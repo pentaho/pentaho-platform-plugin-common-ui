@@ -20,6 +20,7 @@
     <jquery.version>1.12.4</jquery.version>
     <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
     <handlebars.version>4.0.5</handlebars.version>
+    <angular.version>1.5.8</angular.version>
   </properties>
 
   <dependencies>
@@ -60,7 +61,82 @@
       <artifactId>jquery-i18n-properties</artifactId>
       <version>${jquery-i18n-properties.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular</artifactId>
+      <version>${angular.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-animate</artifactId>
+      <version>${angular.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-aria</artifactId>
+      <version>${angular.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-cookies</artifactId>
+      <version>${angular.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-loader</artifactId>
+      <version>${angular.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-message-format</artifactId>
+      <version>${angular.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-messages</artifactId>
+      <version>${angular.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-parse-ext</artifactId>
+      <version>${angular.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-resource</artifactId>
+      <version>${angular.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-route</artifactId>
+      <version>${angular.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-sanitize</artifactId>
+      <version>${angular.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-scenario</artifactId>
+      <version>${angular.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-touch</artifactId>
+      <version>${angular.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-i18n</artifactId>
+      <version>${angular.version}</version>
+    </dependency>
   </dependencies>
 
   <build>

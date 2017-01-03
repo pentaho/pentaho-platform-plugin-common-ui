@@ -30,6 +30,111 @@
       <directory>${webjars.target.directory}/jquery/${jquery.version}/dist</directory>
       <outputDirectory>resources/web/jquery</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/angular/${angular.version}</directory>
+      <outputDirectory>resources/web/angular</outputDirectory>
+      <includes>
+        <include>angular*</include>
+      </includes>
+      <excludes>
+        <exclude>*.gzip</exclude>
+      </excludes>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/angular-animate/${angular.version}</directory>
+      <outputDirectory>resources/web/angular</outputDirectory>
+      <includes>
+        <include>angular*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/angular-aria/${angular.version}</directory>
+      <outputDirectory>resources/web/angular</outputDirectory>
+      <includes>
+        <include>angular*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/angular-cookies/${angular.version}</directory>
+      <outputDirectory>resources/web/angular</outputDirectory>
+      <includes>
+        <include>angular*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/angular-loader/${angular.version}</directory>
+      <outputDirectory>resources/web/angular</outputDirectory>
+      <includes>
+        <include>angular*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/angular-message-format/${angular.version}</directory>
+      <outputDirectory>resources/web/angular</outputDirectory>
+      <includes>
+        <include>angular*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/angular-messages/${angular.version}</directory>
+      <outputDirectory>resources/web/angular</outputDirectory>
+      <includes>
+        <include>angular*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/angular-parse-ext/${angular.version}</directory>
+      <outputDirectory>resources/web/angular</outputDirectory>
+      <includes>
+        <include>angular*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/angular-resource/${angular.version}</directory>
+      <outputDirectory>resources/web/angular</outputDirectory>
+      <includes>
+        <include>angular*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/angular-route/${angular.version}</directory>
+      <outputDirectory>resources/web/angular</outputDirectory>
+      <includes>
+        <include>angular*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/angular-sanitize/${angular.version}</directory>
+      <outputDirectory>resources/web/angular</outputDirectory>
+      <includes>
+        <include>angular*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/angular-scenario/${angular.version}</directory>
+      <outputDirectory>resources/web/angular</outputDirectory>
+      <includes>
+        <include>angular*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/angular-touch/${angular.version}</directory>
+      <outputDirectory>resources/web/angular</outputDirectory>
+      <includes>
+        <include>angular*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/angular-i18n/${angular.version}</directory>
+      <outputDirectory>resources/web/angular/i18n</outputDirectory>
+      <includes>
+        <include>angular*</include>
+      </includes>
+    </fileSet>
+
+
+
+
   </fileSets>
 
   <files>
