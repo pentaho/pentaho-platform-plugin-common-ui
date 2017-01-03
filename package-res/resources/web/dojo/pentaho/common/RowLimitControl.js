@@ -253,6 +253,11 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/ValidationTextBox
             _setRowsNumberInputDisabled: function (isDisabled) {
               this.rowsNumberInput.set('disabled', isDisabled);
               this.rowsNumberInput.set('readonly', isDisabled);
+              if(isDisabled) {
+                $(".rl_rowsNumberInput").hide();
+              } else {
+                $(".rl_rowsNumberInput").show();
+              }
             },
 
             _setRowLimitRestrictionDisabled: function (isDisabled) {
