@@ -194,13 +194,13 @@
 
   requirePaths["common-ui/properties-parser"] = basePath + "/angular-translate/properties-parser";
 
-  requirePaths["common-ui/angular-translate"] = basePath + "/angular-translate/angular-translate" + minSuffix;
+  requirePaths["common-ui/angular-translate"] = basePath + "/angular-translate/angular-translate";
   requireShim ["common-ui/angular-translate"] = ["pentaho/shim/es5", "common-ui/angular"];
 
-  requirePaths["common-ui/angular-translate-loader-partial"] = basePath + "/angular-translate/angular-translate-loader-partial" + minSuffix;
+  requirePaths["common-ui/angular-translate-loader-partial"] = basePath + "/angular-translate/angular-translate-loader-partial";
   requireShim ["common-ui/angular-translate-loader-partial"] = ["common-ui/angular-translate"];
 
-  requirePaths["common-ui/angular-translate-loader-static"] = basePath + "/angular-translate/angular-translate-loader-static" + minSuffix;
+  requirePaths["common-ui/angular-translate-loader-static"] = basePath + "/angular-translate/angular-translate-loader-static";
   requireShim ["common-ui/angular-translate-loader-static"] = ["common-ui/angular-translate"];
 
   requirePaths["common-ui/angular-ui-bootstrap"] = basePath + "/bootstrap/ui-bootstrap-tpls-0.6.0.min";

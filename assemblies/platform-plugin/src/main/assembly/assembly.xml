@@ -154,12 +154,24 @@
     <!-- GWT -->
     <dependencySet>
       <includes>
-        <include>
-          org.pentaho:pentaho-platform-plugin-common-ui-impl-gwt:zip
-        </include>
+        <include>org.pentaho:pentaho-platform-plugin-common-ui-impl-gwt:zip</include>
       </includes>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <unpack>true</unpack>
+    </dependencySet>
+
+    <dependencySet>
+      <includes>
+        <include>angular-translate:angular-translate</include>
+      </includes>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <unpack>true</unpack>
+      <unpackOptions>
+        <includes>
+          <include>angular*</include>
+        </includes>
+      </unpackOptions>
+      <outputDirectory>resources/web/angular-translate</outputDirectory>
     </dependencySet>
 
 
