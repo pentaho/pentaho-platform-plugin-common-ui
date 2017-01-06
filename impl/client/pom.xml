@@ -11,7 +11,45 @@
 
   <artifactId>pentaho-platform-plugin-common-ui-impl-client</artifactId>
 
+
+  <properties>
+    <build.javascriptReportDirectory>${project.build.directory}/js-reports</build.javascriptReportDirectory>
+    <dojo.version>1.9.2</dojo.version>
+
+    <js.project.list>dojo,dijit</js.project.list>
+<!--    <karma.file.config>karma.conf.js</karma.file.config> -->
+
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.webjars.bower</groupId>
+      <artifactId>dojo</artifactId>
+      <version>${dojo.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.bower</groupId>
+      <artifactId>dijit</artifactId>
+      <version>${dojo.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
   <build>
+    <!-- TODO: This test resources declaration shouldn't be needed -->
+    <testResources>
+      <testResource>
+        <targetPath>${project.build.directory}</targetPath>
+        <filtering>true</filtering>
+        <directory>${build.javascriptTestConfigDirectory}</directory>
+        <includes>
+          <include>*</include>
+        </includes>
+      </testResource>
+    </testResources>
+
 
     <plugins>
       <plugin>
@@ -35,6 +73,36 @@
           </execution>
         </executions>
       </plugin>
+
+      <!-- TODO: This plugin declaration shouldn't be needed -->
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>javascript-test_npm-install</id>
+            <phase>${javascript-test_npm-install-phase}</phase>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>install</arguments>
+              <workingDirectory>${frontend-maven-plugin.installDirectory}</workingDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>javascript-test_karma</id>
+            <phase>${javascript-test_karma-phase}</phase>
+            <goals>
+              <goal>karma</goal>
+            </goals>
+            <configuration>
+              <karmaConfPath>${project.build.directory}/${karma.file.config}</karmaConfPath>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
 
     </plugins>
   </build>
