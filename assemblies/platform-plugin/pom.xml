@@ -42,6 +42,12 @@
       <type>zip</type>
     </dependency>
     <dependency>
+      <groupId>org.pentaho</groupId>
+      <artifactId>pentaho-platform-plugin-common-ui-impl-client</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>jquery</artifactId>
       <version>${jquery.version}</version>

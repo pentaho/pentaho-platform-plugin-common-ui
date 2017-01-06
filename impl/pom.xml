@@ -16,6 +16,7 @@
   <modules>
     <module>server</module>
     <module>gwt</module>
+    <module>client</module>
   </modules>
 
 

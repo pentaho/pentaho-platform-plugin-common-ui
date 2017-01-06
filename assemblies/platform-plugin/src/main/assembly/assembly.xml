@@ -174,6 +174,15 @@
       <outputDirectory>resources/web/angular-translate</outputDirectory>
     </dependencySet>
 
+    <dependencySet>
+      <includes>
+        <include>org.pentaho:pentaho-platform-plugin-common-ui-impl-client</include>
+      </includes>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <unpack>true</unpack>
+      <outputDirectory>resources</outputDirectory>
+    </dependencySet>
+
 
     <!-- Server side dependencies -->
     <dependencySet>
