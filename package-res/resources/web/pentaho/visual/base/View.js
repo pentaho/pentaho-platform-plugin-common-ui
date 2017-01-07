@@ -80,8 +80,9 @@ define([
      * @description Initializes a `View` instance.
      * @param {!DOMElement} domContainer - The container element.
      * @param {!pentaho.visual.base.Model} model - The visualization model.
+     * @param {state} model - The initial state of the view.
      */
-    constructor: function(domContainer, model) {
+    constructor: function(domContainer, model, state) {
       if(!domContainer) throw error.argRequired("domContainer");
       if(!model) throw error.argRequired("model");
 
@@ -102,6 +103,15 @@ define([
        * @private
        */
       this.__model = model;
+
+      /**
+       * The state of the view.
+       *
+       * @type {object}
+       * @readOnly
+       * @private
+       */
+      this.__state = state;
 
       /**
        * The promise for the completion of the current update operation, if any; or `null`.
@@ -972,6 +982,26 @@ define([
      * @see pentaho.visual.base.View#_updateAll
      */
     // endregion
+  })
+  .implement(/** @lends pentaho.visual.base.View# */{
+
+    /**
+     * Gets the state of the view as a plain object.
+     *
+     * @return {object}
+     */
+    toJSON: function() {
+      return this.__state || null;
+    },
+
+    /**
+     * Gets the state of the view.
+     *
+     * @return {object}
+     */
+    getState: function() {
+      return this.toJSON();
+    }
   });
 
   /**
