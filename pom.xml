@@ -29,6 +29,7 @@
 
   <properties>
     <dojo.version>1.9.2</dojo.version>
+    <pentaho-modeler.version>${project.version}</pentaho-modeler.version>
   </properties>
 
   <dependencyManagement>

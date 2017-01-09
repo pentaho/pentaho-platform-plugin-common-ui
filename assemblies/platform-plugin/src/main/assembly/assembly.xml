@@ -207,12 +207,9 @@
     <!-- Server side dependencies -->
     <dependencySet>
       <includes>
-        <include>
-          org.pentaho:pentaho-platform-plugin-common-ui-impl-server
-        </include>
-        <include>
-          net.sf.flexjson:flexjson
-        </include>
+        <include>org.pentaho:pentaho-platform-plugin-common-ui-impl-server</include>
+        <include>net.sf.flexjson:flexjson</include>
+        <include>pentaho:pentaho-modeler</include>
       </includes>
       <outputDirectory>/lib</outputDirectory>
       <useTransitiveDependencies>false</useTransitiveDependencies>

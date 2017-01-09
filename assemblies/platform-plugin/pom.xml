@@ -14,7 +14,6 @@
 
   <properties>
     <flexjson.version>2.1</flexjson.version>
-    <pentaho-modeler.version>${project.version}</pentaho-modeler.version>
     <prepared.assembly.directory>${project.build.directory}/${project.artifactId}-${project.version}</prepared.assembly.directory>
     <webjars.target.directory>${prepared.assembly.directory}/webjars/META-INF/resources/webjars</webjars.target.directory>
     <overwrite.directory>${prepared.assembly.directory}/overwrite</overwrite.directory>
@@ -37,6 +36,18 @@
       <artifactId>flexjson</artifactId>
       <version>${flexjson.version}</version>
     </dependency>
+    <dependency>
+      <groupId>pentaho</groupId>
+      <artifactId>pentaho-modeler</artifactId>
+      <version>${pentaho-modeler.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
     <dependency>
       <groupId>org.pentaho</groupId>
       <artifactId>pentaho-platform-plugin-common-ui-impl-gwt</artifactId>
