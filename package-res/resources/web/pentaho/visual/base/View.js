@@ -80,7 +80,7 @@ define([
      * @description Initializes a `View` instance.
      * @param {!DOMElement} domContainer - The container element.
      * @param {!pentaho.visual.base.Model} model - The visualization model.
-     * @param {object} state - The initial state of the view.
+     * @param {Object} [state] - The initial state.
      */
     constructor: function(domContainer, model, state) {
       if(!domContainer) throw error.argRequired("domContainer");
@@ -103,15 +103,6 @@ define([
        * @private
        */
       this.__model = model;
-
-      /**
-       * The state of the view.
-       *
-       * @type {object}
-       * @readOnly
-       * @private
-       */
-      this.__state = state;
 
       /**
        * The promise for the completion of the current update operation, if any; or `null`.
@@ -986,21 +977,33 @@ define([
   .implement(/** @lends pentaho.visual.base.View# */{
 
     /**
-     * Gets the state of the view as a plain object.
+     * Gets the state of the view as a plain object, if any.
      *
-     * @return {object}
+     * This method simply calls the [getState]{@link pentaho.visual.base.View#getState} method
+     * and provides support for `JSON.stringify`.
+     *
+     * @return {Object} The state of the view, or `null`, if none.
+     *
+     * @see pentaho.visual.base.View#getState
      */
     toJSON: function() {
-      return this.__state || null;
+      return this.getState();
     },
 
     /**
-     * Gets the state of the view.
+     * Gets the state of the view as a plain object, if any.
      *
-     * @return {object}
+     * The object returned by this method can later be given to the view's constructor, in argument `state`.
+     *
+     * The returned object must be JSON serializable (must have no cycles, and can only contain numbers, booleans, strings, plain objects and arrays).
+     *
+     * This implementation simply returns `null`. Override this method to expose a view's specific state. When overriding, take care to respect a state object that may be returned by the base class implementation.
+     *
+     * @return {Object} The state of the view, or `null`, if none.
+     * @see pentaho.visual.base.View#toJSON
      */
     getState: function() {
-      return this.toJSON();
+      return null;
     }
   });
 

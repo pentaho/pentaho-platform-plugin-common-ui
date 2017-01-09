@@ -1184,12 +1184,12 @@ define([
         expect(view.toJSON()).toBe(null);
       });
 
-      it("should return the state of the view", function() {
+      it("should return null if the the view does not manage state", function() {
 
         var state = {};
         var view = new DerivedView(document.createElement("div"), model, state);
 
-        expect(view.toJSON()).toBe(state);
+        expect(view.toJSON()).toBe(null);
       });
 
     }); // #toJSON
@@ -1208,12 +1208,12 @@ define([
         expect(view.getState()).toBe(null);
       });
 
-      it("should return the state of the view", function() {
+      it("should return null if the view does not manage state", function() {
 
         var state = {};
         var view = new DerivedView(document.createElement("div"), model, state);
 
-        expect(view.getState()).toBe(state);
+        expect(view.getState()).toBe(null);
       });
 
     }); // #getState
