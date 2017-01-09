@@ -14,10 +14,8 @@
 
   <properties>
     <build.javascriptReportDirectory>${project.build.directory}/js-reports</build.javascriptReportDirectory>
-    <dojo.version>1.9.2</dojo.version>
 
     <js.project.list>dojo,dijit</js.project.list>
-<!--    <karma.file.config>karma.conf.js</karma.file.config> -->
 
   </properties>
 
@@ -25,13 +23,11 @@
     <dependency>
       <groupId>org.webjars.bower</groupId>
       <artifactId>dojo</artifactId>
-      <version>${dojo.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars.bower</groupId>
       <artifactId>dijit</artifactId>
-      <version>${dojo.version}</version>
       <scope>test</scope>
     </dependency>
 

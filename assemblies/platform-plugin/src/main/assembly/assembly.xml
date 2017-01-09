@@ -7,25 +7,19 @@
   </formats>
   <includeBaseDirectory>false</includeBaseDirectory>
 
-  <!--
-  <fileSets>
-    <fileSet>
-      <directory>${gwt.outputDirectory}/Themes/themes</directory>
-      <outputDirectory>/resources/themes</outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>${gwt.outputDirectory}/formatter</directory>
-      <outputDirectory>/resources/web/formatter</outputDirectory>
-    </fileSet>
-
-  </fileSets>
--->
 
   <fileSets>
     <fileSet>
       <directory>${basedir}/src/main/resources</directory>
       <outputDirectory>.</outputDirectory>
     </fileSet>
+
+    <!-- Fetch the overwrites from other dependencies first to make sure they are overwritten. -->
+    <fileSet>
+      <directory>${overwrite.directory}</directory>
+      <outputDirectory>resources</outputDirectory>
+    </fileSet>
+
     <fileSet>
       <directory>${webjars.target.directory}/jquery/${jquery.version}/dist</directory>
       <outputDirectory>resources/web/jquery</outputDirectory>
@@ -131,8 +125,20 @@
         <include>angular*</include>
       </includes>
     </fileSet>
-
-
+    <fileSet>
+      <directory>${webjars.target.directory}/dojo/${dojo.version}</directory>
+      <outputDirectory>resources/web/dojo/dojo</outputDirectory>
+      <excludes>
+        <exclude>tests/**</exclude>
+      </excludes>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/dijit/${dojo.version}</directory>
+      <outputDirectory>resources/web/dojo/dijit</outputDirectory>
+      <excludes>
+        <exclude>tests/**</exclude>
+      </excludes>
+    </fileSet>
 
 
   </fileSets>

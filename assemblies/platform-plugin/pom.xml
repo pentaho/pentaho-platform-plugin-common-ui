@@ -16,6 +16,7 @@
     <flexjson.version>2.1</flexjson.version>
     <pentaho-modeler.version>${project.version}</pentaho-modeler.version>
     <webjars.target.directory>${project.build.directory}/${project.artifactId}-${project.version}/webjars/META-INF/resources/webjars</webjars.target.directory>
+    <overwrite.directory>${project.build.directory}/${artifactId}-${project.version}/overwrite</overwrite.directory>
 
     <jquery.version>1.12.4</jquery.version>
     <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
@@ -149,6 +150,14 @@
       <artifactId>angular-translate</artifactId>
       <version>${angular-translate.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.webjars.bower</groupId>
+      <artifactId>dojo</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.bower</groupId>
+      <artifactId>dijit</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -166,7 +175,7 @@
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>src/main/assembly/unpackWebjarsAssembly.xml</descriptor>
+                <descriptor>src/main/assembly/prepareAssembly.xml</descriptor>
               </descriptors>
               <appendAssemblyId>false</appendAssemblyId>
             </configuration>

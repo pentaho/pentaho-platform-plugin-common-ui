@@ -27,5 +27,24 @@
     <url>https://github.com/pentaho/pentaho-platform-plugin-common-ui</url>
   </scm>
 
+  <properties>
+    <dojo.version>1.9.2</dojo.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.webjars.bower</groupId>
+        <artifactId>dojo</artifactId>
+        <version>${dojo.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.bower</groupId>
+        <artifactId>dijit</artifactId>
+        <version>${dojo.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
 
 </project>
