@@ -195,6 +195,11 @@
       </includes>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <unpack>true</unpack>
+      <unpackOptions>
+        <excludes>
+          <exclude>META-INF/**</exclude>
+        </excludes>
+      </unpackOptions>
       <outputDirectory>resources</outputDirectory>
     </dependencySet>
 

@@ -13,7 +13,7 @@
 
 
   <properties>
-    <build.javascriptReportDirectory>${project.build.directory}/js-reports</build.javascriptReportDirectory>
+    <build.javascriptReportDirectory>target/js-reports</build.javascriptReportDirectory>
 
     <js.project.list>dojo,dijit</js.project.list>
 
