@@ -339,7 +339,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         panel.parameterChanged(param, name, value);
         expect(panel.parametersChanged).toBeTruthy();
         expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
-        expect(parameterChangedSpy).toHaveBeenCalledWith(name, value);
+        expect(parameterChangedSpy).toHaveBeenCalledWith(name, value, undefined);
       });
 
       it("parameterChanged only specific callback should be called", function() {
@@ -357,7 +357,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         panel.parameterChanged(param, name, value);
         expect(panel.parametersChanged).toBeTruthy();
         expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
-        expect(parameterChangedSpySpecific).toHaveBeenCalledWith(name, value);
+        expect(parameterChangedSpySpecific).toHaveBeenCalledWith(name, value, undefined);
         expect(parameterChangedSpyGeneric).not.toHaveBeenCalled();
       });
 

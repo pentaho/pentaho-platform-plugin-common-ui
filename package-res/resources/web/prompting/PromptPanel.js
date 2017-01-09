@@ -821,15 +821,16 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * @param {Parameter} param
          * @param {String} name
          * @param {Object} value
+         * @param {String} widgetId - dijit widget id
          */
-        parameterChanged: function (param, name, value) {
+        parameterChanged: function (param, name, value, widgetId) {
           if (this.onParameterChanged) {
             var paramCallback = this.onParameterChanged[name] ?
                   this.onParameterChanged[name] :
                   this.onParameterChanged[''];
             if (paramCallback) {
               if (typeof paramCallback === 'function') {
-                paramCallback(name, value);
+                paramCallback(name, value, widgetId);
               } else {
                 Logger.warn("The parameterChanged callback for '" + name + "' is not a function");
               }
