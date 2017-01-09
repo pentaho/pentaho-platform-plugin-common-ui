@@ -1216,7 +1216,7 @@ define([
         expect(view.getState()).toBe(state);
       });
 
-    }); // #toJSON
+    }); // #getState
 
     describe("getAsync(modelType)", function() {
       it("should be defined", function() {

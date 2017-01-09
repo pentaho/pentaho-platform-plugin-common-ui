@@ -80,7 +80,7 @@ define([
      * @description Initializes a `View` instance.
      * @param {!DOMElement} domContainer - The container element.
      * @param {!pentaho.visual.base.Model} model - The visualization model.
-     * @param {state} model - The initial state of the view.
+     * @param {object} state - The initial state of the view.
      */
     constructor: function(domContainer, model, state) {
       if(!domContainer) throw error.argRequired("domContainer");
