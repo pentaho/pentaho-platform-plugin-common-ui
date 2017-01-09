@@ -200,7 +200,7 @@
   requirePaths["common-ui/angular-translate-loader-partial"] = basePath + "/angular-translate/angular-translate-loader-partial";
   requireShim ["common-ui/angular-translate-loader-partial"] = ["common-ui/angular-translate"];
 
-  requirePaths["common-ui/angular-translate-loader-static"] = basePath + "/angular-translate/angular-translate-loader-static";
+  requirePaths["common-ui/angular-translate-loader-static"] = basePath + "/angular-translate/angular-translate-loader-static-files";
   requireShim ["common-ui/angular-translate-loader-static"] = ["common-ui/angular-translate"];
 
   requirePaths["common-ui/angular-ui-bootstrap"] = basePath + "/bootstrap/ui-bootstrap-tpls-0.6.0.min";
