@@ -15,8 +15,9 @@
   <properties>
     <flexjson.version>2.1</flexjson.version>
     <pentaho-modeler.version>${project.version}</pentaho-modeler.version>
-    <webjars.target.directory>${project.build.directory}/${project.artifactId}-${project.version}/webjars/META-INF/resources/webjars</webjars.target.directory>
-    <overwrite.directory>${project.build.directory}/${artifactId}-${project.version}/overwrite</overwrite.directory>
+    <prepared.assembly.directory>${project.build.directory}/${project.artifactId}-${project.version}</prepared.assembly.directory>
+    <webjars.target.directory>${prepared.assembly.directory}/webjars/META-INF/resources/webjars</webjars.target.directory>
+    <overwrite.directory>${prepared.assembly.directory}/overwrite</overwrite.directory>
 
     <jquery.version>1.12.4</jquery.version>
     <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
@@ -157,6 +158,17 @@
     <dependency>
       <groupId>org.webjars.bower</groupId>
       <artifactId>dijit</artifactId>
+    </dependency>
+    <!-- Fetching dojox from a source artifact because dojox's webjar does not include dojox/app, dojox/calendar and
+      dojox/dgauges. The reason for this is that the webjar deployer at http://www.webjars.org/bower is unable to handle
+      git submodules.
+    -->
+    <dependency>
+      <groupId>org.dojotoolkit.dojo</groupId>
+      <artifactId>dojo-release</artifactId>
+      <version>${dojo.version}</version>
+      <classifier>src</classifier>
+      <type>zip</type>
     </dependency>
   </dependencies>
 

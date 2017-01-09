@@ -139,6 +139,15 @@
         <exclude>tests/**</exclude>
       </excludes>
     </fileSet>
+    <fileSet>
+      <directory>${prepared.assembly.directory}/dojox/dojo-release-${dojo.version}-src/dojox</directory>
+      <outputDirectory>resources/web/dojo/dojox</outputDirectory>
+      <excludes>
+        <exclude>*/tests/**</exclude>
+        <exclude>*/*/tests/**</exclude>
+        <exclude>.gitmodules</exclude>
+      </excludes>
+    </fileSet>
 
 
   </fileSets>

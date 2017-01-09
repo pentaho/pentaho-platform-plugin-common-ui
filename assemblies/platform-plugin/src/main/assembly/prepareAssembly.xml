@@ -9,16 +9,7 @@
 
   <dependencySets>
 
-    <dependencySet>
-      <includes>
-        <include>
-          org.webjars.*
-        </include>
-      </includes>
-      <useTransitiveDependencies>false</useTransitiveDependencies>
-      <unpack>true</unpack>
-      <outputDirectory>webjars</outputDirectory>
-    </dependencySet>
+
 
     <!-- Common-ui needs to overwrites some files. Because of maven assembly limitations in overriding files between
     type of sets in an assembly descriptor we are unpacking those files into a temporary folder to later be used in the
@@ -37,6 +28,25 @@
       <outputDirectory>overwrite</outputDirectory>
     </dependencySet>
 
+    <dependencySet>
+      <includes>
+        <include>org.dojotoolkit.dojo:dojo-release:zip</include>
+      </includes>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <unpack>true</unpack>
+      <outputDirectory>dojox</outputDirectory>
+    </dependencySet>
+
+    <dependencySet>
+      <includes>
+        <include>
+          org.webjars.*
+        </include>
+      </includes>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <unpack>true</unpack>
+      <outputDirectory>webjars</outputDirectory>
+    </dependencySet>
 
   </dependencySets>
 
