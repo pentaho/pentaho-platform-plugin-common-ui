@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([ "common-ui/vizapi/VizController" ], function() {
+define([
+  "common-ui/vizapi/VizController"
+], function() {
 
   describe("VizController", function() {
 

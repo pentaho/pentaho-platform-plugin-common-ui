@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "pentaho/shim/es6-promise"
+], function(Promise) {
 
   "use strict";
 
@@ -30,7 +32,7 @@ define(function() {
    * Creates a function that adapts a given promise-based async test
    * to a callback-based Jasmine-style async test.
    *
-   * @param {function(any) : ?Promise} test A promise-based async test function.
+   * @param {function(any) : ?Promise} asyncTest - A promise-based async test function.
    *
    * @return {function(function)} A Jasmine-style async test function.
    */
@@ -53,7 +55,8 @@ define(function() {
    * A Jasmine `it` function replacement that supports promise-based test functions,
    * besides Jasmine-style test functions.
    *
-   * @param {function(any) : ?Promise} test A promise-based async test function.
+   * @param {string} description -  The test description.
+   * @param {function(any) : ?Promise} test - A promise-based async test function.
    *
    * @return {function(function)} A Jasmine-style async test function.
    */
@@ -65,8 +68,8 @@ define(function() {
    * Creates a promise that is resolved by waiting for all resulting promises
    * of calling the given _modal_ test function with each of the given modes.
    *
-   * @param {Array} modes An array of modes. Modes can be anything.
-   * @param {function(any) : ?Promise} modalTest A function that when given a mode returns a promise.
+   * @param {Array} modes  - An array of modes. Modes can be anything.
+   * @param {function(any) : ?Promise} modalTest - A function that when given a mode returns a promise.
    *
    * @return {Promise} The overall promise.
    */
@@ -83,10 +86,10 @@ define(function() {
    * Jasmine helper that _expects_ that a given async function
    * is rejected with a given type of error.
    *
-   * @param {function() : ?Promise} asyncTest The async function that should throw or return a rejected promise
-   *  with a given error type.
+   * @param {function() : ?Promise} asyncTest - The async function that should throw or return a rejected promise
+   *                                with a given error type.
    * @param {any|Error|JasmineAsymmetricEqualityTester} [error] The error that is the cause for the rejection.
-   *  When unspecified, rejection of any type is still asserted.
+   *                                                    When unspecified, rejection of any type is still asserted.
    */
   function expectToRejectWith(asyncTest, error) {
 
@@ -101,4 +104,3 @@ define(function() {
         });
   }
 });
-

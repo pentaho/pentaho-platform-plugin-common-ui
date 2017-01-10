@@ -13,7 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(["pentaho/service"], function(singletonService) {
+define([
+  "pentaho/service"
+], function(singletonService) {
+
+  "use strict";
+
+  /* global beforeEach: false, describe: false, it:false, expect:false, Promise:false */
 
   describe("'service' singleton -", function() {
     it("is defined", function() {

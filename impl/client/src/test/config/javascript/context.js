@@ -11,6 +11,9 @@ var requireMap     = requireCfg.map;
 
 requireCfg.baseUrl = "/base";
 
+// Javascript Tests source files
+requirePaths["tests"] = "src/test/javascript";
+
 requirePaths["dojo"] = depWebJars + "/dojo/${dojo.version}";
 requirePaths["dijit"] = depWebJars + "/dijit/${dojo.version}";
 requirePaths["dojox"] = depDir + "/dojo-release-${dojo.version}-src/dojox";
@@ -36,6 +39,7 @@ requirePaths["dijit/_HasDropDown"] = dojoOverrides + "dijit/_HasDropDown";
 requirePaths["dijit/_CssStateMixin"] = dojoOverrides + "dijit/_CssStateMixin";
 
 requirePaths["common-ui"] = basePath;
+requirePaths["pentaho"]   = basePath + "/pentaho";
 requirePaths["common-data"] = basePath + "/dataapi";
 requirePaths["common-repo"] = basePath + "/repo";
 requirePaths["pentaho/common"] = basePath + "/dojo/pentaho/common";
@@ -49,7 +53,6 @@ requireShim["common-ui/jquery-clean"] = {
 requirePaths["common-ui/underscore"] = basePath + "/underscore/underscore";
 
 requirePaths["text"] = basePath + "/util/require-text/text";
-
 
 requireCfg.deps = tests;
 

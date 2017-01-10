@@ -19,11 +19,13 @@ module.exports = function(config) {
             {pattern: '${build.javascriptTestOutputDirectory}/**/*.+(js|css|html)', included: false},
             {pattern: '${build.javascriptTestSourceDirectory}/**/*', included: false},
 
+            // test(not working) {pattern: '${build.javascriptTestSourceDirectory}/**/*.+js', included: false},
+
             '${build.dependenciesDirectory}/cdf/cdf-require-js-cfg.js',
 
             //{pattern: '${basedir}/src/main/resources/i18n/**/*.properties', included: false},
 
-            //'${basedir}/src/test/config/javascript/require-test.js',
+            '${build.javascriptTestConfigDirectory}/require-test.js',
             '${project.build.directory}/context.js'
         ],
 
