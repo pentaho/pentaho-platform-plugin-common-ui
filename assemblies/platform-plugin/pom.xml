@@ -40,6 +40,13 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.pentaho</groupId>
+      <artifactId>pentaho-platform-plugin-common-ui-impl-server</artifactId>
+      <version>${project.version}</version>
+      <classifier>sources</classifier>
+    </dependency>
+
+    <dependency>
       <groupId>net.sf.flexjson</groupId>
       <artifactId>flexjson</artifactId>
       <version>${flexjson.version}</version>
@@ -242,6 +249,23 @@
 
               <appendAssemblyId>false</appendAssemblyId>
               <classifier>zip</classifier>
+            </configuration>
+          </execution>
+
+          <!-- And also... Copy the java sources -->
+          <execution>
+            <id>bundle-common-ui-platform-plugin-sources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/assembly/assembly-sources.xml</descriptor>
+              </descriptors>
+
+              <appendAssemblyId>true</appendAssemblyId>
+              <classifier>sources</classifier>
             </configuration>
           </execution>
 
