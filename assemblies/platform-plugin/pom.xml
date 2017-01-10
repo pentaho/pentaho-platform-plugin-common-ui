@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <groupId>org.pentaho</groupId>
@@ -9,14 +9,23 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>pentaho-common-ui-assemblies-platform-plugin</artifactId>
+  <groupId>pentaho</groupId>
+  <artifactId>common-ui</artifactId>
   <packaging>pom</packaging>
 
   <properties>
-    <flexjson.version>2.1</flexjson.version>
-    <prepared.assembly.directory>${project.build.directory}/${project.artifactId}-${project.version}</prepared.assembly.directory>
+    <prepared.assembly.name>extrated-resources</prepared.assembly.name>
+
+    <prepared.assembly.directory>${project.build.directory}/${prepared.assembly.name}</prepared.assembly.directory>
     <webjars.target.directory>${prepared.assembly.directory}/webjars/META-INF/resources/webjars</webjars.target.directory>
-    <overwrite.directory>${prepared.assembly.directory}/overwrite</overwrite.directory>
+    <common-ui-impl-client.directory>${prepared.assembly.directory}/common-ui-impl-client</common-ui-impl-client.directory>
+
+    <js.assembly.name>${project.artifactId}-${project.version}-js</js.assembly.name>
+    <js.assembly.directory>${project.build.directory}/${js.assembly.name}</js.assembly.directory>
+
+    <prepared-folder.name>extrated-resources</prepared-folder.name>
+
+    <flexjson.version>2.1</flexjson.version>
 
     <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
     <handlebars.version>4.0.5</handlebars.version>
@@ -179,10 +188,13 @@
 
   <build>
     <plugins>
+
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>${maven-assembly-plugin.version}</version>
+
         <executions>
+
           <!-- First unpack all webjar dependencies locally so that we can pick what to copy and where to copy it for the final assembly -->
           <execution>
             <id>unpack-webjars-dependencies</id>
@@ -195,10 +207,28 @@
                 <descriptor>src/main/assembly/prepareAssembly.xml</descriptor>
               </descriptors>
               <appendAssemblyId>false</appendAssemblyId>
+              <finalName>${prepared.assembly.name}</finalName>
             </configuration>
           </execution>
 
-          <!-- Create the platform plugin zip artifact -->
+          <!-- Second, create the platform plugin js zip artifact -->
+          <execution>
+            <id>bundle-common-ui-platform-plugin-js</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/assembly/assembly-js.xml</descriptor>
+              </descriptors>
+
+              <appendAssemblyId>true</appendAssemblyId>
+              <classifier>js</classifier>
+            </configuration>
+          </execution>
+
+          <!-- Last, create the platform plugin zip artifact -->
           <execution>
             <id>bundle-common-ui-platform-plugin</id>
             <phase>package</phase>
@@ -209,10 +239,14 @@
               <descriptors>
                 <descriptor>src/main/assembly/assembly.xml</descriptor>
               </descriptors>
+
               <appendAssemblyId>false</appendAssemblyId>
+              <classifier>zip</classifier>
             </configuration>
           </execution>
+
         </executions>
+
       </plugin>
 
     </plugins>

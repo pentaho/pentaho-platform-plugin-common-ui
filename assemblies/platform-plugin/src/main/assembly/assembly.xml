@@ -1,168 +1,28 @@
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3 http://maven.apache.org/xsd/assembly-1.1.3.xsd">
+
   <id>common-ui-platform-plugin-assembly</id>
+
   <formats>
     <format>zip</format>
   </formats>
+
   <includeBaseDirectory>false</includeBaseDirectory>
 
-
   <fileSets>
+
     <fileSet>
       <directory>${basedir}/src/main/resources</directory>
       <outputDirectory>.</outputDirectory>
     </fileSet>
 
-    <!-- Fetch the overwrites from other dependencies first to make sure they are overwritten. -->
     <fileSet>
-      <directory>${overwrite.directory}</directory>
-      <outputDirectory>resources</outputDirectory>
+      <directory>${js.assembly.directory}/common-ui</directory>
+      <outputDirectory>resources/web</outputDirectory>
     </fileSet>
-
-    <fileSet>
-      <directory>${webjars.target.directory}/jquery/${jquery.version}/dist</directory>
-      <outputDirectory>resources/web/jquery</outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/angular/${angular.version}</directory>
-      <outputDirectory>resources/web/angular</outputDirectory>
-      <includes>
-        <include>angular*</include>
-      </includes>
-      <excludes>
-        <exclude>*.gzip</exclude>
-      </excludes>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/angular-animate/${angular.version}</directory>
-      <outputDirectory>resources/web/angular</outputDirectory>
-      <includes>
-        <include>angular*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/angular-aria/${angular.version}</directory>
-      <outputDirectory>resources/web/angular</outputDirectory>
-      <includes>
-        <include>angular*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/angular-cookies/${angular.version}</directory>
-      <outputDirectory>resources/web/angular</outputDirectory>
-      <includes>
-        <include>angular*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/angular-loader/${angular.version}</directory>
-      <outputDirectory>resources/web/angular</outputDirectory>
-      <includes>
-        <include>angular*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/angular-message-format/${angular.version}</directory>
-      <outputDirectory>resources/web/angular</outputDirectory>
-      <includes>
-        <include>angular*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/angular-messages/${angular.version}</directory>
-      <outputDirectory>resources/web/angular</outputDirectory>
-      <includes>
-        <include>angular*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/angular-parse-ext/${angular.version}</directory>
-      <outputDirectory>resources/web/angular</outputDirectory>
-      <includes>
-        <include>angular*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/angular-resource/${angular.version}</directory>
-      <outputDirectory>resources/web/angular</outputDirectory>
-      <includes>
-        <include>angular*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/angular-route/${angular.version}</directory>
-      <outputDirectory>resources/web/angular</outputDirectory>
-      <includes>
-        <include>angular*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/angular-sanitize/${angular.version}</directory>
-      <outputDirectory>resources/web/angular</outputDirectory>
-      <includes>
-        <include>angular*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/angular-scenario/${angular.version}</directory>
-      <outputDirectory>resources/web/angular</outputDirectory>
-      <includes>
-        <include>angular*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/angular-touch/${angular.version}</directory>
-      <outputDirectory>resources/web/angular</outputDirectory>
-      <includes>
-        <include>angular*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/angular-i18n/${angular.version}</directory>
-      <outputDirectory>resources/web/angular/i18n</outputDirectory>
-      <includes>
-        <include>angular*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/dojo/${dojo.version}</directory>
-      <outputDirectory>resources/web/dojo/dojo</outputDirectory>
-      <excludes>
-        <exclude>tests/**</exclude>
-      </excludes>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/dijit/${dojo.version}</directory>
-      <outputDirectory>resources/web/dojo/dijit</outputDirectory>
-      <excludes>
-        <exclude>tests/**</exclude>
-      </excludes>
-    </fileSet>
-    <fileSet>
-      <directory>${prepared.assembly.directory}/dojox/dojo-release-${dojo.version}-src/dojox</directory>
-      <outputDirectory>resources/web/dojo/dojox</outputDirectory>
-      <excludes>
-        <exclude>*/tests/**</exclude>
-        <exclude>*/*/tests/**</exclude>
-        <exclude>.gitmodules</exclude>
-      </excludes>
-    </fileSet>
-
 
   </fileSets>
-
-  <files>
-    <file>
-      <source>${webjars.target.directory}/jquery-i18n-properties/${jquery-i18n-properties.version}/jquery.i18n.properties-min.js</source>
-      <outputDirectory>resources/web/jquery</outputDirectory>
-    </file>
-    <file>
-      <source>${webjars.target.directory}/handlebars/${handlebars.version}/dist/handlebars.js</source>
-      <destName>handlebars-v4.0.5.js</destName>
-      <outputDirectory>resources/web/handlebars</outputDirectory>
-    </file>
-  </files>
 
   <dependencySets>
 
@@ -188,21 +48,6 @@
       </unpackOptions>
       <outputDirectory>resources/web/angular-translate</outputDirectory>
     </dependencySet>
-
-    <dependencySet>
-      <includes>
-        <include>org.pentaho:pentaho-platform-plugin-common-ui-impl-client</include>
-      </includes>
-      <useTransitiveDependencies>false</useTransitiveDependencies>
-      <unpack>true</unpack>
-      <unpackOptions>
-        <excludes>
-          <exclude>META-INF/**</exclude>
-        </excludes>
-      </unpackOptions>
-      <outputDirectory>resources</outputDirectory>
-    </dependencySet>
-
 
     <!-- Server side dependencies -->
     <dependencySet>

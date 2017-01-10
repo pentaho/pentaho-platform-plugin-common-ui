@@ -9,8 +9,6 @@
 
   <dependencySets>
 
-
-
     <!-- Common-ui needs to overwrites some files. Because of maven assembly limitations in overriding files between
     type of sets in an assembly descriptor we are unpacking those files into a temporary folder to later be used in the
      main assembly descriptor as a file set-->
@@ -20,12 +18,7 @@
       </includes>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <unpack>true</unpack>
-      <unpackOptions>
-        <includes>
-          <include>web/dojo/dijit/**</include>
-        </includes>
-      </unpackOptions>
-      <outputDirectory>overwrite</outputDirectory>
+      <outputDirectory>common-ui-impl-client</outputDirectory>
     </dependencySet>
 
     <dependencySet>
