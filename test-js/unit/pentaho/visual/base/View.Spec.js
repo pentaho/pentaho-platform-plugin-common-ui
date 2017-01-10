@@ -46,7 +46,7 @@ define([
       model = new Model(dataSpec);
     });
 
-    describe("new (domContainer, model)", function() {
+    describe("new (domContainer, model, state)", function() {
 
       it("should throw if invoked with no DOM container", function() {
 
@@ -66,6 +66,13 @@ define([
 
         expect(function() {
           return new View(document.createElement("div"), model);
+        }).not.toThrow();
+      });
+
+      it("should not throw if invoked with both a DOM container, a model, and a state", function() {
+
+        expect(function() {
+          return new View(document.createElement("div"), model, {});
         }).not.toThrow();
       });
     });
@@ -1163,6 +1170,53 @@ define([
         expect(info2).toBe(info);
       });
     }); // #extend
+
+    describe("#toJSON", function() {
+      var DerivedView;
+
+      beforeEach(function() {
+        DerivedView = View.extend({});
+      });
+
+      it("should return null if the view has no state", function() {
+        var view = new DerivedView(document.createElement("div"), model);
+
+        expect(view.toJSON()).toBe(null);
+      });
+
+      it("should return null if the the view does not manage state", function() {
+
+        var state = {};
+        var view = new DerivedView(document.createElement("div"), model, state);
+
+        expect(view.toJSON()).toBe(null);
+      });
+
+    }); // #toJSON
+
+    describe("#getState", function() {
+      var DerivedView;
+
+      beforeEach(function() {
+        DerivedView = View.extend({});
+      });
+
+      it("should return null if the view has no state", function() {
+
+        var view = new DerivedView(document.createElement("div"), model);
+
+        expect(view.getState()).toBe(null);
+      });
+
+      it("should return null if the view does not manage state", function() {
+
+        var state = {};
+        var view = new DerivedView(document.createElement("div"), model, state);
+
+        expect(view.getState()).toBe(null);
+      });
+
+    }); // #getState
 
     describe("getAsync(modelType)", function() {
       it("should be defined", function() {

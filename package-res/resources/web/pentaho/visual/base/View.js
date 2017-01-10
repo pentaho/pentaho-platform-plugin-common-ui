@@ -80,8 +80,9 @@ define([
      * @description Initializes a `View` instance.
      * @param {!DOMElement} domContainer - The container element.
      * @param {!pentaho.visual.base.Model} model - The visualization model.
+     * @param {Object} [state] - The initial state.
      */
-    constructor: function(domContainer, model) {
+    constructor: function(domContainer, model, state) {
       if(!domContainer) throw error.argRequired("domContainer");
       if(!model) throw error.argRequired("model");
 
@@ -972,6 +973,38 @@ define([
      * @see pentaho.visual.base.View#_updateAll
      */
     // endregion
+  })
+  .implement(/** @lends pentaho.visual.base.View# */{
+
+    /**
+     * Gets the state of the view as a plain object, if any.
+     *
+     * This method simply calls the [getState]{@link pentaho.visual.base.View#getState} method
+     * and provides support for `JSON.stringify`.
+     *
+     * @return {Object} The state of the view, or `null`, if none.
+     *
+     * @see pentaho.visual.base.View#getState
+     */
+    toJSON: function() {
+      return this.getState();
+    },
+
+    /**
+     * Gets the state of the view as a plain object, if any.
+     *
+     * The object returned by this method can later be given to the view's constructor, in argument `state`.
+     *
+     * The returned object must be JSON serializable (must have no cycles, and can only contain numbers, booleans, strings, plain objects and arrays).
+     *
+     * This implementation simply returns `null`. Override this method to expose a view's specific state. When overriding, take care to respect a state object that may be returned by the base class implementation.
+     *
+     * @return {Object} The state of the view, or `null`, if none.
+     * @see pentaho.visual.base.View#toJSON
+     */
+    getState: function() {
+      return null;
+    }
   });
 
   /**
