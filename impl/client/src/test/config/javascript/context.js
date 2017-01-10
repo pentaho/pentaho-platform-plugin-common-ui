@@ -77,6 +77,25 @@ requirePaths["common-ui/underscore"] = basePath + "/underscore/underscore";
 requirePaths["json"] = basePath + "/util/require-json/json";
 requirePaths["text"] = basePath + "/util/require-text/text";
 
+// Angular
+requirePaths["common-ui/angular"] = depWebJars + "/angular/${angular.version}/angular";
+requireShim ["common-ui/angular"] = {
+    exports: "angular"
+};
+
+requirePaths["common-ui/angular-resource"] = depWebJars + "/angular-resource/${angular.version}/angular-resource";
+requireShim ["common-ui/angular-resource"] = ["common-ui/angular"];
+
+requirePaths["angular-mocks"] = depWebJars + "/angular-mocks/${angular.version}/angular-mocks";
+requireShim["angular-mocks"] = {deps: ["common-ui/angular-resource"]};
+
+requirePaths["common-ui/angular-ui-bootstrap"] = basePath + "/bootstrap/ui-bootstrap-tpls-0.6.0.min";
+requireShim ["common-ui/angular-ui-bootstrap"] = ["common-ui/angular"];
+
+requirePaths["common-ui/angular-directives"] = basePath + "/angular-directives";
+requireShim ["common-ui/angular-directives"] = ["common-ui/angular-ui-bootstrap"];
+
+
 requireCfg.deps = tests;
 
 function mapTheme(mid, themeRoot, themes) {

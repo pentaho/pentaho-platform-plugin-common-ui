@@ -30,7 +30,6 @@
 
     <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
     <handlebars.version>4.0.5</handlebars.version>
-    <angular.version>1.5.8</angular.version>
     <angular-translate.version>2.2.0-canary-pentaho-modified</angular-translate.version>
   </properties>
 
@@ -99,7 +98,6 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>angular</artifactId>
-      <version>${angular.version}</version>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
@@ -145,7 +143,6 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>angular-resource</artifactId>
-      <version>${angular.version}</version>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>

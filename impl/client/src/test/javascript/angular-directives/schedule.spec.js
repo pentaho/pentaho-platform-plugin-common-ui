@@ -19,7 +19,7 @@ define([
   'angular-mocks',
   'common-ui/angular',
   'common-ui/angular-directives/schedule/scheduleSelector',
-  './commonFiltersMock'
+  './commonFiltersMock.js'
 ], function (angular) {
 
   xdescribe("Schedule Directives", function () {

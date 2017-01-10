@@ -1,7 +1,7 @@
 define([
   'angular-mocks',
   'common-ui/angular',
-  './templateUtil',
+  './templateUtil.js',
   'common-ui/angular-ui-bootstrap',
   'common-ui/angular-directives/recurrence/recurrence'
 ], function (angular, templateUtil) {

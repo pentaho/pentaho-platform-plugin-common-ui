@@ -28,6 +28,7 @@
   </scm>
 
   <properties>
+    <angular.version>1.5.8</angular.version>
     <jquery.version>1.12.4</jquery.version>
     <dojo.version>1.9.2</dojo.version>
     <pentaho-modeler.version>${project.version}</pentaho-modeler.version>
@@ -60,6 +61,16 @@
         <groupId>org.webjars.npm</groupId>
         <artifactId>jquery</artifactId>
         <version>${jquery.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>angular</artifactId>
+        <version>${angular.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>angular-resource</artifactId>
+        <version>${angular.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

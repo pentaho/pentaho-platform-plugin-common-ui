@@ -15,7 +15,7 @@
   <properties>
     <build.javascriptReportDirectory>target/js-reports</build.javascriptReportDirectory>
 
-    <js.project.list>dojo,dijit,jquery,pentaho-cdf-js,dojo-release</js.project.list>
+    <js.project.list>dojo,dijit,jquery,pentaho-cdf-js,dojo-release,angular,angular-mocks,angular-resource</js.project.list>
 
     <pentaho-cdf-plugin.version>${project.version}</pentaho-cdf-plugin.version>
     <!-- <karma.file.config>karma.conf.js</karma.file.config> -->
@@ -60,6 +60,22 @@
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-mocks</artifactId>
+      <version>${angular.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-resource</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
