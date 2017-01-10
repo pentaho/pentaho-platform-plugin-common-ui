@@ -1,0 +1,41 @@
+{
+  "tags": {
+    "allowUnknownTags": true
+  },
+  "source": {
+    "include": [
+      "${project.basedir}/src/main/doc-js",
+      "${build.javascriptTestOutputDirectory}/web/pentaho",
+      "${build.javascriptTestOutputDirectory}/web/pentaho/CONTRIBUTING.md"
+    ],
+    "exclude": [
+      "${build.javascriptTestOutputDirectory}/web/pentaho/web/pentaho/data",
+      "${build.javascriptTestOutputDirectory}/web/pentaho/web/pentaho/shim",
+      "${build.javascriptTestOutputDirectory}/web/pentaho/web/pentaho/visual/samples"
+    ],
+    "includePattern": ".+\\.js(doc)?$"
+  },
+  "plugins": [
+    "plugins/markdown",
+    "${build.jsdoc.template.directory}/vizApi/customPlugins/defineTags"
+  ],
+  "templates": {
+    "cleverLinks": true,
+    "monospaceLinks": false
+  },
+  "opts": {
+    "template": "${build.jsdoc.template.directory}/vizApi",
+    "encoding": "utf8",
+    "destination": "doc-js/vizapi",
+    "outputSourceFiles": false,
+    "recurse": true,
+    "private": true,
+    "verbose": true,
+
+    "githubConfig": {
+      "branch": "${project.version}",
+      "name": "Pentaho Common UI"
+    },
+    "layoutFile": "layout.tmpl"
+  }
+}

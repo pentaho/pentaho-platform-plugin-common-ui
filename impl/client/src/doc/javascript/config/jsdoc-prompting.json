@@ -3,7 +3,7 @@
     "allowUnknownTags": true
   },
   "source": {
-    "include": ["package-res/resources/web/prompting"],
+    "include": ["${build.javascriptTestOutputDirectory}/web/prompting"],
     "includePattern": ".+\\.js(doc)?$",
     "excludePattern": "(^|\\/|\\\\)_"
   },

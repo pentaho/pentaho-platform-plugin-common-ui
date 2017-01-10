@@ -4,9 +4,7 @@ js-lib/
 lib/
 codegen-lib/
 test-lib/
-doc-js/
 eclipse-bin/
-doc-js
 build-res/pentaho-js-build/
 build-res/pentaho-js-build.zip
 build-res/module-scripts/

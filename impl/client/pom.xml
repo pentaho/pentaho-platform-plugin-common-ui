@@ -19,6 +19,9 @@
 
     <pentaho-cdf-plugin.version>${project.version}</pentaho-cdf-plugin.version>
     <!-- <karma.file.config>karma.conf.js</karma.file.config> -->
+    <build.jsdoc.template.directory>${project.basedir}/src/doc/javascript/template</build.jsdoc.template.directory>
+
+    <docjs.config.file>jsdoc-vizapi.json</docjs.config.file>
   </properties>
 
   <dependencies>
