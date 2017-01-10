@@ -99,7 +99,7 @@ define([ "common-ui/prompting/components/StaticAutocompleteBoxComponent", "cdf/l
       comp.update();  
 
       spyOn(comp.dashboard, 'processChange');      
-       $('input', comp.ph).trigger(jQuery.Event( 'keypress', { which: $.ui.keyCode.ENTER } ));
+       $('input', comp.ph).trigger($.Event( 'keypress', { which: $.ui.keyCode.ENTER } ));
 
       expect(comp.dashboard.processChange).toHaveBeenCalled();  
       
@@ -126,7 +126,7 @@ define([ "common-ui/prompting/components/StaticAutocompleteBoxComponent", "cdf/l
       comp.update();
       
       spyOn(comp.dashboard, 'processChange');      
-      $('input', comp.ph).trigger(jQuery.Event( 'keypress', { which: $.ui.keyCode.ESCAPE } ));
+      $('input', comp.ph).trigger($.Event( 'keypress', { which: $.ui.keyCode.ESCAPE } ));
 
       expect(comp.dashboard.processChange).not.toHaveBeenCalled();  
       

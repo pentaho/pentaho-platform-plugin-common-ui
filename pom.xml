@@ -28,6 +28,7 @@
   </scm>
 
   <properties>
+    <jquery.version>1.12.4</jquery.version>
     <dojo.version>1.9.2</dojo.version>
     <pentaho-modeler.version>${project.version}</pentaho-modeler.version>
   </properties>
@@ -43,6 +44,22 @@
         <groupId>org.webjars.bower</groupId>
         <artifactId>dijit</artifactId>
         <version>${dojo.version}</version>
+      </dependency>
+      <!-- Fetching dojox from a source artifact because dojox's webjar does not include dojox/app, dojox/calendar and
+        dojox/dgauges. The reason for this is that the webjar deployer at http://www.webjars.org/bower is unable to handle
+        git submodules.
+      -->
+      <dependency>
+        <groupId>org.dojotoolkit.dojo</groupId>
+        <artifactId>dojo-release</artifactId>
+        <version>${dojo.version}</version>
+        <classifier>src</classifier>
+        <type>zip</type>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>jquery</artifactId>
+        <version>${jquery.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

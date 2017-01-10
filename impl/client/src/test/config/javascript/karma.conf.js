@@ -13,10 +13,13 @@ module.exports = function(config) {
         ],
 
         files: [
-            {pattern: '${project.build.directory}/dependency/*/**/*.+(js|css|properties|map)', included: false},
-            {pattern: '${build.javascriptTestOutputDirectory}/**/*.+(js|css|html)', included: false},
-            {pattern: '${build.javascriptTestSourceDirectory}/**/*.js', included: false},
+            '${project.build.directory}/context-begin.js',
 
+            {pattern: '${project.build.directory}/dependency/*/**/*', included: false},
+            {pattern: '${build.javascriptTestOutputDirectory}/**/*.+(js|css|html)', included: false},
+            {pattern: '${build.javascriptTestSourceDirectory}/**/*', included: false},
+
+            '${build.dependenciesDirectory}/cdf/cdf-require-js-cfg.js',
 
             //{pattern: '${basedir}/src/main/resources/i18n/**/*.properties', included: false},
 

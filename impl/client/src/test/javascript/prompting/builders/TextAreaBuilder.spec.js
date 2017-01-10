@@ -61,7 +61,7 @@ define(['common-ui/prompting/builders/TextAreaBuilder', 'common-ui/jquery-clean'
       component.postExecution();
 
       spyOn(component.dashboard, 'processChange');
-      $('textarea', component.ph).trigger(jQuery.Event( 'keypress', { which: 13 } ));
+      $('textarea', component.ph).trigger($.Event( 'keypress', { which: 13 } ));
       
       expect(component.dashboard.processChange).toHaveBeenCalled();  
       
@@ -83,7 +83,7 @@ define(['common-ui/prompting/builders/TextAreaBuilder', 'common-ui/jquery-clean'
       component.postExecution();
 
       spyOn(component, 'getValue');      
-      $('textarea', component.ph).trigger(jQuery.Event( 'focusout', { } ));
+      $('textarea', component.ph).trigger($.Event( 'focusout', { } ));
 
       expect(component.getValue).toHaveBeenCalled();  
       

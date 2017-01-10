@@ -20,8 +20,9 @@ define([
       "common-ui/prompting/PromptPanel",
       "common-ui/prompting/parameters/ParameterXmlParser",
       "common-ui/prompting/api/EventAPI",
-      "text!./parameterDefinition.xml!strip"],
-    function (Dashboard, PromptPanel, ParameterXmlParser, EventAPI, parameterDefinitionXml) {
+      "common-ui/jquery-clean",
+      "text!./parameterDefinition.xml!strip",],
+    function (Dashboard, PromptPanel, ParameterXmlParser, EventAPI, $, parameterDefinitionXml) {
 
       describe("EventAPI unit tests", function () {
         var eventApi, apiSpy, promptPanelSpy, dashboardSpy, callback;

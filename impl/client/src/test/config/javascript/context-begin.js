@@ -15,6 +15,13 @@
  * Copyright 2016 Pentaho Corporation. All rights reserved.
  */
 
+var depDir = "target/dependency";
+var depWebJars = depDir + "/META-INF/resources/webjars";
+
+var basePath = "target/test-javascript/web";
+var dojoOverrides = basePath + "/dojo/pentaho/common/overrides/";
+
+
 /**
  * The possible configurations to define the environment where the require-cfg files are running.
  * This allows the build and test environments, differing between several plugins to fully configure the path where
@@ -24,8 +31,8 @@
  */
 var ENVIRONMENT_CONFIG = {
   paths: {
-    "cdf": "../../build-res/module-scripts/cdf/js",
-    "cdf/lib": "../../build-res/module-scripts/cdf/js/lib"
+    "cdf": depDir + "/cdf/js",
+    "cdf/lib": depDir + "/cdf/js/lib"
   }
 };
 
@@ -33,6 +40,10 @@ var KARMA_RUN = true;
 var CONTEXT_PATH;
 var pen = {define: define, require: require};
 var SESSION_LOCALE = "en";
+var requireCfg = {
+  paths: {},
+  shim: {}
+};
 
 /**
  * Whether information about detected specification files

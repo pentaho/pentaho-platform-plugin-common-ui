@@ -1,73 +1,60 @@
 /* globals window, requirejs */
 
-
 // Find and inject tests using requirejs
 var tests = Object.keys(window.__karma__.files).filter(function(file) {
     return (/.spec\.js$/).test(file);
 });
 
-var KARMA_RUN = true;
-var CONTEXT_PATH;
-var pen = {define: define, require: require};
-var SESSION_LOCALE = "en";
+var requirePaths   = requireCfg.paths;
+var requireShim    = requireCfg.shim;
+var requireMap     = requireCfg.map;
+
+requireCfg.baseUrl = "/base";
+
+requirePaths["dojo"] = depWebJars + "/dojo/${dojo.version}";
+requirePaths["dijit"] = depWebJars + "/dijit/${dojo.version}";
+requirePaths["dojox"] = depDir + "/dojo-release-${dojo.version}-src/dojox";
 
 
-//var depDir = "${build.dependenciesDirectory}";
-var depDir = "target/dependency";
-var depWebJars = depDir + "/META-INF/resources/webjars";
+// ...Overrides
+requirePaths["dojo/on"] = dojoOverrides + "dojo/on";
+requirePaths["dojo/dom-geometry"] = dojoOverrides + "dojo/dom-geometry";
+requirePaths["dojo/dom-prop"] = dojoOverrides + "dojo/dom-prop";
+requirePaths["dojox/layout/ResizeHandle"] = dojoOverrides + "dojox/layout/ResizeHandle";
+requirePaths["dojox/grid/_View"] = dojoOverrides + "dojox/grid/_View";
+requirePaths["dojox/xml/parser"] = dojoOverrides + "dojox/xml/parser";
+requirePaths["dojox/grid/Selection"] =  dojoOverrides + "dojox/grid/Selection";
+requirePaths["dojox/grid/_FocusManager"] = dojoOverrides + "dojox/grid/_FocusManager";
+requirePaths["dojox/grid/_Scroller"] = dojoOverrides + "dojox/grid/_Scroller";
+requirePaths["dojox/storage"] = dojoOverrides + "dojox/storage";
+requirePaths["dojox/json"] = dojoOverrides + "dojox/json";
+requirePaths["dojox/rpc"] = dojoOverrides + "dojox/rpc";
+requirePaths["dojo/_base/kernel"] = dojoOverrides + "dojo/_base/kernel";
+requirePaths["dojo/_base/config"] = dojoOverrides + "dojo/_base/config";
+requirePaths["dojo/store/Memory"] = dojoOverrides + "dojo/store/Memory";
+requirePaths["dijit/_HasDropDown"] = dojoOverrides + "dijit/_HasDropDown";
+requirePaths["dijit/_CssStateMixin"] = dojoOverrides + "dijit/_CssStateMixin";
 
-//var basePath = "${build.javascriptTestOutputDirectory}/web";
-var basePath = "target/test-javascript/web";
-var dojoOverrides = basePath + "/dojo/pentaho/common/overrides/";
+requirePaths["common-ui"] = basePath;
+requirePaths["common-data"] = basePath + "/dataapi";
+requirePaths["common-repo"] = basePath + "/repo";
+requirePaths["pentaho/common"] = basePath + "/dojo/pentaho/common";
 
-requirejs.config({
-    baseUrl: "/base",
-    paths: {
-        "dojo": depWebJars + "/dojo/${dojo.version}",
-        "dijit": depWebJars + "/dijit/${dojo.version}",
+requirePaths["common-ui/jquery-clean"] = depWebJars + "/jquery/${jquery.version}/dist/jquery";
+requireShim["common-ui/jquery-clean"] = {
+    exports: "$",
+    init: function() { return $.noConflict(true); }
+};
 
-        // ...Overrides
-        "dojo/on": dojoOverrides + "dojo/on",
-        "dojo/dom-geometry": dojoOverrides + "dojo/dom-geometry",
-        "dojo/dom-prop": dojoOverrides + "dojo/dom-prop",
-        "dojox/layout/ResizeHandle": dojoOverrides + "dojox/layout/ResizeHandle",
-        "dojox/grid/_View": dojoOverrides + "dojox/grid/_View",
-        "dojox/xml/parser": dojoOverrides + "dojox/xml/parser",
-        "dojox/grid/Selection": dojoOverrides + "dojox/grid/Selection",
-        "dojox/grid/_FocusManager": dojoOverrides + "dojox/grid/_FocusManager",
-        "dojox/grid/_Scroller": dojoOverrides + "dojox/grid/_Scroller",
-        "dojox/storage": dojoOverrides + "dojox/storage",
-        "dojox/json": dojoOverrides + "dojox/json",
-        "dojox/rpc": dojoOverrides + "dojox/rpc",
-        "dojo/_base/kernel": dojoOverrides + "dojo/_base/kernel",
-        "dojo/_base/config": dojoOverrides + "dojo/_base/config",
-        "dojo/store/Memory": dojoOverrides + "dojo/store/Memory",
-        "dijit/_HasDropDown": dojoOverrides + "dijit/_HasDropDown",
-        "dijit/_CssStateMixin": dojoOverrides + "dijit/_CssStateMixin",
+requirePaths["common-ui/underscore"] = basePath + "/underscore/underscore";
 
-
-        "common-data": basePath + "/dataapi",
-        "common-repo": basePath + "/repo",
-        "pentaho/common": basePath + "/dojo/pentaho/common",
+requirePaths["text"] = basePath + "/util/require-text/text";
 
 
-        /*        "whatwg-fetch": depWebJars + "/whatwg-fetch/${whatwg-fetch.version}/fetch",
-         "pentaho/shim": depDir + "/common-ui/resources/web/pentaho/shim",
-         "pentaho/util": depDir + "/common-ui/resources/web/pentaho/util",
-         "pentaho/lang": depDir + "/common-ui/resources/web/pentaho/lang",
-         "pentaho/data": depDir + "/common-ui/resources/web/pentaho/data",
-         "pentaho/det/data": src
-         */
-    },
-    map: {
-    },
-    bundles: {},
-    config: {
-        service: {}
-    },
-    packages: [],
-    deps: tests,
-    callback: function() {
-        window.__karma__.start();
-    }
-});
+requireCfg.deps = tests;
+
+requireCfg.callback = function() {
+    window.__karma__.start();
+};
+
+requirejs.config(requireCfg);
