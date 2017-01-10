@@ -9,6 +9,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
+  <description>Common-UI Platform Plugin</description>
   <groupId>pentaho</groupId>
   <artifactId>common-ui</artifactId>
   <packaging>pom</packaging>
