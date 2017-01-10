@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/type/Context",
-  "./propertyTypeUtil",
+  "tests/pentaho/type/propertyTypeUtil",
   "tests/pentaho/util/errorMatch"
 ], function(Context, propertyTypeUtil, errorMatch) {
 

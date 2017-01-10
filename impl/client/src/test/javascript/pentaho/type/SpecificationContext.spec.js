@@ -16,7 +16,7 @@
 define([
   "pentaho/type/Context",
   "pentaho/type/SpecificationContext",
-  "../util/errorMatch"
+  "tests/pentaho/util/errorMatch"
 ], function(Context, SpecificationContext, errorMatch) {
 
   "use strict";

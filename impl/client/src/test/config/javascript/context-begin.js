@@ -18,6 +18,7 @@
 var depDir = "target/dependency";
 var depWebJars = depDir + "/META-INF/resources/webjars";
 
+var baseTest = "src/test/javascript";
 var basePath = "target/test-javascript/web";
 var dojoOverrides = basePath + "/dojo/pentaho/common/overrides/";
 

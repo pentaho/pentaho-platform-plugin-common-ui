@@ -17,7 +17,7 @@ define([
   "pentaho/type/Context",
   "pentaho/type/PropertyTypeCollection",
   "tests/pentaho/util/errorMatch",
-  "./sloppyModeUtil"
+  "tests/pentaho/type/sloppyModeUtil"
 ], function(Context, PropertyTypeCollection, errorMatch, sloppyModeUtil) {
   "use strict";
 

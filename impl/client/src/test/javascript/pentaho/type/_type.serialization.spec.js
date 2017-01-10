@@ -17,7 +17,7 @@ define([
   "pentaho/type/Context",
   "pentaho/type/SpecificationScope",
   "pentaho/type/SpecificationContext",
-  "./serializationUtil"
+  "tests/pentaho/type/serializationUtil"
 ], function(Context, SpecificationScope, SpecificationContext, serializationUtil) {
 
   "use strict";

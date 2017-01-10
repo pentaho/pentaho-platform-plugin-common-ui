@@ -12,7 +12,7 @@ var requireMap     = requireCfg.map;
 requireCfg.baseUrl = "/base";
 
 // Javascript Tests source files
-requirePaths["tests"] = "src/test/javascript";
+requirePaths["tests"] = baseTest;
 
 requirePaths["dojo"] = depWebJars + "/dojo/${dojo.version}";
 requirePaths["dijit"] = depWebJars + "/dijit/${dojo.version}";
@@ -38,11 +38,33 @@ requirePaths["dojo/store/Memory"] = dojoOverrides + "dojo/store/Memory";
 requirePaths["dijit/_HasDropDown"] = dojoOverrides + "dijit/_HasDropDown";
 requirePaths["dijit/_CssStateMixin"] = dojoOverrides + "dijit/_CssStateMixin";
 
-requirePaths["common-ui"] = basePath;
-requirePaths["pentaho"]   = basePath + "/pentaho";
-requirePaths["common-data"] = basePath + "/dataapi";
-requirePaths["common-repo"] = basePath + "/repo";
+
+requirePaths["pentaho/CustomContextVars"] = basePath + "/pentaho/CustomContextVars";
+
+// TODO: remove this mapping after all Pentaho consumers of GlobalContextVars (DET, Analyzer, CDF) have been changed.
+requireMap["*"]["pentaho/GlobalContextVars"] = "pentaho/CustomContextVars";
+
+// TODO: Only used if not defined explicitly by webcontext.js.
+// When the latter is converted to do so, these 2 paths can be removed as well as the `_globalContextVars` module.
+requirePaths["pentaho/_globalContextVars"] = basePath + "/pentaho/_globalContextVars";
+requirePaths["pentaho/contextVars"] = requirePaths["pentaho/_globalContextVars"];
+
+requirePaths["common-ui"     ] = basePath;
+requirePaths["common-data"   ] = basePath + "/dataapi";
+requirePaths["common-repo"   ] = basePath + "/repo";
 requirePaths["pentaho/common"] = basePath + "/dojo/pentaho/common";
+
+// TODO: Only used if not defined explicitly by webcontext.js.
+// Unfortunately, mantle already maps the "pentaho" id to "/js",
+// so all the following sub-modules must be mapped individually.
+requirePaths["pentaho/data"   ] = basePath + "/pentaho/data";
+requirePaths["pentaho/lang"   ] = basePath + "/pentaho/lang";
+requirePaths["pentaho/type"   ] = basePath + "/pentaho/type";
+requirePaths["pentaho/util"   ] = basePath + "/pentaho/util";
+requirePaths["pentaho/visual" ] = basePath + "/pentaho/visual";
+requirePaths["pentaho/service"] = basePath + "/pentaho/service";
+requirePaths["pentaho/i18n"   ] = baseTest + "/pentaho/i18nMock";
+requirePaths["pentaho/shim"   ] = basePath + "/pentaho/shim";
 
 requirePaths["common-ui/jquery-clean"] = depWebJars + "/jquery/${jquery.version}/dist/jquery";
 requireShim["common-ui/jquery-clean"] = {
@@ -52,9 +74,33 @@ requireShim["common-ui/jquery-clean"] = {
 
 requirePaths["common-ui/underscore"] = basePath + "/underscore/underscore";
 
+requirePaths["json"] = basePath + "/util/require-json/json";
 requirePaths["text"] = basePath + "/util/require-text/text";
 
 requireCfg.deps = tests;
+
+function mapTheme(mid, themeRoot, themes) {
+  var theme = (typeof active_theme !== "undefined") ? active_theme : null;
+  if(!theme || themes.indexOf(theme) < 0) theme = themes[0];
+
+  // e.g. "/theme" -> "/themes/crystal"
+  requireMap["*"][mid + "/theme"] = mid + "/" + themeRoot + "/" + theme;
+}
+
+/*function registerVizPackage(name) {
+  requireCfg.packages.push({"name": name, "main": "model"});
+
+  requireService[name] = "pentaho/visual/base";
+}*/
+
+// Metadata Model Base Theme
+mapTheme("pentaho/type", "themes", ["crystal"]);
+
+// CCC Themes
+mapTheme("pentaho/visual/ccc", "_themes", ["crystal", "sapphire", "onyx", "det"]);
+
+// sample/calc theme
+mapTheme("pentaho/visual/samples/calc", "themes", ["crystal"]);
 
 requireCfg.callback = function() {
     window.__karma__.start();

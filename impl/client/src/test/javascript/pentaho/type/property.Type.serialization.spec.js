@@ -15,9 +15,9 @@
  */
 define([
   "pentaho/type/Context",
-  "./propertyTypeUtil",
-  "pentaho/type/SpecificationScope"
-], function(Context, propertyTypeUtil, SpecificationScope) {
+  "pentaho/type/SpecificationScope",
+  "tests/pentaho/type/propertyTypeUtil"
+], function(Context, SpecificationScope, propertyTypeUtil) {
 
   "use strict";
 

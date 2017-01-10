@@ -16,7 +16,7 @@ module.exports = function(config) {
             '${project.build.directory}/context-begin.js',
 
             {pattern: '${project.build.directory}/dependency/*/**/*', included: false},
-            {pattern: '${build.javascriptTestOutputDirectory}/**/*.+(js|css|html)', included: false},
+            {pattern: '${build.javascriptTestOutputDirectory}/**/*.+(js|css|html|properties)', included: false},
             {pattern: '${build.javascriptTestSourceDirectory}/**/*', included: false},
 
             // test(not working) {pattern: '${build.javascriptTestSourceDirectory}/**/*.+js', included: false},
