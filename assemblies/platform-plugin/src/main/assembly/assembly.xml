@@ -14,12 +14,12 @@
 
     <fileSet>
       <directory>${basedir}/src/main/resources</directory>
-      <outputDirectory>.</outputDirectory>
+      <outputDirectory>common-ui</outputDirectory>
     </fileSet>
 
     <fileSet>
       <directory>${js.assembly.directory}/common-ui</directory>
-      <outputDirectory>resources/web</outputDirectory>
+      <outputDirectory>common-ui/resources/web</outputDirectory>
     </fileSet>
 
   </fileSets>
@@ -33,6 +33,7 @@
       </includes>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <unpack>true</unpack>
+      <outputDirectory>common-ui</outputDirectory>
     </dependencySet>
 
     <dependencySet>
@@ -46,17 +47,20 @@
           <include>angular*</include>
         </includes>
       </unpackOptions>
-      <outputDirectory>resources/web/angular-translate</outputDirectory>
+      <outputDirectory>common-ui/resources/web/angular-translate</outputDirectory>
     </dependencySet>
 
     <!-- Server side dependencies -->
     <dependencySet>
+      <excludes>
+        <exclude>org.pentaho:pentaho-platform-plugin-common-ui-impl-server:jar:sources</exclude>
+      </excludes>
       <includes>
-        <include>org.pentaho:pentaho-platform-plugin-common-ui-impl-server</include>
+        <include>org.pentaho:pentaho-platform-plugin-common-ui-impl-server:jar</include>
         <include>net.sf.flexjson:flexjson</include>
         <include>pentaho:pentaho-modeler</include>
       </includes>
-      <outputDirectory>/lib</outputDirectory>
+      <outputDirectory>common-ui/lib</outputDirectory>
       <useTransitiveDependencies>false</useTransitiveDependencies>
     </dependencySet>
 
