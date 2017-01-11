@@ -16,7 +16,8 @@
  */
 
 var depDir = "target/dependency";
-var depWebJars = depDir + "/META-INF/resources/webjars";
+var webjarsSubPath = "/META-INF/resources/webjars";
+var depWebJars = depDir + webjarsSubPath;
 
 var baseTest = "src/test/javascript";
 var basePath = "target/test-javascript/web";

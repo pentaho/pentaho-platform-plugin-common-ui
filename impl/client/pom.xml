@@ -155,6 +155,34 @@
         </executions>
       </plugin>
 
+      <!-- We need to extract jquery twice because it is being used with different shims configuration for
+           common-ui/jquery and common-ui/jquery-clean. If the same jquery file was used for both paths, a timeout
+           might occur and the tests would fail. See the third bullet at http://requirejs.org/docs/errors.html#timeout
+           for more information. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>javascript-copy-jquery-clean</id>
+            <phase>${javascript_unpack-dependencies-phase}</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.webjars.npm</groupId>
+                  <artifactId>jquery</artifactId>
+                  <version>${jquery.version}</version>
+                  <outputDirectory>${build.dependenciesDirectory}/jqueryClean</outputDirectory>
+                  <overWrite>true</overWrite>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
 
     </plugins>
   </build>

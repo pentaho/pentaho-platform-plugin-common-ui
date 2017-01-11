@@ -1,12 +1,12 @@
 var deps = [
-    'common-ui/jquery', // force jquery to be loaded as it is used by
+    //'common-ui/jquery', // force jquery to be loaded as it is used by
     'common-ui/AngularPlugin',
     'common-ui/AngularPluginHandler',
     'common-ui/PluginHandler',
     'common-ui/angular'
 ];
 
-define(deps, function($, AngularPlugin, AngularPluginHandler, PluginHandler, angular) {
+define(deps, function(/*$,*/ AngularPlugin, AngularPluginHandler, PluginHandler, angular) {
 
     describe("Angular Plugin", function() {
 

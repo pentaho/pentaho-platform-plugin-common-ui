@@ -69,7 +69,12 @@ requirePaths["pentaho/shim"   ] = basePath + "/pentaho/shim";
 requirePaths["common-ui/jquery"] = depWebJars + "/jquery/${jquery.version}/dist/jquery";
 requireShim["common-ui/jquery"] = {exports: "$"};
 
-requirePaths["common-ui/jquery-clean"] = depWebJars + "/jquery/${jquery.version}/dist/jquery";
+/*
+ The path for common-ui/jquery-clean must be for a different file used by common-ui/jquery.
+ If the same jquery file was used for both paths, a timeout might occur and the tests would fail.
+ See the third bullet at http://requirejs.org/docs/errors.html#timeout for more information.
+ */
+requirePaths["common-ui/jquery-clean"] = depDir + "/jqueryClean" + webjarsSubPath + "/jquery/${jquery.version}/dist/jquery";
 requireShim["common-ui/jquery-clean"] = {
     exports: "$",
     init: function() { return $.noConflict(true); }
@@ -83,7 +88,7 @@ requirePaths["text"] = basePath + "/util/require-text/text";
 // Angular
 requirePaths["common-ui/angular"] = depWebJars + "/angular/${angular.version}/angular";
 requireShim ["common-ui/angular"] = {
-    //deps: ["common-ui/jquery"],
+    deps: ["common-ui/jquery"],
     exports: "angular"
 };
 
