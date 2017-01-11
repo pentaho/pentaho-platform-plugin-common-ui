@@ -43,7 +43,10 @@ var pen = {define: define, require: require};
 var SESSION_LOCALE = "en";
 var requireCfg = {
   paths: {},
-  shim: {}
+  shim: {},
+  map: {
+    "*": {}
+  }
 };
 
 /**
