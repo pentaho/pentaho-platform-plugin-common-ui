@@ -14,32 +14,46 @@
  * limitations under the License.
  *
  */
-define( ["dojo/number"], function( DojoNumber ) {
+define([
+  "dojo/number",
+  "dojo/i18n!dojo/cldr/nls/number"
+], function( DojoNumber ) {
 
-  xdescribe( "Dojo i18n tests", function() {
+  "use strict";
 
-    it( "Number.parse(..) should accept default locale", function() {
+  /* global describe: false, it: false, expect: false */
+
+  describe("Dojo i18n tests", function() {
+
+    it("Number.parse(..) should accept default locale", function() {
       expect( DojoNumber.parse( "1234", {} ) ).toEqual( 1234 );
-    } );
+    });
 
-    it( "Dojo Number.parse(..) should accept correct locale", function() {
-      expect( DojoNumber.parse( "1234", {"locale" : "en-us"} ) ).toEqual( 1234 );
-    } );
+    // Must include i18n resource in the test require dependencies to avoid TypeError when parsing the string
+    it("Dojo Number.parse(..) should accept correct locale", function() {
+      expect( DojoNumber.parse( "1,234", {"locale" : "en-us"} ) ).toEqual( 1234 );
+    });
     
     // This is a known dojo issue
     // See BISERVER-13154
-    it( "Dojo Number.parse(..) should safely accept even incorrect locale", function() {
+    it("Dojo Number.parse(..) should safely accept even incorrect locale", function() {
       //expect( DojoNumber.parse( "1234", {"locale" : "en_us"} ) ).toEqual( 1234 );
-      expect( function(){ DojoNumber.parse( "1234", {"locale" : "en_us"} ) } ).toThrowError( TypeError );
-    } );
+      expectParseTypeError("1234", {"locale" : "en_us"});
+    });
 
     // This is a known dojo issue
     // See BISERVER-13154
-    it( "Dojo Number.parse(..) should safely accept even abracadabra locale", function() {
+    it("Dojo Number.parse(..) should safely accept even abracadabra locale", function() {
       //expect( DojoNumber.parse( "1234", {"locale" : "abracadabra"} ) ).toEqual( 1234 );
-      expect( function(){ DojoNumber.parse( "1234", {"locale" : "abracadabra"} ) } ).toThrowError( TypeError );
-    } );
+      expectParseTypeError("1234", {"locale" : "abracadabra"});
+    });
 
-  } );
+  });
 
-} );
+  function expectParseTypeError(string, options) {
+    expect(function() {
+      DojoNumber.parse(string, options);
+    }).toThrowError( TypeError );
+  }
+
+});
