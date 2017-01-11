@@ -16,7 +16,7 @@
  */
 define( ["dojo/number"], function( DojoNumber ) {
 
-  describe( "Dojo i18n tests", function() {
+  xdescribe( "Dojo i18n tests", function() {
 
     it( "Number.parse(..) should accept default locale", function() {
       expect( DojoNumber.parse( "1234", {} ) ).toEqual( 1234 );
