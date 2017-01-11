@@ -2,12 +2,14 @@
 
 // Find and inject tests using requirejs
 var tests = Object.keys(window.__karma__.files).filter(function(file) {
-    return (/.spec\.js$/).test(file);
+  return (/.spec\.js$/).test(file);
 });
 
-var requirePaths   = requireCfg.paths;
-var requireShim    = requireCfg.shim;
-var requireMap     = requireCfg.map;
+var requirePaths    = requireCfg.paths;
+var requireShim     = requireCfg.shim;
+var requireMap      = requireCfg.map;
+var requirePackages = requireCfg.packages = requireCfg.packages || [];
+var requireService  = requireCfg.config["pentaho/service"] || (requireCfg.config["pentaho/service"] = {});
 
 requireCfg.baseUrl = "/base";
 
@@ -38,12 +40,10 @@ requirePaths["dojo/store/Memory"] = dojoOverrides + "dojo/store/Memory";
 requirePaths["dijit/_HasDropDown"] = dojoOverrides + "dijit/_HasDropDown";
 requirePaths["dijit/_CssStateMixin"] = dojoOverrides + "dijit/_CssStateMixin";
 
-
+// ...Context Vars
 requirePaths["pentaho/CustomContextVars"] = basePath + "/pentaho/CustomContextVars";
-
 // TODO: remove this mapping after all Pentaho consumers of GlobalContextVars (DET, Analyzer, CDF) have been changed.
 requireMap["*"]["pentaho/GlobalContextVars"] = "pentaho/CustomContextVars";
-
 // TODO: Only used if not defined explicitly by webcontext.js.
 // When the latter is converted to do so, these 2 paths can be removed as well as the `_globalContextVars` module.
 requirePaths["pentaho/_globalContextVars"] = basePath + "/pentaho/_globalContextVars";
@@ -66,8 +66,11 @@ requirePaths["pentaho/service"] = basePath + "/pentaho/service";
 requirePaths["pentaho/i18n"   ] = baseTest + "/pentaho/i18nMock";
 requirePaths["pentaho/shim"   ] = basePath + "/pentaho/shim";
 
+requirePaths["json" ] = basePath + "/util/require-json/json";
+
+// jquery
 requirePaths["common-ui/jquery"] = depWebJars + "/jquery/${jquery.version}/dist/jquery";
-requireShim["common-ui/jquery"] = {exports: "$"};
+requireShim ["common-ui/jquery"] = {exports: "$"};
 
 /*
  The path for common-ui/jquery-clean must be for a different file used by common-ui/jquery.
@@ -75,15 +78,13 @@ requireShim["common-ui/jquery"] = {exports: "$"};
  See the third bullet at http://requirejs.org/docs/errors.html#timeout for more information.
  */
 requirePaths["common-ui/jquery-clean"] = depDir + "/jqueryClean" + webjarsSubPath + "/jquery/${jquery.version}/dist/jquery";
-requireShim["common-ui/jquery-clean"] = {
-    exports: "$",
-    init: function() { return $.noConflict(true); }
+requireShim ["common-ui/jquery-clean"] = {
+  exports: "$",
+  init: function() { return $.noConflict(true); }
 };
 
+// underscore
 requirePaths["common-ui/underscore"] = basePath + "/underscore/underscore";
-
-requirePaths["json"] = basePath + "/util/require-json/json";
-requirePaths["text"] = basePath + "/util/require-text/text";
 
 // Angular
 requirePaths["common-ui/angular"] = depWebJars + "/angular/${angular.version}/angular";
@@ -122,7 +123,6 @@ requirePaths["common-ui/AnimatedAngularPlugin"] = basePath + "/plugin-handler/an
 requirePaths["common-ui/ring"] = basePath + "/ring/ring";
 requireShim ["common-ui/ring"] = {deps: ["common-ui/underscore"], exports: "ring"};
 
-
 requireCfg.deps = tests;
 
 function mapTheme(mid, themeRoot, themes) {
@@ -133,11 +133,10 @@ function mapTheme(mid, themeRoot, themes) {
   requireMap["*"][mid + "/theme"] = mid + "/" + themeRoot + "/" + theme;
 }
 
-/*function registerVizPackage(name) {
-  requireCfg.packages.push({"name": name, "main": "model"});
-
+function registerVizPackage(name) {
+  requirePackages.push({"name": name, "main": "model"});
   requireService[name] = "pentaho/visual/base";
-}*/
+}
 
 // Metadata Model Base Theme
 mapTheme("pentaho/type", "themes", ["crystal"]);
@@ -145,8 +144,11 @@ mapTheme("pentaho/type", "themes", ["crystal"]);
 // CCC Themes
 mapTheme("pentaho/visual/ccc", "_themes", ["crystal", "sapphire", "onyx", "det"]);
 
-// sample/calc theme
-mapTheme("pentaho/visual/samples/calc", "themes", ["crystal"]);
+[
+  "pentaho/visual/base",
+  "pentaho/visual/ccc/abstract",
+  "pentaho/visual/ccc/bar"
+].forEach(registerVizPackage);
 
 requireCfg.callback = function() {
     window.__karma__.start();

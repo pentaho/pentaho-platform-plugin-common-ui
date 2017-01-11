@@ -15,23 +15,19 @@ module.exports = function(config) {
         files: [
             '${project.build.directory}/context-begin.js',
 
-            {pattern: '${project.build.directory}/dependency/*/**/*', included: false},
-            {pattern: '${build.javascriptTestOutputDirectory}/**/*.+(js|css|html|properties)', included: false},
-            {pattern: '${build.javascriptTestSourceDirectory}/**/*', included: false},
-
-            // test(not working) {pattern: '${build.javascriptTestSourceDirectory}/**/*.+js', included: false},
+            {pattern: '${build.dependenciesDirectory}/**/*',         included: false}, // target/dependency/
+            {pattern: '${build.javascriptTestOutputDirectory}/**/*', included: false}, // target/test-javascript/
+            {pattern: '${build.javascriptTestSourceDirectory}/**/*', included: false}, // src/test/javascript/
 
             '${build.dependenciesDirectory}/cdf/cdf-require-js-cfg.js',
-
-            //{pattern: '${basedir}/src/main/resources/i18n/**/*.properties', included: false},
-
+            // TODO: remove? {pattern: '${basedir}/src/main/resources/i18n/**/*.properties', included: false},
             '${build.javascriptTestConfigDirectory}/require-test.js',
             '${project.build.directory}/context.js'
         ],
 
         exclude: [
-            //'${project.build.directory}/dependency/common-ui/resources/web/dojo/**/*.+(js|css|properties|map)',
-            //'${basedir}/target/dependency/*/**/*.+(spec.js)'
+            // excluding this two folders because we are using the versions inside the webjars folder
+            '${project.build.directory}/dependency/dojo-release-${dojo.version}-src/(dojo|dijit)/**/*'
         ],
 
         reporters: ["mocha"],
