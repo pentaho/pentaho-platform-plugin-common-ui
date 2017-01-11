@@ -20,7 +20,6 @@ requirePaths["dojo"] = depWebJars + "/dojo/${dojo.version}";
 requirePaths["dijit"] = depWebJars + "/dijit/${dojo.version}";
 requirePaths["dojox"] = depDir + "/dojo-release-${dojo.version}-src/dojox";
 
-
 // ...Overrides
 requirePaths["dojo/on"] = dojoOverrides + "dojo/on";
 requirePaths["dojo/dom-geometry"] = dojoOverrides + "dojo/dom-geometry";
@@ -96,9 +95,6 @@ requireShim ["common-ui/angular"] = {
 requirePaths["common-ui/angular-resource"] = depWebJars + "/angular-resource/${angular.version}/angular-resource";
 requireShim ["common-ui/angular-resource"] = ["common-ui/angular"];
 
-//requirePaths["angular-mocks"] = depWebJars + "/angular-mocks/${angular.version}/angular-mocks";
-//requireShim["angular-mocks"] = {deps: ["common-ui/angular-resource"]};
-
 requirePaths["common-ui/angular-ui-bootstrap"] = basePath + "/bootstrap/ui-bootstrap-tpls-0.6.0.min";
 requireShim ["common-ui/angular-ui-bootstrap"] = ["common-ui/angular"];
 
@@ -109,22 +105,24 @@ requirePaths["common-ui/angular-route"] = depWebJars + "/angular-route/${angular
 requireShim ["common-ui/angular-route"] = ["common-ui/angular"];
 
 requirePaths["common-ui/angular-animate"] = depWebJars + "/angular-animate/${angular.version}/angular-animate";
-requireShim ["common-ui/angular-animate" ] = ["common-ui/angular"];
+requireShim ["common-ui/angular-animate"] = ["common-ui/angular"];
 
 
 // Plugin Handler
-requirePaths["common-ui/PluginHandler"] = basePath + "/plugin-handler/pluginHandler";
 requirePaths["common-ui/Plugin"] = basePath + "/plugin-handler/plugin";
-requirePaths["common-ui/AngularPluginHandler"] = basePath + "/plugin-handler/angularPluginHandler";
+requirePaths["common-ui/PluginHandler"] = basePath + "/plugin-handler/pluginHandler";
 requirePaths["common-ui/AngularPlugin"] = basePath + "/plugin-handler/angularPlugin";
-requirePaths["common-ui/AnimatedAngularPluginHandler"] = basePath + "/plugin-handler/animatedAngularPluginHandler";
+requirePaths["common-ui/AngularPluginHandler"] = basePath + "/plugin-handler/angularPluginHandler";
 requirePaths["common-ui/AnimatedAngularPlugin"] = basePath + "/plugin-handler/animatedAngularPlugin";
+requirePaths["common-ui/AnimatedAngularPluginHandler"] = basePath + "/plugin-handler/animatedAngularPluginHandler";
 
+// Ring
 requirePaths["common-ui/ring"] = basePath + "/ring/ring";
 requireShim ["common-ui/ring"] = {deps: ["common-ui/underscore"], exports: "ring"};
 
 requireCfg.deps = tests;
 
+// --- Extra Viz API config for themes and packages
 function mapTheme(mid, themeRoot, themes) {
   var theme = (typeof active_theme !== "undefined") ? active_theme : null;
   if(!theme || themes.indexOf(theme) < 0) theme = themes[0];
