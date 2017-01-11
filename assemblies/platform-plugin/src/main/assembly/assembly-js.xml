@@ -167,11 +167,13 @@
       <outputDirectory>common-ui/jquery</outputDirectory>
     </file>
 
-    <file>
-      <source>${webjars.target.directory}/handlebars/${handlebars.version}/dist/handlebars.js</source>
-      <destName>handlebars-v4.0.5.js</destName>
-      <outputDirectory>common-ui/handlebars</outputDirectory>
-    </file>
+    <!-- Removed due to custom changes in the current common-ui version -->
+    <!-- (mainly the exporting of the Handlebars global variable) -->
+    <!--<file>-->
+      <!--<source>${webjars.target.directory}/handlebars/${handlebars.version}/dist/handlebars.js</source>-->
+      <!--<destName>handlebars-v4.0.5.js</destName>-->
+      <!--<outputDirectory>common-ui/handlebars</outputDirectory>-->
+    <!--</file>-->
 
   </files>
 

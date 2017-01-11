@@ -79,17 +79,19 @@
       <groupId>org.webjars.npm</groupId>
       <artifactId>jquery</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>handlebars</artifactId>
-      <version>${handlebars.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+    <!-- Removed due to custom changes in the current common-ui version -->
+    <!-- (mainly the exporting of the Handlebars global variable) -->
+    <!--<dependency>-->
+      <!--<groupId>org.webjars.npm</groupId>-->
+      <!--<artifactId>handlebars</artifactId>-->
+      <!--<version>${handlebars.version}</version>-->
+      <!--<exclusions>-->
+        <!--<exclusion>-->
+          <!--<groupId>*</groupId>-->
+          <!--<artifactId>*</artifactId>-->
+        <!--</exclusion>-->
+      <!--</exclusions>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>org.webjars.bower</groupId>
       <artifactId>jquery-i18n-properties</artifactId>
