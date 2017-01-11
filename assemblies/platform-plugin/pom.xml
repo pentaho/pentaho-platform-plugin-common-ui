@@ -104,13 +104,6 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>angular-animate</artifactId>
-      <version>${angular.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
@@ -149,7 +142,6 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>angular-route</artifactId>
-      <version>${angular.version}</version>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>

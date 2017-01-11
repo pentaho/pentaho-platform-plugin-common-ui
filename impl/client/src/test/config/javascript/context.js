@@ -66,6 +66,9 @@ requirePaths["pentaho/service"] = basePath + "/pentaho/service";
 requirePaths["pentaho/i18n"   ] = baseTest + "/pentaho/i18nMock";
 requirePaths["pentaho/shim"   ] = basePath + "/pentaho/shim";
 
+requirePaths["common-ui/jquery"] = depWebJars + "/jquery/${jquery.version}/dist/jquery";
+requireShim["common-ui/jquery"] = {exports: "$"};
+
 requirePaths["common-ui/jquery-clean"] = depWebJars + "/jquery/${jquery.version}/dist/jquery";
 requireShim["common-ui/jquery-clean"] = {
     exports: "$",
@@ -80,20 +83,39 @@ requirePaths["text"] = basePath + "/util/require-text/text";
 // Angular
 requirePaths["common-ui/angular"] = depWebJars + "/angular/${angular.version}/angular";
 requireShim ["common-ui/angular"] = {
+    //deps: ["common-ui/jquery"],
     exports: "angular"
 };
 
 requirePaths["common-ui/angular-resource"] = depWebJars + "/angular-resource/${angular.version}/angular-resource";
 requireShim ["common-ui/angular-resource"] = ["common-ui/angular"];
 
-requirePaths["angular-mocks"] = depWebJars + "/angular-mocks/${angular.version}/angular-mocks";
-requireShim["angular-mocks"] = {deps: ["common-ui/angular-resource"]};
+//requirePaths["angular-mocks"] = depWebJars + "/angular-mocks/${angular.version}/angular-mocks";
+//requireShim["angular-mocks"] = {deps: ["common-ui/angular-resource"]};
 
 requirePaths["common-ui/angular-ui-bootstrap"] = basePath + "/bootstrap/ui-bootstrap-tpls-0.6.0.min";
 requireShim ["common-ui/angular-ui-bootstrap"] = ["common-ui/angular"];
 
 requirePaths["common-ui/angular-directives"] = basePath + "/angular-directives";
 requireShim ["common-ui/angular-directives"] = ["common-ui/angular-ui-bootstrap"];
+
+requirePaths["common-ui/angular-route"] = depWebJars + "/angular-route/${angular.version}/angular-route";
+requireShim ["common-ui/angular-route"] = ["common-ui/angular"];
+
+requirePaths["common-ui/angular-animate"] = depWebJars + "/angular-animate/${angular.version}/angular-animate";
+requireShim ["common-ui/angular-animate" ] = ["common-ui/angular"];
+
+
+// Plugin Handler
+requirePaths["common-ui/PluginHandler"] = basePath + "/plugin-handler/pluginHandler";
+requirePaths["common-ui/Plugin"] = basePath + "/plugin-handler/plugin";
+requirePaths["common-ui/AngularPluginHandler"] = basePath + "/plugin-handler/angularPluginHandler";
+requirePaths["common-ui/AngularPlugin"] = basePath + "/plugin-handler/angularPlugin";
+requirePaths["common-ui/AnimatedAngularPluginHandler"] = basePath + "/plugin-handler/animatedAngularPluginHandler";
+requirePaths["common-ui/AnimatedAngularPlugin"] = basePath + "/plugin-handler/animatedAngularPlugin";
+
+requirePaths["common-ui/ring"] = basePath + "/ring/ring";
+requireShim ["common-ui/ring"] = {deps: ["common-ui/underscore"], exports: "ring"};
 
 
 requireCfg.deps = tests;

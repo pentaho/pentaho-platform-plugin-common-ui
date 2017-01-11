@@ -1,5 +1,5 @@
 define([
-  'angular-mocks',
+  //'angular-mocks',
   'common-ui/angular',
   './templateUtil.js',
   'common-ui/angular-ui-bootstrap',

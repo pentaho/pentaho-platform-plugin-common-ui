@@ -16,7 +16,7 @@
  */
 
 define([
-  'angular-mocks',
+  //'angular-mocks',
   'common-ui/angular',
   'common-ui/angular-directives/folderBrowser/folderBrowser',
   'common-ui/jquery-clean'
