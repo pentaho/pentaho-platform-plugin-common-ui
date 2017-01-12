@@ -91,6 +91,25 @@ define(['./ScopedPentahoButtonComponent', 'common-ui/jquery-clean'], function(Sc
       if (promptPanel.getAutoSubmitSetting()) {
         this.expression(/*isInit*/true);
       }
+
+
+      //BISERVER-13280
+      //A blur event on text input prevents execution of the click event if a blur and a click is a single action on UI.
+      //It can be fixed with a timeout, but we also must prevent a double exucution by clearing a timeout if the click event still occured.
+      var button = $('#' + this.htmlObject + ' button');
+      button.mousedown(function(){
+        this.submitTimeout = setTimeout( function(){
+          this.expression(true);
+          delete this.submitTimeout;
+        }.bind(this), 500);
+      }.bind(this));
+
+      button.click(function(){
+        if(this.submitTimeout){
+          clearTimeout(this.submitTimeout);
+          delete this.submitTimeout;
+        }
+      }.bind(this));
     },
 
     /**
