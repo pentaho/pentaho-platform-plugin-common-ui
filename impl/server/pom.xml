@@ -20,29 +20,21 @@
     <commons-lang.version>2.2</commons-lang.version>
     <commons-logging.version>1.1</commons-logging.version>
     <commons-beanutils.version>1.8.3</commons-beanutils.version>
-    <dom4j.version>1.6.1</dom4j.version>
-    <jaxen.version>1.1</jaxen.version>
-    <log4j.version>1.2.14</log4j.version>
     <flexjson.version>2.1</flexjson.version>
     <json.version>3.1.1</json.version>
     <spring.version>4.3.2.RELEASE</spring.version>
-    <commons-collections.version>3.2.2</commons-collections.version>
     <commons-io.version>2.1</commons-io.version>
     <jmock-junit4.version>2.5.1</jmock-junit4.version>
     <mockito-all.version>1.8.4</mockito-all.version>
-    <xstream.version>1.4.2</xstream.version>
     <simple-jndi.version>0.11.1</simple-jndi.version>
     <hsqldb.version>2.3.2</hsqldb.version>
     <jug-lgpl.version>2.0.0</jug-lgpl.version>
-    <slf4j-api.version>1.7.3</slf4j-api.version>
-    <slf4j-log4j12.version>1.7.3</slf4j-log4j12.version>
-    <jcl-over-slf4j.version>1.6.1</jcl-over-slf4j.version>
-    <dojo-release.version>1.9.2</dojo-release.version>
 
     <!-- Integration tests fail if we reuseForks -->
     <maven-failsafe-plugin.reuseForks>false</maven-failsafe-plugin.reuseForks>
     <maven-failsafe-plugin.forkCount>1</maven-failsafe-plugin.forkCount>
   </properties>
+
   <dependencies>
     <dependency>
       <groupId>commons-lang</groupId>
@@ -72,42 +64,6 @@
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
       <version>${commons-beanutils.version}</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>dom4j</groupId>
-      <artifactId>dom4j</artifactId>
-      <version>${dom4j.version}</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>jaxen</groupId>
-      <artifactId>jaxen</artifactId>
-      <version>${jaxen.version}</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>${log4j.version}</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -155,30 +111,6 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
       <version>${spring.version}</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>pentaho-kettle</groupId>
-      <artifactId>kettle-engine</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>pentaho-kettle</groupId>
-      <artifactId>kettle-core</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -268,27 +200,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>pentaho</groupId>
-      <artifactId>pentaho-platform-repository-test</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-      <version>${commons-collections.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>${commons-io.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-junit4</artifactId>
-      <version>${jmock-junit4.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -298,15 +212,53 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.thoughtworks.xstream</groupId>
-      <artifactId>xstream</artifactId>
-      <version>${xstream.version}</version>
+      <groupId>pentaho-library</groupId>
+      <artifactId>libformula</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.safehaus.jug</groupId>
+      <artifactId>jug-lgpl</artifactId>
+      <version>${jug-lgpl.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+   <!-- Integration tests -->
+    <dependency>
+      <groupId>pentaho-kettle</groupId>
+      <artifactId>kettle-core</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-junit4</artifactId>
+      <version>${jmock-junit4.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>simple-jndi</groupId>
       <artifactId>simple-jndi</artifactId>
       <version>${simple-jndi.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>pentaho</groupId>
+      <artifactId>pentaho-xul-core</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>pentaho</groupId>
+      <artifactId>pentaho-database-model</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -317,44 +269,8 @@
     </dependency>
     <dependency>
       <groupId>pentaho-library</groupId>
-      <artifactId>libformula</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>pentaho-library</groupId>
       <artifactId>libbase</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>pentaho</groupId>
-      <artifactId>pentaho-xul-core</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.safehaus.jug</groupId>
-      <artifactId>jug-lgpl</artifactId>
-      <version>${jug-lgpl.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j-api.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>${slf4j-log4j12.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <version>${jcl-over-slf4j.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -363,29 +279,7 @@
       <version>2.1-20150824</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>pentaho</groupId>
-      <artifactId>pentaho-database-model</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
 
-    <!-- codegen -->
-      <dependency>
-      <groupId>org.dojotoolkit.dojo</groupId>
-      <artifactId>dojo-release</artifactId>
-      <version>${dojo-release.version}</version>
-      <classifier>src</classifier>
-      <type>zip</type>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>pentaho</groupId>
-      <artifactId>pentaho-cdf-js</artifactId>
-      <version>${project.version}</version>
-      <type>zip</type>
-      <scope>provided</scope>
-    </dependency>
   </dependencies>
 
   <build>
