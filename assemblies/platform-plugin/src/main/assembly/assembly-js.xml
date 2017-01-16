@@ -29,12 +29,18 @@
       <directory>${webjars.target.directory}/jquery/${jquery.version}/dist</directory>
       <outputDirectory>common-ui/jquery</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/jquery/${jquery.version}</directory>
+      <includes><include>LICENSE*</include></includes>
+      <outputDirectory>common-ui/jquery</outputDirectory>
+    </fileSet>
 
     <fileSet>
       <directory>${webjars.target.directory}/angular/${angular.version}</directory>
       <outputDirectory>common-ui/angular</outputDirectory>
       <includes>
         <include>angular*</include>
+        <include>LICENSE*</include>
       </includes>
       <excludes>
         <exclude>*.gzip</exclude>
@@ -45,6 +51,7 @@
       <outputDirectory>common-ui/angular</outputDirectory>
       <includes>
         <include>angular*</include>
+        <include>LICENSE*</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -52,6 +59,7 @@
       <outputDirectory>common-ui/angular</outputDirectory>
       <includes>
         <include>angular*</include>
+        <include>LICENSE*</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -59,6 +67,7 @@
       <outputDirectory>common-ui/angular</outputDirectory>
       <includes>
         <include>angular*</include>
+        <include>LICENSE*</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -66,6 +75,7 @@
       <outputDirectory>common-ui/angular</outputDirectory>
       <includes>
         <include>angular*</include>
+        <include>LICENSE*</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -73,6 +83,7 @@
       <outputDirectory>common-ui/angular</outputDirectory>
       <includes>
         <include>angular*</include>
+        <include>LICENSE*</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -80,6 +91,7 @@
       <outputDirectory>common-ui/angular</outputDirectory>
       <includes>
         <include>angular*</include>
+        <include>LICENSE*</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -87,6 +99,7 @@
       <outputDirectory>common-ui/angular</outputDirectory>
       <includes>
         <include>angular*</include>
+        <include>LICENSE*</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -94,6 +107,7 @@
       <outputDirectory>common-ui/angular</outputDirectory>
       <includes>
         <include>angular*</include>
+        <include>LICENSE*</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -101,6 +115,7 @@
       <outputDirectory>common-ui/angular</outputDirectory>
       <includes>
         <include>angular*</include>
+        <include>LICENSE*</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -108,6 +123,7 @@
       <outputDirectory>common-ui/angular</outputDirectory>
       <includes>
         <include>angular*</include>
+        <include>LICENSE*</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -115,6 +131,7 @@
       <outputDirectory>common-ui/angular</outputDirectory>
       <includes>
         <include>angular*</include>
+        <include>LICENSE*</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -122,6 +139,7 @@
       <outputDirectory>common-ui/angular</outputDirectory>
       <includes>
         <include>angular*</include>
+        <include>LICENSE*</include>
       </includes>
     </fileSet>
     <fileSet>
