@@ -10,24 +10,24 @@
   <modelVersion>4.0.0</modelVersion>
 
   <description>Common-UI Platform Plugin</description>
+
+  <!-- Maintaining old group and artifact identifiers to simplify downstream dependencies changes -->
   <groupId>pentaho</groupId>
   <artifactId>common-ui</artifactId>
   <packaging>pom</packaging>
 
   <properties>
     <prepared.assembly.name>extrated-resources</prepared.assembly.name>
-
+    <prepared-folder.name>extrated-resources</prepared-folder.name>
     <prepared.assembly.directory>${project.build.directory}/${prepared.assembly.name}</prepared.assembly.directory>
+
     <webjars.target.directory>${prepared.assembly.directory}/webjars/META-INF/resources/webjars</webjars.target.directory>
     <common-ui-impl-client.directory>${prepared.assembly.directory}/common-ui-impl-client</common-ui-impl-client.directory>
 
     <js.assembly.name>${project.artifactId}-${project.version}-js</js.assembly.name>
     <js.assembly.directory>${project.build.directory}/${js.assembly.name}</js.assembly.directory>
 
-    <prepared-folder.name>extrated-resources</prepared-folder.name>
-
     <flexjson.version>2.1</flexjson.version>
-
     <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
     <handlebars.version>4.0.5</handlebars.version>
     <angular-translate.version>2.2.0-canary-pentaho-modified</angular-translate.version>
@@ -79,7 +79,7 @@
       <groupId>org.webjars.npm</groupId>
       <artifactId>jquery</artifactId>
     </dependency>
-    <!-- Removed due to custom changes in the current common-ui version -->
+    <!-- Temporarily removed due to custom changes in the current common-ui version -->
     <!-- (mainly the exporting of the Handlebars global variable) -->
     <!--<dependency>-->
       <!--<groupId>org.webjars.npm</groupId>-->

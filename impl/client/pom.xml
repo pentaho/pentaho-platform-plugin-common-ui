@@ -90,7 +90,9 @@
   </dependencies>
 
   <build>
-    <!-- TODO: This test resources declaration shouldn't be needed -->
+    <!-- TODO: Update javascript-test profile in the parent poms. We shouldn't need to "mark" the javascript test
+         configuration folder as a filtered test resource. The ${build.javascriptTestConfigDirectory} should already
+         be included in the javascript-test profile defined in the parent poms. -->
     <testResources>
       <testResource>
         <targetPath>${project.build.directory}</targetPath>
@@ -104,29 +106,9 @@
 
 
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-javascript-resources</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${build.javascriptSourceDirectory}</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- TODO: This plugin declaration shouldn't be needed -->
+      <!-- TODO: Update javascript-test profile in the parent poms. This plugin declaration shouldn't be needed.
+           We are overriding the executions of the frontend-maven-plugin in the javascript-test profile in order
+           to be able to use the filtered karma configuration file.  -->
       <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
@@ -154,6 +136,29 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-javascript-resources</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${build.javascriptSourceDirectory}</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
 
       <!-- We need to extract jquery twice because it is being used with different shims configuration for
            common-ui/jquery and common-ui/jquery-clean. If the same jquery file was used for both paths, a timeout
