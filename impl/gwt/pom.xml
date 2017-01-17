@@ -4,13 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <groupId>org.pentaho</groupId>
-    <artifactId>pentaho-platform-plugin-common-ui-impl</artifactId>
+    <artifactId>common-ui-impl</artifactId>
     <version>7.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>pentaho-platform-plugin-common-ui-impl-gwt</artifactId>
+  <artifactId>common-ui-impl-gwt</artifactId>
 
+  <name>Common UI GWT</name>
 
   <properties>
     <gwt.version>2.5.1</gwt.version>

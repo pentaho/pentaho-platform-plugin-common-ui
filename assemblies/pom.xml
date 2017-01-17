@@ -5,13 +5,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>pentaho-platform-plugin-common-ui</artifactId>
     <groupId>org.pentaho</groupId>
+    <artifactId>common-ui</artifactId>
     <version>7.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>pentaho-common-ui-assemblies</artifactId>
+  <artifactId>common-ui-assemblies</artifactId>
   <packaging>pom</packaging>
+
+  <name>Common-UI assemblies</name>
 
   <modules>
     <module>platform-plugin</module>

@@ -5,14 +5,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.pentaho</groupId>
-    <artifactId>pentaho-platform-plugin-common-ui-impl</artifactId>
+    <artifactId>common-ui-impl</artifactId>
     <version>7.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>pentaho-platform-plugin-common-ui-impl-server</artifactId>
+  <artifactId>common-ui-impl-server</artifactId>
   <packaging>jar</packaging>
 
-  <name>Common UI Server</name>
+  <name>Common UI server side</name>
   <description>Java portion of the Common UI codebase</description>
   <url>http://www.pentaho.com</url>
 

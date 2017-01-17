@@ -2,15 +2,6 @@
 Common-ui historically contains commonly used utils/frameworks (e.g. jquery, angular) that are used across the platform.
 As we move forward with OSGI it is expected for these to be removed from common-ui to be deployed in a more modular way.
 
-#### Modules
-
-* Impl
-  * server
-  * gwt
-  * client: This module contains pentaho client side code plus some external dependencies that were modified to run in the pentaho environment.
-* Assemblies
-  * platform-plugin
-
 #### Pre-requisites for building the project:
 * Maven, version 3+
 * Java JDK 1.8
@@ -35,6 +26,11 @@ The `release` builds will compile the source for production (meaning potential o
 ```
 $ mvn clean install
 ```
+#### Deploying to pentaho-server
+
+1) Delete the existing common-ui platform plugin at pentaho-server/pentaho-solutions/system/common-ui.
+2) Build common-ui.
+3) Unzip the file at assemblies/platform-plugin/target/common-ui-{version}.zip to pentaho-server/pentaho-solutions/system/common-ui.
 
 #### Running the tests
 

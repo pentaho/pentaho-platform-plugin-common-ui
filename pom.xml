@@ -9,11 +9,12 @@
     <version>7.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>pentaho-platform-plugin-common-ui</artifactId>
+  <artifactId>common-ui</artifactId>
   <version>7.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <description>Parent pom for pentaho-platform-plugin-common-ui projects</description>
+  <name>Common-UI root POM</name>
+  <description>Parent pom for Common-UI projects.</description>
   <url>http://www.pentaho.com</url>
   
   <modules>

@@ -4,17 +4,28 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <groupId>org.pentaho</groupId>
-    <artifactId>pentaho-common-ui-assemblies</artifactId>
+    <artifactId>common-ui-assemblies</artifactId>
     <version>7.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <description>Common-UI Platform Plugin</description>
-
-  <!-- Maintaining old group and artifact identifiers to simplify downstream dependencies changes -->
+  <!-- TODO: Update groupId to org.pentaho and artifactId to common-ui-assemblies-platform-plugin when we have time to
+       handle the downstream dependencies. When the identifiers are updated, this module should stop publishing the files
+       for the javascript sources (js classifier) and java sources (sources classifier). The downstream dependencies should
+       fetch the artifacts produced by the other modules of the common-ui project (e.g. sources from org.pentaho:common-ui-impl-server).
+       For now we're maintaining old group and artifact identifiers to prevent downstream dependencies changes. -->
   <groupId>pentaho</groupId>
   <artifactId>common-ui</artifactId>
   <packaging>pom</packaging>
+
+  <name>Common-UI Platform Plugin</name>
+  <description>
+    This module assembles the main zip file for Common-UI platform plugin. It builds it by fetching external dependencies,
+    GWT and pentaho client modules. In the process it makes sure that the required files are overwritten.
+    Because the mavenization process should maintain the old group and artifact identifiers in order to reduce the number
+    of changes downstream, this module also produces the zip for the javascript sources (js classifier) and the
+    java sources (sources classifier).
+  </description>
 
   <properties>
     <prepared.assembly.name>extrated-resources</prepared.assembly.name>
@@ -36,12 +47,12 @@
   <dependencies>
     <dependency>
       <groupId>org.pentaho</groupId>
-      <artifactId>pentaho-platform-plugin-common-ui-impl-server</artifactId>
+      <artifactId>common-ui-impl-server</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.pentaho</groupId>
-      <artifactId>pentaho-platform-plugin-common-ui-impl-server</artifactId>
+      <artifactId>common-ui-impl-server</artifactId>
       <version>${project.version}</version>
       <classifier>sources</classifier>
     </dependency>
@@ -65,13 +76,13 @@
 
     <dependency>
       <groupId>org.pentaho</groupId>
-      <artifactId>pentaho-platform-plugin-common-ui-impl-gwt</artifactId>
+      <artifactId>common-ui-impl-gwt</artifactId>
       <version>${project.version}</version>
       <type>zip</type>
     </dependency>
     <dependency>
       <groupId>org.pentaho</groupId>
-      <artifactId>pentaho-platform-plugin-common-ui-impl-client</artifactId>
+      <artifactId>common-ui-impl-client</artifactId>
       <version>${project.version}</version>
     </dependency>
 
