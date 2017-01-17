@@ -38,6 +38,7 @@
     <js.assembly.name>${project.artifactId}-${project.version}-js</js.assembly.name>
     <js.assembly.directory>${project.build.directory}/${js.assembly.name}</js.assembly.directory>
 
+    <pentaho-modeler.version>${project.version}</pentaho-modeler.version>
     <flexjson.version>2.1</flexjson.version>
     <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
     <handlebars.version>4.0.5</handlebars.version>

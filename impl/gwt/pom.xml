@@ -15,6 +15,7 @@
 
   <properties>
     <gwt.version>2.5.1</gwt.version>
+    <pentaho-gwt-widgets.version>${project.version}</pentaho-gwt-widgets.version>
     <validation-api.version>1.0.0.GA</validation-api.version>
     <gwt-maven-plugin.version>2.5.1</gwt-maven-plugin.version>
     <gwt.outputDirectory>${project.build.directory}/gwt-output</gwt.outputDirectory>
@@ -24,7 +25,7 @@
     <dependency>
       <groupId>pentaho</groupId>
       <artifactId>pentaho-gwt-widgets</artifactId>
-      <version>${project.version}</version>
+      <version>${pentaho-gwt-widgets.version}</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -36,7 +37,7 @@
     <dependency>
       <groupId>pentaho</groupId>
       <artifactId>pentaho-gwt-widgets</artifactId>
-      <version>${project.version}</version>
+      <version>${pentaho-gwt-widgets.version}</version>
       <classifier>sources</classifier>
       <scope>provided</scope>
     </dependency>

@@ -32,7 +32,6 @@
     <angular.version>1.5.8</angular.version>
     <jquery.version>1.12.4</jquery.version>
     <dojo.version>1.9.2</dojo.version>
-    <pentaho-modeler.version>${project.version}</pentaho-modeler.version>
   </properties>
 
   <dependencyManagement>
