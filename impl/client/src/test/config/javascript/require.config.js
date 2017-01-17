@@ -1,10 +1,5 @@
 /* globals window, requirejs */
 
-// Find and inject tests using requirejs
-var tests = Object.keys(window.__karma__.files).filter(function(file) {
-  return (/.spec\.js$/).test(file);
-});
-
 var requirePaths    = requireCfg.paths;
 var requireShim     = requireCfg.shim;
 var requireMap      = requireCfg.map;
@@ -13,8 +8,6 @@ var requireService  = requireCfg.config["pentaho/service"] || (requireCfg.config
 
 requireCfg.baseUrl = "/base";
 
-// Javascript Tests source files
-requirePaths["tests"] = baseTest;
 
 requirePaths["dojo"] = depWebJars + "/dojo/${dojo.version}";
 requirePaths["dijit"] = depWebJars + "/dijit/${dojo.version}";
@@ -120,8 +113,6 @@ requirePaths["common-ui/AnimatedAngularPluginHandler"] = basePath + "/plugin-han
 requirePaths["common-ui/ring"] = basePath + "/ring/ring";
 requireShim ["common-ui/ring"] = {deps: ["common-ui/underscore"], exports: "ring"};
 
-requireCfg.deps = tests;
-
 // --- Extra Viz API config for themes and packages
 function mapTheme(mid, themeRoot, themes) {
   var theme = (typeof active_theme !== "undefined") ? active_theme : null;
@@ -148,8 +139,3 @@ mapTheme("pentaho/visual/ccc", "_themes", ["crystal", "sapphire", "onyx", "det"]
   "pentaho/visual/ccc/bar"
 ].forEach(registerVizPackage);
 
-requireCfg.callback = function() {
-    window.__karma__.start();
-};
-
-requirejs.config(requireCfg);

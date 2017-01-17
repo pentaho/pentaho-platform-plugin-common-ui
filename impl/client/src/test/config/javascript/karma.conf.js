@@ -21,7 +21,9 @@ module.exports = function(config) {
 
             '${build.dependenciesDirectory}/cdf/cdf-require-js-cfg.js',
             '${build.javascriptTestConfigDirectory}/require-test.js',
-            '${build.directory}/context.js'
+            '${project.build.directory}/require.config.js',
+
+            '${project.build.directory}/context-end.js'
         ],
 
         exclude: [

@@ -35,14 +35,30 @@
 
   // Karma serves files from '/base'
 
-  requireCfg.paths["tests"] = "/base/test-js/unit";
+  // Javascript Tests source files
+  requirePaths["tests"] = baseTest;
 
   // ----------------
 
+  /* TODO: check old way of picking up js tests
   require.config(requireCfg);
 
   // Ask Require.js to load all spec files and then start test run.
   require(getSpecs(), __karma__.start);
+  */
+
+  // Find and inject tests using requirejs
+  var tests = Object.keys(window.__karma__.files).filter(function(file) {
+    return (/.spec\.js$/).test(file);
+  });
+
+  requireCfg.deps = tests;
+
+  requireCfg.callback = function() {
+      window.__karma__.start();
+  };
+
+  requirejs.config(requireCfg);
 
   /**
    * Filters `*Spec.js` files from `__karma__.files` and
