@@ -38,7 +38,7 @@ define([
                         "i18n?plugin=" + bundleInfo.pluginId + "&name=" + bundleInfo.name;
 
         localRequire([bundleUrl], function(bundle) {
-          //print("bundle: " + JSON.stringify(bundle));
+
           onLoad(new MessageBundle(bundle));
         });
       }
@@ -105,12 +105,17 @@ define([
 
     // Remove basePath from bundle url
     var basePath = contextVars.basePath || "";
-    if(absBundleUrl.indexOf(basePath) === 0)
+    if(basePath && absBundleUrl.indexOf(basePath) === 0)
       absBundleUrl = absBundleUrl.substr(basePath.length);
 
     // The same for content/
     if(absBundleUrl.indexOf("content/") === 0)
       absBundleUrl = absBundleUrl.substr("content/".length);
+
+    // In CGG, these type of URLs arise:
+    // absBundleUrl: "res:../../common-ui/resources/web/pentaho/type/i18n/types"
+    var m = /^res:[\.\/]*(.*)$/.exec(absBundleUrl);
+    if(m) absBundleUrl = m[1];
 
     // Split the url into pluginId and bundleName
     // "pluginId/...bundleName..."
