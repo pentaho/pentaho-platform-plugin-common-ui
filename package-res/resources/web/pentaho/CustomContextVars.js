@@ -41,6 +41,7 @@ define([
 
     if(!customContextVars) customContextVars = {};
 
+    this.basePath = readVar(customContextVars, "basePath");
     this.application = readVar(customContextVars, "application");
     this.user = readVar(customContextVars, "user");
     this.theme = readVar(customContextVars, "theme");
