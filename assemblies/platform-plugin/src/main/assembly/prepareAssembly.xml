@@ -19,6 +19,37 @@
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <unpack>true</unpack>
       <outputDirectory>common-ui-impl-client</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
+
+    <!-- GWT -->
+    <dependencySet>
+      <includes>
+        <include>pentaho:pentaho-gwt-widgets</include>
+      </includes>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <unpack>true</unpack>
+      <unpackOptions>
+        <includes>
+          <include>org/pentaho/gwt/widgets/themes/public/themes/**</include>
+        </includes>
+      </unpackOptions>
+      <outputDirectory>gwt-widgets</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>pentaho:pentaho-gwt-widgets-package:zip</include>
+      </includes>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <unpack>true</unpack>
+      <unpackOptions>
+        <includes>
+          <include>formatter/**</include>
+        </includes>
+      </unpackOptions>
+      <outputDirectory>gwt-widgets</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
 
     <dependencySet>
@@ -28,6 +59,7 @@
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <unpack>true</unpack>
       <outputDirectory>dojox</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
 
     <dependencySet>
@@ -39,6 +71,7 @@
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <unpack>true</unpack>
       <outputDirectory>webjars</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
 
   </dependencySets>

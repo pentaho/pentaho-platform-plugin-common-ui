@@ -18,6 +18,7 @@
       </includes>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <unpack>true</unpack>
+      <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
 
   </dependencySets>

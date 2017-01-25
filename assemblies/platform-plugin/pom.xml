@@ -29,7 +29,6 @@
 
   <properties>
     <prepared.assembly.name>extrated-resources</prepared.assembly.name>
-    <prepared-folder.name>extrated-resources</prepared-folder.name>
     <prepared.assembly.directory>${project.build.directory}/${prepared.assembly.name}</prepared.assembly.directory>
 
     <webjars.target.directory>${prepared.assembly.directory}/webjars/META-INF/resources/webjars</webjars.target.directory>
@@ -38,11 +37,15 @@
     <js.assembly.name>${project.artifactId}-${project.version}-js</js.assembly.name>
     <js.assembly.directory>${project.build.directory}/${js.assembly.name}</js.assembly.directory>
 
+    <gwt-widgets.directory>${prepared.assembly.directory}/gwt-widgets</gwt-widgets.directory>
+
     <pentaho-modeler.version>${project.version}</pentaho-modeler.version>
     <flexjson.version>2.1</flexjson.version>
     <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
     <handlebars.version>4.0.5</handlebars.version>
     <angular-translate.version>2.2.0-canary-pentaho-modified</angular-translate.version>
+
+    <pentaho-gwt-widgets.version>${project.version}</pentaho-gwt-widgets.version>
   </properties>
 
   <dependencies>
@@ -76,11 +79,24 @@
     </dependency>
 
     <dependency>
-      <groupId>org.pentaho</groupId>
-      <artifactId>common-ui-impl-gwt</artifactId>
-      <version>${project.version}</version>
+      <groupId>pentaho</groupId>
+      <artifactId>pentaho-gwt-widgets</artifactId>
+      <version>${pentaho-gwt-widgets.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>pentaho</groupId>
+      <artifactId>pentaho-gwt-widgets-package</artifactId>
+      <version>${pentaho-gwt-widgets.version}</version>
       <type>zip</type>
     </dependency>
+
     <dependency>
       <groupId>org.pentaho</groupId>
       <artifactId>common-ui-impl-client</artifactId>
@@ -208,7 +224,7 @@
 
           <!-- First unpack all webjar dependencies locally so that we can pick what to copy and where to copy it for the final assembly -->
           <execution>
-            <id>unpack-webjars-dependencies</id>
+            <id>prepare-assembly</id>
             <phase>prepare-package</phase>
             <goals>
               <goal>single</goal>
@@ -217,8 +233,27 @@
               <descriptors>
                 <descriptor>src/main/assembly/prepareAssembly.xml</descriptor>
               </descriptors>
+
+              <attach>false</attach>
               <appendAssemblyId>false</appendAssemblyId>
               <finalName>${prepared.assembly.name}</finalName>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>prepare-platform-plugin-js</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/assembly/assembly-js-dir.xml</descriptor>
+              </descriptors>
+
+              <attach>false</attach>
+              <appendAssemblyId>false</appendAssemblyId>
+              <finalName>${js.assembly.name}</finalName>
             </configuration>
           </execution>
 

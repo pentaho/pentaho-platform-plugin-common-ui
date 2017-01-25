@@ -22,19 +22,19 @@
       <outputDirectory>common-ui/resources/web</outputDirectory>
     </fileSet>
 
+    <fileSet>
+      <directory>${gwt-widgets.directory}/org/pentaho/gwt/widgets/themes/public</directory>
+      <outputDirectory>common-ui/resources</outputDirectory>
+    </fileSet>
+
+    <fileSet>
+      <directory>${gwt-widgets.directory}/formatter</directory>
+      <outputDirectory>common-ui/resources/web/formatter</outputDirectory>
+    </fileSet>
+
   </fileSets>
 
   <dependencySets>
-
-    <!-- GWT -->
-    <dependencySet>
-      <includes>
-        <include>org.pentaho:common-ui-impl-gwt:zip</include>
-      </includes>
-      <useTransitiveDependencies>false</useTransitiveDependencies>
-      <unpack>true</unpack>
-      <outputDirectory>common-ui</outputDirectory>
-    </dependencySet>
 
     <dependencySet>
       <includes>
@@ -48,6 +48,7 @@
         </includes>
       </unpackOptions>
       <outputDirectory>common-ui/resources/web/angular-translate</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
 
     <!-- Server side dependencies -->
@@ -62,6 +63,7 @@
       </includes>
       <outputDirectory>common-ui/lib</outputDirectory>
       <useTransitiveDependencies>false</useTransitiveDependencies>
+      <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
 
   </dependencySets>
