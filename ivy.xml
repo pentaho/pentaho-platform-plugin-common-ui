@@ -55,12 +55,13 @@
 
 		<!-- Testing dependencies -->
 
-        <dependency org="pentaho" name="pentaho-platform-core-test" rev="${dependency.pentaho-platform.revision}" changing="true" conf="test->default" transitive="false">
-            <artifact name="pentaho-platform-core-test"/>
-            <artifact name="pentaho-platform-core-test" type="source" ext="jar" m:classifier="sources"/>
+        <dependency org="pentaho" name="pentaho-platform-core" rev="${dependency.pentaho-platform.revision}" changing="true" conf="test->default"  transitive="false">
+            <artifact name="pentaho-platform-core" ext="jar" m:classifier="tests" />
         </dependency>
-        <dependency org="pentaho" name="pentaho-platform-repository-test" rev="${dependency.pentaho-platform.revision}" changing="true"
-                    conf="test->default" transitive="false"/>
+        <dependency org="pentaho" name="pentaho-platform-repository" rev="${dependency.pentaho-platform.revision}" changing="true"
+                    conf="test->default" m:classifier="tests" transitive="false">
+            <artifact name="pentaho-platform-repository" ext="jar" m:classifier="tests" />
+        </dependency>
 
         <dependency org="commons-collections" name="commons-collections" rev="3.2.2" transitive="false" conf="test->default" />
 		<dependency org="commons-io" name="commons-io" rev="2.1" transitive="false" conf="test->default"/>
