@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file expect in compliance with the License.
@@ -339,7 +339,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         panel.parameterChanged(param, name, value);
         expect(panel.parametersChanged).toBeTruthy();
         expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
-        expect(parameterChangedSpy).toHaveBeenCalledWith(name, value);
+        expect(parameterChangedSpy).toHaveBeenCalledWith(name, value, jasmine.any(Object));
       });
 
       it("parameterChanged only specific callback should be called", function() {
@@ -357,7 +357,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         panel.parameterChanged(param, name, value);
         expect(panel.parametersChanged).toBeTruthy();
         expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
-        expect(parameterChangedSpySpecific).toHaveBeenCalledWith(name, value);
+        expect(parameterChangedSpySpecific).toHaveBeenCalledWith(name, value, jasmine.any(Object));
         expect(parameterChangedSpyGeneric).not.toHaveBeenCalled();
       });
 
