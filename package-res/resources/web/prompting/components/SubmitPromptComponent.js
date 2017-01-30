@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,19 +95,24 @@ define(['./ScopedPentahoButtonComponent', 'common-ui/jquery-clean'], function(Sc
 
       //BISERVER-13280
       //A blur event on text input prevents execution of the click event if a blur and a click is a single action on UI.
-      //It can be fixed with a timeout, but we also must prevent a double exucution by clearing a timeout if the click event still occured.
+      //It can be fixed with a timeout, but we also must prevent a double execution by clearing a timeout if the click event still occurred.
       var button = $('#' + this.htmlObject + ' button');
+      //Unbind existent handlers
+      button.unbind('click');
+      button.unbind('mousedown');
+      //Set timeout on mousedown
       button.mousedown(function(){
+        this.expressionStart();
         this.submitTimeout = setTimeout( function(){
-          this.expression(true);
+          this.expression(false);
           delete this.submitTimeout;
         }.bind(this), 500);
       }.bind(this));
 
       button.click(function(){
-        if(this.submitTimeout){
-          clearTimeout(this.submitTimeout);
-          delete this.submitTimeout;
+        //If there is no timeout we need to call expression
+        if(!this.submitTimeout){
+          this.expression(false);
         }
       }.bind(this));
     },
