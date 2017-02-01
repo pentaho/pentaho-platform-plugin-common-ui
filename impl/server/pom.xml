@@ -205,8 +205,9 @@
     <!-- test -->
     <dependency>
       <groupId>pentaho</groupId>
-      <artifactId>pentaho-platform-core-test</artifactId>
+      <artifactId>pentaho-platform-core</artifactId>
       <version>${pentaho-platform.version}</version>
+      <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -238,6 +239,18 @@
     <dependency>
       <groupId>pentaho-kettle</groupId>
       <artifactId>kettle-core</artifactId>
+      <version>${pentaho-kettle.version}</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>pentaho-kettle</groupId>
+      <artifactId>kettle-engine</artifactId>
       <version>${pentaho-kettle.version}</version>
       <scope>test</scope>
       <exclusions>
