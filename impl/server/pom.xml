@@ -21,7 +21,7 @@
     <commons-logging.version>1.1</commons-logging.version>
     <commons-beanutils.version>1.8.3</commons-beanutils.version>
     <flexjson.version>2.1</flexjson.version>
-    <json.version>3.1.1</json.version>
+    <org.json.version>3.1.1</org.json.version>
     <spring.version>4.3.2.RELEASE</spring.version>
     <commons-io.version>2.1</commons-io.version>
     <jmock-junit4.version>2.5.1</jmock-junit4.version>
@@ -96,7 +96,7 @@
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>${json.version}</version>
+      <version>${org.json.version}</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
