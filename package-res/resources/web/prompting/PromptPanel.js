@@ -1347,11 +1347,17 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             if (this.onAfterRender) {
               this.onAfterRender();
             }
-          } else if (this.diff && !this._isDashboardEditMode()) { // Perform update when there are differences
+          } else if (this.diff) { // Perform update when there are differences
             this.update(this.diff);
 
             var layout = this.dashboard.getComponentByName("prompt" + this.guid);
+            if(!layout) {
+              return;
+            }
             var updateCallback = (function(component) {
+              if(!component) {
+                return;
+              }
               if (this.isForceRefresh) {
                 this.dashboard.updateComponent(component);
               }
@@ -1380,14 +1386,6 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
 
           if (this.onAfterUpdate) {
             this.onAfterUpdate();
-          }
-        },
-
-        _isDashboardEditMode : function(){
-          try {
-             return window.frameElement.src.indexOf('dashboard-mode') !== -1 && parent.pho.dashboards.editMode;
-          } catch (e) {
-             return false;
           }
         },
 
