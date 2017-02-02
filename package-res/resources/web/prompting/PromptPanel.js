@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1351,7 +1351,13 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             this.update(this.diff);
 
             var layout = this.dashboard.getComponentByName("prompt" + this.guid);
+            if(!layout) {
+              return;
+            }
             var updateCallback = (function(component) {
+              if(!component) {
+                return;
+              }
               if (this.isForceRefresh) {
                 this.dashboard.updateComponent(component);
               }
