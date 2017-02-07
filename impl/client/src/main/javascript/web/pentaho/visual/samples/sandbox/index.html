@@ -3,15 +3,52 @@
   <head>
     <title>Visualization Sandbox</title>
     <meta charset="utf-8" />
-    <script language="javascript" type="text/javascript" src="/pentaho/webcontext.js"></script>
+    <script language="javascript" type="text/javascript" src="http://localhost:8080/pentaho/webcontext.js"></script>
+
+    <script type="text/javascript">
+      // for embedded scenarios
+      require.config({
+        config: {
+          "text": {
+            useXhr: function() {
+              return true;
+            },
+            onXhr: function(xhr, url) {
+              xhr.withCredentials = true;
+            }
+          }
+        }
+      });
+    </script>
+    <style>
+      .sandbox-container {
+        margin-top: 50px;
+        border: 1px solid black;
+        min-height: 100px;
+      }
+    </style>
   </head>
   <body>
-  <h1>Dirty Container</h1>
+    <p>This sample visualization container can be accessed in two ways:</p>
+    <ol>
+      <li>
+        from within the Pentaho web server, e.g.:
+        <code>http://localhost:8080/pentaho/content/common-ui/resources/web/pentaho/visual/samples/sandbox/index.html</code>,
+        or,
+      </li>
+      <li>
+        from another local web server, simulating an embedded scenario,
+        and assuming that the Pentaho web server is available
+        at <code>http://localhost:8080/pentaho/</code>.
+      </li>
+    </ol>
+
     <div class="sandbox-container"></div>
-  </body>
-  <script>
-   require(['./container'], function(){
-     console.log("The container was loaded");
-   });
+
+    <script type="text/javascript">
+     require(["./container"], function() {
+       console.log("The container was loaded");
+     });
   </script>
+  </body>
 </html>

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,14 +53,14 @@ define([
 
   var view = new View(vizElement, model);
   view.update().then(function() {
-    console.log("render yielded", arguments);
+    console.log("view update finished");
   });
 
+  // Export for users to play with.
   window.app = {
     context: context,
     view: view,
     View: View,
     Model: Model
   };
-
 });
