@@ -52,8 +52,9 @@ define([
   "../util/object",
   "../util/fun",
   "../util/text",
-  "../util/debugInfo"
-], function(module, O, fun, text, debugInfo) {
+  "../debug",
+  "../debug/Levels"
+], function(module, O, fun, text, debugMgr, DebugLevels) {
   "use strict";
 
   // ## Support variables
@@ -84,8 +85,7 @@ define([
         "extend_order": 1,
         "extend_exclude": 1
       });
-
-  var _isDebugMode = debugInfo.Levels.debug <= debugInfo.getMaxLevel(module);
+  var _isDebugMode = debugMgr.testLevel(DebugLevels.debug, module);
 
   return base_create();
 

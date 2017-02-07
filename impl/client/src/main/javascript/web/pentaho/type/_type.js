@@ -26,10 +26,10 @@ define([
   "../util/fun",
   "../util/promise",
   "../util/text",
-  "./util",
+  "../util/spec",
   "./theme/model"
 ], function(localRequire, SpecificationScope, SpecificationContext, bundle, Base,
-    AnnotatableLinked, error, arg, O, F, promiseUtil, text, typeUtil) {
+    AnnotatableLinked, error, arg, O, F, promiseUtil, text, specUtil) {
 
   "use strict";
 
@@ -116,7 +116,7 @@ define([
         // Don't use inherited property definition which may be writable false
         Object.defineProperty(this, "_hasDescendants", {value: false, writable: true});
 
-        this._application = typeUtil.mergeSpecs({}, this._application);
+        this._application = specUtil.merge({}, this._application);
       },
 
       /**
@@ -613,7 +613,7 @@ define([
        * Gets or sets the `application` attribute of this type.
        *
        * The application property serves as a bag of properties specific to the _container application_
-       * that can be modified via the [Configuration Service]{@link pentaho.type.config.ConfigurationService}.
+       * that can be modified via the [Configuration Service]{@link pentaho.config.Service}.
        *
        * Setting this to a {@link Nully} value will have no effect.
        *
@@ -624,7 +624,7 @@ define([
       },
 
       set application(value) {
-        typeUtil.mergeSpecs(this._application, value);
+        specUtil.merge(this._application, value);
       },
       // endregion
 

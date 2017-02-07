@@ -1,7 +1,7 @@
 define([
   //'angular-mocks',
   'common-ui/angular',
-  './templateUtil.js',
+  './templateUtil',
   'common-ui/angular-ui-bootstrap',
   'common-ui/angular-directives/accordionWizard/accordionWizard'
 ], function (angular, templateUtil) {

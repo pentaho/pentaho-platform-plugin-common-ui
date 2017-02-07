@@ -21,7 +21,7 @@ define([
   "pentaho/lang/Event",
   "pentaho/type/filter/abstract",
   "pentaho/type/filter/or",
-  "pentaho/type/util",
+  "pentaho/util/spec",
   "pentaho/util/object",
   "pentaho/util/error",
   "pentaho/util/fun",
@@ -46,7 +46,7 @@ define([
   "../role/ordinal",
   "../role/quantitative"
 ], function(module, modelFactory, visualApplicationFactory,
-            Event, abstractFilterFactory, orFilterFactory, typeUtil, O,
+            Event, abstractFilterFactory, orFilterFactory, specUtil, O,
             error, F, UserError,
             selectionModes,
             WillSelect, DidSelect, RejectedSelect,
@@ -410,7 +410,7 @@ define([
          * locally specified extension properties.
          *
          * The merging is performed using the rules of the
-         * {@link pentaho.type.Util#mergeSpecs} method.
+         * {@link pentaho.util.Spec#merge} method.
          *
          * Returns `null` when there are no local or inherited extension properties.
          *
@@ -429,13 +429,13 @@ define([
               var ancestorExtEf = ancestor.extensionEffective;
               if(ancestorExtEf) {
                 effective = {};
-                typeUtil.mergeSpecs(effective, ancestorExtEf);
+                specUtil.merge(effective, ancestorExtEf);
               }
             }
 
             if(this._extension) {
               if(!effective) effective = {};
-              typeUtil.mergeSpecs(effective, this._extension);
+              specUtil.merge(effective, this._extension);
             }
 
             this._extensionEf = effective;

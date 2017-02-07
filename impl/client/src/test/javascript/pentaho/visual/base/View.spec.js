@@ -13,12 +13,14 @@ define([
 
   // Allow ~0
   // jshint -W016
+  /* eslint max-nested-callbacks:0 */
 
   var it = testUtils.itAsync;
 
   describe("pentaho.visual.base.View", function() {
 
-    var Model, model;
+    var Model;
+    var model;
 
     beforeEach(function() {
 
@@ -232,7 +234,7 @@ define([
 
           spyOn(view, "__onUpdateRejectedOuter").and.callFake(function(error) { return Promise.reject(error); });
           spyOn(view, "__updateLoop").and.callThrough();
-          spyOn(view, '__validate');
+          spyOn(view, "__validate");
           spyOn(view, "_updateAll");
 
           return view;
@@ -252,7 +254,7 @@ define([
           var view = createView();
 
           var originalMethod = view.__selectUpdateMethod;
-          spyOn(view, '__selectUpdateMethod').and.callFake(function() {
+          spyOn(view, "__selectUpdateMethod").and.callFake(function() {
 
             expect(view.__validate).toHaveBeenCalled();
 
@@ -284,7 +286,7 @@ define([
 
           var view = createView();
 
-          spyOn(view, '__selectUpdateMethod').and.callThrough();
+          spyOn(view, "__selectUpdateMethod").and.callThrough();
 
           return view.update().then(function() {
             expect(view.__selectUpdateMethod).toHaveBeenCalled();
@@ -296,7 +298,7 @@ define([
           var view = createView();
 
           view._updateFoo = jasmine.createSpy("_updateFoo");
-          spyOn(view, '__selectUpdateMethod').and.returnValue({name: "_updateFoo", mask: -1});
+          spyOn(view, "__selectUpdateMethod").and.returnValue({name: "_updateFoo", mask: -1});
 
           return view.update().then(function() {
             expect(view._updateFoo).toHaveBeenCalled();
@@ -390,6 +392,7 @@ define([
 
         it("should fulfill the update even if '_onUpdateDid' throws an error", function() {
 
+          console.log("TEST: expect console error.");
           var view = createView();
 
           view._onUpdateDid.and.throwError(new Error());
@@ -483,6 +486,8 @@ define([
           view.__updateLoop.and.returnValue(Promise.reject(error0));
 
           view._onUpdateRejected.and.throwError(new Error());
+
+          console.log("TEST: expect console error.");
 
           return view.update().then(function() {
             fail("Expected update to have been rejected.");
@@ -653,7 +658,6 @@ define([
         var view  = createView();
         var spies = createUpdateSpies(view);
 
-
         view.__dirtyPropGroups.set(View.PropertyGroups.Size | View.PropertyGroups.Selection);
 
         return view.update().then(function() {
@@ -743,7 +747,7 @@ define([
       });
     });
 
-    describe("#_onChangeDid", function(){
+    describe("#_onChangeDid", function() {
       var view;
 
       beforeEach(function() {
@@ -806,7 +810,7 @@ define([
           dirtyPropGroups.set(View.PropertyGroups.General);
         });
 
-        spyOn(view, "update");
+        spyOn(view, "update").and.returnValue(Promise.resolve());
 
         model.isInteractive = false;
 
@@ -1251,7 +1255,8 @@ define([
         });
       });
 
-      it("should return a promise that is fulfilled with the view constructor of the registered default view type", function() {
+      it("should return a promise that is fulfilled with the view constructor of the registered default view type",
+      function() {
         var SubView  = View.extend();
         var SubModel = Model.extend({type: {defaultView: SubView}});
 

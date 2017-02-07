@@ -1,56 +1,56 @@
-var baseConfig = require('./karma.conf.js');
+var baseConfig = require("./karma.conf.js");
 
 module.exports = function(config) {
-    baseConfig(config);
+  baseConfig(config);
 
-    config.set({
+  config.set({
 
-        basePath: '${basedir}',
+    basePath: "${basedir}",
 
-        frameworks: ['jasmine', 'requirejs'],
+    frameworks: ["jasmine", "requirejs"],
 
-        plugins: [
-            'karma-jasmine',
-            'karma-requirejs',
-            'karma-junit-reporter',
-            'karma-html-reporter',
-            'karma-coverage',
-            'karma-phantomjs-launcher'
-        ],
+    plugins: [
+      "karma-jasmine",
+      "karma-requirejs",
+      "karma-junit-reporter",
+      "karma-html-reporter",
+      "karma-coverage",
+      "karma-phantomjs-launcher"
+    ],
 
-        reporters: ["progress", "junit", "coverage"],
+    reporters: ["progress", "junit", "coverage"],
 
-        preprocessors: {
-            '${build.javascriptSourceDirectory}/**/*.js': 'coverage'
+    preprocessors: {
+      "${build.javascriptSourceDirectory}/**/*.js": "coverage"
+    },
+
+    junitReporter: {
+      useBrowserName: false,
+      outputFile: "${build.javascriptReportDirectory}/test-results.xml",
+      suite: "unit"
+    },
+
+    coverageReporter: {
+      useBrowserName: false,
+      reporters: [
+        {
+          type: "html",
+          dir: "${build.javascriptReportDirectory}/jscoverage/html/"
         },
+        {
+          type: "cobertura",
+          dir: "${build.javascriptReportDirectory}/cobertura/xml/"
+        }
+      ],
+      dir: "${build.javascriptReportDirectory}"
+    },
 
-        junitReporter: {
-            useBrowserName: false,
-            outputFile: "${build.javascriptReportDirectory}/test-results.xml",
-            suite: "unit"
-        },
+    logLevel: config.LOG_INFO,
 
-        coverageReporter: {
-            useBrowserName: false,
-            reporters: [
-                {
-                    type: "html",
-                    dir: "${build.javascriptReportDirectory}/jscoverage/html/"
-                },
-                {
-                    type: "cobertura",
-                    dir: "${build.javascriptReportDirectory}/cobertura/xml/"
-                }
-            ],
-            dir: "${build.javascriptReportDirectory}"
-        },
+    autoWatch: false,
 
-        logLevel: config.LOG_INFO,
+    browsers: ["PhantomJS"],
 
-        autoWatch: false,
-
-        browsers: ["PhantomJS"],
-
-        singleRun: true
-    });
+    singleRun: true
+  });
 };

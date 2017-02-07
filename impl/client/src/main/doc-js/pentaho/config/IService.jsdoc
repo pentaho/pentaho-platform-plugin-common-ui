@@ -1,0 +1,140 @@
+/*!
+ * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `config.IService` interface describes a service
+ * that manages configurations, usually of types.
+ *
+ * The platform's main configuration service instance can be obtained by requiring
+ * the module `pentaho/service!pentaho.config.IService?single`.
+ *
+ * The platform registers an instance module that
+ * loads all registered configuration rule set modules
+ * (i.e., modules of type {@link pentaho.config.spec.IRuleSet}).
+ *
+ * The [add]{@link pentaho.config.IService#add} method
+ * is used to register a [config.spec.IRuleSet]{@link pentaho.config.spec.IRuleSet}
+ * to the service.
+ *
+ * The [select]{@link pentaho.config.IService#select} method
+ * selects the rules of added configurations that apply to
+ * a given type and context variables,
+ * sorts these by specificity,
+ * then merges the rules' [specifications]{@link pentaho.config.spec.IRule#apply}
+ * and returns the result.
+ * For more information on the specificity of rules,
+ * see [config.spec.IRuleSet]{@link pentaho.config.spec.IRuleSet}.
+ *
+ * The merged configuration specification can then be used to configure a type or an instance.
+ *
+ * Normally, you won't call these operations directly.
+ *
+ * Then, the [Context]{@link pentaho.type.Context} class
+ * already handles obtaining configurations from its configuration service,
+ * and applying these to the requested value types.
+ *
+ * The following example illustrates how an implementation of this service would be used:
+ *
+ * ```js
+ * var myTypeConfig = {
+ *   rules: [
+ *     // Disable a still experimental component.
+ *     {
+ *       select: {
+ *         type: "my.foo.component"
+ *       },
+ *       apply: {
+ *         enabled: false
+ *       }
+ *     },
+ *
+ *     // Enable it, only for the dev user, "john", and the "super-app" application.
+ *     {
+ *       select: {
+ *         type:        "my.foo.component",
+ *         user:        "john",
+ *         application: "super-app"
+ *       },
+ *       apply: {
+ *         enabled: true
+ *       }
+ *     }
+ *   ]
+ * };
+ *
+ * var configService = new SomeConfigurationService();
+ *
+ * configService.add(myTypeConfig);
+ *
+ * var mergedConfigSpec = configService.select("my.foo.component", {
+ *      user:        "john",
+ *      application: "not-so-super-app"
+ *    });
+ *
+ * // Results in a configuration specification like:
+ * // {
+ * //   enabled: false
+ * // }
+ * ```
+ *
+ * @name pentaho.config.IService
+ * @interface
+ *
+ * @see pentaho.config.spec.IRuleSet
+ */
+
+/**
+ * Obtains the merged configuration specification of
+ * the selection of configuration rules that apply to a given type and context variables.
+ *
+ * @name select
+ * @memberOf pentaho.config.IService#
+ * @method
+ *
+ * @param {string} typeId - The id of the type whose configuration specification is desired.
+ *
+ * @param {pentaho.context.IContext} [context] The platform context that is used to select rules.
+ *
+ * A {@link Nully} variable value is equivalent to a variable that is not present.
+ * It matches only configuration rules that do not select that variable.
+ *
+ * When the map is unspecified,
+ * every variable will appear as though it had been specified with a `null` value.
+ *
+ * Variable values are matched against each value specified by a rule in its selection variables,
+ * using JavaScript's strict equality operator, `===`.
+ *
+ * @return {!Object} The merged configuration specification,
+ * if any rule was selected; or `null`, if no rule was selected.
+ */
+
+/**
+ * Adds a configuration rule set.
+ *
+ * Added configurations overrides previously added configurations,
+ * if all other rule-ordering criteria are equal.
+ * For more information on the specificity of rules,
+ * see [config.spec.IRuleSet]{@link pentaho.config.spec.IRuleSet}.
+ *
+ * Note that the specified configuration object **may** be modified to serve
+ * the service's internal needs.
+ *
+ * @name add
+ * @memberOf pentaho.config.IService#
+ * @method
+ *
+ * @param {!pentaho.config.spec.IRuleSet} config - A type configuration to add.
+ */

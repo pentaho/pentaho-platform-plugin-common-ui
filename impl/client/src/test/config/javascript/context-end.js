@@ -31,37 +31,26 @@
 (function() {
   "use strict";
 
-  /* global requireCfg:false, KARMA_DEBUG:false, __karma__:false, console:false, DEV_SPEC_FILTER:false*/
+  /* globals require, requireCfg, KARMA_DEBUG, __karma__, console, DEV_SPEC_FILTER */
+
+  /* eslint dot-notation: 0 */
 
   // Karma serves files from '/base'
 
   // Javascript Tests source files
-  requirePaths["tests"] = baseTest;
+  requireCfg.paths["tests"] = baseTest;
 
   // ----------------
 
-  /* TODO: check old way of picking up js tests
+  if(KARMA_DEBUG) console.log("requireCfg: " + JSON.stringify(requireCfg));
+
   require.config(requireCfg);
 
-  // Ask Require.js to load all spec files and then start test run.
-  require(getSpecs(), __karma__.start);
-  */
-
-  // Find and inject tests using requirejs
-  var tests = Object.keys(window.__karma__.files).filter(function(file) {
-    return (/.spec\.js$/).test(file);
-  });
-
-  requireCfg.deps = tests;
-
-  requireCfg.callback = function() {
-      window.__karma__.start();
-  };
-
-  requirejs.config(requireCfg);
+  // Ask Require.js to load all spec modules and then start test run.
+  require(getSpecModuleIds(), __karma__.start);
 
   /**
-   * Filters `*Spec.js` files from `__karma__.files` and
+   * Filters `*.spec.js` files from `__karma__.files` and
    * loads these as AMD modules, under the `tests` root amd id.
    *
    * If files were loaded by AMD as js files (and not AMD modules),
@@ -74,20 +63,20 @@
    * If the configuration variable `KARMA_DEBUG` is set to `true`,
    * information about detected spec files is written to the console.
    *
-   * @return {string[]} An array of Spec module ids.
+   * @return {string[]} An array of test spec module ids.
    */
-  function getSpecs() {
-    var reSpec = /^\/base\/test-js\/unit\/(.*?Spec)\.js$/,
-        specs = [],
-        m;
+  function getSpecModuleIds() {
+    var reSpec = new RegExp("^" + baseTest + "/(.+?)\\.spec\\.js$");
+    var specs = [];
+    var m;
 
     for(var file in __karma__.files)
       if((m = reSpec.exec(file)) && (!DEV_SPEC_FILTER || DEV_SPEC_FILTER.test(m[1])))
-        specs.push('tests/' + m[1]); // prefix with the "tests" module id.
+        specs.push("tests/" + m[1] + ".spec"); // prefix with the "tests" module id.
 
-    if(KARMA_DEBUG) console.log("all detected specs:", specs);
+    if(KARMA_DEBUG) console.log("all detected spec module ids: ", specs);
 
     return specs;
   }
 
-}());
+})();

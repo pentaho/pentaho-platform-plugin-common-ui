@@ -1,7 +1,7 @@
 define([
   //'angular-mocks',
   "common-ui/angular",
-  "./templateUtil.js",
+  "./templateUtil",
   "dojo/parser",
   "dojo/ready",
   "dijit/registry",

@@ -54,9 +54,9 @@ define([
         });
       });
 
-      it("should create a context that has a pentaho.contextVars by default", function() {
+      it("should create a context that has a pentaho.context.main by default", function() {
 
-        return require.using(["pentaho/type/Context", "pentaho/contextVars"],
+        return require.using(["pentaho/type/Context", "pentaho/context"],
         function(Context, contextVarsDefault) {
           var context = new Context();
           expect(context.vars).toBe(contextVarsDefault);
@@ -72,13 +72,13 @@ define([
             });
       });
 
-      it("should respect a given contextVars instance", function() {
+      it("should respect a given context instance", function() {
 
-        return require.using(["pentaho/type/Context", "pentaho/CustomContextVars"],
-        function(Context, CustomContextVars) {
-          var vars = new CustomContextVars();
-          var context = new Context(vars);
-          expect(context.vars).toBe(vars);
+        return require.using(["pentaho/type/Context"],
+        function(Context) {
+          var customContext = {createChild: function(){}}; // duck typing
+          var context = new Context(customContext);
+          expect(context.vars).toBe(customContext);
         });
       });
     });
@@ -1077,12 +1077,6 @@ define([
     describe("#getAllAsync(baseTypeId, ka)", function() {
 
       function configRequire(localRequire) {
-        // Reset current service configuration
-        localRequire.config({
-          config: {"pentaho/service": null}
-        });
-
-        // ---
 
         localRequire.define("exp/baseWithNoRegistrations", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
@@ -1368,13 +1362,6 @@ define([
 
       function configRequire(localRequire) {
 
-        // Reset current service configuration
-        localRequire.config({
-          config: {"pentaho/service": null}
-        });
-
-        // ---
-
         localRequire.define("exp/thing", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
             return context.get(simpleFactory).extend({type: {id: "exp/thing"}});
@@ -1466,9 +1453,9 @@ define([
         });
       });
 
-      it("should create a context that has as vars the value of pentaho.contextVars", function() {
+      it("should create a context that has as vars the value of pentaho.context.main", function() {
 
-        return require.using(["pentaho/type/Context", "pentaho/contextVars"], function(Context, contextVarsDefault) {
+        return require.using(["pentaho/type/Context", "pentaho/context"], function(Context, contextVarsDefault) {
           var context = Context.instance;
           expect(context.vars).toBe(contextVarsDefault);
         });

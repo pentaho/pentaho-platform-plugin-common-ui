@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
  * RequireJS loader plugin for loading localized messages.
  */
 define([
-  "./contextVars",
+  "./context",
   "./util/MessageBundle",
   "json"
-], function(contextVars, MessageBundle) {
+], function(context, MessageBundle) {
 
   "use strict";
 
@@ -34,8 +34,9 @@ define([
         onLoad();
       } else {
         var bundleInfo = getBundleInfo(localRequire, bundlePath);
-        var bundleUrl = "json!" + (contextVars.basePath || "") +
-                        "i18n?plugin=" + bundleInfo.pluginId + "&name=" + bundleInfo.name;
+        var serverUrl = context.server.url;
+        var bundleUrl = "json!" + ((serverUrl && serverUrl.pathname) || "") +
+            "i18n?plugin=" + bundleInfo.pluginId + "&name=" + bundleInfo.name;
 
         localRequire([bundleUrl], function(bundle) {
 
@@ -104,7 +105,8 @@ define([
     var absBundleUrl = localRequire.toUrl(bundleMid);
 
     // Remove basePath from bundle url
-    var basePath = contextVars.basePath || "";
+    var serverUrl = context.server.url;
+    var basePath = (serverUrl && serverUrl.pathname) || "";
     if(basePath && absBundleUrl.indexOf(basePath) === 0)
       absBundleUrl = absBundleUrl.substr(basePath.length);
 
