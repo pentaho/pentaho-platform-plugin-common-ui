@@ -13,60 +13,83 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-(function() {
-  /* global requireCfg:false, CONTEXT_PATH:false, KARMA_RUN:false, SESSION_LOCALE:false, active_theme:false */
+(function(global) {
+  /* globals requireCfg, CONTEXT_PATH, KARMA_RUN, SESSION_LOCALE, active_theme, ENVIRONMENT_CONFIG */
+
+  /* eslint dot-notation: 0, require-jsdoc: 0 */
+
   var basePath =
-        // environment configured
-        (typeof ENVIRONMENT_CONFIG !== "undefined" && typeof ENVIRONMENT_CONFIG.paths !== "undefined" &&
-          typeof ENVIRONMENT_CONFIG.paths["common-ui"] !== "undefined") ? ENVIRONMENT_CONFIG.paths["common-ui"] :
-        // production
-        (typeof CONTEXT_PATH !== "undefined") ? CONTEXT_PATH + "content/common-ui/resources/web" :
-        // test
-        (typeof KARMA_RUN    !== "undefined") ? "../../package-res/resources/web" :
-        // build
-        "common-ui",
+      // environment configured
+      (typeof ENVIRONMENT_CONFIG !== "undefined" && typeof ENVIRONMENT_CONFIG.paths !== "undefined" &&
+        typeof ENVIRONMENT_CONFIG.paths["common-ui"] !== "undefined") ? ENVIRONMENT_CONFIG.paths["common-ui"] :
+      // production
+      (typeof CONTEXT_PATH !== "undefined") ? CONTEXT_PATH + "content/common-ui/resources/web" :
+      // test
+      (typeof KARMA_RUN !== "undefined") ? "../../package-res/resources/web" :
+      // build
+      "common-ui";
 
-      useDebug  = typeof document === "undefined" || document.location.href.indexOf("debug=true") > 0,
-      minSuffix = useDebug ? "" : ".min",
-      requirePaths   = requireCfg.paths,
-      requireShim    = requireCfg.shim,
-      requireMap     = requireCfg.map,
+  var useDebug = typeof document === "undefined" || document.location.href.indexOf("debug=true") > 0;
+  var minSuffix = useDebug ? "" : ".min";
+  var requirePaths = requireCfg.paths;
+  var requireShim = requireCfg.shim;
+  var requireMap = requireCfg.map;
 
-      // TODO: This fallback logic is temporary, and can be removed when the remaining
-      //    parts of the system rename the "service" plugin id to "pentaho/service".
-      requireService = requireCfg.config["pentaho/service"] || (requireCfg.config["pentaho/service"] = {});
+  // TODO: This fallback logic is temporary, and can be removed when the remaining
+  //    parts of the system rename the "service" plugin id to "pentaho/service".
+  var requireTypes = requireCfg.config["pentaho/service"] || (requireCfg.config["pentaho/service"] = {});
 
-  requirePaths["common-ui"  ] = basePath;
+  // region common-ui
+  requirePaths["common-ui"] = basePath;
   requirePaths["common-repo"] = basePath + "/repo";
   requirePaths["common-data"] = basePath + "/dataapi";
 
   requirePaths["pentaho/common"] = basePath + "/dojo/pentaho/common";
+  // endregion
 
-  // Unfortunately, mantle already maps the "pentaho" id to "/js",
-  // so all the following sub-modules must be mapped individually.
-  requirePaths["pentaho/data"] = basePath + "/pentaho/data";
-  requirePaths["pentaho/lang"] = basePath + "/pentaho/lang";
-  requirePaths["pentaho/type"] = basePath + "/pentaho/type";
-  requirePaths["pentaho/util"] = basePath + "/pentaho/util";
-  requirePaths["pentaho/visual"] = basePath + "/pentaho/visual";
-  requirePaths["pentaho/service"] = basePath + "/pentaho/service";
-  requirePaths["pentaho/i18n"] = basePath + "/pentaho/i18n";
-  requirePaths["pentaho/shim"] = basePath + "/pentaho/shim";
+  // region Pentaho Web-Client Platform
 
-  requirePaths["pentaho/CustomContextVars"] = basePath + "/pentaho/CustomContextVars";
+  // Unfortunately, *mantle* already maps the "pentaho" id to "/js",
+  // so the paths of all of the following sub-modules must be configured individually.
+  // E.g. requirePaths["pentaho/util"] = basePath + "/pentaho/util";
+  [
+    "shim", "util", "lang",
+    "i18n", "service", "data", "type",
+    "visual", "config", "context", "debug"
+  ].forEach(function(name) {
+    requirePaths["pentaho/" + name] = basePath + "/pentaho/" + name;
+  });
 
-  // TODO: remove this mapping after all Pentaho consumers of GlobalContextVars (DET, Analyzer, CDF) have been changed.
-  requireMap["*"]["pentaho/GlobalContextVars"] = "pentaho/CustomContextVars";
+  // Named instances
+  requireTypes["pentaho/config/impl/instanceOfAmdLoadedService"] = "pentaho.config.IService";
 
-  // TODO: Only used if not defined explicitly by webcontext.js.
-  // When the latter is converted to do so, these 2 paths can be removed as well as the `_globalContextVars` module.
-  requirePaths["pentaho/_globalContextVars"] = basePath + "/pentaho/_globalContextVars";
-  requirePaths["pentaho/contextVars"] = requirePaths["pentaho/_globalContextVars"];
+  // TODO: remove the following when `webcontext.js` already configures pentaho/context
+  requireCfg.config["pentaho/context"] = {
+    theme:  getVar("active_theme"),
+    locale: getVar("SESSION_LOCALE"),
+    user: {
+      id:   getVar("SESSION_NAME"),
+      home: getVar("HOME_FOLDER")
+    },
+    reservedChars: getVar("RESERVED_CHARS"),
+    server: {
+      url: getUrl()
+    }
+  };
+  function getVar(name) {
+    return global[name] || null;
+  }
+  function getUrl() {
+    return getVar("FULL_QUALIFIED_URL") ||
+           getVar("CONTEXT_PATH") ||
+           getVar("SERVER_PROTOCOL");
+  }
+  // endregion
 
-  // AMD PLUGINS
-  requirePaths["local"  ] = basePath + "/util/local";
-  requirePaths["json"   ] = basePath + "/util/require-json/json";
-  requirePaths["text"   ] = basePath + "/util/require-text/text";
+  // region Base AMD Plugins
+  requirePaths["local"] = basePath + "/util/local";
+  requirePaths["json"] = basePath + "/util/require-json/json";
+  requirePaths["text"] = basePath + "/util/require-text/text";
   // Using `map` is important for use in r.js and correct AMD config of the other files of the package.
   // Placing the minSuffix in the path ensures building works well,
   // so that the resolved module id is the same in both debug and non-debug cases.
@@ -74,12 +97,18 @@
     requirePaths["common-ui/util/require-css/css"] = basePath + "/util/require-css/css" + minSuffix;
   }
   requireMap["*"]["css"] = "common-ui/util/require-css/css";
+  // endregion
 
-  // Use the debugInfoByUrl implementation.
-  requirePaths["pentaho/util/debugInfo"] = basePath + "/pentaho/util/debugInfoByUrl";
+  // region ES Shims
+  // Intended for private use of "pentaho/shim/es6-promise" only!
+  if(minSuffix) {
+    requirePaths["pentaho/shim/_es6-promise/es6-promise"] =
+        basePath + "/pentaho/shim/_es6-promise/es6-promise" + minSuffix;
+  }
+  // endregion
 
-  // DOJO
-  requirePaths["dojo" ] = basePath + "/dojo/dojo";
+  // region DOJO
+  requirePaths["dojo"] = basePath + "/dojo/dojo";
   requirePaths["dojox"] = basePath + "/dojo/dojox";
   requirePaths["dijit"] = basePath + "/dojo/dijit";
 
@@ -102,78 +131,75 @@
   requirePaths["dojo/store/Memory"] = dojoOverrides + "dojo/store/Memory";
   requirePaths["dijit/_HasDropDown"] = dojoOverrides + "dijit/_HasDropDown";
   requirePaths["dijit/_CssStateMixin"] = dojoOverrides + "dijit/_CssStateMixin";
+  // endregion
 
-  // Plugin Handler
+  // region Plugin Handler
   requirePaths["common-ui/PluginHandler"] = basePath + "/plugin-handler/pluginHandler";
   requirePaths["common-ui/Plugin"] = basePath + "/plugin-handler/plugin";
   requirePaths["common-ui/AngularPluginHandler"] = basePath + "/plugin-handler/angularPluginHandler";
   requirePaths["common-ui/AngularPlugin"] = basePath + "/plugin-handler/angularPlugin";
   requirePaths["common-ui/AnimatedAngularPluginHandler"] = basePath + "/plugin-handler/animatedAngularPluginHandler";
   requirePaths["common-ui/AnimatedAngularPlugin"] = basePath + "/plugin-handler/animatedAngularPlugin";
+  // endregion
 
-  // OTHER LIBS
+  // region Bundled 3rd party libs
   requirePaths["common-ui/jquery"] = basePath + "/jquery/jquery" + minSuffix;
-  requireShim ["common-ui/jquery"] = {exports: "$"};
+  requireShim["common-ui/jquery"] = {exports: "$"};
 
   requirePaths["common-ui/jquery-clean"] = basePath + "/jquery/jquery" + minSuffix;
-  requireShim ["common-ui/jquery-clean"] = {
+  requireShim["common-ui/jquery-clean"] = {
     exports: "$",
     init: function() {
-      return $.noConflict(true);
+      return this.$.noConflict(true);
     }
-  }
+  };
 
   requirePaths["common-ui/handlebars"] = basePath + "/handlebars/handlebars-v4.0.5";
-  requireShim ["common-ui/handlebars"] = ["common-ui/jquery"];
+  requireShim["common-ui/handlebars"] = ["common-ui/jquery"];
 
   requirePaths["common-ui/jquery-i18n"] = basePath + "/jquery/jquery.i18n.properties-min";
-  requireShim ["common-ui/jquery-i18n"] = ["common-ui/jquery"];
+  requireShim["common-ui/jquery-i18n"] = ["common-ui/jquery"];
   requirePaths["common-ui/jquery-pentaho-i18n"] = basePath + "/jquery/jquery.i18n.properties.supported.languages";
 
   requirePaths["common-ui/bootstrap"] = basePath + "/bootstrap/bootstrap" + minSuffix;
-  requireShim ["common-ui/bootstrap"] = ["common-ui/jquery"];
+  requireShim["common-ui/bootstrap"] = ["common-ui/jquery"];
 
   requirePaths["common-ui/ring"] = basePath + "/ring/ring";
-  requireShim ["common-ui/ring"] = {deps: ["common-ui/underscore"], exports: "ring"};
+  requireShim["common-ui/ring"] = {deps: ["common-ui/underscore"], exports: "ring"};
 
   requirePaths["common-ui/underscore"] = basePath + "/underscore/underscore" + minSuffix;
   // underscore should be required using the module ID above, creating a map entry to guarantee backwards compatibility
   requireMap["*"]["underscore"] = "common-ui/underscore"; // deprecated
 
-  // Intended for private use of "pentaho/shim/es6-promise" only!
-  if(minSuffix) {
-    requirePaths["pentaho/shim/_es6-promise/es6-promise"] = basePath + "/pentaho/shim/_es6-promise/es6-promise" + minSuffix;
-  }
-
   // ANGULAR
   requirePaths["common-ui/angular"] = basePath + "/angular/angular" + minSuffix;
-  requireShim ["common-ui/angular"] = {
+  requireShim["common-ui/angular"] = {
     deps: ["common-ui/jquery"],
     exports: "angular",
     init: function() {
       // Load i18n for angular.
-      var baseMid = "common-ui/angular-i18n/angular-locale_", // mid = module id
-          locale = (typeof SESSION_LOCALE !== "undefined") ? SESSION_LOCALE : "en";
+      var baseMid = "common-ui/angular-i18n/angular-locale_"; // mid = module id
+      var locale = (typeof SESSION_LOCALE !== "undefined") ? SESSION_LOCALE : "en";
 
       locale = locale.replace("_", "-").toLowerCase();
 
-      require([baseMid + locale], function() { }, function(err) {
-          // Couldn"t find the locale specified, fall back.
-          var prev = locale;
+      require([baseMid + locale], function() {}, function() {
+        // Couldn"t find the locale specified, fall back.
+        var prev = locale;
 
-          // Strip off the country designation, try to get just the language.
-          locale = (locale.length > 2) ? locale.substring(0, 2) : "en";
+        // Strip off the country designation, try to get just the language.
+        locale = (locale.length > 2) ? locale.substring(0, 2) : "en";
 
+        if(typeof console !== "undefined" && console.warn)
+          console.warn("Could not load locale for '" + prev + "', falling back to '" + locale + "'");
+
+        require([baseMid + locale], function() {}, function() {
+          // Can't find the language at all, go get english.
           if(typeof console !== "undefined" && console.warn)
-            console.warn("Could not load locale for '" + prev + "', falling back to '" + locale + "'");
+            console.warn("Could not load locale for '" + locale + "', falling back to 'en'");
 
-          require([baseMid + locale], function() { }, function(err) {
-            // Can't find the language at all, go get english.
-            if(typeof console !== "undefined" && console.warn)
-              console.warn("Could not load locale for '" + locale + "', falling back to 'en'");
-
-            require([baseMid + "en"], function() {});
-          });
+          require([baseMid + "en"], function() {});
+        });
       });
     }
   };
@@ -181,37 +207,39 @@
   requirePaths["common-ui/angular-i18n"] = basePath + "/angular/i18n";
 
   requirePaths["common-ui/angular-resource"] = basePath + "/angular/angular-resource" + minSuffix;
-  requireShim ["common-ui/angular-resource"] = ["common-ui/angular"];
+  requireShim["common-ui/angular-resource"] = ["common-ui/angular"];
 
   requirePaths["common-ui/angular-route"] = basePath + "/angular/angular-route" + minSuffix;
-  requireShim ["common-ui/angular-route"] = ["common-ui/angular"];
+  requireShim["common-ui/angular-route"] = ["common-ui/angular"];
 
   requirePaths["common-ui/angular-animate"] = basePath + "/angular/angular-animate" + minSuffix;
-  requireShim ["common-ui/angular-animate" ] = ["common-ui/angular"];
+  requireShim["common-ui/angular-animate"] = ["common-ui/angular"];
 
   requirePaths["common-ui/angular-sanitize"] = basePath + "/angular/angular-sanitize" + minSuffix;
-  requireShim ["common-ui/angular-sanitize"] = ["common-ui/angular"];
+  requireShim["common-ui/angular-sanitize"] = ["common-ui/angular"];
 
   requirePaths["common-ui/properties-parser"] = basePath + "/angular-translate/properties-parser";
 
   requirePaths["common-ui/angular-translate"] = basePath + "/angular-translate/angular-translate";
-  requireShim ["common-ui/angular-translate"] = ["pentaho/shim/es5", "common-ui/angular"];
+  requireShim["common-ui/angular-translate"] = ["pentaho/shim/es5", "common-ui/angular"];
 
-  requirePaths["common-ui/angular-translate-loader-partial"] = basePath + "/angular-translate/angular-translate-loader-partial";
-  requireShim ["common-ui/angular-translate-loader-partial"] = ["common-ui/angular-translate"];
+  requirePaths["common-ui/angular-translate-loader-partial"] = basePath +
+      "/angular-translate/angular-translate-loader-partial";
+  requireShim["common-ui/angular-translate-loader-partial"] = ["common-ui/angular-translate"];
 
-  requirePaths["common-ui/angular-translate-loader-static"] = basePath + "/angular-translate/angular-translate-loader-static-files";
-  requireShim ["common-ui/angular-translate-loader-static"] = ["common-ui/angular-translate"];
+  requirePaths["common-ui/angular-translate-loader-static"] = basePath +
+      "/angular-translate/angular-translate-loader-static-files";
+  requireShim["common-ui/angular-translate-loader-static"] = ["common-ui/angular-translate"];
 
   requirePaths["common-ui/angular-ui-bootstrap"] = basePath + "/bootstrap/ui-bootstrap-tpls-0.6.0.min";
-  requireShim ["common-ui/angular-ui-bootstrap"] = ["common-ui/angular"];
+  requireShim["common-ui/angular-ui-bootstrap"] = ["common-ui/angular"];
 
   requirePaths["common-ui/angular-directives"] = basePath + "/angular-directives";
-  requireShim ["common-ui/angular-directives"] = ["common-ui/angular-ui-bootstrap"];
+  requireShim["common-ui/angular-directives"] = ["common-ui/angular-ui-bootstrap"];
+  // endregion
 
-  // Metadata Model and Visualizations Packages
-  requireService["pentaho/type/config"] = "pentaho.type.spec.ITypeConfiguration";
-  requireService["pentaho/type/config/AmdLoadedConfigurationService"] = "pentaho.type.IConfigurationService";
+  // region Metadata Model and Visualizations Packages
+  requireTypes["pentaho/type/config"] = "pentaho.config.spec.IRuleSet";
 
   function mapTheme(mid, themeRoot, themes) {
     var theme = (typeof active_theme !== "undefined") ? active_theme : null;
@@ -224,7 +252,7 @@
   function registerVizPackage(name) {
     requireCfg.packages.push({"name": name, "main": "model"});
 
-    requireService[name] = "pentaho/visual/base";
+    requireTypes[name] = "pentaho/visual/base";
   }
 
   // Metadata Model Base Theme
@@ -266,5 +294,6 @@
     "pentaho/visual/ccc/scatter",
     "pentaho/visual/ccc/bubble"
   ].forEach(registerVizPackage);
+  // endregion
 
-}());
+})(this);

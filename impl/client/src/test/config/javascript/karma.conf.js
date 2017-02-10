@@ -1,48 +1,47 @@
 module.exports = function(config) {
-    config.set({
+  config.set({
+    basePath: "${basedir}",
 
-        basePath: '${basedir}',
+    frameworks: ["jasmine", "requirejs"],
 
-        frameworks: ['jasmine', 'requirejs'],
+    plugins: [
+      "karma-jasmine",
+      "karma-requirejs",
+      "karma-chrome-launcher",
+      "karma-mocha-reporter"
+    ],
 
-        plugins: [
-            'karma-jasmine',
-            'karma-requirejs',
-            'karma-chrome-launcher',
-            'karma-mocha-reporter'
-        ],
+    files: [
+      "${project.build.directory}/context-begin.js",
 
-        files: [
-            '${project.build.directory}/context-begin.js',
+      {pattern: "${build.dependenciesDirectory}/*/**/*",       included: false}, // /target/dependency/
+      {pattern: "${build.javascriptTestOutputDirectory}/**/*", included: false}, // target/test-javascript/
+      {pattern: "${build.javascriptTestSourceDirectory}/**/*", included: false}, // src/test/javascript/
 
-            {pattern: '${build.dependenciesDirectory}/*/**/*',       included: false}, // /target/dependency/
-            {pattern: '${build.javascriptTestOutputDirectory}/**/*', included: false}, // target/test-javascript/
-            {pattern: '${build.javascriptTestSourceDirectory}/**/*', included: false}, // src/test/javascript/
+      "${build.dependenciesDirectory}/cdf/cdf-require-js-cfg.js",
+      "${build.javascriptTestConfigDirectory}/require-test.js",
+      "${project.build.directory}/require.config.js",
 
-            '${build.dependenciesDirectory}/cdf/cdf-require-js-cfg.js',
-            '${build.javascriptTestConfigDirectory}/require-test.js',
-            '${project.build.directory}/require.config.js',
+      "${project.build.directory}/context-end.js"
+    ],
 
-            '${project.build.directory}/context-end.js'
-        ],
+    exclude: [
+      // excluding these two folders because we are using the versions inside the webjars folder
+      "${build.dependenciesDirectory}/dojo-release-${dojo.version}-src/(dojo|dijit)/**/*",
 
-        exclude: [
-            // excluding this two folders because we are using the versions inside the webjars folder
-            '${build.dependenciesDirectory}/dojo-release-${dojo.version}-src/(dojo|dijit)/**/*',
+      // excluding test files from being included in the dependencies
+      "${build.dependenciesDirectory}/**/dojo/tests/**/*",
+      "${build.dependenciesDirectory}/*/**/*.+(.spec.js)"
+    ],
 
-            // excluding test files from being included in the dependencies
-            '${build.dependenciesDirectory}/**/dojo/tests/**/*',
-            '${build.dependenciesDirectory}/*/**/*.+(spec.js)'
-        ],
+    reporters: ["mocha"],
 
-        reporters: ["mocha"],
+    colors: true,
 
-        colors: true,
+    logLevel: config.LOG_INFO,
 
-        logLevel: config.LOG_INFO,
+    autoWatch: true,
 
-        autoWatch: true,
-
-        browsers: ["Chrome"]
-    });
+    browsers: ["Chrome"]
+  });
 };

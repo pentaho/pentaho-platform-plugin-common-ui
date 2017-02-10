@@ -15,14 +15,34 @@
  * Copyright 2016 Pentaho Corporation. All rights reserved.
  */
 
-var depDir = "target/dependency";
+"use strict";
+
+/* globals require, define */
+
+/* eslint no-unused-vars: 0 */
+
+var depDir;
 var webjarsSubPath = "/META-INF/resources/webjars";
-var depWebJars = depDir + webjarsSubPath;
+var depWebJars;
+var baseTest;
+var basePath;
 
-var baseTest = "src/test/javascript";
-var basePath = "target/test-javascript/web";
-var dojoOverrides = basePath + "/dojo/pentaho/common/overrides/";
+(function() {
+  var baseUrl = "/base/";
 
+  depDir = baseUrl + makeRelativeUrl("${build.dependenciesDirectory}");
+
+  depWebJars = depDir + webjarsSubPath;
+
+  baseTest = baseUrl + makeRelativeUrl("${build.javascriptTestSourceDirectory}");
+  basePath = baseUrl + makeRelativeUrl("${build.javascriptTestOutputDirectory}") + "/web";
+
+  function makeRelativeUrl(path) {
+    return path
+        .replace("${project.basedir}/", "")
+        .replace("\\", "/");
+  }
+})();
 
 /**
  * The possible configurations to define the environment where the require-cfg files are running.
@@ -39,15 +59,25 @@ var ENVIRONMENT_CONFIG = {
 };
 
 var KARMA_RUN = true;
-var CONTEXT_PATH;
+var CONTEXT_PATH = "/";
 var pen = {define: define, require: require};
 var SESSION_LOCALE = "en";
 var requireCfg = {
   paths: {},
-  shim: {},
-  map: {
-    "*": {}
-  }
+  shim:  {},
+  map:   {"*": {}},
+  bundles:  {},
+  config:   {
+    "pentaho/service": {
+    },
+    "pentaho/context": {
+      locale: SESSION_LOCALE,
+      server: {
+        url: CONTEXT_PATH
+      }
+    }
+  },
+  packages: []
 };
 
 /**
@@ -63,7 +93,7 @@ var KARMA_DEBUG = false;
  * for development purposes.
  *
  * The expression is evaluated on the part of the spec file name that is after
- * `test-js/unit/` and before the `.js` extension (e.g. `"pentaho/serviceSpec"`).
+ * `test-js/unit/` and before the `.spec.js` extension (e.g. `"pentaho/service"`).
  *
  * @type RegExp
  *

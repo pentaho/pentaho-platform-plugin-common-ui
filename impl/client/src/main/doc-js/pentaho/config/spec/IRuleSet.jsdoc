@@ -1,0 +1,139 @@
+/*!
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `config.spec.IRuleSet` interface describes
+ * a list of [configuration rules]{@link pentaho.config.spec.IRuleSet#rules}
+ * used to configure one or more types.
+ *
+ * The following example is a hypothetical configuration,
+ * where a developer (John) states that only he should see the visualization
+ * he is currently developing (my/radial/bar) and
+ * only then when working in Pentaho Analyzer:
+ *
+ * ```js
+ * var myTypeConfig = {
+ *   rules: [
+ *     // Disable a still experimental Viz.
+ *     {
+ *       select: {
+ *         type: "my/radial/bar"
+ *       },
+ *       apply: {
+ *         isBrowsable: false
+ *       }
+ *     },
+ *
+ *     // Enable it, only for the dev user, "john", when in Analyzer
+ *     {
+ *       select: {
+ *         type:        "my/radial/bar",
+ *         user:        "john",
+ *         application: "pentaho.analyzer"
+ *       },
+ *       apply: {
+ *         isBrowsable: true
+ *       }
+ *     }
+ *   ]
+ * };
+ * ```
+ *
+ * ### Rule Selection
+ *
+ * A rule is selected by a given type and context variables,
+ * if the type and variables match the rule's
+ * [selection variables]{@link pentaho.config.spec.IRule#select}.
+ *
+ * ### Rule Specificity
+ *
+ * Rule specificity is a measure of the relevance of a rule.
+ *
+ * When two or more _selected_ rules configure the same specification attribute,
+ * it is the value used by the most specific rule that wins.
+ * When configured values are structural and are instead merged,
+ * like with an {@link Object} value,
+ * specificity determines the order in the merge operation
+ * (most specific is merged over less specific).
+ *
+ * A rule is more specific than another if it:
+ *
+ * 1. has a greater [priority]{@link pentaho.config.spec.IRule#priority};
+ *    this is the attribute that most affects specificity, and can be used to easily
+ *    surpass every other affecting factors,
+ * 2. selects a user (and the other doesn't),
+ * 3. selects a theme (and the other doesn't),
+ * 4. selects a locale (and the other doesn't),
+ * 5. selects an application (and the other doesn't),
+ * 6. belongs to a type configuration that was added later, or
+ * 7. it is at a greater index in the type configuration rules list.
+ *
+ * ### Rule's Configuration Merging
+ *
+ * Type configuration rules specify a _configuration_
+ * in its [apply]{@link pentaho.config.spec.IRule#apply} property.
+ *
+ * When merging two configurations, the default behavior works this way:
+ * 1. If both configurations contain a plain JavaScript object,
+ *    in the same property, the two are deeply merged
+ * 2. All other values, such as arrays, `null`, `undefined` or objects of custom classes, are replaced.
+ *
+ * To allow overriding the default merge behavior,
+ * the following object syntax is supported in the place where any value would be:
+ *
+ * ```js
+ * {
+ *   fruits: {
+ *     $op:   "add"
+ *     value: ["banana", apple""]
+ *   }
+ * }
+ * ```
+ *
+ * In the previous example, the "add" operation is used to append new elements to an existing array
+ * configuration value, instead of replacing it, as is the default.
+ *
+ * In the following example, the "replace" operation is used to replace an object configuration
+ * value, instead of merging it, as is the default:
+ *
+ * ```js
+ * {
+ *   score: {
+ *     $op:   "replace"
+ *     value: {"banana": 1, "apple": 3, "orange": 2}
+ *   }
+ * }
+ * ```
+ *
+ * Note that replacing with a {@link Nully} value effectively clears existing configurations.
+ *
+ * @name pentaho.config.spec.IRuleSet
+ * @interface
+ *
+ * @see pentaho.config.IService
+ */
+
+/**
+ * The list of configuration rules.
+ *
+ * Within a type configuration,
+ * if all other rule ordering criteria are equal,
+ * the later configuration rules override the former configuration rules.
+ *
+ * @name rules
+ * @memberOf pentaho.config.spec.IRuleSet#
+ * @type {pentaho.config.spec.IRule}
+ */

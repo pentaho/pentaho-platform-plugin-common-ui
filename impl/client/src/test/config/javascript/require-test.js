@@ -17,7 +17,9 @@
 
   "use strict";
 
-  /* global require:false */
+  /* globals require */
+
+  /* eslint require-jsdoc: 0 */
 
   var _nextUid = 1;
   var A_slice = Array.prototype.slice;
@@ -184,6 +186,9 @@
   }
 
   function newContextConfig(contextName, parentName) {
+
+    /* eslint default-case: 0 */
+
     var configClone = {
       context: contextName
     };
@@ -197,7 +202,6 @@
         case "callback":
         case "context": // shouldn't happen
         case "pkgs": return; // ignore
-
 
         case "shim": v = cloneConfigShims(v); break;
 
@@ -248,4 +252,4 @@
       fun.call(ctx, obj[p], p);
     });
   }
-}());
+})();
