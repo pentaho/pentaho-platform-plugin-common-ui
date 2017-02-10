@@ -27,8 +27,6 @@ define([
 
   describe("pentaho.debug.manager", function() {
 
-    var windowBackup;
-
     function configureDebugMgrMock(localRequire) {
 
       function DebugMgrMock() {
