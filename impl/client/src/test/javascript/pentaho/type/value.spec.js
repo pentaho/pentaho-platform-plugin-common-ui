@@ -59,14 +59,7 @@ define([
       });
 
       describe("#isAbstract", function() {
-        it("should have default `isAbstract` equal to `true`", function () {
-          expect(valueType.isAbstract).toBe(true);
-        });
-
-        it("should allow changing `isAbstract` value", function () {
-          valueType.isAbstract = false;
-          expect(valueType.isAbstract).toBe(false);
-          valueType.isAbstract = true;
+        it("should have `isAbstract` equal to `true`", function () {
           expect(valueType.isAbstract).toBe(true);
         });
       }); // end #isAbstract

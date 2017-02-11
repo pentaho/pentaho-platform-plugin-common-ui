@@ -35,6 +35,8 @@ define([
 
   /* global Promise:false */
 
+  /* eslint valid-jsdoc: 0 */
+
   // Unique type class id exposed through Type#uid and used by Context instances.
   var _nextUid = 1;
   var _normalAttrNames = [
@@ -55,6 +57,13 @@ define([
      * @classDesc The root class of types that can be represented by the Pentaho Type API.
      *
      * For additional information, see the associated _instance class_, {@link pentaho.type.Instance}.
+     *
+     * @description _Initializes_ the type's singleton object.
+     * @param {Object} spec - The specification of this type.
+     * @param {!Object} keyArgs - Keyword arguments.
+     * @param {!pentaho.type.Instance} keyArgs.instance - The _prototype_ of the `Instance` class associated with
+     * this type.
+     * @param {boolean} [keyArgs.isRoot=false] Indicates if the type is a _root_ type.
      */
     var Type = Base.extend("pentaho.type.Type", /** @lends pentaho.type.Type# */{
 
@@ -63,13 +72,18 @@ define([
 
         this._init(spec, keyArgs);
 
-        this.extend(spec, keyArgs);
+        var Ctor = this.constructor;
+        if(Ctor.prototype === this) {
+          // Type with own constructor.
+          // Also, using mix records the applied instSpec, while #extend does not.
+          Ctor.mix(spec, null, keyArgs);
+        } else {
+          // Lightweight type.
+          this.extend(spec, keyArgs);
+        }
 
         this._postInit(spec, keyArgs);
       },
-
-      // Anticipate extension of these properties, or defaultView can be incorrectly evaluated.
-      extend_order: ["id", "sourceId"],
 
       /**
        * Performs initialization tasks that take place before the instance is extended with its specification.
@@ -97,18 +111,33 @@ define([
           O.setConst(this, "root", this);
 
         // ----
+        // excluded from extend: id, sourceId and isAbstract
+        // are here handled one by one.
+
+        var id = nonEmptyString(spec.id);
+        // Is it a temporary id? If so, ignore it.
+        if(SpecificationContext.isIdTemporary(id)) id = null;
+
+        var sourceId = nonEmptyString(spec.sourceId);
+        // Is it a temporary id? If so, ignore it.
+        if(SpecificationContext.isIdTemporary(sourceId)) sourceId = null;
+
+        if(!sourceId) sourceId = id;
+        else if(!id) id = sourceId;
+
+        O.setConst(this, "_id", id);
+        O.setConst(this, "_sourceId", sourceId);
+        O.setConst(this, "_isAbstract", !!spec.isAbstract);
+
         // Block inheritance, with default values
 
         // Don't use inherited property definition which may be writable false
-        Object.defineProperty(this, "_id", {value: null, writable: true});
-        Object.defineProperty(this, "_alias", {value: null, writable: true});
-        Object.defineProperty(this, "_sourceId", {value: null, writable: true});
+
+        Object.defineProperty(this, "_alias",    {value: null, writable: true});
+        Object.defineProperty(this, "_hasDescendants", {value: false, writable: true});
 
         this._styleClass = null;
-        this._isAbstract = false;
 
-        // Don't use inherited property definition which may be writable false
-        Object.defineProperty(this, "_hasDescendants", {value: false, writable: true});
 
         this._application = specUtil.merge({}, this._application);
       },
@@ -126,16 +155,13 @@ define([
        * @overridable
        */
       _postInit: function(spec, keyArgs) {
-        var id = this._id;
         var alias = this._alias;
 
         // Lock these properties
-        O.setConst(this, "_id", id);
         O.setConst(this, "_alias", alias);
-        O.setConst(this, "_sourceId", this._sourceId);
 
         // Default styleClass
-        if(id && spec.styleClass === undefined) this.styleClass = undefined;
+        if(this._id && spec.styleClass === undefined) this.styleClass = undefined;
       },
 
       // region context property
@@ -370,7 +396,7 @@ define([
 
       // endregion
 
-      // region id property
+      // region id and sourceId properties
 
       // -> nonEmptyString, Optional(null), Immutable, Shared (note: not Inherited)
       // "" -> null conversion
@@ -396,21 +422,6 @@ define([
        */
       get id() {
         return this._id;
-      },
-
-      set id(value) {
-
-        value = nonEmptyString(value);
-        if(value != null) {
-          // Is it a temporary id? If so, ignore it.
-          if(SpecificationContext.isIdTemporary(value)) return;
-
-          // Throws if already const.
-          this._id = value;
-
-          // Default sourceId, if not yet set.
-          if(!this._sourceId) this._sourceId = value;
-        }
       },
 
       // -> nonEmptyString, Optional(null), Immutable, Shared (note: not Inherited)
@@ -441,21 +452,6 @@ define([
        */
       get sourceId() {
         return this._sourceId;
-      },
-
-      set sourceId(value) {
-
-        value = nonEmptyString(value);
-        if(value != null) {
-          // Is it a temporary id? If so, ignore it.
-          if(SpecificationContext.isIdTemporary(value)) return;
-
-          // Throws if already const.
-          this._sourceId = value;
-
-          // Default id, if not yet set.
-          if(!this._id) this._id = value;
-        }
       },
 
       /**
@@ -572,10 +568,42 @@ define([
       get isAbstract() {
         return this._isAbstract;
       },
+      // endregion
 
-      set isAbstract(value) {
-        // nully is reset, which is false, so !! works well.
-        this._isAbstract = !!value;
+      // region mixins property
+      /**
+       * Gets or sets the mixin types that are locally mixed into this type.
+       *
+       * Can be set to either type identifiers, instance classes or type instances.
+       *
+       * The attributes defined by the added mixin types become available for
+       * extension/configuration on this type.
+       *
+       * @type Array.<pentaho.type.Type>
+       */
+      get mixins() {
+        var mixinClasses = this.instance.constructor.mixins;
+        if(!mixinClasses) return [];
+
+        return mixinClasses
+          .map(function(Mixin) { return Mixin.type; })
+          .filter(function(type) { return type instanceof Type; });
+      },
+
+      // for configuration only
+      set mixins(values) {
+        var Instance = this.instance.constructor;
+
+        // Add new mixins from values
+        if(Array.isArray(values))
+          values.forEach(addMixinType, this);
+        else
+          addMixinType.call(this, values);
+
+        function addMixinType(MixinType) {
+          var MixinInst = this.context.get(MixinType);
+          Instance.mix(MixinInst);
+        }
       },
       // endregion
 
@@ -1736,7 +1764,8 @@ define([
 
       // @override
       /*
-       * See Base.js
+       * Only takes effect in classes derived from this one.
+       * See Base.js.
        * @ignore
        */
       _subclassed: function(SubTypeCtor, instSpec, classSpec, keyArgs) {
@@ -1748,7 +1777,7 @@ define([
         // Links SubTypeCtor and SubInstCtor and "implements" instSpec.
         SubTypeCtor._initInstCtor(SubInstCtor, instSpec, keyArgs);
 
-        // Implement the given static interface.
+        // Implement the given static interface, and record.
         if(classSpec) SubTypeCtor.implementStatic(classSpec);
       },
 

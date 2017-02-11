@@ -626,29 +626,6 @@ define([
         expect(DerivedAbstract.type.isAbstract).toBe(false);
         expect(DerivedConcrete.type.isAbstract).toBe(false);
       });
-
-      it("should respect a set non-nully value", function() {
-        var Derived = Instance.extend();
-        expect(Derived.type.isAbstract).toBe(false);
-
-        Derived.type.isAbstract = true;
-        expect(Derived.type.isAbstract).toBe(true);
-
-        Derived.type.isAbstract = false;
-        expect(Derived.type.isAbstract).toBe(false);
-      });
-
-      it("should set to the default value false when set to a nully value", function() {
-        var Derived = Instance.extend({type: {isAbstract: true}});
-        expect(Derived.type.isAbstract).toBe(true);
-        Derived.type.isAbstract = null;
-        expect(Derived.type.isAbstract).toBe(false);
-
-        Derived = Instance.extend({type: {isAbstract: true}});
-        expect(Derived.type.isAbstract).toBe(true);
-        Derived.type.isAbstract = undefined;
-        expect(Derived.type.isAbstract).toBe(false);
-      });
     }); // #isAbstract
 
     describe("#application -", function() {
