@@ -62,49 +62,51 @@ define([
 
       this.base(options);
 
-      var measureCount = this._getRoleDepth("size") + this._getRoleDepth("color"),
-          catsDepth = this._getRoleDepth("rows"),
-          sersDepth = this._getRoleDepth("columns"),
+      if(def.get(this._validExtensionOptions, "axisComposite")) {
+        var measureCount = this._getRoleDepth("size") + this._getRoleDepth("color");
+        var catsDepth = this._getRoleDepth("rows");
+        var sersDepth = this._getRoleDepth("columns");
+        var catsBreadth = Math.max(1,this._dataTable.getNumberOfRows() - 1);
+        var sersBreadth = this._dataTable.getNumberOfColumns() - catsDepth;
 
-          catsBreadth = Math.max(1,this._dataTable.getNumberOfRows() - 1),
-          sersBreadth = this._dataTable.getNumberOfColumns() - catsDepth;
+        if(measureCount > 0) sersBreadth /= measureCount;
 
-      if(measureCount > 0) sersBreadth /= measureCount;
+        var width = options.width;
+        var height = options.height;
+        var currRatio = width / height;
+        var xyChartRatio = catsBreadth / sersBreadth;
 
-      var width = options.width,
-          height = options.height,
-          currRatio = width / height,
-          xyChartRatio = catsBreadth / sersBreadth;
+        // Min desirable sizes according to depth
+        var MAX_AXIS_SIZE = 300;
+        var MIN_LEVEL_HEIGHT = 70;
+        var MAX_LEVEL_HEIGHT = 200;
+        var MAX_AXIS_RATIO = 0.35;
 
-      // Min desirable sizes according to depth
-      var MAX_AXIS_SIZE = 300,
-          MIN_LEVEL_HEIGHT = 70,
-          MAX_LEVEL_HEIGHT = 200,
-          MAX_AXIS_RATIO = 0.35;
+        var minXAxisSize = Math.min(MAX_AXIS_SIZE, catsDepth * MIN_LEVEL_HEIGHT);
+        var minYAxisSize = Math.min(MAX_AXIS_SIZE, sersDepth * MIN_LEVEL_HEIGHT);
+        var maxXAxisSize = Math.min(MAX_AXIS_SIZE, catsDepth * MAX_LEVEL_HEIGHT, height * MAX_AXIS_RATIO);
+        var maxYAxisSize = Math.min(MAX_AXIS_SIZE, sersDepth * MAX_LEVEL_HEIGHT, width * MAX_AXIS_RATIO);
 
-      var minXAxisSize = Math.min(MAX_AXIS_SIZE, catsDepth * MIN_LEVEL_HEIGHT),
-          minYAxisSize = Math.min(MAX_AXIS_SIZE, sersDepth * MIN_LEVEL_HEIGHT),
-          maxXAxisSize = Math.min(MAX_AXIS_SIZE, catsDepth * MAX_LEVEL_HEIGHT, height * MAX_AXIS_RATIO),
-          maxYAxisSize = Math.min(MAX_AXIS_SIZE, sersDepth * MAX_LEVEL_HEIGHT, width * MAX_AXIS_RATIO);
+        var xAxisSize;
+        var yAxisSize;
+        if(xyChartRatio > currRatio) { // lock width
+          var extraHeight = height - width / xyChartRatio;
 
-      var xAxisSize, yAxisSize;
-      if(xyChartRatio > currRatio) { // lock width
-        var extraHeight = height - width / xyChartRatio;
+          yAxisSize = minYAxisSize;
 
-        yAxisSize = minYAxisSize;
+          xAxisSize = Math.min(extraHeight, maxXAxisSize);
+          xAxisSize = Math.max(xAxisSize, minXAxisSize);
+        } else if(xyChartRatio < currRatio) { // lock height
+          var extraWidth = width - height * xyChartRatio;
 
-        xAxisSize = Math.min(extraHeight, maxXAxisSize);
-        xAxisSize = Math.max(xAxisSize, minXAxisSize);
-      } else if(xyChartRatio < currRatio) { // lock height
-        var extraWidth = width - height * xyChartRatio;
+          xAxisSize = minXAxisSize;
 
-        xAxisSize = minXAxisSize;
-
-        yAxisSize = Math.min(extraWidth, maxYAxisSize);
-        yAxisSize = Math.max(yAxisSize, minYAxisSize);
+          yAxisSize = Math.min(extraWidth, maxYAxisSize);
+          yAxisSize = Math.max(yAxisSize, minYAxisSize);
+        }
+      } else {
+        xAxisSize = yAxisSize = null;
       }
-
-      // ------------------
 
       options.xAxisSize = xAxisSize;
       options.yAxisSize = yAxisSize;
@@ -126,14 +128,16 @@ define([
       }
 
       return chart;
+    },
+
+    _getBaseAxisTitle: function() {
+      var roleNames = def.getOwn(this._rolesByCccVisualRole, "category");
+      return roleNames ? this._getDiscreteRolesTitle(roleNames) : "";
+    },
+
+    _getOrthoAxisTitle: function() {
+      var roleNames = def.getOwn(this._rolesByCccVisualRole, "series");
+      return roleNames ? this._getDiscreteRolesTitle(roleNames) : "";
     }
-
-    // TODO: not true anymore...
-    // Ortho axis title is not available on the server, so never show
-    // _getOrthoAxisTitle: function(){
-    // },
-
-    // _getBaseAxisTitle: function(){
-    // },
   });
 });
