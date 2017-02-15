@@ -70,7 +70,38 @@ pentaho.pda.app.prototype.discoverSources = function(callback, options) {
 	return sources;
 }
 
+/**
+ * This function is calling a datasource search once again,
+ * falling back to a new ID (including ".xmi" extension).
+ * 
+ * First search can return empty array, even when required datasource is here.
+ * This can happen when datasource and report created in older version of BA server
+ * are uploaded - datasource is imported using "new" rules, adding ".xmi" extension to domain ID,
+ * but report is simply uploaded to the repository and is still referencing to an old domain ID.
+ */
 pentaho.pda.app.prototype.getSources = function(callback, options) {
+    var that = this;
+    var sources = that.doGetSources(callback, options);
+
+    if (options.filter) {
+        if (!sources || (sources instanceof Array && sources.length === 0)) {
+            var filterValue = options.filter.value;
+            var filterValueSplit = filterValue.split(':');
+            if (filterValueSplit.length === 2) {
+                var domainId = filterValueSplit[0];
+                var modelId = filterValueSplit[1];
+                var filterValueNew = domainId + '.xmi:' + modelId;
+                options.filter.value = filterValueNew;
+
+                sources = that.doGetSources(callback, options);
+            }
+        }
+    }
+
+    return sources;
+}
+
+pentaho.pda.app.prototype.doGetSources = function(callback, options) {
 
 	var i,j,_sources = [], each;
   options = options || {};
