@@ -1,0 +1,9 @@
+{
+  "name": "${project.artifactId}",
+  "version": "${project.version}",
+  "config": {
+    "pentaho/service": {
+      "${project.artifactId}_${project.version}/config": "pentaho.config.spec.IRuleSet"
+    }
+  }
+}

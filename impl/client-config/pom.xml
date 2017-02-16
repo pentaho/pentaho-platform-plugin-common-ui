@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>common-ui-impl</artifactId>
+    <groupId>org.pentaho</groupId>
+    <version>7.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>common-ui-impl-client-config</artifactId>
+  <packaging>bundle</packaging>
+
+  <properties>
+    <configuration-bundles.classifier>configuration-bundle</configuration-bundles.classifier>
+  </properties>
+
+  <build>
+    <resources>
+      <resource>
+        <filtering>false</filtering>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*</include>
+        </includes>
+        <excludes>
+          <exclude>META-INF/**/*</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <filtering>true</filtering>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>META-INF/**/*</include>
+        </includes>
+      </resource>
+    </resources>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>${maven-bundle-plugin.version}</version>
+        <extensions>true</extensions>
+
+        <configuration>
+          <!-- just a way to distinguish artifacts intended to be exploded configuration bundles -->
+          <classifier>${configuration-bundles.classifier}</classifier>
+
+          <archive>
+            <!-- no need to include the pom.xml and pom.properties, reduces the boilerplate of the exploded bundle -->
+            <addMavenDescriptor>false</addMavenDescriptor>
+          </archive>
+
+          <instructions>
+            <!-- use META-INF instead of the default OSGI-INF folder, again for reducing the amount of boilerplate -->
+            <Bundle-Blueprint>META-INF/blueprint/blueprint.xml</Bundle-Blueprint>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
