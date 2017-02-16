@@ -1351,7 +1351,13 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             this.update(this.diff);
 
             var layout = this.dashboard.getComponentByName("prompt" + this.guid);
+            if(!layout) {
+              return;
+            }
             var updateCallback = (function(component) {
+              if(!component) {
+                return;
+              }
               if (this.isForceRefresh) {
                 this.dashboard.updateComponent(component);
               }
