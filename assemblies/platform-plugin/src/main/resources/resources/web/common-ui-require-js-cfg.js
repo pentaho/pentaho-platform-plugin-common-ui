@@ -239,8 +239,6 @@
   // endregion
 
   // region Metadata Model and Visualizations Packages
-  requireTypes["pentaho/type/config"] = "pentaho.config.spec.IRuleSet";
-
   function mapTheme(mid, themeRoot, themes) {
     var theme = (typeof active_theme !== "undefined") ? active_theme : null;
     if(!theme || themes.indexOf(theme) < 0) theme = themes[0];
