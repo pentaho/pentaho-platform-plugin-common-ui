@@ -59,6 +59,18 @@
             <Bundle-Blueprint>META-INF/blueprint/blueprint.xml</Bundle-Blueprint>
           </instructions>
         </configuration>
+
+        <executions>
+          <execution>
+            <id>default-install</id>
+            <phase>none</phase>
+          </execution>
+
+          <execution>
+            <id>default-deploy</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
