@@ -22,7 +22,7 @@ define(function() {
    * of visualizations when displayed in different applications.
    *
    * Known Application Ids:
-   * 1. PDI Preview - "pentaho-det"
+   * 1. PDI Data Inspection - "pentaho-det"
    * 2. Pentaho Analyzer - "pentaho/analyzer"
    * 3. Pentaho CDF/CDE - "pentaho-cdf"
    *
