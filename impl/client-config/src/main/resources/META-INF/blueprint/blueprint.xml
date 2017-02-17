@@ -5,7 +5,7 @@
 
   <service interface="org.ops4j.pax.web.extender.whiteboard.ResourceMapping">
     <bean class="org.ops4j.pax.web.extender.whiteboard.runtime.DefaultResourceMapping">
-      <property name="alias" value="/${project.artifactId}/${project.version}"/>
+      <property name="alias" value="/${project.amd-module}/${project.version}"/>
 
       <!-- this exposes the META-INF/* stuff via http, but avoid yet another sub-folder for the config file -->
       <property name="path" value="/"/>
