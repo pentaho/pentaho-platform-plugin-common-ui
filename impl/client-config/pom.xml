@@ -63,6 +63,10 @@
           </instructions>
         </configuration>
 
+        <!-- The deployment of the artifact with classifier (and no primary artifact) by
+        maven-bundle-plugin:install (default-install) generates an ERROR No artifact found.
+
+        The overall build doesn't fail, but those executions aren't really needed has we don't use any OBR. -->
         <executions>
           <execution>
             <id>default-install</id>
