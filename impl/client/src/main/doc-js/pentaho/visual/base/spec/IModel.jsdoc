@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,39 +28,19 @@
  * Represents the relevant state and interface of the visual application in which a
  * visual model is being used.
  *
+ * An application may specialize this property and provide state information that
+ * can be used to implement business logic in model configurations that apply to
+ * that application.
+ *
+ * Check the visual application documentation for the existence of a specialized interface.
+ *
+ * This property is not serialized by default.
+ * To serialize it, specify the argument `keyArgs.omitProps.application` of
+ * [toSpec]{@link pentaho.visual.base.Model#toSpec} to `false`.
+ *
  * @name application
  * @memberOf pentaho.visual.base.spec.IModel#
  * @type {pentaho.visual.base.spec.IApplication}
- */
-
-/**
- * The width of the visualization, in pixels.
- *
- * This property is required.
- *
- * @name width
- * @memberOf pentaho.visual.base.spec.IModel#
- * @type {number}
- */
-
-/**
- * The height of the visualization, in pixels.
- *
- * This property is required.
- *
- * @name height
- * @memberOf pentaho.visual.base.spec.IModel#
- * @type {number}
- */
-
-/**
- * Specifies the usage intention of the visualization,
- * namely if the interactive mode is enabled or not.
- *
- * @name isInteractive
- * @memberOf pentaho.visual.base.spec.IModel#
- * @type {boolean}
- * @default true
  */
 
 /**
@@ -75,46 +55,4 @@
  * @name data
  * @memberOf pentaho.visual.base.spec.IModel#
  * @type {pentaho.data.Table}
- */
-
-/**
- * The current selection filter.
- *
- * This property is not serialized by default.
- * To serialize it, specify the argument `keyArgs.omitProps.selectionFilter` of
- * [toSpec]{@link pentaho.visual.base.Model#toSpec} to `false`.
- *
- * @name selectionFilter
- * @memberOf pentaho.visual.base.spec.IModel#
- * @type {pentaho.type.filter.Abstract}
- */
-
-/**
- * Function to be used as default
- * [when computing]{@link pentaho.visual.base.Model#selectAction} a selection filter from
- * the current selection filter and an input filter.
- *
- * @name selectionMode
- * @memberOf pentaho.visual.base.spec.IModel#
- * @type {function}
- */
-
-/**
- * Function to be associated with the
- * [executeAction]{@link pentaho.visual.base.Model#executeAction},
- * which is typically called when the user double clicks on an item.
- *
- * @name doExecute
- * @memberOf pentaho.visual.base.spec.IModel#
- * @type {function}
- */
-
-/**
- * Extension properties that a view knows how to handle directly.
- *
- * This property is expected to be specified through configuration.
- *
- * @name extension
- * @memberOf pentaho.visual.base.spec.IModel#
- * @type {Object}
  */

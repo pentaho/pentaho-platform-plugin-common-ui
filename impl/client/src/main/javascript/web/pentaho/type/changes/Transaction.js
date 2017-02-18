@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -560,7 +560,7 @@ define([
       while(true) {
         while(++i < L) {
           cset = changesets[i];
-          if((cancelReason = cset.owner._notifyChangeWill(cset)))
+          if((cancelReason = cset.owner._onChangeWill(cset)))
             return ActionResult.reject(cancelReason);
         }
 
@@ -644,8 +644,8 @@ define([
 
       // jshint laxbreak:true
       var mapper = reason
-          ? function(cset) { cset.owner._notifyChangeRej(cset, reason); }
-          : function(cset) { cset.owner._notifyChangeDid(cset); };
+          ? function(cset) { cset.owner._onChangeRejected(cset, reason); }
+          : function(cset) { cset.owner._onChangeDid(cset); };
 
       // Make sure to execute listeners without an active transaction.
       this.context.enterCommitted().using(this._eachChangeset.bind(this, mapper));

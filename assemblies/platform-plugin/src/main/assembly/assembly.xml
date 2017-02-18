@@ -15,6 +15,15 @@
     <fileSet>
       <directory>${basedir}/src/main/resources</directory>
       <outputDirectory>common-ui</outputDirectory>
+      <excludes>
+        <exclude>resources/web/*</exclude>
+      </excludes>
+    </fileSet>
+
+    <fileSet>
+      <directory>${basedir}/src/main/resources/resources/web</directory>
+      <outputDirectory>common-ui/resources/web</outputDirectory>
+      <filtered>true</filtered>
     </fileSet>
 
     <fileSet>

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -246,14 +246,14 @@ define([
        */
 
       /**
-       * Defaults `name` from `classSpec.type.id`, if any.
+       * Defaults `name` from `classSpec.type.sourceId` or `classSpec.type.id`, if any.
        *
        * @ignore
        */
       _extend: function(name, instSpec, classSpec, keyArgs) {
         var typeSpec;
         if(name == null && (typeSpec = (instSpec && instSpec.type))) {
-          name = typeSpec.id || typeSpec.sourceId || null;
+          name = typeSpec.sourceId || typeSpec.id || null;
           if(name) name = name.toString();
         }
 

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,8 @@ define([
   "pentaho/type/model",
   "./application",
   "pentaho/lang/Event",
-  "pentaho/type/filter/abstract",
-  "pentaho/type/filter/or",
-  "pentaho/util/spec",
-  "pentaho/util/object",
-  "pentaho/util/error",
   "pentaho/util/fun",
-  "pentaho/lang/UserError",
+  "pentaho/util/object",
   "./types/selectionModes",
 
   "./events/WillSelect",
@@ -38,7 +33,7 @@ define([
 
   "pentaho/lang/ActionResult",
 
-  "pentaho/i18n!type",
+  "pentaho/i18n!model",
 
   // pre-load all visual role mapping types
   "../role/mapping",
@@ -46,8 +41,7 @@ define([
   "../role/ordinal",
   "../role/quantitative"
 ], function(module, modelFactory, visualApplicationFactory,
-            Event, abstractFilterFactory, orFilterFactory, specUtil, O,
-            error, F, UserError,
+            Event, F, O,
             selectionModes,
             WillSelect, DidSelect, RejectedSelect,
             WillExecute, DidExecute, RejectedExecute,
@@ -67,10 +61,9 @@ define([
      * @memberOf pentaho.visual.base
      * @class
      * @extends pentaho.type.Model
-     * @mixes pentaho.lang.EventSource
      * @abstract
      *
-     * @amd {pentaho.type.Factory<pentaho.visual.base.Model>} pentaho/visual/base/model
+     * @amd {pentaho.type.Factory<pentaho.visual.base.Model>} pentaho/visual/base
      *
      * @classDesc The `Model` class is the abstract base class of visualization models.
      *
@@ -275,18 +268,16 @@ define([
           // Only isJson serialization does not work with the value of `data`
           // due to the circular dependencies it contains.
           if(omitProps.data == null) omitProps.data = true;
-
-          if(omitProps.selectionFilter == null) omitProps.selectionFilter = true;
         }
 
         return this.base(keyArgs);
       },
       // endregion
 
-      type: /** @lends pentaho.visual.base.Model.Meta# */{
+      type: /** @lends pentaho.visual.base.Model.Type# */{
         sourceId: module.id,
         id: module.id.replace(/.\w+$/, ""),
-        defaultView: "./View",
+        defaultView: "./view",
         isAbstract: true,
 
         props: [
@@ -299,7 +290,7 @@ define([
            * This property does not serialize to JSON by default.
            *
            * @name application
-           * @memberOf pentaho.type.Model#
+           * @memberOf pentaho.visual.base.Model#
            * @type {pentaho.visual.base.Application}
            */
           {
@@ -307,31 +298,12 @@ define([
             type: visualApplicationFactory
           },
           {
-            name: "width",
-            type: "number",
-            isRequired: true
-          },
-          {
-            name: "height",
-            type: "number",
-            isRequired: true
-          },
-          {
-            name: "isInteractive",
-            type: "boolean",
-            value: true
-          },
-          {
             name: "data",
             type: "object",
             isRequired: true
           },
-          {
-            name: "selectionFilter",
-            type: "pentaho/type/filter/abstract",
-            value: {_: "pentaho/type/filter/or"},
-            isRequired: true
-          },
+
+          // TODO: remove from here
           {
             name: "selectionMode",
             type: {
@@ -351,99 +323,6 @@ define([
             type: "function"
           }
         ],
-
-        _init: function(spec, keyArgs) {
-
-          this.base.apply(this, arguments);
-
-          // ----
-          // Block inheritance, with default values
-
-          this._extension = null;
-          this._extensionEf = undefined;
-        },
-
-        // region Extension
-        _extension: null,
-        _extensionEf: undefined,
-
-        /**
-         * Gets or sets extension properties that a View handles directly.
-         *
-         * Each visualization type should document the extension properties that
-         * it honors when specified via this attribute.
-         *
-         * When set and the model already has [descendant]{@link pentaho.type.Type#hasDescendants} models,
-         * an error is thrown.
-         *
-         * Returns `null` when there are no local extension properties.
-         *
-         * Note that this attribute is _not_ serialized when serializing a visual model type.
-         * It is expected that this attribute is always specified through configuration.
-         * Also, generally, there would be problems serializing functions and other objects
-         * it can contain.
-         *
-         * @type {Object}
-         *
-         * @throws {pentaho.lang.OperationInvalidError} When setting and the model already has
-         * [descendant]{@link pentaho.type.Type#hasDescendants} models.
-         *
-         * @see pentaho.visual.base.Model.Type#extensionEffective
-         *
-         * @see pentaho.visual.base.spec.IModel#extension
-         */
-        get extension() {
-          return this._extension;
-        },
-
-        set extension(value) {
-          if(this.hasDescendants)
-            throw error.operInvalid("Cannot change the 'extension' of a model type that has descendants.");
-
-          this._extension = value ? Object(value) : null;
-          this._extensionEf = undefined;
-        },
-
-        /**
-         * Gets the effective extension properties,
-         * a merge between the inherited extension properties and the
-         * locally specified extension properties.
-         *
-         * The merging is performed using the rules of the
-         * {@link pentaho.util.Spec#merge} method.
-         *
-         * Returns `null` when there are no local or inherited extension properties.
-         *
-         * @readOnly
-         * @type {Object}
-         *
-         * @see pentaho.visual.base.Model.Type#extension
-         */
-        get extensionEffective() {
-          var effective = this._extensionEf;
-          if(effective === undefined) {
-            effective = null;
-
-            var ancestor = this.ancestor;
-            if(ancestor.isSubtypeOf(VisualModel.type)) {
-              var ancestorExtEf = ancestor.extensionEffective;
-              if(ancestorExtEf) {
-                effective = {};
-                specUtil.merge(effective, ancestorExtEf);
-              }
-            }
-
-            if(this._extension) {
-              if(!effective) effective = {};
-              specUtil.merge(effective, this._extension);
-            }
-
-            this._extensionEf = effective;
-          }
-
-          return effective;
-        },
-        // endregion
 
         /**
          * Calls a function for each defined visual role property type.
@@ -481,7 +360,7 @@ define([
         }
       }
     })
-    .implement({type: bundle.structured});
+    .implement({type: bundle.structured.type});
 
     return VisualModel;
   };

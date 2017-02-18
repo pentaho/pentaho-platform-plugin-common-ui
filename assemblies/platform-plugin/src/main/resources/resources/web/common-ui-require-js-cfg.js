@@ -55,7 +55,7 @@
   [
     "shim", "util", "lang",
     "i18n", "service", "data", "type",
-    "visual", "config", "context", "debug"
+    "visual", "config", "context", "debug", "ccc"
   ].forEach(function(name) {
     requirePaths["pentaho/" + name] = basePath + "/pentaho/" + name;
   });
@@ -76,6 +76,7 @@
       url: getUrl()
     }
   };
+
   function getVar(name) {
     return global[name] || null;
   }
@@ -247,9 +248,7 @@
     requireMap["*"][mid + "/theme"] = mid + "/" + themeRoot + "/" + theme;
   }
 
-  function registerVizPackage(name) {
-    requireCfg.packages.push({"name": name, "main": "model"});
-
+  function registerViz(name) {
     requireTypes[name] = "pentaho/visual/base";
   }
 
@@ -257,10 +256,13 @@
   mapTheme("pentaho/type", "themes", ["crystal"]);
 
   // CCC Themes
-  mapTheme("pentaho/visual/ccc", "_themes", ["crystal", "sapphire", "onyx", "det"]);
+  mapTheme("pentaho/visual/models", "themes", ["crystal", "sapphire", "onyx", "det"]);
 
   // sample/calc theme
   mapTheme("pentaho/visual/samples/calc", "themes", ["crystal"]);
+
+  requireCfg.packages.push({"name": "pentaho/visual/base", "main": "model"});
+  requireCfg.packages.push({"name": "pentaho/visual/samples/calc", "main": "model"});
 
   [
     // base visual
@@ -270,28 +272,33 @@
     "pentaho/visual/samples/calc",
 
     // ccc vizs
-    "pentaho/visual/ccc/abstract",
-    "pentaho/visual/ccc/cartesianAbstract",
-    "pentaho/visual/ccc/categoricalContinuousAbstract",
-    "pentaho/visual/ccc/barAbstract",
-    "pentaho/visual/ccc/barNormalizedAbstract",
-    "pentaho/visual/ccc/barHorizontal",
-    "pentaho/visual/ccc/bar",
-    "pentaho/visual/ccc/barStacked",
-    "pentaho/visual/ccc/barStackedHorizontal",
-    "pentaho/visual/ccc/barNormalized",
-    "pentaho/visual/ccc/barNormalizedHorizontal",
-    "pentaho/visual/ccc/barLine",
-    "pentaho/visual/ccc/line",
-    "pentaho/visual/ccc/metricDotAbstract",
-    "pentaho/visual/ccc/areaStacked",
-    "pentaho/visual/ccc/pie",
-    "pentaho/visual/ccc/heatGrid",
-    "pentaho/visual/ccc/sunburst",
-    "pentaho/visual/ccc/donut",
-    "pentaho/visual/ccc/scatter",
-    "pentaho/visual/ccc/bubble"
-  ].forEach(registerVizPackage);
+    "pentaho/visual/models/abstract",
+    "pentaho/visual/models/cartesianAbstract",
+    "pentaho/visual/models/categoricalContinuousAbstract",
+    "pentaho/visual/models/barAbstract",
+    "pentaho/visual/models/barNormalizedAbstract",
+    "pentaho/visual/models/barHorizontal",
+    "pentaho/visual/models/bar",
+    "pentaho/visual/models/barStacked",
+    "pentaho/visual/models/barStackedHorizontal",
+    "pentaho/visual/models/barNormalized",
+    "pentaho/visual/models/barNormalizedHorizontal",
+    "pentaho/visual/models/barLine",
+    "pentaho/visual/models/line",
+    "pentaho/visual/models/pointAbstract",
+    "pentaho/visual/models/metricDotAbstract",
+    "pentaho/visual/models/areaStacked",
+    "pentaho/visual/models/pie",
+    "pentaho/visual/models/heatGrid",
+    "pentaho/visual/models/sunburst",
+    "pentaho/visual/models/donut",
+    "pentaho/visual/models/scatter",
+    "pentaho/visual/models/bubble"
+  ].forEach(registerViz);
   // endregion
 
+  // TODO: this should be removed from here, and to the GEO plugin's package.json
+  // when it is possible to specify global maps or an option that achieves the same effect.
+  requireMap["*"]["pentaho/visual/models/geoMap"] = "pentaho/geo/visual_${project.version}/model";
+  requireMap["*"]["pentaho/geo/visual/map"] = "pentaho/geo/visual_${project.version}/view";
 })(this);

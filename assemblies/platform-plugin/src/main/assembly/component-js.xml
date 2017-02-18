@@ -8,6 +8,7 @@
     <fileSet>
       <directory>${basedir}/src/main/resources/resources/web</directory>
       <outputDirectory>common-ui</outputDirectory>
+      <filtered>true</filtered>
     </fileSet>
 
     <!-- Fetch all the common-ui js first to make sure included dependencies are overwritten when needed. -->

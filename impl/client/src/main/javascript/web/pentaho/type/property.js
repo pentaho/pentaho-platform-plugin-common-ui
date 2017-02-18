@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -219,7 +219,8 @@ define([
          */
         get declaringType() {
           return this._declaringType;
-        }, // endregion
+        },
+        // endregion
 
         // region index attribute
         /**
@@ -230,7 +231,8 @@ define([
          */
         get index() {
           return this._index;
-        }, // endregion
+        },
+        // endregion
 
         // region name attribute
         _name: undefined,
@@ -275,7 +277,8 @@ define([
             if(value && value !== this._name)
               throw new TypeError("Sub-properties cannot change the 'name' attribute.");
           }
-        }, // endregion
+        },
+        // endregion
 
         // region list attribute
         /**
@@ -290,7 +293,8 @@ define([
          */
         get isList() {
           return this._type.isList;
-        }, // endregion
+        },
+        // endregion
 
         // region (value) element type attribute
         /**
@@ -310,7 +314,8 @@ define([
         get elemType() {
           var type = this._type;
           return type.isList ? type.of : type;
-        }, // endregion
+        },
+        // endregion
 
         // region (value) type attribute
         _type: undefined,
@@ -387,7 +392,8 @@ define([
               this._value = null;
             }
           }
-        }, // endregion
+        },
+        // endregion
 
         // region value attribute and related methods
         _value: null,
@@ -495,7 +501,8 @@ define([
         _freshDefaultValue: function() {
           var value = this.value;
           return value ? value.clone() : this.isList ? this.type.create() : value;
-        }, // endregion
+        },
+        // endregion
 
         // region label attribute
         /**
@@ -514,7 +521,8 @@ define([
           } else {
             delete this._label;
           }
-        }, // endregion
+        },
+        // endregion
 
         // endregion
 

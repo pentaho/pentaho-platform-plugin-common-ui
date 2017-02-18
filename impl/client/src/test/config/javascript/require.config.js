@@ -56,6 +56,7 @@
   requirePaths["pentaho/config"] = basePath + "/pentaho/config";
   requirePaths["pentaho/context"] = basePath + "/pentaho/context";
   requirePaths["pentaho/debug"] = basePath + "/pentaho/debug";
+  requirePaths["pentaho/ccc"] = basePath + "/pentaho/ccc";
 
   // Named instances
   requireTypes["pentaho/config/impl/instanceOfAmdLoadedService"] = "pentaho.config.IService";
@@ -126,21 +127,22 @@
     requireMap["*"][mid + "/theme"] = mid + "/" + themeRoot + "/" + theme;
   }
 
-  function registerVizPackage(name) {
-    requirePackages.push({"name": name, "main": "model"});
+  function registerViz(name) {
     requireTypes[name] = "pentaho/visual/base";
   }
 
   // Metadata Model Base Theme
   mapTheme("pentaho/type", "themes", ["crystal"]);
 
-  // CCC Themes
-  mapTheme("pentaho/visual/ccc", "_themes", ["crystal", "sapphire", "onyx", "det"]);
+  // Visual Models Themes
+  mapTheme("pentaho/visual/models", "themes", ["crystal", "sapphire", "onyx", "det"]);
+
+  requireCfg.packages.push({"name": "pentaho/visual/base", "main": "model"});
 
   [
     "pentaho/visual/base",
-    "pentaho/visual/ccc/abstract",
-    "pentaho/visual/ccc/bar"
-  ].forEach(registerVizPackage);
+    "pentaho/visual/models/abstract",
+    "pentaho/visual/models/bar"
+  ].forEach(registerViz);
 
 })();
