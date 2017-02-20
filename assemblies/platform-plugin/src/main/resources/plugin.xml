@@ -42,10 +42,12 @@
       type="xml,gwt"
       class="org.pentaho.common.ui.metadata.service.MetadataService"/>
 
+  <!-- Commented out per PPP-3679
   <webservice
       id="metadataService2"
       type="xml,gwt"
       class="org.pentaho.common.ui.metadata.service.MetadataService2"/>
+  -->
 
   <external-resources>
     <file context="global">content/common-ui/resources/web/angular-directives/angular-directives.css</file>
