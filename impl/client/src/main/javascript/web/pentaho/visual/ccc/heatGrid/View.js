@@ -62,17 +62,23 @@ define([
 
       this.base(options);
 
-      if(def.get(this._validExtensionOptions, "axisComposite")) {
+      var xAxisSize;
+      var yAxisSize;
+
+      options.axisTitleSize = 25;
+      options.axisComposite = def.get(this._validExtensionOptions, "axisComposite", options.axisComposite);
+
+      if(options.axisComposite) {
         var measureCount = this._getRoleDepth("size") + this._getRoleDepth("color");
         var catsDepth = this._getRoleDepth("rows");
         var sersDepth = this._getRoleDepth("columns");
-        var catsBreadth = Math.max(1,this._dataTable.getNumberOfRows() - 1);
+        var catsBreadth = Math.max(1, this._dataTable.getNumberOfRows() - 1);
         var sersBreadth = this._dataTable.getNumberOfColumns() - catsDepth;
 
         if(measureCount > 0) sersBreadth /= measureCount;
 
-        var width = options.width;
-        var height = options.height;
+        var width = Math.max(0, options.width - options.axisTitleSize);
+        var height = Math.max(0, options.height - options.axisTitleSize);
         var currRatio = width / height;
         var xyChartRatio = catsBreadth / sersBreadth;
 
@@ -87,8 +93,7 @@ define([
         var maxXAxisSize = Math.min(MAX_AXIS_SIZE, catsDepth * MAX_LEVEL_HEIGHT, height * MAX_AXIS_RATIO);
         var maxYAxisSize = Math.min(MAX_AXIS_SIZE, sersDepth * MAX_LEVEL_HEIGHT, width * MAX_AXIS_RATIO);
 
-        var xAxisSize;
-        var yAxisSize;
+
         if(xyChartRatio > currRatio) { // lock width
           var extraHeight = height - width / xyChartRatio;
 
