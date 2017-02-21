@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define(["pentaho/util/has"], function(has) {
 
   "use strict";
 
@@ -101,23 +101,23 @@ define(function() {
 
   function createURL(url) {
     if(url) {
-      if(typeof URL !== "undefined") {
-        try {
-          var urlObj = new URL(url);
-          if(urlObj.href) { // PhantomJS 2.0 does not have an href property !!
-            return urlObj;
-          }
-        } catch(ex) {
-          // Invalid URL syntax
-        }
+      if(has("URL")) {
+        return new URL(url);
       }
 
-      // Return a MOCK
-      var m = /^\s*([^:\/?#]+:)?/.exec(url);
+      // Return a MOCK URL
+      var m = /^\s*([^:\/?#]+:)\/\/([^@]*@)?([^:\/?#]*)(:\d*)?(\/[^?#]*)+/.exec(url);
+      var auth = m[2] != null ? m[2].slice(0, -1).split(":") : [];
       return {
         href:     url,
         protocol: m[1],
-        pathname: url // TODO: parse URL... ?
+        username: auth.length > 0 ? auth[0] : "",
+        password: auth.length > 1 ? auth[1] : "",
+        hostname: m[3],
+        host: m[3] + (m[4] != null ? m[4] : ""),
+        port: (m[4] != null ? m[4].substring(1) : ""),
+        origin: m[1] + "//" + m[3] + (m[4] != null ? m[4] : ""),
+        pathname: m[5]
       };
     }
 

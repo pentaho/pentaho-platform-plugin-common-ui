@@ -33,7 +33,7 @@ define([
       },
       reservedChars: "RESERVED-CHARS-1",
       server: {
-        url: "URL-1"
+        url: "http://host:8888/path-1"
       }
     };
 
@@ -75,7 +75,7 @@ define([
       },
       reservedChars: "RESERVED-CHARS",
       server: {
-        url: "URL"
+        url: "http://host:8888/path-2"
       }
     };
 
