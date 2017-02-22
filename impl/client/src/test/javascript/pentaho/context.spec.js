@@ -91,8 +91,9 @@ define([
      *
      * @param {string} propPath - The name of the context property.
      * @param {string} specPropPath - The name of the context specification property.
+     * @param {object} value - The value to set and read.
      */
-    function testContextProperty(propPath, specPropPath) {
+    function testContextProperty(propPath, specPropPath, value) {
 
       describe(propPath, function() {
 
@@ -112,23 +113,23 @@ define([
 
         it("should respect a non-empty " + specPropPath + " value", function() {
 
-          return require.using(["pentaho/context"], mockConfigWith(specPropPath, "ABC"), function(contextVars) {
-            expect(getPath(contextVars, propPath, null)).toBe("ABC");
+          return require.using(["pentaho/context"], mockConfigWith(specPropPath, value), function(contextVars) {
+            expect(getPath(contextVars, propPath, null)).toBe(value);
           });
         });
       });
     }
 
-    testContextProperty("application", "application");
-    testContextProperty("server.url.href", "server.url");
+    testContextProperty("application", "application", "ABC");
+    testContextProperty("server.url.href", "server.url", "http://host:8888/path");
 
-    testContextProperty("user.id", "user.id");
-    testContextProperty("user.home", "user.home");
+    testContextProperty("user.id", "user.id", "ABC");
+    testContextProperty("user.home", "user.home", "ABC");
 
-    testContextProperty("theme", "theme");
-    testContextProperty("locale", "locale");
+    testContextProperty("theme", "theme", "ABC");
+    testContextProperty("locale", "locale", "ABC");
 
-    testContextProperty("reservedChars", "reservedChars");
+    testContextProperty("reservedChars", "reservedChars", "ABC");
 
   }); // pentaho.context
 });
