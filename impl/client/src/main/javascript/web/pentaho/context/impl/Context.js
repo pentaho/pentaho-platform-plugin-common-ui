@@ -102,7 +102,7 @@ define(["pentaho/util/has"], function(has) {
   function createURL(url) {
     if(url) {
       if(has("URL")) {
-        return new URL(url);
+        return new URL(url, document.location);
       }
 
       // Return a MOCK URL
