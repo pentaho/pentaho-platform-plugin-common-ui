@@ -106,7 +106,8 @@ define(["pentaho/util/has"], function(has) {
       }
 
       // Return a MOCK URL
-      var m = /^\s*([^:\/?#]+:)\/\/([^@]*@)?([^:\/?#]*)(:\d*)?(\/[^?#]*)+/.exec(url);
+      var m = parseUrl(url) || parseUrl((url = makeAbsoluteUrl(url)));
+
       var auth = m[2] != null ? m[2].slice(0, -1).split(":") : [];
       return {
         href:     url,
@@ -122,5 +123,15 @@ define(["pentaho/util/has"], function(has) {
     }
 
     return null;
+  }
+
+  function parseUrl(url) {
+    return /^\s*([^:\/?#]+:)\/\/([^@]*@)?([^:\/?#]*)(:\d*)?(\/[^?#]*)+/.exec(url);
+  }
+
+  function makeAbsoluteUrl(url) {
+    var aElem = document.createElement("a");
+    aElem.href = url;
+    return aElem.href;
   }
 });
