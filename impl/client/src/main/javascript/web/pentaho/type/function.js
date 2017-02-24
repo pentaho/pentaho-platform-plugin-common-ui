@@ -16,14 +16,24 @@
 define([
   "module",
   "./simple",
+  "../util/object",
   "../util/fun",
   "../util/logger",
   "../i18n!types"
-], function(module, simpleFactory, F, logger, bundle) {
+], function(module, simpleFactory, O, F, logger, bundle) {
 
   "use strict";
 
   var NATIVE_CODE = "[native code]";
+
+  var _simpleObjectNextUid = 1;
+  var _OID_PROP = "__pentaho_type_ouid_" + Math.random().toString(32) + "__";
+  var _DEF_OID_PROP = {
+    value: "",
+    configurable: true,
+    writable:     true,
+    enumerable:   false
+  };
 
   return function(context) {
 
@@ -48,6 +58,35 @@ define([
        * @type function
        * @readonly
        */
+
+      constructor: function(spec) {
+
+        this.base(spec);
+
+        // Reuse an existing UID mark, so that two Simple instances with the same underlying primitive value
+        // are considered #equal.
+        var uid = O.getOwn(this._value, _OID_PROP);
+        if(uid == null) {
+          // Mark value with a non-enumerable property.
+          // Note that non-enumerable properties are not included by JSON.stringify.
+          _DEF_OID_PROP.value = uid = String(_simpleObjectNextUid++);
+          Object.defineProperty(this._value, _OID_PROP, _DEF_OID_PROP);
+        }
+
+        this._uid = uid;
+      },
+
+      /**
+       * Gets the unique key of the native function.
+       *
+       * The key of a value identifies it among its _peers_.
+       *
+       * @type {string}
+       * @readonly
+       */
+      get key() {
+        return this._uid;
+      },
 
       // region serialization
       _toJSONValue: function(keyArgs) {
