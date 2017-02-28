@@ -223,7 +223,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>pentaho-library</groupId>
+      <groupId>org.pentaho.reporting.library</groupId>
       <artifactId>libformula</artifactId>
       <version>${libformula.version}</version>
       <scope>test</scope>
@@ -291,7 +291,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>pentaho-library</groupId>
+      <groupId>org.pentaho.reporting.library</groupId>
       <artifactId>libbase</artifactId>
       <version>${libbase.version}</version>
       <scope>test</scope>
