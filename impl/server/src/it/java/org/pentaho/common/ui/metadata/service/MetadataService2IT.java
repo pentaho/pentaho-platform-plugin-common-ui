@@ -692,65 +692,6 @@ public class MetadataService2IT {
     assertNull( "results are not null", results );
   }
 
-  @Ignore("Test randomly failling. Check BACKLOG-13450")
-  @Test
-  public void testXmlQueryToJson1() throws KettleException {
-    StandaloneSession session = new StandaloneSession();
-    PentahoSessionHolder.setSession( session );
-
-    KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
-
-    String queryString =
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?><mql><domain_id>steel-wheels</domain_id><model_id>BV_ORDERS</model_id><options><disable_distinct>false</disable_distinct></options><selections><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTLINE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTNAME</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTCODE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_QUANTITYORDERED</column><aggregation>SUM</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_TOTAL</column><aggregation>SUM</aggregation></selection></selections><constraints/><orders/></mql>";
-    String json = svc.doXmlQueryToJson( queryString, -1 );
-    assertNotNull( "results are null", json );
-    assertTrue( "wrong column name", json.indexOf( "BC_PRODUCTS_PRODUCTLINE" ) != -1 );
-    assertTrue( "wrong column type", json.indexOf( "\"string\"" ) != -1 );
-    assertTrue( "wrong value", json.indexOf( "Classic Cars" ) != -1 );
-  }
-
-  @Ignore("Test randomly failling. Check BACKLOG-13450")
-  @Test
-  public void testJsonQueryToJson1() throws KettleException {
-    StandaloneSession session = new StandaloneSession();
-    PentahoSessionHolder.setSession( session );
-
-    KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
-
-    Query query = getTestQuery();
-    JSONSerializer serializer = new JSONSerializer();
-    String json = serializer.deepSerialize( query );
-
-    json = svc.doJsonQueryToJson( json, -1 );
-
-    assertNotNull( "results are null", json );
-    assertTrue( "wrong column name", json.indexOf( "BC_PRODUCTS_PRODUCTLINE" ) != -1 );
-    assertTrue( "wrong column type", json.indexOf( "\"string\"" ) != -1 );
-    assertTrue( "wrong value", json.indexOf( "Classic Cars" ) != -1 );
-  }
-
-  @Ignore("Test randomly failling. Check BACKLOG-13450")
-  @Test
-  public void testJsonQueryToJson2() throws KettleException {
-    StandaloneSession session = new StandaloneSession();
-    PentahoSessionHolder.setSession( session );
-
-    KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
-    String json =
-        "{\"class\":\"org.pentaho.metadata.model.thin.Query\",\"sourceId\":\""
-            + MetadataService2.PROVIDER_ID
-            + "~steel-wheels~BV_ORDERS\",\"elements\":[{\"aggTypes\":[],\"parentId\":\"BC_CUSTOMER_W_TER_\",\"class\":\"org.pentaho.metadata.model.thin.Element\",\"defaultAggregation\":null,\"fieldType\":null,\"id\":\"BC_CUSTOMER_W_TER_COUNTRY\",\"name\":null,\"selectedAggregation\":\"NONE\",\"type\":null}],\"conditions\":[{\"parentId\":\"BC_CUSTOMER_W_TER_\",\"class\":\"org.pentaho.metadata.model.thin.Condition\",\"elementId\":\"BC_CUSTOMER_W_TER_COUNTRY\",\"combinationType\":\"AND\",\"operator\":\"EQUAL\",\"value\":[\"Australia\"]}],\"defaultParameterMap\":null,\"disableDistinct\":false,\"domainName\":\"steel-wheels\",\"modelId\":\"BV_ORDERS\",\"orders\":[{\"category\":\"BC_CUSTOMER_W_TER_\",\"class\":\"org.pentaho.metadata.model.thin.Order\",\"column\":\"BC_CUSTOMER_W_TER_COUNTRY\",\"orderType\":\"ASC\"}],\"parameters\":[]}";
-    json = svc.doJsonQueryToJson( json, -1 );
-
-    assertNotNull( "results are null", json );
-    assertTrue( "wrong column name", json.indexOf( "BC_CUSTOMER_W_TER_COUNTRY" ) != -1 );
-    assertTrue( "wrong column type", json.indexOf( "\"string\"" ) != -1 );
-    assertTrue( "wrong value", json.indexOf( "Australia" ) != -1 );
-  }
-
   @Test
   public void testXmlQueryJson2() throws KettleException, JSONException {
 
