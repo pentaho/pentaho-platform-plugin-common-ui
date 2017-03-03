@@ -15,16 +15,15 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/visual/samples/calc/model",
-  "pentaho/visual/samples/calc/View",
+  "pentaho/visual/base/View",
   "pentaho/data/Table"
-], function(Context, modelFactory, View, Table) {
+], function(Context, viewBaseFactory, Table) {
 
-  var containerElement = document.querySelector(".sandbox-container");
-  var vizElement = document.createElement("div");
-  containerElement.appendChild(vizElement);
+  "use strict";
 
-  var data = new Table({
+  var sandboxContainer = document.getElementById(".sandbox-container");
+
+  var dataTable = new Table({
     model: [
       {name: "family", type: "string", label: "Family"},
       {name: "sales", type: "number", label: "Sales"}
@@ -35,32 +34,36 @@ define([
     ]
   });
 
-  var context = new Context();
-  var Model = context.get(modelFactory);
-  var model = new Model({
-    width: 0,
-    height: 0,
-    isInteractive: true,
-    data: data,
-    levels: {
-      attributes: ["family"]
-    },
-    measure: {
-      attributes: ["sales"]
-    },
-    operation: "avg"
-  });
-
-  var view = new View(vizElement, model);
-  view.update().then(function() {
-    console.log("view update finished");
-  });
-
-  // Export for users to play with.
-  window.app = {
-    context: context,
-    view: view,
-    View: View,
-    Model: Model
+  var viewSpec = {
+    width:  100,
+    height: 100,
+    domContainer: sandboxContainer,
+    model: {
+      _: "pentaho/visual/samples/calc",
+      data: dataTable,
+      levels: {
+        attributes: ["family"]
+      },
+      measure: {
+        attributes: ["sales"]
+      },
+      operation: "avg"
+    }
   };
+
+  var context = new Context();
+  var View = context.get(viewBaseFactory);
+
+  View.createAsync(viewSpec).then(function(view) {
+
+    view.update().then(function() {
+      console.log("view update finished");
+    });
+
+    // Export for users to play with.
+    window.app = {
+      context: context,
+      view: view
+    };
+  });
 });

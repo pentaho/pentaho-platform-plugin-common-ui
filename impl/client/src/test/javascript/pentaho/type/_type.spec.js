@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,17 @@
 define([
   "pentaho/type/Context",
   "pentaho/type/SpecificationContext",
-  "tests/pentaho/util/errorMatch"
-], function(Context, SpecificationContext, errorMatch) {
+  "tests/pentaho/util/errorMatch",
+  "tests/test-utils"
+], function(Context, SpecificationContext, errorMatch, testUtils) {
 
   "use strict";
 
   /* global describe:true, it:true, expect:true, beforeEach:true, afterEach:true, spyOn: true, jasmine: true*/
+
+  // Use alternate, promise-aware version of `it`.
+  var it = testUtils.itAsync;
+  var expectToRejectWith = testUtils.expectToRejectWith;
 
   describe("pentaho.type.Type", function() {
 
@@ -1208,7 +1213,7 @@ define([
       });
     });
 
-    describe("#create(valueSpec, {defaultType: .}", function() {
+    describe("#create(instSpec)", function() {
       it("returns a new instance of `pentaho.type.Instance`", function() {
         expect(Instance.type.create() instanceof Instance).toBe(true);
       });
@@ -1221,14 +1226,6 @@ define([
 
         inst = MyComplex.type.create(undefined);
         expect(inst instanceof MyComplex).toBe(true);
-      });
-
-      it("should create an instance given a number value when called on a Number type", function() {
-        var Number = context.get("pentaho/type/number");
-        var number = Number.type.create(1);
-
-        expect(number instanceof Number).toBe(true);
-        expect(number.value).toBe(1);
       });
 
       it("should create an instance given a number value when called on Number", function() {
@@ -1372,6 +1369,160 @@ define([
         expect(value.count).toBe(2);
       });
     }); // #create
+
+    describe("#createAsync(instSpec)", function() {
+      // region selection of the sync tests
+      it("returns a new instance of `pentaho.type.Instance`", function() {
+        return Instance.type.createAsync().then(function(inst) {
+          expect(inst instanceof Instance).toBe(true);
+        });
+      });
+
+      it("should return an instance when given nully", function() {
+        var Complex = context.get("pentaho/type/complex");
+        var MyComplex = Complex.extend();
+
+        return MyComplex.type.createAsync(null).then(function(inst) {
+          expect(inst instanceof MyComplex).toBe(true);
+        });
+      });
+
+      it("should create an instance given a number value when called on Number", function() {
+        var Number = context.get("pentaho/type/number");
+
+        return Number.type.createAsync(1).then(function(number) {
+          expect(number instanceof Number).toBe(true);
+          expect(number.value).toBe(1);
+        });
+      });
+
+      it("should create an instance given a boolean value when called on Boolean", function() {
+        var Boolean = context.get("pentaho/type/boolean");
+
+        return Boolean.type.createAsync(1).then(function(value) {
+          expect(value instanceof Boolean).toBe(true);
+          expect(value.value).toBe(true);
+        });
+      });
+
+      it("should create an instance given an object value when called on Object", function() {
+        var Object = context.get("pentaho/type/object");
+        var primitive = {};
+
+        return Object.type.createAsync({v: primitive}).then(function(value) {
+          expect(value instanceof Object).toBe(true);
+          expect(value.value).toBe(primitive);
+        });
+      });
+
+      it("should create an instance given an object with a type annotation, '_'", function() {
+        var Value = context.get("pentaho/type/value");
+
+        return Value.type.createAsync({_: "pentaho/type/number", v: 1}).then(function(value) {
+          var Number = context.get("pentaho/type/number");
+
+          expect(value instanceof Number).toBe(true);
+          expect(value.value).toBe(1);
+        });
+      });
+
+      it("should throw if given a type-annotated value that does not extend from the this type", function() {
+        var String = context.get("pentaho/type/string");
+
+        return expectToRejectWith(
+            function() { return String.type.createAsync({_: "pentaho/type/number", v: 1}); },
+            errorMatch.operInvalid());
+      });
+
+      it("should throw if given a type annotated value of an abstract type", function() {
+        var MyAbstract = context.get("pentaho/type/complex").extend({type: {isAbstract: true}});
+
+        return expectToRejectWith(
+            function() { return Instance.type.createAsync({_: MyAbstract}); },
+            errorMatch.operInvalid());
+      });
+      // endregion
+
+      it("should be able to create a type-annotated value of an inline list complex type", function() {
+
+        function config(localRequire) {
+
+          localRequire.define("test/foo/a", function() {
+            return function(context) {
+
+              var Complex = context.get("pentaho/type/complex");
+
+              return Complex.extend({
+                type: {
+                  id: "test/foo/a",
+                  props: {
+                    a: {type: "string"}
+                  }
+                }
+              });
+            };
+          });
+
+          localRequire.define("test/foo/b", function() {
+            return function(context) {
+
+              var Complex = context.get("pentaho/type/complex");
+
+              return Complex.extend({
+                type: {
+                  id: "test/foo/b",
+                  props: {
+                    b: {type: "string"}
+                  }
+                }
+              });
+            };
+          });
+
+          localRequire.define("test/foo/c", function() {
+            return function(context) {
+
+              var TestFooB = context.get("test/foo/b");
+
+              return TestFooB.extend({
+                type: {
+                  id: "test/foo/c",
+                  props: {
+                    c: {type: "string"}
+                  }
+                }
+              });
+            };
+          });
+        }
+
+        return require.using(["pentaho/type/Context"], config, function(Context) {
+
+          var context = new Context();
+          var Instance = context.get("instance");
+
+          var instSpec = {
+            _: [
+              {
+                props: [
+                  {name: "x", type: "test/foo/a"},
+                  {name: "y", type: "test/foo/b"}
+                ]
+              }
+            ],
+            d: [
+              {x: {a: "1"}, y: {b: "2"}},
+              {x: {a: "2"}, y: {_: "test/foo/c", b: "3"}}
+            ]
+          };
+
+          return Instance.type.createAsync(instSpec).then(function(value) {
+            expect(value instanceof context.get("list")).toBe(true);
+            expect(value.count).toBe(2);
+          });
+        });
+      });
+    }); // #createAsync
 
     describe("#is -", function() {
       it("detects an instance of `pentaho.type.Instance` correctly", function() {

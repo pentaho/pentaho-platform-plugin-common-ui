@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -598,6 +598,21 @@ define([
         return Promise.reject(ex);
       }
     },
+
+    /**
+     * Recursively collects the module ids of custom types used within a type specification.
+     *
+     * @param {pentaho.type.spec.UTypeReference} typeRef - A type reference.
+     * @param {!Object.<string, string>} [customTypeIds] - An object where to add found type ids to.
+     * @return {!Object.<string, string>} A possibly empty object whose own keys are type module ids.
+     * @private
+     * @friend pentaho.type.Type#createAsync
+     */
+    _collectTypeSpecTypeIds: function(typeSpec, customTypeIds) {
+      if(!customTypeIds) customTypeIds = {};
+      collectTypeIdsRecursive(typeSpec, customTypeIds);
+      return customTypeIds;
+    },
     // endregion
 
     // region Changes and Transactions
@@ -876,6 +891,9 @@ define([
      * @private
      */
     _getByFun: function(fun, sync) {
+      // make sure overrides don't confuse factory detection
+      fun = fun.valueOf();
+
       var proto = fun.prototype;
       var Instance = this._Instance;
 
@@ -1077,7 +1095,7 @@ define([
       if(sync) return resolveSync.call(this);
 
       // Collect the module ids of all custom types used within typeSpec.
-      var customTypeIds = collectTypeIds(typeSpec);
+      var customTypeIds = Object.keys(this._collectTypeSpecTypeIds(typeSpec));
       /* jshint laxbreak:true*/
       return customTypeIds.length
           // Require them all and only then invoke the synchronous BaseType.extend method.
@@ -1147,13 +1165,6 @@ define([
     return id.indexOf("/") < 0 ? (_baseMid + id) : id;
   }
 
-  // Recursively collect the module ids of all custom types used within typeSpec.
-  function collectTypeIds(typeSpec) {
-    var customTypeIds = [];
-    collectTypeIdsRecursive(typeSpec, customTypeIds);
-    return customTypeIds;
-  }
-
   function collectTypeIdsRecursive(typeSpec, outIds) {
     if(!typeSpec) return;
 
@@ -1162,14 +1173,12 @@ define([
       case "string":
         if(SpecificationContext.isIdTemporary(typeSpec)) return;
 
-        // It's considered an AMD id only if it has at least one "/".
-        // Otherwise, append pentaho's base amd id.
-        if(typeSpec.indexOf("/") < 0) typeSpec = _baseMid + typeSpec;
+        typeSpec = toAbsTypeId(typeSpec);
 
         // A standard type that is surely loaded?
         if(_standardTypeMids[typeSpec] === 1) return;
 
-        outIds.push(typeSpec);
+        outIds[typeSpec] = typeSpec;
         return;
 
       case "object":

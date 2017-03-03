@@ -106,7 +106,14 @@ define(["pentaho/util/has"], function(has) {
       }
 
       // Return a MOCK URL
-      var m = parseUrl(url) || parseUrl((url = makeAbsoluteUrl(url)));
+      var m = parseUrl(url) ||
+
+          // tests can reach here, as URL is fed from CONTEXT_PATH, which is usually not absolute
+          parseUrl((url = makeAbsoluteUrl(url))) ||
+
+          // TODO: CGG/rhino can reach here, as its createElement is mocked. Remove the latter dies.
+          // Assume the whole url is the pathname.
+          [url, "", null, "", null, url];
 
       var auth = m[2] != null ? m[2].slice(0, -1).split(":") : [];
       return {
@@ -126,6 +133,11 @@ define(["pentaho/util/has"], function(has) {
   }
 
   function parseUrl(url) {
+    // 1 - protocol (required)
+    // 2 - authority (userName:password) (optional)
+    // 3 - host (optional)
+    // 4 - port (optional)
+    // 5 - pathname (optional)
     return /^\s*([^:\/?#]+:)\/\/([^@]*@)?([^:\/?#]*)(:\d*)?(\/[^?#]*)+/.exec(url);
   }
 

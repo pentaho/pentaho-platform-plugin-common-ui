@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -210,17 +210,21 @@ define([
      */
 
     /**
-     * Emits the "will:change" event for a given changeset,
+     * Called before a changeset is committed.
+     *
+     * The default implementation emits the "will:change" event for the given changeset,
      * if there are any listeners.
+     *
+     * When overriding, be sure to call the base implementation.
      *
      * @param {!pentaho.type.changes.Changeset} changeset - The set of changes.
      *
      * @return {pentaho.lang.UserError|undefined} An error if the changeset was canceled; or, `undefined` otherwise.
      *
-     * @private
+     * @protected
      * @friend {pentaho.type.changes.Transaction}
      */
-    _notifyChangeWill: function(changeset) {
+    _onChangeWill: function(changeset) {
       var event;
       if(this._hasListeners("will:change") &&
          !this._emitSafe((event = new WillChange(this, changeset))))
@@ -228,31 +232,39 @@ define([
     },
 
     /**
-     * Emits the "did:change" event for a given changeset,
+     * Called after a changeset has been committed.
+     *
+     * The default implementation emits the "did:change" event for the given changeset,
      * if there are any listeners.
+     *
+     * When overriding, be sure to call the base implementation.
      *
      * @param {!pentaho.type.changes.Changeset} changeset - The set of changes.
      *
-     * @private
+     * @protected
      * @friend {pentaho.type.changes.Transaction}
      */
-    _notifyChangeDid: function(changeset) {
+    _onChangeDid: function(changeset) {
       if(this._hasListeners("did:change")) {
         this._emitSafe(new DidChange(this, changeset));
       }
     },
 
     /**
-     * Emits the "rejected:change" event for a given changeset,
+     * Called after a changeset has been rejected.
+     *
+     * The default implementation emits the "rejected:change" event for the given changeset,
      * if there are any listeners.
+     *
+     * When overriding, be sure to call the base implementation.
      *
      * @param {!pentaho.type.changes.Changeset} changeset - The set of changes.
      * @param {!Error} reason - The reason why the changes were rejected.
      *
-     * @private
+     * @protected
      * @friend {pentaho.type.changes.Transaction}
      */
-    _notifyChangeRej: function(changeset, reason) {
+    _onChangeRejected: function(changeset, reason) {
       if(this._hasListeners("rejected:change")) {
         this._emitSafe(new RejectedChange(this, changeset, reason));
       }

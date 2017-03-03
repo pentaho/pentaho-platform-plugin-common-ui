@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -496,7 +496,7 @@ define([
        * one that is relative to the type's [source location]{@link pentaho.type.Type#sourceId}.
        *
        * Relative module identifiers start with a `.` and do not end with `".js"`.
-       * For example, `"./View"` and `"../View"`, but not `./View.js`.
+       * For example, `"./view"` and `"../view"`, but not `./view.js`.
        *
        * Absolute identifiers are returned without modification.
        *
@@ -508,12 +508,12 @@ define([
        */
       buildSourceRelativeId: function(id) {
         // Relative:
-        //   ./View
+        //   ./view
         // Absolute:
-        //   View
+        //   view
         //   foo.js
         //   ./foo.js
-        //   /View
+        //   /view
         //   http:
         if(/^\./.test(id) && !/\.js$/.test(id)) {
           // Considered relative.
@@ -846,7 +846,10 @@ define([
        * Setting to `undefined`, makes the property assume its default value.
        *
        * The default value of a type with an [id]{@link pentaho.type.Type#id} is
-       * the identifier converted to _snake-case_.
+       * the identifier converted to _snake-case_,
+       * plus special characters like `\`, `/`, `_` and spaces are converted to `-`
+       * (e.g. `"pentaho/visual/models/heatGrid"` would have a default
+       * `styleClass` of `"pentaho-visual-ccc-heat-grid"`).
        * The default value of an anonymous type is `null`.
        *
        * @type {?nonEmptyString}
@@ -1061,13 +1064,14 @@ define([
       /**
        * Creates an instance of this type, given an instance specification.
        *
-       * If the specified instance specification contains an inline type reference,
+       * If the instance specification contains an inline type reference,
        * in property `"_"`, the referenced type is used to create the instance
        * (as long as it is a subtype of this type).
        *
        * If the specified instance specification does not contain an inline type reference,
-       * the type is assumed to be this type.
+       * the type is assumed to be `this` type.
        *
+       * @see pentaho.type.Type#createAsync
        * @see pentaho.type.Type#isSubtypeOf
        * @see pentaho.type.Context#get
        *
@@ -1154,6 +1158,12 @@ define([
        * @throws {pentaho.lang.OperationInvalidError} When `instSpec` contains an inline type reference
        * that refers to a type that is not a subtype of this one.
        *
+       * @throws {Error} When `instSpec` contains an inline type reference which is not defined as a module in the
+       * AMD module system (specified directly in `instSpec`, or present in an generic type specification).
+       *
+       * @throws {Error} When `instSpec` contains an inline type reference which is from a module that the
+       * AMD module system hasn't loaded yet.
+       *
        * @throws {pentaho.lang.OperationInvalidError} When the determined type for the specified `instSpec`
        * is an [abstract]{@link pentaho.type.Value.Type#isAbstract} type.
        */
@@ -1185,6 +1195,62 @@ define([
         }
 
         return O.make(Instance, arguments);
+      },
+
+      /**
+       * Creates an instance of this type, asynchronously, given an instance specification.
+       *
+       * If the instance specification contains an inline type reference,
+       * in property `"_"`, the referenced type is used to create the instance
+       * (as long as it is a subtype of this type).
+       *
+       * If the specified instance specification does not contain an inline type reference,
+       * the type is assumed to be `this` type.
+       *
+       * @param {pentaho.type.spec.UInstance} [instSpec] - An instance specification.
+       *
+       * @return {!Promise.<pentaho.type.Instance>} A promise to the created instance.
+       *
+       * @rejects {pentaho.lang.OperationInvalidError} When `instSpec` contains an inline type reference
+       * that refers to a type that is not a subtype of this one.
+       *
+       * @rejects {Error} When `instSpec` contains an inline type reference which is not defined as a module in the
+       * AMD module system (specified directly in `instSpec`, or present in an generic type specification).
+       *
+       * @rejects {pentaho.lang.OperationInvalidError} When the determined type for the specified `instSpec`
+       * is an [abstract]{@link pentaho.type.Value.Type#isAbstract} type.
+       *
+       * @see pentaho.type.Type#create
+       * @see pentaho.type.Type#isSubtypeOf
+       * @see pentaho.type.Context#get
+       */
+      createAsync: function(instSpec) {
+
+        var customTypeIds = Object.keys(this._collectInstSpecTypeIds(instSpec));
+
+        return customTypeIds.length
+            // Require them all and only then invoke the synchronous BaseType.extend method.
+            ? promiseUtil.require(customTypeIds, localRequire).then(resolveSync.bind(this))
+            // All types are standard and can be assumed to be already loaded.
+            // However, we should behave asynchronously as requested.
+            : promiseUtil.wrapCall(resolveSync, this);
+
+        function resolveSync() {
+          return this.create(instSpec);
+        }
+      },
+
+      /**
+       * Recursively collects the module ids of custom types used within an instance specification.
+       *
+       * @param {pentaho.type.spec.UInstance} instSpec - An instance specification.
+       * @return {!Object.<string, string>} A possibly empty object whose own keys are type module ids.
+       * @private
+       */
+      _collectInstSpecTypeIds: function(instSpec) {
+        var customTypeIds = {};
+        collectTypeIdsRecursive.call(this, instSpec, customTypeIds);
+        return customTypeIds;
       },
 
       /**
@@ -1694,4 +1760,24 @@ define([
       return castAndNormalize(v, cast, dv);
     };
   }
+
+  function collectTypeIdsRecursive(instSpec, outIds) {
+    if(instSpec && typeof instSpec === "object") {
+      if(Array.isArray(instSpec)) {
+        instSpec.forEach(function(elemSpec) {
+          collectTypeIdsRecursive.call(this, elemSpec, outIds);
+        }, this);
+      } else if(instSpec.constructor === Object) {
+        Object.keys(instSpec).forEach(function(name) {
+          var elemSpec = instSpec[name];
+          if(name === "_")
+            this.context._collectTypeSpecTypeIds(elemSpec, outIds);
+          else
+            collectTypeIdsRecursive.call(this, elemSpec, outIds);
+
+        }, this);
+      }
+    }
+  }
+
 });

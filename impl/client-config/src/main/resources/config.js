@@ -23,26 +23,44 @@ define(function() {
    *
    * Known Application Ids:
    * 1. PDI Data Inspection - "pentaho-det"
-   * 2. Pentaho Analyzer - "pentaho/analyzer"
+   * 2. Pentaho Analyzer - "pentaho-analyzer"
    * 3. Pentaho CDF/CDE - "pentaho-cdf"
    *
-   * CCC-family visualization ids:
-   * 1. Pie - "pentaho/visual/ccc/areaStacked"
-   * 2. Column - "pentaho/visual/ccc/bar"
-   * 3. Bar - "pentaho/visual/ccc/barHorizontal"  Normalized
-   * 4. Stacked Column - "pentaho/visual/ccc/barStacked"
-   * 5. Stacked Bar - "pentaho/visual/ccc/barStackedHorizontal"
-   * 6. 100% Stacked Column - "pentaho/visual/ccc/barNormalized"
-   * 7. 100% Stacked Bar - "pentaho/visual/ccc/barNormalizedHorizontal"
-   * 8. Column-Line Combo - "pentaho/visual/ccc/barLine"
-   * 9. Scatter - "pentaho/visual/ccc/scatter"
-   * 10. Bubble - "pentaho/visual/ccc/bubble"
-   * 11. Pie - "pentaho/visual/ccc/pie"
-   * 12. Donut - "pentaho/visual/ccc/donut"
-   * 13. Sunburst - "pentaho/visual/ccc/sunburst"
-   * 14. Heat Grid - "pentaho/visual/ccc/heatGrid"
+   * Pentaho stock visualizations' model ids:
+   * 1. Pie - "pentaho/visual/models/areaStacked"
+   * 2. Column - "pentaho/visual/models/bar"
+   * 3. Bar - "pentaho/visual/models/barHorizontal"
+   * 4. Stacked Column - "pentaho/visual/models/barStacked"
+   * 5. Stacked Bar - "pentaho/visual/models/barStackedHorizontal"
+   * 6. 100% Stacked Column - "pentaho/visual/models/barNormalized"
+   * 7. 100% Stacked Bar - "pentaho/visual/models/barNormalizedHorizontal"
+   * 8. Column-Line Combo - "pentaho/visual/models/barLine"
+   * 9. Scatter - "pentaho/visual/models/scatter"
+   * 10. Bubble - "pentaho/visual/models/bubble"
+   * 11. Pie - "pentaho/visual/models/pie"
+   * 12. Donut - "pentaho/visual/models/donut"
+   * 13. Sunburst - "pentaho/visual/models/sunburst"
+   * 14. Heat Grid - "pentaho/visual/models/heatGrid"
+   * 15. Geo Map - "pentaho/visual/models/geoMap"
    *
-   * Sample visualization ids:
+   * Pentaho stock visualizations' view ids:
+   * 1. Pie - "pentaho/ccc/visual/areaStacked"
+   * 2. Column - "pentaho/ccc/visual/bar"
+   * 3. Bar - "pentaho/ccc/visual/barHorizontal"  Normalized
+   * 4. Stacked Column - "pentaho/ccc/visual/barStacked"
+   * 5. Stacked Bar - "pentaho/ccc/visual/barStackedHorizontal"
+   * 6. 100% Stacked Column - "pentaho/ccc/visual/barNormalized"
+   * 7. 100% Stacked Bar - "pentaho/ccc/visual/barNormalizedHorizontal"
+   * 8. Column-Line Combo - "pentaho/ccc/visual/barLine"
+   * 9. Scatter - "pentaho/ccc/visual/scatter"
+   * 10. Bubble - "pentaho/ccc/visual/bubble"
+   * 11. Pie - "pentaho/ccc/visual/pie"
+   * 12. Donut - "pentaho/ccc/visual/donut"
+   * 13. Sunburst - "pentaho/ccc/visual/sunburst"
+   * 14. Heat Grid - "pentaho/ccc/visual/heatGrid"
+   * 15. Geo Map - "pentaho/geo/visual/map"
+   *
+   * Sample visualization model ids:
    * 1. Calculator - "pentaho/visual/samples/calc"
    */
   return {
@@ -51,8 +69,8 @@ define(function() {
       /*
       {
         select: {
-          application: ["pentaho-det", "pentaho/analyzer"],
-          type: "pentaho/visual/ccc/pie"
+          application: ["pentaho-det", "pentaho-analyzer"],
+          type: "pentaho/visual/models/pie"
         },
         apply: {
           isBrowsable: false
@@ -64,8 +82,8 @@ define(function() {
       /*
       {
         select: {
-          application: "pentaho/analyzer",
-          type: "pentaho/visual/ccc/barNormalizedHorizontal"
+          application: "pentaho-analyzer",
+          type: "pentaho/visual/models/barNormalizedHorizontal"
         },
         apply: {
           label: "Relative Proportion Bar"
@@ -79,8 +97,8 @@ define(function() {
       {
         select: {
           type: [
-            "pentaho/visual/ccc/line",
-            "pentaho/visual/ccc/barLine"
+            "pentaho/visual/models/line",
+            "pentaho/visual/models/barLine"
           ]
         },
         apply: {
@@ -94,12 +112,12 @@ define(function() {
       },
       */
 
-      // Example Rule 4 - Use CCC extension points to change the Donut chart's inner radius.
+      // Example Rule 4 - Use CCC extension points to change the Donut CCC view's inner radius.
       /*
       {
         select: {
-          application: "pentaho/analyzer",
-          type: "pentaho/visual/ccc/donut"
+          application: "pentaho-analyzer",
+          type: "pentaho/ccc/visual/donut"
         },
         apply: {
           extension: {

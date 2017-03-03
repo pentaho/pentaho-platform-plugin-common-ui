@@ -920,7 +920,14 @@ define([
     /* jshint validthis:true*/
 
     if(fun.is(value)) {
-      this[name] = methodOverride(value, this[name], rootProto, name);
+      // Only override if it is a normal property.
+      // When there is not baseDesc, methodOverride may need to provide a default base method.
+      var baseDesc = O.getPropertyDescriptor(this, name);
+      if(baseDesc && (baseDesc.get || baseDesc.set)) {
+        this[name] = value;
+      } else {
+        this[name] = methodOverride(value, baseDesc && baseDesc.value, rootProto, name);
+      }
     } else if(!funOnly) {
       this[name] = value;
     }
