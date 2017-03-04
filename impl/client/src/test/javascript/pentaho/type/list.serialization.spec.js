@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,35 +30,97 @@ define([
 
     describe("#toSpec(keyArgs)", function() {
 
-      describe("when includeType is false", function() {
+      describe("when keyArgs.declaredType is unspecified", function() {
 
         it("should return an empty array for an empty list", function() {
           var list = new List();
-          var spec = list.toSpec({includeType: false});
+          var spec = list.toSpec({});
 
           expect(spec).toEqual([]);
         });
 
         it("should return an array of serialized elements for a list of elements", function() {
           var list = new NumberList([1, 2, 3]);
-          var spec = list.toSpec({includeType: false});
+          var spec = list.toSpec({});
 
           expect(spec).toEqual([1, 2, 3]);
         });
+
+        describe("when keyArgs.forceType is true", function() {
+
+          it("should return a spec with an inline type and an empty 'd' property, for an empty list", function() {
+
+            var list = new List();
+            var spec = list.toSpec({forceType: true});
+
+            expect(spec).toEqual({_: jasmine.any(String), d: []});
+          });
+
+          it("should return a spec with an inline type and a 'd' property with an " +
+              "array of serialized elements for a list of elements", function() {
+
+            var list = new NumberList([1, 2, 3]);
+            var spec = list.toSpec({forceType: true});
+
+            expect(spec).toEqual({_: jasmine.any(Object), d: [1, 2, 3]});
+          });
+        });
       });
 
-      describe("when includeType is true", function() {
+      describe("when keyArgs.declaredType is the list's type", function() {
 
-        it("should return a spec with an empty d property, for an empty list", function() {
+        it("should return an empty array for an empty list", function() {
+
           var list = new List();
-          var spec = list.toSpec({includeType: true});
+          var spec = list.toSpec({declaredType: list.type});
+
+          expect(spec).toEqual([]);
+        });
+
+        it("should return an array of serialized elements for a list of elements", function() {
+
+          var list = new NumberList([1, 2, 3]);
+          var spec = list.toSpec({declaredType: list.type});
+
+          expect(spec).toEqual([1, 2, 3]);
+        });
+
+        describe("when keyArgs.forceType is true", function() {
+
+          it("should return a spec with an inline type and an empty 'd' property, for an empty list", function() {
+
+            var list = new List();
+            var spec = list.toSpec({forceType: true, declaredType: list.type});
+
+            expect(spec).toEqual({_: jasmine.any(String), d: []});
+          });
+
+          it("should return a spec with an inline type and a 'd' property with an " +
+              "array of serialized elements for a list of elements", function() {
+
+            var list = new NumberList([1, 2, 3]);
+            var spec = list.toSpec({forceType: true, declaredType: list.type});
+
+            expect(spec).toEqual({_: jasmine.any(Object), d: [1, 2, 3]});
+          });
+        });
+      });
+
+      describe("when keyArgs.declaredType is the list's type's ancestor", function() {
+
+        it("should return a spec with an inline type and an empty 'd' property, for an empty list", function() {
+
+          var list = new List();
+          var spec = list.toSpec({declaredType: list.type.ancestor});
 
           expect(spec).toEqual({_: jasmine.any(String), d: []});
         });
 
-        it("should return an array of serialized elements for a list of elements", function() {
+        it("should return a spec with an inline type and a 'd' property with an " +
+           "array of serialized elements for a list of elements", function() {
+
           var list = new NumberList([1, 2, 3]);
-          var spec = list.toSpec({includeType: true});
+          var spec = list.toSpec({declaredType: list.type.ancestor});
 
           expect(spec).toEqual({_: jasmine.any(Object), d: [1, 2, 3]});
         });
@@ -78,7 +140,6 @@ define([
           "is of the list's representation element type", function() {
         var Refined = PentahoNumber.refine();
         var RefinedList = context.get([Refined.type]);
-
 
         var list = new RefinedList([1, 2, 3]);
         var spec = list.toSpec();

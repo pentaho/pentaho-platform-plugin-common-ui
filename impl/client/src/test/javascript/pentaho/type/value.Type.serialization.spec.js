@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,7 +98,20 @@ define([
       });
 
       describe("#id", function() {
-        it("should serialize the #id of a type using #shortId", function() {
+        it("should serialize the #id of a type using #alias, if defined", function() {
+          var derivedType = Value.extend({type: {id: "pentaho/type/test", alias: "testAlias"}}).type;
+
+          var scope = new SpecificationScope();
+
+          var spec = derivedType.toSpecInContext();
+
+          scope.dispose();
+
+          expect(spec instanceof Object).toBe(true);
+          expect(spec.id).toBe(derivedType.alias);
+        });
+
+        it("should serialize the #id of a type using #shortId, if an #alias is not defined", function() {
           var derivedType = Value.extend({type: {id: "pentaho/type/test"}}).type;
 
           var scope = new SpecificationScope();
@@ -108,7 +121,22 @@ define([
           scope.dispose();
 
           expect(spec instanceof Object).toBe(true);
-          expect(spec.id).toBe("test");
+          expect(spec.id).toBe(derivedType.shortId);
+        });
+
+        it("should serialize the #id of a type using #id when an #alias is defined but #toSpecInContext is invoked with `noAlias`", function() {
+          var derivedType = Value.extend({type: {id: "pentaho/type/test", alias: "testAlias"}}).type;
+
+          var scope = new SpecificationScope();
+
+          var spec = derivedType.toSpecInContext({
+            noAlias: true
+          });
+
+          scope.dispose();
+
+          expect(spec instanceof Object).toBe(true);
+          expect(spec.id).toBe(derivedType.id);
         });
 
         it("should serialize with an anonymous #id when the type is anonymous", function() {

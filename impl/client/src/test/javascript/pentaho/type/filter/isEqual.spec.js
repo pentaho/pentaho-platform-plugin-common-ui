@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,9 +41,25 @@ define([
 
     describe("new ({property, value})", function() {
 
-      it("should be possible to create an instance", function() {
+      it("should be possible to create an instance " +
+        "by specifying the properties by #name and value specification", function() {
 
         var filter = new IsEqualFilter({property: "foo", value: {_: "string", v: "bar"}});
+
+        expect(filter instanceof IsEqualFilter).toBe(true);
+      });
+
+      it("should be possible to create an instance " +
+        "by specifying the properties by #nameAlias and value specification", function() {
+
+        var filter = new IsEqualFilter({p: "foo", v: {_: "string", v: "bar"}});
+
+        expect(filter instanceof IsEqualFilter).toBe(true);
+      });
+
+      it("should be possible to create an instance by specifying the properties by #nameAlias and value", function() {
+
+        var filter = new IsEqualFilter({p: "foo", v: "bar"});
 
         expect(filter instanceof IsEqualFilter).toBe(true);
       });
@@ -65,7 +81,81 @@ define([
 
         expect(filter.property).toBe("foo");
       });
-    }); //#property
+
+      it("should return the property name specified at construction via #nameAlias", function() {
+
+        var filter = new IsEqualFilter({p: "foo"});
+
+        expect(filter.property).toBe("foo");
+      });
+    }); // #property
+
+    describe("#toSpec", function() {
+      var filter;
+
+      beforeEach(function() {
+        filter = new IsEqualFilter({property: "foo", value: {_: "string", v: "bar"}});
+      });
+
+      describe("when invoked without keyword arguments", function() {
+        var filterSpec;
+
+        beforeEach(function() {
+          filterSpec = filter.toSpec();
+        });
+
+        it("should omit the type", function() {
+          expect(filterSpec._).toBeUndefined();
+        });
+
+        it("should specify the properties by their #nameAlias instead of their #name", function() {
+
+          expect(filterSpec.p).toBe("foo");
+          expect(filterSpec.v).toBe("bar");
+          expect(filterSpec.property).toBeUndefined();
+          expect(filterSpec.value).toBeUndefined();
+        });
+      });
+
+      describe("when invoked with the keyword argument `noAlias` set to `true`", function() {
+        it("should specify the properties by their #name", function() {
+
+          var filterSpec = filter.toSpec({
+            noAlias: true
+          });
+
+          expect(filterSpec._).toBeUndefined();
+
+          expect(filterSpec.p).toBeUndefined();
+          expect(filterSpec.v).toBeUndefined();
+
+          expect(filterSpec.property).toBe("foo");
+          expect(filterSpec.value).toBe("bar");
+        });
+      });
+
+      describe("when invoked with the keyword argument `forceType` set to `true`", function() {
+        it("should specify the type by the #alias", function() {
+
+          var filterSpec = filter.toSpec({
+            forceType: true
+          });
+
+          expect(filterSpec._).toBe("=");
+        });
+
+        it("should specify the type by the #id when the `noAlias` option is additionally specified", function() {
+
+          var filterSpec = filter.toSpec({
+            forceType: true,
+            noAlias: true
+          });
+
+          expect(filterSpec._).toBe("pentaho/type/filter/isEqual");
+        });
+      });
+
+    }); // #toSpec
 
     describe("#value", function() {
 
@@ -75,7 +165,14 @@ define([
 
         expect(filter.value).toBe("bar");
       });
-    }); //#value
+
+      it("should return the value specified at construction via #nameAlias", function() {
+
+        var filter = new IsEqualFilter({v: {_: "string", v: "bar"}});
+
+        expect(filter.value).toBe("bar");
+      });
+    }); // #value
 
     describe("#contains(elem)", function() {
 

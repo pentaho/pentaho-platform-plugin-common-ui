@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ define([
       });
 
       it("should accept '1' as true", function() {
-        expect(new PentahoBoolean('1').value).toBe(true);
+        expect(new PentahoBoolean("1").value).toBe(true);
       });
 
       it("should accept 0 as false", function() {
@@ -56,7 +56,7 @@ define([
       });
 
       it("should accept '0' as true", function() {
-        expect(new PentahoBoolean('0').value).toBe(true);
+        expect(new PentahoBoolean("0").value).toBe(true);
       });
 
       it("should accept true as true", function() {
@@ -68,7 +68,7 @@ define([
       });
 
       it("should accept 'false' as true", function() {
-        expect(new PentahoBoolean('false').value).toBe(true);
+        expect(new PentahoBoolean("false").value).toBe(true);
       });
 
       it("should accept new Date() as true", function() {
@@ -76,11 +76,11 @@ define([
       });
 
       it("should accept empty string as false", function() {
-        expect(new PentahoBoolean('').value).toBe(false);
+        expect(new PentahoBoolean("").value).toBe(false);
       });
 
       it("should accept some random string as true", function() {
-        expect(new PentahoBoolean('someRandom string').value).toBe(true);
+        expect(new PentahoBoolean("someRandom string").value).toBe(true);
       });
 
       it("should not accept null", function() {

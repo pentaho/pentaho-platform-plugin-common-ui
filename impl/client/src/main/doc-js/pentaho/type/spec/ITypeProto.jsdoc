@@ -24,11 +24,30 @@
 /**
  * A reference to the type's base type, if any.
  *
+ * When the specification is used in the context of property, it defaults to `"property"`.
+ * Otherwise, when absent or `undefined`, it defaults to `"complex"`.
+ *
  * See a subtype's documentation for more information on default values.
  *
  * @name base
  * @memberOf pentaho.type.spec.ITypeProto#
  * @type {?pentaho.type.spec.UTypeReference}
+ */
+
+/**
+ * Indicates if the type is abstract.
+ *
+ * An abstract type cannot be used directly to create an instance
+ * and, as such, it is not usually exposed to users in a user interface.
+ *
+ * When not a boolean,
+ * it is taken instead to be the result of passing it to the `Boolean` function.
+ *
+ * @name isAbstract
+ * @memberOf pentaho.type.spec.ITypeProto#
+ * @type {?boolean | any}
+ * @default false
+ * @see pentaho.type.spec.ITypeProto#isBrowsable
  */
 
 /**
@@ -39,6 +58,58 @@
  * @type {pentaho.type.spec.ITypeProto}
  *
  * @see pentaho.type.spec.IInstanceProto#type
+ */
+
+/**
+ * The identifier of the type's AMD module, a _temporary identifier_, or `null`.
+ *
+ * An empty string or `undefined` value is interpreted as `null`.
+ *
+ * For serialization purposes,
+ * a **temporary identifier** can be assigned to an anonymous type.
+ * An identifier is _temporary_ if it starts with
+ * [idTemporaryPrefix]{@link pentaho.type.SpecificationContext.idTemporaryPrefix}.
+ *
+ * Temporary identifiers are ignored upon type construction.
+ *
+ * When unspecified or `null`, it defaults to [sourceId]{@link pentaho.type.spec.ITypeProto#sourceId}.
+ *
+ * @name id
+ * @memberOf pentaho.type.spec.ITypeProto#
+ * @type {?string}
+ *
+ * @see pentaho.type.SpecificationContext.isIdTemporary
+ */
+
+/**
+ * The alias for the identifier of this type.
+ *
+ * The alias of a type can only be specified when extending the ancestor type.
+ *
+ * This attribute is not inherited.
+ *
+ * When unspecified, defaults to `null`.
+ *
+ * @name alias
+ * @memberOf pentaho.type.spec.ITypeProto#
+ * @type {?nonEmptyString}
+ * @readonly
+ *
+ * @see pentaho.type.spec.ITypeProto#id
+ */
+
+/**
+ * The identifier of the value type's _source_ AMD module, or `null`.
+ *
+ * An empty string or `undefined` value is interpreted as `null`.
+ *
+ * When unspecified or `null`, it defaults to [id]{@link pentaho.type.spec.ITypeProto#id}.
+ *
+ * @name sourceId
+ * @memberOf pentaho.type.spec.ITypeProto#
+ * @type {?string}
+ *
+ * @see pentaho.type.SpecificationContext.isIdTemporary
  */
 
 /**

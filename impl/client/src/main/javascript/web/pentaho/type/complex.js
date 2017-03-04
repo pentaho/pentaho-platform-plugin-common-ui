@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@ define([
             ComplexChangeset, bundle, O, error) {
 
   "use strict";
+
+  var O_hasOwn = Object.prototype.hasOwnProperty;
 
   // TODO: self-recursive complexes won't work if we don't handle them specially:
   // Component.parent : Component
@@ -108,14 +110,15 @@ define([
         // Create `Property` instances.
         var propTypes = this.type._getProps();
         var i = propTypes.length;
-        var nameProp = !spec ? undefined : (Array.isArray(spec) ? "index" : "name");
+        var readSpec = !spec ? undefined : (Array.isArray(spec) ? readSpecByIndex : readSpecByNameOrAlias);
         var values = {};
         var propType;
         var value;
 
         while(i--) {
           propType = propTypes[i];
-          values[propType.name] = value = propType.toValue(nameProp && spec[propType[nameProp]]);
+
+          values[propType.name] = value = propType.toValue(readSpec && readSpec(spec, propType));
 
           // If this instance is being newed up while there is an ambient transaction,
           // it should not cease to exist if the txn is rejected,
@@ -698,7 +701,12 @@ define([
         keyArgs = keyArgs ? Object.create(keyArgs) : {};
 
         var spec;
-        var includeType = !!keyArgs.includeType;
+        var noAlias = !!keyArgs.noAlias;
+        var declaredType;
+        var includeType = !!keyArgs.forceType ||
+              (!!(declaredType = keyArgs.declaredType) &&
+               this.type !== (declaredType.isRefinement ? declaredType.of : declaredType));
+
         var useArray = !includeType && keyArgs.preferPropertyArray;
         var omitProps;
         if(useArray) {
@@ -715,6 +723,9 @@ define([
         var includeDefaults = !!keyArgs.includeDefaults;
         var areEqual = this.type.areEqual;
 
+        // reset
+        keyArgs.forceType = false;
+
         this.type.each(propToSpec, this);
 
         return spec;
@@ -723,7 +734,9 @@ define([
 
           /* jshint validthis:true*/
 
-          var name = propType.name;
+          // When serializing, prefer `nameAlias` to `name` by default
+          var name = noAlias ? propType.name : propType.nameAlias;
+          if(!name) name = propType.name;
 
           if(omitProps && omitProps[name] === true) return;
 
@@ -746,9 +759,7 @@ define([
           if(includeValue) {
             var valueSpec;
             if(value) {
-              // Determine if value spec must contain the type inline
-              var valueType = propType.type;
-              keyArgs.includeType = value.type !== (valueType.isRefinement ? valueType.of : valueType);
+              keyArgs.declaredType = propType.type;
 
               valueSpec = value.toSpecInContext(keyArgs);
 
@@ -787,6 +798,7 @@ define([
 
       type: /** @lends pentaho.type.Complex.Type# */{
         id: module.id,
+        alias: "complex",
 
         isAbstract: true,
 
@@ -1026,4 +1038,16 @@ define([
 
     return Complex;
   };
+
+  // Constructor's helper functions
+  function readSpecByIndex(spec, propType) {
+    return spec[propType.index];
+  }
+
+  function readSpecByNameOrAlias(spec, propType) {
+    var name;
+    return O_hasOwn.call(spec, (name = propType.name)) ? spec[name] :
+           ((name = propType.nameAlias) && O_hasOwn.call(spec, name)) ? spec[name] :
+           undefined;
+  }
 });

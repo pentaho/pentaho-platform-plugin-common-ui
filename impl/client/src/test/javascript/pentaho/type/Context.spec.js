@@ -284,15 +284,36 @@ define([
             });
         });
 
-        it("should be able to get a standard type given its relative id", function() {
+        describe("should be able to get a standard type given its alias", function () {
 
-          return testGet(function(sync, Context) {
-            var context = new Context();
-            var promise = callGet(context, sync, "string");
+          var aliasMap = {
+            "=": "pentaho/type/filter/isEqual",
+            "and": "pentaho/type/filter/and",
+            "or": "pentaho/type/filter/or"
+          };
 
-            return promise.then(function(InstCtor) {
-              expect(InstCtor.type.id).toBe("pentaho/type/string");
-            });
+          Object.keys(standard).forEach(function (standardType) {
+            switch (standardType) {
+              case "facets":
+              case "filter":
+                return;
+            }
+            aliasMap[standardType] = "pentaho/type/" + standardType;
+          });
+
+          Object.keys(aliasMap).forEach(function (alias) {
+
+            it("for the alias '" + alias + "'", function () {
+
+              return testGet(function (sync, Context) {
+                var context = new Context();
+                var promise = callGet(context, sync, alias);
+
+                return promise.then(function (InstCtor) {
+                  expect(InstCtor.type.id).toBe(aliasMap[alias]);
+                });
+              });
+            })
           });
         });
 

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ define([
       });
 
       describe("#id", function() {
-        it("should serialize the #id of a type using #shortId", function() {
+        it("should serialize the #id of a type using #id when no alias is defined", function() {
           var derivedType = List.extend({type: {id: "pentaho/type/test"}}).type;
 
           var scope = new SpecificationScope();
@@ -91,7 +91,20 @@ define([
           scope.dispose();
 
           expect(spec instanceof Object).toBe(true);
-          expect(spec.id).toBe("test");
+          expect(spec.id).toBe(derivedType.id);
+        });
+
+        it("should serialize the #id of a type using #alias when an alias is defined", function() {
+          var derivedType = List.extend({type: {id: "pentaho/type/test", alias: "test"}}).type;
+
+          var scope = new SpecificationScope();
+
+          var spec = derivedType.toSpecInContext();
+
+          scope.dispose();
+
+          expect(spec instanceof Object).toBe(true);
+          expect(spec.id).toBe(derivedType.alias);
         });
 
         it("should serialize with an anonymous #id when the type is anonymous", function() {

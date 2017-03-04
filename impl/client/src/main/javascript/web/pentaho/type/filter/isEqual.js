@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,6 +77,7 @@ define([
 
       type: /** @lends pentaho.type.filter.IsEqual.Type# */{
         id: module.id,
+        alias: "=",
 
         styleClass: "pentaho-type-filter-isEqual",
 
@@ -84,6 +85,7 @@ define([
           {
             // may be `null`
             name: "value",
+            nameAlias: "v",
             type: "value"
           }
         ]

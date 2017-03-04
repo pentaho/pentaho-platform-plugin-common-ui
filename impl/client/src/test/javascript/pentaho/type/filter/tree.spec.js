@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,14 @@ define([
 
         expect(filter instanceof CustomTreeFilter).toBe(true);
       });
+
+      it("should be possible to create an instance by specifying nameAlias `args`", function() {
+        var oper1 = new CustomFilter();
+
+        var filter = new CustomTreeFilter({o: [oper1]});
+
+        expect(filter instanceof CustomTreeFilter).toBe(true);
+      });
     });
 
     describe("#operands", function() {
@@ -56,7 +64,20 @@ define([
         expect(opers.at(0)).toBe(oper1);
         expect(opers.at(1)).toBe(oper2);
       });
-    }); //#operands
+
+      it("should return a list of operands with the filters " +
+        "specified via the nameAlias 'args' at construction", function() {
+        var oper1 = new CustomFilter();
+        var oper2 = new CustomFilter();
+
+        var filter = new CustomTreeFilter({o: [oper1, oper2]});
+
+        var opers = filter.operands;
+        expect(opers.count).toBe(2);
+        expect(opers.at(0)).toBe(oper1);
+        expect(opers.at(1)).toBe(oper2);
+      });
+    }); // #operands
 
     describe("#_visitDefault(transformer)", function() {
 

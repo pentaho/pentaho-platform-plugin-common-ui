@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ define([
 
   /* global describe:true, it:true, expect:true, beforeEach:true*/
 
-  describe("pentaho.type.filter.And", function() {
+  describe("pentaho.type.filter.Or", function() {
 
     var context = new Context();
     var AbstractFilter = context.get(abstractFactory);
@@ -48,9 +48,9 @@ define([
 
     describe("#kind", function() {
 
-      it("should return 'and'", function() {
-        var filter  = new AndFilter();
-        expect(filter.kind).toBe("and");
+      it("should return 'or'", function() {
+        var filter  = new OrFilter();
+        expect(filter.kind).toBe("or");
       });
     });
 
@@ -58,13 +58,13 @@ define([
 
       var elem = new ProductSummary({name: "A", sales: 12000, inStock: true});
 
-      it("should return `true` if `operands` is empty", function() {
+      it("should return `false` if `operands` is empty", function() {
 
-        var filter  = new AndFilter();
+        var filter  = new OrFilter();
 
         var result = filter.contains(elem);
 
-        expect(result).toBe(true);
+        expect(result).toBe(false);
       });
 
       it("should return `true` if all operand filters contain the element", function() {
@@ -75,14 +75,14 @@ define([
         spyOn(oper1, "_contains").and.returnValue(true);
         spyOn(oper2, "_contains").and.returnValue(true);
 
-        var filter  = new AndFilter({operands: [oper1, oper2]});
+        var filter  = new OrFilter({operands: [oper1, oper2]});
 
         var result = filter.contains(elem);
 
         expect(result).toBe(true);
       });
 
-      it("should return `false` if one of the operand filters does not contain the element", function() {
+      it("should return `true` if only one of the operand filters contains the element", function() {
 
         var oper1 = new CustomFilter();
         var oper2 = new CustomFilter();
@@ -90,11 +90,11 @@ define([
         spyOn(oper1, "_contains").and.returnValue(true);
         spyOn(oper2, "_contains").and.returnValue(false);
 
-        var filter  = new AndFilter({operands: [oper1, oper2]});
+        var filter  = new OrFilter({operands: [oper1, oper2]});
 
         var result = filter.contains(elem);
 
-        expect(result).toBe(false);
+        expect(result).toBe(true);
       });
 
       it("should be commutative", function() {
@@ -105,17 +105,17 @@ define([
         spyOn(oper1, "_contains").and.returnValue(true);
         spyOn(oper2, "_contains").and.returnValue(false);
 
-        var filter  = new AndFilter({operands: [oper1, oper2]});
+        var filter  = new OrFilter({operands: [oper1, oper2]});
 
         var result = filter.contains(elem);
 
-        expect(result).toBe(false);
+        expect(result).toBe(true);
 
-        filter  = new AndFilter({operands: [oper2, oper1]});
+        filter  = new OrFilter({operands: [oper2, oper1]});
 
         result = filter.contains(elem);
 
-        expect(result).toBe(false);
+        expect(result).toBe(true);
       });
 
       it("should return `false` if none of the operand filters contains the element", function() {
@@ -126,7 +126,7 @@ define([
         spyOn(oper1, "_contains").and.returnValue(false);
         spyOn(oper2, "_contains").and.returnValue(false);
 
-        var filter  = new AndFilter({operands: [oper1, oper2]});
+        var filter  = new OrFilter({operands: [oper1, oper2]});
 
         var result = filter.contains(elem);
 
@@ -135,15 +135,15 @@ define([
     }); // #contains
 
     describe("#negate()", function() {
-      it("should return an `Or` of negated operands", function() {
+      it("should return an `And` of negated operands", function() {
         var oper1 = new CustomFilter();
         var oper2 = new CustomFilter();
 
-        var filter = new AndFilter({operands: [oper1, oper2]});
+        var filter = new OrFilter({operands: [oper1, oper2]});
 
         var invFilter = filter.negate();
 
-        expect(invFilter instanceof OrFilter);
+        expect(invFilter instanceof AndFilter);
 
         var opers = invFilter.operands;
         expect(opers.count).toBe(2);
@@ -156,81 +156,145 @@ define([
       });
     }); // #negate
 
-    describe("#and(filter, ...)", function() {
+    describe("#or(filter, ...)", function() {
 
       it("should return itself when no operands are given", function() {
-        var filter = new AndFilter();
-        var result = filter.and();
+        var filter = new OrFilter();
+        var result = filter.or();
 
         expect(result).toBe(filter);
       });
 
       it("should return itself when only null operands are given", function() {
-        var filter = new AndFilter();
-        var result = filter.and(null, null);
+        var filter = new OrFilter();
+        var result = filter.or(null, null);
 
         expect(result).toBe(filter);
       });
 
       it("should return the single operand when given an operand and initially empty", function() {
-        var filter = new AndFilter();
+        var filter = new OrFilter();
         var oper1  = new CustomFilter();
 
-        var result = filter.and(oper1);
+        var result = filter.or(oper1);
 
         expect(result).toBe(oper1);
       });
 
-      it("should return an `And` filter when given an operand and initially not empty", function() {
+      it("should return an `Or` filter when given an operand and initially not empty", function() {
         var oper1  = new CustomFilter();
-        var filter = new AndFilter({operands: [oper1]});
+        var filter = new OrFilter({operands: [oper1]});
         var oper2  = new CustomFilter();
 
-        var result = filter.and(oper2);
+        var result = filter.or(oper2);
 
-        expect(result instanceof AndFilter).toBe(true);
+        expect(result instanceof OrFilter).toBe(true);
       });
 
       it("should return a new filter when given an operand", function() {
         var oper1  = new CustomFilter();
-        var filter = new AndFilter({operands: [oper1]});
+        var filter = new OrFilter({operands: [oper1]});
         var oper2  = new CustomFilter();
 
-        var result = filter.and(oper2);
+        var result = filter.or(oper2);
 
         expect(result).not.toBe(filter);
         expect(result).not.toBe(oper1);
         expect(result).not.toBe(oper2);
       });
 
-      it("should add elements instead of creating a tree of Ands", function() {
+      it("should add elements instead of creating a tree of Ors", function() {
         var oper1  = new CustomFilter();
         var oper2  = new CustomFilter();
-        var filter = new AndFilter({operands: [oper1, oper2]});
+        var filter = new OrFilter({operands: [oper1, oper2]});
         var oper3  = new CustomFilter();
 
-        var result = filter.and(oper3);
+        var result = filter.or(oper3);
 
         expect(result.operands.count).toBe(3);
       });
 
-      it("should flatten operands of a given And argument", function() {
+      it("should flatten operands of a given Or argument", function() {
         var oper1  = new CustomFilter();
         var oper2  = new CustomFilter();
-        var filter1 = new AndFilter({operands: [oper1, oper2]});
+        var filter1 = new OrFilter({operands: [oper1, oper2]});
 
         var oper3  = new CustomFilter();
-        var filter2 = new AndFilter({operands: [oper3]});
+        var filter2 = new OrFilter({operands: [oper3]});
 
-
-        var result = filter1.and(filter2);
+        var result = filter1.or(filter2);
 
         expect(result.operands.count).toBe(3);
         expect(result.operands.at(0)).toBe(oper1);
         expect(result.operands.at(1)).toBe(oper2);
         expect(result.operands.at(2)).toBe(oper3);
       });
-    }); // #and
+    }); // #or
 
-  }); // pentaho.type.filter.And
+    describe("#toSpec", function() {
+      var filter;
+
+      beforeEach(function() {
+        var oper1 = new CustomFilter();
+        var oper2 = new CustomFilter();
+
+        filter = new OrFilter({operands: [oper1, oper2]});
+      });
+
+      describe("when invoked without keyword arguments", function() {
+        var filterSpec;
+
+        beforeEach(function() {
+          filterSpec = filter.toSpec();
+        });
+
+        it("should omit the type", function() {
+          expect(filterSpec._).toBeUndefined();
+        });
+
+        it("should specify the operands by their #nameAlias 'o' instead of their #name 'operands", function() {
+
+          expect(filterSpec.o.length).toBe(2);
+          expect(filterSpec.operands).toBeUndefined();
+        });
+      });
+
+      describe("when invoked with the keyword argument `noAlias` set to `true`", function() {
+        it("should specify the operands by their #name 'operands", function() {
+
+          var filterSpec = filter.toSpec({
+            noAlias: true
+          });
+
+          expect(filterSpec._).toBeUndefined();
+          expect(filterSpec.o).toBeUndefined();
+          expect(filterSpec.operands.length).toBe(2);
+
+        });
+      });
+
+      describe("when invoked with the keyword argument `forceType` set to `true`", function() {
+        it("should specify the type by the #alias", function() {
+
+          var filterSpec = filter.toSpec({
+            forceType: true
+          });
+
+          expect(filterSpec._).toBe("or");
+        });
+
+        it("should specify the type by the #id when the `noAlias` option is additionally specified", function() {
+
+          var filterSpec = filter.toSpec({
+            forceType: true,
+            noAlias: true
+          });
+
+          expect(filterSpec._).toBe("pentaho/type/filter/or");
+        });
+      });
+
+    }); // #toSpec
+
+  }); // pentaho.type.filter.Or
 });

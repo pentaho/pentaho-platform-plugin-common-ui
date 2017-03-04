@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,10 @@ define([
   return function(context) {
 
     var Element = context.get(elemFactory);
+    var numberType;
+    var stringType;
+    var booleanType;
+    var objectType;
 
     /**
      * @name pentaho.type.Simple.Type
@@ -272,7 +276,32 @@ define([
         if(!keyArgs) keyArgs = {};
 
         var addFormatted = !keyArgs.omitFormatted && !!this._formatted;
-        var includeType = keyArgs.includeType;
+
+        var type = this.type;
+
+        var includeType = !!keyArgs.forceType;
+        if(!includeType) {
+
+          var declaredType = keyArgs.declaredType;
+          if(declaredType) {
+            if(declaredType.isRefinement) declaredType = declaredType.of;
+
+            // Abstract foo = (MyNumber 1)
+
+            if(type !== declaredType) {
+              if(!stringType) {
+                stringType = context.get("string").type;
+                numberType = context.get("number").type;
+                booleanType = context.get("boolean").type;
+              }
+
+              if(!(declaredType.isAbstract && (type === stringType || type === numberType || type === booleanType))) {
+                includeType = true;
+              }
+            }
+          }
+        }
+
         var value;
         if(keyArgs.isJson) {
           value = this._toJSONValue(keyArgs);
@@ -285,7 +314,9 @@ define([
 
         // Plain objects cannot be output without cell format or would not be recognized
         // properly by the constructor code.
-        var isPlainObject = (value instanceof Object) && (value.constructor === Object);
+        if(!objectType) objectType = context.get("object").type;
+
+        var isPlainObject = type.isSubtypeOf(objectType) && (value.constructor === Object);
 
         // Don't need a cell/object spec?
         if(!(isPlainObject || addFormatted || includeType))
@@ -294,7 +325,7 @@ define([
         // Need one. Ensure _ is the first property
         /* jshint laxbreak:true*/
         var spec = includeType
-            ? {_: this.type.toRefInContext(keyArgs), v: value}
+            ? {_: type.toRefInContext(keyArgs), v: value}
             : {v: value};
 
         if(addFormatted) spec.f = this._formatted;
@@ -323,6 +354,7 @@ define([
 
       type: /** pentaho.type.Simple.Type# */{
         id: module.id,
+        alias: "simple",
         isAbstract: true,
 
         get isSimple() { return true; },

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,26 @@
  * @type {!nonEmptyString | any}
  *
  * @see pentaho.type.Property.Type#name
+ */
+
+/**
+ * The alias for the name of the _property type_.
+ *
+ * The alias of a _property type_ is an alternative name for serialization purposes.
+ *
+ * ### Set
+ *
+ * This attribute can only be set when defining a new _property type_,
+ * and cannot be changed afterwards.
+ *
+ * When set to a non-{@link Nully} and non-{@link String} value,
+ * the value is first replaced by the result of calling its `toString` method.
+ *
+ * @name nameAlias
+ * @memberOf pentaho.type.spec.IPropertyTypeProto#
+ * @type {!nonEmptyString | any}
+ *
+ * @see pentaho.type.Property.Type#nameAlias
  */
 
 /**

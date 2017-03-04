@@ -155,7 +155,13 @@ define([
        * @param {?boolean} [keyArgs.isJson=false] Generates a JSON-compatible specification.
        * Attributes that don't have a JSON-compatible specification are omitted.
        *
-       * @param {?boolean} [keyArgs.includeType=false] Includes the inline type property, `_`, in the specification.
+       * @param {?pentaho.type.Type} [keyArgs.declaredType] The base type of this value's storage location.
+       * If the value does not have this exact type, its inline type property must be included
+       * in the specification. Otherwise, it can be omitted.
+       * When unspecified, the inline type property is only included if `forceType` is `true`.
+       *
+       * @param {?boolean} [keyArgs.forceType=false] Forces inclusion of the inline type property, `_`,
+       * in the specification.
        *
        * @return {!any} A specification of this instance.
        */
@@ -283,7 +289,7 @@ define([
       }
     });
 
-    Type._initInstCtor(Instance, {id: module.id});
+    Type._initInstCtor(Instance, {id: module.id, alias: "instance"});
 
     Type.implement(bundle.structured.instance);
 

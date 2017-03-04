@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -216,7 +216,13 @@ define([
        * @param {?boolean} [keyArgs.isJson=false] - Generates a JSON-compatible specification.
        * Attributes which don't have a JSON-compatible specification are omitted.
        *
-       * @param {?boolean} [keyArgs.includeType=false] Includes the inline type property, `_`, in the specification.
+       * @param {?pentaho.type.Type} [keyArgs.declaredType] The base type of this value's storage location.
+       * If the value does not have this exact type, its inline type property must be included
+       * in the specification. Otherwise, it can be omitted.
+       * When unspecified, the inline type property is only included if `forceType` is `true`.
+       *
+       * @param {?boolean} [keyArgs.forceType=false] Forces inclusion of the inline type property, `_`,
+       * in the specification.
        *
        * @param {boolean} [keyArgs.omitFormatted=false] Omits the formatted value
        * on [Simple]{@link pentaho.type.Simple} values' specifications.
@@ -255,6 +261,7 @@ define([
        */
       type: /** @lends pentaho.type.Value.Type# */{
         id: module.id,
+        alias: "value",
         isAbstract: true,
 
         get isValue() { return true; },
@@ -359,7 +366,8 @@ define([
           if(!keyArgs) keyArgs = {};
 
           // The type's id or the temporary id in this scope.
-          var spec = {id: this.shortId || SpecificationContext.current.add(this)};
+          var id = keyArgs && keyArgs.noAlias ? this.id : this.shortId;
+          var spec = {id: id || SpecificationContext.current.add(this)};
 
           // The base type in the **current type hierarchy** (root, ancestor, isRoot).
           var baseType = Object.getPrototypeOf(this);
