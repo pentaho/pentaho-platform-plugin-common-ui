@@ -1189,7 +1189,7 @@ define([
           // Shorthand list type notation
           // Example: [{props: { ...}}]
           if(typeSpec.length)
-            collectTypeIdsRecursive(typeSpec[0], outIds);
+            collectTypeIdsRecursive(typeSpec[0], outIds, byTypeId);
           return;
         }
 

@@ -39,12 +39,14 @@ define([
 
   // Unique type class id exposed through Type#uid and used by Context instances.
   var _nextUid = 1;
+
   var _normalAttrNames = [
     "description", "category", "helpUrl", "isBrowsable", "isAdvanced", "ordinal"
   ];
   var O_isProtoOf = Object.prototype.isPrototypeOf;
 
   return function(context) {
+
     var _type = null;
     var _Number = null;
     var _Boolean = null;
@@ -1495,6 +1497,12 @@ define([
         if(this._labelSet && O.hasOwn(this, "_label")) {
           any = true;
           spec.label = this._label;
+        }
+
+        // "mixins" attribute
+        var mixins = this.mixins;
+        if(mixins.length) {
+          spec.mixins = mixins.map(function(mixinType) { return mixinType.shortId; });
         }
 
         // Normal attributes

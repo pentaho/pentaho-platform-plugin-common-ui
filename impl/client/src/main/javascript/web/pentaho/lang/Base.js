@@ -425,7 +425,7 @@ define([
   function class_extend_core(name, instSpec, classSpec, keyArgs) {
     /* jshint validthis:true*/
 
-    var Subclass = class_extend_subclass.call(this, name, instSpec);
+    var Subclass = class_extend_subclass.call(this, name, instSpec, classSpec, keyArgs);
 
     this._subclassed(Subclass, instSpec, classSpec, keyArgs);
 
@@ -479,12 +479,14 @@ define([
    * The given property names are joined with any inherited _excluded_ property names.
    *
    * Properties can have any value.
+   * @param {Object} classSpec The class-side specification.
+   * @param {Object} keyArgs The keyword arguments.
    *
    * @return {Class.<pentaho.lang.Base>} The new subclass.
    *
    * @private
    */
-  function class_extend_subclass(name, instSpec) {
+  function class_extend_subclass(name, instSpec, classSpec, keyArgs) {
     /* jshint validthis:true*/
 
     if(!name) {
@@ -514,7 +516,10 @@ define([
     base_getOrAssignClassId(subProto, true);
 
     O.setConst(subProto, "__base_bases__", bases);
-    O.setConst(subProto, "__base_ops__", []);
+    O.setConst(subProto, "__base_ops__", [
+      // Represents initial extend, as it will be done when mixing in another class.
+      {name: "mix", args: [instSpec, classSpec, keyArgs]
+    }]);
 
     // ----
 
@@ -543,7 +548,8 @@ define([
   /**
    * Called when a subclass of this class has been created.
    *
-   * The default implementation mixes the given instance and class specification in the new subclass.
+   * The default implementation mixes the given instance and class specification in the new subclass,
+   * without actually recording a mix operation.
    *
    * @alias _subclassed
    * @memberOf pentaho.lang.Base
@@ -556,7 +562,7 @@ define([
    * @protected
    */
   function class_subclassed(Subclass, instSpec, classSpec, keyArgs) {
-    Subclass.mix(instSpec, classSpec, keyArgs);
+    class_mix_core.call(Subclass, instSpec, classSpec, keyArgs);
   }
 
   /**
@@ -738,6 +744,39 @@ define([
    */
   function class_mix(instSpec, classSpec, keyArgs) {
 
+    // Register mixin operation.
+    this.prototype.__base_ops__.push({name: "mix", args: [instSpec, classSpec, keyArgs]});
+
+    class_mix_core.call(this, instSpec, classSpec, keyArgs);
+
+    return this;
+  }
+
+  /**
+   * Really adds additional members to, or overrides existing ones of, this class.
+   *
+   * This method does _not_ create a new class and does not record an operation.
+   *
+   * This method supports two signatures:
+   *
+   * 1. mix(Class: function[, keyArgs: Object]) -
+   *     mixes-in the given class, both its instance and class sides.
+   *
+   * 2. mix(instSpec: Object[, classSpec: Object[, keyArgs: Object]]) -
+   *     mixes-in the given instance and class side specifications.
+   *
+   * @alias _mix
+   * @memberOf pentaho.lang.Base
+   *
+   * @param {function|Object} instSpec The class to mixin or the instance-side specification.
+   * @param {Object} [classSpec] The class-side specification.
+   * @param {Object} [keyArgs] The keyword arguments.
+   * @param {Object} [keyArgs.exclude] A set of property names to _exclude_,
+   *  _both_ from the instance and class sides. Properties can have any value.
+   *
+   * @private
+   */
+  function class_mix_core(instSpec, classSpec, keyArgs) {
     var proto = this.prototype;
 
     // Register mixin operation.

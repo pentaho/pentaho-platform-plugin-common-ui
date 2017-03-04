@@ -524,16 +524,17 @@ define([
           expectIt(false);
         });
 
-        it("should not throw if set to the same value", function() {
+        it("should ignore the spec value", function() {
           function expectIt(value) {
             var MySimple = Simple.extend({type: {isAbstract: value}});
             var MyRefinement = Refinement.extend({
               type: {
-                of: MySimple.type
+                of: MySimple.type,
+                isAbstract: !value
               }
             });
 
-            MyRefinement.type.isAbstract = value;
+            expect(MyRefinement.type.isAbstract).toBe(value);
           }
 
           expectIt(true);
@@ -541,21 +542,17 @@ define([
         });
 
         it("should throw if set to a different value", function() {
-          function expectIt(value) {
-            var MySimple = Simple.extend({type: {isAbstract: value}});
-            var MyRefinement = Refinement.extend({
-              type: {
-                of: MySimple.type
-              }
-            });
 
-            expect(function() {
-              MyRefinement.type.isAbstract = !value;
-            }).toThrow(errorMatch.operInvalid());
-          }
+          var MySimple = Simple.extend({type: {isAbstract: true}});
+          var MyRefinement = Refinement.extend({
+            type: {
+              of: MySimple.type
+            }
+          });
 
-          expectIt(true);
-          expectIt(false);
+          expect(function() {
+            MyRefinement.type.isAbstract = MyRefinement.type.isAbstract;
+          }).toThrowError(TypeError);
         });
       });
 
