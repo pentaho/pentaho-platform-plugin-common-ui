@@ -771,7 +771,7 @@ define([
 
       /* eslint default-case: 0 */
       switch(typeof typeRef) {
-        case "string": return this._getById (typeRef, sync);
+        case "string": return this._getById(typeRef, sync);
         case "function": return this._getByFun(typeRef, sync);
         case "object": return Array.isArray(typeRef)
             ? this._getByListSpec(typeRef, sync)
