@@ -81,6 +81,7 @@ define([
         // and not on Property.Type itself.
 
         id: module.id,
+        alias: "property",
 
         isAbstract: true,
 
@@ -279,6 +280,46 @@ define([
           }
         },
         // endregion
+
+        // region alias attribute
+        _nameAlias: undefined,
+
+        /**
+         * Gets or sets the alias for the name of the _property type_.
+         *
+         * The alias for the name of a _property type_ is an alternative identifier for serialization purposes.
+         *
+         * ### Set
+         *
+         * This attribute can only be set when defining a new _property type_,
+         * and cannot be changed afterwards.
+         *
+         * When set to a non-{@link Nully} and non-{@link String} value,
+         * the value is first replaced by the result of calling its `toString` method.
+         *
+         * @type {!nonEmptyString}
+         *
+         * @throws {TypeError} When attempting to set a value and the property is not a root property.
+         * @throws {pentaho.lang.ArgumentRequiredError} When set to an empty string or a _nully_ value.
+         * @throws {TypeError} When set to a value different from the current one.
+         *
+         * @see pentaho.type.spec.IPropertyTypeProto#nameAlias
+         */
+        get nameAlias() {
+          return this._nameAlias;
+        },
+
+        set nameAlias(value) {
+          if(!this.isRoot)
+            throw new TypeError("The 'nameAlias' attribute can only be assigned to a root property.");
+
+          value = nonEmptyString(value);
+
+          if(!value) throw error.argRequired("nameAlias");
+
+          // Cannot change, or throws.
+          O.setConst(this, "_nameAlias", value);
+        }, // endregion
 
         // region list attribute
         /**
@@ -691,9 +732,7 @@ define([
             if(defaultValue !== undefined) {
               any = true;
               if(defaultValue) {
-                var valueType = this.type;
-                keyArgs.includeType = defaultValue.type !== (valueType.isRefinement ? valueType.of : valueType);
-
+                keyArgs.declaredType = this.type;
                 spec.value = defaultValue.toSpecInContext(keyArgs);
               } else {
                 spec.value = null;

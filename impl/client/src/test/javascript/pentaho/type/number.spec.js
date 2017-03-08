@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ define([
 
       it("should throw and not accept a 'non-numeric' argument", function() {
         expect(function() {
-          var foo = new PentahoNumber('one');
+          var foo = new PentahoNumber("one");
         }).toThrow(errorMatch.argInvalid("value"));
       });
 

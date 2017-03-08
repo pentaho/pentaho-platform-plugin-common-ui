@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,7 +133,20 @@ define([
         expect(keyArgs2.bar).toBe(keyArgs.bar);
       });
 
-      it("should return a specification object having the shortId of the type", function() {
+      it("should return a specification object having the alias of the type", function() {
+        var derivedType = Instance.extend({type: {id: "pentaho/type/test", alias: "testAlias"}}).type;
+
+        var scope = new SpecificationScope();
+
+        var spec = derivedType.toSpecInContext();
+
+        scope.dispose();
+
+        expect(spec instanceof Object).toBe(true);
+        expect(spec.id).toBe(derivedType.alias);
+      });
+
+      it("should return a specification object having the id of the type, if no alias is defined", function() {
         var derivedType = Instance.extend({type: {id: "pentaho/type/test"}}).type;
 
         var scope = new SpecificationScope();
@@ -143,7 +156,7 @@ define([
         scope.dispose();
 
         expect(spec instanceof Object).toBe(true);
-        expect(spec.id).toBe("test");
+        expect(spec.id).toBe(derivedType.id);
       });
     });
 
@@ -241,12 +254,20 @@ define([
 
     describe("#toRef(keyArgs)", function() {
 
-      it("should return the #shortId of the type when it has an id", function() {
+      it("should return the #id of the type when it has an id and no alias", function() {
         var derivedType = Instance.extend({type: {id: "pentaho/type/test"}}).type;
 
         var typeRef = derivedType.toRef();
 
-        expect(typeRef).toBe("test");
+        expect(typeRef).toBe(derivedType.id);
+      });
+
+      it("should return the #alias of the type when it has an id and an alias", function() {
+        var derivedType = Instance.extend({type: {id: "pentaho/type/test", alias: "test"}}).type;
+
+        var typeRef = derivedType.toRef();
+
+        expect(typeRef).toBe(derivedType.alias);
       });
 
       it("should call #toRefInContext when the type is anonymous", function() {
@@ -332,7 +353,7 @@ define([
 
     describe("#toRefInContext(keyArgs)", function() {
 
-      it("should return the #shortId of the type when it has an id", function() {
+      it("should return the #id of the type when it has an id and no alias", function() {
         var derivedType = Instance.extend({type: {id: "pentaho/type/test"}}).type;
 
         var scope = new SpecificationScope();
@@ -341,7 +362,19 @@ define([
 
         scope.dispose();
 
-        expect(typeRef).toBe("test");
+        expect(typeRef).toBe(derivedType.id);
+      });
+
+      it("should return the #alias of the type when it has an id and an alias", function() {
+        var derivedType = Instance.extend({type: {id: "pentaho/type/test", alias: "test"}}).type;
+
+        var scope = new SpecificationScope();
+
+        var typeRef = derivedType.toRefInContext();
+
+        scope.dispose();
+
+        expect(typeRef).toBe(derivedType.alias);
       });
 
       it("should return a spec with an anonymous #id when the type is anonymous; the first occurrence", function() {

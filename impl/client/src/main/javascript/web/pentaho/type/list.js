@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -526,21 +526,36 @@ define([
 
       // region serialization
       toSpecInContext: function(keyArgs) {
-        if(!keyArgs) keyArgs = {};
 
-        var includeType = keyArgs.includeType;
+        keyArgs = keyArgs ? Object.create(keyArgs) : {};
 
-        var elemType = this.type.of;
-        if(elemType.isRefinement) elemType = elemType.of;
+        // Capture now, before using it below for the elements.
+        var listType = this.type;
+        var declaredType;
+        var includeType = !!keyArgs.forceType ||
+              (!!(declaredType = keyArgs.declaredType) &&
+               listType !== (declaredType.isRefinement ? declaredType.of : declaredType));
 
-        var elemSpecs = this.toArray(function(elem) {
-          keyArgs.includeType = elem.type !== elemType;
-          return elem.toSpecInContext(keyArgs);
-        });
+        var elemSpecs;
+
+        if(this.count) {
+          // reset
+          keyArgs.forceType = false;
+
+          var elemType = listType.of;
+          if(elemType.isRefinement) elemType = elemType.of;
+
+          elemSpecs = this.toArray(function(elem) {
+            keyArgs.declaredType = elemType; // JIC it is changed by elem.toSpecInContext
+            return elem.toSpecInContext(keyArgs);
+          });
+        } else {
+          elemSpecs = [];
+        }
 
         if(includeType)
           return {
-            _: this.type.toRefInContext(keyArgs),
+            _: listType.toRefInContext(keyArgs),
             d: elemSpecs
           };
 
@@ -559,6 +574,7 @@ define([
         },
 
         id: module.id,
+        alias: "list",
 
         get isList() { return true; },
         get isContainer() { return true; },

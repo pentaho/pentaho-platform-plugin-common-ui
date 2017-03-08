@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,18 @@ define([
 
         expect(filter instanceof NotFilter).toBe(true);
       });
-    });
+
+      it("should be possible to create an instance by specifying the alias `o`", function() {
+        var oper1 = new CustomFilter();
+
+        var filter = new NotFilter({o: oper1});
+
+        expect(filter instanceof NotFilter).toBe(true);
+
+        expect(filter.operand).toBe(oper1);
+      });
+
+    }); // new
 
     describe("#kind", function() {
 
@@ -71,7 +82,7 @@ define([
 
         expect(filter.operand).toBe(oper1);
       });
-    }); //#operand
+    }); // #operand
 
     describe("#contains(elem)", function() {
 
@@ -166,6 +177,70 @@ define([
         expect(result).toBe(filter);
       });
     }); // #_visitDefault
+
+    describe("#toSpec", function() {
+      var filter;
+
+      beforeEach(function() {
+        var oper = new CustomFilter();
+
+        filter = new NotFilter({operand: oper});
+      });
+
+      describe("when invoked without keyword arguments", function() {
+        var filterSpec;
+
+        beforeEach(function() {
+          filterSpec = filter.toSpec();
+        });
+
+        it("should omit the type", function() {
+          expect(filterSpec._).toBeUndefined();
+        });
+
+        it("should specify the operands by their #nameAlias 'o' instead of their #name 'operands", function() {
+
+          expect(filterSpec.o).toBeDefined();
+          expect(filterSpec.operand).toBeUndefined();
+        });
+      });
+
+      describe("when invoked with the keyword argument `noAlias` set to `true`", function() {
+        it("should specify the operands by their #name 'operands", function() {
+
+          var filterSpec = filter.toSpec({
+            noAlias: true
+          });
+
+          expect(filterSpec._).toBeUndefined();
+          expect(filterSpec.o).toBeUndefined();
+          expect(filterSpec.operand).toBeDefined();
+
+        });
+      });
+
+      describe("when invoked with the keyword argument `forceType` set to `true`", function() {
+        it("should specify the type by the #alias", function() {
+
+          var filterSpec = filter.toSpec({
+            forceType: true
+          });
+
+          expect(filterSpec._).toBe("not");
+        });
+
+        it("should specify the type by the #id when the `noAlias` option is additionally specified", function() {
+
+          var filterSpec = filter.toSpec({
+            forceType: true,
+            noAlias: true
+          });
+
+          expect(filterSpec._).toBe("pentaho/type/filter/not");
+        });
+      });
+
+    }); // #toSpec
 
   }); // pentaho.type.filter.Not
 });

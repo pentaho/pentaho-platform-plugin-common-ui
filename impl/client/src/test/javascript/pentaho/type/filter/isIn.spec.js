@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,9 +41,26 @@ define([
 
     describe("new ({property, values})", function() {
 
-      it("should be possible to create an instance", function() {
+      it("should be possible to create an instance " +
+        "by specifying the properties by #name and list of value specifications", function() {
 
         var filter = new IsInFilter({property: "foo", values: [{_: "string", v: "bar"}]});
+
+        expect(filter instanceof IsInFilter).toBe(true);
+      });
+
+      it("should be possible to create an instance " +
+        "by specifying the properties by #nameAlias and list of value specifications", function() {
+
+        var filter = new IsInFilter({p: "foo", v: [{_: "string", v: "bar"}]});
+
+        expect(filter instanceof IsInFilter).toBe(true);
+      });
+
+      it("should be possible to create an instance " +
+        "by specifying the properties by #nameAlias and list of values", function() {
+
+        var filter = new IsInFilter({p: "foo", v: ["bar", "mux"]});
 
         expect(filter instanceof IsInFilter).toBe(true);
       });
@@ -65,7 +82,7 @@ define([
 
         expect(filter.property).toBe("foo");
       });
-    }); //#property
+    }); // #property
 
     describe("#values", function() {
 
@@ -78,7 +95,17 @@ define([
         expect(values.at(0).value).toBe("bar");
         expect(values.at(1).value).toBe("foo");
       });
-    }); //#values
+
+      it("should return a values list with the values specified via the nameAlias 'v' at construction", function() {
+
+        var filter = new IsInFilter({v: ["bar", "foo"]});
+
+        var values = filter.values;
+        expect(values.count).toBe(2);
+        expect(values.at(0).value).toBe("bar");
+        expect(values.at(1).value).toBe("foo");
+      });
+    }); // #values
 
     describe("#contains(elem)", function() {
 
@@ -155,5 +182,72 @@ define([
         expect(result).toBe(false);
       });
     }); // #contains
+
+    describe("#toSpec", function() {
+      var filter;
+
+      beforeEach(function() {
+
+        filter = new IsInFilter({property: "sales", values: [
+          {_: "number", v: 14000},
+          {_: "number", v: 12000}
+        ]});
+      });
+
+      describe("when invoked without keyword arguments", function() {
+        var filterSpec;
+
+        beforeEach(function() {
+          filterSpec = filter.toSpec();
+        });
+
+        it("should omit the type", function() {
+          expect(filterSpec._).toBeUndefined();
+        });
+
+        it("should specify the values by the #nameAlias 'v' instead of the #name 'values", function() {
+
+          expect(filterSpec.v.length).toBe(2);
+          expect(filterSpec.values).toBeUndefined();
+        });
+      });
+
+      describe("when invoked with the keyword argument `noAlias` set to `true`", function() {
+        it("should specify the operands by their #name 'operands", function() {
+
+          var filterSpec = filter.toSpec({
+            noAlias: true
+          });
+
+          expect(filterSpec._).toBeUndefined();
+          expect(filterSpec.v).toBeUndefined();
+          expect(filterSpec.values.length).toBe(2);
+
+        });
+      });
+
+      describe("when invoked with the keyword argument `forceType` set to `true`", function() {
+        it("should specify the type by the #alias", function() {
+
+          var filterSpec = filter.toSpec({
+            forceType: true
+          });
+
+          expect(filterSpec._).toBe("isIn");
+        });
+
+        it("should specify the type by the #id when the `noAlias` option is additionally specified", function() {
+
+          var filterSpec = filter.toSpec({
+            forceType: true,
+            noAlias: true
+          });
+
+          expect(filterSpec._).toBe("pentaho/type/filter/isIn");
+        });
+      });
+
+    }); // #toSpec
+
   }); // pentaho.type.filter.IsIn
 });

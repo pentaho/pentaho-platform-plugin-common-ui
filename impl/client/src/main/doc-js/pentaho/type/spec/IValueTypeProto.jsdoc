@@ -33,67 +33,6 @@
  */
 
 /**
- * The identifier of the value type's AMD module, a _temporary identifier_, or `null`.
- *
- * An empty string or `undefined` value is interpreted as `null`.
- *
- * For serialization purposes,
- * a **temporary identifier** can be assigned to an anonymous type.
- * An identifier is _temporary_ if it starts with
- * [idTemporaryPrefix]{@link pentaho.type.SpecificationContext.idTemporaryPrefix}.
- *
- * Temporary identifiers are ignored upon type construction.
- *
- * When unspecified or `null`, it defaults to [sourceId]{@link pentaho.type.spec.IValueTypeProto#sourceId}.
- *
- * @name id
- * @memberOf pentaho.type.spec.IValueTypeProto#
- * @type {?string}
- *
- * @see pentaho.type.SpecificationContext.isIdTemporary
- */
-
-/**
- * The identifier of the value type's _source_ AMD module, or `null`.
- *
- * An empty string or `undefined` value is interpreted as `null`.
- *
- * When unspecified or `null`, it defaults to [id]{@link pentaho.type.spec.IValueTypeProto#id}.
- *
- * @name sourceId
- * @memberOf pentaho.type.spec.IValueTypeProto#
- * @type {?string}
- *
- * @see pentaho.type.SpecificationContext.isIdTemporary
- */
-
-/**
- * A reference to the value type's base type, if any.
- *
- * When absent or `undefined`, it defaults to `"complex"`.
- *
- * @name base
- * @memberOf pentaho.type.spec.IValueTypeProto#
- * @type {?pentaho.type.spec.UTypeReference}
- */
-
-/**
- * Indicates if the type is abstract.
- *
- * An abstract type cannot be used directly to create a value instance
- * and, as such, it is not usually exposed to users in a user interface.
- *
- * When not a boolean,
- * it is taken instead to be the result of passing it to the `Boolean` function.
- *
- * @name isAbstract
- * @memberOf pentaho.type.spec.IValueTypeProto#
- * @type {?boolean | any}
- * @default false
- * @see pentaho.type.spec.ITypeProto#isBrowsable
- */
-
-/**
  * Determines if a value of the type is **valid**.
  *
  * Although not limited to,

@@ -68,6 +68,7 @@ define([
 
       type: /** @lends pentaho.type.Model.Type# */{
         id: module.id,
+        alias: "model",
 
         props: [
           /**

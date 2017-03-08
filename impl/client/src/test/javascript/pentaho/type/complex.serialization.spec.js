@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,71 +109,298 @@ define([
         scope = new SpecificationScope();
       });
 
-      describe("when keyArgs.includeType", function() {
+      describe("when keyArgs.declaredType", function() {
 
         describe("= unspecified", function() {
-          it("should default to false", function() {
-            var spec = value.toSpecInContext();
 
-            scope.dispose();
+          describe("when keyArgs.forceType", function() {
 
-            expect(spec.constructor).toBe(Object);
-            expect("_" in spec).toBe(false);
+            describe("= unspecified", function() {
+
+              it("should not include", function() {
+                var spec = value.toSpecInContext();
+
+                scope.dispose();
+
+                expect(spec.constructor).toBe(Object);
+                expect("_" in spec).toBe(false);
+              });
+            });
+
+            describe("= false", function() {
+
+              it("should not include", function() {
+                var spec = value.toSpecInContext();
+
+                scope.dispose();
+
+                expect(spec.constructor).toBe(Object);
+                expect("_" in spec).toBe(false);
+              });
+            });
+
+            describe("= true", function() {
+
+              it("should include", function() {
+                var spec = value.toSpecInContext({forceType: true});
+
+                scope.dispose();
+
+                expect(spec.constructor).toBe(Object);
+                expect("_" in spec).toBe(true);
+              });
+            });
+
           });
         });
 
-        describe("= false", function() {
+        describe("= value.type", function() {
 
-          describe("when keyArgs.preferPropertyArray: false", function() {
+          describe("when keyArgs.forceType", function() {
 
-            it("should return a plain Object", function() {
-              var spec = value.toSpecInContext({includeType: false, preferPropertyArray: false});
+            describe("= unspecified", function() {
 
-              scope.dispose();
+              describe("when keyArgs.preferPropertyArray: false", function() {
 
-              expect(spec.constructor).toBe(Object);
+                it("should return a plain Object", function() {
+                  var spec = value.toSpecInContext({declaredType: value.type, preferPropertyArray: false});
+
+                  scope.dispose();
+
+                  expect(spec.constructor).toBe(Object);
+                });
+
+                it("should not include the type", function() {
+                  var spec = value.toSpecInContext({declaredType: value.type, preferPropertyArray: false});
+
+                  scope.dispose();
+
+                  expect("_" in spec).toBe(false);
+                });
+              });
+
+              describe("when keyArgs.preferPropertyArray: true", function() {
+
+                it("should return an Array", function() {
+                  var spec = value.toSpecInContext({declaredType: value.type, preferPropertyArray: true});
+
+                  scope.dispose();
+
+                  expect(Array.isArray(spec)).toBe(true);
+                });
+              });
             });
 
-          });
+            describe("= false", function() {
 
-          describe("when keyArgs.preferPropertyArray: true", function() {
+              describe("when keyArgs.preferPropertyArray: false", function() {
 
-            it("should return an Array", function() {
-              var spec = value.toSpecInContext({includeType: false, preferPropertyArray: true});
+                it("should return a plain Object", function() {
+                  var spec = value.toSpecInContext({forceType: false, declaredType: value.type, preferPropertyArray: false});
 
-              scope.dispose();
+                  scope.dispose();
 
-              expect(Array.isArray(spec)).toBe(true);
+                  expect(spec.constructor).toBe(Object);
+                });
+
+                it("should not include the type", function() {
+                  var spec = value.toSpecInContext({forceType: false, declaredType: value.type, preferPropertyArray: false});
+
+                  scope.dispose();
+
+                  expect("_" in spec).toBe(false);
+                });
+              });
+
+              describe("when keyArgs.preferPropertyArray: true", function() {
+
+                it("should return an Array", function() {
+                  var spec = value.toSpecInContext({forceType: false, declaredType: value.type, preferPropertyArray: true});
+
+                  scope.dispose();
+
+                  expect(Array.isArray(spec)).toBe(true);
+                });
+              });
             });
 
-          });
+            describe("= true", function() {
 
+              describe("when keyArgs.preferPropertyArray: false", function() {
+
+                it("should return a plain Object", function() {
+                  var spec = value.toSpecInContext({forceType: true, declaredType: value.type, preferPropertyArray: false});
+
+                  scope.dispose();
+
+                  expect(spec.constructor).toBe(Object);
+                });
+
+                it("should include the type", function() {
+                  var spec = value.toSpecInContext({forceType: true, declaredType: value.type, preferPropertyArray: false});
+
+                  scope.dispose();
+
+                  expect("_" in spec).toBe(true);
+                });
+              });
+
+              describe("when keyArgs.preferPropertyArray: true", function() {
+
+                it("should return a plain Object", function() {
+                  var spec = value.toSpecInContext({forceType: true, declaredType: value.type, preferPropertyArray: true});
+
+                  scope.dispose();
+
+                  expect(spec.constructor).toBe(Object);
+                });
+
+                it("should include the type", function() {
+                  var spec = value.toSpecInContext({forceType: true, declaredType: value.type, preferPropertyArray: true});
+
+                  scope.dispose();
+
+                  expect("_" in spec).toBe(true);
+                });
+              });
+            });
+          });
         });
 
-        describe("= true", function() {
+        describe("= ascendant.type", function() {
 
-          describe("when keyArgs.preferPropertyArray: false", function() {
+          describe("when keyArgs.forceType", function() {
 
-            it("should return a plain Object", function() {
-              var spec = value.toSpecInContext({includeType: true, preferPropertyArray: false});
+            describe("= unspecified", function() {
 
-              scope.dispose();
+              describe("when keyArgs.preferPropertyArray: false", function() {
 
-              expect(spec.constructor).toBe(Object);
+                it("should return a plain Object", function() {
+
+                  var spec = value.toSpecInContext({declaredType: value.type.ancestor, preferPropertyArray: false});
+
+                  scope.dispose();
+
+                  expect(spec.constructor).toBe(Object);
+                });
+
+                it("should include the type", function() {
+
+                  var spec = value.toSpecInContext({declaredType: value.type.ancestor, preferPropertyArray: false});
+
+                  scope.dispose();
+
+                  expect("_" in spec).toBe(true);
+                });
+              });
+
+              describe("when keyArgs.preferPropertyArray: true", function() {
+
+                it("should return a plain Object", function() {
+
+                  var spec = value.toSpecInContext({declaredType: value.type.ancestor, preferPropertyArray: false});
+
+                  scope.dispose();
+
+                  expect(spec.constructor).toBe(Object);
+                });
+
+                it("should include the type", function() {
+
+                  var spec = value.toSpecInContext({declaredType: value.type.ancestor, preferPropertyArray: false});
+
+                  scope.dispose();
+
+                  expect("_" in spec).toBe(true);
+                });
+              });
             });
 
-          });
+            describe("= false", function() {
 
-          describe("when keyArgs.preferPropertyArray: true", function() {
+              describe("when keyArgs.preferPropertyArray: false", function() {
 
-            it("should return a plain Object", function() {
-              var spec = value.toSpecInContext({includeType: true, preferPropertyArray: true});
+                it("should return a plain Object", function() {
 
-              scope.dispose();
+                  var spec = value.toSpecInContext({forceType: false, declaredType: value.type.ancestor, preferPropertyArray: false});
 
-              expect(spec.constructor).toBe(Object);
+                  scope.dispose();
+
+                  expect(spec.constructor).toBe(Object);
+                });
+
+                it("should include the type", function() {
+
+                  var spec = value.toSpecInContext({forceType: false, declaredType: value.type.ancestor, preferPropertyArray: false});
+
+                  scope.dispose();
+
+                  expect("_" in spec).toBe(true);
+                });
+              });
+
+              describe("when keyArgs.preferPropertyArray: true", function() {
+
+                it("should return a plain Object", function() {
+
+                  var spec = value.toSpecInContext({forceType: false, declaredType: value.type.ancestor, preferPropertyArray: false});
+
+                  scope.dispose();
+
+                  expect(spec.constructor).toBe(Object);
+                });
+
+                it("should not include the type", function() {
+
+                  var spec = value.toSpecInContext({forceType: false, declaredType: value.type.ancestor, preferPropertyArray: false});
+
+                  scope.dispose();
+
+                  expect("_" in spec).toBe(true);
+                });
+              });
             });
 
+            describe("= true", function() {
+
+              describe("when keyArgs.preferPropertyArray: false", function() {
+
+                it("should return a plain Object", function() {
+                  var spec = value.toSpecInContext({forceType: true, declaredType: value.type.ancestor, preferPropertyArray: false});
+
+                  scope.dispose();
+
+                  expect(spec.constructor).toBe(Object);
+                });
+
+                it("should include the type", function() {
+                  var spec = value.toSpecInContext({forceType: true, declaredType: value.type.ancestor, preferPropertyArray: false});
+
+                  scope.dispose();
+
+                  expect("_" in spec).toBe(true);
+                });
+              });
+
+              describe("when keyArgs.preferPropertyArray: true", function() {
+
+                it("should return a plain Object", function() {
+                  var spec = value.toSpecInContext({forceType: true, declaredType: value.type.ancestor, preferPropertyArray: true});
+
+                  scope.dispose();
+
+                  expect(spec.constructor).toBe(Object);
+                });
+
+                it("should include the type", function() {
+                  var spec = value.toSpecInContext({forceType: true, declaredType: value.type.ancestor, preferPropertyArray: true});
+
+                  scope.dispose();
+
+                  expect("_" in spec).toBe(true);
+                });
+              });
+            });
           });
         });
       });
@@ -183,7 +410,6 @@ define([
         it("should pass-through all options of `keyArgs`", function() {
           var keyArgs = {
             includeDefaults: true,
-            includeType: false,
             foo:  {},
             bar:  {},
             dudu: {}
@@ -214,52 +440,28 @@ define([
           Derived.type.each(function(pType) { expectProperty(pType.name); });
         });
 
-        it("should pass keyArgs.includeType: true when the value is not of the same type of the property", function() {
-          var includeType;
+        it("should pass keyArgs.declaredType with the propertyType's value type", function() {
+          var declaredType;
 
           function expectProperty(name) {
             var v = value.get(name);
             if(v) {
               expect(v.toSpecInContext.calls.count()).toBe(1);
 
-              expect(includeType).toBe(true);
+              expect(declaredType).toBe(TestLevel1.type);
             }
           }
 
           spyProperty("anything", function(keyArgs) {
-            includeType = keyArgs.includeType;
+            declaredType = keyArgs.declaredType;
             return {};
           });
 
-          value.toSpecInContext({includeType: false});
+          value.toSpecInContext({});
 
           scope.dispose();
 
           expectProperty("anything");
-        });
-
-        it("should pass keyArgs.includeType: false when the value is of the same type of the property", function() {
-          var includeType;
-
-          function expectProperty(name) {
-            var v = value.get(name);
-            if(v) {
-              expect(v.toSpecInContext.calls.count()).toBe(1);
-
-              expect(includeType).toBe(false);
-            }
-          }
-
-          spyProperty("noFormat", function(keyArgs) {
-            includeType = keyArgs.includeType;
-            return {};
-          });
-
-          value.toSpecInContext({includeType: false});
-
-          scope.dispose();
-
-          expectProperty("noFormat");
         });
 
         it("should omit a property if its name is in keyArgs.omitProps with a true value", function() {
@@ -289,7 +491,7 @@ define([
         it("should omit a property if its value's toSpecInContext returns null", function() {
           spyProperty("type", function() { return null; });
 
-          var spec = value.toSpecInContext({includeType: false});
+          var spec = value.toSpecInContext({});
 
           scope.dispose();
 
@@ -299,7 +501,7 @@ define([
         it("should include a property as null if its value's toSpecInContext returns null and array form is used", function() {
           spyProperty("type", function() { return null; });
 
-          var spec = value.toSpecInContext({includeType: false, preferPropertyArray: true});
+          var spec = value.toSpecInContext({preferPropertyArray: true});
 
           scope.dispose();
 
@@ -309,7 +511,7 @@ define([
         it("should include a property as null if its value's toSpecInContext returns null and defaults are included", function() {
           spyProperty("type", function() { return null; });
 
-          var spec = value.toSpecInContext({includeType: false, includeDefaults: true});
+          var spec = value.toSpecInContext({includeDefaults: true});
 
           scope.dispose();
 
@@ -321,7 +523,7 @@ define([
         var spec;
 
         beforeEach(function() {
-          spec = value.toSpecInContext({includeType: false, preferPropertyArray: true});
+          spec = value.toSpecInContext({preferPropertyArray: true});
         });
 
         it("should have one entry for each of the complex type's properties", function() {
@@ -345,7 +547,7 @@ define([
             describe("non-list properties", function() {
               it("should return an array with nulls where the value is equal to the default value", function() {
 
-                var spec = value.toSpecInContext({includeType: false, includeDefaults: false, preferPropertyArray: true});
+                var spec = value.toSpecInContext({includeDefaults: false, preferPropertyArray: true});
 
                 scope.dispose();
 
@@ -364,9 +566,13 @@ define([
             });
 
             describe("list properties", function() {
+
               it("should not return an empty array for an empty list that has an empty default value", function() {
+
                 var spec = value.toSpecInContext({
-                  includeType: false, preferPropertyArray: true, includeDefaults: false});
+                  preferPropertyArray: true,
+                  includeDefaults: false
+                });
 
                 scope.dispose();
 
@@ -374,8 +580,11 @@ define([
               });
 
               it("should return an empty array for an empty list that has non-empty default value", function() {
+
                 var spec = value.toSpecInContext({
-                  includeType: false, preferPropertyArray: true, includeDefaults: false});
+                  preferPropertyArray: true,
+                  includeDefaults: false
+                });
 
                 scope.dispose();
 
@@ -383,8 +592,11 @@ define([
               });
 
               it("should serialize a non-empty list", function() {
+
                 var spec = value.toSpecInContext({
-                  includeType: false, preferPropertyArray: true, includeDefaults: false});
+                  preferPropertyArray: true,
+                  includeDefaults: false
+                });
 
                 scope.dispose();
 
@@ -398,7 +610,7 @@ define([
             it("should return an array with entries for all complex type's properties, " +
                "some with the default values", function() {
 
-              var spec = value.toSpecInContext({includeType: false, includeDefaults: true, preferPropertyArray: true});
+              var spec = value.toSpecInContext({includeDefaults: true, preferPropertyArray: true});
 
               scope.dispose();
 
@@ -407,8 +619,7 @@ define([
 
             describe("list properties", function() {
               it("should return an empty array for an empty list that has an empty default value", function() {
-                var spec = value.toSpecInContext({
-                  includeType: false, preferPropertyArray: true, includeDefaults: true});
+                var spec = value.toSpecInContext({preferPropertyArray: true, includeDefaults: true});
 
                 scope.dispose();
 
@@ -416,8 +627,7 @@ define([
               });
 
               it("should return an empty array for an empty list that has non-empty default value", function() {
-                var spec = value.toSpecInContext({
-                  includeType: false, preferPropertyArray: true, includeDefaults: true});
+                var spec = value.toSpecInContext({preferPropertyArray: true, includeDefaults: true});
 
                 scope.dispose();
 
@@ -425,8 +635,7 @@ define([
               });
 
               it("should serialize a non-empty list", function() {
-                var spec = value.toSpecInContext({
-                  includeType: false, preferPropertyArray: true, includeDefaults: true});
+                var spec = value.toSpecInContext({preferPropertyArray: true, includeDefaults: true});
 
                 scope.dispose();
 
@@ -440,7 +649,7 @@ define([
       describe("when returning a complex in object form", function() {
 
         it("should return nested complexes in object form as well", function() {
-          var spec = value.toSpecInContext({includeType: false, preferPropertyArray: false});
+          var spec = value.toSpecInContext({preferPropertyArray: false});
 
           scope.dispose();
 
@@ -455,8 +664,7 @@ define([
               it("should return a plain object with properties only for each of " +
                  "the non-default-valued complex type's properties", function() {
 
-                var spec = value.toSpecInContext(
-                    {includeType: false, includeDefaults: false, preferPropertyArray: false});
+                var spec = value.toSpecInContext({includeDefaults: false, preferPropertyArray: false});
 
                 scope.dispose();
 
@@ -474,7 +682,7 @@ define([
 
             describe("list properties", function() {
               it("should not return an empty array for an empty list that has an empty default value", function() {
-                var spec = value.toSpecInContext({includeType: false, preferPropertyArray: false, includeDefaults: false});
+                var spec = value.toSpecInContext({preferPropertyArray: false, includeDefaults: false});
 
                 scope.dispose();
 
@@ -482,7 +690,7 @@ define([
               });
 
               it("should return an empty array for an empty list that has non-empty default value", function() {
-                var spec = value.toSpecInContext({includeType: false, preferPropertyArray: false, includeDefaults: false});
+                var spec = value.toSpecInContext({preferPropertyArray: false, includeDefaults: false});
 
                 scope.dispose();
 
@@ -491,7 +699,7 @@ define([
               });
 
               it("should serialize a non-empty list", function() {
-                var spec = value.toSpecInContext({includeType: false, preferPropertyArray: false, includeDefaults: false});
+                var spec = value.toSpecInContext({preferPropertyArray: false, includeDefaults: false});
 
                 scope.dispose();
 
@@ -506,8 +714,7 @@ define([
             it("should return a plain object with properties for all complex type's properties, " +
                "even those with default values", function() {
 
-              var spec = value.toSpecInContext(
-                  {includeType: false, includeDefaults: true, preferPropertyArray: false});
+              var spec = value.toSpecInContext({includeDefaults: true, preferPropertyArray: false});
 
               scope.dispose();
 
@@ -518,8 +725,7 @@ define([
 
             describe("list properties", function() {
               it("should not return an empty array for an empty list that has an empty default value", function() {
-                var spec = value.toSpecInContext({
-                  includeType: false, preferPropertyArray: false, includeDefaults: true});
+                var spec = value.toSpecInContext({preferPropertyArray: false, includeDefaults: true});
 
                 scope.dispose();
 
@@ -528,8 +734,7 @@ define([
               });
 
               it("should return an empty array for an empty list that has non-empty default value", function() {
-                var spec = value.toSpecInContext({
-                  includeType: false, preferPropertyArray: false, includeDefaults: true});
+                var spec = value.toSpecInContext({preferPropertyArray: false, includeDefaults: true});
 
                 scope.dispose();
 
@@ -538,8 +743,7 @@ define([
               });
 
               it("should serialize a non-empty list", function() {
-                var spec = value.toSpecInContext({
-                  includeType: false, preferPropertyArray: false, includeDefaults: true});
+                var spec = value.toSpecInContext({preferPropertyArray: false, includeDefaults: true});
 
                 scope.dispose();
 

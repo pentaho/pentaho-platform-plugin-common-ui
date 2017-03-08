@@ -242,6 +242,23 @@ define([
       });
     });
 
+    describe("#alias", function() {
+
+      it("cannot be assigned to an anonymous type", function() {
+        expect(function() {
+          var Derived = Instance.extend({type: {label: "Foo", alias: "bar"}});
+        }).toThrow(errorMatch.argInvalid("alias", "Anonymous types cannot have an alias"));
+      });
+
+      it("is read only", function() {
+        expect(function() {
+          var Derived = Instance.extend({type: {label: "Foo", id: "type/bar", alias: "bar"}});
+          Derived.type.alias = "mux";
+        }).toThrowError(TypeError);
+      });
+
+    }); // #alias
+
     describe("#shortId -", function() {
 
       it("should be `null` when id is `null`", function() {
@@ -249,21 +266,16 @@ define([
         expect(Derived.type.shortId).toBe(null);
       });
 
-      it("should be equal to #id when it is not a standard, single-level id", function() {
+      it("should be equal to #id when no alias is defined", function() {
         var Derived = Instance.extend({type: {id: "my/foo"}});
         expect(Derived.type.shortId).toBe(Derived.type.id);
       });
 
-      it("should be equal to the last sub-module of #id when it is of a standard, single-level id", function() {
-        var Derived = Instance.extend({type: {id: "pentaho/type/foo"}});
-        expect(Derived.type.shortId).toBe("foo");
-        expect(Derived.type.id).not.toBe("foo");
+      it("should be equal to #alias when the alias is defined", function() {
+        var Derived = Instance.extend({type: {id: "my/foo", alias: "foo"}});
+        expect(Derived.type.shortId).toBe(Derived.type.alias);
       });
 
-      it("should be equal to #id when it is of a standard, multiple-level id", function() {
-        var Derived = Instance.extend({type: {id: "pentaho/type/foo/bar"}});
-        expect(Derived.type.shortId).toBe(Derived.type.id);
-      });
     }); // #shortId
 
     describe("#defaultView -", function() {
@@ -1166,49 +1178,49 @@ define([
     }); // #hasDescendants
 
     describe("#isList", function() {
-      it("should have default `isList` equal to `false`", function () {
+      it("should have default `isList` equal to `false`", function() {
         expect(Instance.type.isList).toBe(false);
       });
     });
 
     describe("#isRefinement", function() {
-      it("should have default `isRefinement` equal to `false`", function () {
+      it("should have default `isRefinement` equal to `false`", function() {
         expect(Instance.type.isRefinement).toBe(false);
       });
     });
 
     describe("#isValue", function() {
-      it("should have default `false`", function () {
+      it("should have default `false`", function() {
         expect(Instance.type.isValue).toBe(false);
       });
     });
 
     describe("#isProperty", function() {
-      it("should have default `false`", function () {
+      it("should have default `false`", function() {
         expect(Instance.type.isProperty).toBe(false);
       });
     });
 
     describe("#isElement", function() {
-      it("should have default `false`", function () {
+      it("should have default `false`", function() {
         expect(Instance.type.isElement).toBe(false);
       });
     });
 
     describe("#isComplex", function() {
-      it("should have default `false`", function () {
+      it("should have default `false`", function() {
         expect(Instance.type.isComplex).toBe(false);
       });
     });
 
     describe("#isSimple", function() {
-      it("should have default `false`", function () {
+      it("should have default `false`", function() {
         expect(Instance.type.isSimple).toBe(false);
       });
     });
 
     describe("#isContainer", function() {
-      it("should have default `false`", function () {
+      it("should have default `false`", function() {
         expect(Instance.type.isContainer).toBe(false);
       });
     });
