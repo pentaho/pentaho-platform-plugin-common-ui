@@ -21,7 +21,7 @@
  * @name pentaho.type.action.IObserver
  *
  * @interface
- *
+ * @extends pentaho.lang.IEventObserver
  * @see pentaho.type.action.Base
  */
 
@@ -35,7 +35,7 @@
  *
  * @name init
  * @memberOf pentaho.type.action.IObserver#
- * @type {?function(pentaho.type.action.Base)}
+ * @type {?pentaho.lang.EventListener.<pentaho.type.action.Base>}
  */
 
 /**
@@ -46,11 +46,11 @@
  *
  * @name will
  * @memberOf pentaho.type.action.IObserver#
- * @type {?function(pentaho.type.action.Base)}
+ * @type {?pentaho.lang.EventListener.<pentaho.type.action.Base>}
  */
 
 /**
- * The listener for the action's *do* phase.
+ * The asynchronous listener for the action's *do* phase.
  *
  * The _do_ phase, which follows a successful _will_ phase,
  * allows actual _execution_ of the action.
@@ -64,7 +64,7 @@
  *
  * @name do
  * @memberOf pentaho.type.action.IObserver#
- * @type {?(function(pentaho.type.action.Base) : ?Promise)}
+ * @type {?pentaho.lang.EventListenerAsync.<pentaho.type.action.Base>}
  */
 
 /**
@@ -74,5 +74,5 @@
  *
  * @name finally
  * @memberOf pentaho.type.action.IObserver#
- * @type {?function(pentaho.type.action.Base)}
+ * @type {?pentaho.lang.EventListener.<pentaho.type.action.Base>}
  */

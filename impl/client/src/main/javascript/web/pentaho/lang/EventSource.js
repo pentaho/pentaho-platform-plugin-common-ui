@@ -15,20 +15,33 @@
  */
 
 define([
+  "module",
   "./Base",
   "./Event",
   "../util/error",
+  "../util/object",
+  "../util/fun",
   "../util/logger"
-], function(Base, Event, error, logger) {
+], function(module, Base, Event, error, O, F, logger) {
 
   "use strict";
 
-  // EventRegistrationHandle class handles creating the alias, remove, from dispose.
+  /* eslint new-cap: 0 */
+
+  var O_hasOwn = Object.prototype.hasOwnProperty;
+  var keyArgsEmitEventUnsafe = {isCanceled: event_isCanceled, errorHandler: null};
+  var keyArgsEmitEventSafe = {isCanceled: event_isCanceled, errorHandler: errorHandlerLog};
+
   /**
+   * @classDesc The `EventRegistrationHandle` class handles creating the alias, `remove`,
+   * for the `dispose` method.
+   *
+   * @name pentaho.lang.EventRegistrationHandle
    * @class
    * @implements pentaho.lang.IEventRegistrationHandle
    * @private
    */
+
   function pentaho_lang_IEventRegistrationHandle(dispose) {
     this.dispose = dispose;
   }
@@ -37,24 +50,49 @@ define([
     return this.dispose();
   };
 
+  /**
+   * Holds registration information about an observer.
+   *
+   * @name IObserverRegistration
+   * @interface
+   * @property {pentaho.lang.IEventObserver} observer - The observer.
+   * @property {number} priority - The priority of the observer.
+   * @property {number} index - The index of the observer in the event's observers list.
+   */
+
   // ---
 
-  return Base.extend("pentaho.lang.EventSource", /** @lends pentaho.lang.EventSource# */{
+  /**
+   * @classDesc The `EventSource` class is a **mixin** to be
+   * used by classes that are the source of events - that emit events.
+   *
+   * The exposed interface is compatible with the
+   * [dojo/on]{@link https://dojotoolkit.org/reference-guide/dojo/on.html} API.
+   *
+   * @name EventSource
+   * @memberOf pentaho.lang
+   * @class
+   * @amd pentaho/lang/EventSource
+   */
 
-    __listenersRegistry: null,
+  return Base.extend(module.id, /** @lends pentaho.lang.EventSource# */{
 
     /**
-     * @classDesc The `EventSource` class is a **mixin** to be
-     * used by classes that are the source of events - that emit events.
+     * The registry of event observers.
      *
-     * The exposed interface is compatible with the
-     * [dojo/on]{@link https://dojotoolkit.org/reference-guide/dojo/on.html} API.
+     * Events have a name and, optionally, multiple phases.
      *
-     * @name EventSource
-     * @memberOf pentaho.lang
-     * @class
-     * @amd pentaho/lang/EventSource
+     * Observers are registered for events and can specify listeners for specific phases of the event.
+     *
+     * Events that have a single phase, have, nonetheless, the `"__"` phase, which is used,
+     * implicitly, when a listener is registered directly to an event without specifying a phase.
+     *
+     * A map of event names to observer info arrays.
+     *
+     * @type {Map.<string, Array.<IObserverRegistration>>}
+     * @private
      */
+    __observersRegistry: null,
 
     /**
      * Registers a listener function for events of a given type or types.
@@ -75,14 +113,14 @@ define([
      * composite registration for all event types.
      *
      * @see pentaho.lang.EventSource#off
-     * @see pentaho.lang.Event
      *
-     * @param {string|string[]} type The type or types of events.
+     * @param {string|string[]} type - The type or types of events.
      *   When a string, it can be a comma-separated list of event types.
      *
-     * @param {!pentaho.lang.EventListener} listener The listener function.
-     * @param {?object} [keyArgs] Keyword arguments.
-     * @param {?number} [keyArgs.priority=0] The listening priority.
+     * @param {!pentaho.lang.IEventObserver|!pentaho.lang.EventListener} observer - The event observer or
+     * the single-phase event listener function.
+     * @param {?object} [keyArgs] - Keyword arguments.
+     * @param {?number} [keyArgs.priority=0] - The listening priority.
      * Higher priority event listeners listen to an event before any lower priority event listeners.
      * The priority can be set to `-Infinity` or `Infinity`.
      * In case two listeners are assigned the same priority,
@@ -91,101 +129,28 @@ define([
      * @return {!pentaho.lang.IEventRegistrationHandle} An event registration handle that can be used
      *   for later removal.
      */
-    on: function(type, listener, keyArgs) {
+    on: function(type, observer, keyArgs) {
       if(!type) throw error.argRequired("type");
-      if(!listener) throw error.argRequired("listener");
-
-      var handles = [];
+      if(!observer) throw error.argRequired("observer");
 
       var eventTypes = parseEventTypes(type);
-      if(eventTypes) {
-        var priority = !!keyArgs && !!keyArgs.priority ? keyArgs.priority : 0;
+      if(eventTypes && eventTypes.length) {
 
-        for(var events_i = 0, events_len = eventTypes.length; events_i !== events_len; ++events_i) {
-          var eventType = eventTypes[events_i];
+        var priority = (keyArgs && keyArgs.priority) || 0;
 
-          var queue = this._getQueueOf(eventType, /* create: */true);
+        if(F.is(observer)) observer = {__: observer};
 
-          for(var i = queue.length - 1; i !== -2; --i) {
-            if(i !== -1 && priority <= queue[i].priority) {
-              queue[i + 1] = queue[i];
-              queue[i + 1].order = i + 1;
-            } else {
-              var listenerInfo = {
-                order: i + 1,
-                priority: priority,
-                listener: listener
-              };
+        /** @type pentaho.lang.IEventRegistrationHandle[] */
+        var handles = eventTypes.map(function(eventType) {
+          return registerOne.call(this, eventType, observer, priority);
+        }, this);
 
-              queue[i + 1] = listenerInfo;
-
-              handles.push(new pentaho_lang_IEventRegistrationHandle(removeSingleHandle.bind(this, eventType, listenerInfo)));
-
-              break;
-            }
-          }
-        }
-      }
-
-      if(handles.length === 1) {
-        return handles[0];
-      }
-
-      if(handles.length > 1) {
-        return new pentaho_lang_IEventRegistrationHandle(removeMultipleHandles.bind(this, handles));
+        return handles.length > 1
+            ? new pentaho_lang_IEventRegistrationHandle(disposeHandles.bind(this, handles))
+            : handles[0];
       }
 
       return null;
-    },
-
-    _getQueueOf: function(type, create) {
-      var registry = this.__listenersRegistry;
-      if(!registry) {
-        if(!create) return null;
-
-        // 1st event registration being added
-        this.__listenersRegistry = registry = {};
-        return (registry[type] = []);
-      }
-
-      var queue = registry[type];
-      if(!queue) {
-        if(!create) return null;
-
-        // 1st event of this type being added
-        registry[type] = queue = [];
-      }
-
-      return queue;
-    },
-
-    _indexOfListener: function(type, listener, fromIndex) {
-      var queue = this._getQueueOf(type, /* create: */false);
-      if(queue) {
-        if(fromIndex == null) {
-          fromIndex = 0;
-        }
-
-        for(var i = fromIndex, len = queue.length; i < len; ++i) {
-          if(queue[i].listener === listener) {
-            return i;
-          }
-        }
-      }
-
-      return -1;
-    },
-
-    _removeListener: function(type, listener, fromIndex) {
-      var index = this._indexOfListener(type, listener, fromIndex);
-      if(index !== -1) {
-        var queue = this.__listenersRegistry[type];
-        queue.splice(index, 1);
-
-        return true;
-      }
-
-      return false;
     },
 
     /**
@@ -208,15 +173,15 @@ define([
      * Specifying an event registration handle that has already been disposed of has no effect.
      * Specifying an event type and listener function that have no registrations has no effect.
      *
-     * @memberOf pentaho.lang.EventSource#
-     *
-     * @param {string|string[]|!pentaho.lang.IEventRegistrationHandle} typeOrHandle
-     * The type or types of events, or an event registration handle to dispose of.
+     * @param {string|string[]|!pentaho.lang.IEventRegistrationHandle} typeOrHandle - The type or types of events,
+     * or an event registration handle to dispose of.
      * When a string, it can be a comma-separated list of event types.
      *
-     * @param {!pentaho.lang.EventListener} [listener] The listener function.
+     * @param {pentaho.lang.IEventObserver|pentaho.lang.EventListener} observer - The event observer or
+     * the single-phase event listener function.
+     * Required when `typeOrHandle` is not an event registration handle; ignored, otherwise.
      */
-    off: function(typeOrHandle, listener) {
+    off: function(typeOrHandle, observer) {
       if(!typeOrHandle) throw error.argRequired("typeOrHandle");
 
       if(typeOrHandle instanceof pentaho_lang_IEventRegistrationHandle) {
@@ -225,42 +190,87 @@ define([
         return;
       }
 
-      if(!listener) throw error.argRequired("listener");
+      if(!observer) throw error.argRequired("observer");
 
-      var eventTypes = parseEventTypes(typeOrHandle);
-      if(eventTypes) {
-        for(var events_i = 0, events_len = eventTypes.length; events_i !== events_len; ++events_i) {
-          while(this._removeListener(eventTypes[events_i], listener)) {
+      var types = parseEventTypes(typeOrHandle);
+      if(types && types.length) {
+
+        var find = F.is(observer) ? findSinglePhaseObserver : findObserver;
+
+        types.forEach(function(type) {
+
+          var observerRegistration = find.call(this, type, observer);
+          if(observerRegistration) {
+            unregisterOne.call(this, type, observerRegistration);
           }
-        }
+        }, this);
       }
     },
 
     /**
-     * Determines if there are any registrations for a given event type.
+     * Determines if there are any registrations for a given event type and phase.
+     *
+     * This method can be used to avoid creating expensive event objects
+     * for event type and phase pairs that currently have no registrations.
+     *
+     * @example
+     *
+     * if(this._hasListeners("select", "will")) {
+     *   var event = new Event("select");
+     *   if(this._emit(event)) {
+     *     // Select Will phase
+     *   }
+     * }
+     *
+     * @param {string} type - The type of the event.
+     * @param {string} [phase] - The phase of the event. For single-phase events don't specify this argument.
+     * @return {boolean} `true` if the event has any listeners for the given event type and phase; `false`, otherwise.
+     *
+     * @protected
+     */
+    _hasListeners: function(type, phase) {
+
+      var queue = O.getOwn(this.__observersRegistry, type);
+      if(queue) {
+        if(!phase) phase = "__";
+
+        // Find at least one observer with the desired phase.
+        var i = -1;
+        var L = queue.length;
+        while(++i < L) if(O_hasOwn.call(queue[i].observer, phase)) return true;
+      }
+
+      return false;
+    },
+
+    /**
+     * Determines if there are any registrations for a given event type,
+     * for at least one of its phases.
      *
      * This method can be used to avoid creating expensive event objects
      * for event types that currently have no registrations.
      *
      * @example
      *
-     * if(this._hasListeners("selecting")) {
-     *   var event = new Event("selecting");
-     *   if(this._emit(event)) {
-     *     // Select
+     * if(this._hasObservers("select")) {
+     *   var event = new Event("select");
+     *
+     *   if(this._emit(event, "will")) {
+     *     // Select Will
+     *   }
+     *
+     *   if(this._emit(event, "did")) {
+     *     // Select Did
      *   }
      * }
      *
-     * @memberOf pentaho.lang.EventSource#
-     *
-     * @param {string} type The type of the event.
-     * @return {boolean} `true` if the event has any registrations, `false` if not.
+     * @param {string} type - The type of the event.
+     * @return {boolean} `true` if the event has any observers for the given event type; `false`, otherwise.
      *
      * @protected
      */
-    _hasListeners: function(type) {
-      var registry = this.__listenersRegistry;
-      return registry != null && registry[type] != null && registry[type].length > 0;
+    _hasObservers: function(type) {
+      return O.hasOwn(this.__observersRegistry, type);
     },
 
     /**
@@ -276,8 +286,6 @@ define([
      * If a listener function throws an error, the event processing is interrupted.
      * No more registrations are processed and the error is passed to the caller.
      *
-     * @memberOf pentaho.lang.EventSource#
-     *
      * @param {!pentaho.lang.Event} event The event object to emit.
      * @return {?pentaho.lang.Event} The emitted event object or `null`, when canceled.
      *
@@ -285,7 +293,10 @@ define([
      * @sealed
      */
     _emit: function(event) {
-      return emit.call(this, event, false);
+      if(!event) throw error.argRequired("event");
+      if(!(event instanceof Event)) throw error.argInvalidType("event", "pentaho.type.Event");
+
+      return this._emitGeneric(event, event.type, null, keyArgsEmitEventUnsafe);
     },
 
     /**
@@ -294,41 +305,201 @@ define([
      *
      * If an event listener throws an exception, the following event listeners are still processed.
      *
-     * @memberOf pentaho.lang.EventSource#
-     *
      * @param {!pentaho.lang.Event} event The event object to emit.
      * @return {?pentaho.lang.Event} The emitted event object or `null`, when canceled.
      *
      * @protected
      */
     _emitSafe: function(event) {
-      return emit.call(this, event, true);
+      if(!event) throw error.argRequired("event");
+      if(!(event instanceof Event)) throw error.argInvalidType("event", "pentaho.type.Event");
+
+      return this._emitGeneric(event, event.type, null, keyArgsEmitEventSafe);
+    },
+
+    /**
+     * Emits an event of a generic type and returns it, unless it was canceled.
+     *
+     * @param {Object} event - The event object to emit.
+     * @param {string} type - The type of the event.
+     * @param {?string} [phase] - The phase of the event. For single-phase events don't specify this argument
+     * (or specify as {@link Nully}.
+     *
+     * @param {Object} [keyArgs] - The keyword arguments' object.
+     * @param {function(Object):boolean} [keyArgs.isCanceled] - A predicate that indicates if a given event object
+     * is in a canceled state.
+     * @param {function(any, Object, string, string)} [keyArgs.errorHandler] - When specified with a `null` value,
+     * no error handling is performed and errors thrown by listeners are thrown back to this method's caller.
+     * When unspecified or specified as `undefined`, defaults to a function that simply log the listener errors,
+     * and let execution continue to following listeners.
+     * The function arguments are: the error, the event, the event type and the event phase.
+     *
+     * @return {?Object} The emitted event object or `null`, when canceled.
+     *
+     * @protected
+     */
+    _emitGeneric: function(event, type, phase, keyArgs) {
+
+      // Performance
+      // if(!type) throw error.argRequired("type");
+
+      var isCanceled;
+      var queue;
+
+      if((isCanceled = keyArgs && keyArgs.isCanceled) && isCanceled(event)) {
+        return null;
+      }
+
+      if((queue = O.getOwn(this.__observersRegistry, type))) {
+        return emitQueue(event, queue, type, phase || "__", isCanceled, keyArgs);
+      }
+
+      return event;
     }
   });
 
   /**
-   * Removes a single registration.
+   * Gets or creates the queue of observer registrations for a given event type.
    *
-   * @param {string} type The event type.
-   * @param {Object} info The event registration.
+   * @this pentaho.lang.EventSource
+   *
+   * @param {string} type - The event type.
+   * @return {IObserverRegistration[]} The array of event observer registrations.
    *
    * @this pentaho.lang.EventSource
    * @inner
    * @private
    */
-  function removeSingleHandle(type, info) {
-    var fromIndex = info.order;
+  function getObserversQueueOf(type) {
+    var registry = this.__observersRegistry || (this.__observersRegistry = {});
+    return registry[type] || (registry[type] = createObserversQueue());
+  }
 
-    var r = this._removeListener(type, info.listener, fromIndex);
-    if(!r && fromIndex > 0) {
-      this._removeListener(type, info.listener, 0);
+  /**
+   * Creates a queue of observer registrations.
+   *
+   * @return {IObserverRegistration[]} An empty queue of event observer registrations.
+   *
+   * @private
+   */
+  function createObserversQueue() {
+    var queue = [];
+    queue.emittingLevel = 0;
+    return queue;
+  }
+
+  /**
+   * Register an observer given its event type and priority.
+   *
+   * @param {string} type - The event tyoe.
+   * @param {!pentaho.lang.IEventObserver} observer - The event observer.
+   * @param {number} priority - The listening priority.
+   *
+   * @return {!pentaho.lang.IEventRegistrationHandle} An event registration handle that can be used for later removal.
+   *
+   * @this pentaho.lang.EventSource
+   * @inner
+   * @private
+   */
+  function registerOne(type, observer, priority) {
+    var queue = getObserversQueueOf.call(this, type, /* create: */true);
+
+    var i = queue.length;
+
+    /** @type IObserverRegistration */
+    var observerRegistration;
+    while(i-- && (observerRegistration = queue[i]).priority >= priority) {
+      // Will be shifted to the right one position, with the splice operation, below.
+      observerRegistration.index = i + 1;
+    }
+
+    // `i` has the first position (from end) where priority is lower.
+    // Add to its right.
+    i++;
+
+    // Can change the queue directly? Or need to copy it?
+    if(queue.emittingLevel) {
+      // Use "copy on write". Replace by a fresh copy to not affect current iteration.
+      this.__observersRegistry[type] = queue = queue.slice();
+      queue.emittingLevel = 0;
+    }
+
+    observerRegistration = {
+      index: i,
+      priority: priority,
+      observer: observer
+    };
+
+    // Insert at index `i`.
+    queue.splice(i, 0, observerRegistration);
+
+    return new pentaho_lang_IEventRegistrationHandle(unregisterOne.bind(this, type, observerRegistration));
+  }
+
+  /**
+   * Removes an event observer registration.
+   *
+   * @param {string} type - The event type.
+   * @param {IObserverRegistration} observerRegistration - The event observer registration.
+   *
+   * @this pentaho.lang.EventSource
+   * @inner
+   * @private
+   */
+  function unregisterOne(type, observerRegistration) {
+
+    var queue = this.__observersRegistry[type];
+    var i = observerRegistration.index;
+
+    // Can change the queue directly? Or need to copy it?
+    if(queue.emittingLevel) {
+      // Use "copy on write". Replace by a fresh copy to not affect current iteration.
+      this.__observersRegistry[type] = queue = queue.slice();
+      queue.emittingLevel = 0;
+    }
+
+    // Remove index `i`
+    queue.splice(i, 1);
+
+    // Update indexes of any observers to the right.
+    var L = queue.length;
+    if(L) {
+      while(i < L) {
+        queue[i].index = i;
+        i++;
+      }
+    } else {
+      // Was last observer registration.
+      delete this.__observersRegistry[type];
     }
   }
 
-  function removeMultipleHandles(handles) {
+  function disposeHandles(handles) {
     for(var i = 0, L = handles.length; i !== L; ++i) {
       handles[i].dispose();
     }
+  }
+
+  function findSinglePhaseObserver(type, listener) {
+    var queue = O.getOwn(this.__observersRegistry, type);
+    if(queue) {
+      var i = -1;
+      var L = queue.length;
+      while(++i < L) if(queue[i].observer.__ === listener) return queue[i];
+    }
+
+    return null;
+  }
+
+  function findObserver(type, observer) {
+    var queue = O.getOwn(this.__observersRegistry, type);
+    if(queue) {
+      var i = -1;
+      var L = queue.length;
+      while(++i < L) if(queue[i].observer === observer) return queue[i];
+    }
+
+    return null;
   }
 
   function parseEventTypes(type) {
@@ -346,47 +517,57 @@ define([
     return [type];
   }
 
-  /**
-   * Emits an event, optionally ignoring the exceptions thrown by event listeners
-   *
-   * @param {!pentaho.lang.Event} event - The event object to emit.
-   * @param {boolean} ignoreExceptions - Determines if exceptions triggered by event listeners are ignored.
-   * @return {?pentaho.lang.Event} The emitted event object or `null`, when canceled.
-   * @private
-   */
-  function emit(event, ignoreExceptions) {
-    if(!event) throw error.argRequired("event");
-    if(!(event instanceof Event)) throw error.argInvalidType("event", "pentaho.type.Event");
+  function emitQueue(event, queue, type, phase, isCanceled, keyArgs) {
 
-    if(event.isCanceled) {
-      return null;
-    }
+    // Use `null` to force no error handling.
+    var errorHandler;
+    if((errorHandler = keyArgs && keyArgs.errorHandler) === undefined)
+      errorHandler = errorHandlerLog;
 
-    var queue = this._getQueueOf(event.type, /* create: */false);
-    if(!queue) return event;
+    queue.emittingLevel++;
 
-    queue = queue.slice();
+    try {
 
-    var i = queue.length;
-    if(ignoreExceptions) {
-      while(i-- && !event.isCanceled) {
-        try {
-          queue[i].listener.call(this, event);
-        } catch(e) {
-          logger.log("Exception thrown during '" + event.type + "' loop:" + e.stack);
+      var i = queue.length;
+      var listener;
+
+      if(errorHandler) {
+
+        while(i--) if((listener = queue[i].observer[phase])) {
+
+          try {
+            listener.call(this, event);
+          } catch(ex) {
+
+            if(errorHandler) errorHandler.call(this, ex, event, type, phase);
+          }
+
+          if(isCanceled && isCanceled(event)) return null;
         }
-      }
-    } else {
-      while(i-- && !event.isCanceled) {
-        queue[i].listener.call(this, event);
-      }
-    }
 
-    if(event.isCanceled) {
-      return null;
+      } else {
+
+        while(i--) if((listener = queue[i].observer[phase])) {
+
+          listener.call(this, event);
+
+          if(isCanceled && isCanceled(event)) return null;
+        }
+
+      }
+
+    } finally {
+      queue.emittingLevel--;
     }
 
     return event;
   }
 
+  function event_isCanceled(event) {
+    return event.isCanceled;
+  }
+
+  function errorHandlerLog(ex, event, type, phase) {
+    logger.log("Event listener of '" + type + ":" + phase + "' failed. \nStack: " + ex.stack);
+  }
 });
