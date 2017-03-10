@@ -51,12 +51,13 @@ define([
     var finishedStates = States.did | rejectedStates;
     var cancelableStates = States.init | States.will;
 
-    return Element.extend({
+    return Element.extend(/** @lends  pentaho.type.action.Base# */{
       type: {
         id: module.id,
         isAbstract: true
       },
 
+      // TODO: review this doclet. Create pentaho.type.action.spec.IBase
       /**
        * @alias Base
        * @memberOf pentaho.type.action
@@ -67,14 +68,10 @@ define([
        *
        * @classDesc The base class of action types.
        *
-       * @description Creates an action instance given its specification
+       * @description Creates an action instance given its specification.
        *
        * @constructor
-       * @param {Object} [spec] An action specification.
-       *
-       * @see pentaho.type.spec.IComplex
-       * @see pentaho.type.spec.IComplexProto
-       * @see pentaho.type.spec.IComplexTypeProto
+       * @param {pentaho.type.action.spec.IAction} [spec] An action specification.
        */
       constructor: function(spec) {
         /**
@@ -169,13 +166,14 @@ define([
        * Can only be set while the action is in an [editable]{@link pentaho.type.action.Base#isEditable} state.
        *
        * @type {nonEmptyString}
-       * @throws {pentaho.lang.OperationInvalidError} When set and the action is not editable.
+       * @throws {pentaho.lang.OperationInvalidError} When set and the action is not in an editable state.
        */
       get label() {
         return this.__label || this.type.label;
       },
 
       set label(value) {
+
         this._assertEditable();
         this.__label = nonEmptyString(value);
       },
@@ -189,13 +187,14 @@ define([
        * Can only be set while the action is in an [editable]{@link pentaho.type.action.Base#isEditable} state.
        *
        * @type {nonEmptyString}
-       * @throws {pentaho.lang.OperationInvalidError} When set and the action is not editable.
+       * @throws {pentaho.lang.OperationInvalidError} When set and the action is not in an editable state.
        */
       get description() {
         return this.__description || this.type.description;
       },
 
       set description(value) {
+
         this._assertEditable();
         this.__description = nonEmptyString(value);
       },

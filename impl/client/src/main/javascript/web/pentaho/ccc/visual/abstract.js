@@ -17,7 +17,7 @@ define([
   "module",
   "pentaho/visual/models/abstract",
   "pentaho/visual/base/view",
-  "pentaho/visual/base/types/selectionModes",
+  "pentaho/visual/action/SelectionModes",
   "cdf/lib/CCC/def",
   "cdf/lib/CCC/pvc",
   "cdf/lib/CCC/cdo",
@@ -31,7 +31,7 @@ define([
   "pentaho/visual/role/level",
   "pentaho/data/TableView",
   "pentaho/i18n!view"
-], function(module, modelFactory, baseViewFactory, selectionModes,
+], function(module, modelFactory, baseViewFactory, SelectionModes,
             def, pvc, cdo, pv, Axis,
             util, O, logger, visualColorUtils, visualPaletteRegistry,
             measurementLevelFactory, DataView, bundle) {
@@ -1521,12 +1521,12 @@ define([
           return memo;
         }.bind(this), []);
 
-        var Or = this.type.context.get("pentaho/type/filter/or");
+        var Or = this.type.context.get("or");
 
         var keyArgs = {};
 
         // Replace with empty selection when the user selects nothing.
-        if(operands && operands.length === 0) keyArgs.selectionMode = selectionModes.REPLACE;
+        if(operands && operands.length === 0) keyArgs.selectionMode = SelectionModes.replace;
 
         this.model.selectAction(new Or({operands: operands}), keyArgs);
 

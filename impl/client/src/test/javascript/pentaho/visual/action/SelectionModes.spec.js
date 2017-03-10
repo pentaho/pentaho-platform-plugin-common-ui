@@ -15,27 +15,29 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/visual/base",
+  "pentaho/visual/base/model",
+  "pentaho/visual/base/view",
   "pentaho/type/filter/isIn",
   "pentaho/type/filter/isEqual",
   "pentaho/type/filter/and",
   "pentaho/type/filter/or",
   "pentaho/type/filter/not",
   "pentaho/data/Table",
-  "pentaho/visual/base/types/selectionModes"
-], function(Context, modelFactory, isInFilterFactory, isEqFilterFactory, andFilterFactory, orFilterFactory,
-    notFilterFactory, Table, selectionModes) {
+  "pentaho/visual/action/SelectionModes"
+], function(Context, modelFactory, viewFactory, isInFilterFactory, isEqFilterFactory, andFilterFactory, orFilterFactory,
+    notFilterFactory, Table, SelectionModes) {
 
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false */
 
-  describe("pentaho.visual.base.types.selectionModes -", function() {
+  describe("pentaho.visual.action.SelectionModes -", function() {
     var sales12k;
     var inStock;
     var countryPt;
     var myFilter;
     var model;
+    var view;
     var IsEqFilter;
     var AndFilter;
     var OrFilter;
@@ -45,6 +47,7 @@ define([
       var context = new Context();
 
       var Model = context.get(modelFactory);
+      var View = context.get(viewFactory);
 
       var IsInFilter = context.get(isInFilterFactory);
       IsEqFilter = context.get(isEqFilterFactory);
@@ -73,38 +76,42 @@ define([
       };
 
       model = new Model({
+        data: new Table(dataSpec)
+      });
+
+      view = new View({
         width: 1,
         height: 1,
-        data: new Table(dataSpec)
+        model: model
       });
     });
 
-    describe("REPLACE -", function() {
+    describe("replace -", function() {
       it("should discard current selection and return input selection", function() {
-        var result = selectionModes.REPLACE.call(model, sales12k, inStock);
+        var result = SelectionModes.replace.call(view, sales12k, inStock);
 
         expect(result).toBe(inStock);
       });
     });
 
-    describe("TOGGLE -", function() {
+    describe("toggle -", function() {
       it("should remove the input selection from the current selection when " +
          "the input selection is fully contained in the current selection", function() {
 
-        spyOn(selectionModes, "ADD").and.callThrough();
-        spyOn(selectionModes, "REMOVE").and.callThrough();
+        spyOn(SelectionModes, "add").and.callThrough();
+        spyOn(SelectionModes, "remove").and.callThrough();
 
         // Only the Portugal row is sales12k and inStock
         var inputFilter = sales12k.and(inStock);
 
-        var result = selectionModes.TOGGLE.call(model, sales12k, inputFilter);
+        var result = SelectionModes.toggle.call(view, sales12k, inputFilter);
 
-        expect(selectionModes.ADD.calls.count()).toBe(0);
+        expect(SelectionModes.add.calls.count()).toBe(0);
 
-        expect(selectionModes.REMOVE.calls.count()).toBe(1);
-        expect(selectionModes.REMOVE.calls.first().object).toBe(model);
+        expect(SelectionModes.remove.calls.count()).toBe(1);
+        expect(SelectionModes.remove.calls.first().object).toBe(view);
 
-        var args = selectionModes.REMOVE.calls.first().args;
+        var args = SelectionModes.remove.calls.first().args;
         expect(args[0]).toBe(sales12k);
         expect(args[1]).toBe(inputFilter);
 
@@ -114,8 +121,8 @@ define([
       it("should add the input selection from the current selection when " +
           "the input selection is partially contained in the current selection", function() {
 
-        spyOn(selectionModes, "ADD").and.callThrough();
-        spyOn(selectionModes, "REMOVE").and.callThrough();
+        spyOn(SelectionModes, "add").and.callThrough();
+        spyOn(SelectionModes, "remove").and.callThrough();
 
         // Portugal & France
         var inputFilter = inStock;
@@ -123,14 +130,14 @@ define([
         // Portugal & Germany & Italy
         var currentFilter = sales12k;
 
-        var result = selectionModes.TOGGLE.call(model, currentFilter, inputFilter);
+        var result = SelectionModes.toggle.call(view, currentFilter, inputFilter);
 
-        expect(selectionModes.REMOVE.calls.count()).toBe(0);
+        expect(SelectionModes.remove.calls.count()).toBe(0);
 
-        expect(selectionModes.ADD.calls.count()).toBe(1);
-        expect(selectionModes.ADD.calls.first().object).toBe(model);
+        expect(SelectionModes.add.calls.count()).toBe(1);
+        expect(SelectionModes.add.calls.first().object).toBe(view);
 
-        var args = selectionModes.ADD.calls.first().args;
+        var args = SelectionModes.add.calls.first().args;
         expect(args[0]).toBe(currentFilter);
         expect(args[1]).toBe(inputFilter);
 
@@ -140,8 +147,8 @@ define([
       it("should add the input selection from the current selection when " +
           "the input selection is disjoint from the current selection", function() {
 
-        spyOn(selectionModes, "ADD").and.callThrough();
-        spyOn(selectionModes, "REMOVE").and.callThrough();
+        spyOn(SelectionModes, "add").and.callThrough();
+        spyOn(SelectionModes, "remove").and.callThrough();
 
         // Portugal & France
         var inputFilter = inStock;
@@ -149,14 +156,14 @@ define([
         // Germany
         var currentFilter = new IsEqFilter({property: "country", value: {_: "string", v: "Germany"}});
 
-        var result = selectionModes.TOGGLE.call(model, currentFilter, inputFilter);
+        var result = SelectionModes.toggle.call(view, currentFilter, inputFilter);
 
-        expect(selectionModes.REMOVE.calls.count()).toBe(0);
+        expect(SelectionModes.remove.calls.count()).toBe(0);
 
-        expect(selectionModes.ADD.calls.count()).toBe(1);
-        expect(selectionModes.ADD.calls.first().object).toBe(model);
+        expect(SelectionModes.add.calls.count()).toBe(1);
+        expect(SelectionModes.add.calls.first().object).toBe(view);
 
-        var args = selectionModes.ADD.calls.first().args;
+        var args = SelectionModes.add.calls.first().args;
         expect(args[0]).toBe(currentFilter);
         expect(args[1]).toBe(inputFilter);
 
@@ -164,9 +171,9 @@ define([
       });
     });
 
-    describe("ADD -", function() {
+    describe("add -", function() {
       it("should add the input selection to the current selection", function() {
-        var result = selectionModes.ADD.call(model, sales12k, inStock);
+        var result = SelectionModes.add.call(view, sales12k, inStock);
 
         expect(result instanceof OrFilter).toBe(true);
         expect(result.operands.at(0)).toBe(sales12k);
@@ -174,9 +181,9 @@ define([
       });
     });
 
-    describe("REMOVE -", function() {
+    describe("remove -", function() {
       it("should remove the input selection from the current selection", function() {
-        var result = selectionModes.REMOVE.call(model, sales12k, inStock);
+        var result = SelectionModes.remove.call(view, sales12k, inStock);
 
         expect(result instanceof AndFilter).toBe(true);
         expect(result.operands.at(0)).toBe(sales12k);
@@ -185,5 +192,5 @@ define([
       });
     });
 
-  }); // #pentaho.visual.base.types.selectionModes
+  }); // #pentaho.visual.base.types.SelectionModes
 });

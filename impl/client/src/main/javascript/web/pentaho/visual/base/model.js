@@ -21,7 +21,7 @@ define([
   "pentaho/lang/Event",
   "pentaho/util/fun",
   "pentaho/util/object",
-  "./types/selectionModes",
+  "../action/SelectionModes",
 
   "./events/WillSelect",
   "./events/DidSelect",
@@ -42,7 +42,7 @@ define([
   "../role/quantitative"
 ], function(module, modelFactory, visualApplicationFactory,
             Event, F, O,
-            selectionModes,
+            SelectionModes,
             WillSelect, DidSelect, RejectedSelect,
             WillExecute, DidExecute, RejectedExecute,
             ActionResult,
@@ -309,13 +309,13 @@ define([
             type: {
               base: "function",
               cast: function(f) {
-                if(typeof f === "string" && O.hasOwn(selectionModes, f))
-                  return selectionModes[f];
+                if(typeof f === "string" && O.hasOwn(SelectionModes, f))
+                  return SelectionModes[f];
 
                 return F.as(f);
               }
             },
-            value: selectionModes.REPLACE,
+            value: SelectionModes.replace,
             isRequired: true
           },
           {

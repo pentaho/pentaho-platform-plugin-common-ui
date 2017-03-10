@@ -18,7 +18,6 @@ define([
   "pentaho/visual/base",
   "pentaho/type/filter/or",
   "pentaho/type/filter/and",
-  "pentaho/visual/base/types/selectionModes",
   "pentaho/lang/UserError",
   "pentaho/visual/base/events/WillSelect",
   "pentaho/visual/base/events/DidSelect",
@@ -28,7 +27,7 @@ define([
   "pentaho/visual/base/events/RejectedExecute",
   "pentaho/visual/role/mapping"
 ], function(Context, modelFactory, orFilterFactory, andFilterFactory,
-            selectionModes, UserError,
+            UserError,
             WillSelect, DidSelect, RejectedSelect,
             WillExecute, DidExecute, RejectedExecute, mappingFactory) {
   "use strict";
@@ -339,7 +338,7 @@ define([
         describe("exception on will - ", function() {
           var selectionMode;
           beforeEach(function() {
-            selectionMode = jasmine.createSpy('selectionMode');
+            selectionMode = jasmine.createSpy("selectionMode");
 
             model.on("will:select", listeners.willSelect.and.callFake(function(willEvent) {
               console.log("TEST: expect console error.");
@@ -384,7 +383,7 @@ define([
           var selectionMode;
 
           beforeEach(function() {
-            selectionMode = jasmine.createSpy('selectionMode').and.callFake(function() {
+            selectionMode = jasmine.createSpy("selectionMode").and.callFake(function() {
               throw new Error(errorMsg);
             });
 
