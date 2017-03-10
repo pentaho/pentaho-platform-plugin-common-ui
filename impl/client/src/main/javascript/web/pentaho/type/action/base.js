@@ -268,7 +268,7 @@ define([
        * @private
        */
       __assertStates: function(states) {
-        if((this.__state & states) !== 0) {
+        if(!(this.__state & states)) {
           throw this.__invalidState();
         }
       },

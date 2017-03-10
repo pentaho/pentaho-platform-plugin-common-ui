@@ -768,12 +768,12 @@ define([
       // endregion
 
       // region Actions
-      __emitActionPhase: function(action, phase) {
+      __emitActionPhase: function(action, phase, isFinal) {
         var eventType = action.type.id;
 
         // TODO: emitGenericAsync when action is async.
 
-        this._emitGeneric(action, eventType, phase, _emitActionKeyArgs);
+        this._emitGeneric(action, eventType, phase, isFinal ? null : _emitActionKeyArgs);
       },
 
       /**
@@ -819,8 +819,8 @@ define([
        *
        * @protected
        */
-      _onActionFinally: function(action) {
-        this.__emitActionPhase(action, "finally");
+      _onActionPhaseFinally: function(action) {
+        this.__emitActionPhase(action, "finally", /* isFinal: */ true);
       },
       // endregion
 

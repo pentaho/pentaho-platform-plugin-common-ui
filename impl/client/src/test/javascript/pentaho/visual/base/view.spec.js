@@ -15,13 +15,16 @@
  */
 define([
   "pentaho/visual/base/view",
-  "pentaho/visual/base",
+  "pentaho/visual/base/model",
+  "pentaho/visual/action/select",
+  "pentaho/visual/action/execute",
   "pentaho/data/Table",
   "pentaho/type/Context",
   "pentaho/type/events/DidChange",
   "tests/test-utils",
   "tests/pentaho/util/errorMatch"
-], function(viewFactory, modelFactory, Table, Context, DidChange, testUtils, errorMatch) {
+], function(viewFactory, modelFactory, selectActionFactory, executeActionFactory,
+            Table, Context, DidChange, testUtils, errorMatch) {
 
   "use strict";
 
@@ -1455,6 +1458,120 @@ define([
 
         expect(json instanceof Object).toBe(true);
         expect("selectionFilter" in json).toBe(true);
+      });
+    });
+
+    describe("#act", function() {
+      var SelectAction;
+      var ExecuteAction;
+
+      beforeEach(function() {
+        SelectAction = context.get(selectActionFactory);
+        ExecuteAction = context.get(executeActionFactory);
+      });
+
+      it("should call all _onActionPhase<Phase> methods", function() {
+
+        var view = new View();
+
+        var action = new ExecuteAction();
+
+        spyOn(view, "_onActionPhaseInit").and.callThrough();
+        spyOn(view, "_onActionPhaseWill").and.callThrough();
+        spyOn(view, "_onActionPhaseDo").and.callThrough();
+        spyOn(view, "_onActionPhaseFinally").and.callThrough();
+
+        view.act(action);
+
+        expect(view._onActionPhaseInit).toHaveBeenCalledWith(action);
+        expect(view._onActionPhaseWill).toHaveBeenCalledWith(action);
+        expect(view._onActionPhaseDo).toHaveBeenCalledWith(action);
+        expect(view._onActionPhaseFinally).toHaveBeenCalledWith(action);
+      });
+
+      it("should call registered view event listeners", function() {
+
+        var view = new View();
+
+        var action = new ExecuteAction();
+
+        var observer = {
+          init: jasmine.createSpy(),
+          will: jasmine.createSpy(),
+          "do": jasmine.createSpy(),
+          "finally": jasmine.createSpy()
+        };
+
+        view.on(ExecuteAction.type.id, observer);
+
+        view.act(action);
+
+        expect(observer.init).toHaveBeenCalledWith(action);
+        expect(observer.will).toHaveBeenCalledWith(action);
+        expect(observer["do"]).toHaveBeenCalledWith(action);
+        expect(observer["finally"]).toHaveBeenCalledWith(action);
+      });
+
+      it("should allow canceling the action in the init phase", function() {
+
+        var view = new View();
+
+        var action = new ExecuteAction();
+
+        var observer = {
+          init: jasmine.createSpy("init").and.callFake(function(action) {
+            action.reject();
+          }),
+          will: jasmine.createSpy("will"),
+          "do": jasmine.createSpy("do"),
+          "finally": jasmine.createSpy("finally").and.callFake(function(action) {
+            expect(action.isRejected).toBe(true);
+            expect(action.isCanceled).toBe(true);
+            expect(action.isFailed).toBe(false);
+            expect(action.isExecuting).toBe(false);
+            expect(action.isFinished).toBe(true);
+          })
+        };
+
+        view.on(ExecuteAction.type.id, observer);
+
+        view.act(action);
+
+        expect(observer.init).toHaveBeenCalledWith(action);
+        expect(observer.will).not.toHaveBeenCalled();
+        expect(observer["do"]).not.toHaveBeenCalled();
+        expect(observer["finally"]).toHaveBeenCalledWith(action);
+      });
+
+      it("should allow canceling the action in the will phase", function() {
+
+        var view = new View();
+
+        var action = new ExecuteAction();
+
+        var observer = {
+          init: jasmine.createSpy("init"),
+          will: jasmine.createSpy("will").and.callFake(function(action) {
+            action.reject();
+          }),
+          "do": jasmine.createSpy("do"),
+          "finally": jasmine.createSpy("finally").and.callFake(function(action) {
+            expect(action.isRejected).toBe(true);
+            expect(action.isCanceled).toBe(true);
+            expect(action.isFailed).toBe(false);
+            expect(action.isExecuting).toBe(false);
+            expect(action.isFinished).toBe(true);
+          })
+        };
+
+        view.on(ExecuteAction.type.id, observer);
+
+        view.act(action);
+
+        expect(observer.init).toHaveBeenCalledWith(action);
+        expect(observer.will).toHaveBeenCalledWith(action);
+        expect(observer["do"]).not.toHaveBeenCalled();
+        expect(observer["finally"]).toHaveBeenCalledWith(action);
       });
     });
 
