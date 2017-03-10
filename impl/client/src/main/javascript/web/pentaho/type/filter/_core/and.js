@@ -88,9 +88,7 @@ define([
 
       type: /** @lends pentaho.type.filter.And.Type# */{
         id: "pentaho/type/filter/and",
-        alias: "and",
-
-        styleClass: "pentaho-type-filter-and"
+        alias: "and"
       }
     });
   };

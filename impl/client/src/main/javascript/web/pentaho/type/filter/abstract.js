@@ -189,9 +189,7 @@ define([
       type: /** @lends pentaho.type.filter.Abstract.Type# */{
         id: module.id,
 
-        isAbstract: true,
-
-        styleClass: "pentaho-type-filter-abstract"
+        isAbstract: true
       }
     });
 

@@ -97,11 +97,7 @@ define([
 
       type: /** @lends pentaho.type.filter.Property.Type# */{
         id: module.id,
-
         isAbstract: true,
-
-        styleClass: "pentaho-type-filter-property",
-
         props: [
           {
             name: "property",

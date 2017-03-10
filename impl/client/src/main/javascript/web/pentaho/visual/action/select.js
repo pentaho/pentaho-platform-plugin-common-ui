@@ -81,14 +81,14 @@ define([
        * [defaultAction]{@link pentaho.visual.action.Select.Type#defaultAction}.
        *
        * @description Creates a data action instance given its specification.
-       * @param {pentaho.visual.action.spec.IData} [spec] A data action specification.
+       * @param {pentaho.visual.action.spec.ISelect} [spec] A selection action specification.
        * @constructor
        */
       constructor: function(spec) {
 
         this.base(spec);
 
-        this.dataFilter = spec && spec.dataFilter;
+        this.selectionMode = spec && spec.selectionMode;
       },
 
       /**
@@ -131,7 +131,7 @@ define([
          * @type {?pentaho.visual.action.SelectionMode}
          * @private
          */
-        this.__selectionMode = value;
+        this.__selectionMode = value || null;
       }
     });
   };

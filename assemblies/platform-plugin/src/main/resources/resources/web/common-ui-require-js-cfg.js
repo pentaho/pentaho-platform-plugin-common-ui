@@ -38,6 +38,7 @@
   // TODO: This fallback logic is temporary, and can be removed when the remaining
   //    parts of the system rename the "service" plugin id to "pentaho/service".
   var requireTypes = requireCfg.config["pentaho/service"] || (requireCfg.config["pentaho/service"] = {});
+  var requireTypeInfo = requireCfg.config["pentaho/typeInfo"] || (requireCfg.config["pentaho/typeInfo"] = {});
 
   // region common-ui
   requirePaths["common-ui"] = basePath;
@@ -54,7 +55,7 @@
   // E.g. requirePaths["pentaho/util"] = basePath + "/pentaho/util";
   [
     "shim", "util", "lang",
-    "i18n", "service", "data", "type",
+    "i18n", "service", "data", "type", "typeInfo",
     "visual", "config", "context", "debug", "ccc"
   ].forEach(function(name) {
     requirePaths["pentaho/" + name] = basePath + "/pentaho/" + name;
@@ -62,6 +63,39 @@
 
   // Named instances
   requireTypes["pentaho/config/impl/instanceOfAmdLoadedService"] = "pentaho.config.IService";
+
+  requireTypeInfo["pentaho/type/instance"] = {alias: "instance"};
+  requireTypeInfo["pentaho/type/value"] = {alias: "value", base: "instance"};
+  requireTypeInfo["pentaho/type/property"] = {alias: "property", base: "instance"};
+  requireTypeInfo["pentaho/type/list"] = {alias: "list", base: "value"};
+  requireTypeInfo["pentaho/type/element"] = {alias: "element", base: "value"};
+  requireTypeInfo["pentaho/type/refinement"] = {alias: "refinement", base: "value"};
+  requireTypeInfo["pentaho/type/complex"] = {alias: "complex", base: "element"};
+  requireTypeInfo["pentaho/type/application"] = {alias: "application", base: "complex"};
+  requireTypeInfo["pentaho/type/model"] = {alias: "model", base: "complex"};
+  requireTypeInfo["pentaho/type/simple"] = {alias: "simple", base: "element"};
+  requireTypeInfo["pentaho/type/number"] = {alias: "number", base: "simple"};
+  requireTypeInfo["pentaho/type/string"] = {alias: "string", base: "simple"};
+  requireTypeInfo["pentaho/type/boolean"] = {alias: "boolean", base: "simple"};
+  requireTypeInfo["pentaho/type/date"] = {alias: "date", base: "simple"};
+  requireTypeInfo["pentaho/type/object"] = {alias: "object", base: "simple"};
+  requireTypeInfo["pentaho/type/function"] = {alias: "function", base: "simple"};
+  requireTypeInfo["pentaho/type/filter/abstract"] = {base: "complex"};
+  requireTypeInfo["pentaho/type/filter/tree"] = {base: "pentaho/type/filter/abstract"};
+  requireTypeInfo["pentaho/type/filter/or"] = {alias: "or", base: "pentaho/type/filter/tree"};
+  requireTypeInfo["pentaho/type/filter/and"] = {alias: "and", base: "pentaho/type/filter/tree"};
+  requireTypeInfo["pentaho/type/filter/not"] = {alias: "not", base: "pentaho/type/filter/abstract"};
+  requireTypeInfo["pentaho/type/filter/property"] = {base: "pentaho/type/filter/abstract"};
+  requireTypeInfo["pentaho/type/filter/isEqual"] = {alias: "=", base: "pentaho/type/filter/property"};
+  requireTypeInfo["pentaho/type/filter/isIn"] = {alias: "in", base: "pentaho/type/filter/property"};
+
+  requireTypeInfo["pentaho/visual/base"] = {base: "model"};
+  requireTypeInfo["pentaho/visual/base/view"] = {
+    base: "complex",
+    props: {
+      model: {type: "pentaho/visual/base"}
+    }
+  };
 
   // TODO: remove the following when `webcontext.js` already configures pentaho/context
   requireCfg.config["pentaho/context"] = {
@@ -301,4 +335,9 @@
   // when it is possible to specify global maps or an option that achieves the same effect.
   requireMap["*"]["pentaho/visual/models/geoMap"] = "pentaho/geo/visual_${project.version}/model";
   requireMap["*"]["pentaho/geo/visual/map"] = "pentaho/geo/visual_${project.version}/view";
+
+  // VizAPI actions
+  requireTypeInfo["pentaho/visual/action/select"] = {alias: "select"};
+  requireTypeInfo["pentaho/visual/action/execute"] = {alias: "execute"};
+
 })(this);

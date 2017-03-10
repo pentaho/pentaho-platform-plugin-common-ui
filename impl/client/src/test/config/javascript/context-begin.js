@@ -70,6 +70,8 @@ var requireCfg = {
   config:   {
     "pentaho/service": {
     },
+    "pentaho/typeInfo": {
+    },
     "pentaho/context": {
       locale: SESSION_LOCALE,
       server: {

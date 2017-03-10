@@ -185,11 +185,7 @@ define([
 
       type: /** @lends pentaho.type.filter.Tree.Type# */{
         id: "pentaho/type/filter/tree",
-
         isAbstract: true,
-
-        styleClass: "pentaho-type-filter-tree",
-
         props: [
           {
             name: "operands",

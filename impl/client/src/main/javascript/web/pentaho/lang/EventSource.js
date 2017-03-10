@@ -18,11 +18,12 @@ define([
   "module",
   "./Base",
   "./Event",
+  "../typeInfo",
   "../util/error",
   "../util/object",
   "../util/fun",
   "../util/logger"
-], function(module, Base, Event, error, O, F, logger) {
+], function(module, Base, Event, typeInfo, error, O, F, logger) {
 
   "use strict";
 
@@ -141,8 +142,8 @@ define([
         if(F.is(observer)) observer = {__: observer};
 
         /** @type pentaho.lang.IEventRegistrationHandle[] */
-        var handles = eventTypes.map(function(eventType) {
-          return registerOne.call(this, eventType, observer, priority);
+        var handles = eventTypes.map(function(type) {
+          return registerOne.call(this, type, observer, priority);
         }, this);
 
         return handles.length > 1
@@ -199,6 +200,9 @@ define([
 
         types.forEach(function(type) {
 
+          // Resolve alias
+          type = typeInfo.getIdOf(type) || type;
+
           var observerRegistration = find.call(this, type, observer);
           if(observerRegistration) {
             unregisterOne.call(this, type, observerRegistration);
@@ -229,6 +233,8 @@ define([
      * @protected
      */
     _hasListeners: function(type, phase) {
+      // Resolve alias
+      type = typeInfo.getIdOf(type) || type;
 
       var queue = O.getOwn(this.__observersRegistry, type);
       if(queue) {
@@ -270,6 +276,9 @@ define([
      * @protected
      */
     _hasObservers: function(type) {
+      // Resolve alias
+      type = typeInfo.getIdOf(type) || type;
+
       return O.hasOwn(this.__observersRegistry, type);
     },
 
@@ -350,6 +359,9 @@ define([
         return null;
       }
 
+      // Resolve alias
+      type = typeInfo.getIdOf(type) || type;
+
       if((queue = O.getOwn(this.__observersRegistry, type))) {
         return emitQueue(event, queue, type, phase || "__", isCanceled, keyArgs);
       }
@@ -402,6 +414,10 @@ define([
    * @private
    */
   function registerOne(type, observer, priority) {
+
+    // Resolve alias
+    type = typeInfo.getIdOf(type) || type;
+
     var queue = getObserversQueueOf.call(this, type, /* create: */true);
 
     var i = queue.length;

@@ -1564,7 +1564,8 @@ define([
           })
         };
 
-        view.on(ExecuteAction.type.id, observer);
+        // Use the alias.
+        view.on("execute", observer);
 
         view.act(action);
 

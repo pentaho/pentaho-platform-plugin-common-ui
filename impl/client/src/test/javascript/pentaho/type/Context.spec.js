@@ -352,6 +352,73 @@ define([
                 });
           });
         });
+
+        // The sync case does not apply.
+        it("should be able to get a non-loaded non-standard type given its absolute id", function() {
+
+          var mid = "test/type/a";
+
+          function configAmd(localRequire) {
+
+            localRequire.define(mid, function() {
+              return function(context) {
+                var Simple = context.get("pentaho/type/simple");
+                return Simple.extend({
+                  type: {
+                    id: mid
+                  }
+                });
+              };
+            });
+
+          }
+
+          return require.using(["pentaho/type/Context"], configAmd, function(Context) {
+
+            var context = new Context();
+
+            return context.getAsync(mid);
+          });
+        });
+
+        // The sync case does not apply.
+        it("should be able to get a non-loaded non-standard type given its registered alias", function() {
+
+          var mid = "test/type/a";
+
+          function configAmd(localRequire) {
+
+            localRequire.config({
+              config: {
+                "pentaho/typeInfo": {
+                  "test/type/a": {alias: "XYZ"}
+                }
+              }
+            });
+
+            localRequire.define(mid, function() {
+              return function(context) {
+                var Simple = context.get("pentaho/type/simple");
+                return Simple.extend({
+                  type: {
+                    id: mid,
+                    alias: "XYZ"
+                  }
+                });
+              };
+            });
+
+          }
+
+          return require.using(["pentaho/type/Context"], configAmd, function(Context) {
+
+            var context = new Context();
+
+            return context.getAsync("XYZ").then(function(Xyz) {
+              expect(Xyz.type.id).toBe(mid);
+            });
+          });
+        });
       });
 
       describe("by type factory function", function() {
@@ -948,7 +1015,6 @@ define([
       // should throw when sync and the requested module is not defined
       // should throw when sync and the requested module is not yet loaded
       // should not throw when async and the requested module is not defined
-      // should not throw when async and the requested module is not yet loaded
     }); // #get|getAsync
 
     describe("#inject(typeRefs, fun, ctx)", function() {

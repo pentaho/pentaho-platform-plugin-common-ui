@@ -12,6 +12,7 @@
   var requireMap      = requireCfg.map;
   var requirePackages = requireCfg.packages;
   var requireTypes    = requireCfg.config["pentaho/service"];
+  var requireTypeInfo = requireCfg.config["pentaho/typeInfo"];
 
   requirePaths["dojo"] = depWebJars + "/dojo/${dojo.version}";
   requirePaths["dijit"] = depWebJars + "/dijit/${dojo.version}";
@@ -48,6 +49,7 @@
   requirePaths["pentaho/data"] = basePath + "/pentaho/data";
   requirePaths["pentaho/lang"] = basePath + "/pentaho/lang";
   requirePaths["pentaho/type"] = basePath + "/pentaho/type";
+  requirePaths["pentaho/typeInfo"] = basePath + "/pentaho/typeInfo";
   requirePaths["pentaho/util"] = basePath + "/pentaho/util";
   requirePaths["pentaho/visual"] = basePath + "/pentaho/visual";
   requirePaths["pentaho/service"] = basePath + "/pentaho/service";
@@ -60,6 +62,39 @@
 
   // Named instances
   requireTypes["pentaho/config/impl/instanceOfAmdLoadedService"] = "pentaho.config.IService";
+
+  requireTypeInfo["pentaho/type/instance"] = {alias: "instance"};
+  requireTypeInfo["pentaho/type/value"] = {alias: "value", base: "instance"};
+  requireTypeInfo["pentaho/type/property"] = {alias: "property", base: "instance"};
+  requireTypeInfo["pentaho/type/list"] = {alias: "list", base: "value"};
+  requireTypeInfo["pentaho/type/element"] = {alias: "element", base: "value"};
+  requireTypeInfo["pentaho/type/refinement"] = {alias: "refinement", base: "value"};
+  requireTypeInfo["pentaho/type/complex"] = {alias: "complex", base: "element"};
+  requireTypeInfo["pentaho/type/application"] = {alias: "application", base: "complex"};
+  requireTypeInfo["pentaho/type/model"] = {alias: "model", base: "complex"};
+  requireTypeInfo["pentaho/type/simple"] = {alias: "simple", base: "element"};
+  requireTypeInfo["pentaho/type/number"] = {alias: "number", base: "simple"};
+  requireTypeInfo["pentaho/type/string"] = {alias: "string", base: "simple"};
+  requireTypeInfo["pentaho/type/boolean"] = {alias: "boolean", base: "simple"};
+  requireTypeInfo["pentaho/type/date"] = {alias: "date", base: "simple"};
+  requireTypeInfo["pentaho/type/object"] = {alias: "object", base: "simple"};
+  requireTypeInfo["pentaho/type/function"] = {alias: "function", base: "simple"};
+  requireTypeInfo["pentaho/type/filter/abstract"] = {base: "complex"};
+  requireTypeInfo["pentaho/type/filter/tree"] = {base: "pentaho/type/filter/abstract"};
+  requireTypeInfo["pentaho/type/filter/or"] = {alias: "or", base: "pentaho/type/filter/tree"};
+  requireTypeInfo["pentaho/type/filter/and"] = {alias: "and", base: "pentaho/type/filter/tree"};
+  requireTypeInfo["pentaho/type/filter/not"] = {alias: "not", base: "pentaho/type/filter/abstract"};
+  requireTypeInfo["pentaho/type/filter/property"] = {base: "pentaho/type/filter/abstract"};
+  requireTypeInfo["pentaho/type/filter/isEqual"] = {alias: "=", base: "pentaho/type/filter/property"};
+  requireTypeInfo["pentaho/type/filter/isIn"] = {alias: "in", base: "pentaho/type/filter/property"};
+
+  requireTypeInfo["pentaho/visual/base"] = {base: "model"};
+  requireTypeInfo["pentaho/visual/base/view"] = {
+    base: "complex",
+    props: {
+      model: {type: "pentaho/visual/base"}
+    }
+  };
 
   requirePaths["json"] = basePath + "/util/require-json/json";
 
@@ -144,5 +179,9 @@
     "pentaho/visual/models/abstract",
     "pentaho/visual/models/bar"
   ].forEach(registerViz);
+
+  // VizAPI actions
+  requireTypeInfo["pentaho/visual/action/select"] = {alias: "select"};
+  requireTypeInfo["pentaho/visual/action/execute"] = {alias: "execute"};
 
 })();
