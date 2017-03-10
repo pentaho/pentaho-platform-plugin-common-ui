@@ -51,10 +51,43 @@ define([
     var finishedStates = States.did | rejectedStates;
     var cancelableStates = States.init | States.will;
 
-    return Element.extend(/** @lends  pentaho.type.action.Base# */{
-      type: {
+    return Element.extend(/** @lends pentaho.type.action.Base# */{
+      type: /** @lends pentaho.type.action.Base.Type# */{
         id: module.id,
-        isAbstract: true
+
+        isAbstract: true,
+
+        // region Attribute isSync
+
+        // TODO: hierarchy consistency? immutability?
+
+        __isSync: true,
+
+        get isSync() {
+          return this.__isSync;
+        },
+
+        set isSync(value) {
+          this.__isSync = !!value;
+        },
+        // endregion
+
+        /**
+         * Performs the default action of this action type on the given action instance.
+         *
+         * When the action is [asynchronous]{@link pentaho.type.action.Base.Type#isSync},
+         * this method _may_ return a promise. If the promise is rejected,
+         * the action is rejected with the rejection reason.
+         * However, if the promise is fulfilled, its value is always *ignored*.
+         *
+         * @param {pentaho.type.action.Base} action - The action.
+         *
+         * @return {?Promise} - A promise for the completion of default action of an asynchronous action, or `null`.
+         */
+        defaultAction: function(action) {
+          // noop
+          return null;
+        }
       },
 
       // TODO: review this doclet. Create pentaho.type.action.spec.IBase
@@ -483,9 +516,9 @@ define([
        * @param {!pentaho.type.action.ITarget} target - The action's target.
        * @param {pentaho.type.action.IObserver} [executor] - An action observer to act as action controller/executor.
        *
-       * @return {!Promise.<pentaho.type.action.Base>} A promise that is fulfilled with the
-       * action's [result]{@link pentaho.type.action.Base#result} or
-       * rejected with the action's [error]{@link pentaho.type.action.Base#error}.
+       * @return {!Promise} A promise that is fulfilled with the action's
+       * [result]{@link pentaho.type.action.Base#result} or rejected with the action's
+       * [error]{@link pentaho.type.action.Base#error}.
        *
        * @see pentaho.type.action.ITarget#execute
        * @see pentaho.type.action.ITarget#actAsync
@@ -768,7 +801,19 @@ define([
 
         this.__state = States["do"];
 
-        return this._onPhaseDo();
+        var promise = this._onPhaseDo();
+
+        var isSync = this.type.isSync;
+        if(isSync) {
+          maybeDoDefaultAction.call(this);
+          return null;
+        }
+
+        return (promise || Promise.resolve()).then(maybeDoDefaultAction.bind(this));
+
+        function maybeDoDefaultAction() {
+          return this.isExecuting ? this.type.defaultAction(this) : null;
+        }
       },
 
       __doPhaseFinally: function() {

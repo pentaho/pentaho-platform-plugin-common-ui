@@ -15,15 +15,18 @@
  */
 define([
   "module",
-  "../type/action/base",
-  "../type/filter/abstract"
-], function(module, baseActionFactory, abstractFilterFactory) {
+  "pentaho/type/action/base",
+  "pentaho/visual/base/view",
+  "pentaho/type/filter/abstract",
+  "pentaho/lang/ArgumentInvalidTypeError"
+], function(module, baseActionFactory, baseViewFactory, abstractFilterFactory, ArgumentInvalidTypeError) {
 
   "use strict";
 
   return function(context) {
 
     var AbstractFilter = context.get(abstractFilterFactory);
+    var BaseView = context.get(baseViewFactory);
 
     /**
      * @name pentaho.visual.action.Data.Type
@@ -37,8 +40,8 @@ define([
 
     var ActionBase = context.get(baseActionFactory);
 
-    return ActionBase.extend(/** @lends  pentaho.visual.action.Data# */{
-      type: {
+    return ActionBase.extend(/** @lends pentaho.visual.action.Data# */{
+      type: /** @lends pentaho.visual.action.Data.Type# */{
         id: module.id,
         isAbstract: true
       },
@@ -62,6 +65,28 @@ define([
         this.base(spec);
 
         this.dataFilter = spec && spec.dataFilter;
+      },
+
+      /**
+       * Gets the target *view* where the action is executing or has executed.
+       *
+       * This property contains the value of the `target` argument passed to
+       * [execute]{@link pentaho.type.action.Base#execute} or
+       * [executeAsync]{@link pentaho.type.action.Base#executeAsync},
+       * and is `null` before execution.
+       *
+       * @name target
+       * @memberOf pentaho.visual.action.Data#
+       * @type {pentaho.visual.base.View}
+       * @readonly
+       */
+
+      _setTarget: function(target) {
+
+        this.base(target);
+
+        if(!BaseView.type.is(target))
+          throw new ArgumentInvalidTypeError("target", [BaseView.type.id], typeof target);
       },
 
       /**

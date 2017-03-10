@@ -42,7 +42,25 @@ define([
     return DataAction.extend(/** @lends  pentaho.visual.action.Select# */{
       type: {
         id: module.id,
-        alias: "select"
+        alias: "select",
+
+        /**
+         * Applies the action's `selectionMode` to the view's current `selectionFilter` and
+         * the action's `dataFilter` to obtain the new view's `selectionFilter`,
+         * which is then updated in the view.
+         *
+         * @param {pentaho.visual.action.Select} action - The "select" action.
+         *
+         * @return {?Promise} - The value `null`.
+         */
+        defaultAction: function(action) {
+
+          var view = action.target;
+
+          view.selectionFilter = action.selectionMode.call(view, view.selectionFilter, action.dataFilter);
+
+          return null;
+        }
       },
 
       /**
@@ -58,6 +76,9 @@ define([
        *
        * This action has the *alias* `"select"`, which can be used to listen for its events on
        * action targets.
+       *
+       * See also the default action performed by this action type,
+       * [defaultAction]{@link pentaho.visual.action.Select.Type#defaultAction}.
        *
        * @description Creates a data action instance given its specification.
        * @param {pentaho.visual.action.spec.IData} [spec] A data action specification.
@@ -75,7 +96,7 @@ define([
        *
        * Can only be set while the action is in an [editable]{@link pentaho.type.action.Base#isEditable} state.
        *
-       * The default selection mode is {@link pentaho.visual.action.SelectionModes.toggle}.
+       * The default selection mode is {@link pentaho.visual.action.SelectionModes.replace}.
        *
        * Setting to a {@link Nully} value assumes the default selection mode.
        *
@@ -85,7 +106,7 @@ define([
        */
       get selectionMode() {
 
-        return this.__selectionMode || SelectionModes.toggle;
+        return this.__selectionMode || SelectionModes.replace;
       },
 
       set selectionMode(value) {

@@ -53,9 +53,9 @@
  * @memberOf pentaho.type.action.ITarget#
  * @method
  * @param {!pentaho.type.action.Base} action - The action to execute.
- * @return {!Promise.<pentaho.type.action.Base>} A promise that is fulfilled with the
- * action's [result]{@link pentaho.type.action.Base#result} or
- * rejected with the action's [error]{@link pentaho.type.action.Base#error}.
+ * @return {!Promise} A promise that is fulfilled with the action's
+ * [result]{@link pentaho.type.action.Base#result} or rejected with the action's
+ * [error]{@link pentaho.type.action.Base#error}.
  *
  * @see pentaho.type.action.ITarget#act
  */
