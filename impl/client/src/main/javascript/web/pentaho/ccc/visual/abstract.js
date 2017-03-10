@@ -18,6 +18,8 @@ define([
   "pentaho/visual/models/abstract",
   "pentaho/visual/base/view",
   "pentaho/visual/action/SelectionModes",
+  "pentaho/visual/action/select",
+  "pentaho/visual/action/execute",
   "cdf/lib/CCC/def",
   "cdf/lib/CCC/pvc",
   "cdf/lib/CCC/cdo",
@@ -31,7 +33,7 @@ define([
   "pentaho/visual/role/level",
   "pentaho/data/TableView",
   "pentaho/i18n!view"
-], function(module, modelFactory, baseViewFactory, SelectionModes,
+], function(module, modelFactory, baseViewFactory, SelectionModes, selectActionFactory, executeActionFactory,
             def, pvc, cdo, pv, Axis,
             util, O, logger, visualColorUtils, visualPaletteRegistry,
             measurementLevelFactory, DataView, bundle) {
@@ -1528,7 +1530,11 @@ define([
         // Replace with empty selection when the user selects nothing.
         if(operands && operands.length === 0) keyArgs.selectionMode = SelectionModes.replace;
 
-        this.model.selectAction(new Or({operands: operands}), keyArgs);
+        var SelectAction = this.type.context.get(selectActionFactory);
+
+        this.act(new SelectAction({
+          dataFilter: new Or({operands: operands})
+        }));
 
         // Explicitly cancel CCC's native selection handling.
         return [];
@@ -1616,7 +1622,10 @@ define([
       },
 
       _onDoubleClick: function(complex) {
-        return this.model.executeAction(this._complexToFilter(complex));
+        var ExecuteAction = this.type.context.get(executeActionFactory);
+        var dataFilter = this._complexToFilter(complex);
+
+        this.act(new ExecuteAction({dataFilter: dataFilter}));
       },
       // endregion
 
