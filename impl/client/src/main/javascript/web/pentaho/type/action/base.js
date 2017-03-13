@@ -69,25 +69,8 @@ define([
 
         set isSync(value) {
           this.__isSync = !!value;
-        },
-        // endregion
-
-        /**
-         * Performs the default action of this action type on the given action instance.
-         *
-         * When the action is [asynchronous]{@link pentaho.type.action.Base.Type#isSync},
-         * this method _may_ return a promise. If the promise is rejected,
-         * the action is rejected with the rejection reason.
-         * However, if the promise is fulfilled, its value is always *ignored*.
-         *
-         * @param {pentaho.type.action.Base} action - The action.
-         *
-         * @return {?Promise} - A promise for the completion of default action of an asynchronous action, or `null`.
-         */
-        defaultAction: function(action) {
-          // noop
-          return null;
         }
+        // endregion
       },
 
       // TODO: review this doclet. Create pentaho.type.action.spec.IBase
@@ -805,14 +788,14 @@ define([
 
         var isSync = this.type.isSync;
         if(isSync) {
-          maybeDoDefaultAction.call(this);
+          maybeDoDefault.call(this);
           return null;
         }
 
-        return (promise || Promise.resolve()).then(maybeDoDefaultAction.bind(this));
+        return (promise || Promise.resolve()).then(maybeDoDefault.bind(this));
 
-        function maybeDoDefaultAction() {
-          return this.isExecuting ? this.type.defaultAction(this) : null;
+        function maybeDoDefault() {
+          return this.isExecuting ? this._doDefault() : null;
         }
       },
 
@@ -887,6 +870,21 @@ define([
         if((exec = this.__executor) && exec["do"]) {
           return exec["do"](this);
         }
+      },
+
+      /**
+       * Performs the default "action" of this action.
+       *
+       * When the action is [asynchronous]{@link pentaho.type.action.Base.Type#isSync},
+       * this method _may_ return a promise. If the promise is rejected,
+       * the action is rejected with the rejection reason.
+       * However, if the promise is fulfilled, its value is always *ignored*.
+       *
+       * @return {?Promise} - A promise for the completion of the default action of an asynchronous action, or `null`.
+       */
+      _doDefault: function() {
+        // noop
+        return null;
       },
 
       /**

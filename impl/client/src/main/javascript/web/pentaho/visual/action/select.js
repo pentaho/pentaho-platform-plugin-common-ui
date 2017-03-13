@@ -42,25 +42,7 @@ define([
     return DataAction.extend(/** @lends  pentaho.visual.action.Select# */{
       type: {
         id: module.id,
-        alias: "select",
-
-        /**
-         * Applies the action's `selectionMode` to the view's current `selectionFilter` and
-         * the action's `dataFilter` to obtain the new view's `selectionFilter`,
-         * which is then updated in the view.
-         *
-         * @param {pentaho.visual.action.Select} action - The "select" action.
-         *
-         * @return {?Promise} - The value `null`.
-         */
-        defaultAction: function(action) {
-
-          var view = action.target;
-
-          view.selectionFilter = action.selectionMode.call(view, view.selectionFilter, action.dataFilter);
-
-          return null;
-        }
+        alias: "select"
       },
 
       /**
@@ -78,7 +60,7 @@ define([
        * action targets.
        *
        * See also the default action performed by this action type,
-       * [defaultAction]{@link pentaho.visual.action.Select.Type#defaultAction}.
+       * [_doDefault]{@link pentaho.visual.action.Select#_doDefault}.
        *
        * @description Creates a data action instance given its specification.
        * @param {pentaho.visual.action.spec.ISelect} [spec] A selection action specification.
@@ -132,6 +114,22 @@ define([
          * @private
          */
         this.__selectionMode = value || null;
+      },
+
+      /**
+       * Applies the action's `selectionMode` to the view's current `selectionFilter` and
+       * the action's `dataFilter` to obtain the new view's `selectionFilter`,
+       * which is then updated in the view.
+       *
+       * @return {?Promise} - The value `null`.
+       */
+      _doDefault: function() {
+
+        var view = this.target;
+
+        view.selectionFilter = this.selectionMode.call(view, view.selectionFilter, this.dataFilter);
+
+        return null;
       }
     });
   };
