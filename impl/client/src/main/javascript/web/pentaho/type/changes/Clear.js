@@ -47,7 +47,7 @@ define([
     },
 
     _prepareRefs: function(txn, target) {
-      if(!target.type.of.isSimple) {
+      if(target.type.of.isComplex) {
         target._elems.forEach(function(elem) {
           if(elem._addReference)
             txn._ensureChangeRef(elem).removeReference(target);
@@ -56,7 +56,7 @@ define([
     },
 
     _cancelRefs: function(txn, target) {
-      if(!target.type.of.isSimple) {
+      if(target.type.of.isComplex) {
 
         target._elems.forEach(function(elem) {
           if(elem._addReference)

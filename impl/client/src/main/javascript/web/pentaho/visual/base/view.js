@@ -43,6 +43,11 @@ define([
 
   var _reUpdateMethodName = /^_update(.+)$/;
 
+  var _emitActionKeyArgs = {
+    errorHandler: function(ex, action) { action.fail(ex); },
+    isCanceled: function(action) { return action.isCanceled; }
+  };
+
   return function(context) {
 
     var Complex = context.get(complexFactory);
@@ -56,6 +61,7 @@ define([
        * @class
        * @extends pentaho.type.complex
        * @implements pentaho.lang.IDisposable
+       * @implements pentaho.type.action.ITarget
        *
        * @abstract
        * @amd pentaho/visual/base/view
@@ -727,6 +733,95 @@ define([
           this._emitSafe(new RejectedUpdate(this, reason));
       },
 
+      // endregion
+
+      // region IActionTarget implementation
+      act: function(action) {
+        if(!action) throw error.argRequired("action");
+
+        action.execute(this, this._getActionController(action));
+
+        return action;
+      },
+
+      actAsync: function(action) {
+        if(!action) throw error.argRequired("action");
+
+        return action.executeAsync(this, this._getActionController(action));
+      },
+
+      __genericActionController: null,
+
+      _getActionController: function(action) {
+        return this.__genericActionController ||
+            (this.__genericActionController = this.__createGenericActionController());
+      },
+
+      __createGenericActionController: function() {
+        return {
+          init: this._onActionPhaseInit.bind(this),
+          will: this._onActionPhaseWill.bind(this),
+          "do": this._onActionPhaseDo.bind(this),
+          "finally": this._onActionPhaseFinally.bind(this)
+        };
+      },
+      // endregion
+
+      // region Actions
+      __emitActionPhase: function(action, phase, isFinal) {
+        var eventType = action.type.id;
+
+        // TODO: emitGenericAsync when action is async.
+
+        this._emitGeneric(action, eventType, phase, isFinal ? null : _emitActionKeyArgs);
+      },
+
+      /**
+       * Performs an action's _initialize_ phase, by calling any registered action `init` observers.
+       *
+       * @param {!pentaho.type.action.Base} action - The action.
+       *
+       * @protected
+       */
+      _onActionPhaseInit: function(action) {
+        this.__emitActionPhase(action, "init");
+      },
+
+      /**
+       * Performs an action's _will_ phase, by calling any registered action `will` observers.
+       *
+       * @param {!pentaho.type.action.Base} action - The action.
+       *
+       * @protected
+       */
+      _onActionPhaseWill: function(action) {
+        this.__emitActionPhase(action, "will");
+      },
+
+      /**
+       * Performs an action's _do_ phase, by calling any registered action `do` observers.
+       *
+       * @param {!pentaho.type.action.Base} action - The action.
+       *
+       * @return {?Promise} A promise to the completion of the asynchronous `do` listener,
+       * of an [asynchronous]{@link pentaho.type.action.Base.Type#isSync} action, or `null`.
+       *
+       * @protected
+       */
+      _onActionPhaseDo: function(action) {
+        return this.__emitActionPhase(action, "do");
+      },
+
+      /**
+       * Performs an action's _finally_ phase, by calling any registered action `finally` observers.
+       *
+       * @param {!pentaho.type.action.Base} action - The action.
+       *
+       * @protected
+       */
+      _onActionPhaseFinally: function(action) {
+        this.__emitActionPhase(action, "finally", /* isFinal: */ true);
+      },
       // endregion
 
       /**

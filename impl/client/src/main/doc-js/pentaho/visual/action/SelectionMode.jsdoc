@@ -15,18 +15,17 @@
  */
 
 /**
- * An event _phase_ listener function.
+ * The selection mode is a function that determines how the selection made by the user,
+ * contained in [dataFilter]{@link pentaho.visual.action.Data#dataFilter},
+ * is merged with the view's current selection,
+ * [selectionFilter]{@link pentaho.visual.base.View#selectionFilter}.
  *
- * The event listener function is called with a `this` context
- * being the object where the listener registered for the event.
+ * The selection mode function is called with a `this` context being the view.
  *
- * This type can be used generically by specifying the type of event in angle brackets:
- * `pentaho.lang.EventListener<MyEvent>`.
+ * @callback pentaho.visual.action.SelectionMode
  *
- * Usually, the event payload is of type {@link pentaho.lang.Event},
- * but other object types are acceptable.
+ * @param {pentaho.type.filter.Abstract} current - The view's current selection filter.
+ * @param {pentaho.type.filter.Abstract} input - The user input data filter.
  *
- * @callback pentaho.lang.EventListener
- *
- * @param {Object} [event] The event payload, if any.
+ * @return {pentaho.type.filter.Abstract} The resulting filter.
  */

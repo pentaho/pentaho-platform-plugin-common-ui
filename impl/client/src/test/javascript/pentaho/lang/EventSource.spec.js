@@ -36,7 +36,7 @@ define([
         event2 = new Event("bar", source, true);
         state = 0;
         listener = function() {
-          state = state + 1;
+          state += 1;
         };
       });
 
@@ -90,15 +90,15 @@ define([
       it("should throw an `argRequired` error when the `type` argument is set but the `listener` argument is not provided.", function() {
         expect(function() {
           eventSource.on("test");
-        }).toThrow(errorMatch.argRequired("listener"));
+        }).toThrow(errorMatch.argRequired("observer"));
 
         expect(function() {
           eventSource.on("test", null);
-        }).toThrow(errorMatch.argRequired("listener"));
+        }).toThrow(errorMatch.argRequired("observer"));
 
         expect(function() {
           eventSource.on("test", undefined);
-        }).toThrow(errorMatch.argRequired("listener"));
+        }).toThrow(errorMatch.argRequired("observer"));
       });
 
       describe("should return -", function() {
@@ -228,15 +228,15 @@ define([
       it("should throw an error when the typeOrHandle is a string but no listener is provided.", function() {
         expect(function() {
           eventSource.off("test");
-        }).toThrow(errorMatch.argRequired("listener"));
+        }).toThrow(errorMatch.argRequired("observer"));
 
         expect(function() {
           eventSource.off("test", null);
-        }).toThrow(errorMatch.argRequired("listener"));
+        }).toThrow(errorMatch.argRequired("observer"));
 
         expect(function() {
           eventSource.off("test", undefined);
-        }).toThrow(errorMatch.argRequired("listener"));
+        }).toThrow(errorMatch.argRequired("observer"));
       });
 
     }); // #off
@@ -515,19 +515,19 @@ define([
             var state = "original";
 
             eventSource.on("foo", function() {
-              state = state + " first";
+              state += " first";
             }, {
               priority: 0
             });
 
             eventSource.on("foo", function() {
-              state = state + " second";
+              state += " second";
             }, {
               priority: p
             });
 
             eventSource.on("foo", function() {
-              state = state + " third";
+              state += " third";
             }, {
               priority: 0
             });

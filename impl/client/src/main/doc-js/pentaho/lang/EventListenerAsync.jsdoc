@@ -15,18 +15,22 @@
  */
 
 /**
- * An event _phase_ listener function.
+ * An event _phase_ listener asynchronous function.
  *
  * The event listener function is called with a `this` context
  * being the object where the listener registered for the event.
  *
  * This type can be used generically by specifying the type of event in angle brackets:
- * `pentaho.lang.EventListener<MyEvent>`.
+ * `pentaho.lang.EventListenerAsync<MyEvent>`.
  *
  * Usually, the event payload is of type {@link pentaho.lang.Event},
  * but other object types are acceptable.
  *
- * @callback pentaho.lang.EventListener
+ * @callback pentaho.lang.EventListenerAsync
  *
  * @param {Object} [event] The event payload, if any.
+ *
+ * @return {?Promise} A promise for the listener's completion.
+ *
+ * The actual meaning of the promise's result and rejected reason is specific to each event.
  */

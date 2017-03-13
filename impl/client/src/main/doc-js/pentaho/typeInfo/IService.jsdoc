@@ -1,0 +1,99 @@
+/*!
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @classDesc The `typeInfo.IService` interface represents a service from which basic type information
+ * can be obtained without loading the types' class' AMD modules.
+ *
+ * @name IService
+ * @memberOf pentaho.typeInfo
+ * @interface
+ * @see pentaho.typeInfo.service
+ */
+
+/**
+ * Declares multiple types, possibly interrelated.
+ *
+ * @name configure
+ * @memberOf pentaho.typeInfo.IService#
+ * @method
+ * @param {Object.<string, pentaho.typeInfo.IDeclaration>} [configSpec] - A map of type declarations by their type id.
+ */
+
+// declareType: function(id, typeDecl)
+
+/**
+ * Declares a type.
+ *
+ * @name declare
+ * @memberOf pentaho.typeInfo.IService#
+ * @method
+ * @param {string} [id] - The id of the type.
+ * @param {pentaho.typeInfo.IDeclaration} [decl] - The declaration of the type.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When a type with the given `id` is already defined.
+ */
+
+/**
+ * Gets the alias of a type given its id (or alias).
+ *
+ * @name getAliasOf
+ * @memberOf pentaho.typeInfo.IService#
+ * @method
+ * @param {string} [idOrAlias] - The id or alias of the type.
+ *
+ * @return {string|undefined|null} The alias of the type or,
+ * `undefined` if the type is not known, or
+ * `null` if the type is known but does not have an alias.
+ */
+
+/**
+ * Gets the id of a type given its alias (or id).
+ *
+ * @name getIdOf
+ * @memberOf pentaho.typeInfo.IService#
+ * @method
+ * @param {string} [aliasOrId] - The alias or id of the type.
+ *
+ * @return {string|undefined} The id of the type if it is known under the given alias (or id), or `undefined` if not.
+ */
+
+/**
+ * Gets the base id of a type given its id or alias.
+ *
+ * @name getBaseOf
+ * @memberOf pentaho.typeInfo.IService#
+ * @method
+ * @param {string} [idOrAlias] - The id or alias of the type.
+ *
+ * @return {string|undefined|null} The id of the base type or,
+ * `undefined` if the type is not known, or
+ * `null` if the type is known but does not have a base type.
+ */
+
+/**
+ * Determines if one type is a subtype of another.
+ *
+ * @name isSubtypeOf
+ * @memberOf pentaho.typeInfo.IService#
+ * @method
+ * @param {string} [idOrAliasSub] - The id or alias of the subtype.
+ * @param {string} [idOrAliasBase] - The id or alias of the base type.
+ *
+ * @return {boolean|undefined} `true` if `idOrAliasSub` is a subtype of `idOrAliasBase`;
+ * `false`, if not;
+ * `undefined` if either type is not known.
+ */

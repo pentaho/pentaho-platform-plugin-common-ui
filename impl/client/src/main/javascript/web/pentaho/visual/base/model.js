@@ -21,17 +21,7 @@ define([
   "pentaho/lang/Event",
   "pentaho/util/fun",
   "pentaho/util/object",
-  "./types/selectionModes",
-
-  "./events/WillSelect",
-  "./events/DidSelect",
-  "./events/RejectedSelect",
-
-  "./events/WillExecute",
-  "./events/DidExecute",
-  "./events/RejectedExecute",
-
-  "pentaho/lang/ActionResult",
+  "../action/SelectionModes",
 
   "pentaho/i18n!model",
 
@@ -41,13 +31,7 @@ define([
   "../role/ordinal",
   "../role/quantitative"
 ], function(module, modelFactory, visualApplicationFactory,
-            Event, F, O,
-            selectionModes,
-            WillSelect, DidSelect, RejectedSelect,
-            WillExecute, DidExecute, RejectedExecute,
-            ActionResult,
-            bundle,
-            mappingFactory) {
+            Event, F, O, SelectionModes, bundle, mappingFactory) {
 
   "use strict";
 
@@ -90,171 +74,6 @@ define([
           }
         }, this);
       },
-
-      // region Event Flows Handling
-      /**
-       * Modifies the current selection filter based on an input filter and on a selection mode.
-       *
-       * This action is the entry point for user-driven modifications of the current selection filter.
-       * For example, if the user clicked a bar in a bar chart or drew a rectangle over a set of bars in a bar chart.
-       *
-       * The event ["will:select"]{@link pentaho.visual.base.events.WillSelect}
-       * is first emitted.
-       * Its event listeners can be attributed a _priority_
-       * and can be regarded as operations in a processing pipeline that are allowed to:
-       * - cancel the event
-       * - replace the input filter
-       * - replace the selection mode
-       *
-       * Afterwards, the current selection filter is updated.
-       * If the modification of the current selection filter is successful, the event
-       * ["did:select"]{@link pentaho.visual.base.events.DidSelect} is emitted.
-       *
-       * Any rejection (due to an event cancelation or due to an invalid selection mode)
-       * leads to the emission of the
-       * ["rejected:select"]{@link pentaho.visual.base.events.RejectedSelect}.
-       *
-       * @param {!pentaho.type.filter.Abstract} inputDataFilter - A filter representing
-       * the dataset which will be used to modify the current selection filter.
-       * @param {Object} keyArgs - Keyword arguments.
-       * @param {function} keyArgs.selectionMode - A function that computes a new selection filter,
-       * taking into account the current selection filter and an input `dataFilter`.
-       *
-       * @return {!pentaho.lang.ActionResult}
-       * If unsuccessful, the `error` property describes what originated the error.
-       * If successful,  the `error` property is `null` and the `value` property contains
-       * the updated current selection filter.
-       *
-       * @fires "will:select"
-       * @fires "did:select"
-       * @fires "rejected:select"
-       *
-       * @see pentaho.visual.base.types.selectionModes
-       */
-      selectAction: function(inputDataFilter, keyArgs) {
-        var selectionMode = O.getOwn(keyArgs, "selectionMode") || this.selectionMode;
-        var will = new WillSelect(this, inputDataFilter, selectionMode);
-        return this._doAction(this._doSelect, will, DidSelect, RejectedSelect);
-      },
-
-      /**
-       * Modifies the current selection.
-       *
-       * @param {pentaho.visual.base.events.WillSelect} will - The "will:select" event object.
-       * @return {ActionResult} The result object.
-       * @protected
-       */
-      _doSelect: function(will) {
-        var currentSelectionFilter = this.selectionFilter;
-        var selectionMode = will.selectionMode || this.selectionMode;
-
-        var newSelectionFilter;
-        try {
-          newSelectionFilter = selectionMode.call(this, currentSelectionFilter, will.dataFilter);
-        } catch(e) {
-          return ActionResult.reject(e);
-        }
-
-        try {
-          // Note that when setting to null, it actually gets the default value.
-          this.selectionFilter = newSelectionFilter;
-        } catch(e) {
-          return ActionResult.reject(e);
-        }
-
-        return ActionResult.fulfill();
-      },
-
-      /**
-       * Executes an action when the user interacts with a visual element, normally by double clicking it.
-       *
-       * The flow starts by emitting the event {@link pentaho.visual.base.events.WillExecute|"will:execute"}.
-       * Its event listeners can be attributed a _priority_
-       * and can be regarded as operations in a processing pipeline that are allowed to:
-       * - cancel the event
-       * - replace the input data filter
-       * - change the [doExecute]{@link pentaho.visual.base.Model.Meta} action
-       *
-       * Any rejection (due to an event cancellation or due to an invalid `doExecute` action)
-       * emits the event {@link pentaho.visual.base.events.RejectedSelect|"rejected:execute"}.
-       *
-       * @param {!pentaho.type.filter.Abstract} inputDataFilter - A filter representing the dataset of
-       * the visual element which the user interacted with.
-       *
-       * @param {Object} [keyArgs] - The keywords argument.
-       * @param {function} [keyArgs.doExecute] - A "doExecute" function to use instead of the model's
-       * current [doExecute]{@link pentaho.visual.base.Model#doExecute} function.
-       *
-       * @return {pentaho.lang.ActionResult}
-       * If unsuccessful, the `error` property describes what originated the error.
-       * If successful,  the `error` property is `null`.
-       * In either case no value is returned.
-       *
-       * @fires "will:execute"
-       * @fires "did:execute"
-       * @fires "rejected:execute"
-       *
-       */
-      executeAction: function(inputDataFilter, keyArgs) {
-        var doExecute = O.getOwn(keyArgs, "doExecute") || this.doExecute;
-        var will = new WillExecute(this, inputDataFilter, doExecute);
-        return this._doAction(this._doExecute, will, DidExecute, RejectedExecute);
-      },
-
-      /**
-       * Runs the `doExecute` action and returns a [result]{@link pentaho.lang.ActionResult} object.
-       *
-       * @param {pentaho.visual.base.events.WillExecute} will - The "will:execute" event object.
-       * @return {ActionResult} The result object.
-       * @protected
-       */
-      _doExecute: function(will) {
-        if(!will.doExecute)
-          return ActionResult.reject(bundle.structured.error.action.notDefined);
-
-        var result;
-        try {
-          result = will.doExecute.call(this, will.dataFilter);
-        } catch(e) {
-          return ActionResult.reject(e);
-        }
-        return result && result.isRejected ? result : ActionResult.fulfill();
-      },
-
-      /**
-       * Executes the will/did/rejected event loop associated with a given action.
-       *
-       * @param {function} coreAction - The action to be executed.
-       * @param {pentaho.visual.base.events.Will} willEvent - The "will:" event object.
-       * @param {function} DidEvent - The constructor of the "did:" event.
-       * @param {function} RejectedEvent - The constructor of the "rejected:" event.
-       * @return {pentaho.lang.ActionResult} The result object.
-       * @protected
-       */
-      _doAction: function(coreAction, willEvent, DidEvent, RejectedEvent) {
-
-        if(this._hasListeners(willEvent.type))
-          this._emitSafe(willEvent);
-
-        /* jshint laxbreak:true*/
-        var result = willEvent.isCanceled
-            ? ActionResult.reject(willEvent.cancelReason)
-            : coreAction.call(this, willEvent);
-
-        if(result.error) {
-          if(this._hasListeners(RejectedEvent.type)) {
-            this._emitSafe(new RejectedEvent(this, result.error, willEvent));
-          }
-        } else {
-          /* eslint no-lonely-if: 0 */
-          if(this._hasListeners(DidEvent.type)) {
-            this._emitSafe(new DidEvent(this, result.value, willEvent));
-          }
-        }
-
-        return result;
-      },
-      // endregion
 
       // region serialization
       toSpecInContext: function(keyArgs) {
@@ -301,26 +120,6 @@ define([
             name: "data",
             type: "object",
             isRequired: true
-          },
-
-          // TODO: remove from here
-          {
-            name: "selectionMode",
-            type: {
-              base: "function",
-              cast: function(f) {
-                if(typeof f === "string" && O.hasOwn(selectionModes, f))
-                  return selectionModes[f];
-
-                return F.as(f);
-              }
-            },
-            value: selectionModes.REPLACE,
-            isRequired: true
-          },
-          {
-            name: "doExecute",
-            type: "function"
           }
         ],
 

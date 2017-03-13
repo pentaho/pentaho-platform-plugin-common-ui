@@ -86,9 +86,7 @@ define([
 
       type: /** @lends pentaho.type.filter.Or.Type# */{
         id: "pentaho/type/filter/or",
-        alias: "or",
-
-        styleClass: "pentaho-type-filter-or"
+        alias: "or"
       }
     });
   };

@@ -15,18 +15,8 @@
  */
 
 /**
- * An event _phase_ listener function.
+ * The `typeInfo.impl` namespace contains implementation classes of the `typeInfo` namespace.
  *
- * The event listener function is called with a `this` context
- * being the object where the listener registered for the event.
- *
- * This type can be used generically by specifying the type of event in angle brackets:
- * `pentaho.lang.EventListener<MyEvent>`.
- *
- * Usually, the event payload is of type {@link pentaho.lang.Event},
- * but other object types are acceptable.
- *
- * @callback pentaho.lang.EventListener
- *
- * @param {Object} [event] The event payload, if any.
+ * @name pentaho.typeInfo.impl
+ * @namespace
  */

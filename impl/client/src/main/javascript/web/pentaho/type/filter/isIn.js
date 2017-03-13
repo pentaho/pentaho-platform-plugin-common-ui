@@ -84,10 +84,7 @@ define([
 
       type: /** @lends pentaho.type.filter.IsIn.Type# */{
         id: module.id,
-        alias: "isIn",
-
-        styleClass: "pentaho-type-filter-isIn",
-
+        alias: "in",
         props: [
           {
             // may be empty

@@ -17,6 +17,7 @@ define([
   "require",
   "module",
   "../service",
+  "../typeInfo",
   "../i18n!types",
   "./standard",
   "./SpecificationContext",
@@ -32,7 +33,7 @@ define([
   "../util/error",
   "../util/object",
   "../util/fun"
-], function(localRequire, module, service, bundle, standard, SpecificationContext, SpecificationScope,
+], function(localRequire, module, service, typeInfo, bundle, standard, SpecificationContext, SpecificationScope,
     mainPlatformContext, configurationService,
     Transaction, TransactionScope, CommittedScope,
     Base, promiseUtil, arg, error, O, F) {
@@ -771,7 +772,7 @@ define([
 
       /* eslint default-case: 0 */
       switch(typeof typeRef) {
-        case "string": return this._getById (typeRef, sync);
+        case "string": return this._getById(typeRef, sync);
         case "function": return this._getByFun(typeRef, sync);
         case "object": return Array.isArray(typeRef)
             ? this._getByListSpec(typeRef, sync)
@@ -846,6 +847,11 @@ define([
 
       // Check if id is already present.
       var InstCtor = O.getOwn(this._byTypeId, id);
+      if(!InstCtor) {
+        // Resolve possible alias.
+        var id2 = typeInfo.getIdOf(id);
+        if(id2 && id2 !== id) InstCtor = O.getOwn(this._byTypeId, (id = id2));
+      }
 
       if(InstCtor) return this._return(InstCtor, sync);
 

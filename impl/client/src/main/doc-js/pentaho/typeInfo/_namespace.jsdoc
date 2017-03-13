@@ -15,18 +15,10 @@
  */
 
 /**
- * An event _phase_ listener function.
+ * The `typeInfo` namespace contains classes and interfaces
+ * related to providing basic type information that is available
+ * before the types' AMD modules are loaded.
  *
- * The event listener function is called with a `this` context
- * being the object where the listener registered for the event.
- *
- * This type can be used generically by specifying the type of event in angle brackets:
- * `pentaho.lang.EventListener<MyEvent>`.
- *
- * Usually, the event payload is of type {@link pentaho.lang.Event},
- * but other object types are acceptable.
- *
- * @callback pentaho.lang.EventListener
- *
- * @param {Object} [event] The event payload, if any.
+ * @name pentaho.typeInfo
+ * @namespace
  */

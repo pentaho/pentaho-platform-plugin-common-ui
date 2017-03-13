@@ -233,7 +233,7 @@ define([
             forceType: true
           });
 
-          expect(filterSpec._).toBe("isIn");
+          expect(filterSpec._).toBe("in");
         });
 
         it("should specify the type by the #id when the `noAlias` option is additionally specified", function() {

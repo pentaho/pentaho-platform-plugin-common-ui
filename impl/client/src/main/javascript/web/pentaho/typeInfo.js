@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+define([
+  "module",
+  "./typeInfo/impl/Service"
+], function(module, Service) {
 
-/**
- * The `mixins` namespace contains mixins for developers to use
- * to build new visualizations that work with the Visualization API.
- *
- * @name pentaho.visual.base.mixins
- * @namespace
- *
- */
+  "use strict";
+
+  var service = new Service();
+  service.configure(module.config());
+
+  return service;
+});
