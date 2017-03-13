@@ -342,6 +342,15 @@ define([
         expect(result).toBe(event);
       });
 
+      it("should call listeners with `this` being the event source.", function() {
+        var listener = jasmine.createSpy();
+
+        eventSource.on("foo", listener);
+        eventSource._emit(event);
+
+        expect(listener.calls.first().object).toBe(eventSource);
+      });
+
       it("should return `null` if the event was canceled by some listener.", function() {
         var listener = function(event) {
           event.cancel();

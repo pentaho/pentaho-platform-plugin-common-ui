@@ -363,7 +363,7 @@ define([
       type = typeInfo.getIdOf(type) || type;
 
       if((queue = O.getOwn(this.__observersRegistry, type))) {
-        return emitQueue(event, queue, type, phase || "__", isCanceled, keyArgs);
+        return emitQueue.call(this, event, queue, type, phase || "__", isCanceled, keyArgs);
       }
 
       return event;
