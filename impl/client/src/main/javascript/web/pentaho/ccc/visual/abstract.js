@@ -1315,9 +1315,16 @@ define([
         }, this);
 
         if(!complex.isVirtual) {
-          // TODO: container double click tooltip
-          // msg = this._vizHelper.getDoubleClickTooltip();
-          if(msg) tooltipLines.push(msg);
+
+          // TODO: Generalize getDoubleClickTooltip somehow.
+          var app = this.model.application;
+          if(app && app.getDoubleClickTooltip) {
+            var pointFilter = this._complexToFilter(complex);
+            msg = app.getDoubleClickTooltip(pointFilter);
+            if(msg) {
+              tooltipLines.push(msg);
+            }
+          }
         }
 
         /* Add selection information */
