@@ -286,7 +286,7 @@ define([
 
       _updateSelection: function() {
         var dataFilter = this.selectionFilter;
-        var selectedItems = this.model.data.filter(dataFilter);
+        var selectedItems = this._dataView.filter(dataFilter);
 
         // Get information on the axes
         var props = def.query(this._keyAxesIds)
@@ -1625,7 +1625,8 @@ define([
         var ExecuteAction = this.type.context.get(executeActionFactory);
         var dataFilter = this._complexToFilter(complex);
 
-        this.act(new ExecuteAction({dataFilter: dataFilter}));
+        var Or = this.type.context.get("or");
+        this.act(new ExecuteAction({dataFilter: new Or({ operands: [dataFilter] })}));
       },
       // endregion
 
@@ -1641,7 +1642,15 @@ define([
             filter = filter ? filter.and(operand) : operand;
         }, this);
 
-        return filter;
+        // Enforce that the returned filter is wrapped by an And
+        if(filter.kind === "and") {
+          return filter;
+        } else {
+          var And = this.type.context.get("and");
+          return new And({
+            operands: [filter]
+          });
+        }
       }
       // endregion
     }, /** @lends pentaho.visual.ccc.base.View */{
