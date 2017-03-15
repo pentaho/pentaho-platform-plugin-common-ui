@@ -55,7 +55,19 @@ define(function() {
      * The [IsIn]{@link pentaho.type.filter.IsIn} filter kind.
      * @default
      */
-    IsIn: "isIn"
+    IsIn: "isIn",
+
+    /**
+     * The [True]{@link pentaho.type.filter.True} filter kind.
+     * @default
+     */
+    True: "true",
+
+    /**
+     * The [False]{@link pentaho.type.filter.False} filter kind.
+     * @default
+     */
+    False: "false"
   };
 
   return KnownFilterKind;

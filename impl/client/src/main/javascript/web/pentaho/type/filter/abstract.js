@@ -20,9 +20,12 @@ define([
   "./_core/and",
   "./_core/or",
   "./_core/not",
+  "./_core/true",
+  "./_core/false",
   "../../util/arg",
   "../../util/error"
-], function(module, complexFactory, treeFactory, andFactory, orFactory, notFactory, arg, error) {
+], function(module, complexFactory, treeFactory, andFactory, orFactory, notFactory,
+            trueFactory, falseFactory, arg, error) {
 
   "use strict";
 
@@ -93,7 +96,18 @@ define([
        * @readOnly
        */
       get contentKey() {
-        return this.__contentKey || (this.__contentKey = "(" + this.type.shortId + " " + this._buildContentKey() + ")");
+        return this.__contentKey || (this.__contentKey = this.__buildContentKeyOuter());
+      },
+
+      /**
+       * Wraps the result of calling `_buildContentKey` with information on the kind of filter.
+       *
+       * @return {string} The content key.
+       * @private
+       */
+      __buildContentKeyOuter: function() {
+        var innerKey = this._buildContentKey();
+        return "(" + this.type.shortId + (innerKey ? (" " + innerKey) : "") + ")";
       },
 
       /**
@@ -234,7 +248,8 @@ define([
             .visit(moveNotInward)
             .visit(moveAndInward)
             .visit(flattenTree)
-            .visit(ensureDnfTopLevel);
+            .visit(ensureDnfTopLevel)
+            .visit(simplifyDnf);
       },
 
       type: /** @lends pentaho.type.filter.Abstract.Type# */{
@@ -252,6 +267,8 @@ define([
     treeFactory(filter);
     andFactory(filter);
     orFactory(filter);
+    trueFactory(filter);
+    falseFactory(filter);
 
     return filter.Abstract;
 
@@ -340,6 +357,74 @@ define([
     }
 
     function ensureDnfTopLevel(f) {
+
+      switch(f.kind) {
+        case "or":
+
+          var i = -1;
+          var os = f.operands;
+          var L = os.count;
+          var osAnds = [];
+
+          while(++i < L) {
+            var o = os.at(i);
+            if(o.kind !== "and") {
+              osAnds.push(new filter.And({operands: [o]}));
+            } else {
+              osAnds.push(o);
+            }
+          }
+
+          return new f.constructor({operands: osAnds});
+
+        case "and":
+          f = new filter.Or({operands: [f]});
+          break;
+
+        default:
+          f = new filter.Or({operands: new filter.And({operands: [f]})});
+      }
+
+      return f;
+    }
+
+    function simplifyDnf(f) {
+
+      // NOTE: AND() <=> True
+      // NOTE:  OR() <=> False
+      // NOTE:  OR(AND()) <=> True
+
+      // -- Duplicates --
+      // 1) AND(A, A) <=> AND(A)
+      // 2)  OR(A, A) <=>  OR(A)
+
+      // -- Neutral Operand Elimination --
+      // 3) AND( .. True .. ) <=> AND( .. .. )
+      //    Cannot happen, atm
+
+      // 4)  OR( .. False .. ) <=> OR( .. .. )
+      //     OR( .. AND(A, NOT(A)) ..)
+
+      // -- AND/OR Elimination --
+      // 3) AND( .. False .. ) <=> False
+      //    Cannot happen, atm
+
+      // 4)  OR( .. True .. ) <=> True
+      //     OR( .. AND() .. ) <=> OR(AND()) <=> True
+
+      // -- NOT Elimination --
+      // 5) NOT(True) <=> False
+      //    Cannot happen, atm
+
+      // 6) NOT(False) <=> True
+      //    Cannot happen, atm
+
+      // -- XYZ --
+      // 7) AND(A, NOT(A)) <=> False - Law of non-contradiction
+      //    can occur within an OR
+      //
+      // 8) OR (A, NOT(A)) <=> True  - Law of excluded middle
+      //    cannot occur cause DNF's ORs always contain direct ANDs, and never NOTs.
 
       switch(f.kind) {
         case "or":

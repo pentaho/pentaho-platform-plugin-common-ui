@@ -307,10 +307,10 @@ define([
         expect(filter.contentKey).toBe("(and (= a 1) (= b 2))");
       });
 
-      it("should return '(and ) when there are no operands'", function() {
+      it("should return '(and) when there are no operands'", function() {
         var filter  = new AndFilter({});
 
-        expect(filter.contentKey).toBe("(and )");
+        expect(filter.contentKey).toBe("(and)");
       });
 
       it("should sort child content keys alphabetically", function() {

@@ -225,6 +225,12 @@ define([
 
         expect(filter.contentKey).toBe("(=  1)");
       });
+
+      it("should return '(=  ) when no property or value are set'", function() {
+        var filter  = new IsEqualFilter();
+
+        expect(filter.contentKey).toBe("(=  )");
+      });
     });
   }); // pentaho.type.filter.IsEqual
 });

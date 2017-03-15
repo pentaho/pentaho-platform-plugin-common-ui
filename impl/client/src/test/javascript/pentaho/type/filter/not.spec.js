@@ -251,10 +251,10 @@ define([
         expect(filter.contentKey).toBe("(not (= a 1))");
       });
 
-      it("should return '(not ) when operand is not set'", function() {
+      it("should return '(not) when operand is not set'", function() {
         var filter  = new NotFilter({});
 
-        expect(filter.contentKey).toBe("(not )");
+        expect(filter.contentKey).toBe("(not)");
       });
 
       it("should refresh contentKey when operand is changed", function() {

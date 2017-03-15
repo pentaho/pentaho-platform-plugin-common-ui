@@ -268,6 +268,12 @@ define([
 
         expect(filter.contentKey).toBe("(in  1 2)");
       });
+
+      it("should return '(in  ) when no property or values are set'", function() {
+        var filter  = new IsInFilter();
+
+        expect(filter.contentKey).toBe("(in  )");
+      });
     });
   }); // pentaho.type.filter.IsIn
 });

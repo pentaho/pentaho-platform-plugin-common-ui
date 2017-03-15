@@ -14,32 +14,15 @@
  * limitations under the License.
  */
 define([
-  "./abstract",
-  "./tree",
-  "./property",
-  "./and",
-  "./or",
-  "./not",
-  "./isEqual",
-  "./isIn",
-  "./true",
-  "./false"
-], function(
-    abstractFactory, treeFactory, propFactory,
-    andFactory, orFactory, notFactory, isEqFactory, isInFactory, trueFactory, falseFactory) {
+  "./abstract"
+], function(abstractFactory) {
 
   "use strict";
 
-  return {
-    "abstract": abstractFactory,
-    "tree": treeFactory,
-    "property": propFactory,
-    "and": andFactory,
-    "or": orFactory,
-    "not": notFactory,
-    "isEqual": isEqFactory,
-    "isIn": isInFactory,
-    "true": trueFactory,
-    "false": falseFactory
+  return function(context) {
+
+    var Abstract = context.get(abstractFactory);
+
+    return Abstract._core.True;
   };
 });

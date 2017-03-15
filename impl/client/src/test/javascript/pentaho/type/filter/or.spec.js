@@ -307,10 +307,10 @@ define([
         expect(filter.contentKey).toBe("(or (= a 1) (= b 2))");
       });
 
-      it("should return '(or ) when there are no operands'", function() {
+      it("should return '(or) when there are no operands'", function() {
         var filter  = new OrFilter({});
 
-        expect(filter.contentKey).toBe("(or )");
+        expect(filter.contentKey).toBe("(or)");
       });
 
       it("should sort child content keys alphabetically", function() {
