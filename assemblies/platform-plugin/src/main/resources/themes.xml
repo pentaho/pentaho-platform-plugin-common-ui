@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <themes root-folder="resources/themes">
-  <onyx display-name="Onyx" system="true">
+  <onyx display-name="Onyx" system="true" hidden="true">
     <file>globalOnyx.css</file>
     <file>bootstrap/css/bootstrap-namespaced.css</file>
   </onyx>
