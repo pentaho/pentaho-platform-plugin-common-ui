@@ -1,6 +1,6 @@
 
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,6 +127,8 @@ define([
 
       this.model = Model.to(modelSpec);
       this.implem = new TableImplemClass(tableSpec, {model: this.model});
+
+      if(!this.isPlainTable) this._cachedPlainTable = null;
     },
 
     /** @inheritdoc */
@@ -192,11 +194,13 @@ define([
     // region ITable
     /** @inheritdoc */
     addColumn: function(colSpec, keyArgs) {
+      if(!this.isPlainTable) this._cachedPlainTable = null;
       return this.implem.addColumn(colSpec, keyArgs);
     },
 
     /** @inheritdoc */
     addRow: function(rowSpec, keyArgs) {
+      if(!this.isPlainTable) this._cachedPlainTable = null;
       return this.implem.addRow(rowSpec, keyArgs);
     },
     // endregion
@@ -245,7 +249,9 @@ define([
 
       // assert this.isCrossTable
 
-      return new Table(this.toSpecPlain({shareModel: true}));
+      var plainTable = this._cachedPlainTable;
+      if(!plainTable) plainTable = this._cachedPlainTable = new Table(this.toSpecPlain({shareModel: true}));
+      return plainTable;
     },
 
     /**
@@ -293,8 +299,8 @@ define([
 
     _toSpec: function(keyArgs, asPlain) {
       var tableSpec = (!asPlain || this.isPlainTable)
-          ? this.implem.toSpec(keyArgs)
-          : this.implem.toSpecPlain(keyArgs);
+        ? this.implem.toSpec(keyArgs)
+        : this.implem.toSpecPlain(keyArgs);
 
       tableSpec.model = arg.optional(keyArgs, "shareModel") ? this.model : this.model.toSpec();
       return tableSpec;
@@ -371,7 +377,7 @@ define([
         while(j--) {
           var v = cdaRow[j];
           cellSpecs[j] = v == null ? null : // direct null
-              (typeof v === "object") && ("v" in v) ? v : // direct cell
+            (typeof v === "object") && ("v" in v) ? v : // direct cell
               {v: v, f: null}; // value to cell
         }
 
