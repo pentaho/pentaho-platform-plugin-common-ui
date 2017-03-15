@@ -98,7 +98,7 @@ define([
         expect(filter3.operands.at(0)).toBe(filter2);
       });
 
-      it("should return this when no operand is transformed by the transformer", function() {
+      it("should return a clone when no operand is transformed by the transformer", function() {
         var filter1 = new CustomTreeFilter();
 
         var transf = jasmine.createSpy().and.returnValue(null);
@@ -107,7 +107,8 @@ define([
 
         var filter2 = filter1.visit(transf);
 
-        expect(filter2).toBe(filter1);
+        expect(filter2).not.toBe(filter1);
+        expect(filter2.toSpec()).toEqual(filter1.toSpec());
       });
     }); // #_visitDefault
 
@@ -120,7 +121,7 @@ define([
         }).toThrow(errorMatch.argRequired("transformer"));
       });
 
-      it("should return null if none of the operands is transformed", function() {
+      it("should return null when there are no operands", function() {
         var filter = new CustomTreeFilter();
 
         var transf = jasmine.createSpy().and.returnValue(null);
@@ -151,9 +152,11 @@ define([
         expect(Array.isArray(result)).toBe(true);
         expect(result.length).toBe(3);
 
-        expect(result[0]).toBe(oper1);
+        expect(result[0]).not.toBe(oper1);
+        expect(result[0].toSpec()).toEqual(oper1.toSpec());
         expect(result[1]).toBe(oper4);
-        expect(result[2]).toBe(oper3);
+        expect(result[2]).not.toBe(oper3);
+        expect(result[2].toSpec()).toEqual(oper3.toSpec());
       });
 
       it("should consider elements filtered out by `keyArgs.where` as a modification and " +
@@ -170,8 +173,10 @@ define([
         expect(Array.isArray(result)).toBe(true);
         expect(result.length).toBe(2);
 
-        expect(result[0]).toBe(oper1);
-        expect(result[1]).toBe(oper3);
+        expect(result[0]).not.toBe(oper1);
+        expect(result[0].toSpec()).toEqual(oper1.toSpec());
+        expect(result[1]).not.toBe(oper3);
+        expect(result[1].toSpec()).toEqual(oper3.toSpec());
       });
     }); // #visitOperands
   }); // pentaho.type.filter.Tree

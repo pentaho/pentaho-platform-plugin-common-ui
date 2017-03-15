@@ -75,6 +75,11 @@ define([
         return this.value === value;
       },
 
+      _buildContentKey: function() {
+        var v = this.get("value");
+        return (this.property || "") + " " + (v ? v.key : "");
+      },
+
       type: /** @lends pentaho.type.filter.IsEqual.Type# */{
         id: module.id,
         alias: "=",

@@ -36,8 +36,8 @@ define([
     var ProductSummary = Complex.extend({
       type: {
         props: [
-          {name: "name",    type: "string",  label: "Name"    },
-          {name: "sales",   type: "number",  label: "Sales"   },
+          {name: "name", type: "string", label: "Name"},
+          {name: "sales", type: "number", label: "Sales"},
           {name: "inStock", type: "boolean", label: "In Stock"}
         ]
       }
@@ -166,15 +166,16 @@ define([
         expect(result.operand).toBe(oper2);
       });
 
-      it("should return `this` when the operand is not transformed by the transformer", function() {
-        var oper1  = new CustomFilter();
+      it("should return a clone when the operand is not transformed by the transformer", function() {
+        var oper1 = new CustomFilter();
         var filter = new NotFilter({operand: oper1});
 
         var transf = function() { return null; };
 
         var result = filter.visit(transf);
 
-        expect(result).toBe(filter);
+        expect(result).not.toBe(filter);
+        expect(result.toSpec()).toEqual(filter.toSpec());
       });
     }); // #_visitDefault
 
@@ -242,5 +243,41 @@ define([
 
     }); // #toSpec
 
+    describe("#contentKey", function() {
+
+      it("should return '(not filter)'", function() {
+        var filter  = new NotFilter({operand: {_: "=", p: "a", v: 1}});
+
+        expect(filter.contentKey).toBe("(not (= a 1))");
+      });
+
+      it("should return '(not ) when operand is not set'", function() {
+        var filter  = new NotFilter({});
+
+        expect(filter.contentKey).toBe("(not )");
+      });
+
+      it("should refresh contentKey when operand is changed", function() {
+        var filter  = new NotFilter({operand: {_: "=", p: "a", v: "1"}});
+
+        var contentKey0 = filter.contentKey;
+
+        filter.operand = {_: "=", p: "b", v: "2"};
+
+        expect(filter.contentKey).not.toBe(contentKey0);
+        expect(filter.contentKey).toBe("(not (= b 2))");
+      });
+
+      it("should refresh contentKey when the operand's properties are changed", function() {
+        var filter  = new NotFilter({operand: {_: "=", p: "a", v: "1"}});
+
+        var contentKey0 = filter.contentKey;
+
+        filter.operand.value = 2;
+
+        expect(filter.contentKey).not.toBe(contentKey0);
+        expect(filter.contentKey).toBe("(not (= a 2))");
+      });
+    });
   }); // pentaho.type.filter.Not
 });

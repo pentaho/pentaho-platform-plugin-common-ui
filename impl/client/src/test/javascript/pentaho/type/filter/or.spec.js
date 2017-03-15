@@ -296,5 +296,31 @@ define([
 
     }); // #toSpec
 
+    describe("#contentKey", function() {
+
+      it("should return '(or filter1 filter2)'", function() {
+        var filter  = new OrFilter({operands: [
+          {_: "=", p: "a", v: 1},
+          {_: "=", p: "b", v: 2}
+        ]});
+
+        expect(filter.contentKey).toBe("(or (= a 1) (= b 2))");
+      });
+
+      it("should return '(or ) when there are no operands'", function() {
+        var filter  = new OrFilter({});
+
+        expect(filter.contentKey).toBe("(or )");
+      });
+
+      it("should sort child content keys alphabetically", function() {
+        var filter  = new OrFilter({operands: [
+          {_: "=", p: "b", v: 2},
+          {_: "=", p: "a", v: 1}
+        ]});
+
+        expect(filter.contentKey).toBe("(or (= a 1) (= b 2))");
+      });
+    });
   }); // pentaho.type.filter.Or
 });

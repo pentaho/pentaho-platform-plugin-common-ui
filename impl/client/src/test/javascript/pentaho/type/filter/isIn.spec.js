@@ -249,5 +249,25 @@ define([
 
     }); // #toSpec
 
+    describe("#contentKey", function() {
+
+      it("should return '(= propName value1Key value2Key)'", function() {
+        var filter  = new IsInFilter({property: "name", values: [1, 2]});
+
+        expect(filter.contentKey).toBe("(in name 1 2)");
+      });
+
+      it("should return '(= propName ) when no values are set'", function() {
+        var filter  = new IsInFilter({property: "name"});
+
+        expect(filter.contentKey).toBe("(in name )");
+      });
+
+      it("should return '(=  valueKey) when no property is set'", function() {
+        var filter  = new IsInFilter({values: [1, 2]});
+
+        expect(filter.contentKey).toBe("(in  1 2)");
+      });
+    });
   }); // pentaho.type.filter.IsIn
 });

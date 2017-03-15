@@ -62,6 +62,11 @@ define([
         return false;
       },
 
+      _buildContentKey: function() {
+        var o = this.operand;
+        return o ? o.contentKey : "";
+      },
+
       /**
        * Gets the operand of this filter.
        *

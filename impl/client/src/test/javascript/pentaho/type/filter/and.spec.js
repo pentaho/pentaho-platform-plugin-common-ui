@@ -231,7 +231,6 @@ define([
       });
     }); // #and
 
-
     describe("#toSpec", function() {
       var filter;
 
@@ -297,6 +296,32 @@ define([
 
     }); // #toSpec
 
+    describe("#contentKey", function() {
+
+      it("should return '(and filter1 filter2)'", function() {
+        var filter  = new AndFilter({operands: [
+          {_: "=", p: "a", v: 1},
+          {_: "=", p: "b", v: 2}
+        ]});
+
+        expect(filter.contentKey).toBe("(and (= a 1) (= b 2))");
+      });
+
+      it("should return '(and ) when there are no operands'", function() {
+        var filter  = new AndFilter({});
+
+        expect(filter.contentKey).toBe("(and )");
+      });
+
+      it("should sort child content keys alphabetically", function() {
+        var filter  = new AndFilter({operands: [
+          {_: "=", p: "b", v: 2},
+          {_: "=", p: "a", v: 1}
+        ]});
+
+        expect(filter.contentKey).toBe("(and (= a 1) (= b 2))");
+      });
+    });
   }); // pentaho.type.filter.And
 
 });

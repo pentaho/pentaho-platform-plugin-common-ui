@@ -82,6 +82,10 @@ define([
         return false;
       },
 
+      _buildContentKey: function() {
+        return (this.property || "") + " " + this.values.toArray(function(v) { return v.key; }).join(" ");
+      },
+
       type: /** @lends pentaho.type.filter.IsIn.Type# */{
         id: module.id,
         alias: "in",

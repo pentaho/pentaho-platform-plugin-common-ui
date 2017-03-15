@@ -87,6 +87,35 @@ define([
       },
 
       /**
+       * Gets a key that identifies the content of this filter.
+       *
+       * @type {string}
+       * @readOnly
+       */
+      get contentKey() {
+        return this.__contentKey || (this.__contentKey = "(" + this.type.shortId + " " + this._buildContentKey() + ")");
+      },
+
+      /**
+       * Builds the content key.
+       *
+       * The kind of filter is already added around what is returned by this method.
+       *
+       * @name _buildContentKey
+       * @memberOf pentaho.type.filter.Abstract#
+       * @method
+       * @return {string} The content key.
+       * @protected
+       * @abstract
+       */
+
+      _setVersionInternal: function(version) {
+        this.base(version);
+
+        this.__contentKey = null;
+      },
+
+      /**
        * Determines if an element is selected by this filter.
        *
        * When the filter is not valid, an error is thrown.

@@ -166,7 +166,7 @@ define([
       });
     }); // #visit
 
-    fdescribe("#toDnf()", function() {
+    describe("#toDnf()", function() {
 
       function createFilter(spec) {
         return AbstractFilter.type.create(spec);

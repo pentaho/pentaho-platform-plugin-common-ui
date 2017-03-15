@@ -58,6 +58,11 @@ define([
         return false;
       },
 
+      _buildContentKey: function() {
+        // Sorting makes content equality be independent of operand order.
+        return this.operands.toArray(function(o) { return o.contentKey; }).sort().join(" ");
+      },
+
       /**
        * Gets the list of operands of this filter.
        *
