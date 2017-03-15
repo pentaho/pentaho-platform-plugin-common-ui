@@ -58,6 +58,10 @@ define([
         return KnownFilterKind.Not;
       },
 
+      get isTerminal() {
+        return false;
+      },
+
       /**
        * Gets the operand of this filter.
        *

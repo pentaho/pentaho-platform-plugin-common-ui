@@ -166,5 +166,250 @@ define([
       });
     }); // #visit
 
+    fdescribe("#toDnf()", function() {
+
+      function createFilter(spec) {
+        return AbstractFilter.type.create(spec);
+      }
+
+      function specToDnf(spec) {
+        return createFilter(spec).toDnf();
+      }
+
+      function expectDnf(specIn, specOut) {
+        var fDnf = specToDnf(specIn);
+
+        if(specOut) {
+          expect(fDnf.toSpec({forceType: true})).toEqual(specOut);
+        }
+      }
+
+      it("should preserve a filter already in DNF", function() {
+        expectDnf({
+          _: "or"
+        }, {
+          _: "or"
+        });
+      });
+
+      it("should apply De Morgan Rule 1 - NOT over AND", function() {
+        expectDnf({
+          _: "not",
+          o: {_: "and", o: [{_: "=", p: "a", v: 1}]}
+        },
+        {_: "or",
+          o: [
+            {
+              _: "and",
+              o: [
+                {_: "not", o: {_: "=", p: "a", v: 1}}
+              ]
+            }
+          ]
+        });
+      });
+
+      it("should apply De Morgan Rule 2 - NOT over OR", function() {
+        expectDnf({
+          _: "not",
+          o: {
+            _: "or",
+            o: [
+                {_: "=", p: "a", v: 1}
+            ]
+          }
+        }, {
+          _: "or",
+          o: [
+            {
+              _: "and",
+              o: [
+                {
+                  _: "not",
+                  o: {_: "=", p: "a", v: 1}
+                }
+              ]
+            }
+          ]
+        });
+      });
+
+      it("should eliminate double-negations", function() {
+        expectDnf({
+          _: "not",
+          o: {
+            _: "not",
+            o: {
+              _: "or",
+              o: [
+                {_: "=", p: "a", v: 1}
+              ]
+            }
+          }
+        }, {
+          _: "or",
+          o: [
+            {
+              _: "and",
+              o: [
+                {_: "=", p: "a", v: 1}
+              ]
+            }
+          ]
+        });
+      });
+
+      it("should distribute AND over OR", function() {
+        expectDnf({
+          _: "and",
+          o: [
+            {
+              _: "or",
+              o: [
+                {
+                  _: "not",
+                  o: {_: "=", p: "a", v: 1}
+                }
+              ]
+            }
+          ]
+        }, {
+          _: "or",
+          o: [
+            {
+              _: "and",
+              o: [
+                {
+                  _: "not",
+                  o: {_: "=", p: "a", v: 1}
+                }
+              ]
+            }
+          ]
+        });
+      });
+
+      it("should distribute AND over OR - multiple OR terms", function() {
+        expectDnf({
+          _: "and",
+          o: [
+            {
+              _: "or",
+              o: [
+                {_: "not", o: {_: "=", p: "a", v: 1}},
+                {_: "=", p: "b", v: 1}
+              ]
+            }
+          ]
+        }, {
+          _: "or",
+          o: [
+            {
+              _: "and",
+              o: [
+                {_: "not", o: {_: "=", p: "a", v: 1}}
+              ]
+            },
+            {
+              _: "and",
+              o: [
+                {_: "=", p: "b", v: 1}
+              ]
+            }
+          ]
+        });
+      });
+
+      it("should distribute AND over OR - multiple AND and OR terms", function() {
+        expectDnf({
+          _: "and",
+          o: [
+            {
+              _: "or",
+              o: [
+                {_: "=", p: "a", v: 1},
+                {_: "=", p: "b", v: 1}
+              ]
+            },
+            {
+              _: "or",
+              o: [
+                {_: "=", p: "c", v: 1},
+                {_: "=", p: "d", v: 1}
+              ]
+            }
+          ]
+        }, {
+          _: "or",
+          o: [
+            {
+              _: "and",
+              o: [
+                {_: "=", p: "a", v: 1},
+                {_: "=", p: "c", v: 1}
+              ]
+            },
+            {
+              _: "and",
+              o: [
+                {_: "=", p: "a", v: 1},
+                {_: "=", p: "d", v: 1}
+              ]
+            },
+            {
+              _: "and",
+              o: [
+                {_: "=", p: "b", v: 1},
+                {_: "=", p: "c", v: 1}
+              ]
+            },
+            {
+              _: "and",
+              o: [
+                {_: "=", p: "b", v: 1},
+                {_: "=", p: "d", v: 1}
+              ]
+            }
+          ]
+        });
+      });
+
+      it("should allow subtraction", function() {
+        expectDnf({
+          _: "and",
+          o: [
+            {_: "=", p: "a", v: 1},
+            {
+              _: "not",
+              o: {
+                _: "or",
+                o: [
+                  {_: "=", p: "a", v: 1},
+                  {_: "=", p: "b", v: 2}
+                ]
+              }
+            }
+          ]
+        }, {
+          _: "or"
+        });
+
+        var result = {
+          _: 'or',
+          o: [
+            {
+              _: 'and',
+              o: [
+                {_: '=', p: 'a', v: 1 },
+                { _: 'not', o: { _: '=', p: 'a', v: 1 }},
+                { _: 'not', o: { _: '=', p: 'b', v: 2 }}
+              ]
+            }
+          ]
+        };
+
+      });
+    });
+
   }); // pentaho.type.filter.Abstract
 });

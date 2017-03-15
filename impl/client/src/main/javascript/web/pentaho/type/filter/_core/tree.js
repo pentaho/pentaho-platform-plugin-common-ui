@@ -54,6 +54,10 @@ define([
 
     filter.Tree = filter.Abstract.extend("pentaho.type.filter.Tree", /** @lends pentaho.type.filter.Tree# */{
 
+      get isTerminal() {
+        return false;
+      },
+
       /**
        * Gets the list of operands of this filter.
        *
@@ -140,7 +144,7 @@ define([
        */
       _visitDefault: function(transformer) {
         var opersOut = this.visitOperands(transformer);
-        return opersOut ? new this.constructor({operands: opersOut}) : this;
+        return opersOut ? new this.constructor({operands: opersOut}) : this.clone();
       },
 
       /**

@@ -73,6 +73,20 @@ define([
        */
 
       /**
+       * Gets a value that indicates if this filter is terminal.
+       * The non-terminal filters are
+       * [Or]{@link pentaho.type.filter.Or},
+       * [And]{@link pentaho.type.filter.And} and
+       * [Not]{@link pentaho.type.filter.Not}.
+       *
+       * @type {boolean}
+       * @readOnly
+       */
+      get isTerminal() {
+        return true;
+      },
+
+      /**
        * Determines if an element is selected by this filter.
        *
        * When the filter is not valid, an error is thrown.
@@ -142,7 +156,7 @@ define([
        * @see pentaho.type.filter.Tree#_visitDefault
        */
       _visitDefault: function(transformer) {
-        return this;
+        return this.clone();
       },
 
       /**
@@ -186,6 +200,14 @@ define([
         return new filter.And({operands: args});
       },
 
+      toDnf: function() {
+        return this
+            .visit(moveNotInward)
+            .visit(moveAndInward)
+            .visit(flattenTree)
+            .visit(ensureDnfTopLevel);
+      },
+
       type: /** @lends pentaho.type.filter.Abstract.Type# */{
         id: module.id,
 
@@ -197,11 +219,127 @@ define([
     filter.Abstract._core = filter;
 
     // Setup the remaining core classes
-    notFactory (filter);
+    notFactory(filter);
     treeFactory(filter);
-    andFactory (filter);
-    orFactory  (filter);
+    andFactory(filter);
+    orFactory(filter);
 
     return filter.Abstract;
+
+    function moveNotInward(f) {
+
+      if(f.kind === "not") {
+        var o = f.operand;
+        if(o && !o.isTerminal) {
+          /* eslint default-case: 0 */
+          switch(o.kind) {
+            case "and":
+              // 1. `NOT(A AND B) <=> NOT A OR  NOT B` - De Morgan 1 - NOT over AND
+              return new filter.Or({operands: o.operands.toArray(function(ao) {
+                return ao.negate().visit(moveNotInward);
+              })});
+
+            case "or":
+              // 2. `NOT(A OR B) <=> NOT A AND NOT B` - De Morgan 2 - NOT over OR
+              return new filter.And({operands: o.operands.toArray(function(oo) {
+                return oo.negate().visit(moveNotInward);
+              })});
+
+            case "not":
+              // 3. NOT(NOT(A)) <=> A - Double negation elimination
+              return o.operand && o.operand.visit(moveNotInward);
+          }
+        }
+      }
+    }
+
+    function moveAndInward(f) {
+
+      if(f.kind === "and") {
+
+        // 1. AND distributivity over OR
+        var i = -1;
+        var os = f.operands;
+        var L = os.count;
+        var osAndOther = [];
+        var or;
+        var ao;
+        while(++i < L) {
+          ao = os.at(i);
+          if(!or && ao.kind === "or") {
+            or = ao;
+          } else {
+            osAndOther.push(ao);
+          }
+        }
+
+        if(or) {
+          return new filter.Or({operands: or.operands.toArray(function(oo) {
+            return new filter.And({operands: osAndOther.concat(oo)}).visit(moveAndInward);
+          })});
+        }
+
+        return new filter.And({operands: osAndOther});
+      }
+    }
+
+    function flattenTree(f) {
+
+      var kind;
+
+      switch((kind = f.kind)) {
+        case "and":
+        case "or":
+
+          var i = -1;
+          var os = f.operands;
+          var L = os.count;
+          var osFlattened = [];
+
+          while(++i < L) {
+            // recurse in pre-order
+            var o = os.at(i).visit(moveAndInward);
+            if(o.kind === kind) {
+              osFlattened.push.apply(osFlattened, o.operands.toArray());
+            } else {
+              osFlattened.push(o);
+            }
+          }
+
+          return new f.constructor({operands: osFlattened});
+      }
+    }
+
+    function ensureDnfTopLevel(f) {
+
+      switch(f.kind) {
+        case "or":
+
+          var i = -1;
+          var os = f.operands;
+          var L = os.count;
+          var osAnds = [];
+
+          while(++i < L) {
+            var o = os.at(i);
+            if(o.kind !== "and") {
+              osAnds.push(new filter.And({operands: [o]}));
+            } else {
+              osAnds.push(o);
+            }
+          }
+
+          return new f.constructor({operands: osAnds});
+
+        case "and":
+          f = new filter.Or({operands: [f]});
+          break;
+
+        default:
+          f = new filter.Or({operands: new filter.And({operands: [f]})});
+      }
+
+      return f;
+    }
   };
 });
