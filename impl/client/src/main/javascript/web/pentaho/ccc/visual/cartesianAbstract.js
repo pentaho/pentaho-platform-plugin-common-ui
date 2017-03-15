@@ -65,7 +65,7 @@ define([
         if(title) this.options[axisType + "AxisTitle"] = title;
       },
 
-      /**
+      /*
        * Builds a title composed of the label of the single attribute
        * of the role, or empty, if the role has more than one attribute.
        */
@@ -93,8 +93,8 @@ define([
             .where(def.truthy)
             .array();
 
-        var last = labels.pop(),
-            first = labels.join(", ");
+        var last = labels.pop();
+        var first = labels.join(", ");
         if(first && last) {
           return bundle.get("axis.title.multipleDimText", [first, last]);
         }
@@ -124,13 +124,14 @@ define([
       },
 
       _configureAxisDisplayUnits: function(primary, axisType, allowFractional) {
-        if(!allowFractional)
+        if(!allowFractional && axisType !== "ortho") {
           this.options[axisType + "AxisTickExponentMin"] = 0; // 10^0 => 1
+        }
 
-        var propName = "displayUnits" + (primary ? "" : "Secondary"),
-            displayUnitsElem = this.model.get(propName),
-            displayUnitsType = this.model.type.get(propName).type,
-            scaleFactor = displayUnitsType.scaleFactorOf(displayUnitsElem.value);
+        var propName = "displayUnits" + (primary ? "" : "Secondary");
+        var displayUnitsElem = this.model.get(propName);
+        var displayUnitsType = this.model.type.get(propName).type;
+        var scaleFactor = displayUnitsType.scaleFactorOf(displayUnitsElem.value);
 
         this._cartesianAxesDisplayUnitsText[axisType] =
             scaleFactor > 1 ? displayUnitsType.domain.get(displayUnitsElem).toString() : "";
