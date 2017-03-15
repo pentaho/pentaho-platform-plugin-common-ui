@@ -905,43 +905,43 @@ pentaho.pda.query.mql.prototype.getMQLFilterXML = function(mqlCondition) {
   return xml;
 }
 
-pentaho.pda.query.mql.prototype.getFilterConditionString = function( columnId, category, operator, value, parameterized, parameters, aggregationType ) {
+pentaho.pda.query.mql.prototype.getFilterConditionString = function( columnId, category, operator, value, parameterName, parameters, aggregationType ) {
   operator = operator.toUpperCase();
   var column = this.model.getColumnById( columnId );
   var operand = '[' + category + '.' + columnId + (aggregationType ? '.' + aggregationType : '') + ']';
   var isArrayValues = value.constructor.toString().indexOf("Array") != -1;
   if( operator == pentaho.pda.Column.CONDITION_TYPES.LIKE ) {
-    return 'LIKE('+operand+';"%'+this.getFilterValueString(column, value, parameterized, parameters)+'%")';
+    return 'LIKE('+operand+';"%'+this.getFilterValueString(column, value, parameterName, parameters)+'%")';
   }
   else if( operator == pentaho.pda.Column.CONDITION_TYPES.EQUAL && (!isArrayValues || value.length == 1)) {
-    return 'EQUALS('+operand+';'+this.getFilterValueString(column, value, parameterized, parameters) + ')';
+    return 'EQUALS('+operand+';'+this.getFilterValueString(column, value, parameterName, parameters) + ')';
   }
   else if( operator == pentaho.pda.Column.CONDITION_TYPES.EQUAL && isArrayValues) {
-    return 'IN('+operand+';'+this.getFilterValueString(column, value, parameterized, parameters)+")";
+    return 'IN('+operand+';'+this.getFilterValueString(column, value, parameterName, parameters)+")";
   }
   else if( operator == pentaho.pda.Column.CONDITION_TYPES.LESS_THAN ) {
-    return operand+' <'+this.getFilterValueString(column, value, parameterized, parameters);
+    return operand+' <'+this.getFilterValueString(column, value, parameterName, parameters);
   }
   else if( operator == pentaho.pda.Column.CONDITION_TYPES.LESS_THAN_OR_EQUAL ) {
-    return operand+' <='+this.getFilterValueString(column, value, parameterized, parameters);
+    return operand+' <='+this.getFilterValueString(column, value, parameterName, parameters);
   }
   else if( operator == pentaho.pda.Column.CONDITION_TYPES.MORE_THAN ) {
-    return operand+' >'+this.getFilterValueString(column, value, parameterized, parameters);
+    return operand+' >'+this.getFilterValueString(column, value, parameterName, parameters);
   }
   else if( operator == pentaho.pda.Column.CONDITION_TYPES.MORE_THAN_OR_EQUAL ) {
-    return operand+' >='+this.getFilterValueString(column, value, parameterized, parameters);
+    return operand+' >='+this.getFilterValueString(column, value, parameterName, parameters);
   }
   else if( operator == pentaho.pda.Column.CONDITION_TYPES.CONTAINS) {
-    return 'CONTAINS('+operand+';'+this.getFilterValueString(column, value, parameterized, parameters)+")";
+    return 'CONTAINS('+operand+';'+this.getFilterValueString(column, value, parameterName, parameters)+")";
   }
   else if( operator == pentaho.pda.Column.CONDITION_TYPES.NOT_CONTAINS) {
-    return 'NOT(CONTAINS('+operand+';'+this.getFilterValueString(column, value, parameterized, parameters)+"))";
+    return 'NOT(CONTAINS('+operand+';'+this.getFilterValueString(column, value, parameterName, parameters)+"))";
   }
   else if( operator == pentaho.pda.Column.CONDITION_TYPES.BEGINSWITH) {
-    return 'BEGINSWITH('+operand+';'+this.getFilterValueString(column, value, parameterized, parameters)+")";
+    return 'BEGINSWITH('+operand+';'+this.getFilterValueString(column, value, parameterName, parameters)+")";
   }
   else if( operator == pentaho.pda.Column.CONDITION_TYPES.ENDSWITH) {
-    return 'ENDSWITH('+operand+';'+this.getFilterValueString(column, value, parameterized, parameters)+")";
+    return 'ENDSWITH('+operand+';'+this.getFilterValueString(column, value, parameterName, parameters)+")";
   }
   else if( operator == pentaho.pda.Column.CONDITION_TYPES.IS_NULL) {
     return 'ISNA('+operand+')';
@@ -951,15 +951,15 @@ pentaho.pda.query.mql.prototype.getFilterConditionString = function( columnId, c
   }
 }
 
-pentaho.pda.query.mql.prototype.getFilterValueString = function( column, value, parameterized, parameters ) {
+pentaho.pda.query.mql.prototype.getFilterValueString = function( column, value, parameterName, parameters ) {
   if (value == null) {
     return '';
   }
-  if (parameterized) {
+  if ( parameterName && parameterName != null && parameterName.length > 0 ) {
     // If this filter is parameterized it's value is the name of the parameter
     // see if we have parameters
     for(var idx=0; idx<parameters.length; idx++) {
-      if( parameters[idx].name === value[0] ) {
+      if( parameters[idx].name === parameterName ) {
         // this has a parameter
         var param = '[param:'+parameters[idx].name+']';
         if( column.dataType == pentaho.pda.Column.DATA_TYPES.DATE ) {
