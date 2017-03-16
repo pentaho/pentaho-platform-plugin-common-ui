@@ -23,9 +23,10 @@ define([
   "./_core/true",
   "./_core/false",
   "../../util/arg",
-  "../../util/error"
+  "../../util/error",
+  "../../util/object"
 ], function(module, complexFactory, treeFactory, andFactory, orFactory, notFactory,
-            trueFactory, falseFactory, arg, error) {
+            trueFactory, falseFactory, arg, error, O) {
 
   "use strict";
 
@@ -249,7 +250,7 @@ define([
             .visit(moveAndInward)
             .visit(flattenTree)
             .visit(ensureDnfTopLevel)
-            .visit(simplifyDnf);
+            .visit(simplifyDnfTopLevel);
       },
 
       type: /** @lends pentaho.type.filter.Abstract.Type# */{
@@ -273,28 +274,33 @@ define([
     return filter.Abstract;
 
     function moveNotInward(f) {
+      var o;
+      if(f.kind === "not" && (o = f.operand)) {
+        /* eslint default-case: 0 */
+        switch(o.kind) {
+          case "and":
+            // 1. `NOT(A AND B) <=> NOT A OR  NOT B` - De Morgan 1 - NOT over AND
+            return new filter.Or({operands: o.operands.toArray(function(ao) {
+              return ao.negate().visit(moveNotInward);
+            })});
 
-      if(f.kind === "not") {
-        var o = f.operand;
-        if(o && !o.isTerminal) {
-          /* eslint default-case: 0 */
-          switch(o.kind) {
-            case "and":
-              // 1. `NOT(A AND B) <=> NOT A OR  NOT B` - De Morgan 1 - NOT over AND
-              return new filter.Or({operands: o.operands.toArray(function(ao) {
-                return ao.negate().visit(moveNotInward);
-              })});
+          case "or":
+            // 2. `NOT(A OR B) <=> NOT A AND NOT B` - De Morgan 2 - NOT over OR
+            return new filter.And({operands: o.operands.toArray(function(oo) {
+              return oo.negate().visit(moveNotInward);
+            })});
 
-            case "or":
-              // 2. `NOT(A OR B) <=> NOT A AND NOT B` - De Morgan 2 - NOT over OR
-              return new filter.And({operands: o.operands.toArray(function(oo) {
-                return oo.negate().visit(moveNotInward);
-              })});
+          case "not":
+            // 3. NOT(NOT(A)) <=> A - Double negation elimination
+            return o.operand && o.operand.visit(moveNotInward);
 
-            case "not":
-              // 3. NOT(NOT(A)) <=> A - Double negation elimination
-              return o.operand && o.operand.visit(moveNotInward);
-          }
+          case "true":
+            // 3. NOT(TRUE) <=> FALSE
+            return new filter.False();
+
+          case "false":
+            // 3. NOT(FALSE) <=> TRUE
+            return new filter.True();
         }
       }
     }
@@ -302,30 +308,67 @@ define([
     function moveAndInward(f) {
 
       if(f.kind === "and") {
-
         // 1. AND distributivity over OR
         var i = -1;
         var os = f.operands;
         var L = os.count;
         var osAndOther = [];
-        var or;
+        var ors = [];
         var ao;
+
         while(++i < L) {
-          ao = os.at(i);
-          if(!or && ao.kind === "or") {
-            or = ao;
+          ao = os.at(i).visit(moveAndInward);
+          if(ao.kind === "or") {
+            ors.push(ao);
           } else {
             osAndOther.push(ao);
           }
         }
 
-        if(or) {
-          return new filter.Or({operands: or.operands.toArray(function(oo) {
-            return new filter.And({operands: osAndOther.concat(oo)}).visit(moveAndInward);
-          })});
+        var LOr = ors.length;
+        if(LOr) {
+          // One And operand per permutation of `or` operands
+          //  2   2   3  - # operands
+          //
+          // or1 or2 or3
+          //  1   1   1
+          //  1   1   2
+          //  1   1   3
+          //  1   2   1
+          //  1   2   2
+          //  1   2   3
+          //  2   1   1
+          //  2   1   2
+          //  2   1   3
+          //  2   2   1
+          //  2   2   2
+          //  2   2   3
+          var ands = [];
+          var andOperands = new Array(LOr).concat(osAndOther);
+
+          buildAndOperandsRecursive(ands, andOperands, ors, 0);
+
+          return new filter.Or({operands: ands});
         }
 
         return new filter.And({operands: osAndOther});
+      }
+    }
+
+    function buildAndOperandsRecursive(ands, andOperands, ors, iOr) {
+      if(iOr < ors.length) {
+
+        var iOrNext = iOr + 1;
+        var os = ors[iOr].operands;
+        var L = os.count;
+        var i = -1;
+
+        while(++i < L) {
+          andOperands[iOr] = os.at(i);
+          buildAndOperandsRecursive(ands, andOperands, ors, iOrNext);
+        }
+      } else {
+        ands.push(new filter.And({operands: andOperands.slice()}));
       }
     }
 
@@ -344,7 +387,7 @@ define([
 
           while(++i < L) {
             // recurse in pre-order
-            var o = os.at(i).visit(moveAndInward);
+            var o = os.at(i).visit(flattenTree);
             if(o.kind === kind) {
               osFlattened.push.apply(osFlattened, o.operands.toArray());
             } else {
@@ -359,6 +402,10 @@ define([
     function ensureDnfTopLevel(f) {
 
       switch(f.kind) {
+        case "true":
+        case "false":
+          break;
+
         case "or":
 
           var i = -1;
@@ -368,10 +415,13 @@ define([
 
           while(++i < L) {
             var o = os.at(i);
-            if(o.kind !== "and") {
-              osAnds.push(new filter.And({operands: [o]}));
-            } else {
-              osAnds.push(o);
+            switch(o.kind) {
+              // early true/false detection
+              case "true": return new filter.True();
+              case "false": continue;
+              case "and": osAnds.push(o); break;
+              default:
+                osAnds.push(new filter.And({operands: [o]}));
             }
           }
 
@@ -388,11 +438,7 @@ define([
       return f;
     }
 
-    function simplifyDnf(f) {
-
-      // NOTE: AND() <=> True
-      // NOTE:  OR() <=> False
-      // NOTE:  OR(AND()) <=> True
+    function simplifyDnfTopLevel(f) {
 
       // -- Duplicates --
       // 1) AND(A, A) <=> AND(A)
@@ -400,60 +446,163 @@ define([
 
       // -- Neutral Operand Elimination --
       // 3) AND( .. True .. ) <=> AND( .. .. )
-      //    Cannot happen, atm
-
       // 4)  OR( .. False .. ) <=> OR( .. .. )
-      //     OR( .. AND(A, NOT(A)) ..)
 
       // -- AND/OR Elimination --
-      // 3) AND( .. False .. ) <=> False
-      //    Cannot happen, atm
-
-      // 4)  OR( .. True .. ) <=> True
-      //     OR( .. AND() .. ) <=> OR(AND()) <=> True
+      // 5) AND( .. False .. ) <=> False
+      // 6)  OR( .. True .. ) <=> True
 
       // -- NOT Elimination --
-      // 5) NOT(True) <=> False
-      //    Cannot happen, atm
-
-      // 6) NOT(False) <=> True
-      //    Cannot happen, atm
+      // 7) NOT(True) <=> False (already eliminated above)
+      // 8) NOT(False) <=> True (already eliminated above)
 
       // -- XYZ --
-      // 7) AND(A, NOT(A)) <=> False - Law of non-contradiction
+      // 9) AND(A, NOT(A)) <=> False - Law of non-contradiction
       //    can occur within an OR
       //
-      // 8) OR (A, NOT(A)) <=> True  - Law of excluded middle
+      // 10) OR (A, NOT(A)) <=> True  - Law of excluded middle
       //    cannot occur cause DNF's ORs always contain direct ANDs, and never NOTs.
 
-      switch(f.kind) {
-        case "or":
+      // 11): AND() <=> True
+      // 12):  OR() <=> False
+      // NOTE:  OR(AND()) <=> True
 
-          var i = -1;
-          var os = f.operands;
-          var L = os.count;
-          var osAnds = [];
+      // Remove Nots of properties who have equals to other values
 
-          while(++i < L) {
-            var o = os.at(i);
-            if(o.kind !== "and") {
-              osAnds.push(new filter.And({operands: [o]}));
-            } else {
-              osAnds.push(o);
-            }
-          }
+      // TopLevel = Or | True | False
+      return f.kind === "or" ? simplifyDnfOr(f) : f;
+    }
 
-          return new f.constructor({operands: osAnds});
+    function simplifyDnfOr(f) {
+      // 2)  OR(A, A) <=>  OR(A)
+      // 4)  OR( .. False .. ) <=> OR( .. .. )
+      // 6)  OR( .. True .. ) <=> True
+      // 10) OR (A, NOT(A)) <=> True  - Law of excluded middle (cannt occur in DNF)
+      // 12) OR() <=> False
+      var andsByKey = {};
+      var andsNew = [];
 
-        case "and":
-          f = new filter.Or({operands: [f]});
-          break;
+      var i = -1;
+      var ands = f.operands;
+      var L = ands.count;
+      while(++i < L) {
 
-        default:
-          f = new filter.Or({operands: new filter.And({operands: [f]})});
+        // assert ands.at(i).kind === "and"
+
+        var o = ands.at(i).visit(simplifyDnfAnd);
+        switch(o.kind) {
+          case "true": return new filter.True(); // 6)
+          case "false": continue; // 4)
+        }
+
+        // assert o.kind === "and"
+
+        var key = o.contentKey;
+
+        // 2) Duplicate And? -> Ignore.
+        if(O.hasOwn(andsByKey, key)) continue;
+
+        andsByKey[key] = o;
+        andsNew.push(o);
       }
 
-      return f;
+      if(!andsNew.length) return new filter.False(); // 12)
+
+      return new filter.Or({operands: andsNew});
+    }
+
+    function simplifyDnfAnd(f) {
+      // 1)  AND(A, A) <=> AND(A)
+      // 3)  AND( .. True .. ) <=> AND( .. .. )
+      // 5)  AND( .. False .. ) <=> False
+      // 9)  AND(A, NOT(A)) <=> False - Law of non-contradiction
+      // 11) AND() <=> True
+      // 13) Cannot be equal to two things at the same time
+      //     AND((= p1 1) (= p1 2)) <=> False
+      // 14) Ignore property **not equal** when already have property equal to a != value
+      //     AND((= p1 1) (not (= p1 2))) <=> AND((= p1 1))
+
+      var osByKey = {};
+
+      // +propName -> []   (positive)
+      // -propName -> []   (negated)
+      var equalsByPropName = {};
+      var osNew = [];
+
+      var i = -1;
+      var os = f.operands;
+      var L = os.count;
+      while(++i < L) {
+        var o = os.at(i);
+        var isNot = false;
+        var p;
+        switch(o.kind) {
+          case "false": return new filter.False(); // 5)
+          case "true": continue; // 3)
+          case "not": isNot = true; break;
+        }
+
+        var key = o.contentKey;
+
+        // 2) Duplicate operand? -> Ignore.
+        if(O.hasOwn(osByKey, key)) continue;
+
+        if(isNot) {
+          var oo = o.operand;
+          if(oo) {
+            // 9) Law of non-contradiction
+            if(O.hasOwn(osByKey, oo.contentKey)) {
+              // Already have non-negated operand
+              return new filter.False();
+            }
+
+            if(oo.kind === "isEqual" && (p = oo.property)) {
+              // 14) Ignore property **not equal** when already have property equal to a != value
+              //     If present in equalsByPropName, then it must be for a != value, or the key test above, (9),
+              //     would have caught it.
+              if(O.hasOwn(equalsByPropName, "+" + p)) {
+                continue;
+              }
+              (equalsByPropName["-" + p] || (equalsByPropName["-" + p] = [])).push(o);
+            }
+          }
+        } else {
+          // 9) Law of non-contradiction
+          if(O.hasOwn(osByKey, "(not " + key + ")")) {
+            // Already have negated operand
+            return new filter.False();
+          }
+
+          if(o.kind === "isEqual" && (p = o.property)) {
+
+            // 13) Cannot be equal to two things at the same time.
+            //     If present in equalsByPropName, then it must be for a != value, or the key test above, (2),
+            //     would have caught it.
+            if(O.hasOwn(equalsByPropName, "+" + p)) {
+              return new filter.False();
+            }
+
+            (equalsByPropName["+" + p] || (equalsByPropName["+" + p] = [])).push(o);
+
+            // 14) If property **equal** and already have property **not equal** to a != value
+            //     Remove the property not equal...
+            //     If present in equalsByPropName, then it must be for a != value, or the key test above, (9),
+            //     would have caught it.
+            var notEqual = O.getOwn(equalsByPropName, "-" + p);
+            if(notEqual) {
+              osNew.splice(osNew.indexOf(notEqual), 1);
+              delete osByKey[notEqual.contentKey];
+            }
+          }
+        }
+
+        osByKey[key] = o;
+        osNew.push(o);
+      }
+
+      if(!osNew.length) return new filter.True(); // 11)
+
+      return new filter.And({operands: osNew});
     }
   };
 });

@@ -184,15 +184,47 @@ define([
         }
       }
 
-      it("should preserve a filter already in DNF", function() {
+      it("should convert an empty `or` to false", function() {
+
         expectDnf({
           _: "or"
         }, {
-          _: "or"
+          _: "false"
+        });
+      });
+
+      it("should convert an empty `and` to false", function() {
+
+        expectDnf({
+          _: "and"
+        }, {
+          _: "true"
+        });
+      });
+
+      it("should preserve a filter already in DNF", function() {
+
+        expectDnf({
+          _: "or",
+          o: [
+            {
+              _: "and",
+              o: [{_: "=", p: "a", v: 1}]
+            }
+          ]
+        }, {
+          _: "or",
+          o: [
+            {
+              _: "and",
+              o: [{_: "=", p: "a", v: 1}]
+            }
+          ]
         });
       });
 
       it("should apply De Morgan Rule 1 - NOT over AND", function() {
+
         expectDnf({
           _: "not",
           o: {_: "and", o: [{_: "=", p: "a", v: 1}]}
@@ -210,6 +242,7 @@ define([
       });
 
       it("should apply De Morgan Rule 2 - NOT over OR", function() {
+
         expectDnf({
           _: "not",
           o: {
@@ -235,6 +268,7 @@ define([
       });
 
       it("should eliminate double-negations", function() {
+
         expectDnf({
           _: "not",
           o: {
@@ -260,6 +294,7 @@ define([
       });
 
       it("should distribute AND over OR", function() {
+
         expectDnf({
           _: "and",
           o: [
@@ -290,6 +325,7 @@ define([
       });
 
       it("should distribute AND over OR - multiple OR terms", function() {
+
         expectDnf({
           _: "and",
           o: [
@@ -321,6 +357,7 @@ define([
       });
 
       it("should distribute AND over OR - multiple AND and OR terms", function() {
+
         expectDnf({
           _: "and",
           o: [
@@ -375,6 +412,7 @@ define([
       });
 
       it("should allow subtraction", function() {
+
         expectDnf({
           _: "and",
           o: [
@@ -391,25 +429,49 @@ define([
             }
           ]
         }, {
-          _: "or"
+          _: "false"
         });
+      });
 
-        var result = {
-          _: 'or',
+      it("should allow subtraction ii", function() {
+        // tuple 1 - {a: 1, b: 2}
+        var tuple1 = {
+          _: "and",
           o: [
-            {
-              _: 'and',
-              o: [
-                {_: '=', p: 'a', v: 1 },
-                { _: 'not', o: { _: '=', p: 'a', v: 1 }},
-                { _: 'not', o: { _: '=', p: 'b', v: 2 }}
-              ]
-            }
+            {_: "=", p: "a", v: 1},
+            {_: "=", p: "b", v: 2}
           ]
         };
 
+        // tuple 2 - {a: 3, b: 4}
+        var tuple2 = {
+          _: "and",
+          o: [
+            {_: "=", p: "a", v: 3},
+            {_: "=", p: "b", v: 4}
+          ]
+        };
+
+        // tuple 3 - {a: 5, b: 6}
+        var tuple3 = {
+          _: "and",
+          o: [
+            {_: "=", p: "a", v: 5},
+            {_: "=", p: "b", v: 6}
+          ]
+        };
+
+        var originalDnf = {_: "or", o: [tuple1, tuple2]}
+
+        var removeDnf = {
+          _: "or",
+          o: [tuple1, tuple3]
+        };
+
+        expectDnf(
+          {_: "and", o: [originalDnf, {_: "not", o: removeDnf}]},
+          {_: "or", o: [tuple2]});
       });
     });
-
   }); // pentaho.type.filter.Abstract
 });
