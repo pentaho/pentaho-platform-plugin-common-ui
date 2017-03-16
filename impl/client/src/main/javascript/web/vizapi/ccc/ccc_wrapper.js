@@ -4447,7 +4447,9 @@ define([
         'maxValues',
         'metrics',
         'palette',
-        'selections'
+        'selections',
+
+        'vizApiVersion'
     ],
     def.retTrue);
 
