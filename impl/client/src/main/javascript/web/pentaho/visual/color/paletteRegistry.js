@@ -20,6 +20,8 @@ define([
 
   "use strict";
 
+  var defaultVizApiPalette = "viz_api_all_colors";
+
   /**
    * @name PaletteRegistry
    * @memberOf pentaho.visual.color
@@ -255,68 +257,40 @@ define([
 
   var paletteRegistry = new ColorPaletteRegistry();
 
-  paletteRegistry.add({
-    name: "palette 1", // TODO: Give this a meaningful name!
-    colors: [
-      "#336699",
-      "#99CCFF",
-      "#999933",
-      "#666699",
-      "#CC9933",
-      "#006666",
-      "#3399FF",
-      "#993300",
-      "#CCCC99",
-      "#666666",
-      "#FFCC66",
-      "#6699CC",
-      "#663366"
-    ]
-  });
+  // region Viz API 3.0 palettes
+  var viz_api_neutral = [
+    "#005EAA", "#03A9F4", "#FF7900", "#F2C249", "#5F43C4", "#946FDD",
+    "#00845B", "#18C482", "#5B5B5B", "#C6C6C6", "#B71C1C", "#F75B57"
+  ];
+  paletteRegistry.add({name: "viz_api_neutral", colors: viz_api_neutral});
 
-  paletteRegistry.add({
-    name: "palette 2", // TODO: Give this a meaningful name!
-    colors: [
-      "#880a0f",
-      "#b09a6b",
-      "#772200",
-      "#c52f0d",
-      "#123d82",
-      "#4a0866",
-      "#ffaa00",
-      "#1e8ad3",
-      "#aa6611",
-      "#8b2834",
-      "#333333"
-    ]
-  });
+  var viz_api_light = [
+    "#80AFD5", "#81D4FA", "#FFBC80", "#F8E1A4", "#AFA1E2", "#C9B7EE",
+    "#80C2AD", "#8BE2C1", "#ADADAD", "#E2E2E2", "#DB8E8E", "#FBADAB"
+  ];
+  paletteRegistry.add({name: "viz_api_light", colors: viz_api_light});
 
-  paletteRegistry.add({
-    name: "palette 3", // TODO: Give this a meaningful name!
-    colors: [
-      "#387179",
-      "#626638",
-      "#A8979A",
-      "#B09A6B",
-      "#772200",
-      "#C52F0D",
-      "#123D82",
-      "#4A0866",
-      "#445500",
-      "#FFAA00",
-      "#1E8AD3",
-      "#AA6611"
-    ]
-  });
+  var viz_api_dark = [
+    "#002644", "#014462", "#663000", "#604E1D", "#261B4E", "#3B2C58",
+    "#003524", "#094E34", "#242424", "#4F4F4F", "#490B0B", "#632422"
+  ];
+  paletteRegistry.add({name: "viz_api_dark", colors: viz_api_dark});
+
+  paletteRegistry.add({name: defaultVizApiPalette, colors: viz_api_neutral.concat(viz_api_light, viz_api_dark)});
+  // endregion
 
   paletteRegistry.add({name: "ryg-3",  colors: ["#FF0000", "#FFFF00", "#008000"]});
   paletteRegistry.add({name: "ryg-5",  colors: ["#FF0000", "#FFBF3F", "#FFFF00", "#BFDF3F", "#008000"]});
+
   paletteRegistry.add({name: "ryb-3",  colors: ["#FF0000", "#FFFF00", "#4BB6E4"]});
   paletteRegistry.add({name: "ryb-5",  colors: ["#FF0000", "#FFBF3F", "#FFFF00", "#DCDDDE", "#4BB6E4"]});
+
   paletteRegistry.add({name: "blue-3", colors: ["#CBE7FF", "#33A1FF", "#0345A9"]});
   paletteRegistry.add({name: "blue-5", colors: ["#CBE7FF", "#99D0FF", "#33A1FF", "#006ECC", "#0345A9"]});
+
   paletteRegistry.add({name: "gray-3", colors: ["#E6E6E6", "#999999", "#333333"]});
   paletteRegistry.add({name: "gray-5", colors: ["#E6E6E6", "#CCCCCC", "#999999", "#666666", "#333333"]});
 
   return paletteRegistry;
+
 });

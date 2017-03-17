@@ -242,25 +242,29 @@ define(["pentaho/visual/color/paletteRegistry"], function(singletonPaletteRegist
       expect(singletonPaletteRegistry instanceof PaletteRegistry).toBe(true);
     });
 
-    it("should be pre-loaded with eleven palettes", function() {
+    it("should be pre-loaded with twelve palettes", function() {
 
       var palettes = singletonPaletteRegistry.getAll();
       expect(palettes instanceof Array).toBe(true);
 
-      // TODO: Temporarily, 15 palettes (and not 11) due to the palettes registered by CDF.
-      expect(palettes.length).toBe(15);
+      // TODO: Temporarily, 16 palettes (and not 12) due to the palettes registered by CDF.
+      expect(palettes.length).toBe(16);
     });
 
-    it("should contain a palette named 'palette 1'", function() {
-      expect(singletonPaletteRegistry.get("palette 1")).toBeTruthy();
+    it("should contain a palette named 'viz_api_neutral'", function() {
+      expect(singletonPaletteRegistry.get("viz_api_neutral")).toBeTruthy();
     });
 
-    it("should contain a palette named 'palette 2'", function() {
-      expect(singletonPaletteRegistry.get("palette 2")).toBeTruthy();
+    it("should contain a palette named 'viz_api_light'", function() {
+      expect(singletonPaletteRegistry.get("viz_api_light")).toBeTruthy();
     });
 
-    it("should contain a palette named 'palette 3'", function() {
-      expect(singletonPaletteRegistry.get("palette 3")).toBeTruthy();
+    it("should contain a palette named 'viz_api_dark'", function() {
+      expect(singletonPaletteRegistry.get("viz_api_dark")).toBeTruthy();
+    });
+
+    it("should contain a palette named 'viz_api_all_colors'", function() {
+      expect(singletonPaletteRegistry.get("viz_api_all_colors")).toBeTruthy();
     });
   });
 });
