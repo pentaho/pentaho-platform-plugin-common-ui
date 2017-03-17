@@ -128,6 +128,7 @@ define([
         this.base(version);
 
         this.__contentKey = null;
+        this.__toDnfCache = null;
       },
 
       /**
@@ -213,7 +214,7 @@ define([
       },
 
       /**
-       * Creates a filter that is the union between this filter and a variable number of other filters.
+       * Creates a filter that is the disjunction (union) between this filter and a variable number of other filters.
        *
        * @param {...pentaho.type.filter.Abstract[]} filters - The filters to be joined with this one.
        *
@@ -229,7 +230,8 @@ define([
       },
 
       /**
-       * Creates a filter that is the intersection between this filter and a variable number of other filters.
+       * Creates a filter that is the conjunction (intersection) between this filter and
+       * a variable number of other filters.
        *
        * @param {...pentaho.type.filter.Abstract[]} filters - The filters to be intersected with this one.
        *
@@ -244,13 +246,114 @@ define([
         return new filter.And({operands: args});
       },
 
+      /**
+       * Creates a filter that is the "difference" between this filter and a variable number of other filters.
+       *
+       * This operation is implemented in such a way as to not cause the term explosion that can easily occur if
+       * one would try to convert the result of a naive implementation to DNF:
+       *
+       * ```js
+       * var result = this.and(filter.negate());
+       *
+       * var willIEverGetAResult = result.toDnf();
+       * ```
+       *
+       * This implementation works first by converting both this filter and the `exclude` argument to DNF,
+       * assuming that these can be so converted in a reasonable time.
+       *
+       * @param {pentaho.type.filter.Abstract} exclude - The filter to be "subtracted" from this one.
+       *
+       * @return {!pentaho.type.filter.Abstract} The resulting filter.
+       */
+      andNot: function(exclude) {
+        if(!exclude)
+          return this;
+
+        var currentDnf = this.toDnf();
+        switch(currentDnf.kind) {
+          case "false": return currentDnf; // false \ ? = false
+          case "true": return exclude.negate(); // true \ ?  = !?
+        }
+
+        var excludeDnf = exclude.toDnf();
+        switch(excludeDnf.kind) {
+          case "false": return this; // ? \ false = ?
+          case "true": return new filter.False(); // ? \ true = false
+        }
+
+        // Remove from `current`, any `and` that also exists in exclude.
+
+        // Index exclude Ands by contentKey.
+        var excludeKeys = {};
+        excludeDnf.operands.each(function(and) { excludeKeys[and.contentKey] = and; });
+
+        var remainings = [];
+        currentDnf.operands.each(function(and) {
+          var key = and.contentKey;
+          // Exact match?
+          if(O.hasOwn(excludeKeys, key)) {
+            // Assuming that this excludeAnd would not included in any other currentDnf `and`.
+            // This is somewhat reasonable, if we assume that the original `currentDnf`
+            // did not contain totally subsumed terms... ?
+            // delete excludeKeys[key];
+          } else {
+            remainings.push(and);
+          }
+        });
+
+        // What to do with remainingKeys?
+        // While these did not match exactly any of the current ands, they may, for example,
+        // **include** any of the current `and`
+        // For example, `(and (= Country PT))` **includes** `(and (= Country PT) (= City Lisbon))`
+        // So, excluding the former, indirectly excludes the latter.
+        // The same would apply to isBetween-like filters.
+        // Still N * M complexity...
+        //
+        // Thinking the other way round:
+        // (and (= Country PT) (= City Lisbon)) \ (and (= Country PT))
+        // -> False -> nothing remains...
+        var excludeKeysArray = Object.keys(excludeKeys);
+        var j = -1;
+        var K = excludeKeysArray.length;
+        while(++j < K) {
+          var i = remainings.length;
+          if(!i) break;
+
+          var excludeKey = excludeKeysArray[j];
+          var excludeAnd = excludeKeys[excludeKey];
+
+          //var excludeAndNeg = excludeAnd.negate();
+
+          // Match this against every `remainings`.
+
+          while(i--) {
+            var diff = new filter.And({operands: [remainings[i], excludeAnd.negate()]}).toDnf();
+            if(diff.kind === "false") {
+              // nothing remained.
+              remainings.splice(i, 1);
+            } else {
+              // replace with remainder.
+              remainings[i] = diff;
+            }
+          }
+        }
+
+        return remainings.length
+            ? new filter.Or({operands: remainings})
+            : new filter.False();
+      },
+
       toDnf: function() {
-        return this
-            .visit(moveNotInward)
-            .visit(moveAndInward)
-            .visit(flattenTree)
-            .visit(ensureDnfTopLevel)
-            .visit(simplifyDnfTopLevel);
+        var result = this.__toDnfCache;
+        if(!result) {
+          this.__toDnfCache = result = this
+              .visit(moveNotInward)
+              .visit(moveAndInward)
+              .visit(flattenTree)
+              .visit(ensureDnfTopLevel)
+              .visit(simplifyDnfTopLevel);
+        }
+        return result;
       },
 
       type: /** @lends pentaho.type.filter.Abstract.Type# */{
@@ -369,8 +472,8 @@ define([
         }
       } else {
         ands.push(new filter.And({operands: andOperands.slice()}));
+        }
       }
-    }
 
     function flattenTree(f) {
 
@@ -389,9 +492,9 @@ define([
             // recurse in pre-order
             var o = os.at(i).visit(flattenTree);
             if(o.kind === kind) {
-              osFlattened.push.apply(osFlattened, o.operands.toArray());
+              osFlattened.push.apply(osFlattened, o.operands.toArray(function(f) { return f.clone(); }));
             } else {
-              osFlattened.push(o);
+              osFlattened.push(o.clone());
             }
           }
 
@@ -419,9 +522,9 @@ define([
               // early true/false detection
               case "true": return new filter.True();
               case "false": continue;
-              case "and": osAnds.push(o); break;
+              case "and": osAnds.push(o.clone()); break;
               default:
-                osAnds.push(new filter.And({operands: [o]}));
+                osAnds.push(new filter.And({operands: [o.clone()]}));
             }
           }
 
@@ -432,7 +535,7 @@ define([
           break;
 
         default:
-          f = new filter.Or({operands: new filter.And({operands: [f]})});
+          f = new filter.Or({operands: [new filter.And({operands: [f]})]});
       }
 
       return f;
@@ -588,10 +691,13 @@ define([
             //     Remove the property not equal...
             //     If present in equalsByPropName, then it must be for a != value, or the key test above, (9),
             //     would have caught it.
-            var notEqual = O.getOwn(equalsByPropName, "-" + p);
-            if(notEqual) {
-              osNew.splice(osNew.indexOf(notEqual), 1);
-              delete osByKey[notEqual.contentKey];
+            var notEquals = O.getOwn(equalsByPropName, "-" + p);
+            if(notEquals) {
+              notEquals.forEach(function(notEqual) {
+                osNew.splice(osNew.indexOf(notEqual), 1);
+                delete osByKey[notEqual.contentKey];
+              });
+              delete equalsByPropName["-" + p];
             }
           }
         }

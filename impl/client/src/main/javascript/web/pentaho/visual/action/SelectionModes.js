@@ -41,20 +41,15 @@ define(function() {
     toggle: function(current, input) {
       if(!input) return current;
 
-      // TODO: Evaluating the filter on the current data is cheating...
-      // Should achieve this without leaving the _intensional_ realm.
-
       // Determine if all rows in input are currently selected.
-      var data = this.model.data;
-      if(!data) return current;
+      // current.include(input) ?
+      // input \ current = 0
 
-      var inputData = data.filter(input);
-      var currentInputData = inputData.filter(current);
-      var isAllInputSelected = (inputData.getNumberOfRows() === currentInputData.getNumberOfRows());
-
-      var selectionMode = isAllInputSelected ? SelectionModes.remove : SelectionModes.add;
-
-      return selectionMode.call(this, current, input);
+      return input.andNot(current).toDnf().kind === "false"
+          // all input is already selected, so, actually, toggle it all
+          ? SelectionModes.remove.call(this, current, input)
+          // not all input is already selected, so, add what's missing first, before actually toggling.
+          : SelectionModes.add.call(this, current, input);
     },
 
     /**
@@ -68,7 +63,7 @@ define(function() {
      * Removes the input filter from the current selection filter.
      */
     remove: function(current, input) {
-      return input ? current.and(input.negate()) : current;
+      return current.andNot(input);
     }
   };
 

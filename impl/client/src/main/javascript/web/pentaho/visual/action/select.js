@@ -127,7 +127,9 @@ define([
 
         var view = this.target;
 
-        view.selectionFilter = this.selectionMode.call(view, view.selectionFilter, this.dataFilter);
+        var selectionFilter = this.selectionMode.call(view, view.selectionFilter, this.dataFilter);
+
+        view.selectionFilter = selectionFilter && selectionFilter.toDnf();
 
         return null;
       }
