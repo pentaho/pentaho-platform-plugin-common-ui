@@ -617,18 +617,18 @@ define([
       },
       // endregion
 
-      // region isReadOnly attribute
+      // region isEnabled attribute
       /**
-       * Gets a value that indicates if a given property is currently read-only.
+       * Gets a value that indicates if a given property is currently enabled.
        *
        * @param {string|pentaho.type.Property.Type} name - The property name or property type object.
        *
-       * @return {boolean} Returns `true` if the property is read-only; `false` if the value is other.
+       * @return {boolean} Returns `true` if the property is enabled; `false`, otherwise.
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
-      isReadOnly: function(name) {
-        return this.type.get(name).isReadOnlyEval(this);
+      isEnabled: function(name) {
+        return this.type.get(name).isEnabledEval(this);
       },
       // endregion
 

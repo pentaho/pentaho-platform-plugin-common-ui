@@ -250,10 +250,10 @@
  */
 
 /**
- * Indicates if properties of this type _cannot_ be changed by a user
+ * Indicates if properties of this type _can_ be changed by a user
  * in a user interface.
  *
- * A property should be marked read-only whenever its value is implied/imposed somehow,
+ * A property should be marked disabled whenever its value is implied/imposed somehow,
  * and thus cannot not be changed, directly, by the user in a user interface.
  *
  * ### This attribute is *Dynamic*
@@ -266,8 +266,8 @@
  *
  * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
  *
- * In this case, a _property type_ marked as _not read-only_ can later be marked as _read-only_.
- * However, a _property type_ marked as _read-only_ can no longer go back to being _not read-only_.
+ * In this case, a _property type_ marked as _enabled_ can later be marked as _not enabled_.
+ * However, a _property type_ marked as _not enabled_ can no longer go back to being _enabled_.
  *
  * ### This attribute is *Inherited*
  *
@@ -277,13 +277,13 @@
  *
  * When a {@link Nully} value is specified, it is ignored.
  *
- * The default (root) `isReadOnly` attribute value is `false`.
+ * The default (root) `isEnabled` attribute value is `true`.
  *
- * @name isReadOnly
+ * @name isEnabled
  * @memberOf pentaho.type.spec.IPropertyTypeProto#
  * @type {boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
  *
- * @see pentaho.type.Property.Type#isReadOnly
+ * @see pentaho.type.Property.Type#isEnabled
  */
 
 /**

@@ -1233,22 +1233,22 @@ define([
         });
       }); // end applicable
 
-      describe("#isReadOnly(name)", function() {
+      describe("#isEnabled(name)", function() {
         it("should return the evaluated static value of an existing property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", isReadOnly: false}]}
+            type: {props: [{name: "x", isEnabled: true}]}
           });
 
           var derived = new Derived();
 
-          expect(derived.isReadOnly("x")).toBe(false);
+          expect(derived.isEnabled("x")).toBe(true);
         });
 
         it("should return the evaluated dynamic value of an existing property", function() {
           var Derived = Complex.extend({
             type: {
               props: [{
-                name: "x", isReadOnly: function() {
+                name: "x", isEnabled: function() {
                   return this.foo;
                 }
               }]
@@ -1257,13 +1257,13 @@ define([
 
           var derived = new Derived();
 
-          derived.foo = true;
-
-          expect(derived.isReadOnly("x")).toBe(true);
-
           derived.foo = false;
 
-          expect(derived.isReadOnly("x")).toBe(false);
+          expect(derived.isEnabled("x")).toBe(false);
+
+          derived.foo = true;
+
+          expect(derived.isEnabled("x")).toBe(true);
         });
 
         it("should throw when given the name of an undefined property", function() {
@@ -1274,7 +1274,7 @@ define([
           var derived = new Derived();
 
           expect(function() {
-            derived.isReadOnly("y");
+            derived.isEnabled("y");
           }).toThrow(errorMatch.argInvalid("name"));
         });
 
@@ -1289,10 +1289,10 @@ define([
           var derived = new Derived();
 
           expect(function() {
-            derived.isReadOnly(Other.type.get("x"));
+            derived.isEnabled(Other.type.get("x"));
           }).toThrow(errorMatch.argInvalid("name"));
         });
-      }); // end isReadOnly
+      }); // end isEnabled
 
       describe("#isRequired(name)", function() {
         it("should return the evaluated static value of an existing property", function() {

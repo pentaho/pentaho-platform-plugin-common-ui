@@ -30,7 +30,7 @@ define([
   "use strict";
 
   var _defaultTypeMid = "string";
-  var _dynamicAttrNames = ["isRequired", "countMin", "countMax", "isApplicable", "isReadOnly"];
+  var _dynamicAttrNames = ["isRequired", "countMin", "countMax", "isApplicable", "isEnabled"];
 
   return function(context) {
 
@@ -1089,22 +1089,22 @@ define([
           },
 
           /**
-           * Evaluates the value of the `isReadOnly` attribute of a property of this type
+           * Evaluates the value of the `isEnabled` attribute of a property of this type
            * on a given owner complex value.
            *
-           * @name isReadOnlyEval
+           * @name isEnabledEval
            * @memberOf pentaho.type.Property.Type#
            * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
-           * @return {boolean} The evaluated value of the `isReadOnly` attribute.
+           * @return {boolean} The evaluated value of the `isEnabled` attribute.
            *
            * @ignore
            */
 
           /**
            * Gets or sets a value, or function, that indicates if properties of this type
-           * _cannot_ be changed by a user, in a user interface.
+           * _can_ be changed by a user, in a user interface.
            *
-           * A property should be set read-only whenever its value is implied/imposed somehow,
+           * A property should be set disabled whenever its value is implied/imposed somehow,
            * and thus cannot be changed directly by the user through a user interface.
            *
            * ### This attribute is *Dynamic*
@@ -1119,11 +1119,11 @@ define([
            *
            * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
            *
-           * In this case, a _property type_ marked as _not read-only_ can later be marked as _read-only_.
-           * However, a _property type_ marked as _read-only_ can no longer go back to being _not read-only_.
+           * In this case, a _property type_ marked as _enabled_ can later be marked as _not enabled_.
+           * However, a _property type_ marked as _not enabled_ can no longer go back to being _enabled_.
            *
            * Because this attribute is also _dynamic_,
-           * the actual `isReadOnly` values are only known
+           * the actual `isEnabled` values are only known
            * when evaluated for specific complex instances.
            * This behavior ensures that monotonic changes are deferred until evaluation.
            * No errors are thrown; non-monotonic changes simply don't take any effect.
@@ -1144,22 +1144,22 @@ define([
            * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants} properties,
            * an error is thrown.
            *
-           * The default (root) `isReadOnly` attribute value is `false`.
+           * The default (root) `isEnabled` attribute value is `true`.
            *
-           * @name isReadOnly
+           * @name isEnabled
            * @memberOf pentaho.type.Property.Type#
            * @type undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
            *
-           * @see pentaho.type.Complex#isReadOnly
-           * @see pentaho.type.spec.IPropertyTypeProto#isReadOnly
+           * @see pentaho.type.Complex#isEnabled
+           * @see pentaho.type.spec.IPropertyTypeProto#isEnabled
            */
-          isReadOnly: {
-            value: false,
+          isEnabled: {
+            value: true,
             cast: Boolean,
             combine: function(baseEval, localEval) {
               return function() {
-                // localEval is skipped if base is true.
-                return baseEval.call(this) || localEval.call(this);
+                // localEval is skipped if base is false.
+                return baseEval.call(this) && localEval.call(this);
               };
             }
           }

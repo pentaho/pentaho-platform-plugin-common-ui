@@ -579,9 +579,9 @@ define([
 
       });
 
-      describe("#isReadOnly", function() {
+      describe("#isEnabled", function() {
 
-        itDynamicAttribute("isReadOnly", true);
+        itDynamicAttribute("isEnabled", false);
 
       });
 
