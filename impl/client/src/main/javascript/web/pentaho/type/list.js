@@ -95,8 +95,6 @@ define([
               (spec instanceof List) ? spec._elems :
               null;
 
-          // TODO: should not be created this way so that any current transaction is ignored.
-          // If and when changed, activate commented ou test "should be called when added to a list container".
           if(elemSpecs) this._load(elemSpecs);
         }
       },

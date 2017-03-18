@@ -1690,20 +1690,17 @@ define([
         expect(value._addReference).toHaveBeenCalledWith(container, Container.type.get("a"));
       });
 
-      // TODO: if an when lists are created without a changeset/txn, uncomment this.
-      /*
       it("should be called when added to a list container", function() {
         var Derived = Complex.extend();
         var Container = Complex.extend({type: {props: [{name: "as", type: [Derived]}]}});
 
+        spyOn(Derived.prototype, "_addReference");
+
         var value = new Derived();
         var container = new Container({as: [value]});
 
-        spyOn(Derived.prototype, "_addReference");
-
-        expect(value._addReference).toHaveBeenCalledWith(container.as, null);
+        expect(value._addReference).toHaveBeenCalledWith(container.as);
       });
-      */
     });
   }); // pentaho.type.Complex
 });
