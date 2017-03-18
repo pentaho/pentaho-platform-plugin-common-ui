@@ -72,12 +72,12 @@ define([
 
     _prepareRefs: function(txn, target) {
       var elem = this.element;
-      if(elem._addReference) txn._ensureChangeRef(elem).addReference(target);
+      if(!target.isBoundary && elem._addReference) txn._ensureChangeRef(elem).addReference(target);
     },
 
     _cancelRefs: function(txn, target) {
       var elem = this.element;
-      if(elem._addReference) txn._ensureChangeRef(elem).removeReference(target);
+      if(!target.isBoundary && elem._addReference) txn._ensureChangeRef(elem).removeReference(target);
     },
 
     _apply: function(target) {

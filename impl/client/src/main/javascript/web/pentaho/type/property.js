@@ -554,6 +554,7 @@ define([
 
         __buildListCreateKeyArgs: function() {
           return (this.__listCreateKeyArgs = {
+            isBoundary: this._isBoundary,
             isReadOnly: this._isReadOnly
           });
         },
@@ -629,6 +630,73 @@ define([
         },
         // endregion
 
+        // region isBoundary
+        _isBoundary: false,
+
+        /**
+         * Gets or sets whether the property is a _boundary property_.
+         *
+         * A _boundary property_ identifies the limits of the aggregate of its
+         * [declaring type]{@link pentaho.type.Property.Type#declaringType}.
+         *
+         * If the _value type_ is a [list]{@link pentaho.type.Value.Type#isList} type,
+         * then this property sets its lists as [boundary lists]{@link pentaho.type.List#isBoundary}.
+         *
+         * The validity of the object with a _boundary property_
+         * is not affected by the validity of the property's value (or values).
+         * Also, changes within its value(s) do not bubble through it.
+         *
+         * Boundary properties do not cause their values to hold inverse references to the property holder.
+         * This means that, in objects connected by boundary properties, only the property holders prevent
+         * their values from being garbage collected, and not the other way round.
+         * On the contrary, non-boundary properties form object aggregates that can only be garbage-collected
+         * as a whole.
+         *
+         * ### Get
+         *
+         * The default value is `false`.
+         *
+         * ### Set
+         *
+         * Only a _root property type_ can set its boundary attribute.
+         * When set on a _non-root property type_, an error is thrown.
+         *
+         * When set and the root property already has [descendant]{@link pentaho.type.Type#hasDescendants} properties,
+         * an error is thrown.
+         *
+         * When set to a {@link Nully} value, the set operation is ignored.
+         *
+         * Otherwise, the set value is converted to boolean, by using {@link Boolean}.
+         *
+         * @type {boolean}
+         * @default false
+         *
+         * @throws {pentaho.lang.OperationInvalidError} When set on a non-root property type.
+         *
+         * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
+         * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
+         */
+        get isBoundary() {
+          return this._isBoundary;
+        },
+
+        set isBoundary(value) {
+          // Cannot change the root value.
+          // Testing this here, instead of after the descendants test,
+          // because, otherwise, it would be very hard to test.
+          if(this === _propType) return;
+
+          if(!this.isRoot)
+            throw error.operInvalid("Cannot only change the isBoundary attribute on a root property type.");
+          if(this.hasDescendants)
+            throw error.operInvalid("Cannot change the isBoundary attribute of a property type that has descendants.");
+
+          if(value != null) {
+            this._isBoundary = !!value;
+          }
+        },
+        // endregion
+
         // endregion
 
         // region property accessor
@@ -675,7 +743,7 @@ define([
             };
 
             var value = owner._getByType(this);
-            if(value) {
+            if(value && !this.isBoundary) {
               // Not null and surely of the type, so validateInstance can be called.
               // If a list, element validation is done before cardinality validation.
               // If a complex, its properties validation is done before local cardinality validation.

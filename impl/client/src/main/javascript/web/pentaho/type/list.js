@@ -67,6 +67,7 @@ define([
      * @constructor
      * @param {pentaho.type.spec.UList} [spec] The list specification or another compatible list instance.
      * @param {Object} [keyArgs] - The keyword arguments.
+     * @param {boolean} [keyArgs.isBoundary] - Indicates if the list should be a _boundary list_.
      * @param {boolean} [keyArgs.isReadOnly] - Indicates if the list should be a _read-only list_.
      *
      * @see pentaho.type.spec.IList
@@ -83,6 +84,7 @@ define([
         this._keys  = {};
 
         if(keyArgs) {
+          if(keyArgs.isBoundary) this._isBoundary = true;
           if(keyArgs.isReadOnly) this._isReadOnly = true;
         }
 
@@ -100,6 +102,7 @@ define([
       },
 
       _load: function(elemSpecs) {
+        var isBoundary = this._isBoundary;
         var i = -1;
         var L = elemSpecs.length;
         var elemType = this.type.of;
@@ -112,7 +115,7 @@ define([
             elems.push(elem);
             keys[key] = elem;
 
-            if(elem._addReference) elem._addReference(this);
+            if(!isBoundary && elem._addReference) elem._addReference(this);
           }
         }
       },
@@ -138,6 +141,24 @@ define([
       __assertEditable: function() {
         if(this._isReadOnly) throw new TypeError("The list is read-only.");
       },
+      // endregion
+
+      // region isBoundary
+      _isBoundary: false,
+
+      /**
+       * Gets a value that indicates if this list is a _boundary list_.
+       *
+       * A boundary list isolates the list holder from the list's elements.
+       *
+       * The validity of a _boundary list_ is not affected by the validity of its elements,
+       * Changes within the elements of _boundary list_ do not bubble to it.
+       *
+       * @type {boolean}
+       * @readOnly
+       */
+      get isBoundary() {
+        return this._isBoundary;
       },
       // endregion
 

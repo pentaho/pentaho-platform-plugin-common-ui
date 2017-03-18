@@ -155,6 +155,10 @@ define([
        * nor should its construction time property values be restored to... what? default values?
        * So, references added should also not be subject to the ambient transaction.
        *
+       * Lists have special semantics: isBoundary applies to the relation between the list and its elements.
+       * Adding/Removing elements in an isList and isBoundary property
+       * still generates events in the containing complex.
+       * We could, however, not addRef is the prop (and, thus, the list) is also isReadOnly?
        *
        * @param {!pentaho.type.Property.Type} propType - The property type.
        * @param {!pentaho.type.ContainerMixin} value - The container value.
@@ -163,7 +167,9 @@ define([
        */
       __initValueRelation: function(propType, value) {
 
+        if(propType.isList || !propType.isBoundary) {
           value._addReference(this, propType);
+        }
       },
 
       /**
