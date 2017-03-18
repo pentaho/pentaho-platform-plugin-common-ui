@@ -194,7 +194,7 @@ define([
        * @see pentaho.type.filter.Tree#_visitDefault
        */
       _visitDefault: function(transformer) {
-        return this.clone();
+        return this;
       },
 
       /**
@@ -271,7 +271,7 @@ define([
         var excludeDnf = exclude.toDnf();
         switch(excludeDnf.kind) {
           case "false": return this; // ? \ false = ?
-          case "true": return new filter.False(); // ? \ true = false
+          case "true": return filter.False.instance; // ? \ true = false
         }
 
         // Remove from `current`, any `and` that also exists in exclude.
@@ -333,7 +333,7 @@ define([
 
         return remainings.length
             ? new filter.Or({operands: remainings})
-            : new filter.False();
+            : filter.False.instance;
       },
 
       toDnf: function() {
@@ -392,7 +392,7 @@ define([
 
           case "true":
             // 3. NOT(TRUE) <=> FALSE
-            return new filter.False();
+            return filter.False.instance;
 
           case "false":
             // 3. NOT(FALSE) <=> TRUE
@@ -485,9 +485,9 @@ define([
             // recurse in pre-order
             var o = os.at(i).visit(flattenTree);
             if(o.kind === kind) {
-              osFlattened.push.apply(osFlattened, o.operands.toArray(function(f) { return f.clone(); }));
+              osFlattened.push.apply(osFlattened, o.operands.toArray());
             } else {
-              osFlattened.push(o.clone());
+              osFlattened.push(o);
             }
           }
 
@@ -513,11 +513,11 @@ define([
             var o = os.at(i);
             switch(o.kind) {
               // early true/false detection
-              case "true": return new filter.True();
+              case "true": return filter.True.instance;
               case "false": continue;
-              case "and": osAnds.push(o.clone()); break;
+              case "and": osAnds.push(o); break;
               default:
-                osAnds.push(new filter.And({operands: [o.clone()]}));
+                osAnds.push(new filter.And({operands: [o]}));
             }
           }
 
@@ -587,7 +587,7 @@ define([
 
         var o = ands.at(i).visit(simplifyDnfAnd);
         switch(o.kind) {
-          case "true": return new filter.True(); // 6)
+          case "true": return filter.True.instance; // 6)
           case "false": continue; // 4)
         }
 
@@ -602,7 +602,7 @@ define([
         andsNew.push(o);
       }
 
-      if(!andsNew.length) return new filter.False(); // 12)
+      if(!andsNew.length) return filter.False.instance; // 12)
 
       return new filter.Or({operands: andsNew});
     }
@@ -633,7 +633,7 @@ define([
         var isNot = false;
         var p;
         switch(o.kind) {
-          case "false": return new filter.False(); // 5)
+          case "false": return filter.False.instance; // 5)
           case "true": continue; // 3)
           case "not": isNot = true; break;
         }
@@ -649,7 +649,7 @@ define([
             // 9) Law of non-contradiction
             if(O.hasOwn(osByKey, oo.contentKey)) {
               // Already have non-negated operand
-              return new filter.False();
+              return filter.False.instance;
             }
 
             if(oo.kind === "isEqual" && (p = oo.property)) {
@@ -666,7 +666,7 @@ define([
           // 9) Law of non-contradiction
           if(O.hasOwn(osByKey, "(not " + key + ")")) {
             // Already have negated operand
-            return new filter.False();
+            return filter.False.instance;
           }
 
           if(o.kind === "isEqual" && (p = o.property)) {
@@ -675,7 +675,7 @@ define([
             //     If present in equalsByPropName, then it must be for a != value, or the key test above, (2),
             //     would have caught it.
             if(O.hasOwn(equalsByPropName, "+" + p)) {
-              return new filter.False();
+              return filter.False.instance;
             }
 
             (equalsByPropName["+" + p] || (equalsByPropName["+" + p] = [])).push(o);
@@ -699,7 +699,7 @@ define([
         osNew.push(o);
       }
 
-      if(!osNew.length) return new filter.True(); // 11)
+      if(!osNew.length) return filter.True.instance; // 11)
 
       return new filter.And({operands: osNew});
     }

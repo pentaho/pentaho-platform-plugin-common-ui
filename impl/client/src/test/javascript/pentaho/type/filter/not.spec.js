@@ -174,8 +174,7 @@ define([
 
         var result = filter.visit(transf);
 
-        expect(result).not.toBe(filter);
-        expect(result.toSpec()).toEqual(filter.toSpec());
+        expect(result).toBe(filter);
       });
     }); // #_visitDefault
 

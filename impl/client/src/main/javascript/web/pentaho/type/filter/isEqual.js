@@ -89,7 +89,8 @@ define([
             name: "value",
             nameAlias: "v",
             type: "value",
-            isReadOnly: true
+            isReadOnly: true,
+            isBoundary: true
           }
         ]
       }

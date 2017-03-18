@@ -21,6 +21,8 @@ define([
 
   return function(filter) {
 
+    var _false = null;
+
     /**
      * @name pentaho.type.filter.False.Type
      * @class
@@ -45,6 +47,14 @@ define([
 
     filter.False = filter.Abstract.extend("pentaho.type.filter.False", /** @lends pentaho.type.filter.False# */{
 
+      constructor: function() {
+        if(_false) return _false;
+
+        _false = this;
+
+        this.base();
+      },
+
       get kind() {
         return KnownFilterKind.False;
       },
@@ -62,12 +72,22 @@ define([
       },
 
       negate: function() {
-        return new filter.True();
+        return filter.True.instance;
       },
 
       type: /** @lends pentaho.type.filter.False.Type# */{
         id: "pentaho/type/filter/false",
         alias: "false"
+      }
+    }, /** @lends pentaho.type.filter.False */{
+      /**
+       * Gets the _false_ filter instance.
+       *
+       * @type {!pentaho.type.filter.False}
+       * @readOnly
+       */
+      get instance() {
+        return _false || (_false = new this());
       }
     });
   };

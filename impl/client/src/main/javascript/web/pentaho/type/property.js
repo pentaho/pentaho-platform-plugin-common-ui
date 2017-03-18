@@ -688,6 +688,7 @@ define([
 
           if(!this.isRoot)
             throw error.operInvalid("Cannot only change the isBoundary attribute on a root property type.");
+
           if(this.hasDescendants)
             throw error.operInvalid("Cannot change the isBoundary attribute of a property type that has descendants.");
 

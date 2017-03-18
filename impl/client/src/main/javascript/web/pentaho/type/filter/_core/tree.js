@@ -149,7 +149,7 @@ define([
        */
       _visitDefault: function(transformer) {
         var opersOut = this.visitOperands(transformer);
-        return opersOut ? new this.constructor({operands: opersOut}) : this.clone();
+        return opersOut ? new this.constructor({operands: opersOut}) : this;
       },
 
       /**
@@ -200,7 +200,8 @@ define([
             name: "operands",
             nameAlias: "o",
             type: [filter.Abstract],
-            isReadOnly: true
+            isReadOnly: true,
+            isBoundary: true
           }
         ]
       }

@@ -460,8 +460,7 @@ define([
 
         return Refinement.extend(name || "", instSpec);
       }
-    },
-    /* keyArgs: */{
+    }, /* keyArgs: */{
       isRoot: true
     }).implement({
       type: bundle.structured.value

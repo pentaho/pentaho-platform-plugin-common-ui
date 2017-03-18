@@ -95,7 +95,8 @@ define([
             name: "values",
             nameAlias: "v",
             type: ["element"],
-            isReadOnly: true
+            isReadOnly: true,
+            isBoundary: true
           }
         ]
       }

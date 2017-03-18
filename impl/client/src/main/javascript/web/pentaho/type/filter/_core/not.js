@@ -129,7 +129,8 @@ define([
             nameAlias: "o",
             type: filter.Abstract,
             isRequired: true,
-            isReadOnly: true
+            isReadOnly: true,
+            isBoundary: true
           }
         ]
       }
