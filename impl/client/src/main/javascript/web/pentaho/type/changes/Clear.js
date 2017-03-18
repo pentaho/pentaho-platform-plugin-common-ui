@@ -48,20 +48,29 @@ define([
 
     _prepareRefs: function(txn, target) {
       if(target.type.of.isComplex) {
-        target._elems.forEach(function(elem) {
-          if(elem._addReference)
+        var i = -1;
+        var elems = target._elems;
+        var L = elems.length;
+        var elem;
+        while(++i < L) {
+          if((elem = elems[i])._addReference) {
             txn._ensureChangeRef(elem).removeReference(target);
-        });
+          }
+        }
       }
     },
 
     _cancelRefs: function(txn, target) {
       if(target.type.of.isComplex) {
-
-        target._elems.forEach(function(elem) {
-          if(elem._addReference)
+        var i = -1;
+        var elems = target._elems;
+        var L = elems.length;
+        var elem;
+        while(++i < L) {
+          if((elem = elems[i])._addReference) {
             txn._ensureChangeRef(elem).addReference(target);
-        });
+          }
+        }
       }
     },
 
