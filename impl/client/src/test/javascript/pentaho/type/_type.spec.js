@@ -1594,7 +1594,7 @@ define([
         subSubType.to(value);
 
         expect(createSpy).not.toHaveBeenCalled();
-        expect(subSubType.create).toHaveBeenCalledWith(value);
+        expect(subSubType.create).toHaveBeenCalledWith(value, undefined);
       });
 
       it("casts a nully into `null`", function() {

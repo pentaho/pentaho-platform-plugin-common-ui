@@ -29,16 +29,14 @@ define([
   /* global describe:true, it:true, expect:true, beforeEach:true, afterEach:true, jasmine:true, spyOn:true,
     TypeError:true */
 
-  var context = new Context(),
-      Value = context.get(valueFactory),
-      List = context.get(listFactory),
-      Complex = context.get(complexFactory),
-      PentahoNumber = context.get(numberFactory);
+  var context = new Context();
+  var Value = context.get(valueFactory);
+  var List = context.get(listFactory);
+  var Complex = context.get(complexFactory);
+  var PentahoNumber = context.get(numberFactory);
 
   function expectNoChanges(list) {
-    // TODO: move the tests that use this to ListChangeset.Spec.js
-    //expect(list._changes).toBe(null);
-    //expect(list._changeLevel).toBe(0);
+    expect(list.changeset).toBe(null);
   }
 
   var NumberList = List.extend({
@@ -303,92 +301,6 @@ define([
       });
     }); // endregion constructor
 
-    // region ownership
-    describe("#owner", function() {
-      it("should be null after construction", function() {
-        var list = new List();
-        expect(list.owner).toBe(null);
-      });
-    });
-
-    describe("#ownerProperty", function() {
-      it("should be null after construction", function() {
-        var list = new List();
-        expect(list.ownerProperty).toBe(null);
-      });
-    });
-
-    describe("#setOwnership(owner, ownerProperty)", function() {
-      var Derived = Complex.extend({type: {
-        props: [
-          {name: "foo", type: ["string"]},
-          {name: "bar", type: ["string"]}
-        ]
-      }});
-
-      it("should throw if owner is not provided", function() {
-        var list = new List();
-        var propType = Derived.type.get("foo");
-
-        expect(function() {
-          list.setOwnership(null, propType);
-        }).toThrow(errorMatch.argRequired("owner"));
-      });
-
-      it("should throw if ownerProperty is not provided", function() {
-        var list = new List();
-        var derived = new Derived();
-
-        expect(function() {
-          list.setOwnership(derived, null);
-        }).toThrow(errorMatch.argRequired("propType"));
-      });
-
-      it("should not throw if both owner and ownerProperty are provided", function() {
-        var list = new List();
-        var derived = new Derived();
-        var propType = Derived.type.get("foo");
-
-        expect(function() {
-          list.setOwnership(derived, propType);
-        }).not.toThrow();
-      });
-
-      it("should have #owner return the specified owner", function() {
-        var list = new List();
-        var derived = new Derived();
-        var propType = Derived.type.get("foo");
-
-        list.setOwnership(derived, propType);
-        expect(list.owner).toBe(derived);
-      });
-
-      it("should have #ownerProperty return the specified ownerProperty", function() {
-        var list = new List();
-        var derived = new Derived();
-        var propType = Derived.type.get("foo");
-
-        list.setOwnership(derived, propType);
-        expect(list.ownerProperty).toBe(propType);
-      });
-
-      it("should throw if ownership is already taken", function() {
-        var list = new List();
-        var derived  = new Derived();
-        var propType = Derived.type.get("foo");
-
-        list.setOwnership(derived, propType);
-
-        var derived2  = new Derived();
-        var propType2 = Derived.type.get("bar");
-
-        expect(function() {
-          list.setOwnership(derived2, propType2);
-        }).toThrowError(TypeError);
-      });
-    });
-    // endregion
-
     // region read methods
     describe("#$uid -", function() {
       it("should return a string value", function() {
@@ -397,9 +309,9 @@ define([
       });
 
       it("should have a distinct value for every instance", function() {
-        var uid1 = new List().$uid,
-            uid2 = new List().$uid,
-            uid3 = new List().$uid;
+        var uid1 = new List().$uid;
+        var uid2 = new List().$uid;
+        var uid3 = new List().$uid;
         expect(uid1).not.toBe(uid2);
         expect(uid2).not.toBe(uid3);
         expect(uid3).not.toBe(uid1);
@@ -630,6 +542,24 @@ define([
     });
     // endregion
 
+    // region isReadOnly
+    describe("#isReadOnly", function() {
+
+      it("should be false by default", function() {
+        var list = new NumberList();
+
+        expect(list.isReadOnly).toBe(false);
+      });
+
+      it("should allow creating a read-only list by specifying keyArgs.isReadOnly: true", function() {
+
+        var list = new NumberList(null, {isReadOnly: true});
+
+        expect(list.isReadOnly).toBe(true);
+      });
+    });
+    // endregion
+
     // region write methods
 
     // add or update
@@ -642,6 +572,17 @@ define([
 
         list.add([1, 2, 3]);
         _expectEqualValueAt(list, [1, 2, 3]);
+      });
+
+      it("should throw a TypeError if list is read-only", function() {
+
+        var list = new NumberList(null, {isReadOnly: true});
+
+        expect(function() {
+          list.add([1, 2, 3]);
+        }).toThrowError(TypeError);
+
+        expect(list.count).toBe(0);
       });
 
       it("should append a given array of convertible values to a non-empty list", function() {
@@ -743,9 +684,9 @@ define([
         var derived = new Derived();
 
         var listeners = jasmine.createSpyObj("listeners", ["will", "did", "rejected"]);
-        derived.on("will:change",     listeners.will);
+        derived.on("will:change", listeners.will);
         derived.on("rejected:change", listeners.rejected);
-        derived.on("did:change",      listeners.did);
+        derived.on("did:change", listeners.did);
 
         var list = derived.get("foo");
 
@@ -765,6 +706,17 @@ define([
 
         list.insert([1, 2, 3]);
         _expectEqualValueAt(list, [1, 2, 3]);
+      });
+
+      it("should throw a TypeError if list is read-only", function() {
+
+        var list = new NumberList(null, {isReadOnly: true});
+
+        expect(function() {
+          list.insert([1, 2, 3]);
+        }).toThrowError(TypeError);
+
+        expect(list.count).toBe(0);
       });
 
       it("should append a given array of convertible values to a non-empty list, when index is not specified",
@@ -869,7 +821,8 @@ define([
         expect(list.get("4").value).toBe(4);
       });
 
-      it("should only insert the values not present in the list, at the specified existing index and update the values already present", function() {
+      it("should only insert the values not present in the list, at the specified existing index and " +
+         "update the values already present", function() {
         var list = new NumberList([1, 5, 10, 11, 40]);
 
         expect(list.count).toBe(5);
@@ -894,9 +847,9 @@ define([
         var derived = new Derived();
 
         var listeners = jasmine.createSpyObj("listeners", ["will", "did", "rejected"]);
-        derived.on("will:change",     listeners.will);
+        derived.on("will:change", listeners.will);
         derived.on("rejected:change", listeners.rejected);
-        derived.on("did:change",      listeners.did);
+        derived.on("did:change", listeners.did);
 
         var list = derived.foo;
 
@@ -909,6 +862,17 @@ define([
         expect(listeners.rejected).not.toHaveBeenCalled();
       });
 
+      it("should throw a TypeError if list is read-only", function() {
+
+        var list = new NumberList([1, 2, 3], {isReadOnly: true});
+
+        expect(function() {
+          list.remove([1]);
+        }).toThrowError(TypeError);
+
+        expect(list.count).toBe(3);
+      });
+
       it("should remove a given element that is present in the list", function() {
         var list = new NumberList([1, 2, 3]);
         var elem = list.at(0);
@@ -919,7 +883,6 @@ define([
         list.remove(elem);
 
         // ----
-
 
         expect(list.has("1")).toBe(false);
         _expectEqualValueAt(list, [2, 3]);
@@ -994,9 +957,9 @@ define([
         var derived = new Derived();
 
         var listeners = jasmine.createSpyObj("listeners", ["will", "did", "rejected"]);
-        derived.on("will:change",     listeners.will);
+        derived.on("will:change", listeners.will);
         derived.on("rejected:change", listeners.rejected);
-        derived.on("did:change",      listeners.did);
+        derived.on("did:change", listeners.did);
 
         derived.foo.clear();
 
@@ -1020,7 +983,18 @@ define([
 
         expect(list.count).toBe(0);
       });
-    }); // endregion #remove
+
+      it("should throw a TypeError if list is read-only", function() {
+
+        var list = new NumberList([1, 2, 3], {isReadOnly: true});
+
+        expect(function() {
+          list.clear();
+        }).toThrowError(TypeError);
+
+        expect(list.count).toBe(3);
+      });
+    }); // endregion #clear
 
     // region #removeAt(start, count[, silent])
     describe("#removeAt(start, count[, silent]) -", function() {
@@ -1037,9 +1011,9 @@ define([
         var derived = new Derived();
 
         var listeners = jasmine.createSpyObj("listeners", ["will", "did", "rejected"]);
-        derived.on("will:change",     listeners.will);
+        derived.on("will:change", listeners.will);
         derived.on("rejected:change", listeners.rejected);
-        derived.on("did:change",      listeners.did);
+        derived.on("did:change", listeners.did);
 
         derived.foo.removeAt(1, 1);
 
@@ -1048,6 +1022,17 @@ define([
         expect(listeners.will).toHaveBeenCalled();
         expect(listeners.did).toHaveBeenCalled();
         expect(listeners.rejected).not.toHaveBeenCalled();
+      });
+
+      it("should throw a TypeError if list is read-only", function() {
+
+        var list = new NumberList([1, 2, 3], {isReadOnly: true});
+
+        expect(function() {
+          list.removeAt(1);
+        }).toThrowError(TypeError);
+
+        expect(list.count).toBe(3);
       });
 
       it("should remove the element at the given in-range index when count is 1", function() {
@@ -1164,15 +1149,26 @@ define([
     // region #set(fragment, {noAdd, noUpdate, noRemove, noMove, index})
     describe("#set(fragment, {noAdd, noUpdate, noRemove, noMove, index}) -", function() {
 
-      it("preserves the order of new elements when they are simple objects", function(){
+      it("should throw a TypeError if list is read-only", function() {
+
+        var list = new NumberList([1, 2, 3], {isReadOnly: true});
+
+        expect(function() {
+          list.set([1, 2]);
+        }).toThrowError(TypeError);
+
+        expect(list.count).toBe(3);
+      });
+
+      it("preserves the order of new elements when they are simple objects", function() {
 
         var list = new NumberList();
-        var spec =[1, 2, 3, 4];
+        var spec = [1, 2, 3, 4];
         list.set(spec);
         expect(list.toSpec()).toEqual(spec);
       });
 
-      it("preserves the order of new elements when they are complex objects", function(){
+      it("preserves the order of new elements when they are complex objects", function() {
         var MyComplex = Complex.extend({
           type: {
             props: [{
@@ -1187,7 +1183,7 @@ define([
         });
 
         var list = new ComplexList();
-        var spec =[{
+        var spec = [{
           k: 1
         }, {
           k: 2
@@ -1249,7 +1245,6 @@ define([
         list.set([5, 1, 3], {noUpdate: true});
 
         // ---
-
 
         _expectEqualValueAt(list, [5, 1, 3]);
       });
@@ -1315,7 +1310,7 @@ define([
         var list = new NumberList([1]);
         var spy = jasmine.createSpy();
         var ctx = {};
-        var array = list.toArray(spy, ctx);
+        list.toArray(spy, ctx);
 
         expect(spy.calls.first().object).toBe(ctx);
       });
@@ -1336,9 +1331,9 @@ define([
         var derived = new Derived();
 
         var listeners = jasmine.createSpyObj("listeners", ["will", "did", "rejected"]);
-        derived.on("will:change",     listeners.will);
+        derived.on("will:change", listeners.will);
         derived.on("rejected:change", listeners.rejected);
-        derived.on("did:change",      listeners.did);
+        derived.on("did:change", listeners.did);
 
         derived.foo.sort(fun.compare);
 
@@ -1356,6 +1351,19 @@ define([
 
         _expectEqualValueAt(list, [1, 2, 3, 4]);
       });
+
+      it("should throw a TypeError if list is read-only", function() {
+
+        var list = new NumberList([2, 1, 3], {isReadOnly: true});
+
+        expect(function() {
+          list.sort();
+        }).toThrowError(TypeError);
+
+        expect(list.at(0).value).toBe(2);
+        expect(list.at(1).value).toBe(1);
+        expect(list.at(2).value).toBe(3);
+      });
     }); // endregion #sort
     // endregion
 
@@ -1365,6 +1373,15 @@ define([
         var list = new List();
         var clone = list.clone();
         expect(clone).not.toBe(list);
+      });
+
+      it("should return an editable clone if list is read-only", function() {
+
+        var list = new NumberList([2, 1, 3], {isReadOnly: true});
+
+        var clone = list.clone();
+
+        expect(clone.isReadOnly).toBe(false);
       });
 
       it("should return a list instance with the same count", function() {
@@ -1397,7 +1414,7 @@ define([
       });
 
       describe("#isContainer", function() {
-        it("should have value `true`", function () {
+        it("should have value `true`", function() {
           expect(List.type.isContainer).toBe(true);
         });
       });

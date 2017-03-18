@@ -66,6 +66,8 @@ define([
      *
      * @constructor
      * @param {pentaho.type.spec.UList} [spec] The list specification or another compatible list instance.
+     * @param {Object} [keyArgs] - The keyword arguments.
+     * @param {boolean} [keyArgs.isReadOnly] - Indicates if the list should be a _read-only list_.
      *
      * @see pentaho.type.spec.IList
      * @see pentaho.type.spec.IListProto
@@ -73,13 +75,16 @@ define([
      */
     var List = Value.extend(/** @lends pentaho.type.List# */{
 
-      constructor: function(spec) {
+      constructor: function(spec, keyArgs) {
 
         this._initContainer();
 
         this._elems = [];
         this._keys  = {};
-        this._ownedBy = this._ownedAs = null;
+
+        if(keyArgs) {
+          if(keyArgs.isReadOnly) this._isReadOnly = true;
+        }
 
         if(spec != null) {
           // An array of element specs?
@@ -114,48 +119,29 @@ define([
         }
       },
 
-      /**
-       * Sets the complex that owns this list value.
-       *
-       * Ownership cannot change.
-       *
-       * @param {!pentaho.type.Complex} owner - The owner complex value.
-       * @param {!pentaho.type.Property.Type} propType - The property type of `owner` whose value is this instance.
-       *
-       * @throws {TypeError} When called with argument values that are different from those of the first call.
-       *
-       * @see pentaho.type.List#owner
-       * @see pentaho.type.List#ownerProperty
-       */
-      setOwnership: function(owner, propType) {
-        if(!owner) throw error.argRequired("owner");
-        if(!propType) throw error.argRequired("propType");
+      // region isReadOnly
+      _isReadOnly: false,
 
-        O.setConst(this, "_ownedBy", owner);
-        O.setConst(this, "_ownedAs", propType);
+      /**
+       * Gets a value that indicates if this list is read-only.
+       *
+       * @type {boolean}
+       * @readOnly
+       */
+      get isReadOnly() {
+        return this._isReadOnly;
       },
 
       /**
-       * The complex value that owns this list value.
+       * Asserts that the list can be changed, throwing an error if not.
        *
-       * @type {pentaho.type.Complex}
-       *
-       * @see pentaho.type.List#setOwnership
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
        */
-      get owner() {
-        return this._ownedBy;
+      __assertEditable: function() {
+        if(this._isReadOnly) throw new TypeError("The list is read-only.");
       },
-
-      /**
-       * The complex value that owns this list value.
-       *
-       * @type {pentaho.type.Complex}
-       *
-       * @see pentaho.type.List#setOwnership
-       */
-      get ownerProperty() {
-        return this._ownedAs;
       },
+      // endregion
 
       /**
        * Creates a shallow clone of this list value.
@@ -164,9 +150,9 @@ define([
        *
        * Ownership is not preserved.
        *
-       * @return {!pentaho.type.List} The list value clone.
+       * If the list is read-only, the clone will not.
        *
-       * @see pentaho.type.List#setOwnership
+       * @return {!pentaho.type.List} The list value clone.
        */
       clone: function() {
         var clone = Object.create(Object.getPrototypeOf(this));
@@ -230,7 +216,7 @@ define([
        * The default list implementation, returns the value of the
        * list instance's {@link pentaho.type.List#$uid}.
        *
-       * @type string
+       * @type {string}
        * @readonly
        */
       get key() {
@@ -240,7 +226,7 @@ define([
       /**
        * Gets the number of elements in the list.
        *
-       * @type number
+       * @type {number}
        * @readonly
        */
       get count() {
@@ -325,6 +311,8 @@ define([
        * @param {number} [keyArgs.index] The index at which to add new elements.
        * When unspecified, new elements are appended to the list.
        * This argument is ignored when `noAdd` is `true`.
+       *
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
        */
       set: function(fragment, keyArgs) {
 
@@ -344,6 +332,8 @@ define([
        * are converted to the list's element class.
        *
        * @param {any|Array} fragment - Value or values to add.
+       *
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
        */
       add: function(fragment) {
         this._set(fragment, /* add: */true, /* update: */true, /* remove: */false, /* move: */false);
@@ -360,9 +350,11 @@ define([
        *
        * @param {any|Array} fragment - Element or elements to add.
        * @param {number} index - The index at which to start inserting new elements.
+       *
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
        */
       insert: function(fragment, index) {
-        this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*move:*/false, /*index:*/index);
+        this._set(fragment, /* add: */true, /* update: */true, /* remove: */false, /* move: */false, /* index: */index);
       },
 
       /**
@@ -371,8 +363,13 @@ define([
        * Specified elements that are not present in the list are ignored.
        *
        * @param {any|Array} fragment - Element or elements to remove.
+       *
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
        */
       remove: function(fragment) {
+
+        this.__assertEditable();
+
         this._usingChangeset(function(cset) {
           cset._remove(fragment);
         });
@@ -383,8 +380,13 @@ define([
        *
        * @param {any} elemSpec - An element specification.
        * @param {number} indexNew - The new index of the element.
+       *
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
        */
       move: function(elemSpec, indexNew) {
+
+        this.__assertEditable();
+
         this._usingChangeset(function(cset) {
           cset._move(elemSpec, indexNew);
         });
@@ -402,8 +404,13 @@ define([
        *
        * @param {number} start - The index at which to start removing.
        * @param {number} [count=1] The number of elements to remove.
+       *
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
        */
       removeAt: function(start, count) {
+
+        this.__assertEditable();
+
         this._usingChangeset(function(cset) {
           cset._removeAt(start, count);
         });
@@ -413,8 +420,13 @@ define([
        * Sorts the elements of the list using the given comparer function.
        *
        * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer - The comparer function.
+       *
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
        */
       sort: function(comparer) {
+
+        this.__assertEditable();
+
         this._usingChangeset(function(cset) {
           cset._sort(comparer);
         });
@@ -422,8 +434,13 @@ define([
 
       /**
        * Removes all elements from the list.
+       *
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
        */
       clear: function() {
+
+        this.__assertEditable();
+
         this._usingChangeset(function(cset) {
           cset._clear();
         });
@@ -493,6 +510,9 @@ define([
       },
 
       _set: function(fragment, add, update, remove, move, index) {
+
+        this.__assertEditable();
+
         this._usingChangeset(function(cset) {
           cset._set(fragment, add, update, remove, move, index);
         });
@@ -652,9 +672,9 @@ define([
           // The type's id or the temporary id in this scope.
           var baseType = this.ancestor;
           var spec = {
-              id:   this.shortId,
-              base: baseType.toRefInContext(keyArgs)
-            };
+            id: this.shortId,
+            base: baseType.toRefInContext(keyArgs)
+          };
 
           // Add "of" if we're `List` or the base `of` is different.
           var baseElemType = baseType.isSubtypeOf(List.type) ? baseType._elemType : null;

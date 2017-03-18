@@ -23,13 +23,13 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false, jasmine:false*/
 
-  var context = new Context(),
-      Property = context.get("property"),
-      PropertyType = Property.Type,
-      PentahoBoolean = context.get("pentaho/type/boolean"),
-      Complex = context.get("pentaho/type/complex"),
-      PentahoString = context.get("pentaho/type/string"),
-      PentahoNumber  = context.get("pentaho/type/number");
+  var context = new Context();
+  var Property = context.get("property");
+  var PropertyType = Property.Type;
+  var PentahoBoolean = context.get("pentaho/type/boolean");
+  var Complex = context.get("pentaho/type/complex");
+  var PentahoString = context.get("pentaho/type/string");
+  var PentahoNumber  = context.get("pentaho/type/number");
 
   describe("pentaho.type.Property.Type -", function() {
 
@@ -581,6 +581,50 @@ define([
         */
       }); // end #value
       // endregion
+
+      describe("#isReadOnly - ", function() {
+        it("should default to false", function() {
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
+          expect(propType.isReadOnly).toBe(false);
+        });
+
+        it("should ignore undefined", function() {
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isReadOnly: undefined});
+          expect(propType.isReadOnly).toBe(false);
+        });
+
+        it("should ignore null", function() {
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isReadOnly: null});
+          expect(propType.isReadOnly).toBe(false);
+        });
+
+        it("should not allow changing the Property.type attribute value", function() {
+          var propType = Property.type;
+          var isReadOnly = propType.isReadOnly;
+          propType.isReadOnly = !isReadOnly;
+          expect(propType.isReadOnly).toBe(isReadOnly);
+        });
+
+        it("should cast other values to boolean", function() {
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isReadOnly: 1});
+          expect(propType.isReadOnly).toBe(true);
+
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", isReadOnly: 0});
+          expect(propType.isReadOnly).toBe(false);
+
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo3", isReadOnly: ""});
+          expect(propType.isReadOnly).toBe(false);
+
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo4", isReadOnly: true});
+          expect(propType.isReadOnly).toBe(true);
+
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo5", isReadOnly: "yes"});
+          expect(propType.isReadOnly).toBe(true);
+
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo6", isReadOnly: "no"});
+          expect(propType.isReadOnly).toBe(true);
+        });
+      }); // end #isReadOnly
 
       // region Dynamic & Monotonic Attributes
       describe("#isRequired - ", function() {
@@ -1295,6 +1339,14 @@ define([
       describe("property accessors", function() {
         it("should define the property with both a getter and a setter", function() {
           propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "string"});
+          var propDesc = Object.getOwnPropertyDescriptor(Derived.prototype, "foo");
+          expect(propDesc).not.toBe(null);
+          expect(propDesc.get).not.toBe(null);
+          expect(propDesc.set).not.toBe(null);
+        });
+
+        it("should define the property with both a getter and a setter even if the property is read-only", function() {
+          propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "string", isReadOnly: true});
           var propDesc = Object.getOwnPropertyDescriptor(Derived.prototype, "foo");
           expect(propDesc).not.toBe(null);
           expect(propDesc.get).not.toBe(null);
@@ -2269,6 +2321,133 @@ define([
         });
       });
       // endregion
+
+      // Monotonic. Cannot change if has descendants.
+      describe("isReadOnly - ", function() {
+        it("should inherit base isReadOnly value by default", function() {
+          var Base = Complex.extend();
+
+          Base.type.add({name: "baseNum", isReadOnly: true});
+
+          var Derived = Base.extend();
+
+          var propType = propertyTypeUtil.extend(Derived.type, "baseNum", {name: "baseNum"});
+
+          expect(propType.isReadOnly).toBe(true);
+        });
+
+        it("should ignore a nully value specification", function() {
+          var Base = Complex.extend();
+          Base.type.add({name: "postalCode", isReadOnly: true});
+
+          var Derived = Base.extend();
+
+          var propType = propertyTypeUtil.extend(Derived.type, "postalCode", {name: "postalCode", isReadOnly: null});
+
+          expect(propType.isReadOnly).toBe(true);
+
+          // ---
+
+          Derived = Base.extend();
+
+          propType = propertyTypeUtil.extend(Derived.type, "postalCode", {name: "postalCode", isReadOnly: undefined});
+
+          expect(propType.isReadOnly).toBe(true);
+        });
+
+        it("should ignore setting to a nully value", function() {
+          var Base = Complex.extend();
+          Base.type.add({name: "postalCode", isReadOnly: true});
+
+          var Derived = Base.extend();
+
+          var propType = propertyTypeUtil.extend(Derived.type, "postalCode", {name: "postalCode"});
+
+          expect(propType.isReadOnly).toBe(true);
+
+          propType.isReadOnly = null;
+
+          expect(propType.isReadOnly).toBe(true);
+
+          // ---
+
+          propType.isReadOnly = undefined;
+
+          expect(propType.isReadOnly).toBe(true);
+        });
+
+        it("should accept setting to true if the base property is not read-only", function() {
+          var Base = Complex.extend();
+
+          Base.type.add({name: "postalCode"});
+
+          var Derived = Base.extend();
+
+          var propType = propertyTypeUtil.extend(Derived.type, "postalCode", {name: "postalCode", isReadOnly: true});
+
+          expect(propType.isReadOnly).toBe(true);
+        });
+
+        it("should accept setting to true if the property's **previous** value is false", function() {
+          var Base = Complex.extend();
+
+          Base.type.add({name: "postalCode"});
+
+          var Derived = Base.extend();
+
+          var propType = propertyTypeUtil.extend(Derived.type, "postalCode", {name: "postalCode"});
+
+          propType.isReadOnly = true;
+          expect(propType.isReadOnly).toBe(true);
+        });
+
+        it("should ignore when specifying false and the base property is read-only", function() {
+
+          var Base = Complex.extend();
+
+          Base.type.add({name: "num", isReadOnly: true});
+
+          var Derived = Base.extend();
+
+          var propType = propertyTypeUtil.extend(Derived.type, "num", {name: "num", isReadOnly: false});
+
+          expect(propType.isReadOnly).toBe(true);
+        });
+
+        it("should ignore when set to false and the property's previous value is true", function() {
+
+          var Base = Complex.extend();
+
+          Base.type.add({name: "num", isReadOnly: false});
+
+          var Derived = Base.extend();
+
+          var propType = propertyTypeUtil.extend(Derived.type, "num", {name: "num"});
+
+          propType.isReadOnly = true;
+
+          expect(propType.isReadOnly).toBe(true);
+
+          propType.isReadOnly = false;
+
+          expect(propType.isReadOnly).toBe(true);
+        });
+
+        it("should throw if changed and the property hasDescendants", function() {
+
+          var Base = Complex.extend();
+
+          Base.type.add({name: "num", isReadOnly: false});
+
+          var Derived = Base.extend();
+
+          var propType = propertyTypeUtil.extend(Derived.type, "num", {name: "num"});
+
+          expect(function() {
+            Base.type.get("num").isReadOnly = true;
+          }).toThrow(errorMatch.operInvalid());
+        });
+      });
 
       // region Dynamic & Monotonic attributes
       // Dynamic. Monotonic. Cannot change if has descendants.

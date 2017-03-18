@@ -524,10 +524,12 @@ define([
          */
         toValue: function(valueSpec, noDefault) {
           if(valueSpec == null) {
-            return noDefault ? null : this._freshDefaultValue();
+            return noDefault ? null : this.__freshDefaultValue();
           }
 
-          return this.type.to(valueSpec);
+          return this.isList
+              ? this.type.to(valueSpec, this.__listCreateKeyArgs || this.__buildListCreateKeyArgs())
+              : this.type.to(valueSpec);
         },
 
         /**
@@ -539,9 +541,21 @@ define([
          * @return {pentaho.type.Value} A fresh default value.
          * @private
          */
-        _freshDefaultValue: function() {
+        __freshDefaultValue: function() {
           var value = this.value;
-          return value ? value.clone() : this.isList ? this.type.create() : value;
+          return value
+              ? value.clone()
+              : (this.isList
+                  ? this.type.create(null, this.__listCreateKeyArgs || this.__buildListCreateKeyArgs())
+                  : value);
+        },
+
+        __listCreateKeyArgs: null,
+
+        __buildListCreateKeyArgs: function() {
+          return (this.__listCreateKeyArgs = {
+            isReadOnly: this._isReadOnly
+          });
         },
         // endregion
 
@@ -561,6 +575,56 @@ define([
             this._label = text.titleFromName(this.name);
           } else {
             delete this._label;
+          }
+        },
+        // endregion
+
+        // region isReadOnly attribute
+        _isReadOnly: false,
+
+        /**
+         * Gets or sets whether the value of properties of this type can be changed.
+         *
+         * If the _value type_ is a [list]{@link pentaho.type.Value.Type#isList} type,
+         * then this property effectively makes the list read-only.
+         *
+         * ### Get
+         *
+         * The _default read-only_ value is the _inherited read-only_ value.
+         *
+         * A root _property type_ has a default _read-only_ value of `false`.
+         *
+         * ### Set
+         *
+         * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants} properties,
+         * an error is thrown.
+         *
+         * When set to a {@link Nully} value, the set operation is ignored.
+         *
+         * Otherwise, the set value is converted to boolean, by using {@link Boolean}.
+         *
+         * This property is monotonic. Once set to `true`, it can no longer be set to `false`.
+         *
+         * @type {boolean}
+         *
+         * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
+         * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
+         */
+        get isReadOnly() {
+          return this._isReadOnly;
+        },
+
+        set isReadOnly(value) {
+          // Cannot change the root value.
+          // Testing this here, instead of after the descendants test,
+          // because, otherwise, it would be very hard to test.
+          if(this === _propType) return;
+
+          if(this.hasDescendants)
+            throw error.operInvalid("Cannot change the isReadOnly attribute of a property type that has descendants.");
+
+          if(value != null && !!value) {
+            this._isReadOnly = true;
           }
         },
         // endregion

@@ -381,6 +381,21 @@ define([
           expect(value.value).toBe("1");
         });
 
+        it("should throw a TypeError if the property is read-only", function() {
+
+          var Derived = Complex.extend({
+            type: {props: [{name: "x", type: "string", isReadOnly: true, value: "2"}]}
+          });
+
+          var derived = new Derived();
+
+          expect(function() {
+            derived.set("x", "1");
+          }).toThrowError(TypeError);
+
+          expect(derived.x).toBe("2");
+        });
+
         it("should set the value of an existing list property", function() {
           var Derived = Complex.extend({
             type: {props: [{name: "x", type: ["string"]}]}
@@ -1171,6 +1186,31 @@ define([
     });
 
     describe("Property Attributes", function() {
+
+      describe("Property#isReadOnly", function() {
+
+        it("should make the list of a read-only list property, read-only", function() {
+
+          var Derived = Complex.extend({
+            type: {props: [{name: "x", type: ["string"], isReadOnly: true}]}
+          });
+
+          var derived = new Derived();
+
+          expect(derived.x.isReadOnly).toBe(true);
+        });
+
+        it("should make the list of a writable list property, writable", function() {
+
+          var Derived = Complex.extend({
+            type: {props: [{name: "x", type: ["string"]}]}
+          });
+
+          var derived = new Derived();
+
+          expect(derived.x.isReadOnly).toBe(false);
+        });
+      });
 
       describe("#isApplicable(name)", function() {
         it("should return the evaluated static value of an existing property", function() {

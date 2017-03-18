@@ -103,7 +103,7 @@ define([
       // so, in the name of performance, we're purposely not calling base.
 
       // NOTE 2: keep the constructor code synced with #clone !
-      constructor: function(spec) {
+      constructor: function(spec, keyArgs) {
 
         this._initContainer();
 
@@ -118,16 +118,52 @@ define([
         while(i--) {
           propType = propTypes[i];
 
-          values[propType.name] = value = propType.toValue(readSpec && readSpec(spec, propType));
+          values[propType.name] =
+              value = this._initValue(propType.toValue(readSpec && readSpec(spec, propType)), propType);
 
-          // If this instance is being newed up while there is an ambient transaction,
-          // it should not cease to exist if the txn is rejected,
-          // nor should its construction time property values be restored to... what? default values?
-          // So, references added should also not be subject to the ambient transaction.
-          if(value && value._addReference) value._addReference(this, propType);
+          if(value && value._addReference) {
+            this.__initValueRelation(propType, value);
+          }
         }
 
         this._values = values;
+      },
+
+      /**
+       * Allows further initializing the value of a property.
+       *
+       * This method is called from within the base constructor.
+       *
+       * It is absolutely mandatory to return a value that is an instance of the type of value of the property.
+       * If the value should remain "empty", return `null`, and never `undefined`.
+       *
+       * @param {pentaho.type.Value} value - The value of the property, possibly `null`.
+       * @param {!pentaho.type.Property.Type} propType - The property type.
+       *
+       * @return {pentaho.type.Value} The value of the property, possibly `null`.
+       * @protected
+       */
+      _initValue: function(value, propType) {
+        return value;
+      },
+
+      /**
+       * Initializes the relation between a this complex and its container value.
+       *
+       * If `this` instance is being newed up or cloned while there is an ambient transaction,
+       * it should not cease to exist if the txn is rejected,
+       * nor should its construction time property values be restored to... what? default values?
+       * So, references added should also not be subject to the ambient transaction.
+       *
+       *
+       * @param {!pentaho.type.Property.Type} propType - The property type.
+       * @param {!pentaho.type.ContainerMixin} value - The container value.
+       *
+       * @private
+       */
+      __initValueRelation: function(propType, value) {
+
+          value._addReference(this, propType);
       },
 
       /**
@@ -168,8 +204,9 @@ define([
           name  = propType.name;
           cloneValues[name] = value = propType.isList ? this._getByName(name).clone() : source._getByName(name);
 
-          // See note on constructor. The same reasoning applies to a new clone instance.
-          if(value && value._addReference) value._addReference(clone, propType);
+          if(value && value._addReference) {
+            clone.__initValueRelation(propType, value);
+          }
         }
 
         clone._values = cloneValues;
@@ -191,8 +228,8 @@ define([
        * The default complex implementation, returns the value of the
        * complex instance's {@link pentaho.type.Complex#$uid}.
        *
-       * @type string
-       * @readonly
+       * @type {string}
+       * @readOnly
        */
       get key() {
         return this._uid;
@@ -341,8 +378,8 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When `sloppy` is `false` and a step, on a complex value,
        * is not a defined property.
        */
-      path: function(args, sloppy) {
-        return Array.isArray(args) ? this._path(args, sloppy) : this._path(arguments, false);
+      path: function(steps, sloppy) {
+        return Array.isArray(steps) ? this._path(steps, sloppy) : this._path(arguments, false);
       },
 
       _path: function(args, sloppy) {
@@ -366,6 +403,7 @@ define([
        * @param {any?} [valueSpec=null] A value specification.
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
+       * @throws {TypeError} When property is read-only.
        *
        * @fires "will:change"
        * @fires "did:change"
@@ -373,8 +411,11 @@ define([
        */
       set: function(name, valueSpec) {
         var propType = this.type.get(name);
+
+        if(propType.isReadOnly) throw new TypeError("'" + name + "' is read-only");
+
         if(propType.isList)
-        // Delegate to List#set.
+          // Delegate to List#set.
           this._values[propType.name].set(valueSpec);
         else
           ComplexChangeset._setElement(this, propType, valueSpec);
@@ -850,8 +891,8 @@ define([
           var ps;
           // !_props could only occur if accessing #get directly on Complex.type and it had no derived classes yet...
           return (!name || !(ps = this._props)) ? null :
-                 (typeof name === "string")     ? ps.get(name) :
-                 (ps.get(name.name) === name)   ? name :
+                 (typeof name === "string") ? ps.get(name) :
+                 (ps.get(name.name) === name) ? name :
                  null;
         },
 
