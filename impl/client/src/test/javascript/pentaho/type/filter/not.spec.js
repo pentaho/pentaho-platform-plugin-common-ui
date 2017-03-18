@@ -256,28 +256,6 @@ define([
 
         expect(filter.contentKey).toBe("(not)");
       });
-
-      it("should refresh contentKey when operand is changed", function() {
-        var filter  = new NotFilter({operand: {_: "=", p: "a", v: "1"}});
-
-        var contentKey0 = filter.contentKey;
-
-        filter.operand = {_: "=", p: "b", v: "2"};
-
-        expect(filter.contentKey).not.toBe(contentKey0);
-        expect(filter.contentKey).toBe("(not (= b 2))");
-      });
-
-      it("should refresh contentKey when the operand's properties are changed", function() {
-        var filter  = new NotFilter({operand: {_: "=", p: "a", v: "1"}});
-
-        var contentKey0 = filter.contentKey;
-
-        filter.operand.value = 2;
-
-        expect(filter.contentKey).not.toBe(contentKey0);
-        expect(filter.contentKey).toBe("(not (= a 2))");
-      });
     });
   }); // pentaho.type.filter.Not
 });

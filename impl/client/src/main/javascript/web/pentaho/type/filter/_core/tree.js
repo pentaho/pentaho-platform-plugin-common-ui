@@ -199,7 +199,8 @@ define([
           {
             name: "operands",
             nameAlias: "o",
-            type: [filter.Abstract]
+            type: [filter.Abstract],
+            isReadOnly: true
           }
         ]
       }

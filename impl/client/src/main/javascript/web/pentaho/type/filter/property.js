@@ -103,7 +103,8 @@ define([
             name: "property",
             nameAlias: "p",
             type: "string",
-            isRequired: true
+            isRequired: true,
+            isReadOnly: true
           }
         ]
       }

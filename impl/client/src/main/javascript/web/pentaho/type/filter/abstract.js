@@ -124,13 +124,6 @@ define([
        * @abstract
        */
 
-      _setVersionInternal: function(version) {
-        this.base(version);
-
-        this.__contentKey = null;
-        this.__toDnfCache = null;
-      },
-
       /**
        * Determines if an element is selected by this filter.
        *
@@ -322,7 +315,7 @@ define([
           var excludeKey = excludeKeysArray[j];
           var excludeAnd = excludeKeys[excludeKey];
 
-          //var excludeAndNeg = excludeAnd.negate();
+          // var excludeAndNeg = excludeAnd.negate();
 
           // Match this against every `remainings`.
 
@@ -472,8 +465,8 @@ define([
         }
       } else {
         ands.push(new filter.And({operands: andOperands.slice()}));
-        }
       }
+    }
 
     function flattenTree(f) {
 

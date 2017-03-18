@@ -94,7 +94,8 @@ define([
             // may be empty
             name: "values",
             nameAlias: "v",
-            type: ["element"]
+            type: ["element"],
+            isReadOnly: true
           }
         ]
       }
