@@ -13,10 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "module",
+  "pentaho/util/logger",
+  "pentaho/debug",
+  "pentaho/debug/Levels"
+], function(module, logger, debugMgr, DebugLevels) {
   "use strict";
 
   /* eslint valid-jsdoc: 0 */
+
+  var _isDebugMode = debugMgr.testLevel(DebugLevels.debug, module);
 
   /**
    * The `SelectionModes` enumeration contains the collection of standard selection mode functions.
@@ -39,17 +46,27 @@ define(function() {
      * Otherwise, removes the input filter from the current selection filter.
      */
     toggle: function(current, input) {
+
+      if(_isDebugMode) logger.log("TOGGLE BEGIN");
+
       if(!input) return current;
 
       // Determine if all rows in input are currently selected.
       // current.include(input) ?
       // input \ current = 0
+      var unselectedInput = input.andNot(current).toDnf();
 
-      return input.andNot(current).toDnf().kind === "false"
+      if(_isDebugMode) logger.log(unselectedInput.kind === "false" ? "removing" : "adding");
+
+      var result = unselectedInput.kind === "false"
           // all input is already selected, so, actually, toggle it all
           ? SelectionModes.remove.call(this, current, input)
           // not all input is already selected, so, add what's missing first, before actually toggling.
-          : SelectionModes.add.call(this, current, input);
+          : SelectionModes.add.call(this, current, unselectedInput);
+
+      if(_isDebugMode) logger.log("TOGGLE END");
+
+      return result;
     },
 
     /**

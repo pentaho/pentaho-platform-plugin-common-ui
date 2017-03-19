@@ -192,6 +192,32 @@ define([
         return opersOut;
       },
 
+      // region literalsByPropertyName
+      get literalsByPropertyName() {
+        return this.__literalsByName || (this.__literalsByName = Object.freeze(this.__buildLiteralsByName()));
+      },
+
+      __literalsByName: null,
+
+      __buildLiteralsByName: function() {
+        var literalsByName = {};
+        var os = this.operands;
+        var i = os.count;
+        var o;
+        var p;
+
+        while(i--) {
+          o = os.at(i);
+          p = (o.isNot ? o.operand : o);
+          if(p.isProperty) {
+            literalsByName[o.property] = {operand: o, index: i};
+          }
+        }
+
+        return literalsByName;
+      },
+      // endregion
+
       type: /** @lends pentaho.type.filter.Tree.Type# */{
         id: "pentaho/type/filter/tree",
         isAbstract: true,

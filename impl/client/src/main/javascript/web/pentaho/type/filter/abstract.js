@@ -22,13 +22,18 @@ define([
   "./_core/not",
   "./_core/true",
   "./_core/false",
-  "../../util/arg",
-  "../../util/error",
-  "../../util/object"
+  "pentaho/util/arg",
+  "pentaho/util/error",
+  "pentaho/util/object",
+  "pentaho/util/logger",
+  "pentaho/debug",
+  "pentaho/debug/Levels"
 ], function(module, complexFactory, treeFactory, andFactory, orFactory, notFactory,
-            trueFactory, falseFactory, arg, error, O) {
+            trueFactory, falseFactory, arg, error, O, logger, debugMgr, DebugLevels) {
 
   "use strict";
+
+  var _isDebugMode = debugMgr.testLevel(DebugLevels.debug, module);
 
   return function(context) {
 
@@ -88,6 +93,14 @@ define([
        */
       get isTerminal() {
         return true;
+      },
+
+      get isNot() {
+        return false;
+      },
+
+      get isProperty() {
+        return false;
       },
 
       /**
@@ -264,76 +277,79 @@ define([
 
         var currentDnf = this.toDnf();
         switch(currentDnf.kind) {
-          case "false": return currentDnf; // false \ ? = false
-          case "true": return exclude.negate(); // true \ ?  = !?
+          case "false":
+            return currentDnf; // false \ ? = false
+          case "true":
+            return exclude.negate(); // true \ ?  = !?
         }
 
         var excludeDnf = exclude.toDnf();
         switch(excludeDnf.kind) {
-          case "false": return this; // ? \ false = ?
-          case "true": return filter.False.instance; // ? \ true = false
+          case "false":
+            return this; // ? \ false = ?
+          case "true":
+            return filter.False.instance; // ? \ true = false
         }
 
-        // Remove from `current`, any `and` that also exists in exclude.
+        // Remove from `current`, any `and` that also exists exactly in exclude.
+        // Leave unmatched currentDnf disjuncts in `remainders`.
+
+        var remainders = [];
+
+        if(_isDebugMode) {
+          logger.log("-----------------------------------------");
+          //logger.log("currentDnf #=" + currentDnf.operands.count + " " + currentDnf.contentKey);
+          //logger.log("excludeDnf #=" + excludeDnf.operands.count + " " + excludeDnf.contentKey);
+        }
 
         // Index exclude Ands by contentKey.
         var excludeKeys = {};
         excludeDnf.operands.each(function(and) { excludeKeys[and.contentKey] = and; });
 
-        var remainings = [];
         currentDnf.operands.each(function(and) {
-          var key = and.contentKey;
           // Exact match?
-          if(O.hasOwn(excludeKeys, key)) {
-            // Assuming that this excludeAnd would not included in any other currentDnf `and`.
-            // This is somewhat reasonable, if we assume that the original `currentDnf`
-            // did not contain totally subsumed terms... ?
-            // delete excludeKeys[key];
-          } else {
-            remainings.push(and);
+          if(!O.hasOwn(excludeKeys, and.contentKey)) {
+            remainders.push(and);
           }
         });
 
-        // What to do with remainingKeys?
-        // While these did not match exactly any of the current ands, they may, for example,
-        // **include** any of the current `and`
-        // For example, `(and (= Country PT))` **includes** `(and (= Country PT) (= City Lisbon))`
-        // So, excluding the former, indirectly excludes the latter.
-        // The same would apply to isBetween-like filters.
-        // Still N * M complexity...
-        //
-        // Thinking the other way round:
-        // (and (= Country PT) (= City Lisbon)) \ (and (= Country PT))
-        // -> False -> nothing remains...
-        var excludeKeysArray = Object.keys(excludeKeys);
-        var j = -1;
-        var K = excludeKeysArray.length;
-        while(++j < K) {
-          var i = remainings.length;
-          if(!i) break;
-
-          var excludeKey = excludeKeysArray[j];
-          var excludeAnd = excludeKeys[excludeKey];
-
-          // var excludeAndNeg = excludeAnd.negate();
-
-          // Match this against every `remainings`.
-
-          while(i--) {
-            var diff = new filter.And({operands: [remainings[i], excludeAnd.negate()]}).toDnf();
-            if(diff.kind === "false") {
-              // nothing remained.
-              remainings.splice(i, 1);
-            } else {
-              // replace with remainder.
-              remainings[i] = diff;
-            }
-          }
+        if(_isDebugMode) {
+          logger.log("remainders 1 #=" + remainders.length +
+              " ( " + remainders.length + " * " + excludeDnf.operands.count + " = " +
+              (remainders.length * excludeDnf.operands.count) + ")");
         }
 
-        return remainings.length
-            ? new filter.Or({operands: remainings})
+        if(remainders.length) {
+          excludeDnf.operands.each(function(excludeAnd) {
+
+            var i = remainders.length;
+            while(i--) {
+              var result = subtractDnfAnds(remainders[i], excludeAnd);
+              if(!result) {
+                remainders.splice(i, 1);
+                if(!remainders.length) return false;
+              } else {
+                // replace at i and insert the remaining ands, afterwards.
+                // "Gained" how many ands?
+                // var extra = ands.length - 1;
+                result.unshift(i, 1);
+                remainders.splice.apply(remainders, result);
+
+                // Because looping is done backwards, any extra ands are not visited anymore in this excludeAnd.
+              }
+            }
+          });
+
+          if(_isDebugMode) logger.log("remainders 2 #=" + remainders.length);
+        }
+
+        var result = remainders.length
+            ? new filter.Or({operands: remainders})
             : filter.False.instance;
+
+        //if(_isDebugMode) logger.log("result = " + result.contentKey);
+
+        return result;
       },
 
       toDnf: function() {
@@ -702,6 +718,80 @@ define([
       if(!osNew.length) return filter.True.instance; // 11)
 
       return new filter.And({operands: osNew});
+    }
+
+    // Optimized version... of a - b
+    function subtractDnfAnds(a, b) {
+      // a,b - And of literals: possibly negated isEqual
+      // Additionally, it is assumed that the ands are simplified, such that:
+      // * if a property can only occur once, either positively or negatively
+
+      var results = [];
+      var resulti;
+
+      var literalsAByPropName = a.literalsByPropertyName;
+      var bs = b.operands;
+      var i = bs.count;
+      var isPbNot;
+      var isPaNot;
+
+      while(i--) {
+        var bi = bs.at(i);
+        var pb = (isPbNot = bi.isNot) ? bi.operand : bi;
+
+        var aiInfo = O.getOwn(literalsAByPropName, pb.property);
+        if(aiInfo) {
+          var ai = aiInfo.operand;
+          var pa = (isPaNot = ai.isNot) ? ai.operand : ai;
+          if(isPaNot) {
+            if(isPbNot) {
+              // (-va - -vb) <=> (-va + vb) <=> (p != va and p = vb)
+              // if va == vb => false
+              // if va != vb => (pb = vb)
+              if(!equalValues(pa.value, pb.value)) {
+                resulti = a.operands.toArray();
+                resulti[aiInfo.index] = pb;
+                results.push(new filter.And({operands: resulti}));
+              }
+            } else {
+              // (-va - vb) <=> (-va -vb) <=> (p != va and p != vb)
+              // if va == vb => the whole diff is = to a
+              // if va != vb => (p !in (va,vb))
+              if(equalValues(pa.value, pb.value)) {
+                return [a];
+              }
+
+              // TODO: replace ai by not in(va,vb) ? IsIn is even not defined...
+              resulti = a.operands.toArray();
+              resulti[aiInfo.index] = new filter.IsIn({property: pa.property, values: [pa.value, pb.value]}).negate();
+              results.push(new filter.And({operands: resulti}));
+            }
+          } else if(isPbNot) {
+            // (va - -vb) <=> (va + vb) <=> (p = va and p = vb)
+            // if va == vb => (p = va) => a
+            // if va != vb => false
+            if(equalValues(pa.value, pb.value)) {
+              return [a];
+            }
+          } else if(!equalValues(pa.value, pb.value)) {
+            // (va - vb) <=> (p = va and p != vb)
+            // if va == vb => false
+            // if va != vb => (p = va) => a
+            return [a];
+          }
+        } else {
+          // Add a term with an additional operand, -bi
+          resulti = a.operands.toArray();
+          resulti.push(isPbNot ? pb : pb.negate());
+          results.push(new filter.And({operands: resulti}));
+        }
+      }
+
+      return results.length ? results : null;
+    }
+
+    function equalValues(v1, v2) {
+      return v1 === v2 || (v1 != null && v2 != null && v1.valueOf() === v2.valueOf());
     }
   };
 });

@@ -62,6 +62,10 @@ define([
         return false;
       },
 
+      get isNot() {
+        return true;
+      },
+
       _buildContentKey: function() {
         var o = this.operand;
         return o ? o.contentKey : "";

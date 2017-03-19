@@ -65,6 +65,10 @@ define([
         return this.getv("property");
       },
 
+      get isProperty() {
+        return true;
+      },
+
       // TODO: In the future, review if value argument should be of type pentaho.type.Value.
       /**
        * Determines if a property value is such that its element is selected by this filter.
