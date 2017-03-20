@@ -58,10 +58,7 @@ define([
             invalidDataMessage_visible: false,
 
             plotFrameVisible: false,
-            plotSizeMin: {width: 600, height: 300},
 
-            clickable:  false,
-            selectable: false,
             hoverable:  true,
 
             // Legend

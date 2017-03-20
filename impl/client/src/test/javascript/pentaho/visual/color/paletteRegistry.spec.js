@@ -243,12 +243,10 @@ define(["pentaho/visual/color/paletteRegistry"], function(singletonPaletteRegist
     });
 
     it("should be pre-loaded with twelve palettes", function() {
-
       var palettes = singletonPaletteRegistry.getAll();
       expect(palettes instanceof Array).toBe(true);
 
-      // TODO: Temporarily, 16 palettes (and not 12) due to the palettes registered by CDF.
-      expect(palettes.length).toBe(16);
+      expect(palettes.length).toBe(12);
     });
 
     it("should contain a palette named 'viz_api_neutral'", function() {
