@@ -1184,6 +1184,7 @@ define([
        * });
        *
        * @param {pentaho.type.spec.UInstance} [instSpec] An instance specification.
+       * @param {Object} [keyArgs] - The keyword arguments passed to the instance constructor.
        *
        * @return {!pentaho.type.Instance} The created instance.
        *
@@ -1199,7 +1200,7 @@ define([
        * @throws {pentaho.lang.OperationInvalidError} When the determined type for the specified `instSpec`
        * is an [abstract]{@link pentaho.type.Value.Type#isAbstract} type.
        */
-      create: function(instSpec) {
+      create: function(instSpec, keyArgs) {
         var Instance;
         var typeSpec;
 
@@ -1251,6 +1252,7 @@ define([
        * the type is assumed to be `this` type.
        *
        * @param {pentaho.type.spec.UInstance} [instSpec] - An instance specification.
+       * @param {Object} [keyArgs] - The keyword arguments passed to `create`.
        *
        * @return {!Promise.<pentaho.type.Instance>} A promise to the created instance.
        *
@@ -1267,7 +1269,7 @@ define([
        * @see pentaho.type.Type#isSubtypeOf
        * @see pentaho.type.Context#get
        */
-      createAsync: function(instSpec) {
+      createAsync: function(instSpec, keyArgs) {
 
         var customTypeIds = Object.keys(this._collectInstSpecTypeIds(instSpec));
 
@@ -1279,7 +1281,7 @@ define([
             : promiseUtil.wrapCall(resolveSync, this);
 
         function resolveSync() {
-          return this.create(instSpec);
+          return this.create(instSpec, keyArgs);
         }
       },
 
@@ -1364,12 +1366,14 @@ define([
        * [create]{@link pentaho.type.Type#create}.
        *
        * @param {?any} value - The value to convert.
+       * @param {Object} [keyArgs] - The keyword arguments passed to `create`, when a new instance is created.
+       *
        * @return {?pentaho.type.Instance} The converted value or `null`.
        */
-      to: function(value) {
-        return value == null   ? null  :
-               this.is(value)  ? value :
-               this.create(value);
+      to: function(value, keyArgs) {
+        return value == null ? null :
+               this.is(value) ? value :
+               this.create(value, keyArgs);
       },
 
       // region serialization

@@ -101,10 +101,10 @@ define([
         spyOn(SelectionModes, "add").and.callThrough();
         spyOn(SelectionModes, "remove").and.callThrough();
 
-        // Only the Portugal row is sales12k and inStock
+        var currentFilter = sales12k;
         var inputFilter = sales12k.and(inStock);
 
-        var result = SelectionModes.toggle.call(view, sales12k, inputFilter);
+        var result = SelectionModes.toggle.call(view, currentFilter, inputFilter);
 
         expect(SelectionModes.add.calls.count()).toBe(0);
 
@@ -112,10 +112,8 @@ define([
         expect(SelectionModes.remove.calls.first().object).toBe(view);
 
         var args = SelectionModes.remove.calls.first().args;
-        expect(args[0]).toBe(sales12k);
+        expect(args[0]).toBe(currentFilter);
         expect(args[1]).toBe(inputFilter);
-
-        expect(result instanceof AndFilter).toBe(true);
       });
 
       it("should add the input selection from the current selection when " +
@@ -139,7 +137,7 @@ define([
 
         var args = SelectionModes.add.calls.first().args;
         expect(args[0]).toBe(currentFilter);
-        expect(args[1]).toBe(inputFilter);
+        expect(args[1]).not.toBe(inputFilter); // should be "not yet selected input"
 
         expect(result instanceof OrFilter).toBe(true);
       });
@@ -165,7 +163,7 @@ define([
 
         var args = SelectionModes.add.calls.first().args;
         expect(args[0]).toBe(currentFilter);
-        expect(args[1]).toBe(inputFilter);
+        expect(args[1]).not.toBe(inputFilter); // should be "not yet selected input"
 
         expect(result instanceof OrFilter).toBe(true);
       });
@@ -185,10 +183,7 @@ define([
       it("should remove the input selection from the current selection", function() {
         var result = SelectionModes.remove.call(view, sales12k, inStock);
 
-        expect(result instanceof AndFilter).toBe(true);
-        expect(result.operands.at(0)).toBe(sales12k);
-        expect(result.operands.at(1) instanceof NotFilter).toBe(true);
-        expect(result.operands.at(1).operand).toBe(inStock);
+        expect(result.toDnf().contentKey).toBe("(or (and (in sales 12000) (not (= inStock true))))");
       });
     });
 

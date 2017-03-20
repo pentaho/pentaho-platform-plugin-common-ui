@@ -57,22 +57,11 @@ define([
      */
     var VisualModel = Model.extend(/** @lends pentaho.visual.base.Model# */{
 
-      constructor: function() {
-
-        this.base.apply(this, arguments);
-
-        // Create default visual role mappings
-        this.type.each(function(propType) {
-          if(propType.type.isSubtypeOf(Mapping.type)) {
-            // Visual role
-            var mapping = this.get(propType);
-            if(!mapping) {
-              // Create default instance without firing events
-              this._values[propType.name] = mapping = propType.toValue({});
-              mapping._addReference(this, propType);
-            }
-          }
-        }, this);
+      _initValue: function(value, propType) {
+        // Empty visual role mapping?
+        return !value && propType.type.isSubtypeOf(Mapping.type)
+            ? propType.toValue({})
+            : value;
       },
 
       // region serialization

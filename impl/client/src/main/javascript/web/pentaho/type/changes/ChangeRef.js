@@ -108,16 +108,25 @@ define([
           refs = ReferenceList.to(refs.slice());
         }
 
+        var i;
+        var L;
+        var aref;
         if(refsRem) {
-          refsRem.forEach(function(aref) {
+          i = -1;
+          L = refsRem.length;
+          while(++i < L) {
+            aref = refsRem[i];
             refs.remove(aref.container, aref.property);
-          });
+          }
         }
 
         if(refsAdd) {
-          refsAdd.forEach(function(aref) {
+          i = -1;
+          L = refsAdd.length;
+          while(++i < L) {
+            aref = refsAdd[i];
             refs.add(aref.container, aref.property);
-          });
+          }
         }
       }
 

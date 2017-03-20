@@ -98,7 +98,7 @@ define([
         expect(filter3.operands.at(0)).toBe(filter2);
       });
 
-      it("should return this when no operand is transformed by the transformer", function() {
+      it("should return `this` when no operand is transformed by the transformer", function() {
         var filter1 = new CustomTreeFilter();
 
         var transf = jasmine.createSpy().and.returnValue(null);
@@ -120,7 +120,7 @@ define([
         }).toThrow(errorMatch.argRequired("transformer"));
       });
 
-      it("should return null if none of the operands is transformed", function() {
+      it("should return null when there are no operands", function() {
         var filter = new CustomTreeFilter();
 
         var transf = jasmine.createSpy().and.returnValue(null);

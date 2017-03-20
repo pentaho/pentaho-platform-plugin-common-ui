@@ -24,6 +24,7 @@ define([
   var vizApiFont = "10px OpenSansRegular";
   var maxHorizontalTextWidth = 117;
   var pvc = null;
+  var pv = null;
   var numberFormatCache = {};
 
   var numberStyle = {
@@ -96,7 +97,7 @@ define([
                 item: {
                   // Trim label text
                   labelText: function() {
-                    if (!pvc) {
+                    if(!pvc) {
                       pvc = require("cdf/lib/CCC/pvc");
                     }
                     var text = this.base();
@@ -158,7 +159,7 @@ define([
             },
             // Disable "smart" Date value type on discrete cartesian axis formatting...
             discreteAxisTickFormatter: function(value, absLabel) {
-              if (arguments.length > 2) {
+              if(arguments.length > 2) {
                 // Being called for discrete scale / Date formatting...
                 return String(value);
               }
@@ -269,7 +270,31 @@ define([
             dot_lineWidth: 0,
             dot_fillStyle: function() {
               var c = this.delegate();
-              return this.finished(c && !this.scene.isActive ? c.alpha(0.5) : c);
+              var scene = this.scene;
+              var sign = this.sign;
+
+              if(sign.showsInteraction()) {
+
+                if(sign.mayShowNotAmongSelected(scene)) {
+
+                  if(sign.mayShowActive(scene, true)) {
+                    // not selected & active
+                    if(!pv) pv = require("cdf/lib/CCC/protovis");
+
+                    c = pv.Color.names.darkgray.darker(2).alpha(0.8);
+                  } else {
+                    // not selected
+                    c = pvc.toGrayScale(c, -0.3);
+                  }
+                } else if(sign.mayShowActive(scene, true)) {
+                  // active || (active & selected)
+                } else {
+                  c = c.alpha(0.5);
+                }
+                // else (normal || selected)
+              }
+
+              return this.finished(c);
             }
           }
         }
@@ -348,13 +373,37 @@ define([
             barSizeSpacing: 2,
             barSizeMin:     4,
             barSizeMax:     150,
+
             // No stroke
             bar_lineWidth: function() {
               return this.finished(0);
             },
             bar_fillStyle: function() {
+
               var c = this.delegate();
-              return this.finished(c && this.scene.isActive ? c.alpha(0.5) : c);
+              var scene = this.scene;
+              var sign = this.sign;
+
+              if(sign.showsInteraction()) {
+
+                if(sign.mayShowNotAmongSelected(scene)) {
+                  if(scene.isActive) {
+                    // not selected & active
+                    if(!pv) pv = require("cdf/lib/CCC/protovis");
+
+                    c = pv.Color.names.darkgray.darker(2).alpha(0.8);
+                  } else {
+                    // not selected
+                    c = pvc.toGrayScale(c, -0.3);
+                  }
+                } else if(sign.mayShowActive(scene, true)) {
+                  // active || (active & selected)
+                  c = c.alpha(0.5);
+                }
+                // else (normal || selected)
+              }
+
+              return this.finished(c);
             }
           }
         }
@@ -375,14 +424,14 @@ define([
 
             // . centered grid lines
             xAxisGrid_visible: function() {
-              if (this.panel.axes.base.isDiscrete()) {
+              if(this.panel.axes.base.isDiscrete()) {
                 return this.index > 0;
               }
               return this.delegate();
             },
             xAxisGrid_left: function() {
               var left = this.delegate();
-              if (this.panel.axes.base.isDiscrete()) {
+              if(this.panel.axes.base.isDiscrete()) {
                 var halfStep = this.panel.axes.base.scale.range().step / 2;
                 return left - halfStep;
               }
@@ -394,10 +443,60 @@ define([
             dotsVisible: false,
 
             // . visible only on hover
-            dot_fillStyle:   function() { return this.finished(this.scene.isActive ? "white" : this.delegate()); },
+            dot_fillStyle:   function() {
+              var c = this.delegate();
+              var scene = this.scene;
+              var sign = this.sign;
+
+              if(sign.showsInteraction()) {
+
+                if(sign.mayShowNotAmongSelected(scene)) {
+
+                  if(sign.mayShowActive(scene, true)) {
+                    // not selected & active
+                    if(!pv) pv = require("cdf/lib/CCC/protovis");
+
+                    c = pv.Color.names.darkgray.darker(2).alpha(0.8);
+                  } else {
+                    // not selected
+                    c = pvc.toGrayScale(c, -0.3);
+                  }
+                } else if(sign.mayShowActive(scene, true)) {
+                  // active || (active & selected)
+                  c = "white";
+                }
+                // else (normal || selected)
+              }
+
+              return this.finished(c);
+            },
+
+            dot_strokeStyle: function() {
+              var c = this.delegate();
+              var scene = this.scene;
+              var sign = this.sign;
+
+              if(sign.showsInteraction()) {
+
+                // Not among selected
+                if(sign.mayShowNotAmongSelected(scene)) {
+
+                  if(sign.mayShowActive(scene, true)) {
+                    // not selected & active
+                    if(!pv) pv = require("cdf/lib/CCC/protovis");
+
+                    c = pv.Color.names.darkgray.darker(2).alpha(0.8);
+                  } else {
+                    // not selected
+                    c = pvc.toGrayScale(c, -0.3);
+                  }
+                }
+              }
+
+              return this.finished(c);
+            },
             dot_lineWidth:   function() { return this.finished(2); },
             dot_shapeRadius: function() { return this.finished(5); },
-            dot_strokeStyle: function() { return this.finished(this.delegate()); },
 
             // . line
             linesVisible: true,
@@ -442,11 +541,31 @@ define([
             activeSliceRadius: 0,
 
             // . slice
-            slice_ibits: 0,
-            slice_imask: "ShowsActivity",
             slice_fillStyle: function() {
               var c = this.delegate();
-              return this.finished(c && this.scene.isActive ? c.alpha(0.5) : c);
+              var scene = this.scene;
+              var sign = this.sign;
+
+              if(sign.showsInteraction()) {
+
+                if(sign.mayShowNotAmongSelected(scene)) {
+                  if(scene.isActive) {
+                    // not selected & active
+                    if(!pv) pv = require("cdf/lib/CCC/protovis");
+
+                    c = pv.Color.names.darkgray.darker(2).alpha(0.8);
+                  } else {
+                    // not selected
+                    c = pvc.toGrayScale(c, -0.3);
+                  }
+                } else if(sign.mayShowActive(scene, true)) {
+                  // active || (active & selected)
+                  c = c.alpha(0.85);
+                }
+                // else (normal || selected)
+              }
+
+              return this.finished(c);
             }
           }
         }
@@ -512,7 +631,29 @@ define([
             dot_lineWidth: 0,
             dot_fillStyle: function() {
               var c = this.delegate();
-              return this.finished(c && this.scene.isActive ? c.alpha(0.5) : c);
+              var scene = this.scene;
+              var sign = this.sign;
+
+              if(sign.showsInteraction()) {
+
+                if(sign.mayShowNotAmongSelected(scene)) {
+                  if(scene.isActive) {
+                    // not selected & active
+                    if(!pv) pv = require("cdf/lib/CCC/protovis");
+
+                    c = pv.Color.names.darkgray.darker(2).alpha(0.8);
+                  } else {
+                    // not selected
+                    c = pvc.toGrayScale(c, -0.3);
+                  }
+                } else if(sign.mayShowActive(scene, true)) {
+                  // active || (active & selected)
+                  c = c.alpha(0.5);
+                }
+                // else (normal || selected)
+              }
+
+              return this.finished(c);
             }
           }
         }
@@ -521,14 +662,14 @@ define([
   };
 
   function getNumberFormatter(precision, base) {
-    if (!pvc) {
+    if(!pvc) {
       pvc = require("cdf/lib/CCC/pvc");
     }
 
     var useAbrev = (base >= 1000);
     var key = useAbrev + "|" + precision;
     var numberFormat = numberFormatCache[key];
-    if (!numberFormat) {
+    if(!numberFormat) {
       // #,0 A
       // #,0.0 A
       // #,0.00 A

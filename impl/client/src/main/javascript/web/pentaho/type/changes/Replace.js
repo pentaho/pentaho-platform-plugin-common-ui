@@ -83,8 +83,10 @@ define([
     },
 
     _replaceRefs: function(txn, complex, v1, v2) {
-      if(v1 && v1._addReference) txn._ensureChangeRef(v1).removeReference(complex, this.property);
-      if(v2 && v2._addReference) txn._ensureChangeRef(v2).addReference(complex, this.property);
+      if(!this.property.isBoundary) {
+        if(v1 && v1._addReference) txn._ensureChangeRef(v1).removeReference(complex, this.property);
+        if(v2 && v2._addReference) txn._ensureChangeRef(v2).addReference(complex, this.property);
+      }
     },
 
     /**

@@ -381,6 +381,21 @@ define([
           expect(value.value).toBe("1");
         });
 
+        it("should throw a TypeError if the property is read-only", function() {
+
+          var Derived = Complex.extend({
+            type: {props: [{name: "x", type: "string", isReadOnly: true, value: "2"}]}
+          });
+
+          var derived = new Derived();
+
+          expect(function() {
+            derived.set("x", "1");
+          }).toThrowError(TypeError);
+
+          expect(derived.x).toBe("2");
+        });
+
         it("should set the value of an existing list property", function() {
           var Derived = Complex.extend({
             type: {props: [{name: "x", type: ["string"]}]}
@@ -1172,6 +1187,31 @@ define([
 
     describe("Property Attributes", function() {
 
+      describe("Property#isReadOnly", function() {
+
+        it("should make the list of a read-only list property, read-only", function() {
+
+          var Derived = Complex.extend({
+            type: {props: [{name: "x", type: ["string"], isReadOnly: true}]}
+          });
+
+          var derived = new Derived();
+
+          expect(derived.x.isReadOnly).toBe(true);
+        });
+
+        it("should make the list of a writable list property, writable", function() {
+
+          var Derived = Complex.extend({
+            type: {props: [{name: "x", type: ["string"]}]}
+          });
+
+          var derived = new Derived();
+
+          expect(derived.x.isReadOnly).toBe(false);
+        });
+      });
+
       describe("#isApplicable(name)", function() {
         it("should return the evaluated static value of an existing property", function() {
           var Derived = Complex.extend({
@@ -1233,22 +1273,22 @@ define([
         });
       }); // end applicable
 
-      describe("#isReadOnly(name)", function() {
+      describe("#isEnabled(name)", function() {
         it("should return the evaluated static value of an existing property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", isReadOnly: false}]}
+            type: {props: [{name: "x", isEnabled: true}]}
           });
 
           var derived = new Derived();
 
-          expect(derived.isReadOnly("x")).toBe(false);
+          expect(derived.isEnabled("x")).toBe(true);
         });
 
         it("should return the evaluated dynamic value of an existing property", function() {
           var Derived = Complex.extend({
             type: {
               props: [{
-                name: "x", isReadOnly: function() {
+                name: "x", isEnabled: function() {
                   return this.foo;
                 }
               }]
@@ -1257,13 +1297,13 @@ define([
 
           var derived = new Derived();
 
-          derived.foo = true;
-
-          expect(derived.isReadOnly("x")).toBe(true);
-
           derived.foo = false;
 
-          expect(derived.isReadOnly("x")).toBe(false);
+          expect(derived.isEnabled("x")).toBe(false);
+
+          derived.foo = true;
+
+          expect(derived.isEnabled("x")).toBe(true);
         });
 
         it("should throw when given the name of an undefined property", function() {
@@ -1274,7 +1314,7 @@ define([
           var derived = new Derived();
 
           expect(function() {
-            derived.isReadOnly("y");
+            derived.isEnabled("y");
           }).toThrow(errorMatch.argInvalid("name"));
         });
 
@@ -1289,10 +1329,10 @@ define([
           var derived = new Derived();
 
           expect(function() {
-            derived.isReadOnly(Other.type.get("x"));
+            derived.isEnabled(Other.type.get("x"));
           }).toThrow(errorMatch.argInvalid("name"));
         });
-      }); // end isReadOnly
+      }); // end isEnabled
 
       describe("#isRequired(name)", function() {
         it("should return the evaluated static value of an existing property", function() {
@@ -1650,20 +1690,17 @@ define([
         expect(value._addReference).toHaveBeenCalledWith(container, Container.type.get("a"));
       });
 
-      // TODO: if an when lists are created without a changeset/txn, uncomment this.
-      /*
       it("should be called when added to a list container", function() {
         var Derived = Complex.extend();
         var Container = Complex.extend({type: {props: [{name: "as", type: [Derived]}]}});
 
+        spyOn(Derived.prototype, "_addReference");
+
         var value = new Derived();
         var container = new Container({as: [value]});
 
-        spyOn(Derived.prototype, "_addReference");
-
-        expect(value._addReference).toHaveBeenCalledWith(container.as, null);
+        expect(value._addReference).toHaveBeenCalledWith(container.as);
       });
-      */
     });
   }); // pentaho.type.Complex
 });

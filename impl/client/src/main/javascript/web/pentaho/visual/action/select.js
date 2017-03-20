@@ -42,7 +42,28 @@ define([
     return DataAction.extend(/** @lends  pentaho.visual.action.Select# */{
       type: {
         id: module.id,
-        alias: "select"
+        alias: "select",
+
+        /**
+         * Gets or sets the _default selection mode_ of this action.
+         *
+         * The default selection mode is {@link pentaho.visual.action.SelectionModes.replace}.
+         *
+         * Setting to a {@link Nully} value assumes the default selection mode.
+         *
+         * @type {!pentaho.visual.action.SelectionMode}
+         *
+         * @throws {pentaho.lang.ArgumentInvalidError} When attempting to set an invalid selection mode.
+         */
+        __defaultSelectionMode: null,
+
+        set defaultSelectionMode(value) {
+          this.__defaultSelectionMode = getSelectionMode(value);
+        },
+
+        get defaultSelectionMode() {
+          return this.__defaultSelectionMode || SelectionModes.replace;
+        }
       },
 
       /**
@@ -88,24 +109,12 @@ define([
        */
       get selectionMode() {
 
-        return this.__selectionMode || SelectionModes.replace;
+        return this.__selectionMode;
       },
 
       set selectionMode(value) {
 
         this._assertEditable();
-
-        if(value != null) {
-          if(typeof value === "string") {
-            if(!O.hasOwn(SelectionModes, value)) {
-              throw new ArgumentInvalidError("selectionMode", "Not one of the standard selection mode names.");
-            }
-            value = SelectionModes[value];
-
-          } else if(!F.is(value)) {
-            throw new ArgumentInvalidTypeError("selectionMode", ["string", "function"], typeof value);
-          }
-        }
 
         /**
          * The selection mode of the action.
@@ -113,7 +122,7 @@ define([
          * @type {?pentaho.visual.action.SelectionMode}
          * @private
          */
-        this.__selectionMode = value || null;
+        this.__selectionMode = getSelectionMode(value) || null;
       },
 
       /**
@@ -127,10 +136,28 @@ define([
 
         var view = this.target;
 
-        view.selectionFilter = this.selectionMode.call(view, view.selectionFilter, this.dataFilter);
+        var selectionMode = this.selectionMode || getSelectionMode(this.type.defaultSelectionMode);
+        var selectionFilter = selectionMode.call(view, view.selectionFilter, this.dataFilter);
+
+        view.selectionFilter = selectionFilter && selectionFilter.toDnf();
 
         return null;
       }
     });
   };
+
+  function getSelectionMode(value){
+    if(value != null) {
+      if(typeof value === "string") {
+        if(!O.hasOwn(SelectionModes, value)) {
+          throw new ArgumentInvalidError("selectionMode", "Not one of the standard selection mode names.");
+        }
+        value = SelectionModes[value];
+
+      } else if(!F.is(value)) {
+        throw new ArgumentInvalidTypeError("selectionMode", ["string", "function"], typeof value);
+      }
+    }
+    return value;
+  }
 });

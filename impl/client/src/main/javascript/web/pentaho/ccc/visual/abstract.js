@@ -1530,18 +1530,23 @@ define([
           return memo;
         }.bind(this), []);
 
-        var Or = this.type.context.get("or");
+        var actionSpec;
 
-        var keyArgs = {};
-
-        // Replace with empty selection when the user selects nothing.
-        if(operands && operands.length === 0) keyArgs.selectionMode = SelectionModes.replace;
+        if (operands.length === 0) {
+          // Replace with empty selection when the user selects nothing.
+          actionSpec = {
+            selectionMode: SelectionModes.replace,
+            dataFilter: this.type.context.get("false").instance
+          };
+        } else {
+          var Or = this.type.context.get("or");
+          actionSpec = {
+            dataFilter: new Or({operands: operands})
+          };
+        }
 
         var SelectAction = this.type.context.get(selectActionFactory);
-
-        this.act(new SelectAction({
-          dataFilter: new Or({operands: operands})
-        }));
+        this.act(new SelectAction(actionSpec));
 
         // Explicitly cancel CCC's native selection handling.
         return [];

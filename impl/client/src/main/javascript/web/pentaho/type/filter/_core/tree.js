@@ -54,6 +54,15 @@ define([
 
     filter.Tree = filter.Abstract.extend("pentaho.type.filter.Tree", /** @lends pentaho.type.filter.Tree# */{
 
+      get isTerminal() {
+        return false;
+      },
+
+      _buildContentKey: function() {
+        // Sorting makes content equality be independent of operand order.
+        return this.operands.toArray(function(o) { return o.contentKey; }).sort().join(" ");
+      },
+
       /**
        * Gets the list of operands of this filter.
        *
@@ -183,6 +192,32 @@ define([
         return opersOut;
       },
 
+      // region literalsByPropertyName
+      get literalsByPropertyName() {
+        return this.__literalsByName || (this.__literalsByName = Object.freeze(this.__buildLiteralsByName()));
+      },
+
+      __literalsByName: null,
+
+      __buildLiteralsByName: function() {
+        var literalsByName = {};
+        var os = this.operands;
+        var i = os.count;
+        var o;
+        var p;
+
+        while(i--) {
+          o = os.at(i);
+          p = (o.isNot ? o.operand : o);
+          if(p.isProperty) {
+            literalsByName[o.property] = {operand: o, index: i};
+          }
+        }
+
+        return literalsByName;
+      },
+      // endregion
+
       type: /** @lends pentaho.type.filter.Tree.Type# */{
         id: "pentaho/type/filter/tree",
         isAbstract: true,
@@ -190,7 +225,9 @@ define([
           {
             name: "operands",
             nameAlias: "o",
-            type: [filter.Abstract]
+            type: [filter.Abstract],
+            isReadOnly: true,
+            isBoundary: true
           }
         ]
       }

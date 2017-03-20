@@ -13,26 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+define([
+  "./abstract"
+], function(abstractFactory) {
 
-// TODO: Opted to keep isIn @private, undocumented, for 7.1.
+  "use strict";
 
-/**
- * The `spec.IIsIn` interface describes the information of a membership filter.
- *
- * @name pentaho.type.filter.spec.IIsIn
- *
- * @interface
- * @extends pentaho.type.filter.spec.IProperty
- *
- * @see pentaho.type.filter.IsIn
- *
- * @private
- */
+  return function(context) {
 
-/**
- * The possible values of the property.
- *
- * @name values
- * @memberOf pentaho.type.filter.spec.IIsIn#
- * @type Array.<pentaho.type.UValue>
- */
+    var Abstract = context.get(abstractFactory);
+
+    return Abstract._core.False;
+  };
+});

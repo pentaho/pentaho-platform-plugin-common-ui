@@ -36,8 +36,8 @@ define([
     var ProductSummary = Complex.extend({
       type: {
         props: [
-          {name: "name",    type: "string",  label: "Name"    },
-          {name: "sales",   type: "number",  label: "Sales"   },
+          {name: "name", type: "string", label: "Name"},
+          {name: "sales", type: "number", label: "Sales"},
           {name: "inStock", type: "boolean", label: "In Stock"}
         ]
       }
@@ -166,8 +166,8 @@ define([
         expect(result.operand).toBe(oper2);
       });
 
-      it("should return `this` when the operand is not transformed by the transformer", function() {
-        var oper1  = new CustomFilter();
+      it("should return a clone when the operand is not transformed by the transformer", function() {
+        var oper1 = new CustomFilter();
         var filter = new NotFilter({operand: oper1});
 
         var transf = function() { return null; };
@@ -242,5 +242,19 @@ define([
 
     }); // #toSpec
 
+    describe("#contentKey", function() {
+
+      it("should return '(not filter)'", function() {
+        var filter  = new NotFilter({operand: {_: "=", p: "a", v: 1}});
+
+        expect(filter.contentKey).toBe("(not (= a 1))");
+      });
+
+      it("should return '(not) when operand is not set'", function() {
+        var filter  = new NotFilter({});
+
+        expect(filter.contentKey).toBe("(not)");
+      });
+    });
   }); // pentaho.type.filter.Not
 });

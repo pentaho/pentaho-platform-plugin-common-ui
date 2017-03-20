@@ -13,10 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "module",
+  "pentaho/util/logger",
+  "pentaho/debug",
+  "pentaho/debug/Levels"
+], function(module, logger, debugMgr, DebugLevels) {
   "use strict";
 
   /* eslint valid-jsdoc: 0 */
+
+  var _isDebugMode = debugMgr.testLevel(DebugLevels.debug, module);
 
   /**
    * The `SelectionModes` enumeration contains the collection of standard selection mode functions.
@@ -39,22 +46,27 @@ define(function() {
      * Otherwise, removes the input filter from the current selection filter.
      */
     toggle: function(current, input) {
+
+      if(_isDebugMode) logger.log("TOGGLE BEGIN");
+
       if(!input) return current;
 
-      // TODO: Evaluating the filter on the current data is cheating...
-      // Should achieve this without leaving the _intensional_ realm.
-
       // Determine if all rows in input are currently selected.
-      var data = this.model.data;
-      if(!data) return current;
+      // current.include(input) ?
+      // input \ current = 0
+      var unselectedInput = input.andNot(current).toDnf();
 
-      var inputData = data.filter(input);
-      var currentInputData = inputData.filter(current);
-      var isAllInputSelected = (inputData.getNumberOfRows() === currentInputData.getNumberOfRows());
+      if(_isDebugMode) logger.log(unselectedInput.kind === "false" ? "removing" : "adding");
 
-      var selectionMode = isAllInputSelected ? SelectionModes.remove : SelectionModes.add;
+      var result = unselectedInput.kind === "false"
+          // all input is already selected, so, actually, toggle it all
+          ? SelectionModes.remove.call(this, current, input)
+          // not all input is already selected, so, add what's missing first, before actually toggling.
+          : SelectionModes.add.call(this, current, unselectedInput);
 
-      return selectionMode.call(this, current, input);
+      if(_isDebugMode) logger.log("TOGGLE END");
+
+      return result;
     },
 
     /**
@@ -68,7 +80,7 @@ define(function() {
      * Removes the input filter from the current selection filter.
      */
     remove: function(current, input) {
-      return input ? current.and(input.negate()) : current;
+      return current.andNot(input);
     }
   };
 

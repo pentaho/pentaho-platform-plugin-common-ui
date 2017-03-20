@@ -58,6 +58,19 @@ define([
         return KnownFilterKind.Not;
       },
 
+      get isTerminal() {
+        return false;
+      },
+
+      get isNot() {
+        return true;
+      },
+
+      _buildContentKey: function() {
+        var o = this.operand;
+        return o ? o.contentKey : "";
+      },
+
       /**
        * Gets the operand of this filter.
        *
@@ -119,7 +132,9 @@ define([
             name: "operand",
             nameAlias: "o",
             type: filter.Abstract,
-            isRequired: true
+            isRequired: true,
+            isReadOnly: true,
+            isBoundary: true
           }
         ]
       }

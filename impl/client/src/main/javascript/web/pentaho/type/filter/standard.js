@@ -21,10 +21,12 @@ define([
   "./or",
   "./not",
   "./isEqual",
-  "./isIn"
+  "./isIn",
+  "./true",
+  "./false"
 ], function(
     abstractFactory, treeFactory, propFactory,
-    andFactory, orFactory, notFactory, isEqFactory, isInFactory) {
+    andFactory, orFactory, notFactory, isEqFactory, isInFactory, trueFactory, falseFactory) {
 
   "use strict";
 
@@ -36,6 +38,8 @@ define([
     "or": orFactory,
     "not": notFactory,
     "isEqual": isEqFactory,
-    "isIn": isInFactory
+    "isIn": isInFactory,
+    "true": trueFactory,
+    "false": falseFactory
   };
 });

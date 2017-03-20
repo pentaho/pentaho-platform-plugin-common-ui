@@ -156,6 +156,7 @@ define([
      *
      * @private
      * @friend {pentaho.type.changes.Changeset}
+     * @friend {pentaho.type.filter.Abstract}
      */
     _setVersionInternal: function(version) {
       this._vers = version;
@@ -207,6 +208,7 @@ define([
      * @return {pentaho.type.changes.Changeset} A changeset of appropriate type.
      *
      * @abstract
+     * @protected
      */
 
     /**
