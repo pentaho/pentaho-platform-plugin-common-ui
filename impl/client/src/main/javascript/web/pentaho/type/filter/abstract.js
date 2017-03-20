@@ -361,6 +361,8 @@ define([
               .visit(flattenTree)
               .visit(ensureDnfTopLevel)
               .visit(simplifyDnfTopLevel);
+
+          result.__toDnfCache = result;
         }
         return result;
       },
