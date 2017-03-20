@@ -54,6 +54,7 @@ define(function() {
     /**
      * The [IsIn]{@link pentaho.type.filter.IsIn} filter kind.
      * @default
+     * @private
      */
     IsIn: "isIn",
 

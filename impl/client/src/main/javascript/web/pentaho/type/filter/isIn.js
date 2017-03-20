@@ -25,6 +25,10 @@ define([
 
     var PropertyFilter = context.get(propertyFactory);
 
+    // TODO: Opted to keep isIn @private, undocumented, for 7.1. Currently its use could cause problems with the
+    // DNF algorithm (simplifications are not performed).
+    // Also, existing containers don't currently generate filters with isIn.
+
     /**
      * @name pentaho.type.filter.IsIn.Type
      * @class
@@ -33,6 +37,8 @@ define([
      * @classDesc The type class of the membership filter type.
      *
      * For more information see {@link pentaho.type.filter.IsIn}.
+     *
+     * @private
      */
 
     /**
@@ -49,6 +55,8 @@ define([
      *
      * @constructor
      * @param {pentaho.type.filter.spec.IIsIn} [spec] - A membership filter specification.
+     *
+     * @private
      */
 
     return PropertyFilter.extend("pentaho.type.filter.IsIn", /** @lends pentaho.type.filter.IsIn# */{

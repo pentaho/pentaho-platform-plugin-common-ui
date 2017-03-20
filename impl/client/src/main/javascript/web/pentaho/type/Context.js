@@ -244,6 +244,10 @@ define([
     },
 
     // region Type Registry
+
+    // TODO: Removed from docs, below, until isIn is made public.
+    // [pentaho/type/filter/isIn]{@link pentaho.type.filter.IsIn}
+
     /**
      * Gets the **configured instance constructor** of a type.
      *
@@ -285,7 +289,6 @@ define([
      *     * [pentaho/type/filter/not]{@link pentaho.type.filter.Not}
      *     * [pentaho/type/filter/property]{@link pentaho.type.filter.Property}
      *       * [pentaho/type/filter/isEqual]{@link pentaho.type.filter.IsEqual}
-     *       * [pentaho/type/filter/isIn]{@link pentaho.type.filter.IsIn}
      *
      * If it is not known whether all non-standard types that are referenced by identifier have already been loaded,
      * the asynchronous method version, [getAsync]{@link pentaho.type.Context#getAsync},

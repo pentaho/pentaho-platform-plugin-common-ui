@@ -764,9 +764,12 @@ define([
               }
 
               // TODO: replace ai by not in(va,vb) ? IsIn is even not defined...
+              throw error.notImplemented("This case is not supported.");
+              /*
               resulti = a.operands.toArray();
               resulti[aiInfo.index] = new filter.IsIn({property: pa.property, values: [pa.value, pb.value]}).negate();
               results.push(new filter.And({operands: resulti}));
+              */
             }
           } else if(isPbNot) {
             // (va - -vb) <=> (va + vb) <=> (p = va and p = vb)
