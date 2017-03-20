@@ -193,7 +193,7 @@ define([
         });
       });
 
-      it("should convert an empty `and` to false", function() {
+      it("should convert an empty `and` to true", function() {
 
         expectDnf({
           _: "and"
