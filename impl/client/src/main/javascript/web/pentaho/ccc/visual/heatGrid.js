@@ -49,7 +49,7 @@ define([
 
         xAxisSize: 30,
         yAxisSize: 50,
-        axisComposite: true,
+        axisComposite: false,
         orthoAxisGrid: false, // clear inherited property
 
         //colorMissing:   "lightgray",

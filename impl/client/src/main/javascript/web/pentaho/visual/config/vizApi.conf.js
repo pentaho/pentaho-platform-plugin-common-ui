@@ -319,6 +319,10 @@ define([
 
                     c = pv.Color.names.darkgray.darker(2).alpha(0.8);
                   } else {
+                    if(!pvc) {
+                      pvc = require("cdf/lib/CCC/pvc");
+                    }
+
                     // not selected
                     c = pvc.toGrayScale(c, -0.3);
                   }
@@ -429,6 +433,10 @@ define([
 
                     c = pv.Color.names.darkgray.darker(2).alpha(0.8);
                   } else {
+                    if(!pvc) {
+                      pvc = require("cdf/lib/CCC/pvc");
+                    }
+
                     // not selected
                     c = pvc.toGrayScale(c, -0.3);
                   }
@@ -494,6 +502,10 @@ define([
 
                     c = pv.Color.names.darkgray.darker(2).alpha(0.8);
                   } else {
+                    if(!pvc) {
+                      pvc = require("cdf/lib/CCC/pvc");
+                    }
+
                     // not selected
                     c = pvc.toGrayScale(c, -0.3);
                   }
@@ -523,6 +535,10 @@ define([
 
                     c = pv.Color.names.darkgray.darker(2).alpha(0.8);
                   } else {
+                    if(!pvc) {
+                      pvc = require("cdf/lib/CCC/pvc");
+                    }
+
                     // not selected
                     c = pvc.toGrayScale(c, -0.3);
                   }
@@ -589,6 +605,10 @@ define([
 
                     c = pv.Color.names.darkgray.darker(2).alpha(0.8);
                   } else {
+                    if(!pvc) {
+                      pvc = require("cdf/lib/CCC/pvc");
+                    }
+
                     // not selected
                     c = pvc.toGrayScale(c, -0.3);
                   }
@@ -627,11 +647,6 @@ define([
         },
         apply: {
           extension: {
-            // Don't use composite/hierarchical axes
-            axisComposite: false,
-
-            // ---
-
             // . rule
             axisRule_lineWidth: 0,
 
@@ -673,6 +688,10 @@ define([
 
                     c = pv.Color.names.darkgray.darker(2).alpha(0.8);
                   } else {
+                    if(!pvc) {
+                      pvc = require("cdf/lib/CCC/pvc");
+                    }
+
                     // not selected
                     c = pvc.toGrayScale(c, -0.3);
                   }
