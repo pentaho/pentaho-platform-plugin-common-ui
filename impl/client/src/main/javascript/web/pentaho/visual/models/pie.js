@@ -36,6 +36,12 @@ define([
 
         props: [
           {
+            name: "rows", // VISUAL_ROLE
+            type: {
+              levels: ["ordinal"]
+            }
+          },
+          {
             name:    "columns", // VISUAL_ROLE
             type:    "pentaho/visual/role/ordinal",
             ordinal: 6

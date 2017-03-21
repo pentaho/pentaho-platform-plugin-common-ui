@@ -41,6 +41,7 @@ define([
           {
             name: "rows", // VISUAL_ROLE
             type: {
+              levels: ["ordinal"],
               props: {attributes: {isRequired: true}}
             }
           },

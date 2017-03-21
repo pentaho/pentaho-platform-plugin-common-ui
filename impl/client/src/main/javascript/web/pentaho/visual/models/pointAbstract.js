@@ -40,8 +40,6 @@ define([
             type: {
               // Always a visual key, whatever the effective measurement level or data type.
               isVisualKey: true,
-              // Make it modal, by extending it with quantitative ability
-              levels: ["ordinal", "quantitative"],
               instance: {
                 _getAttributesMaxLevel: function() {
                   // If the mapping contains a single `number` attribute,

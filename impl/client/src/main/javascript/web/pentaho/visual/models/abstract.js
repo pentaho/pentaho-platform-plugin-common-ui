@@ -51,7 +51,7 @@ define([
             name: "rows", // VISUAL_ROLE
             type: {
               base:   "pentaho/visual/role/mapping",
-              levels: ["ordinal"]
+              levels: ["ordinal", "quantitative"] // modal by default
             },
             ordinal: 5
           },
