@@ -38,6 +38,42 @@ define([
 
   return {
     rules: [
+      // line/barLine models
+      {
+        select: {
+          priority: -1,
+          type: [
+            "pentaho/visual/models/line",
+            "pentaho/visual/models/barLine"
+          ]
+        },
+        apply: {
+          props: {
+            // . line
+            lineWidth: {
+              value: 2
+            }
+          }
+        }
+      },
+
+      // heatGrid model
+      {
+        select: {
+          priority: -1,
+          type: [
+            "pentaho/visual/models/heatGrid"
+          ]
+        },
+        apply: {
+          props: {
+            colorSet: {
+              value: "blue"
+            }
+          }
+        }
+      },
+
       // Pentaho CCC Abstract
       {
         select: {
@@ -500,7 +536,6 @@ define([
 
             // . line
             linesVisible: true,
-            line_lineWidth: 2,
             line_ibits: 0,
             line_imask: "ShowsActivity"
           }
@@ -528,7 +563,6 @@ define([
         },
         apply: {
           extension: {
-            valuesVisible: false,
             slice_lineWidth: 0,
 
             // Chart
@@ -579,7 +613,6 @@ define([
         },
         apply: {
           extension: {
-            valuesVisible: false,
             slice_lineWidth: 0,
             slice_innerRadiusEx: "60%"
           }
@@ -621,9 +654,6 @@ define([
             xAxisOverlappedLabelsMode: "rotatethenhide",
             xAxisLabelRotationDirection: "counterclockwise",
             xAxisLabelDesiredAngles: [0, 40 * (Math.PI / 180)],
-
-            // overwrite color scale
-            colors: ["#8eb7d9", "#002f55"],
 
             // . dot
             dot_ibits: 0,
