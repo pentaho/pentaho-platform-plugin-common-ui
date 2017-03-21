@@ -119,7 +119,7 @@ define([
     /**
      * Gets the reason why the event was canceled.
      *
-     * @type {!pentaho.lang.UserError}
+     * @type {!Error}
      * @readonly
      */
     get cancelReason() {
@@ -131,7 +131,7 @@ define([
      *
      * This method has no effect if the event is not cancelable or
      * has already been canceled.
-     * @param {string|pentaho.lang.UserError} [reason="canceled"] - The reason why the event is being canceled.
+     * @param {string|Error} [reason="canceled"] - The reason why the event is being canceled.
      *
      * @see pentaho.lang.Event#isCanceled
      */
@@ -141,8 +141,8 @@ define([
 
         if(typeof reason === "string") {
           reason = new UserError(reason);
-        } else if(!(reason instanceof UserError)) {
-          throw error.argInvalidType("reason", ["string", "pentaho/lang/UserError"], typeof reason);
+        } else if(!(reason instanceof Error)) {
+          throw error.argInvalidType("reason", ["string", "Error"], typeof reason);
         }
 
         this._cancelReason = reason;

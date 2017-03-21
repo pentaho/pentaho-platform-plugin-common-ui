@@ -17,8 +17,9 @@ define([
   "module",
   "pentaho/i18n!messages",
   "pentaho/type/number",
-  "pentaho/type/date"
-], function(module, bundle, numberFactory, dateFactory) {
+  "pentaho/type/date",
+  "pentaho/type/simple"
+], function(module, bundle, numberFactory, dateFactory, simpleFactory) {
 
   "use strict";
 
@@ -27,8 +28,9 @@ define([
     var Refinement = context.get("refinement");
     var orderedLevels = ["nominal", "ordinal", "quantitative"];
 
-    var PentahoNumber = context.get(numberFactory);
-    var PentahoDate = context.get(dateFactory);
+    var pentahoNumber = context.get(numberFactory).type;
+    var pentahoDate = context.get(dateFactory).type;
+    var pentahoSimple = context.get(simpleFactory).type;
 
     /**
      * @name pentaho.visual.role.MeasurementLevel
@@ -124,13 +126,18 @@ define([
          * a qualitative level of measurement.
          *
          * Any type that is not one of (or a subtype of)
-         * [Number]{@link pentaho.type.Number} or [Date]{@link pentaho.type.Date}
+         * [Number]{@link pentaho.type.Number} or [Date]{@link pentaho.type.Date},
+         * and that is also not a super type of these,
          * can only be associated with a qualitative level of measurement.
+         *
+         * @param {pentaho.type.Type} type - The type to test.
          *
          * @return {boolean} `true` if it "is only qualitative"; `false`, otherwise.
          */
         isTypeQualitativeOnly: function(type) {
-          return !(type.isSubtypeOf(PentahoNumber.type) || type.isSubtypeOf(PentahoDate.type));
+          return !type.isSubtypeOf(pentahoNumber) &&
+                 !type.isSubtypeOf(pentahoDate) &&
+                 !pentahoSimple.isSubtypeOf(type);
         },
 
         /**

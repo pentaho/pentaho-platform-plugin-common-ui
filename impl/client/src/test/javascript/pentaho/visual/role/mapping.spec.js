@@ -626,7 +626,7 @@ define([
 
       describe("#levels", function() {
         it("should respect the values specified on the spec", function() {
-          var expectedLevels = ["nominal", "ordinal"];
+          var expectedLevels = ["nominal", "ordinal", "quantitative"];
           var MyMapping = Mapping.extend({type: {levels: expectedLevels}});
 
           var actualLevels = MyMapping.type.levels.toArray(getValue);
@@ -634,98 +634,28 @@ define([
           expect(actualLevels).toEqual(expectedLevels);
         });
 
-        it("should allow adding values by setting", function() {
-          var expectedLevels = ["nominal", "ordinal"];
-          var MyMapping = Mapping.extend({type: {levels: expectedLevels}});
+        it("should allow removing values by setting", function() {
+          var MyMapping = Mapping.extend();
 
           MyMapping.type.levels = ["quantitative"];
 
-          expectedLevels = expectedLevels.concat("quantitative");
-
           var actualLevels = MyMapping.type.levels.toArray(getValue);
 
-          expect(actualLevels).toEqual(expectedLevels);
+          expect(actualLevels).toEqual(["quantitative"]);
         });
 
-        it("should throw when a non-abstract mapping does not support any measurement level", function() {
+        it("should throw when a mapping does not support any measurement level", function() {
           function defineEmptyLevelsMapping() {
             Mapping.extend({type: {levels: []}});
           }
 
-          expect(defineEmptyLevelsMapping).toThrow(errorMatch.argRequired("levels"));
+          expect(defineEmptyLevelsMapping).toThrow(errorMatch.argInvalid("levels"));
         });
 
-        it("should not throw when an abstract mapping does not support any measurement level", function() {
-          function defineAbstractEmptyLevelsMapping() {
-            Mapping.extend({type: {isAbstract: true}});
-          }
+        it("should allow a derived mapping type to remove measurement levels", function() {
+          var BaseMapping = Mapping.extend({type: {levels: ["nominal", "ordinal"]}});
 
-          expect(defineAbstractEmptyLevelsMapping).not.toThrow(errorMatch.argRequired("levels"));
-        });
-
-        it("should allow a derived mapping type to add new measurement levels " +
-           "by specifying the base levels plus the new levels", function() {
-          var baseLevels = ["nominal"];
-          var extendedLevels = baseLevels.concat("ordinal");
-
-          var BaseMapping = Mapping.extend({type: {levels: baseLevels}});
-          var ExtendedMapping = BaseMapping.extend({type: {levels: extendedLevels}});
-
-          expect(ExtendedMapping.type.levels.toArray(getValue)).toEqual(extendedLevels);
-        });
-
-        it("should allow a derived mapping type to add new measurement levels " +
-           "by specifying only the new levels", function() {
-          var baseLevels = ["nominal"];
-          var BaseMapping = Mapping.extend({type: {levels: baseLevels}});
-
-          var addLevels = ["ordinal"];
-          var DerivedMapping = BaseMapping.extend({type: {levels: addLevels}});
-
-          var expectedLevels = baseLevels.concat(addLevels);
-          var actualLevels = DerivedMapping.type.levels.toArray(getValue);
-          expect(expectedLevels).toEqual(actualLevels);
-        });
-
-        it("should throw when adding a measurement level that is quantitative and " +
-           "the visual role's dataType is inherently qualitative", function() {
-
-          var baseLevels = ["nominal"];
-          var BaseMapping = Mapping.extend({
-            type: {
-              levels:   baseLevels,
-              dataType: "string"
-            }
-          });
-
-          var addLevel = "quantitative";
-
-          // Test
-          var extendedLevels = baseLevels.concat(addLevel);
-
-          function extendMapping() {
-            BaseMapping.extend({
-              type: {
-                levels: extendedLevels
-              }
-            });
-          }
-
-          expect(extendMapping).toThrow(errorMatch.argInvalid("levels"));
-        });
-
-        it("should not allow removing an inherited measurement level", function() {
-          var baseLevels = ["nominal", "ordinal"];
-          var BaseMapping = Mapping.extend({type: {levels: baseLevels}});
-
-          var constrainedLevels = [baseLevels[0]];
-          var DerivedMapping = BaseMapping.extend({type: {levels: constrainedLevels}});
-
-          var actualLevels = DerivedMapping.type.levels.toArray(getValue);
-          expect(actualLevels.length).toBe(2);
-          expect(actualLevels).toContain("nominal");
-          expect(actualLevels).toContain("ordinal");
-
+          expect(BaseMapping.type.levels.toArray(getValue)).toEqual(["nominal", "ordinal"]);
         });
 
         it("should inherit the levels of the ancestor mapping type, when levels is unspecified", function() {
@@ -771,22 +701,20 @@ define([
 
         describe("the root mapping type", function() {
           it("should have no levels", function() {
-            expect(Mapping.type.levels.count).toEqual(0);
+            expect(Mapping.type.levels.toArray(getValue)).toEqual(["nominal", "ordinal", "quantitative"]);
           });
         });
       });
 
       describe("#anyLevelsQuantitative", function() {
         it("should be true if any level is quantitative", function() {
-          var levels = ["nominal", "ordinal", "quantitative", "foo", "bar"];
-          var MyMapping = Mapping.extend({type: {levels: levels}});
+          var MyMapping = Mapping.extend({type: {levels: ["ordinal", "quantitative"]}});
 
           expect(MyMapping.type.anyLevelsQuantitative).toBe(true);
         });
 
         it("should be false if not any level is quantitative", function() {
-          var levels = ["foo", "ordinal", "nominal", "bar"];
-          var MyMapping = Mapping.extend({type: {levels: levels}});
+          var MyMapping = Mapping.extend({type: {levels: ["ordinal", "nominal"]}});
 
           expect(MyMapping.type.anyLevelsQuantitative).toBe(false);
         });
@@ -794,25 +722,21 @@ define([
 
       describe("#anyLevelsQualitative", function() {
         it("should be true if any level is qualitative", function() {
-          var levels = ["foo", "ordinal", "quantitative", "bar"];
-          var MyMapping = Mapping.extend({type: {levels: levels}});
+          var MyMapping = Mapping.extend({type: {levels: ["ordinal", "quantitative"]}});
 
           expect(MyMapping.type.anyLevelsQualitative).toBe(true);
 
-          levels = ["nominal", "bar"];
-          MyMapping = Mapping.extend({type: {levels: levels}});
+          MyMapping = Mapping.extend({type: {levels: ["nominal", "quantitative"]}});
 
           expect(MyMapping.type.anyLevelsQualitative).toBe(true);
 
-          levels = ["nominal", "ordinal"];
-          MyMapping = Mapping.extend({type: {levels: levels}});
+          MyMapping = Mapping.extend({type: {levels: ["nominal", "ordinal"]}});
 
           expect(MyMapping.type.anyLevelsQualitative).toBe(true);
         });
 
         it("should be false if not any level is qualitative", function() {
-          var levels = ["quantitative", "other", "foo"];
-          var MyMapping = Mapping.extend({type: {levels: levels}});
+          var MyMapping = Mapping.extend({type: {levels: ["quantitative"]}});
 
           expect(MyMapping.type.anyLevelsQualitative).toBe(false);
         });

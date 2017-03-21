@@ -27,8 +27,6 @@ define([
 
   return function(context) {
 
-    var _mappingType;
-
     var Complex = context.get("complex");
     var MeasurementLevel = context.get(measurementLevelFactory);
     var ListLevel = context.get([measurementLevelFactory]);
@@ -571,16 +569,24 @@ define([
           {name: "attributes", type: [mappingAttributeFactory]}
         ],
 
-        _postInit: function(spec, keyArgs) {
+        _init: function(spec, keyArgs) {
 
           this.base(spec, keyArgs);
 
-          if(!this.isAbstract && !this.levels.count)
-            throw error.argRequired("levels", bundle.structured.errors.mapping.noLevelsInNonAbstract);
+          // Inherit / Clone the base levels list, including each element.
+          var baseLevels = this.ancestor.levels;
+          var ListType = baseLevels.constructor;
+          this._levels = new ListType(baseLevels.toArray(function(elem) { return elem.clone(); }));
+          this._levels.on("will:change", this._onLevelsChangeWill.bind(this));
         },
 
+        // Anticipate extension of `levels`, relative to, at least, `dataType`.
+        // Setting a more restricted dataType at the same time as restricting levels could fail.
+        extend_order: ["levels"],
+
         // region levels
-        _levels: new ListLevel(),
+        // Defaults to all measurement levels
+        _levels: new ListLevel(MeasurementLevel.type.domain, {isReadOnly: true}),
 
         /**
          * Gets or sets the array of measurement levels for which the mapped visual role
@@ -588,14 +594,14 @@ define([
          *
          * A visual role that supports more than one measurement level is said to be **modal**.
          *
-         * A non-abstract visual role needs to support at least one measurement level.
+         * Visual roles need to support at least one measurement level.
          *
          * ### This attribute is *Monotonic*
          *
          * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
          *
-         * In this case, a measurement level can be added to a visual role mapping,
-         * but a supported one cannot be removed.
+         * In this case, a measurement level can be removed from a visual role mapping,
+         * but one cannot be added.
          *
          * ### This attribute is *Inherited*
          *
@@ -608,7 +614,7 @@ define([
          * When set to a {@link Nully} value, the set operation is ignored.
          *
          * The root [visual.role.Mapping]{@link pentaho.visual.role.Mapping} has
-         * a `levels` attribute which is an empty list.
+         * a `levels` attribute which is list of all possible measurement levels.
          *
          * Do **NOT** modify the returned list or its elements in any way.
          *
@@ -626,47 +632,45 @@ define([
         },
 
         set levels(values) {
-          if(this.hasDescendants)
-            throw error.operInvalid(bundle.structured.errors.mapping.levelsLockedWhenTypeHasDescendants);
-
-          // Don't let change the root mapping type.
-          // Cannot clear (monotonicity).
-          if(this === _mappingType || values == null) return;
-
-          var levels = this._ensureLevelsOwn();
-
-          // TODO: Because we don't yet expose independent lists' events,
-          // we need to validate addition by hand and create a levels list to be added,
-          // thus performing parsing for us...
-          var addLevels = new ListLevel(values);
-
-          // A quantitative measurement level cannot be added if data type is qualitative.
-          var dataType = this.dataType;
-          if(!dataType.isAbstract && MeasurementLevel.type.isTypeQualitativeOnly(dataType)) {
-            addLevels.each(function(addLevel) {
-              // New level and quantitative?
-              if(!levels.has(addLevel.key) && MeasurementLevel.type.isQuantitative(addLevel)) {
-                throw error.argInvalid("levels",
-                    bundle.format(
-                        bundle.structured.errors.mapping.dataTypeIncompatibleWithRoleLevel,
-                        [this.dataType, addLevel]));
-              }
-            }, this);
+          if(values != null) {
+            this._levels.set(values, {noMove: true});
           }
-
-          levels.set(addLevels.toArray(), {noRemove: true, noMove: true});
-          levels.sort(MeasurementLevel.type.compare);
         },
 
-        _ensureLevelsOwn: function() {
-          var levels = O.getOwn(this, "_levels");
-          if(!levels) {
-            // Clone the base levels list, including each element.
-            var baseLevels = this.ancestor.levels;
-            var ListType = baseLevels.constructor;
-            this._levels = levels = new ListType(baseLevels.toArray(function(elem) { return elem.clone(); }));
+        _onLevelsChangeWill: function(event) {
+          // Validation Rules
+          // 1. Cannot change if already have descendants
+          // 2. Cannot remove all measurement levels.
+          // 3. Cannot add new levels. Can only restrict, by removing some of the inherited/current levels.
+          // 4. The last qualitative measurement level cannot be removed if data type is qualitative only (e.g. string).
+          //    > Never happens because when extending, levels is always applied first, and only then can dataType
+          //      become qualitative-only. The error is always thrown in the dataType attribute.
+          //    > If we would remove all qualitative measurement-levels while data type is already qual only,
+          //      then we'd remove all measurement levels and rule 2. would be triggered first.
+          if(event.changeset.hasChanges) {
+            if(this.hasDescendants) {
+              event.cancel(error.operInvalid(bundle.structured.errors.mapping.levelsLockedWhenTypeHasDescendants));
+              return;
+            }
+
+            if(!this.levels.count) {
+              event.cancel(error.argInvalid("levels", bundle.structured.errors.mapping.noLevels));
+              return;
+            }
+
+            var changes = event.changeset.changes;
+            var i = -1;
+            var L = changes.length;
+            while(++i < L) {
+              var change = changes[i];
+              if(change.type === "add") {
+                event.cancel(error.operInvalid(bundle.structured.errors.mapping.levelsCannotBeAdded));
+                return;
+              }
+            }
+
+            this.levels.sort(MeasurementLevel.type.compare);
           }
-          return levels;
         },
 
         /**
@@ -776,7 +780,7 @@ define([
                   throw error.argInvalid("dataType",
                       bundle.format(
                         bundle.structured.errors.mapping.dataTypeIncompatibleWithRoleLevel,
-                        [this.dataType, level]));
+                        [newType, level]));
               }, this);
             }
 
@@ -874,8 +878,6 @@ define([
       }
     })
     .implement({type: bundle.structured.mapping});
-
-    _mappingType = VisualRoleMapping.type;
 
     return VisualRoleMapping;
   };
