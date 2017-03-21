@@ -673,7 +673,7 @@ define([
       // #,0 A
       // #,0.0 A
       // #,0.00 A
-      var depPlacesMask = precision ? ("." + new Array(precision + 1).join("0")) : "";
+      var depPlacesMask = precision ? ("." + new Array(precision + 1).join("0")) : ".##";
       var mask = "#,0" + depPlacesMask + (useAbrev ? " A" : "");
 
       numberFormat = pvc.data.numberFormat(mask);
