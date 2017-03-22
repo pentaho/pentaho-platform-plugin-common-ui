@@ -115,6 +115,17 @@ define([
           expect(filterSpec.property).toBeUndefined();
           expect(filterSpec.value).toBeUndefined();
         });
+
+        describe("when the value has a formatted value", function() {
+          it("should output the value's inline type", function() {
+            var filter = new IsEqualFilter({property: "foo", value: {_: "string", v: "bar", f: "Bar"}});
+            var filterSpec = filter.toSpec();
+            expect(filterSpec.p).toBe("foo");
+            expect(filterSpec.v).toEqual({_: "string", v: "bar", f: "Bar"});
+            expect(filterSpec.property).toBeUndefined();
+            expect(filterSpec.value).toBeUndefined();
+          });
+        });
       });
 
       describe("when invoked with the keyword argument `noAlias` set to `true`", function() {

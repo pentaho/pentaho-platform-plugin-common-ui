@@ -396,6 +396,31 @@ define([
           });
         }
       });
+
+      describe("when forceType: false and omitFormatted: false", function() {
+
+        it("should output a cell with the '_' inline type reference", function() {
+          var value = new SimpleClass({v: primitiveValue, f: "Foo"});
+          var spec = value.toSpec({forceType: false, omitFormatted: false, declaredType: SimpleClass.type.ancestor});
+
+          expect(typeof spec).toBe("object");
+          expect(spec._).toEqual(SimpleClass.type.shortId);
+        });
+
+        it("should output the primitive value in the 'v' property", function() {
+          var value = new SimpleClass({v: primitiveValue, f: "Foo"});
+          var spec = value.toSpec({forceType: false, omitFormatted: false, declaredType: SimpleClass.type.ancestor});
+
+          expect(spec.v).toBe(primitiveValue);
+        });
+
+        it("should output the formatted value in the 'f' property", function() {
+          var value = new SimpleClass({v: primitiveValue, f: "Foo"});
+          var spec = value.toSpec({forceType: false, omitFormatted: false, declaredType: SimpleClass.type.ancestor});
+
+          expect(spec.f).toBe("Foo");
+        });
+      });
     });
   }
   // endregion
