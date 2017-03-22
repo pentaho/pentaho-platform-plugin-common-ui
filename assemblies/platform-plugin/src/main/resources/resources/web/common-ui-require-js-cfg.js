@@ -61,7 +61,7 @@
     requirePaths["pentaho/" + name] = basePath + "/pentaho/" + name;
   });
 
-  requireTypes["pentaho/visual/config/vizApi.views.conf"] = "pentaho.config.spec.IRuleSet";
+  requireTypes["pentaho/visual/config/vizApi.conf"] = "pentaho.config.spec.IRuleSet";
 
   // Named instances
   requireTypes["pentaho/config/impl/instanceOfAmdLoadedService"] = "pentaho.config.IService";
