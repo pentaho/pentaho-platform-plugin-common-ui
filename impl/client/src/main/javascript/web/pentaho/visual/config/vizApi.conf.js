@@ -40,8 +40,8 @@ define([
     rules: [
       // line/barLine models
       {
+        priority: -5,
         select: {
-          priority: -1,
           type: [
             "pentaho/visual/models/line",
             "pentaho/visual/models/barLine"
@@ -59,8 +59,8 @@ define([
 
       // heatGrid model
       {
+        priority: -5,
         select: {
-          priority: -1,
           type: [
             "pentaho/visual/models/heatGrid"
           ]
@@ -76,8 +76,8 @@ define([
 
       // Pentaho CCC Abstract
       {
+        priority: -5,
         select: {
-          priority: -1,
           type: "pentaho/ccc/visual/abstract"
         },
         apply: {
@@ -157,8 +157,8 @@ define([
 
       // CCC Cartesian
       {
+        priority: -5,
         select: {
-          priority: -1,
           type: "pentaho/ccc/visual/cartesianAbstract"
         },
         apply: {
@@ -234,8 +234,8 @@ define([
 
       // X/Horizontal Discrete Axis at bottom
       {
+        priority: -5,
         select: {
-          priority: -1,
           type: [
             "pentaho/ccc/visual/bar",
             "pentaho/ccc/visual/barStacked",
@@ -259,8 +259,8 @@ define([
 
       // Y/Vertical Continuous Axis at left
       {
+        priority: -5,
         select: {
-          priority: -1,
           type: [
             "pentaho/ccc/visual/bar",
             "pentaho/ccc/visual/barStacked",
@@ -285,8 +285,8 @@ define([
       // Scatter/Bubble
       // X/Horizontal Continuous Axis at bottom
       {
+        priority: -5,
         select: {
-          priority: -1,
           type: "pentaho/ccc/visual/metricDotAbstract"
         },
         apply: {
@@ -342,8 +342,8 @@ define([
 
       // Bubble - Visual Roles
       {
+        priority: -5,
         select: {
-          priority: -1,
           type: "pentaho/ccc/visual/bubble"
         },
         apply: {
@@ -361,8 +361,8 @@ define([
 
       // Scatter
       {
+        priority: -5,
         select: {
-          priority: -1,
           type: "pentaho/ccc/visual/scatter"
         },
         apply: {
@@ -380,8 +380,8 @@ define([
       // X/Horizontal Continuous Axis at top
       // Y/Vertical Discrete Axis at left, and
       {
+        priority: -5,
         select: {
-          priority: -1,
           type: [
             "pentaho/ccc/visual/barHorizontal",
             "pentaho/ccc/visual/barStackedHorizontal",
@@ -403,8 +403,8 @@ define([
 
       // Bars
       {
+        priority: -5,
         select: {
-          priority: -1,
           type: "pentaho/ccc/visual/barAbstract"
         },
         apply: {
@@ -455,8 +455,8 @@ define([
 
       // Line/Area
       {
+        priority: -5,
         select: {
-          priority: -1,
           type: "pentaho/ccc/visual/pointAbstract"
         },
         apply: {
@@ -560,8 +560,8 @@ define([
 
       // Area
       {
+        priority: -5,
         select: {
-          priority: -1,
           type: "pentaho/ccc/visual/areaStacked"
         },
         apply: {
@@ -573,8 +573,8 @@ define([
 
       // Pie/Donut
       {
+        priority: -5,
         select: {
-          priority: -1,
           type: "pentaho/ccc/visual/pie"
         },
         apply: {
@@ -627,8 +627,8 @@ define([
 
       // Donut
       {
+        priority: -5,
         select: {
-          priority: -1,
           type: "pentaho/ccc/visual/donut"
         },
         apply: {
@@ -641,8 +641,8 @@ define([
 
       // Heat Grid
       {
+        priority: -5,
         select: {
-          priority: -1,
           type: "pentaho/ccc/visual/heatGrid"
         },
         apply: {
