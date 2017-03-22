@@ -279,25 +279,22 @@ define([
 
         var type = this.type;
 
+        var declaredType = keyArgs.declaredType;
         var includeType = !!keyArgs.forceType;
-        if(!includeType) {
+        if(!includeType && declaredType) {
+          if(declaredType.isRefinement) declaredType = declaredType.of;
 
-          var declaredType = keyArgs.declaredType;
-          if(declaredType) {
-            if(declaredType.isRefinement) declaredType = declaredType.of;
+          // Abstract foo = (MyNumber 1)
 
-            // Abstract foo = (MyNumber 1)
+          if(type !== declaredType) {
+            if(!stringType) {
+              stringType = context.get("string").type;
+              numberType = context.get("number").type;
+              booleanType = context.get("boolean").type;
+            }
 
-            if(type !== declaredType) {
-              if(!stringType) {
-                stringType = context.get("string").type;
-                numberType = context.get("number").type;
-                booleanType = context.get("boolean").type;
-              }
-
-              if(!(declaredType.isAbstract && (type === stringType || type === numberType || type === booleanType))) {
-                includeType = true;
-              }
+            if(!(declaredType.isAbstract && (type === stringType || type === numberType || type === booleanType))) {
+              includeType = true;
             }
           }
         }
@@ -324,7 +321,7 @@ define([
 
         // Need one. Ensure _ is the first property
         /* jshint laxbreak:true*/
-        var spec = includeType
+        var spec = (includeType || (declaredType && type !== declaredType))
             ? {_: type.toRefInContext(keyArgs), v: value}
             : {v: value};
 
