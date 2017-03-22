@@ -29,7 +29,15 @@ define([
     return BaseModel.extend({
       type: {
         id: module.id,
-        isAbstract: true
+        isAbstract: true,
+        props: [
+          {
+            name: "rows", // VISUAL_ROLE
+            type: {
+              levels: ["ordinal"]
+            }
+          }
+        ]
       }
     })
     .implement({type: settingsMultiChartType})

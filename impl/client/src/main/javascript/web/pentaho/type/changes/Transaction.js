@@ -19,10 +19,9 @@ define([
   "./TransactionRejectedError",
   "../../lang/Base",
   "../../lang/ActionResult",
-  "../../lang/UserError",
   "../../util/object",
   "../../util/error"
-], function(ChangeRef, TransactionScope, TransactionRejectedError, Base, ActionResult, UserError, O, error) {
+], function(ChangeRef, TransactionScope, TransactionRejectedError, Base, ActionResult, O, error) {
 
   "use strict";
 
