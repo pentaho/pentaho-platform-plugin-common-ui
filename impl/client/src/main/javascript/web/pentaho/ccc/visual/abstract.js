@@ -944,11 +944,9 @@ define([
 
       _configureOptions: function() {
         var options = this.options;
-        var model   = this.model;
+        var model = this.model;
 
-        var colorScaleKind = this._getColorScaleKind();
-        if(colorScaleKind)
-          this._configureColor(colorScaleKind);
+        this._configureColor();
 
         if(options.legend && (options.legend = this._isLegendVisible()))
           this._configureLegend();
@@ -980,31 +978,41 @@ define([
         return "discrete";
       },
 
-      _configureColor: function(colorScaleKind) {
-        var options = this.options;
-        var model = this.model;
+      _configureColor: function() {
+        var colorScaleKind = this._getColorScaleKind();
+        if(colorScaleKind) {
+          var options = this.options;
+          var model = this.model;
 
-        switch(colorScaleKind) {
-          case "discrete":
-            options.colors = this._getDiscreteColors();
-            break;
+          switch(colorScaleKind) {
+            case "discrete":
+              options.colors = this._getDiscreteColors();
+              break;
 
-          case "continuous":
-            options.colorScaleType = model.pattern === "gradient" ? "linear" : "discrete";
-            options.colors = visualColorUtils.buildPalette(
-              model.colorSet,
-              model.pattern,
-              model.reverseColors);
-            break;
+            case "continuous":
+              options.colorScaleType = model.pattern === "gradient" ? "linear" : "discrete";
+              options.colors = visualColorUtils.buildPalette(
+                  model.colorSet,
+                  model.pattern,
+                  model.reverseColors);
+              break;
+          }
         }
       },
 
+      /**
+       * Gets the final color scale, color scale factory or array of colors to use for the current discrete color role.
+       *
+       * @return {pv.Scale|Array.<string|pv.Color>|function():pv.Scale} The final color scale.
+       *
+       * @protected
+       */
       _getDiscreteColors: function() {
         var defaultScale = pv.colors(this._getDefaultDiscreteColors());
 
         var scale;
         if(this._discreteColorRole) {
-          var colorMap = this._getDiscreteColorMap(defaultScale);
+          var colorMap = this._getDiscreteColorMap();
           if(colorMap) {
             // Final?
             if(def.fun.is(colorMap)) { return colorMap; }
@@ -1020,10 +1028,28 @@ define([
         return scale || defaultScale;
       },
 
+      /**
+       * Gets the base array of colors for a discrete color scale.
+       *
+       * @return  {string[]} The base colors.
+       *
+       * @protected
+       */
       _getDefaultDiscreteColors: function() {
         return visualPaletteRegistry.get().colors.slice();
       },
 
+      /**
+       * Gets a color map for members who have fixed colors.
+       *
+       * If the returned value is a function, it is assumed to be final color scale.
+       * The default implementation may return a color scale with one color when there is a single measure
+       * and no color attributes.
+       *
+       * @return {Object.<string, pv.Color>|pv.Scale} The color map, if any or _nully_.
+       *
+       * @protected
+       */
       _getDiscreteColorMap: function() {
         var memberPalette = this._getMemberPalette();
         if(!memberPalette)
@@ -1041,6 +1067,7 @@ define([
         // Possible to create colorMap based on memberPalette?
         if(C || M) {
           if(!C || M > 1) {
+            // TODO: Mondrian/Analyzer specific
             colorMap = memberPalette["[Measures].[MeasuresLevel]"];
 
             // Use measure colors
@@ -1130,12 +1157,28 @@ define([
         return memberPalette;
       },
 
-      _createDiscreteColorMapScaleFactory: function(colorScale, defaultScale) {
+      /**
+       * Creates a color factory given two color scales,
+       * the color map scale, which resolves colors for values with fixed colors and the
+       * base scale, which assigns colors to values on a first-come-first-served basis.
+       *
+       * The actual key used by color scales with color maps is *the value of the last attribute*
+       * that belongs to the color role. This applies both to values that are fixed in the color map and
+       * to those that have to resource to the base color scale.
+       *
+       * @param {function(string) : pv.Color | pv.Scale} colorMapScale - The color map scale.
+       * @param {pv.Scale} baseScale - The base scale.
+       *
+       * @return {function() : pv.Scale} A color scale factory.
+       *
+       * @protected
+       */
+      _createDiscreteColorMapScaleFactory: function(colorMapScale, baseScale) {
 
         // Make sure the scales returned by scaleFactory
         // "are like" pv.Scale - have all the necessary methods.
         return function safeScaleFactory() {
-          return def.copy(scaleFactory(), defaultScale);
+          return def.copy(scaleFactory(), baseScale);
         };
 
         function scaleFactory() {
@@ -1143,7 +1186,7 @@ define([
             if(compKey) {
               var keys = compKey.split("~");
               var key = keys[keys.length - 1];
-              return colorScale(key) || defaultScale(key);
+              return colorMapScale(key) || baseScale(key);
             }
           };
         }

@@ -51,7 +51,7 @@ define([
         valuesVisible: true,
         valuesOverflow: "trim",
         valuesOptimizeLegibility: false,
-        colorMode: "slice"
+        colorMode: "level"
       },
 
       // Changed in _configureDisplayUnits according to option "displayUnits".
@@ -207,9 +207,10 @@ define([
           // Also, there can be at most one measure gem, "size", so M <= 1.
           // Use member colors of all of the color attributes.
           this._getDiscreteColorMappingAttrInfos().forEach(function(colorMAInfo) {
+            // TODO: Mondrian/Analyzer specific
             // Copy map values to colorMap.
             // All color maps are joined together and there will be no
-            // value collisions because the key is prefixed with the category.
+            // value collisions because Mondrian keys are prefixed with the dimensions they belong to...
             if(colorMAInfo && colorMAInfo.attr) {
               var map = memberPalette[colorMAInfo.attr.name];
               if(map) this._copyColorMap(colorMap, map);
@@ -225,7 +226,7 @@ define([
         // Sunburst Level 2 Wedge Key: "[Department].[VAL]~[Region].[USA]"
         // colorMap= {
         //   "[Region].[USA]" : "#FF00FF"
-        //   "[Department].[USA]" : "#AAFF00"
+        //   "[Department].[VAL]" : "#AAFF00"
         // }
 
         // Make sure the scales returned by scaleFactory
@@ -242,7 +243,7 @@ define([
               var keyLevel = keys[level];
 
               // Obtain color for most specific key from color map.
-              // If color map has no color and it is the 1st level,
+              // If color map has no color and it is the 1st level (level = 0),
               //  then reserve a color from the default color scale.
               // Otherwise, return undefined, meaning that a derived color should be used.
               return colorMapScale(keyLevel) || (level ? undefined : defaultScale(keyLevel));
