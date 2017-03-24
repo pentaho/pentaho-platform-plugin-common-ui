@@ -150,7 +150,8 @@ define([
             titleSize:     30,
             titlePosition: "top",
             titleAlign:    "center",
-            titleAlignTo:  "page-center"
+            titleAlignTo:  "page-center",
+            titleFont:     vizApiFont
           }
         }
       },
@@ -206,12 +207,6 @@ define([
 
             axisGrid_lineWidth:   1,
             axisGrid_strokeStyle: "#CCC",
-
-            // . horizontal discrete / minimum distance between bands/ticks
-            xAxisBandSizeMin: 18,
-
-            // . vertical discrete / minimum distance between bands/ticks/line-height
-            yAxisBandSizeMin: 30,
 
             // . rule
             axisRule_lineWidth: 1,
@@ -551,7 +546,7 @@ define([
             dot_shapeRadius: function() { return this.finished(5); },
 
             // . line
-            linesVisible: true,
+            linesVisible: false,
             line_ibits: 0,
             line_imask: "ShowsActivity"
           }
@@ -567,6 +562,23 @@ define([
         apply: {
           extension: {
             linesVisible: false
+          }
+        }
+      },
+
+      {
+        priority: -5,
+        select: {
+          type: [
+            "pentaho/visual/models/line",
+            "pentaho/visual/models/barLine"
+          ]
+        },
+        apply: {
+          props: {
+            extension: {
+              linesVisible: true
+            }
           }
         }
       },
@@ -659,11 +671,9 @@ define([
             // X
             xAxisPosition: "top",
             xAxisSizeMax: 80,
-            xAxisBandSizeMin: 30, // make equal to the inherited yAxisBandSizeMin: 30,
 
             // Y
             yAxisSizeMax: 80, // shouldn't it be: maxHorizontalTextWidth ??
-            yAxisBandSizeMin: 30,
 
             // . label
             xAxisOverlappedLabelsMode: "rotatethenhide",
@@ -706,7 +716,44 @@ define([
             }
           }
         }
-      }
+      },
+
+
+      // context specific rules, not defined in the global configuration
+      {
+        priority: -2,
+        select: {
+          application: ['pentaho-analyzer', 'pentaho-det'],
+          type: [
+            "pentaho/ccc/visual/cartesianAbstract",
+            "pentaho/ccc/visual/heatGrid"
+          ]
+        },
+        apply: {
+          extension: {
+            // . horizontal discrete / minimum distance between bands/ticks
+            xAxisBandSizeMin: 18,
+            // . vertical discrete / minimum distance between bands/ticks/line-height
+            yAxisBandSizeMin: 30,
+          }
+        }
+      },
+      {
+        priority: -1,
+        select: {
+          application: ['pentaho-analyzer', 'pentaho-det'],
+          type: [
+            "pentaho/ccc/visual/heatGrid"
+          ]
+        },
+        apply: {
+          extension: {
+            // . horizontal discrete / minimum distance between bands/ticks
+            xAxisBandSizeMin: 30
+          }
+        }
+      },
+
     ]
   };
 
@@ -734,3 +781,4 @@ define([
   }
 
 });
+
