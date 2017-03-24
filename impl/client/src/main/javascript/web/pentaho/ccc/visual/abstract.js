@@ -351,9 +351,6 @@ define([
       },
 
       _initOptions: function() {
-        // Store the current selections
-        this._selections = null; // TODO: hookup model selections?
-
         // Recursively inherit this class' shared options
         var options = this.options = def.create(this._options);
         def.set(
@@ -706,7 +703,6 @@ define([
           var cccRole = def.lazy(cccVisualRoles, cccRoleName);
           def.array.lazy(cccRole, "dimensions").push(cccDimName);
         };
-        var MeasurementLevel = this.type.context.get(measurementLevelFactory);
 
         // Configure the generic measure visual role
         if(isGenericMeasureMode)
@@ -1373,14 +1369,19 @@ define([
         /* Add selection information */
         // Not the data point count, but the selection count (a single column selection may select many data points).
         // var selectedCount = this._chart && this._chart.data.selectedCount();
-        var selections = this._selections;
-        var selectedCount = selections && selections.length;
-        if(selectedCount) {
-          var msgId = selectedCount === 1 ? "tooltip.footer.selectedOne" : "tooltip.footer.selectedMany";
+        var selectionFilter = this.selectionFilter;
+        if(selectionFilter) {
+          selectionFilter = selectionFilter.toDnf();
+          if(selectionFilter.kind === "or") {
+            var selectedCount = selectionFilter.operands.count;
+            if(selectedCount) {
+              var msgId = selectedCount === 1 ? "tooltip.footer.selectedOne" : "tooltip.footer.selectedMany";
 
-          msg = bundle.get(msgId, [selectedCount]);
+              msg = bundle.get(msgId, [selectedCount]);
 
-          tooltipLines.push(msg);
+              tooltipLines.push(msg);
+            }
+          }
         }
 
         return tooltipLines.join("<br />");
@@ -1526,28 +1527,6 @@ define([
         }]];
       },
 
-      _getSelectionKey: function(selection) {
-        var key = selection.__cccKey;
-        if(!key) {
-          var keys = [selection.type];
-
-          var ap = def.array.append;
-          if(selection.columnId) {
-            ap(keys, selection.columnId);
-            ap(keys, selection.columnItem);
-          }
-
-          if(selection.rowId) {
-            ap(keys, selection.rowId);
-            ap(keys, selection.rowItem);
-          }
-
-          key = selection.__cccKey = keys.join("||");
-        }
-
-        return key;
-      },
-
       _onUserSelection: function(selectingDatums) {
         // Duplicates may occur due to excluded dimensions like the discriminator
 
@@ -1555,7 +1534,7 @@ define([
 
         var alreadyIn = {};
         var operands = selectingDatums.reduce(function(memo, datum) {
-          if(!datum.isVirtual) {
+          if(!datum.isVirtual && !datum.isNull) {
             // When there are no attributes (e.g. bar chart with measures alone),
             // operand is null...
             var operand = this._complexToFilter(datum);
@@ -1581,72 +1560,6 @@ define([
 
         // Explicitly cancel CCC's native selection handling.
         return [];
-      },
-
-      _limitSelection: function(selections) {
-        var selectionsKept = selections;
-
-        // limit selection
-        var filterSelectionMaxCount = Infinity; // deselectCount > 0 always false
-        var L = selections.length;
-        var deselectCount = L - filterSelectionMaxCount;
-        if(deselectCount > 0) {
-          // Build a list of datums to deselect
-          var deselectDatums = [];
-          selectionsKept = [];
-
-          for(var i = 0; i < L; i++) {
-            var selection = selections[i];
-            var keep = true;
-            if(deselectCount) {
-              if(this._previousSelectionKeys) {
-                var key = this._getSelectionKey(selection);
-                if(!this._previousSelectionKeys[key]) keep = false;
-              } else if(i >= filterSelectionMaxCount) {
-                keep = false;
-              }
-            }
-
-            if(keep) {
-              selectionsKept.push(selection);
-            } else {
-              var datums = selection.__cccDatums;
-              if(datums) {
-                if(def.array.is(datums))
-                  def.array.append(deselectDatums, datums);
-                else
-                  deselectDatums.push(datums);
-              }
-              deselectCount--;
-            }
-          }
-
-          // Deselect datums beyond the max count
-          cdo.Data.setSelected(deselectDatums, false);
-
-          // Mark for update UI ASAP
-          this._chart.updateSelections();
-
-          if(typeof alert !== "undefined") {
-            /* eslint no-alert: 0 */
-            alert([
-              "infoExceededMaxSelectionItems",
-              filterSelectionMaxCount,
-              "SELECT_ITEM_LIMIT_REACHED"
-            ]);
-          }
-        }
-
-        // Index with the keys of previous selections
-        this._previousSelectionKeys =
-          def.query(selectionsKept)
-            .object({
-              name: function(selection) { return this._getSelectionKey(selection); },
-              value: def.retTrue,
-              context: this
-            });
-
-        return selectionsKept;
       },
 
       // endregion
