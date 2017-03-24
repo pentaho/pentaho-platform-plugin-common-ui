@@ -285,8 +285,8 @@ define([
   paletteRegistry.add({name: "ryb-3",  colors: ["#FF0000", "#FFFF00", "#4BB6E4"]});
   paletteRegistry.add({name: "ryb-5",  colors: ["#FF0000", "#FFBF3F", "#FFFF00", "#DCDDDE", "#4BB6E4"]});
 
-  paletteRegistry.add({name: "blue-3", colors: ["#CBE7FF", "#33A1FF", "#0345A9"]});
-  paletteRegistry.add({name: "blue-5", colors: ["#CBE7FF", "#99D0FF", "#33A1FF", "#006ECC", "#0345A9"]});
+  paletteRegistry.add({name: "blue-3", colors: ["#0F2B5B", "#6D85A4", "#CCDFED"]});
+  paletteRegistry.add({name: "blue-5", colors: ["#0F2B5B", "#3E587F", "#6D85A4", "#9CB2C8", "#CCDFED"]});
 
   paletteRegistry.add({name: "gray-3", colors: ["#E6E6E6", "#999999", "#333333"]});
   paletteRegistry.add({name: "gray-5", colors: ["#E6E6E6", "#CCCCCC", "#999999", "#666666", "#333333"]});
