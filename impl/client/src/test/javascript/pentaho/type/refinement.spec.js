@@ -23,7 +23,7 @@ define([
 
   /* global describe:true, it:true, expect:true, beforeEach:true*/
 
-  describe("pentaho.type.Refinement -", function() {
+  xdescribe("pentaho.type.Refinement -", function() {
 
     var context = new Context(),
         Instance = context.get("instance"),

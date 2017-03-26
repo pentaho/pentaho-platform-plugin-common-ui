@@ -14,58 +14,104 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
-  "pentaho/type/facets/Refinement"
-], function(Context, RefinementFacet) {
+  "pentaho/type/Context"
+], function(Context) {
 
   "use strict";
 
   /* global describe:true, it:true, expect:true, beforeEach:true*/
 
-  describe("pentaho.type.Value - refine([name,] instSpec) -", function() {
+  describe("pentaho.type.Value", function() {
 
-    var context = new Context(),
-        Element = context.get("pentaho/type/element"),
-        Refinement = context.get("pentaho/type/refinement");
+    describe("refine([name,] instSpec, classSpec, keyArgs)", function() {
 
-    // Must use Element or List to test cause only these are representation types
-    // and Value is not...
+      var context = new Context();
+      var Element = context.get("pentaho/type/element");
 
-    it("should create a refinement type that extends Refinement", function() {
-      var Facet = RefinementFacet.extend(null, {id: "my/foo"});
-      var RefinementType = Element.refine({type: {facets: [Facet]}});
+      // Must use Element or List to test cause only these are representation types
+      // and Value is not...
 
-      expect(RefinementType.prototype instanceof Refinement).toBe(true);
-    });
+      it("should create a subtype", function() {
 
-    it("should create a refinement type that has this as `of`", function() {
-      var Facet = RefinementFacet.extend(null, {id: "my/foo"});
-      var RefinementType = Element.refine({type: {facets: [Facet]}});
+        var AccidentType = Element.refine();
 
-      expect(RefinementType.type.of).toBe(Element.type);
-    });
-
-    it("should create a refinement type that has the specified name", function() {
-      var Facet = RefinementFacet.extend(null, {id: "my/foo"});
-      var MyRefinement = Element.refine("FOOO", {
-        type: {
-          facets: [Facet]
-        }
+        expect(AccidentType.prototype instanceof Element).toBe(true);
       });
 
-      // PhantomJS still fails configuring the name property...
-      expect(MyRefinement.name || MyRefinement.displayName).toBe("FOOO");
-    });
+      it("should create a subtype that has this as `essence`", function() {
 
-    it("should create a refinement type if instSpec is not specified", function() {
-      var MyRefinement = Element.refine();
-      expect(MyRefinement.prototype instanceof Refinement).toBe(true);
+        var AccidentType = Element.refine();
 
-      MyRefinement = Element.refine("FOO");
-      expect(MyRefinement.prototype instanceof Refinement).toBe(true);
+        expect(AccidentType.type.essence).toBe(Element.type);
+      });
 
-      MyRefinement = Element.refine({});
-      expect(MyRefinement.prototype instanceof Refinement).toBe(true);
+      it("should create a subtype that is an accident", function() {
+
+        var AccidentType = Element.refine();
+
+        expect(AccidentType.type.isEssence).toBe(false);
+        expect(AccidentType.type.isAccident).toBe(true);
+      });
+
+      it("should create a subtype that has the specified name", function() {
+
+        var AccidentType = Element.refine("FOOO");
+
+        expect(AccidentType.name || AccidentType.displayName).toBe("FOOO");
+      });
+
+      it("should create a subtype that has the specified class spec", function() {
+
+        var AccidentType = Element.refine({}, {foo: true});
+
+        expect(AccidentType.foo).toBe(true);
+      });
+
+      it("should create a subtype that has the specified name and class spec", function() {
+
+        var AccidentType = Element.refine("FOOO", {}, {foo: true});
+
+        expect(AccidentType.name || AccidentType.displayName).toBe("FOOO");
+        expect(AccidentType.foo).toBe(true);
+      });
+
+      it("should create a subtype whose constructor creates direct instances of the essence type", function() {
+
+        var SubElement = Element.extend();
+        var Accident = SubElement.refine();
+
+        var instance = new Accident();
+        expect(instance instanceof Accident).toBe(false);
+        expect(instance.constructor).toBe(SubElement);
+      });
+
+      describe("when the base type is a accidental type", function() {
+
+        it("should create an accident", function() {
+
+          var SubElement = Element.extend();
+          var Accident = SubElement.refine();
+          var SubAccident = Accident.refine();
+
+          expect(SubAccident.prototype instanceof Accident).toBe(true);
+          expect(SubAccident.type.essence).toBe(SubElement.type);
+          expect(SubAccident.type.isEssence).toBe(false);
+          expect(SubAccident.type.isAccident).toBe(true);
+        });
+
+        it("should create an accident that creates direct instances of the essence type", function() {
+
+          var SubElement = Element.extend();
+          var Accident = SubElement.refine();
+          var SubAccident = Accident.refine();
+
+          var instance = new SubAccident();
+
+          expect(instance instanceof Accident).toBe(false);
+          expect(instance instanceof SubAccident).toBe(false);
+          expect(instance.constructor).toBe(SubElement);
+        });
+      });
     });
   });
 });

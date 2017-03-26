@@ -254,7 +254,7 @@ define([
      * For more information on the `typeRef` argument,
      * see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
      *
-     * The modules of standard types and refinement facet _mixins_ are preloaded and
+     * The modules of standard types and facet _mixins_ are preloaded and
      * can be requested _synchronously_. These are:
      *
      * * [pentaho/type/instance]{@link pentaho.type.Instance}
@@ -271,6 +271,8 @@ define([
      *         * [pentaho/type/boolean]{@link pentaho.type.Boolean}
      *         * [pentaho/type/function]{@link pentaho.type.Function}
      *         * [pentaho/type/object]{@link pentaho.type.Object}
+     *
+     *     // TODO: remove these types when DiscreteDomain is refactored.
      *     * [pentaho/type/refinement]{@link pentaho.type.Refinement}
      *       * [pentaho/type/facets/Refinement]{@link pentaho.type.facets.RefinementFacet}
      *         * [pentaho/type/facets/DiscreteDomain]{@link pentaho.type.facets.DiscreteDomain}

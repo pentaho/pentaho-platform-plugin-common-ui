@@ -23,7 +23,7 @@ define([
 
   /* global describe:true, it:true, expect:true, beforeEach:true, spyOn:true*/
 
-  describe("pentaho.type.Refinement.Type -", function() {
+  xdescribe("pentaho.type.Refinement.Type -", function() {
 
     var context = new Context(),
         Simple  = context.get("pentaho/type/simple"),

@@ -579,8 +579,7 @@ define([
         var listType = this.type;
         var declaredType;
         var includeType = !!keyArgs.forceType ||
-              (!!(declaredType = keyArgs.declaredType) &&
-               listType !== (declaredType.isRefinement ? declaredType.of : declaredType));
+              (!!(declaredType = keyArgs.declaredType) && listType !== declaredType.essence);
 
         var elemSpecs;
 
@@ -588,8 +587,7 @@ define([
           // reset
           keyArgs.forceType = false;
 
-          var elemType = listType.of;
-          if(elemType.isRefinement) elemType = elemType.of;
+          var elemType = listType.of.essence;
 
           elemSpecs = this.toArray(function(elem) {
             keyArgs.declaredType = elemType; // JIC it is changed by elem.toSpecInContext

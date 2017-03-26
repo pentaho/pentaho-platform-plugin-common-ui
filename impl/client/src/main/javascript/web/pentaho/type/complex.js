@@ -754,8 +754,7 @@ define([
         var noAlias = !!keyArgs.noAlias;
         var declaredType;
         var includeType = !!keyArgs.forceType ||
-              (!!(declaredType = keyArgs.declaredType) &&
-               this.type !== (declaredType.isRefinement ? declaredType.of : declaredType));
+              (!!(declaredType = keyArgs.declaredType) && this.type !== declaredType.essence);
 
         var useArray = !includeType && keyArgs.preferPropertyArray;
         var omitProps;

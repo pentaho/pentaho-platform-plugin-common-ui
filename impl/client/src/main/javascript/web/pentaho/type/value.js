@@ -19,18 +19,17 @@ define([
   "./util",
   "./ValidationError",
   "./SpecificationContext",
+  "../util/object",
+  "../util/arg",
+  "../util/error",
   "../i18n!types"
-], function(module, instanceFactory, typeUtil, ValidationError, SpecificationContext, bundle) {
+], function(module, instanceFactory, typeUtil, ValidationError, SpecificationContext, O, arg, error, bundle) {
 
   "use strict";
 
   return function(context) {
 
     var Instance = context.get(instanceFactory);
-
-    // Late bound to break cyclic dependency.
-    // Resolved on first use, in pentaho.type.Value.refine.
-    var Refinement = null;
 
     /**
      * @name pentaho.type.Value.Type
@@ -264,7 +263,48 @@ define([
         alias: "value",
         isAbstract: true,
 
-        get isValue() { return true; },
+        _init: function(spec, keyArgs) {
+
+          var isAccident = this.isAccident || !!spec.isAccident;
+          if(isAccident && !spec.isAbstract) {
+            spec = Object.create(spec);
+            spec.isAbstract = true;
+          }
+
+          this.base(spec, keyArgs);
+
+          if(isAccident) {
+            var essence = this.__essence;
+            if(essence == null) {
+              // This is the root accident.
+              O.setConst(this, "__essence", this.ancestor);
+            }
+          }
+        },
+
+        get isValue() {
+          return true;
+        },
+
+        get _isAbstractImplied() {
+          return this.isAccident;
+        },
+
+        // region essence
+        __essence: null,
+
+        get essence() {
+          return this.__essence || this;
+        },
+
+        get isEssence() {
+          return !this.__essence;
+        },
+
+        get isAccident() {
+          return !!this.__essence;
+        },
+        // endregion
 
         // region equality
         /**
@@ -366,14 +406,18 @@ define([
           if(!keyArgs) keyArgs = {};
 
           // The type's id or the temporary id in this scope.
-          var id = keyArgs && keyArgs.noAlias ? this.id : this.shortId;
-          var spec = {id: id || SpecificationContext.current.add(this)};
+          var spec = {id: this._id || SpecificationContext.current.add(this)};
 
           // The base type in the **current type hierarchy** (root, ancestor, isRoot).
           var baseType = Object.getPrototypeOf(this);
           var baseRef = baseType.toRefInContext(keyArgs);
-          if(baseRef !== "complex")
+          if(baseRef !== "complex") {
             spec.base = baseRef;
+          }
+
+          if(this.isAccident && this.ancestor.isEssence) {
+            spec.isAccident = true;
+          }
 
           this._fillSpecInContext(spec, keyArgs);
 
@@ -420,46 +464,80 @@ define([
        *
        * @return {!Class.<pentaho.type.Value>} The new value instance subclass.
        *
+       * @throws {pentaho.lang.ArgumentInvalidError} When the defined type is accidental and
+       * `instSpec` contains any properties other than `type`. Accidental types cannot have an instance interface.
+       *
        * @see pentaho.type.Instance.extend
        */
+      _extend: function(name, instSpec, classSpec, keyArgs) {
+
+        if(instSpec) {
+          var typeSpec = instSpec.type;
+          var isBaseAccident = this.type.isAccident;
+          var isAccident = isBaseAccident || !!(typeSpec && typeSpec.isAccident);
+          if(isAccident) {
+
+            var hasInstanceInterface = (typeSpec && typeSpec.instance) != null;
+            if(!hasInstanceInterface) {
+              for(var p in instSpec) {
+                if(p !== "type") {
+                  hasInstanceInterface = true;
+                  break;
+                }
+              }
+            }
+
+            if(hasInstanceInterface) {
+              throw error.operInvalid(bundle.structured.errors.refinement.cannotExtendInstance);
+            }
+
+            if(!isBaseAccident) {
+              instSpec = Object.create(instSpec);
+              instSpec.constructor = createAccidentCtor(this.type.essence);
+            }
+          }
+        }
+
+        return this.base(name, instSpec, classSpec, keyArgs);
+      },
 
       /**
-       * Creates a refinement type that refines this one.
+       * Creates an accidental subtype of this one.
        *
-       * @see pentaho.type.Refinement.Type#facets
-       * @see pentaho.type.Refinement.Type#of
+       * @see pentaho.type.Value.Type#essence
        *
        * @param {string} [name] A name of the refinement type used for debugging purposes.
-       * @param {{type: pentaho.type.spec.IRefinementTypeProto}} [instSpec] The refined type instance specification.
-       * The available _type_ attributes are those defined by any specified refinement facet classes.
+       * @param {{type: pentaho.type.spec.IValueTypeProto}} [instSpec] The instance specification.
+       * It can only contain the `type` attribute.
+       * @param {Object} [classSpec] The static specification.
+       * @param {Object} [keyArgs] - Keyword arguments.
        *
-       * @return {Class.<pentaho.type.Refinement>} The refinement type's instance class.
+       * @return {!Class.<pentaho.type.Value>} The accidental type's instance class.
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When `instSpec` contains any properties other than `type`.
-       * The instance interface of refinement types cannot be specified.
+       * Accidental types cannot have an instance interface.
        */
-      refine: function(name, instSpec) {
+      refine: function(name, instSpec, classSpec, keyArgs) {
 
         if(typeof name !== "string") {
+          keyArgs = classSpec;
+          classSpec = instSpec;
           instSpec = name;
-          name = null;
+          // Important to be a string. If nully, `extend` would fail.
+          name = "";
         }
 
-        // Ugly but effective.
-        if(!instSpec) {
-          instSpec = {type: {}};
-        } else if(!instSpec.type) {
-          instSpec.type = {};
+        var typeSpec;
+        if(instSpec) {
+          typeSpec = instSpec.type;
+          instSpec = Object.create(instSpec);
+          instSpec.type = typeSpec = typeSpec ? Object.create(typeSpec) : {};
+          typeSpec.isAccident = true;
+        } else {
+          instSpec = {type: {isAccident: true}};
         }
 
-        instSpec.type.of = this.type;
-
-        // Resolved on first use to break cyclic dependency.
-        if(!Refinement) {
-          Refinement = context.get("pentaho/type/refinement");
-        }
-
-        return Refinement.extend(name || "", instSpec);
+        return this.extend(name, instSpec, classSpec, keyArgs);
       }
     }, /* keyArgs: */{
       isRoot: true
@@ -468,5 +546,25 @@ define([
     });
 
     return Value;
+
+    /**
+     * Creates the constructor for an accidental type, the first in a hierarchy of accidental types.
+     *
+     * Accidental constructors always return an instance of the essence type.
+     *
+     * Cannot give a name to the constructor or the name given to extend gets ignored...
+     *
+     * @param {!pentaho.type.Value.Type} essenceType - The essential type.
+     *
+     * @return {function} The accidental type constructor.
+     *
+     * @private
+     */
+    function createAccidentCtor(essenceType) {
+
+      return function() {
+        return essenceType.create.apply(essenceType, arguments);
+      };
+    }
   };
 });

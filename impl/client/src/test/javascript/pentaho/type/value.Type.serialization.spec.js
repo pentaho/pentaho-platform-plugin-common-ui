@@ -98,7 +98,7 @@ define([
       });
 
       describe("#id", function() {
-        it("should serialize the #id of a type using #alias, if defined", function() {
+        it("should serialize the #id of a type using #shortId, if an #alias is defined", function() {
           var derivedType = Value.extend({type: {id: "pentaho/type/test", alias: "testAlias"}}).type;
 
           var scope = new SpecificationScope();
@@ -108,7 +108,7 @@ define([
           scope.dispose();
 
           expect(spec instanceof Object).toBe(true);
-          expect(spec.id).toBe(derivedType.alias);
+          expect(spec.id).toBe(derivedType.id);
         });
 
         it("should serialize the #id of a type using #shortId, if an #alias is not defined", function() {
@@ -122,21 +122,6 @@ define([
 
           expect(spec instanceof Object).toBe(true);
           expect(spec.id).toBe(derivedType.shortId);
-        });
-
-        it("should serialize the #id of a type using #id when an #alias is defined but #toSpecInContext is invoked with `noAlias`", function() {
-          var derivedType = Value.extend({type: {id: "pentaho/type/test", alias: "testAlias"}}).type;
-
-          var scope = new SpecificationScope();
-
-          var spec = derivedType.toSpecInContext({
-            noAlias: true
-          });
-
-          scope.dispose();
-
-          expect(spec instanceof Object).toBe(true);
-          expect(spec.id).toBe(derivedType.id);
         });
 
         it("should serialize with an anonymous #id when the type is anonymous", function() {

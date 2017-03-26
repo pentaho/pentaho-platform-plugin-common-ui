@@ -285,12 +285,11 @@ define([
         var type = this.type;
 
         var declaredType = keyArgs.declaredType;
+        if(declaredType) declaredType = declaredType.essence;
+
         var includeType = !!keyArgs.forceType;
         if(!includeType && declaredType) {
-          if(declaredType.isRefinement) declaredType = declaredType.of;
-
           // Abstract foo = (MyNumber 1)
-
           if(type !== declaredType) {
             if(!stringType) {
               stringType = context.get("string").type;

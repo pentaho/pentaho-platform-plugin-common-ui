@@ -24,7 +24,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, spyOn:false, jasmine:false*/
 
-  describe("pentaho.type.Refinement.Type", function() {
+  xdescribe("pentaho.type.Refinement.Type", function() {
 
     var context = new Context(),
         PentahoString = context.get("pentaho/type/string"),

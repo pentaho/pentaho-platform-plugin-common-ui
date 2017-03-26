@@ -25,8 +25,6 @@ define([
 
   "use strict";
 
-  var _keyArgsExcludeInstance = {exclude: {type: 1}};
-
   return function(context) {
 
     var Type = typeFactory(context);
