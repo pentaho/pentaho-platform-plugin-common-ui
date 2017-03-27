@@ -25,9 +25,9 @@ define(function() {
     },
 
     defaultFont: function(font, defaultSize) {
-        if(!font) return (defaultSize || 10) + 'px sans-serif';
+        if(!font) return (defaultSize || 10) + 'px OpenSansRegular, sans-serif';
 
-        return font.replace(/\bdefault\s*$/i, 'sans-serif');
+        return font.replace(/\bdefault\s*$/i, 'OpenSansRegular, sans-serif');
     },
 
     readFontModel: function(model, prefix) {

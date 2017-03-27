@@ -21,7 +21,6 @@ define([
 
   /* eslint camelcase: "off", require-jsdoc: "off", brace-style:0, key-spacing:0, quote-props:0 */
 
-  var vizApiFont = "10px OpenSansRegular";
   var maxHorizontalTextWidth = 117;
   var pvc = null;
   var pv = null;
@@ -56,7 +55,6 @@ define([
           }
         }
       },
-
       // heatGrid model
       {
         priority: -5,
@@ -100,17 +98,14 @@ define([
 
             // Legend
             // legend: true,
-            legendPosition:    "top",
-            legendAlign:       "left",
             legendDrawLine:    false,
             legendDrawMarker:  true,
-            legendDot_shape:   "circle",
-            legendFont:        vizApiFont,
-            legendLabel_textStyle: "#666",
 
             legendItemCountMax: 20,
             legendSizeMax:      "30%",
             legendOverflow:     "collapse",
+
+            legendArea_overflow: "visible",
 
             legendPaddings:    0,
             legendMargins:     0,
@@ -120,7 +115,6 @@ define([
 
             // NOTE: needs to be set to slightly higher than 4 to look like 4...
             legendTextMargin:  6,
-            legendMarkerSize:  8,
 
             legendArea_lineWidth: 0, // reset viz wrapper style
 
@@ -172,15 +166,8 @@ define([
 
             // Cartesian Axes
 
-            // . font
-            axisFont: vizApiFont,
-            axisLabel_textStyle: "#666",
-
             // . title
             axisTitleVisible: true,
-            axisTitleSize: 18,
-            axisTitleFont: vizApiFont,
-            axisTitleLabel_textStyle: "#666",
             axisTitleLabel_textMargin: 0,
             xAxisTitleAlign: "left",
             yAxisTitleAlign: "top",
