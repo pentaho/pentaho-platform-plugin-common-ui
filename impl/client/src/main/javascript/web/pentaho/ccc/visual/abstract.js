@@ -467,7 +467,7 @@ define([
         }
         // endregion
 
-        options.legend = value = model.showLegend;
+        options.legendAreaVisible = value = model.showLegend;
         if(value) {
           value = model.legendColor;
           if(value) options.legendLabel_textStyle = value;
