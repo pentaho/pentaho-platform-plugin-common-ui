@@ -56,7 +56,6 @@ define([
           }
         }
       },
-
       // heatGrid model
       {
         priority: -5,
@@ -100,17 +99,14 @@ define([
 
             // Legend
             // legend: true,
-            legendPosition:    "top",
-            legendAlign:       "left",
             legendDrawLine:    false,
             legendDrawMarker:  true,
-            legendDot_shape:   "circle",
-            legendFont:        vizApiFont,
-            legendLabel_textStyle: "#666",
 
             legendItemCountMax: 20,
             legendSizeMax:      "30%",
             legendOverflow:     "collapse",
+
+            legendArea_overflow: "visible",
 
             legendPaddings:    0,
             legendMargins:     0,
@@ -120,7 +116,6 @@ define([
 
             // NOTE: needs to be set to slightly higher than 4 to look like 4...
             legendTextMargin:  6,
-            legendMarkerSize:  8,
 
             legendArea_lineWidth: 0, // reset viz wrapper style
 
@@ -172,15 +167,8 @@ define([
 
             // Cartesian Axes
 
-            // . font
-            axisFont: vizApiFont,
-            axisLabel_textStyle: "#666",
-
             // . title
             axisTitleVisible: true,
-            axisTitleSize: 18,
-            axisTitleFont: vizApiFont,
-            axisTitleLabel_textStyle: "#666",
             axisTitleLabel_textMargin: 0,
             xAxisTitleAlign: "left",
             yAxisTitleAlign: "top",
@@ -718,12 +706,53 @@ define([
         }
       },
 
-
       // context specific rules, not defined in the global configuration
+      {
+        priority: -1,
+        select: {
+          application: ["pentaho-det", "pentaho-cdf"],
+          type: "pentaho/ccc/visual/abstract"
+        },
+        apply: {
+          extension: {
+            legendPosition:    "top",
+            legendAlign:       "left",
+
+            legendDot_shape:   "circle",
+            legendFont:        vizApiFont,
+            legendLabel_textStyle: "#666",
+
+            legendArea_overflow: "hidden",
+
+            legendMarkerSize:  8
+          }
+        }
+      },
+      { // CCC Cartesian
+        priority: -1,
+        select: {
+          application: ["pentaho-det", "pentaho-cdf"],
+          type: "pentaho/ccc/visual/cartesianAbstract"
+        },
+        apply: {
+          extension: {
+            // Cartesian Axes
+
+            // . font
+            axisFont: vizApiFont,
+            axisLabel_textStyle: "#666",
+
+            // . title
+            axisTitleSize: 18,
+            axisTitleFont: vizApiFont,
+            axisTitleLabel_textStyle: "#666"
+          }
+        }
+      },
       {
         priority: -2,
         select: {
-          application: ['pentaho-analyzer', 'pentaho-det'],
+          application: ["pentaho-analyzer", "pentaho-det"],
           type: [
             "pentaho/ccc/visual/cartesianAbstract",
             "pentaho/ccc/visual/heatGrid"
@@ -734,14 +763,14 @@ define([
             // . horizontal discrete / minimum distance between bands/ticks
             xAxisBandSizeMin: 18,
             // . vertical discrete / minimum distance between bands/ticks/line-height
-            yAxisBandSizeMin: 30,
+            yAxisBandSizeMin: 30
           }
         }
       },
       {
         priority: -1,
         select: {
-          application: ['pentaho-analyzer', 'pentaho-det'],
+          application: ["pentaho-analyzer", "pentaho-det"],
           type: [
             "pentaho/ccc/visual/heatGrid"
           ]
@@ -752,7 +781,7 @@ define([
             xAxisBandSizeMin: 30
           }
         }
-      },
+      }
 
     ]
   };
