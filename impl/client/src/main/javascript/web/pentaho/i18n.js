@@ -116,8 +116,14 @@ define([
 
     // In CGG, these type of URLs arise:
     // absBundleUrl: "res:../../common-ui/resources/web/pentaho/type/i18n/types"
+    // or
+    // absBundleUrl: "/plugin/common-ui/resources/web/pentaho/type/i18n/types"
     var m = /^res:[\.\/]*(.*)$/.exec(absBundleUrl);
-    if(m) absBundleUrl = m[1];
+    if(m) {
+      absBundleUrl = m[1];
+    } else if(absBundleUrl.indexOf("/plugin/") === 0) {
+      absBundleUrl = absBundleUrl.substr("/plugin/".length);
+    }
 
     // Split the url into pluginId and bundleName
     // "pluginId/...bundleName..."

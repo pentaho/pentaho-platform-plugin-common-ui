@@ -15,6 +15,7 @@
 */
 
 define(function() {
+  // TODO: Analyzer specific
   // Null Members:  {v: "...[#null]", f: "Not Available"}
   // Null Values:   come as a null cell or null cell value ("-" report setting only affects the pivot table view).
   var _nullMemberRe = /\[#null\]$/;
@@ -27,6 +28,7 @@ define(function() {
     defaultFont: function(font, defaultSize) {
         if(!font) return (defaultSize || 10) + 'px OpenSansRegular, sans-serif';
 
+        // TODO: Analyzer specific
         return font.replace(/\bdefault\s*$/i, 'OpenSansRegular, sans-serif');
     },
 
