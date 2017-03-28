@@ -467,9 +467,7 @@ define([
 
             // Plot
             // . dot
-            dotsVisible: false,
-
-            // . visible only on hover
+            // . on hover
             dot_fillStyle:   function() {
               var c = this.delegate();
               var scene = this.scene;
@@ -531,7 +529,6 @@ define([
               return this.finished(c);
             },
             dot_lineWidth:   function() { return this.finished(2); },
-            dot_shapeRadius: function() { return this.finished(5); },
 
             // . line
             linesVisible: false,
@@ -563,10 +560,8 @@ define([
           ]
         },
         apply: {
-          props: {
-            extension: {
-              linesVisible: true
-            }
+          extension: {
+            linesVisible: true
           }
         }
       },
@@ -725,6 +720,21 @@ define([
             legendArea_overflow: "hidden",
 
             legendMarkerSize:  8
+          }
+        }
+      },
+      { // Line/Area
+        priority: -1,
+        select: {
+          application: ["pentaho-det", "pentaho-cdf"],
+          type: "pentaho/ccc/visual/pointAbstract"
+        },
+        apply: {
+          extension: {
+            // Plot
+            // . dot
+            dotsVisible: false,
+            dot_shapeRadius: function() { return this.finished(5); }
           }
         }
       },
