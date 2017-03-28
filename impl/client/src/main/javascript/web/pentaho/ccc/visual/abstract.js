@@ -295,7 +295,7 @@ define([
               }, this)
               .select(function(maInfo) {
                 return {
-                  ordinal: maInfo.attrColIndex,
+                  attr: maInfo.attr,
                   cccDimName: maInfo.cccDimName
                 };
               })
@@ -308,7 +308,7 @@ define([
 
           /* eslint no-loop-func: 0 */
           var datumFilterSpec = props.reduce(function(datumFilter, prop) {
-            var value = selectedItems.getValue(k, prop.ordinal);
+            var value = selectedItems.getValue(k, selectedItems.getColumnIndexByAttribute(prop.attr));
             datumFilter[prop.cccDimName] = value;
             return datumFilter;
           }, {});
@@ -1580,9 +1580,10 @@ define([
       _onDoubleClick: function(complex) {
         var ExecuteAction = this.type.context.get(executeActionFactory);
         var dataFilter = this._complexToFilter(complex);
-
-        var Or = this.type.context.get("or");
-        this.act(new ExecuteAction({dataFilter: new Or({ operands: [dataFilter] })}));
+        if(dataFilter != null) {
+          var Or = this.type.context.get("or");
+          this.act(new ExecuteAction({dataFilter: new Or({operands: [dataFilter]})}));
+        }
       },
       // endregion
 
@@ -1599,14 +1600,14 @@ define([
         }, this);
 
         // Enforce that the returned filter is wrapped by an And
-        if(filter.kind === "and") {
-          return filter;
-        } else {
+        if (filter != null && filter.kind !== "and") {
           var And = this.type.context.get("and");
           return new And({
             operands: [filter]
           });
         }
+
+        return filter;
       }
       // endregion
     }, /** @lends pentaho.visual.ccc.base.View */{
