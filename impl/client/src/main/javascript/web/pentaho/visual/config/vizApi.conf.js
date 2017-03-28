@@ -146,7 +146,10 @@ define([
             titlePosition: "top",
             titleAlign:    "center",
             titleAlignTo:  "page-center",
-            titleFont:     vizApiFont
+            titleFont:     vizApiFont,
+
+            // Values in case they are visible
+            valuesFont: vizApiFont
           }
         }
       },
@@ -224,7 +227,8 @@ define([
             "pentaho/ccc/visual/barStacked",
             "pentaho/ccc/visual/barNormalized",
             "pentaho/ccc/visual/pointAbstract",
-            "pentaho/ccc/visual/barLine"
+            "pentaho/ccc/visual/barLine",
+            "pentaho/ccc/visual/waterfall"
           ]
         },
         apply: {
@@ -250,7 +254,8 @@ define([
             "pentaho/ccc/visual/barNormalized",
             "pentaho/ccc/visual/pointAbstract",
             "pentaho/ccc/visual/barLine",
-            "pentaho/ccc/visual/metricDotAbstract"
+            "pentaho/ccc/visual/metricDotAbstract",
+            "pentaho/ccc/visual/waterfall"
           ]
         },
         apply: {
@@ -642,6 +647,9 @@ define([
         },
         apply: {
           extension: {
+            // paddings
+            contentPaddings: {right: 80 + 18},
+
             // . rule
             axisRule_lineWidth: 0,
 
@@ -697,6 +705,19 @@ define([
 
               return this.finished(c);
             }
+          }
+        }
+      },
+
+      {
+        priority: -5,
+        select: {
+          type: "pentaho/ccc/visual/boxplot"
+        },
+        apply: {
+          extension: {
+            // paddings
+            contentPaddings: {right: 57 + 18}
           }
         }
       },
