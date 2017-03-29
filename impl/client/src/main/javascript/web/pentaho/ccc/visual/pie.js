@@ -50,10 +50,7 @@ define([
       _tooltipHidePercentageOnPercentAttributes: true,
 
       _options: {
-        legendShape: "circle",
-        titlePosition: "bottom",
-        slice_strokeStyle: "white",
-        slice_lineWidth: 0.8
+        valuesAnchor: "outer"
       },
 
       _configureOptions: function() {

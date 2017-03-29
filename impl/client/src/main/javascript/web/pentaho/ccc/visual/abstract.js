@@ -68,10 +68,7 @@ define([
     "categoriesCount": 1,
     "dataCategoriesCount": 1
   };
-
-  function legendShapeColorProp(scene) {
-    return scene.isOn() ? scene.color : pvc.toGrayScale(scene.color);
-  }
+  
 
   var baseOptions = {
     // Chart
@@ -79,10 +76,6 @@ define([
     compatFlags: {
       discreteTimeSeriesTickFormat: false
     },
-
-    margins: 0,
-    paddings: 10,
-    plotFrameVisible: false,
 
     format: {
       percent: "#,0.00%"
@@ -92,23 +85,7 @@ define([
     multiChartMax: 50,
 
     // Legend
-    legend: true,
     legendPosition: "right",
-    legendSizeMax: "60%",
-    legendPaddings: 10,
-    legendItemPadding: {left: 1, right: 1, top: 2, bottom: 2}, // width: 2, height: 4
-    legendClickMode: "toggleSelected",
-    color2AxisLegendClickMode: "toggleSelected", // for plot 2 (lines in bar/line combo)
-    color3AxisLegendClickMode: "toggleSelected", // for trends
-
-    // Axes
-    axisSizeMax: "50%",
-    axisTitleSizeMax: "20%",
-    orthoAxisGrid: true,
-    continuousAxisLabelSpacingMin: 1.1, // em
-
-    // Title
-    titlePosition: "top",
 
     // Interaction
     interactive: true,
@@ -133,9 +110,6 @@ define([
       opacity: 1
     },
 
-    // Plot
-    valuesVisible: false,
-
     // Data source
     isMultiValued: false,
     seriesInRows: false,
@@ -143,18 +117,7 @@ define([
     // Data
     dataTypeCheckingMode: "none",
     ignoreNulls: false,
-    groupedLabelSep: "~",
-
-    axisRule_strokeStyle: ruleStrokeStyle,
-    axisTicks_strokeStyle: lineStrokeStyle,
-    dot_lineWidth: 1.5,
-    legendArea_lineWidth: 1,
-    legendArea_strokeStyle: "#c0c0c0",
-    legendLabel_textDecoration: null,
-    legendDot_fillStyle: legendShapeColorProp,
-    legendDot_strokeStyle: legendShapeColorProp,
-    legend2Dot_fillStyle: legendShapeColorProp,
-    legend2Dot_strokeStyle: legendShapeColorProp
+    groupedLabelSep: "~"
   };
 
   return function(context) {

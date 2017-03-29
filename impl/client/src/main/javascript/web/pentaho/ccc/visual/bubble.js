@@ -34,10 +34,7 @@ define([
       },
 
       _options: {
-        sizeAxisUseAbs: false,
-        sizeAxisRatio: 1 / 5,
-        sizeAxisRatioTo: "height", // plot area client height
-        sizeAxisOriginIsZero: true
+        sizeAxisUseAbs: false
       },
 
       /* Override Default map */

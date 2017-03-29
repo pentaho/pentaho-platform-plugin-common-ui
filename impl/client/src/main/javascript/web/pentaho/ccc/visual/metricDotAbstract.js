@@ -38,10 +38,7 @@ define([
 
       _supportsTrends: true,
 
-      _options: {
-        axisGrid: true,
-        autoPaddingByDotSize: false
-      },
+      _options: {},
 
       /* Override Default map */
       _roleToCccRole: {
