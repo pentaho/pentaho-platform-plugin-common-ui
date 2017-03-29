@@ -128,19 +128,19 @@ define([
    * 8. `"blue-3"` (3 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
-   * <tr><td style="background-color:#CBE7FF"></td><td>#CBE7FF</td></tr>
-   * <tr><td style="background-color:#33A1FF"></td><td>#33A1FF</td></tr>
-   * <tr><td style="background-color:#0345A9"></td><td>#0345A9</td></tr>
+   * <tr><td style="background-color:#CCDFED"></td><td>#CCDFED</td></tr>
+   * <tr><td style="background-color:#6D85A4"></td><td>#6D85A4</td></tr>
+   * <tr><td style="background-color:#0F2B5B"></td><td>#0F2B5B</td></tr>
    * </table>
    *
    * 9. `"blue-5"` (5 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
-   * <tr><td style="background-color:#CBE7FF"></td><td>#CBE7FF</td></tr>
-   * <tr><td style="background-color:#99D0FF"></td><td>#99D0FF</td></tr>
-   * <tr><td style="background-color:#33A1FF"></td><td>#33A1FF</td></tr>
-   * <tr><td style="background-color:#006ECC"></td><td>#006ECC</td></tr>
-   * <tr><td style="background-color:#0345A9"></td><td>#0345A9</td></tr>
+   * <tr><td style="background-color:#CCDFED"></td><td>#CCDFED</td></tr>
+   * <tr><td style="background-color:#9CB2C8"></td><td>#9CB2C8</td></tr>
+   * <tr><td style="background-color:#6D85A4"></td><td>#6D85A4</td></tr>
+   * <tr><td style="background-color:#3E587F"></td><td>#3E587F</td></tr>
+   * <tr><td style="background-color:#0F2B5B"></td><td>#0F2B5B</td></tr>
    * </table>
    *
    * 10. `"gray-3"` (3 colors):
