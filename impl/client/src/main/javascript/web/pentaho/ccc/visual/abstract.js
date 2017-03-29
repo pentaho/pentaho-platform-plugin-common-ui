@@ -1568,7 +1568,7 @@ define([
       _configureDoubleClick: function() {
         var me = this;
         this.options.doubleClickAction = function(scene) {
-          me._onDoubleClick(scene.datum);
+          me._onDoubleClick(scene.group || scene.datum);
         };
 
         this.options.axisDoubleClickAction = function(scene) {
