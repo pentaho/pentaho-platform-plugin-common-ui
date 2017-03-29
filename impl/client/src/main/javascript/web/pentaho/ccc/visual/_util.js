@@ -26,10 +26,10 @@ define(function() {
     },
 
     defaultFont: function(font, defaultSize) {
-        if(!font) return (defaultSize || 10) + 'px OpenSansRegular, sans-serif';
+        if(!font) return (defaultSize || 10) + "px OpenSansRegular, sans-serif";
 
         // TODO: Analyzer specific
-        return font.replace(/\bdefault\s*$/i, 'OpenSansRegular, sans-serif');
+        return font.replace(/\bdefault\s*$/i, "OpenSansRegular, sans-serif");
     },
 
     readFontModel: function(model, prefix) {

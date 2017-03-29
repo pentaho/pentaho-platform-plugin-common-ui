@@ -134,7 +134,11 @@ define([
           options.plot2ValuesVisible = true;
           options.plot2ValuesAnchor = lineLabelsAnchor;
           options.plot2ValuesFont = util.defaultFont(util.readFontModel(model, "label"));
-          options.plot2Label_textStyle = model.labelColor;
+
+          var labelColor = model.labelColor;
+          if(labelColor != null) {
+            options.plot2Label_textStyle = labelColor;
+          }
         }
       },
 

@@ -53,8 +53,7 @@ define([
         legendShape: "circle",
         titlePosition: "bottom",
         slice_strokeStyle: "white",
-        slice_lineWidth: 0.8,
-        valuesAnchor: "outer"
+        slice_lineWidth: 0.8
       },
 
       _configureOptions: function() {

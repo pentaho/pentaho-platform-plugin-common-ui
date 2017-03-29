@@ -47,13 +47,6 @@ define([
 
       _discreteColorRole: "rows",
 
-      _options: {
-        valuesVisible: true,
-        valuesOverflow: "trim",
-        valuesOptimizeLegibility: false,
-        colorMode: "level"
-      },
-
       // Changed in _configureDisplayUnits according to option "displayUnits".
       _formatSize: function(sizeVar, sizeDim) {
         return sizeVar.label;
@@ -76,7 +69,10 @@ define([
             return !util.isNullMember(scene.vars.category.value);
           };
 
-        options.label_textStyle = this.model.labelColor;
+        var labelColor = this.model.labelColor;
+        if(labelColor != null) {
+          options.label_textStyle= labelColor;
+        }
 
         // Determine whether to show values label
         if(model.labelsOption !== "none" && this.axes.measure.boundRoles.size) {
@@ -158,7 +154,6 @@ define([
 
         if(valuesVisible) {
           options.valuesFont = util.defaultFont(util.readFontModel(this.model, "label"));
-          options.label_textStyle = this.model.labelColor;
         }
       },
 

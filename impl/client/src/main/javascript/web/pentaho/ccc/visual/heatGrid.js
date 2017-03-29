@@ -43,20 +43,6 @@ define([
         "size": "size"
       },
 
-      _options: {
-        useShapes: true,
-        shape: "square",
-
-        xAxisSize: 30,
-        yAxisSize: 50,
-        axisComposite: false,
-        orthoAxisGrid: false, // clear inherited property
-
-        //colorMissing:   "lightgray",
-        colorScaleType: "linear",
-        colorNormByCategory: false
-      },
-
       _configureOptions: function() {
 
         this.base();
@@ -75,7 +61,7 @@ define([
         var xAxisSize;
         var yAxisSize;
 
-        options.axisTitleSize = 25;
+        options.axisTitleSize = def.get(this._validExtensionOptions, "axisTitleSize", 0);
         options.axisComposite = def.get(this._validExtensionOptions, "axisComposite", options.axisComposite);
 
         if(options.axisComposite) {
