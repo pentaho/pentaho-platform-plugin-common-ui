@@ -60,9 +60,7 @@ define([
       {
         priority: -5,
         select: {
-          type: [
-            "pentaho/visual/models/heatGrid"
-          ]
+          type: "pentaho/visual/models/heatGrid"
         },
         apply: {
           props: {
@@ -647,6 +645,16 @@ define([
         },
         apply: {
           extension: {
+            useShapes: true,
+
+            // colorMissing: "lightgray",
+            colorScaleType: "linear",
+            colorNormByCategory: false,
+
+            axisComposite: false,
+
+            axisTitleSize: 25,
+
             // paddings
             contentPaddings: {right: 80 + 18},
 
@@ -709,6 +717,7 @@ define([
         }
       },
 
+      // Boxplot
       {
         priority: -5,
         select: {
@@ -718,6 +727,25 @@ define([
           extension: {
             // paddings
             contentPaddings: {right: 57 + 18}
+          }
+        }
+      },
+
+      // Sunburst
+      {
+        priority: -5,
+        select: {
+          type: "pentaho/ccc/visual/sunburst"
+        },
+        apply: {
+          extension: {
+            legendAreaVisible: false,
+            valuesVisible: true,
+            valuesOverflow: "trim",
+            valuesOptimizeLegibility: true,
+            colorMode: "level",
+            slice_strokeStyle: function() { return this.finished("white"); },
+            slice_lineWidth: function() { return this.finished(2); }
           }
         }
       },
@@ -744,7 +772,9 @@ define([
           }
         }
       },
-      { // Line/Area
+
+      // Line/Area
+      {
         priority: -1,
         select: {
           application: ["pentaho-det", "pentaho-cdf"],
@@ -759,7 +789,9 @@ define([
           }
         }
       },
-      { // CCC Cartesian
+
+      // CCC Cartesian
+      {
         priority: -1,
         select: {
           application: ["pentaho-det", "pentaho-cdf"],
@@ -781,7 +813,7 @@ define([
         }
       },
       {
-        priority: -2,
+        priority: -1,
         select: {
           application: ["pentaho-analyzer", "pentaho-det"],
           type: [
@@ -813,7 +845,6 @@ define([
           }
         }
       }
-
     ]
   };
 

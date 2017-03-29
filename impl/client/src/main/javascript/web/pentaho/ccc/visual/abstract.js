@@ -467,7 +467,7 @@ define([
         }
         // endregion
 
-        options.legendAreaVisible = value = model.showLegend;
+        options.legendAreaVisible = value = model.showLegend && this._isLegendVisible();
         if(value) {
           value = model.legendColor;
           if(value) options.legendLabel_textStyle = value;
@@ -944,7 +944,7 @@ define([
 
         this._configureColor();
 
-        if(options.legend && (options.legend = this._isLegendVisible()))
+        if(def.get(this._validExtensionOptions, "legendAreaVisible", options.legendAreaVisible))
           this._configureLegend();
 
         if(this._hasMultiChartColumns)

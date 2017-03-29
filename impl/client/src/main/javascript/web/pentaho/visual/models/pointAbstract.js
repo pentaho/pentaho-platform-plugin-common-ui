@@ -18,11 +18,9 @@ define([
   "./categoricalContinuousAbstract",
   "pentaho/i18n!./i18n/model",
   "./types/labelsOption",
-  "./types/shape",
   "./mixins/settingsMultiChartType",
   "./mixins/interpolationType"
-], function(module, baseModelFactory, bundle, labelsOptionFactory, shapeFactory,
-    settingsMultiChartType, interpolationType) {
+], function(module, baseModelFactory, bundle, labelsOptionFactory, settingsMultiChartType, interpolationType) {
 
   "use strict";
 
