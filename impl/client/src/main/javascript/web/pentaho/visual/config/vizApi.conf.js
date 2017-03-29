@@ -36,6 +36,10 @@ define([
   var defaultVizApiPalette = "viz_api_all_colors";
   paletteRegistry.setDefault(defaultVizApiPalette);
 
+  var legendShapeColorProp = function(scene) {
+    return scene.isOn() ? scene.color : pvc.toGrayScale(scene.color);
+  };
+
   return {
     rules: [
       // line/barLine models
@@ -79,6 +83,8 @@ define([
         },
         apply: {
           extension: {
+            margins: 0,
+            paddings: 10,
 
             // Chart
             format: {
@@ -87,13 +93,20 @@ define([
               }
             },
 
+            // Multi-chart
+            multiChartMax: 50,
+
             errorMessage_visible: false,
             noDataMessage_visible: false,
             invalidDataMessage_visible: false,
 
             plotFrameVisible: false,
 
+            // Interaction
+            clickable: true,
+            selectable: true,
             hoverable:  true,
+
 
             // Legend
             // legend: true,
@@ -116,6 +129,7 @@ define([
             legendTextMargin:  6,
 
             legendArea_lineWidth: 0, // reset viz wrapper style
+            legendArea_strokeStyle: "#c0c0c0",
 
             // No hover effect
             legendDot_ibits:  0,
@@ -136,6 +150,17 @@ define([
               }
             },
 
+            legendClickMode: "toggleSelected",
+            color2AxisLegendClickMode: "toggleSelected", // for plot 2 (lines in bar/line combo)
+            color3AxisLegendClickMode: "toggleSelected", // for trends
+            
+            legendLabel_textDecoration: null,
+
+            legendDot_fillStyle: legendShapeColorProp,
+            legendDot_strokeStyle: legendShapeColorProp,
+            legend2Dot_fillStyle: legendShapeColorProp,
+            legend2Dot_strokeStyle: legendShapeColorProp,
+
             tooltipOffset: 20,
 
             // Title
@@ -147,7 +172,10 @@ define([
             titleFont:     vizApiFont,
 
             // Values in case they are visible
-            valuesFont: vizApiFont
+            valuesFont: vizApiFont,
+
+            // Plot
+            valuesVisible: false,
           }
         }
       },
@@ -165,10 +193,12 @@ define([
 
             // Chart
             contentMargins: {top: 30, bottom: 30},
+            axisSizeMax: "50%",
 
             // Cartesian Axes
 
             // . title
+            axisTitleSizeMax: "20%",
             axisTitleVisible: true,
             axisTitleLabel_textMargin: 0,
             xAxisTitleAlign: "left",
@@ -194,6 +224,9 @@ define([
               return absLabel;
             },
 
+            baseAxisGrid: false,
+            orthoAxisGrid: true,
+
             axisGrid_lineWidth:   1,
             axisGrid_strokeStyle: "#CCC",
 
@@ -212,6 +245,18 @@ define([
             axisLabel_textMargin:  10,
             xAxisTicks_height:     3, // account for part of the tick that gets hidden by the rule
             yAxisTicks_width:      3
+          }
+        }
+      },
+
+      {
+        priority: -5,
+        select: {
+          type: "pentaho/ccc/visual/cartesianAbstract"
+        },
+        apply: {
+          extension: {
+            panelSizeRatio: 0.8
           }
         }
       },
@@ -280,6 +325,7 @@ define([
             // Cartesian Axes
             xAxisPosition: "bottom",
             xAxisSize:     30,
+            baseAxisGrid: true,
 
             // Plot
             // reset wrapper viz defaults
@@ -335,6 +381,9 @@ define([
         apply: {
           extension: {
             // Plot
+            sizeAxisRatio: 1 / 5,
+            sizeAxisRatioTo: "height", // plot area client height
+            sizeAxisOriginIsZero: true,
 
             // . dot
             dot_shapeSize: function() {
@@ -448,6 +497,10 @@ define([
         apply: {
           extension: {
             // Cartesian Axes
+            axisOffset: 0,
+
+            // Tooltip
+            tooltipOffset: 15,
 
             // X/Horizontal Discrete Grid
             xAxisGrid: true,
@@ -577,18 +630,22 @@ define([
         },
         apply: {
           extension: {
-            slice_lineWidth: 0,
-
             // Chart
             contentPaddings: 0,
             contentMargins: {top: 30},
 
             legendAlign: "center",
+            legendShape: "circle",
 
             // Plot
             activeSliceRadius: 0,
 
+            // Title
+            titlePosition: "bottom",
+
             // . slice
+            slice_lineWidth: 0,
+            slice_strokeStyle: "white",
             slice_fillStyle: function() {
               var c = this.delegate();
               var scene = this.scene;
@@ -751,6 +808,19 @@ define([
       },
 
       // context specific rules, not defined in the global configuration
+      // Abstract
+      {
+        priority: -1,
+        select: {
+          application: ["pentaho-det"],
+          type: "pentaho/ccc/visual/abstract"
+        },
+        apply: {
+          extension: {
+            selectable: false
+          }
+        }
+      },
       {
         priority: -1,
         select: {
@@ -812,6 +882,22 @@ define([
           }
         }
       },
+
+      // BarAbstract
+      {
+        priority: -1,
+        select: {
+          application: "pentaho-cdf",
+          type: "pentaho/ccc/visual/barAbstract"
+        },
+        apply: {
+          extension: {
+            label_textMargin: 7
+          }
+        }
+      },
+
+
       {
         priority: -1,
         select: {
@@ -842,6 +928,22 @@ define([
           extension: {
             // . horizontal discrete / minimum distance between bands/ticks
             xAxisBandSizeMin: 30
+          }
+        }
+      },
+
+      // Bubble
+      {
+        priority: -1,
+        select: {
+          application: "pentaho-cdf",
+          type: [
+            "pentaho/ccc/visual/bubble"
+          ]
+        },
+        apply: {
+          extension: {
+            sizeAxisUseAbs: false
           }
         }
       }

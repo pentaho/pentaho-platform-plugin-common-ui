@@ -33,10 +33,7 @@ define([
         }
       },
 
-      _options: {
-        axisOffset: 0,
-        tooltipOffset: 15
-      },
+      _options: {},
 
       _setNullInterpolationMode: function(options, value) {
         options.nullInterpolationMode = value;

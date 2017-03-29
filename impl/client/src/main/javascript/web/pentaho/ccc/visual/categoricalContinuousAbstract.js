@@ -36,9 +36,7 @@ define([
 
       _genericMeasureCccVisualRole: "value",
 
-      _options: {
-        panelSizeRatio: 0.8
-      },
+      _options: {},
 
       _isAxisTitleVisible: function(type) {
         return !this._hasMultiChartColumns || type === "ortho";
