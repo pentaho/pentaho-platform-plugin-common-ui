@@ -32,8 +32,7 @@ define([
     },
 
     getv: function(property) {
-      var prop = this.table.model.attributes.get(property);
-      return this.table.getValue(this.rowIdx, prop.ordinal);
+      return this.table.getValue(this.rowIdx, this.table.getColumnIndexByAttribute(property));
     }
   });
 });
