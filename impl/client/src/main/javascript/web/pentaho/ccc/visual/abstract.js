@@ -1350,25 +1350,27 @@ define([
         var legendPosition = options.legendPosition;
         var isTopOrBottom = legendPosition === "top" || legendPosition === "bottom";
 
-        if(this._hasMultiChartColumns && !isTopOrBottom) {
+        if(!isTopOrBottom) {
           options.legendAlignTo = "page-middle";
           options.legendKeepInBounds = true; // ensure it is not placed off-page
 
-          // Ensure that legend margins is an object.
-          // Preserve already specified margins.
-          // CCC's default adds a left or right 5 px margin,
-          // to separate the legend from the content area.
-          var legendMargins = options.legendMargins;
-          if(legendMargins) {
-            if(typeof legendMargins !== "object")
-              legendMargins = options.legendMargins = {all: legendMargins};
-          } else {
-            legendMargins = options.legendMargins = {};
-            var oppositeSide = pvc.BasePanel.oppositeAnchor[legendPosition];
-            legendMargins[oppositeSide] = 5;
-          }
+          if(this._hasMultiChartColumns) {
+            // Ensure that legend margins is an object.
+            // Preserve already specified margins.
+            // CCC's default adds a left or right 5 px margin,
+            // to separate the legend from the content area.
+            var legendMargins = options.legendMargins;
+            if(legendMargins) {
+              if(typeof legendMargins !== "object")
+                legendMargins = options.legendMargins = {all: legendMargins};
+            } else {
+              legendMargins = options.legendMargins = {};
+              var oppositeSide = pvc.BasePanel.oppositeAnchor[legendPosition];
+              legendMargins[oppositeSide] = 5;
+            }
 
-          legendMargins.top = 20;
+            legendMargins.top = 20;
+          }
         }
 
         // Calculate 'legendAlign' default value

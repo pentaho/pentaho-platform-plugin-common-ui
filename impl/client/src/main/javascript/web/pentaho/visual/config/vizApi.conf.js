@@ -831,7 +831,10 @@ define(function() {
             // . vertical discrete / minimum distance between bands/ticks/line-height
             yAxisBandSizeMin: 30,
 
-            // Show labels, no matter what
+            // Show labels, until they really overlap.
+            // This is "fine-tuned" so that Analyzer's default 12px font, the xAxisBandSizeMin of 18px,
+            // and the 40º slanted labels, don't cause ticks to hide. Only if font size is increased,
+            // will that happen.
             discreteAxisLabelSpacingMin: 0
           }
         }
