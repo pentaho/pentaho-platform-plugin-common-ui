@@ -38,8 +38,6 @@ define([
 
       _supportsTrends: true,
 
-      _options: {},
-
       /* Override Default map */
       _roleToCccRole: {
         "multi": "multiChart",

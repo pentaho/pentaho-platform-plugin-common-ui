@@ -49,11 +49,7 @@ define([
       },
 
       _options: {
-        plot2: true,
-
-        secondAxisIndependentScale: false, // TODO: isn't this option CCC-V1 only?
-        // prevent default of -1 (which means last series)
-        secondAxisSeriesIndexes: null // TODO: isn't this option CCC-V1 only?
+        plot2: true
       },
 
       _setNullInterpolationMode: function(options, value) {

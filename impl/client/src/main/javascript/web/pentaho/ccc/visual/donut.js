@@ -31,9 +31,6 @@ define([
         props: {
           model: {type: modelFactory}
         }
-      },
-      _options: {
-        slice_innerRadiusEx: "60%"
       }
     });
   };

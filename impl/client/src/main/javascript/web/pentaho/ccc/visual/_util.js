@@ -22,14 +22,14 @@ define(function() {
 
   return {
     isNullMember: function(member) {
-        return member == null || _nullMemberRe.test(member);
+      return member == null || _nullMemberRe.test(member);
     },
 
     defaultFont: function(font, defaultSize) {
-        if(!font) return (defaultSize || 10) + "px OpenSansRegular, sans-serif";
+      if(!font) return (defaultSize || 10) + "px OpenSansRegular, sans-serif";
 
-        // TODO: Analyzer specific
-        return font.replace(/\bdefault\s*$/i, "OpenSansRegular, sans-serif");
+      // TODO: Analyzer specific
+      return font.replace(/\bdefault\s*$/i, "OpenSansRegular, sans-serif");
     },
 
     readFontModel: function(model, prefix) {

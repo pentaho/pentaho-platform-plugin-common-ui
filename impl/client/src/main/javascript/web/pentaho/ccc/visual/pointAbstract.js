@@ -33,8 +33,6 @@ define([
         }
       },
 
-      _options: {},
-
       _setNullInterpolationMode: function(options, value) {
         options.nullInterpolationMode = value;
       }
