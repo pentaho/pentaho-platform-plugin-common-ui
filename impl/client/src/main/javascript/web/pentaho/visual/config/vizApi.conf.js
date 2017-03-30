@@ -666,6 +666,7 @@ define(function() {
             // X
             xAxisPosition: "top",
             xAxisSizeMax: 80,
+            xAxisLabelRotationDirection: "counterclockwise",
 
             // Y
             yAxisSizeMax: 80, // shouldn't it be: maxHorizontalTextWidth ??
