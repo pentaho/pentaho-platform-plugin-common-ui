@@ -13,38 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "pentaho/visual/color/paletteRegistry"
-], function(paletteRegistry) {
+define(function() {
 
   "use strict";
 
   /* eslint camelcase: "off", require-jsdoc: "off", brace-style:0, key-spacing:0, quote-props:0 */
 
-  var vizApiFont = "10px OpenSansRegular";
-  var maxHorizontalTextWidth = 117;
+  var RULE_PRIO_VIZ_DEFAULT = -5;
+  var RULE_PRIO_APP_DEFAULT = -1;
+
   var pvc = null;
   var pv = null;
-  var numberFormatCache = {};
 
+  var vizApiFont = "10px OpenSansRegular";
+  var maxHorizontalTextWidth = 117;
+
+  var numberFormatCache = {};
   var numberStyle = {
     group: " ",
     abbreviations:    ["k", "M", "G", "T", "P", "E", "Z", "Y"],
     subAbbreviations: ["m", "µ", "n", "p", "f", "a", "z", "y"]
   };
 
-  var defaultVizApiPalette = "viz_api_all_colors";
-  paletteRegistry.setDefault(defaultVizApiPalette);
-
-  var legendShapeColorProp = function(scene) {
-    return scene.isOn() ? scene.color : pvc.toGrayScale(scene.color);
-  };
-
   return {
     rules: [
+      // region Model Rules
+
       // line/barLine models
       {
-        priority: -5,
+        priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           type: [
             "pentaho/visual/models/line",
@@ -60,9 +57,10 @@ define([
           }
         }
       },
+
       // heatGrid model
       {
-        priority: -5,
+        priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           type: "pentaho/visual/models/heatGrid"
         },
@@ -74,10 +72,12 @@ define([
           }
         }
       },
+      // endregion
 
+      // region View rules for all applications
       // Pentaho CCC Abstract
       {
-        priority: -5,
+        priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           type: "pentaho/ccc/visual/abstract"
         },
@@ -103,10 +103,14 @@ define([
             plotFrameVisible: false,
 
             // Interaction
+            animate: false,
             clickable: true,
             selectable: true,
-            hoverable:  true,
+            ctrlSelectMode: false,
+            hoverable: true,
 
+            // Data
+            groupedLabelSep: "~",
 
             // Legend
             // legend: true,
@@ -140,11 +144,8 @@ define([
                 item: {
                   // Trim label text
                   labelText: function() {
-                    if(!pvc) {
-                      pvc = require("cdf/lib/CCC/pvc");
-                    }
                     var text = this.base();
-                    return pvc.text.trimToWidthB(maxHorizontalTextWidth, text, this.vars.font, "..");
+                    return getPvc().text.trimToWidthB(maxHorizontalTextWidth, text, this.vars.font, "..");
                   }
                 }
               }
@@ -153,7 +154,7 @@ define([
             legendClickMode: "toggleSelected",
             color2AxisLegendClickMode: "toggleSelected", // for plot 2 (lines in bar/line combo)
             color3AxisLegendClickMode: "toggleSelected", // for trends
-            
+
             legendLabel_textDecoration: null,
 
             legendDot_fillStyle: legendShapeColorProp,
@@ -161,6 +162,7 @@ define([
             legend2Dot_fillStyle: legendShapeColorProp,
             legend2Dot_strokeStyle: legendShapeColorProp,
 
+            // Tooltip
             tooltipOffset: 20,
 
             // Title
@@ -171,18 +173,16 @@ define([
             titleAlignTo:  "page-center",
             titleFont:     vizApiFont,
 
-            // Values in case they are visible
-            valuesFont: vizApiFont,
-
             // Plot
             valuesVisible: false,
+            valuesFont: vizApiFont
           }
         }
       },
 
       // CCC Cartesian
       {
-        priority: -5,
+        priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           type: "pentaho/ccc/visual/cartesianAbstract"
         },
@@ -193,13 +193,18 @@ define([
 
             // Chart
             contentMargins: {top: 30, bottom: 30},
-            axisSizeMax: "50%",
 
             // Cartesian Axes
+            axisComposite: false,
+            axisSizeMax: "50%",
+            xAxisPosition: "bottom",
+            yAxisPosition: "left",
+
+            panelSizeRatio: 0.8,
 
             // . title
-            axisTitleSizeMax: "20%",
             axisTitleVisible: true,
+            axisTitleSizeMax: "20%",
             axisTitleLabel_textMargin: 0,
             xAxisTitleAlign: "left",
             yAxisTitleAlign: "top",
@@ -208,8 +213,12 @@ define([
             discreteAxisLabel_ibits: 0,
             discreteAxisLabel_imask: "ShowsActivity|Hoverable",
 
-            // . grid
-            continuousAxisGrid: true,
+            axisLabel_textMargin: 10,
+
+            xAxisOverlappedLabelsMode: "rotatethenhide",
+            xAxisLabelRotationDirection: "clockwise",
+            xAxisLabelDesiredAngles: [0, 40 * (Math.PI / 180)],
+
             numericAxisTickFormatter: function(value, precision) {
               return getNumberFormatter(precision, this.base)(value);
             },
@@ -224,8 +233,9 @@ define([
               return absLabel;
             },
 
-            baseAxisGrid: false,
-            orthoAxisGrid: true,
+            // . grid
+            axisGrid: false,
+            continuousAxisGrid: true,
 
             axisGrid_lineWidth:   1,
             axisGrid_strokeStyle: "#CCC",
@@ -242,28 +252,15 @@ define([
 
             axisTicks_lineWidth:   1,
             axisTicks_strokeStyle: "#999999",
-            axisLabel_textMargin:  10,
             xAxisTicks_height:     3, // account for part of the tick that gets hidden by the rule
             yAxisTicks_width:      3
           }
         }
       },
 
-      {
-        priority: -5,
-        select: {
-          type: "pentaho/ccc/visual/cartesianAbstract"
-        },
-        apply: {
-          extension: {
-            panelSizeRatio: 0.8
-          }
-        }
-      },
-
       // X/Horizontal Discrete Axis at bottom
       {
-        priority: -5,
+        priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           type: [
             "pentaho/ccc/visual/bar",
@@ -271,25 +268,21 @@ define([
             "pentaho/ccc/visual/barNormalized",
             "pentaho/ccc/visual/pointAbstract",
             "pentaho/ccc/visual/barLine",
+            "pentaho/ccc/visual/boxplot",
             "pentaho/ccc/visual/waterfall"
           ]
         },
         apply: {
           extension: {
             // Cartesian Axes
-            xAxisPosition: "bottom",
-            xAxisSizeMax:  90,
-
-            xAxisOverlappedLabelsMode: "rotatethenhide",
-            xAxisLabelRotationDirection: "clockwise",
-            xAxisLabelDesiredAngles: [0, 40 * (Math.PI / 180)]
+            xAxisSizeMax: 90
           }
         }
       },
 
       // Y/Vertical Continuous Axis at left
       {
-        priority: -5,
+        priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           type: [
             "pentaho/ccc/visual/bar",
@@ -297,15 +290,14 @@ define([
             "pentaho/ccc/visual/barNormalized",
             "pentaho/ccc/visual/pointAbstract",
             "pentaho/ccc/visual/barLine",
-            "pentaho/ccc/visual/metricDotAbstract",
-            "pentaho/ccc/visual/waterfall"
+            "pentaho/ccc/visual/waterfall",
+            "pentaho/ccc/visual/boxplot",
+            "pentaho/ccc/visual/metricDotAbstract"
           ]
         },
         apply: {
           extension: {
             // Cartesian Axes
-            yAxisPosition: "left",
-
             // TODO: should be minimum size
             yAxisSize: 57,
             contentPaddings: {right: 57 + 18}
@@ -316,16 +308,14 @@ define([
       // Scatter/Bubble
       // X/Horizontal Continuous Axis at bottom
       {
-        priority: -5,
+        priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           type: "pentaho/ccc/visual/metricDotAbstract"
         },
         apply: {
           extension: {
             // Cartesian Axes
-            xAxisPosition: "bottom",
-            xAxisSize:     30,
-            baseAxisGrid: true,
+            xAxisSize: 30,
 
             // Plot
             // reset wrapper viz defaults
@@ -347,16 +337,10 @@ define([
 
                   if(sign.mayShowActive(scene, true)) {
                     // not selected & active
-                    if(!pv) pv = require("cdf/lib/CCC/protovis");
-
-                    c = pv.Color.names.darkgray.darker(2).alpha(0.8);
+                    c = getPv().Color.names.darkgray.darker(2).alpha(0.8);
                   } else {
-                    if(!pvc) {
-                      pvc = require("cdf/lib/CCC/pvc");
-                    }
-
                     // not selected
-                    c = pvc.toGrayScale(c, -0.3);
+                    c = getPvc().toGrayScale(c, -0.3);
                   }
                 } else if(sign.mayShowActive(scene, true)) {
                   // active || (active & selected)
@@ -372,9 +356,9 @@ define([
         }
       },
 
-      // Bubble - Visual Roles
+      // Bubble
       {
-        priority: -5,
+        priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           type: "pentaho/ccc/visual/bubble"
         },
@@ -396,7 +380,7 @@ define([
 
       // Scatter
       {
-        priority: -5,
+        priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           type: "pentaho/ccc/visual/scatter"
         },
@@ -413,9 +397,9 @@ define([
       },
 
       // X/Horizontal Continuous Axis at top
-      // Y/Vertical Discrete Axis at left, and
+      // Y/Vertical Discrete Axis at left
       {
-        priority: -5,
+        priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           type: [
             "pentaho/ccc/visual/barHorizontal",
@@ -427,18 +411,17 @@ define([
           extension: {
             // Cartesian Axes
             xAxisPosition: "top",
-            xAxisSize:     30,
+            xAxisSize: 30,
 
-            yAxisPosition: "left",
-            yAxisSizeMax:  maxHorizontalTextWidth,
-            contentMargins: {right: 30} // merges with base margins.
+            yAxisSizeMax: maxHorizontalTextWidth,
+            contentMargins: {right: 30} // merges with inherited contentMargins
           }
         }
       },
 
       // Bars
       {
-        priority: -5,
+        priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           type: "pentaho/ccc/visual/barAbstract"
         },
@@ -464,16 +447,10 @@ define([
                 if(sign.mayShowNotAmongSelected(scene)) {
                   if(scene.isActive) {
                     // not selected & active
-                    if(!pv) pv = require("cdf/lib/CCC/protovis");
-
-                    c = pv.Color.names.darkgray.darker(2).alpha(0.8);
+                    c = getPv().Color.names.darkgray.darker(2).alpha(0.8);
                   } else {
-                    if(!pvc) {
-                      pvc = require("cdf/lib/CCC/pvc");
-                    }
-
                     // not selected
-                    c = pvc.toGrayScale(c, -0.3);
+                    c = getPvc().toGrayScale(c, -0.3);
                   }
                 } else if(sign.mayShowActive(scene, true)) {
                   // active || (active & selected)
@@ -490,7 +467,7 @@ define([
 
       // Line/Area
       {
-        priority: -5,
+        priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           type: "pentaho/ccc/visual/pointAbstract"
         },
@@ -535,16 +512,10 @@ define([
 
                   if(sign.mayShowActive(scene, true)) {
                     // not selected & active
-                    if(!pv) pv = require("cdf/lib/CCC/protovis");
-
-                    c = pv.Color.names.darkgray.darker(2).alpha(0.8);
+                    c = getPv().Color.names.darkgray.darker(2).alpha(0.8);
                   } else {
-                    if(!pvc) {
-                      pvc = require("cdf/lib/CCC/pvc");
-                    }
-
                     // not selected
-                    c = pvc.toGrayScale(c, -0.3);
+                    c = getPvc().toGrayScale(c, -0.3);
                   }
                 } else if(sign.mayShowActive(scene, true)) {
                   // active || (active & selected)
@@ -568,16 +539,10 @@ define([
 
                   if(sign.mayShowActive(scene, true)) {
                     // not selected & active
-                    if(!pv) pv = require("cdf/lib/CCC/protovis");
-
-                    c = pv.Color.names.darkgray.darker(2).alpha(0.8);
+                    c = getPv().Color.names.darkgray.darker(2).alpha(0.8);
                   } else {
-                    if(!pvc) {
-                      pvc = require("cdf/lib/CCC/pvc");
-                    }
-
                     // not selected
-                    c = pvc.toGrayScale(c, -0.3);
+                    c = getPvc().toGrayScale(c, -0.3);
                   }
                 }
               }
@@ -596,7 +561,7 @@ define([
 
       // Area
       {
-        priority: -5,
+        priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           type: "pentaho/ccc/visual/areaStacked"
         },
@@ -607,24 +572,9 @@ define([
         }
       },
 
-      {
-        priority: -5,
-        select: {
-          type: [
-            "pentaho/visual/models/line",
-            "pentaho/visual/models/barLine"
-          ]
-        },
-        apply: {
-          extension: {
-            linesVisible: true
-          }
-        }
-      },
-
       // Pie/Donut
       {
-        priority: -5,
+        priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           type: "pentaho/ccc/visual/pie"
         },
@@ -639,6 +589,7 @@ define([
 
             // Plot
             activeSliceRadius: 0,
+            valuesAnchor: "outer",
 
             // Title
             titlePosition: "bottom",
@@ -656,16 +607,10 @@ define([
                 if(sign.mayShowNotAmongSelected(scene)) {
                   if(scene.isActive) {
                     // not selected & active
-                    if(!pv) pv = require("cdf/lib/CCC/protovis");
-
-                    c = pv.Color.names.darkgray.darker(2).alpha(0.8);
+                    c = getPv().Color.names.darkgray.darker(2).alpha(0.8);
                   } else {
-                    if(!pvc) {
-                      pvc = require("cdf/lib/CCC/pvc");
-                    }
-
                     // not selected
-                    c = pvc.toGrayScale(c, -0.3);
+                    c = getPvc().toGrayScale(c, -0.3);
                   }
                 } else if(sign.mayShowActive(scene, true)) {
                   // active || (active & selected)
@@ -682,13 +627,12 @@ define([
 
       // Donut
       {
-        priority: -5,
+        priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           type: "pentaho/ccc/visual/donut"
         },
         apply: {
           extension: {
-            slice_lineWidth: 0,
             slice_innerRadiusEx: "60%"
           }
         }
@@ -696,7 +640,7 @@ define([
 
       // Heat Grid
       {
-        priority: -5,
+        priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           type: "pentaho/ccc/visual/heatGrid"
         },
@@ -708,8 +652,6 @@ define([
             colorScaleType: "linear",
             colorNormByCategory: false,
 
-            axisComposite: false,
-
             axisTitleSize: 25,
 
             // paddings
@@ -719,9 +661,6 @@ define([
             axisRule_lineWidth: 0,
 
             // . grid
-            orthoAxisGrid: false,
-            baseAxisGrid:  false,
-
             axisBandSpacing: 5, // white border or transparent ?
 
             // X
@@ -731,14 +670,10 @@ define([
             // Y
             yAxisSizeMax: 80, // shouldn't it be: maxHorizontalTextWidth ??
 
-            // . label
-            xAxisOverlappedLabelsMode: "rotatethenhide",
-            xAxisLabelRotationDirection: "counterclockwise",
-            xAxisLabelDesiredAngles: [0, 40 * (Math.PI / 180)],
-
             // . dot
             dot_ibits: 0,
             dot_imask: "ShowsActivity",
+
             dot_lineWidth: 0,
             dot_fillStyle: function() {
               var c = this.delegate();
@@ -750,16 +685,10 @@ define([
                 if(sign.mayShowNotAmongSelected(scene)) {
                   if(scene.isActive) {
                     // not selected & active
-                    if(!pv) pv = require("cdf/lib/CCC/protovis");
-
-                    c = pv.Color.names.darkgray.darker(2).alpha(0.8);
+                    c = getPv().Color.names.darkgray.darker(2).alpha(0.8);
                   } else {
-                    if(!pvc) {
-                      pvc = require("cdf/lib/CCC/pvc");
-                    }
-
                     // not selected
-                    c = pvc.toGrayScale(c, -0.3);
+                    c = getPvc().toGrayScale(c, -0.3);
                   }
                 } else if(sign.mayShowActive(scene, true)) {
                   // active || (active & selected)
@@ -774,43 +703,34 @@ define([
         }
       },
 
-      // Boxplot
-      {
-        priority: -5,
-        select: {
-          type: "pentaho/ccc/visual/boxplot"
-        },
-        apply: {
-          extension: {
-            // paddings
-            contentPaddings: {right: 57 + 18}
-          }
-        }
-      },
-
       // Sunburst
       {
-        priority: -5,
+        priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           type: "pentaho/ccc/visual/sunburst"
         },
         apply: {
           extension: {
             legendAreaVisible: false,
+
             valuesVisible: true,
             valuesOverflow: "trim",
             valuesOptimizeLegibility: true,
+
             colorMode: "level",
+
             slice_strokeStyle: function() { return this.finished("white"); },
             slice_lineWidth: function() { return this.finished(2); }
           }
         }
       },
 
-      // context specific rules, not defined in the global configuration
+      // endregion
+
+      // region context specific rules, not defined in the global configuration
       // Abstract
       {
-        priority: -1,
+        priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: ["pentaho-det"],
           type: "pentaho/ccc/visual/abstract"
@@ -822,7 +742,7 @@ define([
         }
       },
       {
-        priority: -1,
+        priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: ["pentaho-det", "pentaho-cdf"],
           type: "pentaho/ccc/visual/abstract"
@@ -845,7 +765,7 @@ define([
 
       // Line/Area
       {
-        priority: -1,
+        priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: ["pentaho-det", "pentaho-cdf"],
           type: "pentaho/ccc/visual/pointAbstract"
@@ -862,7 +782,7 @@ define([
 
       // CCC Cartesian
       {
-        priority: -1,
+        priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: ["pentaho-det", "pentaho-cdf"],
           type: "pentaho/ccc/visual/cartesianAbstract"
@@ -885,7 +805,7 @@ define([
 
       // BarAbstract
       {
-        priority: -1,
+        priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: "pentaho-cdf",
           type: "pentaho/ccc/visual/barAbstract"
@@ -897,32 +817,34 @@ define([
         }
       },
 
-
       {
-        priority: -1,
+        priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: ["pentaho-analyzer", "pentaho-det"],
-          type: [
-            "pentaho/ccc/visual/cartesianAbstract",
-            "pentaho/ccc/visual/heatGrid"
-          ]
+          type: "pentaho/ccc/visual/cartesianAbstract"
         },
         apply: {
           extension: {
             // . horizontal discrete / minimum distance between bands/ticks
             xAxisBandSizeMin: 18,
+
             // . vertical discrete / minimum distance between bands/ticks/line-height
-            yAxisBandSizeMin: 30
+            yAxisBandSizeMin: 30,
+
+            // Show labels, until they really overlap.
+            // This is "fine-tuned" so that Analyzer's default 12px font, the xAxisBandSizeMin of 18px,
+            // and the 40º slanted labels, don't cause ticks to hide. Only if font size is increased,
+            // will that happen.
+            discreteAxisLabelSpacingMin: 0
           }
         }
       },
+
       {
-        priority: -1,
+        priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: ["pentaho-analyzer", "pentaho-det"],
-          type: [
-            "pentaho/ccc/visual/heatGrid"
-          ]
+          type: "pentaho/ccc/visual/heatGrid"
         },
         apply: {
           extension: {
@@ -934,12 +856,10 @@ define([
 
       // Bubble
       {
-        priority: -1,
+        priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: "pentaho-cdf",
-          type: [
-            "pentaho/ccc/visual/bubble"
-          ]
+          type: "pentaho/ccc/visual/bubble"
         },
         apply: {
           extension: {
@@ -947,14 +867,15 @@ define([
           }
         }
       }
+      // endregion
     ]
   };
 
-  function getNumberFormatter(precision, base) {
-    if(!pvc) {
-      pvc = require("cdf/lib/CCC/pvc");
-    }
+  function legendShapeColorProp(scene) {
+    return scene.isOn() ? scene.color : getPvc().toGrayScale(scene.color);
+  }
 
+  function getNumberFormatter(precision, base) {
     var useAbrev = (base >= 1000);
     var key = useAbrev + "|" + precision;
     var numberFormat = numberFormatCache[key];
@@ -965,12 +886,20 @@ define([
       var depPlacesMask = precision ? ("." + new Array(precision + 1).join("0")) : ".##";
       var mask = "#,0" + depPlacesMask + (useAbrev ? " A" : "");
 
-      numberFormat = pvc.data.numberFormat(mask);
+      numberFormat = getPvc().data.numberFormat(mask);
       numberFormat.style(numberStyle);
       numberFormatCache[key] = numberFormat;
     }
 
     return numberFormat;
+  }
+
+  function getPvc() {
+    return pvc || (pvc = require("cdf/lib/CCC/pvc"));
+  }
+
+  function getPv() {
+    return pv || (pv = require("cdf/lib/CCC/protovis"));
   }
 
 });

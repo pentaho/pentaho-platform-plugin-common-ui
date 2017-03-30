@@ -49,10 +49,6 @@ define([
 
       _tooltipHidePercentageOnPercentAttributes: true,
 
-      _options: {
-        valuesAnchor: "outer"
-      },
-
       _configureOptions: function() {
 
         this.base();

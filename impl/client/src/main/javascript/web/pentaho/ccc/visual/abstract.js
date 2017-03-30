@@ -40,14 +40,11 @@ define([
 
   "use strict";
 
-  /* global alert:false, cv:false, Promise:false */
+  /* globals Promise */
 
-  var ruleStrokeStyle = "#808285";  // "#D8D8D8",  // #f0f0f0
-  var lineStrokeStyle = "#D1D3D4";  // "#D1D3D4"; //"#A0A0A0"; // #D8D8D8",// #f0f0f0
   var extensionBlacklist = {
     "compatVersion": 1,
     "compatFlags": 1,
-    "interactive": 1,
     "isMultiValued": 1,
     "measuresIndexes": 1,
     "multiChartIndexes": 1,
@@ -68,7 +65,6 @@ define([
     "categoriesCount": 1,
     "dataCategoriesCount": 1
   };
-  
 
   var baseOptions = {
     // Chart
@@ -81,20 +77,10 @@ define([
       percent: "#,0.00%"
     },
 
-    // Multi-chart
-    multiChartMax: 50,
-
-    // Legend
-    legendPosition: "right",
-
     // Interaction
-    interactive: true,
-    animate: false,
-    clickable: true,
-    selectable: true,
-    hoverable: false,
-    ctrlSelectMode: false,
     clearSelectionMode: "manual",
+
+    // Tooltip
     tooltipEnabled: true,
     tooltip: {
       className: "pentaho-visual-ccc",
@@ -116,8 +102,7 @@ define([
 
     // Data
     dataTypeCheckingMode: "none",
-    ignoreNulls: false,
-    groupedLabelSep: "~"
+    ignoreNulls: false
   };
 
   return function(context) {
@@ -920,7 +905,7 @@ define([
         options.axisFont = util.defaultFont(options.axisFont, 12);
         options.axisTitleFont = util.defaultFont(options.axisTitleFont, 12);
 
-        options.interactive = !!def.get(this._validExtensionOptions, "interactive", options.interactive);
+        options.interactive = !!def.get(this._validExtensionOptions, "interactive", true);
         if(options.interactive) {
           if(options.tooltipEnabled) this._configureTooltip();
 
@@ -1365,25 +1350,27 @@ define([
         var legendPosition = options.legendPosition;
         var isTopOrBottom = legendPosition === "top" || legendPosition === "bottom";
 
-        if(this._hasMultiChartColumns && !isTopOrBottom) {
+        if(!isTopOrBottom) {
           options.legendAlignTo = "page-middle";
           options.legendKeepInBounds = true; // ensure it is not placed off-page
 
-          // Ensure that legend margins is an object.
-          // Preserve already specified margins.
-          // CCC's default adds a left or right 5 px margin,
-          // to separate the legend from the content area.
-          var legendMargins = options.legendMargins;
-          if(legendMargins) {
-            if(typeof legendMargins !== "object")
-              legendMargins = options.legendMargins = {all: legendMargins};
-          } else {
-            legendMargins = options.legendMargins = {};
-            var oppositeSide = pvc.BasePanel.oppositeAnchor[legendPosition];
-            legendMargins[oppositeSide] = 5;
-          }
+          if(this._hasMultiChartColumns) {
+            // Ensure that legend margins is an object.
+            // Preserve already specified margins.
+            // CCC's default adds a left or right 5 px margin,
+            // to separate the legend from the content area.
+            var legendMargins = options.legendMargins;
+            if(legendMargins) {
+              if(typeof legendMargins !== "object")
+                legendMargins = options.legendMargins = {all: legendMargins};
+            } else {
+              legendMargins = options.legendMargins = {};
+              var oppositeSide = pvc.BasePanel.oppositeAnchor[legendPosition];
+              legendMargins[oppositeSide] = 5;
+            }
 
-          legendMargins.top = 20;
+            legendMargins.top = 20;
+          }
         }
 
         // Calculate 'legendAlign' default value

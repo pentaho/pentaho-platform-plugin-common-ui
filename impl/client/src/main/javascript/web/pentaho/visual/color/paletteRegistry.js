@@ -277,6 +277,7 @@ define([
   paletteRegistry.add({name: "viz_api_dark", colors: viz_api_dark});
 
   paletteRegistry.add({name: defaultVizApiPalette, colors: viz_api_neutral.concat(viz_api_light, viz_api_dark)});
+  paletteRegistry.setDefault(defaultVizApiPalette);
   // endregion
 
   paletteRegistry.add({name: "ryg-3",  colors: ["#FF0000", "#FFFF00", "#008000"]});

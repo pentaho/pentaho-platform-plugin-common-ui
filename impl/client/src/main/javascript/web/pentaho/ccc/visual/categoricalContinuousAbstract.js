@@ -36,8 +36,6 @@ define([
 
       _genericMeasureCccVisualRole: "value",
 
-      _options: {},
-
       _isAxisTitleVisible: function(type) {
         return !this._hasMultiChartColumns || type === "ortho";
       },
