@@ -109,6 +109,10 @@ define([
       arrowVisible: false,
       opacity: 1
     },
+    trendDot_ibits: 0,
+    trendDot_imask: "ShowsActivity",
+    trendLine_ibits: 0,
+    trendLine_imask: "ShowsActivity",
 
     // Data source
     isMultiValued: false,
