@@ -176,9 +176,9 @@ define(function() {
             titleAlignTo:  "page-center",
             titleFont:     vizApiFont,
 
-            // Plot
-            valuesVisible: false,
-            valuesFont: vizApiFont
+            // Labels
+            label_ibits: 0,
+            label_imask: "ShowsActivity"
           }
         }
       },
@@ -439,31 +439,7 @@ define(function() {
             bar_lineWidth: function() {
               return this.finished(0);
             },
-            bar_fillStyle: function() {
-
-              var c = this.delegate();
-              var scene = this.scene;
-              var sign = this.sign;
-
-              if(sign.showsInteraction()) {
-
-                if(sign.mayShowNotAmongSelected(scene)) {
-                  if(scene.isActive) {
-                    // not selected & active
-                    c = getPv().Color.names.darkgray.darker(2).alpha(0.8);
-                  } else {
-                    // not selected
-                    c = getPvc().toGrayScale(c, -0.3);
-                  }
-                } else if(sign.mayShowActive(scene, true)) {
-                  // active || (active & selected)
-                  c = c.alpha(0.5);
-                }
-                // else (normal || selected)
-              }
-
-              return this.finished(c);
-            }
+            bar_fillStyle: fillStyle1
           }
         }
       },
@@ -593,6 +569,7 @@ define(function() {
             // Plot
             activeSliceRadius: 0,
             valuesAnchor: "outer",
+            valuesOptimizeLegibility: true,
 
             // Title
             titlePosition: "bottom",
@@ -600,30 +577,7 @@ define(function() {
             // . slice
             slice_lineWidth: 0,
             slice_strokeStyle: "white",
-            slice_fillStyle: function() {
-              var c = this.delegate();
-              var scene = this.scene;
-              var sign = this.sign;
-
-              if(sign.showsInteraction()) {
-
-                if(sign.mayShowNotAmongSelected(scene)) {
-                  if(scene.isActive) {
-                    // not selected & active
-                    c = getPv().Color.names.darkgray.darker(2).alpha(0.8);
-                  } else {
-                    // not selected
-                    c = getPvc().toGrayScale(c, -0.3);
-                  }
-                } else if(sign.mayShowActive(scene, true)) {
-                  // active || (active & selected)
-                  c = c.alpha(0.85);
-                }
-                // else (normal || selected)
-              }
-
-              return this.finished(c);
-            }
+            slice_fillStyle: fillStyle1
           }
         }
       },
@@ -675,34 +629,9 @@ define(function() {
             yAxisSizeMax: 80, // shouldn't it be: maxHorizontalTextWidth ??
 
             // . dot
-            dot_ibits: 0,
-            dot_imask: "ShowsActivity",
-
-            dot_lineWidth: 0,
-            dot_fillStyle: function() {
-              var c = this.delegate();
-              var scene = this.scene;
-              var sign = this.sign;
-
-              if(sign.showsInteraction()) {
-
-                if(sign.mayShowNotAmongSelected(scene)) {
-                  if(scene.isActive) {
-                    // not selected & active
-                    c = getPv().Color.names.darkgray.darker(2).alpha(0.8);
-                  } else {
-                    // not selected
-                    c = getPvc().toGrayScale(c, -0.3);
-                  }
-                } else if(sign.mayShowActive(scene, true)) {
-                  // active || (active & selected)
-                  c = c.alpha(0.5);
-                }
-                // else (normal || selected)
-              }
-
-              return this.finished(c);
-            }
+            dot_lineWidth: function() { return this.finished(0); },
+            dot_shapeRadius: function() { return this.finished(this.delegate()); },
+            dot_fillStyle: fillStyle1
           }
         }
       },
@@ -727,9 +656,7 @@ define(function() {
 
             slice_strokeStyle: function() { return this.finished("white"); },
             slice_lineWidth: function() { return this.finished(2); },
-
-            label_ibits: 0,
-            label_imask: "ShowsActivity"
+            slice_fillStyle: fillStyle1
           }
         }
       },
@@ -754,7 +681,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: ["pentaho-det"],
+          application: "pentaho-det",
           type: "pentaho/ccc/visual/abstract"
         },
         apply: {
@@ -781,6 +708,20 @@ define(function() {
             legendArea_overflow: "hidden",
 
             legendMarkerSize:  8
+          }
+        }
+      },
+      {
+        priority: RULE_PRIO_APP_DEFAULT,
+        select: {
+          application: "pentaho-cdf",
+          type: "pentaho/ccc/visual/abstract"
+        },
+        apply: {
+          extension: {
+            // Plot
+            valuesVisible: false,
+            valuesFont: vizApiFont
           }
         }
       },
@@ -914,6 +855,31 @@ define(function() {
     }
 
     return numberFormat;
+  }
+
+  // For Bars, Slices and HG dots
+  function fillStyle1() {
+
+    var c = this.delegate();
+    var scene = this.scene;
+    var sign = this.sign;
+
+    if(sign.showsInteraction()) {
+      // hovered and is none selected or is not selected
+      if(sign.mayShowNotAmongSelected(scene)) {
+        if(!(sign.showsActivity() && scene.isActive)) {
+          c = c.alpha(0.5);
+        }
+      } else if(sign.mayShowActive(scene, true)) {
+        // active || (active & selected)
+        // 20% darker
+        c = c.rgb().hsl();
+        c = c.lightness(c.l * (1 - 0.2));
+      }
+      // else (normal || selected)
+    }
+
+    return this.finished(c);
   }
 
   function getPvc() {
