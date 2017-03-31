@@ -71,6 +71,7 @@ define([
               base: labelsOptionFactory,
               domain: ["none", "center"]
             },
+            isApplicable: isSizeMapped,
             isRequired: true,
             value: "none"
           },
@@ -83,6 +84,7 @@ define([
           {
             name: "sliceOrder",
             type: sliceOrderFactory,
+            isApplicable: isSizeMapped,
             isRequired: true,
             value: "bySizeDescending"
           }
@@ -93,4 +95,8 @@ define([
     .implement({type: bundle.structured.settingsMultiChart})
     .implement({type: bundle.structured.sunburst});
   };
+
+  function isSizeMapped() {
+    return this.size.attributes.count > 0;
+  }
 });

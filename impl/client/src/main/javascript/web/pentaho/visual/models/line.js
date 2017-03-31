@@ -38,7 +38,6 @@ define([
           {
             name: "lineWidth",
             type: lineWidthFactory,
-            isApplicable: function() { return this.count("measures") > 0; },
             isRequired: true,
             value: 1
           },
