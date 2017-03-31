@@ -715,6 +715,8 @@ define(function() {
         },
         apply: {
           extension: {
+            rootCategoryLabel: "",
+
             legendAreaVisible: false,
 
             valuesVisible: true,
