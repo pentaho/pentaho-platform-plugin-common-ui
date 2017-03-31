@@ -22,7 +22,7 @@ define([
 
   /* global describe:true, it:true, expect:true, beforeEach:true*/
 
-  describe("pentaho.type.facets.RefinementFacet", function() {
+  xdescribe("pentaho.type.facets.RefinementFacet", function() {
     it("should be a function", function() {
       expect(typeof RefinementFacet).toBe("function");
     });

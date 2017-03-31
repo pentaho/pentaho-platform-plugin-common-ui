@@ -219,27 +219,34 @@ define([
       },
 
       // region configuration
-      /**
-       * Configures this simple value with a given configuration.
-       *
-       *
-       * @name configure
-       * @memberOf pentaho.type.Simple#
-       * @param {?any} config - The configuration.
-       * @return {!pentaho.type.Simple} This instance.
-       */
 
       // TODO: unify constructor, cloning and configuration code somehow?
 
       /**
-       * Configures this value with a given _non-nully_ configuration.
+       * Configures this value with a given configuration.
        *
-       * The default implementation does nothing.
+       * If `config` is {@link Nully}, it is ignored.
        *
-       * @param {any} config - The configuration.
+       * If `config` is a plain object, its properties, `v`, `f`, `value` and `formatted`
+       * are set on this simple's corresponding properties. It is an error if the properties `v` or `value`
+       * contain a primitive value which is different from of this simple.
        *
-       * @protected
+       * If `config` is another simple value, it can be of any simple type.
+       * However, its primitive value must be the same as that of this simple.
+       * If the formatted value of `config` is not {@link Nully}, it updates this simple's formatted value.
+       *
+       * An error is thrown if `config` is of another type.
+       *
+       * @name configure
+       * @memberOf pentaho.type.Simple#
+       *
+       * @param {Object|pentaho.type.Simple} config - The configuration.
+       *
+       * @return {!pentaho.type.Simple} This instance.
+       *
+       * @throws {pentaho.lang.ArgumentInvalidError} When `config` is not either a plain object or a simple value.
        */
+
       _configure: function(config) {
         // Nothing configurable at this level
         if(config instanceof Object) {
@@ -260,12 +267,17 @@ define([
       },
 
       _configureFromSimple: function(other) {
-        // TODO: same simple class?
         if(other !== this) {
-          // implicit "downcast" of simple values
-          this.value     = other.value; // inits or ensures value is the same (and throws otherwise)
-          this.formatted = other.formatted;
-          // TODO: generic metadata
+
+          // TODO: same simple class?
+          // Implicit "downcast" of simple values.
+
+          // Inits or ensures value is the same (and throws otherwise).
+          this.value = other.value;
+          var f = other.formatted;
+          if(f != null) {
+            this.formatted = f;
+          }
         }
       },
 

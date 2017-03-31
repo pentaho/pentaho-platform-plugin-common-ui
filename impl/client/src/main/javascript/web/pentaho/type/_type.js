@@ -1398,13 +1398,13 @@ define([
       // endregion
 
       /**
-       * Determines if a value is an instance of this type.
+       * Determines if a value is an instance of this type's **essence**.
        *
        * @param {?any} value - The value to test.
        * @return {boolean} `true` if the value is an instance of this type; `false`, otherwise.
        */
       is: function(value) {
-        return O_isProtoOf.call(this.instance, value);
+        return O_isProtoOf.call(this.essence.instance, value);
       },
 
       /**

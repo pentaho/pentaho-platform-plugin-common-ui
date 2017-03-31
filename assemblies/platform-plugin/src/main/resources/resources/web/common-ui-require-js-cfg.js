@@ -90,6 +90,7 @@
   requireTypeInfo["pentaho/type/filter/property"] = {base: "pentaho/type/filter/abstract"};
   requireTypeInfo["pentaho/type/filter/isEqual"] = {alias: "=", base: "pentaho/type/filter/property"};
   requireTypeInfo["pentaho/type/filter/isIn"] = {alias: "in", base: "pentaho/type/filter/property"};
+  requireTypeInfo["pentaho/type/facets/discreteDomain"] = {alias: "discreteDomain", base: "value"};
 
   requireTypeInfo["pentaho/visual/base"] = {base: "model"};
   requireTypeInfo["pentaho/visual/base/view"] = {

@@ -208,6 +208,53 @@ define([
         return clone;
       },
 
+      // region configuration
+
+      /**
+       * Configures a list instance with a given configuration.
+       *
+       * When `config` is another list, behaviour is currently undefined.
+       *
+       * When `config` is a plain object, its keys are the keys of list elements,
+       * which must belong to the list, and the values are the configuration values,
+       * which are then passed to the element's [configure]{@link pentaho.type.Element#configure} method.
+       *
+       * @name pentaho.type.List#configure
+       *
+       * @param {?any} config - The configuration.
+       *
+       * @return {!pentaho.type.Value} This instance.
+       *
+       * @throws {pentaho.lang.ArgumentInvalidError} When `config` is a plain object that contains a key that is
+       * not the key of an element in the list.
+       *
+       * @throws {pentaho.lang.ArgumentInvalidType} When `config` is not a list or a plain object.
+       */
+
+      /** @inheritDoc */
+      _configure: function(config) {
+        this._usingChangeset(function() {
+
+          if(config instanceof List) {
+            // TODO: when differences between `configure` and `set` are revisited, try to decide what makes sense here.
+            throw error.notImplemented("Behaviour not yet defined.");
+
+          } else if(config.constructor === Object) {
+
+            O.eachOwn(config, function(v, key) {
+              var elem = this.get(key);
+              if(!elem) throw error.argInvalid("domain", "An element with key '" + key + "' is not defined.");
+
+              elem.configure(v);
+            }, this);
+
+          } else {
+            throw error.argInvalidType("config", ["pentaho.type.List", "Object"], typeof config);
+          }
+        });
+      },
+      // endregion
+
       /**
        * Gets a mock projection of the updated list value.
        *
@@ -624,7 +671,7 @@ define([
         get isList() { return true; },
         get isContainer() { return true; },
 
-        // region of
+        // region of / element type attribute
         _elemType: Element.type,
 
         /**

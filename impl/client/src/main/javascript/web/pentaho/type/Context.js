@@ -228,8 +228,12 @@ define([
           this._getByFactory(standard[lid], /* sync: */true);
       }, this);
 
-      Object.keys(standard.filter).forEach(function(fid){
+      Object.keys(standard.filter).forEach(function(fid) {
         this._getByFactory(standard.filter[fid], /* sync: */true);
+      }, this);
+
+      Object.keys(standard.facets).forEach(function(fid) {
+        this._getByFactory(standard.facets[fid], /* sync: */true);
       }, this);
     },
 
@@ -271,12 +275,8 @@ define([
      *         * [pentaho/type/boolean]{@link pentaho.type.Boolean}
      *         * [pentaho/type/function]{@link pentaho.type.Function}
      *         * [pentaho/type/object]{@link pentaho.type.Object}
-     *
-     *     // TODO: remove these types when DiscreteDomain is refactored.
-     *     * [pentaho/type/refinement]{@link pentaho.type.Refinement}
-     *       * [pentaho/type/facets/Refinement]{@link pentaho.type.facets.RefinementFacet}
-     *         * [pentaho/type/facets/DiscreteDomain]{@link pentaho.type.facets.DiscreteDomain}
-     *         * [pentaho/type/facets/OrdinalDomain]{@link pentaho.type.facets.OrdinalDomain}
+     *     * [pentaho/type/facets/discreteDomain]{@link pentaho.type.facets.DiscreteDomain}
+     *     * [pentaho/type/facets/ordinalDomain]{@link pentaho.type.facets.OrdinalDomain}
      *   * [pentaho/type/property]{@link pentaho.type.Property}
      *
      * For all of these, the `pentaho/type/` or `pentaho/type/facets/` prefix is optional
@@ -604,7 +604,7 @@ define([
     /**
      * Recursively collects the module ids of custom types used within a type specification.
      *
-     * @param {pentaho.type.spec.UTypeReference} typeRef - A type reference.
+     * @param {pentaho.type.spec.ITypeProto} typeSpec - A type specification.
      * @param {!Object.<string, string>} [customTypeIds] - An object where to add found type ids to.
      * @return {!Object.<string, string>} A possibly empty object whose own keys are type module ids.
      * @private
@@ -1205,25 +1205,25 @@ define([
     //   Custom types with own type attributes would need special handling.
     //   Something like a two phase protocol?
 
-        // {[base: "complex", ] [of: "..."] , [props: []]}
-        collectTypeIdsRecursive(typeSpec.base, outIds, byTypeId);
+    // {[base: "complex", ] [of: "..."] , [props: []]}
+    collectTypeIdsRecursive(typeSpec.base, outIds, byTypeId);
 
-        collectTypeIdsRecursive(typeSpec.of, outIds, byTypeId);
+    collectTypeIdsRecursive(typeSpec.of, outIds, byTypeId);
 
-        var props = typeSpec.props;
-        if(props) {
-          if(Array.isArray(props))
-            props.forEach(function(propSpec) {
-              collectTypeIdsRecursive(propSpec && propSpec.type, outIds, byTypeId);
-              collectTypeIdsRecursive(propSpec && propSpec.base, outIds, byTypeId);
-            });
-          else
-            Object.keys(props).forEach(function(propName) {
-              var propSpec = props[propName];
-              collectTypeIdsRecursive(propSpec && propSpec.type, outIds, byTypeId);
-              collectTypeIdsRecursive(propSpec && propSpec.base, outIds, byTypeId);
-            });
-        }
+    var props = typeSpec.props;
+    if(props) {
+      if(Array.isArray(props))
+        props.forEach(function(propSpec) {
+          collectTypeIdsRecursive(propSpec && propSpec.type, outIds, byTypeId);
+          collectTypeIdsRecursive(propSpec && propSpec.base, outIds, byTypeId);
+        });
+      else
+        Object.keys(props).forEach(function(propName) {
+          var propSpec = props[propName];
+          collectTypeIdsRecursive(propSpec && propSpec.type, outIds, byTypeId);
+          collectTypeIdsRecursive(propSpec && propSpec.base, outIds, byTypeId);
+        });
+    }
 
     // These are not ids of types but only of mixin AMD modules.
     var facets = typeSpec.facets;

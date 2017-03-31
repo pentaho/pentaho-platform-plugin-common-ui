@@ -615,61 +615,6 @@ define([
           return of.create.apply(of, arguments);
         },
 
-        // region validation
-        /**
-         * Determines if a value,
-         * that _is an instance of this type_,
-         * is also a **valid instance** of this (and its) type.
-         *
-         * Thus, `this.is(value)` must be true.
-         *
-         * The default implementation calls `value.validate()` and,
-         * if the latter returns no errors,
-         * it additionally validates the value against this type's refinement facets,
-         * by calling [_validateFacets]{@link pentaho.type.Refinement.Type#_validateFacets}.
-         *
-         * @param {!pentaho.type.Value} value - The value to validate.
-         *
-         * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
-         *
-         * @see pentaho.type.Value#validate
-         * @see pentaho.type.Refinement.Type#_validateFacets
-         */
-        validateInstance: function(value) {
-          var errors = value.validate();
-          if(errors) return errors;
-
-          return this._validateFacets(value);
-        },
-
-        /**
-         * Determines if a value that
-         * _is an instance of this type_ and
-         * _a valid instance of its actual type_
-         * is also a valid instance of this refinement type,
-         * according to the registered refinement facets.
-         *
-         * For all registered refinement facets,
-         * their [validate]{@link pentaho.type.facets.RefinementFacet.validate} method
-         * is called and any reported errors collected.
-         *
-         * This method is called by the default implementation of
-         * [validateInstance]{@link pentaho.type.Refinement.Type#validateInstance}.
-         * It is provided just in case you need to override the latter implementation.
-         *
-         * @param {!pentaho.type.Value} value - The value to validate.
-         *
-         * @return {?Array.<!pentaho.type.ValidationError>} An array of errors or `null`.
-         *
-         * @protected
-         */
-        _validateFacets: function(value) {
-          return this.facets.reduce(function(errors, Facet) {
-            return typeUtil.combineErrors(errors, Facet.validate.call(this, value));
-          }.bind(this), null);
-        },
-        // endregion
-
         // region serialization
         /** @inheritDoc */
         _fillSpecInContext: function(spec, keyArgs) {
@@ -702,6 +647,7 @@ define([
           while(++i < L)
             any = facets[i].fillSpecInContext.call(this, spec, keyArgs) || any;
 
+          //validateInstance
           return any;
         }
         // endregion
@@ -744,7 +690,8 @@ define([
 
         return this.base.apply(this, arguments);
       }
-    }, /* keyArgs: */{
+    },
+    /*keyArgs:*/{
       isRoot: true
     });
 
