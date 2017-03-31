@@ -62,7 +62,10 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/visual/models/heatGrid"
+          type: [
+            "pentaho/visual/models/heatGrid",
+            "pentaho/visual/models/bubble"
+          ]
         },
         apply: {
           props: {
