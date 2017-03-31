@@ -721,7 +721,10 @@ define(function() {
             colorMode: "level",
 
             slice_strokeStyle: function() { return this.finished("white"); },
-            slice_lineWidth: function() { return this.finished(2); }
+            slice_lineWidth: function() { return this.finished(2); },
+
+            label_ibits: 0,
+            label_imask: "ShowsActivity"
           }
         }
       },
