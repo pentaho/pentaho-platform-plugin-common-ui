@@ -1306,7 +1306,7 @@ define([
           // TODO: Generalize getDoubleClickTooltip somehow.
           var app = this.model.application;
           if(app && app.getDoubleClickTooltip) {
-            var pointFilter = this._complexToFilter(complex);
+            var pointFilter = this._complexToFilter(context.scene.group || complex);
             msg = app.getDoubleClickTooltip(pointFilter);
             if(msg) {
               tooltipLines.push(msg);
