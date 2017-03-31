@@ -726,6 +726,19 @@ define(function() {
         }
       },
 
+      // Treemap
+      {
+        priority: RULE_PRIO_VIZ_DEFAULT,
+        select: {
+          type: "pentaho/ccc/visual/treemap"
+        },
+        apply: {
+          extension: {
+            valuesVisible: true
+          }
+        }
+      },
+
       // endregion
 
       // region context specific rules, not defined in the global configuration
