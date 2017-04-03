@@ -57,6 +57,7 @@
     <file context="global">content/common-ui/resources/themes/jquery.js</file>
     <file context="global">content/common-ui/resources/themes/themeUtils.js</file>
     <file context="global">content/common-ui/resources/web/util/URLEncoder.js</file>
+    <file context="global">content/common-ui/resources/web/util/SessionExpiryCheckStartingPoint.js</file>
 
     <file context="requirejs">content/common-ui/resources/web/common-ui-require-js-cfg.js</file>
 
