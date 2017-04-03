@@ -5,12 +5,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>common-ui-impl</artifactId>
+    <artifactId>common-ui-impl-client-config-umbrella</artifactId>
     <groupId>org.pentaho</groupId>
     <version>7.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>viz-api-config-folder-enabler</artifactId>
+  <artifactId>common-ui-impl-client-config-folder-enabler</artifactId>
   <packaging>bundle</packaging>
 
   <properties>
@@ -23,11 +23,13 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
       <version>${osgi.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.configadmin</artifactId>
       <version>${felix-configadmin.version}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 

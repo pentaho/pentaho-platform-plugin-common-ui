@@ -17,6 +17,7 @@
 
   <modules>
     <module>platform-plugin</module>
+    <module>client-config</module>
   </modules>
 
 </project>
