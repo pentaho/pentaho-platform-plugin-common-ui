@@ -35,6 +35,11 @@ define(function() {
     subAbbreviations: ["m", "µ", "n", "p", "f", "a", "z", "y"]
   };
 
+  var interactionState = {
+    isSelected: 0,
+    isActive: 0
+  };
+
   return {
     rules: [
       // region Model Rules
@@ -62,15 +67,27 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: [
-            "pentaho/visual/models/heatGrid",
-            "pentaho/visual/models/bubble"
-          ]
+          type: "pentaho/visual/models/heatGrid"
         },
         apply: {
           props: {
             colorSet: {
               value: "blue"
+            }
+          }
+        }
+      },
+
+      // bubble model
+      {
+        priority: RULE_PRIO_VIZ_DEFAULT,
+        select: {
+          type: "pentaho/visual/models/metricDotAbstract"
+        },
+        apply: {
+          props: {
+            colorSet: {
+              value: "ryg"
             }
           }
         }
@@ -329,32 +346,7 @@ define(function() {
 
             // . dot
             dot_lineWidth: 0,
-            dot_fillStyle: function() {
-              var c = this.delegate();
-              var scene = this.scene;
-              var sign = this.sign;
-
-              if(sign.showsInteraction()) {
-
-                if(sign.mayShowNotAmongSelected(scene)) {
-
-                  if(sign.mayShowActive(scene, true)) {
-                    // not selected & active
-                    c = getPv().Color.names.darkgray.darker(2).alpha(0.8);
-                  } else {
-                    // not selected
-                    c = getPvc().toGrayScale(c, -0.3);
-                  }
-                } else if(sign.mayShowActive(scene, true)) {
-                  // active || (active & selected)
-                } else {
-                  c = c.alpha(0.5);
-                }
-                // else (normal || selected)
-              }
-
-              return this.finished(c);
-            }
+            dot_fillStyle: fillStyle2
           }
         }
       },
@@ -528,7 +520,7 @@ define(function() {
 
               return this.finished(c);
             },
-            dot_lineWidth:   function() { return this.finished(2); },
+            dot_lineWidth: function() { return this.finished(2); },
 
             // . line
             linesVisible: false,
@@ -546,7 +538,9 @@ define(function() {
         },
         apply: {
           extension: {
-            linesVisible: false
+            linesVisible: false,
+
+            area_fillStyle: fillStyle3
           }
         }
       },
@@ -861,25 +855,75 @@ define(function() {
   function fillStyle1() {
 
     var c = this.delegate();
-    var scene = this.scene;
-    var sign = this.sign;
+    if(c) {
+      c = c.rgb();
 
-    if(sign.showsInteraction()) {
-      // hovered and is none selected or is not selected
-      if(sign.mayShowNotAmongSelected(scene)) {
-        if(!(sign.showsActivity() && scene.isActive)) {
-          c = c.alpha(0.5);
-        }
-      } else if(sign.mayShowActive(scene, true)) {
-        // active || (active & selected)
+      var istate = getInteractionState(this);
+
+      if(!istate.isActive && istate.isSelected < 0) {
+        c = c.alpha(0.5);
+      } else if(istate.isActive && istate.isSelected > -1) {
         // 20% darker
-        c = c.rgb().hsl();
+        c = c.hsl();
         c = c.lightness(c.l * (1 - 0.2));
       }
-      // else (normal || selected)
     }
 
     return this.finished(c);
+  }
+
+  // For Scatter/Bubble
+  function fillStyle2() {
+
+    var c = this.delegate();
+    if(c) {
+      c = c.rgb();
+
+      var istate = getInteractionState(this);
+
+      if(!istate.isActive && istate.isSelected < 1) {
+        c = c.alpha(0.5);
+      } else if(istate.isActive && istate.isSelected > 0) {
+        // 20% darker
+        c = c.hsl();
+        c = c.lightness(c.l * (1 - 0.2));
+      }
+    }
+
+    return this.finished(c);
+  }
+
+  // For StackedArea
+  function fillStyle3() {
+
+    var c = this.delegate();
+    if(c) {
+      c = c.rgb();
+
+      var istate = getInteractionState(this);
+
+      if(!istate.isActive && istate.isSelected < 0) {
+        c = c.hsl();
+        c = c.lightness(c.l * (1 + 0.2));
+      } else if(istate.isActive && istate.isSelected > -1) {
+        // 20% darker
+        c = c.hsl();
+        c = c.lightness(c.l * (1 - 0.2));
+      }
+    }
+
+    return this.finished(c);
+  }
+
+
+  function getInteractionState(context) {
+    var sign = context.sign;
+    var scene = context.scene;
+
+    interactionState.isSelected = (!sign.showsSelection() || !scene.anySelected()) ? 0 : scene.isSelected() ? 1 : -1;
+    interactionState.isActive  = sign.mayShowActive(scene, true) ? 1 : 0;
+
+    return interactionState;
   }
 
   function getPvc() {
