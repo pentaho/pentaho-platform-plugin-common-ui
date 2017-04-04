@@ -534,12 +534,32 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
+          type: "pentaho/ccc/visual/areaAbstract"
+        },
+        apply: {
+          extension: {
+            linesVisible: false
+          }
+        }
+      },
+      {
+        priority: RULE_PRIO_VIZ_DEFAULT,
+        select: {
+          type: "pentaho/ccc/visual/area"
+        },
+        apply: {
+          extension: {
+            area_fillStyle: fillStyle2
+          }
+        }
+      },
+      {
+        priority: RULE_PRIO_VIZ_DEFAULT,
+        select: {
           type: "pentaho/ccc/visual/areaStacked"
         },
         apply: {
           extension: {
-            linesVisible: false,
-
             area_fillStyle: fillStyle3
           }
         }
@@ -872,7 +892,7 @@ define(function() {
     return this.finished(c);
   }
 
-  // For Scatter/Bubble
+  // For Scatter/Bubble & NonStacked Area
   function fillStyle2() {
 
     var c = this.delegate();
