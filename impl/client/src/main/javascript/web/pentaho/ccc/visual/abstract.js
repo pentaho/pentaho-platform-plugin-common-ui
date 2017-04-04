@@ -1341,9 +1341,24 @@ define([
       // endregion
 
       // region LEGEND
-      _isLegendVisible: function() {
+      /**
+       * Gets a value that indicates if a color role is defined, and mapped, and, if so,
+       * if it is qualitative or not.
+       *
+       * @private
+       *
+       * @return {undefined|boolean} `undefined` if there is no color role,
+       * or if it is not mapped;
+       * otherwise, `true` if its effective level of measurement is qualitative; `false` otherwise.
+       */
+      _isColorDiscrete: function() {
         var colorRole = this._discreteColorRole;
-        return !!colorRole && this._getRoleDepth(colorRole, /* includeMeasureDiscrim: */true) > 0;
+        if(colorRole && this.model[colorRole].isMapped) return this._isRoleQualitative(colorRole);
+      },
+
+      _isLegendVisible: function() {
+        return !!this._isColorDiscrete() &&
+            this._getRoleDepth(this._discreteColorRole, /* includeMeasureDiscrim: */true) > 0;
       },
 
       _configureLegend: function() {
