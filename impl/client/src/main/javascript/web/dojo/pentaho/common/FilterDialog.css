@@ -7,7 +7,7 @@
 }
 
 .filterDialogDetailsContainer {
-  height: 250px;
+  min-height: 250px;
 }
 
 .filterDialogPicklistFindInput {
