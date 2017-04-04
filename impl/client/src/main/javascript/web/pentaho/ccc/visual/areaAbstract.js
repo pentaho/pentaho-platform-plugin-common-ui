@@ -15,9 +15,8 @@
  */
 define([
   "module",
-  "pentaho/visual/models/areaStacked",
-  "./areaAbstract"
-], function(module, modelFactory, baseViewFactory) {
+  "./pointAbstract"
+], function(module, baseViewFactory) {
 
   "use strict";
 
@@ -26,13 +25,10 @@ define([
     var BaseView = context.get(baseViewFactory);
 
     return BaseView.extend({
-      _cccClass: "StackedAreaChart",
+      _cccClass: "AreaChart",
 
       type: {
-        id: module.id,
-        props: {
-          model: {type: modelFactory}
-        }
+        id: module.id
       }
     });
   };
