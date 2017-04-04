@@ -829,6 +829,20 @@ define(function() {
             xAxisBandSizeMin: 30
           }
         }
+      }, 
+
+      // MetricDocAbstract
+      {
+        priority: RULE_PRIO_APP_DEFAULT,
+        select: {
+          application: "pentaho-cdf",
+          type: "pentaho/ccc/visual/metricDotAbstract"
+        },
+        apply: {
+          extension: {
+            continuousColorAxisColors: ["#FF0000", "#FFFF00", "#008000"]
+          }
+        }
       },
 
       // Bubble
