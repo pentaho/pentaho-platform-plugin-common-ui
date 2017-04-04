@@ -56,10 +56,6 @@ define([
         "measures": false
       },
 
-      _isColorDiscrete: function() {
-        if(this.model.color.isMapped) return this._isRoleQualitative("color");
-      },
-
       _getColorScaleKind: function() {
         var isDiscrete = this._isColorDiscrete();
         return isDiscrete == null ? undefined  :
@@ -75,12 +71,12 @@ define([
       },
 
       _isLegendVisible: function() {
-        // Prevent default behavior that hides the legend when there are no series.
+        // Add to default behavior, that hides the legend when there are no series.
         // Hide the legend even if there is only one "series".
+        var isLegendVisible = this.base();
+
         // TODO: this is not the proper way to do this cause it's tied to Analyzer's data format...
-        return this._isColorDiscrete() === true &&
-            this._dataTable.isCrossTable &&
-            this._dataTable.implem.cols.length > 1;
+        return isLegendVisible && (!this._dataTable.isCrossTable || this._dataTable.implem.cols.length > 1);
       },
 
       _getOrthoAxisTitle: function() {
