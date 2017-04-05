@@ -1357,7 +1357,10 @@ define([
       },
 
       _isLegendVisible: function() {
-        return !!this._isColorDiscrete() &&
+        // When the measureDiscrim is accounted for,
+        // it is not necessary to have a mapped color role to have a legend...
+        // It is only needed that, if it is mapped, that it it qualitative.
+        return (this._isColorDiscrete() !== false) &&
             this._getRoleDepth(this._discreteColorRole, /* includeMeasureDiscrim: */true) > 0;
       },
 
