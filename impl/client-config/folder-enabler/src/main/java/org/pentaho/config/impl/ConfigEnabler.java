@@ -35,6 +35,22 @@ public class ConfigEnabler implements BundleActivator {
     if ( configurationAdminReference != null ) {
       ConfigurationAdmin confAdmin = (ConfigurationAdmin) bundleContext.getService( configurationAdminReference );
 
+      // check if an existing fileinstall configuration already watches the ${karaf.base}/config folder
+      // if so, there's no need to create a new configuration
+      Configuration[] existingConfigs = confAdmin.listConfigurations( "(service.factoryPid=org.apache.felix.fileinstall)" );
+      if ( existingConfigs != null ) {
+        for ( Configuration existingConfig : existingConfigs ) {
+          final Dictionary<String, Object> existingConfigProperties = existingConfig.getProperties();
+          final Object fileInstallDir = existingConfigProperties.get( "felix.fileinstall.dir" );
+          if ( fileInstallDir != null && fileInstallDir.equals( "${karaf.base}/config" ) ) {
+            this.configuration = existingConfig;
+
+            // nothing to do, we can leave
+            return;
+          }
+        }
+      }
+
       this.configuration = confAdmin.createFactoryConfiguration( "org.apache.felix.fileinstall", null );
 
       Dictionary<String, String> properties = new Hashtable<>();
