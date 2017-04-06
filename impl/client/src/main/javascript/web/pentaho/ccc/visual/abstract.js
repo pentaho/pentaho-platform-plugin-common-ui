@@ -441,7 +441,10 @@ define([
         value = model.getv("lineWidth", /* sloppy: */true);
         if(value != null) {
           options.line_lineWidth = value;
-          var radius = 3 + 6 * (value / 8); // 1 -> 8 => 3 -> 9,
+          // 1 -> 3.167
+          // 2 -> 4
+          // 8 -> 9
+          var radius = 5 / 6 * (value - 2) + 4;
           options.dot_shapeSize = radius * radius;
 
           options.plot2Line_lineWidth = options.line_lineWidth;
@@ -1174,8 +1177,13 @@ define([
 
           var value = model.trendLineWidth;
           if(value != null) {
-            options.trendLine_lineWidth = +value;      // + -> to number
-            var radius = 3 + 6 * ((+value) / 8); // 1 -> 8 => 3 -> 9,
+            value = +value; // + -> to number
+
+            options.trendLine_lineWidth = value;
+            // 1 -> 3.167
+            // 2 -> 4
+            // 8 -> 9
+            var radius = 5 / 6 * (value - 2) + 4;
             options.trendDot_shapeSize = radius * radius;
           }
         }
@@ -1372,9 +1380,10 @@ define([
         var legendPosition = options.legendPosition;
         var isTopOrBottom = legendPosition === "top" || legendPosition === "bottom";
 
-        if(!isTopOrBottom) {
-          options.legendAlignTo = "page-middle";
-          options.legendKeepInBounds = true; // ensure it is not placed off-page
+        if(isTopOrBottom) {
+          options.legendAlign = "left";
+        } else {
+          options.legendAlign = "top";
 
           if(this._hasMultiChartColumns) {
             // Ensure that legend margins is an object.
@@ -1395,9 +1404,20 @@ define([
           }
         }
 
-        // Calculate 'legendAlign' default value
-        if(!("legendAlign" in options))
-          options.legendAlign = isTopOrBottom ? "center" : "middle";
+        // Set, before, whenever lineWidth is defined.
+        var dotSize = options.dot_shapeSize;
+        if(dotSize == null || def.fun.is(dotSize)) {
+          dotSize = 16; // radius = 4
+        }
+
+        var dotRadius = Math.sqrt(dotSize);
+
+        // Unfortunately, diamonds are slightly bigger than other shapes, and would overflow or touch the text.
+        var shape = this.model.getv("shape", /* sloppy: */true);
+        var extraMargin = (shape === "diamond") ? 2 : 0;
+
+        options.legendMarkerSize = 2 * (dotRadius + extraMargin);
+        options.legend$Dot_shapeSize = dotSize;
       },
       // endregion
 

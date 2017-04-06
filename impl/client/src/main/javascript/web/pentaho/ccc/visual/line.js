@@ -48,18 +48,6 @@ define([
           options.dotsVisible = true;
           options.dot_shape = shape;
         }
-      },
-
-      _configureLegend: function() {
-
-        this.base();
-
-        var options = this.options,
-            dotSize = options.dot_shapeSize;
-        if(dotSize != null) {
-          var dotRadius = Math.sqrt(dotSize);
-          options.legendMarkerSize = Math.max(15, 2 * (dotRadius + 3));
-        }
       }
     });
   };
