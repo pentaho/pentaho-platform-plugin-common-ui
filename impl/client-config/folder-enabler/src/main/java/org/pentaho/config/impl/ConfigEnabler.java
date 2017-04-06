@@ -61,6 +61,13 @@ public class ConfigEnabler implements BundleActivator {
       properties.put( "felix.fileinstall.active.level", "80" );
       properties.put( "felix.fileinstall.log.level", "3" );
 
+      // limit bundles to be refreshed
+      // this folder is intended only for deployment of client side configuration files
+      // no need to check for optional imports and fragments
+      // https://issues.apache.org/jira/browse/FELIX-4328
+      properties.put( "felix.fileinstall.optionalImportRefreshScope", "none" );
+      properties.put( "felix.fileinstall.fragmentRefreshScope", "none" );
+
       this.configuration.update( properties );
     }
   }
