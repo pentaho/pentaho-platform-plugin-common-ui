@@ -134,14 +134,14 @@ define(function() {
 
             // Legend
             // legend: true,
-            legendDrawLine:    false,
-            legendDrawMarker:  true,
+            legendDrawLine: false,
+            color2AxisLegendDrawLine: false, // Used by plot2
+            legendDrawMarker: true,
+            legendShape: "circle",
 
             legendItemCountMax: 20,
             legendSizeMax:      "30%",
             legendOverflow:     "collapse",
-
-            legendArea_overflow: "visible",
 
             legendPaddings:    0,
             legendMargins:     0,
@@ -156,8 +156,10 @@ define(function() {
             legendArea_strokeStyle: "#c0c0c0",
 
             // No hover effect
-            legendDot_ibits:  0,
-            legendDot_imask:  "Hoverable",
+            legend$Dot_ibits: 0,
+            legend$Dot_imask: "Hoverable",
+            legend$Rule_ibits: 0,
+            legend$Rule_imask: "Hoverable",
 
             legend: {
               scenes: {
@@ -226,8 +228,14 @@ define(function() {
             axisTitleVisible: true,
             axisTitleSizeMax: "20%",
             axisTitleLabel_textMargin: 0,
+
             xAxisTitleAlign: "left",
+            x2AxisTitleAlign: "left",
+            x3AxisTitleAlign: "left",
+
             yAxisTitleAlign: "top",
+            y2AxisTitleAlign: "top",
+            y3AxisTitleAlign: "top",
 
             // . label
             discreteAxisLabel_ibits: 0,
@@ -469,10 +477,30 @@ define(function() {
               return left;
             },
 
+            // . line
+            // Line chart actually forces this to true.
+            // Only takes effect on areaXyz
+            linesVisible: false
+          }
+        }
+      },
+
+      {
+        priority: RULE_PRIO_VIZ_DEFAULT,
+        select: {
+          type: [
+            "pentaho/ccc/visual/pointAbstract",
+            "pentaho/ccc/visual/barLine"
+          ]
+        },
+        apply: {
+          extension: {
+            // The point prefix covers both the main and the second plot (barLine).
+
             // Plot
             // . dot
             // . on hover
-            dot_fillStyle:   function() {
+            pointDot_fillStyle:   function() {
               var c = this.delegate();
               var scene = this.scene;
               var sign = this.sign;
@@ -498,7 +526,7 @@ define(function() {
               return this.finished(c);
             },
 
-            dot_strokeStyle: function() {
+            pointDot_strokeStyle: function() {
               var c = this.delegate();
               var scene = this.scene;
               var sign = this.sign;
@@ -520,12 +548,11 @@ define(function() {
 
               return this.finished(c);
             },
-            dot_lineWidth: function() { return this.finished(2); },
+            pointDot_lineWidth: function() { return this.finished(2); },
 
             // . line
-            linesVisible: false,
-            line_ibits: 0,
-            line_imask: "ShowsActivity"
+            pointLine_ibits: 0,
+            pointLine_imask: "ShowsActivity"
           }
         }
       },
@@ -578,7 +605,6 @@ define(function() {
             contentMargins: {top: 30},
 
             legendAlign: "center",
-            legendShape: "circle",
 
             // Plot
             activeSliceRadius: 0,
@@ -715,13 +741,8 @@ define(function() {
             legendPosition:    "top",
             legendAlign:       "left",
 
-            legendDot_shape:   "circle",
             legendFont:        vizApiFont,
-            legendLabel_textStyle: "#666",
-
-            legendArea_overflow: "hidden",
-
-            legendMarkerSize:  8
+            legendLabel_textStyle: "#666"
           }
         }
       },
@@ -735,7 +756,12 @@ define(function() {
           extension: {
             // Plot
             valuesVisible: false,
-            valuesFont: vizApiFont
+            valuesFont: vizApiFont,
+
+            // Legend defaults
+            // By UX design spec, line-width: 2 => radius: 4
+            legend$Dot_shapeSize: 16, // = radius * radius
+            legendMarkerSize:      8  // = diameter = 2 * radius
           }
         }
       },
@@ -829,7 +855,7 @@ define(function() {
             xAxisBandSizeMin: 30
           }
         }
-      }, 
+      },
 
       // MetricDocAbstract
       {
