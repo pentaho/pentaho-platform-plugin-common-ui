@@ -1405,16 +1405,12 @@ define([
         }
 
         // Set, before, whenever lineWidth is defined.
-        var dotSize = options.dot_shapeSize;
-        if(dotSize == null || def.fun.is(dotSize)) {
-          dotSize = 16; // radius = 4
-        }
-
-        var dotRadius = Math.sqrt(dotSize);
+        var dotSize = 16;
+        var dotRadius = 4;
 
         // Unfortunately, diamonds are slightly bigger than other shapes, and would overflow or touch the text.
         var shape = this.model.getv("shape", /* sloppy: */true);
-        var extraMargin = (shape === "diamond") || (shape === "triangle") ? 4 : 0;
+        var extraMargin = (shape === "diamond") || (shape === "triangle") ? 2 : 0;
 
         options.legendMarkerSize = 2 * (dotRadius + extraMargin);
         options.legend$Dot_shapeSize = dotSize;
