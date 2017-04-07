@@ -1414,7 +1414,7 @@ define([
 
         // Unfortunately, diamonds are slightly bigger than other shapes, and would overflow or touch the text.
         var shape = this.model.getv("shape", /* sloppy: */true);
-        var extraMargin = (shape === "diamond") ? 2 : 0;
+        var extraMargin = (shape === "diamond") || (shape === "triangle") ? 4 : 0;
 
         options.legendMarkerSize = 2 * (dotRadius + extraMargin);
         options.legend$Dot_shapeSize = dotSize;

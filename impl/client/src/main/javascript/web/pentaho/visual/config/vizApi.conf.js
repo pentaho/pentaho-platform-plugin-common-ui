@@ -932,7 +932,7 @@ define(function() {
     return this.finished(c);
   }
 
-  // For Scatter/Bubble & NonStacked Area
+  // For Scatter/Bubble & NonStacked Area (CDF)
   function fillStyle2() {
 
     var c = this.delegate();
