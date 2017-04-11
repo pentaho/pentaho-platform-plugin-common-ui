@@ -369,13 +369,23 @@ define(function() {
           extension: {
             // Plot
             sizeAxisRatio: 1 / 5,
-            sizeAxisRatioTo: "height", // plot area client height
+            sizeAxisRatioTo: "minwidthheight",
             sizeAxisOriginIsZero: true,
 
             // . dot
+            dot_lineWidth: function() {
+              // show nullShape
+              var v = !this.panel.visualRoles.size.isBound() || this.getSize() != null ? 0 : this.delegate();
+              return this.finished(v);
+            },
+            dot_strokeStyle: fillStyle2,
             dot_shapeSize: function() {
               var v = this.panel.visualRoles.size.isBound() ? this.delegate() : (5 * 5);
               return this.finished(v);
+            },
+
+            dot_DefaultVisible: function() {
+              return this.finished(true);
             }
           }
         }
@@ -669,7 +679,12 @@ define(function() {
             yAxisSizeMax: 80, // shouldn't it be: maxHorizontalTextWidth ??
 
             // . dot
-            dot_lineWidth: function() { return this.finished(0); },
+            dot_lineWidth: function() {
+              // show nullShape
+              var v = this.getSize() != null ? 0 : this.delegate();
+              return this.finished(v);
+            },
+            dot_strokeStyle: fillStyle1,
             dot_shapeRadius: function() { return this.finished(this.delegate()); },
             dot_fillStyle: fillStyle1
           }
