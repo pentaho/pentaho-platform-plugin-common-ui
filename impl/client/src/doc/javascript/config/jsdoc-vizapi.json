@@ -32,9 +32,11 @@
     "private": true,
     "verbose": true,
 
-    "githubConfig": {
-      "branch": "${project.version}",
-      "name": "Pentaho Common UI"
+    "gitHubConfig": {
+      "name": "${jsdoc.config.github.name}",
+      "url": "${jsdoc.config.github.url}",
+      "company": "${jsdoc.config.github.company}",
+      "branch": "${project.stage}"
     },
     "layoutFile": "layout.tmpl"
   }

@@ -18,7 +18,10 @@
     <build.javascriptReportDirectory>target/js-reports</build.javascriptReportDirectory>
     <docjs.config.file>jsdoc-vizapi.json</docjs.config.file>
     <pentaho-cdf-plugin.version>8.0-SNAPSHOT</pentaho-cdf-plugin.version>
-    <build.jsdoc.template.directory>${project.basedir}/src/doc/javascript/template</build.jsdoc.template.directory>
+    <jsdoc.config.templates.directory>${project.basedir}/src/doc/javascript/template</jsdoc.config.templates.directory>
+    <jsdoc.config.github.url>https://github.com/pentaho/pentaho-platform-plugin-common-ui/</jsdoc.config.github.url>
+    <jsdoc.config.github.company>pentaho</jsdoc.config.github.company>
+    <jsdoc.config.github.name>common-ui</jsdoc.config.github.name>
   </properties>
   <dependencies>
     <dependency>

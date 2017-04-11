@@ -25,81 +25,7 @@ var hasOwnProp = Object.prototype.hasOwnProperty;
 var data;
 var view;
 
-var version = '' + env.opts.githubConfig.branch;
-var github = '' + env.opts.githubConfig.name;
-
 var outdir = path.normalize(env.opts.destination);
-
-registerStandardJsTypes();
-
-function registerStandardJsTypes() {
-
-  var typeNames = [
-    ["string",  "String"],
-    ["number",  "Number"],
-    ["boolean", "Boolean"],
-    ["array",   "Array"],
-    ["object",  "Object"],
-    ["function", "Function"],
-    "null",
-    "undefined",
-    "RegExp",
-    "DataView",
-    "Promise",
-    "Generator",
-    "GeneratorFunction",
-    "Proxy",
-    "JSON",
-    "Error",
-    "EvalError",
-    "TypeError",
-    "SyntaxError",
-    "RangeError",
-    "InternalError",
-    "ReferenceError",
-    "URIError",
-    "Reflect",
-    "Date",
-    "Function",
-    "Object",
-    "Array",
-    "ArrayBuffer",
-    "Float32Array",
-    "Float64Array",
-    "Int8Array",
-    "Int16Array",
-    "Int32Array",
-    "Uint8Array",
-    "Uint8ClampedArray",
-    "Uint16Array",
-    "Uint32Array",
-    "TypedArray",
-    "Boolean",
-    "Number",
-    "String",
-    "Intl",
-    "Map",
-    "WeakMap",
-    "Math",
-    "Set",
-    "WeakSet",
-    "Symbol"
-  ];
-
-  var baseUrl = "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/";
-
-  typeNames.forEach(function(typeNameSpec) {
-    var typeName, urlName;
-    if(Array.isArray(typeNameSpec)) {
-      typeName = typeNameSpec[0];
-      urlName  = typeNameSpec[1];
-    } else {
-      typeName = urlName = typeNameSpec;
-    }
-
-    helper.registerLink(typeName, baseUrl + urlName);
-  });
-}
 
 function trimDoubleQuotes(s) {
     var pattern = /^\"(.+)\"$/;
@@ -196,6 +122,8 @@ function buildAttribsString(attribs) {
         attribsString = htmlsafe( util.format('(%s) ', attribs.join(', ')) );
     }
 
+    console.log("build attribs string: ", attribsString);
+
     return attribsString;
 }
 
@@ -285,7 +213,12 @@ function getLinkFromDoclet(doclet) {
     if (!doclet.meta) {
         return null;
     }
-    var linkBase = 'https://github.com/webdetails/';
+
+    var gitConfVersion = '' + env.opts.githubConfig.branch;
+    var gitConfCompany = '' + env.opts.githubConfig.company;
+    var gitConfName = '' + env.opts.githubConfig.name;
+
+    var linkBase = 'https://github.com/' + gitConfCompany + '/' + gitConfName + '/';
     var type = 'tree';
 
     if (doclet.meta.shortpath && doclet.meta.shortpath !== 'null'
@@ -293,10 +226,10 @@ function getLinkFromDoclet(doclet) {
         type = 'blob';
     }
 
-    var cdfPath = doclet.meta.path.replace(/\\/g,"/");
-    cdfPath = cdfPath.substring(cdfPath.indexOf(github) + 4, cdfPath.length);
+    var path = doclet.meta.path.replace(/\\/g,"/");
+    path = path.substring(path.indexOf(gitConfName) + 4, path.length);
 
-    linkBase = linkBase + github + '/' + type + '/' + version + '/' + cdfPath;
+    linkBase = linkBase + '/' + type + '/' + gitConfVersion + '/' + path;
 
     var fileName = doclet.meta.shortpath.indexOf('/') != -1 ?
         doclet.meta.shortpath.substr(
@@ -439,7 +372,13 @@ function createMemberData(data, member, kind) {
     }
 
     if(kind === 'event') {
-        memberData.title = prefix.replace("#event:", ".html#event:").replace(/\"/g, "_") + encodeURIComponent(member.name);
+        if(typeof member.scope === "string") {
+            if(member.scope === "static") {
+                memberData.title = prefix.replace("#event:", ".html#.event:").replace(/\"/g, "_") + encodeURI(member.name);
+            } else if(member.scope === "instance") {
+                memberData.title = prefix.replace("#event:", ".html#event:").replace(/\"/g, "_") + encodeURI(member.name);
+            }
+        }
     }
 
     return memberData;
@@ -731,36 +670,11 @@ exports.publish = function(taffyData, opts, tutorials) {
     // handle summary, description and class description default values properly
     data().each(function(doclet) {
         if(!doclet.ignore) {
-            var desc;
             if(!doclet.summary && (desc = (doclet.description || doclet.classdesc))) {
-                // Try to split when a "." or a ".</htmlTag>" is found.
-                /*
-                    ^              - start of string
-                    \s*            - optional leading space
-                    <tagName>      - optional tag, whose tagName is captured in m[1] and \1
-                    \s*            - optional white space
-                    (.|\n|\r)+?\.  - summary text, that can cross lines, and ends in a period; captured in m[2]
-                    \s*            - optional white space
-                    (
-                      $          - the end of the string, or
-                      \r|\n      - line-break, or
-                      </tagName> - the closing tag from the corresponding to the beginning opening tag
-                    )
-                */
-                var m = (/^\s*(?:<(\w+)>)?\s*((?:.|\n|\r)+?\.)\s*?($|(\r|\n)|(<\/\1>))/i).exec(desc);
-                if(m) {
-                  // MATCHED!
-                  var tagName = m[1];
-                  var summary = m[2];
-                  if(tagName) summary = "<" + tagName + ">" + summary + "</" + tagName + ">";
-
-                  doclet.summary = summary;
-                  //console.log("summary: " + summary);
-                  //console.log("  description: " + desc);
-                  //console.log(" ");
-                } else {
-                  console.warn("Could not determine summary for: " + desc);
-                }
+                //Try to split when a "." or a ".</htmlTag>" is found.
+                //TODO: When markdown is present it fails the split and dumps all description in the summary.
+                var split = desc.split(/(\.(<\/?([^<]+)>)?\s*)$/)
+                doclet.summary = split[0] + (split[1] || "");
             }
 
             var checkP = function(prop) {
@@ -773,7 +687,7 @@ exports.publish = function(taffyData, opts, tutorials) {
                 } 
 
                 return prop;
-            };
+            }
 
             var replaceCode = function(string) {
                 if(!string) return;
@@ -804,6 +718,9 @@ exports.publish = function(taffyData, opts, tutorials) {
 
             //dont split for code
             if(doclet.description && doclet.description.indexOf("syntax.javascript") == -1) {
+                doclet.description = split(doclet.description, '<br>');
+            }
+            if(doclet.description && doclet.description.indexOf("syntax.text") == -1) {
                 doclet.description = split(doclet.description, '<br>');
             }
             if(doclet.classdesc && doclet.classdesc.indexOf("syntax.javascript") == -1) {
