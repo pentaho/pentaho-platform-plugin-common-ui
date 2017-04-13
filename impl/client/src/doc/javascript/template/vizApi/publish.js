@@ -19,8 +19,6 @@ helper.htmlsafe = function(str){
 var htmlsafe = helper.htmlsafe;
 var linkto = helper.linkto;
 var resolveAuthorLinks = helper.resolveAuthorLinks;
-var scopeToPunc = helper.scopeToPunc;
-var hasOwnProp = Object.prototype.hasOwnProperty;
 
 var data;
 var view;
@@ -28,7 +26,7 @@ var view;
 var outdir = path.normalize(env.opts.destination);
 
 function trimDoubleQuotes(s) {
-    var pattern = /^\"(.+)\"$/;
+    var pattern = /^"(.+)"$/;
     var m = pattern.exec(s);
     return m != null ? m[1] : s;
 }
@@ -75,26 +73,8 @@ function needsSignature(doclet) {
     return needsSig;
 }
 
-function getSignatureAttributes(item) {
-    var attributes = [];
-
-    if (item.optional) {
-        attributes.push('opt');
-    }
-
-    if (item.nullable === true) {
-        attributes.push('nullable');
-    }
-    else if (item.nullable === false) {
-        attributes.push('non-null');
-    }
-
-    return attributes;
-}
-
 function updateItemName(item) {
-    var itemName = item.name || '';
-    return itemName;
+  return item.name || '';
 }
 
 function addParamAttributes(params) {
@@ -122,57 +102,13 @@ function buildAttribsString(attribs) {
         attribsString = htmlsafe( util.format('(%s) ', attribs.join(', ')) );
     }
 
-    console.log("build attribs string: ", attribsString);
-
     return attribsString;
-}
-
-function addNonParamAttributes(items) {
-    var types = [];
-
-    items.forEach(function(item) {
-        types = types.concat( buildItemTypeStrings(item) );
-    });
-
-    return types;
 }
 
 function addSignatureParams(f) {
     var params = f.params ? addParamAttributes(f.params) : [];
 
     f.signature = util.format( '%s(%s)', (f.signature || ''), params.join(', ') );
-}
-
-function addSignatureReturns(f) {
-    var attribs = [];
-    var attribsString = '';
-    var returnTypes = [];
-    var returnTypesString = '';
-
-    // jam all the return-type attributes into an array. this could create odd results (for example,
-    // if there are both nullable and non-nullable return types), but let's assume that most people
-    // who use multiple @return tags aren't using Closure Compiler type annotations, and vice-versa.
-    if (f.returns) {
-        f.returns.forEach(function(item) {
-            helper.getAttribs(item).forEach(function(attrib) {
-                if (attribs.indexOf(attrib) === -1) {
-                    attribs.push(attrib);
-                }
-            });
-        });
-
-        attribsString = buildAttribsString(attribs);
-    }
-
-    if (f.returns) {
-        returnTypes = addNonParamAttributes(f.returns);
-    }
-    if (returnTypes.length) {
-        returnTypesString = util.format( ' &rarr; %s{%s}', attribsString, returnTypes.join('|') );
-    }
-
-    f.signature = '<span class="signature">' + (f.signature || '') + '</span>' +
-        '<span class="type-signature">' + returnTypesString + '</span>';
 }
 
 function addSignatureTypes(f) {
@@ -209,47 +145,80 @@ function getPathFromDoclet(doclet) {
         doclet.meta.filename;
 }
 
+function getSourceFromDoclet(doclet, gitRepoName) {
+  var path = doclet.meta.path.replace(/\\/g,"/");
+  var pathLength = path.length;
+
+  var nameLength = gitRepoName ? gitRepoName.length : 0;
+  var nameIndexOf = gitRepoName ? path.indexOf(gitRepoName) + 1 : 0;
+
+  return path.substring(nameIndexOf + nameLength, pathLength);
+}
+
 function getLinkFromDoclet(doclet) {
     if (!doclet.meta) {
         return null;
     }
 
-    var gitConfVersion = '' + env.opts.githubConfig.branch;
-    var gitConfCompany = '' + env.opts.githubConfig.company;
-    var gitConfName = '' + env.opts.githubConfig.name;
+    var filename = doclet.meta.filename;
+    var shortPath = doclet.meta.shortpath;
+    var lineNumber = doclet.meta.lineno;
 
-    var linkBase = 'https://github.com/' + gitConfCompany + '/' + gitConfName + '/';
-    var type = 'tree';
+    var repoName     = _getGitHubName();
+    var repoVersion  = _getGitHubBranch();
 
-    if (doclet.meta.shortpath && doclet.meta.shortpath !== 'null'
-            && doclet.meta.shortpath.indexOf('.js') != -1) {
-        type = 'blob';
-    }
+    var isJavascriptFile = shortPath && shortPath.indexOf('.js') !== -1;
+    var type = isJavascriptFile ? 'tree' : 'blob';
 
-    var path = doclet.meta.path.replace(/\\/g,"/");
-    path = path.substring(path.indexOf(gitConfName) + 4, path.length);
+    var path = getSourceFromDoclet(doclet, repoName);
+    var linkBase = _getGitHubUrl() + '/' + type + '/' + repoVersion + '/' + path;
 
-    linkBase = linkBase + '/' + type + '/' + gitConfVersion + '/' + path;
-
-    var fileName = doclet.meta.shortpath.indexOf('/') != -1 ?
-        doclet.meta.shortpath.substr(
-            doclet.meta.shortpath.lastIndexOf('/') + 1, 
-            doclet.meta.shortpath.length) :
-        doclet.meta.shortpath;
-    var url = linkBase + '/' + fileName;
-
-    var linkText = doclet.meta.shortpath;    
-
-    if (doclet.meta.lineno) {
-        url += '#L' + doclet.meta.lineno;
-        linkText += ', line ' + doclet.meta.lineno;
-    }
+    var url = linkBase + '/' + filename + (lineNumber ? '#L' + lineNumber : '');
+    var linkText = shortPath + (lineNumber ? ', line ' + lineNumber : '');
 
     return '<a href="' + url + '" target="_blank">' + linkText + '</a>';
 }
 
+function _getGitHubName() {
+  var config = env.opts.gitHubConfig;
+
+  if (config.name) {
+    return config.name;
+  }
+
+  if (config.url) {
+    var url = config.url.replace(/(^\/|\/$)/, '');
+    var lastSlash = url.lastIndexOf('/');
+
+    return lastSlash !== -1 ? url.substring(lastSlash, url.length) : url;
+  }
+
+  return null;
+}
+
+function _getGitHubBranch() {
+  var config = env.opts.gitHubConfig;
+
+  if (config.branch) {
+      return config.branch;
+  }
+
+  return 'master';
+}
+
+function _getGitHubUrl() {
+  var config = env.opts.gitHubConfig;
+
+  if (config.url) {
+    return config.url.replace(/\/$/, '');
+  }
+
+  var urlBase = "https://github.com/";
+  return urlBase + config.company + "/" + config.name;
+}
+
 function generate(title, docs, filename, resolveLinks) {
-    resolveLinks = resolveLinks === false ? false : true;
+    resolveLinks = resolveLinks !== false;
 
     var docData = {
         title: title,
@@ -264,29 +233,6 @@ function generate(title, docs, filename, resolveLinks) {
     }
 
     fs.writeFileSync(outpath, html, 'utf8');
-}
-
-function generateSourceFiles(sourceFiles, encoding) {
-    encoding = encoding || 'utf8';
-    Object.keys(sourceFiles).forEach(function(file) {
-        var source;
-        // links are keyed to the shortened path in each doclet's `meta.shortpath` property
-        var sourceOutfile = helper.getUniqueFilename(sourceFiles[file].shortened);
-        helper.registerLink(sourceFiles[file].shortened, sourceOutfile);
-
-        try {
-            source = {
-                kind: 'source',
-                code: helper.htmlsafe( fs.readFileSync(sourceFiles[file].resolved, encoding) )
-            };
-        }
-        catch(e) {
-            logger.error('Error while generating source file %s: %s', file, e.message);
-        }
-
-        generate('Source: ' + sourceFiles[file].shortened, [source], sourceOutfile,
-            false);
-    });
 }
 
 /**
@@ -328,14 +274,6 @@ function attachModuleSymbols(doclets, modules) {
                 });
         }
     });
-}
-
-function linktoTutorial(longName, name) {
-    return tutoriallink(name);
-}
-
-function linktoExternal(longName, name) {
-    return linkto(longName, name.replace(/(^"|"$)/g, ''));
 }
 
 function findMembers(data, kind, memberOf) {
@@ -465,7 +403,8 @@ exports.publish = function(taffyData, opts, tutorials) {
 
     var sourceFiles = {};
     var sourceFilePaths = [];
-    data().each(function(doclet) {
+    var data_exec = data();
+    data_exec.each(function(doclet) {
          doclet.attribs = '';
 
         if (doclet.examples) {
@@ -522,7 +461,7 @@ exports.publish = function(taffyData, opts, tutorials) {
      * Handle the defaul values for non optional properties correctly. 
      * 
      */
-    data().each(function(doclet) {
+    data_exec.each(function(doclet) {
         if (doclet.properties) {
             doclet.properties = doclet.properties.map(function(property) {
                 var separator = " - ",
@@ -595,7 +534,8 @@ exports.publish = function(taffyData, opts, tutorials) {
     if (sourceFilePaths.length) {
         sourceFiles = shortenPaths( sourceFiles, path.commonPrefix(sourceFilePaths) );
     }
-    data().each(function(doclet) {
+
+    data_exec.each(function(doclet) {
         var url = helper.createLink(doclet);
         helper.registerLink(doclet.longname, url);
 
@@ -616,7 +556,7 @@ exports.publish = function(taffyData, opts, tutorials) {
         }
     });
 
-    data().each(function(doclet) {
+    data_exec.each(function(doclet) {
         var url = helper.longnameToUrl[doclet.longname];
 
         if (url.indexOf('#') > -1) {
@@ -634,7 +574,7 @@ exports.publish = function(taffyData, opts, tutorials) {
     });
 
     // do this after the urls have all been generated
-    data().each(function(doclet) {
+    data_exec.each(function(doclet) {
         doclet.ancestors = getAncestorLinks(doclet);
 
         if (doclet.kind === 'member') {
@@ -650,7 +590,7 @@ exports.publish = function(taffyData, opts, tutorials) {
         }
     });
 
-    data().each(function(doclet) {
+    data_exec.each(function(doclet) {
         if(!doclet.ignore) {
             var parent = find({longname: doclet.memberof})[0];
             if( !parent ) {
@@ -668,7 +608,7 @@ exports.publish = function(taffyData, opts, tutorials) {
     });
 
     // handle summary, description and class description default values properly
-    data().each(function(doclet) {
+    data_exec.each(function(doclet) {
         if(!doclet.ignore) {
             if(!doclet.summary && (desc = (doclet.description || doclet.classdesc))) {
                 //Try to split when a "." or a ".</htmlTag>" is found.
@@ -708,7 +648,7 @@ exports.publish = function(taffyData, opts, tutorials) {
     });
 
     //handle splits and joins on names
-    data().each(function(doclet) {
+    data_exec.each(function(doclet) {
         if(!doclet.ignore) {
             var split = function(str, sep) {
                 if(str) {
