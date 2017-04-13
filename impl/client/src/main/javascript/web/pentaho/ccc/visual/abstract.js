@@ -1405,7 +1405,7 @@ define([
         }
 
         // Set, before, whenever lineWidth is defined.
-        var dotSize = 16;
+        var dotSize = 8;
         var dotRadius = 4;
 
         // Unfortunately, diamonds are slightly bigger than other shapes, and would overflow or touch the text.
