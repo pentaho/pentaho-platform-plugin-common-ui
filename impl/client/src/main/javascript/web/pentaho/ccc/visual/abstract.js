@@ -1405,14 +1405,15 @@ define([
         }
 
         // Set, before, whenever lineWidth is defined.
-        var dotSize = 8;
+        var dotSize = 16;
         var dotRadius = 4;
 
         // Unfortunately, diamonds are slightly bigger than other shapes, and would overflow or touch the text.
-        var shape = this.model.getv("shape", /* sloppy: */true);
-        var extraMargin = (shape === "diamond") || (shape === "triangle") ? 2 : 0;
+        var extraMargin = 1;
 
+        // [BACKLOG-15788] In 'pentaho/visual/config/vizApi.conf#L778' there is a configuration for "pentaho-cdf" that needs to match this values
         options.legendMarkerSize = 2 * (dotRadius + extraMargin);
+        options.legend$Dot_lineWidth = 0;
         options.legend$Dot_shapeSize = dotSize;
       },
       // endregion
