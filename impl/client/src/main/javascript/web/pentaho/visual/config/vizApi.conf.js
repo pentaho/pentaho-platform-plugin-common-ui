@@ -250,16 +250,6 @@ define(function() {
             numericAxisTickFormatter: function(value, precision) {
               return getNumberFormatter(precision, this.base)(value);
             },
-            // Disable "smart" Date value type on discrete cartesian axis formatting...
-            discreteAxisTickFormatter: function(value, absLabel) {
-              if(arguments.length > 2) {
-                // Being called for discrete scale / Date formatting...
-                return String(value);
-              }
-
-              // Normal discrete formatting.
-              return absLabel;
-            },
 
             // . grid
             axisGrid: false,
@@ -853,7 +843,18 @@ define(function() {
             // This is "fine-tuned" so that Analyzer's default 12px font, the xAxisBandSizeMin of 18px,
             // and the 40º slanted labels, don't cause ticks to hide. Only if font size is increased,
             // will that happen.
-            discreteAxisLabelSpacingMin: 0
+            discreteAxisLabelSpacingMin: 0,
+
+            // Disable "smart" Date value type on discrete cartesian axis formatting...
+            discreteAxisTickFormatter: function(value, absLabel) {
+              if(arguments.length > 2) {
+                // Being called for discrete scale / Date formatting...
+                return String(value);
+              }
+
+              // Normal discrete formatting.
+              return absLabel;
+            }
           }
         }
       },
