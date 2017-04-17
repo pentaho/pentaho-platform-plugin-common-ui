@@ -775,8 +775,12 @@ define(function() {
 
             // Legend defaults
             // By UX design spec, line-width: 2 => radius: 4
+            // [BACKLOG-15788] In "pentaho/ccc/visual/abstract.js#L1414" the code is calculating this properties' values
+            // and they need to match the ones in this configuration
             legend$Dot_shapeSize: 16, // = radius * radius
+            legend$Dot_lineWidth: 0,
             legendMarkerSize:      8  // = diameter = 2 * radius
+
           }
         }
       },
