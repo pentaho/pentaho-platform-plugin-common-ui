@@ -21,7 +21,7 @@ define([
 
   "use strict";
 
-  var sandboxContainer = document.getElementById(".sandbox-container");
+  var sandboxContainer = document.getElementById("sandbox-container");
 
   var dataTable = new Table({
     model: [
