@@ -26,7 +26,10 @@
  * Usually, the event payload is of type {@link pentaho.lang.Event},
  * but other object types are acceptable.
  *
+ * @see pentaho.lang.IEventObserver
+ * @see pentaho.lang.EventListenerAsync
+ *
  * @callback pentaho.lang.EventListener
  *
- * @param {Object} [event] The event payload, if any.
+ * @param {object} event The event payload.
  */

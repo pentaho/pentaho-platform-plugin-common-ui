@@ -17,7 +17,7 @@
 /**
  * The `ITarget` interface represents the entity _where_ an
  * [action]{@link pentaho.type.action.Base} takes place,
- * or the pacient/object of action.
+ * or the patient/object of action.
  *
  * @name pentaho.type.action.ITarget
  *

@@ -39,7 +39,7 @@ define([
      * @class
      * @extends pentaho.type.Element.Type
      *
-     * @classDesc The base type class of actions.
+     * @classDesc The base class of action types.
      *
      * For more information see {@link pentaho.type.action.Base}.
      */
@@ -82,12 +82,12 @@ define([
        *
        * @amd {pentaho.type.Factory<pentaho.type.action.Base>} pentaho/type/action/base
        *
-       * @classDesc The base class of action types.
+       * @classDesc The base class of actions.
        *
        * @description Creates an action instance given its specification.
        *
        * @constructor
-       * @param {pentaho.type.action.spec.IAction} [spec] An action specification.
+       * @param {pentaho.type.action.spec.IBase} [spec] An action specification.
        */
       constructor: function(spec) {
         /**

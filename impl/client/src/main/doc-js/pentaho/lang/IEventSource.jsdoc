@@ -1,0 +1,159 @@
+/*!
+ * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @classdesc The `IEventSource` interface represents objects that emit events.
+ *
+ * ##### The structure of events
+ *
+ * Events are identified by their type and can be "structured" or not.
+ *
+ * Structured events go through multiple-phases,
+ * while unstructured events have no phases (or can be seen to have a single phase).
+ *
+ * The following are examples of the phases of hypothetical structured events:
+ *
+ * * "before" and "after"
+ * * "capture" and "bubble"
+ * * "init", "success" and "failure"
+ *
+ * The order and logic of occurrence of each of the phases is specific to each event and should
+ * be documented along with it.
+ * The occurrence of event phases can be conditional, and event phases can be synchronous or asynchronous.
+ *
+ * ##### Listening to events
+ *
+ * [Event observers]{@link pentaho.lang.IEventObserver} are maps of event listener functions,
+ * one for each relevant phase of an event, and is used to register for the emissions of a structured event.
+ *
+ * Event listener functions, which can be
+ * [synchronous]{@link pentaho.lang.EventListener} or
+ * [asynchronous]{@link pentaho.lang.EventListenerAsync},
+ * are used to register for the emissions of an unstructured event.
+ *
+ * The listener functions are called with a single `object` argument,
+ * that represents the specific event emission.
+ * The specific type of this argument is not mandated,
+ * however, the provided [Event]{@link pentaho.lang.Event} class is a reasonable choice for unstructured events,
+ * and is used for events of many of the Web Client Framework classes.
+ *
+ * This interface exposes methods for the registration and
+ * unregistration of event observers (or listeners),
+ * [on]{@link pentaho.lang.EventSource#on} and
+ * [off]{@link pentaho.lang.EventSource#off},
+ * respectively.
+ *
+ * @example
+ *    // An hypothetical event source.
+ *    var car = new MyCar();
+ *
+ *    // Register for an unstructured event
+ *    car.on("validate", function(ev) {
+ *      // Do validation of this car instance.
+ *    });
+ *
+ *    // Register for a structured event
+ *    car.on("start", {
+ *      will: function(ev) {
+ *        // About to start the engine.
+ *      },
+ *      did: function(ev) {
+ *        // The engine has started!
+ *      },
+ *    });
+ *
+ * @name pentaho.lang.IEventSource
+ * @interface
+ *
+ * @see pentaho.lang.IEventObserver
+ * @see pentaho.lang.EventListener
+ * @see pentaho.lang.EventListenerAsync
+ * @see pentaho.lang.IEventRegistrationHandle
+ *
+ * @see pentaho.lang.Event
+ * @see pentaho.lang.EventSource
+ */
+
+/**
+ * Registers an observer (or listener function) for an event(s) of a given type(s).
+ *
+ * Optionally, a _listening priority_ may be specified to adjust
+ * the order by which an observer is notified, relative to other listeners.
+ *
+ * Note that if an observer is registered more than once to the same event type,
+ * a **new registration** is created each time and its listeners will be called
+ * once per registration.
+ *
+ * It is safe to register for an event type while it is being emitted.
+ * However, new registrations are only taken into account in subsequent emissions.
+ *
+ * When `type` represents multiple event types,
+ * the returned event registration handle is a
+ * composite registration for all of the event types.
+ *
+ * This method is compatible with the
+ * [dojo/on]{@link https://dojotoolkit.org/reference-guide/dojo/on.html} API.
+ *
+ * @see pentaho.lang.IEventSource#off
+ *
+ * @name on
+ * @memberOf pentaho.lang.IEventSource#
+ *
+ * @param {nonEmptyString|nonEmptyString[]} type - The type or types of events.
+ * When a string, it can be a comma-separated list of event types.
+ * @param {!pentaho.lang.IEventObserver|!pentaho.lang.EventListener|!pentaho.lang.EventListenerAsync} observer -
+ * The event observer (or listener function).
+ * @param {?object} [keyArgs] - Keyword arguments.
+ * @param {?number} [keyArgs.priority=0] - The listening priority.
+ * Higher priority observers are notified of an event before any lower priority observers.
+ * The priority can be set to `-Infinity` or `Infinity`.
+ * In case two observers are assigned the same priority,
+ * the registration order determines which is notified first.
+ *
+ * @return {!pentaho.lang.IEventRegistrationHandle} An event registration handle that can be used
+ *   for later removal.
+ */
+
+/**
+ * Removes one registration given its handle,
+ * or all registrations of a given event type (or types) and observer (or listener function).
+ *
+ * To remove an event registration,
+ * it is sufficient to call the [dispose]{@link pentaho.lang.IEventRegistrationHandle#dispose} method
+ * of the registration handle returned by [on]{@link pentaho.lang.IEventSource#on},
+ * upon registration.
+ * Alternatively, as a convenience syntax,
+ * the registration handle can be passed as the single argument to this method.
+ *
+ * It is safe to unregister from an event type while it is being emitted.
+ * However, removed registrations are still taken into account in the current emission.
+ *
+ * Specifying an event registration handle that has already been disposed of has no effect.
+ * Specifying an event type and observer (or listener function) that have no registrations has no effect.
+ *
+ * @see pentaho.lang.IEventSource#on
+ *
+ * @name off
+ * @memberOf pentaho.lang.IEventSource#
+ *
+ * @param {nonEmptyString|nonEmptyString[]|!pentaho.lang.IEventRegistrationHandle} typeOrHandle -
+ * The type or types of events, or an event registration handle to dispose of.
+ * When a string, it can be a comma-separated list of event types.
+ *
+ * @param {pentaho.lang.IEventObserver|pentaho.lang.EventListener|pentaho.lang.EventListenerAsync} observer -
+ * The event observer (or listener function).
+ * Required when `typeOrHandle` is not an event registration handle; ignored, otherwise.
+ */

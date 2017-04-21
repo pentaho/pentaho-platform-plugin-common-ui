@@ -19,4 +19,8 @@
  *
  * @name pentaho.lang.IEventObserver
  * @interface
+ *
+ * @see pentaho.lang.IEventSource
+ * @see pentaho.lang.EventListener
+ * @see pentaho.lang.EventListenerAsync
  */
