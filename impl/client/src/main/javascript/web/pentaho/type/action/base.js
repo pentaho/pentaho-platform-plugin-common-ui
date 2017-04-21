@@ -73,16 +73,149 @@ define([
         // endregion
       },
 
-      // TODO: review this doclet. Create pentaho.type.action.spec.IBase
+      // TODO: Create pentaho.type.action.spec.IBase
       /**
        * @alias Base
        * @memberOf pentaho.type.action
        * @class
        * @extends pentaho.type.Element
+       * @abstract
        *
        * @amd {pentaho.type.Factory<pentaho.type.action.Base>} pentaho/type/action/base
        *
-       * @classDesc The base class of actions.
+       * @classDesc The `action.Base` class represents a certain model of actions.
+       *
+       * The associated type class provides a way to express metadata and to be configured.
+       *
+       * This class -- the instance class --, manages the execution of the action
+       * and enforces the multiple phases by which all actions, generically, go through:
+       * "init", "will", "do", and "finally".
+       *
+       * ##### Synchronous and Asynchronous actions
+       *
+       * An action can be synchronous or asynchronous, as determined by the type property,
+       * [Base.Type#isSync]{@link pentaho.type.action.Base.Type#isSync}.
+       *
+       * The execution of a synchronous action is fully completed synchronously.
+       * An asynchronous action, however, has an asynchronous "do" phase,
+       * and thus only fully completes asynchronously.
+       *
+       * To support these two kinds of actions, two execution methods exist,
+       * [execute]{@link pentaho.type.action.Base#execute} and
+       * [executeAsync]{@link pentaho.type.action.Base#executeAsync}.
+       * For an unknown kind of action,
+       * use the former if you do not care about the outcome of the action execution
+       * and the latter if you do.
+       *
+       * ##### Action model
+       *
+       * 1. When an action is constructed, it is in the [candidate]{@link pentaho.type.action.States#candidate} state.
+       *    It merely represents a possible, or candidate, action that can be executed.
+       *
+       *    At this point, it has no associated [target]{@link pentaho.type.action.Base#target}
+       *    or [_executor]{@link pentaho.type.action.Base#_executor}.
+       *
+       *    Its [label]{@link pentaho.type.action.Base#label} and
+       *    [description]{@link pentaho.type.action.Base#description},
+       *    and anything else that defines exactly what the action ultimately does,
+       *    can still be freely modified.
+       *
+       *    In this state, the action cannot be marked
+       *    [done]{@link pentaho.type.action.Base#done} or be
+       *    [rejected]{@link pentaho.type.action.Base#reject}.
+       *
+       * 2. When either
+       *    the [execute]{@link pentaho.type.action.Base#execute} or
+       *    the [executeAsync]{@link pentaho.type.action.Base#executeAsync} method is called,
+       *    the action enters the **init** phase and is set to the [init]{@link pentaho.type.action.States#init} state.
+       *
+       *    The action's [target]{@link pentaho.type.action.Base#target} and
+       *    [_executor]{@link pentaho.type.action.Base#_executor} are set to the ones provided as arguments in
+       *    the said methods.
+       *
+       *    The [_onPhaseInit]{@link pentaho.type.action.Base#_onPhaseInit} method is called,
+       *    which, by default,
+       *    delegates to the set [executor]{@link pentaho.type.action.Base#_executor}, if any,
+       *    by calling its [init]{@link pentaho.type.action.IObserver#init} method.
+       *
+       *    The action's [label]{@link pentaho.type.action.Base#label} and
+       *    [description]{@link pentaho.type.action.Base#description},
+       *    and anything else that defines exactly what the action ultimately does,
+       *    can still be freely modified.
+       *
+       *    The action can be marked [rejected]{@link pentaho.type.action.Base#reject},
+       *    in which case it is set to either
+       *    the [canceled]{@link pentaho.type.action.States#canceled} or
+       *    the [failed]{@link pentaho.type.action.States#failed} state,
+       *    and the **finally** phase is entered.
+       *
+       *    Otherwise, the action automatically transits to the _will_ phase.
+       *
+       * 3. In the **will** phase, what the action will do,
+       *    along with its
+       *    [label]{@link pentaho.type.action.Base#label} and
+       *    [description]{@link pentaho.type.action.Base#description},
+       *    is now settled and cannot be changed anymore --
+       *    an action can now be canceled based on what exactly it will do.
+       *
+       *    The action is set to the [will]{@link pentaho.type.action.States#will} state.
+       *
+       *    From now on,
+       *    calling [isEditable]{@link pentaho.type.action.Base#isEditable} will return `false`
+       *    and calling [_assertEditable]{@link pentaho.type.action.Base#_assertEditable} will throw an error.
+       *
+       *    The [_onPhaseWill]{@link pentaho.type.action.Base#_onPhaseWill} method is called,
+       *    which, by default,
+       *    delegates to the set [executor]{@link pentaho.type.action.Base#_executor}, if any,
+       *    by calling its [will]{@link pentaho.type.action.IObserver#will} method.
+       *
+       *    The action can be marked [rejected]{@link pentaho.type.action.Base#reject},
+       *    in which case it is set to either
+       *    the [canceled]{@link pentaho.type.action.States#canceled} or
+       *    the [failed]{@link pentaho.type.action.States#failed} state,
+       *    and the **finally** phase is entered.
+       *
+       *    Otherwise, the action automatically transits to the _do_ phase.
+       *
+       * 4. In the **do** phase, the action execution, proper, is carried out.
+       *    The action is set to the [do]{@link pentaho.type.action.States#do} state.
+       *
+       *    The [_onPhaseDo]{@link pentaho.type.action.Base#_onPhaseDo} method is called,
+       *    which, by default,
+       *    delegates to the set [executor]{@link pentaho.type.action.Base#_executor}, if any,
+       *    by calling its [do]{@link pentaho.type.action.IObserver#do} method.
+       *
+       *    The action cannot be canceled anymore, but can, however, be marked _failed_,
+       *    by [rejecting]{@link pentaho.type.action.Base#reject} it with a runtime error,
+       *    in which case it is set to the [failed]{@link pentaho.type.action.States#failed} state,
+       *    and the **finally** phase is entered.
+       *
+       *    Alternatively, the action can be marked [done]{@link pentaho.type.action.Base#done}.
+       *
+       *    If after calling `_onPhaseDo` the action is not yet done or rejected,
+       *    the [_doDefault]{@link pentaho.type.action.Base#_doDefault} is called,
+       *    allowing the action class to provide a default implementation.
+       *
+       *    Finally, the action is set to the [did]{@link pentaho.type.action.States#did} state,
+       *    and the _finally_ phase is entered.
+       *
+       * 5. When in the **finally** phase, the action is [finished]{@link pentaho.type.action.Base#isFinished},
+       *    with our without success,
+       *    and is in one of the
+       *    [canceled]{@link pentaho.type.action.States#canceled},
+       *    [failed]{@link pentaho.type.action.States#failed} or
+       *    [did]{@link pentaho.type.action.States#did}
+       *    states.
+       *
+       *    The [_onPhaseFinally]{@link pentaho.type.action.Base#_onPhaseFinally} method is called,
+       *    which, by default,
+       *    delegates to the set [executor]{@link pentaho.type.action.Base#_executor}, if any,
+       *    by calling its [finally]{@link pentaho.type.action.IObserver#finally} method.
+       *
+       *    If the action was [done]{@link pentaho.type.action.Base#isDone},
+       *    an action [result]{@link pentaho.type.action.Base#result} may be available,
+       *    while if the action was [rejected]{@link pentaho.type.action.Base#isRejected},
+       *    an action [error]{@link pentaho.type.action.Base#error} may be available.
        *
        * @description Creates an action instance given its specification.
        *
@@ -171,6 +304,22 @@ define([
        */
       get target() {
         return this.__target;
+      },
+
+      /**
+       * Gets the executor to which the actual action execution is delegated.
+       *
+       * This property contains the value of the `executor` argument passed to
+       * [execute]{@link pentaho.type.action.Base#execute} or
+       * [executeAsync]{@link pentaho.type.action.Base#executeAsync},
+       * and is `null` before execution.
+       *
+       * @type {pentaho.type.action.IObserver}
+       * @readonly
+       * @protected
+       */
+      get _executor() {
+        return this.__executor;
       },
 
       /**
@@ -394,9 +543,9 @@ define([
        * Gets a value that indicates if the action has finished execution.
        *
        * An action has finished execution if its state is one of
-       * [init]{@link pentaho.type.action.States.did},
-       * [will]{@link pentaho.type.action.States.canceled} or
-       * [do]{@link pentaho.type.action.States.failed}.
+       * [did]{@link pentaho.type.action.States.did},
+       * [canceled]{@link pentaho.type.action.States.canceled} or
+       * [failed]{@link pentaho.type.action.States.failed}.
        *
        * @type {boolean}
        * @readonly
@@ -417,7 +566,7 @@ define([
        * This promise can be requested anytime,
        * before starting execution, during execution, or after finishing execution of this action.
        * Also, it can be requested whether or not the action is
-       * [synchronous]{@link pentaho.type.action.Base#isSync} or asynchronous.
+       * [synchronous]{@link pentaho.type.action.Base.Type#isSync} or asynchronous.
        *
        * The promise is fulfilled with the action's [result]{@link pentaho.type.action.Base#result}
        * or rejected with the action's [error]{@link pentaho.type.action.Base#error}.
@@ -475,6 +624,8 @@ define([
        *
        * @param {!pentaho.type.action.ITarget} target - The action's target.
        * @param {pentaho.type.action.IObserver} [executor] - An action observer to act as action controller/executor.
+       * Unlike with normal event/action observers, the functions of executor observers are called with the executor
+       * as the value of the JavaScript `this` context.
        *
        * @return {!pentaho.type.action.Base} The value of `this`.
        *
@@ -498,6 +649,8 @@ define([
        *
        * @param {!pentaho.type.action.ITarget} target - The action's target.
        * @param {pentaho.type.action.IObserver} [executor] - An action observer to act as action controller/executor.
+       * Unlike with normal event/action observers, the functions of executor observers are called with the executor
+       * as the value of the JavaScript `this` context.
        *
        * @return {!Promise} A promise that is fulfilled with the action's
        * [result]{@link pentaho.type.action.Base#result} or rejected with the action's

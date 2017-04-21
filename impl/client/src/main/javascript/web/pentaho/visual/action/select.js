@@ -47,7 +47,7 @@ define([
         /**
          * Gets or sets the _default selection mode_ of this action.
          *
-         * The default selection mode is {@link pentaho.visual.action.SelectionModes.replace}.
+         * The default selection mode is {@link pentaho.visual.action.SelectionModes#replace}.
          *
          * Setting to a {@link Nully} value assumes the default selection mode.
          *
@@ -99,7 +99,7 @@ define([
        *
        * Can only be set while the action is in an [editable]{@link pentaho.type.action.Base#isEditable} state.
        *
-       * The default selection mode is {@link pentaho.visual.action.SelectionModes.replace}.
+       * The default selection mode is {@link pentaho.visual.action.SelectionModes#replace}.
        *
        * Setting to a {@link Nully} value assumes the default selection mode.
        *
