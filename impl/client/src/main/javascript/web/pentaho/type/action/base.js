@@ -742,7 +742,22 @@ define([
         return this.__executor;
       },
 
-      // region Action Execution Control
+      /**
+       * Performs the default "action" of this action.
+       *
+       * When the action is [asynchronous]{@link pentaho.type.action.Base.Type#isSync},
+       * this method _may_ return a promise. If the promise is rejected,
+       * the action is rejected with the rejection reason.
+       * However, if the promise is fulfilled, its value is always *ignored*.
+       *
+       * @return {?Promise} - A promise for the completion of the default action of an asynchronous action, or `null`.
+       */
+      _doDefault: function() {
+        // noop
+        return null;
+      },
+
+      // region Execution Control
       /**
        * Called from an action observer to mark the action as being done, optionally given a result value.
        *
@@ -804,7 +819,8 @@ define([
        *   // ...
        * });
        *
-       * @param {string|Error} [reason] - The result of the action, if any.
+       * @param {string|Error} [reason] - The reason for the rejection.
+       *
        * @return {pentaho.type.action.Base} The value of `this`.
        *
        * @throws {pentaho.lang.OperationInvalidError} When canceling and the action is not in one of the states
@@ -864,7 +880,8 @@ define([
       },
 
       /**
-       * Actually executes an action.
+       * Sets the executor and dispatches the execution of the action
+       * to either the synchronous or asynchronous lifecycle.
        *
        * @param {pentaho.type.action.IObserver} executor - An action observer to act as action controller/executor.
        *
@@ -882,7 +899,7 @@ define([
       },
 
       /**
-       * Actually executes a **synchronous** action.
+       * Performs the **synchronous** action lifecycle.
        *
        * @private
        */
@@ -907,7 +924,7 @@ define([
       },
 
       /**
-       * Actually executes an **asynchronous** action.
+       * Performs the **asynchronous** action lifecycle.
        *
        * @private
        */
@@ -936,15 +953,17 @@ define([
         (promiseFinished || Promise.resolve()).then(this.__executePhaseFinally.bind(this));
       },
 
-      __rejectFinal: function(reason) {
-        try {
-          this.__reject(reason);
-        } catch(ex) {
-          // Reason was a cancellation, which is invalid during do. Only failure, allowed.
-          this.__reject(ex);
-        }
-      },
-
+      /**
+       * Rejects the action with a given reason.
+       *
+       * An error is thrown when the given reason constitutes a cancellation and only failures are
+       * allowed in the current state.
+       *
+       * @param {string|Error} [reason] - The reason for the rejection.
+       *
+       * @throws {pentaho.lang.OperationInvalidError} When canceling and the action is not in one of the states
+       * [init]{@link pentaho.type.action.States.init} or [will]{@link pentaho.type.action.States.will}.
+       */
       __reject: function(reason) {
 
         // Depends
@@ -976,10 +995,30 @@ define([
         this.__result = undefined;
       },
 
+      /**
+       * Rejects the action with a given reason and,
+       * if that fails due to a cancellation not currently being a valid operation,
+       * fails the action.
+       *
+       * @param {string|Error} [reason] - The reason for the rejection.
+       */
+      __rejectFinal: function(reason) {
+        try {
+          this.__reject(reason);
+        } catch(ex) {
+          // Reason was a cancellation, which is invalid during do. Only failure, allowed.
+          this.__reject(ex);
+        }
+      },
+
       // region Private __executePhase* Methods
       /**
-       * Handles execution of the `init` phase.
-       * Used by both synchronous and asynchronous action kinds.
+       * Executes the **init** phase.
+       *
+       * Changes the state to [init]{@link pentaho.type.action.States.init}
+       * and delegates to [_onPhaseInit]{@link pentaho.type.action.Base#_onPhaseInit}.
+       *
+       * Used by both the synchronous and the asynchronous action kinds.
        */
       __executePhaseInit: function() {
 
@@ -988,6 +1027,14 @@ define([
         this._onPhaseInit();
       },
 
+      /**
+       * Executes the **will** phase.
+       *
+       * Changes the state to [will]{@link pentaho.type.action.States.will}
+       * and delegates to [_onPhaseWill]{@link pentaho.type.action.Base#_onPhaseWill}.
+       *
+       * Used by both the synchronous and the asynchronous action kinds.
+       */
       __executePhaseWill: function() {
 
         this.__state = States.will;
@@ -995,6 +1042,18 @@ define([
         this._onPhaseWill();
       },
 
+      /**
+       * Executes the **do** phase.
+       *
+       * Changes the state to [do]{@link pentaho.type.action.States.do}
+       * and delegates to [_onPhaseDo]{@link pentaho.type.action.Base#_onPhaseDo},
+       * after which, in case the action is still executing,
+       * calls the [_doDefault]{@link pentaho.type.action.Base#_doDefault} method.
+       *
+       * Used by both the synchronous and the asynchronous action kinds.
+       *
+       * @return {?Promise} A promise to the completion of an asynchronous _do_ phase or `null`.
+       */
       __executePhaseDo: function() {
 
         this.__state = States["do"];
@@ -1014,6 +1073,21 @@ define([
         }
       },
 
+      /**
+       * Executes the **finally** phase.
+       *
+       * If the action is still executing, calls [done]{@link pentaho.type.action.Base#done},
+       * with an `undefined` result.
+       *
+       * Delegates to [_onPhaseFinally]{@link pentaho.type.action.Base#_onPhaseFinally}.
+       * Any error thrown by it is simply caught and logged.
+       *
+       * Finally, the [executor]{@link pentaho.type.action.Base#_executor} object, if any, is released
+       * and the action [promise]{@link pentaho.type.action.Base#promise}, if previously requested,
+       * is resolved.
+       *
+       * Used by both the synchronous and the asynchronous action kinds.
+       */
       __executePhaseFinally: function() {
 
         if(this.isExecuting) {
@@ -1048,8 +1122,10 @@ define([
 
       // region Protected _onPhase* methods
       /**
-       * Performs the action's _initialize_ phase,
-       * by calling the executor's `init` listener, if any.
+       * Called during the action's **initialize** phase.
+       *
+       * The default implementation calls the executor's
+       * [init]{@link pentaho.type.action.IObserver#init} listener, if any.
        *
        * @protected
        */
@@ -1061,8 +1137,10 @@ define([
       },
 
       /**
-       * Performs the action's _will_ phase,
-       * by calling the executor's `will` listener, if any.
+       * Called during the action's _will_ phase.
+       *
+       * The default implementation calls the executor's
+       * [will]{@link pentaho.type.action.IObserver#will} listener, if any.
        *
        * @protected
        */
@@ -1074,8 +1152,10 @@ define([
       },
 
       /**
-       * Performs the action's _do_ phase,
-       * by calling the executor's `do` listener, if any.
+       * Called during the action's **do** phase.
+       *
+       * The default implementation calls the executor's
+       * [do]{@link pentaho.type.action.IObserver#do} listener, if any.
        *
        * @return {?Promise} A promise to the completion of the asynchronous `do` listener,
        * of an [asynchronous]{@link pentaho.type.action.Base.Type#isSync} action, or `null`.
@@ -1090,23 +1170,10 @@ define([
       },
 
       /**
-       * Performs the default "action" of this action.
+       * Called during the action's **finally** phase.
        *
-       * When the action is [asynchronous]{@link pentaho.type.action.Base.Type#isSync},
-       * this method _may_ return a promise. If the promise is rejected,
-       * the action is rejected with the rejection reason.
-       * However, if the promise is fulfilled, its value is always *ignored*.
-       *
-       * @return {?Promise} - A promise for the completion of the default action of an asynchronous action, or `null`.
-       */
-      _doDefault: function() {
-        // noop
-        return null;
-      },
-
-      /**
-       * Performs the action's _finally_ phase,
-       * by calling the executor's `finally` listener, if any.
+       * The default implementation calls the executor's
+       * [finally]{@link pentaho.type.action.IObserver#finally} listener, if any.
        *
        * @protected
        */
