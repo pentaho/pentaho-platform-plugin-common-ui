@@ -44,5 +44,4 @@
  * @name isSync
  * @memberOf pentaho.type.action.spec.IBaseTypeProto#
  * @type {boolean}
- * @readOnly
  */

@@ -15,17 +15,20 @@
  */
 
 /**
- * The selection mode is a function that determines how the selection made by the user,
- * contained in [dataFilter]{@link pentaho.visual.action.Data#dataFilter},
- * is merged with the view's current selection,
- * [selectionFilter]{@link pentaho.visual.base.View#selectionFilter}.
+ * The `visual.action.spec.IData` interface describes a data action instance using a generic, _object_ form.
  *
- * The selection mode function is called with a `this` context being the target view.
+ * @name pentaho.visual.action.spec.IData
  *
- * @callback pentaho.visual.action.SelectionMode
+ * @interface
+ * @extends pentaho.type.action.spec.IBase
+ */
+
+/**
+ * The data filter of the action instance.
  *
- * @param {pentaho.type.filter.Abstract} current - The view's current selection filter.
- * @param {pentaho.type.filter.Abstract} input - The user input data filter.
+ * When unspecified, the action targets the whole dataset.
  *
- * @return {pentaho.type.filter.Abstract} The resulting filter.
+ * @name dataFilter
+ * @memberOf pentaho.visual.action.spec.IData#
+ * @type {pentaho.type.filter.spec.IAbstract|pentaho.type.filter.Abstract}
  */

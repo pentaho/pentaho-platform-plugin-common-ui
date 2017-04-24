@@ -103,7 +103,7 @@ define([
         },
         // endregion
 
-        // region Serialization
+        // region serialization
         _fillSpecInContext: function(spec, keyArgs) {
 
           var any = this.base(spec, keyArgs);

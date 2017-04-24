@@ -51,10 +51,15 @@ define([
        * @memberOf pentaho.visual.action
        * @class
        * @extends pentaho.type.action.Base
+       * @abstract
        *
        * @amd {pentaho.type.Factory<pentaho.visual.action.Data>} pentaho/visual/action/data
        *
-       * @classDesc The base class of data action types.
+       * @classDesc The `visual.action.Data` class is the base class of action types
+       * which are performed on a subset of a dataset and
+       * whose [target]{@link pentaho.visual.action.Data#target} is a [View]{@link pentaho.visual.base.View}.
+       *
+       * The actual subset is determined by the [data filter]{@link pentaho.visual.action.Data#dataFilter} property.
        *
        * @description Creates a data action instance given its specification.
        * @param {pentaho.visual.action.spec.IData} [spec] A data action specification.
@@ -114,10 +119,22 @@ define([
          * The data filter of the action.
          *
          * @type {pentaho.type.filter.Abstract}
+         * @memberOf pentaho.visual.action.Data#
          * @private
          */
         this.__dataFilter = AbstractFilter.type.to(value);
+      },
+
+      // region serialization
+      toSpecInContext: function(keyArgs) {
+
+        var spec = this.base(keyArgs);
+
+        if(this.__dataFilter) spec.dataFilter = this.__dataFilter.toSpecInContext(keyArgs);
+
+        return spec;
       }
+      // endregion
     });
   };
 });

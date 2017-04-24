@@ -15,34 +15,20 @@
  */
 
 /**
- * The `spec.IBase` interface describes an action instance using a generic, _object_ form.
+ * The `visual.action.spec.ISelectProto` interface represents the specification of the
+ * prototype of a selection action type's instance class.
  *
- * @name pentaho.type.action.spec.IBase
- *
+ * @name pentaho.visual.action.spec.ISelectProto
  * @interface
- * @extends pentaho.type.spec.IValue
+ * @extends pentaho.type.action.spec.IBaseProto
  */
 
 /**
- * The label of the action instance.
+ * The extensible/configurable members of the prototype of the selection action type class.
  *
- * When unspecified,
- * the label of the action type,
- * {@link pentaho.type.Type#label}, is used.
+ * @name type
+ * @memberOf pentaho.visual.action.spec.ISelectProto#
+ * @type {pentaho.visual.action.spec.ISelectTypeProto}
  *
- * @name label
- * @memberOf pentaho.type.action.spec.IBase#
- * @type {nonEmptyString}
- */
-
-/**
- * The description of the action instance.
- *
- * When unspecified,
- * the description of the action type,
- * {@link pentaho.type.Type#description}, is used.
- *
- * @name description
- * @memberOf pentaho.type.action.spec.IBase#
- * @type {nonEmptyString}
+ * @see pentaho.visual.action.spec.ISelectTypeProto#instance
  */
