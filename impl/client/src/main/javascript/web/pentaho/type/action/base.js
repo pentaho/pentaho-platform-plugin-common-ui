@@ -339,37 +339,7 @@ define([
         this.__promiseControl = null;
       },
 
-      /**
-       * Gets the target where the action is executing or has executed.
-       *
-       * This property contains the value of the `target` argument passed to
-       * [execute]{@link pentaho.type.action.Base#execute} or
-       * [executeAsync]{@link pentaho.type.action.Base#executeAsync},
-       * and is `null` before execution.
-       *
-       * @type {pentaho.type.action.ITarget}
-       * @readonly
-       */
-      get target() {
-        return this.__target;
-      },
-
-      /**
-       * Gets the executor to which the actual action execution is delegated.
-       *
-       * This property contains the value of the `executor` argument passed to
-       * [execute]{@link pentaho.type.action.Base#execute} or
-       * [executeAsync]{@link pentaho.type.action.Base#executeAsync},
-       * and is `null` before execution.
-       *
-       * @type {pentaho.type.action.IObserver}
-       * @readonly
-       * @protected
-       */
-      get _executor() {
-        return this.__executor;
-      },
-
+      // region Action Description
       /**
        * Gets or sets the label of this action.
        *
@@ -411,6 +381,7 @@ define([
         this._assertEditable();
         this.__description = nonEmptyString(value);
       },
+      // endregion
 
       // region Action state and result, predicates and get/set properties
 
@@ -607,7 +578,7 @@ define([
       },
       // endregion
 
-      // region Execution
+      // region promise
       /**
        * Gets a promise for the result (or error) of this action's execution, if ever.
        *
@@ -661,7 +632,9 @@ define([
           return promiseControl;
         }
       },
+      // endregion
 
+      // region Execution - Main
       /**
        * Executes the action on a given target and, optionally, with a given executor,
        * and does not wait for its outcome.
@@ -720,108 +693,20 @@ define([
         return this.promise;
       },
 
+      // region target
       /**
-       * Setups the target and validates if the action can start executing.
+       * Gets the target where the action is executing or has executed.
        *
-       * Throws if the action execution cannot start.
+       * This property contains the value of the `target` argument passed to
+       * [execute]{@link pentaho.type.action.Base#execute} or
+       * [executeAsync]{@link pentaho.type.action.Base#executeAsync},
+       * and is `null` before execution.
        *
-       * @param {!pentaho.type.action.ITarget} target - The action's target.
-       *
-       * @throws {Error} When the action execution cannot start.
-       *
-       * @private
+       * @type {pentaho.type.action.ITarget}
+       * @readonly
        */
-      __validateAction: function(target) {
-
-        // Take care to test the correct state before overwriting the current promise.
-        // Also, need to return a different promise in this case.
-        this.__assertStates(States.candidate);
-
-        try {
-          this._setTarget(target);
-        } catch(ex) {
-          this.__target = null;
-          throw ex;
-        }
-
-        var errors = this.validate();
-        if(errors && errors.length) {
-          this.__target = null;
-          throw errors[0];
-        }
-      },
-
-      /**
-       * Actually executes an action.
-       *
-       * @param {pentaho.type.action.IObserver} executor - An action observer to act as action controller/executor.
-       *
-       * @private
-       */
-      __executeAction: function(executor) {
-
-        this.__executor = executor || null;
-
-        if(this.type.isSync) {
-          this.__executeSyncAction();
-        } else {
-          this.__executeAsyncAction();
-        }
-      },
-
-      /**
-       * Actually executes an asynchronous action.
-       *
-       * @private
-       */
-      __executeAsyncAction: function() {
-
-        var promiseFinished;
-        try {
-          this.__doPhaseInit();
-
-          if(this.isExecuting) {
-
-            this.__doPhaseWill();
-
-            if(this.isExecuting) {
-
-              /* eslint no-unexpected-multiline: 0 */
-
-              promiseFinished = Promise.resolve(this.__doPhaseDo())
-                  ["catch"](this.__rejectFinal.bind(this));
-            }
-          }
-        } catch(ex) {
-          this.__rejectFinal(ex);
-        }
-
-        (promiseFinished || Promise.resolve()).then(this.__doPhaseFinally.bind(this));
-      },
-
-      /**
-       * Actually executes a synchronous action.
-       *
-       * @private
-       */
-      __executeSyncAction: function() {
-        try {
-          this.__doPhaseInit();
-
-          if(this.isExecuting) {
-
-            this.__doPhaseWill();
-
-            if(this.isExecuting) {
-
-              this.__doPhaseDo();
-            }
-          }
-        } catch(ex) {
-          this.__rejectFinal(ex);
-        }
-
-        this.__doPhaseFinally();
+      get target() {
+        return this.__target;
       },
 
       /**
@@ -839,7 +724,25 @@ define([
 
         this.__target = target;
       },
+      // endregion
 
+      /**
+       * Gets the executor to which the actual action execution is delegated.
+       *
+       * This property contains the value of the `executor` argument passed to
+       * [execute]{@link pentaho.type.action.Base#execute} or
+       * [executeAsync]{@link pentaho.type.action.Base#executeAsync},
+       * and is `null` before execution.
+       *
+       * @type {pentaho.type.action.IObserver}
+       * @readonly
+       * @protected
+       */
+      get _executor() {
+        return this.__executor;
+      },
+
+      // region Action Execution Control
       /**
        * Called from an action observer to mark the action as being done, optionally given a result value.
        *
@@ -924,6 +827,114 @@ define([
 
         return this;
       },
+      // endregion
+
+      // endregion
+
+      // region Execution - Other
+      /**
+       * Setups the target and validates if the action can start executing.
+       *
+       * Throws if the action execution cannot start.
+       *
+       * @param {!pentaho.type.action.ITarget} target - The action's target.
+       *
+       * @throws {Error} When the action execution cannot start.
+       *
+       * @private
+       */
+      __validateAction: function(target) {
+
+        // Take care to test the correct state before overwriting the current promise.
+        // Also, need to return a different promise in this case.
+        this.__assertStates(States.candidate);
+
+        try {
+          this._setTarget(target);
+        } catch(ex) {
+          this.__target = null;
+          throw ex;
+        }
+
+        var errors = this.validate();
+        if(errors && errors.length) {
+          this.__target = null;
+          throw errors[0];
+        }
+      },
+
+      /**
+       * Actually executes an action.
+       *
+       * @param {pentaho.type.action.IObserver} executor - An action observer to act as action controller/executor.
+       *
+       * @private
+       */
+      __executeAction: function(executor) {
+
+        this.__executor = executor || null;
+
+        if(this.type.isSync) {
+          this.__executeSyncAction();
+        } else {
+          this.__executeAsyncAction();
+        }
+      },
+
+      /**
+       * Actually executes a **synchronous** action.
+       *
+       * @private
+       */
+      __executeSyncAction: function() {
+        try {
+          this.__executePhaseInit();
+
+          if(this.isExecuting) {
+
+            this.__executePhaseWill();
+
+            if(this.isExecuting) {
+
+              this.__executePhaseDo();
+            }
+          }
+        } catch(ex) {
+          this.__rejectFinal(ex);
+        }
+
+        this.__executePhaseFinally();
+      },
+
+      /**
+       * Actually executes an **asynchronous** action.
+       *
+       * @private
+       */
+      __executeAsyncAction: function() {
+
+        var promiseFinished;
+        try {
+          this.__executePhaseInit();
+
+          if(this.isExecuting) {
+
+            this.__executePhaseWill();
+
+            if(this.isExecuting) {
+
+              /* eslint no-unexpected-multiline: 0 */
+
+              promiseFinished = Promise.resolve(this.__executePhaseDo())
+                  ["catch"](this.__rejectFinal.bind(this));
+            }
+          }
+        } catch(ex) {
+          this.__rejectFinal(ex);
+        }
+
+        (promiseFinished || Promise.resolve()).then(this.__executePhaseFinally.bind(this));
+      },
 
       __rejectFinal: function(reason) {
         try {
@@ -965,23 +976,26 @@ define([
         this.__result = undefined;
       },
 
-      // endregion
-
-      __doPhaseInit: function() {
+      // region Private __executePhase* Methods
+      /**
+       * Handles execution of the `init` phase.
+       * Used by both synchronous and asynchronous action kinds.
+       */
+      __executePhaseInit: function() {
 
         this.__state = States.init;
 
         this._onPhaseInit();
       },
 
-      __doPhaseWill: function() {
+      __executePhaseWill: function() {
 
         this.__state = States.will;
 
         this._onPhaseWill();
       },
 
-      __doPhaseDo: function() {
+      __executePhaseDo: function() {
 
         this.__state = States["do"];
 
@@ -1000,7 +1014,7 @@ define([
         }
       },
 
-      __doPhaseFinally: function() {
+      __executePhaseFinally: function() {
 
         if(this.isExecuting) {
           // Auto-fulfill the action, in case no explicit done(.) or reject(.) was called.
@@ -1030,7 +1044,9 @@ define([
           }
         }
       },
+      // endregion
 
+      // region Protected _onPhase* methods
       /**
        * Performs the action's _initialize_ phase,
        * by calling the executor's `init` listener, if any.
@@ -1099,6 +1115,10 @@ define([
         if((exec = this.__executor) && exec["finally"]) {
           exec["finally"](this);
         }
+      },
+      // endregion
+      // endregion
+
       // region serialization
       toSpecInContext: function(keyArgs) {
 
