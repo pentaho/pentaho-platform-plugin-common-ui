@@ -56,7 +56,7 @@ define(function() {
     did: 16,
 
     /**
-     * The `canceled` action state
+     * The `canceled` action state.
      * @default
      */
     canceled: 32,

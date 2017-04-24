@@ -24,15 +24,18 @@ define([
   "pentaho/lang/RuntimeError",
   "pentaho/debug",
   "pentaho/debug/Levels",
-  "pentaho/util/logger"
+  "pentaho/util/logger",
+  "pentaho/util/object"
 ], function(module, elementFactory, States, ArgumentRequiredError, ArgumentInvalidTypeError, OperationInvalidError,
-            UserError, RuntimeError, debugMgr, DebugLevels, logger) {
+            UserError, RuntimeError, debugMgr, DebugLevels, logger, O) {
 
   "use strict";
 
   /* eslint dot-notation: 0 */
 
-  return function(context) {
+  var actionType;
+
+  var Action = function(context) {
 
     /**
      * @name pentaho.type.action.Base.Type
@@ -44,6 +47,26 @@ define([
      * For more information see {@link pentaho.type.action.Base}.
      */
 
+    // override the documentation to specialize the argument types.
+    /**
+     * Creates a subtype of this one.
+     *
+     * For more information on class extension, in general,
+     * see {@link pentaho.lang.Base.extend}.
+     *
+     * @name extend
+     * @memberOf pentaho.type.action.Base
+     *
+     * @param {string} [name] The name of the created class; used for debugging purposes.
+     * @param {pentaho.type.action.spec.IBaseProto} [instSpec] The instance specification.
+     * @param {Object} [classSpec] The static specification.
+     * @param {Object} [keyArgs] The keyword arguments.
+     *
+     * @return {!Class.<pentaho.type.Value>} The new value instance subclass.
+     *
+     * @see pentaho.type.Instance.extend
+     */
+
     var Element = context.get(elementFactory);
 
     var executingStates = States.init | States.will | States["do"];
@@ -52,28 +75,49 @@ define([
     var cancelableStates = States.init | States.will;
 
     return Element.extend(/** @lends pentaho.type.action.Base# */{
+
       type: /** @lends pentaho.type.action.Base.Type# */{
         id: module.id,
-
         isAbstract: true,
 
+        _init: function(spec, keyArgs) {
+
+          this.base(spec, keyArgs);
+
+          var isSync = spec && spec.isSync;
+          if(isSync == null) isSync = this.__isSync;
+          O.setConst(this, "__isSync", !!isSync);
+        },
+
         // region Attribute isSync
-
-        // TODO: hierarchy consistency? immutability?
-
         __isSync: true,
 
+        /**
+         * Gets a value that indicates if the action is synchronous.
+         *
+         * @type {boolean}
+         * @readOnly
+         */
         get isSync() {
           return this.__isSync;
         },
+        // endregion
 
-        set isSync(value) {
-          this.__isSync = !!value;
+        // region Serialization
+        _fillSpecInContext: function(spec, keyArgs) {
+
+          var any = this.base(spec, keyArgs);
+
+          if(this !== actionType && this.isSync !== this.ancestor.isSync) {
+            spec.isSync = this.isSync;
+            any = true;
+          }
+
+          return any;
         }
         // endregion
       },
 
-      // TODO: Create pentaho.type.action.spec.IBase
       /**
        * @alias Base
        * @memberOf pentaho.type.action
@@ -91,15 +135,13 @@ define([
        * and enforces the multiple phases by which all actions, generically, go through:
        * "init", "will", "do", and "finally".
        *
-       * ##### Synchronous and Asynchronous actions
+       * ##### Synchronous or Asynchronous
        *
        * An action can be synchronous or asynchronous, as determined by the type property,
        * [Base.Type#isSync]{@link pentaho.type.action.Base.Type#isSync}.
-       *
-       * The execution of a synchronous action is fully completed synchronously.
+       * The execution of a synchronous action is completed synchronously.
        * An asynchronous action, however, has an asynchronous "do" phase,
        * and thus only fully completes asynchronously.
-       *
        * To support these two kinds of actions, two execution methods exist,
        * [execute]{@link pentaho.type.action.Base#execute} and
        * [executeAsync]{@link pentaho.type.action.Base#executeAsync}.
@@ -108,6 +150,8 @@ define([
        * and the latter if you do.
        *
        * ##### Action model
+       *
+       * The following is a detailed description of the action model:
        *
        * 1. When an action is constructed, it is in the [candidate]{@link pentaho.type.action.States#candidate} state.
        *    It merely represents a possible, or candidate, action that can be executed.
@@ -147,7 +191,7 @@ define([
        *    in which case it is set to either
        *    the [canceled]{@link pentaho.type.action.States#canceled} or
        *    the [failed]{@link pentaho.type.action.States#failed} state,
-       *    and the **finally** phase is entered.
+       *    and the _finally_ phase is entered.
        *
        *    Otherwise, the action automatically transits to the _will_ phase.
        *
@@ -173,7 +217,7 @@ define([
        *    in which case it is set to either
        *    the [canceled]{@link pentaho.type.action.States#canceled} or
        *    the [failed]{@link pentaho.type.action.States#failed} state,
-       *    and the **finally** phase is entered.
+       *    and the _finally_ phase is entered.
        *
        *    Otherwise, the action automatically transits to the _do_ phase.
        *
@@ -188,7 +232,7 @@ define([
        *    The action cannot be canceled anymore, but can, however, be marked _failed_,
        *    by [rejecting]{@link pentaho.type.action.Base#reject} it with a runtime error,
        *    in which case it is set to the [failed]{@link pentaho.type.action.States#failed} state,
-       *    and the **finally** phase is entered.
+       *    and the _finally_ phase is entered.
        *
        *    Alternatively, the action can be marked [done]{@link pentaho.type.action.Base#done}.
        *
@@ -221,6 +265,10 @@ define([
        *
        * @constructor
        * @param {pentaho.type.action.spec.IBase} [spec] An action specification.
+       *
+       * @see pentaho.type.action.spec.IBase
+       * @see pentaho.type.action.spec.IBaseProto
+       * @see pentaho.type.action.spec.IBaseTypeProto
        */
       constructor: function(spec) {
         /**
@@ -1051,9 +1099,35 @@ define([
         if((exec = this.__executor) && exec["finally"]) {
           exec["finally"](this);
         }
+      // region serialization
+      toSpecInContext: function(keyArgs) {
+
+        keyArgs = keyArgs ? Object.create(keyArgs) : {};
+
+        var spec = {};
+
+        var declaredType;
+        var includeType = !!keyArgs.forceType ||
+              (!!(declaredType = keyArgs.declaredType) &&
+              this.type !== (declaredType.isRefinement ? declaredType.of : declaredType));
+
+        if(includeType) spec._ = this.type.toRefInContext(keyArgs);
+        if(this.label) spec.label = this.label;
+        if(this.description) spec.description = this.description;
+
+        // Don't think there is a point in serializing state, error, result, etc.
+        // Some wouldn't be serializable. Others would be ignored at construction.
+        // So only serializing what defines what a new action would do.
+
+        return spec;
       }
+      // endregion
     });
   };
+
+  actionType = Action.type;
+
+  return Action;
 
   function nonEmptyString(value) {
     return value == null ? null : (String(value) || null);
