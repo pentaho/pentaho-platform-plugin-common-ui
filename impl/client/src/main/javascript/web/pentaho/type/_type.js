@@ -55,14 +55,6 @@ define([
      * @classDesc The base **type class** of the types of the Pentaho Client Metadata Model.
      *
      * For additional information, see the class of _instances_, {@link pentaho.type.Instance}.
-     *
-     * @description _Initializes_ the type's singleton object.
-     * @param {Object} spec - The specification of this type.
-     * @param {!Object} keyArgs - Keyword arguments.
-     * @param {!pentaho.type.Instance} keyArgs.instance - The _prototype_ of the `Instance` class associated with
-     * this type.
-     * @param {boolean} [keyArgs.isRoot=false] Indicates if the type is a _root_ type.
-     *
      */
     var Type = Base.extend("pentaho.type.Type", /** @lends pentaho.type.Type# */{
 
@@ -84,7 +76,7 @@ define([
        *
        * This method is typically overridden to block the inheritance of certain attributes.
        *
-       * @param {!Object} spec - The specification of this type.
+       * @param {!pentaho.type.spec.ITypeProto} spec - The specification of this type.
        * @param {!Object} keyArgs - Keyword arguments.
        * @param {!pentaho.type.Instance} keyArgs.instance - The _prototype_ of the `Instance` class associated with
        * this type.
