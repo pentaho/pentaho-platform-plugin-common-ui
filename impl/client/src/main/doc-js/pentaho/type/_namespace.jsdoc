@@ -20,5 +20,5 @@
  *
  * @description
  *
- * The `type` namespace contains classes and interfaces of the client metadata model.
+ * The `type` namespace contains classes and interfaces of the Pentaho client metadata model.
  */

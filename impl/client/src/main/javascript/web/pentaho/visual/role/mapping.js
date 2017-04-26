@@ -48,11 +48,10 @@ define([
      * @amd {pentaho.type.Factory<pentaho.visual.role.Mapping>} pentaho/visual/role/mapping
      *
      * @classDesc The `Mapping` class represents the association between
-     * a specific visual role and the data properties, here named _attributes_,
+     * a specific visual role and the data properties, here named _data attributes_,
      * of a visualization's current dataset.
      *
-     * As a _type_, the mapping defines the capabilities of the visual role it maps to
-     * through the attributes:
+     * As a _type_, the mapping defines the capabilities of the visual role, through the following properties:
      *
      * 1. [levels]{@link pentaho.visual.role.Mapping.Type#levels}
      * 2. [dataType]{@link pentaho.visual.role.Mapping.Type#dataType}.
