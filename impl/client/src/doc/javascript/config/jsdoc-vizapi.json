@@ -6,7 +6,7 @@
     "include": [
       "${project.basedir}/src/main/doc-js",
       "${build.javascriptSourceDirectory}/web/pentaho",
-      "${build.javascriptSourceDirectory}/web/pentaho/CONTRIBUTING.md"
+      "${build.javascriptSourceDirectory}/web/pentaho/VizApiReadme.md"
     ],
     "exclude": [
       "${project.basedir}/src/main/doc-js/pentaho/data",
@@ -29,8 +29,8 @@
     "encoding": "utf8",
     "outputSourceFiles": false,
     "recurse": true,
-    "private": true,
-    "verbose": true,
+    "private": ${jsdoc.config.opts.private},
+    "verbose": ${jsdoc.config.opts.verbose},
 
     "gitHubConfig": {
       "name": "${jsdoc.config.github.name}",

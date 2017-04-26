@@ -19,8 +19,11 @@
   <properties>
     <js.project.list>dojo,dijit,jquery,pentaho-cdf-js,dojo-release,angular,angular-mocks,angular-resource,angular-route,angular-animate</js.project.list>
     <build.javascriptReportDirectory>target/js-reports</build.javascriptReportDirectory>
-    <docjs.config.file>jsdoc-vizapi.json</docjs.config.file>
     <pentaho-cdf-plugin.version>${project.version}</pentaho-cdf-plugin.version>
+
+    <docjs.config.file>jsdoc-vizapi.json</docjs.config.file>
+    <jsdoc.local>true</jsdoc.local>
+
     <jsdoc.config.templates.directory>${project.basedir}/src/doc/javascript/template</jsdoc.config.templates.directory>
     <jsdoc.config.github.url>https://github.com/pentaho/pentaho-platform-plugin-common-ui/</jsdoc.config.github.url>
     <jsdoc.config.github.company>pentaho</jsdoc.config.github.company>
