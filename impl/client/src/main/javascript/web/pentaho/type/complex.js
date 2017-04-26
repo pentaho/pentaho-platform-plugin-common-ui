@@ -427,6 +427,7 @@ define([
           ComplexChangeset._setElement(this, propType, valueSpec);
       },
 
+      /** @inheritDoc */
       _configure: function(config) {
         this._usingChangeset(function() {
 
@@ -453,6 +454,7 @@ define([
       },
 
       // implement abstract pentaho.type.ContainerMixin#_createChangeset
+      /** @inheritDoc */
       _createChangeset: function(txn) {
         return new ComplexChangeset(txn, this);
       },
@@ -743,6 +745,7 @@ define([
       // endregion
 
       // region serialization
+      /** @inheritDoc */
       toSpecInContext: function(keyArgs) {
 
         keyArgs = keyArgs ? Object.create(keyArgs) : {};
@@ -995,6 +998,7 @@ define([
         },
 
         // region serialization
+        /** @inheritDoc */
         _fillSpecInContext: function(spec, keyArgs) {
 
           var any = this.base(spec, keyArgs);

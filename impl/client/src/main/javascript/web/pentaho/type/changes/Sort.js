@@ -53,6 +53,7 @@ define([
       return "sort";
     },
 
+    /** @inheritDoc */
     _apply: function(target) {
       target._elems.sort(this.comparer);
     }

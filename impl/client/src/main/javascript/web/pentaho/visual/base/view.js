@@ -20,6 +20,7 @@ define([
   "pentaho/type/filter/or",
   "pentaho/type/changes/ComplexChangeset",
   "./model",
+  "pentaho/type/action/base",
   "pentaho/i18n!view",
   "./events/WillUpdate",
   "./events/DidUpdate",
@@ -32,8 +33,10 @@ define([
   "pentaho/util/error",
   "pentaho/util/logger",
   "pentaho/util/promise",
-  "pentaho/util/spec"
+  "pentaho/util/spec",
+  "../action/standard"
 ], function(module, complexFactory, abstractFilterFactory, orFilterFactory, ComplexChangeset, visualModelFactory,
+            baseActionFactory,
             bundle, WillUpdate, DidUpdate, RejectedUpdate, UserError,
             O, arg, F, BitSet, error, logger, promise, specUtil) {
 
@@ -51,20 +54,27 @@ define([
   return function(context) {
 
     var Complex = context.get(complexFactory);
+    var actionBaseType = context.get(baseActionFactory).type;
 
     var View = Complex.extend(/** @lends pentaho.visual.base.View# */{
+
+      // TODO: Although the current code does, 7.1 doesn't support specs on act and actAsync.
+      // Post-7.1, add this JsDoc to the "In reponse ..." paragraph:
+      //
+      // * Note that standard actions come pre-loaded with the `View` class,
+      // * and can thus be safely constructed synchronously from View derived classes.
 
       /**
        * @alias View
        * @memberOf pentaho.visual.base
        *
        * @class
-       * @extends pentaho.type.complex
+       * @extends pentaho.type.Complex
        * @implements pentaho.lang.IDisposable
        * @implements pentaho.type.action.ITarget
        *
        * @abstract
-       * @amd pentaho/visual/base/view
+       * @amd {pentaho.type.Factory<pentaho.visual.base.View>} pentaho/visual/base/view
        *
        * @classDesc This is the base class for views of visualizations.
        *
@@ -76,26 +86,33 @@ define([
        *
        * In any case, the first rendering of the view must be explicitly triggered by a call to
        * [update]{@link pentaho.visual.base.View#update}.
-       * This allows the _container application_ to further configure the view,
-       * like, for example,
-       * setting the [isAutoUpdate]{@link pentaho.visual.base.View#isAutoUpdate} property
-       * or registering event listeners,
+       * This two-phase process allows a _container application_ to further configure a view,
+       * like, for example, registering event listeners,
        * before the initial update.
        *
        * Over time, the view's model is mutated and, in response,
-       * the view detects these changes, marks itself [dirty]{@link pentaho.visual.base.View#isDirty},
+       * the view detects these changes, marks itself as [dirty]{@link pentaho.visual.base.View#isDirty},
        * and, by default, automatically updates itself.
+       *
+       * In response to the user interacting with the view,
+       * it may perform [actions]{@link pentaho.visual.View#act},
+       * such as the standard actions
+       * [Select]{@link pentaho.visual.action.Select} and
+       * [Execute]{@link pentaho.visual.action.Execute},
+       * and emit events for these.
        *
        * When a view is no longer needed,
        * the _container application_ **must** call its [dispose]{@link pentaho.visual.base.View#dispose} method,
        * so that the view can free held _resources_ and not cause memory-leaks.
        *
        * @constructor
-       * @description Constructs a `View` instance.
+       * @description Creates a visualization `View` instance.
        * @param {pentaho.visual.base.spec.IViewEx} [viewSpec] - The extended view specification.
        *
        * @see pentaho.visual.base.spec.IView
        * @see pentaho.visual.base.spec.IViewType
+       * @see pentaho.visual.action.Select
+       * @see pentaho.visual.action.Execute
        */
       constructor: function(viewSpec) {
 
@@ -736,16 +753,99 @@ define([
       // endregion
 
       // region IActionTarget implementation
+
+      // TODO: Although the current code does, 7.1 doesn't support specs on act and actAsync.
+      // Post-7.1, the example can be simplified.
+
+      /**
+       * Executes a given action with this view as its target and does not wait for its outcome.
+       *
+       * Emits a structured event of a type equal to the action type's id,
+       * with the action as event payload,
+       * for each of the action's phases.
+       *
+       * This method can be given [synchronous]{@link pentaho.type.action.Base.Type#isSync} or asynchronous actions.
+       * However, in the latter case, this method is only suitable for _fire-and-forget_ scenarios,
+       * where it is not needed to know the outcome of the asynchronous action.
+       *
+       * @example
+       *
+       * define(["pentaho/visual/action/execute"], function(executeFactory) {
+       *
+       *   // ...
+       *
+       *   // Listen to the execute event
+       *   view.on("pentaho/visual/action/execute", {
+       *
+       *     do: function(action) {
+       *
+       *       var dataFilter = action.dataFilter;
+       *
+       *       alert("Executed on rows where " + (dataFilter && dataFilter.contentKey));
+       *
+       *       // Mark action as done.
+       *       action.done();
+       *     }
+       *   });
+       *
+       *   // ...
+       *
+       *   // Act "execute" on data rows that have "country" = "us".
+       *
+       *   var Execute = view.type.context.get(executeFactory);
+       *
+       *   var action = new Execute({
+       *     dataFilter: {
+       *       _: "isEqual",
+       *       p: "country",
+       *       v: "us"
+       *     }
+       *   });
+       *
+       *   view.act(action);
+       * });
+       *
+       * @param {!pentaho.type.action.Base} action - The action to execute.
+       *
+       * @return {!pentaho.type.action.Base} The given action.
+       *
+       * @see pentaho.visual.base.View#actAsync
+       */
       act: function(action) {
+
         if(!action) throw error.argRequired("action");
+
+        action = actionBaseType.to(action);
 
         action.execute(this, this._getActionController(action));
 
         return action;
       },
 
+      /**
+       * Executes a given action in this view as its target and waits for its outcome.
+       *
+       * Emits a structured event of a type equal to the action type's id,
+       * with the action as event payload,
+       * for each of the action's phases.
+       *
+       * This method can be given [synchronous]{@link pentaho.type.action.Base.Type#isSync} or asynchronous actions,
+       * and can be used when uniformity in treatment is desired and it is needed to know the outcome of the
+       * asynchronous action.
+       *
+       * @param {!pentaho.type.action.Base} action - The action to execute.
+       *
+       * @return {!Promise} A promise that is fulfilled with the action's
+       * [result]{@link pentaho.type.action.Base#result} or rejected with the action's
+       * [error]{@link pentaho.type.action.Base#error}.
+       *
+       * @see pentaho.visual.base.View#act
+       */
       actAsync: function(action) {
+
         if(!action) throw error.argRequired("action");
+
+        action = actionBaseType.to(action);
 
         return action.executeAsync(this, this._getActionController(action));
       },

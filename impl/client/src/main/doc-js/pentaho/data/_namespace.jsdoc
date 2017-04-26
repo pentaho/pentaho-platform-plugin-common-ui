@@ -15,7 +15,7 @@
  */
 /**
  * The data namespace contains classes and interfaces
- * used for data representation by the Visualization API.
+ * used for data representation.
  *
  * The classes used most frequently, and directly, are:
  * * {@link pentaho.data.Table}

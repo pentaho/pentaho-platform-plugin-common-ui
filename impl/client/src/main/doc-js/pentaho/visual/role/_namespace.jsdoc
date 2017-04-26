@@ -16,7 +16,7 @@
 
 /**
  * The `visual.role` namespace contains classes for describing visual roles -
- * an important property type of visualization models in the Visualization API.
+ * an important type of property of visualization models in the Visualization API.
  *
  * @name pentaho.visual.role
  * @namespace

@@ -179,6 +179,7 @@ define([
      * @param {string} uid - The container unique identifier.
      *
      * @return {pentaho.type.changes.ChangeRef} The corresponding `ChangeRef` or `null`.
+     *
      * @private
      */
     _getChangeRef: function(uid) {
@@ -583,11 +584,15 @@ define([
     /**
      * Commits the transaction.
      *
+     * @return {!pentaho.lang.ActionResult} The commit result of the transaction.
+     *
      * @throws {pentaho.lang.OperationInvalidError} When this method is called while one of
      * [_commitWill]{@link pentaho.type.changes.Transaction#_commitWill} or
      * [_commit]{@link pentaho.type.changes.Transaction#_commit} is already being called.
      *
      * @throws {Error} When the transaction is rejected.
+     *
+     * @private
      */
     _commit: function() {
 

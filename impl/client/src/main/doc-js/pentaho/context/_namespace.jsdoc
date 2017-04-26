@@ -15,7 +15,7 @@
  */
 
 /**
- * The `context` namespace contains types related to the Pentaho Web Client Platform context.
+ * The `context` namespace contains types related to the platform environment.
  *
  * @name pentaho.context
  * @namespace

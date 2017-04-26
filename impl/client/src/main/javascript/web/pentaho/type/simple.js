@@ -60,6 +60,7 @@ define([
     var Simple = Element.extend(/** @lends pentaho.type.Simple# */{
 
       constructor: function(spec) {
+
         if(spec instanceof Object) {
           // A plain object?
           if(spec.constructor === Object) {
@@ -235,6 +236,8 @@ define([
        * The default implementation does nothing.
        *
        * @param {any} config - The configuration.
+       *
+       * @protected
        */
       _configure: function(config) {
         // Nothing configurable at this level
@@ -272,6 +275,7 @@ define([
       // endregion
 
       // region serialization
+      /** @inheritDoc */
       toSpecInContext: function(keyArgs) {
         if(!keyArgs) keyArgs = {};
 
@@ -416,6 +420,7 @@ define([
         // endregion
 
         // region serialization
+        /** @inheritDoc */
         _fillSpecInContext: function(spec, keyArgs) {
 
           var any = this.base(spec, keyArgs);

@@ -137,6 +137,8 @@ define([
        * Asserts that the list can be changed, throwing an error if not.
        *
        * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
+       *
+       * @private
        */
       __assertEditable: function() {
         if(this._isReadOnly) throw new TypeError("The list is read-only.");
@@ -481,8 +483,8 @@ define([
       /**
        * Calls a function for each element of the list.
        *
-       * @param {function(pentaho.type.Element, number, pentaho.type.List) : boolean?} fun
-       * - The mapping function. Return `false` to break iteration.
+       * @param {function(pentaho.type.Element, number, pentaho.type.List) : boolean?} fun - The mapping function.
+       * Return `false` to break iteration.
        *
        * @param {Object} [ctx] The JS context object on which `fun` is called.
        */
@@ -564,6 +566,7 @@ define([
       // endregion
 
       // region serialization
+      /** @inheritDoc */
       toSpecInContext: function(keyArgs) {
 
         keyArgs = keyArgs ? Object.create(keyArgs) : {};
@@ -604,6 +607,7 @@ define([
 
       type: /** @lends pentaho.type.List.Type# */{
 
+        /** @inheritDoc */
         _postInit: function() {
 
           this.base.apply(this, arguments);
@@ -685,6 +689,7 @@ define([
         //   toRefInContext calls the toSpecInContext, cause it has no id and because a temporary id is also
         //   never generated to it, in scope
         //   toSpecInContext only can return this form if there are no other local list class attributes
+        /** @inheritDoc */
         toSpecInContext: function(keyArgs) {
           if(!keyArgs) keyArgs = {};
 

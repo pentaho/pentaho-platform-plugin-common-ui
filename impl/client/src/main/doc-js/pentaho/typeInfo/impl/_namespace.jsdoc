@@ -19,4 +19,5 @@
  *
  * @name pentaho.typeInfo.impl
  * @namespace
+ * @private
  */

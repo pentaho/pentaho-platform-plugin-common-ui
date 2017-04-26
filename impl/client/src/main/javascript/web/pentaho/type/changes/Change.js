@@ -53,6 +53,7 @@ define([
      * @method
      * @param {!pentaho.type.ContainerMixin} target - The container to which changes are applied.
      * @abstract
+     * @protected
      */
   });
 });

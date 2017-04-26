@@ -15,7 +15,7 @@
  */
 
 /**
- * This namespace contains types for expressing
+ * The `filter` namespace contains types for expressing
  * [intensional]{@link https://en.wikipedia.org/wiki/Intensional_definition}
  * filters of complex values or lists thereof.
  *

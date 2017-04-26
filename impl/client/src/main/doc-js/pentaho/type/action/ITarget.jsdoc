@@ -43,7 +43,8 @@
  * @name act
  * @memberOf pentaho.type.action.ITarget#
  * @method
- * @param {!pentaho.type.action.Base} action - The action to execute.
+ * @param {!pentaho.type.action.Base|!pentaho.type.action.spec.IBase} action - The action or
+ * action specification to execute.
  * @return {!pentaho.type.action.Base} The given action.
  *
  * @see pentaho.type.action.ITarget#actAsync
@@ -63,7 +64,8 @@
  * @name actAsync
  * @memberOf pentaho.type.action.ITarget#
  * @method
- * @param {!pentaho.type.action.Base} action - The action to execute.
+ * @param {!pentaho.type.action.Base|!pentaho.type.action.spec.IBase} action - The action or
+ * action specification to execute.
  * @return {!Promise} A promise that is fulfilled with the action's
  * [result]{@link pentaho.type.action.Base#result} or rejected with the action's
  * [error]{@link pentaho.type.action.Base#error}.

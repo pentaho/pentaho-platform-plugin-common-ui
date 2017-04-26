@@ -80,6 +80,7 @@ define([
       if(!target.isBoundary && elem._addReference) txn._ensureChangeRef(elem).removeReference(target);
     },
 
+    /** @inheritDoc */
     _apply: function(target) {
       var elem = this.element;
 

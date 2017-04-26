@@ -135,6 +135,7 @@ define([
          * @param {!Object} keyArgs - Keyword arguments.
          * @param {!pentaho.type.Complex.Type} keyArgs.declaringType - The complex type that declares the property.
          * @param {number} keyArgs.index - The index of the property within its complex type.
+         *
          * @protected
          */
         _init: function(spec, keyArgs) {
@@ -165,6 +166,7 @@ define([
           }
         },
 
+        /** @inheritDoc */
         _postInit: function() {
 
           this.base.apply(this, arguments);
@@ -567,7 +569,7 @@ define([
          * The label of a root property is reset to a capitalization of the `name` attribute.
          * A non-root property inherits the label of its closest ancestor.
          *
-         * @ignore
+         * @private
          */
         _resetLabel: function() {
           this._labelSet = false;
@@ -731,6 +733,7 @@ define([
          * {@link pentaho.type.Property.Type#countMin} and {@link pentaho.type.Property.Type#countMax}.
          *
          * @param {pentaho.type.Complex} owner - The complex value that owns the property.
+         *
          * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
          *
          * @see pentaho.type.Complex#validate
@@ -772,6 +775,7 @@ define([
         }, // endregion
 
         // region serialization
+        /** @inheritDoc */
         toSpecInContext: function(keyArgs) {
           if(!keyArgs) keyArgs = {};
 
@@ -850,6 +854,7 @@ define([
           return spec;
         },
 
+        /** @inheritDoc */
         _fillSpecInContext: function(spec, keyArgs) {
           var any = this.base(spec, keyArgs);
 

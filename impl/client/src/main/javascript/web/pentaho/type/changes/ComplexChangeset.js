@@ -70,6 +70,7 @@ define([
       return "complex";
     },
 
+    /** @inheritDoc */
     get hasChanges() {
       var changes = this._changes;
       for(var p in changes)
@@ -79,6 +80,7 @@ define([
       return false;
     },
 
+    /** @inheritDoc */
     _clearChanges: function() {
       var changes = this._changes;
       var complex = this.owner;
@@ -177,6 +179,7 @@ define([
       return this.owner._getByName(pName);
     },
 
+    /** @inheritDoc */
     _apply: function(target) {
       this.propertyNames.forEach(function(property) {
         var change = this[property];

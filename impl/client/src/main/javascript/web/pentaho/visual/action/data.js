@@ -16,17 +16,18 @@
 define([
   "module",
   "pentaho/type/action/base",
-  "pentaho/visual/base/view",
   "pentaho/type/filter/abstract",
   "pentaho/lang/ArgumentInvalidTypeError"
-], function(module, baseActionFactory, baseViewFactory, abstractFilterFactory, ArgumentInvalidTypeError) {
+], function(module, baseActionFactory, abstractFilterFactory, ArgumentInvalidTypeError) {
 
   "use strict";
 
   return function(context) {
 
     var AbstractFilter = context.get(abstractFilterFactory);
-    var BaseView = context.get(baseViewFactory);
+
+    // Cannot depend directly or an AMD dependency cycle would arise...
+    var baseViewType = null;
 
     /**
      * @name pentaho.visual.action.Data.Type
@@ -90,8 +91,11 @@ define([
 
         this.base(target);
 
-        if(!BaseView.type.is(target))
-          throw new ArgumentInvalidTypeError("target", [BaseView.type.id], typeof target);
+        // If not yet loaded, then, surely target isn't a BaseView...
+        if(!baseViewType) baseViewType = context.get("pentaho/visual/base/view").type;
+
+        if(!baseViewType.is(target))
+          throw new ArgumentInvalidTypeError("target", [baseViewType.id], typeof target);
       },
 
       /**
@@ -118,6 +122,7 @@ define([
         /**
          * The data filter of the action.
          *
+         * @alias __dataFilter
          * @type {pentaho.type.filter.Abstract}
          * @memberOf pentaho.visual.action.Data#
          * @private

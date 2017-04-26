@@ -81,12 +81,13 @@ define([
      *
      * @type {string}
      * @readonly
-     * @default "remove"
+     * @default "move"
      */
     get type() {
       return "move";
     },
 
+    /** @inheritDoc */
     _apply: function(target) {
       target._elems.splice(this.indexNew, 0, target._elems.splice(this.indexOld, 1)[0]);
     }

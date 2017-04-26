@@ -104,6 +104,7 @@ define([
         // endregion
 
         // region serialization
+        /** @inheritDoc */
         _fillSpecInContext: function(spec, keyArgs) {
 
           var any = this.base(spec, keyArgs);
@@ -337,6 +338,11 @@ define([
          * @private
          */
         this.__promiseControl = null;
+      },
+
+      /** @inheritDoc */
+      clone: function() {
+        return new this.constructor(this.toSpec());
       },
 
       // region Action Description
@@ -963,6 +969,8 @@ define([
        *
        * @throws {pentaho.lang.OperationInvalidError} When canceling and the action is not in one of the states
        * [init]{@link pentaho.type.action.States.init} or [will]{@link pentaho.type.action.States.will}.
+       *
+       * @private
        */
       __reject: function(reason) {
 
@@ -1001,6 +1009,8 @@ define([
        * fails the action.
        *
        * @param {string|Error} [reason] - The reason for the rejection.
+       *
+       * @private
        */
       __rejectFinal: function(reason) {
         try {
@@ -1019,6 +1029,8 @@ define([
        * and delegates to [_onPhaseInit]{@link pentaho.type.action.Base#_onPhaseInit}.
        *
        * Used by both the synchronous and the asynchronous action kinds.
+       *
+       * @private
        */
       __executePhaseInit: function() {
 
@@ -1034,6 +1046,8 @@ define([
        * and delegates to [_onPhaseWill]{@link pentaho.type.action.Base#_onPhaseWill}.
        *
        * Used by both the synchronous and the asynchronous action kinds.
+       *
+       * @private
        */
       __executePhaseWill: function() {
 
@@ -1053,6 +1067,8 @@ define([
        * Used by both the synchronous and the asynchronous action kinds.
        *
        * @return {?Promise} A promise to the completion of an asynchronous _do_ phase or `null`.
+       *
+       * @private
        */
       __executePhaseDo: function() {
 
@@ -1087,6 +1103,8 @@ define([
        * is resolved.
        *
        * Used by both the synchronous and the asynchronous action kinds.
+       *
+       * @private
        */
       __executePhaseFinally: function() {
 
@@ -1187,6 +1205,7 @@ define([
       // endregion
 
       // region serialization
+      /** @inheritDoc */
       toSpecInContext: function(keyArgs) {
 
         keyArgs = keyArgs ? Object.create(keyArgs) : {};

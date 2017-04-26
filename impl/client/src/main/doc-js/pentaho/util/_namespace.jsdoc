@@ -15,8 +15,7 @@
  */
 
 /**
- * The `util` namespace contains a minimal set of supporting modules
- * used by other Pentaho Client Metadata Model classes.
+ * The `util` namespace contains a minimal set of supporting modules used by other platform classes.
  *
  * @name pentaho.util
  * @namespace

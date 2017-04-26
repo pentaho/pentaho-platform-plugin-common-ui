@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+define([
+  "./data",
+  "./select",
+  "./execute"
+], function(dataActionFactory, selectActionFactory, executeActionFactory) {
 
-/**
- * @name pentaho.type
- * @namespace
- *
- * @description
- *
- * The `type` namespace contains classes and interfaces of the client metadata model.
- */
+  "use strict";
+
+  return {
+    data: dataActionFactory,
+    select: selectActionFactory,
+    execute: executeActionFactory
+  };
+});

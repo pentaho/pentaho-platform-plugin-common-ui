@@ -24,6 +24,7 @@ define(function() {
    * @namespace
    * @memberOf pentaho.util
    * @amd pentaho/util/logger
+   * @private
    */
   var logger = /** @lends pentaho.util.logger */{
 

@@ -18,5 +18,5 @@
  * @name pentaho.visual.base.spec
  * @namespace
  *
- * @description The `base.spec` namespace contains specification interfaces for the base visual types.
+ * @description The `visual.base.spec` namespace contains specification interfaces for the base visual types.
  */

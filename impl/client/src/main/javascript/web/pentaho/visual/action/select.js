@@ -166,8 +166,9 @@ define([
          *
          * A simple function value that wraps a {@link pentaho.visual.action.SelectionMode} function.
          *
-         * @type {?pentaho.type.Function}
+         * @alias __selectionMode
          * @memberOf pentaho.visual.action.Select#
+         * @type {?pentaho.type.Function}
          * @private
          */
         this.__selectionMode = getSelectionMode(value, "selectionMode");

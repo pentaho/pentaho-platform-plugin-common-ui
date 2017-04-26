@@ -347,7 +347,7 @@ define([
       // region isComplex property
       /**
        * Gets a value that indicates if this type
-       * [is]{@link pentaho.type.Type#isSubtypeOf} an
+       * [is]{@link pentaho.type.Type#isSubtypeOf} a
        * [complex]{@link pentaho.type.Complex.Type} type.
        *
        * @type boolean
@@ -359,7 +359,7 @@ define([
       // region isSimple property
       /**
        * Gets a value that indicates if this type
-       * [is]{@link pentaho.type.Type#isSubtypeOf} an
+       * [is]{@link pentaho.type.Type#isSubtypeOf} a
        * [simple]{@link pentaho.type.Simple.Type} type.
        *
        * @type boolean
@@ -462,13 +462,7 @@ define([
        * Gets the short identifier of this type.
        *
        * The short identifier of a type is equal to its alias, provided it is defined.
-       *
-       * In particular, when a type is one of the standard types,
-       * and thus a direct sub-module of the `pentaho/type` module,
-       * its short identifier is its _local module id_,
-       * like `"string"` or `"boolean"`.
-       *
-       * Otherwise, the short identifier is equal to the identifier.
+       * Otherwise, it is equal to the identifier.
        *
        * @type {?nonEmptyString}
        * @readOnly
@@ -893,7 +887,7 @@ define([
       /**
        * Gets the style classes of this and any base types.
        *
-       * Do **NOT** modify the returned array.
+       * Do **not** modify the returned array.
        *
        * @type string[]
        * @readonly
@@ -1433,7 +1427,7 @@ define([
        * Specifically, attributes with a function value are not supported.
        *
        * This method simply calls {@link @see pentaho.type.Instance#toSpec} with argument `keyArgs.isJson` as `true`
-       * and exists for seamless integrations with JavaScript's
+       * and exists for seamless integration with JavaScript's
        * [JSON.stringify](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
        * method.
        *
@@ -1586,6 +1580,7 @@ define([
        * to extend the type with new dynamic attributes.
        *
        * @type {Object}
+       * @ignore
        */
       set dynamicAttributes(attrSpecs) {
         Object.keys(attrSpecs).forEach(function(name) {
@@ -1713,6 +1708,7 @@ define([
        * @return {boolean} Returns `true` if the dynamic attribute was added; `false`, otherwise.
        *
        * @protected
+       * @ignore
        *
        * @see pentaho.type.Type#_fillSpecInContext
        */

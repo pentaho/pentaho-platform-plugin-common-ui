@@ -74,6 +74,7 @@ define([
       }
     },
 
+    /** @inheritDoc */
     _apply: function(target) {
       target._elems = [];
       target._keys = {};
