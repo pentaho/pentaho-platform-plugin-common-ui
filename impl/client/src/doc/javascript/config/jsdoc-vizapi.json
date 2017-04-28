@@ -25,17 +25,16 @@
     "monospaceLinks": false
   },
   "opts": {
-    "template": "${jsdoc.config.templates.directory}/vizApi",
+    "template": "${docjs.config.templateDirectory}/vizApi",
     "encoding": "utf8",
     "outputSourceFiles": false,
     "recurse": true,
-    "private": ${jsdoc.config.opts.private},
-    "verbose": ${jsdoc.config.opts.verbose},
+    "verbose": false,
 
-    "gitHubConfig": {
-      "name": "${jsdoc.config.github.name}",
-      "url": "${jsdoc.config.github.url}",
-      "company": "${jsdoc.config.github.company}",
+    "githubConfig": {
+      "name": "common-ui",
+      "url": "https://github.com/pentaho/pentaho-platform-plugin-common-ui/",
+      "company": "pentaho",
       "branch": "${project.stage}"
     },
 
