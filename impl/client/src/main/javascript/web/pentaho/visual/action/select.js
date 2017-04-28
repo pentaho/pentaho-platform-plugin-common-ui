@@ -216,7 +216,7 @@ define([
      * @throws {pentaho.lang.ArgumentInvalidError} When `value` is a `string` which is not one of the
      * [standard selection mode names]{@link pentaho.visual.action.SelectionModes}.
      *
-     * @throws {pentaho.lang.ArgumentInvalidTypeError} When `value` is not a `string` or a `function`.
+     * @throws {pentaho.lang.ArgumentInvalidTypeError} When `value` is neither a `string` nor a `function`.
      *
      * @private
      */

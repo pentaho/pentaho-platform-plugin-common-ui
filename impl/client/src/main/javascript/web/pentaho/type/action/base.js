@@ -652,7 +652,7 @@ define([
        *
        * @param {!pentaho.type.action.ITarget} target - The action's target.
        * @param {pentaho.type.action.IObserver} [executor] - An action observer to act as action controller/executor.
-       * Unlike with normal event/action observers, the functions of executor observers are called with the executor
+       * Unlike normal event/action observers, the functions of executor observers are called with the executor
        * as the value of the JavaScript `this` context.
        *
        * @return {!pentaho.type.action.Base} The value of `this`.
@@ -677,7 +677,7 @@ define([
        *
        * @param {!pentaho.type.action.ITarget} target - The action's target.
        * @param {pentaho.type.action.IObserver} [executor] - An action observer to act as action controller/executor.
-       * Unlike with normal event/action observers, the functions of executor observers are called with the executor
+       * Unlike normal event/action observers, the functions of executor observers are called with the executor
        * as the value of the JavaScript `this` context.
        *
        * @return {!Promise} A promise that is fulfilled with the action's
@@ -1029,7 +1029,7 @@ define([
        * Changes the state to [init]{@link pentaho.type.action.States.init}
        * and delegates to [_onPhaseInit]{@link pentaho.type.action.Base#_onPhaseInit}.
        *
-       * Used by both the synchronous and the asynchronous action kinds.
+       * Used by both the synchronous and the asynchronous actions.
        *
        * @private
        */
@@ -1046,7 +1046,7 @@ define([
        * Changes the state to [will]{@link pentaho.type.action.States.will}
        * and delegates to [_onPhaseWill]{@link pentaho.type.action.Base#_onPhaseWill}.
        *
-       * Used by both the synchronous and the asynchronous action kinds.
+       * Used by both the synchronous and the asynchronous actions.
        *
        * @private
        */
@@ -1065,7 +1065,7 @@ define([
        * after which, in case the action is still executing,
        * calls the [_doDefault]{@link pentaho.type.action.Base#_doDefault} method.
        *
-       * Used by both the synchronous and the asynchronous action kinds.
+       * Used by both the synchronous and the asynchronous actions.
        *
        * @return {?Promise} A promise to the completion of an asynchronous _do_ phase or `null`.
        *
@@ -1103,7 +1103,7 @@ define([
        * and the action [promise]{@link pentaho.type.action.Base#promise}, if previously requested,
        * is resolved.
        *
-       * Used by both the synchronous and the asynchronous action kinds.
+       * Used by both the synchronous and the asynchronous actions.
        *
        * @private
        */

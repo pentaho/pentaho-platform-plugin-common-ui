@@ -539,7 +539,7 @@ define([
    * @this pentaho.lang.EventSource
    *
    * @param {object} event - The event payload object.
-   * @param {!Array.<pentaho.lang.IEventObserverRegistration>} queue - The queue of event observer regitrations.
+   * @param {!Array.<pentaho.lang.IEventObserverRegistration>} queue - The queue of event observer registrations.
    * @param {nonEmptyString} type - The event type.
    * @param {nonEmptyString} phase - The event phase.
    * @param {function(object):boolean} [isCanceled] - A predicate that indicates if a given event object
@@ -547,8 +547,8 @@ define([
    * @param {function(any, object, nonEmptyString, nonEmptyString)} [errorHandler] -
    * When specified with a `null` value,
    * no error handling is performed and errors thrown by listeners are thrown back to this method's caller.
-   * When unspecified or specified as `undefined`, defaults to a function that simply log the listener errors,
-   * and let execution continue to following listeners.
+   * When unspecified or specified as `undefined`, defaults to a function that simply logs the listener errors,
+   * and lets execution continue to following listeners.
    * The function arguments are: the error, the event, the event type and the event phase.
    *
    * @return {?object} The event payload object or `null`, when the event is canceled.

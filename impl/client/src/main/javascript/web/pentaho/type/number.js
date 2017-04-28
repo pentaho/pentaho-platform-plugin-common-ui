@@ -38,7 +38,7 @@ define([
     var PenNumber = Simple.extend(/** @lends pentaho.type.Number# */{
       /**
        * Gets the underlying number primitive of the value.
-       * @name pentaho.type.PenNumber#value
+       * @name pentaho.type.Number#value
        * @type number
        * @readonly
        */

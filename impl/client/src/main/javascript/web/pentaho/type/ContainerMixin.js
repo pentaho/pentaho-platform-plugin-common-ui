@@ -205,9 +205,9 @@ define([
      *
      * @method
      *
-     * @param {!pentaho.type.changes.Transaction} transaction - The owning transaction.
+     * @param {!pentaho.type.changes.Transaction} transaction - The transaction that owns this changeset.
      *
-     * @return {!pentaho.type.changes.Changeset} A changeset of appropriate type.
+     * @return {!pentaho.type.changes.Changeset} A changeset of the appropriate type.
      *
      * @abstract
      * @protected
