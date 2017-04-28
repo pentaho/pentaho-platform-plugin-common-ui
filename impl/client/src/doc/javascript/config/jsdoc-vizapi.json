@@ -5,37 +5,39 @@
   "source": {
     "include": [
       "${project.basedir}/src/main/doc-js",
-      "${build.javascriptTestOutputDirectory}/web/pentaho",
-      "${build.javascriptTestOutputDirectory}/web/pentaho/CONTRIBUTING.md"
+      "${build.javascriptSourceDirectory}/web/pentaho",
+      "${build.javascriptSourceDirectory}/web/pentaho/VizApiReadme.md"
     ],
     "exclude": [
-      "${build.javascriptTestOutputDirectory}/web/pentaho/web/pentaho/data",
-      "${build.javascriptTestOutputDirectory}/web/pentaho/web/pentaho/shim",
-      "${build.javascriptTestOutputDirectory}/web/pentaho/web/pentaho/visual/samples"
+      "${project.basedir}/src/main/doc-js/pentaho/data",
+      "${build.javascriptSourceDirectory}/web/pentaho/data",
+      "${build.javascriptSourceDirectory}/web/pentaho/shim",
+      "${build.javascriptSourceDirectory}/web/pentaho/visual/samples"
     ],
     "includePattern": ".+\\.js(doc)?$"
   },
   "plugins": [
     "plugins/markdown",
-    "${build.jsdoc.template.directory}/vizApi/customPlugins/defineTags"
+    "${basedir}/src/doc/javascript/config/customPlugins/defineTags"
   ],
   "templates": {
     "cleverLinks": true,
     "monospaceLinks": false
   },
   "opts": {
-    "template": "${build.jsdoc.template.directory}/vizApi",
+    "template": "${docjs.config.templateDirectory}/vizApi",
     "encoding": "utf8",
-    "destination": "doc-js/vizapi",
     "outputSourceFiles": false,
     "recurse": true,
-    "private": true,
-    "verbose": true,
+    "verbose": false,
 
     "githubConfig": {
-      "branch": "${project.version}",
-      "name": "Pentaho Common UI"
+      "name": "common-ui",
+      "url": "https://github.com/pentaho/pentaho-platform-plugin-common-ui/",
+      "company": "pentaho",
+      "branch": "${project.stage}"
     },
+
     "layoutFile": "layout.tmpl"
   }
 }
