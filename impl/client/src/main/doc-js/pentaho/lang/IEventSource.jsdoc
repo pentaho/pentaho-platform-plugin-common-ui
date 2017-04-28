@@ -111,6 +111,7 @@
  *
  * @name on
  * @memberOf pentaho.lang.IEventSource#
+ * @method
  *
  * @param {nonEmptyString|nonEmptyString[]} type - The type or types of events.
  * When a string, it can be a comma-separated list of event types.
@@ -148,6 +149,7 @@
  *
  * @name off
  * @memberOf pentaho.lang.IEventSource#
+ * @method
  *
  * @param {nonEmptyString|nonEmptyString[]|!pentaho.lang.IEventRegistrationHandle} typeOrHandle -
  * The type or types of events, or an event registration handle to dispose of.

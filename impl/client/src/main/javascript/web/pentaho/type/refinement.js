@@ -723,6 +723,7 @@ define([
        *
        * @name extend
        * @memberOf pentaho.type.Refinement
+       * @method
        *
        * @param {string} [name] The name of the created class; used for debugging purposes.
        * @param {{type: pentaho.type.spec.IRefinementTypeProto}} [instSpec] The refinement type specification.

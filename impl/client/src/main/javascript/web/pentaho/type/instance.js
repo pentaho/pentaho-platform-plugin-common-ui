@@ -239,6 +239,7 @@ define([
        *
        * @name extend
        * @memberOf pentaho.type.Instance
+       * @method
        *
        * @param {string} [name] The name of the created class.
        * The name of the created class is used for debugging purposes.

@@ -446,6 +446,7 @@ define([
      *
      * @name extend
      * @memberOf pentaho.type.Simple
+     * @method
      *
      * @param {string} [name] The name of the created class; used for debugging purposes.
      * @param {pentaho.type.spec.ISimpleProto} [instSpec] The instance specification.

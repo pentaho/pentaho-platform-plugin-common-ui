@@ -56,6 +56,7 @@ define([
      *
      * @name extend
      * @memberOf pentaho.type.action.Base
+     * @method
      *
      * @param {string} [name] The name of the created class; used for debugging purposes.
      * @param {pentaho.type.action.spec.IBaseProto} [instSpec] The instance specification.

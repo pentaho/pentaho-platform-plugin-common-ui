@@ -72,12 +72,10 @@ define([
    *
    * The class publicly exposes the `IEventSource` interface, allowing the registration and
    * unregistration of event listeners/observers.
-   *
    * The ability to emit events is, however, only exposed via the protected interface, through the methods:
    * [_emit]{@link pentaho.lang.EventSource#_emit},
    * [_emitSafe]{@link pentaho.lang.EventSource#_emitSafe} and
    * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
-   *
    * The methods `_emit` and `_emitSafe` can only be used with events of the [Event]{@link pentaho.lang.Event} type,
    * while the `_emitGeneric` method can be used with any event type and exposes more control options.
    *

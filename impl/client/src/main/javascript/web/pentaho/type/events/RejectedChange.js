@@ -25,37 +25,29 @@ define([
    * @memberOf pentaho.type.events
    * @class
    * @extends pentaho.lang.Event
-   * @mixes pentaho.lang.mixins.mixinError
-   * @mixes pentaho.lang.mixins._mixinChangeset
+   * @mixes pentaho.type.mixins.mixinError
+   * @mixes pentaho.type.mixins._mixinChangeset
    *
-   * @classDesc This event is emitted when any rejection occurs while changing
-   * properties values with {@link pentaho.type.Complex#set|Complex#set}.
-   *
-   * A rejection can be one of the following:
-   *  - the event {@link pentaho.type.events.WillChange|"will:change"} was canceled
-   *  - the value of a property in changeset was not consistent with the current value of the property,
-   *  which indicates that some change took place during the processing of the
-   *  {@link pentaho.type.events.WillChange|"will:change"} event listeners.
+   * @classDesc This event is emitted when changes in complex or list values are rejected.
    *
    * @constructor
    * @description Creates a `RejectedChange` event.
    *
    * @param {!pentaho.type.Complex} source - The object which is emitting the event.
-   * @param {!pentaho.type.ComplexChangeset} changeset - The changes to be made to the values of the properties.
+   * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
    * @param {!Error|pentaho.lang.UserError} error - The error of a rejected
    * {@link pentaho.lang.ActionResult|ActionResult}.
    */
-  return Event.extend("pentaho.type.events.RejectedChange",
-    /** @lends pentaho.type.events.RejectedChange# */{
+  return Event.extend("pentaho.type.events.RejectedChange", /** @lends pentaho.type.events.RejectedChange# */{
 
-      constructor: function(source, changeset, error) {
-        this.base("rejected:change", source, false);
-        this._initChangeset(changeset);
-        this._initError(error);
-      }
+    constructor: function(source, changeset, error) {
+      this.base("rejected:change", source, false);
+      this._initChangeset(changeset);
+      this._initError(error);
+    }
 
-    })
-    .implement(mixinChangeset)
-    .implement(mixinError);
+  })
+  .implement(mixinChangeset)
+  .implement(mixinError);
 
 });

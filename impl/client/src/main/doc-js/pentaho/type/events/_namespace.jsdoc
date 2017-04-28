@@ -15,7 +15,7 @@
  */
 
 /**
- * The `event` namespace contains classes for events.
+ * The `events` namespace contains event classes.
  *
  * @name pentaho.type.events
  * @namespace

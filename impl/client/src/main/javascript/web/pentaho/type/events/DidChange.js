@@ -24,26 +24,24 @@ define([
    * @memberOf pentaho.type.events
    * @class
    * @extends pentaho.lang.Event
-   * @mixes pentaho.lang.mixins._mixinChangeset
+   * @mixes pentaho.type.mixins._mixinChangeset
    *
-   * @classDesc This event is emitted when changing properties values
-   * with {@link pentaho.type.Complex#set|Complex#set} occurs without any failures.
+   * @classDesc This event is emitted when changes have occurred in complex or list values.
    *
    * @constructor
    * @description Creates a `DidChange` event.
    *
    * @param {!pentaho.type.Complex} source - The object which is emitting the event.
-   * @param {!pentaho.type.ComplexChangeset} changeset - The changes to be made to the values of the properties.
+   * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
    */
-  return Event.extend("pentaho.type.events.DidChange",
-    /** @lends pentaho.type.events.DidChange# */{
+  return Event.extend("pentaho.type.events.DidChange", /** @lends pentaho.type.events.DidChange# */{
 
-      constructor: function(source, changeset) {
-        this.base("did:change", source, false);
-        this._initChangeset(changeset);
-      }
+    constructor: function(source, changeset) {
+      this.base("did:change", source, false);
+      this._initChangeset(changeset);
+    }
 
-    })
-    .implement(mixinChangeset);
+  })
+  .implement(mixinChangeset);
 
 });

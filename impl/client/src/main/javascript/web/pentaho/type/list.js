@@ -51,7 +51,7 @@ define([
      * @memberOf pentaho.type
      * @class
      * @extends pentaho.type.Value
-     * @mixes pentaho.type.ContainerMixin
+     * @extends pentaho.type.ContainerMixin
      *
      * @amd {pentaho.type.Factory<pentaho.type.List>} pentaho/type/list
      *
@@ -736,6 +736,7 @@ define([
      *
      * @name extend
      * @memberOf pentaho.type.List
+     * @method
      *
      * @param {string} [name] The name of the created class, used for debugging purposes.
      * @param {pentaho.type.spec.IListProto} [instSpec] The instance specification.
