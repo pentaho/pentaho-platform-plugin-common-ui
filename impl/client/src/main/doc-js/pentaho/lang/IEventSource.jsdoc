@@ -21,7 +21,7 @@
  *
  * Events are identified by their type and can be "structured" or not.
  *
- * Structured events go through multiple-phases,
+ * Structured events go through multiple phases,
  * while unstructured events have no phases (or can be seen to have a single phase).
  *
  * The following are examples of the phases of hypothetical structured events:
@@ -140,7 +140,7 @@
  * the registration handle can be passed as the single argument to this method.
  *
  * It is safe to unregister from an event type while it is being emitted.
- * However, removed registrations are still taken into account in the current emission.
+ * However, any registrations removed during the current emission will still execute.
  *
  * Specifying an event registration handle that has already been disposed of has no effect.
  * Specifying an event type and observer (or listener function) that have no registrations has no effect.
