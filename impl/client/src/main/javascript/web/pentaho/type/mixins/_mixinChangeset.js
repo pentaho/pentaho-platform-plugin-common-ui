@@ -24,13 +24,12 @@ define([
    * @mixin
    * @private
    */
-  return  /** @lends pentaho.type.mixins._mixinChangeset */{
+  return /** @lends pentaho.type.mixins._mixinChangeset */{
 
     /**
      * Initializes the mixin.
      *
-     * @param {!pentaho.type.ComplexChangeset} changeset - An object that describes the changes
-     * to be made to a set of properties.
+     * @param {!pentaho.type.changes.Changeset} changeset - An object that describes a set of changes.
      * @protected
      */
     _initChangeset: function(changeset) {
@@ -39,9 +38,9 @@ define([
     },
 
     /**
-     * Gets the object with the changes to the set of properties.
+     * Gets the object that describes the set of changes.
      *
-     * @type {!pentaho.type.ComplexChangeset}
+     * @type {!pentaho.type.changes.Changeset}
      * @readonly
      */
     get changeset() {

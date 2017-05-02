@@ -38,8 +38,8 @@ define([
   // Unique type class id exposed through Type#uid and used by Context instances.
   var _nextUid = 1;
   var _normalAttrNames = [
-        "description", "category", "helpUrl", "isBrowsable", "isAdvanced", "ordinal"
-      ];
+    "description", "category", "helpUrl", "isBrowsable", "isAdvanced", "ordinal"
+  ];
   var O_isProtoOf = Object.prototype.isPrototypeOf;
 
   return function(context) {
@@ -52,17 +52,9 @@ define([
      * @name pentaho.type.Type
      * @class
      *
-     * @classDesc The base **type class** of the types of the Pentaho Client Metadata Model.
+     * @classDesc The base **type class** of the types of the Pentaho client metadata model.
      *
-     * For additional information, see the class of _instances_, {@link pentaho.type.Instance}.
-     *
-     * @description _Initializes_ the type's singleton object.
-     * @param {Object} spec - The specification of this type.
-     * @param {!Object} keyArgs - Keyword arguments.
-     * @param {!pentaho.type.Instance} keyArgs.instance - The _prototype_ of the `Instance` class associated with
-     * this type.
-     * @param {boolean} [keyArgs.isRoot=false] Indicates if the type is a _root_ type.
-     *
+     * For additional information, see the associated _instance class_, {@link pentaho.type.Instance}.
      */
     var Type = Base.extend("pentaho.type.Type", /** @lends pentaho.type.Type# */{
 
@@ -76,7 +68,7 @@ define([
         this._postInit(spec, keyArgs);
       },
 
-      // Antecipate extension of these properties, or defaultView can be incorrectly evaluated.
+      // Anticipate extension of these properties, or defaultView can be incorrectly evaluated.
       extend_order: ["id", "sourceId"],
 
       /**
@@ -84,7 +76,7 @@ define([
        *
        * This method is typically overridden to block the inheritance of certain attributes.
        *
-       * @param {!Object} spec - The specification of this type.
+       * @param {!pentaho.type.spec.ITypeProto} spec - The specification of this type.
        * @param {!Object} keyArgs - Keyword arguments.
        * @param {!pentaho.type.Instance} keyArgs.instance - The _prototype_ of the `Instance` class associated with
        * this type.
@@ -108,8 +100,8 @@ define([
         // Block inheritance, with default values
 
         // Don't use inherited property definition which may be writable false
-        Object.defineProperty(this, "_id",       {value: null, writable: true});
-        Object.defineProperty(this, "_alias",    {value: null, writable: true});
+        Object.defineProperty(this, "_id", {value: null, writable: true});
+        Object.defineProperty(this, "_alias", {value: null, writable: true});
         Object.defineProperty(this, "_sourceId", {value: null, writable: true});
 
         this._styleClass = null;
@@ -151,7 +143,7 @@ define([
       // NOTE: Any class extended from this will return the same context.
       /**
        * Gets the context that defined this type class.
-       * @type pentaho.type.Context
+       * @type {pentaho.type.Context}
        * @readOnly
        */
       get context() {
@@ -171,7 +163,7 @@ define([
        *
        * This attribute is _not_ inherited.
        *
-       * @type number
+       * @type {number}
        * @readonly
        */
       uid: -1, // set in _init
@@ -208,7 +200,7 @@ define([
        *
        * @name root
        * @memberOf pentaho.type.Type#
-       * @type pentaho.type.Type
+       * @type {pentaho.type.Type}
        * @readonly
        * @see pentaho.type.Type#isRoot
        * @see pentaho.type.Type#ancestor
@@ -217,7 +209,7 @@ define([
       /**
        * Gets a value that indicates if this type is the root of its type hierarchy.
        *
-       * @type boolean
+       * @type {boolean}
        *
        * @readonly
        *
@@ -234,7 +226,7 @@ define([
        *
        * The root type returns `null`.
        *
-       * @type ?pentaho.type.Type
+       * @type {?pentaho.type.Type}
        * @readonly
        * @see pentaho.type.Type#root
        * @see pentaho.type.Type#hasDescendants
@@ -261,7 +253,7 @@ define([
       /**
        * Gets the _prototype_ of the instances of this type.
        *
-       * @type pentaho.type.Instance
+       * @type {pentaho.type.Instance}
        * @readOnly
        */
       get instance() {
@@ -285,7 +277,7 @@ define([
        * [is]{@link pentaho.type.Type#isSubtypeOf} a
        * [value]{@link pentaho.type.Value.Type} type.
        *
-       * @type boolean
+       * @type {boolean}
        * @readOnly
        */
       get isValue() { return false; },
@@ -297,7 +289,7 @@ define([
        * [is]{@link pentaho.type.Type#isSubtypeOf} a
        * [property]{@link pentaho.type.Property.Type} type.
        *
-       * @type boolean
+       * @type {boolean}
        * @readOnly
        */
       get isProperty() { return false; },
@@ -310,7 +302,7 @@ define([
        * [list]{@link pentaho.type.List.Type} or a
        * [complex]{@link pentaho.type.Complex.Type} type.
        *
-       * @type boolean
+       * @type {boolean}
        * @readOnly
        */
       get isContainer() { return false; },
@@ -322,7 +314,7 @@ define([
        * [is]{@link pentaho.type.Type#isSubtypeOf} a
        * [list]{@link pentaho.type.List.Type} type.
        *
-       * @type boolean
+       * @type {boolean}
        * @readOnly
        */
       get isList() { return false; },
@@ -334,7 +326,7 @@ define([
        * [is]{@link pentaho.type.Type#isSubtypeOf} an
        * [element]{@link pentaho.type.Element.Type} type.
        *
-       * @type boolean
+       * @type {boolean}
        * @readOnly
        */
       get isElement() { return false; },
@@ -346,7 +338,7 @@ define([
        * [is]{@link pentaho.type.Type#isSubtypeOf} a
        * [refinement]{@link pentaho.type.Refinement.Type} type.
        *
-       * @type boolean
+       * @type {boolean}
        * @readOnly
        */
       get isRefinement() { return false; },
@@ -355,10 +347,10 @@ define([
       // region isComplex property
       /**
        * Gets a value that indicates if this type
-       * [is]{@link pentaho.type.Type#isSubtypeOf} an
+       * [is]{@link pentaho.type.Type#isSubtypeOf} a
        * [complex]{@link pentaho.type.Complex.Type} type.
        *
-       * @type boolean
+       * @type {boolean}
        * @readOnly
        */
       get isComplex() { return false; },
@@ -367,10 +359,10 @@ define([
       // region isSimple property
       /**
        * Gets a value that indicates if this type
-       * [is]{@link pentaho.type.Type#isSubtypeOf} an
+       * [is]{@link pentaho.type.Type#isSubtypeOf} a
        * [simple]{@link pentaho.type.Simple.Type} type.
        *
-       * @type boolean
+       * @type {boolean}
        * @readOnly
        */
       get isSimple() { return false; },
@@ -470,13 +462,7 @@ define([
        * Gets the short identifier of this type.
        *
        * The short identifier of a type is equal to its alias, provided it is defined.
-       *
-       * In particular, when a type is one of the standard types,
-       * and thus a direct sub-module of the `pentaho/type` module,
-       * its short identifier is its _local module id_,
-       * like `"string"` or `"boolean"`.
-       *
-       * Otherwise, the short identifier is equal to the identifier.
+       * Otherwise, it is equal to the identifier.
        *
        * @type {?nonEmptyString}
        * @readOnly
@@ -649,7 +635,7 @@ define([
        *
        * Setting this to a {@link Nully} value will have no effect.
        *
-       * @type object
+       * @type {object}
        */
       get application() {
         return this._application;
@@ -901,9 +887,9 @@ define([
       /**
        * Gets the style classes of this and any base types.
        *
-       * Do **NOT** modify the returned array.
+       * Do **not** modify the returned array.
        *
-       * @type string[]
+       * @type {string[]}
        * @readonly
        */
       get inheritedStyleClasses() {
@@ -1441,7 +1427,7 @@ define([
        * Specifically, attributes with a function value are not supported.
        *
        * This method simply calls {@link @see pentaho.type.Instance#toSpec} with argument `keyArgs.isJson` as `true`
-       * and exists for seamless integrations with JavaScript's
+       * and exists for seamless integration with JavaScript's
        * [JSON.stringify](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
        * method.
        *
@@ -1587,13 +1573,14 @@ define([
       },
 
       // region dynamic & monotonic attributes
-      /**
+      /*
        * Defines dynamic, monotonic, inherited attributes of the type.
        *
        * This **setter**-only JavaScript property is used
        * to extend the type with new dynamic attributes.
        *
        * @type {Object}
+       * @ignore
        */
       set dynamicAttributes(attrSpecs) {
         Object.keys(attrSpecs).forEach(function(name) {
@@ -1606,8 +1593,8 @@ define([
        *
        * A "dynamic" attribute is dynamic (can be a function), monotonic and inherited.
        *
-       * @param {String} name
-       * @param {Object} spec
+       * @param {String} name - The name of the attribute.
+       * @param {Object} spec - The specification of the attribute.
        * @private
        * @ignore
        */
@@ -1639,7 +1626,7 @@ define([
         })();
 
         Object.defineProperty(root, name, {
-          /**
+          /*
            * Gets the _last_ set local value, or `undefined` if there hasn't been one.
            * Only at eval time does inheritance and combination come into play and
            * evaluate into an _effective_ value.
@@ -1650,7 +1637,7 @@ define([
             return O.getOwn(this, namePriv);
           },
 
-          /**
+          /*
            * Combines a given value to the current local or inherited value.
            * Note that getting the value of the attribute always returns just the last set local value.
            *
@@ -1721,6 +1708,7 @@ define([
        * @return {boolean} Returns `true` if the dynamic attribute was added; `false`, otherwise.
        *
        * @protected
+       * @ignore
        *
        * @see pentaho.type.Type#_fillSpecInContext
        */
@@ -1748,7 +1736,7 @@ define([
     }, /** @lends pentaho.type.Type */{
 
       // @override
-      /**
+      /*
        * See Base.js
        * @ignore
        */

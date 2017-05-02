@@ -42,11 +42,12 @@ define([
      *
      * @amd {pentaho.type.Factory<pentaho.visual.action.Execute>} pentaho/visual/action/execute
      *
-     * @classDesc The `Execute` action is performed when the user interacts with a visual element,
-     * normally by double clicking it.
+     * @classDesc The `Execute` action is a synchronous action that is performed when
+     * the user interacts with a visual element, typically by double clicking it.
      *
-     * This action has the *alias* `"execute"`, which can be used to listen for its events on
-     * action targets.
+     * This action has the *alias* `"execute"`,
+     * which can also be specified as the event name
+     * when calling [on]{@link pentaho.lang,IEventSource#on} of action targets.
      */
     return DataAction.extend(/** @lends  pentaho.visual.action.Execute# */{
       type: {

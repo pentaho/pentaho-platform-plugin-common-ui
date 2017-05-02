@@ -52,7 +52,7 @@ define([
      * @classDesc The `Model` class is the abstract base class of visualization models.
      *
      * @constructor
-     * @description Creates a visual model.
+     * @description Creates a visualization `Model` instance.
      * @param {pentaho.visual.base.spec.IModel} [modelSpec] A plain object containing the model specification.
      */
     var VisualModel = Model.extend(/** @lends pentaho.visual.base.Model# */{

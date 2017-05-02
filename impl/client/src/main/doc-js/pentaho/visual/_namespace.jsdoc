@@ -15,8 +15,7 @@
  */
 
 /**
- * The `visual` namespace contains the classes and interfaces
- * of the Visualization API.
+ * The `visual` namespace contains the classes and interfaces that constitute the Visualization API.
  *
  * @name pentaho.visual
  * @namespace

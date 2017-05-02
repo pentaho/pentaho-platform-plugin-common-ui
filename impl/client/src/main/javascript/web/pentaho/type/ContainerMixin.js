@@ -36,7 +36,7 @@ define([
    * @name pentaho.type.ContainerMixin
    * @class
    * @extends pentaho.lang.Base
-   * @mixes pentaho.lang.EventSource
+   * @extends pentaho.lang.EventSource
    *
    * @classDesc The `ContainerMixin` class contains functionality that is shared
    * by the instance container classes [Complex]{@link pentaho.type.Complex} and [List]{@link pentaho.type.List}.
@@ -203,9 +203,11 @@ define([
      *
      * @name pentaho.type.ContainerMixin#_createChangeset
      *
-     * @param {!pentaho.type.changes.Transaction} transaction - The owning transaction.
+     * @method
      *
-     * @return {pentaho.type.changes.Changeset} A changeset of appropriate type.
+     * @param {!pentaho.type.changes.Transaction} transaction - The transaction that owns this changeset.
+     *
+     * @return {!pentaho.type.changes.Changeset} A changeset of the appropriate type.
      *
      * @abstract
      * @protected

@@ -52,6 +52,7 @@ define([
     var Model = Complex.extend(/** @lends pentaho.type.Model# */{
 
       // region serialization
+      /** @inheritDoc */
       toSpecInContext: function(keyArgs) {
         if(keyArgs && keyArgs.isJson) {
           keyArgs = keyArgs ? Object.create(keyArgs) : {};

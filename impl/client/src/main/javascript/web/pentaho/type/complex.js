@@ -57,7 +57,7 @@ define([
      * @name pentaho.type.Complex
      * @class
      * @extends pentaho.type.Element
-     * @mixes pentaho.type.ContainerMixin
+     * @extends pentaho.type.ContainerMixin
      *
      * @amd {pentaho.type.Factory<pentaho.type.Complex>} pentaho/type/complex
      *
@@ -427,6 +427,7 @@ define([
           ComplexChangeset._setElement(this, propType, valueSpec);
       },
 
+      /** @inheritDoc */
       _configure: function(config) {
         this._usingChangeset(function() {
 
@@ -743,6 +744,7 @@ define([
       // endregion
 
       // region serialization
+      /** @inheritDoc */
       toSpecInContext: function(keyArgs) {
 
         keyArgs = keyArgs ? Object.create(keyArgs) : {};
@@ -995,6 +997,7 @@ define([
         },
 
         // region serialization
+        /** @inheritDoc */
         _fillSpecInContext: function(spec, keyArgs) {
 
           var any = this.base(spec, keyArgs);
@@ -1072,6 +1075,7 @@ define([
      *
      * @name extend
      * @memberOf pentaho.type.Complex
+     * @method
      *
      * @param {string} [name] The name of the created class, used for debugging purposes.
      * @param {pentaho.type.spec.IComplexProto} [instSpec] The instance specification.

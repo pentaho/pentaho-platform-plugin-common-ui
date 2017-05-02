@@ -110,6 +110,7 @@ define([
       return this._value;
     },
 
+    /** @inheritDoc */
     _apply: function(target) {
       target._values[this.property.name] = this._value;
     }

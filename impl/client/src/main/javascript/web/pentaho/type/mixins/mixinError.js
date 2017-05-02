@@ -23,7 +23,7 @@ define([
    * @memberOf pentaho.type.mixins
    * @mixin
    */
-  return  /** @lends pentaho.type.mixins.mixinError */{
+  return /** @lends pentaho.type.mixins.mixinError */{
 
     /**
      * Initializes the mixin.

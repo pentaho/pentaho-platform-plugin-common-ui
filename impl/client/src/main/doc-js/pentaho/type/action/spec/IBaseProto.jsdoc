@@ -15,8 +15,19 @@
  */
 
 /**
- * An `IEventObserver` contains properties named after event phase names and whose values are event listeners.
+ * The `spec.IBaseProto` interface represents the specification of the prototype of an action type's instance class.
  *
- * @name pentaho.lang.IEventObserver
+ * @name pentaho.type.action.spec.IBaseProto
  * @interface
+ * @extends pentaho.type.spec.IValueProto
+ */
+
+/**
+ * The extensible/configurable members of the prototype of action type classes.
+ *
+ * @name type
+ * @memberOf pentaho.type.spec.IBaseProto#
+ * @type {pentaho.type.spec.IBaseTypeProto}
+ *
+ * @see pentaho.type.spec.IBaseTypeProto#instance
  */

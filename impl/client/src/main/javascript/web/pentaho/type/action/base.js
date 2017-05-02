@@ -24,24 +24,48 @@ define([
   "pentaho/lang/RuntimeError",
   "pentaho/debug",
   "pentaho/debug/Levels",
-  "pentaho/util/logger"
+  "pentaho/util/logger",
+  "pentaho/util/object"
 ], function(module, elementFactory, States, ArgumentRequiredError, ArgumentInvalidTypeError, OperationInvalidError,
-            UserError, RuntimeError, debugMgr, DebugLevels, logger) {
+            UserError, RuntimeError, debugMgr, DebugLevels, logger, O) {
 
   "use strict";
 
   /* eslint dot-notation: 0 */
 
-  return function(context) {
+  var actionType;
+
+  var Action = function(context) {
 
     /**
      * @name pentaho.type.action.Base.Type
      * @class
      * @extends pentaho.type.Element.Type
      *
-     * @classDesc The base type class of actions.
+     * @classDesc The base class of action types.
      *
      * For more information see {@link pentaho.type.action.Base}.
+     */
+
+    // override the documentation to specialize the argument types.
+    /**
+     * Creates a subtype of this one.
+     *
+     * For more information on class extension, in general,
+     * see {@link pentaho.lang.Base.extend}.
+     *
+     * @name extend
+     * @memberOf pentaho.type.action.Base
+     * @method
+     *
+     * @param {string} [name] The name of the created class; used for debugging purposes.
+     * @param {pentaho.type.action.spec.IBaseProto} [instSpec] The instance specification.
+     * @param {Object} [classSpec] The static specification.
+     * @param {Object} [keyArgs] The keyword arguments.
+     *
+     * @return {!Class.<pentaho.type.Value>} The new value instance subclass.
+     *
+     * @see pentaho.type.Instance.extend
      */
 
     var Element = context.get(elementFactory);
@@ -52,42 +76,201 @@ define([
     var cancelableStates = States.init | States.will;
 
     return Element.extend(/** @lends pentaho.type.action.Base# */{
+
       type: /** @lends pentaho.type.action.Base.Type# */{
         id: module.id,
-
         isAbstract: true,
 
+        _init: function(spec, keyArgs) {
+
+          this.base(spec, keyArgs);
+
+          var isSync = spec && spec.isSync;
+          if(isSync == null) isSync = this.__isSync;
+          O.setConst(this, "__isSync", !!isSync);
+        },
+
         // region Attribute isSync
-
-        // TODO: hierarchy consistency? immutability?
-
         __isSync: true,
 
+        /**
+         * Gets a value that indicates if the action is synchronous.
+         *
+         * @type {boolean}
+         * @readOnly
+         */
         get isSync() {
           return this.__isSync;
         },
+        // endregion
 
-        set isSync(value) {
-          this.__isSync = !!value;
+        // region serialization
+        /** @inheritDoc */
+        _fillSpecInContext: function(spec, keyArgs) {
+
+          var any = this.base(spec, keyArgs);
+
+          if(this !== actionType && this.isSync !== this.ancestor.isSync) {
+            spec.isSync = this.isSync;
+            any = true;
+          }
+
+          return any;
         }
         // endregion
       },
 
-      // TODO: review this doclet. Create pentaho.type.action.spec.IBase
       /**
        * @alias Base
        * @memberOf pentaho.type.action
        * @class
        * @extends pentaho.type.Element
+       * @abstract
        *
        * @amd {pentaho.type.Factory<pentaho.type.action.Base>} pentaho/type/action/base
        *
-       * @classDesc The base class of action types.
+       * @classDesc The `action.Base` class represents a certain model of actions.
+       *
+       * The associated type class provides a way to express metadata and to be configured.
+       *
+       * This class -- the instance class --, manages the execution of the action
+       * and enforces the multiple phases by which all actions, generically, go through:
+       * "init", "will", "do", and "finally".
+       *
+       * ##### Synchronous or Asynchronous
+       *
+       * An action can be synchronous or asynchronous, as determined by the type property,
+       * [Base.Type#isSync]{@link pentaho.type.action.Base.Type#isSync}.
+       * The execution of a synchronous action is completed synchronously.
+       * An asynchronous action, however, has an asynchronous "do" phase,
+       * and thus only fully completes asynchronously.
+       * To support these two kinds of actions, two execution methods exist,
+       * [execute]{@link pentaho.type.action.Base#execute} and
+       * [executeAsync]{@link pentaho.type.action.Base#executeAsync}.
+       * For an unknown kind of action,
+       * use the former if you do not care about the outcome of the action execution
+       * and the latter if you do.
+       *
+       * ##### Action model
+       *
+       * The following is a detailed description of the action model:
+       *
+       * 1. When an action is constructed, it is in the [candidate]{@link pentaho.type.action.States#candidate} state.
+       *    It merely represents a possible, or candidate, action that can be executed.
+       *
+       *    At this point, it has no associated [target]{@link pentaho.type.action.Base#target}
+       *    or [_executor]{@link pentaho.type.action.Base#_executor}.
+       *
+       *    Its [label]{@link pentaho.type.action.Base#label} and
+       *    [description]{@link pentaho.type.action.Base#description},
+       *    and anything else that defines exactly what the action ultimately does,
+       *    can still be freely modified.
+       *
+       *    In this state, the action cannot be marked
+       *    [done]{@link pentaho.type.action.Base#done} or be
+       *    [rejected]{@link pentaho.type.action.Base#reject}.
+       *
+       * 2. When either
+       *    the [execute]{@link pentaho.type.action.Base#execute} or
+       *    the [executeAsync]{@link pentaho.type.action.Base#executeAsync} method is called,
+       *    the action enters the **init** phase and is set to the [init]{@link pentaho.type.action.States#init} state.
+       *
+       *    The action's [target]{@link pentaho.type.action.Base#target} and
+       *    [_executor]{@link pentaho.type.action.Base#_executor} are set to the ones provided as arguments in
+       *    the said methods.
+       *
+       *    The [_onPhaseInit]{@link pentaho.type.action.Base#_onPhaseInit} method is called,
+       *    which, by default,
+       *    delegates to the set [executor]{@link pentaho.type.action.Base#_executor}, if any,
+       *    by calling its [init]{@link pentaho.type.action.IObserver#init} method.
+       *
+       *    The action's [label]{@link pentaho.type.action.Base#label} and
+       *    [description]{@link pentaho.type.action.Base#description},
+       *    and anything else that defines exactly what the action ultimately does,
+       *    can still be freely modified.
+       *
+       *    The action can be marked [rejected]{@link pentaho.type.action.Base#reject},
+       *    in which case it is set to either
+       *    the [canceled]{@link pentaho.type.action.States#canceled} or
+       *    the [failed]{@link pentaho.type.action.States#failed} state,
+       *    and the _finally_ phase is entered.
+       *
+       *    Otherwise, the action automatically transits to the _will_ phase.
+       *
+       * 3. In the **will** phase, what the action will do,
+       *    along with its
+       *    [label]{@link pentaho.type.action.Base#label} and
+       *    [description]{@link pentaho.type.action.Base#description},
+       *    is now settled and cannot be changed anymore --
+       *    an action can now be canceled based on what exactly it will do.
+       *
+       *    The action is set to the [will]{@link pentaho.type.action.States#will} state.
+       *
+       *    From now on,
+       *    calling [isEditable]{@link pentaho.type.action.Base#isEditable} will return `false`
+       *    and calling [_assertEditable]{@link pentaho.type.action.Base#_assertEditable} will throw an error.
+       *
+       *    The [_onPhaseWill]{@link pentaho.type.action.Base#_onPhaseWill} method is called,
+       *    which, by default,
+       *    delegates to the set [executor]{@link pentaho.type.action.Base#_executor}, if any,
+       *    by calling its [will]{@link pentaho.type.action.IObserver#will} method.
+       *
+       *    The action can be marked [rejected]{@link pentaho.type.action.Base#reject},
+       *    in which case it is set to either
+       *    the [canceled]{@link pentaho.type.action.States#canceled} or
+       *    the [failed]{@link pentaho.type.action.States#failed} state,
+       *    and the _finally_ phase is entered.
+       *
+       *    Otherwise, the action automatically transits to the _do_ phase.
+       *
+       * 4. In the **do** phase, the action execution, proper, is carried out.
+       *    The action is set to the [do]{@link pentaho.type.action.States#do} state.
+       *
+       *    The [_onPhaseDo]{@link pentaho.type.action.Base#_onPhaseDo} method is called,
+       *    which, by default,
+       *    delegates to the set [executor]{@link pentaho.type.action.Base#_executor}, if any,
+       *    by calling its [do]{@link pentaho.type.action.IObserver#do} method.
+       *
+       *    The action cannot be canceled anymore, but can, however, be marked _failed_,
+       *    by [rejecting]{@link pentaho.type.action.Base#reject} it with a runtime error,
+       *    in which case it is set to the [failed]{@link pentaho.type.action.States#failed} state,
+       *    and the _finally_ phase is entered.
+       *
+       *    Alternatively, the action can be marked [done]{@link pentaho.type.action.Base#done}.
+       *
+       *    If after calling `_onPhaseDo` the action is not yet done or rejected,
+       *    the [_doDefault]{@link pentaho.type.action.Base#_doDefault} is called,
+       *    allowing the action class to provide a default implementation.
+       *
+       *    Finally, the action is set to the [did]{@link pentaho.type.action.States#did} state,
+       *    and the _finally_ phase is entered.
+       *
+       * 5. When in the **finally** phase, the action is [finished]{@link pentaho.type.action.Base#isFinished},
+       *    with our without success,
+       *    and is in one of the
+       *    [canceled]{@link pentaho.type.action.States#canceled},
+       *    [failed]{@link pentaho.type.action.States#failed} or
+       *    [did]{@link pentaho.type.action.States#did}
+       *    states.
+       *
+       *    The [_onPhaseFinally]{@link pentaho.type.action.Base#_onPhaseFinally} method is called,
+       *    which, by default,
+       *    delegates to the set [executor]{@link pentaho.type.action.Base#_executor}, if any,
+       *    by calling its [finally]{@link pentaho.type.action.IObserver#finally} method.
+       *
+       *    If the action was [done]{@link pentaho.type.action.Base#isDone},
+       *    an action [result]{@link pentaho.type.action.Base#result} may be available,
+       *    while if the action was [rejected]{@link pentaho.type.action.Base#isRejected},
+       *    an action [error]{@link pentaho.type.action.Base#error} may be available.
        *
        * @description Creates an action instance given its specification.
        *
        * @constructor
-       * @param {pentaho.type.action.spec.IAction} [spec] An action specification.
+       * @param {pentaho.type.action.spec.IBase} [spec] An action specification.
+       *
+       * @see pentaho.type.action.spec.IBase
+       * @see pentaho.type.action.spec.IBaseProto
+       * @see pentaho.type.action.spec.IBaseTypeProto
        */
       constructor: function(spec) {
         /**
@@ -158,21 +341,12 @@ define([
         this.__promiseControl = null;
       },
 
-      /**
-       * Gets the target where the action is executing or has executed.
-       *
-       * This property contains the value of the `target` argument passed to
-       * [execute]{@link pentaho.type.action.Base#execute} or
-       * [executeAsync]{@link pentaho.type.action.Base#executeAsync},
-       * and is `null` before execution.
-       *
-       * @type {pentaho.type.action.ITarget}
-       * @readonly
-       */
-      get target() {
-        return this.__target;
+      /** @inheritDoc */
+      clone: function() {
+        return new this.constructor(this.toSpec());
       },
 
+      // region Action Description
       /**
        * Gets or sets the label of this action.
        *
@@ -214,6 +388,7 @@ define([
         this._assertEditable();
         this.__description = nonEmptyString(value);
       },
+      // endregion
 
       // region Action state and result, predicates and get/set properties
 
@@ -394,9 +569,9 @@ define([
        * Gets a value that indicates if the action has finished execution.
        *
        * An action has finished execution if its state is one of
-       * [init]{@link pentaho.type.action.States.did},
-       * [will]{@link pentaho.type.action.States.canceled} or
-       * [do]{@link pentaho.type.action.States.failed}.
+       * [did]{@link pentaho.type.action.States.did},
+       * [canceled]{@link pentaho.type.action.States.canceled} or
+       * [failed]{@link pentaho.type.action.States.failed}.
        *
        * @type {boolean}
        * @readonly
@@ -410,14 +585,14 @@ define([
       },
       // endregion
 
-      // region Execution
+      // region promise
       /**
        * Gets a promise for the result (or error) of this action's execution, if ever.
        *
        * This promise can be requested anytime,
        * before starting execution, during execution, or after finishing execution of this action.
        * Also, it can be requested whether or not the action is
-       * [synchronous]{@link pentaho.type.action.Base#isSync} or asynchronous.
+       * [synchronous]{@link pentaho.type.action.Base.Type#isSync} or asynchronous.
        *
        * The promise is fulfilled with the action's [result]{@link pentaho.type.action.Base#result}
        * or rejected with the action's [error]{@link pentaho.type.action.Base#error}.
@@ -464,7 +639,9 @@ define([
           return promiseControl;
         }
       },
+      // endregion
 
+      // region Execution - Main
       /**
        * Executes the action on a given target and, optionally, with a given executor,
        * and does not wait for its outcome.
@@ -475,6 +652,8 @@ define([
        *
        * @param {!pentaho.type.action.ITarget} target - The action's target.
        * @param {pentaho.type.action.IObserver} [executor] - An action observer to act as action controller/executor.
+       * Unlike normal event/action observers, the functions of executor observers are called with the executor
+       * as the value of the JavaScript `this` context.
        *
        * @return {!pentaho.type.action.Base} The value of `this`.
        *
@@ -498,6 +677,8 @@ define([
        *
        * @param {!pentaho.type.action.ITarget} target - The action's target.
        * @param {pentaho.type.action.IObserver} [executor] - An action observer to act as action controller/executor.
+       * Unlike normal event/action observers, the functions of executor observers are called with the executor
+       * as the value of the JavaScript `this` context.
        *
        * @return {!Promise} A promise that is fulfilled with the action's
        * [result]{@link pentaho.type.action.Base#result} or rejected with the action's
@@ -519,108 +700,20 @@ define([
         return this.promise;
       },
 
+      // region target
       /**
-       * Setups the target and validates if the action can start executing.
+       * Gets the target where the action is executing or has executed.
        *
-       * Throws if the action execution cannot start.
+       * This property contains the value of the `target` argument passed to
+       * [execute]{@link pentaho.type.action.Base#execute} or
+       * [executeAsync]{@link pentaho.type.action.Base#executeAsync},
+       * and is `null` before execution.
        *
-       * @param {!pentaho.type.action.ITarget} target - The action's target.
-       *
-       * @throws {Error} When the action execution cannot start.
-       *
-       * @private
+       * @type {pentaho.type.action.ITarget}
+       * @readonly
        */
-      __validateAction: function(target) {
-
-        // Take care to test the correct state before overwriting the current promise.
-        // Also, need to return a different promise in this case.
-        this.__assertStates(States.candidate);
-
-        try {
-          this._setTarget(target);
-        } catch(ex) {
-          this.__target = null;
-          throw ex;
-        }
-
-        var errors = this.validate();
-        if(errors && errors.length) {
-          this.__target = null;
-          throw errors[0];
-        }
-      },
-
-      /**
-       * Actually executes an action.
-       *
-       * @param {pentaho.type.action.IObserver} executor - An action observer to act as action controller/executor.
-       *
-       * @private
-       */
-      __executeAction: function(executor) {
-
-        this.__executor = executor || null;
-
-        if(this.type.isSync) {
-          this.__executeSyncAction();
-        } else {
-          this.__executeAsyncAction();
-        }
-      },
-
-      /**
-       * Actually executes an asynchronous action.
-       *
-       * @private
-       */
-      __executeAsyncAction: function() {
-
-        var promiseFinished;
-        try {
-          this.__doPhaseInit();
-
-          if(this.isExecuting) {
-
-            this.__doPhaseWill();
-
-            if(this.isExecuting) {
-
-              /* eslint no-unexpected-multiline: 0 */
-
-              promiseFinished = Promise.resolve(this.__doPhaseDo())
-                  ["catch"](this.__rejectFinal.bind(this));
-            }
-          }
-        } catch(ex) {
-          this.__rejectFinal(ex);
-        }
-
-        (promiseFinished || Promise.resolve()).then(this.__doPhaseFinally.bind(this));
-      },
-
-      /**
-       * Actually executes a synchronous action.
-       *
-       * @private
-       */
-      __executeSyncAction: function() {
-        try {
-          this.__doPhaseInit();
-
-          if(this.isExecuting) {
-
-            this.__doPhaseWill();
-
-            if(this.isExecuting) {
-
-              this.__doPhaseDo();
-            }
-          }
-        } catch(ex) {
-          this.__rejectFinal(ex);
-        }
-
-        this.__doPhaseFinally();
+      get target() {
+        return this.__target;
       },
 
       /**
@@ -638,7 +731,40 @@ define([
 
         this.__target = target;
       },
+      // endregion
 
+      /**
+       * Gets the executor to which the actual action execution is delegated.
+       *
+       * This property contains the value of the `executor` argument passed to
+       * [execute]{@link pentaho.type.action.Base#execute} or
+       * [executeAsync]{@link pentaho.type.action.Base#executeAsync},
+       * and is `null` before execution.
+       *
+       * @type {pentaho.type.action.IObserver}
+       * @readonly
+       * @protected
+       */
+      get _executor() {
+        return this.__executor;
+      },
+
+      /**
+       * Performs the default "action" of this action.
+       *
+       * When the action is [asynchronous]{@link pentaho.type.action.Base.Type#isSync},
+       * this method _may_ return a promise. If the promise is rejected,
+       * the action is rejected with the rejection reason.
+       * However, if the promise is fulfilled, its value is always *ignored*.
+       *
+       * @return {?Promise} - A promise for the completion of the default action of an asynchronous action, or `null`.
+       */
+      _doDefault: function() {
+        // noop
+        return null;
+      },
+
+      // region Execution Control
       /**
        * Called from an action observer to mark the action as being done, optionally given a result value.
        *
@@ -700,7 +826,8 @@ define([
        *   // ...
        * });
        *
-       * @param {string|Error} [reason] - The result of the action, if any.
+       * @param {string|Error} [reason] - The reason for the rejection.
+       *
        * @return {pentaho.type.action.Base} The value of `this`.
        *
        * @throws {pentaho.lang.OperationInvalidError} When canceling and the action is not in one of the states
@@ -723,16 +850,129 @@ define([
 
         return this;
       },
+      // endregion
 
-      __rejectFinal: function(reason) {
+      // endregion
+
+      // region Execution - Other
+      /**
+       * Setups the target and validates if the action can start executing.
+       *
+       * Throws if the action execution cannot start.
+       *
+       * @param {!pentaho.type.action.ITarget} target - The action's target.
+       *
+       * @throws {Error} When the action execution cannot start.
+       *
+       * @private
+       */
+      __validateAction: function(target) {
+
+        // Take care to test the correct state before overwriting the current promise.
+        // Also, need to return a different promise in this case.
+        this.__assertStates(States.candidate);
+
         try {
-          this.__reject(reason);
+          this._setTarget(target);
         } catch(ex) {
-          // Reason was a cancellation, which is invalid during do. Only failure, allowed.
-          this.__reject(ex);
+          this.__target = null;
+          throw ex;
+        }
+
+        var errors = this.validate();
+        if(errors && errors.length) {
+          this.__target = null;
+          throw errors[0];
         }
       },
 
+      /**
+       * Sets the executor and dispatches the execution of the action
+       * to either the synchronous or asynchronous lifecycle.
+       *
+       * @param {pentaho.type.action.IObserver} executor - An action observer to act as action controller/executor.
+       *
+       * @private
+       */
+      __executeAction: function(executor) {
+
+        this.__executor = executor || null;
+
+        if(this.type.isSync) {
+          this.__executeSyncAction();
+        } else {
+          this.__executeAsyncAction();
+        }
+      },
+
+      /**
+       * Performs the **synchronous** action lifecycle.
+       *
+       * @private
+       */
+      __executeSyncAction: function() {
+        try {
+          this.__executePhaseInit();
+
+          if(this.isExecuting) {
+
+            this.__executePhaseWill();
+
+            if(this.isExecuting) {
+
+              this.__executePhaseDo();
+            }
+          }
+        } catch(ex) {
+          this.__rejectFinal(ex);
+        }
+
+        this.__executePhaseFinally();
+      },
+
+      /**
+       * Performs the **asynchronous** action lifecycle.
+       *
+       * @private
+       */
+      __executeAsyncAction: function() {
+
+        var promiseFinished;
+        try {
+          this.__executePhaseInit();
+
+          if(this.isExecuting) {
+
+            this.__executePhaseWill();
+
+            if(this.isExecuting) {
+
+              /* eslint no-unexpected-multiline: 0 */
+
+              promiseFinished = Promise.resolve(this.__executePhaseDo())
+                  ["catch"](this.__rejectFinal.bind(this));
+            }
+          }
+        } catch(ex) {
+          this.__rejectFinal(ex);
+        }
+
+        (promiseFinished || Promise.resolve()).then(this.__executePhaseFinally.bind(this));
+      },
+
+      /**
+       * Rejects the action with a given reason.
+       *
+       * An error is thrown when the given reason constitutes a cancellation and only failures are
+       * allowed in the current state.
+       *
+       * @param {string|Error} [reason] - The reason for the rejection.
+       *
+       * @throws {pentaho.lang.OperationInvalidError} When canceling and the action is not in one of the states
+       * [init]{@link pentaho.type.action.States.init} or [will]{@link pentaho.type.action.States.will}.
+       *
+       * @private
+       */
       __reject: function(reason) {
 
         // Depends
@@ -764,23 +1004,74 @@ define([
         this.__result = undefined;
       },
 
-      // endregion
+      /**
+       * Rejects the action with a given reason and,
+       * if that fails due to a cancellation not currently being a valid operation,
+       * fails the action.
+       *
+       * @param {string|Error} [reason] - The reason for the rejection.
+       *
+       * @private
+       */
+      __rejectFinal: function(reason) {
+        try {
+          this.__reject(reason);
+        } catch(ex) {
+          // Reason was a cancellation, which is invalid during do. Only failure, allowed.
+          this.__reject(ex);
+        }
+      },
 
-      __doPhaseInit: function() {
+      // region Private __executePhase* Methods
+      /**
+       * Executes the **init** phase.
+       *
+       * Changes the state to [init]{@link pentaho.type.action.States.init}
+       * and delegates to [_onPhaseInit]{@link pentaho.type.action.Base#_onPhaseInit}.
+       *
+       * Used by both the synchronous and the asynchronous actions.
+       *
+       * @private
+       */
+      __executePhaseInit: function() {
 
         this.__state = States.init;
 
         this._onPhaseInit();
       },
 
-      __doPhaseWill: function() {
+      /**
+       * Executes the **will** phase.
+       *
+       * Changes the state to [will]{@link pentaho.type.action.States.will}
+       * and delegates to [_onPhaseWill]{@link pentaho.type.action.Base#_onPhaseWill}.
+       *
+       * Used by both the synchronous and the asynchronous actions.
+       *
+       * @private
+       */
+      __executePhaseWill: function() {
 
         this.__state = States.will;
 
         this._onPhaseWill();
       },
 
-      __doPhaseDo: function() {
+      /**
+       * Executes the **do** phase.
+       *
+       * Changes the state to [do]{@link pentaho.type.action.States.do}
+       * and delegates to [_onPhaseDo]{@link pentaho.type.action.Base#_onPhaseDo},
+       * after which, in case the action is still executing,
+       * calls the [_doDefault]{@link pentaho.type.action.Base#_doDefault} method.
+       *
+       * Used by both the synchronous and the asynchronous actions.
+       *
+       * @return {?Promise} A promise to the completion of an asynchronous _do_ phase or `null`.
+       *
+       * @private
+       */
+      __executePhaseDo: function() {
 
         this.__state = States["do"];
 
@@ -799,7 +1090,24 @@ define([
         }
       },
 
-      __doPhaseFinally: function() {
+      /**
+       * Executes the **finally** phase.
+       *
+       * If the action is still executing, calls [done]{@link pentaho.type.action.Base#done},
+       * with an `undefined` result.
+       *
+       * Delegates to [_onPhaseFinally]{@link pentaho.type.action.Base#_onPhaseFinally}.
+       * Any error thrown by it is simply caught and logged.
+       *
+       * Finally, the [executor]{@link pentaho.type.action.Base#_executor} object, if any, is released
+       * and the action [promise]{@link pentaho.type.action.Base#promise}, if previously requested,
+       * is resolved.
+       *
+       * Used by both the synchronous and the asynchronous actions.
+       *
+       * @private
+       */
+      __executePhaseFinally: function() {
 
         if(this.isExecuting) {
           // Auto-fulfill the action, in case no explicit done(.) or reject(.) was called.
@@ -829,10 +1137,14 @@ define([
           }
         }
       },
+      // endregion
 
+      // region Protected _onPhase* methods
       /**
-       * Performs the action's _initialize_ phase,
-       * by calling the executor's `init` listener, if any.
+       * Called during the action's **initialize** phase.
+       *
+       * The default implementation calls the executor's
+       * [init]{@link pentaho.type.action.IObserver#init} listener, if any.
        *
        * @protected
        */
@@ -844,8 +1156,10 @@ define([
       },
 
       /**
-       * Performs the action's _will_ phase,
-       * by calling the executor's `will` listener, if any.
+       * Called during the action's _will_ phase.
+       *
+       * The default implementation calls the executor's
+       * [will]{@link pentaho.type.action.IObserver#will} listener, if any.
        *
        * @protected
        */
@@ -857,8 +1171,10 @@ define([
       },
 
       /**
-       * Performs the action's _do_ phase,
-       * by calling the executor's `do` listener, if any.
+       * Called during the action's **do** phase.
+       *
+       * The default implementation calls the executor's
+       * [do]{@link pentaho.type.action.IObserver#do} listener, if any.
        *
        * @return {?Promise} A promise to the completion of the asynchronous `do` listener,
        * of an [asynchronous]{@link pentaho.type.action.Base.Type#isSync} action, or `null`.
@@ -873,23 +1189,10 @@ define([
       },
 
       /**
-       * Performs the default "action" of this action.
+       * Called during the action's **finally** phase.
        *
-       * When the action is [asynchronous]{@link pentaho.type.action.Base.Type#isSync},
-       * this method _may_ return a promise. If the promise is rejected,
-       * the action is rejected with the rejection reason.
-       * However, if the promise is fulfilled, its value is always *ignored*.
-       *
-       * @return {?Promise} - A promise for the completion of the default action of an asynchronous action, or `null`.
-       */
-      _doDefault: function() {
-        // noop
-        return null;
-      },
-
-      /**
-       * Performs the action's _finally_ phase,
-       * by calling the executor's `finally` listener, if any.
+       * The default implementation calls the executor's
+       * [finally]{@link pentaho.type.action.IObserver#finally} listener, if any.
        *
        * @protected
        */
@@ -898,9 +1201,40 @@ define([
         if((exec = this.__executor) && exec["finally"]) {
           exec["finally"](this);
         }
+      },
+      // endregion
+      // endregion
+
+      // region serialization
+      /** @inheritDoc */
+      toSpecInContext: function(keyArgs) {
+
+        keyArgs = keyArgs ? Object.create(keyArgs) : {};
+
+        var spec = {};
+
+        var declaredType;
+        var includeType = !!keyArgs.forceType ||
+              (!!(declaredType = keyArgs.declaredType) &&
+              this.type !== (declaredType.isRefinement ? declaredType.of : declaredType));
+
+        if(includeType) spec._ = this.type.toRefInContext(keyArgs);
+        if(this.label) spec.label = this.label;
+        if(this.description) spec.description = this.description;
+
+        // Don't think there is a point in serializing state, error, result, etc.
+        // Some wouldn't be serializable. Others would be ignored at construction.
+        // So only serializing what defines what a new action would do.
+
+        return spec;
       }
+      // endregion
     });
   };
+
+  actionType = Action.type;
+
+  return Action;
 
   function nonEmptyString(value) {
     return value == null ? null : (String(value) || null);

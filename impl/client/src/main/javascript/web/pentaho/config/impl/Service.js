@@ -20,6 +20,7 @@ define([
   "../../lang/ArgumentRequiredError",
   "../../lang/SortedList"
 ], function(module, Base, specUtil, ArgumentRequiredError, SortedList) {
+
   "use strict";
 
   /**

@@ -16,17 +16,18 @@
 define([
   "module",
   "pentaho/type/action/base",
-  "pentaho/visual/base/view",
   "pentaho/type/filter/abstract",
   "pentaho/lang/ArgumentInvalidTypeError"
-], function(module, baseActionFactory, baseViewFactory, abstractFilterFactory, ArgumentInvalidTypeError) {
+], function(module, baseActionFactory, abstractFilterFactory, ArgumentInvalidTypeError) {
 
   "use strict";
 
   return function(context) {
 
     var AbstractFilter = context.get(abstractFilterFactory);
-    var BaseView = context.get(baseViewFactory);
+
+    // Cannot depend directly or an AMD dependency cycle would arise...
+    var baseViewType = null;
 
     /**
      * @name pentaho.visual.action.Data.Type
@@ -51,10 +52,15 @@ define([
        * @memberOf pentaho.visual.action
        * @class
        * @extends pentaho.type.action.Base
+       * @abstract
        *
        * @amd {pentaho.type.Factory<pentaho.visual.action.Data>} pentaho/visual/action/data
        *
-       * @classDesc The base class of data action types.
+       * @classDesc The `visual.action.Data` class is the base class of action types
+       * which are performed on a subset of a dataset and
+       * whose [target]{@link pentaho.visual.action.Data#target} is a [View]{@link pentaho.visual.base.View}.
+       *
+       * The actual subset is determined by the [data filter]{@link pentaho.visual.action.Data#dataFilter} property.
        *
        * @description Creates a data action instance given its specification.
        * @param {pentaho.visual.action.spec.IData} [spec] A data action specification.
@@ -85,8 +91,11 @@ define([
 
         this.base(target);
 
-        if(!BaseView.type.is(target))
-          throw new ArgumentInvalidTypeError("target", [BaseView.type.id], typeof target);
+        // If not yet loaded, then, surely target isn't a BaseView...
+        if(!baseViewType) baseViewType = context.get("pentaho/visual/base/view").type;
+
+        if(!baseViewType.is(target))
+          throw new ArgumentInvalidTypeError("target", [baseViewType.id], typeof target);
       },
 
       /**
@@ -113,11 +122,24 @@ define([
         /**
          * The data filter of the action.
          *
+         * @alias __dataFilter
          * @type {pentaho.type.filter.Abstract}
+         * @memberOf pentaho.visual.action.Data#
          * @private
          */
         this.__dataFilter = AbstractFilter.type.to(value);
+      },
+
+      // region serialization
+      toSpecInContext: function(keyArgs) {
+
+        var spec = this.base(keyArgs);
+
+        if(this.__dataFilter) spec.dataFilter = this.__dataFilter.toSpecInContext(keyArgs);
+
+        return spec;
       }
+      // endregion
     });
   };
 });

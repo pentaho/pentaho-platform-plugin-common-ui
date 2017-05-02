@@ -15,8 +15,9 @@
  */
 
 /**
- * The `typeInfo.impl` namespace contains implementation classes of the `typeInfo` namespace.
- *
- * @name pentaho.typeInfo.impl
+ * @name pentaho.visual.action.spec
  * @namespace
+ *
+ * @description The `visual.action.spec` namespace contains specification interfaces and type definitions.
  */
+

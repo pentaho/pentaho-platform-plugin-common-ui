@@ -86,6 +86,7 @@ define([
       }
     },
 
+    /** @inheritDoc */
     _apply: function(target) {
       var elems = this.elements;
 

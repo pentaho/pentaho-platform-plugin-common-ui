@@ -16,10 +16,7 @@
 
 /**
  * The `config` namespace contains classes and interfaces
- * related to the configuration of value types.
- *
- * Specifically, it contains classes that implement the
- * {@link pentaho.config.IService} interface.
+ * related to the configuration of _types_.
  *
  * @name pentaho.config
  * @namespace
