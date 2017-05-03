@@ -234,9 +234,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this.msgBox.setLocalizationLookupFunction(this.getLocaleString);
             }
 
-            this.msgBox.buttons = [this.getLocaleString('Ok'), this.getLocaleString('Cancel')];
-            this.msgBox.setTitle(this.getLocaleString('Warning'));
-            this.msgBox.setMessage(this.getLocaleString('DeleteDatasourceWarning'));
+            this.msgBox.buttons = [this.getLocaleString('Yes'), this.getLocaleString('No')];
+            this.msgBox.setTitle(this.getLocaleString('DeleteDatasourceWarningTitle'));
+            this.msgBox.setMessage(this.getLocaleString('DeleteDatasourceWarning', this.getSelectedModel().name));
             this.msgBox.callbacks = [
               lang.hitch(this, this.deleteDatasource2),
               lang.hitch(this, function () {
