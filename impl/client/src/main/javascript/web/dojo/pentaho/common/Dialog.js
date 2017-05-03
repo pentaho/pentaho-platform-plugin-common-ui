@@ -32,6 +32,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             closeIcon: undefined,
             _onCancelCallback: undefined,
 
+            constructor: function() {
+              Dialog._DialogLevelManager._beginZIndex = 1051;
+            },
+
             setLocalizationLookupFunction: function(f) {
               this.getLocaleString = f;
               this._localize();
