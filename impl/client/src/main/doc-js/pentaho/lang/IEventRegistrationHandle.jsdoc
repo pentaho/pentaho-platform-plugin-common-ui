@@ -15,7 +15,7 @@
  */
 /**
  * @classdesc The `IEventRegistrationHandle` interface represents an event registration
- * and provides a means to explicitly unsubscribe from it.
+ * and provides a means to explicitly unregister from the event.
  *
  * This interface extends `IDisposable` to provide the
  * [remove]{@link pentaho.lang.IEventRegistrationHandle#remove} as an alias

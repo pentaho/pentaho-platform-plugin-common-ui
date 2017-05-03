@@ -3702,9 +3702,7 @@ define([
        //     return this.axes.row.getAxisLabel();
        // },
 
-        _doesSharedSeriesSelection: function(){
-            return false;
-        },
+        
 
         
     });

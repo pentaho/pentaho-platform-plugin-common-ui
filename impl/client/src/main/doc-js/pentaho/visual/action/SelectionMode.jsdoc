@@ -20,7 +20,7 @@
  * is merged with the view's current selection,
  * [selectionFilter]{@link pentaho.visual.base.View#selectionFilter}.
  *
- * The selection mode function is called with a `this` context being the view.
+ * The selection mode function is called with a `this` context being the target view.
  *
  * @callback pentaho.visual.action.SelectionMode
  *

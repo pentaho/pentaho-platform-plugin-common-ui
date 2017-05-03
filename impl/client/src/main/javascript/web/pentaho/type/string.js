@@ -35,7 +35,7 @@ define([
      *
      * @description Creates a string instance.
      */
-    return Simple.extend({
+    var PenString = Simple.extend({
       /**
        * Gets the underlying string primitive value of the value.
        * @name pentaho.type.String#value
@@ -51,5 +51,7 @@ define([
     }).implement({
       type: bundle.structured["string"] // eslint-disable-line dot-notation
     });
+
+    return PenString;
   };
 });

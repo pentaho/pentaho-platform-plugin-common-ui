@@ -38,7 +38,7 @@ define([
      * @constructor
      * @param {pentaho.type.spec.IDate|Date|string} [spec] A date specification.
      */
-    return Simple.extend(/** @lends pentaho.type.Date# */{
+    var PenDate = Simple.extend(/** @lends pentaho.type.Date# */{
       /**
        * Gets the underlying `Date` object of the date value.
        * @name pentaho.type.Date#value
@@ -47,6 +47,7 @@ define([
        */
 
       // region serialization
+      /** @inheritDoc */
       _toJSONValue: function(keyArgs) {
         // A string in a format based upon a simplification of the ISO-8601 Extended Format,
         // as defined by [ECMA-262]{@link http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15}.
@@ -65,5 +66,7 @@ define([
     }).implement(/** @lends pentaho.type.Date# */{
       type: bundle.structured["date"] // eslint-disable-line dot-notation
     });
+
+    return PenDate;
   };
 });

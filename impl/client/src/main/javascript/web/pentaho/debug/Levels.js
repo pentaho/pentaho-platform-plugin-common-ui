@@ -46,7 +46,7 @@ define([
    *
    * The enum also exposes a `parse` method.
    *
-   * @memberOf pentaho.util
+   * @memberOf pentaho.debug
    * @enum {number}
    * @readonly
    */

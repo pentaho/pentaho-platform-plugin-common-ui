@@ -195,7 +195,7 @@ define([
        * Specifically, for inline types, attributes with a function value are not supported.
        *
        * This method simply calls {@link @see pentaho.type.Instance#toSpec} with argument `keyArgs.isJson` as `true`
-       * and exists for seamless integrations with JavaScript's
+       * and exists for seamless integration with JavaScript's
        * [JSON.stringify](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
        * method.
        *
@@ -239,6 +239,7 @@ define([
        *
        * @name extend
        * @memberOf pentaho.type.Instance
+       * @method
        *
        * @param {string} [name] The name of the created class.
        * The name of the created class is used for debugging purposes.

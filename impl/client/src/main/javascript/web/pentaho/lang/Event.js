@@ -25,21 +25,13 @@ define([
 
   return Base.extend("pentaho.lang.Event", /** @lends pentaho.lang.Event# */{
     /**
-     * @classDesc The `Event` class is the base class of event objects emitted by an
-     * [EventSource]{@link pentaho.lang.EventSource}.
+     * @classDesc The `Event` class is the base class of a certain kind of event objects that can be
+     * emitted by [event sources]{@link pentaho.lang.EventSource}.
      *
      * The source of an event is the object that emits it and
-     * is given by its [source]{@link pentaho.lang.Event#source} property.
+     * is given by the event's [source]{@link pentaho.lang.Event#source} property.
      *
-     * ##### Event Type
-     *
-     * Events have a _type_ that is given by its [type]{@link pentaho.lang.Event#type} property.
-     * The type of an event is the _id_ used to register to it,
-     * using [EventSource#on]{@link pentaho.lang.EventSource#on}.
-     *
-     * An event type corresponds to a single subclass of `Event`.
-     * However, an `Event` subclass can be used by several event types.
-     * The `Event` subclass of an event type mainly depends on the data that it is associated with.
+     * The type of an event is given by its [type]{@link pentaho.lang.Event#type} property.
      *
      * ##### Event Cancellation
      *
@@ -49,8 +41,7 @@ define([
      * the event is said to be _cancelable_.
      * That characteristic is exposed by the [isCancelable]{@link pentaho.lang.Event#isCancelable} property.
      *
-     * When an event is canceled, its corresponding action is also canceled and
-     * the listeners of unprocessed registrations are not notified.
+     * When an event is canceled, the listeners of unprocessed registrations are not notified.
      *
      * To cancel an event, call its [cancel]{@link pentaho.lang.Event#cancel} method.
      * To find out if an event has been canceled, read the [isCanceled]{@link pentaho.lang.Event#isCanceled} property.
@@ -68,10 +59,10 @@ define([
      * @class
      * @amd pentaho/lang/Event
      *
-     * @description Creates an event of a given type, source and cancelable.
+     * @description Creates an event of a given type, source and ability to be canceled.
      * @constructor
-     * @param {!nonEmptyString} type - The type of the event.
-     * @param {!Object} source - The object where the event will be initially emitted.
+     * @param {nonEmptyString} type - The type of the event.
+     * @param {!pentaho.lang.IEventSource} source - The object where the event is emitted.
      * @param {?boolean} [cancelable=false] - Indicates if the event can be canceled.
      */
     constructor: function(type, source, cancelable) {
@@ -89,7 +80,7 @@ define([
     /**
      * Gets the type of the event.
      *
-     * @type {!nonEmptyString}
+     * @type {nonEmptyString}
      * @readonly
      */
     get type() {
@@ -97,9 +88,9 @@ define([
     },
 
     /**
-     * Gets the object where the event was initially emitted.
+     * Gets the source of the event.
      *
-     * @type {!Object}
+     * @type {!pentaho.lang.IEventSource}
      * @readonly
      */
     get source() {
@@ -117,9 +108,9 @@ define([
     },
 
     /**
-     * Gets the reason why the event was canceled.
+     * Gets the reason why the event was canceled, if any, or `null`.
      *
-     * @type {!Error}
+     * @type {Error}
      * @readonly
      */
     get cancelReason() {
@@ -129,11 +120,13 @@ define([
     /**
      * Cancels the event.
      *
-     * This method has no effect if the event is not cancelable or
-     * has already been canceled.
+     * This method has no effect if the event is not cancelable or has already been canceled.
+     *
      * @param {string|Error} [reason="canceled"] - The reason why the event is being canceled.
      *
+     * @see pentaho.lang.Event#isCancelable
      * @see pentaho.lang.Event#isCanceled
+     * @see pentaho.lang.Event#cancelReason
      */
     cancel: function(reason) {
       if(this._cancelable && !this._isCanceled) {

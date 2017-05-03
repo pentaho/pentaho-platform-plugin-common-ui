@@ -84,6 +84,7 @@ define([
       return this._changes;
     },
 
+    /** @inheritDoc */
     get hasChanges() {
       if(this._changes.length > 0)
         return true;
@@ -109,6 +110,7 @@ define([
       return O.getOwn(this._changesByElemKey, key) || null;
     },
 
+    /** @inheritDoc */
     _clearChanges: function() {
       // NOTE: called from constructor
 
@@ -160,6 +162,7 @@ define([
       return projMock;
     },
 
+    /** @inheritDoc */
     _apply: function(target) {
       if(target === this.owner && this._projMock) {
 

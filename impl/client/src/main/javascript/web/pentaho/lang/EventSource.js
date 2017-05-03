@@ -54,82 +54,55 @@ define([
   /**
    * Holds registration information about an observer.
    *
-   * @name IObserverRegistration
+   * @name pentaho.lang.IEventObserverRegistration
    * @interface
    * @property {pentaho.lang.IEventObserver} observer - The observer.
    * @property {number} priority - The priority of the observer.
    * @property {number} index - The index of the observer in the event's observers list.
+   * @private
    */
 
   // ---
 
+  // TODO: Move this to the pentaho.lang.impl namespace; possibly along with Event ?
+
   /**
-   * @classDesc The `EventSource` class is a **mixin** to be
-   * used by classes that are the source of events - that emit events.
+   * @classDesc The `EventSource` class is an implementation [IEventSource]{@link pentaho.lang.IEventSource}
+   * that can be used as **mixin** class for classes that emit events.
    *
-   * The exposed interface is compatible with the
-   * [dojo/on]{@link https://dojotoolkit.org/reference-guide/dojo/on.html} API.
+   * The class publicly exposes the `IEventSource` interface, allowing the registration and
+   * unregistration of event listeners/observers.
+   * The ability to emit events is, however, only exposed via the protected interface, through the methods:
+   * [_emit]{@link pentaho.lang.EventSource#_emit},
+   * [_emitSafe]{@link pentaho.lang.EventSource#_emitSafe} and
+   * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
+   * The methods `_emit` and `_emitSafe` can only be used with events of the [Event]{@link pentaho.lang.Event} type,
+   * while the `_emitGeneric` method can be used with any event type and exposes more control options.
+   *
+   * To know if any listeners are registered for a certain event type and phase,
+   * use the [_hasListeners]{@link pentaho.lang.EventSource#_hasListeners} method.
+   * To know if any listeners are registered for any of the phases of a certain event type:
+   * [_hasObservers]{@link pentaho.lang.EventSource#_hasObservers} method.
    *
    * @name EventSource
    * @memberOf pentaho.lang
    * @class
+   * @implements pentaho.lang.IEventSource
    * @amd pentaho/lang/EventSource
    */
 
   return Base.extend(module.id, /** @lends pentaho.lang.EventSource# */{
 
     /**
-     * The registry of event observers.
+     * The registry of event observers by event type.
      *
-     * Events have a name and, optionally, multiple phases.
+     * Listeners of unstructured events are registered as observers of the special `"__"` phase.
      *
-     * Observers are registered for events and can specify listeners for specific phases of the event.
-     *
-     * Events that have a single phase, have, nonetheless, the `"__"` phase, which is used,
-     * implicitly, when a listener is registered directly to an event without specifying a phase.
-     *
-     * A map of event names to observer info arrays.
-     *
-     * @type {Map.<string, Array.<IObserverRegistration>>}
+     * @type {Map.<nonEmptyString, Array.<pentaho.lang.IEventObserverRegistration>>}
      * @private
      */
     __observersRegistry: null,
 
-    /**
-     * Registers a listener function for events of a given type or types.
-     *
-     * Optionally, a _listening priority_ may be specified to adjust
-     * the order by which a listener is notified of an emitted event,
-     * relative to other listeners.
-     *
-     * Note that if a listener function is registered more than once to the same event type,
-     * a **new registration** is created each time and the function will be called
-     * once per registration.
-     *
-     * It is safe to register for an event type while it is being emitted.
-     * However, new registrations are only taken into account in subsequent emissions.
-     *
-     * When `type` represents multiple event types,
-     * the returned event registration handle is a
-     * composite registration for all event types.
-     *
-     * @see pentaho.lang.EventSource#off
-     *
-     * @param {string|string[]} type - The type or types of events.
-     *   When a string, it can be a comma-separated list of event types.
-     *
-     * @param {!pentaho.lang.IEventObserver|!pentaho.lang.EventListener} observer - The event observer or
-     * the single-phase event listener function.
-     * @param {?object} [keyArgs] - Keyword arguments.
-     * @param {?number} [keyArgs.priority=0] - The listening priority.
-     * Higher priority event listeners listen to an event before any lower priority event listeners.
-     * The priority can be set to `-Infinity` or `Infinity`.
-     * In case two listeners are assigned the same priority,
-     * the insertion order determines which runs first.
-     *
-     * @return {!pentaho.lang.IEventRegistrationHandle} An event registration handle that can be used
-     *   for later removal.
-     */
     on: function(type, observer, keyArgs) {
       if(!type) throw error.argRequired("type");
       if(!observer) throw error.argRequired("observer");
@@ -154,34 +127,6 @@ define([
       return null;
     },
 
-    /**
-     * Removes one registration, or all registrations of a given event type and listener function.
-     *
-     * To remove an event registration,
-     * it is sufficient to call the [dispose]{@link pentaho.lang.IEventRegistrationHandle#dispose} method
-     * (or `remove`) of the registration handle returned by [on]{@link pentaho.lang.EventSource#on},
-     * upon registration.
-     *
-     * Alternatively, as a convenience syntax,
-     * the registration handle can be passed as the single argument to this method.
-     *
-     * To remove all registrations of a given event type and listener function,
-     * specify these as arguments.
-     *
-     * It is safe to unregister from an event type while it is being emitted.
-     * However, removed registrations are still taken into account in the current emission.
-     *
-     * Specifying an event registration handle that has already been disposed of has no effect.
-     * Specifying an event type and listener function that have no registrations has no effect.
-     *
-     * @param {string|string[]|!pentaho.lang.IEventRegistrationHandle} typeOrHandle - The type or types of events,
-     * or an event registration handle to dispose of.
-     * When a string, it can be a comma-separated list of event types.
-     *
-     * @param {pentaho.lang.IEventObserver|pentaho.lang.EventListener} observer - The event observer or
-     * the single-phase event listener function.
-     * Required when `typeOrHandle` is not an event registration handle; ignored, otherwise.
-     */
     off: function(typeOrHandle, observer) {
       if(!typeOrHandle) throw error.argRequired("typeOrHandle");
 
@@ -196,7 +141,7 @@ define([
       var types = parseEventTypes(typeOrHandle);
       if(types && types.length) {
 
-        var find = F.is(observer) ? findSinglePhaseObserver : findObserver;
+        var find = F.is(observer) ? findUnstructuredObserverRegistration : findObserverRegistration;
 
         types.forEach(function(type) {
 
@@ -215,19 +160,23 @@ define([
      * Determines if there are any registrations for a given event type and phase.
      *
      * This method can be used to avoid creating expensive event objects
-     * for event type and phase pairs that currently have no registrations.
+     * for event type and phase pairs that don't have registrations.
      *
      * @example
      *
      * if(this._hasListeners("select", "will")) {
-     *   var event = new Event("select");
+     *
+     *   var event = new Event("select", this);
+     *
      *   if(this._emit(event)) {
      *     // Select Will phase
      *   }
      * }
      *
-     * @param {string} type - The type of the event.
-     * @param {string} [phase] - The phase of the event. For single-phase events don't specify this argument.
+     * @param {nonEmptyString} type - The type of the event.
+     * @param {?nonEmptyString} [phase] - The phase of a structured event.
+     * For unstructured events don't specify this argument.
+     *
      * @return {boolean} `true` if the event has any listeners for the given event type and phase; `false`, otherwise.
      *
      * @protected
@@ -259,18 +208,18 @@ define([
      * @example
      *
      * if(this._hasObservers("select")) {
+     *
      *   var event = new Event("select");
      *
-     *   if(this._emit(event, "will")) {
+     *   if(this._emitGeneric(event, "select", "will")) {
      *     // Select Will
-     *   }
      *
-     *   if(this._emit(event, "did")) {
-     *     // Select Did
+     *     this._emitGeneric(event, "select", "did");
      *   }
      * }
      *
-     * @param {string} type - The type of the event.
+     * @param {nonEmptyString} type - The type of the event.
+     *
      * @return {boolean} `true` if the event has any observers for the given event type; `false`, otherwise.
      *
      * @protected
@@ -283,10 +232,10 @@ define([
     },
 
     /**
-     * Emits an event and returns it, unless it was canceled.
+     * Emits an unstructured event and returns it, unless it was canceled.
      *
      * The listeners of existing registrations by the time the method is called are notified,
-     * synchronously, by priority order and then insertion order,
+     * synchronously, by priority order and then registration order,
      * until either the event is canceled or all of the listeners have been notified.
      *
      * It is safe to register or unregister to/from and event type while it is being emitted.
@@ -295,11 +244,14 @@ define([
      * If a listener function throws an error, the event processing is interrupted.
      * No more registrations are processed and the error is passed to the caller.
      *
-     * @param {!pentaho.lang.Event} event The event object to emit.
-     * @return {?pentaho.lang.Event} The emitted event object or `null`, when canceled.
+     * @see pentaho.lang.EventSource#_emitSafe
+     * @see pentaho.lang.EventSource#_emitGeneric
+     *
+     * @param {!pentaho.lang.Event} event - The event object.
+     *
+     * @return {?pentaho.lang.Event} The given event object or `null`, when canceled.
      *
      * @protected
-     * @sealed
      */
     _emit: function(event) {
       if(!event) throw error.argRequired("event");
@@ -310,12 +262,16 @@ define([
 
     /**
      * Variation of the [_emit]{@link pentaho.lang.EventSource#_emit} method in which
-     * all exceptions are caught (and logged).
+     * errors thrown by event listeners are caught and logged.
      *
-     * If an event listener throws an exception, the following event listeners are still processed.
+     * If an event listener throws an error, the following event listeners are still processed.
      *
-     * @param {!pentaho.lang.Event} event The event object to emit.
-     * @return {?pentaho.lang.Event} The emitted event object or `null`, when canceled.
+     * @see pentaho.lang.EventSource#_emit
+     * @see pentaho.lang.EventSource#_emitGeneric
+     *
+     * @param {!pentaho.lang.Event} event - The event object.
+     *
+     * @return {?pentaho.lang.Event} The given event object or `null`, when canceled.
      *
      * @protected
      */
@@ -327,29 +283,32 @@ define([
     },
 
     /**
-     * Emits an event of a generic type and returns it, unless it was canceled.
+     * Emits an event given an arbitrary payload object, its type and phase.
+     * Returns the event payload object, unless the event is canceled.
      *
-     * @param {Object} event - The event object to emit.
-     * @param {string} type - The type of the event.
-     * @param {?string} [phase] - The phase of the event. For single-phase events don't specify this argument
-     * (or specify as {@link Nully}.
+     * @param {object} event - The event object.
+     * @param {nonEmptyString} type - The type of the event.
+     * @param {?nonEmptyString} [phase] - The phase of the event. For unstructured events don't specify this argument
+     * (or specify a {@link Nully} value).
      *
      * @param {Object} [keyArgs] - The keyword arguments' object.
-     * @param {function(Object):boolean} [keyArgs.isCanceled] - A predicate that indicates if a given event object
+     * @param {function(object):boolean} [keyArgs.isCanceled] - A predicate that indicates if a given event object
      * is in a canceled state.
-     * @param {function(any, Object, string, string)} [keyArgs.errorHandler] - When specified with a `null` value,
+     * @param {function(any, object, nonEmptyString, nonEmptyString)} [keyArgs.errorHandler] -
+     * When specified with a `null` value,
      * no error handling is performed and errors thrown by listeners are thrown back to this method's caller.
      * When unspecified or specified as `undefined`, defaults to a function that simply log the listener errors,
      * and let execution continue to following listeners.
      * The function arguments are: the error, the event, the event type and the event phase.
      *
-     * @return {?Object} The emitted event object or `null`, when canceled.
+     * @return {?object} The event payload object or `null`, when the event is canceled.
      *
      * @protected
      */
     _emitGeneric: function(event, type, phase, keyArgs) {
 
       // Performance
+      // if(!event) throw error.argRequired("event");
       // if(!type) throw error.argRequired("type");
 
       var isCanceled;
@@ -363,7 +322,7 @@ define([
       type = typeInfo.getIdOf(type) || type;
 
       if((queue = O.getOwn(this.__observersRegistry, type))) {
-        return emitQueue.call(this, event, queue, type, phase || "__", isCanceled, keyArgs);
+        return emitQueue.call(this, event, queue, type, phase || "__", isCanceled, keyArgs && keyArgs.errorHandler);
       }
 
       return event;
@@ -375,11 +334,9 @@ define([
    *
    * @this pentaho.lang.EventSource
    *
-   * @param {string} type - The event type.
-   * @return {IObserverRegistration[]} The array of event observer registrations.
+   * @param {nonEmptyString} type - The event type.
+   * @return {!Array.<pentaho.lang.IEventObserverRegistration>} The array of event observer registrations.
    *
-   * @this pentaho.lang.EventSource
-   * @inner
    * @private
    */
   function getObserversQueueOf(type) {
@@ -390,7 +347,7 @@ define([
   /**
    * Creates a queue of observer registrations.
    *
-   * @return {IObserverRegistration[]} An empty queue of event observer registrations.
+   * @return {!Array.<pentaho.lang.IEventObserverRegistration>} An empty queue of event observer registrations.
    *
    * @private
    */
@@ -403,14 +360,14 @@ define([
   /**
    * Register an observer given its event type and priority.
    *
-   * @param {string} type - The event tyoe.
+   * @this pentaho.lang.EventSource
+   *
+   * @param {nonEmptyString} type - The event tyoe.
    * @param {!pentaho.lang.IEventObserver} observer - The event observer.
    * @param {number} priority - The listening priority.
    *
    * @return {!pentaho.lang.IEventRegistrationHandle} An event registration handle that can be used for later removal.
    *
-   * @this pentaho.lang.EventSource
-   * @inner
    * @private
    */
   function registerOne(type, observer, priority) {
@@ -422,7 +379,7 @@ define([
 
     var i = queue.length;
 
-    /** @type IObserverRegistration */
+    /** @type pentaho.lang.IEventObserverRegistration */
     var observerRegistration;
     while(i-- && (observerRegistration = queue[i]).priority >= priority) {
       // Will be shifted to the right one position, with the splice operation, below.
@@ -455,11 +412,11 @@ define([
   /**
    * Removes an event observer registration.
    *
-   * @param {string} type - The event type.
-   * @param {IObserverRegistration} observerRegistration - The event observer registration.
-   *
    * @this pentaho.lang.EventSource
-   * @inner
+   *
+   * @param {nonEmptyString} type - The event type.
+   * @param {!pentaho.lang.IEventObserverRegistration} observerRegistration - The event observer registration.
+   *
    * @private
    */
   function unregisterOne(type, observerRegistration) {
@@ -490,13 +447,32 @@ define([
     }
   }
 
+  /**
+   * Disposes a given array of event registration handles.
+   *
+   * @param {!Array.<pentaho.lang.IEventRegistrationHandle>} handles - The array of event registration handles.
+   *
+   * @private
+   */
   function disposeHandles(handles) {
     for(var i = 0, L = handles.length; i !== L; ++i) {
       handles[i].dispose();
     }
   }
 
-  function findSinglePhaseObserver(type, listener) {
+  /**
+   * Finds the first unstructured event observer registration for the given event type and listener.
+   *
+   * @this pentaho.lang.EventSource
+   *
+   * @param {nonEmptyString} type - The event type.
+   * @param {function} listener - The event listener.
+   *
+   * @return {pentaho.lang.IEventObserverRegistration} The event registration, if any; or `null`, otherwise.
+   *
+   * @private
+   */
+  function findUnstructuredObserverRegistration(type, listener) {
     var queue = O.getOwn(this.__observersRegistry, type);
     if(queue) {
       var i = -1;
@@ -507,7 +483,19 @@ define([
     return null;
   }
 
-  function findObserver(type, observer) {
+  /**
+   * Finds the first structured event observer registration for the given event type and observer.
+   *
+   * @this pentaho.lang.EventSource
+   *
+   * @param {nonEmptyString} type - The event type.
+   * @param {!pentaho.lang.IEventObserver} observer - The event observer.
+   *
+   * @return {pentaho.lang.IEventObserverRegistration} The event registration, if any; or `null`, otherwise.
+   *
+   * @private
+   */
+  function findObserverRegistration(type, observer) {
     var queue = O.getOwn(this.__observersRegistry, type);
     if(queue) {
       var i = -1;
@@ -518,7 +506,19 @@ define([
     return null;
   }
 
+  /**
+   * Parses the given event type specification.
+   *
+   * When a string, multiple event types can be specified separated by a comma, `,`.
+   *
+   * @param {nonEmptyString|nonEmptyString[]} type - The event type specification.
+   *
+   * @return {nonEmptyString[]} An array of event types.
+   *
+   * @private
+   */
   function parseEventTypes(type) {
+
     if(type instanceof Array) {
       // Allow an array of event types.
       return type;
@@ -533,17 +533,40 @@ define([
     return [type];
   }
 
-  function emitQueue(event, queue, type, phase, isCanceled, keyArgs) {
+  /**
+   * Emits an event.
+   *
+   * @this pentaho.lang.EventSource
+   *
+   * @param {object} event - The event payload object.
+   * @param {!Array.<pentaho.lang.IEventObserverRegistration>} queue - The queue of event observer registrations.
+   * @param {nonEmptyString} type - The event type.
+   * @param {nonEmptyString} phase - The event phase.
+   * @param {function(object):boolean} [isCanceled] - A predicate that indicates if a given event object
+   * is in a canceled state.
+   * @param {function(any, object, nonEmptyString, nonEmptyString)} [errorHandler] -
+   * When specified with a `null` value,
+   * no error handling is performed and errors thrown by listeners are thrown back to this method's caller.
+   * When unspecified or specified as `undefined`, defaults to a function that simply logs the listener errors,
+   * and lets execution continue to following listeners.
+   * The function arguments are: the error, the event, the event type and the event phase.
+   *
+   * @return {?object} The event payload object or `null`, when the event is canceled.
+   */
+  function emitQueue(event, queue, type, phase, isCanceled, errorHandler) {
+
+    // Performance
+    // if(!event) throw error.argRequired("event");
+    // if(!queue) throw error.argRequired("queue");
+    // if(!type) throw error.argRequired("type");
+    // if(!phase) throw error.argRequired("phase");
 
     // Use `null` to force no error handling.
-    var errorHandler;
-    if((errorHandler = keyArgs && keyArgs.errorHandler) === undefined)
-      errorHandler = errorHandlerLog;
+    if(errorHandler === undefined) errorHandler = errorHandlerLog;
 
     queue.emittingLevel++;
 
     try {
-
       var i = queue.length;
       var listener;
 
@@ -555,12 +578,11 @@ define([
             listener.call(this, event);
           } catch(ex) {
 
-            if(errorHandler) errorHandler.call(this, ex, event, type, phase);
+            errorHandler.call(this, ex, event, type, phase);
           }
 
           if(isCanceled && isCanceled(event)) return null;
         }
-
       } else {
 
         while(i--) if((listener = queue[i].observer[phase])) {
@@ -569,9 +591,7 @@ define([
 
           if(isCanceled && isCanceled(event)) return null;
         }
-
       }
-
     } finally {
       queue.emittingLevel--;
     }
@@ -579,11 +599,36 @@ define([
     return event;
   }
 
+  /**
+   * Determines if a given event object is canceled.
+   *
+   * @param {!pentaho.lang.Event} event - The event object.
+   *
+   * @return {boolean} `true` if it is canceled; `false`, otherwise.
+   *
+   * @private
+   */
   function event_isCanceled(event) {
     return event.isCanceled;
   }
 
-  function errorHandlerLog(ex, event, type, phase) {
-    logger.log("Event listener of '" + type + ":" + phase + "' failed. \nStack: " + ex.stack);
+  // TODO: check log level!
+
+  /**
+   * Logs an error thrown by an event listener.
+   *
+   * @param {any} error - The thrown value.
+   * @param {pentaho.lang.Event} event - The event object.
+   * @param {nonEmptyString} type - The event type.
+   * @param {nonEmptyString} phase - The event phase.
+   *
+   * @private
+   */
+  function errorHandlerLog(error, event, type, phase) {
+
+    var eventTypeId = type + (phase !== "__" ? (":" + phase) : "");
+    var errorDesc = error ? (" Error: " + error.message) : "";
+
+    logger.log("Event listener of '" + eventTypeId + "' failed." + errorDesc);
   }
 });

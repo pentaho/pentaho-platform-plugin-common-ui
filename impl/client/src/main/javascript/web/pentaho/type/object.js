@@ -45,7 +45,7 @@ define([
      *
      * @description Creates an object instance.
      */
-    return Simple.extend(/** @lends pentaho.type.Object# */{
+    var PenObject = Simple.extend(/** @lends pentaho.type.Object# */{
 
       constructor: function(spec) {
 
@@ -91,5 +91,7 @@ define([
     }).implement(/** @lends pentaho.type.Object# */{
       type: bundle.structured["object"] // eslint-disable-line dot-notation
     });
+
+    return PenObject;
   };
 });

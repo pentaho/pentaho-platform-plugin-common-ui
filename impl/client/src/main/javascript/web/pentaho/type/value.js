@@ -411,6 +411,7 @@ define([
        *
        * @name extend
        * @memberOf pentaho.type.Value
+       * @method
        *
        * @param {string} [name] The name of the created class; used for debugging purposes.
        * @param {pentaho.type.spec.IValueProto} [instSpec] The instance specification.

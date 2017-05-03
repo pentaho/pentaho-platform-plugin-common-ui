@@ -278,6 +278,7 @@ define([
 
         // Note: constructor/_init only called on sub-classes of Refinement.Type,
         // and not on Refinement.Type itself.
+        /** @inheritDoc */
         _init: function(instSpec) {
           this.base.apply(this, arguments);
 
@@ -304,7 +305,7 @@ define([
          * The attributes defined by the added refinement facets become available for
          * extension/configuration on the refinement type.
          *
-         * @type Array.<pentaho.type.RefinementFacet>
+         * @type {Array.<pentaho.type.RefinementFacet>}
          *
          * @see pentaho.type.spec.IRefinementTypeProto#facets
          */
@@ -677,6 +678,7 @@ define([
         // endregion
 
         // region serialization
+        /** @inheritDoc */
         _fillSpecInContext: function(spec, keyArgs) {
           var any = false;
 
@@ -707,7 +709,6 @@ define([
           while(++i < L)
             any = facets[i].fillSpecInContext.call(this, spec, keyArgs) || any;
 
-          //validateInstance
           return any;
         }
         // endregion
@@ -722,6 +723,7 @@ define([
        *
        * @name extend
        * @memberOf pentaho.type.Refinement
+       * @method
        *
        * @param {string} [name] The name of the created class; used for debugging purposes.
        * @param {{type: pentaho.type.spec.IRefinementTypeProto}} [instSpec] The refinement type specification.
@@ -749,8 +751,7 @@ define([
 
         return this.base.apply(this, arguments);
       }
-    },
-    /*keyArgs:*/{
+    }, /* keyArgs: */{
       isRoot: true
     });
 

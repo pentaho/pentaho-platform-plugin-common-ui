@@ -83,7 +83,8 @@ define([
 
       /**
        * Gets a value that indicates if this filter is terminal.
-       * The non-terminal filters are
+       *
+       * The non-terminal filter types are
        * [Or]{@link pentaho.type.filter.Or},
        * [And]{@link pentaho.type.filter.And} and
        * [Not]{@link pentaho.type.filter.Not}.
@@ -95,10 +96,22 @@ define([
         return true;
       },
 
+      /**
+       * Gets a value that indicates if this filter is a [Not]{@link pentaho.type.filter.Not} filter.
+       *
+       * @type {boolean}
+       * @readOnly
+       */
       get isNot() {
         return false;
       },
 
+      /**
+       * Gets a value that indicates if this filter is a [Property]{@link pentaho.type.filter.Property} filter.
+       *
+       * @type {boolean}
+       * @readOnly
+       */
       get isProperty() {
         return false;
       },
@@ -266,10 +279,13 @@ define([
        *
        * This implementation works first by converting both this filter and the `exclude` argument to DNF,
        * assuming that these can be so converted in a reasonable time.
+       * Then, the difference is performed using an efficient algorithm.
        *
        * @param {pentaho.type.filter.Abstract} exclude - The filter to be "subtracted" from this one.
        *
-       * @return {!pentaho.type.filter.Abstract} The resulting filter.
+       * @return {!pentaho.type.filter.Abstract} The resulting filter (not necessarily in DNF form).
+       *
+       * @see pentaho.type.filter.Abstract#toDnf
        */
       andNot: function(exclude) {
         if(!exclude)
@@ -298,8 +314,8 @@ define([
 
         if(_isDebugMode) {
           logger.log("-----------------------------------------");
-          //logger.log("currentDnf #=" + currentDnf.operands.count + " " + currentDnf.contentKey);
-          //logger.log("excludeDnf #=" + excludeDnf.operands.count + " " + excludeDnf.contentKey);
+          // logger.log("currentDnf #=" + currentDnf.operands.count + " " + currentDnf.contentKey);
+          // logger.log("excludeDnf #=" + excludeDnf.operands.count + " " + excludeDnf.contentKey);
         }
 
         // Index exclude Ands by contentKey.
@@ -347,11 +363,46 @@ define([
             ? new filter.Or({operands: remainders})
             : filter.False.instance;
 
-        //if(_isDebugMode) logger.log("result = " + result.contentKey);
+        // if(_isDebugMode) logger.log("result = " + result.contentKey);
 
         return result;
       },
 
+      /**
+       * Converts a copy of this filter into Disjunctive Normal Form and returns it.
+       *
+       * A filter in DNF is one of:
+       *
+       * 1. A [True]{@link pentaho.type.filter.True} filter - filters everything
+       * 2. A [False]{@link pentaho.type.filter.False} filter - filters nothing
+       * 3. An [Or]{@link pentaho.type.filter.Or} of [Ands]{@link pentaho.type.filter.And} of,
+       *    possibly negated, (non-degenerate) [terminal]{@link pentaho.type.filter.Abstract#isTerminal} filters,
+       *    like [IsEqual]{@link pentaho.type.filter.IsEqual}.
+       *
+       * DNF is particularly useful for representing filters because,
+       * excluding its degenerate cases,
+       * it is the natural form of a filter that selects a set of rows,
+       * such as:
+       *
+       *   (country = "us" and productLine = "cars") or (country = "pt" and productLine = "jets")
+       *
+       * Generally, DNF conversion is computationally expensive, and, for some types of filters,
+       * can not terminate in a reasonable amount of time.
+       * One such type of filter is that which results from a difference operation,
+       * such as `filterA.and(filterB.negate())`. Directly converting such a structured filter to DNF
+       * will usually not terminate soon enough.
+       * For such a reason, and because it is such a common operation,
+       * the Filter API provides an optimized difference operator that is able to keep computational cost low enough
+       * for practical cases, [andNot]{@link pentaho.type.filter.Abstract#andNot}.
+       * The resulting filter can safely be converted to DNF.
+       *
+       * The result of this operation is cached.
+       *
+       * @return {!pentaho.type.filter.True|!pentaho.type.filter.False|!pentaho.type.filter.Or} The resulting
+       * DNF filter.
+       *
+       * @see https://en.wikipedia.org/wiki/Disjunctive_normal_form
+       */
       toDnf: function() {
         var result = this.__toDnfCache;
         if(!result) {
