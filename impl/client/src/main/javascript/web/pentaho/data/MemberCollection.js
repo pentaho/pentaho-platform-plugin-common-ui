@@ -25,7 +25,7 @@ define([
      * @memberOf pentaho.data
      * @class
      * @extends pentaho.lang.Collection
-     *
+     * @ignore
      * @classdesc A collection of members.
      *
      * ### AMD

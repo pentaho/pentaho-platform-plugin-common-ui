@@ -36,14 +36,15 @@ define([
     "date":    AtomicTypeName.DATE
   };
 
-  var Table = AbstractTable.extend("pentaho.data.Table", /** @lends pentaho.data.Table# */{
+  var Table = AbstractTable.extend("pentaho.data.Table", /** @lends pentaho.data.Table2# */{
     /**
-     * @alias Table
+     * @ignore
+     * @alias Table2
      * @memberOf pentaho.data
      * @class
      * @extends pentaho.data.AbstractTable
      *
-     * @classdesc The `Table` class implements a type of table that directly stores data.
+     * @classdesc The `Table2` class implements a type of table that directly stores data.
      *
      * ### AMD
      *
@@ -305,7 +306,7 @@ define([
       tableSpec.model = arg.optional(keyArgs, "shareModel") ? this.model : this.model.toSpec();
       return tableSpec;
     }
-  }, /** @lends pentaho.data.Table */{
+  }, /** @lends pentaho.data.Table2 */{
     /**
      * Converts a table in JSON _CDA_ format to JSON _DataTable_ format.
      *

@@ -22,4 +22,5 @@
  * (e.g. {@link pentaho.data.Cell#value}).
  *
  * @typedef {number|string|Date|boolean} pentaho.data.Atomic
+ * @ignore
  */

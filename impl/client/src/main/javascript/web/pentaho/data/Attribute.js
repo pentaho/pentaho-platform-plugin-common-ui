@@ -30,6 +30,7 @@ define([
      * @alias Attribute
      * @memberOf pentaho.data
      * @class
+     * @ignore
      *
      * @implements pentaho.lang.ISpecifiable
      * @implements pentaho.lang.IAnnotatable

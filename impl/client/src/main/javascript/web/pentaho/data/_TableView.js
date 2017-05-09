@@ -25,6 +25,7 @@ define([
 
   var TableView = AbstractTable.extend("pentaho.data.TableView", /** @lends pentaho.data.TableView# */{
     /**
+     * @ignore
      * @alias TableView
      * @memberOf pentaho.data
      * @class

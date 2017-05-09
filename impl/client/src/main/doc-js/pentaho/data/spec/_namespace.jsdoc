@@ -17,5 +17,6 @@
  * The specifications sub-namespace of the `pentaho.data` namespace.
  *
  * @name pentaho.data.spec
+ * @ignore
  * @namespace
  */
