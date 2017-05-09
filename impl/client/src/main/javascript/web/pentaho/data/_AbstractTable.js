@@ -67,6 +67,28 @@ define([
      * @return {!pentaho.data.Cell} The specified cell object.
      */
 
+    /**
+     * Adds a column.
+     *
+     * @name pentaho.data.AbstractTable#addColumn
+     * @method
+     * @abstract
+     * @param {Object} colSpec The column specification.
+     * @param {Object} [keyArgs] The keyword arguments.
+     * @return {number} The index of the new column.
+     */
+
+    /**
+     * Adds a row.
+     *
+     * @name pentaho.data.AbstractTable#addRow
+     * @method
+     * @abstract
+     * @param {Object} rowSpec The row specification.
+     * @param {Object} [keyArgs] The keyword arguments.
+     * @return {number} The index of the new row.
+     */
+
     // -----
 
     /** @ignore */

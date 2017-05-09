@@ -1,4 +1,21 @@
 /*!
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+/*!
  * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,32 +33,146 @@
 
 /**
  * @ignore
- * @classdesc The `ITable` interface extends the `ITableReadOnly` interface
- * to allow manipulation of a **tabular** dataset.
+ * @classdesc The `ITableReadOnly` interface allows **readonly** access to a **tabular** dataset.
  *
- * @name pentaho.data.ITable
+ * @name pentaho.data.ITableReadOnly
  * @interface
- * @extends pentaho.data.ITableReadOnly
+ *
+ * @property {pentaho.data.Model} model Gets the underlying model object.
  */
 
 /**
- * Adds a column.
+ * Gets the number of columns.
  *
- * @name pentaho.data.AbstractTable#addColumn
+ * @name pentaho.data.AbstractTable#getNumberOfColumns
  * @method
  * @abstract
- * @param {Object} colSpec The column specification.
- * @param {Object} [keyArgs] The keyword arguments.
- * @return {number} The index of the new column.
+ * @return {number} The number of columns.
  */
 
 /**
- * Adds a row.
+ * Gets the number of rows.
  *
- * @name pentaho.data.AbstractTable#addRow
+ * @name pentaho.data.AbstractTable#getNumberOfRows
  * @method
  * @abstract
- * @param {Object} rowSpec The row specification.
- * @param {Object} [keyArgs] The keyword arguments.
- * @return {number} The index of the new row.
+ * @return {number} The number of rows.
+ */
+
+/**
+ * Gets the id of a column, given its index.
+ *
+ * @name pentaho.data.AbstractTable#getColumnId
+ * @method
+ * @abstract
+ * @param {number} colIndex The column index (zero-based).
+ * @return {string} The id of the column.
+ */
+
+/**
+ * Gets the label of a column, given its index.
+ *
+ * @name pentaho.data.AbstractTable#getColumnLabel
+ * @method
+ * @abstract
+ * @param {number} colIndex The column index (zero-based).
+ * @return {string} The label of the column.
+ */
+
+/**
+ * Gets the attribute of a column, given its index.
+ *
+ * @name pentaho.data.AbstractTable#getColumnAttribute
+ * @method
+ * @abstract
+ * @param {number} colIndex The column index (zero-based).
+ * @return {pentaho.data.Attribute} The column attribute object or `null`, if none.
+ *
+ *    Only cross-tables can have columns that have no associated attribute.
+ */
+
+/**
+ * Gets the type name of the values of a column's attribute, given its index.
+ *
+ * Note that whatever the provided casing,
+ * type names are returned in lower case.
+ *
+ * @name pentaho.data.AbstractTable#getColumnType
+ * @method
+ * @abstract
+ * @param {number} colIndex The column index (zero-based).
+ * @return {pentaho.data.AtomicTypeName|undefined} The data type of the column's values or
+ *    `undefined`, if the column has no underlying attribute.
+ *
+ *    Only cross-tables can have columns that have no associated attribute.
+ */
+
+/**
+ * Gets the value of a cell, given its row and column indexes.
+ *
+ * When a cell is missing or has a `null` or `undefined` value,
+ * then `null` is returned.
+ *
+ * @name pentaho.data.AbstractTable#getValue
+ * @method
+ * @abstract
+ * @param {number} rowIndex The row index (zero-based).
+ * @param {number} colIndex The column index (zero-based).
+ * @return {pentaho.data.Atomic|null} The cell's value.
+ */
+
+/**
+ * Gets the key of the value of a cell, given its row and column indexes.
+ *
+ * When a cell contains the `null` value, its key is the empty string, `""`.
+ * When a cell is discrete (and is not `null`), its key is that of its referent.
+ * Otherwise, the key is the result of calling its value's `toString` method.
+ *
+ * @name pentaho.data.AbstractTable#getValueKey
+ * @method
+ * @abstract
+ * @param {number} rowIndex The row index (zero-based).
+ * @param {number} colIndex The column index (zero-based).
+ * @return {string} The key of the cell's value.
+ */
+
+/**
+ * Gets the formatted value _property_ of a cell, given its row and column indexes.
+ *
+ * This method returns the string representation of the value of the cell's `f` property,
+ * when the value is defined, or `undefined`, otherwise.
+ *
+ * Contrast this method with {@link pentaho.data.AbstractTable#getFormattedValue},
+ * that returns a best-effort formatted value in all cases.
+ *
+ * @name pentaho.data.AbstractTable#getLabel
+ * @method
+ * @abstract
+ * @param {number} rowIndex The row index (zero-based).
+ * @param {number} colIndex The column index (zero-based).
+ * @return {string|undefined} The specified formatted value or `undefined`.
+ */
+
+/**
+ * Gets a best-effort formatted value of a cell, given its row and column indexes.
+ *
+ * If the cell has a specified label,
+ * then the string representation of that value is returned.
+ *
+ * Otherwise, if the cell has a specified value,
+ * then the string representation of that value is returned.
+ *
+ * When both the cell's formatted value and value are `null` or `undefined`,
+ * then an empty string is returned.
+ *
+ * Contrast this method with {@link pentaho.data.AbstractTable#getLabel},
+ * that only returns a formatted value when one has been explicitly
+ * defined in the cell's `f` property.
+ *
+ * @name pentaho.data.AbstractTable#getFormattedValue
+ * @method
+ * @abstract
+ * @param {number} rowIndex The row index (zero-based).
+ * @param {number} colIndex The column index (zero-based).
+ * @return {string} The cell's formatted value.
  */
