@@ -38,6 +38,9 @@ public class Category implements ICategory, Serializable {
    */
   @Override
   public String getId() {
+    if ( this.id != null ) {
+      return this.id.replaceAll( "<", "&lt;" ).replaceAll( ">", "&gt;" );
+    }
     return this.id;
   }
 
@@ -46,7 +49,11 @@ public class Category implements ICategory, Serializable {
    */
   @Override
   public String getName() {
-    return this.name;
+    if ( this.name != null ) {
+      return this.name.replaceAll( "<", "&lt;" ).replaceAll( ">", "&gt;" );
+    } else {
+      return this.name;
+    }
   }
 
   /**
