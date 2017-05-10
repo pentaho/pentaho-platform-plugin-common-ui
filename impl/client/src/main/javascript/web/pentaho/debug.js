@@ -29,8 +29,8 @@ define([
   if(level != null) spec.level = level;
 
   /**
-   * The `pentaho.debug.manager` singleton provides access to the main Pentaho Web Client Platform's
-   * debugging manager.
+   * The `pentaho.debug.manager` singleton provides access to the main debugging manager of
+   * the JavaScript Pentaho Platform.
    *
    * The debugging levels can be configured through AMD as shown in the following example:
    *

@@ -166,7 +166,7 @@
     requireTypes[name] = "pentaho/visual/base";
   }
 
-  // Metadata Model Base Theme
+  // Type API Base Theme
   mapTheme("pentaho/type", "themes", ["crystal"]);
 
   // Visual Models Themes

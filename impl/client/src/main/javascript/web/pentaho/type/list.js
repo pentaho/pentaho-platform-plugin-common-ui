@@ -41,7 +41,7 @@ define([
      * @class
      * @extends pentaho.type.Value.Type
      *
-     * @classDesc The base type class of *plural*, list value types.
+     * @classDesc The base type class of plural value types.
      *
      * For more information see {@link pentaho.type.List}.
      */
@@ -55,7 +55,10 @@ define([
      *
      * @amd {pentaho.type.Factory<pentaho.type.List>} pentaho/type/list
      *
-     * @classdesc A list of `Element` instances of some _common base_ type.
+     * @classDesc The base class of plural values.
+     *
+     * A list is an ordered set of [elements]{@link pentaho.type.Element} of
+     * a [common, base type]{@link pentaho.type.List.Type#of}.
      *
      * @description Creates a list instance.
      *
@@ -70,6 +73,7 @@ define([
      * @param {boolean} [keyArgs.isBoundary] - Indicates if the list should be a _boundary list_.
      * @param {boolean} [keyArgs.isReadOnly] - Indicates if the list should be a _read-only list_.
      *
+     * @see pentaho.type.Element
      * @see pentaho.type.spec.IList
      * @see pentaho.type.spec.IListProto
      * @see pentaho.type.spec.IListTypeProto

@@ -54,5 +54,5 @@
  *
  * @name data
  * @memberOf pentaho.visual.base.spec.IModel#
- * @type {pentaho.data.Table}
+ * @type {pentaho.data.ITable}
  */

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,50 @@
  */
 
 /**
- * The `visual` namespace contains the classes and interfaces that constitute the Visualization API.
+ * The `visual` namespace contains the types that constitute the **Pentaho Visualization API**.
+ *
+ * ## Overview
+ *
+ * The Visualization API provides a unified way to visualize data across the Pentaho suite
+ * (e.g. [Analyzer]{@link http://www.pentaho.com/product/business-visualization-analytics},
+ * [PDI]{@link http://www.pentaho.com/product/data-integration},
+ * [CDF]{@link http://community.pentaho.com/ctools/cdf/}).
+ *
+ * Essentially, it is a set of abstractions that enables safe, isolated operation between
+ * applications, visualizations and business logic.
+ *
+ * A **visualization** is constituted by:
+ *
+ * * One [Model]{@link pentaho.visual.base.Model},
+ *   which _identifies_ the visualization and
+ *   _defines_ it in terms of its data requirements,
+ *   such as the visual degrees of freedom it has (e.g. _X position_, _color_ and _size_) and
+ *   any major options that affect its rendering.
+ *
+ * * One [View]{@link pentaho.visual.base.View} (at least),
+ *   which implements the actual rendering using chosen technologies
+ *   (e.g. [HTML]{@link https://www.w3.org/TR/html/},
+ *   [SVG]{@link https://www.w3.org/TR/SVG/},
+ *   [D3]{@link https://d3js.org/}),
+ *   and handle user interaction,
+ *   dispatching [actions]{@link pentaho.visual.action} and, for example, showing tooltips.
+ *   The standard data actions are
+ *   [Select]{@link pentaho.visual.action.Select} and
+ *   [Execute]{@link pentaho.visual.action.Execute}.
+ *
+ * The Visualization API is built on top of other Platform JavaScript APIs:
+ * * The [Data API]{@link pentaho.data} ensures seamless integration with data sources in the Pentaho platform,
+ *   as well as with other client-side component frameworks.
+ *
+ * * The [Type API]{@link pentaho.type} provides to visualizations out-of-the-box features
+ *   such as class inheritance, metadata support, configuration, validation and serialization.
+ *
+ * * The [Core APIs]{@link pentaho} provide to visualizations features such as localization,
+ *   theming and service registration and consumption.
+ *
+ * A set of stock visualizations is included, covering the most common chart types.
+ * Based on the [CCC]{@link http://community.pentaho.com/ctools/ccc/} charting library,
+ * they're customizable and extensible to fit your organization's desired look and feel.
  *
  * @name pentaho.visual
  * @namespace

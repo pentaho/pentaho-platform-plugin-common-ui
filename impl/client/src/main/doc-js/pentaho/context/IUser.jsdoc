@@ -15,8 +15,8 @@
  */
 
 /**
- * The `IUser` interface allows access to the Pentaho Web Client Platform's
- * contextual information that pertains to the user.
+ * The `IUser` interface allows access to the Pentaho Platform's
+ * environmental information that pertains to the user.
  *
  * @name pentaho.context.IUser
  * @interface

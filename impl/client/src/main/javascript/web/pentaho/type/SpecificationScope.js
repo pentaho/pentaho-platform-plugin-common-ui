@@ -31,7 +31,7 @@ define([
      *
      * @amd pentaho/type/SpecificationScope
      *
-     * @classDesc The `SpecificationScope` class manages the
+     * @classDesc A class that manages the
      * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
      *
      * @constructor

@@ -61,7 +61,7 @@ define([
      *
      * @amd {pentaho.type.Factory<pentaho.type.Complex>} pentaho/type/complex
      *
-     * @classDesc The base class of complex types.
+     * @classDesc The base class of structured values.
      *
      * Example complex type:
      * ```js
@@ -75,7 +75,7 @@ define([
      *       type: {
      *         props: [
      *           {name: "name", type: "string", label: "Name"},
-     *           {name: "category", type: ["string"], label: "Category"},
+     *           {name: "categories", type: ["string"], label: "Categories"},
      *           {name: "price", type: "number", label: "Price"}
      *         ]
      *       }
@@ -93,6 +93,7 @@ define([
      * @constructor
      * @param {pentaho.type.spec.UComplex} [spec] A complex specification.
      *
+     * @see pentaho.type.Simple
      * @see pentaho.type.spec.IComplex
      * @see pentaho.type.spec.IComplexProto
      * @see pentaho.type.spec.IComplexTypeProto

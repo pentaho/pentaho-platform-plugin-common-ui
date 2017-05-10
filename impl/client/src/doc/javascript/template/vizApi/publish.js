@@ -379,6 +379,7 @@ function registerTypeHelpers(view) {
   view._typeBuilder = typeBuilder;
 
   var mdnJsTypeBaseURL = "http://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/";
+  var mdnJsWindowBaseURL = "https://developer.mozilla.org/en-US/docs/Web/API/Window/";
   var mdnJsTypes = {
     "string" : true,  "String": true,
     "number": true,   "Number": true,
@@ -409,6 +410,10 @@ function registerTypeHelpers(view) {
     "Map": true, "WeakMap": true,
     "Set": true, "WeakSet": true,
     "Math": true, "Symbol": true
+  };
+
+  var mdnJsWindow = {
+    "URL": true
   };
 
   var backboneTypeBaseURL = "http://backbonejs.org/#";
@@ -600,12 +605,16 @@ function registerTypeHelpers(view) {
     var jsTypeLower = jsType.toLowerCase();
 
     var isMdnJsType = mdnJsTypes[jsType];
+    var isMdnJsWindow = mdnJsWindow[jsType];
     var isJQueryType = typeof jQueryTypes[jsTypeLower] !== "undefined";
     var isBackboneType = BACKBONE_TYPE_REGX.exec(jsType) !== null;
 
     var link;
     if (isMdnJsType) {
       link = mdnJsTypeBaseURL + jsType;
+
+    } else if(isMdnJsWindow) {
+      link = mdnJsWindowBaseURL + jsType;
 
     } else if (isBackboneType) {
       link = backboneTypeBaseURL + jsType.split(".")[1];
@@ -716,15 +725,15 @@ exports.publish = function(taffyData, opts, tutorials) {
     });
 
     /*
-     * Handle the defaul values for non optional properties correctly. 
-     * 
+     * Handle the defaul values for non optional properties correctly.
+     *
      */
     data().each(function(doclet) {
         if (doclet.properties) {
             doclet.properties = doclet.properties.map(function(property) {
                 var separator = " - ",
                     separatorLength = separator.length;
-                
+
                 var defaultvalue = property.defaultvalue;
                 var description = property.description;
 
@@ -739,8 +748,8 @@ exports.publish = function(taffyData, opts, tutorials) {
                     description: description,
                     type: property.type,
                     name: property.name
-                }  
-            });                  
+                }
+            });
         }
     });
 
@@ -910,7 +919,7 @@ exports.publish = function(taffyData, opts, tutorials) {
             var split = function(str, sep) {
                 if(str) {
                     return str.split(sep).join('');
-                } 
+                }
             };
 
             //dont split for code
@@ -926,7 +935,7 @@ exports.publish = function(taffyData, opts, tutorials) {
             if(doclet.summary && doclet.summary.indexOf("syntax.javascript") === -1) {
                 doclet.summary = split(doclet.summary, '<br>');
             }
-            
+
             doclet.parsedName = split(doclet.name, '"');
             doclet.parsedLongname = split(doclet.longname, '"')
         }
@@ -934,14 +943,14 @@ exports.publish = function(taffyData, opts, tutorials) {
 
     var members = helper.getMembers(data);
     members.tutorials = tutorials.children;
-    
+
     // add template helpers
     view.find = find;
     view.linkto = linkto;
     view.resolveAuthorLinks = resolveAuthorLinks;
     view.tutoriallink = tutoriallink;
     view.htmlsafe = htmlsafe;
-    
+
     // once for all
     view.nav = buildNav(findMembers(data, 'namespace'));
     attachModuleSymbols( find({ longname: {left: 'module:'} }), members.modules );

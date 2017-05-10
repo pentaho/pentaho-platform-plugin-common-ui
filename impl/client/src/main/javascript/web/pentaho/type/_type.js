@@ -52,7 +52,7 @@ define([
      * @name pentaho.type.Type
      * @class
      *
-     * @classDesc The base **type class** of the types of the Pentaho client metadata model.
+     * @classDesc The root class of types that can be represented by the Pentaho Type API.
      *
      * For additional information, see the associated _instance class_, {@link pentaho.type.Instance}.
      */

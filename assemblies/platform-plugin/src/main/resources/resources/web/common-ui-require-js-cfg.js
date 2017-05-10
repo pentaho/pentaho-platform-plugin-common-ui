@@ -48,7 +48,7 @@
   requirePaths["pentaho/common"] = basePath + "/dojo/pentaho/common";
   // endregion
 
-  // region Pentaho Web-Client Platform
+  // region Pentaho Platform JavaScript APIs (Core, Data, Visual)
 
   // Unfortunately, *mantle* already maps the "pentaho" id to "/js",
   // so the paths of all of the following sub-modules must be configured individually.
@@ -275,7 +275,7 @@
   requireShim["common-ui/angular-directives"] = ["common-ui/angular-ui-bootstrap"];
   // endregion
 
-  // region Metadata Model and Visualizations Packages
+  // region Type API and Visualization Models Packages and Themes
   function mapTheme(mid, themeRoot, themes) {
     var theme = (typeof active_theme !== "undefined") ? active_theme : null;
     if(!theme || themes.indexOf(theme) < 0) theme = themes[0];
@@ -288,10 +288,10 @@
     requireTypes[name] = "pentaho/visual/base";
   }
 
-  // Metadata Model Base Theme
+  // Type API Base Theme
   mapTheme("pentaho/type", "themes", ["crystal"]);
 
-  // CCC Themes
+  // Visual Models Themes
   mapTheme("pentaho/visual/models", "themes", ["crystal", "sapphire", "onyx", "det"]);
 
   // sample/calc theme

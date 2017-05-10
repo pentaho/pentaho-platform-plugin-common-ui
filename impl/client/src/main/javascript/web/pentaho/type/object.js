@@ -41,7 +41,7 @@ define([
      * @extends pentaho.type.Simple
      * @amd {pentaho.type.Factory<pentaho.type.Object>} pentaho/type/object
      *
-     * @classDesc A primitive JavaScript object type.
+     * @classDesc The class that represents primitive, JavaScript {@link object} values.
      *
      * @description Creates an object instance.
      */

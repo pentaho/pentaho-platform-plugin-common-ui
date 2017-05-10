@@ -18,13 +18,6 @@
  * The `config.IService` interface describes a service
  * that manages configurations, usually of types.
  *
- * The platform's main configuration service instance can be obtained by requiring
- * the module `pentaho/service!pentaho.config.IService?single`.
- *
- * The platform registers an instance module that
- * loads all registered configuration rule set modules
- * (i.e., modules of type {@link pentaho.config.spec.IRuleSet}).
- *
  * The [add]{@link pentaho.config.IService#add} method
  * is used to register a [config.spec.IRuleSet]{@link pentaho.config.spec.IRuleSet}
  * to the service.
@@ -117,7 +110,7 @@
  * Variable values are matched against each value specified by a rule in its selection variables,
  * using JavaScript's strict equality operator, `===`.
  *
- * @return {!Object} The merged configuration specification,
+ * @return {Object} The merged configuration specification,
  * if any rule was selected; or `null`, if no rule was selected.
  */
 

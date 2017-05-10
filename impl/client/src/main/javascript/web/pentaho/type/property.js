@@ -66,7 +66,7 @@ define([
      * @abstract
      * @amd {pentaho.type.Factory<pentaho.type.Property>} pentaho/type/property
      *
-     * @classDesc A property of a complex value.
+     * @classDesc The class of properties of complex values.
      *
      * @description This class was not designed to be constructed directly.
      *
