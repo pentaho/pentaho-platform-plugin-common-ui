@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,33 +15,139 @@
  */
 
 /**
- * @ignore
- * @classdesc The `ITable` interface extends the `ITableReadOnly` interface
- * to allow manipulation of a **tabular** dataset.
+ * @classdesc The `ITable` interface exposes the data and metadata of a tabular dataset.
  *
  * @name pentaho.data.ITable
  * @interface
- * @extends pentaho.data.ITableReadOnly
  */
 
 /**
- * Adds a column.
+ * Gets the number of columns.
  *
- * @name pentaho.data.AbstractTable#addColumn
+ * @name pentaho.data.ITable#getNumberOfColumns
  * @method
- * @abstract
- * @param {Object} colSpec The column specification.
- * @param {Object} [keyArgs] The keyword arguments.
- * @return {number} The index of the new column.
+ * @return {number} The number of columns.
  */
 
 /**
- * Adds a row.
+ * Gets the number of rows.
  *
- * @name pentaho.data.AbstractTable#addRow
+ * @name pentaho.data.ITable#getNumberOfRows
  * @method
- * @abstract
- * @param {Object} rowSpec The row specification.
- * @param {Object} [keyArgs] The keyword arguments.
- * @return {number} The index of the new row.
+ * @return {number} The number of rows.
+ */
+
+/**
+ * Gets the id of a column, given its index.
+ *
+ * @name pentaho.data.ITable#getColumnId
+ * @method
+ * @param {number} colIndex - The column index (zero-based).
+ * @return {string} The id of the column.
+ */
+
+/**
+ * Gets the label of a column, given its index.
+ *
+ * @name pentaho.data.ITable#getColumnLabel
+ * @method
+ * @param {number} colIndex - The column index (zero-based).
+ * @return {string} The label of the column.
+ */
+
+/**
+ * Gets the type name of the values of a column's attribute, given its index.
+ *
+ * @name pentaho.data.ITable#getColumnType
+ * @method
+ * @param {number} colIndex - The column index (zero-based).
+ * @return {string} The type name.
+ */
+
+/**
+ * Gets the value of a cell, given its row and column indexes.
+ *
+ * When a cell is missing or has a `null` or `undefined` value,
+ * then `null` is returned.
+ *
+ * @name pentaho.data.ITable#getValue
+ * @method
+ * @param {number} rowIndex - The row index (zero-based).
+ * @param {number} colIndex - The column index (zero-based).
+ * @return {any|null} The cell's value.
+ */
+
+/**
+ * Gets the key of the value of a cell, given its row and column indexes.
+ *
+ * When a cell contains the `null` value, its key is the empty string, `""`.
+ *
+ * @name pentaho.data.ITable#getValueKey
+ * @method
+ * @param {number} rowIndex - The row index (zero-based).
+ * @param {number} colIndex - The column index (zero-based).
+ * @return {string} The key of the cell's value.
+ */
+
+/**
+ * Gets the formatted value _property_ of a cell, given its row and column indexes.
+ *
+ * This method returns the string representation of the value of the cell's `f` property,
+ * when the value is defined, or `undefined`, otherwise.
+ *
+ * Contrast this method with {@link pentaho.data.ITable#getFormattedValue},
+ * that returns a best-effort formatted value in all cases.
+ *
+ * @name pentaho.data.ITable#getLabel
+ * @method
+ * @param {number} rowIndex - The row index (zero-based).
+ * @param {number} colIndex - The column index (zero-based).
+ * @return {string|undefined} The specified formatted value or `undefined`.
+ */
+
+/**
+ * Gets a best-effort formatted value of a cell, given its row and column indexes.
+ *
+ * If the cell has a specified label,
+ * then the string representation of that value is returned.
+ *
+ * Otherwise, if the cell has a specified value,
+ * then the string representation of that value is returned.
+ *
+ * When both the cell's formatted value and value are `null` or `undefined`,
+ * then an empty string is returned.
+ *
+ * Contrast this method with {@link pentaho.data.ITable#getLabel},
+ * that only returns a formatted value when one has been explicitly
+ * defined in the cell's `f` property.
+ *
+ * @name pentaho.data.ITable#getFormattedValue
+ * @method
+ * @param {number} rowIndex - The row index (zero-based).
+ * @param {number} colIndex - The column index (zero-based).
+ * @return {string} The cell's formatted value.
+ */
+
+/**
+ * Gets a value that indicates if a given filter includes a given row.
+ *
+ * @name pentaho.data.ITable#filterMatchesRow
+ * @method
+ * @param {!pentaho.type.filter.Abstract} filter - The filter.
+ * @param {number} rowIndex - The row index (zero-based).
+ *
+ * @return {boolean} `true` if the filter includes the row; `false`, otherwise.
+ *
+ * @throws {pentaho.type.ValidationError} When the filter is not valid,
+ * the first error returned by the `validate` method.
+ */
+
+/**
+ * Gets the index of the first column having a given attribute.
+ *
+ * @name pentaho.data.ITable#getColumnIndexByAttribute
+ * @method
+ * @param {string} attr - The name of an attribute.
+ * @return {number} The (0-based) index of the column having the specified attribute,
+ * if any, or `-1`, if none.
  */

@@ -34,7 +34,7 @@
  *    {min: 100, max: 200}
  *
  * @typedef {Object} pentaho.data.Range
- *
+ * @ignore
  * @property {pentaho.data.Atomic|undefined} min The minimum range value, or,
  *     when there is no data, or no meaningful data, `undefined`.
  *

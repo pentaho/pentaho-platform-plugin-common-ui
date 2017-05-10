@@ -32,6 +32,7 @@ define(function() {
    * @enum {string}
    * @readonly
    * @see pentaho.data.Atomic
+   * @ignore
    */
   var AtomicTypeName = {
     /**

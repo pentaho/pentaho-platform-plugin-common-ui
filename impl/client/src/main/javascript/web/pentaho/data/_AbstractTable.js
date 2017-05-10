@@ -19,7 +19,7 @@ define([
   "./AtomicTypeName"
 ], function(Base, ElementMock, AtomicTypeName) {
 
-  // NOTE: most of this class is actually documented in ITableReadOnly.jsdoc and ITable.jsdoc.
+  // NOTE: most of this class is actually documented in ITable.jsdoc.
   // While the latter shape the implementation, they are not publicized.
 
   // Map of DataTable types to CDA lowercase colType
@@ -33,11 +33,13 @@ define([
   COLTYPE_DT_CDA[AtomicTypeName.BOOLEAN] = "boolean";
 
   /**
+   * @ignore
    * @name AbstractTable
    * @memberOf pentaho.data
    * @class
    * @abstract
    * @implements pentaho.lang.ISpecifiable
+   * @implements pentaho.data.ITable
    * @amd pentaho/data/AbstractTable
    *
    * @classdesc The `AbstractTable` class is the abstract base class of
@@ -65,6 +67,48 @@ define([
      * @param {number} rowIndex The row index (zero-based).
      * @param {number} colIndex The column index (zero-based).
      * @return {!pentaho.data.Cell} The specified cell object.
+     */
+
+    /**
+     * Adds a column.
+     *
+     * @name pentaho.data.AbstractTable#addColumn
+     * @method
+     * @abstract
+     * @param {Object} colSpec The column specification.
+     * @param {Object} [keyArgs] The keyword arguments.
+     * @return {number} The index of the new column.
+     */
+
+    /**
+     * Adds a row.
+     *
+     * @name pentaho.data.AbstractTable#addRow
+     * @method
+     * @abstract
+     * @param {Object} rowSpec The row specification.
+     * @param {Object} [keyArgs] The keyword arguments.
+     * @return {number} The index of the new row.
+     */
+
+    /**
+     * Gets the attribute of a column, given its index.
+     *
+     * @name pentaho.data.AbstractTable#getColumnAttribute
+     * @method
+     * @abstract
+     * @param {number} colIndex The column index (zero-based).
+     * @return {pentaho.data.Attribute} The column attribute object or `null`, if none.
+     *
+     *    Only cross-tables can have columns that have no associated attribute.
+     */
+
+    /**
+     * Gets the underlying model object.
+     *
+     * @name pentaho.data.AbstractTable#model
+     * @readonly
+     * @type {pentaho.data.Model}
      */
 
     // -----
@@ -275,17 +319,6 @@ define([
       return dataView;
     },
 
-    /**
-     * Gets a value that indicates if a given filter includes a given row.
-     *
-     * @param {!pentaho.type.filter.Abstract} filter - The filter.
-     * @param {number} rowIndex The row index (zero-based).
-     *
-     * @return {boolean} `true` if the filter includes the row; `false`, otherwise.
-     *
-     * @throws {pentaho.type.ValidationError} When the filter is not valid,
-     * the first error returned by the `validate` method.
-     */
     filterMatchesRow: function(filter, rowIndex) {
 
       filter.assertValid();

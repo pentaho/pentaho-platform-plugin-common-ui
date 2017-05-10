@@ -9,8 +9,6 @@
       "${build.javascriptSourceDirectory}/web/pentaho/VizApiReadme.md"
     ],
     "exclude": [
-      "${project.basedir}/src/main/doc-js/pentaho/data",
-      "${build.javascriptSourceDirectory}/web/pentaho/data",
       "${build.javascriptSourceDirectory}/web/pentaho/shim",
       "${build.javascriptSourceDirectory}/web/pentaho/visual/samples"
     ],

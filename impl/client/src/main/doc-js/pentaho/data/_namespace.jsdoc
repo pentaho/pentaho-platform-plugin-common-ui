@@ -14,15 +14,7 @@
  * limitations under the License.
  */
 /**
- * The data namespace contains classes and interfaces
- * used for data representation.
- *
- * The classes used most frequently, and directly, are:
- * * {@link pentaho.data.Table}
- * * {@link pentaho.data.TableView}
- *
- * The top-level class for describing a data model is:
- * * {@link pentaho.data.Model}
+ * The data namespace contains classes and interfaces used for data representation.
  *
  * @name pentaho.data
  * @namespace

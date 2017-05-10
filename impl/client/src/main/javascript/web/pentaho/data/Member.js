@@ -29,7 +29,7 @@ define([
      * @memberOf pentaho.data
      * @class
      * @abstract
-     *
+     * @ignore
      * @implements pentaho.lang.ISpecifiable
      * @implements pentaho.lang.IAnnotatable
      * @implements pentaho.lang.IListElement

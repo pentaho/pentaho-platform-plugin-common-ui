@@ -31,6 +31,7 @@ define(function() {
    * @memberOf pentaho.data
    * @enum {string}
    * @readonly
+   * @ignore
    */
   var WellKnownGeoRole = {
     /**

@@ -24,6 +24,7 @@ define([
    * @class
    * @extends pentaho.lang.Collection
    *
+   * @ignore
    * @classdesc A collection of attributes.
    *
    * ### AMD

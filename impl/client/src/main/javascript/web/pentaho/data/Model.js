@@ -26,7 +26,7 @@ define([
      * @class
      * @implements pentaho.lang.IAnnotatable
      * @implements pentaho.lang.ISpecifiable
-     *
+     * @ignore
      * @classdesc The `Model` class contains metadata about a certain type of entities.
      *
      * In a nutshell, a model contains the definition of attributes that can be attributed to its entities.
