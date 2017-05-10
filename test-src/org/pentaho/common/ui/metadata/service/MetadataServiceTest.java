@@ -12,17 +12,13 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
- * Copyright (c) 2002-2015 Pentaho Corporation..  All rights reserved.
+ * Copyright (c) 2002-2017 Pentaho Corporation..  All rights reserved.
  */
 
 package org.pentaho.common.ui.metadata.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
+import org.junit.Assert;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,7 +48,11 @@ public class MetadataServiceTest {
 
   private static final String DOMAIN_NAME = "testDomain";
   private static final String MODEL_ID = "visibleModelId";
+  private static final String MODEL_NAME = " visibleModelName";
+  private static final String MODEL_ID_XSS = "zModelId_XSS";
   private static final String CTX = "testContext";
+  private static final String XSS_STRING = "<iMg SrC=x OnErRoR=alert(11113)>";
+
 
   private MetadataService metadataService;
 
@@ -65,99 +65,106 @@ public class MetadataServiceTest {
 
   @Before
   public void setUp() throws Exception {
-    metadataService = spy( new MetadataService() );
+    metadataService = Mockito.spy( new MetadataService() );
 
-    mockDomainRepo = mock( IMetadataDomainRepository.class );
+    mockDomainRepo = Mockito.mock( IMetadataDomainRepository.class );
 
-    visibleModel = mock( LogicalModel.class );
-    doReturn( "testCtx0," + CTX ).when( visibleModel ).getProperty( "visible" );
-    doReturn( MODEL_ID ).when( visibleModel ).getId();
-    doReturn( "visibleModelName" ).when( visibleModel ).getName( DEFAULT_LOCALE );
-    doReturn( new LocalizedString() ).when( visibleModel ).getDescription();
-    doReturn( "visibleModelDescLocale" ).when( visibleModel ).getDescription( DEFAULT_LOCALE );
+    visibleModel = Mockito.mock( LogicalModel.class );
+    Mockito.doReturn( "testCtx0," + CTX ).when( visibleModel ).getProperty( "visible" );
+    Mockito.doReturn( MODEL_ID ).when( visibleModel ).getId();
+    Mockito.doReturn( MODEL_NAME ).when( visibleModel ).getName( DEFAULT_LOCALE );
+    Mockito.doReturn( new LocalizedString() ).when( visibleModel ).getDescription();
+    Mockito.doReturn( "visibleModelDescLocale" ).when( visibleModel ).getDescription( DEFAULT_LOCALE );
+    LogicalModel visibleModel2 = Mockito.mock( LogicalModel.class );
+    Mockito.doReturn( "testCtx0," + CTX ).when( visibleModel2 ).getProperty( "visible" );
+    Mockito.doReturn( MODEL_ID_XSS ).when( visibleModel2 ).getId();
+    Mockito.doReturn( XSS_STRING ).when( visibleModel2 ).getName( DEFAULT_LOCALE );
+    Mockito.doReturn( new LocalizedString() ).when( visibleModel2 ).getDescription();
+    Mockito.doReturn( "visibleModelDescLocale" ).when( visibleModel2 ).getDescription( DEFAULT_LOCALE );
 
-    LogicalModel invisibleModel = mock( LogicalModel.class );
-    doReturn( "testCtx0,testCtx1" ).when( invisibleModel ).getProperty( "visible" );
+    LogicalModel invisibleModel = Mockito.mock( LogicalModel.class );
+    Mockito.doReturn( "testCtx0,testCtx1" ).when( invisibleModel ).getProperty( "visible" );
 
     List<LogicalModel> listModels = new ArrayList<LogicalModel>( 2 );
     listModels.add( visibleModel );
     listModels.add( invisibleModel );
+    listModels.add( visibleModel2 );
 
-    validDomain = mock( Domain.class );
-    doReturn( listModels ).when( validDomain ).getLogicalModels();
-    doReturn( DEFAULT_LOCALES_CODES ).when( validDomain ).getLocaleCodes();
-    doReturn( visibleModel ).when( validDomain ).findLogicalModel( MODEL_ID );
-    doReturn( validDomain ).when( mockDomainRepo ).getDomain( DOMAIN_NAME );
+    validDomain = Mockito.mock( Domain.class );
+    Mockito.doReturn( listModels ).when( validDomain ).getLogicalModels();
+    Mockito.doReturn( DEFAULT_LOCALES_CODES ).when( validDomain ).getLocaleCodes();
+    Mockito.doReturn( visibleModel ).when( validDomain ).findLogicalModel( MODEL_ID );
+    Mockito.doReturn( validDomain ).when( mockDomainRepo ).getDomain( DOMAIN_NAME );
     Set<String> domainIds = new HashSet<String>();
     domainIds.add( DOMAIN_NAME );
-    doReturn( domainIds ).when( mockDomainRepo ).getDomainIds();
-    doReturn( mockDomainRepo ).when( metadataService ).getMetadataRepository();
+    Mockito.doReturn( domainIds ).when( mockDomainRepo ).getDomainIds();
+    Mockito.doReturn( mockDomainRepo ).when( metadataService ).getMetadataRepository();
 
-    util = mock( MetadataServiceUtil.class );
-    doReturn( util ).when( metadataService ).getMetadataServiceUtil();
+    util = Mockito.mock( MetadataServiceUtil.class );
+    Mockito.doReturn( util ).when( metadataService ).getMetadataServiceUtil();
 
-    util2 = mock( MetadataServiceUtil2.class );
-    doReturn( util2 ).when( metadataService ).getMetadataServiceUtil2();
+    util2 = Mockito.mock( MetadataServiceUtil2.class );
+    Mockito.doReturn( util2 ).when( metadataService ).getMetadataServiceUtil2();
 
-    helper = mock( QueryXmlHelper.class );
-    doReturn( helper ).when( metadataService ).getHelper();
+    helper = Mockito.mock( QueryXmlHelper.class );
+    Mockito.doReturn( helper ).when( metadataService ).getHelper();
   }
 
   @Test
   public void testListBusinessModelsWithoutRepository() throws Exception {
-    doReturn( null ).when( metadataService ).getMetadataRepository();
+    Mockito.doReturn( null ).when( metadataService ).getMetadataRepository();
     ModelInfo[] result = metadataService.listBusinessModels( StringUtils.EMPTY, StringUtils.EMPTY );
-    assertNull( result );
+    Assert.assertNull( result );
   }
 
   @Test
   public void testListBusinessModelsWithoutDomainName() throws Exception {
     ModelInfo[] result = metadataService.listBusinessModels( StringUtils.EMPTY, CTX );
-    assertNotNull( result );
-    assertEquals( 1, result.length );
-    assertEquals( DOMAIN_NAME, result[0].getDomainId() );
-    assertEquals( visibleModel.getId(), result[0].getModelId() );
-    assertEquals( visibleModel.getName( DEFAULT_LOCALE ), result[0].getModelName() );
-    assertEquals( visibleModel.getDescription( DEFAULT_LOCALE ), result[0].getModelDescription() );
+    Assert.assertNotNull( result );
+    Assert.assertEquals( 2, result.length );
+    Assert.assertEquals( DOMAIN_NAME, result[0].getDomainId() );
+    Assert.assertEquals( visibleModel.getId(), result[0].getModelId() );
+    Assert.assertEquals( visibleModel.getName( DEFAULT_LOCALE ), result[0].getModelName() );
+    Assert.assertEquals( visibleModel.getDescription( DEFAULT_LOCALE ), result[0].getModelDescription() );
   }
 
   @Test
   public void testListBusinessModels() throws Exception {
     ModelInfo[] result = metadataService.listBusinessModels( DOMAIN_NAME, CTX );
-    assertNotNull( result );
-    assertEquals( 1, result.length );
-    assertEquals( DOMAIN_NAME, result[0].getDomainId() );
-    assertEquals( visibleModel.getId(), result[0].getModelId() );
-    assertEquals( visibleModel.getName( DEFAULT_LOCALE ), result[0].getModelName() );
-    assertEquals( visibleModel.getDescription( DEFAULT_LOCALE ), result[0].getModelDescription() );
+    Assert.assertNotNull( result );
+    Assert.assertEquals( 2, result.length );
+    Assert.assertEquals( DOMAIN_NAME, result[0].getDomainId() );
+    Assert.assertEquals( visibleModel.getId(), result[0].getModelId() );
+    Assert.assertEquals( visibleModel.getName( DEFAULT_LOCALE ), result[0].getModelName() );
+    Assert.assertEquals( visibleModel.getDescription( DEFAULT_LOCALE ), result[0].getModelDescription() );
   }
 
   @Test
   public void testListBusinessModelsJson() throws IOException {
     String json = metadataService.listBusinessModelsJson( DOMAIN_NAME, CTX );
-    assertEquals(
-        "[{\"class\":\"org.pentaho.common.ui.metadata.model.impl.ModelInfo\",\"domainId\":\"testDomain\",\"modelDescription\":\"visibleModelDescLocale\",\"modelId\":\"visibleModelId\",\"modelName\":\"visibleModelName\"}]",
+    Assert.assertEquals(
+        "[{\"class\":\"org.pentaho.common.ui.metadata.model.impl.ModelInfo\",\"domainId\":\"testDomain\",\"modelDescription\":\"visibleModelDescLocale\",\"modelId\":\"visibleModelId\",\"modelName\":\" visibleModelName\"},{\"class\":\"org.pentaho.common.ui.metadata.model.impl.ModelInfo\",\"domainId\":\"testDomain\",\"modelDescription\":\"visibleModelDescLocale\",\"modelId\":\"zModelId_XSS\",\"modelName\":\"&lt;iMg SrC=x OnErRoR=alert(11113)&gt;\"}]",
         json );
   }
 
   @Test
   public void testLoadModel() {
     Model model = metadataService.loadModel( null, null );
-    assertNull( model );
+    Assert.assertNull( model );
 
     model = metadataService.loadModel( DOMAIN_NAME, null );
-    assertNull( model );
+    Assert.assertNull( model );
 
     model = metadataService.loadModel( "invalid_domain", "invalid_model" );
-    assertNull( model );
+    Assert.assertNull( model );
 
     model = metadataService.loadModel( DOMAIN_NAME, "invalid_model" );
-    assertNull( model );
+    Assert.assertNull( model );
 
-    Model mockModel = mock( Model.class );
-    doReturn( mockModel ).when( util ).createThinModel( visibleModel, DOMAIN_NAME );
+    Model mockModel = Mockito.mock( Model.class );
+    Mockito.doReturn( mockModel ).when( util ).createThinModel( visibleModel, DOMAIN_NAME );
     model = metadataService.loadModel( DOMAIN_NAME, MODEL_ID );
-    assertEquals( mockModel, model );
+    Assert.assertEquals( mockModel, model );
   }
 
   @Test
@@ -168,10 +175,10 @@ public class MetadataServiceTest {
     model.setId( mId );
     model.setName( "name" );
     model.setDomainId( dId );
-    doReturn( model ).when( metadataService ).loadModel( dId, mId );
+    Mockito.doReturn( model ).when( metadataService ).loadModel( dId, mId );
 
     String json = metadataService.loadModelJson( dId, mId );
-    assertEquals(
+    Assert.assertEquals(
         "{\"categories\":[],\"class\":\"org.pentaho.common.ui.metadata.model.impl.Model\",\"description\":null,\"domainId\":\"dom_id\",\"id\":\"model_id\",\"name\":\"name\"}",
         json );
   }
@@ -180,15 +187,15 @@ public class MetadataServiceTest {
   public void testDoQuery() {
     Integer rowLimit = new Integer( 10 );
     String xml = "xml";
-    Query query = mock( Query.class );
-    MarshallableResultSet mockRS = mock( MarshallableResultSet.class );
-    org.pentaho.metadata.query.model.Query mockQuery = mock( org.pentaho.metadata.query.model.Query.class );
-    doReturn( mockQuery ).when( util ).convertQuery( query );
-    doReturn( xml ).when( helper ).toXML( mockQuery );
-    doReturn( mockRS ).when( metadataService ).doXmlQuery( xml, rowLimit );
+    Query query = Mockito.mock( Query.class );
+    MarshallableResultSet mockRS = Mockito.mock( MarshallableResultSet.class );
+    org.pentaho.metadata.query.model.Query mockQuery = Mockito.mock( org.pentaho.metadata.query.model.Query.class );
+    Mockito.doReturn( mockQuery ).when( util ).convertQuery( query );
+    Mockito.doReturn( xml ).when( helper ).toXML( mockQuery );
+    Mockito.doReturn( mockRS ).when( metadataService ).doXmlQuery( xml, rowLimit );
 
     MarshallableResultSet result = metadataService.doQuery( query, rowLimit );
-    assertEquals( mockRS, result );
+    Assert.assertEquals( mockRS, result );
   }
 
   @Test
@@ -196,24 +203,24 @@ public class MetadataServiceTest {
     Integer rowLimit = new Integer( 10 );
     String xml = "xml";
 
-    doReturn( null ).when( metadataService ).executeQuery( xml, rowLimit );
+    Mockito.doReturn( null ).when( metadataService ).executeQuery( xml, rowLimit );
     MarshallableResultSet result = metadataService.doXmlQuery( xml, rowLimit );
-    assertNull( result );
+    Assert.assertNull( result );
 
-    IPentahoMetaData mockedMetadata = mock( IPentahoMetaData.class );
-    doReturn( new Object[][] { { "tt" } } ).when( mockedMetadata ).getColumnHeaders();
-    IPentahoResultSet mockedResult = mock( IPentahoResultSet.class );
-    doReturn( 1 ).when( mockedResult ).getColumnCount();
-    doReturn( 1 ).when( mockedResult ).getRowCount();
-    doReturn( null ).when( mockedResult ).next();
-    doReturn( mockedMetadata ).when( mockedResult ).getMetaData();
+    IPentahoMetaData mockedMetadata = Mockito.mock( IPentahoMetaData.class );
+    Mockito.doReturn( new Object[][] { { "tt" } } ).when( mockedMetadata ).getColumnHeaders();
+    IPentahoResultSet mockedResult = Mockito.mock( IPentahoResultSet.class );
+    Mockito.doReturn( 1 ).when( mockedResult ).getColumnCount();
+    Mockito.doReturn( 1 ).when( mockedResult ).getRowCount();
+    Mockito.doReturn( null ).when( mockedResult ).next();
+    Mockito.doReturn( mockedMetadata ).when( mockedResult ).getMetaData();
 
-    doReturn( mockedResult ).when( metadataService ).executeQuery( xml, rowLimit );
+    Mockito.doReturn( mockedResult ).when( metadataService ).executeQuery( xml, rowLimit );
     result = metadataService.doXmlQuery( xml, rowLimit );
-    assertNotNull( result );
-    assertEquals( 0, result.getNumColumnHeaderSets() );
-    assertEquals( 0, result.getNumRowHeaderSets() );
-    assertEquals( "tt", result.getColumnNames().getColumnName()[0] );
+    Assert.assertNotNull( result );
+    Assert.assertEquals( 0, result.getNumColumnHeaderSets() );
+    Assert.assertEquals( 0, result.getNumRowHeaderSets() );
+    Assert.assertEquals( "tt", result.getColumnNames().getColumnName()[0] );
   }
 
   @Test
@@ -221,16 +228,16 @@ public class MetadataServiceTest {
     Integer rowLimit = new Integer( 10 );
     String xml = "xml";
 
-    doReturn( null ).when( metadataService ).doXmlQuery( xml, rowLimit );
+    Mockito.doReturn( null ).when( metadataService ).doXmlQuery( xml, rowLimit );
     String result = metadataService.doXmlQueryToJson( xml, rowLimit );
-    assertNull( result );
+    Assert.assertNull( result );
 
     MarshallableResultSet resultSet = new MarshallableResultSet();
     resultSet.setNumColumnHeaderSets( 2 );
     resultSet.setNumRowHeaderSets( 1 );
-    doReturn( resultSet ).when( metadataService ).doXmlQuery( xml, rowLimit );
+    Mockito.doReturn( resultSet ).when( metadataService ).doXmlQuery( xml, rowLimit );
     result = metadataService.doXmlQueryToJson( xml, rowLimit );
-    assertNotNull( result );
+    Assert.assertNotNull( result );
   }
 
   @Test
@@ -239,16 +246,16 @@ public class MetadataServiceTest {
     String xml = "xml";
     String json = "json";
 
-    doReturn( null ).when( metadataService ).executeQuery( xml, rowLimit );
+    Mockito.doReturn( null ).when( metadataService ).executeQuery( xml, rowLimit );
     String result = metadataService.doXmlQueryToCdaJson( xml, rowLimit );
-    assertNull( result );
+    Assert.assertNull( result );
 
-    IPentahoResultSet mockedResult = mock( IPentahoResultSet.class );
-    doReturn( mockedResult ).when( metadataService ).executeQuery( xml, rowLimit );
-    doReturn( validDomain ).when( util2 ).getDomainObject( xml );
-    doReturn( json ).when( util2 ).createCdaJson( mockedResult, DEFAULT_LOCALE );
+    IPentahoResultSet mockedResult = Mockito.mock( IPentahoResultSet.class );
+    Mockito.doReturn( mockedResult ).when( metadataService ).executeQuery( xml, rowLimit );
+    Mockito.doReturn( validDomain ).when( util2 ).getDomainObject( xml );
+    Mockito.doReturn( json ).when( util2 ).createCdaJson( mockedResult, DEFAULT_LOCALE );
     result = metadataService.doXmlQueryToCdaJson( xml, rowLimit );
-    assertEquals( json, result );
+    Assert.assertEquals( json, result );
   }
 
   @Test
@@ -257,11 +264,11 @@ public class MetadataServiceTest {
     String json = "json";
     String query = "query";
 
-    MarshallableResultSet rs = mock( MarshallableResultSet.class );
-    doReturn( query ).when( metadataService ).getQueryXmlFromJson( json );
-    doReturn( rs ).when( metadataService ).doXmlQuery( query, rowLimit );
+    MarshallableResultSet rs = Mockito.mock( MarshallableResultSet.class );
+    Mockito.doReturn( query ).when( metadataService ).getQueryXmlFromJson( json );
+    Mockito.doReturn( rs ).when( metadataService ).doXmlQuery( query, rowLimit );
     MarshallableResultSet result = metadataService.doJsonQuery( json, rowLimit );
-    assertEquals( rs, result );
+    Assert.assertEquals( rs, result );
   }
 
   @Test
@@ -271,10 +278,10 @@ public class MetadataServiceTest {
     String query = "query";
     String rs = "result";
 
-    doReturn( query ).when( metadataService ).getQueryXmlFromJson( json );
-    doReturn( rs ).when( metadataService ).doXmlQueryToJson( query, rowLimit );
+    Mockito.doReturn( query ).when( metadataService ).getQueryXmlFromJson( json );
+    Mockito.doReturn( rs ).when( metadataService ).doXmlQueryToJson( query, rowLimit );
     String result = metadataService.doJsonQueryToJson( json, rowLimit );
-    assertEquals( rs, result );
+    Assert.assertEquals( rs, result );
   }
 
   @Test
@@ -284,10 +291,10 @@ public class MetadataServiceTest {
     String query = "query";
     String rs = "result";
 
-    doReturn( query ).when( metadataService ).getQueryXmlFromJson( json );
-    doReturn( rs ).when( metadataService ).doXmlQueryToCdaJson( query, rowLimit );
+    Mockito.doReturn( query ).when( metadataService ).getQueryXmlFromJson( json );
+    Mockito.doReturn( rs ).when( metadataService ).doXmlQueryToCdaJson( query, rowLimit );
     String result = metadataService.doJsonQueryToCdaJson( json, rowLimit );
-    assertEquals( rs, result );
+    Assert.assertEquals( rs, result );
   }
 
   @Test
@@ -295,13 +302,22 @@ public class MetadataServiceTest {
     String json = "json";
     String resultXml = "result";
 
-    Query query = mock( Query.class );
-    org.pentaho.metadata.query.model.Query modelQuery = mock( org.pentaho.metadata.query.model.Query.class );
-    doReturn( query ).when( util ).deserializeJsonQuery( json );
-    doReturn( modelQuery ).when( util ).convertQuery( query );
-    doReturn( resultXml ).when( helper ).toXML( modelQuery );
+    Query query = Mockito.mock( Query.class );
+    org.pentaho.metadata.query.model.Query modelQuery = Mockito.mock( org.pentaho.metadata.query.model.Query.class );
+    Mockito.doReturn( query ).when( util ).deserializeJsonQuery( json );
+    Mockito.doReturn( modelQuery ).when( util ).convertQuery( query );
+    Mockito.doReturn( resultXml ).when( helper ).toXML( modelQuery );
 
     String result = metadataService.getQueryXmlFromJson( json );
-    assertEquals( resultXml, result );
+    Assert.assertEquals( resultXml, result );
+  }
+
+  @Test
+  public void testListBusinessModelsXSS() throws Exception {
+    ModelInfo[] result = metadataService.listBusinessModels( DOMAIN_NAME, CTX );
+    Assert.assertNotNull( result );
+    Assert.assertEquals( 2, result.length );
+    Assert.assertFalse( XSS_STRING.equals( result[1].getModelName() ) );
+    Assert.assertFalse( result[1].getModelName().contains( "<" ) );
   }
 }
