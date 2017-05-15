@@ -867,14 +867,6 @@ exports.publish = function(taffyData, opts, tutorials) {
     // handle summary, description and class description default values properly
     data().each(function(doclet) {
         if(!doclet.ignore) {
-            var desc;
-            if(!doclet.summary && (desc = (doclet.description || doclet.classdesc))) {
-                //Try to split when a "." or a ".</htmlTag>" is found.
-                //TODO: When markdown is present it fails the split and dumps all description in the summary.
-                var split = desc.split(/(\.(<\/?([^<]+)>)?\s*)$/);
-                doclet.summary = split[0] + (split[1] || "");
-            }
-
             var checkP = function(prop) {
                 if (!prop) return;
                 var START_P = "<p>";
@@ -900,6 +892,11 @@ exports.publish = function(taffyData, opts, tutorials) {
                 }
                 return string;
             };
+
+            if ( doclet.kind === "class" ) {
+              doclet.classSummary = replaceCode(checkP(doclet.classSummary));
+              doclet.constructorSummary = replaceCode(checkP(doclet.constructorSummary));
+            }
 
             doclet.summary = replaceCode(checkP(doclet.summary));
             doclet.description = replaceCode(checkP(doclet.description));

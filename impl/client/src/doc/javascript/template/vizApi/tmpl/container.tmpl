@@ -55,23 +55,21 @@
         <?js if(doc.augments && doc.augments.length) { ?>
             <p class="h3">Extends</p>
             <?js= self.partial('augments.tmpl', doc) ?>
-        <?js } ?>
-
-        <!-- Placeholder for implements / mixins -->
+        <?js } ?> <!-- end if (doc.augments && doc.augments.length) -->
 
         <?js if (doc.implements && doc.implements.length) { ?>
             <p class="h3">Implements:</p>
             <ul><?js doc.implements.forEach(function( impl ) { ?>
                 <li><?js= self.linkto( impl, self.htmlsafe( impl ) ) ?></li>
             <?js }); ?></ul>
-        <?js } ?>
+        <?js } ?> <!-- end if (doc.implements && doc.implements.length) -->
 
         <?js if (doc.mixes && doc.mixes.length) { ?>
         <p class="h3">Mixes In:</p>
         <ul><?js doc.mixes.forEach(function( mix ) { ?>
             <li><?js= self.linkto( mix, mix ) ?></li>
         <?js }); ?></ul>
-        <?js } ?>
+        <?js } ?> <!-- end if (doc.mixes && doc.mixes.length) -->
 
 
         <h3>Constructor</h3>
