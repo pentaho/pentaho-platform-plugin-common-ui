@@ -4,7 +4,7 @@
   },
   "source": {
     "include": [
-      "${project.basedir}/src/main/doc-js",
+      "${project.basedir}/src/main/doc-js/pentaho",
       "${build.javascriptSourceDirectory}/web/pentaho",
       "${build.javascriptSourceDirectory}/web/pentaho/VizApiReadme.md"
     ],
@@ -16,7 +16,8 @@
   },
   "plugins": [
     "plugins/markdown",
-    "${basedir}/src/doc/javascript/config/customPlugins/defineTags"
+    "${basedir}/src/doc/javascript/config/customPlugins/defineTags",
+    "${basedir}/src/doc/javascript/config/customPlugins/eventHandlers"
   ],
   "templates": {
     "cleverLinks": true,

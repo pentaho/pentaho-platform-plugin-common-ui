@@ -1,23 +1,5 @@
-exports.handlers = {
-  newDoclet: function(event) {
-    let doclet = event.doclet;
-
-    switch (doclet.kind) {
-      case "class":
-        doclet.classSummary = getSummary( doclet.classdesc );
-        doclet.constructorSummary = getSummary( doclet.description );
-        break;
-      case "interface":
-        doclet.summary = getSummary( doclet.description || doclet.classdesc );
-        break;
-      default:
-        doclet.summary = getSummary( doclet.description );
-    }
-  }
-};
-
 /**
- * Define your custom tags inside this block
+ * Define your custom tags inside this block. {@link http://usejsdoc.org/about-plugins.html#tag-definitions}
  *
  * Tag options:
  *
@@ -74,10 +56,23 @@ exports.defineTags = function ( dictionary ) {
 
   // ------ Private -----
 
+  /**
+   * Wrapper function of `dictionary.defineTag`
+   * to make it clear that we are creating a new tag.
+   *
+   * @param {string} name    - Tag name.
+   * @param {object} options - Tag options.
+   */
   function createTagDefinition( name, options ) {
     return dictionary.defineTag( name, options );
   }
 
+  /**
+   * Change an existing tag definition, to change the behaviour its default behaviour.
+   *
+   * @param {string}  name    - Tag name.
+   * @param {object}  options - Tag options.
+   */
   function extendTagDefinition( name, options ) {
     const tagDefinition = dictionary.lookUp( name );
     const isNewTag = tagDefinition === false;
@@ -88,14 +83,9 @@ exports.defineTags = function ( dictionary ) {
 
     Object.keys( tagDefinition ).map(function( key ) {
       const tagOption = tagDefinition[key];
-      if ( tagDefinition.hasOwnProperty( key ) && key !== 'onTagged' ) options[key] = tagOption;
+      if ( tagDefinition.hasOwnProperty( key ) && options[key] === undefined )
+        options[key] = tagOption;
     });
-
-    const onTagged = options.onTagged;
-    options.onTagged = function( doclet, tag ) {
-      tagDefinition.onTagged( doclet, tag );
-      if ( onTagged ) onTagged( doclet, tag );
-    };
 
     return createTagDefinition( name, options );
   }
@@ -118,12 +108,3 @@ function firstWordOf( string ) {
     return '';
   }
 }
-
-function getSummary( description ) {
-  if ( !description ) return "";
-
-  const summary = description.split(/(\.(<\/?([^<]+)>)?\s*)$/);
-  return summary[0] + ( summary[1] || "" );
-}
-
-
