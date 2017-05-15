@@ -54,7 +54,7 @@ if (data.defaultvalue && (data.defaultvaluetype === 'object' || data.defaultvalu
 </ul></dd>
 <?js } ?>
 
-<?js if (data.implements && data.implements.length) { ?>
+<?js if (data.kind !== "class" && data.implements && data.implements.length) { ?>
 <dt class="implements">Implements:</dt>
 <dd class="implements"><ul>
     <?js data.implements.forEach(function(impl) { ?>
@@ -63,7 +63,7 @@ if (data.defaultvalue && (data.defaultvaluetype === 'object' || data.defaultvalu
 </ul></dd>
 <?js } ?>
 
-<?js if (data.mixes && data.mixes.length) { ?>
+<?js if (data.kind !== "class" && data.mixes && data.mixes.length) { ?>
     <dt class="mixes">Mixes In:</dt>
 
     <dd class="mixes"><ul>

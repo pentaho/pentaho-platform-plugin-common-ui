@@ -33,7 +33,7 @@
       "name": "common-ui",
       "url": "https://github.com/pentaho/pentaho-platform-plugin-common-ui/",
       "company": "pentaho",
-      "branch": "${project.stage}"
+      "branch": "${docjs.config.github.branch}"
     },
 
     "layoutFile": "layout.tmpl"
