@@ -1,1 +1,30 @@
+title: Pentaho Platform JavaScript APIs
+description: > # this means to ignore newlines until "theme:"
+  You can use the JavaScript APIs to develop components for the Pentaho platform.
+
 theme: jekyll-theme-cayman
+
+# Build settings
+markdown: kramdown
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+
+safe: true
+
+# JsDoc 3 Urls are like:
+#
+# * Namespace: http://localhost:8000/pentaho.type.html
+# * TypeDef:   http://localhost:8000/pentaho.type.html#Factory
+# * Class:     http://localhost:8000/pentaho.type.Complex.html
+# * Property:  http://localhost:8000/pentaho.type.Complex.html#changeset
+#
+# In Mindtouch, the ".html" is removed.
+#
+# Usage is like:
+# * Namespace: {{site.refDocsUrlPattern | replace: '$', 'pentaho.type'}}
+# * TypeDef:   {{site.refDocsUrlPattern | replace: '$', 'pentaho.type' | append: '#Factory'}}
+# * Class:     {{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex'}}
+# * Property:  {{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex' | append: '#changeset'}}
+refDocsUrlPattern: https://help.pentaho.com/Documentation/7.1/0R0/070/javascript-apis/platform/$
