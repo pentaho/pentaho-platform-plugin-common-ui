@@ -12,8 +12,8 @@ var util = require('util');
 
 //override htmlsafe function
 helper.htmlsafeOrig = helper.htmlsafe;
-helper.htmlsafe = function(str){
-    return helper.htmlsafeOrig(str).replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+helper.htmlsafe = function( string ) {
+    return helper.htmlsafeOrig( string ).replace(/>/g, '&gt;').replace(/\n/g, '<br>');
 };
 
 var htmlsafe = helper.htmlsafe;
@@ -867,21 +867,16 @@ exports.publish = function(taffyData, opts, tutorials) {
     // handle summary, description and class description default values properly
     data().each(function(doclet) {
         if(!doclet.ignore) {
-            if(!doclet.summary && (desc = (doclet.description || doclet.classdesc))) {
-                //Try to split when a "." or a ".</htmlTag>" is found.
-                //TODO: When markdown is present it fails the split and dumps all description in the summary.
-                var split = desc.split(/(\.(<\/?([^<]+)>)?\s*)$/)
-                doclet.summary = split[0] + (split[1] || "");
-            }
-
             var checkP = function(prop) {
-                if(!prop) return;
+                if (!prop) return;
+                var START_P = "<p>";
+                var END_P   = "</p>";
 
-                prop = prop.replace(/<p><p>/g, "<p>");
+                prop = prop.replace(/<p><p>/g, START_P);
 
-                if(prop.indexOf("<p>") == -1) {
-                    return "<p>" + prop + "</p>";
-                } 
+                if (prop.indexOf(START_P) === -1) {
+                    return START_P + prop + END_P;
+                }
 
                 return prop;
             };
@@ -897,6 +892,11 @@ exports.publish = function(taffyData, opts, tutorials) {
                 }
                 return string;
             };
+
+            if ( doclet.kind === "class" ) {
+              doclet.classSummary = replaceCode(checkP(doclet.classSummary));
+              doclet.constructorSummary = replaceCode(checkP(doclet.constructorSummary));
+            }
 
             doclet.summary = replaceCode(checkP(doclet.summary));
             doclet.description = replaceCode(checkP(doclet.description));
@@ -927,7 +927,7 @@ exports.publish = function(taffyData, opts, tutorials) {
                 doclet.summary = split(doclet.summary, '<br>');
             }
             
-            doclet.parsedName = split(doclet.name, '"')
+            doclet.parsedName = split(doclet.name, '"');
             doclet.parsedLongname = split(doclet.longname, '"')
         }
     });
