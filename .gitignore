@@ -15,3 +15,5 @@ bin
 *.ear
 .DS_Store
 /impl/server/pentaho.log
+docs/.jekyll-metadata
+docs/_site

@@ -64,12 +64,13 @@ var ruleSpec = {
 };
 ```
 
-### Setting the default line width of a line chart
+### Setting the default line width of a line chart and hiding the property
 
-The following rule configures the default value of the `lineWidth` property of both
-the _Line_ and the _Column/Line Combo_ stock visualizations, 
-when in the [PDI](http://www.pentaho.com/product/data-integration) application,
-to be of `2` pixels:
+The following rule configures the default value of the `lineWidth` property, 
+of both the _Line_ and the _Column/Line Combo_ stock visualizations,
+to be `2` pixels and, additionally, 
+hides it from the Analyzer application's properties panel,
+effectively preventing the user from changing its default value:
 
 ```js
 var ruleSpec = {
@@ -78,12 +79,13 @@ var ruleSpec = {
       "pentaho/visual/models/line",
       "pentaho/visual/models/barLine"
     ],
-    application: "pentaho-det"
+    application: "pentaho-analyzer"
   },
   apply: {
     props: {
       lineWidth: {
-        value: 2
+        value: 2,
+        isBrowsable: false
       }
     }
   }
@@ -115,38 +117,13 @@ var ruleSpec = {
 };
 ```
 
-### Hiding the line width property of line charts
-
-The following rule hides the `lineWidth` property of both
-the _Line_ and the _Column/Line Combo_ stock visualizations, 
-from the Analyzer application's properties panel, 
-effectively preventing the user from changing its default value:
-
-```js
-var ruleSpec = {
-  select: {
-    type: [
-      "pentaho/visual/models/line",
-      "pentaho/visual/models/barLine"
-    ],
-    application: "pentaho-analyzer"
-  },
-  apply: {
-    props: {
-      lineWidth: {
-        isBrowsable: false
-      }
-    }
-  }
-};
-```
-
 ### Changing the name of a visualization, as shown in the menu of an application
 
 The following rule changes the 
 [label]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#label'}})
 type attribute of the _Bar_ stock visualization, 
-affecting how it is displayed in the visualizations menu of the Analyzer and PDI applications:
+affecting how it is displayed in the visualizations menu of the Analyzer and 
+[PDI](http://www.pentaho.com/product/data-integration) applications:
 
 ```js
 var ruleSpec = {

@@ -39,7 +39,12 @@ as a service of type `pentaho.config.spec.IRuleSet`.
    
 2. The [**apply**]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule#apply'}}) object
    specifies the actual configuration properties and their values.
-   You will need to consult the reference documentation of the target _type_ to known the list of available properties.
+   You will need to consult the reference documentation of the target _type_ to know the list of available properties.
+   For example, the [Visualization API](visual)'s 
+   [Model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) type,
+   being a [Complex]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex'}}) type,
+   can be configured with the properties of the 
+   [IComplexTypeProto]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.spec.IComplexTypeProto'}}) interface.
 
 3. The [**priority**]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule#priority'}}) 
    allows fine-tuning the order by which rules that target the same _type_ are merged.
@@ -121,6 +126,9 @@ so you need to backup the file yourself before upgrading and restore it afterwar
 As an alternative to using the global configuration file, 
 you can bundle and deploy your own [Pentaho Web Package](pentaho-web-package) 
 containing a registered configuration module.
+
+Component authors may also wish to provide a default configuration beside the component,
+included and registered in the same [Pentaho Web Package](pentaho-web-package). 
 
 
 ## Known Values of Pentaho Environment Variables
