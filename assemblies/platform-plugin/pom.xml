@@ -1,53 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.pentaho</groupId>
     <artifactId>common-ui-assemblies</artifactId>
-    <version>7.1-SNAPSHOT</version>
+    <version>7.1.0.0-12</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
-
-  <!-- TODO: Update groupId to org.pentaho and artifactId to common-ui-assemblies-platform-plugin when we have time to
-       handle the downstream dependencies. When the identifiers are updated, this module should stop publishing the files
-       for the javascript sources (js classifier) and java sources (sources classifier). The downstream dependencies should
-       fetch the artifacts produced by the other modules of the common-ui project (e.g. sources from org.pentaho:common-ui-impl-server).
-       For now we're maintaining old group and artifact identifiers to prevent downstream dependencies changes. -->
   <groupId>pentaho</groupId>
   <artifactId>common-ui</artifactId>
+  <version>7.1.0.0-12</version>
   <packaging>pom</packaging>
-
   <name>Common-UI Platform Plugin</name>
-  <description>
-    This module assembles the main zip file for Common-UI platform plugin. It builds it by fetching external dependencies,
+  <description>This module assembles the main zip file for Common-UI platform plugin. It builds it by fetching external dependencies,
     GWT and pentaho client modules. In the process it makes sure that the required files are overwritten.
     Because the mavenization process should maintain the old group and artifact identifiers in order to reduce the number
     of changes downstream, this module also produces the zip for the javascript sources (js classifier) and the
-    java sources (sources classifier).
-  </description>
-
+    java sources (sources classifier).</description>
   <properties>
-    <prepared.assembly.name>extrated-resources</prepared.assembly.name>
-    <prepared.assembly.directory>${project.build.directory}/${prepared.assembly.name}</prepared.assembly.directory>
-
     <webjars.target.directory>${prepared.assembly.directory}/webjars/META-INF/resources/webjars</webjars.target.directory>
-    <common-ui-impl-client.directory>${prepared.assembly.directory}/common-ui-impl-client</common-ui-impl-client.directory>
-
-    <js.assembly.name>${project.artifactId}-${project.version}-js</js.assembly.name>
     <js.assembly.directory>${project.build.directory}/${js.assembly.name}</js.assembly.directory>
-
-    <gwt-widgets.directory>${prepared.assembly.directory}/gwt-widgets</gwt-widgets.directory>
-
-    <pentaho-modeler.version>${project.version}</pentaho-modeler.version>
-    <flexjson.version>2.1</flexjson.version>
-    <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
+    <prepared.assembly.name>extrated-resources</prepared.assembly.name>
     <handlebars.version>4.0.5</handlebars.version>
+    <common-ui-impl-client.directory>${prepared.assembly.directory}/common-ui-impl-client</common-ui-impl-client.directory>
+    <flexjson.version>2.1</flexjson.version>
     <angular-translate.version>2.2.0-canary-pentaho-modified</angular-translate.version>
-
-    <pentaho-gwt-widgets.version>${project.version}</pentaho-gwt-widgets.version>
+    <pentaho-modeler.version>7.1.0.0-12</pentaho-modeler.version>
+    <prepared.assembly.directory>${project.build.directory}/${prepared.assembly.name}</prepared.assembly.directory>
+    <pentaho-gwt-widgets.version>7.1.0.0-12</pentaho-gwt-widgets.version>
+    <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
+    <js.assembly.name>${project.artifactId}-${project.version}-js</js.assembly.name>
+    <gwt-widgets.directory>${prepared.assembly.directory}/gwt-widgets</gwt-widgets.directory>
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.pentaho</groupId>
@@ -60,7 +44,6 @@
       <version>${project.version}</version>
       <classifier>sources</classifier>
     </dependency>
-
     <dependency>
       <groupId>net.sf.flexjson</groupId>
       <artifactId>flexjson</artifactId>
@@ -72,54 +55,37 @@
       <version>${pentaho-modeler.version}</version>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
-
     <dependency>
       <groupId>pentaho</groupId>
       <artifactId>pentaho-gwt-widgets</artifactId>
       <version>${pentaho-gwt-widgets.version}</version>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
-
     <dependency>
       <groupId>pentaho</groupId>
       <artifactId>pentaho-gwt-widgets-package</artifactId>
       <version>${pentaho-gwt-widgets.version}</version>
       <type>zip</type>
     </dependency>
-
     <dependency>
       <groupId>org.pentaho</groupId>
       <artifactId>common-ui-impl-client</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>jquery</artifactId>
     </dependency>
-    <!-- Temporarily removed due to custom changes in the current common-ui version -->
-    <!-- (mainly the exporting of the Handlebars global variable) -->
-    <!--<dependency>-->
-      <!--<groupId>org.webjars.npm</groupId>-->
-      <!--<artifactId>handlebars</artifactId>-->
-      <!--<version>${handlebars.version}</version>-->
-      <!--<exclusions>-->
-        <!--<exclusion>-->
-          <!--<groupId>*</groupId>-->
-          <!--<artifactId>*</artifactId>-->
-        <!--</exclusion>-->
-      <!--</exclusions>-->
-    <!--</dependency>-->
     <dependency>
       <groupId>org.webjars.bower</groupId>
       <artifactId>jquery-i18n-properties</artifactId>
@@ -204,25 +170,19 @@
       <groupId>org.webjars.bower</groupId>
       <artifactId>dijit</artifactId>
     </dependency>
-    <!-- dojox -->
     <dependency>
       <groupId>org.dojotoolkit.dojo</groupId>
       <artifactId>dojo-release</artifactId>
-      <classifier>src</classifier>
       <type>zip</type>
+      <classifier>src</classifier>
     </dependency>
   </dependencies>
-
   <build>
     <plugins>
-
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>${maven-assembly-plugin.version}</version>
-
         <executions>
-
-          <!-- First unpack all webjar dependencies locally so that we can pick what to copy and where to copy it for the final assembly -->
           <execution>
             <id>prepare-assembly</id>
             <phase>prepare-package</phase>
@@ -233,13 +193,11 @@
               <descriptors>
                 <descriptor>src/main/assembly/prepareAssembly.xml</descriptor>
               </descriptors>
-
               <attach>false</attach>
               <appendAssemblyId>false</appendAssemblyId>
               <finalName>${prepared.assembly.name}</finalName>
             </configuration>
           </execution>
-
           <execution>
             <id>prepare-platform-plugin-js</id>
             <phase>package</phase>
@@ -250,14 +208,11 @@
               <descriptors>
                 <descriptor>src/main/assembly/assembly-js-dir.xml</descriptor>
               </descriptors>
-
               <attach>false</attach>
               <appendAssemblyId>false</appendAssemblyId>
               <finalName>${js.assembly.name}</finalName>
             </configuration>
           </execution>
-
-          <!-- Second, create the platform plugin js zip artifact -->
           <execution>
             <id>bundle-common-ui-platform-plugin-js</id>
             <phase>package</phase>
@@ -268,13 +223,10 @@
               <descriptors>
                 <descriptor>src/main/assembly/assembly-js.xml</descriptor>
               </descriptors>
-
               <appendAssemblyId>true</appendAssemblyId>
               <classifier>js</classifier>
             </configuration>
           </execution>
-
-          <!-- Last, create the platform plugin zip artifact -->
           <execution>
             <id>bundle-common-ui-platform-plugin</id>
             <phase>package</phase>
@@ -285,13 +237,10 @@
               <descriptors>
                 <descriptor>src/main/assembly/assembly.xml</descriptor>
               </descriptors>
-
               <appendAssemblyId>false</appendAssemblyId>
               <classifier>zip</classifier>
             </configuration>
           </execution>
-
-          <!-- And also... Copy the java sources -->
           <execution>
             <id>bundle-common-ui-platform-plugin-sources</id>
             <phase>package</phase>
@@ -302,17 +251,12 @@
               <descriptors>
                 <descriptor>src/main/assembly/assembly-sources.xml</descriptor>
               </descriptors>
-
               <appendAssemblyId>true</appendAssemblyId>
               <classifier>sources</classifier>
             </configuration>
           </execution>
-
         </executions>
-
       </plugin>
-
     </plugins>
   </build>
-
 </project>
