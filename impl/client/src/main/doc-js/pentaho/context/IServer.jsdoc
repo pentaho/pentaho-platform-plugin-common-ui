@@ -15,8 +15,8 @@
  */
 
 /**
- * The `IServer` interface exposes the part of the contextual information of the Pentaho Web Client Platform
- * that is concerned with the server application.
+ * The `IServer` interface allows access to the Pentaho Web Client Platform’s
+ * contextual information that pertains to the server application.
  *
  * @name pentaho.context.IServer
  * @interface
