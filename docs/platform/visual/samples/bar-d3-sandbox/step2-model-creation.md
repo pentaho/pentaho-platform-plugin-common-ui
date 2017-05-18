@@ -1,5 +1,5 @@
 ---
-title: Part 2 - Creating the model
+title: Step 2 - Creating the model
 description: Walks you through the creation of the Bar visualization model.
 parent-path: .
 parent-title: Create a custom Bar chart visualization using D3
@@ -185,4 +185,4 @@ The model could still be enriched in several ways, such as:
 However, these are all accessory and can be done at a later stage.
 Now you can't wait to see something shining on the screen, so let's move on into creating the view.
 
-**Continue** to [Creating the view](part3-view-creating).
+**Continue** to [Creating the view](step3-view-creation).

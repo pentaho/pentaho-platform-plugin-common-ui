@@ -1,5 +1,5 @@
 ---
-title: Part 3 - Creating the view
+title: Step 3 - Creating the view
 description: Walks you through the creation of the Bar visualization view.
 parent-path: .
 parent-title: Create a custom Bar chart visualization using D3
@@ -117,8 +117,7 @@ Edit the `index.html` file and place the following code in it:
       var modelSpec = {
         "data": new Table(dataSpec),
         "category": {attributes: ["productFamily"]},
-        "measure": {attributes: ["sales"]},
-        "barSize": 20
+        "measure": {attributes: ["sales"]}
       };
 
       var BarModel = context.get(barModelFactory);
@@ -164,7 +163,6 @@ Remarks:
   - The used visualization model is now `pentaho/visual/samples/bar`.
   - The model now contains visual role mappings for the `category` and `measure` visual roles.
   - The dimensions of the visualization were increased.
-  - The `barSize` property is being given a value different from its default.
 
 Now, refresh the `index.html` page in the browser, and you should read `Hello World!`.
 
@@ -333,4 +331,4 @@ Remarks:
 
 Now, refresh the `index.html` page in the browser, and you should finally see a Bar chart!
 
-**Continue** to [Styling the view](part4-view-styling).
+**Continue** to [Styling the view](step4-view-styling).

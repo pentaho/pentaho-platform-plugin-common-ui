@@ -1,5 +1,5 @@
 ---
-title: Part 1 - Preparing the environment
+title: Step 1 - Preparing the environment
 description: Walks you through setting up a basic sandbox for experimenting with visualizations.
 parent-path: .
 parent-title: Create a custom Bar chart visualization using D3
@@ -159,5 +159,5 @@ static -p 8000</code></pre>
 " type="warning" %}
 
 
-**Continue** to [Creating the model](part2-model-creating).
+**Continue** to [Creating the model](step2-model-creation).
 

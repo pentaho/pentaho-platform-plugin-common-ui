@@ -1,5 +1,5 @@
 ---
-title: Part 5 - Adding interactivity to the view
+title: Step 5 - Adding interactivity to the view
 description: Walks you through adding interactivity to the Bar visualization view.
 parent-path: .
 parent-title: Create a custom Bar chart visualization using D3
@@ -261,4 +261,4 @@ This is a known issue of DOM events and there are multiple solutions to it.
 Here's one solution, specifically for D3: 
 [Distinguishing click and double-click in D3](http://bl.ocks.org/couchand/6394506).
 
-**Continue** to [Adding a default configuration](part6-default-configuration).
+**Continue** to [Adding a default configuration](step6-default-configuration).

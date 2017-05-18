@@ -1,5 +1,5 @@
 ---
-title: Part 4 - Styling the view
+title: Step 4 - Styling the view
 description: Walks you through the styling of the Bar visualization view.
 parent-path: .
 parent-title: Create a custom Bar chart visualization using D3
@@ -64,4 +64,4 @@ define([
 
 Now, refresh the `index.html` page in the browser, and you should see a more colorful Bar chart!
 
-**Continue** to [Adding interactivity to the view](part5-view-interactivity).
+**Continue** to [Adding interactivity to the view](step5-view-interactivity).

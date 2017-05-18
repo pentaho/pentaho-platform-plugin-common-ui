@@ -76,7 +76,7 @@ Finally, any third-party dependencies must be declared in the same file.
   "config": {
     "pentaho/service": {
       "foo_1.0.0/my-viz/model": "pentaho/visual/base",
-      "foo_1.0.0/my-viz/default-config": "pentaho.config.spec.IRuleSet"
+      "foo_1.0.0/my-viz/config": "pentaho.config.spec.IRuleSet"
     }
   },
   "dependencies": {
