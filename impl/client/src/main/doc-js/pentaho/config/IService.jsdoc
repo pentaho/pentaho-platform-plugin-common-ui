@@ -40,7 +40,7 @@
  *
  * The merged configuration specification can then be used to configure a type or an instance.
  *
- * Normally, you won't call these operations directly.
+ * Normally, you would not call these operations directly.
  *
  * Then, the [Context]{@link pentaho.type.Context} class
  * already handles obtaining configurations from its configuration service,
