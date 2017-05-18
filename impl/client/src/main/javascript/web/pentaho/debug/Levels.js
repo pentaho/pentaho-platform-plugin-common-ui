@@ -42,7 +42,7 @@ define([
   };
 
   /**
-   * The `Levels` enum is the class of names of well known _debugging levels_.
+   * The `Levels` enum is the class of names for well known _debugging levels_.
    *
    * The enum also exposes a `parse` method.
    *
@@ -70,7 +70,7 @@ define([
     exception: 1,
 
     /**
-     * The `warn` debugging level represents events that might be a problem or not.
+     * The `warn` debugging level represents events that could be a problem or not.
      * @default
      */
     warn: 2,
