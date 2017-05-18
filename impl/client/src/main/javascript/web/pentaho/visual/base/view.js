@@ -1112,9 +1112,9 @@ define([
          * @throws {pentaho.lang.OperationInvalidError} When setting and the model already has
          * [descendant]{@link pentaho.type.Type#hasDescendants} models.
          *
-         * @see pentaho.visual.base.Model.Type#extensionEffective
+         * @see pentaho.visual.base.View.Type#extensionEffective
          *
-         * @see pentaho.visual.base.spec.IModel#extension
+         * @see pentaho.visual.base.spec.IViewType#extension
          */
         get extension() {
           return this._extension;

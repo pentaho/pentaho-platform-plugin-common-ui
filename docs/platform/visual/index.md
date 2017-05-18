@@ -76,7 +76,7 @@ Finally, any third-party dependencies must be declared in the same file.
   "config": {
     "pentaho/service": {
       "foo_1.0.0/my-viz/model": "pentaho/visual/base",
-      "foo_1.0.0/my-viz/default-config": "pentaho.config.spec.IRuleSet"
+      "foo_1.0.0/my-viz/config": "pentaho.config.spec.IRuleSet"
     }
   },
   "dependencies": {
@@ -92,7 +92,7 @@ See [Pentaho Web Package description](../pentaho-web-package) for a more detaile
 The Pentaho platform is built on top of an OSGi container, so developers must provide their code as an OSGi bundle. 
 Additionally, the required client side dependencies must also be provided to the platform as bundles.
 
-The recommended way is to package the visualization bundle, its dependencies, 
+The recommended way is to put the visualization bundle, its dependencies, 
 and corresponding feature definition together into a single KAR file.
 
 See [Bundling](bundling) for instructions.
