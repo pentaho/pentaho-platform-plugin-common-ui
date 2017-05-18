@@ -8,9 +8,8 @@ layout: sub-intro
 
 # Overview
 
-Up until 7.0, the Pentaho platform included the 2.0 (internal) version of the Visualization API.
-As of 7.1, the Pentaho platform also ships with the **beta** version of the future Visualization API, (internal) version 3.0, 
-**side-by-side** with version 2.0. This documentation relates to the future version, 3.0.
+As of 7.1, the Pentaho platform ships with a _new_ version of the Visualization API, still in **beta**, 
+**side-by-side** with the _previous_ version. This documentation relates to the new version.
 
 The Pentaho Visualization API provides a unified way to visualize data across the Pentaho suite 
 (e.g.
@@ -39,8 +38,8 @@ desired look and feel.
 For more information on how to customize visualizations,
 see [Configuration](configuration).
 
-If you want to know more about how Pentaho Analyzer exposes the future Visualization API, 
-read [Analyzer and the Future Visualization API](analyzer-future-viz-api).
+If you want to know more about how Pentaho Analyzer exposes the new Visualization API, 
+read [Analyzer and the Visualization API](analyzer-viz-api).
 
 # Creating a visualization
 
