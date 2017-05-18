@@ -33,8 +33,8 @@ npm install
     
    # Add and install the Visualization API dev dependency.
    # (the runtime dependency is provided by the platform)
-   npm install https://github.com/nantunes/pentaho-viz-sandbox/releases/download/3.0.4/nantunes-viz-api-3.0.4.tgz --save-dev
-   # or: yarn add https://github.com/nantunes/pentaho-viz-sandbox/releases/download/3.0.4/nantunes-viz-api-3.0.4.tgz --dev
+   npm install https://github.com/pentaho/pentaho-platform-plugin-common-ui/releases/download/v3.0.0-beta/pentaho-viz-api-v3.0.0.tgz --save-dev
+   # or: yarn add https://github.com/pentaho/pentaho-platform-plugin-common-ui/releases/download/v3.0.0-beta/pentaho-viz-api-v3.0.0.tgz --dev
    ```
 
 2. Create a file named `sales-by-product-family.json` and place the following content in it:
@@ -71,7 +71,7 @@ npm install
         <script type="text/javascript" src="node_modules/RequireJS/require.js"></script>
     
         <!-- Load the VizAPI dev bootstrap helper. -->
-        <script type="text/javascript" src="node_modules/@nantunes/viz-api/dev-bootstrap.js"></script>
+        <script type="text/javascript" src="node_modules/@pentaho/viz-api/dev-bootstrap.js"></script>
     
         <script>
           require([

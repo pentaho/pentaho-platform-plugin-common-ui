@@ -83,7 +83,7 @@ Edit the `index.html` file and place the following code in it:
 
   <script type="text/javascript" src="node_modules/RequireJS/require.js"></script>
 
-  <script type="text/javascript" src="node_modules/@nantunes/viz-api/dev-bootstrap.js"></script>
+  <script type="text/javascript" src="node_modules/@pentaho/viz-api/dev-bootstrap.js"></script>
 
   <script>
     // Needed only in a sandbox environment.
