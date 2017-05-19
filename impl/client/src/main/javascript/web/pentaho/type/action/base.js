@@ -131,11 +131,14 @@ define([
        *
        * @classDesc The `action.Base` class represents a certain model of actions.
        *
-       * The associated type class provides a way to express metadata and to be configured.
+       * This class, the instance class, manages the execution of the action
+       * and enforces the multiple phases by which all actions, generically, go through it,
+       * including: "init", "will", "do", and "finally"*
        *
-       * This class -- the instance class --, manages the execution of the action
-       * and enforces the multiple phases by which all actions, generically, go through:
-       * "init", "will", "do", and "finally".
+       * Note that the associated type class is to be used to configure metadata information
+       * about actions. For example: [label]{@link pentaho.type.Type#label} and
+       * [description]{@link pentaho.type.Type#description} metadata are
+       * to be used in user interfaces to portray the action to the user.
        *
        * ##### Synchronous or Asynchronous
        *
@@ -144,12 +147,11 @@ define([
        * The execution of a synchronous action is completed synchronously.
        * An asynchronous action, however, has an asynchronous "do" phase,
        * and thus only fully completes asynchronously.
-       * To support these two kinds of actions, two execution methods exist,
+       * To support these two kinds of actions, two execution methods exist:
        * [execute]{@link pentaho.type.action.Base#execute} and
        * [executeAsync]{@link pentaho.type.action.Base#executeAsync}.
-       * For an unknown kind of action,
-       * use the former if you do not care about the outcome of the action execution
-       * and the latter if you do.
+       * For an unknown kind of action, use execute if you are not concerned about the outcome
+       * of the action execution. Use executeAsync if you are concerned about the outcome of the action.
        *
        * ##### Action model
        *
@@ -246,7 +248,7 @@ define([
        *    and the _finally_ phase is entered.
        *
        * 5. When in the **finally** phase, the action is [finished]{@link pentaho.type.action.Base#isFinished},
-       *    with our without success,
+       *    with or without success,
        *    and is in one of the
        *    [canceled]{@link pentaho.type.action.States#canceled},
        *    [failed]{@link pentaho.type.action.States#failed} or
