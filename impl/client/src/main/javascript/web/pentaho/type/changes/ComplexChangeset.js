@@ -200,8 +200,8 @@ define([
      */
     _setElement: function(complex, propType, valueSpec) {
 
-      // NOTE: For performance reasons, this function inlines code that would otherwise be available from,
-      // for example, ContainerMixin#usingChangeset(.) and TransactionScope.
+      // NOTE: For performance reasons, this function inlines code that would otherwise be available from.
+      // For example: ContainerMixin#usingChangeset(.) and TransactionScope.
       var type = complex.type;
       var name = propType.name;
 

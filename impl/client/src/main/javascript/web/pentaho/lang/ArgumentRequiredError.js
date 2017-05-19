@@ -23,19 +23,18 @@ define([
 
   return ArgumentError.extend("pentaho.lang.ArgumentRequiredError", /** @lends pentaho.lang.ArgumentRequiredError# */{
     /**
-     * @classDesc The `ArgumentRequiredError` class is the class of errors that
-     * signals that a required function argument was not specified,
-     * or was specified _nully_ or empty.
+     * @classDesc The `ArgumentRequiredError` class is the class of errors for a function's argument
+     * that was required but was not specified,
+     * or was specified but with a [_nully_]{@link Nully} or empty value.
      *
-     * The name of the argument can be that of a nested property,
-     * like, for example, `"keyArgs.description"`.
+     * The name of the argument can be that of a nested property.
+     * For example: `"keyArgs.description"`.
      *
      * An argument being "required" may mean that an argument must be:
-     * * specified - `if(arguments.length < 1) ...`
-     * * truthy - `if(!value) ...`
-     * * not nully - `if(value == null) ...`
-     * * not nully or an empty string - `if(value == null || value === "") ...`
-     * * ...
+     * * Specified: `if(arguments.length < 1) ...`
+     * * [_Truthy_]{@link https://developer.mozilla.org/en/docs/Glossary/Truthy}: `if(!value) ...`
+     * * Not [_nully_]{@link Nully}: `if(value == null) ...`
+     * * Not [_nully_]{@link Nully} or an empty string: `if(value == null || value === "") ...`
      *
      * @example
      *

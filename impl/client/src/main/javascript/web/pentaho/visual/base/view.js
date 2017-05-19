@@ -87,7 +87,7 @@ define([
        * In any case, the first rendering of the view must be explicitly triggered by a call to
        * [update]{@link pentaho.visual.base.View#update}.
        * This two-phase process allows a _container application_ to further configure a view,
-       * like, for example, registering event listeners,
+       * for example, registering event listeners,
        * before the initial update.
        *
        * Over time, the view's model is mutated and, in response,
@@ -1378,7 +1378,7 @@ define([
        * [_updateSelection]{@link pentaho.visual.base.View#_updateSelection} and
        * [_updateGeneral]{@link pentaho.visual.base.View#_updateGeneral}.
        *
-       * Other appropriate combinations of these can also be implemented, like,
+       * Other appropriate combinations of these can also be implemented,
        * for example, `_updateSizeAndSelection`,
        * by combining the names of the known property groups: `Data`, `Size`, `Selection` and `General`,
        * with an `And` to form a corresponding method name.

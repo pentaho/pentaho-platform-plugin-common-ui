@@ -65,6 +65,7 @@ define([
   // ---
 
   // TODO: Move this to the pentaho.lang.impl namespace; possibly along with Event ?
+  // TODO: remove @description and @constructor when jsdocs handles mixins properly.
 
   /**
    * @classDesc The `EventSource` class is an implementation [IEventSource]{@link pentaho.lang.IEventSource}
@@ -79,16 +80,20 @@ define([
    * The methods `_emit` and `_emitSafe` can only be used with events of the [Event]{@link pentaho.lang.Event} type,
    * while the `_emitGeneric` method can be used with any event type and exposes more control options.
    *
-   * To know if any listeners are registered for a certain event type and phase,
-   * use the [_hasListeners]{@link pentaho.lang.EventSource#_hasListeners} method.
-   * To know if any listeners are registered for any of the phases of a certain event type:
-   * [_hasObservers]{@link pentaho.lang.EventSource#_hasObservers} method.
+   * To ascertain whether any listeners are registered for a certain event type and phase,
+   * use: [_hasListeners]{@link pentaho.lang.EventSource#_hasListeners}.
+   * To ascertain whether any listeners are registered for any of the phases of a certain event type, use:
+   * [_hasObservers]{@link pentaho.lang.EventSource#_hasObservers}.
    *
    * @name EventSource
    * @memberOf pentaho.lang
    * @class
    * @implements pentaho.lang.IEventSource
    * @amd pentaho/lang/EventSource
+   *
+   * @description This class was not designed to be constructed directly.
+   * It was designed to be used as a **mixin**.
+   * @constructor
    */
 
   return Base.extend(module.id, /** @lends pentaho.lang.EventSource# */{
@@ -234,11 +239,11 @@ define([
     /**
      * Emits an unstructured event and returns it, unless it was canceled.
      *
-     * The listeners of existing registrations by the time the method is called are notified,
+     * When this method is called, the listeners of existing registrations are notified
      * synchronously, by priority order and then registration order,
      * until either the event is canceled or all of the listeners have been notified.
      *
-     * It is safe to register or unregister to/from and event type while it is being emitted.
+     * It is safe to register or unregister to/from an event type while it is being emitted.
      * However, changes are only taken into account in subsequent emissions.
      *
      * If a listener function throws an error, the event processing is interrupted.

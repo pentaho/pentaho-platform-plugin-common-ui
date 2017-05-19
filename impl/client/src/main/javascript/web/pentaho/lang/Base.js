@@ -160,8 +160,8 @@ define([
      *
      * If provided, extends the created instance with the spec in `source` parameter.
      *
-     * To "create" an instance of `Base.Array`,
-     * use {@link pentaho.lang.Base.Array.to},
+     * Create an instance of `Base.Array`
+     * by using {@link pentaho.lang.Base.Array.to}
      * to convert an existing array instance.
      *
      * @constructor
@@ -263,7 +263,7 @@ define([
     });
 
     /**
-     * If a method has been overridden then the base method provides access to the overridden method.
+     * If a method has been overridden, then the base method provides access to the overridden method.
      *
      * Can also be called from within a constructor function.
      *

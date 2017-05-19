@@ -1525,8 +1525,8 @@ define([
        * obtained by calling [toSpecInContext]{@link pentaho.type.Type#toSpecInContext}.
        * In following occurrences, only the previously used temporary identifier is returned.
        *
-       * Some standard types have a special reference syntax,
-       * for example, [List.Type#toRef]{@link pentaho.type.List.Type#toRef}.
+       * Some standard types have a special reference syntax.
+       * For example: [List.Type#toRef]{@link pentaho.type.List.Type#toRef}.
        *
        * @see pentaho.type.Type#toSpec
        *

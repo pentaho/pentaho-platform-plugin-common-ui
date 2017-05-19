@@ -22,12 +22,12 @@ define([
 
   return ArgumentError.extend("pentaho.lang.ArgumentRangeError", /** @lends pentaho.lang.ArgumentRangeError# */{
     /**
-     * @classDesc The `ArgumentRangeError` class is the class of errors that
-     * signals that a function argument was specified with a value of one of the expected types,
+     * @classDesc The `ArgumentRangeError` class is the class of errors for a function's argument
+     * that was specified with a value of one of the expected types,
      * albeit not within the expected range.
      *
-     * The name of the argument can be that of a nested property,
-     * like, for example, `"keyArgs.description"`.
+     * The name of the argument can be that of a nested property.
+     * For example: `"keyArgs.description"`.
      *
      * @example
      *

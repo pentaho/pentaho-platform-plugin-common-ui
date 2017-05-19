@@ -23,20 +23,20 @@ define([
 
   return ArgumentError.extend("pentaho.lang.ArgumentInvalidError", /** @lends pentaho.lang.ArgumentInvalidError# */{
     /**
-     * @classDesc The `ArgumentInvalidError` class is the class of errors that
-     * signals that a function argument has been specified, albeit with an invalid value.
+     * @classDesc  The `ArgumentInvalidError` class is the class of errors
+     * for a function's argument that has been specified,
+     * although with an invalid value.
      *
-     * The name of the argument can be that of a nested property,
-     * like, for example, `"keyArgs.description"`.
+     * The name of the argument can be that of a nested property.
+     * For example: `"keyArgs.description"`.
      *
      * An argument's value can be considered **invalid** because:
-     * * it is not of one of the supported, documented types -
-     *   use {@link pentaho.lang.ArgumentInvalidTypeError} instead
-     * * the specific value is not supported, or is out of range -
-     *   use {@link pentaho.lang.ArgumentRangeError} instead
-     * * the value is not in an acceptable state
-     * * the value refers to something which does not exist (like a dictionary _key_ which is undefined)
-     * * ...
+     * * It is not of one of the supported (and documented) types.
+     *   Use instead: {@link pentaho.lang.ArgumentInvalidTypeError}.
+     * * The specific value is not supported, or is out of range.
+     *   Use instead: {@link pentaho.lang.ArgumentRangeError}
+     * * The value is not in an acceptable state.
+     * * The value refers to something which does not exist (like a dictionary _key_ which is undefined)
      *
      * You should use this error if none of the other more specific
      * invalid argument errors applies.

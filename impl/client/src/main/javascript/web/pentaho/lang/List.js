@@ -25,15 +25,10 @@ define([
      *
      * Elements of a list must implement the {@link pentaho.lang.IListElement} interface.
      *
-     * ### AMD
-     *
-     * To obtain the constructor of this class,
-     * require the module `"pentaho/lang/List"`.
-     *
      * @description Initializes a list instance.
      *
      * Note that because a `List` is a sub-class of `Array`,
-     * it cannot be a "newable" constructor function (at least up to ECMAScript version 5).
+     * the `new` operator cannot be used to create instances (at least up to ECMAScript version 5).
      * Instead, instances of `List` are actually initial instances of `Array`
      * whose prototype is then changed to be that of `List`.
      * In other words, `List` is an "initialization" constructor
@@ -48,6 +43,7 @@ define([
      * @name List
      * @memberOf pentaho.lang
      * @extends pentaho.lang.Base.Array
+     * @amd pentaho/lang/List
      * @param {Object} [keyArgs] The keyword arguments.
      *
      * These are not used directly by the `List` class
