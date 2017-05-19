@@ -49,7 +49,7 @@ define([
      *
      * @classDesc The `IsIn` class represents a membership filter.
      * This filter selects elements in which the value of a certain property belongs to
-     * a certain reference set, [values]{@link pentaho.type.filter.IsIn#values}.
+     * a certain reference set: [values]{@link pentaho.type.filter.IsIn#values}.
      *
      * @description Creates a membership filter instance.
      *

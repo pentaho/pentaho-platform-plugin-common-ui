@@ -43,7 +43,7 @@ define([
      *
      * @classDesc The `IsEqual` class represents an equality filter.
      * This filter selects elements having the value of a certain property equal to
-     * a reference value, [value]{@link pentaho.type.filter.IsEqual#value}.
+     * a reference value: [value]{@link pentaho.type.filter.IsEqual#value}.
      *
      * @description Creates an equality filter instance.
      *
