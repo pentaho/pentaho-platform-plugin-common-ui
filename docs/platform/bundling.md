@@ -1,7 +1,7 @@
 ---
-title: Bundling a visualization
-description: Explains the core concepts and walks through the creation of a kar file for deploying a visualization in the Pentaho Platform.
-parent-title: Visualization API
+title: Bundling a web package and provisioning
+description: Explains the core concepts and walks through the creation of a kar file for deploying a web package in the Pentaho Platform.
+parent-title: ""
 layout: default
 ---
 

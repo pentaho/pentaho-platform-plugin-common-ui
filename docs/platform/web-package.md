@@ -1,12 +1,11 @@
 ---
-title: Pentaho Web Package
+title: Web Package
 description: Describes how to package web client resources, including visualizations, into the Pentaho platform.
-parent-title: Pentaho Platform JavaScript APIs
-parent-path: ..
+parent-title: ""
 layout: default
 ---
 
-The Pentaho Platform detects and manages OSGi bundles that are Web Client Packages, 
+The Pentaho Platform detects and manages OSGi bundles that are Web Packages, 
 collecting the information needed to build the AMD/RequireJS configuration and 
 to setup the mappings needed to serve the package resources through HTTP.
 

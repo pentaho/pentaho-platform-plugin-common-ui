@@ -1,8 +1,7 @@
 ---
 title: Configuration API
 description: The Configuration API provides a means for types to be configured by third-parties.
-parent-title: Pentaho Platform JavaScript APIs
-parent-path: ../..
+parent-title: ""
 layout: default
 ---
 
@@ -124,11 +123,11 @@ The configuration file is shipped with a small set of illustrative (but commente
 so you need to backup the file yourself before upgrading and restore it afterwards.
 
 As an alternative to using the global configuration file, 
-you can bundle and deploy your own [Pentaho Web Package](pentaho-web-package) 
+you can bundle and deploy your own [Pentaho Web Package](web-package) 
 containing a registered configuration module.
 
 Component authors may also wish to provide a default configuration beside the component,
-included and registered in the same [Pentaho Web Package](pentaho-web-package). 
+included and registered in the same [Pentaho Web Package](web-package). 
 
 
 ## Known Values of Pentaho Environment Variables

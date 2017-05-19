@@ -1,6 +1,8 @@
 title: Pentaho Platform JavaScript APIs
-description: > # this means to ignore newlines until "theme:"
-  You can use the JavaScript APIs to develop components for the Pentaho platform.
+description: > # this means to ignore newlines in this property's value
+  JavaScript component development for the Pentaho platform.
+
+titleHtml: Platform JavaScript APIs <sup><em>beta</em></sup>
 
 theme: jekyll-theme-cayman
 
