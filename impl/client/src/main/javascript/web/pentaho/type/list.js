@@ -153,7 +153,7 @@ define([
        *
        * A boundary list isolates the list holder from the list's elements.
        *
-       * The validity of a _boundary list_ is not affected by the validity of its elements,
+       * The validity of a _boundary list_ is not affected by the validity of its elements.
        * Changes within the elements of _boundary list_ do not bubble to it.
        *
        * @type {boolean}

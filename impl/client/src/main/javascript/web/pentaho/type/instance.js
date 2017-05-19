@@ -44,8 +44,8 @@ define([
      *
      * The former creates the actual instances of the type.
      * The latter creates a single object (a singleton) that **represents the type**,
-     * is shared by all instances of the type,
-     * and, essentially, holds its metadata.
+     * which is shared by all instances of the type,
+     * and essentially, holds its metadata.
      *
      * The **type class** of the _Instance_ type is {@link pentaho.type.Type}.
      *
@@ -142,26 +142,26 @@ define([
       /**
        * Creates a top-level specification that describes this instance.
        *
-       * If an [ambient specification context]{@link pentaho.type.SpecificationContext.current},
+       * If an [ambient specification context]{@link pentaho.type.SpecificationContext.current}
        * currently exists, it is used to manage the serialization process.
        * Otherwise, one is created and set as current.
        * Then, the actual work is delegated to {@link pentaho.type.Instance#toSpecInContext}.
        *
-       * @param {Object} [keyArgs] - The keyword arguments object.
+       * @param {Object} [keyArgs] - The keyword arguments' object.
        * Passed to every instance and type serialized within this scope.
        *
        * Please see the documentation of subclasses for information on additional, supported keyword arguments.
        *
        * @param {?boolean} [keyArgs.isJson=false] Generates a JSON-compatible specification.
-       * Attributes that don't have a JSON-compatible specification are omitted.
+       * Attributes that do not have a JSON-compatible specification are omitted.
        *
        * @param {?pentaho.type.Type} [keyArgs.declaredType] The base type of this value's storage location.
        * If the value does not have this exact type, its inline type property must be included
        * in the specification. Otherwise, it can be omitted.
        * When unspecified, the inline type property is only included if `forceType` is `true`.
        *
-       * @param {?boolean} [keyArgs.forceType=false] Forces inclusion of the inline type property, `_`,
-       * in the specification.
+       * @param {?boolean} [keyArgs.forceType=false] In the specification, forces inclusion of
+       * the inline type property: `_`.
        *
        * @return {!any} A specification of this instance.
        */
@@ -172,7 +172,7 @@ define([
       /**
        * Creates a specification that describes this instance.
        *
-       * @param {Object} [keyArgs] The keyword arguments object.
+       * @param {Object} [keyArgs] The keyword arguments' object.
        * Passed to every instance and type serialized within this scope.
        *
        * Please see the documentation of subclasses for information on additional, supported keyword arguments.
@@ -191,7 +191,7 @@ define([
       /**
        * Creates a top-level JSON specification that describes this instance.
        *
-       * Attributes which don't have a JSON-compatible specification are omitted.
+       * Attributes which do not have a JSON-compatible specification are omitted.
        * Specifically, for inline types, attributes with a function value are not supported.
        *
        * This method simply calls {@link @see pentaho.type.Instance#toSpec} with argument `keyArgs.isJson` as `true`

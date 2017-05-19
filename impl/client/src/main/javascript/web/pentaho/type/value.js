@@ -214,7 +214,7 @@ define([
        * Please see the documentation of value subclasses for information on additional, supported keyword arguments.
        *
        * @param {?boolean} [keyArgs.isJson=false] - Generates a JSON-compatible specification.
-       * Attributes which don't have a JSON-compatible specification are omitted.
+       * Attributes which do not have a JSON-compatible specification are omitted.
        *
        * @param {?pentaho.type.Type} [keyArgs.declaredType] The base type of this value's storage location.
        * If the value does not have this exact type, its inline type property must be included

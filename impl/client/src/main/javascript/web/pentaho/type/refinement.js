@@ -60,12 +60,12 @@ define([
      * Instances are created by the instance constructors of concrete representation types.
      *
      * The **representation types** of this system are
-     * {@link pentaho.type.Element} and {@link pentaho.type.List}, and its subtypes.
+     * {@link pentaho.type.Element} and {@link pentaho.type.List} and its subtypes.
      *
      * ### Refinement types
      *
-     * On the contrary, **refinement types** are intrinsically **abstract**
-     * and never _create_ instances (or are the base types of types that do).
+     * On the contrary, **refinement types** are intrinsically **abstract** and never _create_ instances.
+     * Refinement types are also never the base types of types that do _create_ instances.
      *
      * A refinement type reduces the set of **valid** instances of the associated representation type,
      * by requiring these to satisfy additional conditions.
@@ -75,15 +75,15 @@ define([
      *
      * A refinement type can be used wherever its representation type can be:
      *
-     * 1. as the [value type]{@link pentaho.type.Property.Type#type} of a property, or
-     * 2. as the [element type]{@link pentaho.type.List.Type#of} of a list.
+     * 1. As the [value type]{@link pentaho.type.Property.Type#type} of a property
+     * 2. As the [element type]{@link pentaho.type.List.Type#of} of a list
      *
      * Besides supporting refined validation,
      * refinement types are also useful to enable more refined type configuration.
      *
      * ### Instance interface
      *
-     * The instance interface of a refinement type - represented by _this_ class - is meaningless.
+     * The instance interface of a refinement type, represented by _this_ class, is meaningless.
      *
      * The fact that an instance constructor exists in this system is a matter of
      * uniformity and convenience.
@@ -113,7 +113,7 @@ define([
      * [defaultView]{@link pentaho.type.Value.Type#defaultView},
      *
      * Although the [styleClass]{@link pentaho.type.Type#styleClass} attribute
-     * isn't inheritable,
+     * is not inheritable,
      * the value of [inheritedStyleClasses]{@link pentaho.type.Type#inheritedStyleClasses}
      * of the representation type
      * is included in
@@ -140,9 +140,9 @@ define([
      *    using property [facets]{@link pentaho.type.Refinement.Type#facets},
      *    and specify the configuration attributes these define.
      *
-     * The latter is the preferred method as the configuration attributes
-     * defined by refinement facets can be used elsewhere,
-     * for example, to add a UI control to directly constrain input values.
+     * The latter is the preferred method since the configuration attributes
+     * defined by refinement facets can be used elsewhere.
+     * For example, to add a UI control to directly constrain input values.
      *
      * ### Examples
      *
