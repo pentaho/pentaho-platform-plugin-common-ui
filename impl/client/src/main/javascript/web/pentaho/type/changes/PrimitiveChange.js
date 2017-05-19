@@ -34,9 +34,11 @@ define([
    * Primitive changes always exist in the context of a [Changeset]{@link pentaho.type.changes.Changeset}.
    *
    * Example primitive changes are
-   * the [Replace]{@link pentaho.type.changes.Replace} operation on a [Complex]{@link pentaho.type.Complex} value and
-   * the [Add]{@link pentaho.type.changes.Add}, and [Clear]{@link pentaho.type.changes.Clear} on a
+   * the [Replace]{@link pentaho.type.changes.Replace} operation on a [Complex]{@link pentaho.type.Complex} value, and
+   * the [Add]{@link pentaho.type.changes.Add} and [Clear]{@link pentaho.type.changes.Clear} operations on a
    * [List]{@link pentaho.type.List} value.
+   *
+   * @description Creates a `PrimitiveChange` instance.
    */
 
   return Change.extend("pentaho.type.changes.PrimitiveChange", {

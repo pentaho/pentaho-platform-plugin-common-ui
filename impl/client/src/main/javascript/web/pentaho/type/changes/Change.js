@@ -29,6 +29,8 @@ define([
    *
    * @classDesc The `Change` class is the abstract base class of classes that
    * describe changes in [structured value instances]{@link pentaho.type.UStructuredValue}.
+   *
+   * @description Creates a `Change` instance.
    */
   return Base.extend("pentaho.type.changes.Change", /** @lends pentaho.type.changes.Change# */{
 
