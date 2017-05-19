@@ -15,9 +15,8 @@
  */
 
 /**
- * The `ITarget` interface represents the entity _where_ an
- * [action]{@link pentaho.type.action.Base} takes place,
- * or the patient/object of action.
+ * The `ITarget` interface represents the entity which is acted upon
+ * or the place where the [action]{@link pentaho.type.action.Base} takes place.
  *
  * In turn, commonly, an action target will emit events for each of the action's phases,
  * events in which it is its _source_.
@@ -32,7 +31,7 @@
 /**
  * Executes a given action in this target and does not wait for its outcome.
  *
- * This method can be given [synchronous]{@link pentaho.type.action.Base.Type#isSync} or asynchronous actions.
+ * This method can be given [synchronous or asynchronous]{@link pentaho.type.action.Base.Type#isSync} actions.
  * However, in the latter case, this method is only suitable for _fire-and-forget_ scenarios,
  * where it is not needed to know the outcome of the asynchronous action.
  *
@@ -53,9 +52,9 @@
 /**
  * Executes a given action in this target and waits for its outcome.
  *
- * This method can be given [synchronous]{@link pentaho.type.action.Base.Type#isSync} or asynchronous actions,
- * and can be used when uniformity in treatment is desired and it is needed to know the outcome of the
- * asynchronous action.
+ * This method can be given either [synchronous or asynchronous]{@link pentaho.type.action.Base.Type#isSync}
+ * actions which allows for uniform treatment regardless of the synchronous nature of the action.
+ * This method can also be used when the outcome of an asynchronous action must be known.
  *
  * It is up to the action target implementation to
  * call the given action's [executeAsync]{@link pentaho.type.action.Base#executeAsync} method

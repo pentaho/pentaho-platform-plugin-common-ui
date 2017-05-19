@@ -31,7 +31,6 @@ define([
      * @extends pentaho.type.Complex.Type
      *
      * @classDesc The base type class of application types.
-     *
      * For more information see {@link pentaho.type.Application}.
      */
 

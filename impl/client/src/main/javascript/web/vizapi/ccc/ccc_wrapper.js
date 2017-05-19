@@ -4174,8 +4174,8 @@ define([
                 // * scale and format the values only when showing them in the slice.
 
                 // Undo scaling applied by the server
-                // The existence of a converter discards any label received through a google style cell
-                // (DataTable conversion sends values and labels to CCC as a google-style cell).
+                // The existence of a converter discards any label received through a Google-style cell
+                // (DataTable conversion sends values and labels to CCC as a Google-style cell).
                 dimSize.converter = function(v) {
                     return (v != null && !isNaN(v))
                         ? (v * scaleFactor)

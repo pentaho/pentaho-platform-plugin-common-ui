@@ -26,8 +26,8 @@ define([
      * @class
      * @extends pentaho.type.changes.AbstractTransactionScope
      *
-     * @classDesc The `CommittedScope` class allows ensuring that a certain region of code
-     * reads the committed values of instances.
+     * @classDesc The `CommittedScope` class provides a way for a certain region of code to
+     * read the committed values of instances.
      *
      * @constructor
      * @description Creates a `CommittedScope`.

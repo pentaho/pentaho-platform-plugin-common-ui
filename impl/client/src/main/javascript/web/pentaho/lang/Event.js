@@ -59,7 +59,7 @@ define([
      * @class
      * @amd pentaho/lang/Event
      *
-     * @description Creates an event of a given type, source and ability to be canceled.
+     * @description Creates an event of a given type, source, and ability to be canceled.
      * @constructor
      * @param {nonEmptyString} type - The type of the event.
      * @param {!pentaho.lang.IEventSource} source - The object where the event is emitted.

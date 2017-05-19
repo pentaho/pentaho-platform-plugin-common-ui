@@ -15,7 +15,7 @@
  */
 
 /**
- * The `spec.ITree` interface describes the information of a tree filter.
+ * The `spec.ITree` interface describes the information associated with a tree filter.
  *
  * @name pentaho.type.filter.spec.ITree
  *

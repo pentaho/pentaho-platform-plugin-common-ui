@@ -27,10 +27,9 @@ define([
      * that signals that performing an operation is considered invalid.
      *
      * Performing an operation can be considered **invalid** when:
-     * * the object in which it is executed is not in a state that allows the operation to be performed,
-     *   like it is _locked_, _busy_ or _disposed_.
-     * * it cannot be performed on a certain type of object
-     * * ...
+     * * The object in which it is executed is not in a state that allows the operation to be performed.
+     *   For exampel: it is _locked_, _busy_ or _disposed_.
+     * * It cannot be performed on a certain type of object.
      *
      * @example
      *

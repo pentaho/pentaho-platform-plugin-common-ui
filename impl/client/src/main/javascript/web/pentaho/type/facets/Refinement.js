@@ -36,14 +36,14 @@ define([
    * through {@link pentaho.type.Value.refine} or, directly
    * through {@link pentaho.type.Refinement.extend}.
    *
-   * Besides any attributes that you may define in this type's prototype,
+   * In addition to any attributes that you may define in this type's prototype,
    * to enable configuring an actual refinement,
    * you must implement the static {@link pentaho.type.facets.RefinementFacet.validate} method
    * that will perform the actual validation of instances of the representation class.
    * Note that this method is invoked on the mixed into refinement type,
    * an instance of {@link pentaho.type.Refinement.Type}.
    *
-   * @description The constructor is not used, as a mixin.
+   * @description The constructor is not used, as the class is to be used as a mixin.
    * @abstract
    * @see pentaho.type.Refinement
    * @see pentaho.type.Refinement.Type#facets

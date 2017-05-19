@@ -86,7 +86,7 @@ define([
        *
        * The non-terminal filter types are
        * [Or]{@link pentaho.type.filter.Or},
-       * [And]{@link pentaho.type.filter.And} and
+       * [And]{@link pentaho.type.filter.And}, and
        * [Not]{@link pentaho.type.filter.Not}.
        *
        * @type {boolean}
@@ -140,7 +140,7 @@ define([
       /**
        * Builds the content key.
        *
-       * The kind of filter is already added around what is returned by this method.
+       * The return value is automatically augmented with the kind of filter information.
        *
        * @name _buildContentKey
        * @memberOf pentaho.type.filter.Abstract#
@@ -170,7 +170,7 @@ define([
       },
 
       /**
-       * Actually determines if an element is selected by this filter.
+       * Actual implementation that determines if an element is selected by this filter.
        *
        * This method assumes that the filter is valid.
        *
@@ -207,11 +207,11 @@ define([
       },
 
       /**
-       * Creates a filter that is a transformed version of this filter, the default way.
+       * Creates a filter that is the default transformed version of this filter.
        *
        * This implementation simply returns `this`.
        * Override to implement a custom default transformation logic,
-       * like transforming operands.
+       * as when transforming operands.
        *
        * @param {!pentaho.type.filter.FTransformer} transformer - The transformer function.
        *
@@ -268,8 +268,8 @@ define([
       /**
        * Creates a filter that is the "difference" between this filter and a variable number of other filters.
        *
-       * This operation is implemented in such a way as to not cause the term explosion that can easily occur if
-       * one would try to convert the result of a naive implementation to DNF:
+       * This operation is implemented in such a way as to not cause the term explosion that is likely to occur when
+       * trying to convert the result with a naive implementation to DNF:
        *
        * ```js
        * var result = this.and(filter.negate());
@@ -373,11 +373,11 @@ define([
        *
        * A filter in DNF is one of:
        *
-       * 1. A [True]{@link pentaho.type.filter.True} filter - filters everything
-       * 2. A [False]{@link pentaho.type.filter.False} filter - filters nothing
+       * 1. A [True]{@link pentaho.type.filter.True} filter - filters everything.
+       * 2. A [False]{@link pentaho.type.filter.False} filter - filters nothing.
        * 3. An [Or]{@link pentaho.type.filter.Or} of [Ands]{@link pentaho.type.filter.And} of,
        *    possibly negated, (non-degenerate) [terminal]{@link pentaho.type.filter.Abstract#isTerminal} filters,
-       *    like [IsEqual]{@link pentaho.type.filter.IsEqual}.
+       *    such as: [IsEqual]{@link pentaho.type.filter.IsEqual}.
        *
        * DNF is particularly useful for representing filters because,
        * excluding its degenerate cases,
@@ -392,8 +392,8 @@ define([
        * such as `filterA.and(filterB.negate())`. Directly converting such a structured filter to DNF
        * will usually not terminate soon enough.
        * For such a reason, and because it is such a common operation,
-       * the Filter API provides an optimized difference operator that is able to keep computational cost low enough
-       * for practical cases, [andNot]{@link pentaho.type.filter.Abstract#andNot}.
+       * the Filter API provides an optimized difference operator: [andNot]{@link pentaho.type.filter.Abstract#andNot}
+       * which is able to keep computational cost low enough for practical cases, .
        * The resulting filter can safely be converted to DNF.
        *
        * The result of this operation is cached.

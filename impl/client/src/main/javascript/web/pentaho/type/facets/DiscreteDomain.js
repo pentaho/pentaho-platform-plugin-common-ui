@@ -33,7 +33,7 @@ define([
    * @classDesc The _discrete domain_ refinement facet limits the domain of a representation type
    * to a discrete set of its instances.
    *
-   * @description The constructor is not used, as a mixin.
+   * @description The constructor is not used, as the class is to be used as a mixin.
    *
    * @see pentaho.type.facets.spec.IDiscreteDomainTypeProto
    */
@@ -48,7 +48,7 @@ define([
     _isDomainRoot: true,
 
     /**
-     * Gets or sets the fixed domain of the type, if any, or `null`.
+     * Gets or sets the fixed domain of the type, if any.  Otherwise, it is set to `null`.
      *
      * The domain attribute refines a type to a set of discrete values
      * whose type is that of the representation type,

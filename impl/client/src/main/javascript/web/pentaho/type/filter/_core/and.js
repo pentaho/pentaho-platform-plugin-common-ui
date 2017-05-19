@@ -42,7 +42,7 @@ define([
      * @classDesc The `And` filter represents a boolean conjunction (an And) filter.
      *
      * This filter selects the elements that are selected by all of
-     * a series of other filters, [operands]{@link pentaho.type.filter.Tree#operands}.
+     * a series of other filters: [operands]{@link pentaho.type.filter.Tree#operands}.
      *
      * In terms of set operations,
      * the `And` filter corresponds to the intersection of all of its operands' subsets.

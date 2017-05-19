@@ -24,21 +24,22 @@ define([
   return ArgumentError.extend("pentaho.lang.ArgumentInvalidTypeError",
     /** @lends pentaho.lang.ArgumentInvalidTypeError# */{
       /**
-       * @classDesc The `ArgumentInvalidTypeError` class is the class of errors that
-       * signals that a function argument has been specified, albeit with a value of an unsupported type,
-       * according to the documented contract.
+       * @classDesc  The `ArgumentInvalidTypeError` class is the class of errors
+       * for a function's argument that has been specified,
+       * although with a value of an unsupported type, according to the documented contract.
        *
-       * The name of the argument can be that of a nested property,
-       * like, for example, `"keyArgs.description"`.
+       * The name of the argument can be that of a nested property.
+       * For example: `"keyArgs.description"`.
        *
        * Types can be:
-       * * one of the possible results of the `typeof` operator,
-       *   like `"number"`, `"string"`, `"boolean"`, `"function"`, ...
-       * * the name of global classes/constructors,
+       * * One of the possible results of the `typeof` operator.
+       *   For example: `"number"`, `"string"`, `"boolean"`, `"function"`.
+       * * The name of global classes/constructors,
        *   that would be testable by use of the `instanceof` operator or
-       *   by accessing the `constructor` property,
-       *   like `"Array"`, `"Object"`, or `"HTMLElement"`
-       * * the id of an AMD module that returns a constructor or factory, like `"pentaho/type/complex"`.
+       *   by accessing the `constructor` property.
+       *   For example: `"Array"`, `"Object"`, or `"HTMLElement"`.
+       * * The identifier of an AMD module that returns a constructor or factory.
+       *   For example: `"pentaho/type/complex"`.
        *
        * @example
        *

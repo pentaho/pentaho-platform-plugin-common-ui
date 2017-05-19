@@ -15,7 +15,7 @@
  */
 
 /**
- * The `spec.IProperty` interface describes the information of a property filter.
+ * The `spec.IProperty` interface describes the information associated with a property filter.
  *
  * @name pentaho.type.filter.spec.IProperty
  *

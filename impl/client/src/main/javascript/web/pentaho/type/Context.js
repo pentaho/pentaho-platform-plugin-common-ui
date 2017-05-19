@@ -252,7 +252,7 @@ define([
      * Gets the **configured instance constructor** of a type.
      *
      * For more information on the `typeRef` argument,
-     * please see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
+     * see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
      *
      * The modules of standard types and refinement facet _mixins_ are preloaded and
      * can be requested _synchronously_. These are:
@@ -340,7 +340,7 @@ define([
      * (specified directly in `typeRef`, or present in an generic type specification).
      *
      * @throws {Error} When the identifier of a **non-standard type** is from a module that the AMD module system
-     * hasn't loaded yet (specified directly in `typeRef`, or present in an generic type specification).
+     * has not loaded yet (specified directly in `typeRef`, or present in an generic type specification).
      *
      * @throws {pentaho.lang.OperationInvalidError} When the value returned by a factory function is not
      * an instance constructor of a subtype of `Instance`
@@ -389,7 +389,7 @@ define([
      * Gets, asynchronously, the **configured instance constructor** of a type.
      *
      * For more information on the `typeRef` argument,
-     * please see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
+     * see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
      *
      * This method can be used even if a generic type specification references non-standard types
      * whose modules have not yet been loaded by the AMD module system.
@@ -444,8 +444,8 @@ define([
      * an instance constructor of a subtype of `Instance`
      * (specified directly in `typeRef`, or obtained indirectly by loading a type's module given its identifier).
      *
-     * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, an array-shorthand,
-     * list type specification that has more than one child element type specification.
+     * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, a list type specification
+     * with an invalid structure.
      *
      * @rejects {Error} When any other unexpected error occurs.
      */
@@ -488,7 +488,7 @@ define([
      *
      * });
      *
-     * @param {string} [baseTypeId] The identifier of the base type. Defaults to `"pentaho/type/value"`.
+     * @param {string} [baseTypeId] The identifier of the base type. It defaults to `"pentaho/type/value"`.
      * @param {object} [keyArgs] Keyword arguments.
      * @param {?boolean} [keyArgs.isBrowsable=null] Indicates that only types with the specified
      *   [isBrowsable]{@link pentaho.type.Value.Type#isBrowsable} value are returned.
@@ -497,7 +497,7 @@ define([
      *
      * @throws {Error} When the identifier of a type is not defined as a module in the AMD module system.
      * @throws {Error} When the identifier of a **non-standard type** is from a module that the AMD module system
-     * hasn't loaded yet.
+     * has not loaded yet.
      *
      * @see pentaho.type.Context#getAllAsync
      * @see pentaho.type.Context#get
@@ -800,7 +800,7 @@ define([
      *
      * Otherwise, it requires the module, using either the sync or the async AMD form.
      *
-     * If sync, AMD throws if a module with the given identifier is not yet loaded or isn't defined.
+     * If sync, AMD throws if a module with the given identifier is not yet loaded or is not defined.
      *
      * When the resulting module is returned by AMD,
      * its result is passed on, _recursively_, to `_get`,

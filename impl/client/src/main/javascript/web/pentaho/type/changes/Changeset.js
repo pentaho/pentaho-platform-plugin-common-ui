@@ -163,6 +163,9 @@ define([
      *
      * Primitive changes are removed, while contained changesets are cleared.
      *
+     * This method validates that the changeset is in a valid state and then delegates actual
+     * work to the [_clearChanges]{@link pentaho.type.changes.Changeset#_clearChanges} method.
+     *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset or any of its contained changesets
      * have been marked [read-only]{@link pentaho.type.changes.Changeset#isReadOnly}.
      *

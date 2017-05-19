@@ -15,14 +15,14 @@
  */
 
 /**
- * The `IContext` interface exposes contextual information of the Pentaho Web Client Platform,
- * like, for example, its
+ * The `IContext` interface allows access to contextual information of the Pentaho Web Client Platform.
+ * For example, it allows access to
  * [user]{@link pentaho.context.IContext#user},
  * [theme]{@link pentaho.context.IContext#theme},
  * [locale]{@link pentaho.context.IContext#locale},
  * [application]{@link pentaho.context.IContext#application}
  * and
- * [server]{@link pentaho.context.IContext#server}
+ * [server]{@link pentaho.context.IContext#server}.
  *
  * Not all information is always available, or sometimes it is not fixed,
  * and so some of these can be `null`. Check the documentation of each property and sub-property.

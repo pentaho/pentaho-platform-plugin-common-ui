@@ -40,7 +40,7 @@ define([
      *
      * @classDesc The `Not` type represents a negation filter.
      *
-     * This filter selects the elements that are **not** selected by another filter,
+     * This filter selects the elements that are **not** selected by another filter:
      * [operand]{@link pentaho.type.filter.Not#operand}.
      *
      * In terms of set operations,

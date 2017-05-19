@@ -40,6 +40,8 @@ define([
    *
    * @classDesc The `ContainerMixin` class contains functionality that is shared
    * by the instance container classes [Complex]{@link pentaho.type.Complex} and [List]{@link pentaho.type.List}.
+   *
+   * @description This class was not designed to be constructed directly. It was designed to be used as a **mixin**.
    */
   return Base.extend("pentaho.type.ContainerMixin", /** @lends pentaho.type.ContainerMixin# */{
 

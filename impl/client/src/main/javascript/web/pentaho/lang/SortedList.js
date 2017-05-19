@@ -26,14 +26,9 @@ define([
     /**
      * @classdesc The `SortedList` class is an abstract base class for ordered arrays.
      *
-     * ### AMD
-     *
-     * To obtain the constructor of this class,
-     * require the module `"pentaho/lang/SortedList"`.
-     *
      * ### Remarks
      *
-     * If an attempt is made to add a element to a specific index of the list
+     * If an attempt is made to add an element to a specific index of the list,
      * an error is thrown.
      *
      * @class
@@ -41,11 +36,12 @@ define([
      * @memberOf pentaho.lang
      * @abstract
      * @extends pentaho.lang.List
+     * @amd pentaho/lang/SortedList
      *
      * @description Initializes a sorted list instance.
      *
      * Note that because a `SortedList` is a sub-class of `Array`,
-     * it cannot be a "newable" constructor function (at least up to ECMAScript version 5).
+     * the `new` operator cannot be used to create instances (at least up to ECMAScript version 5).
      * Instead, instances of `SortedList` are actually initial instances of `Array`
      * whose prototype is then changed to be that of `SortedList`.
      *

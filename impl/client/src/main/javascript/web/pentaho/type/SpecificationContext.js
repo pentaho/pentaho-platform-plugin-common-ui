@@ -89,7 +89,7 @@ define([
     /**
      * Gets the identifier of a type, if it has one; or, its temporary identifier within this context, if not.
      *
-     * If the given type is anonymous and also hasn't been added to this context, `null` is returned.
+     * If the given type is anonymous and also has not been added to this context, `null` is returned.
      *
      * @param {pentaho.type.Type} type - The type.
      *

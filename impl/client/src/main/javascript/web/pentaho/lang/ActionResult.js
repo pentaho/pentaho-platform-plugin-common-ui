@@ -26,9 +26,10 @@ define([
    *
    * ### `ActionResult` Value
    *
-   * When successful, an _action_ can return a value that represents its final state or `undefined`. For example,
-   * if you do a google search using an {@link pentaho.visual.base.model#executeAction|executeAction}, there is
-   * no value to be returned.
+   * When successful, an _action_ can return a value that represents its final state or `undefined`.
+   * For example, if you do a Google search using an
+   * {@link pentaho.visual.base.model#executeAction|executeAction},
+   * there is no value to be returned.
    *
    * ### `ActionResult` Error
    *

@@ -26,6 +26,7 @@ define([
      * @class
      * @implements pentaho.lang.IAnnotatable
      * @implements pentaho.lang.ISpecifiable
+     * @amd pentaho/data/Model
      * @ignore
      * @classdesc The `Model` class contains metadata about a certain type of entities.
      *
@@ -34,11 +35,6 @@ define([
      * A model, just like all of its main components,
      * implements the {@link pentaho.lang.IAnnotatable}.
      * As such, any desired data can be associated with it.
-     *
-     * ### AMD
-     *
-     * To obtain the constructor of this class,
-     * require the module `"pentaho/data/Model"`.
      *
      * ### Remarks
      *

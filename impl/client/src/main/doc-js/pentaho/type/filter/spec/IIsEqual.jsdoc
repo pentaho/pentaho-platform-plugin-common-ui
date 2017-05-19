@@ -15,7 +15,7 @@
  */
 
 /**
- * The `spec.IIsEqual` interface describes the information of an equality filter.
+ * The `spec.IIsEqual` interface describes the information associated with an equality filter.
  *
  * @name pentaho.type.filter.spec.IIsEqual
  *

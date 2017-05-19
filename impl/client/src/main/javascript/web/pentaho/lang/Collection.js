@@ -20,12 +20,7 @@ define([
 
   return List.extend("pentaho.lang.Collection", /** @lends pentaho.lang.Collection# */{
     /**
-     * @classdesc The `Collection` class is an abstract base class for typed ordered maps.
-     *
-     * ### AMD
-     *
-     * To obtain the constructor of this class,
-     * require the module `"pentaho/lang/Collection"`.
+     * @classdesc The `Collection` class is an abstract base class for typed, ordered maps.
      *
      * ### Remarks
      *
@@ -42,16 +37,17 @@ define([
      * @memberOf pentaho.lang
      * @abstract
      * @extends pentaho.lang.List
+     * @amd pentaho/lang/Collection
      *
      * @description Initializes a collection instance.
      *
-     * Note that because a `Collection`  is a sub-class of `Array`,
-     * it cannot be a "newable" constructor function (at least up to ECMAScript version 5).
+     * Note that because a `Collection` is a sub-class of `Array`,
+     * the `new` operator cannot be used to create instances (at least up to ECMAScript version 5).
      * Instead, instances of `Collection` are actually initial instances of `Array`
      * whose prototype is then changed to be that of `Collection`.
      * In other words, `Collection` is an "initialization" constructor
      * (see {@link pentaho.lang.ISpecifiable} for more information
-     *  on these concepts.
+     *  on these concepts).
      *
      * Concrete `Collection` sub-classes should provide a static `to` method
      * to help in their construction.
@@ -167,7 +163,7 @@ define([
     },
 
     /**
-     * Gets an element given its key.
+     * Gets an element by its key.
      *
      * @param {string} [key] The element's key.
      * @param {boolean} [assertExists=false] Indicates if an error should be thrown when
@@ -193,7 +189,7 @@ define([
     },
 
     /**
-     * Gets an existing element given its key.
+     * Gets an existing element by its key.
      *
      * An error is thrown when
      * the collection does not contain an element with the given key.

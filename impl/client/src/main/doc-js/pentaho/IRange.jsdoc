@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,20 @@
  */
 
 /**
- * A range represents an interval on an underlying, base, ordinal domain.
+ * A range represents an interval on an underlying ordinal domain.
  * It denotes a subset of a base domain.
  *
  * It is defined by the minimum and maximum values on that domain.
  *
- * When one of the limits of the interval is not defined, it is said that that limit is _open_,
- * and its property's value should be `undefined` (or be absent).
+ * The minimum value must not be greater than the maximum value when both limits are defined.
  *
- * When both of the limits of the interval are not defined, they are both _open_,
- * and their properties' values should be `undefined` (or both be absent).
+ * When one of the limits of the interval is not defined, that limit is _open_,
+ * and its property's value is `undefined` (or absent).
+ *
+ * When both limits of the interval are not defined, both are _open_,
+ * and their properties' values are `undefined` (or absent).
  * This is an open range.
- * When the base domain is empty, this is the only valid range that can exist.
- *
- * When both of the limits are defined,
- * the minimum must not be greater than the maximum.
+ * When the base domain is empty, the only valid range is open.
  *
  * @example
  * var closedRange = {min: 100, max: 200};

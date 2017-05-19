@@ -70,7 +70,7 @@ define([
     },
 
     /**
-     * Disposes the specification scope.
+     * Disposes of the specification scope.
      *
      * If this scope created its specification context, it disposes of it, as well.
      *

@@ -15,7 +15,7 @@
  */
 
 /**
- * The `spec.IFilter` interface describes the information of a filter.
+ * The `spec.IFilter` interface describes the information associated with a filter.
  *
  * @example
  * <caption>

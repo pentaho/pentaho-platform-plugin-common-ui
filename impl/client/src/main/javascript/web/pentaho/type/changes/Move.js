@@ -47,7 +47,7 @@ define([
      * @description Creates an instance.
      *
      * @param {!Array.<pentaho.type.Element>} elem - The element to be moved in the list.
-     * @param {number} indexOld - The (old) index of the element in the list.
+     * @param {number} indexOld - The old index of the element in the list.
      * @param {number} indexNew - The new index of the element in the list.
      */
     constructor: function(elem, indexOld, indexNew) {

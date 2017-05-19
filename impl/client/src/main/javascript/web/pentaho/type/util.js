@@ -25,6 +25,8 @@ define([
    * @name pentaho.type.Util
    * @class
    * @amd {pentaho.type.Util} pentaho/type/util
+   *
+   * @description This class was not designed to be constructed directly.
    */
 
   return /** @lends pentaho.type.Util# */{

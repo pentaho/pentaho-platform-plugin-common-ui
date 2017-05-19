@@ -157,8 +157,8 @@ define([
        *
        * Unique type identifiers are auto-generated in each session.
        *
-       * Note that even anonymous types -
-       * those whose {@link pentaho.type.Type#id} is `null` -
+       * Note that even anonymous types
+       * (those whose {@link pentaho.type.Type#id} is `null`)
        * have a unique identifier.
        *
        * This attribute is _not_ inherited.
@@ -192,8 +192,8 @@ define([
        * However, [Property]{@link pentaho.type.Property},
        * also an immediate subtype of `Instance`,
        * is not considered a root type.
-       * It is the immediate subtypes of `Property` -
-       * each root property within a complex type -
+       * It is the immediate subtypes of `Property`
+       * (each root property within a complex type)
        * which are considered roots.
        * This aligns with users expectations of what an attribute named `root`
        * in a property type should mean.
@@ -630,7 +630,7 @@ define([
       /**
        * Gets or sets the `application` attribute of this type.
        *
-       * The application property serves as a bag of properties specific to the _container application_
+       * The application property serves as a collection of properties specific to the _container application_
        * that can be modified via the [Configuration Service]{@link pentaho.config.Service}.
        *
        * Setting this to a {@link Nully} value will have no effect.
@@ -865,9 +865,9 @@ define([
        *
        * The default value of a type with an [id]{@link pentaho.type.Type#id} is
        * the identifier converted to _snake-case_,
-       * plus special characters like `\`, `/`, `_` and spaces are converted to `-`
-       * (e.g. `"pentaho/visual/models/heatGrid"` would have a default
-       * `styleClass` of `"pentaho-visual-ccc-heat-grid"`).
+       * plus special characters like `\`, `/`, `_` and spaces are converted to: a dash (`–`).
+       * For example: `"pentaho/visual/models/heatGrid"` would have a default
+       * `styleClass` of: `"pentaho-visual-ccc-heat-grid"`.
        * The default value of an anonymous type is `null`.
        *
        * @type {?nonEmptyString}
@@ -887,7 +887,7 @@ define([
       /**
        * Gets the style classes of this and any base types.
        *
-       * Do **not** modify the returned array.
+       * Does **not** modify the returned array.
        *
        * @type {string[]}
        * @readonly
@@ -1181,7 +1181,7 @@ define([
        * AMD module system (specified directly in `instSpec`, or present in an generic type specification).
        *
        * @throws {Error} When `instSpec` contains an inline type reference which is from a module that the
-       * AMD module system hasn't loaded yet.
+       * AMD module system has not loaded yet.
        *
        * @throws {pentaho.lang.OperationInvalidError} When the determined type for the specified `instSpec`
        * is an [abstract]{@link pentaho.type.Value.Type#isAbstract} type.
@@ -1380,7 +1380,7 @@ define([
        * Please see the documentation of subclasses for information on additional, supported keyword arguments.
        *
        * @param {?boolean} [keyArgs.isJson=false] Generates a JSON-compatible specification.
-       * Attributes that don't have a JSON-compatible specification are omitted.
+       * Attributes that do not have a JSON-compatible specification are omitted.
        *
        * @return {!pentaho.type.spec.ITypeProto} A specification of this type.
        *
@@ -1423,7 +1423,7 @@ define([
       /**
        * Creates a JSON specification that describes this type.
        *
-       * Attributes which don't have a JSON-compatible specification are omitted.
+       * Attributes which do not have a JSON-compatible specification are omitted.
        * Specifically, attributes with a function value are not supported.
        *
        * This method simply calls {@link @see pentaho.type.Instance#toSpec} with argument `keyArgs.isJson` as `true`
@@ -1515,8 +1515,7 @@ define([
        * currently exists, it is used to manage the serialization process.
        * Otherwise, one is created and set as current.
        *
-       * When a type is not anonymous, the cheapest reference,
-       * the [id]{@link pentaho.type.Type#id}, is returned.
+       * When a type is not anonymous, the [id]{@link pentaho.type.Type#id} is returned.
        *
        * For anonymous types, a [temporary]{@link pentaho.type.SpecificationContext.isIdTemporary},
        * serialization-only identifier is generated.
@@ -1525,8 +1524,8 @@ define([
        * obtained by calling [toSpecInContext]{@link pentaho.type.Type#toSpecInContext}.
        * In following occurrences, only the previously used temporary identifier is returned.
        *
-       * Some standard types have a special reference syntax,
-       * for example, [List.Type#toRef]{@link pentaho.type.List.Type#toRef}.
+       * Some standard types have a special reference syntax.
+       * For example: [List.Type#toRef]{@link pentaho.type.List.Type#toRef}.
        *
        * @see pentaho.type.Type#toSpec
        *
@@ -1627,7 +1626,7 @@ define([
 
         Object.defineProperty(root, name, {
           /*
-           * Gets the _last_ set local value, or `undefined` if there hasn't been one.
+           * Gets the _last_ set local value, or `undefined` if there has not been one.
            * Only at eval time does inheritance and combination come into play and
            * evaluate into an _effective_ value.
            *

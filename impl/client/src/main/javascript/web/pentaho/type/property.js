@@ -68,6 +68,8 @@ define([
      *
      * @classDesc A property of a complex value.
      *
+     * @description This class was not designed to be constructed directly.
+     *
      * @see pentaho.type.Complex
      */
 
@@ -933,7 +935,7 @@ define([
            * the actual required values are only known
            * when evaluated for specific complex instances.
            * This behavior ensures that monotonic changes are deferred until evaluation.
-           * No errors are thrown; non-monotonic changes simply don't take effect.
+           * No errors are thrown; non-monotonic changes simply do not take effect.
            *
            * ### This attribute is *Inherited*
            *
@@ -1022,7 +1024,7 @@ define([
            * the actual `countMin` values are only known
            * when evaluated for specific complex instances.
            * This behavior ensures that monotonic changes are deferred until evaluation.
-           * No errors are thrown; non-monotonic changes simply don't take effect.
+           * No errors are thrown; non-monotonic changes simply do not take effect.
            *
            * ### This attribute is *Inherited*
            *
@@ -1109,7 +1111,7 @@ define([
            * the actual `countMax` values are only known
            * when evaluated for specific complex instances.
            * This behavior ensures that monotonic changes are deferred until evaluation.
-           * No errors are thrown; non-monotonic changes simply don't take any effect.
+           * No errors are thrown; non-monotonic changes simply do not take any effect.
            *
            * ### This attribute is *Inherited*
            *
@@ -1187,7 +1189,7 @@ define([
            * the actual `isApplicable` values are only known
            * when evaluated for specific complex instances.
            * This behavior ensures that monotonic changes are deferred until evaluation.
-           * No errors are thrown; non-monotonic changes simply don't take any effect.
+           * No errors are thrown; non-monotonic changes simply do not take any effect.
            *
            * ### This attribute is *Inherited*
            *
@@ -1264,7 +1266,7 @@ define([
            * the actual `isEnabled` values are only known
            * when evaluated for specific complex instances.
            * This behavior ensures that monotonic changes are deferred until evaluation.
-           * No errors are thrown; non-monotonic changes simply don't take any effect.
+           * No errors are thrown; non-monotonic changes simply do not take any effect.
            *
            * ### This attribute is *Inherited*
            *

@@ -41,7 +41,7 @@ define([
      * @classDesc The `Or` filter represents a boolean disjunction (an Or) filter.
      *
      * This filter selects the elements that are selected by at least one of
-     * a series of other filters, [operands]{@link pentaho.type.filter.Tree#operands}.
+     * a series of other filters: [operands]{@link pentaho.type.filter.Tree#operands}.
      *
      * In terms of set operations,
      * the `Or` filter corresponds to the union of all of its operands' subsets.

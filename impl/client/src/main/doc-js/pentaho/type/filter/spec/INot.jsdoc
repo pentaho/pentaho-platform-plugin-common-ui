@@ -15,7 +15,7 @@
  */
 
 /**
- * The `spec.INot` interface describes the information of a negation filter.
+ * The `spec.INot` interface describes the information associated with a negation filter.
  *
  * @name pentaho.type.filter.spec.INot
  *

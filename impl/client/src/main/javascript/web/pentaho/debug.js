@@ -32,7 +32,7 @@ define([
    * The `pentaho.debug.manager` singleton provides access to the main Pentaho Web Client Platform's
    * debugging manager.
    *
-   * The debugging levels can be configured through AMD like in the following example:
+   * The debugging levels can be configured through AMD as shown in the following example:
    *
    * ```js
    * require.config({
