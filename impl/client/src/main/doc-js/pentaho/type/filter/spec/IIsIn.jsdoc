@@ -17,7 +17,7 @@
 // TODO: Opted to keep isIn @private, undocumented, for 7.1.
 
 /**
- * The `spec.IIsIn` interface describes the information of a membership filter.
+ * The `spec.IIsIn` interface describes the information associated with a membership filter.
  *
  * @name pentaho.type.filter.spec.IIsIn
  *
