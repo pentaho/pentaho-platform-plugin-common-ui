@@ -31,7 +31,7 @@ define([
      * @extends pentaho.type.Simple
      * @amd {pentaho.type.Factory<pentaho.type.Number>} pentaho/type/number
      *
-     * @classDesc The base class of numeric values.
+     * @classDesc The class of number values.
      *
      * @description Creates a number instance.
      */

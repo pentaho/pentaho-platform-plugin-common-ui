@@ -32,7 +32,7 @@ define([
      * @extends pentaho.type.Simple
      * @amd {pentaho.type.Factory<pentaho.type.Date>} pentaho/type/date
      *
-     * @classDesc The class of a date value.
+     * @classDesc The class of date values.
      *
      * @description Creates a date instance.
      * @constructor

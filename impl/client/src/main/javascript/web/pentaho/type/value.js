@@ -55,12 +55,12 @@ define([
      * @implements pentaho.lang.ISpecifiable
      * @amd {pentaho.type.Factory<pentaho.type.Value>} pentaho/type/value
      *
-     * @classDesc A Value is an abstract class used as a base implementation and unifying type.
+     * @classDesc The base, abstract class of [instances]{@link pentaho.type.Instance} which
+     * are the _value of_ [properties]{@link pentaho.type.Property}.
      *
-     * A Value has a key that uniquely identifies the entity it represents.
+     * A `Value` has a key that uniquely identifies the entity it represents.
      *
-     *
-     * @description Creates a value instance.
+     * @description Creates a `Value` instance.
      * @constructor
      * @param {pentaho.type.spec.UValue} [spec] A value specification.
      *

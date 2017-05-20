@@ -47,12 +47,13 @@ define([
      * @extends pentaho.type.Element
      * @amd {pentaho.type.Factory<pentaho.type.Simple>} pentaho/type/simple
      *
-     * @classDesc The base abstract class of un-structured, indivisible values.
+     * @classDesc The base, abstract class of unstructured values.
      *
      * @description Creates a simple instance.
      * @constructor
      * @param {pentaho.type.spec.USimple} [spec] A simple specification.
      *
+     * @see pentaho.type.Complex
      * @see pentaho.type.spec.ISimple
      * @see pentaho.type.spec.ISimpleProto
      * @see pentaho.type.spec.ISimpleTypeProto

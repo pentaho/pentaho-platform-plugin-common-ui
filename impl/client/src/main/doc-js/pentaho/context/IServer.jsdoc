@@ -15,15 +15,14 @@
  */
 
 /**
- * The `IServer` interface allows access to the Pentaho Web Client Platform’s
- * contextual information that pertains to the server application.
+ * The `IServer` interface allows access to the Pentaho Platform’s
+ * environmental information that pertains to the server application.
  *
  * @name pentaho.context.IServer
  * @interface
  * @see pentaho.context.IContext
  */
 
-// Docs should point `URL` to https://developer.mozilla.org/en-US/docs/Web/API/Window/URL
 /**
  * Gets the base url of the web server application.
  *

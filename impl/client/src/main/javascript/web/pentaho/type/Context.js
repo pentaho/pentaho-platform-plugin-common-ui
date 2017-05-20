@@ -60,7 +60,7 @@ define([
      * @class
      * @amd pentaho/type/Context
      *
-     * @classDesc A `Context` object holds instance constructors of **configured** types.
+     * @classDesc A class that holds **configured** types.
      *
      * When a component, like a visualization, is being assembled,
      * it should not necessarily be unaware of the environment where it is going to be used.
@@ -71,7 +71,7 @@ define([
      * As such, besides holding contextual, environmental information,
      * a context object should contain the necessary logic to
      * facilitate the configuration of component types using that information.
-     * The Pentaho Metadata Model embraces this concept by defining types as
+     * The Pentaho Type API embraces this concept by defining types as
      * _type factories_ that take a context object as their argument.
      *
      * The instance constructors of types
@@ -85,8 +85,8 @@ define([
      * so that these are configured before being used.
      * This applies whether an instance constructor is used for creating an instance or to derive a subtype.
      *
-     * A type context holds environmental information in the form of a Pentaho web client context,
-     * {@link pentaho.context.IContext},
+     * A type context holds environmental information in the form of an environment of the
+     * [JavaScript Pentaho Platform]{@link pentaho.context.IContext},
      * which contains relevant information such as:
      * [application]{@link pentaho.context.IContext#application},
      * [user]{@link pentaho.context.IContext#user},
@@ -1150,9 +1150,9 @@ define([
   }, /** @lends pentaho.type.Context */{
 
     /**
-     * Gets the default type context of the Pentaho Web-Client Platform.
+     * Gets the default type context of the Pentaho Type API.
      *
-     * This type context instance is created with the Platform's default context variables,
+     * This type context instance is created with the Pentaho Platform's default context variables,
      * as given by {@link pentaho.context.main}.
      *
      * @type {!pentaho.type.Context}

@@ -65,6 +65,16 @@ define([
       // * and can thus be safely constructed synchronously from View derived classes.
 
       /**
+       * @name pentaho.visual.base.View.Type
+       * @class
+       * @extends pentaho.type.Complex.Type
+       *
+       * @classDesc The base class of view types.
+       *
+       * For more information see {@link pentaho.visual.base.View}.
+       */
+
+      /**
        * @alias View
        * @memberOf pentaho.visual.base
        *

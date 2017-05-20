@@ -37,9 +37,9 @@ define([
      * @abstract
      * @amd {pentaho.type.Factory<pentaho.type.Instance>} pentaho/type/instance
      *
-     * @classDesc The base **instance class** of types in the Pentaho Client Metadata Model.
+     * @classDesc The root, abstract class of things that can be represented by the Pentaho Type API.
      *
-     * Types of the metadata model are constituted by two classes (or constructors):
+     * _Types_ are constituted by two classes (or constructors):
      * the **instance class** and the **type class**.
      *
      * The former creates the actual instances of the type.

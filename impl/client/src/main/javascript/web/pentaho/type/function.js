@@ -45,7 +45,7 @@ define([
      * @extends pentaho.type.Simple
      * @amd {pentaho.type.Factory<pentaho.type.Function>} pentaho/type/function
      *
-     * @classDesc A primitive JavaScript function type.
+     * @classDesc The class that represents primitive, JavaScript {@link function} values.
      *
      * @description Creates a function instance.
      * @constructor

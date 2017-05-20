@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,18 @@
  * limitations under the License.
  */
 /**
- * The data namespace contains classes and interfaces used for data representation.
+ * The `data` namespace contains the types of the **Pentaho Data API**.
+ *
+ * ## Overview
+ *
+ * The Pentaho Data API contains, at its core, a _data table_ abstraction that allows JavaScript APIs,
+ * components and applications to consume and exchange tabular data in a common way.
+ *
+ * The data table abstraction is the [ITable]{@link pentaho.data.ITable} interface and
+ * the data table class, [Table]{@link pentaho.data.Table}, provides a basic implementation of it.
  *
  * @name pentaho.data
  * @namespace
  */
+
+// TODO: pentaho.data.access, when made public, should be introduced here.

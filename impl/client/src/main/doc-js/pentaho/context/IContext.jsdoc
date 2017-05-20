@@ -15,7 +15,7 @@
  */
 
 /**
- * The `IContext` interface allows access to contextual information of the Pentaho Web Client Platform.
+ * The `IContext` interface allows access to environmental information of the Pentaho Platform.
  * For example, it allows access to
  * [user]{@link pentaho.context.IContext#user},
  * [theme]{@link pentaho.context.IContext#theme},

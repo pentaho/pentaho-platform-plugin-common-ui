@@ -45,9 +45,11 @@ define([
      * @extends pentaho.type.Value
      * @amd {pentaho.type.Factory<pentaho.type.Element>} pentaho/type/element
      *
-     * @classDesc
+     * @classDesc The base class of singular values.
      *
      * @description Creates an element instance.
+     *
+     * @see pentaho.type.List
      */
     var Element = Value.extend({
 

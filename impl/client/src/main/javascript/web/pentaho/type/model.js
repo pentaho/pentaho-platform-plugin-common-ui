@@ -42,7 +42,9 @@ define([
      *
      * @amd {pentaho.type.Factory<pentaho.type.Model>} pentaho/type/model
      *
-     * @classDesc The base class of model types.
+     * @classDesc The base class of model values.
+     *
+     * Models are complex values that have an [application]{@link pentaho.type.Model#application} property.
      *
      * @description Creates a model instance.
      *

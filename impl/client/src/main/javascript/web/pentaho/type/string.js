@@ -31,7 +31,7 @@ define([
      * @extends pentaho.type.Simple
      * @amd {pentaho.type.Factory<pentaho.type.String>} pentaho/type/string
      *
-     * @classDesc A textual type.
+     * @classDesc The class of textual values.
      *
      * @description Creates a string instance.
      */

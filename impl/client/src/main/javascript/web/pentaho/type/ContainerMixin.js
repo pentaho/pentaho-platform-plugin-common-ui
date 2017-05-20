@@ -38,8 +38,8 @@ define([
    * @extends pentaho.lang.Base
    * @extends pentaho.lang.EventSource
    *
-   * @classDesc The `ContainerMixin` class contains functionality that is shared
-   * by the instance container classes [Complex]{@link pentaho.type.Complex} and [List]{@link pentaho.type.List}.
+   * @classDesc A mixin class that contains functionality shared by the
+   * instance container classes: [Complex]{@link pentaho.type.Complex} and [List]{@link pentaho.type.List}.
    *
    * @description This class was not designed to be constructed directly. It was designed to be used as a **mixin**.
    */

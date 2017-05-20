@@ -41,6 +41,16 @@ define([
     var Mapping = context.get(mappingFactory);
 
     /**
+     * @name pentaho.visual.base.Model.Type
+     * @class
+     * @extends pentaho.type.Model.Type
+     *
+     * @classDesc The base class of visual model types.
+     *
+     * For more information see {@link pentaho.visual.base.Model}.
+     */
+
+    /**
      * @name Model
      * @memberOf pentaho.visual.base
      * @class

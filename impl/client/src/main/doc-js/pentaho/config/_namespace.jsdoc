@@ -20,24 +20,23 @@
  * ## Overview
  *
  * The Configuration API provides a means for _types_ to be configured by third-parties.
+ *
  * _Types_ are known by their _string_ identifier and are, for all other purposes, opaque entities
- * — these may or may not exist as actual classes, or may simply represent an interface type.
+ * — these may or may not exist as actual classes; these may simply represent an interface type.
  *
- * A configuration is a set of configuration rules, represented by the
- * [IRuleSet]{@link pentaho.config.IRuleSet} and
- * [IRule]{@link pentaho.config.IRule}
- * interfaces, respectively.
- * Each rule specifies the _type_ and the values of any
+ * **Configurations** are JavaScript objects that conform to the
+ * [IRuleSet]{@link pentaho.config.spec.IRuleSet} interface — essentially, a set of configuration rules,
+ * [IRule]{@link pentaho.config.spec.IRule}.
+ * Typically,
+ * configurations are provided as the value returned by an AMD/RequireJS module.
+ * This module needs to be advertised to the configuration system by registering it
+ * with [pentaho/service]{@link pentaho.service},
+ * as a service of type `pentaho.config.spec.IRuleSet`.
+ *
+ * **Configuration rules** specify the _type_ and the values of any
  * [Pentaho environmental variables]{@link pentaho.context.IContext}
- * to which it applies,
+ * to which they apply,
  * as well as the actual configuration properties that should be applied.
- *
- * Configuration modules — AMD/RequireJS modules that return an instance of
- * [IRuleSet]{@link pentaho.config.spec.IRuleSet}
- * — must be advertised to {@link pentaho/system}, using the service id `pentaho.config.spec.IRuleSet`,
- * to be visible to the configuration system.
- *
- * The configuration system merges multiple configurations that target the same type.
  *
  * Configurations can be obtained (and also registered)
  * through the [config.IService]{@link pentaho.config.IService} interface.
@@ -64,3 +63,5 @@
  * @name pentaho.config
  * @namespace
  */
+
+// TODO: The configuration system should use typeInfo to accept _aliases_ and allow for _configuration inheritance_.

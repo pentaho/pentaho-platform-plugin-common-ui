@@ -33,8 +33,8 @@ define([
    *
    * @amd pentaho/type/SpecificationContext
    *
-   * @classDesc A `SpecificationContext` object holds information that is
-   * shared during the serialization (or conversion to specification) of an instance or type.
+   * @classDesc A class that holds information that is
+   * shared during the serialization (or conversion to specification) of instances and types.
    *
    * Specifically, a specification context tracks the temporary identifiers assigned to referenced anonymous types.
    *

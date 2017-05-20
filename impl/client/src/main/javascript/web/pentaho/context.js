@@ -24,9 +24,9 @@ define([
   // as it may be used in a bootstrapping phase.
 
   /**
-   * The Pentaho Web Client Platform's _main_ context.
+   * The _main_ environment of the JavaScript Pentaho Platform.
    *
-   * This instance is initialized with the context specification
+   * This instance is initialized with the environment specification
    * which is the value of this module's AMD configuration.
    *
    * @name pentaho.context.main

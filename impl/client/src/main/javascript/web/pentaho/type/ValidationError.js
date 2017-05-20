@@ -22,8 +22,7 @@ define([
   "use strict";
 
   /**
-   * @classDesc The `ValidationError` class is the base class of error objects associated with
-   * [value]{@link pentaho.type.Value} validation.
+   * @classDesc The base class of errors associated with [values]{@link pentaho.type.Value} validation.
    *
    * @name ValidationError
    * @memberOf pentaho.type

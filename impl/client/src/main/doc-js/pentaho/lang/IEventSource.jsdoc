@@ -48,7 +48,7 @@
  * that represents the specific event emission.
  * The specific type of this argument is not mandated,
  * however, the provided [Event]{@link pentaho.lang.Event} class is a reasonable choice for unstructured events,
- * and is used for events of many of the Web Client Framework classes.
+ * and is used for events of many of the Pentaho Platform JavaScript APIs' classes.
  *
  * This interface exposes methods for the registration and
  * unregistration of event observers (or listeners),

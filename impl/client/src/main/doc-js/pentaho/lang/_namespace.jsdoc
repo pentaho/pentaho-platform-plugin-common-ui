@@ -17,7 +17,7 @@
 /**
  * The `lang` namespace contains classes and interfaces used as
  * type system building blocks to form other classes and interfaces
- * of the Pentaho Web Platform.
+ * of the Pentaho Platform JavaScript APIs.
  *
  * @name pentaho.lang
  * @namespace
