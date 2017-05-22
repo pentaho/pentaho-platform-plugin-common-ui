@@ -1,13 +1,11 @@
 ---
-title: Configuring your Visualization
+title: Configuring a visualization
 description: Shows how to use the Configuration API to configure a visualization.
 parent-title: Visualization API
 layout: default
 ---
 
-This article shows you how to create a configuration for a 
-[Visualization API](.) 
-visualization.
+This article shows you how to create a configuration for a [Visualization API](.) visualization.
 
 It is assumed that you have some basic knowledge on how to configure JavaScript _types_ on the Pentaho platform
 and on what constitutes a visualization.

@@ -1,44 +1,60 @@
 ---
-title: Pentaho Visualization API
-description: The Pentaho Visualization API provides a unified way to visualize data across the Pentaho suite (Analyzer, PDI, CDF).
-parent-title: Pentaho Platform JavaScript APIs
-parent-path: ..
+title: Visualization API
+description: A unified way to visualize data across the Pentaho suite.
 layout: sub-intro
 ---
 
 # Overview
 
-As of 7.1, the Pentaho platform ships with a _new_ version of the Visualization API, still in **beta**, 
-**side-by-side** with the _previous_ version. This documentation relates to the new version.
+{% include callout.html content="<p>As of version 7.1, 
+the Pentaho platform ships with a <em>new</em>, <b>beta</b> version of the Visualization API, 
+<b>side-by-side</b> with the <em>previous</em> version. 
+This documentation relates to the new version.</p>
+" type="warning" %}
 
-The Pentaho Visualization API provides a unified way to visualize data across the Pentaho suite 
+The [Visualization API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual'}}) 
+provides a unified way to visualize data across the Pentaho suite 
 (e.g.
 [Analyzer](http://www.pentaho.com/product/business-visualization-analytics), 
 [PDI](http://www.pentaho.com/product/data-integration), 
 [CDF](http://community.pentaho.com/ctools/cdf/)).
 
-Essentially, it is a set of abstractions that ensures isolation between
-applications, visualizations and configurations (that glue the two together).
+Essentially, it is a set of abstractions that enables safe, isolated operation between 
+applications, visualizations and business logic.
 
-Visualizations are implemented on top of the Pentaho Core, Type and Data JavaScript APIs:
-- Using the [Type API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type'}}) 
-  endows visualizations with out-of-the-box class inheritance, metadata support, type configuration, 
-  validation, serialization, among other features.
-- Using the [Data API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data'}}) 
+A **visualization** is constituted by:
+
+- One [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}), 
+  which _identifies_ the visualization and 
+  _defines_ it in terms of its their data requirements, 
+  such as the visual degrees of freedom it has (e.g. _X position_, _color_ and _size_) and 
+  any major options that affect its rendering.
+
+- One [`View`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}}) (at least), 
+  which implements the actual rendering using chosen technologies 
+  (e.g. [HTML](https://www.w3.org/TR/html/), [SVG](https://www.w3.org/TR/SVG/), [D3](https://d3js.org/)),
+  and handle user interaction, 
+  dispatching [actions]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action'}}) and, 
+  for example, showing tooltips.
+
+The Visualization API is built on top of other Platform JavaScript APIs:
+
+- The [Data API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data'}}) 
   ensures seamless integration with data sources in the Pentaho platform, 
   as well as with other client-side component frameworks.
-- Using [Core APIs]()
-  provides visualizations with features such as localization, theming and registration.
 
-The platform provides a set of stock visualizations, covering the most
-common chart-types.
-Based on the [CCC](http://community.pentaho.com/ctools/ccc/) charting
-library, they're customizable and extensible to fit your organization's
-desired look and feel.
-For more information on how to customize visualizations,
-see [Configuration](configuration).
+- The [Type API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type'}}) 
+  provides to visualizations out-of-the-box features such as class inheritance, metadata support, configuration, 
+  validation and serialization.
 
-If you want to know more about how Pentaho Analyzer exposes the new Visualization API, 
+- The [Core APIs](../../#core) provide to visualizations features such as localization, theming and 
+  services registration and consumption.
+
+A set of stock visualizations is included, covering the most common chart types.
+Based on the [CCC](http://community.pentaho.com/ctools/ccc/) charting library, 
+they're customizable and extensible to fit your organization's desired look and feel.
+
+If you want to know more about the specifics of how Analyzer exposes the Visualization API, 
 read [Analyzer and the Visualization API](analyzer-viz-api).
 
 # Creating a visualization
@@ -56,7 +72,7 @@ For a better understanding, see the [Bar/D3 sample](samples/bar-d3-sandbox),
 that walks you through creating a custom visualization having a
 [D3](https://d3js.org/)-based view.
 
-# Packaging
+# Packaging the visualization
 
 Your visualization must be wrapped as a Pentaho Web Package. 
 All packages must contain a file `META-INF/js/package.json`, 
@@ -84,7 +100,7 @@ Finally, any third-party dependencies must be declared in the same file.
 }
 ```
 
-See [Pentaho Web Package description](../pentaho-web-package) for a more detailed view.
+See [Pentaho Web Package description](../web-package) for a more detailed view.
 
 # Bundling and provisioning
 
@@ -94,7 +110,7 @@ Additionally, the required client side dependencies must also be provided to the
 The recommended way is to put the visualization bundle, its dependencies, 
 and corresponding feature definition together into a single KAR file.
 
-See [Bundling](bundling) for instructions.
+See [Bundling a web package and provisioning](../bundling) for instructions.
 
 # Deploying the visualization
 
@@ -119,7 +135,7 @@ If every thing went well you should now see your visualization in Analyzer and/o
 
 > TODO: Explain how to distribute it using marketplace?
 
-# Configuring a visualization
+# Configuring the visualization
 
 Pentaho's JavaScript API allows users to declare _prioritized configuration rules_ 
 that configure the objects built using the Type API.
@@ -129,5 +145,4 @@ Typical configuration rules include:
 - adding validations, 
 - extending objects with environment-specific properties
 
-See [configuration](configuration) for more details.
-
+See [Configuring a visualization](configuration) for more details.

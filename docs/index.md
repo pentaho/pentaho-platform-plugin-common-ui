@@ -1,39 +1,36 @@
 ---
-title: Pentaho Platform JavaScript APIs
+title: Platform JavaScript APIs
 description: The Pentaho Platform JavaScript APIs support the development of JavaScript components for the Pentaho platform.
 layout: intro
 ---
 
-The Pentaho Platform JavaScript APIs support the development of JavaScript components for the Pentaho platform, by standardizing in cross-cutting areas, such as data and visualization, but also on lower-level areas, such as configuration, localization, services and, even, control of debugging information; and exposing key Pentaho platform information and services to JavaScript components.
+The **Platform JavaScript APIs** support the development of JavaScript components for the **Pentaho** platform:
+1. Standardizes in cross-cutting areas, such as data and visualization, 
+   but also on lower-level areas, such as configuration, localization and services. 
+2. Exposes key platform information and services to JavaScript components.
 
 The APIs are organized as follows:
 <ul class="api-list">
     <li class="bigger">
         <dl>
             <dt>
-                <a title="Pentaho Visualization API" href="platform/visual">Pentaho Visualization API</a> ⭐ <em>3.0 beta</em>
+                <a title="Pentaho JavaScript Visualization API" href="platform/visual">Visualization</a>
             </dt>
-            <dd>
-                The Pentaho Visualization API provides a unified way to visualize data across the Pentaho suite 
-                (e.g. Analyzer, PDI, CDF).
-
-                Essentially, it is a set of abstractions that ensures isolation between applications, visualizations and configurations (that glue the two together).
-            </dd>
+            <dd>A unified way to visualize data across the Pentaho suite.</dd>
         </dl>
     </li>
     <li>
         <dl>
             <dt>
-                <a title="Pentaho Data API" 
-                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.data'}}">Pentaho Data API</a>
+                <a title="Pentaho JavaScript Data API" 
+                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.data'}}">Data</a>
             </dt>
-            <dd>The Pentaho Data API contains a <em>data table</em> abstraction that allows components and applications to consume and exchange tabular data in a common way.
+            <dd>Abstractions for data exchange among components, applications and data sources.
                 <ul style="display: none;">
                     <li>
                         <dl>
                             <dt>
-                                <a title="Pentaho Data Access API" 
-                                   href="data/access">Data Access API</a>
+                                <a title="Pentaho JavaScript Data Access API" href="data/access">Data Access</a>
                             </dt>
                             <dd>Unreleased</dd>
                         </dl>
@@ -45,56 +42,73 @@ The APIs are organized as follows:
     <li>
         <dl>
             <dt>
-                <a title="Pentaho Type API" 
-                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.type'}}">Type API</a>
+                <a title="Pentaho JavaScript Type API" 
+                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.type'}}">Type</a>
             </dt>
-            <dd>Pentaho Client Metadata Model.</dd>
+            <dd><em>Types</em> offer out-of-the-box features such as class inheritance, metadata support, 
+                configuration, validation and serialization.
+            </dd>
         </dl>
     </li>
     <li class="bigger">
         <dl>
-            <dt>
-                Pentaho Core APIs
+            <dt id="core">
+                Core
             </dt>
-            <dd>Pentaho Web Platform's base functionality.
+            <dd>
                 <ul>
                     <li>
                         <dl>
                             <dt>
-                                <a title="Environment" 
+                                <a title="Pentaho JavaScript Configuration API" 
+                                href="platform/configuration">Configuration</a>
+                            </dt>
+                            <dd>Allows <em>types</em> to be configured by third-parties.</dd>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl>
+                            <dt>
+                                <a title="Pentaho JavaScript Service API" 
+                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.service'}}">Service</a>
+                            </dt>
+                            <dd>Service provider AMD/RequireJS plugin.</dd>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl>
+                            <dt>
+                                <a title="Pentaho JavaScript Localization API"
+                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.i18n'}}">Localization</a>
+                            </dt>
+                            <dd>Resource bundle loader AMD/RequireJS plugin.</dd>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl>
+                            <dt>
+                                <a title="Pentaho JavaScript Language Support API"
+                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.lang'}}">Language Support</a>
+                            </dt>
+                            <dd>API building blocks for JavaScript.</dd>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl>
+                            <dt>
+                                <a title="Pentaho JavaScript Environment API" 
                                    href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.context'}}">Environment</a>
                             </dt>
-                            <dd>The Pentaho Web Client Platform's contextual information.</dd>
+                            <dd>Platform environmental information.</dd>
                         </dl>
                     </li>
                     <li>
                         <dl>
                             <dt>
-                                <a title="Services" 
-                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.service'}}">Services</a>
+                                <a title="Pentaho JavaScript Debugging Control API"
+                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.debug'}}">Debugging</a>
                             </dt>
-                            <dd>AMD plugin which maintains a collection of logical modules and their dependencies.</dd>
-                        </dl>
-                    </li>
-                    <li>
-                        <dl>
-                            <dt>
-                                <a title="Pentaho Core API Configuration" 
-                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.config'}}">Configuration System</a>
-                            </dt>
-                            <dd>Classes and interfaces related to the configuration of value types.</dd>
-                        </dl>
-                    </li>
-                    <li>
-                        <dl>
-                            <dt>
-                                <a title="Pentaho Core API Lang package" 
-                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.lang'}}">pentaho/lang</a>
-                            </dt>
-                            <dd>
-                                Classes and interfaces used as type system building blocks to form other classes and 
-                                interfaces of the Pentaho Web Platform.
-                             </dd>
+                            <dd>Controls the debugging level of components.</dd>
                         </dl>
                     </li>
                 </ul>
@@ -104,9 +118,9 @@ The APIs are organized as follows:
     <li>
         <dl>
             <dt>
-                <a title="Pentaho Web Package" href="platform/pentaho-web-package">Pentaho Web Package</a>
+                <a title="Pentaho Web Package" href="platform/web-package">Web Package</a>
             </dt>
-            <dd>How to package web resources into the Pentaho platform.</dd>
+            <dd>The deployment, dependency and versioning unit for web resources.</dd>
         </dl>
     </li>
 </ul>
