@@ -1,0 +1,62 @@
+/*!
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The interface of service locator AMD/RequireJS loader plugins.
+ *
+ * The service locator allows JavaScript components to declare dependency on other components in terms of the name of
+ * a _logical_ service.
+ * Other modules that provide such logical service should register as such.
+ * See []{@link pentaho.service.locator}.
+ *
+ * **AMD Plugin Usage**: `"pentaho/service!{logical-module-name}?meta&single&ids"`
+ *
+ * 1. `{logical-module-name}` — the name of a required logical module.
+ * 2. `single` — if present, the module resolves as a single value, the first declared dependency.
+ * 3. `meta` — if present, the module resolves as an array where each member is an object with two properties,
+ *    `moduleId` and `value`.
+ * 4. `ids` - if present, the module resolves as an array of the identifiers of the registered modules
+ *     and **does not load them**;
+ *     you can also use this module's {@link pentaho.service.ILocator#getRegisteredIds} method,
+ *     to be able to know the registered module ids synchronously.
+ *
+ * #### Logical service type
+ *
+ * There are no _a priori_ constraints on the type of value of a logical service.
+ * When a logical service has a certain value type, that should be described in its documentation.
+ * More often than not, the value type can be precisely defined as an interface or class.
+ *
+ * Currently, the plugin mechanism provides no assurances on the type of value of
+ * registered service provider modules.
+ * However, components requesting a logical module _should_ trust that the provided dependencies respect any
+ * documented contract.
+ *
+ * @name ILocator
+ * @memberOf pentaho.service
+ * @interface
+ * @extends IAmdLoaderPlugin
+ * @see pentaho.service.locator
+ */
+
+/**
+ * Gets the identifiers of modules registered as dependencies of a given logical module.
+ *
+ * @name getRegisteredIds
+ * @memberOf pentaho.service.ILocator#
+ * @method
+ * @param {string} name - The name of the logical module.
+ * @return {string[]} An array of identifiers, possibly empty.
+ */
