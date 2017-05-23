@@ -63,8 +63,8 @@ for the Pentaho platform, from developing the visualization itself to deploying 
 1. [Create a visualization](#create-a-visualization)
    1. [Develop the visualization itself](#develop-the-visualization-itself)
    2. [Create the Pentaho Web Package](#create-the-pentaho-web-package)
-   3. [Create the OSGi Project](#create-the-osgi-project)
-2. [Build the OSGi Project](#build-the-osgi-project)
+   3. [Create the OSGi Web Project](#create-the-osgi-web-project)
+2. [Build the OSGi Web Project](#build-the-osgi-web-project)
 3. [Deploy the OSGi Artifact](#deploy-the-osgi-artifact)
 4. [Configure the visualization](#configure-the-visualization)
 
@@ -75,7 +75,7 @@ for the Pentaho platform, from developing the visualization itself to deploying 
 If you prefer to skip through the development of the visualization itself, 
 up until its bundling as an OSGi artifact,
 you can skip the following sub-sections and head on to 
-[Build the OSGi Project](#build-the-osgi-project).
+[Build the OSGi Web Project](#build-the-osgi-web-project).
 Before you go, though, you should clone the complete OSGi project:
 
 ```shell
@@ -130,7 +130,7 @@ The result is the following `package.json` content:
 }
 ```
 
-## Create the OSGi Project
+## Create the OSGi Web Project
 
 The Pentaho platform is built on top of an OSGi container, 
 so developers must provide their code as an OSGi/Karaf artifact. 
@@ -139,9 +139,9 @@ Additionally, any client-side dependencies must also be provided to the platform
 The recommended way is to put the visualization bundle, its dependencies, 
 and corresponding feature definition together into a single KAR file.
 
-See [Create an OSGi project for a Web Package and its Dependencies](../osgi-web-project) for instructions.
+See [Create an OSGi Web Project for a Web Package and its Dependencies](../osgi-web-project) for instructions.
 
-## Build the OSGi Project
+# Build the OSGi Web Project
 
 Now that you have an OSGi project containing the custom Bar/D3 visualization, 
 you need to build it. At the project root execute:
@@ -152,9 +152,9 @@ mvn clean package
 
 If everything went well, the KAR artifact will be located at `assemblies/target`.
 
-## Deploy the OSGi Artifact
+# Deploy the OSGi Artifact
 
-See [OSGi/Karaf Artifacts Deployment](../osgi-deployment) for quick instructions on 
+See [OSGi Artifacts Deployment](../osgi-deployment) for quick instructions on 
 how to deploy the KAR file you just built.
 
 If everything went well, you should now see your visualization being offered in Analyzer and/or PDI:
