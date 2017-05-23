@@ -1,12 +1,12 @@
 ---
-title: Create a custom Bar chart visualization using D3
-description: Walks you through the creation of a simple Bar chart visualization that uses the D3 graphics library.
+title: Develop a custom Bar chart visualization using D3
+description: Walks you through the development of a simple Bar chart visualization that uses the D3 graphics library.
 parent-title: Visualization API
 parent-path: ../..
 layout: default
 ---
 
-This walk-through will guide you through the creation of a simple Bar chart visualization, 
+This walk-through will guide you through the development of a simple Bar chart visualization, 
 using the Pentaho Visualization API and the amazing [D3](https://d3js.org/) graphics library.
  
 The complete code of this sample is available at 

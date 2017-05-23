@@ -5,7 +5,7 @@ parent-title: ""
 layout: default
 ---
 
-The Pentaho Platform detects and manages OSGi bundles that are Web Packages, 
+The Pentaho Platform detects and manages [OSGi](https://www.osgi.org/) bundles that are **Pentaho Web Packages**, 
 collecting the information needed to build the AMD/RequireJS configuration and 
 to setup the mappings needed to serve the package resources through HTTP.
 
@@ -19,26 +19,44 @@ These are, for now, the relevant supported fields:
 
 **mandatory**
 
-The most important fields in `package.json` are the "name" and "version" fields. 
+The most important fields in `package.json` are the `name` and `version` fields. 
 Those are required, and the package must not install without them.
 - The name must be shorter than 214 characters;
 - The name can't start with a dot or an underscore;
 - The name should not have uppercase letters;
-- The name will end up being part of an URL; therefore, the name should avoid any non-URL-safe characters;
-- The version must be follow the the Semantic Versioning Specification (http://semver.org/).
+- The name will end up being part of an URL;
+  therefore, the name should avoid any non-URL-safe characters;
+  however, forward-slashes, `/`, are allowed; 
+- The version must follow the the Semantic Versioning Specification (http://semver.org/).
 
 The name and version together form an identifier that is assumed to be unique and 
 is used both as the main AMD/RequireJS module identifier (separated by an underscore, like `name_version`) and 
 as part of the HTTP location where the resources will be served from 
 (separated by a forward slash, like `/name/version`).
 
+Example:
+
+```json
+{
+  "name": "baz",
+  "version": "1.0.0"
+}
+```
+
 ## dependencies
 
 Dependencies are specified in a simple object that maps a package name to a version range.
 The version range is a string which has one or more space-separated descriptors, 
 as defined in https://github.com/npm/node-semver#ranges.
+
 ```json
-{ "name": "baz", "version": "1.0.0", "dependencies": { "bar": "~2.0" } }
+{
+  "name": "baz", 
+  "version": "1.0.0", 
+  "dependencies": { 
+    "bar": "~2.0" 
+  }
+}
 ```
 
 This information is used by the platform to find out the dependency tree, do the runtime dependency resolution, and 
@@ -66,7 +84,8 @@ In particular,
 this is used to configure the [`pentaho/service`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.service'}}) plugin, 
 used as an inversion-of-control mechanism to inject the package resources into the system.
 
-For instance, to declare that the resource `"my-viz/model.js"` implements `"pentaho/visual/base"` you would need:
+For instance, to declare that the resource `"my-viz/model.js"` implements the service named `pentaho/visual/base`, 
+you would need:
 ```json
 { 
   "name": "baz",
@@ -79,25 +98,27 @@ For instance, to declare that the resource `"my-viz/model.js"` implements `"pent
 }
 ```
 
-Notice that you must use the complete final module identifier (`"baz_1.0.0"`) as the dependency name. 
+{% include callout.html content='<p>Notice that you must use the complete final module identifier 
+(<code>"baz_1.0.0"</code>) as the dependency name. 
 This is currently a limitation, as ideally you should be unaware of whatever naming scheme is chosen by the platform.
+</p>' type="warning" %}
 
 ## packages
 
-This field isn't part of the package.json spec. 
-It is based in [RequireJS's login modules from packages](http://requirejs.org/docs/api.html#packages) and 
-serves the same purpose.
+This field isn't part of the `package.json` spec.
+It is based in [RequireJS's Packages](http://requirejs.org/docs/api.html#packages) and serves the same purpose.
 
-Package configuration allows for CommonJS style path lookup rules, 
+Package configuration allows for CommonJS style path lookup rules,
 which are somewhat different from the default id-to-path lookup rules that are otherwise used by AMD loaders.
 
-It is an array of package configuration objects. Each configuration can either be:
-- String: The package’s module identifier prefix, which indicates the package name.
-- Object: a configuration object that can have the following properties:
+It is an array of package configurations. Each package configuration can either be:
+- String: The package’s module identifier.
+- Object: An object with the following properties:
   - name: String. The package’s module identifier.
   - location: String. _Optional_.
-  - main: String. _Optional_. 
-    Default value is "main". The module identifier to use inside the package for the "main module".
+  - main: String. _Optional_. The identifier of the sub-module that is used as the "main module", 
+    relative (appended) to the package module. Default value is "main".
 
-In the current implementation, each module identifier is relative (appended) to the package’s main module identifier, 
+In the current implementation, 
+each module identifier is relative (appended) to the Web Package’s main module identifier,
 unless if it starts with "/". This might change in the final release.
