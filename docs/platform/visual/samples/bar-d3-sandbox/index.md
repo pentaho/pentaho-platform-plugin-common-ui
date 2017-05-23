@@ -1,6 +1,6 @@
 ---
-title: Develop a custom Bar chart visualization using D3
-description: Walks you through the development of a simple Bar chart visualization that uses the D3 graphics library.
+title: Bar/D3 Visualization in Sandbox
+description: Walks you through the development of a simple Bar chart visualization that uses the D3 graphics library, under a controlled sandbox environment.
 parent-title: Visualization API
 parent-path: ../..
 layout: default
@@ -20,7 +20,7 @@ The complete code of this sample is available at
 
 ## Steps
 
-The walk-through is divided in the following steps:
+This walk-through is divided in the following steps:
 
 1. [Preparing the environment](step1-environment-preparation)
 2. [Creating the model](step2-model-creation)

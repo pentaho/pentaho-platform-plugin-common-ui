@@ -2,7 +2,7 @@
 title: Step 1 - Preparing the environment
 description: Walks you through setting up a basic sandbox for experimenting with visualizations.
 parent-path: .
-parent-title: Develop a custom Bar chart visualization using D3
+parent-title: Bar/D3 Visualization in Sandbox
 layout: default
 ---
 

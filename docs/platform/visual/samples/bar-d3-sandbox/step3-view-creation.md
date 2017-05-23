@@ -2,7 +2,7 @@
 title: Step 3 - Creating the view
 description: Walks you through the creation of the Bar visualization view.
 parent-path: .
-parent-title: Develop a custom Bar chart visualization using D3
+parent-title: Bar/D3 Visualization in Sandbox
 layout: default
 ---
 

@@ -2,7 +2,7 @@
 title: Step 6 - Adding a default configuration
 description: Walks you through adding a default configuration to the visualization.
 parent-path: .
-parent-title: Develop a custom Bar chart visualization using D3
+parent-title: Bar/D3 Visualization in Sandbox
 layout: default
 ---
 

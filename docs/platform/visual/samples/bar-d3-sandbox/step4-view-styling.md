@@ -2,7 +2,7 @@
 title: Step 4 - Styling the view
 description: Walks you through the styling of the Bar visualization view.
 parent-path: .
-parent-title: Develop a custom Bar chart visualization using D3
+parent-title: Bar/D3 Visualization in Sandbox
 layout: default
 ---
 

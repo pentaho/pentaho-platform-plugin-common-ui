@@ -2,7 +2,7 @@
 title: Step 5 - Adding interactivity to the view
 description: Walks you through adding interactivity to the Bar visualization view.
 parent-path: .
-parent-title: Develop a custom Bar chart visualization using D3
+parent-title: Bar/D3 Visualization in Sandbox
 layout: default
 ---
 
