@@ -6,24 +6,24 @@ parent-title: Bar/D3 Visualization in Sandbox
 layout: default
 ---
 
-## Fast-lane
+{% include callout.html content="<h2>Fast-lane</h2>
+<p>If you prefer, you can follow the walk-through step-by-step but skip writing the code itself. 
+   Just clone the sample repository and install its dependencies:</p>
 
-If you prefer, you can follow the walk-through step-by-step but skip writing the code itself. 
-Just clone the sample repository and install its dependencies:
-
-```shell
-# Clone the sample repository.
+<pre class='highlight'><code># Clone the sample repository.
 git clone https://github.com/pentaho/pentaho-engineering-samples
 
 # Go to the complete sample's directory.
+cd pentaho-engineering-samples
 cd Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/bar-d3-sandbox
 
 # Install the dependencies.
 npm install
 # or: yarn install
-```
+</code></pre>
 
-You might want to go directly to [Visualize it](#visualize-it).
+<p>Go directly to <a title='Visualize it' href='#visualize-it'>Visualize it</a>.</p>
+" type="warning" %}
 
 ## Setup the sandbox environment
 

@@ -22,21 +22,6 @@ provides a unified way to visualize data across the Pentaho suite
 Essentially, it is a set of abstractions that enables safe, isolated operation between 
 applications, visualizations and business logic.
 
-A **visualization** is constituted by:
-
-- One [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}), 
-  which _identifies_ the visualization and 
-  _defines_ it in terms of its their data requirements, 
-  such as the visual degrees of freedom it has (e.g. _X position_, _color_ and _size_) and 
-  any major options that affect its rendering.
-
-- One [`View`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}}) (at least), 
-  which implements the actual rendering using chosen technologies 
-  (e.g. [HTML](https://www.w3.org/TR/html/), [SVG](https://www.w3.org/TR/SVG/), [D3](https://d3js.org/)),
-  and handle user interaction, 
-  dispatching [actions]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action'}}) and, 
-  for example, showing tooltips.
-
 The Visualization API is built on top of other Platform JavaScript APIs:
 
 - The [Data API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data'}}) 
@@ -59,18 +44,49 @@ read [Analyzer and the Visualization API](analyzer-viz-api).
 
 The following sections will guide you through the complete process of creating a custom visualization 
 for the Pentaho platform, 
-from [developing it](#create-a-visualization), 
-to [deploying it](#deploy-the-visualization) to Pentaho products and 
-to [configuring it](#configure-the-visualization).
+from [developing it](#creating-a-visualization), 
+to [deploying it](#deploying-the-visualization) to Pentaho products and 
+to [configuring it](#configuring-the-visualization).
  
-# Create a visualization
+# Creating a visualization
 
-Read the [Create a Custom Visualization](create) walk-through.
+Creating a visualization boils down to creating:
 
-# Deploy the visualization
+- One [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) — 
+  which _identifies_ the visualization and 
+  _defines_ it in terms of its their data requirements, 
+  such as the visual degrees of freedom it has (e.g. _X position_, _color_ and _size_) and 
+  any major options that affect its rendering, — and
 
-See [OSGi Artifacts Deployment](../osgi-deployment) for quick instructions on 
-how to deploy the KAR file you just built (located at `assemblies/target`).
+- One [`View`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}}) (at least) — 
+  which implements the actual rendering using chosen technologies 
+  (e.g. [HTML](https://www.w3.org/TR/html/), [SVG](https://www.w3.org/TR/SVG/), [D3](https://d3js.org/)),
+  and handle user interaction, 
+  dispatching [actions]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action'}}) and, 
+  for example, showing tooltips.
+
+The [Create a Custom Visualization](create) walk-through shows you how to develop these and 
+how to create an OSGi artifact containing the visualization, 
+so that it can be deployed to a Pentaho product.
+
+{% include callout.html content="<h2>Fast-lane</h2>
+<p>If you prefer, you can skip the walk-through and get the final Pentaho Web Project, and build it.</p>
+<pre class='highlight'><code># Clone the repository.
+git clone https://github.com/pentaho/pentaho-engineering-samples
+
+# Go to the sample's directory.
+cd pentaho-engineering-samples
+cd Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/bar-d3-bundle
+
+# Build the Web Project
+mvn package
+</code></pre>" type="warning" %}
+
+# Deploying the visualization
+
+To deploy the visualization to a Pentaho product (Pentaho Server or PDI), 
+copy the KAR file you just built (located at `assemblies/target`) into its `karaf/deploy` folder.
+See [OSGi Artifacts Deployment](../osgi-deployment) if you need more information.
 
 If everything went well, you should now see your visualization being offered in Analyzer and/or PDI:
 
@@ -88,9 +104,9 @@ If everything went well, you should now see your visualization being offered in 
 
 <!-- TODO: Explain how to distribute it using marketplace? -->
 
-# Configure the visualization
+# Configuring the visualization
 
-Besides the default configuration you have included with the visualization,
-the visualization can be further configured by third-parties. 
+A visualization can be configured by third-parties using configuration rules in external configuration files.
+These configurations are merged with any default configuration that is included with the visualization.
 
 See [Configuring a Visualization](configuration) for more details.

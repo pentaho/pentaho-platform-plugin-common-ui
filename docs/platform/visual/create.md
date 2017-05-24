@@ -7,21 +7,6 @@ layout: default
 
 This walk-through guides you through the creation of a custom visualization for the Pentaho platform, 
 from developing the visualization itself to building an OSGi Artifact that can be deployed to Pentaho products.
- 
-## Fast-lane
-
-If you prefer, you can skip the walk-through and get the final OSGi Web Project, and build it.
-
-```shell
-# Clone the repository.
-git clone https://github.com/pentaho/pentaho-engineering-samples
-
-# Go to the sample's directory.
-cd Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/bar-d3-bundle
-
-# Build the OSGi Web Project
-mvn clean package
-```
 
 ## 1. Develop the Visualization in a Sandbox
 
@@ -35,13 +20,23 @@ which guides you through the development of a custom visualization having a [D3]
 ## 2. Create the Pentaho Web Package
 
 In the previous section you developed a custom visualization and tested it in a controlled sandbox environment.
-To use the visualization in Pentaho products, 
-it must take the form of a [Pentaho Web Package](../web-package). 
-This essentially means that you need to create a `package.json` file that describes the contained JavaScript resources.
 
-Apart from the mandatory `name` and `version` fields, and the D3 library dependency, 
-you must also advertise the existence of your visualization to the platform, 
-so that applications like Analyzer and PDI can offer it to users.
+If you exclude the sandbox specific files, 
+you are left with `model.js`, `view-d3.js`, `config.js` and a `css` folder.
+However, note, one important feature — the AMD/RequireJS configuration — was part of the sandbox `index.html` file.
+Also, the D3 dependency was declared in the sandbox's `npm` `package.json` file.
+ 
+When developing for the Pentaho platform, 
+equivalent information needs to be provided in a _Pentaho Web Package descriptor_ file, 
+which, not coincidentally, is called `package.json`.
+We call the set of web resources plus its package descriptor a [Pentaho Web Package](../web-package).
+
+At a minimum, the `package.json` file requires the `name` and `version` fields.
+We choose the package name to match the AMD/RequireJS identifier prefix by which we want the resources to be available.
+
+The D3 library dependency, is declared similarly to how it was declared.
+
+Your visualization must be advertised to the platform so that applications like Analyzer and PDI can offer it to users.
 This is done by registering 
 the visualization's [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) module
 with [`pentaho/service`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.service'}}),
@@ -70,7 +65,7 @@ The result is the following `package.json` content:
 }
 ```
 
-## 3. Create the OSGi Web Project
+## 3. Create the Pentaho Web Project
 
 The Pentaho platform is built on top of an OSGi container, 
 so developers must provide their code as an OSGi/Karaf artifact. 
@@ -79,9 +74,9 @@ Additionally, any client-side dependencies must also be provided to the platform
 The recommended way is to put the visualization bundle, its dependencies, 
 and corresponding feature definition together into a single KAR file.
 
-See [Create an OSGi Web Project for a Web Package and its Dependencies](../osgi-web-project) for instructions.
+See [Create a Pentaho Web Project for a Web Package and its Dependencies](../web-project) for instructions.
 
 ## 4. Next Steps
 
 To learn how to deploy the visualization,
-continue reading at [Deploy the visualization](.#deploy-the-visualization).
+continue reading at [Deploy the visualization](.#deploying-the-visualization).

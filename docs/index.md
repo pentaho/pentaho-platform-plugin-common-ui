@@ -127,7 +127,7 @@ The APIs are organized as follows:
                             <dt>
                                 <a title="Pentaho Web Package" href="platform/web-package">Pentaho Web Package</a>
                             </dt>
-                            <dd>The dependency and versioning unit for JavaScript web resources
+                            <dd>The dependency and versioning unit for JavaScript resources
                                 in the Pentaho platform.</dd>
                         </dl>
                     </li>
@@ -136,10 +136,11 @@ The APIs are organized as follows:
                     <li>
                         <dl>
                             <dt>
-                                <a title="OSGi Bundle" href="platform/osgi-web-project">OSGi Web Project</a>
+                                <a title="Pentaho Web Project" href="platform/web-project">Pentaho Web Project</a>
                             </dt>
-                            <dd>Bundles a Pentaho Web Package and its dependencies and 
-                                compiles into an OSGi Artifact.</dd>
+                            <dd>A Maven project that contains a Pentaho Web Package and 
+                                information of WebJar dependencies, 
+                                and compiles into an OSGi Artifact.</dd>
                         </dl>
                     </li>
                 </ul>

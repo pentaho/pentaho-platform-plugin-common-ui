@@ -1,5 +1,5 @@
 ---
-title: Web Package
+title: Pentaho Web Package
 description: Describes how to package web client resources, including visualizations, into the Pentaho platform.
 parent-title: ""
 layout: default
