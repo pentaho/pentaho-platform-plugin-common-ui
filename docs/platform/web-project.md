@@ -1,13 +1,16 @@
 ---
-title: Bundling a web package and provisioning
-description: Explains the core concepts and walks through the creation of a kar file for deploying a web package in the Pentaho Platform.
+title: Create a Pentaho Web Project for a Web Package and its Dependencies
+description: Explains the core concepts and walks through the creation of a KAR file for deploying a web package and its dependencies in the Pentaho Platform.
 parent-title: ""
 layout: default
 ---
 
-The Pentaho platform is built on top of an OSGi container ([Apache Karaf](https://karaf.apache.org)).
+The Pentaho platform is built on top of an [OSGi](https://www.osgi.org/) container 
+([Apache Karaf](https://karaf.apache.org)).
 It allows for a simple modular approach at both development time and runtime, 
 reducing complexity and facilitating deployment.
+
+## OSGi/Karaf Artifacts
 
 A **bundle** is the deployment unit in OSGi. 
 Basically, a bundle is just a JAR file with special bundle headers in its `META-INF/MANIFEST.MF` file.
@@ -86,8 +89,13 @@ as these are provided by the platform.
 
 ## Building it
 
+To build the project, execute:
+
 ```shell
-mvn package
+mvn clean package
 ```
 
-...
+If everything went well, the KAR artifact will be located at `assemblies/target`.
+
+If you want to know how to deploy the built artifact to a Pentaho product,
+see [OSGi/Karaf Artifacts Deployment](osgi-deployment).

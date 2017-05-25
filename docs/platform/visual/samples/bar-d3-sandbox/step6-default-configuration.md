@@ -2,7 +2,7 @@
 title: Step 6 - Adding a default configuration
 description: Walks you through adding a default configuration to the visualization.
 parent-path: .
-parent-title: Create a custom Bar chart visualization using D3
+parent-title: Bar/D3 Visualization in Sandbox
 layout: default
 ---
 
@@ -17,20 +17,26 @@ the developer of `V1` may package it a configuration module so that it better in
 out-of-the-box.
 
 If you do not have any knowledge about JavaScript configuration in the Pentaho Platform, 
-you might want to read [Configuring your Visualization](../configuration) before continuing.
+you might want to read 
+[Configuring a visualization](../../configuration) before continuing.
 
 ## Create the configuration module
 
 Now, create a configuration file, called `config.js`, and place the following content in it:
 
 ```js
-define(function() {
+define(["module"], function(module) {
+  
+  // Replace /config by /model.
+  // e.g. "pentaho/visual/samples/bar/model".
+  var vizId = module.id.replace(/(\w+)$/, "model");
+  
   return {
     rules: [
       {
         priority: -1,
         select: {
-          type: "pentaho/visual/samples/bar"
+          type: vizId
         },
         apply: {
           props: {
@@ -59,14 +65,8 @@ with the following:
   <script>
     // Needed only in a sandbox environment.
     require.config({
-      packages: [
-        {
-          "name": "pentaho/visual/samples/bar",
-          "main": "model",
-          "location": "."
-        }
-      ],
       paths: {
+        "pentaho/visual/samples/bar": ".",
         "d3": "./node_modules/d3/build/d3"
       },
       config: {
@@ -92,14 +92,15 @@ However, until then, the Bar visualization can be configured to contain this req
 being used by the PDI application. Add the following rule to the `config.js` file:
 
 ```js
-define(function() {
+define(["module"], function(module) {
+  // ...
   return {
     rules: [
       // ..,
       {
         priority: -1,
         select: {
-          type: "pentaho/visual/samples/bar",
+          type: vizId,
           application: "pentaho-det"
         },
         apply: {
@@ -129,14 +130,15 @@ parent attribute with the child attribute when drilling-down.
 Add the following rule to the `config.js` file:
 
 ```js
-define(function() {
+define(["module"], function(module) {
+  // ...
   return {
     rules: [
       // ..,
       {
         priority: -1,
         select: {
-          type: "pentaho/visual/samples/bar",
+          type: vizId,
           application: "pentaho-analyzer"
         },
         apply: {

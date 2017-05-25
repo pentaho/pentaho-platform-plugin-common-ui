@@ -2,29 +2,30 @@
 title: Step 1 - Preparing the environment
 description: Walks you through setting up a basic sandbox for experimenting with visualizations.
 parent-path: .
-parent-title: Create a custom Bar chart visualization using D3
+parent-title: Bar/D3 Visualization in Sandbox
 layout: default
 ---
 
-## Choose your walk-through following mode
+{% include callout.html content="<h2>Fast-lane</h2>
+<p>If you prefer, you can follow the walk-through step-by-step but skip writing the code itself. 
+   Just clone the sample repository and install its dependencies:</p>
 
-While reading, you can either build the sample step-by-step or follow along with the complete code.
-
-### a. Following with the complete code
-
-```shell
-# Clone the repository.
+<pre class='highlight'><code># Clone the sample repository.
 git clone https://github.com/pentaho/pentaho-engineering-samples
 
-# Go to the sample's directory.
-cd "Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/bar-d3-sandbox"
+# Go to the complete sample's directory.
+cd pentaho-engineering-samples
+cd Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/bar-d3-sandbox
 
 # Install the dependencies.
 npm install
 # or: yarn install
-```
+</code></pre>
 
-### b. Building it yourself
+<p>Go directly to <a title='Visualize it' href='#visualize-it'>Visualize it</a>.</p>
+" type="warning" %}
+
+## Setup the sandbox environment
 
 1. Create a folder and then initialize it:
    ```shell

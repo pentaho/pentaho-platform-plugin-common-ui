@@ -1,5 +1,5 @@
 ---
-title: Configuring a visualization
+title: Configuring a Visualization
 description: Shows how to use the Configuration API to configure a visualization.
 parent-title: Visualization API
 layout: default

@@ -2,7 +2,7 @@
 title: Step 2 - Creating the model
 description: Walks you through the creation of the Bar visualization model.
 parent-path: .
-parent-title: Create a custom Bar chart visualization using D3
+parent-title: Bar/D3 Visualization in Sandbox
 layout: default
 ---
 
@@ -39,8 +39,8 @@ define([
     
     var BarModel = BaseModel.extend({
       type: {
-        id: "pentaho/visual/samples/bar",
-        sourceId: module.id,
+        id: module.id,
+        styleClass: "pentaho-visual-samples-bar",
         label: "D3 Bar Chart",
         defaultView: "./view-d3",
         props: [
@@ -76,9 +76,12 @@ define([
 
 Remarks:
   - The value of the AMD module is a factory function of Bar model classes.
-  - Defines a visualization (model) of id `pentaho/visual/samples/bar`.
+  - Defines a visualization (model) whose id is the file's AMD module identifier
+    (depending on how AMD is configured, it can be, for example: `pentaho/visual/samples/bar/model`).
   - Inherits directly from the base visualization model, 
     [pentaho/visual/base]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}).
+  - Specifies the [styleClass]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#styleClass'}}),
+    which will later be useful to style the component using CSS.
   - Specifies the
     [default view]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#defaultView'}}) 
     to use with this model (which you'll create in a moment).

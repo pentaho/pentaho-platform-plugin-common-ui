@@ -115,12 +115,48 @@ The APIs are organized as follows:
             </dd>
         </dl>
     </li>
-    <li>
+    <li class="bigger ground-layer">
         <dl>
-            <dt>
-                <a title="Pentaho Web Package" href="platform/web-package">Web Package</a>
+            <dt id="ground">
+                Pentaho Web Platform
             </dt>
-            <dd>The deployment, dependency and versioning unit for web resources.</dd>
+            <dd>
+                <ul>
+                    <li>
+                        <dl>
+                            <dt>
+                                <a title="Pentaho Web Package" href="platform/web-package">Pentaho Web Package</a>
+                            </dt>
+                            <dd>The dependency and versioning unit for JavaScript resources
+                                in the Pentaho platform.</dd>
+                        </dl>
+                    </li>
+                </ul>
+                <ul>
+                    <li>
+                        <dl>
+                            <dt>
+                                <a title="Pentaho Web Project" href="platform/web-project">Pentaho Web Project</a>
+                            </dt>
+                            <dd>A Maven project that contains a Pentaho Web Package and 
+                                information of WebJar dependencies, 
+                                and compiles into an OSGi Artifact.</dd>
+                        </dl>
+                    </li>
+                </ul>
+                <ul>
+                    <li>
+                        <dl>
+                            <dt>
+                                <a title="OSGi Artifacts Deployment" href="platform/osgi-deployment">
+                                OSGi Artifacts Deployment
+                                </a>
+                            </dt>
+                            <dd>Deployment of OSGi artifacts on the Pentaho platform.</dd>
+                        </dl>
+                    </li>
+                </ul>
+            </dd>
         </dl>
     </li>
 </ul>

@@ -22,21 +22,6 @@ provides a unified way to visualize data across the Pentaho suite
 Essentially, it is a set of abstractions that enables safe, isolated operation between 
 applications, visualizations and business logic.
 
-A **visualization** is constituted by:
-
-- One [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}), 
-  which _identifies_ the visualization and 
-  _defines_ it in terms of its their data requirements, 
-  such as the visual degrees of freedom it has (e.g. _X position_, _color_ and _size_) and 
-  any major options that affect its rendering.
-
-- One [`View`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}}) (at least), 
-  which implements the actual rendering using chosen technologies 
-  (e.g. [HTML](https://www.w3.org/TR/html/), [SVG](https://www.w3.org/TR/SVG/), [D3](https://d3js.org/)),
-  and handle user interaction, 
-  dispatching [actions]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action'}}) and, 
-  for example, showing tooltips.
-
 The Visualization API is built on top of other Platform JavaScript APIs:
 
 - The [Data API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data'}}) 
@@ -57,92 +42,71 @@ they're customizable and extensible to fit your organization's desired look and 
 If you want to know more about the specifics of how Analyzer exposes the Visualization API, 
 read [Analyzer and the Visualization API](analyzer-viz-api).
 
+The following sections will guide you through the complete process of creating a custom visualization 
+for the Pentaho platform, 
+from [developing it](#creating-a-visualization), 
+to [deploying it](#deploying-the-visualization) to Pentaho products and 
+to [configuring it](#configuring-the-visualization).
+ 
 # Creating a visualization
 
-Visualizations are constituted by one [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) 
-and (at least) one [`View`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}}).
-Models identify visualizations and 
-define their data requirements. Views implement the actual rendering using chosen technologies 
-(e.g. [HTML](https://www.w3.org/TR/html/), [SVG](https://www.w3.org/TR/SVG/), [D3](https://d3js.org/)),
-and handle user interaction, 
-dispatching [actions]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action'}}) and, 
-for example, showing tooltips.
+Creating a visualization boils down to creating:
 
-For a better understanding, see the [Bar/D3 sample](samples/bar-d3-sandbox),
-that walks you through creating a custom visualization having a
-[D3](https://d3js.org/)-based view.
+- One [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) — 
+  which _identifies_ the visualization and 
+  _defines_ it in terms of its their data requirements, 
+  such as the visual degrees of freedom it has (e.g. _X position_, _color_ and _size_) and 
+  any major options that affect its rendering, — and
 
-# Packaging the visualization
+- One [`View`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}}) (at least) — 
+  which implements the actual rendering using chosen technologies 
+  (e.g. [HTML](https://www.w3.org/TR/html/), [SVG](https://www.w3.org/TR/SVG/), [D3](https://d3js.org/)),
+  and handle user interaction, 
+  dispatching [actions]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action'}}) and, 
+  for example, showing tooltips.
 
-Your visualization must be wrapped as a Pentaho Web Package. 
-All packages must contain a file `META-INF/js/package.json`, 
-holding the relevant metadata about the resources being deployed.
+The [Create a Custom Visualization](create) walk-through shows you how to develop these and 
+how to create an OSGi artifact containing the visualization, 
+so that it can be deployed to a Pentaho product.
 
-Apart from the mandatory `"name"` and `"version"` fields, you must also register your visualization into the platform. This is done by configuring the `pentaho/service` plugin to declare your visualization's model class as implementing/extending `"pentaho/visual/base"`.
+{% include callout.html content="<h2>Fast-lane</h2>
+<p>If you prefer, you can skip the walk-through and get the final Pentaho Web Project, and build it.</p>
+<pre class='highlight'><code># Clone the repository.
+git clone https://github.com/pentaho/pentaho-engineering-samples
 
-If you provide any configuration file you must as well declare it as implementing `"pentaho.config.spec.IRuleSet"`.
+# Go to the sample's directory.
+cd pentaho-engineering-samples
+cd Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/bar-d3-bundle
 
-Finally, any third-party dependencies must be declared in the same file.
-
-```json
-{ 
-  "name": "foo",
-  "version": "1.0.0",
-  "config": {
-    "pentaho/service": {
-      "foo_1.0.0/my-viz/model": "pentaho/visual/base",
-      "foo_1.0.0/my-viz/config": "pentaho.config.spec.IRuleSet"
-    }
-  },
-  "dependencies": {
-    "bar": "~2.0"
-  }
-}
-```
-
-See [Pentaho Web Package description](../web-package) for a more detailed view.
-
-# Bundling and provisioning
-
-The Pentaho platform is built on top of an OSGi container, so developers must provide their code as an OSGi bundle. 
-Additionally, the required client side dependencies must also be provided to the platform as bundles.
-
-The recommended way is to put the visualization bundle, its dependencies, 
-and corresponding feature definition together into a single KAR file.
-
-See [Bundling a web package and provisioning](../bundling) for instructions.
+# Build the Web Project
+mvn package
+</code></pre>" type="warning" %}
 
 # Deploying the visualization
 
-The platform supports hot deployment: simply drop a bundle file in the deploy directory and 
-Apache Karaf will detect the file and try to deploy it.
+To deploy the visualization to a Pentaho product (Pentaho Server or PDI), 
+copy the KAR file you just built (located at `assemblies/target`) into its `karaf/deploy` folder.
+See [OSGi Artifacts Deployment](../osgi-deployment) if you need more information.
 
-For PDI the Karaf folder is located in `system/karaf`. 
-On the Pentaho Server it's found within `pentaho-solutions/system/karaf`.
+If everything went well, you should now see your visualization being offered in Analyzer and/or PDI:
 
-You can drop any KAR file, bundle or Feature file into the `karaf/deploy` folder. 
-It will be automatically installed and activated, even after restarts of the product. 
-Replacing a bundle or feature already in the deploy folder will reinstall it within OSGI. Deleting it will uninstall.
+1. Your Bar/D3 visualization in Analyzer:
+   
+   <img src="img/sample-bar-d3-analyzer.png" alt="Bar/D3 in Analyzer" style="width: 767px;">
 
-If every thing went well you should now see your visualization in Analyzer and/or PDI.
+2. Your Bar/D3 visualization in the PDI menu:
+   
+   <img src="img/sample-bar-d3-pdi-menu.png" alt="Bar/D3 in PDI - menu" style="width: 365px;">
+   
+3. Your Bar/D3 visualization in PDI:
+   
+   <img src="img/sample-bar-d3-pdi.png" alt="Bar/D3 in PDI" style="width: 777px;">
 
-<img src="img/sample-bar-d3-analyzer.png" alt="Bar/D3 in Analyzer" style="width: 100%; max-width: 575px;"><br>
-*Your Bar/D3 walkthrough visualization in Analyzer*
-
-<img src="img/sample-bar-d3-pdi-menu.png" alt="Bar/D3 in PDI - menu" style="width: 40%; max-width: 274px;  min-width: 274px;">
-<img src="img/sample-bar-d3-pdi.png" alt="Bar/D3 in PDI" style="width: 60%;max-width: 583px;  min-width: 420px;"><br>
-*Your Bar/D3 walkthrough visualization in PDI*
-
-> TODO: Explain how to distribute it using marketplace?
+<!-- TODO: Explain how to distribute it using marketplace? -->
 
 # Configuring the visualization
 
-Pentaho's JavaScript API allows users to declare _prioritized configuration rules_ 
-that configure the objects built using the Type API.
+A visualization can be configured by third-parties using configuration rules in external configuration files.
+These configurations are merged with any default configuration that is included with the visualization.
 
-Typical configuration rules include:
-- modifying default values for properties,
-- adding validations, 
-- extending objects with environment-specific properties
-
-See [Configuring a visualization](configuration) for more details.
+See [Configuring a Visualization](configuration) for more details.

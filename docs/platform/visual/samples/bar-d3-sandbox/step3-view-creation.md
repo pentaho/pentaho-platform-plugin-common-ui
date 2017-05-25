@@ -2,7 +2,7 @@
 title: Step 3 - Creating the view
 description: Walks you through the creation of the Bar visualization view.
 parent-path: .
-parent-title: Create a custom Bar chart visualization using D3
+parent-title: Bar/D3 Visualization in Sandbox
 layout: default
 ---
 
@@ -46,7 +46,8 @@ define([
 ```
 
 Remarks:
-  - Defines a visualization view type of id `pentaho/visual/samples/bar/view-d3`.
+  - Defines a visualization view whose id is the file's AMD module identifier
+    (depending on how AMD is configured, it can be, for example: `pentaho/visual/samples/bar/view-d3`).
   - Inherits directly from the base visualization view, 
     [pentaho/visual/base/view]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}}).
   - The inherited 
@@ -88,14 +89,8 @@ Edit the `index.html` file and place the following code in it:
   <script>
     // Needed only in a sandbox environment.
     require.config({
-      packages: [
-        {
-          "name": "pentaho/visual/samples/bar",
-          "main": "model",
-          "location": "."
-        }
-      ],
       paths: {
+        "pentaho/visual/samples/bar": ".",
         "d3": "./node_modules/d3/build/d3"
       }
     });
@@ -106,7 +101,7 @@ Edit the `index.html` file and place the following code in it:
       "pentaho/type/Context",
       "pentaho/data/Table",
       "pentaho/visual/base/view",
-      "pentaho/visual/samples/bar",
+      "pentaho/visual/samples/bar/model",
       "json!./sales-by-product-family.json"
     ], function(Context, Table, baseViewFactory, barModelFactory, dataSpec) {
 
@@ -160,7 +155,7 @@ Remarks:
     This step is only needed in a sandbox environment. 
     When inside the Pentaho platform, these configurations are provided automatically,
     built from the web package information.
-  - The used visualization model is now `pentaho/visual/samples/bar`.
+  - The used visualization model is now `pentaho/visual/samples/bar/model`.
   - The model now contains visual role mappings for the `category` and `measure` visual roles.
   - The dimensions of the visualization were increased.
 

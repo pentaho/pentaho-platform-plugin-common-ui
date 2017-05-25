@@ -2,7 +2,7 @@
 title: Step 4 - Styling the view
 description: Walks you through the styling of the Bar visualization view.
 parent-path: .
-parent-title: Create a custom Bar chart visualization using D3
+parent-title: Bar/D3 Visualization in Sandbox
 layout: default
 ---
 
@@ -43,7 +43,7 @@ Create a folder named `css` and, in it, create a file named `view-d3.css`. Add t
 Remarks:
   - The CSS rules are scoped with the visualization model's
     CSS [style class]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#styleClass'}}), 
-    which, by default is derived from its id, `pentaho/visual/samples/bar`.
+    previously specified when defining the model.
 
 ## Loading the CSS file with the view
 
