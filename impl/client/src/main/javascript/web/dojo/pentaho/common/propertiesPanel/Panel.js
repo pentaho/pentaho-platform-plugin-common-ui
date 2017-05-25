@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2013 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,7 @@ define([
     seperatorTemplate: "<div class='propPanel-seperator'></div>",
     propUIs: null,
     groups:  null,
+    previousGroupsOpenState: null,
     gutters: false,
     baseClass: "pentahoPropertiesPanel",
     minHeightDeviation: 0,
@@ -187,6 +188,13 @@ define([
             region:   'top',
             splitter: false
           });
+
+      if (this.previousGroupsOpenState !== null && typeof this.previousGroupsOpenState[groupId] !== 'undefined') {
+        if (group.open && this.previousGroupsOpenState[groupId].open === false) {
+          //just setting the group.open variable doesn't ensure that the label arrow is coherent with the open state
+          group.toggle();
+        }
+      }
 
       aspect.after(group, "resize", lang.hitch(this, function() {
         this._resizeGroup(group);
@@ -322,6 +330,16 @@ define([
 
     _setConfiguration: function(config) {
       if(this.propUIs && this.propUIs.length) this._destroyChildrenDeferred();
+
+      if (this.groups) {
+        this.previousGroupsOpenState = {};
+        for (var groupName in this.groups) {
+          if (this.groups.hasOwnProperty(groupName)) {
+            this.previousGroupsOpenState[groupName] = {};
+            this.previousGroupsOpenState[groupName].open = this.groups[groupName].open || false;
+          }
+        }
+      }
 
       this.propUIs = [];
       this.groups  = {};
