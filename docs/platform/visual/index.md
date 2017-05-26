@@ -85,7 +85,7 @@ mvn package
 # Deploying the visualization
 
 To deploy the visualization to a Pentaho product (Pentaho Server or PDI), 
-copy the KAR file you just built (located at `assemblies/target`) into its `karaf/deploy` folder.
+copy the KAR file you just built (located at `assemblies/target`) into its `system/karaf/deploy` folder.
 See [OSGi Artifacts Deployment](../osgi-deployment) if you need more information.
 
 If everything went well, you should now see your visualization being offered in Analyzer and/or PDI:
