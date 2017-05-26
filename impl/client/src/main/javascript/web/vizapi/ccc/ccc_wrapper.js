@@ -3069,7 +3069,7 @@ define([
         _getDoubleClickSelection: function(scene) {
             var complex = scene.group || scene.datum;
             if(complex) {
-                return this._complexToCellSelection(complex, this._selectionExcludesMultiGems());
+                return this._complexToCellSelection(complex, false);
             }
         },
 
