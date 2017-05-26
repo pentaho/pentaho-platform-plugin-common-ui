@@ -259,20 +259,20 @@ define([
 
   // region Viz API 3.0 palettes
   var viz_api_neutral = [
-    "#005EAA", "#03A9F4", "#FF7900", "#F2C249", "#5F43C4", "#946FDD",
-    "#00845B", "#18C482", "#5B5B5B", "#C6C6C6", "#B71C1C", "#F75B57"
+    "#005DA6", "#03A9F4", "#FF7900", "#F2C249", "#5F43C4", "#946FDD",
+    "#00845B", "#18C482", "#A4C65F", "#AFE73E", "#B71C1C", "#F75B57"
   ];
   paletteRegistry.add({name: "viz_api_neutral", colors: viz_api_neutral});
 
   var viz_api_light = [
     "#80AFD5", "#81D4FA", "#FFBC80", "#F8E1A4", "#AFA1E2", "#C9B7EE",
-    "#80C2AD", "#8BE2C1", "#ADADAD", "#E2E2E2", "#DB8E8E", "#FBADAB"
+    "#80C2AD", "#8BE2C1", "#BFD09D", "#CBEC8A", "#DB8E8E", "#FBADAB"
   ];
   paletteRegistry.add({name: "viz_api_light", colors: viz_api_light});
 
   var viz_api_dark = [
     "#002644", "#014462", "#663000", "#604E1D", "#261B4E", "#3B2C58",
-    "#003524", "#094E34", "#242424", "#4F4F4F", "#490B0B", "#632422"
+    "#003524", "#094E34", "#668032", "#74A611", "#490B0B", "#632422"
   ];
   paletteRegistry.add({name: "viz_api_dark", colors: viz_api_dark});
 
