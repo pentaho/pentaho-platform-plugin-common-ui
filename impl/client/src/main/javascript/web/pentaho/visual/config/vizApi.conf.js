@@ -40,6 +40,8 @@ define(function() {
     isActive: 0
   };
 
+  var notSelectedColor = "rgb(234,234,234)";
+
   return {
     rules: [
       // region Model Rules
@@ -941,7 +943,7 @@ define(function() {
       var istate = getInteractionState(this);
 
       if(!istate.isActive && istate.isSelected < 0) {
-        c = c.alpha(0.5);
+        c = getPv().color(notSelectedColor);
       } else if(istate.isActive && istate.isSelected > -1) {
         // 20% darker
         c = c.hsl();
@@ -961,8 +963,14 @@ define(function() {
 
       var istate = getInteractionState(this);
 
-      if(!istate.isActive && istate.isSelected < 1) {
-        c = c.alpha(0.5);
+      if(!istate.isActive) {
+        if (istate.isSelected < 0) {
+          // TODO: alpha value for non-selected items still under discussion by UX
+          c = getPv().color(notSelectedColor);
+          c = c.alpha(0.75);
+        } else {
+          c = c.alpha(0.5);
+        }
       } else if(istate.isActive && istate.isSelected > 0) {
         // 20% darker
         c = c.hsl();
@@ -983,8 +991,7 @@ define(function() {
       var istate = getInteractionState(this);
 
       if(!istate.isActive && istate.isSelected < 0) {
-        c = c.hsl();
-        c = c.lightness(c.l * (1 + 0.2));
+        c = getPv().color(notSelectedColor);
       } else if(istate.isActive && istate.isSelected > -1) {
         // 20% darker
         c = c.hsl();
