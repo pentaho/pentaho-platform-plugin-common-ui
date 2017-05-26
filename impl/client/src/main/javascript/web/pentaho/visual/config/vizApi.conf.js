@@ -967,6 +967,7 @@ define(function() {
         if (istate.isSelected < 0) {
           // TODO: alpha value for non-selected items still under discussion by UX
           c = getPv().color(notSelectedColor);
+          c = c.alpha(0.75);
         } else {
           c = c.alpha(0.5);
         }
