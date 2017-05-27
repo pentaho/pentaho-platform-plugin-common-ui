@@ -81,6 +81,9 @@ relative to the _previous_ stock visualizations.
 
 1. Printing of scrolled charts shrinks them to fit, breaking their aspect-ratio.
 2. Printing does not reflect custom configurations.
+3. The Analyzer property used to configure a custom color palette, 
+   `chart.series.colors`, is not supported for new visualizations and, 
+   currently, there is no direct counterpart.
 
 
 ## Changing the visualization format of stock visualizations.
@@ -113,9 +116,6 @@ in a Pentaho Server installation.
 Visualizations of the _new_ format are however configured using the 
 [platform-wide JavaScript configuration system](configuration), 
 and so, the Analyzer _previous_ format visualization settings must be migrated to it.
-
-Despite this, the color palette Analyzer option, `chart.series.colors`, 
-is still supported for previous and new visualizations.
 
 ### General visualization properties
 

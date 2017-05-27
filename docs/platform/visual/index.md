@@ -54,7 +54,7 @@ Creating a visualization boils down to creating:
 
 - One [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) — 
   which _identifies_ the visualization and 
-  _defines_ it in terms of its their data requirements, 
+  _defines_ it in terms of its data requirements, 
   such as the visual degrees of freedom it has (e.g. _X position_, _color_ and _size_) and 
   any major options that affect its rendering, — and
 
