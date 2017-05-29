@@ -37,6 +37,15 @@ If you later decide to switch-back Analyzer to using the previous format of stoc
 the visualization part of this report will not be available and 
 the report will be displayed in the Pivot table view.
 
+{% include callout.html content="<h2>Remember</h2>
+<p>When you choose to try out the new format of stock visualizations:</p>
+<ol>
+    <li>For precaution, be sure to create a backup of your existing Analyzer reports.</li>
+    <li>To be sure that you are satisfied with the new experience, 
+        test all of your existing Analyzer reports before saving any of them.
+    </li>
+</ol>" type="warning" %}
+
 Fresh Pentaho installations are configured to use the new format stock visualizations, 
 while upgrade installations are configured to keep using the previous format stock visualizations.
 
@@ -72,6 +81,9 @@ relative to the _previous_ stock visualizations.
 
 1. Printing of scrolled charts shrinks them to fit, breaking their aspect-ratio.
 2. Printing does not reflect custom configurations.
+3. The Analyzer property used to configure a custom color palette, 
+   `chart.series.colors`, is not supported for new visualizations and, 
+   currently, there is no direct counterpart.
 
 
 ## Changing the visualization format of stock visualizations.
@@ -104,9 +116,6 @@ in a Pentaho Server installation.
 Visualizations of the _new_ format are however configured using the 
 [platform-wide JavaScript configuration system](configuration), 
 and so, the Analyzer _previous_ format visualization settings must be migrated to it.
-
-Despite this, the color palette Analyzer option, `chart.series.colors`, 
-is still supported for previous and new visualizations.
 
 ### General visualization properties
 

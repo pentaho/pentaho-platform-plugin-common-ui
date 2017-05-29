@@ -54,7 +54,7 @@ Creating a visualization boils down to creating:
 
 - One [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) — 
   which _identifies_ the visualization and 
-  _defines_ it in terms of its their data requirements, 
+  _defines_ it in terms of its data requirements, 
   such as the visual degrees of freedom it has (e.g. _X position_, _color_ and _size_) and 
   any major options that affect its rendering, — and
 
@@ -85,7 +85,7 @@ mvn package
 # Deploying the visualization
 
 To deploy the visualization to a Pentaho product (Pentaho Server or PDI), 
-copy the KAR file you just built (located at `assemblies/target`) into its `karaf/deploy` folder.
+copy the KAR file you just built (located at `assemblies/target`) into its `system/karaf/deploy` folder.
 See [OSGi Artifacts Deployment](../osgi-deployment) if you need more information.
 
 If everything went well, you should now see your visualization being offered in Analyzer and/or PDI:
