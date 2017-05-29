@@ -20,7 +20,7 @@
  * The service locator allows JavaScript components to declare dependency on other components in terms of the name of
  * a _logical_ service.
  * Other modules that provide such logical service should register as such.
- * See []{@link pentaho.service.locator}.
+ * See [pentaho.service.locator]{@link pentaho.service.locator}.
  *
  * **AMD Plugin Usage**: `"pentaho/service!{logical-module-name}?meta&single&ids"`
  *

@@ -19,7 +19,7 @@
  *
  * This service allows loading a message bundle given its identifier as the AMD/RequireJS loader plugin parameter.
  *
- * Message bundle Identifiers have the general form of AMD/RequireJS module identifiers.
+ * Message bundle identifiers have the general form of AMD/RequireJS module identifiers.
  * When relative, the full message bundle identifier is resolved relative to the requesting module's parent module.
  *
  * The following example loads the message bundle having the full identifier of `foo.bar`.
