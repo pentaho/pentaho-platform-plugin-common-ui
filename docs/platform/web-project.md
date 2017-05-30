@@ -41,23 +41,23 @@ in your <user-home>/.m2 directory
 
 ## Recommended Maven project directory layout
 
-Pentaho maven OSGI projects are commonly composed by a [root project](https://maven.apache.org/guides/introduction/introduction-to-the-pom.html) that contains an `impl` 
+Pentaho maven OSGi projects are commonly composed by a [root project](https://maven.apache.org/guides/introduction/introduction-to-the-pom.html) that contains an `impl` 
 folder for bundle implementation [modules](https://maven.apache.org/guides/mini/guide-multiple-modules.html) and an `assemblies` folder for modules concerning the provisioning of those bundles.
 
 If the project contemplates multiple bundles then `impl` will itself include multiple 
 modules, one for each bundle. If the project only has a single bundle then it is OK for `impl` to 
 directly contain the bundle implementation module without the need for a sub module.
 
-A provisioning module, in the context of a Pentaho OSGI project, is a module that automates, 
+A provisioning module, in the context of a Pentaho OSGi project, is a module that automates, 
 as much as possible, the creation of a feature file and potentially the KAR file that allows that feature 
 to be easily deployed. 
-One reason why multiple provisioning modules might exist is that it may desired to deploy the bundle(s) in 
-different applications such as pentaho-server and pdi-client (spoon). The different 
+One reason why multiple provisioning modules might exist is that it may be desirable to deploy the bundle(s) in 
+different products such as Pentaho Server and PDI. The different 
 targets may warrant different configurations or dependency provisioning and thus different features 
 and KAR files.
 
-In order to take advantadge of Pentaho conventions and build pipeline, the root project should have
-the [`pentaho-ce-bundle-parent-pom`](https://github.com/pentaho/maven-parent-poms/blob/7.1.0.0-R/pentaho-ce-parent-pom/pentaho-ce-jar-parent-pom/pentaho-ce-bundle-parent-pom/pom.xml) as its parent project.
+In order to take advantage of Pentaho conventions and build pipeline, the root project should have 
+[`pentaho-ce-bundle-parent-pom`](https://github.com/pentaho/maven-parent-poms/blob/7.1.0.0-R/pentaho-ce-parent-pom/pentaho-ce-jar-parent-pom/pentaho-ce-bundle-parent-pom/pom.xml) as its parent project.
 
 
 ### Bundle modules
@@ -81,21 +81,21 @@ Consider the following example folder structure for `impl`:
 | | | | | | |____blueprint
 ```
 
-On this example case we have a single bundle and as such its source folder is directly under the `impl` 
+On this example case, we have a single bundle and as such its source folder is directly under the `impl` 
 folder  (`impl/src`) instead of being on a dedicated sub module (`impl/myBundleModule/src`).
 
-The `impl/src/main/config/javascript/osgi` folder contains the configuration file for the optimisation that
+The `impl/src/main/config/javascript/osgi` folder contains the configuration file for the optimization that
 is to be performed by the [RequireJS optimizer](http://requirejs.org/docs/optimization.html) when building 
-the bundle. If the configuration file exists but does not specify any configuration option then by default 
-each javascript file is minimised in place and source maps are generated.
+the bundle. If the configuration file exists but does not specify any configuration option then, by default, 
+each javascript file is minified in place and source maps are generated.
 
 The `impl/src/main/resources/META-INF/js` folder is where the [`package.json`](./web-package) descriptor should 
-be placed at.
+be placed.
 
-The `impl/src/main/resources/OSGI-INF/blueprint` folder contains one or more [blueprint descriptor files](https://www.ibm.com/developerworks/library/os-osgiblueprint/). For web projects the blueprint descriptor is mostly used 
-to register bundle resources to be available in a given URL. This is done by declaring a 
+The `impl/src/main/resources/OSGI-INF/blueprint` folder contains one or more [blueprint descriptor files](https://www.ibm.com/developerworks/library/os-osgiblueprint/). For web projects, the blueprint descriptor is mostly used 
+to register bundle resources so that they become available at a given URL. This is done by declaring a 
 [service](https://www.ibm.com/developerworks/library/os-osgiblueprint/#servman) that implements the resource 
-mapping from the [whiteboard extender](http://ops4j.github.io/pax/web/SNAPSHOT/User-Guide.html#WhiteboardExtender-Howdoesithelponresourceregistration). For example:
+mapping from the [whiteboard extender](http://ops4j.github.io/pax/web/SNAPSHOT/User-Guide.html#WhiteboardExtender-Howdoesithelponresourceregistration). For example, a descriptor file (e.g. `blueprint.xml`) would contain:
 
 ```xml
 <service interface="org.ops4j.pax.web.extender.whiteboard.ResourceMapping">
@@ -107,7 +107,7 @@ mapping from the [whiteboard extender](http://ops4j.github.io/pax/web/SNAPSHOT/U
 ```
 
 Finally, the Javascript source code is to be placed in `impl/src/main/javascript/web`. The `web` 
-folder name is a convention but the project creator may change it as long as the value of 
+folder name is a convention. The project creator may change it as long as the value of 
 the `path` property for the resource mapping service is changed accordingly in the blueprint descriptor.
 
 
@@ -123,15 +123,15 @@ Consider the following example folder structure for `assemblies`:
 | | | | |____feature
 ```
 
-As it was the case for the `impl` folder example, here we have a single module for provisioning located 
+As it was the case for the `impl` folder example, here we have a single module for provisioning, located 
 directly in the `assemblies` folder. It is this module that is responsible for building
-the KAR file for deploy.
+the KAR file for deployment.
 
-Not only your bundle but also the client-side dependencies of your package — declared in the 
-[`package.json`](./web-package) file — must be provided to the platform as bundles. 
+Not only your bundle, but also the client-side dependencies of your package declared in the 
+[`package.json`](./web-package) file, must be provided to the platform as bundles. 
 
-If they are third-party code that means you would have to bundle them yourself, creating separate modules, etc. 
-Luckily there is a project that already packages client-side web libraries as JAR files. 
+If they are third-party code, that means you would have to bundle them yourself, creating separate modules, etc. 
+Fortunately, there is a project that already packages client-side web libraries as JAR files. 
 It is appropriately called [WebJars](http://www.webjars.org). All you have to do is to look for the needed 
 libraries (the [NPM flavor](http://www.webjars.org/npm) is recommended), choose the right versions and copy 
 their Maven artifact information (groupId, artifactId and version).
@@ -163,7 +163,7 @@ This will build all implementation and provisioning modules. The result of the b
 `target` folder located in the folder of the corresponding module.
 
 For the example given above, after building and if all went well, the `impl/target` folder will contain a JAR 
-file that corresponds to your bundle. If you would like to check its content simply unzip it. 
+file that corresponds to your bundle. If you would like to check its content, simply unzip it. 
 
 Likewise, The KAR file will be located at `assemblies/target` and you can check that your feature file, bundle and 
 bundle dependencies are zipped within it. 
