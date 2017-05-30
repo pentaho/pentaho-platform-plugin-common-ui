@@ -259,7 +259,7 @@ define([
 
   // region Viz API 3.0 palettes
   var viz_api_neutral = [
-    "#005EAA", "#03A9F4", "#FF7900", "#F2C249", "#5F43C4", "#946FDD",
+    "#005DA6", "#03A9F4", "#FF7900", "#F2C249", "#5F43C4", "#946FDD",
     "#00845B", "#18C482", "#A4C65F", "#AFE73E", "#B71C1C", "#F75B57"
   ];
   paletteRegistry.add({name: "viz_api_neutral", colors: viz_api_neutral});
