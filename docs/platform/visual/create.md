@@ -49,13 +49,13 @@ The result is the following `package.json` content:
 
 ```json
 { 
-  "name": "pentaho/visual/samples/bar",
-  "version": "1.0.0",
+  "name": "pentaho-visual-samples-bar",
+  "version": "0.0.1",
   
   "config": {
     "pentaho/service": {
-      "pentaho/visual/samples/bar_1.0.0/model": "pentaho/visual/base",
-      "pentaho/visual/samples/bar_1.0.0/config": "pentaho.config.spec.IRuleSet"
+      "pentaho-visual-samples-bar_0.0.1/model": "pentaho/visual/base",
+      "pentaho-visual-samples-bar_0.0.1/config": "pentaho.config.spec.IRuleSet"
     }
   },
   
@@ -74,7 +74,32 @@ Additionally, any client-side dependencies must also be provided to the platform
 The recommended way is to put the visualization bundle, its dependencies, 
 and corresponding feature definition together into a single KAR file.
 
-See [Create a Pentaho Web Project for a Web Package and its Dependencies](../web-project) for instructions.
+If you are not familiar with  details about Pentaho Web projects please see [Create a Pentaho Web Project for a Web Package and its Dependencies](../web-project).
+
+To do so we've prepared a maven project that can be used as the foundation to create the KAR file for the
+D3 visualization developed in the previous sections.
+
+1. Clone the repository `https://github.com/pentaho/pentaho-engineering-samples`.
+1. Copy the stub maven project at `Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/web-project/` to a folder of your choice, e.g. `myWebProject`. Make sure the folder path does not contain whitespaces. 
+1. Do a recursive find and replace for the following strings:
+   1. _myGroupId_ - Replace with the group identifier of your choice. Commonly associated with the company or organization where the artifact was developed.
+   1. _myArtifactId_ - Replace with the `name` set in your `package.json` (i.e. `pentaho-visual-samples-bar`).
+1. Copy the resources developed during the [Bar/D3 Visualization in Sandbox](samples/bar-d3-sandbox) walk-through. Put the css folder and `model.js`, `view-d3.js` and `config.js` files at `impl/src/main/javascript/web`.
+1. Create a `package.json` file at `impl/src/main/resources/META-INF/js` with the content defined in the [previous section](#2-create-the-pentaho-web-package).
+1. Edit the feature descriptor at `assemblies/src/main/feature/feature.xml` to include the dependency on D3:
+   
+   ```xml
+   <features name="${project.artifactId}-repo" xmlns="http://karaf.apache.org/xmlns/features/v1.2.1">
+     <feature name="${project.artifactId}" version="${project.version}">
+       <feature>pentaho-requirejs-osgi-manager</feature>
+       <feature>pentaho-deployers</feature>
+       <bundle>pentaho-webjars:mvn:org.webjars.npm/d3/4.8.0</bundle>
+     </feature>
+   </features>
+   ```
+1. Run `mvn package` at the root maven project (e.g. `myWebProject`).
+1. Your KAR file for deployment should now be available at `assemblies/target`.
+
 
 ## 4. Next Steps
 

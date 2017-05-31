@@ -70,7 +70,8 @@ how to create an OSGi artifact containing the visualization,
 so that it can be deployed to a Pentaho product.
 
 {% include callout.html content="<h2>Fast-lane</h2>
-<p>If you prefer, you can skip the walk-through and get the final Pentaho Web Project, and build it.</p>
+<p>If you prefer, you can skip the walk-through and get the final Pentaho Web Project, and build it. First make sure that you have git and maven 3+ installed and that this <a href='https://github.com/pentaho/maven-parent-poms/blob/master/maven-support-files/settings.xml'>settings.xml</a> is in your USER_HOME/.m2 directory.</p>
+
 <pre class='highlight'><code># Clone the repository.
 git clone https://github.com/pentaho/pentaho-engineering-samples
 
