@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -167,7 +166,7 @@ public class MetadataService extends PentahoBase {
       ModelInfo modelInfo = new ModelInfo();
       modelInfo.setDomainId( domain );
       modelInfo.setModelId( model.getId() );
-      modelInfo.setModelName( StringEscapeUtils.escapeHtml( model.getName( locale ) ) );
+      modelInfo.setModelName( model.getName( locale ) );
       if ( model.getDescription() != null ) {
         String modelDescription = model.getDescription( locale );
         modelInfo.setModelDescription( modelDescription );
