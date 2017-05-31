@@ -14,12 +14,12 @@
  * limitations under the License.
  *
  */
-define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/on", "dojox/html/entities", 'pentaho/common/SmallImageButton',
+define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/on", 'pentaho/common/SmallImageButton',
   'pentaho/common/ListBox',
   'pentaho/common/Dialog',
   'pentaho/common/MessageBox', "dojo/_base/lang", 'dojo/text!pentaho/common/datasourceselect.html',
   'dojo/Stateful', 'dojo/has', 'dojo/_base/sniff'],
-  function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, entities, SmallImageButton, ListBox, Dialog, MessageBox, lang, templateStr, Stateful, has) {
+  function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, SmallImageButton, ListBox, Dialog, MessageBox, lang, templateStr, Stateful, has) {
     return declare("pentaho.common.datasourceselect", [Stateful, Dialog, _TemplatedMixin, _WidgetsInTemplateMixin],
 
       {
@@ -234,10 +234,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this.msgBox.setLocalizationLookupFunction(this.getLocaleString);
             }
 
-            this.msgBox.buttons = [this.getLocaleString('Yes'), this.getLocaleString('No')];
-            this.msgBox.setTitle(this.getLocaleString('DeleteDatasourceWarningTitle'));
-            this.msgBox.setMessage(this.getLocaleString('DeleteDatasourceWarning', entities.encode(this.getSelectedModel().name)));
-
+            this.msgBox.buttons = [this.getLocaleString('Ok'), this.getLocaleString('Cancel')];
+            this.msgBox.setTitle(this.getLocaleString('Warning'));
+            this.msgBox.setMessage(this.getLocaleString('DeleteDatasourceWarning'));
             this.msgBox.callbacks = [
               lang.hitch(this, this.deleteDatasource2),
               lang.hitch(this, function () {

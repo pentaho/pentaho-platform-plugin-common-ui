@@ -17,8 +17,6 @@
 
 package org.pentaho.common.ui.metadata.service;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -54,11 +52,7 @@ public class MetadataServiceTest {
 
   private static final String DOMAIN_NAME = "testDomain";
   private static final String MODEL_ID = "visibleModelId";
-  private static final String MODEL_NAME = " visibleModelName";
-  private static final String MODEL_ID_XSS = "zModelId_XSS";
   private static final String CTX = "testContext";
-  private static final String XSS_STRING = "<iMg SrC=x OnErRoR=alert(11113)>";
-
 
   private MetadataService metadataService;
 
@@ -78,15 +72,9 @@ public class MetadataServiceTest {
     visibleModel = mock( LogicalModel.class );
     doReturn( "testCtx0," + CTX ).when( visibleModel ).getProperty( "visible" );
     doReturn( MODEL_ID ).when( visibleModel ).getId();
-    doReturn( MODEL_NAME ).when( visibleModel ).getName( DEFAULT_LOCALE );
+    doReturn( "visibleModelName" ).when( visibleModel ).getName( DEFAULT_LOCALE );
     doReturn( new LocalizedString() ).when( visibleModel ).getDescription();
     doReturn( "visibleModelDescLocale" ).when( visibleModel ).getDescription( DEFAULT_LOCALE );
-    LogicalModel visibleModel2 = mock( LogicalModel.class );
-    doReturn( "testCtx0," + CTX ).when( visibleModel2 ).getProperty( "visible" );
-    doReturn( MODEL_ID_XSS ).when( visibleModel2 ).getId();
-    doReturn( XSS_STRING ).when( visibleModel2 ).getName( DEFAULT_LOCALE );
-    doReturn( new LocalizedString() ).when( visibleModel2 ).getDescription();
-    doReturn( "visibleModelDescLocale" ).when( visibleModel2 ).getDescription( DEFAULT_LOCALE );
 
     LogicalModel invisibleModel = mock( LogicalModel.class );
     doReturn( "testCtx0,testCtx1" ).when( invisibleModel ).getProperty( "visible" );
@@ -94,7 +82,6 @@ public class MetadataServiceTest {
     List<LogicalModel> listModels = new ArrayList<LogicalModel>( 2 );
     listModels.add( visibleModel );
     listModels.add( invisibleModel );
-    listModels.add( visibleModel2 );
 
     validDomain = mock( Domain.class );
     doReturn( listModels ).when( validDomain ).getLogicalModels();
@@ -127,7 +114,7 @@ public class MetadataServiceTest {
   public void testListBusinessModelsWithoutDomainName() throws Exception {
     ModelInfo[] result = metadataService.listBusinessModels( StringUtils.EMPTY, CTX );
     assertNotNull( result );
-    assertEquals( 2, result.length );
+    assertEquals( 1, result.length );
     assertEquals( DOMAIN_NAME, result[0].getDomainId() );
     assertEquals( visibleModel.getId(), result[0].getModelId() );
     assertEquals( visibleModel.getName( DEFAULT_LOCALE ), result[0].getModelName() );
@@ -138,7 +125,7 @@ public class MetadataServiceTest {
   public void testListBusinessModels() throws Exception {
     ModelInfo[] result = metadataService.listBusinessModels( DOMAIN_NAME, CTX );
     assertNotNull( result );
-    assertEquals( 2, result.length );
+    assertEquals( 1, result.length );
     assertEquals( DOMAIN_NAME, result[0].getDomainId() );
     assertEquals( visibleModel.getId(), result[0].getModelId() );
     assertEquals( visibleModel.getName( DEFAULT_LOCALE ), result[0].getModelName() );
@@ -149,7 +136,7 @@ public class MetadataServiceTest {
   public void testListBusinessModelsJson() throws IOException {
     String json = metadataService.listBusinessModelsJson( DOMAIN_NAME, CTX );
     assertEquals(
-        "[{\"class\":\"org.pentaho.common.ui.metadata.model.impl.ModelInfo\",\"domainId\":\"testDomain\",\"modelDescription\":\"visibleModelDescLocale\",\"modelId\":\"visibleModelId\",\"modelName\":\" visibleModelName\"},{\"class\":\"org.pentaho.common.ui.metadata.model.impl.ModelInfo\",\"domainId\":\"testDomain\",\"modelDescription\":\"visibleModelDescLocale\",\"modelId\":\"zModelId_XSS\",\"modelName\":\"&lt;iMg SrC=x OnErRoR=alert(11113)&gt;\"}]",
+        "[{\"class\":\"org.pentaho.common.ui.metadata.model.impl.ModelInfo\",\"domainId\":\"testDomain\",\"modelDescription\":\"visibleModelDescLocale\",\"modelId\":\"visibleModelId\",\"modelName\":\"visibleModelName\"}]",
         json );
   }
 
@@ -316,14 +303,5 @@ public class MetadataServiceTest {
 
     String result = metadataService.getQueryXmlFromJson( json );
     assertEquals( resultXml, result );
-  }
-
-  @Test
-  public void testListBusinessModelsXSS() throws Exception {
-    ModelInfo[] result = metadataService.listBusinessModels( DOMAIN_NAME, CTX );
-    assertNotNull( result );
-    assertEquals( 2, result.length );
-    assertFalse( XSS_STRING.equals( result[1].getModelName() ) );
-    assertFalse( result[1].getModelName().contains( "<" ) );
   }
 }
