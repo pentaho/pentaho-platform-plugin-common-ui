@@ -2462,7 +2462,7 @@ define([
                             //  "[Department].[USA]" : "#AAFF00"
                             // }
                             scaleFactory = function() {
-                                return function(compKey) {
+                                function colorScale(compKey) {
                                     if(compKey) {
                                         var keys     = compKey.split("~"),
                                             level    = keys.length - 1,
@@ -2476,7 +2476,23 @@ define([
                                         return def.getOwn(colorMap, keyLevel) ||
                                             (level ? undefined : defaultScale(keyLevel));
                                     }
+                                }
+
+                                colorScale.available = function(compKey) {
+                                    if(compKey) {
+                                        var keys     = compKey.split("~"),
+                                            level    = keys.length - 1,
+                                            keyLevel = keys[level];
+
+                                        // Obtain color for most specific key from color map.
+                                        // We have a fixed color if color map has that key or it is the 1st level.
+                                        // Otherwise, return false, meaning that a derived color should be used.
+                                        return !level || def.getOwn(colorMap, keyLevel);
+                                    }
+                                    return false;
                                 };
+
+                                return colorScale;
                             };
                         }
 
@@ -4057,7 +4073,7 @@ define([
             valuesVisible: true,
             valuesOverflow: 'trim',
             valuesOptimizeLegibility: false,
-            colorMode: 'slice'
+            colorMode: 'fan'
         },
 
         _discreteColorRole: 'rows',
