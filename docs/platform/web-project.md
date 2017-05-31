@@ -66,19 +66,19 @@ Consider the following example folder structure for `impl`:
 
 ```
 |____rootProject
-| |____impl
-| | |____src
-| | | |____main
-| | | | |____config
-| | | | | |____javascript
-| | | | | | |____osgi
-| | | | |____javascript
-| | | | | |____web
-| | | | |____resources
-| | | | | |____META-INF
-| | | | | | |____js
-| | | | | |____OSGI-INF
-| | | | | | |____blueprint
+  |____impl
+    |____src
+      |____main
+        |____config
+        | |____javascript
+        |   |____osgi
+        |____javascript
+        | |____web
+        |____resources
+          |____META-INF
+          | |____js
+          |____OSGI-INF
+            |____blueprint
 ```
 
 On this example case, we have a single bundle and as such its source folder is directly under the `impl` 
@@ -117,10 +117,10 @@ Consider the following example folder structure for `assemblies`:
 
 ```
 |____rootProject
-| |____assemblies
-| | |____src
-| | | |____main
-| | | | |____feature
+  |____assemblies
+    |____src
+      |____main
+        |____feature
 ```
 
 As it was the case for the `impl` folder example, here we have a single module for provisioning, located 
