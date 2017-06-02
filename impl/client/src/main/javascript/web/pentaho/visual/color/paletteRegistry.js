@@ -196,7 +196,7 @@ define([
       /**
        * Gets an array with all registered color palettes.
        *
-       * Do **not** modify the returned array.
+       * The returned array should not be modified.
        *
        * @return {Array.<pentaho.visual.color.IColorPalette>} An array of color palettes.
        */

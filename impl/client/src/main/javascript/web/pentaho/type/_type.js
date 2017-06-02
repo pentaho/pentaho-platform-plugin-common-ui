@@ -887,7 +887,7 @@ define([
       /**
        * Gets the style classes of this and any base types.
        *
-       * Do **not** modify the returned array.
+       * The returned array should not be modified.
        *
        * @type {string[]}
        * @readonly
