@@ -22,13 +22,13 @@ define([
 
   return function(context) {
 
-    var Refinement = context.get("pentaho/type/refinement");
+    var PentahoString = context.get("string");
 
-    return Refinement.extend({
+    return PentahoString.refine({
+
       type: {
         id: module.id,
-        of: "number",
-        facets: ["DiscreteDomain"],
+        mixins: ["discreteDomain"],
         domain: [1, 2, 3, 4, 5]
       }
     })

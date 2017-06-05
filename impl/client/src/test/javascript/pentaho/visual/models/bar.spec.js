@@ -29,6 +29,7 @@ define([
   var BarModel = context.get("pentaho/visual/models/bar");
 
   describe("pentaho.visual.ccc.bar.Model", function() {
+
     it("should be a function", function() {
       expect(typeof BarModel).toBe("function");
     });
@@ -42,6 +43,7 @@ define([
     });
 
     it("should create a valid instance", function() {
+
       var dataTable = new Table({
         model: [
           {name: "foo", type: "number"}
@@ -59,9 +61,11 @@ define([
     });
 
     it("should have a default view", function(done) {
+
       expect(!!BarModel.type.defaultView).toBe(true);
 
       BarModel.type.defaultViewClass.then(function(BarView) {
+
         expect(typeof BarView).toBe("function");
 
         done();

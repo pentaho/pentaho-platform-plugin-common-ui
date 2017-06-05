@@ -22,12 +22,12 @@ define([
 
   return function(context) {
 
-    var Refinement = context.get("pentaho/type/refinement");
+    var PentahoString = context.get("string");
 
-    return Refinement.extend({
+    return PentahoString.refine({
+
       type: {
-        id: module.id,
-        of: "string"
+        id: module.id
       }
     })
     .implement({type: bundle.structured.color});

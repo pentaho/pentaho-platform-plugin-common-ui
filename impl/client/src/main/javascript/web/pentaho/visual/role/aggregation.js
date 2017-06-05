@@ -15,15 +15,14 @@
  */
 define([
   "module",
-  "pentaho/type/string",
   "pentaho/i18n!messages"
-], function(module, stringFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
   return function(context) {
 
-    var PentahoString = context.get(stringFactory);
+    var PentahoString = context.get("string");
 
     /**
      * @name pentaho.visual.role.Aggregation

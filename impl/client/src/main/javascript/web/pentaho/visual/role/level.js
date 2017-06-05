@@ -15,12 +15,8 @@
  */
 define([
   "module",
-  "pentaho/i18n!messages",
-  "pentaho/type/string",
-  "pentaho/type/number",
-  "pentaho/type/date",
-  "pentaho/type/simple"
-], function(module, bundle, stringFactory, numberFactory, dateFactory, simpleFactory) {
+  "pentaho/i18n!messages"
+], function(module, bundle) {
 
   "use strict";
 
@@ -28,11 +24,11 @@ define([
 
     var orderedLevels = ["nominal", "ordinal", "quantitative"];
 
-    var PentahoString = context.get(stringFactory);
+    var PentahoString = context.get("string");
 
-    var pentahoNumber = context.get(numberFactory).type;
-    var pentahoDate = context.get(dateFactory).type;
-    var pentahoSimple = context.get(simpleFactory).type;
+    var pentahoNumber = context.get("number").type;
+    var pentahoDate = context.get("date").type;
+    var pentahoSimple = context.get("simple").type;
 
     /**
      * @name pentaho.visual.role.MeasurementLevel.Type
