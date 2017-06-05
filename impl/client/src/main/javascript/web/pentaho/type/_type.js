@@ -135,11 +135,10 @@ define([
 
         // Don't use inherited property definition which may be writable false
 
-        Object.defineProperty(this, "_alias",    {value: null, writable: true});
+        Object.defineProperty(this, "_alias", {value: null, writable: true});
         Object.defineProperty(this, "_hasDescendants", {value: false, writable: true});
 
         this._styleClass = null;
-
 
         this._application = specUtil.merge({}, this._application);
       },
