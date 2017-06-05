@@ -16,31 +16,43 @@
 define([
   "module",
   "pentaho/i18n!messages",
+  "pentaho/type/string",
   "pentaho/type/number",
   "pentaho/type/date",
   "pentaho/type/simple"
-], function(module, bundle, numberFactory, dateFactory, simpleFactory) {
+], function(module, bundle, stringFactory, numberFactory, dateFactory, simpleFactory) {
 
   "use strict";
 
   return function(context) {
 
-    var Refinement = context.get("refinement");
     var orderedLevels = ["nominal", "ordinal", "quantitative"];
+
+    var PentahoString = context.get(stringFactory);
 
     var pentahoNumber = context.get(numberFactory).type;
     var pentahoDate = context.get(dateFactory).type;
     var pentahoSimple = context.get(simpleFactory).type;
 
     /**
+     * @name pentaho.visual.role.MeasurementLevel.Type
+     * @class
+     * @extends pentaho.type.String.Type
+     * @extends pentaho.type.facets.DiscreteDomain.Type
+     *
+     * @classDesc The type class of {@link pentaho.visual.role.MeasurementLevel}.
+     */
+
+    /**
      * @name pentaho.visual.role.MeasurementLevel
      * @class
      * @extends pentaho.type.String
+     * @extends pentaho.type.facets.DiscreteDomain
      *
      * @amd {pentaho.type.Factory<pentaho.visual.role.MeasurementLevel>} pentaho/visual/role/level
      *
-     * @classDesc The `MeasurementLevel` class is **a refinement of** the
-     * [String]{@link pentaho.type.String} simple type that represents a **Level or Measurement**,
+     * @classDesc The `MeasurementLevel` class is **a refinement of** [String]{@link pentaho.type.String}
+     * that represents a **Level or Measurement**,
      * as understood by [S. S. Steven]{@link https://en.wikipedia.org/wiki/Level_of_measurement}.
      *
      * Currently, the following levels of measurement are supported:
@@ -79,13 +91,13 @@ define([
      *    Only the {@link pentaho.type.Number} and {@link pentaho.type.Date} data types
      *    can be (directly) represented by a quantitative visual role.
      */
-    return Refinement.extend("pentaho.visual.role.MeasurementLevel", {
+
+    var Level = PentahoString.refine({
 
       type: /** @lends pentaho.visual.role.MeasurementLevel.Type# */{
 
         id: module.id,
-        of: "string",
-        facets: ["DiscreteDomain"],
+        mixins: ["discreteDomain"],
         domain: orderedLevels,
 
         /**
@@ -122,7 +134,7 @@ define([
         },
 
         /**
-         * Returns a value that indicates if a given type can only be associated with
+         * Gets a value that indicates if a given type can only be associated with
          * a qualitative level of measurement.
          *
          * Any type that is not one of (or a subtype of)
@@ -141,22 +153,25 @@ define([
         },
 
         /**
-         * Compares two levels of measurement according to the order from _lowest_ to _highest_.
+         * Compares two levels of measurement strings according to the order from _lowest_ to _highest_.
          *
          * A level of measurement that is not one of the
          * {@link pentaho.visual.role.MeasurementLevel} values
          * is considered lower than these.
          *
-         * @param {string|pentaho.type.String} [a] The first level of measurement.
-         * @param {string|pentaho.type.String} [b] The second level of measurement.
+         * @param {string} [a] The first level of measurement.
+         * @param {string} [b] The second level of measurement.
          *
          * @return {number} A negative number, if `a` is _lower_ than `b`;
          * a positive number, if `a` is _higher_ than `b`;
          * and, `0`, if these are same level of measurement.
+         *
+         * @protected
          */
-        compare: function(a, b) {
-          var indexA = orderedLevels.indexOf(a.valueOf());
-          var indexB = orderedLevels.indexOf(b.valueOf());
+        _compareValues: function(a, b) {
+          /* eslint no-multi-spaces: 0 */
+          var indexA = orderedLevels.indexOf(a);
+          var indexB = orderedLevels.indexOf(b);
           return indexA === indexB ?  0 : // includes both negative
                  indexA < 0        ? -1 : // undefined is lowest
                  indexB < 0        ? +1 : // idem
@@ -165,5 +180,7 @@ define([
       }
     })
     .implement({type: bundle.structured.level});
+
+    return Level;
   };
 });

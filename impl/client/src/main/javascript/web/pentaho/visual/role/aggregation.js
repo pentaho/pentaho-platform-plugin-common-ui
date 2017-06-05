@@ -15,24 +15,26 @@
  */
 define([
   "module",
+  "pentaho/type/string",
   "pentaho/i18n!messages"
-], function(module, bundle) {
+], function(module, stringFactory, bundle) {
 
   "use strict";
 
   return function(context) {
 
-    var Refinement = context.get("refinement");
+    var PentahoString = context.get(stringFactory);
 
     /**
      * @name pentaho.visual.role.Aggregation
      * @class
      * @extends pentaho.type.String
+     * @extends pentaho.type.facets.DiscreteDomain
      *
      * @amd {pentaho.type.Factory<pentaho.visual.role.Aggregation>} pentaho/visual/role/aggregation
      *
-     * @classDesc The `Aggregation` class is **a refinement of** the
-     * [String]{@link pentaho.type.String} simple type that represents an **aggregation** operation.
+     * @classDesc The `Aggregation` class is **a refinement of** [String]{@link pentaho.type.String}
+     * that represents an **aggregation** operation.
      *
      * Currently, the following aggregations are supported:
      *
@@ -42,11 +44,10 @@ define([
      * * `max` - Maximum (applicable to ordinal types)
      * * `mode` - Mode (applicable to any type)
      */
-    return Refinement.extend("pentaho.visual.role.Aggregation", {
+    return PentahoString.refine({
       type: {
         id: module.id,
-        of: "string",
-        facets: ["DiscreteDomain"],
+        mixins: ["discreteDomain"],
         domain: ["sum", "avg", "min", "max", "first", "last"]
       }
     })
