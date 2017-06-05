@@ -668,7 +668,8 @@ define([
               }
             }
 
-            this.levels.sort(MeasurementLevel.type.compare);
+            var levelType = MeasurementLevel.type;
+            this.levels.sort(levelType.compare.bind(levelType));
           }
         },
 

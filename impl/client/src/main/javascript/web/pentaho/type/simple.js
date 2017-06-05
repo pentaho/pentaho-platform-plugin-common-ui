@@ -431,6 +431,103 @@ define([
         },
         // endregion
 
+        // region equality and comparison
+        /**
+         * Gets a value that indicates if two distinct, non {@link Nully} simple values are, nonetheless,
+         * considered equal.
+         *
+         * The default implementation considers two values equal if the
+         * primitive value of one is equal to the primitive value of the other.
+         * If both values are simple values, then they must have the same constructor.
+         *
+         * @param {any} va - The first value.
+         * @param {any} vb - The second value.
+         *
+         * @return {boolean} `true` if two simple values are considered equal; `false`, otherwise.
+         *
+         * @protected
+         */
+        _areEqual: function(va, vb) {
+          if((va instanceof Simple) && (vb instanceof Simple)) {
+            if(va.constructor !== vb.constructor) {
+              return false;
+            }
+          }
+          return va.valueOf() === vb.valueOf();
+        },
+
+        /**
+         * Gets a value that indicates if one simple value of this type is considered equal to a distinct,
+         * non-nully value, but possibly not a value instance.
+         *
+         * The default implementation considers two values equal if the
+         * primitive value of one is equal to the primitive value of the other.
+         * If `vb` is also a simple value, then it must have the same constructor as `va`.
+         *
+         * @param {!pentaho.type.Value} va - The value instance.
+         * @param {any} vb - The other value.
+         *
+         * @return {boolean} `true` if two values are considered equal; `false`, otherwise.
+         *
+         * @protected
+         *
+         * @see pentaho.type.Simple.Type#_areEqual
+         */
+        _isEqual: function(va, vb) {
+          if(vb instanceof Simple) {
+            if(va.constructor !== vb.constructor) {
+              return false;
+            }
+          }
+          return va._value === vb.valueOf();
+        },
+
+        // TODO: consider creating a key counterpart for order: `ordinal` to use in comparisons.
+
+        /**
+         * Compares two non-equal, non-{@link Nully} values according to their order.
+         *
+         * If both values are simple values and their constructors are different,
+         * then they're assumed to have the same order.
+         * Otherwise, the two values are compared by the natural ascending order of their primitive value.
+         * If both primitive values are numbers or {@link Date} objects, numeric order is used.
+         * Otherwise, their string representations are compared in lexicographical order.
+         *
+         * @param {any} va - The first value.
+         * @param {any} vb - The second value.
+         *
+         * @return {number} `-1` if `va` is considered _before_ `vb`; `1` is `va` is considered _after_ `vb`;
+         * `0`, otherwise.
+         *
+         * @protected
+         */
+        _compare: function(va, vb) {
+          // Dunno how to compare apples and bananas.
+          if((va instanceof Simple) && (vb instanceof Simple)) {
+            if(va.constructor !== vb.constructor) {
+              return 0;
+            }
+          }
+
+          return this._compareValues(va.valueOf(), vb.valueOf());
+        },
+
+        /**
+         * Compares two primitive values according to their order.
+         *
+         * @param {any} a - The first value.
+         * @param {any} b - The second value.
+         *
+         * @return {number} `-1` if `a` is considered _before_ `b`; `1` is `a` is considered _after_ `b`;
+         * `0`, otherwise.
+         *
+         * @protected
+         */
+        _compareValues: function(a, b) {
+          return fun.compare(a, b);
+        },
+        // endregion
+
         // region serialization
         /** @inheritDoc */
         _fillSpecInContext: function(spec, keyArgs) {

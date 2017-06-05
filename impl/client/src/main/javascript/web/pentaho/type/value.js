@@ -72,22 +72,16 @@ define([
       /**
        * Gets the key of the value.
        *
-       * The key of a value identifies it among values of the same concrete type.
-       *
-       * Two values of the same concrete type and with the same key represent the same entity.*
-       *
-       * If two values have the same concrete type and their
-       * keys are equal, then it must also be the case that
-       * {@link pentaho.type.Value.Type#areEqual}
-       * returns `true` when given the two values.
-       * The opposite should be true as well.
-       * If two values of the same concrete type have distinct keys,
-       * then {@link pentaho.type.Value.Type#areEqual} should return `false`.
+       * The key of a value must identify it among values of the same concrete type.
+       * Two values of the same concrete type and with the same key represent the same entity.
        *
        * The default implementation returns the result of calling `toString()`.
        *
        * @type {string}
        * @readonly
+       *
+       * @see pentaho.type.Value#equals
+       * @see pentaho.type.Value.Type#areEqual
        */
       get key() {
         return this.toString();
@@ -104,22 +98,17 @@ define([
       /**
        * Determines if a given value, of the same type, represents the same entity.
        *
-       * The given value **must** be of the same concrete type (or the result is undefined).
+       * The default implementation delegates the operation to the
+       * [_isEqual]{@link pentaho.type.Value.Type#_isEqual} method.
        *
-       * To test equality for any two arbitrary values,
-       * in a robust way, use {@link pentaho.type.Value.Type#areEqual}.
-       *
-       * If two values are equal, they must have an equal {@link pentaho.type.Value#key}.
-       * Otherwise, if they are different, they must have a different `key`.
-       *
-       * The default implementation returns `true` if the two values
-       * have the same `key`; or, `false`, otherwise.
-       *
-       * @param {!pentaho.type.Value} other - A value to test for equality.
+       * @param {any} other - A value to test for equality.
        * @return {boolean} `true` if the given value is equal to this one; or, `false`, otherwise.
+       *
+       * @see pentaho.type.Value#key
+       * @see pentaho.type.Value.Type#areEqual
        */
       equals: function(other) {
-        return this === other || this.key === other.key;
+        return this === other || (other != null && this.type._isEqual(this, other));
       },
 
       // region validation
@@ -308,23 +297,72 @@ define([
 
         // region equality
         /**
-         * Gets a value that indicates if two given values are equal.
+         * Gets a value that indicates if two given values are considered equal.
          *
+         * Two values are considered equal if they represent the same real-world entity.
+         *
+         * If two values are considered equal,
+         * their value instances must have an equal [key]{@link pentaho.type.Value#key}.
+         * Conversely, if they are considered different,
+         * their value instances must have a different `key`.
+         *
+         * If the values are identical as per JavaScript's `===` operator, `true` is returned.
          * If both values are {@link Nully}, `true` is returned.
          * If only one is {@link Nully}, `false` is returned.
-         * If the values have different constructors, `false` is returned.
-         * Otherwise, {@link pentaho.type.Value#equals} is called
-         * on `va`, with `vb` as an argument, and its result is returned.
+         * Otherwise, the operation is delegated to the {@link pentaho.type.Value#_areEqual} method.
          *
-         * @param {pentaho.type.Value|Nully} [va] The first value.
-         * @param {pentaho.type.Value|Nully} [vb] The second value.
+         * @param {any} va - The first value.
+         * @param {any} vb - The second value.
          *
-         * @return {boolean} `true` if two values are equal; `false`, otherwise.
+         * @return {boolean} `true` if two values are considered equal; `false`, otherwise.
+         *
+         * @see pentaho.type.Value#key
+         * @see pentaho.type.Value.Type#_areEqual
+         * @see pentaho.type.Value.Type#_isEqual
          */
         areEqual: function(va, vb) {
-          return va === vb || (va == null && vb == null) ||
-                 (va != null && vb != null &&
-                  (va.constructor === vb.constructor) && va.equals(vb));
+          return va === vb || (va == null && vb == null) || (va != null && vb != null && this._areEqual(va, vb));
+        },
+
+        /**
+         * Gets a value that indicates if two distinct, non-{@link Nully} values are, nonetheless, considered equal.
+         *
+         * The default implementation checks if one of the values is a value instance, and, if so,
+         * delegates the operation to its type's {@link pentaho.type.Value#_isEqual} method.
+         *
+         * @param {!any} va - The first value.
+         * @param {!any} vb - The second value.
+         *
+         * @return {boolean} `true` if two values are considered equal; `false`, otherwise.
+         *
+         * @protected
+         *
+         * @see pentaho.type.Value.Type#areEqual
+         */
+        _areEqual: function(va, vb) {
+          return (va instanceof Value) ? va.type._isEqual(va, vb) :
+                 (vb instanceof Value) ? vb.type._isEqual(vb, va) :
+                 false;
+        },
+
+        /**
+         * Gets a value that indicates if one instance of this type is considered equal to a distinct,
+         * non-nully value, but possibly not a value instance.
+         *
+         * The default implementation considers two values equal if
+         * they have the same constructor and equal keys.
+         *
+         * @param {!pentaho.type.Value} va - The value instance.
+         * @param {any} vb - The other value.
+         *
+         * @return {boolean} `true` if two values are considered equal; `false`, otherwise.
+         *
+         * @protected
+         *
+         * @see pentaho.type.Value.Type#areEqual
+         */
+        _isEqual: function(va, vb) {
+          return (va.constructor === vb.constructor) && (va.key === vb.key);
         },
         // endregion
 

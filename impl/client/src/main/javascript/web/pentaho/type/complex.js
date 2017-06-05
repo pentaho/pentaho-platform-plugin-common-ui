@@ -770,12 +770,12 @@ define([
         }
 
         var includeDefaults = !!keyArgs.includeDefaults;
-        var areEqual = this.type.areEqual;
+        var type = this.type;
 
         // reset
         keyArgs.forceType = false;
 
-        this.type.each(propToSpec, this);
+        type.each(propToSpec, this);
 
         return spec;
 
@@ -801,7 +801,7 @@ define([
               // However, this prevents serializing an empty list when the default is also empty.
               includeValue = (defaultValue && defaultValue.count > 0) || (value.count > 0);
             } else {
-              includeValue = !areEqual(defaultValue, value);
+              includeValue = !type.areEqual(defaultValue, value);
             }
           }
 
