@@ -385,9 +385,6 @@ define([
          *
          * The default implementation simply calls `value.validate()`.
          *
-         * Special types, like [refinement types]{@link pentaho.type.Refinement},
-         * perform additional validations on values.
-         *
          * @param {!pentaho.type.Value} value - The value to validate.
          *
          * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
@@ -488,7 +485,7 @@ define([
             }
 
             if(hasInstanceInterface) {
-              throw error.operInvalid(bundle.structured.errors.refinement.cannotExtendInstance);
+              throw error.operInvalid(bundle.structured.errors.accidental.cannotExtendInstance);
             }
 
             if(!isBaseAccident) {
@@ -506,7 +503,7 @@ define([
        *
        * @see pentaho.type.Value.Type#essence
        *
-       * @param {string} [name] A name of the refinement type used for debugging purposes.
+       * @param {string} [name] A name of the accidental type used for debugging purposes.
        * @param {{type: pentaho.type.spec.IValueTypeProto}} [instSpec] The instance specification.
        * It can only contain the `type` attribute.
        * @param {Object} [classSpec] The static specification.

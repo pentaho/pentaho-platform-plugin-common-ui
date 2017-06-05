@@ -18,5 +18,5 @@
  * @name pentaho.type.facets
  * @namespace
  *
- * @description The `facets` namespace contains the standard refinement facet mixin classes.
+ * @description The `facets` namespace contains the standard facet mixin classes.
  */

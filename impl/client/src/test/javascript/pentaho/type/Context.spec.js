@@ -736,26 +736,6 @@ define([
         });
         // endregion
 
-        // region refinement
-        it("should be able to create a refinement type using generic notation", function() {
-
-          return testGet(function(sync, Context) {
-            var context = new Context();
-            var promise = callGet(context, sync, {
-              base: "refinement",
-              of:   "number"
-            });
-
-            return promise.then(function(InstCtor) {
-              var Refinement = context.get("refinement");
-              expect(InstCtor.type.isSubtypeOf(Refinement.type)).toBe(true);
-
-              expect(InstCtor.ancestor).toBe(Refinement);
-            });
-          });
-        });
-        // endregion
-
         // region temporary ids
         it("should allow creating a type that contains a temporary type id", function() {
 
@@ -943,8 +923,10 @@ define([
           }
 
           function defineTempFacet(mid) {
-            localRequire.define(mid, ["pentaho/type/facets/Refinement"], function(Refinement) {
-              return Refinement.extend(null, {id: mid});
+            localRequire.define(mid, [], function() {
+              return function(context) {
+                return context.get("pentaho/type/value").extend({type: {id: mid}});
+              };
             });
           }
 
@@ -961,14 +943,11 @@ define([
           defineTempModule("pentaho/foo/dudu3");
           defineTempModule("pentaho/foo/dudu4");
           defineTempFacet("pentaho/foo/facets/Mixin1");
-          defineTempFacet("pentaho/foo/facets/Mixin2");
-          defineTempFacet("pentaho/foo/facets/Mixin3");
           defineTempProp("pentaho/foo/prop1");
 
           // -----
 
           var context = new Context();
-          var RefinementMixin2 = localRequire("pentaho/type/facets/Refinement").extend(null, {id: "my/facets/foo"});
           var spec = {
             base: "complex",
             props: [
@@ -976,25 +955,13 @@ define([
               {name: "foo2", type: {base: "pentaho/foo/dudu2"}},
               {name: "foo3", type: {base: "list", of: "pentaho/foo/dudu3"}},
               {name: "foo4", type: ["pentaho/foo/dudu3"]},
-              //{name: "foo5", type: ["string"]},
-              {name: "foo6", type: {
-                base: "refinement",
-                of: "pentaho/foo/dudu3",
-                facets: [
-                  "pentaho/foo/facets/Mixin1",
-                  "pentaho/foo/facets/Mixin2",
-                  "DiscreteDomain",
-                  RefinementMixin2
-                ]
-              }},
               {name: "foo7", type: {props: {
                 a: {type: "pentaho/foo/dudu4"},
                 b: {type: "pentaho/foo/dudu3"}
               }}},
               {name: "foo8", type: {
-                base: "refinement",
-                of: "string",
-                facets: "pentaho/foo/facets/Mixin3"
+                base: "pentaho/foo/dudu1",
+                mixins: ["pentaho/foo/facets/Mixin1"]
               }},
               {name: "foo9", base: "pentaho/foo/prop1", type: "string"}
             ]
@@ -1006,7 +973,7 @@ define([
                 expect(InstCtor.type.get("foo2").type.ancestor.id).toBe("pentaho/foo/dudu2");
                 expect(InstCtor.type.get("foo3").type.of.id).toBe("pentaho/foo/dudu3");
                 expect(InstCtor.type.get("foo7").type.get("a").type.id).toBe("pentaho/foo/dudu4");
-                expect(InstCtor.type.get("foo8").type.facets[0]).toBe(localRequire("pentaho/foo/facets/Mixin3"));
+                expect(InstCtor.type.get("foo8").type.mixins[0]).toBe(context.get("pentaho/foo/facets/Mixin1").type);
                 expect(InstCtor.type.get("foo9").isSubtypeOf(context.get("pentaho/foo/prop1").type)).toBe(true);
               });
         });

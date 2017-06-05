@@ -71,7 +71,6 @@
   requireTypeInfo["pentaho/type/property"] = {alias: "property", base: "instance"};
   requireTypeInfo["pentaho/type/list"] = {alias: "list", base: "value"};
   requireTypeInfo["pentaho/type/element"] = {alias: "element", base: "value"};
-  requireTypeInfo["pentaho/type/refinement"] = {alias: "refinement", base: "value"};
   requireTypeInfo["pentaho/type/complex"] = {alias: "complex", base: "element"};
   requireTypeInfo["pentaho/type/application"] = {alias: "application", base: "complex"};
   requireTypeInfo["pentaho/type/model"] = {alias: "model", base: "complex"};

@@ -251,7 +251,6 @@ define([
 
     // TODO: Removed from docs, below, until isIn is made public.
     // [pentaho/type/filter/isIn]{@link pentaho.type.filter.IsIn}
-
     /**
      * Gets the **configured instance constructor** of a type.
      *

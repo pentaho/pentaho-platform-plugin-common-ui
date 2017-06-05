@@ -18,6 +18,6 @@
  * @name pentaho.type.facets.spec
  * @namespace
  *
- * @description The `facets.spec` namespace contains specification interfaces for refinement facet
+ * @description The `facets.spec` namespace contains specification interfaces supporting facet mixin types.
  * mixin classes.
  */
