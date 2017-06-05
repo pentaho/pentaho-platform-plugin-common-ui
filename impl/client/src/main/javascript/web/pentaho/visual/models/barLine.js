@@ -20,9 +20,9 @@ define([
   "./types/labelsOption",
   "./types/shape",
   "./types/lineWidth",
-  "./mixins/interpolationType"
+  "./mixins/interpolated"
 ], function(module, baseModelFactory, bundle, labelsOptionFactory, shapeFactory, lineWidthFactory,
-    interpolationType) {
+    interpolatedFactory) {
 
   "use strict";
 
@@ -34,9 +34,10 @@ define([
 
       type: {
         id: module.id,
+        mixins: [interpolatedFactory],
+
         v2Id: "ccc_barline",
         category: "barchart",
-
         defaultView: "pentaho/ccc/visual/barLine",
 
         props: [
@@ -95,8 +96,6 @@ define([
         ]
       }
     })
-    .implement({type: interpolationType})
-    .implement({type: bundle.structured.interpolation})
     .implement({type: bundle.structured.barLine});
   };
 

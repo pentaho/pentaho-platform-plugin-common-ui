@@ -896,8 +896,6 @@ define([
      * @private
      */
     _getByFun: function(fun, sync) {
-      // make sure overrides don't confuse factory detection
-      fun = fun.valueOf();
 
       var proto = fun.prototype;
       var Instance = this._Instance;

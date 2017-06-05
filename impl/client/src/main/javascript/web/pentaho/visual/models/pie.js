@@ -18,8 +18,8 @@ define([
   "./abstract",
   "pentaho/i18n!./i18n/model",
   "./types/labelsOption",
-  "./mixins/settingsMultiChartType"
-], function(module, baseModelFactory, bundle, labelsOptionFactory, settingsMultiChartType) {
+  "./mixins/multiCharted"
+], function(module, baseModelFactory, bundle, labelsOptionFactory, multiChartedFactory) {
 
   "use strict";
 
@@ -30,6 +30,8 @@ define([
     return BaseModel.extend({
       type: {
         id: module.id,
+        mixins: [multiChartedFactory],
+
         v2Id: "ccc_pie",
         category: "piechart",
         defaultView: "pentaho/ccc/visual/pie",
@@ -67,8 +69,6 @@ define([
         ]
       }
     })
-    .implement({type: settingsMultiChartType})
-    .implement({type: bundle.structured.settingsMultiChart})
     .implement({type: bundle.structured.pie});
   };
 });

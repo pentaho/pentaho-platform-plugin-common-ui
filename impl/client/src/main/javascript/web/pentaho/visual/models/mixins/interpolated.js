@@ -14,38 +14,34 @@
  * limitations under the License.
  */
 define([
-  "../types/trendType",
-  "../types/lineWidth"
-], function(trendTypeFactory, lineWidthFactory) {
+  "module",
+  "../types/emptyCellMode",
+  "pentaho/visual/base/model",
+  "pentaho/i18n!../i18n/model"
+], function(module, emptyCellModeFactory, modelFactory, bundle) {
 
   "use strict";
 
-  function isApplicableTrend() {
-    /* jshint validthis:true */
-    return this.trendType !== "none";
-  }
+  // Used by: Line, BarLine e AreaStacked
 
-  // Used by: Line, Bar, Scatter
-  return {
-    props: [
-      {
-        name: "trendType",
-        type: trendTypeFactory,
-        isRequired: true,
-        value: "none"
-      },
-      {
-        name: "trendName",
-        type: "string",
-        isApplicable: isApplicableTrend
-      },
-      {
-        name: "trendLineWidth",
-        type: lineWidthFactory,
-        isApplicable: isApplicableTrend,
-        isRequired: true,
-        value: 1
+  return function(context) {
+
+    var BaseModel = context.get(modelFactory);
+
+    return BaseModel.extend({
+      type: {
+        id: module.id,
+        isAbstract: true,
+        props: [
+          {
+            name: "emptyCellMode",
+            type: emptyCellModeFactory,
+            isRequired: true,
+            value: "gap"
+          }
+        ]
       }
-    ]
+    })
+    .implement({type: bundle.structured.interpolation});
   };
 });

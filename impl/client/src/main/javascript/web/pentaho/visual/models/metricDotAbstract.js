@@ -18,11 +18,11 @@ define([
   "./cartesianAbstract",
   "pentaho/i18n!./i18n/model",
   "./types/labelsOption",
-  "./mixins/scaleColorContinuousType",
-  "./mixins/settingsMultiChartType",
-  "./mixins/trendType"
+  "./mixins/scaleColorContinuous",
+  "./mixins/multiCharted",
+  "./mixins/trended"
 ], function(module, baseModelFactory, bundle, labelsOptionFactory,
-    scaleColorContinuousType, settingsMultiChartType, trendType) {
+    scaleColorContinuousFactory, multiChartedFactory, trendedFactory) {
 
   "use strict";
 
@@ -34,6 +34,9 @@ define([
       type: {
         id: module.id,
         isAbstract: true,
+        // TODO: scaleColor... should only be applicable when color is continuous
+        mixins: [trendedFactory, scaleColorContinuousFactory, multiChartedFactory],
+
         category: "scatter",
 
         props: [
@@ -72,7 +75,7 @@ define([
                   countMax: function() {
                     var MeasurementLevel = this.type.context.get("pentaho/visual/role/level");
                     return MeasurementLevel.type.isQuantitative(this.levelEffective) ? 1 : null;
-                  }
+                  }// TODO: should only be applicable when color is continuous
                 }
               },
               instance: {
@@ -109,13 +112,6 @@ define([
         ]
       }
     })
-    // TODO: should only be applicable when color is continuous
-    .implement({type: scaleColorContinuousType})
-    .implement({type: bundle.structured.scaleColorContinuous})
-    .implement({type: settingsMultiChartType})
-    .implement({type: bundle.structured.settingsMultiChart})
-    .implement({type: trendType})
-    .implement({type: bundle.structured.trend})
     .implement({type: bundle.structured.metricDot});
   };
 });

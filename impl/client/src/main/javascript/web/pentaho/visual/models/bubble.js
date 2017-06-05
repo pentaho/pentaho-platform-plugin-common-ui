@@ -17,8 +17,8 @@ define([
   "module",
   "./metricDotAbstract",
   "pentaho/i18n!./i18n/model",
-  "./mixins/scaleSizeContinuousType"
-], function(module, baseModelFactory, bundle, scaleSizeContinuousType) {
+  "./mixins/scaleSizeContinuous"
+], function(module, baseModelFactory, bundle, scaleSizeContinuousFactory) {
 
   "use strict";
 
@@ -29,6 +29,8 @@ define([
     return BaseModel.extend({
       type: {
         id: module.id,
+        mixins: [scaleSizeContinuousFactory],
+
         v2Id: "ccc_scatter",
         defaultView: "pentaho/ccc/visual/bubble",
 
@@ -45,8 +47,6 @@ define([
         ]
       }
     })
-    .implement({type: scaleSizeContinuousType})
-    .implement({type: bundle.structured.scaleSizeContinuous})
     .implement({type: bundle.structured.bubble});
   };
 });

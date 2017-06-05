@@ -15,47 +15,51 @@
  */
 define([
   "module",
-  "./barAbstract",
-  "pentaho/i18n!./i18n/model",
-  "./types/labelsOption",
-  "./mixins/trended"
-], function(module, baseModelFactory, bundle, labelsOptionFactory, trendedFactory) {
+  "pentaho/visual/base/model",
+  "../types/trendType",
+  "../types/lineWidth",
+  "pentaho/i18n!../i18n/model"
+], function(module, modelFactory, trendTypeFactory, lineWidthFactory, bundle) {
 
   "use strict";
 
+  // Used by: Line, Bar, Scatter
+
   return function(context) {
 
-    var BaseModel = context.get(baseModelFactory);
+    var BaseModel = context.get(modelFactory);
 
     return BaseModel.extend({
       type: {
         id: module.id,
-        mixins: [trendedFactory],
-
-        v2Id: "ccc_bar",
-        category: "barchart",
-        defaultView: "pentaho/ccc/visual/bar",
-
+        isAbstract: true,
         props: [
           {
-            name: "measures", // VISUAL_ROLE
-            type: {
-              props: {attributes: {isRequired: true}}
-            },
-            ordinal: 7
-          },
-          {
-            name: "labelsOption",
-            type: {
-              base: labelsOptionFactory,
-              domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"]
-            },
+            name: "trendType",
+            type: trendTypeFactory,
             isRequired: true,
             value: "none"
+          },
+          {
+            name: "trendName",
+            type: "string",
+            isApplicable: isApplicableTrend
+          },
+          {
+            name: "trendLineWidth",
+            type: lineWidthFactory,
+            isApplicable: isApplicableTrend,
+            isRequired: true,
+            value: 1
           }
         ]
       }
     })
-    .implement({type: bundle.structured.bar});
+    .implement({type: bundle.structured.trend});
   };
+
+  function isApplicableTrend() {
+    /* jshint validthis:true */
+    return this.trendType !== "none";
+  }
 });

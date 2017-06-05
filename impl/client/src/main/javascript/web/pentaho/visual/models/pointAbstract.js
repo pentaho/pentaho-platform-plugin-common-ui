@@ -18,9 +18,9 @@ define([
   "./categoricalContinuousAbstract",
   "pentaho/i18n!./i18n/model",
   "./types/labelsOption",
-  "./mixins/settingsMultiChartType",
-  "./mixins/interpolationType"
-], function(module, baseModelFactory, bundle, labelsOptionFactory, settingsMultiChartType, interpolationType) {
+  "./mixins/multiCharted",
+  "./mixins/interpolated"
+], function(module, baseModelFactory, bundle, labelsOptionFactory, multiChartedFactory, interpolatedFactory) {
 
   "use strict";
 
@@ -32,6 +32,7 @@ define([
       type: {
         id: module.id,
         isAbstract: true,
+        mixins: [interpolatedFactory, multiChartedFactory],
         props: [
           {
             name: "rows", // VISUAL_ROLE
@@ -77,10 +78,6 @@ define([
       }
 
     })
-    .implement({type: settingsMultiChartType})
-    .implement({type: bundle.structured.settingsMultiChart})
-    .implement({type: interpolationType})
-    .implement({type: bundle.structured.interpolation})
     .implement({type: bundle.structured.pointAbstract});
   };
 });

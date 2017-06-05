@@ -20,9 +20,9 @@ define([
   "./types/displayUnits",
   "./types/labelsOption",
   "./types/sliceOrder",
-  "./mixins/settingsMultiChartType"
+  "./mixins/multiCharted"
 ], function(module, baseModelFactory, bundle, displayUnitsFactory, labelsOptionFactory, sliceOrderFactory,
-    settingsMultiChartType) {
+    multiChartedFactory) {
 
   "use strict";
 
@@ -33,6 +33,7 @@ define([
     return BaseModel.extend({
       type: {
         id: module.id,
+        mixins: [multiChartedFactory],
         v2Id: "ccc_sunburst",
         category: "treemapchart",
         defaultView: "pentaho/ccc/visual/sunburst",
@@ -91,8 +92,6 @@ define([
         ]
       }
     })
-    .implement({type: settingsMultiChartType})
-    .implement({type: bundle.structured.settingsMultiChart})
     .implement({type: bundle.structured.sunburst});
   };
 
