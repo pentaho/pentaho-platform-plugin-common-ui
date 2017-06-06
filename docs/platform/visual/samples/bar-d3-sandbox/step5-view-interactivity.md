@@ -245,7 +245,7 @@ function() {
   // Part 5
   bar.classed("selected", function(d) {
     var selectionFilter = view.selectionFilter;
-    return !!selectionFilter && dataTable.filterRow(selectionFilter, d.rowIndex);
+    return !!selectionFilter && dataTable.filterMatchesRow(selectionFilter, d.rowIndex);
   });
 }
 ```

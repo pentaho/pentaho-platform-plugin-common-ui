@@ -89,7 +89,8 @@ To deploy the visualization to a Pentaho product (Pentaho Server or PDI),
 copy the KAR file you just built (located at `assemblies/target`) into its `system/karaf/deploy` folder.
 See [OSGi Artifacts Deployment](../osgi-deployment) if you need more information.
 
-If everything went well, you should now see your visualization being offered in Analyzer and/or PDI:
+If everything went well, you should now see your visualization being offered in Analyzer and PDI, 
+as well as be able to use it in a [CDE](http://community.pentaho.com/ctools/cde/) dashboard:
 
 1. Your Bar/D3 visualization in Analyzer:
    
@@ -102,6 +103,15 @@ If everything went well, you should now see your visualization being offered in 
 3. Your Bar/D3 visualization in PDI:
    
    <img src="img/sample-bar-d3-pdi.png" alt="Bar/D3 in PDI" style="width: 777px;">
+
+4. Your Bar/D3 visualization in CDE:
+   
+   You can get the following dashboard from the
+   `https://github.com/pentaho/pentaho-engineering-samples` repository,
+   at the location:
+   `Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/bar-d3-cde`.
+   
+   <img src="img/sample-bar-d3-cde.png" alt="Bar/D3 in CDE" style="width: 777px;">
 
 <!-- TODO: Explain how to distribute it using marketplace? -->
 
