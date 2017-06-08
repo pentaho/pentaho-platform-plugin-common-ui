@@ -177,7 +177,7 @@ function() {
 
 Remarks:
   - Each time a bar is clicked, the current view's `selectionFilter` will be 
-    [replaced]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action' | append: '#SelectionModes'}})
+    [replaced]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action' | append: '#.SelectionModes'}})
     with the data filter associated with the clicked bar.
 
 ### Handle the `select` action event

@@ -25,7 +25,7 @@ All [stock visualizations](https://help.pentaho.com/Documentation/7.1/0L0/120/03
 with the exception of the [Geo Map](https://help.pentaho.com/Documentation/7.1/0L0/120/030/010#Geo_Map_Visualization), 
 are already available in the new format 
 and you **can choose** which format you want Analyzer to use, by configuring an Analyzer setting
-(see [Changing the visualization format of stock visualizations](Changing-the-visualization-format-of-stock-visualizations)).
+(see [Changing the visualization format of stock visualizations](./#changing-the-visualization-format-of-stock-visualizations)).
 This setting **does not** affect reports that use a custom (non-stock) visualization — 
 these will continue to use their visualization format, whether it is the previous or new.
 
@@ -74,7 +74,7 @@ relative to the _previous_ stock visualizations.
 
 1. Visualization configuration is performed in a different way, 
    so existing Analyzer visualization configurations need to be migrated;
-   see [Migrating visualization settings](Migrating-visualization-settings).
+   see [Migrating visualization settings](./#migrating-visualization-settings).
 2. Custom translations for properties of stock visualizations may not work anymore.
 
 ### Work In Progress
