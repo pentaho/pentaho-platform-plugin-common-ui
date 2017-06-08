@@ -23,6 +23,8 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, Promise:false, spyOn:false*/
 
+  /* jslint max-nested-callbacks: 7 */
+
   // Use alternate, promise-aware version of `it`.
   var it = testUtils.itAsync;
   var expectToRejectWith = testUtils.expectToRejectWith;
@@ -76,7 +78,7 @@ define([
 
         return require.using(["pentaho/type/Context"],
         function(Context) {
-          var customContext = {createChild: function(){}}; // duck typing
+          var customContext = {createChild: function() {}}; // duck typing
           var context = new Context(customContext);
           expect(context.vars).toBe(customContext);
         });
@@ -227,7 +229,7 @@ define([
         });
       }
 
-      /**
+      /*
        * Calls the get or getAsync method depending on the `sync` argument value.
        */
       function callGet(context, sync, spec) {
@@ -269,22 +271,22 @@ define([
         it("should throw on get, when the given id exists but hasn't been loaded yet", function() {
           return require.using(["pentaho/type/Context", "require"], function(Context, localRequire) {
 
-              var context = new Context();
+            var context = new Context();
 
-              localRequire.define("my/foo", [], function() {
-                return function(ctx) {
-                  return function() {};
-                };
-              });
-
-              // expect to throw
-              expect(function() {
-                context.get("my/foo");
-              }).toThrow();
+            localRequire.define("my/foo", [], function() {
+              return function(ctx) {
+                return function() {};
+              };
             });
+
+            // expect to throw
+            expect(function() {
+              context.get("my/foo");
+            }).toThrow();
+          });
         });
 
-        describe("should be able to get a standard type given its alias", function () {
+        describe("should be able to get a standard type given its alias", function() {
 
           var aliasMap = {
             "=": "pentaho/type/filter/isEqual",
@@ -292,8 +294,9 @@ define([
             "or": "pentaho/type/filter/or"
           };
 
-          Object.keys(standard).forEach(function (standardType) {
-            switch (standardType) {
+          Object.keys(standard).forEach(function(standardType) {
+            /* eslint default-case: 0 */
+            switch(standardType) {
               case "facets":
               case "filter":
                 return;
@@ -301,19 +304,19 @@ define([
             aliasMap[standardType] = "pentaho/type/" + standardType;
           });
 
-          Object.keys(aliasMap).forEach(function (alias) {
+          Object.keys(aliasMap).forEach(function(alias) {
 
-            it("for the alias '" + alias + "'", function () {
+            it("for the alias '" + alias + "'", function() {
 
-              return testGet(function (sync, Context) {
+              return testGet(function(sync, Context) {
                 var context = new Context();
                 var promise = callGet(context, sync, alias);
 
-                return promise.then(function (InstCtor) {
+                return promise.then(function(InstCtor) {
                   expect(InstCtor.type.id).toBe(aliasMap[alias]);
                 });
               });
-            })
+            });
           });
         });
 
@@ -335,7 +338,7 @@ define([
 
             var mid = "pentaho/foo/bar";
 
-            localRequire.define(mid,[], function() {
+            localRequire.define(mid, [], function() {
               return function(context) {
                 var Simple = context.get("pentaho/type/simple");
                 return Simple.extend({type: {id: mid}});
@@ -475,6 +478,193 @@ define([
             });
           });
         });
+
+        it("should not configure a type twice", function() {
+
+          return testGet(function(sync, Context) {
+
+            spyOn(Context.prototype, "_getConfig").and.callFake(function(id) {
+              if(id === "tests/foo/bar") {
+                return {foo: "bar", instance: {bar: "foo"}};
+              }
+            });
+
+            var context = new Context();
+            var Value = context.get("pentaho/type/value");
+            var Value2 = Value.extend({
+              type: {
+                id: "tests/foo/bar"
+              }
+            });
+
+            var ValueType2 = Value2.type.constructor;
+            spyOn(ValueType2, "implement").and.callThrough();
+
+            var promise = callGet(context, sync, Value2);
+
+            return promise.then(function(InstCtor) {
+              expect(InstCtor).toBe(Value2);
+
+              expect(Context.prototype._getConfig).toHaveBeenCalledWith("tests/foo/bar");
+              expect(ValueType2.implement).toHaveBeenCalledTimes(1);
+
+              expect(InstCtor.prototype.bar).toBe("foo");
+              expect(InstCtor.type.foo).toBe("bar");
+
+              var promise2 = callGet(context, sync, Value2);
+
+              return promise2.then(function(InstCtor) {
+                expect(InstCtor).toBe(Value2);
+
+                expect(ValueType2.implement).toHaveBeenCalledTimes(1);
+              });
+            });
+          });
+        });
+
+        it("should increment the configuration depth level while configuring a type", function() {
+
+          return testGet(function(sync, Context) {
+
+            spyOn(Context.prototype, "_getConfig").and.callFake(function(id) {
+              if(id === "tests/foo/bar") {
+                return {foo: "bar", instance: {bar: "foo"}};
+              }
+            });
+
+            var context = new Context();
+
+            expect(context._configDepth).toBe(0);
+
+            var Value = context.get("pentaho/type/value");
+            var Value2 = Value.extend({
+              type: {
+                id: "tests/foo/bar"
+              }
+            });
+
+            var ValueType2 = Value2.type.constructor;
+
+            spyOn(ValueType2, "implement").and.callFake(function() {
+
+              expect(context._configDepth).toBe(1);
+            });
+
+            var promise = callGet(context, sync, Value2);
+
+            return promise.then(function(InstCtor) {
+
+              expect(InstCtor).toBe(Value2);
+
+              expect(ValueType2.implement).toHaveBeenCalledTimes(1);
+
+              expect(context._configDepth).toBe(0);
+            });
+          });
+        });
+
+        it("should create accidental types for object specs when configuring a type", function() {
+
+          return testGet(function(sync, Context) {
+
+            spyOn(Context.prototype, "_getConfig").and.callFake(function(id) {
+              if(id === "tests/foo/bar") {
+                return {
+                  props: {
+                    "a": {
+                      type: { // object spec
+                        // NOTE: no need for `isAccident: true`
+                        mixins: ["discreteDomain"],
+                        domain: ["1", "2", "3"]
+                      }
+                    }
+                  }
+                };
+              }
+            });
+
+            var context = new Context();
+
+            expect(context._configDepth).toBe(0);
+
+            var Complex = context.get("pentaho/type/complex");
+            var Complex2 = Complex.extend({
+              type: {
+                id: "tests/foo/bar",
+                props: [
+                  {name: "a", type: "string"}
+                ]
+              }
+            });
+
+            var propA = Complex2.type.get("a");
+            expect(propA.type.isAccident).toBe(false);
+
+            var promise = callGet(context, sync, Complex2);
+
+            return promise.then(function(InstCtor) {
+
+              expect(InstCtor).toBe(Complex2);
+
+              propA = Complex2.type.get("a");
+
+              expect(propA.type.isAccident).toBe(true);
+            });
+          });
+        });
+
+        it("should not create accidental types for object specs having isAccident: false," +
+           " when configuring a type", function() {
+
+          return testGet(function(sync, Context) {
+
+            spyOn(Context.prototype, "_getConfig").and.callFake(function(id) {
+              if(id === "tests/foo/bar") {
+                return {
+                  props: {
+                    "a": {
+                      type: { // object spec
+                        // Just a subtype of string...
+                        isAccident: false
+                      }
+                    }
+                  }
+                };
+              }
+            });
+
+            var context = new Context();
+
+            expect(context._configDepth).toBe(0);
+
+            var Complex = context.get("pentaho/type/complex");
+            var Complex2 = Complex.extend({
+              type: {
+                id: "tests/foo/bar",
+                props: [
+                  {name: "a", type: "string"}
+                ]
+              }
+            });
+
+            var propA = Complex2.type.get("a");
+            var stringType = propA.type;
+
+            expect(propA.type.isAccident).toBe(false);
+
+            var promise = callGet(context, sync, Complex2);
+
+            return promise.then(function(InstCtor) {
+
+              expect(InstCtor).toBe(Complex2);
+
+              propA = Complex2.type.get("a");
+
+              expect(propA.type.isAccident).toBe(false);
+              expect(propA.type.ancestor).toBe(stringType);
+            });
+          });
+        });
       });
 
       describe("by type object", function() {
@@ -590,7 +780,7 @@ define([
 
               return testGet(function(sync, Context) {
                 var context = new Context();
-                var promise = callGet(context, sync, {id: 'value'});
+                var promise = callGet(context, sync, {id: "value"});
 
                 return promise.then(function(InstCtor) {
                   var Value = context.get("pentaho/type/value");
@@ -688,9 +878,9 @@ define([
           return testGet(function(sync, Context) {
             var context = new Context();
             var promise = callGet(context, sync, {
-                base: "list",
-                of:   {props: ["a", "b"]}
-              });
+              base: "list",
+              of: {props: ["a", "b"]}
+            });
 
             return promise.then(function(InstCtor) {
               expect(InstCtor.prototype instanceof context.get("list")).toBe(true);
@@ -866,7 +1056,7 @@ define([
           return testGet(function(sync, Context, localRequire, errorMatch) {
             var mid = "pentaho/foo/bar2";
 
-            localRequire.define(mid,[], function() {
+            localRequire.define(mid, [], function() {
               return function(context) {
                 return "not a function";
               };
@@ -890,9 +1080,9 @@ define([
           return testGet(function(sync, Context, localRequire, errorMatch) {
             var mid = "pentaho/foo/bar2";
 
-            localRequire.define(mid,[], function() {
+            localRequire.define(mid, [], function() {
               return function(context) {
-                return function(){};
+                return function() {};
               };
             });
 
@@ -1453,7 +1643,7 @@ define([
 
           // expect to throw
           expect(function() {
-          context.getAll("exp/thing");
+            context.getAll("exp/thing");
           }).toThrow();
         });
       });

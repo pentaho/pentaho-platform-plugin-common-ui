@@ -163,6 +163,21 @@ define([
           mainPlatformContext.createChild(platformContextSpec);
 
       /**
+       * The configuration depth is incremented each time the context
+       * starts configuring a type, and decremented when it finishes.
+       *
+       * When the configuration depth is greater than 0,
+       * types created through object-specifications default to be accidental types.
+       * In particular, this affects overriding property value types.
+       *
+       * @type {number}
+       * @private
+       * @see pentaho.type.Context#_getByInstCtor
+       * @see pentaho.type.Context#_getByObjectSpec
+       */
+      this._configDepth = 0;
+
+      /**
        * The ambient/current transaction, if any, or `null`.
        *
        * @type {pentaho.type.changes.Transaction}
@@ -953,7 +968,16 @@ define([
         if(id) {
           // Configuration is for the type-constructor.
           var config = this._getConfig(id);
-          if(config) type.constructor.implement(config);
+          if(config) {
+            try {
+              this._configDepth++;
+
+              type.constructor.implement(config);
+
+            } finally {
+              this._configDepth--;
+            }
+          }
 
           this._byTypeId[id] = InstCtor;
 
@@ -1070,6 +1094,12 @@ define([
     // specification context.
     _getByObjectSpecCore: function(id, baseTypeSpec, typeSpec, sync) {
       // if id and not loaded, the id is used later to register the new type under that id and configure it.
+
+      // If configuring, all spec-created types default to being accidental types.
+      if((this._configDepth > 0) && !("isAccident" in typeSpec)) {
+        typeSpec = Object.create(typeSpec);
+        typeSpec.isAccident = true;
+      }
 
       // A root generic type spec initiates a specification context.
       // Each root generic type spec has a separate specification context.
