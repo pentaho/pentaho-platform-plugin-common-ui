@@ -405,7 +405,7 @@ define([
          *
          * When `null` is returned, it is considered that the conversion is not possible.
          * For informing on the actual reason why the conversion is not possible,
-         * throw an [UserError]{@link pentaho.lang.UserError} should be used instead.
+         * throw an [UserError]{@link pentaho.lang.UserError} instead.
          *
          * The default implementation is the identity function.
          *

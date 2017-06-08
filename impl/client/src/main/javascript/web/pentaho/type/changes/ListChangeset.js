@@ -75,7 +75,7 @@ define([
     /**
      * Gets the list of contained primitive changes.
      *
-     * Do **NOT** modify the returned array in any way.
+     * The returned array should not be modified.
      *
      * @type {pentaho.type.change.PrimitiveChange[]}
      * @readOnly
