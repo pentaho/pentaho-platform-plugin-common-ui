@@ -34,7 +34,7 @@ as a service of type [`pentaho.config.spec.IRuleSet`]({{site.refDocsUrlPattern |
    like, for example, 
    [CDF](http://community.pentaho.com/ctools/cdf/) or 
    [Analyzer](http://www.pentaho.com/product/business-visualization-analytics).
-   See also [Known Values of Pentaho Environment Variables](./#known-values-of-pentaho-environment-variables).
+   See also [Known Values of Pentaho Environment Variables](#known-values-of-pentaho-environment-variables).
    
 2. The [**apply**]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule#apply'}}) object
    specifies the actual configuration properties and their values.
