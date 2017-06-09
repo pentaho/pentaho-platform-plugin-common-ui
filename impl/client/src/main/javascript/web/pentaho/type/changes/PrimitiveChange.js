@@ -29,7 +29,7 @@ define([
    *
    * @classDesc The `PrimitiveChange` class is the abstract base class of changes
    * that are the direct consequence of performing **primitive operations** on a
-   * [structured value]{@link pentaho.type.UStructuredValue}.
+   * [structured value]{@link pentaho.type.UContainer}.
    *
    * Primitive changes always exist in the context of a [Changeset]{@link pentaho.type.changes.Changeset}.
    *
