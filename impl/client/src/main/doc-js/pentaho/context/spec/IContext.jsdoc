@@ -57,6 +57,8 @@
 /**
  * The identifier of the locale.
  *
+ * Locales are converted to lower-case. Case differences are not significant.
+ *
  * @name locale
  * @memberOf pentaho.context.spec.IContext#
  * @type {?nonEmptyString}
