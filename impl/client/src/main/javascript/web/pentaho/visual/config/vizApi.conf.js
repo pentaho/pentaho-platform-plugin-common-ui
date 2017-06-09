@@ -84,7 +84,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/visual/models/metricDotAbstract"
+          type: "pentaho/visual/models/metricPointAbstract"
         },
         apply: {
           props: {
@@ -312,7 +312,7 @@ define(function() {
             "pentaho/ccc/visual/barLine",
             "pentaho/ccc/visual/waterfall",
             "pentaho/ccc/visual/boxplot",
-            "pentaho/ccc/visual/metricDotAbstract"
+            "pentaho/ccc/visual/metricPointAbstract"
           ]
         },
         apply: {
@@ -330,7 +330,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/ccc/visual/metricDotAbstract"
+          type: "pentaho/ccc/visual/metricPointAbstract"
         },
         apply: {
           extension: {
@@ -884,7 +884,7 @@ define(function() {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: "pentaho-cdf",
-          type: "pentaho/ccc/visual/metricDotAbstract"
+          type: "pentaho/ccc/visual/metricPointAbstract"
         },
         apply: {
           extension: {

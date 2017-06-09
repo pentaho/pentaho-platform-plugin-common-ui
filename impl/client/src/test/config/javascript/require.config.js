@@ -54,6 +54,7 @@
   requirePaths["pentaho/visual"] = basePath + "/pentaho/visual";
   requirePaths["pentaho/service"] = basePath + "/pentaho/service";
   requirePaths["pentaho/i18n"] = baseTest + "/pentaho/i18nMock";
+  requirePaths["pentaho/i18n/MessageBundle"] = basePath + "/pentaho/i18n/MessageBundle";
   requirePaths["pentaho/shim"] = basePath + "/pentaho/shim";
   requirePaths["pentaho/config"] = basePath + "/pentaho/config";
   requirePaths["pentaho/context"] = basePath + "/pentaho/context";

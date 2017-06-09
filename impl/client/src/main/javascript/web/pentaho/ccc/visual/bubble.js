@@ -16,7 +16,7 @@
 define([
   "module",
   "pentaho/visual/models/bubble",
-  "./metricDotAbstract"
+  "./metricPointAbstract"
 ], function(module, modelFactory, baseViewFactory) {
 
   "use strict";

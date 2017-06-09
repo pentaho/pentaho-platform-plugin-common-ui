@@ -15,7 +15,7 @@
  */
 define([
   "module",
-  "./metricDotAbstract",
+  "./metricPointAbstract",
   "pentaho/i18n!./i18n/model",
   "./mixins/scaleSizeContinuous"
 ], function(module, baseModelFactory, bundle, scaleSizeContinuousFactory) {

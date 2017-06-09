@@ -15,7 +15,7 @@
  */
 define([
   "module",
-  "pentaho/visual/models/metricDotAbstract",
+  "pentaho/visual/models/metricPointAbstract",
   "./cartesianAbstract",
   "./_trends"
 ], function(module, modelFactory, baseViewFactory) {
@@ -91,7 +91,7 @@ define([
 
         this.base();
 
-        this._configureAxisDisplayUnits(/* isPrimary: */true,  "base",  /* allowFractional: */true);
+        this._configureAxisDisplayUnits(/* isPrimary: */true, "base",  /* allowFractional: */true);
         this._configureAxisDisplayUnits(/* isPrimary: */false, "ortho", /* allowFractional: */true);
       }
     });

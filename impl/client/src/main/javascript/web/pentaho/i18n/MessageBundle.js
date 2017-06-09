@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "./object",
+  "../util/object",
   "../lang/ArgumentRequiredError"
 ], function(O, ArgumentRequiredError) {
 
