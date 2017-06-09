@@ -127,7 +127,7 @@ Being [ordinal]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Or
 means that it can visually encode discrete values 
 and their relative order.
 
-The [data]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Mode' | append: '#data'}}) property, 
+The [data]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model' | append: '#data'}}) property, 
 which is inherited from the base visualization model, 
 is given a dataset containing data for attributes such as _Product Family_ and _Sales_.
 The value of a visual role contains the names of the data attributes that are _mapped_ to it,
