@@ -59,8 +59,9 @@ define(function() {
     /**
      * Converts a string into a snake-like string.
      *
-     * Slashes, white space and underscores are converted to an hyphen character, `-`.
+     * Slashes, periods, white space and underscores are converted to an hyphen character, `-`.
      * Camel-case strings are split and joined by an hyphen character as well.
+     * Consecutive resulting hyphens are converted to a single hyphen.
      *
      * @param {string} name - The string to convert to snake-case.
      * @return {string} The snake-case string.
@@ -70,7 +71,8 @@ define(function() {
       if(name) {
         return name
             .replace(/([a-z\d])([A-Z])/g, "$1-$2")
-            .replace(/[\/\\_\s]+/g, "-")
+            .replace(/[\/\\_\s\.]+/g, "-")
+            .replace(/-+/g, "-")
             .toLowerCase();
       }
       return name;
