@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -201,17 +201,9 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
           var dojoFormat;
           var dateFormat = this._getDateFormat();
 
-          if(dateFormat.match(/(^|(?!y).)(y{1}(?!y))/)) {
-            return true;
-          }
-
           try {
             dojoFormat = this.localeFormatter.format(new Date(), {datePattern: dateFormat, selector: "date"});
           } catch(e) { //in case we have an invalid format and the format breaks
-            return true;
-          }
-
-          if(dateFormat.match(/m/)) {
             return true;
           }
 
