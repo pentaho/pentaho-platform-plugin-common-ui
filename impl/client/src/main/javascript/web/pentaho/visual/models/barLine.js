@@ -44,6 +44,7 @@ define([
           {
             name: "measures", // VISUAL_ROLE
             type: {
+              isAccident: true,
               props: {attributes: {isRequired: requiredOneMeasure}}
             }
           },

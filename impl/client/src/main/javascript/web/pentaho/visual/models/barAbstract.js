@@ -35,6 +35,7 @@ define([
           {
             name: "rows", // VISUAL_ROLE
             type: {
+              isAccident: true,
               levels: ["ordinal"]
             }
           }

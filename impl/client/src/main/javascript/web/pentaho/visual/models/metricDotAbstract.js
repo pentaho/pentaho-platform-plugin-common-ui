@@ -43,6 +43,7 @@ define([
           {
             name: "rows", // VISUAL_ROLE
             type: {
+              isAccident: true,
               levels: ["ordinal"],
               props: {attributes: {isRequired: true}}
             }
@@ -78,19 +79,17 @@ define([
                   }// TODO: should only be applicable when color is continuous
                 }
               },
-              instance: {
-                _getAttributesMaxLevel: function() {
-                  // If the mapping contains a single `date` attribute,
-                  // consider it ordinal, and not quantitative as the base code does.
-                  // Currently, CCC does not like dates in continuous color scales...
-                  if(this.attributes.count === 1) {
-                    var dataAttr = this.attributes.at(0).dataAttribute;
-                    if(dataAttr && dataAttr.type === "date")
-                      return "ordinal";
-                  }
-
-                  return this.base();
+              getAttributesMaxLevelOf: function(mapping) {
+                // If the mapping contains a single `date` attribute,
+                // consider it ordinal, and not quantitative as the base code does.
+                // Currently, CCC does not like dates in continuous color scales...
+                if(mapping.attributes.count === 1) {
+                  var dataAttr = mapping.attributes.at(0).dataAttribute;
+                  if(dataAttr && dataAttr.type === "date")
+                    return "ordinal";
                 }
+
+                return this.base(mapping);
               }
             },
             ordinal: 6
