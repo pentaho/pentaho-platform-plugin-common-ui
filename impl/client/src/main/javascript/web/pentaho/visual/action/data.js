@@ -15,10 +15,9 @@
  */
 define([
   "module",
-  "pentaho/type/action/base",
-  "pentaho/type/filter/abstract",
-  "pentaho/lang/ArgumentInvalidTypeError"
-], function(module, baseActionFactory, abstractFilterFactory, ArgumentInvalidTypeError) {
+  "pentaho/visual/action/base",
+  "pentaho/type/filter/abstract"
+], function(module, baseActionFactory, abstractFilterFactory) {
 
   "use strict";
 
@@ -32,7 +31,7 @@ define([
     /**
      * @name pentaho.visual.action.Data.Type
      * @class
-     * @extends pentaho.type.action.Base.Type
+     * @extends pentaho.visual.action.Base.Type
      *
      * @classDesc The base type class of data actions.
      *
@@ -51,14 +50,14 @@ define([
        * @alias Data
        * @memberOf pentaho.visual.action
        * @class
-       * @extends pentaho.type.action.Base
+       * @extends pentaho.visual.action.Base
        * @abstract
        *
        * @amd {pentaho.type.Factory<pentaho.visual.action.Data>} pentaho/visual/action/data
        *
        * @classDesc The `visual.action.Data` class is the base class of action types
        * which are performed on a subset of a dataset and
-       * whose [target]{@link pentaho.visual.action.Data#target} is a [View]{@link pentaho.visual.base.View}.
+       * whose [target]{@link pentaho.visual.action.Base#target} is a [View]{@link pentaho.visual.base.View}.
        *
        * The actual subset is determined by the [data filter]{@link pentaho.visual.action.Data#dataFilter} property.
        *
@@ -71,31 +70,6 @@ define([
         this.base(spec);
 
         this.dataFilter = spec && spec.dataFilter;
-      },
-
-      /**
-       * Gets the target *view* where the action is executing or has executed.
-       *
-       * This property contains the value of the `target` argument passed to
-       * [execute]{@link pentaho.type.action.Base#execute} or
-       * [executeAsync]{@link pentaho.type.action.Base#executeAsync},
-       * and is `null` before execution.
-       *
-       * @name target
-       * @memberOf pentaho.visual.action.Data#
-       * @type {pentaho.visual.base.View}
-       * @readonly
-       */
-
-      _setTarget: function(target) {
-
-        this.base(target);
-
-        // If not yet loaded, then, surely target isn't a BaseView...
-        if(!baseViewType) baseViewType = context.get("pentaho/visual/base/view").type;
-
-        if(!baseViewType.is(target))
-          throw new ArgumentInvalidTypeError("target", [baseViewType.id], typeof target);
       },
 
       /**
