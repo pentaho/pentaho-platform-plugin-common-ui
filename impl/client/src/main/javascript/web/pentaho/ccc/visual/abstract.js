@@ -1509,14 +1509,14 @@ define([
       _configureSelection: function() {
         var me = this;
         this.options.userSelectionAction = function(cccSelections) {
-          return me._onUserSelection(cccSelections);
+          return me._onUserSelection(cccSelections, this.event);
         };
         this.options.base_event = [["click", function() {
           me._onUserSelection([]);
         }]];
       },
 
-      _onUserSelection: function(selectingDatums) {
+      _onUserSelection: function(selectingDatums, srcEvent) {
         // Duplicates may occur due to excluded dimensions like the discriminator
 
         // TODO: improve detection of viz without attributes.
@@ -1544,7 +1544,8 @@ define([
         var SelectAction = this.type.context.get(selectActionFactory);
         var Or = this.type.context.get("or");
         this.act(new SelectAction({
-          dataFilter: new Or({operands: operands})
+          dataFilter: new Or({operands: operands}),
+          position: srcEvent ? {x: srcEvent.clientX, y: srcEvent.clientY} : null
         }));
 
         // Explicitly cancel CCC's native selection handling.
@@ -1557,21 +1558,24 @@ define([
       _configureDoubleClick: function() {
         var me = this;
         this.options.doubleClickAction = function(scene) {
-          me._onDoubleClick(scene.group || scene.datum);
+          me._onDoubleClick(scene.group || scene.datum, this.event);
         };
 
         this.options.axisDoubleClickAction = function(scene) {
           var group = scene.group;
-          if(group) return me._onDoubleClick(group);
+          if(group) return me._onDoubleClick(group, this.event);
         };
       },
 
-      _onDoubleClick: function(complex) {
+      _onDoubleClick: function(complex, srcEvent) {
         var ExecuteAction = this.type.context.get(executeActionFactory);
         var dataFilter = this._complexToFilter(complex);
         if(dataFilter != null) {
           var Or = this.type.context.get("or");
-          this.act(new ExecuteAction({dataFilter: new Or({operands: [dataFilter]})}));
+          this.act(new ExecuteAction({
+            dataFilter: new Or({operands: [dataFilter]}),
+            position: srcEvent ? {x: srcEvent.clientX, y: srcEvent.clientY} : null
+          }));
         }
       },
       // endregion

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
+ * Copyright 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,18 @@
  */
 
 /**
- * The `visual.action.spec.IData` interface describes a data action instance using a generic, _object_ form.
+ * The `visual.action.spec.IBase` interface describes a base action instance using a generic, _object_ form.
  *
- * @name pentaho.visual.action.spec.IData
+ * @name pentaho.visual.action.spec.IBase
  *
  * @interface
- * @extends pentaho.visual.action.spec.IBase
+ * @extends pentaho.type.action.spec.IBase
  */
 
 /**
- * The data filter of the action instance.
+ * The position where the action took place, in screen coordinates.
  *
- * When unspecified, the action targets the whole dataset.
- *
- * @name dataFilter
- * @memberOf pentaho.visual.action.spec.IData#
- * @type {pentaho.type.filter.spec.IAbstract|pentaho.type.filter.Abstract}
+ * @name position
+ * @memberOf pentaho.visual.action.spec.IBase#
+ * @type {pentaho.visual.spec.IPoint}
  */

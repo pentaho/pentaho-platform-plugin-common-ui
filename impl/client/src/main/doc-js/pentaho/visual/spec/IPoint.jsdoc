@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
+ * Copyright 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,25 @@
  */
 
 /**
- * The `visual.action.spec.IData` interface describes a data action instance using a generic, _object_ form.
+ * The `visual.spec.IPoint` interface describes a point instance using a generic, _object_ form.
  *
- * @name pentaho.visual.action.spec.IData
+ * @name pentaho.visual.spec.IPoint
  *
  * @interface
- * @extends pentaho.visual.action.spec.IBase
  */
 
 /**
- * The data filter of the action instance.
+ * The x coordinate of the point.
  *
- * When unspecified, the action targets the whole dataset.
+ * @name x
+ * @memberOf pentaho.visual.spec.IPoint#
+ * @type {number}
+ */
+
+/**
+ * The y coordinate of the point.
  *
- * @name dataFilter
- * @memberOf pentaho.visual.action.spec.IData#
- * @type {pentaho.type.filter.spec.IAbstract|pentaho.type.filter.Abstract}
+ * @name y
+ * @memberOf pentaho.visual.spec.IPoint#
+ * @type {number}
  */
