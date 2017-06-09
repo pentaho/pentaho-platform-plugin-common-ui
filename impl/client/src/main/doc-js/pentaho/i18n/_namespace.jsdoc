@@ -22,7 +22,7 @@
  * The **Pentaho Localization API** is constituted by an AMD/RequireJS loader plugin, {@link pentaho.i18n.IService},
  * and a couple of helper types which allow you to load message bundles for use in JavaScript components.
  *
- * Message bundles are exposed as instances of {@link pentaho.util.MessageBundle}.
+ * Message bundles are exposed as instances of {@link pentaho.i18n.MessageBundle}.
  *
  * The main localization service, and AMD/RequireJS loader plugin, is {@link pentaho.i18n.main}.
  *
