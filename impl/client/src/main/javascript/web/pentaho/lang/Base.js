@@ -15,7 +15,7 @@
  *    Namely, it is now possible to call the mixed-in class constructor
  *    to initialize an instance of another class.
  *
- * 5. `Class.init` is now inherited.
+ * 5. `Class.init` was removed.
  * 6. Added the `Class.to` method.
  *
  *    Converts its arguments to an instance of `Class`, or throws if that is impossible.
@@ -33,8 +33,8 @@
  * 10. `Base._prototyping` and `Base#_constructing` are no longer needed to
  *     control Class constructor and inst_extend flow.
  * 11. Class.valueOf removed. No longer needed... ?
- * 12. `Base#__root_proto__` is a new constant, non-enumerable property, set at each "Base" root prototype.
- * 13. `Base#__init__` is a new constant, non-enumerable, property, set at the prototype of "Base" classes
+ * 12. `Base#__base_root_proto__` is a new constant, non-enumerable property, set at each "Base" root prototype.
+ * 13. `Base#__base_init__` is a new constant, non-enumerable, property, set at the prototype of "Base" classes
  *     that have an own initialization method (specified with the `constructor` property).
  * 14. Added new Class.implementStatic method to allow to specify the class interface after extend.
  *     Is parallel to Class.implement.
@@ -59,32 +59,45 @@ define([
 
   // ## Support variables
 
-  // Used by `inst_extend_object`
   var F_toString = Function.prototype.toString;
   var O_hasOwn = Object.prototype.hasOwnProperty;
   var A_slice = Array.prototype.slice;
+  var _nextClassId = 1;
   var _excludeExtendInst = Object.freeze({
-        "base": 1,
-        "constructor": 1,
-        "extend_order": 1,
-        "extend_exclude": 1,
-        "__init__": 1,
-        "__root_proto__": 1,
-        "__extend_order__": 1,
-        "__extend_exclude__": 1
-      });
+    // Base.js gives special meaning to these properties in instance extend specifications
+
+    // Special when creating new classes:
+    //  Class#extend's instance specification
+    "constructor": 1,
+    "extend_order": 1,
+    "extend_exclude": 1,
+
+    // reserved for instances to call base methods.
+    "base": 1,
+
+    // Base.js custom prototype properties (stored in prototypes of Base.js classes)
+    "__base_init__": 1,
+    "__base_root_proto__": 1,
+    "__base_extend_order__": 1,
+    "__base_extend_exclude__": 1,
+    "__base_class_id__": 1,
+    "__base_bases__": 1,
+    "__base_ops__": 1
+  });
   var _excludeExtendStatic = Object.freeze({
-        "ancestor": 1,
-        "prototype": 1,
-        "valueOf": 1,
-        "Array": 1,
-        "Object": 1,
-        "base": 1,
-        "name": 1,
-        "displayName": 1,
-        "extend_order": 1,
-        "extend_exclude": 1
-      });
+    // Base.js custom constructor properties
+    "ancestor": 1,
+    "mixins": 1, // holds list of mixed in classes
+    "prototype": 1,
+    "valueOf": 1,
+    "Array": 1,
+    "Object": 1,
+    "base": 1, // overriding static methods sets `base` on constructors...
+    "name": 1,
+    "displayName": 1,
+    "extend_order": 1, // why in constructors?
+    "extend_exclude": 1
+  });
   var _isDebugMode = debugMgr.testLevel(DebugLevels.debug, module);
 
   return base_create();
@@ -209,6 +222,22 @@ define([
   }
 
   /**
+   * Gets or assigns the Base.js class id of a given prototype.
+   *
+   * Having a Base.js doesn't imply that a constructor is a class defined by Base.js.
+   * Every mixed in class gets assigned a Base.js id.
+   *
+   * @param {object} proto - The prototype.
+   * @param {boolean} [assign] - Indicates is an id is assigned when not present.
+   * @return {number} The Base.js class id.
+   */
+  function base_getOrAssignClassId(proto, assign) {
+    return O_hasOwn.call(proto, "__base_class_id__")
+        ? proto.__base_class_id__
+        : (assign ? (proto.__base_class_id__ = _nextClassId++) : null);
+  }
+
+  /**
    * Creates a `Base` root class.
    *
    * @param {!Class} NativeBase The native base constructor that this _Base_ root is rooted on.
@@ -232,6 +261,14 @@ define([
 
     BaseBoot.prototype = bootProto;
 
+    // Used by BaseBoot.extend, just below
+    bootProto.extend = inst_extend;
+    base_getOrAssignClassId(bootProto, true);
+    O.setConst(bootProto, "__base_bases__", Object.freeze({}));
+    O.setConst(bootProto, "__base_extend_exclude__", _excludeExtendInst);
+    O.setConst(bootProto, "__base_extend_order__", Object.freeze([]));
+    O.setConst(bootProto, "__base_ops__", Object.freeze([]));
+
     // Static interface that is inherited by all Base classes.
     BaseBoot.extend      = class_extend;
     BaseBoot._extend     = class_extend_core;
@@ -239,18 +276,13 @@ define([
     BaseBoot.mix         = class_mix;
     BaseBoot.implement   = class_implement;
     BaseBoot.implementStatic = class_implementStatic;
-    BaseBoot.toString    = properFunToString;
     BaseBoot.to          = class_to;
-    BaseBoot.init        = null;
-
-    // Used by BaseBoot.extend, just below
-    BaseBoot.prototype.extend = inst_extend;
+    BaseBoot.toString    = properFunToString;
 
     // ---
 
     var BaseRoot = BaseBoot.extend({
-      constructor: baseConstructor,
-      extend_exclude: _excludeExtendInst
+      constructor: baseConstructor
     }, {
       /**
        * The ancestor class.
@@ -261,6 +293,8 @@ define([
        */
       ancestor: NativeBase // Replaces BaseBoot by NativeBase
     });
+
+    var rootProto = BaseRoot.prototype;
 
     /**
      * If a method has been overridden, then the base method provides access to the overridden method.
@@ -273,18 +307,18 @@ define([
      * @readonly
      * @protected
      */
-    Object.defineProperty(BaseRoot.prototype, "base", {
+    Object.defineProperty(rootProto, "base", {
       configurable: true,
       writable: true,
       enumerable: false,
       value: inst_base
     });
 
-    // The `__root_proto__` property is a cheap way to obtain
+    // The `__base_root_proto__` property is a cheap way to obtain
     // the correct Base-root prototype for setting the `base` property,
     // in `methodOverride`.
-    // Create shared, hidden, constant `__root_proto__` property.
-    O.setConst(BaseRoot.prototype, "__root_proto__", BaseRoot.prototype);
+    // Create shared, hidden, constant `__base_root_proto__` property.
+    O.setConst(rootProto, "__base_root_proto__", rootProto);
 
     setFunName(BaseRoot, baseRootName);
 
@@ -358,7 +392,6 @@ define([
    * Then, it delegates the remainder of the subclass setup to the
    * [_subclassed]{@link pentaho.lang.Base._subclassed},
    * whose default implementation mixes-in the given instance and class specifications.
-   * Finally, when the subclass' [init]{@link pentaho.lang.Base.init} method is defined, it is called.
    *
    * @alias _extend
    * @memberOf pentaho.lang.Base
@@ -392,8 +425,23 @@ define([
   function class_extend_core(name, instSpec, classSpec, keyArgs) {
     /* jshint validthis:true*/
 
+    var Subclass = class_extend_subclass.call(this, name, instSpec, classSpec, keyArgs);
+
+    this._subclassed(Subclass, instSpec, classSpec, keyArgs);
+
+    return Subclass;
+  }
+
+  /**
+   * Processes the class name, so that if it is a module id (contains a "/" character),
+   * it is converted to a "dotted namespaced name".
+   *
+   * @param {string} name - The class name.
+   * @return {string} The processed class name.
+   */
+  function class_process_name(name) {
     // Allow the value of AMD module.id to be passed directly to name
-    if(name && name.indexOf("/") > 0) {
+    if(name.indexOf("/") > 0) {
       var parts = name.split("/");
       // Also, ensure last segment is upper case, as this is a class...
       // Module ids sometimes differ in casing due to other reasons.
@@ -402,13 +450,7 @@ define([
       name = parts.join(".");
     }
 
-    var Subclass = class_extend_subclass.call(this, name, instSpec);
-
-    this._subclassed(Subclass, instSpec, classSpec, keyArgs);
-
-    if(fun.is(Subclass.init)) Subclass.init(keyArgs);
-
-    return Subclass;
+    return name;
   }
 
   /**
@@ -437,21 +479,27 @@ define([
    * The given property names are joined with any inherited _excluded_ property names.
    *
    * Properties can have any value.
+   * @param {Object} classSpec The class-side specification.
+   * @param {Object} keyArgs The keyword arguments.
    *
    * @return {Class.<pentaho.lang.Base>} The new subclass.
    *
    * @private
    */
-  function class_extend_subclass(name, instSpec) {
+  function class_extend_subclass(name, instSpec, classSpec, keyArgs) {
     /* jshint validthis:true*/
 
     if(!name) {
+      // Derive a name from this' name, by adding a $ character to it.
       name = this.name || this.displayName || null;
       if(name) name += "$";
+    } else {
+      name = class_process_name(name);
     }
 
     // Create PROTOTYPE and CONSTRUCTOR
     var subProto = Object.create(this.prototype);
+
     var Subclass = class_extend_createCtor(subProto, instSpec, name);
 
     // Wire proto and constructor, so that the `instanceof` operator works.
@@ -459,20 +507,34 @@ define([
     Subclass.prototype = subProto;
     Subclass.ancestor = this;
 
+    // Inherit `bases` map from base class
+    var bases = Object.create(subProto.__base_bases__);
+    // Adds ancestor to bases, before assigning the sub class id
+    // Mixins will also be added, in duplication, to bases.
+    bases[subProto.__base_class_id__] = 1;
+
+    base_getOrAssignClassId(subProto, true);
+
+    O.setConst(subProto, "__base_bases__", bases);
+    O.setConst(subProto, "__base_ops__", [
+      // Represents initial extend, as it will be done when mixing in another class.
+      {name: "mix", args: [instSpec, classSpec, keyArgs]
+    }]);
+
     // ----
 
     var subExclude = instSpec && instSpec.extend_exclude;
     if(subExclude) {
-      subExclude = O.assignOwn(O.assignOwn({}, subProto.__extend_exclude__), subExclude);
+      subExclude = O.assignOwn(O.assignOwn({}, subProto.__base_extend_exclude__), subExclude);
 
-      O.setConst(subProto, "__extend_exclude__", Object.freeze(subExclude));
+      O.setConst(subProto, "__base_extend_exclude__", Object.freeze(subExclude));
     }
 
     var subOrdered = instSpec && instSpec.extend_order;
     if(subOrdered) {
-      subOrdered = (subProto.__extend_order__ || []).concat(subOrdered);
+      subOrdered = (subProto.__base_extend_order__ || []).concat(subOrdered);
 
-      O.setConst(subProto, "__extend_order__", Object.freeze(subOrdered));
+      O.setConst(subProto, "__base_extend_order__", Object.freeze(subOrdered));
     }
 
     // ----
@@ -486,7 +548,8 @@ define([
   /**
    * Called when a subclass of this class has been created.
    *
-   * The default implementation mixes the given instance and class specification in the new subclass.
+   * The default implementation mixes the given instance and class specification in the new subclass,
+   * without actually recording a mix operation.
    *
    * @alias _subclassed
    * @memberOf pentaho.lang.Base
@@ -499,7 +562,7 @@ define([
    * @protected
    */
   function class_subclassed(Subclass, instSpec, classSpec, keyArgs) {
-    Subclass.mix(instSpec, classSpec, keyArgs);
+    class_mix_core.call(Subclass, instSpec, classSpec, keyArgs);
   }
 
   /**
@@ -525,15 +588,14 @@ define([
   function class_extend_createCtor(proto, instSpec, name) {
     /* jshint validthis:true*/
 
-    var baseInit = proto.__init__;
+    var baseInit = proto.__base_init__;
     var Class = class_extend_readCtor(instSpec);
-
     if(Class) {
       // Maybe override base constructor.
-      Class = methodOverride(Class, baseInit, proto.__root_proto__, name, /* forceOverrideIfDebug: */true);
+      Class = methodOverride(Class, baseInit, proto.__base_root_proto__, name, /* forceOverrideIfDebug: */true);
 
-      // Create shared, hidden, constant `__init__` property.
-      O.setConst(proto, "__init__", Class);
+      // Create shared, hidden, constant `__base_init__` property.
+      O.setConst(proto, "__base_init__", Class);
     } else {
       Class = class_extend_createCtorInit(baseInit, name);
     }
@@ -560,9 +622,9 @@ define([
   }
 
   /**
-   * Creates constructor that calls `init`.
+   * Creates a constructor that calls `init`.
    *
-   * When mixing in, `init` won't be available through `this.__init__`,
+   * When mixing in, `init` won't be available through `this.__base_init__`,
    * so the fixed `init` argument is actually required.
    *
    * @param {function} init The function to be called by the constructor.
@@ -579,16 +641,17 @@ define([
       };
     }
 
+    /* eslint no-new-func: 0 */
     var f = new Function(
         "init",
-        "return function " + sanitizeIdentifier(name) + "() {\n" +
+        "return function " + sanitizeJSIdentifier(name) + "() {\n" +
         "  return init.apply(this, arguments);\n" +
         "};");
 
     return f(init);
   }
 
-  function sanitizeIdentifier(name) {
+  function sanitizeJSIdentifier(name) {
     return name.replace(/[^\w0-9$_]/gi, "_");
   }
 
@@ -677,23 +740,141 @@ define([
    * @param {Object} [keyArgs.exclude] A set of property names to _exclude_,
    *  _both_ from the instance and class sides. Properties can have any value.
    *
-   * @return {Class.<pentaho.lang.Base>} This class.
+   * @return {!Class.<pentaho.lang.Base>} This class.
    */
   function class_mix(instSpec, classSpec, keyArgs) {
-    /* jshint validthis:true*/
 
-    if(fun.is(instSpec)) {
-      // function, keyArgs
-      keyArgs   = classSpec;
-      classSpec = instSpec;
-      instSpec  = classSpec.prototype;
-    }
+    // Register mixin operation.
+    this.prototype.__base_ops__.push({name: "mix", args: [instSpec, classSpec, keyArgs]});
 
-    // Versions of implement and implementStatic, but for a single spec and with keyArgs
-    if(instSpec)  this.prototype.extend(instSpec, keyArgs);
-    if(classSpec) inst_extend_object.call(this, classSpec, null, keyArgs);
+    class_mix_core.call(this, instSpec, classSpec, keyArgs);
 
     return this;
+  }
+
+  /**
+   * Really adds additional members to, or overrides existing ones of, this class.
+   *
+   * This method does _not_ create a new class and does not record an operation.
+   *
+   * This method supports two signatures:
+   *
+   * 1. mix(Class: function[, keyArgs: Object]) -
+   *     mixes-in the given class, both its instance and class sides.
+   *
+   * 2. mix(instSpec: Object[, classSpec: Object[, keyArgs: Object]]) -
+   *     mixes-in the given instance and class side specifications.
+   *
+   * @alias _mix
+   * @memberOf pentaho.lang.Base
+   *
+   * @param {function|Object} instSpec The class to mixin or the instance-side specification.
+   * @param {Object} [classSpec] The class-side specification.
+   * @param {Object} [keyArgs] The keyword arguments.
+   * @param {Object} [keyArgs.exclude] A set of property names to _exclude_,
+   *  _both_ from the instance and class sides. Properties can have any value.
+   *
+   * @private
+   */
+  function class_mix_core(instSpec, classSpec, keyArgs) {
+    var proto = this.prototype;
+
+    // Register mixin operation.
+    proto.__base_ops__.push({name: "mix", args: [instSpec, classSpec, keyArgs]});
+
+    // If instSpec is a function
+    var isClassMixin = fun.is(instSpec);
+    if(isClassMixin) {
+      // (function, keyArgs)
+      keyArgs = classSpec;
+      classSpec = instSpec;
+      instSpec = classSpec.prototype;
+    }
+
+    // Is the mixin class already applied in an ancestor, or is an ancestor, or self.
+    if(instSpec) {
+      if(instSpec === proto)
+        return this;
+
+      // At least instSpec is assigned a class id.
+      var classId = base_getOrAssignClassId(instSpec, true);
+
+      // If it is already a base or mixin of this class, leave.
+      // Don't mix twice. Setters called twice may have unwanted side-effects.
+      if(proto.__base_bases__[classId])
+        return this;
+    }
+
+    if(isClassMixin) {
+      (this.mixins || (this.mixins = [])).push(classSpec);
+
+      // Mixing in a Base.js class?
+      if(instSpec && instSpec.__base_ops__) {
+        class_mix_baseJsClass.call(this, classSpec);
+        return this;
+      }
+    }
+
+    // Like implement, but for a single spec, with keyArgs and does not register a new operation.
+    if(instSpec) proto.extend(instSpec, keyArgs);
+
+    if(classSpec) class_implementStaticOne.call(this, classSpec, keyArgs);
+
+    return this;
+  }
+
+  /**
+   * Mixes another Base.js class into this one,
+   * by replaying the recorded operations defining it.
+   *
+   * @param {function} Other - A Base.js class to mix in.
+   * @private
+   */
+  function class_mix_baseJsClass(Other) {
+
+    var lcaProto = O.lca(this.prototype, Other.prototype);
+
+    // assert lcaProto != null or Other would not be a BaseJs class
+
+    // Build array with ascendant protos of Other not shared with this.
+    // Note lcaProto is shared and thus not included.
+    var sourceProtos = [];
+    var sourceProto = Other.prototype;
+    while(sourceProto !== lcaProto) {
+      sourceProtos.push(sourceProto);
+      sourceProto = Object.getPrototypeOf(sourceProto);
+    }
+
+    // Apply from the most base type to Other
+    var thisProto = this.prototype;
+    var i = sourceProtos.length;
+    while(i--) {
+      sourceProto = sourceProtos[i];
+
+      // Again, must have a class id.
+      var classId = base_getOrAssignClassId(sourceProto);
+
+      // If it is already a base or mixin of this class, leave.
+      // Don't mix twice. Setters called twice may have unwanted side-effects.
+      if(!thisProto.__base_bases__[classId]) {
+        thisProto.__base_bases__[classId] = 1;
+
+        // The replay of operations may add more bases and mixins.
+        class_mix_replayOps.call(this, sourceProtos[i].__base_ops__);
+      }
+    }
+  }
+
+  /**
+   * Replays an array of recorded operations in this class.
+   *
+   * @param {Array.<{name: string, args: Array}>} ops - An array of operations
+   * @private
+   */
+  function class_mix_replayOps(ops) {
+    var i = -1;
+    var L = ops.length;
+    while(++i < L) this[ops[i].name].apply(this, ops[i].args);
   }
 
   /**
@@ -703,8 +884,6 @@ define([
    *
    * Each instance specification can be a class or an object.
    * When it is a class, only its instance-side is mixed-in.
-   *
-   * This method can be applied to other, non-`Base` classes (e.g. using `Base.implement.call(Alien, instanceMix)`).
    *
    * @alias implement
    * @memberOf pentaho.lang.Base
@@ -717,16 +896,17 @@ define([
    * @see pentaho.lang.Base.mix
    */
   function class_implement() {
-    /* jshint validthis:true*/
+
+    var proto = this.prototype;
+
+    // Register implementOne operation.
+    proto.__base_ops__.push({name: "implement", args: A_slice.call(arguments)});
 
     var i = -1;
     var L = arguments.length;
-    var proto = this.prototype;
-    var extend = proto.extend || inst_extend;
-
     while(++i < L) {
       var v = arguments[i];
-      extend.call(proto, fun.is(v) ? v.prototype : v);
+      proto.extend(fun.is(v) ? v.prototype : v);
     }
 
     return this;
@@ -734,8 +914,6 @@ define([
 
   /**
    * Inherit each of the `BaseClass` properties to this class.
-   *
-   * Adapted from `inst_extend_object` to better handle the Class static inheritance case.
    *
    * @param {function} BaseClass Class from where to inherit static members.
    *
@@ -745,7 +923,7 @@ define([
     /* jshint validthis:true*/
 
     for(var name in BaseClass)
-      if(!Object[name] && !O_hasOwn.call(_excludeExtendStatic, name))
+      if(!(name in Object) && !O_hasOwn.call(_excludeExtendStatic, name))
         inst_extend_propDesc.call(this, name, BaseClass, undefined, /* funOnly: */true);
   }
 
@@ -757,8 +935,6 @@ define([
    * Each class-side/static specification can be a class or an object.
    * When it is a class, only its class-side is mixed-in.
    *
-   * This method can be applied to other, non-`Base` classes (e.g. using `Base.implementStatic.call(Alien, classMix)`).
-   *
    * @alias implementStatic
    * @memberOf pentaho.lang.Base
    *
@@ -769,16 +945,73 @@ define([
   function class_implementStatic() {
     /* jshint validthis:true*/
 
+    // Register implementStatic operation.
+    this.prototype.__base_ops__.push({name: "implementStatic", args: A_slice.call(arguments)});
+
     var i = -1;
     var L = arguments.length;
     while(++i < L) {
       // Extend the constructor with `classSpec`.
-      // (overriding static methods sets the `base` property on the constructor)
+      // Note that overriding static methods sets the `base` property on the constructor...
       var classSpec = arguments[i];
-      if(classSpec) inst_extend_object.call(this, classSpec);
+      if(classSpec) class_implementStaticOne.call(this, classSpec);
     }
 
     return this;
+  }
+
+  function class_implementStaticOne(source, keyArgs) {
+
+    // Ad hoc, properties to exclude.
+    var l_exclude = keyArgs && keyArgs.exclude;
+
+    // How to detect classSpec properties, which are copy-inherited,
+    // from a common base constructor? These should not be copied over, unless changed by classSpec.
+    // If not changed, then the properties of this, which might themselves have been overridden,
+    // should not be overwritten.
+
+    var n;
+    if(fun.is(source)) {
+      /*
+       * If M overrode x, then M.x_1 should overwrite T.x_?, otherwise don't touch it.
+       *
+       *       l-c-ancestor
+       *          A - x_0
+       *        /   \
+       *      /       \
+       *    /           \
+       *   T x_?  <--   M - x_1
+       * target       mixin
+       */
+
+      // This is the easiest way to get the "LCA".
+      var lcaProto = O.lca(this.prototype, source.prototype);
+      var LCA = lcaProto && lcaProto.constructor;
+
+      for(n in source) {
+        if(!(n in Object) &&
+           !O_hasOwn.call(_excludeExtendStatic, n) &&
+           (!l_exclude || !O_hasOwn.call(l_exclude, n)) &&
+           (!LCA ||
+            !equalPropDesc(
+               Object.getOwnPropertyDescriptor(source, n),
+               Object.getOwnPropertyDescriptor(LCA, n)))) {
+
+          inst_extend_propDesc.call(this, n, source);
+        }
+      }
+
+    } else {
+      for(n in source) {
+        if(!(n in Object) &&
+           !O_hasOwn.call(_excludeExtendInst, n) &&
+           !O_hasOwn.call(_excludeExtendStatic, n) &&
+           (!l_exclude || !O_hasOwn.call(l_exclude, n))) {
+
+          inst_extend_propDesc.call(this, n, source);
+        }
+      }
+    }
   }
 
   // endregion
@@ -794,8 +1027,6 @@ define([
    *
    * This object is extended, but its class doesn't change.
    *
-   * Can be applied to non-`Base` instances (e.g. using `Base.prototype.extend.call(alien, {a: "hello"})`).
-   *
    * @alias extend
    * @memberOf pentaho.lang.Base#
    *
@@ -806,70 +1037,57 @@ define([
    * @return {!Object} This object.
    */
   function inst_extend(source, keyArgs) {
-    /* jshint validthis:true*/
     if(source) {
-      // Call `this.extend` method instead of this one, if it exists.
-      if(!fun.is(this) && !this.__root_proto__ && fun.is(this.extend) && this.extend !== inst_extend) {
-        // If it is inherited from Base (has __root_proto__), don't go this path,
-        // to allow overriding the extend method and still call this.base().
-        //
-        // Because in Base.js, Function#extend has a sub-classing semantics,
-        // functions are not considered here, by testing `!fun.is(this)`.
-        //
-        // This path of code is not used by "Base"'s internal code.
-        // It can only happen when `Base#extend` method is applied to a "foreign" object.
-        this.extend(source, keyArgs);
-      } else {
-        inst_extend_object.call(this, source, this.__root_proto__, keyArgs);
+      var inst = this;
+      var rootProto = this.__base_root_proto__;
+      var exclude = this.__base_extend_exclude__;
+
+      // If source shares part of the prototype chain with `this`, we do not wish to copy properties
+      // of those shared prototypes.
+      // These might share only the root proto, or, as is the case of mixins, a lower (common ancestor) prototype.
+      var lcaExclude = rootProto && O.lca(source, this);
+      if(lcaExclude) {
+
+        // From `source` to `lcaExclude` (exclusive), must mark all classes along the path as `bases` and `mixins`.
+        var ascProto = source;
+        while(ascProto && ascProto !== lcaExclude && ascProto !== rootProto) {
+          var classId = base_getOrAssignClassId(ascProto, false);
+          if(classId) {
+            inst.__base_bases__[classId] = 1;
+          }
+          ascProto = Object.getPrototypeOf(ascProto);
+        }
       }
+
+      // Additional, ad hoc, properties to exclude.
+      var l_exclude = keyArgs && keyArgs.exclude;
+
+      var visited = Object.create(null);
+
+      var extendProp = function(n) {
+        if(!O_hasOwn.call(visited, n) &&
+           !O_hasOwn.call(exclude, n) &&
+           (!l_exclude || !O_hasOwn.call(l_exclude, n))) {
+          visited[n] = 1;
+          inst_extend_propDesc.call(inst, n, source, rootProto, null, lcaExclude);
+        }
+      };
+
+      // Ordered properties first.
+      var name;
+      var ordered = this.__base_extend_order__;
+      if(ordered) {
+        var i = -1;
+        var L = ordered.length;
+        while(++i < L) if((name = ordered[i]) in source) extendProp(name);
+      }
+
+      // All other properties
+      /* eslint guard-for-in: 0 */
+      for(name in source) extendProp(name);
     }
 
     return this;
-  }
-
-  /**
-   * Copy each of the `source` members to this object.
-   *
-   * Copies `toString` manually and skip _special_ members.
-   *
-   * @param {!Object} source Object from where to copy members.
-   * @param {Object} [rootProto] The root prototype.
-   * When unspecified, overriding methods requires using each actual instance to store the special `base` property.
-   *
-   * @param {Object} [keyArgs] The keyword arguments.
-   * @param {Object} [keyArgs.exclude] A map of property names to _exclude_ from `source`.
-   *
-   * @private
-   */
-  function inst_extend_object(source, rootProto, keyArgs) {
-    /* jshint validthis:true*/
-
-    // When called, for e.g. on functions, there's no __extend_exclude__
-    var lcaExclude = rootProto && O.lca(source, rootProto);
-    var exclude = this.__extend_exclude__ || _excludeExtendInst;
-    var l_exclude = keyArgs && keyArgs.exclude;
-    var visited = Object.create(null);
-    var extendProp = function(inst, n) {
-      if(!O_hasOwn.call(visited, n) &&
-         !O_hasOwn.call(exclude, n) &&
-         (!l_exclude || !O_hasOwn.call(l_exclude, n))) {
-        visited[n] = 1;
-        inst_extend_propDesc.call(inst, n, source, rootProto, null, lcaExclude);
-      }
-    };
-
-    // Ordered properties first.
-    var name;
-    var ordered = this.__extend_order__;
-    if(ordered) {
-      var i = -1;
-      var L = ordered.length;
-      while(++i < L) if((name = ordered[i]) in source) extendProp(this, name);
-    }
-
-    // All other properties
-    // eshint guard-for-in: 0
-    for(name in source) extendProp(this, name);
   }
 
   /**
@@ -886,53 +1104,52 @@ define([
    */
   function inst_extend_propDesc(name, source, rootProto, funOnly, lcaExclude) {
     /* jshint validthis:true*/
-
+    var baseDesc;
     var desc = O.getPropertyDescriptor(source, name, lcaExclude);
     if(desc) {
+      baseDesc = O.getPropertyDescriptor(this, name);
       if(desc.get || desc.set) {
-        // Property getter/setter
-        var baseDesc = O.getPropertyDescriptor(this, name);
         if(baseDesc) {
           if(desc.get || baseDesc.get) desc.get = methodOverride(desc.get, baseDesc.get, rootProto);
           if(desc.set || baseDesc.set) desc.set = methodOverride(desc.set, baseDesc.set, rootProto);
+
+          // Don't touch the property if get/set did not change.
+          if(desc.get === baseDesc.get && desc.set === baseDesc.set) return;
         }
 
         Object.defineProperty(this, name, desc);
       } else {
+        // Just ignore trying to set a value on a readOnly property.
+        if(baseDesc && baseDesc.get && !baseDesc.set)
+          return;
+
         // Property value
-        inst_extend_propAssign.call(this, name, desc.value, rootProto, funOnly);
+        // Note that the property of _this_ may have a setter.
+        var value = desc.value;
+        if(fun.is(value)) {
+          // Only override if it is a normal property.
+          // When there is not baseDesc, methodOverride may need to provide a default base method.
+          if(baseDesc && (baseDesc.get || baseDesc.set)) {
+            this[name] = value;
+          } else {
+            this[name] = methodOverride(value, baseDesc && baseDesc.value, rootProto, name);
+          }
+        } else if(!funOnly) {
+          this[name] = value;
+        }
       }
     }
   }
 
-  /**
-   * Assign `value` to member `name` of this object.
-   *
-   * @param {string} name The name of the property.
-   * @param {any} value The value to assign to the member.
-   * @param {Object} [rootProto] The root prototype.
-   * When unspecified, overriding methods requires using each actual instance to store the special `base` property.
-   * @param {?boolean} [funOnly] If true, assign only if value is a function.
-   *
-   * @private
-   */
-  function inst_extend_propAssign(name, value, rootProto, funOnly) {
-    /* jshint validthis:true*/
+  function equalPropDesc(a, b) {
+    // both nully ?
+    if(a == null && b == null) return true;
 
-    if(fun.is(value)) {
-      // Only override if it is a normal property.
-      // When there is not baseDesc, methodOverride may need to provide a default base method.
-      var baseDesc = O.getPropertyDescriptor(this, name);
-      if(baseDesc && (baseDesc.get || baseDesc.set)) {
-        this[name] = value;
-      } else {
-        this[name] = methodOverride(value, baseDesc && baseDesc.value, rootProto, name);
-      }
-    } else if(!funOnly) {
-      this[name] = value;
-    }
+    // one is nully ?
+    if(!a || !b) return false;
+
+    return (a.get === b.get) && (a.set === b.set) && (a.value === b.value);
   }
-
   // endregion
 
   // region Method Override
@@ -1056,7 +1273,7 @@ define([
           "_method_",
           "_baseMethod_",
           "_rootProto_",
-          "return function " + sanitizeIdentifier(name) + "() {\n" +
+          "return function " + sanitizeJSIdentifier(name) + "() {\n" +
           "  var previous = _rootProto_.base; _rootProto_.base = _baseMethod_;\n" +
           "  try {\n" +
           "      return _method_.apply(this, arguments);\n" +
@@ -1068,7 +1285,7 @@ define([
           "_method_",
           "_baseMethod_",
           "_rootProto_",
-          "return function " + sanitizeIdentifier(name) + "() {\n" +
+          "return function " + sanitizeJSIdentifier(name) + "() {\n" +
           "  var previous = this.base; this.base = _baseMethod_;\n" +
           "  try {\n" +
           "     return _method_.apply(this, arguments);\n" +

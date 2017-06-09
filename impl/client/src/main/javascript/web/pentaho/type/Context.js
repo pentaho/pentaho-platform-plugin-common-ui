@@ -40,7 +40,7 @@ define([
 
   "use strict";
 
-  /* global Promise:false */
+  /* globals Promise */
 
   var _nextFactoryUid = 1;
   var _singleton = null;
@@ -1193,9 +1193,15 @@ define([
           return;
         }
 
-        // TODO: this method only supports standard types deserialization.
-        //   Custom types with own type attributes would need special handling.
-        //   Something like a two phase protocol?
+        collectTypeIdsGenericRecursive(typeSpec, outIds, byTypeId);
+        return;
+    }
+  }
+
+  function collectTypeIdsGenericRecursive(typeSpec, outIds, byTypeId) {
+    // TODO: this method only supports standard types deserialization.
+    //   Custom types with own type attributes would need special handling.
+    //   Something like a two phase protocol?
 
         // {[base: "complex", ] [of: "..."] , [props: []]}
         collectTypeIdsRecursive(typeSpec.base, outIds, byTypeId);
@@ -1217,21 +1223,31 @@ define([
             });
         }
 
-        // These are not ids of types but only of mixin AMD modules.
-        var facets = typeSpec.facets;
-        if(facets != null) {
-          if(!(Array.isArray(facets))) facets = [facets];
+    // These are not ids of types but only of mixin AMD modules.
+    var facets = typeSpec.facets;
+    if(facets != null) {
+      if(!(Array.isArray(facets))) facets = [facets];
 
-          facets.forEach(function(facetIdOrClass) {
-            if(typeof facetIdOrClass === "string") {
-              if(facetIdOrClass.indexOf("/") < 0)
-                facetIdOrClass = _baseFacetsMid + facetIdOrClass;
+      facets.forEach(function(facetIdOrClass) {
+        if(typeof facetIdOrClass === "string") {
+          if(facetIdOrClass.indexOf("/") < 0)
+            facetIdOrClass = _baseFacetsMid + facetIdOrClass;
 
-              collectTypeIdsRecursive(facetIdOrClass, outIds, byTypeId);
-            }
-          });
+          collectTypeIdsRecursive(facetIdOrClass, outIds, byTypeId);
         }
-        return;
+      });
+    }
+
+    // These are either ids of AMD modules of type mixins or, directly, type mixins.
+    var mixins = typeSpec.mixins;
+    if(mixins) {
+      if(!(Array.isArray(mixins))) mixins = [mixins];
+
+      mixins.forEach(function(mixinIdOrClass) {
+        if(typeof mixinIdOrClass === "string") {
+          collectTypeIdsRecursive(mixinIdOrClass, outIds, byTypeId);
+        }
+      });
     }
   }
   // endregion

@@ -17,13 +17,16 @@ define([
   "pentaho/type/Context",
   "pentaho/type/SpecificationScope",
   "pentaho/type/SpecificationContext",
-  "tests/pentaho/type/serializationUtil"
-], function(Context, SpecificationScope, SpecificationContext, serializationUtil) {
+  "tests/pentaho/type/serializationUtil",
+  "tests/test-utils"
+], function(Context, SpecificationScope, SpecificationContext, serializationUtil, testUtils) {
 
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, spyOn:false, jasmine:false,
            JSON:false */
+
+  var it = testUtils.itAsync;
 
   describe("pentaho.type.Type", function() {
 
@@ -248,6 +251,81 @@ define([
 
           expect(result).toBe(true);
           expect(spec.defaultView).toBe("/my/view/");
+        });
+      });
+
+      describe("#mixins", function() {
+
+        function defineSampleMixins(localRequire) {
+
+          localRequire.define("tests/mixins/A", ["pentaho/type/value"], function(valueFactory) {
+
+            return function(context) {
+
+              var Value = context.get(valueFactory);
+
+              return Value.extend({
+                testMethodAInst: function() {},
+                type: {
+                  id: "tests/mixins/A",
+                  testMethodA: function() {}
+                }
+              });
+            };
+          });
+
+          localRequire.define("tests/mixins/B", ["pentaho/type/value"], function(valueFactory) {
+
+            return function(context) {
+
+              var Value = context.get(valueFactory);
+
+              return Value.extend({
+                testMethodBInst: function() {},
+                type: {
+                  id: "tests/mixins/B",
+                  testMethodB: function() {}
+                }
+              });
+            };
+          });
+        }
+
+        it("should include all local mixin ids", function() {
+
+          return require.using([
+            "pentaho/type/Context",
+            "tests/mixins/A",
+            "tests/mixins/B"
+          ], defineSampleMixins, function(Context, mixinFactoryA, mixinFactoryB) {
+
+            var context = new Context();
+            var Value = context.get("pentaho/type/value");
+
+            var DerivedValue1 = Value.extend({
+              type: {
+                id: "tests/types/foo1",
+                mixins: [mixinFactoryA]
+              }
+            });
+
+            var DerivedValue2 = DerivedValue1.extend({
+              type: {
+                id: "tests/types/foo2",
+                mixins: [mixinFactoryB]
+              }
+            });
+
+            var scope = new SpecificationScope();
+            var spec = {};
+
+            var result = DerivedValue2.type._fillSpecInContext(spec, {});
+
+            scope.dispose();
+
+            expect(result).toBe(true);
+            expect(spec.mixins).toEqual(["tests/mixins/B"]);
+          });
         });
       });
     });

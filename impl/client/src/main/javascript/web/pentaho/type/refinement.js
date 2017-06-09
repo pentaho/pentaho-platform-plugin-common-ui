@@ -273,7 +273,7 @@ define([
 
       type: /** @lends pentaho.type.Refinement.Type# */{
 
-        // Antecipate extend of these properties
+        // Anticipate extend of these properties
         extend_order: ["of", "facets"],
 
         // Note: constructor/_init only called on sub-classes of Refinement.Type,
@@ -386,7 +386,7 @@ define([
         },
         // endregion
 
-        // region abstract property
+        // region isAbstract property
         /**
          * Gets a value that indicates if this type is abstract.
          *
@@ -400,13 +400,6 @@ define([
         get isAbstract() {
           var of = this.of;
           return !of || of.isAbstract;
-        },
-
-        set isAbstract(value) {
-          // nully is reset, which is false, so !! works well.
-          // jshint -W018
-          if((!!value) !== this.isAbstract)
-            throw error.operInvalid("Attribute cannot be changed.");
         },
         // endregion
 
