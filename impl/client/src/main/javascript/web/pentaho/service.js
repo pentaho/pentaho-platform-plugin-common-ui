@@ -15,110 +15,40 @@
  */
 
 /**
- * AMD plugin which maintains a collection of _logical modules_ and their _dependencies_.
- *
- * #### AMD
- *
- * **Module Id**: `"pentaho/service"`
- *
- * **Plugin Usage**: `"pentaho/service!{logical-module-name}?meta&single"`
- *
- *   1. `{logical-module-name}` — the name of a required logical module.
- *   2. `meta` — if present, provides the loaded module identifiers, encapsulating it with the module value.
- *   3. `single` — if present, returns only the first declared dependency.
- *   4. `ids` - if present, returns only the identifiers of the registered modules and **does not load them**;
- *       you can use this module's exported `getRegisteredIds` method,
- *       to be able to know the registered module ids synchronously.
- *
- * #### A Plugin mechanism
- *
- * The dependency list of logical modules is described in the
- * AMD configuration object, under this module's configuration section.
- *
- * Scripts require logical modules by _name_ as the argument to this plugin.
- * An array with its dependencies is passed to the loading function.
- *
- * Combined, these capabilities form a simple plugin mechanism.
- *
- * #### Module as a Service
- *
- * A logical module can be taken
- * to represent a _service_, having a certain predefined contract or interface type, and,
- * its dependencies,
- * to be the AMD modules that _implement_ it (or _provide_ it).
- *
- * #### Logical module value type
- *
- * There are no a priori constraints on the type of value of dependency modules
- * of a logical module — or, more loosely, on the type of value(s) of a logical module.
- *
- * When a logical module has a certain value type,
- * that should be described in its documentation.
- * More often than not, the value type can be precisely defined as an interface or class.
- *
- * Currently, the plugin mechanism makes no assurances on the type of value of
- * a logical module's dependencies.
- * However, scripts requiring a logical module _should_ trust that
- * the provided dependencies respect any documented contract.
+ * The _main_ service locator service of the JavaScript Pentaho platform.
  *
  * #### Configuration
  *
- * A module can be the dependency of a single logical module
- * (a module can only provide a single service).
+ * To register a module that provides a service, you configure this module, `pentaho/service`.
+ * For example, the following AMD/RequireJS configuration registers two modules,
+ * `mine/homeScreen` and `yours/proHomeScreen`,
+ * as providing the logical service named `IHomeScreen`:
+ * ```js
+ * require.config({
+ *   config: {
+ *     "pentaho/service": {
+ *       "mine/homeScreen": "IHomeScreen",
+ *       "yours/proHomeScreen": "IHomeScreen"
+ *     }
+ *   }
+ * });
+ * ```
  *
- * See the configuration syntax in the accompanying examples.
+ * Later, some other component can request for all implementers of the logical service:
  *
- * @example
- * Load all dependencies of the "IHomeScreen" logical module:
+ * ```js
+ * define(["pentaho/service!IHomeScreen"], function(arrayOfHomeScreenModules) {
  *
- *     // Register the dependencies of a logical module
- *     require.config({
- *       config: {
- *         "pentaho/service": {
- *           "toyModule/myHomeScreen":   "IHomeScreen",
- *           "megaPlugin/proHomeScreen": "IHomeScreen"
- *         }
- *       }
- *     });
+ *   arrayOfHomeScreenModules.forEach(function(homeScreen) {
+ *     // ...
+ *   });
+ * });
+ * ```
  *
- *     // Require the dependencies of a logical module
- *     require(["pentaho/service!IHomeScreen"], function(arrayOfHomeScreenModules) {
- *
- *  	     arrayOfHomeScreenModules.forEach(function(homeScreen) {
- *            // consume `homeScreen`
- *         });
- *
- *     });
- *
- * @example
- * In an AMD configuration file (one whose named ends in `"require-js-cfg.js"`),
- * the dependencies of a logical module can be specified like:
- *
- *     requireCfg.config.service["toyModule/myHomeScreen"  ] = "IHomeScreen";
- *     requireCfg.config.service["megaPlugin/proHomeScreen"] = "IHomeScreen";
- *
- * @example
- * With the `meta` option the module value is encapsulated together with its moduleId:
- *
- *     // Register the dependencies of a logical module
- *     require.config({
- *       config: {
- *         "pentaho/service": {
- *           "toyModule/myHomeScreen":   "IHomeScreen",
- *           "megaPlugin/proHomeScreen": "IHomeScreen"
- *         }
- *       }
- *     });
- *
- *     // Require the dependencies of a logical module
- *     require(["pentaho/service!IHomeScreen?meta"], function(arrayOfHomeScreenModules) {
- *
- *  	     arrayOfHomeScreenModules.forEach(function(homeScreen) {
- *            // consume homeScreen.moduleId
- *            // consume homeScreen.value
- *         });
- *
- *     });
+ * @name locator
+ * @memberOf pentaho.service
+ * @type {pentaho.service.ILocator}
+ * @amd pentaho/service
  */
 define([
   "module",
@@ -136,98 +66,76 @@ define([
 
   processConfig();
 
-  return {
-    load: loadLogicalModule,
-    normalize: normalizeLogicalModule,
-    getRegisteredIds: getRegisteredIds
-  };
+  return /** @type pentaho.service.ILocator */ {
 
-  /**
-   * The `load` function of the AMD plugin.
-   *
-   * An empty logical module name is resolved as an empty array.
-   * An unregistered logical module name is resolved as an empty array.
-   *
-   * @param {String} name - The name of the logical module to load.
-   * @param {function} require - The global require function.
-   * @param {function} onLoad - Callback function to call once all of the
-   *   the logical module's dependencies are satisfied.
-   *   Receives, as single argument, an array with the
-   *   logical module's dependencies.
-   * @param {Object} config - The full require-JS config object.
-   */
-  function loadLogicalModule(name, require, onLoad, config) {
-    if(config.isBuild) {
-      // Don't include dependencies in the build.
-      // These are resolved dynamically in the "browser".
-      // If a specific dependency should be included in the build,
-      // it must be included explicitly and directly,
-      // by specifying its AMD module id.
-      onLoad();
-    } else {
-      var nameAndOptions = parseNameAndOptions(name);
-      var modules = getLogicalModule(nameAndOptions.name);
+    load: function(name, require, onLoad, config) {
+      if(config.isBuild) {
+        // Don't include dependencies in the build.
+        // These are resolved dynamically in the "browser".
+        // If a specific dependency should be included in the build,
+        // it must be included explicitly and directly,
+        // by specifying its AMD module id.
+        onLoad();
+      } else {
+        var nameAndOptions = parseNameAndOptions(name);
+        var modules = getLogicalModule(nameAndOptions.name);
 
-      var modulesCount = modules.length;
-      var isSingle = nameAndOptions.options.single === "true";
-      if(isSingle) {
-        if(modulesCount > 1) {
-          modules = [modules[0]];
-        } else if(modulesCount === 0) {
-          onLoad(null);
+        var modulesCount = modules.length;
+        var isSingle = nameAndOptions.options.single === "true";
+        if(isSingle) {
+          if(modulesCount > 1) {
+            modules = [modules[0]];
+          } else if(modulesCount === 0) {
+            onLoad(null);
+            return;
+          }
+        }
+
+        var isIds = nameAndOptions.options.ids === "true";
+        if(isIds) {
+          if(isSingle) {
+            onLoad(modules[0]);
+          } else {
+            onLoad(modules.slice());
+          }
           return;
         }
-      }
 
-      var isIds = nameAndOptions.options.ids === "true";
-      if(isIds) {
-        if(isSingle) {
-          onLoad(modules[0]);
-        } else {
-          onLoad(modules.slice());
-        }
-        return;
-      }
+        // `require` is ok with resolving empty arrays as empty arrays.
+        // Create any requested logical module, even if it has no registrations.
+        // Empty name included, just to make the code simpler
+        // (there's no way to register a dependency under an empty logical name).
+        require(modules, function() {
+          var values = A_slice.call(arguments);
 
-      // `require` is ok with resolving empty arrays as empty arrays.
-      // Create any requested logical module, even if it has no registrations.
-      // Empty name included, just to make the code simpler
-      // (there's no way to register a dependency under an empty logical name).
-      require(modules, function() {
-        var values = A_slice.call(arguments);
+          var withMeta = nameAndOptions.options.meta === "true";
+          if(withMeta) {
+            var toReturn = [];
+            for(var i = 0, ic = modules.length; i !== ic; ++i) {
+              toReturn.push({moduleId: modules[i], value: values[i]});
+            }
 
-        var withMeta = nameAndOptions.options.meta === "true";
-        if(withMeta) {
-          var toReturn = [];
-          for(var i = 0, ic = modules.length; i !== ic; ++i) {
-            toReturn.push({moduleId: modules[i], value: values[i]});
+            onLoad(isSingle ? toReturn[0] : toReturn);
+          } else {
+            // Pass the resolved modules to the original onLoad function,
+            // as a single array argument.
+            onLoad(isSingle ? values[0] : values);
           }
+        });
+      }
+    },
 
-          onLoad(isSingle ? toReturn[0] : toReturn);
-        } else {
-          // Pass the resolved modules to the original onLoad function,
-          // as a single array argument.
-          onLoad(isSingle ? values[0] : values);
-        }
-      });
+    normalize: function(name, normalize) {
+      var nameAndOptions = parseNameAndOptions(name);
+
+      return stringifyNameAndOptions(nameAndOptions);
+    },
+
+    getRegisteredIds: function(logicalModuleName) {
+      var ids = O.getOwn(logicalModules, logicalModuleName);
+      return ids ? ids.slice() : [];
     }
-  }
-
-  /**
-   * The `normalize` function of the AMD plugin.
-   *
-   * Assures that requests with the exact same options are
-   * identified as the same and get correctly cached.
-   *
-   * @param {string} name - The name of the logical module to load.
-   * @param {function} normalize - The original normalize function.
-   * @return {string} The normalized module id.
-   */
-  function normalizeLogicalModule(name, normalize) {
-    var nameAndOptions = parseNameAndOptions(name);
-
-    return stringifyNameAndOptions(nameAndOptions);
-  }
+  };
 
   /**
    * Gets the identifiers of modules registered as dependencies of a given logical module.
@@ -265,6 +173,9 @@ define([
    *
    * In the future could eventually be used to extend the query
    * capabilities of the service.
+   *
+   * @param {string} name - The name of the logical module.
+   * @return {{name: string, options: Object.<string, string>}} The parsed name and options object.
    */
   function parseNameAndOptions(name) {
     var logicalModuleName;
@@ -292,6 +203,9 @@ define([
    * Generates a normalized the moduleId from the logical module name
    * and the options, assuring the order doesn't affect the require's
    * cache of the values.
+   *
+   * @param {{name: string, options: Object.<string, string>}} nameAndOptions - The name and options object.
+   * @return {string} The normalized module id.
    */
   function stringifyNameAndOptions(nameAndOptions) {
     var options = [];
@@ -306,16 +220,5 @@ define([
     options.sort();
 
     return nameAndOptions.name + (options.length ? "?" + options.join("&") : "");
-  }
-
-  /**
-   * Gets the identifiers of modules registered as dependencies of a given logical module.
-   *
-   * @param {string} logicalModuleName - The name of the logical module.
-   * @return {string[]} An array of identifiers, possibly empty.
-   */
-  function getRegisteredIds(logicalModuleName) {
-    var ids = O.getOwn(logicalModules, logicalModuleName);
-    return ids ? ids.slice() : [];
   }
 });
