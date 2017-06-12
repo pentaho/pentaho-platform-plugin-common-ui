@@ -138,10 +138,10 @@ define([
 
       it("should not include inline type specification for an element which " +
           "is of the list's representation element type", function() {
-        var Refined = PentahoNumber.refine();
-        var RefinedList = context.get([Refined.type]);
+        var Accident = PentahoNumber.refine();
+        var AccidentList = context.get([Accident.type]);
 
-        var list = new RefinedList([1, 2, 3]);
+        var list = new AccidentList([1, 2, 3]);
         var spec = list.toSpec();
 
         expect(spec).toEqual([1, 2, 3]);

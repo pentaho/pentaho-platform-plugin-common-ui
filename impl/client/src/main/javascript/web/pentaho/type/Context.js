@@ -163,6 +163,21 @@ define([
           mainPlatformContext.createChild(platformContextSpec);
 
       /**
+       * The configuration depth is incremented each time the context
+       * starts configuring a type, and decremented when it finishes.
+       *
+       * When the configuration depth is greater than 0,
+       * types created through object-specifications default to be accidental types.
+       * In particular, this affects overriding property value types.
+       *
+       * @type {number}
+       * @private
+       * @see pentaho.type.Context#_getByInstCtor
+       * @see pentaho.type.Context#_getByObjectSpec
+       */
+      this._configDepth = 0;
+
+      /**
        * The ambient/current transaction, if any, or `null`.
        *
        * @type {pentaho.type.changes.Transaction}
@@ -228,8 +243,12 @@ define([
           this._getByFactory(standard[lid], /* sync: */true);
       }, this);
 
-      Object.keys(standard.filter).forEach(function(fid){
+      Object.keys(standard.filter).forEach(function(fid) {
         this._getByFactory(standard.filter[fid], /* sync: */true);
+      }, this);
+
+      Object.keys(standard.facets).forEach(function(fid) {
+        this._getByFactory(standard.facets[fid], /* sync: */true);
       }, this);
     },
 
@@ -247,14 +266,13 @@ define([
 
     // TODO: Removed from docs, below, until isIn is made public.
     // [pentaho/type/filter/isIn]{@link pentaho.type.filter.IsIn}
-
     /**
      * Gets the **configured instance constructor** of a type.
      *
      * For more information on the `typeRef` argument,
      * see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
      *
-     * The modules of standard types and refinement facet _mixins_ are preloaded and
+     * The modules of standard types and facet _mixins_ are preloaded and
      * can be requested _synchronously_. These are:
      *
      * * [pentaho/type/instance]{@link pentaho.type.Instance}
@@ -271,10 +289,8 @@ define([
      *         * [pentaho/type/boolean]{@link pentaho.type.Boolean}
      *         * [pentaho/type/function]{@link pentaho.type.Function}
      *         * [pentaho/type/object]{@link pentaho.type.Object}
-     *     * [pentaho/type/refinement]{@link pentaho.type.Refinement}
-     *       * [pentaho/type/facets/Refinement]{@link pentaho.type.facets.RefinementFacet}
-     *         * [pentaho/type/facets/DiscreteDomain]{@link pentaho.type.facets.DiscreteDomain}
-     *         * [pentaho/type/facets/OrdinalDomain]{@link pentaho.type.facets.OrdinalDomain}
+     *     * [pentaho/type/facets/discreteDomain]{@link pentaho.type.facets.DiscreteDomain}
+     *     * [pentaho/type/facets/ordinalDomain]{@link pentaho.type.facets.OrdinalDomain}
      *   * [pentaho/type/property]{@link pentaho.type.Property}
      *
      * For all of these, the `pentaho/type/` or `pentaho/type/facets/` prefix is optional
@@ -602,7 +618,7 @@ define([
     /**
      * Recursively collects the module ids of custom types used within a type specification.
      *
-     * @param {pentaho.type.spec.UTypeReference} typeRef - A type reference.
+     * @param {pentaho.type.spec.ITypeProto} typeSpec - A type specification.
      * @param {!Object.<string, string>} [customTypeIds] - An object where to add found type ids to.
      * @return {!Object.<string, string>} A possibly empty object whose own keys are type module ids.
      * @private
@@ -895,8 +911,6 @@ define([
      * @private
      */
     _getByFun: function(fun, sync) {
-      // make sure overrides don't confuse factory detection
-      fun = fun.valueOf();
 
       var proto = fun.prototype;
       var Instance = this._Instance;
@@ -954,7 +968,16 @@ define([
         if(id) {
           // Configuration is for the type-constructor.
           var config = this._getConfig(id);
-          if(config) type.constructor.implement(config);
+          if(config) {
+            try {
+              this._configDepth++;
+
+              type.constructor.implement(config);
+
+            } finally {
+              this._configDepth--;
+            }
+          }
 
           this._byTypeId[id] = InstCtor;
 
@@ -1071,6 +1094,12 @@ define([
     // specification context.
     _getByObjectSpecCore: function(id, baseTypeSpec, typeSpec, sync) {
       // if id and not loaded, the id is used later to register the new type under that id and configure it.
+
+      // If configuring, all spec-created types default to being accidental types.
+      if((this._configDepth > 0) && !("isAccident" in typeSpec)) {
+        typeSpec = Object.create(typeSpec);
+        typeSpec.isAccident = true;
+      }
 
       // A root generic type spec initiates a specification context.
       // Each root generic type spec has a separate specification context.
@@ -1203,25 +1232,25 @@ define([
     //   Custom types with own type attributes would need special handling.
     //   Something like a two phase protocol?
 
-        // {[base: "complex", ] [of: "..."] , [props: []]}
-        collectTypeIdsRecursive(typeSpec.base, outIds, byTypeId);
+    // {[base: "complex", ] [of: "..."] , [props: []]}
+    collectTypeIdsRecursive(typeSpec.base, outIds, byTypeId);
 
-        collectTypeIdsRecursive(typeSpec.of, outIds, byTypeId);
+    collectTypeIdsRecursive(typeSpec.of, outIds, byTypeId);
 
-        var props = typeSpec.props;
-        if(props) {
-          if(Array.isArray(props))
-            props.forEach(function(propSpec) {
-              collectTypeIdsRecursive(propSpec && propSpec.type, outIds, byTypeId);
-              collectTypeIdsRecursive(propSpec && propSpec.base, outIds, byTypeId);
-            });
-          else
-            Object.keys(props).forEach(function(propName) {
-              var propSpec = props[propName];
-              collectTypeIdsRecursive(propSpec && propSpec.type, outIds, byTypeId);
-              collectTypeIdsRecursive(propSpec && propSpec.base, outIds, byTypeId);
-            });
-        }
+    var props = typeSpec.props;
+    if(props) {
+      if(Array.isArray(props))
+        props.forEach(function(propSpec) {
+          collectTypeIdsRecursive(propSpec && propSpec.type, outIds, byTypeId);
+          collectTypeIdsRecursive(propSpec && propSpec.base, outIds, byTypeId);
+        });
+      else
+        Object.keys(props).forEach(function(propName) {
+          var propSpec = props[propName];
+          collectTypeIdsRecursive(propSpec && propSpec.type, outIds, byTypeId);
+          collectTypeIdsRecursive(propSpec && propSpec.base, outIds, byTypeId);
+        });
+    }
 
     // These are not ids of types but only of mixin AMD modules.
     var facets = typeSpec.facets;

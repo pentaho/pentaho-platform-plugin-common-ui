@@ -97,27 +97,51 @@ define([
         // endregion
 
         // region compare method
+        /**
+         * Compares two values according to their order.
+         *
+         * If the two values are identical, as per JavaScript's `===` operator, they have the same order.
+         * If both values are {@link Nully}, they have the same order.
+         * If only one of the values is {@link Nully},
+         * that value is considered to occur _before_, and the other, _after_.
+         * If the two values are considered equal according to {@link pentaho.type.Value.Type#_areEqual},
+         * then they have the same order.
+         * Otherwise, the operation is delegated to {@link pentaho.type.Element.Type#_compare}.
+         *
+         * @param {any} va - The first value.
+         * @param {any} vb - The second value.
+         *
+         * @return {number} `-1` if `va` is considered _before_ `vb`; `1` is `va` is considered _after_ `vb`;
+         * `0`, otherwise.
+         */
+        compare: function(va, vb) {
+          // Quick bailout tests
+          if(va === vb) return 0;
+          if(va == null) return vb == null ? 0 : -1;
+          if(vb == null) return 1;
 
-        // TODO: document equals consistency and 0 result
-        // Should be consistent with result of Value#equals
-        // Should be consistent with result of Value#key
-        // areEqual => compare -> 0
-        // areEqual => key1 === key2
-
-        // Configurable in a special way.
-        // Setting always sets the core.
-        // Getting always gets the wrapper.
-        get compare() {
-          /* istanbul ignore next : not implemented method */
-          return compareTop;
+          return this._areEqual(va, vb) ? 0 : this._compare(va, vb);
         },
 
-        set compare(_) {
-          /* istanbul ignore next : not implemented method */
-          this._compare = _ || compareCore;
-        },
-
-        _compare: compareCore
+        /**
+         * Compares two non-equal, non-{@link Nully} values according to their order.
+         *
+         * The default implementation compares the two values
+         * by natural ascending order of their data type.
+         * If both values are numbers, numeric order is used.
+         * Otherwise, their string representations are compared in lexicographical order.
+         *
+         * @param {any} va - The first value.
+         * @param {any} vb - The second value.
+         *
+         * @return {number} `-1` if `va` is considered _before_ `vb`; `1` is `va` is considered _after_ `vb`;
+         * `0`, otherwise.
+         *
+         * @protected
+         */
+        _compare: function(va, vb) {
+          return fun.compare(va, vb);
+        }
         // endregion
       }
     }).implement({
@@ -128,25 +152,4 @@ define([
 
     return Element;
   };
-
-  // region compare private methods
-  // consistent with isEmpty and areEqual
-  /* istanbul ignore next : not implemented method */
-  function compareTop(va, vb) {
-    // Quick bailout test
-    if(va === vb) return 0;
-    if(va == null) return vb == null ? 0 : 1;
-    if(vb == null) return -1;
-
-    return (va.constructor === vb.constructor && va.equals(vb))
-        ? 0
-        : this._compare(va, vb);
-  }
-
-  // natural ascending comparer of non-equal, non-empty values
-  /* istanbul ignore next : not implemented method */
-  function compareCore(va, vb) {
-    return fun.compare(va, vb);
-  }
-  // endregion
 });

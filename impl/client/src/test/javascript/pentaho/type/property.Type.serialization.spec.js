@@ -426,13 +426,13 @@ define([
           expect(spec.value).toBe("Foo");
         });
 
-        it("should serialize without type annotation when of the same representation type", function() {
+        it("should serialize without type annotation when of the same essential type", function() {
           var Derived = Complex.extend();
-          var Refined = PentahoString.refine();
+          var Accident = PentahoString.refine();
 
           var scope = new SpecificationScope();
 
-          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: Refined.type, value: "Foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: Accident.type, value: "Foo"});
 
           var spec = {};
           var keyArgs = {};

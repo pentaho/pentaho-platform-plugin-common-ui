@@ -19,18 +19,17 @@ define([
   "./util",
   "./ValidationError",
   "./SpecificationContext",
+  "../util/object",
+  "../util/arg",
+  "../util/error",
   "../i18n!types"
-], function(module, instanceFactory, typeUtil, ValidationError, SpecificationContext, bundle) {
+], function(module, instanceFactory, typeUtil, ValidationError, SpecificationContext, O, arg, error, bundle) {
 
   "use strict";
 
   return function(context) {
 
     var Instance = context.get(instanceFactory);
-
-    // Late bound to break cyclic dependency.
-    // Resolved on first use, in pentaho.type.Value.refine.
-    var Refinement = null;
 
     /**
      * @name pentaho.type.Value.Type
@@ -73,22 +72,16 @@ define([
       /**
        * Gets the key of the value.
        *
-       * The key of a value identifies it among values of the same concrete type.
-       *
-       * Two values of the same concrete type and with the same key represent the same entity.*
-       *
-       * If two values have the same concrete type and their
-       * keys are equal, then it must also be the case that
-       * {@link pentaho.type.Value.Type#areEqual}
-       * returns `true` when given the two values.
-       * The opposite should be true as well.
-       * If two values of the same concrete type have distinct keys,
-       * then {@link pentaho.type.Value.Type#areEqual} should return `false`.
+       * The key of a value must identify it among values of the same concrete type.
+       * Two values of the same concrete type and with the same key represent the same entity.
        *
        * The default implementation returns the result of calling `toString()`.
        *
        * @type {string}
        * @readonly
+       *
+       * @see pentaho.type.Value#equals
+       * @see pentaho.type.Value.Type#areEqual
        */
       get key() {
         return this.toString();
@@ -105,22 +98,17 @@ define([
       /**
        * Determines if a given value, of the same type, represents the same entity.
        *
-       * The given value **must** be of the same concrete type (or the result is undefined).
+       * The default implementation delegates the operation to the
+       * [_isEqual]{@link pentaho.type.Value.Type#_isEqual} method.
        *
-       * To test equality for any two arbitrary values,
-       * in a robust way, use {@link pentaho.type.Value.Type#areEqual}.
-       *
-       * If two values are equal, they must have an equal {@link pentaho.type.Value#key}.
-       * Otherwise, if they are different, they must have a different `key`.
-       *
-       * The default implementation returns `true` if the two values
-       * have the same `key`; or, `false`, otherwise.
-       *
-       * @param {!pentaho.type.Value} other - A value to test for equality.
+       * @param {any} other - A value to test for equality.
        * @return {boolean} `true` if the given value is equal to this one; or, `false`, otherwise.
+       *
+       * @see pentaho.type.Value#key
+       * @see pentaho.type.Value.Type#areEqual
        */
       equals: function(other) {
-        return this === other || this.key === other.key;
+        return this === other || (other != null && this.type._isEqual(this, other));
       },
 
       // region validation
@@ -264,27 +252,117 @@ define([
         alias: "value",
         isAbstract: true,
 
-        get isValue() { return true; },
+        _init: function(spec, keyArgs) {
+
+          var isAccident = this.isAccident || !!spec.isAccident;
+          if(isAccident && !spec.isAbstract) {
+            spec = Object.create(spec);
+            spec.isAbstract = true;
+          }
+
+          this.base(spec, keyArgs);
+
+          if(isAccident) {
+            var essence = this.__essence;
+            if(essence == null) {
+              // This is the root accident.
+              O.setConst(this, "__essence", this.ancestor);
+            }
+          }
+        },
+
+        get isValue() {
+          return true;
+        },
+
+        get _isAbstractImplied() {
+          return this.isAccident;
+        },
+
+        // region essence
+        __essence: null,
+
+        get essence() {
+          return this.__essence || this;
+        },
+
+        get isEssence() {
+          return !this.__essence;
+        },
+
+        get isAccident() {
+          return !!this.__essence;
+        },
+        // endregion
 
         // region equality
         /**
-         * Gets a value that indicates if two given values are equal.
+         * Gets a value that indicates if two given values are considered equal.
          *
+         * Two values are considered equal if they represent the same real-world entity.
+         *
+         * If two values are considered equal,
+         * their value instances must have an equal [key]{@link pentaho.type.Value#key}.
+         * Conversely, if they are considered different,
+         * their value instances must have a different `key`.
+         *
+         * If the values are identical as per JavaScript's `===` operator, `true` is returned.
          * If both values are {@link Nully}, `true` is returned.
          * If only one is {@link Nully}, `false` is returned.
-         * If the values have different constructors, `false` is returned.
-         * Otherwise, {@link pentaho.type.Value#equals} is called
-         * on `va`, with `vb` as an argument, and its result is returned.
+         * Otherwise, the operation is delegated to the {@link pentaho.type.Value#_areEqual} method.
          *
-         * @param {pentaho.type.Value|Nully} [va] The first value.
-         * @param {pentaho.type.Value|Nully} [vb] The second value.
+         * @param {any} va - The first value.
+         * @param {any} vb - The second value.
          *
-         * @return {boolean} `true` if two values are equal; `false`, otherwise.
+         * @return {boolean} `true` if two values are considered equal; `false`, otherwise.
+         *
+         * @see pentaho.type.Value#key
+         * @see pentaho.type.Value.Type#_areEqual
+         * @see pentaho.type.Value.Type#_isEqual
          */
         areEqual: function(va, vb) {
-          return va === vb || (va == null && vb == null) ||
-                 (va != null && vb != null &&
-                  (va.constructor === vb.constructor) && va.equals(vb));
+          return va === vb || (va == null && vb == null) || (va != null && vb != null && this._areEqual(va, vb));
+        },
+
+        /**
+         * Gets a value that indicates if two distinct, non-{@link Nully} values are, nonetheless, considered equal.
+         *
+         * The default implementation checks if one of the values is a value instance, and, if so,
+         * delegates the operation to its type's {@link pentaho.type.Value#_isEqual} method.
+         *
+         * @param {!any} va - The first value.
+         * @param {!any} vb - The second value.
+         *
+         * @return {boolean} `true` if two values are considered equal; `false`, otherwise.
+         *
+         * @protected
+         *
+         * @see pentaho.type.Value.Type#areEqual
+         */
+        _areEqual: function(va, vb) {
+          return (va instanceof Value) ? va.type._isEqual(va, vb) :
+                 (vb instanceof Value) ? vb.type._isEqual(vb, va) :
+                 false;
+        },
+
+        /**
+         * Gets a value that indicates if one instance of this type is considered equal to a distinct,
+         * non-nully value, but possibly not a value instance.
+         *
+         * The default implementation considers two values equal if
+         * they have the same constructor and equal keys.
+         *
+         * @param {!pentaho.type.Value} va - The value instance.
+         * @param {any} vb - The other value.
+         *
+         * @return {boolean} `true` if two values are considered equal; `false`, otherwise.
+         *
+         * @protected
+         *
+         * @see pentaho.type.Value.Type#areEqual
+         */
+        _isEqual: function(va, vb) {
+          return (va.constructor === vb.constructor) && (va.key === vb.key);
         },
         // endregion
 
@@ -345,9 +423,6 @@ define([
          *
          * The default implementation simply calls `value.validate()`.
          *
-         * Special types, like [refinement types]{@link pentaho.type.Refinement},
-         * perform additional validations on values.
-         *
          * @param {!pentaho.type.Value} value - The value to validate.
          *
          * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
@@ -366,14 +441,18 @@ define([
           if(!keyArgs) keyArgs = {};
 
           // The type's id or the temporary id in this scope.
-          var id = keyArgs && keyArgs.noAlias ? this.id : this.shortId;
-          var spec = {id: id || SpecificationContext.current.add(this)};
+          var spec = {id: this._id || SpecificationContext.current.add(this)};
 
           // The base type in the **current type hierarchy** (root, ancestor, isRoot).
           var baseType = Object.getPrototypeOf(this);
           var baseRef = baseType.toRefInContext(keyArgs);
-          if(baseRef !== "complex")
+          if(baseRef !== "complex") {
             spec.base = baseRef;
+          }
+
+          if(this.isAccident && this.ancestor.isEssence) {
+            spec.isAccident = true;
+          }
 
           this._fillSpecInContext(spec, keyArgs);
 
@@ -420,46 +499,80 @@ define([
        *
        * @return {!Class.<pentaho.type.Value>} The new value instance subclass.
        *
+       * @throws {pentaho.lang.ArgumentInvalidError} When the defined type is accidental and
+       * `instSpec` contains any properties other than `type`. Accidental types cannot have an instance interface.
+       *
        * @see pentaho.type.Instance.extend
        */
+      _extend: function(name, instSpec, classSpec, keyArgs) {
+
+        if(instSpec) {
+          var typeSpec = instSpec.type;
+          var isBaseAccident = this.type.isAccident;
+          var isAccident = isBaseAccident || !!(typeSpec && typeSpec.isAccident);
+          if(isAccident) {
+
+            var hasInstanceInterface = (typeSpec && typeSpec.instance) != null;
+            if(!hasInstanceInterface) {
+              for(var p in instSpec) {
+                if(p !== "type") {
+                  hasInstanceInterface = true;
+                  break;
+                }
+              }
+            }
+
+            if(hasInstanceInterface) {
+              throw error.operInvalid(bundle.structured.errors.accidental.cannotExtendInstance);
+            }
+
+            if(!isBaseAccident) {
+              instSpec = Object.create(instSpec);
+              instSpec.constructor = createAccidentCtor(this.type.essence);
+            }
+          }
+        }
+
+        return this.base(name, instSpec, classSpec, keyArgs);
+      },
 
       /**
-       * Creates a refinement type that refines this one.
+       * Creates an accidental subtype of this one.
        *
-       * @see pentaho.type.Refinement.Type#facets
-       * @see pentaho.type.Refinement.Type#of
+       * @see pentaho.type.Value.Type#essence
        *
-       * @param {string} [name] A name of the refinement type used for debugging purposes.
-       * @param {{type: pentaho.type.spec.IRefinementTypeProto}} [instSpec] The refined type instance specification.
-       * The available _type_ attributes are those defined by any specified refinement facet classes.
+       * @param {string} [name] A name of the accidental type used for debugging purposes.
+       * @param {{type: pentaho.type.spec.IValueTypeProto}} [instSpec] The instance specification.
+       * It can only contain the `type` attribute.
+       * @param {Object} [classSpec] The static specification.
+       * @param {Object} [keyArgs] - Keyword arguments.
        *
-       * @return {Class.<pentaho.type.Refinement>} The refinement type's instance class.
+       * @return {!Class.<pentaho.type.Value>} The accidental type's instance class.
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When `instSpec` contains any properties other than `type`.
-       * The instance interface of refinement types cannot be specified.
+       * Accidental types cannot have an instance interface.
        */
-      refine: function(name, instSpec) {
+      refine: function(name, instSpec, classSpec, keyArgs) {
 
         if(typeof name !== "string") {
+          keyArgs = classSpec;
+          classSpec = instSpec;
           instSpec = name;
-          name = null;
+          // Important to be a string. If nully, `extend` would fail.
+          name = "";
         }
 
-        // Ugly but effective.
-        if(!instSpec) {
-          instSpec = {type: {}};
-        } else if(!instSpec.type) {
-          instSpec.type = {};
+        var typeSpec;
+        if(instSpec) {
+          typeSpec = instSpec.type;
+          instSpec = Object.create(instSpec);
+          instSpec.type = typeSpec = typeSpec ? Object.create(typeSpec) : {};
+          typeSpec.isAccident = true;
+        } else {
+          instSpec = {type: {isAccident: true}};
         }
 
-        instSpec.type.of = this.type;
-
-        // Resolved on first use to break cyclic dependency.
-        if(!Refinement) {
-          Refinement = context.get("pentaho/type/refinement");
-        }
-
-        return Refinement.extend(name || "", instSpec);
+        return this.extend(name, instSpec, classSpec, keyArgs);
       }
     }, /* keyArgs: */{
       isRoot: true
@@ -468,5 +581,25 @@ define([
     });
 
     return Value;
+
+    /**
+     * Creates the constructor for an accidental type, the first in a hierarchy of accidental types.
+     *
+     * Accidental constructors always return an instance of the essence type.
+     *
+     * Cannot give a name to the constructor or the name given to extend gets ignored...
+     *
+     * @param {!pentaho.type.Value.Type} essenceType - The essential type.
+     *
+     * @return {function} The accidental type constructor.
+     *
+     * @private
+     */
+    function createAccidentCtor(essenceType) {
+
+      return function() {
+        return essenceType.create.apply(essenceType, arguments);
+      };
+    }
   };
 });

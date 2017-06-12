@@ -16,9 +16,9 @@
 define([
   "module",
   "./categoricalContinuousAbstract",
-  "pentaho/i18n!./i18n/model",
-  "./mixins/settingsMultiChartType"
-], function(module, baseModelFactory, bundle, settingsMultiChartType) {
+  "./mixins/multiCharted",
+  "pentaho/i18n!./i18n/model"
+], function(module, baseModelFactory, multiChartedFactory, bundle) {
 
   "use strict";
 
@@ -29,19 +29,19 @@ define([
     return BaseModel.extend({
       type: {
         id: module.id,
+        mixins: [multiChartedFactory],
         isAbstract: true,
         props: [
           {
             name: "rows", // VISUAL_ROLE
             type: {
+              isAccident: true,
               levels: ["ordinal"]
             }
           }
         ]
       }
     })
-    .implement({type: settingsMultiChartType})
-    .implement({type: bundle.structured.settingsMultiChart})
     .implement({type: bundle.structured.barAbstract});
   };
 });

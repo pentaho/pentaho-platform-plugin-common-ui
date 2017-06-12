@@ -18,11 +18,11 @@ define([
   "./cartesianAbstract",
   "pentaho/i18n!./i18n/model",
   "./types/labelsOption",
-  "./mixins/scaleColorContinuousType",
-  "./mixins/settingsMultiChartType",
-  "./mixins/trendType"
+  "./mixins/scaleColorContinuous",
+  "./mixins/multiCharted",
+  "./mixins/trended"
 ], function(module, baseModelFactory, bundle, labelsOptionFactory,
-    scaleColorContinuousType, settingsMultiChartType, trendType) {
+    scaleColorContinuousFactory, multiChartedFactory, trendedFactory) {
 
   "use strict";
 
@@ -34,12 +34,16 @@ define([
       type: {
         id: module.id,
         isAbstract: true,
+        // TODO: scaleColor... should only be applicable when color is continuous
+        mixins: [trendedFactory, scaleColorContinuousFactory, multiChartedFactory],
+
         category: "scatter",
 
         props: [
           {
             name: "rows", // VISUAL_ROLE
             type: {
+              isAccident: true,
               levels: ["ordinal"],
               props: {attributes: {isRequired: true}}
             }
@@ -72,22 +76,20 @@ define([
                   countMax: function() {
                     var MeasurementLevel = this.type.context.get("pentaho/visual/role/level");
                     return MeasurementLevel.type.isQuantitative(this.levelEffective) ? 1 : null;
-                  }
+                  }// TODO: should only be applicable when color is continuous
                 }
               },
-              instance: {
-                _getAttributesMaxLevel: function() {
-                  // If the mapping contains a single `date` attribute,
-                  // consider it ordinal, and not quantitative as the base code does.
-                  // Currently, CCC does not like dates in continuous color scales...
-                  if(this.attributes.count === 1) {
-                    var dataAttr = this.attributes.at(0).dataAttribute;
-                    if(dataAttr && dataAttr.type === "date")
-                      return "ordinal";
-                  }
-
-                  return this.base();
+              getAttributesMaxLevelOf: function(mapping) {
+                // If the mapping contains a single `date` attribute,
+                // consider it ordinal, and not quantitative as the base code does.
+                // Currently, CCC does not like dates in continuous color scales...
+                if(mapping.attributes.count === 1) {
+                  var dataAttr = mapping.attributes.at(0).dataAttribute;
+                  if(dataAttr && dataAttr.type === "date")
+                    return "ordinal";
                 }
+
+                return this.base(mapping);
               }
             },
             ordinal: 6
@@ -109,13 +111,6 @@ define([
         ]
       }
     })
-    // TODO: should only be applicable when color is continuous
-    .implement({type: scaleColorContinuousType})
-    .implement({type: bundle.structured.scaleColorContinuous})
-    .implement({type: settingsMultiChartType})
-    .implement({type: bundle.structured.settingsMultiChart})
-    .implement({type: trendType})
-    .implement({type: bundle.structured.trend})
     .implement({type: bundle.structured.metricDot});
   };
 });

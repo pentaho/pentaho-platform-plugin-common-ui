@@ -183,14 +183,6 @@ define([
 
           expect(Derived.type.sourceId).toBe("foo/bar");
         });
-
-        it("should ignore it, if it is a temporary id", function() {
-          var Derived = Instance.extend({
-            type: {sourceId: SpecificationContext.idTemporaryPrefix + "id"}
-          });
-
-          expect(Derived.type.sourceId).toBe(null);
-        });
       });
 
       describe("when both `id` and `sourceId` are truthy and different -", function() {
@@ -1157,12 +1149,6 @@ define([
     describe("#isList", function() {
       it("should have default `isList` equal to `false`", function() {
         expect(Instance.type.isList).toBe(false);
-      });
-    });
-
-    describe("#isRefinement", function() {
-      it("should have default `isRefinement` equal to `false`", function() {
-        expect(Instance.type.isRefinement).toBe(false);
       });
     });
 

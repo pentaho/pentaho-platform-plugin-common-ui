@@ -121,24 +121,23 @@ define([
         if(SpecificationContext.isIdTemporary(id)) id = null;
 
         var sourceId = nonEmptyString(spec.sourceId);
-        // Is it a temporary id? If so, ignore it.
-        if(SpecificationContext.isIdTemporary(sourceId)) sourceId = null;
-
         if(!sourceId) sourceId = id;
         else if(!id) id = sourceId;
 
+        var alias = nonEmptyString(spec.alias);
+        if(alias != null && id == null) throw error.argInvalid("alias", "Anonymous types cannot have an alias");
+
         O.setConst(this, "_id", id);
         O.setConst(this, "_sourceId", sourceId);
+        O.setConst(this, "_alias", alias);
         O.setConst(this, "_isAbstract", !!spec.isAbstract);
 
         // Block inheritance, with default values
 
         // Don't use inherited property definition which may be writable false
-
-        Object.defineProperty(this, "_alias", {value: null, writable: true});
         Object.defineProperty(this, "_hasDescendants", {value: false, writable: true});
 
-        this._styleClass = null;
+        if(!("styleClass" in spec)) this.styleClass = undefined;
 
         this._application = specUtil.merge({}, this._application);
       },
@@ -146,9 +145,7 @@ define([
       /**
        * Performs initialization tasks that take place after the instance is extended with its specification.
        *
-       * This method is typically overridden to validate the values of the attributes.
-       *
-       * The default implementation does nothing.
+       * This method is typically overridden to validate or default the values of the attributes.
        *
        * @param {!Object} spec - The specification of this type.
        * @param {!Object} keyArgs - Keyword arguments.
@@ -156,13 +153,6 @@ define([
        * @overridable
        */
       _postInit: function(spec, keyArgs) {
-        var alias = this._alias;
-
-        // Lock these properties
-        O.setConst(this, "_alias", alias);
-
-        // Default styleClass
-        if(this._id && spec.styleClass === undefined) this.styleClass = undefined;
       },
 
       // region context property
@@ -359,18 +349,6 @@ define([
       get isElement() { return false; },
       // endregion
 
-      // region isRefinement property
-      /**
-       * Gets a value that indicates if this type
-       * [is]{@link pentaho.type.Type#isSubtypeOf} a
-       * [refinement]{@link pentaho.type.Refinement.Type} type.
-       *
-       * @type {boolean}
-       * @readOnly
-       */
-      get isRefinement() { return false; },
-      // endregion
-
       // region isComplex property
       /**
        * Gets a value that indicates if this type
@@ -395,9 +373,69 @@ define([
       get isSimple() { return false; },
       // endregion
 
+      // region essence
+      /**
+       * Gets the essential type of this type, possibly itself.
+       *
+       * A non-essential type is an accidental type, or an _accident_.
+       * Only subtypes of [Value]{@link pentaho.type.Value} can be accidental types.
+       * Accidental types are _abstract_ types
+       * that restrict, or, can also be said, refine, a base type,
+       * which can be either essential or accidental,
+       * without changing its _essence_.
+       *
+       * An accidental type can only specialize its _type class_.
+       * Its instance constructor always returns direct instances
+       * of the essence type and its instance prototype cannot be extended.
+       *
+       * An accidental type is defined by calling
+       * the [refine]{@link pentaho.type.Value.refine} method of
+       * a `Value` base type's instance constructor,
+       * which can be either essential or accidental.
+       * Alternatively, if the base type is already an accidental type,
+       * calling [extend]{@link pentaho.type.Value.extend} on its
+       * instance constructor is equivalent, and
+       * refines the underlying essence further.
+       *
+       * @type {!pentaho.type.Type}
+       * @readOnly
+       *
+       * @see pentaho.type.Type#isEssence
+       * @see pentaho.type.Type#isAccident
+       * @see pentaho.type.Value.refine
+       * @see pentaho.type.Value.extend
+       */
+      get essence() {
+        return this;
+      },
+
+      /**
+       * Gets a value that indicates if this type is an essential type.
+       *
+       * @type {boolean}
+       * @readOnly
+       *
+       * @see pentaho.type.Type#essence
+       */
+      get isEssence() {
+        return true;
+      },
+
+      /**
+       * Gets a value that indicates if this type is an accidental type.
+       *
+       * @type {boolean}
+       * @readOnly
+       *
+       * @see pentaho.type.Type#essence
+       */
+      get isAccident() {
+        return false;
+      },
+      // endregion
       // endregion
 
-      // region id and sourceId properties
+      // region id, sourceId and alias properties
 
       // -> nonEmptyString, Optional(null), Immutable, Shared (note: not Inherited)
       // "" -> null conversion
@@ -535,19 +573,6 @@ define([
       get alias() {
         return this._alias;
       },
-
-      set alias(value) {
-        value = nonEmptyString(value);
-        if(value != null) {
-          if(!this.id) {
-            throw error.argInvalid("alias", "Anonymous types cannot have an alias");
-          }
-
-          // Throws if already const.
-          this._alias = value;
-        }
-      },
-
       // endregion
 
       // region isAbstract property
@@ -559,15 +584,35 @@ define([
       _isAbstract: true,
 
       /**
-       * Gets or sets a value that indicates if this type is abstract.
+       * Gets a value that indicates if this type is abstract.
        *
        * This attribute can only be set once, upon the type definition.
        *
        * @type {boolean}
+       * @readOnly
+       *
        * @default false
        */
       get isAbstract() {
         return this._isAbstract;
+      },
+
+      /**
+       * Gets a value that indicates if this type is abstract because it is implied by other properties
+       * and not by specification.
+       *
+       * The default implementation returns `false`.
+       *
+       * Override and return `true`,
+       * to avoid serializing the `isAbstract` attribute when it is implied.
+       *
+       * @type {boolean}
+       * @readOnly
+       *
+       * @protected
+       */
+      get _isAbstractImplied() {
+        return false;
       },
       // endregion
 
@@ -879,6 +924,7 @@ define([
       // "" or undefined -> null conversion
 
       _styleClass: null,
+      _styleClassIsDefault: undefined,
 
       /**
        * Gets or sets the CSS class associated with this type.
@@ -908,8 +954,10 @@ define([
       set styleClass(value) {
         if(value === undefined) {
           this._styleClass = this._id ? text.toSnakeCase(this._id) : null;
+          this._styleClassIsDefault = true;
         } else {
           this._styleClass = value === "" ? null : value;
+          this._styleClassIsDefault = false;
         }
       },
 
@@ -1218,16 +1266,19 @@ define([
       create: function(instSpec, keyArgs) {
         var Instance;
         var typeSpec;
+        var instType;
 
         // If it is a plain Object, does it have the inline type property, "_"?
         if(instSpec && typeof instSpec === "object" && (typeSpec = instSpec._) && instSpec.constructor === Object) {
 
           Instance = context.get(typeSpec);
 
-          if(this._assertSubtype(Instance.type).isAbstract)
-            Instance.type._throwAbstractType();
+          instType = this._assertSubtype(Instance.type).essence;
 
-        } else if(this.isAbstract) {
+          if(instType.isAbstract) instType._throwAbstractType();
+
+        } else if(this.essence.isAbstract) {
+
           /* eslint default-case: 0 */
           switch(typeof instSpec) {
             case "string": Instance = _String || (_String = context.get("string")); break;
@@ -1347,13 +1398,13 @@ define([
       // endregion
 
       /**
-       * Determines if a value is an instance of this type.
+       * Determines if a value is an instance of this type's **essence**.
        *
        * @param {?any} value - The value to test.
        * @return {boolean} `true` if the value is an instance of this type; `false`, otherwise.
        */
       is: function(value) {
-        return O_isProtoOf.call(this.instance, value);
+        return O_isProtoOf.call(this.essence.instance, value);
       },
 
       /**
@@ -1440,9 +1491,8 @@ define([
        * @see pentaho.type.Type#toSpec
        */
       toSpecInContext: function(keyArgs) {
-        var id = keyArgs && keyArgs.noAlias ? this.id : this.shortId;
 
-        var spec = {id: id || SpecificationContext.current.add(this)};
+        var spec = {id: this._id || SpecificationContext.current.add(this)};
 
         this._fillSpecInContext(spec, keyArgs || {});
 
@@ -1493,6 +1543,19 @@ define([
         var any = false;
         var isJson = keyArgs.isJson;
 
+        if(this._alias != null) {
+          any = true;
+          spec.alias = this._alias;
+        }
+
+        // TODO: if sourceId is not serialized, defaultView looses the relative reference.
+
+        // Custom attributes
+        if(!this._isAbstractImplied && this.isAbstract) {
+          any = true;
+          spec.isAbstract = true;
+        }
+
         if(this._labelSet && O.hasOwn(this, "_label")) {
           any = true;
           spec.label = this._label;
@@ -1501,6 +1564,7 @@ define([
         // "mixins" attribute
         var mixins = this.mixins;
         if(mixins.length) {
+          any = true;
           spec.mixins = mixins.map(function(mixinType) { return mixinType.shortId; });
         }
 
@@ -1515,14 +1579,8 @@ define([
           }
         }, this);
 
-        // Custom attributes
-        if(!this.isRefinement && this.isAbstract) {
-          any = true;
-          spec.isAbstract = true;
-        }
-
         var styleClass = this._styleClass;
-        if(styleClass) {
+        if(styleClass && !this._styleClassIsDefault) {
           any = true;
           spec.styleClass = styleClass;
         }

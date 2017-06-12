@@ -136,7 +136,7 @@ define([
         expect(keyArgs2.bar).toBe(keyArgs.bar);
       });
 
-      it("should return a specification object having the alias of the type", function() {
+      it("should return a specification object having the id of the type, if an alias is defined", function() {
         var derivedType = Instance.extend({type: {id: "pentaho/type/test", alias: "testAlias"}}).type;
 
         var scope = new SpecificationScope();
@@ -146,7 +146,20 @@ define([
         scope.dispose();
 
         expect(spec instanceof Object).toBe(true);
-        expect(spec.id).toBe(derivedType.alias);
+        expect(spec.id).toBe(derivedType.id);
+      });
+
+      it("should return a specification object having the alias of the type, if it is defined", function() {
+        var derivedType = Instance.extend({type: {id: "pentaho/type/test", alias: "testAlias"}}).type;
+
+        var scope = new SpecificationScope();
+
+        var spec = derivedType.toSpecInContext();
+
+        scope.dispose();
+
+        expect(spec instanceof Object).toBe(true);
+        expect(spec.alias).toBe(derivedType.alias);
       });
 
       it("should return a specification object having the id of the type, if no alias is defined", function() {

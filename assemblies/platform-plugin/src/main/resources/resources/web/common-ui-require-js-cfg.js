@@ -71,7 +71,6 @@
   requireTypeInfo["pentaho/type/property"] = {alias: "property", base: "instance"};
   requireTypeInfo["pentaho/type/list"] = {alias: "list", base: "value"};
   requireTypeInfo["pentaho/type/element"] = {alias: "element", base: "value"};
-  requireTypeInfo["pentaho/type/refinement"] = {alias: "refinement", base: "value"};
   requireTypeInfo["pentaho/type/complex"] = {alias: "complex", base: "element"};
   requireTypeInfo["pentaho/type/application"] = {alias: "application", base: "complex"};
   requireTypeInfo["pentaho/type/model"] = {alias: "model", base: "complex"};
@@ -90,6 +89,7 @@
   requireTypeInfo["pentaho/type/filter/property"] = {base: "pentaho/type/filter/abstract"};
   requireTypeInfo["pentaho/type/filter/isEqual"] = {alias: "=", base: "pentaho/type/filter/property"};
   requireTypeInfo["pentaho/type/filter/isIn"] = {alias: "in", base: "pentaho/type/filter/property"};
+  requireTypeInfo["pentaho/type/facets/discreteDomain"] = {alias: "discreteDomain", base: "value"};
 
   requireTypeInfo["pentaho/visual/base"] = {base: "model"};
   requireTypeInfo["pentaho/visual/base/view"] = {

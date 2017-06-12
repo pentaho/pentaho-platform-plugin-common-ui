@@ -64,7 +64,85 @@ define([
         });
       }); // end #isAbstract
 
-      describe("#areEqual(va, vb)", function() {
+      describe("_isEqual(va, vb)", function() {
+
+        it("should return `true` if two distinct values have the same constructor and the same key", function() {
+          var va = new Value();
+          var vb = new Value();
+
+          // Override/Redefine getter property
+          Object.defineProperty(va, "key", {value: "A"});
+          Object.defineProperty(vb, "key", {value: "A"});
+
+          expect(va.type._isEqual(va, vb)).toBe(true);
+        });
+
+        it("should return `false` if two distinct values have different constructors and the same key", function() {
+          var Value2 = Value.extend();
+          var va = new Value();
+          var vb = new Value2();
+
+          // Override/Redefine getter property
+          Object.defineProperty(va, "key", {value: "A"});
+          Object.defineProperty(vb, "key", {value: "A"});
+
+          expect(va.type._isEqual(va, vb)).toBe(false);
+        });
+
+        it("should return `false` if two distinct values have the same constructor and different keys", function() {
+          var va = new Value();
+          var vb = new Value();
+
+          // Override/Redefine getter property
+          Object.defineProperty(va, "key", {value: "A"});
+          Object.defineProperty(vb, "key", {value: "B"});
+
+          expect(va.type._isEqual(va, vb)).toBe(false);
+        });
+      });
+
+      describe("_areEqual(va, vb)", function() {
+
+        it("should call va.type._isEqual if va is a Value", function() {
+          var Value2 = Value.extend();
+
+          spyOn(Value2.type, "_isEqual").and.returnValue(true);
+
+          var va = new Value2();
+          var vb = new Value2();
+
+          Value.type._areEqual(va, vb);
+
+          expect(va.type._isEqual).toHaveBeenCalledWith(va, vb);
+        });
+
+        it("should call vb.type._isEqual if va is not a Value but vb is", function() {
+          var Value2 = Value.extend();
+
+          spyOn(Value2.type, "_isEqual").and.returnValue(true);
+
+          var va = "A";
+          var vb = new Value2();
+
+          Value.type._areEqual(va, vb);
+
+          expect(vb.type._isEqual).toHaveBeenCalledWith(vb, va);
+        });
+
+        it("should return false and not call Value.type._isEqual if neither va nor vb are Value instances", function() {
+
+          spyOn(Value.type, "_isEqual").and.returnValue(true);
+
+          var va = "A";
+          var vb = "B";
+
+          expect(Value.type._areEqual(va, vb)).toBe(false);
+
+          expect(Value.type._isEqual).not.toHaveBeenCalled();
+        });
+      });
+
+      describe("areEqual(va, vb)", function() {
         it("should return `true` if both values are nully", function() {
           expect(Value.type.areEqual(null, null)).toBe(true);
           expect(Value.type.areEqual(undefined, undefined)).toBe(true);
@@ -81,42 +159,24 @@ define([
           expect(Value.type.areEqual(va, null)).toBe(false);
         });
 
-        it("should return `true` when given the same value instances and not call its #equals method", function() {
+        it("should return `true` when given the same value instances and not call the _areEqual method", function() {
           var va = new Value();
 
-          spyOn(va, "equals").and.callThrough();
+          spyOn(va.type, "_areEqual").and.callThrough();
 
           expect(Value.type.areEqual(va, va)).toBe(true);
-          expect(va.equals).not.toHaveBeenCalled();
+          expect(va.type._areEqual).not.toHaveBeenCalled();
         });
 
-        it("should return `false` when given values with different constructors and not call their #equals methods",
-        function() {
-          var PentahoNumber = context.get("pentaho/type/number");
-          var va = new Value();
-          var vb = new PentahoNumber(1);
-
-          spyOn(va, "equals").and.callThrough();
-          spyOn(vb, "equals").and.callThrough();
-
-          expect(Value.type.areEqual(va, vb)).toBe(false);
-
-          expect(va.equals).not.toHaveBeenCalled();
-          expect(vb.equals).not.toHaveBeenCalled();
-        });
-
-        it("should call the first value's #equals method when these are distinct instances with the same constructor",
-            function() {
+        it("should call the _areEqual method when given two distinct, non-nully arguments", function() {
           var va = new Value();
           var vb = new Value();
 
-          spyOn(va, "equals").and.callFake(function() { return false; });
-          spyOn(vb, "equals").and.callFake(function() { return false; });
+          spyOn(Value.type, "_areEqual").and.callThrough();
 
-          expect(Value.type.areEqual(va, vb)).toBe(false);
+          Value.type.areEqual(va, vb);
 
-          expect(va.equals).toHaveBeenCalled();
-          expect(vb.equals).not.toHaveBeenCalled();
+          expect(Value.type._areEqual).toHaveBeenCalledWith(va, vb);
         });
       }); // end #areEqual
     }); // "Type"
@@ -173,26 +233,21 @@ define([
         expect(va.equals(va)).toBe(true);
       });
 
-      it("should return `true` if two distinct values have the same key", function() {
-        var va = new Value(),
-            vb = new Value();
+      it("should return `false` if given a nully value", function() {
+        var va = new Value();
 
-        // Override/Redefine getter property
-        Object.defineProperty(va, "key", {value: "A"});
-        Object.defineProperty(vb, "key", {value: "A"});
-
-        expect(va.equals(vb)).toBe(true);
+        expect(va.equals(null)).toBe(false);
+        expect(va.equals(undefined)).toBe(false);
       });
 
-      it("should return `false` if two distinct values have different keys", function() {
-        var va = new Value(),
-            vb = new Value();
+      it("should call type._isEqual if not the same value and the other is not null", function() {
+        var va = new Value();
+        var vb = new Value();
 
-        // Override/Redefine getter property
-        Object.defineProperty(va, "key", {value: "A"});
-        Object.defineProperty(vb, "key", {value: "B"});
+        spyOn(va.type, "_isEqual").and.returnValue(false);
 
         expect(va.equals(vb)).toBe(false);
+        expect(va.type._isEqual).toHaveBeenCalledWith(va, vb);
       });
     }); // end #equals
 

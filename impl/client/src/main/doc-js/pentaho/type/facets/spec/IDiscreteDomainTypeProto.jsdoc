@@ -16,8 +16,7 @@
 
 /**
  * The `spec.IDiscreteDomainTypeProto` interface represents the
- * specification made available to a refinement type
- * by a discrete domain refinement facet.
+ * specification made available to a value type by the discrete domain mixin facet.
  *
  * @name pentaho.type.facets.spec.IDiscreteDomainTypeProto
  * @interface
@@ -27,10 +26,9 @@
  * The discrete domain of the type.
  *
  * The domain attribute refines a type to a set of discrete values
- * whose type is that of the representation type,
- * {@link pentaho.type.Refinement.Type#of}.
+ * whose type is that of this type's [essence type]{@link pentaho.type.Type#essence}.
  *
- * If the ancestor refinement type has `domain` set,
+ * If the ancestor type has `domain` set,
  * the specified set of values must be a subset of those.
  *
  * @name domain

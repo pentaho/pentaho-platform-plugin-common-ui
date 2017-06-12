@@ -219,27 +219,34 @@ define([
       },
 
       // region configuration
-      /**
-       * Configures this simple value with a given configuration.
-       *
-       *
-       * @name configure
-       * @memberOf pentaho.type.Simple#
-       * @param {?any} config - The configuration.
-       * @return {!pentaho.type.Simple} This instance.
-       */
 
       // TODO: unify constructor, cloning and configuration code somehow?
 
       /**
-       * Configures this value with a given _non-nully_ configuration.
+       * Configures this value with a given configuration.
        *
-       * The default implementation does nothing.
+       * If `config` is {@link Nully}, it is ignored.
        *
-       * @param {any} config - The configuration.
+       * If `config` is a plain object, its properties, `v`, `f`, `value` and `formatted`
+       * are set on this simple's corresponding properties. It is an error if the properties `v` or `value`
+       * contain a primitive value which is different from of this simple.
        *
-       * @protected
+       * If `config` is another simple value, it can be of any simple type.
+       * However, its primitive value must be the same as that of this simple.
+       * If the formatted value of `config` is not {@link Nully}, it updates this simple's formatted value.
+       *
+       * An error is thrown if `config` is of another type.
+       *
+       * @name configure
+       * @memberOf pentaho.type.Simple#
+       *
+       * @param {Object|pentaho.type.Simple} config - The configuration.
+       *
+       * @return {!pentaho.type.Simple} This instance.
+       *
+       * @throws {pentaho.lang.ArgumentInvalidError} When `config` is not either a plain object or a simple value.
        */
+
       _configure: function(config) {
         // Nothing configurable at this level
         if(config instanceof Object) {
@@ -260,12 +267,17 @@ define([
       },
 
       _configureFromSimple: function(other) {
-        // TODO: same simple class?
         if(other !== this) {
-          // implicit "downcast" of simple values
-          this.value     = other.value; // inits or ensures value is the same (and throws otherwise)
-          this.formatted = other.formatted;
-          // TODO: generic metadata
+
+          // TODO: same simple class?
+          // Implicit "downcast" of simple values.
+
+          // Inits or ensures value is the same (and throws otherwise).
+          this.value = other.value;
+          var f = other.formatted;
+          if(f != null) {
+            this.formatted = f;
+          }
         }
       },
 
@@ -285,12 +297,11 @@ define([
         var type = this.type;
 
         var declaredType = keyArgs.declaredType;
+        if(declaredType) declaredType = declaredType.essence;
+
         var includeType = !!keyArgs.forceType;
         if(!includeType && declaredType) {
-          if(declaredType.isRefinement) declaredType = declaredType.of;
-
           // Abstract foo = (MyNumber 1)
-
           if(type !== declaredType) {
             if(!stringType) {
               stringType = context.get("string").type;
@@ -417,6 +428,103 @@ define([
          */
         cast: function(value) {
           return value;
+        },
+        // endregion
+
+        // region equality and comparison
+        /**
+         * Gets a value that indicates if two distinct, non {@link Nully} simple values are, nonetheless,
+         * considered equal.
+         *
+         * The default implementation considers two values equal if the
+         * primitive value of one is equal to the primitive value of the other.
+         * If both values are simple values, then they must have the same constructor.
+         *
+         * @param {any} va - The first value.
+         * @param {any} vb - The second value.
+         *
+         * @return {boolean} `true` if two simple values are considered equal; `false`, otherwise.
+         *
+         * @protected
+         */
+        _areEqual: function(va, vb) {
+          if((va instanceof Simple) && (vb instanceof Simple)) {
+            if(va.constructor !== vb.constructor) {
+              return false;
+            }
+          }
+          return va.valueOf() === vb.valueOf();
+        },
+
+        /**
+         * Gets a value that indicates if one simple value of this type is considered equal to a distinct,
+         * non-nully value, but possibly not a value instance.
+         *
+         * The default implementation considers two values equal if the
+         * primitive value of one is equal to the primitive value of the other.
+         * If `vb` is also a simple value, then it must have the same constructor as `va`.
+         *
+         * @param {!pentaho.type.Value} va - The value instance.
+         * @param {any} vb - The other value.
+         *
+         * @return {boolean} `true` if two values are considered equal; `false`, otherwise.
+         *
+         * @protected
+         *
+         * @see pentaho.type.Simple.Type#_areEqual
+         */
+        _isEqual: function(va, vb) {
+          if(vb instanceof Simple) {
+            if(va.constructor !== vb.constructor) {
+              return false;
+            }
+          }
+          return va._value === vb.valueOf();
+        },
+
+        // TODO: consider creating a key counterpart for order: `ordinal` to use in comparisons.
+
+        /**
+         * Compares two non-equal, non-{@link Nully} values according to their order.
+         *
+         * If both values are simple values and their constructors are different,
+         * then they're assumed to have the same order.
+         * Otherwise, the two values are compared by the natural ascending order of their primitive value.
+         * If both primitive values are numbers or {@link Date} objects, numeric order is used.
+         * Otherwise, their string representations are compared in lexicographical order.
+         *
+         * @param {any} va - The first value.
+         * @param {any} vb - The second value.
+         *
+         * @return {number} `-1` if `va` is considered _before_ `vb`; `1` is `va` is considered _after_ `vb`;
+         * `0`, otherwise.
+         *
+         * @protected
+         */
+        _compare: function(va, vb) {
+          // Dunno how to compare apples and bananas.
+          if((va instanceof Simple) && (vb instanceof Simple)) {
+            if(va.constructor !== vb.constructor) {
+              return 0;
+            }
+          }
+
+          return this._compareValues(va.valueOf(), vb.valueOf());
+        },
+
+        /**
+         * Compares two primitive values according to their order.
+         *
+         * @param {any} va - The first value.
+         * @param {any} vb - The second value.
+         *
+         * @return {number} `-1` if `va` is considered _before_ `vb`; `1` is `va` is considered _after_ `vb`;
+         * `0`, otherwise.
+         *
+         * @protected
+         */
+        _compareValues: function(va, vb) {
+          return fun.compare(va, vb);
         },
         // endregion
 

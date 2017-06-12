@@ -754,8 +754,7 @@ define([
         var noAlias = !!keyArgs.noAlias;
         var declaredType;
         var includeType = !!keyArgs.forceType ||
-              (!!(declaredType = keyArgs.declaredType) &&
-               this.type !== (declaredType.isRefinement ? declaredType.of : declaredType));
+              (!!(declaredType = keyArgs.declaredType) && this.type !== declaredType.essence);
 
         var useArray = !includeType && keyArgs.preferPropertyArray;
         var omitProps;
@@ -771,12 +770,12 @@ define([
         }
 
         var includeDefaults = !!keyArgs.includeDefaults;
-        var areEqual = this.type.areEqual;
+        var type = this.type;
 
         // reset
         keyArgs.forceType = false;
 
-        this.type.each(propToSpec, this);
+        type.each(propToSpec, this);
 
         return spec;
 
@@ -802,7 +801,7 @@ define([
               // However, this prevents serializing an empty list when the default is also empty.
               includeValue = (defaultValue && defaultValue.count > 0) || (value.count > 0);
             } else {
-              includeValue = !areEqual(defaultValue, value);
+              includeValue = !type.areEqual(defaultValue, value);
             }
           }
 
@@ -1030,14 +1029,14 @@ define([
          * If it is a complex type, each of the corresponding local properties is yielded.
          *
          * @param {!pentaho.type.Type} otherType - The other type.
-         * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} f -
+         * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} fun -
          * The mapping function. Return `false` to break iteration.
          *
-         * @param {Object} [x] - The JS context object on which `f` is called.
+         * @param {Object} [ctx] - The JS context object on which `fun` is called.
          *
          * @return {!pentaho.type.Complex} This object.
          */
-        eachCommonWith: function(otherType, f, x) {
+        eachAssignableFrom: function(otherType, fun, ctx) {
           var lca;
           if(otherType.isComplex && (lca = O.lca(this, otherType)) && lca.isComplex) {
 
@@ -1046,16 +1045,18 @@ define([
               var localPropType = this.get(name);
 
               /* A property is yielded if the value-type of the other type's property is a subtype of
-               * the value-type of the local property.
-               *
-               *  var otherPropType = otherType.get(name);
-               *
-               * // assert basePropType === O.lca(localPropType, otherPropType)
-               *
-               * if(otherPropType.type.isSubtypeOf(localPropType.type))
-              */
-              if(f.call(x, localPropType, i, this) === false)
-                return false;
+               * (is assignable to) the value-type of the local property.
+               */
+              var otherPropType = otherType.get(name);
+
+              // assert basePropType === O.lca(localPropType, otherPropType)
+
+              if(otherPropType.type.essence.isSubtypeOf(localPropType.type.essence)) {
+                if(fun.call(ctx, localPropType, i, this) === false) {
+                  return false;
+                }
+              }
+
             }, this);
           }
 

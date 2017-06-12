@@ -14,21 +14,34 @@
  * limitations under the License.
  */
 define([
-  "../types/sizeByNegativesMode"
-], function(sizeByNegativesModeFactory) {
+  "module",
+  "pentaho/visual/base/model",
+  "../types/sizeByNegativesMode",
+  "pentaho/i18n!../i18n/model"
+], function(module, modelFactory, sizeByNegativesModeFactory, bundle) {
 
   "use strict";
 
   // Used by: HG, Scatter
-  return {
-    props: [
-      {
-        name: "sizeByNegativesMode",
-        type: sizeByNegativesModeFactory,
-        isApplicable: function() { return this.count("size") > 0; },
-        isRequired: true,
-        value: "negLowest"
+  return function(context) {
+
+    var BaseModel = context.get(modelFactory);
+
+    return BaseModel.extend({
+      type: {
+        id: module.id,
+        isAbstract: true,
+        props: [
+          {
+            name: "sizeByNegativesMode",
+            type: sizeByNegativesModeFactory,
+            isApplicable: function() { return this.count("size") > 0; },
+            isRequired: true,
+            value: "negLowest"
+          }
+        ]
       }
-    ]
+    })
+    .implement({type: bundle.structured.scaleSizeContinuous});
   };
 });

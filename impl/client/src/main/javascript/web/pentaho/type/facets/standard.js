@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 define([
-  "./Refinement",
-  "./DiscreteDomain"
-], function(Refinement, DiscreteDomain) {
+  "./discreteDomain"
+], function(discreteDomain) {
 
   "use strict";
 
   return {
-    // "Refinement": Refinement,
-    "DiscreteDomain": DiscreteDomain
+    "discreteDomain": discreteDomain
   };
 });

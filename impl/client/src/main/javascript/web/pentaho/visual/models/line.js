@@ -19,8 +19,8 @@ define([
   "pentaho/i18n!./i18n/model",
   "./types/shape",
   "./types/lineWidth",
-  "./mixins/trendType"
-], function(module, baseModelFactory, bundle, shapeFactory, lineWidthFactory, trendType) {
+  "./mixins/trended"
+], function(module, baseModelFactory, bundle, shapeFactory, lineWidthFactory, trendedFactory) {
 
   "use strict";
 
@@ -31,6 +31,8 @@ define([
     return BaseModel.extend({
       type: {
         id: module.id,
+        mixins: [trendedFactory],
+
         v2Id: "ccc_line",
         category: "linechart",
         defaultView: "pentaho/ccc/visual/line",
@@ -49,10 +51,7 @@ define([
           }
         ]
       }
-
     })
-    .implement({type: trendType})
-    .implement({type: bundle.structured.trend})
     .implement({type: bundle.structured.line});
   };
 });

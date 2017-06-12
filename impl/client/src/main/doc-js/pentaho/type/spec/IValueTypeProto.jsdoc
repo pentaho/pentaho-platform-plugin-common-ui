@@ -33,14 +33,20 @@
  */
 
 /**
- * Determines if a value of the type is **valid**.
+ * Indicates if the type is an accidental type.
  *
- * Although not limited to,
- * this method is used mostly for
- * [refinement types]{@link pentaho.type.Refinement},
- * to perform additional validations on values,
- * besides that which is performed by their
- * type's instance-side validate method.
+ * A type that extends an accidental type is necessarily an accidental type, and so any value is ignored.
+ * Otherwise, if the type extends an essential type and when `true`, defines an accidental type.
+ *
+ * @name isAccident
+ * @memberOf pentaho.type.spec.IValueTypeProto#
+ * @type {boolean}
+ *
+ * @see pentaho.type.Type#isAccident
+ */
+
+/**
+ * Determines if a value of the type is **valid**.
  *
  * If you override this method,
  * be sure to call the base implementation,

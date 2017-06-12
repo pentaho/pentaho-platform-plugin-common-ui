@@ -57,9 +57,9 @@ define([
           {
             name: "operation",
             type: {
-              base: "refinement",
-              of:   "string",
-              facets: ["DiscreteDomain"],
+              base: "string",
+              isAccident: true,
+              mixins: ["discreteDomain"],
               domain: ["min", "max", "avg", "sum"]
             },
             value: "min"

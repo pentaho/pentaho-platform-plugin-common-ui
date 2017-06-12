@@ -43,7 +43,6 @@ define([
      * @name pentaho.visual.role.Mapping
      * @class
      * @extends pentaho.type.Complex
-     * @abstract
      *
      * @amd {pentaho.type.Factory<pentaho.visual.role.Mapping>} pentaho/visual/role/mapping
      *
@@ -218,7 +217,7 @@ define([
          * Downgrade from quantitative to any qualitative is possible.
          * Auto Level:    quantitative->ordinal
          */
-        var attrsMaxLevel = this._getAttributesMaxLevel();
+        var attrsMaxLevel = this.type.getAttributesMaxLevelOf(this);
         if(attrsMaxLevel) return this._getRoleLevelCompatibleWith(attrsMaxLevel);
       },
 
@@ -269,54 +268,6 @@ define([
 
         // Already sorted from lowest to highest
         return roleLevels.map(function(level) { return level.value; });
-      },
-
-      /**
-       * Determines the highest level of measurement supported by all of the data properties
-       * in mapping attributes.
-       *
-       * Any attributes that aren't defined in the visual model's current data should be ignored.
-       * Defined attributes should be considered even if their data type is not compatible with the visual role's
-       * supported data types.
-       *
-       * When there are no attributes or when all attributes are invalid, `undefined` is returned.
-       *
-       * This method should not care about whether the returned level of measurement
-       * is one of the supported visual role's measurement levels.
-       *
-       * @return {string|undefined} The highest level of measurement.
-       * @protected
-       */
-      _getAttributesMaxLevel: function() {
-        var mappingAttrs = this.attributes;
-        var data;
-        var visualModel;
-        var L;
-        if(!(L = mappingAttrs.count) || !(visualModel = this.model) || !(data = visualModel.data))
-          return;
-
-        // First, find the lowest level of measurement in the mapped attributes.
-        // The lowest of the levels in attributes that are also supported by the visual role.
-        var levelLowest;
-
-        var dataAttrs = data.model.attributes;
-        var i = -1;
-        var name;
-        var dataAttr;
-        var dataAttrLevel;
-        while(++i < L) {
-          var mappingAttr = mappingAttrs.at(i);
-          if(!(name = mappingAttr.name) ||
-             !(dataAttr = dataAttrs.get(name)) ||
-             !(dataAttrLevel = dataAttr.level) ||
-             !MeasurementLevel.type.domain.get(dataAttrLevel))
-            return; // invalid
-
-          if(!levelLowest || MeasurementLevel.type.compare(dataAttrLevel, levelLowest) < 0)
-            levelLowest = dataAttrLevel;
-        }
-
-        return levelLowest;
       },
 
       /**
@@ -406,7 +357,7 @@ define([
         }
 
         // Data Attributes, if any, must be compatible with level.
-        var dataAttrLevel = this._getAttributesMaxLevel();
+        var dataAttrLevel = this.type.getAttributesMaxLevelOf(this);
         if(dataAttrLevel) {
           var roleLevel = this._getRoleLevelCompatibleWith(dataAttrLevel, roleLevels);
           if(!roleLevel) {
@@ -531,8 +482,6 @@ define([
 
       type: /** @lends pentaho.visual.role.Mapping.Type# */{
         id: module.id,
-
-        isAbstract: true,
 
         props: [
           /**
@@ -668,7 +617,8 @@ define([
               }
             }
 
-            this.levels.sort(MeasurementLevel.type.compare);
+            var levelType = MeasurementLevel.type;
+            this.levels.sort(levelType.compare.bind(levelType));
           }
         },
 
@@ -873,6 +823,55 @@ define([
               };
             }
           }
+        },
+
+        /**
+         * Determines the highest level of measurement supported by all of the data properties
+         * in the mapping attributes of the given mapping.
+         *
+         * Any attributes that aren't defined in the visual model's current data should be ignored.
+         * Defined attributes should be considered even if their data type is not compatible with the visual role's
+         * supported data types.
+         *
+         * When there are no attributes or when all attributes are invalid, `undefined` is returned.
+         *
+         * This method should not care about whether the returned level of measurement
+         * is one of the supported visual role's measurement levels.
+         *
+         * @param {!pentaho.visual.role.Mapping} mapping - The visual role mapping.
+         *
+         * @return {string|undefined} The highest level of measurement.
+         */
+        getAttributesMaxLevelOf: function(mapping) {
+          var mappingAttrs = mapping.attributes;
+          var data;
+          var visualModel;
+          var L;
+          if(!(L = mappingAttrs.count) || !(visualModel = mapping.model) || !(data = visualModel.data))
+            return;
+
+          // First, find the lowest level of measurement in the mapped attributes.
+          // The lowest of the levels in attributes that are also supported by the visual role.
+          var levelLowest;
+
+          var dataAttrs = data.model.attributes;
+          var i = -1;
+          var name;
+          var dataAttr;
+          var dataAttrLevel;
+          while(++i < L) {
+            var mappingAttr = mappingAttrs.at(i);
+            if(!(name = mappingAttr.name) ||
+                !(dataAttr = dataAttrs.get(name)) ||
+                !(dataAttrLevel = dataAttr.level) ||
+                !MeasurementLevel.type.domain.get(dataAttrLevel))
+              return; // invalid
+
+            if(!levelLowest || MeasurementLevel.type.compare(dataAttrLevel, levelLowest) < 0)
+              levelLowest = dataAttrLevel;
+          }
+
+          return levelLowest;
         }
       }
     })

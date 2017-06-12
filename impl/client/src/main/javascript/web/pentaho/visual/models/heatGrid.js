@@ -19,17 +19,12 @@ define([
   "pentaho/i18n!./i18n/model",
   "./types/shape",
   "./types/labelsOption",
-  "./mixins/scaleSizeContinuousType",
-  "./mixins/scaleColorContinuousType"
+  "./mixins/scaleSizeContinuous",
+  "./mixins/scaleColorContinuous"
 ], function(module, baseModelFactory, bundle, shapeFactory, labelsOptionFactory,
-    scaleSizeContinuousType, scaleColorContinuousType) {
+    scaleSizeContinuousFactory, scaleColorContinuousFactory) {
 
   "use strict";
-
-  function requiredOneMeasure() {
-    /* jshint validthis:true*/
-    return !this.model.size.attributes.count && !this.model.color.attributes.count;
-  }
 
   return function(context) {
 
@@ -38,6 +33,8 @@ define([
     return BaseModel.extend({
       type: {
         id: module.id,
+        mixins: [scaleColorContinuousFactory, scaleSizeContinuousFactory],
+
         v2Id: "ccc_heatgrid",
         category: "heatgrid",
         defaultView: "pentaho/ccc/visual/heatGrid",
@@ -46,6 +43,7 @@ define([
           {
             name: "rows", // VISUAL_ROLE
             type: {
+              isAccident: true,
               levels: ["ordinal"],
               props: {attributes: {isRequired: true}}
             },
@@ -95,10 +93,11 @@ define([
         ]
       }
     })
-    .implement({type: scaleSizeContinuousType})
-    .implement({type: bundle.structured.scaleSizeContinuous})
-    .implement({type: scaleColorContinuousType})
-    .implement({type: bundle.structured.scaleColorContinuous})
     .implement({type: bundle.structured.heatGrid});
   };
+
+  function requiredOneMeasure() {
+    /* jshint validthis:true*/
+    return !this.model.size.attributes.count && !this.model.color.attributes.count;
+  }
 });
