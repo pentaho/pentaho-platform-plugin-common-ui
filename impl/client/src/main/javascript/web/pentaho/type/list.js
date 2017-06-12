@@ -213,7 +213,7 @@ define([
       /**
        * Configures a list instance with a given configuration.
        *
-       * When `config` is another list, behaviour is currently undefined.
+       * When `config` is another list, an error is thrown.
        *
        * When `config` is a plain object, its keys are the keys of list elements,
        * which must belong to the list, and the values are the configuration values,

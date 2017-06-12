@@ -515,16 +515,16 @@ define([
         /**
          * Compares two primitive values according to their order.
          *
-         * @param {any} a - The first value.
-         * @param {any} b - The second value.
+         * @param {any} va - The first value.
+         * @param {any} vb - The second value.
          *
-         * @return {number} `-1` if `a` is considered _before_ `b`; `1` is `a` is considered _after_ `b`;
+         * @return {number} `-1` if `va` is considered _before_ `vb`; `1` is `va` is considered _after_ `vb`;
          * `0`, otherwise.
          *
          * @protected
          */
-        _compareValues: function(a, b) {
-          return fun.compare(a, b);
+        _compareValues: function(va, vb) {
+          return fun.compare(va, vb);
         },
         // endregion
 

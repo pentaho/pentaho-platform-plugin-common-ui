@@ -22,9 +22,9 @@ define([
 
   return function(context) {
 
-    var PentahoString = context.get("string");
+    var PentahoNumber = context.get("number");
 
-    return PentahoString.refine({
+    return PentahoNumber.refine({
 
       type: {
         id: module.id,

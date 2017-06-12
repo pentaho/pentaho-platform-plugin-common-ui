@@ -1029,14 +1029,14 @@ define([
          * If it is a complex type, each of the corresponding local properties is yielded.
          *
          * @param {!pentaho.type.Type} otherType - The other type.
-         * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} f -
+         * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} fun -
          * The mapping function. Return `false` to break iteration.
          *
-         * @param {Object} [x] - The JS context object on which `f` is called.
+         * @param {Object} [ctx] - The JS context object on which `fun` is called.
          *
          * @return {!pentaho.type.Complex} This object.
          */
-        eachAssignableFrom: function(otherType, f, x) {
+        eachAssignableFrom: function(otherType, fun, ctx) {
           var lca;
           if(otherType.isComplex && (lca = O.lca(this, otherType)) && lca.isComplex) {
 
@@ -1052,7 +1052,7 @@ define([
               // assert basePropType === O.lca(localPropType, otherPropType)
 
               if(otherPropType.type.essence.isSubtypeOf(localPropType.type.essence)) {
-                if(f.call(x, localPropType, i, this) === false) {
+                if(fun.call(ctx, localPropType, i, this) === false) {
                   return false;
                 }
               }
