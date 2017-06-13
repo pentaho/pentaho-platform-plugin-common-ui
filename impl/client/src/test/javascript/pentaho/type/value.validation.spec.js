@@ -144,15 +144,15 @@ define([
       });
 
       it("should return an error array when given a value not an instance " +
-         "of the type and not call the validateInstance method", function() {
+         "of the type and not call the _validate method", function() {
         var value = new Value();
 
         var errors = PentahoNumber.type.validate(value);
-        spyOn(PentahoNumber.type, "validateInstance").and.callThrough();
-        spyOn(Value.type, "validateInstance").and.callThrough();
+        spyOn(PentahoNumber.type, "_validate").and.callThrough();
+        spyOn(Value.type, "_validate").and.callThrough();
 
-        expect(PentahoNumber.type.validateInstance).not.toHaveBeenCalled();
-        expect(Value.type.validateInstance).not.toHaveBeenCalled();
+        expect(PentahoNumber.type._validate).not.toHaveBeenCalled();
+        expect(Value.type._validate).not.toHaveBeenCalled();
 
         expect(Array.isArray(errors)).toBe(true);
         expect(errors.length).toBe(1);
@@ -161,20 +161,19 @@ define([
           .toBe(bundle.format(bundle.structured.errors.value.notOfType, [PentahoNumber.type.label]));
       });
 
-      it("should call the validateInstance method with the value when it is an instance of the type",
-          function() {
-        spyOn(Value.type, "validateInstance").and.callThrough();
+      it("should call the _validate method with the value when it is an instance of the type", function() {
+        spyOn(Value.type, "_validate").and.callThrough();
 
         var value = new Value();
         Value.type.validate(value);
-        expect(Value.type.validateInstance.calls.count()).toBe(1);
-        expect(Value.type.validateInstance).toHaveBeenCalledWith(value);
+        expect(Value.type._validate.calls.count()).toBe(1);
+        expect(Value.type._validate).toHaveBeenCalledWith(value);
       });
 
-      it("should return an error array returned by the validateInstance method", function() {
+      it("should return an error array returned by the _validate method", function() {
         var value = new Value();
         var errors = [new ValidationError()];
-        spyOn(Value.type, "validateInstance").and.returnValue(errors);
+        spyOn(Value.type, "_validate").and.returnValue(errors);
         var result = Value.type.validate(value);
         expect(result).toBe(errors);
       });

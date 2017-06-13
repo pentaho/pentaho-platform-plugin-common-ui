@@ -1412,11 +1412,21 @@ define([
        *
        * A type is considered a subtype of itself.
        *
-       * @param {?pentaho.type.Type} superType - The candidate super-type.
+       * @param {pentaho.type.Type} superType - The candidate super-type.
        * @return {boolean} `true` if this is a subtype of `superType` type; `false`, otherwise.
        */
       isSubtypeOf: function(superType) {
         return !!superType && (superType === this || O_isProtoOf.call(superType, this));
+      },
+
+      /**
+       * Returns the most specific type, between this and the given type.
+       *
+       * @param {!pentaho.type.Type} otherType - The other type.
+       * @return {!pentaho.type.Type} The most specific type.
+       */
+      mostSpecific: function(otherType) {
+        return this.isSubtypeOf(otherType) ? this : otherType;
       },
 
       // TODO: is conversion always successful? If so, should it be?

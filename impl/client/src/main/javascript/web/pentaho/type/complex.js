@@ -715,35 +715,6 @@ define([
       // endregion
       // endregion
 
-      // region validation
-      // @override
-      /**
-       * Determines if this complex value is a **valid instance** of its type.
-       *
-       * The default implementation
-       * validates each property's value against
-       * the property's [type]{@link pentaho.type.Property.Type#type}
-       * and collects and returns any reported errors.
-       * Override to complement with a type's specific validation logic.
-       *
-       * You can use the error utilities in {@link pentaho.type.Util} to
-       * help in the implementation.
-       *
-       * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
-       *
-       * @see pentaho.type.Value#isValid
-       */
-      validate: function() {
-        var errors = null;
-
-        this.type.each(function(pType) {
-          errors = typeUtil.combineErrors(errors, pType.validate(this));
-        }, this);
-
-        return errors;
-      },
-      // endregion
-
       // region serialization
       /** @inheritDoc */
       toSpecInContext: function(keyArgs) {
@@ -995,6 +966,37 @@ define([
           this._getProps().configure(propTypeSpec);
           return this;
         },
+
+        // region validation
+        // @override
+        /**
+         * Determines if the given complex value is a **valid instance** of this type.
+         *
+         * The default implementation
+         * validates each property's value against
+         * the property's [type]{@link pentaho.type.Property.Type#type}
+         * and collects and returns any reported errors.
+         * Override to complement with a type's specific validation logic.
+         *
+         * You can use the error utilities in {@link pentaho.type.Util} to
+         * help in the implementation.
+         *
+         * @param {!pentaho.type.Value} value - The value to validate.
+         *
+         * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
+         *
+         * @protected
+         */
+        _validate: function(value) {
+          var errors = null;
+
+          this.each(function(pType) {
+            errors = typeUtil.combineErrors(errors, pType.validateOwner(value));
+          });
+
+          return errors;
+        },
+        // endregion
 
         // region serialization
         /** @inheritDoc */

@@ -591,31 +591,6 @@ define([
       },
       // endregion
 
-      // region validation
-      /**
-       * Determines if this list value is a **valid instance** of its type.
-       *
-       * The default implementation validates each element against the
-       * list's [element type]{@link pentaho.type.List.Type#of}
-       * and collects and returns any reported errors.
-       * Override to complement with a type's specific validation logic.
-       *
-       * You can use the error utilities in {@link pentaho.type.Util} to
-       * help in the implementation.
-       *
-       * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
-       *
-       * @see pentaho.type.Value#isValid
-       */
-      validate: function() {
-        var elemType = this.type.of;
-
-        return this._projectedMock._elems.reduce(function(errors, elem) {
-          return typeUtil.combineErrors(errors, elemType.validateInstance(elem));
-        }, null);
-      },
-      // endregion
-
       // region serialization
       /** @inheritDoc */
       toSpecInContext: function(keyArgs) {
@@ -729,6 +704,33 @@ define([
           // Mark set locally even if it is the same...
           this._elemType = elemType;
 
+        },
+        // endregion
+
+        // region validation
+        /**
+         * Determines if the given list value is a **valid instance** of this type.
+         *
+         * The default implementation validates each element against the
+         * list's [element type]{@link pentaho.type.List.Type#of}
+         * and collects and returns any reported errors.
+         * Override to complement with a type's specific validation logic.
+         *
+         * You can use the error utilities in {@link pentaho.type.Util} to
+         * help in the implementation.
+         *
+         * @param {!pentaho.type.Value} value - The value to validate.
+         *
+         * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
+         *
+         * @protected
+         */
+        _validate: function(value) {
+          var elemType = this.of;
+
+          return value._projectedMock._elems.reduce(function(errors, elem) {
+            return typeUtil.combineErrors(errors, elemType.mostSpecific(elem.type)._validate(elem));
+          }, null);
         },
         // endregion
 

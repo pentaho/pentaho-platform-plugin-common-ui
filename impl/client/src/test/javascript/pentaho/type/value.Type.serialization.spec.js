@@ -24,6 +24,8 @@ define([
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, spyOn:false, jasmine:false,
            JSON:false */
 
+  /* eslint max-nested-callbacks: 0 */
+
   var context = new Context();
   var Value = context.get("pentaho/type/value");
 
@@ -221,34 +223,8 @@ define([
       describe("#isAbstract", function() {
         // isAbstract is always local. Non-nullable. false by default.
 
-        serializationUtil.itFillSpecAttribute(Value, "isAbstract", true,  true);
+        serializationUtil.itFillSpecAttribute(Value, "isAbstract", true, true);
         serializationUtil.itFillSpecAttribute(Value, "isAbstract", false, false);
-      });
-
-      describe("#validateInstance", function() {
-
-        serializationUtil.itFillSpecMethodAttribute(Value, "validateInstance");
-
-        it("should not serialize when value is local and isJson: true", function() {
-          var spec = {};
-          var typeSpec = {validateInstance: function() {}};
-          var result = serializationUtil.fillSpec(Value, spec, typeSpec, {isJson: true});
-
-          expect(result).toBe(false);
-        });
-      });
-
-      describe("#instance.validate", function() {
-
-        serializationUtil.itFillSpecMethodAttribute(Value, "instance.validate");
-
-        it("should not serialize when value is local and isJson: true", function() {
-          var spec = {};
-          var typeSpec = {instance: {validate: function() {}}};
-          var result = serializationUtil.fillSpec(Value, spec, typeSpec, {isJson: true});
-
-          expect(result).toBe(false);
-        });
       });
     });
   });

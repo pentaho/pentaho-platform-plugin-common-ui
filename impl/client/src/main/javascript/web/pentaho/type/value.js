@@ -106,6 +106,7 @@ define([
        *
        * @see pentaho.type.Value#key
        * @see pentaho.type.Value.Type#areEqual
+       * @final
        */
       equals: function(other) {
         return this === other || (other != null && this.type._isEqual(this, other));
@@ -121,6 +122,7 @@ define([
        *
        * @type {boolean}
        * @readonly
+       * @final
        */
       get isValid() {
         return !this.validate();
@@ -129,18 +131,15 @@ define([
       /**
        * Determines if this value is a **valid instance** of its type.
        *
-       * The default implementation does nothing and considers the instance valid.
-       * Override to implement a type's specific validation logic.
-       *
-       * You can use the error utilities in {@link pentaho.type.Util} to
-       * help in the implementation.
+       * The default implementation delegates to {@link pentaho.type.Value.Type#_validate}.
        *
        * @return {Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
        *
        * @see pentaho.type.Value#isValid
+       * @final
        */
       validate: function() {
-        return null;
+        return this.type.validate(this);
       },
 
       /**
@@ -152,6 +151,7 @@ define([
        *
        * @throws {pentaho.type.ValidationError} When the value is not valid,
        * the first error returned by the `validate` method.
+       * @final
        */
       assertValid: function() {
         var errors = this.validate();
@@ -390,17 +390,17 @@ define([
          * Validation of `value` proceeds as follows:
          * 1. If it is {@link Nully}, an error is returned
          * 2. If it does not satisfy [is]{@link pentaho.type.Value.Type#is}, an error is returned
-         * 3. Validation is delegated to [validateInstance]{@link pentaho.type.Value.Type#validateInstance}.
-         *
-         * Use this method when you know nothing about a value.
-         * Otherwise, if you know that a value is an instance of this type,
-         * you can call [validateInstance]{@link pentaho.type.Value.Type#validateInstance} instead.
+         * 3. Validation is delegated to [_validate]{@link pentaho.type.Value.Type#_validate}.
          *
          * @param {?any} value - The value to validate.
          *
          * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
          *
+         * @see pentaho.type.Value#validate
          * @see pentaho.type.Value.Type#isValid
+         * @see pentaho.type.Value.Type#_validate
+         *
+         * @final
          */
         validate: function(value) {
           // 1. Is of type
@@ -410,29 +410,36 @@ define([
           if(!this.is(value))
             return [new ValidationError(bundle.format(bundle.structured.errors.value.notOfType, [this.label]))];
 
-          // 2. Validate further, knowing it is an instance of.
-          return this.validateInstance(value);
+          // 2. Validate further, knowing it is an instance of, but using the most specific validation method.
+          return this.mostSpecific(value.type)._validate(value);
         },
 
         /**
          * Determines if a value,
-         * that _is an instance of this type_,
-         * is also a **valid instance** of this (and its) type.
+         * that **is an instance of this type**,
+         * is also a **valid instance** of this type.
          *
-         * Thus, `this.is(value)` must be true.
+         * Thus, `this.essence === value.type` must be true.
          *
-         * The default implementation simply calls `value.validate()`.
+         * The default implementation does nothing and considers the instance valid.
+         * Override to implement a type's specific validation logic.
+         *
+         * You can use the error utilities in {@link pentaho.type.Util} to
+         * help in the implementation.
          *
          * @param {!pentaho.type.Value} value - The value to validate.
          *
          * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
          *
-         * @see pentaho.type.Value#validate
+         * @protected
+         *
          * @see pentaho.type.Value.Type#validate
-         * @see pentaho.type.spec.IValueTypeProto#validateInstance
          */
-        validateInstance: function(value) {
-          return value.validate();
+        _validate: function(value) {
+
+          // assert this.essence === value.type
+
+          return null;
         },
         // endregion
 
@@ -457,25 +464,6 @@ define([
           this._fillSpecInContext(spec, keyArgs);
 
           return spec;
-        },
-
-        _fillSpecInContext: function(spec, keyArgs) {
-          var any = false;
-
-          if(!keyArgs.isJson) {
-            any = typeUtil.fillSpecMethodInContext(spec, this, "validateInstance") || any;
-
-            // Instance methods
-            var instSpec = {};
-            var instance = this.instance;
-            var instAny = typeUtil.fillSpecMethodInContext(instSpec, instance, "validate");
-            if(instAny) {
-              spec.instance = instSpec;
-              any = true;
-            }
-          }
-
-          return this.base(spec, keyArgs) || any;
         }
         // endregion
       }
