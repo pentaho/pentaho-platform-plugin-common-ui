@@ -75,7 +75,7 @@ define([
         },
 
         /** @inheritDoc */
-        validateInstance: function(value) {
+        _validate: function(value) {
           return typeUtil.combineErrors(
               this.base(value),
               this.__validateDomain(value));

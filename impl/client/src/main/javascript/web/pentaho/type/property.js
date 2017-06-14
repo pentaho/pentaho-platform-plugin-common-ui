@@ -740,7 +740,7 @@ define([
          *
          * @see pentaho.type.Complex#validate
          */
-        validate: function(owner) {
+        validateOwner: function(owner) {
           var errors = null;
 
           if(this.isApplicableEval(owner)) {
@@ -750,10 +750,10 @@ define([
 
             var value = owner._getByType(this);
             if(value && !this.isBoundary) {
-              // Not null and surely of the type, so validateInstance can be called.
+              // Not null and surely of the type, so _validate can be called.
               // If a list, element validation is done before cardinality validation.
               // If a complex, its properties validation is done before local cardinality validation.
-              addErrors(this.type.validateInstance(value));
+              addErrors(this.type.mostSpecific(value.type)._validate(value));
             }
 
             var range = this.countRangeEval(owner);

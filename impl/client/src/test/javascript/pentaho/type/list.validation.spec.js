@@ -27,22 +27,62 @@ define([
 
     var context = new Context();
     var List = context.get(listFactory);
-    var PentahoNumber = context.get(numberFactory);
-    var NumberList = List.extend({
-      type: {of: PentahoNumber}
-    });
 
     describe("#validate() -", function() {
-      it("should call validateInstance(.) of the list element type with each of its members", function() {
-        spyOn(PentahoNumber.type, "validateInstance");
+      it("should call _validate(.) of the list element type with each of its members", function() {
+        var PentahoNumber = context.get(numberFactory);
+        var NumberList = List.extend({
+          type: {of: PentahoNumber}
+        });
+
+        spyOn(PentahoNumber.type, "_validate");
 
         var list = new NumberList([1, 2, 3]);
 
         list.validate();
 
-        expect(PentahoNumber.type.validateInstance).toHaveBeenCalledWith(list.at(0));
-        expect(PentahoNumber.type.validateInstance).toHaveBeenCalledWith(list.at(1));
-        expect(PentahoNumber.type.validateInstance).toHaveBeenCalledWith(list.at(2));
+        expect(PentahoNumber.type._validate).toHaveBeenCalledWith(list.at(0));
+        expect(PentahoNumber.type._validate).toHaveBeenCalledWith(list.at(1));
+        expect(PentahoNumber.type._validate).toHaveBeenCalledWith(list.at(2));
+      });
+
+      it("should call _validate(.) of the list element accidental type with each of its members", function() {
+        var PentahoNumber = context.get(numberFactory);
+        var PentahoInteger = PentahoNumber.refine();
+
+        var IntegerList = List.extend({
+          type: {of: PentahoInteger}
+        });
+
+        spyOn(PentahoInteger.type, "_validate");
+
+        var list = new IntegerList([1, 2, 3]);
+
+        list.validate();
+
+        expect(PentahoInteger.type._validate).toHaveBeenCalledWith(list.at(0));
+        expect(PentahoInteger.type._validate).toHaveBeenCalledWith(list.at(1));
+        expect(PentahoInteger.type._validate).toHaveBeenCalledWith(list.at(2));
+      });
+
+      it("should call _validate(.) of each of the list elements' type " +
+         "when the list element type is of a base type", function() {
+        var PentahoNumber = context.get(numberFactory);
+        var PentahoInteger = PentahoNumber.extend();
+
+        var NumberList = List.extend({
+          type: {of: PentahoNumber}
+        });
+
+        spyOn(PentahoInteger.type, "_validate");
+
+        var list = new NumberList([new PentahoInteger(1), new PentahoInteger(2), new PentahoInteger(3)]);
+
+        list.validate();
+
+        expect(PentahoInteger.type._validate).toHaveBeenCalledWith(list.at(0));
+        expect(PentahoInteger.type._validate).toHaveBeenCalledWith(list.at(1));
+        expect(PentahoInteger.type._validate).toHaveBeenCalledWith(list.at(2));
       });
     });
   });

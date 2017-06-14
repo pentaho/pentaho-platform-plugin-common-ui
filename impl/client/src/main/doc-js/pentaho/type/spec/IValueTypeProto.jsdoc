@@ -44,21 +44,3 @@
  *
  * @see pentaho.type.Type#isAccident
  */
-
-/**
- * Determines if a value of the type is **valid**.
- *
- * If you override this method,
- * be sure to call the base implementation,
- * and return any errors it reports.
- *
- * @name validateInstance
- * @memberOf pentaho.type.spec.IValueTypeProto#
- * @method
- *
- * @param {!pentaho.type.Value} value - The value to validate.
- *
- * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
- *
- * @see pentaho.type.Value.Type#validateInstance
- */
