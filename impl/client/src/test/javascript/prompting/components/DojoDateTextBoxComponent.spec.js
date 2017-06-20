@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,7 +130,7 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
       it("should init date text box with legacy date", function() {
         dashboard.getParameterValue.and.returnValue(testVal);
         comp.transportFormatter = undefined;
-        comp.dateFormat = "yy-mm-dd";
+        comp.dateFormat = "yy-mm-oo";
         comp.localeFormatter = localeFormatter;
         spyOn(comp, "_isLegacyDateFormat").and.callFake(function() { return true; });
         spyOn(comp, "_convertFormat").and.callThrough();
@@ -234,14 +234,9 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
           expect(comp.dateFormat).toEqual(newFormat);
         };
 
-        testFormat("yy-mm-dd", "yyyy-MM-dd");
-        testFormat("yyyy/mm MM/dd", "yyyy/MM MMMM/dd");
-        testFormat("yMMdd", "yyMMMMdd");
-        testFormat("MMyydd", "MMMMyyyydd");
         testFormat("MMo", "MMMMD");
         testFormat("MMoo", "MMMMDD");
         testFormat("MM ooo", "MMMM DDD");
-        testFormat("M D", "MMM EEE");
         testFormat("MM D ooo", "MMMM EEE DDD");
         testFormat("DD ooo", "EEEE DDD");
       });
@@ -258,9 +253,9 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
           expect(comp._isLegacyDateFormat()).toEqual(legacy);
         };
 
-        testLegacy("yy-mm-dd", true);
-        testLegacy("yyyy/mm MM/dd", true);
-        testLegacy("yMMdd", true);
+        testLegacy("yy-mm-dd", false);
+        testLegacy("yyyy/mm MM/dd", false);
+        testLegacy("yMMdd", false);
         testLegacy("MMyydd", false);
         testLegacy("MMo", true);
         testLegacy("MMoo", true);
