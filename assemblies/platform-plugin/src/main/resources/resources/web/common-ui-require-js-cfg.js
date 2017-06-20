@@ -322,7 +322,7 @@
     "pentaho/visual/models/barLine",
     "pentaho/visual/models/line",
     "pentaho/visual/models/pointAbstract",
-    "pentaho/visual/models/metricDotAbstract",
+    "pentaho/visual/models/metricPointAbstract",
     "pentaho/visual/models/areaStacked",
     "pentaho/visual/models/pie",
     "pentaho/visual/models/heatGrid",

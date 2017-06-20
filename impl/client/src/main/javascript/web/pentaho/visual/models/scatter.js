@@ -15,7 +15,7 @@
  */
 define([
   "module",
-  "./metricDotAbstract",
+  "./metricPointAbstract",
   "pentaho/i18n!./i18n/model"
 ], function(module, baseModelFactory, bundle) {
 

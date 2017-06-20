@@ -72,6 +72,10 @@ define([
         expect(text.toSnakeCase("product family")).toBe("product-family");
       });
 
+      it("should convert periods to hyphen", function() {
+        expect(text.toSnakeCase("product.family")).toBe("product-family");
+      });
+
       it("should convert backward and forward slashes to hyphens", function() {
         expect(text.toSnakeCase("product/family\\id")).toBe("product-family-id");
       });
@@ -85,6 +89,10 @@ define([
         expect(text.toSnakeCase("product  family")).toBe("product-family");
         expect(text.toSnakeCase("product//family")).toBe("product-family");
         expect(text.toSnakeCase("product\\\\family")).toBe("product-family");
+      });
+
+      it("should convert resulting consecutive hyphens to a single hyphen", function() {
+        expect(text.toSnakeCase("product_-_family")).toBe("product-family");
       });
 
       it("should return empty string if given empty string", function() {

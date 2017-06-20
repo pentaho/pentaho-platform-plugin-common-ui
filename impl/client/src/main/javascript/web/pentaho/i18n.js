@@ -25,7 +25,7 @@
 
 define([
   "./context",
-  "./util/MessageBundle",
+  "./i18n/MessageBundle",
   "json"
 ], function(context, MessageBundle) {
 

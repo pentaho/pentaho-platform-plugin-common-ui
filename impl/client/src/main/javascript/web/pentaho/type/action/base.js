@@ -781,6 +781,7 @@ define([
         this.__assertStates(States["do"]);
 
         this.__result = result;
+        this.__state = States.did;
 
         return this;
       },

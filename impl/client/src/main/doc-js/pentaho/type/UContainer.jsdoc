@@ -15,7 +15,7 @@
  */
 
 /**
- * A `UStructuredValue` is the combination of value types that have an internal structure.
+ * A `UContainer` is the combination of value types that have an internal structure.
  *
- * @typedef {pentaho.type.List|pentaho.type.Complex} pentaho.type.UStructuredValue
+ * @typedef {pentaho.type.List|pentaho.type.Complex} pentaho.type.UContainer
  */

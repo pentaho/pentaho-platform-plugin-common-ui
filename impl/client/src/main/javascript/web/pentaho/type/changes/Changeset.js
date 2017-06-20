@@ -42,7 +42,7 @@ define([
      * @description Creates an empty `Changeset` for a given owner value.
      *
      * @param {!pentaho.type.changes.Transaction} transaction - The owning transaction.
-     * @param {!pentaho.type.UStructuredValue} owner - The container instance where the changes take place.
+     * @param {!pentaho.type.UContainer} owner - The container instance where the changes take place.
      */
     constructor: function(transaction, owner) {
       if(!transaction) throw error.argRequired("transaction");

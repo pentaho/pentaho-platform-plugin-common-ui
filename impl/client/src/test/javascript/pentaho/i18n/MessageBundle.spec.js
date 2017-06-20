@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/util/MessageBundle",
+  "pentaho/i18n/MessageBundle",
   "tests/pentaho/util/errorMatch"
 ], function(MessageBundle, errorMatch) {
   "use strict";

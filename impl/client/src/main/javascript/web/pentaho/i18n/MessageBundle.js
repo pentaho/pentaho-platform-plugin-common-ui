@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 define([
-  "./object",
+  "../util/object",
   "../lang/ArgumentRequiredError"
 ], function(O, ArgumentRequiredError) {
 
   "use strict";
 
   /**
-   * @name pentaho.util.MessageBundle
+   * @name pentaho.i18n.MessageBundle
    * @class
-   * @amd pentaho/util/MessageBundle
+   * @amd pentaho/i18n/MessageBundle
    *
    * @classdesc The `MessageBundle` class is a container of localized messages.
    *
@@ -47,7 +47,7 @@ define([
   /**
    * Indicates if the bundle contains a message with the given key.
    * @alias has
-   * @memberOf pentaho.util.MessageBundle#
+   * @memberOf pentaho.i18n.MessageBundle#
    * @param {string} key The key of the message.
    * @return {boolean} `true` if yes, `false` if no.
    */
@@ -59,10 +59,10 @@ define([
    * Gets a localized, formatted message, given its key.
    *
    * @alias get
-   * @memberOf pentaho.util.MessageBundle#
+   * @memberOf pentaho.i18n.MessageBundle#
    *
    * @example
-   * define(["pentaho/util/MessageBundle"], function(MessageBundle) {
+   * define(["pentaho/i18n/MessageBundle"], function(MessageBundle) {
    *    var bundle = new MessageBundle({key1: "value1", key2: "value2_{0}", key3: "value3_{keyword}");
    *
    *    bundle.get("key1");                        //returns "value1"
@@ -101,7 +101,7 @@ define([
    * formed from splitting dotted message keys.
    *
    * @example
-   * define(["pentaho/util/MessageBundle"], function(MessageBundle) {
+   * define(["pentaho/i18n/MessageBundle"], function(MessageBundle) {
    *    var bundle = new MessageBundle({
    *        'key1.folder1' : 'value1',
    *        'key1.folder2' : 'value2',
@@ -158,7 +158,7 @@ define([
    * });
    *
    * @alias format
-   * @memberOf pentaho.util.MessageBundle
+   * @memberOf pentaho.i18n.MessageBundle
    * @param {string} text The text to format.
    * @param {Array|Object|function} [scope] A scope array, object or function.
    *
@@ -183,9 +183,9 @@ define([
 
   /**
    * @alias format
-   * @memberOf pentaho.util.MessageBundle#
+   * @memberOf pentaho.i18n.MessageBundle#
    *
-   * @see pentaho.util.MessageBundle.format
+   * @see pentaho.i18n.MessageBundle.format
    */
   MessageBundle.prototype.format = MessageBundle.format;
 

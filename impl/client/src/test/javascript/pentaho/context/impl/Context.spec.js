@@ -82,7 +82,7 @@ define([
     function expectContextAndSpec(context, contextSpec) {
       expect(context.application).toBe(contextSpec.application);
       expect(context.theme).toBe(contextSpec.theme);
-      expect(context.locale).toBe(contextSpec.locale);
+      expect(context.locale).toBe(contextSpec.locale.toLowerCase());
 
       expect(context.user.id).toBe(contextSpec.user.id);
       expect(context.user.home).toBe(contextSpec.user.home);
@@ -152,8 +152,10 @@ define([
 
     describe("#toSpec()", function() {
 
-      it("should return an object with the same values", function() {
+      it("should return an object with the same values (except for a lower case locale)", function() {
         var context = new Context(contextSpec);
+
+        contextSpec.locale = contextSpec.locale.toLowerCase();
 
         expect(context.toSpec()).toEqual(contextSpec);
 
@@ -185,6 +187,9 @@ define([
 
       it("should have the same information as the parent when no spec is specified", function() {
         var context = new Context(contextSpec);
+
+        contextSpec.locale = contextSpec.locale.toLowerCase();
+
         var childContext = context.createChild();
         expect(childContext.toSpec()).toEqual(contextSpec);
       });
@@ -192,6 +197,9 @@ define([
       it("should override the information specified in childSpec", function() {
         var context = new Context(defaultContextSpec);
         var childContext = context.createChild(contextSpec);
+
+        contextSpec.locale = contextSpec.locale.toLowerCase();
+
         expect(childContext.toSpec()).toEqual(contextSpec);
       });
     });

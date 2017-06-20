@@ -58,12 +58,6 @@ define([
 
     var View = Complex.extend(/** @lends pentaho.visual.base.View# */{
 
-      // TODO: Although the current code does, 7.1 doesn't support specs on act and actAsync.
-      // Post-7.1, add this JsDoc to the "In reponse ..." paragraph:
-      //
-      // * Note that standard actions come pre-loaded with the `View` class,
-      // * and can thus be safely constructed synchronously from View derived classes.
-
       /**
        * @name pentaho.visual.base.View.Type
        * @class
@@ -110,6 +104,8 @@ define([
        * [Select]{@link pentaho.visual.action.Select} and
        * [Execute]{@link pentaho.visual.action.Execute},
        * and emit events for these.
+       * Note that standard actions come pre-loaded with the `View` class,
+       * and can thus be safely constructed synchronously from View derived classes.
        *
        * When a view is no longer needed,
        * the _container application_ **must** call its [dispose]{@link pentaho.visual.base.View#dispose} method,
@@ -763,10 +759,6 @@ define([
       // endregion
 
       // region IActionTarget implementation
-
-      // TODO: Although the current code does, 7.1 doesn't support specs on act and actAsync.
-      // Post-7.1, the example can be simplified.
-
       /**
        * Executes a given action with this view as its target and does not wait for its outcome.
        *
@@ -780,7 +772,7 @@ define([
        *
        * @example
        *
-       * define(["pentaho/visual/action/execute"], function(executeFactory) {
+       * define(function() {
        *
        *   // ...
        *
@@ -802,17 +794,14 @@ define([
        *
        *   // Act "execute" on data rows that have "country" = "us".
        *
-       *   var Execute = view.type.context.get(executeFactory);
-       *
-       *   var action = new Execute({
+       *   view.act({
+       *     _: "pentaho/visual/action/execute",
        *     dataFilter: {
        *       _: "isEqual",
        *       p: "country",
        *       v: "us"
        *     }
        *   });
-       *
-       *   view.act(action);
        * });
        *
        * @param {!pentaho.type.action.Base} action - The action to execute.

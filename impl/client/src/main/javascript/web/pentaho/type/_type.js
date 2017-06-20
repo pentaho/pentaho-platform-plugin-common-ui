@@ -940,7 +940,7 @@ define([
        *
        * The default value of a type with an [id]{@link pentaho.type.Type#id} is
        * the identifier converted to _snake-case_,
-       * plus special characters like `\`, `/`, `_` and spaces are converted to: a dash (`–`).
+       * plus special characters like `\`, `/`, `_`, `.` and spaces are converted to: a dash (`–`).
        * For example: `"pentaho/visual/models/heatGrid"` would have a default
        * `styleClass` of: `"pentaho-visual-ccc-heat-grid"`.
        * The default value of an anonymous type is `null`.

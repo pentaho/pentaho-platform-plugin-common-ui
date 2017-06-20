@@ -92,8 +92,11 @@ define([
      * @param {string} propPath - The name of the context property.
      * @param {string} specPropPath - The name of the context specification property.
      * @param {object} value - The value to set and read.
+     * @param {object} valueRead - The value to read. Defaults to `value`.
      */
-    function testContextProperty(propPath, specPropPath, value) {
+    function testContextProperty(propPath, specPropPath, value, valueRead) {
+
+      if(valueRead === undefined) valueRead = value;
 
       describe(propPath, function() {
 
@@ -114,7 +117,7 @@ define([
         it("should respect a non-empty " + specPropPath + " value", function() {
 
           return require.using(["pentaho/context"], mockConfigWith(specPropPath, value), function(contextVars) {
-            expect(getPath(contextVars, propPath, null)).toBe(value);
+            expect(getPath(contextVars, propPath, null)).toBe(valueRead);
           });
         });
       });
@@ -127,7 +130,7 @@ define([
     testContextProperty("user.home", "user.home", "ABC");
 
     testContextProperty("theme", "theme", "ABC");
-    testContextProperty("locale", "locale", "ABC");
+    testContextProperty("locale", "locale", "ABC", "abc");
 
     testContextProperty("reservedChars", "reservedChars", "ABC");
 

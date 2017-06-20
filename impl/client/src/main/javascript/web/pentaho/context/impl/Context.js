@@ -44,7 +44,21 @@ define(["pentaho/util/has"], function(has) {
 
     this.application = readVar(spec, "application", defaultSpec);
     this.theme  = readVar(spec, "theme", defaultSpec);
-    this.locale = readVar(spec, "locale", defaultSpec);
+
+    /* From http://www.ietf.org/rfc/bcp/bcp47.txt
+
+     2.1.1.  Formatting of Language Tags
+
+     At all times, language tags and their subtags, including private use
+     and extensions, are to be treated as case insensitive: there exist
+     conventions for the capitalization of some of the subtags, but these
+     MUST NOT be taken to carry meaning.
+
+     Thus, the tag "mn-Cyrl-MN" is not distinct from "MN-cYRL-mn" or "mN-
+     cYrL-Mn" (or any other combination), and each of these variations.
+    */
+    var locale = readVar(spec, "locale", defaultSpec);
+    this.locale = locale && locale.toLowerCase();
 
     var propSpec = readVar(spec, "user");
     var propSpecDef = readVar(defaultSpec, "user");
