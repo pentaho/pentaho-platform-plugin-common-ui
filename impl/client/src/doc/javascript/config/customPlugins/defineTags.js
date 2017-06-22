@@ -18,7 +18,18 @@ exports.defineTags = function ( dictionary ) {
   // region New Tags
   /** Tag to add AMD module information to a class */
   createTagDefinition('amd', {
-    onTagged: function( doclet, tag ) { doclet.amd = tag; }
+    canHaveType: true,
+    canHaveName: true,
+
+    onTagged: function( doclet, tag ) {
+      const value = tag.value;
+
+      doclet.amd = {
+        text: tag.text,
+        type: firstTypeOf( value ),
+        module: value.name
+      };
+    }
   });
 
   /** Other tag for code examples in order to have different header */
@@ -47,7 +58,7 @@ exports.defineTags = function ( dictionary ) {
     onTagged: function( doclet, tag ) {
       let value = tag.value;
       if ( value.indexOf( "@link" ) < 0 ) {
-        value = firstWordOf(value);
+        value = firstWordOf( value );
       }
 
       doclet.augment( value );
@@ -107,4 +118,18 @@ function firstWordOf( string ) {
   } else {
     return '';
   }
+}
+
+/**
+ * Gets the first type a {@code tag}
+ *
+ * @param {object} tag
+ *
+ * @return {?string} the first type of a {@code tag} if any exist.
+ */
+function firstTypeOf( tag ) {
+  const FIRST_TYPE = 0;
+  const types = tag.type ? tag.type.names : [];
+
+  return types[ FIRST_TYPE ];
 }
