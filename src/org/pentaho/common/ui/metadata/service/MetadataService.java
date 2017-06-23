@@ -43,7 +43,7 @@ import org.pentaho.platform.engine.core.system.PentahoSystem;
 import org.pentaho.platform.plugin.action.pentahometadata.MetadataQueryComponent;
 import org.pentaho.platform.util.messages.LocaleHelper;
 import org.pentaho.pms.core.exception.PentahoMetadataException;
-
+import org.apache.commons.lang.StringEscapeUtils;
 import flexjson.JSONSerializer;
 
 /**
@@ -166,7 +166,7 @@ public class MetadataService extends PentahoBase {
       ModelInfo modelInfo = new ModelInfo();
       modelInfo.setDomainId( domain );
       modelInfo.setModelId( model.getId() );
-      modelInfo.setModelName( model.getName( locale ) );
+      modelInfo.setModelName( StringEscapeUtils.escapeHtml( model.getName( locale ) ) );
       if ( model.getDescription() != null ) {
         String modelDescription = model.getDescription( locale );
         modelInfo.setModelDescription( modelDescription );
