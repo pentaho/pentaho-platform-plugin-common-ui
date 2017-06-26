@@ -23,9 +23,9 @@ import org.pentaho.common.ui.metadata.model.ICategory;
 
 /**
  * Concrete, lightweight, serializable implementation of an {@see ICategory} object
- * 
+ *
  * @author jamesdixon
- * 
+ *
  */
 public class Category implements ICategory, Serializable {
 
@@ -38,6 +38,9 @@ public class Category implements ICategory, Serializable {
    */
   @Override
   public String getId() {
+    if ( this.id != null ) {
+      return this.id.replaceAll( "<", "&lt;" ).replaceAll( ">", "&gt;" );
+    }
     return this.id;
   }
 
@@ -46,12 +49,16 @@ public class Category implements ICategory, Serializable {
    */
   @Override
   public String getName() {
-    return this.name;
+    if ( this.name != null ) {
+      return this.name.replaceAll( "<", "&lt;" ).replaceAll( ">", "&gt;" );
+    } else {
+      return this.name;
+    }
   }
 
   /**
    * Returns the id of the category
-   * 
+   *
    * @param id
    */
   public void setId( String id ) {
@@ -60,7 +67,7 @@ public class Category implements ICategory, Serializable {
 
   /**
    * Sets the name of the category
-   * 
+   *
    * @param name
    */
   public void setName( String name ) {
@@ -77,7 +84,7 @@ public class Category implements ICategory, Serializable {
 
   /**
    * Sets the array of {@see IColumn}s for this category
-   * 
+   *
    * @param columns
    */
   public void setColumns( Column[] columns ) {
