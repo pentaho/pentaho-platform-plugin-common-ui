@@ -1,0 +1,8 @@
+.project
+.classpath
+.settings
+*.iml
+.idea
+.DS_Store
+.jekyll-metadata
+_site
