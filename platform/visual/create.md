@@ -80,6 +80,7 @@ To do so we've prepared a maven project that can be used as the foundation to cr
 D3 visualization developed in the previous sections.
 
 1. Clone the repository `https://github.com/pentaho/pentaho-engineering-samples`.
+1. Checkout the `7.1` branch.
 1. Copy the stub maven project at `Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/web-project/` to a folder of your choice, e.g. `myWebProject`. Make sure the folder path does not contain whitespaces. 
 1. Do a recursive find and replace for the following strings:
    1. _myGroupId_ - Replace with the group identifier of your choice. Commonly associated with the company or organization where the artifact was developed.

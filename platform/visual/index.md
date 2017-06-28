@@ -74,6 +74,7 @@ so that it can be deployed to a Pentaho product.
 
 <pre class='highlight'><code># Clone the repository.
 git clone https://github.com/pentaho/pentaho-engineering-samples
+git checkout -b 7.1
 
 # Go to the sample's directory.
 cd pentaho-engineering-samples
@@ -108,6 +109,7 @@ as well as be able to use it in a [CDE](http://community.pentaho.com/ctools/cde/
    
    You can get the following dashboard from the
    `https://github.com/pentaho/pentaho-engineering-samples` repository,
+   `7.1` branch, 
    at the location:
    `Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/bar-d3-cde`.
    
