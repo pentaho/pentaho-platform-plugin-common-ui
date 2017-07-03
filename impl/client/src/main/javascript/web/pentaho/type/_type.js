@@ -1490,6 +1490,11 @@ define([
           }
         }
 
+        // Dynamic attributes
+        if(this.__fillSpecInContextDynamicAttributes(spec, keyArgs)) {
+          any = true;
+        }
+
         return any;
       },
 
@@ -1561,6 +1566,10 @@ define([
       },
 
       // region dynamic & monotonic attributes
+
+      // Infos of attributes declared locally in this type.
+      __dynamicAttrInfos: null,
+
       /*
        * Defines dynamic, monotonic, inherited attributes of the type.
        *
@@ -1589,22 +1598,34 @@ define([
       _defineDynamicAttribute: function(name, spec) {
         var cast = spec.cast; // Monotonicity
         // * minimum/default/neutral value
-        var dv = castAndNormalize(spec.value, cast, null); // * effective/monotone value function
+
         var monotoneCombineEvals = spec.combine;
-        var namePriv = "_" + name;
+        var namePriv = "__" + name;
         var namePrivEval = namePriv + "On";
         var root = this;
 
+        // Register in local dynamic attributes.
+        var dynAttrInfos = O.getOwn(root, "__dynamicAttrInfos");
+        if(!dynAttrInfos) {
+          dynAttrInfos = root.__dynamicAttrInfos = [];
+        }
+        dynAttrInfos.push({
+          name: name,
+          spec: spec
+        });
+
+        var dv;
         (function() {
           dv = spec.value;
 
           var fValue;
           if(F.is(dv)) {
             fValue = dv;
-            if(cast) fValue = wrapWithCast(fValue, cast, null);
+            dv = null;
+            if(cast) fValue = wrapWithCast.call(root, fValue, cast, dv);
           } else {
             // When cast failure is found at static time, we ignore the local value.
-            dv = castAndNormalize(dv, cast, null);
+            dv = castAndNormalize.call(root, dv, cast, null);
             fValue = F.constant(dv);
           }
 
@@ -1650,10 +1671,10 @@ define([
             var fValue;
             if(F.is(value)) {
               fValue = value;
-              if(cast) fValue = wrapWithCast(fValue, cast, dv);
+              if(cast) fValue = wrapWithCast.call(this, fValue, cast, dv);
             } else {
               // When cast failure is found at static time, we ignore the local value.
-              value = castAndNormalize(value, cast, null);
+              value = castAndNormalize.call(this, value, cast, null);
               if(value == null) return;
 
               fValue = F.constant(value);
@@ -1683,6 +1704,63 @@ define([
       },
 
       /**
+       * Fills the given specification with this type's dynamic attributes' local values,
+       * and returns whether any dynamic attribute was actually added.
+       *
+       * This method requires that there currently exists an
+       * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
+       *
+       * This method calls the base implementation.
+       * Then, it calls
+       * [__fillSpecInContextDynamicAttribute]{@link pentaho.type.Type#__fillSpecInContextDynamicAttribute}
+       * for each locally registered dynamic attribute.
+       *
+       * @param {!Object} spec - The specification to be filled.
+       * @param {Object} [keyArgs] The keyword arguments object.
+       * Passed to every type and instance serialized within this scope.
+       *
+       * @return {boolean} Returns `true` if the dynamic attribute was added; `false`, otherwise.
+       *
+       * @private
+       *
+       * @see pentaho.type.Type#_fillSpecInContext
+       * @see pentaho.type.Type#__fillSpecInContextDynamicAttribute
+       */
+      __fillSpecInContextDynamicAttributes: function(spec, keyArgs) {
+
+        var any = false;
+        var type = this;
+
+        fillSpecRecursive(type);
+
+        return any;
+
+        function fillSpecRecursive(declaringType) {
+
+          if(!declaringType) return;
+
+          if(declaringType !== _type) {
+            // ancestor, in properties, wouldn't reach _type.
+            fillSpecRecursive(Object.getPrototypeOf(declaringType));
+          }
+
+          var dynAttrInfos = O.getOwn(declaringType, "__dynamicAttrInfos");
+          if(dynAttrInfos) {
+            dynAttrInfos.forEach(function(info) {
+              if(type.__fillSpecInContextDynamicAttribute(spec,
+                      info.name,
+                      info.spec.group,
+                      info.spec.localName,
+                      info.spec.toSpec,
+                      keyArgs)) {
+                any = true;
+              }
+            });
+          }
+        }
+      },
+
+      /**
        * Fills the given specification with the local value of a dynamic attribute of this type
        * and returns whether the attribute was actually added.
        *
@@ -1691,31 +1769,49 @@ define([
        *
        * @param {!Object} spec - The specification to be filled.
        * @param {string} name - The name of the dynamic attribute.
+       * @param {string} group - The group name of the dynamic attribute.
+       * @param {string} localName - The name of the dynamic attribute within the group.
+       * @param {function(any, object) : any} toSpec - The custom serialization method of the dynamic attribute, if any,
+       * is called to serialize a specified value of the dynamic attribute.
+       * The method is called with the value and the keyArgs as arguments and with the property type as
+       * the `this` context and should return the serialized value.
        * @param {Object} [keyArgs] The keyword arguments object.
        * Passed to every type and instance serialized within this scope.
        *
        * @return {boolean} Returns `true` if the dynamic attribute was added; `false`, otherwise.
        *
-       * @protected
-       * @ignore
+       * @private
        *
        * @see pentaho.type.Type#_fillSpecInContext
+       * @see pentaho.type.Type#__fillSpecInContextDynamicAttributes
        */
-      _fillSpecInContextDynamicAttribute: function(spec, name, keyArgs) {
+      __fillSpecInContextDynamicAttribute: function(spec, name, group, localName, toSpec, keyArgs) {
 
-        var namePriv = "_" + name;
+        var namePriv = "__" + name;
         var any = false;
 
-        if(O.hasOwn(this, namePriv)) {
-          var value = this[namePriv];
+        var value = O.getOwn(this, namePriv);
+        if(value != null) {
+          var valueSpec;
           if(F.is(value)) {
             if(!keyArgs.isJson) {
               any = true;
-              spec[name] = value.valueOf();
+              valueSpec = value.valueOf();
             }
           } else {
             any = true;
-            spec[name] = value;
+            valueSpec = toSpec ? toSpec.call(this, value, keyArgs) : value;
+          }
+
+          if(any) {
+            var groupSpec;
+            if(group) {
+              groupSpec = spec[group] || (spec[group] = {});
+            } else {
+              groupSpec = spec;
+            }
+
+            groupSpec[localName || name] = valueSpec;
           }
         }
 
@@ -1770,11 +1866,14 @@ define([
     return value == null ? null : (String(value) || null);
   }
 
+  /*
+   * @this {pentaho.type.Property.Type}
+   */
   function castAndNormalize(v, cast, dv) {
     if(v == null) {
       v = dv;
     } else if(cast) {
-      v = cast(v, dv);
+      v = cast.call(this, v, dv);
       if(v == null)
         v = dv;
     }
@@ -1782,10 +1881,18 @@ define([
     return v;
   }
 
+  /*
+   * @this {pentaho.type.Property.Type}
+   */
   function wrapWithCast(fun, cast, dv) {
-    return function() {
+    /*
+     * @type {pentaho.type.PropertyDynamicAttribute}
+     */
+    return function(propType) {
+
       var v = fun.apply(this, arguments);
-      return castAndNormalize(v, cast, dv);
+
+      return castAndNormalize.call(propType, v, cast, dv);
     };
   }
 

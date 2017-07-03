@@ -464,130 +464,33 @@ define([
       });
 
       // region Dynamic Attributes
-      function itDynamicAttribute(name, value) {
-
-        it("should not serialize when not specified", function() {
-          var Derived = Complex.extend();
-          var scope = new SpecificationScope();
-          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
-
-          var spec = {};
-          var keyArgs = {};
-          var result = propType._fillSpecInContext(spec, keyArgs);
-
-          scope.dispose();
-
-          expect(result).toBe(false);
-          expect(name in spec).toBe(false);
-        });
-
-        it("should serialize when specified as a non-function value", function() {
-          var Derived = Complex.extend();
-          var scope = new SpecificationScope();
-          var propTypeSpec = {name: "foo"};
-          propTypeSpec[name] = value;
-
-          var propType = propertyTypeUtil.createRoot(Derived.type, propTypeSpec);
-
-          var spec = {};
-          var keyArgs = {};
-          var result = propType._fillSpecInContext(spec, keyArgs);
-
-          scope.dispose();
-
-          expect(result).toBe(true);
-          expect(spec[name]).toBe(value);
-        });
-
-        it("should serialize when specified as a function value and isJson: false", function() {
-          var Derived = Complex.extend();
-          var scope = new SpecificationScope();
-          var propTypeSpec = {name: "foo"};
-          var fValue = function() { return value; };
-          propTypeSpec[name] = fValue;
-
-          var propType = propertyTypeUtil.createRoot(Derived.type, propTypeSpec);
-
-          var spec = {};
-          var keyArgs = {};
-          var result = propType._fillSpecInContext(spec, keyArgs);
-
-          scope.dispose();
-
-          expect(result).toBe(true);
-          expect(spec[name]).toBe(fValue);
-        });
-
-        it("should not serialize when specified as a function value and isJson: true", function() {
-          var Derived = Complex.extend();
-          var scope = new SpecificationScope();
-          var propTypeSpec = {name: "foo"};
-          var fValue = function() { return value; };
-          propTypeSpec[name] = fValue;
-
-          var propType = propertyTypeUtil.createRoot(Derived.type, propTypeSpec);
-
-          var spec = {};
-          var keyArgs = {isJson: true};
-          var result = propType._fillSpecInContext(spec, keyArgs);
-
-          scope.dispose();
-
-          expect(result).toBe(false);
-        });
-
-        it("should not serialize when inherited", function() {
-          var Base = Complex.extend();
-
-          var propTypeSpec = {name: "foo"};
-          propTypeSpec[name] = value;
-
-          Base.type.add(propTypeSpec);
-
-          var Derived = Base.extend();
-
-          var scope = new SpecificationScope();
-
-          var propType = propertyTypeUtil.extend(Derived.type, "foo", {});
-
-          var spec = {};
-          var keyArgs = {};
-          var result = propType._fillSpecInContext(spec, keyArgs);
-
-          scope.dispose();
-
-          expect(result).toBe(false);
-          expect(name in spec).toBe(false);
-        });
-      }
-
       describe("#isRequired", function() {
 
-        itDynamicAttribute("isRequired", true);
+        propertyTypeUtil.itDynamicAttribute("isRequired", true);
 
       });
 
       describe("#isApplicable", function() {
 
-        itDynamicAttribute("isApplicable", false);
+        propertyTypeUtil.itDynamicAttribute("isApplicable", false);
 
       });
 
       describe("#isEnabled", function() {
 
-        itDynamicAttribute("isEnabled", false);
+        propertyTypeUtil.itDynamicAttribute("isEnabled", false);
 
       });
 
       describe("#countMin", function() {
 
-        itDynamicAttribute("countMin", 1);
+        propertyTypeUtil.itDynamicAttribute("countMin", 1);
 
       });
 
       describe("#countMax", function() {
 
-        itDynamicAttribute("countMax", 2);
+        propertyTypeUtil.itDynamicAttribute("countMax", 2);
 
       });
       // endregion

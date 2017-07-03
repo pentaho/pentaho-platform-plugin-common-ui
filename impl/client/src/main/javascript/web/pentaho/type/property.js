@@ -30,7 +30,6 @@ define([
   "use strict";
 
   var _defaultTypeMid = "string";
-  var _dynamicAttrNames = ["isRequired", "countMin", "countMax", "isApplicable", "isEnabled"];
 
   return function(context) {
 
@@ -764,6 +763,7 @@ define([
         // region serialization
         /** @inheritDoc */
         toSpecInContext: function(keyArgs) {
+
           if(!keyArgs) keyArgs = {};
 
           // no id and no base
@@ -845,13 +845,6 @@ define([
         _fillSpecInContext: function(spec, keyArgs) {
 
           var any = this.base(spec, keyArgs);
-
-          if(this !== _propType) {
-            // Dynamic attributes
-            _dynamicAttrNames.forEach(function(name) {
-              if(this._fillSpecInContextDynamicAttribute(spec, name, keyArgs))
-                any = true;
-            }, this);
 
           // Custom attributes
           var defaultValue = O.getOwn(this, "_defaultValue");
@@ -955,7 +948,7 @@ define([
            *
            * @name isRequired
            * @memberOf pentaho.type.Property.Type#
-           * @type undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
+           * @type {undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
            *
            * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
            * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
@@ -967,9 +960,9 @@ define([
             value: false,
             cast: Boolean,
             combine: function(baseEval, localEval) {
-              return function() {
+              return function(propType) {
                 // localEval is skipped if base is true.
-                return baseEval.call(this) || localEval.call(this);
+                return baseEval.call(this, propType) || localEval.call(this, propType);
               };
             }
           },
@@ -1054,8 +1047,8 @@ define([
             value: 0,
             cast: castCount,
             combine: function(baseEval, localEval) {
-              return function() {
-                return Math.max(baseEval.call(this), localEval.call(this));
+              return function(propType) {
+                return Math.max(baseEval.call(this, propType), localEval.call(this, propType));
               };
             }
           },
@@ -1140,8 +1133,8 @@ define([
             value: Infinity,
             cast: castCount,
             combine: function(baseEval, localEval) {
-              return function() {
-                return Math.min(baseEval.call(this), localEval.call(this));
+              return function(propType) {
+                return Math.min(baseEval.call(this, propType), localEval.call(this, propType));
               };
             }
           },
@@ -1219,9 +1212,9 @@ define([
             value: true,
             cast: Boolean,
             combine: function(baseEval, localEval) {
-              return function() {
+              return function(propType) {
                 // localEval is skipped if base is false.
-                return baseEval.call(this) && localEval.call(this);
+                return baseEval.call(this, propType) && localEval.call(this, propType);
               };
             }
           },
@@ -1295,9 +1288,9 @@ define([
             value: true,
             cast: Boolean,
             combine: function(baseEval, localEval) {
-              return function() {
+              return function(propType) {
                 // localEval is skipped if base is false.
-                return baseEval.call(this) && localEval.call(this);
+                return baseEval.call(this, propType) && localEval.call(this, propType);
               };
             }
           }

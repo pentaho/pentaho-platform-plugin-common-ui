@@ -28,5 +28,6 @@
  * @callback pentaho.type.PropertyDynamicAttribute
  * @template T
  * @this pentaho.type.Complex
+ * @param {pentaho.type.Property.Type} propType - The property type being evaluated.
  * @return {T} The calculated attribute's value.
  */
