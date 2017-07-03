@@ -1038,7 +1038,7 @@ define([
          *
          * @return {!pentaho.type.Complex} This object.
          */
-        eachAssignableFrom: function(otherType, fun, ctx) {
+        eachCommonWith: function(otherType, fun, ctx) {
           var lca;
           if(otherType.isComplex && (lca = O.lca(this, otherType)) && lca.isComplex) {
 
@@ -1047,17 +1047,16 @@ define([
               var localPropType = this.get(name);
 
               /* A property is yielded if the value-type of the other type's property is a subtype of
-               * (is assignable to) the value-type of the local property.
+               * the value-type of the local property.
+               *
+               *  var otherPropType = otherType.get(name);
+               *
+               * // assert basePropType === O.lca(localPropType, otherPropType)
+               *
+               * if(otherPropType.type.isSubtypeOf(localPropType.type))
                */
-              var otherPropType = otherType.get(name);
-
-              // assert basePropType === O.lca(localPropType, otherPropType)
-
-              if(otherPropType.type.essence.isSubtypeOf(localPropType.type.essence)) {
-                if(fun.call(ctx, localPropType, i, this) === false) {
-                  return false;
-                }
-              }
+              if(fun.call(ctx, localPropType, i, this) === false)
+                return false;
 
             }, this);
           }

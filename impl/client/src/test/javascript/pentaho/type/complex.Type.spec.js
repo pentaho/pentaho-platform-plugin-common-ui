@@ -658,7 +658,7 @@ define([
       });
     });
 
-    describe("#eachAssignableFrom(otherType, f, x)", function() {
+    describe("#eachCommonWith(otherType, f, x)", function() {
 
       it("should call f once for each corresponding property of the common base type", function() {
 
@@ -676,7 +676,7 @@ define([
 
         var f = jasmine.createSpy();
 
-        SubTypeA.type.eachAssignableFrom(SubTypeB.type, f);
+        SubTypeA.type.eachCommonWith(SubTypeB.type, f);
 
         expect(f.calls.argsFor(0)[0]).toBe(SubTypeA.type.get("a"));
         expect(f.calls.argsFor(1)[0]).toBe(SubTypeA.type.get("b"));
@@ -699,7 +699,7 @@ define([
 
         var f = jasmine.createSpy();
 
-        SubTypeA.type.eachAssignableFrom(SubTypeB.type, f);
+        SubTypeA.type.eachCommonWith(SubTypeB.type, f);
 
         expect(f.calls.argsFor(0)[1]).toBe(0);
         expect(f.calls.argsFor(1)[1]).toBe(1);
@@ -722,7 +722,7 @@ define([
 
         var f = jasmine.createSpy();
 
-        SubTypeA.type.eachAssignableFrom(SubTypeB.type, f);
+        SubTypeA.type.eachCommonWith(SubTypeB.type, f);
 
         expect(f.calls.argsFor(0)[2]).toBe(SubTypeA.type);
         expect(f.calls.argsFor(1)[2]).toBe(SubTypeA.type);
@@ -744,7 +744,7 @@ define([
         var f = jasmine.createSpy();
 
         var x = {};
-        SubTypeA.type.eachAssignableFrom(SubTypeB.type, f, x);
+        SubTypeA.type.eachCommonWith(SubTypeB.type, f, x);
 
         expect(f.calls.first().object).toBe(x);
       });
@@ -764,7 +764,7 @@ define([
 
         var f = jasmine.createSpy();
 
-        var result = SubTypeA.type.eachAssignableFrom(SubTypeB.type, f);
+        var result = SubTypeA.type.eachCommonWith(SubTypeB.type, f);
 
         expect(result).toBe(SubTypeA.type);
       });
@@ -791,7 +791,7 @@ define([
 
         var f = jasmine.createSpy();
 
-        SubTypeA.type.eachAssignableFrom(SubTypeB.type, f);
+        SubTypeA.type.eachCommonWith(SubTypeB.type, f);
 
         expect(f).not.toHaveBeenCalled();
       });
@@ -812,7 +812,7 @@ define([
 
         var f = jasmine.createSpy().and.callFake(function() { return false; });
 
-        SubTypeA.type.eachAssignableFrom(SubTypeB.type, f);
+        SubTypeA.type.eachCommonWith(SubTypeB.type, f);
 
         expect(f).toHaveBeenCalledTimes(1);
       });
@@ -842,7 +842,7 @@ define([
 
         var f = jasmine.createSpy();
 
-        SubTypeA.type.eachAssignableFrom(SubTypeB.type, f);
+        SubTypeA.type.eachCommonWith(SubTypeB.type, f);
 
         expect(f.calls.argsFor(0)[0]).toBe(SubTypeA.type.get("a"));
         expect(f.calls.argsFor(1)[0]).toBe(SubTypeA.type.get("b"));
@@ -872,7 +872,7 @@ define([
 
         var f = jasmine.createSpy();
 
-        SubTypeA.type.eachAssignableFrom(SubTypeB.type, f);
+        SubTypeA.type.eachCommonWith(SubTypeB.type, f);
 
         expect(f).not.toHaveBeenCalled();
       });
