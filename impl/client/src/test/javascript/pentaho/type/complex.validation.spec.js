@@ -27,7 +27,7 @@ define([
   describe("pentaho.type.Complex", function() {
 
     describe("#validate()", function() {
-      it("should call each property's validateOwner with the owner complex instance", function() {
+      it("should call each property's validateOn with the owner complex instance", function() {
         var Derived = Complex.extend({
           type: {
             props: [
@@ -44,15 +44,15 @@ define([
         var yPropType = derived.type.get("y");
         var zPropType = derived.type.get("z");
 
-        spyOn(xPropType, "validateOwner");
-        spyOn(yPropType, "validateOwner");
-        spyOn(zPropType, "validateOwner");
+        spyOn(xPropType, "validateOn");
+        spyOn(yPropType, "validateOn");
+        spyOn(zPropType, "validateOn");
 
         derived.validate();
 
-        expect(xPropType.validateOwner).toHaveBeenCalledWith(derived);
-        expect(yPropType.validateOwner).toHaveBeenCalledWith(derived);
-        expect(zPropType.validateOwner).toHaveBeenCalledWith(derived);
+        expect(xPropType.validateOn).toHaveBeenCalledWith(derived);
+        expect(yPropType.validateOn).toHaveBeenCalledWith(derived);
+        expect(zPropType.validateOn).toHaveBeenCalledWith(derived);
       });
 
     });

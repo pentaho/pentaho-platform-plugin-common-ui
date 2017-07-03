@@ -712,35 +712,47 @@ define([
         // region validation
 
         /**
-         * Determines if this property is valid in a given complex instance.
+         * Determines if this property is valid on a given complex instance.
          *
-         * This method first ensures the value of the property is consistent with its type.
+         * If this property is not a [boundary]{@link pentaho.type.Property.Type#isBoundary} property,
+         * this method validates the value of the property itself.
+         *
          * Afterwards, the cardinality is verified against the attributes
-         * {@link pentaho.type.Property.Type#countMin} and {@link pentaho.type.Property.Type#countMax}.
+         * {@link pentaho.type.Property.Type#isRequired},
+         * {@link pentaho.type.Property.Type#countMin} and
+         * {@link pentaho.type.Property.Type#countMax}.
          *
-         * @param {pentaho.type.Complex} owner - The complex value that owns the property.
+         * @param {!pentaho.type.Complex} owner - The complex value that owns the property.
          *
-         * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+         * @return {pentaho.type.ValidationError|Array.<pentaho.type.ValidationError>} An error,
+         * a non-empty array of errors or `null`.
          *
          * @see pentaho.type.Complex#validate
          */
-        validateOwner: function(owner) {
+        validateOn: function(owner) {
           var errors = null;
 
-          if(this.isApplicableEval(owner)) {
+          if(this.isApplicableOn(owner)) {
             var addErrors = function(newErrors) {
               errors = typeUtil.combineErrors(errors, newErrors);
             };
 
             var value = owner._getByType(this);
-            if(value && !this.isBoundary) {
-              // Not null and surely of the type, so _validate can be called.
-              // If a list, element validation is done before cardinality validation.
-              // If a complex, its properties validation is done before local cardinality validation.
-              addErrors(this.type.mostSpecific(value.type)._validate(value));
+            if(value) {
+              // Intrinsic value validation.
+              if(!this.isBoundary) {
+                // If a list, element validation is done before cardinality validation.
+                // If a complex, its properties' validation is done before local cardinality validation.
+                addErrors(value.validate());
+              }
+
+              // Extrinsic/Contextual value validation.
+              addErrors(this._validateValueOn(owner, value));
             }
 
+            // Extrinsic/Contextual value validation.
 
+            // Cardinality validation
             var range = this.countRangeOn(owner);
             var count = this.isList ? value.count : (value ? 1 : 0);
             if(count < range.min) {
@@ -758,7 +770,70 @@ define([
           }
 
           return errors;
-        }, // endregion
+        },
+
+        /**
+         * Validates the given non-null value in the context of this property.
+         *
+         * The base implementation calls
+         * [_collectElementValidators]{@link pentaho.type.Property.Type#_collectElementValidators}
+         * to obtain the list of currently applicable element validators.
+         * Then, each element is validated against the list of collected validators.
+         *
+         * When overriding this method,
+         * the error utilities in {@link pentaho.type.Util} can be used to help in the implementation.
+         *
+         * @param {!pentaho.type.Complex} owner - The complex value that owns the property.
+         * @param {!pentaho.type.Value} value - The value to validate.
+         *
+         * @return {pentaho.type.ValidationError|Array.<pentaho.type.ValidationError>} An error,
+         * a non-empty array of errors or `null`.
+         *
+         * @protected
+         */
+        _validateValueOn: function(owner, value) {
+          var errors = null;
+
+          if(!this.isList || value.count > 0) {
+
+            var validators = null;
+            var addValidator = function(validator) {
+              (validators || (validators = [])).push(validator);
+            };
+
+            this._collectElementValidators(addValidator, owner, value);
+
+            if(validators) {
+              var validateElem = function(elem, index) {
+                validators.forEach(function(validator) {
+                  errors = typeUtil.combineErrors(errors, validator.call(this, owner, elem, index));
+                });
+              };
+
+              if(this.isList) {
+                value.each(validateElem, this);
+              } else {
+                validateElem.call(this, value, 0);
+              }
+            }
+          }
+          return errors;
+        },
+
+        /**
+         * Called each time a property value is validated to collect the list of element validators.
+         *
+         * When overriding this method, be sure to also call the base implementation.
+         *
+         * @param {function() : void} addValidator - The function to call to register an element validator.
+         * @param {!pentaho.type.Complex} owner - The complex value that owns the property.
+         * @param {!pentaho.type.Value} value - The value whose elements will be validated.
+         *
+         * @protected
+         */
+        _collectElementValidators: function(addValidator, owner, value) {
+        },
+        // endregion
 
         // region serialization
         /** @inheritDoc */
