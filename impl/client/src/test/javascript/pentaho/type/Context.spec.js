@@ -563,23 +563,13 @@ define([
           });
         });
 
-        it("should create accidental types for object specs when configuring a type", function() {
+        it("should have #isConfiguring = true, while configuring a type", function() {
 
           return testGet(function(sync, Context) {
 
             spyOn(Context.prototype, "_getConfig").and.callFake(function(id) {
               if(id === "tests/foo/bar") {
-                return {
-                  props: {
-                    "a": {
-                      type: { // object spec
-                        // NOTE: no need for `isAccident: true`
-                        mixins: ["discreteDomain"],
-                        domain: ["1", "2", "3"]
-                      }
-                    }
-                  }
-                };
+                return {foo: "bar", instance: {bar: "foo"}};
               }
             });
 
@@ -587,81 +577,29 @@ define([
 
             expect(context._configDepth).toBe(0);
 
-            var Complex = context.get("pentaho/type/complex");
-            var Complex2 = Complex.extend({
+            var Value = context.get("pentaho/type/value");
+            var Value2 = Value.extend({
               type: {
-                id: "tests/foo/bar",
-                props: [
-                  {name: "a", type: "string"}
-                ]
+                id: "tests/foo/bar"
               }
             });
 
-            var propA = Complex2.type.get("a");
-            expect(propA.type.isAccident).toBe(false);
+            var ValueType2 = Value2.type.constructor;
 
-            var promise = callGet(context, sync, Complex2);
+            spyOn(ValueType2, "implement").and.callFake(function() {
+
+              expect(context.isConfiguring).toBe(true);
+            });
+
+            var promise = callGet(context, sync, Value2);
 
             return promise.then(function(InstCtor) {
 
-              expect(InstCtor).toBe(Complex2);
+              expect(InstCtor).toBe(Value2);
 
-              propA = Complex2.type.get("a");
+              expect(ValueType2.implement).toHaveBeenCalledTimes(1);
 
-              expect(propA.type.isAccident).toBe(true);
-            });
-          });
-        });
-
-        it("should not create accidental types for object specs having isAccident: false," +
-           " when configuring a type", function() {
-
-          return testGet(function(sync, Context) {
-
-            spyOn(Context.prototype, "_getConfig").and.callFake(function(id) {
-              if(id === "tests/foo/bar") {
-                return {
-                  props: {
-                    "a": {
-                      type: { // object spec
-                        // Just a subtype of string...
-                        isAccident: false
-                      }
-                    }
-                  }
-                };
-              }
-            });
-
-            var context = new Context();
-
-            expect(context._configDepth).toBe(0);
-
-            var Complex = context.get("pentaho/type/complex");
-            var Complex2 = Complex.extend({
-              type: {
-                id: "tests/foo/bar",
-                props: [
-                  {name: "a", type: "string"}
-                ]
-              }
-            });
-
-            var propA = Complex2.type.get("a");
-            var stringType = propA.type;
-
-            expect(propA.type.isAccident).toBe(false);
-
-            var promise = callGet(context, sync, Complex2);
-
-            return promise.then(function(InstCtor) {
-
-              expect(InstCtor).toBe(Complex2);
-
-              propA = Complex2.type.get("a");
-
-              expect(propA.type.isAccident).toBe(false);
-              expect(propA.type.ancestor).toBe(stringType);
+              expect(context.isConfiguring).toBe(false);
             });
           });
         });

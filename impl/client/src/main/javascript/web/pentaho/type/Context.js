@@ -261,6 +261,19 @@ define([
       return this._vars;
     },
 
+    /**
+     * Gets a value that indicates that the context is currently loading and, in particular, configuring a type.
+     *
+     * Certain changes to types are not safe when performed from configurations.
+     * This property allows blocking these changes.
+     *
+     * @type {boolean}
+     * @readonly
+     */
+    get isConfiguring() {
+      return this._configDepth > 0;
+    },
+
     // region Type Registry
 
     // TODO: Removed from docs, below, until isIn is made public.

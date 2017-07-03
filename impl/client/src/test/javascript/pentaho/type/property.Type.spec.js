@@ -449,11 +449,34 @@ define([
           }).toThrow(errorMatch.operInvalid());
         });
 
+        it("should throw when set from configuration on an existing property", function() {
+          var propType = propertyTypeUtil.createRoot(Derived.type, {
+            name: "foo",
+            valueType: "string"
+          });
+
           var PostalCode = PentahoString.extend();
+
+          Object.defineProperty(context, "isConfiguring", {
+            value: true
+          });
 
           expect(function() {
             propType.valueType = PostalCode.type;
           }).toThrow(errorMatch.operInvalid());
+        });
+
+        it("should throw when set from configuration on a new property", function() {
+          Object.defineProperty(context, "isConfiguring", {
+            value: true
+          });
+
+          expect(function() {
+            propertyTypeUtil.createRoot(Derived.type, {
+              name: "foo",
+              valueType: "string"
+            });
+          }).not.toThrow(errorMatch.operInvalid());
         });
 
         it("should resolve the specified spec value", function() {

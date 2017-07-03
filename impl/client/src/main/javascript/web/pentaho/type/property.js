@@ -107,6 +107,14 @@ define([
          */
         extend_order: ["name", "label", "type"],
 
+        /**
+         * Gets a value that indicates if the type is being construction.
+         * Certain operations are allowed only during construction.
+         *
+         * @type {boolean}
+         */
+        __isConstructing: false,
+
         // TODO: Not validating property value type must descend from Value.Type.
         // Could probably solve by assuming a Property.Type default of Value.
 
@@ -125,7 +133,9 @@ define([
 
           this.base.apply(this, arguments);
 
-          // NOTE: Not validating same context as base.
+          this.__isConstructing = true;
+
+          // TODO: Not validating same context as base.
 
           // Abstract Property types don't yet have an associated declaringType.
           // e.g. Property.extend()
@@ -160,6 +170,8 @@ define([
 
             this._createValueAccessor();
           }
+
+          this.__isConstructing = false;
         },
 
         // region IListElement
@@ -385,6 +397,7 @@ define([
          *
          * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
          * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
+         * @throws {pentaho.lang.OperationInvalidError} When setting on an existing property from configuration.
          * @throws {pentaho.lang.ArgumentInvalidError} When setting to a _value type_ that is not a subtype
          * of the current _value type_.
          *
@@ -397,6 +410,9 @@ define([
         set valueType(value) {
           if(this.hasDescendants)
             throw error.operInvalid("Cannot change the value type of a property type that has descendants.");
+
+          if(!this.__isConstructing && context.isConfiguring)
+            throw error.operInvalid("Cannot change the value type of an existing property type from configuration.");
 
           if(value == null) return;
 
