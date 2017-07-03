@@ -29,24 +29,32 @@ define(function() {
     var baseId = typeSpec && typeSpec.base;
     var Property = declaringType.context.get(baseId || "property");
 
-    return Property.type.extendProto(
-        typeSpec,
-        {
-          declaringType: declaringType,
-          index: 1,
-          isRoot: true
-        });
+    var SubProperty = Property.extend({
+      type: typeSpec
+    }, null, {
+      declaringType: declaringType,
+      index: 1,
+      isRoot: true
+    });
+
+    return SubProperty.type;
   }
 
   function extend(declaringType, baseProperty, subPropTypeSpec) {
 
     var basePropType = declaringType.ancestor.get(baseProperty);
+    var BaseProperty = basePropType.instance.constructor;
+    var SubProperty = BaseProperty.extend({
+      type: subPropTypeSpec
+    }, null, {
+      declaringType: declaringType,
+      index: -1,
+      isRoot: false
+    });
 
-    return basePropType.extendProto(subPropTypeSpec,
-        {
-          declaringType: declaringType,
-          instance: declaringType.instance
-        });
+    return SubProperty.type;
+  }
+
   }
 });
 

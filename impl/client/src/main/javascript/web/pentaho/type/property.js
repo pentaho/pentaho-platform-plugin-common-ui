@@ -84,30 +84,12 @@ define([
 
         id: module.id,
         alias: "property",
-
         isAbstract: true,
-
         styleClass: null,
 
         // Break inheritance
         _label: null,
         _description: null,
-
-        /**
-         * Initializes a property type object, given a property type specification.
-         *
-         * @param {!pentaho.type.spec.UPropertyTypeProto} spec - A property name or type specification.
-         * @param {!Object} keyArgs - Keyword arguments.
-         * @param {!pentaho.type.Complex.Type} keyArgs.declaringType - The complex type that declares the property.
-         * @param {number} keyArgs.index - The index of the property within its complex type.
-         * @ignore
-         */
-        constructor: function(spec, keyArgs) {
-          // A singular string property with the specified name.
-          if(typeof spec === "string") spec = {name: spec};
-
-          this.base(spec, keyArgs);
-        },
 
         /**
          * Setting name and label first allows describing the property in subsequent error messages.
@@ -116,7 +98,7 @@ define([
          *
          * Setting type before value (not included here, so it is processed after type) avoids:
          * 1. Checking the new value against the old type (and then again, against the new type)
-         * 2. Ensures error messages are given in a predicatable order,
+         * 2. Ensures error messages are given in a predictable order,
          *    independently of the order of properties in an instSpec:
          *   a. Is new type a subtype of old type?
          *   b. Is new value an instance of the new type?
@@ -886,6 +868,19 @@ define([
           return any;
         }
         // endregion
+      }
+    }, /** @lends pentaho.type.Property */{
+      type: /** @lends pentaho.type.Property.Type */{
+        /** @inheritDoc */
+        _extend: function(name, instSpec, classSpec, keyArgs) {
+
+          // Accept typeSpec as being the property name.
+          if(typeof instSpec === "string") {
+            instSpec = {name: instSpec};
+          }
+
+          return this.base(name, instSpec, classSpec, keyArgs);
+        }
       }
     }).implement({
       type: /** @lends pentaho.type.Property.Type# */{

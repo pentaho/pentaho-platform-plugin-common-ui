@@ -1137,13 +1137,6 @@ define([
         Derived.extend();
         expect(Derived.type.hasDescendants).toBe(true);
       });
-
-      it("returns true if the type has been extended using .type.extendProto(...)", function() {
-        var Derived = Instance.extend();
-
-        Derived.type.extendProto();
-        expect(Derived.type.hasDescendants).toBe(true);
-      });
     }); // #hasDescendants
 
     describe("#isList", function() {
@@ -1537,27 +1530,16 @@ define([
         expect(Instance.type.to(inst)).toBe(inst);
       });
 
-      it("calls #create(value) and returns its result " +
-          "when value is not an instance and type does not have an own constructor", function() {
-        var createSpy = jasmine.createSpy();
-        var SubInstance = Instance.extend({
-          type: {
-            get context() {
-              return {
-                create: createSpy
-              };
-            }
-          }
-        });
+      it("calls #create(value) and returns its result when value is not an instance of the type", function() {
+        var SubInstance = Instance.extend();
 
-        var subSubType = SubInstance.type.extendProto();
-        spyOn(subSubType, "create").and.callThrough();
+        spyOn(SubInstance.type, "create").and.callThrough();
 
         var value = {};
-        subSubType.to(value);
+        var subInst = SubInstance.type.to(value);
 
-        expect(createSpy).not.toHaveBeenCalled();
-        expect(subSubType.create).toHaveBeenCalledWith(value, undefined);
+        expect(subInst instanceof SubInstance).toBe(true);
+        expect(SubInstance.type.create).toHaveBeenCalledWith(value, undefined);
       });
 
       it("casts a nully into `null`", function() {
@@ -1585,40 +1567,6 @@ define([
         var SubType1 = Instance.extend();
         var SubType2 = Instance.extend();
         expect(SubType1.type.isSubtypeOf(SubType2.type)).toBe(false);
-      });
-    });
-
-    describe("#extendProto(typeSpec, keyArgs)", function() {
-      var derivedProto;
-      beforeEach(function() {
-        derivedProto = Instance.type.extendProto({}, {});
-      });
-
-      it("derived classes have the proper 'ancestor'", function() {
-        expect(derivedProto).not.toBe(Instance.type);
-        expect(derivedProto.ancestor).toBe(Instance.type);
-      });
-
-      it("can be invoked without arguments", function() {
-        expect(Instance.type.extendProto().ancestor).toBe(Instance.type);
-        expect(Instance.type.extendProto(null).ancestor).toBe(Instance.type);
-        expect(Instance.type.extendProto(null, {}).ancestor).toBe(Instance.type);
-      });
-
-      it("does not return a constructor", function() {
-        expect(typeof derivedProto).not.toBe("function");
-      });
-
-      it("returns an instance whose constructor is the same as the extended class", function() {
-        expect(derivedProto.constructor).toBe(Instance.type.constructor);
-      });
-
-      it("accepts keyArgs", function() {
-        var derivedType = Instance.type.extendProto({}, {
-          isRoot: true
-        });
-        expect(Instance.type.isRoot).toBe(false);
-        expect(derivedType.isRoot).toBe(true);
       });
     });
 

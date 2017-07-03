@@ -1062,47 +1062,6 @@ define([
       },
       // endregion
 
-      /**
-       * Creates a subtype of this one.
-       *
-       * This method creates a subtype that does not have own instance or type constructors.
-       * The base type's instance and type constructors are used to _initialize_ instances and the type.
-       *
-       * To create a type with own constructors,
-       * extend from the base instance constructor instead,
-       * by calling its `extend` method.
-       *
-       * @param {object} [typeSpec] The new type specification.
-       * @param {object} [keyArgs] Keyword arguments.
-       *
-       * @return {pentaho.type.Type} The created subtype.
-       */
-      extendProto: function(typeSpec, keyArgs) {
-        if(!typeSpec) typeSpec = {};
-
-        var baseInstProto = this.instance;
-
-        // INSTANCE I
-        var instProto = Object.create(baseInstProto);
-
-        // TYPE
-        O.setConst(this, "_hasDescendants", true);
-
-        var type = Object.create(this);
-
-        var ka = keyArgs ? Object.create(keyArgs) : {};
-        ka.instance = instProto;
-        ka.exclude  = {instance: 1};
-
-        // NOTE: `type.constructor` is still the "base" constructor.
-        type.constructor(typeSpec, ka);
-
-        // INSTANCE II
-        instProto.extend(typeSpec && typeSpec.instance, {exclude: {type: 1}});
-
-        return type;
-      },
-
       // region creation
       /**
        * Creates an instance of this type, given an instance specification.
@@ -1240,16 +1199,7 @@ define([
           if(!Instance) this._throwAbstractType();
 
         } else {
-          // Does this type have an own constructor?
-          var baseInst = this.instance;
-
-          Instance = baseInst.constructor;
-
-          if(Instance.prototype !== baseInst) {
-            // Type was created through extendProto.
-            var inst = Object.create(baseInst);
-            return Instance.apply(inst, arguments) || inst;
-          }
+          Instance = this.instance.constructor;
         }
 
         return O.make(Instance, arguments);
