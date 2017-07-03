@@ -31,9 +31,9 @@ define([
         var Derived = Complex.extend({
           type: {
             props: [
-              {name: "x", type: "number" },
-              {name: "y", type: "string" },
-              {name: "z", type: "boolean"}
+              {name: "x", valueType: "number"},
+              {name: "y", valueType: "string"},
+              {name: "z", valueType: "boolean"}
             ]
           }
         });

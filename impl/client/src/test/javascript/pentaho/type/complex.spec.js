@@ -99,7 +99,7 @@ define([
             props: [
               "x",
               "y",
-              {name: "z", type: ["string"]}
+              {name: "z", valueType: ["string"]}
             ]
           }
         });
@@ -194,7 +194,7 @@ define([
       describe("#get(name[, sloppy])", function() {
         it("should return the `Value` of an existing singular property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", type: "string"}]}
+            type: {props: [{name: "x", valueType: "string"}]}
           });
 
           var derived = new Derived({x: "1"});
@@ -207,7 +207,7 @@ define([
 
         it("should return the value of an existing property given its type object", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", type: "string"}]}
+            type: {props: [{name: "x", valueType: "string"}]}
           });
 
           var derived = new Derived({x: "1"});
@@ -223,7 +223,7 @@ define([
 
         it("should return the `List` value of an existing list property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", type: ["string"]}]}
+            type: {props: [{name: "x", valueType: ["string"]}]}
           });
 
           var derived = new Derived();
@@ -236,7 +236,7 @@ define([
 
         it("should return the same `List` of an existing list property every time", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", type: ["string"]}]}
+            type: {props: [{name: "x", valueType: ["string"]}]}
           });
 
           var derived = new Derived({x: ["1"]});
@@ -280,8 +280,8 @@ define([
 
         var Derived = Complex.extend({
           type: {props: [
-            {name: "x", type: "string"},
-            {name: "z", type: "object"}
+            {name: "x", valueType: "string"},
+            {name: "z", valueType: "object"}
           ]}
         });
 
@@ -325,8 +325,8 @@ define([
 
         var Derived = Complex.extend({type: {
           props: [
-            {name: "x", type: "string"},
-            {name: "z", type: "object"}
+            {name: "x", valueType: "string"},
+            {name: "z", valueType: "object"}
           ]
         }});
 
@@ -370,7 +370,7 @@ define([
       describe("#set(name, valueSpec)", function() {
         it("should set the value of an existing property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", type: "string"}]}
+            type: {props: [{name: "x", valueType: "string"}]}
           });
 
           var derived = new Derived();
@@ -384,7 +384,7 @@ define([
         it("should throw a TypeError if the property is read-only", function() {
 
           var Derived = Complex.extend({
-            type: {props: [{name: "x", type: "string", isReadOnly: true, value: "2"}]}
+            type: {props: [{name: "x", valueType: "string", isReadOnly: true, defaultValue: "2"}]}
           });
 
           var derived = new Derived();
@@ -398,7 +398,7 @@ define([
 
         it("should set the value of an existing list property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", type: ["string"]}]}
+            type: {props: [{name: "x", valueType: ["string"]}]}
           });
 
           var derived = new Derived();
@@ -412,7 +412,7 @@ define([
 
         it("should keep the value of property if the new is equals", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", type: "string"}]}
+            type: {props: [{name: "x", valueType: "string"}]}
           });
 
           var derived = new Derived({"x": "1"});
@@ -428,7 +428,7 @@ define([
 
         it("should replace the value of property if the new is different", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", type: "string"}]}
+            type: {props: [{name: "x", valueType: "string"}]}
           });
 
           var derived = new Derived({"x": "1"});
@@ -459,8 +459,8 @@ define([
           var THREE = 3,
               Derived = Complex.extend({
                 type: {props: [
-                  {name: "x", type: "number"},
-                  {name: "y", type: ["number"]}
+                  {name: "x", valueType: "number"},
+                  {name: "y", valueType: ["number"]}
                 ]}
               });
 
@@ -621,7 +621,7 @@ define([
 
         describe("when given an empty steps array", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", type: "string"}]}
+            type: {props: [{name: "x", valueType: "string"}]}
           });
           var derived = new Derived({x: "1"});
           var getter  = buildGetter(derived);
@@ -634,7 +634,7 @@ define([
 
           describe("when given a property name", function() {
             var Derived = Complex.extend({
-              type: {props: [{name: "x", type: "string"}]}
+              type: {props: [{name: "x", valueType: "string"}]}
             });
             var simple  = new PentahoString(1);
             var derived = new Derived({x: simple});
@@ -646,7 +646,7 @@ define([
 
           describe("when given a property name and an index", function() {
             var Derived = Complex.extend({
-              type: {props: [{name: "x", type: ["string"]}]}
+              type: {props: [{name: "x", valueType: ["string"]}]}
             });
             var simple1 = new PentahoString(1);
             var simple2 = new PentahoString(2);
@@ -662,7 +662,7 @@ define([
 
           describe("when given a property name and a list element key", function() {
             var Derived = Complex.extend({
-              type: {props: [{name: "x", type: ["string"]}]}
+              type: {props: [{name: "x", valueType: ["string"]}]}
             });
             var simple1 = new PentahoString(1);
             var simple2 = new PentahoString(2);
@@ -681,10 +681,10 @@ define([
               type: {
                 props: [
                   {
-                    name: "x", type: [
+                    name: "x", valueType: [
                     {
                       props: [
-                        {name: "y", type: ["string"]}
+                        {name: "y", valueType: ["string"]}
                       ]
                     }
                   ]
@@ -708,9 +708,9 @@ define([
                 props: [
                   {
                     name: "x",
-                    type: {
+                    valueType: {
                       props: [
-                        {name: "y", type: ["number"]}
+                        {name: "y", valueType: ["number"]}
                       ]
                     }
                   }
@@ -729,9 +729,9 @@ define([
                 props: [
                   {
                     name: "x",
-                    type: {
+                    valueType: {
                       props: [
-                        {name: "y", type: ["number"]}
+                        {name: "y", valueType: ["number"]}
                       ]
                     }
                   }
@@ -750,9 +750,9 @@ define([
                 props: [
                   {
                     name: "x",
-                    type: {
+                    valueType: {
                       props: [
-                        {name: "y", type: ["number"]}
+                        {name: "y", valueType: ["number"]}
                       ]
                     }
                   }
@@ -772,7 +772,7 @@ define([
       describe("#path(step1, step2, ...)", function() {
         it("should call `_path` with ([step1, step2, ...], false)", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", type: "string"}]}
+            type: {props: [{name: "x", valueType: "string"}]}
           });
 
           function expectIt(args) {
@@ -818,7 +818,7 @@ define([
 
           describe("when index is 0 and the property value is non-null", function() {
             var Derived = Complex.extend({
-              type: {props: [{name: "x", type: "string"}]}
+              type: {props: [{name: "x", valueType: "string"}]}
             });
 
             var derived = new Derived({x: "1"});
@@ -833,7 +833,7 @@ define([
 
           describe("when index is <> 0 and the property value is non-null", function() {
             var Derived = Complex.extend({
-              type: {props: [{name: "x", type: "string"}]}
+              type: {props: [{name: "x", valueType: "string"}]}
             });
 
             var derived = new Derived({x: "1"});
@@ -849,7 +849,7 @@ define([
 
           describe("when the property value is null, for any non-null index", function() {
             var Derived = Complex.extend({
-              type: {props: [{name: "x", type: "string"}]}
+              type: {props: [{name: "x", valueType: "string"}]}
             });
 
             var derived = new Derived();
@@ -866,7 +866,7 @@ define([
 
           describe("when index is nully", function() {
             var Derived = Complex.extend({
-              type: {props: [{name: "x", type: "string"}]}
+              type: {props: [{name: "x", valueType: "string"}]}
             });
 
             var derived = new Derived();
@@ -884,7 +884,7 @@ define([
         describe("when `name` is that of a list property", function() {
           describe("when index exists", function() {
             var Derived = Complex.extend({
-              type: {props: [{name: "x", type: ["string"]}]}
+              type: {props: [{name: "x", valueType: ["string"]}]}
             });
 
             var derived = new Derived({"x": ["1", "2"]});
@@ -900,7 +900,7 @@ define([
 
           describe("when index is out of range", function() {
             var Derived = Complex.extend({
-              type: {props: [{name: "x", type: ["string"]}]}
+              type: {props: [{name: "x", valueType: ["string"]}]}
             });
 
             var derived = new Derived({"x": ["1", "2"]});
@@ -920,8 +920,8 @@ define([
 
         var Derived = Complex.extend({
           type: {props: [
-            {name: "x", type: "string"},
-            {name: "z", type: "object"}
+            {name: "x", valueType: "string"},
+            {name: "z", valueType: "object"}
           ]}
         });
 
@@ -965,8 +965,8 @@ define([
 
         var Derived = Complex.extend({type: {
           props: [
-            {name: "x", type: "string"},
-            {name: "z", type: "object"}
+            {name: "x", valueType: "string"},
+            {name: "z", valueType: "object"}
           ]
         }});
 
@@ -1049,7 +1049,7 @@ define([
 
         describe("when `name` is that of a list property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", type: ["string"]}]}
+            type: {props: [{name: "x", valueType: ["string"]}]}
           });
 
           var result, derived, getter;
@@ -1076,8 +1076,8 @@ define([
       describe("#first(name[, sloppy])", function() {
         var Derived = Complex.extend({type: {
           props: [
-            {name: "x", type: "string"},
-            {name: "z", type: "string"}
+            {name: "x", valueType: "string"},
+            {name: "z", valueType: "string"}
           ]
         }});
 
@@ -1110,8 +1110,8 @@ define([
       describe("#firstv(name[, sloppy])", function() {
         var Derived = Complex.extend({type: {
           props: [
-            {name: "x", type: "string"},
-            {name: "z", type: "object"}
+            {name: "x", valueType: "string"},
+            {name: "z", valueType: "object"}
           ]
         }});
 
@@ -1148,8 +1148,8 @@ define([
       describe("#firstf(name[, sloppy])", function() {
         var Derived = Complex.extend({type: {
           props: [
-            {name: "x", type: "string"},
-            {name: "z", type: "object"}
+            {name: "x", valueType: "string"},
+            {name: "z", valueType: "object"}
           ]
         }});
 
@@ -1192,7 +1192,7 @@ define([
         it("should make the list of a read-only list property, read-only", function() {
 
           var Derived = Complex.extend({
-            type: {props: [{name: "x", type: ["string"], isReadOnly: true}]}
+            type: {props: [{name: "x", valueType: ["string"], isReadOnly: true}]}
           });
 
           var derived = new Derived();
@@ -1203,7 +1203,7 @@ define([
         it("should make the list of a writable list property, writable", function() {
 
           var Derived = Complex.extend({
-            type: {props: [{name: "x", type: ["string"]}]}
+            type: {props: [{name: "x", valueType: ["string"]}]}
           });
 
           var derived = new Derived();
@@ -1487,7 +1487,7 @@ define([
         var MyComplex1 = Complex.extend();
         var MyComplex2 = Complex.extend({
           type: {
-            props: ["a", "b", {name: "c", type: MyComplex1}]
+            props: ["a", "b", {name: "c", valueType: MyComplex1}]
           }
         });
 
@@ -1503,7 +1503,7 @@ define([
         var MyComplex2 = Complex.extend({
           type: {
             props: [
-              {name: "a", type: [MyComplex1]}
+              {name: "a", valueType: [MyComplex1]}
             ]
           }
         });
@@ -1668,7 +1668,7 @@ define([
 
       it("should be called when a complex container is set to this value", function() {
         var Derived = Complex.extend();
-        var Container = Complex.extend({type: {props: [{name: "a", type: Derived}]}});
+        var Container = Complex.extend({type: {props: [{name: "a", valueType: Derived}]}});
 
         spyOn(Derived.prototype, "_addReference");
 
@@ -1680,7 +1680,7 @@ define([
 
       it("should be called with the complex container and its property type", function() {
         var Derived = Complex.extend();
-        var Container = Complex.extend({type: {props: [{name: "a", type: Derived}]}});
+        var Container = Complex.extend({type: {props: [{name: "a", valueType: Derived}]}});
 
         spyOn(Derived.prototype, "_addReference");
 
@@ -1692,7 +1692,7 @@ define([
 
       it("should be called when added to a list container", function() {
         var Derived = Complex.extend();
-        var Container = Complex.extend({type: {props: [{name: "as", type: [Derived]}]}});
+        var Container = Complex.extend({type: {props: [{name: "as", valueType: [Derived]}]}});
 
         spyOn(Derived.prototype, "_addReference");
 

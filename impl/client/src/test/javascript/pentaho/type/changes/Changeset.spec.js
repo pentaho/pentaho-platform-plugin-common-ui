@@ -25,25 +25,32 @@ define([
 
   describe("pentaho.type.changes.Changeset", function() {
 
-    var context, Complex;
+    var context;
+    var Complex;
 
     beforeEach(function() {
       context = new Context();
       Complex = context.get("complex");
     });
 
-    it("should be defined", function () {
+    it("should be defined", function() {
       expect(typeof Changeset).toBeDefined();
     });
 
     describe("instance -", function() {
 
-      var owner, changeset, scope;
+      var owner;
+      var changeset;
+      var scope;
 
       beforeEach(function() {
-        var Derived = Complex.extend({type: {props: [
-                {name: "foo", value: "bar"}
-              ]}});
+        var Derived = Complex.extend({
+          type: {
+            props: [
+              {name: "foo", defaultValue: "bar"}
+            ]
+          }
+        });
 
         owner = new Derived();
 

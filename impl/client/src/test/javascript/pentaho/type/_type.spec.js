@@ -821,10 +821,10 @@ define([
 
       it("should default to the id of the type, in snake case, when the type is not anonymous", function() {
         var Derived = Instance.extend({
-            type: {
-              id: "foo/bar"
-            }
-          });
+          type: {
+            id: "foo/bar"
+          }
+        });
 
         expect(Derived.type.styleClass).toBe("foo-bar");
       });
@@ -1431,7 +1431,7 @@ define([
                 type: {
                   id: "test/foo/a",
                   props: {
-                    a: {type: "string"}
+                    a: {valueType: "string"}
                   }
                 }
               });
@@ -1447,7 +1447,7 @@ define([
                 type: {
                   id: "test/foo/b",
                   props: {
-                    b: {type: "string"}
+                    b: {valueType: "string"}
                   }
                 }
               });
@@ -1463,7 +1463,7 @@ define([
                 type: {
                   id: "test/foo/c",
                   props: {
-                    c: {type: "string"}
+                    c: {valueType: "string"}
                   }
                 }
               });
@@ -1480,8 +1480,8 @@ define([
             _: [
               {
                 props: [
-                  {name: "x", type: "test/foo/a"},
-                  {name: "y", type: "test/foo/b"}
+                  {name: "x", valueType: "test/foo/a"},
+                  {name: "y", valueType: "test/foo/b"}
                 ]
               }
             ],
@@ -1511,7 +1511,7 @@ define([
         expect(SubInstance.type.is(new SubInstance())).toBe(true);
       });
 
-      it("detects that an instance of another Instance class is not of the type ", function() {
+      it("detects that an instance of another Instance class is not of the type", function() {
         var SubInstance1 = Instance.extend();
         var SubInstance2 = Instance.extend();
 
@@ -1524,7 +1524,7 @@ define([
           null, undefined,
           {}, [],
           new Date(),
-          (function() { return this; }()) // global object
+          (function() { return this; })() // global object
         ].forEach(function(obj) {
           expect(Instance.type.is(obj)).toBe(false);
         });

@@ -115,8 +115,8 @@ define([
               expect(propType.label).toBe("Foo Bar");
             });
 
-            it("should have `type` string", function() {
-              expect(propType.type).toBe(PentahoString.type);
+            it("should have `valueType` string", function() {
+              expect(propType.valueType).toBe(PentahoString.type);
             });
 
             it("should have `declaringType` equal to containing ComplexType class", function() {
@@ -522,8 +522,8 @@ define([
         var SampleType = Complex.extend({
           type: {
             props: [
-              {name: "a", type: "string"},
-              {name: "b", type: "string"}
+              {name: "a", valueType: "string"},
+              {name: "b", valueType: "string"}
             ]
           }
         });
@@ -541,8 +541,8 @@ define([
         var SampleType = Complex.extend({
           type: {
             props: [
-              {name: "a", type: "string"},
-              {name: "b", type: "string"}
+              {name: "a", valueType: "string"},
+              {name: "b", valueType: "string"}
             ]
           }
         });
@@ -560,8 +560,8 @@ define([
         var SampleType = Complex.extend({
           type: {
             props: [
-              {name: "a", type: "string"},
-              {name: "b", type: "string"}
+              {name: "a", valueType: "string"},
+              {name: "b", valueType: "string"}
             ]
           }
         });
@@ -579,7 +579,7 @@ define([
         var SampleType = Complex.extend({
           type: {
             props: [
-              {name: "a", type: "string"}
+              {name: "a", valueType: "string"}
             ]
           }
         });
@@ -597,7 +597,7 @@ define([
         var SampleType = Complex.extend({
           type: {
             props: [
-              {name: "a", type: "string"}
+              {name: "a", valueType: "string"}
             ]
           }
         });
@@ -614,8 +614,8 @@ define([
         var SampleType = Complex.extend({
           type: {
             props: [
-              {name: "a", type: "string"},
-              {name: "b", type: "string"}
+              {name: "a", valueType: "string"},
+              {name: "b", valueType: "string"}
             ]
           }
         });
@@ -632,8 +632,8 @@ define([
         var RootType = Complex.extend({
           type: {
             props: [
-              {name: "a", type: "string"},
-              {name: "b", type: "string"}
+              {name: "a", valueType: "string"},
+              {name: "b", valueType: "string"}
             ]
           }
         });
@@ -641,8 +641,8 @@ define([
         var SampleType = RootType.extend({
           type: {
             props: [
-              {name: "c", type: "string"},
-              {name: "d", type: "string"}
+              {name: "c", valueType: "string"},
+              {name: "d", valueType: "string"}
             ]
           }
         });
@@ -665,8 +665,8 @@ define([
         var BaseType = Complex.extend({
           type: {
             props: [
-              {name: "a", type: "string"},
-              {name: "b", type: "string"}
+              {name: "a", valueType: "string"},
+              {name: "b", valueType: "string"}
             ]
           }
         });
@@ -688,8 +688,8 @@ define([
         var BaseType = Complex.extend({
           type: {
             props: [
-              {name: "a", type: "string"},
-              {name: "b", type: "string"}
+              {name: "a", valueType: "string"},
+              {name: "b", valueType: "string"}
             ]
           }
         });
@@ -711,8 +711,8 @@ define([
         var BaseType = Complex.extend({
           type: {
             props: [
-              {name: "a", type: "string"},
-              {name: "b", type: "string"}
+              {name: "a", valueType: "string"},
+              {name: "b", valueType: "string"}
             ]
           }
         });
@@ -733,7 +733,7 @@ define([
         var BaseType = Complex.extend({
           type: {
             props: [
-              {name: "a", type: "string"}
+              {name: "a", valueType: "string"}
             ]
           }
         });
@@ -754,7 +754,7 @@ define([
         var BaseType = Complex.extend({
           type: {
             props: [
-              {name: "a", type: "string"}
+              {name: "a", valueType: "string"}
             ]
           }
         });
@@ -776,7 +776,7 @@ define([
         var SubTypeA = BaseType.extend({
           type: {
             props: [
-              {name: "a", type: "string"}
+              {name: "a", valueType: "string"}
             ]
           }
         });
@@ -784,7 +784,7 @@ define([
         var SubTypeB = BaseType.extend({
           type: {
             props: [
-              {name: "b", type: "string"}
+              {name: "b", valueType: "string"}
             ]
           }
         });
@@ -801,8 +801,8 @@ define([
         var BaseType = Complex.extend({
           type: {
             props: [
-              {name: "a", type: "string"},
-              {name: "b", type: "string"}
+              {name: "a", valueType: "string"},
+              {name: "b", valueType: "string"}
             ]
           }
         });
@@ -822,8 +822,8 @@ define([
         var RootType = Complex.extend({
           type: {
             props: [
-              {name: "a", type: "string"},
-              {name: "b", type: "string"}
+              {name: "a", valueType: "string"},
+              {name: "b", valueType: "string"}
             ]
           }
         });
@@ -831,8 +831,8 @@ define([
         var BaseType = RootType.extend({
           type: {
             props: [
-              {name: "c", type: "string"},
-              {name: "d", type: "string"}
+              {name: "c", valueType: "string"},
+              {name: "d", valueType: "string"}
             ]
           }
         });
@@ -857,7 +857,7 @@ define([
         var SubTypeA = BaseType.extend({
           type: {
             props: [
-              {name: "a", type: "string"}
+              {name: "a", valueType: "string"}
             ]
           }
         });
@@ -865,7 +865,7 @@ define([
         var SubTypeB = BaseType.extend({
           type: {
             props: [
-              {name: "a", type: "string"}
+              {name: "a", valueType: "string"}
             ]
           }
         });

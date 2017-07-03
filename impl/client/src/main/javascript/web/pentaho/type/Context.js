@@ -1235,13 +1235,13 @@ define([
     if(props) {
       if(Array.isArray(props))
         props.forEach(function(propSpec) {
-          collectTypeIdsRecursive(propSpec && propSpec.type, outIds, byTypeId);
+          collectTypeIdsRecursive(propSpec && propSpec.valueType, outIds, byTypeId);
           collectTypeIdsRecursive(propSpec && propSpec.base, outIds, byTypeId);
         });
       else
         Object.keys(props).forEach(function(propName) {
           var propSpec = props[propName];
-          collectTypeIdsRecursive(propSpec && propSpec.type, outIds, byTypeId);
+          collectTypeIdsRecursive(propSpec && propSpec.valueType, outIds, byTypeId);
           collectTypeIdsRecursive(propSpec && propSpec.base, outIds, byTypeId);
         });
     }

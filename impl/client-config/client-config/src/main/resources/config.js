@@ -104,7 +104,7 @@ define(function() {
         apply: {
           props: {
             shape: {
-              value: "diamond",
+              defaultValue: "diamond",
               isBrowsable: false
             }
           }

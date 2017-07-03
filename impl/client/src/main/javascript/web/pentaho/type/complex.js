@@ -74,9 +74,9 @@ define([
      *     return Complex.extend({
      *       type: {
      *         props: [
-     *           {name: "name", type: "string", label: "Name"},
-     *           {name: "categories", type: ["string"], label: "Categories"},
-     *           {name: "price", type: "number", label: "Price"}
+     *           {name: "name", valueType: "string", label: "Name"},
+     *           {name: "categories", valueType: ["string"], label: "Categories"},
+     *           {name: "price", valueType: "number", label: "Price"}
      *         ]
      *       }
      *     });
@@ -662,7 +662,7 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       isApplicable: function(name) {
-        return this.type.get(name).isApplicableEval(this);
+        return this.type.get(name).isApplicableOn(this);
       },
       // endregion
 
@@ -677,7 +677,7 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       isEnabled: function(name) {
-        return this.type.get(name).isEnabledEval(this);
+        return this.type.get(name).isEnabledOn(this);
       },
       // endregion
 
@@ -692,7 +692,7 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       countRange: function(name) {
-        return this.type.get(name).countRangeEval(this);
+        return this.type.get(name).countRangeOn(this);
       },
       // endregion
 
@@ -710,7 +710,8 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       isRequired: function(name) {
-        return this.type.get(name).countRangeEval(this).min > 0;
+        return this.type.get(name).countRangeOn(this).min > 0;
+      },
       },
       // endregion
       // endregion
@@ -764,7 +765,7 @@ define([
 
           var includeValue = includeDefaults;
           if(!includeValue) {
-            var defaultValue = propType.value;
+            var defaultValue = propType.defaultValue;
             // Isn't equal to the default value?
             if(propType.isList) {
               // TODO: This is not perfect... In a way lists are always created by us.
@@ -779,7 +780,7 @@ define([
           if(includeValue) {
             var valueSpec;
             if(value) {
-              keyArgs.declaredType = propType.type;
+              keyArgs.declaredType = propType.valueType;
 
               valueSpec = value.toSpecInContext(keyArgs);
 
@@ -791,11 +792,11 @@ define([
                 if(includeDefaults) {
                   // The default value is better than a `null` that is the result of
                   // a serialization failure...
-                  valueSpec = propType.value;
+                  valueSpec = propType.defaultValue;
                 } else {
                   // Defaults can be omitted as long as complex form is used.
                   // Same value as default?
-                  if(!useArray && valueSpec === propType.value) return;
+                  if(!useArray && valueSpec === propType.defaultValue) return;
 
                   valueSpec = null;
                 }
@@ -974,7 +975,7 @@ define([
          *
          * The default implementation
          * validates each property's value against
-         * the property's [type]{@link pentaho.type.Property.Type#type}
+         * the property's [valueType]{@link pentaho.type.Property.Type#valueType}
          * and collects and returns any reported errors.
          * Override to complement with a type's specific validation logic.
          *
@@ -983,7 +984,7 @@ define([
          *
          * @param {!pentaho.type.Value} value - The value to validate.
          *
-         * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
+         * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
          *
          * @protected
          */
@@ -991,7 +992,7 @@ define([
           var errors = null;
 
           this.each(function(pType) {
-            errors = typeUtil.combineErrors(errors, pType.validateOwner(value));
+            errors = typeUtil.combineErrors(errors, pType.validateOn(value));
           });
 
           return errors;

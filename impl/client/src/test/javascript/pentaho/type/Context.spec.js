@@ -932,8 +932,8 @@ define([
           return testGet(function(sync, Context) {
             var typeSpec = {
               props: [
-                {name: "a", type: {id: "_:ab1", base: "number", label: "My Number"}},
-                {name: "b", type: "_:ab1"}
+                {name: "a", valueType: {id: "_:ab1", base: "number", label: "My Number"}},
+                {name: "b", valueType: "_:ab1"}
               ]
             };
             var context = new Context();
@@ -941,12 +941,12 @@ define([
 
             return promise.then(function(InstCtor) {
               var type = InstCtor.type;
-              var myNumberType = type.get("a").type;
+              var myNumberType = type.get("a").valueType;
 
               expect(myNumberType.ancestor.shortId).toBe("number");
               expect(myNumberType.label).toBe("My Number");
 
-              expect(type.get("b").type).toBe(myNumberType);
+              expect(type.get("b").valueType).toBe(myNumberType);
             });
           });
         });
@@ -956,8 +956,8 @@ define([
           return testGet(function(sync, Context) {
             var typeSpec = {
               props: [
-                {name: "a", type: {id: "_:1", base: "number", label: "My Number"}},
-                {name: "b", type: "_:1"}
+                {name: "a", valueType: {id: "_:1", base: "number", label: "My Number"}},
+                {name: "b", valueType: "_:1"}
               ]
             };
             var context = new Context();
@@ -966,7 +966,7 @@ define([
             return promise.then(function(InstCtor) {
               var type = InstCtor.type;
 
-              expect(type.get("a").type).toBe(type.get("b").type);
+              expect(type.get("a").valueType).toBe(type.get("b").valueType);
             });
           });
         });
@@ -979,8 +979,8 @@ define([
             var typeSpec = {
               id: "_:1",
               props: [
-                {name: "a", type: "string"},
-                {name: "b", type: "string"}
+                {name: "a", valueType: "string"},
+                {name: "b", valueType: "string"}
               ]
             };
             var context = new Context();
@@ -995,8 +995,8 @@ define([
           return testGet(function(sync, Context) {
             var typeSpec = {
               props: [
-                {name: "a", type: {id: "_:1", base: "string"}},
-                {name: "b", type: {id: "_:1", base: "number"}}
+                {name: "a", valueType: {id: "_:1", base: "string"}},
+                {name: "b", valueType: {id: "_:1", base: "number"}}
               ]
             };
             var context = new Context();
@@ -1006,9 +1006,9 @@ define([
             return promise.then(function(InstCtor) {
               var type = InstCtor.type;
 
-              expect(type.get("a").type).toBe(type.get("b").type);
+              expect(type.get("a").valueType).toBe(type.get("b").valueType);
 
-              expect(type.get("a").type.ancestor.shortId).toBe("string");
+              expect(type.get("a").valueType.ancestor.shortId).toBe("string");
             });
           });
         });

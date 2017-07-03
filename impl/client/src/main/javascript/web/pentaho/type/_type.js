@@ -1103,7 +1103,7 @@ define([
        *
        *   var product = Value.type.create({
        *         _: {
-       *           props: ["id", "name", {name: "price", type: "number"}]
+       *           props: ["id", "name", {name: "price", valueType: "number"}]
        *         },
        *
        *         id:    "mpma",
@@ -1127,7 +1127,7 @@ define([
        *
        *   var productList = Value.type.create({
        *         _: [{
-       *           props: ["id", "name", {name: "price", type: "number"}]
+       *           props: ["id", "name", {name: "price", valueType: "number"}]
        *         }],
        *
        *         d: [
@@ -1152,7 +1152,7 @@ define([
        *           props: [
        *             "id",
        *             "name",
-       *             {name: "price", type: "number"}
+       *             {name: "price", valueType: "number"}
        *           ]
        *         }]);
        *
@@ -1615,7 +1615,7 @@ define([
         var dv = castAndNormalize(spec.value, cast, null); // * effective/monotone value function
         var monotoneCombineEvals = spec.combine;
         var namePriv = "_" + name;
-        var namePrivEval = namePriv + "Eval";
+        var namePrivEval = namePriv + "On";
         var root = this;
 
         (function() {
@@ -1698,9 +1698,10 @@ define([
           }
         });
 
-        // Handles passing the `owner` argument to the `this` context of the private eval method.
-        this[name + "Eval"] = function(owner) {
-          return this[namePrivEval].call(owner);
+        // Handles passing the `owner` argument to the `this` context of the private eval method,
+        // and the `this` context to the first argument...
+        root[name + "On"] = function(owner) {
+          return this[namePrivEval].call(owner, this);
         };
       },
 

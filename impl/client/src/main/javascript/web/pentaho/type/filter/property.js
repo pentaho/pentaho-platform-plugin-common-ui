@@ -58,12 +58,12 @@ define([
        *
        * This getter is a shorthand for `this.getv("property")`.
        *
+       * @name property
+       * @memberOf pentaho.type.filter.Property#
        * @type {string}
        * @readonly
        */
-      get property() {
-        return this.getv("property");
-      },
+
 
       get isProperty() {
         return true;
@@ -106,7 +106,7 @@ define([
           {
             name: "property",
             nameAlias: "p",
-            type: "string",
+            valueType: "string",
             isRequired: true,
             isReadOnly: true
           }

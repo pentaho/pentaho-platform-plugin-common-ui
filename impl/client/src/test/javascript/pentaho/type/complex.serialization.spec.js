@@ -49,24 +49,24 @@ define([
       type: {
         label: "Derived",
         props: [
-          {name: "quantity", type: "number"},
+          {name: "quantity", valueType: "number"},
           "type",
-          {name: "noFormat", type: "number"},
-          {name: "anything", type: TestLevel1},
+          {name: "noFormat", valueType: "number"},
+          {name: "anything", valueType: TestLevel1},
           {
             name: "sub",
-            type: {
+            valueType: {
               props: [
-                {name: "truth", type: "boolean"},
-                {name: "when", type: "date"}
+                {name: "truth", valueType: "boolean"},
+                {name: "when", valueType: "date"}
               ]
             }
           },
-          {name: "sameAsDefault", type: "number", value: 0},
-          {name: "noValue", type: "number"},
-          {name: "emptyListEmptyDefault", type: ["number"]},
-          {name: "emptyListWithDefault", type: ["number"], value: [1, 2, 3]},
-          {name: "nonEmptyList", type: ["number"]}
+          {name: "sameAsDefault", valueType: "number", defaultValue: 0},
+          {name: "noValue", valueType: "number"},
+          {name: "emptyListEmptyDefault", valueType: ["number"]},
+          {name: "emptyListWithDefault", valueType: ["number"], defaultValue: [1, 2, 3]},
+          {name: "nonEmptyList", valueType: ["number"]}
         ]
       }
     });
@@ -555,7 +555,7 @@ define([
 
                 Derived.type.each(function(pType, index) {
                   if(!pType.isList) {
-                    if(Derived.type.areEqual(pType.value, value.get(pType))) {
+                    if(Derived.type.areEqual(pType.defaultValue, value.get(pType))) {
                       expect(spec[index]).toBe(null);
                     } else {
                       expect(spec[index]).not.toBe(null);
@@ -670,7 +670,7 @@ define([
 
                 Derived.type.each(function(pType) {
                   if(!pType.isList) {
-                    if(Derived.type.areEqual(pType.value, value.get(pType))) {
+                    if(Derived.type.areEqual(pType.defaultValue, value.get(pType))) {
                       expect(pType.name in spec).toBe(false);
                     } else {
                       expect(pType.name in spec).toBe(true);
