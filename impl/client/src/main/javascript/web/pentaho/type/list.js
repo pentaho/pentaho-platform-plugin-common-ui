@@ -15,7 +15,7 @@
  */
 define([
   "module",
-  "./ContainerMixin",
+  "./mixins/Container",
   "./changes/ListChangeset",
   "./value",
   "./element",
@@ -51,7 +51,7 @@ define([
      * @memberOf pentaho.type
      * @class
      * @extends pentaho.type.Value
-     * @extends pentaho.type.ContainerMixin
+     * @extends pentaho.type.mixins.Container
      *
      * @amd {pentaho.type.Factory<pentaho.type.List>} pentaho/type/list
      *
@@ -576,7 +576,7 @@ define([
       },
 
       // region Core change methods
-      // implement abstract pentaho.type.ContainerMixin#_createChangeset
+      // implement abstract pentaho.type.mixins.Container#_createChangeset
       _createChangeset: function(txn) {
         return new ListChangeset(txn, this);
       },

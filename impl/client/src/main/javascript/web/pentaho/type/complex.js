@@ -18,7 +18,7 @@ define([
   "./element",
   "./PropertyTypeCollection",
   "./util",
-  "./ContainerMixin",
+  "./mixins/Container",
   "../lang/ActionResult",
   "../lang/UserError",
   "./changes/ComplexChangeset",
@@ -57,7 +57,7 @@ define([
      * @name pentaho.type.Complex
      * @class
      * @extends pentaho.type.Element
-     * @extends pentaho.type.ContainerMixin
+     * @extends pentaho.type.mixins.Container
      *
      * @amd {pentaho.type.Factory<pentaho.type.Complex>} pentaho/type/complex
      *
@@ -162,7 +162,7 @@ define([
        * We could, however, not addRef is the prop (and, thus, the list) is also isReadOnly?
        *
        * @param {!pentaho.type.Property.Type} propType - The property type.
-       * @param {!pentaho.type.ContainerMixin} value - The container value.
+       * @param {!pentaho.type.mixins.Container} value - The container value.
        *
        * @private
        */
@@ -454,7 +454,7 @@ define([
         });
       },
 
-      // implement abstract pentaho.type.ContainerMixin#_createChangeset
+      // implement abstract pentaho.type.mixins.Container#_createChangeset
       _createChangeset: function(txn) {
         return new ComplexChangeset(txn, this);
       },

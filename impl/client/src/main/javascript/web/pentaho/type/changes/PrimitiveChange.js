@@ -46,7 +46,7 @@ define([
      * Register reference changes caused by the change.
      *
      * @param {!pentaho.type.changes.Transaction} transaction - The ambient transaction, provided for performance.
-     * @param {!pentaho.type.ContainerMixin} container - The container instance.
+     * @param {!pentaho.type.mixins.Container} container - The container instance.
      *
      * @private
      *
@@ -60,7 +60,7 @@ define([
      * Unregisters reference changes caused by the change.
      *
      * @param {!pentaho.type.changes.Transaction} transaction - The ambient transaction, provided for performance.
-     * @param {!pentaho.type.ContainerMixin} container - The container instance.
+     * @param {!pentaho.type.mixins.Container} container - The container instance.
      *
      * @private
      *

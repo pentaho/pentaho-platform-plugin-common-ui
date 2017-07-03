@@ -63,7 +63,7 @@ define([
        *
        * @name owner
        * @memberOf pentaho.type.changes.Changeset#
-       * @type {!pentaho.type.ContainerMixin}
+       * @type {!pentaho.type.mixins.Container}
        * @readOnly
        */
       O.setConst(this, "owner", owner);
