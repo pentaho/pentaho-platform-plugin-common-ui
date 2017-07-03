@@ -18,14 +18,15 @@ define([
   "./instance",
   "./util",
   "./ValidationError",
+  "./mixins/discreteDomain",
   "../i18n!types",
   "../lang/_AnnotatableLinked",
   "../util/arg",
   "../util/error",
   "../util/object",
-  "../util/text",
-  "../util/fun"
-], function(module, instanceFactory, typeUtil, ValidationError, bundle, AnnotatableLinked, arg, error, O, text, F) {
+  "../util/text"
+], function(module, instanceFactory, typeUtil, ValidationError, discreteDomainFactory, bundle, AnnotatableLinked,
+            arg, error, O, text) {
 
   "use strict";
 
@@ -42,6 +43,8 @@ define([
      *
      * @class
      * @extends pentaho.type.Type
+     * @extends pentaho.type.mixins.DiscreteDomain.Type
+     *
      * @abstract
      *
      * @implements pentaho.lang.IWithKey
@@ -62,6 +65,8 @@ define([
      *
      * @class
      * @extends pentaho.type.Instance
+     * @extends pentaho.type.mixins.DiscreteDomain
+     *
      * @abstract
      * @amd {pentaho.type.Factory<pentaho.type.Property>} pentaho/type/property
      *
@@ -1446,6 +1451,11 @@ define([
 
           return {min: countMin, max: countMax};
         }
+      }
+    }).implement({
+      type: /** @lends pentaho.type.Property.Type# */{
+        // These are applied last so that mixins see any of the methods above as base implementations.
+        mixins: [discreteDomainFactory]
       }
     });
 

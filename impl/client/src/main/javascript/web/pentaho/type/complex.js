@@ -712,6 +712,20 @@ define([
       isRequired: function(name) {
         return this.type.get(name).countRangeOn(this).min > 0;
       },
+      // endregion
+
+      // region getPropDomain attribute
+      /**
+       * Gets the current list of valid values of a given property.
+       *
+       * @param {string|pentaho.type.Property.Type} [name] The property name or type object.
+       *
+       * @return {Array.<pentaho.type.Element>} An array of elements if the property is constrained; `null` otherwise.
+       *
+       * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
+       */
+      getPropDomain: function(name) {
+        return this.type.get(name).domainOn(this);
       },
       // endregion
       // endregion

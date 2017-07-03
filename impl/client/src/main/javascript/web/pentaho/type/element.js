@@ -17,9 +17,10 @@ define([
   "module",
   "./value",
   "../i18n!types",
+  "../util/object",
   "../util/error",
   "../util/fun"
-], function(module, valueFactory, bundle, error, fun) {
+], function(module, valueFactory, bundle, O, error, fun) {
 
   "use strict";
 
@@ -141,8 +142,50 @@ define([
          */
         _compare: function(va, vb) {
           return fun.compare(va, vb);
-        }
+        },
         // endregion
+
+        /**
+         * Intersects two element arrays whose declared element type is this type.
+         *
+         * If this type is a simple type,
+         * the intersection preserves the instance which has a `formatted` value.
+         * When both have one, the elements of `bs` are preserved.
+         *
+         * Removes duplicates of `bs`, keeping the first occurrence.
+         *
+         * @param {!Array.<pentaho.type.Element} as - The previous array of elements.
+         * @param {!Array.<pentaho.type.Element} bs - The next array of elements.
+         *
+         * @return {!Array.<pentaho.type.Element} The intersection array, possibly empty.
+         *
+         * @private
+         * @internal
+         */
+        __intersect: function(as, bs) {
+          var asByKey = {};
+          O.eachOwn(as, function(a0) { asByKey[a0.key] = a0; });
+
+          // Output order is that of `bs`.
+          var isSimple = this.isSimple;
+          var cs = [];
+          var csByKey = {};
+          var i = -1;
+          var B = bs.length;
+          while(++i < B) {
+            var b = bs[i];
+            var k = b.key;
+            var a = O.getOwn(asByKey, k);
+            if(a && !O.hasOwn(csByKey, k)) {
+              // The formatted value of b overrides that of a. Keep b if it has a formatted value.
+              var c = (!isSimple || b.formatted) ? b : a;
+              csByKey[k] = c;
+              cs.push(c);
+            }
+          }
+
+          return cs;
+        }
       }
     }).implement({
       type: bundle.structured.element

@@ -1457,6 +1457,63 @@ define([
           }).toThrow(errorMatch.argInvalid("name"));
         });
       }); // end countRange
+
+      describe("#getPropDomain(name)", function() {
+
+        it("should return the evaluated value of an existing property", function() {
+
+          var Derived = Complex.extend({
+            type: {
+              props: [
+                {name: "x", valueType: "string", domain: ["1", "2", "3"]}
+              ]
+            }
+          });
+
+          var derived = new Derived();
+
+          var domain = derived.getPropDomain("x");
+          expect(Array.isArray(domain)).toBe(true);
+          expect(domain.length).toBe(3);
+          expect(domain[0].value).toBe("1");
+          expect(domain[1].value).toBe("2");
+          expect(domain[2].value).toBe("3");
+        });
+
+        it("should throw when given the name of an undefined property", function() {
+
+          var Derived = Complex.extend({
+            type: {
+              props: [
+                {name: "x", valueType: "string"}
+              ]
+            }
+          });
+
+          var derived = new Derived();
+
+          expect(function() {
+            derived.getPropDomain("y");
+          }).toThrow(errorMatch.argInvalid("name"));
+        });
+
+        it("should throw when given a property type object not owned by the complex, " +
+            "even if of same name as an existing one", function() {
+
+          var Other = Complex.extend({type: {props: [{name: "x"}]}});
+
+          var Derived = Complex.extend({
+            type: {props: [{name: "x"}]}
+          });
+
+          var derived = new Derived();
+
+          expect(function() {
+            derived.getPropDomain(Other.type.get("x"));
+          }).toThrow(errorMatch.argInvalid("name"));
+        });
+      }); // end getPropDomain
+
     });
 
     describe("#clone", function() {
