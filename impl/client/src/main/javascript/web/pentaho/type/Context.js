@@ -45,7 +45,6 @@ define([
   var _nextFactoryUid = 1;
   var _singleton = null;
   var _baseMid = module.id.replace(/Context$/, ""); // e.g.: "pentaho/type/"
-  var _baseFacetsMid = _baseMid + "facets/";
 
   // Default `base` type in a type specification.
   var _defaultBaseTypeMid = "complex";
@@ -167,8 +166,8 @@ define([
        * starts configuring a type, and decremented when it finishes.
        *
        * When the configuration depth is greater than 0,
-       * types created through object-specifications default to be accidental types.
-       * In particular, this affects overriding property value types.
+       * certain Type changes, like property value type subtyping,
+       * are not allowed.
        *
        * @type {number}
        * @private
@@ -1095,12 +1094,6 @@ define([
     _getByObjectSpecCore: function(id, baseTypeSpec, typeSpec, sync) {
       // if id and not loaded, the id is used later to register the new type under that id and configure it.
 
-      // If configuring, all spec-created types default to being accidental types.
-      if((this._configDepth > 0) && !("isAccident" in typeSpec)) {
-        typeSpec = Object.create(typeSpec);
-        typeSpec.isAccident = true;
-      }
-
       // A root generic type spec initiates a specification context.
       // Each root generic type spec has a separate specification context.
       var resolveSync = function() {
@@ -1250,21 +1243,6 @@ define([
           collectTypeIdsRecursive(propSpec && propSpec.type, outIds, byTypeId);
           collectTypeIdsRecursive(propSpec && propSpec.base, outIds, byTypeId);
         });
-    }
-
-    // These are not ids of types but only of mixin AMD modules.
-    var facets = typeSpec.facets;
-    if(facets != null) {
-      if(!(Array.isArray(facets))) facets = [facets];
-
-      facets.forEach(function(facetIdOrClass) {
-        if(typeof facetIdOrClass === "string") {
-          if(facetIdOrClass.indexOf("/") < 0)
-            facetIdOrClass = _baseFacetsMid + facetIdOrClass;
-
-          collectTypeIdsRecursive(facetIdOrClass, outIds, byTypeId);
-        }
-      });
     }
 
     // These are either ids of AMD modules of type mixins or, directly, type mixins.

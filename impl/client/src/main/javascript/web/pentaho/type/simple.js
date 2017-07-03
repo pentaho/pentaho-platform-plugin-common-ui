@@ -297,8 +297,6 @@ define([
         var type = this.type;
 
         var declaredType = keyArgs.declaredType;
-        if(declaredType) declaredType = declaredType.essence;
-
         var includeType = !!keyArgs.forceType;
         if(!includeType && declaredType) {
           // Abstract foo = (MyNumber 1)

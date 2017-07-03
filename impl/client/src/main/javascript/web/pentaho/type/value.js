@@ -133,7 +133,7 @@ define([
        *
        * The default implementation delegates to {@link pentaho.type.Value.Type#_validate}.
        *
-       * @return {Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
+       * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
        *
        * @see pentaho.type.Value#isValid
        * @final
@@ -252,48 +252,9 @@ define([
         alias: "value",
         isAbstract: true,
 
-        _init: function(spec, keyArgs) {
-
-          var isAccident = this.isAccident || !!spec.isAccident;
-          if(isAccident && !spec.isAbstract) {
-            spec = Object.create(spec);
-            spec.isAbstract = true;
-          }
-
-          this.base(spec, keyArgs);
-
-          if(isAccident) {
-            var essence = this.__essence;
-            if(essence == null) {
-              // This is the root accident.
-              O.setConst(this, "__essence", this.ancestor);
-            }
-          }
-        },
-
         get isValue() {
           return true;
         },
-
-        get _isAbstractImplied() {
-          return this.isAccident;
-        },
-
-        // region essence
-        __essence: null,
-
-        get essence() {
-          return this.__essence || this;
-        },
-
-        get isEssence() {
-          return !this.__essence;
-        },
-
-        get isAccident() {
-          return !!this.__essence;
-        },
-        // endregion
 
         // region equality
         /**
@@ -394,7 +355,7 @@ define([
          *
          * @param {?any} value - The value to validate.
          *
-         * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
+         * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
          *
          * @see pentaho.type.Value#validate
          * @see pentaho.type.Value.Type#isValid
@@ -403,15 +364,13 @@ define([
          * @final
          */
         validate: function(value) {
-          // 1. Is of type
           if(value == null)
             return [new ValidationError(bundle.structured.errors.value.cannotBeNull)];
 
           if(!this.is(value))
             return [new ValidationError(bundle.format(bundle.structured.errors.value.notOfType, [this.label]))];
 
-          // 2. Validate further, knowing it is an instance of, but using the most specific validation method.
-          return this.mostSpecific(value.type)._validate(value);
+          return value.type._validate(value);
         },
 
         /**
@@ -419,7 +378,7 @@ define([
          * that **is an instance of this type**,
          * is also a **valid instance** of this type.
          *
-         * Thus, `this.essence === value.type` must be true.
+         * Thus, `this === value.type` must be true.
          *
          * The default implementation does nothing and considers the instance valid.
          * Override to implement a type's specific validation logic.
@@ -429,7 +388,7 @@ define([
          *
          * @param {!pentaho.type.Value} value - The value to validate.
          *
-         * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
+         * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
          *
          * @protected
          *
@@ -437,7 +396,7 @@ define([
          */
         _validate: function(value) {
 
-          // assert this.essence === value.type
+          // assert this === value.type
 
           return null;
         },
@@ -457,137 +416,39 @@ define([
             spec.base = baseRef;
           }
 
-          if(this.isAccident && this.ancestor.isEssence) {
-            spec.isAccident = true;
-          }
-
           this._fillSpecInContext(spec, keyArgs);
 
           return spec;
         }
         // endregion
       }
-    }, /** @lends pentaho.type.Value */{
-
-      // override the documentation to specialize the argument types.
-      /**
-       * Creates a subtype of this one.
-       *
-       * For more information on class extension, in general,
-       * see {@link pentaho.lang.Base.extend}.
-       *
-       * @name extend
-       * @memberOf pentaho.type.Value
-       * @method
-       *
-       * @param {string} [name] The name of the created class; used for debugging purposes.
-       * @param {pentaho.type.spec.IValueProto} [instSpec] The instance specification.
-       * @param {Object} [classSpec] The static specification.
-       * @param {Object} [keyArgs] The keyword arguments.
-       *
-       * @return {!Class.<pentaho.type.Value>} The new value instance subclass.
-       *
-       * @throws {pentaho.lang.ArgumentInvalidError} When the defined type is accidental and
-       * `instSpec` contains any properties other than `type`. Accidental types cannot have an instance interface.
-       *
-       * @see pentaho.type.Instance.extend
-       */
-      _extend: function(name, instSpec, classSpec, keyArgs) {
-
-        if(instSpec) {
-          var typeSpec = instSpec.type;
-          var isBaseAccident = this.type.isAccident;
-          var isAccident = isBaseAccident || !!(typeSpec && typeSpec.isAccident);
-          if(isAccident) {
-
-            var hasInstanceInterface = (typeSpec && typeSpec.instance) != null;
-            if(!hasInstanceInterface) {
-              for(var p in instSpec) {
-                if(p !== "type") {
-                  hasInstanceInterface = true;
-                  break;
-                }
-              }
-            }
-
-            if(hasInstanceInterface) {
-              throw error.operInvalid(bundle.structured.errors.accidental.cannotExtendInstance);
-            }
-
-            if(!isBaseAccident) {
-              instSpec = Object.create(instSpec);
-              instSpec.constructor = createAccidentCtor(this.type.essence);
-            }
-          }
-        }
-
-        return this.base(name, instSpec, classSpec, keyArgs);
-      },
-
-      /**
-       * Creates an accidental subtype of this one.
-       *
-       * @see pentaho.type.Value.Type#essence
-       *
-       * @param {string} [name] A name of the accidental type used for debugging purposes.
-       * @param {{type: pentaho.type.spec.IValueTypeProto}} [instSpec] The instance specification.
-       * It can only contain the `type` attribute.
-       * @param {Object} [classSpec] The static specification.
-       * @param {Object} [keyArgs] - Keyword arguments.
-       *
-       * @return {!Class.<pentaho.type.Value>} The accidental type's instance class.
-       *
-       * @throws {pentaho.lang.ArgumentInvalidError} When `instSpec` contains any properties other than `type`.
-       * Accidental types cannot have an instance interface.
-       */
-      refine: function(name, instSpec, classSpec, keyArgs) {
-
-        if(typeof name !== "string") {
-          keyArgs = classSpec;
-          classSpec = instSpec;
-          instSpec = name;
-          // Important to be a string. If nully, `extend` would fail.
-          name = "";
-        }
-
-        var typeSpec;
-        if(instSpec) {
-          typeSpec = instSpec.type;
-          instSpec = Object.create(instSpec);
-          instSpec.type = typeSpec = typeSpec ? Object.create(typeSpec) : {};
-          typeSpec.isAccident = true;
-        } else {
-          instSpec = {type: {isAccident: true}};
-        }
-
-        return this.extend(name, instSpec, classSpec, keyArgs);
-      }
-    }, /* keyArgs: */{
+    }, /* classDesc: */{}, /* keyArgs: */{
       isRoot: true
     }).implement({
       type: bundle.structured.value
     });
 
-    return Value;
-
+    // override the documentation to specialize the argument types.
     /**
-     * Creates the constructor for an accidental type, the first in a hierarchy of accidental types.
+     * Creates a subtype of this one.
      *
-     * Accidental constructors always return an instance of the essence type.
+     * For more information on class extension, in general,
+     * see {@link pentaho.lang.Base.extend}.
      *
-     * Cannot give a name to the constructor or the name given to extend gets ignored...
+     * @name extend
+     * @memberOf pentaho.type.Value
+     * @method
      *
-     * @param {!pentaho.type.Value.Type} essenceType - The essential type.
+     * @param {string} [name] The name of the created class; used for debugging purposes.
+     * @param {pentaho.type.spec.IValueProto} [instSpec] The instance specification.
+     * @param {Object} [classSpec] The static specification.
+     * @param {Object} [keyArgs] The keyword arguments.
      *
-     * @return {function} The accidental type constructor.
+     * @return {!Class.<pentaho.type.Value>} The new value instance subclass.
      *
-     * @private
+     * @see pentaho.type.Instance.extend
      */
-    function createAccidentCtor(essenceType) {
 
-      return function() {
-        return essenceType.create.apply(essenceType, arguments);
-      };
-    }
+    return Value;
   };
 });

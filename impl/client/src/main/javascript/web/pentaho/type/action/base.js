@@ -1218,7 +1218,7 @@ define([
 
         var declaredType;
         var includeType = !!keyArgs.forceType ||
-              (!!(declaredType = keyArgs.declaredType) && this.type !== declaredType.essence);
+              (!!(declaredType = keyArgs.declaredType) && this.type !== declaredType);
 
         if(includeType) spec._ = this.type.toRefInContext(keyArgs);
         if(this.label) spec.label = this.label;

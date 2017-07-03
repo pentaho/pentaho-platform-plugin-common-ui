@@ -372,67 +372,6 @@ define([
        */
       get isSimple() { return false; },
       // endregion
-
-      // region essence
-      /**
-       * Gets the essential type of this type, possibly itself.
-       *
-       * A non-essential type is an accidental type, or an _accident_.
-       * Only subtypes of [Value]{@link pentaho.type.Value} can be accidental types.
-       * Accidental types are _abstract_ types
-       * that restrict, or, can also be said, refine, a base type,
-       * which can be either essential or accidental,
-       * without changing its _essence_.
-       *
-       * An accidental type can only specialize its _type class_.
-       * Its instance constructor always returns direct instances
-       * of the essence type and its instance prototype cannot be extended.
-       *
-       * An accidental type is defined by calling
-       * the [refine]{@link pentaho.type.Value.refine} method of
-       * a `Value` base type's instance constructor,
-       * which can be either essential or accidental.
-       * Alternatively, if the base type is already an accidental type,
-       * calling [extend]{@link pentaho.type.Value.extend} on its
-       * instance constructor is equivalent, and
-       * refines the underlying essence further.
-       *
-       * @type {!pentaho.type.Type}
-       * @readOnly
-       *
-       * @see pentaho.type.Type#isEssence
-       * @see pentaho.type.Type#isAccident
-       * @see pentaho.type.Value.refine
-       * @see pentaho.type.Value.extend
-       */
-      get essence() {
-        return this;
-      },
-
-      /**
-       * Gets a value that indicates if this type is an essential type.
-       *
-       * @type {boolean}
-       * @readOnly
-       *
-       * @see pentaho.type.Type#essence
-       */
-      get isEssence() {
-        return true;
-      },
-
-      /**
-       * Gets a value that indicates if this type is an accidental type.
-       *
-       * @type {boolean}
-       * @readOnly
-       *
-       * @see pentaho.type.Type#essence
-       */
-      get isAccident() {
-        return false;
-      },
-      // endregion
       // endregion
 
       // region id, sourceId and alias properties
@@ -595,24 +534,6 @@ define([
        */
       get isAbstract() {
         return this._isAbstract;
-      },
-
-      /**
-       * Gets a value that indicates if this type is abstract because it is implied by other properties
-       * and not by specification.
-       *
-       * The default implementation returns `false`.
-       *
-       * Override and return `true`,
-       * to avoid serializing the `isAbstract` attribute when it is implied.
-       *
-       * @type {boolean}
-       * @readOnly
-       *
-       * @protected
-       */
-      get _isAbstractImplied() {
-        return false;
       },
       // endregion
 
@@ -1273,11 +1194,11 @@ define([
 
           Instance = context.get(typeSpec);
 
-          instType = this._assertSubtype(Instance.type).essence;
+          instType = this._assertSubtype(Instance.type);
 
           if(instType.isAbstract) instType._throwAbstractType();
 
-        } else if(this.essence.isAbstract) {
+        } else if(this.isAbstract) {
 
           /* eslint default-case: 0 */
           switch(typeof instSpec) {
@@ -1398,13 +1319,13 @@ define([
       // endregion
 
       /**
-       * Determines if a value is an instance of this type's **essence**.
+       * Determines if a value is an instance of this type.
        *
        * @param {?any} value - The value to test.
        * @return {boolean} `true` if the value is an instance of this type; `false`, otherwise.
        */
       is: function(value) {
-        return O_isProtoOf.call(this.essence.instance, value);
+        return O_isProtoOf.call(this.instance, value);
       },
 
       /**
@@ -1417,16 +1338,6 @@ define([
        */
       isSubtypeOf: function(superType) {
         return !!superType && (superType === this || O_isProtoOf.call(superType, this));
-      },
-
-      /**
-       * Returns the most specific type, between this and the given type.
-       *
-       * @param {!pentaho.type.Type} otherType - The other type.
-       * @return {!pentaho.type.Type} The most specific type.
-       */
-      mostSpecific: function(otherType) {
-        return this.isSubtypeOf(otherType) ? this : otherType;
       },
 
       // TODO: is conversion always successful? If so, should it be?
@@ -1561,7 +1472,7 @@ define([
         // TODO: if sourceId is not serialized, defaultView looses the relative reference.
 
         // Custom attributes
-        if(!this._isAbstractImplied && this.isAbstract) {
+        if(this.isAbstract) {
           any = true;
           spec.isAbstract = true;
         }
@@ -1581,11 +1492,9 @@ define([
         // Normal attributes
         _normalAttrNames.forEach(function(name) {
           var _name = "_" + name;
-          var v;
-          // !== undefined ensures refinement fields are well handled as well
-          if(O.hasOwn(this, _name) && (v = this[_name]) !== undefined) {
+          if(O.hasOwn(this, _name)) {
             any = true;
-            spec[name] = v;
+            spec[name] = this[_name];
           }
         }, this);
 

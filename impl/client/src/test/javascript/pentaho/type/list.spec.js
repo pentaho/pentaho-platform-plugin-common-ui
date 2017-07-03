@@ -60,8 +60,6 @@ define([
     // region #of
     describe("#of -", function() {
 
-      // NOTE: see also refinement.Spec.js, list usage unit tests
-
       it("accepts an `of` property be given a type derived from `Element`", function() {
         expect(NumberList.type.of).toBe(PentahoNumber.type);
       });
