@@ -238,7 +238,7 @@ define([
       // This mostly helps tests being able to require.undef(.) these at any time
       //  and not cause random failures for assuming all standard types were loaded.
       Object.keys(standard).forEach(function(lid) {
-        if(lid !== "facets" && lid !== "filter" && lid !== "instance")
+        if(lid !== "mixins" && lid !== "filter" && lid !== "instance")
           this._getByFactory(standard[lid], /* sync: */true);
       }, this);
 
@@ -246,8 +246,8 @@ define([
         this._getByFactory(standard.filter[fid], /* sync: */true);
       }, this);
 
-      Object.keys(standard.facets).forEach(function(fid) {
-        this._getByFactory(standard.facets[fid], /* sync: */true);
+      Object.keys(standard.mixins).forEach(function(fid) {
+        this._getByFactory(standard.mixins[fid], /* sync: */true);
       }, this);
     },
 
@@ -288,11 +288,12 @@ define([
      *         * [pentaho/type/boolean]{@link pentaho.type.Boolean}
      *         * [pentaho/type/function]{@link pentaho.type.Function}
      *         * [pentaho/type/object]{@link pentaho.type.Object}
-     *     * [pentaho/type/facets/discreteDomain]{@link pentaho.type.facets.DiscreteDomain}
-     *     * [pentaho/type/facets/ordinalDomain]{@link pentaho.type.facets.OrdinalDomain}
+     *         * [pentaho/type/mixins/enum]{@link pentaho.type.mixins.Enum}
      *   * [pentaho/type/property]{@link pentaho.type.Property}
+     *     * [pentaho/type/mixins/discreteDomain]{@link pentaho.type.mixins.DiscreteDomain}
+     *     * [pentaho/type/mixins/ordinalDomain]{@link pentaho.type.mixins.OrdinalDomain}
      *
-     * For all of these, the `pentaho/type/` or `pentaho/type/facets/` prefix is optional
+     * For all of these, the `pentaho/type/` or `pentaho/type/mixins/` prefix is optional
      * (when requested to a _context_; the AMD module system requires the full module identifiers to be specified).
      *
      * The filter types are also preloaded:
