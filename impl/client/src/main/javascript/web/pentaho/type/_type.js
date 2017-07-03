@@ -69,8 +69,54 @@ define([
      */
     var Type = Base.extend("pentaho.type.Type", /** @lends pentaho.type.Type# */{
 
+      /* Mixins are mixed before anything else, so that they are applied and serve as a base implementation. */
+      extend_order: ["mixins"],
+
       constructor: function(spec, keyArgs) {
         if(!spec) spec = {};
+
+        // Anticipate required initialization.
+        O.setConst(this, "uid", _nextUid++);
+
+        // Bind
+        var instance = arg.required(keyArgs, "instance", "keyArgs");
+        O.setConst(instance, "_type", this);
+        O.setConst(this, "_instance", instance);
+
+        if(arg.optional(keyArgs, "isRoot"))
+          O.setConst(this, "root", this);
+
+        // ----
+        // excluded from extend: id, sourceId, alias and isAbstract
+        // are here handled one by one.
+
+        var id = nonEmptyString(spec.id);
+        // Is it a temporary id? If so, ignore it.
+        if(SpecificationContext.isIdTemporary(id)) id = null;
+
+        var sourceId = nonEmptyString(spec.sourceId);
+        if(!sourceId) sourceId = id;
+        else if(!id) id = sourceId;
+
+        var alias = nonEmptyString(spec.alias);
+        if(alias != null && id == null) throw error.argInvalid("alias", "Anonymous types cannot have an alias");
+
+        O.setConst(this, "_id", id);
+        O.setConst(this, "_sourceId", sourceId);
+        O.setConst(this, "_alias", alias);
+        O.setConst(this, "_isAbstract", !!spec.isAbstract);
+
+        // ---
+
+        // Anticipate mixins handling cause, otherwise, `_init` would not be overridable by mixins.
+        if(spec.mixins) {
+          this.mixins = spec.mixins;
+          // Prevent being applied again.
+          spec = Object.create(spec);
+          spec.mixins = undefined;
+        }
+
+        // ---
 
         this._init(spec, keyArgs);
 
@@ -101,37 +147,6 @@ define([
        * @overridable
        */
       _init: function(spec, keyArgs) {
-
-        O.setConst(this, "uid", _nextUid++);
-
-        // Bind
-        var instance = arg.required(keyArgs, "instance", "keyArgs");
-        O.setConst(instance, "_type", this);
-        O.setConst(this, "_instance", instance);
-
-        if(arg.optional(keyArgs, "isRoot"))
-          O.setConst(this, "root", this);
-
-        // ----
-        // excluded from extend: id, sourceId and isAbstract
-        // are here handled one by one.
-
-        var id = nonEmptyString(spec.id);
-        // Is it a temporary id? If so, ignore it.
-        if(SpecificationContext.isIdTemporary(id)) id = null;
-
-        var sourceId = nonEmptyString(spec.sourceId);
-        if(!sourceId) sourceId = id;
-        else if(!id) id = sourceId;
-
-        var alias = nonEmptyString(spec.alias);
-        if(alias != null && id == null) throw error.argInvalid("alias", "Anonymous types cannot have an alias");
-
-        O.setConst(this, "_id", id);
-        O.setConst(this, "_sourceId", sourceId);
-        O.setConst(this, "_alias", alias);
-        O.setConst(this, "_isAbstract", !!spec.isAbstract);
-
         // Block inheritance, with default values
 
         // Don't use inherited property definition which may be writable false
@@ -541,24 +556,36 @@ define([
       /**
        * Gets or sets the mixin types that are locally mixed into this type.
        *
-       * Can be set to either type identifiers, instance classes or type instances.
+       * Can be set to either type identifiers, instance classes or type instances and arrays thereof.
        *
        * The attributes defined by the added mixin types become available for
        * extension/configuration on this type.
+       * When extending, mixins are always applied first.
+       *
+       * When set to a {@link Nully} value, nothing is done.
        *
        * @type Array.<pentaho.type.Type>
        */
       get mixins() {
-        var mixinClasses = this.instance.constructor.mixins;
-        if(!mixinClasses) return [];
+        // NOTE: for lightweight types, mixins would be inherited, if getOwn were not used.
+        var OwnCtor = O.getOwn(this.instance, "constructor");
+        if(OwnCtor) {
+          var mixinClasses = OwnCtor.mixins;
+          if(mixinClasses) {
+            return mixinClasses
+              .map(function(Mixin) { return Mixin.type; })
+              .filter(function(type) { return type instanceof Type; });
+          }
+        }
 
-        return mixinClasses
-          .map(function(Mixin) { return Mixin.type; })
-          .filter(function(type) { return type instanceof Type; });
+        return [];
       },
 
       // for configuration only
       set mixins(values) {
+
+        if(!values) return;
+
         var Instance = this.instance.constructor;
 
         // Add new mixins from values

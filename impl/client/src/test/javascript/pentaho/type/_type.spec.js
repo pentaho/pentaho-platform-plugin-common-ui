@@ -1657,6 +1657,24 @@ define([
             });
           };
         });
+
+        localRequire.define("tests/mixins/C", ["pentaho/type/value"], function(valueFactory) {
+
+          return function(context) {
+
+            var Value = context.get(valueFactory);
+
+            return Value.extend({
+              type: {
+                id: "tests/mixins/C",
+                _init: function(spec, ka) {
+                  this.base(spec, ka);
+                  this.__hasBeenInInit = true;
+                }
+              }
+            });
+          };
+        });
       }
 
       it("should initially be an empty array", function() {
@@ -1910,6 +1928,74 @@ define([
 
             expect(mixins[0].instance.constructor).toBe(MixinA);
             expect(mixins[1].instance.constructor).toBe(MixinB);
+          });
+        });
+
+        it("should ignore a nully value", function() {
+
+          return require.using([
+            "pentaho/type/Context",
+            "tests/mixins/A"
+          ], defineSampleMixins, function(Context, mixinFactoryA) {
+
+            var context = new Context();
+            var Value = context.get("pentaho/type/value");
+
+            var DerivedValue = Value.extend({
+              type: {
+                mixins: null
+              }
+            });
+
+            expect(DerivedValue.type.mixins).toEqual([]);
+
+            // ---
+
+            DerivedValue = Value.extend({
+              type: {
+                mixins: undefined
+              }
+            });
+
+            expect(DerivedValue.type.mixins).toEqual([]);
+
+            // ---
+
+            DerivedValue = Value.extend({
+              type: {
+                mixins: [mixinFactoryA]
+              }
+            });
+
+            DerivedValue.type.mixins = null;
+
+            expect(DerivedValue.type.mixins.length).toBe(1);
+
+            // ---
+
+            DerivedValue.type.mixins = undefined;
+
+            expect(DerivedValue.type.mixins.length).toBe(1);
+          });
+        });
+
+        it("should allow overriding the Type#_init method from a mixin", function() {
+
+          return require.using([
+            "pentaho/type/Context",
+            "tests/mixins/C"
+          ], defineSampleMixins, function(Context, mixinFactoryC) {
+
+            var context = new Context();
+            var Value = context.get("pentaho/type/value");
+
+            var DerivedValue = Value.extend({
+              type: {
+                mixins: [mixinFactoryC]
+              }
+            });
+
+            expect(DerivedValue.type.__hasBeenInInit).toBe(true);
           });
         });
       });
