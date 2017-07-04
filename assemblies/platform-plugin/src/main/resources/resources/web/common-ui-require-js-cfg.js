@@ -98,29 +98,6 @@
       model: {type: "pentaho/visual/base"}
     }
   };
-
-  // TODO: remove the following when `webcontext.js` already configures pentaho/context
-  requireCfg.config["pentaho/context"] = {
-    theme:  getVar("active_theme"),
-    locale: getVar("SESSION_LOCALE"),
-    user: {
-      id:   getVar("SESSION_NAME"),
-      home: getVar("HOME_FOLDER")
-    },
-    reservedChars: getVar("RESERVED_CHARS"),
-    server: {
-      url: getUrl()
-    }
-  };
-
-  function getVar(name) {
-    return global[name] || null;
-  }
-  function getUrl() {
-    return getVar("FULL_QUALIFIED_URL") ||
-           getVar("CONTEXT_PATH") ||
-           getVar("SERVER_PROTOCOL");
-  }
   // endregion
 
   // region Base AMD Plugins
