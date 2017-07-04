@@ -55,6 +55,7 @@ define([
        * Gets the visual role mapping that owns this mapping attribute, if any, or `null`.
        *
        * @type {pentaho.visual.base.role.Mapping}
+       * @readonly
        */
       get mapping() {
         // TODO: Test it is an attributes list of a mapping...
@@ -66,16 +67,21 @@ define([
        * Gets the visual model that owns this visual role mapping attribute, if any, or `null`.
        *
        * @type {pentaho.visual.base.Model}
+       * @readonly
        */
       get model() {
         var mapping = this.mapping;
         return mapping && mapping.model;
       },
 
+      // TODO: cannot make this public unless the data model is made public...
+
       /**
        * Gets the data attribute referenced by this visual role mapping attribute.
        *
        * @type {pentaho.data.Attribute}
+       * @private
+       * @readonly
        *
        * @see pentaho.visual.role.MappingAttribute#name
        * @see pentaho.visual.role.MappingAttribute#mapping
@@ -103,7 +109,7 @@ define([
           var count = 0;
           var name = null;
 
-          /* eshint guard-for-in: 0 */
+          /* eslint guard-for-in: 0 */
           for(var p in spec) {
             count++;
             if(count > 1 || p !== "name") break;
@@ -161,34 +167,34 @@ define([
            * @type {string}
            * @see pentaho.visual.role.spec.IMappingAttribute#name
            */
-          {name: "name", type: "string", isRequired: true},
+          {name: "name", valueType: "string", isRequired: true},
 
           // Not defaulted because only "first" and "last" are compatible with any type.
           // Applies to quantitative or qualitative mappings.
           /**
-           * Gets or sets the aggregation that is performed on the data property.
+           * Gets or sets the aggregation that is performed on the data attribute.
            *
            * The value must be one of the supported [Aggregation]{@link pentaho.visual.role.Aggregation} values.
            *
-           * The aggregation must be compatible with the data type of the data property.
+           * The aggregation must be compatible with the data type of the data attribute.
            *
            * @name pentaho.visual.role.MappingAttribute#aggregation
            * @type {string}
            * @see pentaho.visual.role.spec.IMappingAttribute#aggregation
            */
-          {name: "aggregation", type: aggregationFactory},
+          {name: "aggregation", valueType: aggregationFactory},
 
           /**
            * Gets or sets a value that indicates if the data property contributes to the
-           * default order of an _ordinal_ visual role mapping
-           * by using the **reverse** natural order of the data property.
+           * default order of an _ordinal_ visual role
+           * by using the **reverse** natural order of the data attribute.
            *
            * @name pentaho.visual.role.MappingAttribute#isReverseOrder
            * @type {boolean}
            * @default false
            * @see pentaho.visual.role.spec.IMappingAttribute#isReverseOrder
            */
-          {name: "isReverseOrder", type: "boolean", value: false}
+          {name: "isReverseOrder", valueType: "boolean", defaultValue: false}
         ]
       }
     })

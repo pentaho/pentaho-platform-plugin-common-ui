@@ -55,7 +55,7 @@ define([
       OrFilter = context.get(orFilterFactory);
       NotFilter = context.get(notFilterFactory);
 
-      sales12k  = new IsInFilter({property: "sales",   values: [{_: "number", v: 12000}]});
+      sales12k  = new IsInFilter({property: "sales", values: [{_: "number", v: 12000}]});
       countryPt = new IsEqFilter({property: "country", value: {_: "string", v: "Portugal"}});
       inStock   = new IsEqFilter({property: "inStock", value: {_: "string", v: "true"}});
       myFilter  = new AndFilter({operands: [sales12k, inStock]});
@@ -63,7 +63,7 @@ define([
       var dataSpec = {
         model: [
           {name: "country", type: "string"},
-          {name: "sales",   type: "number"},
+          {name: "sales", type: "number"},
           {name: "inStock", type: "string"}
         ],
         rows: [

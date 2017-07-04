@@ -323,7 +323,7 @@ define([
       // endregion
 
       // region Changes
-      // @override ContainerMixin
+      // @override Container
       _onChangeDid: function(changeset) {
 
         var bitSetNew = new BitSet();
@@ -1022,7 +1022,7 @@ define([
              * @type {number}
              */
             name: "width",
-            type: "number",
+            valueType: "number",
             isRequired: true
           },
           {
@@ -1037,12 +1037,12 @@ define([
              * @type {number}
              */
             name: "height",
-            type: "number",
+            valueType: "number",
             isRequired: true
           },
 
           // TODO: Currently, the type system provides no easy way to normalize a set value,
-          // without defining a subtype. Ideally, we'd use an accidental type or some "cast" hook provided
+          // without defining a subtype. Ideally, we'd use some "cast" hook provided
           // by property types. Because of this, the conversion to DNF (or simply calling toDnf() to make sure
           // non-termination is caught early) is not being ensured when the property is set but only on
           // the Select action's _doDefault.
@@ -1064,8 +1064,8 @@ define([
              * @type {pentaho.type.filter.Abstract}
              */
             name: "selectionFilter",
-            type: "pentaho/type/filter/abstract",
-            value: {_: "pentaho/type/filter/or"},
+            valueType: "pentaho/type/filter/abstract",
+            defaultValue: {_: "pentaho/type/filter/or"},
             isRequired: true
           },
           {
@@ -1079,7 +1079,7 @@ define([
              * @type {pentaho.visual.base.Model}
              */
             name: "model",
-            type: visualModelFactory,
+            valueType: visualModelFactory,
             isRequired: true
           }
         ],

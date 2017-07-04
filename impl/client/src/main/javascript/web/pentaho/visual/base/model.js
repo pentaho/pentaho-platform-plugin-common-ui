@@ -15,30 +15,18 @@
  */
 define([
   "module",
-
   "pentaho/type/model",
   "./application",
-  "pentaho/lang/Event",
-  "pentaho/util/fun",
-  "pentaho/util/object",
-  "../action/SelectionModes",
-
-  "pentaho/i18n!model",
-
-  // pre-load all visual role mapping types
-  "../role/mapping",
-  "../role/nominal",
-  "../role/ordinal",
-  "../role/quantitative"
-], function(module, modelFactory, visualApplicationFactory,
-            Event, F, O, SelectionModes, bundle, mappingFactory) {
+  "../role/property",
+  "pentaho/i18n!model"
+], function(module, modelFactory, visualApplicationFactory, rolePropertyFactory, bundle) {
 
   "use strict";
 
   return function(context) {
 
     var Model = context.get(modelFactory);
-    var Mapping = context.get(mappingFactory);
+    var _rolePropertyType = context.get(rolePropertyFactory).type;
 
     /**
      * @name pentaho.visual.base.Model.Type
@@ -66,13 +54,6 @@ define([
      * @param {pentaho.visual.base.spec.IModel} [modelSpec] A plain object containing the model specification.
      */
     var VisualModel = Model.extend(/** @lends pentaho.visual.base.Model# */{
-
-      _initValue: function(value, propType) {
-        // Empty visual role mapping?
-        return !value && propType.type.isSubtypeOf(Mapping.type)
-            ? propType.toValue({})
-            : value;
-      },
 
       // region serialization
       toSpecInContext: function(keyArgs) {
@@ -113,11 +94,11 @@ define([
            */
           {
             name: "application",
-            type: visualApplicationFactory
+            valueType: visualApplicationFactory
           },
           {
             name: "data",
-            type: "object",
+            valueType: "object",
             isRequired: true
           }
         ],
@@ -125,21 +106,19 @@ define([
         /**
          * Calls a function for each defined visual role property type.
          *
-         * A visual role property type is a property type whose
-         * [value type]{@link pentaho.type.Property.Type#type} is a subtype of
-         * [Mapping]{@link pentaho.visual.role.Mapping}.
+         * A visual role property type is a property type which is a subtype of {@link pentaho.visual.role.Property}.
          *
          * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} f - The mapping
          * function. Return `false` to break iteration.
          *
          * @param {Object} [x] The JS context object on which `f` is called.
          *
-         * @return {pentaho.visual.base.Model} This object.
+         * @return {!pentaho.visual.base.Model} This object.
          */
         eachVisualRole: function(f, x) {
           var j = 0;
           this.each(function(propType) {
-            if(this.isVisualRole(propType.type) && f.call(x, propType, j++, this) === false) {
+            if(this.isVisualRole(propType) && f.call(x, propType, j++, this) === false) {
               return false;
             }
           }, this);
@@ -148,13 +127,13 @@ define([
 
         /**
          * Gets a value that indicates if a given property type is a subtype of
-         * [Mapping]{@link pentaho.visual.role.Mapping.Type}.
+         * {@link pentaho.visual.role.Property.Type}.
          *
-         * @param {!pentaho.type.Type} type - The type to test.
-         * @return {boolean} `true` if `type` is a mapping type; or `false`, otherwise.
+         * @param {!pentaho.type.Property.Type} propType - The property type to test.
+         * @return {boolean} `true` if `type` is a visual role property type; or `false`, otherwise.
          */
-        isVisualRole: function(type) {
-          return type.isSubtypeOf(Mapping.type);
+        isVisualRole: function(propType) {
+          return propType.isSubtypeOf(_rolePropertyType);
         }
       }
     })

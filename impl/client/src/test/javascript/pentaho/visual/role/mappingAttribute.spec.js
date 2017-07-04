@@ -1,13 +1,15 @@
 define([
   "pentaho/type/Context",
-  "pentaho/visual/base",
+  "pentaho/visual/base/model",
   "pentaho/visual/role/mapping",
   "pentaho/visual/role/mappingAttribute",
   "pentaho/type/SpecificationScope",
   "pentaho/data/Table"
-], function(Context, visualFactory, mappingFactory, mappingAttributeFactory, SpecificationScope, Table) {
+], function(Context, visualModelFactory, mappingFactory, mappingAttributeFactory, SpecificationScope, Table) {
 
   "use strict";
+
+  /* globals describe, it, beforeEach, spyOn */
 
   describe("pentaho.visual.role.MappingAttribute", function() {
 
@@ -26,22 +28,22 @@ define([
       };
     }
 
-    var Visual;
+    var VisualModel;
     var Mapping;
     var MappingAttribute;
-    var specScope;
 
     beforeEach(function() {
-      specScope = new SpecificationScope();
 
       var context = new Context();
-      Visual = context.get(visualFactory);
+      VisualModel = context.get(visualModelFactory);
       Mapping = context.get(mappingFactory);
       MappingAttribute = context.get(mappingAttributeFactory);
     });
 
     describe("constructor(name|spec)", function() {
+
       it("should allow creating with a spec object", function() {
+
         var name = "foo";
         var mapping = new MappingAttribute({name: name});
         expect(mapping instanceof MappingAttribute).toBe(true);
@@ -50,6 +52,7 @@ define([
       });
 
       it("should allow creating with a string and recognize it as the name property", function() {
+
         var name = "foo";
         var mapping = new MappingAttribute(name);
         expect(mapping instanceof MappingAttribute).toBe(true);
@@ -59,7 +62,9 @@ define([
     });
 
     describe("#keyQualitative", function() {
+
       it("should be equal if the names are equal and all other properties different", function() {
+
         var a = new MappingAttribute({name: "a", aggregation: "sum", isReversed: true});
         var b = new MappingAttribute({name: "a", aggregation: "avg", isReversed: false});
 
@@ -67,6 +72,7 @@ define([
       });
 
       it("should be equal if the names are empty and all other properties different", function() {
+
         var a = new MappingAttribute({aggregation: "sum", isReversed: true});
         var b = new MappingAttribute({aggregation: "avg", isReversed: false});
 
@@ -82,7 +88,9 @@ define([
     });
 
     describe("#keyQuantitative", function() {
+
       it("should be equal if the names and aggregations are equal and all other properties different", function() {
+
         var a = new MappingAttribute({name: "a", aggregation: "sum", isReversed: true});
         var b = new MappingAttribute({name: "a", aggregation: "sum", isReversed: false});
 
@@ -90,6 +98,7 @@ define([
       });
 
       it("should be equal if the names and aggregations are empty and all other properties different", function() {
+
         var a = new MappingAttribute({isReversed: true});
         var b = new MappingAttribute({isReversed: false});
 
@@ -97,6 +106,7 @@ define([
       });
 
       it("should be different if the names are different and all other properties equal", function() {
+
         var a = new MappingAttribute({name: "a"});
         var b = new MappingAttribute({name: "b"});
 
@@ -104,6 +114,7 @@ define([
       });
 
       it("should be different if the aggregations are different and all other properties equal", function() {
+
         var a = new MappingAttribute({aggregation: "sum"});
         var b = new MappingAttribute({aggregation: "avg"});
 
@@ -112,28 +123,22 @@ define([
     });
 
     describe("#model and #mapping", function() {
-      var Derived;
-      var DerivedMapping;
-      var propType;
+
       var derived;
       var mapping;
 
       beforeEach(function() {
-        DerivedMapping = Mapping.extend({type: {levels: ["nominal"]}});
 
-        Derived = Visual.extend({type: {
+        var DerivedModel = VisualModel.extend({type: {
           props: [
-            {name: "propFoo", type: DerivedMapping}
+            {name: "propRole", base: "pentaho/visual/role/property"}
           ]
         }});
 
-        propType = Derived.type.get("propFoo");
-
-        derived = new Derived();
-
-        derived.propFoo = mapping = new DerivedMapping({
-          attributes: ["a", "b", "c"]
+        derived = new DerivedModel({
+          propRole: {attributes: ["a", "b", "c"]}
         });
+        mapping = derived.propRole;
       });
 
       it("should have #mapping return the parent mapping", function() {
@@ -153,7 +158,7 @@ define([
       });
 
       it("should have #model return `null` when the parent mapping has no model", function() {
-        var mappingNoModel = new DerivedMapping({attributes: ["a", "b", "c"]});
+        var mappingNoModel = new Mapping({attributes: ["a", "b", "c"]});
 
         expect(mappingNoModel.attributes.at(0).model).toBe(null);
       });
@@ -161,40 +166,39 @@ define([
 
     describe("#dataAttribute", function() {
 
-      var Derived;
-      var DerivedMapping;
-      var propType;
       var derived;
       var mapping;
 
       beforeEach(function() {
-        DerivedMapping = Mapping.extend({type: {levels: ["nominal"]}});
 
-        Derived = Visual.extend({type: {
+        var DerivedModel = VisualModel.extend({type: {
           props: [
-            {name: "propFoo", type: DerivedMapping}
+            {name: "propRole", base: "pentaho/visual/role/property"}
           ]
         }});
 
-        propType = Derived.type.get("propFoo");
-
-        derived = new Derived();
-
-        derived.propFoo = mapping = new DerivedMapping({
-          attributes: ["undefined", "country", "date"]
+        derived = new DerivedModel({
+          propRole: {
+            attributes: ["undefined", "country", "date"]
+          }
         });
+
+        mapping = derived.propRole;
       });
 
       it("should return null if the mapping attribute has no name", function() {
+
         expect(new MappingAttribute().dataAttribute).toBe(null);
       });
 
       it("should return null if the mapping attribute has name but no parent mapping", function() {
+
         expect(new MappingAttribute({name: "a"}).dataAttribute).toBe(null);
       });
 
       it("should return null if the mapping attribute has name, parent mapping, but no model", function() {
-        var mappingWithNoModel = new DerivedMapping({
+
+        var mappingWithNoModel = new Mapping({
           attributes: ["a", "b", "c"]
         });
 
@@ -202,11 +206,13 @@ define([
       });
 
       it("should return null if the mapping attribute has name, parent mapping, model but no data", function() {
+
         expect(mapping.attributes.at(0).dataAttribute).toBe(null);
       });
 
       it("should return null if the mapping attribute has name, parent mapping, model, data, " +
          "but attribute is not defined", function() {
+
         derived.data = new Table(getDataSpec1());
 
         expect(mapping.attributes.at(0).dataAttribute).toBe(null);
@@ -214,6 +220,7 @@ define([
 
       it("should return the data table attribute if the mapping attribute has name, parent mapping, model, data, " +
           "and exists in the data table", function() {
+
         var data = derived.data = new Table(getDataSpec1());
 
         expect(mapping.attributes.at(1).dataAttribute).toBe(data.model.attributes.get("country"));
@@ -222,7 +229,15 @@ define([
 
     describe("#toSpecInContext(keyArgs)", function() {
 
+      var specScope;
+
+      beforeEach(function() {
+
+        specScope = new SpecificationScope();
+      });
+
       it("should return a string when only the name property is serialized", function() {
+
         var name = "foo";
         var mapping = new MappingAttribute({name: name});
 
@@ -234,6 +249,7 @@ define([
       });
 
       it("should return an array when the base serialization is an array", function() {
+
         var mapping = new MappingAttribute({name: "foo"});
 
         var result = mapping.toSpecInContext({includeDefaults: false, preferPropertyArray: true});
@@ -244,6 +260,7 @@ define([
       });
 
       it("should return a generic spec object when more than the name property is serialized", function() {
+
         var name = "foo";
         var mapping = new MappingAttribute({name: name});
 

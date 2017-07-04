@@ -862,7 +862,7 @@ define([
         SubView = View.extend({
           type: {
             props: [
-              {name: "foo", type: "string"}
+              {name: "foo", valueType: "string"}
             ]
           }
         });
@@ -1736,7 +1736,7 @@ define([
               return View.extend({
                 type: {
                   id: "test/foo/view",
-                  props: {a: {type: "string"}}
+                  props: {a: {valueType: "string"}}
                 }
               });
             };
@@ -1794,7 +1794,7 @@ define([
               return View.extend({
                 type: {
                   id: "test/foo/view",
-                  props: {a: {type: "string"}}
+                  props: {a: {valueType: "string"}}
                 }
               });
             };
