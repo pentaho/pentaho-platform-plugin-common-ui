@@ -82,7 +82,7 @@ var ruleSpec = {
   apply: {
     props: {
       lineWidth: {
-        value: 2,
+        defaultValue: 2,
         isBrowsable: false
       }
     }
@@ -108,7 +108,7 @@ var ruleSpec = {
   apply: {
     props: {
       shape: {
-        value: "diamond"
+        defaultValue: "diamond"
       }
     }
   }

@@ -139,7 +139,7 @@ the default value of the "Line width" property of "Line chart" visualizations.
           },
           apply: {
             props: {
-              "lineWidth": {value: 1}
+              "lineWidth": {defaultValue: 1}
             }
           }
         }
