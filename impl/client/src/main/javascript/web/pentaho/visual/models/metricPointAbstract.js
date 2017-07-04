@@ -78,12 +78,12 @@ define([
               var mapping = model.get(this);
 
               // If the mapping contains a single `date` attribute,
-              // consider it ordinal, and not quantitative as the base code does.
+              // consider it nominal, and not quantitative as the base code does.
               // Currently, CCC does not like dates in continuous color scales...
               if(mapping.attributes.count === 1) {
                 var dataAttr = mapping.attributes.at(0).dataAttribute;
                 if(dataAttr && dataAttr.type === "date")
-                  return "ordinal";
+                  return "nominal";
               }
 
               return this.base(model);
