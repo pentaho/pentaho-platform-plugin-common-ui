@@ -59,7 +59,7 @@ define(function() {
           props: {
             // . line
             lineWidth: {
-              value: 2
+              defaultValue: 2
             }
           }
         }
@@ -74,7 +74,7 @@ define(function() {
         apply: {
           props: {
             colorSet: {
-              value: "blue"
+              defaultValue: "blue"
             }
           }
         }
@@ -89,7 +89,7 @@ define(function() {
         apply: {
           props: {
             colorSet: {
-              value: "ryg"
+              defaultValue: "ryg"
             }
           }
         }

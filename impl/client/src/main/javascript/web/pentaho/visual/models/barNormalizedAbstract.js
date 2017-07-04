@@ -34,20 +34,14 @@ define([
         props: [
           {
             name: "measures", // VISUAL_ROLE
-            type: {
-              isAccident: true,
-              props: {attributes: {isRequired: true}}
-            }
+            attributes: {isRequired: true}
           },
-
           {
             name: "labelsOption",
-            type: {
-              base: labelsOptionFactory,
-              domain: ["none", "center", "insideEnd", "insideBase"]
-            },
+            valueType: labelsOptionFactory,
+            domain: ["none", "center", "insideEnd", "insideBase"],
             isRequired: true,
-            value: "none"
+            defaultValue: "none"
           }
         ]
       }

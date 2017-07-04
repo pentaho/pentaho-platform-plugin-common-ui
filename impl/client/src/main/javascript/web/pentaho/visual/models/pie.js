@@ -39,33 +39,29 @@ define([
         props: [
           {
             name: "rows", // VISUAL_ROLE
-            type: {
-              isAccident: true,
-              levels: ["ordinal"]
-            }
+            base: "pentaho/visual/role/property",
+            levels: ["ordinal"]
           },
           {
-            name:    "columns", // VISUAL_ROLE
-            type:    "pentaho/visual/role/ordinal",
+            name: "columns", // VISUAL_ROLE
+            base: "pentaho/visual/role/property",
+            levels: ["ordinal"],
             ordinal: 6
           },
           {
             name: "measures", // VISUAL_ROLE
-            type: {
-              base:     "pentaho/visual/role/quantitative",
-              dataType: "number",
-              props:    {attributes: {isRequired: true}}
-            },
+            base: "pentaho/visual/role/property",
+            levels: ["quantitative"],
+            dataType: "number",
+            attributes: {isRequired: true},
             ordinal: 7
           },
           {
             name: "labelsOption",
-            type: {
-              base:   labelsOptionFactory,
-              domain: ["none", "outside", "inside"]
-            },
+            valueType: labelsOptionFactory,
+            domain: ["none", "outside", "inside"],
             isRequired: true,
-            value: "outside"
+            defaultValue: "outside"
           }
         ]
       }

@@ -16,12 +16,13 @@
 define([
   "module",
   "./cartesianAbstract",
+  "pentaho/visual/role/level",
   "pentaho/i18n!./i18n/model",
   "./types/labelsOption",
   "./mixins/scaleColorContinuous",
   "./mixins/multiCharted",
   "./mixins/trended"
-], function(module, baseModelFactory, bundle, labelsOptionFactory,
+], function(module, baseModelFactory, measurementLevelFactory, bundle, labelsOptionFactory,
     scaleColorContinuousFactory, multiChartedFactory, trendedFactory) {
 
   "use strict";
@@ -29,6 +30,7 @@ define([
   return function(context) {
 
     var BaseModel = context.get(baseModelFactory);
+    var MeasurementLevel = context.get(measurementLevelFactory);
 
     return BaseModel.extend({
       type: {
@@ -42,71 +44,64 @@ define([
         props: [
           {
             name: "rows", // VISUAL_ROLE
-            type: {
-              isAccident: true,
-              levels: ["ordinal"],
-              props: {attributes: {isRequired: true}}
-            }
+            base: "pentaho/visual/role/property",
+            levels: ["ordinal"],
+            attributes: {isRequired: true}
           },
           {
             name: "x", // VISUAL_ROLE
-            type: {
-              base: "pentaho/visual/role/quantitative",
-              props: {attributes: {countMin: 1, countMax: 1}}
-            },
+            base: "pentaho/visual/role/property",
+            levels: ["quantitative"],
+            attributes: {countMin: 1, countMax: 1},
             ordinal: 1
           },
           {
             name: "y", // VISUAL_ROLE
-            type: {
-              base: "pentaho/visual/role/quantitative",
-              props: {attributes: {countMin: 1, countMax: 1}}
-            },
+            base: "pentaho/visual/role/property",
+            levels: ["quantitative"],
+            attributes: {countMin: 1, countMax: 1},
             ordinal: 2
           },
           {
             // Modal visual role
             name: "color", // VISUAL_ROLE
-            type: {
-              base: "pentaho/visual/role/mapping",
-              levels: ["nominal", "quantitative"],
-              props: {
-                attributes: {
-                  // TODO: countMax depends on whether data props are discrete or continuous...
-                  countMax: function() {
-                    var MeasurementLevel = this.type.context.get("pentaho/visual/role/level");
-                    return MeasurementLevel.type.isQuantitative(this.levelEffective) ? 1 : null;
-                  }// TODO: should only be applicable when color is continuous
-                }
-              },
-              getAttributesMaxLevelOf: function(mapping) {
-                // If the mapping contains a single `date` attribute,
-                // consider it ordinal, and not quantitative as the base code does.
-                // Currently, CCC does not like dates in continuous color scales...
-                if(mapping.attributes.count === 1) {
-                  var dataAttr = mapping.attributes.at(0).dataAttribute;
-                  if(dataAttr && dataAttr.type === "date")
-                    return "ordinal";
-                }
-
-                return this.base(mapping);
+            base: "pentaho/visual/role/property",
+            levels: ["nominal", "quantitative"],
+            attributes: {
+              countMax: function(rolePropType) {
+                var level = rolePropType.levelEffectiveOn(this);
+                return MeasurementLevel.type.isQuantitative(level) ? 1 : null;
               }
+              // TODO: should only be applicable when color is continuous
+            },
+            getAttributesMaxLevelOf: function(model) {
+              var mapping = model.get(this);
+
+              // If the mapping contains a single `date` attribute,
+              // consider it ordinal, and not quantitative as the base code does.
+              // Currently, CCC does not like dates in continuous color scales...
+              if(mapping.attributes.count === 1) {
+                var dataAttr = mapping.attributes.at(0).dataAttribute;
+                if(dataAttr && dataAttr.type === "date")
+                  return "ordinal";
+              }
+
+              return this.base(model);
             },
             ordinal: 6
           },
           {
             name: "multi", // VISUAL_ROLE
-            type: "pentaho/visual/role/ordinal",
+            base: "pentaho/visual/role/property",
+            levels: ["ordinal"],
             ordinal: 10
           },
           {
             name: "labelsOption",
-            type: {
-              base: labelsOptionFactory,
-              domain: ["none", "center", "left", "right", "top", "bottom"]
-            },
+            valueType: labelsOptionFactory,
+            domain: ["none", "center", "left", "right", "top", "bottom"],
             isRequired: true,
-            value: "none"
+            defaultValue: "none"
           }
         ]
       }

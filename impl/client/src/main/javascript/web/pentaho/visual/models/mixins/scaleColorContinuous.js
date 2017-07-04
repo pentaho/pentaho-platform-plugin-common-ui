@@ -16,10 +16,11 @@
 define([
   "module",
   "pentaho/visual/base/model",
+  "pentaho/visual/role/level",
   "../types/colorSet",
   "../types/pattern",
   "pentaho/i18n!../i18n/model"
-], function(module, modelFactory, colorSetFactory, patternFactory, bundle) {
+], function(module, modelFactory, measurementLevelFactory, colorSetFactory, patternFactory, bundle) {
 
   "use strict";
 
@@ -28,6 +29,7 @@ define([
   return function(context) {
 
     var BaseModel = context.get(modelFactory);
+    var MeasurementLevel = context.get(measurementLevelFactory);
 
     return BaseModel.extend({
       type: {
@@ -36,32 +38,37 @@ define([
         props: [
           {
             name: "pattern",
-            type: patternFactory,
+            valueType: patternFactory,
             isRequired: true,
             isApplicable: hasQuantitativeAttributesColor,
-            value: "gradient"
+            defaultValue: "gradient"
           },
           {
             name: "colorSet",
-            type: colorSetFactory,
+            valueType: colorSetFactory,
             isRequired: true,
             isApplicable: hasQuantitativeAttributesColor,
-            value: "ryg"
+            defaultValue: "ryg"
           },
           {
             name: "reverseColors",
-            type: "boolean",
+            valueType: "boolean",
             isRequired: true,
             isApplicable: hasQuantitativeAttributesColor,
-            value: false
+            defaultValue: false
           }
         ]
       }
     })
     .implement({type: bundle.structured.scaleColorContinuous});
-  };
 
-  function hasQuantitativeAttributesColor() {
-    return this.color.attributes.count > 0 && this.color.levelEffective === "quantitative";
-  }
+    function hasQuantitativeAttributesColor() {
+      if(!this.color.isMapped) return false;
+
+      var rolePropType = this.type.get("color");
+      var level = rolePropType.levelEffectiveOn(this);
+
+      return MeasurementLevel.type.isQuantitative(level);
+    }
+  };
 });

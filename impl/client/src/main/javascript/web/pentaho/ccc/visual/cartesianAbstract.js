@@ -31,7 +31,7 @@ define([
       type: {
         id: module.id,
         props: {
-          model: {type: modelFactory}
+          model: {valueType: modelFactory}
         }
       },
 
@@ -130,8 +130,7 @@ define([
 
         var propName = "displayUnits" + (primary ? "" : "Secondary");
         var displayUnitsElem = this.model.get(propName);
-        var displayUnitsType = this.model.type.get(propName).type;
-        var scaleFactor = displayUnitsType.scaleFactorOf(displayUnitsElem.value);
+        var scaleFactor = displayUnitsElem.type.scaleFactorOf(displayUnitsElem.value);
 
         this._cartesianAxesDisplayUnitsText[axisType] =
             scaleFactor > 1 ? displayUnitsType.domain.get(displayUnitsElem).toString() : "";

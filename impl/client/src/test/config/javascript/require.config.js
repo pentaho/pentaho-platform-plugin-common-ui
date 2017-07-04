@@ -173,12 +173,40 @@
   // Visual Models Themes
   mapTheme("pentaho/visual/models", "themes", ["crystal", "sapphire", "onyx", "det"]);
 
+  // sample/calc theme
+  mapTheme("pentaho/visual/samples/calc", "themes", ["crystal"]);
+
   requireCfg.packages.push({"name": "pentaho/visual/base", "main": "model"});
+  requireCfg.packages.push({"name": "pentaho/visual/samples/calc", "main": "model"});
 
   [
     "pentaho/visual/base",
+
+    "pentaho/visual/samples/calc",
+
+    // ccc vizs
     "pentaho/visual/models/abstract",
-    "pentaho/visual/models/bar"
+    "pentaho/visual/models/cartesianAbstract",
+    "pentaho/visual/models/categoricalContinuousAbstract",
+    "pentaho/visual/models/barAbstract",
+    "pentaho/visual/models/barNormalizedAbstract",
+    "pentaho/visual/models/barHorizontal",
+    "pentaho/visual/models/bar",
+    "pentaho/visual/models/barStacked",
+    "pentaho/visual/models/barStackedHorizontal",
+    "pentaho/visual/models/barNormalized",
+    "pentaho/visual/models/barNormalizedHorizontal",
+    "pentaho/visual/models/barLine",
+    "pentaho/visual/models/line",
+    "pentaho/visual/models/pointAbstract",
+    "pentaho/visual/models/metricPointAbstract",
+    "pentaho/visual/models/areaStacked",
+    "pentaho/visual/models/pie",
+    "pentaho/visual/models/heatGrid",
+    "pentaho/visual/models/sunburst",
+    "pentaho/visual/models/donut",
+    "pentaho/visual/models/scatter",
+    "pentaho/visual/models/bubble"
   ].forEach(registerViz);
 
   // VizAPI actions

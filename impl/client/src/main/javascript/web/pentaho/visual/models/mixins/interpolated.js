@@ -35,9 +35,9 @@ define([
         props: [
           {
             name: "emptyCellMode",
-            type: emptyCellModeFactory,
+            valueType: emptyCellModeFactory,
             isRequired: true,
-            value: "gap"
+            defaultValue: "gap"
           }
         ]
       }

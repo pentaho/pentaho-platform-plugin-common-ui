@@ -41,54 +41,49 @@ define([
         props: [
           {
             name: "rows", // VISUAL_ROLE
-            type: {
-              isAccident: true,
-              levels: ["ordinal"],
-              props: {attributes: {isRequired: true}}
-            }
+            levels: ["ordinal"],
+            attributes: {isRequired: true}
           },
           {
             name: "size", // VISUAL_ROLE
-            type: {
-              base: "pentaho/visual/role/quantitative",
-              dataType: "number",
-              props: {attributes: {countMax: 1}}
-            },
+            base: "pentaho/visual/role/property",
+            levels: ["quantitative"],
+            dataType: "number",
+            attributes: {countMax: 1},
             ordinal: 7
           },
           {
             name: "multi", // VISUAL_ROLE
-            type: "pentaho/visual/role/ordinal",
+            base: "pentaho/visual/role/property",
+            levels: ["ordinal"],
             ordinal: 10
           },
           {
             name: "displayUnits",
-            type: displayUnitsFactory,
+            valueType: displayUnitsFactory,
             isRequired: true,
-            value: "units_0"
+            defaultValue: "units_0"
           },
           {
             name: "labelsOption",
-            type: {
-              base: labelsOptionFactory,
-              domain: ["none", "center"]
-            },
+            valueType: labelsOptionFactory,
+            domain: ["none", "center"],
             isApplicable: isSizeMapped,
             isRequired: true,
-            value: "none"
+            defaultValue: "none"
           },
           {
             name: "emptySlicesHidden",
-            type: "boolean",
+            valueType: "boolean",
             isRequired: true,
-            value: true
+            defaultValue: true
           },
           {
             name: "sliceOrder",
-            type: sliceOrderFactory,
+            valueType: sliceOrderFactory,
             isApplicable: isSizeMapped,
             isRequired: true,
-            value: "bySizeDescending"
+            defaultValue: "bySizeDescending"
           }
         ]
       }
