@@ -33,21 +33,22 @@ define([
         props: [
           {
             name: "columns", // VISUAL_ROLE
-            type: "pentaho/visual/role/ordinal",
+            base: "pentaho/visual/role/property",
+            levels: ["ordinal"],
             ordinal: 6
           },
           {
             name: "multi", // VISUAL_ROLE
-            type: "pentaho/visual/role/ordinal",
+            base: "pentaho/visual/role/property",
+            levels: ["ordinal"],
             ordinal: 10
           },
           {
             name: "measures", // VISUAL_ROLE
-            ordinal: 7,
-            type: {
-              base: "pentaho/visual/role/quantitative",
-              dataType: "number"
-            }
+            base: "pentaho/visual/role/property",
+            levels: ["quantitative"],
+            dataType: "number",
+            ordinal: 7
           }
         ]
       }

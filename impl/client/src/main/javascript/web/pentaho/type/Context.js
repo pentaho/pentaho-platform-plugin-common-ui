@@ -45,7 +45,6 @@ define([
   var _nextFactoryUid = 1;
   var _singleton = null;
   var _baseMid = module.id.replace(/Context$/, ""); // e.g.: "pentaho/type/"
-  var _baseFacetsMid = _baseMid + "facets/";
 
   // Default `base` type in a type specification.
   var _defaultBaseTypeMid = "complex";
@@ -167,8 +166,8 @@ define([
        * starts configuring a type, and decremented when it finishes.
        *
        * When the configuration depth is greater than 0,
-       * types created through object-specifications default to be accidental types.
-       * In particular, this affects overriding property value types.
+       * certain Type changes, like property value type subtyping,
+       * are not allowed.
        *
        * @type {number}
        * @private
@@ -239,7 +238,7 @@ define([
       // This mostly helps tests being able to require.undef(.) these at any time
       //  and not cause random failures for assuming all standard types were loaded.
       Object.keys(standard).forEach(function(lid) {
-        if(lid !== "facets" && lid !== "filter" && lid !== "instance")
+        if(lid !== "mixins" && lid !== "filter" && lid !== "instance")
           this._getByFactory(standard[lid], /* sync: */true);
       }, this);
 
@@ -247,8 +246,8 @@ define([
         this._getByFactory(standard.filter[fid], /* sync: */true);
       }, this);
 
-      Object.keys(standard.facets).forEach(function(fid) {
-        this._getByFactory(standard.facets[fid], /* sync: */true);
+      Object.keys(standard.mixins).forEach(function(fid) {
+        this._getByFactory(standard.mixins[fid], /* sync: */true);
       }, this);
     },
 
@@ -260,6 +259,19 @@ define([
      */
     get vars() {
       return this._vars;
+    },
+
+    /**
+     * Gets a value that indicates that the context is currently loading and, in particular, configuring a type.
+     *
+     * Certain changes to types are not safe when performed from configurations.
+     * This property allows blocking these changes.
+     *
+     * @type {boolean}
+     * @readonly
+     */
+    get isConfiguring() {
+      return this._configDepth > 0;
     },
 
     // region Type Registry
@@ -289,11 +301,12 @@ define([
      *         * [pentaho/type/boolean]{@link pentaho.type.Boolean}
      *         * [pentaho/type/function]{@link pentaho.type.Function}
      *         * [pentaho/type/object]{@link pentaho.type.Object}
-     *     * [pentaho/type/facets/discreteDomain]{@link pentaho.type.facets.DiscreteDomain}
-     *     * [pentaho/type/facets/ordinalDomain]{@link pentaho.type.facets.OrdinalDomain}
+     *         * [pentaho/type/mixins/enum]{@link pentaho.type.mixins.Enum}
      *   * [pentaho/type/property]{@link pentaho.type.Property}
+     *     * [pentaho/type/mixins/discreteDomain]{@link pentaho.type.mixins.DiscreteDomain}
+     *     * [pentaho/type/mixins/ordinalDomain]{@link pentaho.type.mixins.OrdinalDomain}
      *
-     * For all of these, the `pentaho/type/` or `pentaho/type/facets/` prefix is optional
+     * For all of these, the `pentaho/type/` or `pentaho/type/mixins/` prefix is optional
      * (when requested to a _context_; the AMD module system requires the full module identifiers to be specified).
      *
      * The filter types are also preloaded:
@@ -1095,12 +1108,6 @@ define([
     _getByObjectSpecCore: function(id, baseTypeSpec, typeSpec, sync) {
       // if id and not loaded, the id is used later to register the new type under that id and configure it.
 
-      // If configuring, all spec-created types default to being accidental types.
-      if((this._configDepth > 0) && !("isAccident" in typeSpec)) {
-        typeSpec = Object.create(typeSpec);
-        typeSpec.isAccident = true;
-      }
-
       // A root generic type spec initiates a specification context.
       // Each root generic type spec has a separate specification context.
       var resolveSync = function() {
@@ -1241,30 +1248,15 @@ define([
     if(props) {
       if(Array.isArray(props))
         props.forEach(function(propSpec) {
-          collectTypeIdsRecursive(propSpec && propSpec.type, outIds, byTypeId);
+          collectTypeIdsRecursive(propSpec && propSpec.valueType, outIds, byTypeId);
           collectTypeIdsRecursive(propSpec && propSpec.base, outIds, byTypeId);
         });
       else
         Object.keys(props).forEach(function(propName) {
           var propSpec = props[propName];
-          collectTypeIdsRecursive(propSpec && propSpec.type, outIds, byTypeId);
+          collectTypeIdsRecursive(propSpec && propSpec.valueType, outIds, byTypeId);
           collectTypeIdsRecursive(propSpec && propSpec.base, outIds, byTypeId);
         });
-    }
-
-    // These are not ids of types but only of mixin AMD modules.
-    var facets = typeSpec.facets;
-    if(facets != null) {
-      if(!(Array.isArray(facets))) facets = [facets];
-
-      facets.forEach(function(facetIdOrClass) {
-        if(typeof facetIdOrClass === "string") {
-          if(facetIdOrClass.indexOf("/") < 0)
-            facetIdOrClass = _baseFacetsMid + facetIdOrClass;
-
-          collectTypeIdsRecursive(facetIdOrClass, outIds, byTypeId);
-        }
-      });
     }
 
     // These are either ids of AMD modules of type mixins or, directly, type mixins.

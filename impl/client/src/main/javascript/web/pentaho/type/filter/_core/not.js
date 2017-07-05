@@ -131,7 +131,7 @@ define([
           {
             name: "operand",
             nameAlias: "o",
-            type: filter.Abstract,
+            valueType: filter.Abstract,
             isRequired: true,
             isReadOnly: true,
             isBoundary: true

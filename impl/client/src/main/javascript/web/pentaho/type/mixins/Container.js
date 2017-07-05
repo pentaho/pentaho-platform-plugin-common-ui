@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 define([
-  "../lang/Base",
-  "../lang/EventSource",
-  "./ReferenceList",
-  "./changes/Transaction",
-  "./events/WillChange",
-  "./events/RejectedChange",
-  "./events/DidChange"
+  "../../lang/Base",
+  "../../lang/EventSource",
+  "../ReferenceList",
+  "../changes/Transaction",
+  "../events/WillChange",
+  "../events/RejectedChange",
+  "../events/DidChange"
 ], function(Base, EventSource, ReferenceList, Transaction, WillChange, RejectedChange, DidChange) {
 
   "use strict";
@@ -33,7 +33,7 @@ define([
   var _nextUid = 1;
 
   /**
-   * @name pentaho.type.ContainerMixin
+   * @name pentaho.type.mixins.Container
    * @class
    * @extends pentaho.lang.Base
    * @extends pentaho.lang.EventSource
@@ -43,7 +43,7 @@ define([
    *
    * @description This class was not designed to be constructed directly. It was designed to be used as a **mixin**.
    */
-  return Base.extend("pentaho.type.ContainerMixin", /** @lends pentaho.type.ContainerMixin# */{
+  return Base.extend("pentaho.type.mixins.Container", /** @lends pentaho.type.mixins.Container# */{
 
     /**
      * Initializes a container instance, with a unique identifier and a version field.
@@ -76,7 +76,7 @@ define([
       /**
        * References (from others) to this container.
        *
-       * Maintained by ContainerMixin#_addReference and Changeset#_updateReferences.
+       * Maintained by Container#_addReference and Changeset#_updateReferences.
        *
        * @type {pentaho.type.ReferenceList}
        */
@@ -86,7 +86,7 @@ define([
     /**
      * Initializes a container instance clone.
      *
-     * @param {!pentaho.type.ContainerMixin} clone - The cloned container instance.
+     * @param {!pentaho.type.mixins.Container} clone - The cloned container instance.
      *
      * @private
      */
@@ -129,7 +129,7 @@ define([
      * for when the internal fields are updated directly, for performance and for working
      * outside of any ambient txn. The _removeReference counterpart is not needed.
      *
-     * @param {!pentaho.type.ContainerMixin} container - The container that refers this one.
+     * @param {!pentaho.type.mixins.Container} container - The container that refers this one.
      * @param {pentaho.type.Property.Type} [propType] When `container` is a complex,
      * the property type whose value contains this instance.
      *
@@ -203,7 +203,7 @@ define([
     /**
      * Creates a changeset with this container as owner and returns it.
      *
-     * @name pentaho.type.ContainerMixin#_createChangeset
+     * @name pentaho.type.mixins.Container#_createChangeset
      *
      * @method
      *

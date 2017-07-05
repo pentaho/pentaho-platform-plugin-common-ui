@@ -37,13 +37,13 @@ define([
 
       DerivedComplex = context.get({
         props: [
-          {name: "foo", type: "number"}
+          {name: "foo", valueType: "number"}
         ]
       });
       ComplexList = context.get([DerivedComplex]);
     });
 
-    it("should be defined", function () {
+    it("should be defined", function() {
       expect(typeof Sort).toBeDefined();
     });
 

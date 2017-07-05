@@ -124,11 +124,11 @@
  * The resolved _value type_ must be a [subtype]{@link pentaho.type.Type#isSubtypeOf} of the
  * attribute's current (local or inherited) _value type_.
  *
- * @name type
+ * @name valueType
  * @memberOf pentaho.type.spec.IPropertyTypeProto#
  * @type {!pentaho.type.spec.UTypeReference}
  *
- * @see pentaho.type.Property.Type#type
+ * @see pentaho.type.Property.Type#valueType
  */
 
 /**
@@ -146,11 +146,11 @@
  *
  * * for [root]{@link pentaho.type.Type#root} _property types_, the _default value_ is `null`
  * * for non-root _property types_, the _default value_ is the _inherited value_,
- *   if it is an instance of the _property type_'s [value type]{@link pentaho.type.spec.IPropertyTypeProto#type},
+ *   if it is an instance of the _property type_'s [valueType]{@link pentaho.type.spec.IPropertyTypeProto#valueType},
  *   or, `null`, otherwise.
  *
  * Else, the value must be a valid specification for a value of the _property type_'s
- * current (local or inherited) [value type]{@link pentaho.type.spec.IPropertyTypeProto#type}.
+ * current (local or inherited) [valueType]{@link pentaho.type.spec.IPropertyTypeProto#valueType}.
  *
  * When this is a [list]{@link pentaho.type.Property.Type#isList} _property type_,
  * the value must be a valid list value specification.
@@ -172,7 +172,7 @@
  *
  * Note that this attribute is taken together with
  * the [countMin]{@link pentaho.type.spec.IPropertyTypeProto#countMin} attribute
- * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeEval}
+ * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeOn}
  * of a _property type_.
  *
  * ### This attribute is *Dynamic*
@@ -202,10 +202,10 @@
  * @memberOf pentaho.type.spec.IPropertyTypeProto#
  * @type {boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
  *
- * @see pentaho.type.spec.IPropertyTypeProto#type
+ * @see pentaho.type.spec.IPropertyTypeProto#valueType
  * @see pentaho.type.spec.IPropertyTypeProto#countMin
  * @see pentaho.type.Property.Type#isRequired
- * @see pentaho.type.Property.Type#countRangeEval
+ * @see pentaho.type.Property.Type#countRangeOn
  */
 
 /**
@@ -291,7 +291,7 @@
  *
  * Note that this attribute is taken together with
  * the [isRequired]{@link pentaho.type.spec.IPropertyTypeProto#isRequired} attribute
- * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeEval}
+ * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeOn}
  * of a _property type_.
  *
  * ### This attribute is *Dynamic*
@@ -334,7 +334,7 @@
  * Note that this attribute is taken together with
  * the [isRequired]{@link pentaho.type.spec.IPropertyTypeProto#isRequired}
  * and the [countMin]{@link pentaho.type.IPropertyTypeProto#countMin} attributes
- * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeEval}
+ * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeOn}
  * of a _property type_.
  *
  * ### This attribute is *Dynamic*

@@ -90,7 +90,7 @@ define([
            */
           {
             name: "application",
-            type: "pentaho/type/application"
+            valueType: "pentaho/type/application"
           }
         ]
       }

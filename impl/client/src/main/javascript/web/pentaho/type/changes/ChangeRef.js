@@ -35,7 +35,7 @@ define([
      * @class
      * @extends pentaho.lang.Base
      * @constructor
-     * @param {!pentaho.type.ContainerMixin} owner - The owner container.
+     * @param {!pentaho.type.mixins.Container} owner - The owner container.
      * @private
      */
     constructor: function(owner) {
@@ -48,7 +48,7 @@ define([
     /**
      * Adds a reference to the owner of this changeset.
      *
-     * @param {!pentaho.type.ContainerMixin} container - The container that references the owner of the changeset.
+     * @param {!pentaho.type.mixins.Container} container - The container that references the owner of the changeset.
      * @param {pentaho.type.Property.Type} [propType] When `container` is a complex,
      * the property type whose value contains the owner of this changeset.
      */
@@ -62,7 +62,7 @@ define([
     /**
      * Removes a reference to this instance.
      *
-     * @param {!pentaho.type.ContainerMixin} container - The container that used to refer this one.
+     * @param {!pentaho.type.mixins.Container} container - The container that used to refer this one.
      * @param {pentaho.type.Property.Type} [propType] When `container` is a complex,
      * the property type whose value used to contain this instance.
      */

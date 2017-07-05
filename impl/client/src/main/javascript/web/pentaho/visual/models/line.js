@@ -39,15 +39,15 @@ define([
         props: [
           {
             name: "lineWidth",
-            type: lineWidthFactory,
+            valueType: lineWidthFactory,
             isRequired: true,
-            value: 1
+            defaultValue: 1
           },
           {
             name: "shape",
-            type: shapeFactory,
+            valueType: shapeFactory,
             isRequired: true,
-            value: "circle"
+            defaultValue: "circle"
           }
         ]
       }

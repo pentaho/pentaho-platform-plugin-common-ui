@@ -49,10 +49,8 @@ define([
           // region Visual Roles
           {
             name: "rows", // VISUAL_ROLE
-            type: {
-              base:   "pentaho/visual/role/mapping",
-              levels: ["ordinal", "quantitative"] // modal by default
-            },
+            base: "pentaho/visual/role/property",
+            levels: ["ordinal", "quantitative"], // modal by default
             ordinal: 5
           },
           // endregion
@@ -60,13 +58,13 @@ define([
           // region background fill
           {
             name: "backgroundFill",
-            type: backgroundFillFactory,
+            valueType: backgroundFillFactory,
             isRequired: true,
-            value: "none"
+            defaultValue: "none"
           },
           {
             name: "backgroundColor",
-            type: colorFactory,
+            valueType: colorFactory,
             isApplicable: function() {
               return this.backgroundFill !== "none";
             },
@@ -74,7 +72,7 @@ define([
           },
           {
             name: "backgroundColorEnd",
-            type: colorFactory,
+            valueType: colorFactory,
             isApplicable: function() {
               return this.backgroundFill === "gradient";
             },
@@ -86,72 +84,72 @@ define([
 
           // For multi-charts, Size and Family also used for chart title font
           {
-            name:  "labelColor",
-            type:  colorFactory
+            name: "labelColor",
+            valueType: colorFactory
           },
           {
             name: "labelSize",
-            type: "number"
+            valueType: "number"
           },
           {
             name: "labelStyle",
-            type: fontStyleFactory,
+            valueType: fontStyleFactory,
             isRequired: true,
-            value: "plain"
+            defaultValue: "plain"
           },
           {
             name: "labelFontFamily",
-            type: "string"
+            valueType: "string"
           },
           // endregion
 
           // region Legend
           {
             name: "showLegend",
-            type: "boolean",
-            value: true
+            valueType: "boolean",
+            defaultValue: true
           },
           {
             name: "legendPosition",
-            type: sidesFactory,
+            valueType: sidesFactory,
             isApplicable: isApplicableLegend,
             isRequired: true,
-            value: "right"
+            defaultValue: "right"
           },
           {
             name: "legendBackgroundColor",
-            type: colorFactory,
+            valueType: colorFactory,
             isApplicable: isApplicableLegend
           },
 
           // Legend Item Label Font
           {
             name: "legendColor",
-            type: colorFactory,
+            valueType: colorFactory,
             isApplicable: isApplicableLegend
           },
           {
             name: "legendSize",
-            type: "number",
+            valueType: "number",
             isApplicable: isApplicableLegend
           },
           {
             name: "legendStyle",
-            type: fontStyleFactory,
+            valueType: fontStyleFactory,
             isApplicable: isApplicableLegend,
             isRequired: true,
-            value: "plain"
+            defaultValue: "plain"
           },
           {
             name: "legendFontFamily",
-            type: "string",
+            valueType: "string",
             isApplicable: isApplicableLegend
           },
           // endregion
 
           { // TODO: do all charts have this?
             name: "labelsOption",
-            type: labelsOptionFactory
+            valueType: labelsOptionFactory
           }
         ]
       }

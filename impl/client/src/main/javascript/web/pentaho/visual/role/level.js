@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ define([
 
   return function(context) {
 
-    var orderedLevels = ["nominal", "ordinal", "quantitative"];
-
     var PentahoString = context.get("string");
 
     var pentahoNumber = context.get("number").type;
@@ -34,7 +32,7 @@ define([
      * @name pentaho.visual.role.MeasurementLevel.Type
      * @class
      * @extends pentaho.type.String.Type
-     * @extends pentaho.type.facets.DiscreteDomain.Type
+     * @extends pentaho.type.mixins.DiscreteDomain.Type
      *
      * @classDesc The type class of {@link pentaho.visual.role.MeasurementLevel}.
      */
@@ -43,11 +41,11 @@ define([
      * @name pentaho.visual.role.MeasurementLevel
      * @class
      * @extends pentaho.type.String
-     * @extends pentaho.type.facets.DiscreteDomain
+     * @extends pentaho.type.mixins.DiscreteDomain
      *
      * @amd {pentaho.type.Factory<pentaho.visual.role.MeasurementLevel>} pentaho/visual/role/level
      *
-     * @classDesc The `MeasurementLevel` class is **a refinement of** [String]{@link pentaho.type.String}
+     * @classDesc The `MeasurementLevel` class is [String]{@link pentaho.type.String} based enumeration
      * that represents a **Level or Measurement**,
      * as understood by [S. S. Steven]{@link https://en.wikipedia.org/wiki/Level_of_measurement}.
      *
@@ -88,13 +86,13 @@ define([
      *    can be (directly) represented by a quantitative visual role.
      */
 
-    var Level = PentahoString.refine({
+    var Level = PentahoString.extend({
 
       type: /** @lends pentaho.visual.role.MeasurementLevel.Type# */{
 
         id: module.id,
-        mixins: ["discreteDomain"],
-        domain: orderedLevels,
+        mixins: ["enum"],
+        domain: ["nominal", "ordinal", "quantitative"],
 
         /**
          * Returns a value that indicates if a given level of measurement is
@@ -146,32 +144,6 @@ define([
           return !type.isSubtypeOf(pentahoNumber) &&
                  !type.isSubtypeOf(pentahoDate) &&
                  !pentahoSimple.isSubtypeOf(type);
-        },
-
-        /**
-         * Compares two levels of measurement strings according to the order from _lowest_ to _highest_.
-         *
-         * A level of measurement that is not one of the
-         * {@link pentaho.visual.role.MeasurementLevel} values
-         * is considered lower than these.
-         *
-         * @param {string} [a] The first level of measurement.
-         * @param {string} [b] The second level of measurement.
-         *
-         * @return {number} A negative number, if `a` is _lower_ than `b`;
-         * a positive number, if `a` is _higher_ than `b`;
-         * and, `0`, if these are same level of measurement.
-         *
-         * @protected
-         */
-        _compareValues: function(a, b) {
-          /* eslint no-multi-spaces: 0 */
-          var indexA = orderedLevels.indexOf(a);
-          var indexB = orderedLevels.indexOf(b);
-          return indexA === indexB ?  0 : // includes both negative
-                 indexA < 0        ? -1 : // undefined is lowest
-                 indexB < 0        ? +1 : // idem
-                 indexA - indexB;         // compare two non-negative indexes
         }
       }
     })

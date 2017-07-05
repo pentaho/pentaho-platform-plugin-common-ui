@@ -34,10 +34,10 @@ define([
         props: [
           {
             name: "sizeByNegativesMode",
-            type: sizeByNegativesModeFactory,
+            valueType: sizeByNegativesModeFactory,
             isApplicable: function() { return this.count("size") > 0; },
             isRequired: true,
-            value: "negLowest"
+            defaultValue: "negLowest"
           }
         ]
       }

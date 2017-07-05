@@ -31,16 +31,3 @@
  *
  * @see pentaho.type.spec.IValueProto#type
  */
-
-/**
- * Indicates if the type is an accidental type.
- *
- * A type that extends an accidental type is necessarily an accidental type, and so any value is ignored.
- * Otherwise, if the type extends an essential type and when `true`, defines an accidental type.
- *
- * @name isAccident
- * @memberOf pentaho.type.spec.IValueTypeProto#
- * @type {boolean}
- *
- * @see pentaho.type.Type#isAccident
- */

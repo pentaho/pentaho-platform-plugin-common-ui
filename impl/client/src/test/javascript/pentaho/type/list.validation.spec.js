@@ -46,25 +46,6 @@ define([
         expect(PentahoNumber.type._validate).toHaveBeenCalledWith(list.at(2));
       });
 
-      it("should call _validate(.) of the list element accidental type with each of its members", function() {
-        var PentahoNumber = context.get(numberFactory);
-        var PentahoInteger = PentahoNumber.refine();
-
-        var IntegerList = List.extend({
-          type: {of: PentahoInteger}
-        });
-
-        spyOn(PentahoInteger.type, "_validate");
-
-        var list = new IntegerList([1, 2, 3]);
-
-        list.validate();
-
-        expect(PentahoInteger.type._validate).toHaveBeenCalledWith(list.at(0));
-        expect(PentahoInteger.type._validate).toHaveBeenCalledWith(list.at(1));
-        expect(PentahoInteger.type._validate).toHaveBeenCalledWith(list.at(2));
-      });
-
       it("should call _validate(.) of each of the list elements' type " +
          "when the list element type is of a base type", function() {
         var PentahoNumber = context.get(numberFactory);

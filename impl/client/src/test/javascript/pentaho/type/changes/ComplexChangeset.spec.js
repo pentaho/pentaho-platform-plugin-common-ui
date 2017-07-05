@@ -46,9 +46,9 @@ define([
       Derived = Complex.extend({
         type: {
           props: [
-            {name: "foo", type: "number"},
-            {name: "bar", type: "number"},
-            {name: "myList", type: NumberList}
+            {name: "foo", valueType: "number"},
+            {name: "bar", valueType: "number"},
+            {name: "myList", valueType: NumberList}
           ]
         }
       });

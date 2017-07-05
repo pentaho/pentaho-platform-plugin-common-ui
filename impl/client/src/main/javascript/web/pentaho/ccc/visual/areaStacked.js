@@ -31,7 +31,7 @@ define([
       type: {
         id: module.id,
         props: {
-          model: {type: modelFactory}
+          model: {valueType: modelFactory}
         }
       }
     });

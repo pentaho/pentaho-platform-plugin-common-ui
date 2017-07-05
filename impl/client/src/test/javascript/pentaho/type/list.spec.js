@@ -60,8 +60,6 @@ define([
     // region #of
     describe("#of -", function() {
 
-      // NOTE: see also refinement.Spec.js, list usage unit tests
-
       it("accepts an `of` property be given a type derived from `Element`", function() {
         expect(NumberList.type.of).toBe(PentahoNumber.type);
       });
@@ -676,7 +674,7 @@ define([
         var Derived = Complex.extend({
           type: {
             props: {
-              foo: {type: NumberList}
+              foo: {valueType: NumberList}
             }
           }
         });
@@ -839,7 +837,7 @@ define([
         var Derived = Complex.extend({
           type: {
             props: {
-              foo: {type: NumberList, value: [1, 2, 3]}
+              foo: {valueType: NumberList, defaultValue: [1, 2, 3]}
             }
           }
         });
@@ -949,7 +947,7 @@ define([
         var Derived = Complex.extend({
           type: {
             props: {
-              foo: {type: NumberList, value: [1, 2, 3]}
+              foo: {valueType: NumberList, defaultValue: [1, 2, 3]}
             }
           }
         });
@@ -1003,7 +1001,7 @@ define([
         var Derived = Complex.extend({
           type: {
             props: {
-              foo: {type: NumberList, value: [1, 2, 3, 4]}
+              foo: {valueType: NumberList, defaultValue: [1, 2, 3, 4]}
             }
           }
         });
@@ -1173,7 +1171,7 @@ define([
           type: {
             props: [{
               name: "k",
-              type: "number"
+              valueType: "number"
             }]
           }
         });
@@ -1323,7 +1321,7 @@ define([
         var Derived = Complex.extend({
           type: {
             props: {
-              foo: {type: NumberList, value: [4, 2, 1, 3]}
+              foo: {valueType: NumberList, defaultValue: [4, 2, 1, 3]}
             }
           }
         });

@@ -102,7 +102,7 @@ define([
             // may be empty
             name: "values",
             nameAlias: "v",
-            type: ["element"],
+            valueType: ["element"],
             isReadOnly: true,
             isBoundary: true
           }

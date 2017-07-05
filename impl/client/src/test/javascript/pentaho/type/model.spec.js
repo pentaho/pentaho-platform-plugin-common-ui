@@ -46,7 +46,7 @@ define([
       it("should define a property named application of type application", function() {
         var p = Model.type.get("application");
         expect(p != null).toBe(true);
-        expect(p.type.id).toBe("pentaho/type/application");
+        expect(p.valueType.id).toBe("pentaho/type/application");
       });
 
       it("should have a default application of null", function() {

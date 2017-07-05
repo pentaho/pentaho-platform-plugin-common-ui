@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,20 @@
 
 /**
  * The `spec.IDiscreteDomainTypeProto` interface represents the
- * specification made available to a value type by the discrete domain mixin facet.
+ * specification made available to a property type by the discrete domain mixin.
  *
- * @name pentaho.type.facets.spec.IDiscreteDomainTypeProto
+ * @name pentaho.type.mixins.spec.IDiscreteDomainTypeProto
  * @interface
+ * @see pentaho.type.mixins.DiscreteDomain
  */
 
 /**
- * The discrete domain of the type.
- *
- * The domain attribute refines a type to a set of discrete values
- * whose type is that of this type's [essence type]{@link pentaho.type.Type#essence}.
- *
- * If the ancestor type has `domain` set,
- * the specified set of values must be a subset of those.
+ * The list of valid values of the property type.
  *
  * @name domain
- * @memberOf pentaho.type.facets.spec.IDiscreteDomainTypeProto#
- * @type {?pentaho.type.List}
+ * @memberOf pentaho.type.mixins.spec.IDiscreteDomainTypeProto#
+ * @type {Array.<pentaho.type.spec.UElement> |
+ *        pentaho.type.PropertyDynamicAttribute.<Array.<pentaho.type.spec.UElement>>}
  *
- * @see pentaho.type.facets.DiscreteDomain#domain
+ * @see pentaho.type.mixins.DiscreteDomain.Type#domain
  */

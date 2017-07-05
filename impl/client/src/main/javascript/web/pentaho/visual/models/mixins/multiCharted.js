@@ -39,21 +39,21 @@ define([
         props: [
           {
             name:  "maxChartsPerRow",
-            type:  maxChartsPerRowFactory,
+            valueType:  maxChartsPerRowFactory,
             isRequired: true,
-            value: 3
+            defaultValue: 3
           },
           {
             name: "multiChartRangeScope",
-            type: multiChartRangeScopeFactory,
+            valueType: multiChartRangeScopeFactory,
             isRequired: true,
-            value: "global"
+            defaultValue: "global"
           },
           {
             name: "multiChartOverflow",
-            type: multiChartOverflowFactory,
+            valueType: multiChartOverflowFactory,
             isRequired: true,
-            value: "grow"
+            defaultValue: "grow"
           }
         ]
       }

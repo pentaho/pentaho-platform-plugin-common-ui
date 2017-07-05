@@ -43,55 +43,47 @@ define([
         props: [
           {
             name: "measures", // VISUAL_ROLE
-            type: {
-              isAccident: true,
-              props: {attributes: {isRequired: requiredOneMeasure}}
-            }
+            attributes: {isRequired: requiredOneMeasure}
           },
           {
             name: "measuresLine", // VISUAL_ROLE
-            type: {
-              base: "pentaho/visual/role/quantitative",
-              dataType: "number",
-              props: {attributes: {isRequired: requiredOneMeasure}}
-            },
+            base: "pentaho/visual/role/property",
+            levels: ["quantitative"],
+            dataType: "number",
+            attributes: {isRequired: requiredOneMeasure},
             ordinal: 7
           },
 
           {
             name: "lineWidth",
-            type: lineWidthFactory,
+            valueType: lineWidthFactory,
             isApplicable: hasAttributesMeasuresLine,
             isRequired: true,
-            value: 1
+            defaultValue: 1
           },
           {
             name: "labelsOption",
-            type: {
-              base: labelsOptionFactory,
-              domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"]
-            },
+            valueType: labelsOptionFactory,
+            domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"],
             isApplicable: hasAttributesMeasures,
             isRequired: true,
-            value: "none"
+            defaultValue: "none"
           },
 
           {
             name: "lineLabelsOption",
-            type: {
-              base: labelsOptionFactory,
-              domain: ["none", "center", "left", "right", "top", "bottom"]
-            },
+            valueType: labelsOptionFactory,
+            domain: ["none", "center", "left", "right", "top", "bottom"],
             isApplicable: hasAttributesMeasuresLine,
             isRequired: true,
-            value: "none"
+            defaultValue: "none"
           },
 
           {
             name: "shape",
-            type: shapeFactory,
+            valueType: shapeFactory,
             isRequired: true,
-            value: "circle",
+            defaultValue: "circle",
             isApplicable: hasAttributesMeasuresLine
           }
         ]
@@ -103,7 +95,7 @@ define([
 
   function requiredOneMeasure() {
     /* jshint validthis:true*/
-    return !this.model.measures.attributes.count && !this.model.measuresLine.attributes.count;
+    return !this.measures.attributes.count && !this.measuresLine.attributes.count;
   }
 
   function hasAttributesMeasuresLine() {

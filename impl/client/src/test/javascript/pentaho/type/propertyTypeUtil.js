@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "pentaho/type/Context",
+  "pentaho/type/SpecificationScope"
+], function(Context, SpecificationScope) {
 
   "use strict";
 
-  /* global it:false, expect:false, JSON:false */
+  /* globals it, expect, beforeEach */
 
   return {
     createRoot: createRoot,
-    extend: extend
+    extend: extend,
+    itDynamicAttribute: itDynamicAttribute
   };
 
   function createRoot(declaringType, typeSpec) {
@@ -29,24 +33,219 @@ define(function() {
     var baseId = typeSpec && typeSpec.base;
     var Property = declaringType.context.get(baseId || "property");
 
-    return Property.type.extendProto(
-        typeSpec,
-        {
-          declaringType: declaringType,
-          index: 1,
-          isRoot: true
-        });
+    var SubProperty = Property.extend({
+      type: typeSpec
+    }, null, {
+      declaringType: declaringType,
+      index: 1,
+      isRoot: true
+    });
+
+    return SubProperty.type;
   }
 
   function extend(declaringType, baseProperty, subPropTypeSpec) {
 
     var basePropType = declaringType.ancestor.get(baseProperty);
+    var BaseProperty = basePropType.instance.constructor;
+    var SubProperty = BaseProperty.extend({
+      type: subPropTypeSpec
+    }, null, {
+      declaringType: declaringType,
+      index: -1,
+      isRoot: false
+    });
 
-    return basePropType.extendProto(subPropTypeSpec,
-        {
-          declaringType: declaringType,
-          instance: declaringType.instance
-        });
+    return SubProperty.type;
+  }
+
+  function itDynamicAttribute(name, value, base, groupName) {
+
+    var Complex;
+
+    beforeEach(function() {
+      var context = new Context();
+      Complex = context.get("pentaho/type/complex");
+    });
+
+    it("should not serialize when not specified", function() {
+
+      var Derived = Complex.extend();
+      var scope = new SpecificationScope();
+      var propType = createRoot(Derived.type, {name: "foo", base: base});
+
+      var spec = {};
+      var keyArgs = {};
+      var result = propType._fillSpecInContext(spec, keyArgs);
+
+      scope.dispose();
+
+      expect(result).toBe(false);
+
+      var groupSpec;
+      if(groupName) {
+        groupSpec = spec[groupName];
+      } else {
+        groupSpec = spec;
+      }
+
+      if(groupSpec) {
+        expect(name in groupSpec).toBe(false);
+      }
+    });
+
+    it("should serialize when specified as a non-function value", function() {
+
+      var Derived = Complex.extend();
+      var scope = new SpecificationScope();
+      var propTypeSpec = {name: "foo", base: base};
+
+      var propTypeGroupSpec;
+      if(groupName) {
+        propTypeGroupSpec = (propTypeSpec[groupName] = {});
+      } else {
+        propTypeGroupSpec = propTypeSpec;
+      }
+
+      propTypeGroupSpec[name] = value;
+
+      var propType = createRoot(Derived.type, propTypeSpec);
+
+      var spec = {};
+      var keyArgs = {};
+      var result = propType._fillSpecInContext(spec, keyArgs);
+
+      scope.dispose();
+
+      expect(result).toBe(true);
+
+      var groupSpec;
+      if(groupName) {
+        groupSpec = spec[groupName];
+        expect(groupSpec != null).toBe(true);
+      } else {
+        groupSpec = spec;
+      }
+
+      expect(groupSpec[name]).toBe(value);
+    });
+
+    it("should serialize when specified as a function value and isJson: false", function() {
+
+      var Derived = Complex.extend();
+      var scope = new SpecificationScope();
+      var propTypeSpec = {name: "foo", base: base};
+      var fValue = function() { return value; };
+
+      var propTypeGroupSpec;
+      if(groupName) {
+        propTypeGroupSpec = (propTypeSpec[groupName] = {});
+      } else {
+        propTypeGroupSpec = propTypeSpec;
+      }
+
+      propTypeGroupSpec[name] = fValue;
+
+      var propType = createRoot(Derived.type, propTypeSpec);
+
+      var spec = {};
+      var keyArgs = {};
+      var result = propType._fillSpecInContext(spec, keyArgs);
+
+      scope.dispose();
+
+      expect(result).toBe(true);
+
+      var groupSpec;
+      if(groupName) {
+        groupSpec = spec[groupName];
+        expect(groupSpec != null).toBe(true);
+      } else {
+        groupSpec = spec;
+      }
+
+      expect(groupSpec[name]).toBe(fValue);
+    });
+
+    it("should not serialize when specified as a function value and isJson: true", function() {
+
+      var Derived = Complex.extend();
+      var scope = new SpecificationScope();
+      var propTypeSpec = {name: "foo", base: base};
+      var fValue = function() { return value; };
+
+      var propTypeGroupSpec;
+      if(groupName) {
+        propTypeGroupSpec = (propTypeSpec[groupName] = {});
+      } else {
+        propTypeGroupSpec = propTypeSpec;
+      }
+
+      propTypeGroupSpec[name] = fValue;
+
+      var propType = createRoot(Derived.type, propTypeSpec);
+
+      var spec = {};
+      var keyArgs = {isJson: true};
+      var result = propType._fillSpecInContext(spec, keyArgs);
+
+      scope.dispose();
+
+      expect(result).toBe(false);
+
+      var groupSpec;
+      if(groupName) {
+        groupSpec = spec[groupName];
+      } else {
+        groupSpec = spec;
+      }
+
+      if(groupSpec) {
+        expect(name in groupSpec).toBe(false);
+      }
+    });
+
+    it("should not serialize when inherited", function() {
+
+      var Base = Complex.extend();
+
+      var propTypeSpec = {name: "foo", base: base};
+      var propTypeGroupSpec;
+      if(groupName) {
+        propTypeGroupSpec = (propTypeSpec[groupName] = {});
+      } else {
+        propTypeGroupSpec = propTypeSpec;
+      }
+
+      propTypeGroupSpec[name] = value;
+
+      Base.type.add(propTypeSpec);
+
+      var Derived = Base.extend();
+
+      var scope = new SpecificationScope();
+
+      var propType = extend(Derived.type, "foo", {});
+
+      var spec = {};
+      var keyArgs = {};
+      var result = propType._fillSpecInContext(spec, keyArgs);
+
+      scope.dispose();
+
+      expect(result).toBe(false);
+
+      var groupSpec;
+      if(groupName) {
+        groupSpec = spec[groupName];
+      } else {
+        groupSpec = spec;
+      }
+
+      if(groupSpec) {
+        expect(name in groupSpec).toBe(false);
+      }
+    });
   }
 });
 

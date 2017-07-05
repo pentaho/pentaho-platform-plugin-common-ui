@@ -23,12 +23,19 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false, jasmine:false*/
 
-  var context = new Context();
-  var Property = context.get("property");
-  var Complex = context.get("pentaho/type/complex");
-  var PentahoString = context.get("pentaho/type/string");
-
   describe("pentaho.type.Property.Type", function() {
+
+    var context;
+    var Property;
+    var Complex;
+    var PentahoString;
+
+    beforeEach(function() {
+      context = new Context();
+      Property = context.get("property");
+      Complex = context.get("pentaho/type/complex");
+      PentahoString = context.get("pentaho/type/string");
+    });
 
     describe("#toSpecInContext(keyArgs)", function() {
 
@@ -121,7 +128,7 @@ define([
       it("should return a specification when the type is not 'string'", function() {
         var scope = new SpecificationScope();
 
-        var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "number"});
+        var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", valueType: "number"});
 
         spyOn(propType, "_fillSpecInContext").and.returnValue(false);
 
@@ -135,7 +142,7 @@ define([
       it("should not include `base` when a root property has Property.Type as base", function() {
         var scope = new SpecificationScope();
 
-        var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "number"});
+        var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", valueType: "number"});
 
         spyOn(propType, "_fillSpecInContext").and.returnValue(false);
 
@@ -150,7 +157,7 @@ define([
         var scope = new SpecificationScope();
 
         var SubProperty = Property.extend();
-        var propType = propertyTypeUtil.createRoot(Derived.type, {base: SubProperty, name: "foo", type: "number"});
+        var propType = propertyTypeUtil.createRoot(Derived.type, {base: SubProperty, name: "foo", valueType: "number"});
 
         expect(propType).not.toBe(SubProperty.type);
         expect(propType.isSubtypeOf(SubProperty.type)).toBe(true);
@@ -177,7 +184,7 @@ define([
       it("should not include `base` on a non-root property", function() {
         var scope = new SpecificationScope();
 
-        Derived.type.add({name: "foo", type: "number"});
+        Derived.type.add({name: "foo", valueType: "number"});
 
         var Derived2 = Derived.extend();
 
@@ -196,7 +203,7 @@ define([
         var scope = new SpecificationScope();
 
         var propType = Property.type;
-        //var SubProperty = Property.extend();
+        // var SubProperty = Property.extend();
 
         spyOn(propType, "_fillSpecInContext").and.returnValue(false);
 
@@ -215,7 +222,7 @@ define([
         var SubProperty = Property.extend();
         propType = SubProperty.type;
 
-        //spyOn(propType, "_fillSpecInContext").and.returnValue(false);
+        // spyOn(propType, "_fillSpecInContext").and.returnValue(false);
 
         spec = propType.toSpecInContext();
 
@@ -231,7 +238,7 @@ define([
         var scope = new SpecificationScope();
 
         var propType = Property.type;
-        //var SubProperty = Property.extend();
+        // var SubProperty = Property.extend();
 
         spyOn(propType, "_fillSpecInContext").and.returnValue(false);
 
@@ -263,7 +270,7 @@ define([
       it("should include `type` if != from 'value' when serializing an abstract property", function() {
         var scope = new SpecificationScope();
 
-        var SubProperty = Property.extend({type: {type: "string"}});
+        var SubProperty = Property.extend({type: {valueType: "string"}});
         var propType = SubProperty.type;
 
         spyOn(propType, "_fillSpecInContext").and.returnValue(false);
@@ -307,7 +314,7 @@ define([
 
         expect(spec.id).toBe("property");
 
-        //console.log(JSON.stringify(spec));
+        // console.log(JSON.stringify(spec));
         // > {"id":"property"}
       });
     });
@@ -350,7 +357,7 @@ define([
         });
       });
 
-      describe("#value", function() {
+      describe("#defaultValue", function() {
 
         it("should not serialize when undefined (root)", function() {
           var Derived = Complex.extend();
@@ -366,7 +373,7 @@ define([
           scope.dispose();
 
           expect(result).toBe(false);
-          expect("value" in spec).toBe(false);
+          expect("defaultValue" in spec).toBe(false);
         });
 
         it("should not serialize when undefined (non-root)", function() {
@@ -387,7 +394,7 @@ define([
           scope.dispose();
 
           expect(result).toBe(false);
-          expect("value" in spec).toBe(false);
+          expect("defaultValue" in spec).toBe(false);
         });
 
         it("should serialize when null (non-root)", function() {
@@ -399,7 +406,7 @@ define([
 
           var scope = new SpecificationScope();
 
-          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {value: null});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {defaultValue: null});
 
           var spec = {};
           var keyArgs = {};
@@ -407,7 +414,7 @@ define([
 
           scope.dispose();
           expect(result).toBe(true);
-          expect(spec.value).toBe(null);
+          expect(spec.defaultValue).toBe(null);
         });
 
         it("should serialize without type annotation when of the same type", function() {
@@ -415,7 +422,11 @@ define([
 
           var scope = new SpecificationScope();
 
-          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "string", value: "Foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {
+            name: "foo",
+            valueType: "string",
+            defaultValue: "Foo"
+          });
 
           var spec = {};
           var keyArgs = {};
@@ -423,24 +434,7 @@ define([
 
           scope.dispose();
           expect(result).toBe(true);
-          expect(spec.value).toBe("Foo");
-        });
-
-        it("should serialize without type annotation when of the same essential type", function() {
-          var Derived = Complex.extend();
-          var Accident = PentahoString.refine();
-
-          var scope = new SpecificationScope();
-
-          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: Accident.type, value: "Foo"});
-
-          var spec = {};
-          var keyArgs = {};
-          var result = propType._fillSpecInContext(spec, keyArgs);
-
-          scope.dispose();
-          expect(result).toBe(true);
-          expect(spec.value).toBe("Foo");
+          expect(spec.defaultValue).toBe("Foo");
         });
 
         it("should serialize with type annotation when of different subtype", function() {
@@ -451,8 +445,8 @@ define([
 
           var propType = propertyTypeUtil.createRoot(Derived.type, {
             name:  "foo",
-            type:  "string",
-            value: new PostalCode("Foo")
+            valueType:  "string",
+            defaultValue: new PostalCode("Foo")
           });
 
           var spec = {};
@@ -462,7 +456,7 @@ define([
           scope.dispose();
           expect(result).toBe(true);
 
-          expect(spec.value).toEqual({
+          expect(spec.defaultValue).toEqual({
             _: jasmine.any(Object),
             v: "Foo"
           });
@@ -470,130 +464,33 @@ define([
       });
 
       // region Dynamic Attributes
-      function itDynamicAttribute(name, value) {
-
-        it("should not serialize when not specified", function() {
-          var Derived = Complex.extend();
-          var scope = new SpecificationScope();
-          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
-
-          var spec = {};
-          var keyArgs = {};
-          var result = propType._fillSpecInContext(spec, keyArgs);
-
-          scope.dispose();
-
-          expect(result).toBe(false);
-          expect(name in spec).toBe(false);
-        });
-
-        it("should serialize when specified as a non-function value", function() {
-          var Derived = Complex.extend();
-          var scope = new SpecificationScope();
-          var propTypeSpec = {name: "foo"};
-          propTypeSpec[name] = value;
-
-          var propType = propertyTypeUtil.createRoot(Derived.type, propTypeSpec);
-
-          var spec = {};
-          var keyArgs = {};
-          var result = propType._fillSpecInContext(spec, keyArgs);
-
-          scope.dispose();
-
-          expect(result).toBe(true);
-          expect(spec[name]).toBe(value);
-        });
-
-        it("should serialize when specified as a function value and isJson: false", function() {
-          var Derived = Complex.extend();
-          var scope = new SpecificationScope();
-          var propTypeSpec = {name: "foo"};
-          var fValue = function() { return value; };
-          propTypeSpec[name] = fValue;
-
-          var propType = propertyTypeUtil.createRoot(Derived.type, propTypeSpec);
-
-          var spec = {};
-          var keyArgs = {};
-          var result = propType._fillSpecInContext(spec, keyArgs);
-
-          scope.dispose();
-
-          expect(result).toBe(true);
-          expect(spec[name]).toBe(fValue);
-        });
-
-        it("should not serialize when specified as a function value and isJson: true", function() {
-          var Derived = Complex.extend();
-          var scope = new SpecificationScope();
-          var propTypeSpec = {name: "foo"};
-          var fValue = function() { return value; };
-          propTypeSpec[name] = fValue;
-
-          var propType = propertyTypeUtil.createRoot(Derived.type, propTypeSpec);
-
-          var spec = {};
-          var keyArgs = {isJson: true};
-          var result = propType._fillSpecInContext(spec, keyArgs);
-
-          scope.dispose();
-
-          expect(result).toBe(false);
-        });
-
-        it("should not serialize when inherited", function() {
-          var Base = Complex.extend();
-
-          var propTypeSpec = {name: "foo"};
-          propTypeSpec[name] = value;
-
-          Base.type.add(propTypeSpec);
-
-          var Derived = Base.extend();
-
-          var scope = new SpecificationScope();
-
-          var propType = propertyTypeUtil.extend(Derived.type, "foo", {});
-
-          var spec = {};
-          var keyArgs = {};
-          var result = propType._fillSpecInContext(spec, keyArgs);
-
-          scope.dispose();
-
-          expect(result).toBe(false);
-          expect(name in spec).toBe(false);
-        });
-      }
-
       describe("#isRequired", function() {
 
-        itDynamicAttribute("isRequired", true);
+        propertyTypeUtil.itDynamicAttribute("isRequired", true);
 
       });
 
       describe("#isApplicable", function() {
 
-        itDynamicAttribute("isApplicable", false);
+        propertyTypeUtil.itDynamicAttribute("isApplicable", false);
 
       });
 
       describe("#isEnabled", function() {
 
-        itDynamicAttribute("isEnabled", false);
+        propertyTypeUtil.itDynamicAttribute("isEnabled", false);
 
       });
 
       describe("#countMin", function() {
 
-        itDynamicAttribute("countMin", 1);
+        propertyTypeUtil.itDynamicAttribute("countMin", 1);
 
       });
 
       describe("#countMax", function() {
 
-        itDynamicAttribute("countMax", 2);
+        propertyTypeUtil.itDynamicAttribute("countMax", 2);
 
       });
       // endregion

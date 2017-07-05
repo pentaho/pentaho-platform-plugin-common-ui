@@ -133,7 +133,7 @@ define([
        *
        * This class, the instance class, manages the execution of the action
        * and enforces the multiple phases by which all actions, generically, go through it,
-       * including: "init", "will", "do", and "finally"*
+       * including: "init", "will", "do", and "finally".
        *
        * Note that the associated type class is to be used to configure metadata information
        * about actions. For example: [label]{@link pentaho.type.Type#label} and
@@ -1218,7 +1218,7 @@ define([
 
         var declaredType;
         var includeType = !!keyArgs.forceType ||
-              (!!(declaredType = keyArgs.declaredType) && this.type !== declaredType.essence);
+              (!!(declaredType = keyArgs.declaredType) && this.type !== declaredType);
 
         if(includeType) spec._ = this.type.toRefInContext(keyArgs);
         if(this.label) spec.label = this.label;

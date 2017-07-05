@@ -245,7 +245,7 @@ define([
       }
       // endregion
 
-      it("should have preloaded standard primitive types, facets and filters", function() {
+      it("should have preloaded standard primitive types, mixins and filters", function() {
 
         return require.using(["require", "pentaho/type/Context"], function(localRequire, Context) {
           var context = new Context();
@@ -253,15 +253,15 @@ define([
 
           for(p in standard)
             if(standard.hasOwnProperty(p))
-              if(p !== "facets" && p !== "filter" && p !== "Instance")
+              if(p !== "mixins" && p !== "filter" && p !== "Instance")
                 expect(!!context.get("pentaho/type/" + p)).toBe(true);
 
-          for(p in standard.facets)
-            if(standard.facets.hasOwnProperty(p))
-              localRequire("pentaho/type/facets/" + p);
+          for(p in standard.mixins)
+            if(standard.mixins.hasOwnProperty(p))
+              localRequire("pentaho/type/mixins/" + p);
 
-          for(p in standard.type)
-            if(standard.type.hasOwnProperty(p))
+          for(p in standard.filters)
+            if(standard.filters.hasOwnProperty(p))
               localRequire("pentaho/type/filter/" + p);
         });
       });
@@ -297,7 +297,7 @@ define([
           Object.keys(standard).forEach(function(standardType) {
             /* eslint default-case: 0 */
             switch(standardType) {
-              case "facets":
+              case "mixins":
               case "filter":
                 return;
             }
@@ -563,23 +563,13 @@ define([
           });
         });
 
-        it("should create accidental types for object specs when configuring a type", function() {
+        it("should have #isConfiguring = true, while configuring a type", function() {
 
           return testGet(function(sync, Context) {
 
             spyOn(Context.prototype, "_getConfig").and.callFake(function(id) {
               if(id === "tests/foo/bar") {
-                return {
-                  props: {
-                    "a": {
-                      type: { // object spec
-                        // NOTE: no need for `isAccident: true`
-                        mixins: ["discreteDomain"],
-                        domain: ["1", "2", "3"]
-                      }
-                    }
-                  }
-                };
+                return {foo: "bar", instance: {bar: "foo"}};
               }
             });
 
@@ -587,81 +577,29 @@ define([
 
             expect(context._configDepth).toBe(0);
 
-            var Complex = context.get("pentaho/type/complex");
-            var Complex2 = Complex.extend({
+            var Value = context.get("pentaho/type/value");
+            var Value2 = Value.extend({
               type: {
-                id: "tests/foo/bar",
-                props: [
-                  {name: "a", type: "string"}
-                ]
+                id: "tests/foo/bar"
               }
             });
 
-            var propA = Complex2.type.get("a");
-            expect(propA.type.isAccident).toBe(false);
+            var ValueType2 = Value2.type.constructor;
 
-            var promise = callGet(context, sync, Complex2);
+            spyOn(ValueType2, "implement").and.callFake(function() {
+
+              expect(context.isConfiguring).toBe(true);
+            });
+
+            var promise = callGet(context, sync, Value2);
 
             return promise.then(function(InstCtor) {
 
-              expect(InstCtor).toBe(Complex2);
+              expect(InstCtor).toBe(Value2);
 
-              propA = Complex2.type.get("a");
+              expect(ValueType2.implement).toHaveBeenCalledTimes(1);
 
-              expect(propA.type.isAccident).toBe(true);
-            });
-          });
-        });
-
-        it("should not create accidental types for object specs having isAccident: false," +
-           " when configuring a type", function() {
-
-          return testGet(function(sync, Context) {
-
-            spyOn(Context.prototype, "_getConfig").and.callFake(function(id) {
-              if(id === "tests/foo/bar") {
-                return {
-                  props: {
-                    "a": {
-                      type: { // object spec
-                        // Just a subtype of string...
-                        isAccident: false
-                      }
-                    }
-                  }
-                };
-              }
-            });
-
-            var context = new Context();
-
-            expect(context._configDepth).toBe(0);
-
-            var Complex = context.get("pentaho/type/complex");
-            var Complex2 = Complex.extend({
-              type: {
-                id: "tests/foo/bar",
-                props: [
-                  {name: "a", type: "string"}
-                ]
-              }
-            });
-
-            var propA = Complex2.type.get("a");
-            var stringType = propA.type;
-
-            expect(propA.type.isAccident).toBe(false);
-
-            var promise = callGet(context, sync, Complex2);
-
-            return promise.then(function(InstCtor) {
-
-              expect(InstCtor).toBe(Complex2);
-
-              propA = Complex2.type.get("a");
-
-              expect(propA.type.isAccident).toBe(false);
-              expect(propA.type.ancestor).toBe(stringType);
+              expect(context.isConfiguring).toBe(false);
             });
           });
         });
@@ -932,8 +870,8 @@ define([
           return testGet(function(sync, Context) {
             var typeSpec = {
               props: [
-                {name: "a", type: {id: "_:ab1", base: "number", label: "My Number"}},
-                {name: "b", type: "_:ab1"}
+                {name: "a", valueType: {id: "_:ab1", base: "number", label: "My Number"}},
+                {name: "b", valueType: "_:ab1"}
               ]
             };
             var context = new Context();
@@ -941,12 +879,12 @@ define([
 
             return promise.then(function(InstCtor) {
               var type = InstCtor.type;
-              var myNumberType = type.get("a").type;
+              var myNumberType = type.get("a").valueType;
 
               expect(myNumberType.ancestor.shortId).toBe("number");
               expect(myNumberType.label).toBe("My Number");
 
-              expect(type.get("b").type).toBe(myNumberType);
+              expect(type.get("b").valueType).toBe(myNumberType);
             });
           });
         });
@@ -956,8 +894,8 @@ define([
           return testGet(function(sync, Context) {
             var typeSpec = {
               props: [
-                {name: "a", type: {id: "_:1", base: "number", label: "My Number"}},
-                {name: "b", type: "_:1"}
+                {name: "a", valueType: {id: "_:1", base: "number", label: "My Number"}},
+                {name: "b", valueType: "_:1"}
               ]
             };
             var context = new Context();
@@ -966,7 +904,7 @@ define([
             return promise.then(function(InstCtor) {
               var type = InstCtor.type;
 
-              expect(type.get("a").type).toBe(type.get("b").type);
+              expect(type.get("a").valueType).toBe(type.get("b").valueType);
             });
           });
         });
@@ -979,8 +917,8 @@ define([
             var typeSpec = {
               id: "_:1",
               props: [
-                {name: "a", type: "string"},
-                {name: "b", type: "string"}
+                {name: "a", valueType: "string"},
+                {name: "b", valueType: "string"}
               ]
             };
             var context = new Context();
@@ -995,8 +933,8 @@ define([
           return testGet(function(sync, Context) {
             var typeSpec = {
               props: [
-                {name: "a", type: {id: "_:1", base: "string"}},
-                {name: "b", type: {id: "_:1", base: "number"}}
+                {name: "a", valueType: {id: "_:1", base: "string"}},
+                {name: "b", valueType: {id: "_:1", base: "number"}}
               ]
             };
             var context = new Context();
@@ -1006,9 +944,9 @@ define([
             return promise.then(function(InstCtor) {
               var type = InstCtor.type;
 
-              expect(type.get("a").type).toBe(type.get("b").type);
+              expect(type.get("a").valueType).toBe(type.get("b").valueType);
 
-              expect(type.get("a").type.ancestor.shortId).toBe("string");
+              expect(type.get("a").valueType.ancestor.shortId).toBe("string");
             });
           });
         });
@@ -1112,7 +1050,7 @@ define([
             });
           }
 
-          function defineTempFacet(mid) {
+          function defineTempMixin(mid) {
             localRequire.define(mid, [], function() {
               return function(context) {
                 return context.get("pentaho/type/value").extend({type: {id: mid}});
@@ -1132,7 +1070,7 @@ define([
           defineTempModule("pentaho/foo/dudu2");
           defineTempModule("pentaho/foo/dudu3");
           defineTempModule("pentaho/foo/dudu4");
-          defineTempFacet("pentaho/foo/facets/Mixin1");
+          defineTempMixin("pentaho/foo/mixins/Mixin1");
           defineTempProp("pentaho/foo/prop1");
 
           // -----
@@ -1141,30 +1079,32 @@ define([
           var spec = {
             base: "complex",
             props: [
-              {name: "foo1", type: "pentaho/foo/dudu1"},
-              {name: "foo2", type: {base: "pentaho/foo/dudu2"}},
-              {name: "foo3", type: {base: "list", of: "pentaho/foo/dudu3"}},
-              {name: "foo4", type: ["pentaho/foo/dudu3"]},
-              {name: "foo7", type: {props: {
-                a: {type: "pentaho/foo/dudu4"},
-                b: {type: "pentaho/foo/dudu3"}
+              {name: "foo1", valueType: "pentaho/foo/dudu1"},
+              {name: "foo2", valueType: {base: "pentaho/foo/dudu2"}},
+              {name: "foo3", valueType: {base: "list", of: "pentaho/foo/dudu3"}},
+              {name: "foo4", valueType: ["pentaho/foo/dudu3"]},
+              {name: "foo7", valueType: {props: {
+                a: {valueType: "pentaho/foo/dudu4"},
+                b: {valueType: "pentaho/foo/dudu3"}
               }}},
-              {name: "foo8", type: {
+              {name: "foo8", valueType: {
                 base: "pentaho/foo/dudu1",
-                mixins: ["pentaho/foo/facets/Mixin1"]
+                mixins: ["pentaho/foo/mixins/Mixin1"]
               }},
-              {name: "foo9", base: "pentaho/foo/prop1", type: "string"}
+              {name: "foo9", base: "pentaho/foo/prop1", valueType: "string"}
             ]
           };
 
           return context.getAsync(spec)
               .then(function(InstCtor) {
-                expect(InstCtor.type.get("foo1").type.id).toBe("pentaho/foo/dudu1");
-                expect(InstCtor.type.get("foo2").type.ancestor.id).toBe("pentaho/foo/dudu2");
-                expect(InstCtor.type.get("foo3").type.of.id).toBe("pentaho/foo/dudu3");
-                expect(InstCtor.type.get("foo7").type.get("a").type.id).toBe("pentaho/foo/dudu4");
-                expect(InstCtor.type.get("foo8").type.mixins[0]).toBe(context.get("pentaho/foo/facets/Mixin1").type);
-                expect(InstCtor.type.get("foo9").isSubtypeOf(context.get("pentaho/foo/prop1").type)).toBe(true);
+                expect(InstCtor.type.get("foo1").valueType.id).toBe("pentaho/foo/dudu1");
+                expect(InstCtor.type.get("foo2").valueType.ancestor.id).toBe("pentaho/foo/dudu2");
+                expect(InstCtor.type.get("foo3").valueType.of.id).toBe("pentaho/foo/dudu3");
+                expect(InstCtor.type.get("foo7").valueType.get("a").valueType.id).toBe("pentaho/foo/dudu4");
+                expect(InstCtor.type.get("foo8").valueType.mixins[0])
+                    .toBe(context.get("pentaho/foo/mixins/Mixin1").type);
+                expect(InstCtor.type.get("foo9").isSubtypeOf(context.get("pentaho/foo/prop1").type))
+                    .toBe(true);
               });
         });
       });

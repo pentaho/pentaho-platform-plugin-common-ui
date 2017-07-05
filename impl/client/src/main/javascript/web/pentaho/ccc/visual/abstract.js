@@ -118,7 +118,7 @@ define([
       type: {
         id: module.id,
         props: {
-          model: {type: modelFactory}
+          model: {valueType: modelFactory}
         }
       },
 
@@ -347,7 +347,8 @@ define([
         if(mapping.attributes.count > 1) return true;
 
         var MeasurementLevel = this.type.context.get(measurementLevelFactory);
-        var level = this.model.get(roleName).levelEffective;
+        var rolePropType = this.model.type.get(roleName);
+        var level = rolePropType.levelEffectiveOn(this.model);
         return !level || MeasurementLevel.type.isQualitative(level);
       },
 

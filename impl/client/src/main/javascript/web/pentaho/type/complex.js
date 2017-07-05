@@ -18,7 +18,7 @@ define([
   "./element",
   "./PropertyTypeCollection",
   "./util",
-  "./ContainerMixin",
+  "./mixins/Container",
   "../lang/ActionResult",
   "../lang/UserError",
   "./changes/ComplexChangeset",
@@ -57,7 +57,7 @@ define([
      * @name pentaho.type.Complex
      * @class
      * @extends pentaho.type.Element
-     * @extends pentaho.type.ContainerMixin
+     * @extends pentaho.type.mixins.Container
      *
      * @amd {pentaho.type.Factory<pentaho.type.Complex>} pentaho/type/complex
      *
@@ -74,9 +74,9 @@ define([
      *     return Complex.extend({
      *       type: {
      *         props: [
-     *           {name: "name", type: "string", label: "Name"},
-     *           {name: "categories", type: ["string"], label: "Categories"},
-     *           {name: "price", type: "number", label: "Price"}
+     *           {name: "name", valueType: "string", label: "Name"},
+     *           {name: "categories", valueType: ["string"], label: "Categories"},
+     *           {name: "price", valueType: "number", label: "Price"}
      *         ]
      *       }
      *     });
@@ -162,7 +162,7 @@ define([
        * We could, however, not addRef is the prop (and, thus, the list) is also isReadOnly?
        *
        * @param {!pentaho.type.Property.Type} propType - The property type.
-       * @param {!pentaho.type.ContainerMixin} value - The container value.
+       * @param {!pentaho.type.mixins.Container} value - The container value.
        *
        * @private
        */
@@ -454,7 +454,7 @@ define([
         });
       },
 
-      // implement abstract pentaho.type.ContainerMixin#_createChangeset
+      // implement abstract pentaho.type.mixins.Container#_createChangeset
       _createChangeset: function(txn) {
         return new ComplexChangeset(txn, this);
       },
@@ -662,7 +662,7 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       isApplicable: function(name) {
-        return this.type.get(name).isApplicableEval(this);
+        return this.type.get(name).isApplicableOn(this);
       },
       // endregion
 
@@ -677,7 +677,7 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       isEnabled: function(name) {
-        return this.type.get(name).isEnabledEval(this);
+        return this.type.get(name).isEnabledOn(this);
       },
       // endregion
 
@@ -692,7 +692,7 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       countRange: function(name) {
-        return this.type.get(name).countRangeEval(this);
+        return this.type.get(name).countRangeOn(this);
       },
       // endregion
 
@@ -710,7 +710,22 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       isRequired: function(name) {
-        return this.type.get(name).countRangeEval(this).min > 0;
+        return this.type.get(name).countRangeOn(this).min > 0;
+      },
+      // endregion
+
+      // region getPropDomain attribute
+      /**
+       * Gets the current list of valid values of a given property.
+       *
+       * @param {string|pentaho.type.Property.Type} [name] The property name or type object.
+       *
+       * @return {Array.<pentaho.type.Element>} An array of elements if the property is constrained; `null` otherwise.
+       *
+       * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
+       */
+      getPropDomain: function(name) {
+        return this.type.get(name).domainOn(this);
       },
       // endregion
       // endregion
@@ -725,7 +740,7 @@ define([
         var noAlias = !!keyArgs.noAlias;
         var declaredType;
         var includeType = !!keyArgs.forceType ||
-              (!!(declaredType = keyArgs.declaredType) && this.type !== declaredType.essence);
+              (!!(declaredType = keyArgs.declaredType) && this.type !== declaredType);
 
         var useArray = !includeType && keyArgs.preferPropertyArray;
         var omitProps;
@@ -764,7 +779,7 @@ define([
 
           var includeValue = includeDefaults;
           if(!includeValue) {
-            var defaultValue = propType.value;
+            var defaultValue = propType.defaultValue;
             // Isn't equal to the default value?
             if(propType.isList) {
               // TODO: This is not perfect... In a way lists are always created by us.
@@ -779,7 +794,7 @@ define([
           if(includeValue) {
             var valueSpec;
             if(value) {
-              keyArgs.declaredType = propType.type;
+              keyArgs.declaredType = propType.valueType;
 
               valueSpec = value.toSpecInContext(keyArgs);
 
@@ -791,11 +806,11 @@ define([
                 if(includeDefaults) {
                   // The default value is better than a `null` that is the result of
                   // a serialization failure...
-                  valueSpec = propType.value;
+                  valueSpec = propType.defaultValue;
                 } else {
                   // Defaults can be omitted as long as complex form is used.
                   // Same value as default?
-                  if(!useArray && valueSpec === propType.value) return;
+                  if(!useArray && valueSpec === propType.defaultValue) return;
 
                   valueSpec = null;
                 }
@@ -974,7 +989,7 @@ define([
          *
          * The default implementation
          * validates each property's value against
-         * the property's [type]{@link pentaho.type.Property.Type#type}
+         * the property's [valueType]{@link pentaho.type.Property.Type#valueType}
          * and collects and returns any reported errors.
          * Override to complement with a type's specific validation logic.
          *
@@ -983,7 +998,7 @@ define([
          *
          * @param {!pentaho.type.Value} value - The value to validate.
          *
-         * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
+         * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
          *
          * @protected
          */
@@ -991,7 +1006,7 @@ define([
           var errors = null;
 
           this.each(function(pType) {
-            errors = typeUtil.combineErrors(errors, pType.validateOwner(value));
+            errors = typeUtil.combineErrors(errors, pType.validateOn(value));
           });
 
           return errors;
@@ -1038,7 +1053,7 @@ define([
          *
          * @return {!pentaho.type.Complex} This object.
          */
-        eachAssignableFrom: function(otherType, fun, ctx) {
+        eachCommonWith: function(otherType, fun, ctx) {
           var lca;
           if(otherType.isComplex && (lca = O.lca(this, otherType)) && lca.isComplex) {
 
@@ -1047,17 +1062,16 @@ define([
               var localPropType = this.get(name);
 
               /* A property is yielded if the value-type of the other type's property is a subtype of
-               * (is assignable to) the value-type of the local property.
+               * the value-type of the local property.
+               *
+               *  var otherPropType = otherType.get(name);
+               *
+               * // assert basePropType === O.lca(localPropType, otherPropType)
+               *
+               * if(otherPropType.type.isSubtypeOf(localPropType.type))
                */
-              var otherPropType = otherType.get(name);
-
-              // assert basePropType === O.lca(localPropType, otherPropType)
-
-              if(otherPropType.type.essence.isSubtypeOf(localPropType.type.essence)) {
-                if(fun.call(ctx, localPropType, i, this) === false) {
-                  return false;
-                }
-              }
+              if(fun.call(ctx, localPropType, i, this) === false)
+                return false;
 
             }, this);
           }

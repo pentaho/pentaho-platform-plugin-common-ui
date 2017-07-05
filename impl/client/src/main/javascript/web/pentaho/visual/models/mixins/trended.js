@@ -36,21 +36,21 @@ define([
         props: [
           {
             name: "trendType",
-            type: trendTypeFactory,
+            valueType: trendTypeFactory,
             isRequired: true,
-            value: "none"
+            defaultValue: "none"
           },
           {
             name: "trendName",
-            type: "string",
+            valueType: "string",
             isApplicable: isApplicableTrend
           },
           {
             name: "trendLineWidth",
-            type: lineWidthFactory,
+            valueType: lineWidthFactory,
             isApplicable: isApplicableTrend,
             isRequired: true,
-            value: 1
+            defaultValue: 1
           }
         ]
       }

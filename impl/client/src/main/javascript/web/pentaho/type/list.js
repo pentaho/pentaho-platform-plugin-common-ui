@@ -15,7 +15,7 @@
  */
 define([
   "module",
-  "./ContainerMixin",
+  "./mixins/Container",
   "./changes/ListChangeset",
   "./value",
   "./element",
@@ -51,7 +51,7 @@ define([
      * @memberOf pentaho.type
      * @class
      * @extends pentaho.type.Value
-     * @extends pentaho.type.ContainerMixin
+     * @extends pentaho.type.mixins.Container
      *
      * @amd {pentaho.type.Factory<pentaho.type.List>} pentaho/type/list
      *
@@ -576,7 +576,7 @@ define([
       },
 
       // region Core change methods
-      // implement abstract pentaho.type.ContainerMixin#_createChangeset
+      // implement abstract pentaho.type.mixins.Container#_createChangeset
       _createChangeset: function(txn) {
         return new ListChangeset(txn, this);
       },
@@ -600,8 +600,7 @@ define([
         // Capture now, before using it below for the elements.
         var listType = this.type;
         var declaredType;
-        var includeType = !!keyArgs.forceType ||
-              (!!(declaredType = keyArgs.declaredType) && listType !== declaredType.essence);
+        var includeType = !!keyArgs.forceType || (!!(declaredType = keyArgs.declaredType) && listType !== declaredType);
 
         var elemSpecs;
 
@@ -609,7 +608,7 @@ define([
           // reset
           keyArgs.forceType = false;
 
-          var elemType = listType.of.essence;
+          var elemType = listType.of;
 
           elemSpecs = this.toArray(function(elem) {
             keyArgs.declaredType = elemType; // JIC it is changed by elem.toSpecInContext
@@ -721,15 +720,13 @@ define([
          *
          * @param {!pentaho.type.Value} value - The value to validate.
          *
-         * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
+         * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
          *
          * @protected
          */
         _validate: function(value) {
-          var elemType = this.of;
-
           return value._projectedMock._elems.reduce(function(errors, elem) {
-            return typeUtil.combineErrors(errors, elemType.mostSpecific(elem.type)._validate(elem));
+            return typeUtil.combineErrors(errors, elem.validate());
           }, null);
         },
         // endregion

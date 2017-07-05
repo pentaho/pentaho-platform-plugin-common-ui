@@ -156,7 +156,7 @@ define([
     /**
      * Gets the `ChangeRef` for the given container, creating one if necessary.
      *
-     * @param {pentaho.type.ContainerMixin} container - The container.
+     * @param {pentaho.type.mixins.Container} container - The container.
      *
      * @return {!pentaho.type.changes.ChangeRef} The corresponding `ChangeRef`.
      *

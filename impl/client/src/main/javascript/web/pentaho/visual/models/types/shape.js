@@ -24,12 +24,11 @@ define([
 
     var PentahoString = context.get("string");
 
-    return PentahoString.refine({
-
+    return PentahoString.extend({
       type: {
         id: module.id,
-        mixins: ["discreteDomain"],
-        domain:  ["none", "circle", "cross", "diamond", "square", "triangle"]
+        mixins: ["enum"],
+        domain: ["none", "circle", "cross", "diamond", "square", "triangle"]
       }
     })
     .implement({type: bundle.structured.shape});

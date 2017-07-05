@@ -24,11 +24,10 @@ define([
 
     var PentahoNumber = context.get("number");
 
-    return PentahoNumber.refine({
-
+    return PentahoNumber.extend({
       type: {
         id: module.id,
-        mixins: ["discreteDomain"],
+        mixins: ["enum"],
         domain: [1, 2, 3, 4, 5, 6, 7, 8]
       }
     })

@@ -32,7 +32,7 @@ define([
 
       DerivedComplex = context.get({
         props: [
-          {name: "foo", type: "number"}
+          {name: "foo", valueType: "number"}
         ]
       });
       ComplexList = context.get([DerivedComplex]);

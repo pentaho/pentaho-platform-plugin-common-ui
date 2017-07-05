@@ -168,7 +168,12 @@ define([
       }
 
       // Replace with overridden property.
-      return existing.extendProto(spec, ka);
+      var Existing = existing.instance.constructor;
+      var Replacement = Existing.extend({
+        type: spec
+      }, null, ka);
+
+      return Replacement.type;
     },
 
     /**
@@ -201,12 +206,13 @@ define([
       ka.index = index;
       ka.isRoot = true;
 
-      var propType = basePropType.extendProto(spec, ka);
+      var BaseProp = basePropType.instance.constructor;
+      var Prop = BaseProp.extend({type: spec}, null, ka);
 
       ka.index = -1;
       ka.isRoot = false;
 
-      return propType;
+      return Prop.type;
     },
     // endregion
 

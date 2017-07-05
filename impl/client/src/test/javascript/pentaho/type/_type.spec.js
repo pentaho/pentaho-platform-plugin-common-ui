@@ -821,10 +821,10 @@ define([
 
       it("should default to the id of the type, in snake case, when the type is not anonymous", function() {
         var Derived = Instance.extend({
-            type: {
-              id: "foo/bar"
-            }
-          });
+          type: {
+            id: "foo/bar"
+          }
+        });
 
         expect(Derived.type.styleClass).toBe("foo-bar");
       });
@@ -1137,13 +1137,6 @@ define([
         Derived.extend();
         expect(Derived.type.hasDescendants).toBe(true);
       });
-
-      it("returns true if the type has been extended using .type.extendProto(...)", function() {
-        var Derived = Instance.extend();
-
-        Derived.type.extendProto();
-        expect(Derived.type.hasDescendants).toBe(true);
-      });
     }); // #hasDescendants
 
     describe("#isList", function() {
@@ -1431,7 +1424,7 @@ define([
                 type: {
                   id: "test/foo/a",
                   props: {
-                    a: {type: "string"}
+                    a: {valueType: "string"}
                   }
                 }
               });
@@ -1447,7 +1440,7 @@ define([
                 type: {
                   id: "test/foo/b",
                   props: {
-                    b: {type: "string"}
+                    b: {valueType: "string"}
                   }
                 }
               });
@@ -1463,7 +1456,7 @@ define([
                 type: {
                   id: "test/foo/c",
                   props: {
-                    c: {type: "string"}
+                    c: {valueType: "string"}
                   }
                 }
               });
@@ -1480,8 +1473,8 @@ define([
             _: [
               {
                 props: [
-                  {name: "x", type: "test/foo/a"},
-                  {name: "y", type: "test/foo/b"}
+                  {name: "x", valueType: "test/foo/a"},
+                  {name: "y", valueType: "test/foo/b"}
                 ]
               }
             ],
@@ -1511,7 +1504,7 @@ define([
         expect(SubInstance.type.is(new SubInstance())).toBe(true);
       });
 
-      it("detects that an instance of another Instance class is not of the type ", function() {
+      it("detects that an instance of another Instance class is not of the type", function() {
         var SubInstance1 = Instance.extend();
         var SubInstance2 = Instance.extend();
 
@@ -1524,7 +1517,7 @@ define([
           null, undefined,
           {}, [],
           new Date(),
-          (function() { return this; }()) // global object
+          (function() { return this; })() // global object
         ].forEach(function(obj) {
           expect(Instance.type.is(obj)).toBe(false);
         });
@@ -1537,27 +1530,16 @@ define([
         expect(Instance.type.to(inst)).toBe(inst);
       });
 
-      it("calls #create(value) and returns its result " +
-          "when value is not an instance and type does not have an own constructor", function() {
-        var createSpy = jasmine.createSpy();
-        var SubInstance = Instance.extend({
-          type: {
-            get context() {
-              return {
-                create: createSpy
-              };
-            }
-          }
-        });
+      it("calls #create(value) and returns its result when value is not an instance of the type", function() {
+        var SubInstance = Instance.extend();
 
-        var subSubType = SubInstance.type.extendProto();
-        spyOn(subSubType, "create").and.callThrough();
+        spyOn(SubInstance.type, "create").and.callThrough();
 
         var value = {};
-        subSubType.to(value);
+        var subInst = SubInstance.type.to(value);
 
-        expect(createSpy).not.toHaveBeenCalled();
-        expect(subSubType.create).toHaveBeenCalledWith(value, undefined);
+        expect(subInst instanceof SubInstance).toBe(true);
+        expect(SubInstance.type.create).toHaveBeenCalledWith(value, undefined);
       });
 
       it("casts a nully into `null`", function() {
@@ -1585,40 +1567,6 @@ define([
         var SubType1 = Instance.extend();
         var SubType2 = Instance.extend();
         expect(SubType1.type.isSubtypeOf(SubType2.type)).toBe(false);
-      });
-    });
-
-    describe("#extendProto(typeSpec, keyArgs)", function() {
-      var derivedProto;
-      beforeEach(function() {
-        derivedProto = Instance.type.extendProto({}, {});
-      });
-
-      it("derived classes have the proper 'ancestor'", function() {
-        expect(derivedProto).not.toBe(Instance.type);
-        expect(derivedProto.ancestor).toBe(Instance.type);
-      });
-
-      it("can be invoked without arguments", function() {
-        expect(Instance.type.extendProto().ancestor).toBe(Instance.type);
-        expect(Instance.type.extendProto(null).ancestor).toBe(Instance.type);
-        expect(Instance.type.extendProto(null, {}).ancestor).toBe(Instance.type);
-      });
-
-      it("does not return a constructor", function() {
-        expect(typeof derivedProto).not.toBe("function");
-      });
-
-      it("returns an instance whose constructor is the same as the extended class", function() {
-        expect(derivedProto.constructor).toBe(Instance.type.constructor);
-      });
-
-      it("accepts keyArgs", function() {
-        var derivedType = Instance.type.extendProto({}, {
-          isRoot: true
-        });
-        expect(Instance.type.isRoot).toBe(false);
-        expect(derivedType.isRoot).toBe(true);
       });
     });
 
@@ -1653,6 +1601,24 @@ define([
               type: {
                 id: "tests/mixins/B",
                 testMethodB: function() {}
+              }
+            });
+          };
+        });
+
+        localRequire.define("tests/mixins/C", ["pentaho/type/value"], function(valueFactory) {
+
+          return function(context) {
+
+            var Value = context.get(valueFactory);
+
+            return Value.extend({
+              type: {
+                id: "tests/mixins/C",
+                _init: function(spec, ka) {
+                  this.base(spec, ka);
+                  this.__hasBeenInInit = true;
+                }
               }
             });
           };
@@ -1910,6 +1876,74 @@ define([
 
             expect(mixins[0].instance.constructor).toBe(MixinA);
             expect(mixins[1].instance.constructor).toBe(MixinB);
+          });
+        });
+
+        it("should ignore a nully value", function() {
+
+          return require.using([
+            "pentaho/type/Context",
+            "tests/mixins/A"
+          ], defineSampleMixins, function(Context, mixinFactoryA) {
+
+            var context = new Context();
+            var Value = context.get("pentaho/type/value");
+
+            var DerivedValue = Value.extend({
+              type: {
+                mixins: null
+              }
+            });
+
+            expect(DerivedValue.type.mixins).toEqual([]);
+
+            // ---
+
+            DerivedValue = Value.extend({
+              type: {
+                mixins: undefined
+              }
+            });
+
+            expect(DerivedValue.type.mixins).toEqual([]);
+
+            // ---
+
+            DerivedValue = Value.extend({
+              type: {
+                mixins: [mixinFactoryA]
+              }
+            });
+
+            DerivedValue.type.mixins = null;
+
+            expect(DerivedValue.type.mixins.length).toBe(1);
+
+            // ---
+
+            DerivedValue.type.mixins = undefined;
+
+            expect(DerivedValue.type.mixins.length).toBe(1);
+          });
+        });
+
+        it("should allow overriding the Type#_init method from a mixin", function() {
+
+          return require.using([
+            "pentaho/type/Context",
+            "tests/mixins/C"
+          ], defineSampleMixins, function(Context, mixinFactoryC) {
+
+            var context = new Context();
+            var Value = context.get("pentaho/type/value");
+
+            var DerivedValue = Value.extend({
+              type: {
+                mixins: [mixinFactoryC]
+              }
+            });
+
+            expect(DerivedValue.type.__hasBeenInInit).toBe(true);
           });
         });
       });

@@ -26,6 +26,8 @@ define([
 
     var BaseModel = context.get(baseModelFactory);
 
+    var operDomain = bundle.structured.operation.domain;
+
     /**
      * @name pentaho.visual.samples.calc.Model
      * @class
@@ -42,31 +44,30 @@ define([
         props: [
           {
             name: "levels",
-            type: {
-              base: "pentaho/visual/role/nominal",
-              props: {attributes: {isRequired: true}}
-            }
+            base: "pentaho/visual/role/property",
+            levels: ["nominal"],
+            attributes: {isRequired: true}
           },
           {
             name: "measure",
-            type: {
-              base: "pentaho/visual/role/quantitative",
-              props: {attributes: {countMin: 1, countMax: 1}}
-            }
+            base: "pentaho/visual/role/property",
+            levels: ["quantitative"],
+            attributes: {countMin: 1, countMax: 1}
           },
           {
             name: "operation",
-            type: {
-              base: "string",
-              isAccident: true,
-              mixins: ["discreteDomain"],
-              domain: ["min", "max", "avg", "sum"]
-            },
-            value: "min"
+            valueType: "string",
+            domain: [
+              {v: "min", f: operDomain.min.f},
+              {v: "max", f: operDomain.max.f},
+              {v: "avg", f: operDomain.avg.f},
+              {v: "sum", f: operDomain.sum.f}
+            ],
+            defaultValue: "min"
           }
         ]
       }
     })
-    .implement({type: bundle.structured});
+    .implement({type: bundle.structured.type});
   };
 });

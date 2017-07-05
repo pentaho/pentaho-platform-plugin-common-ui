@@ -69,8 +69,54 @@ define([
      */
     var Type = Base.extend("pentaho.type.Type", /** @lends pentaho.type.Type# */{
 
+      /* Mixins are mixed before anything else, so that they are applied and serve as a base implementation. */
+      extend_order: ["mixins"],
+
       constructor: function(spec, keyArgs) {
         if(!spec) spec = {};
+
+        // Anticipate required initialization.
+        O.setConst(this, "uid", _nextUid++);
+
+        // Bind
+        var instance = arg.required(keyArgs, "instance", "keyArgs");
+        O.setConst(instance, "_type", this);
+        O.setConst(this, "_instance", instance);
+
+        if(arg.optional(keyArgs, "isRoot"))
+          O.setConst(this, "root", this);
+
+        // ----
+        // excluded from extend: id, sourceId, alias and isAbstract
+        // are here handled one by one.
+
+        var id = nonEmptyString(spec.id);
+        // Is it a temporary id? If so, ignore it.
+        if(SpecificationContext.isIdTemporary(id)) id = null;
+
+        var sourceId = nonEmptyString(spec.sourceId);
+        if(!sourceId) sourceId = id;
+        else if(!id) id = sourceId;
+
+        var alias = nonEmptyString(spec.alias);
+        if(alias != null && id == null) throw error.argInvalid("alias", "Anonymous types cannot have an alias");
+
+        O.setConst(this, "_id", id);
+        O.setConst(this, "_sourceId", sourceId);
+        O.setConst(this, "_alias", alias);
+        O.setConst(this, "_isAbstract", !!spec.isAbstract);
+
+        // ---
+
+        // Anticipate mixins handling cause, otherwise, `_init` would not be overridable by mixins.
+        if(spec.mixins) {
+          this.mixins = spec.mixins;
+          // Prevent being applied again.
+          spec = Object.create(spec);
+          spec.mixins = undefined;
+        }
+
+        // ---
 
         this._init(spec, keyArgs);
 
@@ -101,37 +147,6 @@ define([
        * @overridable
        */
       _init: function(spec, keyArgs) {
-
-        O.setConst(this, "uid", _nextUid++);
-
-        // Bind
-        var instance = arg.required(keyArgs, "instance", "keyArgs");
-        O.setConst(instance, "_type", this);
-        O.setConst(this, "_instance", instance);
-
-        if(arg.optional(keyArgs, "isRoot"))
-          O.setConst(this, "root", this);
-
-        // ----
-        // excluded from extend: id, sourceId and isAbstract
-        // are here handled one by one.
-
-        var id = nonEmptyString(spec.id);
-        // Is it a temporary id? If so, ignore it.
-        if(SpecificationContext.isIdTemporary(id)) id = null;
-
-        var sourceId = nonEmptyString(spec.sourceId);
-        if(!sourceId) sourceId = id;
-        else if(!id) id = sourceId;
-
-        var alias = nonEmptyString(spec.alias);
-        if(alias != null && id == null) throw error.argInvalid("alias", "Anonymous types cannot have an alias");
-
-        O.setConst(this, "_id", id);
-        O.setConst(this, "_sourceId", sourceId);
-        O.setConst(this, "_alias", alias);
-        O.setConst(this, "_isAbstract", !!spec.isAbstract);
-
         // Block inheritance, with default values
 
         // Don't use inherited property definition which may be writable false
@@ -372,67 +387,6 @@ define([
        */
       get isSimple() { return false; },
       // endregion
-
-      // region essence
-      /**
-       * Gets the essential type of this type, possibly itself.
-       *
-       * A non-essential type is an accidental type, or an _accident_.
-       * Only subtypes of [Value]{@link pentaho.type.Value} can be accidental types.
-       * Accidental types are _abstract_ types
-       * that restrict, or, can also be said, refine, a base type,
-       * which can be either essential or accidental,
-       * without changing its _essence_.
-       *
-       * An accidental type can only specialize its _type class_.
-       * Its instance constructor always returns direct instances
-       * of the essence type and its instance prototype cannot be extended.
-       *
-       * An accidental type is defined by calling
-       * the [refine]{@link pentaho.type.Value.refine} method of
-       * a `Value` base type's instance constructor,
-       * which can be either essential or accidental.
-       * Alternatively, if the base type is already an accidental type,
-       * calling [extend]{@link pentaho.type.Value.extend} on its
-       * instance constructor is equivalent, and
-       * refines the underlying essence further.
-       *
-       * @type {!pentaho.type.Type}
-       * @readOnly
-       *
-       * @see pentaho.type.Type#isEssence
-       * @see pentaho.type.Type#isAccident
-       * @see pentaho.type.Value.refine
-       * @see pentaho.type.Value.extend
-       */
-      get essence() {
-        return this;
-      },
-
-      /**
-       * Gets a value that indicates if this type is an essential type.
-       *
-       * @type {boolean}
-       * @readOnly
-       *
-       * @see pentaho.type.Type#essence
-       */
-      get isEssence() {
-        return true;
-      },
-
-      /**
-       * Gets a value that indicates if this type is an accidental type.
-       *
-       * @type {boolean}
-       * @readOnly
-       *
-       * @see pentaho.type.Type#essence
-       */
-      get isAccident() {
-        return false;
-      },
-      // endregion
       // endregion
 
       // region id, sourceId and alias properties
@@ -596,48 +550,42 @@ define([
       get isAbstract() {
         return this._isAbstract;
       },
-
-      /**
-       * Gets a value that indicates if this type is abstract because it is implied by other properties
-       * and not by specification.
-       *
-       * The default implementation returns `false`.
-       *
-       * Override and return `true`,
-       * to avoid serializing the `isAbstract` attribute when it is implied.
-       *
-       * @type {boolean}
-       * @readOnly
-       *
-       * @protected
-       */
-      get _isAbstractImplied() {
-        return false;
-      },
       // endregion
 
       // region mixins property
       /**
        * Gets or sets the mixin types that are locally mixed into this type.
        *
-       * Can be set to either type identifiers, instance classes or type instances.
+       * Can be set to either type identifiers, instance classes or type instances and arrays thereof.
        *
        * The attributes defined by the added mixin types become available for
        * extension/configuration on this type.
+       * When extending, mixins are always applied first.
+       *
+       * When set to a {@link Nully} value, nothing is done.
        *
        * @type Array.<pentaho.type.Type>
        */
       get mixins() {
-        var mixinClasses = this.instance.constructor.mixins;
-        if(!mixinClasses) return [];
+        // NOTE: for lightweight types, mixins would be inherited, if getOwn were not used.
+        var OwnCtor = O.getOwn(this.instance, "constructor");
+        if(OwnCtor) {
+          var mixinClasses = OwnCtor.mixins;
+          if(mixinClasses) {
+            return mixinClasses
+              .map(function(Mixin) { return Mixin.type; })
+              .filter(function(type) { return type instanceof Type; });
+          }
+        }
 
-        return mixinClasses
-          .map(function(Mixin) { return Mixin.type; })
-          .filter(function(type) { return type instanceof Type; });
+        return [];
       },
 
       // for configuration only
       set mixins(values) {
+
+        if(!values) return;
+
         var Instance = this.instance.constructor;
 
         // Add new mixins from values
@@ -1114,47 +1062,6 @@ define([
       },
       // endregion
 
-      /**
-       * Creates a subtype of this one.
-       *
-       * This method creates a subtype that does not have own instance or type constructors.
-       * The base type's instance and type constructors are used to _initialize_ instances and the type.
-       *
-       * To create a type with own constructors,
-       * extend from the base instance constructor instead,
-       * by calling its `extend` method.
-       *
-       * @param {object} [typeSpec] The new type specification.
-       * @param {object} [keyArgs] Keyword arguments.
-       *
-       * @return {pentaho.type.Type} The created subtype.
-       */
-      extendProto: function(typeSpec, keyArgs) {
-        if(!typeSpec) typeSpec = {};
-
-        var baseInstProto = this.instance;
-
-        // INSTANCE I
-        var instProto = Object.create(baseInstProto);
-
-        // TYPE
-        O.setConst(this, "_hasDescendants", true);
-
-        var type = Object.create(this);
-
-        var ka = keyArgs ? Object.create(keyArgs) : {};
-        ka.instance = instProto;
-        ka.exclude  = {instance: 1};
-
-        // NOTE: `type.constructor` is still the "base" constructor.
-        type.constructor(typeSpec, ka);
-
-        // INSTANCE II
-        instProto.extend(typeSpec && typeSpec.instance, {exclude: {type: 1}});
-
-        return type;
-      },
-
       // region creation
       /**
        * Creates an instance of this type, given an instance specification.
@@ -1182,7 +1089,7 @@ define([
        *
        *   var product = Value.type.create({
        *         _: {
-       *           props: ["id", "name", {name: "price", type: "number"}]
+       *           props: ["id", "name", {name: "price", valueType: "number"}]
        *         },
        *
        *         id:    "mpma",
@@ -1206,7 +1113,7 @@ define([
        *
        *   var productList = Value.type.create({
        *         _: [{
-       *           props: ["id", "name", {name: "price", type: "number"}]
+       *           props: ["id", "name", {name: "price", valueType: "number"}]
        *         }],
        *
        *         d: [
@@ -1231,7 +1138,7 @@ define([
        *           props: [
        *             "id",
        *             "name",
-       *             {name: "price", type: "number"}
+       *             {name: "price", valueType: "number"}
        *           ]
        *         }]);
        *
@@ -1273,11 +1180,11 @@ define([
 
           Instance = context.get(typeSpec);
 
-          instType = this._assertSubtype(Instance.type).essence;
+          instType = this._assertSubtype(Instance.type);
 
           if(instType.isAbstract) instType._throwAbstractType();
 
-        } else if(this.essence.isAbstract) {
+        } else if(this.isAbstract) {
 
           /* eslint default-case: 0 */
           switch(typeof instSpec) {
@@ -1292,16 +1199,7 @@ define([
           if(!Instance) this._throwAbstractType();
 
         } else {
-          // Does this type have an own constructor?
-          var baseInst = this.instance;
-
-          Instance = baseInst.constructor;
-
-          if(Instance.prototype !== baseInst) {
-            // Type was created through extendProto.
-            var inst = Object.create(baseInst);
-            return Instance.apply(inst, arguments) || inst;
-          }
+          Instance = this.instance.constructor;
         }
 
         return O.make(Instance, arguments);
@@ -1398,13 +1296,13 @@ define([
       // endregion
 
       /**
-       * Determines if a value is an instance of this type's **essence**.
+       * Determines if a value is an instance of this type.
        *
        * @param {?any} value - The value to test.
        * @return {boolean} `true` if the value is an instance of this type; `false`, otherwise.
        */
       is: function(value) {
-        return O_isProtoOf.call(this.essence.instance, value);
+        return O_isProtoOf.call(this.instance, value);
       },
 
       /**
@@ -1417,16 +1315,6 @@ define([
        */
       isSubtypeOf: function(superType) {
         return !!superType && (superType === this || O_isProtoOf.call(superType, this));
-      },
-
-      /**
-       * Returns the most specific type, between this and the given type.
-       *
-       * @param {!pentaho.type.Type} otherType - The other type.
-       * @return {!pentaho.type.Type} The most specific type.
-       */
-      mostSpecific: function(otherType) {
-        return this.isSubtypeOf(otherType) ? this : otherType;
       },
 
       // TODO: is conversion always successful? If so, should it be?
@@ -1561,7 +1449,7 @@ define([
         // TODO: if sourceId is not serialized, defaultView looses the relative reference.
 
         // Custom attributes
-        if(!this._isAbstractImplied && this.isAbstract) {
+        if(this.isAbstract) {
           any = true;
           spec.isAbstract = true;
         }
@@ -1581,11 +1469,9 @@ define([
         // Normal attributes
         _normalAttrNames.forEach(function(name) {
           var _name = "_" + name;
-          var v;
-          // !== undefined ensures refinement fields are well handled as well
-          if(O.hasOwn(this, _name) && (v = this[_name]) !== undefined) {
+          if(O.hasOwn(this, _name)) {
             any = true;
-            spec[name] = v;
+            spec[name] = this[_name];
           }
         }, this);
 
@@ -1602,6 +1488,11 @@ define([
             any = true;
             spec.defaultView = defaultView;
           }
+        }
+
+        // Dynamic attributes
+        if(this.__fillSpecInContextDynamicAttributes(spec, keyArgs)) {
+          any = true;
         }
 
         return any;
@@ -1675,6 +1566,10 @@ define([
       },
 
       // region dynamic & monotonic attributes
+
+      // Infos of attributes declared locally in this type.
+      __dynamicAttrInfos: null,
+
       /*
        * Defines dynamic, monotonic, inherited attributes of the type.
        *
@@ -1703,22 +1598,34 @@ define([
       _defineDynamicAttribute: function(name, spec) {
         var cast = spec.cast; // Monotonicity
         // * minimum/default/neutral value
-        var dv = castAndNormalize(spec.value, cast, null); // * effective/monotone value function
+
         var monotoneCombineEvals = spec.combine;
-        var namePriv = "_" + name;
-        var namePrivEval = namePriv + "Eval";
+        var namePriv = "__" + name;
+        var namePrivEval = namePriv + "On";
         var root = this;
 
+        // Register in local dynamic attributes.
+        var dynAttrInfos = O.getOwn(root, "__dynamicAttrInfos");
+        if(!dynAttrInfos) {
+          dynAttrInfos = root.__dynamicAttrInfos = [];
+        }
+        dynAttrInfos.push({
+          name: name,
+          spec: spec
+        });
+
+        var dv;
         (function() {
           dv = spec.value;
 
           var fValue;
           if(F.is(dv)) {
             fValue = dv;
-            if(cast) fValue = wrapWithCast(fValue, cast, null);
+            dv = null;
+            if(cast) fValue = wrapWithCast.call(root, fValue, cast, dv);
           } else {
             // When cast failure is found at static time, we ignore the local value.
-            dv = castAndNormalize(dv, cast, null);
+            dv = castAndNormalize.call(root, dv, cast, null);
             fValue = F.constant(dv);
           }
 
@@ -1764,10 +1671,10 @@ define([
             var fValue;
             if(F.is(value)) {
               fValue = value;
-              if(cast) fValue = wrapWithCast(fValue, cast, dv);
+              if(cast) fValue = wrapWithCast.call(this, fValue, cast, dv);
             } else {
               // When cast failure is found at static time, we ignore the local value.
-              value = castAndNormalize(value, cast, null);
+              value = castAndNormalize.call(this, value, cast, null);
               if(value == null) return;
 
               fValue = F.constant(value);
@@ -1789,10 +1696,68 @@ define([
           }
         });
 
-        // Handles passing the `owner` argument to the `this` context of the private eval method.
-        this[name + "Eval"] = function(owner) {
-          return this[namePrivEval].call(owner);
+        // Handles passing the `owner` argument to the `this` context of the private eval method,
+        // and the `this` context to the first argument...
+        root[name + "On"] = function(owner) {
+          return this[namePrivEval].call(owner, this);
         };
+      },
+
+      /**
+       * Fills the given specification with this type's dynamic attributes' local values,
+       * and returns whether any dynamic attribute was actually added.
+       *
+       * This method requires that there currently exists an
+       * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
+       *
+       * This method calls the base implementation.
+       * Then, it calls
+       * [__fillSpecInContextDynamicAttribute]{@link pentaho.type.Type#__fillSpecInContextDynamicAttribute}
+       * for each locally registered dynamic attribute.
+       *
+       * @param {!Object} spec - The specification to be filled.
+       * @param {Object} [keyArgs] The keyword arguments object.
+       * Passed to every type and instance serialized within this scope.
+       *
+       * @return {boolean} Returns `true` if the dynamic attribute was added; `false`, otherwise.
+       *
+       * @private
+       *
+       * @see pentaho.type.Type#_fillSpecInContext
+       * @see pentaho.type.Type#__fillSpecInContextDynamicAttribute
+       */
+      __fillSpecInContextDynamicAttributes: function(spec, keyArgs) {
+
+        var any = false;
+        var type = this;
+
+        fillSpecRecursive(type);
+
+        return any;
+
+        function fillSpecRecursive(declaringType) {
+
+          if(!declaringType) return;
+
+          if(declaringType !== _type) {
+            // ancestor, in properties, wouldn't reach _type.
+            fillSpecRecursive(Object.getPrototypeOf(declaringType));
+          }
+
+          var dynAttrInfos = O.getOwn(declaringType, "__dynamicAttrInfos");
+          if(dynAttrInfos) {
+            dynAttrInfos.forEach(function(info) {
+              if(type.__fillSpecInContextDynamicAttribute(spec,
+                      info.name,
+                      info.spec.group,
+                      info.spec.localName,
+                      info.spec.toSpec,
+                      keyArgs)) {
+                any = true;
+              }
+            });
+          }
+        }
       },
 
       /**
@@ -1804,31 +1769,49 @@ define([
        *
        * @param {!Object} spec - The specification to be filled.
        * @param {string} name - The name of the dynamic attribute.
+       * @param {string} group - The group name of the dynamic attribute.
+       * @param {string} localName - The name of the dynamic attribute within the group.
+       * @param {function(any, object) : any} toSpec - The custom serialization method of the dynamic attribute, if any,
+       * is called to serialize a specified value of the dynamic attribute.
+       * The method is called with the value and the keyArgs as arguments and with the property type as
+       * the `this` context and should return the serialized value.
        * @param {Object} [keyArgs] The keyword arguments object.
        * Passed to every type and instance serialized within this scope.
        *
        * @return {boolean} Returns `true` if the dynamic attribute was added; `false`, otherwise.
        *
-       * @protected
-       * @ignore
+       * @private
        *
        * @see pentaho.type.Type#_fillSpecInContext
+       * @see pentaho.type.Type#__fillSpecInContextDynamicAttributes
        */
-      _fillSpecInContextDynamicAttribute: function(spec, name, keyArgs) {
+      __fillSpecInContextDynamicAttribute: function(spec, name, group, localName, toSpec, keyArgs) {
 
-        var namePriv = "_" + name;
+        var namePriv = "__" + name;
         var any = false;
 
-        if(O.hasOwn(this, namePriv)) {
-          var value = this[namePriv];
+        var value = O.getOwn(this, namePriv);
+        if(value != null) {
+          var valueSpec;
           if(F.is(value)) {
             if(!keyArgs.isJson) {
               any = true;
-              spec[name] = value.valueOf();
+              valueSpec = value.valueOf();
             }
           } else {
             any = true;
-            spec[name] = value;
+            valueSpec = toSpec ? toSpec.call(this, value, keyArgs) : value;
+          }
+
+          if(any) {
+            var groupSpec;
+            if(group) {
+              groupSpec = spec[group] || (spec[group] = {});
+            } else {
+              groupSpec = spec;
+            }
+
+            groupSpec[localName || name] = valueSpec;
           }
         }
 
@@ -1883,22 +1866,33 @@ define([
     return value == null ? null : (String(value) || null);
   }
 
-  function castAndNormalize(v, cast, dv) {
-    if(v == null) {
-      v = dv;
+  /*
+   * @this {pentaho.type.Property.Type}
+   */
+  function castAndNormalize(value, cast, defaultValue) {
+    if(value == null) {
+      value = defaultValue;
     } else if(cast) {
-      v = cast(v, dv);
-      if(v == null)
-        v = dv;
+      value = cast.call(this, value, defaultValue);
+      if(value == null)
+        value = defaultValue;
     }
 
-    return v;
+    return value;
   }
 
-  function wrapWithCast(fun, cast, dv) {
-    return function() {
-      var v = fun.apply(this, arguments);
-      return castAndNormalize(v, cast, dv);
+  /*
+   * @this {pentaho.type.Property.Type}
+   */
+  function wrapWithCast(fun, cast, defaultValue) {
+    /*
+     * @type {pentaho.type.PropertyDynamicAttribute}
+     */
+    return function(propType) {
+
+      var value = fun.apply(this, arguments);
+
+      return castAndNormalize.call(propType, value, cast, defaultValue);
     };
   }
 

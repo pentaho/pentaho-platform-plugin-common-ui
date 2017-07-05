@@ -33,7 +33,7 @@ define([
       type: {
         id: module.id,
         props: {
-          model: {type: modelFactory}
+          model: {valueType: modelFactory}
         }
       },
 
@@ -158,7 +158,7 @@ define([
       },
 
       _configureDisplayUnits: function() {
-        var displayUnitsType = this.model.type.get("displayUnits", true).type;
+        var displayUnitsType = this.model.type.get("displayUnits", true).valueType;
         var displayUnits = this.model.displayUnits;
         var scaleFactor = displayUnitsType.scaleFactorOf(displayUnits);
         if(scaleFactor > 1) {

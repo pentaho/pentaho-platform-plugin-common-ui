@@ -17,9 +17,10 @@ define([
   "module",
   "./value",
   "../i18n!types",
+  "../util/object",
   "../util/error",
   "../util/fun"
-], function(module, valueFactory, bundle, error, fun) {
+], function(module, valueFactory, bundle, O, error, fun) {
 
   "use strict";
 
@@ -141,8 +142,50 @@ define([
          */
         _compare: function(va, vb) {
           return fun.compare(va, vb);
-        }
+        },
         // endregion
+
+        /**
+         * Intersects two element arrays whose declared element type is this type.
+         *
+         * If this type is a simple type,
+         * the intersection preserves the instance which has a `formatted` value.
+         * When both have one, the elements of `elemsB` are preserved.
+         *
+         * Removes duplicates of `elemsB`, keeping the first occurrence.
+         *
+         * @param {!Array.<pentaho.type.Element>} elemsA - The previous array of elements.
+         * @param {!Array.<pentaho.type.Element>} elemsB - The next array of elements.
+         *
+         * @return {!Array.<pentaho.type.Element>} The intersection array, possibly empty.
+         *
+         * @private
+         * @internal
+         */
+        __intersect: function(elemsA, elemsB) {
+          var elemsAByKey = {};
+          O.eachOwn(elemsA, function(elemA0) { elemsAByKey[elemA0.key] = elemA0; });
+
+          // Output order is that of `elemsB`.
+          var isSimple = this.isSimple;
+          var elemsC = [];
+          var elemsCByKey = {};
+          var i = -1;
+          var countB = elemsB.length;
+          while(++i < countB) {
+            var elemB = elemsB[i];
+            var key = elemB.key;
+            var elemA = O.getOwn(elemsAByKey, key);
+            if(elemA && !O.hasOwn(elemsCByKey, key)) {
+              // The formatted value of elemB overrides that of elemA. Keep elemB if it has a formatted value.
+              var elemC = (!isSimple || elemB.formatted) ? elemB : elemA;
+              elemsCByKey[key] = elemC;
+              elemsC.push(elemC);
+            }
+          }
+
+          return elemsC;
+        }
       }
     }).implement({
       type: bundle.structured.element

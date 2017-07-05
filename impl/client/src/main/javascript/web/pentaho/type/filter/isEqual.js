@@ -88,7 +88,7 @@ define([
             // may be `null`
             name: "value",
             nameAlias: "v",
-            type: "value",
+            valueType: "value",
             isReadOnly: true,
             isBoundary: true
           }

@@ -53,7 +53,7 @@ define([
      * @name _apply
      * @memberOf pentaho.type.changes.Change#
      * @method
-     * @param {!pentaho.type.ContainerMixin} target - The container to which changes are applied.
+     * @param {!pentaho.type.mixins.Container} target - The container to which changes are applied.
      * @abstract
      * @protected
      */

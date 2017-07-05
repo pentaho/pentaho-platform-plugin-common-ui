@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 define([
-  "./discreteDomain"
-], function(discreteDomain) {
+  "./enum"
+], function(enumMixin) {
 
   "use strict";
 
   return {
-    "discreteDomain": discreteDomain
+    "enum": enumMixin
   };
 });

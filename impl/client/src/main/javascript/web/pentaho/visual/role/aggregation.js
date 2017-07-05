@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +28,11 @@ define([
      * @name pentaho.visual.role.Aggregation
      * @class
      * @extends pentaho.type.String
-     * @extends pentaho.type.facets.DiscreteDomain
+     * @extends pentaho.type.mixins.DiscreteDomain
      *
      * @amd {pentaho.type.Factory<pentaho.visual.role.Aggregation>} pentaho/visual/role/aggregation
      *
-     * @classDesc The `Aggregation` class is **a refinement of** [String]{@link pentaho.type.String}
+     * @classDesc The `Aggregation` class is [String]{@link pentaho.type.String} based enumeration
      * that represents an **aggregation** operation.
      *
      * Currently, the following aggregations are supported:
@@ -43,10 +43,10 @@ define([
      * * `max` - Maximum (applicable to ordinal types)
      * * `mode` - Mode (applicable to any type)
      */
-    return PentahoString.refine({
+    return PentahoString.extend({
       type: {
         id: module.id,
-        mixins: ["discreteDomain"],
+        mixins: ["enum"],
         domain: ["sum", "avg", "min", "max", "first", "last"]
       }
     })

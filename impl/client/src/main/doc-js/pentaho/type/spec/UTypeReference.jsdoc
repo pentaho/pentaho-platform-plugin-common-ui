@@ -136,7 +136,7 @@
  * The special `base` attribute allows specifying the base type
  * and defaults to `"pentaho/type/complex"`,
  * on a global context, or
- * to the [type]{@link pentaho.type.Property.Type#type} of the base property,
+ * to the [valueType]{@link pentaho.type.Property.Type#valueType} of the base property,
  * when overriding it.
  * Any additional attributes are determined and processed by
  * each type's {@link pentaho.type.Type.extend} method.
@@ -151,9 +151,9 @@
  *   var MyProduct = context.get({
  *         base: "complex" // optional
  *         props: [
- *           {name: "id",    label: "Id",    type: "string"},
- *           {name: "name",  label: "Name",  type: "string"},
- *           {name: "price", label: "Price", type: "number"}
+ *           {name: "id",    label: "Id",    valueType: "string"},
+ *           {name: "name",  label: "Name",  valueType: "string"},
+ *           {name: "price", label: "Price", valueType: "number"}
  *         ]
  *       });
  *

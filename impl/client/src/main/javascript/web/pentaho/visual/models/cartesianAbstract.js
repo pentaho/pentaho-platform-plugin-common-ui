@@ -33,25 +33,25 @@ define([
 
         props: [
           // Primary axis
-          {name: "autoRange", type: "boolean", value: true},
-          {name: "valueAxisLowerLimit", type: "number"},
-          {name: "valueAxisUpperLimit", type: "number"},
+          {name: "autoRange", valueType: "boolean", defaultValue: true},
+          {name: "valueAxisLowerLimit", valueType: "number"},
+          {name: "valueAxisUpperLimit", valueType: "number"},
           {
             name: "displayUnits",
-            type: displayUnitsFactory,
+            valueType: displayUnitsFactory,
             isRequired: true,
-            value: "units_0"
+            defaultValue: "units_0"
           },
 
           // Secondary axis
-          {name: "autoRangeSecondary", type: "boolean", value: true},
-          {name: "valueAxisLowerLimitSecondary", type: "number"},
-          {name: "valueAxisUpperLimitSecondary", type: "number"},
+          {name: "autoRangeSecondary", valueType: "boolean", defaultValue: true},
+          {name: "valueAxisLowerLimitSecondary", valueType: "number"},
+          {name: "valueAxisUpperLimitSecondary", valueType: "number"},
           {
             name: "displayUnitsSecondary",
-            type: displayUnitsFactory,
+            valueType: displayUnitsFactory,
             isRequired: true,
-            value: "units_0"
+            defaultValue: "units_0"
           }
         ]
       }

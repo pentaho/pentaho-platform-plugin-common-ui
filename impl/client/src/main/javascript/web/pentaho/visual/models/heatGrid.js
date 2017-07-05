@@ -42,53 +42,46 @@ define([
         props: [
           {
             name: "rows", // VISUAL_ROLE
-            type: {
-              isAccident: true,
-              levels: ["ordinal"],
-              props: {attributes: {isRequired: true}}
-            },
+            base: "pentaho/visual/role/property",
+            levels: ["ordinal"],
+            attributes: {isRequired: true},
             ordinal: 5
           },
           {
             name: "columns", // VISUAL_ROLE
-            type: "pentaho/visual/role/ordinal",
+            base: "pentaho/visual/role/property",
+            levels: ["ordinal"],
             ordinal: 6
           },
           {
             name: "color", // VISUAL_ROLE
-            type: {
-              base: "pentaho/visual/role/quantitative",
-              dataType: "number",
-              props: {attributes: {countMax: 1, isRequired: requiredOneMeasure}}
-            },
+            base: "pentaho/visual/role/property",
+            levels: ["quantitative"],
+            dataType: "number",
+            attributes: {isRequired: requiredOneMeasure, countMax: 1},
             ordinal: 7
           },
           {
             name: "size", // VISUAL_ROLE
-            type: {
-              base: "pentaho/visual/role/quantitative",
-              dataType: "number",
-              props: {attributes: {countMax: 1, isRequired: requiredOneMeasure}}
-            },
+            base: "pentaho/visual/role/property",
+            levels: ["quantitative"],
+            dataType: "number",
+            attributes: {isRequired: requiredOneMeasure, countMax: 1},
             ordinal: 8
           },
           {
             name: "labelsOption",
-            type: {
-              base: labelsOptionFactory,
-              domain: ["none", "center"]
-            },
+            valueType: labelsOptionFactory,
+            domain: ["none", "center"],
             isRequired: true,
-            value: "none"
+            defaultValue: "none"
           },
           {
             name: "shape",
-            type: {
-              base: shapeFactory,
-              domain: ["none", "circle", "square"]
-            },
+            valueType: shapeFactory,
+            domain: ["none", "circle", "square"],
             isRequired: true,
-            value: "square"
+            defaultValue: "square"
           }
         ]
       }
@@ -98,6 +91,6 @@ define([
 
   function requiredOneMeasure() {
     /* jshint validthis:true*/
-    return !this.model.size.attributes.count && !this.model.color.attributes.count;
+    return !this.size.attributes.count && !this.color.attributes.count;
   }
 });

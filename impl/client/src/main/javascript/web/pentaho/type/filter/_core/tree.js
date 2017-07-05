@@ -225,7 +225,7 @@ define([
           {
             name: "operands",
             nameAlias: "o",
-            type: [filter.Abstract],
+            valueType: [filter.Abstract],
             isReadOnly: true,
             isBoundary: true
           }

@@ -22,7 +22,7 @@
  * it's taken to represent a property
  * whose {@link pentaho.type.spec.IPropertyTypeProto#name} is that string
  * and
- * whose {@link pentaho.type.spec.IPropertyTypeProto#type} is {@link pentaho.type.String}.
+ * whose {@link pentaho.type.spec.IPropertyTypeProto#valueType} is {@link pentaho.type.String}.
  *
  * @typedef {string|pentaho.type.spec.IPropertyTypeProto} pentaho.type.spec.UPropertyTypeProto
  */

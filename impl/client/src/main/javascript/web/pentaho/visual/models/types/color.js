@@ -13,10 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "module",
-  "pentaho/i18n!../i18n/model"
-], function(module, bundle) {
+define(["module"], function(module) {
 
   "use strict";
 
@@ -24,12 +21,10 @@ define([
 
     var PentahoString = context.get("string");
 
-    return PentahoString.refine({
-
+    return PentahoString.extend({
       type: {
         id: module.id
       }
-    })
-    .implement({type: bundle.structured.color});
+    });
   };
 });

@@ -37,11 +37,10 @@ define([
         props: [
           {
             name: "size", // VISUAL_ROLE
-            type: {
-              base: "pentaho/visual/role/quantitative",
-              dataType: "number",
-              props: {attributes: {countMax: 1}}
-            },
+            base: "pentaho/visual/role/property",
+            levels: ["quantitative"],
+            dataType: "number",
+            attributes: {countMax: 1},
             ordinal: 7
           }
         ]

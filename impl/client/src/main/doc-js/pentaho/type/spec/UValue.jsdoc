@@ -24,8 +24,7 @@
  * To describe an absent instance, use a {@link Nully} JavaScript value.
  *
  * @typedef {pentaho.type.spec.IValue|
- *           pentaho.type.spec.UComplex|
- *           pentaho.type.spec.USimple|
+ *           pentaho.type.spec.UElement|
  *           pentaho.type.spec.UList|
  *           Nully} pentaho.type.spec.UValue
  */

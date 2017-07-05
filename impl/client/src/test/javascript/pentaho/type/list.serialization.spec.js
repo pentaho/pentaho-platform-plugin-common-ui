@@ -135,17 +135,6 @@ define([
 
         expect(spec).toEqual([1, {_: jasmine.any(Object), v: 2}, 3]);
       });
-
-      it("should not include inline type specification for an element which " +
-          "is of the list's representation element type", function() {
-        var Accident = PentahoNumber.refine();
-        var AccidentList = context.get([Accident.type]);
-
-        var list = new AccidentList([1, 2, 3]);
-        var spec = list.toSpec();
-
-        expect(spec).toEqual([1, 2, 3]);
-      });
     });
 
     describe("#toSpecInContext(keyArgs)", function() {

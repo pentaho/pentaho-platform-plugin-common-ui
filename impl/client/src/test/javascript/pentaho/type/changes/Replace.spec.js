@@ -29,7 +29,7 @@ define([
       context = new Context();
       Derived = context.get({props: ["x"]});
 
-      ComplexOfComplex = context.get({props: [{name: "y", type: Derived}]});
+      ComplexOfComplex = context.get({props: [{name: "y", valueType: Derived}]});
       propY = ComplexOfComplex.type.get("y");
     });
 

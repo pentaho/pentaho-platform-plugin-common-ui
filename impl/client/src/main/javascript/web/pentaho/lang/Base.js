@@ -777,10 +777,8 @@ define([
    * @private
    */
   function class_mix_core(instSpec, classSpec, keyArgs) {
-    var proto = this.prototype;
 
-    // Register mixin operation.
-    proto.__base_ops__.push({name: "mix", args: [instSpec, classSpec, keyArgs]});
+    var proto = this.prototype;
 
     // If instSpec is a function
     var isClassMixin = fun.is(instSpec);

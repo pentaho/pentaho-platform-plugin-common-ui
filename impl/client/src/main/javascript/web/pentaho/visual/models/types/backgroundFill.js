@@ -24,11 +24,11 @@ define([
 
     var PentahoString = context.get("string");
 
-    return PentahoString.refine({
+    return PentahoString.extend({
 
       type: {
         id: module.id,
-        mixins: ["discreteDomain"],
+        mixins: ["enum"],
         domain: ["none", "solid", "gradient"]
       }
     })

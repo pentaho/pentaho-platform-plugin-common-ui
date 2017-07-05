@@ -68,7 +68,7 @@ define([
 
       var model = new BarModel({
         rows:     {attributes: [{name: "country"}]},
-        measures: {attributes: [{name: "sales"  }]},
+        measures: {attributes: [{name: "sales"}]},
         data:     new Table(tableSpec),
         showLegend: true
       });

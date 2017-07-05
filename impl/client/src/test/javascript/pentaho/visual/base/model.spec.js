@@ -19,13 +19,14 @@ define([
   "pentaho/type/filter/or",
   "pentaho/type/filter/and",
   "pentaho/lang/UserError",
-  "pentaho/visual/role/mapping"
-], function(Context, modelFactory, orFilterFactory, andFilterFactory, UserError, mappingFactory) {
+  "pentaho/visual/role/property"
+], function(Context, modelFactory, orFilterFactory, andFilterFactory, UserError, rolePropFactory) {
   "use strict";
 
-  /* global jasmine:false, console:false, expect:false */
+  /* globals jasmine, console, expect, it, describe, beforeEach */
 
   describe("pentaho.visual.base.Model", function() {
+
     var context;
     var Model;
     var dataSpec;
@@ -33,6 +34,7 @@ define([
     var AndFilter;
 
     beforeEach(function() {
+
       context = new Context();
       Model = context.get(modelFactory);
       OrFilter = context.get(orFilterFactory);
@@ -74,10 +76,7 @@ define([
         }).not.toThrow();
       }
 
-      expectIt("mapping");
-      expectIt("quantitative");
-      expectIt("ordinal");
-      expectIt("nominal");
+      expectIt("property");
       expectIt("level");
       expectIt("aggregation");
     });
@@ -165,24 +164,24 @@ define([
     describe(".Type", function() {
 
       describe("#isVisualRole()", function() {
-        it("should return true if type is a Mapping", function() {
-          var Mapping = context.get(mappingFactory);
-          var SubMapping = Mapping.extend({type: {levels: ["nominal"]}});
 
-          expect(Model.type.isVisualRole(Mapping.type)).toBe(true);
-          expect(Model.type.isVisualRole(SubMapping.type)).toBe(true);
+        it("should return true if property type is a role.Property", function() {
+
+          var RoleProperty = context.get(rolePropFactory);
+          var SubRoleProperty = RoleProperty.extend();
+
+          expect(Model.type.isVisualRole(RoleProperty.type)).toBe(true);
+          expect(Model.type.isVisualRole(SubRoleProperty.type)).toBe(true);
         });
 
         it("should return false if type is not a Mapping", function() {
-          var NotMapping = context.get("complex");
+          var NotRoleProp = context.get("complex");
 
-          expect(Model.type.isVisualRole(NotMapping.type)).toBe(false);
+          expect(Model.type.isVisualRole(NotRoleProp.type)).toBe(false);
         });
       });
 
       describe("#eachVisualRole()", function() {
-        var Mapping;
-        var DerivedMapping;
 
         var DerivedModel;
 
@@ -190,15 +189,12 @@ define([
         var forEachContext;
 
         beforeEach(function() {
-          Mapping = context.get(mappingFactory);
-
-          DerivedMapping = Mapping.extend({type: {levels: ["nominal"]}});
 
           DerivedModel = Model.extend({type: {
             props: [
-              {name: "vr1", type: DerivedMapping},
-              {name: "vr2", type: DerivedMapping},
-              {name: "vr3", type: DerivedMapping}
+              {name: "vr1", base: rolePropFactory},
+              {name: "vr2", base: rolePropFactory},
+              {name: "vr3", base: rolePropFactory}
             ]
           }});
 
@@ -207,6 +203,7 @@ define([
         });
 
         it("should call function for each defined visual role property", function() {
+
           DerivedModel.type.eachVisualRole(forEachSpy);
 
           expect(forEachSpy).toHaveBeenCalledTimes(3);
@@ -217,6 +214,7 @@ define([
         });
 
         it("should break iteration if function returns false", function() {
+
           forEachSpy.and.returnValues(true, false);
 
           DerivedModel.type.eachVisualRole(forEachSpy);
@@ -228,6 +226,7 @@ define([
         });
 
         it("should set context object on which the function is called", function() {
+
           DerivedModel.type.eachVisualRole(forEachSpy, forEachContext);
 
           forEachSpy.calls.all().forEach(function(info) {

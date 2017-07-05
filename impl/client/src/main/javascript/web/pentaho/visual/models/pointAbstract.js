@@ -36,43 +36,41 @@ define([
         props: [
           {
             name: "rows", // VISUAL_ROLE
-            type: {
-              // Always a visual key, whatever the effective measurement level or data type.
-              isAccident: true,
-              isVisualKey: true,
-              getAttributesMaxLevelOf: function(mapping) {
-                // If the mapping contains a single `number` attribute,
-                // consider it ordinal, and not quantitative as the base code does.
-                var count = mapping.attributes.count;
-                if(count === 1) {
-                  var dataAttr = mapping.attributes.at(0).dataAttribute;
-                  if(dataAttr && dataAttr.type === "number") {
-                    return "ordinal";
-                  }
-                } else if(count > 1) {
+            base: "pentaho/visual/role/property",
+
+            // Always a visual key, whatever the effective measurement level or data type.
+            isVisualKey: true,
+
+            getAttributesMaxLevelOf: function(model) {
+
+              var mapping = model.get(this);
+
+              // If the mapping contains a single `number` attribute,
+              // consider it ordinal, and not quantitative as the base code does.
+              var count = mapping.attributes.count;
+              if(count === 1) {
+                var dataAttr = mapping.attributes.at(0).dataAttribute;
+                if(dataAttr && dataAttr.type === "number") {
                   return "ordinal";
                 }
-
-                return this.base(mapping);
+              } else if(count > 1) {
+                return "ordinal";
               }
+
+              return this.base(model);
             }
           },
           {
             name: "measures", // VISUAL_ROLE
-            type: {
-              isAccident: true,
-              props: {attributes: {isRequired: true}}
-            },
+            attributes: {isRequired: true},
             ordinal: 7
           },
           {
             name: "labelsOption",
-            type: {
-              base: labelsOptionFactory,
-              domain: ["none", "center", "left", "right", "top", "bottom"]
-            },
+            valueType: labelsOptionFactory,
+            domain: ["none", "center", "left", "right", "top", "bottom"],
             isRequired: true,
-            value: "none"
+            defaultValue: "none"
           }
         ]
       }

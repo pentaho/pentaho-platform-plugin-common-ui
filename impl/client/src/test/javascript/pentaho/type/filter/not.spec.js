@@ -36,9 +36,9 @@ define([
     var ProductSummary = Complex.extend({
       type: {
         props: [
-          {name: "name", type: "string", label: "Name"},
-          {name: "sales", type: "number", label: "Sales"},
-          {name: "inStock", type: "boolean", label: "In Stock"}
+          {name: "name", valueType: "string", label: "Name"},
+          {name: "sales", valueType: "number", label: "Sales"},
+          {name: "inStock", valueType: "boolean", label: "In Stock"}
         ]
       }
     });

@@ -34,10 +34,7 @@ define([
         props: [
           {
             name: "rows", // VISUAL_ROLE
-            type: {
-              isAccident: true,
-              levels: ["ordinal"]
-            }
+            levels: ["ordinal"]
           }
         ]
       }

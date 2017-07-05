@@ -18,19 +18,19 @@ define([
   "./instance",
   "./util",
   "./ValidationError",
+  "./mixins/discreteDomain",
   "../i18n!types",
   "../lang/_AnnotatableLinked",
   "../util/arg",
   "../util/error",
   "../util/object",
-  "../util/text",
-  "../util/fun"
-], function(module, instanceFactory, typeUtil, ValidationError, bundle, AnnotatableLinked, arg, error, O, text, F) {
+  "../util/text"
+], function(module, instanceFactory, typeUtil, ValidationError, discreteDomainFactory, bundle, AnnotatableLinked,
+            arg, error, O, text) {
 
   "use strict";
 
   var _defaultTypeMid = "string";
-  var _dynamicAttrNames = ["isRequired", "countMin", "countMax", "isApplicable", "isEnabled"];
 
   return function(context) {
 
@@ -43,6 +43,8 @@ define([
      *
      * @class
      * @extends pentaho.type.Type
+     * @extends pentaho.type.mixins.DiscreteDomain.Type
+     *
      * @abstract
      *
      * @implements pentaho.lang.IWithKey
@@ -63,6 +65,8 @@ define([
      *
      * @class
      * @extends pentaho.type.Instance
+     * @extends pentaho.type.mixins.DiscreteDomain
+     *
      * @abstract
      * @amd {pentaho.type.Factory<pentaho.type.Property>} pentaho/type/property
      *
@@ -84,30 +88,12 @@ define([
 
         id: module.id,
         alias: "property",
-
         isAbstract: true,
-
         styleClass: null,
 
         // Break inheritance
         _label: null,
         _description: null,
-
-        /**
-         * Initializes a property type object, given a property type specification.
-         *
-         * @param {!pentaho.type.spec.UPropertyTypeProto} spec - A property name or type specification.
-         * @param {!Object} keyArgs - Keyword arguments.
-         * @param {!pentaho.type.Complex.Type} keyArgs.declaringType - The complex type that declares the property.
-         * @param {number} keyArgs.index - The index of the property within its complex type.
-         * @ignore
-         */
-        constructor: function(spec, keyArgs) {
-          // A singular string property with the specified name.
-          if(typeof spec === "string") spec = {name: spec};
-
-          this.base(spec, keyArgs);
-        },
 
         /**
          * Setting name and label first allows describing the property in subsequent error messages.
@@ -116,7 +102,7 @@ define([
          *
          * Setting type before value (not included here, so it is processed after type) avoids:
          * 1. Checking the new value against the old type (and then again, against the new type)
-         * 2. Ensures error messages are given in a predicatable order,
+         * 2. Ensures error messages are given in a predictable order,
          *    independently of the order of properties in an instSpec:
          *   a. Is new type a subtype of old type?
          *   b. Is new value an instance of the new type?
@@ -125,6 +111,15 @@ define([
          * @ignore
          */
         extend_order: ["name", "label", "type"],
+
+        /**
+         * Gets a value that indicates if the type is under construction.
+         * Certain operations are allowed only during construction.
+         *
+         * @type {boolean}
+         * @private
+         */
+        __isConstructing: false,
 
         // TODO: Not validating property value type must descend from Value.Type.
         // Could probably solve by assuming a Property.Type default of Value.
@@ -144,7 +139,9 @@ define([
 
           this.base.apply(this, arguments);
 
-          // NOTE: Not validating same context as base.
+          this.__isConstructing = true;
+
+          // TODO: Not validating same context as base.
 
           // Abstract Property types don't yet have an associated declaringType.
           // e.g. Property.extend()
@@ -162,8 +159,8 @@ define([
               if(!("name" in spec)) this.name = null; // throws
 
               // Assume the _default_ type _before_ extend, to make sure `value` can be validated against it.
-              var type = spec.type;
-              if(type == null || type === "") this.type = _defaultTypeMid;
+              if(!spec.valueType && (this._valueType === _propType._valueType))
+                this.valueType = _defaultTypeMid;
             }
           }
         },
@@ -179,6 +176,8 @@ define([
 
             this._createValueAccessor();
           }
+
+          this.__isConstructing = false;
         },
 
         // region IListElement
@@ -330,14 +329,14 @@ define([
          * Gets a value that indicates if the property is a _list_.
          *
          * A property is a _list_ property if
-         * its [value type]{@link pentaho.type.Property.Type#type} is a list type,
+         * its [value type]{@link pentaho.type.Property.Type#valueType} is a list type,
          * that is, if it is or extends [List]{@link pentaho.type.List}.
          *
          * @type {boolean}
          * @readonly
          */
         get isList() {
-          return this._type.isList;
+          return this._valueType.isList;
         },
         // endregion
 
@@ -357,13 +356,15 @@ define([
          * @readonly
          */
         get elemType() {
-          var type = this._type;
-          return type.isList ? type.of : type;
+          var valueType = this._valueType;
+          return valueType.isList ? valueType.of : valueType;
         },
         // endregion
 
-        // region (value) type attribute
-        _type: undefined,
+        // region valueType attribute
+
+        // NOTE: see at the end of the class declaration: valueType = "value";
+        _valueType: undefined,
 
         /**
          * Gets or sets the type of value that properties of this type can hold.
@@ -402,46 +403,50 @@ define([
          *
          * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
          * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
+         * @throws {pentaho.lang.OperationInvalidError} When setting on an existing property from configuration.
          * @throws {pentaho.lang.ArgumentInvalidError} When setting to a _value type_ that is not a subtype
          * of the current _value type_.
          *
-         * @see pentaho.type.spec.IPropertyTypeProto#type
+         * @see pentaho.type.spec.IPropertyTypeProto#valueType
          */
-        get type() {
-          return this._type;
+        get valueType() {
+          return this._valueType;
         },
 
-        set type(value) {
+        set valueType(value) {
           if(this.hasDescendants)
             throw error.operInvalid("Cannot change the value type of a property type that has descendants.");
 
+          if(!this.__isConstructing && context.isConfiguring)
+            throw error.operInvalid("Cannot change the value type of an existing property type from configuration.");
+
           if(value == null) return;
 
-          var oldType = this._type;
+          var oldType = this._valueType;
           // Prevent using "value", inherited from abstract base classes, as a default base class.
-          // However, allow configuring a root property, by sub.classing its current, own, type.
-          var defaultBaseType = this.isRoot ? O.getOwn(this, "_type") : oldType;
+          // However, allow configuring a root property, by sub-classing its current, own, type.
+          var defaultBaseType = this.isRoot ? O.getOwn(this, "_valueType") : oldType;
           var newType = context.get(value, {defaultBase: defaultBaseType}).type;
           if(newType !== oldType) {
             // Hierarchy/PreviousValue consistency
             if(oldType && !newType.isSubtypeOf(oldType))
-              throw error.argInvalid("type", bundle.structured.errors.property.typeNotSubtypeOfBaseType);
+              throw error.argInvalid("valueType", bundle.structured.errors.property.typeNotSubtypeOfBaseType);
 
-            this._type = newType;
+            this._valueType = newType;
 
             // Set local value to null, if it is not an instance of the new type.
             // Not really needed as the value getter tests the if value is of type.
             // However, this improves performance.
             var dv;
-            if(O.hasOwn(this, "_value") && (dv = this._value) && !newType.is(dv)) {
-              this._value = null;
+            if(O.hasOwn(this, "_defaultValue") && (dv = this._defaultValue) && !newType.is(dv)) {
+              this._defaultValue = null;
             }
           }
         },
         // endregion
 
         // region value attribute and related methods
-        _value: null,
+        _defaultValue: undefined,
 
         /**
          * Gets or sets the _default value_ of properties of this type.
@@ -456,7 +461,7 @@ define([
          * ### Get
          *
          * When got and the _default value_ (local or inherited)
-         * is not an instance of the _value type_ (local or inherited),
+         * is not an instance of the _defaultValue type_ (local or inherited),
          * `null` is returned.
          *
          * ### Set
@@ -471,12 +476,12 @@ define([
          *
          * * for [root]{@link pentaho.type.Type#root} _property types_, the default value is `null`
          * * for non-root _property types_, the default value is the _inherited value_,
-         *   if it is an instance of the _property type_'s [value type]{@link pentaho.type.Property.Type#type};
+         *   if it is an instance of the _property type_'s [valueType]{@link pentaho.type.Property.Type#valueType};
          *   or, `null`, otherwise.
          *
          * When set to any other value,
          * it is first converted to the _property type_'s
-         * [value type]{@link pentaho.type.Property.Type#type},
+         * [valueType]{@link pentaho.type.Property.Type#valueType},
          * using its [Value.Type#to]{@link pentaho.type.Value.Type#to} method.
          * The conversion may be impossible and thus an error may be thrown.
          *
@@ -486,26 +491,26 @@ define([
          * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
          *
          * @throws {Error} When setting to a _default value_ that cannot be converted to the
-         * property type's current _value type_.
+         * property type's current `valueType`.
          *
          * @see pentaho.type.spec.IPropertyTypeProto#value
          */
-        get value() {
-          var value = this._value;
-          return value && this._type.is(value) ? value : null;
+        get defaultValue() {
+          var value = this._defaultValue;
+          return value && this._valueType.is(value) ? value : null;
         },
 
-        set value(_) {
+        set defaultValue(_) {
           if(this.hasDescendants)
             throw error.operInvalid("Cannot change the default value of a property type that has descendants.");
 
           if(_ === undefined || (_ === null && this.isRoot)) {
             if(this !== _propType) {
               // Clear local value. Inherit base value.
-              delete this._value;
+              delete this._defaultValue;
             }
           } else {
-            this._value = this.toValue(_, /* noDefault: */true);
+            this._defaultValue = this.toValue(_, /* noDefault: */true);
           }
         },
 
@@ -532,8 +537,8 @@ define([
           }
 
           return this.isList
-              ? this.type.to(valueSpec, this.__listCreateKeyArgs || this.__buildListCreateKeyArgs())
-              : this.type.to(valueSpec);
+              ? this._valueType.to(valueSpec, this.__listCreateKeyArgs || this.__buildListCreateKeyArgs())
+              : this._valueType.to(valueSpec);
         },
 
         /**
@@ -546,12 +551,12 @@ define([
          * @private
          */
         __freshDefaultValue: function() {
-          var value = this.value;
-          return value
-              ? value.clone()
+          var dv = this.defaultValue;
+          return dv
+              ? dv.clone()
               : (this.isList
-                  ? this.type.create(null, this.__listCreateKeyArgs || this.__buildListCreateKeyArgs())
-                  : value);
+                  ? this._valueType.create(null, this.__listCreateKeyArgs || this.__buildListCreateKeyArgs())
+                  : dv);
         },
 
         __listCreateKeyArgs: null,
@@ -585,6 +590,7 @@ define([
         // endregion
 
         // region isReadOnly attribute
+        // TODO: shouldn't this only be settable on the root property??
         _isReadOnly: false,
 
         /**
@@ -728,37 +734,49 @@ define([
         // region validation
 
         /**
-         * Determines if this property is valid in a given complex instance.
+         * Determines if this property is valid on a given complex instance.
          *
-         * This method first ensures the value of the property is consistent with its type.
+         * If this property is not a [boundary]{@link pentaho.type.Property.Type#isBoundary} property,
+         * this method validates the value of the property itself.
+         *
          * Afterwards, the cardinality is verified against the attributes
-         * {@link pentaho.type.Property.Type#countMin} and {@link pentaho.type.Property.Type#countMax}.
+         * {@link pentaho.type.Property.Type#isRequired},
+         * {@link pentaho.type.Property.Type#countMin} and
+         * {@link pentaho.type.Property.Type#countMax}.
          *
-         * @param {pentaho.type.Complex} owner - The complex value that owns the property.
+         * @param {!pentaho.type.Complex} owner - The complex value that owns the property.
          *
-         * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+         * @return {pentaho.type.ValidationError|Array.<pentaho.type.ValidationError>} An error,
+         * a non-empty array of errors or `null`.
          *
          * @see pentaho.type.Complex#validate
          */
-        validateOwner: function(owner) {
+        validateOn: function(owner) {
           var errors = null;
 
-          if(this.isApplicableEval(owner)) {
+          if(this.isApplicableOn(owner)) {
             var addErrors = function(newErrors) {
               errors = typeUtil.combineErrors(errors, newErrors);
             };
 
             var value = owner._getByType(this);
-            if(value && !this.isBoundary) {
-              // Not null and surely of the type, so _validate can be called.
-              // If a list, element validation is done before cardinality validation.
-              // If a complex, its properties validation is done before local cardinality validation.
-              addErrors(this.type.mostSpecific(value.type)._validate(value));
+            if(value) {
+              // Intrinsic value validation.
+              if(!this.isBoundary) {
+                // If a list, element validation is done before cardinality validation.
+                // If a complex, its properties' validation is done before local cardinality validation.
+                addErrors(value.validate());
+              }
+
+              // Extrinsic/Contextual value validation.
+              addErrors(this._validateValueOn(owner, value));
             }
 
-            var range = this.countRangeEval(owner);
-            var count = this.isList ? value.count : (value ? 1 : 0);
+            // Extrinsic/Contextual value validation.
 
+            // Cardinality validation
+            var range = this.countRangeOn(owner);
+            var count = this.isList ? value.count : (value ? 1 : 0);
             if(count < range.min) {
               if(this.isList) {
                 addErrors(new ValidationError(
@@ -774,18 +792,82 @@ define([
           }
 
           return errors;
-        }, // endregion
+        },
+
+        /**
+         * Validates the given non-null value in the context of this property.
+         *
+         * The base implementation calls
+         * [_collectElementValidators]{@link pentaho.type.Property.Type#_collectElementValidators}
+         * to obtain the list of currently applicable element validators.
+         * Then, each element is validated against the list of collected validators.
+         *
+         * When overriding this method,
+         * the error utilities in {@link pentaho.type.Util} can be used to help in the implementation.
+         *
+         * @param {!pentaho.type.Complex} owner - The complex value that owns the property.
+         * @param {!pentaho.type.Value} value - The value to validate.
+         *
+         * @return {pentaho.type.ValidationError|Array.<pentaho.type.ValidationError>} An error,
+         * a non-empty array of errors or `null`.
+         *
+         * @protected
+         */
+        _validateValueOn: function(owner, value) {
+          var errors = null;
+
+          if(!this.isList || value.count > 0) {
+
+            var validators = null;
+            var addValidator = function(validator) {
+              (validators || (validators = [])).push(validator);
+            };
+
+            this._collectElementValidators(addValidator, owner, value);
+
+            if(validators) {
+              var validateElem = function(elem, index) {
+                validators.forEach(function(validator) {
+                  errors = typeUtil.combineErrors(errors, validator.call(this, owner, elem, index));
+                });
+              };
+
+              if(this.isList) {
+                value.each(validateElem, this);
+              } else {
+                validateElem.call(this, value, 0);
+              }
+            }
+          }
+          return errors;
+        },
+
+        /**
+         * Called each time a property value is validated to collect the list of element validators.
+         *
+         * When overriding this method, be sure to also call the base implementation.
+         *
+         * @param {function() : void} addValidator - The function to call to register an element validator.
+         * @param {!pentaho.type.Complex} owner - The complex value that owns the property.
+         * @param {!pentaho.type.Value} value - The value whose elements will be validated.
+         *
+         * @protected
+         */
+        _collectElementValidators: function(addValidator, owner, value) {
+        },
+        // endregion
 
         // region serialization
         /** @inheritDoc */
         toSpecInContext: function(keyArgs) {
+
           if(!keyArgs) keyArgs = {};
 
           // no id and no base
           var spec = {};
           var baseType;
 
-          var valueTypeRef = this.type.toRefInContext(keyArgs);
+          var valueTypeRef = this._valueType.toRefInContext(keyArgs);
 
           // # Abstract Property Types
           //
@@ -858,31 +940,37 @@ define([
 
         /** @inheritDoc */
         _fillSpecInContext: function(spec, keyArgs) {
+
           var any = this.base(spec, keyArgs);
 
-          if(this !== _propType) {
-            // Dynamic attributes
-            _dynamicAttrNames.forEach(function(name) {
-              if(this._fillSpecInContextDynamicAttribute(spec, name, keyArgs))
-                any = true;
-            }, this);
-
-            // Custom attributes
-            var defaultValue = O.getOwn(this, "_value");
-            if(defaultValue !== undefined) {
-              any = true;
-              if(defaultValue) {
-                keyArgs.declaredType = this.type;
-                spec.value = defaultValue.toSpecInContext(keyArgs);
-              } else {
-                spec.value = null;
-              }
+          // Custom attributes
+          var defaultValue = O.getOwn(this, "_defaultValue");
+          if(defaultValue !== undefined) {
+            any = true;
+            if(defaultValue) {
+              keyArgs.declaredType = this._valueType;
+              spec.defaultValue = defaultValue.toSpecInContext(keyArgs);
+            } else {
+              spec.defaultValue = null;
             }
           }
 
           return any;
         }
         // endregion
+      }
+    }, /** @lends pentaho.type.Property */{
+      type: /** @lends pentaho.type.Property.Type */{
+        /** @inheritDoc */
+        _extend: function(name, instSpec, classSpec, keyArgs) {
+
+          // Accept typeSpec as being the property name.
+          if(typeof instSpec === "string") {
+            instSpec = {name: instSpec};
+          }
+
+          return this.base(name, instSpec, classSpec, keyArgs);
+        }
       }
     }).implement({
       type: /** @lends pentaho.type.Property.Type# */{
@@ -892,15 +980,15 @@ define([
            * on a given complex value.
            *
            * This method is used to determine the effective
-           * [element count range]{@link pentaho.type.Property.Type#countRangeEval} and
+           * [element count range]{@link pentaho.type.Property.Type#countRangeOn} and
            * is not intended to be used directly.
            *
-           * @name isRequiredEval
+           * @name isRequiredOn
            * @memberOf pentaho.type.Property.Type#
-           * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
+           * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
            * @return {boolean} The evaluated value of the `isRequired` attribute.
            *
-           * @ignore
+           * @see pentaho.type.Property.Type#isRequired
            */
 
           /**
@@ -913,7 +1001,7 @@ define([
            *
            * Note that this attribute is taken together with
            * the [countMin]{@link pentaho.type.Property.Type#countMin} attribute
-           * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeEval}
+           * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeOn}
            * of a _property type_.
            *
            * ### This attribute is *Dynamic*
@@ -957,7 +1045,7 @@ define([
            *
            * @name isRequired
            * @memberOf pentaho.type.Property.Type#
-           * @type undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
+           * @type {undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
            *
            * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
            * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
@@ -969,9 +1057,9 @@ define([
             value: false,
             cast: Boolean,
             combine: function(baseEval, localEval) {
-              return function() {
+              return function(propType) {
                 // localEval is skipped if base is true.
-                return baseEval.call(this) || localEval.call(this);
+                return baseEval.call(this, propType) || localEval.call(this, propType);
               };
             }
           },
@@ -981,15 +1069,15 @@ define([
            * on a given complex value.
            *
            * This method is used to determine the effective
-           * [element count range]{@link pentaho.type.Property.Type#countRangeEval} and
+           * [element count range]{@link pentaho.type.Property.Type#countRangeOn} and
            * is not intended to be used directly.
            *
-           * @name countMinEval
+           * @name countMinOn
            * @memberOf pentaho.type.Property.Type#
-           * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
+           * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
            * @return {number} The evaluated value of the `countMin` attribute.
            *
-           * @ignore
+           * @see pentaho.type.Property.Type#countMin
            */
 
           /**
@@ -999,7 +1087,7 @@ define([
            *
            * Note that this attribute is taken together with
            * the [isRequired]{@link pentaho.type.Property.Type#isRequired} attribute
-           * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeEval}
+           * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeOn}
            * of a _property type_.
            *
            * ### This attribute is *Dynamic*
@@ -1046,7 +1134,7 @@ define([
            *
            * @name countMin
            * @memberOf pentaho.type.Property.Type#
-           * @type undefined | number | pentaho.type.PropertyDynamicAttribute.<number>
+           * @type {undefined | number | pentaho.type.PropertyDynamicAttribute.<number>}
            *
            * @see pentaho.type.Complex#countRange
            *
@@ -1056,8 +1144,8 @@ define([
             value: 0,
             cast: castCount,
             combine: function(baseEval, localEval) {
-              return function() {
-                return Math.max(baseEval.call(this), localEval.call(this));
+              return function(propType) {
+                return Math.max(baseEval.call(this, propType), localEval.call(this, propType));
               };
             }
           },
@@ -1067,15 +1155,15 @@ define([
            * on a given complex value.
            *
            * This method is used to determine the effective
-           * [element count range]{@link pentaho.type.Property.Type#countRangeEval} and
+           * [element count range]{@link pentaho.type.Property.Type#countRangeOn} and
            * is not intended to be used directly.
            *
-           * @name countMaxEval
+           * @name countMaxOn
            * @memberOf pentaho.type.Property.Type#
-           * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
+           * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
            * @return {number} The evaluated value of the `countMax` attribute.
            *
-           * @ignore
+           * @see pentaho.type.Property.Type#countMax
            */
 
           /**
@@ -1086,7 +1174,7 @@ define([
            * Note that this attribute is taken together with
            * the [isRequired]{@link pentaho.type.Property.Type#isRequired}
            * and the [countMin]{@link pentaho.type.Property.Type#countMin} attributes
-           * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeEval}
+           * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeOn}
            * of a _property type_.
            *
            * ### This attribute is *Dynamic*
@@ -1133,7 +1221,7 @@ define([
            *
            * @name countMax
            * @memberOf pentaho.type.Property.Type#
-           * @type undefined | number | pentaho.type.PropertyDynamicAttribute.<number>
+           * @type {undefined | number | pentaho.type.PropertyDynamicAttribute.<number>}
            *
            * @see pentaho.type.Complex#countRange
            * @see pentaho.type.spec.IPropertyTypeProto#countMax
@@ -1142,8 +1230,8 @@ define([
             value: Infinity,
             cast: castCount,
             combine: function(baseEval, localEval) {
-              return function() {
-                return Math.min(baseEval.call(this), localEval.call(this));
+              return function(propType) {
+                return Math.min(baseEval.call(this, propType), localEval.call(this, propType));
               };
             }
           },
@@ -1152,12 +1240,12 @@ define([
            * Evaluates the value of the `isApplicable` attribute of a property of this type
            * on a given owner complex value.
            *
-           * @name applicableEval
+           * @name isApplicableOn
            * @memberOf pentaho.type.Property.Type#
-           * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
+           * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
            * @return {boolean} The evaluated value of the `isApplicable` attribute.
            *
-           * @ignore
+           * @see pentaho.type.Property.Type#isApplicable
            */
 
           /**
@@ -1211,7 +1299,7 @@ define([
            *
            * @name isApplicable
            * @memberOf pentaho.type.Property.Type#
-           * @type undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
+           * @type {undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
            *
            * @see pentaho.type.Property.Type#isRequired
            * @see pentaho.type.Complex#isApplicable
@@ -1221,9 +1309,9 @@ define([
             value: true,
             cast: Boolean,
             combine: function(baseEval, localEval) {
-              return function() {
+              return function(propType) {
                 // localEval is skipped if base is false.
-                return baseEval.call(this) && localEval.call(this);
+                return baseEval.call(this, propType) && localEval.call(this, propType);
               };
             }
           },
@@ -1232,12 +1320,12 @@ define([
            * Evaluates the value of the `isEnabled` attribute of a property of this type
            * on a given owner complex value.
            *
-           * @name isEnabledEval
+           * @name isEnabledOn
            * @memberOf pentaho.type.Property.Type#
-           * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
+           * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
            * @return {boolean} The evaluated value of the `isEnabled` attribute.
            *
-           * @ignore
+           * @see pentaho.type.Property.Type#isEnabled
            */
 
           /**
@@ -1288,7 +1376,7 @@ define([
            *
            * @name isEnabled
            * @memberOf pentaho.type.Property.Type#
-           * @type undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
+           * @type {undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
            *
            * @see pentaho.type.Complex#isEnabled
            * @see pentaho.type.spec.IPropertyTypeProto#isEnabled
@@ -1297,9 +1385,9 @@ define([
             value: true,
             cast: Boolean,
             combine: function(baseEval, localEval) {
-              return function() {
+              return function(propType) {
                 // localEval is skipped if base is false.
-                return baseEval.call(this) && localEval.call(this);
+                return baseEval.call(this, propType) && localEval.call(this, propType);
               };
             }
           }
@@ -1348,10 +1436,10 @@ define([
          *
          * @see pentaho.type.Complex#countRange
          */
-        countRangeEval: function(owner) {
-          var isRequired = this.isRequiredEval(owner);
-          var countMin = this.countMinEval(owner);
-          var countMax = this.countMaxEval(owner);
+        countRangeOn: function(owner) {
+          var isRequired = this.isRequiredOn(owner);
+          var countMin = this.countMinOn(owner);
+          var countMax = this.countMaxOn(owner);
 
           if(!this.isList) {
             if(countMin > 1) countMin = 1;
@@ -1365,12 +1453,17 @@ define([
           return {min: countMin, max: countMax};
         }
       }
+    }).implement({
+      type: /** @lends pentaho.type.Property.Type# */{
+        // These are applied last so that mixins see any of the methods above as base implementations.
+        mixins: [discreteDomainFactory]
+      }
     });
 
     _propType = Property.type;
 
-    // Root property value type.
-    _propType.type = "value";
+    // Root property valueType.
+    _propType.valueType = "value";
 
     return Property;
   };
