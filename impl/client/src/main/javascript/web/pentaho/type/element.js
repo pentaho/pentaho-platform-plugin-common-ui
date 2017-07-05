@@ -150,41 +150,41 @@ define([
          *
          * If this type is a simple type,
          * the intersection preserves the instance which has a `formatted` value.
-         * When both have one, the elements of `bs` are preserved.
+         * When both have one, the elements of `elemsB` are preserved.
          *
-         * Removes duplicates of `bs`, keeping the first occurrence.
+         * Removes duplicates of `elemsB`, keeping the first occurrence.
          *
-         * @param {!Array.<pentaho.type.Element} as - The previous array of elements.
-         * @param {!Array.<pentaho.type.Element} bs - The next array of elements.
+         * @param {!Array.<pentaho.type.Element>} elemsA - The previous array of elements.
+         * @param {!Array.<pentaho.type.Element>} elemsB - The next array of elements.
          *
-         * @return {!Array.<pentaho.type.Element} The intersection array, possibly empty.
+         * @return {!Array.<pentaho.type.Element>} The intersection array, possibly empty.
          *
          * @private
          * @internal
          */
-        __intersect: function(as, bs) {
-          var asByKey = {};
-          O.eachOwn(as, function(a0) { asByKey[a0.key] = a0; });
+        __intersect: function(elemsA, elemsB) {
+          var elemsAByKey = {};
+          O.eachOwn(elemsA, function(elemA0) { elemsAByKey[elemA0.key] = elemA0; });
 
-          // Output order is that of `bs`.
+          // Output order is that of `elemsB`.
           var isSimple = this.isSimple;
-          var cs = [];
-          var csByKey = {};
+          var elemsC = [];
+          var elemsCByKey = {};
           var i = -1;
-          var B = bs.length;
-          while(++i < B) {
-            var b = bs[i];
-            var k = b.key;
-            var a = O.getOwn(asByKey, k);
-            if(a && !O.hasOwn(csByKey, k)) {
-              // The formatted value of b overrides that of a. Keep b if it has a formatted value.
-              var c = (!isSimple || b.formatted) ? b : a;
-              csByKey[k] = c;
-              cs.push(c);
+          var countB = elemsB.length;
+          while(++i < countB) {
+            var elemB = elemsB[i];
+            var key = elemB.key;
+            var elemA = O.getOwn(elemsAByKey, key);
+            if(elemA && !O.hasOwn(elemsCByKey, key)) {
+              // The formatted value of elemB overrides that of elemA. Keep elemB if it has a formatted value.
+              var elemC = (!isSimple || elemB.formatted) ? elemB : elemA;
+              elemsCByKey[key] = elemC;
+              elemsC.push(elemC);
             }
           }
 
-          return cs;
+          return elemsC;
         }
       }
     }).implement({

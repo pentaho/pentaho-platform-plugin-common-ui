@@ -113,10 +113,11 @@ define([
         extend_order: ["name", "label", "type"],
 
         /**
-         * Gets a value that indicates if the type is being construction.
+         * Gets a value that indicates if the type is under construction.
          * Certain operations are allowed only during construction.
          *
          * @type {boolean}
+         * @private
          */
         __isConstructing: false,
 

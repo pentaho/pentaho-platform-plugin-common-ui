@@ -1869,30 +1869,30 @@ define([
   /*
    * @this {pentaho.type.Property.Type}
    */
-  function castAndNormalize(v, cast, dv) {
-    if(v == null) {
-      v = dv;
+  function castAndNormalize(value, cast, defaultValue) {
+    if(value == null) {
+      value = defaultValue;
     } else if(cast) {
-      v = cast.call(this, v, dv);
-      if(v == null)
-        v = dv;
+      value = cast.call(this, value, defaultValue);
+      if(value == null)
+        value = defaultValue;
     }
 
-    return v;
+    return value;
   }
 
   /*
    * @this {pentaho.type.Property.Type}
    */
-  function wrapWithCast(fun, cast, dv) {
+  function wrapWithCast(fun, cast, defaultValue) {
     /*
      * @type {pentaho.type.PropertyDynamicAttribute}
      */
     return function(propType) {
 
-      var v = fun.apply(this, arguments);
+      var value = fun.apply(this, arguments);
 
-      return castAndNormalize.call(propType, v, cast, dv);
+      return castAndNormalize.call(propType, value, cast, defaultValue);
     };
   }
 
