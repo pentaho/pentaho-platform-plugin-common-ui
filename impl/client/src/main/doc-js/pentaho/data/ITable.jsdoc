@@ -133,7 +133,7 @@
  *
  * @name pentaho.data.ITable#filterMatchesRow
  * @method
- * @param {!pentaho.type.filter.Abstract} filter - The filter.
+ * @param {!pentaho.data.filter.Abstract} filter - The filter.
  * @param {number} rowIndex - The row index (zero-based).
  *
  * @return {boolean} `true` if the filter includes the row; `false`, otherwise.

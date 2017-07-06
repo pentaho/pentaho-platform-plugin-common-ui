@@ -168,11 +168,22 @@ define([
       });
     });
 
+    it("should preload the filter/standard module", function() {
+
+      return require.using(["pentaho/type/Context", "pentaho/visual/base/view"], function(Context, viewFactory) {
+
+        var context = new Context();
+        context.get("pentaho/data/filter/standard");
+      });
+    });
+
     describe("#selectionFilter", function() {
+
       it("should have a default selectionFilter", function() {
         var view = new View();
         var selectionFilter = view.selectionFilter;
-        var AbstractFilter = context.get("pentaho/type/filter/abstract");
+
+        var AbstractFilter = context.get("pentaho/data/filter/abstract");
         expect(selectionFilter).toBeDefined();
         expect(selectionFilter instanceof AbstractFilter).toBe(true);
       });
@@ -1401,7 +1412,7 @@ define([
         var view = new View({
           width: 1,
           height: 1,
-          selectionFilter: {_: "pentaho/type/filter/and"}
+          selectionFilter: {_: "pentaho/data/filter/and"}
         });
 
         expect(!!view.get("selectionFilter")).toBe(true);
@@ -1416,7 +1427,7 @@ define([
         var view = new View({
           width: 1,
           height: 1,
-          selectionFilter: {_: "pentaho/type/filter/and"}
+          selectionFilter: {_: "pentaho/data/filter/and"}
         });
 
         expect(!!view.get("selectionFilter")).toBe(true);
@@ -1449,7 +1460,7 @@ define([
         var view = new View({
           width: 1,
           height: 1,
-          selectionFilter: {_: "pentaho/type/filter/and"}
+          selectionFilter: {_: "pentaho/data/filter/and"}
         });
 
         expect(!!view.get("selectionFilter")).toBe(true);

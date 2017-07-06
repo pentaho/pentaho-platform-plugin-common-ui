@@ -81,7 +81,7 @@ function() {
 ```
 
 Remarks:
-  - An [isEqual]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.filter.IsEqual'}}) 
+  - An [isEqual]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.filter.IsEqual'}}) 
     filter is being created; `=` is the alias of the filter type. 
   - The action is being dispatched through the view, where action listeners can handle it. 
 
@@ -106,7 +106,7 @@ Remarks:
   - Actions emit _structured_ events, composed of multiple phases; you're handling its `do` phase.
   - Action listener functions receive the action as argument.
   - The filter's 
-    [contentKey]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.filter.Abstract' | append: '#contentKey'}})
+    [contentKey]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.filter.Abstract' | append: '#contentKey'}})
     property provides an easy way to get a human-readable description of a filter.
 
 What are you waiting for? 

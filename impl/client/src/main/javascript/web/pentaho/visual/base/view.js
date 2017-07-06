@@ -16,8 +16,6 @@
 define([
   "module",
   "pentaho/type/complex",
-  "pentaho/type/filter/abstract",
-  "pentaho/type/filter/or",
   "pentaho/type/changes/ComplexChangeset",
   "./model",
   "pentaho/type/action/base",
@@ -35,8 +33,7 @@ define([
   "pentaho/util/promise",
   "pentaho/util/spec",
   "../action/standard"
-], function(module, complexFactory, abstractFilterFactory, orFilterFactory, ComplexChangeset, visualModelFactory,
-            baseActionFactory,
+], function(module, complexFactory, ComplexChangeset, visualModelFactory, baseActionFactory,
             bundle, WillUpdate, DidUpdate, RejectedUpdate, UserError,
             O, arg, F, BitSet, error, logger, promise, specUtil) {
 
@@ -106,6 +103,8 @@ define([
        * and emit events for these.
        * Note that standard actions come pre-loaded with the `View` class,
        * and can thus be safely constructed synchronously from View derived classes.
+       *
+       * All standard filter types are preloaded and can be safely loaded synchronously.
        *
        * When a view is no longer needed,
        * the _container application_ **must** call its [dispose]{@link pentaho.visual.base.View#dispose} method,
@@ -1059,16 +1058,20 @@ define([
              * To serialize it, specify the argument `keyArgs.omitProps.selectionFilter` of
              * [toSpec]{@link pentaho.visual.base.View#toSpec} to `false`.
              *
+             * When set to a filter specification, {@link pentaho.data.filter.spec.IAbstract},
+             * it is converted into a filter object.
+             * Any standard filter can be safely loaded synchronously.
+             *
              * **ATTENTION**: The current implementation only supports filters that can be
-             * converted to [DNF]{@link pentaho.type.filter.Abstract#toDnf} _in a reasonable amount of time_.
+             * converted to [DNF]{@link pentaho.data.filter.Abstract#toDnf} _in a reasonable amount of time_.
              *
              * @name selectionFilter
              * @memberOf pentaho.visual.base.View#
-             * @type {pentaho.type.filter.Abstract}
+             * @type {pentaho.data.filter.Abstract}
              */
             name: "selectionFilter",
-            valueType: "pentaho/type/filter/abstract",
-            defaultValue: {_: "pentaho/type/filter/or"},
+            valueType: "pentaho/data/filter/abstract",
+            defaultValue: {_: "pentaho/data/filter/or"},
             isRequired: true
           },
           {

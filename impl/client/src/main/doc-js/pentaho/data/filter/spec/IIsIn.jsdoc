@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./base",
-  "./data",
-  "./select",
-  "./execute"
-], function(baseActionFactory, dataActionFactory, selectActionFactory, executeActionFactory) {
 
-  "use strict";
+// TODO: Opted to keep isIn @private, undocumented, for 7.1.
 
-  return {
-    base: baseActionFactory,
-    data: dataActionFactory,
-    select: selectActionFactory,
-    execute: executeActionFactory
-  };
-});
+/**
+ * The `spec.IIsIn` interface describes the information associated with a membership filter.
+ *
+ * @name pentaho.data.filter.spec.IIsIn
+ *
+ * @interface
+ * @extends pentaho.data.filter.spec.IProperty
+ *
+ * @see pentaho.data.filter.IsIn
+ *
+ * @private
+ */
+
+/**
+ * The possible values of the property.
+ *
+ * @name values
+ * @memberOf pentaho.data.filter.spec.IIsIn#
+ * @type Array.<pentaho.type.UValue>
+ */

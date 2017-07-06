@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./base",
-  "./data",
-  "./select",
-  "./execute"
-], function(baseActionFactory, dataActionFactory, selectActionFactory, executeActionFactory) {
 
-  "use strict";
-
-  return {
-    base: baseActionFactory,
-    data: dataActionFactory,
-    select: selectActionFactory,
-    execute: executeActionFactory
-  };
-});
+/**
+ * Function that is called for each filter in a filter tree during a
+ * [visit]{@link pentaho.data.filter.Abstract#visit} operation.
+ *
+ * @callback pentaho.data.filter.FTransformer
+ *
+ * @param {!pentaho.data.filter.Abstract} filter - The filter to be transformed.
+ * @param {pentaho.data.filter.Abstract[]} [filterOperands] - The list of filter operands.
+ *
+ * @return {!pentaho.data.filter.Abstract[]|pentaho.data.filter.Abstract}
+ *
+ * @see pentaho.data.filter.Abstract#visit
+ * @see pentaho.data.filter.Tree#visit
+ */

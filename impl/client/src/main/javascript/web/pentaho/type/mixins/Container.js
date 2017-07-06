@@ -186,7 +186,7 @@ define([
      * @private
      * @internal
      * @friend {pentaho.type.changes.Changeset}
-     * @friend {pentaho.type.filter.Abstract}
+     * @friend {pentaho.data.filter.Abstract}
      */
     __setVersionInternal: function(version) {
       this.__version = version;

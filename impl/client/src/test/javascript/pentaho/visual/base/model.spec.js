@@ -16,11 +16,9 @@
 define([
   "pentaho/type/Context",
   "pentaho/visual/base",
-  "pentaho/type/filter/or",
-  "pentaho/type/filter/and",
   "pentaho/lang/UserError",
   "pentaho/visual/role/property"
-], function(Context, modelFactory, orFilterFactory, andFilterFactory, UserError, rolePropFactory) {
+], function(Context, modelFactory, UserError, rolePropFactory) {
   "use strict";
 
   /* globals jasmine, console, expect, it, describe, beforeEach */
@@ -30,15 +28,11 @@ define([
     var context;
     var Model;
     var dataSpec;
-    var OrFilter;
-    var AndFilter;
 
     beforeEach(function() {
 
       context = new Context();
       Model = context.get(modelFactory);
-      OrFilter = context.get(orFilterFactory);
-      AndFilter = context.get(andFilterFactory);
 
       var data = {
         model: [

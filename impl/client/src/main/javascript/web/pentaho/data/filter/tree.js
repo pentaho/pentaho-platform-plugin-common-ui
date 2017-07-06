@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 define([
-  "./base",
-  "./data",
-  "./select",
-  "./execute"
-], function(baseActionFactory, dataActionFactory, selectActionFactory, executeActionFactory) {
+  "./abstract"
+], function(abstractFactory) {
 
   "use strict";
 
-  return {
-    base: baseActionFactory,
-    data: dataActionFactory,
-    select: selectActionFactory,
-    execute: executeActionFactory
+  return function(context) {
+
+    var Abstract = context.get(abstractFactory);
+
+    return Abstract._core.Tree;
   };
 });

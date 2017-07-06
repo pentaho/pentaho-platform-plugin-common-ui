@@ -13,19 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./base",
-  "./data",
-  "./select",
-  "./execute"
-], function(baseActionFactory, dataActionFactory, selectActionFactory, executeActionFactory) {
 
-  "use strict";
-
-  return {
-    base: baseActionFactory,
-    data: dataActionFactory,
-    select: selectActionFactory,
-    execute: executeActionFactory
-  };
-});
+/**
+ * @name pentaho.data.filter.spec
+ * @namespace
+ *
+ * @description The `filter.spec` namespace contains specification interfaces for filters.
+ */

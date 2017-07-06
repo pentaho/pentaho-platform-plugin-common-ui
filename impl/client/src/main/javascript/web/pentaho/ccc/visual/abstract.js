@@ -32,7 +32,8 @@ define([
   "pentaho/visual/color/paletteRegistry",
   "pentaho/visual/role/level",
   "pentaho/data/TableView",
-  "pentaho/i18n!view"
+  "pentaho/i18n!view",
+  "pentaho/data/filter/standard"
 ], function(module, modelFactory, baseViewFactory, SelectionModes, selectActionFactory, executeActionFactory,
             def, pvc, cdo, pv, Axis,
             util, O, logger, visualColorUtils, visualPaletteRegistry,

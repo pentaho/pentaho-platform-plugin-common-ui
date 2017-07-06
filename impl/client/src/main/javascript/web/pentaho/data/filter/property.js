@@ -1,0 +1,115 @@
+/*!
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+define([
+  "module",
+  "pentaho/util/object",
+  "./abstract"
+], function(module, O, abstractFactory) {
+
+  "use strict";
+
+  return function(context) {
+
+    var AbstractFilter = context.get(abstractFactory);
+
+    /**
+     * @name pentaho.data.filter.Property.Type
+     * @class
+     * @extends pentaho.data.filter.Abstract.Type
+     *
+     * @classDesc The base type class of filter types.
+     *
+     * For more information see {@link pentaho.data.filter.Property}.
+     */
+
+    /**
+     * @name pentaho.data.filter.Property
+     * @class
+     * @extends pentaho.data.filter.Abstract
+     * @abstract
+     * @amd {pentaho.type.Factory<pentaho.data.filter.Property>} pentaho/data/filter/property
+     *
+     * @classDesc The base class of filters that filter elements in a set
+     * by matching the value of a given property against a criteria/condition.
+     *
+     * @description Creates a property filter instance.
+     *
+     * @constructor
+     * @param {pentaho.data.filter.spec.IProperty} [spec] - A property filter specification.
+     */
+
+    return AbstractFilter.extend("pentaho.data.filter.Property", /** @lends pentaho.data.filter.Property# */{
+
+      /**
+       * Gets the name of the property.
+       *
+       * This getter is a shorthand for `this.getv("property")`.
+       *
+       * @name property
+       * @memberOf pentaho.data.filter.Property#
+       * @type {string}
+       * @readonly
+       */
+
+      /** @inheritDoc */
+      get isProperty() {
+        return true;
+      },
+
+      // TODO: In the future, review if value argument should be of type pentaho.type.Value.
+      /**
+       * Determines if a property value is such that its element is selected by this filter.
+       *
+       * @name _operation
+       * @memberOf pentaho.data.filter.Property#
+       * @method
+       *
+       * @param {any} value - The property value to be tested.
+       *
+       * @returns {boolean} `true` if the element is selected; `false`, otherwise.
+       *
+       * @protected
+       * @abstract
+       */
+
+      /**
+       * Determines if an element is selected by this filter.
+       *
+       * @param {!pentaho.type.Element} elem - The element to be tested.
+       *
+       * @return {boolean} `true` if `elem` is selected; `false`, otherwise.
+       */
+      _contains: function(elem) {
+        var prop = this.property;
+        return elem.type.has(prop) && this._operation(elem.getv(prop));
+      },
+
+      type: /** @lends pentaho.data.filter.Property.Type# */{
+        id: module.id,
+        isAbstract: true,
+        props: [
+          {
+            name: "property",
+            nameAlias: "p",
+            valueType: "string",
+            isRequired: true,
+            isReadOnly: true
+          }
+        ]
+      }
+    });
+  };
+});

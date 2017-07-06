@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./base",
-  "./data",
-  "./select",
-  "./execute"
-], function(baseActionFactory, dataActionFactory, selectActionFactory, executeActionFactory) {
 
-  "use strict";
+/**
+ * The `spec.ITree` interface describes the information associated with a tree filter.
+ *
+ * @name pentaho.data.filter.spec.ITree
+ *
+ * @interface
+ * @extends pentaho.data.filter.spec.IAbstract
+ *
+ * @see pentaho.data.filter.Tree
+ */
 
-  return {
-    base: baseActionFactory,
-    data: dataActionFactory,
-    select: selectActionFactory,
-    execute: executeActionFactory
-  };
-});
+/**
+ * The operands of the filter.
+ *
+ * @name operands
+ * @memberOf pentaho.data.filter.spec.ITree#
+ * @type Array.<pentaho.data.filter.spec.IAbstract>
+ */

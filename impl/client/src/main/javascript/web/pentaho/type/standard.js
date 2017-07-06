@@ -29,13 +29,11 @@ define([
   "./property",
   "./model",
   "./application",
-  "./mixins/standard",
-  "./filter/standard"
+  "./mixins/standard"
 ], function(instanceFactory, valueFactory, elementFactory, listFactory,
     simpleFactory, complexFactory, stringFactory, numberFactory, booleanFactory,
     dateFactory, objectFactory, functionFactory, propertyFactory,
-    modelFactory, applicationFactory,
-    standardMixins, standardFilters) {
+    modelFactory, applicationFactory, standardMixins) {
 
   "use strict";
 
@@ -56,7 +54,6 @@ define([
     "property": propertyFactory,
     "model":    modelFactory,
     "application": applicationFactory,
-    "mixins":   standardMixins,
-    "filter":   standardFilters
+    "mixins":   standardMixins
   };
 });

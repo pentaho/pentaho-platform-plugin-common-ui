@@ -16,16 +16,15 @@
 define([
   "module",
   "pentaho/type/action/base",
-  "pentaho/type/filter/abstract",
   "pentaho/lang/ArgumentInvalidTypeError"
-], function(module, baseActionFactory, abstractFilterFactory, ArgumentInvalidTypeError) {
+], function(module, baseActionFactory, ArgumentInvalidTypeError) {
 
   "use strict";
 
   return function(context) {
 
     // Cannot depend directly or an AMD dependency cycle would arise...
-    var baseViewType = null;
+    var __baseViewType = null;
 
     /**
      * @name pentaho.visual.action.Base.Type
@@ -37,9 +36,9 @@ define([
      * For more information see {@link pentaho.visual.action.Base}.
      */
 
-    var ActionBase = context.get(baseActionFactory);
+    var __ActionBase = context.get(baseActionFactory);
 
-    return ActionBase.extend(/** @lends pentaho.visual.action.Base# */{
+    return __ActionBase.extend(/** @lends pentaho.visual.action.Base# */{
       type: /** @lends pentaho.visual.action.Base.Type# */{
         id: module.id,
         isAbstract: true
@@ -89,10 +88,10 @@ define([
         this.base(target);
 
         // If not yet loaded, then, surely target isn't a BaseView...
-        if(!baseViewType) baseViewType = context.get("pentaho/visual/base/view").type;
+        if(!__baseViewType) __baseViewType = context.get("pentaho/visual/base/view").type;
 
-        if(!baseViewType.is(target))
-          throw new ArgumentInvalidTypeError("target", [baseViewType.id], typeof target);
+        if(!__baseViewType.is(target))
+          throw new ArgumentInvalidTypeError("target", [__baseViewType.id], typeof target);
       },
 
       /**

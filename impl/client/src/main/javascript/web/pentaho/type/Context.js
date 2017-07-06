@@ -44,7 +44,6 @@ define([
 
   var __nextFactoryUid = 1;
   var __singleton = null;
-  var __baseMid = module.id.replace(/Context$/, ""); // e.g.: "pentaho/type/"
 
   // Default `base` type in a type specification.
   var __defaultBaseTypeMid = "complex";
@@ -242,12 +241,8 @@ define([
       // This mostly helps tests being able to require.undef(.) these at any time
       //  and not cause random failures for assuming all standard types were loaded.
       Object.keys(standard).forEach(function(lid) {
-        if(lid !== "mixins" && lid !== "filter" && lid !== "instance")
+        if(lid !== "mixins" && lid !== "instance")
           this.__getByFactory(standard[lid], /* sync: */true);
-      }, this);
-
-      Object.keys(standard.filter).forEach(function(fid) {
-        this.__getByFactory(standard.filter[fid], /* sync: */true);
       }, this);
 
       Object.keys(standard.mixins).forEach(function(fid) {
@@ -280,15 +275,13 @@ define([
 
     // region Type Registry
 
-    // TODO: Removed from docs, below, until isIn is made public.
-    // [pentaho/type/filter/isIn]{@link pentaho.type.filter.IsIn}
     /**
      * Gets the **configured instance constructor** of a type.
      *
      * For more information on the `typeRef` argument,
      * see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
      *
-     * The modules of standard types and facet _mixins_ are preloaded and
+     * The modules of standard types and mixins are preloaded and
      * can be requested _synchronously_. These are:
      *
      * * [pentaho/type/instance]{@link pentaho.type.Instance}
@@ -312,16 +305,6 @@ define([
      *
      * For all of these, the `pentaho/type/` or `pentaho/type/mixins/` prefix is optional
      * (when requested to a _context_; the AMD module system requires the full module identifiers to be specified).
-     *
-     * The filter types are also preloaded:
-     *
-     *   * [pentaho/type/filter/abstract]{@link pentaho.type.filter.Abstract}
-     *     * [pentaho/type/filter/tree]{@link pentaho.type.filter.Tree}
-     *       * [pentaho/type/filter/and]{@link pentaho.type.filter.And}
-     *       * [pentaho/type/filter/or]{@link pentaho.type.filter.Or}
-     *     * [pentaho/type/filter/not]{@link pentaho.type.filter.Not}
-     *     * [pentaho/type/filter/property]{@link pentaho.type.filter.Property}
-     *       * [pentaho/type/filter/isEqual]{@link pentaho.type.filter.IsEqual}
      *
      * If it is not known whether all non-standard types that are referenced by identifier have already been loaded,
      * the asynchronous method version, [getAsync]{@link pentaho.type.Context#getAsync},
@@ -387,6 +370,33 @@ define([
     },
 
     /**
+     * Gets a set of configured instance constructors,
+     * given type references to these,
+     * either in the form of an array or of a map.
+     *
+     * The specified type references are each resolved synchronously,
+     * using [get]{@link pentaho.type.Context#get}.
+     *
+     * @param {!Array.<pentaho.type.spec.UTypeReference>|!Object.<string,pentaho.type.spec.UTypeReference>} typeRefs -
+     * An array or map of type references.
+     *
+     * @return {!Array.<Class.<pentaho.type.Instance>>|!Object.<string, Class.<pentaho.type.Instance>>} A resolved
+     * data structure of the same type as provided.
+     *
+     * @see pentaho.type.Context#get
+     * @see pentaho.type.Context#inject
+     */
+    resolve: function(typeRefs) {
+
+      if(Array.isArray(typeRefs))
+        return typeRefs.map(function(typeRef) { return this.get(typeRef); }, this);
+
+      var map = {};
+      O.eachOwn(typeRefs, function(typeRef, key) { map[key] = this.get(typeRef); }, this);
+      return map;
+    },
+
+    /**
      * Binds the initial arguments of a function to
      * the instance constructors corresponding to
      * given type references.
@@ -400,21 +410,34 @@ define([
      * then `fun` gets bound to that object.
      * Otherwise, the JavaScript context object in which `fun` is called is dynamic (whichever the caller decides).
      *
-     * @param {!Array.<pentaho.type.spec.UTypeReference>} typeRefs - An array of type references.
+     * @param {!Array.<pentaho.type.spec.UTypeReference>|Object.<string,pentaho.type.spec.UTypeReference>} typeRefs -
+     * An array or map of type references.
      * @param {function} fun - The function to bind.
      * @param {Object} [ctx] The fixed JavaScript context object to use.
      *
      * @return {function} The new bound function.
+     *
+     * @see pentaho.type.Context#get
+     * @see pentaho.type.Context#resolve
      */
     inject: function(typeRefs, fun, ctx) {
+
       var InstCtors = null;
       var me = this;
 
-      return function injected() {
+      var resolve = function() {
         // Resolve on first use.
-        if(!InstCtors) InstCtors = typeRefs.map(me.get, me);
+        if(!InstCtors) {
+          InstCtors = me.resolve(typeRefs);
+          if(!Array.isArray(typeRefs)) {
+            InstCtors = [InstCtors];
+          }
+        }
+        return InstCtors;
+      };
 
-        return fun.apply(ctx || this, InstCtors.concat(arg.slice(arguments)));
+      return function injected() {
+        return fun.apply(ctx || this, resolve().concat(arg.slice(arguments)));
       };
     },
 
