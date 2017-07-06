@@ -16,17 +16,17 @@
 define([
   "module",
   "pentaho/visual/action/base",
-  "pentaho/type/filter/abstract"
-], function(module, baseActionFactory, abstractFilterFactory) {
+  "pentaho/data/filter/standard"
+], function(module, baseActionFactory, filterFactories) {
 
   "use strict";
 
   return function(context) {
 
-    var AbstractFilter = context.get(abstractFilterFactory);
+    /* eslint dot-notation: 0 */
 
-    // Cannot depend directly or an AMD dependency cycle would arise...
-    var baseViewType = null;
+    // Load all standard filter factories so that any of these can be safely resolved.
+    var __abstractFilterType = context.get(filterFactories["abstract"]).type;
 
     /**
      * @name pentaho.visual.action.Data.Type
@@ -77,10 +77,11 @@ define([
        *
        * Can only be set while the action is in an [editable]{@link pentaho.type.action.Base#isEditable} state.
        *
-       * When set to a filter specification, {@link pentaho.type.filter.spec.IAbstract},
+       * When set to a filter specification, {@link pentaho.data.filter.spec.IAbstract},
        * it is converted into a filter object.
+       * Any standard filter can be safely loaded synchronously.
        *
-       * @type {pentaho.type.filter.Abstract}
+       * @type {pentaho.data.filter.Abstract}
        *
        * @throws {pentaho.lang.OperationInvalidError} When set and the action is not in an editable state.
        */
@@ -97,11 +98,11 @@ define([
          * The data filter of the action.
          *
          * @alias __dataFilter
-         * @type {pentaho.type.filter.Abstract}
+         * @type {pentaho.data.filter.Abstract}
          * @memberOf pentaho.visual.action.Data#
          * @private
          */
-        this.__dataFilter = AbstractFilter.type.to(value);
+        this.__dataFilter = __abstractFilterType.to(value);
       },
 
       // region serialization

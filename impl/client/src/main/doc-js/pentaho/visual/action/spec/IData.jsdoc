@@ -30,5 +30,5 @@
  *
  * @name dataFilter
  * @memberOf pentaho.visual.action.spec.IData#
- * @type {pentaho.type.filter.spec.IAbstract|pentaho.type.filter.Abstract}
+ * @type {pentaho.data.filter.spec.IAbstract|pentaho.data.filter.Abstract}
  */

@@ -16,7 +16,7 @@
 define([
   "pentaho/data/Table",
   "pentaho/data/TableView",
-  "pentaho/type/filter/abstract",
+  "pentaho/data/filter/abstract",
   "pentaho/type/Context"
 ], function(DataTable, TableView, abstractFilterFactory, Context) {
 

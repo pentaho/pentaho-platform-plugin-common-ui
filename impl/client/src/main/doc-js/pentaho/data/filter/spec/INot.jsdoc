@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./base",
-  "./data",
-  "./select",
-  "./execute"
-], function(baseActionFactory, dataActionFactory, selectActionFactory, executeActionFactory) {
 
-  "use strict";
+/**
+ * The `spec.INot` interface describes the information associated with a negation filter.
+ *
+ * @name pentaho.data.filter.spec.INot
+ *
+ * @interface
+ * @extends pentaho.data.filter.spec.IAbstract
+ *
+ * @see pentaho.data.filter.Not
+ */
 
-  return {
-    base: baseActionFactory,
-    data: dataActionFactory,
-    select: selectActionFactory,
-    execute: executeActionFactory
-  };
-});
+/**
+ * The operand of the filter.
+ *
+ * @name operand
+ * @memberOf pentaho.data.filter.spec.INot#
+ * @type pentaho.data.filter.spec.IAbstract
+ */

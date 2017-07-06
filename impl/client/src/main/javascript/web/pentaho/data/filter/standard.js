@@ -14,18 +14,32 @@
  * limitations under the License.
  */
 define([
-  "./base",
-  "./data",
-  "./select",
-  "./execute"
-], function(baseActionFactory, dataActionFactory, selectActionFactory, executeActionFactory) {
+  "./abstract",
+  "./tree",
+  "./property",
+  "./and",
+  "./or",
+  "./not",
+  "./isEqual",
+  "./isIn",
+  "./true",
+  "./false"
+], function(
+    abstractFactory, treeFactory, propFactory, andFactory, orFactory, notFactory, isEqFactory, isInFactory,
+    trueFactory, falseFactory) {
 
   "use strict";
 
   return {
-    base: baseActionFactory,
-    data: dataActionFactory,
-    select: selectActionFactory,
-    execute: executeActionFactory
+    "abstract": abstractFactory,
+    "tree": treeFactory,
+    "property": propFactory,
+    "and": andFactory,
+    "or": orFactory,
+    "not": notFactory,
+    "isEqual": isEqFactory,
+    "isIn": isInFactory,
+    "true": trueFactory,
+    "false": falseFactory
   };
 });

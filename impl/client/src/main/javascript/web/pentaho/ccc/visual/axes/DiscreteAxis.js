@@ -17,8 +17,9 @@ define([
   "cdf/lib/CCC/def",
   "cdf/lib/CCC/pvc",
   "./AbstractAxis",
-  "../_util"
-], function(def, pvc, AbstractAxis, util) {
+  "../_util",
+  "pentaho/data/filter/isEqual"
+], function(def, pvc, AbstractAxis, util, isEqualFactory) {
 
   "use strict";
 
@@ -59,7 +60,7 @@ define([
         var value = atom.value == null ? atom.rawValue : atom.value;
 
         if(value != null) {
-          if(!IsEqual) IsEqual = context.get("pentaho/type/filter/isEqual");
+          if(!IsEqual) IsEqual = context.get(isEqualFactory);
 
           var operand = new IsEqual({property: maInfo.attr.name, value: {_: "string", v: value, f: atom.label}});
           filter = filter ? filter.and(operand) : operand;

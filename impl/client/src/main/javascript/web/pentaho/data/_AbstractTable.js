@@ -291,7 +291,7 @@ define([
      * Returns a view for the subset of rows of a data table
      * that are selected by this filter.
      *
-     * @param {!pentaho.type.filter.Abstract} filter - The filter.
+     * @param {!pentaho.data.filter.Abstract} filter - The filter.
      *
      * @return {!pentaho.data.TableView} A view of the filtered data table.
      *

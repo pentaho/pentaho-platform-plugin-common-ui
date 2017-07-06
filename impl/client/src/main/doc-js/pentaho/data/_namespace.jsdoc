@@ -24,6 +24,8 @@
  * The data table abstraction is the [ITable]{@link pentaho.data.ITable} interface and
  * the data table class, [Table]{@link pentaho.data.Table}, provides a basic implementation of it.
  *
+ * Additionally, the `data` namespace contains the **Pentaho Filter API** (see {@link pentaho.data.filter}).
+ *
  * @name pentaho.data
  * @namespace
  */

@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./base",
-  "./data",
-  "./select",
-  "./execute"
-], function(baseActionFactory, dataActionFactory, selectActionFactory, executeActionFactory) {
 
-  "use strict";
+/**
+ * The `spec.IIsEqual` interface describes the information associated with an equality filter.
+ *
+ * @name pentaho.data.filter.spec.IIsEqual
+ *
+ * @interface
+ * @extends pentaho.data.filter.spec.IProperty
+ *
+ * @see pentaho.data.filter.IsEqual
+ */
 
-  return {
-    base: baseActionFactory,
-    data: dataActionFactory,
-    select: selectActionFactory,
-    execute: executeActionFactory
-  };
-});
+/**
+ * The expected value of the property.
+ *
+ * @name value
+ * @memberOf pentaho.data.filter.spec.IIsEqual#
+ * @type pentaho.type.UValue
+ */

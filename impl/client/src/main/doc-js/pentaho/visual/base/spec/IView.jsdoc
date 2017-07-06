@@ -57,6 +57,6 @@
  *
  * @name selectionFilter
  * @memberOf pentaho.visual.base.spec.IView#
- * @type {pentaho.type.filter.Abstract}
+ * @type {pentaho.data.filter.Abstract}
  * @see pentaho.visual.base.View#selectionFilter
  */

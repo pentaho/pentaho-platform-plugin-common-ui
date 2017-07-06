@@ -24,8 +24,8 @@
  *
  * @callback pentaho.visual.action.SelectionMode
  *
- * @param {pentaho.type.filter.Abstract} current - The view's current selection filter.
- * @param {pentaho.type.filter.Abstract} input - The user input data filter.
+ * @param {pentaho.data.filter.Abstract} current - The view's current selection filter.
+ * @param {pentaho.data.filter.Abstract} input - The user input data filter.
  *
- * @return {pentaho.type.filter.Abstract} The resulting filter.
+ * @return {pentaho.data.filter.Abstract} The resulting filter.
  */

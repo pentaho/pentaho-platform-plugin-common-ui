@@ -79,15 +79,17 @@
   requireTypeInfo["pentaho/type/date"] = {alias: "date", base: "simple"};
   requireTypeInfo["pentaho/type/object"] = {alias: "object", base: "simple"};
   requireTypeInfo["pentaho/type/function"] = {alias: "function", base: "simple"};
-  requireTypeInfo["pentaho/type/filter/abstract"] = {base: "complex"};
-  requireTypeInfo["pentaho/type/filter/tree"] = {base: "pentaho/type/filter/abstract"};
-  requireTypeInfo["pentaho/type/filter/or"] = {alias: "or", base: "pentaho/type/filter/tree"};
-  requireTypeInfo["pentaho/type/filter/and"] = {alias: "and", base: "pentaho/type/filter/tree"};
-  requireTypeInfo["pentaho/type/filter/not"] = {alias: "not", base: "pentaho/type/filter/abstract"};
-  requireTypeInfo["pentaho/type/filter/property"] = {base: "pentaho/type/filter/abstract"};
-  requireTypeInfo["pentaho/type/filter/isEqual"] = {alias: "=", base: "pentaho/type/filter/property"};
-  requireTypeInfo["pentaho/type/filter/isIn"] = {alias: "in", base: "pentaho/type/filter/property"};
   requireTypeInfo["pentaho/type/mixins/enum"] = {alias: "enum", base: "element"};
+  requireTypeInfo["pentaho/data/filter/abstract"] = {base: "complex"};
+  requireTypeInfo["pentaho/data/filter/true"] = {alias: "true", base: "pentaho/data/filter/abstract"};
+  requireTypeInfo["pentaho/data/filter/false"] = {alias: "false", base: "pentaho/data/filter/abstract"};
+  requireTypeInfo["pentaho/data/filter/tree"] = {base: "pentaho/data/filter/abstract"};
+  requireTypeInfo["pentaho/data/filter/or"] = {alias: "or", base: "pentaho/data/filter/tree"};
+  requireTypeInfo["pentaho/data/filter/and"] = {alias: "and", base: "pentaho/data/filter/tree"};
+  requireTypeInfo["pentaho/data/filter/not"] = {alias: "not", base: "pentaho/data/filter/abstract"};
+  requireTypeInfo["pentaho/data/filter/property"] = {base: "pentaho/data/filter/abstract"};
+  requireTypeInfo["pentaho/data/filter/isEqual"] = {alias: "=", base: "pentaho/data/filter/property"};
+  requireTypeInfo["pentaho/data/filter/isIn"] = {alias: "in", base: "pentaho/data/filter/property"};
 
   requireTypeInfo["pentaho/visual/base"] = {base: "model"};
   requireTypeInfo["pentaho/visual/base/view"] = {
