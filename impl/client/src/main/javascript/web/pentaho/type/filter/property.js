@@ -64,7 +64,7 @@ define([
        * @readonly
        */
 
-
+      /** @inheritDoc */
       get isProperty() {
         return true;
       },
@@ -91,8 +91,6 @@ define([
        * @param {!pentaho.type.Element} elem - The element to be tested.
        *
        * @return {boolean} `true` if `elem` is selected; `false`, otherwise.
-       *
-       * @override
        */
       _contains: function(elem) {
         var prop = this.property;

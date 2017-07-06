@@ -83,6 +83,7 @@ define([
        * @readonly
        */
 
+      /** @inheritDoc */
       _setTarget: function(target) {
 
         this.base(target);
@@ -116,11 +117,12 @@ define([
       },
 
       // region serialization
+      /** @inheritDoc */
       toSpecInContext: function(keyArgs) {
 
         var spec = this.base(keyArgs);
 
-        if (this.__position) {
+        if(this.__position) {
           spec.position = {x: this.__position.x, y: this.__position.y};
         }
 

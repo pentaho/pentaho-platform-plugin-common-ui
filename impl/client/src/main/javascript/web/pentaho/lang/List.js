@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ define([
 ], function(Base) {
 
   var baseProto = Base.Array.prototype;
+
+  // TODO: This class has several undocumented methods.
 
   return Base.Array.extend("pentaho.lang.List", /** @lends  pentaho.lang.List# */{
     /**
@@ -74,11 +76,21 @@ define([
      *
      * This class must implement the {@link pentaho.lang.IListElement} interface.
      *
-     * @type Class
+     * @type {Class}
      * @readonly
      */
     elemClass: null,
 
+    /**
+     * Gets a common name for the elements held by this list.
+     *
+     * The default implementation returns the value of
+     * {@link pentaho.lang.IListElement#elemName} of
+     * {@link pentaho.lang.List#elemClass}.
+     *
+     * @return {string} The common name of the elements.
+     * @protected
+     */
     _getElemName: function() {
       return this.elemClass.prototype.elemName;
     },
@@ -88,7 +100,7 @@ define([
      *
      * @name pentaho.lang.List#length
      * @readonly
-     * @type number
+     * @type {number}
      */
 
     /**
@@ -232,7 +244,7 @@ define([
      * If the element's class does not implement {@link pentaho.lang.ISpecifiable},
      * each element is assumed to be its own specification.
      *
-     * @return {Array} The list specification.
+     * @return {!Array} The list specification.
      */
     toSpec: function() {
       return this.map(function(elem) { return elem.toSpec ? elem.toSpec() : elem; });

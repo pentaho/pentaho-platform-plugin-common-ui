@@ -109,9 +109,9 @@ define([
         this._initContainer();
 
         // Create `Property` instances.
-        var propTypes = this.type._getProps();
+        var propTypes = this.type.__getProps();
         var i = propTypes.length;
-        var readSpec = !spec ? undefined : (Array.isArray(spec) ? readSpecByIndex : readSpecByNameOrAlias);
+        var readSpec = !spec ? undefined : (Array.isArray(spec) ? __readSpecByIndex : __readSpecByNameOrAlias);
         var values = {};
         var propType;
         var value;
@@ -122,7 +122,7 @@ define([
           values[propType.name] =
               value = this._initValue(propType.toValue(readSpec && readSpec(spec, propType)), propType);
 
-          if(value && value._addReference) {
+          if(value && value.__addReference) {
             this.__initValueRelation(propType, value);
           }
         }
@@ -169,54 +169,8 @@ define([
       __initValueRelation: function(propType, value) {
 
         if(propType.isList || !propType.isBoundary) {
-          value._addReference(this, propType);
+          value.__addReference(this, propType);
         }
-      },
-
-      /**
-       * Creates a shallow clone of this complex value.
-       *
-       * All property values are shared with the clone.
-       *
-       * @return {!pentaho.type.Complex} The complex value clone.
-       */
-      clone: function() {
-        var clone = Object.create(Object.getPrototypeOf(this));
-        this._clone(clone);
-        return clone;
-      },
-
-      /**
-       * Initializes a clone of this complex value.
-       *
-       * @param {!pentaho.type.Complex} clone - The complex value clone.
-       * @protected
-       */
-      _clone: function(clone) {
-
-        this._cloneContainer(clone);
-
-        // All properties are copied except lists, which are shallow cloned.
-        // List properties are not affected by changesets.
-        var propTypes = this.type._getProps();
-        var source = (this._cset || this);
-        var i = propTypes.length;
-        var cloneValues = {};
-        var propType;
-        var name;
-        var value;
-
-        while(i--) {
-          propType = propTypes[i];
-          name  = propType.name;
-          cloneValues[name] = value = propType.isList ? this._getByName(name).clone() : source._getByName(name);
-
-          if(value && value._addReference) {
-            clone.__initValueRelation(propType, value);
-          }
-        }
-
-        clone._values = cloneValues;
       },
 
       /**
@@ -239,7 +193,7 @@ define([
        * @readOnly
        */
       get key() {
-        return this._uid;
+        return this.$uid;
       },
 
       // region As Raw
@@ -266,17 +220,18 @@ define([
        */
       get: function(name, sloppy) {
         var pType = this.type.get(name, sloppy);
-        if(pType) return this._getByType(pType);
+        if(pType) return this.__getByType(pType);
       },
 
-      // friend Property.Type
-      _getByType: function(pType) {
+      // @internal friend Property.Type
+      __getByType: function(pType) {
         // List values are never changed directly, only within,
         // so there's no need to waste time asking the changeset for changes.
-        return (pType.isList ? this : (this._cset || this))._getByName(pType.name);
+        return (pType.isList ? this : (this.__cset || this)).__getByName(pType.name);
       },
 
-      _getByName: function(name) {
+      // @internal
+      __getByName: function(name) {
         return this._values[name];
       },
 
@@ -430,7 +385,7 @@ define([
 
       /** @inheritDoc */
       _configure: function(config) {
-        this._usingChangeset(function() {
+        this.__usingChangeset(function() {
 
           if(config instanceof Complex) {
 
@@ -452,11 +407,6 @@ define([
 
           }
         });
-      },
-
-      // implement abstract pentaho.type.mixins.Container#_createChangeset
-      _createChangeset: function(txn) {
-        return new ComplexChangeset(txn, this);
       },
       // endregion
 
@@ -542,7 +492,7 @@ define([
         var pType = this.type.get(name, sloppy);
         if(!pType) return 0;
 
-        var value = this._getByType(pType);
+        var value = this.__getByType(pType);
         return pType.isList ? value.count : (value ? 1 : 0);
       },
 
@@ -581,7 +531,7 @@ define([
 
         if(!pType) return undefined;
 
-        var value = this._getByType(pType);
+        var value = this.__getByType(pType);
 
         if(pType.isList) /* assert value */ return value.at(index || 0);
 
@@ -775,7 +725,7 @@ define([
 
           if(omitProps && omitProps[name] === true) return;
 
-          var value = this._getByType(propType);
+          var value = this.__getByType(propType);
 
           var includeValue = includeDefaults;
           if(!includeValue) {
@@ -841,19 +791,20 @@ define([
         get isContainer() { return true; },
 
         // region properties property
-        _props: null,
+        __props: null,
 
         // Used for configuration only.
         set props(propSpecs) {
-          this._getProps().configure(propSpecs);
+          this.__getProps().configure(propSpecs);
         }, // jshint -W078
 
-        _getProps: function() {
+        // @internal
+        __getProps: function() {
           // Always get/create from/on the class' prototype.
           // Lazy creation.
           var proto = this.constructor.prototype;
-          return O.getOwn(proto, "_props") ||
-            (proto._props = PropertyTypeCollection.to([], /* declaringType: */this));
+          return O.getOwn(proto, "__props") ||
+            (proto.__props = PropertyTypeCollection.to([], /* declaringType: */this));
         },
         // endregion
 
@@ -875,16 +826,16 @@ define([
          */
         get: function(name, sloppy) {
           if(!name) throw error.argRequired("name");
-          var p = this._get(name);
+          var p = this.__get(name);
           if(!p && !sloppy)
             throw error.argInvalid("name", "A property with the name '" + (name.name || name) + "' is not defined.");
           return p;
         },
 
-        _get: function(name) {
+        __get: function(name) {
           var ps;
-          // !_props could only occur if accessing #get directly on Complex.type and it had no derived classes yet...
-          return (!name || !(ps = this._props)) ? null :
+          // !__props could only occur if accessing #get directly on Complex.type and it had no derived classes yet...
+          return (!name || !(ps = this.__props)) ? null :
                  (typeof name === "string") ? ps.get(name) :
                  (ps.get(name.name) === name) ? name :
                  null;
@@ -901,9 +852,9 @@ define([
          * @return {boolean} `true` if the property is defined; `false`, otherwise.
          */
         has: function(name) {
-          // !_props could only occur if accessing #has directly on Complex.type and it had no derived classes yet...
+          // !__props could only occur if accessing #has directly on Complex.type and it had no derived classes yet...
           var ps;
-          if(!name || !(ps = this._props)) return false;
+          if(!name || !(ps = this.__props)) return false;
           if(typeof name === "string") return ps.has(name);
           // Name is a type object
           return ps.get(name.name) === name;
@@ -922,15 +873,15 @@ define([
          */
         at: function(index, sloppy) {
           if(index == null) throw error.argRequired("index");
-          var pType = this._at(index);
+          var pType = this.__at(index);
           if(!pType && !sloppy)
             throw error.argRange("index");
           return pType;
         },
 
-        _at: function(index) {
-          // !_props could only occur if accessing #at directly on Complex.type and it had no derived classes yet...
-          var ps = this._props;
+        __at: function(index) {
+          // !__props could only occur if accessing #at directly on Complex.type and it had no derived classes yet...
+          var ps = this.__props;
           return (ps && ps[index]) || null;
         },
 
@@ -940,8 +891,8 @@ define([
          * @return {number} The number of properties.
          */
         get count() {
-          // !_props could only occur if accessing #at directly on Complex.type and it had no derived classes yet...
-          var ps = this._props;
+          // !__props could only occur if accessing #at directly on Complex.type and it had no derived classes yet...
+          var ps = this.__props;
           return ps ? ps.length : 0;
         },
 
@@ -956,7 +907,7 @@ define([
          * @return {!pentaho.type.Complex} This object.
          */
         each: function(f, x) {
-          var ps = this._props;
+          var ps = this.__props;
           var L;
           if(ps && (L = ps.length)) {
             var i = -1;
@@ -978,7 +929,7 @@ define([
          */
         add: function(propTypeSpec) {
           if(!Array.isArray(propTypeSpec)) propTypeSpec = [propTypeSpec];
-          this._getProps().configure(propTypeSpec);
+          this.__getProps().configure(propTypeSpec);
           return this;
         },
 
@@ -1081,7 +1032,41 @@ define([
       }
     })
     .implement(ContainerMixin)
-    .implement({
+    .implement(/** @lends pentaho.type.Complex# */{
+
+      /** @inheritDoc */
+      _initClone: function(clone) {
+
+        this.base(clone);
+
+        // All properties are copied except lists, which are shallow cloned.
+        // List properties are not affected by changesets.
+        var propTypes = this.type.__getProps();
+        var source = (this.__cset || this);
+        var i = propTypes.length;
+        var cloneValues = {};
+        var propType;
+        var name;
+        var value;
+
+        while(i--) {
+          propType = propTypes[i];
+          name  = propType.name;
+          cloneValues[name] = value = propType.isList ? this.__getByName(name).clone() : source.__getByName(name);
+
+          if(value && value.__addReference) {
+            clone.__initValueRelation(propType, value);
+          }
+        }
+
+        clone._values = cloneValues;
+      },
+
+      /** @inheritDoc */
+      _createChangeset: function(txn) {
+        return new ComplexChangeset(txn, this);
+      },
+
       type: bundle.structured.complex
     });
 
@@ -1109,11 +1094,11 @@ define([
   };
 
   // Constructor's helper functions
-  function readSpecByIndex(spec, propType) {
+  function __readSpecByIndex(spec, propType) {
     return spec[propType.index];
   }
 
-  function readSpecByNameOrAlias(spec, propType) {
+  function __readSpecByNameOrAlias(spec, propType) {
     var name;
     return O_hasOwn.call(spec, (name = propType.name)) ? spec[name] :
            ((name = propType.nameAlias) && O_hasOwn.call(spec, name)) ? spec[name] :

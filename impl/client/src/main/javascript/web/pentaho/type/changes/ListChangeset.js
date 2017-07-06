@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,7 +132,8 @@ define([
       this._lastClearIndex = -1;
     },
 
-    _setNestedChangeset: function(csetNested) {
+    /** @inheritDoc */
+    __setNestedChangeset: function(csetNested) {
       this._changesByElemKey[csetNested.owner.key] = csetNested;
     },
 
@@ -147,7 +148,7 @@ define([
      * @readOnly
      * @private
      */
-    get _projectedMock() {
+    get __projectedMock() {
       var changeCount = this._changes.length;
       if(!changeCount) return this.owner;
 
@@ -169,12 +170,12 @@ define([
         // Reuse `_projMock`'s fields and discard it afterwards.
 
         // Ensure up to date with every change.
-        var projMock = this._projectedMock;
+        var projMock = this.__projectedMock;
 
         this._projMock = null;
 
-        target._elems = projMock._elems;
-        target._keys = projMock._keys;
+        target.__elems = projMock.__elems;
+        target.__keys = projMock.__keys;
       } else {
         this._applyFrom(target, 0);
       }
@@ -221,17 +222,18 @@ define([
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
      * @private
+     * @internal
      * @friend pentaho.type.List
      */
-    _set: function(fragment, add, update, remove, move, index) {
+    __set: function(fragment, add, update, remove, move, index) {
 
       // TODO: don't convert elements twice (elemType.to)
 
       this._assertWritable();
 
-      var list = this._projectedMock; // calculate relative the last change
-      var elems = list._elems;
-      var keys = list._keys;
+      var list = this.__projectedMock; // calculate relative the last change
+      var elems = list.__elems;
+      var keys = list.__keys;
       var elemType = this.owner.type.of;
       var existing;
       var elem;
@@ -407,10 +409,10 @@ define([
 
       this._assertWritable();
 
-      var list = this._projectedMock; // calculate relative to the last change
+      var list = this.__projectedMock; // calculate relative to the last change
       var elemType = this.owner.type.of;
-      var elems = list._elems;
-      var keys = list._keys;
+      var elems = list.__elems;
+      var keys = list.__keys;
       var removeElems = Array.isArray(fragment)
         ? fragment.map(elemType.to, elemType)
         : [elemType.to(fragment)];
@@ -493,17 +495,17 @@ define([
 
       if(count < 0) return; // noop
 
-      var list = this._projectedMock;
+      var list = this.__projectedMock;
 
       if(count == null) count = 1;
 
-      var L = list._elems.length;
+      var L = list.__elems.length;
 
       if(start >= L) return; // noop
 
       if(start < 0) start = Math.max(0, L + start);
 
-      var removed = list._elems.slice(start, start + count);
+      var removed = list.__elems.slice(start, start + count);
 
       this._addChange(new Remove(removed, start));
     },
@@ -526,14 +528,14 @@ define([
       this._assertWritable();
 
       var owner = this.owner;
-      var elem = owner._cast(elemSpec);
+      var elem = owner.__cast(elemSpec);
       var existing = owner.get(elem.key);
       if(existing) {
         var indexOld = owner.indexOf(existing);
 
         // assert indexOld >= 0
 
-        var L = this._projectedMock._elems.length;
+        var L = this.__projectedMock.__elems.length;
 
         indexNew = indexNew < 0 ? Math.max(0, L + indexNew) : Math.min(indexNew, L);
 

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -152,7 +152,7 @@ define([
             });
       });
 
-      it("should call the new ambient transaction's #_enteringAmbient method", function() {
+      it("should call the new ambient transaction's #__enteringAmbient method", function() {
 
         return require.using([
           "pentaho/type/Context",
@@ -162,17 +162,17 @@ define([
           var context = new Context();
           var txn = new Transaction(context);
 
-          spyOn(txn, "_enteringAmbient");
+          spyOn(txn, "__enteringAmbient");
 
           var scope = new TransactionScope(context, txn);
 
-          expect(txn._enteringAmbient).toHaveBeenCalled();
+          expect(txn.__enteringAmbient).toHaveBeenCalled();
 
           scope.exit();
         });
       });
 
-      it("should call the suspending ambient transaction's _exitingAmbient, when a null scope enters", function() {
+      it("should call the suspending ambient transaction's __exitingAmbient, when a null scope enters", function() {
 
         return require.using([
           "pentaho/type/Context",
@@ -184,11 +184,11 @@ define([
           var txn = new Transaction(context);
           var scope = new TransactionScope(context, txn);
 
-          spyOn(txn, "_exitingAmbient");
+          spyOn(txn, "__exitingAmbient");
 
           var scopeNull = new CommittedScope(context);
 
-          expect(txn._exitingAmbient).toHaveBeenCalled();
+          expect(txn.__exitingAmbient).toHaveBeenCalled();
 
           scopeNull.exit();
           scope.exit();
@@ -460,7 +460,7 @@ define([
           return testGet(function(sync, Context) {
             // "value" is configured on the Context constructor, so need to wire the prototype...
 
-            spyOn(Context.prototype, "_getConfig").and.callFake(function(id) {
+            spyOn(Context.prototype, "__getConfig").and.callFake(function(id) {
               if(id === "pentaho/type/value") {
                 return {foo: "bar", instance: {bar: "foo"}};
               }
@@ -471,7 +471,7 @@ define([
             var promise = callGet(context, sync, "pentaho/type/value");
 
             return promise.then(function(InstCtor) {
-              expect(Context.prototype._getConfig).toHaveBeenCalledWith("pentaho/type/value");
+              expect(Context.prototype.__getConfig).toHaveBeenCalledWith("pentaho/type/value");
 
               expect(InstCtor.prototype.bar).toBe("foo");
               expect(InstCtor.type.foo).toBe("bar");
@@ -483,7 +483,7 @@ define([
 
           return testGet(function(sync, Context) {
 
-            spyOn(Context.prototype, "_getConfig").and.callFake(function(id) {
+            spyOn(Context.prototype, "__getConfig").and.callFake(function(id) {
               if(id === "tests/foo/bar") {
                 return {foo: "bar", instance: {bar: "foo"}};
               }
@@ -505,7 +505,7 @@ define([
             return promise.then(function(InstCtor) {
               expect(InstCtor).toBe(Value2);
 
-              expect(Context.prototype._getConfig).toHaveBeenCalledWith("tests/foo/bar");
+              expect(Context.prototype.__getConfig).toHaveBeenCalledWith("tests/foo/bar");
               expect(ValueType2.implement).toHaveBeenCalledTimes(1);
 
               expect(InstCtor.prototype.bar).toBe("foo");
@@ -526,7 +526,7 @@ define([
 
           return testGet(function(sync, Context) {
 
-            spyOn(Context.prototype, "_getConfig").and.callFake(function(id) {
+            spyOn(Context.prototype, "__getConfig").and.callFake(function(id) {
               if(id === "tests/foo/bar") {
                 return {foo: "bar", instance: {bar: "foo"}};
               }
@@ -534,7 +534,7 @@ define([
 
             var context = new Context();
 
-            expect(context._configDepth).toBe(0);
+            expect(context.__configDepth).toBe(0);
 
             var Value = context.get("pentaho/type/value");
             var Value2 = Value.extend({
@@ -547,7 +547,7 @@ define([
 
             spyOn(ValueType2, "implement").and.callFake(function() {
 
-              expect(context._configDepth).toBe(1);
+              expect(context.__configDepth).toBe(1);
             });
 
             var promise = callGet(context, sync, Value2);
@@ -558,7 +558,7 @@ define([
 
               expect(ValueType2.implement).toHaveBeenCalledTimes(1);
 
-              expect(context._configDepth).toBe(0);
+              expect(context.__configDepth).toBe(0);
             });
           });
         });
@@ -567,7 +567,7 @@ define([
 
           return testGet(function(sync, Context) {
 
-            spyOn(Context.prototype, "_getConfig").and.callFake(function(id) {
+            spyOn(Context.prototype, "__getConfig").and.callFake(function(id) {
               if(id === "tests/foo/bar") {
                 return {foo: "bar", instance: {bar: "foo"}};
               }
@@ -575,7 +575,7 @@ define([
 
             var context = new Context();
 
-            expect(context._configDepth).toBe(0);
+            expect(context.__configDepth).toBe(0);
 
             var Value = context.get("pentaho/type/value");
             var Value2 = Value.extend({

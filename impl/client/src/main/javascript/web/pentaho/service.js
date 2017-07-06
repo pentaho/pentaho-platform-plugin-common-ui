@@ -62,9 +62,9 @@ define([
    * A map from logical module names to identifiers of dependency modules.
    * @type Object.<string, string[]>
    */
-  var logicalModules = {};
+  var __logicalModules = {};
 
-  processConfig();
+  __processConfig();
 
   return /** @type pentaho.service.ILocator */ {
 
@@ -77,8 +77,8 @@ define([
         // by specifying its AMD module id.
         onLoad();
       } else {
-        var nameAndOptions = parseNameAndOptions(name);
-        var modules = getLogicalModule(nameAndOptions.name);
+        var nameAndOptions = __parseNameAndOptions(name);
+        var modules = __getLogicalModule(nameAndOptions.name);
 
         var modulesCount = modules.length;
         var isSingle = nameAndOptions.options.single === "true";
@@ -126,13 +126,13 @@ define([
     },
 
     normalize: function(name, normalize) {
-      var nameAndOptions = parseNameAndOptions(name);
+      var nameAndOptions = __parseNameAndOptions(name);
 
-      return stringifyNameAndOptions(nameAndOptions);
+      return __stringifyNameAndOptions(nameAndOptions);
     },
 
     getRegisteredIds: function(logicalModuleName) {
-      var ids = O.getOwn(logicalModules, logicalModuleName);
+      var ids = O.getOwn(__logicalModules, logicalModuleName);
       return ids ? ids.slice() : [];
     }
   };
@@ -143,9 +143,9 @@ define([
    * @param {string} logicalModuleName - The name of the logical module.
    * @return {Array} An array of module identifiers, possibly empty.
    */
-  function getLogicalModule(logicalModuleName) {
-    return O.getOwn(logicalModules, logicalModuleName) ||
-           (logicalModules[logicalModuleName] = []);
+  function __getLogicalModule(logicalModuleName) {
+    return O.getOwn(__logicalModules, logicalModuleName) ||
+           (__logicalModules[logicalModuleName] = []);
   }
 
   /**
@@ -155,12 +155,12 @@ define([
    * Ignores a _nully_ module configuration value.
    * Ignores _falsy_ physical and logical module identifiers.
    */
-  function processConfig() {
+  function __processConfig() {
     var config = module.config();
     var logicalModule;
     for(var absModuleId in config) { // nully tolerant
       if(absModuleId && (logicalModule = O.getOwn(config, absModuleId)))
-        getLogicalModule(logicalModule).push(absModuleId);
+        __getLogicalModule(logicalModule).push(absModuleId);
     }
   }
 
@@ -177,7 +177,7 @@ define([
    * @param {string} name - The name of the logical module.
    * @return {{name: string, options: Object.<string, string>}} The parsed name and options object.
    */
-  function parseNameAndOptions(name) {
+  function __parseNameAndOptions(name) {
     var logicalModuleName;
     var options = {};
 
@@ -207,7 +207,7 @@ define([
    * @param {{name: string, options: Object.<string, string>}} nameAndOptions - The name and options object.
    * @return {string} The normalized module id.
    */
-  function stringifyNameAndOptions(nameAndOptions) {
+  function __stringifyNameAndOptions(nameAndOptions) {
     var options = [];
 
     for(var prop in nameAndOptions.options) {

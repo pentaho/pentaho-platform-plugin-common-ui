@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,14 +41,14 @@ define([
    * @description Creates a `PrimitiveChange` instance.
    */
 
-  return Change.extend("pentaho.type.changes.PrimitiveChange", {
+  return Change.extend("pentaho.type.changes.PrimitiveChange", /** @lends pentaho.type.changes.PrimitiveChange# */{
     /**
      * Register reference changes caused by the change.
      *
      * @param {!pentaho.type.changes.Transaction} transaction - The ambient transaction, provided for performance.
      * @param {!pentaho.type.mixins.Container} container - The container instance.
      *
-     * @private
+     * @protected
      *
      * @see pentaho.type.changes.ListChangeset._addChange
      * @see pentaho.type.changes.ComplexChangeset._setElement
@@ -62,7 +62,7 @@ define([
      * @param {!pentaho.type.changes.Transaction} transaction - The ambient transaction, provided for performance.
      * @param {!pentaho.type.mixins.Container} container - The container instance.
      *
-     * @private
+     * @protected
      *
      * @see pentaho.type.changes.ListChangeset#_clearChanges
      * @see pentaho.type.changes.ComplexChangeset#_clearChanges

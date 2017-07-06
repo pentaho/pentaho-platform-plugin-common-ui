@@ -59,8 +59,8 @@ define([
        */
       get mapping() {
         // TODO: Test it is an attributes list of a mapping...
-        var attrsList = typeUtil._getFirstRefContainer(this);
-        return attrsList && typeUtil._getFirstRefContainer(attrsList);
+        var attrsList = typeUtil.__getFirstRefContainer(this);
+        return attrsList && typeUtil.__getFirstRefContainer(attrsList);
       },
 
       /**
@@ -75,6 +75,7 @@ define([
       },
 
       // TODO: cannot make this public unless the data model is made public...
+      // TODO: change to __
 
       /**
        * Gets the data attribute referenced by this visual role mapping attribute.
@@ -100,6 +101,7 @@ define([
         return null;
       },
 
+      /** @inheritDoc */
       toSpecInContext: function(keyArgs) {
 
         var spec = this.base(keyArgs);

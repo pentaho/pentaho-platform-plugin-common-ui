@@ -84,12 +84,14 @@ define([
 
         this._initContainer();
 
-        this._elems = [];
-        this._keys  = {};
+        // @internal
+        this.__elems = [];
+        // @internal
+        this.__keys  = {};
 
         if(keyArgs) {
-          if(keyArgs.isBoundary) this._isBoundary = true;
-          if(keyArgs.isReadOnly) this._isReadOnly = true;
+          if(keyArgs.isBoundary) this.__isBoundary = true;
+          if(keyArgs.isReadOnly) this.__isReadOnly = true;
         }
 
         if(spec != null) {
@@ -98,20 +100,20 @@ define([
           var elemSpecs =
               Array.isArray(spec) ? spec :
               (spec.constructor === Object && Array.isArray(spec.d)) ? spec.d :
-              (spec instanceof List) ? spec._elems :
+              (spec instanceof List) ? spec.__elems :
               null;
 
-          if(elemSpecs) this._load(elemSpecs);
+          if(elemSpecs) this.__load(elemSpecs);
         }
       },
 
-      _load: function(elemSpecs) {
-        var isBoundary = this._isBoundary;
+      __load: function(elemSpecs) {
+        var isBoundary = this.__isBoundary;
         var i = -1;
         var L = elemSpecs.length;
         var elemType = this.type.of;
-        var elems = this._elems;
-        var keys  = this._keys;
+        var elems = this.__elems;
+        var keys  = this.__keys;
         var elem;
         var key;
         while(++i < L) {
@@ -119,13 +121,13 @@ define([
             elems.push(elem);
             keys[key] = elem;
 
-            if(!isBoundary && elem._addReference) elem._addReference(this);
+            if(!isBoundary && elem.__addReference) elem.__addReference(this);
           }
         }
       },
 
       // region isReadOnly
-      _isReadOnly: false,
+      __isReadOnly: false,
 
       /**
        * Gets a value that indicates if this list is read-only.
@@ -134,7 +136,7 @@ define([
        * @readOnly
        */
       get isReadOnly() {
-        return this._isReadOnly;
+        return this.__isReadOnly;
       },
 
       /**
@@ -145,12 +147,12 @@ define([
        * @private
        */
       __assertEditable: function() {
-        if(this._isReadOnly) throw new TypeError("The list is read-only.");
+        if(this.__isReadOnly) throw new TypeError("The list is read-only.");
       },
       // endregion
 
       // region isBoundary
-      _isBoundary: false,
+      __isBoundary: false,
 
       /**
        * Gets a value that indicates if this list is a _boundary list_.
@@ -164,31 +166,9 @@ define([
        * @readOnly
        */
       get isBoundary() {
-        return this._isBoundary;
+        return this.__isBoundary;
       },
       // endregion
-
-      /**
-       * Creates a shallow clone of this list value.
-       *
-       * All elements are shared with the clone.
-       *
-       * Ownership is not preserved.
-       *
-       * If the list is read-only, the clone will not.
-       *
-       * @return {!pentaho.type.List} The list value clone.
-       */
-      clone: function() {
-        var clone = Object.create(Object.getPrototypeOf(this));
-        this._clone(clone);
-        return clone;
-      },
-
-      _clone: function(clone) {
-        this._cloneContainer(clone);
-        this._cloneElementData(clone);
-      },
 
       /**
        * Clones the data structures that store elements.
@@ -198,13 +178,14 @@ define([
        * @return {!Object} The specified clone object.
        *
        * @private
+       * @internal
        * @friend {pentaho.type.changes.ListChangeset}
-       * @see pentaho.type.changes.ListChangeset#_projectedMock
+       * @see pentaho.type.changes.ListChangeset#__projectedMock
        */
       _cloneElementData: function(clone, useCommitted) {
-        var mock = useCommitted ? this : this._projectedMock;
-        clone._elems = mock._elems.slice();
-        clone._keys  = O.assignOwnDefined({}, mock._keys);
+        var mock = useCommitted ? this : this.__projectedMock;
+        clone.__elems = mock.__elems.slice();
+        clone.__keys  = O.assignOwnDefined({}, mock.__keys);
         return clone;
       },
 
@@ -233,7 +214,7 @@ define([
 
       /** @inheritDoc */
       _configure: function(config) {
-        this._usingChangeset(function() {
+        this.__usingChangeset(function() {
 
           if(config instanceof List) {
             // TODO: when differences between `configure` and `set` are revisited, try to decide what makes sense here.
@@ -265,11 +246,12 @@ define([
        * @type {!Object|!pentaho.type.List}
        * @readOnly
        * @private
-       * @see pentaho.type.changes.ListChangeset#_projectedMock
+       * @internal
+       * @see pentaho.type.changes.ListChangeset#__projectedMock
        */
-      get _projectedMock() {
+      get __projectedMock() {
         var cset;
-        return (cset = this._cset) ? cset._projectedMock : this;
+        return (cset = this.__cset) ? cset.__projectedMock : this;
       },
 
       /**
@@ -292,7 +274,7 @@ define([
        * @readonly
        */
       get key() {
-        return this._uid;
+        return this.$uid;
       },
 
       /**
@@ -302,7 +284,7 @@ define([
        * @readonly
        */
       get count() {
-        return this._projectedMock._elems.length;
+        return this.__projectedMock.__elems.length;
       },
 
       /**
@@ -313,7 +295,7 @@ define([
        */
       at: function(index) {
         if(index == null) throw error.argRequired("index");
-        return this._projectedMock._elems[index] || null;
+        return this.__projectedMock.__elems[index] || null;
       },
 
       /**
@@ -325,8 +307,8 @@ define([
        */
       has: function(key) {
         return key != null &&
-            (key = this._castKey(key)) != null &&
-            O.hasOwn(this._projectedMock._keys, key);
+            (key = this.__castKey(key)) != null &&
+            O.hasOwn(this.__projectedMock.__keys, key);
       },
 
       /**
@@ -348,7 +330,7 @@ define([
        * @return {number} `true` if the element is present in the list; `false`, otherwise.
        */
       indexOf: function(elem) {
-        return elem && this.has(elem.key) ? this._projectedMock._elems.indexOf(elem) : -1;
+        return elem && this.has(elem.key) ? this.__projectedMock.__elems.indexOf(elem) : -1;
       },
 
       /**
@@ -360,8 +342,8 @@ define([
        */
       get: function(key) {
         // jshint laxbreak:true
-        return (key != null && (key = this._castKey(key)) != null)
-            ? O.getOwn(this._projectedMock._keys, key, null)
+        return (key != null && (key = this.__castKey(key)) != null)
+            ? O.getOwn(this.__projectedMock.__keys, key, null)
             : null;
       },
 
@@ -388,7 +370,7 @@ define([
        */
       set: function(fragment, keyArgs) {
 
-        this._set(
+        this.__set(
             fragment,
             !arg.optional(keyArgs, "noAdd"),
             !arg.optional(keyArgs, "noUpdate"),
@@ -408,7 +390,7 @@ define([
        * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
        */
       add: function(fragment) {
-        this._set(fragment, /* add: */true, /* update: */true, /* remove: */false, /* move: */false);
+        this.__set(fragment, /* add: */true, /* update: */true, /* remove: */false, /* move: */false);
       },
 
       /**
@@ -426,7 +408,8 @@ define([
        * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
        */
       insert: function(fragment, index) {
-        this._set(fragment, /* add: */true, /* update: */true, /* remove: */false, /* move: */false, /* index: */index);
+        this.__set(fragment,
+            /* add: */true, /* update: */true, /* remove: */false, /* move: */false, /* index: */index);
       },
 
       /**
@@ -442,7 +425,7 @@ define([
 
         this.__assertEditable();
 
-        this._usingChangeset(function(cset) {
+        this.__usingChangeset(function(cset) {
           cset._remove(fragment);
         });
       },
@@ -459,7 +442,7 @@ define([
 
         this.__assertEditable();
 
-        this._usingChangeset(function(cset) {
+        this.__usingChangeset(function(cset) {
           cset._move(elemSpec, indexNew);
         });
       },
@@ -483,7 +466,7 @@ define([
 
         this.__assertEditable();
 
-        this._usingChangeset(function(cset) {
+        this.__usingChangeset(function(cset) {
           cset._removeAt(start, count);
         });
       },
@@ -499,7 +482,7 @@ define([
 
         this.__assertEditable();
 
-        this._usingChangeset(function(cset) {
+        this.__usingChangeset(function(cset) {
           cset._sort(comparer);
         });
       },
@@ -513,7 +496,7 @@ define([
 
         this.__assertEditable();
 
-        this._usingChangeset(function(cset) {
+        this.__usingChangeset(function(cset) {
           cset._clear();
         });
       },
@@ -527,7 +510,7 @@ define([
        * @return {Array.<any>} An array of elements.
        */
       toArray: function(map, ctx) {
-        var elems = this._projectedMock._elems;
+        var elems = this.__projectedMock.__elems;
         return map ? elems.map(map, ctx) : elems.slice();
       },
 
@@ -540,7 +523,7 @@ define([
        * @param {Object} [ctx] The JS context object on which `fun` is called.
        */
       each: function(fun, ctx) {
-        var elems = this._projectedMock._elems;
+        var elems = this.__projectedMock.__elems;
         var L = elems.length;
         var i = -1;
 
@@ -556,9 +539,9 @@ define([
        *
        * @return {nonEmptyString} The key.
        *
-       * @protected
+       * @private
        */
-      _castKey: function(value) {
+      __castKey: function(value) {
         return value.toString();
       },
 
@@ -569,24 +552,27 @@ define([
        *
        * @return {pentaho.type.Element} An element.
        *
-       * @protected
+       * @private
+       * @internal
        */
-      _cast: function(valueSpec) {
-        return this.type._elemType.to(valueSpec);
+      __cast: function(valueSpec) {
+        return this.type.__elemType.to(valueSpec);
       },
 
       // region Core change methods
       // implement abstract pentaho.type.mixins.Container#_createChangeset
+      /** @inheritDoc */
       _createChangeset: function(txn) {
         return new ListChangeset(txn, this);
       },
 
-      _set: function(fragment, add, update, remove, move, index) {
+      // @internal
+      __set: function(fragment, add, update, remove, move, index) {
 
         this.__assertEditable();
 
-        this._usingChangeset(function(cset) {
-          cset._set(fragment, add, update, remove, move, index);
+        this.__usingChangeset(function(cset) {
+          cset.__set(fragment, add, update, remove, move, index);
         });
       },
       // endregion
@@ -636,7 +622,7 @@ define([
           this.base.apply(this, arguments);
 
           // Force base value inheritance. Cannot change after being set locally...
-          if(!O.hasOwn(this, "_elemType")) this._elemType = this._elemType;
+          if(!O.hasOwn(this, "__elemType")) this.__elemType = this.__elemType;
         },
 
         id: module.id,
@@ -646,7 +632,7 @@ define([
         get isContainer() { return true; },
 
         // region of / element type attribute
-        _elemType: Element.type,
+        __elemType: Element.type,
 
         /**
          * Gets or sets the type of the elements that this type of list can contain.
@@ -670,7 +656,7 @@ define([
          * @see pentaho.type.spec.IListTypeProto#of
          */
         get of() {
-          return this._elemType;
+          return this.__elemType;
         },
 
         // supports configuration
@@ -685,11 +671,11 @@ define([
 
           var ElemInstance = this.context.get(value);
           var elemType = ElemInstance.type;
-          var baseElemType = this._elemType;
+          var baseElemType = this.__elemType;
 
           // Can't use O.setConst cause the configurable: false is inherited
           // and we need to be able to set each local value at least once.
-          if(O.hasOwn(this, "_elemType")) {
+          if(O.hasOwn(this, "__elemType")) {
             if(elemType !== baseElemType) throw error.operInvalid("Property 'of' cannot change.");
             return;
           }
@@ -701,7 +687,7 @@ define([
             throw error.argInvalid("of", bundle.structured.errors.list.elemTypeNotSubtypeOfBaseElemType);
 
           // Mark set locally even if it is the same...
-          this._elemType = elemType;
+          this.__elemType = elemType;
 
         },
         // endregion
@@ -725,7 +711,7 @@ define([
          * @protected
          */
         _validate: function(value) {
-          return value._projectedMock._elems.reduce(function(errors, elem) {
+          return value.__projectedMock.__elems.reduce(function(errors, elem) {
             return typeUtil.combineErrors(errors, elem.validate());
           }, null);
         },
@@ -749,15 +735,15 @@ define([
           };
 
           // Add "of" if we're `List` or the base `of` is different.
-          var baseElemType = baseType.isSubtypeOf(List.type) ? baseType._elemType : null;
-          if(!baseElemType || this._elemType !== baseElemType) {
-            spec.of = this._elemType.toRefInContext(keyArgs);
+          var baseElemType = baseType.isSubtypeOf(List.type) ? baseType.__elemType : null;
+          if(!baseElemType || this.__elemType !== baseElemType) {
+            spec.of = this.__elemType.toRefInContext(keyArgs);
           }
 
           // No other attributes, no id and base is "list"?
           if(!this._fillSpecInContext(spec, keyArgs) && !spec.id && spec.base === "list") {
 
-            if(!spec.of) spec.of = this._elemType.toRefInContext(keyArgs);
+            if(!spec.of) spec.of = this.__elemType.toRefInContext(keyArgs);
 
             return [spec.of];
           }
@@ -771,7 +757,13 @@ define([
       }
     })
     .implement(ContainerMixin)
-    .implement({
+    .implement(/** @lends pentaho.type.List# */{
+      /** @inheritDoc */
+      _initClone: function(clone) {
+        this.base(clone);
+        this._cloneElementData(clone);
+      },
+
       type: bundle.structured.list
     });
 

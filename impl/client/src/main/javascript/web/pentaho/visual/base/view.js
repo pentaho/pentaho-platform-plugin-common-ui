@@ -44,19 +44,19 @@ define([
 
   /* global Promise:false */
 
-  var _reUpdateMethodName = /^_update(.+)$/;
+  var __reUpdateMethodName = /^_update(.+)$/;
 
-  var _emitActionKeyArgs = {
+  var __emitActionKeyArgs = {
     errorHandler: function(ex, action) { action.fail(ex); },
     isCanceled: function(action) { return action.isCanceled; }
   };
 
   return function(context) {
 
-    var Complex = context.get(complexFactory);
-    var actionBaseType = context.get(baseActionFactory).type;
+    var __Complex = context.get(complexFactory);
+    var __actionBaseType = context.get(baseActionFactory).type;
 
-    var View = Complex.extend(/** @lends pentaho.visual.base.View# */{
+    var View = __Complex.extend(/** @lends pentaho.visual.base.View# */{
 
       /**
        * @name pentaho.visual.base.View.Type
@@ -324,6 +324,7 @@ define([
 
       // region Changes
       // @override Container
+      /** @inheritDoc */
       _onChangeDid: function(changeset) {
 
         var bitSetNew = new BitSet();
@@ -814,9 +815,9 @@ define([
 
         if(!action) throw error.argRequired("action");
 
-        action = actionBaseType.to(action);
+        action = __actionBaseType.to(action);
 
-        action.execute(this, this._getActionController(action));
+        action.execute(this, this.__getActionController(action));
 
         return action;
       },
@@ -844,14 +845,14 @@ define([
 
         if(!action) throw error.argRequired("action");
 
-        action = actionBaseType.to(action);
+        action = __actionBaseType.to(action);
 
-        return action.executeAsync(this, this._getActionController(action));
+        return action.executeAsync(this, this.__getActionController(action));
       },
 
       __genericActionController: null,
 
-      _getActionController: function(action) {
+      __getActionController: function(action) {
         return this.__genericActionController ||
             (this.__genericActionController = this.__createGenericActionController());
       },
@@ -872,7 +873,7 @@ define([
 
         // TODO: emitGenericAsync when action is async.
 
-        this._emitGeneric(action, eventType, phase, isFinal ? null : _emitActionKeyArgs);
+        this._emitGeneric(action, eventType, phase, isFinal ? null : __emitActionKeyArgs);
       },
 
       /**
@@ -937,6 +938,7 @@ define([
 
       // region Property groups - instance
       // see Base.js
+      /** @inheritDoc */
       extend: function(source, keyArgs) {
 
         this.base(source, keyArgs);
@@ -946,9 +948,9 @@ define([
 
           O.eachOwn(source, function(v, methodName) {
             var m;
-            if(F.is(v) && (m = _reUpdateMethodName.exec(methodName))) {
+            if(F.is(v) && (m = __reUpdateMethodName.exec(methodName))) {
 
-              var methodCleansBits = parsePropertyGroupsText(Subclass, m[1]);
+              var methodCleansBits = __parsePropertyGroupsText(Subclass, m[1]);
               if(methodCleansBits && !Subclass.__UpdateMethods[methodCleansBits]) {
                 var updateMethodInfo = {
                   name: methodName,
@@ -991,6 +993,7 @@ define([
       },
 
       // region serialization
+      /** @inheritDoc */
       toSpecInContext: function(keyArgs) {
 
         if(keyArgs && keyArgs.isJson) {
@@ -1084,6 +1087,7 @@ define([
           }
         ],
 
+        /** @inheritDoc */
         _init: function(spec, keyArgs) {
 
           this.base.apply(this, arguments);
@@ -1091,13 +1095,13 @@ define([
           // ----
           // Block inheritance, with default values
 
-          this._extension = null;
-          this._extensionEf = undefined;
+          this.__extension = null;
+          this.__extensionEf = undefined;
         },
 
         // region Extension
-        _extension: null,
-        _extensionEf: undefined,
+        __extension: null,
+        __extensionEf: undefined,
 
         /**
          * Gets or sets extension properties that a View handles directly.
@@ -1125,15 +1129,15 @@ define([
          * @see pentaho.visual.base.spec.IViewType#extension
          */
         get extension() {
-          return this._extension;
+          return this.__extension;
         },
 
         set extension(value) {
           if(this.hasDescendants)
             throw error.operInvalid("Cannot change the 'extension' of a view type that has descendants.");
 
-          this._extension = value ? Object(value) : null;
-          this._extensionEf = undefined;
+          this.__extension = value ? Object(value) : null;
+          this.__extensionEf = undefined;
         },
 
         /**
@@ -1152,7 +1156,7 @@ define([
          * @see pentaho.visual.base.View.Type#extension
          */
         get extensionEffective() {
-          var effective = this._extensionEf;
+          var effective = this.__extensionEf;
           if(effective === undefined) {
             effective = null;
 
@@ -1165,12 +1169,12 @@ define([
               }
             }
 
-            if(this._extension) {
+            if(this.__extension) {
               if(!effective) effective = {};
-              specUtil.merge(effective, this._extension);
+              specUtil.merge(effective, this.__extension);
             }
 
-            this._extensionEf = effective;
+            this.__extensionEf = effective;
           }
 
           return effective;
@@ -1284,6 +1288,7 @@ define([
 
       // region Property groups - class
       // see Base.js
+      /** @inheritDoc */
       _subclassed: function(Subclass, instSpec, classSpec, keyArgs) {
 
         // "Inherit" PropertyGroups, __PropertyGroupOfProperty, __UpdateMethods and __UpdateMethodsList properties
@@ -1491,7 +1496,7 @@ define([
    *
    * @return {number} The property group bits corresponding to the method name.
    */
-  function parsePropertyGroupsText(ViewClass, groupNamesText) {
+  function __parsePropertyGroupsText(ViewClass, groupNamesText) {
 
     var groupsBits = 0;
 

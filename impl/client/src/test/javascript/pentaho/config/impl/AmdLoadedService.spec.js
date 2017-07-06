@@ -20,7 +20,7 @@ define(function() {
 
   describe("pentaho.config.impl.AmdLoadedService -", function() {
 
-    // Should we refactor the tests so they don't depend on the "private" property _ruleStore?
+    // Should we refactor the tests so they don't depend on the "private" property __ruleStore?
 
     describe("configuration loading", function() {
       var localRequire;
@@ -116,7 +116,7 @@ define(function() {
       it("should add loaded rules", function(done) {
         localRequire(["pentaho/config/impl/AmdLoadedService"], function(ConfigService) {
           var cf = new ConfigService();
-          expect(cf._ruleStore["A"].length).toBe(6);
+          expect(cf.__ruleStore["A"].length).toBe(6);
           done();
         });
       });
@@ -125,7 +125,7 @@ define(function() {
         localRequire(["pentaho/config/impl/AmdLoadedService"], function(ConfigService) {
           var cf = new ConfigService();
 
-          var Ids = cf._ruleStore["A"].map(function(rule) {
+          var Ids = cf.__ruleStore["A"].map(function(rule) {
             return rule.apply.testId;
           });
 

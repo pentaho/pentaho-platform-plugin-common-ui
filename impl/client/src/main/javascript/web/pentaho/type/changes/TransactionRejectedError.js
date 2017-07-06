@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@
  */
 
 define([
+  "module",
   "../../lang/UserError",
   "../../util/object"
-], function(UserError, O) {
+], function(module, UserError, O) {
 
   "use strict";
 
@@ -39,8 +40,7 @@ define([
    * @param {Error} reason - The error message.
    */
 
-  return UserError.extend("pentaho.type.changes.TransactionRejectedError",
-    /** @lends pentaho.type.changes.TransactionRejectedError# */{
+  return UserError.extend(module.id, /** @lends pentaho.type.changes.TransactionRejectedError# */{
 
     constructor: function(reason) {
 

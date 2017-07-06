@@ -364,7 +364,7 @@ define([
    *
    * @return {!Class.<pentaho.lang.Base>} The new subclass.
    *
-   * @sealed
+   * @final
    */
   function class_extend(name, instSpec, classSpec, keyArgs) {
     /* jshint validthis:true*/

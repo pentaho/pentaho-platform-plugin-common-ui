@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -168,8 +168,8 @@ define([
     /** @lends pentaho.visual.color.PaletteRegistry# */{
 
       constructor: function() {
-        this._paletteList = [];
-        this._paletteMap  = {};
+        this.__paletteList = [];
+        this.__paletteMap  = {};
       },
 
       /**
@@ -182,14 +182,14 @@ define([
         if(!palette) throw new Error("Argument required 'palette'.");
 
         var name = palette.name;
-        var current = O.hasOwn(this._paletteMap, name) ? this._paletteMap[name] : null;
+        var current = O.hasOwn(this.__paletteMap, name) ? this.__paletteMap[name] : null;
 
         if(!current)
-          this._paletteList.push(palette);
+          this.__paletteList.push(palette);
         else
-          this._paletteList.splice(this._paletteList.indexOf(current), 1, palette);
+          this.__paletteList.splice(this.__paletteList.indexOf(current), 1, palette);
 
-        this._paletteMap[name] = palette;
+        this.__paletteMap[name] = palette;
         return this;
       },
 
@@ -201,7 +201,7 @@ define([
        * @return {Array.<pentaho.visual.color.IColorPalette>} An array of color palettes.
        */
       getAll: function() {
-        return this._paletteList;
+        return this.__paletteList;
       },
 
       /**
@@ -226,12 +226,12 @@ define([
        * @return {pentaho.visual.color.PaletteRegistry} This instance.
        */
       setDefault: function(name) {
-        if(name && !O.hasOwn(this._paletteMap, name))
+        if(name && !O.hasOwn(this.__paletteMap, name))
           throw new Error(
             "Invalid argument 'name'. " +
             "A palette with name '" + name + "' is not defined.");
 
-        this._defaultName = name || null;
+        this.__defaultName = name || null;
         return this;
       },
 
@@ -245,11 +245,11 @@ define([
        * @return {pentaho.visual.color.IColorPalette} The color palette.
        */
       get: function(name) {
-        if(!name && !(name = this._defaultName)) {
-          return this._paletteList.length ? this._paletteList[0] : null;
+        if(!name && !(name = this.__defaultName)) {
+          return this.__paletteList.length ? this.__paletteList[0] : null;
         }
 
-        return O.hasOwn(this._paletteMap, name) ? this._paletteMap[name] : null;
+        return O.hasOwn(this.__paletteMap, name) ? this.__paletteMap[name] : null;
       }
     });
 
@@ -280,11 +280,11 @@ define([
   paletteRegistry.setDefault(defaultVizApiPalette);
   // endregion
 
-  paletteRegistry.add({name: "ryg-3",  colors: ["#FF0000", "#FFFF00", "#008000"]});
-  paletteRegistry.add({name: "ryg-5",  colors: ["#FF0000", "#FFBF3F", "#FFFF00", "#BFDF3F", "#008000"]});
+  paletteRegistry.add({name: "ryg-3", colors: ["#FF0000", "#FFFF00", "#008000"]});
+  paletteRegistry.add({name: "ryg-5", colors: ["#FF0000", "#FFBF3F", "#FFFF00", "#BFDF3F", "#008000"]});
 
-  paletteRegistry.add({name: "ryb-3",  colors: ["#FF0000", "#FFFF00", "#4BB6E4"]});
-  paletteRegistry.add({name: "ryb-5",  colors: ["#FF0000", "#FFBF3F", "#FFFF00", "#DCDDDE", "#4BB6E4"]});
+  paletteRegistry.add({name: "ryb-3", colors: ["#FF0000", "#FFFF00", "#4BB6E4"]});
+  paletteRegistry.add({name: "ryb-5", colors: ["#FF0000", "#FFBF3F", "#FFFF00", "#DCDDDE", "#4BB6E4"]});
 
   paletteRegistry.add({name: "blue-3", colors: ["#CCDFED", "#6D85A4", "#0F2B5B"]});
   paletteRegistry.add({name: "blue-5", colors: ["#CCDFED", "#9CB2C8", "#6D85A4", "#3E587F", "#0F2B5B"]});

@@ -42,12 +42,12 @@ define([
 
   /* globals Promise */
 
-  var _nextFactoryUid = 1;
-  var _singleton = null;
-  var _baseMid = module.id.replace(/Context$/, ""); // e.g.: "pentaho/type/"
+  var __nextFactoryUid = 1;
+  var __singleton = null;
+  var __baseMid = module.id.replace(/Context$/, ""); // e.g.: "pentaho/type/"
 
   // Default `base` type in a type specification.
-  var _defaultBaseTypeMid = "complex";
+  var __defaultBaseTypeMid = "complex";
 
   var O_hasOwn = Object.prototype.hasOwnProperty;
 
@@ -157,7 +157,7 @@ define([
        * @type {!pentaho.context.IContext}
        * @private
        */
-      this._vars = !platformContextSpec ? mainPlatformContext :
+      this.__env = !platformContextSpec ? mainPlatformContext :
           platformContextSpec.createChild ? platformContextSpec :
           mainPlatformContext.createChild(platformContextSpec);
 
@@ -171,10 +171,10 @@ define([
        *
        * @type {number}
        * @private
-       * @see pentaho.type.Context#_getByInstCtor
-       * @see pentaho.type.Context#_getByObjectSpec
+       * @see pentaho.type.Context#__getByInstCtor
+       * @see pentaho.type.Context#__getByObjectSpec
        */
-      this._configDepth = 0;
+      this.__configDepth = 0;
 
       /**
        * The ambient/current transaction, if any, or `null`.
@@ -182,7 +182,7 @@ define([
        * @type {pentaho.type.changes.Transaction}
        * @private
        */
-      this._txnCurrent = null;
+      this.__txnCurrent = null;
 
       /**
        * The stack of transaction scopes.
@@ -190,7 +190,7 @@ define([
        * @type {Array.<pentaho.type.changes.AbstractTransactionScope>}
        * @private
        */
-      this._txnScopes = [];
+      this.__txnScopes = [];
 
       /**
        * The version of the next committed/fulfilled transaction.
@@ -199,23 +199,25 @@ define([
        * @private
        * @default 1
        */
-      this._nextVersion = 1;
+      this.__nextVersion = 1;
 
       /**
        * Map of instance constructors by factory function _uid_.
        *
-       * See also `_nextFactoryUid` and `getFactoryUid`.
+       * See also `__nextFactoryUid` and `__getFactoryUid`.
        *
        * @type {!Object.<string, Class.<pentaho.type.Instance>>}
+       * @private
        */
-      this._byFactoryUid = {};
+      this.__byFactoryUid = {};
 
       /**
        * Map of instance constructors by [type uid]{@link pentaho.type.Type#uid}.
        *
        * @type {!Object.<string, Class.<pentaho.type.Instance>>}
+       * @private
        */
-      this._byTypeUid = {};
+      this.__byTypeUid = {};
 
       // non-anonymous types
       /**
@@ -224,41 +226,43 @@ define([
        * for non-anonymous types.
        *
        * @type {!Object.<string, Class.<pentaho.type.Instance>>}
+       * @private
        */
-      this._byTypeId = {};
+      this.__byTypeId = {};
 
       /**
        * The root [Instance]{@link pentaho.type.Instance} constructor.
        *
        * @type {!Class.<pentaho.type.Instance>}
+       * @private
        */
-      this._Instance = this._getByFactory(standard.instance, /* sync: */true);
+      this.__Instance = this.__getByFactory(standard.instance, /* sync: */true);
 
       // Register all other standard types
       // This mostly helps tests being able to require.undef(.) these at any time
       //  and not cause random failures for assuming all standard types were loaded.
       Object.keys(standard).forEach(function(lid) {
         if(lid !== "mixins" && lid !== "filter" && lid !== "instance")
-          this._getByFactory(standard[lid], /* sync: */true);
+          this.__getByFactory(standard[lid], /* sync: */true);
       }, this);
 
       Object.keys(standard.filter).forEach(function(fid) {
-        this._getByFactory(standard.filter[fid], /* sync: */true);
+        this.__getByFactory(standard.filter[fid], /* sync: */true);
       }, this);
 
       Object.keys(standard.mixins).forEach(function(fid) {
-        this._getByFactory(standard.mixins[fid], /* sync: */true);
+        this.__getByFactory(standard.mixins[fid], /* sync: */true);
       }, this);
     },
 
     /**
-     * Gets the associated platform context.
+     * Gets the associated platform environment.
      *
      * @type {!pentaho.context.IContext}
      * @readOnly
      */
     get vars() {
-      return this._vars;
+      return this.__env;
     },
 
     /**
@@ -271,7 +275,7 @@ define([
      * @readonly
      */
     get isConfiguring() {
-      return this._configDepth > 0;
+      return this.__configDepth > 0;
     },
 
     // region Type Registry
@@ -379,7 +383,7 @@ define([
      * list type specification that has more than one child element type specification.
      */
     get: function(typeRef, keyArgs) {
-      return this._get(typeRef, O.getOwn(keyArgs, "defaultBase"), true);
+      return this.__get(typeRef, O.getOwn(keyArgs, "defaultBase"), true);
     },
 
     /**
@@ -480,7 +484,7 @@ define([
      */
     getAsync: function(typeRef, keyArgs) {
       try {
-        return this._get(typeRef, O.getOwn(keyArgs, "defaultBase"), false);
+        return this.__get(typeRef, O.getOwn(keyArgs, "defaultBase"), false);
       } catch(ex) {
         /* istanbul ignore next : really hard to test safeguard */
         return Promise.reject(ex);
@@ -543,7 +547,7 @@ define([
       // Throws if one isn't yet.
       service.getRegisteredIds(baseTypeId).forEach(function(id) { this.get(id); }, this);
 
-      var byTypeUid = this._byTypeUid;
+      var byTypeUid = this.__byTypeUid;
 
       var output = [];
       for(var uid in byTypeUid) {
@@ -612,8 +616,8 @@ define([
         return Promise.all([this.getAsync(baseTypeId), instCtorsPromise])
           .then(function(values) {
             var baseType  = values[0].type;
-            var InstCtors = Object.keys(me._byTypeUid).map(function(typeUid) {
-              return me._byTypeUid[typeUid];
+            var InstCtors = Object.keys(me.__byTypeUid).map(function(typeUid) {
+              return me.__byTypeUid[typeUid];
             });
 
             return InstCtors.filter(function(InstCtor) {
@@ -635,11 +639,12 @@ define([
      * @param {!Object.<string, string>} [customTypeIds] - An object where to add found type ids to.
      * @return {!Object.<string, string>} A possibly empty object whose own keys are type module ids.
      * @private
+     * @internal
      * @friend pentaho.type.Type#createAsync
      */
-    _collectTypeSpecTypeIds: function(typeSpec, customTypeIds) {
+    __collectTypeSpecTypeIds: function(typeSpec, customTypeIds) {
       if(!customTypeIds) customTypeIds = {};
-      collectTypeIdsRecursive(typeSpec, customTypeIds, this._byTypeId);
+      __collectTypeIdsRecursive(typeSpec, customTypeIds, this.__byTypeId);
       return customTypeIds;
     },
     // endregion
@@ -652,7 +657,7 @@ define([
      * @readOnly
      */
     get transaction() {
-      return this._txnCurrent;
+      return this.__txnCurrent;
     },
 
     /**
@@ -677,7 +682,7 @@ define([
      * @return {!pentaho.type.changes.TransactionScope} The new transaction scope.
      */
     enterChange: function() {
-      var txn = this._txnCurrent || new Transaction(this);
+      var txn = this.__txnCurrent || new Transaction(this);
       return txn.enter();
     },
 
@@ -693,8 +698,8 @@ define([
       return new CommittedScope(this);
     },
 
-    get _scopeCurrent() {
-      var scopes = this._txnScopes;
+    get __txnScopeCurrent() {
+      var scopes = this.__txnScopes;
       return scopes.length ? scopes[scopes.length - 1] : null;
     },
 
@@ -704,28 +709,30 @@ define([
      * @param {!pentaho.type.changes.AbstractTransactionScope} scopeEnter - The new ambient scope.
      *
      * @private
+     * @internal
      *
      * @see pentaho.type.changes.AbstractTransactionScope
      */
-    _scopeEnter: function(scopeEnter) {
+    __scopeEnter: function(scopeEnter) {
 
-      this._txnScopes.push(scopeEnter);
+      this.__txnScopes.push(scopeEnter);
 
-      this._setTransaction(scopeEnter.transaction);
+      this.__setTransaction(scopeEnter.transaction);
     },
 
     /**
      * Called by a scope to stop being the current scope.
      *
      * @private
+     * @internal
      *
      * @see pentaho.type.changes.AbstractTransactionScope#exit
      */
-    _scopeExit: function() {
-      this._txnScopes.pop();
-      var scopeResume = this._scopeCurrent;
+    __scopeExit: function() {
+      this.__txnScopes.pop();
+      var scopeResume = this.__txnScopeCurrent;
 
-      this._setTransaction(scopeResume && scopeResume.transaction);
+      this.__setTransaction(scopeResume && scopeResume.transaction);
     },
 
     /**
@@ -735,29 +742,30 @@ define([
      *
      * @private
      */
-    _setTransaction: function(txnNew) {
-      var txnExit = this._txnCurrent;
+    __setTransaction: function(txnNew) {
+      var txnExit = this.__txnCurrent;
       if(txnExit !== txnNew) {
-        if(txnExit) txnExit._exitingAmbient();
-        this._txnCurrent = txnNew;
-        if(txnNew) txnNew._enteringAmbient();
+        if(txnExit) txnExit.__exitingAmbient();
+        this.__txnCurrent = txnNew;
+        if(txnNew) txnNew.__enteringAmbient();
       }
     },
 
-    _transactionExit: function() {
+    // @internal
+    __transactionExit: function() {
       // Local-exit all scopes of the exiting transaction.
       // Null scopes or scopes of other txns remain non-exited.
-      var txnCurrent = this._txnCurrent;
-      this._txnCurrent = null;
+      var txnCurrent = this.__txnCurrent;
+      this.__txnCurrent = null;
 
       // Initial scope must be a transaction scope.
-      var scopes = this._txnScopes;
+      var scopes = this.__txnScopes;
       var i = scopes.length;
       while(i--) {
         var scope = scopes[i];
         if(scope.transaction === txnCurrent) {
           scopes.pop();
-          scope._exitLocal();
+          scope.__exitLocal();
           if(scope.isRoot)
             break;
         }
@@ -770,9 +778,10 @@ define([
      *
      * @return {number} The next version number.
      * @private
+     * @internal
      */
-    _takeNextVersion: function() {
-      return ++this._nextVersion;
+    __takeNextVersion: function() {
+      return ++this.__nextVersion;
     },
     // endregion
 
@@ -798,20 +807,20 @@ define([
      *
      * @private
      */
-    _get: function(typeRef, defaultBase, sync) {
+    __get: function(typeRef, defaultBase, sync) {
       if(typeRef == null || typeRef === "")
-        return this._error(error.argRequired("typeRef"), sync);
+        return this.__error(error.argRequired("typeRef"), sync);
 
       /* eslint default-case: 0 */
       switch(typeof typeRef) {
-        case "string": return this._getById(typeRef, sync);
-        case "function": return this._getByFun(typeRef, sync);
+        case "string": return this.__getById(typeRef, sync);
+        case "function": return this.__getByFun(typeRef, sync);
         case "object": return Array.isArray(typeRef)
-            ? this._getByListSpec(typeRef, sync)
-            : this._getByObjectSpec(typeRef, defaultBase, sync);
+            ? this.__getByListSpec(typeRef, sync)
+            : this.__getByObjectSpec(typeRef, defaultBase, sync);
       }
 
-      return this._error(error.argInvalid("typeRef"), sync);
+      return this.__error(error.argInvalid("typeRef"), sync);
     },
 
     /**
@@ -824,7 +833,7 @@ define([
      * If the identifier does not contain any "/" character,
      * it is considered relative to Pentaho's `pentaho/type` module.
      *
-     * Checks if the identifier is already present in the `_byTypeId` map,
+     * Checks if the identifier is already present in the `__byTypeId` map,
      * returning immediately (modulo sync) if it is.
      *
      * Otherwise, it requires the module, using either the sync or the async AMD form.
@@ -832,7 +841,7 @@ define([
      * If sync, AMD throws if a module with the given identifier is not yet loaded or is not defined.
      *
      * When the resulting module is returned by AMD,
-     * its result is passed on, _recursively_, to `_get`,
+     * its result is passed on, _recursively_, to `__get`,
      * and, thus, the module can return any of the supported type reference formats.
      * The usual is to return a factory function.
      *
@@ -856,12 +865,12 @@ define([
      *
      * @private
      */
-    _getById: function(id, sync) {
+    __getById: function(id, sync) {
       // Is it a temporary id?
       if(SpecificationContext.isIdTemporary(id)) {
         var specContext = SpecificationContext.current;
         if(!specContext) {
-          return this._error(
+          return this.__error(
               error.argInvalid("typeRef", "Temporary ids cannot occur outside of a generic type specification."),
               sync);
         }
@@ -869,30 +878,30 @@ define([
         // id must exist at the specification context, or it's invalid.
         var type = specContext.get(id);
         if(!type) {
-          return this._error(
+          return this.__error(
               error.argInvalid("typeRef", "Temporary id does not correspond to an existing type."),
               sync);
         }
 
-        return this._return(type.instance.constructor, sync);
+        return this.__return(type.instance.constructor, sync);
       }
 
       // Check if id is already present.
-      var InstCtor = O.getOwn(this._byTypeId, id);
+      var InstCtor = O.getOwn(this.__byTypeId, id);
       if(!InstCtor) {
         // Resolve possible alias.
         var id2 = typeInfo.getIdOf(id);
-        if(id2 && id2 !== id) InstCtor = O.getOwn(this._byTypeId, (id = id2));
+        if(id2 && id2 !== id) InstCtor = O.getOwn(this.__byTypeId, (id = id2));
       }
 
-      if(InstCtor) return this._return(InstCtor, sync);
+      if(InstCtor) return this.__return(InstCtor, sync);
 
       /* jshint laxbreak:true*/
       return sync
           // `require` fails if a module with the id in the `typeSpec` var
           // is not already _loaded_.
-          ? this._get(localRequire(id), null, true)
-          : promiseUtil.require(id, localRequire).then(this._get.bind(this));
+          ? this.__get(localRequire(id), null, true)
+          : promiseUtil.require(id, localRequire).then(this.__get.bind(this));
     },
 
     /**
@@ -907,7 +916,7 @@ define([
      * In the first two cases, the operation is delegated to `getByType`,
      * passing in the instance constructor, representing the type.
      *
-     * In the latter case, it is delegated to `_getByFactory`.
+     * In the latter case, it is delegated to `__getByFactory`.
      *
      * @param {function} fun - A function.
      * @param {boolean} [sync=false] Whether to perform a synchronous get.
@@ -919,23 +928,23 @@ define([
      * (e.g. [Type]{@link pentaho.type.Type}).
      *
      * @throws {Error} Other errors,
-     * thrown by {@link pentaho.type.Context#_getByInstCtor} and {@link pentaho.type.Context#_getByFactory}.
+     * thrown by {@link pentaho.type.Context#__getByInstCtor} and {@link pentaho.type.Context#__getByFactory}.
      *
      * @private
      */
-    _getByFun: function(fun, sync) {
+    __getByFun: function(fun, sync) {
 
       var proto = fun.prototype;
-      var Instance = this._Instance;
+      var Instance = this.__Instance;
 
       if(proto instanceof Instance)
-        return this._getByInstCtor(fun, sync);
+        return this.__getByInstCtor(fun, sync);
 
       if(proto instanceof Instance.Type)
-        return this._error(error.argInvalid("typeRef", "Type constructor is not supported."), sync);
+        return this.__error(error.argInvalid("typeRef", "Type constructor is not supported."), sync);
 
       // Assume it's a factory function.
-      return this._getByFactory(fun, sync);
+      return this.__getByFactory(fun, sync);
     },
 
     /**
@@ -947,7 +956,7 @@ define([
      * because it uses the types' [uid]{@link pentaho.type.Type#uid}
      * to identify types.
      *
-     * A map of already configured types is kept in `_byTypeUid`.
+     * A map of already configured types is kept in `__byTypeUid`.
      *
      * If the type is not yet in the map, and it is not anonymous,
      * configuration is requested for it, and, if any exists,
@@ -969,52 +978,52 @@ define([
      *
      * @private
      */
-    _getByInstCtor: function(InstCtor, sync, factoryUid) {
+    __getByInstCtor: function(InstCtor, sync, factoryUid) {
       var type = InstCtor.type;
 
       // Check if already present, by uid.
-      var InstCtorExisting = O.getOwn(this._byTypeUid, type.uid);
+      var InstCtorExisting = O.getOwn(this.__byTypeUid, type.uid);
       /* istanbul ignore else */
       if(!InstCtorExisting) {
         // Not present yet.
         var id = type.id;
         if(id) {
           // Configuration is for the type-constructor.
-          var config = this._getConfig(id);
+          var config = this.__getConfig(id);
           if(config) {
             try {
-              this._configDepth++;
+              this.__configDepth++;
 
               type.constructor.implement(config);
 
             } finally {
-              this._configDepth--;
+              this.__configDepth--;
             }
           }
 
-          this._byTypeId[id] = InstCtor;
+          this.__byTypeId[id] = InstCtor;
 
           var alias = type.alias;
           if(alias) {
-            if(O_hasOwn.call(this._byTypeId, alias)) {
-              return this._error(error.argInvalid("typeRef", "Duplicate type class alias."), sync);
+            if(O_hasOwn.call(this.__byTypeId, alias)) {
+              return this.__error(error.argInvalid("typeRef", "Duplicate type class alias."), sync);
             }
-            this._byTypeId[alias] = InstCtor;
+            this.__byTypeId[alias] = InstCtor;
           }
         }
 
-        this._byTypeUid[type.uid] = InstCtor;
+        this.__byTypeUid[type.uid] = InstCtor;
 
       } else if(InstCtor !== InstCtorExisting) {
         // Pathological case, only possible if the result of an exploit.
-        return this._error(error.argInvalid("typeRef", "Duplicate type class uid."), sync);
+        return this.__error(error.argInvalid("typeRef", "Duplicate type class uid."), sync);
       }
 
       if(factoryUid != null) {
-        this._byFactoryUid[factoryUid] = InstCtor;
+        this.__byFactoryUid[factoryUid] = InstCtor;
       }
 
-      return this._return(InstCtor, sync);
+      return this.__return(InstCtor, sync);
     },
 
     /**
@@ -1026,7 +1035,7 @@ define([
      * to this function.
      *
      * A map of already evaluated factory functions,
-     * indexed by their unique identifier, is kept in `_byFactoryUid`.
+     * indexed by their unique identifier, is kept in `__byFactoryUid`.
      *
      * If a factory has already been evaluated before,
      * the type it returned then is now returned immediately (modulo sync).
@@ -1048,34 +1057,34 @@ define([
      *
      * @private
      */
-    _getByFactory: function(typeFactory, sync) {
-      var factoryUid = getFactoryUid(typeFactory);
+    __getByFactory: function(typeFactory, sync) {
+      var factoryUid = __getFactoryUid(typeFactory);
 
-      var InstCtor = O.getOwn(this._byFactoryUid, factoryUid);
+      var InstCtor = O.getOwn(this.__byFactoryUid, factoryUid);
       if(InstCtor)
-        return this._return(InstCtor, sync);
+        return this.__return(InstCtor, sync);
 
       InstCtor = typeFactory(this);
 
-      if(!F.is(InstCtor) || (this._Instance && !(InstCtor.prototype instanceof this._Instance)))
-        return this._error(
+      if(!F.is(InstCtor) || (this.__Instance && !(InstCtor.prototype instanceof this.__Instance)))
+        return this.__error(
             error.operInvalid("Type factory must return a sub-class of 'pentaho.type.Instance'."),
             sync);
 
-      return this._getByInstCtor(InstCtor, sync, factoryUid);
+      return this.__getByInstCtor(InstCtor, sync, factoryUid);
     },
 
     // Inline type spec: {[base: "complex"], [id: ]}
-    _getByObjectSpec: function(typeSpec, defaultBase, sync) {
-      var Instance = this._Instance;
+    __getByObjectSpec: function(typeSpec, defaultBase, sync) {
+      var Instance = this.__Instance;
 
       if(typeSpec instanceof Instance.Type)
-        return this._getByInstCtor(typeSpec.instance.constructor, sync);
+        return this.__getByInstCtor(typeSpec.instance.constructor, sync);
 
       if(typeSpec instanceof Instance)
-        return this._error(error.argInvalid("typeRef", "Instances are not supported as type references."), sync);
+        return this.__error(error.argInvalid("typeRef", "Instances are not supported as type references."), sync);
 
-      var baseTypeSpec = typeSpec.base || defaultBase || _defaultBaseTypeMid;
+      var baseTypeSpec = typeSpec.base || defaultBase || __defaultBaseTypeMid;
       var id = typeSpec.id;
       if(id) {
         // Already loaded?
@@ -1090,22 +1099,22 @@ define([
           }
         } else {
           // id ~ "value" goes here.
-          InstCtor = O.getOwn(this._byTypeId, id);
+          InstCtor = O.getOwn(this.__byTypeId, id);
         }
 
         // If so, keep initial specification. Ignore the new one.
-        if(InstCtor) return this._return(InstCtor, sync);
+        if(InstCtor) return this.__return(InstCtor, sync);
       }
 
       // assert baseTypeSpec
 
-      return this._getByObjectSpecCore(id, baseTypeSpec, typeSpec, sync);
+      return this.__getByObjectSpecCore(id, baseTypeSpec, typeSpec, sync);
     },
 
     // Actually gets an object specification, given its already processed _base type spec_ and id.
     // Also, this method assumes that the type is not yet registered either in the context or in the
     // specification context.
-    _getByObjectSpecCore: function(id, baseTypeSpec, typeSpec, sync) {
+    __getByObjectSpecCore: function(id, baseTypeSpec, typeSpec, sync) {
       // if id and not loaded, the id is used later to register the new type under that id and configure it.
 
       // A root generic type spec initiates a specification context.
@@ -1117,12 +1126,12 @@ define([
           /* jshint validthis:true*/
 
           // Note the switch to sync mode here, whatever the outer `sync` value.
-          // Only the outermost _getByObjectSpec call will be async.
+          // Only the outermost __getByObjectSpec call will be async.
           // All following "reentries" will be sync.
           // So, it works to use the above ambient specification context to handle all contained temporary ids.
 
           // 1. Resolve the base type
-          var BaseInstCtor = this._get(baseTypeSpec, null, /* sync: */true);
+          var BaseInstCtor = this.__get(baseTypeSpec, null, /* sync: */true);
 
           // 2. Extend the base type
           var InstCtor = BaseInstCtor.extend({type: typeSpec});
@@ -1133,7 +1142,7 @@ define([
             specScope.specContext.add(InstCtor.type, id);
           }
 
-          return this._getByInstCtor(InstCtor, /* sync: */true);
+          return this.__getByInstCtor(InstCtor, /* sync: */true);
         }, this);
       };
 
@@ -1142,7 +1151,7 @@ define([
       if(sync) return resolveSync.call(this);
 
       // Collect the module ids of all custom types used within typeSpec.
-      var customTypeIds = Object.keys(this._collectTypeSpecTypeIds(typeSpec));
+      var customTypeIds = Object.keys(this.__collectTypeSpecTypeIds(typeSpec));
       /* jshint laxbreak:true*/
       return customTypeIds.length
           // Require them all and only then invoke the synchronous BaseType.extend method.
@@ -1159,27 +1168,27 @@ define([
      *  <=>
      *  {base: "list", of: {props: { ...}}}
      */
-    _getByListSpec: function(typeSpec, sync) {
+    __getByListSpec: function(typeSpec, sync) {
       var elemTypeSpec;
       if(typeSpec.length !== 1 || !(elemTypeSpec = typeSpec[0]))
-        return this._error(
+        return this.__error(
             error.argInvalid("typeRef", "List type specification must have a single child element type spec."),
             sync);
 
       // Expand compact list type spec syntax and delegate to the generic handler.
-      return this._getByObjectSpec({base: "list", of: elemTypeSpec}, null, sync);
+      return this.__getByObjectSpec({base: "list", of: elemTypeSpec}, null, sync);
     },
 
-    _getConfig: function(id) {
-      return configurationService.select(id, this._vars);
+    __getConfig: function(id) {
+      return configurationService.select(id, this.__env);
     },
     // endregion
 
-    _return: function(value, sync) {
+    __return: function(value, sync) {
       return sync ? value : Promise.resolve(value);
     },
 
-    _error: function(ex, sync) {
+    __error: function(ex, sync) {
       if(sync) throw ex;
       return Promise.reject(ex);
     }
@@ -1195,18 +1204,18 @@ define([
      * @readOnly
      */
     get instance() {
-      return _singleton || (_singleton = new Context());
+      return __singleton || (__singleton = new Context());
     }
   });
 
   return Context;
 
   // region type registry
-  function getFactoryUid(factory) {
-    return factory._fuid_ || (factory._fuid_ = _nextFactoryUid++);
+  function __getFactoryUid(factory) {
+    return factory._fuid_ || (factory._fuid_ = __nextFactoryUid++);
   }
 
-  function collectTypeIdsRecursive(typeSpec, outIds, byTypeId) {
+  function __collectTypeIdsRecursive(typeSpec, outIds, byTypeId) {
     if(!typeSpec) return;
 
     /* eslint default-case: 0 */
@@ -1225,37 +1234,37 @@ define([
           // Shorthand list type notation
           // Example: [{props: { ...}}]
           if(typeSpec.length)
-            collectTypeIdsRecursive(typeSpec[0], outIds, byTypeId);
+            __collectTypeIdsRecursive(typeSpec[0], outIds, byTypeId);
           return;
         }
 
-        collectTypeIdsGenericRecursive(typeSpec, outIds, byTypeId);
+        __collectTypeIdsGenericRecursive(typeSpec, outIds, byTypeId);
         return;
     }
   }
 
-  function collectTypeIdsGenericRecursive(typeSpec, outIds, byTypeId) {
+  function __collectTypeIdsGenericRecursive(typeSpec, outIds, byTypeId) {
     // TODO: this method only supports standard types deserialization.
     //   Custom types with own type attributes would need special handling.
     //   Something like a two phase protocol?
 
     // {[base: "complex", ] [of: "..."] , [props: []]}
-    collectTypeIdsRecursive(typeSpec.base, outIds, byTypeId);
+    __collectTypeIdsRecursive(typeSpec.base, outIds, byTypeId);
 
-    collectTypeIdsRecursive(typeSpec.of, outIds, byTypeId);
+    __collectTypeIdsRecursive(typeSpec.of, outIds, byTypeId);
 
     var props = typeSpec.props;
     if(props) {
       if(Array.isArray(props))
         props.forEach(function(propSpec) {
-          collectTypeIdsRecursive(propSpec && propSpec.valueType, outIds, byTypeId);
-          collectTypeIdsRecursive(propSpec && propSpec.base, outIds, byTypeId);
+          __collectTypeIdsRecursive(propSpec && propSpec.valueType, outIds, byTypeId);
+          __collectTypeIdsRecursive(propSpec && propSpec.base, outIds, byTypeId);
         });
       else
         Object.keys(props).forEach(function(propName) {
           var propSpec = props[propName];
-          collectTypeIdsRecursive(propSpec && propSpec.valueType, outIds, byTypeId);
-          collectTypeIdsRecursive(propSpec && propSpec.base, outIds, byTypeId);
+          __collectTypeIdsRecursive(propSpec && propSpec.valueType, outIds, byTypeId);
+          __collectTypeIdsRecursive(propSpec && propSpec.base, outIds, byTypeId);
         });
     }
 
@@ -1266,7 +1275,7 @@ define([
 
       mixins.forEach(function(mixinIdOrClass) {
         if(typeof mixinIdOrClass === "string") {
-          collectTypeIdsRecursive(mixinIdOrClass, outIds, byTypeId);
+          __collectTypeIdsRecursive(mixinIdOrClass, outIds, byTypeId);
         }
       });
     }

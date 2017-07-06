@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,14 +134,14 @@ define([
           expect(changeset._apply).toHaveBeenCalled();
         });
 
-        it("should call owner._setVersionInternal", function() {
+        it("should call owner.__setVersionInternal", function() {
           changeset._apply = jasmine.createSpy();
 
-          spyOn(changeset.owner, "_setVersionInternal");
+          spyOn(changeset.owner, "__setVersionInternal");
 
           changeset._applyInternal(1);
 
-          expect(changeset.owner._setVersionInternal).toHaveBeenCalledWith(1);
+          expect(changeset.owner.__setVersionInternal).toHaveBeenCalledWith(1);
         });
 
         it("should call _apply with the owner", function() {
@@ -165,7 +165,7 @@ define([
         });
 
         it("should throw when read-only", function() {
-          changeset._setReadOnlyInternal();
+          changeset.__setReadOnlyInternal();
 
           expect(function() {
             changeset.clearChanges();

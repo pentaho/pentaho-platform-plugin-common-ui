@@ -43,21 +43,21 @@ define([
         props: [
           {
             name: "measures", // VISUAL_ROLE
-            attributes: {isRequired: requiredOneMeasure}
+            attributes: {isRequired: __requiredOneMeasure}
           },
           {
             name: "measuresLine", // VISUAL_ROLE
             base: "pentaho/visual/role/property",
             levels: ["quantitative"],
             dataType: "number",
-            attributes: {isRequired: requiredOneMeasure},
+            attributes: {isRequired: __requiredOneMeasure},
             ordinal: 7
           },
 
           {
             name: "lineWidth",
             valueType: lineWidthFactory,
-            isApplicable: hasAttributesMeasuresLine,
+            isApplicable: __hasAttributesMeasuresLine,
             isRequired: true,
             defaultValue: 1
           },
@@ -65,7 +65,7 @@ define([
             name: "labelsOption",
             valueType: labelsOptionFactory,
             domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"],
-            isApplicable: hasAttributesMeasures,
+            isApplicable: __hasAttributesMeasures,
             isRequired: true,
             defaultValue: "none"
           },
@@ -74,7 +74,7 @@ define([
             name: "lineLabelsOption",
             valueType: labelsOptionFactory,
             domain: ["none", "center", "left", "right", "top", "bottom"],
-            isApplicable: hasAttributesMeasuresLine,
+            isApplicable: __hasAttributesMeasuresLine,
             isRequired: true,
             defaultValue: "none"
           },
@@ -84,7 +84,7 @@ define([
             valueType: shapeFactory,
             isRequired: true,
             defaultValue: "circle",
-            isApplicable: hasAttributesMeasuresLine
+            isApplicable: __hasAttributesMeasuresLine
           }
         ]
       }
@@ -92,18 +92,17 @@ define([
     .implement({type: bundle.structured.barLine});
   };
 
-
-  function requiredOneMeasure() {
+  function __requiredOneMeasure() {
     /* jshint validthis:true*/
     return !this.measures.attributes.count && !this.measuresLine.attributes.count;
   }
 
-  function hasAttributesMeasuresLine() {
+  function __hasAttributesMeasuresLine() {
     /* jshint validthis:true*/
     return this.measuresLine.attributes.count > 0;
   }
 
-  function hasAttributesMeasures() {
+  function __hasAttributesMeasures() {
     /* jshint validthis:true*/
     return this.measures.attributes.count > 0;
   }

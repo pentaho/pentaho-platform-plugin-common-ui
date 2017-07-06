@@ -109,7 +109,7 @@ define([
       extend_exclude: {_: 1},
 
       // region type property
-      _type: null, // Set on Type#_init
+      __type: null, // Set on Type#_init
 
       /**
        * Gets the type of this instance.
@@ -120,7 +120,7 @@ define([
        * @see pentaho.type.Type#instance
        */
       get type() {
-        return this._type;
+        return this.__type;
       },
 
       // Supports Type instance-level configuration only. Can only be called on the prototype,
@@ -250,7 +250,7 @@ define([
        * @see pentaho.lang.Base.extend
        */
 
-      /**
+      /*
        * Defaults `name` from `classSpec.type.sourceId` or `classSpec.type.id`, if any.
        *
        * @ignore
@@ -265,7 +265,7 @@ define([
         return this.base(name, instSpec, classSpec, keyArgs);
       },
 
-      /**
+      /*
        * See `Base.js`.
        * @ignore
        */

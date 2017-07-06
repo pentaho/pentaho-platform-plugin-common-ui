@@ -24,11 +24,11 @@ define([
 
   "use strict";
 
-  var NATIVE_CODE = "[native code]";
+  var __NATIVE_CODE = "[native code]";
 
-  var _simpleObjectNextUid = 1;
-  var _OID_PROP = "__pentaho_type_ouid_" + Math.random().toString(32) + "__";
-  var _DEF_OID_PROP = {
+  var __simpleObjectNextUid = 1;
+  var __OID_PROP = "__pentaho_type_ouid_" + Math.random().toString(32) + "__";
+  var __DEF_OID_PROP = {
     value: "",
     configurable: true,
     writable:     true,
@@ -65,15 +65,15 @@ define([
 
         // Reuse an existing UID mark, so that two Simple instances with the same underlying primitive value
         // are considered #equal.
-        var uid = O.getOwn(this._value, _OID_PROP);
+        var uid = O.getOwn(this.value, __OID_PROP);
         if(uid == null) {
           // Mark value with a non-enumerable property.
           // Note that non-enumerable properties are not included by JSON.stringify.
-          _DEF_OID_PROP.value = uid = String(_simpleObjectNextUid++);
-          Object.defineProperty(this._value, _OID_PROP, _DEF_OID_PROP);
+          __DEF_OID_PROP.value = uid = String(__simpleObjectNextUid++);
+          Object.defineProperty(this.value, __OID_PROP, __DEF_OID_PROP);
         }
 
-        this._uid = uid;
+        this.__uid = uid;
       },
 
       /**
@@ -85,14 +85,14 @@ define([
        * @readonly
        */
       get key() {
-        return this._uid;
+        return this.__uid;
       },
 
       // region serialization
       /** @inheritDoc */
       _toJSONValue: function(keyArgs) {
-        var code = String(this._value);
-        if(code.indexOf(NATIVE_CODE) > 0) {
+        var code = String(this.value);
+        if(code.indexOf(__NATIVE_CODE) > 0) {
           logger.warn(bundle.structured.errors.json.cannotSerializeNativeFunction);
 
           // Indicate serialization failure.

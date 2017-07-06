@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,12 +83,12 @@ define([
       });
 
       it("shouldn't build structured object if not needed", function() {
-        expect(this.bundle._structured).toBeNull();
+        expect(this.bundle.__structured).toBeNull();
       });
 
       it("should build structured object if needed", function() {
         var obj = this.bundle.structured;
-        expect(this.bundle._structured).not.toBeNull();
+        expect(this.bundle.__structured).not.toBeNull();
       });
 
       it("should provide structured object", function() {

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -654,7 +654,7 @@ define([
 
           Property2.type.defaultValue = undefined;
 
-          expect(Property2.type.hasOwnProperty("_defaultValue")).toBe(true);
+          expect(Property2.type.hasOwnProperty("__defaultValue")).toBe(true);
         });
         */
       }); // end #value

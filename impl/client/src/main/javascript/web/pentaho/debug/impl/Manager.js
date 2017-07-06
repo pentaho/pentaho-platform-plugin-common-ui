@@ -34,8 +34,8 @@ define([
    */
   function pentaho_debug_impl_Manager() {
 
-    this._level = DebugLevels.error;
-    this._modules = {};
+    this.__level = DebugLevels.error;
+    this.__modules = {};
   }
 
   pentaho_debug_impl_Manager.prototype = /** @lends pentaho.debug.impl.Manager# */{
@@ -51,19 +51,19 @@ define([
 
     getLevel: function(module) {
 
-      if(module == null) return this._level;
+      if(module == null) return this.__level;
 
-      var level = O.getOwn(this._modules, getModuleId(module));
-      return level == null ? this._level : level;
+      var level = O.getOwn(this.__modules, getModuleId(module));
+      return level == null ? this.__level : level;
     },
 
     setLevel: function(level, module) {
 
       var l = DebugLevels.parse(level);
       if(module == null) {
-        this._level = l;
+        this.__level = l;
       } else {
-        this._modules[getModuleId(module)] = l;
+        this.__modules[getModuleId(module)] = l;
       }
     },
 

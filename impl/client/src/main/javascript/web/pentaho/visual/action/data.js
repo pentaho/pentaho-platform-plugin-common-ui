@@ -105,6 +105,7 @@ define([
       },
 
       // region serialization
+      /** @inheritDoc */
       toSpecInContext: function(keyArgs) {
 
         var spec = this.base(keyArgs);

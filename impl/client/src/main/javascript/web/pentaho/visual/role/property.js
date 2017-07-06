@@ -29,9 +29,9 @@ define([
 
   return function(context) {
 
-    var Property = context.get("property");
-    var _levelType = context.get(measurementLevelFactory).type;
-    var ListLevelType = context.get([measurementLevelFactory]);
+    var __Property = context.get("property");
+    var __levelType = context.get(measurementLevelFactory).type;
+    var __ListLevelType = context.get([measurementLevelFactory]);
 
     /**
      * @name pentaho.visual.role.Property.Type
@@ -69,7 +69,7 @@ define([
      *
      * @description This class was not designed to be constructed directly.
      */
-    var VisualRoleProperty = Property.extend(/** @lends pentaho.visual.role.Property# */{
+    var VisualRoleProperty = __Property.extend(/** @lends pentaho.visual.role.Property# */{
 
       type: /** @lends pentaho.visual.role.Property.Type# */{
 
@@ -85,7 +85,7 @@ define([
 
         // region levels
         // Defaults to all measurement levels
-        _levels: _levelType.domain,
+        __levels: __levelType.domain,
 
         /**
          * Gets or sets the array of measurement levels for which the visual role
@@ -123,7 +123,7 @@ define([
          * [subtypes]{@link pentaho.type.Type#hasDescendants}.
          */
         get levels() {
-          return this._levels;
+          return this.__levels;
         },
 
         set levels(values) {
@@ -144,17 +144,17 @@ define([
 
           if(!Array.isArray(values)) values = [values];
 
-          var levels = values.map(function(value) { return this.to(value); }, _levelType);
+          var levels = values.map(function(value) { return this.to(value); }, __levelType);
 
           // Intersect with current list.
-          var levelsNew = _levelType.__intersect(this._levels.toArray(), levels);
+          var levelsNew = __levelType.__intersect(this.__levels.toArray(), levels);
 
           if(!levelsNew.length)
             throw error.argInvalid("levels", bundle.structured.errors.property.noLevels);
 
-          levelsNew.sort(_levelType.compare.bind(_levelType));
+          levelsNew.sort(__levelType.compare.bind(__levelType));
 
-          this._levels = new ListLevelType(levelsNew, {isReadOnly: true});
+          this.__levels = new __ListLevelType(levelsNew, {isReadOnly: true});
         },
 
         /**
@@ -167,7 +167,7 @@ define([
         get anyLevelsQualitative() {
           var any = false;
           this.levels.each(function(level) {
-            if(_levelType.isQualitative(level)) {
+            if(__levelType.isQualitative(level)) {
               any = true;
               return false;
             }
@@ -185,7 +185,7 @@ define([
         get anyLevelsQuantitative() {
           var any = false;
           this.levels.each(function(level) {
-            if(_levelType.isQuantitative(level)) {
+            if(__levelType.isQuantitative(level)) {
               any = true;
               return false;
             }
@@ -195,7 +195,7 @@ define([
         // endregion
 
         // region dataType
-        _dataType: context.get("value").type,
+        __dataType: context.get("value").type,
 
         /**
          * Gets or sets the value type of data properties required by the visual role.
@@ -240,7 +240,7 @@ define([
          * [levels]{@link pentaho.visual.role.Mapping#levels}.
          */
         get dataType() {
-          return this._dataType;
+          return this.__dataType;
         },
 
         set dataType(value) {
@@ -250,7 +250,7 @@ define([
 
           if(value == null) return;
 
-          var oldType = this._dataType;
+          var oldType = this.__dataType;
           var newType = context.get(value).type;
           if(newType !== oldType) {
             // Hierarchy/PreviousValue consistency
@@ -258,10 +258,10 @@ define([
               throw error.argInvalid("dataType", bundle.structured.errors.property.dataTypeNotSubtypeOfBaseType);
 
             // Is the new data type incompatible with existing measurement levels?
-            if(_levelType.isTypeQualitativeOnly(newType)) {
+            if(__levelType.isTypeQualitativeOnly(newType)) {
               // Is there a qualitative measurement level?
               this.levels.each(function(level) {
-                if(!_levelType.isQualitative(level))
+                if(!__levelType.isQualitative(level))
                   throw error.argInvalid("dataType",
                       bundle.format(
                           bundle.structured.errors.property.dataTypeIncompatibleWithRoleLevel,
@@ -269,7 +269,7 @@ define([
               });
             }
 
-            this._dataType = newType;
+            this.__dataType = newType;
           }
         },
         // endregion
@@ -364,7 +364,7 @@ define([
           // Additionally defines __attrsCountMinOn
           __attrsCountMin: {
             value: 0,
-            cast: castCount,
+            cast: __castCount,
             group: "attributes",
             localName: "countMin",
             combine: function(baseEval, localEval) {
@@ -378,7 +378,7 @@ define([
           // Additionally defines __attrsCountMaxOn
           __attrsCountMax: {
             value: Infinity,
-            cast: castCount,
+            cast: __castCount,
             group: "attributes",
             localName: "countMax",
             combine: function(baseEval, localEval) {
@@ -567,10 +567,10 @@ define([
             if(!(name = mappingAttr.name) ||
                 !(dataAttr = dataAttrs.get(name)) ||
                 !(dataAttrLevel = dataAttr.level) ||
-                !_levelType.domain.get(dataAttrLevel))
+                !__levelType.domain.get(dataAttrLevel))
               return; // invalid
 
-            if(!levelLowest || _levelType.compare(dataAttrLevel, levelLowest) < 0)
+            if(!levelLowest || __levelType.compare(dataAttrLevel, levelLowest) < 0)
               levelLowest = dataAttrLevel;
           }
 
@@ -610,7 +610,7 @@ define([
          */
         getLevelsCompatibleWith: function(attributeLevel, allRoleLevels) {
 
-          var isMaxQuant = _levelType.isQuantitative(attributeLevel);
+          var isMaxQuant = __levelType.isQuantitative(attributeLevel);
 
           // if attributeLevel is Quantitative, any role levels are compatible.
           // if attributeLevel is Qualitative,  **only qualitative** role levels are compatible.
@@ -618,7 +618,7 @@ define([
           var roleLevels = allRoleLevels || this.levels.toArray();
           if(!isMaxQuant) {
             roleLevels = roleLevels.filter(function(level) {
-              return !_levelType.isQuantitative(level);
+              return !__levelType.isQuantitative(level);
             });
           }
 
@@ -653,7 +653,7 @@ define([
           // Is the mapping mapped and valid?
           var level = this.levelEffectiveOn(model);
           if(!level) return false;
-          if(!_levelType.isQuantitative(level)) return true;
+          if(!__levelType.isQuantitative(level)) return true;
 
           // If a Date typed attribute is mapped, then default to being a visual key as well,
           // cause date aggregations are harder to make sense of (and only the non-default AVG would apply).
@@ -819,7 +819,7 @@ define([
                   {
                     role: this,
                     // Try to provide a label for dataAttrLevel.
-                    dataLevel: _levelType.domain.get(dataAttrLevel),
+                    dataLevel: __levelType.domain.get(dataAttrLevel),
                     roleLevels: ("'" + allRoleLevels.toArray().join("', '") + "'")
                   })));
             }
@@ -900,7 +900,7 @@ define([
           var data = mapping.model.data;
           var dataAttrs = data && data.model.attributes;
 
-          var isQuant = _levelType.isQuantitative(levelEffective);
+          var isQuant = __levelType.isQuantitative(levelEffective);
 
           var byKey = {};
           var i = -1;
@@ -938,7 +938,7 @@ define([
         // endregion
 
         // region Serialization
-
+        /** @inheritDoc */
         _fillSpecInContext: function(spec, keyArgs) {
 
           // The dynamic attributes: isVisualKey and attributes.countMin/countMax/isRequired are handled
@@ -946,13 +946,13 @@ define([
 
           var any = this.base(spec, keyArgs);
 
-          var levels = O.getOwn(this, "_levels");
+          var levels = O.getOwn(this, "__levels");
           if(levels) {
             any = true;
             spec.levels = levels.toSpecInContext(keyArgs);
           }
 
-          var dataType = O.getOwn(this, "_dataType");
+          var dataType = O.getOwn(this, "__dataType");
           if(dataType) {
             var dataTypeRef = dataType.toRefInContext(keyArgs);
             if(dataTypeRef !== "value") {
@@ -972,7 +972,7 @@ define([
     return VisualRoleProperty;
   };
 
-  function castCount(v) {
+  function __castCount(v) {
     v = +v;
     if(isNaN(v) || v < 0) return;// undefined;
     return Math.floor(v);

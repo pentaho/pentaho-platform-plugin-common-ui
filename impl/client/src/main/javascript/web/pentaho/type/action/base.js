@@ -321,18 +321,18 @@ define([
         /**
          * The label of the action instance.
          *
-         * @type {nonEmptyString}
+         * @type {__nonEmptyString}
          * @private
          */
-        this.__label = nonEmptyString(spec && spec.label);
+        this.__label = __nonEmptyString(spec && spec.label);
 
         /**
          * The description of the action instance.
          *
-         * @type {!nonEmptyString}
+         * @type {!__nonEmptyString}
          * @private
          */
-        this.__description = nonEmptyString(spec && spec.description);
+        this.__description = __nonEmptyString(spec && spec.description);
 
         /**
          * An object with a `promise` and it's controlling `resolve` and `reject` functions.
@@ -357,7 +357,7 @@ define([
        *
        * Can only be set while the action is in an [editable]{@link pentaho.type.action.Base#isEditable} state.
        *
-       * @type {nonEmptyString}
+       * @type {__nonEmptyString}
        * @throws {pentaho.lang.OperationInvalidError} When set and the action is not in an editable state.
        */
       get label() {
@@ -367,7 +367,7 @@ define([
       set label(value) {
 
         this._assertEditable();
-        this.__label = nonEmptyString(value);
+        this.__label = __nonEmptyString(value);
       },
 
       /**
@@ -378,7 +378,7 @@ define([
        *
        * Can only be set while the action is in an [editable]{@link pentaho.type.action.Base#isEditable} state.
        *
-       * @type {nonEmptyString}
+       * @type {__nonEmptyString}
        * @throws {pentaho.lang.OperationInvalidError} When set and the action is not in an editable state.
        */
       get description() {
@@ -388,7 +388,7 @@ define([
       set description(value) {
 
         this._assertEditable();
-        this.__description = nonEmptyString(value);
+        this.__description = __nonEmptyString(value);
       },
       // endregion
 
@@ -462,7 +462,7 @@ define([
        * This property can only return a non-null value if
        * {@link pentaho.type.action.Base#isRejected} is `true`.
        *
-       * @type {?Error|pentaho.lang.UserError}
+       * @type {Error|pentaho.lang.UserError}
        * @readonly
        */
       get error() {
@@ -759,7 +759,7 @@ define([
        * the action is rejected with the rejection reason.
        * However, if the promise is fulfilled, its value is always *ignored*.
        *
-       * @return {?Promise} - A promise for the completion of the default action of an asynchronous action, or `null`.
+       * @return {Promise} - A promise for the completion of the default action of an asynchronous action, or `null`.
        */
       _doDefault: function() {
         // noop
@@ -1238,7 +1238,7 @@ define([
 
   return Action;
 
-  function nonEmptyString(value) {
+  function __nonEmptyString(value) {
     return value == null ? null : (String(value) || null);
   }
 });

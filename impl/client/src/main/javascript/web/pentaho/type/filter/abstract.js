@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,11 +33,11 @@ define([
 
   "use strict";
 
-  var _isDebugMode = debugMgr.testLevel(DebugLevels.debug, module);
+  var __isDebugMode = debugMgr.testLevel(DebugLevels.debug, module);
 
   return function(context) {
 
-    var filter = {};
+    var __filter = {};
 
     var Complex = context.get(complexFactory);
 
@@ -66,7 +66,7 @@ define([
      * @param {pentaho.type.filter.spec.IAbstract} [spec] - A filter specification.
      */
 
-    filter.Abstract = Complex.extend("pentaho.type.filter.Abstract", /** @lends pentaho.type.filter.Abstract# */{
+    __filter.Abstract = Complex.extend("pentaho.type.filter.Abstract", /** @lends pentaho.type.filter.Abstract# */{
 
       /**
        * Gets the kind of this filter.
@@ -121,6 +121,7 @@ define([
        *
        * @type {string}
        * @readOnly
+       * @final
        */
       get contentKey() {
         return this.__contentKey || (this.__contentKey = this.__buildContentKeyOuter());
@@ -162,6 +163,8 @@ define([
        *
        * @throws {pentaho.type.ValidationError} When the filter is not valid,
        * the first error returned by the `validate` method.
+       *
+       * @final
        */
       contains: function(elem) {
         this.assertValid();
@@ -218,6 +221,8 @@ define([
        * @return {!pentaho.type.filter.Abstract} The transformed filter.
        *
        * @see pentaho.type.filter.Tree#_visitDefault
+       *
+       * @protected
        */
       _visitDefault: function(transformer) {
         return this;
@@ -229,7 +234,7 @@ define([
        * @return {!pentaho.type.filter.Abstract} A negated filter.
        */
       negate: function() {
-        return new filter.Not({operand: this});
+        return new __filter.Not({operand: this});
       },
 
       /**
@@ -245,7 +250,7 @@ define([
         var args = arg.slice(arguments);
         args.unshift(this);
 
-        return new filter.Or({operands: args});
+        return new __filter.Or({operands: args});
       },
 
       /**
@@ -262,7 +267,7 @@ define([
         var args = arg.slice(arguments);
         args.unshift(this);
 
-        return new filter.And({operands: args});
+        return new __filter.And({operands: args});
       },
 
       /**
@@ -304,7 +309,7 @@ define([
           case "false":
             return this; // ? \ false = ?
           case "true":
-            return filter.False.instance; // ? \ true = false
+            return __filter.False.instance; // ? \ true = false
         }
 
         // Remove from `current`, any `and` that also exists exactly in exclude.
@@ -312,7 +317,7 @@ define([
 
         var remainders = [];
 
-        if(_isDebugMode) {
+        if(__isDebugMode) {
           logger.log("-----------------------------------------");
           // logger.log("currentDnf #=" + currentDnf.operands.count + " " + currentDnf.contentKey);
           // logger.log("excludeDnf #=" + excludeDnf.operands.count + " " + excludeDnf.contentKey);
@@ -329,7 +334,7 @@ define([
           }
         });
 
-        if(_isDebugMode) {
+        if(__isDebugMode) {
           logger.log("remainders 1 #=" + remainders.length +
               " ( " + remainders.length + " * " + excludeDnf.operands.count + " = " +
               (remainders.length * excludeDnf.operands.count) + ")");
@@ -340,7 +345,7 @@ define([
 
             var i = remainders.length;
             while(i--) {
-              var result = subtractDnfAnds(remainders[i], excludeAnd);
+              var result = __subtractDnfAnds(remainders[i], excludeAnd);
               if(!result) {
                 remainders.splice(i, 1);
                 if(!remainders.length) return false;
@@ -356,14 +361,14 @@ define([
             }
           });
 
-          if(_isDebugMode) logger.log("remainders 2 #=" + remainders.length);
+          if(__isDebugMode) logger.log("remainders 2 #=" + remainders.length);
         }
 
         var result = remainders.length
-            ? new filter.Or({operands: remainders})
-            : filter.False.instance;
+            ? new __filter.Or({operands: remainders})
+            : __filter.False.instance;
 
-        // if(_isDebugMode) logger.log("result = " + result.contentKey);
+        // if(__isDebugMode) logger.log("result = " + result.contentKey);
 
         return result;
       },
@@ -407,11 +412,11 @@ define([
         var result = this.__toDnfCache;
         if(!result) {
           this.__toDnfCache = result = this
-              .visit(moveNotInward)
-              .visit(moveAndInward)
-              .visit(flattenTree)
-              .visit(ensureDnfTopLevel)
-              .visit(simplifyDnfTopLevel);
+              .visit(__moveNotInward)
+              .visit(__moveAndInward)
+              .visit(__flattenTree)
+              .visit(__ensureDnfTopLevel)
+              .visit(__simplifyDnfTopLevel);
 
           result.__toDnfCache = result;
         }
@@ -426,51 +431,51 @@ define([
     });
 
     // Store reference back to the `filter` object in the Abstract class.
-    filter.Abstract._core = filter;
+    __filter.Abstract._core = __filter;
 
     // Setup the remaining core classes
-    notFactory(filter);
-    treeFactory(filter);
-    andFactory(filter);
-    orFactory(filter);
-    trueFactory(filter);
-    falseFactory(filter);
+    notFactory(__filter);
+    treeFactory(__filter);
+    andFactory(__filter);
+    orFactory(__filter);
+    trueFactory(__filter);
+    falseFactory(__filter);
 
-    return filter.Abstract;
+    return __filter.Abstract;
 
-    function moveNotInward(f) {
+    function __moveNotInward(f) {
       var o;
       if(f.kind === "not" && (o = f.operand)) {
         /* eslint default-case: 0 */
         switch(o.kind) {
           case "and":
             // 1. `NOT(A AND B) <=> NOT A OR  NOT B` - De Morgan 1 - NOT over AND
-            return new filter.Or({operands: o.operands.toArray(function(ao) {
-              return ao.negate().visit(moveNotInward);
+            return new __filter.Or({operands: o.operands.toArray(function(ao) {
+              return ao.negate().visit(__moveNotInward);
             })});
 
           case "or":
             // 2. `NOT(A OR B) <=> NOT A AND NOT B` - De Morgan 2 - NOT over OR
-            return new filter.And({operands: o.operands.toArray(function(oo) {
-              return oo.negate().visit(moveNotInward);
+            return new __filter.And({operands: o.operands.toArray(function(oo) {
+              return oo.negate().visit(__moveNotInward);
             })});
 
           case "not":
             // 3. NOT(NOT(A)) <=> A - Double negation elimination
-            return o.operand && o.operand.visit(moveNotInward);
+            return o.operand && o.operand.visit(__moveNotInward);
 
           case "true":
             // 3. NOT(TRUE) <=> FALSE
-            return filter.False.instance;
+            return __filter.False.instance;
 
           case "false":
             // 3. NOT(FALSE) <=> TRUE
-            return new filter.True();
+            return new __filter.True();
         }
       }
     }
 
-    function moveAndInward(f) {
+    function __moveAndInward(f) {
 
       if(f.kind === "and") {
         // 1. AND distributivity over OR
@@ -482,7 +487,7 @@ define([
         var ao;
 
         while(++i < L) {
-          ao = os.at(i).visit(moveAndInward);
+          ao = os.at(i).visit(__moveAndInward);
           if(ao.kind === "or") {
             ors.push(ao);
           } else {
@@ -511,16 +516,16 @@ define([
           var ands = [];
           var andOperands = new Array(LOr).concat(osAndOther);
 
-          buildAndOperandsRecursive(ands, andOperands, ors, 0);
+          __buildAndOperandsRecursive(ands, andOperands, ors, 0);
 
-          return new filter.Or({operands: ands});
+          return new __filter.Or({operands: ands});
         }
 
-        return new filter.And({operands: osAndOther});
+        return new __filter.And({operands: osAndOther});
       }
     }
 
-    function buildAndOperandsRecursive(ands, andOperands, ors, iOr) {
+    function __buildAndOperandsRecursive(ands, andOperands, ors, iOr) {
       if(iOr < ors.length) {
 
         var iOrNext = iOr + 1;
@@ -530,14 +535,14 @@ define([
 
         while(++i < L) {
           andOperands[iOr] = os.at(i);
-          buildAndOperandsRecursive(ands, andOperands, ors, iOrNext);
+          __buildAndOperandsRecursive(ands, andOperands, ors, iOrNext);
         }
       } else {
-        ands.push(new filter.And({operands: andOperands.slice()}));
+        ands.push(new __filter.And({operands: andOperands.slice()}));
       }
     }
 
-    function flattenTree(f) {
+    function __flattenTree(f) {
 
       var kind;
 
@@ -552,7 +557,7 @@ define([
 
           while(++i < L) {
             // recurse in pre-order
-            var o = os.at(i).visit(flattenTree);
+            var o = os.at(i).visit(__flattenTree);
             if(o.kind === kind) {
               osFlattened.push.apply(osFlattened, o.operands.toArray());
             } else {
@@ -564,7 +569,7 @@ define([
       }
     }
 
-    function ensureDnfTopLevel(f) {
+    function __ensureDnfTopLevel(f) {
 
       switch(f.kind) {
         case "true":
@@ -582,28 +587,28 @@ define([
             var o = os.at(i);
             switch(o.kind) {
               // early true/false detection
-              case "true": return filter.True.instance;
+              case "true": return __filter.True.instance;
               case "false": continue;
               case "and": osAnds.push(o); break;
               default:
-                osAnds.push(new filter.And({operands: [o]}));
+                osAnds.push(new __filter.And({operands: [o]}));
             }
           }
 
           return new f.constructor({operands: osAnds});
 
         case "and":
-          f = new filter.Or({operands: [f]});
+          f = new __filter.Or({operands: [f]});
           break;
 
         default:
-          f = new filter.Or({operands: [new filter.And({operands: [f]})]});
+          f = new __filter.Or({operands: [new __filter.And({operands: [f]})]});
       }
 
       return f;
     }
 
-    function simplifyDnfTopLevel(f) {
+    function __simplifyDnfTopLevel(f) {
 
       // -- Duplicates --
       // 1) AND(A, A) <=> AND(A)
@@ -635,10 +640,10 @@ define([
       // Remove Nots of properties who have equals to other values
 
       // TopLevel = Or | True | False
-      return f.kind === "or" ? simplifyDnfOr(f) : f;
+      return f.kind === "or" ? __simplifyDnfOr(f) : f;
     }
 
-    function simplifyDnfOr(f) {
+    function __simplifyDnfOr(f) {
       // 2)  OR(A, A) <=>  OR(A)
       // 4)  OR( .. False .. ) <=> OR( .. .. )
       // 6)  OR( .. True .. ) <=> True
@@ -654,9 +659,9 @@ define([
 
         // assert ands.at(i).kind === "and"
 
-        var o = ands.at(i).visit(simplifyDnfAnd);
+        var o = ands.at(i).visit(__simplifyDnfAnd);
         switch(o.kind) {
-          case "true": return filter.True.instance; // 6)
+          case "true": return __filter.True.instance; // 6)
           case "false": continue; // 4)
         }
 
@@ -671,12 +676,12 @@ define([
         andsNew.push(o);
       }
 
-      if(!andsNew.length) return filter.False.instance; // 12)
+      if(!andsNew.length) return __filter.False.instance; // 12)
 
-      return new filter.Or({operands: andsNew});
+      return new __filter.Or({operands: andsNew});
     }
 
-    function simplifyDnfAnd(f) {
+    function __simplifyDnfAnd(f) {
       // 1)  AND(A, A) <=> AND(A)
       // 3)  AND( .. True .. ) <=> AND( .. .. )
       // 5)  AND( .. False .. ) <=> False
@@ -702,7 +707,7 @@ define([
         var isNot = false;
         var p;
         switch(o.kind) {
-          case "false": return filter.False.instance; // 5)
+          case "false": return __filter.False.instance; // 5)
           case "true": continue; // 3)
           case "not": isNot = true; break;
         }
@@ -718,7 +723,7 @@ define([
             // 9) Law of non-contradiction
             if(O.hasOwn(osByKey, oo.contentKey)) {
               // Already have non-negated operand
-              return filter.False.instance;
+              return __filter.False.instance;
             }
 
             if(oo.kind === "isEqual" && (p = oo.property)) {
@@ -735,7 +740,7 @@ define([
           // 9) Law of non-contradiction
           if(O.hasOwn(osByKey, "(not " + key + ")")) {
             // Already have negated operand
-            return filter.False.instance;
+            return __filter.False.instance;
           }
 
           if(o.kind === "isEqual" && (p = o.property)) {
@@ -744,7 +749,7 @@ define([
             //     If present in equalsByPropName, then it must be for a != value, or the key test above, (2),
             //     would have caught it.
             if(O.hasOwn(equalsByPropName, "+" + p)) {
-              return filter.False.instance;
+              return __filter.False.instance;
             }
 
             (equalsByPropName["+" + p] || (equalsByPropName["+" + p] = [])).push(o);
@@ -768,13 +773,13 @@ define([
         osNew.push(o);
       }
 
-      if(!osNew.length) return filter.True.instance; // 11)
+      if(!osNew.length) return __filter.True.instance; // 11)
 
-      return new filter.And({operands: osNew});
+      return new __filter.And({operands: osNew});
     }
 
     // Optimized version... of a - b
-    function subtractDnfAnds(a, b) {
+    function __subtractDnfAnds(a, b) {
       // a,b - And of literals: possibly negated isEqual
       // Additionally, it is assumed that the ands are simplified, such that:
       // * if a property can only occur once, either positively or negatively
@@ -782,7 +787,7 @@ define([
       var results = [];
       var resulti;
 
-      var literalsAByPropName = a.literalsByPropertyName;
+      var literalsAByPropName = a.__literalsByPropertyName;
       var bs = b.operands;
       var i = bs.count;
       var isPbNot;
@@ -801,16 +806,16 @@ define([
               // (-va - -vb) <=> (-va + vb) <=> (p != va and p = vb)
               // if va == vb => false
               // if va != vb => (pb = vb)
-              if(!equalValues(pa.value, pb.value)) {
+              if(!__equalValues(pa.value, pb.value)) {
                 resulti = a.operands.toArray();
                 resulti[aiInfo.index] = pb;
-                results.push(new filter.And({operands: resulti}));
+                results.push(new __filter.And({operands: resulti}));
               }
             } else {
               // (-va - vb) <=> (-va -vb) <=> (p != va and p != vb)
               // if va == vb => the whole diff is = to a
               // if va != vb => (p !in (va,vb))
-              if(equalValues(pa.value, pb.value)) {
+              if(__equalValues(pa.value, pb.value)) {
                 return [a];
               }
 
@@ -826,10 +831,10 @@ define([
             // (va - -vb) <=> (va + vb) <=> (p = va and p = vb)
             // if va == vb => (p = va) => a
             // if va != vb => false
-            if(equalValues(pa.value, pb.value)) {
+            if(__equalValues(pa.value, pb.value)) {
               return [a];
             }
-          } else if(!equalValues(pa.value, pb.value)) {
+          } else if(!__equalValues(pa.value, pb.value)) {
             // (va - vb) <=> (p = va and p != vb)
             // if va == vb => false
             // if va != vb => (p = va) => a
@@ -839,14 +844,14 @@ define([
           // Add a term with an additional operand, -bi
           resulti = a.operands.toArray();
           resulti.push(isPbNot ? pb : pb.negate());
-          results.push(new filter.And({operands: resulti}));
+          results.push(new __filter.And({operands: resulti}));
         }
       }
 
       return results.length ? results : null;
     }
 
-    function equalValues(v1, v2) {
+    function __equalValues(v1, v2) {
       return v1 === v2 || (v1 != null && v2 != null && v1.valueOf() === v2.valueOf());
     }
   };

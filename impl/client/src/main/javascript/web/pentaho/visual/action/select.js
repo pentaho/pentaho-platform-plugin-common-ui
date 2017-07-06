@@ -28,7 +28,7 @@ define([
 
   return function(context) {
 
-    var PenFunction = context.get(funFactory);
+    var __PenFunction = context.get(funFactory);
 
     /**
      * @name pentaho.visual.action.Select.Type
@@ -76,17 +76,18 @@ define([
 
         set defaultSelectionMode(value) {
 
-          this.__defaultSelectionMode = getSelectionMode(value, "defaultSelectionMode");
+          this.__defaultSelectionMode = __getSelectionMode(value, "defaultSelectionMode");
         },
         // endregion
 
         // region serialization
+        /** @inheritDoc */
         _fillSpecInContext: function(spec, keyArgs) {
 
           var any = this.base(spec, keyArgs);
 
           if(this.__defaultSelectionMode) {
-            spec.defaultSelectionMode = serializeSelectionMode(this.__defaultSelectionMode, keyArgs);
+            spec.defaultSelectionMode = __serializeSelectionMode(this.__defaultSelectionMode, keyArgs);
             any = true;
           }
 
@@ -171,7 +172,7 @@ define([
          * @type {?pentaho.type.Function}
          * @private
          */
-        this.__selectionMode = getSelectionMode(value, "selectionMode");
+        this.__selectionMode = __getSelectionMode(value, "selectionMode");
       },
 
       /**
@@ -197,11 +198,12 @@ define([
       },
 
       // region serialization
+      /** @inheritDoc */
       toSpecInContext: function(keyArgs) {
 
         var spec = this.base(keyArgs);
 
-        if(this.__selectionMode) spec.selectionMode = serializeSelectionMode(this.__selectionMode, keyArgs);
+        if(this.__selectionMode) spec.selectionMode = __serializeSelectionMode(this.__selectionMode, keyArgs);
 
         return spec;
       }
@@ -223,7 +225,7 @@ define([
      *
      * @private
      */
-    function getSelectionMode(value, argName) {
+    function __getSelectionMode(value, argName) {
       if(value != null) {
 
         var name;
@@ -238,7 +240,7 @@ define([
           throw new ArgumentInvalidTypeError(argName, ["string", "function"], typeof value);
         }
 
-        var fun = new PenFunction(value);
+        var fun = new __PenFunction(value);
 
         // For serialization purposes
         fun.selectionModeName = name;
@@ -250,19 +252,20 @@ define([
     }
 
     /**
-     * Serializes a simple function value constructed by `getSelectionMode`.
+     * Serializes a simple function value constructed by `__getSelectionMode`.
      *
      * @param {!pentaho.type.Function} fun - A selection mode function wrapped in a simple function value.
      * @param {?object} keyArgs - The serialization keyword arguments.
+     * @return {string} The function serialization.
      * @private
      */
-    function serializeSelectionMode(fun, keyArgs) {
+    function __serializeSelectionMode(fun, keyArgs) {
 
       if(fun.selectionModeName) return fun.selectionModeName;
 
       keyArgs = keyArgs ? Object.create(keyArgs) : {};
 
-      keyArgs.declaredType = PenFunction.type;
+      keyArgs.declaredType = __PenFunction.type;
 
       return this.__selectionMode.toSpecInContext(keyArgs);
     }

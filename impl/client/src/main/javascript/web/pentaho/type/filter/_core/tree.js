@@ -54,10 +54,12 @@ define([
 
     filter.Tree = filter.Abstract.extend("pentaho.type.filter.Tree", /** @lends pentaho.type.filter.Tree# */{
 
+      /** @inheritDoc */
       get isTerminal() {
         return false;
       },
 
+      /** @inheritDoc */
       _buildContentKey: function() {
         // Sorting makes content equality be independent of operand order.
         return this.operands.toArray(function(o) { return o.contentKey; }).sort().join(" ");
@@ -87,6 +89,7 @@ define([
        * @readOnly
        */
 
+      /** @inheritDoc */
       negate: function() {
         var invOpers = this.operands.toArray(function(operand) {
           return operand.negate();
@@ -96,6 +99,14 @@ define([
         return new InvFilter({operands: invOpers});
       },
 
+      /**
+       * Performs the boolean operation including its operands and the additional operands provided as arguments.
+       *
+       * @param {...any} operands - The additional operands.
+       * @return {!pentaho.filter.Abstract} The resulting filter.
+       *
+       * @protected
+       */
       _operation: function() {
         var N = arguments.length;
         if(!N) return this;
@@ -146,6 +157,8 @@ define([
        * @return {!pentaho.type.filter.Abstract} The transformed filter.
        *
        * @see pentaho.type.filter.Tree#visitOperands
+       *
+       * @protected
        */
       _visitDefault: function(transformer) {
         var opersOut = this.visitOperands(transformer);
@@ -192,8 +205,8 @@ define([
         return opersOut;
       },
 
-      // region literalsByPropertyName
-      get literalsByPropertyName() {
+      // region __literalsByPropertyName
+      get __literalsByPropertyName() {
         return this.__literalsByName || (this.__literalsByName = Object.freeze(this.__buildLiteralsByName()));
       },
 

@@ -34,7 +34,7 @@ define([
      * @readOnly
      */
     get isEmpty() {
-      return this._bits === 0;
+      return this.__bits === 0;
     },
 
     /**
@@ -43,7 +43,7 @@ define([
      * @return {number} The internal bits as a number.
      */
     get: function() {
-      return this._bits;
+      return this.__bits;
     },
 
     /**
@@ -54,7 +54,7 @@ define([
      * @return {boolean} `true` when `mask` is equal to the current state; `false` otherwise.
      */
     is: function(mask) {
-      return this._bits === mask;
+      return this.__bits === mask;
     },
 
     /**
@@ -63,7 +63,7 @@ define([
      * @param {?number} [mask] - The bits to be set. Defaults to all bits.
      */
     set: function(mask) {
-      this._bits = (mask == null) ? ~0 : (this._bits | mask);
+      this.__bits = (mask == null) ? ~0 : (this.__bits | mask);
     },
 
     /**
@@ -72,7 +72,7 @@ define([
      * @param {?number} [mask] - The bits to be cleared. Defaults to all bits.
      */
     clear: function(mask) {
-      this._bits = (mask == null) ? 0 : (this._bits & ~mask);
+      this.__bits = (mask == null) ? 0 : (this.__bits & ~mask);
     },
 
     /**
@@ -85,7 +85,7 @@ define([
      * @return {boolean} `true` if the bits currently set are within the specified mask; `false` otherwise.
      */
     isSubsetOf: function(mask) {
-      var bits = this._bits;
+      var bits = this.__bits;
       return (bits !== 0) && ((bits | mask) === mask);
     }
   });
