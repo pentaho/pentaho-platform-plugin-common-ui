@@ -129,10 +129,15 @@ define([
         }
 
         var propName = "displayUnits" + (primary ? "" : "Secondary");
-        var displayUnitsElem = this.model.get(propName);
-        var scaleFactor = displayUnitsElem.type.scaleFactorOf(displayUnitsElem.value);
+        var displayUnits = this.model.getv(propName);
+        var displayUnitsType = this.model.type.get(propName).valueType;
+        var scaleFactor = displayUnitsType.scaleFactorOf(displayUnits);
 
-        this._cartesianAxesDisplayUnitsText[axisType] = scaleFactor > 1 ? displayUnitsElem.formatted : "";
+        // Unfortunately the stored element value usually has no formatted value associated,
+        // so that we need to read it from the corresponding domain element.
+        this._cartesianAxesDisplayUnitsText[axisType] = scaleFactor > 1
+            ? displayUnitsType.domain.get(displayUnits).toString()
+            : "";
       }
     });
   };
