@@ -50,8 +50,8 @@ define([
      *
      * @protected
      *
-     * @see pentaho.type.changes.ListChangeset._addChange
-     * @see pentaho.type.changes.ComplexChangeset._setElement
+     * @see pentaho.type.changes.ListChangeset.__addChange
+     * @see pentaho.type.changes.ComplexChangeset.__setElement
      */
     _prepareRefs: function(transaction, container) {
     },
@@ -66,7 +66,7 @@ define([
      *
      * @see pentaho.type.changes.ListChangeset#_clearChanges
      * @see pentaho.type.changes.ComplexChangeset#_clearChanges
-     * @see pentaho.type.changes.ComplexChangeset._setElement
+     * @see pentaho.type.changes.ComplexChangeset.__setElement
      */
     _cancelRefs: function(transaction, container) {
     }

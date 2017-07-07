@@ -54,7 +54,7 @@ define([
         var elem;
         while(++i < L) {
           if((elem = elems[i]).__addReference) {
-            txn._ensureChangeRef(elem).removeReference(target);
+            txn.__ensureChangeRef(elem).removeReference(target);
           }
         }
       }
@@ -68,7 +68,7 @@ define([
         var elem;
         while(++i < L) {
           if((elem = elems[i]).__addReference) {
-            txn._ensureChangeRef(elem).addReference(target);
+            txn.__ensureChangeRef(elem).addReference(target);
           }
         }
       }

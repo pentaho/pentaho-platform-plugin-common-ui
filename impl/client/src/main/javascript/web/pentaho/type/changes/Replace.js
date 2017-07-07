@@ -70,9 +70,10 @@ define([
      * @param {!pentaho.type.Complex} complex - The complex instance.
      * @param {pentaho.type.Element} value - The new proposed value of the property.
      * @private
-     * @see pentaho.type.changes.ComplexChangeset._setElement
+     * @internal
+     * @see pentaho.type.changes.ComplexChangeset.__setElement
      */
-    _updateValue: function(txn, complex, value) {
+    __updateValue: function(txn, complex, value) {
 
       this.__replaceRefs(txn, complex, this.__value, value);
 
@@ -86,8 +87,8 @@ define([
 
     __replaceRefs: function(txn, complex, v1, v2) {
       if(!this.property.isBoundary) {
-        if(v1 && v1.__addReference) txn._ensureChangeRef(v1).removeReference(complex, this.property);
-        if(v2 && v2.__addReference) txn._ensureChangeRef(v2).addReference(complex, this.property);
+        if(v1 && v1.__addReference) txn.__ensureChangeRef(v1).removeReference(complex, this.property);
+        if(v2 && v2.__addReference) txn.__ensureChangeRef(v2).addReference(complex, this.property);
       }
     },
 
@@ -114,7 +115,7 @@ define([
 
     /** @inheritDoc */
     _apply: function(target) {
-      target._values[this.property.name] = this.__value;
+      target.__values[this.property.name] = this.__value;
     }
   });
 });

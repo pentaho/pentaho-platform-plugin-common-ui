@@ -127,7 +127,7 @@ define([
       });
     });
 
-    describe("#_addChangeset(changeset)", function() {
+    describe("#__addChangeset(changeset)", function() {
       var Derived;
 
       beforeEach(function() {
@@ -182,7 +182,7 @@ define([
       });
     });
 
-    describe("#_ensureChangeRef(container)", function() {
+    describe("#__ensureChangeRef(container)", function() {
       var Derived;
 
       beforeEach(function() {
@@ -193,7 +193,7 @@ define([
         var txn = new Transaction(context);
         var container = new Derived();
 
-        var cref = txn._ensureChangeRef(container);
+        var cref = txn.__ensureChangeRef(container);
 
         expect(cref instanceof ChangeRef).toBe(true);
       });
@@ -203,8 +203,8 @@ define([
         var scope = txn.enter();
         var container = new Derived();
 
-        var cref1 = txn._ensureChangeRef(container);
-        var cref2 = txn._ensureChangeRef(container);
+        var cref1 = txn.__ensureChangeRef(container);
+        var cref2 = txn.__ensureChangeRef(container);
 
         expect(cref1).toBe(cref2);
 
@@ -216,7 +216,7 @@ define([
         var scope = txn.enter();
         var container = new Derived();
 
-        var cref = txn._ensureChangeRef(container);
+        var cref = txn.__ensureChangeRef(container);
 
         expect(cref.owner).toBe(container);
 
@@ -224,7 +224,7 @@ define([
       });
     });
 
-    describe("#_getChangeRef(uid)", function() {
+    describe("#__getChangeRef(uid)", function() {
       var Derived;
 
       beforeEach(function() {
@@ -235,7 +235,7 @@ define([
         var txn = new Transaction(context);
         var container = new Derived();
 
-        var cref = txn._getChangeRef(container.$uid);
+        var cref = txn.__getChangeRef(container.$uid);
 
         expect(cref).toBe(null);
       });
@@ -244,9 +244,9 @@ define([
         var txn = new Transaction(context);
         var scope = txn.enter();
         var container = new Derived();
-        txn._ensureChangeRef(container);
+        txn.__ensureChangeRef(container);
 
-        var cref = txn._getChangeRef(container.$uid);
+        var cref = txn.__getChangeRef(container.$uid);
 
         expect(cref instanceof ChangeRef).toBe(true);
 
@@ -257,9 +257,9 @@ define([
         var txn = new Transaction(context);
         var scope = txn.enter();
         var container = new Derived();
-        txn._ensureChangeRef(container);
+        txn.__ensureChangeRef(container);
 
-        var cref = txn._getChangeRef(container.$uid);
+        var cref = txn.__getChangeRef(container.$uid);
 
         expect(cref.owner).toBe(container);
 
@@ -267,7 +267,7 @@ define([
       });
     });
 
-    describe("#_eachChangeset(fun)", function() {
+    describe("#__eachChangeset(fun)", function() {
       var Derived, txn, scope, inst1, inst2, inst3;
 
       beforeEach(function() {
@@ -293,7 +293,7 @@ define([
       it("should call fun once per changeset in the transaction", function() {
         var fun = jasmine.createSpy();
 
-        txn._eachChangeset(fun);
+        txn.__eachChangeset(fun);
 
         expect(fun.calls.count()).toBe(3);
       });
@@ -301,7 +301,7 @@ define([
       it("should call fun once with each changeset in the transaction", function() {
         var fun = jasmine.createSpy();
 
-        txn._eachChangeset(fun);
+        txn.__eachChangeset(fun);
 
         expect(fun).toHaveBeenCalledWith(inst1.changeset);
         expect(fun).toHaveBeenCalledWith(inst2.changeset);
@@ -311,7 +311,7 @@ define([
       it("should call fun with the transaction as JS context", function() {
         var fun = jasmine.createSpy();
 
-        txn._eachChangeset(fun);
+        txn.__eachChangeset(fun);
 
         expect(fun.calls.first().object).toBe(txn);
       });

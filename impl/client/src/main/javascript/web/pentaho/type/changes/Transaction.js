@@ -162,8 +162,9 @@ define([
      * @return {!pentaho.type.changes.ChangeRef} The corresponding `ChangeRef`.
      *
      * @private
+     * @internal
      */
-    _ensureChangeRef: function(container) {
+    __ensureChangeRef: function(container) {
       var uid = container.$uid;
       var cref = O.getOwn(this.__crefByUid, uid);
       if(!cref) {
@@ -182,8 +183,9 @@ define([
      * @return {pentaho.type.changes.ChangeRef} The corresponding `ChangeRef` or `null`.
      *
      * @private
+     * @internal
      */
-    _getChangeRef: function(uid) {
+    __getChangeRef: function(uid) {
       return O.getOwn(this.__crefByUid, uid) || null;
     },
 
@@ -196,8 +198,9 @@ define([
      * committed or rejected, and thus can no longer be changed.
      *
      * @private
+     * @internal
      */
-    _addChangeset: function(changeset) {
+    __addChangeset: function(changeset) {
       if(this.isReadOnly)
         throw error.operInvalid(
             "Transaction cannot change because it has already been previewed, committed or rejected.");
@@ -218,7 +221,7 @@ define([
      *
      * @private
      */
-    _eachChangeset: function(fun) {
+    __eachChangeset: function(fun) {
       var changesets = this.__csets;
       var L = changesets.length;
       var i = -1;
@@ -226,19 +229,19 @@ define([
     },
 
     // At least initially, the leafs of the graph are those changesets that have local, primitive changes.
-    _buildGraph: function() {
+    __buildGraph: function() {
       // owner uid : true
       var visitedSet = Object.create(null);
 
-      this._eachChangeset(function(cset) {
-        this._exploreContainer(cset.owner, 0, visitedSet);
+      this.__eachChangeset(function(cset) {
+        this.__exploreContainer(cset.owner, 0, visitedSet);
       }, this);
 
       // Sort the changesets according to topological order.
-      this.__csets.sort(compareChangesets);
+      this.__csets.sort(__compareChangesets);
     },
 
-    _exploreContainer: function(container, netOrder, visitedSet) {
+    __exploreContainer: function(container, netOrder, visitedSet) {
       var cset = container.__cset;
       var uid = container.$uid;
 
@@ -257,7 +260,7 @@ define([
         }
 
         // This isn't a loop.
-        this._updateContainerNetOrder(container, netOrder, visitedSet);
+        this.__updateContainerNetOrder(container, netOrder, visitedSet);
         return cset;
       }
 
@@ -272,7 +275,7 @@ define([
       var refs = container.__refs;
       if(refs) refs.forEach(function(aref) {
 
-        var containerRef = this._exploreContainer(aref.container, netOrder + 1, visitedSet);
+        var containerRef = this.__exploreContainer(aref.container, netOrder + 1, visitedSet);
         if(containerRef)
           // Not a cycle, so hook up the two.
           containerRef.__setNestedChangeset(cset, aref.property);
@@ -286,7 +289,7 @@ define([
       return cset;
     },
 
-    _updateContainerNetOrder: function(container, netOrder, visitedSet) {
+    __updateContainerNetOrder: function(container, netOrder, visitedSet) {
       // 1. Must update the net order of cset to the highest one with which one can get to it, from leafs.
       // 2. If the net order increases, must then propagate the change to its references,
       //    until it does not increase anymore or the graph ends.
@@ -302,7 +305,7 @@ define([
 
           var refs = container.__refs;
           if(refs) refs.forEach(function(aref) {
-            this._updateContainerNetOrder(aref.container, netOrder + 1, visitedSet);
+            this.__updateContainerNetOrder(aref.container, netOrder + 1, visitedSet);
           }, this);
         }
 
@@ -368,7 +371,7 @@ define([
         while(++i < L) {
           cset = csets[i];
           if(cset.ownerVersion !== cset.owner.$version)
-            throw this._reject(new TransactionRejectedError("Concurrency error."));
+            throw this.__reject(new TransactionRejectedError("Concurrency error."));
         }
       }
 
@@ -397,7 +400,7 @@ define([
      */
     __enteringAmbient: function() {
 
-      this._eachChangeset(function(cset) {
+      this.__eachChangeset(function(cset) {
         cset.owner.__cset = cset;
       });
 
@@ -416,7 +419,7 @@ define([
 
       this.__isCurrent = false;
 
-      this._eachChangeset(function(cset) {
+      this.__eachChangeset(function(cset) {
         cset.owner.__cset = null;
       });
     },
@@ -427,15 +430,15 @@ define([
      * Tries to acquire the _action_ lock, throwing if it is already taken.
      *
      * @throws {pentaho.lang.OperationInvalidError} When this method is called while one of
-     *  [_commitWill]{@link pentaho.type.changes.Transaction#_commitWill},
-     *  [_reject]{@link pentaho.type.changes.Transaction#_reject} or
-     *  [_commit]{@link pentaho.type.changes.Transaction#_commit}
+     *  [__commitWill]{@link pentaho.type.changes.Transaction#__commitWill},
+     *  [__reject]{@link pentaho.type.changes.Transaction#__reject} or
+     *  [__commit]{@link pentaho.type.changes.Transaction#__commit}
      *  is already being called.
      *
      * @private
      */
-    _acquireActionLock: function() {
-      this._assertActionLockFree();
+    __acquireActionLock: function() {
+      this.__assertActionLockFree();
       this.__actionLockTaken = true;
     },
 
@@ -443,15 +446,15 @@ define([
      * Asserts that the _action lock_ is not taken.
      *
      * @throws {pentaho.lang.OperationInvalidError} When this method is called while one of
-     * [_commitWill]{@link pentaho.type.changes.Transaction#_commitWill},
-     * [_reject]{@link pentaho.type.changes.Transaction#_reject} or
-     * [_commit]{@link pentaho.type.changes.Transaction#_commit}
+     * [__commitWill]{@link pentaho.type.changes.Transaction#__commitWill},
+     * [__reject]{@link pentaho.type.changes.Transaction#__reject} or
+     * [__commit]{@link pentaho.type.changes.Transaction#__commit}
      * is already being called.
      *
      * @private
      */
-    _assertActionLockFree: function() {
-      if(this.__actionLockTaken) throw error.operInvalid("Already in the _commit or _commitWill methods.");
+    __assertActionLockFree: function() {
+      if(this.__actionLockTaken) throw error.operInvalid("Already in the __commit or __commitWill methods.");
     },
 
     /**
@@ -459,50 +462,51 @@ define([
      *
      * @private
      */
-    _releaseActionLock: function() {
+    __releaseActionLock: function() {
       this.__actionLockTaken = false;
     },
     // endregion
 
-    // region _reject
+    // region __reject
     /**
      * Rejects the transaction with a given reason and throws an error.
      *
      * @param {string|Error|pentaho.lang.UserError} [reason="canceled"] The reason for rejecting the transaction.
      *
      * @throws {pentaho.lang.OperationInvalidError} When this method is called while one of
-     * [_commitWill]{@link pentaho.type.changes.Transaction#_commitWill} or
-     * [_commit]{@link pentaho.type.changes.Transaction#_commit} is already being called.
+     * [__commitWill]{@link pentaho.type.changes.Transaction#__commitWill} or
+     * [__commit]{@link pentaho.type.changes.Transaction#__commit} is already being called.
      *
      * @throws {Error} If all else goes well, an error is thrown containing the provided rejection reason.
      *
      * @private
+     * @internal
      */
-    _reject: function(reason) {
+    __reject: function(reason) {
 
-      this._assertActionLockFree();
+      this.__assertActionLockFree();
 
-      throw this._resolve(ActionResult.reject(reason || "Transaction canceled."));
+      throw this.__resolve(ActionResult.reject(reason || "Transaction canceled."));
     },
     // endregion
 
-    // region _commitWill
+    // region __commitWill
     /**
-     * Previews the result of [committing]{@link pentaho.type.changes.Transaction#_commit}
+     * Previews the result of [committing]{@link pentaho.type.changes.Transaction#__commit}
      * the transaction by performing its _will_ phase.
      *
      * Call this method to determine if an operation would be valid when there's
      * no _a priori_ intention of committing it, in case it is valid.
      * If previewing returns a fulfilled result, the transaction can still be committed, if desired.
      * In any case,
-     * no more changes can be performed in this transaction after `_commitWill` has been called for the first time.
+     * no more changes can be performed in this transaction after `__commitWill` has been called for the first time.
      *
      * If this method is called after a transaction has been committed or rejected,
      * the [commit result]{@link pentaho.type.changes.Transaction#result} is returned.
      *
      * Any subsequent calls to the method while in the proposed state
      * return the result of the first call.
-     * As such, when the `_commit` method is later called,
+     * As such, when the `__commit` method is later called,
      * it will reuse the result of the anticipated _will_ phase.
      *
      * For each changeset that was registered with the transaction,
@@ -515,47 +519,50 @@ define([
      * If a `will:change` listener cancels one of the changesets,
      * no more listeners are notified and the rejected result is returned.
      * To notify listeners of the rejection,
-     * [_commit]{@link pentaho.type.changes.Transaction#_commit} still needs to be called.
+     * [__commit]{@link pentaho.type.changes.Transaction#__commit} still needs to be called.
      *
      * @return {!pentaho.lang.ActionResult} The commit-will or commit result of the transaction.
      *
      * @throws {pentaho.lang.OperationInvalidError} When this method is called while one of
-     *  [_commitWill]{@link pentaho.type.changes.Transaction#_commitWill} or
-     *  [_commit]{@link pentaho.type.changes.Transaction#_commit} is already being called.
+     *  [__commitWill]{@link pentaho.type.changes.Transaction#__commitWill} or
+     *  [__commit]{@link pentaho.type.changes.Transaction#__commit} is already being called.
      *
      * @private
+     * @internal
      */
-    _commitWill: function() {
-      // NOTE: the reason why we don't immediately reject the transaction when the _commitWill
+    __commitWill: function() {
+      // NOTE: the reason why we don't immediately reject the transaction when the __commitWill
       // is rejected is that if in the future we'd want to support making further changes
       // that behavior would be broken...
 
       var result = this.__result || this.__resultWill;
       if(!result) {
-        this._acquireActionLock();
+        this.__acquireActionLock();
 
-        result = this._commitWillCore();
+        result = this.__commitWillCore();
 
-        this._releaseActionLock();
+        this.__releaseActionLock();
       }
 
       return result;
     },
 
-    _commitWillCore: function() {
-      this._buildGraph();
+    // @private
+    __commitWillCore: function() {
+      this.__buildGraph();
 
-      var result = this.__resultWill = this._notifyChangeWill();
+      var result = this.__resultWill = this.__notifyChangeWill();
 
       // Lock changes, whatever the result.
-      this._eachChangeset(function(cset) {
+      this.__eachChangeset(function(cset) {
         cset.__setReadOnlyInternal();
       });
 
       return result;
     },
 
-    _notifyChangeWill: function() {
+    // @private
+    __notifyChangeWill: function() {
       var changesets = this.__csets;
       var L = changesets.length;
       var i = -1;
@@ -585,38 +592,40 @@ define([
     },
     // endregion
 
-    // region _commit
+    // region __commit
     /**
      * Commits the transaction.
      *
      * @return {!pentaho.lang.ActionResult} The commit result of the transaction.
      *
      * @throws {pentaho.lang.OperationInvalidError} When this method is called while one of
-     * [_commitWill]{@link pentaho.type.changes.Transaction#_commitWill} or
-     * [_commit]{@link pentaho.type.changes.Transaction#_commit} is already being called.
+     * [__commitWill]{@link pentaho.type.changes.Transaction#__commitWill} or
+     * [__commit]{@link pentaho.type.changes.Transaction#__commit} is already being called.
      *
      * @throws {Error} When the transaction is rejected.
      *
      * @private
+     * @internal
      */
-    _commit: function() {
+    __commit: function() {
 
-      this._acquireActionLock();
+      this.__acquireActionLock();
 
-      var result = this._commitWillCore();
+      var result = this.__commitWillCore();
       if(result.isFulfilled)
-        result = this._applyChanges();
+        result = this.__applyChanges();
 
-      this._releaseActionLock();
+      this.__releaseActionLock();
 
-      this._resolve(result);
+      this.__resolve(result);
 
       if(result.error) throw result.error;
 
       return result;
     },
 
-    _applyChanges: function() {
+    // @private
+    __applyChanges: function() {
       // Apply all changesets.
       // Includes setting owner versions to the new txn version.
       var version = this.context.__takeNextVersion();
@@ -625,7 +634,7 @@ define([
         cref.apply();
       });
 
-      this._eachChangeset(function(cset) {
+      this.__eachChangeset(function(cset) {
         cset._applyInternal(version);
       });
 
@@ -633,11 +642,12 @@ define([
     },
     // endregion
 
-    _resolve: function(result) {
+    // @private
+    __resolve: function(result) {
 
       this.__result = result;
 
-      // Release any _commitWill result.
+      // Release any __commitWill result.
       this.__resultWill = null;
 
       // Exit all context scopes, including CommittedScopes, until the isRoot scope.
@@ -657,13 +667,13 @@ define([
           : function(cset) { cset.owner._onChangeDid(cset); };
 
       // Make sure to execute listeners without an active transaction.
-      this.context.enterCommitted().using(this._eachChangeset.bind(this, mapper));
+      this.context.enterCommitted().using(this.__eachChangeset.bind(this, mapper));
 
       return reason;
     }
   });
 
-  function compareChangesets(csa, csb) {
+  function __compareChangesets(csa, csb) {
     return csa._netOrder - csb._netOrder;
   }
 });

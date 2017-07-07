@@ -774,7 +774,7 @@ define([
 
     /**
      * Increments and returns the next version number for use in the
-     * [commit]{@link pentaho.type.changes.Transaction#_applyChanges} of a transaction.
+     * [commit]{@link pentaho.type.changes.Transaction#__applyChanges} of a transaction.
      *
      * @return {number} The next version number.
      * @private

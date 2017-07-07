@@ -147,6 +147,7 @@ define([
      * @type {!Object|!pentaho.type.List}
      * @readOnly
      * @private
+     * @internal
      */
     get __projectedMock() {
       var changeCount = this._changes.length;
@@ -156,7 +157,7 @@ define([
           (this._projMock = this.owner._cloneElementData({changeCount: 0}, /* useCommitted: */true));
 
       if(projMock.changeCount < changeCount) {
-        this._applyFrom(projMock, projMock.changeCount);
+        this.__applyFrom(projMock, projMock.changeCount);
         projMock.changeCount = changeCount;
       }
 
@@ -177,7 +178,7 @@ define([
         target.__elems = projMock.__elems;
         target.__keys = projMock.__keys;
       } else {
-        this._applyFrom(target, 0);
+        this.__applyFrom(target, 0);
       }
     },
 
@@ -189,8 +190,9 @@ define([
      * @param {!Object|!pentaho.type.List} list - The list or list mock to which to apply changes.
      * @param {number} startingFromIdx - The index of the first change to be considered.
      * @private
+     * @internal
      */
-    _applyFrom: function(list, startingFromIdx) {
+    __applyFrom: function(list, startingFromIdx) {
       // assert startingFromIdx >= 0
 
       var changes = this._changes;
@@ -318,7 +320,7 @@ define([
               --index;
             }
 
-            this._addChange(new Remove([elem], i - removeCount));
+            this.__addChange(new Remove([elem], i - removeCount));
 
             ++removeCount;
           } else {
@@ -350,7 +352,7 @@ define([
 
           var newIndex = index + action.to;
 
-          this._addChange(new Add(action.value, newIndex));
+          this.__addChange(new Add(action.value, newIndex));
 
           computed.splice(newIndex, 0, action.value.key);
         }
@@ -372,7 +374,7 @@ define([
               if(currentIndex < baseIndex + i || currentIndex < lastDestinationIndex) {
                 var destinationIndex = Math.max(baseIndex + i, lastDestinationIndex);
 
-                this._addChange(new Move([elem], currentIndex, destinationIndex));
+                this.__addChange(new Move([elem], currentIndex, destinationIndex));
 
                 computed.splice(destinationIndex, 0, computed.splice(currentIndex, 1)[0]);
 
@@ -403,9 +405,10 @@ define([
      *
      * @see pentaho.type.changes.Remove
      * @private
+     * @internal
      * @friend pentaho.type.List
      */
-    _remove: function(fragment) {
+    __remove: function(fragment) {
 
       this._assertWritable();
 
@@ -463,7 +466,7 @@ define([
 
           if(!batchElems || (info.from !== batchIndex - 1)) {
             // End existing batch and create a new one.
-            if(batchElems) this._addChange(new Remove(batchElems, batchIndex));
+            if(batchElems) this.__addChange(new Remove(batchElems, batchIndex));
 
             batchElems = [];
           }
@@ -472,7 +475,7 @@ define([
           batchIndex = info.from;
         } while(++i < L);
 
-        if(batchElems) this._addChange(new Remove(batchElems, batchIndex));
+        if(batchElems) this.__addChange(new Remove(batchElems, batchIndex));
       }
     },
 
@@ -487,9 +490,10 @@ define([
      *
      * @see pentaho.type.changes.Remove
      * @private
+     * @internal
      * @friend pentaho.type.List
      */
-    _removeAt: function(start, count) {
+    __removeAt: function(start, count) {
 
       this._assertWritable();
 
@@ -507,7 +511,7 @@ define([
 
       var removed = list.__elems.slice(start, start + count);
 
-      this._addChange(new Remove(removed, start));
+      this.__addChange(new Remove(removed, start));
     },
 
     /**
@@ -521,9 +525,10 @@ define([
      *
      * @see pentaho.type.changes.Move
      * @private
+     * @internal
      * @friend pentaho.type.List
      */
-    _move: function(elemSpec, indexNew) {
+    __move: function(elemSpec, indexNew) {
 
       this._assertWritable();
 
@@ -540,7 +545,7 @@ define([
         indexNew = indexNew < 0 ? Math.max(0, L + indexNew) : Math.min(indexNew, L);
 
         if(indexOld !== indexNew)
-          this._addChange(new Move(elem, indexOld, indexNew));
+          this.__addChange(new Move(elem, indexOld, indexNew));
       }
     },
 
@@ -554,13 +559,14 @@ define([
      *
      * @see pentaho.type.changes.Sort
      * @private
+     * @internal
      * @friend pentaho.type.List
      */
-    _sort: function(comparer) {
+    __sort: function(comparer) {
 
       this._assertWritable();
 
-      this._addChange(new Sort(comparer));
+      this.__addChange(new Sort(comparer));
     },
 
     /**
@@ -571,16 +577,17 @@ define([
      *
      * @see pentaho.type.changes.Clear
      * @private
+     * @internal
      * @friend pentaho.type.List
      */
-    _clear: function() {
+    __clear: function() {
 
       this._assertWritable();
 
-      // See #_applyFrom
+      // See #__applyFrom
       this._lastClearIndex = this._changes.length;
 
-      this._addChange(new Clear());
+      this.__addChange(new Clear());
     },
 
     /**
@@ -588,8 +595,9 @@ define([
      *
      * @param {!pentaho.type.changes.PrimitiveChange} change - Change object to be appended to the list of changes.
      * @private
+     * @internal
      */
-    _addChange: function(change) {
+    __addChange: function(change) {
       this._changes.push(change);
 
       change._prepareRefs(this.transaction, this.owner);

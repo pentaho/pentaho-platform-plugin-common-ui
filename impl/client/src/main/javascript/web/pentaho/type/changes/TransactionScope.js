@@ -73,7 +73,7 @@ define([
     acceptWill: function() {
       this._assertInsideAndCurrent();
 
-      return this.transaction._commitWill();
+      return this.transaction.__commitWill();
     },
 
     /**
@@ -96,7 +96,7 @@ define([
       this._assertInsideAndCurrent();
 
       if(this.canCommit)
-        this.transaction._commit();
+        this.transaction.__commit();
       else
         this.exit();
 
@@ -118,7 +118,7 @@ define([
     reject: function(reason) {
       this._assertInsideAndCurrent();
 
-      this.transaction._reject(reason);
+      this.transaction.__reject(reason);
     },
 
     /**

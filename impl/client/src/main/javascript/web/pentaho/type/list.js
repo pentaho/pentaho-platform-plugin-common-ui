@@ -426,7 +426,7 @@ define([
         this.__assertEditable();
 
         this.__usingChangeset(function(cset) {
-          cset._remove(fragment);
+          cset.__remove(fragment);
         });
       },
 
@@ -443,7 +443,7 @@ define([
         this.__assertEditable();
 
         this.__usingChangeset(function(cset) {
-          cset._move(elemSpec, indexNew);
+          cset.__move(elemSpec, indexNew);
         });
       },
 
@@ -467,7 +467,7 @@ define([
         this.__assertEditable();
 
         this.__usingChangeset(function(cset) {
-          cset._removeAt(start, count);
+          cset.__removeAt(start, count);
         });
       },
 
@@ -483,7 +483,7 @@ define([
         this.__assertEditable();
 
         this.__usingChangeset(function(cset) {
-          cset._sort(comparer);
+          cset.__sort(comparer);
         });
       },
 
@@ -497,7 +497,7 @@ define([
         this.__assertEditable();
 
         this.__usingChangeset(function(cset) {
-          cset._clear();
+          cset.__clear();
         });
       },
 

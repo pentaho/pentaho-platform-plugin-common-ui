@@ -73,7 +73,7 @@ define([
       if(!target.isBoundary && target.type.of.isComplex) {
         this.elements.forEach(function(elem) {
           if(elem.__addReference)
-            txn._ensureChangeRef(elem).removeReference(target);
+            txn.__ensureChangeRef(elem).removeReference(target);
         });
       }
     },
@@ -83,7 +83,7 @@ define([
       if(!target.isBoundary && target.type.of.isComplex) {
         this.elements.forEach(function(elem) {
           if(elem.__addReference)
-            txn._ensureChangeRef(elem).addReference(target);
+            txn.__ensureChangeRef(elem).addReference(target);
         });
       }
     },
