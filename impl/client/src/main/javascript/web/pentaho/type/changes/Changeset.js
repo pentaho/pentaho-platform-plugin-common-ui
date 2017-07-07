@@ -75,7 +75,7 @@ define([
       // and their owner's references.
       this._netOrder = 0;
 
-      transaction._addChangeset(this);
+      transaction.__addChangeset(this);
     },
 
     /**

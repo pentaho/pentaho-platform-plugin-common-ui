@@ -82,7 +82,7 @@ define([
 
         it("should store changes that are created", function() {
           var elem = {"foo": "bar"};
-          changeset._addChange(new Add(elem, 0)); // create add change
+          changeset.__addChange(new Add(elem, 0)); // create add change
 
           var changes = changeset.changes;
           expect(changes).toBeDefined();
@@ -98,7 +98,7 @@ define([
 
         it("should be `true` when it contains primitive changes", function() {
           var elem = {"foo": "bar"};
-          changeset._addChange(new Add(elem, 0));
+          changeset.__addChange(new Add(elem, 0));
 
           expect(changeset.hasChanges).toBe(true);
         });
@@ -139,7 +139,7 @@ define([
           var listElems = list.__elems;
 
           changeset = new ListChangeset(context.transaction, list);
-          changeset._addChange(new Add(list.__cast(4), 0));
+          changeset.__addChange(new Add(list.__cast(4), 0));
 
           var mock = changeset.__projectedMock;
           expect(mock).not.toBe(list);
@@ -158,15 +158,15 @@ define([
           var list = new NumberList([1, 2, 3]);
 
           changeset = new ListChangeset(context.transaction, list);
-          changeset._addChange(new Add(list.__cast(4), 0));
+          changeset.__addChange(new Add(list.__cast(4), 0));
 
-          spyOn(changeset, "_applyFrom").and.callThrough();
+          spyOn(changeset, "__applyFrom").and.callThrough();
 
           var mock1 = changeset.__projectedMock;
           var mock2 = changeset.__projectedMock;
 
           expect(mock1).toBe(mock2);
-          expect(changeset._applyFrom.calls.count()).toBe(1);
+          expect(changeset.__applyFrom.calls.count()).toBe(1);
         });
       }); // endregion #__projectedMock
 
@@ -174,7 +174,7 @@ define([
       describe("#clearChanges -", function() {
         it("should remove any created changes from the changeset during the 'will' phase", function() {
           var elem = {"foo": "bar"};
-          changeset._addChange(new Add(elem, 0)); // create add change
+          changeset.__addChange(new Add(elem, 0)); // create add change
           changeset.clearChanges();
 
           expect(changeset.hasChanges).toBe(false);
@@ -196,7 +196,7 @@ define([
 
         it("should throw when attempting to clear the changes from the changeset after becoming read-only", function() {
           var elem = {"foo": "bar"};
-          changeset._addChange(new Add(elem, 0)); // create add change
+          changeset.__addChange(new Add(elem, 0)); // create add change
           changeset.__setReadOnlyInternal();
 
           expect(function() {
@@ -205,10 +205,10 @@ define([
         });
       }); // endregion #clearChanges
 
-      // region #_clear
-      describe("#_clear -", function() {
+      // region #__clear
+      describe("#__clear -", function() {
         it("should append a `clear` change to the changeset", function() {
-          changeset._clear(); // create clear change
+          changeset.__clear(); // create clear change
 
           expect(changeset.changes.length).toBe(1);
           expect(changeset.changes[0].type).toBe("clear");
@@ -218,10 +218,10 @@ define([
           changeset.__setReadOnlyInternal();
 
           expect(function() {
-            changeset._clear();
+            changeset.__clear();
           }).toThrow(errorMatch.operInvalid());
         });
-      }); // endregion #_clear
+      }); // endregion #__clear
 
       // region #__set
       describe("#__set(fragment, add, update, remove, move, index)", function() {
@@ -285,14 +285,14 @@ define([
           expect(changeset.changes[0].type).toBe("add");
           expect(changeset.changes[1].type).toBe("move");
         });
-      }); // endregion #_removeAt
+      }); // endregion #__removeAt
 
-      // region #_remove
-      describe("#_remove -", function() {
+      // region #__remove
+      describe("#__remove -", function() {
         it("for a single element, should append a `Remove` change to the changeset", function() {
           var list = new NumberList([1, 2, 3, 4]);
           changeset = new ListChangeset(context.transaction, list);
-          changeset._remove(2);
+          changeset.__remove(2);
 
           expect(changeset.changes.length).toBe(1);
           expect(changeset.changes[0].type).toBe("remove");
@@ -301,7 +301,7 @@ define([
         it("for an array of elements, should append a `Remove` change to the changeset per element", function() {
           var list = new NumberList([1, 2, 3, 4]);
           changeset = new ListChangeset(context.transaction, list);
-          changeset._remove([2, 3]);
+          changeset.__remove([2, 3]);
 
           expect(changeset.changes.length).toBe(2);
           expect(changeset.changes[0].type).toBe("remove");
@@ -314,13 +314,13 @@ define([
           changeset.__setReadOnlyInternal();
 
           expect(function() {
-            changeset._remove(2);
+            changeset.__remove(2);
           }).toThrow(errorMatch.operInvalid());
         });
-      }); // endregion #_removeAt
+      }); // endregion #__removeAt
 
-      // region #_removeAt
-      describe("#_removeAt -", function() {
+      // region #__removeAt
+      describe("#__removeAt -", function() {
         var list;
 
         beforeEach(function(){
@@ -329,17 +329,17 @@ define([
         });
 
         it("should do nothing if the number of elements to remove is negative", function() {
-          changeset._removeAt(1, -1);
+          changeset.__removeAt(1, -1);
           expect(changeset.hasChanges).toBe(false);
         });
 
         it("should do nothing if the starting index exceeds the number of elements", function() {
-          changeset._removeAt(5, 1);
+          changeset.__removeAt(5, 1);
           expect(changeset.hasChanges).toBe(false);
         });
 
         it("should append a `Remove` change to the changeset", function() {
-          changeset._removeAt(1, 2); // remove two consecutive elements
+          changeset.__removeAt(1, 2); // remove two consecutive elements
 
           expect(changeset.changes.length).toBe(1);
           expect(changeset.changes[0].type).toBe("remove");
@@ -349,15 +349,15 @@ define([
           changeset.__setReadOnlyInternal();
 
           expect(function() {
-            changeset._removeAt(1);
+            changeset.__removeAt(1);
           }).toThrow(errorMatch.operInvalid());
         });
-      }); // endregion #_removeAt
+      }); // endregion #__removeAt
 
-      // region #_sort
-      describe("#_sort -", function() {
+      // region #__sort
+      describe("#__sort -", function() {
         it("should add append a `sort` change to the changeset", function() {
-          changeset._sort(function(x) { return x;}); // create sort change
+          changeset.__sort(function(x) { return x;}); // create sort change
 
           expect(changeset.changes.length).toBe(1);
           expect(changeset.changes[0].type).toBe("sort");
@@ -367,10 +367,10 @@ define([
           changeset.__setReadOnlyInternal();
 
           expect(function() {
-            changeset._sort(function(x) { return x;});
+            changeset.__sort(function(x) { return x;});
           }).toThrow(errorMatch.operInvalid());
         });
-      }); // endregion #_sort
+      }); // endregion #__sort
 
       // region #_apply
       describe("#_apply -", function() {
@@ -413,7 +413,7 @@ define([
           expect(list.__elems).toBe(projElems);
           expect(list.__keys).toBe(projKeys);
         });
-      }); // endregion #_sort
+      }); // endregion #__sort
 
     }); // end instance
   }); // end pentaho.lang.ComplexChangeset

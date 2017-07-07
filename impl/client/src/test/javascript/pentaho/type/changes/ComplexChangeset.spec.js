@@ -275,7 +275,7 @@ define([
           expect(changeset.hasChange("foo")).toBe(true);
           txnScope.dispose();
         });
-      }); // endregion #_setElement
+      }); // endregion #__setElement
 
       // region #propertyNames
       describe("#propertyNames -", function() {

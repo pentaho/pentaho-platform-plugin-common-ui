@@ -164,7 +164,7 @@ define([
       return Object.keys(this._changes);
     },
 
-    // TODO: Documente me!
+    // TODO: Document me!
     __getByName: function(name) {
       // NOTE: Only called for element properties.
       var change = O.getOwn(this._changes, name);
@@ -205,9 +205,10 @@ define([
      * @param {any?} [valueSpec=null] The new value specification.
      *
      * @private
+     * @internal
      * @see pentaho.type.Complex#set
      */
-    _setElement: function(complex, propType, valueSpec) {
+    __setElement: function(complex, propType, valueSpec) {
 
       // NOTE: For performance reasons, this function inlines code that would otherwise be available from.
       // For example: Container#usingChangeset(.) and TransactionScope.
@@ -237,7 +238,7 @@ define([
           change._cancelRefs(cset.transaction, complex, valueIni);
         } else {
           // Update its value.
-          change._updateValue(cset.transaction, complex, valueNew);
+          change.__updateValue(cset.transaction, complex, valueNew);
         }
         return;
       }

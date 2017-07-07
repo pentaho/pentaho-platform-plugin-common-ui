@@ -251,11 +251,11 @@ define([
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
 
-        spyOn(txn, "_commitWill");
+        spyOn(txn, "__commitWill");
 
         scope.acceptWill();
 
-        expect(txn._commitWill).toHaveBeenCalled();
+        expect(txn.__commitWill).toHaveBeenCalled();
         scope.exit();
       });
 
@@ -265,7 +265,7 @@ define([
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
         var result = {};
-        spyOn(txn, "_commitWill").and.returnValue(result);
+        spyOn(txn, "__commitWill").and.returnValue(result);
 
         var result2 = scope.acceptWill();
 
@@ -305,42 +305,42 @@ define([
 
     describe("#reject(reason)", function() {
 
-      it("should call txn _reject if current", function() {
+      it("should call txn __reject if current", function() {
 
         var context = new Context();
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
 
-        spyOn(txn, "_reject");
+        spyOn(txn, "__reject");
 
         scope.reject();
 
-        expect(txn._reject).toHaveBeenCalled();
+        expect(txn.__reject).toHaveBeenCalled();
         scope.exit();
       });
 
-      it("should call txn _reject with the given reason, if current", function() {
+      it("should call txn __reject with the given reason, if current", function() {
 
         var context = new Context();
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
         var reason = {};
-        spyOn(txn, "_reject");
+        spyOn(txn, "__reject");
 
         scope.reject(reason);
 
-        expect(txn._reject).toHaveBeenCalledWith(reason);
+        expect(txn.__reject).toHaveBeenCalledWith(reason);
 
         scope.exit();
       });
 
-      it("should call txn _reject and throw its error, if current", function() {
+      it("should call txn __reject and throw its error, if current", function() {
 
         var context = new Context();
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
         var ex = new Error();
-        spyOn(txn, "_reject").and.callFake(function() { throw ex; });
+        spyOn(txn, "__reject").and.callFake(function() { throw ex; });
 
         expect(function() {
           scope.reject();
@@ -380,17 +380,17 @@ define([
 
     describe("#accept()", function() {
 
-      it("should call txn _commit if current and root", function() {
+      it("should call txn __commit if current and root", function() {
 
         var context = new Context();
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
 
-        spyOn(txn, "_commit");
+        spyOn(txn, "__commit");
 
         scope.accept();
 
-        expect(txn._commit).toHaveBeenCalled();
+        expect(txn.__commit).toHaveBeenCalled();
         scope.exit();
       });
 
@@ -405,7 +405,7 @@ define([
         expect(result).toBe(scope);
       });
 
-      it("should not call txn _commit and should simply call exit if cannot commit", function() {
+      it("should not call txn __commit and should simply call exit if cannot commit", function() {
 
         var context = new Context();
         var txn = new Transaction(context);

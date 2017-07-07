@@ -127,7 +127,7 @@ define([
           }
         }
 
-        this._values = values;
+        this.__values = values;
       },
 
       /**
@@ -232,7 +232,7 @@ define([
 
       // @internal
       __getByName: function(name) {
-        return this._values[name];
+        return this.__values[name];
       },
 
       /**
@@ -378,9 +378,9 @@ define([
 
         if(propType.isList)
           // Delegate to List#set.
-          this._values[propType.name].set(valueSpec);
+          this.__values[propType.name].set(valueSpec);
         else
-          ComplexChangeset._setElement(this, propType, valueSpec);
+          ComplexChangeset.__setElement(this, propType, valueSpec);
       },
 
       /** @inheritDoc */
@@ -1059,7 +1059,7 @@ define([
           }
         }
 
-        clone._values = cloneValues;
+        clone.__values = cloneValues;
       },
 
       /** @inheritDoc */

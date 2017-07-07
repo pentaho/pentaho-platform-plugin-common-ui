@@ -63,7 +63,7 @@ define([
       /**
        * Version number.
        *
-       * Updated with each transaction's version on Transaction#_commit.
+       * Updated with each transaction's version on Transaction#__commit.
        *
        * @memberOf pentaho.type.mixins.Container#
        * @type {number}
@@ -145,7 +145,7 @@ define([
     get $references() {
       var cref;
       var txn = this.type.context.transaction;
-      return (txn && (cref = txn._getChangeRef(this.__uid))) ? cref.projectedReferences : this.__refs;
+      return (txn && (cref = txn.__getChangeRef(this.__uid))) ? cref.projectedReferences : this.__refs;
     },
 
     /**
