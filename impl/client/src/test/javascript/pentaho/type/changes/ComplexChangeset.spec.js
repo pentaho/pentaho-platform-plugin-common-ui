@@ -110,6 +110,13 @@ define([
 
           expect(cset.hasChanges).toBe(false);
         });
+
+        it("should return `true` if the ComplexChangeset has a ListChangeset that has changes", function() {
+          var cset = new ComplexChangeset(context.transaction, {});
+          cset._changes = {"myList" : {hasChanges: true}};
+
+          expect(cset.hasChanges).toBe(true);
+        });
       }); // endregion #hasChanges
 
       // region #getChange

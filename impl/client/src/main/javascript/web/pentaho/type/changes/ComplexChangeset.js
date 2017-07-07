@@ -258,6 +258,6 @@ define([
   });
 
   function __hasChanges(change) {
-    return !(change instanceof Changeset) || change.__hasChanges;
+    return !(change instanceof Changeset) || change.hasChanges;
   }
 });
