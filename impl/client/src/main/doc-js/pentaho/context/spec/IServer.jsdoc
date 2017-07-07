@@ -29,3 +29,11 @@
  * @memberOf pentaho.context.spec.IServer#
  * @type {?nonEmptyString}
  */
+
+/**
+ * The base cxf endpoint of the web server application.
+ *
+ * @name cxf
+ * @memberOf pentaho.context.spec.IServer#
+ * @type {?nonEmptyString}
+ */
