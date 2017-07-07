@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ define([
 
         it("should store changes that are created", function() {
           var elem = {"foo": "bar"};
-          changeset._addChange(new Add(elem, 0)); //create add change
+          changeset._addChange(new Add(elem, 0)); // create add change
 
           var changes = changeset.changes;
           expect(changes).toBeDefined();
@@ -109,7 +109,7 @@ define([
           var cset = new ComplexChangeset(context.transaction, elem);
           Object.defineProperty(cset, "hasChanges", {value: true});
 
-          changeset._setNestedChangeset(cset);
+          changeset.__setNestedChangeset(cset);
 
           expect(changeset.hasChanges).toBe(true);
         });
@@ -119,34 +119,34 @@ define([
           var elem = new Derived();
           var cset = new ComplexChangeset(context.transaction, elem);
 
-          changeset._setNestedChangeset(cset);
+          changeset.__setNestedChangeset(cset);
 
           expect(changeset.hasChanges).toBe(false);
         });
       }); // endregion #hasChanges
 
-      // region #_projectedMock
-      describe("#_projectedMock -", function() {
+      // region #__projectedMock
+      describe("#__projectedMock -", function() {
         it("should return the original list when there are no changes", function() {
           var list = new NumberList([1, 2, 3]);
 
           changeset = new ListChangeset(context.transaction, list);
-          expect(changeset._projectedMock).toBe(list);
+          expect(changeset.__projectedMock).toBe(list);
         });
 
         it("should return a mock with all changes applied", function() {
           var list = new NumberList([1, 2, 3]);
-          var listElems = list._elems;
+          var listElems = list.__elems;
 
           changeset = new ListChangeset(context.transaction, list);
-          changeset._addChange(new Add(list._cast(4), 0));
+          changeset._addChange(new Add(list.__cast(4), 0));
 
-          var mock = changeset._projectedMock;
+          var mock = changeset.__projectedMock;
           expect(mock).not.toBe(list);
 
-          expect(list._elems).toBe(listElems);
+          expect(list.__elems).toBe(listElems);
 
-          var newElems = mock._elems;
+          var newElems = mock.__elems;
           expect(newElems[0].value).toBe(4);
 
           for(var i = 0; i < listElems.length; i++) {
@@ -158,23 +158,23 @@ define([
           var list = new NumberList([1, 2, 3]);
 
           changeset = new ListChangeset(context.transaction, list);
-          changeset._addChange(new Add(list._cast(4), 0));
+          changeset._addChange(new Add(list.__cast(4), 0));
 
           spyOn(changeset, "_applyFrom").and.callThrough();
 
-          var mock1 = changeset._projectedMock;
-          var mock2 = changeset._projectedMock;
+          var mock1 = changeset.__projectedMock;
+          var mock2 = changeset.__projectedMock;
 
           expect(mock1).toBe(mock2);
           expect(changeset._applyFrom.calls.count()).toBe(1);
         });
-      }); // endregion #_projectedMock
+      }); // endregion #__projectedMock
 
       // region #clearChanges
       describe("#clearChanges -", function() {
         it("should remove any created changes from the changeset during the 'will' phase", function() {
           var elem = {"foo": "bar"};
-          changeset._addChange(new Add(elem, 0)); //create add change
+          changeset._addChange(new Add(elem, 0)); // create add change
           changeset.clearChanges();
 
           expect(changeset.hasChanges).toBe(false);
@@ -185,7 +185,7 @@ define([
           var elem = new Derived();
           var cset = new ComplexChangeset(context.transaction, elem);
 
-          changeset._setNestedChangeset(cset);
+          changeset.__setNestedChangeset(cset);
 
           spyOn(cset, "clearChanges");
 
@@ -196,8 +196,8 @@ define([
 
         it("should throw when attempting to clear the changes from the changeset after becoming read-only", function() {
           var elem = {"foo": "bar"};
-          changeset._addChange(new Add(elem, 0)); //create add change
-          changeset._setReadOnlyInternal();
+          changeset._addChange(new Add(elem, 0)); // create add change
+          changeset.__setReadOnlyInternal();
 
           expect(function() {
             changeset.clearChanges();
@@ -208,14 +208,14 @@ define([
       // region #_clear
       describe("#_clear -", function() {
         it("should append a `clear` change to the changeset", function() {
-          changeset._clear(); //create clear change
+          changeset._clear(); // create clear change
 
           expect(changeset.changes.length).toBe(1);
           expect(changeset.changes[0].type).toBe("clear");
         });
 
         it("should throw when called after becoming read-only", function() {
-          changeset._setReadOnlyInternal();
+          changeset.__setReadOnlyInternal();
 
           expect(function() {
             changeset._clear();
@@ -223,20 +223,20 @@ define([
         });
       }); // endregion #_clear
 
-      // region #_set
-      describe("#_set(fragment, add, update, remove, move, index)", function() {
+      // region #__set
+      describe("#__set(fragment, add, update, remove, move, index)", function() {
 
         it("should throw when called after becoming read-only", function() {
-          changeset._setReadOnlyInternal();
+          changeset.__setReadOnlyInternal();
 
           expect(function() {
-            changeset._set([1], true);
+            changeset.__set([1], true);
           }).toThrow(errorMatch.operInvalid());
         });
 
         it("for a single element, and add=true, should append a `Add` change to the changeset",
         function() {
-          changeset._set([1], true);
+          changeset.__set([1], true);
 
           expect(changeset.changes.length).toBe(1);
           expect(changeset.changes[0].type).toBe("add");
@@ -245,7 +245,7 @@ define([
         it("should prevent the creation of duplicates when add=true", function() {
           var list = new NumberList([1, 2, 3, 4]);
           changeset = new ListChangeset(context.transaction, list);
-          changeset._set([9, 9, 9, 9], true);
+          changeset.__set([9, 9, 9, 9], true);
 
           expect(changeset.changes.length).toBe(1);
           expect(changeset.changes[0].type).toBe("add");
@@ -255,7 +255,7 @@ define([
           var list = new NumberList([1, 2, 3, 4]);
           changeset = new ListChangeset(context.transaction, list);
 
-          changeset._set([2], false, false, true);
+          changeset.__set([2], false, false, true);
 
           expect(changeset.changes.length).toBe(3);
           expect(changeset.changes[0].type).toBe("remove");
@@ -267,7 +267,7 @@ define([
           var list = new NumberList([1, 2, 3, 4]);
           changeset = new ListChangeset(context.transaction, list);
 
-          changeset._set([3, 2], false, false, false, true);
+          changeset.__set([3, 2], false, false, false, true);
 
           expect(changeset.changes.length).toBe(1);
           expect(changeset.changes[0].type).toBe("move");
@@ -279,7 +279,7 @@ define([
           var list = new NumberList([1, 2, 3, 4]);
           changeset = new ListChangeset(context.transaction, list);
 
-          changeset._set([5, 2], true, true, false, true);
+          changeset.__set([5, 2], true, true, false, true);
 
           expect(changeset.changes.length).toBe(2);
           expect(changeset.changes[0].type).toBe("add");
@@ -311,7 +311,7 @@ define([
         it("should throw when called after becoming read-only", function() {
           var list = new NumberList([1, 2, 3, 4]);
           changeset = new ListChangeset(context.transaction, list);
-          changeset._setReadOnlyInternal();
+          changeset.__setReadOnlyInternal();
 
           expect(function() {
             changeset._remove(2);
@@ -339,14 +339,14 @@ define([
         });
 
         it("should append a `Remove` change to the changeset", function() {
-          changeset._removeAt(1, 2); //remove two consecutive elements
+          changeset._removeAt(1, 2); // remove two consecutive elements
 
           expect(changeset.changes.length).toBe(1);
           expect(changeset.changes[0].type).toBe("remove");
         });
 
         it("should throw when called after becoming read-only", function() {
-          changeset._setReadOnlyInternal();
+          changeset.__setReadOnlyInternal();
 
           expect(function() {
             changeset._removeAt(1);
@@ -357,14 +357,14 @@ define([
       // region #_sort
       describe("#_sort -", function() {
         it("should add append a `sort` change to the changeset", function() {
-          changeset._sort(function(x) { return x;}); //create sort change
+          changeset._sort(function(x) { return x;}); // create sort change
 
           expect(changeset.changes.length).toBe(1);
           expect(changeset.changes[0].type).toBe("sort");
         });
 
         it("should throw when called after becoming read-only", function() {
-          changeset._setReadOnlyInternal();
+          changeset.__setReadOnlyInternal();
 
           expect(function() {
             changeset._sort(function(x) { return x;});
@@ -378,7 +378,7 @@ define([
           var list = new NumberList([1, 2, 3, 4]);
 
           changeset = new ListChangeset(context.transaction, list);
-          changeset._set([5], true); //append an element
+          changeset.__set([5], true); // append an element
 
           changeset._apply(list); // apply to owning list
 
@@ -394,15 +394,15 @@ define([
           changeset = new ListChangeset(context.transaction, list);
 
           // Append an element.
-          changeset._set([5], true);
+          changeset.__set([5], true);
 
           // Preview the future state of the list.
-          var projMock  = changeset._projectedMock;
-          var projElems = projMock._elems;
-          var projKeys  = projMock._keys;
+          var projMock  = changeset.__projectedMock;
+          var projElems = projMock.__elems;
+          var projKeys  = projMock.__keys;
 
-          expect(list._elems).not.toBe(projElems);
-          expect(list._keys).not.toBe(projKeys);
+          expect(list.__elems).not.toBe(projElems);
+          expect(list.__keys).not.toBe(projKeys);
 
           // Apply to target list.
           changeset._apply(list);
@@ -410,12 +410,12 @@ define([
           scope.exit();
 
           expectEqualValueAt(list, [1, 2, 3, 4, 5]);
-          expect(list._elems).toBe(projElems);
-          expect(list._keys).toBe(projKeys);
+          expect(list.__elems).toBe(projElems);
+          expect(list.__keys).toBe(projKeys);
         });
       }); // endregion #_sort
 
-    }); //end instance
-  }); //end pentaho.lang.ComplexChangeset
+    }); // end instance
+  }); // end pentaho.lang.ComplexChangeset
 
 });

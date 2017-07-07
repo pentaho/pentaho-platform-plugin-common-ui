@@ -39,7 +39,7 @@ define([
         // This resource will be resolved dynamically during run time in the web browser.
         onLoad();
       } else {
-        var bundleInfo = getBundleInfo(localRequire, bundlePath);
+        var bundleInfo = __getBundleInfo(localRequire, bundlePath);
         var serverUrl = context.server.url;
         var bundleUrl = "json!" + ((serverUrl && serverUrl.pathname) || "") +
             "i18n?plugin=" + bundleInfo.pluginId + "&name=" + bundleInfo.name;
@@ -51,7 +51,7 @@ define([
       }
     },
     normalize: function(name, normalize) {
-      return normalize(getBundleId(name));
+      return normalize(__getBundleId(name));
     }
   };
 
@@ -61,7 +61,7 @@ define([
    * @param {string} bundlePath - The specified bundle path argument.
    * @return {string} The normalized bundle identifier.
    */
-  function getBundleId(bundlePath) {
+  function __getBundleId(bundlePath) {
     var bundleMid;
     if(!bundlePath) {
       // E.g. bundlePath="pentaho/i18n!"
@@ -97,7 +97,7 @@ define([
    * @throws {Error} If the specified module identifier cannot be resolved
    *   to a plugin identifier and bundle name.
    */
-  function getBundleInfo(localRequire, bundlePath) {
+  function __getBundleInfo(localRequire, bundlePath) {
     // e.g.:
     // bundlePath: pentaho/common/nls/messages
     // bundleMid:  pentaho/common/nls/messages
@@ -106,7 +106,7 @@ define([
     // pluginId: common-ui
     // bundleName: resources/web/dojo/pentaho/common/nls/messages
 
-    var bundleMid = getBundleId(bundlePath);
+    var bundleMid = __getBundleId(bundlePath);
 
     var absBundleUrl = localRequire.toUrl(bundleMid);
 

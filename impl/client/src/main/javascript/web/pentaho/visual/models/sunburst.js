@@ -68,7 +68,7 @@ define([
             name: "labelsOption",
             valueType: labelsOptionFactory,
             domain: ["none", "center"],
-            isApplicable: isSizeMapped,
+            isApplicable: __isSizeMapped,
             isRequired: true,
             defaultValue: "none"
           },
@@ -81,7 +81,7 @@ define([
           {
             name: "sliceOrder",
             valueType: sliceOrderFactory,
-            isApplicable: isSizeMapped,
+            isApplicable: __isSizeMapped,
             isRequired: true,
             defaultValue: "bySizeDescending"
           }
@@ -91,7 +91,7 @@ define([
     .implement({type: bundle.structured.sunburst});
   };
 
-  function isSizeMapped() {
+  function __isSizeMapped() {
     return this.size.attributes.count > 0;
   }
 });

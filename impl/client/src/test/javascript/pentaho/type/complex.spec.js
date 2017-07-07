@@ -1721,42 +1721,42 @@ define([
       });
     });
 
-    describe("#_addReference(container, propType)", function() {
+    describe("#__addReference(container, propType)", function() {
 
       it("should be called when a complex container is set to this value", function() {
         var Derived = Complex.extend();
         var Container = Complex.extend({type: {props: [{name: "a", valueType: Derived}]}});
 
-        spyOn(Derived.prototype, "_addReference");
+        spyOn(Derived.prototype, "__addReference");
 
         var value = new Derived();
         var container = new Container({a: value});
 
-        expect(value._addReference).toHaveBeenCalled();
+        expect(value.__addReference).toHaveBeenCalled();
       });
 
       it("should be called with the complex container and its property type", function() {
         var Derived = Complex.extend();
         var Container = Complex.extend({type: {props: [{name: "a", valueType: Derived}]}});
 
-        spyOn(Derived.prototype, "_addReference");
+        spyOn(Derived.prototype, "__addReference");
 
         var value = new Derived();
         var container = new Container({a: value});
 
-        expect(value._addReference).toHaveBeenCalledWith(container, Container.type.get("a"));
+        expect(value.__addReference).toHaveBeenCalledWith(container, Container.type.get("a"));
       });
 
       it("should be called when added to a list container", function() {
         var Derived = Complex.extend();
         var Container = Complex.extend({type: {props: [{name: "as", valueType: [Derived]}]}});
 
-        spyOn(Derived.prototype, "_addReference");
+        spyOn(Derived.prototype, "__addReference");
 
         var value = new Derived();
         var container = new Container({as: [value]});
 
-        expect(value._addReference).toHaveBeenCalledWith(container.as);
+        expect(value.__addReference).toHaveBeenCalledWith(container.as);
       });
     });
   }); // pentaho.type.Complex

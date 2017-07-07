@@ -23,6 +23,8 @@ define([
 
   "use strict";
 
+  // TODO: This class does not have unit tests.
+
   var O_isProtoOf = Object.prototype.isPrototypeOf;
 
   return Base.extend(module.id, /** @lends pentaho.typeInfo.impl.Service# */{
@@ -114,29 +116,29 @@ define([
       this.configure(decls);
     },
 
-    _get: function(idOrAlias) {
+    __get: function(idOrAlias) {
       return O.getOwn(this.__declById, idOrAlias);
     },
 
     getAliasOf: function(idOrAlias) {
-      var decl = this._get(idOrAlias);
+      var decl = this.__get(idOrAlias);
       if(decl) return decl.alias;
     },
 
     getIdOf: function(aliasOrId) {
-      var decl = this._get(aliasOrId);
+      var decl = this.__get(aliasOrId);
       if(decl) return decl.id;
     },
 
     getBaseOf: function(idOrAlias) {
       var base;
-      var decl = this._get(idOrAlias);
+      var decl = this.__get(idOrAlias);
       if(decl) return (base = decl.base) ? base.id : null;
     },
 
     isSubtypeOf: function(idOrAliasSub, idOrAliasBase) {
-      var declSub = this._get(idOrAliasSub);
-      var declBase = this._get(idOrAliasBase);
+      var declSub = this.__get(idOrAliasSub);
+      var declBase = this.__get(idOrAliasBase);
 
       if(declSub && declBase) return declSub === declBase || O_isProtoOf.call(declBase, declSub);
     }

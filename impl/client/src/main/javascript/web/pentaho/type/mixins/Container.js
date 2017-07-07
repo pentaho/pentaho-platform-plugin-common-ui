@@ -30,7 +30,7 @@ define([
    *
    * @type {number}
    */
-  var _nextUid = 1;
+  var __nextUid = 1;
 
   /**
    * @name pentaho.type.mixins.Container
@@ -46,51 +46,77 @@ define([
   return Base.extend("pentaho.type.mixins.Container", /** @lends pentaho.type.mixins.Container# */{
 
     /**
-     * Initializes a container instance, with a unique identifier and a version field.
+     * Initializes a container instance.
      *
-     * @private
+     * @protected
      */
     _initContainer: function() {
       /**
        * Container unique identifier.
        *
+       * @memberOf pentaho.type.mixins.Container#
        * @type {string}
+       * @private
        */
-      this._uid = String(_nextUid++);
+      this.__uid = String(__nextUid++);
 
       /**
        * Version number.
        *
        * Updated with each transaction's version on Transaction#_commit.
+       *
+       * @memberOf pentaho.type.mixins.Container#
        * @type {number}
+       * @private
        */
-      this._vers = 0;
+      this.__version = 0;
 
       /**
        * Ambient Changeset. Set whenever this container has a changeset in the ambient transaction.
        *
+       * @memberOf pentaho.type.mixins.Container#
        * @type {pentaho.type.changes.Changeset}
+       * @private
+       * @internal
        */
-      this._cset = null;
+      this.__cset = null;
 
       /**
        * References (from others) to this container.
        *
-       * Maintained by Container#_addReference and Changeset#_updateReferences.
+       * Maintained by Container#__addReference and Changeset#_updateReferences.
        *
+       * @memberOf pentaho.type.mixins.Container#
        * @type {pentaho.type.ReferenceList}
+       * @private
+       * @internal
        */
-      this._refs = null;
+      this.__refs = null;
     },
 
     /**
-     * Initializes a container instance clone.
+     * Creates a shallow clone of this container.
      *
-     * @param {!pentaho.type.mixins.Container} clone - The cloned container instance.
+     * All property values or elements are shared with the clone.
      *
-     * @private
+     * @return {!pentaho.type.ContainerMixin} The cloned container.
      */
-    _cloneContainer: function(clone) {
+    clone: function() {
+      var clone = Object.create(Object.getPrototypeOf(this));
+      this._initClone(clone);
+      return clone;
+    },
+
+    /**
+     * Initializes a shallow clone of this container.
+     *
+     * The default implementation calls {@link pentaho.type.mixins.Container#_initContainer}.
+     *
+     * @param {!pentaho.type.ContainerMixin} clone - The cloned container to initialize.
+     *
+     * @protected
+     */
+    _initClone: function(clone) {
       clone._initContainer();
     },
 
@@ -101,7 +127,7 @@ define([
      * @readonly
      */
     get $uid() {
-      return this._uid;
+      return this.__uid;
     },
 
     // region References
@@ -119,7 +145,7 @@ define([
     get $references() {
       var cref;
       var txn = this.type.context.transaction;
-      return (txn && (cref = txn._getChangeRef(this._uid))) ? cref.projectedReferences : this._refs;
+      return (txn && (cref = txn._getChangeRef(this.__uid))) ? cref.projectedReferences : this.__refs;
     },
 
     /**
@@ -134,9 +160,10 @@ define([
      * the property type whose value contains this instance.
      *
      * @private
+     * @internal
      */
-    _addReference: function(container, propType) {
-      (this._refs || (this._refs = ReferenceList.to([]))).add(container, propType);
+    __addReference: function(container, propType) {
+      (this.__refs || (this.__refs = ReferenceList.to([]))).add(container, propType);
     },
     // endregion
 
@@ -148,7 +175,7 @@ define([
      * @readonly
      */
     get $version() {
-      return this._vers;
+      return this.__version;
     },
 
     /**
@@ -157,11 +184,12 @@ define([
      * @param {number} version - The new container version.
      *
      * @private
+     * @internal
      * @friend {pentaho.type.changes.Changeset}
      * @friend {pentaho.type.filter.Abstract}
      */
-    _setVersionInternal: function(version) {
-      this._vers = version;
+    __setVersionInternal: function(version) {
+      this.__version = version;
     },
     // endregion
 
@@ -173,15 +201,17 @@ define([
      * @readonly
      */
     get changeset() {
-      return this._cset;
+      return this.__cset;
     },
 
+    // TODO: Maybe remove
     get hasChanges() {
-      return !!this._cset && this._cset.hasChanges;
+      return !!this.__cset && this.__cset.hasChanges;
     },
 
-    _usingChangeset: function(fun) {
-      var cset = this._cset;
+    // @internal
+    __usingChangeset: function(fun) {
+      var cset = this.__cset;
       if(cset) return fun.call(this, cset);
 
       var scope = this.type.context.enterChange();
@@ -190,14 +220,14 @@ define([
 
         cset = this._createChangeset(scope.transaction);
 
-        // assert this._cset === cset
+        // assert this.__cset === cset
 
         var result = fun.call(this, cset);
 
         scope.accept();
 
         return result;
-      }, this); // assert !this._cset
+      }, this); // assert !this.__cset
     },
 
     /**
@@ -228,6 +258,7 @@ define([
      * @return {pentaho.lang.UserError|undefined} An error if the changeset was canceled; or, `undefined` otherwise.
      *
      * @protected
+     * @internal
      * @friend {pentaho.type.changes.Transaction}
      */
     _onChangeWill: function(changeset) {
@@ -248,6 +279,7 @@ define([
      * @param {!pentaho.type.changes.Changeset} changeset - The set of changes.
      *
      * @protected
+     * @internal
      * @friend {pentaho.type.changes.Transaction}
      */
     _onChangeDid: function(changeset) {
@@ -268,6 +300,7 @@ define([
      * @param {!Error} reason - The reason why the changes were rejected.
      *
      * @protected
+     * @internal
      * @friend {pentaho.type.changes.Transaction}
      */
     _onChangeRejected: function(changeset, reason) {

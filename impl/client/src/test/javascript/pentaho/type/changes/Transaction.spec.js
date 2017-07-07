@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ define([
     });
 
     describe("new(context)", function() {
-      it("should be defined", function () {
+      it("should be defined", function() {
         expect(typeof Transaction).toBeDefined();
       });
 
@@ -317,7 +317,7 @@ define([
       });
     });
 
-    // enter, _scopeEnter, _enteringAmbient
+    // enter, __scopeEnter, __enteringAmbient
     describe("#enter()", function() {
       var Derived, txn;
 

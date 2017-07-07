@@ -116,7 +116,7 @@ define(function() {
         // Is date only? It is local time (utcOffset === undefined).
         if(m[4]) utcOffset = [0, 0];
 
-        //else d = new Date(Number(m[1]), Number(m[2] || "1") - 1, Number(m[3] || "1"));
+        // else d = new Date(Number(m[1]), Number(m[2] || "1") - 1, Number(m[3] || "1"));
       }
 
       var d = utcOffset
@@ -156,7 +156,7 @@ define(function() {
     var m = RE_ECMA_TIME.exec(time);
     if(!m) return null;
 
-    var time = [Number(m[1]), Number(m[2]), 0, 0];
+    time = [Number(m[1]), Number(m[2]), 0, 0];
     if(m[3]) {
       time[2] = Number(m[3]);
       if(m[4]) {

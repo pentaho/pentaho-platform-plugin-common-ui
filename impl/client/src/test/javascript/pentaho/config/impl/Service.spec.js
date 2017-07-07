@@ -21,13 +21,15 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false, beforeAll:false */
 
+  /* eslint dot-notation: 0 */
+
   describe("pentaho.config.Service -", function() {
 
     it("should be defined.", function() {
       expect(ConfigurationService).toBeDefined();
     });
 
-    // Should we refactor the tests so they don't depend on the "private" property _ruleStore?
+    // Should we refactor the tests so they don't depend on the "private" property __ruleStore?
 
     describe("adding", function() {
       describe("types", function() {
@@ -62,16 +64,16 @@ define([
 
           configurationService.add({rules: [ruleOneId1]});
 
-          expect(configurationService._ruleStore["A"]).toBeDefined();
+          expect(configurationService.__ruleStore["A"]).toBeDefined();
         });
 
         it("should define rules with multiple type ids", function() {
 
           configurationService.add({rules: [ruleMultiIds]});
 
-          expect(configurationService._ruleStore["test/type"]).toBeDefined();
-          expect(configurationService._ruleStore["test/type2"]).toBeDefined();
-          expect(configurationService._ruleStore["A2"]).toBeDefined();
+          expect(configurationService.__ruleStore["test/type"]).toBeDefined();
+          expect(configurationService.__ruleStore["test/type2"]).toBeDefined();
+          expect(configurationService.__ruleStore["A2"]).toBeDefined();
         });
 
         it("should define rules with multiple rules", function() {
@@ -81,8 +83,8 @@ define([
             ruleOneId2
           ]});
 
-          expect(configurationService._ruleStore["A"]).toBeDefined();
-          expect(configurationService._ruleStore["B"]).toBeDefined();
+          expect(configurationService.__ruleStore["A"]).toBeDefined();
+          expect(configurationService.__ruleStore["B"]).toBeDefined();
         });
 
         it("should throw if given a rule with no type", function() {
@@ -105,7 +107,7 @@ define([
       });
 
       describe("order", function() {
-        // notice that _ruleStore stores rules in the order they should be merged
+        // notice that __ruleStore stores rules in the order they should be merged
         // with the more specific having higher indexes
 
         describe("priority", function() {
@@ -127,7 +129,7 @@ define([
               ]
             });
 
-            testTypeRuleStore = configurationService._ruleStore["test/type"];
+            testTypeRuleStore = configurationService.__ruleStore["test/type"];
           });
 
           it("higher priority before", function() {
@@ -170,7 +172,7 @@ define([
               ]
             });
 
-            testTypeRuleStore = configurationService._ruleStore["test/type"];
+            testTypeRuleStore = configurationService.__ruleStore["test/type"];
           });
 
           it("more specific before", function() {
@@ -217,7 +219,7 @@ define([
               ]
             });
 
-            testTypeRuleStore = configurationService._ruleStore["test/type"];
+            testTypeRuleStore = configurationService.__ruleStore["test/type"];
           });
 
           it("later before", function() {

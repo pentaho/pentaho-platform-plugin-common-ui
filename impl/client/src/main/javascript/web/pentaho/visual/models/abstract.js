@@ -28,7 +28,7 @@ define([
 
   "use strict";
 
-  function isApplicableLegend() {
+  function __isApplicableLegend() {
     /* jshint validthis:true */
     return this.showLegend;
   }
@@ -112,38 +112,38 @@ define([
           {
             name: "legendPosition",
             valueType: sidesFactory,
-            isApplicable: isApplicableLegend,
+            isApplicable: __isApplicableLegend,
             isRequired: true,
             defaultValue: "right"
           },
           {
             name: "legendBackgroundColor",
             valueType: colorFactory,
-            isApplicable: isApplicableLegend
+            isApplicable: __isApplicableLegend
           },
 
           // Legend Item Label Font
           {
             name: "legendColor",
             valueType: colorFactory,
-            isApplicable: isApplicableLegend
+            isApplicable: __isApplicableLegend
           },
           {
             name: "legendSize",
             valueType: "number",
-            isApplicable: isApplicableLegend
+            isApplicable: __isApplicableLegend
           },
           {
             name: "legendStyle",
             valueType: fontStyleFactory,
-            isApplicable: isApplicableLegend,
+            isApplicable: __isApplicableLegend,
             isRequired: true,
             defaultValue: "plain"
           },
           {
             name: "legendFontFamily",
             valueType: "string",
-            isApplicable: isApplicableLegend
+            isApplicable: __isApplicableLegend
           },
           // endregion
 

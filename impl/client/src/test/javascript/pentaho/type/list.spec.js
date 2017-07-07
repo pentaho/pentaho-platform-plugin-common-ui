@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,7 +124,7 @@ define([
 
         it("it should have 0 elements", function() {
           var list = new NumberList();
-          var elems = list._elems;
+          var elems = list.__elems;
           expect(elems.length).toBe(0);
         });
 
@@ -144,11 +144,11 @@ define([
 
         it("it should have 0 elements", function() {
           var list = new NumberList(null);
-          var elems = list._elems;
+          var elems = list.__elems;
           expect(elems.length).toBe(0);
 
           list = new NumberList(undefined);
-          elems = list._elems;
+          elems = list.__elems;
           expect(elems.length).toBe(0);
         });
 
@@ -167,7 +167,7 @@ define([
 
         it("it should have 0 elements", function() {
           var list = new NumberList([]);
-          var elems = list._elems;
+          var elems = list.__elems;
           expect(elems.length).toBe(0);
         });
 
@@ -185,13 +185,13 @@ define([
 
         it("it should have as many elements as those given", function() {
           var list = new NumberList([1, 2, 3]);
-          var elems = list._elems;
+          var elems = list.__elems;
           expect(elems.length).toBe(3);
         });
 
         it("it should convert every given value to the list element type", function() {
           var list = new NumberList([1, 2, 3]);
-          var elems = list._elems;
+          var elems = list.__elems;
 
           expect(elems[1] instanceof PentahoNumber).toBe(true);
           expect(elems[0] instanceof PentahoNumber).toBe(true);
@@ -216,13 +216,13 @@ define([
 
         it("it should have as many elements as those given", function() {
           var list = new NumberList({d: [1, 2, 3]});
-          var elems = list._elems;
+          var elems = list.__elems;
           expect(elems.length).toBe(3);
         });
 
         it("it should convert every given value to the list element type", function() {
           var list = new NumberList({d: [1, 2, 3]});
-          var elems = list._elems;
+          var elems = list.__elems;
 
           expect(elems[1] instanceof PentahoNumber).toBe(true);
           expect(elems[0] instanceof PentahoNumber).toBe(true);
@@ -249,14 +249,14 @@ define([
         it("it should have as many elements as those given", function() {
           var list1 = new NumberList([1, 2, 3]);
           var list2 = new NumberList(list1);
-          var elems = list2._elems;
+          var elems = list2.__elems;
           expect(elems.length).toBe(3);
         });
 
         it("it should convert every given value to the list element type", function() {
           var list1 = new NumberList([1, 2, 3]);
           var list2 = new NumberList(list1);
-          var elems = list2._elems;
+          var elems = list2.__elems;
 
           expect(elems[1] instanceof PentahoNumber).toBe(true);
           expect(elems[0] instanceof PentahoNumber).toBe(true);
@@ -285,11 +285,11 @@ define([
 
         it("it should have 0 elements", function() {
           var list = new NumberList({d: null});
-          var elems = list._elems;
+          var elems = list.__elems;
           expect(elems.length).toBe(0);
 
           list = new NumberList({d: undefined});
-          elems = list._elems;
+          elems = list.__elems;
           expect(elems.length).toBe(0);
         });
 

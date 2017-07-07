@@ -53,10 +53,12 @@ define([
      */
     filter.Or = filter.Tree.extend("pentaho.type.filter.Or", /** @lends pentaho.type.filter.Or# */{
 
+      /** @inheritDoc */
       get kind() {
         return KnownFilterKind.Or;
       },
 
+      /** @inheritDoc */
       _contains: function(elem) {
         var ops = this.operands;
         var i = -1;
@@ -80,6 +82,7 @@ define([
         return this._operation.apply(this, arguments);
       },
 
+      /** @inheritDoc */
       get _inverseClass() {
         return filter.And;
       },

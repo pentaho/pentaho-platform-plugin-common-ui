@@ -54,18 +54,22 @@ define([
 
     filter.Not = filter.Abstract.extend("pentaho.type.filter.Not", /** @lends pentaho.type.filter.Not# */{
 
+      /** @inheritDoc */
       get kind() {
         return KnownFilterKind.Not;
       },
 
+      /** @inheritDoc */
       get isTerminal() {
         return false;
       },
 
+      /** @inheritDoc */
       get isNot() {
         return true;
       },
 
+      /** @inheritDoc */
       _buildContentKey: function() {
         var o = this.operand;
         return o ? o.contentKey : "";
@@ -84,6 +88,7 @@ define([
         return this.get("operand");
       },
 
+      /** @inheritDoc */
       _contains: function(elem) {
         return !this.operand._contains(elem);
       },

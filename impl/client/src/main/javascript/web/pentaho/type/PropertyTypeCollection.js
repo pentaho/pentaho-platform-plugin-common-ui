@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ define([
    * This constructor is used internally by the `pentaho/type` package and should not be used directly.
    *
    * @see pentaho.type.Property
-   * @ignore
+   * @private
    */
   return Collection.extend(module.id, /** @lends pentaho.type.PropertyTypeCollection# */{
     /**
@@ -49,18 +49,18 @@ define([
     constructor: function(declaringType) {
       if(!declaringType) throw error.argRequired("declaringType");
 
-      this._cachedKeyArgs = {
+      this.__cachedKeyArgs = {
         declaringType: declaringType,
         index:  -1,
         isRoot: false
       };
 
       // Caches Property.Type
-      this._propType = null;
+      this.__propType = null;
 
       // Copy the declaring complex type's ancestor's properties.
       var ancestorType = declaringType.ancestor;
-      var colBase = ancestorType.isComplex ? ancestorType._getProps() : null;
+      var colBase = ancestorType.isComplex ? ancestorType.__getProps() : null;
       if(colBase) {
         // Backup any provided specs.
         var newProps;
@@ -89,8 +89,8 @@ define([
      * @readOnly
      * @private
      */
-    get _context() {
-      return this._cachedKeyArgs.declaringType.context;
+    get __context() {
+      return this.__cachedKeyArgs.declaringType.context;
     },
 
     /**
@@ -100,14 +100,14 @@ define([
      * @readOnly
      * @private
      */
-    get _propertyType() {
-      var propertyType = this._propType;
-      if(!propertyType) this._propType = propertyType = this._context.get(propertyFactory).type;
+    get __propertyType() {
+      var propertyType = this.__propType;
+      if(!propertyType) this.__propType = propertyType = this.__context.get(propertyFactory).type;
       return propertyType;
     },
 
     // region List implementation
-    //elemClass: Property.Type,
+    // elemClass: Property.Type,
 
     /**
      * Add a {@link pentaho.type.UPropertyTypeProto} to the properties collection.
@@ -122,13 +122,13 @@ define([
     _adding: function(spec, index, ka) {
       if(!spec) throw error.argRequired("props[i]");
 
-      var name = getSpecName(spec);
+      var name = __getSpecName(spec);
       var existing;
       if(name && (existing = this.get(name))) {
         // An object spec? Otherwise it's a noop - nothing to configure or override.
         // Configure existing local property or override inherited one.
         if(spec !== name) {
-          if(existing.declaringType === this._cachedKeyArgs.declaringType)
+          if(existing.declaringType === this.__cachedKeyArgs.declaringType)
             existing.extend(spec);
           else
             this.replace(spec, this.indexOf(existing));
@@ -154,11 +154,11 @@ define([
     _replacing: function(spec, index, existing) {
       if(!spec) throw error.argRequired("props[i]");
 
-      var name = getSpecName(spec);
+      var name = __getSpecName(spec);
       if(name !== existing.name)
         throw error.argInvalid("props[i]", "Incorrect property name.");
 
-      var ka = this._cachedKeyArgs;
+      var ka = this.__cachedKeyArgs;
 
       if(existing.declaringType === ka.declaringType) {
         // Configure existing local property and cancel replace.
@@ -195,14 +195,14 @@ define([
       var basePropType;
       var baseId = spec.base;
       if(!baseId) {
-        basePropType = this._propertyType;
+        basePropType = this.__propertyType;
       } else {
-        basePropType = this._context.get(baseId).type;
-        if(!basePropType.isSubtypeOf(this._propertyType))
+        basePropType = this.__context.get(baseId).type;
+        if(!basePropType.isSubtypeOf(this.__propertyType))
           throw error.argInvalid("props[i]", "Property base type does not extend Property.");
       }
 
-      var ka = this._cachedKeyArgs;
+      var ka = this.__cachedKeyArgs;
       ka.index = index;
       ka.isRoot = true;
 
@@ -250,7 +250,7 @@ define([
     // endregion
   });
 
-  function getSpecName(spec) {
+  function __getSpecName(spec) {
     return typeof spec === "string" ? spec : spec.name;
   }
 });

@@ -61,6 +61,7 @@ define([
 
     return PropertyFilter.extend("pentaho.type.filter.IsIn", /** @lends pentaho.type.filter.IsIn# */{
 
+      /** @inheritDoc */
       get kind() {
         return KnownFilterKind.IsIn;
       },
@@ -79,6 +80,7 @@ define([
         return this.get("values");
       },
 
+      /** @inheritDoc */
       _operation: function(value) {
         if(value != null) {
           var values = this.values;
@@ -90,6 +92,7 @@ define([
         return false;
       },
 
+      /** @inheritDoc */
       _buildContentKey: function() {
         return (this.property || "") + " " + this.values.toArray(function(v) { return v.key; }).join(" ");
       },

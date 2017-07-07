@@ -55,22 +55,27 @@ define([
         this.base();
       },
 
+      /** @inheritDoc */
       get kind() {
         return KnownFilterKind.True;
       },
 
+      /** @inheritDoc */
       get isTerminal() {
         return true;
       },
 
+      /** @inheritDoc */
       _buildContentKey: function() {
         return "";
       },
 
+      /** @inheritDoc */
       _contains: function(elem) {
         return true;
       },
 
+      /** @inheritDoc */
       negate: function() {
         return filter.False.instance;
       },

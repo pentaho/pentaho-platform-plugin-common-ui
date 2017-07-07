@@ -26,7 +26,7 @@ define([
 
   return function(context) {
 
-    var _elemType = null;
+    var __elemType = null;
 
     /**
      * @name pentaho.type.Element.Type
@@ -59,6 +59,7 @@ define([
        * Determines if a given value, of the same type, represents the same entity with the same content.
        *
        * @param {!pentaho.type.Value} other - A value to test for equality.
+       * @return {boolean} `true` if the values have the same content; or, `false`, oterhwise.
        */
       equalsContent: function(other) {
         return false;
@@ -77,22 +78,22 @@ define([
         // TODO: recursively inherit? clone? merge on set?
 
         // -> Optional({}), Inherited, Configurable
-        _format: undefined,
+        __format: undefined,
 
         get format() {
           /* istanbul ignore next : not implemented method */
-          return this._format;
+          return this.__format;
         },
 
         set format(value) {
           /* istanbul ignore next : not implemented method */
 
           if(value == null) {
-            if(this !== _elemType) {
-              delete this._format;
+            if(this !== __elemType) {
+              delete this.__format;
             }
           } else {
-            this._format = value || {};
+            this.__format = value || {};
           }
         },
         // endregion
@@ -191,7 +192,7 @@ define([
       type: bundle.structured.element
     });
 
-    _elemType = Element.type;
+    __elemType = Element.type;
 
     return Element;
   };

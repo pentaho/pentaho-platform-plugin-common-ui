@@ -55,10 +55,12 @@ define([
 
     filter.And = filter.Tree.extend("pentaho.type.filter.And", /** @lends pentaho.type.filter.And# */{
 
+      /** @inheritDoc */
       get kind() {
         return KnownFilterKind.And;
       },
 
+      /** @inheritDoc */
       _contains: function(elem) {
         var ops = this.operands;
         var i = -1;
@@ -75,13 +77,12 @@ define([
        * @param {...pentaho.type.filter.Abstract[]} filters - The filters to be intersected with this one.
        *
        * @return {!pentaho.type.filter.Abstract} The resulting filter.
-       *
-       * @override
        */
       and: function() {
         return this._operation.apply(this, arguments);
       },
 
+      /** @inheritDoc */
       get _inverseClass() {
         return filter.Or;
       },

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,9 +55,9 @@ define([
         SpecificationContext.current = context = new SpecificationContext();
       }
 
-      this._isOwn = isOwn;
-      this._context = context;
-      this._previous = current;
+      this.__isOwn = isOwn;
+      this.__context = context;
+      this.__previous = current;
     },
 
     /**
@@ -66,7 +66,7 @@ define([
      * @ype {!pentaho.type.SpecificationContext}
      */
     get specContext() {
-      return this._context;
+      return this.__context;
     },
 
     /**
@@ -78,18 +78,18 @@ define([
      * it is restored.
      */
     dispose: function() {
-      var context = this._context;
+      var context = this.__context;
       if(context) {
-        this._context = null;
+        this.__context = null;
 
         // This removes the context from being current.
-        if(this._isOwn) context.dispose();
+        if(this.__isOwn) context.dispose();
 
         // Restore the previous current scope, if any.
-        var previous = this._previous;
+        var previous = this.__previous;
         if(previous) {
           if(previous !== context) SpecificationContext.current = previous;
-          this._previous = null;
+          this.__previous = null;
         }
       }
     }

@@ -16,7 +16,6 @@
 
 define([
   "module",
-
   "pentaho/util/object",
   "../ValidationError",
   "../../i18n!../i18n/types"

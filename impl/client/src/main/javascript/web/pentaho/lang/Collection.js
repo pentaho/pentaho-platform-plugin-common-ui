@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ define([
   "./List",
   "../util/object"
 ], function(List, O) {
+
+  // TODO: This class has several undocumented methods.
 
   return List.extend("pentaho.lang.Collection", /** @lends pentaho.lang.Collection# */{
     /**
@@ -58,15 +60,16 @@ define([
      * but are passed-through to the methods that handle
      * the initialization of each list element.
      */
-    constructor: function Collection(keyArgs) {
-      this._keys = {};
+    constructor: function(keyArgs) {
+
+      this.__keys = {};
 
       this.base(keyArgs);
     },
 
     copyTo: function(col) {
       this.base(col);
-      O.assignOwn(col._keys, this._keys);
+      O.assignOwn(col.__keys, this.__keys);
     },
 
     /**
@@ -75,7 +78,7 @@ define([
      * when an element with a given key
      * is not contained in the collection.
      *
-     * @type *
+     * @type {any}
      * @default null
      * @readonly
      */
@@ -87,7 +90,7 @@ define([
      * This class must implement the {@link pentaho.lang.ICollectionElement} interface.
      *
      * @name pentaho.lang.Collection#elemClass
-     * @type function
+     * @type {Class}
      * @abstract
      * @readonly
      */
@@ -128,11 +131,11 @@ define([
     },
 
     _added: function(elem) {
-      this._keys[this._getElemKey(elem)] = elem;
+      this.__keys[this._getElemKey(elem)] = elem;
     },
 
     _replaced: function(elem) {
-      this._keys[this._getElemKey(elem)] = elem;
+      this.__keys[this._getElemKey(elem)] = elem;
     },
 
     /**
@@ -159,7 +162,7 @@ define([
       var key2;
       return key != null &&
          (key2 = this._castKey(key)) != null &&
-          O.hasOwn(this._keys, key2);
+          O.hasOwn(this.__keys, key2);
     },
 
     /**
@@ -179,8 +182,8 @@ define([
       var key2;
       if(key != null &&
          (key2 = this._castKey(key)) != null &&
-         O.hasOwn(this._keys, key2)) {
-        return this._keys[key2];
+         O.hasOwn(this.__keys, key2)) {
+        return this.__keys[key2];
       }
 
       if(assertExists) throw new Error(this._sayElemWithKey(key2) + " is not defined.");

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ define([
        * @type {boolean}
        * @readOnly
        */
-      O.setConst(this, "isRoot", (!!transaction && !transaction._scopeCount));
+      O.setConst(this, "isRoot", (!!transaction && !transaction.__scopeCount));
 
       /**
        * Indicates if the scope has not been exited from.
@@ -85,11 +85,11 @@ define([
        * @default false
        * @private
        */
-      this._isInside = true;
+      this.__isInside = true;
 
       // Entering. May throw if already resolved or concurrency error.
-      if(transaction) transaction._scopeEnter();
-      context._scopeEnter(this);
+      if(transaction) transaction.__scopeEnter();
+      context.__scopeEnter(this);
     },
 
     /**
@@ -101,8 +101,8 @@ define([
      * @protected
      */
     _assertInsideAndCurrent: function() {
-      if(!this._isInside) throw this._getErrorNotInside();
-      if(!this.isCurrent) throw this._getErrorNotCurrent();
+      if(!this.__isInside) throw this.__getErrorNotInside();
+      if(!this.isCurrent) throw this.__getErrorNotCurrent();
     },
 
     /**
@@ -112,7 +112,7 @@ define([
      *
      * @private
      */
-    _getErrorNotInside: function() {
+    __getErrorNotInside: function() {
       return error.operInvalid("Scope has been exited from.");
     },
 
@@ -123,7 +123,7 @@ define([
      *
      * @private
      */
-    _getErrorNotCurrent: function() {
+    __getErrorNotCurrent: function() {
       return error.operInvalid("Scope is not the current scope of its context.");
     },
 
@@ -134,7 +134,7 @@ define([
      * @readOnly
      */
     get isInside() {
-      return this._isInside;
+      return this.__isInside;
     },
 
     /**
@@ -146,7 +146,7 @@ define([
      * @readOnly
      */
     get isCurrent() {
-      return this._isInside && (this === this.context._scopeCurrent);
+      return this.__isInside && (this === this.context.__txnScopeCurrent);
     },
 
     /**
@@ -194,13 +194,13 @@ define([
     exit: function(keyArgs) {
 
       if(!O.getOwn(keyArgs, "sloppy", false)) {
-        var error = !this._isInside ? this._getErrorNotInside() :
-                    !this.isCurrent ? this._getErrorNotCurrent() : null;
+        var error = !this.__isInside ? this.__getErrorNotInside() :
+                    !this.isCurrent ? this.__getErrorNotCurrent() : null;
 
         if(error) logger.warn(error.message);
       }
 
-      if(this._isInside) this._exit();
+      if(this.__isInside) this.__exit();
 
       return this;
     },
@@ -210,22 +210,23 @@ define([
      *
      * @private
      */
-    _exit: function() {
+    __exit: function() {
 
-      this._exitLocal();
+      this.__exitLocal();
 
-      if(this.transaction) this.transaction._scopeExit();
+      if(this.transaction) this.transaction.__scopeExit();
 
-      this.context._scopeExit();
+      this.context.__scopeExit();
     },
 
     /**
      * Exits the scope locally.
      *
      * @private
+     * @internal
      */
-    _exitLocal: function() {
-      this._isInside = false;
+    __exitLocal: function() {
+      this.__isInside = false;
     },
 
     /**

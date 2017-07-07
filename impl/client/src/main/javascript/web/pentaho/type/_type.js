@@ -38,19 +38,19 @@ define([
   /* eslint valid-jsdoc: 0 */
 
   // Unique type class id exposed through Type#uid and used by Context instances.
-  var _nextUid = 1;
+  var __nextUid = 1;
 
-  var _normalAttrNames = [
+  var __normalAttrNames = [
     "description", "category", "helpUrl", "isBrowsable", "isAdvanced", "ordinal"
   ];
   var O_isProtoOf = Object.prototype.isPrototypeOf;
 
   return function(context) {
 
-    var _type = null;
-    var _Number = null;
-    var _Boolean = null;
-    var _String = null;
+    var __type = null;
+    var __Number = null;
+    var __Boolean = null;
+    var __String = null;
 
     /**
      * @name pentaho.type.Type
@@ -76,12 +76,12 @@ define([
         if(!spec) spec = {};
 
         // Anticipate required initialization.
-        O.setConst(this, "uid", _nextUid++);
+        O.setConst(this, "uid", __nextUid++);
 
         // Bind
         var instance = arg.required(keyArgs, "instance", "keyArgs");
-        O.setConst(instance, "_type", this);
-        O.setConst(this, "_instance", instance);
+        O.setConst(instance, "__type", this);
+        O.setConst(this, "__instance", instance);
 
         if(arg.optional(keyArgs, "isRoot"))
           O.setConst(this, "root", this);
@@ -90,21 +90,21 @@ define([
         // excluded from extend: id, sourceId, alias and isAbstract
         // are here handled one by one.
 
-        var id = nonEmptyString(spec.id);
+        var id = __nonEmptyString(spec.id);
         // Is it a temporary id? If so, ignore it.
         if(SpecificationContext.isIdTemporary(id)) id = null;
 
-        var sourceId = nonEmptyString(spec.sourceId);
+        var sourceId = __nonEmptyString(spec.sourceId);
         if(!sourceId) sourceId = id;
         else if(!id) id = sourceId;
 
-        var alias = nonEmptyString(spec.alias);
+        var alias = __nonEmptyString(spec.alias);
         if(alias != null && id == null) throw error.argInvalid("alias", "Anonymous types cannot have an alias");
 
-        O.setConst(this, "_id", id);
-        O.setConst(this, "_sourceId", sourceId);
-        O.setConst(this, "_alias", alias);
-        O.setConst(this, "_isAbstract", !!spec.isAbstract);
+        O.setConst(this, "__id", id);
+        O.setConst(this, "__sourceId", sourceId);
+        O.setConst(this, "__alias", alias);
+        O.setConst(this, "__isAbstract", !!spec.isAbstract);
 
         // ---
 
@@ -144,17 +144,16 @@ define([
        * this type.
        * @param {boolean} [keyArgs.isRoot=false] If `true`, creates a _root_ type.
        * @protected
-       * @overridable
        */
       _init: function(spec, keyArgs) {
         // Block inheritance, with default values
 
         // Don't use inherited property definition which may be writable false
-        Object.defineProperty(this, "_hasDescendants", {value: false, writable: true});
+        Object.defineProperty(this, "__hasDescendants", {value: false, writable: true});
 
         if(!("styleClass" in spec)) this.styleClass = undefined;
 
-        this._application = specUtil.merge({}, this._application);
+        this.__application = specUtil.merge({}, this.__application);
       },
 
       /**
@@ -165,7 +164,6 @@ define([
        * @param {!Object} spec - The specification of this type.
        * @param {!Object} keyArgs - Keyword arguments.
        * @protected
-       * @overridable
        */
       _postInit: function(spec, keyArgs) {
       },
@@ -258,7 +256,7 @@ define([
        *
        * The root type returns `null`.
        *
-       * @type {?pentaho.type.Type}
+       * @type {pentaho.type.Type}
        * @readonly
        * @see pentaho.type.Type#root
        * @see pentaho.type.Type#hasDescendants
@@ -277,7 +275,7 @@ define([
        * @see pentaho.type.Type#ancestor
        */
       get hasDescendants() {
-        return this._hasDescendants;
+        return this.__hasDescendants;
       },
       // endregion
 
@@ -289,7 +287,7 @@ define([
        * @readOnly
        */
       get instance() {
-        return this._instance;
+        return this.__instance;
       },
 
       // Supports Instance configuration only, from the type side.
@@ -394,7 +392,7 @@ define([
       // -> nonEmptyString, Optional(null), Immutable, Shared (note: not Inherited)
       // "" -> null conversion
 
-      _id: null,
+      __id: null,
 
       /**
        * Gets the identifier of this type.
@@ -408,19 +406,19 @@ define([
        *
        * When unspecified, defaults to the value of [sourceId]{@link pentaho.type.Type#sourceId}.
        *
-       * @type {?nonEmptyString}
+       * @type {?__nonEmptyString}
        * @readonly
        *
        * @see pentaho.type.Type#sourceId
        */
       get id() {
-        return this._id;
+        return this.__id;
       },
 
       // -> nonEmptyString, Optional(null), Immutable, Shared (note: not Inherited)
       // "" -> null conversion
 
-      _sourceId: null,
+      __sourceId: null,
 
       /**
        * Gets the source module identifier of this type.
@@ -438,13 +436,13 @@ define([
        *
        * When unspecified, defaults to the value of [id]{@link pentaho.type.Type#id}.
        *
-       * @type {?nonEmptyString}
+       * @type {?__nonEmptyString}
        * @readonly
        * @see pentaho.type.Type#id
        * @see pentaho.type.Type#defaultView
        */
       get sourceId() {
-        return this._sourceId;
+        return this.__sourceId;
       },
 
       /**
@@ -453,13 +451,13 @@ define([
        * The short identifier of a type is equal to its alias, provided it is defined.
        * Otherwise, it is equal to the identifier.
        *
-       * @type {?nonEmptyString}
+       * @type {?__nonEmptyString}
        * @readOnly
        * @see pentaho.type.Type#id
        * @see pentaho.type.Type#alias
        */
       get shortId() {
-        return this._alias || this._id;
+        return this.__alias || this.__id;
       },
 
       /**
@@ -508,7 +506,7 @@ define([
       // -> nonEmptyString, Optional(null), Immutable, Shared (note: not Inherited)
       // "" -> null conversion
 
-      _alias: null,
+      __alias: null,
 
       /**
        * Gets the alias for the identifier of this type.
@@ -519,13 +517,13 @@ define([
        *
        * When unspecified, defaults to `null`.
        *
-       * @type {?nonEmptyString}
+       * @type {?__nonEmptyString}
        * @readonly
        *
        * @see pentaho.type.Type#id
        */
       get alias() {
-        return this._alias;
+        return this.__alias;
       },
       // endregion
 
@@ -535,7 +533,7 @@ define([
 
       // Default value is for `Type` only.
       // @see Type#constructor.
-      _isAbstract: true,
+      __isAbstract: true,
 
       /**
        * Gets a value that indicates if this type is abstract.
@@ -548,7 +546,7 @@ define([
        * @default false
        */
       get isAbstract() {
-        return this._isAbstract;
+        return this.__isAbstract;
       },
       // endregion
 
@@ -564,11 +562,10 @@ define([
        *
        * When set to a {@link Nully} value, nothing is done.
        *
-       * @type Array.<pentaho.type.Type>
+       * @type {Array.<pentaho.type.Type>}
        */
       get mixins() {
-        // NOTE: for lightweight types, mixins would be inherited, if getOwn were not used.
-        var OwnCtor = O.getOwn(this.instance, "constructor");
+        var OwnCtor = this.instance.constructor;
         if(OwnCtor) {
           var mixinClasses = OwnCtor.mixins;
           if(mixinClasses) {
@@ -603,8 +600,8 @@ define([
 
       // region label property
       // must have some non-null value to inherit
-      _label: "instance",
-      _labelSet: false,
+      __label: "instance",
+      __labelIsSet: false,
 
       /**
        * Gets or sets the label of this type.
@@ -621,33 +618,54 @@ define([
        *
        * The _initial value_ of the attribute on the top-root type is `"instance"`.
        *
-       * @type {!nonEmptyString}
+       * @type {__nonEmptyString}
        */
       get label() {
-        return this._label;
+        return this.__label;
       },
 
       set label(value) {
-        value = nonEmptyString(value);
+        value = __nonEmptyString(value);
         if(value === null) {
-          this._resetLabel();
+          this.__labelIsSet = false;
+          if(this !== __type) {
+            value = __nonEmptyString(this._getLabelDefault());
+            if(value == null) {
+              delete this.__label;
+            } else {
+              this.__label = value;
+            }
+          }
         } else {
-          this._labelSet = true;
-          this._label = value;
+          this.__labelIsSet = true;
+          this.__label = value;
         }
       },
 
-      _resetLabel: function() {
-        this._labelSet = false;
+      /**
+       * Gets the default label to use when the label is not set.
+       *
+       * @return {?string} The default label or an empty value.
+       * @protected
+       */
+      _getLabelDefault: function() {
+        return undefined;
+      },
 
-        if(this !== _type) {
-          delete this._label;
-        }
+      /**
+       * Gets a value that indicates if the label is locally set.
+       *
+       * @type {boolean}
+       * @readOnly
+       * @protected
+       */
+      get _isLabelSet() {
+        return O.getOwn(this, "__labelIsSet") === true;
       },
       // endregion
 
       // region application property
-      _application: {},
+      __application: {},
 
       /**
        * Gets or sets the `application` attribute of this type.
@@ -660,11 +678,11 @@ define([
        * @type {object}
        */
       get application() {
-        return this._application;
+        return this.__application;
       },
 
       set application(value) {
-        specUtil.merge(this._application, value);
+        specUtil.merge(this.__application, value);
       },
       // endregion
 
@@ -673,7 +691,7 @@ define([
       // -> nonEmptyString, Optional, Inherited, Configurable, Localized
       // "" -> null conversion
 
-      _description: null, // set through implement bundle, below
+      __description: null, // set through implement bundle, below
 
       /**
        * Gets or sets the description of this type.
@@ -686,23 +704,19 @@ define([
        * Setting this to `null` or to an empty string clears the attribute and sets it to `null`,
        * ignoring any inherited value.
        *
-       * @type {?nonEmptyString}
+       * @type {?__nonEmptyString}
        */
       get description() {
-        return this._description;
+        return this.__description;
       },
 
       set description(value) {
         if(value === undefined) {
-          this._resetDescription();
+          if(this !== __type) {
+            delete this.__description;
+          }
         } else {
-          this._description = nonEmptyString(value);
-        }
-      },
-
-      _resetDescription: function() {
-        if(this !== _type) {
-          delete this._description;
+          this.__description = __nonEmptyString(value);
         }
       },
       // endregion
@@ -712,7 +726,7 @@ define([
       // -> nonEmptyString, Optional, Inherited, Configurable, Localized
       // "" -> null conversion
 
-      _category: null,
+      __category: null,
 
       /**
        * Gets or sets the category associated with this type.
@@ -728,25 +742,21 @@ define([
        * Setting this to `null` or to an empty string clears the attribute and sets it to `null`,
        * thus ignoring any inherited value.
        *
-       * @type {?nonEmptyString}
+       * @type {?__nonEmptyString}
        * @see pentaho.type.Type#isBrowsable
        * @see pentaho.type.Type#ordinal
        */
       get category() {
-        return this._category;
+        return this.__category;
       },
 
       set category(value) {
         if(value === undefined) {
-          this._resetCategory();
+          if(this !== __type) {
+            delete this.__category;
+          }
         } else {
-          this._category = nonEmptyString(value);
-        }
-      },
-
-      _resetCategory: function() {
-        if(this !== _type) {
-          delete this._category;
+          this.__category = __nonEmptyString(value);
         }
       },
       // endregion
@@ -756,7 +766,7 @@ define([
       // -> nonEmptyString, Optional, Inherited, Configurable, Localized?
       // "" -> null conversion
 
-      _helpUrl: null,
+      __helpUrl: null,
 
       /**
        * Gets or sets a URL pointing to documentation associated with this type.
@@ -770,23 +780,19 @@ define([
        * Setting this to `null` or to an empty string clears the attribute and sets it to `null`,
        * ignoring any inherited value.
        *
-       * @type {?nonEmptyString}
+       * @type {?__nonEmptyString}
        */
       get helpUrl() {
-        return this._helpUrl;
+        return this.__helpUrl;
       },
 
       set helpUrl(value) {
         if(value === undefined) {
-          this._resetHelpUrl();
+          if(this !== __type) {
+            delete this.__helpUrl;
+          }
         } else {
-          this._helpUrl = nonEmptyString(value);
-        }
-      },
-
-      _resetHelpUrl: function() {
-        if(this !== _type) {
-          delete this._helpUrl;
+          this.__helpUrl = __nonEmptyString(value);
         }
       },
       // endregion
@@ -796,7 +802,7 @@ define([
       // -> boolean, Optional(true), Inherited, Configurable
       // undefined or null -> resets
 
-      _isBrowsable: true,
+      __isBrowsable: true,
 
       /**
        * Gets or sets the `isBrowsable` attribute of this type.
@@ -810,20 +816,16 @@ define([
        * @type {boolean}
        */
       get isBrowsable() {
-        return this._isBrowsable;
+        return this.__isBrowsable;
       },
 
       set isBrowsable(value) {
         if(value == null) {
-          this._resetIsBrowsable();
+          if(this !== __type) {
+            delete this.__isBrowsable;
+          }
         } else {
-          this._isBrowsable = !!value;
-        }
-      },
-
-      _resetIsBrowsable: function() {
-        if(this !== _type) {
-          delete this._isBrowsable;
+          this.__isBrowsable = !!value;
         }
       },
       // endregion
@@ -832,7 +834,7 @@ define([
       // @type boolean
       // -> boolean, Optional(false), Inherited, Configurable
       // null || undefined -> reset
-      _isAdvanced: false,
+      __isAdvanced: false,
 
       /**
        * Gets or sets the `isAdvanced` attribute of this type.
@@ -848,20 +850,16 @@ define([
        * @see pentaho.type.Type#isBrowsable
        */
       get isAdvanced() {
-        return this._isAdvanced;
+        return this.__isAdvanced;
       },
 
       set isAdvanced(value) {
         if(value == null) {
-          this._resetIsAdvanced();
+          if(this !== __type) {
+            delete this.__isAdvanced;
+          }
         } else {
-          this._isAdvanced = !!value;
-        }
-      },
-
-      _resetIsAdvanced: function() {
-        if(this !== _type) {
-          delete this._isAdvanced;
+          this.__isAdvanced = !!value;
         }
       },
       // endregion
@@ -871,8 +869,8 @@ define([
       // -> nonEmptyString, Optional(null), Configurable, Localized
       // "" or undefined -> null conversion
 
-      _styleClass: null,
-      _styleClassIsDefault: undefined,
+      __styleClass: null,
+      __styleClassIsSet: undefined,
 
       /**
        * Gets or sets the CSS class associated with this type.
@@ -893,19 +891,19 @@ define([
        * `styleClass` of: `"pentaho-visual-ccc-heat-grid"`.
        * The default value of an anonymous type is `null`.
        *
-       * @type {?nonEmptyString}
+       * @type {?__nonEmptyString}
        */
       get styleClass() {
-        return this._styleClass;
+        return this.__styleClass;
       },
 
       set styleClass(value) {
         if(value === undefined) {
-          this._styleClass = this._id ? text.toSnakeCase(this._id) : null;
-          this._styleClassIsDefault = true;
+          this.__styleClass = this.__id ? text.toSnakeCase(this.__id) : null;
+          this.__styleClassIsSet = false;
         } else {
-          this._styleClass = value === "" ? null : value;
-          this._styleClassIsDefault = false;
+          this.__styleClass = value === "" ? null : value;
+          this.__styleClassIsSet = true;
         }
       },
 
@@ -919,9 +917,9 @@ define([
        */
       get inheritedStyleClasses() {
         var styleClasses;
-        var styleClass = this._styleClass;
+        var styleClass = this.__styleClass;
 
-        var baseType = this !== _type ? Object.getPrototypeOf(this) : null;
+        var baseType = this !== __type ? Object.getPrototypeOf(this) : null;
         if(baseType) {
           styleClasses = baseType.inheritedStyleClasses;
           if(styleClass) styleClasses = styleClasses.concat(styleClass);
@@ -936,7 +934,7 @@ define([
       // region ordinal property
       // @type integer
       // -> Optional(0), Inherited, Configurable
-      _ordinal: 0,
+      __ordinal: 0,
 
       /**
        * Gets or sets the ordinal associated with this type.
@@ -952,20 +950,16 @@ define([
        * @see pentaho.type.Type#category
        */
       get ordinal() {
-        return this._ordinal;
+        return this.__ordinal;
       },
 
       set ordinal(value) {
         if(value == null) {
-          this._resetOrdinal();
+          if(this !== __type) {
+            delete this.__ordinal;
+          }
         } else {
-          this._ordinal = Math.floor((+value) || 0);
-        }
-      },
-
-      _resetOrdinal: function() {
-        if(this !== _type) {
-          delete this._ordinal;
+          this.__ordinal = Math.floor((+value) || 0);
         }
       },
       // endregion
@@ -977,7 +971,7 @@ define([
       // null -> clear
       // "" -> null conversion
 
-      _defaultView: null, // {value: any, promise: Promise.<Class.<View>>}
+      __defaultView: null, // {value: any, promise: Promise.<Class.<View>>}
 
      /**
       * Gets or sets the default view for instances of this type.
@@ -1004,7 +998,7 @@ define([
       * a string, a function or {@link Nully}.
       */
       get defaultView() {
-        return this._defaultView && this._defaultView.value;
+        return this.__defaultView && this.__defaultView.value;
       },
 
       set defaultView(value) {
@@ -1012,34 +1006,30 @@ define([
 
         if(value === undefined) {
 
-          this._resetDefaultView();
+          if(this !== __type) {
+            delete this.__defaultView;
+          }
 
         } else if(!value) { // null || ""
 
-          this._defaultView = null;
+          this.__defaultView = null;
 
         } else if(typeof value === "string") {
 
-          defaultViewInfo = O.getOwn(this, "_defaultView");
+          defaultViewInfo = O.getOwn(this, "__defaultView");
           if(!defaultViewInfo || (defaultViewInfo.value !== value && defaultViewInfo.fullValue !== value)) {
-            this._defaultView = {value: value, promise: null, fullValue: this.buildSourceRelativeId(value)};
+            this.__defaultView = {value: value, promise: null, fullValue: this.buildSourceRelativeId(value)};
           }
         } else if(typeof value === "function") {
 
           // Assume it is the View class itself, already fulfilled.
-          defaultViewInfo = O.getOwn(this, "_defaultView");
+          defaultViewInfo = O.getOwn(this, "__defaultView");
           if(!defaultViewInfo || defaultViewInfo.value !== value) {
-            this._defaultView = {value: value, promise: Promise.resolve(value), fullValue: value};
+            this.__defaultView = {value: value, promise: Promise.resolve(value), fullValue: value};
           }
         } else {
 
           throw error.argInvalidType("defaultView", ["nully", "string", "function"], typeof value);
-        }
-      },
-
-      _resetDefaultView: function() {
-        if(this !== _type) {
-          delete this._defaultView;
         }
       },
 
@@ -1055,7 +1045,7 @@ define([
        */
       get defaultViewClass() {
         /* jshint laxbreak:true*/
-        var defaultView = this._defaultView;
+        var defaultView = this.__defaultView;
         return defaultView
             ? (defaultView.promise || (defaultView.promise = promiseUtil.require(defaultView.fullValue, localRequire)))
             : Promise.resolve(null);
@@ -1180,23 +1170,23 @@ define([
 
           Instance = context.get(typeSpec);
 
-          instType = this._assertSubtype(Instance.type);
+          instType = this.__assertSubtype(Instance.type);
 
-          if(instType.isAbstract) instType._throwAbstractType();
+          if(instType.isAbstract) instType.__throwAbstractType();
 
         } else if(this.isAbstract) {
 
           /* eslint default-case: 0 */
           switch(typeof instSpec) {
-            case "string": Instance = _String || (_String = context.get("string")); break;
-            case "number": Instance = _Number || (_Number = context.get("number")); break;
-            case "boolean": Instance = _Boolean || (_Boolean = context.get("boolean")); break;
+            case "string": Instance = __String || (__String = context.get("string")); break;
+            case "number": Instance = __Number || (__Number = context.get("number")); break;
+            case "boolean": Instance = __Boolean || (__Boolean = context.get("boolean")); break;
           }
 
           // Must still respect the base type: `this`.
           if(Instance && !Instance.type.isSubtypeOf(this)) Instance = null;
 
-          if(!Instance) this._throwAbstractType();
+          if(!Instance) this.__throwAbstractType();
 
         } else {
           Instance = this.instance.constructor;
@@ -1235,7 +1225,7 @@ define([
        */
       createAsync: function(instSpec, keyArgs) {
 
-        var customTypeIds = Object.keys(this._collectInstSpecTypeIds(instSpec));
+        var customTypeIds = Object.keys(this.__collectInstSpecTypeIds(instSpec));
 
         return customTypeIds.length
             // Require them all and only then invoke the synchronous BaseType.extend method.
@@ -1256,9 +1246,9 @@ define([
        * @return {!Object.<string, string>} A possibly empty object whose own keys are type module ids.
        * @private
        */
-      _collectInstSpecTypeIds: function(instSpec) {
+      __collectInstSpecTypeIds: function(instSpec) {
         var customTypeIds = {};
-        collectTypeIdsRecursive.call(this, instSpec, customTypeIds);
+        __collectTypeIdsRecursive.call(this, instSpec, customTypeIds);
         return customTypeIds;
       },
 
@@ -1273,7 +1263,7 @@ define([
        *
        * @private
        */
-      _assertSubtype: function(subtype) {
+      __assertSubtype: function(subtype) {
         if(!subtype.isSubtypeOf(this)) {
           throw error.operInvalid(
               bundle.format(bundle.structured.errors.instance.notOfExpectedBaseType, [this]));
@@ -1289,7 +1279,7 @@ define([
        *
        * @private
        */
-      _throwAbstractType: function() {
+      __throwAbstractType: function() {
         throw error.operInvalid(bundle.format(
             bundle.structured.errors.instance.cannotCreateInstanceOfAbstractType, [this]));
       },
@@ -1390,7 +1380,7 @@ define([
        */
       toSpecInContext: function(keyArgs) {
 
-        var spec = {id: this._id || SpecificationContext.current.add(this)};
+        var spec = {id: this.__id || SpecificationContext.current.add(this)};
 
         this._fillSpecInContext(spec, keyArgs || {});
 
@@ -1441,9 +1431,9 @@ define([
         var any = false;
         var isJson = keyArgs.isJson;
 
-        if(this._alias != null) {
+        if(this.__alias != null) {
           any = true;
-          spec.alias = this._alias;
+          spec.alias = this.__alias;
         }
 
         // TODO: if sourceId is not serialized, defaultView looses the relative reference.
@@ -1454,9 +1444,9 @@ define([
           spec.isAbstract = true;
         }
 
-        if(this._labelSet && O.hasOwn(this, "_label")) {
+        if(this._isLabelSet) {
           any = true;
-          spec.label = this._label;
+          spec.label = this.__label;
         }
 
         // "mixins" attribute
@@ -1467,21 +1457,21 @@ define([
         }
 
         // Normal attributes
-        _normalAttrNames.forEach(function(name) {
-          var _name = "_" + name;
-          if(O.hasOwn(this, _name)) {
+        __normalAttrNames.forEach(function(name) {
+          var __attrName = "__" + name;
+          if(O.hasOwn(this, __attrName)) {
             any = true;
-            spec[name] = this[_name];
+            spec[name] = this[__attrName];
           }
         }, this);
 
-        var styleClass = this._styleClass;
-        if(styleClass && !this._styleClassIsDefault) {
+        var styleClass = this.__styleClass;
+        if(styleClass && this.__styleClassIsSet) {
           any = true;
           spec.styleClass = styleClass;
         }
 
-        var defaultViewInfo = O.getOwn(this, "_defaultView");
+        var defaultViewInfo = O.getOwn(this, "__defaultView");
         if(defaultViewInfo !== undefined) { // can be null
           var defaultView = defaultViewInfo && defaultViewInfo.value;
           if(!defaultView || !isJson || !F.is(defaultView)) {
@@ -1581,7 +1571,7 @@ define([
        */
       set dynamicAttributes(attrSpecs) {
         Object.keys(attrSpecs).forEach(function(name) {
-          this._defineDynamicAttribute(name, attrSpecs[name]);
+          this.__defineDynamicAttribute(name, attrSpecs[name]);
         }, this);
       }, // jshint -W078
 
@@ -1593,9 +1583,8 @@ define([
        * @param {String} name - The name of the attribute.
        * @param {Object} spec - The specification of the attribute.
        * @private
-       * @ignore
        */
-      _defineDynamicAttribute: function(name, spec) {
+      __defineDynamicAttribute: function(name, spec) {
         var cast = spec.cast; // Monotonicity
         // * minimum/default/neutral value
 
@@ -1622,10 +1611,10 @@ define([
           if(F.is(dv)) {
             fValue = dv;
             dv = null;
-            if(cast) fValue = wrapWithCast.call(root, fValue, cast, dv);
+            if(cast) fValue = __wrapWithCast.call(root, fValue, cast, dv);
           } else {
             // When cast failure is found at static time, we ignore the local value.
-            dv = castAndNormalize.call(root, dv, cast, null);
+            dv = __castAndNormalize.call(root, dv, cast, null);
             fValue = F.constant(dv);
           }
 
@@ -1671,10 +1660,10 @@ define([
             var fValue;
             if(F.is(value)) {
               fValue = value;
-              if(cast) fValue = wrapWithCast.call(this, fValue, cast, dv);
+              if(cast) fValue = __wrapWithCast.call(this, fValue, cast, dv);
             } else {
               // When cast failure is found at static time, we ignore the local value.
-              value = castAndNormalize.call(this, value, cast, null);
+              value = __castAndNormalize.call(this, value, cast, null);
               if(value == null) return;
 
               fValue = F.constant(value);
@@ -1739,8 +1728,8 @@ define([
 
           if(!declaringType) return;
 
-          if(declaringType !== _type) {
-            // ancestor, in properties, wouldn't reach _type.
+          if(declaringType !== __type) {
+            // ancestor, in properties, wouldn't reach __type.
             fillSpecRecursive(Object.getPrototypeOf(declaringType));
           }
 
@@ -1828,7 +1817,7 @@ define([
        */
       _subclassed: function(SubTypeCtor, instSpec, classSpec, keyArgs) {
 
-        O.setConst(this.prototype, "_hasDescendants", true);
+        O.setConst(this.prototype, "__hasDescendants", true);
 
         var SubInstCtor = keyArgs.instance.constructor;
 
@@ -1855,21 +1844,21 @@ define([
       }
     });
 
-    _type = Type.prototype;
+    __type = Type.prototype;
 
     Type.implement(AnnotatableLinked);
 
     return Type;
   };
 
-  function nonEmptyString(value) {
+  function __nonEmptyString(value) {
     return value == null ? null : (String(value) || null);
   }
 
   /*
    * @this {pentaho.type.Property.Type}
    */
-  function castAndNormalize(value, cast, defaultValue) {
+  function __castAndNormalize(value, cast, defaultValue) {
     if(value == null) {
       value = defaultValue;
     } else if(cast) {
@@ -1884,7 +1873,7 @@ define([
   /*
    * @this {pentaho.type.Property.Type}
    */
-  function wrapWithCast(fun, cast, defaultValue) {
+  function __wrapWithCast(fun, cast, defaultValue) {
     /*
      * @type {pentaho.type.PropertyDynamicAttribute}
      */
@@ -1892,27 +1881,26 @@ define([
 
       var value = fun.apply(this, arguments);
 
-      return castAndNormalize.call(propType, value, cast, defaultValue);
+      return __castAndNormalize.call(propType, value, cast, defaultValue);
     };
   }
 
-  function collectTypeIdsRecursive(instSpec, outIds) {
+  function __collectTypeIdsRecursive(instSpec, outIds) {
     if(instSpec && typeof instSpec === "object") {
       if(Array.isArray(instSpec)) {
         instSpec.forEach(function(elemSpec) {
-          collectTypeIdsRecursive.call(this, elemSpec, outIds);
+          __collectTypeIdsRecursive.call(this, elemSpec, outIds);
         }, this);
       } else if(instSpec.constructor === Object) {
         Object.keys(instSpec).forEach(function(name) {
           var elemSpec = instSpec[name];
           if(name === "_")
-            this.context._collectTypeSpecTypeIds(elemSpec, outIds);
+            this.context.__collectTypeSpecTypeIds(elemSpec, outIds);
           else
-            collectTypeIdsRecursive.call(this, elemSpec, outIds);
+            __collectTypeIdsRecursive.call(this, elemSpec, outIds);
 
         }, this);
       }
     }
   }
-
 });

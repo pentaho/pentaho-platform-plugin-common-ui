@@ -65,16 +65,16 @@ define([
         if(spec instanceof Object) {
           // A plain object?
           if(spec.constructor === Object) {
-            this._configureFromObject(spec);
+            this.__configureFromObject(spec);
 
             // Required validation
-            if(this._value == null) this.value = null;
+            if(this.__value == null) this.value = null;
             return;
           }
 
           // Another Simple? Clone or Downcast.
           if(spec instanceof Simple) {
-            this._configureFromSimple(spec);
+            this.__configureFromSimple(spec);
             return;
           }
         }
@@ -94,7 +94,7 @@ define([
       },
 
       // region value attribute
-      _value: undefined,
+      __value: undefined,
 
       /**
        * Gets the underlying JavaScript value represented by the _simple_ value.
@@ -103,7 +103,7 @@ define([
        * @readonly
        */
       get value() {
-        return this._value;
+        return this.__value;
       },
 
       set value(_) {
@@ -112,15 +112,15 @@ define([
         // Throws if nully.
         _ = this.type.toValue(_);
 
-        if(this._value == null) {
+        if(this.__value == null) {
           // First set
-          this._value = _;
-        } else if(this._value !== _) {
+          this.__value = _;
+        } else if(this.__value !== _) {
           throw error.argInvalid("value", bundle.structured.errors.value.cannotChangeValue);
         }
       },
 
-      /**
+      /*
        * Configuration alias that sets the underlying primitive value of the _simple_ value.
        * {@link pentaho.type.Simple#value}
        *
@@ -132,7 +132,7 @@ define([
       // endregion
 
       // region formatted attribute
-      _formatted: null,
+      __formatted: null,
 
       /**
        * Gets or sets the formatted value of the property.
@@ -140,14 +140,14 @@ define([
        * @type {?string}
        */
       get formatted() {
-        return this._formatted;
+        return this.__formatted;
       },
 
       set formatted(value) {
-        this._formatted = nonEmptyString(value);
+        this.__formatted = __nonEmptyString(value);
       },
 
-      /**
+      /*
        * Configuration alias that sets the formatted value of the property
        * {@link pentaho.type.Simple#formatted}
        *
@@ -164,7 +164,7 @@ define([
        * @return {*} The underlying value.
        */
       valueOf: function() {
-        return this._value;
+        return this.__value;
       },
 
       /**
@@ -173,8 +173,8 @@ define([
        * @return {String} The string representation.
        */
       toString: function() {
-        var f = this._formatted;
-        return f != null ? f : String(this._value);
+        var f = this.__formatted;
+        return f != null ? f : String(this.__value);
       },
 
       /**
@@ -197,7 +197,7 @@ define([
        * @readonly
        */
       get key() {
-        return this._value.toString();
+        return this.__value.toString();
       },
 
       /**
@@ -215,7 +215,7 @@ define([
         if(!this.equals(other)) return false;
 
         // TODO: generic metadata
-        return this._value === other._value && this._formatted === other._formatted;
+        return this.__value === other.__value && this.__formatted === other.__formatted;
       },
 
       // region configuration
@@ -247,18 +247,19 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When `config` is not either a plain object or a simple value.
        */
 
+      /** @inheritDoc */
       _configure: function(config) {
         // Nothing configurable at this level
         if(config instanceof Object) {
           // A plain object?
           if(config.constructor === Object) {
-            this._configureFromObject(config);
+            this.__configureFromObject(config);
             return;
           }
 
           // Another Simple? Clone or Downcast.
           if(config instanceof Simple) {
-            this._configureFromSimple(config);
+            this.__configureFromSimple(config);
             return;
           }
         }
@@ -266,7 +267,7 @@ define([
         throw error.argInvalidType("config", ["Object", "pentaho.type.Simple"], typeof config);
       },
 
-      _configureFromSimple: function(other) {
+      __configureFromSimple: function(other) {
         if(other !== this) {
 
           // TODO: same simple class?
@@ -281,7 +282,7 @@ define([
         }
       },
 
-      _configureFromObject: function(config) {
+      __configureFromObject: function(config) {
         // TODO: more efficient implementation?
         this.extend(config);
       },
@@ -292,7 +293,7 @@ define([
       toSpecInContext: function(keyArgs) {
         if(!keyArgs) keyArgs = {};
 
-        var addFormatted = !keyArgs.omitFormatted && !!this._formatted;
+        var addFormatted = !keyArgs.omitFormatted && !!this.__formatted;
 
         var type = this.type;
 
@@ -320,7 +321,7 @@ define([
           if(value == null) return null;
 
         } else {
-          value = this._value;
+          value = this.__value;
         }
 
         // Plain objects cannot be output without cell format or would not be recognized
@@ -339,7 +340,7 @@ define([
             ? {_: type.toRefInContext(keyArgs), v: value}
             : {v: value};
 
-        if(addFormatted) spec.f = this._formatted;
+        if(addFormatted) spec.f = this.__formatted;
 
         return spec;
       },
@@ -359,7 +360,7 @@ define([
        * @protected
        */
       _toJSONValue: function(keyArgs) {
-        return this._value;
+        return this.__value;
       },
       // endregion
 
@@ -393,7 +394,7 @@ define([
          * @throws {pentaho.lang.UserError} When the value cannot be converted for some reason.
          * Thrown by the [cast]{@link pentaho.type.Simple#cast} method.
          *
-         * @sealed
+         * @final
          */
         toValue: function(value) {
           if(value == null) throw error.argRequired("value");
@@ -477,7 +478,7 @@ define([
               return false;
             }
           }
-          return va._value === vb.valueOf();
+          return va.__value === vb.valueOf();
         },
 
         // TODO: consider creating a key counterpart for order: `ordinal` to use in comparisons.
@@ -522,7 +523,7 @@ define([
          * @protected
          */
         _compareValues: function(va, vb) {
-          return fun.compare(va, vb);
+          return F.compare(va, vb);
         },
         // endregion
 
@@ -573,7 +574,7 @@ define([
      * @param {*} value The value to be verified
      * @return {?String} A non-empty string.
      */
-    function nonEmptyString(value) {
+    function __nonEmptyString(value) {
       return value == null ? null : (String(value) || null);
     }
   };

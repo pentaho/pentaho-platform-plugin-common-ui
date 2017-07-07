@@ -29,7 +29,7 @@ define([
 
   return function(context) {
 
-    var Instance = context.get(instanceFactory);
+    var __Instance = context.get(instanceFactory);
 
     /**
      * @name pentaho.type.Value.Type
@@ -67,7 +67,7 @@ define([
      * @see pentaho.type.spec.IValueProto
      * @see pentaho.type.spec.IValueTypeProto
      */
-    var Value = Instance.extend(/** @lends pentaho.type.Value# */{
+    var Value = __Instance.extend(/** @lends pentaho.type.Value# */{
 
       /**
        * Gets the key of the value.
@@ -91,7 +91,7 @@ define([
        * Creates a shallow clone of this value.
        * @name pentaho.type.Value#clone
        * @abstract
-       * @function
+       * @method
        * @return {!pentaho.type.Value} The value clone.
        */
 
@@ -164,6 +164,7 @@ define([
        * Configures this value with a given configuration.
        * @param {?any} config - The configuration.
        * @return {!pentaho.type.Value} This instance.
+       * @final
        */
       configure: function(config) {
         if(config != null) this._configure(config);
@@ -177,7 +178,6 @@ define([
        *
        * @param {any} config - The configuration.
        * @protected
-       * @overridable
        */
       _configure: function(config) {
         // Nothing configurable at this level
@@ -252,6 +252,7 @@ define([
         alias: "value",
         isAbstract: true,
 
+        /** @inheritDoc */
         get isValue() {
           return true;
         },
@@ -340,6 +341,7 @@ define([
          * @param {any} value - The value to validate.
          *
          * @return {boolean} `true` if the value is a valid instance of this type, `false` if not.
+         * @final
          */
         isValid: function(value) {
           return !this.validate(value);
@@ -407,7 +409,7 @@ define([
           if(!keyArgs) keyArgs = {};
 
           // The type's id or the temporary id in this scope.
-          var spec = {id: this._id || SpecificationContext.current.add(this)};
+          var spec = {id: this.__id || SpecificationContext.current.add(this)};
 
           // The base type in the **current type hierarchy** (root, ancestor, isRoot).
           var baseType = Object.getPrototypeOf(this);

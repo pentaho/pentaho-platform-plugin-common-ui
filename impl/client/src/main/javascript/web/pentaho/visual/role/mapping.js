@@ -68,7 +68,7 @@ define([
        */
       get model() {
         // TODO: Test it is a visual Model (cyclic dependency)
-        return typeUtil._getFirstRefContainer(this);
+        return typeUtil.__getFirstRefContainer(this);
       },
 
       /**

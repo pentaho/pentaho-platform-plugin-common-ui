@@ -46,7 +46,7 @@ define([
       type: /** @lends pentaho.type.Number.Type# */{
         id: module.id,
         alias: "number",
-        cast: toNumber
+        cast: __toNumber
       }
     }).implement(/** @lends pentaho.type.Number# */{
       type: bundle.structured["number"] // eslint-disable-line dot-notation
@@ -54,7 +54,7 @@ define([
 
     return PenNumber;
 
-    function toNumber(v) {
+    function __toNumber(v) {
       v = +v;
       return isNaN(v) ? null : v;
     }

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,13 +69,13 @@ define([
       if(!type) throw error.argRequired("type");
       if(!source) throw error.argRequired("source");
 
-      this._type = type;
-      this._source = source;
-      this._cancelable = !!cancelable;
+      this.__type = type;
+      this.__source = source;
+      this.__cancelable = !!cancelable;
     },
 
-    _cancelReason: null,
-    _isCanceled: false,
+    __cancelReason: null,
+    __isCanceled: false,
 
     /**
      * Gets the type of the event.
@@ -84,7 +84,7 @@ define([
      * @readonly
      */
     get type() {
-      return this._type;
+      return this.__type;
     },
 
     /**
@@ -94,7 +94,7 @@ define([
      * @readonly
      */
     get source() {
-      return this._source;
+      return this.__source;
     },
 
     /**
@@ -104,7 +104,7 @@ define([
      * @readonly
      */
     get isCancelable() {
-      return this._cancelable;
+      return this.__cancelable;
     },
 
     /**
@@ -114,7 +114,7 @@ define([
      * @readonly
      */
     get cancelReason() {
-      return this._cancelReason;
+      return this.__cancelReason;
     },
 
     /**
@@ -129,7 +129,7 @@ define([
      * @see pentaho.lang.Event#cancelReason
      */
     cancel: function(reason) {
-      if(this._cancelable && !this._isCanceled) {
+      if(this.__cancelable && !this.__isCanceled) {
         if(!reason) reason = "canceled";
 
         if(typeof reason === "string") {
@@ -138,8 +138,8 @@ define([
           throw error.argInvalidType("reason", ["string", "Error"], typeof reason);
         }
 
-        this._cancelReason = reason;
-        this._isCanceled = true;
+        this.__cancelReason = reason;
+        this.__isCanceled = true;
       }
     },
 
@@ -150,7 +150,7 @@ define([
      * @readonly
      */
     get isCanceled() {
-      return this._isCanceled;
+      return this.__isCanceled;
     },
 
     /**

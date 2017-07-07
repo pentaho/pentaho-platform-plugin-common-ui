@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -245,7 +245,7 @@ define([
           // ---
 
           // There's no other public way...
-          expect(scope.transaction._crefs.length).toBe(0);
+          expect(scope.transaction.__crefs.length).toBe(0);
         });
 
         it("should not try to cancel an added reference when changes are cleared", function() {

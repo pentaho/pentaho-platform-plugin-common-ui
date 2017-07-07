@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ define([
      * @private
      * @internal
      */
-    _getFirstRefContainer: function(inst) {
+    __getFirstRefContainer: function(inst) {
       var refs = inst.$references;
       return refs && refs.length ? refs[0].container : null;
     },
@@ -52,7 +52,7 @@ define([
      * @private
      * @internal
      */
-    _getFirstRefProperty: function(inst) {
+    __getFirstRefProperty: function(inst) {
       var refs = inst.$references;
       return refs && refs.length ? refs[0].property : null;
     },
@@ -66,7 +66,7 @@ define([
      * @return {Array.<pentaho.type.ValidationError>} An array of validation errors or `null`.
      */
     normalizeErrors: function(errors) {
-      return errors ? toArray(errors) : null;
+      return errors ? __toArray(errors) : null;
     },
 
     /**
@@ -80,7 +80,7 @@ define([
     combineErrors: function(errors, errorsAdd) {
       if(errorsAdd) {
         if(!errors)
-          errors = toArray(errorsAdd);
+          errors = __toArray(errorsAdd);
         else if(Array.isArray(errorsAdd))
           errors.push.apply(errors, errorsAdd);
         else
@@ -129,7 +129,7 @@ define([
    *
    * @private
    */
-  function toArray(v) {
+  function __toArray(v) {
     return Array.isArray(v) ? v : [v];
   }
 });

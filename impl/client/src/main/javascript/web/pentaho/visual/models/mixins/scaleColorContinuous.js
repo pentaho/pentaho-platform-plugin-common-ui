@@ -40,21 +40,21 @@ define([
             name: "pattern",
             valueType: patternFactory,
             isRequired: true,
-            isApplicable: hasQuantitativeAttributesColor,
+            isApplicable: __hasQuantitativeAttributesColor,
             defaultValue: "gradient"
           },
           {
             name: "colorSet",
             valueType: colorSetFactory,
             isRequired: true,
-            isApplicable: hasQuantitativeAttributesColor,
+            isApplicable: __hasQuantitativeAttributesColor,
             defaultValue: "ryg"
           },
           {
             name: "reverseColors",
             valueType: "boolean",
             isRequired: true,
-            isApplicable: hasQuantitativeAttributesColor,
+            isApplicable: __hasQuantitativeAttributesColor,
             defaultValue: false
           }
         ]
@@ -62,7 +62,7 @@ define([
     })
     .implement({type: bundle.structured.scaleColorContinuous});
 
-    function hasQuantitativeAttributesColor() {
+    function __hasQuantitativeAttributesColor() {
       if(!this.color.isMapped) return false;
 
       var rolePropType = this.type.get("color");

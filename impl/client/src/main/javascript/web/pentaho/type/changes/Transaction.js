@@ -76,17 +76,17 @@ define([
       O.setConst(this, "context", context);
 
       // Dictionary of changesets by container uid.
-      this._csetByUid = {};
-      this._csets = [];
+      this.__csetByUid = {};
+      this.__csets = [];
 
       // Dictionary of ChangeRef by container uid.
-      this._crefByUid = {};
-      this._crefs = [];
+      this.__crefByUid = {};
+      this.__crefs = [];
 
-      this._actionLockTaken = false;
-      this._resultWill = null;
-      this._result = null;
-      this._isCurrent = false;
+      this.__actionLockTaken = false;
+      this.__resultWill = null;
+      this.__result = null;
+      this.__isCurrent = false;
 
       /**
        * The number of active scopes of this transaction.
@@ -95,8 +95,9 @@ define([
        *
        * @type {number}
        * @private
+       * @internal
        */
-      this._scopeCount = 0;
+      this.__scopeCount = 0;
     },
 
     // region State
@@ -110,7 +111,7 @@ define([
      * @see pentaho.type.changes.Transaction#result
      */
     get isProposed() {
-      return !this._result;
+      return !this.__result;
     },
 
     /**
@@ -122,7 +123,7 @@ define([
      * @readOnly
      */
     get isReadOnly() {
-      return !!(this._result || this._resultWill);
+      return !!(this.__result || this.__resultWill);
     },
 
     /**
@@ -135,7 +136,7 @@ define([
      * @see pentaho.type.changes.Transaction#isProposed
      */
     get result() {
-      return this._result;
+      return this.__result;
     },
     // endregion
 
@@ -150,7 +151,7 @@ define([
      * @return {pentaho.type.changes.Changeset} The changeset, or `null`.
      */
     getChangeset: function(uid) {
-      return O.getOwn(this._csetByUid, uid) || null;
+      return O.getOwn(this.__csetByUid, uid) || null;
     },
 
     /**
@@ -164,10 +165,10 @@ define([
      */
     _ensureChangeRef: function(container) {
       var uid = container.$uid;
-      var cref = O.getOwn(this._crefByUid, uid);
+      var cref = O.getOwn(this.__crefByUid, uid);
       if(!cref) {
-        this._crefByUid[uid] = cref = new ChangeRef(container);
-        this._crefs.push(cref);
+        this.__crefByUid[uid] = cref = new ChangeRef(container);
+        this.__crefs.push(cref);
       }
 
       return cref;
@@ -183,7 +184,7 @@ define([
      * @private
      */
     _getChangeRef: function(uid) {
-      return O.getOwn(this._crefByUid, uid) || null;
+      return O.getOwn(this.__crefByUid, uid) || null;
     },
 
     /**
@@ -203,10 +204,10 @@ define([
 
       var owner = changeset.owner;
 
-      this._csetByUid[owner._uid] = changeset;
-      this._csets.push(changeset);
+      this.__csetByUid[owner.$uid] = changeset;
+      this.__csets.push(changeset);
 
-      if(this._isCurrent) owner._cset = changeset;
+      if(this.__isCurrent) owner.__cset = changeset;
     },
 
     /**
@@ -218,7 +219,7 @@ define([
      * @private
      */
     _eachChangeset: function(fun) {
-      var changesets = this._csets;
+      var changesets = this.__csets;
       var L = changesets.length;
       var i = -1;
       while(++i < L) fun.call(this, changesets[i]);
@@ -234,12 +235,12 @@ define([
       }, this);
 
       // Sort the changesets according to topological order.
-      this._csets.sort(compareChangesets);
+      this.__csets.sort(compareChangesets);
     },
 
     _exploreContainer: function(container, netOrder, visitedSet) {
-      var cset = container._cset;
-      var uid = container._uid;
+      var cset = container.__cset;
+      var uid = container.$uid;
 
       // Already been here?
       if(uid in visitedSet) {
@@ -265,16 +266,16 @@ define([
 
       if(!cset) cset = container._createChangeset(this);
 
-      cset._updateNetOrder(netOrder);
+      cset.__updateNetOrder(netOrder);
 
       // Follow refs
-      var refs = container._refs;
+      var refs = container.__refs;
       if(refs) refs.forEach(function(aref) {
 
         var containerRef = this._exploreContainer(aref.container, netOrder + 1, visitedSet);
         if(containerRef)
           // Not a cycle, so hook up the two.
-          containerRef._setNestedChangeset(cset, aref.property);
+          containerRef.__setNestedChangeset(cset, aref.property);
 
       }, this);
 
@@ -292,14 +293,14 @@ define([
       // 3. The fact that it isn't a loop up until now, doesn't mean that, ahead, there isn't a loop...
       // 4. Because we're already been here, surely all paths forward already have changesets.
 
-      var uid = container._uid;
+      var uid = container.$uid;
       if(!visitedSet[uid]) {
         visitedSet[uid] = true;
 
-        if(container._cset._updateNetOrder(netOrder)) {
+        if(container.__cset.__updateNetOrder(netOrder)) {
           // Propagate through references...
 
-          var refs = container._refs;
+          var refs = container.__refs;
           if(refs) refs.forEach(function(aref) {
             this._updateContainerNetOrder(aref.container, netOrder + 1, visitedSet);
           }, this);
@@ -318,7 +319,7 @@ define([
      * @type {boolean}
      */
     get isCurrent() {
-      return this._isCurrent;
+      return this.__isCurrent;
     },
 
     /**
@@ -344,22 +345,23 @@ define([
      * and the transaction is automatically rejected due to a concurrency error.
      *
      * @private
+     * @internal
      *
      * @see pentaho.type.changes.AbstractTransactionScope
      */
-    _scopeEnter: function() {
+    __scopeEnter: function() {
       // Validate entry
 
-      if(this._result)
+      if(this.__result)
         throw error.operInvalid("The transaction is resolved.");
 
       // Is this the root scope entering?
-      if(!this._scopeCount) {
+      if(!this.__scopeCount) {
         // Reentering a txn that was set aside?
         // This txn may now be in concurrency error.
         // a) Check if every owners' version is that which was initially captured in the changeset.
 
-        var csets = this._csets;
+        var csets = this.__csets;
         var L = csets.length;
         var i = -1;
         var cset;
@@ -370,49 +372,52 @@ define([
         }
       }
 
-      this._scopeCount++;
+      this.__scopeCount++;
     },
 
     /**
      * Called by a scope of this transaction to notify that it is exiting.
      *
      * @private
+     * @internal
      *
      * @see pentaho.type.changes.AbstractTransactionScope#_exit
      */
-    _scopeExit: function() {
-      this._scopeCount--;
+    __scopeExit: function() {
+      this.__scopeCount--;
     },
 
     /**
      * Called by the context when this transaction becomes the ambient transaction.
      *
      * @private
+     * @internal
      *
-     * @see pentaho.type.Context#_setTransaction
+     * @see pentaho.type.Context#__setTransaction
      */
-    _enteringAmbient: function() {
+    __enteringAmbient: function() {
 
       this._eachChangeset(function(cset) {
-        cset.owner._cset = cset;
+        cset.owner.__cset = cset;
       });
 
-      this._isCurrent = true;
+      this.__isCurrent = true;
     },
 
     /**
      * Called by the context when this transaction will stop being the ambient transaction.
      *
      * @private
+     * @internal
      *
-     * @see pentaho.type.Context#_setTransaction
+     * @see pentaho.type.Context#__setTransaction
      */
-    _exitingAmbient: function() {
+    __exitingAmbient: function() {
 
-      this._isCurrent = false;
+      this.__isCurrent = false;
 
       this._eachChangeset(function(cset) {
-        cset.owner._cset = null;
+        cset.owner.__cset = null;
       });
     },
     // endregion
@@ -431,7 +436,7 @@ define([
      */
     _acquireActionLock: function() {
       this._assertActionLockFree();
-      this._actionLockTaken = true;
+      this.__actionLockTaken = true;
     },
 
     /**
@@ -446,7 +451,7 @@ define([
      * @private
      */
     _assertActionLockFree: function() {
-      if(this._actionLockTaken) throw error.operInvalid("Already in the _commit or _commitWill methods.");
+      if(this.__actionLockTaken) throw error.operInvalid("Already in the _commit or _commitWill methods.");
     },
 
     /**
@@ -455,7 +460,7 @@ define([
      * @private
      */
     _releaseActionLock: function() {
-      this._actionLockTaken = false;
+      this.__actionLockTaken = false;
     },
     // endregion
 
@@ -525,7 +530,7 @@ define([
       // is rejected is that if in the future we'd want to support making further changes
       // that behavior would be broken...
 
-      var result = this._result || this._resultWill;
+      var result = this.__result || this.__resultWill;
       if(!result) {
         this._acquireActionLock();
 
@@ -540,18 +545,18 @@ define([
     _commitWillCore: function() {
       this._buildGraph();
 
-      var result = this._resultWill = this._notifyChangeWill();
+      var result = this.__resultWill = this._notifyChangeWill();
 
       // Lock changes, whatever the result.
       this._eachChangeset(function(cset) {
-        cset._setReadOnlyInternal();
+        cset.__setReadOnlyInternal();
       });
 
       return result;
     },
 
     _notifyChangeWill: function() {
-      var changesets = this._csets;
+      var changesets = this.__csets;
       var L = changesets.length;
       var i = -1;
       var cset;
@@ -614,9 +619,9 @@ define([
     _applyChanges: function() {
       // Apply all changesets.
       // Includes setting owner versions to the new txn version.
-      var version = this.context._takeNextVersion();
+      var version = this.context.__takeNextVersion();
 
-      this._crefs.forEach(function(cref) {
+      this.__crefs.forEach(function(cref) {
         cref.apply();
       });
 
@@ -630,17 +635,17 @@ define([
 
     _resolve: function(result) {
 
-      this._result = result;
+      this.__result = result;
 
       // Release any _commitWill result.
-      this._resultWill = null;
+      this.__resultWill = null;
 
       // Exit all context scopes, including CommittedScopes, until the isRoot scope.
       // The error thrown below, if rejected, should help prevent executing lines of code that would fail.
-      if(this._scopeCount) {
-        this._scopeCount = 0;
-        this._exitingAmbient();
-        this.context._transactionExit();
+      if(this.__scopeCount) {
+        this.__scopeCount = 0;
+        this.__exitingAmbient();
+        this.context.__transactionExit();
       }
 
       // Any new changes arising from notification create new transactions/changesets.

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,13 @@ define([
     constructor: function(transaction, owner) {
       this.base(transaction, owner);
 
+      /**
+       * A map of property name to a corresponding change.
+       *
+       * @type {!Object.<string, !pentaho.type.changes.Change>}
+       * @protected
+       * @readonly
+       */
       this._changes = {};
     },
 
@@ -74,7 +81,7 @@ define([
     get hasChanges() {
       var changes = this._changes;
       for(var p in changes)
-        if(O.hasOwn(changes, p) && hasChanges(changes[p]))
+        if(O.hasOwn(changes, p) && __hasChanges(changes[p]))
           return true;
 
       return false;
@@ -94,13 +101,14 @@ define([
             // Primitive changes cannot be cleared; must be removed.
             // Assuming a Replace change...
             delete changes[name];
-            change._cancelRefs(this.transaction, complex, /* valueIni: */complex._getByName(name));
+            change._cancelRefs(this.transaction, complex, /* valueIni: */complex.__getByName(name));
           }
         }
       }
     },
 
-    _setNestedChangeset: function(csetNested, propType) {
+    /** @inheritDoc */
+    __setNestedChangeset: function(csetNested, propType) {
       // Cannot set changesets like this over Replace changes, or the latter would be, well... , overwritten.
       // this._changes[propType.name] = csetNested;
 
@@ -149,17 +157,18 @@ define([
     /**
      * Gets an array with all of the property names contained in this changeset.
      *
-     * @type {!string[]}
+     * @type {!Array.<string>}
      * @readonly
      */
     get propertyNames() {
       return Object.keys(this._changes);
     },
 
-    _getByName: function(name) {
+    // TODO: Documente me!
+    __getByName: function(name) {
       // NOTE: Only called for element properties.
       var change = O.getOwn(this._changes, name);
-      if(!change) return this.owner._getByName(name);
+      if(!change) return this.owner.__getByName(name);
 
       // If it's a changeset, it's a ComplexChangeset. Otherwise, it's a `Replace` change.
       return (change instanceof Changeset) ? change.owner : change.value;
@@ -176,7 +185,7 @@ define([
      */
     getOld: function(name) {
       var pName = this.owner.type.get(name).name;
-      return this.owner._getByName(pName);
+      return this.owner.__getByName(pName);
     },
 
     /** @inheritDoc */
@@ -209,7 +218,7 @@ define([
       var valueNew = propType.toValue(valueSpec);
 
       // Original/Initial value.
-      var valueIni = complex._getByName(name);
+      var valueIni = complex.__getByName(name);
 
       // Ambient value.
       var cset = complex.changeset;
@@ -248,7 +257,7 @@ define([
     }
   });
 
-  function hasChanges(change) {
-    return !(change instanceof Changeset) || change.hasChanges;
+  function __hasChanges(change) {
+    return !(change instanceof Changeset) || change.__hasChanges;
   }
 });

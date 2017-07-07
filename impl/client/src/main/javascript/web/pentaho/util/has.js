@@ -23,10 +23,10 @@ define(function() {
   var hasUrl = false;
   if(typeof URL !== "undefined") {
     try {
-      var u = new URL('b', 'http://a');
-      u.pathname = 'c%20d';
-      hasUrl = u.href === 'http://a/c%20d';
-    } catch (e) {
+      var u = new URL("b", "http://a");
+      u.pathname = "c%20d";
+      hasUrl = u.href === "http://a/c%20d";
+    } catch(e) {
     }
   }
 

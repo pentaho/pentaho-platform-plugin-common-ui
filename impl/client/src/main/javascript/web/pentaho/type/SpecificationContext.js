@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ define([
        * @type {Object.<string, Object>}
        * @private
        */
-      this._typeInfosByUid = {};
+      this.__typeInfosByUid = {};
 
       /**
        * The type infos of anonymous types already described in the context,
@@ -75,7 +75,7 @@ define([
        * @type {Object.<string, Object>}
        * @private
        */
-      this._typeInfosByTid = {};
+      this.__typeInfosByTid = {};
 
       /**
        * The next number that will be used to build a temporary identifier.
@@ -83,7 +83,7 @@ define([
        * @type {number}
        * @private
        */
-      this._nextId = 1;
+      this.__nextId = 1;
     },
 
     /**
@@ -98,7 +98,7 @@ define([
     getIdOf: function(type) {
       var id = type.id;
       if(!id) {
-        var typeInfo = O.getOwn(this._typeInfosByUid, type.uid);
+        var typeInfo = O.getOwn(this.__typeInfosByUid, type.uid);
         if(typeInfo) id = typeInfo.id;
       }
       return id;
@@ -112,7 +112,7 @@ define([
      * @return {pentaho.type.Type} The type with the given temporary identifier, if any; or, `null`.
      */
     get: function(tid) {
-      var typeInfo = O.getOwn(this._typeInfosByTid, tid);
+      var typeInfo = O.getOwn(this.__typeInfosByTid, tid);
       return typeInfo ? typeInfo.type : null;
     },
 
@@ -138,12 +138,12 @@ define([
       if(id) return id;
 
       var uid = type.uid;
-      var typeInfo = O.getOwn(this._typeInfosByUid, uid);
+      var typeInfo = O.getOwn(this.__typeInfosByUid, uid);
       if(typeInfo) return typeInfo.id;
 
       // Get a temporary id.
       if(tid) {
-        if(O.hasOwn(this._typeInfosByTid, tid)) {
+        if(O.hasOwn(this.__typeInfosByTid, tid)) {
           throw error.argInvalid("tid", "The temporary id is already being used by another type.");
         }
       } else {
@@ -153,11 +153,11 @@ define([
         // In practice, the spec context is either used for serialization,
         // where all ids are generated, or for deserialization, where all ids are given...
         do {
-          tid = idTemporaryPrefix + (this._nextId++);
-        } while(O.hasOwn(this._typeInfosByTid, tid));
+          tid = idTemporaryPrefix + (this.__nextId++);
+        } while(O.hasOwn(this.__typeInfosByTid, tid));
       }
 
-      this._typeInfosByUid[uid] = this._typeInfosByTid[tid] = {type: type, id: tid};
+      this.__typeInfosByUid[uid] = this.__typeInfosByTid[tid] = {type: type, id: tid};
 
       return tid;
     },
@@ -210,7 +210,9 @@ define([
      * @see pentaho.type.SpecificationContext.isIdTemporary
      * @default "_:"
      */
-    get idTemporaryPrefix() { return idTemporaryPrefix; }
+    get idTemporaryPrefix() {
+      return idTemporaryPrefix;
+    }
   });
 
   return SpecificationContext;

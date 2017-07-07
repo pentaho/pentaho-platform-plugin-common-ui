@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,19 +68,21 @@ define([
       return "remove";
     },
 
+    /** @inheritDoc */
     _prepareRefs: function(txn, target) {
       if(!target.isBoundary && target.type.of.isComplex) {
         this.elements.forEach(function(elem) {
-          if(elem._addReference)
+          if(elem.__addReference)
             txn._ensureChangeRef(elem).removeReference(target);
         });
       }
     },
 
+    /** @inheritDoc */
     _cancelRefs: function(txn, target) {
       if(!target.isBoundary && target.type.of.isComplex) {
         this.elements.forEach(function(elem) {
-          if(elem._addReference)
+          if(elem.__addReference)
             txn._ensureChangeRef(elem).addReference(target);
         });
       }
@@ -90,10 +92,10 @@ define([
     _apply: function(target) {
       var elems = this.elements;
 
-      target._elems.splice(this.index, elems.length);
+      target.__elems.splice(this.index, elems.length);
 
       elems.forEach(function(elem) {
-        delete target._keys[elem.key];
+        delete target.__keys[elem.key];
       });
     }
   });

@@ -56,6 +56,7 @@ define([
     var VisualModel = Model.extend(/** @lends pentaho.visual.base.Model# */{
 
       // region serialization
+      /** @inheritDoc */
       toSpecInContext: function(keyArgs) {
 
         if(keyArgs && keyArgs.isJson) {
@@ -96,6 +97,16 @@ define([
             name: "application",
             valueType: visualApplicationFactory
           },
+
+          /**
+           * Gets or sets the data of the visualization.
+           *
+           * This property does not serialize to JSON by default.
+           *
+           * @name data
+           * @memberOf pentaho.visual.base.Model#
+           * @type {pentaho.data.ITable}
+           */
           {
             name: "data",
             valueType: "object",

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,8 +41,8 @@ define([
     constructor: function(owner) {
       this.owner = owner;
 
-      this._refsAdd = null;
-      this._refsRem = null;
+      this.__refsAdd = null;
+      this.__refsRem = null;
     },
 
     /**
@@ -53,9 +53,9 @@ define([
      * the property type whose value contains the owner of this changeset.
      */
     addReference: function(container, propType) {
-      if(!(this._refsRem && this._refsRem.remove(container, propType))) {
+      if(!(this.__refsRem && this.__refsRem.remove(container, propType))) {
 
-        (this._refsAdd || (this._refsAdd = ReferenceList.to([]))).add(container, propType);
+        (this.__refsAdd || (this.__refsAdd = ReferenceList.to([]))).add(container, propType);
       }
     },
 
@@ -67,9 +67,9 @@ define([
      * the property type whose value used to contain this instance.
      */
     removeReference: function(container, propType) {
-      if(!(this._refsAdd && this._refsAdd.remove(container, propType))) {
+      if(!(this.__refsAdd && this.__refsAdd.remove(container, propType))) {
 
-        (this._refsRem || (this._refsRem = ReferenceList.to([]))).add(container, propType);
+        (this.__refsRem || (this.__refsRem = ReferenceList.to([]))).add(container, propType);
       }
     },
 
@@ -80,11 +80,11 @@ define([
      * @readOnly
      */
     get projectedReferences() {
-      return this._updateReferences(this.owner._refs, /* mutate: */false);
+      return this._updateReferences(this.owner.__refs, /* mutate: */false);
     },
 
     apply: function() {
-      this.owner._refs = this._updateReferences(this.owner._refs, /* mutate: */true);
+      this.owner.__refs = this._updateReferences(this.owner.__refs, /* mutate: */true);
     },
 
     /**
@@ -99,8 +99,8 @@ define([
      * @private
      */
     _updateReferences: function(refs, mutate) {
-      var refsRem = this._refsRem;
-      var refsAdd = this._refsAdd;
+      var refsRem = this.__refsRem;
+      var refsAdd = this.__refsAdd;
       if(refsRem || refsAdd) {
         if(!refs) {
           refs = ReferenceList.to([]);

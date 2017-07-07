@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,11 +55,12 @@ define([
        */
       O.setConst(this, "property", propType);
 
-      this._value = value;
+      this.__value = value;
     },
 
+    /** @inheritDoc */
     _prepareRefs: function(txn, complex, valueIni) {
-      this._replaceRefs(txn, complex, valueIni, this._value);
+      this.__replaceRefs(txn, complex, valueIni, this.__value);
     },
 
     /**
@@ -73,19 +74,20 @@ define([
      */
     _updateValue: function(txn, complex, value) {
 
-      this._replaceRefs(txn, complex, this._value, value);
+      this.__replaceRefs(txn, complex, this.__value, value);
 
-      this._value = value;
+      this.__value = value;
     },
 
+    /** @inheritDoc */
     _cancelRefs: function(txn, complex, valueIni) {
-      this._replaceRefs(txn, complex, this._value, valueIni);
+      this.__replaceRefs(txn, complex, this.__value, valueIni);
     },
 
-    _replaceRefs: function(txn, complex, v1, v2) {
+    __replaceRefs: function(txn, complex, v1, v2) {
       if(!this.property.isBoundary) {
-        if(v1 && v1._addReference) txn._ensureChangeRef(v1).removeReference(complex, this.property);
-        if(v2 && v2._addReference) txn._ensureChangeRef(v2).addReference(complex, this.property);
+        if(v1 && v1.__addReference) txn._ensureChangeRef(v1).removeReference(complex, this.property);
+        if(v2 && v2.__addReference) txn._ensureChangeRef(v2).addReference(complex, this.property);
       }
     },
 
@@ -107,12 +109,12 @@ define([
      * @readOnly
      */
     get value() {
-      return this._value;
+      return this.__value;
     },
 
     /** @inheritDoc */
     _apply: function(target) {
-      target._values[this.property.name] = this._value;
+      target._values[this.property.name] = this.__value;
     }
   });
 });

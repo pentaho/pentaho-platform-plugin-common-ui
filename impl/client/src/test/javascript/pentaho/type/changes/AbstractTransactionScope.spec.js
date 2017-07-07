@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,21 +103,21 @@ define([
         expect(scope.isInside).toBe(true);
       });
 
-      it("should call transaction#_scopeEnter", function() {
-        spyOn(txn, "_scopeEnter").and.callThrough();
+      it("should call transaction#__scopeEnter", function() {
+        spyOn(txn, "__scopeEnter").and.callThrough();
 
         scope = new AbstractTransactionScope(context, txn);
 
-        expect(txn._scopeEnter).toHaveBeenCalled();
+        expect(txn.__scopeEnter).toHaveBeenCalled();
       });
 
-      it("should call context#_scopeEnter", function() {
-        spyOn(context, "_scopeEnter").and.callThrough();
+      it("should call context#__scopeEnter", function() {
+        spyOn(context, "__scopeEnter").and.callThrough();
 
         scope = new AbstractTransactionScope(context, txn);
 
-        expect(context._scopeEnter).toHaveBeenCalled();
-        expect(context._scopeEnter).toHaveBeenCalledWith(scope);
+        expect(context.__scopeEnter).toHaveBeenCalled();
+        expect(context.__scopeEnter).toHaveBeenCalledWith(scope);
       });
 
       it("should have isCurrent = true", function() {

@@ -25,7 +25,7 @@ define([
   var spec = module.config() || {};
 
   // URL debugLevel has precedence
-  var level = urlDebugLevel();
+  var level = __urlDebugLevel();
   if(level != null) spec.level = level;
 
   /**
@@ -62,7 +62,7 @@ define([
   return mgr;
 
   // Check URL for "debug" and "debugLevel"
-  function urlDebugLevel() {
+  function __urlDebugLevel() {
     if(domWindow) {
 
       var urlIfHasDebug = function(win) {

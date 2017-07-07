@@ -53,6 +53,7 @@ define([
 
     return PropertyFilter.extend("pentaho.type.filter.IsEqual", /** @lends pentaho.type.filter.IsEqual# */{
 
+      /** @inheritDoc */
       get kind() {
         return KnownFilterKind.IsEqual;
       },
@@ -71,10 +72,12 @@ define([
         return this.getv("value");
       },
 
+      /** @inheritDoc */
       _operation: function(value) {
         return this.value === value;
       },
 
+      /** @inheritDoc */
       _buildContentKey: function() {
         var v = this.get("value");
         return (this.property || "") + " " + (v ? v.key : "");

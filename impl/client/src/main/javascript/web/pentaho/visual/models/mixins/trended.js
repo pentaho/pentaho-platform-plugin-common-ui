@@ -43,12 +43,12 @@ define([
           {
             name: "trendName",
             valueType: "string",
-            isApplicable: isApplicableTrend
+            isApplicable: __isApplicableTrend
           },
           {
             name: "trendLineWidth",
             valueType: lineWidthFactory,
-            isApplicable: isApplicableTrend,
+            isApplicable: __isApplicableTrend,
             isRequired: true,
             defaultValue: 1
           }
@@ -58,7 +58,7 @@ define([
     .implement({type: bundle.structured.trend});
   };
 
-  function isApplicableTrend() {
+  function __isApplicableTrend() {
     /* jshint validthis:true */
     return this.trendType !== "none";
   }

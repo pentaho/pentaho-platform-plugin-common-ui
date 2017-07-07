@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,11 +49,11 @@ define([
     _prepareRefs: function(txn, target) {
       if(!target.isBoundary && target.type.of.isComplex) {
         var i = -1;
-        var elems = target._elems;
+        var elems = target.__elems;
         var L = elems.length;
         var elem;
         while(++i < L) {
-          if((elem = elems[i])._addReference) {
+          if((elem = elems[i]).__addReference) {
             txn._ensureChangeRef(elem).removeReference(target);
           }
         }
@@ -63,11 +63,11 @@ define([
     _cancelRefs: function(txn, target) {
       if(!target.isBoundary && target.type.of.isComplex) {
         var i = -1;
-        var elems = target._elems;
+        var elems = target.__elems;
         var L = elems.length;
         var elem;
         while(++i < L) {
-          if((elem = elems[i])._addReference) {
+          if((elem = elems[i]).__addReference) {
             txn._ensureChangeRef(elem).addReference(target);
           }
         }
@@ -76,8 +76,8 @@ define([
 
     /** @inheritDoc */
     _apply: function(target) {
-      target._elems = [];
-      target._keys = {};
+      target.__elems = [];
+      target.__keys = {};
     }
   });
 });

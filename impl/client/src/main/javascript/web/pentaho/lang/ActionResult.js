@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,11 +66,11 @@ define([
         } else if(!(error instanceof Error)) {
           throw utilError.argInvalidType("error", ["string", "Error"], typeof error);
         }
-        this._value = undefined;
-        this._error = error;
+        this.__value = undefined;
+        this.__error = error;
       } else {
-        this._value = value;
-        this._error = null;
+        this.__value = value;
+        this.__error = null;
       }
     },
 
@@ -81,7 +81,7 @@ define([
      * @readonly
      */
     get value() {
-      return this._value;
+      return this.__value;
     },
 
     /**
@@ -91,7 +91,7 @@ define([
      * @readonly
      */
     get error() {
-      return this._error;
+      return this.__error;
     },
 
     /**
@@ -101,7 +101,7 @@ define([
      * @readonly
      */
     get isCanceled() {
-      var error = this._error;
+      var error = this.__error;
       return error != null && error instanceof UserError;
     },
 
@@ -112,7 +112,7 @@ define([
      * @readonly
      */
     get isFailed() {
-      var error = this._error;
+      var error = this.__error;
       return error != null && !(error instanceof UserError);
     },
 
@@ -123,7 +123,7 @@ define([
      * @readonly
      */
     get isFulfilled() {
-      return !this._error;
+      return !this.__error;
     },
 
     /**
@@ -133,7 +133,7 @@ define([
      * @readonly
      */
     get isRejected() {
-      return !!this._error;
+      return !!this.__error;
     }
   }, /** @lends pentaho.lang.ActionResult */{
 

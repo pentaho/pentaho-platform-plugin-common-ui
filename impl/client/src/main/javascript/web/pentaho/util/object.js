@@ -195,7 +195,7 @@ define(["./has"], function(has) {
      * @method
      * @see pentaho.util.object.assignOwn
      */
-    assignOwnDefined: assignOwnDefined,
+    assignOwnDefined: __assignOwnDefined,
 
     /**
      * Creates a shallow clone of a plain object or array.
@@ -213,7 +213,7 @@ define(["./has"], function(has) {
         if(v instanceof Array)
           v = v.slice();
         else if(v.constructor === Object)
-          v = assignOwnDefined({}, v);
+          v = __assignOwnDefined({}, v);
       }
       return v;
     },
@@ -321,7 +321,7 @@ define(["./has"], function(has) {
     }
   };
 
-  function assignOwnDefined(to, from) {
+  function __assignOwnDefined(to, from) {
     var v;
     for(var p in from) {
       if(O_hasOwn.call(from, p) && (v = from[p]) !== undefined)
@@ -339,9 +339,9 @@ define(["./has"], function(has) {
    * @param {!Object} from - The source object.
    * @param {string} p - the name of the property.
    * @return {!Object} The target object.
-   * @method
+   * @private
    */
-  function copyOneDefined(to, from, p) {
+  function __copyOneDefined(to, from, p) {
     var pd = getPropertyDescriptor(from, p);
     if(pd && pd.get || pd.set || pd.value !== undefined)
       Object.defineProperty(to, p, pd);
@@ -363,7 +363,7 @@ define(["./has"], function(has) {
 
   function setProtoCopy(o, proto) {
     /* eslint guard-for-in: 0 */
-    for(var p in proto) copyOneDefined(o, proto, p);
+    for(var p in proto) __copyOneDefined(o, proto, p);
     return o;
   }
 });

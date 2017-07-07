@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ define([
   /* eslint new-cap: 0 */
 
   var O_hasOwn = Object.prototype.hasOwnProperty;
-  var keyArgsEmitEventUnsafe = {isCanceled: event_isCanceled, errorHandler: null};
-  var keyArgsEmitEventSafe = {isCanceled: event_isCanceled, errorHandler: errorHandlerLog};
+  var keyArgsEmitEventUnsafe = {isCanceled: __event_isCanceled, errorHandler: null};
+  var keyArgsEmitEventSafe = {isCanceled: __event_isCanceled, errorHandler: __errorHandlerLog};
 
   /**
    * @classDesc The `EventRegistrationHandle` class handles creating the alias, `remove`,
@@ -112,7 +112,7 @@ define([
       if(!type) throw error.argRequired("type");
       if(!observer) throw error.argRequired("observer");
 
-      var eventTypes = parseEventTypes(type);
+      var eventTypes = __parseEventTypes(type);
       if(eventTypes && eventTypes.length) {
 
         var priority = (keyArgs && keyArgs.priority) || 0;
@@ -121,11 +121,11 @@ define([
 
         /** @type pentaho.lang.IEventRegistrationHandle[] */
         var handles = eventTypes.map(function(type) {
-          return registerOne.call(this, type, observer, priority);
+          return __registerOne.call(this, type, observer, priority);
         }, this);
 
         return handles.length > 1
-            ? new pentaho_lang_IEventRegistrationHandle(disposeHandles.bind(this, handles))
+            ? new pentaho_lang_IEventRegistrationHandle(__disposeHandles.bind(this, handles))
             : handles[0];
       }
 
@@ -143,10 +143,10 @@ define([
 
       if(!observer) throw error.argRequired("observer");
 
-      var types = parseEventTypes(typeOrHandle);
+      var types = __parseEventTypes(typeOrHandle);
       if(types && types.length) {
 
-        var find = F.is(observer) ? findUnstructuredObserverRegistration : findObserverRegistration;
+        var find = F.is(observer) ? __findUnstructuredObserverRegistration : __findObserverRegistration;
 
         types.forEach(function(type) {
 
@@ -155,7 +155,7 @@ define([
 
           var observerRegistration = find.call(this, type, observer);
           if(observerRegistration) {
-            unregisterOne.call(this, type, observerRegistration);
+            __unregisterOne.call(this, type, observerRegistration);
           }
         }, this);
       }
@@ -327,7 +327,7 @@ define([
       type = typeInfo.getIdOf(type) || type;
 
       if((queue = O.getOwn(this.__observersRegistry, type))) {
-        return emitQueue.call(this, event, queue, type, phase || "__", isCanceled, keyArgs && keyArgs.errorHandler);
+        return __emitQueue.call(this, event, queue, type, phase || "__", isCanceled, keyArgs && keyArgs.errorHandler);
       }
 
       return event;
@@ -344,9 +344,9 @@ define([
    *
    * @private
    */
-  function getObserversQueueOf(type) {
+  function __getObserversQueueOf(type) {
     var registry = this.__observersRegistry || (this.__observersRegistry = {});
-    return registry[type] || (registry[type] = createObserversQueue());
+    return registry[type] || (registry[type] = __createObserversQueue());
   }
 
   /**
@@ -356,7 +356,7 @@ define([
    *
    * @private
    */
-  function createObserversQueue() {
+  function __createObserversQueue() {
     var queue = [];
     queue.emittingLevel = 0;
     return queue;
@@ -375,12 +375,12 @@ define([
    *
    * @private
    */
-  function registerOne(type, observer, priority) {
+  function __registerOne(type, observer, priority) {
 
     // Resolve alias
     type = typeInfo.getIdOf(type) || type;
 
-    var queue = getObserversQueueOf.call(this, type, /* create: */true);
+    var queue = __getObserversQueueOf.call(this, type, /* create: */true);
 
     var i = queue.length;
 
@@ -411,7 +411,7 @@ define([
     // Insert at index `i`.
     queue.splice(i, 0, observerRegistration);
 
-    return new pentaho_lang_IEventRegistrationHandle(unregisterOne.bind(this, type, observerRegistration));
+    return new pentaho_lang_IEventRegistrationHandle(__unregisterOne.bind(this, type, observerRegistration));
   }
 
   /**
@@ -424,7 +424,7 @@ define([
    *
    * @private
    */
-  function unregisterOne(type, observerRegistration) {
+  function __unregisterOne(type, observerRegistration) {
 
     var queue = this.__observersRegistry[type];
     var i = observerRegistration.index;
@@ -459,7 +459,7 @@ define([
    *
    * @private
    */
-  function disposeHandles(handles) {
+  function __disposeHandles(handles) {
     for(var i = 0, L = handles.length; i !== L; ++i) {
       handles[i].dispose();
     }
@@ -477,7 +477,7 @@ define([
    *
    * @private
    */
-  function findUnstructuredObserverRegistration(type, listener) {
+  function __findUnstructuredObserverRegistration(type, listener) {
     var queue = O.getOwn(this.__observersRegistry, type);
     if(queue) {
       var i = -1;
@@ -500,7 +500,7 @@ define([
    *
    * @private
    */
-  function findObserverRegistration(type, observer) {
+  function __findObserverRegistration(type, observer) {
     var queue = O.getOwn(this.__observersRegistry, type);
     if(queue) {
       var i = -1;
@@ -522,7 +522,7 @@ define([
    *
    * @private
    */
-  function parseEventTypes(type) {
+  function __parseEventTypes(type) {
 
     if(type instanceof Array) {
       // Allow an array of event types.
@@ -557,8 +557,10 @@ define([
    * The function arguments are: the error, the event, the event type and the event phase.
    *
    * @return {?object} The event payload object or `null`, when the event is canceled.
+   *
+   * @private
    */
-  function emitQueue(event, queue, type, phase, isCanceled, errorHandler) {
+  function __emitQueue(event, queue, type, phase, isCanceled, errorHandler) {
 
     // Performance
     // if(!event) throw error.argRequired("event");
@@ -567,7 +569,7 @@ define([
     // if(!phase) throw error.argRequired("phase");
 
     // Use `null` to force no error handling.
-    if(errorHandler === undefined) errorHandler = errorHandlerLog;
+    if(errorHandler === undefined) errorHandler = __errorHandlerLog;
 
     queue.emittingLevel++;
 
@@ -613,7 +615,7 @@ define([
    *
    * @private
    */
-  function event_isCanceled(event) {
+  function __event_isCanceled(event) {
     return event.isCanceled;
   }
 
@@ -629,7 +631,7 @@ define([
    *
    * @private
    */
-  function errorHandlerLog(error, event, type, phase) {
+  function __errorHandlerLog(error, event, type, phase) {
 
     var eventTypeId = type + (phase !== "__" ? (":" + phase) : "");
     var errorDesc = error ? (" Error: " + error.message) : "";

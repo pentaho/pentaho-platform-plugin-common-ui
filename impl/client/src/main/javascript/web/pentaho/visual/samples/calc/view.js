@@ -46,6 +46,7 @@ define([
         }
       },
 
+      /** @inheritDoc */
       _initDomContainer: function() {
 
         var numSpan = document.createElement("span");
@@ -55,17 +56,17 @@ define([
         this.domContainer.appendChild(numSpan);
       },
 
+      /** @inheritDoc */
       _updateAll: function() {
 
-        var result = this._calculate();
+        var result = this.__calculate();
 
-        // TODO: format result
-
-        this.domContainer.firstChild.innerHTML = bundle.get("result", [result]);
+        this.domContainer.firstChild.innerHTML = bundle.get("result", [result.toFixed(2)]);
 
         this._updateSize();
       },
 
+      /** @inheritDoc */
       _updateSize: function() {
 
         var element = this.domContainer.firstChild;
@@ -79,7 +80,7 @@ define([
 
       // ---------
 
-      _calculate: function() {
+      __calculate: function() {
         var dataTable = this.model.data;
         var R = dataTable.getNumberOfRows();
         var measureAttrName = this.model.measure.attributes.at(0).name;

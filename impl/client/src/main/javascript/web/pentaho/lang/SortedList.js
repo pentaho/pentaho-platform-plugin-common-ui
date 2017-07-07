@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ define([
   "use strict";
 
   var baseProto = Base.Array.prototype;
+
+  // TODO: This class has several undocumented methods.
 
   return List.extend("pentaho.lang.SortedList", /** @lends  pentaho.lang.SortedList# */{
     /**
@@ -66,7 +68,7 @@ define([
       this.base(keyArgs);
     },
 
-    _comparer: function(e1, e2) {
+    __comparer: function(e1, e2) {
       if(e1 == null || e2 == null) {
         if(e1 != null) {
           return 1;
@@ -86,16 +88,16 @@ define([
     },
 
     get comparer() {
-      return this._comparer;
+      return this.__comparer;
     },
 
     set comparer(comparer) {
-      var hasOwn = O.hasOwn(this, "_comparer");
-      if(hasOwn && this._comparer !== comparer || !hasOwn && comparer != null) {
+      var hasOwn = O.hasOwn(this, "__comparer");
+      if(hasOwn && this.__comparer !== comparer || !hasOwn && comparer != null) {
         if(comparer == null) {
-          delete this._comparer;
+          delete this.__comparer;
         } else {
-          this._comparer = comparer;
+          this.__comparer = comparer;
         }
 
         this.sort();
@@ -175,7 +177,7 @@ define([
       this.base(arguments);
     },
 
-    _insertInOrder: function(elem, keyArgs) {
+    __insertInOrder: function(elem, keyArgs) {
       var elem2 = this._adding(elem, null, keyArgs);
 
       if(elem2 !== undefined) {
@@ -228,7 +230,7 @@ define([
         this.sort();
       } else {
         while(i < LE) {
-          this._insertInOrder(elems[i], keyArgs);
+          this.__insertInOrder(elems[i], keyArgs);
 
           i++;
         }

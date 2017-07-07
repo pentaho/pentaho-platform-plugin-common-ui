@@ -24,12 +24,12 @@ define([
    * Map of merge operation name to operation handler function.
    *
    * @type {Object.<string, function>}
-   * @see mergeOne
+   * @see __mergeOne
    */
   var _mergeHandlers = {
-    "replace": mergeOperReplace,
-    "merge": mergeOperMerge,
-    "add": mergeOperAdd
+    "replace": __mergeOperReplace,
+    "merge": __mergeOperMerge,
+    "add": __mergeOperAdd
   };
 
   /**
@@ -63,7 +63,7 @@ define([
 
     for(var name in specSource)
       if(O.hasOwn(specSource, name))
-        mergeOne(specTarget, name, specSource[name]);
+        __mergeOne(specTarget, name, specSource[name]);
 
     return specTarget;
   }
@@ -78,10 +78,10 @@ define([
    *
    * @private
    */
-  function mergeOne(target, name, sourceValue) {
+  function __mergeOne(target, name, sourceValue) {
     var op;
 
-    if(isPlainJSObject(sourceValue)) {
+    if(__isPlainJSObject(sourceValue)) {
       // Is `sourceValue` an operation structure?
       //   {$op: "merge", value: {}}
       if((op = sourceValue.$op)) {
@@ -91,7 +91,7 @@ define([
         // Merge operation only applies between two plain objects and
         // add operation only applies between two arrays.
         // Otherwise behaves like _replace_.
-        if(op === "merge" && !isPlainJSObject(sourceValue) || op === "add" && !Array.isArray(sourceValue)) {
+        if(op === "merge" && !__isPlainJSObject(sourceValue) || op === "add" && !Array.isArray(sourceValue)) {
           op = "replace";
         }
       } else {
@@ -116,13 +116,13 @@ define([
    *
    * @private
    */
-  function mergeOperMerge(target, name, sourceValue) {
+  function __mergeOperMerge(target, name, sourceValue) {
     // Is `targetValue` also a plain object?
     var targetValue = target[name];
-    if(isPlainJSObject(targetValue))
+    if(__isPlainJSObject(targetValue))
       merge(targetValue, sourceValue);
     else
-      mergeOperReplace(target, name, sourceValue);
+      __mergeOperReplace(target, name, sourceValue);
   }
 
   /**
@@ -134,9 +134,9 @@ define([
    *
    * @private
    */
-  function mergeOperReplace(target, name, sourceValue) {
+  function __mergeOperReplace(target, name, sourceValue) {
     // Clone source value so that future merges into it don't change it, inadvertently.
-    target[name] = cloneOwnDeep(sourceValue);
+    target[name] = __cloneOwnDeep(sourceValue);
   }
 
   /**
@@ -151,7 +151,7 @@ define([
    *
    * @private
    */
-  function mergeOperAdd(target, name, sourceValue) {
+  function __mergeOperAdd(target, name, sourceValue) {
     // If both are arrays, append source to target, while cloning source elements.
     // Else, fallback to replace operation.
     var targetValue;
@@ -159,10 +159,10 @@ define([
       var i = -1;
       var L = sourceValue.length;
       while(++i < L)
-        targetValue.push(cloneOwnDeep(sourceValue[i]));
+        targetValue.push(__cloneOwnDeep(sourceValue[i]));
 
     } else {
-      mergeOperReplace(target, name, sourceValue);
+      __mergeOperReplace(target, name, sourceValue);
     }
   }
 
@@ -177,14 +177,14 @@ define([
    *
    * @private
    */
-  function cloneOwnDeep(value) {
+  function __cloneOwnDeep(value) {
     if(value && typeof value === "object") {
       if(value instanceof Array) {
-        value = value.map(cloneOwnDeep);
+        value = value.map(__cloneOwnDeep);
       } else if(value.constructor === Object) {
         var clone = {};
         O.eachOwn(value, function(vi, p) {
-          this[p] = cloneOwnDeep(vi);
+          this[p] = __cloneOwnDeep(vi);
         }, clone);
         value = clone;
       }
@@ -203,20 +203,8 @@ define([
    *
    * @private
    */
-  function isPlainJSObject(value) {
+  function __isPlainJSObject(value) {
     return (!!value) && (typeof value === "object") && (value.constructor === Object);
   }
   // endregion
-
-  /**
-   * Converts to array.
-   *
-   * @param {Array|Object} v - The value to convert to array.
-   * @return {Array} The given array or an array with the given value.
-   *
-   * @private
-   */
-  function toArray(v) {
-    return Array.isArray(v) ? v : [v];
-  }
 });

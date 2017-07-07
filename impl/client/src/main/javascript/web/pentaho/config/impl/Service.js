@@ -74,7 +74,7 @@ define([
        * @type {Object.<string, Array.<pentaho.config.spec.IRule>>}
        * @private
        */
-      this._ruleStore = {};
+      this.__ruleStore = {};
     },
 
     /** @inheritdoc */
@@ -116,17 +116,17 @@ define([
         if(!typeId)
           throw new ArgumentRequiredError("rule.select.type");
 
-        if(!this._ruleStore[typeId]) {
-          this._ruleStore[typeId] = new SortedList({"comparer": _ruleComparer});
+        if(!this.__ruleStore[typeId]) {
+          this.__ruleStore[typeId] = new SortedList({"comparer": _ruleComparer});
         }
 
-        this._ruleStore[typeId].push(rule);
+        this.__ruleStore[typeId].push(rule);
       }, this);
     },
 
     /** @inheritdoc */
     select: function(typeId, context) {
-      var rules = this._ruleStore[typeId] || [];
+      var rules = this.__ruleStore[typeId] || [];
       var filtered_rules = rules.filter(_ruleFilterer, context || {});
       var configs = filtered_rules.map(function(rule) {
         return rule.apply;

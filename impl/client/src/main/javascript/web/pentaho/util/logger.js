@@ -48,7 +48,7 @@ define(function() {
      * @param {string} m - Message to log.
      */
     debug: function(m) {
-      _log(m, "debug");
+      __log(m, "debug");
     },
 
     /**
@@ -57,7 +57,7 @@ define(function() {
      * @param {string} m - Message to log.
      */
     log: function(m) {
-      _log(m, "log");
+      __log(m, "log");
     },
 
     /**
@@ -66,7 +66,7 @@ define(function() {
      * @param {string} m - Message to log.
      */
     info: function(m) {
-      _log(m, "info");
+      __log(m, "info");
     },
 
     /**
@@ -75,7 +75,7 @@ define(function() {
      * @param {string} m - Message to log.
      */
     warn: function(m) {
-      _log(m, "warn");
+      __log(m, "warn");
     },
 
     /**
@@ -84,11 +84,11 @@ define(function() {
      * @param {string} m - Message to log.
      */
     error: function(m) {
-      _log(m, "error");
+      __log(m, "error");
     }
   };
 
-  function _log(m, type, css) {
+  function __log(m, type, css) {
     type = type || "info";
 
     if(logger.logLevels.indexOf(type) < logger.logLevels.indexOf(logger.logLevel)) return;

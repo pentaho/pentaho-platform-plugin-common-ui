@@ -34,9 +34,9 @@ define([
 
   return function(context) {
 
-    var Instance = context.get(instanceFactory);
+    var __Instance = context.get(instanceFactory);
 
-    var _propType;
+    var __propType;
 
     /**
      * @name pentaho.type.Property.Type
@@ -77,7 +77,7 @@ define([
      * @see pentaho.type.Complex
      */
 
-    var Property = Instance.extend(/** @lends pentaho.type.Property# */{
+    var Property = __Instance.extend(/** @lends pentaho.type.Property# */{
 
       // TODO: value, members?
       // TODO: p -> AnnotatableLinked.configure(this, config);
@@ -92,8 +92,8 @@ define([
         styleClass: null,
 
         // Break inheritance
-        _label: null,
-        _description: null,
+        __label: null,
+        __description: null,
 
         /**
          * Setting name and label first allows describing the property in subsequent error messages.
@@ -150,16 +150,16 @@ define([
             if(declaringType.context !== context)
               throw error.argInvalid("declaringType", "Invalid context");
 
-            O.setConst(this, "_declaringType", declaringType);
+            O.setConst(this, "__declaringType", declaringType);
 
             if(this.isRoot) {
-              O.setConst(this, "_index", keyArgs.index || 0);
+              O.setConst(this, "__index", keyArgs.index || 0);
 
               // Required stuff
               if(!("name" in spec)) this.name = null; // throws
 
               // Assume the _default_ type _before_ extend, to make sure `value` can be validated against it.
-              if(!spec.valueType && (this._valueType === _propType._valueType))
+              if(!spec.valueType && (this.__valueType === __propType.__valueType))
                 this.valueType = _defaultTypeMid;
             }
           }
@@ -171,10 +171,9 @@ define([
           this.base.apply(this, arguments);
 
           if(this.isRoot) {
-            // Assuming default values
-            if(!O.hasOwn(this, "_label")) this._resetLabel();
+            if(!this._isLabelSet) { this.label = null; }
 
-            this._createValueAccessor();
+            this.__createValueAccessor();
           }
 
           this.__isConstructing = false;
@@ -207,11 +206,12 @@ define([
          * @readonly
          */
         get key() {
-          return this._name;
+          return this.__name;
         }, // endregion
 
         // region attributes
 
+        /** @inheritDoc */
         get isProperty() { return true; },
 
         // region declaringType attribute
@@ -222,7 +222,7 @@ define([
          * @readonly
          */
         get declaringType() {
-          return this._declaringType;
+          return this.__declaringType;
         },
         // endregion
 
@@ -234,12 +234,12 @@ define([
          * @readonly
          */
         get index() {
-          return this._index;
+          return this.__index;
         },
         // endregion
 
         // region name attribute
-        _name: undefined,
+        __name: undefined,
 
         /**
          * Gets or sets the name of the _property type_.
@@ -255,7 +255,7 @@ define([
          * When set to a non-{@link Nully} and non-{@link String} value,
          * the value is first replaced by the result of calling its `toString` method.
          *
-         * @type {!nonEmptyString}
+         * @type {!__nonEmptyString}
          *
          * @throws {pentaho.lang.ArgumentRequiredError} When set to an empty string or a _nully_ value.
          * @throws {TypeError} When set to a value different from the current one.
@@ -263,29 +263,29 @@ define([
          * @see pentaho.type.spec.IPropertyTypeProto#name
          */
         get name() {
-          return this._name;
+          return this.__name;
         },
 
         set name(value) {
-          value = nonEmptyString(value);
+          value = __nonEmptyString(value);
 
           if(!value) throw error.argRequired("name");
 
           // Only stored at the root property type.
           if(this.isRoot) {
             // Cannot change, or throws.
-            O.setConst(this, "_name", value);
+            O.setConst(this, "__name", value);
           } else {
             /* eslint no-lonely-if: 0 */
             // Hierarchy consistency
-            if(value && value !== this._name)
+            if(value && value !== this.__name)
               throw new TypeError("Sub-properties cannot change the 'name' attribute.");
           }
         },
         // endregion
 
         // region alias attribute
-        _nameAlias: undefined,
+        __nameAlias: undefined,
 
         /**
          * Gets or sets the alias for the name of the _property type_.
@@ -300,7 +300,7 @@ define([
          * When set to a non-{@link Nully} and non-{@link String} value,
          * the value is first replaced by the result of calling its `toString` method.
          *
-         * @type {!nonEmptyString}
+         * @type {!__nonEmptyString}
          *
          * @throws {TypeError} When attempting to set a value and the property is not a root property.
          * @throws {pentaho.lang.ArgumentRequiredError} When set to an empty string or a _nully_ value.
@@ -309,19 +309,19 @@ define([
          * @see pentaho.type.spec.IPropertyTypeProto#nameAlias
          */
         get nameAlias() {
-          return this._nameAlias;
+          return this.__nameAlias;
         },
 
         set nameAlias(value) {
           if(!this.isRoot)
             throw new TypeError("The 'nameAlias' attribute can only be assigned to a root property.");
 
-          value = nonEmptyString(value);
+          value = __nonEmptyString(value);
 
           if(!value) throw error.argRequired("nameAlias");
 
           // Cannot change, or throws.
-          O.setConst(this, "_nameAlias", value);
+          O.setConst(this, "__nameAlias", value);
         }, // endregion
 
         // region list attribute
@@ -336,7 +336,7 @@ define([
          * @readonly
          */
         get isList() {
-          return this._valueType.isList;
+          return this.__valueType.isList;
         },
         // endregion
 
@@ -356,7 +356,7 @@ define([
          * @readonly
          */
         get elemType() {
-          var valueType = this._valueType;
+          var valueType = this.__valueType;
           return valueType.isList ? valueType.of : valueType;
         },
         // endregion
@@ -364,7 +364,7 @@ define([
         // region valueType attribute
 
         // NOTE: see at the end of the class declaration: valueType = "value";
-        _valueType: undefined,
+        __valueType: undefined,
 
         /**
          * Gets or sets the type of value that properties of this type can hold.
@@ -410,7 +410,7 @@ define([
          * @see pentaho.type.spec.IPropertyTypeProto#valueType
          */
         get valueType() {
-          return this._valueType;
+          return this.__valueType;
         },
 
         set valueType(value) {
@@ -422,31 +422,31 @@ define([
 
           if(value == null) return;
 
-          var oldType = this._valueType;
+          var oldType = this.__valueType;
           // Prevent using "value", inherited from abstract base classes, as a default base class.
           // However, allow configuring a root property, by sub-classing its current, own, type.
-          var defaultBaseType = this.isRoot ? O.getOwn(this, "_valueType") : oldType;
+          var defaultBaseType = this.isRoot ? O.getOwn(this, "__valueType") : oldType;
           var newType = context.get(value, {defaultBase: defaultBaseType}).type;
           if(newType !== oldType) {
             // Hierarchy/PreviousValue consistency
             if(oldType && !newType.isSubtypeOf(oldType))
               throw error.argInvalid("valueType", bundle.structured.errors.property.typeNotSubtypeOfBaseType);
 
-            this._valueType = newType;
+            this.__valueType = newType;
 
             // Set local value to null, if it is not an instance of the new type.
             // Not really needed as the value getter tests the if value is of type.
             // However, this improves performance.
             var dv;
-            if(O.hasOwn(this, "_defaultValue") && (dv = this._defaultValue) && !newType.is(dv)) {
-              this._defaultValue = null;
+            if(O.hasOwn(this, "__defaultValue") && (dv = this.__defaultValue) && !newType.is(dv)) {
+              this.__defaultValue = null;
             }
           }
         },
         // endregion
 
         // region value attribute and related methods
-        _defaultValue: undefined,
+        __defaultValue: undefined,
 
         /**
          * Gets or sets the _default value_ of properties of this type.
@@ -461,7 +461,7 @@ define([
          * ### Get
          *
          * When got and the _default value_ (local or inherited)
-         * is not an instance of the _defaultValue type_ (local or inherited),
+         * is not an instance of the _value type_ (local or inherited),
          * `null` is returned.
          *
          * ### Set
@@ -496,8 +496,8 @@ define([
          * @see pentaho.type.spec.IPropertyTypeProto#value
          */
         get defaultValue() {
-          var value = this._defaultValue;
-          return value && this._valueType.is(value) ? value : null;
+          var value = this.__defaultValue;
+          return value && this.__valueType.is(value) ? value : null;
         },
 
         set defaultValue(_) {
@@ -505,12 +505,12 @@ define([
             throw error.operInvalid("Cannot change the default value of a property type that has descendants.");
 
           if(_ === undefined || (_ === null && this.isRoot)) {
-            if(this !== _propType) {
+            if(this !== __propType) {
               // Clear local value. Inherit base value.
-              delete this._defaultValue;
+              delete this.__defaultValue;
             }
           } else {
-            this._defaultValue = this.toValue(_, /* noDefault: */true);
+            this.__defaultValue = this.toValue(_, /* noDefault: */true);
           }
         },
 
@@ -537,8 +537,8 @@ define([
           }
 
           return this.isList
-              ? this._valueType.to(valueSpec, this.__listCreateKeyArgs || this.__buildListCreateKeyArgs())
-              : this._valueType.to(valueSpec);
+              ? this.__valueType.to(valueSpec, this.__listCreateKeyArgs || this.__buildListCreateKeyArgs())
+              : this.__valueType.to(valueSpec);
         },
 
         /**
@@ -555,7 +555,7 @@ define([
           return dv
               ? dv.clone()
               : (this.isList
-                  ? this._valueType.create(null, this.__listCreateKeyArgs || this.__buildListCreateKeyArgs())
+                  ? this.__valueType.create(null, this.__listCreateKeyArgs || this.__buildListCreateKeyArgs())
                   : dv);
         },
 
@@ -563,35 +563,34 @@ define([
 
         __buildListCreateKeyArgs: function() {
           return (this.__listCreateKeyArgs = {
-            isBoundary: this._isBoundary,
-            isReadOnly: this._isReadOnly
+            isBoundary: this.__isBoundary,
+            isReadOnly: this.__isReadOnly
           });
         },
         // endregion
 
         // region label attribute
         /**
-         * Resets the label of the property.
+         * Gets the default label of the property.
          *
          * The label of a root property is reset to a capitalization of the `name` attribute.
          * A non-root property inherits the label of its closest ancestor.
          *
-         * @private
+         * @return {?string} The default label or an empty value.
+         * @protected
          */
-        _resetLabel: function() {
-          this._labelSet = false;
-
+        _getLabelDefault: function() {
           if(this.isRoot) {
-            this._label = text.titleFromName(this.name);
-          } else {
-            delete this._label;
+            return text.titleFromName(this.name);
           }
+
+          // return undefined;
         },
         // endregion
 
         // region isReadOnly attribute
         // TODO: shouldn't this only be settable on the root property??
-        _isReadOnly: false,
+        __isReadOnly: false,
 
         /**
          * Gets or sets whether the value of properties of this type can be changed.
@@ -622,26 +621,26 @@ define([
          * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
          */
         get isReadOnly() {
-          return this._isReadOnly;
+          return this.__isReadOnly;
         },
 
         set isReadOnly(value) {
           // Cannot change the root value.
           // Testing this here, instead of after the descendants test,
           // because, otherwise, it would be very hard to test.
-          if(this === _propType) return;
+          if(this === __propType) return;
 
           if(this.hasDescendants)
             throw error.operInvalid("Cannot change the isReadOnly attribute of a property type that has descendants.");
 
           if(value != null && !!value) {
-            this._isReadOnly = true;
+            this.__isReadOnly = true;
           }
         },
         // endregion
 
         // region isBoundary
-        _isBoundary: false,
+        __isBoundary: false,
 
         /**
          * Gets or sets whether the property is a _boundary property_.
@@ -687,14 +686,14 @@ define([
          * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
          */
         get isBoundary() {
-          return this._isBoundary;
+          return this.__isBoundary;
         },
 
         set isBoundary(value) {
           // Cannot change the root value.
           // Testing this here, instead of after the descendants test,
           // because, otherwise, it would be very hard to test.
-          if(this === _propType) return;
+          if(this === __propType) return;
 
           if(!this.isRoot)
             throw error.operInvalid("Cannot only change the isBoundary attribute on a root property type.");
@@ -703,7 +702,7 @@ define([
             throw error.operInvalid("Cannot change the isBoundary attribute of a property type that has descendants.");
 
           if(value != null) {
-            this._isBoundary = !!value;
+            this.__isBoundary = !!value;
           }
         },
         // endregion
@@ -711,9 +710,9 @@ define([
         // endregion
 
         // region property accessor
-        _createValueAccessor: function() {
-          var instance = this._declaringType.instance;
-          var name = this._name;
+        __createValueAccessor: function() {
+          var instance = this.__declaringType.instance;
+          var name = this.__name;
 
           if(!(name in instance)) {
             Object.defineProperty(instance, name, {
@@ -759,7 +758,7 @@ define([
               errors = typeUtil.combineErrors(errors, newErrors);
             };
 
-            var value = owner._getByType(this);
+            var value = owner.__getByType(this);
             if(value) {
               // Intrinsic value validation.
               if(!this.isBoundary) {
@@ -867,7 +866,7 @@ define([
           var spec = {};
           var baseType;
 
-          var valueTypeRef = this._valueType.toRefInContext(keyArgs);
+          var valueTypeRef = this.__valueType.toRefInContext(keyArgs);
 
           // # Abstract Property Types
           //
@@ -882,7 +881,7 @@ define([
           // The default `base` of a root property type is Property
           // and so, in this case, `base` can be omitted.
           //
-          var isAbstract = !this._declaringType;
+          var isAbstract = !this.__declaringType;
           if(isAbstract) {
             // The id, if any, needs to be included.
             // Property has an id. Subtypes of it may not have.
@@ -909,7 +908,7 @@ define([
               // and is omitted if this is the case.
               // Again, the ancestor of a root property is null, and would not work in this case.
               baseType = Object.getPrototypeOf(this);
-              if(baseType !== _propType) {
+              if(baseType !== __propType) {
                 spec.base = baseType.toRefInContext(keyArgs);
                 count++;
               }
@@ -920,7 +919,7 @@ define([
             // so it is never included.
 
             // Always have a name.
-            spec.name = this._name;
+            spec.name = this.__name;
             count++;
 
             // The default value type of non-abstract properties is string
@@ -931,7 +930,7 @@ define([
 
             // If there are no attributes besides `name`
             if(!this._fillSpecInContext(spec, keyArgs) && count === 1) {
-              return this._name;
+              return this.__name;
             }
           }
 
@@ -944,11 +943,11 @@ define([
           var any = this.base(spec, keyArgs);
 
           // Custom attributes
-          var defaultValue = O.getOwn(this, "_defaultValue");
+          var defaultValue = O.getOwn(this, "__defaultValue");
           if(defaultValue !== undefined) {
             any = true;
             if(defaultValue) {
-              keyArgs.declaredType = this._valueType;
+              keyArgs.declaredType = this.__valueType;
               spec.defaultValue = defaultValue.toSpecInContext(keyArgs);
             } else {
               spec.defaultValue = null;
@@ -1142,7 +1141,7 @@ define([
            */
           countMin: {
             value: 0,
-            cast: castCount,
+            cast: __castCount,
             combine: function(baseEval, localEval) {
               return function(propType) {
                 return Math.max(baseEval.call(this, propType), localEval.call(this, propType));
@@ -1228,7 +1227,7 @@ define([
            */
           countMax: {
             value: Infinity,
-            cast: castCount,
+            cast: __castCount,
             combine: function(baseEval, localEval) {
               return function(propType) {
                 return Math.min(baseEval.call(this, propType), localEval.call(this, propType));
@@ -1460,19 +1459,19 @@ define([
       }
     });
 
-    _propType = Property.type;
+    __propType = Property.type;
 
     // Root property valueType.
-    _propType.valueType = "value";
+    __propType.valueType = "value";
 
     return Property;
   };
 
-  function nonEmptyString(value) {
+  function __nonEmptyString(value) {
     return value == null ? null : (String(value) || null);
   }
 
-  function castCount(v) {
+  function __castCount(v) {
     v = +v;
     if(isNaN(v) || v < 0) return;// undefined;
     return Math.floor(v);

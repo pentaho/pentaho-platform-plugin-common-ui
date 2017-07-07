@@ -187,6 +187,7 @@ define([
 
       // region VizAPI implementation
 
+      /** @inheritDoc */
       _updateAll: function() {
         this._dataTable = this.model.data;
 
@@ -214,6 +215,7 @@ define([
         return this._renderCore();
       },
 
+      /** @inheritDoc */
       _updateSize: function() {
         // Resize event throttling
         if(this._lastResizeTimeout != null)
@@ -225,17 +227,15 @@ define([
         }.bind(this), 50);
       },
 
-      /** @override */
+      /** @inheritDoc */
       _releaseDomContainer: function() {
         if(this._chart && this._chart.dispose) {
           this._chart.dispose();
           this._chart = null;
         }
       },
-      // endregion
 
-      // region Helpers
-
+      /** @inheritDoc */
       _updateSelection: function() {
         var dataFilter = this.selectionFilter;
         var selectedItems = this._dataView.filter(dataFilter);
@@ -289,6 +289,10 @@ define([
           return key;
         }
       },
+
+      // endregion
+
+      // region Helpers
 
       _doResize: function() {
         if(this._chart) {

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,8 +68,8 @@ define([
        */
       O.setConst(this, "owner", owner);
 
-      this._isReadOnly = false;
-      this._ownerVersion = owner.$version;
+      this.__isReadOnly = false;
+      this.__ownerVersion = owner.$version;
 
       // The longest path by which this changeset can be reached following the path of changesets
       // and their owner's references.
@@ -84,8 +84,9 @@ define([
      * @param {number} netOrder - The net order.
      * @return {boolean} `true` if the order was updated; `false`, otherwise.
      * @private
+     * @internal
      */
-    _updateNetOrder: function(netOrder) {
+    __updateNetOrder: function(netOrder) {
       if(this._netOrder < netOrder) {
         this._netOrder = netOrder;
         return true;
@@ -97,12 +98,13 @@ define([
     /**
      * Sets a nested changeset of this changeset.
      *
-     * @name pentaho.type.changes.Changeset#_setNestedChangeset
+     * @name pentaho.type.changes.Changeset#__setNestedChangeset
      * @param {!pentaho.type.changes.Changeset} csetNested - The nested changeset.
      * @param {pentaho.type.Property.Type} propType - The property type whose value is the changeset owner.
      * Only applies when this changeset is a complex changeset.
      *
      * @private
+     * @internal
      */
 
     /**
@@ -125,17 +127,18 @@ define([
      * @readOnly
      */
     get isReadOnly() {
-      return this._isReadOnly;
+      return this.__isReadOnly;
     },
 
     /**
      * Sets the changeset to a read-only state.
      *
      * @private
+     * @internal
      * @friend {pentaho.type.changes.Transaction}
      */
-    _setReadOnlyInternal: function() {
-      this._isReadOnly = true;
+    __setReadOnlyInternal: function() {
+      this.__isReadOnly = true;
     },
 
     /**
@@ -145,7 +148,7 @@ define([
      * @readOnly
      */
     get ownerVersion() {
-      return this._ownerVersion;
+      return this.__ownerVersion;
     },
 
     /**
@@ -204,7 +207,7 @@ define([
       this._apply(owner);
 
       // Update version
-      owner._setVersionInternal(version);
+      owner.__setVersionInternal(version);
     }
   });
 });

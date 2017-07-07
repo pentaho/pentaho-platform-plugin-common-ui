@@ -18,15 +18,15 @@ define(["pentaho/i18n/MessageBundle", "json"], function(MessageBundle) {
     load: function(bundlePath, require, onLoad, config) {
       var bundleUrl = require.toUrl(bundlePath) + ".properties";
       require(["text!" + bundleUrl], function(bundleText) {
-        onLoad(new MessageBundle(parseProperties(bundleText)));
+        onLoad(new MessageBundle(__parseProperties(bundleText)));
       });
     },
     normalize: function(name, normalize) {
-      return normalize(getBundleID(name));
+      return normalize(__getBundleID(name));
     }
   };
 
-  function getBundleID(bundlePath) {
+  function __getBundleID(bundlePath) {
     var bundleMid;
     if(!bundlePath) {
       // "pentaho/i18n!"
@@ -51,7 +51,7 @@ define(["pentaho/i18n/MessageBundle", "json"], function(MessageBundle) {
     return bundleMid;
   }
 
-  function parseProperties(text) {
+  function __parseProperties(text) {
     // "Brute" parsing.
     var lines = text.split(/[\n\r]+/);
     var props = {};
