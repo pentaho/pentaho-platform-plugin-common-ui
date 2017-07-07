@@ -132,8 +132,7 @@ define([
         var displayUnitsElem = this.model.get(propName);
         var scaleFactor = displayUnitsElem.type.scaleFactorOf(displayUnitsElem.value);
 
-        this._cartesianAxesDisplayUnitsText[axisType] =
-            scaleFactor > 1 ? displayUnitsType.domain.get(displayUnitsElem).toString() : "";
+        this._cartesianAxesDisplayUnitsText[axisType] = scaleFactor > 1 ? displayUnitsElem.formatted : "";
       }
     });
   };
