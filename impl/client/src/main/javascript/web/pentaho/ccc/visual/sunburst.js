@@ -158,7 +158,7 @@ define([
       },
 
       _configureDisplayUnits: function() {
-        var displayUnitsType = this.model.type.get("displayUnits", true).valueType;
+        var displayUnitsType = this.model.type.get("displayUnits").valueType;
         var displayUnits = this.model.displayUnits;
         var scaleFactor = displayUnitsType.scaleFactorOf(displayUnits);
         if(scaleFactor > 1) {
