@@ -25,15 +25,15 @@
 /**
  * The base url of the web server application.
  *
- * @name url
+ * @name root
  * @memberOf pentaho.context.spec.IServer#
  * @type {?nonEmptyString}
  */
 
 /**
- * The base cxf endpoint of the web server application.
+ * The base services endpoint of the web server application.
  *
- * @name cxf
+ * @name services
  * @memberOf pentaho.context.spec.IServer#
  * @type {?nonEmptyString}
  */

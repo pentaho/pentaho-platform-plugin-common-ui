@@ -124,7 +124,8 @@ define([
     }
 
     testContextProperty("application", "application", "ABC");
-    testContextProperty("server.url.href", "server.url", "http://host:8888/path");
+    testContextProperty("server.root.href", "server.root", "http://host:8888/path");
+    testContextProperty("server.services.href", "server.services", "http://host:8888/path/services");
 
     testContextProperty("user.id", "user.id", "ABC");
     testContextProperty("user.home", "user.home", "ABC");
