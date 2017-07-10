@@ -15,19 +15,19 @@
  */
 
 /**
- * The `IContext` interface allows access to environmental information of the Pentaho Platform.
+ * The `IEnvironment` interface allows access to environmental information of the Pentaho Platform.
  * For example, it allows access to
- * [user]{@link pentaho.context.IContext#user},
- * [theme]{@link pentaho.context.IContext#theme},
- * [locale]{@link pentaho.context.IContext#locale},
- * [application]{@link pentaho.context.IContext#application}
+ * [user]{@link pentaho.environment.IEnvironment#user},
+ * [theme]{@link pentaho.environment.IEnvironment#theme},
+ * [locale]{@link pentaho.environment.IEnvironment#locale},
+ * [application]{@link pentaho.environment.IEnvironment#application}
  * and
- * [server]{@link pentaho.context.IContext#server}.
+ * [server]{@link pentaho.environment.IEnvironment#server}.
  *
  * Not all information is always available, or sometimes it is not fixed,
  * and so some of these can be `null`. Check the documentation of each property and sub-property.
  *
- * @name pentaho.context.IContext
+ * @name pentaho.environment.IEnvironment
  * @interface
  */
 
@@ -35,7 +35,7 @@
  * Gets the identifier of the client application.
  *
  * @name application
- * @memberOf pentaho.context.IContext#
+ * @memberOf pentaho.environment.IEnvironment#
  * @type {?nonEmptyString}
  * @readOnly
  */
@@ -44,8 +44,8 @@
  * Gets information about the user.
  *
  * @name user
- * @memberOf pentaho.context.IContext#
- * @type {!pentaho.context.IUser}
+ * @memberOf pentaho.environment.IEnvironment#
+ * @type {!pentaho.environment.IUser}
  * @readOnly
  */
 
@@ -53,8 +53,8 @@
  * Gets information about the server web application.
  *
  * @name server
- * @memberOf pentaho.context.IContext#
- * @type {!pentaho.context.IServer}
+ * @memberOf pentaho.environment.IEnvironment#
+ * @type {!pentaho.environment.IServer}
  * @readOnly
  */
 
@@ -62,7 +62,7 @@
  * Gets the identifier of the theme.
  *
  * @name theme
- * @memberOf pentaho.context.IContext#
+ * @memberOf pentaho.environment.IEnvironment#
  * @type {?nonEmptyString}
  * @readOnly
  */
@@ -71,7 +71,7 @@
  * Gets the identifier of the locale.
  *
  * @name locale
- * @memberOf pentaho.context.IContext#
+ * @memberOf pentaho.environment.IEnvironment#
  * @type {?nonEmptyString}
  * @readOnly
  */
@@ -80,7 +80,7 @@
  * Gets the reserved characters for file names, all concatenated in a single string.
  *
  * @name reservedChars
- * @memberOf pentaho.context.IContext#
+ * @memberOf pentaho.environment.IEnvironment#
  * @type {?nonEmptyString}
  * @readOnly
  */
@@ -90,30 +90,30 @@
  * Any unspecified information is inherited from this context.
  *
  * @name createChild
- * @memberOf pentaho.context.IContext#
+ * @memberOf pentaho.environment.IEnvironment#
  * @method
- * @param {pentaho.context.spec.IContext} [childSpec] - The child context specification.
- * @return {!pentaho.context.IContext} The child context.
+ * @param {pentaho.environment.spec.IEnvironment} [childSpec] - The child context specification.
+ * @return {!pentaho.environment.IEnvironment} The child context.
  */
 
 /**
  * Creates a specification with the information of this context.
  *
  * @name toSpec
- * @memberOf pentaho.context.IContext#
+ * @memberOf pentaho.environment.IEnvironment#
  * @method
- * @return {!pentaho.context.spec.IContext} The context specification.
- * @see pentaho.context.IContext#toJSON
+ * @return {!pentaho.environment.spec.IEnvironment} The context specification.
+ * @see pentaho.environment.IEnvironment#toJSON
  */
 
 /**
  * Serializes this context to JSON.
  *
- * This method is an alias of [toSpec]{pentaho.context.IContext#toSpec}.
+ * This method is an alias of [toSpec]{pentaho.environment.IEnvironment#toSpec}.
  *
  * @name toJSON
- * @memberOf pentaho.context.IContext#
+ * @memberOf pentaho.environment.IEnvironment#
  * @method
- * @return {!pentaho.context.spec.IContext} The context specification.
- * @see pentaho.context.IContext#toSpec
+ * @return {!pentaho.environment.spec.IEnvironment} The context specification.
+ * @see pentaho.environment.IEnvironment#toSpec
  */

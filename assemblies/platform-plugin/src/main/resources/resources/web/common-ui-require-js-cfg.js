@@ -34,6 +34,7 @@
   var requirePaths = requireCfg.paths;
   var requireShim = requireCfg.shim;
   var requireMap = requireCfg.map;
+  var requirePackages = requireCfg.packages;
 
   // TODO: This fallback logic is temporary, and can be removed when the remaining
   //    parts of the system rename the "service" plugin id to "pentaho/service".
@@ -56,12 +57,10 @@
   [
     "shim", "util", "lang",
     "i18n", "service", "data", "type", "typeInfo",
-    "visual", "config", "context", "debug", "ccc"
+    "visual", "config", "environment", "debug", "ccc"
   ].forEach(function(name) {
     requirePaths["pentaho/" + name] = basePath + "/pentaho/" + name;
   });
-
-  requireTypes["pentaho/visual/config/vizApi.conf"] = "pentaho.config.spec.IRuleSet";
 
   // Named instances
   requireTypes["pentaho/config/impl/instanceOfAmdLoadedService"] = "pentaho.config.IService";
@@ -187,9 +186,6 @@
   // underscore should be required using the module ID above, creating a map entry to guarantee backwards compatibility
   requireMap["*"]["underscore"] = "common-ui/underscore"; // deprecated
 
-  // TODO Remove when BACKLOG-16424 is completed
-  requireMap["*"]["pentaho/environment"] = "pentaho/context";
-
   // ANGULAR
   requirePaths["common-ui/angular"] = basePath + "/angular/angular" + minSuffix;
   requireShim["common-ui/angular"] = {
@@ -279,8 +275,10 @@
   // sample/calc theme
   mapTheme("pentaho/visual/samples/calc", "themes", ["crystal"]);
 
-  requireCfg.packages.push({"name": "pentaho/visual/base", "main": "model"});
-  requireCfg.packages.push({"name": "pentaho/visual/samples/calc", "main": "model"});
+  requireTypes["pentaho/visual/config/vizApi.conf"] = "pentaho.config.spec.IRuleSet";
+
+  requirePackages.push({"name": "pentaho/visual/base", "main": "model"});
+  requirePackages.push({"name": "pentaho/visual/samples/calc", "main": "model"});
 
   [
     // base visual

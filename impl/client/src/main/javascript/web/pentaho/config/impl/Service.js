@@ -24,11 +24,11 @@ define([
   "use strict";
 
   /**
-   * List of names of context variables that are handled "generically" when sorting rules.
+   * List of names of environment variables that are handled "generically" when sorting rules.
    * More specific first.
    *
    * @type {string[]}
-   * @see pentaho.context.IContext
+   * @see pentaho.environment.IEnvironment
    * @see _ruleComparer
    * @see _ruleFilterer
    */
@@ -182,7 +182,7 @@ define([
    * Determines if a given rule is selected by the current context.
    *
    * @param {pentaho.config.spec.IRule} rule - A type configuration rule to check.
-   * @this pentaho.context.IContext
+   * @this pentaho.environment.IEnvironment
    * @return {boolean} `true` if `rule` is selected, `false`, otherwise.
    */
   function _ruleFilterer(rule) {

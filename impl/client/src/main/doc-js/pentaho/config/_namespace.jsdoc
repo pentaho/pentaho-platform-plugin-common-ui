@@ -34,7 +34,7 @@
  * as a service of type `pentaho.config.spec.IRuleSet`.
  *
  * **Configuration rules** specify the _type_ and the values of any
- * [Pentaho environmental variables]{@link pentaho.context.IContext}
+ * [Pentaho environmental variables]{@link pentaho.environment.IEnvironment}
  * to which they apply,
  * as well as the actual configuration properties that should be applied.
  *

@@ -54,7 +54,7 @@
  *
  * ### Rule Selection
  *
- * A rule is selected by a given type and context variables,
+ * A rule is selected by a given type and environment variables,
  * if the type and variables match the rule's
  * [selection variables]{@link pentaho.config.spec.IRule#select}.
  *

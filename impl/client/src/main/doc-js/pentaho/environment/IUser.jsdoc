@@ -15,25 +15,28 @@
  */
 
 /**
- * The `spec.IUser` interface represents a specification of [IUser]{@link pentaho.context.IUser}.
+ * The `IUser` interface allows access to the Pentaho Platform's
+ * environmental information that pertains to the user.
  *
- * @name pentaho.context.spec.IUser
+ * @name pentaho.environment.IUser
  * @interface
- * @see pentaho.context.spec.IContext
+ * @see pentaho.environment.IEnvironment
  */
 
 /**
- * The identifier of the user.
+ * Gets the identifier of the user.
  *
  * @name id
- * @memberOf pentaho.context.spec.IUser#
+ * @memberOf pentaho.environment.IUser#
  * @type {?nonEmptyString}
+ * @readOnly
  */
 
 /**
- * The home folder of the user.
+ * Gets the home folder of the user.
  *
  * @name home
- * @memberOf pentaho.context.spec.IUser#
+ * @memberOf pentaho.environment.IUser#
  * @type {?nonEmptyString}
+ * @readOnly
  */

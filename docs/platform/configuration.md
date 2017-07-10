@@ -26,10 +26,10 @@ as a service of type [`pentaho.config.spec.IRuleSet`]({{site.refDocsUrlPattern |
 
 1. The [**select**]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule#select'}}) object
    specifies the targeted _type_ (or _types_) and the values of any 
-   [Pentaho environment variables]({{site.refDocsUrlPattern | replace: '$', 'pentaho.context.IContext'}})
+   [Pentaho environment variables]({{site.refDocsUrlPattern | replace: '$', 'pentaho.environment.IEnvironment'}})
    to which it applies. Alternative values for a variable can be specified using a JavaScript array. 
    The most useful environment variable is 
-   [application]({{site.refDocsUrlPattern | replace: '$', 'pentaho.context.IContext#application'}}),
+   [application]({{site.refDocsUrlPattern | replace: '$', 'pentaho.environment.IEnvironment#application'}}),
    as it allows creating rules that are only applied when a _type_ is being used by a certain _application_,
    like, for example, 
    [CDF](http://community.pentaho.com/ctools/cdf/) or 

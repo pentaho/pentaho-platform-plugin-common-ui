@@ -22,7 +22,7 @@ define([
   "./standard",
   "./SpecificationContext",
   "./SpecificationScope",
-  "../context",
+  "../environment",
   "../service!pentaho.config.IService?single",
   "./changes/Transaction",
   "./changes/TransactionScope",
@@ -34,7 +34,7 @@ define([
   "../util/object",
   "../util/fun"
 ], function(localRequire, module, service, typeInfo, bundle, standard, SpecificationContext, SpecificationScope,
-    mainPlatformContext, configurationService,
+    mainPlatformEnv, configurationService,
     Transaction, TransactionScope, CommittedScope,
     Base, promiseUtil, arg, error, O, F) {
 
@@ -84,12 +84,12 @@ define([
      * This applies whether an instance constructor is used for creating an instance or to derive a subtype.
      *
      * A type context holds environmental information in the form of an environment of the
-     * [JavaScript Pentaho Platform]{@link pentaho.context.IContext},
+     * [JavaScript Pentaho Platform]{@link pentaho.environment.IEnvironment},
      * which contains relevant information such as:
-     * [application]{@link pentaho.context.IContext#application},
-     * [user]{@link pentaho.context.IContext#user},
-     * [theme]{@link pentaho.context.IContext#theme} and
-     * [locale]{@link pentaho.context.IContext#locale}.
+     * [application]{@link pentaho.environment.IEnvironment#application},
+     * [user]{@link pentaho.environment.IEnvironment#user},
+     * [theme]{@link pentaho.environment.IEnvironment#theme} and
+     * [locale]{@link pentaho.environment.IEnvironment#locale}.
      * Their values determine (or "select") the _type configuration rules_ that
      * apply and are used to configure the constructors provided by the context.
      *
@@ -145,20 +145,20 @@ define([
      *
      * @constructor
      * @description Creates a `Context` with given variables.
-     * @param {pentaho.context.spec.IContext} [platformContextSpec] The context variables' specification.
-     * When unspecified, it defaults to {@link pentaho.context.main}.
+     * @param {pentaho.environment.spec.IEnvironment} [envSpec] The environment variables' specification.
+     * When unspecified, it defaults to {@link pentaho.environment.main}.
      * Unspecified platform context properties default to the value of those of the default context.
      */
-    constructor: function(platformContextSpec) {
+    constructor: function(envSpec) {
       /**
        * The associated platform context.
        *
-       * @type {!pentaho.context.IContext}
+       * @type {!pentaho.environment.IEnvironment}
        * @private
        */
-      this.__env = !platformContextSpec ? mainPlatformContext :
-          platformContextSpec.createChild ? platformContextSpec :
-          mainPlatformContext.createChild(platformContextSpec);
+      this.__env = !envSpec ? mainPlatformEnv :
+          envSpec.createChild ? envSpec :
+          mainPlatformEnv.createChild(envSpec);
 
       /**
        * The configuration depth is incremented each time the context
@@ -253,10 +253,10 @@ define([
     /**
      * Gets the associated platform environment.
      *
-     * @type {!pentaho.context.IContext}
+     * @type {!pentaho.environment.IEnvironment}
      * @readOnly
      */
-    get vars() {
+    get environment() {
       return this.__env;
     },
 
@@ -1220,8 +1220,8 @@ define([
     /**
      * Gets the default type context of the Pentaho Type API.
      *
-     * This type context instance is created with the Pentaho Platform's default context variables,
-     * as given by {@link pentaho.context.main}.
+     * This type context instance is created with the Pentaho Platform's default environment,
+     * as given by {@link pentaho.environment.main}.
      *
      * @type {!pentaho.type.Context}
      * @readOnly

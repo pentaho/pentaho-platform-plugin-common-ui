@@ -48,20 +48,20 @@ define([
         });
       });
 
-      it("should create a context that has a ContextVars in #vars", function() {
+      it("should create a context that has an Environment in #environment", function() {
 
         return require.using(["pentaho/type/Context"], function(Context) {
           var context = new Context();
-          expect(context.vars instanceof Object).toBe(true);
+          expect(context.environment instanceof Object).toBe(true);
         });
       });
 
-      it("should create a context that has a pentaho.context.main by default", function() {
+      it("should create a context that has a pentaho.environment.main by default", function() {
 
-        return require.using(["pentaho/type/Context", "pentaho/context"],
-        function(Context, contextVarsDefault) {
+        return require.using(["pentaho/type/Context", "pentaho/environment"],
+        function(Context, envDefault) {
           var context = new Context();
-          expect(context.vars).toBe(contextVarsDefault);
+          expect(context.environment).toBe(envDefault);
         });
       });
 
@@ -78,9 +78,9 @@ define([
 
         return require.using(["pentaho/type/Context"],
         function(Context) {
-          var customContext = {createChild: function() {}}; // duck typing
-          var context = new Context(customContext);
-          expect(context.vars).toBe(customContext);
+          var customEnv = {createChild: function() {}}; // duck typing
+          var context = new Context(customEnv);
+          expect(context.environment).toBe(customEnv);
         });
       });
     });
@@ -1838,11 +1838,11 @@ define([
         });
       });
 
-      it("should create a context that has as vars the value of pentaho.context.main", function() {
+      it("should create a context that has as environment the value of pentaho.environment.main", function() {
 
-        return require.using(["pentaho/type/Context", "pentaho/context"], function(Context, contextVarsDefault) {
+        return require.using(["pentaho/type/Context", "pentaho/environment"], function(Context, envDefault) {
           var context = Context.instance;
-          expect(context.vars).toBe(contextVarsDefault);
+          expect(context.environment).toBe(envDefault);
         });
       });
 

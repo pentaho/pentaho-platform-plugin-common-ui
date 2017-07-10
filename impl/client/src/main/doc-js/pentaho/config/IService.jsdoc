@@ -24,7 +24,7 @@
  *
  * The [select]{@link pentaho.config.IService#select} method
  * selects the rules of added configurations that apply to
- * a given type and context variables,
+ * a given type and environment variables,
  * sorts these by specificity,
  * then merges the rules' [specifications]{@link pentaho.config.spec.IRule#apply}
  * and returns the result.
@@ -35,7 +35,7 @@
  *
  * Normally, you would not call these operations directly.
  *
- * Then, the [Context]{@link pentaho.type.Context} class
+ * Then, the [type.Context]{@link pentaho.type.Context} class
  * already handles obtaining configurations from its configuration service,
  * and applying these to the requested value types.
  *
@@ -91,7 +91,7 @@
 
 /**
  * Obtains the merged configuration specification of
- * the selection of configuration rules that apply to a given type and context variables.
+ * the selection of configuration rules that apply to a given type and environment variables.
  *
  * @name select
  * @memberOf pentaho.config.IService#
@@ -99,7 +99,7 @@
  *
  * @param {string} typeId - The id of the type whose configuration specification is desired.
  *
- * @param {pentaho.context.IContext} [context] The platform context that is used to select rules.
+ * @param {pentaho.environment.IEnvironment} [environment] The platform environment that is used to select rules.
  *
  * A {@link Nully} variable value is equivalent to a variable that is not present.
  * It matches only configuration rules that do not select that variable.

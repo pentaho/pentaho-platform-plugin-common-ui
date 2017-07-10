@@ -24,7 +24,7 @@
  */
 
 define([
-  "./context",
+  "./environment",
   "./i18n/MessageBundle",
   "json"
 ], function(context, MessageBundle) {

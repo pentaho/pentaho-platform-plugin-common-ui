@@ -13,26 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "module",
-  "./context/impl/Context"
-], function(module, Context) {
 
-  "use strict";
+/**
+ * The `spec.IServer` interface represents a specification of [IServer]{@link pentaho.environment.IServer}.
+ *
+ * @name pentaho.environment.spec.IServer
+ * @interface
+ * @see pentaho.environment.spec.IEnvironment
+ */
 
-  // This singleton instance module does not use an intermediary interface to be resolved,
-  // as it may be used in a bootstrapping phase.
+/**
+ * The base url of the web server application.
+ *
+ * @name root
+ * @memberOf pentaho.environment.spec.IServer#
+ * @type {?nonEmptyString}
+ */
 
-  /**
-   * The _main_ environment of the JavaScript Pentaho Platform.
-   *
-   * This instance is initialized with the environment specification
-   * which is the value of this module's AMD configuration.
-   *
-   * @name pentaho.context.main
-   * @type pentaho.context.IContext
-   * @amd pentaho/context
-   * @see pentaho.context.spec.IContext
-   */
-  return new Context(module.config());
-});
+/**
+ * The base url of services' endpoints of the web server application.
+ *
+ * @name services
+ * @memberOf pentaho.environment.spec.IServer#
+ * @type {?nonEmptyString}
+ */

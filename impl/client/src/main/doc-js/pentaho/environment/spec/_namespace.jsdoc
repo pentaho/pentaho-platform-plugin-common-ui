@@ -17,6 +17,6 @@
 /**
  * The `context.spec` namespace contains specification interfaces.
  *
- * @name pentaho.context.spec
+ * @name pentaho.environment.spec
  * @namespace
  */

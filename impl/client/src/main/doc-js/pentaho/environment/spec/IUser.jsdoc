@@ -15,9 +15,25 @@
  */
 
 /**
- * The `impl` namespace contains implementation classes related to the platform environment.
+ * The `spec.IUser` interface represents a specification of [IUser]{@link pentaho.environment.IUser}.
  *
- * @name pentaho.context.impl
- * @namespace
- * @private
+ * @name pentaho.environment.spec.IUser
+ * @interface
+ * @see pentaho.environment.spec.IEnvironment
+ */
+
+/**
+ * The identifier of the user.
+ *
+ * @name id
+ * @memberOf pentaho.environment.spec.IUser#
+ * @type {?nonEmptyString}
+ */
+
+/**
+ * The home folder of the user.
+ *
+ * @name home
+ * @memberOf pentaho.environment.spec.IUser#
+ * @type {?nonEmptyString}
  */

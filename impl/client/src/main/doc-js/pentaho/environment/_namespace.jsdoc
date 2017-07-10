@@ -19,21 +19,21 @@
  *
  * ## Overview
  *
- * The [IContext]{@link pentaho.context.IContext} interface is the top interface that represents the environment.
+ * The [IEnvironment]{@link pentaho.environment.IEnvironment} interface is the top interface that represents the environment.
  * Part of its information is described by the contained
- * [IServer]{@link pentaho.context.IServer} and
- * [IUser]{@link pentaho.context.IUser} interfaces.
+ * [IServer]{@link pentaho.environment.IServer} and
+ * [IUser]{@link pentaho.environment.IUser} interfaces.
  *
- * {@link pentaho.context.main} is the _main_ environment instance of the Pentaho Platform.
+ * {@link pentaho.environment.main} is the _main_ environment instance of the Pentaho Platform.
  * Secondary environments can be derived from the main environment,
- * by using its [IContext#createChild]{@link pentaho.context.IContext#createChild} method.
+ * by using its [IEnvironment#createChild]{@link pentaho.environment.IEnvironment#createChild} method.
  *
- * The specification classes, in the {@link pentaho.context.spec} namespace,
+ * The specification classes, in the {@link pentaho.environment.spec} namespace,
  * expose the raw environmental data in plain JavaScript objects or JSON format.
  * These
- * can be used in [IContext#createChild]{@link pentaho.context.IContext#createChild} or
- * result from [IContext#toSpec]{@link pentaho.context.IContext#toSpec}.
+ * can be used in [IEnvironment#createChild]{@link pentaho.environment.IEnvironment#createChild} or
+ * result from [IEnvironment#toSpec]{@link pentaho.environment.IEnvironment#toSpec}.
  *
- * @name pentaho.context
+ * @name pentaho.environment
  * @namespace
  */

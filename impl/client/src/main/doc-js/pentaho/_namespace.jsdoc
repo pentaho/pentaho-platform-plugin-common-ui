@@ -37,7 +37,7 @@
  * The APIs are organized as follows:
  *
  * 1. Core
- *   * Environment — {@link pentaho.context}
+ *   * Environment — {@link pentaho.environment}
  *   * Debugging — {@link pentaho.debug}
  *   * Utilities — {@link pentaho.util}
  *   * JavaScript Language support — {@link pentaho.lang}

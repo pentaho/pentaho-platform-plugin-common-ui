@@ -15,28 +15,9 @@
  */
 
 /**
- * The `IUser` interface allows access to the Pentaho Platform's
- * environmental information that pertains to the user.
+ * The `impl` namespace contains implementation classes related to the platform environment.
  *
- * @name pentaho.context.IUser
- * @interface
- * @see pentaho.context.IContext
- */
-
-/**
- * Gets the identifier of the user.
- *
- * @name id
- * @memberOf pentaho.context.IUser#
- * @type {?nonEmptyString}
- * @readOnly
- */
-
-/**
- * Gets the home folder of the user.
- *
- * @name home
- * @memberOf pentaho.context.IUser#
- * @type {?nonEmptyString}
- * @readOnly
+ * @name pentaho.environment.impl
+ * @namespace
+ * @private
  */

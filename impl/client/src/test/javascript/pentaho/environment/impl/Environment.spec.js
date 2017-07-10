@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 define([
-  "pentaho/context/impl/Context"
+  "pentaho/environment/impl/Environment"
 ], function(Context) {
 
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false */
 
-  describe("pentaho.context.impl.Context -", function() {
+  describe("pentaho.environment.impl.Context -", function() {
 
     var contextSpec = {
       application: "APP-1",
@@ -209,5 +209,5 @@ define([
         expect(childContext.toSpec()).toEqual(contextSpec);
       });
     });
-  }); // pentaho.context.impl.Context
+  }); // pentaho.environment.impl.Context
 });
