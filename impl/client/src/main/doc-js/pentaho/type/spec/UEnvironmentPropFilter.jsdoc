@@ -15,19 +15,19 @@
  */
 
 /**
- * A `spec.UContextPropFilter` represents the union of JS types that can be used to
- * filter the value of a [context property]{@link pentaho.context.IContext},
+ * A `spec.UEnvironmentPropFilter` represents the union of JS types that can be used to
+ * filter the value of an [environment variable]{@link pentaho.environment.IEnvironment},
  * in the [select]{@link pentaho.config.spec.IRule#select} attribute
  * of a type configuration rule.
  *
  * A {@link Nully} filter is equivalent to not filtering a variable.
- * When unfiltered, any context variable value is matched.
+ * When unfiltered, any environment variable value is matched.
  *
- * An array filter matches a context variable if any of the values in the array
- * are the same exact value of the context variable.
+ * An array filter matches an environment variable if any of the values in the array
+ * are the same exact value of the environment variable.
  *
- * Any other value is assumed to be a single value, and matches the context variable
+ * Any other value is assumed to be a single value, and matches the environment variable
  * if it is the same value.
  *
- * @typedef {Nully|any|Array.<any>} pentaho.type.spec.UContextPropFilter
+ * @typedef {Nully|any|Array.<any>} pentaho.type.spec.UEnvironmentPropFilter
  */

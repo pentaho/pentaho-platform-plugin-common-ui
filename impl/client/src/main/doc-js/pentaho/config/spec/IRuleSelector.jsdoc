@@ -17,13 +17,13 @@
 /**
  * The `config.spec.IRuleSelector` interface describes
  * the criteria map that determines if a rule is selected
- * for a given type and context variables.
+ * for a given type and environment variables.
  *
  * It is the type of the [select]{@link pentaho.config.spec.IRule#select} property
  * of a configuration rule.
  *
  * Besides the [type]{@link pentaho.config.spec.IRuleSelector#type} property,
- * this interface allows filtering on any of the [context properties]{@link pentaho.context.IContext}.
+ * this interface allows filtering on any of the [context properties]{@link pentaho.environment.IEnvironment}.
  *
  * @name pentaho.config.spec.IRuleSelector
  * @interface
@@ -38,7 +38,7 @@
  *
  * @name type
  * @memberOf pentaho.config.spec.IRuleSelector#
- * @type {pentaho.type.spec.UContextPropFilter<string>}
+ * @type {pentaho.type.spec.UEnvironmentPropFilter<string>}
  */
 
 /**
@@ -46,7 +46,7 @@
  *
  * @name application
  * @memberOf pentaho.config.spec.IRuleSelector#
- * @type {pentaho.type.spec.UContextPropFilter<string>}
+ * @type {pentaho.type.spec.UEnvironmentPropFilter<string>}
  */
 
 /**
@@ -54,7 +54,7 @@
  *
  * @name user
  * @memberOf pentaho.config.spec.IRuleSelector#
- * @type {pentaho.type.spec.UContextPropFilter<string>}
+ * @type {pentaho.type.spec.UEnvironmentPropFilter<string>}
  */
 
 /**
@@ -62,7 +62,7 @@
  *
  * @name theme
  * @memberOf pentaho.config.spec.IRuleSelector#
- * @type {pentaho.type.spec.UContextPropFilter<string>}
+ * @type {pentaho.type.spec.UEnvironmentPropFilter<string>}
  */
 
 /**
@@ -70,5 +70,5 @@
  *
  * @name locale
  * @memberOf pentaho.config.spec.IRuleSelector#
- * @type {pentaho.type.spec.UContextPropFilter<string>}
+ * @type {pentaho.type.spec.UEnvironmentPropFilter<string>}
  */

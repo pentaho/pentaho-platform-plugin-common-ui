@@ -20,25 +20,26 @@ define(["pentaho/util/has"], function(has) {
   /* eslint new-cap: 0 */
 
   /**
-   * @alias Context
-   * @memberOf pentaho.context.impl
+   * @alias Environment
+   * @memberOf pentaho.environment.impl
    *
    * @class
-   * @implements pentaho.context.IContext
+   * @implements pentaho.environment.IEnvironment
    *
-   * @classDesc The `Context` class is an implementation of the [IContext]{@link pentaho.context.IContext} interface.
+   * @classDesc The `Environment` class is an implementation of
+   * the [IEnvironment]{@link pentaho.environment.IEnvironment} interface.
    *
    * @constructor
-   * @description Creates a context given its specification.
+   * @description Creates an environment given its specification.
    *
    * Any absent or `undefined`-valued properties assume the values of the given default specification, if any,
    * or `null`, if none.
    *
-   * @param {pentaho.context.spec.IContext} [spec] The context specification.
-   * @param {pentaho.context.spec.IContext} [defaultSpec] The context specification
+   * @param {pentaho.environment.spec.IEnvironment} [spec] The environment specification.
+   * @param {pentaho.environment.spec.IEnvironment} [defaultSpec] The environment specification
    * from which unspecified or `undefined` `spec` properties are initialized.
    */
-  function pentaho_context_impl_Context(spec, defaultSpec) {
+  function pentaho_environment_impl_Environment(spec, defaultSpec) {
 
     if(!spec) spec = {};
 
@@ -84,9 +85,9 @@ define(["pentaho/util/has"], function(has) {
     Object.freeze(this);
   }
 
-  var proto = pentaho_context_impl_Context.prototype = /** @lends pentaho.context.impl.Context# */{
+  var proto = pentaho_environment_impl_Environment.prototype = /** @lends pentaho.environment.impl.Environment# */{
     createChild: function(childSpec) {
-      return new pentaho_context_impl_Context(childSpec, this.toSpec());
+      return new pentaho_environment_impl_Environment(childSpec, this.toSpec());
     },
 
     toSpec: function() {
@@ -109,7 +110,7 @@ define(["pentaho/util/has"], function(has) {
 
   proto.toJSON = proto.toSpec;
 
-  return pentaho_context_impl_Context;
+  return pentaho_environment_impl_Environment;
 
   function readVar(spec, name, defaultSpec) {
     return (spec && spec[name]) || (defaultSpec && defaultSpec[name]) || null;

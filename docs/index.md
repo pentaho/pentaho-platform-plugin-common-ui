@@ -97,7 +97,7 @@ The APIs are organized as follows:
                         <dl>
                             <dt>
                                 <a title="Pentaho JavaScript Environment API" 
-                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.context'}}">Environment</a>
+                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.environment'}}">Environment</a>
                             </dt>
                             <dd>Platform environmental information.</dd>
                         </dl>

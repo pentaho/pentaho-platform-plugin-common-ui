@@ -72,7 +72,7 @@ var requireCfg = {
     },
     "pentaho/typeInfo": {
     },
-    "pentaho/context": {
+    "pentaho/environment": {
       locale: SESSION_LOCALE,
       server: {
         root: CONTEXT_PATH,

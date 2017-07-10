@@ -39,7 +39,7 @@
 
 /**
  * The criteria map that determines when a rule is selected for a
- * given type and context variables.
+ * given type and environment variables.
  *
  * When the map is unspecified,
  * it is like every selection variable had been specified with a `null` value.

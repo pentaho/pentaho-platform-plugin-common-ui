@@ -15,18 +15,18 @@
  */
 
 /**
- * The `spec.IContext` interface represents a specification of [IContext]{@link pentaho.context.IContext}.
+ * The `spec.IEnvironment` interface represents a specification of [IEnvironment]{@link pentaho.environment.IEnvironment}.
  *
- * @name pentaho.context.spec.IContext
+ * @name pentaho.environment.spec.IEnvironment
  * @interface
- * @see pentaho.context.IContext
+ * @see pentaho.environment.IEnvironment
  */
 
 /**
  * The identifier of the client application.
  *
  * @name application
- * @memberOf pentaho.context.spec.IContext#
+ * @memberOf pentaho.environment.spec.IEnvironment#
  * @type {?nonEmptyString}
  */
 
@@ -34,23 +34,23 @@
  * The information about the user.
  *
  * @name user
- * @memberOf pentaho.context.spec.IContext#
- * @type {!pentaho.context.spec.IUser}
+ * @memberOf pentaho.environment.spec.IEnvironment#
+ * @type {!pentaho.environment.spec.IUser}
  */
 
 /**
  * The information about the server web application.
  *
  * @name server
- * @memberOf pentaho.context.spec.IContext#
- * @type {!pentaho.context.spec.IServer}
+ * @memberOf pentaho.environment.spec.IEnvironment#
+ * @type {!pentaho.environment.spec.IServer}
  */
 
 /**
  * The identifier of the theme.
  *
  * @name theme
- * @memberOf pentaho.context.spec.IContext#
+ * @memberOf pentaho.environment.spec.IEnvironment#
  * @type {?nonEmptyString}
  */
 
@@ -60,7 +60,7 @@
  * Locales are converted to lower-case. Case differences are not significant.
  *
  * @name locale
- * @memberOf pentaho.context.spec.IContext#
+ * @memberOf pentaho.environment.spec.IEnvironment#
  * @type {?nonEmptyString}
  */
 
@@ -68,6 +68,6 @@
  * The reserved characters for file names, all concatenated in a single string.
  *
  * @name reservedChars
- * @memberOf pentaho.context.spec.IContext#
+ * @memberOf pentaho.environment.spec.IEnvironment#
  * @type {?nonEmptyString}
  */

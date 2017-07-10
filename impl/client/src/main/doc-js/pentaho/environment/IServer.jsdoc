@@ -18,9 +18,9 @@
  * The `IServer` interface allows access to the Pentaho Platform’s
  * environmental information that pertains to the server application.
  *
- * @name pentaho.context.IServer
+ * @name pentaho.environment.IServer
  * @interface
- * @see pentaho.context.IContext
+ * @see pentaho.environment.IEnvironment
  */
 
 /**
@@ -31,7 +31,16 @@
  * properties.
  *
  * @name url
- * @memberOf pentaho.context.IServer#
- * @type {?URL}
+ * @memberOf pentaho.environment.IServer#
+ * @type {URL}
+ * @readOnly
+ */
+
+/**
+ * The base url of services' endpoints of the web server application.
+ *
+ * @name services
+ * @memberOf pentaho.environment.IServer#
+ * @type {URL}
  * @readOnly
  */

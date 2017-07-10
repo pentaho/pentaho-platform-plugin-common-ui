@@ -24,7 +24,7 @@ define([
   // Use alternate, promise-aware version of `it`.
   var it = testUtils.itAsync;
 
-  describe("pentaho.context", function() {
+  describe("pentaho.environment", function() {
 
     // Gets the value of a property path.
     function getPath(o, path, dv, create) {
@@ -63,7 +63,7 @@ define([
       return o;
     }
 
-    // Configures the pentaho/context AMD module with a given configuration object.
+    // Configures the pentaho/environment AMD module with a given configuration object.
     function mockConfigWith(specPropPath, value) {
 
       var spec = {};
@@ -74,20 +74,20 @@ define([
         // reset config first
         localRequire.config({
           config: {
-            "pentaho/context": null
+            "pentaho/environment": null
           }
         });
 
         localRequire.config({
           config: {
-            "pentaho/context": spec
+            "pentaho/environment": spec
           }
         });
       };
     }
 
     /**
-     * Tests that a context variable is properly implemented.
+     * Tests that an environment variable is properly implemented.
      *
      * @param {string} propPath - The name of the context property.
      * @param {string} specPropPath - The name of the context specification property.
@@ -102,21 +102,21 @@ define([
 
         it("should have a null value when " + specPropPath + " is undefined", function() {
 
-          return require.using(["pentaho/context"], mockConfigWith(), function(contextVars) {
+          return require.using(["pentaho/environment"], mockConfigWith(), function(contextVars) {
             expect(getPath(contextVars, propPath, null)).toBe(null);
           });
         });
 
         it("should have a null value when " + specPropPath + " is empty", function() {
 
-          return require.using(["pentaho/context"], mockConfigWith(specPropPath, ""), function(contextVars) {
+          return require.using(["pentaho/environment"], mockConfigWith(specPropPath, ""), function(contextVars) {
             expect(getPath(contextVars, propPath, null)).toBe(null);
           });
         });
 
         it("should respect a non-empty " + specPropPath + " value", function() {
 
-          return require.using(["pentaho/context"], mockConfigWith(specPropPath, value), function(contextVars) {
+          return require.using(["pentaho/environment"], mockConfigWith(specPropPath, value), function(contextVars) {
             expect(getPath(contextVars, propPath, null)).toBe(valueRead);
           });
         });
@@ -135,5 +135,5 @@ define([
 
     testContextProperty("reservedChars", "reservedChars", "ABC");
 
-  }); // pentaho.context
+  }); // pentaho.environment
 });

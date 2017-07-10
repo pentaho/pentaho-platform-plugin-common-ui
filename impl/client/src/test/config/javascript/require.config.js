@@ -57,7 +57,7 @@
   requirePaths["pentaho/i18n/MessageBundle"] = basePath + "/pentaho/i18n/MessageBundle";
   requirePaths["pentaho/shim"] = basePath + "/pentaho/shim";
   requirePaths["pentaho/config"] = basePath + "/pentaho/config";
-  requirePaths["pentaho/context"] = basePath + "/pentaho/context";
+  requirePaths["pentaho/environment"] = basePath + "/pentaho/environment";
   requirePaths["pentaho/debug"] = basePath + "/pentaho/debug";
   requirePaths["pentaho/ccc"] = basePath + "/pentaho/ccc";
 
@@ -177,8 +177,8 @@
   // sample/calc theme
   mapTheme("pentaho/visual/samples/calc", "themes", ["crystal"]);
 
-  requireCfg.packages.push({"name": "pentaho/visual/base", "main": "model"});
-  requireCfg.packages.push({"name": "pentaho/visual/samples/calc", "main": "model"});
+  requirePackages.push({"name": "pentaho/visual/base", "main": "model"});
+  requirePackages.push({"name": "pentaho/visual/samples/calc", "main": "model"});
 
   [
     "pentaho/visual/base",
