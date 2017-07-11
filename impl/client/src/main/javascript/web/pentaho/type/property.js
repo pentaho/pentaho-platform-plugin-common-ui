@@ -1049,7 +1049,7 @@ define([
            * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
            * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
            *
-           * @see pentaho.type.Complex#isRequired
+           * @see pentaho.type.Complex#isRequiredOf
            * @see pentaho.type.spec.IPropertyTypeProto#isRequired
            */
           isRequired: {
@@ -1135,7 +1135,7 @@ define([
            * @memberOf pentaho.type.Property.Type#
            * @type {undefined | number | pentaho.type.PropertyDynamicAttribute.<number>}
            *
-           * @see pentaho.type.Complex#countRange
+           * @see pentaho.type.Complex#countRangeOf
            *
            * @see pentaho.type.spec.IPropertyTypeProto#countMin
            */
@@ -1222,7 +1222,7 @@ define([
            * @memberOf pentaho.type.Property.Type#
            * @type {undefined | number | pentaho.type.PropertyDynamicAttribute.<number>}
            *
-           * @see pentaho.type.Complex#countRange
+           * @see pentaho.type.Complex#countRangeOf
            * @see pentaho.type.spec.IPropertyTypeProto#countMax
            */
           countMax: {
@@ -1301,7 +1301,7 @@ define([
            * @type {undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
            *
            * @see pentaho.type.Property.Type#isRequired
-           * @see pentaho.type.Complex#isApplicable
+           * @see pentaho.type.Complex#isApplicableOf
            * @see pentaho.type.spec.IPropertyTypeProto#isApplicable
            */
           isApplicable: {
@@ -1377,7 +1377,7 @@ define([
            * @memberOf pentaho.type.Property.Type#
            * @type {undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
            *
-           * @see pentaho.type.Complex#isEnabled
+           * @see pentaho.type.Complex#isEnabledOf
            * @see pentaho.type.spec.IPropertyTypeProto#isEnabled
            */
           isEnabled: {
@@ -1433,7 +1433,7 @@ define([
          *
          * @return {pentaho.IRange<number>} The evaluated element count range.
          *
-         * @see pentaho.type.Complex#countRange
+         * @see pentaho.type.Complex#countRangeOf
          */
         countRangeOn: function(owner) {
           var isRequired = this.isRequiredOn(owner);

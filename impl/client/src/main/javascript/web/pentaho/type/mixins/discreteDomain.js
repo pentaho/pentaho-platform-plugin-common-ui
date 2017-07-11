@@ -135,7 +135,7 @@ define([
            * @type {undefined | Array.<pentaho.type.Element> |
            *        pentaho.type.PropertyDynamicAttribute.<Array.<pentaho.type.Element>>}
            *
-           * @see pentaho.type.Complex#getPropDomain
+           * @see pentaho.type.Complex#domainOf
            * @see pentaho.type.mixins.spec.IDiscreteDomainTypeProto#domain
            */
           "domain": {
