@@ -36,7 +36,7 @@ define([
   var PentahoNumber = context.get(numberFactory);
 
   function expectNoChanges(list) {
-    expect(list.changeset).toBe(null);
+    expect(list.$changeset).toBe(null);
   }
 
   var NumberList = List.extend({

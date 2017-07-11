@@ -166,7 +166,7 @@ define([
         // ---
 
         list.move(/*elemSpec:*/3, /*indexNew:*/0);
-        list.changeset.clearChanges();
+        list.$changeset.clearChanges();
 
         // ---
 
@@ -188,7 +188,7 @@ define([
         // ---
 
         list.move(/*elemSpec:*/3, /*indexNew:*/0);
-        list.changeset.clearChanges();
+        list.$changeset.clearChanges();
 
         // ---
 

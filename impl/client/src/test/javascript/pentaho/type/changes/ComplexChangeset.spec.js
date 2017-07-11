@@ -75,8 +75,8 @@ define([
         owner.foo = 10;
         owner.myList.add(3);
 
-        listChangeset = myList.changeset;
-        changeset = owner.changeset;
+        listChangeset = myList.$changeset;
+        changeset = owner.$changeset;
       });
 
       afterEach(function() {
@@ -211,7 +211,7 @@ define([
           derived.set("foo", "b");
 
           expect(derived.hasChanges).toBe(true);
-          expect(derived.changeset.hasChange("foo")).toBe(true);
+          expect(derived.$changeset.hasChange("foo")).toBe(true);
 
           txnScope.dispose();
         });
@@ -225,13 +225,13 @@ define([
 
           derived.set("foo", "b");
 
-          var change0 = derived.changeset.getChange("foo");
+          var change0 = derived.$changeset.getChange("foo");
 
           expect(change0.value.valueOf()).toBe("b");
 
           derived.set("foo", "c");
 
-          var change1 = derived.changeset.getChange("foo");
+          var change1 = derived.$changeset.getChange("foo");
 
           expect(change0).toBe(change1);
           expect(change1.value.valueOf()).toBe("c");

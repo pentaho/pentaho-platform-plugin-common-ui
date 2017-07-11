@@ -80,11 +80,11 @@ define([
 
         derived.x = "1";
 
-        var change1 = derived.changeset.getChange("x");
+        var change1 = derived.$changeset.getChange("x");
 
         derived.x = "2";
 
-        var change2 = derived.changeset.getChange("x");
+        var change2 = derived.$changeset.getChange("x");
 
         // ---
 
@@ -153,7 +153,7 @@ define([
 
         // ---
 
-        derived.changeset.clearChanges();
+        derived.$changeset.clearChanges();
 
         // ---
 
@@ -171,7 +171,7 @@ define([
 
         // ---
 
-        derived.changeset.clearChanges();
+        derived.$changeset.clearChanges();
         scope.accept();
 
         // ---
@@ -227,7 +227,7 @@ define([
 
           // ---
 
-          owner.changeset.clearChanges();
+          owner.$changeset.clearChanges();
         });
       });
 
@@ -324,7 +324,7 @@ define([
 
           // ---
 
-          owner.changeset.clearChanges();
+          owner.$changeset.clearChanges();
 
           // ---
 
@@ -344,7 +344,7 @@ define([
 
           // ---
 
-          owner.changeset.clearChanges();
+          owner.$changeset.clearChanges();
 
           scope.accept();
 
@@ -514,7 +514,7 @@ define([
 
           // ---
 
-          owner.changeset.clearChanges();
+          owner.$changeset.clearChanges();
 
           // ---
 
@@ -538,7 +538,7 @@ define([
 
           // ---
 
-          owner.changeset.clearChanges();
+          owner.$changeset.clearChanges();
           scope.accept();
 
           // ---

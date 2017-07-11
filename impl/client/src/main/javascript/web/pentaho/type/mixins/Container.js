@@ -200,7 +200,7 @@ define([
      * @type {pentaho.type.changes.Changeset}
      * @readonly
      */
-    get changeset() {
+    get $changeset() {
       return this.__cset;
     },
 

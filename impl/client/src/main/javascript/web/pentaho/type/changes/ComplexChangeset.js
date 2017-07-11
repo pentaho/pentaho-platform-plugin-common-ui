@@ -115,7 +115,7 @@ define([
       // getChange("foo") -> PrimitiveChange or Changeset
       // Case I - Replace without changes within the new value (apart from ref changes)
       // Replace
-      //   (new) value : Value .changeset = null
+      //   (new) value : Value .$changeset = null
 
       // Lists, are never changed, and must always be copied.
       // The asymmetry comes from the fact that complex changesets cannot coexist with replaced values...
@@ -222,7 +222,7 @@ define([
       var valueIni = complex.__getByName(name);
 
       // Ambient value.
-      var cset = complex.changeset;
+      var cset = complex.$changeset;
       var change;
       var valueAmb = (cset && (change = O.getOwn(cset._changes, name))) ? change.value : valueIni;
 
