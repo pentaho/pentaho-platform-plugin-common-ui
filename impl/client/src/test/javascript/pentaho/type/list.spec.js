@@ -540,20 +540,20 @@ define([
     });
     // endregion
 
-    // region isReadOnly
-    describe("#isReadOnly", function() {
+    // region $isReadOnly
+    describe("#$isReadOnly", function() {
 
       it("should be false by default", function() {
         var list = new NumberList();
 
-        expect(list.isReadOnly).toBe(false);
+        expect(list.$isReadOnly).toBe(false);
       });
 
       it("should allow creating a read-only list by specifying keyArgs.isReadOnly: true", function() {
 
         var list = new NumberList(null, {isReadOnly: true});
 
-        expect(list.isReadOnly).toBe(true);
+        expect(list.$isReadOnly).toBe(true);
       });
     });
     // endregion
@@ -1379,7 +1379,7 @@ define([
 
         var clone = list.clone();
 
-        expect(clone.isReadOnly).toBe(false);
+        expect(clone.$isReadOnly).toBe(false);
       });
 
       it("should return a list instance with the same count", function() {

@@ -649,7 +649,7 @@ define([
          * [declaring type]{@link pentaho.type.Property.Type#declaringType}.
          *
          * If the _value type_ is a [list]{@link pentaho.type.Value.Type#isList} type,
-         * then this property sets its lists as [boundary lists]{@link pentaho.type.List#isBoundary}.
+         * then this property sets its lists as [boundary lists]{@link pentaho.type.List#$isBoundary}.
          *
          * The validity of the object with a _boundary property_
          * is not affected by the validity of the property's value (or values).

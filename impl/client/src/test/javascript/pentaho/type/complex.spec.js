@@ -696,7 +696,7 @@ define([
 
           var derived = new Derived();
 
-          expect(derived.x.isReadOnly).toBe(true);
+          expect(derived.x.$isReadOnly).toBe(true);
         });
 
         it("should make the list of a writable list property, writable", function() {
@@ -707,7 +707,7 @@ define([
 
           var derived = new Derived();
 
-          expect(derived.x.isReadOnly).toBe(false);
+          expect(derived.x.$isReadOnly).toBe(false);
         });
       });
 
