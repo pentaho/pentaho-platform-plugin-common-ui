@@ -199,10 +199,10 @@ define([
       });
     });
 
-    describe("#key -", function() {
+    describe("#$key -", function() {
       it("Should convert the given value to a string", function() {
         var simple1 = new Simple(123);
-        expect(simple1.key).toBe(String(123));
+        expect(simple1.$key).toBe(String(123));
       });
     });
 

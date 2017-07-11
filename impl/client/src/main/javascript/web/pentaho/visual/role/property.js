@@ -790,7 +790,7 @@ define([
           if(level) {
             // Fixed level.
             // Must be one of the role's levels.
-            if(!allRoleLevels.has(level.key)) {
+            if(!allRoleLevels.has(level.$key)) {
               addErrors(new ValidationError(bundle.format(
                 bundle.structured.errors.property.levelIsNotOneOfRoleLevels,
                 {

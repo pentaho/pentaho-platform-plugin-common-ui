@@ -117,7 +117,7 @@ define([
          */
         __validateDomain: function(value) {
           var domain = this.__domain;
-          return (!domain || domain.has(value.key))
+          return (!domain || domain.has(value.$key))
               ? null
               : new ValidationError(bundle.structured.errors.enum.notInDomain);
         },

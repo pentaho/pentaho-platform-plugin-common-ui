@@ -196,7 +196,7 @@ define([
        * @type {string}
        * @readonly
        */
-      get key() {
+      get $key() {
         return this.__value.toString();
       },
 
@@ -205,7 +205,7 @@ define([
        *
        * The given value **must** be of the same concrete type (or the result is undefined).
        *
-       * If two values are equal, they must have an equal [key]{@link pentaho.type.Simple#key},
+       * If two values are equal, they must have an equal [key]{@link pentaho.type.Simple#$key},
        * [value]{@link pentaho.type.Simple#value}, [formatted value]{@link pentaho.type.Simple#formatted}.
        *
        * @param {!pentaho.type.Simple} other - A simple value to test for equality.

@@ -87,7 +87,7 @@ define([
       var elem = this.element;
 
       target.__elems.splice(this.index, 0, elem);
-      target.__keys[elem.key] = elem;
+      target.__keys[elem.$key] = elem;
     }
   });
 });

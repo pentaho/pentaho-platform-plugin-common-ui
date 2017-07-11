@@ -197,13 +197,13 @@ define([
           if(domain) {
             var domainByKey = {};
             domain.forEach(function(elem) {
-              domainByKey[elem.key] = elem;
+              domainByKey[elem.$key] = elem;
             });
 
             var propType = this;
 
             addValidator(function(owner, element) {
-              if(!O.hasOwn(domainByKey, element.key)) {
+              if(!O.hasOwn(domainByKey, element.$key)) {
                 return new ValidationError(
                     bundle.get("errors.discreteDomain.notInDomain", [element.toString(), propType.label]));
               }

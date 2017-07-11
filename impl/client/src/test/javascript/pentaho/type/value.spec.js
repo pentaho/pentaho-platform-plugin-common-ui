@@ -94,8 +94,8 @@ define([
           var vb = new Value();
 
           // Override/Redefine getter property
-          Object.defineProperty(va, "key", {value: "A"});
-          Object.defineProperty(vb, "key", {value: "B"});
+          Object.defineProperty(va, "$key", {value: "A"});
+          Object.defineProperty(vb, "$key", {value: "B"});
 
           expect(va.type._isEqual(va, vb)).toBe(false);
         });
@@ -215,16 +215,16 @@ define([
 
     }); // .extend({...})
 
-    describe("#key", function() {
+    describe("#$key", function() {
       it("should return the result of toString()", function() {
         var va = new Value();
 
         spyOn(va, "toString").and.returnValue("FOOO");
 
-        expect(va.key).toBe("FOOO");
+        expect(va.$key).toBe("FOOO");
         expect(va.toString).toHaveBeenCalled();
       });
-    });// end #key
+    });// end #$key
 
     describe("#equals", function() {
       it("should return `true` if given the same value", function() {

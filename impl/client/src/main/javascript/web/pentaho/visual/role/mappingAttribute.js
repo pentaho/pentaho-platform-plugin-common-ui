@@ -137,7 +137,7 @@ define([
        */
       get keyQualitative() {
         var name = this.get("name");
-        return name ? name.key : "";
+        return name ? name.$key : "";
       },
 
       /**
@@ -153,7 +153,7 @@ define([
        */
       get keyQuantitative() {
         var aggregation = this.get("aggregation");
-        return this.keyQualitative + "|" + (aggregation ? aggregation.key : "");
+        return this.keyQualitative + "|" + (aggregation ? aggregation.$key : "");
       },
 
       type: {

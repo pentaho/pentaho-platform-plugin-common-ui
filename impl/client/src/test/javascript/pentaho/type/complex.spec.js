@@ -184,10 +184,10 @@ define([
       });
     });
 
-    describe("#key", function() {
+    describe("#$key", function() {
       it("should return the value of #uid", function() {
         var value = new Complex();
-        expect(value.$uid).toBe(value.key);
+        expect(value.$uid).toBe(value.$key);
       });
     });
 

@@ -192,7 +192,7 @@ define([
        * @type {string}
        * @readOnly
        */
-      get key() {
+      get $key() {
         return this.$uid;
       },
 

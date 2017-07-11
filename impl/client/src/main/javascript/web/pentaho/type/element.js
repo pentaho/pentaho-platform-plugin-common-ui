@@ -165,7 +165,7 @@ define([
          */
         __intersect: function(elemsA, elemsB) {
           var elemsAByKey = {};
-          O.eachOwn(elemsA, function(elemA0) { elemsAByKey[elemA0.key] = elemA0; });
+          O.eachOwn(elemsA, function(elemA0) { elemsAByKey[elemA0.$key] = elemA0; });
 
           // Output order is that of `elemsB`.
           var isSimple = this.isSimple;
@@ -175,7 +175,7 @@ define([
           var countB = elemsB.length;
           while(++i < countB) {
             var elemB = elemsB[i];
-            var key = elemB.key;
+            var key = elemB.$key;
             var elemA = O.getOwn(elemsAByKey, key);
             if(elemA && !O.hasOwn(elemsCByKey, key)) {
               // The formatted value of elemB overrides that of elemA. Keep elemB if it has a formatted value.

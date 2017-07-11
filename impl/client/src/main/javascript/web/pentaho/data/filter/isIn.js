@@ -94,7 +94,7 @@ define([
 
       /** @inheritDoc */
       _buildContentKey: function() {
-        return (this.property || "") + " " + this.values.toArray(function(v) { return v.key; }).join(" ");
+        return (this.property || "") + " " + this.values.toArray(function(v) { return v.$key; }).join(" ");
       },
 
       type: /** @lends pentaho.data.filter.IsIn.Type# */{

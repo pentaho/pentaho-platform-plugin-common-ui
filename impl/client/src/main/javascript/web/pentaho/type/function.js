@@ -84,7 +84,7 @@ define([
        * @type {string}
        * @readonly
        */
-      get key() {
+      get $key() {
         return this.__uid;
       },
 

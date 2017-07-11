@@ -117,7 +117,7 @@ define([
         var elem;
         var key;
         while(++i < L) {
-          if((elem = elemType.to(elemSpecs[i])) != null && !O.hasOwn(keys, (key = elem.key))) {
+          if((elem = elemType.to(elemSpecs[i])) != null && !O.hasOwn(keys, (key = elem.$key))) {
             elems.push(elem);
             keys[key] = elem;
 
@@ -273,7 +273,7 @@ define([
        * @type {string}
        * @readonly
        */
-      get key() {
+      get $key() {
         return this.$uid;
       },
 
@@ -319,7 +319,7 @@ define([
        * @return {boolean} `true` if the element is present in the list; `false`, otherwise.
        */
       includes: function(elem) {
-        return elem != null && this.get(elem.key) === elem;
+        return elem != null && this.get(elem.$key) === elem;
       },
 
       /**
@@ -330,7 +330,7 @@ define([
        * @return {number} `true` if the element is present in the list; `false`, otherwise.
        */
       indexOf: function(elem) {
-        return elem && this.has(elem.key) ? this.__projectedMock.__elems.indexOf(elem) : -1;
+        return elem && this.has(elem.$key) ? this.__projectedMock.__elems.indexOf(elem) : -1;
       },
 
       /**

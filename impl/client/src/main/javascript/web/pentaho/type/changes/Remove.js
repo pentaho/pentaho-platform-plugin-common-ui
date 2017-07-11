@@ -95,7 +95,7 @@ define([
       target.__elems.splice(this.index, elems.length);
 
       elems.forEach(function(elem) {
-        delete target.__keys[elem.key];
+        delete target.__keys[elem.$key];
       });
     }
   });

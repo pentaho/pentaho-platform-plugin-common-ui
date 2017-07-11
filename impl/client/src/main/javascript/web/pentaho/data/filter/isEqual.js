@@ -80,7 +80,7 @@ define([
       /** @inheritDoc */
       _buildContentKey: function() {
         var v = this.get("value");
-        return (this.property || "") + " " + (v ? v.key : "");
+        return (this.property || "") + " " + (v ? v.$key : "");
       },
 
       type: /** @lends pentaho.data.filter.IsEqual.Type# */{

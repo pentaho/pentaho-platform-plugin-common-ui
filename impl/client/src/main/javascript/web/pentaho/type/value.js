@@ -83,7 +83,7 @@ define([
        * @see pentaho.type.Value#equals
        * @see pentaho.type.Value.Type#areEqual
        */
-      get key() {
+      get $key() {
         return this.toString();
       },
 
@@ -104,7 +104,7 @@ define([
        * @param {any} other - A value to test for equality.
        * @return {boolean} `true` if the given value is equal to this one; or, `false`, otherwise.
        *
-       * @see pentaho.type.Value#key
+       * @see pentaho.type.Value#$key
        * @see pentaho.type.Value.Type#areEqual
        * @final
        */
@@ -264,9 +264,9 @@ define([
          * Two values are considered equal if they represent the same real-world entity.
          *
          * If two values are considered equal,
-         * their value instances must have an equal [key]{@link pentaho.type.Value#key}.
+         * their value instances must have an equal [key]{@link pentaho.type.Value#$key}.
          * Conversely, if they are considered different,
-         * their value instances must have a different `key`.
+         * their value instances must have a different `$key`.
          *
          * If the values are identical as per JavaScript's `===` operator, `true` is returned.
          * If both values are {@link Nully}, `true` is returned.
@@ -278,7 +278,7 @@ define([
          *
          * @return {boolean} `true` if two values are considered equal; `false`, otherwise.
          *
-         * @see pentaho.type.Value#key
+         * @see pentaho.type.Value#$key
          * @see pentaho.type.Value.Type#_areEqual
          * @see pentaho.type.Value.Type#_isEqual
          */
@@ -324,7 +324,7 @@ define([
          * @see pentaho.type.Value.Type#areEqual
          */
         _isEqual: function(va, vb) {
-          return (va.constructor === vb.constructor) && (va.key === vb.key);
+          return (va.constructor === vb.constructor) && (va.$key === vb.$key);
         },
         // endregion
 

@@ -134,7 +134,7 @@ define([
 
     /** @inheritDoc */
     __setNestedChangeset: function(csetNested) {
-      this._changesByElemKey[csetNested.owner.key] = csetNested;
+      this._changesByElemKey[csetNested.owner.$key] = csetNested;
     },
 
     /**
@@ -277,7 +277,7 @@ define([
       var L = setElems.length;
       while(++i < L) {
         if((elem = setElems[i]) != null) {
-          key = elem.key;
+          key = elem.$key;
 
           var repeated = O.hasOwn(setKeys, key);
 
@@ -312,7 +312,7 @@ define([
       L = elems.length;
       while(++i < L) {
         elem = elems[i];
-        key = elem.key;
+        key = elem.$key;
 
         if(!O.hasOwn(setKeys, key)) {
           if(remove) {
@@ -354,7 +354,7 @@ define([
 
           this.__addChange(new Add(action.value, newIndex));
 
-          computed.splice(newIndex, 0, action.value.key);
+          computed.splice(newIndex, 0, action.value.$key);
         }
       }
 
@@ -365,7 +365,7 @@ define([
         L = setElems.length;
         while(++i < L) {
           if((elem = setElems[i]) != null) {
-            var currentIndex = computed.indexOf(elem.key);
+            var currentIndex = computed.indexOf(elem.$key);
             if(move) {
               if(currentIndex < baseIndex) {
                 --baseIndex;
@@ -384,8 +384,8 @@ define([
               lastDestinationIndex = currentIndex;
             }
 
-            if(update && setKeys[elem.key] === 2) {
-              existing = O.getOwn(keys, elem.key);
+            if(update && setKeys[elem.$key] === 2) {
+              existing = O.getOwn(keys, elem.$key);
 
               // This may create a new changeset, that gets hooked up into this.
               existing.configure(elem);
@@ -438,7 +438,7 @@ define([
       var L = removeElems.length;
       while(++i < L) {
         if((elem = removeElems[i])) {
-          key = elem.key;
+          key = elem.$key;
 
           if(!O.hasOwn(removeKeys, key) && O.hasOwn(keys, key)) {
             removeKeys[key] = 1;
@@ -534,7 +534,7 @@ define([
 
       var owner = this.owner;
       var elem = owner.__cast(elemSpec);
-      var existing = owner.get(elem.key);
+      var existing = owner.get(elem.$key);
       if(existing) {
         var indexOld = owner.indexOf(existing);
 
