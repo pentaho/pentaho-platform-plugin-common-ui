@@ -124,7 +124,7 @@ define([
        * @readonly
        * @final
        */
-      get isValid() {
+      get $isValid() {
         return !this.validate();
       },
 
@@ -135,7 +135,7 @@ define([
        *
        * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
        *
-       * @see pentaho.type.Value#isValid
+       * @see pentaho.type.Value#$isValid
        * @final
        */
       validate: function() {

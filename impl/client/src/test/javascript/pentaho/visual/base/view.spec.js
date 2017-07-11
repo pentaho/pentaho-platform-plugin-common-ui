@@ -960,7 +960,7 @@ define([
           model: model
         });
 
-        expect(view.isValid).toBe(true);
+        expect(view.$isValid).toBe(true);
 
         view.__dirtyPropGroups.clear(); // view is clean
 
@@ -1005,7 +1005,7 @@ define([
           model: model
         });
 
-        expect(view.isValid).toBe(true);
+        expect(view.$isValid).toBe(true);
 
         view.__dirtyPropGroups.clear(); // view is clean
 

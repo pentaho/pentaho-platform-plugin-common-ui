@@ -56,7 +56,7 @@ define([
 
       it("should be valid without an application defined", function() {
         var m = new Model();
-        expect(m.isValid).toBe(true);
+        expect(m.$isValid).toBe(true);
       });
     });
 
