@@ -206,11 +206,11 @@ define([
 
           var txnScope = context.enterChange();
 
-          expect(derived.hasChanges).toBe(false);
+          expect(derived.$hasChanges).toBe(false);
 
           derived.set("foo", "b");
 
-          expect(derived.hasChanges).toBe(true);
+          expect(derived.$hasChanges).toBe(true);
           expect(derived.$changeset.hasChange("foo")).toBe(true);
 
           txnScope.dispose();
@@ -246,11 +246,11 @@ define([
 
           var txnScope = context.enterChange();
 
-          expect(derived.hasChanges).toBe(false);
+          expect(derived.$hasChanges).toBe(false);
 
           derived.set("foo", "a");
 
-          expect(derived.hasChanges).toBe(false);
+          expect(derived.$hasChanges).toBe(false);
 
           txnScope.dispose();
         });

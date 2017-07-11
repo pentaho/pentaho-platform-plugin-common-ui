@@ -204,8 +204,13 @@ define([
       return this.__cset;
     },
 
-    // TODO: Maybe remove
-    get hasChanges() {
+    /**
+     * Gets a value that indicates if this instance has any changes in the ambient transaction.
+     *
+     * @type {boolean}
+     * @readonly
+     */
+    get $hasChanges() {
       return !!this.__cset && this.__cset.hasChanges;
     },
 
