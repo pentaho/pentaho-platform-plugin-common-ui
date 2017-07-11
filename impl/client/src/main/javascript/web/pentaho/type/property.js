@@ -895,7 +895,7 @@ define([
             // Abstract Property classes don't have declaring type or `name`.
 
             // The default value type of abstract properties is value
-            if(valueTypeRef !== "value") spec.type = valueTypeRef;
+            if(valueTypeRef !== "value") spec.valueType = valueTypeRef;
 
             this._fillSpecInContext(spec, keyArgs);
           } else {
@@ -924,7 +924,7 @@ define([
 
             // The default value type of non-abstract properties is string
             if(valueTypeRef !== "string") {
-              spec.type = valueTypeRef;
+              spec.valueType = valueTypeRef;
               count++;
             }
 

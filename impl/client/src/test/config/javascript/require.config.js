@@ -95,7 +95,7 @@
   requireTypeInfo["pentaho/visual/base/view"] = {
     base: "complex",
     props: {
-      model: {type: "pentaho/visual/base"}
+      model: {valueType: "pentaho/visual/base"}
     }
   };
 

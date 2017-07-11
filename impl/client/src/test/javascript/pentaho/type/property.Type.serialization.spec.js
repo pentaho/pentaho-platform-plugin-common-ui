@@ -176,7 +176,7 @@ define([
                  "base": "property"
                },
                "name": "foo",
-               "type": "number"
+               "valueType": "number"
              }
          */
       });
@@ -279,10 +279,10 @@ define([
 
         scope.dispose();
 
-        expect(spec.type).toBe("string");
+        expect(spec.valueType).toBe("string");
 
         // console.log(JSON.stringify(spec));
-        // > {"base": "property", "type": "string"}
+        // > {"base": "property", "valueType": "string"}
       });
 
       it("should include `id` if defined when serializing an abstract property", function() {
