@@ -732,6 +732,11 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(panel.dashboard.updateComponent).not.toHaveBeenCalled();
         });
 
+        it("should init dashboard with 'flarParameters' = true by default", function() {
+          panel.init(true);
+          expect(panel.dashboard.flatParameters).toBe('true');
+        })
+
         it("should update components by diff", function() {
           paramDefn.showParameterUI.and.returnValue(true);
           panel.diff = jasmine.createSpy("diff");
