@@ -25,7 +25,7 @@ define([
     var BaseView = context.get(baseViewFactory);
 
     var BarView = BaseView.extend({
-      type: {
+      $type: {
         id: module.id,
         props: [
           {
@@ -128,7 +128,7 @@ Edit the `index.html` file and place the following code in it:
 
       // These are responsibilities of the visualization container application:
       // 1. Mark the container with the model's CSS classes, for styling purposes.
-      viewSpec.domContainer.className = model.type.inheritedStyleClasses.join(" ");
+      viewSpec.domContainer.className = model.$type.inheritedStyleClasses.join(" ");
 
       // 2. Set the DOM container dimensions.
       viewSpec.domContainer.style.width = viewSpec.width + "px";

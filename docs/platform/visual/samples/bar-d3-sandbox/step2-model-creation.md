@@ -38,7 +38,7 @@ define([
     var BaseModel = context.get(baseModelFactory);
     
     var BarModel = BaseModel.extend({
-      type: {
+      $type: {
         id: module.id,
         styleClass: "pentaho-visual-samples-bar",
         label: "D3 Bar Chart",

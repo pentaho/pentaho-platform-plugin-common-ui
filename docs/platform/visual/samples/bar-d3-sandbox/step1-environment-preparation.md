@@ -107,7 +107,7 @@ npm install
             
             // These are responsibilities of the visualization container application:
             // 1. Mark the container with the model's CSS classes, for styling purposes.
-            viewSpec.domContainer.className = model.type.inheritedStyleClasses.join(" ");
+            viewSpec.domContainer.className = model.$type.inheritedStyleClasses.join(" ");
         
             // 2. Set the DOM container dimensions.
             viewSpec.domContainer.style.width = viewSpec.width + "px";
