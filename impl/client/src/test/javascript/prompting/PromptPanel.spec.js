@@ -40,6 +40,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         expect(panel.autoSubmit).toBeTruthy();
         expect(panel.guid).toBeDefined();
         expect(panel.dashboard).toBeDefined();
+        expect(panel.dashboard.flatParameters).toBe(true);
         expect(panel.promptGUIDHelper).toBeDefined();
         expect(panel.parametersChanged).toBeFalsy();
       });
@@ -731,11 +732,6 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           });
           expect(panel.dashboard.updateComponent).not.toHaveBeenCalled();
         });
-
-        it("should init dashboard with 'flarParameters' = true by default", function() {
-          panel.init(true);
-          expect(panel.dashboard.flatParameters).toBe('true');
-        })
 
         it("should update components by diff", function() {
           paramDefn.showParameterUI.and.returnValue(true);
