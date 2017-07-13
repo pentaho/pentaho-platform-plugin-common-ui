@@ -102,8 +102,7 @@
   requirePaths["json"] = basePath + "/util/require-json/json";
 
   // jquery
-  requirePaths["common-ui/jquery"] = depWebJars + "/jquery/${jquery.version}/dist/jquery";
-  requireShim["common-ui/jquery"] = {exports: "$"};
+  requirePaths["common-ui/jquery"] = basePath + "/jquery/jquery.conflict";
 
   /*
    The path for common-ui/jquery-clean must be for a different file used by common-ui/jquery.
