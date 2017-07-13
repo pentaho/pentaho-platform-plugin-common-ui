@@ -144,7 +144,7 @@ define([
      */
     get $references() {
       var cref;
-      var txn = this.type.context.transaction;
+      var txn = this.$type.context.transaction;
       return (txn && (cref = txn.__getChangeRef(this.__uid))) ? cref.projectedReferences : this.__refs;
     },
 
@@ -219,7 +219,7 @@ define([
       var cset = this.__cset;
       if(cset) return fun.call(this, cset);
 
-      var scope = this.type.context.enterChange();
+      var scope = this.$type.context.enterChange();
 
       return scope.using(function() {
 

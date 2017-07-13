@@ -29,7 +29,7 @@ define([
     return BaseView.extend({
       _supportsTrends: true,
 
-      type: {
+      $type: {
         id: module.id,
         props: {
           model: {valueType: modelFactory}

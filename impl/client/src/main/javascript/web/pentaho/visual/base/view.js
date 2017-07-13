@@ -868,7 +868,7 @@ define([
 
       // region Actions
       __emitActionPhase: function(action, phase, isFinal) {
-        var eventType = action.type.id;
+        var eventType = action.$type.id;
 
         // TODO: emitGenericAsync when action is async.
 
@@ -1008,7 +1008,7 @@ define([
       },
       // endregion
 
-      type: /** @lends pentaho.visual.base.View.Type# */{
+      $type: /** @lends pentaho.visual.base.View.Type# */{
         id: module.id,
         isAbstract: true,
         props: [
@@ -1272,8 +1272,6 @@ define([
 
         if(!modelType) return Promise.reject(error.argRequired("modelType"));
 
-        var context = this.type.context;
-
         return context
             .getAsync(modelType)
             .then(function(Model) {
@@ -1486,7 +1484,7 @@ define([
        */
       // endregion
     })
-    .implement({type: bundle.structured.type});
+    .implement({$type: bundle.structured.type});
 
     return View;
   };

@@ -45,7 +45,7 @@ define([
 
       beforeEach(function() {
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "foo", defaultValue: "bar"}
             ]

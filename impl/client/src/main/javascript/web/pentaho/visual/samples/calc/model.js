@@ -35,7 +35,7 @@ define([
      * @amd {pentaho.type.Factory<pentaho.visual.samples.calc.Model>} pentaho/visual/samples/calc
      */
     return BaseModel.extend({
-      type: {
+      $type: {
         sourceId: module.id,
         id: module.id.replace(/.\w+$/, ""),
         v2Id: "sample_calc",
@@ -68,6 +68,6 @@ define([
         ]
       }
     })
-    .implement({type: bundle.structured.type});
+    .implement({$type: bundle.structured.type});
   };
 });

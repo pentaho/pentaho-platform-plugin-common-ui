@@ -72,7 +72,7 @@ define([
      *     var Complex = context.get(complexFactory);
      *
      *     return Complex.extend({
-     *       type: {
+     *       $type: {
      *         props: [
      *           {name: "name", valueType: "string", label: "Name"},
      *           {name: "categories", valueType: ["string"], label: "Categories"},
@@ -109,7 +109,7 @@ define([
         this._initContainer();
 
         // Create `Property` instances.
-        var propTypes = this.type.__getProps();
+        var propTypes = this.$type.__getProps();
         var i = propTypes.length;
         var readSpec = !spec ? undefined : (Array.isArray(spec) ? __readSpecByIndex : __readSpecByNameOrAlias);
         var values = {};
@@ -217,7 +217,7 @@ define([
        * name `name` is not defined.
        */
       get: function(name, sloppy) {
-        var pType = this.type.get(name, sloppy);
+        var pType = this.$type.get(name, sloppy);
         if(pType) return this.__getByType(pType);
       },
 
@@ -306,7 +306,7 @@ define([
        * @fires "rejected:change"
        */
       set: function(name, valueSpec) {
-        var propType = this.type.get(name);
+        var propType = this.$type.get(name);
 
         if(propType.isReadOnly) throw new TypeError("'" + name + "' is read-only");
 
@@ -326,8 +326,8 @@ define([
             // TODO: should copy only the properties of the LCA type?
 
             // Copy common properties, if it is a subtype of this one.
-            if(config.type.isSubtypeOf(this.type))
-              this.type.each(function(propType) {
+            if(config.$type.isSubtypeOf(this.$type))
+              this.$type.each(function(propType) {
                 this.set(propType, config.get(propType.name));
               }, this);
 
@@ -361,7 +361,7 @@ define([
        * name `name` is not defined.
        */
       countOf: function(name, sloppy) {
-        var pType = this.type.get(name, sloppy);
+        var pType = this.$type.get(name, sloppy);
         if(!pType) return 0;
 
         var value = this.__getByType(pType);
@@ -381,7 +381,7 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       isApplicableOf: function(name) {
-        return this.type.get(name).isApplicableOn(this);
+        return this.$type.get(name).isApplicableOn(this);
       },
       // endregion
 
@@ -396,7 +396,7 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       isEnabledOf: function(name) {
-        return this.type.get(name).isEnabledOn(this);
+        return this.$type.get(name).isEnabledOn(this);
       },
       // endregion
 
@@ -411,7 +411,7 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       countRangeOf: function(name) {
-        return this.type.get(name).countRangeOn(this);
+        return this.$type.get(name).countRangeOn(this);
       },
       // endregion
 
@@ -429,7 +429,7 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       isRequiredOf: function(name) {
-        return this.type.get(name).countRangeOn(this).min > 0;
+        return this.$type.get(name).countRangeOn(this).min > 0;
       },
       // endregion
 
@@ -444,7 +444,7 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       domainOf: function(name) {
-        return this.type.get(name).domainOn(this);
+        return this.$type.get(name).domainOn(this);
       },
       // endregion
       // endregion
@@ -459,7 +459,7 @@ define([
         var noAlias = !!keyArgs.noAlias;
         var declaredType;
         var includeType = !!keyArgs.forceType ||
-              (!!(declaredType = keyArgs.declaredType) && this.type !== declaredType);
+              (!!(declaredType = keyArgs.declaredType) && this.$type !== declaredType);
 
         var useArray = !includeType && keyArgs.preferPropertyArray;
         var omitProps;
@@ -467,7 +467,7 @@ define([
           spec = [];
         } else {
           spec = {};
-          if(includeType) spec._ = this.type.toRefInContext(keyArgs);
+          if(includeType) spec._ = this.$type.toRefInContext(keyArgs);
           omitProps = keyArgs.omitProps;
 
           // Do not propagate to child values
@@ -475,7 +475,7 @@ define([
         }
 
         var includeDefaults = !!keyArgs.includeDefaults;
-        var type = this.type;
+        var type = this.$type;
 
         // reset
         keyArgs.forceType = false;
@@ -550,7 +550,7 @@ define([
       },
       // endregion
 
-      type: /** @lends pentaho.type.Complex.Type# */{
+      $type: /** @lends pentaho.type.Complex.Type# */{
         id: module.id,
         alias: "complex",
 
@@ -788,7 +788,7 @@ define([
                *
                * // assert basePropType === O.lca(localPropType, otherPropType)
                *
-               * if(otherPropType.type.isSubtypeOf(localPropType.type))
+               * if(otherPropType.valueType.isSubtypeOf(localPropType.valueType))
                */
               if(fun.call(ctx, localPropType, i, this) === false)
                 return false;
@@ -810,7 +810,7 @@ define([
 
         // All properties are copied except lists, which are shallow cloned.
         // List properties are not affected by changesets.
-        var propTypes = this.type.__getProps();
+        var propTypes = this.$type.__getProps();
         var source = (this.__cset || this);
         var i = propTypes.length;
         var cloneValues = {};
@@ -836,7 +836,7 @@ define([
         return new ComplexChangeset(txn, this);
       },
 
-      type: bundle.structured.complex
+      $type: bundle.structured.complex
     });
 
     /**

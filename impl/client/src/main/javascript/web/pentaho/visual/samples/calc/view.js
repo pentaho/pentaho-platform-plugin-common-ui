@@ -39,7 +39,7 @@ define([
     var BaseView = context.get(baseViewFactory);
 
     return BaseView.extend(/** @lends pentaho.visual.samples.calc.View# */{
-      type: {
+      $type: {
         id: module.id,
         props: {
           model: {valueType: modelFactory}

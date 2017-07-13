@@ -22,7 +22,7 @@ define(["module"], function(module) {
     var PentahoString = context.get("string");
 
     return PentahoString.extend({
-      type: {
+      $type: {
         id: module.id
       }
     });

@@ -27,7 +27,7 @@ define([
     var BaseModel = context.get(baseModelFactory);
 
     return BaseModel.extend({
-      type: {
+      $type: {
         id: module.id,
         v2Id: "ccc_horzbar",
         category: "horzbarchart",
@@ -50,6 +50,6 @@ define([
       }
 
     })
-    .implement({type: bundle.structured.barHorizontal});
+    .implement({$type: bundle.structured.barHorizontal});
   };
 });

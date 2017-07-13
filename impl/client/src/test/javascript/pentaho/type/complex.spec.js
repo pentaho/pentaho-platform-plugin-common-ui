@@ -87,7 +87,7 @@ define([
 
       it("should have type.count = 0", function() {
         var complex = new Complex({});
-        expect(complex.type.count).toBe(0);
+        expect(complex.$type.count).toBe(0);
       });
     });
 
@@ -96,7 +96,7 @@ define([
 
       beforeEach(function() {
         Derived = Complex.extend({
-          type: {
+          $type: {
             label: "Derived",
             props: [
               "x",
@@ -196,7 +196,7 @@ define([
       describe("#get(name[, sloppy])", function() {
         it("should return the `Value` of an existing singular property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", valueType: "string"}]}
+            $type: {props: [{name: "x", valueType: "string"}]}
           });
 
           var derived = new Derived({x: "1"});
@@ -209,7 +209,7 @@ define([
 
         it("should return the value of an existing property given its type object", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", valueType: "string"}]}
+            $type: {props: [{name: "x", valueType: "string"}]}
           });
 
           var derived = new Derived({x: "1"});
@@ -225,7 +225,7 @@ define([
 
         it("should return the `List` value of an existing list property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", valueType: ["string"]}]}
+            $type: {props: [{name: "x", valueType: ["string"]}]}
           });
 
           var derived = new Derived();
@@ -238,7 +238,7 @@ define([
 
         it("should return the same `List` of an existing list property every time", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", valueType: ["string"]}]}
+            $type: {props: [{name: "x", valueType: ["string"]}]}
           });
 
           var derived = new Derived({x: ["1"]});
@@ -262,7 +262,7 @@ define([
 
         describe("when given the name of an undefined property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x"}]}
+            $type: {props: [{name: "x"}]}
           });
 
           var derived = new Derived();
@@ -281,7 +281,7 @@ define([
       describe("#getv(name[, sloppy])", function() {
 
         var Derived = Complex.extend({
-          type: {props: [
+          $type: {props: [
             {name: "x", valueType: "string"},
             {name: "z", valueType: "object"}
           ]}
@@ -325,7 +325,7 @@ define([
 
       describe("#getf(name[, sloppy])", function() {
 
-        var Derived = Complex.extend({type: {
+        var Derived = Complex.extend({$type: {
           props: [
             {name: "x", valueType: "string"},
             {name: "z", valueType: "object"}
@@ -372,7 +372,7 @@ define([
       describe("#set(name, valueSpec)", function() {
         it("should set the value of an existing property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", valueType: "string"}]}
+            $type: {props: [{name: "x", valueType: "string"}]}
           });
 
           var derived = new Derived();
@@ -386,7 +386,7 @@ define([
         it("should throw a TypeError if the property is read-only", function() {
 
           var Derived = Complex.extend({
-            type: {props: [{name: "x", valueType: "string", isReadOnly: true, defaultValue: "2"}]}
+            $type: {props: [{name: "x", valueType: "string", isReadOnly: true, defaultValue: "2"}]}
           });
 
           var derived = new Derived();
@@ -400,7 +400,7 @@ define([
 
         it("should set the value of an existing list property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", valueType: ["string"]}]}
+            $type: {props: [{name: "x", valueType: ["string"]}]}
           });
 
           var derived = new Derived();
@@ -414,7 +414,7 @@ define([
 
         it("should keep the value of property if the new is equals", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", valueType: "string"}]}
+            $type: {props: [{name: "x", valueType: "string"}]}
           });
 
           var derived = new Derived({"x": "1"});
@@ -430,7 +430,7 @@ define([
 
         it("should replace the value of property if the new is different", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", valueType: "string"}]}
+            $type: {props: [{name: "x", valueType: "string"}]}
           });
 
           var derived = new Derived({"x": "1"});
@@ -446,7 +446,7 @@ define([
 
         it("should throw when given the name of an undefined property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x"}]}
+            $type: {props: [{name: "x"}]}
           });
 
           var derived = new Derived();
@@ -461,7 +461,7 @@ define([
           var complex;
           var THREE = 3;
           var Derived = Complex.extend({
-            type: {props: [
+            $type: {props: [
               {name: "x", valueType: "number"},
               {name: "y", valueType: ["number"]}
             ]}
@@ -638,7 +638,7 @@ define([
 
         describe("when `name` is that of an element property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x"}]}
+            $type: {props: [{name: "x"}]}
           });
 
           describe("when the property value is null", function() {
@@ -660,7 +660,7 @@ define([
 
         describe("when `name` is that of a list property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", valueType: ["string"]}]}
+            $type: {props: [{name: "x", valueType: ["string"]}]}
           });
 
           var result;
@@ -691,7 +691,7 @@ define([
         it("should make the list of a read-only list property, read-only", function() {
 
           var Derived = Complex.extend({
-            type: {props: [{name: "x", valueType: ["string"], isReadOnly: true}]}
+            $type: {props: [{name: "x", valueType: ["string"], isReadOnly: true}]}
           });
 
           var derived = new Derived();
@@ -702,7 +702,7 @@ define([
         it("should make the list of a writable list property, writable", function() {
 
           var Derived = Complex.extend({
-            type: {props: [{name: "x", valueType: ["string"]}]}
+            $type: {props: [{name: "x", valueType: ["string"]}]}
           });
 
           var derived = new Derived();
@@ -714,7 +714,7 @@ define([
       describe("#isApplicableOf(name)", function() {
         it("should return the evaluated static value of an existing property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", isApplicable: false}]}
+            $type: {props: [{name: "x", isApplicable: false}]}
           });
 
           var derived = new Derived();
@@ -724,7 +724,7 @@ define([
 
         it("should return the evaluated dynamic value of an existing property", function() {
           var Derived = Complex.extend({
-            type: {
+            $type: {
               props: [{
                 name: "x", isApplicable: function() {
                   return this.foo;
@@ -746,7 +746,7 @@ define([
 
         it("should throw when given the name of an undefined property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x"}]}
+            $type: {props: [{name: "x"}]}
           });
 
           var derived = new Derived();
@@ -758,10 +758,10 @@ define([
 
         it("should throw when given a property type object not owned by the complex, " +
            "even if of same name as an existing one", function() {
-          var Other = Complex.extend({type: {props: [{name: "x"}]}});
+          var Other = Complex.extend({$type: {props: [{name: "x"}]}});
 
           var Derived = Complex.extend({
-            type: {props: [{name: "x"}]}
+            $type: {props: [{name: "x"}]}
           });
 
           var derived = new Derived();
@@ -775,7 +775,7 @@ define([
       describe("#isEnabledOf(name)", function() {
         it("should return the evaluated static value of an existing property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", isEnabled: true}]}
+            $type: {props: [{name: "x", isEnabled: true}]}
           });
 
           var derived = new Derived();
@@ -785,7 +785,7 @@ define([
 
         it("should return the evaluated dynamic value of an existing property", function() {
           var Derived = Complex.extend({
-            type: {
+            $type: {
               props: [{
                 name: "x", isEnabled: function() {
                   return this.foo;
@@ -807,7 +807,7 @@ define([
 
         it("should throw when given the name of an undefined property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x"}]}
+            $type: {props: [{name: "x"}]}
           });
 
           var derived = new Derived();
@@ -819,10 +819,10 @@ define([
 
         it("should throw when given a property type object not owned by the complex, " +
            "even if of same name as an existing one", function() {
-          var Other = Complex.extend({type: {props: [{name: "x"}]}});
+          var Other = Complex.extend({$type: {props: [{name: "x"}]}});
 
           var Derived = Complex.extend({
-            type: {props: [{name: "x"}]}
+            $type: {props: [{name: "x"}]}
           });
 
           var derived = new Derived();
@@ -836,7 +836,7 @@ define([
       describe("#isRequiredOf(name)", function() {
         it("should return the evaluated static value of an existing property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", isRequired: true}]}
+            $type: {props: [{name: "x", isRequired: true}]}
           });
 
           var derived = new Derived();
@@ -846,7 +846,7 @@ define([
 
         it("should return the evaluated dynamic value of an existing property", function() {
           var Derived = Complex.extend({
-            type: {
+            $type: {
               props: [{
                 name: "x", isRequired: function() {
                   return this.foo;
@@ -868,7 +868,7 @@ define([
 
         it("should throw when given the name of an undefined property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x"}]}
+            $type: {props: [{name: "x"}]}
           });
 
           var derived = new Derived();
@@ -880,10 +880,10 @@ define([
 
         it("should throw when given a property type object not owned by the complex, " +
            "even if of same name as an existing one", function() {
-          var Other = Complex.extend({type: {props: [{name: "x"}]}});
+          var Other = Complex.extend({$type: {props: [{name: "x"}]}});
 
           var Derived = Complex.extend({
-            type: {props: [{name: "x"}]}
+            $type: {props: [{name: "x"}]}
           });
 
           var derived = new Derived();
@@ -897,7 +897,7 @@ define([
       describe("#countRangeOf(name)", function() {
         it("should return the evaluated static value of an existing property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x", countMin: 1, countMax: 1}]}
+            $type: {props: [{name: "x", countMin: 1, countMax: 1}]}
           });
 
           var derived = new Derived();
@@ -909,7 +909,7 @@ define([
 
         it("should return the evaluated dynamic value of an existing property", function() {
           var Derived = Complex.extend({
-            type: {
+            $type: {
               props: [{
                 name: "x", countMin: function() {
                   return this.fooMin;
@@ -931,7 +931,7 @@ define([
 
         it("should throw when given the name of an undefined property", function() {
           var Derived = Complex.extend({
-            type: {props: [{name: "x"}]}
+            $type: {props: [{name: "x"}]}
           });
 
           var derived = new Derived();
@@ -943,10 +943,10 @@ define([
 
         it("should throw when the given property type object is not owned by the complex, " +
            "even if of an existing name", function() {
-          var Other = Complex.extend({type: {props: [{name: "x"}]}});
+          var Other = Complex.extend({$type: {props: [{name: "x"}]}});
 
           var Derived = Complex.extend({
-            type: {props: [{name: "x"}]}
+            $type: {props: [{name: "x"}]}
           });
 
           var derived = new Derived();
@@ -962,7 +962,7 @@ define([
         it("should return the evaluated value of an existing property", function() {
 
           var Derived = Complex.extend({
-            type: {
+            $type: {
               props: [
                 {name: "x", valueType: "string", domain: ["1", "2", "3"]}
               ]
@@ -982,7 +982,7 @@ define([
         it("should throw when given the name of an undefined property", function() {
 
           var Derived = Complex.extend({
-            type: {
+            $type: {
               props: [
                 {name: "x", valueType: "string"}
               ]
@@ -999,10 +999,10 @@ define([
         it("should throw when given a property type object not owned by the complex, " +
             "even if of same name as an existing one", function() {
 
-          var Other = Complex.extend({type: {props: [{name: "x"}]}});
+          var Other = Complex.extend({$type: {props: [{name: "x"}]}});
 
           var Derived = Complex.extend({
-            type: {props: [{name: "x"}]}
+            $type: {props: [{name: "x"}]}
           });
 
           var derived = new Derived();
@@ -1042,7 +1042,7 @@ define([
       it("should create an object having the same element value instances", function() {
         var MyComplex1 = Complex.extend();
         var MyComplex2 = Complex.extend({
-          type: {
+          $type: {
             props: ["a", "b", {name: "c", valueType: MyComplex1}]
           }
         });
@@ -1057,7 +1057,7 @@ define([
       it("should create an object having distinct list value instances but the same list elements", function() {
         var MyComplex1 = Complex.extend();
         var MyComplex2 = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: [MyComplex1]}
             ]
@@ -1081,8 +1081,8 @@ define([
 
       describe("when config is a complex that is not a subtype of it", function() {
         it("should do nothing, even if properties has the same names and types", function() {
-          var Derived1 = Complex.extend({type: {props: ["a", "b"]}});
-          var Derived2 = Complex.extend({type: {props: ["a", "b"]}});
+          var Derived1 = Complex.extend({$type: {props: ["a", "b"]}});
+          var Derived2 = Complex.extend({$type: {props: ["a", "b"]}});
 
           var derived1 = new Derived1({a: "a1", b: "b1"});
           var derived2 = new Derived2({a: "a2", b: "b2"});
@@ -1100,7 +1100,7 @@ define([
       describe("when config is a complex from a subtype of it", function() {
 
         it("should copy all base properties", function() {
-          var Derived1 = Complex.extend({type: {props: ["a", "b"]}});
+          var Derived1 = Complex.extend({$type: {props: ["a", "b"]}});
           var Derived2 = Derived1.extend();
 
           var derived1 = new Derived1({a: "a1", b: "b1"});
@@ -1116,8 +1116,8 @@ define([
         });
 
         it("should copy all base properties even when overridden", function() {
-          var Derived1 = Complex.extend({type: {props: ["a"]}});
-          var Derived2 = Derived1.extend({type: {props: [
+          var Derived1 = Complex.extend({$type: {props: ["a"]}});
+          var Derived2 = Derived1.extend({$type: {props: [
             {name: "a", label: "A2"}
           ]}});
 
@@ -1132,8 +1132,8 @@ define([
         });
 
         it("should copy ignore properties of the subtype", function() {
-          var Derived1 = Complex.extend({type: {props: ["a"]}});
-          var Derived2 = Derived1.extend({type: {props: ["c"]}});
+          var Derived1 = Complex.extend({$type: {props: ["a"]}});
+          var Derived2 = Derived1.extend({$type: {props: ["c"]}});
 
           var derived1 = new Derived1({a: "a1"});
           var derived2 = new Derived2({a: "a2", c: "c2"});
@@ -1146,7 +1146,7 @@ define([
         });
 
         it("should copy when target property is null and config is not", function() {
-          var Derived1 = Complex.extend({type: {props: ["a"]}});
+          var Derived1 = Complex.extend({$type: {props: ["a"]}});
           var Derived2 = Derived1.extend();
 
           var derived1 = new Derived1();
@@ -1160,7 +1160,7 @@ define([
         });
 
         it("should copy when config property is null and target is not", function() {
-          var Derived1 = Complex.extend({type: {props: ["a"]}});
+          var Derived1 = Complex.extend({$type: {props: ["a"]}});
           var Derived2 = Derived1.extend();
 
           var derived1 = new Derived1({a: "a1"});
@@ -1177,7 +1177,7 @@ define([
       describe("when config is a not a complex", function() {
 
         it("should copy all own properties", function() {
-          var Derived1 = Complex.extend({type: {props: ["a", "b"]}});
+          var Derived1 = Complex.extend({$type: {props: ["a", "b"]}});
 
           var derived1 = new Derived1({a: "a1", b: "b1"});
           var derived2 = {a: "a2", b: "b2"};
@@ -1192,7 +1192,7 @@ define([
         });
 
         it("should ignore non-own properties", function() {
-          var Derived1 = Complex.extend({type: {props: ["a", "b"]}});
+          var Derived1 = Complex.extend({$type: {props: ["a", "b"]}});
 
           var derived1 = new Derived1({a: "a1", b: "b1"});
           var derived2 = Object.create({a: "a3"});
@@ -1208,7 +1208,7 @@ define([
         });
 
         it("should throw on an undefined property (non-sloppy)", function() {
-          var Derived1 = Complex.extend({type: {props: ["a", "b"]}});
+          var Derived1 = Complex.extend({$type: {props: ["a", "b"]}});
 
           var derived1 = new Derived1({a: "a1", b: "b1"});
           var derived2 = {c: "c2"};
@@ -1224,7 +1224,7 @@ define([
 
       it("should be called when a complex container is set to this value", function() {
         var Derived = Complex.extend();
-        var Container = Complex.extend({type: {props: [{name: "a", valueType: Derived}]}});
+        var Container = Complex.extend({$type: {props: [{name: "a", valueType: Derived}]}});
 
         spyOn(Derived.prototype, "__addReference");
 
@@ -1236,7 +1236,7 @@ define([
 
       it("should be called with the complex container and its property type", function() {
         var Derived = Complex.extend();
-        var Container = Complex.extend({type: {props: [{name: "a", valueType: Derived}]}});
+        var Container = Complex.extend({$type: {props: [{name: "a", valueType: Derived}]}});
 
         spyOn(Derived.prototype, "__addReference");
 
@@ -1248,7 +1248,7 @@ define([
 
       it("should be called when added to a list container", function() {
         var Derived = Complex.extend();
-        var Container = Complex.extend({type: {props: [{name: "as", valueType: [Derived]}]}});
+        var Container = Complex.extend({$type: {props: [{name: "as", valueType: [Derived]}]}});
 
         spyOn(Derived.prototype, "__addReference");
 

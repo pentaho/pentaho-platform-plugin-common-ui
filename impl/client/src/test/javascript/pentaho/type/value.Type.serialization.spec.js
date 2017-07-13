@@ -101,7 +101,7 @@ define([
 
       describe("#id", function() {
         it("should serialize the #id of a type using #shortId, if an #alias is defined", function() {
-          var derivedType = Value.extend({type: {id: "pentaho/type/test", alias: "testAlias"}}).type;
+          var derivedType = Value.extend({$type: {id: "pentaho/type/test", alias: "testAlias"}}).type;
 
           var scope = new SpecificationScope();
 
@@ -114,7 +114,7 @@ define([
         });
 
         it("should serialize the #id of a type using #shortId, if an #alias is not defined", function() {
-          var derivedType = Value.extend({type: {id: "pentaho/type/test"}}).type;
+          var derivedType = Value.extend({$type: {id: "pentaho/type/test"}}).type;
 
           var scope = new SpecificationScope();
 

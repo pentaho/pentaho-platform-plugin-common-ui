@@ -27,7 +27,7 @@ define([
     return BaseView.extend({
       _cccClass: "AreaChart",
 
-      type: {
+      $type: {
         id: module.id
       }
     });

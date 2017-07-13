@@ -135,7 +135,7 @@ define([
        */
       __buildContentKeyOuter: function() {
         var innerKey = this._buildContentKey();
-        return "(" + this.type.shortId + (innerKey ? (" " + innerKey) : "") + ")";
+        return "(" + this.$type.shortId + (innerKey ? (" " + innerKey) : "") + ")";
       },
 
       /**
@@ -423,7 +423,7 @@ define([
         return result;
       },
 
-      type: /** @lends pentaho.data.filter.Abstract.Type# */{
+      $type: /** @lends pentaho.data.filter.Abstract.Type# */{
         id: module.id,
 
         isAbstract: true

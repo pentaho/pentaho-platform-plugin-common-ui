@@ -95,7 +95,7 @@
  *
  *     // Derive and return the derived type constructor
  *     return MyBaseType.extend({
- *        type: {
+ *        $type: {
  *          id: "my/derived/type"
  *          // ...
  *        }

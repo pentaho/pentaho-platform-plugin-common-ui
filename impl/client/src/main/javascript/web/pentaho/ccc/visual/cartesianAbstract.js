@@ -28,7 +28,7 @@ define([
     var BaseView = context.get(baseViewFactory);
 
     return BaseView.extend({
-      type: {
+      $type: {
         id: module.id,
         props: {
           model: {valueType: modelFactory}
@@ -130,7 +130,7 @@ define([
 
         var propName = "displayUnits" + (primary ? "" : "Secondary");
         var displayUnits = this.model.getv(propName);
-        var displayUnitsType = this.model.type.get(propName).valueType;
+        var displayUnitsType = this.model.$type.get(propName).valueType;
         var scaleFactor = displayUnitsType.scaleFactorOf(displayUnits);
 
         // Unfortunately the stored element value usually has no formatted value associated,

@@ -65,7 +65,7 @@ define([
         return false;
       },
 
-      type: /** @lends pentaho.type.Element.Type# */{
+      $type: /** @lends pentaho.type.Element.Type# */{
 
         id: module.id,
         alias: "element",
@@ -189,7 +189,7 @@ define([
         }
       }
     }).implement({
-      type: bundle.structured.element
+      $type: bundle.structured.element
     });
 
     __elemType = Element.type;

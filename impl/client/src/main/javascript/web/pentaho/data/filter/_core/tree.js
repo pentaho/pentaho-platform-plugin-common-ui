@@ -231,7 +231,7 @@ define([
       },
       // endregion
 
-      type: /** @lends pentaho.data.filter.Tree.Type# */{
+      $type: /** @lends pentaho.data.filter.Tree.Type# */{
         id: "pentaho/data/filter/tree",
         isAbstract: true,
         props: [

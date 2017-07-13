@@ -41,7 +41,7 @@ define([
 
       it("should return the id of a type that has an id", function() {
         var id = "foo";
-        var Derived = Instance.extend({type: {id: id}});
+        var Derived = Instance.extend({$type: {id: id}});
         var context = new SpecificationContext();
 
         var result = context.getIdOf(Derived.type);
@@ -144,7 +144,7 @@ define([
 
       it("should add a type that has an id and return its id", function() {
         var id = "foo";
-        var Derived = Instance.extend({type: {id: id}});
+        var Derived = Instance.extend({$type: {id: id}});
         var context = new SpecificationContext();
 
         var result = context.add(Derived.type);
@@ -154,7 +154,7 @@ define([
 
       it("should accept adding a type that has an id multiple times, always returning its id", function() {
         var id = "foo";
-        var Derived = Instance.extend({type: {id: id}});
+        var Derived = Instance.extend({$type: {id: id}});
         var context = new SpecificationContext();
 
         var result1 = context.add(Derived.type);
@@ -207,7 +207,7 @@ define([
 
       it("should return the id returned by get, for the same named type", function() {
         var id = "foo";
-        var Derived = Instance.extend({type: {id: id}});
+        var Derived = Instance.extend({$type: {id: id}});
         var context = new SpecificationContext();
 
         var result1 = context.add(Derived.type);

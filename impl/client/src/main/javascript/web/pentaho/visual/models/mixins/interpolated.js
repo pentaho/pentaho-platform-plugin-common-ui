@@ -29,7 +29,7 @@ define([
     var BaseModel = context.get(modelFactory);
 
     return BaseModel.extend({
-      type: {
+      $type: {
         id: module.id,
         isAbstract: true,
         props: [
@@ -42,6 +42,6 @@ define([
         ]
       }
     })
-    .implement({type: bundle.structured.interpolation});
+    .implement({$type: bundle.structured.interpolation});
   };
 });

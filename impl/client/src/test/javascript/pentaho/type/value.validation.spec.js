@@ -34,9 +34,9 @@ define([
         expect(va.validate()).toBe(null);
       });
 
-      it("should be overridable using {type: {instance: {}}", function() {
+      it("should be overridable using {$type: {instance: {}}", function() {
         var Derived = Value.extend({
-          type: {
+          $type: {
             instance: {
               validate: function() {
                 return [new ValidationError("Foo")];

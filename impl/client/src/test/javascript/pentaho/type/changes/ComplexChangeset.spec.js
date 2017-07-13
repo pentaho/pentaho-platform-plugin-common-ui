@@ -40,11 +40,11 @@ define([
       PentahoNumber = context.get(numberFactory);
 
       NumberList = List.extend({
-        type: {of: PentahoNumber}
+        $type: {of: PentahoNumber}
       });
 
       Derived = Complex.extend({
-        type: {
+        $type: {
           props: [
             {name: "foo", valueType: "number"},
             {name: "bar", valueType: "number"},
@@ -200,7 +200,7 @@ define([
         });
 
         it("should add a new property to the ComplexChangeset", function() {
-          var Derived = Complex.extend({type: {props: ["foo"]}});
+          var Derived = Complex.extend({$type: {props: ["foo"]}});
 
           var derived = new Derived({foo: "a"});
 
@@ -217,7 +217,7 @@ define([
         });
 
         it("should update a Replace change, when it already exists in the changeset", function() {
-          var Derived = Complex.extend({type: {props: ["foo"]}});
+          var Derived = Complex.extend({$type: {props: ["foo"]}});
 
           var derived = new Derived({foo: "a"});
 
@@ -240,7 +240,7 @@ define([
         });
 
         it("should not create a change, when the value is the same", function() {
-          var Derived = Complex.extend({type: {props: ["foo"]}});
+          var Derived = Complex.extend({$type: {props: ["foo"]}});
 
           var derived = new Derived({foo: "a"});
 
@@ -259,7 +259,7 @@ define([
 
           var txnScope = context.enterChange();
 
-          var Derived = Complex.extend({type: {props: ["foo"]}});
+          var Derived = Complex.extend({$type: {props: ["foo"]}});
           var derived = new Derived({foo: "bar"});
 
           var changeset = new ComplexChangeset(txnScope.transaction, derived);

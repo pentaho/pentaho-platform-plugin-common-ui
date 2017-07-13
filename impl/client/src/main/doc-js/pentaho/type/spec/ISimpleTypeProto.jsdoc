@@ -29,7 +29,7 @@
  * @memberOf pentaho.type.spec.ISimpleTypeProto#
  * @type {pentaho.type.spec.ISimpleProto}
  *
- * @see pentaho.type.spec.ISimpleProto#type
+ * @see pentaho.type.spec.ISimpleProto#$type
  */
 
 /**

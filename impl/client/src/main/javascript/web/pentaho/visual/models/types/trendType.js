@@ -25,12 +25,12 @@ define([
     var PentahoString = context.get("string");
 
     return PentahoString.extend({
-      type:  {
+      $type:  {
         id: module.id,
         mixins: ["enum"],
         domain: ["none", "linear"]
       }
     })
-    .implement({type: bundle.structured.trendType});
+    .implement({$type: bundle.structured.trendType});
   };
 });

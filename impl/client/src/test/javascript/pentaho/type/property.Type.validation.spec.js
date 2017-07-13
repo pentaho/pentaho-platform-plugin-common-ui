@@ -40,7 +40,7 @@ define([
 
         beforeEach(function() {
           Derived = Complex.extend({
-            type: {
+            $type: {
               label: "Derived",
               props: [
                 {name: "x", valueType: "string", isRequired: true},
@@ -66,7 +66,7 @@ define([
 
       it("should be considered valid when not applicable", function() {
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "x", valueType: "string", isRequired: true, isApplicable: false}
             ]
@@ -86,7 +86,7 @@ define([
       it("should call value.validate when not null and singular", function() {
 
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "x", valueType: "string"}
             ]
@@ -109,7 +109,7 @@ define([
       it("should call value.validate when not null and plural", function() {
 
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "x", valueType: ["string"]}
             ]
@@ -132,7 +132,7 @@ define([
       it("should call _validateValueOn with owner and value when not null and singular", function() {
 
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "x", valueType: "string"}
             ]
@@ -154,7 +154,7 @@ define([
       it("should call _validateValueOn with owner and value when not null and plural", function() {
 
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "x", valueType: ["string"]}
             ]
@@ -181,7 +181,7 @@ define([
         it("should call _collectElementValidators with a function, the owner and value", function() {
 
           var Derived = Complex.extend({
-            type: {
+            $type: {
               props: [
                 {name: "x", valueType: "string"}
               ]
@@ -204,7 +204,7 @@ define([
             "with the owner, value and 0-index", function() {
 
           var Derived = Complex.extend({
-            type: {
+            $type: {
               props: [
                 {name: "x", valueType: "string"}
               ]
@@ -230,7 +230,7 @@ define([
         it("should fail validation with errors returned by validators", function() {
 
           var Derived = Complex.extend({
-            type: {
+            $type: {
               props: [
                 {name: "x", valueType: "string"}
               ]
@@ -261,7 +261,7 @@ define([
         it("should not call _collectElementValidators if list is empty", function() {
 
           var Derived = Complex.extend({
-            type: {
+            $type: {
               props: [
                 {name: "x", valueType: ["string"]}
               ]
@@ -282,7 +282,7 @@ define([
         it("should call _collectElementValidators with a function, the owner and value", function() {
 
           var Derived = Complex.extend({
-            type: {
+            $type: {
               props: [
                 {name: "x", valueType: ["string"]}
               ]
@@ -305,7 +305,7 @@ define([
             "with the owner, element and index", function() {
 
           var Derived = Complex.extend({
-            type: {
+            $type: {
               props: [
                 {name: "x", valueType: ["string"]}
               ]
@@ -334,7 +334,7 @@ define([
         it("should fail validation with errors returned by validators", function() {
 
           var Derived = Complex.extend({
-            type: {
+            $type: {
               props: [
                 {name: "x", valueType: ["string"]}
               ]

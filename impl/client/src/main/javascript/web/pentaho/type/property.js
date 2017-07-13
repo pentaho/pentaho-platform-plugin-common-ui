@@ -82,7 +82,7 @@ define([
       // TODO: value, members?
       // TODO: p -> AnnotatableLinked.configure(this, config);
 
-      type: /** @lends pentaho.type.Property.Type# */{
+      $type: /** @lends pentaho.type.Property.Type# */{
         // Note: constructor/_init is only called on sub-classes of Property.Type,
         // and not on Property.Type itself.
 
@@ -959,7 +959,7 @@ define([
         // endregion
       }
     }, /** @lends pentaho.type.Property */{
-      type: /** @lends pentaho.type.Property.Type */{
+      $type: /** @lends pentaho.type.Property.Type */{
         /** @inheritDoc */
         _extend: function(name, instSpec, classSpec, keyArgs) {
 
@@ -972,7 +972,7 @@ define([
         }
       }
     }).implement({
-      type: /** @lends pentaho.type.Property.Type# */{
+      $type: /** @lends pentaho.type.Property.Type# */{
         dynamicAttributes: {
           /**
            * Evaluates the value of the `isRequired` attribute of a property of this type
@@ -1453,7 +1453,7 @@ define([
         }
       }
     }).implement({
-      type: /** @lends pentaho.type.Property.Type# */{
+      $type: /** @lends pentaho.type.Property.Type# */{
         // These are applied last so that mixins see any of the methods above as base implementations.
         mixins: [discreteDomainFactory]
       }

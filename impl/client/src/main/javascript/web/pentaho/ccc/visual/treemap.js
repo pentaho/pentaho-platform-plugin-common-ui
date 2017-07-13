@@ -27,7 +27,7 @@ define([
     return BaseView.extend({
       _cccClass: "TreemapChart",
 
-      type: {
+      $type: {
         id: module.id
       }
     });

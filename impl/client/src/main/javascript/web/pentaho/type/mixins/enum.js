@@ -68,7 +68,7 @@ define([
      *     var String = context.get("string");
      *
      *     return String.extend({
-     *       type: {
+     *       $type: {
      *         id: module.id,
      *         mixins: ["enum"],
      *         domain: [
@@ -86,7 +86,7 @@ define([
      */
     var Enum = Simple.extend(/** @lends pentaho.type.mixins.Enum# */{
 
-      type: /** @lends pentaho.type.mixins.Enum.Type# */{
+      $type: /** @lends pentaho.type.mixins.Enum.Type# */{
 
         id: module.id,
         alias: "enum",
@@ -128,7 +128,7 @@ define([
           this.base(spec, keyArgs);
 
           if(!keyArgs) keyArgs = {};
-          keyArgs.declaredType = this.type;
+          keyArgs.declaredType = this.$type;
           spec.domain = this.__domain.toSpecInContext(keyArgs);
 
           return true;
@@ -168,7 +168,7 @@ define([
           if(!this.__domain) {
             // List can only be configured (to allow for simple element's configuration of `formatted` field),
             // but is, for all other purposes, read-only.
-            var ListType = List.extend({type: {of: this}});
+            var ListType = List.extend({$type: {of: this}});
             this.__domain = new ListType(values, {isReadOnly: true});
             this.__domainPrimitive = this.__domain.toArray(function(v) { return v.value; });
 

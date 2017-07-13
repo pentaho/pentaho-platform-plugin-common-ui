@@ -88,7 +88,7 @@ define([
 
     var Level = PentahoString.extend({
 
-      type: /** @lends pentaho.visual.role.MeasurementLevel.Type# */{
+      $type: /** @lends pentaho.visual.role.MeasurementLevel.Type# */{
 
         id: module.id,
         mixins: ["enum"],
@@ -147,7 +147,7 @@ define([
         }
       }
     })
-    .implement({type: bundle.structured.level});
+    .implement({$type: bundle.structured.level});
 
     return Level;
   };

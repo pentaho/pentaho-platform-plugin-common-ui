@@ -156,7 +156,7 @@ define([
         return this.keyQualitative + "|" + (aggregation ? aggregation.$key : "");
       },
 
-      type: {
+      $type: {
         id: module.id,
 
         props: [
@@ -200,6 +200,6 @@ define([
         ]
       }
     })
-    .implement({type: bundle.structured.mappingAttribute});
+    .implement({$type: bundle.structured.mappingAttribute});
   };
 });

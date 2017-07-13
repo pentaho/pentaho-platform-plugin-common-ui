@@ -55,7 +55,7 @@ define([
       },
       // endregion
 
-      type: /** @lends pentaho.type.Date.Type# */{
+      $type: /** @lends pentaho.type.Date.Type# */{
         id: module.id,
         alias: "date",
 
@@ -64,7 +64,7 @@ define([
         }
       }
     }).implement(/** @lends pentaho.type.Date# */{
-      type: bundle.structured["date"] // eslint-disable-line dot-notation
+      $type: bundle.structured["date"] // eslint-disable-line dot-notation
     });
 
     return PenDate;

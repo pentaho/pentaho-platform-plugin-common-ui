@@ -136,7 +136,7 @@ define([
      * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
      */
     getChange: function(name) {
-      var pName = this.owner.type.get(name).name;
+      var pName = this.owner.$type.get(name).name;
       return O.getOwn(this._changes, pName) || null;
     },
 
@@ -150,7 +150,7 @@ define([
      * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
      */
     hasChange: function(name) {
-      var pName = this.owner.type.get(name).name;
+      var pName = this.owner.$type.get(name).name;
       return O.hasOwn(this._changes, pName);
     },
 
@@ -184,7 +184,7 @@ define([
      * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
      */
     getOld: function(name) {
-      var pName = this.owner.type.get(name).name;
+      var pName = this.owner.$type.get(name).name;
       return this.owner.__getByName(pName);
     },
 
@@ -212,7 +212,7 @@ define([
 
       // NOTE: For performance reasons, this function inlines code that would otherwise be available from.
       // For example: Container#usingChangeset(.) and TransactionScope.
-      var type = complex.type;
+      var type = complex.$type;
       var name = propType.name;
 
       // New value. Cast spec.

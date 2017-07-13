@@ -29,7 +29,7 @@
  * @memberOf pentaho.visual.action.spec.ISelectTypeProto#
  * @type {pentaho.visual.action.spec.ISelectProto}
  *
- * @see pentaho.visual.action.spec.ISelectProto#type
+ * @see pentaho.visual.action.spec.ISelectProto#$type
  */
 
 /**

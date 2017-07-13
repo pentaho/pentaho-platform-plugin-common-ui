@@ -270,7 +270,7 @@ define([
       it("should include `type` if != from 'value' when serializing an abstract property", function() {
         var scope = new SpecificationScope();
 
-        var SubProperty = Property.extend({type: {valueType: "string"}});
+        var SubProperty = Property.extend({$type: {valueType: "string"}});
         var propType = SubProperty.type;
 
         spyOn(propType, "_fillSpecInContext").and.returnValue(false);
@@ -290,7 +290,7 @@ define([
 
         spyOn(Property.type, "_fillSpecInContext").and.returnValue(false);
 
-        var SubProperty = Property.extend({type: {id: "my/foo"}});
+        var SubProperty = Property.extend({$type: {id: "my/foo"}});
         var propType = SubProperty.type;
 
         var spec = propType.toSpecInContext();

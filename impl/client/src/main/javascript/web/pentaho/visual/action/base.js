@@ -39,7 +39,7 @@ define([
     var __ActionBase = context.get(baseActionFactory);
 
     return __ActionBase.extend(/** @lends pentaho.visual.action.Base# */{
-      type: /** @lends pentaho.visual.action.Base.Type# */{
+      $type: /** @lends pentaho.visual.action.Base.Type# */{
         id: module.id,
         isAbstract: true
       },

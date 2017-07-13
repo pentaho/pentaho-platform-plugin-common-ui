@@ -83,7 +83,7 @@ define([
         return (this.property || "") + " " + (v ? v.$key : "");
       },
 
-      type: /** @lends pentaho.data.filter.IsEqual.Type# */{
+      $type: /** @lends pentaho.data.filter.IsEqual.Type# */{
         id: module.id,
         alias: "=",
         props: [

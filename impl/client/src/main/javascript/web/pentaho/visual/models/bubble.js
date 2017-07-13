@@ -27,7 +27,7 @@ define([
     var BaseModel = context.get(baseModelFactory);
 
     return BaseModel.extend({
-      type: {
+      $type: {
         id: module.id,
         mixins: [scaleSizeContinuousFactory],
 
@@ -46,6 +46,6 @@ define([
         ]
       }
     })
-    .implement({type: bundle.structured.bubble});
+    .implement({$type: bundle.structured.bubble});
   };
 });

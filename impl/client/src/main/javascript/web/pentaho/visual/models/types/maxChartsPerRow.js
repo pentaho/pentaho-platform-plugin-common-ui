@@ -25,12 +25,12 @@ define([
     var PentahoNumber = context.get("number");
 
     return PentahoNumber.extend({
-      type: {
+      $type: {
         id: module.id,
         mixins: ["enum"],
         domain: [1, 2, 3, 4, 5]
       }
     })
-    .implement({type: bundle.structured.maxChartsPerRow});
+    .implement({$type: bundle.structured.maxChartsPerRow});
   };
 });

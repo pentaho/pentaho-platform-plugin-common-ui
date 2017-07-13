@@ -116,7 +116,7 @@ define([
 
     return BaseView.extend(/** @lends pentaho.visual.ccc.base.View# */{
 
-      type: {
+      $type: {
         id: module.id,
         props: {
           model: {valueType: modelFactory}
@@ -351,8 +351,8 @@ define([
         var mapping = this.model.get(roleName);
         if(mapping.attributes.count > 1) return true;
 
-        var MeasurementLevel = this.type.context.get(measurementLevelFactory);
-        var rolePropType = this.model.type.get(roleName);
+        var MeasurementLevel = this.$type.context.get(measurementLevelFactory);
+        var rolePropType = this.model.$type.get(roleName);
         var level = rolePropType.levelEffectiveOn(this.model);
         return !level || MeasurementLevel.type.isQualitative(level);
       },
@@ -597,7 +597,7 @@ define([
         // This is because, otherwise, we would not be able to specify valueType and isDiscrete differently
         // for different visual roles...
 
-        this.model.type.eachVisualRole(function(propType) {
+        this.model.$type.eachVisualRole(function(propType) {
           var roleName = propType.name;
           var mapping  = this.model.get(roleName);
 
@@ -1435,7 +1435,7 @@ define([
       _processExtensions: function() {
         var valid = null;
 
-        var extension = this.type.extensionEffective;
+        var extension = this.$type.extensionEffective;
         if(extension) {
           def.each(extension, function(v, p) {
             if(!def.hasOwn(extensionBlacklist, p)) {
@@ -1479,7 +1479,7 @@ define([
 
         // TODO: Currently, this is DET dependent...
 
-        var modelTypeApp = this.model.type.application;
+        var modelTypeApp = this.model.$type.application;
         var cellCountMax = +(modelTypeApp && modelTypeApp.optimalMaxDataSize);
         return cellCountMax > 0 ? cellCountMax : -1;
       },
@@ -1538,7 +1538,7 @@ define([
             operands.push(operand);
           }
         } else {
-          operands =selectingDatums.reduce(function(memo, datum) {
+          operands = selectingDatums.reduce(function(memo, datum) {
             if(!datum.isVirtual && !datum.isNull) {
               // When there are no attributes (e.g. bar chart with measures alone),
               // operand is null...
@@ -1559,8 +1559,8 @@ define([
         }
 
         if(operands.length) {
-          var SelectAction = this.type.context.get(selectActionFactory);
-          var Or = this.type.context.get("or");
+          var SelectAction = this.$type.context.get(selectActionFactory);
+          var Or = this.$type.context.get("or");
           this.act(new SelectAction({
             dataFilter: new Or({operands: operands}),
             position: srcEvent ? {x: srcEvent.clientX, y: srcEvent.clientY} : null
@@ -1587,10 +1587,10 @@ define([
       },
 
       _onDoubleClick: function(complex, srcEvent) {
-        var ExecuteAction = this.type.context.get(executeActionFactory);
+        var ExecuteAction = this.$type.context.get(executeActionFactory);
         var dataFilter = this._complexToFilter(complex);
         if(dataFilter != null) {
-          var Or = this.type.context.get("or");
+          var Or = this.$type.context.get("or");
           this.act(new ExecuteAction({
             dataFilter: new Or({operands: [dataFilter]}),
             position: srcEvent ? {x: srcEvent.clientX, y: srcEvent.clientY} : null
@@ -1613,7 +1613,7 @@ define([
 
         // Enforce that the returned filter is wrapped by an And
         if (filter != null && filter.kind !== "and") {
-          var And = this.type.context.get("and");
+          var And = this.$type.context.get("and");
           return new And({
             operands: [filter]
           });

@@ -61,7 +61,7 @@ define([
     var Instance = context.get("instance");
 
     return Instance.extend(/** @lends pentaho.type.mixins.DiscreteDomain# */{
-      type: /** @lends pentaho.type.mixins.DiscreteDomain.Type# */{
+      $type: /** @lends pentaho.type.mixins.DiscreteDomain.Type# */{
         id: module.id,
 
         dynamicAttributes: {

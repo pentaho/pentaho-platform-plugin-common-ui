@@ -81,7 +81,7 @@ define([
         return this.attributes.count > 0;
       },
 
-      type: /** @lends pentaho.visual.role.Mapping.Type# */{
+      $type: /** @lends pentaho.visual.role.Mapping.Type# */{
         id: module.id,
 
         props: [
@@ -114,7 +114,7 @@ define([
         ]
       }
     })
-    .implement({type: bundle.structured.mapping});
+    .implement({$type: bundle.structured.mapping});
 
     return VisualRoleMapping;
   };

@@ -27,7 +27,7 @@ define([
     return BaseView.extend({
       _cccClass: "BoxplotChart",
 
-      type: {
+      $type: {
         id: module.id
       }
     });

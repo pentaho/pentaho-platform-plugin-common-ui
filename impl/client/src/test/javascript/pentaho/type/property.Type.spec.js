@@ -154,7 +154,7 @@ define([
           var Complex2 = context2.get("complex");
           expect(function() {
             Property.extend({
-              type: {name: "foo"}
+              $type: {name: "foo"}
             }, null, {
               declaringType: Complex2.type,
               index: 1,
@@ -437,7 +437,7 @@ define([
 
           // Create a descendant property
           propType.instance.constructor.extend({
-            type: {name: "foo1"}
+            $type: {name: "foo1"}
           }, null, {
             declaringType: Derived2.type
           }); // keyArgs
@@ -636,7 +636,7 @@ define([
           var Derived2 = Derived.extend();
 
           propType.instance.constructor.extend(
-              {type: {name: "foo1"}}, null,
+              {$type: {name: "foo1"}}, null,
               {declaringType: Derived2.type}); // keyArgs
 
           expect(function() {
@@ -739,7 +739,7 @@ define([
 
           // Create a descendant property
           propType.instance.constructor.extend(
-              {type: {name: "foo"}}, // spec
+              {$type: {name: "foo"}}, // spec
               null,
               {declaringType: Derived2.type}); // keyArgs
 
@@ -938,7 +938,7 @@ define([
 
           // Create a descendant property
           propType.instance.constructor.extend(
-              {type: {name: "foo"}}, // spec
+              {$type: {name: "foo"}}, // spec
               null,
               {declaringType: Derived2.type}); // keyArgs
 
@@ -1057,7 +1057,7 @@ define([
 
           // Create a descendant property
           propType.instance.constructor.extend(
-              {type: {name: "foo"}}, // spec
+              {$type: {name: "foo"}}, // spec
               null,
               {declaringType: Derived2.type}); // keyArgs
 
@@ -1159,7 +1159,7 @@ define([
 
           // Create a descendant property
           propType.instance.constructor.extend(
-              {type: {name: "foo"}}, // spec
+              {$type: {name: "foo"}}, // spec
               null,
               {declaringType: Derived2.type}); // keyArgs
 
@@ -1261,7 +1261,7 @@ define([
 
           // Create a descendant property
           propType.instance.constructor.extend(
-              {type: {name: "foo"}}, // spec
+              {$type: {name: "foo"}}, // spec
               null,
               {declaringType: Derived2.type}); // keyArgs
 
@@ -1397,7 +1397,7 @@ define([
           var context2 = new Context();
           var Property2 = context2.get("property")
                 .implement({
-                  type: {
+                  $type: {
                     dynamicAttributes: {
                       isFoo: {
                         defaultValue: false,
@@ -1415,7 +1415,7 @@ define([
 
           var fValue = function() { return true; };
           var SubProperty2 = Property2.extend({
-            type: {
+            $type: {
               isFoo: fValue
             }
           });
@@ -1444,7 +1444,7 @@ define([
 
         it("should read the valueOf of the value of the property", function() {
           var Derived2 = Complex.extend({
-            type: {
+            $type: {
               props: [
                 {name: "foo", valueType: "string"}
               ]
@@ -1458,7 +1458,7 @@ define([
 
         it("should set the value of the property", function() {
           var Derived2 = Complex.extend({
-            type: {
+            $type: {
               props: [
                 {name: "foo", valueType: "string"}
               ]
@@ -2270,7 +2270,7 @@ define([
 
         it("should allow deriving the base property type without specifying it", function() {
           var Derived = Complex.extend({
-            type: {
+            $type: {
               props: [
                 {name: "postalCode", valueType: PentahoString}
               ]
@@ -2278,7 +2278,7 @@ define([
           });
 
           var Derived2 = Derived.extend({
-            type: {
+            $type: {
               props: [
                 {name: "postalCode", valueType: {}}
               ]

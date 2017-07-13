@@ -35,7 +35,7 @@ define([
 
     describe("construction", function() {
       it("should allow specifying static type members", function() {
-        var Derived = Instance.extend({}, {type: {foo: "bar"}});
+        var Derived = Instance.extend({}, {$type: {foo: "bar"}});
 
         expect(Derived.Type.foo).toBe("bar");
       });
@@ -69,7 +69,7 @@ define([
 
         it("should inherit `label`", function() {
           function expectIt(derivedSpec) {
-            var Derived = Instance.extend({type: derivedSpec});
+            var Derived = Instance.extend({$type: derivedSpec});
             expect(Derived.type.label).toBe(Instance.type.label);
           }
 
@@ -80,8 +80,8 @@ define([
         });
 
         it("subclasses should preserve the default value", function() {
-          var FirstDerivative  = Instance.extend({type: {label: "Foo"}});
-          var SecondDerivative = FirstDerivative.extend({type: {label: "Bar"}});
+          var FirstDerivative  = Instance.extend({$type: {label: "Foo"}});
+          var SecondDerivative = FirstDerivative.extend({$type: {label: "Bar"}});
           SecondDerivative.type.label = undefined;
           // The default value is still there (did not delete)
           expect(SecondDerivative.type.label).toBe("Foo");
@@ -91,7 +91,7 @@ define([
       describe("when `label` is truthy", function() {
         // Can change the label
         it("should respect the `label`", function() {
-          var Derived = Instance.extend({type: {label: "Foo"}});
+          var Derived = Instance.extend({$type: {label: "Foo"}});
           expect(Derived.type.label).toBe("Foo");
         });
       });
@@ -102,7 +102,7 @@ define([
       describe("when `id` is falsy -", function() {
         it("should have `null` as a default `id`", function() {
           function expectIt(spec) {
-            var Derived = Instance.extend({type: spec});
+            var Derived = Instance.extend({$type: spec});
             expect(Derived.type.id).toBe(null);
           }
 
@@ -115,7 +115,7 @@ define([
           function expectIt(spec) {
             spec.sourceId = "foo";
 
-            var Derived = Instance.extend({type: spec});
+            var Derived = Instance.extend({$type: spec});
             expect(Derived.type.id).toBe("foo");
           }
 
@@ -128,7 +128,7 @@ define([
       describe("when `id` is truthy -", function() {
         it("should respect it", function() {
           var Derived = Instance.extend({
-            type: {id: "foo/bar"}
+            $type: {id: "foo/bar"}
           });
 
           expect(Derived.type.id).toBe("foo/bar");
@@ -136,7 +136,7 @@ define([
 
         it("should convert it to a string", function() {
           var Derived = Instance.extend({
-            type: {id: {toString: function() { return "foo/bar"; }}}
+            $type: {id: {toString: function() { return "foo/bar"; }}}
           });
 
           expect(Derived.type.id).toBe("foo/bar");
@@ -144,7 +144,7 @@ define([
 
         it("should ignore it, if it is a temporary id", function() {
           var Derived = Instance.extend({
-            type: {id: SpecificationContext.idTemporaryPrefix + "id"}
+            $type: {id: SpecificationContext.idTemporaryPrefix + "id"}
           });
 
           expect(Derived.type.id).toBe(null);
@@ -157,7 +157,7 @@ define([
           function expectIt(spec) {
             spec.id = "foo";
 
-            var Derived = Instance.extend({type: spec});
+            var Derived = Instance.extend({$type: spec});
             expect(Derived.type.sourceId).toBe("foo");
           }
 
@@ -170,7 +170,7 @@ define([
       describe("when `sourceId` is truthy -", function() {
         it("should respect it", function() {
           var Derived = Instance.extend({
-            type: {sourceId: "foo/bar"}
+            $type: {sourceId: "foo/bar"}
           });
 
           expect(Derived.type.sourceId).toBe("foo/bar");
@@ -178,7 +178,7 @@ define([
 
         it("should convert it to a string", function() {
           var Derived = Instance.extend({
-            type: {sourceId: {toString: function() { return "foo/bar"; }}}
+            $type: {sourceId: {toString: function() { return "foo/bar"; }}}
           });
 
           expect(Derived.type.sourceId).toBe("foo/bar");
@@ -188,7 +188,7 @@ define([
       describe("when both `id` and `sourceId` are truthy and different -", function() {
         it("should respect both", function() {
           var Derived = Instance.extend({
-            type: {id: "bar/foo", sourceId: "foo/bar"}
+            $type: {id: "bar/foo", sourceId: "foo/bar"}
           });
 
           expect(Derived.type.id).toBe("bar/foo");
@@ -202,7 +202,7 @@ define([
 
       it("should leave absolute ids intact", function() {
 
-        var Derived = Instance.extend({type: {sourceId: "fake/id"}});
+        var Derived = Instance.extend({$type: {sourceId: "fake/id"}});
 
         expect(Derived.type.buildSourceRelativeId("/foo")).toBe("/foo");
         expect(Derived.type.buildSourceRelativeId("foo:")).toBe("foo:");
@@ -213,7 +213,7 @@ define([
 
       it("should convert relative ids to absolute", function() {
 
-        var Derived = Instance.extend({type: {sourceId: "fake/id"}});
+        var Derived = Instance.extend({$type: {sourceId: "fake/id"}});
 
         expect(Derived.type.buildSourceRelativeId("./foo/bar")).toBe("fake/./foo/bar");
         expect(Derived.type.buildSourceRelativeId("./bar")).toBe("fake/./bar");
@@ -228,7 +228,7 @@ define([
 
         // ---
 
-        Derived = Instance.extend({type: {sourceId: "id"}});
+        Derived = Instance.extend({$type: {sourceId: "id"}});
 
         expect(Derived.type.buildSourceRelativeId("../bar")).toBe("../bar");
       });
@@ -238,13 +238,13 @@ define([
 
       it("cannot be assigned to an anonymous type", function() {
         expect(function() {
-          var Derived = Instance.extend({type: {label: "Foo", alias: "bar"}});
+          var Derived = Instance.extend({$type: {label: "Foo", alias: "bar"}});
         }).toThrow(errorMatch.argInvalid("alias", "Anonymous types cannot have an alias"));
       });
 
       it("is read only", function() {
         expect(function() {
-          var Derived = Instance.extend({type: {label: "Foo", id: "type/bar", alias: "bar"}});
+          var Derived = Instance.extend({$type: {label: "Foo", id: "type/bar", alias: "bar"}});
           Derived.type.alias = "mux";
         }).toThrowError(TypeError);
       });
@@ -259,12 +259,12 @@ define([
       });
 
       it("should be equal to #id when no alias is defined", function() {
-        var Derived = Instance.extend({type: {id: "my/foo"}});
+        var Derived = Instance.extend({$type: {id: "my/foo"}});
         expect(Derived.type.shortId).toBe(Derived.type.id);
       });
 
       it("should be equal to #alias when the alias is defined", function() {
-        var Derived = Instance.extend({type: {id: "my/foo", alias: "foo"}});
+        var Derived = Instance.extend({$type: {id: "my/foo", alias: "foo"}});
         expect(Derived.type.shortId).toBe(Derived.type.alias);
       });
 
@@ -272,20 +272,20 @@ define([
 
     describe("#defaultView -", function() {
       it("should default to `null`", function() {
-        var Derived = Instance.extend({type: {id: "fake/id"}});
+        var Derived = Instance.extend({$type: {id: "fake/id"}});
 
         expect(Derived.type.defaultView).toBe(null);
       });
 
       it("should store relative ids as relative ids", function() {
 
-        var Derived = Instance.extend({type: {id: "fake/id", defaultView: "./foo/bar"}});
+        var Derived = Instance.extend({$type: {id: "fake/id", defaultView: "./foo/bar"}});
 
         expect(Derived.type.defaultView).toBe("./foo/bar");
       });
 
       it("should inherit the base type's defaultView, when unspecified", function() {
-        var A = Instance.extend({type: {defaultView: "foo"}});
+        var A = Instance.extend({$type: {defaultView: "foo"}});
 
         expect(A.type.defaultView).toBe("foo");
 
@@ -295,52 +295,52 @@ define([
       });
 
       it("should inherit the base type's defaultView, when spec is undefined", function() {
-        var A = Instance.extend({type: {defaultView: "foo"}});
+        var A = Instance.extend({$type: {defaultView: "foo"}});
 
         expect(A.type.defaultView).toBe("foo");
 
-        var B = A.extend({type: {defaultView: undefined}});
+        var B = A.extend({$type: {defaultView: undefined}});
 
         expect(B.type.defaultView).toBe("foo");
       });
 
       it("should respect a null spec value", function() {
-        var A = Instance.extend({type: {defaultView: "foo"}});
+        var A = Instance.extend({$type: {defaultView: "foo"}});
 
         expect(A.type.defaultView).toBe("foo");
 
-        var B = A.extend({type: {defaultView: null}});
+        var B = A.extend({$type: {defaultView: null}});
 
         expect(B.type.defaultView).toBe(null);
       });
 
       it("should convert an empty string value to null", function() {
-        var A = Instance.extend({type: {defaultView: "foo"}});
+        var A = Instance.extend({$type: {defaultView: "foo"}});
 
         expect(A.type.defaultView).toBe("foo");
 
-        var B = A.extend({type: {defaultView: ""}});
+        var B = A.extend({$type: {defaultView: ""}});
 
         expect(B.type.defaultView).toBe(null);
       });
 
       it("should respect a specified non-empty string", function() {
-        var A = Instance.extend({type: {defaultView: "foo"}});
+        var A = Instance.extend({$type: {defaultView: "foo"}});
 
         expect(A.type.defaultView).toBe("foo");
 
-        var B = A.extend({type: {defaultView: "bar"}});
+        var B = A.extend({$type: {defaultView: "bar"}});
 
         expect(B.type.defaultView).toBe("bar");
       });
 
       // coverage
       it("should allow setting to the same string value", function() {
-        var A = Instance.extend({type: {defaultView: "foo"}});
+        var A = Instance.extend({$type: {defaultView: "foo"}});
 
         expect(A.type.defaultView).toBe("foo");
 
-        var B = A.extend({type: {defaultView: "bar"}});
+        var B = A.extend({$type: {defaultView: "bar"}});
 
         B.type.defaultView = "bar";
 
@@ -350,7 +350,7 @@ define([
       it("should inherit a base function", function() {
         var FA = function() {
         };
-        var A  = Instance.extend({type: {defaultView: FA}});
+        var A  = Instance.extend({$type: {defaultView: FA}});
 
         expect(A.type.defaultView).toBe(FA);
 
@@ -362,13 +362,13 @@ define([
       it("should respect a specified function", function() {
         var FA = function() {
         };
-        var A  = Instance.extend({type: {defaultView: FA}});
+        var A  = Instance.extend({$type: {defaultView: FA}});
 
         expect(A.type.defaultView).toBe(FA);
 
         var FB = function() {
         };
-        var B  = A.extend({type: {defaultView: FB}});
+        var B  = A.extend({$type: {defaultView: FB}});
 
         expect(B.type.defaultView).toBe(FB);
       });
@@ -377,13 +377,13 @@ define([
       it("should allow setting to the same function", function() {
         var FA = function() {
         };
-        var A  = Instance.extend({type: {defaultView: FA}});
+        var A  = Instance.extend({$type: {defaultView: FA}});
 
         expect(A.type.defaultView).toBe(FA);
 
         var FB = function() {
         };
-        var B  = A.extend({type: {defaultView: FB}});
+        var B  = A.extend({$type: {defaultView: FB}});
 
         B.type.defaultView = FB;
 
@@ -398,7 +398,7 @@ define([
 
       it("should throw when defaultView is not a string, nully or a function", function() {
         expect(function() {
-          Instance.extend({type: {defaultView: {}}});
+          Instance.extend({$type: {defaultView: {}}});
         }).toThrow(errorMatch.argInvalidType("defaultView", ["nully", "string", "function"], "object"));
       });
     }); // end #defaultView
@@ -427,7 +427,7 @@ define([
         var View = function() {
         };
 
-        var A = Instance.extend({type: {defaultView: View}});
+        var A = Instance.extend({$type: {defaultView: View}});
         var p = A.type.defaultViewClass;
 
         expect(p instanceof Promise).toBe(true);
@@ -446,7 +446,7 @@ define([
           return View;
         });
 
-        var A = Instance.extend({type: {defaultView: "foo/bar"}});
+        var A = Instance.extend({$type: {defaultView: "foo/bar"}});
 
         var p = A.type.defaultViewClass;
 
@@ -468,7 +468,7 @@ define([
           return View;
         });
 
-        var A = Instance.extend({type: {sourceId: "foo/bar", defaultView: "./barView"}});
+        var A = Instance.extend({$type: {sourceId: "foo/bar", defaultView: "./barView"}});
 
         var p = A.type.defaultViewClass;
 
@@ -489,7 +489,7 @@ define([
           return View;
         });
 
-        var A = Instance.extend({type: {defaultView: "foo/bar"}});
+        var A = Instance.extend({$type: {defaultView: "foo/bar"}});
 
         var B = A.extend();
 
@@ -516,9 +516,9 @@ define([
           return View;
         });
 
-        var A = Instance.extend({type: {sourceId: "foo/bar", defaultView: "./barView"}});
+        var A = Instance.extend({$type: {sourceId: "foo/bar", defaultView: "./barView"}});
 
-        var B = A.extend({type: {sourceId: "gugu/dada"}});
+        var B = A.extend({$type: {sourceId: "gugu/dada"}});
 
         var pb = B.type.defaultViewClass;
 
@@ -542,7 +542,7 @@ define([
           return View;
         });
 
-        var A = Instance.extend({type: {defaultView: "foo/bar"}});
+        var A = Instance.extend({$type: {defaultView: "foo/bar"}});
 
         var pa = A.type.defaultViewClass;
 
@@ -567,7 +567,7 @@ define([
           return ViewDude;
         });
 
-        var A = Instance.extend({type: {defaultView: "foo/bar"}});
+        var A = Instance.extend({$type: {defaultView: "foo/bar"}});
 
         var pa = A.type.defaultViewClass;
 
@@ -598,10 +598,10 @@ define([
 
     describe("#isAbstract", function() {
       it("should respect a specified abstract spec value", function() {
-        var Derived = Instance.extend({type: {isAbstract: true}});
+        var Derived = Instance.extend({$type: {isAbstract: true}});
         expect(Derived.type.isAbstract).toBe(true);
 
-        Derived = Instance.extend({type: {isAbstract: false}});
+        Derived = Instance.extend({$type: {isAbstract: false}});
         expect(Derived.type.isAbstract).toBe(false);
       });
 
@@ -609,8 +609,8 @@ define([
         var Derived = Instance.extend();
         expect(Derived.type.isAbstract).toBe(false);
 
-        var Abstract = Instance.extend({type: {isAbstract: true}});
-        var Concrete = Instance.extend({type: {isAbstract: false}});
+        var Abstract = Instance.extend({$type: {isAbstract: true}});
+        var Concrete = Instance.extend({$type: {isAbstract: false}});
 
         var DerivedAbstract = Abstract.extend();
         var DerivedConcrete = Concrete.extend();
@@ -630,7 +630,7 @@ define([
       describe("when not specified -", function() {
         it("should inherit the base application attribute", function() {
           function expectIt(spec) {
-            var Derived = Instance.extend({type: spec});
+            var Derived = Instance.extend({$type: spec});
 
             expect(Derived.type.application).toEqual({});
           }
@@ -643,15 +643,15 @@ define([
       describe("when specified -", function() {
         it("should clone the spec if there is no previous application attribute defined", function() {
           var spec = {foo: "bar"};
-          var Derived = Instance.extend({type: {application: spec}});
+          var Derived = Instance.extend({$type: {application: spec}});
 
           expect(Derived.type.application).not.toBe(spec);
           expect(Derived.type.application.foo).toBe(spec.foo);
         });
 
         it("should merge the spec if there is a previous application attribute defined", function() {
-          var Derived1 = Instance.extend({type: {application: {foo: "foo"}}});
-          var Derived2 = Instance.extend({type: {application: {foo: "bar", bar: "foo"}}});
+          var Derived1 = Instance.extend({$type: {application: {foo: "foo"}}});
+          var Derived2 = Instance.extend({$type: {application: {foo: "bar", bar: "foo"}}});
           expect(Derived1.type.application.foo).toBe("foo");
           expect(Derived2.type.application.foo).toBe("bar");
           expect(Derived2.type.application.bar).toBe("foo");
@@ -675,7 +675,7 @@ define([
       describe("when not specified -", function() {
         it("should inherit the base description", function() {
           function expectIt(spec) {
-            var Derived = Instance.extend({type: spec});
+            var Derived = Instance.extend({$type: spec});
 
             expect(Derived.type.description).toBe(Instance.type.description);
           }
@@ -688,7 +688,7 @@ define([
       describe("when specified as `null` or an empty string -", function() {
         it("should set the description to `null`", function() {
           function expectIt(spec) {
-            var Derived = Instance.extend({type: spec});
+            var Derived = Instance.extend({$type: spec});
 
             expect(Derived.type.description).toBe(null);
           }
@@ -700,7 +700,7 @@ define([
 
       describe("when specified as a non-empty string -", function() {
         it("should respect it", function() {
-          var Derived = Instance.extend({type: {description: "Foo"}});
+          var Derived = Instance.extend({$type: {description: "Foo"}});
 
           expect(Derived.type.description).toBe("Foo");
         });
@@ -718,7 +718,7 @@ define([
 
         it("should inherit the base category", function() {
           function expectIt(spec) {
-            var Derived = Instance.extend({type: spec});
+            var Derived = Instance.extend({$type: spec});
 
             expect(Derived.type.category).toBe(Instance.type.category);
           }
@@ -731,7 +731,7 @@ define([
       describe("when specified as `null` or an empty string -", function() {
         it("should set the category to `null`", function() {
           function expectIt(spec) {
-            var Derived = Instance.extend({type: spec});
+            var Derived = Instance.extend({$type: spec});
 
             expect(Derived.type.category).toBe(null);
           }
@@ -743,7 +743,7 @@ define([
 
       describe("when specified as a non-empty string", function() {
         it("should respect it", function() {
-          var Derived = Instance.extend({type: {category: "Foo"}});
+          var Derived = Instance.extend({$type: {category: "Foo"}});
 
           expect(Derived.type.category).toBe("Foo");
         });
@@ -760,7 +760,7 @@ define([
       describe("when not specified", function() {
         it("should inherit the base helpUrl", function() {
           function expectIt(spec) {
-            var Derived = Instance.extend({type: spec});
+            var Derived = Instance.extend({$type: spec});
 
             expect(Derived.type.helpUrl).toBe(Instance.type.helpUrl);
           }
@@ -773,7 +773,7 @@ define([
       describe("when specified as `null` or an empty string -", function() {
         it("should set the helpUrl to `null`", function() {
           function expectIt(spec) {
-            var Derived = Instance.extend({type: spec});
+            var Derived = Instance.extend({$type: spec});
 
             expect(Derived.type.helpUrl).toBe(null);
           }
@@ -785,7 +785,7 @@ define([
 
       describe("when specified as a non-empty string -", function() {
         it("should respect it", function() {
-          var Derived = Instance.extend({type: {helpUrl: "Foo"}});
+          var Derived = Instance.extend({$type: {helpUrl: "Foo"}});
 
           expect(Derived.type.helpUrl).toBe("Foo");
         });
@@ -821,7 +821,7 @@ define([
 
       it("should default to the id of the type, in snake case, when the type is not anonymous", function() {
         var Derived = Instance.extend({
-          type: {
+          $type: {
             id: "foo/bar"
           }
         });
@@ -837,7 +837,7 @@ define([
 
       it("should respect a specified styleClass upon extension", function() {
         var Derived = Instance.extend({
-          type: {
+          $type: {
             id: "foo/bar",
             styleClass: "foo-bar-gugu"
           }
@@ -848,7 +848,7 @@ define([
 
       it("should respect a specified styleClass equal to `null` upon extension", function() {
         var Derived = Instance.extend({
-          type: {
+          $type: {
             id: "foo/bar",
             styleClass: null
           }
@@ -859,7 +859,7 @@ define([
 
       it("should convert a specified styleClass equal to `''` to `null` upon extension", function() {
         var Derived = Instance.extend({
-          type: {
+          $type: {
             id: "foo/bar",
             styleClass: ""
           }
@@ -870,7 +870,7 @@ define([
 
       it("should default to the id of the type if specified as `undefined` upon extension", function() {
         var Derived = Instance.extend({
-          type: {
+          $type: {
             id: "foo/bar",
             styleClass: undefined
           }
@@ -881,7 +881,7 @@ define([
 
       it("should clear the value when set to '' after extension", function() {
         var Derived = Instance.extend({
-          type: {
+          $type: {
             id: "foo/bar",
             styleClass: "abc"
           }
@@ -894,7 +894,7 @@ define([
 
       it("should clear the value when set to `null` after extension", function() {
         var Derived = Instance.extend({
-          type: {
+          $type: {
             id: "foo/bar",
             styleClass: "abc"
           }
@@ -907,7 +907,7 @@ define([
 
       it("should default the value when set to `undefined` after extension", function() {
         var Derived = Instance.extend({
-          type: {
+          $type: {
             id: "foo/bar",
             styleClass: "abc"
           }
@@ -934,9 +934,9 @@ define([
         Instance = context.get("instance");
 
         Instance.type.styleClass = null;
-        DerivedLevel1 = Instance.extend({type: {styleClass: null}});
-        DerivedLevel2 = DerivedLevel1.extend({type: {styleClass: null}});
-        DerivedLevel3 = DerivedLevel2.extend({type: {styleClass: null}});
+        DerivedLevel1 = Instance.extend({$type: {styleClass: null}});
+        DerivedLevel2 = DerivedLevel1.extend({$type: {styleClass: null}});
+        DerivedLevel3 = DerivedLevel2.extend({$type: {styleClass: null}});
       });
 
       it("should return empty array when no styleClass are defined", function() {
@@ -984,19 +984,19 @@ define([
 
       it("can be set on a derived class", function() {
         [true, false].forEach(function(bool) {
-          var Derived = Instance.extend({type: {"isAdvanced": bool}});
+          var Derived = Instance.extend({$type: {"isAdvanced": bool}});
           expect(Derived.type.isAdvanced).toBe(bool);
 
           var inst = new Derived();
-          expect(inst.type.isAdvanced).toBe(bool);
+          expect(inst.$type.isAdvanced).toBe(bool);
         });
       });
 
       it("can be unset by passing a nully, thus delegating to the ancestor class", function() {
         [true, false].forEach(function(bool) {
           [null, undefined].forEach(function(value) {
-            var FirstDerivative  = Instance.extend({type: {"isAdvanced": bool}});
-            var SecondDerivative = FirstDerivative.extend({type: {"isAdvanced": !bool}});
+            var FirstDerivative  = Instance.extend({$type: {"isAdvanced": bool}});
+            var SecondDerivative = FirstDerivative.extend({$type: {"isAdvanced": !bool}});
 
             SecondDerivative.type.isAdvanced = value;
             expect(SecondDerivative.type.isAdvanced).toBe(FirstDerivative.type.isAdvanced);
@@ -1014,19 +1014,19 @@ define([
 
       it("can be set on a derived class", function() {
         [true, false].forEach(function(bool) {
-          var Derived = Instance.extend({type: {"isBrowsable": bool}});
+          var Derived = Instance.extend({$type: {"isBrowsable": bool}});
           expect(Derived.type.isBrowsable).toBe(bool);
 
           var inst = new Derived();
-          expect(inst.type.isBrowsable).toBe(bool);
+          expect(inst.$type.isBrowsable).toBe(bool);
         });
       });
 
       it("can be unset by passing a nully, thus delegating to the ancestor class", function() {
         [true, false].forEach(function(bool) {
           [null, undefined].forEach(function(value) {
-            var FirstDerivative  = Instance.extend({type: {"isBrowsable": bool}});
-            var SecondDerivative = FirstDerivative.extend({type: {"isBrowsable": !bool}});
+            var FirstDerivative  = Instance.extend({$type: {"isBrowsable": bool}});
+            var SecondDerivative = FirstDerivative.extend({$type: {"isBrowsable": !bool}});
 
             SecondDerivative.type.isBrowsable = value;
             expect(SecondDerivative.type.isBrowsable).toBe(FirstDerivative.type.isBrowsable);
@@ -1044,11 +1044,11 @@ define([
 
       it("can be set on a derived class", function() {
         [1].forEach(function(someValue) {
-          var Derived = Instance.extend({type: {"ordinal": someValue}});
+          var Derived = Instance.extend({$type: {"ordinal": someValue}});
           expect(Derived.type.ordinal).toBe(someValue);
 
           var inst = new Derived();
-          expect(inst.type.ordinal).toBe(someValue);
+          expect(inst.$type.ordinal).toBe(someValue);
         });
       });
 
@@ -1066,20 +1066,20 @@ define([
           var candidate = candidateAndFinal[0];
           var final     = candidateAndFinal[1];
 
-          var FirstDerivative  = Instance.extend({type: {"ordinal": 42}});
-          var SecondDerivative = FirstDerivative.extend({type: {"ordinal": candidate}});
+          var FirstDerivative  = Instance.extend({$type: {"ordinal": 42}});
+          var SecondDerivative = FirstDerivative.extend({$type: {"ordinal": candidate}});
           expect(SecondDerivative.type.ordinal).toBe(final);
 
           var inst = new SecondDerivative();
-          expect(inst.type.ordinal).toBe(final);
+          expect(inst.$type.ordinal).toBe(final);
         });
       });
 
       it("can be unset by passing a nully, thus delegating to the ancestor class", function() {
         [1, 20].forEach(function(someValue) {
           [null, undefined].forEach(function(resetValue) {
-            var FirstDerivative  = Instance.extend({type: {"ordinal": 42}});
-            var SecondDerivative = FirstDerivative.extend({type: {"ordinal": someValue}});
+            var FirstDerivative  = Instance.extend({$type: {"ordinal": 42}});
+            var SecondDerivative = FirstDerivative.extend({$type: {"ordinal": someValue}});
 
             SecondDerivative.type.ordinal = resetValue;
             expect(SecondDerivative.type.ordinal).toBe(FirstDerivative.type.ordinal);
@@ -1095,16 +1095,16 @@ define([
           expect(Derived.type.isRoot).toBe(isRoot);
 
           var inst = new Derived();
-          expect(inst.type.isRoot).toBe(isRoot);
+          expect(inst.$type.isRoot).toBe(isRoot);
         });
       });
     }); // #isRoot
 
     describe("#ancestor -", function() {
       it("returns the immediate ancestor", function() {
-        var FirstDerivative  = Instance.extend({type: {"firstDerivative": true}});
-        var FirstSibling     = Instance.extend({type: {"firstSibling": true}});
-        var SecondDerivative = FirstDerivative.extend({type: {"secondDerivative": true}});
+        var FirstDerivative  = Instance.extend({$type: {"firstDerivative": true}});
+        var FirstSibling     = Instance.extend({$type: {"firstSibling": true}});
+        var SecondDerivative = FirstDerivative.extend({$type: {"secondDerivative": true}});
 
         expect(FirstDerivative.type.ancestor).toBe(Instance.type);
 
@@ -1249,7 +1249,7 @@ define([
       });
 
       it("should throw if given a type annotated value of an abstract type", function() {
-        var MyAbstract = context.get("pentaho/type/complex").extend({type: {isAbstract: true}});
+        var MyAbstract = context.get("pentaho/type/complex").extend({$type: {isAbstract: true}});
 
         expect(function() {
           Instance.type.create({_: MyAbstract});
@@ -1257,7 +1257,7 @@ define([
       });
 
       it("should throw if given a value and called on an abstract type", function() {
-        var MyAbstract = context.get("pentaho/type/complex").extend({type: {isAbstract: true}});
+        var MyAbstract = context.get("pentaho/type/complex").extend({$type: {isAbstract: true}});
 
         expect(function() {
           MyAbstract.type.create({});
@@ -1403,7 +1403,7 @@ define([
       });
 
       it("should throw if given a type annotated value of an abstract type", function() {
-        var MyAbstract = context.get("pentaho/type/complex").extend({type: {isAbstract: true}});
+        var MyAbstract = context.get("pentaho/type/complex").extend({$type: {isAbstract: true}});
 
         return expectToRejectWith(
             function() { return Instance.type.createAsync({_: MyAbstract}); },
@@ -1421,7 +1421,7 @@ define([
               var Complex = context.get("pentaho/type/complex");
 
               return Complex.extend({
-                type: {
+                $type: {
                   id: "test/foo/a",
                   props: {
                     a: {valueType: "string"}
@@ -1437,7 +1437,7 @@ define([
               var Complex = context.get("pentaho/type/complex");
 
               return Complex.extend({
-                type: {
+                $type: {
                   id: "test/foo/b",
                   props: {
                     b: {valueType: "string"}
@@ -1453,7 +1453,7 @@ define([
               var TestFooB = context.get("test/foo/b");
 
               return TestFooB.extend({
-                type: {
+                $type: {
                   id: "test/foo/c",
                   props: {
                     c: {valueType: "string"}
@@ -1582,7 +1582,7 @@ define([
 
             return Value.extend({
               testMethodAInst: function() {},
-              type: {
+              $type: {
                 id: "tests/mixins/A",
                 testMethodA: function() {}
               }
@@ -1598,7 +1598,7 @@ define([
 
             return Value.extend({
               testMethodBInst: function() {},
-              type: {
+              $type: {
                 id: "tests/mixins/B",
                 testMethodB: function() {}
               }
@@ -1613,7 +1613,7 @@ define([
             var Value = context.get(valueFactory);
 
             return Value.extend({
-              type: {
+              $type: {
                 id: "tests/mixins/C",
                 _init: function(spec, ka) {
                   this.base(spec, ka);
@@ -1654,7 +1654,7 @@ define([
             var Value = context.get("pentaho/type/value");
 
             var DerivedValue = Value.extend({
-              type: {
+              $type: {
                 mixins: ["tests/mixins/A"]
               }
             });
@@ -1682,7 +1682,7 @@ define([
             var Value = context.get("pentaho/type/value");
 
             var DerivedValue = Value.extend({
-              type: {
+              $type: {
                 mixins: "tests/mixins/A"
               }
             });
@@ -1710,7 +1710,7 @@ define([
             var Value = context.get("pentaho/type/value");
 
             var DerivedValue = Value.extend({
-              type: {
+              $type: {
                 mixins: [mixinFactoryA]
               }
             });
@@ -1739,7 +1739,7 @@ define([
             var MixinA = context.get(mixinFactoryA);
 
             var DerivedValue = Value.extend({
-              type: {
+              $type: {
                 mixins: [MixinA]
               }
             });
@@ -1765,7 +1765,7 @@ define([
             var Value = context.get("pentaho/type/value");
 
             var DerivedValue = Value.extend({
-              type: {
+              $type: {
                 mixins: ["tests/mixins/A"]
               }
             });
@@ -1786,7 +1786,7 @@ define([
             var Value = context.get("pentaho/type/value");
 
             var DerivedValue = Value.extend({
-              type: {
+              $type: {
                 id: "tests/type/target",
                 mixins: ["tests/mixins/A"]
               }
@@ -1808,13 +1808,13 @@ define([
             var Value = context.get("pentaho/type/value");
 
             var DerivedValue1 = Value.extend({
-              type: {
+              $type: {
                 mixins: ["tests/mixins/A"]
               }
             });
 
             var DerivedValue2 = DerivedValue1.extend({
-              type: {
+              $type: {
                 mixins: ["tests/mixins/B"]
               }
             });
@@ -1861,7 +1861,7 @@ define([
             var Value = context.get("pentaho/type/value");
 
             var DerivedValue = Value.extend({
-              type: {
+              $type: {
                 mixins: ["tests/mixins/A", "tests/mixins/A", "tests/mixins/B"]
               }
             });
@@ -1890,7 +1890,7 @@ define([
             var Value = context.get("pentaho/type/value");
 
             var DerivedValue = Value.extend({
-              type: {
+              $type: {
                 mixins: null
               }
             });
@@ -1900,7 +1900,7 @@ define([
             // ---
 
             DerivedValue = Value.extend({
-              type: {
+              $type: {
                 mixins: undefined
               }
             });
@@ -1910,7 +1910,7 @@ define([
             // ---
 
             DerivedValue = Value.extend({
-              type: {
+              $type: {
                 mixins: [mixinFactoryA]
               }
             });
@@ -1938,7 +1938,7 @@ define([
             var Value = context.get("pentaho/type/value");
 
             var DerivedValue = Value.extend({
-              type: {
+              $type: {
                 mixins: [mixinFactoryC]
               }
             });

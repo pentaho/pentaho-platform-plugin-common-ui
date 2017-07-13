@@ -29,7 +29,7 @@ define([
     describe("#validate()", function() {
       it("should call each property's validateOn with the owner complex instance", function() {
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "x", valueType: "number"},
               {name: "y", valueType: "string"},
@@ -40,9 +40,9 @@ define([
 
         var derived = new Derived({x: 5, y: "a", z: true});
 
-        var xPropType = derived.type.get("x");
-        var yPropType = derived.type.get("y");
-        var zPropType = derived.type.get("z");
+        var xPropType = derived.$type.get("x");
+        var yPropType = derived.$type.get("y");
+        var zPropType = derived.$type.get("z");
 
         spyOn(xPropType, "validateOn");
         spyOn(yPropType, "validateOn");

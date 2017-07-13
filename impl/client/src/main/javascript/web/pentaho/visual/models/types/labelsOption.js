@@ -25,7 +25,7 @@ define([
     var PentahoString = context.get("string");
 
     return PentahoString.extend({
-      type: {
+      $type: {
         id: module.id,
         mixins: ["enum"],
         domain: [
@@ -38,6 +38,6 @@ define([
         ]
       }
     })
-    .implement({type: bundle.structured.labelsOption});
+    .implement({$type: bundle.structured.labelsOption});
   };
 });

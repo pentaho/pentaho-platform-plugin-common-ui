@@ -30,7 +30,7 @@ define([
   var Complex = context.get("complex");
   var PostalCode = PentahoString.extend();
   var Derived = Complex.extend({
-    type: {
+    $type: {
       props: ["foo", "guru"]
     }
   });
@@ -260,7 +260,7 @@ define([
 
     describe("property inheritance", function() {
       var MoreDerived = Derived.extend({
-        type: {
+        $type: {
           label: "MoreDerived",
           props: ["bar"]
         }

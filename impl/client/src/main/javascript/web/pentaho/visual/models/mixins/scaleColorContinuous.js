@@ -32,7 +32,7 @@ define([
     var MeasurementLevel = context.get(measurementLevelFactory);
 
     return BaseModel.extend({
-      type: {
+      $type: {
         id: module.id,
         isAbstract: true,
         props: [
@@ -60,12 +60,12 @@ define([
         ]
       }
     })
-    .implement({type: bundle.structured.scaleColorContinuous});
+    .implement({$type: bundle.structured.scaleColorContinuous});
 
     function __hasQuantitativeAttributesColor() {
       if(!this.color.isMapped) return false;
 
-      var rolePropType = this.type.get("color");
+      var rolePropType = this.$type.get("color");
       var level = rolePropType.levelEffectiveOn(this);
 
       return MeasurementLevel.type.isQuantitative(level);

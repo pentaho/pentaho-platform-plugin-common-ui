@@ -31,7 +31,7 @@ define([
     var BaseModel = context.get(baseModelFactory);
 
     return BaseModel.extend({
-      type: {
+      $type: {
         id: module.id,
         mixins: [multiChartedFactory],
         v2Id: "ccc_sunburst",
@@ -88,7 +88,7 @@ define([
         ]
       }
     })
-    .implement({type: bundle.structured.sunburst});
+    .implement({$type: bundle.structured.sunburst});
   };
 
   function __isSizeMapped() {

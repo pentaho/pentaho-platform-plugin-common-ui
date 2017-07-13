@@ -43,13 +43,13 @@ define([
        * @readonly
        */
 
-      type: /** @lends pentaho.type.Number.Type# */{
+      $type: /** @lends pentaho.type.Number.Type# */{
         id: module.id,
         alias: "number",
         cast: __toNumber
       }
     }).implement(/** @lends pentaho.type.Number# */{
-      type: bundle.structured["number"] // eslint-disable-line dot-notation
+      $type: bundle.structured["number"] // eslint-disable-line dot-notation
     });
 
     return PenNumber;

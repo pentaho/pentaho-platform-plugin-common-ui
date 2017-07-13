@@ -71,7 +71,7 @@ define([
      */
     var VisualRoleProperty = __Property.extend(/** @lends pentaho.visual.role.Property# */{
 
-      type: /** @lends pentaho.visual.role.Property.Type# */{
+      $type: /** @lends pentaho.visual.role.Property.Type# */{
 
         id: module.id,
 
@@ -456,7 +456,7 @@ define([
         // endregion
       }
     }).implement({
-      type: /** @lends pentaho.visual.role.Property.Type# */{
+      $type: /** @lends pentaho.visual.role.Property.Type# */{
         /**
          * Determines the level of measurement on which this visual role will effectively be operating,
          * on the given visualization model, according to the mapping's current state.
@@ -739,7 +739,7 @@ define([
             if(count < range.min) {
               addErrors(new ValidationError(
                   bundleTypes.get("errors.property.countOutOfRange", [
-                    this.label + " " + mapping.type.get("attributes").label,
+                    this.label + " " + mapping.$type.get("attributes").label,
                     count,
                     range.min,
                     range.max
@@ -748,7 +748,7 @@ define([
             } else if(count > range.max) {
               addErrors(new ValidationError(
                   bundleTypes.get("errors.property.countOutOfRange", [
-                    this.label + " " + mapping.type.get("attributes").label,
+                    this.label + " " + mapping.$type.get("attributes").label,
                     count,
                     range.min,
                     range.max
@@ -967,7 +967,7 @@ define([
         // endregion
       }
     })
-    .implement({type: bundle.structured.property});
+    .implement({$type: bundle.structured.property});
 
     return VisualRoleProperty;
   };

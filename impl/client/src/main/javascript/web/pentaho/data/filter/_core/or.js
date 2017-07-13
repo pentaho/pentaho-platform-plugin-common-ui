@@ -87,7 +87,7 @@ define([
         return filter.And;
       },
 
-      type: /** @lends pentaho.data.filter.Or.Type# */{
+      $type: /** @lends pentaho.data.filter.Or.Type# */{
         id: "pentaho/data/filter/or",
         alias: "or"
       }

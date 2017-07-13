@@ -109,7 +109,7 @@ define([
        * @final
        */
       equals: function(other) {
-        return this === other || (other != null && this.type._isEqual(this, other));
+        return this === other || (other != null && this.$type._isEqual(this, other));
       },
 
       // region validation
@@ -139,7 +139,7 @@ define([
        * @final
        */
       validate: function() {
-        return this.type.validate(this);
+        return this.$type.validate(this);
       },
 
       /**
@@ -247,7 +247,7 @@ define([
        * @type pentaho.type.Value.Type
        * @readonly
        */
-      type: /** @lends pentaho.type.Value.Type# */{
+      $type: /** @lends pentaho.type.Value.Type# */{
         id: module.id,
         alias: "value",
         isAbstract: true,
@@ -302,8 +302,8 @@ define([
          * @see pentaho.type.Value.Type#areEqual
          */
         _areEqual: function(va, vb) {
-          return (va instanceof Value) ? va.type._isEqual(va, vb) :
-                 (vb instanceof Value) ? vb.type._isEqual(vb, va) :
+          return (va instanceof Value) ? va.$type._isEqual(va, vb) :
+                 (vb instanceof Value) ? vb.$type._isEqual(vb, va) :
                  false;
         },
 
@@ -372,7 +372,7 @@ define([
           if(!this.is(value))
             return [new ValidationError(bundle.format(bundle.structured.errors.value.notOfType, [this.label]))];
 
-          return value.type._validate(value);
+          return value.$type._validate(value);
         },
 
         /**
@@ -380,7 +380,7 @@ define([
          * that **is an instance of this type**,
          * is also a **valid instance** of this type.
          *
-         * Thus, `this === value.type` must be true.
+         * Thus, `this === value.$type` must be true.
          *
          * The default implementation does nothing and considers the instance valid.
          * Override to implement a type's specific validation logic.
@@ -398,7 +398,7 @@ define([
          */
         _validate: function(value) {
 
-          // assert this === value.type
+          // assert this === value.$type
 
           return null;
         },
@@ -427,7 +427,7 @@ define([
     }, /* classDesc: */{}, /* keyArgs: */{
       isRoot: true
     }).implement({
-      type: bundle.structured.value
+      $type: bundle.structured.value
     });
 
     // override the documentation to specialize the argument types.

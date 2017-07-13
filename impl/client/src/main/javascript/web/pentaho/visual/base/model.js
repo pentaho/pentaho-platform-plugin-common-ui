@@ -74,7 +74,7 @@ define([
       },
       // endregion
 
-      type: /** @lends pentaho.visual.base.Model.Type# */{
+      $type: /** @lends pentaho.visual.base.Model.Type# */{
         sourceId: module.id,
         id: module.id.replace(/.\w+$/, ""),
         defaultView: "./view",
@@ -148,7 +148,7 @@ define([
         }
       }
     })
-    .implement({type: bundle.structured.type});
+    .implement({$type: bundle.structured.type});
 
     return VisualModel;
   };

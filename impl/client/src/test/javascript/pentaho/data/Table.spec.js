@@ -358,7 +358,7 @@ define([
           var filter = new CustomFilter();
 
           spyOn(filter, "_contains").and.callFake(function(elem) {
-            return elem.type.has("sales") && elem.getv("sales") === 12000;
+            return elem.$type.has("sales") && elem.getv("sales") === 12000;
           });
 
           var view = data.filter(filter);

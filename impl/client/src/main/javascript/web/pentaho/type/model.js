@@ -69,7 +69,7 @@ define([
       },
       // endregion
 
-      type: /** @lends pentaho.type.Model.Type# */{
+      $type: /** @lends pentaho.type.Model.Type# */{
         id: module.id,
         alias: "model",
 
@@ -96,7 +96,7 @@ define([
       }
     })
     .implement({
-      type: bundle.structured.model
+      $type: bundle.structured.model
     });
 
     return Model;

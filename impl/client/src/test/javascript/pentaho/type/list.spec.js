@@ -40,7 +40,7 @@ define([
   }
 
   var NumberList = List.extend({
-    type: {of: PentahoNumber}
+    $type: {of: PentahoNumber}
   });
 
   describe("pentaho.type.List -", function() {
@@ -67,7 +67,7 @@ define([
       it("should throw if given a nully `of` property", function() {
         expect(function() {
           List.extend({
-            type: {of: null}
+            $type: {of: null}
           });
         }).toThrow(errorMatch.argRequired("of"));
       });
@@ -76,14 +76,14 @@ define([
         var DerivedList = List.extend();
         expect(DerivedList.type.of).toBe(List.type.of);
 
-        DerivedList = List.extend({type: {of: undefined}});
+        DerivedList = List.extend({$type: {of: undefined}});
         expect(DerivedList.type.of).toBe(List.type.of);
       });
 
       it("should throw if given a null `of` property", function() {
         expect(function() {
           List.extend({
-            type: {of: null}
+            $type: {of: null}
           });
         }).toThrow(errorMatch.argRequired("of"));
       });
@@ -91,7 +91,7 @@ define([
       it("should throw if given an `of` property of a type not a subtype of `Element`", function() {
         expect(function() {
           List.extend({
-            type: {of: Value}
+            $type: {of: Value}
           });
         }).toThrow(errorMatch.argInvalid("of"));
       });
@@ -672,7 +672,7 @@ define([
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: {
               foo: {valueType: NumberList}
             }
@@ -835,7 +835,7 @@ define([
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: {
               foo: {valueType: NumberList, defaultValue: [1, 2, 3]}
             }
@@ -945,7 +945,7 @@ define([
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: {
               foo: {valueType: NumberList, defaultValue: [1, 2, 3]}
             }
@@ -999,7 +999,7 @@ define([
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: {
               foo: {valueType: NumberList, defaultValue: [1, 2, 3, 4]}
             }
@@ -1168,7 +1168,7 @@ define([
 
       it("preserves the order of new elements when they are complex objects", function() {
         var MyComplex = Complex.extend({
-          type: {
+          $type: {
             props: [{
               name: "k",
               valueType: "number"
@@ -1177,7 +1177,7 @@ define([
         });
 
         var ComplexList = List.extend({
-          type: {of: MyComplex}
+          $type: {of: MyComplex}
         });
 
         var list = new ComplexList();
@@ -1319,7 +1319,7 @@ define([
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: {
               foo: {valueType: NumberList, defaultValue: [4, 2, 1, 3]}
             }

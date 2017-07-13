@@ -25,12 +25,12 @@ define([
     var PentahoString = context.get("string");
 
     return PentahoString.extend({
-      type: {
+      $type: {
         id: module.id,
         mixins: ["enum"],
         domain: ["grow", "fit", "clip"]
       }
     })
-    .implement({type: bundle.structured.multiChartOverflow});
+    .implement({$type: bundle.structured.multiChartOverflow});
   };
 });

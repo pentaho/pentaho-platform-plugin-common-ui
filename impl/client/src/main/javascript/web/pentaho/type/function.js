@@ -103,13 +103,13 @@ define([
       },
       // endregion
 
-      type: /** @lends pentaho.type.Function.Type# */{
+      $type: /** @lends pentaho.type.Function.Type# */{
         id: module.id,
         alias: "function",
         cast: F.as
       }
     }).implement(/** @lends pentaho.type.Function# */{
-      type: bundle.structured["function"] // eslint-disable-line dot-notation
+      $type: bundle.structured["function"] // eslint-disable-line dot-notation
     });
 
     return PenFunction;

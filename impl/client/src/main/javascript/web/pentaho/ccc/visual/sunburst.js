@@ -30,7 +30,7 @@ define([
     var BaseView = context.get(baseViewFactory);
 
     return BaseView.extend({
-      type: {
+      $type: {
         id: module.id,
         props: {
           model: {valueType: modelFactory}
@@ -158,7 +158,7 @@ define([
       },
 
       _configureDisplayUnits: function() {
-        var displayUnitsType = this.model.type.get("displayUnits").valueType;
+        var displayUnitsType = this.model.$type.get("displayUnits").valueType;
         var displayUnits = this.model.displayUnits;
         var scaleFactor = displayUnitsType.scaleFactorOf(displayUnits);
         if(scaleFactor > 1) {

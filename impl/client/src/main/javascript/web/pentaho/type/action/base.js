@@ -77,7 +77,7 @@ define([
 
     return Element.extend(/** @lends pentaho.type.action.Base# */{
 
-      type: /** @lends pentaho.type.action.Base.Type# */{
+      $type: /** @lends pentaho.type.action.Base.Type# */{
         id: module.id,
         isAbstract: true,
 
@@ -361,7 +361,7 @@ define([
        * @throws {pentaho.lang.OperationInvalidError} When set and the action is not in an editable state.
        */
       get label() {
-        return this.__label || this.type.label;
+        return this.__label || this.$type.label;
       },
 
       set label(value) {
@@ -382,7 +382,7 @@ define([
        * @throws {pentaho.lang.OperationInvalidError} When set and the action is not in an editable state.
        */
       get description() {
-        return this.__description || this.type.description;
+        return this.__description || this.$type.description;
       },
 
       set description(value) {
@@ -901,7 +901,7 @@ define([
 
         this.__executor = executor || null;
 
-        if(this.type.isSync) {
+        if(this.$type.isSync) {
           this.__executeSyncAction();
         } else {
           this.__executeAsyncAction();
@@ -1080,7 +1080,7 @@ define([
 
         var promise = this._onPhaseDo();
 
-        var isSync = this.type.isSync;
+        var isSync = this.$type.isSync;
         if(isSync) {
           maybeDoDefault.call(this);
           return null;
@@ -1218,9 +1218,9 @@ define([
 
         var declaredType;
         var includeType = !!keyArgs.forceType ||
-              (!!(declaredType = keyArgs.declaredType) && this.type !== declaredType);
+              (!!(declaredType = keyArgs.declaredType) && this.$type !== declaredType);
 
-        if(includeType) spec._ = this.type.toRefInContext(keyArgs);
+        if(includeType) spec._ = this.$type.toRefInContext(keyArgs);
         if(this.label) spec.label = this.label;
         if(this.description) spec.description = this.description;
 

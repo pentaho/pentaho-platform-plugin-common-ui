@@ -26,7 +26,7 @@ define([
     var BaseModel = context.get(baseModelFactory);
 
     return BaseModel.extend({
-      type: {
+      $type: {
         id: module.id,
         v2Id: "ccc_horzbarnormalized",
         category: "horzbarchart",
@@ -34,6 +34,6 @@ define([
         defaultView: "pentaho/ccc/visual/barNormalizedHorizontal"
       }
     })
-    .implement({type: bundle.structured.barNormalizedHorizontal});
+    .implement({$type: bundle.structured.barNormalizedHorizontal});
   };
 });

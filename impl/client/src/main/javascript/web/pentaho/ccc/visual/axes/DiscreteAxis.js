@@ -52,7 +52,7 @@ define([
     complexToFilter: function(complex) {
       var filter = null;
 
-      var context = this.chart.type.context;
+      var context = this.chart.$type.context;
       var IsEqual;
 
       this.getSelectionMappingAttrInfos().each(function(maInfo) {

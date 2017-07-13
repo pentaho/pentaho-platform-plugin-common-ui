@@ -327,7 +327,7 @@ define([
      *   var model = new VizChordModel({outerRadius: 200});
      *
      *   // Render the model using the default view
-     *   model.type.defaultViewClass.then(function(View) {
+     *   model.$type.defaultViewClass.then(function(View) {
      *     var view = new View(document.getElementById("container"), model);
      *
      *     // ...
@@ -467,7 +467,7 @@ define([
      *       var model = new VizChordModel({outerRadius: 200});
      *
      *       // Render the model using the default view
-     *       model.type.defaultViewClass.then(function(View) {
+     *       model.$type.defaultViewClass.then(function(View) {
      *         var view = new View(document.getElementById("container"), model);
      *
      *         // ...
@@ -637,8 +637,8 @@ define([
           });
 
         return Promise.all([this.getAsync(baseTypeId), instCtorsPromise])
-          .then(function(values) {
-            var baseType  = values[0].type;
+          .then(function(Values) {
+            var baseType  = Values[0].type;
             var InstCtors = Object.keys(me.__byTypeUid).map(function(typeUid) {
               return me.__byTypeUid[typeUid];
             });
@@ -1157,7 +1157,7 @@ define([
           var BaseInstCtor = this.__get(baseTypeSpec, null, /* sync: */true);
 
           // 2. Extend the base type
-          var InstCtor = BaseInstCtor.extend({type: typeSpec});
+          var InstCtor = BaseInstCtor.extend({$type: typeSpec});
 
           // 3. Register and configure the new type
           if(SpecificationContext.isIdTemporary(id)) {

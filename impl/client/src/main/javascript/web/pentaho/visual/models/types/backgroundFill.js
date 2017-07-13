@@ -26,12 +26,12 @@ define([
 
     return PentahoString.extend({
 
-      type: {
+      $type: {
         id: module.id,
         mixins: ["enum"],
         domain: ["none", "solid", "gradient"]
       }
     })
-    .implement({type: bundle.structured.backgroundFill});
+    .implement({$type: bundle.structured.backgroundFill});
   };
 });

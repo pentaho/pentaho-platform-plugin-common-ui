@@ -110,7 +110,7 @@ define([
         // Value is immutable. Can only be set once.
 
         // Throws if nully.
-        _ = this.type.toValue(_);
+        _ = this.$type.toValue(_);
 
         if(this.__value == null) {
           // First set
@@ -295,7 +295,7 @@ define([
 
         var addFormatted = !keyArgs.omitFormatted && !!this.__formatted;
 
-        var type = this.type;
+        var type = this.$type;
 
         var declaredType = keyArgs.declaredType;
         var includeType = !!keyArgs.forceType;
@@ -364,7 +364,7 @@ define([
       },
       // endregion
 
-      type: /** pentaho.type.Simple.Type# */{
+      $type: /** pentaho.type.Simple.Type# */{
         id: module.id,
         alias: "simple",
         isAbstract: true,
@@ -542,7 +542,7 @@ define([
         // endregion
       }
     }).implement(/** @lends pentaho.type.Simple# */{
-      type: bundle.structured.simple
+      $type: bundle.structured.simple
     });
 
     // override the documentation to specialize the argument types.

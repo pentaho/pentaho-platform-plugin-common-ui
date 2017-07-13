@@ -82,7 +82,7 @@ define([
 
       describe("#id", function() {
         it("should serialize the #id of a type using #id when no alias is defined", function() {
-          var derivedType = List.extend({type: {id: "pentaho/type/test"}}).type;
+          var derivedType = List.extend({$type: {id: "pentaho/type/test"}}).type;
 
           var scope = new SpecificationScope();
 
@@ -95,7 +95,7 @@ define([
         });
 
         it("should serialize the #id of a type using #alias when an alias is defined", function() {
-          var derivedType = List.extend({type: {id: "pentaho/type/test", alias: "test"}}).type;
+          var derivedType = List.extend({$type: {id: "pentaho/type/test", alias: "test"}}).type;
 
           var scope = new SpecificationScope();
 
@@ -109,7 +109,7 @@ define([
 
         it("should serialize with an anonymous #id when the type is anonymous", function() {
           // Force generic object spec by specifying a label.
-          var derivedType = List.extend({type: {label: "Foo"}}).type;
+          var derivedType = List.extend({$type: {label: "Foo"}}).type;
 
           var scope = new SpecificationScope();
 
@@ -124,7 +124,7 @@ define([
 
         it("should serialize with the existing anonymous id, " +
             "already in the scope, when the type is anonymous", function() {
-          var derivedType = List.extend({type: {label: "Foo"}}).type;
+          var derivedType = List.extend({$type: {label: "Foo"}}).type;
 
           var scope = new SpecificationScope();
 
@@ -156,7 +156,7 @@ define([
       describe("#of", function() {
         it("should serialize the #of of a type when it is different from base", function() {
           // Force generic object spec by specifying a label.
-          var derivedType = List.extend({type: {of: "string", label: "Foo"}}).type;
+          var derivedType = List.extend({$type: {of: "string", label: "Foo"}}).type;
 
           var scope = new SpecificationScope();
 
@@ -170,7 +170,7 @@ define([
 
         it("should not serialize the #of of a type when it is inherited", function() {
           // Force generic object spec by specifying a label.
-          var derivedType = List.extend({type: {label: "Foo"}}).type;
+          var derivedType = List.extend({$type: {label: "Foo"}}).type;
 
           var scope = new SpecificationScope();
 

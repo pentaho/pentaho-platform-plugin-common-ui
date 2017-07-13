@@ -47,7 +47,7 @@ define([
       PentahoNumber = context.get(numberFactory);
 
       NumberList = List.extend({
-        type: {of: PentahoNumber}
+        $type: {of: PentahoNumber}
       });
 
       scope = context.enterChange();
