@@ -160,8 +160,7 @@
   // endregion
 
   // region Bundled 3rd party libs
-  requirePaths["common-ui/jquery"] = basePath + "/jquery/jquery" + minSuffix;
-  requireShim["common-ui/jquery"] = {exports: "$"};
+  requirePaths["common-ui/jquery"] = basePath + "/jquery/jquery.conflict";
 
   requirePaths["common-ui/jquery-clean"] = basePath + "/jquery/jquery" + minSuffix;
   requireShim["common-ui/jquery-clean"] = {
