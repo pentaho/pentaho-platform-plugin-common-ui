@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,40 +50,41 @@
  * @class
  * @extends ValueBasedParameterWidgetBuilder
  */
-define(['cdf/components/SelectComponent', './ValueBasedParameterWidgetBuilder', 'common-ui/jquery-clean'],
-    function(SelectComponent, ValueBasedParameterWidgetBuilder, $){
+define(["cdf/components/SelectComponent", "./ValueBasedParameterWidgetBuilder", "common-ui/jquery-clean"],
+  function(SelectComponent, ValueBasedParameterWidgetBuilder, $) {
 
-  return ValueBasedParameterWidgetBuilder.extend({
-    /**
-     * Method used to build the widget, returning an instance of CDF SelectComponent
-     *
-     * @name DropDownBuilder#build
-     * @method
-     *
-     * @param   {Object}          args - The object with the properties to build the component according to [the CDF Documentation]{@link http://localhost:8080/pentaho/api/repos/:public:plugin-samples:pentaho-cdf:pentaho-cdf-require:30-documentation:30-component_reference:10-core:16-SelectComponent:select_component.xcdf/generatedContent SelectComponent}
-     * @param   {Parameter}       args.param - The parameter with the properties needed to build the component
-     * @returns {SelectComponent} The instance of SelectComponent
-     */
-    build: function(args) {
-      var widget = this.base(args);
+    return ValueBasedParameterWidgetBuilder.extend({
+      /**
+       * Method used to build the widget, returning an instance of CDF SelectComponent
+       *
+       * @name DropDownBuilder#build
+       * @method
+       *
+       * @param   {Object}          args - The object with the properties to build the component according to [the CDF Documentation]{@link http://localhost:8080/pentaho/api/repos/:public:plugin-samples:pentaho-cdf:pentaho-cdf-require:30-documentation:30-component_reference:10-core:16-SelectComponent:select_component.xcdf/generatedContent SelectComponent}
+       * @param   {Parameter}       args.param - The parameter with the properties needed to build the component
+       * @return {SelectComponent} The instance of SelectComponent
+       */
+      build: function(args) {
+        var widget = this.base(args);
 
-      if (args.promptPanel.paramDefn.ignoreBiServer5538 && !args.param.hasSelection()) {
-        // If there is no empty selection, and no value is selected, create one. This way, we can represent
-        // the unselected state.
-        widget.valuesArray = widget.valuesArray.concat([['', '']]);
-      }
-
-      $.extend(widget, {
-        type: 'SelectComponent',
-        preExecution: function() {
-          // SelectComponent defines defaultIfEmpty = true for non-multi selects.
-          // We can't override any properties of the component so we must set them just before update() is called. :(
-          // Only select the first item if we have no selection and are not ignoring BISERVER-5538
-          this.defaultIfEmpty = !args.promptPanel.paramDefn.ignoreBiServer5538 && !args.param.hasSelection();
+        if(args.promptPanel.paramDefn.ignoreBiServer5538 && !args.param.hasSelection()) {
+          // If there is no empty selection, and no value is selected, create one. This way, we can represent
+          // the unselected state.
+          widget.valuesArray = widget.valuesArray.concat([["", ""]]);
         }
-      });
 
-      return new SelectComponent(widget);
-    }
+        $.extend(widget, {
+          type: "SelectComponent",
+          preExecution: function() {
+            // SelectComponent defines defaultIfEmpty = true for non-multi selects.
+            // We can't override any properties of the component so we must set them just before update() is called. :(
+            // Only select the first item if we have no selection and are not ignoring BISERVER-5538
+            this.defaultIfEmpty = !args.promptPanel.paramDefn.ignoreBiServer5538 && !args.param.hasSelection();
+          },
+          externalPlugin: args.param.attributes.externalPlugin
+        });
+
+        return new SelectComponent(widget);
+      }
+    });
   });
-});
