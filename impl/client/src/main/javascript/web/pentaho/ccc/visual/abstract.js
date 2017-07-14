@@ -1514,45 +1514,56 @@ define([
       // region SELECTION
       _configureSelection: function() {
         var me = this;
-        this.options.userSelectionAction = function(cccSelections) {
-          return me._onUserSelection(cccSelections, this.event);
+        this.options.userSelectionAction = function(cccSelections, cccGroup) {
+          return me._onUserSelection(cccSelections, cccGroup, this.event);
         };
         this.options.base_event = [["click", function() {
           me._onUserSelection([]);
         }]];
       },
 
-      _onUserSelection: function(selectingDatums, srcEvent) {
+      _onUserSelection: function(selectingDatums, selectingGroup, srcEvent) {
         // Duplicates may occur due to excluded dimensions like the discriminator
 
         // TODO: improve detection of viz without attributes.
 
         var alreadyIn = {};
-        var operands = selectingDatums.reduce(function(memo, datum) {
-          if(!datum.isVirtual && !datum.isNull) {
-            // When there are no attributes (e.g. bar chart with measures alone),
-            // operand is null...
-            var operand = this._complexToFilter(datum);
-            if(operand) {
-              // Check if there's already a selection with the same key.
-              // If not, add a new selection to the selections list.
-              var key = JSON.stringify(operand.toSpec()); // TODO: improve key
-              if(alreadyIn[key]) return memo;
-              alreadyIn[key] = true;
+        var operands = [];
 
-              memo.push(operand);
-            }
+        if(selectingGroup) {
+          var operand = this._complexToFilter(selectingGroup);
+          if(operand) {
+            operands.push(operand);
           }
+        } else {
+          operands =selectingDatums.reduce(function(memo, datum) {
+            if(!datum.isVirtual && !datum.isNull) {
+              // When there are no attributes (e.g. bar chart with measures alone),
+              // operand is null...
+              var operand = this._complexToFilter(datum);
+              if(operand) {
+                // Check if there's already a selection with the same key.
+                // If not, add a new selection to the selections list.
+                var key = JSON.stringify(operand.toSpec()); // TODO: improve key
+                if(alreadyIn[key]) return memo;
+                alreadyIn[key] = true;
 
-          return memo;
-        }.bind(this), []);
+                memo.push(operand);
+              }
+            }
 
-        var SelectAction = this.type.context.get(selectActionFactory);
-        var Or = this.type.context.get("or");
-        this.act(new SelectAction({
-          dataFilter: new Or({operands: operands}),
-          position: srcEvent ? {x: srcEvent.clientX, y: srcEvent.clientY} : null
-        }));
+            return memo;
+          }.bind(this), []);
+        }
+
+        if(operands.length) {
+          var SelectAction = this.type.context.get(selectActionFactory);
+          var Or = this.type.context.get("or");
+          this.act(new SelectAction({
+            dataFilter: new Or({operands: operands}),
+            position: srcEvent ? {x: srcEvent.clientX, y: srcEvent.clientY} : null
+          }));
+        }
 
         // Explicitly cancel CCC's native selection handling.
         return [];
