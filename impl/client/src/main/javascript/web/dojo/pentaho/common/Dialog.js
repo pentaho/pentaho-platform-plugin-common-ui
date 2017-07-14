@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2013 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             hasCloseIcon: false,
             closeIcon: undefined,
             _onCancelCallback: undefined,
-
-            constructor: function() {
-              Dialog._DialogLevelManager._beginZIndex = 1051;
-            },
 
             setLocalizationLookupFunction: function(f) {
               this.getLocaleString = f;
