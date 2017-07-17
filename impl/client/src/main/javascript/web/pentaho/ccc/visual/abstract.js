@@ -1411,16 +1411,18 @@ define([
         }
 
         // Set, before, whenever lineWidth is defined.
-        var dotSize = 16;
+        // var dotSize = 16;
         var dotRadius = 4;
+        // If no line width was used, shapes such as crosses could not show.
+        var dotStrokeWidth = 2;
 
         // Unfortunately, diamonds are slightly bigger than other shapes, and would overflow or touch the text.
         var extraMargin = 1;
 
         // [BACKLOG-15788] In 'pentaho/visual/config/vizApi.conf#L778' there is a configuration for "pentaho-cdf" that needs to match this values
         options.legendMarkerSize = 2 * (dotRadius + extraMargin);
-        options.legend$Dot_lineWidth = 0;
-        options.legend$Dot_shapeSize = dotSize;
+        options.legend$Dot_lineWidth = dotStrokeWidth;
+        options.legend$Dot_shapeSize = Math.pow(dotRadius - dotStrokeWidth / 2, 2); // 9
       },
       // endregion
 
