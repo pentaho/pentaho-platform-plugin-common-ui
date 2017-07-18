@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-define(['common-ui/prompting/builders/DropDownBuilder'], function(DropDownBuilder) {
+define(["common-ui/prompting/builders/DropDownBuilder"], function(DropDownBuilder) {
 
   describe("DropDownBuilder", function() {
 
@@ -25,7 +25,7 @@ define(['common-ui/prompting/builders/DropDownBuilder'], function(DropDownBuilde
         paramDefn: {
           ignoreBiServer5538: true
         }
-      }, 
+      },
       param:  {
         values: { },
         attributes: { },
@@ -45,12 +45,12 @@ define(['common-ui/prompting/builders/DropDownBuilder'], function(DropDownBuilde
 
     it("should return a SelectComponent", function() {
       var component = dropDownBuilder.build(args);
-      expect(component.type).toBe('SelectComponent');
+      expect(component.type).toBe("SelectComponent");
       expect(component.preExecution).toBeDefined();
     });
 
     it("should create an empty selection if no value is selected", function() {
-      spyOn(args.param, 'hasSelection').and.returnValue(false);
+      spyOn(args.param, "hasSelection").and.returnValue(false);
 
       var component = dropDownBuilder.build(args);
       expect(args.param.hasSelection).toHaveBeenCalled();
@@ -60,11 +60,11 @@ define(['common-ui/prompting/builders/DropDownBuilder'], function(DropDownBuilde
     });
 
     it("should create an empty selection at the end if no value is selected", function() {
-      spyOn(args.param, 'hasSelection').and.returnValue(false);
+      spyOn(args.param, "hasSelection").and.returnValue(false);
 
-      args.param.values = [
-        { label: "banana", value: "banana" }
-      ];
+      args.param.values = [{
+        label: "banana", value: "banana"
+      }];
 
       var component = dropDownBuilder.build(args);
       expect(args.param.hasSelection).toHaveBeenCalled();
@@ -73,15 +73,39 @@ define(['common-ui/prompting/builders/DropDownBuilder'], function(DropDownBuilde
       expect(component.valuesArray[1][1]).toEqual("");
     });
 
-    it ("should set defaultIfEmpty to true for non-multi select on preExecution", function() {
+    it("should set defaultIfEmpty to true for non-multi select on preExecution", function() {
       var component = dropDownBuilder.build(args);
 
-      spyOn(component, 'preExecution').and.callThrough();     
+      spyOn(component, "preExecution").and.callThrough();
       component.preExecution();
       expect(component.preExecution).toHaveBeenCalled();
       expect(component.defaultIfEmpty).toBeFalsy();
     });
 
-  });
+    it("should allow specifying the external plugin parameter", function(done) {
+      args.param.attributes.externalPlugin = "select2";
 
+      var mockSelectComponent;
+      function mockDeps(localRequire) {
+        localRequire.define("cdf/components/SelectComponent", function() {
+          mockSelectComponent = jasmine.createSpy("SelectComponent");
+          return mockSelectComponent;
+        });
+      }
+      require.using([
+        "common-ui/prompting/builders/DropDownBuilder"
+      ], mockDeps, function(DropDownBuilder) {
+
+        var _dropDownBuilder = new DropDownBuilder();
+        _dropDownBuilder.build(args);
+
+        expect(mockSelectComponent).toHaveBeenCalledWith(jasmine.objectContaining({
+          param: jasmine.objectContaining({attributes: {externalPlugin: "select2"}})
+        }));
+
+        delete args.param.attributes.externalPlugin;
+        done();
+      });
+    });
+  });
 });
