@@ -40,7 +40,7 @@ define([
         onLoad();
       } else {
         var bundleInfo = __getBundleInfo(localRequire, bundlePath);
-        var serverUrl = context.server.url;
+        var serverUrl = context.server.root;
         var bundleUrl = "json!" + ((serverUrl && serverUrl.pathname) || "") +
             "i18n?plugin=" + bundleInfo.pluginId + "&name=" + bundleInfo.name;
 
@@ -111,7 +111,7 @@ define([
     var absBundleUrl = localRequire.toUrl(bundleMid);
 
     // Remove basePath from bundle url
-    var serverUrl = context.server.url;
+    var serverUrl = context.server.root;
     var basePath = (serverUrl && serverUrl.pathname) || "";
     if(basePath && absBundleUrl.indexOf(basePath) === 0)
       absBundleUrl = absBundleUrl.substr(basePath.length);

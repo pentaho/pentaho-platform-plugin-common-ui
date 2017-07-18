@@ -74,7 +74,8 @@ define(["pentaho/util/has"], function(has) {
       // href
       // protocol
       // pathname
-      url: createURL(readVar(propSpec, "url", propSpecDef))
+      root: createURL(readVar(propSpec, "root", propSpecDef)),
+      services: createURL(readVar(propSpec, "services", propSpecDef))
     };
 
     this.reservedChars = readVar(spec, "reservedChars", defaultSpec);
@@ -98,7 +99,8 @@ define(["pentaho/util/has"], function(has) {
           home: this.user.home
         },
         server: {
-          url: this.server.url && this.server.url.href
+          root: this.server.root && this.server.root.href,
+          services: this.server.services && this.server.services.href
         },
         reservedChars: this.reservedChars
       };

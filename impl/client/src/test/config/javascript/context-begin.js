@@ -75,7 +75,8 @@ var requireCfg = {
     "pentaho/context": {
       locale: SESSION_LOCALE,
       server: {
-        url: CONTEXT_PATH
+        root: CONTEXT_PATH,
+        services: CONTEXT_PATH + "cxf/"
       }
     }
   },

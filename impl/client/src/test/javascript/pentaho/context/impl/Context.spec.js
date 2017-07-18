@@ -33,7 +33,8 @@ define([
       },
       reservedChars: "RESERVED-CHARS-1",
       server: {
-        url: "http://host:8888/path-1"
+        root: "http://host:8888/path-1",
+        services: "http://host:8888/s-path-1"
       }
     };
 
@@ -47,7 +48,8 @@ define([
       },
       reservedChars: "",
       server: {
-        url: ""
+        root: "",
+        services: ""
       }
     };
 
@@ -61,7 +63,8 @@ define([
       },
       reservedChars: null,
       server: {
-        url: null
+        root: null,
+        services: null
       }
     };
 
@@ -75,7 +78,8 @@ define([
       },
       reservedChars: "RESERVED-CHARS",
       server: {
-        url: "http://host:8888/path-2"
+        root: "http://host:8888/path-2",
+        services: "http://host:8888/s-path-2"
       }
     };
 
@@ -87,7 +91,8 @@ define([
       expect(context.user.id).toBe(contextSpec.user.id);
       expect(context.user.home).toBe(contextSpec.user.home);
 
-      expect(context.server.url.href).toBe(contextSpec.server.url);
+      expect(context.server.root.href).toBe(contextSpec.server.root);
+      expect(context.server.services.href).toBe(contextSpec.server.services);
 
       expect(context.reservedChars).toBe(contextSpec.reservedChars);
     }
@@ -100,7 +105,8 @@ define([
       expect(context.user.id).toBe(null);
       expect(context.user.home).toBe(null);
 
-      expect(context.server.url).toBe(null);
+      expect(context.server.root).toBe(null);
+      expect(context.server.services).toBe(null);
 
       expect(context.reservedChars).toBe(null);
     }

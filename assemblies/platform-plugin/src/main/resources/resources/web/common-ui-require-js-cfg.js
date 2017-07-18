@@ -187,6 +187,9 @@
   // underscore should be required using the module ID above, creating a map entry to guarantee backwards compatibility
   requireMap["*"]["underscore"] = "common-ui/underscore"; // deprecated
 
+  // TODO Remove when BACKLOG-16424 is completed
+  requireMap["*"]["pentaho/environment"] = "pentaho/context";
+
   // ANGULAR
   requirePaths["common-ui/angular"] = basePath + "/angular/angular" + minSuffix;
   requireShim["common-ui/angular"] = {

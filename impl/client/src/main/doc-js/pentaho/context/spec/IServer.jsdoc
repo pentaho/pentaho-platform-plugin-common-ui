@@ -25,7 +25,15 @@
 /**
  * The base url of the web server application.
  *
- * @name url
+ * @name root
+ * @memberOf pentaho.context.spec.IServer#
+ * @type {?nonEmptyString}
+ */
+
+/**
+ * The base services endpoint of the web server application.
+ *
+ * @name services
  * @memberOf pentaho.context.spec.IServer#
  * @type {?nonEmptyString}
  */
