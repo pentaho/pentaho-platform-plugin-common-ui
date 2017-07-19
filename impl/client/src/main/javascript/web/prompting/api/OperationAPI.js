@@ -25,8 +25,8 @@
  * @property {Object} _msgs Contains possible constants of messages
  */
 define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
-  return function(api, id) {
-    this._promptPanel = new PromptPanel(id);
+  return function(api, id, options) {
+    this._promptPanel = new PromptPanel(id, undefined, options);
     this._msgs = {
       PROMPT_PANEL_NOT_FOUND: "Prompt Panel not found. Call 'api.operation.render' to create a panel.",
       NO_PARAM_DEFN: "'getParameterDefinitionCallback' function does not return a valid ParameterDefinition instance.",
