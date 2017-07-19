@@ -490,8 +490,9 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * @method
          * @param {String} destinationId The html id to place the prompt
          * @param {ParameterDefinition} paramDefn The parameter definition assigned to the prompt
+         * @param {Object} [options] Extra configuration options to be passed to the prompt renderer constructor.
          */
-        constructor: function (destinationId, paramDefn) {
+        constructor: function (destinationId, paramDefn, options) {
           if (!destinationId) {
             throw new Error('destinationId is required');
           }
@@ -511,7 +512,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
 
           this.guid = this.promptGUIDHelper.generateGUID();
 
-          this.dashboard = new Dashboard();
+          this.dashboard = new Dashboard(options);
           this.dashboard.flatParameters = true;  // PRD-5909
 
           this.paramDiffer = new ParamDiff();

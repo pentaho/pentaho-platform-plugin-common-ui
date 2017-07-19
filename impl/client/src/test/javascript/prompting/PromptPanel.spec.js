@@ -40,9 +40,17 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         expect(panel.autoSubmit).toBeTruthy();
         expect(panel.guid).toBeDefined();
         expect(panel.dashboard).toBeDefined();
+        expect(panel.dashboard.isSilent).toBe(false);
         expect(panel.dashboard.flatParameters).toBe(true);
         expect(panel.promptGUIDHelper).toBeDefined();
         expect(panel.parametersChanged).toBeFalsy();
+      });
+
+      it("should create prompt panel in silent mode", function() {
+        var paramDefn = jasmine.createSpyObj("paramDefn", [ "allowAutoSubmit" ]);
+        paramDefn.allowAutoSubmit.and.returnValue(true);
+        var panel = new PromptPanel(testId, paramDefn, {isSilent: true});
+        expect(panel.dashboard.isSilent).toBe(true);
       });
     });
 
