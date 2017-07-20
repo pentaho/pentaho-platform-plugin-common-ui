@@ -19,7 +19,7 @@
  * Timezone Utility to generate a timezone offset string from a given timezone.
  */
 
-define("common-ui/util/timeutil", [], function() {
+define("common-ui/util/timeutil", ['cdf/lib/moment-timezone'], function(momentTimezone) {
   return {
     offsets: {
       "ACT": 570,
@@ -631,12 +631,20 @@ define("common-ui/util/timeutil", [], function() {
     /**
      * Returns the timezone offset in minutes from UTC
      */
-    getOffset: function(timezone) {
-      return this.offsets[timezone] || 0;
+    getOffset: function(timezone, date) {
+	var zone = momentTimezone.tz.zone(timezone);
+	//there are possible cases when the certain timezone is absent in data of Moment Timezone
+	//in this case we are trying to use values from this.offsets without DST time
+	if(!zone){
+		return this.offsets[timezone] || 0;
+		}
+	//returns real offset in minutes with POSIX-style signs
+	//so should be reversed for backward compatibility because before this change this method exactly returned reversed offsets (please see values in this.offsets array)
+	return -1 * zone.parse(momentTimezone.utc(date));
     },
 
-    getOffsetAsString: function(timezone) {
-      return this.formatOffset(this.getOffset(timezone));
+    getOffsetAsString: function(timezone, date) {
+      return this.formatOffset(this.getOffset(timezone, date));
     },
 
     formatOffset: function(offsetMinutes) {
