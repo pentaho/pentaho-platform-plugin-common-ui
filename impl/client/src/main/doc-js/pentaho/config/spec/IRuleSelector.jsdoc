@@ -46,7 +46,7 @@
  *
  * @name application
  * @memberOf pentaho.config.spec.IRuleSelector#
- * @type {?pentaho.type.spec.UContextPropFilter<string>}
+ * @type {pentaho.type.spec.UContextPropFilter<string>}
  */
 
 /**
@@ -54,7 +54,7 @@
  *
  * @name user
  * @memberOf pentaho.config.spec.IRuleSelector#
- * @type {?pentaho.type.spec.UContextPropFilter<string>}
+ * @type {pentaho.type.spec.UContextPropFilter<string>}
  */
 
 /**
@@ -62,7 +62,7 @@
  *
  * @name theme
  * @memberOf pentaho.config.spec.IRuleSelector#
- * @type {?pentaho.type.spec.UContextPropFilter<string>}
+ * @type {pentaho.type.spec.UContextPropFilter<string>}
  */
 
 /**
@@ -70,5 +70,5 @@
  *
  * @name locale
  * @memberOf pentaho.config.spec.IRuleSelector#
- * @type {?pentaho.type.spec.UContextPropFilter<string>}
+ * @type {pentaho.type.spec.UContextPropFilter<string>}
  */

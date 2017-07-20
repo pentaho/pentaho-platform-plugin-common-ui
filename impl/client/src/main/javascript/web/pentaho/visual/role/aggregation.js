@@ -44,12 +44,12 @@ define([
      * * `mode` - Mode (applicable to any type)
      */
     return PentahoString.extend({
-      type: {
+      $type: {
         id: module.id,
         mixins: ["enum"],
         domain: ["sum", "avg", "min", "max", "first", "last"]
       }
     })
-    .implement({type: bundle.structured.aggregation});
+    .implement({$type: bundle.structured.aggregation});
   };
 });

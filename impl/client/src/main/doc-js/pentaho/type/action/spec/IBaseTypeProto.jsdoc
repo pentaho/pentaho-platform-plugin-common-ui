@@ -29,7 +29,7 @@
  * @memberOf pentaho.type.action.spec.IBaseTypeProto#
  * @type {pentaho.type.action.spec.IBaseProto}
  *
- * @see pentaho.type.action.spec.IBaseProto#type
+ * @see pentaho.type.action.spec.IBaseProto#$type
  */
 
 /**

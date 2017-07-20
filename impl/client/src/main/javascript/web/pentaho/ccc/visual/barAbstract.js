@@ -28,7 +28,7 @@ define([
 
     return BaseView.extend({
 
-      type: {
+      $type: {
         id: module.id,
         props: {
           model: {valueType: modelFactory}

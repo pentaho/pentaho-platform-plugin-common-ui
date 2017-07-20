@@ -40,11 +40,11 @@ define([
       PentahoNumber = context.get(numberFactory);
 
       NumberList = List.extend({
-        type: {of: PentahoNumber}
+        $type: {of: PentahoNumber}
       });
 
       Derived = Complex.extend({
-        type: {
+        $type: {
           props: [
             {name: "foo", valueType: "number"},
             {name: "bar", valueType: "number"},
@@ -75,8 +75,8 @@ define([
         owner.foo = 10;
         owner.myList.add(3);
 
-        listChangeset = myList.changeset;
-        changeset = owner.changeset;
+        listChangeset = myList.$changeset;
+        changeset = owner.$changeset;
       });
 
       afterEach(function() {
@@ -200,24 +200,24 @@ define([
         });
 
         it("should add a new property to the ComplexChangeset", function() {
-          var Derived = Complex.extend({type: {props: ["foo"]}});
+          var Derived = Complex.extend({$type: {props: ["foo"]}});
 
           var derived = new Derived({foo: "a"});
 
           var txnScope = context.enterChange();
 
-          expect(derived.hasChanges).toBe(false);
+          expect(derived.$hasChanges).toBe(false);
 
           derived.set("foo", "b");
 
-          expect(derived.hasChanges).toBe(true);
-          expect(derived.changeset.hasChange("foo")).toBe(true);
+          expect(derived.$hasChanges).toBe(true);
+          expect(derived.$changeset.hasChange("foo")).toBe(true);
 
           txnScope.dispose();
         });
 
         it("should update a Replace change, when it already exists in the changeset", function() {
-          var Derived = Complex.extend({type: {props: ["foo"]}});
+          var Derived = Complex.extend({$type: {props: ["foo"]}});
 
           var derived = new Derived({foo: "a"});
 
@@ -225,13 +225,13 @@ define([
 
           derived.set("foo", "b");
 
-          var change0 = derived.changeset.getChange("foo");
+          var change0 = derived.$changeset.getChange("foo");
 
           expect(change0.value.valueOf()).toBe("b");
 
           derived.set("foo", "c");
 
-          var change1 = derived.changeset.getChange("foo");
+          var change1 = derived.$changeset.getChange("foo");
 
           expect(change0).toBe(change1);
           expect(change1.value.valueOf()).toBe("c");
@@ -240,17 +240,17 @@ define([
         });
 
         it("should not create a change, when the value is the same", function() {
-          var Derived = Complex.extend({type: {props: ["foo"]}});
+          var Derived = Complex.extend({$type: {props: ["foo"]}});
 
           var derived = new Derived({foo: "a"});
 
           var txnScope = context.enterChange();
 
-          expect(derived.hasChanges).toBe(false);
+          expect(derived.$hasChanges).toBe(false);
 
           derived.set("foo", "a");
 
-          expect(derived.hasChanges).toBe(false);
+          expect(derived.$hasChanges).toBe(false);
 
           txnScope.dispose();
         });
@@ -259,7 +259,7 @@ define([
 
           var txnScope = context.enterChange();
 
-          var Derived = Complex.extend({type: {props: ["foo"]}});
+          var Derived = Complex.extend({$type: {props: ["foo"]}});
           var derived = new Derived({foo: "bar"});
 
           var changeset = new ComplexChangeset(txnScope.transaction, derived);

@@ -26,11 +26,11 @@ define([
     var BaseModel = context.get(baseModelFactory);
 
     return BaseModel.extend({
-      type: {
+      $type: {
         id: module.id,
         defaultView: "pentaho/ccc/visual/scatter"
       }
     })
-    .implement({type: bundle.structured.scatter});
+    .implement({$type: bundle.structured.scatter});
   };
 });

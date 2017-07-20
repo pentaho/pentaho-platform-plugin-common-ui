@@ -26,7 +26,7 @@
 /**
  * The extensible/configurable members of the prototype of the selection action type class.
  *
- * @name type
+ * @name $type
  * @memberOf pentaho.visual.action.spec.ISelectProto#
  * @type {pentaho.visual.action.spec.ISelectTypeProto}
  *

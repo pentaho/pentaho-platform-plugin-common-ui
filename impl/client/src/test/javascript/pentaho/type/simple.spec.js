@@ -199,10 +199,10 @@ define([
       });
     });
 
-    describe("#key -", function() {
+    describe("#$key -", function() {
       it("Should convert the given value to a string", function() {
         var simple1 = new Simple(123);
-        expect(simple1.key).toBe(String(123));
+        expect(simple1.$key).toBe(String(123));
       });
     });
 
@@ -282,7 +282,7 @@ define([
         });
 
         it("should be overridable", function() {
-          var Derived = Simple.extend({type: {
+          var Derived = Simple.extend({$type: {
             cast: function(v) {
               return v * 2;
             }
@@ -292,13 +292,13 @@ define([
         });
 
         it("should be possible to call base", function() {
-          var Derived1 = Simple.extend({type: {
+          var Derived1 = Simple.extend({$type: {
             cast: function(v) {
               return v * 2;
             }
           }});
 
-          var Derived2 = Derived1.extend({type: {
+          var Derived2 = Derived1.extend({$type: {
             cast: function(v) {
               return this.base(v) * 5;
             }

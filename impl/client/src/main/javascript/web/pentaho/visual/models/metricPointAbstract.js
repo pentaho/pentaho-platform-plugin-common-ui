@@ -33,7 +33,7 @@ define([
     var MeasurementLevel = context.get(measurementLevelFactory);
 
     return BaseModel.extend({
-      type: {
+      $type: {
         id: module.id,
         isAbstract: true,
         // TODO: scaleColor... should only be applicable when color is continuous
@@ -106,6 +106,6 @@ define([
         ]
       }
     })
-    .implement({type: bundle.structured.metricDot});
+    .implement({$type: bundle.structured.metricDot});
   };
 });

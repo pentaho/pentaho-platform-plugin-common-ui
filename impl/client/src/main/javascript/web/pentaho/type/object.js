@@ -72,7 +72,7 @@ define([
        * @type {string}
        * @readonly
        */
-      get key() {
+      get $key() {
         return this.__uid;
       },
 
@@ -83,13 +83,13 @@ define([
        * @readonly
        */
 
-      type: /** @lends pentaho.type.Object.Type# */{
+      $type: /** @lends pentaho.type.Object.Type# */{
         id:   module.id,
         alias: "object",
         cast: Object
       }
     }).implement(/** @lends pentaho.type.Object# */{
-      type: bundle.structured["object"] // eslint-disable-line dot-notation
+      $type: bundle.structured["object"] // eslint-disable-line dot-notation
     });
 
     return PenObject;

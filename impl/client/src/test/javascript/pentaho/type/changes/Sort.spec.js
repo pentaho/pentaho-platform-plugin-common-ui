@@ -141,7 +141,7 @@ define([
 
         list.sort(fun.compare);
 
-        list.changeset.clearChanges();
+        list.$changeset.clearChanges();
 
         // ---
 
@@ -157,7 +157,7 @@ define([
 
         list.sort(fun.compare);
 
-        list.changeset.clearChanges();
+        list.$changeset.clearChanges();
 
         // ---
 

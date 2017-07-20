@@ -34,7 +34,7 @@ define([
     var Property = declaringType.context.get(baseId || "property");
 
     var SubProperty = Property.extend({
-      type: typeSpec
+      $type: typeSpec
     }, null, {
       declaringType: declaringType,
       index: 1,
@@ -49,7 +49,7 @@ define([
     var basePropType = declaringType.ancestor.get(baseProperty);
     var BaseProperty = basePropType.instance.constructor;
     var SubProperty = BaseProperty.extend({
-      type: subPropTypeSpec
+      $type: subPropTypeSpec
     }, null, {
       declaringType: declaringType,
       index: -1,

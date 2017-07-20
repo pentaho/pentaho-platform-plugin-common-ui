@@ -57,7 +57,7 @@ define([
             expect(Derived.type.count).toBe(0);
 
             Derived = Complex.extend({
-              type: {
+              $type: {
                 props: []
               }
             });
@@ -67,7 +67,7 @@ define([
 
           it("#each should never call the mapping function", function() {
             var Derived = Complex.extend({
-              type: {
+              $type: {
                 props: []
               }
             });
@@ -82,7 +82,7 @@ define([
 
           it("should inherit the base class' properties", function() {
             var A = Complex.extend({
-              type: {
+              $type: {
                 props: ["fooBar", "guru"]
               }
             });
@@ -99,7 +99,7 @@ define([
 
         describe("when specified with a single 'string' entry", function() {
           var Derived = Complex.extend({
-            type: {
+            $type: {
               props: ["fooBar"]
             }
           });
@@ -139,7 +139,7 @@ define([
 
         describe("when specified with two entries", function() {
           var Derived = Complex.extend({
-            type: {
+            $type: {
               props: ["fooBar", "guru"]
             }
           });
@@ -172,14 +172,14 @@ define([
 
         describe("when specified with with an entry that overrides a base type property", function() {
           var A = Complex.extend({
-            type: {
+            $type: {
               label: "A",
               props: ["fooBar", "guru"]
             }
           });
 
           var B = A.extend({
-            type: {
+            $type: {
               label: "B",
               props: [{name: "guru", label: "HELLO"}]
             }
@@ -206,14 +206,14 @@ define([
 
         describe("when specified with with an entry that is not a base type property", function() {
           var A = Complex.extend({
-            type: {
+            $type: {
               label: "A",
               props: ["fooBar", "guru"]
             }
           });
 
           var B = A.extend({
-            type: {
+            $type: {
               label: "B",
               props: [{name: "guru", label: "HELLO"}, {name: "babah"}]
             }
@@ -232,7 +232,7 @@ define([
         describe("when specified with with a dictionary", function() {
           it("should define the defined properties", function() {
             var A = Complex.extend({
-              type: {
+              $type: {
                 label: "A",
                 props: {"fooBar": {}, "guru": {}}
               }
@@ -252,7 +252,7 @@ define([
 
           it("should ignore undefined properties", function() {
             var A = Complex.extend({
-              type: {
+              $type: {
                 label: "A",
                 props: {"fooBar": {}, "guru": {}, "dada": null, "babah": undefined}
               }
@@ -268,7 +268,7 @@ define([
           it("should throw if a property specifies a name different from the key", function() {
             expect(function() {
               Complex.extend({
-                type: {
+                $type: {
                   label: "A",
                   props: {"fooBar": {name: "babah"}}
                 }
@@ -282,14 +282,14 @@ define([
     describe(".implement(...)", function() {
       it("should be possible to configure existing properties with a dictionary", function() {
         var A = Complex.extend({
-          type: {
+          $type: {
             label: "A",
             props: ["x", "y"]
           }
         });
 
         A.implement({
-          type: {
+          $type: {
             props: {
               "x": {label: "labelX"},
               "y": {label: "labelY"}
@@ -315,11 +315,11 @@ define([
     });
 
     describe("#has(name)", function() {
-      var Derived = Complex.extend({type: {
+      var Derived = Complex.extend({$type: {
         props: ["foo", "bar"]
       }});
 
-      var DerivedB = Derived.extend({type: {
+      var DerivedB = Derived.extend({$type: {
         props: [{name: "bar", label: "HELLO"}]
       }});
 
@@ -343,7 +343,7 @@ define([
 
       it("should return false when given the type object of a property from a different complex type", function() {
         var OtherDerived = Complex.extend({
-          type: {
+          $type: {
             props: ["fooBar"]
           }
         });
@@ -364,7 +364,7 @@ define([
 
     describe("#at(index[, sloppy])", function() {
 
-      var Derived = Complex.extend({type: {
+      var Derived = Complex.extend({$type: {
         props: ["foo", "bar"]
       }});
 
@@ -407,7 +407,7 @@ define([
     });
 
     describe("#get(name[, sloppy])", function() {
-      var Derived = Complex.extend({type: {
+      var Derived = Complex.extend({$type: {
         props: ["foo", "bar"]
       }});
 
@@ -468,7 +468,7 @@ define([
 
       describe("when given a property type object from a different complex type", function() {
         var OtherDerived = Complex.extend({
-          type: {
+          $type: {
             props: ["fooBar"]
           }
         });
@@ -483,7 +483,7 @@ define([
 
     describe("#count", function() {
       it("should return the number of properties of a type with properties", function() {
-        var Derived = Complex.extend({type: {
+        var Derived = Complex.extend({$type: {
           props: ["foo", "bar"]
         }});
         expect(Derived.type.count).toBe(2);
@@ -498,7 +498,7 @@ define([
     describe("#add", function() {
       it("should add new properties", function() {
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: []
           }
         });
@@ -520,7 +520,7 @@ define([
       it("should call f once for each property of the type", function() {
 
         var SampleType = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: "string"},
               {name: "b", valueType: "string"}
@@ -539,7 +539,7 @@ define([
       it("should call f once for each property of the type passing the index as second argument", function() {
 
         var SampleType = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: "string"},
               {name: "b", valueType: "string"}
@@ -558,7 +558,7 @@ define([
       it("should call f once for each property of the type passing this as the third argument", function() {
 
         var SampleType = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: "string"},
               {name: "b", valueType: "string"}
@@ -577,7 +577,7 @@ define([
       it("should call f on the given x", function() {
 
         var SampleType = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: "string"}
             ]
@@ -595,7 +595,7 @@ define([
       it("should return this", function() {
 
         var SampleType = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: "string"}
             ]
@@ -612,7 +612,7 @@ define([
       it("should stop iteration if f returns false", function() {
 
         var SampleType = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: "string"},
               {name: "b", valueType: "string"}
@@ -630,7 +630,7 @@ define([
       it("should call f for inherited properties", function() {
 
         var RootType = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: "string"},
               {name: "b", valueType: "string"}
@@ -639,7 +639,7 @@ define([
         });
 
         var SampleType = RootType.extend({
-          type: {
+          $type: {
             props: [
               {name: "c", valueType: "string"},
               {name: "d", valueType: "string"}
@@ -663,7 +663,7 @@ define([
       it("should call f once for each corresponding property of the common base type", function() {
 
         var BaseType = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: "string"},
               {name: "b", valueType: "string"}
@@ -686,7 +686,7 @@ define([
          "passing the index as second argument", function() {
 
         var BaseType = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: "string"},
               {name: "b", valueType: "string"}
@@ -709,7 +709,7 @@ define([
           "passing this as third argument", function() {
 
         var BaseType = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: "string"},
               {name: "b", valueType: "string"}
@@ -731,7 +731,7 @@ define([
       it("should call f on the given x", function() {
 
         var BaseType = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: "string"}
             ]
@@ -752,7 +752,7 @@ define([
       it("should return this", function() {
 
         var BaseType = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: "string"}
             ]
@@ -774,7 +774,7 @@ define([
         var BaseType = Complex.extend();
 
         var SubTypeA = BaseType.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: "string"}
             ]
@@ -782,7 +782,7 @@ define([
         });
 
         var SubTypeB = BaseType.extend({
-          type: {
+          $type: {
             props: [
               {name: "b", valueType: "string"}
             ]
@@ -799,7 +799,7 @@ define([
       it("should stop iteration if f returns false", function() {
 
         var BaseType = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: "string"},
               {name: "b", valueType: "string"}
@@ -820,7 +820,7 @@ define([
       it("should call f for inherited properties", function() {
 
         var RootType = Complex.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: "string"},
               {name: "b", valueType: "string"}
@@ -829,7 +829,7 @@ define([
         });
 
         var BaseType = RootType.extend({
-          type: {
+          $type: {
             props: [
               {name: "c", valueType: "string"},
               {name: "d", valueType: "string"}
@@ -855,7 +855,7 @@ define([
         var BaseType = Complex.extend();
 
         var SubTypeA = BaseType.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: "string"}
             ]
@@ -863,7 +863,7 @@ define([
         });
 
         var SubTypeB = BaseType.extend({
-          type: {
+          $type: {
             props: [
               {name: "a", valueType: "string"}
             ]

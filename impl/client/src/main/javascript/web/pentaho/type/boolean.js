@@ -43,13 +43,13 @@ define([
        * @readonly
        */
 
-      type: /** @lends pentaho.type.Boolean.Type# */{
+      $type: /** @lends pentaho.type.Boolean.Type# */{
         id: module.id,
         alias: "boolean",
         cast: Boolean
       }
     }).implement(/** @lends pentaho.type.Boolean# */{
-      type: bundle.structured["boolean"] // eslint-disable-line dot-notation
+      $type: bundle.structured["boolean"] // eslint-disable-line dot-notation
     });
 
     return PenBoolean;

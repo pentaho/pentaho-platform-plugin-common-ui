@@ -29,7 +29,7 @@
  * @memberOf pentaho.type.spec.IListTypeProto#
  * @type {pentaho.type.spec.IListProto}
  *
- * @see pentaho.type.spec.IListProto#type
+ * @see pentaho.type.spec.IListProto#$type
  */
 
 /**

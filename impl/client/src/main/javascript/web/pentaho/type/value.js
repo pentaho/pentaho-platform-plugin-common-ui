@@ -83,7 +83,7 @@ define([
        * @see pentaho.type.Value#equals
        * @see pentaho.type.Value.Type#areEqual
        */
-      get key() {
+      get $key() {
         return this.toString();
       },
 
@@ -104,12 +104,12 @@ define([
        * @param {any} other - A value to test for equality.
        * @return {boolean} `true` if the given value is equal to this one; or, `false`, otherwise.
        *
-       * @see pentaho.type.Value#key
+       * @see pentaho.type.Value#$key
        * @see pentaho.type.Value.Type#areEqual
        * @final
        */
       equals: function(other) {
-        return this === other || (other != null && this.type._isEqual(this, other));
+        return this === other || (other != null && this.$type._isEqual(this, other));
       },
 
       // region validation
@@ -124,7 +124,7 @@ define([
        * @readonly
        * @final
        */
-      get isValid() {
+      get $isValid() {
         return !this.validate();
       },
 
@@ -135,11 +135,11 @@ define([
        *
        * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
        *
-       * @see pentaho.type.Value#isValid
+       * @see pentaho.type.Value#$isValid
        * @final
        */
       validate: function() {
-        return this.type.validate(this);
+        return this.$type.validate(this);
       },
 
       /**
@@ -247,7 +247,7 @@ define([
        * @type pentaho.type.Value.Type
        * @readonly
        */
-      type: /** @lends pentaho.type.Value.Type# */{
+      $type: /** @lends pentaho.type.Value.Type# */{
         id: module.id,
         alias: "value",
         isAbstract: true,
@@ -264,9 +264,9 @@ define([
          * Two values are considered equal if they represent the same real-world entity.
          *
          * If two values are considered equal,
-         * their value instances must have an equal [key]{@link pentaho.type.Value#key}.
+         * their value instances must have an equal [key]{@link pentaho.type.Value#$key}.
          * Conversely, if they are considered different,
-         * their value instances must have a different `key`.
+         * their value instances must have a different `$key`.
          *
          * If the values are identical as per JavaScript's `===` operator, `true` is returned.
          * If both values are {@link Nully}, `true` is returned.
@@ -278,7 +278,7 @@ define([
          *
          * @return {boolean} `true` if two values are considered equal; `false`, otherwise.
          *
-         * @see pentaho.type.Value#key
+         * @see pentaho.type.Value#$key
          * @see pentaho.type.Value.Type#_areEqual
          * @see pentaho.type.Value.Type#_isEqual
          */
@@ -302,8 +302,8 @@ define([
          * @see pentaho.type.Value.Type#areEqual
          */
         _areEqual: function(va, vb) {
-          return (va instanceof Value) ? va.type._isEqual(va, vb) :
-                 (vb instanceof Value) ? vb.type._isEqual(vb, va) :
+          return (va instanceof Value) ? va.$type._isEqual(va, vb) :
+                 (vb instanceof Value) ? vb.$type._isEqual(vb, va) :
                  false;
         },
 
@@ -324,7 +324,7 @@ define([
          * @see pentaho.type.Value.Type#areEqual
          */
         _isEqual: function(va, vb) {
-          return (va.constructor === vb.constructor) && (va.key === vb.key);
+          return (va.constructor === vb.constructor) && (va.$key === vb.$key);
         },
         // endregion
 
@@ -372,7 +372,7 @@ define([
           if(!this.is(value))
             return [new ValidationError(bundle.format(bundle.structured.errors.value.notOfType, [this.label]))];
 
-          return value.type._validate(value);
+          return value.$type._validate(value);
         },
 
         /**
@@ -380,7 +380,7 @@ define([
          * that **is an instance of this type**,
          * is also a **valid instance** of this type.
          *
-         * Thus, `this === value.type` must be true.
+         * Thus, `this === value.$type` must be true.
          *
          * The default implementation does nothing and considers the instance valid.
          * Override to implement a type's specific validation logic.
@@ -398,7 +398,7 @@ define([
          */
         _validate: function(value) {
 
-          // assert this === value.type
+          // assert this === value.$type
 
           return null;
         },
@@ -427,7 +427,7 @@ define([
     }, /* classDesc: */{}, /* keyArgs: */{
       isRoot: true
     }).implement({
-      type: bundle.structured.value
+      $type: bundle.structured.value
     });
 
     // override the documentation to specialize the argument types.

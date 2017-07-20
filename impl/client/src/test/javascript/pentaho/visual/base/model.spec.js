@@ -184,7 +184,7 @@ define([
 
         beforeEach(function() {
 
-          DerivedModel = Model.extend({type: {
+          DerivedModel = Model.extend({$type: {
             props: [
               {name: "vr1", base: rolePropFactory},
               {name: "vr2", base: rolePropFactory},

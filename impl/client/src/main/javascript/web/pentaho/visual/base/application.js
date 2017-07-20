@@ -50,12 +50,12 @@ define([
      * @param {pentaho.visual.base.spec.IApplication} [spec] A visual application specification.
      */
     var VisualApplication = Application.extend(/** @lends pentaho.visual.base.Application# */{
-      type: /** @lends pentaho.visual.base.Application.Type# */{
+      $type: /** @lends pentaho.visual.base.Application.Type# */{
         id: module.id
       }
     })
     .implement({
-      type: bundle.structured.application.type
+      $type: bundle.structured.application.type
     });
 
     return VisualApplication;

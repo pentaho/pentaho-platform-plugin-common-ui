@@ -72,7 +72,7 @@ define([
         it("should return an empty array for an empty list", function() {
 
           var list = new List();
-          var spec = list.toSpec({declaredType: list.type});
+          var spec = list.toSpec({declaredType: list.$type});
 
           expect(spec).toEqual([]);
         });
@@ -80,7 +80,7 @@ define([
         it("should return an array of serialized elements for a list of elements", function() {
 
           var list = new NumberList([1, 2, 3]);
-          var spec = list.toSpec({declaredType: list.type});
+          var spec = list.toSpec({declaredType: list.$type});
 
           expect(spec).toEqual([1, 2, 3]);
         });
@@ -90,7 +90,7 @@ define([
           it("should return a spec with an inline type and an empty 'd' property, for an empty list", function() {
 
             var list = new List();
-            var spec = list.toSpec({forceType: true, declaredType: list.type});
+            var spec = list.toSpec({forceType: true, declaredType: list.$type});
 
             expect(spec).toEqual({_: jasmine.any(String), d: []});
           });
@@ -99,7 +99,7 @@ define([
               "array of serialized elements for a list of elements", function() {
 
             var list = new NumberList([1, 2, 3]);
-            var spec = list.toSpec({forceType: true, declaredType: list.type});
+            var spec = list.toSpec({forceType: true, declaredType: list.$type});
 
             expect(spec).toEqual({_: jasmine.any(Object), d: [1, 2, 3]});
           });
@@ -111,7 +111,7 @@ define([
         it("should return a spec with an inline type and an empty 'd' property, for an empty list", function() {
 
           var list = new List();
-          var spec = list.toSpec({declaredType: list.type.ancestor});
+          var spec = list.toSpec({declaredType: list.$type.ancestor});
 
           expect(spec).toEqual({_: jasmine.any(String), d: []});
         });
@@ -120,7 +120,7 @@ define([
            "array of serialized elements for a list of elements", function() {
 
           var list = new NumberList([1, 2, 3]);
-          var spec = list.toSpec({declaredType: list.type.ancestor});
+          var spec = list.toSpec({declaredType: list.$type.ancestor});
 
           expect(spec).toEqual({_: jasmine.any(Object), d: [1, 2, 3]});
         });

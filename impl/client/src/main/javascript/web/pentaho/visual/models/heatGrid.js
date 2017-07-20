@@ -31,7 +31,7 @@ define([
     var BaseModel = context.get(baseModelFactory);
 
     return BaseModel.extend({
-      type: {
+      $type: {
         id: module.id,
         mixins: [scaleColorContinuousFactory, scaleSizeContinuousFactory],
 
@@ -86,7 +86,7 @@ define([
         ]
       }
     })
-    .implement({type: bundle.structured.heatGrid});
+    .implement({$type: bundle.structured.heatGrid});
   };
 
   function requiredOneMeasure() {

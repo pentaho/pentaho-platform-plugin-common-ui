@@ -73,13 +73,13 @@ define([
     /** @inheritDoc */
     _prepareRefs: function(txn, target) {
       var elem = this.element;
-      if(!target.isBoundary && elem.__addReference) txn.__ensureChangeRef(elem).addReference(target);
+      if(!target.$isBoundary && elem.__addReference) txn.__ensureChangeRef(elem).addReference(target);
     },
 
     /** @inheritDoc */
     _cancelRefs: function(txn, target) {
       var elem = this.element;
-      if(!target.isBoundary && elem.__addReference) txn.__ensureChangeRef(elem).removeReference(target);
+      if(!target.$isBoundary && elem.__addReference) txn.__ensureChangeRef(elem).removeReference(target);
     },
 
     /** @inheritDoc */
@@ -87,7 +87,7 @@ define([
       var elem = this.element;
 
       target.__elems.splice(this.index, 0, elem);
-      target.__keys[elem.key] = elem;
+      target.__keys[elem.$key] = elem;
     }
   });
 });

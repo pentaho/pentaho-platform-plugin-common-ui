@@ -32,7 +32,7 @@ define([
 
     return BaseModel.extend({
 
-      type: {
+      $type: {
         id: module.id,
         mixins: [interpolatedFactory],
 
@@ -89,7 +89,7 @@ define([
         ]
       }
     })
-    .implement({type: bundle.structured.barLine});
+    .implement({$type: bundle.structured.barLine});
   };
 
   function __requiredOneMeasure() {

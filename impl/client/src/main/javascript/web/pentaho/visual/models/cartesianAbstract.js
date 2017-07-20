@@ -27,7 +27,7 @@ define([
     var BaseModel = context.get(baseModelFactory);
 
     return BaseModel.extend({
-      type: {
+      $type: {
         id: module.id,
         isAbstract: true,
 
@@ -56,6 +56,6 @@ define([
         ]
       }
     })
-    .implement({type: bundle.structured.cartesianAbstract});
+    .implement({$type: bundle.structured.cartesianAbstract});
   };
 });

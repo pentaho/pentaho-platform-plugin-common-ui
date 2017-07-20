@@ -94,10 +94,10 @@ define([
        */
       _contains: function(elem) {
         var prop = this.property;
-        return elem.type.has(prop) && this._operation(elem.getv(prop));
+        return elem.$type.has(prop) && this._operation(elem.getv(prop));
       },
 
-      type: /** @lends pentaho.data.filter.Property.Type# */{
+      $type: /** @lends pentaho.data.filter.Property.Type# */{
         id: module.id,
         isAbstract: true,
         props: [

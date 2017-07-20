@@ -26,7 +26,7 @@ define([
     var BaseView = context.get(baseViewFactory);
 
     return BaseView.extend({
-      type: {
+      $type: {
         id: module.id,
         props: {
           model: {valueType: modelFactory}

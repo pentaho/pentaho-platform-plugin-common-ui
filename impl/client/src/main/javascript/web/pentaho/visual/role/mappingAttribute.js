@@ -137,7 +137,7 @@ define([
        */
       get keyQualitative() {
         var name = this.get("name");
-        return name ? name.key : "";
+        return name ? name.$key : "";
       },
 
       /**
@@ -153,10 +153,10 @@ define([
        */
       get keyQuantitative() {
         var aggregation = this.get("aggregation");
-        return this.keyQualitative + "|" + (aggregation ? aggregation.key : "");
+        return this.keyQualitative + "|" + (aggregation ? aggregation.$key : "");
       },
 
-      type: {
+      $type: {
         id: module.id,
 
         props: [
@@ -200,6 +200,6 @@ define([
         ]
       }
     })
-    .implement({type: bundle.structured.mappingAttribute});
+    .implement({$type: bundle.structured.mappingAttribute});
   };
 });

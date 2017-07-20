@@ -36,11 +36,11 @@ define([
   var PentahoNumber = context.get(numberFactory);
 
   function expectNoChanges(list) {
-    expect(list.changeset).toBe(null);
+    expect(list.$changeset).toBe(null);
   }
 
   var NumberList = List.extend({
-    type: {of: PentahoNumber}
+    $type: {of: PentahoNumber}
   });
 
   describe("pentaho.type.List -", function() {
@@ -67,7 +67,7 @@ define([
       it("should throw if given a nully `of` property", function() {
         expect(function() {
           List.extend({
-            type: {of: null}
+            $type: {of: null}
           });
         }).toThrow(errorMatch.argRequired("of"));
       });
@@ -76,14 +76,14 @@ define([
         var DerivedList = List.extend();
         expect(DerivedList.type.of).toBe(List.type.of);
 
-        DerivedList = List.extend({type: {of: undefined}});
+        DerivedList = List.extend({$type: {of: undefined}});
         expect(DerivedList.type.of).toBe(List.type.of);
       });
 
       it("should throw if given a null `of` property", function() {
         expect(function() {
           List.extend({
-            type: {of: null}
+            $type: {of: null}
           });
         }).toThrow(errorMatch.argRequired("of"));
       });
@@ -91,7 +91,7 @@ define([
       it("should throw if given an `of` property of a type not a subtype of `Element`", function() {
         expect(function() {
           List.extend({
-            type: {of: Value}
+            $type: {of: Value}
           });
         }).toThrow(errorMatch.argInvalid("of"));
       });
@@ -316,10 +316,10 @@ define([
       });
     });
 
-    describe("#key -", function() {
+    describe("#$key -", function() {
       it("should return the value of #uid", function() {
         var value = new List();
-        expect(value.$uid).toBe(value.key);
+        expect(value.$uid).toBe(value.$key);
       });
     });
 
@@ -540,20 +540,20 @@ define([
     });
     // endregion
 
-    // region isReadOnly
-    describe("#isReadOnly", function() {
+    // region $isReadOnly
+    describe("#$isReadOnly", function() {
 
       it("should be false by default", function() {
         var list = new NumberList();
 
-        expect(list.isReadOnly).toBe(false);
+        expect(list.$isReadOnly).toBe(false);
       });
 
       it("should allow creating a read-only list by specifying keyArgs.isReadOnly: true", function() {
 
         var list = new NumberList(null, {isReadOnly: true});
 
-        expect(list.isReadOnly).toBe(true);
+        expect(list.$isReadOnly).toBe(true);
       });
     });
     // endregion
@@ -672,7 +672,7 @@ define([
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: {
               foo: {valueType: NumberList}
             }
@@ -835,7 +835,7 @@ define([
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: {
               foo: {valueType: NumberList, defaultValue: [1, 2, 3]}
             }
@@ -945,7 +945,7 @@ define([
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: {
               foo: {valueType: NumberList, defaultValue: [1, 2, 3]}
             }
@@ -999,7 +999,7 @@ define([
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: {
               foo: {valueType: NumberList, defaultValue: [1, 2, 3, 4]}
             }
@@ -1168,7 +1168,7 @@ define([
 
       it("preserves the order of new elements when they are complex objects", function() {
         var MyComplex = Complex.extend({
-          type: {
+          $type: {
             props: [{
               name: "k",
               valueType: "number"
@@ -1177,7 +1177,7 @@ define([
         });
 
         var ComplexList = List.extend({
-          type: {of: MyComplex}
+          $type: {of: MyComplex}
         });
 
         var list = new ComplexList();
@@ -1319,7 +1319,7 @@ define([
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
-          type: {
+          $type: {
             props: {
               foo: {valueType: NumberList, defaultValue: [4, 2, 1, 3]}
             }
@@ -1379,7 +1379,7 @@ define([
 
         var clone = list.clone();
 
-        expect(clone.isReadOnly).toBe(false);
+        expect(clone.$isReadOnly).toBe(false);
       });
 
       it("should return a list instance with the same count", function() {

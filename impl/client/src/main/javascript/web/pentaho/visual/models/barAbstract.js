@@ -27,7 +27,7 @@ define([
     var BaseModel = context.get(baseModelFactory);
 
     return BaseModel.extend({
-      type: {
+      $type: {
         id: module.id,
         mixins: [multiChartedFactory],
         isAbstract: true,
@@ -39,6 +39,6 @@ define([
         ]
       }
     })
-    .implement({type: bundle.structured.barAbstract});
+    .implement({$type: bundle.structured.barAbstract});
   };
 });

@@ -38,7 +38,7 @@ define([
     var BaseModel = context.get(baseModelFactory);
 
     return BaseModel.extend({
-      type: {
+      $type: {
         id: module.id,
 
         isAbstract: true,
@@ -156,6 +156,6 @@ define([
 
     })
     /* eslint dot-notation:0 */
-    .implement({type: bundle.structured["abstract"]});
+    .implement({$type: bundle.structured["abstract"]});
   };
 });

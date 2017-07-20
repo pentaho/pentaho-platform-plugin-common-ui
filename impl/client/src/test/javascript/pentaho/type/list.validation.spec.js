@@ -32,7 +32,7 @@ define([
       it("should call _validate(.) of the list element type with each of its members", function() {
         var PentahoNumber = context.get(numberFactory);
         var NumberList = List.extend({
-          type: {of: PentahoNumber}
+          $type: {of: PentahoNumber}
         });
 
         spyOn(PentahoNumber.type, "_validate");
@@ -52,7 +52,7 @@ define([
         var PentahoInteger = PentahoNumber.extend();
 
         var NumberList = List.extend({
-          type: {of: PentahoNumber}
+          $type: {of: PentahoNumber}
         });
 
         spyOn(PentahoInteger.type, "_validate");

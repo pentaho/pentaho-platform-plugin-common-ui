@@ -25,12 +25,12 @@ define([
     var PentahoString = context.get("string");
 
     return PentahoString.extend({
-      type: {
+      $type: {
         id: module.id,
         mixins: ["enum"],
         domain: ["gradient", "3_color", "5_color"]
       }
     })
-    .implement({type: bundle.structured.pattern});
+    .implement({$type: bundle.structured.pattern});
   };
 });

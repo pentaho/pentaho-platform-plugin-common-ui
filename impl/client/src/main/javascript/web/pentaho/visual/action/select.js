@@ -43,7 +43,7 @@ define([
     var DataAction = context.get(dataActionFactory);
 
     return DataAction.extend(/** @lends pentaho.visual.action.Select# */{
-      type: /** @lends pentaho.visual.action.Select.Type# */{
+      $type: /** @lends pentaho.visual.action.Select.Type# */{
         id: module.id,
         alias: "select",
 
@@ -155,7 +155,7 @@ define([
       get selectionMode() {
 
         var fun = this.__selectionMode;
-        return fun ? fun.valueOf() : this.type.defaultSelectionMode;
+        return fun ? fun.valueOf() : this.$type.defaultSelectionMode;
       },
 
       set selectionMode(value) {

@@ -44,7 +44,7 @@ define([
       });
 
       it("should not create a props array when there are no local properties to serialize", function() {
-        var Derived = Complex.extend({type: {props: ["foo"]}});
+        var Derived = Complex.extend({$type: {props: ["foo"]}});
 
         var spec = {};
         serializationUtil.fillSpec(Derived, spec, {});
@@ -63,7 +63,7 @@ define([
 
       it("should call propertyType#toSpecInContext when the property is root", function() {
 
-        var derivedType = Complex.extend({type: {props: ["foo"]}}).type;
+        var derivedType = Complex.extend({$type: {props: ["foo"]}}).type;
         var fooPropType = derivedType.get("foo");
 
         spyOn(fooPropType, "toSpecInContext").and.returnValue({});
@@ -79,8 +79,8 @@ define([
 
       it("should call propertyType#toSpecInContext when the property is overridden", function() {
 
-        var Derived = Complex.extend({type: {props: ["foo"]}});
-        var Derived2 = Derived.extend({type: {props: [{name: "foo", label: "Bar"}]}});
+        var Derived = Complex.extend({$type: {props: ["foo"]}});
+        var Derived2 = Derived.extend({$type: {props: [{name: "foo", label: "Bar"}]}});
 
         var fooPropType = Derived2.type.get("foo");
 
@@ -97,7 +97,7 @@ define([
 
       it("should not call propertyType#toSpecInContext when the property is inherited", function() {
 
-        var Derived = Complex.extend({type: {props: ["foo"]}});
+        var Derived = Complex.extend({$type: {props: ["foo"]}});
         var Derived2 = Derived.extend();
 
         var fooPropType = Derived2.type.get("foo");
@@ -119,7 +119,7 @@ define([
           bar: {}
         };
 
-        var derivedType = Complex.extend({type: {props: ["foo"]}}).type;
+        var derivedType = Complex.extend({$type: {props: ["foo"]}}).type;
         var fooPropType = derivedType.get("foo");
 
         spyOn(fooPropType, "toSpecInContext").and.returnValue({});
@@ -137,7 +137,7 @@ define([
       });
 
       it("should call propertyType#toSpecInContext and push its result to spec.props", function() {
-        var derivedType = Complex.extend({type: {props: ["foo"]}}).type;
+        var derivedType = Complex.extend({$type: {props: ["foo"]}}).type;
         var fooPropType = derivedType.get("foo");
 
         var propTypeSpec = {};

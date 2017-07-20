@@ -28,7 +28,7 @@ define([
     var BaseModel = context.get(baseModelFactory);
 
     return BaseModel.extend({
-      type: {
+      $type: {
         id: module.id,
         mixins: [multiChartedFactory],
 
@@ -66,6 +66,6 @@ define([
         ]
       }
     })
-    .implement({type: bundle.structured.pie});
+    .implement({$type: bundle.structured.pie});
   };
 });

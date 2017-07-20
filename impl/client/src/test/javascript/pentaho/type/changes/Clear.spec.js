@@ -146,7 +146,7 @@ define([
 
         // ---
 
-        list.changeset.clearChanges();
+        list.$changeset.clearChanges();
 
         // ---
 
@@ -163,7 +163,7 @@ define([
 
         // ---
 
-        list.changeset.clearChanges();
+        list.$changeset.clearChanges();
 
         scope.accept();
 
@@ -297,7 +297,7 @@ define([
 
             // ---
 
-            list.changeset.clearChanges();
+            list.$changeset.clearChanges();
           });
         });
 
@@ -320,7 +320,7 @@ define([
 
           // ---
 
-          list.changeset.clearChanges();
+          list.$changeset.clearChanges();
         });
       });
 
@@ -427,7 +427,7 @@ define([
 
           // ---
 
-          list.changeset.clearChanges();
+          list.$changeset.clearChanges();
 
           // ---
 
@@ -449,7 +449,7 @@ define([
 
           // ---
 
-          list.changeset.clearChanges();
+          list.$changeset.clearChanges();
 
           scope.accept();
 

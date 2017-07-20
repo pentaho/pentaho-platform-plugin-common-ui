@@ -49,13 +49,13 @@ define([
      * @param {pentaho.type.spec.IApplication} [spec] An application specification.
      */
     var Application = Complex.extend(/** @lends pentaho.type.Application# */{
-      type: /** @lends pentaho.type.Application.Type# */{
+      $type: /** @lends pentaho.type.Application.Type# */{
         id: module.id,
         alias: "application"
       }
     })
     .implement({
-      type: bundle.structured.application
+      $type: bundle.structured.application
     });
 
     return Application;

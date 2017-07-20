@@ -111,13 +111,13 @@ define([
         var isBoundary = this.__isBoundary;
         var i = -1;
         var L = elemSpecs.length;
-        var elemType = this.type.of;
+        var elemType = this.$type.of;
         var elems = this.__elems;
         var keys  = this.__keys;
         var elem;
         var key;
         while(++i < L) {
-          if((elem = elemType.to(elemSpecs[i])) != null && !O.hasOwn(keys, (key = elem.key))) {
+          if((elem = elemType.to(elemSpecs[i])) != null && !O.hasOwn(keys, (key = elem.$key))) {
             elems.push(elem);
             keys[key] = elem;
 
@@ -126,7 +126,7 @@ define([
         }
       },
 
-      // region isReadOnly
+      // region $isReadOnly
       __isReadOnly: false,
 
       /**
@@ -135,14 +135,14 @@ define([
        * @type {boolean}
        * @readOnly
        */
-      get isReadOnly() {
+      get $isReadOnly() {
         return this.__isReadOnly;
       },
 
       /**
        * Asserts that the list can be changed, throwing an error if not.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        *
        * @private
        */
@@ -151,7 +151,7 @@ define([
       },
       // endregion
 
-      // region isBoundary
+      // region $isBoundary
       __isBoundary: false,
 
       /**
@@ -165,7 +165,7 @@ define([
        * @type {boolean}
        * @readOnly
        */
-      get isBoundary() {
+      get $isBoundary() {
         return this.__isBoundary;
       },
       // endregion
@@ -273,7 +273,7 @@ define([
        * @type {string}
        * @readonly
        */
-      get key() {
+      get $key() {
         return this.$uid;
       },
 
@@ -291,7 +291,7 @@ define([
        * Gets the element at a specified index, or `null`.
        *
        * @param {number} index - The desired index.
-       * @return {?pentaho.type.Element} The element value or `null`.
+       * @return {pentaho.type.Element} The element value or `null`.
        */
       at: function(index) {
         if(index == null) throw error.argRequired("index");
@@ -319,7 +319,7 @@ define([
        * @return {boolean} `true` if the element is present in the list; `false`, otherwise.
        */
       includes: function(elem) {
-        return elem != null && this.get(elem.key) === elem;
+        return elem != null && this.get(elem.$key) === elem;
       },
 
       /**
@@ -330,7 +330,7 @@ define([
        * @return {number} `true` if the element is present in the list; `false`, otherwise.
        */
       indexOf: function(elem) {
-        return elem && this.has(elem.key) ? this.__projectedMock.__elems.indexOf(elem) : -1;
+        return elem && this.has(elem.$key) ? this.__projectedMock.__elems.indexOf(elem) : -1;
       },
 
       /**
@@ -338,7 +338,7 @@ define([
        *
        * @param {string|any} key - The element's key.
        *
-       * @return {?pentaho.type.Element} The corresponding element or `null`.
+       * @return {pentaho.type.Element} The corresponding element or `null`.
        */
       get: function(key) {
         // jshint laxbreak:true
@@ -366,7 +366,7 @@ define([
        * When unspecified, new elements are appended to the list.
        * This argument is ignored when `noAdd` is `true`.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       set: function(fragment, keyArgs) {
 
@@ -387,7 +387,7 @@ define([
        *
        * @param {any|Array} fragment - Value or values to add.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       add: function(fragment) {
         this.__set(fragment, /* add: */true, /* update: */true, /* remove: */false, /* move: */false);
@@ -405,7 +405,7 @@ define([
        * @param {any|Array} fragment - Element or elements to add.
        * @param {number} index - The index at which to start inserting new elements.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       insert: function(fragment, index) {
         this.__set(fragment,
@@ -419,7 +419,7 @@ define([
        *
        * @param {any|Array} fragment - Element or elements to remove.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       remove: function(fragment) {
 
@@ -436,7 +436,7 @@ define([
        * @param {any} elemSpec - An element specification.
        * @param {number} indexNew - The new index of the element.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       move: function(elemSpec, indexNew) {
 
@@ -460,7 +460,7 @@ define([
        * @param {number} start - The index at which to start removing.
        * @param {number} [count=1] The number of elements to remove.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       removeAt: function(start, count) {
 
@@ -476,7 +476,7 @@ define([
        *
        * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer - The comparer function.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       sort: function(comparer) {
 
@@ -490,7 +490,7 @@ define([
       /**
        * Removes all elements from the list.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#isReadOnly}.
+       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       clear: function() {
 
@@ -556,7 +556,7 @@ define([
        * @internal
        */
       __cast: function(valueSpec) {
-        return this.type.__elemType.to(valueSpec);
+        return this.$type.__elemType.to(valueSpec);
       },
 
       // region Core change methods
@@ -584,7 +584,7 @@ define([
         keyArgs = keyArgs ? Object.create(keyArgs) : {};
 
         // Capture now, before using it below for the elements.
-        var listType = this.type;
+        var listType = this.$type;
         var declaredType;
         var includeType = !!keyArgs.forceType || (!!(declaredType = keyArgs.declaredType) && listType !== declaredType);
 
@@ -614,7 +614,7 @@ define([
       },
       // endregion
 
-      type: /** @lends pentaho.type.List.Type# */{
+      $type: /** @lends pentaho.type.List.Type# */{
 
         /** @inheritDoc */
         _postInit: function() {
@@ -764,7 +764,7 @@ define([
         this._cloneElementData(clone);
       },
 
-      type: bundle.structured.list
+      $type: bundle.structured.list
     });
 
     // override the documentation to specialize the argument types.

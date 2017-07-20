@@ -61,7 +61,7 @@ define([
     var Instance = context.get("instance");
 
     return Instance.extend(/** @lends pentaho.type.mixins.DiscreteDomain# */{
-      type: /** @lends pentaho.type.mixins.DiscreteDomain.Type# */{
+      $type: /** @lends pentaho.type.mixins.DiscreteDomain.Type# */{
         id: module.id,
 
         dynamicAttributes: {
@@ -135,7 +135,7 @@ define([
            * @type {undefined | Array.<pentaho.type.Element> |
            *        pentaho.type.PropertyDynamicAttribute.<Array.<pentaho.type.Element>>}
            *
-           * @see pentaho.type.Complex#getPropDomain
+           * @see pentaho.type.Complex#domainOf
            * @see pentaho.type.mixins.spec.IDiscreteDomainTypeProto#domain
            */
           "domain": {
@@ -197,13 +197,13 @@ define([
           if(domain) {
             var domainByKey = {};
             domain.forEach(function(elem) {
-              domainByKey[elem.key] = elem;
+              domainByKey[elem.$key] = elem;
             });
 
             var propType = this;
 
             addValidator(function(owner, element) {
-              if(!O.hasOwn(domainByKey, element.key)) {
+              if(!O.hasOwn(domainByKey, element.$key)) {
                 return new ValidationError(
                     bundle.get("errors.discreteDomain.notInDomain", [element.toString(), propType.label]));
               }

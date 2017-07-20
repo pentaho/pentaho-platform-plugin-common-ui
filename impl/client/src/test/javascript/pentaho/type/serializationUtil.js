@@ -28,7 +28,7 @@ define([
   };
 
   function fillSpec(BaseInstCtor, spec, typeSpec, keyArgs) {
-    var derivedType = BaseInstCtor.extend({type: typeSpec}).type;
+    var derivedType = BaseInstCtor.extend({$type: typeSpec}).type;
 
     var scope = new SpecificationScope();
 

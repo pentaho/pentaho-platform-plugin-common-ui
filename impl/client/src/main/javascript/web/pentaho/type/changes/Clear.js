@@ -47,7 +47,7 @@ define([
     },
 
     _prepareRefs: function(txn, target) {
-      if(!target.isBoundary && target.type.of.isComplex) {
+      if(!target.$isBoundary && target.$type.of.isComplex) {
         var i = -1;
         var elems = target.__elems;
         var L = elems.length;
@@ -61,7 +61,7 @@ define([
     },
 
     _cancelRefs: function(txn, target) {
-      if(!target.isBoundary && target.type.of.isComplex) {
+      if(!target.$isBoundary && target.$type.of.isComplex) {
         var i = -1;
         var elems = target.__elems;
         var L = elems.length;

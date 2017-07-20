@@ -129,7 +129,7 @@ define([
         return this.operand || new filter.Not({operand: this});
       },
 
-      type: /** @lends pentaho.data.filter.Not.Type# */{
+      $type: /** @lends pentaho.data.filter.Not.Type# */{
         id: "pentaho/data/filter/not",
         alias: "not",
         props: [

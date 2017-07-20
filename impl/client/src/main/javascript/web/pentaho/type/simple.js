@@ -110,7 +110,7 @@ define([
         // Value is immutable. Can only be set once.
 
         // Throws if nully.
-        _ = this.type.toValue(_);
+        _ = this.$type.toValue(_);
 
         if(this.__value == null) {
           // First set
@@ -196,7 +196,7 @@ define([
        * @type {string}
        * @readonly
        */
-      get key() {
+      get $key() {
         return this.__value.toString();
       },
 
@@ -205,7 +205,7 @@ define([
        *
        * The given value **must** be of the same concrete type (or the result is undefined).
        *
-       * If two values are equal, they must have an equal [key]{@link pentaho.type.Simple#key},
+       * If two values are equal, they must have an equal [key]{@link pentaho.type.Simple#$key},
        * [value]{@link pentaho.type.Simple#value}, [formatted value]{@link pentaho.type.Simple#formatted}.
        *
        * @param {!pentaho.type.Simple} other - A simple value to test for equality.
@@ -295,7 +295,7 @@ define([
 
         var addFormatted = !keyArgs.omitFormatted && !!this.__formatted;
 
-        var type = this.type;
+        var type = this.$type;
 
         var declaredType = keyArgs.declaredType;
         var includeType = !!keyArgs.forceType;
@@ -364,7 +364,7 @@ define([
       },
       // endregion
 
-      type: /** pentaho.type.Simple.Type# */{
+      $type: /** pentaho.type.Simple.Type# */{
         id: module.id,
         alias: "simple",
         isAbstract: true,
@@ -542,7 +542,7 @@ define([
         // endregion
       }
     }).implement(/** @lends pentaho.type.Simple# */{
-      type: bundle.structured.simple
+      $type: bundle.structured.simple
     });
 
     // override the documentation to specialize the argument types.

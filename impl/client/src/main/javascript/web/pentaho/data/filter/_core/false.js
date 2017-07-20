@@ -80,7 +80,7 @@ define([
         return filter.True.instance;
       },
 
-      type: /** @lends pentaho.data.filter.False.Type# */{
+      $type: /** @lends pentaho.data.filter.False.Type# */{
         id: "pentaho/data/filter/false",
         alias: "false"
       }

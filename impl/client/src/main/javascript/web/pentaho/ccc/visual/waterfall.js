@@ -27,7 +27,7 @@ define([
     return BaseView.extend({
       _cccClass: "WaterfallChart",
 
-      type: {
+      $type: {
         id: module.id
       }
     });

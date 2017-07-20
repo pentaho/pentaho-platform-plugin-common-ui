@@ -66,7 +66,7 @@ define([
           it("should default to an unset local value", function() {
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: "number"}]
               }
             });
@@ -79,13 +79,13 @@ define([
           it("should throw when set and property already has descendant properties", function() {
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: "number"}]
               }
             });
 
             ComplexA.extend({
-              type: {
+              $type: {
                 props: [{name: "propA"}]
               }
             });
@@ -100,7 +100,7 @@ define([
           it("should respect a static value", function() {
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: "number", domain: [1, 2, 3]}]
               }
             });
@@ -119,7 +119,7 @@ define([
           it("should ignore setting to null or undefined", function() {
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: "number", domain: [1, 2, 3]}]
               }
             });
@@ -140,7 +140,7 @@ define([
           it("should cast non-function spec values to the property's elemType", function() {
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: "number", domain: [1, 2, 3]}]
               }
             });
@@ -153,7 +153,7 @@ define([
           it("should cast non-function spec values to the property's elemType when a list", function() {
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: ["number"], domain: [1, 2, 3]}]
               }
             });
@@ -168,7 +168,7 @@ define([
             var f = function() {};
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: "number", domain: f}]
               }
             });
@@ -183,7 +183,7 @@ define([
             var f = jasmine.createSpy().and.callFake(function() { return [1, 2, 3]; });
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: "number", domain: f}]
               }
             });
@@ -207,7 +207,7 @@ define([
             var f = jasmine.createSpy();
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: "number", domain: f}]
               }
             });
@@ -226,7 +226,7 @@ define([
             var f = jasmine.createSpy();
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: "number", domain: f}]
               }
             });
@@ -244,14 +244,14 @@ define([
           it("should default to the domain of the value type when it is an enum type", function() {
 
             var MyString = PentahoString.extend({
-              type: {
+              $type: {
                 mixins: ["enum"],
                 domain: ["a", "b", "c"]
               }
             });
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: MyString}]
               }
             });
@@ -271,14 +271,14 @@ define([
           it("should intersect with the domain of the value type when it is an enum type", function() {
 
             var MyString = PentahoString.extend({
-              type: {
+              $type: {
                 mixins: ["enum"],
                 domain: ["a", "b", "c"]
               }
             });
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: MyString, domain: ["b", "c"]}]
               }
             });
@@ -297,14 +297,14 @@ define([
           it("should use the order in the domain attribute even when the value type is an enum type", function() {
 
             var MyString = PentahoString.extend({
-              type: {
+              $type: {
                 mixins: ["enum"],
                 domain: ["a", "b", "c"]
               }
             });
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: MyString, domain: ["c", "b"]}]
               }
             });
@@ -324,14 +324,14 @@ define([
               "is an enum type", function() {
 
             var MyString = PentahoString.extend({
-              type: {
+              $type: {
                 mixins: ["enum"],
                 domain: [{v: "a", f: "AA"}]
               }
             });
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: MyString, domain: [{v: "a", f: "AAA"}]}]
               }
             });
@@ -350,14 +350,14 @@ define([
           it("should use the formatted value of the enum when the domain attribute has no formatted value", function() {
 
             var MyString = PentahoString.extend({
-              type: {
+              $type: {
                 mixins: ["enum"],
                 domain: [{v: "a", f: "AA"}]
               }
             });
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: MyString, domain: ["a"]}]
               }
             });
@@ -379,13 +379,13 @@ define([
           it("should evaluate to the domain of the base property when unspecified", function() {
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: "number", domain: [1, 2, 3]}]
               }
             });
 
             var ComplexB = ComplexA.extend({
-              type: {
+              $type: {
                 props: [{name: "propA"}]
               }
             });
@@ -405,13 +405,13 @@ define([
           it("should evaluate to the intersection of the local and base domain", function() {
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: "number", domain: [1, 2, 3]}]
               }
             });
 
             var ComplexB = ComplexA.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", domain: [1, 3]}]
               }
             });
@@ -430,13 +430,13 @@ define([
           it("should use the order of the local domain", function() {
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: "number", domain: [1, 2, 3]}]
               }
             });
 
             var ComplexB = ComplexA.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", domain: [3, 2, 1]}]
               }
             });
@@ -456,13 +456,13 @@ define([
           it("should use the local formatted value, if there is one", function() {
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: "number", domain: [{v: 1, f: "One"}]}]
               }
             });
 
             var ComplexB = ComplexA.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", domain: [{v: 1, f: "Uno"}]}]
               }
             });
@@ -481,13 +481,13 @@ define([
           it("should use the base formatted value, when there isn't one locally", function() {
 
             var ComplexA = Complex.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", valueType: "number", domain: [{v: 1, f: "One"}]}]
               }
             });
 
             var ComplexB = ComplexA.extend({
-              type: {
+              $type: {
                 props: [{name: "propA", domain: [{v: 1}]}]
               }
             });
@@ -511,7 +511,7 @@ define([
         it("should validate that a singular property has as value one of the domain values", function() {
 
           var ComplexA = Complex.extend({
-            type: {
+            $type: {
               props: [{name: "propA", valueType: "number", domain: [1, 2, 3]}]
             }
           });
@@ -528,7 +528,7 @@ define([
         it("should validate that a plural property does contains only domain values", function() {
 
           var ComplexA = Complex.extend({
-            type: {
+            $type: {
               props: [{name: "propA", valueType: ["number"], domain: [1, 2, 3]}]
             }
           });
@@ -545,7 +545,7 @@ define([
         it("should validate that a singular property does not have as value one of the domain values", function() {
 
           var ComplexA = Complex.extend({
-            type: {
+            $type: {
               props: [{name: "propA", valueType: "number", domain: [1, 2, 3]}]
             }
           });
@@ -564,7 +564,7 @@ define([
         it("should validate that a plural property does not contain one of the domain values", function() {
 
           var ComplexA = Complex.extend({
-            type: {
+            $type: {
               props: [{name: "propA", valueType: ["number"], domain: [1, 2, 3]}]
             }
           });
@@ -590,7 +590,7 @@ define([
           var scope = new SpecificationScope();
 
           var ComplexA = Complex.extend({
-            type: {
+            $type: {
               props: [{name: "propA", valueType: "number", domain: [1, 2, 3]}]
             }
           });
@@ -614,13 +614,13 @@ define([
           var scope = new SpecificationScope();
 
           var ComplexA = Complex.extend({
-            type: {
+            $type: {
               props: [{name: "propA", valueType: "number", domain: [1, 2, 3]}]
             }
           });
 
           var ComplexB = ComplexA.extend({
-            type: {
+            $type: {
               props: [{name: "propA"}]
             }
           });

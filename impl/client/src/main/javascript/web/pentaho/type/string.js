@@ -43,13 +43,13 @@ define([
        * @readonly
        */
 
-      type: {
+      $type: {
         id: module.id,
         alias: "string",
         cast: String
       }
     }).implement({
-      type: bundle.structured["string"] // eslint-disable-line dot-notation
+      $type: bundle.structured["string"] // eslint-disable-line dot-notation
     });
 
     return PenString;

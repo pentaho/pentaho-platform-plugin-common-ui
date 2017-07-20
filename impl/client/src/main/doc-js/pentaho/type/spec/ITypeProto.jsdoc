@@ -57,7 +57,7 @@
  * @memberOf pentaho.type.spec.ITypeProto#
  * @type {pentaho.type.spec.ITypeProto}
  *
- * @see pentaho.type.spec.IInstanceProto#type
+ * @see pentaho.type.spec.IInstanceProto#$type
  */
 
 /**

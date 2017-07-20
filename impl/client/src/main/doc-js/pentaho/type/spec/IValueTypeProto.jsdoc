@@ -29,5 +29,5 @@
  * @memberOf pentaho.type.spec.IValueTypeProto#
  * @type {pentaho.type.spec.IValueProto}
  *
- * @see pentaho.type.spec.IValueProto#type
+ * @see pentaho.type.spec.IValueProto#$type
  */

@@ -70,7 +70,7 @@ define([
 
     /** @inheritDoc */
     _prepareRefs: function(txn, target) {
-      if(!target.isBoundary && target.type.of.isComplex) {
+      if(!target.$isBoundary && target.$type.of.isComplex) {
         this.elements.forEach(function(elem) {
           if(elem.__addReference)
             txn.__ensureChangeRef(elem).removeReference(target);
@@ -80,7 +80,7 @@ define([
 
     /** @inheritDoc */
     _cancelRefs: function(txn, target) {
-      if(!target.isBoundary && target.type.of.isComplex) {
+      if(!target.$isBoundary && target.$type.of.isComplex) {
         this.elements.forEach(function(elem) {
           if(elem.__addReference)
             txn.__ensureChangeRef(elem).addReference(target);
@@ -95,7 +95,7 @@ define([
       target.__elems.splice(this.index, elems.length);
 
       elems.forEach(function(elem) {
-        delete target.__keys[elem.key];
+        delete target.__keys[elem.$key];
       });
     }
   });

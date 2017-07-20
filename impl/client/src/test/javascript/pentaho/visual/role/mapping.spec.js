@@ -47,7 +47,7 @@ define([
       it("should have #model return the container `derived`", function() {
 
         var Derived = VisualModel.extend({
-          type: {
+          $type: {
             props: [
               {name: "foo", base: "pentaho/visual/role/property"}
             ]

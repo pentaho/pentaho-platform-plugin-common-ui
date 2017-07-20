@@ -81,7 +81,7 @@ define([
       });
     });
 
-    describe("#key -", function() {
+    describe("#$key -", function() {
       var PentahoObject;
 
       beforeEach(function() {
@@ -89,22 +89,22 @@ define([
       });
 
       it("should return a string value", function() {
-        var key = new PentahoObject({v: {}}).key;
+        var key = new PentahoObject({v: {}}).$key;
         expect(typeof key).toBe("string");
       });
 
       it("should have distinct values for distinct primitive instances", function() {
         var emptyObjA = {};
         var emptyObjB = {};
-        var keyA = new PentahoObject({v: emptyObjA}).key;
-        var keyB = new PentahoObject({v: emptyObjB}).key;
+        var keyA = new PentahoObject({v: emptyObjA}).$key;
+        var keyB = new PentahoObject({v: emptyObjB}).$key;
         expect(keyA).not.toBe(keyB);
       });
 
       it("should have the same value for the same primitive instance", function() {
         var emptyObj = {};
-        var key1 = new PentahoObject({v: emptyObj}).key;
-        var key2 = new PentahoObject({v: emptyObj}).key;
+        var key1 = new PentahoObject({v: emptyObj}).$key;
+        var key2 = new PentahoObject({v: emptyObj}).$key;
         expect(key1).toBe(key2);
       });
     });

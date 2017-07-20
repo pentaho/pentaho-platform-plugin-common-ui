@@ -82,7 +82,7 @@ define([
       // TODO: value, members?
       // TODO: p -> AnnotatableLinked.configure(this, config);
 
-      type: /** @lends pentaho.type.Property.Type# */{
+      $type: /** @lends pentaho.type.Property.Type# */{
         // Note: constructor/_init is only called on sub-classes of Property.Type,
         // and not on Property.Type itself.
 
@@ -649,7 +649,7 @@ define([
          * [declaring type]{@link pentaho.type.Property.Type#declaringType}.
          *
          * If the _value type_ is a [list]{@link pentaho.type.Value.Type#isList} type,
-         * then this property sets its lists as [boundary lists]{@link pentaho.type.List#isBoundary}.
+         * then this property sets its lists as [boundary lists]{@link pentaho.type.List#$isBoundary}.
          *
          * The validity of the object with a _boundary property_
          * is not affected by the validity of the property's value (or values).
@@ -895,7 +895,7 @@ define([
             // Abstract Property classes don't have declaring type or `name`.
 
             // The default value type of abstract properties is value
-            if(valueTypeRef !== "value") spec.type = valueTypeRef;
+            if(valueTypeRef !== "value") spec.valueType = valueTypeRef;
 
             this._fillSpecInContext(spec, keyArgs);
           } else {
@@ -924,7 +924,7 @@ define([
 
             // The default value type of non-abstract properties is string
             if(valueTypeRef !== "string") {
-              spec.type = valueTypeRef;
+              spec.valueType = valueTypeRef;
               count++;
             }
 
@@ -959,7 +959,7 @@ define([
         // endregion
       }
     }, /** @lends pentaho.type.Property */{
-      type: /** @lends pentaho.type.Property.Type */{
+      $type: /** @lends pentaho.type.Property.Type */{
         /** @inheritDoc */
         _extend: function(name, instSpec, classSpec, keyArgs) {
 
@@ -972,7 +972,7 @@ define([
         }
       }
     }).implement({
-      type: /** @lends pentaho.type.Property.Type# */{
+      $type: /** @lends pentaho.type.Property.Type# */{
         dynamicAttributes: {
           /**
            * Evaluates the value of the `isRequired` attribute of a property of this type
@@ -1049,7 +1049,7 @@ define([
            * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
            * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
            *
-           * @see pentaho.type.Complex#isRequired
+           * @see pentaho.type.Complex#isRequiredOf
            * @see pentaho.type.spec.IPropertyTypeProto#isRequired
            */
           isRequired: {
@@ -1135,7 +1135,7 @@ define([
            * @memberOf pentaho.type.Property.Type#
            * @type {undefined | number | pentaho.type.PropertyDynamicAttribute.<number>}
            *
-           * @see pentaho.type.Complex#countRange
+           * @see pentaho.type.Complex#countRangeOf
            *
            * @see pentaho.type.spec.IPropertyTypeProto#countMin
            */
@@ -1222,7 +1222,7 @@ define([
            * @memberOf pentaho.type.Property.Type#
            * @type {undefined | number | pentaho.type.PropertyDynamicAttribute.<number>}
            *
-           * @see pentaho.type.Complex#countRange
+           * @see pentaho.type.Complex#countRangeOf
            * @see pentaho.type.spec.IPropertyTypeProto#countMax
            */
           countMax: {
@@ -1301,7 +1301,7 @@ define([
            * @type {undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
            *
            * @see pentaho.type.Property.Type#isRequired
-           * @see pentaho.type.Complex#isApplicable
+           * @see pentaho.type.Complex#isApplicableOf
            * @see pentaho.type.spec.IPropertyTypeProto#isApplicable
            */
           isApplicable: {
@@ -1377,7 +1377,7 @@ define([
            * @memberOf pentaho.type.Property.Type#
            * @type {undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
            *
-           * @see pentaho.type.Complex#isEnabled
+           * @see pentaho.type.Complex#isEnabledOf
            * @see pentaho.type.spec.IPropertyTypeProto#isEnabled
            */
           isEnabled: {
@@ -1433,7 +1433,7 @@ define([
          *
          * @return {pentaho.IRange<number>} The evaluated element count range.
          *
-         * @see pentaho.type.Complex#countRange
+         * @see pentaho.type.Complex#countRangeOf
          */
         countRangeOn: function(owner) {
           var isRequired = this.isRequiredOn(owner);
@@ -1453,7 +1453,7 @@ define([
         }
       }
     }).implement({
-      type: /** @lends pentaho.type.Property.Type# */{
+      $type: /** @lends pentaho.type.Property.Type# */{
         // These are applied last so that mixins see any of the methods above as base implementations.
         mixins: [discreteDomainFactory]
       }

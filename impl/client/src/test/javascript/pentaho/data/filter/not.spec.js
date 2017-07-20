@@ -34,7 +34,7 @@ define([
     var CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
 
     var ProductSummary = Complex.extend({
-      type: {
+      $type: {
         props: [
           {name: "name", valueType: "string", label: "Name"},
           {name: "sales", valueType: "number", label: "Sales"},

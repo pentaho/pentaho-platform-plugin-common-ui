@@ -34,9 +34,9 @@ define([
         expect(va.validate()).toBe(null);
       });
 
-      it("should be overridable using {type: {instance: {}}", function() {
+      it("should be overridable using {$type: {instance: {}}", function() {
         var Derived = Value.extend({
-          type: {
+          $type: {
             instance: {
               validate: function() {
                 return [new ValidationError("Foo")];
@@ -50,26 +50,26 @@ define([
       });
     }); // #validate
 
-    describe("#isValid -", function() {
+    describe("#$isValid -", function() {
       it("should call #validate()", function() {
         var va = new Value();
         spyOn(va, "validate").and.returnValue(null);
-        var isValid = va.isValid;
+        var isValid = va.$isValid;
         expect(va.validate).toHaveBeenCalled();
       });
 
       it("should return `false` if #validate() returns a truthy value", function() {
         var va = new Value();
         spyOn(va, "validate").and.returnValue([new ValidationError()]);
-        expect(va.isValid).toBe(false);
+        expect(va.$isValid).toBe(false);
       });
 
       it("should return `true` if #validate() returns a nully value", function() {
         var va = new Value();
         spyOn(va, "validate").and.returnValue(null);
-        expect(va.isValid).toBe(true);
+        expect(va.$isValid).toBe(true);
       });
-    });// end #isValid
+    });// end #$isValid
 
     describe("#assertValid() -", function() {
       it("should not throw an error if the value is valid", function() {

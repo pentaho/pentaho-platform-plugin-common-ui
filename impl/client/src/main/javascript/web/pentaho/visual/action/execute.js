@@ -50,7 +50,7 @@ define([
      * when calling [on]{@link pentaho.lang,IEventSource#on} of action targets.
      */
     return DataAction.extend(/** @lends  pentaho.visual.action.Execute# */{
-      type: {
+      $type: {
         id: module.id,
         alias: "execute"
       }

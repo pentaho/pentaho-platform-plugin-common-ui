@@ -871,7 +871,7 @@ define([
 
       beforeEach(function() {
         SubView = View.extend({
-          type: {
+          $type: {
             props: [
               {name: "foo", valueType: "string"}
             ]
@@ -960,7 +960,7 @@ define([
           model: model
         });
 
-        expect(view.isValid).toBe(true);
+        expect(view.$isValid).toBe(true);
 
         view.__dirtyPropGroups.clear(); // view is clean
 
@@ -1005,7 +1005,7 @@ define([
           model: model
         });
 
-        expect(view.isValid).toBe(true);
+        expect(view.$isValid).toBe(true);
 
         view.__dirtyPropGroups.clear(); // view is clean
 
@@ -1603,7 +1603,7 @@ define([
 
       it("should return a promise", function() {
 
-        var p = View.getClassAsync(model.type);
+        var p = View.getClassAsync(model.$type);
 
         expect(p instanceof Promise).toBe(true);
       });
@@ -1618,7 +1618,7 @@ define([
       it("should return a promise that is rejected when the type of model does not have " +
           "a registered view type", function() {
 
-        var SubModel = Model.extend({type: {defaultView: null}});
+        var SubModel = Model.extend({$type: {defaultView: null}});
 
         return testUtils.expectToRejectWith(View.getClassAsync(SubModel.type), {
           asymmetricMatch: function(error) { return error instanceof Error; }
@@ -1628,7 +1628,7 @@ define([
       it("should return a promise that is rejected when the type of model refers an " +
           "undefined view type", function() {
 
-        var SubModel = Model.extend({type: {defaultView: "test/foo/bar/view"}});
+        var SubModel = Model.extend({$type: {defaultView: "test/foo/bar/view"}});
 
         return testUtils.expectToRejectWith(View.getClassAsync(SubModel.type), {
           asymmetricMatch: function(error) { return error instanceof Error; }
@@ -1646,7 +1646,7 @@ define([
          "the registered default view type", function() {
 
         var SubView  = View.extend();
-        var SubModel = Model.extend({type: {defaultView: SubView}});
+        var SubModel = Model.extend({$type: {defaultView: SubView}});
 
         return View.getClassAsync(SubModel.type)
             .then(function(ViewCtor) {
@@ -1657,7 +1657,7 @@ define([
       it("should return a promise that is fulfilled with the view constructor of " +
           "the registered default view type identifier", function() {
 
-        var SubModel = Model.extend({type: {defaultView: "pentaho/visual/base/view"}});
+        var SubModel = Model.extend({$type: {defaultView: "pentaho/visual/base/view"}});
 
         return View.getClassAsync(SubModel.type)
             .then(function(ViewCtor) {
@@ -1710,7 +1710,7 @@ define([
               var View = context.get(baseViewFactory);
 
               return View.extend({
-                type: {
+                $type: {
                   id: "test/foo/view"
                 }
               });
@@ -1728,7 +1728,7 @@ define([
 
               return View.createAsync({_: "test/foo/view"}).then(function(fooView) {
                 expect(fooView instanceof View).toBe(true);
-                expect(fooView.type.id).toBe("test/foo/view");
+                expect(fooView.$type.id).toBe("test/foo/view");
               });
             });
       });
@@ -1745,7 +1745,7 @@ define([
               var View = context.get(baseViewFactory);
 
               return View.extend({
-                type: {
+                $type: {
                   id: "test/foo/view",
                   props: {a: {valueType: "string"}}
                 }
@@ -1760,7 +1760,7 @@ define([
               var Model = context.get(baseModelFactory);
 
               return Model.extend({
-                type: {
+                $type: {
                   id: "test/foo/model",
                   defaultView: "test/foo/view"
                 }
@@ -1785,7 +1785,7 @@ define([
               return View.createAsync(viewSpec).then(function(fooView) {
 
                 expect(fooView instanceof View).toBe(true);
-                expect(fooView.type.id).toBe("test/foo/view");
+                expect(fooView.$type.id).toBe("test/foo/view");
                 expect(fooView.a).toBe("b");
               });
             });
@@ -1803,7 +1803,7 @@ define([
               var View = context.get(baseViewFactory);
 
               return View.extend({
-                type: {
+                $type: {
                   id: "test/foo/view",
                   props: {a: {valueType: "string"}}
                 }
@@ -1818,7 +1818,7 @@ define([
               var Model = context.get(baseModelFactory);
 
               return Model.extend({
-                type: {
+                $type: {
                   id: "test/foo/model",
                   defaultView: "test/foo/view"
                 }
@@ -1843,7 +1843,7 @@ define([
               return View.createAsync(viewSpec).then(function(fooView) {
 
                 expect(fooView instanceof View).toBe(true);
-                expect(fooView.type.id).toBe("test/foo/view");
+                expect(fooView.$type.id).toBe("test/foo/view");
                 expect(fooView.a).toBe("b");
                 expect(fooView.model).toBe(fooModel);
               });
@@ -1856,7 +1856,7 @@ define([
 
         it("should respect a specified object value", function() {
           var ext = {foo: "bar"};
-          var DerivedView = View.extend({type: {
+          var DerivedView = View.extend({$type: {
             extension: ext
           }});
 
@@ -1864,7 +1864,7 @@ define([
         });
 
         it("should convert a falsy value to null", function() {
-          var DerivedView = View.extend({type: {
+          var DerivedView = View.extend({$type: {
             extension: false
           }});
 
@@ -1873,7 +1873,7 @@ define([
 
         it("should read the local value and not an inherited base value", function() {
           var ext = {foo: "bar"};
-          var DerivedView = View.extend({type: {
+          var DerivedView = View.extend({$type: {
             extension: ext
           }});
 
@@ -1899,7 +1899,7 @@ define([
           var ext = {foo: "bar"};
 
           var DerivedView = View.extend({
-            type: {
+            $type: {
               extension: ext
             }
           });
@@ -1911,7 +1911,7 @@ define([
           var ext = {foo: "bar"};
 
           var DerivedView = View.extend({
-            type: {
+            $type: {
               extension: ext
             }
           });
@@ -1925,7 +1925,7 @@ define([
         it("should reflect an inherited object value", function() {
 
           var ext = {foo: "bar"};
-          var DerivedView = View.extend({type: {
+          var DerivedView = View.extend({$type: {
             extension: ext
           }});
 
@@ -1936,11 +1936,11 @@ define([
 
         it("should merge local and inherited object values", function() {
 
-          var DerivedView = View.extend({type: {
+          var DerivedView = View.extend({$type: {
             extension: {foo: "bar"}
           }});
 
-          var DerivedView2 = DerivedView.extend({type: {
+          var DerivedView2 = DerivedView.extend({$type: {
             extension: {bar: "foo"}
           }});
 
@@ -1952,11 +1952,11 @@ define([
 
         it("should override inherited properties with local properties", function() {
 
-          var DerivedView = View.extend({type: {
+          var DerivedView = View.extend({$type: {
             extension: {foo: "bar"}
           }});
 
-          var DerivedView2 = DerivedView.extend({type: {
+          var DerivedView2 = DerivedView.extend({$type: {
             extension: {foo: "gugu"}
           }});
 

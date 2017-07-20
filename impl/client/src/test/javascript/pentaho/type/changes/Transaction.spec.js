@@ -117,7 +117,7 @@ define([
         var scope = txn.enter();
         var container = new Derived();
         container.x = "foo";
-        container.changeset.clearChanges();
+        container.$changeset.clearChanges();
 
         var cset = txn.getChangeset(container.$uid);
 
@@ -166,7 +166,7 @@ define([
         var container = new Derived();
         var cset = new Changeset(txn, container);
 
-        expect(container.changeset).toBe(null);
+        expect(container.$changeset).toBe(null);
       });
 
       it("should add the changeset and sync the container's changeset if txn is current", function() {
@@ -176,7 +176,7 @@ define([
         var container = new Derived();
         var cset = new Changeset(txn, container);
 
-        expect(container.changeset).toBe(cset);
+        expect(container.$changeset).toBe(cset);
 
         scope.exit();
       });
@@ -303,9 +303,9 @@ define([
 
         txn.__eachChangeset(fun);
 
-        expect(fun).toHaveBeenCalledWith(inst1.changeset);
-        expect(fun).toHaveBeenCalledWith(inst2.changeset);
-        expect(fun).toHaveBeenCalledWith(inst3.changeset);
+        expect(fun).toHaveBeenCalledWith(inst1.$changeset);
+        expect(fun).toHaveBeenCalledWith(inst2.$changeset);
+        expect(fun).toHaveBeenCalledWith(inst3.$changeset);
       });
 
       it("should call fun with the transaction as JS context", function() {
@@ -449,9 +449,9 @@ define([
 
         scope.exit();
 
-        expect(inst1.changeset).toBe(null);
-        expect(inst2.changeset).toBe(null);
-        expect(inst3.changeset).toBe(null);
+        expect(inst1.$changeset).toBe(null);
+        expect(inst2.$changeset).toBe(null);
+        expect(inst3.$changeset).toBe(null);
 
         scope = txn.enter();
 
@@ -463,9 +463,9 @@ define([
         expect(cset2).not.toBe(null);
         expect(cset3).not.toBe(null);
 
-        expect(inst1.changeset).toBe(cset1);
-        expect(inst2.changeset).toBe(cset2);
-        expect(inst3.changeset).toBe(cset3);
+        expect(inst1.$changeset).toBe(cset1);
+        expect(inst2.$changeset).toBe(cset2);
+        expect(inst3.$changeset).toBe(cset3);
 
         scope.exit();
       });
@@ -485,15 +485,15 @@ define([
         var cset2 = txn.getChangeset(inst2.$uid);
         var cset3 = txn.getChangeset(inst3.$uid);
 
-        expect(inst1.changeset).toBe(cset1);
-        expect(inst2.changeset).toBe(cset2);
-        expect(inst3.changeset).toBe(cset3);
+        expect(inst1.$changeset).toBe(cset1);
+        expect(inst2.$changeset).toBe(cset2);
+        expect(inst3.$changeset).toBe(cset3);
 
         scope.exit();
 
-        expect(inst1.changeset).toBe(null);
-        expect(inst2.changeset).toBe(null);
-        expect(inst3.changeset).toBe(null);
+        expect(inst1.$changeset).toBe(null);
+        expect(inst2.$changeset).toBe(null);
+        expect(inst3.$changeset).toBe(null);
       });
     });
   });

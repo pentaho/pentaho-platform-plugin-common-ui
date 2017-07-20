@@ -330,7 +330,7 @@ define([
             localRequire.define(mid, [], function() {
               return function(context) {
                 var Simple = context.get("pentaho/type/simple");
-                return Simple.extend({type: {id: mid}});
+                return Simple.extend({$type: {id: mid}});
               };
             });
 
@@ -356,7 +356,7 @@ define([
               return function(context) {
                 var Simple = context.get("pentaho/type/simple");
                 return Simple.extend({
-                  type: {
+                  $type: {
                     id: mid
                   }
                 });
@@ -392,7 +392,7 @@ define([
               return function(context) {
                 var Simple = context.get("pentaho/type/simple");
                 return Simple.extend({
-                  type: {
+                  $type: {
                     id: mid,
                     alias: "XYZ"
                   }
@@ -481,7 +481,7 @@ define([
             var context = new Context();
             var Value = context.get("pentaho/type/value");
             var Value2 = Value.extend({
-              type: {
+              $type: {
                 id: "tests/foo/bar"
               }
             });
@@ -527,7 +527,7 @@ define([
 
             var Value = context.get("pentaho/type/value");
             var Value2 = Value.extend({
-              type: {
+              $type: {
                 id: "tests/foo/bar"
               }
             });
@@ -568,7 +568,7 @@ define([
 
             var Value = context.get("pentaho/type/value");
             var Value2 = Value.extend({
-              type: {
+              $type: {
                 id: "tests/foo/bar"
               }
             });
@@ -1034,7 +1034,7 @@ define([
           function defineTempModule(mid) {
             localRequire.define(mid, [], function() {
               return function(context) {
-                return context.get("pentaho/type/simple").extend({type: {id: mid}});
+                return context.get("pentaho/type/simple").extend({$type: {id: mid}});
               };
             });
           }
@@ -1042,7 +1042,7 @@ define([
           function defineTempMixin(mid) {
             localRequire.define(mid, [], function() {
               return function(context) {
-                return context.get("pentaho/type/value").extend({type: {id: mid}});
+                return context.get("pentaho/type/value").extend({$type: {id: mid}});
               };
             });
           }
@@ -1050,7 +1050,7 @@ define([
           function defineTempProp(mid) {
             localRequire.define(mid, [], function() {
               return function(context) {
-                return context.get("pentaho/type/property").extend({type: {id: mid}});
+                return context.get("pentaho/type/property").extend({$type: {id: mid}});
               };
             });
           }
@@ -1465,7 +1465,7 @@ define([
 
         localRequire.define("exp/baseWithNoRegistrations", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
-            return context.get(simpleFactory).extend({type: {id: "exp/baseWithNoRegistrations"}});
+            return context.get(simpleFactory).extend({$type: {id: "exp/baseWithNoRegistrations"}});
           };
         });
 
@@ -1473,13 +1473,13 @@ define([
 
         localRequire.define("exp/thing", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
-            return context.get(simpleFactory).extend({type: {id: "exp/thing"}});
+            return context.get(simpleFactory).extend({$type: {id: "exp/thing"}});
           };
         });
 
         localRequire.define("exp/foo", ["exp/thing"], function(thingFactory) {
           return function(context) {
-            return context.get(thingFactory).extend({type: {id: "exp/foo"}});
+            return context.get(thingFactory).extend({$type: {id: "exp/foo"}});
           };
         });
 
@@ -1487,7 +1487,7 @@ define([
 
         localRequire.define("exp/bar", ["exp/thing"], function(thingFactory) {
           return function(context) {
-            return context.get(thingFactory).extend({type: {id: "exp/bar", isBrowsable: false}});
+            return context.get(thingFactory).extend({$type: {id: "exp/bar", isBrowsable: false}});
           };
         });
 
@@ -1495,7 +1495,7 @@ define([
 
         localRequire.define("exp/dude", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
-            return context.get(simpleFactory).extend({type: {id: "exp/dude"}});
+            return context.get(simpleFactory).extend({$type: {id: "exp/dude"}});
           };
         });
 
@@ -1503,7 +1503,7 @@ define([
 
         localRequire.define("exp/prop", ["pentaho/type/property"], function(propFactory) {
           return function(context) {
-            return context.get(propFactory).extend({type: {id: "exp/prop"}});
+            return context.get(propFactory).extend({$type: {id: "exp/prop"}});
           };
         });
 
@@ -1698,7 +1698,7 @@ define([
 
           var simpleType = context.get("pentaho/type/simple").type;
 
-          var ExpBar = context.get(simpleType).extend({type: {id: "exp/bar", isBrowsable: false}});
+          var ExpBar = context.get(simpleType).extend({$type: {id: "exp/bar", isBrowsable: false}});
 
           // register
           context.get(ExpBar);
@@ -1716,7 +1716,7 @@ define([
 
           var simpleType = context.get("pentaho/type/simple").type;
 
-          var ExpBar = context.get(simpleType).extend({type: {id: "exp/bar", isBrowsable: false}});
+          var ExpBar = context.get(simpleType).extend({$type: {id: "exp/bar", isBrowsable: false}});
 
           // register
           context.get(ExpBar);
@@ -1734,7 +1734,7 @@ define([
 
           var Simple = context.get("pentaho/type/simple");
 
-          var ExpBar = Simple.extend({type: {id: "exp/bar", isBrowsable: false}});
+          var ExpBar = Simple.extend({$type: {id: "exp/bar", isBrowsable: false}});
 
           // register
           context.get(ExpBar);
@@ -1749,19 +1749,19 @@ define([
 
         localRequire.define("exp/thing", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
-            return context.get(simpleFactory).extend({type: {id: "exp/thing"}});
+            return context.get(simpleFactory).extend({$type: {id: "exp/thing"}});
           };
         });
 
         localRequire.define("exp/foo", ["exp/thing"], function(thingFactory) {
           return function(context) {
-            return context.get(thingFactory).extend({type: {id: "exp/foo"}});
+            return context.get(thingFactory).extend({$type: {id: "exp/foo"}});
           };
         });
 
         localRequire.define("exp/bar", ["exp/thing"], function(simpleFactory) {
           return function(context) {
-            return context.get(simpleFactory).extend({type: {id: "exp/bar"}});
+            return context.get(simpleFactory).extend({$type: {id: "exp/bar"}});
           };
         });
 

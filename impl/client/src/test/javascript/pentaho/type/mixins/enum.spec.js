@@ -39,7 +39,7 @@ define([
       it("should throw if extended", function() {
 
         var MyNumber = PentahoNumber.extend({
-          type: {
+          $type: {
             mixins: [Enum],
             domain: [1, 2, 3]
           }
@@ -57,7 +57,7 @@ define([
 
         expect(function() {
           PentahoNumber.extend({
-            type: {
+            $type: {
               mixins: [Enum]
             }
           });
@@ -67,7 +67,7 @@ define([
       it("should respect the specified domain", function() {
 
         var MyNumber = PentahoNumber.extend({
-          type: {
+          $type: {
             mixins: [Enum],
             domain: [1, 2, 3]
           }
@@ -90,7 +90,7 @@ define([
 
         function expectIt(newDomain) {
           var MyNumber = PentahoNumber.extend({
-            type: {
+            $type: {
               mixins: Enum,
               domain: [1, 2, 3]
             }
@@ -115,7 +115,7 @@ define([
       it("should allow setting to an object after initialization, for configuration", function() {
 
         var MyNumber = PentahoNumber.extend({
-          type: {
+          $type: {
             mixins: Enum,
             domain: [1, 2, 3]
           }
@@ -144,7 +144,7 @@ define([
       it("should return null on a value that is equal to one of `domain`", function() {
 
         var MyNumber = PentahoNumber.extend({
-          type: {
+          $type: {
             mixins: Enum,
             domain: [1, 2, 3]
           }
@@ -158,7 +158,7 @@ define([
       it("should return an Error on a value that is not equal to one of `domain`", function() {
 
         var MyNumber = PentahoNumber.extend({
-          type: {
+          $type: {
             mixins: Enum,
             domain: [1, 2, 3]
           }
@@ -177,7 +177,7 @@ define([
       it("should serialize `domain` using array form", function() {
 
         var MyNumber = PentahoNumber.extend({
-          type: {
+          $type: {
             mixins: Enum,
             domain: [1, 2, 3]
           }
@@ -199,7 +199,7 @@ define([
 
       beforeEach(function() {
         MyString = PentahoString.extend({
-          type: {
+          $type: {
             mixins: Enum,
             domain: ["Xau", "Wow", "Beu"]
           }

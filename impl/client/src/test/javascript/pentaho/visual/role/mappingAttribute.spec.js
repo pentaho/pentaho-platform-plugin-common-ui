@@ -129,7 +129,7 @@ define([
 
       beforeEach(function() {
 
-        var DerivedModel = VisualModel.extend({type: {
+        var DerivedModel = VisualModel.extend({$type: {
           props: [
             {name: "propRole", base: "pentaho/visual/role/property"}
           ]
@@ -171,7 +171,7 @@ define([
 
       beforeEach(function() {
 
-        var DerivedModel = VisualModel.extend({type: {
+        var DerivedModel = VisualModel.extend({$type: {
           props: [
             {name: "propRole", base: "pentaho/visual/role/property"}
           ]

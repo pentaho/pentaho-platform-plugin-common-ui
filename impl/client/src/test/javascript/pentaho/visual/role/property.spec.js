@@ -65,7 +65,7 @@ define([
       function createFullValidQualitativeMapping() {
 
         var DerivedVisualModel = VisualModel.extend({
-          type: {
+          $type: {
             props: {
               propRole: {
                 base: "pentaho/visual/role/property",
@@ -90,7 +90,7 @@ define([
       function createFullValidQuantitativeMapping() {
 
         var DerivedVisualModel = VisualModel.extend({
-          type: {
+          $type: {
             props: {
               propRole: {
                 base: "pentaho/visual/role/property",
@@ -125,7 +125,7 @@ define([
           var expectedLevels = ["nominal", "ordinal"];
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -143,7 +143,7 @@ define([
         it("should sort the values specified on the spec", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -161,7 +161,7 @@ define([
         it("should allow removing values by setting", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property"
@@ -184,7 +184,7 @@ define([
           expect(function() {
 
             VisualModel.extend({
-              type: {
+              $type: {
                 props: {
                   propRole: {
                     base: "pentaho/visual/role/property",
@@ -199,7 +199,7 @@ define([
         it("should allow a derived property to remove measurement levels", function() {
 
           var ModelA = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -210,7 +210,7 @@ define([
           });
 
           var ModelB = ModelA.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   levels: ["nominal"]
@@ -229,7 +229,7 @@ define([
           var baseLevels = ["nominal", "ordinal"];
 
           var ModelA = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -255,7 +255,7 @@ define([
             var expectedLevels = ["nominal", "ordinal"];
 
             var Model = VisualModel.extend({
-              type: {
+              $type: {
                 props: {
                   propRole: {
                     base: "pentaho/visual/role/property",
@@ -288,7 +288,7 @@ define([
         it("should throw an error, when levels is set and the mapping type already has descendants.", function() {
 
           var ModelA = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -299,7 +299,7 @@ define([
           });
 
           ModelA.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {}
               }
@@ -329,7 +329,7 @@ define([
         it("should be true if any level is quantitative", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -347,7 +347,7 @@ define([
         it("should be false if not any level is quantitative", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -368,7 +368,7 @@ define([
         it("should be true if any level is qualitative", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRoleA: {
                   base: "pentaho/visual/role/property",
@@ -394,7 +394,7 @@ define([
         it("should be false if not any level is qualitative", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -416,7 +416,7 @@ define([
           var dataTypeB = Complex.extend().type;
 
           var ModelA = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -429,7 +429,7 @@ define([
 
           expect(function() {
             ModelA.extend({
-              type: {
+              $type: {
                 props: {
                   propRole: {
                     dataType: dataTypeB
@@ -447,7 +447,7 @@ define([
           var dataTypeB = DataTypeA.extend().type;
 
           var ModelA = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -459,7 +459,7 @@ define([
           });
 
           var ModelB = ModelA.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   dataType: dataTypeB
@@ -476,7 +476,7 @@ define([
           var dataTypeA = Complex.extend().type;
 
           var ModelA = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -488,7 +488,7 @@ define([
           });
 
           var ModelB = ModelA.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {}
               }
@@ -503,7 +503,7 @@ define([
           var dataTypeA = Complex.extend().type;
 
           var ModelA = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -531,7 +531,7 @@ define([
           var dataTypeA = Complex.extend().type;
 
           var ModelA = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -554,7 +554,7 @@ define([
           var dataTypeA = Complex.extend().type;
 
           var ModelA = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -568,7 +568,7 @@ define([
           var roleAPropType = ModelA.type.get("propRole");
 
           ModelA.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {}
               }
@@ -585,7 +585,7 @@ define([
         it("should resolve values through the context", function() {
 
           var ModelA = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -611,7 +611,7 @@ define([
             "one of the role's levels is quantitative", function() {
 
           var ModelA = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -642,7 +642,7 @@ define([
         it("should be undefined by default", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -660,7 +660,7 @@ define([
         it("should respect a specified boolean false value", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -679,7 +679,7 @@ define([
         it("should respect a specified boolean true value", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -698,7 +698,7 @@ define([
         it("should consider as true a specified truthy value", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -717,7 +717,7 @@ define([
         it("should consider as false a specified falsey, non-nully value", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -736,7 +736,7 @@ define([
         it("should ignore a specified null value", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -755,7 +755,7 @@ define([
         it("should ignore a specified undefined value", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -774,7 +774,7 @@ define([
         it("should ignore setting to an undefined value", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -797,7 +797,7 @@ define([
         it("should ignore setting to a null value", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -820,7 +820,7 @@ define([
         it("should respect setting to the value true", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -840,7 +840,7 @@ define([
         it("should respect setting to the value false", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -862,7 +862,7 @@ define([
           var fIsKey = function() { return true; };
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -886,7 +886,7 @@ define([
         it("should get an object that conforms to the interface IPropertyAttributes", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -909,7 +909,7 @@ define([
         it("should get the same object each time", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -935,7 +935,7 @@ define([
           };
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -966,7 +966,7 @@ define([
         it("should return undefined, when the mapping contains no attributes", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -979,7 +979,7 @@ define([
           var model = new Model({
             data: new Table(getDataSpec1())
           });
-          var rolePropType = model.type.get("propRole");
+          var rolePropType = model.$type.get("propRole");
 
           // Assumptions
           assertIsValid(model);
@@ -992,7 +992,7 @@ define([
         it("should return undefined, when one of the attributes is not defined in the model's data", function() {
 
           var model = createFullValidQualitativeMapping();
-          var rolePropType = model.type.get("propRole");
+          var rolePropType = model.$type.get("propRole");
 
           model.propRole.attributes.add({name: "mugambo"});
 
@@ -1002,7 +1002,7 @@ define([
         it("should return undefined, when the attributes' level is incompatible with the role's levels", function() {
 
           var model = createFullValidQuantitativeMapping();
-          var rolePropType = model.type.get("propRole");
+          var rolePropType = model.$type.get("propRole");
 
           model.propRole.attributes.set(["country"]);
 
@@ -1015,7 +1015,7 @@ define([
           // properly determines the lowest attribute level of measurement.
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -1030,7 +1030,7 @@ define([
             propRole: {attributes: ["product", "sales"]}
           });
 
-          var rolePropType = model.type.get("propRole");
+          var rolePropType = model.$type.get("propRole");
 
           expect(rolePropType.levelAutoOn(model)).toBe("ordinal");
         });
@@ -1039,7 +1039,7 @@ define([
             "qualitative and quantitative", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -1054,7 +1054,7 @@ define([
             propRole: {attributes: ["sales"]}
           });
 
-          var rolePropType = model.type.get("propRole");
+          var rolePropType = model.$type.get("propRole");
 
           expect(rolePropType.levelAutoOn(model)).toBe("quantitative");
         });
@@ -1063,7 +1063,7 @@ define([
             "both nominal and ordinal", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -1078,7 +1078,7 @@ define([
             propRole: {attributes: ["country"]}
           });
 
-          var rolePropType = model.type.get("propRole");
+          var rolePropType = model.$type.get("propRole");
 
           expect(rolePropType.levelAutoOn(model)).toBe("ordinal");
         });
@@ -1086,7 +1086,7 @@ define([
         it("should return nominal, when the attributes level is quantitative and the role is nominal", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -1101,7 +1101,7 @@ define([
             propRole: {attributes: ["sales"]}
           });
 
-          var rolePropType = model.type.get("propRole");
+          var rolePropType = model.$type.get("propRole");
 
           expect(rolePropType.levelAutoOn(model)).toBe("nominal");
         });
@@ -1109,7 +1109,7 @@ define([
         it("should return ordinal, when the attributes level is quantitative and the role is ordinal", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -1124,7 +1124,7 @@ define([
             propRole: {attributes: ["sales"]}
           });
 
-          var rolePropType = model.type.get("propRole");
+          var rolePropType = model.$type.get("propRole");
 
           expect(rolePropType.levelAutoOn(model)).toBe("ordinal");
         });
@@ -1135,7 +1135,7 @@ define([
         it("should be equal to the auto level when the level is null", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -1147,7 +1147,7 @@ define([
 
           var model = new Model();
           var mapping = model.propRole;
-          var rolePropType = model.type.get("propRole");
+          var rolePropType = model.$type.get("propRole");
 
           // Assumptions
           expect(mapping.level).toBe(null);
@@ -1165,7 +1165,7 @@ define([
         it("should be equal to the level, when the level is not null", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -1177,7 +1177,7 @@ define([
 
           var level = "nominal";
           var model = new Model({propRole: {level: level}});
-          var rolePropType = model.type.get("propRole");
+          var rolePropType = model.$type.get("propRole");
 
           spyOn(rolePropType, "levelAutoOn").and.returnValue("foo-level");
 
@@ -1195,7 +1195,7 @@ define([
         function testItLocal(valueSpec, valueExpected) {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -1219,7 +1219,7 @@ define([
         function testItInherited(value1Spec, value2Spec, valueExpected) {
 
           var ModelA = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -1231,7 +1231,7 @@ define([
           });
 
           var ModelB = ModelA.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   isVisualKey: value2Spec
@@ -1253,7 +1253,7 @@ define([
         it("should be false for an unmapped quantitative visual role", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -1275,7 +1275,7 @@ define([
         it("should be false for an unmapped qualitative visual role", function() {
 
           var Model = VisualModel.extend({
-            type: {
+            $type: {
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
@@ -1298,7 +1298,7 @@ define([
 
           var model = createFullValidQualitativeMapping();
 
-          var rolePropType = model.type.get("propRole");
+          var rolePropType = model.$type.get("propRole");
 
           expect(rolePropType.isVisualKeyOn(model)).toBe(true);
         });
@@ -1309,7 +1309,7 @@ define([
           var model = createFullValidQuantitativeMapping();
           model.propRole.attributes.add(["date"]);
 
-          var rolePropType = model.type.get("propRole");
+          var rolePropType = model.$type.get("propRole");
 
           expect(rolePropType.isVisualKeyOn(model)).toBe(true);
         });
@@ -1318,7 +1318,7 @@ define([
 
           var model = createFullValidQuantitativeMapping();
 
-          var rolePropType = model.type.get("propRole");
+          var rolePropType = model.$type.get("propRole");
 
           expect(rolePropType.isVisualKeyOn(model)).toBe(false);
         });
@@ -1374,19 +1374,19 @@ define([
               if(txnScope) txnScope.acceptWill();
 
               // this way, errors are shown in the console...
-              expect(model.type.get("propRole").validateOn(model)).toBe(null);
+              expect(model.$type.get("propRole").validateOn(model)).toBe(null);
             }
 
             function assertIsInvalid(model) {
               if(txnScope) txnScope.acceptWill();
 
-              expect(model.type.get("propRole").validateOn(model) != null).toBe(true);
+              expect(model.$type.get("propRole").validateOn(model) != null).toBe(true);
             }
 
             it("should stop validation if base validation returns errors", function() {
 
               var Model = VisualModel.extend({
-                type: {
+                $type: {
                   props: {
                     propRole: {
                       base: "pentaho/visual/role/property",
@@ -1413,7 +1413,7 @@ define([
             it("should be invalid when attributes.isRequired and there are no attributes", function() {
 
               var Model = VisualModel.extend({
-                type: {
+                $type: {
                   props: {
                     propRole: {
                       base: "pentaho/visual/role/property",
@@ -1441,7 +1441,7 @@ define([
             it("should be valid when attributes.isRequired and there are attributes", function() {
 
               var Model = VisualModel.extend({
-                type: {
+                $type: {
                   props: {
                     propRole: {
                       base: "pentaho/visual/role/property",
@@ -1469,7 +1469,7 @@ define([
             it("should be invalid when attributes.countMin = 2 and there are no attributes", function() {
 
               var Model = VisualModel.extend({
-                type: {
+                $type: {
                   props: {
                     propRole: {
                       base: "pentaho/visual/role/property",
@@ -1497,7 +1497,7 @@ define([
             it("should be valid when attributes.countMin = 2 and there are 2 attributes", function() {
 
               var Model = VisualModel.extend({
-                type: {
+                $type: {
                   props: {
                     propRole: {
                       base: "pentaho/visual/role/property",
@@ -1525,7 +1525,7 @@ define([
             it("should be invalid when attributes.countMax = 1 and there are 2 attributes", function() {
 
               var Model = VisualModel.extend({
-                type: {
+                $type: {
                   props: {
                     propRole: {
                       base: "pentaho/visual/role/property",
@@ -1554,7 +1554,7 @@ define([
             it("should be valid when attributes.countMax = 1 and there are 1 attributes", function() {
 
               var Model = VisualModel.extend({
-                type: {
+                $type: {
                   props: {
                     propRole: {
                       base: "pentaho/visual/role/property",
@@ -1643,7 +1643,7 @@ define([
                 "but its data type is not a subtype", function() {
 
               var Model = VisualModel.extend({
-                type: {
+                $type: {
                   props: {
                     propRole: {
                       base: "pentaho/visual/role/property",
@@ -1667,7 +1667,7 @@ define([
                 "compatible with the role's levels", function() {
 
               var Model = VisualModel.extend({
-                type: {
+                $type: {
                   props: {
                     propRole: {
                       base: "pentaho/visual/role/property",
@@ -1738,7 +1738,7 @@ define([
             var scope = new SpecificationScope();
 
             var DerivedVisualModel = VisualModel.extend({
-              type: {
+              $type: {
                 props: {
                   propRole: {
                     base: "pentaho/visual/role/property"
@@ -1764,7 +1764,7 @@ define([
             var scope = new SpecificationScope();
 
             var DerivedVisualModel = VisualModel.extend({
-              type: {
+              $type: {
                 props: {
                   propRole: {
                     base: "pentaho/visual/role/property",
@@ -1797,7 +1797,7 @@ define([
             var scope = new SpecificationScope();
 
             var DerivedVisualModel = VisualModel.extend({
-              type: {
+              $type: {
                 props: {
                   propRole: {
                     base: "pentaho/visual/role/property"
@@ -1823,7 +1823,7 @@ define([
             var scope = new SpecificationScope();
 
             var DerivedVisualModel = VisualModel.extend({
-              type: {
+              $type: {
                 props: {
                   propRole: {
                     base: "pentaho/visual/role/property",

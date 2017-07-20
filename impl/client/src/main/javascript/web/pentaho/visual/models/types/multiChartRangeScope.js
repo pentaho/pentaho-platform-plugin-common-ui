@@ -25,12 +25,12 @@ define([
     var PentahoString = context.get("string");
 
     return PentahoString.extend({
-      type: {
+      $type: {
         id: module.id,
         mixins: ["enum"],
         domain: ["global", "cell"]
       }
     })
-    .implement({type: bundle.structured.multiChartRangeScope});
+    .implement({$type: bundle.structured.multiChartRangeScope});
   };
 });

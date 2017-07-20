@@ -37,7 +37,7 @@ define([
       var derivedType;
 
       beforeEach(function() {
-        derivedType = Instance.extend({type: {id: "pentaho/type/test"}}).type;
+        derivedType = Instance.extend({$type: {id: "pentaho/type/test"}}).type;
       });
 
       it("should call #toSpecInContext", function() {
@@ -137,7 +137,7 @@ define([
       });
 
       it("should return a specification object having the id of the type, if an alias is defined", function() {
-        var derivedType = Instance.extend({type: {id: "pentaho/type/test", alias: "testAlias"}}).type;
+        var derivedType = Instance.extend({$type: {id: "pentaho/type/test", alias: "testAlias"}}).type;
 
         var scope = new SpecificationScope();
 
@@ -150,7 +150,7 @@ define([
       });
 
       it("should return a specification object having the alias of the type, if it is defined", function() {
-        var derivedType = Instance.extend({type: {id: "pentaho/type/test", alias: "testAlias"}}).type;
+        var derivedType = Instance.extend({$type: {id: "pentaho/type/test", alias: "testAlias"}}).type;
 
         var scope = new SpecificationScope();
 
@@ -163,7 +163,7 @@ define([
       });
 
       it("should return a specification object having the id of the type, if no alias is defined", function() {
-        var derivedType = Instance.extend({type: {id: "pentaho/type/test"}}).type;
+        var derivedType = Instance.extend({$type: {id: "pentaho/type/test"}}).type;
 
         var scope = new SpecificationScope();
 
@@ -279,7 +279,7 @@ define([
 
               return Value.extend({
                 testMethodAInst: function() {},
-                type: {
+                $type: {
                   id: "tests/mixins/A",
                   testMethodA: function() {}
                 }
@@ -295,7 +295,7 @@ define([
 
               return Value.extend({
                 testMethodBInst: function() {},
-                type: {
+                $type: {
                   id: "tests/mixins/B",
                   testMethodB: function() {}
                 }
@@ -316,14 +316,14 @@ define([
             var Value = context.get("pentaho/type/value");
 
             var DerivedValue1 = Value.extend({
-              type: {
+              $type: {
                 id: "tests/types/foo1",
                 mixins: [mixinFactoryA]
               }
             });
 
             var DerivedValue2 = DerivedValue1.extend({
-              type: {
+              $type: {
                 id: "tests/types/foo2",
                 mixins: [mixinFactoryB]
               }
@@ -346,7 +346,7 @@ define([
     describe("#toRef(keyArgs)", function() {
 
       it("should return the #id of the type when it has an id and no alias", function() {
-        var derivedType = Instance.extend({type: {id: "pentaho/type/test"}}).type;
+        var derivedType = Instance.extend({$type: {id: "pentaho/type/test"}}).type;
 
         var typeRef = derivedType.toRef();
 
@@ -354,7 +354,7 @@ define([
       });
 
       it("should return the #alias of the type when it has an id and an alias", function() {
-        var derivedType = Instance.extend({type: {id: "pentaho/type/test", alias: "test"}}).type;
+        var derivedType = Instance.extend({$type: {id: "pentaho/type/test", alias: "test"}}).type;
 
         var typeRef = derivedType.toRef();
 
@@ -445,7 +445,7 @@ define([
     describe("#toRefInContext(keyArgs)", function() {
 
       it("should return the #id of the type when it has an id and no alias", function() {
-        var derivedType = Instance.extend({type: {id: "pentaho/type/test"}}).type;
+        var derivedType = Instance.extend({$type: {id: "pentaho/type/test"}}).type;
 
         var scope = new SpecificationScope();
 
@@ -457,7 +457,7 @@ define([
       });
 
       it("should return the #alias of the type when it has an id and an alias", function() {
-        var derivedType = Instance.extend({type: {id: "pentaho/type/test", alias: "test"}}).type;
+        var derivedType = Instance.extend({$type: {id: "pentaho/type/test", alias: "test"}}).type;
 
         var scope = new SpecificationScope();
 
@@ -503,7 +503,7 @@ define([
       var derivedType;
 
       beforeEach(function() {
-        derivedType = Instance.extend({type: {id: "pentaho/type/test"}}).type;
+        derivedType = Instance.extend({$type: {id: "pentaho/type/test"}}).type;
       });
 
       it("should call #toSpec({isJson: true})", function() {

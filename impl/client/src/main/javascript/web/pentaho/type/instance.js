@@ -54,7 +54,7 @@ define([
      * [Foo.type]{@link pentaho.type.Instance.type}.
      *
      * Instances of the type `Foo` can also conveniently access the type's singleton object
-     * through the instance property [this.type]{@link pentaho.type.Instance#type}.
+     * through the instance property [this.$type]{@link pentaho.type.Instance#$type}.
      *
      * The instance and type classes of a type are closely bound and
      * must naturally reference each other.
@@ -75,12 +75,12 @@ define([
      *     constructor: function(label) {
      *       this.label = label;
      *     },
-     *     type: { // type specification
+     *     $type: { // type specification
      *       greeting: "Hello, ",
      *       veryLongString: "..."
      *     },
      *     saySomething: function() {
-     *       console.log(this.type.greeting + this.label + "!");
+     *       console.log(this.$type.greeting + this.label + "!");
      *     }
      *   });
      *
@@ -91,7 +91,7 @@ define([
      *   b.saySomething(); // "Hello, Bob!"
      *
      *   // All instances share the same _type_:
-     *   b.type.greeting ===  a.type.greeting // true
+     *   b.$type.greeting ===  a.$type.greeting // true
      * });
      *
      * @description Creates an instance of this type.
@@ -108,7 +108,7 @@ define([
       // Properties to ignore within extend
       extend_exclude: {_: 1},
 
-      // region type property
+      // region $type property
       __type: null, // Set on Type#_init
 
       /**
@@ -119,7 +119,7 @@ define([
        * @see pentaho.type.Instance.type
        * @see pentaho.type.Type#instance
        */
-      get type() {
+      get $type() {
         return this.__type;
       },
 
@@ -128,12 +128,12 @@ define([
       // Not documented on purpose, to avoid users trying to configure a type
       //  when they already have an instance of it, which is not supported...
       // However, this is the simplest and cleanest way to implement:
-      //   Instance.implement({type: {.}})
+      //   Instance.implement({$type: {.}})
       // to mean
       //   Type.implement({.}).instance.constructor
-      set type(config) {
+      set $type(config) {
         // Class.implement essentially just calls Class#extend.
-        if(config) this.type.extend(config);
+        if(config) this.__type.extend(config);
       }, // endregion
 
       // region serialization
@@ -215,13 +215,13 @@ define([
        * @readonly
        */
       get type() {
-        return this.prototype.type;
+        return this.prototype.$type;
       },
 
       // Supports Type class-level configuration only.
       // Not documented on purpose.
       // Allows writing;
-      //   Instance.implementStatic({type: .})
+      //   Instance.implementStatic({$type: .})
       // to mean:
       //   Type#implementStatic(.).instance.constructor
       set type(config) {
@@ -251,13 +251,13 @@ define([
        */
 
       /*
-       * Defaults `name` from `classSpec.type.sourceId` or `classSpec.type.id`, if any.
+       * Defaults `name` from `classSpec.$type.sourceId` or `classSpec.$type.id`, if any.
        *
        * @ignore
        */
       _extend: function(name, instSpec, classSpec, keyArgs) {
         var typeSpec;
-        if(name == null && (typeSpec = (instSpec && instSpec.type))) {
+        if(name == null && (typeSpec = (instSpec && instSpec.$type))) {
           name = typeSpec.sourceId || typeSpec.id || null;
           if(name) name = name.toString();
         }
@@ -281,11 +281,11 @@ define([
         var ka = keyArgs ? Object.create(keyArgs) : {};
         ka.instance = SubInstCtor.prototype;
 
-        this.Type.extend(typeName, instSpec && instSpec.type, classSpec && classSpec.type, ka);
+        this.Type.extend(typeName, instSpec && instSpec.$type, classSpec && classSpec.$type, ka);
 
-        // Don't process `instSpec.type` and `classSpec.type` twice, during construction.
+        // Don't process `instSpec.$type` and `classSpec.$type` twice, during construction.
         ka = keyArgs ? Object.create(keyArgs) : {};
-        (ka.exclude || (ka.exclude = {})).type = 1;
+        (ka.exclude || (ka.exclude = {})).$type = 1;
 
         this.base(SubInstCtor, instSpec, classSpec, ka);
       }

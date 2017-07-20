@@ -26,13 +26,13 @@ define([
     var BaseModel = context.get(baseModelFactory);
 
     return BaseModel.extend({
-      type: {
+      $type: {
         id: module.id,
         v2Id: "ccc_area",
         category: "areachart",
         defaultView: "pentaho/ccc/visual/areaStacked"
       }
     })
-    .implement({type: bundle.structured.areaStacked});
+    .implement({$type: bundle.structured.areaStacked});
   };
 });

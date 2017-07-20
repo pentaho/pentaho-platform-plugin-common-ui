@@ -28,20 +28,20 @@ define([
     var BaseModel = context.get(modelFactory);
 
     return BaseModel.extend({
-      type: {
+      $type: {
         id: module.id,
         isAbstract: true,
         props: [
           {
             name: "sizeByNegativesMode",
             valueType: sizeByNegativesModeFactory,
-            isApplicable: function() { return this.count("size") > 0; },
+            isApplicable: function() { return this.countOf("size") > 0; },
             isRequired: true,
             defaultValue: "negLowest"
           }
         ]
       }
     })
-    .implement({type: bundle.structured.scaleSizeContinuous});
+    .implement({$type: bundle.structured.scaleSizeContinuous});
   };
 });

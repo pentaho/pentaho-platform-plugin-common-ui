@@ -29,7 +29,7 @@
  * @memberOf pentaho.type.spec.IComplexTypeProto#
  * @type {pentaho.type.spec.IComplexProto}
  *
- * @see pentaho.type.spec.IComplexProto#type
+ * @see pentaho.type.spec.IComplexProto#$type
  */
 
 /**
