@@ -205,15 +205,15 @@ define([
         return opersOut;
       },
 
-      // region __literalsByPropertyName
-      get __literalsByPropertyName() {
-        return this.__literalsByName || (this.__literalsByName = Object.freeze(this.__buildLiteralsByName()));
+      // region __equalityLiteralsByPropertyName
+      get __equalityLiteralsByPropertyName() {
+        return this.__equalityLiteralsByName || (this.__equalityLiteralsByName = Object.freeze(this.__buildEqualityLiteralsByName()));
       },
 
-      __literalsByName: null,
+      __equalityLiteralsByName: null,
 
-      __buildLiteralsByName: function() {
-        var literalsByName = {};
+      __buildEqualityLiteralsByName: function() {
+        var equalityLiteralsByName = {};
         var os = this.operands;
         var i = os.count;
         var o;
@@ -222,12 +222,12 @@ define([
         while(i--) {
           o = os.at(i);
           p = (o.isNot ? o.operand : o);
-          if(p.isProperty) {
-            literalsByName[o.property] = {operand: o, index: i};
+          if(p.kind === "isEqual") {
+            equalityLiteralsByName[p.property] = {operand: o, index: i};
           }
         }
 
-        return literalsByName;
+        return equalityLiteralsByName;
       },
       // endregion
 

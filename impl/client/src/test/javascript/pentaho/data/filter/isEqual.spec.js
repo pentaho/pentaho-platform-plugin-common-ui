@@ -21,8 +21,6 @@ define([
 
   "use strict";
 
-  /* global describe:true, it:true, expect:true, beforeEach:true*/
-
   describe("pentaho.data.filter.IsEqual", function() {
 
     var context = new Context();
