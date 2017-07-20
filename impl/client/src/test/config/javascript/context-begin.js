@@ -38,9 +38,11 @@ var basePath;
   basePath = baseUrl + makeRelativeUrl("${build.javascriptTestOutputDirectory}") + "/web";
 
   function makeRelativeUrl(path) {
+    var basePath = "${project.basedir}/".replace(/\\/g, "/");
+
     return path
-        .replace("${project.basedir}/", "")
-        .replace("\\", "/");
+      .replace(/\\/g, "/")
+      .replace(basePath, "");
   }
 })();
 
