@@ -82,21 +82,31 @@ define(["common-ui/prompting/builders/DropDownBuilder"], function(DropDownBuilde
       expect(component.defaultIfEmpty).toBeFalsy();
     });
 
-    it("should allow specifying the external plugin parameter", function(done) {
-      args.param.attributes.externalPlugin = "select2";
-
+    describe("build", function() {
       var mockSelectComponent;
-      function mockDeps(localRequire) {
+      var _dropDownBuilder;
+
+      function createMockSelectComponent(localRequire) {
         localRequire.define("cdf/components/SelectComponent", function() {
           mockSelectComponent = jasmine.createSpy("SelectComponent");
           return mockSelectComponent;
         });
       }
-      require.using([
-        "common-ui/prompting/builders/DropDownBuilder"
-      ], mockDeps, function(DropDownBuilder) {
 
-        var _dropDownBuilder = new DropDownBuilder();
+      beforeAll(function(done) {
+
+        require.using([
+          "common-ui/prompting/builders/DropDownBuilder"
+        ], createMockSelectComponent, function(DropDownBuilder) {
+          _dropDownBuilder = new DropDownBuilder();
+          done();
+        });
+
+      });
+
+      it("should allow specifying the external plugin parameter", function() {
+        args.param.attributes.externalPlugin = "select2";
+
         _dropDownBuilder.build(args);
 
         expect(mockSelectComponent).toHaveBeenCalledWith(jasmine.objectContaining({
@@ -104,8 +114,29 @@ define(["common-ui/prompting/builders/DropDownBuilder"], function(DropDownBuilde
         }));
 
         delete args.param.attributes.externalPlugin;
-        done();
       });
+
+      it("should allow specifying extra options parameter", function() {
+        args.param.attributes.extraOptions = {dummyParameter1: "dummyParameter1", dummyParameter2: "dummyParameter2"};
+
+        _dropDownBuilder.build(args);
+
+        expect(mockSelectComponent).toHaveBeenCalledWith(jasmine.objectContaining({
+          param: jasmine.objectContaining(
+            {
+              attributes: {
+                extraOptions: {
+                  dummyParameter1: "dummyParameter1",
+                  dummyParameter2: "dummyParameter2"
+                }
+              }
+            })
+        }));
+
+        delete args.param.attributes.extraOptions;
+      });
+
     });
+
   });
 });
