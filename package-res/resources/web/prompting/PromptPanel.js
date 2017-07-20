@@ -498,6 +498,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
           this.guid = this.promptGUIDHelper.generateGUID();
 
           this.dashboard = new Dashboard();
+          this.dashboard.flatParameters = true;  // PRD-5909
 
           this.paramDiffer = new ParamDiff();
 
