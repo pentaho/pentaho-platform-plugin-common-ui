@@ -81,7 +81,8 @@ define(["cdf/components/SelectComponent", "./ValueBasedParameterWidgetBuilder", 
             // Only select the first item if we have no selection and are not ignoring BISERVER-5538
             this.defaultIfEmpty = !args.promptPanel.paramDefn.ignoreBiServer5538 && !args.param.hasSelection();
           },
-          externalPlugin: args.param.attributes.externalPlugin
+          externalPlugin: args.param.attributes.externalPlugin,
+          extraOptions: args.param.attributes.extraOptions
         });
 
         return new SelectComponent(widget);
