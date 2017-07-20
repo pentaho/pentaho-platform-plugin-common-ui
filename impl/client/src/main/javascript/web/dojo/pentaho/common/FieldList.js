@@ -168,6 +168,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     domClass.remove(node, "dojoDndItem" + type);
     if(type == 'Selected' || type == 'Anchor'){
         domClass.remove(node, "pentaho-listitem-selected");
+        domClass.remove(node, "pentaho-listitem");
         domClass.remove(node, 'pentaho-listitem-hover');
     }
   },
@@ -506,19 +507,20 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     if (!selected) {
       this.clearSelection();
       // Logic borrowed from dojo.dnd.Selector.selectAll
-      this.dndObj._addItemClass(node, "pentaho-listitem-selected")
+      this.dndObj._addItemClass(node, "Selected")
       this.dndObj.selection[id] = 1;
     }
     _anchor = this.dndObj.anchor;
     // Update anchor
     if (this.dndObj.anchor) {
-      this.dndObj._addItemClass(this.dndObj.anchor, "pentaho-listitem-selected");
+      this.dndObj._removeItemClass(this.dndObj.anchor, "Anchor");
+      this.dndObj._addItemClass(this.dndObj.anchor, "Selected");
     }
-    this.dndObj._removeAnchor();
+	
     this.dndObj._addItemClass(node, "Anchor");
     this.dndObj._removeItemClass(node, "Selected");
     this.dndObj.anchor = node;
-    this.dndObj._addItemClass(_anchor, "Selected");
+
   },
 
   getSelectedItems: function() {
