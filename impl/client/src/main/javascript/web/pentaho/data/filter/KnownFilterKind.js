@@ -59,6 +59,30 @@ define(function() {
     IsIn: "isIn",
 
     /**
+     * The [IsGreater]{@link pentaho.data.filter.IsGreater} filter kind.
+     * @default
+     */
+    IsGreater: "isGreater",
+
+    /**
+     * The [IsLess]{@link pentaho.data.filter.IsLess} filter kind.
+     * @default
+     */
+    IsLess: "isLess",
+
+    /**
+     * The [IsGreaterOrEqual]{@link pentaho.data.filter.IsGreaterOrEqual} filter kind.
+     * @default
+     */
+    IsGreaterOrEqual: "isGreaterOrEqual",
+
+    /**
+     * The [IsLessOrEqual]{@link pentaho.data.filter.IsLessOrEqual} filter kind.
+     * @default
+     */
+    IsLessOrEqual: "isLessOrEqual",
+
+    /**
      * The [True]{@link pentaho.data.filter.True} filter kind.
      * @default
      */

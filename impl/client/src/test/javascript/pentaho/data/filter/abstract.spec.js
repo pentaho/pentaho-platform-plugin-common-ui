@@ -24,8 +24,6 @@ define([
 
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
-
   describe("pentaho.data.filter.Abstract", function() {
 
     var context = new Context();
@@ -166,7 +164,8 @@ define([
       });
     }); // #visit
 
-    describe("#toDnf()", function() {
+
+    describe("Logical manipulation and simplification", function() {
 
       function createFilter(spec) {
         return AbstractFilter.type.create(spec);
@@ -176,102 +175,77 @@ define([
         return createFilter(spec).toDnf();
       }
 
-      function expectDnf(specIn, specOut) {
-        var fDnf = specToDnf(specIn);
+      describe("#toDnf()", function () {
 
-        if(specOut) {
-          expect(fDnf.toSpec({forceType: true})).toEqual(specOut);
+        function expectDnf(specIn, specOut) {
+          var fDnf = specToDnf(specIn);
+
+          if (specOut) {
+            expect(fDnf.toSpec({forceType: true})).toEqual(specOut);
+          }
         }
-      }
 
-      it("should convert an empty `or` to false", function() {
+        it("should convert an empty `or` to false", function () {
 
-        expectDnf({
-          _: "or"
-        }, {
-          _: "false"
+          expectDnf({
+            _: "or"
+          }, {
+            _: "false"
+          });
         });
-      });
 
-      it("should convert an empty `and` to true", function() {
+        it("should convert an empty `and` to true", function () {
 
-        expectDnf({
-          _: "and"
-        }, {
-          _: "true"
+          expectDnf({
+            _: "and"
+          }, {
+            _: "true"
+          });
         });
-      });
 
-      it("should preserve a filter already in DNF", function() {
+        it("should preserve a filter already in DNF", function () {
 
-        expectDnf({
-          _: "or",
-          o: [
-            {
-              _: "and",
-              o: [{_: "=", p: "a", v: 1}]
-            }
-          ]
-        }, {
-          _: "or",
-          o: [
-            {
-              _: "and",
-              o: [{_: "=", p: "a", v: 1}]
-            }
-          ]
-        });
-      });
-
-      it("should apply De Morgan Rule 1 - NOT over AND", function() {
-
-        expectDnf({
-          _: "not",
-          o: {_: "and", o: [{_: "=", p: "a", v: 1}]}
-        },
-        {_: "or",
-          o: [
-            {
-              _: "and",
-              o: [
-                {_: "not", o: {_: "=", p: "a", v: 1}}
-              ]
-            }
-          ]
-        });
-      });
-
-      it("should apply De Morgan Rule 2 - NOT over OR", function() {
-
-        expectDnf({
-          _: "not",
-          o: {
+          expectDnf({
             _: "or",
             o: [
-                {_: "=", p: "a", v: 1}
+              {
+                _: "and",
+                o: [{_: "=", p: "a", v: 1}]
+              }
             ]
-          }
-        }, {
-          _: "or",
-          o: [
+          }, {
+            _: "or",
+            o: [
+              {
+                _: "and",
+                o: [{_: "=", p: "a", v: 1}]
+              }
+            ]
+          });
+        });
+
+        it("should apply De Morgan Rule 1 - NOT over AND", function () {
+
+          expectDnf({
+              _: "not",
+              o: {_: "and", o: [{_: "=", p: "a", v: 1}]}
+            },
             {
-              _: "and",
+              _: "or",
               o: [
                 {
-                  _: "not",
-                  o: {_: "=", p: "a", v: 1}
+                  _: "and",
+                  o: [
+                    {_: "not", o: {_: "=", p: "a", v: 1}}
+                  ]
                 }
               ]
-            }
-          ]
+            });
         });
-      });
 
-      it("should eliminate double-negations", function() {
+        it("should apply De Morgan Rule 2 - NOT over OR", function () {
 
-        expectDnf({
-          _: "not",
-          o: {
+          expectDnf({
             _: "not",
             o: {
               _: "or",
@@ -279,199 +253,397 @@ define([
                 {_: "=", p: "a", v: 1}
               ]
             }
-          }
-        }, {
-          _: "or",
-          o: [
-            {
-              _: "and",
-              o: [
-                {_: "=", p: "a", v: 1}
-              ]
-            }
-          ]
+          }, {
+            _: "or",
+            o: [
+              {
+                _: "and",
+                o: [
+                  {
+                    _: "not",
+                    o: {_: "=", p: "a", v: 1}
+                  }
+                ]
+              }
+            ]
+          });
         });
-      });
 
-      it("should distribute AND over OR", function() {
+        it("should eliminate double-negations", function () {
 
-        expectDnf({
-          _: "and",
-          o: [
-            {
-              _: "or",
-              o: [
-                {
-                  _: "not",
-                  o: {_: "=", p: "a", v: 1}
-                }
-              ]
-            }
-          ]
-        }, {
-          _: "or",
-          o: [
-            {
-              _: "and",
-              o: [
-                {
-                  _: "not",
-                  o: {_: "=", p: "a", v: 1}
-                }
-              ]
-            }
-          ]
-        });
-      });
-
-      it("should distribute AND over OR - multiple OR terms", function() {
-
-        expectDnf({
-          _: "and",
-          o: [
-            {
-              _: "or",
-              o: [
-                {_: "not", o: {_: "=", p: "a", v: 1}},
-                {_: "=", p: "b", v: 1}
-              ]
-            }
-          ]
-        }, {
-          _: "or",
-          o: [
-            {
-              _: "and",
-              o: [
-                {_: "not", o: {_: "=", p: "a", v: 1}}
-              ]
-            },
-            {
-              _: "and",
-              o: [
-                {_: "=", p: "b", v: 1}
-              ]
-            }
-          ]
-        });
-      });
-
-      it("should distribute AND over OR - multiple AND and OR terms", function() {
-
-        expectDnf({
-          _: "and",
-          o: [
-            {
-              _: "or",
-              o: [
-                {_: "=", p: "a", v: 1},
-                {_: "=", p: "b", v: 1}
-              ]
-            },
-            {
-              _: "or",
-              o: [
-                {_: "=", p: "c", v: 1},
-                {_: "=", p: "d", v: 1}
-              ]
-            }
-          ]
-        }, {
-          _: "or",
-          o: [
-            {
-              _: "and",
-              o: [
-                {_: "=", p: "a", v: 1},
-                {_: "=", p: "c", v: 1}
-              ]
-            },
-            {
-              _: "and",
-              o: [
-                {_: "=", p: "a", v: 1},
-                {_: "=", p: "d", v: 1}
-              ]
-            },
-            {
-              _: "and",
-              o: [
-                {_: "=", p: "b", v: 1},
-                {_: "=", p: "c", v: 1}
-              ]
-            },
-            {
-              _: "and",
-              o: [
-                {_: "=", p: "b", v: 1},
-                {_: "=", p: "d", v: 1}
-              ]
-            }
-          ]
-        });
-      });
-
-      it("should allow subtraction", function() {
-
-        expectDnf({
-          _: "and",
-          o: [
-            {_: "=", p: "a", v: 1},
-            {
+          expectDnf({
+            _: "not",
+            o: {
               _: "not",
               o: {
                 _: "or",
                 o: [
-                  {_: "=", p: "a", v: 1},
-                  {_: "=", p: "b", v: 2}
+                  {_: "=", p: "a", v: 1}
                 ]
               }
             }
-          ]
-        }, {
-          _: "false"
+          }, {
+            _: "or",
+            o: [
+              {
+                _: "and",
+                o: [
+                  {_: "=", p: "a", v: 1}
+                ]
+              }
+            ]
+          });
+        });
+
+        it("should distribute AND over OR", function () {
+
+          expectDnf({
+            _: "and",
+            o: [
+              {
+                _: "or",
+                o: [
+                  {
+                    _: "not",
+                    o: {_: "=", p: "a", v: 1}
+                  }
+                ]
+              }
+            ]
+          }, {
+            _: "or",
+            o: [
+              {
+                _: "and",
+                o: [
+                  {
+                    _: "not",
+                    o: {_: "=", p: "a", v: 1}
+                  }
+                ]
+              }
+            ]
+          });
+        });
+
+        it("should distribute AND over OR - multiple OR terms", function () {
+
+          expectDnf({
+            _: "and",
+            o: [
+              {
+                _: "or",
+                o: [
+                  {_: "not", o: {_: "=", p: "a", v: 1}},
+                  {_: "=", p: "b", v: 1}
+                ]
+              }
+            ]
+          }, {
+            _: "or",
+            o: [
+              {
+                _: "and",
+                o: [
+                  {_: "not", o: {_: "=", p: "a", v: 1}}
+                ]
+              },
+              {
+                _: "and",
+                o: [
+                  {_: "=", p: "b", v: 1}
+                ]
+              }
+            ]
+          });
+        });
+
+        it("should distribute AND over OR - multiple AND and OR terms", function () {
+
+          expectDnf({
+            _: "and",
+            o: [
+              {
+                _: "or",
+                o: [
+                  {_: "=", p: "a", v: 1},
+                  {_: "=", p: "b", v: 1}
+                ]
+              },
+              {
+                _: "or",
+                o: [
+                  {_: "=", p: "c", v: 1},
+                  {_: "=", p: "d", v: 1}
+                ]
+              }
+            ]
+          }, {
+            _: "or",
+            o: [
+              {
+                _: "and",
+                o: [
+                  {_: "=", p: "a", v: 1},
+                  {_: "=", p: "c", v: 1}
+                ]
+              },
+              {
+                _: "and",
+                o: [
+                  {_: "=", p: "a", v: 1},
+                  {_: "=", p: "d", v: 1}
+                ]
+              },
+              {
+                _: "and",
+                o: [
+                  {_: "=", p: "b", v: 1},
+                  {_: "=", p: "c", v: 1}
+                ]
+              },
+              {
+                _: "and",
+                o: [
+                  {_: "=", p: "b", v: 1},
+                  {_: "=", p: "d", v: 1}
+                ]
+              }
+            ]
+          });
+        });
+
+        it("should allow subtraction", function () {
+
+          expectDnf({
+            _: "and",
+            o: [
+              {_: "=", p: "a", v: 1},
+              {
+                _: "not",
+                o: {
+                  _: "or",
+                  o: [
+                    {_: "=", p: "a", v: 1},
+                    {_: "=", p: "b", v: 2}
+                  ]
+                }
+              }
+            ]
+          }, {
+            _: "false"
+          });
+        });
+
+        it("should allow subtraction ii", function () {
+          // tuple 1 - {a: 1, b: 2}
+          var tuple1 = {
+            _: "and",
+            o: [
+              {_: "=", p: "a", v: 1},
+              {_: "=", p: "b", v: 2}
+            ]
+          };
+
+          // tuple 2 - {a: 3, b: 4}
+          var tuple2 = {
+            _: "and",
+            o: [
+              {_: "=", p: "a", v: 3},
+              {_: "=", p: "b", v: 4}
+            ]
+          };
+
+          // tuple 3 - {a: 5, b: 6}
+          var tuple3 = {
+            _: "and",
+            o: [
+              {_: "=", p: "a", v: 5},
+              {_: "=", p: "b", v: 6}
+            ]
+          };
+
+          var originalDnf = {_: "or", o: [tuple1, tuple2]}
+
+          var removeDnf = {
+            _: "or",
+            o: [tuple1, tuple3]
+          };
+
+          expectDnf(
+            {_: "and", o: [originalDnf, {_: "not", o: removeDnf}]},
+            {_: "or", o: [tuple2]});
+        });
+
+        it("should not try to subtract or simplify literals other than isEqual", function () {
+          // tuple 1 - {a=1, b=2, a>0}
+          var tuple1 = {
+            _: "and",
+            o: [
+              {_: "=", p: "a", v: 1},
+              {_: "=", p: "b", v: 2},
+              {_: ">", p: "a", v: 0}
+            ]
+          };
+
+          // tuple 2 - {a=3, b=4, a>1}
+          var tuple2 = {
+            _: "and",
+            o: [
+              {_: "=", p: "a", v: 3},
+              {_: "=", p: "b", v: 4},
+              {_: ">", p: "a", v: 1}
+            ]
+          };
+
+          // tuple 3 - {a!=1, b!=2, a<=5}
+          var tuple3 = {
+            _: "and",
+            o: [
+              {_: "not", o: {_: "=", p: "a", v: 1}},
+              {_: "not", o: {_: "=", p: "b", v: 2}},
+              {_: "not", o: {_: ">", p: "a", v: 5}}
+            ]
+          };
+
+          // tuple 4 - {a=3, b=4, a>1, a<=5}
+          var tuple4 = {
+            _: "and",
+            o: [
+              {_: "=", p: "a", v: 3},
+              {_: "=", p: "b", v: 4},
+              {_: ">", p: "a", v: 1},
+              {_: "<=", p: "a", v: 5}
+            ]
+          };
+
+          var originalDnf = {_: "or", o: [tuple1, tuple2]}
+
+          var removeDnf = {
+            _: "or",
+            o: [tuple3]
+          };
+
+          var resultDnf = {
+            _: "or",
+            o: [tuple4]
+          };
+
+          expectDnf(
+            {_: "and", o: [originalDnf, removeDnf]},
+            resultDnf
+          );
+
+        });
+
+      });
+      describe("#andNot()", function () {
+
+        function expectAndNot(specIn, specSubstract, specOut) {
+          var fDnfIn = specToDnf(specIn);
+          var fDnfSubtract = specToDnf(specSubstract);
+
+          var fOut = fDnfIn.andNot(fDnfSubtract);
+
+          if (specOut) {
+            expect(fOut.toSpec({forceType: true})).toEqual(specOut);
+          }
+        }
+
+        it("correctly subtracts isEqual predicates", function () {
+          // (a=1) or ((a=2) and (b=3))
+          var originalSpec = {
+            _: "or",
+            o: [
+              {_: "=", p: "a", v: 1},
+              {
+                _: "and",
+                o: [
+                  {_: "=", p: "a", v: 2},
+                  {_: "=", p: "b", v: 3}
+                ]
+              }
+            ]
+          };
+
+          // a=1
+          var subtractSpec1 = {_: "=", p: "a", v: 1};
+
+          // a=2
+          var subtractSpec2 = {_: "=", p: "a", v: 2};
+
+          // (a=2) and (b=3)
+          var expected1 = {
+            _: "or",
+            o: [{
+              _: "and",
+              o: [
+                {_: "=", p: "a", v: 2},
+                {_: "=", p: "b", v: 3}
+              ]
+            }]
+          };
+
+          // (a=1)
+          var expected2 = {
+            _: "or",
+            o: [{
+              _: "and",
+              o: [{_: "=", p: "a", v: 1}]
+            }]
+          };
+
+          expectAndNot(originalSpec, subtractSpec1, expected1);
+          expectAndNot(originalSpec, subtractSpec2, expected2);
+
+        });
+
+        it("correctly deals with terminal filters other than isEquals", function(){
+           // (b=1) or (a>0) or ((a=2) and (b=3) and (a<5))
+          var originalSpec = {
+            _: "or",
+            o: [
+              {_: "=", p: "b", v: 1},
+              {_: ">", p: "a", v: 0},
+              {
+                _: "and",
+                o: [
+                  {_: "=", p: "a", v: 2},
+                  {_: "=", p: "b", v: 3},
+                  {_: "<", p: "a", v: 5}
+                ]
+              }
+            ]
+          };
+
+          // a=2 or b=1 or a>3
+          var subtractSpec = {
+            _: "or", o: [
+              {_: "=", p: "a", v: 2},
+              {_: "=", p: "b", v: 1},
+              {_: ">", p: "a", v: 3}
+            ]
+          };
+
+          // a!=2 and b!=1 and a>0 and a<=3
+          var expected = {
+            _: "or",
+            o:[{
+              _: "and",
+              o: [
+                {_: ">", p: "a", v: 0},
+                {_: "not", o: {_: "=", p: "a", v: 2}},
+                {_: "not", o: {_: "=", p: "b", v: 1}},
+                {_: "<=", p: "a", v: 3}
+              ]
+            }]
+          };
+
+         expectAndNot(originalSpec, subtractSpec, expected);
+
         });
       });
-
-      it("should allow subtraction ii", function() {
-        // tuple 1 - {a: 1, b: 2}
-        var tuple1 = {
-          _: "and",
-          o: [
-            {_: "=", p: "a", v: 1},
-            {_: "=", p: "b", v: 2}
-          ]
-        };
-
-        // tuple 2 - {a: 3, b: 4}
-        var tuple2 = {
-          _: "and",
-          o: [
-            {_: "=", p: "a", v: 3},
-            {_: "=", p: "b", v: 4}
-          ]
-        };
-
-        // tuple 3 - {a: 5, b: 6}
-        var tuple3 = {
-          _: "and",
-          o: [
-            {_: "=", p: "a", v: 5},
-            {_: "=", p: "b", v: 6}
-          ]
-        };
-
-        var originalDnf = {_: "or", o: [tuple1, tuple2]}
-
-        var removeDnf = {
-          _: "or",
-          o: [tuple1, tuple3]
-        };
-
-        expectDnf(
-          {_: "and", o: [originalDnf, {_: "not", o: removeDnf}]},
-          {_: "or", o: [tuple2]});
-      });
     });
+
   }); // pentaho.data.filter.Abstract
 });

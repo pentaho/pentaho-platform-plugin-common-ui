@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
+ * Copyright 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./abstract"
-], function(abstractFactory) {
 
-  "use strict";
+/**
+ * The `spec.IIsLess` interface describes the information associated with a is less filter.
+ *
+ * @name pentaho.data.filter.spec.IIsLess
+ *
+ * @interface
+ * @extends pentaho.data.filter.spec.IProperty
+ *
+ * @see pentaho.data.filter.IsLess
+ */
 
-  return function(context) {
-
-    var Abstract = context.get(abstractFactory);
-
-    return Abstract._core.Property;
-  };
-});
+/**
+ * The expected value of the property.
+ *
+ * @name value
+ * @memberOf pentaho.data.filter.spec.IIsLess#
+ * @type {!pentaho.type.UElement}
+ */

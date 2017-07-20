@@ -22,14 +22,22 @@ define([
   "./_core/not",
   "./_core/true",
   "./_core/false",
+  "./_core/property",
+  "./_core/isEqual",
+  "./_core/isIn",
+  "./_core/isGreater",
+  "./_core/isLess",
+  "./_core/isGreaterOrEqual",
+  "./_core/isLessOrEqual",
   "pentaho/util/arg",
   "pentaho/util/error",
   "pentaho/util/object",
   "pentaho/util/logger",
   "pentaho/debug",
   "pentaho/debug/Levels"
-], function(module, complexFactory, treeFactory, andFactory, orFactory, notFactory,
-            trueFactory, falseFactory, arg, error, O, logger, debugMgr, DebugLevels) {
+], function(module, complexFactory, treeFactory, andFactory, orFactory, notFactory, trueFactory, falseFactory,
+            propertyFactory, isEqFactory, isInFactory, isGtFactory, isLtFactory, isGteFactory, isLteFactory,
+            arg, error, O, logger, debugMgr, DebugLevels) {
 
   "use strict";
 
@@ -440,6 +448,13 @@ define([
     orFactory(__filter);
     trueFactory(__filter);
     falseFactory(__filter);
+    propertyFactory(__filter);
+    isEqFactory(__filter);
+    isInFactory(__filter);
+    isGtFactory(__filter);
+    isLtFactory(__filter);
+    isGteFactory(__filter);
+    isLteFactory(__filter);
 
     return __filter.Abstract;
 
@@ -471,6 +486,9 @@ define([
           case "false":
             // 3. NOT(FALSE) <=> TRUE
             return new __filter.True();
+
+          default:
+            return o.negate();
         }
       }
     }
@@ -647,7 +665,7 @@ define([
       // 2)  OR(A, A) <=>  OR(A)
       // 4)  OR( .. False .. ) <=> OR( .. .. )
       // 6)  OR( .. True .. ) <=> True
-      // 10) OR (A, NOT(A)) <=> True  - Law of excluded middle (cannt occur in DNF)
+      // 10) OR (A, NOT(A)) <=> True  - Law of excluded middle (cannot occur in DNF)
       // 12) OR() <=> False
       var andsByKey = {};
       var andsNew = [];
@@ -780,14 +798,14 @@ define([
 
     // Optimized version... of a - b
     function __subtractDnfAnds(a, b) {
-      // a,b - And of literals: possibly negated isEqual
+      // a,b - And of literals: possibly negated
       // Additionally, it is assumed that the ands are simplified, such that:
-      // * if a property can only occur once, either positively or negatively
+      // * a isEqual property can only occur once, either positively or negatively
 
       var results = [];
       var resulti;
 
-      var literalsAByPropName = a.__literalsByPropertyName;
+      var literalsAByPropName = a.__equalityLiteralsByPropertyName;
       var bs = b.operands;
       var i = bs.count;
       var isPbNot;
@@ -798,7 +816,7 @@ define([
         var pb = (isPbNot = bi.isNot) ? bi.operand : bi;
 
         var aiInfo = O.getOwn(literalsAByPropName, pb.property);
-        if(aiInfo) {
+        if(aiInfo && pb.kind === "isEqual") {
           var ai = aiInfo.operand;
           var pa = (isPaNot = ai.isNot) ? ai.operand : ai;
           if(isPaNot) {

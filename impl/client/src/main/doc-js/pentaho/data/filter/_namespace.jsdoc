@@ -32,6 +32,10 @@
  *   * [pentaho/data/filter/not]{@link pentaho.data.filter.Not}
  *   * [pentaho/data/filter/property]{@link pentaho.data.filter.Property}
  *     * [pentaho/data/filter/isEqual]{@link pentaho.data.filter.IsEqual}
+ *     * [pentaho/data/filter/isGreater]{@link pentaho.data.filter.IsGreater}
+ *     * [pentaho/data/filter/isLess]{@link pentaho.data.filter.IsLess}
+ *     * [pentaho/data/filter/isGreaterOrEqual]{@link pentaho.data.filter.IsGreaterOrEqual}
+ *     * [pentaho/data/filter/isLessOrEqual]{@link pentaho.data.filter.IsLessOrEqual}
  *
  * @name pentaho.data.filter
  * @namespace

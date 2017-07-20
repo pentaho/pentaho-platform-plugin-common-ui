@@ -90,6 +90,11 @@
   requireTypeInfo["pentaho/data/filter/property"] = {base: "pentaho/data/filter/abstract"};
   requireTypeInfo["pentaho/data/filter/isEqual"] = {alias: "=", base: "pentaho/data/filter/property"};
   requireTypeInfo["pentaho/data/filter/isIn"] = {alias: "in", base: "pentaho/data/filter/property"};
+  requireTypeInfo["pentaho/data/filter/isGreater"] = {alias: ">", base: "pentaho/data/filter/property"};
+  requireTypeInfo["pentaho/data/filter/isGreaterOrEqual"] = {alias: ">=", base: "pentaho/data/filter/property"};
+  requireTypeInfo["pentaho/data/filter/isLess"] = {alias: "<", base: "pentaho/data/filter/property"};
+  requireTypeInfo["pentaho/data/filter/isLessOrEqual"] = {alias: "<=", base: "pentaho/data/filter/property"};
+
 
   requireTypeInfo["pentaho/visual/base"] = {base: "model"};
   requireTypeInfo["pentaho/visual/base/view"] = {
