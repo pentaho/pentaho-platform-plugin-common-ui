@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -203,7 +203,7 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
           var dojoFormat;
           var dateFormat = this._getDateFormat();
 
-          if(dateFormat.match(/(^|(?!y).)(y{1}(?!y))/)) {
+          if(dateFormat.match(/o/)) {
             return true;
           }
 
@@ -213,8 +213,8 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
             return true;
           }
 
-          if(dateFormat.match(/m/)) {
-            return true;
+          if(dateFormat.match(/(G|qQ|w|E|a|h|H|K|k|s|S|vz|Z)/)) {
+            return false;
           }
 
           return dojoFormat == $.datepicker.formatDate(dateFormat, new Date());
