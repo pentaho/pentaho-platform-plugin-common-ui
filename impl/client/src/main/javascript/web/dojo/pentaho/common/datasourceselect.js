@@ -235,8 +235,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             }
 
 
-            this.msgBox.buttons = [this.getLocaleString('Yes'), this.getLocaleString('No')];
-            this.msgBox.setTitle(this.getLocaleString('DeleteDatasourceWarningTitle'));
+            this.msgBox.buttons = [this.getLocaleString('Ok'), this.getLocaleString('Cancel')];
+            this.msgBox.setTitle(this.getLocaleString('Warning'));
             this.msgBox.setMessage(this.getLocaleString('DeleteDatasourceWarning', entities.encode(this.getSelectedModel().name)));
 
             this.msgBox.callbacks = [
