@@ -125,7 +125,7 @@ define([
 
     testEnvironmentProperty("application", "application", "ABC");
     testEnvironmentProperty("server.root.href", "server.root", "http://host:8888/path");
-    testEnvironmentProperty("server.osgiRoot.href", "server.osgiRoot", "http://host:8888/path/osgi");
+    testEnvironmentProperty("server.packages.href", "server.packages", "http://host:8888/path/osgi");
     testEnvironmentProperty("server.services.href", "server.services", "http://host:8888/path/services");
 
     testEnvironmentProperty("user.id", "user.id", "ABC");

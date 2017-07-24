@@ -34,7 +34,7 @@ define([
       reservedChars: "RESERVED-CHARS-1",
       server: {
         root: "http://host:8888/path-1",
-        osgiRoot: "http://host:8888/o-path-1",
+        packages: "http://host:8888/o-path-1",
         services: "http://host:8888/s-path-1"
       }
     };
@@ -50,7 +50,7 @@ define([
       reservedChars: "",
       server: {
         root: "",
-        osgiRoot: "",
+        packages: "",
         services: ""
       }
     };
@@ -66,7 +66,7 @@ define([
       reservedChars: null,
       server: {
         root: null,
-        osgiRoot: null,
+        packages: null,
         services: null
       }
     };
@@ -82,7 +82,7 @@ define([
       reservedChars: "RESERVED-CHARS",
       server: {
         root: "http://host:8888/path-2",
-        osgiRoot: "http://host:8888/o-path-2",
+        packages: "http://host:8888/o-path-2",
         services: "http://host:8888/s-path-2"
       }
     };
@@ -96,7 +96,7 @@ define([
       expect(environment.user.home).toBe(environmentSpec.user.home);
 
       expect(environment.server.root.href).toBe(environmentSpec.server.root);
-      expect(environment.server.osgiRoot.href).toBe(environmentSpec.server.osgiRoot);
+      expect(environment.server.packages.href).toBe(environmentSpec.server.packages);
       expect(environment.server.services.href).toBe(environmentSpec.server.services);
 
       expect(environment.reservedChars).toBe(environmentSpec.reservedChars);
@@ -111,7 +111,7 @@ define([
       expect(environment.user.home).toBe(null);
 
       expect(environment.server.root).toBe(null);
-      expect(environment.server.osgiRoot).toBe(null);
+      expect(environment.server.packages).toBe(null);
       expect(environment.server.services).toBe(null);
 
       expect(environment.reservedChars).toBe(null);
