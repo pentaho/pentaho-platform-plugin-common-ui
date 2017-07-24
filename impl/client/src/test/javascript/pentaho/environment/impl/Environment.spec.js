@@ -15,15 +15,15 @@
  */
 define([
   "pentaho/environment/impl/Environment"
-], function(Context) {
+], function(Environment) {
 
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false */
 
-  describe("pentaho.environment.impl.Context -", function() {
+  describe("pentaho.environment.impl.Environment -", function() {
 
-    var contextSpec = {
+    var environmentSpec = {
       application: "APP-1",
       theme: "THEME-1",
       locale: "LOCALE-1",
@@ -34,11 +34,12 @@ define([
       reservedChars: "RESERVED-CHARS-1",
       server: {
         root: "http://host:8888/path-1",
+        osgiRoot: "http://host:8888/o-path-1",
         services: "http://host:8888/s-path-1"
       }
     };
 
-    var emptyContextSpec = {
+    var emptyEnvironmentSpec = {
       application: "",
       theme: "",
       locale: "",
@@ -49,11 +50,12 @@ define([
       reservedChars: "",
       server: {
         root: "",
+        osgiRoot: "",
         services: ""
       }
     };
 
-    var nullContextSpec = {
+    var nullEnvironmentSpec = {
       application: null,
       theme: null,
       locale: null,
@@ -64,11 +66,12 @@ define([
       reservedChars: null,
       server: {
         root: null,
+        osgiRoot: null,
         services: null
       }
     };
 
-    var defaultContextSpec = {
+    var defaultEnvironmentSpec = {
       application: "APP",
       theme: "THEME",
       locale: "LOCALE",
@@ -79,135 +82,138 @@ define([
       reservedChars: "RESERVED-CHARS",
       server: {
         root: "http://host:8888/path-2",
+        osgiRoot: "http://host:8888/o-path-2",
         services: "http://host:8888/s-path-2"
       }
     };
 
-    function expectContextAndSpec(context, contextSpec) {
-      expect(context.application).toBe(contextSpec.application);
-      expect(context.theme).toBe(contextSpec.theme);
-      expect(context.locale).toBe(contextSpec.locale.toLowerCase());
+    function expectEnvironmentAndSpec(environment, environmentSpec) {
+      expect(environment.application).toBe(environmentSpec.application);
+      expect(environment.theme).toBe(environmentSpec.theme);
+      expect(environment.locale).toBe(environmentSpec.locale.toLowerCase());
 
-      expect(context.user.id).toBe(contextSpec.user.id);
-      expect(context.user.home).toBe(contextSpec.user.home);
+      expect(environment.user.id).toBe(environmentSpec.user.id);
+      expect(environment.user.home).toBe(environmentSpec.user.home);
 
-      expect(context.server.root.href).toBe(contextSpec.server.root);
-      expect(context.server.services.href).toBe(contextSpec.server.services);
+      expect(environment.server.root.href).toBe(environmentSpec.server.root);
+      expect(environment.server.osgiRoot.href).toBe(environmentSpec.server.osgiRoot);
+      expect(environment.server.services.href).toBe(environmentSpec.server.services);
 
-      expect(context.reservedChars).toBe(contextSpec.reservedChars);
+      expect(environment.reservedChars).toBe(environmentSpec.reservedChars);
     }
 
-    function expectContextNullValues(context) {
-      expect(context.application).toBe(null);
-      expect(context.theme).toBe(null);
-      expect(context.locale).toBe(null);
+    function expectEnvironmentNullValues(environment) {
+      expect(environment.application).toBe(null);
+      expect(environment.theme).toBe(null);
+      expect(environment.locale).toBe(null);
 
-      expect(context.user.id).toBe(null);
-      expect(context.user.home).toBe(null);
+      expect(environment.user.id).toBe(null);
+      expect(environment.user.home).toBe(null);
 
-      expect(context.server.root).toBe(null);
-      expect(context.server.services).toBe(null);
+      expect(environment.server.root).toBe(null);
+      expect(environment.server.osgiRoot).toBe(null);
+      expect(environment.server.services).toBe(null);
 
-      expect(context.reservedChars).toBe(null);
+      expect(environment.reservedChars).toBe(null);
     }
 
     it("is a function", function() {
-      expect(typeof Context).toBe("function");
+      expect(typeof Environment).toBe("function");
     });
 
-    describe("new Context(spec, [defaultSpec]) -", function() {
+    describe("new Environment(spec, [defaultSpec]) -", function() {
 
-      it("should return a Context instance", function() {
+      it("should return a Environment instance", function() {
 
-        var context = new Context();
-        expect(context instanceof Context).toBe(true);
+        var environment = new Environment();
+        expect(environment instanceof Environment).toBe(true);
       });
 
       it("should default properties to the default value specified", function() {
 
-        var context = new Context(null, defaultContextSpec);
+        var environment = new Environment(null, defaultEnvironmentSpec);
 
-        expectContextAndSpec(context, defaultContextSpec);
+        expectEnvironmentAndSpec(environment, defaultEnvironmentSpec);
       });
 
       it("should default properties to null when defaultSpec is not specified", function() {
 
-        var context = new Context();
+        var environment = new Environment();
 
-        expectContextNullValues(context);
+        expectEnvironmentNullValues(environment);
       });
 
       it("should default properties to null when defaultSpec contains empty values", function() {
 
-        var context = new Context(emptyContextSpec);
+        var environment = new Environment(emptyEnvironmentSpec);
 
-        expectContextNullValues(context);
+        expectEnvironmentNullValues(environment);
       });
 
       it("should set properties to the value specified", function() {
 
-        var context = new Context(contextSpec, defaultContextSpec);
+        var environment = new Environment(environmentSpec, defaultEnvironmentSpec);
 
-        expectContextAndSpec(context, contextSpec);
+        expectEnvironmentAndSpec(environment, environmentSpec);
 
-        context = new Context(contextSpec);
+        environment = new Environment(environmentSpec);
 
-        expectContextAndSpec(context, contextSpec);
+        expectEnvironmentAndSpec(environment, environmentSpec);
       });
     });
 
     describe("#toSpec()", function() {
 
       it("should return an object with the same values (except for a lower case locale)", function() {
-        var context = new Context(contextSpec);
+        var environment = new Environment(environmentSpec);
 
-        contextSpec.locale = contextSpec.locale.toLowerCase();
+        environmentSpec.locale = environmentSpec.locale.toLowerCase();
 
-        expect(context.toSpec()).toEqual(contextSpec);
+        expect(environment.toSpec()).toEqual(environmentSpec);
 
-        context = new Context();
+        environment = new Environment();
 
-        expect(context.toSpec()).toEqual(nullContextSpec);
+        expect(environment.toSpec()).toEqual(nullEnvironmentSpec);
       });
 
       it("should be the same method as toJSON", function() {
-        var context = new Context();
+        var environment = new Environment();
 
-        expect(context.toSpec).toBe(context.toJSON);
+        expect(environment.toSpec).toBe(environment.toJSON);
       });
     });
 
     describe("#createChild(childSpec)", function() {
 
-      it("should return an instance of Context", function() {
-        var context = new Context(contextSpec);
-        var childContext = context.createChild();
-        expect(childContext instanceof Context).toBe(true);
+      it("should return an instance of Environment", function() {
+        var environment = new Environment(environmentSpec);
+        var childEnvironment = environment.createChild();
+        expect(childEnvironment instanceof Environment).toBe(true);
       });
 
       it("should be a different instance", function() {
-        var context = new Context(contextSpec);
-        var childContext = context.createChild();
-        expect(childContext).not.toBe(context);
+        var environment = new Environment(environmentSpec);
+        var childEnvironment = environment.createChild();
+        expect(childEnvironment).not.toBe(environment);
       });
 
       it("should have the same information as the parent when no spec is specified", function() {
-        var context = new Context(contextSpec);
+        var environment = new Environment(environmentSpec);
 
-        contextSpec.locale = contextSpec.locale.toLowerCase();
+        environmentSpec.locale = environmentSpec.locale.toLowerCase();
 
-        var childContext = context.createChild();
-        expect(childContext.toSpec()).toEqual(contextSpec);
+        var childEnvironment = environment.createChild();
+        expect(childEnvironment.toSpec()).toEqual(environmentSpec);
       });
 
       it("should override the information specified in childSpec", function() {
-        var context = new Context(defaultContextSpec);
-        var childContext = context.createChild(contextSpec);
+        var environment = new Environment(defaultEnvironmentSpec);
+        var childEnvironment = environment.createChild(environmentSpec);
 
-        contextSpec.locale = contextSpec.locale.toLowerCase();
+        environmentSpec.locale = environmentSpec.locale.toLowerCase();
 
-        expect(childContext.toSpec()).toEqual(contextSpec);
+        expect(childEnvironment.toSpec()).toEqual(environmentSpec);
       });
     });
-  }); // pentaho.environment.impl.Context
+  }); // pentaho.environment.impl.Environment
 });
