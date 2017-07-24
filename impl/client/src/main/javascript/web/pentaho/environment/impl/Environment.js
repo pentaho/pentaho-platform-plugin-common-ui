@@ -76,6 +76,7 @@ define(["pentaho/util/has"], function(has) {
       // protocol
       // pathname
       root: createURL(readVar(propSpec, "root", propSpecDef)),
+      osgiRoot: createURL(readVar(propSpec, "osgiRoot", propSpecDef)),
       services: createURL(readVar(propSpec, "services", propSpecDef))
     };
 
@@ -101,6 +102,7 @@ define(["pentaho/util/has"], function(has) {
         },
         server: {
           root: this.server.root && this.server.root.href,
+          osgiRoot: this.server.osgiRoot && this.server.osgiRoot.href,
           services: this.server.services && this.server.services.href
         },
         reservedChars: this.reservedChars
