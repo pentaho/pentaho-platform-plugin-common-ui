@@ -37,7 +37,7 @@
  */
 
 /**
- * Gets the base url to access osgi resources of the web server application.
+ * Gets the base url to access web packages of the web server application.
  *
  * @name packages
  * @memberOf pentaho.environment.IServer#
