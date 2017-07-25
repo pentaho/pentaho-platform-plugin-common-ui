@@ -31,6 +31,14 @@
  */
 
 /**
+ * The base url to access web packages of the web server application.
+ *
+ * @name packages
+ * @memberOf pentaho.environment.spec.IServer#
+ * @type {?nonEmptyString}
+ */
+
+/**
  * The base url of services' endpoints of the web server application.
  *
  * @name services

@@ -89,12 +89,12 @@ define([
     /**
      * Tests that an environment variable is properly implemented.
      *
-     * @param {string} propPath - The name of the context property.
-     * @param {string} specPropPath - The name of the context specification property.
+     * @param {string} propPath - The name of the environment property.
+     * @param {string} specPropPath - The name of the environment specification property.
      * @param {object} value - The value to set and read.
      * @param {object} valueRead - The value to read. Defaults to `value`.
      */
-    function testContextProperty(propPath, specPropPath, value, valueRead) {
+    function testEnvironmentProperty(propPath, specPropPath, value, valueRead) {
 
       if(valueRead === undefined) valueRead = value;
 
@@ -102,38 +102,39 @@ define([
 
         it("should have a null value when " + specPropPath + " is undefined", function() {
 
-          return require.using(["pentaho/environment"], mockConfigWith(), function(contextVars) {
-            expect(getPath(contextVars, propPath, null)).toBe(null);
+          return require.using(["pentaho/environment"], mockConfigWith(), function(environmentVars) {
+            expect(getPath(environmentVars, propPath, null)).toBe(null);
           });
         });
 
         it("should have a null value when " + specPropPath + " is empty", function() {
 
-          return require.using(["pentaho/environment"], mockConfigWith(specPropPath, ""), function(contextVars) {
-            expect(getPath(contextVars, propPath, null)).toBe(null);
+          return require.using(["pentaho/environment"], mockConfigWith(specPropPath, ""), function(environmentVars) {
+            expect(getPath(environmentVars, propPath, null)).toBe(null);
           });
         });
 
         it("should respect a non-empty " + specPropPath + " value", function() {
 
-          return require.using(["pentaho/environment"], mockConfigWith(specPropPath, value), function(contextVars) {
-            expect(getPath(contextVars, propPath, null)).toBe(valueRead);
+          return require.using(["pentaho/environment"], mockConfigWith(specPropPath, value), function(environmentVars) {
+            expect(getPath(environmentVars, propPath, null)).toBe(valueRead);
           });
         });
       });
     }
 
-    testContextProperty("application", "application", "ABC");
-    testContextProperty("server.root.href", "server.root", "http://host:8888/path");
-    testContextProperty("server.services.href", "server.services", "http://host:8888/path/services");
+    testEnvironmentProperty("application", "application", "ABC");
+    testEnvironmentProperty("server.root.href", "server.root", "http://host:8888/path");
+    testEnvironmentProperty("server.packages.href", "server.packages", "http://host:8888/path/osgi");
+    testEnvironmentProperty("server.services.href", "server.services", "http://host:8888/path/services");
 
-    testContextProperty("user.id", "user.id", "ABC");
-    testContextProperty("user.home", "user.home", "ABC");
+    testEnvironmentProperty("user.id", "user.id", "ABC");
+    testEnvironmentProperty("user.home", "user.home", "ABC");
 
-    testContextProperty("theme", "theme", "ABC");
-    testContextProperty("locale", "locale", "ABC", "abc");
+    testEnvironmentProperty("theme", "theme", "ABC");
+    testEnvironmentProperty("locale", "locale", "ABC", "abc");
 
-    testContextProperty("reservedChars", "reservedChars", "ABC");
+    testEnvironmentProperty("reservedChars", "reservedChars", "ABC");
 
   }); // pentaho.environment
 });

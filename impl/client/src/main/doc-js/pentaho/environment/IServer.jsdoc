@@ -30,14 +30,23 @@
  * a replacement object is provided that supports, at a minimum, its `href`, `pathname` and `protocol`
  * properties.
  *
- * @name url
+ * @name root
  * @memberOf pentaho.environment.IServer#
  * @type {URL}
  * @readOnly
  */
 
 /**
- * The base url of services' endpoints of the web server application.
+ * Gets the base url to access web packages of the web server application.
+ *
+ * @name packages
+ * @memberOf pentaho.environment.IServer#
+ * @type {URL}
+ * @readOnly
+ */
+
+/**
+ * Gets the base url of services' endpoints of the web server application.
  *
  * @name services
  * @memberOf pentaho.environment.IServer#
