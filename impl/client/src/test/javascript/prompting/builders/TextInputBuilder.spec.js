@@ -124,6 +124,7 @@ define(['common-ui/prompting/builders/TextInputBuilder', 'dojo/number', 'common-
         setParameter: function() { },
         getParameterValue: function() { return parameterValue; }
       };
+      spyOn(DojoNumber, "format").and.callFake(function(val) { return val; });
 
       component.update();
       spyOn($.fn, 'attr').and.callThrough();

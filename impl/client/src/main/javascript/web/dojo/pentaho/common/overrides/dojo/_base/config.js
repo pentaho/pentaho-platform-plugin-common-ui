@@ -185,7 +185,12 @@ return {
 		adviseHas(result.has, "", 1);
 	}
 
-	if(!result.locale && typeof navigator != "undefined"){
+	if(!result.locale && typeof window !== "undefined" && window.SESSION_LOCALE){
+		// Default locale for pentaho platform.
+		result.locale = window.SESSION_LOCALE.toLowerCase().replace("_", "-");
+	}
+
+	if(!result.locale && typeof navigator !== "undefined"){
 		// Default locale for browsers.
 		result.locale = (navigator.language || navigator.userLanguage).toLowerCase();
 	}
