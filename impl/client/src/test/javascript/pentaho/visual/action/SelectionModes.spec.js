@@ -43,47 +43,51 @@ define([
     var OrFilter;
     var NotFilter;
 
-    beforeEach(function() {
-      var context = new Context();
+    beforeEach(function(done) {
 
-      var Model = context.get(modelFactory);
-      var View = context.get(viewFactory);
+      Context.createAsync()
+          .then(function(context) {
 
-      var IsInFilter = context.get(isInFilterFactory);
-      IsEqFilter = context.get(isEqFilterFactory);
-      AndFilter = context.get(andFilterFactory);
-      OrFilter = context.get(orFilterFactory);
-      NotFilter = context.get(notFilterFactory);
+            var Model = context.get(modelFactory);
+            var View = context.get(viewFactory);
 
-      sales12k  = new IsInFilter({property: "sales", values: [{_: "number", v: 12000}]});
-      countryPt = new IsEqFilter({property: "country", value: {_: "string", v: "Portugal"}});
-      inStock   = new IsEqFilter({property: "inStock", value: {_: "string", v: "true"}});
-      myFilter  = new AndFilter({operands: [sales12k, inStock]});
+            var IsInFilter = context.get(isInFilterFactory);
+            IsEqFilter = context.get(isEqFilterFactory);
+            AndFilter = context.get(andFilterFactory);
+            OrFilter = context.get(orFilterFactory);
+            NotFilter = context.get(notFilterFactory);
 
-      var dataSpec = {
-        model: [
-          {name: "country", type: "string"},
-          {name: "sales", type: "number"},
-          {name: "inStock", type: "string"}
-        ],
-        rows: [
-          {c: [{v: "Portugal"}, {v: 12000}, {v: "true" }]},
-          {c: [{v: "Ireland" }, {v:  6000}, {v: "false"}]},
-          {c: [{v: "France"  }, {v: 50000}, {v: "true" }]},
-          {c: [{v: "Germany" }, {v: 12000}, {v: "false"}]},
-          {c: [{v: "Italy"   }, {v: 12000}, {v: "false"}]}
-        ]
-      };
+            sales12k  = new IsInFilter({property: "sales", values: [{_: "number", v: 12000}]});
+            countryPt = new IsEqFilter({property: "country", value: {_: "string", v: "Portugal"}});
+            inStock   = new IsEqFilter({property: "inStock", value: {_: "string", v: "true"}});
+            myFilter  = new AndFilter({operands: [sales12k, inStock]});
 
-      model = new Model({
-        data: new Table(dataSpec)
-      });
+            var dataSpec = {
+              model: [
+                {name: "country", type: "string"},
+                {name: "sales", type: "number"},
+                {name: "inStock", type: "string"}
+              ],
+              rows: [
+                {c: [{v: "Portugal"}, {v: 12000}, {v: "true" }]},
+                {c: [{v: "Ireland" }, {v:  6000}, {v: "false"}]},
+                {c: [{v: "France"  }, {v: 50000}, {v: "true" }]},
+                {c: [{v: "Germany" }, {v: 12000}, {v: "false"}]},
+                {c: [{v: "Italy"   }, {v: 12000}, {v: "false"}]}
+              ]
+            };
 
-      view = new View({
-        width: 1,
-        height: 1,
-        model: model
-      });
+            model = new Model({
+              data: new Table(dataSpec)
+            });
+
+            view = new View({
+              width: 1,
+              height: 1,
+              model: model
+            });
+          })
+          .then(done, done.fail);
     });
 
     describe("replace -", function() {

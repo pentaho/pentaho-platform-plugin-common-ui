@@ -24,8 +24,18 @@ define([
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, spyOn:false, jasmine:false*/
 
   describe("pentaho.type.SpecificationContext", function() {
-    var context = new Context();
-    var Instance = context.get("instance");
+
+    var context;
+    var Instance;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Instance = context.get("instance");
+          })
+          .then(done, done.fail);
+    });
 
     beforeEach(function() {
       // J.I.C.

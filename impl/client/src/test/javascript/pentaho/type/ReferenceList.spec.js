@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/ReferenceList",
-  "pentaho/type/Context",
-  "tests/pentaho/util/errorMatch"
-], function(ReferenceList, Context, errorMatch) {
+  "pentaho/type/ReferenceList"
+], function(ReferenceList) {
 
   "use strict";
 

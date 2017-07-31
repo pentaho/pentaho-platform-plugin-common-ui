@@ -125,7 +125,7 @@ define([
     },
 
     /** @inheritdoc */
-    select: function(typeId, context) {
+    selectAsync: function(typeId, context) {
       var rules = this.__ruleStore[typeId] || [];
       var filtered_rules = rules.filter(_ruleFilterer, context || {});
       var configs = filtered_rules.map(function(rule) {
@@ -133,10 +133,10 @@ define([
       });
 
       if(configs.length === 0) {
-        return null;
+        return Promise.resolve(null);
       }
 
-      return configs.reduce(specUtil.merge.bind(specUtil), {});
+      return Promise.resolve(configs.reduce(specUtil.merge.bind(specUtil), {}));
     }
   });
 

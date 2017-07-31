@@ -23,72 +23,85 @@ define([
 
   describe("pentaho.type.Complex", function() {
 
-    var context = new Context();
-
-    var Complex = context.get("pentaho/type/complex");
-
-    var TestLevel1 = Complex.extend("TestLevel1", {
-      $type: {
-        label: "TestLevel1",
-        props: [
-          "type"
-        ]
-      }
-    });
-
-    var TestLevel2 = TestLevel1.extend("TestLevel2", {
-      $type: {
-        label: "TestLevel2",
-        props: [
-          "name"
-        ]
-      }
-    });
-
-    var Derived = Complex.extend({
-      $type: {
-        label: "Derived",
-        props: [
-          {name: "quantity", valueType: "number"},
-          "type",
-          {name: "noFormat", valueType: "number"},
-          {name: "anything", valueType: TestLevel1},
-          {
-            name: "sub",
-            valueType: {
-              props: [
-                {name: "truth", valueType: "boolean"},
-                {name: "when", valueType: "date"}
-              ]
-            }
-          },
-          {name: "sameAsDefault", valueType: "number", defaultValue: 0},
-          {name: "noValue", valueType: "number"},
-          {name: "emptyListEmptyDefault", valueType: ["number"]},
-          {name: "emptyListWithDefault", valueType: ["number"], defaultValue: [1, 2, 3]},
-          {name: "nonEmptyList", valueType: ["number"]}
-        ]
-      }
-    });
-
-    var whenDate = new Date();
-    var originalSpec = {
-      quantity: {v: 20, f: "I'm a simple 20"},
-      type: {v: "bar", f: "I'm a bar"},
-      noFormat: 50,
-      anything: new TestLevel2({"name": "concrete", "type": "Level2"}),
-      sub: {
-        truth: {v: true, f: "I'm a nested true"},
-        when: whenDate
-      },
-      sameAsDefault: 0,
-      noValue: null,
-      emptyListEmptyDefault: [],
-      emptyListWithDefault: [],
-      nonEmptyList: [1, 2, 3]
-    };
-
+    var context;
+    var Complex;
+    var TestLevel1;
+    var TestLevel2;
+    var Derived;
+    var whenDate;
+    var originalSpec;
     var value;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Complex = context.get("pentaho/type/complex");
+
+            TestLevel1 = Complex.extend("TestLevel1", {
+              $type: {
+                label: "TestLevel1",
+                props: [
+                  "type"
+                ]
+              }
+            });
+
+            TestLevel2 = TestLevel1.extend("TestLevel2", {
+              $type: {
+                label: "TestLevel2",
+                props: [
+                  "name"
+                ]
+              }
+            });
+
+            Derived = Complex.extend({
+              $type: {
+                label: "Derived",
+                props: [
+                  {name: "quantity", valueType: "number"},
+                  "type",
+                  {name: "noFormat", valueType: "number"},
+                  {name: "anything", valueType: TestLevel1},
+                  {
+                    name: "sub",
+                    valueType: {
+                      props: [
+                        {name: "truth", valueType: "boolean"},
+                        {name: "when", valueType: "date"}
+                      ]
+                    }
+                  },
+                  {name: "sameAsDefault", valueType: "number", defaultValue: 0},
+                  {name: "noValue", valueType: "number"},
+                  {name: "emptyListEmptyDefault", valueType: ["number"]},
+                  {name: "emptyListWithDefault", valueType: ["number"], defaultValue: [1, 2, 3]},
+                  {name: "nonEmptyList", valueType: ["number"]}
+                ]
+              }
+            });
+
+            whenDate = new Date();
+
+            originalSpec = {
+              quantity: {v: 20, f: "I'm a simple 20"},
+              type: {v: "bar", f: "I'm a bar"},
+              noFormat: 50,
+              anything: new TestLevel2({"name": "concrete", "type": "Level2"}),
+              sub: {
+                truth: {v: true, f: "I'm a nested true"},
+                when: whenDate
+              },
+              sameAsDefault: 0,
+              noValue: null,
+              emptyListEmptyDefault: [],
+              emptyListWithDefault: [],
+              nonEmptyList: [1, 2, 3]
+            };
+          })
+          .then(done, done.fail);
+    });
 
     describe("#toSpecInContext(keyArgs)", function() {
       var scope;

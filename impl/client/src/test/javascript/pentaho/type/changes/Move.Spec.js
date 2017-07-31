@@ -23,21 +23,25 @@ define([
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false */
 
   describe("pentaho.type.changes.Move", function() {
+
     var context, List, NumberList, DerivedComplex, ComplexList;
 
-    beforeEach(function() {
-      context = new Context();
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            List = context.get(["element"]);
 
-      List = context.get(["element"]);
+            NumberList = context.get(["number"]);
 
-      NumberList = context.get(["number"]);
-
-      DerivedComplex = context.get({
-        props: [
-          {name: "foo", valueType: "number"}
-        ]
-      });
-      ComplexList = context.get([DerivedComplex]);
+            DerivedComplex = context.get({
+              props: [
+                {name: "foo", valueType: "number"}
+              ]
+            });
+            ComplexList = context.get([DerivedComplex]);
+          })
+          .then(done, done.fail);
     });
 
     it("should be defined", function() {

@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/model",
   "pentaho/type/Context"
-], function(modelFactory, Context) {
+], function(Context) {
 
   "use strict";
 
@@ -24,16 +23,19 @@ define([
 
   describe("pentaho.type.Model -", function() {
 
-    it("is a function", function() {
-      expect(typeof modelFactory).toBe("function");
+    var Model;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(context) {
+            Model = context.get("pentaho/type/model");
+          })
+          .then(done, done.fail);
     });
 
-    describe("new Model()", function() {
-      var Model;
 
-      beforeEach(function() {
-        Model = modelFactory(new Context());
-      });
+
+    describe("new Model()", function() {
 
       it("should be a function", function() {
         expect(typeof Model).toBe("function");
@@ -61,12 +63,6 @@ define([
     });
 
     describe("#toSpecInContext(keyArgs)", function() {
-
-      var Model;
-
-      beforeEach(function() {
-        Model = modelFactory(new Context());
-      });
 
       it("should return an object", function() {
         var model = new Model();

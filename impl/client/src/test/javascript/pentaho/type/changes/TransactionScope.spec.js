@@ -26,8 +26,18 @@ define([
 
   describe("pentaho.type.changes.TransactionScope", function() {
 
+    var context;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+          })
+          .then(done, done.fail);
+    });
+
     describe("new(context, transaction)", function() {
-      it("should be defined", function () {
+      it("should be defined", function() {
         expect(typeof TransactionScope).toBeDefined();
       });
     });
@@ -36,7 +46,6 @@ define([
 
       it("should return true if txn and scope just created", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
 
@@ -47,7 +56,6 @@ define([
 
       it("should return false if scope not exited but not current", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope1 = new TransactionScope(context, txn);
         var scope2 = new TransactionScope(context, txn);
@@ -60,7 +68,6 @@ define([
 
       it("should return false if scope exited", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
 
@@ -71,7 +78,6 @@ define([
 
       it("should return false if scope is current but is not root", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope1 = new TransactionScope(context, txn);
         var scope2 = new TransactionScope(context, txn);
@@ -85,10 +91,9 @@ define([
     });
 
     describe("#using(fun, ctx)", function() {
-      var context, txn, scope;
+      var txn, scope;
 
       beforeEach(function() {
-        context = new Context();
         txn = new Transaction(context);
         scope = new TransactionScope(context, txn);
       });
@@ -99,7 +104,6 @@ define([
           scope = null;
         }
         txn = null;
-        context = null;
       });
 
       it("should call the specified function", function() {
@@ -247,7 +251,6 @@ define([
 
       it("should call txn _preview if current", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
 
@@ -261,7 +264,6 @@ define([
 
       it("should call txn _preview and return its value if current", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
         var result = {};
@@ -276,7 +278,6 @@ define([
 
       it("should throw if scope not exited but not current", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope1 = new TransactionScope(context, txn);
         var scope2 = new TransactionScope(context, txn);
@@ -291,7 +292,6 @@ define([
 
       it("should throw if scope exited", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
 
@@ -307,7 +307,6 @@ define([
 
       it("should call txn __reject if current", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
 
@@ -321,7 +320,6 @@ define([
 
       it("should call txn __reject with the given reason, if current", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
         var reason = {};
@@ -336,7 +334,6 @@ define([
 
       it("should call txn __reject and throw its error, if current", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
         var ex = new Error();
@@ -351,7 +348,6 @@ define([
 
       it("should throw if scope not exited but not current", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope1 = new TransactionScope(context, txn);
         var scope2 = new TransactionScope(context, txn);
@@ -366,7 +362,6 @@ define([
 
       it("should throw if scope exited", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
 
@@ -382,7 +377,6 @@ define([
 
       it("should call txn __commit if current and root", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
 
@@ -396,7 +390,6 @@ define([
 
       it("should return this, if current and root", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
 
@@ -407,7 +400,6 @@ define([
 
       it("should not call txn __commit and should simply call exit if cannot commit", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope1 = new TransactionScope(context, txn);
         var scope2 = new TransactionScope(context, txn);
@@ -423,7 +415,6 @@ define([
 
       it("should throw if scope not exited but not current", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope1 = new TransactionScope(context, txn);
         var scope2 = new TransactionScope(context, txn);
@@ -438,7 +429,6 @@ define([
 
       it("should throw if scope exited", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
 

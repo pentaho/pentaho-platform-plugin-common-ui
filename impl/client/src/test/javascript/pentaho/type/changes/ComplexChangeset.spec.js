@@ -19,13 +19,9 @@ define([
   "pentaho/type/changes/Replace",
   "pentaho/type/changes/Add",
   "pentaho/type/Context",
-  "pentaho/type/complex",
-  "pentaho/type/list",
-  "pentaho/type/number",
   "pentaho/lang/Base",
   "tests/pentaho/util/errorMatch"
-], function(ComplexChangeset, ListChangeset, Replace, Add,
-            Context, complexFactory, listFactory, numberFactory, Base, errorMatch) {
+], function(ComplexChangeset, ListChangeset, Replace, Add, Context, Base, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
@@ -33,25 +29,29 @@ define([
   describe("pentaho.type.ComplexChangeset -", function() {
     var context, Complex, List, PentahoNumber, NumberList, Derived;
 
-    beforeEach(function() {
-      context = new Context();
-      Complex = context.get(complexFactory);
-      List = context.get(listFactory);
-      PentahoNumber = context.get(numberFactory);
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Complex = context.get("pentaho/type/complex");
+            List = context.get("pentaho/type/list");
+            PentahoNumber = context.get("pentaho/type/number");
 
-      NumberList = List.extend({
-        $type: {of: PentahoNumber}
-      });
+            NumberList = List.extend({
+              $type: {of: PentahoNumber}
+            });
 
-      Derived = Complex.extend({
-        $type: {
-          props: [
-            {name: "foo", valueType: "number"},
-            {name: "bar", valueType: "number"},
-            {name: "myList", valueType: NumberList}
-          ]
-        }
-      });
+            Derived = Complex.extend({
+              $type: {
+                props: [
+                  {name: "foo", valueType: "number"},
+                  {name: "bar", valueType: "number"},
+                  {name: "myList", valueType: NumberList}
+                ]
+              }
+            });
+          })
+          .then(done, done.fail);
     });
 
     it("should be defined.", function () {

@@ -74,7 +74,7 @@ define([
     o[steps[j]] = v;
   }
 
-  function itFillSpecAttribute(BaseInstCtor, name, valueIn, result, valueOut) {
+  function itFillSpecAttribute(getBaseInstCtor, name, valueIn, result, valueOut) {
     var msg;
     if(result) {
       if(arguments.length < 5) valueOut = valueIn;
@@ -94,9 +94,9 @@ define([
       }
 
       var spec = {};
-      var actualResult = fillSpec(BaseInstCtor, spec, typeSpec);
+      var actualResult = fillSpec(getBaseInstCtor(), spec, typeSpec);
 
-      //console.log(JSON.stringify(spec));
+      // console.log(JSON.stringify(spec));
 
       expect(actualResult).toBe(result);
 
@@ -109,12 +109,12 @@ define([
     });
   }
 
-  function itFillSpecMethodAttribute(BaseInstCtor, name) {
+  function itFillSpecMethodAttribute(getBaseInstCtor, name) {
 
     var valueNoBase = function() {};
     valueNoBase.toTestString = function() { return "'method that does not call base'"; };
 
-    itFillSpecAttribute(BaseInstCtor, name, valueNoBase, true);
+    itFillSpecAttribute(getBaseInstCtor, name, valueNoBase, true);
 
     // ---
 
@@ -122,7 +122,7 @@ define([
 
     valueCallsBase.toTestString = function() { return "'method that calls base'"; };
 
-    itFillSpecAttribute(BaseInstCtor, name, valueCallsBase, true);
+    itFillSpecAttribute(getBaseInstCtor, name, valueCallsBase, true);
 
     // ---
 
@@ -131,7 +131,7 @@ define([
       toTestString: function() { return "'method inherited'"; }
     };
 
-    itFillSpecAttribute(BaseInstCtor, name, valueInherited, false);
+    itFillSpecAttribute(getBaseInstCtor, name, valueInherited, false);
   }
 
 });

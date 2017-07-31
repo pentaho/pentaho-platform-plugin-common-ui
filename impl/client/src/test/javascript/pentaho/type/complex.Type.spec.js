@@ -23,14 +23,27 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  var context = new Context();
-  var Property = context.get("property");
-  var PropertyType = Property.Type;
-  var Value = context.get("value");
-  var Complex = context.get("complex");
-  var PentahoString = context.get("string");
-
   describe("pentaho.type.Complex.Type", function() {
+
+    var context;
+    var Property;
+    var PropertyType;
+    var Value;
+    var Complex;
+    var PentahoString;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Property = context.get("property");
+            PropertyType = Property.Type;
+            Value = context.get("value");
+            Complex = context.get("complex");
+            PentahoString = context.get("string");
+          })
+          .then(done, done.fail);
+    });
 
     describe("anatomy", function() {
       it("should be a function", function() {
@@ -98,10 +111,15 @@ define([
         }); // when not specified or specified empty
 
         describe("when specified with a single 'string' entry", function() {
-          var Derived = Complex.extend({
-            $type: {
-              props: ["fooBar"]
-            }
+          var Derived;
+
+          beforeEach(function() {
+
+            Derived = Complex.extend({
+              $type: {
+                props: ["fooBar"]
+              }
+            });
           });
 
           it("should result in a single property", function() {
@@ -109,7 +127,11 @@ define([
           });
 
           describe("the single property type", function() {
-            var propType = Derived.type.at(0);
+            var propType;
+
+            beforeEach(function() {
+              propType = Derived.type.at(0);
+            });
 
             it("should have `label` derived by 'capitalization' of name", function() {
               expect(propType.label).toBe("Foo Bar");
@@ -138,10 +160,15 @@ define([
         });
 
         describe("when specified with two entries", function() {
-          var Derived = Complex.extend({
-            $type: {
-              props: ["fooBar", "guru"]
-            }
+
+          var Derived;
+
+          beforeEach(function() {
+            Derived = Complex.extend({
+              $type: {
+                props: ["fooBar", "guru"]
+              }
+            });
           });
 
           it("should result in 2 properties", function() {
@@ -171,18 +198,25 @@ define([
         });
 
         describe("when specified with with an entry that overrides a base type property", function() {
-          var A = Complex.extend({
-            $type: {
-              label: "A",
-              props: ["fooBar", "guru"]
-            }
-          });
 
-          var B = A.extend({
-            $type: {
-              label: "B",
-              props: [{name: "guru", label: "HELLO"}]
-            }
+          var A;
+          var B;
+
+          beforeEach(function() {
+
+            A = Complex.extend({
+              $type: {
+                label: "A",
+                props: ["fooBar", "guru"]
+              }
+            });
+
+            B = A.extend({
+              $type: {
+                label: "B",
+                props: [{name: "guru", label: "HELLO"}]
+              }
+            });
           });
 
           it("should create a sub-property", function() {
@@ -205,18 +239,24 @@ define([
         });
 
         describe("when specified with with an entry that is not a base type property", function() {
-          var A = Complex.extend({
-            $type: {
-              label: "A",
-              props: ["fooBar", "guru"]
-            }
-          });
 
-          var B = A.extend({
-            $type: {
-              label: "B",
-              props: [{name: "guru", label: "HELLO"}, {name: "babah"}]
-            }
+          var A;
+          var B;
+
+          beforeEach(function() {
+            A = Complex.extend({
+              $type: {
+                label: "A",
+                props: ["fooBar", "guru"]
+              }
+            });
+
+            B = A.extend({
+              $type: {
+                label: "B",
+                props: [{name: "guru", label: "HELLO"}, {name: "babah"}]
+              }
+            });
           });
 
           it("should append a new property", function() {
@@ -230,6 +270,7 @@ define([
         });
 
         describe("when specified with with a dictionary", function() {
+
           it("should define the defined properties", function() {
             var A = Complex.extend({
               $type: {
@@ -315,13 +356,19 @@ define([
     });
 
     describe("#has(name)", function() {
-      var Derived = Complex.extend({$type: {
-        props: ["foo", "bar"]
-      }});
 
-      var DerivedB = Derived.extend({$type: {
-        props: [{name: "bar", label: "HELLO"}]
-      }});
+      var Derived;
+      var DerivedB;
+
+      beforeEach(function() {
+        Derived = Complex.extend({$type: {
+          props: ["foo", "bar"]
+        }});
+
+        DerivedB = Derived.extend({$type: {
+          props: [{name: "bar", label: "HELLO"}]
+        }});
+      });
 
       it("should return false when given no arguments", function() {
         expect(Complex.type.has()).toBe(false);
@@ -364,15 +411,19 @@ define([
 
     describe("#at(index[, sloppy])", function() {
 
-      var Derived = Complex.extend({$type: {
-        props: ["foo", "bar"]
-      }});
+      var Derived;
+
+      function getter(args) {
+        return Complex.type.at.apply(Complex.type, args);
+      }
+
+      beforeEach(function() {
+        Derived = Complex.extend({$type: {
+          props: ["foo", "bar"]
+        }});
+      });
 
       describe("when index is nully", function() {
-
-        function getter(args) {
-          return Complex.type.at.apply(Complex.type, args);
-        }
 
         var strictError = errorMatch.argRequired("index");
 
@@ -381,10 +432,6 @@ define([
       });
 
       describe("when index is out of range", function() {
-
-        function getter(args) {
-          return Complex.type.at.apply(Complex.type, args);
-        }
 
         var sloppyResult = null;
         var strictError = errorMatch.argRange("index");
@@ -407,13 +454,17 @@ define([
     });
 
     describe("#get(name[, sloppy])", function() {
-      var Derived = Complex.extend({$type: {
-        props: ["foo", "bar"]
-      }});
+      var Derived;
 
       function getter(args) {
         return Derived.type.get.apply(Derived.type, args);
       }
+
+      beforeEach(function() {
+        Derived = Complex.extend({$type: {
+          props: ["foo", "bar"]
+        }});
+      });
 
       describe("when name is not specified or is nully", function() {
 
@@ -447,11 +498,10 @@ define([
       });
 
       describe("when the derived type has no properties and given some property argument", function() {
-        var Derived = Complex.extend();
 
-        function getter(args) {
-          return Derived.type.get.apply(Derived.type, args);
-        }
+        beforeEach(function() {
+          Derived = Complex.extend();
+        });
 
         var strictError = errorMatch.argInvalid("name");
         var sloppyResult = null;
@@ -460,24 +510,55 @@ define([
       });
 
       describe("when given a property type object that it contains", function() {
-        var propType = Derived.type.at(0);
-        var result = propType;
 
-        sloppyModeUtil.itShouldReturnValueWhateverTheSloppyValue(getter, [propType], result);
+        it("should return it, when sloppy is unspecified or has any other value", function() {
+          var propType = Derived.type.at(0);
+
+          expect(Derived.type.get(propType)).toBe(propType);
+          expect(Derived.type.get(propType, false)).toBe(propType);
+          expect(Derived.type.get(propType, null)).toBe(propType);
+          expect(Derived.type.get(propType, undefined)).toBe(propType);
+          expect(Derived.type.get(propType, true)).toBe(propType);
+        });
       });
 
       describe("when given a property type object from a different complex type", function() {
-        var OtherDerived = Complex.extend({
-          $type: {
-            props: ["fooBar"]
-          }
-        });
 
-        var otherPropType = OtherDerived.type.at(0);
         var strictError = errorMatch.argInvalid("name");
         var sloppyResult = null;
+        var OtherDerived;
+        var otherPropType;
+        var args;
 
-        sloppyModeUtil.itShouldBehaveStrictlyUnlessSloppyIsTrue(getter, [otherPropType], sloppyResult, strictError);
+        beforeEach(function() {
+          OtherDerived = Complex.extend({
+            $type: {
+              props: ["fooBar"]
+            }
+          });
+          otherPropType = OtherDerived.type.at(0);
+          args = [otherPropType];
+        });
+
+        // sloppyModeUtils.itShouldBehaveStrictlyUnlessSloppyIsTrue
+
+        it("should throw when sloppy is unspecified, false, null or undefined", function() {
+
+          expect(function() { getter(args); }).toThrow(strictError);
+
+          function expectIt(sloppy) {
+            expect(function() { getter(args.concat(sloppy)); }).toThrow(strictError);
+          }
+
+          expectIt(false);
+          expectIt(null);
+          expectIt(undefined);
+        });
+
+        it("should return `" + sloppyResult + "` when sloppy is true", function() {
+          var sloppy = true;
+          expect(getter(args.concat(sloppy))).toBe(sloppyResult);
+        });
       });
     });
 

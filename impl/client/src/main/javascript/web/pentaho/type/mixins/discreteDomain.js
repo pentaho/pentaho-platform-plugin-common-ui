@@ -23,7 +23,9 @@ define([
 
   "use strict";
 
-  return function(context) {
+  // This should be Property, however, because the mixin is applied to Property itself,
+  // we have to derive from Instance instead (or a cycle would be formed).
+  return ["instance", function(Instance) {
 
     /**
      * @name pentaho.type.mixins.DiscreteDomain.Type
@@ -56,11 +58,8 @@ define([
      * @description This class was not designed to be constructed directly.
      */
 
-    // This should be Property, however, because the mixin is applied to Property itself,
-    // we have to derive from Instance instead (or a cycle would be formed).
-    var Instance = context.get("instance");
-
     return Instance.extend(/** @lends pentaho.type.mixins.DiscreteDomain# */{
+
       $type: /** @lends pentaho.type.mixins.DiscreteDomain.Type# */{
         id: module.id,
 
@@ -212,5 +211,5 @@ define([
         }
       }
     });
-  };
+  }];
 });

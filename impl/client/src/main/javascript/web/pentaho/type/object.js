@@ -15,10 +15,9 @@
  */
 define([
   "module",
-  "./simple",
   "../util/object",
   "../i18n!types"
-], function(module, simpleFactory, O, bundle) {
+], function(module, O, bundle) {
 
   "use strict";
 
@@ -31,9 +30,7 @@ define([
     enumerable:   false
   };
 
-  return function(context) {
-
-    var __Simple = context.get(simpleFactory);
+  return ["simple", function(Simple) {
 
     /**
      * @name pentaho.type.Object
@@ -45,7 +42,7 @@ define([
      *
      * @description Creates an object instance.
      */
-    var PenObject = __Simple.extend(/** @lends pentaho.type.Object# */{
+    var PenObject = Simple.extend(/** @lends pentaho.type.Object# */{
 
       constructor: function(spec) {
 
@@ -93,5 +90,5 @@ define([
     });
 
     return PenObject;
-  };
+  }];
 });

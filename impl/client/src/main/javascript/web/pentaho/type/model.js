@@ -15,15 +15,12 @@
  */
 define([
   "module",
-  "./complex",
   "../i18n!types"
-], function(module, complexFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
-
-    var Complex = context.get(complexFactory);
+  return ["complex", "application", function(Complex, Application) {
 
     /**
      * @name pentaho.type.Model.Type
@@ -90,7 +87,7 @@ define([
            */
           {
             name: "application",
-            valueType: "pentaho/type/application"
+            valueType: Application
           }
         ]
       }
@@ -100,5 +97,5 @@ define([
     });
 
     return Model;
-  };
+  }];
 });

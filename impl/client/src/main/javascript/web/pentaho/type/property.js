@@ -15,10 +15,8 @@
  */
 define([
   "module",
-  "./instance",
   "./util",
   "./ValidationError",
-  "./mixins/discreteDomain",
   "../i18n!types",
   "../lang/_AnnotatableLinked",
   "../util/arg",
@@ -26,16 +24,15 @@ define([
   "../util/object",
   "../util/text",
   "../util/fun"
-], function(module, instanceFactory, typeUtil, ValidationError, discreteDomainFactory, bundle, AnnotatableLinked,
-            arg, error, O, text, F) {
+], function(module, typeUtil, ValidationError, bundle, AnnotatableLinked, arg, error, O, text, F) {
 
   "use strict";
 
   var _defaultTypeMid = "string";
 
-  return function(context) {
+  return ["instance", "pentaho/type/mixins/discreteDomain", function(Instance, DiscreteDomain) {
 
-    var __Instance = context.get(instanceFactory);
+    var context = this;
 
     var __propType;
 
@@ -78,7 +75,7 @@ define([
      * @see pentaho.type.Complex
      */
 
-    var Property = __Instance.extend(/** @lends pentaho.type.Property# */{
+    var Property = Instance.extend(/** @lends pentaho.type.Property# */{
 
       // TODO: value, members?
       // TODO: p -> AnnotatableLinked.configure(this, config);
@@ -1499,7 +1496,7 @@ define([
     }).implement({
       $type: /** @lends pentaho.type.Property.Type# */{
         // These are applied last so that mixins see any of the methods above as base implementations.
-        mixins: [discreteDomainFactory]
+        mixins: [DiscreteDomain]
       }
     });
 
@@ -1509,7 +1506,7 @@ define([
     __propType.valueType = "value";
 
     return Property;
-  };
+  }];
 
   function __nonEmptyString(value) {
     return value == null ? null : (String(value) || null);

@@ -22,7 +22,7 @@
  * is used to register a [config.spec.IRuleSet]{@link pentaho.config.spec.IRuleSet}
  * to the service.
  *
- * The [select]{@link pentaho.config.IService#select} method
+ * The [selectAsync]{@link pentaho.config.IService#selectAsync} method
  * selects the rules of added configurations that apply to
  * a given type and environment variables,
  * sorts these by specificity,
@@ -72,15 +72,15 @@
  *
  * configService.add(myTypeConfig);
  *
- * var mergedConfigSpec = configService.select("my.foo.component", {
- *      user:        "john",
- *      application: "not-so-super-app"
- *    });
- *
- * // Results in a configuration specification like:
- * // {
- * //   enabled: false
- * // }
+ * configService.selectAsync("my.foo.component", {
+ *   user:        "john",
+ *   application: "not-so-super-app"
+ * }).then(function(mergedConfigSpec) {
+ *   // Results in a configuration specification like:
+ *   // {
+ *   //   enabled: false
+ *   // }
+ * });
  * ```
  *
  * @name pentaho.config.IService
@@ -90,10 +90,10 @@
  */
 
 /**
- * Obtains the merged configuration specification of
+ * Obtains a promise for the merged configuration specification of
  * the selection of configuration rules that apply to a given type and environment variables.
  *
- * @name select
+ * @name selectAsync
  * @memberOf pentaho.config.IService#
  * @method
  *
@@ -110,7 +110,7 @@
  * Variable values are matched against each value specified by a rule in its selection variables,
  * using JavaScript's strict equality operator, `===`.
  *
- * @return {Object} The merged configuration specification,
+ * @return {Promise.<Object>} A promise for the merged configuration specification,
  * if any rule was selected; or `null`, if no rule was selected.
  */
 

@@ -53,10 +53,11 @@
  *
  *   // Get the configuration for 'my.IFoo' components,
  *   // under the main Pentaho environment:
- *   var config = configService.select("my.IFoo");
- *   if(config) {
- *     // ...
- *   }
+ *   configService.selectAsync("my.IFoo").then(function(config) {
+ *     if(config) {
+ *       // ...
+ *     }
+ *   });
  * });
  * ```
  *

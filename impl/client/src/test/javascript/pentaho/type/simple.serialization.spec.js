@@ -17,372 +17,241 @@ define([
   "pentaho/type/Context",
   "pentaho/type/SpecificationScope"
 ], function(Context, SpecificationScope) {
+
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, Date:false */
 
-  var context = new Context();
-  var PentahoObject = context.get("pentaho/type/object");
-  var PentahoString = context.get("pentaho/type/string");
-  var PentahoNumber = context.get("pentaho/type/number");
-  var PentahoBoolean = context.get("pentaho/type/boolean");
+  describe("Simple types", function() {
 
-  describe("pentaho.type.Simple", function() {
+    var context;
+    var PentahoObject;
+    var PentahoBoolean;
 
-    // Using pentaho/type/boolean because pentaho/type/simple is abstract
-
-    var originalSpec = {v: false, f: "I'm a simple value"};
-
-    describe("values", function() {
-
-      describe("value with formatted info", function() {
-        var value;
-
-        beforeEach(function() {
-          value = new PentahoBoolean(originalSpec);
-        });
-
-        describe("default", function() {
-          it("should return primitive value and formatted value", function() {
-            var spec = value.toSpec();
-
-            expect(spec.v).toBe(originalSpec.v);
-            expect(spec.f).toBe(originalSpec.f);
-            expect(spec._).toBeUndefined();
-          });
-        });
-
-        describe("omitFormatted: true and forceType: true", function() {
-          it("should return primitive value and inline type ", function() {
-            var spec = value.toSpec({omitFormatted: true, forceType: true});
-
-            expect(spec.v).toBe(originalSpec.v);
-            expect(spec.f).toBeUndefined();
-            expect(spec._).toEqual(PentahoBoolean.type.toRefInContext());
-          });
-        });
-
-        describe("omitFormatted: true and forceType: false", function() {
-          it("should return primitive value, undefined formatted value, and undefined inline type", function() {
-            var spec = value.toSpec({omitFormatted: true, forceType: false});
-
-            expect(spec).toBe(originalSpec.v);
-            expect(spec.f).toBeUndefined();
-            expect(spec._).toBeUndefined();
-          });
-        });
-
-        describe("omitFormatted: false and forceType: false", function() {
-          it("should return primitive value, formatted value, and undefined inline type", function() {
-            var spec = value.toSpec({forceType: false});
-
-            expect(spec.v).toBe(originalSpec.v);
-            expect(spec.f).toBe(originalSpec.f);
-            expect(spec._).toBeUndefined();
-          });
-        });
-      });
-
-      describe("value without formatted info", function() {
-        var value;
-
-        beforeEach(function() {
-          value = new PentahoBoolean(originalSpec.v);
-        });
-
-        describe("default", function() {
-          it("should return primitive value", function() {
-            var spec = value.toSpec();
-
-            expect(spec).toBe(originalSpec.v);
-          });
-        });
-
-        describe("omitFormatted: true and forceType: true", function() {
-          it("should return primitive value and undefined formatted value", function() {
-            var spec = value.toSpec({omitFormatted: true, forceType: true});
-
-            expect(spec.v).toBe(originalSpec.v);
-            expect(spec.f).toBeUndefined();
-            expect(spec._).toEqual(PentahoBoolean.type.toRefInContext());
-          });
-        });
-
-        describe("omitFormatted: true and forceType: false", function() {
-          it("should return primitive value, undefined formatted value, and undefined inline type", function() {
-            var spec = value.toSpec({omitFormatted: true, forceType: false});
-
-            expect(spec).toBe(originalSpec.v);
-            expect(spec.f).toBeUndefined();
-            expect(spec._).toBeUndefined();
-          });
-        });
-
-        describe("omitFormatted: false and forceType: false", function() {
-          it("should return primitive value", function() {
-            var spec = value.toSpec({forceType: false});
-
-            expect(spec).toBe(originalSpec.v);
-          });
-        });
-      });
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            PentahoObject = context.get("pentaho/type/object");
+            PentahoBoolean = context.get("pentaho/type/boolean");
+          })
+          .then(done, done.fail);
     });
 
-    describe("#toSpecInContext(keyArgs)", function() {
-      // coverage
-      it("should allow not specifying keyArgs", function() {
-        var scope = new SpecificationScope();
+    describe("pentaho.type.Simple", function() {
 
-        var value = new PentahoBoolean(true);
+      // Using pentaho/type/boolean because pentaho/type/simple is abstract
 
-        value.toSpecInContext();
+      var originalSpec = {v: false, f: "I'm a simple value"};
 
-        scope.dispose();
-      });
+      describe("values", function() {
 
-      it("should call _toJSONValue when keyArgs.isJson: true", function() {
-        var scope = new SpecificationScope();
+        describe("value with formatted info", function() {
+          var value;
 
-        var value = new PentahoBoolean(true);
+          beforeEach(function() {
+            value = new PentahoBoolean(originalSpec);
+          });
 
-        spyOn(value, "_toJSONValue").and.callThrough();
+          describe("default", function() {
+            it("should return primitive value and formatted value", function() {
+              var spec = value.toSpec();
 
-        value.toSpecInContext({isJson: true});
+              expect(spec.v).toBe(originalSpec.v);
+              expect(spec.f).toBe(originalSpec.f);
+              expect(spec._).toBeUndefined();
+            });
+          });
 
-        scope.dispose();
+          describe("omitFormatted: true and forceType: true", function() {
+            it("should return primitive value and inline type ", function() {
+              var spec = value.toSpec({omitFormatted: true, forceType: true});
 
-        expect(value._toJSONValue).toHaveBeenCalled();
-      });
+              expect(spec.v).toBe(originalSpec.v);
+              expect(spec.f).toBeUndefined();
+              expect(spec._).toEqual(PentahoBoolean.type.toRefInContext());
+            });
+          });
 
-      it("should not call _toJSONValue when keyArgs.isJson: false", function() {
-        var scope = new SpecificationScope();
-
-        var value = new PentahoBoolean(true);
-
-        spyOn(value, "_toJSONValue");
-
-        value.toSpecInContext({isJson: false});
-
-        scope.dispose();
-
-        expect(value._toJSONValue).not.toHaveBeenCalled();
-      });
-
-      it("should return cell format when _toJSONValue returns a plain object and keyArgs.isJson: true", function() {
-        var scope = new SpecificationScope();
-
-        var valueResult = {};
-        var value = new PentahoObject({v: valueResult});
-
-        spyOn(value, "_toJSONValue").and.returnValue(valueResult);
-
-        var cellResult = value.toSpecInContext({isJson: true});
-
-        scope.dispose();
-
-        expect(cellResult instanceof Object).toBe(true);
-        expect(cellResult.v).toBe(valueResult);
-      });
-
-      it("should return null when _toJSONValue returns null and keyArgs.isJson: true", function() {
-        var scope = new SpecificationScope();
-
-        var valueResult = {};
-        var value = new PentahoObject({v: valueResult});
-
-        spyOn(value, "_toJSONValue").and.returnValue(null);
-
-        var cellResult = value.toSpecInContext({isJson: true});
-
-        scope.dispose();
-
-        expect(cellResult).toBe(null);
-      });
-    });
-
-    describe("#_toJSONValue", function() {
-      it("should return the value property", function() {
-        var scope = new SpecificationScope();
-
-        var value = new PentahoBoolean(true);
-
-        expect(value._toJSONValue()).toBe(true);
-
-        scope.dispose();
-
-        // ---
-
-        scope = new SpecificationScope();
-
-        value = new PentahoBoolean(false);
-
-        expect(value._toJSONValue()).toBe(false);
-
-        scope.dispose();
-      });
-    });
-  }); // pentaho.type.Simple
-
-  // region Other Simple Types Test Helpers
-
-  function testSimple(SimpleClass, primitiveValue) {
-
-    var isPlainObject = (SimpleClass === PentahoObject) && (!!primitiveValue&& primitiveValue.constructor === Object);
-    var isNumOrBoolOrStr = (SimpleClass === PentahoNumber) || (SimpleClass === PentahoBoolean) || (SimpleClass === PentahoString);
-
-    describe("when declaredType is unspecified", function() {
-
-      describe("when forceType: true", function() {
-
-        it("should output a cell with the '_' inline type reference", function() {
-          var value = new SimpleClass({v: primitiveValue});
-          var spec = value.toSpec({forceType: true});
-
-          expect(typeof spec).toBe("object");
-          expect(spec._).toEqual(SimpleClass.type.toRefInContext());
-        });
-
-        it("should output the primitive value in the 'v' property", function() {
-          var value = new SimpleClass({v: primitiveValue});
-          var spec = value.toSpec({forceType: true});
-
-          expect(spec.v).toBe(primitiveValue);
-        });
-      });
-
-      describe("when forceType: false and omitFormatted: true", function() {
-
-        if(isPlainObject) {
-
-          describe("when the primitive value is a plain object", function() {
-
-            it("should return a cell with a 'v' property", function() {
-
-              expect(primitiveValue instanceof Object && primitiveValue.constructor === Object).toBe(true);
-
-              var value = new SimpleClass({v: primitiveValue});
-
+          describe("omitFormatted: true and forceType: false", function() {
+            it("should return primitive value, undefined formatted value, and undefined inline type", function() {
               var spec = value.toSpec({omitFormatted: true, forceType: false});
 
-              expect(spec instanceof Object).toBe(true);
-              expect(spec).not.toBe(primitiveValue);
-              expect(spec.v).toBe(primitiveValue);
+              expect(spec).toBe(originalSpec.v);
+              expect(spec.f).toBeUndefined();
+              expect(spec._).toBeUndefined();
             });
           });
-        } else {
 
-          describe("when the primitive value is *not* a plain object", function() {
+          describe("omitFormatted: false and forceType: false", function() {
+            it("should return primitive value, formatted value, and undefined inline type", function() {
+              var spec = value.toSpec({forceType: false});
 
-            it("should return the primitive value", function() {
+              expect(spec.v).toBe(originalSpec.v);
+              expect(spec.f).toBe(originalSpec.f);
+              expect(spec._).toBeUndefined();
+            });
+          });
+        });
 
-              expect(primitiveValue instanceof Object && primitiveValue.constructor === Object).toBe(false);
+        describe("value without formatted info", function() {
+          var value;
 
-              var value = new SimpleClass({v: primitiveValue});
+          beforeEach(function() {
+            value = new PentahoBoolean(originalSpec.v);
+          });
 
+          describe("default", function() {
+            it("should return primitive value", function() {
+              var spec = value.toSpec();
+
+              expect(spec).toBe(originalSpec.v);
+            });
+          });
+
+          describe("omitFormatted: true and forceType: true", function() {
+            it("should return primitive value and undefined formatted value", function() {
+              var spec = value.toSpec({omitFormatted: true, forceType: true});
+
+              expect(spec.v).toBe(originalSpec.v);
+              expect(spec.f).toBeUndefined();
+              expect(spec._).toEqual(PentahoBoolean.type.toRefInContext());
+            });
+          });
+
+          describe("omitFormatted: true and forceType: false", function() {
+            it("should return primitive value, undefined formatted value, and undefined inline type", function() {
               var spec = value.toSpec({omitFormatted: true, forceType: false});
 
-              expect(spec).toBe(primitiveValue);
+              expect(spec).toBe(originalSpec.v);
+              expect(spec.f).toBeUndefined();
+              expect(spec._).toBeUndefined();
             });
           });
-        }
-      });
-    });
 
-    describe("when declaredType is the simple type", function() {
+          describe("omitFormatted: false and forceType: false", function() {
+            it("should return primitive value", function() {
+              var spec = value.toSpec({forceType: false});
 
-      describe("when forceType: true", function() {
-
-        it("should output a cell with the '_' inline type reference", function() {
-          var value = new SimpleClass({v: primitiveValue});
-          var spec = value.toSpec({forceType: true, declaredType: SimpleClass.type});
-
-          expect(typeof spec).toBe("object");
-          expect(spec._).toEqual(SimpleClass.type.toRefInContext());
-        });
-
-        it("should output the primitive value in the 'v' property", function() {
-          var value = new SimpleClass({v: primitiveValue});
-          var spec = value.toSpec({forceType: true, declaredType: SimpleClass.type});
-
-          expect(spec.v).toBe(primitiveValue);
-        });
-      });
-
-      describe("when forceType: false and omitFormatted: true", function() {
-
-        if(isPlainObject) {
-
-          describe("when the primitive value is a plain object", function() {
-
-            it("should return a cell with a 'v' property", function() {
-
-              expect(primitiveValue instanceof Object && primitiveValue.constructor === Object).toBe(true);
-
-              var value = new SimpleClass({v: primitiveValue});
-
-              var spec = value.toSpec({omitFormatted: true, forceType: false, declaredType: SimpleClass.type});
-
-              expect(spec instanceof Object).toBe(true);
-              expect(spec).not.toBe(primitiveValue);
-              expect(spec.v).toBe(primitiveValue);
+              expect(spec).toBe(originalSpec.v);
             });
           });
-        } else {
-
-          describe("when the primitive value is *not* a plain object", function() {
-
-            it("should return the primitive value", function() {
-
-              expect(primitiveValue instanceof Object && primitiveValue.constructor === Object).toBe(false);
-
-              var value = new SimpleClass({v: primitiveValue});
-
-              var spec = value.toSpec({omitFormatted: true, forceType: false, declaredType: SimpleClass.type});
-
-              expect(spec).toBe(primitiveValue);
-            });
-          });
-        }
-      });
-    });
-
-    describe("when declaredType is the simple type's ancestor (abstract)", function() {
-
-      describe("when forceType: true", function() {
-
-        it("should output a cell with the '_' inline type reference", function() {
-          var value = new SimpleClass({v: primitiveValue});
-          var spec = value.toSpec({forceType: true, declaredType: SimpleClass.type.ancestor});
-
-          expect(typeof spec).toBe("object");
-          expect(spec._).toEqual(SimpleClass.type.toRefInContext());
-        });
-
-        it("should output the primitive value in the 'v' property", function() {
-          var value = new SimpleClass({v: primitiveValue});
-          var spec = value.toSpec({forceType: true, declaredType: SimpleClass.type.ancestor});
-
-          expect(spec.v).toBe(primitiveValue);
         });
       });
 
-      describe("when forceType: false and omitFormatted: true", function() {
+      describe("#toSpecInContext(keyArgs)", function() {
+        // coverage
+        it("should allow not specifying keyArgs", function() {
+          var scope = new SpecificationScope();
 
-        if(isNumOrBoolOrStr) {
+          var value = new PentahoBoolean(true);
 
-          it("should return the primitive value", function() {
+          value.toSpecInContext();
 
-            var value = new SimpleClass({v: primitiveValue});
-            var spec = value.toSpec({forceType: false, omitFormatted: true, declaredType: SimpleClass.type.ancestor});
+          scope.dispose();
+        });
 
-            expect(spec).toBe(primitiveValue);
-          });
+        it("should call _toJSONValue when keyArgs.isJson: true", function() {
+          var scope = new SpecificationScope();
 
-        } else {
+          var value = new PentahoBoolean(true);
+
+          spyOn(value, "_toJSONValue").and.callThrough();
+
+          value.toSpecInContext({isJson: true});
+
+          scope.dispose();
+
+          expect(value._toJSONValue).toHaveBeenCalled();
+        });
+
+        it("should not call _toJSONValue when keyArgs.isJson: false", function() {
+          var scope = new SpecificationScope();
+
+          var value = new PentahoBoolean(true);
+
+          spyOn(value, "_toJSONValue");
+
+          value.toSpecInContext({isJson: false});
+
+          scope.dispose();
+
+          expect(value._toJSONValue).not.toHaveBeenCalled();
+        });
+
+        it("should return cell format when _toJSONValue returns a plain object and keyArgs.isJson: true", function() {
+          var scope = new SpecificationScope();
+
+          var valueResult = {};
+          var value = new PentahoObject({v: valueResult});
+
+          spyOn(value, "_toJSONValue").and.returnValue(valueResult);
+
+          var cellResult = value.toSpecInContext({isJson: true});
+
+          scope.dispose();
+
+          expect(cellResult instanceof Object).toBe(true);
+          expect(cellResult.v).toBe(valueResult);
+        });
+
+        it("should return null when _toJSONValue returns null and keyArgs.isJson: true", function() {
+          var scope = new SpecificationScope();
+
+          var valueResult = {};
+          var value = new PentahoObject({v: valueResult});
+
+          spyOn(value, "_toJSONValue").and.returnValue(null);
+
+          var cellResult = value.toSpecInContext({isJson: true});
+
+          scope.dispose();
+
+          expect(cellResult).toBe(null);
+        });
+      });
+
+      describe("#_toJSONValue", function() {
+        it("should return the value property", function() {
+          var scope = new SpecificationScope();
+
+          var value = new PentahoBoolean(true);
+
+          expect(value._toJSONValue()).toBe(true);
+
+          scope.dispose();
+
+          // ---
+
+          scope = new SpecificationScope();
+
+          value = new PentahoBoolean(false);
+
+          expect(value._toJSONValue()).toBe(false);
+
+          scope.dispose();
+        });
+      });
+    }); // pentaho.type.Simple
+
+    // region Other Simple Types Test Helpers
+
+    function testSimple(getSimpleClass, primitiveValue, isPlainObject, isNumOrBoolOrStr) {
+
+      var SimpleClass;
+
+      describe("when declaredType is unspecified", function() {
+
+        beforeEach(function() {
+          SimpleClass = getSimpleClass();
+        });
+
+        describe("when forceType: true", function() {
 
           it("should output a cell with the '_' inline type reference", function() {
+
             var value = new SimpleClass({v: primitiveValue});
-            var spec = value.toSpec({forceType: false, omitFormatted: true, declaredType: SimpleClass.type.ancestor});
+            var spec = value.toSpec({forceType: true});
 
             expect(typeof spec).toBe("object");
             expect(spec._).toEqual(SimpleClass.type.toRefInContext());
@@ -390,88 +259,267 @@ define([
 
           it("should output the primitive value in the 'v' property", function() {
             var value = new SimpleClass({v: primitiveValue});
-            var spec = value.toSpec({forceType: false, omitFormatted: true, declaredType: SimpleClass.type.ancestor});
+            var spec = value.toSpec({forceType: true});
 
             expect(spec.v).toBe(primitiveValue);
           });
-        }
+        });
+
+        describe("when forceType: false and omitFormatted: true", function() {
+
+          if(isPlainObject) {
+
+            describe("when the primitive value is a plain object", function() {
+
+              it("should return a cell with a 'v' property", function() {
+
+                expect(primitiveValue instanceof Object && primitiveValue.constructor === Object).toBe(true);
+
+                var value = new SimpleClass({v: primitiveValue});
+
+                var spec = value.toSpec({omitFormatted: true, forceType: false});
+
+                expect(spec instanceof Object).toBe(true);
+                expect(spec).not.toBe(primitiveValue);
+                expect(spec.v).toBe(primitiveValue);
+              });
+            });
+          } else {
+
+            describe("when the primitive value is *not* a plain object", function() {
+
+              it("should return the primitive value", function() {
+
+                expect(primitiveValue instanceof Object && primitiveValue.constructor === Object).toBe(false);
+
+                var value = new SimpleClass({v: primitiveValue});
+
+                var spec = value.toSpec({omitFormatted: true, forceType: false});
+
+                expect(spec).toBe(primitiveValue);
+              });
+            });
+          }
+        });
       });
 
-      describe("when forceType: false and omitFormatted: false", function() {
+      describe("when declaredType is the simple type", function() {
 
-        it("should output a cell with the '_' inline type reference", function() {
-          var value = new SimpleClass({v: primitiveValue, f: "Foo"});
-          var spec = value.toSpec({forceType: false, omitFormatted: false, declaredType: SimpleClass.type.ancestor});
-
-          expect(typeof spec).toBe("object");
-          expect(spec._).toEqual(SimpleClass.type.shortId);
+        beforeEach(function() {
+          SimpleClass = getSimpleClass();
         });
 
-        it("should output the primitive value in the 'v' property", function() {
-          var value = new SimpleClass({v: primitiveValue, f: "Foo"});
-          var spec = value.toSpec({forceType: false, omitFormatted: false, declaredType: SimpleClass.type.ancestor});
+        describe("when forceType: true", function() {
 
-          expect(spec.v).toBe(primitiveValue);
+          it("should output a cell with the '_' inline type reference", function() {
+            var value = new SimpleClass({v: primitiveValue});
+            var spec = value.toSpec({forceType: true, declaredType: SimpleClass.type});
+
+            expect(typeof spec).toBe("object");
+            expect(spec._).toEqual(SimpleClass.type.toRefInContext());
+          });
+
+          it("should output the primitive value in the 'v' property", function() {
+            var value = new SimpleClass({v: primitiveValue});
+            var spec = value.toSpec({forceType: true, declaredType: SimpleClass.type});
+
+            expect(spec.v).toBe(primitiveValue);
+          });
         });
 
-        it("should output the formatted value in the 'f' property", function() {
-          var value = new SimpleClass({v: primitiveValue, f: "Foo"});
-          var spec = value.toSpec({forceType: false, omitFormatted: false, declaredType: SimpleClass.type.ancestor});
+        describe("when forceType: false and omitFormatted: true", function() {
 
-          expect(spec.f).toBe("Foo");
+          if(isPlainObject) {
+
+            describe("when the primitive value is a plain object", function() {
+
+              it("should return a cell with a 'v' property", function() {
+
+                expect(primitiveValue instanceof Object && primitiveValue.constructor === Object).toBe(true);
+
+                var value = new SimpleClass({v: primitiveValue});
+
+                var spec = value.toSpec({omitFormatted: true, forceType: false, declaredType: SimpleClass.type});
+
+                expect(spec instanceof Object).toBe(true);
+                expect(spec).not.toBe(primitiveValue);
+                expect(spec.v).toBe(primitiveValue);
+              });
+            });
+          } else {
+
+            describe("when the primitive value is *not* a plain object", function() {
+
+              it("should return the primitive value", function() {
+
+                expect(primitiveValue instanceof Object && primitiveValue.constructor === Object).toBe(false);
+
+                var value = new SimpleClass({v: primitiveValue});
+
+                var spec = value.toSpec({omitFormatted: true, forceType: false, declaredType: SimpleClass.type});
+
+                expect(spec).toBe(primitiveValue);
+              });
+            });
+          }
         });
       });
+
+      describe("when declaredType is the simple type's ancestor (abstract)", function() {
+
+        beforeEach(function() {
+          SimpleClass = getSimpleClass();
+        });
+
+        describe("when forceType: true", function() {
+
+          it("should output a cell with the '_' inline type reference", function() {
+            var value = new SimpleClass({v: primitiveValue});
+            var spec = value.toSpec({forceType: true, declaredType: SimpleClass.type.ancestor});
+
+            expect(typeof spec).toBe("object");
+            expect(spec._).toEqual(SimpleClass.type.toRefInContext());
+          });
+
+          it("should output the primitive value in the 'v' property", function() {
+            var value = new SimpleClass({v: primitiveValue});
+            var spec = value.toSpec({forceType: true, declaredType: SimpleClass.type.ancestor});
+
+            expect(spec.v).toBe(primitiveValue);
+          });
+        });
+
+        describe("when forceType: false and omitFormatted: true", function() {
+
+          if(isNumOrBoolOrStr) {
+
+            it("should return the primitive value", function() {
+
+              var value = new SimpleClass({v: primitiveValue});
+              var spec = value.toSpec({forceType: false, omitFormatted: true, declaredType: SimpleClass.type.ancestor});
+
+              expect(spec).toBe(primitiveValue);
+            });
+
+          } else {
+
+            it("should output a cell with the '_' inline type reference", function() {
+              var value = new SimpleClass({v: primitiveValue});
+              var spec = value.toSpec({forceType: false, omitFormatted: true, declaredType: SimpleClass.type.ancestor});
+
+              expect(typeof spec).toBe("object");
+              expect(spec._).toEqual(SimpleClass.type.toRefInContext());
+            });
+
+            it("should output the primitive value in the 'v' property", function() {
+              var value = new SimpleClass({v: primitiveValue});
+              var spec = value.toSpec({forceType: false, omitFormatted: true, declaredType: SimpleClass.type.ancestor});
+
+              expect(spec.v).toBe(primitiveValue);
+            });
+          }
+        });
+
+        describe("when forceType: false and omitFormatted: false", function() {
+
+          it("should output a cell with the '_' inline type reference", function() {
+            var value = new SimpleClass({v: primitiveValue, f: "Foo"});
+            var spec = value.toSpec({forceType: false, omitFormatted: false, declaredType: SimpleClass.type.ancestor});
+
+            expect(typeof spec).toBe("object");
+            expect(spec._).toEqual(SimpleClass.type.shortId);
+          });
+
+          it("should output the primitive value in the 'v' property", function() {
+            var value = new SimpleClass({v: primitiveValue, f: "Foo"});
+            var spec = value.toSpec({forceType: false, omitFormatted: false, declaredType: SimpleClass.type.ancestor});
+
+            expect(spec.v).toBe(primitiveValue);
+          });
+
+          it("should output the formatted value in the 'f' property", function() {
+            var value = new SimpleClass({v: primitiveValue, f: "Foo"});
+            var spec = value.toSpec({forceType: false, omitFormatted: false, declaredType: SimpleClass.type.ancestor});
+
+            expect(spec.f).toBe("Foo");
+          });
+        });
+      });
+    }
+    // endregion
+
+    describe("pentaho.type.Boolean", function() {
+
+      function getSimpleClass() {
+        return context.get("pentaho/type/boolean");
+      }
+
+      var primitiveValue = true;
+
+      testSimple(getSimpleClass, primitiveValue, false, true);
     });
-  }
-  // endregion
 
-  describe("pentaho.type.Boolean", function() {
-    var SimpleClass = context.get("pentaho/type/boolean");
-    var primitiveValue = true;
+    describe("pentaho.type.Number", function() {
 
-    testSimple(SimpleClass, primitiveValue);
-  });
+      function getSimpleClass() {
+        return context.get("pentaho/type/number");
+      }
 
-  describe("pentaho.type.Number", function() {
-    var SimpleClass = context.get("pentaho/type/number");
-    var primitiveValue = 10;
+      var primitiveValue = 10;
 
-    testSimple(SimpleClass, primitiveValue);
-  });
+      testSimple(getSimpleClass, primitiveValue, false, true);
+    });
 
-  describe("pentaho.type.String", function() {
-    var SimpleClass = context.get("pentaho/type/string");
-    var primitiveValue = "hello";
+    describe("pentaho.type.String", function() {
 
-    testSimple(SimpleClass, primitiveValue);
-  });
+      function getSimpleClass() {
+        return context.get("pentaho/type/string");
+      }
 
-  describe("pentaho.type.Function", function() {
-    var SimpleClass = context.get("pentaho/type/function");
-    var primitiveValue = function() {};
+      var primitiveValue = "hello";
 
-    testSimple(SimpleClass, primitiveValue);
-  });
+      testSimple(getSimpleClass, primitiveValue, false, true);
+    });
 
-  describe("pentaho.type.Date", function() {
-    var SimpleClass = context.get("pentaho/type/date");
-    var primitiveValue = new Date();
+    describe("pentaho.type.Function", function() {
 
-    testSimple(SimpleClass, primitiveValue);
-  });
+      function getSimpleClass() {
+        return context.get("pentaho/type/function");
+      }
 
-  describe("pentaho.type.Object", function() {
-    var SimpleClass = context.get("pentaho/type/object");
-    var primitiveValue = {foo: "bar"};
+      var primitiveValue = function() {};
 
-    testSimple(SimpleClass, primitiveValue);
+      testSimple(getSimpleClass, primitiveValue, false, false);
+    });
 
-    // ----
+    describe("pentaho.type.Date", function() {
 
-    function NonPlainClass() {}
+      function getSimpleClass() {
+        return context.get("pentaho/type/date");
+      }
 
-    primitiveValue = new NonPlainClass();
+      var primitiveValue = new Date();
 
-    testSimple(SimpleClass, primitiveValue);
+      testSimple(getSimpleClass, primitiveValue, false, false);
+    });
+
+    describe("pentaho.type.Object", function() {
+
+      function getSimpleClass() {
+        return context.get("pentaho/type/object");
+      }
+
+      var primitiveValue = {foo: "bar"};
+
+      testSimple(getSimpleClass, primitiveValue, true, false);
+
+      // ----
+
+      function NonPlainClass() {}
+
+      primitiveValue = new NonPlainClass();
+
+      testSimple(getSimpleClass, primitiveValue, false, false);
+    });
   });
 });

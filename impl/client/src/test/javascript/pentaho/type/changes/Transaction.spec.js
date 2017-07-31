@@ -30,8 +30,12 @@ define([
   describe("pentaho.type.changes.Transaction", function() {
     var context;
 
-    beforeEach(function() {
-      context = new Context();
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+          })
+          .then(done, done.fail);
     });
 
     describe("new(context)", function() {

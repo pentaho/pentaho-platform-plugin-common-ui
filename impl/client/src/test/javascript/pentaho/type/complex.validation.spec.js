@@ -21,10 +21,19 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
 
-  var context = new Context();
-  var Complex = context.get("pentaho/type/complex");
-
   describe("pentaho.type.Complex", function() {
+
+    var context;
+    var Complex;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Complex = context.get("pentaho/type/complex");
+          })
+          .then(done, done.fail);
+    });
 
     describe("#validate()", function() {
       it("should call each property's validateOn with the owner complex instance", function() {

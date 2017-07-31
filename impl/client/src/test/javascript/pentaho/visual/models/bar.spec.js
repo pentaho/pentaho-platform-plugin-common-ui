@@ -60,19 +60,9 @@ define([
       expect(model.validate()).toBe(null);
     });
 
-    it("should have a default view", function(done) {
+    it("should have a default view", function() {
 
       expect(!!BarModel.type.defaultView).toBe(true);
-
-      BarModel.type.defaultViewClass.then(function(BarView) {
-
-        expect(typeof BarView).toBe("function");
-
-        done();
-      }, function(error) {
-        fail(error);
-        done();
-      });
     });
   });
 });

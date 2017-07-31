@@ -1277,13 +1277,10 @@ define([
             .getAsync(modelType)
             .then(function(Model) {
 
-              var promise = Model.type.defaultViewClass;
-              if(!promise) throw new Error("No registered default view class.");
+              var defaultView = Model.type.defaultView;
+              if(!defaultView) throw new Error("No registered default view class.");
 
-              return promise;
-            })
-            .then(function(viewFactory) {
-              return context.get(viewFactory);
+              return context.getAsync(defaultView);
             });
       },
       // endregion

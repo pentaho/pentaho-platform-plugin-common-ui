@@ -34,14 +34,18 @@ define([
     var PentahoString;
     var PentahoNumber;
 
-    beforeEach(function() {
-      context = new Context();
-      Property = context.get("property");
-      PropertyType = Property.Type;
-      PentahoBoolean = context.get("pentaho/type/boolean");
-      Complex = context.get("pentaho/type/complex");
-      PentahoString = context.get("pentaho/type/string");
-      PentahoNumber  = context.get("pentaho/type/number");
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Property = context.get("property");
+            PropertyType = Property.Type;
+            PentahoBoolean = context.get("pentaho/type/boolean");
+            Complex = context.get("pentaho/type/complex");
+            PentahoString = context.get("pentaho/type/string");
+            PentahoNumber  = context.get("pentaho/type/number");
+          })
+          .then(done, done.fail);
     });
 
     it("is a function", function() {
@@ -149,18 +153,22 @@ define([
           expect(propType.ancestor).toBe(null);
         });
 
-        it("should throw if `declaringType` is of a different context", function() {
-          var context2 = new Context();
-          var Complex2 = context2.get("complex");
-          expect(function() {
-            Property.extend({
-              $type: {name: "foo"}
-            }, null, {
-              declaringType: Complex2.type,
-              index: 1,
-              isRoot: true
-            });
-          }).toThrow(errorMatch.argInvalid("declaringType"));
+        it("should throw if `declaringType` is of a different context", function(done) {
+          Context.createAsync()
+              .then(function(context2) {
+
+                var Complex2 = context2.get("complex");
+                expect(function() {
+                  Property.extend({
+                    $type: {name: "foo"}
+                  }, null, {
+                    declaringType: Complex2.type,
+                    index: 1,
+                    isRoot: true
+                  });
+                }).toThrow(errorMatch.argInvalid("declaringType"));
+              })
+              .then(done, done.fail);
         });
       }); // end when spec is an object
 
@@ -1389,35 +1397,39 @@ define([
 
       describe("dynamic attribute", function() {
 
-        it("should allow defining and setting to a function an attribute that has no cast function", function() {
+        it("should allow defining and setting to a function an attribute that has no cast function", function(done) {
 
-          var context2 = new Context();
-          var Property2 = context2.get("property")
-                .implement({
-                  $type: {
-                    dynamicAttributes: {
-                      isFoo: {
-                        defaultValue: false,
-                        // cast: null. // <<---- no cast function
-                        combine: function(baseEval, localEval) {
-                          return function() {
-                            // localEval is skipped if base is true.
-                            return baseEval.call(this) || localEval.call(this);
-                          };
+          Context.createAsync()
+              .then(function(context2) {
+
+                var Property2 = context2.get("property")
+                      .implement({
+                        $type: {
+                          dynamicAttributes: {
+                            isFoo: {
+                              defaultValue: false,
+                              // cast: null. // <<---- no cast function
+                              combine: function(baseEval, localEval) {
+                                return function() {
+                                  // localEval is skipped if base is true.
+                                  return baseEval.call(this) || localEval.call(this);
+                                };
+                              }
+                            }
+                          }
                         }
-                      }
-                    }
+                      });
+
+                var fValue = function() { return true; };
+                var SubProperty2 = Property2.extend({
+                  $type: {
+                    isFoo: fValue
                   }
                 });
 
-          var fValue = function() { return true; };
-          var SubProperty2 = Property2.extend({
-            $type: {
-              isFoo: fValue
-            }
-          });
-
-          expect(SubProperty2.type.isFoo).toBe(fValue);
+                expect(SubProperty2.type.isFoo).toBe(fValue);
+              })
+              .then(done, done.fail);
         });
       }); // end dynamic attribute
       // endregion

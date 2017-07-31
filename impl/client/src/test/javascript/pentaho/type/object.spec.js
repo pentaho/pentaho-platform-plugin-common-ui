@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/object",
   "pentaho/type/Context",
   "tests/pentaho/util/errorMatch"
-], function(objectFactory, Context, errorMatch) {
+], function(Context, errorMatch) {
 
   "use strict";
 
@@ -25,17 +24,24 @@ define([
 
   describe("pentaho.type.Object -", function() {
 
-    it("should be a function", function() {
-      expect(typeof objectFactory).toBe("function");
+    var context;
+    var PentahoObject;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            PentahoObject = context.get("pentaho/type/object");
+          })
+          .then(done, done.fail);
     });
 
     describe("new Object() -", function() {
-      var PentahoObject;
+
       var emptyObj;
       var dateObj;
 
       beforeEach(function() {
-        PentahoObject = objectFactory(new Context());
         emptyObj = {};
         dateObj = new Date();
       });
@@ -82,11 +88,6 @@ define([
     });
 
     describe("#$key -", function() {
-      var PentahoObject;
-
-      beforeEach(function() {
-        PentahoObject = objectFactory(new Context());
-      });
 
       it("should return a string value", function() {
         var key = new PentahoObject({v: {}}).$key;

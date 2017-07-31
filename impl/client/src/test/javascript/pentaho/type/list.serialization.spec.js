@@ -17,16 +17,28 @@ define([
   "pentaho/type/Context",
   "pentaho/type/SpecificationScope"
 ], function(Context, SpecificationScope) {
+
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, Date:false */
 
-  var context = new Context();
-  var List = context.get("pentaho/type/list");
-  var PentahoNumber = context.get("pentaho/type/number");
-  var NumberList = context.get(["number"]);
-
   describe("pentaho.type.List", function() {
+
+    var context;
+    var List;
+    var PentahoNumber;
+    var NumberList;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            List = context.get("pentaho/type/list");
+            PentahoNumber = context.get("pentaho/type/number");
+            NumberList = context.get(["number"]);
+          })
+          .then(done, done.fail);
+    });
 
     describe("#toSpec(keyArgs)", function() {
 

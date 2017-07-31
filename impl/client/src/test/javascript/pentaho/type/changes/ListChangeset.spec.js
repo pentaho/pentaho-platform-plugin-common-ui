@@ -16,13 +16,10 @@
 define([
   "tests/pentaho/util/errorMatch",
   "pentaho/type/Context",
-  "pentaho/type/list",
-  "pentaho/type/complex",
-  "pentaho/type/number",
   "pentaho/type/changes/ListChangeset",
   "pentaho/type/changes/ComplexChangeset",
   "pentaho/type/changes/Add"
-], function(errorMatch, Context, listFactory, complexFactory, numberFactory, ListChangeset, ComplexChangeset, Add) {
+], function(errorMatch, Context, ListChangeset, ComplexChangeset, Add) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false */
@@ -40,17 +37,21 @@ define([
 
     var context, List, Complex, PentahoNumber, NumberList, scope;
 
-    beforeEach(function() {
-      context = new Context();
-      List = context.get(listFactory);
-      Complex = context.get(complexFactory);
-      PentahoNumber = context.get(numberFactory);
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            List = context.get("pentaho/type/list");
+            Complex = context.get("pentaho/type/complex");
+            PentahoNumber = context.get("pentaho/type/number");
 
-      NumberList = List.extend({
-        $type: {of: PentahoNumber}
-      });
+            NumberList = List.extend({
+              $type: {of: PentahoNumber}
+            });
 
-      scope = context.enterChange();
+            scope = context.enterChange();
+          })
+          .then(done, done.fail);
     });
 
     afterEach(function() {

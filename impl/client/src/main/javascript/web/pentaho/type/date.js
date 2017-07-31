@@ -15,16 +15,13 @@
  */
 define([
   "module",
-  "./simple",
   "../util/date",
   "../i18n!types"
-], function(module, simpleFactory, date, bundle) {
+], function(module, date, bundle) {
 
   "use strict";
 
-  return function(context) {
-
-    var Simple = context.get(simpleFactory);
+  return ["simple", function(Simple) {
 
     /**
      * @name pentaho.type.Date
@@ -68,5 +65,5 @@ define([
     });
 
     return PenDate;
-  };
+  }];
 });

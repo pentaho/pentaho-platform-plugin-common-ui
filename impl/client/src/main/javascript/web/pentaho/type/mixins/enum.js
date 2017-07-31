@@ -15,20 +15,15 @@
  */
 define([
   "module",
-  "../simple",
-  "../list",
   "../util",
   "../ValidationError",
   "../../i18n!../i18n/types",
   "../../util/error"
-], function(module, simpleTypeFactory, listTypeFactory, typeUtil, ValidationError, bundle, error) {
+], function(module, typeUtil, ValidationError, bundle, error) {
 
   "use strict";
 
-  return function(context) {
-
-    var Simple = context.get(simpleTypeFactory);
-    var List = context.get(listTypeFactory);
+  return ["simple", "list", function(Simple, List) {
 
     /**
      * @name pentaho.type.mixins.Enum.Type
@@ -63,11 +58,9 @@ define([
      * ```js
      * define(["module"], function(module) {
      *
-     *   return function(context) {
+     *   return ["string", function(PenString) {
      *
-     *     var String = context.get("string");
-     *
-     *     return String.extend({
+     *     return PenString.extend({
      *       $type: {
      *         id: module.id,
      *         mixins: ["enum"],
@@ -78,7 +71,7 @@ define([
      *         ]
      *       }
      *     });
-     *   };
+     *   }];
      * });
      * ```
      *
@@ -201,5 +194,5 @@ define([
     });
 
     return Enum;
-  };
+  }];
 });

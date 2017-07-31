@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/boolean",
   "pentaho/type/Context",
   "tests/pentaho/util/errorMatch"
-], function(booleanFactory, Context, errorMatch) {
+], function(Context, errorMatch) {
 
   "use strict";
 
   /* global describe:true, it:true, expect:true, beforeEach:true*/
 
-  describe("pentaho/type/boolean -", function() {
-    it("is a function", function() {
-      expect(typeof booleanFactory).toBe("function");
-    });
+  describe("pentaho.type.Boolean", function() {
 
-    describe("new boolean()", function() {
+    describe("new ()", function() {
       var PentahoBoolean;
 
-      beforeEach(function() {
-        PentahoBoolean = booleanFactory(new Context());
+      beforeEach(function(done) {
+        Context.createAsync()
+            .then(function(context) {
+              PentahoBoolean = context.get("pentaho/type/boolean");
+            })
+            .then(done, done.fail);
       });
 
       it("should be a function", function() {

@@ -30,11 +30,15 @@ define([
     var Complex;
     var PentahoString;
 
-    beforeEach(function() {
-      context = new Context();
-      Property = context.get("property");
-      Complex = context.get("pentaho/type/complex");
-      PentahoString = context.get("pentaho/type/string");
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Property = context.get("property");
+            Complex = context.get("pentaho/type/complex");
+            PentahoString = context.get("pentaho/type/string");
+          })
+          .then(done, done.fail);
     });
 
     describe("#toSpecInContext(keyArgs)", function() {

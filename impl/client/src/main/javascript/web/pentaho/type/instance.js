@@ -25,9 +25,9 @@ define([
 
   "use strict";
 
-  return function(context) {
+  return [function() {
 
-    var Type = typeFactory(context);
+    var Type = typeFactory.call(this);
 
     /**
      * @name pentaho.type.Instance
@@ -67,8 +67,8 @@ define([
      *   <code>greeting</code> and a method <code>doSomething</code>.
      * </caption>
      *
-     * require(["pentaho/type/Context"], function(Context) {
-     *   var context = new Context();
+     * require(["pentaho/type/context!"], function(context) {
+     *
      *   var Instance = context.get("instance");
      *
      *   var Derived = Instance.extend({
@@ -100,7 +100,7 @@ define([
      * @see pentaho.type.spec.IInstanceProto
      * @see pentaho.type.spec.ITypeProto
      */
-    var Instance = Base.extend("pentaho.type.instance", /** @lends pentaho.type.Instance# */{
+    var Instance = Base.extend("pentaho.type.Instance", /** @lends pentaho.type.Instance# */{
       // NOTE: not calling base to block default Base.js from copying 1st argument into `this`.
       constructor: function() {
       },
@@ -296,5 +296,5 @@ define([
     Type.implement(bundle.structured.instance);
 
     return Instance;
-  };
+  }];
 });

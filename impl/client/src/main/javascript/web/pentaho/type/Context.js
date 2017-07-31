@@ -43,13 +43,220 @@ define([
 
   /* globals Promise */
 
-  var __nextFactoryUid = 1;
+  /* eslint dot-notation: 0, no-unexpected-multiline: 0 */
+
   var __singleton = null;
 
   // Default `base` type in a type specification.
   var __defaultBaseTypeMid = "complex";
 
+  var __typeId = "pentaho/type";
+  var __instanceTypeId = "pentaho/type/instance";
+
   var O_hasOwn = Object.prototype.hasOwnProperty;
+
+  /**
+   * @name pentaho.type.ITypeHolder
+   * @interface
+   * @private
+   *
+   * @property {string} id - The type's identifier. Always set.
+   * @property {?function} factory - The type's factory function. Set when the AMD module is loaded.
+   * @property {!Array.<string>} deps - The type's dependencies. Set when the AMD module is loaded.
+   *
+   * @property {Class.<pentaho.type.Instance>} Ctor - The type's constructor.
+   * Only not `null` when the type has already been created.
+   *
+   * @property {Promise.<Class.<pentaho.type.Instance>>} promise - A promise for the type's constructor.
+   * Only not `null` since the type has begun loading.
+   */
+
+  var TypeHolder = Base.extend({
+
+    constructor: function(id, context) {
+
+      // assert !id || !temporary(id)
+
+      // Set on construction.
+      this.context = context;
+      this.id = id || null; // anonymous type
+
+      // Set when loading/creating.
+      this.promise = null;
+
+      // Set when Created.
+      this.Ctor = null;
+      this.error = null; // Set when resolved and error'ed.
+
+      // Register
+      if(id) {
+        context.__byTypeId[id] = this;
+      }
+    },
+
+    get isFinished() {
+      return !!(this.Ctor || this.error);
+    },
+
+    // region load from module
+    loadModuleAsync: function() {
+
+      // assert this.id
+
+      return this.promise || this.__finalizeCtorAsync(this.__loadModuleAsyncCore());
+    },
+
+    __loadModuleAsyncCore: function() {
+      return promiseUtil.require(this.id, localRequire)
+          .then(this.__onModuleLoaded.bind(this));
+    },
+
+    __onModuleLoaded: function(typeModule) {
+
+      if(typeModule) {
+
+        var factory;
+        var deps;
+
+        if(Array.isArray(typeModule)) {
+          var L = typeModule.length;
+          if(L > 0) {
+            factory = typeModule[L - 1];
+            deps = typeModule.slice(0, L - 1);
+          }
+        }
+
+        if(factory) {
+          if(!F.is(factory)) {
+            return Promise.reject(error.argInvalid("typeModule", "Not an array whose last position is a function."));
+          }
+
+          return this.__loadFactory(factory, deps);
+        }
+      }
+
+      return Promise.reject(error.argInvalidType("typeModule", "Array", typeof typeModule));
+    },
+
+    __loadFactory: function(factory, deps) {
+
+      if(deps.length) {
+        return this.context.resolveAsync(deps)
+            .then(this.__createFromFactoryAsync.bind(this, factory));
+      }
+
+      return this.__createFromFactoryAsync(factory, deps);
+    },
+
+    __createFromFactoryAsync: function(factory, DepInstCtors) {
+      var InstCtor;
+      try {
+        InstCtor = factory.apply(this.context, DepInstCtors);
+      } catch(ex) {
+        // TODO: contextual error message.
+        return Promise.reject(ex);
+      }
+
+      return this.__setCtorAsync(InstCtor);
+    },
+    // endregion
+
+    // region load from factory
+    loadFactory: function(factory, deps) {
+      return this.__finalizeCtorAsync(this.__loadFactory(factory, deps));
+    },
+    // endregion
+
+    // region load from constructor
+    loadCtorAsync: function(InstCtor) {
+      return this.__finalizeCtorAsync(this.__setCtorAsync(InstCtor));
+    },
+    // endregion
+
+    loadCtorFinished: function(InstCtor) {
+      this.Ctor = InstCtor;
+      this.promise = Promise.resolve(InstCtor);
+    },
+
+    // region set constructor
+    __finalizeCtorAsync: function(p) {
+      var me = this;
+
+      return this.promise = p.then(function(InstCtor) {
+        me.Ctor = InstCtor;
+        me.error = null;
+
+        if(me.id === __instanceTypeId) {
+          me.context.__Instance = InstCtor;
+        }
+
+        return InstCtor;
+      })["catch"](function(ex) {
+        me.Ctor = null;
+        me.error = ex;
+        return Promise.reject(ex);
+      });
+    },
+
+    __setCtorAsync: function(InstCtor) {
+
+      var ctx = this.context;
+
+      // Validate
+      if(!F.is(InstCtor) || (ctx.__Instance && !(InstCtor.prototype instanceof ctx.__Instance))) {
+        return Promise.reject(error.operInvalid("Type factory must return a subtype of 'pentaho.type.Instance'."));
+      }
+
+      // Holder Registration
+      var type = InstCtor.type;
+      ctx.__byTypeUid[type.uid] = this;
+
+      if(!this.id) {
+        return Promise.resolve(InstCtor);
+      }
+
+      // TODO: should alias be registered based on typeInfo alone?
+      var alias = type.alias;
+      if(alias) {
+        if(O_hasOwn.call(ctx.__byTypeId, alias)) {
+          return this.__error(error.argInvalid("typeRef", "Duplicate type class alias."), sync);
+        }
+        ctx.__byTypeId[alias] = this;
+      }
+
+      // Configuration
+      return this.__loadConfigAsync()
+          .then(function(typeConfig) {
+            if(typeConfig) {
+              // May throw.
+              ctx.__applyConfig(InstCtor, typeConfig);
+            }
+
+            return InstCtor;
+          });
+    },
+
+    __loadConfigAsync: function() {
+
+      var ctx = this.context;
+
+      return ctx.__getConfigAsync(this.id)
+          .then(function(typeConfig) {
+            if(typeConfig) {
+              // Load typeConfig dependencies and only then...
+
+              // Collect the module ids of all custom types used within typeSpec.
+              var customTypeIds = Object.keys(ctx.__collectTypeSpecTypeIds(typeConfig));
+              if(customTypeIds.length) {
+                return ctx.resolveAsync(customTypeIds).then(function() { return typeConfig; });
+              }
+
+              return typeConfig;
+            }
+          });
+    }
+    // endregion
+  });
 
   var Context = Base.extend(module.id, /** @lends pentaho.type.Context# */{
 
@@ -202,19 +409,9 @@ define([
       this.__nextVersion = 1;
 
       /**
-       * Map of instance constructors by factory function _uid_.
-       *
-       * See also `__nextFactoryUid` and `__getFactoryUid`.
-       *
-       * @type {!Object.<string, Class.<pentaho.type.Instance>>}
-       * @private
-       */
-      this.__byFactoryUid = {};
-
-      /**
        * Map of instance constructors by [type uid]{@link pentaho.type.Type#uid}.
        *
-       * @type {!Object.<string, Class.<pentaho.type.Instance>>}
+       * @type {!Object.<string, !pentaho.type.ITypeHolder>}
        * @private
        */
       this.__byTypeUid = {};
@@ -225,7 +422,7 @@ define([
        * and by [type alias]{@link pentaho.type.Type#alias}
        * for non-anonymous types.
        *
-       * @type {!Object.<string, Class.<pentaho.type.Instance>>}
+       * @type {!Object.<string, !pentaho.type.ITypeHolder>}
        * @private
        */
       this.__byTypeId = {};
@@ -237,22 +434,10 @@ define([
       /**
        * The root [Instance]{@link pentaho.type.Instance} constructor.
        *
-       * @type {!Class.<pentaho.type.Instance>}
+       * @type {Class.<pentaho.type.Instance>}
        * @private
        */
-      this.__Instance = this.__getByFactory(standard.instance, /* sync: */true);
-
-      // Register all other standard types
-      // This mostly helps tests being able to require.undef(.) these at any time
-      //  and not cause random failures for assuming all standard types were loaded.
-      Object.keys(standard).forEach(function(lid) {
-        if(lid !== "mixins" && lid !== "instance")
-          this.__getByFactory(standard[lid], /* sync: */true);
-      }, this);
-
-      Object.keys(standard.mixins).forEach(function(fid) {
-        this.__getByFactory(standard.mixins[fid], /* sync: */true);
-      }, this);
+      this.__Instance = null;
     },
 
     /**
@@ -326,29 +511,6 @@ define([
      * should be used instead.
      *
      * @see pentaho.type.Context#getAsync
-     *
-     * @example
-     * <caption>
-     *   Getting a <b>configured</b> type instance constructor <b>synchronously</b> for a specific application.
-     * </caption>
-     *
-     * require(["pentaho/type/Context", "my/viz/chord"], function(Context) {
-     *
-     *   var context = new Context({application: "data-explorer-101"})
-     *
-     *   // Request synchronously cause it was already loaded in the above `require`
-     *   var VizChordModel = context.get("my/viz/chord");
-     *
-     *   var model = new VizChordModel({outerRadius: 200});
-     *
-     *   // Render the model using the default view
-     *   model.$type.defaultViewClass.then(function(View) {
-     *     var view = new View(document.getElementById("container"), model);
-     *
-     *     // ...
-     *   });
-     *
-     * });
      *
      * @param {!pentaho.type.spec.UTypeReference} typeRef - A type reference.
      * @param {Object} [keyArgs] The keyword arguments.
@@ -478,6 +640,13 @@ define([
       };
     },
 
+    applyAsync: function(typeRefs, fun, ctx) {
+
+      return this.resolveAsync(typeRefs).then(function(Types) {
+        return fun.apply(ctx || this, Types);
+      });
+    },
+
     /**
      * Gets, asynchronously, the **configured instance constructor** of a type.
      *
@@ -491,26 +660,23 @@ define([
      *
      * @example
      * <caption>
-     *   Getting a <b>configured</b> type instance constructor <b>asynchronously</b> for a specific application.
+     *   Getting a <b>configured</b> type instance constructor, <b>asynchronously</b>, for a specific application.
      * </caption>
      *
      * require(["pentaho/type/Context"], function(Context) {
      *
-     *   var context = new Context({application: "data-explorer-101"})
+     *   Context
+     *     .createAsync({application: "data-explorer-101"})
+     *     .then(function(context) {
      *
-     *   context.getAsync("my/viz/chord")
-     *     .then(function(VizChordModel) {
+     *       context.getAsync("my/viz/chord").then(function(VizChordModel) {
      *
-     *       var model = new VizChordModel({outerRadius: 200});
-     *
-     *       // Render the model using the default view
-     *       model.$type.defaultViewClass.then(function(View) {
-     *         var view = new View(document.getElementById("container"), model);
+     *         var model = new VizChordModel({outerRadius: 200});
      *
      *         // ...
      *       });
-     *     });
      *
+     *     });
      * });
      *
      * @param {!pentaho.type.spec.UTypeReference} typeRef - A type reference.
@@ -605,23 +771,28 @@ define([
 
       // Ensure that all registered types are loaded.
       // Throws if one isn't yet.
-      service.getRegisteredIds(baseTypeId).forEach(function(id) { this.get(id); }, this);
+      this.resolve(service.getRegisteredIds(baseTypeId));
+
+      return this.__getAllLoadedSubtypesOf(baseType, predicate);
+    },
+
+    __getAllLoadedSubtypesOf: function(baseType, predicate) {
 
       var byTypeUid = this.__byTypeUid;
 
-      var output = [];
-      for(var uid in byTypeUid) {
-        /* istanbul ignore else: almost impossible to test; browser dependent */
-        if(O_hasOwn.call(byTypeUid, uid)) {
-          var InstCtor = byTypeUid[uid];
+      var result = [];
+
+      Object.keys(byTypeUid).forEach(function(typeUid) {
+        var InstCtor = byTypeUid[typeUid].Ctor; // may be null
+        if(InstCtor) { // created successfully
           var type = InstCtor.type;
           if(type.isSubtypeOf(baseType) && (!predicate || predicate(type))) {
-            output.push(InstCtor);
+            result.push(InstCtor);
           }
         }
-      }
+      });
 
-      return output;
+      return result;
     },
 
     /**
@@ -667,27 +838,18 @@ define([
         if(!baseTypeId) baseTypeId = "pentaho/type/value";
 
         var predicate = F.predicate(keyArgs);
+
         var me = this;
-        var instCtorsPromise = promiseUtil.require("pentaho/service!" + baseTypeId, localRequire)
-          .then(function(factories) {
-            return Promise.all(factories.map(me.getAsync, me));
-          });
 
-        return Promise.all([this.getAsync(baseTypeId), instCtorsPromise])
-          .then(function(Values) {
-            var baseType  = Values[0].type;
-            var InstCtors = Object.keys(me.__byTypeUid).map(function(typeUid) {
-              return me.__byTypeUid[typeUid];
-            });
+        return this.resolveAsync([baseTypeId].concat(service.getRegisteredIds(baseTypeId)))
+            .then(function(InstCtors) {
 
-            return InstCtors.filter(function(InstCtor) {
-              var type = InstCtor.type;
-              return type.isSubtypeOf(baseType) && (!predicate || predicate(type));
+              var baseType = InstCtors[0].type;
+
+              return me.__getAllLoadedSubtypesOf(baseType, predicate);
             });
-          });
 
       } catch(ex) {
-        /* istanbul ignore next : really hard to test safeguard */
         return Promise.reject(ex);
       }
     },
@@ -883,6 +1045,77 @@ define([
       return this.__error(error.argInvalid("typeRef"), sync);
     },
 
+    __processId: function(id) {
+      if(id) {
+        if(!SpecificationContext.isIdTemporary(id)) {
+          var id2 = typeInfo.getIdOf(id);
+          if(id2) {
+            id = id2;
+          }
+        }
+      }
+      return id;
+    },
+
+    __getByIdSettled: function(id, sync, canDefineSpecId) {
+
+      // assert id
+
+      // Deserializing?
+
+      // Is it a temporary id?
+      if(SpecificationContext.isIdTemporary(id)) {
+        var specContext = SpecificationContext.current;
+        if(!specContext) {
+          if(canDefineSpecId) {
+            return null;
+          }
+
+          return this.__error(
+              error.argInvalid("typeRef", "Temporary ids cannot occur outside of a generic type specification."),
+              sync);
+        }
+
+        // id must exist at the specification context, or it's invalid.
+        var type = specContext.get(id);
+        if(!type) {
+          if(canDefineSpecId) {
+            return null;
+          }
+
+          return this.__error(
+              error.argInvalid("typeRef", "Temporary id does not correspond to an existing type."),
+              sync);
+        }
+
+        return this.__return(type.instance.constructor, sync);
+      }
+
+      // ---
+
+      // Already created?
+      var typeHolder = O.getOwn(this.__byTypeId, id);
+      if(typeHolder) {
+        if(sync) {
+          if(typeHolder.Ctor) {
+            return typeHolder.Ctor;
+          } else if(typeHolder.error) {
+            throw typeHolder.error;
+          }
+        } else {
+          return typeHolder.promise;
+        }
+      }
+
+      if(sync) {
+        return this.__error(
+            error.argInvalid("typeRef", "Type '" + id + "' has not been loaded yet."),
+            true);
+      }
+
+      return null;
+    },
+
     /**
      * Gets the instance constructor of a type given its identifier.
      *
@@ -926,57 +1159,23 @@ define([
      * @private
      */
     __getById: function(id, sync) {
-      // Is it a temporary id?
-      if(SpecificationContext.isIdTemporary(id)) {
-        var specContext = SpecificationContext.current;
-        if(!specContext) {
-          return this.__error(
-              error.argInvalid("typeRef", "Temporary ids cannot occur outside of a generic type specification."),
-              sync);
-        }
 
-        // id must exist at the specification context, or it's invalid.
-        var type = specContext.get(id);
-        if(!type) {
-          return this.__error(
-              error.argInvalid("typeRef", "Temporary id does not correspond to an existing type."),
-              sync);
-        }
+      id = this.__processId(id);
 
-        return this.__return(type.instance.constructor, sync);
+      var result = this.__getByIdSettled(id, sync);
+      if(result) {
+        // Loaded, Loading and Async, Error'ed
+        return result;
       }
 
-      // Check if id is already present.
-      var InstCtor = O.getOwn(this.__byTypeId, id);
-      if(!InstCtor) {
-        // Resolve possible alias.
-        var id2 = typeInfo.getIdOf(id);
-        if(id2 && id2 !== id) InstCtor = O.getOwn(this.__byTypeId, (id = id2));
-      }
+      // Not Loaded and Not Loading and Not Sync
 
-      if(InstCtor) return this.__return(InstCtor, sync);
-
-      /* jshint laxbreak:true*/
-      return sync
-          // `require` fails if a module with the id in the `typeSpec` var
-          // is not already _loaded_.
-          ? this.__get(localRequire(id), null, true)
-          : promiseUtil.require(id, localRequire).then(this.__get.bind(this));
+      // Load
+      return new TypeHolder(id, this).loadModuleAsync();
     },
 
     /**
-     * Gets the instance constructor of a type, given a function that represents it.
-     *
-     * The function can be:
-     *
-     * 1. An instance constructor
-     * 2. A type constructor
-     * 3. Any other function, which is assumed to be a factory function.
-     *
-     * In the first two cases, the operation is delegated to `getByType`,
-     * passing in the instance constructor, representing the type.
-     *
-     * In the latter case, it is delegated to `__getByFactory`.
+     * Gets the configured instance constructor of a type, given the instance constructor.
      *
      * @param {function} fun - A function.
      * @param {boolean} [sync=false] Whether to perform a synchronous get.
@@ -984,27 +1183,20 @@ define([
      * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
      *   returns the instance constructor; while, when async, returns a promise for it.
      *
-     * @throws {pentaho.lang.ArgumentInvalidError} When `fun` is a type constructor
-     * (e.g. [Type]{@link pentaho.type.Type}).
+     * @throws {pentaho.lang.ArgumentInvalidError} When `fun` is not an `Instance` constructor.
      *
-     * @throws {Error} Other errors,
-     * thrown by {@link pentaho.type.Context#__getByInstCtor} and {@link pentaho.type.Context#__getByFactory}.
+     * @throws {Error} Other errors, thrown by {@link pentaho.type.Context#__getByInstCtor}.
      *
      * @private
      */
     __getByFun: function(fun, sync) {
 
-      var proto = fun.prototype;
       var Instance = this.__Instance;
 
-      if(proto instanceof Instance)
+      if(Instance && fun.prototype instanceof Instance)
         return this.__getByInstCtor(fun, sync);
 
-      if(proto instanceof Instance.Type)
-        return this.__error(error.argInvalid("typeRef", "Type constructor is not supported."), sync);
-
-      // Assume it's a factory function.
-      return this.__getByFactory(fun, sync);
+      return this.__error(error.argInvalid("typeRef", "Function is not a 'pentaho.type.Instance' constructor."), sync);
     },
 
     /**
@@ -1028,7 +1220,6 @@ define([
      *
      * @param {!Class.<pentaho.type.Instance>} InstCtor - An instance constructor.
      * @param {boolean} [sync=false] Whether to perform a synchronous get.
-     * @param {?number} [factoryUid] The factory unique identifier, when `Type` was created by one.
      *
      * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
      *   returns the instance constructor; while, when async, returns a promise for it.
@@ -1038,159 +1229,129 @@ define([
      *
      * @private
      */
-    __getByInstCtor: function(InstCtor, sync, factoryUid) {
+    __getByInstCtor: function(InstCtor, sync) {
       var type = InstCtor.type;
 
       // Check if already present, by uid.
-      var InstCtorExisting = O.getOwn(this.__byTypeUid, type.uid);
-      /* istanbul ignore else */
-      if(!InstCtorExisting) {
-        // Not present yet.
-        var id = type.id;
-        if(id) {
-          // Configuration is for the type-constructor.
-          var config = this.__getConfig(id);
-          if(config) {
-            try {
-              this.__configDepth++;
+      var typeHolder = O.getOwn(this.__byTypeUid, type.uid);
+      if(typeHolder) {
+        // Loaded / Error'ed | Loading
 
-              type.constructor.implement(config);
+        var InstCtorExisting = typeHolder.Ctor;
+        if(InstCtorExisting) {
+          // Loaded
 
-            } finally {
-              this.__configDepth--;
-            }
+          if(InstCtor !== InstCtorExisting) {
+            // Pathological case, only possible if the result of an exploit.
+            return this.__error(error.argInvalid("typeRef", "Duplicate type class uid."), sync);
           }
 
-          this.__byTypeId[id] = InstCtor;
-
-          var alias = type.alias;
-          if(alias) {
-            if(O_hasOwn.call(this.__byTypeId, alias)) {
-              return this.__error(error.argInvalid("typeRef", "Duplicate type class alias."), sync);
-            }
-            this.__byTypeId[alias] = InstCtor;
-          }
+          return this.__return(InstCtor, sync);
         }
 
-        this.__byTypeUid[type.uid] = InstCtor;
+        // Error'ed | Loading
 
-      } else if(InstCtor !== InstCtorExisting) {
-        // Pathological case, only possible if the result of an exploit.
-        return this.__error(error.argInvalid("typeRef", "Duplicate type class uid."), sync);
-      }
+        if(!sync) {
+          return typeHolder.promise;
+        }
 
-      if(factoryUid != null) {
-        this.__byFactoryUid[factoryUid] = InstCtor;
-      }
+        if(typeHolder.error) {
+          this.__error(typeHolder.error, /* sync: */true);
+        }
 
-      return this.__return(InstCtor, sync);
-    },
+        // Getting sync when still loading async.
+        // Could it be a cyclic dependency?
 
-    /**
-     * Gets a configured instance constructor of a type,
-     * given a factory function that creates it.
-     *
-     * Factory functions are tracked by using an unique identifier property (`_uid_`),
-     * which is automatically assigned to them the first time they are given
-     * to this function.
-     *
-     * A map of already evaluated factory functions,
-     * indexed by their unique identifier, is kept in `__byFactoryUid`.
-     *
-     * If a factory has already been evaluated before,
-     * the type it returned then is now returned immediately (modulo sync).
-     *
-     * Otherwise, the factory function is evaluated, being passed this context as argument.
-     *
-     * The returned instance constructor is passed to `_getType`,
-     * for registration and configuration,
-     * and then returned immediately (module sync).
-     *
-     * @param {!pentaho.type.Factory.<pentaho.type.Instance>} typeFactory - A factory of a type's instance constructor.
-     * @param {boolean} [sync=false] Whether to perform a synchronous get.
-     *
-     * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
-     * returns the instance constructor; while, when async, returns a promise for it.
-     *
-     * @throws {pentaho.lang.OperationInvalidError} When the value returned by the factory function
-     * is not a instance constructor of a subtype of `Instance`.
-     *
-     * @private
-     */
-    __getByFactory: function(typeFactory, sync) {
-      var factoryUid = __getFactoryUid(typeFactory);
-
-      var InstCtor = O.getOwn(this.__byFactoryUid, factoryUid);
-      if(InstCtor)
-        return this.__return(InstCtor, sync);
-
-      InstCtor = typeFactory(this);
-
-      if(!F.is(InstCtor) || (this.__Instance && !(InstCtor.prototype instanceof this.__Instance)))
         return this.__error(
-            error.operInvalid("Type factory must return a sub-class of 'pentaho.type.Instance'."),
-            sync);
+            error.argInvalid("typeRef", "Type is still loading."),
+            true);
+      }
 
-      return this.__getByInstCtor(InstCtor, sync, factoryUid);
+      var id = type.id;
+
+      // Getting a constructor registers it implicitly.
+      // If named, can only be done asynchronously.
+      if(sync) {
+        if(id) {
+          return this.__error(
+              error.argInvalid("typeRef", "Type '" + id + "' has not been loaded yet."),
+              true);
+        }
+
+        new TypeHolder(id, this).loadCtorFinished(InstCtor);
+
+        return InstCtor;
+      }
+
+      // NOTE: A type's non-null id is never temporary.
+      return new TypeHolder(id, this).loadCtorAsync(InstCtor);
     },
 
     // Inline type spec: {[base: "complex"], [id: ]}
     __getByObjectSpec: function(typeSpec, defaultBase, sync) {
       var Instance = this.__Instance;
 
-      if(typeSpec instanceof Instance.Type)
-        return this.__getByInstCtor(typeSpec.instance.constructor, sync);
+      if(typeSpec.constructor !== Object) {
+        // An instance of Type ?
+        if(typeSpec instanceof Instance.Type)
+          return this.__getByInstCtor(typeSpec.instance.constructor, sync);
 
-      if(typeSpec instanceof Instance)
-        return this.__error(error.argInvalid("typeRef", "Instances are not supported as type references."), sync);
+        if(typeSpec instanceof Instance)
+          return this.__error(error.argInvalid("typeRef", "Instances are not supported as type references."), sync);
 
-      var baseTypeSpec = typeSpec.base || defaultBase || __defaultBaseTypeMid;
-      var id = typeSpec.id;
-      if(id) {
-        // Already loaded?
-
-        var InstCtor;
-
-        if(SpecificationContext.isIdTemporary(id)) {
-          var specContext = SpecificationContext.current;
-          if(specContext) {
-            var type = specContext.get(id);
-            if(type) InstCtor = type.instance.constructor;
-          }
-        } else {
-          // id ~ "value" goes here.
-          InstCtor = O.getOwn(this.__byTypeId, id);
-        }
-
-        // If so, keep initial specification. Ignore the new one.
-        if(InstCtor) return this.__return(InstCtor, sync);
+        return this.__error(
+            error.argInvalid("typeRef", "Object is not a 'pentaho.type.Type' instance or a plain object."), sync);
       }
 
-      // assert baseTypeSpec
+      var id = typeSpec.id;
+      if(id) {
+        id = this.__processId(id);
 
-      return this.__getByObjectSpecCore(id, baseTypeSpec, typeSpec, sync);
+        var result = this.__getByIdSettled(id, sync, /* canDefineSpecId: */true);
+        if(result) {
+          // Loaded, Loading and Async, Error'ed
+          return result;
+        }
+
+        // Not Loaded and Not Loading and (NewTempId() or Not Sync)
+      }
+
+      return this.__loadByObjectSpec(id, typeSpec, defaultBase, sync);
     },
 
-    // Actually gets an object specification, given its already processed _base type spec_ and id.
-    // Also, this method assumes that the type is not yet registered either in the context or in the
-    // specification context.
-    __getByObjectSpecCore: function(id, baseTypeSpec, typeSpec, sync) {
-      // if id and not loaded, the id is used later to register the new type under that id and configure it.
+    // Actually loads a (new) object specification, given its (optional) id and default base.
+    __loadByObjectSpec: function(id, typeSpec, defaultBase, sync) {
 
-      // A root generic type spec initiates a specification context.
-      // Each root generic type spec has a separate specification context.
-      var resolveSync = function() {
-        /* jshint validthis:true*/
+      if(sync) {
+        // assert !id || NewTempId()
+        // No configuration.
 
-        return O.using(new SpecificationScope(), function resolveSyncInContext(specScope) {
-          /* jshint validthis:true*/
+        // When sync, it should be the case that every referenced id is already loaded,
+        // or an error will be thrown when getting these.
+        return typeFactory.call(this);
+      }
+
+      // if id, may have configuration.
+
+      // Collect the module ids of all custom types used within typeSpec.
+      var customTypeIds = Object.keys(this.__collectTypeSpecTypeIds(typeSpec));
+
+      return new TypeHolder(id, this).loadFactory(typeFactory, customTypeIds);
+
+      function typeFactory() {
+
+        // A root generic type spec initiates a specification context.
+        // Each root generic type spec has a separate specification context.
+        return O.using(new SpecificationScope(), function createSyncInContext(specScope) {
 
           // Note the switch to sync mode here, whatever the outer `sync` value.
-          // Only the outermost __getByObjectSpec call will be async.
+          // Only the outermost __getByObjectSpec/__loadByObjectSpec call may be async.
           // All following "reentries" will be sync.
           // So, it works to use the above ambient specification context to handle all contained temporary ids.
 
           // 1. Resolve the base type
+          var baseTypeSpec = typeSpec.base || defaultBase || __defaultBaseTypeMid;
+
           var BaseInstCtor = this.__get(baseTypeSpec, null, /* sync: */true);
 
           // 2. Extend the base type
@@ -1202,23 +1363,9 @@ define([
             specScope.specContext.add(InstCtor.type, id);
           }
 
-          return this.__getByInstCtor(InstCtor, /* sync: */true);
+          return InstCtor;
         }, this);
-      };
-
-      // When sync, it should be the case that every referenced id is already loaded,
-      // or an error will be thrown when requiring these.
-      if(sync) return resolveSync.call(this);
-
-      // Collect the module ids of all custom types used within typeSpec.
-      var customTypeIds = Object.keys(this.__collectTypeSpecTypeIds(typeSpec));
-      /* jshint laxbreak:true*/
-      return customTypeIds.length
-          // Require them all and only then invoke the synchronous BaseType.extend method.
-          ? promiseUtil.require(customTypeIds, localRequire).then(resolveSync.bind(this))
-          // All types are standard and can be assumed to be already loaded.
-          // However, we should behave asynchronously as requested.
-          : promiseUtil.wrapCall(resolveSync, this);
+      }
     },
 
     /*
@@ -1239,8 +1386,20 @@ define([
       return this.__getByObjectSpec({base: "list", of: elemTypeSpec}, null, sync);
     },
 
-    __getConfig: function(id) {
-      return configurationService.select(id, this.__env);
+    __getConfigAsync: function(id) {
+      return configurationService.selectAsync(id, this.__env);
+    },
+
+    __applyConfig: function(InstCtor, typeConfig) {
+      var TypeCtor = InstCtor.type.constructor;
+      try {
+        this.__configDepth++;
+
+        TypeCtor.implement(typeConfig);
+
+      } finally {
+        this.__configDepth--;
+      }
     },
     // endregion
 
@@ -1265,15 +1424,36 @@ define([
      */
     get instance() {
       return __singleton || (__singleton = new Context());
+    },
+
+    get standardIds() {
+      var standardIds = Object.keys(standard).filter(function(lid) { return lid !== "mixins"; });
+
+      standardIds.push.apply(
+          standardIds,
+          Object.keys(standard.mixins).map(function(lid) { return "mixins/" + lid; }));
+
+      standardIds.forEach(function(lid, index) {
+        standardIds[index] = __typeId + "/" + lid;
+      });
+
+      return standardIds;
+    },
+
+    createAsync: function(envSpec) {
+
+      var context = new Context(envSpec);
+
+      return context.resolveAsync(this.standardIds)
+          .then(function() {
+            return context;
+          });
     }
   });
 
   return Context;
 
   // region type registry
-  function __getFactoryUid(factory) {
-    return factory._fuid_ || (factory._fuid_ = __nextFactoryUid++);
-  }
 
   function __collectTypeIdsRecursive(typeSpec, outIds, byTypeId) {
     if(!typeSpec) return;

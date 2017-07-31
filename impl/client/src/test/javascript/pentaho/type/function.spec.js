@@ -14,25 +14,34 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/function",
   "pentaho/type/Context",
   "tests/pentaho/util/errorMatch"
-], function(functionFactory, Context, errorMatch) {
+], function(Context, errorMatch) {
 
   "use strict";
 
   /* global describe:true, it:true, expect:true, beforeEach:true*/
 
   describe("pentaho.type.Function -", function() {
-    it("is a function", function() {
-      expect(typeof functionFactory).toBe("function");
+
+    var context;
+    var PentahoFunction;
+
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            PentahoFunction = context.get("pentaho/type/function");
+          })
+          .then(done, done.fail);
     });
 
     describe("new Function()", function() {
-      var PentahoFunction, testFunc;
+
+      var testFunc;
 
       beforeEach(function() {
-        PentahoFunction = functionFactory(new Context());
         testFunc = new PentahoFunction(function() {});
       });
 
@@ -71,20 +80,19 @@ define([
     });
 
     describe("#toJSON()", function() {
-      var PentahoFun;
-      var testFun = function(foo) { return foo; };
+      var testFun;
 
-      beforeEach(function () {
-        PentahoFun = functionFactory(new Context());
+      beforeEach(function() {
+        testFun = function(foo) { return foo; };
       });
 
       it("should return the function's code as a string", function() {
-        var fun = new PentahoFun(testFun);
+        var fun = new PentahoFunction(testFun);
         expect(fun.toJSON()).toBe(testFun.toString());
       });
 
       it("should return `null` if the function is native", function() {
-        var fun = new PentahoFun(String);
+        var fun = new PentahoFunction(String);
         expect(fun.toJSON()).toBe(null);
       });
     });

@@ -15,19 +15,19 @@
  */
 define([
   "module",
-  "./element",
   "./util",
   "../util/object",
   "../util/error",
   "../util/fun",
   "../i18n!types"
-], function(module, elemFactory, typeUtil, O, error, F, bundle) {
+], function(module, typeUtil, O, error, F, bundle) {
 
   "use strict";
 
-  return function(context) {
+  return ["element", function(Element) {
 
-    var Element = context.get(elemFactory);
+    var context = this;
+
     var numberType;
     var stringType;
     var booleanType;
@@ -567,15 +567,15 @@ define([
      */
 
     return Simple;
+  }];
 
-    /**
-     * Returns `null` when given a {@link Nully} value; or, a String, otherwise.
-     *
-     * @param {*} value The value to be verified
-     * @return {?String} A non-empty string.
-     */
-    function __nonEmptyString(value) {
-      return value == null ? null : (String(value) || null);
-    }
-  };
+  /**
+   * Returns `null` when given a {@link Nully} value; or, a String, otherwise.
+   *
+   * @param {*} value The value to be verified
+   * @return {?String} A non-empty string.
+   */
+  function __nonEmptyString(value) {
+    return value == null ? null : (String(value) || null);
+  }
 });

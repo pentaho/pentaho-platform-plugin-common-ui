@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/number",
   "pentaho/type/Context",
   "tests/pentaho/util/errorMatch"
-], function(numberFactory, Context, errorMatch) {
+], function(Context, errorMatch) {
 
   "use strict";
 
@@ -25,20 +24,19 @@ define([
 
   describe("pentaho.type.Number -", function() {
 
-    it("the AMD module returns a factory function", function() {
-      expect(typeof numberFactory).toBe("function");
-    });
+    var context;
+    var PentahoNumber;
 
-    it("factory function should accept a context and return a function", function() {
-      expect(typeof numberFactory(new Context())).toBe("function");
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            PentahoNumber = context.get("pentaho/type/number");
+          })
+          .then(done, done.fail);
     });
 
     describe("new Number()", function() {
-      var PentahoNumber;
-
-      beforeEach(function() {
-        PentahoNumber = numberFactory(new Context());
-      });
 
       it("should return an object", function() {
         expect(typeof new PentahoNumber(1)).toBe("object");

@@ -15,16 +15,12 @@
  */
 define([
   "module",
-  "./complex",
   "../i18n!types"
-], function(module, complexFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
-
-    var Complex = context.get(complexFactory);
-
+  return ["complex", function(Complex) {
     /**
      * @name pentaho.type.Application.Type
      * @class
@@ -59,5 +55,5 @@ define([
     });
 
     return Application;
-  };
+  }];
 });

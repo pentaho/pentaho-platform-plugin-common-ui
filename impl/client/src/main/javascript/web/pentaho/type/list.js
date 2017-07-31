@@ -17,8 +17,6 @@ define([
   "module",
   "./mixins/Container",
   "./changes/ListChangeset",
-  "./value",
-  "./element",
   "./util",
   "./SpecificationContext",
   "../i18n!types",
@@ -26,16 +24,12 @@ define([
   "../util/error",
   "../util/object"
 ], function(module, ContainerMixin, ListChangeset,
-            valueFactory, elemFactory, typeUtil, SpecificationContext,
+            typeUtil, SpecificationContext,
             bundle, arg, error, O) {
 
   "use strict";
 
-  return function(context) {
-
-    var Value = context.get(valueFactory);
-    var Element = context.get(elemFactory);
-
+  return ["value", "element", function(Value, Element) {
     /**
      * @name pentaho.type.List.Type
      * @class
@@ -789,5 +783,5 @@ define([
      */
 
     return List;
-  };
+  }];
 });

@@ -15,12 +15,11 @@
  */
 define([
   "module",
-  "./simple",
   "../util/object",
   "../util/fun",
   "../util/logger",
   "../i18n!types"
-], function(module, simpleFactory, O, F, logger, bundle) {
+], function(module, O, F, logger, bundle) {
 
   "use strict";
 
@@ -35,9 +34,7 @@ define([
     enumerable:   false
   };
 
-  return function(context) {
-
-    var Simple = context.get(simpleFactory);
+  return ["simple", function(Simple) {
 
     /**
      * @name pentaho.type.Function
@@ -113,5 +110,5 @@ define([
     });
 
     return PenFunction;
-  };
+  }];
 });

@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
-  "pentaho/type/list",
-  "pentaho/type/number"
-], function(Context, listFactory, numberFactory) {
+  "pentaho/type/Context"
+], function(Context) {
 
   "use strict";
 
@@ -25,12 +23,24 @@ define([
 
   describe("pentaho.type.List", function() {
 
-    var context = new Context();
-    var List = context.get(listFactory);
+    var context;
+    var List;
+    var PentahoNumber;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            List = context.get("pentaho/type/list");
+            PentahoNumber = context.get("pentaho/type/number");
+          })
+          .then(done, done.fail);
+    });
 
     describe("#validate() -", function() {
+
       it("should call _validate(.) of the list element type with each of its members", function() {
-        var PentahoNumber = context.get(numberFactory);
+
         var NumberList = List.extend({
           $type: {of: PentahoNumber}
         });
@@ -48,7 +58,7 @@ define([
 
       it("should call _validate(.) of each of the list elements' type " +
          "when the list element type is of a base type", function() {
-        var PentahoNumber = context.get(numberFactory);
+
         var PentahoInteger = PentahoNumber.extend();
 
         var NumberList = List.extend({
