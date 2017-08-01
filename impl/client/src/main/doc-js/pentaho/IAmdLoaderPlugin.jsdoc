@@ -1,0 +1,74 @@
+/*!
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * An AMD/RequireJS loader plugin module is a module which can be used to load other, _logical_ modules.
+ *
+ * To use this type of module as an AMD loader plugin module, request it with an `!` character appended
+ * to its module identifier. Any content after the `!` character denotes the logical module name.
+ *
+ * In the following example,
+ * the first dependency loads the the virtual module `foo.bar` using the `my/plugin-module` loader plugin module
+ * as an intermediary,
+ * while the second dependency loads the `my/plugin-module` itself.
+ * The latter is useful only if the loader plugin module exposes members beyond those of the loader plugin interface.
+ *
+ * ```js
+ * define([
+ *   "my/plugin-module!foo.bar",
+ *   "my/plugin-module"
+ * ], function(fooBar, pluginModule) {
+ *   // ...
+ * }
+ * ```
+ *
+ * AMD loader plugin modules are required to contain a [load]{@link IAmdLoaderPlugin#load} method.
+ *
+ * @name IAmdLoaderPlugin
+ * @interface
+ * @see http://requirejs.org/docs/plugins.html
+ */
+
+/**
+ * Loads a logical module given its name.
+ *
+ * @name load
+ * @memberOf IAmdLoaderPlugin#
+ * @method
+ *
+ * @param {string} name - The name of the logical module to load.
+ * @param {function} require - The contextual require function of the dependent module, if any,
+ *  or the global `require` function, if requested using it.
+ * @param {function} onLoad - Callback function to call with the resolved module, once it is resolved.
+ * @param {object} config - The full AMD/RequireJS config object.
+ */
+
+/**
+ * Normalizes the name of a logical module.
+ *
+ * Converts several names that refer to the same logical module to its canonical name,
+ * to ensure that the modules are recognized as being the same and are correctly cached.
+ *
+ * This is an optional method.
+ *
+ * @name normalize
+ * @memberOf IAmdLoaderPlugin#
+ * @method
+ *
+ * @param {string} name - The name of the logical module to load.
+ * @param {function} normalize - The default normalize function.
+ * @return {string} The normalized logical module
+ */

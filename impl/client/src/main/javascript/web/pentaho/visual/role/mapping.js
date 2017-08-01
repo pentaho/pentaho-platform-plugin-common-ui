@@ -615,7 +615,7 @@ define([
          * The root [visual.role.Mapping]{@link pentaho.visual.role.Mapping} has
          * a `levels` attribute which is list of all possible measurement levels.
          *
-         * Do **NOT** modify the returned list or its elements in any way.
+         * The returned list or its elements should not be modified.
          *
          * @type {pentaho.type.List.<pentaho.visual.role.MeasurementLevel>}
          *

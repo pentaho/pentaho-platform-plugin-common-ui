@@ -15,8 +15,14 @@
  */
 
 /**
- * RequireJS loader plugin for loading localized messages.
+ * The _main_ localization service of the JavaScript Pentaho platform.
+ *
+ * @name main
+ * @memberOf pentaho.i18n
+ * @type {pentaho.i18n.IService}
+ * @amd pentaho/i18n
  */
+
 define([
   "./context",
   "./util/MessageBundle",
@@ -25,7 +31,7 @@ define([
 
   "use strict";
 
-  return {
+  return /** @type pentaho.i18n.IService */ {
     load: function(bundlePath, localRequire, onLoad, config) {
 
       if(config.isBuild) {

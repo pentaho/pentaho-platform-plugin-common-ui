@@ -112,24 +112,21 @@
 
     <?js 
       var classes = self.find({kind: 'class', memberof: doc.longname});
-      if (!isGlobalPage && classes && classes.length) {
-    ?>
+      if (!isGlobalPage && classes && classes.length) { ?>
         <h3>Classes</h3>
         <?js= self.partial('summary.tmpl', classes) ?>
     <?js } ?>
 
     <?js 
       var events = self.find({kind: 'event', memberof: doc.longname, scope: "static"});
-      if (!isGlobalPage && events && events.length) {
-    ?>
+      if (!isGlobalPage && events && events.length) { ?>
         <h3>Events</h3>
         <?js= self.partial('summary.tmpl', events) ?>
     <?js } ?>
 
     <?js 
       var interfaces = self.find({kind: 'interface', memberof: doc.longname});
-      if (!isGlobalPage && events && events.length) {
-    ?>
+      if (!isGlobalPage && interfaces && interfaces.length) { ?>
         <h3>Interfaces</h3>
         <?js= self.partial('summary.tmpl', interfaces) ?>
     <?js } ?>
@@ -137,7 +134,6 @@
     <?js var mixins = self.find({kind: 'mixin', memberof: doc.longname});
     if (!isGlobalPage && mixins && mixins.length) { ?>
         <h3>Mixins</h3>
-
         <dl><?js mixins.forEach(function(m) { ?>
             <dt><?js= self.linkto(m.longname, m.name) ?></dt>
         <?js }); ?></dl>
