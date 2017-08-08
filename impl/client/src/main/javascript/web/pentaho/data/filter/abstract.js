@@ -29,6 +29,7 @@ define([
   "./_core/isLess",
   "./_core/isGreaterOrEqual",
   "./_core/isLessOrEqual",
+  "./_core/isLike",
   "pentaho/util/arg",
   "pentaho/util/error",
   "pentaho/util/object",
@@ -37,7 +38,7 @@ define([
   "pentaho/debug/Levels"
 ], function(module, complexFactory, treeFactory, andFactory, orFactory, notFactory, trueFactory, falseFactory,
             propertyFactory, isEqFactory, isInFactory, isGtFactory, isLtFactory, isGteFactory, isLteFactory,
-            arg, error, O, logger, debugMgr, DebugLevels) {
+            isLikeFactory, arg, error, O, logger, debugMgr, DebugLevels) {
 
   "use strict";
 
@@ -455,6 +456,7 @@ define([
     isLtFactory(__filter);
     isGteFactory(__filter);
     isLteFactory(__filter);
+    isLikeFactory(__filter);
 
     return __filter.Abstract;
 

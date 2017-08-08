@@ -26,12 +26,13 @@ define([
   "./isLess",
   "./isGreaterOrEqual",
   "./isLessOrEqual",
+  "./isLike",
   "./true",
   "./false"
 ], function(
     abstractFactory, treeFactory, propFactory,
     andFactory, orFactory, notFactory, isEqFactory, isInFactory, isGtFactory, isLtFactory, isGteFactory, isLteFactory,
-    trueFactory, falseFactory) {
+    isLikeFactory, trueFactory, falseFactory) {
 
   "use strict";
 
@@ -48,6 +49,7 @@ define([
     "isLess": isLtFactory,
     "isGreaterOrEqual": isGteFactory,
     "isLessOrEqual": isLteFactory,
+    "isLike": isLikeFactory,
     "true": trueFactory,
     "false": falseFactory
   };
