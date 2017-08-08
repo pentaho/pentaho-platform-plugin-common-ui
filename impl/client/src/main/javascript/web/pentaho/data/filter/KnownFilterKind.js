@@ -83,6 +83,12 @@ define(function() {
     IsLessOrEqual: "isLessOrEqual",
 
     /**
+     * The [IsLike]{@link pentaho.data.filter.IsLike} filter kind.
+     * @default
+     */
+    IsLike: "isLike",
+
+    /**
      * The [True]{@link pentaho.data.filter.True} filter kind.
      * @default
      */

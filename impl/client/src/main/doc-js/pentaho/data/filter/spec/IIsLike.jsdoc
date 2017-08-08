@@ -15,20 +15,20 @@
  */
 
 /**
- * The `spec.IIsGreaterOrEqual` interface describes the information associated with a is greater or equal filter.
+ * The `spec.IIsLike` interface describes the information associated with an is-like filter.
  *
- * @name pentaho.data.filter.spec.IIsGreaterOrEqual
+ * @name pentaho.data.filter.spec.IIsLike
  *
  * @interface
  * @extends pentaho.data.filter.spec.IProperty
  *
- * @see pentaho.data.filter.IsGreaterOrEqual
+ * @see pentaho.data.filter.IsLike
  */
 
 /**
- * The value which the property is expected to be greater or equal to.
+ * The value to which the property is expected to be an affix of.
  *
  * @name value
- * @memberOf pentaho.data.filter.spec.IIsGreaterOrEqual#
- * @type {!pentaho.type.UElement}
+ * @memberOf pentaho.data.filter.spec.IIsLike#
+ * @type pentaho.type.UValue
  */

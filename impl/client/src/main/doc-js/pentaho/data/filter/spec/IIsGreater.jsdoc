@@ -26,7 +26,7 @@
  */
 
 /**
- * The expected value of the property.
+ * The value which the property is expected to be greater than.
  *
  * @name value
  * @memberOf pentaho.data.filter.spec.IIsGreater#

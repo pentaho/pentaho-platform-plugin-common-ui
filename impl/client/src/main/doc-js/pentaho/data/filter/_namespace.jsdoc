@@ -36,6 +36,7 @@
  *     * [pentaho/data/filter/isLess]{@link pentaho.data.filter.IsLess}
  *     * [pentaho/data/filter/isGreaterOrEqual]{@link pentaho.data.filter.IsGreaterOrEqual}
  *     * [pentaho/data/filter/isLessOrEqual]{@link pentaho.data.filter.IsLessOrEqual}
+ *     * [pentaho/data/filter/IsLike]{@link pentaho.data.filter.IsLike}
  *
  * @name pentaho.data.filter
  * @namespace

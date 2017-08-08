@@ -13,22 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+define([
+  "./abstract"
+], function(abstractFactory) {
 
-/**
- * The `spec.IIsGreaterOrEqual` interface describes the information associated with a is greater or equal filter.
- *
- * @name pentaho.data.filter.spec.IIsGreaterOrEqual
- *
- * @interface
- * @extends pentaho.data.filter.spec.IProperty
- *
- * @see pentaho.data.filter.IsGreaterOrEqual
- */
+  "use strict";
 
-/**
- * The value which the property is expected to be greater or equal to.
- *
- * @name value
- * @memberOf pentaho.data.filter.spec.IIsGreaterOrEqual#
- * @type {!pentaho.type.UElement}
- */
+  return function(context) {
+
+    var Abstract = context.get(abstractFactory);
+
+    return Abstract._core.IsLike;
+  };
+});
