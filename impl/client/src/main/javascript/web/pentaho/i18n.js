@@ -22,12 +22,11 @@
  * @type {pentaho.i18n.IService}
  * @amd pentaho/i18n
  */
-
 define([
   "./environment",
   "./i18n/MessageBundle",
   "json"
-], function(context, MessageBundle) {
+], function(env, MessageBundle) {
 
   "use strict";
 
@@ -40,8 +39,11 @@ define([
         onLoad();
       } else {
         var bundleInfo = __getBundleInfo(localRequire, bundlePath);
-        var serverUrl = context.server.root;
-        var bundleUrl = "json!" + ((serverUrl && serverUrl.pathname) || "") +
+        var serverUrl = env.server.root;
+
+        // Taking into account embedded scenarios when the host
+        // is not the Pentaho Server / PDI
+        var bundleUrl = "json!" + serverUrl +
             "i18n?plugin=" + bundleInfo.pluginId + "&name=" + bundleInfo.name;
 
         localRequire([bundleUrl], function(bundle) {
@@ -110,11 +112,14 @@ define([
 
     var absBundleUrl = localRequire.toUrl(bundleMid);
 
+    var serverUrl = env.server.root;
+
     // Remove basePath from bundle url
-    var serverUrl = context.server.root;
-    var basePath = (serverUrl && serverUrl.pathname) || "";
-    if(basePath && absBundleUrl.indexOf(basePath) === 0)
-      absBundleUrl = absBundleUrl.substr(basePath.length);
+    // Taking into account embedded scenarios, where it will be a full URL - "http://host:port/..."
+    var reminderUrlRegX = new RegExp("^(?:" + serverUrl + "|" + serverUrl.origin + "|" + serverUrl.pathname + ")(.*)");
+    var reminderUrlMatch = reminderUrlRegX.exec(absBundleUrl);
+
+    absBundleUrl = reminderUrlMatch ? reminderUrlMatch[1] : absBundleUrl;
 
     // The same for content/
     if(absBundleUrl.indexOf("content/") === 0)
