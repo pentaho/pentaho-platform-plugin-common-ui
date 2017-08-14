@@ -4,6 +4,10 @@
     <file>globalOnyx.css</file>
     <file>bootstrap/css/bootstrap-namespaced.css</file>
   </onyx>
+  <ruby display-name="Ruby" system="true">
+    <file>globalRuby.css</file>
+    <file>bootstrap/css/bootstrap-namespaced.css</file>
+  </ruby>
   <crystal display-name="Crystal" system="true">
     <file>globalCrystal.css</file>
     <file>bootstrap/css/bootstrap-namespaced.css</file>

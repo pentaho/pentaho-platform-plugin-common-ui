@@ -175,13 +175,13 @@
   }
 
   // Type API Base Theme
-  mapTheme("pentaho/type", "themes", ["crystal"]);
+  mapTheme("pentaho/type", "themes", ["ruby"]);
 
   // Visual Models Themes
-  mapTheme("pentaho/visual/models", "themes", ["crystal", "sapphire", "onyx", "det"]);
+  mapTheme("pentaho/visual/models", "themes", ["crystal", "sapphire", "onyx", "det", "ruby"]);
 
   // sample/calc theme
-  mapTheme("pentaho/visual/samples/calc", "themes", ["crystal"]);
+  mapTheme("pentaho/visual/samples/calc", "themes", ["ruby"]);
 
   requirePackages.push({"name": "pentaho/visual/base", "main": "model"});
   requirePackages.push({"name": "pentaho/visual/samples/calc", "main": "model"});
