@@ -1558,14 +1558,12 @@ define([
           }.bind(this), []);
         }
 
-        if(operands.length) {
-          var SelectAction = this.$type.context.get(selectActionFactory);
-          var Or = this.$type.context.get("or");
-          this.act(new SelectAction({
-            dataFilter: new Or({operands: operands}),
-            position: srcEvent ? {x: srcEvent.clientX, y: srcEvent.clientY} : null
-          }));
-        }
+        var SelectAction = this.$type.context.get(selectActionFactory);
+        var Or = this.$type.context.get("or");
+        this.act(new SelectAction({
+          dataFilter: new Or({operands: operands}),
+          position: srcEvent ? {x: srcEvent.clientX, y: srcEvent.clientY} : null
+        }));
 
         // Explicitly cancel CCC's native selection handling.
         return [];
