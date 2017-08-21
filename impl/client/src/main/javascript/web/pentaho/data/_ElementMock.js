@@ -33,6 +33,10 @@ define([
 
     getv: function(property) {
       return this.table.getValue(this.rowIdx, this.table.getColumnIndexByAttribute(property));
+    },
+
+    getf: function(property) {
+      return this.table.getFormattedValue(this.rowIdx, this.table.getColumnIndexByAttribute(property));
     }
   });
 });
