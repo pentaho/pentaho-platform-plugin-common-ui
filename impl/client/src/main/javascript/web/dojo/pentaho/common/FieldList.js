@@ -369,7 +369,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
   onFieldMouseOver: function(event) {
     if (event.currentTarget==this.dndObj.anchor) {
       return;
-    }  
+    }
     if(this.selector) {
         this.selector.onMouseOver(event);
     }
@@ -389,9 +389,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     if(!domClass.contains(event.target,'pentaho-listitem-selected')) {
         domClass.add(event.target, 'pentaho-listitem');
         domClass.remove(event.target, 'pentaho-listitem-hover');
-    } else {
-        domClass.remove(event.target, 'pentaho-listitem-hover');
-        domClass.add(event.target, 'pentaho-listitem-selected');
     }
   },
 
@@ -504,23 +501,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
 
     var id = "field-" + fieldId;
     var node = dom.byId(id);
+    // Logic borrowed from dojo.dnd.Selector.onMouseDown
     if (!selected) {
       this.clearSelection();
-      // Logic borrowed from dojo.dnd.Selector.selectAll
-      this.dndObj._addItemClass(node, "Selected")
+      this.dndObj.anchor = node;
+      this.dndObj._addItemClass(node, "Anchor");
       this.dndObj.selection[id] = 1;
     }
-    _anchor = this.dndObj.anchor;
-    // Update anchor
-    if (this.dndObj.anchor) {
-      this.dndObj._removeItemClass(this.dndObj.anchor, "Anchor");
-      this.dndObj._addItemClass(this.dndObj.anchor, "Selected");
-    }
-	
-    this.dndObj._addItemClass(node, "Anchor");
-    this.dndObj._removeItemClass(node, "Selected");
-    this.dndObj.anchor = node;
-
   },
 
   getSelectedItems: function() {
