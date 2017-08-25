@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
  */
 
 /**
- * This is the prompting user interface API class. Contains all general functions for working with the prompting user interface.
+ * This is the prompting user interface API class. Contains all general functions for working with the prompting user
+ * interface.
  *
  * @name UiAPI
  * @class
@@ -53,7 +54,7 @@ define([], function() {
     };
 
     /**
-     * Sets the default options for blockUI, which allows you to simulate synchronous behaviour when using AJAX
+     * Sets the default options for blockUI, which allows you to simulate synchronous behavior when using AJAX
      * by preventing user activity. Visually, an overlay can be used to cover the user interface.
      *
      * @name UiAPI#setBlockUiOptions
@@ -86,6 +87,20 @@ define([], function() {
      */
     this.setBlockUiOptions = function(options) {
       api.operation._getPromptPanel().setBlockUiOptions(options);
+    };
+
+    /**
+     * Enables or disables a submit button in a submit panel. Checks if it's necessary change "disabled" attribute of
+     * the button and applies it to a submit button component in the dashboard.
+     *
+     * @name UiAPI#setDisabledSubmitButton
+     * @method
+     * @param {Boolean} disabled When `true` enables the submit button, when `false` disables it.
+     * @example
+     *      api.ui.setDisabledSubmitButton(true);
+     */
+    this.setDisabledSubmitButton = function(disabled) {
+      api.operation._getPromptPanel().setDisabledSubmitButton(disabled);
     };
   };
 });

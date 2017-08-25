@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
  */
 
-define([ 'common-ui/prompting/components/ScopedPentahoButtonComponent', 'common-ui/jquery-clean' ], function(
+define(["common-ui/prompting/components/ScopedPentahoButtonComponent", "common-ui/jquery-clean"], function(
   ScopedPentahoButtonComponent, $) {
 
   describe("ScopedPentahoButtonComponent", function() {
@@ -37,7 +37,7 @@ define([ 'common-ui/prompting/components/ScopedPentahoButtonComponent', 'common-
       var testLabel = "test label";
       var id = "test_id";
       var comp;
-      var spyElem = jasmine.createSpyObj("spyElem", [ "bind", "appendTo" ]);
+      var spyElem = jasmine.createSpyObj("spyElem", ["bind", "appendTo"]);
       spyElem.bind.and.returnValue(spyElem);
       spyElem.appendTo.and.returnValue(spyElem);
       beforeEach(function() {
@@ -60,8 +60,8 @@ define([ 'common-ui/prompting/components/ScopedPentahoButtonComponent', 'common-
       afterEach(function() {
         expect($.fn.empty).toHaveBeenCalled();
         expect($.fn.text).toHaveBeenCalledWith(testLabel);
-        expect(spyElem.bind.calls.argsFor(0)).toEqual([ "mousedown", jasmine.any(Function) ]);
-        expect(spyElem.bind.calls.argsFor(1)).toEqual([ "click", jasmine.any(Function) ]);
+        expect(spyElem.bind.calls.argsFor(0)).toEqual(["mousedown", jasmine.any(Function)]);
+        expect(spyElem.bind.calls.argsFor(1)).toEqual(["click", jasmine.any(Function)]);
         expect(spyElem.appendTo).toHaveBeenCalled();
       });
     });
@@ -69,6 +69,24 @@ define([ 'common-ui/prompting/components/ScopedPentahoButtonComponent', 'common-
     it("should execute expressionStart fn", function() {
       var comp = new ScopedPentahoButtonComponent();
       comp.expressionStart();
+    });
+
+    describe("setDisabledButton", function() {
+      beforeEach(function() {
+        spyOn($.fn, "attr");
+      });
+
+      it("should disable the submit button", function() {
+        var comp = new ScopedPentahoButtonComponent();
+        comp.setDisabledButton(true);
+        expect($.fn.attr).toHaveBeenCalledWith("disabled", true);
+      });
+
+      it("should enable the submit button", function() {
+        var comp = new ScopedPentahoButtonComponent();
+        comp.setDisabledButton(false);
+        expect($.fn.attr).toHaveBeenCalledWith("disabled", false);
+      });
     });
   });
 });
