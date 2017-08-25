@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 /**
  * <h2>The ScopedPentahoButtonComponent</h2>
  *
- * <p>The ScopedPentahoButtonComponent is an abstract class, that needs to be extended by whoever needs to create a submit
- * prompt component. This abstraction is used to render a single button and register click event to submit prompts and
- * update report. Also it's used as super class for {@link SubmitPromptComponent}.</p>
+ * <p>The ScopedPentahoButtonComponent is an abstract class, that needs to be extended by whoever needs to create a
+ * submit prompt component. This abstraction is used to render a single button and register click event to submit
+ * prompts and update report. Also it's used as super class for {@link SubmitPromptComponent}.</p>
  *
  * To use the ScopedPentahoButtonComponent you should require the appropriate file from common-ui:
  *
@@ -36,7 +36,7 @@
  * @class
  * @extends BaseComponent
  */
-define([ 'cdf/components/BaseComponent', 'common-ui/jquery-clean' ], function(BaseComponent, $) {
+define(["cdf/components/BaseComponent", "common-ui/jquery-clean"], function(BaseComponent, $) {
   return BaseComponent.extend({
 
     /**
@@ -45,7 +45,7 @@ define([ 'cdf/components/BaseComponent', 'common-ui/jquery-clean' ], function(Ba
      * @method
      * @name ScopedPentahoButtonComponent#update
      */
-    update : function() {
+    update: function() {
       this.registerSubmitClickEvent();
     },
 
@@ -57,16 +57,18 @@ define([ 'cdf/components/BaseComponent', 'common-ui/jquery-clean' ], function(Ba
      * @name ScopedPentahoButtonComponent#registerSubmitClickEvent
      * @private
      */
-    registerSubmitClickEvent : function() {
-      if (!this.viewReportButtonRegistered) {
+    registerSubmitClickEvent: function() {
+      if(!this.viewReportButtonRegistered) {
 
         var $container = $("#" + this.htmlObject).empty();
+        var disabledSubmitBtn = this.promptPanel && !this.promptPanel.isEnableSubmitButton;
 
-        $("<button type='button' class='pentaho-button'/>").text(this.label).bind("mousedown",
-          this.expressionStart.bind(this)).bind("click", function() {
-          // Don't let click-event go as first argument.
-          this.expression(false);
-        }.bind(this)).appendTo($container);
+        $("<button type='button' class='pentaho-button' " + (disabledSubmitBtn ? "disabled" : "") + "/>")
+          .text(this.label)
+          .bind("mousedown", this.expressionStart.bind(this)).bind("click", function() {
+            // Don't let click-event go as first argument.
+            this.expression(false);
+          }.bind(this)).appendTo($container);
       }
     },
 
@@ -75,9 +77,9 @@ define([ 'cdf/components/BaseComponent', 'common-ui/jquery-clean' ], function(Ba
      *
      * @name ScopedPentahoButtonComponent#expression
      * @method
-     * @param {Boolean} isInit
+     * @param {Boolean} isInit - Flag informing if the prompt is being initialized
      */
-    expression : function(isInit) {
+    expression: function(isInit) {
     },
 
     /**
@@ -86,7 +88,19 @@ define([ 'cdf/components/BaseComponent', 'common-ui/jquery-clean' ], function(Ba
      * @name ScopedPentahoButtonComponent#expressionStart
      * @method
      */
-    expressionStart : function() {
+    expressionStart: function() {
+    },
+
+    /**
+     * Sets `disabled` attribute of the submit button.
+     * Can be called by Prompting API to enable/disable the submit button for example, for validation purpose.
+     *
+     * @name ScopedPentahoButtonComponent#setDisabledButton
+     * @method
+     * @param {boolean} disabled When `true` enables the submit button, when `false` disables it.
+     */
+    setDisabledButton: function(disabled) {
+      $("#" + this.name).find("button.pentaho-button").attr("disabled", disabled);
     }
   });
 });
