@@ -26,6 +26,7 @@ define([
     var context;
     var Model;
     var RoleProperty;
+    var PaletteProperty;
     var dataSpec;
 
     beforeEach(function(done) {
@@ -36,10 +37,12 @@ define([
 
             return context.getDependencyApplyAsync([
               "pentaho/visual/base/model",
-              "pentaho/visual/role/property"
-            ], function(_Model, _RoleProperty) {
+              "pentaho/visual/role/property",
+              "pentaho/visual/color/paletteProperty"
+            ], function(_Model, _RoleProperty, _PaletteProperty) {
               Model = _Model;
               RoleProperty = _RoleProperty;
+              PaletteProperty = _PaletteProperty;
             });
           })
           .then(done, done.fail);
@@ -182,6 +185,24 @@ define([
           var NotRoleProp = context.get("complex");
 
           expect(Model.type.isVisualRole(NotRoleProp.type)).toBe(false);
+        });
+      });
+
+      describe("#isColorPalette()", function() {
+
+        it("should return true if property type is a color.PaletteProperty", function() {
+
+          var SubColorPaletteProperty = PaletteProperty.extend();
+
+          expect(Model.type.isColorPalette(PaletteProperty.type)).toBe(true);
+          expect(Model.type.isColorPalette(SubColorPaletteProperty.type)).toBe(true);
+        });
+
+        it("should return false if type is not a Color Palette", function() {
+
+          var NotPaletteProp = context.get("complex");
+
+          expect(Model.type.isColorPalette(NotPaletteProp.type)).toBe(false);
         });
       });
 

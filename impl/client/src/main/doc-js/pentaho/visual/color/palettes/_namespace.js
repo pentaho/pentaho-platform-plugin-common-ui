@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,8 @@
  */
 
 /**
- * @classDesc A color palette is an ordered list of colors.
+ * The `palettes` namespace contains the standard color palettes instances.
  *
- * @see pentaho.visual.color.PaletteRegistry
- *
- * @interface
- * @name pentaho.visual.color.IColorPalette
- *
- * @property {string} name - The name of the color palette.
- * @property {string[]} colors - The array of colors of the palette, in "#RRGGBB" format.
+ * @name pentaho.visual.color.palettes
+ * @namespace
  */

@@ -213,4 +213,9 @@
   requireTypeInfo["pentaho/visual/action/select"] = {alias: "select", base: "pentaho/visual/action/data"};
   requireTypeInfo["pentaho/visual/action/execute"] = {alias: "execute", base: "pentaho/visual/action/data"};
 
+  // Color Palette
+  requireTypeInfo["pentaho/visual/color/palette"] = {base: "complex"};
+
+  requireTypes["pentaho/visual/config/vizApi.conf"] = "pentaho.config.spec.IRuleSet";
+
 })();

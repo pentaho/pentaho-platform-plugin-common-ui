@@ -23,10 +23,12 @@ define([
   return [
     "pentaho/type/model",
     "pentaho/visual/role/property",
+    "pentaho/visual/color/paletteProperty",
     "pentaho/visual/base/application",
-    function(Model, RoleProperty, VisualApplication) {
+    function(Model, RoleProperty, PaletteProperty, VisualApplication) {
 
       var _rolePropertyType = RoleProperty.type;
+      var _palettePropertyType = PaletteProperty.type;
 
       /**
        * @name pentaho.visual.base.Model.Type
@@ -144,6 +146,17 @@ define([
            */
           isVisualRole: function(propType) {
             return propType.isSubtypeOf(_rolePropertyType);
+          },
+
+          /**
+           * Gets a value that indicates if a given property type is a subtype of
+           * {@link pentaho.visual.color.PaletteProperty.Type}.
+           *
+           * @param {!pentaho.type.Property.Type} propType - The property type to test.
+           * @return {boolean} `true` if `type` is a color palette property type; or `false`, otherwise.
+           */
+          isColorPalette: function(propType) {
+            return propType.isSubtypeOf(_palettePropertyType);
           }
         }
       })

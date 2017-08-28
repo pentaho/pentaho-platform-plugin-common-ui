@@ -44,6 +44,31 @@ define(function() {
 
   return {
     rules: [
+      // region Viz API Standard Color Palettes Context Registration
+      {
+        priority: RULE_PRIO_VIZ_DEFAULT,
+        select: {
+          type: "pentaho/type/Context"
+        },
+        apply: {
+          instances: {
+            "pentaho/visual/color/palettes/nominalPrimary":    {type: "pentaho/visual/color/palette", priority: -10},
+            "pentaho/visual/color/palettes/nominalNeutral":    {type: "pentaho/visual/color/palette", priority: -110},
+            "pentaho/visual/color/palettes/nominalLight":      {type: "pentaho/visual/color/palette", priority: -120},
+            "pentaho/visual/color/palettes/nominalDark":       {type: "pentaho/visual/color/palette", priority: -130},
+            "pentaho/visual/color/palettes/quantitativeBlue3": {type: "pentaho/visual/color/palette", priority: -10},
+            "pentaho/visual/color/palettes/quantitativeBlue5": {type: "pentaho/visual/color/palette", priority: -10},
+            "pentaho/visual/color/palettes/quantitativeGray3": {type: "pentaho/visual/color/palette", priority: -10},
+            "pentaho/visual/color/palettes/quantitativeGray5": {type: "pentaho/visual/color/palette", priority: -10},
+            "pentaho/visual/color/palettes/divergentRyg3":     {type: "pentaho/visual/color/palette", priority: -10},
+            "pentaho/visual/color/palettes/divergentRyg5":     {type: "pentaho/visual/color/palette", priority: -10},
+            "pentaho/visual/color/palettes/divergentRyb3":     {type: "pentaho/visual/color/palette", priority: -10},
+            "pentaho/visual/color/palettes/divergentRyb5":     {type: "pentaho/visual/color/palette", priority: -10}
+          }
+        }
+      },
+      // endregion
+
       // region Model Rules
 
       // line/barLine models
