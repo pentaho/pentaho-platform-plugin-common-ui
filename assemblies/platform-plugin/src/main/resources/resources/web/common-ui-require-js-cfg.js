@@ -272,13 +272,13 @@
   }
 
   // Type API Base Theme
-  mapTheme("pentaho/type", "themes", ["crystal"]);
+  mapTheme("pentaho/type", "themes", ["ruby"]);
 
   // Visual Models Themes
-  mapTheme("pentaho/visual/models", "themes", ["crystal", "sapphire", "onyx", "det"]);
+  mapTheme("pentaho/visual/models", "themes", ["crystal", "sapphire", "onyx", "det", "ruby"]);
 
   // sample/calc theme
-  mapTheme("pentaho/visual/samples/calc", "themes", ["crystal"]);
+  mapTheme("pentaho/visual/samples/calc", "themes", ["ruby"]);
 
   requireTypes["pentaho/visual/config/vizApi.conf"] = "pentaho.config.spec.IRuleSet";
 
