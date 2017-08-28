@@ -1,0 +1,46 @@
+
+.pentaho-type-instance.component-icon-small,
+.pentaho-type-instance.component-icon-medium,
+.pentaho-type-instance.component-icon-sprite,
+.pentaho-type-instance.component-icon-large,
+.pentaho-type-instance.component-icon-landscape
+{
+  background: no-repeat center;
+  background-size: contain;
+  /*border: solid 1px red;*/
+}
+
+.pentaho-type-instance.component-icon-small {
+  width:  16px;
+  height: 16px;
+  background-image: url("./images/icon-small.png");
+}
+
+.pentaho-type-instance.component-icon-medium {
+  width:  32px;
+  height: 32px;
+  background-image: url("./images/icon-medium.png");
+}
+
+.pentaho-type-instance.component-icon-sprite {
+  width:  40px;
+  height: 40px;
+  background-image: url("./images/icon-sprite.svg");
+  background-position: 0 -40px;
+
+}
+.pentaho-type-instance.component-icon-sprite.active {
+  background-position: 0 0;
+}
+
+.pentaho-type-instance.component-icon-large {
+  width:  64px;
+  height: 64px;
+  background-image: url("./images/icon-large.png");
+}
+
+.pentaho-type-instance.component-icon-landscape {
+  width:  168px;
+  height: 119px;
+  background-image: url("./images/icon-landscape.png");
+}
