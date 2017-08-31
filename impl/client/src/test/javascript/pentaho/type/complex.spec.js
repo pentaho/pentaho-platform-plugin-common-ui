@@ -29,7 +29,6 @@ define([
   var Value = context.get("value");
   var Complex = context.get("complex");
   var Property = context.get("property");
-  var PentahoString = context.get("string");
   var List = context.get("list");
 
   describe("pentaho.type.Complex", function() {
@@ -185,9 +184,12 @@ define([
     });
 
     describe("#$key", function() {
-      it("should return the value of #uid", function() {
+
+      it("should return the value of #$uid", function() {
+
         var value = new Complex();
-        expect(value.$uid).toBe(value.$key);
+
+        expect(value.$key).toBe(value.$uid);
       });
     });
 
@@ -1074,7 +1076,6 @@ define([
         expect(aList.at(1)).toBe(bList.at(1));
         expect(aList.at(2)).toBe(bList.at(2));
       });
-
     });
 
     describe("#_configure(config)", function() {

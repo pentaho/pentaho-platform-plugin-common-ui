@@ -64,7 +64,7 @@ define([
      *
      * When a derived class overrides the constructor
      * and creates additional instance properties,
-     * the {@link pentaho.type.List#_clone} method should
+     * the {@link pentaho.type.List#_initClone} method should
      * also be overridden to copy those properties.
      *
      * @constructor

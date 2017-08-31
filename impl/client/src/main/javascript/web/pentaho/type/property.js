@@ -158,7 +158,7 @@ define([
               // Required stuff
               if(!("name" in spec)) this.name = null; // throws
 
-              // Assume the _default_ type _before_ extend, to make sure `value` can be validated against it.
+              // Assume the _default_ type _before_ extend, to make sure `defaultValue` can be validated against it.
               if(!spec.valueType && (this.__valueType === __propType.__valueType))
                 this.valueType = _defaultTypeMid;
             }
@@ -393,7 +393,7 @@ define([
          * [subtype]{@link pentaho.type.Type#isSubtypeOf} of the attribute's current _value type_,
          * an error is thrown.
          *
-         * ### Relation to `value` attribute
+         * ### Relation to the `defaultValue` attribute
          *
          * When set and the [value]{@link pentaho.type.Property.Type#value} attribute
          * is _locally_ set, it is checked against the new _value type_,
@@ -493,7 +493,7 @@ define([
          * @throws {Error} When setting to a _default value_ that cannot be converted to the
          * property type's current `valueType`.
          *
-         * @see pentaho.type.spec.IPropertyTypeProto#value
+         * @see pentaho.type.spec.IPropertyTypeProto#defaultValue
          */
         get defaultValue() {
           var value = this.__defaultValue;

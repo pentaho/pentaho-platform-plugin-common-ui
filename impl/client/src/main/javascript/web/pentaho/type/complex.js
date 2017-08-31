@@ -88,7 +88,7 @@ define([
      * @description Creates a complex instance.
      *
      * When a derived class overrides the constructor and creates additional instance properties,
-     * the {@link pentaho.type.Complex#_clone} method should also be overridden to copy those properties.
+     * the {@link pentaho.type.Complex#_initClone} method should also be overridden to copy those properties.
      *
      * @constructor
      * @param {pentaho.type.spec.UComplex} [spec] A complex specification.
@@ -106,9 +106,22 @@ define([
       // NOTE 2: keep the constructor code synced with #clone !
       constructor: function(spec, keyArgs) {
 
+        // Ensure compiler gets a stable properties layout.
+
         this._initContainer();
 
-        // Create `Property` instances.
+        this._initProperties(spec);
+      },
+
+      /**
+       * Initializes the properties of the complex instance from a the given specification.
+       *
+       * @param {pentaho.type.spec.UComplex} [spec] A complex specification.
+       * @protected
+       */
+      _initProperties: function(spec) {
+
+        // Create `Property` instances (not quite...).
         var propTypes = this.$type.__getProps();
         var i = propTypes.length;
         var readSpec = !spec ? undefined : (Array.isArray(spec) ? __readSpecByIndex : __readSpecByNameOrAlias);
@@ -119,33 +132,14 @@ define([
         while(i--) {
           propType = propTypes[i];
 
-          values[propType.name] =
-              value = this._initValue(propType.toValue(readSpec && readSpec(spec, propType)), propType);
+          values[propType.name] = value = propType.toValue(readSpec && readSpec(spec, propType));
 
-          if(value && value.__addReference) {
-            this.__initValueRelation(propType, value);
+          if(value != null && value.__addReference) {
+            this.__initPropertyValueRelation(propType, value);
           }
         }
 
         this.__values = values;
-      },
-
-      /**
-       * Allows further initializing the value of a property.
-       *
-       * This method is called from within the base constructor.
-       *
-       * It is absolutely mandatory to return a value that is an instance of the type of value of the property.
-       * If the value should remain "empty", return `null`, and never `undefined`.
-       *
-       * @param {pentaho.type.Value} value - The value of the property, possibly `null`.
-       * @param {!pentaho.type.Property.Type} propType - The property type.
-       *
-       * @return {pentaho.type.Value} The value of the property, possibly `null`.
-       * @protected
-       */
-      _initValue: function(value, propType) {
-        return value;
       },
 
       /**
@@ -166,7 +160,7 @@ define([
        *
        * @private
        */
-      __initValueRelation: function(propType, value) {
+      __initPropertyValueRelation: function(propType, value) {
 
         if(propType.isList || !propType.isBoundary) {
           value.__addReference(this, propType);
@@ -186,8 +180,7 @@ define([
        * If two values of the same concrete type have distinct keys,
        * then {@link pentaho.type.Value.Type#areEqual} should return `false`.
        *
-       * The default complex implementation, returns the value of the
-       * complex instance's {@link pentaho.type.Complex#$uid}.
+       * The default complex implementation returns the value of the [$uid]{@link pentaho.type.Complex#$uid} property.
        *
        * @type {string}
        * @readOnly
@@ -456,6 +449,7 @@ define([
         keyArgs = keyArgs ? Object.create(keyArgs) : {};
 
         var spec;
+
         var noAlias = !!keyArgs.noAlias;
         var declaredType;
         var includeType = !!keyArgs.forceType ||
@@ -468,8 +462,8 @@ define([
         } else {
           spec = {};
           if(includeType) spec._ = this.$type.toRefInContext(keyArgs);
-          omitProps = keyArgs.omitProps;
 
+          omitProps = keyArgs.omitProps;
           // Do not propagate to child values
           keyArgs.omitProps = null;
         }
@@ -824,7 +818,7 @@ define([
           cloneValues[name] = value = propType.isList ? this.__getByName(name).clone() : source.__getByName(name);
 
           if(value && value.__addReference) {
-            clone.__initValueRelation(propType, value);
+            clone.__initPropertyValueRelation(propType, value);
           }
         }
 

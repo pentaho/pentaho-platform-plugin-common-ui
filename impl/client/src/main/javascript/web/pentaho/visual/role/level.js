@@ -29,23 +29,23 @@ define([
     var pentahoSimple = context.get("simple").type;
 
     /**
-     * @name pentaho.visual.role.MeasurementLevel.Type
+     * @name pentaho.visual.role.Level.Type
      * @class
      * @extends pentaho.type.String.Type
      * @extends pentaho.type.mixins.DiscreteDomain.Type
      *
-     * @classDesc The type class of {@link pentaho.visual.role.MeasurementLevel}.
+     * @classDesc The type class of {@link pentaho.visual.role.Level}.
      */
 
     /**
-     * @name pentaho.visual.role.MeasurementLevel
+     * @name pentaho.visual.role.Level
      * @class
      * @extends pentaho.type.String
      * @extends pentaho.type.mixins.DiscreteDomain
      *
-     * @amd {pentaho.type.Factory<pentaho.visual.role.MeasurementLevel>} pentaho/visual/role/level
+     * @amd {pentaho.type.Factory<pentaho.visual.role.Level>} pentaho/visual/role/level
      *
-     * @classDesc The `MeasurementLevel` class is [String]{@link pentaho.type.String} based enumeration
+     * @classDesc The `Level` class is [String]{@link pentaho.type.String} based enumeration
      * that represents a **Level or Measurement**,
      * as understood by [S. S. Steven]{@link https://en.wikipedia.org/wiki/Level_of_measurement}.
      *
@@ -88,7 +88,7 @@ define([
 
     var Level = PentahoString.extend({
 
-      $type: /** @lends pentaho.visual.role.MeasurementLevel.Type# */{
+      $type: /** @lends pentaho.visual.role.Level.Type# */{
 
         id: module.id,
         mixins: ["enum"],

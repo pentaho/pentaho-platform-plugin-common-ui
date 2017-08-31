@@ -117,7 +117,7 @@ define([
          *
          * The returned array or its elements should not be modified.
          *
-         * @type {!pentaho.type.List.<pentaho.visual.role.MeasurementLevel>}
+         * @type {!pentaho.type.List.<pentaho.visual.role.Level>}
          *
          * @throws {pentaho.lang.OperationInvalidError} When setting and the type already has
          * [subtypes]{@link pentaho.type.Type#hasDescendants}.
@@ -582,7 +582,7 @@ define([
          * with a given data property level of measurement, if any.
          *
          * @param {string} attributeLevel - The level of measurement of the data property.
-         * @param {pentaho.visual.role.MeasurementLevel[]} [allRoleLevels] - The role's levels of measurement.
+         * @param {pentaho.visual.role.Level[]} [allRoleLevels] - The role's levels of measurement.
          * Defaults to the visual role's levels.
          *
          * @return {string|undefined} The highest role level of measurement or
@@ -603,7 +603,7 @@ define([
          * with a given data property level of measurement.
          *
          * @param {string} attributeLevel - The level of measurement of the data property.
-         * @param {pentaho.visual.role.MeasurementLevel[]} [allRoleLevels] - The role's levels of measurement.
+         * @param {pentaho.visual.role.Level[]} [allRoleLevels] - The role's levels of measurement.
          * Defaults to the visual role's levels.
          *
          * @return {string[]} The compatible role's levels of measurement.

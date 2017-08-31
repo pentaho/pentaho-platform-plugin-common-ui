@@ -155,11 +155,11 @@
  * When this is a [list]{@link pentaho.type.Property.Type#isList} _property type_,
  * the value must be a valid list value specification.
  *
- * @name value
+ * @name defaultValue
  * @memberOf pentaho.type.spec.IPropertyTypeProto#
  * @type {pentaho.type.spec.UValue}
  *
- * @see pentaho.type.Property.Type#value
+ * @see pentaho.type.Property.Type#defaultValue
  */
 
 /**

@@ -98,7 +98,7 @@ define([
            * otherwise, the mapping is considered _invalid_.
            *
            * @name pentaho.visual.role.Mapping#level
-           * @type {pentaho.visual.role.MeasurementLevel}
+           * @type {pentaho.visual.role.Level}
            *
            * @see pentaho.visual.role.spec.IMapping#level
            */

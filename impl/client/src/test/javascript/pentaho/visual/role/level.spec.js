@@ -4,11 +4,12 @@ define([
 ], function(Context, levelFactory) {
   "use strict";
 
-  describe("pentaho.visual.role.MeasurementLevel.Type", function() {
+  describe("pentaho.visual.role.Level.Type", function() {
 
-    var context, MeasurementLevel;
+    var context;
+    var MeasurementLevel;
 
-    beforeEach(function () {
+    beforeEach(function() {
       context = new Context();
       MeasurementLevel = context.get(levelFactory);
     });

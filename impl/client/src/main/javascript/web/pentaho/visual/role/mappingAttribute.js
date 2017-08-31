@@ -128,7 +128,7 @@ define([
       /**
        * Gets a key of this mapping attribute for use when
        * the containing mapping's [levelEffective]{@link pentaho.visual.role.Mapping#levelEffective}
-       * is [qualitative]{@link pentaho.visual.role.MeasurementLevel.Type#isQualitative}.
+       * is [qualitative]{@link pentaho.visual.role.Level.Type#isQualitative}.
        *
        * This key is composed by the value of the [name]{@link pentaho.visual.role.MappingAttribute#name} property.
        *
@@ -143,7 +143,7 @@ define([
       /**
        * Gets a key of this mapping attribute for use when
        * the containing mapping's [levelEffective]{@link pentaho.visual.role.Mapping#levelEffective}
-       * is [quantitative]{@link pentaho.visual.role.MeasurementLevel.Type#isQuantitative}.
+       * is [quantitative]{@link pentaho.visual.role.Level.Type#isQuantitative}.
        *
        * This key is composed by the value of the [name]{@link pentaho.visual.role.MappingAttribute#name} and
        * the [aggregation]{@link pentaho.visual.role.MappingAttribute#aggregation} properties.

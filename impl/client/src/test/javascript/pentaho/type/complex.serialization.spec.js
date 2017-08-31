@@ -97,10 +97,11 @@ define([
         var v = value.get(name);
         if(v) {
           var spy = spyOn(v, "toSpecInContext");
-         if(fake)
-           spy.and.callFake(fake);
-         else
-           spy.and.callThrough();
+          if(fake) {
+            spy.and.callFake(fake);
+          } else {
+            spy.and.callThrough();
+          }
         }
       }
 
@@ -754,7 +755,6 @@ define([
           });
         });
       });
-
     }); // toSpecInContext
   });
 });
