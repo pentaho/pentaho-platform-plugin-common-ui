@@ -137,19 +137,18 @@
  * The _default value_ is the "prototype" value that properties of this type take,
  * on complex instances,
  * when the property is unspecified or specified as a {@link Nully} value.
- * A [cloned]{@link pentaho.type.Value#clone} value is used each time.
  *
  * The value `null` is a valid _default value_.
  *
  * The _control value_ `undefined` resets the attribute,
- * causing it to assume its _default value_:
+ * causing it to assume its default value (yes, the default value of the _default value_ attribute...):
  *
- * * for [root]{@link pentaho.type.Type#root} _property types_, the _default value_ is `null`
- * * for non-root _property types_, the _default value_ is the _inherited value_,
- *   if it is an instance of the _property type_'s [valueType]{@link pentaho.type.spec.IPropertyTypeProto#valueType},
- *   or, `null`, otherwise.
+ * * for [root]{@link pentaho.type.Type#root} _property types_ or
+ *   properties with a locally set [valueType]{@link pentaho.type.Property.Type#defaultValue},
+ *   the default value is `null`
+ * * for other _property types_, the default value is the _inherited value_.
  *
- * Else, the value must be a valid specification for a value of the _property type_'s
+ * Else, the value must be either a function or a valid specification for a value of the _property type_'s
  * current (local or inherited) [valueType]{@link pentaho.type.spec.IPropertyTypeProto#valueType}.
  *
  * When this is a [list]{@link pentaho.type.Property.Type#isList} _property type_,
@@ -157,7 +156,7 @@
  *
  * @name defaultValue
  * @memberOf pentaho.type.spec.IPropertyTypeProto#
- * @type {pentaho.type.spec.UValue}
+ * @type {pentaho.type.spec.UValue | pentaho.type.PropertyDynamicAttribute.<pentaho.type.spec.UValue>}
  *
  * @see pentaho.type.Property.Type#defaultValue
  */

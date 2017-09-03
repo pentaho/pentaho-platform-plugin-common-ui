@@ -210,13 +210,13 @@ define([
      */
     __setElement: function(complex, propType, valueSpec) {
 
-      // NOTE: For performance reasons, this function inlines code that would otherwise be available from.
-      // For example: Container#usingChangeset(.) and TransactionScope.
+      // NOTE: For performance reasons, this function inlines code that would otherwise be available from,
+      // for example, Container#usingChangeset(.) and TransactionScope.
       var type = complex.$type;
       var name = propType.name;
 
       // New value. Cast spec.
-      var valueNew = propType.toValue(valueSpec);
+      var valueNew = propType.toValueOn(complex, valueSpec);
 
       // Original/Initial value.
       var valueIni = complex.__getByName(name);

@@ -24,10 +24,11 @@ define([
   "./changes/ComplexChangeset",
   "../i18n!types",
   "../util/object",
-  "../util/error"
+  "../util/error",
+  "../util/fun"
 ], function(module, elemFactory, PropertyTypeCollection, typeUtil,
             ContainerMixin, ActionResult, UserError,
-            ComplexChangeset, bundle, O, error) {
+            ComplexChangeset, bundle, O, error, F) {
 
   "use strict";
 
@@ -132,7 +133,7 @@ define([
         while(i--) {
           propType = propTypes[i];
 
-          values[propType.name] = value = propType.toValue(readSpec && readSpec(spec, propType));
+          values[propType.name] = value = propType.toValueOn(this, readSpec && readSpec(spec, propType));
 
           if(value != null && value.__addReference) {
             this.__initPropertyValueRelation(propType, value);
@@ -493,6 +494,12 @@ define([
           var includeValue = includeDefaults;
           if(!includeValue) {
             var defaultValue = propType.defaultValue;
+            if(F.is(defaultValue)) {
+              // Because there is no "using default bit", it is now needed to
+              // generate a new default for comparison :-(
+              defaultValue = propType.defaultValueOn(this);
+            }
+
             // Isn't equal to the default value?
             if(propType.isList) {
               // TODO: This is not perfect... In a way lists are always created by us.
@@ -516,17 +523,11 @@ define([
               // In this case, we must check again if the value should be included,
               // like if it were originally `null`.
               if(valueSpec == null) {
-                if(includeDefaults) {
-                  // The default value is better than a `null` that is the result of
-                  // a serialization failure...
-                  valueSpec = propType.defaultValue;
-                } else {
-                  // Defaults can be omitted as long as complex form is used.
-                  // Same value as default?
-                  if(!useArray && valueSpec === propType.defaultValue) return;
+                // Serialization failure.
+                // Values can be omitted as long as complex form is used.
+                if(!useArray) return;
 
-                  valueSpec = null;
-                }
+                valueSpec = null;
               }
             } else {
               valueSpec = null;

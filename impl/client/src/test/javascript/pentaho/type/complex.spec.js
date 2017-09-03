@@ -100,7 +100,9 @@ define([
             props: [
               "x",
               "y",
-              {name: "z", valueType: ["string"]}
+              {name: "z", valueType: ["string"]},
+              {name: "w", valueType: "string", defaultValue: "foo"},
+              {name: "q", valueType: "string", defaultValue: function() { return "bar"; }}
             ]
           }
         });
@@ -117,6 +119,8 @@ define([
           expect(derived.get("x")).toBe(null);
           expect(derived.get("y")).toBe(null);
           expect(derived.get("z").toArray()).toEqual([]);
+          expect(derived.get("w").value).toBe("foo");
+          expect(derived.get("q").value).toBe("bar");
         });
       });
 
@@ -163,6 +167,34 @@ define([
           expect(derived.get("x").formatted).toBe("1.0 EUR");
           expect(derived.get("y").formatted).toBe("2.0 USD");
           expect(derived.get("z").at(0).formatted).toBe("0.0 POUNDS");
+        });
+      });
+
+      describe("when setting a property to null", function() {
+
+        it("should call the defaultValue factory function each time and use its result", function() {
+
+          var f = jasmine.createSpy().and.returnValue("bar");
+          Derived.type.add({
+            name: "t",
+            valueType: "string",
+            defaultValue: f
+          });
+
+          var derived = new Derived();
+
+          expect(f).toHaveBeenCalledTimes(1);
+          expect(derived.t).toBe("bar");
+
+          derived.t = null;
+
+          expect(f).toHaveBeenCalledTimes(2);
+          expect(derived.t).toBe("bar");
+
+          derived.t = null;
+
+          expect(f).toHaveBeenCalledTimes(3);
+          expect(derived.t).toBe("bar");
         });
       });
     });

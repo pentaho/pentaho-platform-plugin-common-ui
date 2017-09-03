@@ -1071,6 +1071,7 @@ define([
              */
             name: "selectionFilter",
             valueType: "pentaho/data/filter/abstract",
+            // Can be a shared instance - filters are immutable.
             defaultValue: {_: "pentaho/data/filter/or"},
             isRequired: true
           },

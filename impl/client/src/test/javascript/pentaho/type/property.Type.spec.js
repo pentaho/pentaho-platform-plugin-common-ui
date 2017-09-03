@@ -629,6 +629,17 @@ define([
           expect(propType.defaultValue).toBe(null);
         });
 
+        it("should allow setting to a function value, whatever the valueType", function() {
+          var f = function() { return "Foo"; };
+          var propType = propertyTypeUtil.createRoot(Derived.type, {
+            name: "foo",
+            valueType: "string",
+            defaultValue: f
+          });
+
+          expect(propType.defaultValue).toBe(f);
+        });
+
         it("should throw when set and property already has descendant properties", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", valueType: "string"});
 
@@ -643,21 +654,7 @@ define([
             propType.defaultValue = null;
           }).toThrow(errorMatch.operInvalid());
         });
-
-        /* Not possible to do anymore since now, the default pre-loaded context
-           has derived complex classes with properties, and has thus already derived the
-           Property class...
-        it("should not delete when set to undefined at Property.type", function() {
-          // Must obtain a fresh Property such that hasDescendants is false.
-          var context2 = new Context();
-          var Property2 = context2.get("property");
-
-          Property2.type.defaultValue = undefined;
-
-          expect(Property2.type.hasOwnProperty("__defaultValue")).toBe(true);
-        });
-        */
-      }); // end #value
+      }); // end #defaultValue
       // endregion
 
       describe("#isReadOnly - ", function() {
@@ -2292,10 +2289,11 @@ define([
 
       // Cannot change if has descendants.
       describe("defaultValue -", function() {
-        it("should get null if an inherited default value is not an instance of the local value type", function() {
-          var Integer = PentahoNumber.extend();
 
-          var dv = new PentahoNumber(1);
+        it("should get null and not inherit if locally unspecified and there is a local value type", function() {
+
+          var Integer = PentahoNumber.extend();
+          var dv = new Integer(1);
 
           var Base = Complex.extend();
           Base.type.add({name: "baseNum", valueType: PentahoNumber, defaultValue: dv});
@@ -2308,24 +2306,22 @@ define([
           expect(propType.defaultValue).toBe(null);
         });
 
-        it("should get null if an inherited default value is not an instance of the inherited value type", function() {
-          var Integer = PentahoNumber.extend();
+        it("should inherit if locally unspecified and there is no local value type", function() {
 
           var dv = new PentahoNumber(1);
 
           var Base = Complex.extend();
           Base.type.add({name: "baseNum", valueType: PentahoNumber, defaultValue: dv});
 
-          var Derived1 = Base.extend();
-          Derived1.type.add({name: "baseNum", valueType: Integer.type});
+          expect(Base.type.get("baseNum").defaultValue).toBe(dv);
 
-          var Derived2 = Derived1.extend();
-          var propType2 = propertyTypeUtil.extend(Derived2.type, "baseNum", {name: "baseNum"});
+          var Derived = Base.extend();
+          var propType = propertyTypeUtil.extend(Derived.type, "baseNum", {name: "baseNum"});
 
-          expect(propType2.defaultValue).toBe(null);
+          expect(propType.defaultValue).toBe(dv);
         });
 
-        describe("test group", function() {
+        describe("test group -", function() {
           var Derived;
 
           beforeEach(function() {
@@ -2333,6 +2329,7 @@ define([
 
             Base.type.add({name: "baseNum", valueType: PentahoNumber});
             Base.type.add({name: "baseStr", valueType: PentahoString, defaultValue: "a"});
+            Base.type.add({name: "baseStrFun", valueType: PentahoString, defaultValue: function() { return "a"; }});
 
             Derived = Base.extend();
           });
@@ -2345,6 +2342,11 @@ define([
 
             propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr"});
             expect(propType.defaultValue.value).toBe("a");
+          });
+
+          it("should inherit the base function default value when unspecified", function() {
+            var propType = propertyTypeUtil.extend(Derived.type, "baseStrFun", {name: "baseStrFun"});
+            expect(propType.defaultValue()).toBe("a");
           });
 
           it("should inherit the base default value when specified as undefined", function() {

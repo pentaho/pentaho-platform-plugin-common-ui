@@ -76,7 +76,10 @@ define([
         id: module.id,
 
         valueType: mappingFactory,
-        defaultValue: {},
+
+        // Create a new Mapping each time.
+        defaultValue: function() { return {}; },
+
         isRequired: true,
 
         // Anticipate extension of `levels`, relative to, at least, `dataType`.
@@ -326,7 +329,7 @@ define([
            *
            * @name isVisualKey
            * @memberOf pentaho.visual.role.Property.Type#
-           * @type undefined | boolean | pentaho.type.DynamicAttribute.<boolean>
+           * @type {undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
            *
            * @throws {pentaho.lang.OperationInvalidError} When setting and the type already has
            * [descendant]{@link pentaho.type.Type#hasDescendants} types.

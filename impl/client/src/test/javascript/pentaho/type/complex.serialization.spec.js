@@ -197,7 +197,11 @@ define([
               describe("when keyArgs.preferPropertyArray: false", function() {
 
                 it("should return a plain Object", function() {
-                  var spec = value.toSpecInContext({forceType: false, declaredType: value.$type, preferPropertyArray: false});
+                  var spec = value.toSpecInContext({
+                    forceType: false,
+                    declaredType: value.$type,
+                    preferPropertyArray: false
+                  });
 
                   scope.dispose();
 
@@ -205,7 +209,11 @@ define([
                 });
 
                 it("should not include the type", function() {
-                  var spec = value.toSpecInContext({forceType: false, declaredType: value.$type, preferPropertyArray: false});
+                  var spec = value.toSpecInContext({
+                    forceType: false,
+                    declaredType: value.$type,
+                    preferPropertyArray: false
+                  });
 
                   scope.dispose();
 
@@ -216,7 +224,11 @@ define([
               describe("when keyArgs.preferPropertyArray: true", function() {
 
                 it("should return an Array", function() {
-                  var spec = value.toSpecInContext({forceType: false, declaredType: value.$type, preferPropertyArray: true});
+                  var spec = value.toSpecInContext({
+                    forceType: false,
+                    declaredType: value.$type,
+                    preferPropertyArray: true
+                  });
 
                   scope.dispose();
 
@@ -230,7 +242,11 @@ define([
               describe("when keyArgs.preferPropertyArray: false", function() {
 
                 it("should return a plain Object", function() {
-                  var spec = value.toSpecInContext({forceType: true, declaredType: value.$type, preferPropertyArray: false});
+                  var spec = value.toSpecInContext({
+                    forceType: true,
+                    declaredType: value.$type,
+                    preferPropertyArray: false
+                  });
 
                   scope.dispose();
 
@@ -238,7 +254,11 @@ define([
                 });
 
                 it("should include the type", function() {
-                  var spec = value.toSpecInContext({forceType: true, declaredType: value.$type, preferPropertyArray: false});
+                  var spec = value.toSpecInContext({
+                    forceType: true,
+                    declaredType: value.$type,
+                    preferPropertyArray: false
+                  });
 
                   scope.dispose();
 
@@ -249,7 +269,11 @@ define([
               describe("when keyArgs.preferPropertyArray: true", function() {
 
                 it("should return a plain Object", function() {
-                  var spec = value.toSpecInContext({forceType: true, declaredType: value.$type, preferPropertyArray: true});
+                  var spec = value.toSpecInContext({
+                    forceType: true,
+                    declaredType: value.$type,
+                    preferPropertyArray: true
+                  });
 
                   scope.dispose();
 
@@ -257,7 +281,11 @@ define([
                 });
 
                 it("should include the type", function() {
-                  var spec = value.toSpecInContext({forceType: true, declaredType: value.$type, preferPropertyArray: true});
+                  var spec = value.toSpecInContext({
+                    forceType: true,
+                    declaredType: value.$type,
+                    preferPropertyArray: true
+                  });
 
                   scope.dispose();
 
@@ -278,7 +306,10 @@ define([
 
                 it("should return a plain Object", function() {
 
-                  var spec = value.toSpecInContext({declaredType: value.$type.ancestor, preferPropertyArray: false});
+                  var spec = value.toSpecInContext({
+                    declaredType: value.$type.ancestor,
+                    preferPropertyArray: false
+                  });
 
                   scope.dispose();
 
@@ -287,7 +318,10 @@ define([
 
                 it("should include the type", function() {
 
-                  var spec = value.toSpecInContext({declaredType: value.$type.ancestor, preferPropertyArray: false});
+                  var spec = value.toSpecInContext({
+                    declaredType: value.$type.ancestor,
+                    preferPropertyArray: false
+                  });
 
                   scope.dispose();
 
@@ -299,7 +333,10 @@ define([
 
                 it("should return a plain Object", function() {
 
-                  var spec = value.toSpecInContext({declaredType: value.$type.ancestor, preferPropertyArray: false});
+                  var spec = value.toSpecInContext({
+                    declaredType: value.$type.ancestor,
+                    preferPropertyArray: false
+                  });
 
                   scope.dispose();
 
@@ -308,7 +345,10 @@ define([
 
                 it("should include the type", function() {
 
-                  var spec = value.toSpecInContext({declaredType: value.$type.ancestor, preferPropertyArray: false});
+                  var spec = value.toSpecInContext({
+                    declaredType: value.$type.ancestor,
+                    preferPropertyArray: false
+                  });
 
                   scope.dispose();
 
@@ -323,7 +363,11 @@ define([
 
                 it("should return a plain Object", function() {
 
-                  var spec = value.toSpecInContext({forceType: false, declaredType: value.$type.ancestor, preferPropertyArray: false});
+                  var spec = value.toSpecInContext({
+                    forceType: false,
+                    declaredType: value.$type.ancestor,
+                    preferPropertyArray: false
+                  });
 
                   scope.dispose();
 
@@ -332,7 +376,11 @@ define([
 
                 it("should include the type", function() {
 
-                  var spec = value.toSpecInContext({forceType: false, declaredType: value.$type.ancestor, preferPropertyArray: false});
+                  var spec = value.toSpecInContext({
+                    forceType: false,
+                    declaredType: value.$type.ancestor,
+                    preferPropertyArray: false
+                  });
 
                   scope.dispose();
 
@@ -344,7 +392,11 @@ define([
 
                 it("should return a plain Object", function() {
 
-                  var spec = value.toSpecInContext({forceType: false, declaredType: value.$type.ancestor, preferPropertyArray: false});
+                  var spec = value.toSpecInContext({
+                    forceType: false,
+                    declaredType: value.$type.ancestor,
+                    preferPropertyArray: false
+                  });
 
                   scope.dispose();
 
@@ -353,7 +405,11 @@ define([
 
                 it("should not include the type", function() {
 
-                  var spec = value.toSpecInContext({forceType: false, declaredType: value.$type.ancestor, preferPropertyArray: false});
+                  var spec = value.toSpecInContext({
+                    forceType: false,
+                    declaredType: value.$type.ancestor,
+                    preferPropertyArray: false
+                  });
 
                   scope.dispose();
 
@@ -367,7 +423,11 @@ define([
               describe("when keyArgs.preferPropertyArray: false", function() {
 
                 it("should return a plain Object", function() {
-                  var spec = value.toSpecInContext({forceType: true, declaredType: value.$type.ancestor, preferPropertyArray: false});
+                  var spec = value.toSpecInContext({
+                    forceType: true,
+                    declaredType: value.$type.ancestor,
+                    preferPropertyArray: false
+                  });
 
                   scope.dispose();
 
@@ -375,7 +435,11 @@ define([
                 });
 
                 it("should include the type", function() {
-                  var spec = value.toSpecInContext({forceType: true, declaredType: value.$type.ancestor, preferPropertyArray: false});
+                  var spec = value.toSpecInContext({
+                    forceType: true,
+                    declaredType: value.$type.ancestor,
+                    preferPropertyArray: false
+                  });
 
                   scope.dispose();
 
@@ -386,7 +450,11 @@ define([
               describe("when keyArgs.preferPropertyArray: true", function() {
 
                 it("should return a plain Object", function() {
-                  var spec = value.toSpecInContext({forceType: true, declaredType: value.$type.ancestor, preferPropertyArray: true});
+                  var spec = value.toSpecInContext({
+                    forceType: true,
+                    declaredType: value.$type.ancestor,
+                    preferPropertyArray: true
+                  });
 
                   scope.dispose();
 
@@ -394,7 +462,11 @@ define([
                 });
 
                 it("should include the type", function() {
-                  var spec = value.toSpecInContext({forceType: true, declaredType: value.$type.ancestor, preferPropertyArray: true});
+                  var spec = value.toSpecInContext({
+                    forceType: true,
+                    declaredType: value.$type.ancestor,
+                    preferPropertyArray: true
+                  });
 
                   scope.dispose();
 
@@ -499,7 +571,8 @@ define([
           expect("type" in spec).toBe(false);
         });
 
-        it("should include a property as null if its value's toSpecInContext returns null and array form is used", function() {
+        it("should include a property as null if its value's toSpecInContext " +
+           "returns null and array form is used", function() {
           spyProperty("type", function() { return null; });
 
           var spec = value.toSpecInContext({preferPropertyArray: true});
@@ -509,14 +582,15 @@ define([
           expect(spec[1]).toBe(null);
         });
 
-        it("should include a property as null if its value's toSpecInContext returns null and defaults are included", function() {
+        it("should not include a property if its value's toSpecInContext returns null", function() {
+
           spyProperty("type", function() { return null; });
 
           var spec = value.toSpecInContext({includeDefaults: true});
 
           scope.dispose();
 
-          expect(spec.type).toBe(null);
+          expect("type" in spec).toBe(false);
         });
       });
 

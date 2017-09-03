@@ -819,7 +819,7 @@ define([
         // _updateSize is still updating
 
         // Change the view's selection
-        view.selectionFilter = null;
+        view.selectionFilter = {_: "or"};
 
         expect((view.__dirtyPropGroups.get() & View.PropertyGroups.Selection) !== 0).toBe(true);
 
@@ -907,7 +907,7 @@ define([
       });
 
       it("should set the Selection bit  when 'selectionFilter' changes", function() {
-        view.selectionFilter = null;
+        view.selectionFilter = {_: "or"};
         expect(view.__dirtyPropGroups.is(View.PropertyGroups.Selection)).toBe(true);
       });
 

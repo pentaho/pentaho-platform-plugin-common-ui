@@ -24,9 +24,10 @@ define([
   "../util/arg",
   "../util/error",
   "../util/object",
-  "../util/text"
+  "../util/text",
+  "../util/fun"
 ], function(module, instanceFactory, typeUtil, ValidationError, discreteDomainFactory, bundle, AnnotatableLinked,
-            arg, error, O, text) {
+            arg, error, O, text, F) {
 
   "use strict";
 
@@ -395,8 +396,10 @@ define([
          *
          * ### Relation to the `defaultValue` attribute
          *
-         * When set and the [value]{@link pentaho.type.Property.Type#value} attribute
-         * is _locally_ set, it is checked against the new _value type_,
+         * When set and the [defaultValue]{@link pentaho.type.Property.Type#defaultValue} attribute
+         * is not _locally_ set, it is set to `null`, blocking inheritance.
+         *
+         * Otherwise, if it is locally set, it is checked against the new _value type_,
          * and set to `null`, if it's not an instance of it.
          *
          * @type {!pentaho.type.Value.Type}
@@ -434,19 +437,21 @@ define([
 
             this.__valueType = newType;
 
-            // Set local value to null, if it is not an instance of the new type.
-            // Not really needed as the value getter tests the if value is of type.
-            // However, this improves performance.
+            // Don't inherit the default value if valueType is local.
+            // Don't preserve the default value if it no longer is an instance of valueType.
             var dv;
-            if(O.hasOwn(this, "__defaultValue") && (dv = this.__defaultValue) && !newType.is(dv)) {
+            if(!O.hasOwn(this, "__defaultValue") ||
+               (((dv = this.__defaultValue) != null) && !newType.is(dv))) {
               this.__defaultValue = null;
+              this.__defaultValueFun  = null;
             }
           }
         },
         // endregion
 
         // region value attribute and related methods
-        __defaultValue: undefined,
+        __defaultValue: null,
+        __defaultValueFun: null,
 
         /**
          * Gets or sets the _default value_ of properties of this type.
@@ -454,9 +459,16 @@ define([
          * The _default value_ is the "prototype" value that properties of this type take,
          * on complex instances,
          * when the property is unspecified or specified as a {@link Nully} value.
-         * A [cloned]{@link pentaho.type.Value#clone} value is used each time.
          *
          * The value `null` is a valid _default value_.
+         *
+         * ### This attribute is *Dynamic*
+         *
+         * When a _dynamic_ attribute is set to a function,
+         * it can evaluate to a different value for each complex instance.
+         *
+         * When a _dynamic_ attribute is set to a value other than a function or a {@link Nully} value,
+         * its value is the same for every complex instance.
          *
          * ### Get
          *
@@ -474,66 +486,90 @@ define([
          * When set to the _control value_ `undefined`, the attribute value is reset,
          * causing it to assume its default value (yes, the default value of the _default value_ attribute...):
          *
-         * * for [root]{@link pentaho.type.Type#root} _property types_, the default value is `null`
-         * * for non-root _property types_, the default value is the _inherited value_,
-         *   if it is an instance of the _property type_'s [valueType]{@link pentaho.type.Property.Type#valueType};
-         *   or, `null`, otherwise.
+         * * for [root]{@link pentaho.type.Type#root} _property types_ or
+         *   properties with a locally set [valueType]{@link pentaho.type.Property.Type#defaultValue},
+         *   the default value is `null`
+         * * for other _property types_, the default value is the _inherited value_.
          *
-         * When set to any other value,
-         * it is first converted to the _property type_'s
+         * When set to a function, it is accepted.
+         * For each instance the function is evaluated and its result converted to the _property type_'s
          * [valueType]{@link pentaho.type.Property.Type#valueType},
          * using its [Value.Type#to]{@link pentaho.type.Value.Type#to} method.
          * The conversion may be impossible and thus an error may be thrown.
          *
-         * @type {pentaho.type.Value}
+         * When set to any other value,
+         * it is immediately converted to the _property type_'s
+         * [valueType]{@link pentaho.type.Property.Type#valueType}.
+         *
+         * @type {pentaho.type.Value | pentaho.type.PropertyDynamicAttribute.<pentaho.type.spec.UValue>}
          *
          * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
          * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
          *
-         * @throws {Error} When setting to a _default value_ that cannot be converted to the
+         * @throws {Error} When setting to a non-function _default value_ that cannot be converted to the
          * property type's current `valueType`.
          *
          * @see pentaho.type.spec.IPropertyTypeProto#defaultValue
          */
         get defaultValue() {
-          var value = this.__defaultValue;
-          return value && this.__valueType.is(value) ? value : null;
+          return this.__defaultValue;
         },
 
-        set defaultValue(_) {
+        set defaultValue(value) {
           if(this.hasDescendants)
             throw error.operInvalid("Cannot change the default value of a property type that has descendants.");
 
-          if(_ === undefined || (_ === null && this.isRoot)) {
+          if(value === undefined) {
             if(this !== __propType) {
-              // Clear local value. Inherit base value.
-              delete this.__defaultValue;
+              if(O.hasOwn(this, "__valueType")) {
+                // Cannot inherit, so reset.
+                this.__defaultValue = null;
+                this.__defaultValueFun = null;
+              } else {
+                // Clear local value. Inherit base value.
+                delete this.__defaultValue;
+                delete this.__defaultValueFun;
+              }
             }
           } else {
-            this.__defaultValue = this.toValue(_, /* noDefault: */true);
+            var dvf;
+            if(value === null) {
+              dvf = null;
+            } else if(F.is(value)) {
+              // wrap it with cast function
+              dvf = function propertyDefaultValue(propType) {
+                return propType.toValueOn(null, value.apply(this, arguments));
+              };
+            } else {
+              // Cast it now (throwing if not possible) and wrap it in a constant function.
+              value = this.toValueOn(null, value);
+              dvf = F.constant(value);
+            }
+
+            this.__defaultValue = value;
+            this.__defaultValueFun = dvf;
           }
         },
 
         /**
-         * Converts the given value or value specification to
-         * a value of this property's value type.
+         * Converts the given value or value specification to a value of this property's value type.
          *
-         * If the given value is already an instance of the property's value type,
-         * it is returned.
+         * If the given value is already an instance of the property's value type, it is returned.
          *
-         * By default, a {@link Nully} value is converted to
-         * (a clone of) the property's default value,
-         * {@link pentaho.type.Property.Type#value}.
+         * By default, if, `defaultValueOwner` is specified,
+         * a {@link Nully} value is converted to the property's default value,
+         * {@link pentaho.type.Property.Type#defaultValue}.
+         *
+         * @param {pentaho.type.Complex} defaultValueOwner - The complex value that owns the property.
+         *   Only needed if it is desired that {@link Nully} values are converted to the property's default value.
          *
          * @param {?any} valueSpec - A value or value specification.
-         * @param {boolean} [noDefault=false] Indicates if {@link Nully} values
-         *  should _not_ be converted to the property's default value.
          *
          * @return {?pentaho.type.Value} A value.
          */
-        toValue: function(valueSpec, noDefault) {
+        toValueOn: function(defaultValueOwner, valueSpec) {
           if(valueSpec == null) {
-            return noDefault ? null : this.__freshDefaultValue();
+            return defaultValueOwner ? this.defaultValueOn(defaultValueOwner) : null;
           }
 
           return this.isList
@@ -542,18 +578,18 @@ define([
         },
 
         /**
-         * Gets a fresh default value for use in a new `Complex` instance.
+         * Gets a default value for use in given `Complex` instance.
          *
-         * Ensures that default values are _cloned_ (specially important for lists and complexes).
          * Ensures that list properties always have a non-null default value.
          *
-         * @return {pentaho.type.Value} A fresh default value.
-         * @private
+         * @param {!pentaho.type.Complex} owner - The complex value that owns the property.
+         * @return {pentaho.type.Value} The default value.
          */
-        __freshDefaultValue: function() {
-          var dv = this.defaultValue;
+        defaultValueOn: function(owner) {
+          var dv = this.__defaultValueFun;
+
           return dv
-              ? dv.clone()
+              ? dv.call(owner, this)
               : (this.isList
                   ? this.__valueType.create(null, this.__listCreateKeyArgs || this.__buildListCreateKeyArgs())
                   : dv);
@@ -945,11 +981,19 @@ define([
           // Custom attributes
           var defaultValue = O.getOwn(this, "__defaultValue");
           if(defaultValue !== undefined) {
-            any = true;
             if(defaultValue) {
-              keyArgs.declaredType = this.__valueType;
-              spec.defaultValue = defaultValue.toSpecInContext(keyArgs);
-            } else {
+              if(F.is(defaultValue)) {
+                if(!keyArgs.isJson) {
+                  any = true;
+                  spec.defaultValue = defaultValue.valueOf();
+                }
+              } else {
+                any = true;
+                keyArgs.declaredType = this.__valueType;
+                spec.defaultValue = defaultValue.toSpecInContext(keyArgs);
+              }
+            } else if(!O.hasOwn(this, "__valueType")) { // resets defaultValue inheritance
+              any = true;
               spec.defaultValue = null;
             }
           }
