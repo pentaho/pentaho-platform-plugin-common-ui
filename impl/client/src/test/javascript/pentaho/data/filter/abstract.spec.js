@@ -14,24 +14,46 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/filter/abstract",
-  "pentaho/data/filter/not",
-  "pentaho/data/filter/and",
-  "pentaho/data/filter/or",
   "pentaho/type/Context",
   "tests/pentaho/util/errorMatch"
-], function(abstractFactory, notFactory, andFactory, orFactory, Context, errorMatch) {
+], function(Context, errorMatch) {
 
   "use strict";
 
   describe("pentaho.data.filter.Abstract", function() {
 
-    var context = new Context();
-    var AbstractFilter = context.get(abstractFactory);
-    var NotFilter = context.get(notFactory);
-    var AndFilter = context.get(andFactory);
-    var OrFilter = context.get(orFactory);
-    var CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
+    var context;
+    var AbstractFilter;
+    var NotFilter;
+    var AndFilter;
+    var OrFilter;
+    var CustomFilter;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+
+            context = _context;
+
+            return context.applyAsync([
+              "pentaho/data/filter/abstract",
+              "pentaho/data/filter/not",
+              "pentaho/data/filter/and",
+              "pentaho/data/filter/or",
+              "pentaho/data/filter/isEqual",
+              "pentaho/data/filter/isGreater",
+              "pentaho/data/filter/isLess"
+            ], function(Abstract, Not, And, Or) {
+              AbstractFilter = Abstract;
+              NotFilter = Not;
+              AndFilter = And;
+              OrFilter = Or;
+
+              CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
+            });
+          })
+          .then(done, done.fail);
+    });
 
     describe("#negate()", function() {
 
@@ -163,7 +185,6 @@ define([
         expect(result).toBe(filter2);
       });
     }); // #visit
-
 
     describe("Logical manipulation and simplification", function() {
 

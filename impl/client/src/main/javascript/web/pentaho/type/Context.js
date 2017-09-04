@@ -353,20 +353,20 @@ define([
      *
      * @constructor
      * @description Creates a `Context` with given variables.
-     * @param {pentaho.environment.spec.IEnvironment} [envSpec] The environment variables' specification.
+     * @param {pentaho.environment.IEnvironment} [env] A platform environment.
      * When unspecified, it defaults to {@link pentaho.environment.main}.
-     * Unspecified platform context properties default to the value of those of the default context.
+     *
+     * @param {pentaho.type.spec.IContext} [configSpec] The context's configuration.
      */
-    constructor: function(envSpec) {
+    constructor: function(env, configSpec) {
       /**
        * The associated platform context.
        *
        * @type {!pentaho.environment.IEnvironment}
+       * @readOnly
        * @private
        */
-      this.__env = !envSpec ? mainPlatformEnv :
-          envSpec.createChild ? envSpec :
-          mainPlatformEnv.createChild(envSpec);
+      this.__env = env || mainPlatformEnv;
 
       /**
        * The configuration depth is incremented each time the context
@@ -395,6 +395,7 @@ define([
        * The stack of transaction scopes.
        *
        * @type {Array.<pentaho.type.changes.AbstractTransactionScope>}
+       * @readOnly
        * @private
        */
       this.__txnScopes = [];
@@ -412,6 +413,7 @@ define([
        * Map of instance constructors by [type uid]{@link pentaho.type.Type#uid}.
        *
        * @type {!Object.<string, !pentaho.type.ITypeHolder>}
+       * @readOnly
        * @private
        */
       this.__byTypeUid = {};
@@ -423,13 +425,17 @@ define([
        * for non-anonymous types.
        *
        * @type {!Object.<string, !pentaho.type.ITypeHolder>}
+       * @readOnly
        * @private
        */
       this.__byTypeId = {};
 
-      var config = configurationService.select("pentaho/type/context") || {};
-
-      this.__instances = new InstancesContainer(this, config.instances);
+      /**
+       * @type {!pentaho.type.InstancesContainer}
+       * @readOnly
+       * @private
+       */
+      this.__instances = new InstancesContainer(this, configSpec && configSpec.instances);
 
       /**
        * The root [Instance]{@link pentaho.type.Instance} constructor.
@@ -1268,6 +1274,21 @@ define([
       }
 
       var id = type.id;
+      if(id) {
+        typeHolder = O.getOwn(this.__byTypeId, id);
+        if(typeHolder) {
+          // uid is not registered, but id is...
+          // so, the type must still be loading (the factory is being evaluated)
+          // and its constructor is being used in some nested/recursive structure.
+
+          if(!sync) {
+            return typeHolder.promise;
+          }
+
+          // Return the constructor, although it is not yet configured by now and hope for the best.
+          return InstCtor;
+        }
+      }
 
       // Getting a constructor registers it implicitly.
       // If named, can only be done asynchronously.
@@ -1440,14 +1461,32 @@ define([
       return standardIds;
     },
 
+    /**
+     * Creates a new context with a given environment and returns a promise for it.
+     *
+     * @param {pentaho.environment.spec.IEnvironment} [envSpec] The environment variables' specification.
+     * When unspecified, it defaults to {@link pentaho.environment.main}.
+     * Unspecified platform context properties default to the value of those of the default context.
+     *
+     * @return {!Promise.<!pentaho.type.Context>} A promise for the new context.
+     */
     createAsync: function(envSpec) {
 
-      var context = new Context(envSpec);
+      var env = !envSpec ? mainPlatformEnv :
+                envSpec.createChild ? envSpec :
+                mainPlatformEnv.createChild(envSpec);
 
-      return context.resolveAsync(this.standardIds)
-          .then(function() {
-            return context;
-          });
+      var standardIds = this.standardIds;
+
+      return configurationService.selectAsync("pentaho/type/context", env).then(function(configSpec) {
+
+        var context = new Context(env, configSpec);
+
+        return context.resolveAsync(standardIds)
+            .then(function() {
+              return context;
+            });
+      });
     }
   });
 

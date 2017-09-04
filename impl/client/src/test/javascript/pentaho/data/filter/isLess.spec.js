@@ -14,31 +14,47 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/filter/isLess",
   "pentaho/type/Context",
-  "pentaho/type/complex",
   "./propertyUtils"
-], function(isLessFactory, Context, complexFactory, propertyUtils) {
+], function(Context, propertyUtils) {
 
   "use strict";
 
   describe("pentaho.data.filter.IsLess", function() {
 
-    var context = new Context();
-    var IsLessFilter = context.get(isLessFactory);
-    var Complex = context.get(complexFactory);
+    var context;
+    var Complex;
+    var IsLessFilter;
+    var ProductSummary;
 
-    var ProductSummary = Complex.extend({
-      $type: {
-        props: [
-          {name: "name", valueType: "string", label: "Name"},
-          {name: "sales", valueType: "number", label: "Sales"},
-          {name: "inStock", valueType: "boolean", label: "In Stock"}
-        ]
-      }
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+
+            context = _context;
+            Complex = context.get("complex");
+
+            ProductSummary = Complex.extend({
+              $type: {
+                props: [
+                  {name: "name", valueType: "string", label: "Name"},
+                  {name: "sales", valueType: "number", label: "Sales"},
+                  {name: "inStock", valueType: "boolean", label: "In Stock"}
+                ]
+              }
+            });
+
+            return context.applyAsync([
+              "pentaho/data/filter/isLess"
+            ], function(IsLess) {
+              IsLessFilter = IsLess;
+            });
+          })
+          .then(done, done.fail);
+
     });
 
-    propertyUtils.behavesLikeProperty(IsLessFilter, {
+    propertyUtils.behavesLikeProperty(function() { return IsLessFilter; }, {
       valueType: "number",
       rawValue: 42,
       kind: "isLess",
@@ -46,8 +62,11 @@ define([
     });
 
     describe("#contains(elem)", function() {
+      var elem;
 
-      var elem = new ProductSummary({name: "A", sales: 12000, inStock: true});
+      beforeEach(function() {
+        elem = new ProductSummary({name: "A", sales: 12000, inStock: true});
+      });
 
       it("should return `false` if `elem` has property `property` with a value > `value`", function() {
 

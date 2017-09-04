@@ -182,7 +182,7 @@ define([
     // endregion
   });
 
-  var InstancesContainer = Base.extend(module.id, /** @lends pentaho.type.InstancesContainer# */{
+  return Base.extend(module.id, /** @lends pentaho.type.InstancesContainer# */{
 
     /**
      * @alias InstancesContainer

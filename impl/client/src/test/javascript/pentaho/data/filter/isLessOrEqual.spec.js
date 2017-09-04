@@ -24,21 +24,39 @@ define([
 
   describe("pentaho.data.filter.IsLessOrEqual", function() {
 
-    var context = new Context();
-    var IsLessOrEqualFilter = context.get(isLessOrEqualFactory);
-    var Complex = context.get(complexFactory);
+    var context;
+    var Complex;
+    var IsLessOrEqualFilter;
+    var ProductSummary;
 
-    var ProductSummary = Complex.extend({
-      $type: {
-        props: [
-          {name: "name", valueType: "string", label: "Name"},
-          {name: "sales", valueType: "number", label: "Sales"},
-          {name: "inStock", valueType: "boolean", label: "In Stock"}
-        ]
-      }
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+
+            context = _context;
+            Complex = context.get("complex");
+
+            ProductSummary = Complex.extend({
+              $type: {
+                props: [
+                  {name: "name", valueType: "string", label: "Name"},
+                  {name: "sales", valueType: "number", label: "Sales"},
+                  {name: "inStock", valueType: "boolean", label: "In Stock"}
+                ]
+              }
+            });
+
+            return context.applyAsync([
+              "pentaho/data/filter/isLessOrEqual"
+            ], function(IsLessOrEqual) {
+              IsLessOrEqualFilter = IsLessOrEqual;
+            });
+          })
+          .then(done, done.fail);
+
     });
 
-    propertyUtils.behavesLikeProperty(IsLessOrEqualFilter, {
+    propertyUtils.behavesLikeProperty(function() { return IsLessOrEqualFilter; }, {
       valueType: "number",
       rawValue: 42,
       kind: "isLessOrEqual",
@@ -47,7 +65,11 @@ define([
 
     describe("#contains(elem)", function() {
 
-      var elem = new ProductSummary({name: "A", sales: 12000, inStock: true});
+      var elem;
+
+      beforeEach(function() {
+        elem = new ProductSummary({name: "A", sales: 12000, inStock: true});
+      });
 
       it("should return `false` if `elem` has property `property` with a value > `value`", function() {
 

@@ -14,29 +14,46 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/filter/true",
-  "pentaho/data/filter/false",
-  "pentaho/type/Context",
-  "pentaho/type/complex"
-], function(trueFactory, falseFactory, Context, complexFactory) {
+  "pentaho/type/Context"
+], function(Context) {
 
   "use strict";
 
   describe("pentaho.data.filter.True", function() {
 
-    var context = new Context();
-    var TrueFilter = context.get(trueFactory);
-    var FalseFilter = context.get(falseFactory);
-    var Complex = context.get(complexFactory);
+    var context;
+    var Complex;
+    var TrueFilter;
+    var FalseFilter;
+    var ProductSummary;
 
-    var ProductSummary = Complex.extend({
-      $type: {
-        props: [
-          {name: "name", valueType: "string", label: "Name"},
-          {name: "sales", valueType: "number", label: "Sales"},
-          {name: "inStock", valueType: "boolean", label: "In Stock"}
-        ]
-      }
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+
+            context = _context;
+            Complex = context.get("complex");
+
+            ProductSummary = Complex.extend({
+              $type: {
+                props: [
+                  {name: "name", valueType: "string", label: "Name"},
+                  {name: "sales", valueType: "number", label: "Sales"},
+                  {name: "inStock", valueType: "boolean", label: "In Stock"}
+                ]
+              }
+            });
+
+            return context.applyAsync([
+              "pentaho/data/filter/true",
+              "pentaho/data/filter/false"
+            ], function(True, False) {
+              TrueFilter = True;
+              FalseFilter = False;
+            });
+          })
+          .then(done, done.fail);
+
     });
 
     describe("#kind", function() {

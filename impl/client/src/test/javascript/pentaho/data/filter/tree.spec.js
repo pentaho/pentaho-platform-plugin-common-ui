@@ -24,11 +24,45 @@ define([
 
   describe("pentaho.data.filter.Tree", function() {
 
-    var context = new Context();
-    var AbstractFilter = context.get(abstractFactory);
-    var TreeFilter = context.get(treeFactory);
-    var CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
-    var CustomTreeFilter = TreeFilter.extend({_contains: function() { return false; }});
+    var context;
+    var Complex;
+    var AbstractFilter;
+    var TreeFilter;
+    var CustomFilter;
+    var CustomTreeFilter;
+    var ProductSummary;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+
+            context = _context;
+            Complex = context.get("complex");
+
+            ProductSummary = Complex.extend({
+              $type: {
+                props: [
+                  {name: "name", valueType: "string", label: "Name"},
+                  {name: "sales", valueType: "number", label: "Sales"},
+                  {name: "inStock", valueType: "boolean", label: "In Stock"}
+                ]
+              }
+            });
+
+            return context.applyAsync([
+              "pentaho/data/filter/abstract",
+              "pentaho/data/filter/tree"
+            ], function(Abstract, Tree) {
+              AbstractFilter = Abstract;
+              TreeFilter = Tree;
+
+              CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
+              CustomTreeFilter = TreeFilter.extend({_contains: function() { return false; }});
+            });
+          })
+          .then(done, done.fail);
+
+    });
 
     describe("new ({operands})", function() {
 
