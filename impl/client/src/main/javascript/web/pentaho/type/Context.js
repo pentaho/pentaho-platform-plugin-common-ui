@@ -22,6 +22,7 @@ define([
   "./standard",
   "./SpecificationContext",
   "./SpecificationScope",
+  "./InstancesContainer",
   "../environment",
   "../service!pentaho.config.IService?single",
   "./changes/Transaction",
@@ -34,7 +35,7 @@ define([
   "../util/object",
   "../util/fun"
 ], function(localRequire, module, service, typeInfo, bundle, standard, SpecificationContext, SpecificationScope,
-    mainPlatformEnv, configurationService,
+    InstancesContainer, mainPlatformEnv, configurationService,
     Transaction, TransactionScope, CommittedScope,
     Base, promiseUtil, arg, error, O, F) {
 
@@ -229,6 +230,10 @@ define([
        */
       this.__byTypeId = {};
 
+      var config = configurationService.select("pentaho/type/context") || {};
+
+      this.__instances = new InstancesContainer(this, config.instances);
+
       /**
        * The root [Instance]{@link pentaho.type.Instance} constructor.
        *
@@ -258,6 +263,16 @@ define([
      */
     get environment() {
       return this.__env;
+    },
+
+    /**
+     * Gets the associated instances' container.
+     *
+     * @type {!pentaho.type.InstancesContainer}
+     * @readOnly
+     */
+    get instances() {
+      return this.__instances;
     },
 
     /**
@@ -394,6 +409,28 @@ define([
       var map = {};
       O.eachOwn(typeRefs, function(typeRef, key) { map[key] = this.get(typeRef); }, this);
       return map;
+    },
+
+    resolveAsync: function(typeRefs) {
+      var depPromises = [];
+
+      if(Array.isArray(typeRefs)) {
+        depPromises = typeRefs.map(function(typeRef) { return this.getAsync(typeRef); }, this);
+
+        return Promise.all(depPromises);
+      }
+
+      var map = {};
+
+      O.eachOwn(typeRefs, function(typeRef, key) {
+        depPromises.push(this.getAsync(typeRef).then(function(InstCtor) {
+          map[key] = InstCtor;
+        }));
+      }, this);
+
+      return Promise.all(depPromises).then(function() {
+        return map;
+      });
     },
 
     /**
