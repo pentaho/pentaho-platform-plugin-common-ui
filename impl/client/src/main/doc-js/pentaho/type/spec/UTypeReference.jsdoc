@@ -54,55 +54,11 @@
  *
  * ```js
  * require(["pentaho/type/Context"], function(Context) {
- *   var context = new Context();
- *   var Complex = context.get("pentaho/type/complex");
- *   // ...
- * });
- * ```
+ *   Context.createAsync().then(function(context) {
+ *     var Complex = context.get("pentaho/type/complex");
  *
- * ##### A _type factory_ function
- *
- * The functions that create instance constructors of value types,
- * each time they are called,
- * for a given [context]{@link pentaho.type.Context}.
- * They have the signature {@link pentaho.type.Factory.<pentaho.type.Instance>}.
- *
- * The AMD module under the identifier of a value type _must_ return a type factory function.
- * A type factory can thus be obtained by requiring the AMD module that has the type's identifier:
- *
- * ```js
- * require(["pentaho/type/Context", "pentaho/type/string"], function(Context, stringFactory) {
- *   var context = new Context();
- *   var PentahoString = context.get(stringFactory);
- *
- *   // ...
- * });
- * ```
- *
- * In practice, a type factory _reference_ is seldom needed,
- * and is only used for obtaining the base type of a type being defined:
- *
- * ```js
- * // In a file accessible through module id "my/derived/type"
- *
- * define(["my/base/type"], function(baseTypeFactory) {
- *
- *   // Return the derived type's factory function
- *   return function(context) {
- *
- *     // Obtain the base type's instance constructor in this context
- *     var MyBaseType = context.get(baseTypeFactory);
- *
- *     // Derive and return the derived type constructor
- *     return MyBaseType.extend({
- *        $type: {
- *          id: "my/derived/type"
- *          // ...
- *        }
- *        // ...
- *     });
- *   };
- *
+ *     // ...
+ *   });
  * });
  * ```
  *
@@ -114,17 +70,17 @@
  * Example:
  * ```js
  * require(["pentaho/type/Context"], function(Context) {
- *   var context = new Context();
+ *   Context.createAsync().then(function(context) {
+ *     var PentahoNumber = context.get("pentaho/type/number");
+ *     var numberType = PentahoNumber.type;
  *
- *   var PentahoNumber = context.get("pentaho/type/number");
- *   var numberType = PentahoNumber.type;
+ *     // Get a number list type
+ *     var NumberList = context.get([numberType]);
  *
- *   // Get a number list type
- *   var NumberList = context.get([numberType]);
+ *     var numbers = new NumberList([1, 2, 3]);
  *
- *   var numbers = new NumberList([1, 2, 3]);
- *
- *   // ...
+ *     // ...
+ *   });
  * });
  * ```
  *
@@ -145,21 +101,22 @@
  *
  * ```js
  * require(["pentaho/type/Context"], function(Context) {
- *   var context = new Context();
+ *   Context.createAsync().then(function(context) {
  *
- *   // Obtain an anonymous, derived complex type from the context
- *   var MyProduct = context.get({
- *         base: "complex" // optional
- *         props: [
- *           {name: "id",    label: "Id",    valueType: "string"},
- *           {name: "name",  label: "Name",  valueType: "string"},
- *           {name: "price", label: "Price", valueType: "number"}
- *         ]
- *       });
+ *     // Obtain an anonymous, derived complex type from the context
+ *     var MyProduct = context.get({
+ *           base: "complex" // optional
+ *           props: [
+ *             {name: "id",    label: "Id",    valueType: "string"},
+ *             {name: "name",  label: "Name",  valueType: "string"},
+ *             {name: "price", label: "Price", valueType: "number"}
+ *           ]
+ *         });
  *
- *   var productA = new MyProduct({id: "mabc", name: "Principia Mathematica", price: 1200});
+ *     var productA = new MyProduct({id: "mabc", name: "Principia Mathematica", price: 1200});
  *
- *   // ...
+ *     // ...
+ *   });
  * });
  * ```
  *
@@ -172,34 +129,36 @@
  *
  * ```js
  * require(["pentaho/type/Context"], function(Context) {
- *   var context = new Context();
  *
- *   // Obtain the List type instance constructor
+ *   Context.createAsync().then(function(context) {
  *
- *   // Using the id
- *   var ListA = context.get("list");
+ *     // Obtain the List type instance constructor
  *
- *   // Obtain a derived List type instance constructor
- *   // with Number as the element type
+ *     // Using the id
+ *     var ListA = context.get("list");
  *
- *   // Using the generic type specification syntax
- *   var NumberListA = context.get({base: "list", of: "number"});
+ *     // Obtain a derived List type instance constructor
+ *     // with Number as the element type
  *
- *   // Using the shorthand syntax
- *   var NumberListB = context.get(["number"]);
+ *     // Using the generic type specification syntax
+ *     var NumberListA = context.get({base: "list", of: "number"});
  *
- *   // ...
+ *     // Using the shorthand syntax
+ *     var NumberListB = context.get(["number"]);
  *
- *   // Assuming the type MyProduct from a previous example
+ *     // ...
  *
- *   var ProductList = context.get([MyProduct]);
+ *     // Assuming the type MyProduct from a previous example
  *
- *   var productList = new ProductList([
- *         {id: "mpma", name: "Principia Mathematica", price: 1200},
- *         {id: "flot", name: "The Laws of Thought",   price:  500}
- *       ]);
+ *     var ProductList = context.get([MyProduct]);
  *
- *   alert("Product count: " + productList.count);
+ *     var productList = new ProductList([
+ *           {id: "mpma", name: "Principia Mathematica", price: 1200},
+ *           {id: "flot", name: "The Laws of Thought",   price:  500}
+ *         ]);
+ *
+ *     alert("Product count: " + productList.count);
+ *   });
  * });
  * ```
  *

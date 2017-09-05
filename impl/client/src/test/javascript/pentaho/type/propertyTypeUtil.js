@@ -67,6 +67,10 @@ define([
       Context.createAsync()
           .then(function(context) {
             Complex = context.get("pentaho/type/complex");
+
+            if(base) {
+              return context.getAsync(base);
+            }
           })
           .then(done, done.fail);
     });

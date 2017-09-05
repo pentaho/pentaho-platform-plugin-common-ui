@@ -16,10 +16,8 @@
 define([
   "require",
   "module",
-  "../service",
   "../typeInfo",
   "../i18n!types",
-  "./standard",
   "./SpecificationContext",
   "./SpecificationScope",
   "./InstancesContainer",
@@ -34,7 +32,7 @@ define([
   "../util/error",
   "../util/object",
   "../util/fun"
-], function(localRequire, module, service, typeInfo, bundle, standard, SpecificationContext, SpecificationScope,
+], function(localRequire, module, typeInfo, bundle, SpecificationContext, SpecificationScope,
     InstancesContainer, mainPlatformEnv, configurationService,
     Transaction, TransactionScope, CommittedScope,
     Base, promiseUtil, arg, error, O, F) {
@@ -45,15 +43,32 @@ define([
 
   /* eslint dot-notation: 0, no-unexpected-multiline: 0 */
 
-  var __singleton = null;
-
   // Default `base` type in a type specification.
   var __defaultBaseTypeMid = "complex";
 
-  var __typeId = "pentaho/type";
   var __instanceTypeId = "pentaho/type/instance";
 
   var O_hasOwn = Object.prototype.hasOwnProperty;
+
+  var __standardIds = Object.freeze([
+    // types
+    "instance",
+    "value",
+    "element",
+    "list",
+    "simple",
+    "string",
+    "number",
+    "boolean",
+    "date",
+    "complex",
+    "object",
+    "function",
+    "property",
+    "model",
+    "application",
+    "mixins/enum"
+  ].map(function(id) { return "pentaho/type/" + id; }));
 
   /**
    * @name pentaho.type.ITypeHolder
@@ -436,7 +451,6 @@ define([
        */
       this.__byTypeId = {};
 
-
       var configSpec = config.selectType("pentaho/type/context");
 
       /**
@@ -562,107 +576,6 @@ define([
     },
 
     /**
-     * Gets a set of configured instance constructors,
-     * given type references to these,
-     * either in the form of an array or of a map.
-     *
-     * The specified type references are each resolved synchronously,
-     * using [get]{@link pentaho.type.Context#get}.
-     *
-     * @param {!Array.<pentaho.type.spec.UTypeReference>|!Object.<string,pentaho.type.spec.UTypeReference>} typeRefs -
-     * An array or map of type references.
-     *
-     * @return {!Array.<Class.<pentaho.type.Instance>>|!Object.<string, Class.<pentaho.type.Instance>>} A resolved
-     * data structure of the same type as provided.
-     *
-     * @see pentaho.type.Context#get
-     * @see pentaho.type.Context#inject
-     */
-    resolve: function(typeRefs) {
-
-      if(Array.isArray(typeRefs))
-        return typeRefs.map(function(typeRef) { return this.get(typeRef); }, this);
-
-      var map = {};
-      O.eachOwn(typeRefs, function(typeRef, key) { map[key] = this.get(typeRef); }, this);
-      return map;
-    },
-
-    resolveAsync: function(typeRefs) {
-      var depPromises = [];
-
-      if(Array.isArray(typeRefs)) {
-        depPromises = typeRefs.map(function(typeRef) { return this.getAsync(typeRef); }, this);
-
-        return Promise.all(depPromises);
-      }
-
-      var map = {};
-
-      O.eachOwn(typeRefs, function(typeRef, key) {
-        depPromises.push(this.getAsync(typeRef).then(function(InstCtor) {
-          map[key] = InstCtor;
-        }));
-      }, this);
-
-      return Promise.all(depPromises).then(function() {
-        return map;
-      });
-    },
-
-    /**
-     * Binds the initial arguments of a function to
-     * the instance constructors corresponding to
-     * given type references.
-     *
-     * The specified type references are each resolved synchronously,
-     * using [get]{@link pentaho.type.Context#get},
-     * when the bound function is first called.
-     * Thus, any resolve errors are only thrown then.
-     *
-     * If a fixed JavaScript context object is specified in `ctx`,
-     * then `fun` gets bound to that object.
-     * Otherwise, the JavaScript context object in which `fun` is called is dynamic (whichever the caller decides).
-     *
-     * @param {!Array.<pentaho.type.spec.UTypeReference>|Object.<string,pentaho.type.spec.UTypeReference>} typeRefs -
-     * An array or map of type references.
-     * @param {function} fun - The function to bind.
-     * @param {Object} [ctx] The fixed JavaScript context object to use.
-     *
-     * @return {function} The new bound function.
-     *
-     * @see pentaho.type.Context#get
-     * @see pentaho.type.Context#resolve
-     */
-    inject: function(typeRefs, fun, ctx) {
-
-      var InstCtors = null;
-      var me = this;
-
-      var resolve = function() {
-        // Resolve on first use.
-        if(!InstCtors) {
-          InstCtors = me.resolve(typeRefs);
-          if(!Array.isArray(typeRefs)) {
-            InstCtors = [InstCtors];
-          }
-        }
-        return InstCtors;
-      };
-
-      return function injected() {
-        return fun.apply(ctx || this, resolve().concat(arg.slice(arguments)));
-      };
-    },
-
-    applyAsync: function(typeRefs, fun, ctx) {
-
-      return this.resolveAsync(typeRefs).then(function(Types) {
-        return fun.apply(ctx || this, Types);
-      });
-    },
-
-    /**
      * Gets, asynchronously, the **configured instance constructor** of a type.
      *
      * For more information on the `typeRef` argument,
@@ -751,15 +664,14 @@ define([
      *
      * require(["pentaho/type/Context"], function(Context) {
      *
-     *   var context = new Context({application: "data-explorer-101"});
+     *   Context.createAsync({application: "data-explorer-101"})
+     *       .then(function(context) {
+     *         var ComponentModels = context.getAll("my/component", {isBrowsable: true});
      *
-     *   var ComponentModels = context.getAll("my/component", {isBrowsable: true});
-     *   ComponentModels.forEach(function(ComponentModel) {
-     *
-     *     console.log("will display menu entry for: " + ComponentModel.type.label);
-     *
-     *   });
-     *
+     *         ComponentModels.forEach(function(ComponentModel) {
+     *           console.log("will display menu entry for: " + ComponentModel.type.label);
+     *         });
+     *       });
      * });
      *
      * @param {string} [baseTypeId] The identifier of the base type. It defaults to `"pentaho/type/value"`.
@@ -782,32 +694,16 @@ define([
 
       var predicate = F.predicate(keyArgs);
 
-      var baseType  = this.get(baseTypeId).type;
+      var baseType = this.get(baseTypeId).type;
 
       // Ensure that all registered types are loaded.
       // Throws if one isn't yet.
-      this.resolve(service.getRegisteredIds(baseTypeId));
+      var resolveSpec = typeInfo.getSubtypesOf(baseTypeId, {includeDescendants: true});
+      if(resolveSpec) {
+        this.resolve(resolveSpec);
+      }
 
       return this.__getAllLoadedSubtypesOf(baseType, predicate);
-    },
-
-    __getAllLoadedSubtypesOf: function(baseType, predicate) {
-
-      var byTypeUid = this.__byTypeUid;
-
-      var result = [];
-
-      Object.keys(byTypeUid).forEach(function(typeUid) {
-        var InstCtor = byTypeUid[typeUid].Ctor; // may be null
-        if(InstCtor) { // created successfully
-          var type = InstCtor.type;
-          if(type.isSubtypeOf(baseType) && (!predicate || predicate(type))) {
-            result.push(InstCtor);
-          }
-        }
-      });
-
-      return result;
     },
 
     /**
@@ -824,18 +720,15 @@ define([
      *
      * require(["pentaho/type/Context"], function(Context) {
      *
-     *   var context = new Context({application: "data-explorer-101"});
-     *
-     *   context.getAllAsync("my/component", {isBrowsable: true})
-     *     .then(function(ComponentModels) {
-     *
-     *       ComponentModels.forEach(function(ComponentModel) {
-     *
-     *         console.log("will display menu entry for: " + ComponentModel.type.label);
-     *
+     *   Context.createAsync({application: "data-explorer-101"})
+     *       .then(function(context) {
+     *         return context.getAllAsync("my/component", {isBrowsable: true})
+     *       })
+     *       .then(function(ComponentModels) {
+     *         ComponentModels.forEach(function(ComponentModel) {
+     *           console.log("will display menu entry for: " + ComponentModel.type.label);
+     *         });
      *       });
-     *     });
-     *
      * });
      *
      * @param {string} [baseTypeId] The identifier of the base type. Defaults to `"pentaho/type/value"`.
@@ -856,7 +749,10 @@ define([
 
         var me = this;
 
-        return this.resolveAsync([baseTypeId].concat(service.getRegisteredIds(baseTypeId)))
+        var resolveSpec =
+            typeInfo.getSubtypesOf(baseTypeId, {includeSelf: true, includeDescendants: true}) || [baseTypeId];
+
+        return this.resolveAsync(resolveSpec)
             .then(function(InstCtors) {
 
               var baseType = InstCtors[0].type;
@@ -883,6 +779,241 @@ define([
       if(!customTypeIds) customTypeIds = {};
       __collectTypeIdsRecursive(typeSpec, customTypeIds, this.__byTypeId);
       return customTypeIds;
+    },
+    // endregion
+
+    // region resolve, resolveAsync, apply, applyAsync
+    /**
+     * Gets a set of configured dependencies,
+     * either instance constructors or named instances.
+     *
+     * Types can be obtained by directly providing type references to these,
+     * either as values of an array or values of a map.
+     * Only type identifiers, instance constructors or type objects are supported directly.
+     * If you want to specify a type's generic specification or
+     * list shorthand syntax,
+     * these must be wrapped with the special `$type.ref` syntax,
+     * introduced below.
+     *
+     * Type references are each resolved synchronously, using [get]{@link pentaho.type.Context#get}.
+     *
+     * ##### Special syntax
+     *
+     * 1. To resolve to the type (which must be loadable synchronously) whose type reference is `typeRef`,
+     *    similarly to [context.get]{@link pentaho.type.Context#get},
+     *    use the syntax:
+     *    ```json
+     *    {"$type": {ref: typeRef}}
+     *    ```
+     *
+     * 2. To resolve to the type (which must be loadable synchronously) whose type identifier is `typeId`,
+     *    similarly to [context.get]{@link pentaho.type.Context#get},
+     *    use the syntax:
+     *    ```json
+     *    {"$type": {id: typeId}}
+     *    ```
+     *
+     * 3. To resolve to an array of the already loaded subtypes of `baseTypeId`,
+     *    similarly to [context.getAll]{@link pentaho.type.Context#getAll},
+     *    use the syntax:
+     *    ```json
+     *    {"$types": {base: baseTypeId}}
+     *    ```
+     *
+     * 4. To resolve to a named instance (which must have been loaded already)
+     *    whose identifier is `instanceId`,
+     *    use the syntax:
+     *    ```json
+     *    {"$instance": {id: instanceId}}
+     *    ```
+     *
+     * 5. To resolve to the first registered and loaded instance of the type `baseTypeId`,
+     *    use the syntax:
+     *    ```json
+     *    {"$instance": {type: baseTypeId}}
+     *    ```
+     *
+     * 6. To resolve to an array of the loaded instances of the type `baseTypeId`,
+     *    use the syntax:
+     *    ```json
+     *    {"$instances": {type: baseTypeId}}
+     *    ```
+     *
+     * @param {Array.<string|function|pentaho.type.Type|object>|
+     *         Object.<string, string|function|pentaho.type.Type|object>} resolveSpec - A resolve specification.
+     * @return {object} A resolved data structure of the same type as provided.
+     *
+     * @see pentaho.type.Context#get
+     * @see pentaho.type.Context#inject
+     */
+    resolve: function(resolveSpec, keyArgs) {
+
+      if(!resolveSpec) throw error.argRequired("resolveSpec");
+
+      switch(typeof resolveSpec) {
+        case "string":
+        case "function":
+          return this.get(resolveSpec);
+
+        case "object":
+          if(Array.isArray(resolveSpec)) {
+            return resolveSpec.map(function(spec) {
+              return this.__resolveOne(spec, keyArgs, true);
+            }, this);
+          }
+
+          if(resolveSpec.constructor === Object) {
+            // Top-level special syntax?
+            if(resolveSpec.$instances || resolveSpec.$instance || resolveSpec.$type || resolveSpec.$types) {
+              return this.__resolveOne(resolveSpec, keyArgs, true);
+            }
+
+            // Just a shell object.
+            var map = {};
+            O.eachOwn(resolveSpec, function(spec, key) {
+              map[key] = this.__resolveOne(spec, keyArgs, true);
+            }, this);
+            return map;
+          }
+
+          // An instance of Type ?
+          if(this.__Instance && resolveSpec instanceof this.__Instance.Type) {
+            return this.get(resolveSpec, keyArgs);
+          }
+          break;
+      }
+
+      throw error.argInvalid("resolveSpec", "Invalid resolve specification.");
+    },
+
+    resolveAsync: function(resolveSpec, keyArgs) {
+
+      if(!resolveSpec) return Promise.reject(error.argRequired("resolveSpec"));
+
+      switch(typeof resolveSpec) {
+        case "string":
+        case "function":
+          return this.getAsync(resolveSpec);
+
+        case "object":
+          var depPromises;
+
+          if(Array.isArray(resolveSpec)) {
+
+            depPromises = resolveSpec.map(function(spec) {
+              return this.__resolveOne(spec, keyArgs, false);
+            }, this);
+
+            return Promise.all(depPromises);
+          }
+
+          if(resolveSpec.constructor === Object) {
+            // Top-level special syntax?
+            if(resolveSpec.$instances || resolveSpec.$instance || resolveSpec.$type || resolveSpec.$types) {
+              return this.__resolveOne(resolveSpec, keyArgs, false);
+            }
+
+            // Just a shell object.
+            depPromises = [];
+
+            var map = {};
+
+            O.eachOwn(resolveSpec, function(spec, key) {
+              depPromises.push(this.__resolveOne(spec, keyArgs, false).then(function(value) {
+                map[key] = value;
+              }));
+            }, this);
+
+            return Promise.all(depPromises).then(function() { return map; });
+          }
+
+          // An instance of Type ?
+          if(this.__Instance && resolveSpec instanceof this.__Instance.Type) {
+            return this.getAsync(resolveSpec, keyArgs);
+          }
+          break;
+      }
+
+      return Promise.reject(error.argInvalid("resolveSpec", "Invalid resolve specification."));
+    },
+
+    __resolveOne: function(spec, keyArgs, sync) {
+      if(spec != null && typeof spec === "object" && spec.constructor === Object) {
+        // Special syntax
+        var id;
+        var type;
+
+        if(spec.$instance) {
+          if((id = spec.$instance.id)) {
+            return sync ? this.instances.getById(id, keyArgs) : this.instances.getByIdAsync(id, keyArgs);
+          }
+
+          if((type = spec.$instance.type)) {
+            return sync ? this.instances.getByType(type, keyArgs) : this.instances.getByTypeAsync(type, keyArgs);
+          }
+        } else if(spec.$instances) {
+          if((type = spec.$instances.type)) {
+            return sync ? this.instances.getAllByType(type, keyArgs) : this.instances.getAllByTypeAsync(type, keyArgs);
+          }
+        } else if(spec.$type) {
+          if(typeof (id = spec.$type.id) === "string" || (id = spec.$type.ref)) {
+            return sync ? this.get(id, keyArgs) : this.getAsync(id, keyArgs);
+          }
+        } else if(spec.$types) {
+          if((type = spec.$types.base)) {
+            return sync ? this.getAll(type, keyArgs) : this.getAllAsync(type, keyArgs);
+          }
+        }
+
+        return this.__error(error.argInvalid("resolveSpec", "Invalid resolve specification."), sync);
+      }
+
+      return sync ? this.get(spec, keyArgs) : this.getAsync(spec, keyArgs);
+    },
+
+    /**
+     * Resolves a given specification,
+     * calls a function on the resolved values and
+     * returns its result.
+     *
+     * This method calls [resolve]{@link pentaho.type.Context#resolve}
+     * and then calls the given function on the resolved values.
+     * Any `resolveSpec` whose resolution is an array can be specified.
+     *
+     * @param {object} resolveSpec - A "resolve" specification.
+     * @param {function} fun - The function to call.
+     * @param {Object} [ctx=this] - The object on which to call `fun`.
+     *
+     * @return {any} The result of calling the given function.
+     * @see pentaho.type.Context#resolve
+     */
+    apply: function(resolveSpec, fun, ctx) {
+
+      var resolved = this.resolve(resolveSpec);
+      return fun.apply(ctx, resolved);
+    },
+
+    /**
+     * Resolves a given specification, asynchronously,
+     * calls a function on the resolved values and
+     * returns a promise for its result.
+     *
+     * This method calls [resolveAsync]{@link pentaho.type.Context#resolveAsync}
+     * and then calls the given function on the resolved values.
+     * Any `resolveSpec` whose resolution is an array can be specified.
+     *
+     * @param {object} resolveSpec - A "resolve" specification.
+     * @param {function} fun - The function to call.
+     * @param {Object} [ctx=this] - The object on which to call `fun`.
+     *
+     * @return {Promise} A promise for the result of calling the given function.
+     * @see pentaho.type.Context#resolveAsync
+     */
+    applyAsync: function(resolveSpec, fun, ctx) {
+
+      return this.resolveAsync(resolveSpec).then(function(resolved) {
+        return fun.apply(ctx, resolved);
+      });
     },
     // endregion
 
@@ -1022,7 +1153,26 @@ define([
     },
     // endregion
 
-    // region get support
+    // region get* support
+    __getAllLoadedSubtypesOf: function(baseType, predicate) {
+
+      var byTypeUid = this.__byTypeUid;
+
+      var result = [];
+
+      Object.keys(byTypeUid).forEach(function(typeUid) {
+        var InstCtor = byTypeUid[typeUid].Ctor; // may be null
+        if(InstCtor) { // created successfully
+          var type = InstCtor.type;
+          if(type.isSubtypeOf(baseType) && (!predicate || predicate(type))) {
+            result.push(InstCtor);
+          }
+        }
+      });
+
+      return result;
+    },
+
     /**
      * Gets the instance constructor of a type.
      *
@@ -1444,17 +1594,7 @@ define([
   }, /** @lends pentaho.type.Context */{
 
     get standardIds() {
-      var standardIds = Object.keys(standard).filter(function(lid) { return lid !== "mixins"; });
-
-      standardIds.push.apply(
-          standardIds,
-          Object.keys(standard.mixins).map(function(lid) { return "mixins/" + lid; }));
-
-      standardIds.forEach(function(lid, index) {
-        standardIds[index] = __typeId + "/" + lid;
-      });
-
-      return standardIds;
+      return __standardIds;
     },
 
     /**
@@ -1488,8 +1628,7 @@ define([
 
   return Context;
 
-  // region type registry
-
+  // region __collectTypeIds
   function __collectTypeIdsRecursive(typeSpec, outIds, byTypeId) {
     if(!typeSpec) return;
 

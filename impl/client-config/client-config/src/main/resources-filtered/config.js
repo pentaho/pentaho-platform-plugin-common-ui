@@ -61,7 +61,7 @@ define(function() {
    * 15. Geo Map - "pentaho/geo/visual/map"
    *
    * Sample visualization model ids:
-   * 1. Calculator - "pentaho/visual/samples/calc"
+   * 1. Calculator - "pentaho/visual/samples/calc/model"
    */
   return {
     rules: [

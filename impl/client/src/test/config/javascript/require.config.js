@@ -80,6 +80,8 @@
   requireTypeInfo["pentaho/type/object"] = {alias: "object", base: "simple"};
   requireTypeInfo["pentaho/type/function"] = {alias: "function", base: "simple"};
   requireTypeInfo["pentaho/type/mixins/enum"] = {alias: "enum", base: "element"};
+  requireTypeInfo["pentaho/type/action/base"] = {base: "element"};
+
   requireTypeInfo["pentaho/data/filter/abstract"] = {base: "complex"};
   requireTypeInfo["pentaho/data/filter/true"] = {alias: "true", base: "pentaho/data/filter/abstract"};
   requireTypeInfo["pentaho/data/filter/false"] = {alias: "false", base: "pentaho/data/filter/abstract"};

@@ -85,6 +85,20 @@
  */
 
 /**
+ * Gets an array of the identifiers of known subtypes of a given base type,
+ * optionally including itself.
+ *
+ * @name getSubtypesOf
+ * @memberOf pentaho.typeInfo.IService#
+ * @method
+ * @param {string} [idOrAliasBase] - The id or alias of the base type.
+ * @param {boolean} [keyArgs.includeDescendants=false] - Indicates that all descendant types should be part of the result.
+ * @param {boolean} [keyArgs.includeSelf=false] - Indicates that the base type should be included in the result.
+ *
+ * @return {string[]|undefined} The ids of known subtypes or undefined, if the base type is not known.
+ */
+
+/**
  * Determines if one type is a subtype of another.
  *
  * @name isSubtypeOf

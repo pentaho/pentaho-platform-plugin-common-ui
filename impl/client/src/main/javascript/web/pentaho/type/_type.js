@@ -1056,21 +1056,23 @@ define([
        *
        * require(["pentaho/type/Context"], function(Context) {
        *
-       *   var context = new Context({application: "data-explorer-101"});
-       *   var Value   = context.get("value");
+       *   Context.createAsync({application: "data-explorer-101"})
+       *       .then(function(context) {
        *
-       *   var product = Value.type.create({
-       *         _: {
-       *           props: ["id", "name", {name: "price", valueType: "number"}]
-       *         },
+       *         var Value = context.get("value");
        *
-       *         id:    "mpma",
-       *         name:  "Principia Mathematica",
-       *         price: 1200
+       *         var product = Value.type.create({
+       *           _: {
+       *             props: ["id", "name", {name: "price", valueType: "number"}]
+       *           },
+       *
+       *           id:    "mpma",
+       *           name:  "Principia Mathematica",
+       *           price: 1200
+       *         });
+       *
+       *         // ...
        *       });
-       *
-       *   // ...
-       *
        * });
        *
        * @example
@@ -1080,22 +1082,24 @@ define([
        *
        * require(["pentaho/type/Context"], function(Context) {
        *
-       *   var context = new Context({application: "data-explorer-101"});
-       *   var Value   = context.get("value");
+       *   Context.createAsync({application: "data-explorer-101"})
+       *       .then(function(context) {
        *
-       *   var productList = Value.type.create({
-       *         _: [{
-       *           props: ["id", "name", {name: "price", valueType: "number"}]
-       *         }],
+       *         var Value = context.get("value");
        *
-       *         d: [
-       *           {id: "mpma", name: "Principia Mathematica", price: 1200},
-       *           {id: "flot", name: "The Laws of Thought",   price:  500}
-       *         ]
+       *         var productList = Value.type.create({
+       *           _: [{
+       *             props: ["id", "name", {name: "price", valueType: "number"}]
+       *           }],
+       *
+       *           d: [
+       *             {id: "mpma", name: "Principia Mathematica", price: 1200},
+       *             {id: "flot", name: "The Laws of Thought",   price:  500}
+       *           ]
+       *         });
+       *
+       *         // ...
        *       });
-       *
-       *   // ...
-       *
        * });
        *
        * @example
@@ -1105,24 +1109,26 @@ define([
        *
        * require(["pentaho/type/Context"], function(Context) {
        *
-       *   var context = new Context({application: "data-explorer-101"});
-       *   var ProductList = context.get([{
-       *           props: [
-       *             "id",
-       *             "name",
-       *             {name: "price", valueType: "number"}
-       *           ]
-       *         }]);
+       *   Context.createAsync({application: "data-explorer-101"})
+       *       .then(function(context) {
        *
-       *   // Provide the default type, in case the instance spec doesn't provide one.
-       *   var productList = ProductList.type.create(
-       *          [
-       *            {id: "mpma", name: "Principia Mathematica", price: 1200},
-       *            {id: "flot", name: "The Laws of Thought",   price:  500}
-       *         ]);
+       *         var ProductList = context.get([{
+       *             props: [
+       *               "id",
+       *               "name",
+       *               {name: "price", valueType: "number"}
+       *             ]
+       *           }]);
        *
-       *   // ...
+       *         // Provide the default type, in case the instance spec doesn't provide one.
+       *         var productList = ProductList.type.create(
+       *           [
+       *             {id: "mpma", name: "Principia Mathematica", price: 1200},
+       *             {id: "flot", name: "The Laws of Thought",   price:  500}
+       *           ]);
        *
+       *         // ...
+       *       });
        * });
        *
        * @param {pentaho.type.spec.UInstance} [instSpec] An instance specification.
