@@ -493,13 +493,13 @@ define([
 
             // "value" is configured on the Context constructor, so need to wire the prototype...
 
-            spyOn(Context.prototype, "__getConfigAsync").and.callFake(function(id) {
-              return Promise.resolve(id === "pentaho/type/value" ? {foo: "bar", instance: {bar: "foo"}} : null);
+            spyOn(Context.prototype, "__getTypeConfig").and.callFake(function(id) {
+              return id === "pentaho/type/value" ? {foo: "bar", instance: {bar: "foo"}} : null;
             });
 
             return Context.createAsync().then(function(context) {
 
-              expect(Context.prototype.__getConfigAsync).toHaveBeenCalledWith("pentaho/type/value");
+              expect(Context.prototype.__getTypeConfig).toHaveBeenCalledWith("pentaho/type/value");
 
               var InstCtor = context.get("pentaho/type/value");
               expect(InstCtor.prototype.bar).toBe("foo");
@@ -512,8 +512,8 @@ define([
 
           return require.using(["pentaho/type/Context"], function(Context) {
 
-            spyOn(Context.prototype, "__getConfigAsync").and.callFake(function(id) {
-              return Promise.resolve(id === "tests/foo/bar" ? {foo: "bar", instance: {bar: "foo"}} : null);
+            spyOn(Context.prototype, "__getTypeConfig").and.callFake(function(id) {
+              return id === "tests/foo/bar" ? {foo: "bar", instance: {bar: "foo"}} : null;
             });
 
             return Context.createAsync().then(function(context) {
@@ -533,7 +533,7 @@ define([
 
                 expect(InstCtor).toBe(Value2);
 
-                expect(Context.prototype.__getConfigAsync).toHaveBeenCalledWith("tests/foo/bar");
+                expect(Context.prototype.__getTypeConfig).toHaveBeenCalledWith("tests/foo/bar");
                 expect(ValueType2.implement).toHaveBeenCalledTimes(1);
 
                 expect(Value2.prototype.bar).toBe("foo");
@@ -554,8 +554,8 @@ define([
 
           return require.using(["pentaho/type/Context"], function(Context) {
 
-            spyOn(Context.prototype, "__getConfigAsync").and.callFake(function(id) {
-              return Promise.resolve(id === "tests/foo/bar" ? {foo: "bar", instance: {bar: "foo"}} : null);
+            spyOn(Context.prototype, "__getTypeConfig").and.callFake(function(id) {
+              return id === "tests/foo/bar" ? {foo: "bar", instance: {bar: "foo"}} : null;
             });
 
             return Context.createAsync().then(function(context) {
@@ -592,8 +592,8 @@ define([
 
           return require.using(["pentaho/type/Context"], function(Context) {
 
-            spyOn(Context.prototype, "__getConfigAsync").and.callFake(function(id) {
-              return Promise.resolve(id === "tests/foo/bar" ? {foo: "bar", instance: {bar: "foo"}} : null);
+            spyOn(Context.prototype, "__getTypeConfig").and.callFake(function(id) {
+              return id === "tests/foo/bar" ? {foo: "bar", instance: {bar: "foo"}} : null;
             });
 
             return Context.createAsync().then(function(context) {
@@ -2037,35 +2037,5 @@ define([
         });
       });
     }); // #getAll
-
-    describe("instance", function() {
-
-      it("should return a context instance", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-          var context = Context.instance;
-          expect(context instanceof Context).toBe(true);
-        });
-      });
-
-      it("should create a context that has as environment the value of pentaho.environment.main", function() {
-
-        return require.using(["pentaho/type/Context", "pentaho/environment"], function(Context, envDefault) {
-          var context = Context.instance;
-          expect(context.environment).toBe(envDefault);
-        });
-      });
-
-      it("should always return the same context instance", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-          var context1 = Context.instance;
-
-          expect(Context.instance).toBe(context1);
-          expect(Context.instance).toBe(context1);
-          expect(Context.instance).toBe(context1);
-        });
-      });
-    });
   }); // pentaho.type.Context
 });

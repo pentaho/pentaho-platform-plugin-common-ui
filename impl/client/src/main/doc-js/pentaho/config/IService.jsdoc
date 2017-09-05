@@ -22,60 +22,61 @@
  * is used to register a [config.spec.IRuleSet]{@link pentaho.config.spec.IRuleSet}
  * to the service.
  *
- * The [selectAsync]{@link pentaho.config.IService#selectAsync} method
- * selects the rules of added configurations that apply to
- * a given type and environment variables,
- * sorts these by specificity,
- * then merges the rules' [specifications]{@link pentaho.config.spec.IRule#apply}
- * and returns the result.
+ * The [getAsync]{@link pentaho.config.IService#getAsync} method
+ * gets a filtered configuration for a given environment.
+ *
+ * From the returned configuration,
+ * rules for specific types or instances can be obtained
+ * by calling its
+ * [selectType]{@link pentaho.config.IConfiguration#selectType} and
+ * [selectInstance]{@link pentaho.config.IConfiguration#selectInstance},
+ * respectively.
+ *
+ * Rules that apply to a given type/instance and environment variables are sorted by specificity
+ * and then their [specifications]{@link pentaho.config.spec.IRule#apply} are merged.
  * For more information on the specificity of rules,
  * see [config.spec.IRuleSet]{@link pentaho.config.spec.IRuleSet}.
  *
- * The merged configuration specification can then be used to configure a type or an instance.
+ * Suppose that the following rule set is defined in the system:
  *
- * Normally, you would not call these operations directly.
- *
- * Then, the [type.Context]{@link pentaho.type.Context} class
- * already handles obtaining configurations from its configuration service,
- * and applying these to the requested value types.
- *
- * The following example illustrates how an implementation of this service would be used:
- *
- * ```js
- * var myTypeConfig = {
- *   rules: [
+ * ```json
+ * {
+ *   "rules": [
  *     // Disable a still experimental component.
  *     {
- *       select: {
- *         type: "my.foo.component"
+ *       "select": {
+ *         "type": "my.foo.component"
  *       },
- *       apply: {
- *         enabled: false
+ *       "apply": {
+ *         "enabled": false
  *       }
  *     },
  *
  *     // Enable it, only for the dev user, "john", and the "super-app" application.
  *     {
- *       select: {
- *         type:        "my.foo.component",
- *         user:        "john",
- *         application: "super-app"
+ *       "select": {
+ *         "type ":        "my.foo.component",
+ *         "user":        "john",
+ *         "application": "super-app"
  *       },
- *       apply: {
- *         enabled: true
+ *       "apply": {
+ *         "enabled": true
  *       }
  *     }
  *   ]
- * };
+ * }
+ * ```
  *
- * var configService = new SomeConfigurationService();
- *
- * configService.add(myTypeConfig);
- *
- * configService.selectAsync("my.foo.component", {
+ * Now, given some implementation of a configuration service,
+ * we could use it like in the following example:
+ * ```js
+ * configService.getAsync({
  *   user:        "john",
  *   application: "not-so-super-app"
- * }).then(function(mergedConfigSpec) {
+ * }).then(function(config) {
+ *
+ *   var mergedConfigSpec = config.selectType("my.foo.component");
+ *
  *   // Results in a configuration specification like:
  *   // {
  *   //   enabled: false
@@ -86,20 +87,19 @@
  * @name pentaho.config.IService
  * @interface
  *
+ * @see pentaho.config.IConfiguration
  * @see pentaho.config.spec.IRuleSet
  */
 
 /**
- * Obtains a promise for the merged configuration specification of
- * the selection of configuration rules that apply to a given type and environment variables.
+ * Obtains a promise for a configuration that applies to a given platform environment.
  *
- * @name selectAsync
+ * @name getAsync
  * @memberOf pentaho.config.IService#
  * @method
  *
- * @param {string} typeId - The id of the type whose configuration specification is desired.
- *
  * @param {pentaho.environment.IEnvironment} [environment] The platform environment that is used to select rules.
+ * When unspecified, a "null" environment is used.
  *
  * A {@link Nully} variable value is equivalent to a variable that is not present.
  * It matches only configuration rules that do not select that variable.
@@ -110,24 +110,5 @@
  * Variable values are matched against each value specified by a rule in its selection variables,
  * using JavaScript's strict equality operator, `===`.
  *
- * @return {Promise.<Object>} A promise for the merged configuration specification,
- * if any rule was selected; or `null`, if no rule was selected.
- */
-
-/**
- * Adds a configuration rule set.
- *
- * Added configurations overrides previously added configurations,
- * if all other rule-ordering criteria are equal.
- * For more information on the specificity of rules,
- * see [config.spec.IRuleSet]{@link pentaho.config.spec.IRuleSet}.
- *
- * Note that the specified configuration object **may** be modified to serve
- * the service's internal needs.
- *
- * @name add
- * @memberOf pentaho.config.IService#
- * @method
- *
- * @param {!pentaho.config.spec.IRuleSet} config - A type configuration to add.
+ * @return {!Promise.<!pentaho.config.IConfiguration>} A promise for the configuration.
  */

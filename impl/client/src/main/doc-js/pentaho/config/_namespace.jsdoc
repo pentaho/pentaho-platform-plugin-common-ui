@@ -19,10 +19,10 @@
  *
  * ## Overview
  *
- * The Configuration API provides a means for _types_ to be configured by third-parties.
+ * The Configuration API provides a means for _types_ and _instances_ to be configured by third-parties.
  *
- * _Types_ are known by their _string_ identifier and are, for all other purposes, opaque entities
- * — these may or may not exist as actual classes; these may simply represent an interface type.
+ * _Types_ and _instances_ are known by their _string_ identifier and are, for all other purposes, opaque entities
+ * — types may or may not exist as actual classes; these may simply represent an interface type.
  *
  * **Configurations** are JavaScript objects that conform to the
  * [IRuleSet]{@link pentaho.config.spec.IRuleSet} interface — essentially, a set of configuration rules,
@@ -33,28 +33,30 @@
  * with [pentaho/service]{@link pentaho.service},
  * as a service of type `pentaho.config.spec.IRuleSet`.
  *
- * **Configuration rules** specify the _type_ and the values of any
- * [Pentaho environmental variables]{@link pentaho.environment.IEnvironment}
+ * **Configuration rules** specify the _type_ or _instance_ and the values of any
+ * [platform environmental variables]{@link pentaho.environment.IEnvironment}
  * to which they apply,
  * as well as the actual configuration properties that should be applied.
  *
- * Configurations can be obtained (and also registered)
+ * Configurations can be obtained
  * through the [config.IService]{@link pentaho.config.IService} interface.
  *
- * The Pentaho Platform's main configuration service instance can be obtained
+ * The platform's main configuration service instance can be obtained
  * by getting the service of id `pentaho.config.IService`,
  * i.e., by requiring the AMD/RequireJS module `pentaho/service!pentaho.config.IService?single`.
  * Example:
  *
  * ```js
  * require([
- *   "pentaho/service!pentaho.config.IService?single"
- * ], function(configService) {
+ *   "pentaho/service!pentaho.config.IService?single",
+ *   "pentaho/environment"
+ * ], function(configService, mainEnvironment) {
  *
  *   // Get the configuration for 'my.IFoo' components,
- *   // under the main Pentaho environment:
- *   configService.selectAsync("my.IFoo").then(function(config) {
- *     if(config) {
+ *   // under the main platform environment:
+ *   configService.getAsync(mainEnvironment).then(function(config) {
+ *     var myConfig = config.selectType("my.IFoo");
+ *     if(myConfig) {
  *       // ...
  *     }
  *   });

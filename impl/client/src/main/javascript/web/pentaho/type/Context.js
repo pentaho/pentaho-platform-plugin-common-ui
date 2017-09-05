@@ -240,20 +240,18 @@ define([
 
       var ctx = this.context;
 
-      return ctx.__getConfigAsync(this.id)
-          .then(function(typeConfig) {
-            if(typeConfig) {
-              // Load typeConfig dependencies and only then...
+      var typeConfig = ctx.__getTypeConfig(this.id);
+      if(typeConfig) {
+        // Load typeConfig dependencies and only then...
 
-              // Collect the module ids of all custom types used within typeSpec.
-              var customTypeIds = Object.keys(ctx.__collectTypeSpecTypeIds(typeConfig));
-              if(customTypeIds.length) {
-                return ctx.resolveAsync(customTypeIds).then(function() { return typeConfig; });
-              }
+        // Collect the module ids of all custom types used within typeSpec.
+        var customTypeIds = Object.keys(ctx.__collectTypeSpecTypeIds(typeConfig));
+        if(customTypeIds.length) {
+          return ctx.resolveAsync(customTypeIds).then(function() { return typeConfig; });
+        }
+      }
 
-              return typeConfig;
-            }
-          });
+      return Promise.resolve(typeConfig);
     }
     // endregion
   });
@@ -353,20 +351,28 @@ define([
      *
      * @constructor
      * @description Creates a `Context` with given variables.
-     * @param {pentaho.environment.IEnvironment} [env] A platform environment.
+     * @param {!pentaho.environment.IEnvironment} env A platform environment.
      * When unspecified, it defaults to {@link pentaho.environment.main}.
-     *
-     * @param {pentaho.type.spec.IContext} [configSpec] The context's configuration.
+     * @param {!pentaho.config.IConfiguration} config The configuration for the given environment.
      */
-    constructor: function(env, configSpec) {
+    constructor: function(env, config) {
       /**
-       * The associated platform context.
+       * The associated platform environment.
        *
        * @type {!pentaho.environment.IEnvironment}
        * @readOnly
        * @private
        */
-      this.__env = env || mainPlatformEnv;
+      this.__env = env;
+
+      /**
+       * The types and instances configuration.
+       *
+       * @type {!pentaho.config.IConfiguration}
+       * @readOnly
+       * @private
+       */
+      this.__config = config;
 
       /**
        * The configuration depth is incremented each time the context
@@ -429,6 +435,9 @@ define([
        * @private
        */
       this.__byTypeId = {};
+
+
+      var configSpec = config.selectType("pentaho/type/context");
 
       /**
        * @type {!pentaho.type.InstancesContainer}
@@ -1407,8 +1416,8 @@ define([
       return this.__getByObjectSpec({base: "list", of: elemTypeSpec}, null, sync);
     },
 
-    __getConfigAsync: function(id) {
-      return configurationService.selectAsync(id, this.__env);
+    __getTypeConfig: function(id) {
+      return this.__config.selectType(id);
     },
 
     __applyConfig: function(InstCtor, typeConfig) {
@@ -1433,19 +1442,6 @@ define([
       return Promise.reject(ex);
     }
   }, /** @lends pentaho.type.Context */{
-
-    /**
-     * Gets the default type context of the Pentaho Type API.
-     *
-     * This type context instance is created with the Pentaho Platform's default environment,
-     * as given by {@link pentaho.environment.main}.
-     *
-     * @type {!pentaho.type.Context}
-     * @readOnly
-     */
-    get instance() {
-      return __singleton || (__singleton = new Context());
-    },
 
     get standardIds() {
       var standardIds = Object.keys(standard).filter(function(lid) { return lid !== "mixins"; });
@@ -1478,9 +1474,9 @@ define([
 
       var standardIds = this.standardIds;
 
-      return configurationService.selectAsync("pentaho/type/context", env).then(function(configSpec) {
+      return configurationService.getAsync(env).then(function(config) {
 
-        var context = new Context(env, configSpec);
+        var context = new Context(env, config);
 
         return context.resolveAsync(standardIds)
             .then(function() {

@@ -18,7 +18,8 @@ define([
   "../../lang/Base",
   "../../util/spec",
   "../../lang/ArgumentRequiredError",
-  "../../lang/SortedList"
+  "../../lang/SortedList",
+  "../../shim/es6-promise"
 ], function(module, Base, specUtil, ArgumentRequiredError, SortedList) {
 
   "use strict";
@@ -50,8 +51,81 @@ define([
    */
   var _ruleCounter = 0;
 
+  var Configuration = Base.extend("pentaho.config.impl.Configuration", /** @lends pentaho.config.impl.Configuration# */{
+
+    /**
+     * @classDesc The `Configuration` class is an in-memory implementation of the
+     * {@link pentaho.config.IConfiguration} interface.
+     *
+     * @class
+     * @alias Configuration
+     * @memberOf pentaho.config.impl
+     *
+     * @extends pentaho.lang.Base
+     * @implements pentaho.config.IConfiguration
+     * @private
+     *
+     * @description Creates a configuration for the given service and environment.
+     * @param {!pentaho.config.impl.Service} service - The configuration service.
+     * @param {!pentaho.environment.IEnvironment} env - The platform environment.
+     */
+    constructor: function(service, env) {
+      this.__service = service;
+      this.__env = env;
+    },
+
+    /** @inheritDoc */
+    selectType: function(typeId) {
+      return this.__service.__selectType(typeId, this.__env);
+    },
+
+    /** @inheritDoc */
+    selectInstance: function(instanceId) {
+      return this.__service.__selectInstance(instanceId, this.__env);
+    },
+
+    __cloneEnv: function() {
+      var env = this.__env;
+      var clone = {};
+
+      _selectCriteria.forEach(function(p) {
+        clone[p] = env[p];
+      });
+
+      return clone;
+    },
+
+    __processConfig: function(config) {
+      if(!config) return config;
+
+      return config.map(function(rule) {
+        var ruleClone;
+        if(rule) {
+          ruleClone = {
+            select: this.__cloneEnv(),
+            apply:  rule.apply
+          };
+
+          var select = rule.select;
+          if(select) {
+            var select2 = ruleClone.select;
+            select2.type = select.type;
+            select2.instance = select.instance;
+          }
+        }
+        return ruleClone;
+      });
+    },
+
+    // This implementation makes sure to ignore the environment variables in config.select
+    /** @inheritDoc */
+    add: function(config) {
+      this.__service.add(this.__processConfig(config));
+    }
+  });
+
   /**
-   * @classDesc The `Service` class is the base implementation of the {@link pentaho.config.IService} interface.
+   * @classDesc The `Service` class is an in-memory implementation of the {@link pentaho.config.IService} interface.
    *
    * @class
    * @alias Service
@@ -67,8 +141,7 @@ define([
 
     constructor: function() {
       /**
-       * A map connecting a value type's absolute identifier to
-       * the applicable type configuration rules,
+       * A map connecting a type or instance identifier to the applicable configuration rules,
        * ordered from least to most specific.
        *
        * @type {Object.<string, Array.<pentaho.config.spec.IRule>>}
@@ -77,7 +150,11 @@ define([
       this.__ruleStore = {};
     },
 
-    /** @inheritdoc */
+    /**
+     * Adds an configuration rule set.
+     *
+     * @param {!pentaho.config.spec.IRuleSet} config - A configuration rule set to add.
+     */
     add: function(config) {
       if(config.rules) {
         config.rules.forEach(function(rule) {
@@ -87,7 +164,7 @@ define([
     },
 
     /**
-     * Adds a type configuration rule.
+     * Adds a configuration rule.
      *
      * The insertion order is used as the fallback rule order.
      * For more information on the specificity of rules,
@@ -96,7 +173,7 @@ define([
      * Note that the specified rule object may be slightly modified to serve
      * the service's internal needs.
      *
-     * @param {!pentaho.config.spec.IRule} rule - The type configuration rule to add.
+     * @param {!pentaho.config.spec.IRule} rule - The configuration rule to add.
      */
     addRule: function(rule) {
       // Assuming the Service takes ownership of
@@ -104,39 +181,63 @@ define([
       rule._ordinal = _ruleCounter++;
 
       var select = rule.select || {};
-      var typeIds = select.type;
-      if(!typeIds)
-        throw new ArgumentRequiredError("rule.select.type");
 
-      if(!Array.isArray(typeIds)) {
-        typeIds = [typeIds];
+      var itemKey;
+
+      itemKey = "instance";
+      var itemIds = select[itemKey];
+      if(!itemIds) {
+        itemKey = "type";
+        itemIds = select[itemKey];
       }
 
-      typeIds.forEach(function(typeId) {
-        if(!typeId)
-          throw new ArgumentRequiredError("rule.select.type");
+      if(!itemIds)
+        throw new ArgumentRequiredError("rule.select.type");
 
-        if(!this.__ruleStore[typeId]) {
-          this.__ruleStore[typeId] = new SortedList({"comparer": _ruleComparer});
+      if(!Array.isArray(itemIds)) {
+        itemIds = [itemIds];
+      }
+
+      itemIds.forEach(function(itemId) {
+        if(!itemId)
+          throw new ArgumentRequiredError("rule.select." + itemKey);
+
+        var fullItemId = itemKey + ":" + itemId;
+
+        var list = this.__ruleStore[fullItemId];
+        if(!list) {
+          this.__ruleStore[fullItemId] = list = new SortedList({"comparer": _ruleComparer});
         }
 
-        this.__ruleStore[typeId].push(rule);
+        list.push(rule);
       }, this);
     },
 
-    /** @inheritdoc */
-    selectAsync: function(typeId, context) {
-      var rules = this.__ruleStore[typeId] || [];
-      var filtered_rules = rules.filter(_ruleFilterer, context || {});
+    /** @inheritDoc */
+    getAsync: function(env) {
+      return Promise.resolve(new Configuration(this, env || {}));
+    },
+
+    __selectType: function(typeId, env) {
+      return this.__selectItem("type:" + typeId, env);
+    },
+
+    __selectInstance: function(instanceId, env) {
+      return this.__selectItem("instance:" + instanceId, env);
+    },
+
+    __selectItem: function(fullItemId, env) {
+      var rules = this.__ruleStore[fullItemId] || [];
+      var filtered_rules = rules.filter(_ruleFilterer, env);
       var configs = filtered_rules.map(function(rule) {
         return rule.apply;
       });
 
       if(configs.length === 0) {
-        return Promise.resolve(null);
+        return null;
       }
 
-      return Promise.resolve(configs.reduce(specUtil.merge.bind(specUtil), {}));
+      return configs.reduce(specUtil.merge.bind(specUtil), {});
     }
   });
 
@@ -186,6 +287,7 @@ define([
    * @return {boolean} `true` if `rule` is selected, `false`, otherwise.
    */
   function _ruleFilterer(rule) {
+
     /* jshint validthis:true*/
 
     var select = rule.select || {};

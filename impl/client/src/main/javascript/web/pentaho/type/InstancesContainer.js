@@ -18,7 +18,6 @@ define([
   "module",
   "../typeInfo",
   "../i18n!types",
-  "../service!pentaho.config.IService?single",
   "./changes/Transaction",
   "./changes/TransactionScope",
   "./changes/CommittedScope",
@@ -28,7 +27,7 @@ define([
   "../util/error",
   "../util/object",
   "../util/fun"
-], function(localRequire, module, service, typeInfo, bundle, configurationService,
+], function(localRequire, module, service, typeInfo, bundle,
             Base, promiseUtil, arg, error, O, F) {
 
   "use strict";
@@ -89,14 +88,13 @@ define([
     },
 
     __loadModuleAsyncCore: function() {
-      var configPromise = this.__loadConfigAsync();
       var typePromise = this.container.context.getAsync(this.typeId);
       var modulePromise = promiseUtil.require(this.id, localRequire);
 
-      return modulePromise.then(this.__onModuleLoaded.bind(this, configPromise, typePromise));
+      return modulePromise.then(this.__onModuleLoaded.bind(this, typePromise));
     },
 
-    __onModuleLoaded: function(configPromise, typePromise, instModule) {
+    __onModuleLoaded: function(typePromise, instModule) {
 
       if(instModule) {
 
@@ -116,16 +114,15 @@ define([
             return Promise.reject(error.argInvalid("instModule", "Not an array whose last position is a function."));
           }
 
-          return this.__loadFactory(factory, deps, configPromise, typePromise);
+          return this.__loadFactory(factory, deps, typePromise);
         }
       }
 
       return Promise.reject(error.argInvalidType("instModule", "Array", typeof instModule));
     },
 
-    __loadFactory: function(factory, deps, configPromise, typePromise) {
+    __loadFactory: function(factory, deps, typePromise) {
       var allPromises = [
-        configPromise,
         typePromise
       ];
 
@@ -137,10 +134,10 @@ define([
     },
 
     __createFromFactoryAsync: function(factory, results) {
-      var configSpec = results[0];
-      var InstCtor = results[1];
-      var deps = results[2] || [];
+      var InstCtor = results[0];
+      var deps = results[1] || [];
 
+      var configSpec = this.container.context.__config.selectInstance(this.id);
       var depsAndConfig = deps.concat(configSpec);
       var instance;
       try {
@@ -160,10 +157,6 @@ define([
     // endregion
 
     // region set instance
-    __loadConfigAsync: function() {
-      return configurationService.selectInstanceAsync(this.id, this.container.context.environment);
-    },
-
     __finalizeInstanceAsync: function(p) {
       var me = this;
 
