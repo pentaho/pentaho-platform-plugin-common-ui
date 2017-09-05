@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 define([
-  "module",
-  "./barAbstract"
-], function(module, baseViewFactory) {
+  "module"
+], function(module) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/ccc/visual/barAbstract",
+    function(BaseView) {
 
-    var BaseView = context.get(baseViewFactory);
+      return BaseView.extend({
+        _cccClass: "WaterfallChart",
 
-    return BaseView.extend({
-      _cccClass: "WaterfallChart",
-
-      $type: {
-        id: module.id
-      }
-    });
-  };
+        $type: {
+          id: module.id
+        }
+      });
+    }
+  ];
 });

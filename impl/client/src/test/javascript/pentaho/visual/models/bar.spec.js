@@ -15,20 +15,34 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/data/Table",
-  "pentaho/visual/models/abstract",
-  "pentaho/visual/models/bar"
+  "pentaho/data/Table"
 ], function(Context, Table) {
 
   "use strict";
 
   /* global describe:true, it:true, expect:true, beforeEach:true*/
 
-  var context = new Context();
-  var AbstractModel = context.get("pentaho/visual/models/abstract");
-  var BarModel = context.get("pentaho/visual/models/bar");
-
   describe("pentaho.visual.ccc.bar.Model", function() {
+
+    var AbstractModel;
+    var BarModel;
+
+    beforeEach(function(done) {
+
+      Context.createAsync()
+          .then(function(context) {
+
+            return context.applyAsync([
+              "pentaho/visual/models/abstract",
+              "pentaho/visual/models/bar"
+            ], function(_AbstractModel, _BarModel) {
+              AbstractModel = _AbstractModel;
+              BarModel = _BarModel;
+            });
+          })
+          .then(done, done.fail);
+
+    });
 
     it("should be a function", function() {
       expect(typeof BarModel).toBe("function");

@@ -15,43 +15,43 @@
  */
 define([
   "module",
-  "./barAbstract",
-  "pentaho/i18n!./i18n/model",
-  "./types/labelsOption",
-  "./mixins/trended"
-], function(module, baseModelFactory, bundle, labelsOptionFactory, trendedFactory) {
+  "pentaho/i18n!./i18n/model"
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/visual/models/barAbstract",
+    "pentaho/visual/models/types/labelsOption",
+    "pentaho/visual/models/mixins/trended",
+    function(BaseModel, LabelsOption, TrendedModel) {
 
-    var BaseModel = context.get(baseModelFactory);
+      return BaseModel.extend({
+        $type: {
+          id: module.id,
+          mixins: [TrendedModel],
 
-    return BaseModel.extend({
-      $type: {
-        id: module.id,
-        mixins: [trendedFactory],
+          v2Id: "ccc_bar",
+          category: "barchart",
+          defaultView: "pentaho/ccc/visual/bar",
 
-        v2Id: "ccc_bar",
-        category: "barchart",
-        defaultView: "pentaho/ccc/visual/bar",
-
-        props: [
-          {
-            name: "measures", // VISUAL_ROLE
-            attributes: {isRequired: true},
-            ordinal: 7
-          },
-          {
-            name: "labelsOption",
-            valueType: labelsOptionFactory,
-            domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"],
-            isRequired: true,
-            defaultValue: "none"
-          }
-        ]
-      }
-    })
-    .implement({$type: bundle.structured.bar});
-  };
+          props: [
+            {
+              name: "measures", // VISUAL_ROLE
+              attributes: {isRequired: true},
+              ordinal: 7
+            },
+            {
+              name: "labelsOption",
+              valueType: LabelsOption,
+              domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"],
+              isRequired: true,
+              defaultValue: "none"
+            }
+          ]
+        }
+      })
+      .implement({$type: bundle.structured.bar});
+    }
+  ];
 });

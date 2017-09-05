@@ -15,33 +15,33 @@
  */
 define([
   "module",
-  "../types/emptyCellMode",
-  "pentaho/visual/base/model",
   "pentaho/i18n!../i18n/model"
-], function(module, emptyCellModeFactory, modelFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
   // Used by: Line, BarLine e AreaStacked
 
-  return function(context) {
+  return [
+    "pentaho/visual/base/model",
+    "pentaho/visual/models/types/emptyCellMode",
+    function(BaseModel, EmptyCellMode) {
 
-    var BaseModel = context.get(modelFactory);
-
-    return BaseModel.extend({
-      $type: {
-        id: module.id,
-        isAbstract: true,
-        props: [
-          {
-            name: "emptyCellMode",
-            valueType: emptyCellModeFactory,
-            isRequired: true,
-            defaultValue: "gap"
-          }
-        ]
-      }
-    })
-    .implement({$type: bundle.structured.interpolation});
-  };
+      return BaseModel.extend({
+        $type: {
+          id: module.id,
+          isAbstract: true,
+          props: [
+            {
+              name: "emptyCellMode",
+              valueType: EmptyCellMode,
+              isRequired: true,
+              defaultValue: "gap"
+            }
+          ]
+        }
+      })
+      .implement({$type: bundle.structured.interpolation});
+    }
+  ];
 });

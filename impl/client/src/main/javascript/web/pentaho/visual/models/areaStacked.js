@@ -15,15 +15,12 @@
  */
 define([
   "module",
-  "./pointAbstract",
   "pentaho/i18n!./i18n/model"
-], function(module, baseModelFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
-
-    var BaseModel = context.get(baseModelFactory);
+  return ["pentaho/visual/models/pointAbstract", function(BaseModel) {
 
     return BaseModel.extend({
       $type: {
@@ -34,5 +31,5 @@ define([
       }
     })
     .implement({$type: bundle.structured.areaStacked});
-  };
+  }];
 });

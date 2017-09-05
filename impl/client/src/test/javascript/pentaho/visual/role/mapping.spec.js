@@ -10,15 +10,24 @@ define([
 
   describe("pentaho.visual.role.Mapping", function() {
 
-    var context;
     var VisualModel;
     var Mapping;
 
-    beforeEach(function() {
+    beforeEach(function(done) {
 
-      context = new Context();
-      VisualModel = context.get(visualModelFactory);
-      Mapping = context.get(mappingFactory);
+      Context.createAsync()
+          .then(function(context) {
+
+            return context.applyAsync([
+              "pentaho/visual/base/model",
+              "pentaho/visual/role/mapping"
+            ], function(_Model, _Mapping) {
+              VisualModel = _Model;
+              Mapping = _Mapping;
+            });
+          })
+          .then(done, done.fail);
+
     });
 
     describe("#isMapped", function() {

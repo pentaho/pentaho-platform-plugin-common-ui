@@ -15,97 +15,95 @@
  */
 define([
   "module",
-  "./cartesianAbstract",
-  "pentaho/visual/role/level",
-  "pentaho/i18n!./i18n/model",
-  "./types/labelsOption",
-  "./mixins/scaleColorContinuous",
-  "./mixins/multiCharted",
-  "./mixins/trended"
-], function(module, baseModelFactory, measurementLevelFactory, bundle, labelsOptionFactory,
-    scaleColorContinuousFactory, multiChartedFactory, trendedFactory) {
+  "pentaho/i18n!./i18n/model"
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/visual/models/cartesianAbstract",
+    "pentaho/visual/models/types/labelsOption",
+    "pentaho/visual/models/mixins/scaleColorContinuous",
+    "pentaho/visual/models/mixins/multiCharted",
+    "pentaho/visual/models/mixins/trended",
+    "pentaho/visual/role/level",
+    function(BaseModel, LabelsOption, ScaleColorContinuousModel, MultiChartedModel, TrendedModel, MeasurementLevel) {
 
-    var BaseModel = context.get(baseModelFactory);
-    var MeasurementLevel = context.get(measurementLevelFactory);
+      return BaseModel.extend({
+        $type: {
+          id: module.id,
+          isAbstract: true,
+          // TODO: scaleColor... should only be applicable when color is continuous
+          mixins: [TrendedModel, ScaleColorContinuousModel, MultiChartedModel],
 
-    return BaseModel.extend({
-      $type: {
-        id: module.id,
-        isAbstract: true,
-        // TODO: scaleColor... should only be applicable when color is continuous
-        mixins: [trendedFactory, scaleColorContinuousFactory, multiChartedFactory],
+          category: "scatter",
 
-        category: "scatter",
-
-        props: [
-          {
-            name: "rows", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["ordinal"],
-            attributes: {isRequired: true}
-          },
-          {
-            name: "x", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["quantitative"],
-            attributes: {countMin: 1, countMax: 1},
-            ordinal: 1
-          },
-          {
-            name: "y", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["quantitative"],
-            attributes: {countMin: 1, countMax: 1},
-            ordinal: 2
-          },
-          {
-            // Modal visual role
-            name: "color", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["nominal", "quantitative"],
-            attributes: {
-              countMax: function(rolePropType) {
-                var level = rolePropType.levelEffectiveOn(this);
-                return MeasurementLevel.type.isQuantitative(level) ? 1 : null;
-              }
-              // TODO: should only be applicable when color is continuous
+          props: [
+            {
+              name: "rows", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["ordinal"],
+              attributes: {isRequired: true}
             },
-            getAttributesMaxLevelOf: function(model) {
-              var mapping = model.get(this);
-
-              // If the mapping contains a single `date` attribute,
-              // consider it nominal, and not quantitative as the base code does.
-              // Currently, CCC does not like dates in continuous color scales...
-              if(mapping.attributes.count === 1) {
-                var dataAttr = mapping.attributes.at(0).dataAttribute;
-                if(dataAttr && dataAttr.type === "date")
-                  return "nominal";
-              }
-
-              return this.base(model);
+            {
+              name: "x", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["quantitative"],
+              attributes: {countMin: 1, countMax: 1},
+              ordinal: 1
             },
-            ordinal: 6
-          },
-          {
-            name: "multi", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["ordinal"],
-            ordinal: 10
-          },
-          {
-            name: "labelsOption",
-            valueType: labelsOptionFactory,
-            domain: ["none", "center", "left", "right", "top", "bottom"],
-            isRequired: true,
-            defaultValue: "none"
-          }
-        ]
-      }
-    })
-    .implement({$type: bundle.structured.metricDot});
-  };
+            {
+              name: "y", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["quantitative"],
+              attributes: {countMin: 1, countMax: 1},
+              ordinal: 2
+            },
+            {
+              // Modal visual role
+              name: "color", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["nominal", "quantitative"],
+              attributes: {
+                countMax: function(rolePropType) {
+                  var level = rolePropType.levelEffectiveOn(this);
+                  return MeasurementLevel.type.isQuantitative(level) ? 1 : null;
+                }
+                // TODO: should only be applicable when color is continuous
+              },
+              getAttributesMaxLevelOf: function(model) {
+                var mapping = model.get(this);
+
+                // If the mapping contains a single `date` attribute,
+                // consider it nominal, and not quantitative as the base code does.
+                // Currently, CCC does not like dates in continuous color scales...
+                if(mapping.attributes.count === 1) {
+                  var dataAttr = mapping.attributes.at(0).dataAttribute;
+                  if(dataAttr && dataAttr.type === "date")
+                    return "nominal";
+                }
+
+                return this.base(model);
+              },
+              ordinal: 6
+            },
+            {
+              name: "multi", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["ordinal"],
+              ordinal: 10
+            },
+            {
+              name: "labelsOption",
+              valueType: LabelsOption,
+              domain: ["none", "center", "left", "right", "top", "bottom"],
+              isRequired: true,
+              defaultValue: "none"
+            }
+          ]
+        }
+      })
+      .implement({$type: bundle.structured.metricDot});
+    }
+  ];
 });

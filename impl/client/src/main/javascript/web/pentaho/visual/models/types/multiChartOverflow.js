@@ -20,17 +20,15 @@ define([
 
   "use strict";
 
-  return function(context) {
-
-    var PentahoString = context.get("string");
+  return ["string", "enum", function(PentahoString, Enum) {
 
     return PentahoString.extend({
       $type: {
         id: module.id,
-        mixins: ["enum"],
+        mixins: [Enum],
         domain: ["grow", "fit", "clip"]
       }
     })
     .implement({$type: bundle.structured.multiChartOverflow});
-  };
+  }];
 });

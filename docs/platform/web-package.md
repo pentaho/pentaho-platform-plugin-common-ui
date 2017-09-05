@@ -82,9 +82,10 @@ Modules with a matching module identifier can access the configuration object vi
 
 In particular, 
 this is used to configure the [`pentaho/service`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.service'}}) plugin, 
-used as an inversion-of-control mechanism to inject the package resources into the system.
+used as a basic inversion-of-control mechanism to inject the package resources into the system.
 
-For instance, to declare that the resource `"my-viz/model.js"` implements the service named `pentaho/visual/base`, 
+For instance, to declare that the resource `"my-viz/config.js"` 
+implements the service named `"pentaho.config.spec.IRuleSet"`, 
 you would need:
 ```json
 { 
@@ -92,7 +93,7 @@ you would need:
   "version": "1.0.0",
   "config": {
     "pentaho/service": {
-      "baz_1.0.0/my-viz/model": "pentaho/visual/base"
+      "baz_1.0.0/my-viz/config": "pentaho.config.spec.IRuleSet"
     }
   }
 }
@@ -102,6 +103,20 @@ you would need:
 (<code>"baz_1.0.0"</code>) as the dependency name. 
 This is currently a limitation, as ideally you should be unaware of whatever naming scheme is chosen by the platform.
 </p>' type="warning" %}
+
+Another use is to declare that a type such as that exported by the module `"my-viz/model.js"` is 
+a visualization model type.
+```json
+{ 
+  "name": "baz",
+  "version": "1.0.0",
+  "config": {
+    "pentaho/typeInfo": {
+      "baz_1.0.0/my-viz/model": {"base": "pentaho/visual/base/model"}
+    }
+  }
+}
+```
 
 ## packages
 

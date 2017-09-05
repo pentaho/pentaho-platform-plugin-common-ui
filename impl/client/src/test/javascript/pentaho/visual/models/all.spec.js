@@ -25,17 +25,19 @@ define([
 
     it("should be possible to load all models", function(done) {
 
-      var context = new Context();
-
-      context.getAllAsync("pentaho/visual/base")
+      Context.createAsync()
+          .then(function(context) {
+            return context.getAllAsync("pentaho/visual/base/model");
+          })
           .then(done, done.fail);
     });
 
     it("should be possible to load the sample calc model", function(done) {
 
-      var context = new Context();
-
-      context.getAsync("pentaho/visual/samples/calc")
+      Context.createAsync()
+          .then(function(context) {
+            return context.getAsync("pentaho/visual/samples/calc/model");
+          })
           .then(done, done.fail);
     });
   });

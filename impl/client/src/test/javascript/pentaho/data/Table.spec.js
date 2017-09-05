@@ -16,9 +16,8 @@
 define([
   "pentaho/data/Table",
   "pentaho/data/TableView",
-  "pentaho/data/filter/abstract",
   "pentaho/type/Context"
-], function(DataTable, TableView, abstractFilterFactory, Context) {
+], function(DataTable, TableView, Context) {
 
   function getDatasetCDA1() {
     return {
@@ -294,26 +293,39 @@ define([
       });
 
       describe("#filter(filter)", function() {
+        var context;
+        var data;
+        var CustomFilter;
 
-        var context = new Context();
-        var AbstractFilter = context.get(abstractFilterFactory);
-        var CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
+        beforeEach(function(done) {
 
-        var data = new DataTable({
-          model: [
-            {name: "product", type: "string", label: "Product"},
-            {name: "sales", type: "number", label: "Sales"},
-            {name: "inStock", type: "boolean", label: "In Stock"}
-          ],
-          rows: [
-            {c: [{v: "A"}, {v: 12000}, {v: true }]},
-            {c: [{v: "B"}, {v: 6000},  {v: true }]},
-            {c: [{v: "C"}, {v: 12000}, {v: false}]},
-            {c: [{v: "D"}, {v: 1000},  {v: false}]},
-            {c: [{v: "E"}, {v: 2000},  {v: false}]},
-            {c: [{v: "F"}, {v: 3000},  {v: false}]},
-            {c: [{v: "G"}, {v: 4000},  {v: false}]}
-          ]
+          Context.createAsync()
+              .then(function(_context) {
+                context = _context;
+
+                return context.applyAsync(["pentaho/data/filter/abstract"], function(AbstractFilter) {
+
+                  CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
+                });
+              })
+              .then(done, done.fail);
+
+          data = new DataTable({
+            model: [
+              {name: "product", type: "string", label: "Product"},
+              {name: "sales", type: "number", label: "Sales"},
+              {name: "inStock", type: "boolean", label: "In Stock"}
+            ],
+            rows: [
+              {c: [{v: "A"}, {v: 12000}, {v: true }]},
+              {c: [{v: "B"}, {v: 6000},  {v: true }]},
+              {c: [{v: "C"}, {v: 12000}, {v: false}]},
+              {c: [{v: "D"}, {v: 1000},  {v: false}]},
+              {c: [{v: "E"}, {v: 2000},  {v: false}]},
+              {c: [{v: "F"}, {v: 3000},  {v: false}]},
+              {c: [{v: "G"}, {v: 4000},  {v: false}]}
+            ]
+          });
         });
 
         it("should return a view", function() {
@@ -371,25 +383,39 @@ define([
 
       describe("#filterMatchesRow(filter, rowIndex)", function() {
 
-        var context = new Context();
-        var AbstractFilter = context.get(abstractFilterFactory);
-        var CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
+        var context;
+        var data;
+        var CustomFilter;
 
-        var data = new DataTable({
-          model: [
-            {name: "product", type: "string", label: "Product"},
-            {name: "sales", type: "number", label: "Sales"},
-            {name: "inStock", type: "boolean", label: "In Stock"}
-          ],
-          rows: [
-            {c: [{v: "A"}, {v: 12000}, {v: true }]},
-            {c: [{v: "B"}, {v: 6000},  {v: true }]},
-            {c: [{v: "C"}, {v: 12000}, {v: false}]},
-            {c: [{v: "D"}, {v: 1000},  {v: false}]},
-            {c: [{v: "E"}, {v: 2000},  {v: false}]},
-            {c: [{v: "F"}, {v: 3000},  {v: false}]},
-            {c: [{v: "G"}, {v: 4000},  {v: false}]}
-          ]
+        beforeEach(function(done) {
+
+          Context.createAsync()
+              .then(function(_context) {
+                context = _context;
+
+                return context.applyAsync(["pentaho/data/filter/abstract"], function(AbstractFilter) {
+
+                  CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
+                });
+              })
+              .then(done, done.fail);
+
+          data = new DataTable({
+            model: [
+              {name: "product", type: "string", label: "Product"},
+              {name: "sales", type: "number", label: "Sales"},
+              {name: "inStock", type: "boolean", label: "In Stock"}
+            ],
+            rows: [
+              {c: [{v: "A"}, {v: 12000}, {v: true }]},
+              {c: [{v: "B"}, {v: 6000},  {v: true }]},
+              {c: [{v: "C"}, {v: 12000}, {v: false}]},
+              {c: [{v: "D"}, {v: 1000},  {v: false}]},
+              {c: [{v: "E"}, {v: 2000},  {v: false}]},
+              {c: [{v: "F"}, {v: 3000},  {v: false}]},
+              {c: [{v: "G"}, {v: 4000},  {v: false}]}
+            ]
+          });
         });
 
         it("should return `false` when a filter does not selects the row", function() {

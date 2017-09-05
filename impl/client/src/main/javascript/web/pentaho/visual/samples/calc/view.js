@@ -15,111 +15,111 @@
  */
 define([
   "module",
-  "./model",
-  "pentaho/visual/base/view",
   "pentaho/i18n!view"
-], function(module, modelFactory, baseViewFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
   /* global document:false*/
 
-  return function(context) {
+  return [
+    "pentaho/visual/samples/calc/model",
+    "pentaho/visual/base/view",
+    function(Model, BaseView) {
 
-    /**
-     * @name View
-     * @memberOf pentaho.visual.samples.calc
-     * @class
-     * @extends pentaho.visual.base.View
-     * @amd {pentaho.type.Factory<pentaho.visual.samples.calc.View>} pentaho/visual/samples/calc/view
-     *
-     * @classDesc The `View` of the calculator visualization.
-     */
+      /**
+       * @name View
+       * @memberOf pentaho.visual.samples.calc
+       * @class
+       * @extends pentaho.visual.base.View
+       * @amd {pentaho.type.Factory<pentaho.visual.samples.calc.View>} pentaho/visual/samples/calc/view
+       *
+       * @classDesc The `View` of the calculator visualization.
+       */
 
-    var BaseView = context.get(baseViewFactory);
+      return BaseView.extend(/** @lends pentaho.visual.samples.calc.View# */{
+        $type: {
+          id: module.id,
+          props: {
+            model: {valueType: Model}
+          }
+        },
 
-    return BaseView.extend(/** @lends pentaho.visual.samples.calc.View# */{
-      $type: {
-        id: module.id,
-        props: {
-          model: {valueType: modelFactory}
-        }
-      },
+        /** @inheritDoc */
+        _initDomContainer: function() {
 
-      /** @inheritDoc */
-      _initDomContainer: function() {
+          var numSpan = document.createElement("span");
+          numSpan.style.fontSize = "42px";
+          numSpan.style.position = "relative";
 
-        var numSpan = document.createElement("span");
-        numSpan.style.fontSize = "42px";
-        numSpan.style.position = "relative";
+          this.domContainer.appendChild(numSpan);
+        },
 
-        this.domContainer.appendChild(numSpan);
-      },
+        /** @inheritDoc */
+        _updateAll: function() {
 
-      /** @inheritDoc */
-      _updateAll: function() {
+          var result = this.__calculate();
 
-        var result = this.__calculate();
+          this.domContainer.firstChild.innerHTML = bundle.get("result", [result.toFixed(2)]);
 
-        this.domContainer.firstChild.innerHTML = bundle.get("result", [result.toFixed(2)]);
+          this._updateSize();
+        },
 
-        this._updateSize();
-      },
+        /** @inheritDoc */
+        _updateSize: function() {
 
-      /** @inheritDoc */
-      _updateSize: function() {
+          var element = this.domContainer.firstChild;
 
-        var element = this.domContainer.firstChild;
+          // Center the span
+          var width  = this.width;
+          var height = this.height;
+          element.style.left = ((width - element.offsetWidth) / 2) + "px";
+          element.style.top  = ((height - element.offsetHeight) / 2) + "px";
+        },
 
-        // Center the span
-        var width  = this.width;
-        var height = this.height;
-        element.style.left = ((width - element.offsetWidth) / 2) + "px";
-        element.style.top  = ((height - element.offsetHeight) / 2) + "px";
-      },
+        // ---------
 
-      // ---------
+        __calculate: function() {
+          var dataTable = this.model.data;
+          var R = dataTable.getNumberOfRows();
+          var measureAttrName = this.model.measure.attributes.at(0).name;
+          var jMeasure = dataTable.getColumnIndexByAttribute(measureAttrName);
+          var getValue = function(k) {
+            var v = dataTable.getValue(k, jMeasure);
+            return !isNaN(v) && v != null ? v : null;
+          };
+          var value = null;
+          var i;
+          var vi;
 
-      __calculate: function() {
-        var dataTable = this.model.data;
-        var R = dataTable.getNumberOfRows();
-        var measureAttrName = this.model.measure.attributes.at(0).name;
-        var jMeasure = dataTable.getColumnIndexByAttribute(measureAttrName);
-        var getValue = function(k) {
-          var v = dataTable.getValue(k, jMeasure);
-          return !isNaN(v) && v != null ? v : null;
-        };
-        var value = null;
-        var i;
-        var vi;
-
-        /* eslint default-case: 0 */
-        switch(this.model.operation) {
-          case "max":
-            for(i = 0; i < R; i++)
-              if((vi = getValue(i)) != null)
-                value = value == null ? vi : Math.max(value, vi);
-            break;
-
-          case "min":
-            for(i = 0; i < R; i++)
-              if((vi = getValue(i)) != null)
-                value = value == null ? vi : Math.min(value, vi);
-            break;
-
-          case "avg":
-            var total = value = 0;
-            if(R) {
+          /* eslint default-case: 0 */
+          switch(this.model.operation) {
+            case "max":
               for(i = 0; i < R; i++)
                 if((vi = getValue(i)) != null)
-                  total += vi;
-              value = total / R;
-            }
-            break;
-        }
+                  value = value == null ? vi : Math.max(value, vi);
+              break;
 
-        return value;
-      }
-    });
-  };
+            case "min":
+              for(i = 0; i < R; i++)
+                if((vi = getValue(i)) != null)
+                  value = value == null ? vi : Math.min(value, vi);
+              break;
+
+            case "avg":
+              var total = value = 0;
+              if(R) {
+                for(i = 0; i < R; i++)
+                  if((vi = getValue(i)) != null)
+                    total += vi;
+                value = total / R;
+              }
+              break;
+          }
+
+          return value;
+        }
+      });
+    }
+  ];
 });

@@ -15,13 +15,14 @@
  */
 define([
   "module",
-  "pentaho/type/action/base",
   "pentaho/lang/ArgumentInvalidTypeError"
-], function(module, baseActionFactory, ArgumentInvalidTypeError) {
+], function(module, ArgumentInvalidTypeError) {
 
   "use strict";
 
-  return function(context) {
+  return ["pentaho/type/action/base", function(ActionBase) {
+
+    var context = this;
 
     // Cannot depend directly or an AMD dependency cycle would arise...
     var __baseViewType = null;
@@ -36,9 +37,7 @@ define([
      * For more information see {@link pentaho.visual.action.Base}.
      */
 
-    var __ActionBase = context.get(baseActionFactory);
-
-    return __ActionBase.extend(/** @lends pentaho.visual.action.Base# */{
+    return ActionBase.extend(/** @lends pentaho.visual.action.Base# */{
       $type: /** @lends pentaho.visual.action.Base.Type# */{
         id: module.id,
         isAbstract: true
@@ -129,5 +128,5 @@ define([
       }
       // endregion
     });
-  };
+  }];
 });

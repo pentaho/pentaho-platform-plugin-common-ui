@@ -99,11 +99,11 @@
   requireTypeInfo["pentaho/data/filter/isLessOrEqual"] = {alias: "<=", base: "pentaho/data/filter/property"};
   requireTypeInfo["pentaho/data/filter/isLike"] = {alias: "like", base: "pentaho/data/filter/property"};
 
-  requireTypeInfo["pentaho/visual/base"] = {base: "model"};
+  requireTypeInfo["pentaho/visual/base/model"] = {base: "model"};
   requireTypeInfo["pentaho/visual/base/view"] = {
     base: "complex",
     props: {
-      model: {valueType: "pentaho/visual/base"}
+      model: {valueType: "pentaho/visual/base/model"}
     }
   };
   // endregion
@@ -268,10 +268,6 @@
     requireMap["*"][mid + "/theme"] = mid + "/" + themeRoot + "/" + theme;
   }
 
-  function registerViz(name) {
-    requireTypes[name] = "pentaho/visual/base";
-  }
-
   // Type API Base Theme
   mapTheme("pentaho/type", "themes", ["ruby"]);
 
@@ -283,18 +279,9 @@
 
   requireTypes["pentaho/visual/config/vizApi.conf"] = "pentaho.config.spec.IRuleSet";
 
-  requirePackages.push({"name": "pentaho/visual/base", "main": "model"});
-  requirePackages.push({"name": "pentaho/visual/samples/calc", "main": "model"});
-
+  requireTypeInfo["pentaho/visual/models/abstract"] = {base: "pentaho/visual/base/model"};
+  requireTypeInfo["pentaho/visual/samples/calc/model"] = {base: "pentaho/visual/base/model"};
   [
-    // base visual
-    "pentaho/visual/base",
-
-    // calc viz
-    "pentaho/visual/samples/calc",
-
-    // ccc vizs
-    "pentaho/visual/models/abstract",
     "pentaho/visual/models/cartesianAbstract",
     "pentaho/visual/models/categoricalContinuousAbstract",
     "pentaho/visual/models/barAbstract",
@@ -316,7 +303,9 @@
     "pentaho/visual/models/donut",
     "pentaho/visual/models/scatter",
     "pentaho/visual/models/bubble"
-  ].forEach(registerViz);
+  ].forEach(function(name) {
+    requireTypeInfo[name] = {base: "pentaho/visual/models/abstract"};
+  });
   // endregion
 
   // TODO: this should be removed from here, and to the GEO plugin's package.json
@@ -325,7 +314,9 @@
   requireMap["*"]["pentaho/geo/visual/map"] = "pentaho/geo/visual_${project.version}/view";
 
   // VizAPI actions
-  requireTypeInfo["pentaho/visual/action/select"] = {alias: "select"};
-  requireTypeInfo["pentaho/visual/action/execute"] = {alias: "execute"};
+  requireTypeInfo["pentaho/visual/action/base"] = {base: "pentaho/type/action/base"};
+  requireTypeInfo["pentaho/visual/action/data"] = {base: "pentaho/visual/action/base"};
+  requireTypeInfo["pentaho/visual/action/select"] = {alias: "select", base: "pentaho/visual/action/data"};
+  requireTypeInfo["pentaho/visual/action/execute"] = {alias: "execute", base: "pentaho/visual/action/data"};
 
 })(this);

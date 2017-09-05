@@ -15,23 +15,40 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/visual/models/bar",
-  "pentaho/ccc/visual/bar",
-  "pentaho/ccc/visual/abstract",
   "pentaho/data/Table"
-], function(Context, barModelFactory, barViewFactory, abstractViewFactory, Table) {
+], function(Context, Table) {
 
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false*/
   /* global document:false*/
 
-  var context = new Context();
-  var BarModel = context.get(barModelFactory);
-  var BarView  = context.get(barViewFactory);
-  var AbstractView = context.get(abstractViewFactory);
-
   describe("pentaho.visual.ccc.views.Bar", function() {
+
+    var context;
+    var BarModel;
+    var BarView;
+    var AbstractView;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+
+            context = _context;
+
+            return context.applyAsync([
+              "pentaho/visual/models/bar",
+              "pentaho/ccc/visual/bar",
+              "pentaho/ccc/visual/abstract"
+            ], function(_BarModel, _BarView, _AbstractView) {
+              BarModel = _BarModel;
+              BarView  = _BarView;
+              AbstractView = _AbstractView;
+            });
+          })
+          .then(done, done.fail);
+    });
+
     it("should be a function", function() {
       expect(typeof BarView).toBe("function");
     });

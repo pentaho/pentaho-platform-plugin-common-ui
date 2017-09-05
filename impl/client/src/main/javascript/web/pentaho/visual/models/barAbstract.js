@@ -15,30 +15,30 @@
  */
 define([
   "module",
-  "./categoricalContinuousAbstract",
-  "./mixins/multiCharted",
   "pentaho/i18n!./i18n/model"
-], function(module, baseModelFactory, multiChartedFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/visual/models/categoricalContinuousAbstract",
+    "pentaho/visual/models/mixins/multiCharted",
+    function(BaseModel, MultiChartedModel) {
 
-    var BaseModel = context.get(baseModelFactory);
-
-    return BaseModel.extend({
-      $type: {
-        id: module.id,
-        mixins: [multiChartedFactory],
-        isAbstract: true,
-        props: [
-          {
-            name: "rows", // VISUAL_ROLE
-            levels: ["ordinal"]
-          }
-        ]
-      }
-    })
-    .implement({$type: bundle.structured.barAbstract});
-  };
+      return BaseModel.extend({
+        $type: {
+          id: module.id,
+          mixins: [MultiChartedModel],
+          isAbstract: true,
+          props: [
+            {
+              name: "rows", // VISUAL_ROLE
+              levels: ["ordinal"]
+            }
+          ]
+        }
+      })
+      .implement({$type: bundle.structured.barAbstract});
+    }
+  ];
 });

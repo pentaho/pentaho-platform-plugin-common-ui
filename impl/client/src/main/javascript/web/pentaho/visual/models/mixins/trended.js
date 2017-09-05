@@ -15,48 +15,48 @@
  */
 define([
   "module",
-  "pentaho/visual/base/model",
-  "../types/trendType",
-  "../types/lineWidth",
   "pentaho/i18n!../i18n/model"
-], function(module, modelFactory, trendTypeFactory, lineWidthFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
   // Used by: Line, Bar, Scatter
 
-  return function(context) {
+  return [
+    "pentaho/visual/base/model",
+    "pentaho/visual/models/types/trendType",
+    "pentaho/visual/models/types/lineWidth",
+    function(BaseModel, TrendType, LineWidth) {
 
-    var BaseModel = context.get(modelFactory);
-
-    return BaseModel.extend({
-      $type: {
-        id: module.id,
-        isAbstract: true,
-        props: [
-          {
-            name: "trendType",
-            valueType: trendTypeFactory,
-            isRequired: true,
-            defaultValue: "none"
-          },
-          {
-            name: "trendName",
-            valueType: "string",
-            isApplicable: __isApplicableTrend
-          },
-          {
-            name: "trendLineWidth",
-            valueType: lineWidthFactory,
-            isApplicable: __isApplicableTrend,
-            isRequired: true,
-            defaultValue: 1
-          }
-        ]
-      }
-    })
-    .implement({$type: bundle.structured.trend});
-  };
+      return BaseModel.extend({
+        $type: {
+          id: module.id,
+          isAbstract: true,
+          props: [
+            {
+              name: "trendType",
+              valueType: TrendType,
+              isRequired: true,
+              defaultValue: "none"
+            },
+            {
+              name: "trendName",
+              valueType: "string",
+              isApplicable: __isApplicableTrend
+            },
+            {
+              name: "trendLineWidth",
+              valueType: LineWidth,
+              isApplicable: __isApplicableTrend,
+              isRequired: true,
+              defaultValue: 1
+            }
+          ]
+        }
+      })
+      .implement({$type: bundle.structured.trend});
+    }
+  ];
 
   function __isApplicableTrend() {
     /* jshint validthis:true */

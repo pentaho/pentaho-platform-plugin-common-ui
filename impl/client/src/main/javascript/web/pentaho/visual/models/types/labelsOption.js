@@ -20,14 +20,12 @@ define([
 
   "use strict";
 
-  return function(context) {
-
-    var PentahoString = context.get("string");
+  return ["string", "enum", function(PentahoString, Enum) {
 
     return PentahoString.extend({
       $type: {
         id: module.id,
-        mixins: ["enum"],
+        mixins: [Enum],
         domain: [
           "none", "center",                 // all (HeatGrid, Sunburst)
           "insideEnd", "insideBase",        // StackedBar, NormalizedBar (vertical and horizontal)
@@ -39,5 +37,5 @@ define([
       }
     })
     .implement({$type: bundle.structured.labelsOption});
-  };
+  }];
 });

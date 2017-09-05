@@ -15,60 +15,60 @@
  */
 define([
   "module",
-  "pentaho/visual/base/model",
-  "pentaho/visual/role/level",
-  "../types/colorSet",
-  "../types/pattern",
   "pentaho/i18n!../i18n/model"
-], function(module, modelFactory, measurementLevelFactory, colorSetFactory, patternFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
   // Used by: HG, Scatter
 
-  return function(context) {
+  return [
+    "pentaho/visual/base/model",
+    "pentaho/visual/role/level",
+    "pentaho/visual/models/types/colorSet",
+    "pentaho/visual/models/types/pattern",
+    "pentaho/visual/models/types/multiChartOverflow",
+    function(BaseModel, MeasurementLevel, ColorSet, Pattern) {
 
-    var BaseModel = context.get(modelFactory);
-    var MeasurementLevel = context.get(measurementLevelFactory);
+      return BaseModel.extend({
+        $type: {
+          id: module.id,
+          isAbstract: true,
+          props: [
+            {
+              name: "pattern",
+              valueType: Pattern,
+              isRequired: true,
+              isApplicable: __hasQuantitativeAttributesColor,
+              defaultValue: "gradient"
+            },
+            {
+              name: "colorSet",
+              valueType: ColorSet,
+              isRequired: true,
+              isApplicable: __hasQuantitativeAttributesColor,
+              defaultValue: "ryg"
+            },
+            {
+              name: "reverseColors",
+              valueType: "boolean",
+              isRequired: true,
+              isApplicable: __hasQuantitativeAttributesColor,
+              defaultValue: false
+            }
+          ]
+        }
+      })
+      .implement({$type: bundle.structured.scaleColorContinuous});
 
-    return BaseModel.extend({
-      $type: {
-        id: module.id,
-        isAbstract: true,
-        props: [
-          {
-            name: "pattern",
-            valueType: patternFactory,
-            isRequired: true,
-            isApplicable: __hasQuantitativeAttributesColor,
-            defaultValue: "gradient"
-          },
-          {
-            name: "colorSet",
-            valueType: colorSetFactory,
-            isRequired: true,
-            isApplicable: __hasQuantitativeAttributesColor,
-            defaultValue: "ryg"
-          },
-          {
-            name: "reverseColors",
-            valueType: "boolean",
-            isRequired: true,
-            isApplicable: __hasQuantitativeAttributesColor,
-            defaultValue: false
-          }
-        ]
+      function __hasQuantitativeAttributesColor() {
+        if(!this.color.isMapped) return false;
+
+        var rolePropType = this.$type.get("color");
+        var level = rolePropType.levelEffectiveOn(this);
+
+        return MeasurementLevel.type.isQuantitative(level);
       }
-    })
-    .implement({$type: bundle.structured.scaleColorContinuous});
-
-    function __hasQuantitativeAttributesColor() {
-      if(!this.color.isMapped) return false;
-
-      var rolePropType = this.$type.get("color");
-      var level = rolePropType.levelEffectiveOn(this);
-
-      return MeasurementLevel.type.isQuantitative(level);
     }
-  };
+  ];
 });

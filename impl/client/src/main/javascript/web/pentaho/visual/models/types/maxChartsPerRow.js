@@ -20,17 +20,15 @@ define([
 
   "use strict";
 
-  return function(context) {
-
-    var PentahoNumber = context.get("number");
+  return ["number", "enum", function(PentahoNumber, Enum) {
 
     return PentahoNumber.extend({
       $type: {
         id: module.id,
-        mixins: ["enum"],
+        mixins: [Enum],
         domain: [1, 2, 3, 4, 5]
       }
     })
     .implement({$type: bundle.structured.maxChartsPerRow});
-  };
+  }];
 });

@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 define([
-  "module",
-  "pentaho/visual/models/scatter",
-  "./metricPointAbstract"
-], function(module, modelFactory, baseViewFactory) {
+  "module"
+], function(module) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/ccc/visual/metricPointAbstract",
+    "pentaho/visual/models/scatter",
+    function(BaseView, Model) {
 
-    var BaseView = context.get(baseViewFactory);
-
-    return BaseView.extend({
-      $type: {
-        id: module.id,
-        props: {
-          model: {valueType: modelFactory}
+      return BaseView.extend({
+        $type: {
+          id: module.id,
+          props: {
+            model: {valueType: Model}
+          }
         }
-      }
-    });
-  };
+      });
+    }
+  ];
 });

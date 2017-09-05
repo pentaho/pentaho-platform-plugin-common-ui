@@ -11,37 +11,34 @@ layout: default
 Create a file named `view-d3.js` and place the following code in it:
 
 ```js
-define([
-  "module",
-  "pentaho/visual/base/view",
-  "./model",
-  "d3"
-], function(module, baseViewFactory, barModelFactory, d3) {
+define(["module", "d3"], function(module, d3) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/visual/base/view",
+    "pentaho/visual/samples/bar/model",
+    function(BaseView, Model) {
 
-    var BaseView = context.get(baseViewFactory);
-
-    var BarView = BaseView.extend({
-      $type: {
-        id: module.id,
-        props: [
-          {
-            name: "model",
-            type: barModelFactory
-          }
-        ]
-      },
+      var BarView = BaseView.extend({
+        $type: {
+          id: module.id,
+          props: [
+            {
+              name: "model",
+              valueType: Model
+            }
+          ]
+        },
       
-      _updateAll: function() {
-        d3.select(this.domContainer).text("Hello World!");
-      }
-    });
+        _updateAll: function() {
+          d3.select(this.domContainer).text("Hello World!");
+        }
+      });
 
-    return BarView;
-  };
+      return BarView;
+    }
+  ];
 });
 ```
 
@@ -100,46 +97,52 @@ Edit the `index.html` file and place the following code in it:
     require([
       "pentaho/type/Context",
       "pentaho/data/Table",
-      "pentaho/visual/base/view",
-      "pentaho/visual/samples/bar/model",
       "json!./sales-by-product-family.json"
-    ], function(Context, Table, baseViewFactory, barModelFactory, dataSpec) {
+    ], function(Context, Table, dataSpec) {
 
       // Setup up a VizAPI context.
-      var context = new Context({application: "viz-api-sandbox"});
+      Context.createAsync({application: "viz-api-sandbox"})
+          .then(function(context) {
+             // Get the model and base view types
+             return context.resolveAsync({
+                BarModel: "pentaho/visual/samples/bar/model",
+                BaseView: "pentaho/visual/base/view"
+             });
+           })
+           .then(function(types) {
+             
+             // Create the visualization model.
+             var modelSpec = {
+               "data": new Table(dataSpec),
+               "category": {attributes: ["productFamily"]},
+               "measure": {attributes: ["sales"]}
+             };
+      
+             var model = new types.BarModel(modelSpec);
 
-      // Create the visualization model.
-      var modelSpec = {
-        "data": new Table(dataSpec),
-        "category": {attributes: ["productFamily"]},
-        "measure": {attributes: ["sales"]}
-      };
+             // Create the visualization view
+             var viewSpec = {
+               width: 700,
+               height: 300,
+               domContainer: document.getElementById("viz_div"),
+               model: model
+             };
 
-      var BarModel = context.get(barModelFactory);
-      var model = new BarModel(modelSpec);
-
-      // Create the visualization view
-      var viewSpec = {
-        width: 700,
-        height: 300,
-        domContainer: document.getElementById("viz_div"),
-        model: model
-      };
-
-      // These are responsibilities of the visualization container application:
-      // 1. Mark the container with the model's CSS classes, for styling purposes.
-      viewSpec.domContainer.className = model.$type.inheritedStyleClasses.join(" ");
-
-      // 2. Set the DOM container dimensions.
-      viewSpec.domContainer.style.width = viewSpec.width + "px";
-      viewSpec.domContainer.style.height = viewSpec.height + "px";
-
-      // Create the visualization view.
-      var BaseView = context.get(baseViewFactory);
-      BaseView.createAsync(viewSpec).then(function(view) {
-        // Render the visualization.
-        view.update();
-      });
+             // These are responsibilities of the visualization container application:
+             // 1. Mark the container with the model's CSS classes, for styling purposes.
+             viewSpec.domContainer.className = model.$type.inheritedStyleClasses.join(" ");
+       
+             // 2. Set the DOM container dimensions.
+             viewSpec.domContainer.style.width = viewSpec.width + "px";
+             viewSpec.domContainer.style.height = viewSpec.height + "px";
+       
+             // Create the visualization view.
+             return types.BaseView.createAsync(viewSpec);
+           })
+           .then(function(view) {
+             // Render the visualization.
+             view.update();
+           });
     });
   </script>
 </head>

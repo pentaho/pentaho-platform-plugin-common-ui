@@ -14,49 +14,49 @@
  * limitations under the License.
  */
 define([
-  "module",
-  "pentaho/visual/models/bubble",
-  "./metricPointAbstract"
-], function(module, modelFactory, baseViewFactory) {
+  "module"
+], function(module) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/ccc/visual/metricPointAbstract",
+    "pentaho/visual/models/bubble",
+    function(BaseView, Model) {
 
-    var BaseView = context.get(baseViewFactory);
+      return BaseView.extend({
+        $type: {
+          id: module.id,
+          props: {
+            model: {valueType: Model}
+          }
+        },
 
-    return BaseView.extend({
-      $type: {
-        id: module.id,
-        props: {
-          model: {valueType: modelFactory}
+        _options: {
+          sizeAxisUseAbs: false
+        },
+
+        /* Override Default map */
+        _roleToCccRole: {
+          "multi": "multiChart",
+          "rows": "category",
+          "x": "x",
+          "y": "y",
+          "size": "size",
+          "color": "color"
+        },
+
+        _configureOptions: function() {
+
+          this.base();
+
+          /* jshint laxbreak:true*/
+          // ~ DOT SIZE
+          this.options.axisOffset = this._isRoleBound("size")
+              ? (1.1 * this.options.sizeAxisRatio / 2) // Axis offset like legacy analyzer
+              : 0;
         }
-      },
-
-      _options: {
-        sizeAxisUseAbs: false
-      },
-
-      /* Override Default map */
-      _roleToCccRole: {
-        "multi": "multiChart",
-        "rows": "category",
-        "x": "x",
-        "y": "y",
-        "size": "size",
-        "color": "color"
-      },
-
-      _configureOptions: function() {
-
-        this.base();
-
-        /* jshint laxbreak:true*/
-        // ~ DOT SIZE
-        this.options.axisOffset = this._isRoleBound("size")
-            ? (1.1 * this.options.sizeAxisRatio / 2) // Axis offset like legacy analyzer
-            : 0;
-      }
-    });
-  };
+      });
+    }
+  ];
 });

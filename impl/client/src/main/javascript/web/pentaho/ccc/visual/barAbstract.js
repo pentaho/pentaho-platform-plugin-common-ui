@@ -15,66 +15,66 @@
  */
 define([
   "module",
-  "pentaho/visual/models/barAbstract",
-  "./categoricalContinuousAbstract",
   "cdf/lib/CCC/def"
-], function(module, modelFactory, baseViewFactory, def) {
+], function(module, def) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/ccc/visual/categoricalContinuousAbstract",
+    "pentaho/visual/models/barAbstract",
+    function(BaseView, Model) {
 
-    var BaseView = context.get(baseViewFactory);
+      return BaseView.extend({
 
-    return BaseView.extend({
+        $type: {
+          id: module.id,
+          props: {
+            model: {valueType: Model}
+          }
+        },
 
-      $type: {
-        id: module.id,
-        props: {
-          model: {valueType: modelFactory}
+        _cccClass: "BarChart",
+
+        _configureOptions: function() {
+
+          this.base();
+
+          var options = this.options;
+          if(options.orientation !== "vertical")
+            def.lazy(options.visualRoles, "category").isReversed = true;
+        },
+
+        _configureLabelsAnchor: function(options, visualSpec) {
+
+          options.label_textMargin = 7;
+
+          /* eslint default-case: 0 */
+          switch(visualSpec.labelsOption) {
+            case "center":
+              options.valuesAnchor = "center";
+              break;
+
+            case "insideEnd":
+              options.valuesAnchor = options.orientation === "horizontal" ? "right" : "top";
+              break;
+
+            case "insideBase":
+              options.valuesAnchor = options.orientation === "horizontal" ? "left" : "bottom";
+              break;
+
+            case "outsideEnd":
+              if(options.orientation === "horizontal") {
+                options.valuesAnchor = "right";
+                options.label_textAlign = "left";
+              } else {
+                options.valuesAnchor = "top";
+                options.label_textBaseline = "bottom";
+              }
+              break;
+          }
         }
-      },
-
-      _cccClass: "BarChart",
-
-      _configureOptions: function() {
-
-        this.base();
-
-        var options = this.options;
-        if(options.orientation !== "vertical")
-          def.lazy(options.visualRoles, "category").isReversed = true;
-      },
-
-      _configureLabelsAnchor: function(options, visualSpec) {
-
-        options.label_textMargin = 7;
-
-        /* eslint default-case: 0 */
-        switch(visualSpec.labelsOption) {
-          case "center":
-            options.valuesAnchor = "center";
-            break;
-
-          case "insideEnd":
-            options.valuesAnchor = options.orientation === "horizontal" ? "right" : "top";
-            break;
-
-          case "insideBase":
-            options.valuesAnchor = options.orientation === "horizontal" ? "left" : "bottom";
-            break;
-
-          case "outsideEnd":
-            if(options.orientation === "horizontal") {
-              options.valuesAnchor = "right";
-              options.label_textAlign = "left";
-            } else {
-              options.valuesAnchor = "top";
-              options.label_textBaseline = "bottom";
-            }
-            break;
-        }
-      }
-    });
-  };
+      });
+    }
+  ];
 });

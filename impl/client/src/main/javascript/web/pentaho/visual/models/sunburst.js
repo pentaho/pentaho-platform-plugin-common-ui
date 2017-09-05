@@ -15,81 +15,80 @@
  */
 define([
   "module",
-  "./abstract",
-  "pentaho/i18n!./i18n/model",
-  "./types/displayUnits",
-  "./types/labelsOption",
-  "./types/sliceOrder",
-  "./mixins/multiCharted"
-], function(module, baseModelFactory, bundle, displayUnitsFactory, labelsOptionFactory, sliceOrderFactory,
-    multiChartedFactory) {
+  "pentaho/i18n!./i18n/model"
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/visual/models/abstract",
+    "pentaho/visual/models/types/displayUnits",
+    "pentaho/visual/models/types/labelsOption",
+    "pentaho/visual/models/types/sliceOrder",
+    "pentaho/visual/models/mixins/multiCharted",
+    function(BaseModel, DisplayUnits, LabelsOption, SliceOrder, MultiChartedModel) {
 
-    var BaseModel = context.get(baseModelFactory);
+      return BaseModel.extend({
+        $type: {
+          id: module.id,
+          mixins: [MultiChartedModel],
+          v2Id: "ccc_sunburst",
+          category: "treemapchart",
+          defaultView: "pentaho/ccc/visual/sunburst",
 
-    return BaseModel.extend({
-      $type: {
-        id: module.id,
-        mixins: [multiChartedFactory],
-        v2Id: "ccc_sunburst",
-        category: "treemapchart",
-        defaultView: "pentaho/ccc/visual/sunburst",
-
-        props: [
-          {
-            name: "rows", // VISUAL_ROLE
-            levels: ["ordinal"],
-            attributes: {isRequired: true}
-          },
-          {
-            name: "size", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["quantitative"],
-            dataType: "number",
-            attributes: {countMax: 1},
-            ordinal: 7
-          },
-          {
-            name: "multi", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["ordinal"],
-            ordinal: 10
-          },
-          {
-            name: "displayUnits",
-            valueType: displayUnitsFactory,
-            isRequired: true,
-            defaultValue: "units_0"
-          },
-          {
-            name: "labelsOption",
-            valueType: labelsOptionFactory,
-            domain: ["none", "center"],
-            isApplicable: __isSizeMapped,
-            isRequired: true,
-            defaultValue: "none"
-          },
-          {
-            name: "emptySlicesHidden",
-            valueType: "boolean",
-            isRequired: true,
-            defaultValue: true
-          },
-          {
-            name: "sliceOrder",
-            valueType: sliceOrderFactory,
-            isApplicable: __isSizeMapped,
-            isRequired: true,
-            defaultValue: "bySizeDescending"
-          }
-        ]
-      }
-    })
-    .implement({$type: bundle.structured.sunburst});
-  };
+          props: [
+            {
+              name: "rows", // VISUAL_ROLE
+              levels: ["ordinal"],
+              attributes: {isRequired: true}
+            },
+            {
+              name: "size", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["quantitative"],
+              dataType: "number",
+              attributes: {countMax: 1},
+              ordinal: 7
+            },
+            {
+              name: "multi", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["ordinal"],
+              ordinal: 10
+            },
+            {
+              name: "displayUnits",
+              valueType: DisplayUnits,
+              isRequired: true,
+              defaultValue: "units_0"
+            },
+            {
+              name: "labelsOption",
+              valueType: LabelsOption,
+              domain: ["none", "center"],
+              isApplicable: __isSizeMapped,
+              isRequired: true,
+              defaultValue: "none"
+            },
+            {
+              name: "emptySlicesHidden",
+              valueType: "boolean",
+              isRequired: true,
+              defaultValue: true
+            },
+            {
+              name: "sliceOrder",
+              valueType: SliceOrder,
+              isApplicable: __isSizeMapped,
+              isRequired: true,
+              defaultValue: "bySizeDescending"
+            }
+          ]
+        }
+      })
+      .implement({$type: bundle.structured.sunburst});
+    }
+  ];
 
   function __isSizeMapped() {
     return this.size.attributes.count > 0;

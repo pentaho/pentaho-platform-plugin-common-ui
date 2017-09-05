@@ -15,33 +15,33 @@
  */
 define([
   "module",
-  "pentaho/visual/base/model",
-  "../types/sizeByNegativesMode",
   "pentaho/i18n!../i18n/model"
-], function(module, modelFactory, sizeByNegativesModeFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
   // Used by: HG, Scatter
-  return function(context) {
+  return [
+    "pentaho/visual/base/model",
+    "pentaho/visual/models/types/sizeByNegativesMode",
+    function(BaseModel, SizeByNegativesMode) {
 
-    var BaseModel = context.get(modelFactory);
-
-    return BaseModel.extend({
-      $type: {
-        id: module.id,
-        isAbstract: true,
-        props: [
-          {
-            name: "sizeByNegativesMode",
-            valueType: sizeByNegativesModeFactory,
-            isApplicable: function() { return this.countOf("size") > 0; },
-            isRequired: true,
-            defaultValue: "negLowest"
-          }
-        ]
-      }
-    })
-    .implement({$type: bundle.structured.scaleSizeContinuous});
-  };
+      return BaseModel.extend({
+        $type: {
+          id: module.id,
+          isAbstract: true,
+          props: [
+            {
+              name: "sizeByNegativesMode",
+              valueType: SizeByNegativesMode,
+              isApplicable: function() { return this.countOf("size") > 0; },
+              isRequired: true,
+              defaultValue: "negLowest"
+            }
+          ]
+        }
+      })
+      .implement({$type: bundle.structured.scaleSizeContinuous});
+    }
+  ];
 });

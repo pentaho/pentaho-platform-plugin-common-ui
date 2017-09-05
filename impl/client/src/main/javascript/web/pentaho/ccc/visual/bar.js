@@ -15,26 +15,26 @@
  */
 define([
   "module",
-  "pentaho/visual/models/bar",
-  "./barAbstract",
   "./_trends"
-], function(module, modelFactory, baseViewFactory) {
+], function(module) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/ccc/visual/barAbstract",
+    "pentaho/visual/models/bar",
+    function(BaseView, Model) {
 
-    var BaseView = context.get(baseViewFactory);
+      return BaseView.extend({
+        _supportsTrends: true,
 
-    return BaseView.extend({
-      _supportsTrends: true,
-
-      $type: {
-        id: module.id,
-        props: {
-          model: {valueType: modelFactory}
+        $type: {
+          id: module.id,
+          props: {
+            model: {valueType: Model}
+          }
         }
-      }
-    });
-  };
+      });
+    }
+  ];
 });

@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 define([
-  "module",
-  "./data"
-], function(module, dataActionFactory) {
+  "module"
+], function(module) {
 
   "use strict";
 
-  return function(context) {
+  return ["pentaho/visual/action/data", function(DataAction) {
 
     /**
      * @name pentaho.visual.action.Execute.Type
@@ -31,8 +30,6 @@ define([
      *
      * For more information see {@link pentaho.visual.action.Execute}.
      */
-
-    var DataAction = context.get(dataActionFactory);
 
     /**
      * @name Execute
@@ -55,5 +52,5 @@ define([
         alias: "execute"
       }
     });
-  };
+  }];
 });

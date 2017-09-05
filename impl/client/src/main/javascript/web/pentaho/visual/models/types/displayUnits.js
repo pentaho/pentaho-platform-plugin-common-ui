@@ -20,14 +20,12 @@ define([
 
   "use strict";
 
-  return function(context) {
-
-    var PentahoString = context.get("string");
+  return ["string", "enum", function(PentahoString, Enum) {
 
     return PentahoString.extend({
       $type: {
         id: module.id,
-        mixins: ["enum"],
+        mixins: [Enum],
         domain: ["units_0", "units_2", "units_3", "units_4", "units_5", "units_6"],
 
         scaleFactorOf: function(displayUnits) {
@@ -48,5 +46,5 @@ define([
       }
     })
     .implement({$type: bundle.structured.displayUnits});
-  };
+  }];
 });

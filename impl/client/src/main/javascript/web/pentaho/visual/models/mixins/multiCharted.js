@@ -15,49 +15,48 @@
  */
 define([
   "module",
-  "pentaho/visual/base/model",
-  "../types/maxChartsPerRow",
-  "../types/multiChartRangeScope",
-  "../types/multiChartOverflow",
   "pentaho/i18n!../i18n/model"
-], function(module, modelFactory, maxChartsPerRowFactory, multiChartRangeScopeFactory,
-            multiChartOverflowFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
   // TODO: should only apply when multi has a value, but Pie does multi through
   // other gembar combination other than "multi".
 
-  return function(context) {
+  return [
+    "pentaho/visual/base/model",
+    "pentaho/visual/models/types/maxChartsPerRow",
+    "pentaho/visual/models/types/multiChartRangeScope",
+    "pentaho/visual/models/types/multiChartOverflow",
+    function(BaseModel, MaxChartsPerRow, MultiChartRangeScope, MultiChartOverflow) {
 
-    var BaseModel = context.get(modelFactory);
-
-    return BaseModel.extend({
-      $type: {
-        id: module.id,
-        isAbstract: true,
-        props: [
-          {
-            name:  "maxChartsPerRow",
-            valueType:  maxChartsPerRowFactory,
-            isRequired: true,
-            defaultValue: 3
-          },
-          {
-            name: "multiChartRangeScope",
-            valueType: multiChartRangeScopeFactory,
-            isRequired: true,
-            defaultValue: "global"
-          },
-          {
-            name: "multiChartOverflow",
-            valueType: multiChartOverflowFactory,
-            isRequired: true,
-            defaultValue: "grow"
-          }
-        ]
-      }
-    })
-    .implement({$type: bundle.structured.settingsMultiChart});
-  };
+      return BaseModel.extend({
+        $type: {
+          id: module.id,
+          isAbstract: true,
+          props: [
+            {
+              name: "maxChartsPerRow",
+              valueType:  MaxChartsPerRow,
+              isRequired: true,
+              defaultValue: 3
+            },
+            {
+              name: "multiChartRangeScope",
+              valueType: MultiChartRangeScope,
+              isRequired: true,
+              defaultValue: "global"
+            },
+            {
+              name: "multiChartOverflow",
+              valueType: MultiChartOverflow,
+              isRequired: true,
+              defaultValue: "grow"
+            }
+          ]
+        }
+      })
+      .implement({$type: bundle.structured.settingsMultiChart});
+    }
+  ];
 });

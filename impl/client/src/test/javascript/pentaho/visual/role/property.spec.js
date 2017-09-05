@@ -1,17 +1,11 @@
 define([
   "tests/pentaho/util/errorMatch",
   "pentaho/type/Context",
-  "pentaho/type/complex",
-  "pentaho/visual/base",
-  "pentaho/type/value",
   "pentaho/type/ValidationError",
   "pentaho/type/SpecificationScope",
-  "pentaho/visual/role/mapping",
-  "pentaho/visual/role/mappingAttribute",
   "pentaho/data/Table",
   "tests/pentaho/type/propertyTypeUtil"
-], function(errorMatch, Context, complexFactory, visualModelFactory, valueFactory, ValidationError, SpecificationScope,
-    mappingFactory, attributeFactory, Table, propertyTypeUtil) {
+], function(errorMatch, Context, ValidationError, SpecificationScope, Table, propertyTypeUtil) {
 
   "use strict";
 
@@ -29,21 +23,27 @@ define([
       var Complex;
       var VisualModel;
       var RoleProperty;
-      var Mapping;
-      var MappingAttribute;
       var context;
 
-      beforeEach(function() {
-        context = new Context();
+      beforeEach(function(done) {
 
-        Value = context.get(valueFactory);
-        Complex = context.get(complexFactory);
+        Context.createAsync()
+            .then(function(_context) {
+              context = _context;
 
-        VisualModel = context.get(visualModelFactory);
-        RoleProperty = context.get("pentaho/visual/role/property");
-        Mapping = context.get(mappingFactory);
+              Value = context.get("value");
+              Complex = context.get("complex");
 
-        MappingAttribute = context.get(attributeFactory);
+              return context.applyAsync([
+                "pentaho/visual/base/model",
+                "pentaho/visual/role/property"
+              ], function(_Model, _RoleProperty) {
+                VisualModel = _Model;
+                RoleProperty = _RoleProperty;
+              });
+            })
+            .then(done, done.fail);
+
       });
 
       // region helper methods

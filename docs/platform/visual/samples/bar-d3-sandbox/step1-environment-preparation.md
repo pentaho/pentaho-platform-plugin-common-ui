@@ -78,46 +78,51 @@ npm install
           require([
             "pentaho/type/Context",
             "pentaho/data/Table",
-            "pentaho/visual/base/view",
-            "pentaho/visual/samples/calc",
             "json!./sales-by-product-family.json"
-          ], function(Context, Table, baseViewFactory, calcFactory, dataSpec) {
+          ], function(Context, Table, dataSpec) {
             
             // Setup up a VizAPI context.
-            var context = new Context({application: "viz-api-sandbox"});
-        
-            // Create the visualization model.
-            var modelSpec = {
-              "data": new Table(dataSpec),
-              "levels": {attributes: ["productFamily"]},
-              "measure": {attributes: ["sales"]},
-              "operation": "avg"
-            };
-        
-            var CalcModel = context.get(calcFactory);
-            var model = new CalcModel(modelSpec);
-        
-            // Create the visualization view.
-            var viewSpec = {
-              width: 400,
-              height: 200,
-              domContainer: document.getElementById("viz_div"),
-              model: model
-            };
-            
-            // These are responsibilities of the visualization container application:
-            // 1. Mark the container with the model's CSS classes, for styling purposes.
-            viewSpec.domContainer.className = model.$type.inheritedStyleClasses.join(" ");
-        
-            // 2. Set the DOM container dimensions.
-            viewSpec.domContainer.style.width = viewSpec.width + "px";
-            viewSpec.domContainer.style.height = viewSpec.height + "px";
-        
-            var BaseView = context.get(baseViewFactory);
-            BaseView.createAsync(viewSpec).then(function(view) {
-              // Render the visualization.
-              view.update();
-            });
+            Context.createAsync({application: "viz-api-sandbox"})
+               .then(function(context) {
+                 // Get the calc model and base view types
+                 return context.resolveAsync({
+                    CalcModel: "pentaho/visual/samples/calc/model",
+                    BaseView: "pentaho/visual/base/view"
+                 });
+               })
+               .then(function(types) {
+                 // Create the visualization model.
+                 var modelSpec = {
+                   "data": new Table(dataSpec),
+                   "levels": {attributes: ["productFamily"]},
+                   "measure": {attributes: ["sales"]},
+                   "operation": "avg"
+                 };
+                                       
+                 var model = new types.CalcModel(modelSpec);
+                                     
+                 // Create the visualization view.
+                 var viewSpec = {
+                   width: 400,
+                   height: 200,
+                   domContainer: document.getElementById("viz_div"),
+                   model: model
+                 };
+                                              
+                 // These are responsibilities of the visualization container application:
+                 // 1. Mark the container with the model's CSS classes, for styling purposes.
+                 viewSpec.domContainer.className = model.type.inheritedStyleClasses.join(" ");
+                                          
+                 // 2. Set the DOM container dimensions.
+                 viewSpec.domContainer.style.width = viewSpec.width + "px";
+                 viewSpec.domContainer.style.height = viewSpec.height + "px";
+                   
+                 return types.BaseView.createAsync(viewSpec);
+               })
+               .then(function(view) {
+                 // Render the visualization.
+                 view.update();
+               });
           });
         </script>
       </head>

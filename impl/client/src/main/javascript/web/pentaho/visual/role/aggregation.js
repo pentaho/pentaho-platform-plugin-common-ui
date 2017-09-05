@@ -20,9 +20,7 @@ define([
 
   "use strict";
 
-  return function(context) {
-
-    var PentahoString = context.get("string");
+  return ["string", "enum", function(PentahoString, Enum) {
 
     /**
      * @name pentaho.visual.role.Aggregation
@@ -46,10 +44,10 @@ define([
     return PentahoString.extend({
       $type: {
         id: module.id,
-        mixins: ["enum"],
+        mixins: [Enum],
         domain: ["sum", "avg", "min", "max", "first", "last"]
       }
     })
     .implement({$type: bundle.structured.aggregation});
-  };
+  }];
 });

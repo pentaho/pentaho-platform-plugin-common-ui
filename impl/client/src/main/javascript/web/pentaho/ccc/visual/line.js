@@ -15,40 +15,40 @@
  */
 define([
   "module",
-  "pentaho/visual/models/line",
-  "./pointAbstract",
   "./_trends"
-], function(module, modelFactory, baseViewFactory) {
+], function(module) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/ccc/visual/pointAbstract",
+    "pentaho/visual/models/line",
+    function(BaseView, Model) {
 
-    var BaseView = context.get(baseViewFactory);
+      return BaseView.extend({
+        $type: {
+          id: module.id,
+          props: {
+            model: {valueType: Model}
+          }
+        },
 
-    return BaseView.extend({
-      $type: {
-        id: module.id,
-        props: {
-          model: {valueType: modelFactory}
+        _cccClass: "LineChart",
+
+        _supportsTrends: true,
+
+        _readUserOptions: function(options) {
+          this.base.apply(this, arguments);
+
+          var shape = this.model.shape;
+          if(shape && shape === "none") {
+            options.dotsVisible = false;
+          } else {
+            options.dotsVisible = true;
+            options.dot_shape = shape;
+          }
         }
-      },
-
-      _cccClass: "LineChart",
-
-      _supportsTrends: true,
-
-      _readUserOptions: function(options) {
-        this.base.apply(this, arguments);
-
-        var shape = this.model.shape;
-        if(shape && shape === "none") {
-          options.dotsVisible = false;
-        } else {
-          options.dotsVisible = true;
-          options.dot_shape = shape;
-        }
-      }
-    });
-  };
+      });
+    }
+  ];
 });

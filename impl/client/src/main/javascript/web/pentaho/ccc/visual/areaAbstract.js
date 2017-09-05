@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 define([
-  "module",
-  "./pointAbstract"
-], function(module, baseViewFactory) {
+  "module"
+], function(module) {
 
   "use strict";
 
-  return function(context) {
-
-    var BaseView = context.get(baseViewFactory);
+  return ["pentaho/ccc/visual/pointAbstract", function(BaseView) {
 
     return BaseView.extend({
       _cccClass: "AreaChart",
@@ -31,5 +28,5 @@ define([
         id: module.id
       }
     });
-  };
+  }];
 });

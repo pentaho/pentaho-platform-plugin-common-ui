@@ -15,67 +15,67 @@
  */
 define([
   "module",
-  "./categoricalContinuousAbstract",
-  "pentaho/i18n!./i18n/model",
-  "./types/labelsOption",
-  "./mixins/multiCharted",
-  "./mixins/interpolated"
-], function(module, baseModelFactory, bundle, labelsOptionFactory, multiChartedFactory, interpolatedFactory) {
+  "pentaho/i18n!./i18n/model"
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/visual/models/categoricalContinuousAbstract",
+    "pentaho/visual/models/types/labelsOption",
+    "pentaho/visual/models/mixins/multiCharted",
+    "pentaho/visual/models/mixins/interpolated",
+    function(BaseModel, LabelsOption, MultiChartedModel, InterpolatedModel) {
 
-    var BaseModel = context.get(baseModelFactory);
+      return BaseModel.extend({
+        $type: {
+          id: module.id,
+          isAbstract: true,
+          mixins: [MultiChartedModel, InterpolatedModel],
+          props: [
+            {
+              name: "rows", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
 
-    return BaseModel.extend({
-      $type: {
-        id: module.id,
-        isAbstract: true,
-        mixins: [interpolatedFactory, multiChartedFactory],
-        props: [
-          {
-            name: "rows", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
+              // Always a visual key, whatever the effective measurement level or data type.
+              isVisualKey: true,
 
-            // Always a visual key, whatever the effective measurement level or data type.
-            isVisualKey: true,
+              getAttributesMaxLevelOf: function(model) {
 
-            getAttributesMaxLevelOf: function(model) {
+                var mapping = model.get(this);
 
-              var mapping = model.get(this);
-
-              // If the mapping contains a single `number` attribute,
-              // consider it ordinal, and not quantitative as the base code does.
-              var count = mapping.attributes.count;
-              if(count === 1) {
-                var dataAttr = mapping.attributes.at(0).dataAttribute;
-                if(dataAttr && dataAttr.type === "number") {
+                // If the mapping contains a single `number` attribute,
+                // consider it ordinal, and not quantitative as the base code does.
+                var count = mapping.attributes.count;
+                if(count === 1) {
+                  var dataAttr = mapping.attributes.at(0).dataAttribute;
+                  if(dataAttr && dataAttr.type === "number") {
+                    return "ordinal";
+                  }
+                } else if(count > 1) {
                   return "ordinal";
                 }
-              } else if(count > 1) {
-                return "ordinal";
+
+                return this.base(model);
               }
-
-              return this.base(model);
+            },
+            {
+              name: "measures", // VISUAL_ROLE
+              attributes: {isRequired: true},
+              ordinal: 7
+            },
+            {
+              name: "labelsOption",
+              valueType: LabelsOption,
+              domain: ["none", "center", "left", "right", "top", "bottom"],
+              isRequired: true,
+              defaultValue: "none"
             }
-          },
-          {
-            name: "measures", // VISUAL_ROLE
-            attributes: {isRequired: true},
-            ordinal: 7
-          },
-          {
-            name: "labelsOption",
-            valueType: labelsOptionFactory,
-            domain: ["none", "center", "left", "right", "top", "bottom"],
-            isRequired: true,
-            defaultValue: "none"
-          }
-        ]
-      }
+          ]
+        }
 
-    })
-    .implement({$type: bundle.structured.pointAbstract});
-  };
+      })
+      .implement({$type: bundle.structured.pointAbstract});
+    }
+  ];
 });
