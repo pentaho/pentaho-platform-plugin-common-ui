@@ -35,7 +35,7 @@ define([
      * @class
      * @extends pentaho.type.Complex
      *
-     * @amd {pentaho.type.Factory<pentaho.type.Application>} pentaho/type/application
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Application>} pentaho/type/application
      *
      * @classDesc The base class of application types.
      *

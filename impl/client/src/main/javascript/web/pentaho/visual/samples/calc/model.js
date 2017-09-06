@@ -29,7 +29,7 @@ define([
      * @name pentaho.visual.samples.calc.Model
      * @class
      * @extends pentaho.visual.base.Model
-     * @amd {pentaho.type.Factory<pentaho.visual.samples.calc.Model>} pentaho/visual/samples/calc
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.samples.calc.Model>} pentaho/visual/samples/calc
      */
     return BaseModel.extend({
       $type: {

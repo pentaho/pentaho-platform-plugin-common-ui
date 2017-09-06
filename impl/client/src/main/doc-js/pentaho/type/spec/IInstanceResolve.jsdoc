@@ -1,0 +1,110 @@
+/*!
+ * Copyright 2017 Pentaho Corporation. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.IInstanceResolve` interface describes a special syntax used
+ * for resolving instances from a Type API [instance container]{@link pentaho.type.InstancesContainer}.
+ *
+ * ##### Resolve instance by id syntax
+ *
+ * Denotes the named instance with the given id. The instance must be registered.
+ *
+ * ```json
+ * {$instance: {id: "my/service"}}
+ * ```
+ *
+ * The property
+ * [reservation]{@link pentaho.type.spec.IInstanceResolve#reservation},
+ * can also be specified.
+ *
+ * ##### Resolve instance by element type syntax
+ *
+ * Denotes the highest priority registered instance of a given [element]{@link pentaho.type.Element} type.
+ *
+ * ```json
+ * {$instance: {type: "my/Service"}}
+ * ```
+ *
+ * The properties
+ * [filter]{@link pentaho.type.spec.IInstanceResolve#filter},
+ * [isRequired]{@link pentaho.type.spec.IInstanceResolve#isRequired} or
+ * [reservation]{@link pentaho.type.spec.IInstanceResolve#reservation},
+ * can also be specified.
+ *
+ * ##### Resolve instance by list type syntax
+ *
+ * Denotes the list of all of the registered instances of
+ * the given list type's [element type]{@link pentaho.type.List.Type#of},
+ * ordered from highest to lowest [priority]{@link pentaho.type.spec.IInstanceDeclaration#priority}.
+ *
+ * ```json
+ * {$instance: {type: ["my/Service"]}}
+ * ```
+ *
+ * The properties
+ * [filter]{@link pentaho.type.spec.IInstanceResolve#filter},
+ * [isRequired]{@link pentaho.type.spec.IInstanceResolve#isRequired} or
+ * [reservation]{@link pentaho.type.spec.IInstanceResolve#reservation},
+ * can also be specified.
+ *
+ * @name pentaho.type.spec.IInstanceResolve
+ * @interface
+ * @see pentaho.type.spec.UInstanceReference
+ */
+
+/**
+ * The identifier of the desired instance.
+ *
+ * @name id
+ * @memberOf pentaho.type.spec.IInstanceResolve#
+ * @type {nonEmptyString}
+ */
+
+/**
+ * A reference to the type of the denoted instance.
+ *
+ * @name type
+ * @memberOf pentaho.type.spec.IInstanceResolve#
+ * @type {UTypeReference}
+ */
+
+/**
+ * An instance predicate function that restricts the set of denoted instances.
+ *
+ * @name filter
+ * @memberOf pentaho.type.spec.IInstanceResolve#
+ * @type {function(!pentaho.type.Instance) : boolean}
+ */
+
+/**
+ * Indicates that there must be at least one instance being denoted.
+ *
+ * When [type]{@link pentaho.type.spec.IInstanceResolve#type} is a [list type]{@link pentaho.type.Type#isList},
+ * this refers to the list's elements.
+ *
+ * @name isRequired
+ * @memberOf pentaho.type.spec.IInstanceResolve#
+ * @type {boolean}
+ */
+
+/**
+ * The reservation to use when resolving the denoted instance.
+ *
+ * @name reservation
+ * @memberOf pentaho.type.spec.IInstanceResolve#
+ * @type {pentaho.type.spec.InstanceReservation}
+ * @default {"none"}
+ */

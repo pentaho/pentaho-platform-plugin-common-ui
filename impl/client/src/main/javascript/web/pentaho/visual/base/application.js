@@ -37,7 +37,7 @@ define([
      * @class
      * @extends pentaho.type.Application
      *
-     * @amd {pentaho.type.Factory<pentaho.visual.Application>} pentaho/visual/base/application
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.Application>} pentaho/visual/base/application
      *
      * @classDesc The base class of visual applications.
      *

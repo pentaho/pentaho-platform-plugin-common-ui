@@ -34,7 +34,7 @@ define(function() {
      * @class
      * @extends pentaho.data.filter.Abstract
      * @abstract
-     * @amd {pentaho.type.Factory<pentaho.data.filter.Property>} pentaho/data/filter/property
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.Property>} pentaho/data/filter/property
      *
      * @classDesc The base class of filters that filter elements in a set
      * by matching the value of a given property against a criteria/condition.

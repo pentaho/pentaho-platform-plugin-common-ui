@@ -1,0 +1,57 @@
+/*!
+ * Copyright 2017 Pentaho Corporation. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.IContext` interface describes the configuration of a Type API [context]{@link pentaho.type.Context}.
+ *
+ * The following is a sample [configuration rule set]{@link pentaho.config.spec.IRuleSet} that
+ * configures the Type API context for the Analyzer application with the hypothetical
+ * instance `"my/customSpecialService"`:
+ *
+ * ```json
+ * {
+ *   "rules": [
+ *     {
+ *       "select": {
+ *         "application": "pentaho-analyzer",
+ *         "type": "pentaho/type/Context"
+ *       },
+ *       "apply": {
+ *         "instances": {
+ *           "my/customSpecialService": {
+ *             "type": "my/SpecialService",
+ *             "priority": 10
+ *           }
+ *         }
+ *       }
+ *     }
+ *   ]
+ * }
+ * ```
+ *
+ * @name pentaho.type.spec.IContext
+ * @interface
+ *
+ * @see pentaho.type.spec.InstancesContainer
+ */
+
+/**
+ * The instances' container configuration of the context.
+ *
+ * @name instances
+ * @memberOf pentaho.type.spec.IContext#
+ * @type {pentaho.type.spec.InstancesContainer}
+ */

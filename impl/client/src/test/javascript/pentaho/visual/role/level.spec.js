@@ -15,7 +15,7 @@ define([
           .then(function(_context) {
             context = _context;
 
-            return context.applyAsync([
+            return context.getDependencyApplyAsync([
               "pentaho/visual/role/level"
             ], function(_MeasurementLevel) {
               MeasurementLevel = _MeasurementLevel;

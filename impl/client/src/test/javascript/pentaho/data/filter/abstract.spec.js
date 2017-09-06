@@ -35,7 +35,7 @@ define([
 
             context = _context;
 
-            return context.applyAsync([
+            return context.getDependencyApplyAsync([
               "pentaho/data/filter/abstract",
               "pentaho/data/filter/not",
               "pentaho/data/filter/and",

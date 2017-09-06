@@ -82,7 +82,7 @@ define([
          * @implements pentaho.type.action.ITarget
          *
          * @abstract
-         * @amd {pentaho.type.Factory<pentaho.visual.base.View>} pentaho/visual/base/view
+         * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.base.View>} pentaho/visual/base/view
          *
          * @classDesc This is the base class for views of visualizations.
          *

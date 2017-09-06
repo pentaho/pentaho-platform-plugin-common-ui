@@ -35,7 +35,7 @@ define([
      * @name pentaho.data.filter.IsLess
      * @class
      * @extends pentaho.data.filter.Property
-     * @amd {pentaho.type.Factory<pentaho.data.filter.IsLess>} pentaho/data/filter/isLess
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.IsLess>} pentaho/data/filter/isLess
      *
      * @classDesc The `IsLess` class represents a filter for being strictly less than a given value.
      * The filter selects elements having the value of a certain property strictly less than a reference

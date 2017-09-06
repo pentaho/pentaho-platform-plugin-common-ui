@@ -36,7 +36,7 @@ define([
      * @class
      * @extends pentaho.data.filter.Tree
      *
-     * @amd {pentaho.type.Factory<pentaho.data.filter.Or>} pentaho/data/filter/or
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.Or>} pentaho/data/filter/or
      *
      * @classDesc The `Or` filter represents a boolean disjunction (an Or) filter.
      *

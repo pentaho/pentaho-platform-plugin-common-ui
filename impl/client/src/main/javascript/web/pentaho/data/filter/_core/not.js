@@ -36,7 +36,7 @@ define([
      * @class
      * @extends pentaho.data.filter.Abstract
      *
-     * @amd {pentaho.type.Factory<pentaho.data.filter.Not>} pentaho/data/filter/not
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.Not>} pentaho/data/filter/not
      *
      * @classDesc The `Not` type represents a negation filter.
      *

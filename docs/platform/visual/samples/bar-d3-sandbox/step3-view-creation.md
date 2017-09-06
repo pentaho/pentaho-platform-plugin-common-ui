@@ -104,7 +104,7 @@ Edit the `index.html` file and place the following code in it:
       Context.createAsync({application: "viz-api-sandbox"})
           .then(function(context) {
              // Get the model and base view types
-             return context.resolveAsync({
+             return context.getDependencyAsync({
                 BarModel: "pentaho/visual/samples/bar/model",
                 BaseView: "pentaho/visual/base/view"
              });

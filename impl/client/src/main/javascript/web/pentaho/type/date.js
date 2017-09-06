@@ -27,7 +27,7 @@ define([
      * @name pentaho.type.Date
      * @class
      * @extends pentaho.type.Simple
-     * @amd {pentaho.type.Factory<pentaho.type.Date>} pentaho/type/date
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Date>} pentaho/type/date
      *
      * @classDesc The class of date values.
      *

@@ -32,7 +32,7 @@ define([
        * @memberOf pentaho.visual.samples.calc
        * @class
        * @extends pentaho.visual.base.View
-       * @amd {pentaho.type.Factory<pentaho.visual.samples.calc.View>} pentaho/visual/samples/calc/view
+       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.samples.calc.View>} pentaho/visual/samples/calc/view
        *
        * @classDesc The `View` of the calculator visualization.
        */

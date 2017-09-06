@@ -55,7 +55,7 @@ define([
          * @extends pentaho.visual.action.Base
          * @abstract
          *
-         * @amd {pentaho.type.Factory<pentaho.visual.action.Data>} pentaho/visual/action/data
+         * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.action.Data>} pentaho/visual/action/data
          *
          * @classDesc The `visual.action.Data` class is the base class of action types
          * which are performed on a subset of a dataset and

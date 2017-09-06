@@ -40,7 +40,7 @@ define([
        * @class
        * @extends pentaho.type.Complex
        *
-       * @amd {pentaho.type.Factory<pentaho.visual.role.Mapping>} pentaho/visual/role/mapping
+       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.Mapping>} pentaho/visual/role/mapping
        *
        * @classDesc The `Mapping` class holds the association between
        * a specific visual role and the data properties, here named _data attributes_,

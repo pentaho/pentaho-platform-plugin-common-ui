@@ -40,7 +40,7 @@ define([
       Context.createAsync()
           .then(function(context) {
 
-            return context.applyAsync([
+            return context.getDependencyApplyAsync([
               "pentaho/visual/base/model",
               "pentaho/visual/base/view",
               "pentaho/data/filter/isIn",

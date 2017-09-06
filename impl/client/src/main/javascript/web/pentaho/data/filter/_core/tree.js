@@ -37,7 +37,7 @@ define([
      * @extends pentaho.data.filter.Abstract
      * @abstract
      *
-     * @amd {pentaho.type.Factory<pentaho.data.filter.Tree>} pentaho/data/filter/tree
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.Tree>} pentaho/data/filter/tree
      *
      * @classDesc The base class of filters that combine other filters.
      *

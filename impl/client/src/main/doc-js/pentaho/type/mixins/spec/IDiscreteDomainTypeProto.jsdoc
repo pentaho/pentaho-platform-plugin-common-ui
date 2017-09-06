@@ -29,7 +29,7 @@
  * @name domain
  * @memberOf pentaho.type.mixins.spec.IDiscreteDomainTypeProto#
  * @type {Array.<pentaho.type.spec.UElement> |
- *        pentaho.type.PropertyDynamicAttribute.<Array.<pentaho.type.spec.UElement>>}
+ *        pentaho.type.spec.PropertyDynamicAttribute.<Array.<pentaho.type.spec.UElement>>}
  *
  * @see pentaho.type.mixins.DiscreteDomain.Type#domain
  */

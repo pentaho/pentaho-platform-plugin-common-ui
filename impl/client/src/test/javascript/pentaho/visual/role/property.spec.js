@@ -34,7 +34,7 @@ define([
               Value = context.get("value");
               Complex = context.get("complex");
 
-              return context.applyAsync([
+              return context.getDependencyApplyAsync([
                 "pentaho/visual/base/model",
                 "pentaho/visual/role/property"
               ], function(_Model, _RoleProperty) {

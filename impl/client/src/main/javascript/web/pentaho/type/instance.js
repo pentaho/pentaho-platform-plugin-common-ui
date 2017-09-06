@@ -33,7 +33,7 @@ define([
      * @name pentaho.type.Instance
      * @class
      * @abstract
-     * @amd {pentaho.type.Factory<pentaho.type.Instance>} pentaho/type/instance
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Instance>} pentaho/type/instance
      *
      * @classDesc The root, abstract class of things that can be represented by the Pentaho Type API.
      *
@@ -96,6 +96,8 @@ define([
      *
      * @description Creates an instance of this type.
      *
+     * @see pentaho.type.spec.UInstanceModule
+     * @see pentaho.type.spec.UTypeModule
      * @see pentaho.type.spec.IInstance
      * @see pentaho.type.spec.IInstanceProto
      * @see pentaho.type.spec.ITypeProto

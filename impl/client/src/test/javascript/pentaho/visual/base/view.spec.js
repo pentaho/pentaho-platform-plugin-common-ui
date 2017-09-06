@@ -53,7 +53,7 @@ define([
           .then(function(_context) {
             context = _context;
 
-            return context.applyAsync([
+            return context.getDependencyApplyAsync([
               "pentaho/visual/base/view",
               "pentaho/visual/base/model"
             ], function(BaseView, BaseModel) {
@@ -179,7 +179,7 @@ define([
 
         return Context.createAsync().then(function(context) {
 
-          return context.applyAsync(["pentaho/visual/base/view"], function(BaseView) {
+          return context.getDependencyApplyAsync(["pentaho/visual/base/view"], function(BaseView) {
 
             context.get("pentaho/data/filter/or");
           });
@@ -1731,7 +1731,7 @@ define([
 
           return Context.createAsync().then(function(context) {
 
-            return context.applyAsync(["pentaho/visual/base/view"], function(View) {
+            return context.getDependencyApplyAsync(["pentaho/visual/base/view"], function(View) {
 
               return View.createAsync({_: "test/foo/view"}).then(function(fooView) {
                 expect(fooView instanceof View).toBe(true);
@@ -1778,7 +1778,7 @@ define([
 
           return Context.createAsync().then(function(context) {
 
-            return context.applyAsync(["pentaho/visual/base/view"], function(View) {
+            return context.getDependencyApplyAsync(["pentaho/visual/base/view"], function(View) {
 
               var viewSpec = {
                 a: "b",
@@ -1832,7 +1832,7 @@ define([
 
           return Context.createAsync().then(function(context) {
 
-            return context.applyAsync(["pentaho/visual/base/view", "test/foo/model"], function(View, FooModel) {
+            return context.getDependencyApplyAsync(["pentaho/visual/base/view", "test/foo/model"], function(View, FooModel) {
 
               var fooModel = new FooModel();
               var viewSpec = {

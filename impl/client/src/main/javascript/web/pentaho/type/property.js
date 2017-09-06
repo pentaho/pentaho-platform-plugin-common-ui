@@ -66,7 +66,7 @@ define([
      * @extends pentaho.type.mixins.DiscreteDomain
      *
      * @abstract
-     * @amd {pentaho.type.Factory<pentaho.type.Property>} pentaho/type/property
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Property>} pentaho/type/property
      *
      * @classDesc The class of properties of complex values.
      *
@@ -489,7 +489,8 @@ define([
          * * for other _property types_, the default value is the _inherited value_.
          *
          * When set to a function, it is accepted.
-         * For each instance the function is evaluated and its result converted to the _property type_'s
+         * For each complex instance,
+         * the function is evaluated and its result converted to the _property type_'s
          * [valueType]{@link pentaho.type.Property.Type#valueType},
          * using its [Value.Type#to]{@link pentaho.type.Value.Type#to} method.
          * The conversion may be impossible and thus an error may be thrown.
@@ -498,7 +499,7 @@ define([
          * it is immediately converted to the _property type_'s
          * [valueType]{@link pentaho.type.Property.Type#valueType}.
          *
-         * @type {pentaho.type.Value | pentaho.type.PropertyDynamicAttribute.<pentaho.type.spec.UValue>}
+         * @type {pentaho.type.Value | pentaho.type.spec.PropertyDynamicAttribute.<pentaho.type.spec.UValue>}
          *
          * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
          * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
@@ -1085,7 +1086,7 @@ define([
            *
            * @name isRequired
            * @memberOf pentaho.type.Property.Type#
-           * @type {undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
+           * @type {undefined | boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
            *
            * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
            * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
@@ -1174,7 +1175,7 @@ define([
            *
            * @name countMin
            * @memberOf pentaho.type.Property.Type#
-           * @type {undefined | number | pentaho.type.PropertyDynamicAttribute.<number>}
+           * @type {undefined | number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
            *
            * @see pentaho.type.Complex#countRangeOf
            *
@@ -1261,7 +1262,7 @@ define([
            *
            * @name countMax
            * @memberOf pentaho.type.Property.Type#
-           * @type {undefined | number | pentaho.type.PropertyDynamicAttribute.<number>}
+           * @type {undefined | number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
            *
            * @see pentaho.type.Complex#countRangeOf
            * @see pentaho.type.spec.IPropertyTypeProto#countMax
@@ -1339,7 +1340,7 @@ define([
            *
            * @name isApplicable
            * @memberOf pentaho.type.Property.Type#
-           * @type {undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
+           * @type {undefined | boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
            *
            * @see pentaho.type.Property.Type#isRequired
            * @see pentaho.type.Complex#isApplicableOf
@@ -1416,7 +1417,7 @@ define([
            *
            * @name isEnabled
            * @memberOf pentaho.type.Property.Type#
-           * @type {undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
+           * @type {undefined | boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
            *
            * @see pentaho.type.Complex#isEnabledOf
            * @see pentaho.type.spec.IPropertyTypeProto#isEnabled

@@ -49,7 +49,7 @@ define([
      * @extends pentaho.type.Instance
      * @implements pentaho.lang.IConfigurable
      * @implements pentaho.lang.ISpecifiable
-     * @amd {pentaho.type.Factory<pentaho.type.Value>} pentaho/type/value
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Value>} pentaho/type/value
      *
      * @classDesc The base, abstract class of [instances]{@link pentaho.type.Instance} which
      * are the _value of_ [properties]{@link pentaho.type.Property}.

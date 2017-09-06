@@ -303,7 +303,7 @@ define([
               .then(function(_context) {
                 context = _context;
 
-                return context.applyAsync(["pentaho/data/filter/abstract"], function(AbstractFilter) {
+                return context.getDependencyApplyAsync(["pentaho/data/filter/abstract"], function(AbstractFilter) {
 
                   CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
                 });
@@ -393,7 +393,7 @@ define([
               .then(function(_context) {
                 context = _context;
 
-                return context.applyAsync(["pentaho/data/filter/abstract"], function(AbstractFilter) {
+                return context.getDependencyApplyAsync(["pentaho/data/filter/abstract"], function(AbstractFilter) {
 
                   CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
                 });

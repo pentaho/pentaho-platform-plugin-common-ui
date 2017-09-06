@@ -43,7 +43,7 @@ define([
               }
             });
 
-            return context.applyAsync([
+            return context.getDependencyApplyAsync([
               "pentaho/data/filter/isEqual"
             ], function(IsEqual) {
               IsEqualFilter = IsEqual;

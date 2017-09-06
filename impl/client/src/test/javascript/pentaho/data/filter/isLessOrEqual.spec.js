@@ -46,7 +46,7 @@ define([
               }
             });
 
-            return context.applyAsync([
+            return context.getDependencyApplyAsync([
               "pentaho/data/filter/isLessOrEqual"
             ], function(IsLessOrEqual) {
               IsLessOrEqualFilter = IsLessOrEqual;

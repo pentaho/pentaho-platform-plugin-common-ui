@@ -44,7 +44,7 @@ define([
               }
             });
 
-            return context.applyAsync([
+            return context.getDependencyApplyAsync([
               "pentaho/data/filter/isGreaterOrEqual"
             ], function(IsGreaterOrEqual) {
               IsGreaterOrEqualFilter = IsGreaterOrEqual;

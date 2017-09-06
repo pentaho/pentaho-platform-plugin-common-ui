@@ -37,7 +37,7 @@ define([
      * @class
      * @extends pentaho.type.Complex
      *
-     * @amd {pentaho.type.Factory<pentaho.type.Model>} pentaho/type/model
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Model>} pentaho/type/model
      *
      * @classDesc The base class of model values.
      *

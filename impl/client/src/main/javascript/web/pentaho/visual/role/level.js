@@ -47,7 +47,7 @@ define([
        * @extends pentaho.type.String
        * @extends pentaho.type.mixins.DiscreteDomain
        *
-       * @amd {pentaho.type.Factory<pentaho.visual.role.Level>} pentaho/visual/role/level
+       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.Level>} pentaho/visual/role/level
        *
        * @classDesc The `Level` class is [String]{@link pentaho.type.String} based enumeration
        * that represents a **Level or Measurement**,

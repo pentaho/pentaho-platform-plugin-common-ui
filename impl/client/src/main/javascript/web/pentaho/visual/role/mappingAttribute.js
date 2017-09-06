@@ -31,7 +31,7 @@ define([
        * @class
        * @extends pentaho.type.Complex
        *
-       * @amd {pentaho.type.Factory<pentaho.visual.role.MappingAttribute>} pentaho/visual/role/mappingAttribute
+       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.MappingAttribute>} pentaho/visual/role/mappingAttribute
        *
        * @classDesc The `MappingAttribute` class represents a data property in a
        * [visual role mapping]{@link pentaho.visual.role.Mapping}.

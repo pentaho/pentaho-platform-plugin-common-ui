@@ -1036,18 +1036,10 @@ define([
 
       // region creation
       /**
-       * Creates an instance of this type, given an instance specification.
+       * Creates or resolves an instance of this type given an instance reference.
        *
-       * If the instance specification contains an inline type reference,
-       * in property `"_"`, the referenced type is used to create the instance
-       * (as long as it is a subtype of this type).
-       *
-       * If the specified instance specification does not contain an inline type reference,
-       * the type is assumed to be `this` type.
-       *
-       * @see pentaho.type.Type#createAsync
-       * @see pentaho.type.Type#isSubtypeOf
-       * @see pentaho.type.Context#get
+       * This method delegates to [InstancesContainer#get]{@link pentaho.type.InstancesContainer#get}
+       * with this type as the `typeBase` argument.
        *
        * @example
        * <caption>
@@ -1131,113 +1123,40 @@ define([
        *       });
        * });
        *
-       * @param {pentaho.type.spec.UInstance} [instSpec] An instance specification.
-       * @param {Object} [keyArgs] - The keyword arguments passed to the instance constructor.
+       * @param {pentaho.type.spec.UInstanceReference} [instRef] - An instance reference.
+       * @param {Object} [instKeyArgs] - The keyword arguments passed to the instance constructor, when one is created.
        *
-       * @return {!pentaho.type.Instance} The created instance.
+       * @return {pentaho.type.Instance} The created instance or the resolved instance (possibly `null`).
        *
-       * @throws {pentaho.lang.OperationInvalidError} When `instSpec` contains an inline type reference
-       * that refers to a type that is not a subtype of this one.
+       * @throws {Error} Other errors, as documented in:
+       * [InstancesContainer#get]{@link pentaho.type.InstancesContainer#get}.
        *
-       * @throws {Error} When `instSpec` contains an inline type reference which is not defined as a module in the
-       * AMD module system (specified directly in `instSpec`, or present in an generic type specification).
-       *
-       * @throws {Error} When `instSpec` contains an inline type reference which is from a module that the
-       * AMD module system has not loaded yet.
-       *
-       * @throws {pentaho.lang.OperationInvalidError} When the determined type for the specified `instSpec`
-       * is an [abstract]{@link pentaho.type.Value.Type#isAbstract} type.
+       * @see pentaho.type.Type#createAsync
+       * @see pentaho.type.Type#to
+       * @see pentaho.type.Type#is
        */
-      create: function(instSpec, keyArgs) {
-        var Instance;
-        var typeSpec;
-        var instType;
-
-        // If it is a plain Object, does it have the inline type property, "_"?
-        if(instSpec && typeof instSpec === "object" && (typeSpec = instSpec._) && instSpec.constructor === Object) {
-
-          Instance = context.get(typeSpec);
-
-          instType = this.__assertSubtype(Instance.type);
-
-          if(instType.isAbstract) instType.__throwAbstractType();
-
-        } else if(this.isAbstract) {
-
-          /* eslint default-case: 0 */
-          switch(typeof instSpec) {
-            case "string": Instance = __String || (__String = context.get("string")); break;
-            case "number": Instance = __Number || (__Number = context.get("number")); break;
-            case "boolean": Instance = __Boolean || (__Boolean = context.get("boolean")); break;
-          }
-
-          // Must still respect the base type: `this`.
-          if(Instance && !Instance.type.isSubtypeOf(this)) Instance = null;
-
-          if(!Instance) this.__throwAbstractType();
-
-        } else {
-          Instance = this.instance.constructor;
-        }
-
-        return O.make(Instance, arguments);
+      create: function(instRef, instKeyArgs) {
+        return this.context.instances.get(instRef, instKeyArgs, this);
       },
 
       /**
-       * Creates an instance of this type, asynchronously, given an instance specification.
+       * Creates or resolves an instance of this type, asynchronously, given an instance reference.
        *
-       * If the instance specification contains an inline type reference,
-       * in property `"_"`, the referenced type is used to create the instance
-       * (as long as it is a subtype of this type).
+       * This method delegates to [InstancesContainer#getAsync]{@link pentaho.type.InstancesContainer#getAsync}
+       * with this type as the `typeBase` argument.
        *
-       * If the specified instance specification does not contain an inline type reference,
-       * the type is assumed to be `this` type.
+       * @param {pentaho.type.spec.UInstanceReference} [instRef] - An instance reference.
+       * @param {Object} [instKeyArgs] - The keyword arguments passed to the instance constructor, when one is created.
        *
-       * @param {pentaho.type.spec.UInstance} [instSpec] - An instance specification.
-       * @param {Object} [keyArgs] - The keyword arguments passed to `create`.
+       * @return {!Promise.<pentaho.type.Instance>} A promise to the created instance or resolved instance (possibly `null`).
        *
-       * @return {!Promise.<pentaho.type.Instance>} A promise to the created instance.
-       *
-       * @rejects {pentaho.lang.OperationInvalidError} When `instSpec` contains an inline type reference
-       * that refers to a type that is not a subtype of this one.
-       *
-       * @rejects {Error} When `instSpec` contains an inline type reference which is not defined as a module in the
-       * AMD module system (specified directly in `instSpec`, or present in an generic type specification).
-       *
-       * @rejects {pentaho.lang.OperationInvalidError} When the determined type for the specified `instSpec`
-       * is an [abstract]{@link pentaho.type.Value.Type#isAbstract} type.
+       * @rejects {Error} Other errors, as documented in:
+       * [InstancesContainer#getAsync]{@link pentaho.type.InstancesContainer#getAsync}.
        *
        * @see pentaho.type.Type#create
-       * @see pentaho.type.Type#isSubtypeOf
-       * @see pentaho.type.Context#get
        */
-      createAsync: function(instSpec, keyArgs) {
-
-        var customTypeIds = Object.keys(this.__collectInstSpecTypeIds(instSpec));
-
-        return customTypeIds.length
-            // Require them all and only then invoke the synchronous BaseType.extend method.
-            ? this.context.resolveAsync(customTypeIds).then(resolveSync.bind(this))
-            // All types are standard and can be assumed to be already loaded.
-            // However, we should behave asynchronously as requested.
-            : promiseUtil.wrapCall(resolveSync, this);
-
-        function resolveSync() {
-          return this.create(instSpec, keyArgs);
-        }
-      },
-
-      /**
-       * Recursively collects the module ids of custom types used within an instance specification.
-       *
-       * @param {pentaho.type.spec.UInstance} instSpec - An instance specification.
-       * @return {!Object.<string, string>} A possibly empty object whose own keys are type module ids.
-       * @private
-       */
-      __collectInstSpecTypeIds: function(instSpec) {
-        var customTypeIds = {};
-        __collectTypeIdsRecursive.call(this, instSpec, customTypeIds);
-        return customTypeIds;
+      createAsync: function(instRef, instKeyArgs) {
+        return this.context.instances.getAsync(instRef, instKeyArgs, this);
       },
 
       /**
@@ -1863,7 +1782,7 @@ define([
    */
   function __wrapWithCast(fun, cast, defaultValue) {
     /*
-     * @type {pentaho.type.PropertyDynamicAttribute}
+     * @type {pentaho.type.spec.PropertyDynamicAttribute}
      */
     return function(propType) {
 
@@ -1871,24 +1790,5 @@ define([
 
       return __castAndNormalize.call(propType, value, cast, defaultValue);
     };
-  }
-
-  function __collectTypeIdsRecursive(instSpec, outIds) {
-    if(instSpec && typeof instSpec === "object") {
-      if(Array.isArray(instSpec)) {
-        instSpec.forEach(function(elemSpec) {
-          __collectTypeIdsRecursive.call(this, elemSpec, outIds);
-        }, this);
-      } else if(instSpec.constructor === Object) {
-        Object.keys(instSpec).forEach(function(name) {
-          var elemSpec = instSpec[name];
-          if(name === "_")
-            this.context.__collectTypeSpecTypeIds(elemSpec, outIds);
-          else
-            __collectTypeIdsRecursive.call(this, elemSpec, outIds);
-
-        }, this);
-      }
-    }
   }
 });

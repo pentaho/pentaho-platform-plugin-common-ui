@@ -100,7 +100,7 @@ define([
          * @class
          * @extends pentaho.visual.action.Data
          *
-         * @amd {pentaho.type.Factory<pentaho.visual.action.Select>} pentaho/visual/action/select
+         * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.action.Select>} pentaho/visual/action/select
          *
          * @classDesc The `Select` action is a synchronous action that
          * is performed when the user interacts with a visual element, typically by clicking on it.

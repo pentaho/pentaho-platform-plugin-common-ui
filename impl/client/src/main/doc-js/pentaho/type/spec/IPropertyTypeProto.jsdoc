@@ -156,7 +156,7 @@
  *
  * @name defaultValue
  * @memberOf pentaho.type.spec.IPropertyTypeProto#
- * @type {pentaho.type.spec.UValue | pentaho.type.PropertyDynamicAttribute.<pentaho.type.spec.UValue>}
+ * @type {pentaho.type.spec.UValue | pentaho.type.spec.PropertyDynamicAttribute.<pentaho.type.spec.UValue>}
  *
  * @see pentaho.type.Property.Type#defaultValue
  */
@@ -199,7 +199,7 @@
  *
  * @name isRequired
  * @memberOf pentaho.type.spec.IPropertyTypeProto#
- * @type {boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
+ * @type {boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
  *
  * @see pentaho.type.spec.IPropertyTypeProto#valueType
  * @see pentaho.type.spec.IPropertyTypeProto#countMin
@@ -242,7 +242,7 @@
  *
  * @name isApplicable
  * @memberOf pentaho.type.spec.IPropertyTypeProto#
- * @type {boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
+ * @type {boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
  *
  * @see pentaho.type.spec.IPropertyTypeProto#isRequired
  * @see pentaho.type.Property.Type#isApplicable
@@ -280,7 +280,7 @@
  *
  * @name isEnabled
  * @memberOf pentaho.type.spec.IPropertyTypeProto#
- * @type {boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
+ * @type {boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
  *
  * @see pentaho.type.Property.Type#isEnabled
  */
@@ -321,7 +321,7 @@
  *
  * @name countMin
  * @memberOf pentaho.type.spec.IPropertyTypeProto#
- * @type {number | pentaho.type.PropertyDynamicAttribute.<number>}
+ * @type {number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
  *
  * @see pentaho.type.spec.IPropertyTypeProto#countMax
  * @see pentaho.type.Property.Type#countMin
@@ -364,7 +364,7 @@
  *
  * @name countMax
  * @memberOf pentaho.type.spec.IPropertyTypeProto#
- * @type {number | pentaho.type.PropertyDynamicAttribute.<number>}
+ * @type {number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
  *
  * @see pentaho.type.spec.IPropertyTypeProto#countMin
  * @see pentaho.type.Property.Type#countMax

@@ -120,6 +120,15 @@ define([
         fun.call(ctx);
         return Promise.reject(reason);
       });
+    },
+
+    "return": function(value, sync) {
+      return sync ? value : Promise.resolve(value);
+    },
+
+    "error": function(ex, sync) {
+      if(sync) throw ex;
+      return Promise.reject(ex);
     }
   };
 });

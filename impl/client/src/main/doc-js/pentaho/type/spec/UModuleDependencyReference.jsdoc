@@ -1,0 +1,86 @@
+/*!
+ * Copyright 2017 Pentaho Corporation. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.UModuleDependencyReference` union represents the set of JS types that can be used to
+ * reference a _type_ or _instance_ dependency,
+ * from either
+ * an [instance module]{@link pentaho.type.spec.UInstanceModule} or
+ * a [type module]{@link pentaho.type.spec.UTypeModule}.
+ *
+ * Dependency references are the main arguments of methods such as
+ * [Context#getDependency]{@link pentaho.type.Context#getDependency} and
+ * [Context#getDependencyAsync]{@link pentaho.type.Context#getDependencyAsync}.
+ *
+ * ### Examples
+ *
+ * 1. The type whose identifier is `"my/CustomService"`
+ *    ```json
+ *    "my/CustomService"
+ *    ```
+ *
+ * 2. An array of multiple types, given their identifiers:
+ *    ```json
+ *    ["my/CustomService", "my/Product"]
+ *    ```
+ *
+ * 3. An object whose values are multiple types, given by their identifiers:
+ *    ```json
+ *    {
+ *      A: "my/CustomService",
+ *      B: "my/Product"
+ *    }
+ *    ```
+ *
+ * 4. A combination of array and object whose leaf values denote types given by their identifiers:
+ *    ```json
+ *    ["my/Product", {A: "my/CustomService"}]
+ *    ```
+ *
+ * 5. The array of types that are known to be subtypes of `"my/Service"`, including itself:
+ *    ```json
+ *    {$types: {base: "my/Service"}}
+ *    ```
+ *
+ * 6. The registered instance whose identifier is `"my/instance"`:
+ *    ```json
+ *    {"$instance": {"id": "my/instance"}}
+ *    ```
+ *
+ * 7. The registered instance of type `"my/Service"` (or of a subtype of) which has the
+ *    highest registration [priority]{@link pentaho.type.spec.IInstanceDeclaration#priority}:
+ *
+ *    ```json
+ *    {"$instance": {"type": "my/Service"}}
+ *    ```
+ *
+ * 8. The [list]{@link pentaho.type.List} of registered instances of type `"my/Service"` (or of a subtype of)
+ *    ordered from highest to lowest registration [priority]{@link pentaho.type.spec.IInstanceDeclaration#priority}:
+ *
+ *    ```json
+ *    {"$instance": {"type": "my/Service"}
+ *    ```
+ *
+ * @typedef {string|
+ *           pentaho.type.spec.ITypesResolve |
+ *           pentaho.type.spec.IInstanceResolve |
+ *           Array.<pentaho.type.spec.UModuleDependencyReference>|
+ *           Object.<string, pentaho.type.spec.UModuleDependencyReference>} pentaho.type.spec.UModuleDependencyReference
+ *
+ * @see pentaho.type.spec.UInstanceModule
+ * @see pentaho.type.spec.UTypeModule
+ */
+

@@ -34,7 +34,7 @@ define([
           .then(function(_context) {
             context = _context;
 
-            return context.applyAsync([
+            return context.getDependencyApplyAsync([
               "pentaho/visual/base/model",
               "pentaho/visual/role/property"
             ], function(_Model, _RoleProperty) {

@@ -42,7 +42,7 @@ define([
      * @class
      * @extends pentaho.type.Instance
      * @abstract
-     * @amd {pentaho.type.Factory<pentaho.type.mixins.DiscreteDomain>} pentaho/type/mixins/discreteDomain
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.mixins.DiscreteDomain>} pentaho/type/mixins/discreteDomain
      *
      * @classDesc A mixin type that adds to properties the ability to specify a discrete set of values
      * that are valid as property values.
@@ -132,14 +132,14 @@ define([
            * @name domain
            * @memberOf pentaho.type.Property.Type#
            * @type {undefined | Array.<pentaho.type.Element> |
-           *        pentaho.type.PropertyDynamicAttribute.<Array.<pentaho.type.Element>>}
+           *        pentaho.type.spec.PropertyDynamicAttribute.<Array.<pentaho.type.Element>>}
            *
            * @see pentaho.type.Complex#domainOf
            * @see pentaho.type.mixins.spec.IDiscreteDomainTypeProto#domain
            */
           "domain": {
 
-            /* @type pentaho.type.PropertyDynamicAttribute */
+            /* @type pentaho.type.spec.PropertyDynamicAttribute */
             value: function(propType) {
 
               // The initial domain is that of the property's valueType's domain, if any.

@@ -318,7 +318,7 @@ define([
 
             return Context.createAsync().then(function(context) {
 
-              return context.applyAsync([
+              return context.getDependencyApplyAsync([
                 "pentaho/type/value",
                 "tests/mixins/A",
                 "tests/mixins/B"

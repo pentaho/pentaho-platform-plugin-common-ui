@@ -40,7 +40,7 @@ define([
      * @name pentaho.type.Function
      * @class
      * @extends pentaho.type.Simple
-     * @amd {pentaho.type.Factory<pentaho.type.Function>} pentaho/type/function
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Function>} pentaho/type/function
      *
      * @classDesc The class that represents primitive, JavaScript {@link function} values.
      *

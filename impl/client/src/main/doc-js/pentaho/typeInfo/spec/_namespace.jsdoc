@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,8 @@
  */
 
 /**
- * Creates the class of a `Value` type for a given context.
+ * The `typeInfo.spec` namespace contains specification interfaces.
  *
- * @callback pentaho.type.Factory
- * @param {pentaho.type.Context} context - The context for which the type's class is being created.
- * @return {Class.<pentaho.type.Value>} The new type class.
+ * @name pentaho.typeInfo.spec
+ * @namespace
  */

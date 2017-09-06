@@ -79,7 +79,7 @@ define([
         });
       });
 
-      it("should respect a given context instance", function() {
+      it("should respect a given environment instance", function() {
 
         return require.using(["pentaho/type/Context"], function(Context) {
 
@@ -87,6 +87,64 @@ define([
 
           return Context.createAsync(customEnv).then(function(context) {
             expect(context.environment).toBe(customEnv);
+          });
+        });
+      });
+
+      it("should create a context that contains an instances container", function() {
+
+        return require.using([
+          "pentaho/type/Context",
+          "pentaho/type/InstancesContainer"
+        ], function(Context, InstancesContainer) {
+
+          return Context.createAsync().then(function(context) {
+            expect(context.instances).toEqual(jasmine.any(InstancesContainer));
+          });
+        });
+      });
+
+      it("should create a context that contains a configured instances container", function() {
+
+        function configAmd(localRequire) {
+
+          localRequire.config({
+            config: {
+              "pentaho/service": {
+                "myConfigModule": "pentaho.config.spec.IRuleSet"
+              }
+            }
+          });
+
+          localRequire.define("myConfigModule", function() {
+
+            return {
+              rules: [
+                {
+                  select: {type: "pentaho/type/Context"},
+                  apply: {
+                    instances: {
+                      "myFoo": {type: "Foo"}
+                    }
+                  }
+                }
+              ]
+            };
+          });
+        }
+
+        return require.using([
+          "pentaho/type/Context",
+          "pentaho/type/InstancesContainer"
+        ], configAmd, function(Context, InstancesContainer) {
+
+          var configure = spyOn(InstancesContainer.prototype, "configure").and.callThrough();
+
+          return Context.createAsync().then(function(context) {
+
+            expect(configure).toHaveBeenCalledWith(jasmine.objectContaining({
+              "myFoo": {type: "Foo"}
+            }));
           });
         });
       });
@@ -1247,7 +1305,7 @@ define([
       // should not throw when async and the requested module is not defined
     }); // #get|getAsync
 
-    describe("#resolve(resolveSpec, keyArgs)", function() {
+    describe("#getDependency(resolveSpec)", function() {
 
       it("should return an empty array when given an empty array", function() {
 
@@ -1255,7 +1313,7 @@ define([
 
           return Context.createAsync().then(function(context) {
 
-            var result = context.resolve([]);
+            var result = context.getDependency([]);
 
             expect(Array.isArray(result)).toBe(true);
             expect(result.length).toBe(0);
@@ -1268,7 +1326,7 @@ define([
         return require.using(["pentaho/type/Context"], function(Context) {
           return Context.createAsync().then(function(context) {
 
-            var result = context.resolve({});
+            var result = context.getDependency({});
 
             expect(result != null).toBe(true);
             expect(result.constructor).toBe(Object);
@@ -1293,11 +1351,11 @@ define([
               }
             });
 
-            context.resolve(["f2", "f1"]);
+            context.getDependency(["f2", "f1"]);
 
             expect(context.get.calls.count()).toBe(2);
-            expect(context.get).toHaveBeenCalledWith("f2", undefined);
-            expect(context.get).toHaveBeenCalledWith("f1", undefined);
+            expect(context.get).toHaveBeenCalledWith("f2");
+            expect(context.get).toHaveBeenCalledWith("f1");
           });
         });
       });
@@ -1318,459 +1376,14 @@ define([
               }
             });
 
-            context.resolve({a: "f2", b: "f1"});
+            context.getDependency({a: "f2", b: "f1"});
 
             expect(context.get.calls.count()).toBe(2);
-            expect(context.get).toHaveBeenCalledWith("f2", undefined);
-            expect(context.get).toHaveBeenCalledWith("f1", undefined);
+            expect(context.get).toHaveBeenCalledWith("f2");
+            expect(context.get).toHaveBeenCalledWith("f1");
           });
         });
       });
-
-      // region direct special form
-      it("should call #get(id) if given a special {$type: {id: id}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-
-            spyOn(context, "get").and.callFake(function(typeRef) {
-              switch(typeRef) {
-                case "f1": return F1;
-              }
-            });
-
-            var keyArgs = {};
-
-            var result = context.resolve({$type: {id: "f1"}}, keyArgs);
-
-            expect(context.get.calls.count()).toBe(1);
-            expect(context.get).toHaveBeenCalledWith("f1", keyArgs);
-
-            expect(result).toBe(F1);
-          });
-        });
-      });
-
-      it("should call #get(typeRef) if given a special {$type: {ref: typeRef}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-            var typeRef = {};
-
-            spyOn(context, "get").and.callFake(function(typeRef) {
-              return F1;
-            });
-
-            var keyArgs = {};
-            var result = context.resolve({$type: {ref: typeRef}}, keyArgs);
-
-            expect(context.get.calls.count()).toBe(1);
-            expect(context.get).toHaveBeenCalledWith(typeRef, keyArgs);
-
-            expect(result).toBe(F1);
-          });
-        });
-      });
-
-      it("should call #getAll(baseTypeId) if given a special {$types: {base: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-            var F2 = function() {};
-
-            spyOn(context, "getAll").and.callFake(function(baseTypeId) {
-              return [F1, F2];
-            });
-
-            var keyArgs = {};
-            var result = context.resolve({$types: {base: "A"}}, keyArgs);
-
-            expect(context.getAll.calls.count()).toBe(1);
-            expect(context.getAll).toHaveBeenCalledWith("A", keyArgs);
-
-            expect(result).toEqual([F1, F2]);
-          });
-        });
-      });
-
-      it("should call #instances.getById(instanceId) if given a special {$instance: {id: instanceId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance = {};
-
-            spyOn(context.instances, "getById").and.callFake(function(instanceId) {
-              return instance;
-            });
-
-            var keyArgs = {};
-            var result = context.resolve({$instance: {id: "A"}}, keyArgs);
-
-            expect(context.instances.getById.calls.count()).toBe(1);
-            expect(context.instances.getById).toHaveBeenCalledWith("A", keyArgs);
-
-            expect(result).toBe(instance);
-          });
-        });
-      });
-
-      it("should call #instances.getByType(baseTypeId) if given a special {$instance: {type: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance = {};
-
-            spyOn(context.instances, "getByType").and.callFake(function(baseTypeId) {
-              return instance;
-            });
-
-            var keyArgs = {};
-            var result = context.resolve({$instance: {type: "A"}}, keyArgs);
-
-            expect(context.instances.getByType.calls.count()).toBe(1);
-            expect(context.instances.getByType).toHaveBeenCalledWith("A", keyArgs);
-
-            expect(result).toBe(instance);
-          });
-        });
-      });
-
-      it("should call #instances.getAllByType(baseTypeId) if given a " +
-          "special {$instances: {type: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance1 = {};
-            var instance2 = {};
-
-            spyOn(context.instances, "getAllByType").and.callFake(function(baseTypeId) {
-              return [instance1, instance2];
-            });
-
-            var keyArgs = {};
-            var result = context.resolve({$instances: {type: "A"}}, keyArgs);
-
-            expect(context.instances.getAllByType.calls.count()).toBe(1);
-            expect(context.instances.getAllByType).toHaveBeenCalledWith("A", keyArgs);
-
-            expect(result).toEqual([instance1, instance2]);
-          });
-        });
-      });
-      // endregion
-
-      // region array of special form
-      it("should call #get(id) if given an array of special {$type: {id: id}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-
-            spyOn(context, "get").and.callFake(function(typeRef) {
-              switch(typeRef) {
-                case "f1": return F1;
-              }
-            });
-
-            var keyArgs = {};
-
-            var result = context.resolve([{$type: {id: "f1"}}], keyArgs);
-
-            expect(context.get.calls.count()).toBe(1);
-            expect(context.get).toHaveBeenCalledWith("f1", keyArgs);
-
-            expect(result).toEqual([F1]);
-          });
-        });
-      });
-
-      it("should call #get(typeRef) if given an array of special {$type: {ref: typeRef}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-            var typeRef = {};
-
-            spyOn(context, "get").and.callFake(function(typeRef) {
-              return F1;
-            });
-
-            var keyArgs = {};
-            var result = context.resolve([{$type: {ref: typeRef}}], keyArgs);
-
-            expect(context.get.calls.count()).toBe(1);
-            expect(context.get).toHaveBeenCalledWith(typeRef, keyArgs);
-
-            expect(result).toEqual([F1]);
-          });
-        });
-      });
-
-      it("should call #getAll(baseTypeId) if given an array of special {$types: {base: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-            var F2 = function() {};
-
-            spyOn(context, "getAll").and.callFake(function(baseTypeId) {
-              return [F1, F2];
-            });
-
-            var keyArgs = {};
-            var result = context.resolve([{$types: {base: "A"}}], keyArgs);
-
-            expect(context.getAll.calls.count()).toBe(1);
-            expect(context.getAll).toHaveBeenCalledWith("A", keyArgs);
-
-            expect(result).toEqual([[F1, F2]]);
-          });
-        });
-      });
-
-      it("should call #instances.getById(instanceId) if given an array of " +
-          "special {$instance: {id: instanceId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance = {};
-
-            spyOn(context.instances, "getById").and.callFake(function(instanceId) {
-              return instance;
-            });
-
-            var keyArgs = {};
-            var result = context.resolve([{$instance: {id: "A"}}], keyArgs);
-
-            expect(context.instances.getById.calls.count()).toBe(1);
-            expect(context.instances.getById).toHaveBeenCalledWith("A", keyArgs);
-
-            expect(result).toEqual([instance]);
-          });
-        });
-      });
-
-      it("should call #instances.getByType(baseTypeId) if given an array of " +
-          "special {$instance: {type: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance = {};
-
-            spyOn(context.instances, "getByType").and.callFake(function(baseTypeId) {
-              return instance;
-            });
-
-            var keyArgs = {};
-            var result = context.resolve([{$instance: {type: "A"}}], keyArgs);
-
-            expect(context.instances.getByType.calls.count()).toBe(1);
-            expect(context.instances.getByType).toHaveBeenCalledWith("A", keyArgs);
-
-            expect(result).toEqual([instance]);
-          });
-        });
-      });
-
-      it("should call #instances.getAllByType(baseTypeId) if given an array of " +
-          "special {$instances: {type: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance1 = {};
-            var instance2 = {};
-
-            spyOn(context.instances, "getAllByType").and.callFake(function(baseTypeId) {
-              return [instance1, instance2];
-            });
-
-            var keyArgs = {};
-            var result = context.resolve([{$instances: {type: "A"}}], keyArgs);
-
-            expect(context.instances.getAllByType.calls.count()).toBe(1);
-            expect(context.instances.getAllByType).toHaveBeenCalledWith("A", keyArgs);
-
-            expect(result).toEqual([[instance1, instance2]]);
-          });
-        });
-      });
-      // endregion
-
-      // region object of special form
-      it("should call #get(id) if given a map of special {$type: {id: id}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-
-            spyOn(context, "get").and.callFake(function(typeRef) {
-              switch(typeRef) {
-                case "f1": return F1;
-              }
-            });
-
-            var keyArgs = {};
-
-            var result = context.resolve({a: {$type: {id: "f1"}}}, keyArgs);
-
-            expect(context.get.calls.count()).toBe(1);
-            expect(context.get).toHaveBeenCalledWith("f1", keyArgs);
-
-            expect(result).toEqual({a: F1});
-          });
-        });
-      });
-
-      it("should call #get(typeRef) if given a map of special {$type: {ref: typeRef}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-            var typeRef = {};
-
-            spyOn(context, "get").and.callFake(function(typeRef) {
-              return F1;
-            });
-
-            var keyArgs = {};
-            var result = context.resolve({a: {$type: {ref: typeRef}}}, keyArgs);
-
-            expect(context.get.calls.count()).toBe(1);
-            expect(context.get).toHaveBeenCalledWith(typeRef, keyArgs);
-
-            expect(result).toEqual({a: F1});
-          });
-        });
-      });
-
-      it("should call #getAll(baseTypeId) if given a map of special {$types: {base: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-            var F2 = function() {};
-
-            spyOn(context, "getAll").and.callFake(function(baseTypeId) {
-              return [F1, F2];
-            });
-
-            var keyArgs = {};
-            var result = context.resolve({a: {$types: {base: "A"}}}, keyArgs);
-
-            expect(context.getAll.calls.count()).toBe(1);
-            expect(context.getAll).toHaveBeenCalledWith("A", keyArgs);
-
-            expect(result).toEqual({a: [F1, F2]});
-          });
-        });
-      });
-
-      it("should call #instances.getById(instanceId) if given a map of " +
-          "special {$instance: {id: instanceId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance = {};
-
-            spyOn(context.instances, "getById").and.callFake(function(instanceId) {
-              return instance;
-            });
-
-            var keyArgs = {};
-            var result = context.resolve({a: {$instance: {id: "A"}}}, keyArgs);
-
-            expect(context.instances.getById.calls.count()).toBe(1);
-            expect(context.instances.getById).toHaveBeenCalledWith("A", keyArgs);
-
-            expect(result).toEqual({a: instance});
-          });
-        });
-      });
-
-      it("should call #instances.getByType(baseTypeId) if given a map of " +
-          "special {$instance: {type: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance = {};
-
-            spyOn(context.instances, "getByType").and.callFake(function(baseTypeId) {
-              return instance;
-            });
-
-            var keyArgs = {};
-            var result = context.resolve({a: {$instance: {type: "A"}}}, keyArgs);
-
-            expect(context.instances.getByType.calls.count()).toBe(1);
-            expect(context.instances.getByType).toHaveBeenCalledWith("A", keyArgs);
-
-            expect(result).toEqual({a: instance});
-          });
-        });
-      });
-
-      it("should call #instances.getAllByType(baseTypeId) if given a map of " +
-          "special {$instances: {type: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance1 = {};
-            var instance2 = {};
-
-            spyOn(context.instances, "getAllByType").and.callFake(function(baseTypeId) {
-              return [instance1, instance2];
-            });
-
-            var keyArgs = {};
-            var result = context.resolve({a: {$instances: {type: "A"}}}, keyArgs);
-
-            expect(context.instances.getAllByType.calls.count()).toBe(1);
-            expect(context.instances.getAllByType).toHaveBeenCalledWith("A", keyArgs);
-
-            expect(result).toEqual({a: [instance1, instance2]});
-          });
-        });
-      });
-      // endregion
 
       it("should return an array of types when given an array of type ids", function() {
 
@@ -1788,7 +1401,7 @@ define([
               }
             });
 
-            var result = context.resolve(["f2", "f1"]);
+            var result = context.getDependency(["f2", "f1"]);
 
             expect(result).toEqual([F2, F1]);
           });
@@ -1811,15 +1424,226 @@ define([
               }
             });
 
-            var result = context.resolve({a: "f2", b: "f1"});
+            var result = context.getDependency({a: "f2", b: "f1"});
 
             expect(result).toEqual({a: F2, b: F1});
           });
         });
       });
-    }); // #resolve
 
-    describe("#resolveAsync(resolveSpec, keyArgs)", function() {
+      // region direct special form
+      it("should call #getAll(baseTypeId) if given a special {$types: {base: baseTypeId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var F1 = function() {};
+            var F2 = function() {};
+
+            spyOn(context, "getAll").and.callFake(function(baseTypeId) {
+              return [F1, F2];
+            });
+
+            var result = context.getDependency({$types: {base: "A"}});
+
+            expect(context.getAll.calls.count()).toBe(1);
+            expect(context.getAll).toHaveBeenCalledWith("A");
+
+            expect(result).toEqual([F1, F2]);
+          });
+        });
+      });
+
+      it("should call #instances.__getSpecial if given a special {$instance: {id: instanceId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var instance = {};
+
+            spyOn(context.instances, "__getSpecial").and.callFake(function() {
+              return instance;
+            });
+
+            var result = context.getDependency({$instance: {id: "A"}});
+
+            expect(context.instances.__getSpecial.calls.count()).toBe(1);
+            expect(context.instances.__getSpecial).toHaveBeenCalledWith({id: "A"}, null, null, true);
+
+            expect(result).toBe(instance);
+          });
+        });
+      });
+
+      it("should call #instances.__getSpecial if given a special {$instance: {type: baseTypeId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var instance = {};
+
+            spyOn(context.instances, "__getSpecial").and.callFake(function() {
+              return instance;
+            });
+
+            var result = context.getDependency({$instance: {type: "A"}});
+
+            expect(context.instances.__getSpecial.calls.count()).toBe(1);
+            expect(context.instances.__getSpecial).toHaveBeenCalledWith({type: "A"}, null, null, true);
+
+            expect(result).toBe(instance);
+          });
+        });
+      });
+      // endregion
+
+      // region array of special form
+      it("should call #getAll(baseTypeId) if given an array of special {$types: {base: baseTypeId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var F1 = function() {};
+            var F2 = function() {};
+
+            spyOn(context, "getAll").and.callFake(function(baseTypeId) {
+              return [F1, F2];
+            });
+
+            var result = context.getDependency([{$types: {base: "A"}}]);
+
+            expect(context.getAll.calls.count()).toBe(1);
+            expect(context.getAll).toHaveBeenCalledWith("A");
+
+            expect(result).toEqual([[F1, F2]]);
+          });
+        });
+      });
+
+      it("should call #instances.__getSpecial if given an array of " +
+          "special {$instance: {id: instanceId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var instance = {};
+
+            spyOn(context.instances, "__getSpecial").and.callFake(function() {
+              return instance;
+            });
+
+            var result = context.getDependency([{$instance: {id: "A"}}]);
+
+            expect(context.instances.__getSpecial.calls.count()).toBe(1);
+            expect(context.instances.__getSpecial).toHaveBeenCalledWith({id: "A"}, null, null, true);
+
+            expect(result).toEqual([instance]);
+          });
+        });
+      });
+
+      it("should call #instances.__getSpecial if given an array of " +
+          "special {$instance: {type: baseTypeId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var instance = {};
+
+            spyOn(context.instances, "__getSpecial").and.callFake(function() {
+              return instance;
+            });
+
+            var result = context.getDependency([{$instance: {type: "A"}}]);
+
+            expect(context.instances.__getSpecial.calls.count()).toBe(1);
+            expect(context.instances.__getSpecial).toHaveBeenCalledWith({type: "A"}, null, null, true);
+
+            expect(result).toEqual([instance]);
+          });
+        });
+      });
+      // endregion
+
+      // region object of special form
+      it("should call #getAll(baseTypeId) if given a map of special {$types: {base: baseTypeId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var F1 = function() {};
+            var F2 = function() {};
+
+            spyOn(context, "getAll").and.callFake(function(baseTypeId) {
+              return [F1, F2];
+            });
+
+            var result = context.getDependency({a: {$types: {base: "A"}}});
+
+            expect(context.getAll.calls.count()).toBe(1);
+            expect(context.getAll).toHaveBeenCalledWith("A");
+
+            expect(result).toEqual({a: [F1, F2]});
+          });
+        });
+      });
+
+      it("should call #instances.__getSpecial if given a map of " +
+          "special {$instance: {id: instanceId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var instance = {};
+
+            spyOn(context.instances, "__getSpecial").and.callFake(function() {
+              return instance;
+            });
+
+            var result = context.getDependency({a: {$instance: {id: "A"}}});
+
+            expect(context.instances.__getSpecial.calls.count()).toBe(1);
+            expect(context.instances.__getSpecial).toHaveBeenCalledWith({id: "A"}, null, null, true);
+
+            expect(result).toEqual({a: instance});
+          });
+        });
+      });
+
+      it("should call #instances.__getSpecial if given a map of " +
+          "special {$instance: {type: baseTypeId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var instance = {};
+
+            spyOn(context.instances, "__getSpecial").and.callFake(function(baseTypeId) {
+              return instance;
+            });
+
+            var result = context.getDependency({a: {$instance: {type: "A"}}});
+
+            expect(context.instances.__getSpecial.calls.count()).toBe(1);
+            expect(context.instances.__getSpecial).toHaveBeenCalledWith({type: "A"}, null, null, true);
+
+            expect(result).toEqual({a: instance});
+          });
+        });
+      });
+      // endregion
+    }); // #getDependency
+
+    describe("#getDependencyAsync(resolveSpec)", function() {
 
       it("should return an empty array when given an empty array", function() {
 
@@ -1827,7 +1651,7 @@ define([
 
           return Context.createAsync().then(function(context) {
 
-            return context.resolveAsync([]).then(function(result) {
+            return context.getDependencyAsync([]).then(function(result) {
               expect(Array.isArray(result)).toBe(true);
               expect(result.length).toBe(0);
             });
@@ -1840,7 +1664,7 @@ define([
         return require.using(["pentaho/type/Context"], function(Context) {
           return Context.createAsync().then(function(context) {
 
-            return context.resolveAsync({}).then(function(result) {
+            return context.getDependencyAsync({}).then(function(result) {
               expect(result != null).toBe(true);
               expect(result.constructor).toBe(Object);
               expect(result).toEqual({});
@@ -1865,11 +1689,11 @@ define([
               }
             });
 
-            return context.resolveAsync(["f2", "f1"]).then(function(result) {
+            return context.getDependencyAsync(["f2", "f1"]).then(function(result) {
 
               expect(context.getAsync.calls.count()).toBe(2);
-              expect(context.getAsync).toHaveBeenCalledWith("f2", undefined);
-              expect(context.getAsync).toHaveBeenCalledWith("f1", undefined);
+              expect(context.getAsync).toHaveBeenCalledWith("f2");
+              expect(context.getAsync).toHaveBeenCalledWith("f1");
 
               expect(result).toEqual([F2, F1]);
             });
@@ -1893,482 +1717,17 @@ define([
               }
             });
 
-            return context.resolveAsync({a: "f2", b: "f1"}).then(function(result) {
+            return context.getDependencyAsync({a: "f2", b: "f1"}).then(function(result) {
 
               expect(context.getAsync.calls.count()).toBe(2);
-              expect(context.getAsync).toHaveBeenCalledWith("f2", undefined);
-              expect(context.getAsync).toHaveBeenCalledWith("f1", undefined);
+              expect(context.getAsync).toHaveBeenCalledWith("f2");
+              expect(context.getAsync).toHaveBeenCalledWith("f1");
 
               expect(result).toEqual({a: F2, b: F1});
             });
           });
         });
       });
-
-      // region direct special form
-      it("should call #getAsync(id) if given a special {$type: {id: id}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-
-            spyOn(context, "getAsync").and.callFake(function(typeRef) {
-              switch(typeRef) {
-                case "f1": return Promise.resolve(F1);
-              }
-            });
-
-            var keyArgs = {};
-
-            return context.resolveAsync({$type: {id: "f1"}}, keyArgs).then(function(result) {
-
-              expect(context.getAsync.calls.count()).toBe(1);
-              expect(context.getAsync).toHaveBeenCalledWith("f1", keyArgs);
-
-              expect(result).toBe(F1);
-            });
-          });
-        });
-      });
-
-      it("should call #getAsync(typeRef) if given a special {$type: {ref: typeRef}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-            var typeRef = {};
-
-            spyOn(context, "getAsync").and.callFake(function(typeRef) {
-              return Promise.resolve(F1);
-            });
-
-            var keyArgs = {};
-            return context.resolveAsync({$type: {ref: typeRef}}, keyArgs).then(function(result) {
-
-              expect(context.getAsync.calls.count()).toBe(1);
-              expect(context.getAsync).toHaveBeenCalledWith(typeRef, keyArgs);
-
-              expect(result).toBe(F1);
-            });
-          });
-        });
-      });
-
-      it("should call #getAllAsync(baseTypeId) if given a special {$types: {base: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-            var F2 = function() {};
-
-            spyOn(context, "getAllAsync").and.callFake(function(baseTypeId) {
-              return Promise.resolve([F1, F2]);
-            });
-
-            var keyArgs = {};
-            return context.resolveAsync({$types: {base: "A"}}, keyArgs).then(function(result) {
-
-              expect(context.getAllAsync.calls.count()).toBe(1);
-              expect(context.getAllAsync).toHaveBeenCalledWith("A", keyArgs);
-
-              expect(result).toEqual([F1, F2]);
-            });
-          });
-        });
-      });
-
-      it("should call #instances.getByIdAsync(instanceId) if given a " +
-         "special {$instance: {id: instanceId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance = {};
-
-            spyOn(context.instances, "getByIdAsync").and.callFake(function(instanceId) {
-              return Promise.resolve(instance);
-            });
-
-            var keyArgs = {};
-            return context.resolveAsync({$instance: {id: "A"}}, keyArgs).then(function(result) {
-
-              expect(context.instances.getByIdAsync.calls.count()).toBe(1);
-              expect(context.instances.getByIdAsync).toHaveBeenCalledWith("A", keyArgs);
-
-              expect(result).toBe(instance);
-            });
-          });
-        });
-      });
-
-      it("should call #instances.getByTypeAsync(baseTypeId) if given a " +
-          "special {$instance: {type: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance = {};
-
-            spyOn(context.instances, "getByTypeAsync").and.callFake(function(baseTypeId) {
-              return Promise.resolve(instance);
-            });
-
-            var keyArgs = {};
-            return context.resolveAsync({$instance: {type: "A"}}, keyArgs).then(function(result) {
-
-              expect(context.instances.getByTypeAsync.calls.count()).toBe(1);
-              expect(context.instances.getByTypeAsync).toHaveBeenCalledWith("A", keyArgs);
-
-              expect(result).toBe(instance);
-            });
-          });
-        });
-      });
-
-      it("should call #instances.getAllByTypeAsync(baseTypeId) if given a " +
-          "special {$instances: {type: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance1 = {};
-            var instance2 = {};
-
-            spyOn(context.instances, "getAllByTypeAsync").and.callFake(function(baseTypeId) {
-              return Promise.resolve([instance1, instance2]);
-            });
-
-            var keyArgs = {};
-            return context.resolveAsync({$instances: {type: "A"}}, keyArgs).then(function(result) {
-
-              expect(context.instances.getAllByTypeAsync.calls.count()).toBe(1);
-              expect(context.instances.getAllByTypeAsync).toHaveBeenCalledWith("A", keyArgs);
-
-              expect(result).toEqual([instance1, instance2]);
-            });
-          });
-        });
-      });
-      // endregion
-
-      // region array of special form
-      it("should call #getAsync(id) if given an array of special {$type: {id: id}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-
-            spyOn(context, "getAsync").and.callFake(function(typeRef) {
-              switch(typeRef) {
-                case "f1": return Promise.resolve(F1);
-              }
-            });
-
-            var keyArgs = {};
-
-            return context.resolveAsync([{$type: {id: "f1"}}], keyArgs).then(function(result) {
-
-              expect(context.getAsync.calls.count()).toBe(1);
-              expect(context.getAsync).toHaveBeenCalledWith("f1", keyArgs);
-
-              expect(result).toEqual([F1]);
-            });
-          });
-        });
-      });
-
-      it("should call #getAsync(typeRef) if given an array of special {$type: {ref: typeRef}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-            var typeRef = {};
-
-            spyOn(context, "getAsync").and.callFake(function(typeRef) {
-              return Promise.resolve(F1);
-            });
-
-            var keyArgs = {};
-            return context.resolveAsync([{$type: {ref: typeRef}}], keyArgs).then(function(result) {
-
-              expect(context.getAsync.calls.count()).toBe(1);
-              expect(context.getAsync).toHaveBeenCalledWith(typeRef, keyArgs);
-
-              expect(result).toEqual([F1]);
-            });
-          });
-        });
-      });
-
-      it("should call #getAllAsync(baseTypeId) if given an array of special {$types: {base: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-            var F2 = function() {};
-
-            spyOn(context, "getAllAsync").and.callFake(function(baseTypeId) {
-              return Promise.resolve([F1, F2]);
-            });
-
-            var keyArgs = {};
-            return context.resolveAsync([{$types: {base: "A"}}], keyArgs).then(function(result) {
-
-              expect(context.getAllAsync.calls.count()).toBe(1);
-              expect(context.getAllAsync).toHaveBeenCalledWith("A", keyArgs);
-
-              expect(result).toEqual([[F1, F2]]);
-            });
-          });
-        });
-      });
-
-      it("should call #instances.getByIdAsync(instanceId) if given an array of " +
-          "special {$instance: {id: instanceId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance = {};
-
-            spyOn(context.instances, "getByIdAsync").and.callFake(function(instanceId) {
-              return Promise.resolve(instance);
-            });
-
-            var keyArgs = {};
-            return context.resolveAsync([{$instance: {id: "A"}}], keyArgs).then(function(result) {
-
-              expect(context.instances.getByIdAsync.calls.count()).toBe(1);
-              expect(context.instances.getByIdAsync).toHaveBeenCalledWith("A", keyArgs);
-
-              expect(result).toEqual([instance]);
-            });
-          });
-        });
-      });
-
-      it("should call #instances.getByTypeAsync(baseTypeId) if given an array of " +
-          "special {$instance: {type: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance = {};
-
-            spyOn(context.instances, "getByTypeAsync").and.callFake(function(baseTypeId) {
-              return Promise.resolve(instance);
-            });
-
-            var keyArgs = {};
-            return context.resolveAsync([{$instance: {type: "A"}}], keyArgs).then(function(result) {
-
-              expect(context.instances.getByTypeAsync.calls.count()).toBe(1);
-              expect(context.instances.getByTypeAsync).toHaveBeenCalledWith("A", keyArgs);
-
-              expect(result).toEqual([instance]);
-            });
-          });
-        });
-      });
-
-      it("should call #instances.getAllByTypeAsync(baseTypeId) if given an array of " +
-          "special {$instances: {type: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance1 = {};
-            var instance2 = {};
-
-            spyOn(context.instances, "getAllByTypeAsync").and.callFake(function(baseTypeId) {
-              return Promise.resolve([instance1, instance2]);
-            });
-
-            var keyArgs = {};
-            return context.resolveAsync([{$instances: {type: "A"}}], keyArgs).then(function(result) {
-
-              expect(context.instances.getAllByTypeAsync.calls.count()).toBe(1);
-              expect(context.instances.getAllByTypeAsync).toHaveBeenCalledWith("A", keyArgs);
-
-              expect(result).toEqual([[instance1, instance2]]);
-            });
-          });
-        });
-      });
-      // endregion
-
-      // region object of special form
-      it("should call #getAsync(id) if given a map of special {$type: {id: id}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-
-            spyOn(context, "getAsync").and.callFake(function(typeRef) {
-              switch(typeRef) {
-                case "f1": return Promise.resolve(F1);
-              }
-            });
-
-            var keyArgs = {};
-
-            return context.resolveAsync({a: {$type: {id: "f1"}}}, keyArgs).then(function(result) {
-
-              expect(context.getAsync.calls.count()).toBe(1);
-              expect(context.getAsync).toHaveBeenCalledWith("f1", keyArgs);
-
-              expect(result).toEqual({a: F1});
-            });
-          });
-        });
-      });
-
-      it("should call #getAsync(typeRef) if given a map of special {$type: {ref: typeRef}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-            var typeRef = {};
-
-            spyOn(context, "getAsync").and.callFake(function(typeRef) {
-              return Promise.resolve(F1);
-            });
-
-            var keyArgs = {};
-            return context.resolveAsync({a: {$type: {ref: typeRef}}}, keyArgs).then(function(result) {
-
-              expect(context.getAsync.calls.count()).toBe(1);
-              expect(context.getAsync).toHaveBeenCalledWith(typeRef, keyArgs);
-
-              expect(result).toEqual({a: F1});
-            });
-          });
-        });
-      });
-
-      it("should call #getAllAsync(baseTypeId) if given a map of special {$types: {base: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var F1 = function() {};
-            var F2 = function() {};
-
-            spyOn(context, "getAllAsync").and.callFake(function(baseTypeId) {
-              return Promise.resolve([F1, F2]);
-            });
-
-            var keyArgs = {};
-            return context.resolveAsync({a: {$types: {base: "A"}}}, keyArgs).then(function(result) {
-
-              expect(context.getAllAsync.calls.count()).toBe(1);
-              expect(context.getAllAsync).toHaveBeenCalledWith("A", keyArgs);
-
-              expect(result).toEqual({a: [F1, F2]});
-            });
-          });
-        });
-      });
-
-      it("should call #instances.getByIdAsync(instanceId) if given a map of " +
-          "special {$instance: {id: instanceId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance = {};
-
-            spyOn(context.instances, "getByIdAsync").and.callFake(function(instanceId) {
-              return Promise.resolve(instance);
-            });
-
-            var keyArgs = {};
-            return context.resolveAsync({a: {$instance: {id: "A"}}}, keyArgs).then(function(result) {
-
-              expect(context.instances.getByIdAsync.calls.count()).toBe(1);
-              expect(context.instances.getByIdAsync).toHaveBeenCalledWith("A", keyArgs);
-
-              expect(result).toEqual({a: instance});
-            });
-          });
-        });
-      });
-
-      it("should call #instances.getByTypeAsync(baseTypeId) if given a map of " +
-          "special {$instance: {type: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance = {};
-
-            spyOn(context.instances, "getByTypeAsync").and.callFake(function(baseTypeId) {
-              return Promise.resolve(instance);
-            });
-
-            var keyArgs = {};
-            return context.resolveAsync({a: {$instance: {type: "A"}}}, keyArgs).then(function(result) {
-
-              expect(context.instances.getByTypeAsync.calls.count()).toBe(1);
-              expect(context.instances.getByTypeAsync).toHaveBeenCalledWith("A", keyArgs);
-
-              expect(result).toEqual({a: instance});
-            });
-          });
-        });
-      });
-
-      it("should call #instances.getAllByTypeAsync(baseTypeId) if given a map of " +
-          "special {$instances: {type: baseTypeId}}", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var instance1 = {};
-            var instance2 = {};
-
-            spyOn(context.instances, "getAllByTypeAsync").and.callFake(function(baseTypeId) {
-              return Promise.resolve([instance1, instance2]);
-            });
-
-            var keyArgs = {};
-            return context.resolveAsync({a: {$instances: {type: "A"}}}, keyArgs).then(function(result) {
-
-              expect(context.instances.getAllByTypeAsync.calls.count()).toBe(1);
-              expect(context.instances.getAllByTypeAsync).toHaveBeenCalledWith("A", keyArgs);
-
-              expect(result).toEqual({a: [instance1, instance2]});
-            });
-          });
-        });
-      });
-      // endregion
 
       it("should return an array of types when given an array of type ids", function() {
 
@@ -2386,7 +1745,7 @@ define([
               }
             });
 
-            return context.resolveAsync(["f2", "f1"]).then(function(result) {
+            return context.getDependencyAsync(["f2", "f1"]).then(function(result) {
 
               expect(result).toEqual([F2, F1]);
             });
@@ -2410,16 +1769,237 @@ define([
               }
             });
 
-            return context.resolveAsync({a: "f2", b: "f1"}).then(function(result) {
+            return context.getDependencyAsync({a: "f2", b: "f1"}).then(function(result) {
 
               expect(result).toEqual({a: F2, b: F1});
             });
           });
         });
       });
-    }); // #resolveAsync
 
-    describe("#getAllAsync(baseTypeId, ka)", function() {
+      // region direct special form
+      it("should call #getAllAsync(baseTypeId) if given a special {$types: {base: baseTypeId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var F1 = function() {};
+            var F2 = function() {};
+
+            spyOn(context, "getAllAsync").and.callFake(function(baseTypeId) {
+              return Promise.resolve([F1, F2]);
+            });
+
+            return context.getDependencyAsync({$types: {base: "A"}}).then(function(result) {
+
+              expect(context.getAllAsync.calls.count()).toBe(1);
+              expect(context.getAllAsync).toHaveBeenCalledWith("A");
+
+              expect(result).toEqual([F1, F2]);
+            });
+          });
+        });
+      });
+
+      it("should call #instances.__getSpecial if given a special {$instance: {id: instanceId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var instance = {};
+
+            spyOn(context.instances, "__getSpecial").and.callFake(function() {
+              return Promise.resolve(instance);
+            });
+
+            return context.getDependencyAsync({$instance: {id: "A"}}).then(function(result) {
+
+              expect(context.instances.__getSpecial.calls.count()).toBe(1);
+              expect(context.instances.__getSpecial).toHaveBeenCalledWith({id: "A"}, null, null, false);
+
+              expect(result).toBe(instance);
+            });
+          });
+        });
+      });
+
+      it("should call #instances.__getSpecial if given a special {$instance: {type: baseTypeId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var instance = {};
+
+            spyOn(context.instances, "__getSpecial").and.callFake(function() {
+              return Promise.resolve(instance);
+            });
+
+            return context.getDependencyAsync({$instance: {type: "A"}}).then(function(result) {
+
+              expect(context.instances.__getSpecial.calls.count()).toBe(1);
+              expect(context.instances.__getSpecial).toHaveBeenCalledWith({type: "A"}, null, null, false);
+
+              expect(result).toBe(instance);
+            });
+          });
+        });
+      });
+      // endregion
+
+      // region array of special form
+      it("should call #getAllAsync(baseTypeId) if given an array of special {$types: {base: baseTypeId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var F1 = function() {};
+            var F2 = function() {};
+
+            spyOn(context, "getAllAsync").and.callFake(function(baseTypeId) {
+              return Promise.resolve([F1, F2]);
+            });
+
+            return context.getDependencyAsync([{$types: {base: "A"}}]).then(function(result) {
+
+              expect(context.getAllAsync.calls.count()).toBe(1);
+              expect(context.getAllAsync).toHaveBeenCalledWith("A");
+
+              expect(result).toEqual([[F1, F2]]);
+            });
+          });
+        });
+      });
+
+      it("should call #instances.__getSpecial if given an array of " +
+          "special {$instance: {id: instanceId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var instance = {};
+
+            spyOn(context.instances, "__getSpecial").and.callFake(function() {
+              return Promise.resolve(instance);
+            });
+
+            return context.getDependencyAsync([{$instance: {id: "A"}}]).then(function(result) {
+
+              expect(context.instances.__getSpecial.calls.count()).toBe(1);
+              expect(context.instances.__getSpecial).toHaveBeenCalledWith({id: "A"}, null, null, false);
+
+              expect(result).toEqual([instance]);
+            });
+          });
+        });
+      });
+
+      it("should call #instances.__getSpecial if given an array of " +
+          "special {$instance: {type: baseTypeId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var instance = {};
+
+            spyOn(context.instances, "__getSpecial").and.callFake(function() {
+              return Promise.resolve(instance);
+            });
+
+            return context.getDependencyAsync([{$instance: {type: "A"}}]).then(function(result) {
+
+              expect(context.instances.__getSpecial.calls.count()).toBe(1);
+              expect(context.instances.__getSpecial).toHaveBeenCalledWith({type: "A"}, null, null, false);
+
+              expect(result).toEqual([instance]);
+            });
+          });
+        });
+      });
+      // endregion
+
+      // region object of special form
+      it("should call #getAllAsync(baseTypeId) if given a map of special {$types: {base: baseTypeId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var F1 = function() {};
+            var F2 = function() {};
+
+            spyOn(context, "getAllAsync").and.callFake(function(baseTypeId) {
+              return Promise.resolve([F1, F2]);
+            });
+
+            return context.getDependencyAsync({a: {$types: {base: "A"}}}).then(function(result) {
+
+              expect(context.getAllAsync.calls.count()).toBe(1);
+              expect(context.getAllAsync).toHaveBeenCalledWith("A");
+
+              expect(result).toEqual({a: [F1, F2]});
+            });
+          });
+        });
+      });
+
+      it("should call #instances.__getSpecial if given a map of " +
+          "special {$instance: {id: instanceId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var instance = {};
+
+            spyOn(context.instances, "__getSpecial").and.callFake(function(instanceId) {
+              return Promise.resolve(instance);
+            });
+
+            return context.getDependencyAsync({a: {$instance: {id: "A"}}}).then(function(result) {
+
+              expect(context.instances.__getSpecial.calls.count()).toBe(1);
+              expect(context.instances.__getSpecial)
+                  .toHaveBeenCalledWith({id: "A"}, null, null, false);
+
+              expect(result).toEqual({a: instance});
+            });
+          });
+        });
+      });
+
+      it("should call #instances.__getSpecial if given a map of " +
+          "special {$instance: {type: baseTypeId}}", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            var instance = {};
+
+            spyOn(context.instances, "__getSpecial").and.callFake(function(baseTypeId) {
+              return Promise.resolve(instance);
+            });
+
+            return context.getDependencyAsync({a: {$instance: {type: "A"}}}).then(function(result) {
+
+              expect(context.instances.__getSpecial.calls.count()).toBe(1);
+              expect(context.instances.__getSpecial).toHaveBeenCalledWith({type: "A"}, null, null, false);
+
+              expect(result).toEqual({a: instance});
+            });
+          });
+        });
+      });
+      // endregion
+    }); // #getDependencyAsync
+
+    describe("#getAllAsync(baseTypeId, keyArgs)", function() {
 
       function configRequire(localRequire) {
 
@@ -2500,19 +2080,7 @@ define([
         });
       }
 
-      it("should return a promise", function() {
-
-        return require.using(["pentaho/type/Context"], configRequire, function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var p = context.getAllAsync();
-            expect(p instanceof Promise).toBe(true);
-          });
-        });
-      });
-
-      it("should return all known subtypes of 'pentaho/type/value' by default", function() {
+      it("should return all known subtypes of 'pentaho/type/value'", function() {
 
         return require.using(["require", "pentaho/type/Context"], configRequire, function(localRequire, Context) {
 
@@ -2521,7 +2089,7 @@ define([
             var valueType = context.get("pentaho/type/value").type;
 
             return context
-                .getAllAsync()
+                .getAllAsync("pentaho/type/value")
                 .then(function(InstCtors) {
                   expect(InstCtors instanceof Array).toBe(true);
 
@@ -2552,8 +2120,7 @@ define([
         });
       });
 
-      it("should return all known non-abstract subtypes of 'pentaho/type/value' by default, " +
-         "when isAbstract is false", function() {
+      it("should return all known non-abstract subtypes of 'pentaho/type/value', when isAbstract is false", function() {
 
         return require.using(["require", "pentaho/type/Context"], configRequire, function(localRequire, Context) {
 
@@ -2562,7 +2129,7 @@ define([
             var valueType = context.get("pentaho/type/value").type;
 
             return context
-                .getAllAsync(null, {isAbstract: false})
+                .getAllAsync("pentaho/type/value", {isAbstract: false})
                 .then(function(InstCtors) {
                   expect(InstCtors instanceof Array).toBe(true);
 
@@ -2641,7 +2208,7 @@ define([
       });
     }); // #getAllAsync
 
-    describe("#getAll(baseTypeId, ka)", function() {
+    describe("#getAll(baseTypeId, keyArgs)", function() {
 
       it("should return only subtypes of the specified baseType", function() {
 
@@ -2697,7 +2264,7 @@ define([
             // register
             context.getAsync(ExpBar).then(function() {
 
-              var InstCtors = context.getAll(null, {isBrowsable: false});
+              var InstCtors = context.getAll("pentaho/type/value", {isBrowsable: false});
 
               expect(InstCtors.indexOf(ExpBar) >= 0).toBe(true);
             });
@@ -2718,7 +2285,7 @@ define([
             // register
             context.getAsync(ExpBar).then(function() {
 
-              var InstCtors = context.getAll(null, {isBrowsable: true});
+              var InstCtors = context.getAll("pentaho/type/value", {isBrowsable: true});
 
               expect(InstCtors.indexOf(ExpBar) >= 0).toBe(false);
             });
@@ -2801,7 +2368,7 @@ define([
         return require.using(["pentaho/type/Context", "require"], configRequire, function(Context, localRequire) {
 
           return Context.createAsync().then(function(context) {
-            return context.resolveAsync(["exp/thing", "exp/foo", "exp/bar"])
+            return context.getDependencyAsync(["exp/thing", "exp/foo", "exp/bar"])
                 .then(function() {
 
                   var InstCtors = context.getAll("exp/thing");

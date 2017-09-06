@@ -26,7 +26,7 @@ define([
      * @name pentaho.type.Boolean
      * @class
      * @extends pentaho.type.Simple
-     * @amd {pentaho.type.Factory<pentaho.type.Boolean>} pentaho/type/boolean
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Boolean>} pentaho/type/boolean
      *
      * @classDesc The class of boolean values.
      *

@@ -41,7 +41,7 @@ define([
      * @name pentaho.data.filter.IsIn
      * @class
      * @extends pentaho.data.filter.Property
-     * @amd {pentaho.type.Factory<pentaho.data.filter.IsIn>} pentaho/data/filter/isIn
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.IsIn>} pentaho/data/filter/isIn
      *
      * @classDesc The `IsIn` class represents a membership filter.
      * This filter selects elements in which the value of a certain property belongs to

@@ -49,7 +49,7 @@ define([
        * @class
        * @extends pentaho.type.Property
        *
-       * @amd {pentaho.type.Factory<pentaho.visual.role.Property>} pentaho/visual/role/property
+       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.Property>} pentaho/visual/role/property
        *
        * @classDesc The `Property` class represents a visual role of a visualization and defines its capabilities.
        *
@@ -228,7 +228,7 @@ define([
            *
            * When set to a {@link Nully} value, the set operation is ignored.
            *
-           * Otherwise, the set value is assumed to be an [spec.UTypeReference]{@link pentaho.type.spec.UTypeReference}
+           * Otherwise, the set value is assumed to be an [type reference]{@link pentaho.type.spec.UTypeReference}
            * and is first resolved using [this.context.get]{@link pentaho.type.Context#get}.
            *
            * The root [visual.role.Property]{@link pentaho.visual.role.Property} has
@@ -334,7 +334,7 @@ define([
              *
              * @name isVisualKey
              * @memberOf pentaho.visual.role.Property.Type#
-             * @type {undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
+             * @type {undefined | boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
              *
              * @throws {pentaho.lang.OperationInvalidError} When setting and the type already has
              * [descendant]{@link pentaho.type.Type#hasDescendants} types.

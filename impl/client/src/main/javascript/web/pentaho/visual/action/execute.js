@@ -37,7 +37,7 @@ define([
      * @class
      * @extends pentaho.visual.action.Data
      *
-     * @amd {pentaho.type.Factory<pentaho.visual.action.Execute>} pentaho/visual/action/execute
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.action.Execute>} pentaho/visual/action/execute
      *
      * @classDesc The `Execute` action is a synchronous action that is performed when
      * the user interacts with a visual element, typically by double clicking it.

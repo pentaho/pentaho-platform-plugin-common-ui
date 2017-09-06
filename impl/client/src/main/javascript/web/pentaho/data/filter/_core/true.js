@@ -38,7 +38,7 @@ define([
      * @class
      * @extends pentaho.data.filter.Abstract
      *
-     * @amd {pentaho.type.Factory<pentaho.data.filter.True>} pentaho/data/filter/true
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.True>} pentaho/data/filter/true
      *
      * @classDesc The `True` type represents a filter that encompasses all and any data.
      *

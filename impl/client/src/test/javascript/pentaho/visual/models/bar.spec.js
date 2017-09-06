@@ -32,7 +32,7 @@ define([
       Context.createAsync()
           .then(function(context) {
 
-            return context.applyAsync([
+            return context.getDependencyApplyAsync([
               "pentaho/visual/models/abstract",
               "pentaho/visual/models/bar"
             ], function(_AbstractModel, _BarModel) {

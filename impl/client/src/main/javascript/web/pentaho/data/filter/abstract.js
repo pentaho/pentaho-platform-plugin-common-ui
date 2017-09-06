@@ -62,7 +62,7 @@ define([
      * @class
      * @extends pentaho.type.Complex
      * @abstract
-     * @amd {pentaho.type.Factory<pentaho.data.filter.Abstract>} pentaho/data/filter/abstract
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.Abstract>} pentaho/data/filter/abstract
      *
      * @classDesc The base class of filter types.
      *

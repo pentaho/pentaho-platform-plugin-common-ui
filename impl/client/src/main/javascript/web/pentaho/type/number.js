@@ -26,7 +26,7 @@ define([
      * @name pentaho.type.Number
      * @class
      * @extends pentaho.type.Simple
-     * @amd {pentaho.type.Factory<pentaho.type.Number>} pentaho/type/number
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Number>} pentaho/type/number
      *
      * @classDesc The class of number values.
      *

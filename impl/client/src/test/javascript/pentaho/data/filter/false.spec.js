@@ -44,7 +44,7 @@ define([
               }
             });
 
-            return context.applyAsync([
+            return context.getDependencyApplyAsync([
               "pentaho/data/filter/true",
               "pentaho/data/filter/false"
             ], function(True, False) {

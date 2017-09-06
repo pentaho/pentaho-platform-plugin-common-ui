@@ -49,7 +49,7 @@ define([
               }
             });
 
-            return context.applyAsync([
+            return context.getDependencyApplyAsync([
               "pentaho/data/filter/abstract",
               "pentaho/data/filter/tree"
             ], function(Abstract, Tree) {

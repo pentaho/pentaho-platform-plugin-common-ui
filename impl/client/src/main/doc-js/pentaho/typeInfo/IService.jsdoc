@@ -30,7 +30,8 @@
  * @name configure
  * @memberOf pentaho.typeInfo.IService#
  * @method
- * @param {Object.<string, pentaho.typeInfo.IDeclaration>} [configSpec] - A map of type declarations by their type id.
+ * @param {pentaho.type.spec.Declarations} [configSpec] - A map of type declarations
+ * whose keys are the corresponding type identifiers.
  */
 
 // declareType: function(id, typeDecl)
@@ -42,7 +43,7 @@
  * @memberOf pentaho.typeInfo.IService#
  * @method
  * @param {string} [id] - The id of the type.
- * @param {pentaho.typeInfo.IDeclaration} [decl] - The declaration of the type.
+ * @param {pentaho.typeInfo.spec.IDeclaration} [decl] - The declaration of the type.
  *
  * @throws {pentaho.lang.ArgumentInvalidError} When a type with the given `id` is already defined.
  */

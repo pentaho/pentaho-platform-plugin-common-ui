@@ -85,7 +85,7 @@ npm install
             Context.createAsync({application: "viz-api-sandbox"})
                .then(function(context) {
                  // Get the calc model and base view types
-                 return context.resolveAsync({
+                 return context.getDependencyAsync({
                     CalcModel: "pentaho/visual/samples/calc/model",
                     BaseView: "pentaho/visual/base/view"
                  });

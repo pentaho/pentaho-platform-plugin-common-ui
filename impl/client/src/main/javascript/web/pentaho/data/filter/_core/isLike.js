@@ -35,7 +35,7 @@ define([
      * @name pentaho.data.filter.IsLike
      * @class
      * @extends pentaho.data.filter.Property
-     * @amd {pentaho.type.Factory<pentaho.data.filter.IsLike>} pentaho/data/filter/isLike
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.IsLike>} pentaho/data/filter/isLike
      *
      * @classDesc The `IsLike` class represents a simple string matching filter.
      * This filter selects elements having the formatted value match an affix

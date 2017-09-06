@@ -18,17 +18,18 @@ define([
   "module",
   "../typeInfo",
   "../i18n!types",
-  "./changes/Transaction",
-  "./changes/TransactionScope",
-  "./changes/CommittedScope",
   "../lang/Base",
+  "../lang/SortedList",
   "../util/promise",
   "../util/arg",
   "../util/error",
   "../util/object",
-  "../util/fun"
-], function(localRequire, module, service, typeInfo, bundle,
-            Base, promiseUtil, arg, error, O, F) {
+  "../util/fun",
+  "../debug",
+  "../debug/Levels",
+  "../util/logger"
+], function(localRequire, module, typeInfo, bundle, Base, SortedList,
+            promiseUtil, arg, error, O, F, debugMgr, DebugLevels, logger) {
 
   "use strict";
 
@@ -58,15 +59,18 @@ define([
 
     constructor: function(id, container, spec) {
       if(!id) throw error.argRequired("id");
-      if(!spec) throw error.argRequired("instances['" + id + "]'");
+      if(!spec) throw error.argRequired("instances['" + id + "']");
 
       this.index = __nextInstanceIndex++;
 
       // Set on construction.
       this.container = container;
 
-      this.typeId = spec.type;
-      if(!this.typeId) throw error.argRequired("instances['" + id + "'].type");
+      var typeId = spec.type;
+      if(!typeId) throw error.argRequired("instances['" + id + "'].type");
+
+      // Convert an alias to its id.
+      this.typeId = typeInfo.getIdOf(typeId) || typeId;
 
       this.id = id;
       this.priority = +spec.priority || 0;
@@ -127,7 +131,7 @@ define([
       ];
 
       if(deps && deps.length) {
-        allPromises.push(this.container.context.resolveAsync(deps));
+        allPromises.push(this.container.context.getDependencyAsync(deps));
       }
 
       return Promise.all(allPromises).then(this.__createFromFactoryAsync.bind(this, factory));
@@ -164,10 +168,18 @@ define([
         me.instance = instance;
         me.error = null;
 
+        if(debugMgr.testLevel(DebugLevels.info, module)) {
+          logger.info("Loaded named instance '" + me.id + "'.");
+        }
+
         return instance;
       })["catch"](function(ex) {
         me.instance = null;
         me.error = ex;
+
+        if(debugMgr.testLevel(DebugLevels.error, module)) {
+          logger.error("Error loading named instance '" + me.id + "': " + ex);
+        }
 
         return Promise.reject(ex);
       });
@@ -187,7 +199,7 @@ define([
      *
      * @constructor
      * @param {!pentaho.type.Context} context - The associated type context.
-     * @param {pentaho.type.spec.IInstancesContainer} spec - The container specification.
+     * @param {pentaho.type.spec.InstancesContainer} spec - The container specification.
      */
     constructor: function(context, spec) {
 
@@ -218,6 +230,11 @@ define([
        */
       this.__instancesByType = {};
 
+      // Caches
+      this.__Number = null;
+      this.__Boolean = null;
+      this.__String = null;
+
       // Initialize from given specification
       if(spec) {
         this.configure(spec);
@@ -237,34 +254,26 @@ define([
     /**
      * Configures the instance container with the given specification.
      *
-     * @param {pentaho.type.spec.IInstancesContainer} spec - The container specification.
-     * @return {!pentaho.type.InstanceContainer} This instance container.
+     * @param {pentaho.type.spec.InstancesContainer} spec - The container specification.
+     * @return {!pentaho.type.InstancesContainer} This instance container.
      */
     configure: function(spec) {
-      O.eachOwn(spec, function(spec, id) { this.__define(id, spec, /* noSort: */true); }, this);
 
-      O.eachOwn(this.__instancesByType, function(holders) { this.__sortHolders(holders); }, this);
+      O.eachOwn(spec, function(spec, id) { this.declare(id, spec); }, this);
 
       return this;
     },
 
     // region define
     /**
-     * Defines an instance with a given identifier and container specification.
+     * Declares an instance with a given identifier and container specification.
      *
      * @param {string} id - The instance identifier.
      * @param {object} instanceSpec — The instance's container specification.
      *
-     * @return {!pentaho.type.InstanceContainer} This instance container.
+     * @return {!pentaho.type.InstancesContainer} This instance container.
      */
-    define: function(id, instanceSpec) {
-
-      this.__define(id, instanceSpec);
-
-      return this;
-    },
-
-    __define: function(id, instanceSpec, noSort) {
+    declare: function(id, instanceSpec) {
 
       if(O.getOwn(this.__instanceById, id))
         throw error.argInvalid("id", "An instance with identifier '" + id + "' is already defined.");
@@ -273,22 +282,12 @@ define([
 
       this.__instanceById[holder.id] = holder;
 
-      var holders = (this.__instancesByType[holder.typeId] || (this.__instancesByType[holder.typeId] = []));
+      var holders = (this.__instancesByType[holder.typeId] ||
+          (this.__instancesByType[holder.typeId] = new SortedList({comparer: __holderComparer})));
 
       holders.push(holder);
 
-      if(!noSort) {
-        this.__sortHolders(holders);
-      }
-    },
-
-    __sortHolders: function(holders) {
-      if(holders.length > 1) {
-        // By Descending priority and then By Ascending definition index.
-        holders.sort(function(holderA, holderB) {
-          return F.compare(holderB.priority, holderA.priority) || F.compare(holderA.index, holderB.index);
-        });
-      }
+      return this;
     },
     // endregion
 
@@ -335,7 +334,7 @@ define([
      * @return {!pentaho.type.Instance} The requested instance.
      *
      * @throws {pentaho.lang.ArgumentRequiredError} When `id` is an empty string or {@link Nully}.
-     * @throws {pentaho.lang.ArgumentInvalidError} When `id` is not the identifier of a defined instance.
+     * @throws {pentaho.lang.OperationInvalidError} When `id` is not the identifier of a defined instance.
      * @throws {pentaho.lang.OperationInvalidError} When the requested instance has not been loaded yet.
      *
      * @throws {Error} When the requested instance or its type are not defined as a module in the AMD module system.
@@ -349,7 +348,7 @@ define([
       // Check if there is an instance holder for it.
       var holder = O.getOwn(this.__instanceById, id);
       if(!holder) {
-        throw error.argInvalid("id", "An instance with identifier '" + id + "' is not defined.");
+        throw error.operInvalid("An instance with identifier '" + id + "' is not defined.");
       }
 
       if(!holder.isFinished) {
@@ -382,24 +381,10 @@ define([
 
       if(!baseTypeId) return Promise.reject(error.argRequired("baseTypeId"));
 
-      if(O.getOwn(keyArgs, "filter")) {
-        // Loads all instances of type and then filters.
-        return this.__getAllByTypeAsync(baseTypeId, keyArgs).then(function(instances) {
-          return instances.length ? instances[0] : null;
-        });
-      }
-
-      // Load the first registered instance, only.
-      var holders = O.getOwn(this.__instancesByType, baseTypeId);
-      if(holders) {
-        return holders[0].promise;
-      }
-
-      if(O.getOwn(keyArgs, "isRequired")) {
-        return Promise.reject(error.operInvalid("There is no defined matching instance of type '" + baseTypeId + "'."));
-      }
-
-      return Promise.resolve(null);
+      // Loads all instances of type and then filters.
+      return this.__getAllByTypeAsync(baseTypeId, keyArgs).then(function(instances) {
+        return instances.length ? instances[0] : null;
+      });
     },
 
     /**
@@ -440,7 +425,7 @@ define([
      */
     getByType: function(baseTypeId, keyArgs) {
 
-      if(!baseTypeId) return error.argRequired("baseTypeId");
+      if(!baseTypeId) throw error.argRequired("baseTypeId");
 
       var holders = this.__getHolders(baseTypeId);
       if(holders) {
@@ -457,7 +442,7 @@ define([
       }
 
       if(O.getOwn(keyArgs, "isRequired")) {
-        throw this.__createRequiredError(baseTypeId);
+        throw this.__createNoInstancesOfTypeError(baseTypeId);
       }
 
       return null;
@@ -479,74 +464,414 @@ define([
      */
     getAllByType: function(baseTypeId, keyArgs) {
 
-      if(!baseTypeId) return error.argRequired("baseTypeId");
+      if(!baseTypeId) throw error.argRequired("baseTypeId");
 
       var filter = O.getOwn(keyArgs, "filter");
 
       var holders = this.__getHolders(baseTypeId);
       if(holders) {
-        holders = holders.filter(function(holder) {
-          return !!holder.instance && (!filter || filter(holder.instance));
-        });
+        var instances = holders
+            .map(function(holder) {
+              // NotLoaded/Failed instances return null.
+              return holder.instance;
+            })
+            .filter(function(instance) {
+              return !!instance && (!filter || filter(instance));
+            });
 
-        if(holders.length) {
-          return holders;
+        if(instances.length) {
+          return instances;
         }
       }
 
       if(O.getOwn(keyArgs, "isRequired")) {
-        throw this.__createRequiredError(baseTypeId);
+        throw this.__createNoInstancesOfTypeError(baseTypeId);
       }
 
       return [];
     },
 
     __getAllByTypeAsync: function(baseTypeId, keyArgs) {
+
       var promiseAll;
+      var isRequired = O.getOwn(keyArgs, "isRequired");
+
       var holders = this.__getHolders(baseTypeId);
       if(holders) {
-        promiseAll = Promise.all(holders.map(function(holder) { return holder.promise; }));
-
         var filter = O.getOwn(keyArgs, "filter");
-        if(filter) {
-          promiseAll = promiseAll.then(function(instances) { return instances.filter(filter); });
-        }
-      } else {
-        promiseAll = Promise.resolve([]);
-      }
+        var me = this;
 
-      if(O.getOwn(keyArgs, "isRequired")) {
-        promiseAll = promiseAll.then(function(instances) {
-          if(!instances.length) {
-            return Promise.reject(this.__createRequiredError(baseTypeId));
+        promiseAll = Promise.all(holders.map(function(holder) {
+          // Convert failed instances to null
+          return holder.promise["catch"](function() { return null; });
+        }))
+        .then(function(instances) {
+          instances = instances.filter(function(instance) {
+            return !!instance && (!filter || filter(instance));
+          });
+
+          if(isRequired && !instances.length) {
+            return Promise.reject(me.__createNoInstancesOfTypeError(baseTypeId));
           }
 
           return instances;
         });
+
+      } else if(isRequired) {
+        promiseAll = Promise.reject(this.__createNoInstancesOfTypeError(baseTypeId));
+      } else {
+        promiseAll = Promise.resolve([]);
       }
 
       return promiseAll;
     },
 
     // Holders are already sorted by priority.
+    // It is assumed that the resulting array cannot be modified/made public.
     __getHolders: function(baseTypeId) {
 
-      // TODO: Get, from typeInfo, all types that descend from baseTypeId.
+      var instsByType = this.__instancesByType;
 
-      return O.getOwn(this.__instancesByType, baseTypeId);
+      // Also automatically converts aliases to full type ids
+      var typeIds = typeInfo.getSubtypesOf(baseTypeId, {includeSelf: true, includeDescendants: true}) || [baseTypeId];
+      var hasCloned = false;
+
+      return typeIds.reduce(function(holders, typeId) {
+        var holdersOfType = O.getOwn(instsByType, typeId);
+        if(holdersOfType) {
+          if(holders) {
+            // Don't modify a list stored in __instancesByType.
+            if(!hasCloned) {
+              hasCloned = true;
+              var holdersClone = new SortedList({comparer: __holderComparer});
+              holdersClone.addMany(holders);
+              holders = holdersClone;
+            }
+
+            holders.addMany(holdersOfType);
+          } else {
+            // Use same instance if possible.
+            holders = holdersOfType;
+          }
+        }
+
+        return holders;
+      }, null);
     },
 
-    __createRequiredError: function(baseTypeId) {
+    __createNoInstancesOfTypeError: function(baseTypeId) {
       return error.operInvalid("There is no defined matching instance of type '" + baseTypeId + "'.");
     },
     // endregion
 
-    getAsync: function(instSpec) {
+    // region get, getAsync
+    /**
+     * Resolves an instance reference, asynchronously.
+     *
+     * This method can be used for:
+     *
+     * * creating a new instance - when given an [instance specification]{@link pentaho.type.spec.UInstance}
+     * * resolving instances from the instances' container -
+     *   when given a [resolve instance specification]{@link pentaho.type.spec.IInstanceResolve}.
+     *
+     * @param {pentaho.type.spec.UInstanceReference} [instRef] - An instance reference.
+     *
+     * @param {Object} [instKeyArgs] - The keyword arguments passed to the instance constructor, when one is created.
+     * @param {pentaho.type.Type} [typeBase] - The base type of which returned instances must be an instance and,
+     * also, the default type used when type information is not available in `instRef`.
+     *
+     * @return {!Promise.<pentaho.type.Instance>} A promise to an instance.
+     *
+     * @rejects {pentaho.lang.OperationInvalidError} When it is not possible to determine the type of instance to create
+     * based on `instRef` and `baseType` is not specified.
+     *
+     * @rejects {pentaho.lang.OperationInvalidError} When an instance should be created but its determined type
+     * is [abstract]{@link pentaho.type.Value.Type#isAbstract}.
+     *
+     * @rejects {pentaho.lang.OperationInvalidError} When the special "resolve instance by type" syntax is used
+     * but it is not possible to determine the type to resolve against and `baseType` is not specified.
+     *
+     * @rejects {pentaho.lang.OperationInvalidError} When the special "resolve instance by type" syntax is used
+     * but the corresponding "element type" is an anonymous type.
+     *
+     * @rejects {pentaho.lang.OperationInvalidError} When the type of the resolved value is not a subtype of `typeBase`.
+     *
+     * @rejects {Error} Other errors, as documented in:
+     * [Context#get]{@link pentaho.type.Context#get},
+     * [Context#getDependencyAsync]{@link pentaho.type.Context#getDependencyAsync},
+     * [get]{@link pentaho.type.InstancesContainer#get},
+     * [getByIdAsync]{@link pentaho.type.InstancesContainer#getByIdAsync} and
+     * [getByTypeAsync]{@link pentaho.type.InstancesContainer#getByTypeAsync}.
+     *
+     * @see pentaho.type.InstancesContainer#get
+     * @see pentaho.type.Type#createAsync
+     */
+    getAsync: function(instRef, instKeyArgs, typeBase) {
 
+      if(instRef && typeof instRef === "object") {
+
+        // 1. A special $instance form
+        if(instRef.constructor === Object && instRef.$instance) {
+          return this.__getSpecial(instRef.$instance, instKeyArgs, typeBase, /* sync: */ false);
+        }
+
+        // Follow the generic path of loading all found dependencies first and calling `get` later.
+
+        var depRefs = this.__getDependencyRefs(instRef);
+        if(depRefs.length) {
+          // 2. Resolve dependencies first and only then use the synchronous get method.
+          return this.context
+              .getDependencyAsync(depRefs)
+              .then(getSync.bind(this));
+        }
+      }
+
+      // 3. No dependencies. Yet, behave asynchronously as requested.
+      return promiseUtil.wrapCall(getSync, this);
+
+      function getSync() {
+        return this.get(instRef, instKeyArgs, typeBase);
+      }
     },
 
-    getAllAsync: function(typeSpec) {
+    /**
+     * Resolves an instance reference.
+     *
+     * This method can be used for:
+     *
+     * * creating a new instance - when given an [instance specification]{@link pentaho.type.spec.UInstance}
+     * * resolving instances from the instances' container -
+     *   when given a [resolve instance specification]{@link pentaho.type.spec.IInstanceResolve}.
+     *
+     * @param {pentaho.type.spec.UInstanceReference} [instRef] - An instance reference.
+     *
+     * @param {Object} [instKeyArgs] - The keyword arguments passed to the instance constructor, when one is created.
+     * @param {pentaho.type.Type} [typeBase] - The base type of which returned instances must be an instance and,
+     * also, the default type used when type information is not available in `instRef`.
+     *
+     * @return {pentaho.type.Instance} An instance, or `null`
+     *
+     * @throws {pentaho.lang.OperationInvalidError} When it is not possible to determine the type of instance to create
+     * based on `instRef` and `baseType` is not specified.
+     *
+     * @throws {pentaho.lang.OperationInvalidError} When an instance should be created but its determined type
+     * is [abstract]{@link pentaho.type.Value.Type#isAbstract}.
+     *
+     * @throws {pentaho.lang.OperationInvalidError} When the special "resolve instance by type" syntax is used
+     * but it is not possible to determine the type to resolve against and `baseType` is not specified.
+     *
+     * @throws {pentaho.lang.OperationInvalidError} When the special "resolve instance by type" syntax is used
+     * but the corresponding "element type" is an anonymous type.
+     *
+     * @throws {pentaho.lang.OperationInvalidError} When the type of the resolved value is not a subtype of `typeBase`.
+     *
+     * @throws {Error} Other errors, as documented in:
+     * [Context#get]{@link pentaho.type.Context#get},
+     * [getById]{@link pentaho.type.InstancesContainer#getById} and
+     * [getByType]{@link pentaho.type.InstancesContainer#getByType}.
+     *
+     * @see pentaho.type.InstancesContainer#getAsync
+     * @see pentaho.type.Type#create
+     */
+    get: function(instRef, instKeyArgs, typeBase) {
 
+      var InstCtor;
+      var typeRef;
+
+      // Find either a special $instance or a specific InstCtor or fail
+
+      if(instRef && typeof instRef === "object" && instRef.constructor === Object) {
+
+        // 1. A special instance
+        if(instRef.$instance) {
+          return this.__getSpecial(instRef.$instance, instKeyArgs, typeBase, /* sync: */ true);
+        }
+
+        // 2. Type in inline type property {_: "type"}
+        if((typeRef = instRef._)) {
+          InstCtor = this.__context.get(typeRef);
+
+          var type = InstCtor.type;
+          if(typeBase) typeBase.__assertSubtype(type);
+
+          if(type.isAbstract) { type.__throwAbstractType(); }
+        }
+      }
+
+      // 3. Default the type from one of String, Number, or Boolean,
+      //    if one of these is the type of `instRef` and typeBase is respected.
+      if(!InstCtor) {
+        if(!typeBase || typeBase.isAbstract) {
+
+          /* eslint default-case: 0 */
+          switch(typeof instRef) {
+            case "string": InstCtor = this.__String || (this.__String = this.__context.get("string")); break;
+            case "number": InstCtor = this.__Number || (this.__Number = this.__context.get("number")); break;
+            case "boolean": InstCtor = this.__Boolean || (this.__Boolean = this.__context.get("boolean")); break;
+          }
+
+          // Must still respect the base type.
+          if(InstCtor && typeBase && !InstCtor.type.isSubtypeOf(typeBase)) { InstCtor = null; }
+
+          if(!InstCtor) {
+            if(typeBase) {
+              typeBase.__throwAbstractType();
+            } else {
+              throw error.operInvalid("Cannot create instance of unspecified type.");
+            }
+          }
+
+          // These types are never abstract
+        } else {
+          InstCtor = typeBase.instance.constructor;
+        }
+      }
+
+      // assert InstCtor
+
+      return new InstCtor(instRef, instKeyArgs);
+    },
+
+    __getSpecial: function(specialSpec, instKeyArgs, typeDefault, sync) {
+
+      var value;
+
+      if((value = specialSpec.id)) {
+        // specialSpec: {id}
+
+        // Always required.
+        return sync
+            ? this.getById(value)
+            : this.getByIdAsync(value);
+      }
+
+      if((value = specialSpec.type || typeDefault)) {
+        // specialSpec: {type, isRequired, filter}
+
+        // (Async) Take care not to `context.get` a type given as a string (or an array-wrapped one)
+        // as these may not be loaded. Always calling context.get does not do.
+        // In the end, note that only identified element types are supported.
+
+        var elemTypeId;
+        var listType;
+        var isList;
+
+        // "elemTypeId"
+        // ["elemTypeId"]
+        // [elementTypeInstance]
+        // elementTypeInstance
+        // listTypeInstance
+        if(typeof value === "string") {
+          isList = false;
+          elemTypeId = value;
+        } else if(Array.isArray(value)) {
+          isList = true;
+          value = value[0];
+          if(typeof value === "string") {
+            elemTypeId = value;
+          } else {
+            // better not be a list type...
+            elemTypeId = this.__context.get(value).type.id;
+          }
+        } else {
+          // Assume a typeRef of some kind
+          var type = this.__context.get(value).type;
+          if(type.isList) {
+            isList = true;
+            listType = type;
+            elemTypeId = type.of.id;
+          } else {
+            isList = false;
+            elemTypeId = type.id;
+          }
+        }
+
+        if(!elemTypeId) {
+          return promiseUtil.error(error.operInvalid("Cannot resolve instance for an anonymous type."), sync);
+        }
+
+        if(isList) {
+          // Must load the list type, even if there are 0 results...
+
+          var context = this.__context;
+
+          var getListCtor = function() {
+            if(!listType) {
+              return context.__get([elemTypeId], /* defaultBase: */null, sync);
+            }
+
+            var ListCtor = listType.instance.constructor;
+
+            return promiseUtil["return"](ListCtor, sync);
+          };
+
+          var createList = function(ListCtor, results) {
+            return new ListCtor(results, instKeyArgs);
+          };
+
+          if(sync) {
+            return createList(getListCtor(), this.getAllByType(elemTypeId, specialSpec));
+          }
+
+          return Promise.all([getListCtor(), this.getAllByTypeAsync(elemTypeId, specialSpec)])
+              .then(function(values) {
+                return createList(values[0], values[1]);
+              });
+        }
+
+        return sync
+            ? this.getByType(elemTypeId, specialSpec)
+            : this.getByTypeAsync(elemTypeId, specialSpec);
+      }
+
+      return promiseUtil.error(error.operInvalid("Cannot resolve instance for an unspecified type."), sync);
+    },
+    // endregion
+
+    // region dependency references
+    __getDependencyRefs: function(instRef) {
+      var depIdsSet = {};
+      var depRefs = [];
+      __collectDependencyRefsRecursive.call(this, instRef, depIdsSet, depRefs);
+
+      return depRefs;
+    },
+
+    __collectDependencyRefs: function(instRef, depIdsSet, depRefs) {
+      __collectDependencyRefsRecursive.call(this, instRef, depIdsSet, depRefs);
     }
+    // endregion
   });
+
+  // By Descending priority and then By Ascending definition index.
+  function __holderComparer(holderA, holderB) {
+    return F.compare(holderB.priority, holderA.priority) || F.compare(holderA.index, holderB.index);
+  }
+
+  function __collectDependencyRefsRecursive(instRef, depIdsSet, depRefs) {
+    if(instRef && typeof instRef === "object") {
+      __collectDependencyRefsObjectRecursive.call(this, instRef, depIdsSet, depRefs);
+    }
+  }
+
+  function __collectDependencyRefsObjectRecursive(instRef, depIdsSet, depRefs) {
+    if(Array.isArray(instRef)) {
+      instRef.forEach(function(elemRef) {
+        __collectDependencyRefsRecursive.call(this, elemRef, depIdsSet, depRefs);
+      }, this);
+    } else if(instRef.constructor === Object) {
+      if(instRef.$instance) {
+        depRefs.push(instRef);
+      } else {
+        Object.keys(instRef).forEach(function(name) {
+          var elemRef = instRef[name];
+          if(name === "_") {
+            this.__context.__collectDependencyRefs(elemRef, depIdsSet, depRefs);
+          } else {
+            __collectDependencyRefsRecursive.call(this, elemRef, depIdsSet, depRefs);
+          }
+        }, this);
+      }
+    }
+  }
 });

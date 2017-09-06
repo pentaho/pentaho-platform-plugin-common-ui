@@ -25,9 +25,9 @@
  * * {@link pentaho.type.Property.Type#countMin}
  * * {@link pentaho.type.Property.Type#countMax}
  *
- * @callback pentaho.type.PropertyDynamicAttribute
+ * @callback pentaho.type.spec.PropertyDynamicAttribute
  * @template T
  * @this pentaho.type.Complex
- * @param {pentaho.type.Property.Type} propType - The property type being evaluated.
+ * @param {!pentaho.type.Property.Type} propType - The property type being evaluated.
  * @return {T} The calculated attribute's value.
  */

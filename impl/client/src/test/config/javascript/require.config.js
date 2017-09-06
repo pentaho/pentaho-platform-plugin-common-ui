@@ -10,7 +10,6 @@
   var requirePaths    = requireCfg.paths;
   var requireShim     = requireCfg.shim;
   var requireMap      = requireCfg.map;
-  var requirePackages = requireCfg.packages;
   var requireTypes    = requireCfg.config["pentaho/service"];
   var requireTypeInfo = requireCfg.config["pentaho/typeInfo"];
 

@@ -28,7 +28,7 @@ define([
      * @extends pentaho.type.String
      * @extends pentaho.type.mixins.DiscreteDomain
      *
-     * @amd {pentaho.type.Factory<pentaho.visual.role.Aggregation>} pentaho/visual/role/aggregation
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.Aggregation>} pentaho/visual/role/aggregation
      *
      * @classDesc The `Aggregation` class is [String]{@link pentaho.type.String} based enumeration
      * that represents an **aggregation** operation.

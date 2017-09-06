@@ -50,7 +50,7 @@ define([
        * @extends pentaho.type.action.Base
        * @abstract
        *
-       * @amd {pentaho.type.Factory<pentaho.visual.action.Base>} pentaho/visual/action/base
+       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.action.Base>} pentaho/visual/action/base
        *
        * @classDesc The `visual.action.Base` class is the base class of action types
        * which are performed on a point whose [target]{@link pentaho.visual.action.Base#target}

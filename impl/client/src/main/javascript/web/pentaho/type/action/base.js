@@ -124,7 +124,7 @@ define([
        * @extends pentaho.type.Element
        * @abstract
        *
-       * @amd {pentaho.type.Factory<pentaho.type.action.Base>} pentaho/type/action/base
+       * @amd {pentaho.type.spec.UTypeModule<pentaho.type.action.Base>} pentaho/type/action/base
        *
        * @classDesc The `action.Base` class represents a certain model of actions.
        *

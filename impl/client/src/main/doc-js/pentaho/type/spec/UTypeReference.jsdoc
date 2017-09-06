@@ -15,7 +15,7 @@
  */
 
 /**
- * The `spec.UTypeReference` union represents the set of JS types that can be used to reference a type.
+ * The `spec.UTypeReference` union represents the set of JS types that can be used to reference one type.
  *
  * It can be one of the following:
  *
@@ -163,7 +163,6 @@
  * ```
  *
  * @typedef {nonEmptyString|
- *           pentaho.type.Factory<pentaho.type.Instance>|
  *           pentaho.type.Type|
  *           Class.<pentaho.type.Instance>|
  *           Array.<pentaho.type.spec.UTypeReference>|

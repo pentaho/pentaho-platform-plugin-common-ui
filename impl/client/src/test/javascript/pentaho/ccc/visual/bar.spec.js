@@ -36,7 +36,7 @@ define([
 
             context = _context;
 
-            return context.applyAsync([
+            return context.getDependencyApplyAsync([
               "pentaho/visual/models/bar",
               "pentaho/ccc/visual/bar",
               "pentaho/ccc/visual/abstract"

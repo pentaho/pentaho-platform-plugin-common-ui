@@ -18,7 +18,7 @@ define([
       Context.createAsync()
           .then(function(context) {
 
-            return context.applyAsync([
+            return context.getDependencyApplyAsync([
               "pentaho/visual/base/model",
               "pentaho/visual/role/mapping"
             ], function(_Model, _Mapping) {

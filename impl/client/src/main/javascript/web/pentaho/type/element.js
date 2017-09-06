@@ -41,7 +41,7 @@ define([
      * @name pentaho.type.Element
      * @class
      * @extends pentaho.type.Value
-     * @amd {pentaho.type.Factory<pentaho.type.Element>} pentaho/type/element
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Element>} pentaho/type/element
      *
      * @classDesc The base class of singular values.
      *

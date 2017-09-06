@@ -34,7 +34,6 @@
   var requirePaths = requireCfg.paths;
   var requireShim = requireCfg.shim;
   var requireMap = requireCfg.map;
-  var requirePackages = requireCfg.packages;
 
   // TODO: This fallback logic is temporary, and can be removed when the remaining
   //    parts of the system rename the "service" plugin id to "pentaho/service".

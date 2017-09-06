@@ -38,7 +38,7 @@ define([
      * @class
      * @extends pentaho.data.filter.Abstract
      *
-     * @amd {pentaho.type.Factory<pentaho.data.filter.False>} pentaho/data/filter/true
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.False>} pentaho/data/filter/true
      *
      * @classDesc The `False` type represents a filter that encompasses no data.
      *

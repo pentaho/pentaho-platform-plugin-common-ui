@@ -26,7 +26,7 @@ define([
      * @name pentaho.type.String
      * @class
      * @extends pentaho.type.Simple
-     * @amd {pentaho.type.Factory<pentaho.type.String>} pentaho/type/string
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.String>} pentaho/type/string
      *
      * @classDesc The class of textual values.
      *

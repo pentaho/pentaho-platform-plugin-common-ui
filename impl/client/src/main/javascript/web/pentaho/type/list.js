@@ -47,7 +47,7 @@ define([
      * @extends pentaho.type.Value
      * @extends pentaho.type.mixins.Container
      *
-     * @amd {pentaho.type.Factory<pentaho.type.List>} pentaho/type/list
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.List>} pentaho/type/list
      *
      * @classDesc The base class of plural values.
      *

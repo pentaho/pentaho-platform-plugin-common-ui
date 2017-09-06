@@ -57,7 +57,7 @@ define([
      * @extends pentaho.type.Element
      * @extends pentaho.type.mixins.Container
      *
-     * @amd {pentaho.type.Factory<pentaho.type.Complex>} pentaho/type/complex
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Complex>} pentaho/type/complex
      *
      * @classDesc The base class of structured values.
      *

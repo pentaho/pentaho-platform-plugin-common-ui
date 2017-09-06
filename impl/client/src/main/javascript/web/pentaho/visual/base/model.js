@@ -45,7 +45,7 @@ define([
        * @extends pentaho.type.Model
        * @abstract
        *
-       * @amd {pentaho.type.Factory<pentaho.visual.base.Model>} pentaho/visual/base/model
+       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.base.Model>} pentaho/visual/base/model
        *
        * @classDesc The `Model` class is the abstract base class of visualization models.
        *

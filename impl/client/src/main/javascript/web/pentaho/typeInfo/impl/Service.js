@@ -42,7 +42,7 @@ define([
       /**
        * A map of type declarations by type id and alias.
        *
-       * @type {Object.<string, pentaho.typeInfo.IDeclaration>}
+       * @type {Object.<string, pentaho.typeInfo.spec.IDeclaration>}
        * @private
        */
       this.__declById = {};
