@@ -235,6 +235,39 @@ define([
       this.__Boolean = null;
       this.__String = null;
 
+      /**
+       * Indicates that a container instance is not being created.
+       *
+       * Set and unset by the top-most container of a creation operation.
+       *
+       * The set of two properties: `__isNotCreating` and `__reservations` achieves
+       * the minimum code-path and memory use.
+       *
+       * See the code in the {@link pentaho.type.Complex} and {@link pentaho.type.List} constructors,
+       * managing `__isNotCreating` and `__reservations`.
+       *
+       * Also see the code that actually uses these in {@link pentaho.type.InstancesContainer#get}.
+       *
+       * @type {boolean}
+       * @private
+       */
+      this.__isNotCreating = true;
+
+      /**
+       * The set of tree-level reserved containers,
+       * indexed by {@link pentaho.type.mixins.Container#$uid}.
+       *
+       * If a type is in the map, then:
+       * * used - value 1
+       * * reserved - value 2
+       *
+       * Lazily created by {@link pentaho.type.InstancesContainer#__getFilterAndReserve}.
+       *
+       * @type {Object.<string, number>}
+       * @private
+       */
+      this.__reservations = null;
+
       // Initialize from given specification
       if(spec) {
         this.configure(spec);
@@ -331,17 +364,24 @@ define([
      * An instance can only be requested synchronously if it has already been requested asynchronously before.
      *
      * @param {string} id - The instance identifier.
-     * @return {!pentaho.type.Instance} The requested instance.
+     * @param {Object} [keyArgs] - The keyword arguments.
+     * @param {pentaho.type.spec.InstanceReservation} [keyArgs.reservation="none"] - Indicates that the returned
+     * instance should become reserved in a certain way.
+     * @param {boolean} [keyArgs.isRequired=false] - Indicates that an error should be thrown if there is no matching
+     * result.
+     *
+     * @return {pentaho.type.Instance} The requested instance, or `null`, when reserved.
      *
      * @throws {pentaho.lang.ArgumentRequiredError} When `id` is an empty string or {@link Nully}.
      * @throws {pentaho.lang.OperationInvalidError} When `id` is not the identifier of a defined instance.
      * @throws {pentaho.lang.OperationInvalidError} When the requested instance has not been loaded yet.
-     *
-     * @throws {Error} When the requested instance or its type are not defined as a module in the AMD module system.
+     * @throws {pentaho.lang.OperationInvalidError} When the requested instance is reserved and `keyArgs.isRequired`
+     * is specified as `true`.
      * @throws {pentaho.lang.OperationInvalidError} When the requested instance's AMD module did not return
      * an instance of the defined type.
+     * @throws {Error} When the requested instance or its type are not defined as a module in the AMD module system.
      */
-    getById: function(id) {
+    getById: function(id, keyArgs) {
 
       if(!id) throw error.argRequired("id");
 
@@ -355,8 +395,20 @@ define([
         throw error.operInvalid("The instance with identifier '" + id + "' has not been loaded yet.");
       }
 
-      if(holder.instance)
-        return holder.instance;
+      var instance = holder.instance;
+      if(instance) {
+
+        var filterAndReserve = this.__getFilterAndReserve(keyArgs, /* noFilter: */true);
+        if(filterAndReserve(instance)) {
+          return instance;
+        }
+
+        if(O.getOwn(keyArgs, "isRequired")) {
+          throw error.operInvalid("The instance of id '" + id + "' is reserved.");
+        }
+
+        return null;
+      }
 
       throw holder.error;
     },
@@ -366,7 +418,9 @@ define([
     /**
      * Gets a promise for the first instance of the given type and that, optionally, matches a specified filter.
      *
-     * @param {string} baseTypeId - The identifier of the base type.
+     * @param {string|Class.<pentaho.type.Instance>|pentaho.type.Type} baseTypeId - The identifier of the base type or
+     * the instance constructor or type of an identified type.
+     *
      * @param {Object} [keyArgs] - The keyword arguments.
      * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
      * whether an instance can be the result.
@@ -376,21 +430,27 @@ define([
      * @return {!Promise.<pentaho.type.Instance>} A promise for: a matching instance or `null`.
      *
      * @rejects {pentaho.lang.ArgumentRequiredError} When `baseTypeId` is an empty string or {@link Nully}.
+     * @rejects {pentaho.lang.ArgumentInvalidError} When `baseTypeId` is an instance constructor or type object of
+     * an anonymous type.
      */
     getByTypeAsync: function(baseTypeId, keyArgs) {
 
-      if(!baseTypeId) return Promise.reject(error.argRequired("baseTypeId"));
-
-      // Loads all instances of type and then filters.
-      return this.__getAllByTypeAsync(baseTypeId, keyArgs).then(function(instances) {
-        return instances.length ? instances[0] : null;
-      });
+      try {
+        // Loads all instances of type and then filters.
+        return this.__getAllByTypeAsync(baseTypeId, keyArgs).then(function(instances) {
+          return instances.length ? instances[0] : null;
+        });
+      } catch(ex) {
+        return Promise.reject(ex);
+      }
     },
 
     /**
      * Gets a promise for all of the instances of the given type and that, optionally, match a specified filter.
      *
-     * @param {string} baseTypeId - The identifier of the base type.
+     * @param {string|Class.<pentaho.type.Instance>|pentaho.type.Type} baseTypeId - The identifier of the base type or
+     * the instance constructor or type of an identified type.
+     *
      * @param {Object} [keyArgs] - The keyword arguments.
      * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
      * whether an instance can be part of the result.
@@ -400,42 +460,105 @@ define([
      * @return {!Promise.<Array.<!pentaho.type.Instance>>} A promise for an array of matching instances, possibly empty.
      *
      * @rejects {pentaho.lang.ArgumentRequiredError} When `baseTypeId` is an empty string or {@link Nully}.
+     * @rejects {pentaho.lang.ArgumentInvalidError} When `baseTypeId` is an instance constructor or type object of
+     * an anonymous type.
      */
     getAllByTypeAsync: function(baseTypeId, keyArgs) {
 
-      if(!baseTypeId) return Promise.reject(error.argRequired("baseTypeId"));
-
-      return this.__getAllByTypeAsync(baseTypeId, keyArgs);
+      try {
+        return this.__getAllByTypeAsync(baseTypeId, keyArgs);
+      } catch(ex) {
+        return Promise.reject(ex);
+      }
     },
 
     /**
-     * Gets the first of the instances of the given type which are already successfully loaded and that, optionally,
-     * match a specified filter.
+     * Gets a function which filters and reserves passing results.
      *
-     * @param {string} baseTypeId - The identifier of the base type.
      * @param {Object} [keyArgs] - The keyword arguments.
      * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
      * whether an instance can be the result.
+     * @param {pentaho.type.spec.InstanceReservation} [keyArgs.reservation="none"] - Indicates that the returned
+     * instance should become reserved in a certain way.
+     * @param {boolean} [ignoreFilter=false] Indicates that `keyArgs.filter` should be ignored.
+     *
+     * @return {function(!pentaho.type.Instance) : boolean} A function that returns `true` if the instance is selected
+     * by the filter and returns `false`, otherwise.
+     * @private
+     */
+    __getFilterAndReserve: function(keyArgs, ignoreFilter) {
+
+      var filter = ignoreFilter ? null : O.getOwn(keyArgs, "filter");
+
+      var startReserve;
+      var construction = this.context.__construction;
+      switch(O.getOwn(keyArgs, "reservation")) {
+        case "tree": startReserve = construction.startReserveTree; break;
+        case "subtree": startReserve = construction.startReserveSubtree; break;
+        // case "none":
+        default: startReserve = construction.startUse;
+      }
+
+      return function(instance) {
+
+        if(!instance) {
+          return false;
+        }
+
+        var endReserve;
+
+        if(instance.$type.isContainer && !(endReserve = startReserve(instance))) {
+          return false;
+        }
+
+        // Passes the user filter?
+        if(filter && !filter(instance)) {
+          return false;
+        }
+
+        if(endReserve) {
+          endReserve();
+        }
+
+        return true;
+      };
+    },
+
+    /**
+     * Gets the highest priority instance among the instances of the given type which
+     * are successfully loaded and
+     * are not currently [reserved]{@link pentaho.type.spec.InstanceReservation} and
+     * that, optionally, match a specified filter.
+     *
+     * @param {string|Class.<pentaho.type.Instance>|pentaho.type.Type} baseTypeId - The identifier of the base type or
+     * the instance constructor or type of an identified type.
+     * @param {Object} [keyArgs] - The keyword arguments.
+     * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
+     * whether an instance can be the result.
+     * @param {pentaho.type.spec.InstanceReservation} [keyArgs.reservation="none"] - Indicates that the returned
+     * instance should become reserved in a certain way.
      * @param {boolean} [keyArgs.isRequired=false] - Indicates that an error should be thrown if there is no matching
      * result.
      *
      * @return {pentaho.type.Instance} A matching loaded instance, or `null`.
      *
+     * @throws {pentaho.lang.ArgumentInvalidError} When `baseTypeId` is an instance constructor or type object of
+     * an anonymous type.
      * @throws {pentaho.lang.OperationInvalidError} When there is no matching result and `keyArgs.isRequired` is `true`.
      */
     getByType: function(baseTypeId, keyArgs) {
 
-      if(!baseTypeId) throw error.argRequired("baseTypeId");
+      baseTypeId = this.__processType(baseTypeId);
 
       var holders = this.__getHolders(baseTypeId);
       if(holders) {
-        var filter = O.getOwn(keyArgs, "filter");
+        var filterAndReserve = this.__getFilterAndReserve(keyArgs);
 
         var L = holders.length;
         var i = -1;
         while(++i < L) {
           var instance = holders[i].instance;
-          if(instance && (!filter || filter(instance))) {
+          if(filterAndReserve(instance)) {
             return instance;
           }
         }
@@ -452,32 +575,37 @@ define([
      * Gets all of the instances of the given type which are already successfully loaded and that, optionally,
      * match a specified filter.
      *
-     * @param {string} baseTypeId - The identifier of the base type.
+     * @param {string|Class.<pentaho.type.Instance>|pentaho.type.Type} baseTypeId - The identifier of the base type or
+     * the instance constructor or type of an identified type.
+     *
      * @param {Object} [keyArgs] - The keyword arguments.
      * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
      * whether an instance can be part of the result.
-     *
+     * @param {pentaho.type.spec.InstanceReservation} [keyArgs.reservation="none"] - Indicates that the returned
+     * instance should become reserved in a certain way.
      * @param {boolean} [keyArgs.isRequired=false] - Indicates that an error should be thrown if there are no matching
      * results.
      *
      * @return {!Array.<!pentaho.type.Instance>} An array of matching instances, possibly empty.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When `baseTypeId` is an instance constructor or type object of
+     * an anonymous type.
+     * @throws {pentaho.lang.OperationInvalidError} When there is no matching result and `keyArgs.isRequired` is `true`.
      */
     getAllByType: function(baseTypeId, keyArgs) {
 
-      if(!baseTypeId) throw error.argRequired("baseTypeId");
-
-      var filter = O.getOwn(keyArgs, "filter");
+      baseTypeId = this.__processType(baseTypeId);
 
       var holders = this.__getHolders(baseTypeId);
       if(holders) {
+        var filterAndReserve = this.__getFilterAndReserve(keyArgs);
+
         var instances = holders
             .map(function(holder) {
               // NotLoaded/Failed instances return null.
               return holder.instance;
             })
-            .filter(function(instance) {
-              return !!instance && (!filter || filter(instance));
-            });
+            .filter(filterAndReserve);
 
         if(instances.length) {
           return instances;
@@ -492,6 +620,8 @@ define([
     },
 
     __getAllByTypeAsync: function(baseTypeId, keyArgs) {
+
+      baseTypeId = this.__processType(baseTypeId);
 
       var promiseAll;
       var isRequired = O.getOwn(keyArgs, "isRequired");
@@ -524,6 +654,41 @@ define([
       }
 
       return promiseAll;
+    },
+
+    __processType: function(baseTypeId) {
+
+      if(!baseTypeId) throw error.argRequired("baseTypeId");
+
+      var Instance;
+      switch(typeof baseTypeId) {
+        case "string":
+          return baseTypeId;
+
+        case "function":
+          Instance = this.context.__Instance;
+          if(Instance && baseTypeId.prototype instanceof Instance) {
+            return this.__validateTypeId(baseTypeId.type.id);
+          }
+          break;
+
+        case "object":
+          Instance = this.context.__Instance;
+          if(Instance && baseTypeId instanceof Instance.Type) {
+            return this.__validateTypeId(baseTypeId.id);
+          }
+          break;
+      }
+
+      throw error.argInvalidType(
+          "baseTypeId",
+          ["string", "Class<pentaho.type.Instance>", "pentaho.type.Type"],
+          typeof baseTypeId);
+    },
+
+    __validateTypeId: function(baseTypeId) {
+      if(!baseTypeId) throw error.argInvalid("baseTypeId", "Type is anonymous.");
+      return baseTypeId;
     },
 
     // Holders are already sorted by priority.
@@ -737,16 +902,16 @@ define([
       var value;
 
       if((value = specialSpec.id)) {
-        // specialSpec: {id}
+        // specialSpec: {id, reservation, isRequired}
 
         // Always required.
         return sync
-            ? this.getById(value)
-            : this.getByIdAsync(value);
+            ? this.getById(value, specialSpec)
+            : this.getByIdAsync(value); // no need for keyArgs as there are no async reservations.
       }
 
       if((value = specialSpec.type || typeDefault)) {
-        // specialSpec: {type, isRequired, filter}
+        // specialSpec: {type, isRequired, filter, reservation}
 
         // (Async) Take care not to `context.get` a type given as a string (or an array-wrapped one)
         // as these may not be loaded. Always calling context.get does not do.
@@ -762,6 +927,9 @@ define([
         // elementTypeInstance
         // listTypeInstance
         if(typeof value === "string") {
+
+          // TODO: FIXME: this is not necessarily true; it may be the id of a list type...
+
           isList = false;
           elemTypeId = value;
         } else if(Array.isArray(value)) {
@@ -795,14 +963,10 @@ define([
 
           var context = this.__context;
 
-          var getListCtor = function() {
-            if(!listType) {
-              return context.__get([elemTypeId], /* defaultBase: */null, sync);
-            }
-
-            var ListCtor = listType.instance.constructor;
-
-            return promiseUtil["return"](ListCtor, sync);
+          var getListCtorSync = function() {
+            return listType
+                ? listType.instance.constructor
+                : context.get([elemTypeId]);
           };
 
           var createList = function(ListCtor, results) {
@@ -810,12 +974,12 @@ define([
           };
 
           if(sync) {
-            return createList(getListCtor(), this.getAllByType(elemTypeId, specialSpec));
+            return createList(getListCtorSync(), this.getAllByType(elemTypeId, specialSpec));
           }
 
-          return Promise.all([getListCtor(), this.getAllByTypeAsync(elemTypeId, specialSpec)])
+          return Promise.all([elemTypeId, this.getAllByTypeAsync(elemTypeId, specialSpec)])
               .then(function(values) {
-                return createList(values[0], values[1]);
+                return createList(getListCtorSync(), values[1]);
               });
         }
 

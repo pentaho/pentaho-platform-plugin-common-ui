@@ -106,7 +106,14 @@ define([
 
         this._initContainer();
 
-        this._initProperties(spec);
+        var construction = this.$type.context.__construction;
+        construction.enter();
+
+        try {
+          this._initProperties(spec);
+        } finally {
+          construction.exit();
+        }
       },
 
       /**
@@ -119,13 +126,13 @@ define([
 
         // Create `Property` instances (not quite...).
         var propTypes = this.$type.__getProps();
-        var i = propTypes.length;
+        var L = propTypes.length;
         var readSpec = !spec ? undefined : (Array.isArray(spec) ? __readSpecByIndex : __readSpecByNameOrAlias);
         var values = {};
         var propType;
         var value;
-
-        while(i--) {
+        var i = -1;
+        while(++i < L) {
           propType = propTypes[i];
 
           values[propType.name] = value = propType.toValueOn(this, readSpec && readSpec(spec, propType));

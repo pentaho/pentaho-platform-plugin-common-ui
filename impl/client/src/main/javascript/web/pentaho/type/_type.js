@@ -593,7 +593,7 @@ define([
           addMixinType.call(this, values);
 
         function addMixinType(MixinType) {
-          var MixinInst = this.context.get(MixinType);
+          var MixinInst = context.get(MixinType);
           Instance.mix(MixinInst);
         }
       },
@@ -1136,7 +1136,7 @@ define([
        * @see pentaho.type.Type#is
        */
       create: function(instRef, instKeyArgs) {
-        return this.context.instances.get(instRef, instKeyArgs, this);
+        return context.instances.get(instRef, instKeyArgs, this);
       },
 
       /**
@@ -1156,7 +1156,7 @@ define([
        * @see pentaho.type.Type#create
        */
       createAsync: function(instRef, instKeyArgs) {
-        return this.context.instances.getAsync(instRef, instKeyArgs, this);
+        return context.instances.getAsync(instRef, instKeyArgs, this);
       },
 
       /**

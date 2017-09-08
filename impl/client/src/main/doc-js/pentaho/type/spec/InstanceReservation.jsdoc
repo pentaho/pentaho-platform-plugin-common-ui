@@ -15,8 +15,40 @@
  */
 
 /**
- * The `InstanceReservation` enumeration contains the possible reservation modes to use when
- * [resolving]{@link pentaho.type.InstancesContainer#get} an instance.
+ * The `InstanceReservation` enumeration contains the possible reservation modes
+ * that a synchronous instance resolution operation can use.
+ *
+ * The synchronous instance resolution operations are:
+ * * [InstancesContainer#getById]{@link pentaho.type.InstancesContainer#getById}
+ * * [InstancesContainer#getByType]{@link pentaho.type.InstancesContainer#getByType}
+ * * [InstancesContainer#getAllByType]{@link pentaho.type.InstancesContainer#getByType}
+ * * [InstancesContainer#get]{@link pentaho.type.InstancesContainer#get}
+ *   (when used with a [resolve instance specification]{@link pentaho.type.spec.IInstanceResolve})
+ *
+ * When any of these operations is performed during the creation operation of a container value,
+ * a [Complex]{@link pentaho.type.Complex} or a [List]{@link pentaho.type.List} value,
+ * the reservation mode affects its possible results.
+ *
+ * Take the following example.
+ * During the creation of a complex instance, `a`,
+ * one of its properties evaluates a
+ * [defaultValue]{@link pentaho.type.Property.Type#defaultValue} function
+ * which asks for an instance of type `R`,
+ * with a [tree]{@link pentaho.type.spec.InstanceReservation#tree} reservation mode,
+ * by calling `context.instances.getByType("R", {reservation: "tree"})`.
+ *
+ * An instance `r1` exists and has not been "used" yet,
+ * during the creation operation and, as such,
+ * it is returned.
+ *
+ * Still during the creation of `a`,
+ * another property of the same type, `R`,
+ * is initialized with a value which is given as a specification:
+ * `{$instance: {type: "R"}}`,
+ * which, again, asks for an instance of type `R`, but, this type,
+ * without any reservation requirements.
+ * Because the instance `r1` has become reserved,
+ * it cannot be the result and another existing instance, `r2`, is instead returned.
  *
  * @enum {string}
  * @memberOf pentaho.type.spec.InstanceReservation
@@ -24,17 +56,39 @@
  */
 var InstanceReservation = {
   /**
-   * No reservation is performed.
+   * The instance resolution operation requires no reservation of the resolved instance.
    *
-   * An instance may be resolved any number of times during an instance tree creation operation.
+   * An instance may be the result of the operation as long as
+   * it has not become reserved by a previous resolution operation
+   * within the same top-level tree creation operation.
+   *
+   * Once a given instance is resolved,
+   * it cannot be the result of
+   * a resolution operation with
+   * [tree]{@link pentaho.type.spec.InstanceReservation#tree} reservation.
+   *
+   * Also, it cannot be the result of following resolution operations,
+   * with [subtree]{@link pentaho.type.spec.InstanceReservation#tree} reservation,
+   * that occur during the creation of the immediate container that initially resolved the instance.
+   *
    */
   none: "none",
 
   /**
-   * A resolved instance is reserved during the whole instance tree creation operation.
+   * The instance resolution operation requires that the resolved instance has not been
+   * resolved previously since the creation of the immediate, current container (the subtree root).
    *
-   * Each instance can be the result of [InstancesContainer#get]{@link pentaho.type.InstancesContainer#get}
-   * at most once.
+   * The resolved instance will not be the result of other following resolution operations
+   * until the immediate, current container finishes construction.
    */
-  resolve: "tree"
+  subtree: "subtree",
+
+  /**
+   * The instance resolution operation requires that the resolved instance has not been
+   * resolved previously during top-level creation operation (the tree root).
+   *
+   * The resolved instance will not be the result of other following resolution operations
+   * during the current top-level creation operation.
+   */
+  tree: "tree"
 };

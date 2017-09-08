@@ -26,7 +26,8 @@
  * {$instance: {id: "my/service"}}
  * ```
  *
- * The property
+ * The properties
+ * [isRequired]{@link pentaho.type.spec.IInstanceResolve#isRequired} and
  * [reservation]{@link pentaho.type.spec.IInstanceResolve#reservation},
  * can also be specified.
  *
@@ -40,7 +41,7 @@
  *
  * The properties
  * [filter]{@link pentaho.type.spec.IInstanceResolve#filter},
- * [isRequired]{@link pentaho.type.spec.IInstanceResolve#isRequired} or
+ * [isRequired]{@link pentaho.type.spec.IInstanceResolve#isRequired} and
  * [reservation]{@link pentaho.type.spec.IInstanceResolve#reservation},
  * can also be specified.
  *
@@ -56,7 +57,7 @@
  *
  * The properties
  * [filter]{@link pentaho.type.spec.IInstanceResolve#filter},
- * [isRequired]{@link pentaho.type.spec.IInstanceResolve#isRequired} or
+ * [isRequired]{@link pentaho.type.spec.IInstanceResolve#isRequired} and
  * [reservation]{@link pentaho.type.spec.IInstanceResolve#reservation},
  * can also be specified.
  *

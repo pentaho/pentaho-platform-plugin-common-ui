@@ -566,17 +566,25 @@ define([
          * @return {?pentaho.type.Value} A value.
          */
         toValueOn: function(defaultValueOwner, valueSpec) {
+
+          if(this.isList) {
+            // Always create a local list, so that it is properly hooked with its owner.
+
+            if(valueSpec == null && defaultValueOwner) {
+              valueSpec = this.defaultValueOn(defaultValueOwner);
+            }
+
+            return this.__valueType.create(valueSpec, this.__listCreateKeyArgs || this.__buildListCreateKeyArgs());
+          }
+
           if(valueSpec == null) {
             return defaultValueOwner ? this.defaultValueOn(defaultValueOwner) : null;
           }
-
-          return this.isList
-              ? this.__valueType.to(valueSpec, this.__listCreateKeyArgs || this.__buildListCreateKeyArgs())
-              : this.__valueType.to(valueSpec);
+          return this.__valueType.to(valueSpec);
         },
 
         /**
-         * Gets a default value for use in given `Complex` instance.
+         * Gets a default value for use in a given `Complex` instance.
          *
          * Ensures that list properties always have a non-null default value.
          *
@@ -588,15 +596,14 @@ define([
 
           return dv
               ? dv.call(owner, this)
-              : (this.isList
-                  ? this.__valueType.create(null, this.__listCreateKeyArgs || this.__buildListCreateKeyArgs())
-                  : dv);
+              : (this.isList ? this.__valueType.create(null) : dv);
         },
 
         __listCreateKeyArgs: null,
 
         __buildListCreateKeyArgs: function() {
           return (this.__listCreateKeyArgs = {
+            isOwned:    true,
             isBoundary: this.__isBoundary,
             isReadOnly: this.__isReadOnly
           });

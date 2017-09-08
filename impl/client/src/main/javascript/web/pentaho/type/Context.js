@@ -18,6 +18,7 @@ define([
   "module",
   "../typeInfo",
   "../i18n!types",
+  "./InstanceConstructionContext",
   "./SpecificationContext",
   "./SpecificationScope",
   "./InstancesContainer",
@@ -35,7 +36,8 @@ define([
   "../debug",
   "../debug/Levels",
   "../util/logger"
-], function(localRequire, module, typeInfo, bundle, SpecificationContext, SpecificationScope,
+], function(localRequire, module, typeInfo, bundle, InstanceConstructionContext,
+    SpecificationContext, SpecificationScope,
     InstancesContainer, mainPlatformEnv, configurationService,
     Transaction, TransactionScope, CommittedScope,
     Base, promiseUtil, arg, error, O, F, debugMgr, DebugLevels, logger) {
@@ -428,6 +430,10 @@ define([
        * @private
        */
       this.__instances = new InstancesContainer(this, configSpec && configSpec.instances);
+
+      // The context is placed here instead of in the InstancesContainer to reduce the number of de-refs
+      // that each complex/list needs to do to get to it.
+      this.__construction = new InstanceConstructionContext();
 
       /**
        * The root [Instance]{@link pentaho.type.Instance} constructor.
@@ -849,8 +855,8 @@ define([
       var specialSpec;
 
       if((specialSpec = depRef.$instance)) {
-        // specialSpec: {id} | {type, isRequired, filter}
-        // instKeyArgs used only when creating a list of results
+        // specialSpec: {id, isRequired, reservation} | {type, isRequired, filter, reservation}
+        // instKeyArgs is used only when creating a list of results
         return this.__instances.__getSpecial(specialSpec, /* instKeyArgs: */ null, /* typeDefault */null, sync);
       }
 

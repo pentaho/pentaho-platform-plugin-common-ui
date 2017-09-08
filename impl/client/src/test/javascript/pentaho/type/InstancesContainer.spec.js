@@ -706,7 +706,7 @@ define([
         });
       });
 
-      describe("#getById(id)", function() {
+      describe("#getById(id, keyArgs)", function() {
 
         it("should throw if id is falsy", function() {
 
@@ -850,6 +850,128 @@ define([
                 });
           });
         });
+
+        it("should throw if the instance is reserved and keyArgs.isRequired is true", function() {
+
+          var context;
+          var container;
+
+          return require.using([
+            "pentaho/type/Context",
+            "pentaho/type/InstancesContainer",
+            "tests/pentaho/util/errorMatch"
+          ], configAmd, function(Context, InstancesContainer, errorMatch) {
+
+            return Context.createAsync()
+                .then(function(_context) {
+
+                  context = _context;
+                  container = new InstancesContainer(context, containerConfig);
+                  context.__instances = container;
+
+                  // Load instance
+                  return container.getByIdAsync("myFoo");
+                })
+                .then(function() {
+
+                  var beenHere = false;
+
+                  var Complex = context.get("complex");
+
+                  var ReservingComplex = Complex.extend({
+                    $type: {
+                      props: [
+                        {
+                          name: "propA",
+                          valueType: "Foo",
+                          defaultValue: function() {
+
+                            beenHere = true;
+
+                            // Reserve myFoo
+                            var myFoo = container.getById("myFoo", {reservation: "tree"});
+
+                            expect(myFoo).not.toBeNull();
+
+                            // Ask for it again.
+                            expect(function() {
+                              container.getById("myFoo", {isRequired: true});
+                            }).toThrow(errorMatch.operInvalid());
+                          }
+                        }
+                      ]
+                    }
+                  });
+
+                  // It all happens inside...
+                  var reservingComplex = new ReservingComplex();
+
+                  // Make sure to have been in the defaultValue function.
+                  expect(beenHere).toBe(true);
+                });
+          });
+        });
+
+        it("should return null if the instance is reserved and keyArgs.isRequired is false", function() {
+
+          var context;
+          var container;
+
+          return require.using([
+            "pentaho/type/Context",
+            "pentaho/type/InstancesContainer"
+          ], configAmd, function(Context, InstancesContainer) {
+
+            return Context.createAsync()
+                .then(function(_context) {
+
+                  context = _context;
+                  container = new InstancesContainer(context, containerConfig);
+                  context.__instances = container;
+
+                  // Load instance
+                  return container.getByIdAsync("myFoo");
+                })
+                .then(function() {
+
+                  var beenHere = false;
+
+                  var Complex = context.get("complex");
+
+                  var ReservingComplex = Complex.extend({
+                    $type: {
+                      props: [
+                        {
+                          name: "propA",
+                          valueType: "Foo",
+                          defaultValue: function() {
+
+                            beenHere = true;
+
+                            // Reserve myFoo
+                            var myFoo = container.getById("myFoo", {reservation: "tree"});
+
+                            expect(myFoo).not.toBeNull();
+
+                            // Ask for it again.
+                            var myFoo2 = container.getById("myFoo", {isRequired: false});
+
+                            expect(myFoo2).toBeNull();
+                          }
+                        }
+                      ]
+                    }
+                  });
+
+                  // It all happens inside...
+                  var reservingComplex = new ReservingComplex();
+
+                  // Make sure to have been in the defaultValue function.
+                  expect(beenHere).toBe(true);
+                });
+          });
+        });
+
       });
 
       describe("#getAllByTypeAsync(baseTypeId, [{filter, isRequired}])", function() {
@@ -1331,6 +1453,72 @@ define([
                 });
           });
         });
+
+        it("should return the next unreserved instances", function() {
+
+          var context;
+          var container;
+
+          return require.using([
+            "pentaho/type/Context",
+            "pentaho/type/InstancesContainer"
+          ], configAmd, function(Context, InstancesContainer) {
+
+            return Context.createAsync()
+                .then(function(_context) {
+
+                  context = _context;
+                  container = new InstancesContainer(context, containerConfig);
+                  context.__instances = container;
+
+                  // Load instance
+                  return Promise.all([
+                    container.getByIdAsync("myFoo"),
+                    container.getByIdAsync("myFoo2"),
+                    container.getByIdAsync("myBar")
+                  ]);
+                })
+                .then(function(foosAndBar) {
+
+                  var beenHere = false;
+
+                  var Complex = context.get("complex");
+
+                  var ReservingComplex = Complex.extend({
+                    $type: {
+                      props: [
+                        {
+                          name: "propA",
+                          valueType: "Root",
+                          defaultValue: function() {
+
+                            beenHere = true;
+
+                            // Reserve myFoo
+                            var myFoo = container.getById("myFoo", {reservation: "tree"});
+
+                            expect(myFoo).not.toBeNull();
+
+                            // Ask for next unreserved Roots
+                            var roots = container.getAllByType("Root");
+
+                            expect(roots.length).toBe(2);
+                            expect(roots[0]).toBe(foosAndBar[2]); // myBar, has higher priority
+                            expect(roots[1]).toBe(foosAndBar[1]); // myFoo2
+                          }
+                        }
+                      ]
+                    }
+                  });
+
+                  // It all happens inside...
+                  var reservingComplex = new ReservingComplex();
+
+                  // Make sure to have been in the defaultValue function.
+                  expect(beenHere).toBe(true);
+                });
+          });
+        });
       });
 
       describe("#getByTypeAsync(baseTypeId, [{filter, isRequired}])", function() {
@@ -1513,6 +1701,114 @@ define([
           });
         });
 
+        it("should return the registered and loaded instance whose type is BaseType", function() {
+
+          var container;
+
+          return require.using([
+            "pentaho/type/Context",
+            "pentaho/type/InstancesContainer"
+          ], configAmd, function(Context, InstancesContainer) {
+
+            return Context.createAsync()
+                .then(function(context) {
+
+                  container = new InstancesContainer(context, containerConfig);
+
+                  return Promise.all([
+                    container.getByIdAsync("myFoo"),
+                    container.getByIdAsync("myFoo2")
+                  ]);
+                })
+                .then(function(foos) {
+
+                  var Foo = container.context.get("Foo");
+
+                  var result = container.getByType(Foo);
+
+                  expect(result).toEqual(jasmine.any(Foo));
+                });
+          });
+        });
+
+        it("should return the registered and loaded instance whose type is BaseType.Type", function() {
+
+          var container;
+
+          return require.using([
+            "pentaho/type/Context",
+            "pentaho/type/InstancesContainer"
+          ], configAmd, function(Context, InstancesContainer) {
+
+            return Context.createAsync()
+                .then(function(context) {
+
+                  container = new InstancesContainer(context, containerConfig);
+
+                  return Promise.all([
+                    container.getByIdAsync("myFoo"),
+                    container.getByIdAsync("myFoo2")
+                  ]);
+                })
+                .then(function(foos) {
+
+                  var Foo = container.context.get("Foo");
+
+                  var result = container.getByType(Foo.type);
+
+                  expect(result).toEqual(jasmine.any(Foo));
+                });
+          });
+        });
+
+        it("should throw if given an anonyous BaseType", function() {
+
+          var container;
+
+          return require.using([
+            "pentaho/type/Context",
+            "pentaho/type/InstancesContainer",
+            "tests/pentaho/util/errorMatch"
+          ], configAmd, function(Context, InstancesContainer, errorMatch) {
+
+            return Context.createAsync()
+                .then(function(context) {
+
+                  container = new InstancesContainer(context, containerConfig);
+
+                  var Anonymous = container.context.get("complex").extend();
+
+                  expect(function() {
+                    container.getByType(Anonymous);
+                  }).toThrow(errorMatch.argInvalid("baseTypeId"));
+                });
+          });
+        });
+
+        it("should throw if given an anonyous BaseType.Type", function() {
+
+          var container;
+
+          return require.using([
+            "pentaho/type/Context",
+            "pentaho/type/InstancesContainer",
+            "tests/pentaho/util/errorMatch"
+          ], configAmd, function(Context, InstancesContainer, errorMatch) {
+
+            return Context.createAsync()
+                .then(function(context) {
+
+                  container = new InstancesContainer(context, containerConfig);
+
+                  var Anonymous = container.context.get("complex").extend();
+
+                  expect(function() {
+                    container.getByType(Anonymous.type);
+                  }).toThrow(errorMatch.argInvalid("baseTypeId"));
+                });
+          });
+        });
+
         it("should return the registered and loaded instance whose type is baseTypeId and " +
             "that has the highest priority", function() {
 
@@ -1659,12 +1955,207 @@ define([
                 });
           });
         });
+
+        it("should return the next unreserved instance", function() {
+
+          var context;
+          var container;
+
+          return require.using([
+            "pentaho/type/Context",
+            "pentaho/type/InstancesContainer"
+          ], configAmd, function(Context, InstancesContainer) {
+
+            return Context.createAsync()
+                .then(function(_context) {
+
+                  context = _context;
+                  container = new InstancesContainer(context, containerConfig);
+                  context.__instances = container;
+
+                  // Load instance
+                  return Promise.all([
+                    container.getByIdAsync("myFoo"),
+                    container.getByIdAsync("myFoo2")
+                  ]);
+                })
+                .then(function(foos) {
+
+                  var beenHere = false;
+
+                  var Complex = context.get("complex");
+
+                  var ReservingComplex = Complex.extend({
+                    $type: {
+                      props: [
+                        {
+                          name: "propA",
+                          valueType: "Foo",
+                          defaultValue: function() {
+
+                            beenHere = true;
+
+                            // Reserve a Foo (the best)
+                            var myFoo2 = container.getByType("Foo", {reservation: "tree"});
+
+                            expect(myFoo2).toBe(foos[1]);
+
+                            // Ask for next unreserved Foo
+                            var myFoo = container.getByType("Foo");
+
+                            expect(myFoo).toBe(foos[0]);
+                          }
+                        }
+                      ]
+                    }
+                  });
+
+                  // It all happens inside...
+                  var reservingComplex = new ReservingComplex();
+
+                  // Make sure to have been in the defaultValue function.
+                  expect(beenHere).toBe(true);
+                });
+          });
+        });
+      });
+
+      describe("#get(instRef, instKeyArgs, typeBase)", function() {
+
+        // see also top-level tests, below
+
+        it("should handle reservations correctly I", function() {
+
+          var context;
+          var container;
+
+          return require.using([
+            "pentaho/type/Context",
+            "pentaho/type/InstancesContainer"
+          ], configAmd, function(Context, InstancesContainer) {
+
+            return Context.createAsync()
+                .then(function(_context) {
+
+                  context = _context;
+                  container = new InstancesContainer(context, containerConfig);
+                  context.__instances = container;
+
+                  // Load instance
+                  return Promise.all([
+                    container.getByIdAsync("myFoo"),
+                    container.getByIdAsync("myFoo2"),
+                    container.getByIdAsync("myBar")
+                  ]);
+                })
+                .then(function(foosAndBar) {
+
+                  var RootList = context.get(["Root"]);
+
+                  var rootList = new RootList([
+                    {$instance: {id: "myBar", reservation: "tree"}}, // myBar and reserve
+                    {$instance: {type: "Root"}}, // myFoo2 and use
+                    {$instance: {type: "Root", reservation: "tree"}}, // myFoo and reserve
+                    {$instance: {type: "Root", reservation: "tree"}} // null
+                  ]);
+
+                  expect(rootList.at(0)).toBe(foosAndBar[2]); // myBar
+                  expect(rootList.at(1)).toBe(foosAndBar[1]); // myFoo2
+                  expect(rootList.at(2)).toBe(foosAndBar[0]); // myFoo
+                  expect(rootList.at(3)).toBe(null);          // null
+                });
+          });
+        });
+
+        it("should handle reservations correctly II", function() {
+
+          var context;
+          var container;
+
+          return require.using([
+            "pentaho/type/Context",
+            "pentaho/type/InstancesContainer"
+          ], configAmd, function(Context, InstancesContainer) {
+
+            return Context.createAsync()
+                .then(function(_context) {
+
+                  context = _context;
+                  container = new InstancesContainer(context, containerConfig);
+                  context.__instances = container;
+
+                  // Load instance
+                  return Promise.all([
+                    container.getByIdAsync("myFoo"),
+                    container.getByIdAsync("myFoo2"),
+                    container.getByIdAsync("myBar")
+                  ]);
+                })
+                .then(function(foosAndBar) {
+
+                  var AType = context.get({
+                    base: "complex",
+                    props: [
+                      {name: "as", valueType: [{
+                        props: [
+                          {name: "x", valueType: "Root"}
+                        ]
+                      }]},
+                      {name: "bs", valueType: [{
+                        props: [
+                          {name: "y", valueType: "Root"},
+                          {name: "z", valueType: "Root"}
+                        ]
+                      }]}
+                    ]
+                  });
+
+                  var instance = new AType({
+                    "as": [
+                      {
+                        "x": {$instance: {id: "myBar", reservation: "tree"}} // myBar and reserves in tree (instance)
+                      },
+                      {
+                        "x": {$instance: {type: "Root"}}                      // myFoo2 and use
+                      }
+                    ],
+                    "bs": [
+                      { // bs[0]
+                        "y": {$instance: {type: "Root", reservation: "subtree"}}, // myFoo2 and reserve in bs[0]
+                        "z": {$instance: {type: "Root"}} // myFoo and use
+                      },
+                      {
+                        "y": {$instance: {type: "Root", reservation: "subtree"}}, // myFoo2 and reserve in bs[0]
+                        "z": {$instance: {type: "Root"}} // myFoo and use
+                      },
+                      {
+                        "y": {$instance: {type: "Root", reservation: "tree"}}, // null
+                        "z": {$instance: {id: "myFoo", reservation: "subtree"}} // myFoo
+                      }
+                    ]
+                  });
+
+                  var myFoo = foosAndBar[0];
+                  var myFoo2 = foosAndBar[1];
+                  var myBar = foosAndBar[2];
+
+                  expect(instance.as.at(0).x).toBe(myBar);
+                  expect(instance.as.at(1).x).toBe(myFoo2);
+                  expect(instance.bs.at(0).y).toBe(myFoo2);
+                  expect(instance.bs.at(0).z).toBe(myFoo);
+                  expect(instance.bs.at(1).y).toBe(myFoo2);
+                  expect(instance.bs.at(1).z).toBe(myFoo);
+                  expect(instance.bs.at(2).y).toBe(null);
+                  expect(instance.bs.at(2).z).toBe(myFoo);
+                });
+          });
+        });
       });
     });
 
     describe("#get(instRef, instKeyArgs, typeBase)", function() {
 
-      // see also tests with a shared context instance, above
+      // see also tests with a shared context instance and a shared container config, above
 
       it("should resolve the special reference {$instance: {id: instanceId}}", function() {
 
@@ -1683,7 +2174,7 @@ define([
             var result = container.get({$instance: {id: "myFoo"}});
 
             expect(container.getById.calls.count()).toBe(1);
-            expect(container.getById).toHaveBeenCalledWith("myFoo");
+            expect(container.getById).toHaveBeenCalledWith("myFoo", {id: "myFoo"});
 
             expect(result).toEqual(instance);
           });
@@ -1884,7 +2375,8 @@ define([
         });
       });
 
-      it("should resolve the special reference {$instance: {type: listBaseTypeOfAnonymousElemType}}", function() {
+      it("should throw when given the special reference " +
+          "{$instance: {type: listBaseTypeOfAnonymousElemType}}", function() {
 
         return require.using(["pentaho/type/Context", "tests/pentaho/util/errorMatch"], function(Context, errorMatch) {
 
