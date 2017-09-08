@@ -66,7 +66,7 @@ function() {
   
   // Part 3
   var view = this;
-  var context = this.type.context;
+  var context = this.$type.context;
 
   bar.on("dblclick", function(d) {
     

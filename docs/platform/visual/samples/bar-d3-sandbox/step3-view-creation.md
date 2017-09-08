@@ -25,7 +25,7 @@ define([
     var BaseView = context.get(baseViewFactory);
 
     var BarView = BaseView.extend({
-      type: {
+      $type: {
         id: module.id,
         props: [
           {
@@ -53,7 +53,7 @@ Remarks:
   - The inherited 
     [model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#model'}}) 
     property is overridden so that its 
-    [type]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#type'}}) 
+    [valueType]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#valueType'}}) 
     is the Bar model you previously created.
   - The [_updateAll]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#_updateAll'}})
     method is where the code that fully renders the visualization must go,
@@ -128,7 +128,7 @@ Edit the `index.html` file and place the following code in it:
 
       // These are responsibilities of the visualization container application:
       // 1. Mark the container with the model's CSS classes, for styling purposes.
-      viewSpec.domContainer.className = model.type.inheritedStyleClasses.join(" ");
+      viewSpec.domContainer.className = model.$type.inheritedStyleClasses.join(" ");
 
       // 2. Set the DOM container dimensions.
       viewSpec.domContainer.style.width = viewSpec.width + "px";

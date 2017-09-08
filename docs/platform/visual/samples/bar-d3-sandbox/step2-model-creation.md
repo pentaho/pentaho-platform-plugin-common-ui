@@ -38,7 +38,7 @@ define([
     var BaseModel = context.get(baseModelFactory);
     
     var BarModel = BaseModel.extend({
-      type: {
+      $type: {
         id: module.id,
         styleClass: "pentaho-visual-samples-bar",
         label: "D3 Bar Chart",
@@ -46,24 +46,22 @@ define([
         props: [
           {
             name: "barSize",
-            type: "number",
-            value: 30,
+            valueType: "number",
+            defaultValue: 30,
             isRequired: true
           },
           {
             name: "category",
-            type: {
-              base: "pentaho/visual/role/ordinal",
-              props: {attributes: {isRequired: true, countMax: 1}}
-            }
+            base: "pentaho/visual/role/property", 
+            levels: ["ordinal"],
+            attributes: {isRequired: true, countMax: 1}
           },
           {
             name: "measure",
-            type: {
-              base: "pentaho/visual/role/quantitative",
-              dataType: "number",
-              props: {attributes: {isRequired: true, countMax: 1}}
-            }
+            base: "pentaho/visual/role/property", 
+            levels: "quantitative",
+            dataType: "number",
+            attributes: {isRequired: true, countMax: 1}
           }
         ]
       }
@@ -94,19 +92,19 @@ The following sections explain each of the model properties.
 ```js
 specification = {
   name: "barSize",
-  type: "number",
-  value: 30,
+  valueType: "number",
+  defaultValue: 30,
   isRequired: true
 }
 ```
 
 A general property which determines the constant width of bars. 
 It is of 
-[type]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#type'}})
+[valueType]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#valueType'}})
 [number]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Number'}}), 
 is [required]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#isRequired'}}) and 
 has a 
-[default value]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#value'}}) 
+[defaultValue]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#defaultValue'}}) 
 of `30`.
 That's as simple as it gets.
 
@@ -115,15 +113,17 @@ That's as simple as it gets.
 ```js
 specification = {
   name: "category",
-  type: {
-    base: "pentaho/visual/role/ordinal",
-    props: {attributes: {isRequired: true, countMax: 1}}
-  }
+  base: "pentaho/visual/role/property",
+  levels: ["ordinal"],
+  attributes: {isRequired: true, countMax: 1}
 }
 ```
 
 Represents the _Category_ visual role.
-Being [ordinal]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.OrdinalMapping'}}) 
+The property is of a special type, 
+a [visual role property]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property'}}).
+Having `ordinal` as 
+[levels]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property.Type' | append: '#levels'}})
 means that it can visually encode discrete values 
 and their relative order.
 
@@ -136,26 +136,27 @@ So, the value of a visual role is an object with a list property named
 [attributes]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Mapping' | append: '#attributes'}}).
 
 Because by default, any number of data attributes can be mapped to a visual role, including 0 or 10, 
-it is necessary to derive the 
-[pentaho/visual/role/ordinal]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.OrdinalMapping'}}) 
-visual role type to limit the cardinality 
-limits of its `attributes` property, so that it accepts and requires a single data attribute.
+it is necessary to limit the cardinality limits of the internal `attributes` list, 
+so that it accepts and requires a single data attribute.
+For that we use the special 
+[attributes]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property.Type' | append: '#attributes'}})
+syntax that this property type provides.
 
 ## The `measure` property
 
 ```js
 specification = {
   name: "measure",
-  type: {
-    base: "pentaho/visual/role/quantitative",
-    dataType: "number",
-    props: {attributes: {isRequired: true, countMax: 1}}
-  }
+  base: "pentaho/visual/role/property",
+  levels: ["quantitative"],
+  dataType: "number",
+  attributes: {isRequired: true, countMax: 1}
 }
 ```
 
 Represents the _Measure_ visual role. 
-Being [quantitative]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.QuantitativeMapping'}}) 
+Having `quantitative` as 
+[levels]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property.Type' | append: '#levels'}})
 means that it can visually represent the proportion between values (_this is twice that_).
 The quantitative data types are 
 [date]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Date'}})
