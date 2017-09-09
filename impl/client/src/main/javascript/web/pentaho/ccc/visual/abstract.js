@@ -25,12 +25,9 @@ define([
   "pentaho/util/object",
   "pentaho/util/logger",
   "pentaho/visual/color/utils",
-  "pentaho/visual/color/paletteRegistry",
   "pentaho/data/TableView",
   "pentaho/i18n!view"
-], function(module, SelectionModes, def, pvc, cdo, pv, Axis,
-            util, O, logger, visualColorUtils, visualPaletteRegistry,
-            DataView, bundle) {
+], function(module, SelectionModes, def, pvc, cdo, pv, Axis, util, O, logger, visualColorUtils, DataView, bundle) {
 
   "use strict";
 
@@ -940,10 +937,17 @@ define([
 
               case "continuous":
                 options.colorScaleType = model.pattern === "gradient" ? "linear" : "discrete";
-                options.colors = visualColorUtils.buildPalette(
-                    model.colorSet,
-                    model.pattern,
-                    model.reverseColors);
+
+                var paletteQuantitative = model.paletteQuantitative;
+                if(paletteQuantitative) {
+                  options.colors = paletteQuantitative.colors.toArray(function(color) { return color.value; });
+                } else {
+                  options.colors = visualColorUtils.buildPalette(
+                      model.$type.context,
+                      model.colorSet,
+                      model.pattern,
+                      model.reverseColors);
+                }
                 break;
             }
           }
@@ -986,7 +990,8 @@ define([
          * @protected
          */
         _getDefaultDiscreteColors: function() {
-          return visualPaletteRegistry.get().colors.slice();
+          // Note palette is only available for models with the pentaho.visual.models.mixin.ScaleColorDiscrete applied.
+          return this.model.palette.colors.toArray(function(color) { return color.value; });
         },
 
         /**

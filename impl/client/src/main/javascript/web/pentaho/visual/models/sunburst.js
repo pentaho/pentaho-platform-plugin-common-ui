@@ -26,12 +26,13 @@ define([
     "pentaho/visual/models/types/labelsOption",
     "pentaho/visual/models/types/sliceOrder",
     "pentaho/visual/models/mixins/multiCharted",
-    function(BaseModel, DisplayUnits, LabelsOption, SliceOrder, MultiChartedModel) {
+    "pentaho/visual/models/mixins/scaleColorDiscrete",
+    function(BaseModel, DisplayUnits, LabelsOption, SliceOrder, MultiChartedModel, ScaleColorDiscreteModel) {
 
       return BaseModel.extend({
         $type: {
           id: module.id,
-          mixins: [MultiChartedModel],
+          mixins: [MultiChartedModel, ScaleColorDiscreteModel],
           v2Id: "ccc_sunburst",
           category: "treemapchart",
           defaultView: "pentaho/ccc/visual/sunburst",

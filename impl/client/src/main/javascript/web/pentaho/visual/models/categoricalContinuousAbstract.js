@@ -22,12 +22,14 @@ define([
 
   return [
     "pentaho/visual/models/cartesianAbstract",
-    function(BaseModel) {
+    "pentaho/visual/models/mixins/scaleColorDiscrete",
+    function(BaseModel, ScaleColorDiscreteModel) {
 
       return BaseModel.extend({
         $type: {
           id: module.id,
           isAbstract: true,
+          mixins: [ScaleColorDiscreteModel],
 
           props: [
             {

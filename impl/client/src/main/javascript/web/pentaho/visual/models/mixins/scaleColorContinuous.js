@@ -20,7 +20,7 @@ define([
 
   "use strict";
 
-  // Used by: HG, Scatter
+  // Used by: HG, Scatter and GEO
 
   return [
     "pentaho/visual/base/model",
@@ -35,6 +35,13 @@ define([
           id: module.id,
           isAbstract: true,
           props: [
+            {
+              name: "paletteQuantitative",
+              base: "pentaho/visual/color/paletteProperty",
+              levels: ["quantitative", "divergent"],
+              isApplicable: __hasQuantitativeAttributesColor,
+              defaultValue: null // value is calculated from the other properties.
+            },
             {
               name: "pattern",
               valueType: Pattern,

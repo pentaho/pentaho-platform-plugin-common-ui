@@ -24,17 +24,19 @@ define([
     "pentaho/visual/models/cartesianAbstract",
     "pentaho/visual/models/types/labelsOption",
     "pentaho/visual/models/mixins/scaleColorContinuous",
+    "pentaho/visual/models/mixins/scaleColorDiscrete",
     "pentaho/visual/models/mixins/multiCharted",
     "pentaho/visual/models/mixins/trended",
     "pentaho/visual/role/level",
-    function(BaseModel, LabelsOption, ScaleColorContinuousModel, MultiChartedModel, TrendedModel, MeasurementLevel) {
+    function(BaseModel, LabelsOption, ScaleColorContinuousModel, ScaleColorDiscreteModel,
+             MultiChartedModel, TrendedModel, MeasurementLevel) {
 
       return BaseModel.extend({
         $type: {
           id: module.id,
           isAbstract: true,
           // TODO: scaleColor... should only be applicable when color is continuous
-          mixins: [TrendedModel, ScaleColorContinuousModel, MultiChartedModel],
+          mixins: [TrendedModel, ScaleColorDiscreteModel, ScaleColorContinuousModel, MultiChartedModel],
 
           category: "scatter",
 

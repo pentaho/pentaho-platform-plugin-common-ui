@@ -24,12 +24,13 @@ define([
     "pentaho/visual/models/abstract",
     "pentaho/visual/models/types/labelsOption",
     "pentaho/visual/models/mixins/multiCharted",
-    function(BaseModel, LabelsOption, MultiChartedModel) {
+    "pentaho/visual/models/mixins/scaleColorDiscrete",
+    function(BaseModel, LabelsOption, MultiChartedModel, ScaleColorDiscreteModel) {
 
       return BaseModel.extend({
         $type: {
           id: module.id,
-          mixins: [MultiChartedModel],
+          mixins: [MultiChartedModel, ScaleColorDiscreteModel],
 
           v2Id: "ccc_pie",
           category: "piechart",
