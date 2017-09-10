@@ -25,9 +25,9 @@ define([
   return [
     "pentaho/visual/base/model",
     "pentaho/visual/role/level",
-    "pentaho/visual/models/types/colorSet",
-    "pentaho/visual/models/types/pattern",
-    "pentaho/visual/models/types/multiChartOverflow",
+    "../types/colorSet",
+    "../types/pattern",
+    "../types/multiChartOverflow",
     function(BaseModel, MeasurementLevel, ColorSet, Pattern) {
 
       return BaseModel.extend({

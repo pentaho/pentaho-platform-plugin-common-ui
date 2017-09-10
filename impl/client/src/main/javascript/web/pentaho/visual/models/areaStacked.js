@@ -20,7 +20,7 @@ define([
 
   "use strict";
 
-  return ["pentaho/visual/models/pointAbstract", function(BaseModel) {
+  return ["./pointAbstract", function(BaseModel) {
 
     return BaseModel.extend({
       $type: {

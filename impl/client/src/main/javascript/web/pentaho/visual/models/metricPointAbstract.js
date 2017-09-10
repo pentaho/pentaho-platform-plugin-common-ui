@@ -21,12 +21,12 @@ define([
   "use strict";
 
   return [
-    "pentaho/visual/models/cartesianAbstract",
-    "pentaho/visual/models/types/labelsOption",
-    "pentaho/visual/models/mixins/scaleColorContinuous",
-    "pentaho/visual/models/mixins/scaleColorDiscrete",
-    "pentaho/visual/models/mixins/multiCharted",
-    "pentaho/visual/models/mixins/trended",
+    "./cartesianAbstract",
+    "./types/labelsOption",
+    "./mixins/scaleColorContinuous",
+    "./mixins/scaleColorDiscrete",
+    "./mixins/multiCharted",
+    "./mixins/trended",
     "pentaho/visual/role/level",
     function(BaseModel, LabelsOption, ScaleColorContinuousModel, ScaleColorDiscreteModel,
              MultiChartedModel, TrendedModel, MeasurementLevel) {

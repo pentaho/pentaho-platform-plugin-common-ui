@@ -21,9 +21,9 @@ define([
   "use strict";
 
   return [
-    "pentaho/visual/models/barAbstract",
-    "pentaho/visual/models/types/labelsOption",
-    "pentaho/visual/models/mixins/trended",
+    "./barAbstract",
+    "./types/labelsOption",
+    "./mixins/trended",
     function(BaseModel, LabelsOption, TrendedModel) {
 
       return BaseModel.extend({

@@ -21,7 +21,7 @@ define([
   "use strict";
 
   return [
-    "pentaho/visual/models/barNormalizedAbstract",
+    "./barNormalizedAbstract",
     function(BaseModel) {
 
       return BaseModel.extend({

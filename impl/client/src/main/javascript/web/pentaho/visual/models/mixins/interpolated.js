@@ -24,7 +24,7 @@ define([
 
   return [
     "pentaho/visual/base/model",
-    "pentaho/visual/models/types/emptyCellMode",
+    "../types/emptyCellMode",
     function(BaseModel, EmptyCellMode) {
 
       return BaseModel.extend({

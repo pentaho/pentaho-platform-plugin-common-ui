@@ -21,11 +21,11 @@ define([
   "use strict";
 
   return [
-    "pentaho/visual/models/barAbstract",
-    "pentaho/visual/models/types/labelsOption",
-    "pentaho/visual/models/types/shape",
-    "pentaho/visual/models/types/lineWidth",
-    "pentaho/visual/models/mixins/interpolated",
+    "./barAbstract",
+    "./types/labelsOption",
+    "./types/shape",
+    "./types/lineWidth",
+    "./mixins/interpolated",
     function(BaseModel, LabelsOption, Shape, LineWidth, InterpolatedModel) {
 
       return BaseModel.extend({

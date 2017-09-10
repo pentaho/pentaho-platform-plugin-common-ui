@@ -21,8 +21,8 @@ define([
   "use strict";
 
   return [
-    "pentaho/visual/models/cartesianAbstract",
-    "pentaho/visual/models/mixins/scaleColorDiscrete",
+    "./cartesianAbstract",
+    "./mixins/scaleColorDiscrete",
     function(BaseModel, ScaleColorDiscreteModel) {
 
       return BaseModel.extend({

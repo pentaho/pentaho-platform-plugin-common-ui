@@ -20,13 +20,13 @@ define([
 
   "use strict";
 
-  return ["string", "enum", function(PentahoString, Enum) {
+  return ["string", function(PentahoString) {
 
     return PentahoString.extend({
 
       $type: {
         id: module.id,
-        mixins: [Enum],
+        mixins: ["enum"],
         domain: ["none", "solid", "gradient"]
       }
     })

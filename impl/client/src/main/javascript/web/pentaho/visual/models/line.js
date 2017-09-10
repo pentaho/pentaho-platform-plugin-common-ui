@@ -21,10 +21,10 @@ define([
   "use strict";
 
   return [
-    "pentaho/visual/models/pointAbstract",
-    "pentaho/visual/models/types/shape",
-    "pentaho/visual/models/types/lineWidth",
-    "pentaho/visual/models/mixins/trended",
+    "./pointAbstract",
+    "./types/shape",
+    "./types/lineWidth",
+    "./mixins/trended",
     function(BaseModel, Shape, LineWidth, TrendedModel) {
 
       return BaseModel.extend({

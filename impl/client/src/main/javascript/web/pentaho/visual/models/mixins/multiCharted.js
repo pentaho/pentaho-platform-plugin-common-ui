@@ -25,9 +25,9 @@ define([
 
   return [
     "pentaho/visual/base/model",
-    "pentaho/visual/models/types/maxChartsPerRow",
-    "pentaho/visual/models/types/multiChartRangeScope",
-    "pentaho/visual/models/types/multiChartOverflow",
+    "../types/maxChartsPerRow",
+    "../types/multiChartRangeScope",
+    "../types/multiChartOverflow",
     function(BaseModel, MaxChartsPerRow, MultiChartRangeScope, MultiChartOverflow) {
 
       return BaseModel.extend({

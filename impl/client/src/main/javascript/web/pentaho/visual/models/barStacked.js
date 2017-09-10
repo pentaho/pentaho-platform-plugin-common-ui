@@ -21,8 +21,8 @@ define([
   "use strict";
 
   return [
-    "pentaho/visual/models/barAbstract",
-    "pentaho/visual/models/types/labelsOption",
+    "./barAbstract",
+    "./types/labelsOption",
     function(BaseModel, LabelsOption) {
 
       return BaseModel.extend({

@@ -21,8 +21,8 @@ define([
   "use strict";
 
   return [
-    "pentaho/visual/models/abstract",
-    "pentaho/visual/models/types/displayUnits",
+    "./abstract",
+    "./types/displayUnits",
     function(BaseModel, DisplayUnits) {
 
       return BaseModel.extend({

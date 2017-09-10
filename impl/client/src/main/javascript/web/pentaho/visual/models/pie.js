@@ -21,10 +21,10 @@ define([
   "use strict";
 
   return [
-    "pentaho/visual/models/abstract",
-    "pentaho/visual/models/types/labelsOption",
-    "pentaho/visual/models/mixins/multiCharted",
-    "pentaho/visual/models/mixins/scaleColorDiscrete",
+    "./abstract",
+    "./types/labelsOption",
+    "./mixins/multiCharted",
+    "./mixins/scaleColorDiscrete",
     function(BaseModel, LabelsOption, MultiChartedModel, ScaleColorDiscreteModel) {
 
       return BaseModel.extend({

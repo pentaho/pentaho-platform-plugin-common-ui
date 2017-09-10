@@ -23,7 +23,7 @@ define([
   // Used by: HG, Scatter
   return [
     "pentaho/visual/base/model",
-    "pentaho/visual/models/types/sizeByNegativesMode",
+    "../types/sizeByNegativesMode",
     function(BaseModel, SizeByNegativesMode) {
 
       return BaseModel.extend({

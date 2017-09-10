@@ -21,10 +21,10 @@ define([
   "use strict";
 
   return [
-    "pentaho/visual/models/categoricalContinuousAbstract",
-    "pentaho/visual/models/types/labelsOption",
-    "pentaho/visual/models/mixins/multiCharted",
-    "pentaho/visual/models/mixins/interpolated",
+    "./categoricalContinuousAbstract",
+    "./types/labelsOption",
+    "./mixins/multiCharted",
+    "./mixins/interpolated",
     function(BaseModel, LabelsOption, MultiChartedModel, InterpolatedModel) {
 
       return BaseModel.extend({

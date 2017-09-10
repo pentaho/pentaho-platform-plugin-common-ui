@@ -21,11 +21,11 @@ define([
   "use strict";
 
   return [
-    "pentaho/visual/models/cartesianAbstract",
-    "pentaho/visual/models/types/shape",
-    "pentaho/visual/models/types/labelsOption",
-    "pentaho/visual/models/mixins/scaleSizeContinuous",
-    "pentaho/visual/models/mixins/scaleColorContinuous",
+    "./cartesianAbstract",
+    "./types/shape",
+    "./types/labelsOption",
+    "./mixins/scaleSizeContinuous",
+    "./mixins/scaleColorContinuous",
     function(BaseModel, Shape, LabelsOption, ScaleSizeContinuousModel, ScaleColorContinuousModel) {
 
       return BaseModel.extend({

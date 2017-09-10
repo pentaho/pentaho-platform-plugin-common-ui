@@ -24,8 +24,8 @@ define([
 
   return [
     "pentaho/visual/base/model",
-    "pentaho/visual/models/types/trendType",
-    "pentaho/visual/models/types/lineWidth",
+    "../types/trendType",
+    "../types/lineWidth",
     function(BaseModel, TrendType, LineWidth) {
 
       return BaseModel.extend({

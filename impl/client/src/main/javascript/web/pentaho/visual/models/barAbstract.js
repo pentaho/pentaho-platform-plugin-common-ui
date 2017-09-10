@@ -21,8 +21,8 @@ define([
   "use strict";
 
   return [
-    "pentaho/visual/models/categoricalContinuousAbstract",
-    "pentaho/visual/models/mixins/multiCharted",
+    "./categoricalContinuousAbstract",
+    "./mixins/multiCharted",
     function(BaseModel, MultiChartedModel) {
 
       return BaseModel.extend({

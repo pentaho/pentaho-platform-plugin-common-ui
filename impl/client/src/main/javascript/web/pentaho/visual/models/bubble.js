@@ -21,8 +21,8 @@ define([
   "use strict";
 
   return [
-    "pentaho/visual/models/metricPointAbstract",
-    "pentaho/visual/models/mixins/scaleSizeContinuous",
+    "./metricPointAbstract",
+    "./mixins/scaleSizeContinuous",
     function(BaseModel, ScaleSizeContinuousModel) {
 
       return BaseModel.extend({

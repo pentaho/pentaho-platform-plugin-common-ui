@@ -28,11 +28,11 @@ define([
 
   return [
     "pentaho/visual/base/model",
-    "pentaho/visual/models/types/color",
-    "pentaho/visual/models/types/backgroundFill",
-    "pentaho/visual/models/types/fontStyle",
-    "pentaho/visual/models/types/sides",
-    "pentaho/visual/models/types/labelsOption",
+    "./types/color",
+    "./types/backgroundFill",
+    "./types/fontStyle",
+    "./types/sides",
+    "./types/labelsOption",
     function(BaseModel, Color, BackgroundFill, FontStyle, Sides, LabelsOption) {
 
       return BaseModel.extend({
