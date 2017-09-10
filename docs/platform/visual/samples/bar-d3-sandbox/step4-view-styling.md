@@ -52,12 +52,11 @@ Modify the AMD module declaration of the `view-d3.js` file to the following:
 
 ```js
 define([
-  "module",
-  "pentaho/visual/base/view",
-  "./model",
+  "module", 
   "d3",
   "css!./css/view-d3"
-], function(module, baseViewFactory, barModelFactory, d3) {
+], function(module, d3) {
+
   // ...
 });
 ```

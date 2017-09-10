@@ -121,7 +121,7 @@ npm install
                })
                .then(function(view) {
                  // Render the visualization.
-                 view.update();
+                 return view.update();
                });
           });
         </script>

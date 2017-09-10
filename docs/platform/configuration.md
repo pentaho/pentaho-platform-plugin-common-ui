@@ -145,6 +145,7 @@ included and registered in the same [Pentaho Web Package](web-package).
 |-------------|
 |`saphire`    |
 |`crystal`    |
+|`ruby`       |
 
 ### `locale`
 

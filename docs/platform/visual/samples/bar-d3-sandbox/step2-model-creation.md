@@ -70,7 +70,8 @@ define([
 ```
 
 Remarks:
-  - The value of the AMD module is a factory function of Bar model classes.
+  - The value of the AMD module is an array of dependencies and of a factory function 
+    of Bar model classes.
   - Defines a visualization (model) whose id is the file's AMD module identifier
     (depending on how AMD is configured, it can be, for example: `pentaho/visual/samples/bar/model`).
   - Inherits directly from the base visualization model, 

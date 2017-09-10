@@ -141,7 +141,7 @@ Edit the `index.html` file and place the following code in it:
            })
            .then(function(view) {
              // Render the visualization.
-             view.update();
+             return view.update();
            });
     });
   </script>

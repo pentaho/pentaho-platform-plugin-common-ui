@@ -83,38 +83,6 @@ Note the added `config` property.
 Now, refresh the `index.html` page in the browser, and you should see a Bar chart with wider bars.
 Go ahead and experiment with different values.
 
-## PDI Integration
-
-Currently, the [PDI](http://www.pentaho.com/product/data-integration) application
-requires visualizations to come annotated with which "data views", _Stream_ and/or _Model_, they can be used with.
-This is a current limitation that will be removed in future releases. 
-However, until then, the Bar visualization can be configured to contain this required metadata when
-being used by the PDI application. Add the following rule to the `config.js` file:
-
-```js
-define(["module"], function(module) {
-  // ...
-  return {
-    rules: [
-      // ..,
-      {
-        priority: -1,
-        select: {
-          type: vizId,
-          application: "pentaho-det"
-        },
-        apply: {
-          supportedModes: ["STREAM", "MODEL"]
-        }
-      }
-    ]
-  };
-});
-```
-
-Note that this rule has no effect when testing your visualization in the sandbox environment, 
-but is important if you package and bundle your visualization for deployment. 
-
 ## Analyzer Integration
 
 In [Analyzer](http://www.pentaho.com/product/business-visualization-analytics), 
@@ -152,7 +120,7 @@ define(["module"], function(module) {
 });
 ```
 
-Again, note that this rule has no effect when testing your visualization in the sandbox environment, 
+Note that this rule has no effect when testing your visualization in the sandbox environment, 
 but is important if you package and bundle your visualization for deployment.
 
 **Continue** to [Next steps](stepNext).
