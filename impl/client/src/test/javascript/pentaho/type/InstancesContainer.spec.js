@@ -511,7 +511,8 @@ define([
         "myFoo2": {type: "Foo", priority: 10},
         "myBar": {type: "Bar", priority: 20},
         "myAliased": {type: "A"}, // registered using its type alias...
-        "missing": {type: "Guu"}
+        "missing": {type: "Guu"},
+        "folder/dependentRelativeType": {type: "folder/Relative"}
       };
 
       function configAmd(localRequire) {
@@ -572,7 +573,22 @@ define([
         localRequire.define("myAliased", function() {
           return [
             "Aliased",
-            function(Aliased) { return new Aliased(); }
+            function(Aliased) { return new Aliased({v: "foo"}); }
+          ];
+        });
+
+        // instance with relative type dependency
+        localRequire.define("folder/dependentRelativeType", function() {
+          return [
+            "./Relative",
+            function(Relative) { return new Relative({v: "foo"}); }
+          ];
+        });
+
+        localRequire.define("folder/Relative", function() {
+          return [
+            "simple",
+            function(Simple) { return Simple.extend({$type: {id: "folder/Relative"}}); }
           ];
         });
 
@@ -584,7 +600,8 @@ define([
               "Foo":  {base: "Root"},
               "Bar":  {base: "Root"},
               "Aliased": {base: "simple", alias: "A"},
-              "NoInstances": {base: "simple"}
+              "NoInstances": {base: "simple"},
+              "Relative": {base: "simple"}
             }
           }
         });
@@ -679,6 +696,28 @@ define([
                 .then(function(foo2) {
 
                   expect(foo2).toBe(foo1);
+                });
+          });
+        });
+
+        it("should return an instance with a relative type dependency", function() {
+
+          var container;
+
+          return require.using([
+            "pentaho/type/Context",
+            "pentaho/type/InstancesContainer"
+          ], configAmd, function(Context, InstancesContainer) {
+
+            return Context.createAsync()
+                .then(function(context) {
+
+                  container = new InstancesContainer(context, containerConfig);
+
+                  return container.getByIdAsync("folder/dependentRelativeType");
+                })
+                .then(function(relative) {
+                  expect(relative != null).toBe(true);
                 });
           });
         });
@@ -1761,7 +1800,7 @@ define([
           });
         });
 
-        it("should throw if given an anonyous BaseType", function() {
+        it("should throw if given an anonymous BaseType", function() {
 
           var container;
 
@@ -1785,7 +1824,7 @@ define([
           });
         });
 
-        it("should throw if given an anonyous BaseType.Type", function() {
+        it("should throw if given an anonymous BaseType.Type", function() {
 
           var container;
 
@@ -1833,6 +1872,30 @@ define([
 
                   var result = container.getByType("Foo");
                   expect(result).toBe(foos[1]);
+                });
+          });
+        });
+
+        it("should return a registered and loaded instance whose type alias is given", function() {
+
+          var container;
+
+          return require.using([
+            "pentaho/type/Context",
+            "pentaho/type/InstancesContainer"
+          ], configAmd, function(Context, InstancesContainer) {
+
+            return Context.createAsync()
+                .then(function(context) {
+
+                  container = new InstancesContainer(context, containerConfig);
+
+                  return container.getByIdAsync("myAliased");
+                })
+                .then(function(aliased) {
+
+                  var result = container.getByType("A");
+                  expect(result).toBe(aliased);
                 });
           });
         });

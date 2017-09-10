@@ -1148,7 +1148,8 @@ define([
        * @param {pentaho.type.spec.UInstanceReference} [instRef] - An instance reference.
        * @param {Object} [instKeyArgs] - The keyword arguments passed to the instance constructor, when one is created.
        *
-       * @return {!Promise.<pentaho.type.Instance>} A promise to the created instance or resolved instance (possibly `null`).
+       * @return {!Promise.<pentaho.type.Instance>} A promise to the created instance or resolved instance
+       * (possibly `null`).
        *
        * @rejects {Error} Other errors, as documented in:
        * [InstancesContainer#getAsync]{@link pentaho.type.InstancesContainer#getAsync}.

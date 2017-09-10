@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "../util/object"
-], function(O) {
+  "../util/object",
+  "../util/error"
+], function(O, error) {
 
   "use strict";
 
@@ -118,6 +119,54 @@ define([
       }
 
       return any;
+    },
+
+    __baseIdOf: function(id) {
+      return id.replace(/.\w+$/, "");
+    },
+
+    __absolutizeDependenciesOf: function(depRefs, siblingId) {
+
+      var baseId = this.__baseIdOf(siblingId);
+
+      depRefs.forEach(function(depRef, index) {
+        if(typeof depRef === "string") {
+          depRefs[index] = this.__absolutizeId(depRef, baseId);
+        }
+      }, this);
+    },
+
+    __absolutizeId: function(id, baseId) {
+      if(id) {
+        var baseIds = baseId.split("/");
+        var ids = id.split("/");
+        var needsBase = false;
+
+        while(ids.length) {
+          var segment = ids[0];
+          if(segment === ".") {
+            ids.shift();
+            needsBase = true;
+          } else if(segment === "..") {
+            if(!baseIds.pop()) {
+              throw error.operInvalid("Invalid path: '" + id + "'.");
+            }
+            ids.shift();
+            needsBase = true;
+          } else {
+            break;
+          }
+        }
+
+        if(needsBase) {
+          baseId = baseIds.join("/");
+          id = ids.join("/");
+
+          return (baseId && id) ? (baseId + "/" + id) : (baseId || id);
+        }
+      }
+
+      return id;
     }
   };
 

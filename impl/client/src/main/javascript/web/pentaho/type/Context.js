@@ -28,6 +28,7 @@ define([
   "./changes/TransactionScope",
   "./changes/CommittedScope",
   "../lang/Base",
+  "./util",
   "../util/promise",
   "../util/arg",
   "../util/error",
@@ -40,7 +41,7 @@ define([
     SpecificationContext, SpecificationScope,
     InstancesContainer, mainPlatformEnv, configurationService,
     Transaction, TransactionScope, CommittedScope,
-    Base, promiseUtil, arg, error, O, F, debugMgr, DebugLevels, logger) {
+    Base, typeUtil, promiseUtil, arg, error, O, F, debugMgr, DebugLevels, logger) {
 
   "use strict";
 
@@ -161,6 +162,10 @@ define([
     __loadFactory: function(factory, depRefs) {
 
       if(depRefs.length) {
+        if(this.id) {
+          typeUtil.__absolutizeDependenciesOf(depRefs, this.id);
+        }
+
         return this.context.getDependencyAsync(depRefs)
             .then(this.__createFromFactoryAsync.bind(this, factory));
       }

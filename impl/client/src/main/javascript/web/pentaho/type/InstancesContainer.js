@@ -20,6 +20,7 @@ define([
   "../i18n!types",
   "../lang/Base",
   "../lang/SortedList",
+  "./util",
   "../util/promise",
   "../util/arg",
   "../util/error",
@@ -28,7 +29,7 @@ define([
   "../debug",
   "../debug/Levels",
   "../util/logger"
-], function(localRequire, module, typeInfo, bundle, Base, SortedList,
+], function(localRequire, module, typeInfo, bundle, Base, SortedList, typeUtil,
             promiseUtil, arg, error, O, F, debugMgr, DebugLevels, logger) {
 
   "use strict";
@@ -125,13 +126,16 @@ define([
       return Promise.reject(error.argInvalidType("instModule", "Array", typeof instModule));
     },
 
-    __loadFactory: function(factory, deps, typePromise) {
+    __loadFactory: function(factory, depRefs, typePromise) {
       var allPromises = [
         typePromise
       ];
 
-      if(deps && deps.length) {
-        allPromises.push(this.container.context.getDependencyAsync(deps));
+      if(depRefs && depRefs.length) {
+
+        typeUtil.__absolutizeDependenciesOf(depRefs, this.id);
+
+        allPromises.push(this.container.context.getDependencyAsync(depRefs));
       }
 
       return Promise.all(allPromises).then(this.__createFromFactoryAsync.bind(this, factory));
