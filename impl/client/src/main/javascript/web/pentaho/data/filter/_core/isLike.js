@@ -77,13 +77,11 @@ define([
           reference = value;
         }
 
-        var firstOccurrence = -1;
-        if (reference != null){
-          firstOccurrence = reference.indexOf(caption);
-        }
+        var firstOccurrence = reference.indexOf(caption);
+
         return firstOccurrence > -1 &&
           (!anchorStart || firstOccurrence === 0) &&
-          (!anchorEnd || reference.endsWith(caption));
+          (!anchorEnd || firstOccurrence + caption.length === reference.length);
 
       },
 
