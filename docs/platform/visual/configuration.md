@@ -7,7 +7,8 @@ layout: default
 
 This article shows you how to create a configuration for a [Visualization API](.) visualization.
 
-It is assumed that you have some basic knowledge on how to configure JavaScript _types_ on the Pentaho platform
+It is assumed that you have some basic knowledge on how to configure JavaScript 
+_types_ and _instances_ on the Pentaho platform
 and on what constitutes a visualization.
 If not, you should first read [Configuration API](../configuration) and 
 [Creating a visualization](./#creating-a-visualization).
@@ -23,6 +24,9 @@ that can be configured.
 
 Section [Identifiers of Stock Visualizations](#identifiers-of-stock-visualizations) contains the list
 of identifiers of stock `Model` and `View` types.
+Additionally, 
+section [Identifiers of Stock Color Palettes](#identifiers-of-stock-color-palettes) contains the list
+of identifiers of stock color palettes.
 
 The following sections show examples of typical `Model` and `View` configurations.
 A single [IRule]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule'}}) object 
@@ -206,6 +210,29 @@ var ruleSpec = {
 };
 ```
 
+## Examples of color palette configurations
+
+### Change the colors of the default discrete color palette
+
+The following rule changes the 
+[Palette#colors]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.Palette' | append: '#colors'}})
+property of default nominal color palette,
+[pentaho.visual.color.palettes.nominalPrimary]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.palettes.nominalPrimary'}}),
+in any application:
+
+```js
+var ruleSpec = {
+  select: {
+    instance:"pentaho.visual.color.palettes.nominalPrimary"
+  },
+  apply: {
+    colors: [
+      "red", "#00FF00", "rgb(0, 0, 255)"
+    ]
+  }
+};
+```
+
 ## Identifiers of Stock Visualizations
 
 The models of stock visualizations are all sub-modules of `pentaho/visual/models`. 
@@ -233,3 +260,28 @@ the stock Line visualization model.
 | pie                     | Pie                      |
 | donut                   | Donut                    |
 | sunburst                | Sunburst                 |
+
+The Geo Map visualization is the exception to these rules.
+Its model's identifier is `pentaho/visual/models/geoMap`
+and its view's identifier is `pentaho/geo/visual/map`.
+
+## Identifiers of Stock Color Palettes
+
+All stock color palettes are sub-modules of `pentaho/visual/color/palettes`.
+For example, `pentaho/visual/color/palettes/nominalPrimary`, 
+is the identifier of the default discrete color palette.
+
+| Local Module            |
+|-------------------------|
+| nominalPrimary          |
+| nominalNeutral          |
+| nominalLight            |
+| nominalDark             |
+| quantitativeBlue3       |
+| quantitativeBlue5       |
+| quantitativeGray3       |
+| quantitativeGray5       |
+| divergentRyb3           |
+| divergentRyb5           |
+| divergentRyg3           |
+| divergentRyg5           |
