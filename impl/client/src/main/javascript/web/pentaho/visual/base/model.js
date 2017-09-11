@@ -15,7 +15,13 @@
  */
 define([
   "module",
-  "pentaho/i18n!model"
+  "pentaho/i18n!model",
+
+  // so that r.js sees otherwise invisible dependencies.
+  "pentaho/type/model",
+  "pentaho/visual/role/property",
+  "pentaho/visual/color/paletteProperty",
+  "pentaho/visual/base/application"
 ], function(module, bundle) {
 
   "use strict";

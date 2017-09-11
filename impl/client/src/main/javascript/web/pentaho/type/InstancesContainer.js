@@ -132,10 +132,7 @@ define([
       ];
 
       if(depRefs && depRefs.length) {
-
-        typeUtil.__absolutizeDependenciesOf(depRefs, this.id);
-
-        allPromises.push(this.container.context.getDependencyAsync(depRefs));
+        allPromises.push(this.container.context.getDependencyAsync(depRefs, {dependentId: this.id}));
       }
 
       return Promise.all(allPromises).then(this.__createFromFactoryAsync.bind(this, factory));

@@ -122,23 +122,17 @@ define([
     },
 
     __baseIdOf: function(id) {
-      return id.replace(/.\w+$/, "");
+      return id && id.replace(/.[^\/]+$/, "");
     },
 
-    __absolutizeDependenciesOf: function(depRefs, siblingId) {
+    __absolutizeDependencyOf: function(id, siblingId) {
 
-      var baseId = this.__baseIdOf(siblingId);
-
-      depRefs.forEach(function(depRef, index) {
-        if(typeof depRef === "string") {
-          depRefs[index] = this.__absolutizeId(depRef, baseId);
-        }
-      }, this);
+      return this.__absolutizeId(id, this.__baseIdOf(siblingId));
     },
 
     __absolutizeId: function(id, baseId) {
       if(id) {
-        var baseIds = baseId.split("/");
+        var baseIds = baseId ? baseId.split("/") : [];
         var ids = id.split("/");
         var needsBase = false;
 

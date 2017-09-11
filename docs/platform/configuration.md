@@ -133,11 +133,12 @@ included and registered in the same [Pentaho Web Package](web-package).
 ## Known Values of Pentaho Environment Variables
 ### `application`
 
-| Description | Value              |
-|-------------|--------------------|
-| CDF         | `pentaho-cdf`      |
-| Analyzer    | `pentaho-analyzer` |
-| PDI         | `pentaho-det`      |
+| Description             | Value                |
+|-------------------------|----------------------|
+| CDF                     | `pentaho-cdf`        |
+| Analyzer                | `pentaho-analyzer`   |
+| Analyzer in Dashboards  | `pentaho-dashboards` |
+| PDI                     | `pentaho-det`        |
 
 ### `theme`
 

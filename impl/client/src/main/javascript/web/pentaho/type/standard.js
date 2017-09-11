@@ -15,24 +15,23 @@
  */
 
 // This exists only so that r.js sees otherwise invisible dependencies.
-
 define([
-  "./abstract",
-  "./tree",
+  "./instance",
+  "./value",
+  "./element",
+  "./list",
+  "./simple",
+  "./complex",
+  "./string",
+  "./number",
+  "./boolean",
+  "./date",
+  "./object",
+  "./function",
   "./property",
-  "./and",
-  "./or",
-  "./not",
-  "./isEqual",
-  "./isIn",
-  "./isGreater",
-  "./isLess",
-  "./isGreaterOrEqual",
-  "./isLessOrEqual",
-  "./isLike",
-  "./true",
-  "./false"
+  "./model",
+  "./application",
+  "./mixins/enum"
 ], function() {
-
   "use strict";
 });

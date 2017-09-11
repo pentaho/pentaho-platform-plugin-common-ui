@@ -28,7 +28,14 @@ define([
   "pentaho/util/error",
   "pentaho/util/logger",
   "pentaho/util/promise",
-  "pentaho/util/spec"
+  "pentaho/util/spec",
+
+  // so that r.js sees otherwise invisible dependencies.
+  "pentaho/type/complex",
+  "pentaho/visual/base/model",
+  "pentaho/type/action/base",
+  "pentaho/data/filter/abstract",
+  "pentaho/visual/action/base"
 ], function(module, ComplexChangeset, bundle, WillUpdate, DidUpdate, RejectedUpdate, UserError,
             O, arg, F, BitSet, error, logger, promise, specUtil) {
 

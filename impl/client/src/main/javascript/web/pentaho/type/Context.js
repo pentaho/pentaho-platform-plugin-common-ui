@@ -36,7 +36,8 @@ define([
   "../util/fun",
   "../debug",
   "../debug/Levels",
-  "../util/logger"
+  "../util/logger",
+  "./standard" // so that r.js sees otherwise invisible dependencies.
 ], function(localRequire, module, typeInfo, bundle, InstanceConstructionContext,
     SpecificationContext, SpecificationScope,
     InstancesContainer, mainPlatformEnv, configurationService,
@@ -162,11 +163,8 @@ define([
     __loadFactory: function(factory, depRefs) {
 
       if(depRefs.length) {
-        if(this.id) {
-          typeUtil.__absolutizeDependenciesOf(depRefs, this.id);
-        }
 
-        return this.context.getDependencyAsync(depRefs)
+        return this.context.getDependencyAsync(depRefs, {dependentId: this.id})
             .then(this.__createFromFactoryAsync.bind(this, factory));
       }
 
@@ -789,6 +787,9 @@ define([
      * Resolves a [module dependency reference]{@link pentaho.type.spec.UModuleDependencyReference}.
      *
      * @param {!pentaho.type.spec.UModuleDependencyReference} depRef - A module dependency reference.
+     * @param {object} [keyArgs] Keyword arguments.
+     * @param {string} [keyArgs.dependentId] - The identifier of the dependent type,
+     * for resolving relative identifiers.
      *
      * @return {Object|Array|pentaho.type.Instance|pentaho.type.Type} A module dependency.
      *
@@ -799,17 +800,20 @@ define([
      * [getAll]{@link pentaho.type.Context#getAll} and
      * [InstancesContainer#get]{@link pentaho.type.InstancesContainer#get}.
      */
-    getDependency: function(depRef) {
+    getDependency: function(depRef, keyArgs) {
 
       if(!depRef) throw error.argRequired("depRef");
 
-      return this.__getDependencyRecursive(depRef, /* sync: */ true);
+      return this.__getDependencyRecursive(depRef, /* sync: */ true, keyArgs);
     },
 
     /**
      * Resolves a [module dependency reference]{@link pentaho.type.spec.UModuleDependencyReference}, asynchronously.
      *
      * @param {!pentaho.type.spec.UModuleDependencyReference} depRef - A module dependency reference.
+     * @param {object} [keyArgs] Keyword arguments.
+     * @param {string} [keyArgs.dependentId] - The identifier of the dependent type,
+     * for resolving relative identifiers.
      *
      * @return {Promise.<Object|Array|pentaho.type.Instance|pentaho.type.Type>} A promise for a module dependency.
      *
@@ -820,17 +824,19 @@ define([
      * [getAllAsync]{@link pentaho.type.Context#getAllAsync} and
      * [InstancesContainer#getAsync]{@link pentaho.type.InstancesContainer#getAsync}.
      */
-    getDependencyAsync: function(depRef) {
+    getDependencyAsync: function(depRef, keyArgs) {
 
       if(!depRef) return Promise.reject(error.argRequired("depRef"));
 
-      return this.__getDependencyRecursive(depRef, /* sync: */ false);
+      return this.__getDependencyRecursive(depRef, /* sync: */ false, keyArgs);
     },
 
-    __getDependencyRecursive: function(depRef, sync) {
+    __getDependencyRecursive: function(depRef, sync, keyArgs) {
 
       switch(typeof depRef) {
         case "string":
+          depRef = typeUtil.__absolutizeDependencyOf(depRef, O.getOwn(keyArgs, "dependentId"));
+
           return sync ? this.get(depRef) : this.getAsync(depRef);
 
         case "object":
@@ -839,14 +845,14 @@ define([
           if(Array.isArray(depRef)) {
 
             results = depRef.map(function(oneDepRef) {
-              return this.__getDependencyRecursive(oneDepRef, sync);
+              return this.__getDependencyRecursive(oneDepRef, sync, keyArgs);
             }, this);
 
             return sync ? results : Promise.all(results);
           }
 
           if(depRef.constructor === Object) {
-            return this.__getDependencyObjectRecursive(depRef, sync);
+            return this.__getDependencyObjectRecursive(depRef, sync, keyArgs);
           }
           break;
       }
@@ -854,18 +860,22 @@ define([
       return promiseUtil.error(error.argInvalid("depRef", "Invalid module dependency reference."), sync);
     },
 
-    __getDependencyObjectRecursive: function(depRef, sync) {
+    __getDependencyObjectRecursive: function(depRef, sync, keyArgs) {
 
       // Special syntax ?
       var specialSpec;
 
       if((specialSpec = depRef.$instance)) {
+        // TODO: dependentId for id and type
+
         // specialSpec: {id, isRequired, reservation} | {type, isRequired, filter, reservation}
         // instKeyArgs is used only when creating a list of results
         return this.__instances.__getSpecial(specialSpec, /* instKeyArgs: */ null, /* typeDefault */null, sync);
       }
 
       if((specialSpec = depRef.$types)) {
+        // TODO: dependentId for base
+
         // specialSpec: {base}
         return sync
             ? this.getAll(specialSpec.base)
@@ -879,7 +889,7 @@ define([
       if(!sync) { results = []; }
 
       O.eachOwn(depRef, function(oneDepRef, key) {
-        var result = this.__getDependencyRecursive(oneDepRef, sync);
+        var result = this.__getDependencyRecursive(oneDepRef, sync, keyArgs);
         if(sync) {
           map[key] = result;
         } else {

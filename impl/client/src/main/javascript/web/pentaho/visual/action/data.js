@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 define([
-  "module"
+  "module",
+
+  // This exists only so that r.js sees otherwise invisible dependencies.
+  "pentaho/visual/action/base",
+  "pentaho/data/filter/standard"
 ], function(module) {
 
   "use strict";
