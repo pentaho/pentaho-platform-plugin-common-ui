@@ -221,22 +221,26 @@ define([
 
         var Derived = Instance.extend({$type: {sourceId: "fake/id"}});
 
-        expect(Derived.type.buildSourceRelativeId("./foo/bar")).toBe("fake/./foo/bar");
-        expect(Derived.type.buildSourceRelativeId("./bar")).toBe("fake/./bar");
-        expect(Derived.type.buildSourceRelativeId("../bar")).toBe("fake/../bar");
+        expect(Derived.type.buildSourceRelativeId("./foo/bar")).toBe("fake/foo/bar");
+        expect(Derived.type.buildSourceRelativeId("./bar")).toBe("fake/bar");
+        expect(Derived.type.buildSourceRelativeId("../bar")).toBe("bar");
 
         // ---
         // no base folder..
 
         Derived = Instance.extend();
 
-        expect(Derived.type.buildSourceRelativeId("../bar")).toBe("../bar");
+        expect(function() {
+          Derived.type.buildSourceRelativeId("../bar");
+        }).toThrow(errorMatch.operInvalid());
 
         // ---
 
         Derived = Instance.extend({$type: {sourceId: "id"}});
 
-        expect(Derived.type.buildSourceRelativeId("../bar")).toBe("../bar");
+        expect(function() {
+          Derived.type.buildSourceRelativeId("../bar");
+        }).toThrow(errorMatch.operInvalid());
       });
     });
 
@@ -353,61 +357,70 @@ define([
         expect(B.type.defaultView).toBe("bar");
       });
 
-      it("should inherit a base function", function() {
-        var FA = function() {
-        };
-        var A  = Instance.extend({$type: {defaultView: FA}});
-
-        expect(A.type.defaultView).toBe(FA);
-
-        var B = A.extend();
-
-        expect(B.type.defaultView).toBe(FA);
-      });
-
-      it("should respect a specified function", function() {
-        var FA = function() {
-        };
-        var A  = Instance.extend({$type: {defaultView: FA}});
-
-        expect(A.type.defaultView).toBe(FA);
-
-        var FB = function() {
-        };
-        var B  = A.extend({$type: {defaultView: FB}});
-
-        expect(B.type.defaultView).toBe(FB);
-      });
-
       // coverage
-      it("should allow setting to the same function", function() {
-        var FA = function() {
-        };
-        var A  = Instance.extend({$type: {defaultView: FA}});
-
-        expect(A.type.defaultView).toBe(FA);
-
-        var FB = function() {
-        };
-        var B  = A.extend({$type: {defaultView: FB}});
-
-        B.type.defaultView = FB;
-
-        expect(B.type.defaultView).toBe(FB);
-      });
-
       it("should preserve the default value", function() {
         Instance.type.defaultView = undefined;
         // The default value is still there (did not delete)
         expect(Instance.type.defaultView).toBe(null);
       });
-
-      it("should throw when defaultView is not a string, nully or a function", function() {
-        expect(function() {
-          Instance.extend({$type: {defaultView: {}}});
-        }).toThrow(errorMatch.argInvalidType("defaultView", ["nully", "string", "function"], "object"));
-      });
     }); // end #defaultView
+
+    describe("#defaultViewAbs -", function() {
+
+      it("should return null when defaultView is null", function() {
+        var A = Instance.extend();
+        var view = A.type.defaultViewAbs;
+
+        expect(view).toBe(null);
+      });
+
+      it("should return the same as defaultView when it is an absolute string", function() {
+
+        var A = Instance.extend({$type: {defaultView: "foo/bar"}});
+
+        var view = A.type.defaultViewAbs;
+
+        expect(view).toBe("foo/bar");
+      });
+
+      it("should return an absolute value when defaultView is a source relative string", function() {
+
+        var A = Instance.extend({$type: {sourceId: "foo/bar", defaultView: "./barView"}});
+
+        var view = A.type.defaultViewAbs;
+
+        expect(view).toBe("foo/barView");
+      });
+
+      it("should return an absolute value when inherited from the base class", function() {
+
+        var A = Instance.extend({$type: {defaultView: "foo/bar"}});
+
+        var B = A.extend();
+
+        var pb = B.type.defaultViewAbs;
+
+        var pa = A.type.defaultViewAbs;
+
+        expect(pa).toBe(pb);
+      });
+
+      it("should return an abs id if defaultView is a source relative string inherited from the base class and " +
+          "resolve relative to the base class' source id", function() {
+
+        var A = Instance.extend({$type: {id: "foo/bar", defaultView: "./barView"}});
+
+        var B = A.extend({$type: {id: "gugu/dada"}});
+
+        var pb = B.type.defaultViewAbs;
+
+        var pa = A.type.defaultViewAbs;
+
+        expect(pa).toBe(pb);
+        expect(pa).toBe("foo/barView");
+      });
+
+    }); // end #defaultViewAbs
 
     describe("#isAbstract", function() {
       it("should respect a specified abstract spec value", function() {

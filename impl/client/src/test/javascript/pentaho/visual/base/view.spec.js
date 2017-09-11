@@ -1654,18 +1654,6 @@ define([
       });
 
       it("should return a promise that is fulfilled with the view constructor of " +
-         "the registered default view type", function() {
-
-        var SubView  = View.extend();
-        var SubModel = Model.extend({$type: {defaultView: SubView}});
-
-        return View.getClassAsync(SubModel.type)
-            .then(function(ViewCtor) {
-              expect(ViewCtor).toBe(SubView);
-            });
-      });
-
-      it("should return a promise that is fulfilled with the view constructor of " +
           "the registered default view type identifier", function() {
 
         var SubModel = Model.extend({$type: {defaultView: "pentaho/visual/base/view"}});

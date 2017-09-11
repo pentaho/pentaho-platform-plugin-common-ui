@@ -131,7 +131,7 @@ define([
     },
 
     __absolutizeId: function(id, baseId) {
-      if(id) {
+      if(id && /^\./.test(id) && !/\.js$/.test(id)) {
         var baseIds = baseId ? baseId.split("/") : [];
         var ids = id.split("/");
         var needsBase = false;

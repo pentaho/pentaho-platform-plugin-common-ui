@@ -27,9 +27,10 @@ define([
   "../util/promise",
   "../util/text",
   "../util/spec",
+  "./util",
   "./theme/model"
 ], function(localRequire, SpecificationScope, SpecificationContext, bundle, Base,
-    AnnotatableLinked, error, arg, O, F, promiseUtil, text, specUtil) {
+    AnnotatableLinked, error, arg, O, F, promiseUtil, text, specUtil, typeUtil) {
 
   "use strict";
 
@@ -477,31 +478,7 @@ define([
        * @see pentaho.type.Type#sourceId
        */
       buildSourceRelativeId: function(id) {
-        // Relative:
-        //   ./view
-        // Absolute:
-        //   view
-        //   foo.js
-        //   ./foo.js
-        //   /view
-        //   http:
-        if(/^\./.test(id) && !/\.js$/.test(id)) {
-          // Considered relative.
-          // ./ and ../ work fine cause RequireJs later normalizes those.
-          var sourceId = this.sourceId;
-          if(sourceId) {
-            // "foo/bar"  -> "foo"
-            // "foo/bar/" -> "foo"
-            // "foo" -> ""
-            // "foo/" -> ""
-            var baseId = sourceId.replace(/\/?([^\/]*)\/?$/, "");
-            if(baseId) {
-              id = baseId + "/" + id;
-            }
-          }
-        }
-
-        return id;
+        return typeUtil.__absolutizeDependencyOf(id, this.sourceId);
       },
 
       // -> nonEmptyString, Optional(null), Immutable, Shared (note: not Inherited)
@@ -977,8 +954,7 @@ define([
      /**
       * Gets or sets the default view for instances of this type.
       *
-      * When a string,
-      * it is the identifier of the view's AMD module.
+      * The identifier of the view's AMD module.
       * If the identifier is relative, it is relative to [sourceId]{@link pentaho.type.Type#sourceId}.
       *
       * Setting this to `undefined` causes the default view to be inherited from the ancestor type,
@@ -987,12 +963,9 @@ define([
       * Setting this to a _falsy_ value (like `null` or an empty string),
       * clears the value of the attribute and sets it to `null`, ignoring any inherited value.
       *
-      * When a function,
-      * it is the class or factory of the default view.
-      *
       * @see pentaho.type.Type#buildSourceRelativeId
       *
-      * @type {string | function}
+      * @type {string}
 
       * @throws {pentaho.lang.ArgumentInvalidTypeError} When the set value is not
       * a string, a function or {@link Nully}.
@@ -1014,23 +987,27 @@ define([
 
           this.__defaultView = null;
 
-        } else if(typeof value === "string") {
-
+        } else {
           defaultViewInfo = O.getOwn(this, "__defaultView");
           if(!defaultViewInfo || (defaultViewInfo.value !== value && defaultViewInfo.fullValue !== value)) {
-            this.__defaultView = {value: value, promise: null, fullValue: this.buildSourceRelativeId(value)};
+            this.__defaultView = {value: value, fullValue: this.buildSourceRelativeId(value)};
           }
-        } else if(typeof value === "function") {
-
-          // Assume it is the View class itself, already fulfilled.
-          defaultViewInfo = O.getOwn(this, "__defaultView");
-          if(!defaultViewInfo || defaultViewInfo.value !== value) {
-            this.__defaultView = {value: value, promise: Promise.resolve(value), fullValue: value};
-          }
-        } else {
-
-          throw error.argInvalidType("defaultView", ["nully", "string", "function"], typeof value);
         }
+      },
+
+      /**
+       * Gets the absolute view module identifier, if any.
+       *
+       * A default view exists if property {@link pentaho.type.Type#defaultView}
+       * has a non-null value.
+       *
+       * @type {string}
+       * @readOnly
+       * @see pentaho.type.Type#defaultView
+       */
+      get defaultViewAbs() {
+        var defaultView = this.__defaultView;
+        return defaultView ? defaultView.fullValue : null;
       },
       // endregion
 

@@ -1280,8 +1280,8 @@ define([
          *
          * @rejects {pentaho.lang.ArgumentRequiredError} When `modelType` is not specified.
          * @rejects {Error} When `modelType` is a string, any error returned by {@link pentaho.type.Context#getAsync}.
-         * @rejects {Error} When there isn't a registered default view class for `modelType`.
-         * @rejects {Error} When the registered default view class does not exist or otherwise fails to load
+         * @rejects {Error} When there isn't a registered default view for `modelType`.
+         * @rejects {Error} When the registered default view does not exist or otherwise fails to load
          * by {@link pentaho.type.Context#getAsync}.
          */
         getClassAsync: function(modelType) {
@@ -1292,8 +1292,8 @@ define([
               .getAsync(modelType)
               .then(function(Model) {
 
-                var defaultView = Model.type.defaultView;
-                if(!defaultView) throw new Error("No registered default view class.");
+                var defaultView = Model.type.defaultViewAbs;
+                if(!defaultView) throw new Error("No registered default view.");
 
                 return context.getAsync(defaultView);
               });
