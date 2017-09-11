@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/filter/isLike",
   "pentaho/type/Context",
-  "pentaho/type/complex",
   "./propertyUtils"
-], function(isLikeFactory, Context, complexFactory, propertyUtils) {
+], function(Context, propertyUtils) {
 
   "use strict";
 
