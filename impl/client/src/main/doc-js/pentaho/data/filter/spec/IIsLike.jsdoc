@@ -32,3 +32,19 @@
  * @memberOf pentaho.data.filter.spec.IIsLike#
  * @type pentaho.type.UValue
  */
+
+ /**
+  * A flag indicating whether the affix is required to be a prefix.
+  *
+  * @name anchorStart
+  * @memberOf pentaho.data.filter.spec.IIsLike#
+  * @type pentaho.type.Boolean
+  */
+
+ /**
+  * A flag indicating whether the affix is required to be a suffix.
+  *
+  * @name anchorEnd
+  * @memberOf pentaho.data.filter.spec.IIsLike#
+  * @type pentaho.type.Boolean
+  */

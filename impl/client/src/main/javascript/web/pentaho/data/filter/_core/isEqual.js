@@ -67,7 +67,8 @@ define([
        */
 
       /** @inheritDoc */
-      _operation: function(value) {
+      _operation: function(elem) {
+        var value = elem.getv(this.property);
         return this.value === value;
       },
 
