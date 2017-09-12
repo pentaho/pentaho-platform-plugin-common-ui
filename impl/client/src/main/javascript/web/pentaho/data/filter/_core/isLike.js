@@ -67,13 +67,15 @@ define([
        */
 
       /** @inheritDoc */
-      _operation: function(value, formattedValue) {
+      _operation: function(elem) {
+        var value = elem.getv(this.property);
+        var formattedValue = elem.getf(this.property);
         var anchorStart = this.getv("anchorStart");
         var anchorEnd = this.getv("anchorEnd");
         var caption = this.getf("value") || this.getv("value");
 
         var reference = formattedValue;
-        if (reference == null){
+        if(reference == null) {
           reference = value;
         }
 

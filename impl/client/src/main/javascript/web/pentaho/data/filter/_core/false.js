@@ -71,7 +71,7 @@ define([
       },
 
       /** @inheritDoc */
-      _contains: function(elem) {
+      _contains: function() {
         return false;
       },
 

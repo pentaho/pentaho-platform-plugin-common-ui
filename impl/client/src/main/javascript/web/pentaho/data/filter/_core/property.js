@@ -70,8 +70,7 @@ define(function() {
        * @memberOf pentaho.data.filter.Property#
        * @method
        *
-       * @param {any} value - The property value to be tested.
-       * @param {any} [formattedValue] - The property formatted value to be tested.
+       * @param {!pentaho.type.Element} elem - The element to be tested
        *
        * @returns {boolean} `true` if the element is selected; `false`, otherwise.
        *
@@ -87,8 +86,7 @@ define(function() {
        * @return {boolean} `true` if `elem` is selected; `false`, otherwise.
        */
       _contains: function(elem) {
-        var prop = this.property;
-        return elem.$type.has(prop) && this._operation(elem.getv(prop), elem.getf(prop));
+        return elem.$type.has(this.property) && this._operation(elem);
       },
 
       $type: /** @lends pentaho.data.filter.Property.Type# */{
