@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+define([
+  "module",
+  "./instanceInfo/impl/Service"
+], function(module, Service) {
 
-/**
- * The `spec.InstancesContainer` interface is the configuration of a
- * Type API [instances container]{@link pentaho.type.InstancesContainer}
- * and is part of a [spec.IContext]{@link pentaho.type.IContext} specification.
- *
- * An object whose keys are instance identifiers and whose values are instance declarations.
- *
- * @typedef {Object.<string, pentaho.type.spec.IInstanceConfiguration>} pentaho.type.spec.InstancesContainer
- */
+  "use strict";
+
+  var service = new Service();
+  service.configure(module.config());
+
+  return service;
+});

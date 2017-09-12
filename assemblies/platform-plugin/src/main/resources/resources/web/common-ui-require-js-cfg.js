@@ -39,6 +39,7 @@
   //    parts of the system rename the "service" plugin id to "pentaho/service".
   var requireTypes = requireCfg.config["pentaho/service"] || (requireCfg.config["pentaho/service"] = {});
   var requireTypeInfo = requireCfg.config["pentaho/typeInfo"] || (requireCfg.config["pentaho/typeInfo"] = {});
+  var requireInstInfo = requireCfg.config["pentaho/instanceInfo"] || (requireCfg.config["pentaho/instanceInfo"] = {});
 
   // region common-ui
   requirePaths["common-ui"] = basePath;
@@ -55,7 +56,7 @@
   // E.g. requirePaths["pentaho/util"] = basePath + "/pentaho/util";
   [
     "shim", "util", "lang",
-    "i18n", "service", "data", "type", "typeInfo",
+    "i18n", "service", "data", "type", "typeInfo", "instanceInfo",
     "visual", "config", "environment", "debug", "ccc"
   ].forEach(function(name) {
     requirePaths["pentaho/" + name] = basePath + "/pentaho/" + name;
@@ -318,7 +319,24 @@
   requireTypeInfo["pentaho/visual/action/select"] = {alias: "select", base: "pentaho/visual/action/data"};
   requireTypeInfo["pentaho/visual/action/execute"] = {alias: "execute", base: "pentaho/visual/action/data"};
 
-  // Color Palette
+  // Color Palettes
   requireTypeInfo["pentaho/visual/color/palette"] = {base: "complex"};
+
+  [
+    "pentaho/visual/color/palettes/nominalPrimary",
+    "pentaho/visual/color/palettes/nominalNeutral",
+    "pentaho/visual/color/palettes/nominalLight",
+    "pentaho/visual/color/palettes/nominalDark",
+    "pentaho/visual/color/palettes/quantitativeBlue3",
+    "pentaho/visual/color/palettes/quantitativeBlue5",
+    "pentaho/visual/color/palettes/quantitativeGray3",
+    "pentaho/visual/color/palettes/quantitativeGray5",
+    "pentaho/visual/color/palettes/divergentRyg3",
+    "pentaho/visual/color/palettes/divergentRyg5",
+    "pentaho/visual/color/palettes/divergentRyb3",
+    "pentaho/visual/color/palettes/divergentRyb5"
+  ].forEach(function(id) {
+    requireInstInfo[id] = {type: "pentaho/visual/color/palette"};
+  });
 
 })(this);

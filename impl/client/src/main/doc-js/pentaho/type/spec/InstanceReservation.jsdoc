@@ -21,7 +21,7 @@
  * The synchronous instance resolution operations are:
  * * [InstancesContainer#getById]{@link pentaho.type.InstancesContainer#getById}
  * * [InstancesContainer#getByType]{@link pentaho.type.InstancesContainer#getByType}
- * * [InstancesContainer#getAllByType]{@link pentaho.type.InstancesContainer#getByType}
+ * * [InstancesContainer#getAllByType]{@link pentaho.type.InstancesContainer#getAllByType}
  * * [InstancesContainer#get]{@link pentaho.type.InstancesContainer#get}
  *   (when used with a [resolve instance specification]{@link pentaho.type.spec.IInstanceResolve})
  *

@@ -15,11 +15,11 @@
  */
 
 /**
- * The `spec.IInstanceDeclaration` interface declares an instance
+ * The `spec.IInstanceConfiguration` interface declares an instance
  * in a Type API [instance container]{@link pentaho.type.InstancesContainer}
  * and is part of a [context]{@link pentaho.type.IContext} specification.
  *
- * @name pentaho.type.spec.IInstanceDeclaration
+ * @name pentaho.type.spec.IInstanceConfiguration
  * @interface
  *
  * @see pentaho.type.IContext
@@ -27,18 +27,10 @@
  */
 
 /**
- * The type of the instance.
+ * The resolution ranking of the instance.
  *
- * @name type
- * @memberOf pentaho.type.spec.IInstanceDeclaration#
- * @type {nonEmptyString}
- */
-
-/**
- * The resolution priority of the instance.
- *
- * @name priority
- * @memberOf pentaho.type.spec.IInstanceDeclaration#
+ * @name ranking
+ * @memberOf pentaho.type.spec.IInstanceConfiguration#
  * @type {number}
  * @default 0
  */

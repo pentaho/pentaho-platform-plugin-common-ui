@@ -1,0 +1,72 @@
+/*!
+ * Copyright 2017 Pentaho Corporation. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @classDesc The `instanceInfo.IService` interface represents a service from which basic metadata
+ * information can be obtained about instances without loading the their AMD modules.
+ *
+ * @name IService
+ * @memberOf pentaho.instanceInfo
+ * @interface
+ * @see pentaho.instanceInfo.service
+ */
+
+/**
+ * Declares multiple instances.
+ *
+ * @name configure
+ * @memberOf pentaho.instanceInfo.IService#
+ * @method
+ * @param {pentaho.instanceInfo.spec.Declarations} [configSpec] - A map of instance declarations
+ * whose keys are the corresponding instance identifiers.
+ */
+
+/**
+ * Declares an instance.
+ *
+ * @name declare
+ * @memberOf pentaho.instanceInfo.IService#
+ * @method
+ * @param {string} [id] - The id of the instance.
+ * @param {pentaho.instanceInfo.spec.IDeclaration} [decl] - The declaration of the instance.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When an instance with the given `id` is already defined.
+ */
+
+/**
+ * Gets the type identifier of an instance given its identifier.
+ *
+ * @name getTypeOf
+ * @memberOf pentaho.instanceInfo.IService#
+ * @method
+ * @param {string} instanceId - The identifier of the instance
+ *
+ * @return {string|undefined|null} The identifier of the instance's type or,
+ * `undefined` if the instance is not known.
+ */
+
+/**
+ * Gets an array of the identifiers of known instances of a given type.
+ *
+ * @name getAllByType
+ * @memberOf pentaho.instanceInfo.IService#
+ * @method
+ * @param {string} typeIdOrAlias - The identifier or alias of the type.
+ * @param {boolean} [keyArgs.includeDescendants=false] - Indicates that instances of all
+ * descendant types should be part of the result.
+ *
+ * @return {string[]} The ids of known instances.
+ */

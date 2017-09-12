@@ -16,6 +16,7 @@
 define([
   "require",
   "module",
+  "../instanceInfo",
   "../typeInfo",
   "../i18n!types",
   "../lang/Base",
@@ -29,7 +30,7 @@ define([
   "../debug",
   "../debug/Levels",
   "../util/logger"
-], function(localRequire, module, typeInfo, bundle, Base, SortedList, typeUtil,
+], function(localRequire, module, instanceInfo, typeInfo, bundle, Base, SortedList, typeUtil,
             promiseUtil, arg, error, O, F, debugMgr, DebugLevels, logger) {
 
   "use strict";
@@ -58,23 +59,22 @@ define([
 
   var InstanceHolder = Base.extend({
 
-    constructor: function(id, container, spec) {
+    constructor: function(id, container, typeId, instanceConfig) {
+
       if(!id) throw error.argRequired("id");
-      if(!spec) throw error.argRequired("instances['" + id + "']");
+      if(!typeId) throw error.argRequired("typeId");
 
       this.index = __nextInstanceIndex++;
 
       // Set on construction.
       this.container = container;
 
-      var typeId = spec.type;
-      if(!typeId) throw error.argRequired("instances['" + id + "'].type");
-
       // Convert an alias to its id.
       this.typeId = typeInfo.getIdOf(typeId) || typeId;
 
+
       this.id = id;
-      this.priority = +spec.priority || 0;
+      this.ranking = (instanceConfig && +instanceConfig.ranking) || 0;
 
       // Set lazily, when loading.
       this.__promise = null;
@@ -269,9 +269,13 @@ define([
        */
       this.__reservations = null;
 
-      // Initialize from given specification
-      if(spec) {
-        this.configure(spec);
+      var instanceIds = instanceInfo.getAllByType("pentaho/type/instance", {includeDescendants: true});
+      if(instanceIds) {
+        instanceIds.forEach(function(instanceId) {
+          var typeId = instanceInfo.getTypeOf(instanceId);
+          var instanceDecl = O.getOwn(spec, instanceId);
+          this.declare(instanceId, typeId, instanceDecl);
+        }, this);
       }
     },
 
@@ -285,34 +289,22 @@ define([
       return this.__context;
     },
 
-    /**
-     * Configures the instance container with the given specification.
-     *
-     * @param {pentaho.type.spec.InstancesContainer} spec - The container specification.
-     * @return {!pentaho.type.InstancesContainer} This instance container.
-     */
-    configure: function(spec) {
-
-      O.eachOwn(spec, function(spec, id) { this.declare(id, spec); }, this);
-
-      return this;
-    },
-
-    // region define
+    // region declare
     /**
      * Declares an instance with a given identifier and container specification.
      *
      * @param {string} id - The instance identifier.
-     * @param {object} instanceSpec — The instance's container specification.
+     * @param {string} typeId - The type identifier.
+     * @param {pentaho.type.spec.IInstanceConfiguration} instanceConfig — The instance's container configuration.
      *
      * @return {!pentaho.type.InstancesContainer} This instance container.
      */
-    declare: function(id, instanceSpec) {
+    declare: function(id, typeId, instanceConfig) {
 
       if(O.getOwn(this.__instanceById, id))
         throw error.argInvalid("id", "An instance with identifier '" + id + "' is already defined.");
 
-      var holder = new InstanceHolder(id, this, instanceSpec);
+      var holder = new InstanceHolder(id, this, typeId, instanceConfig);
 
       this.__instanceById[holder.id] = holder;
 
@@ -526,7 +518,7 @@ define([
     },
 
     /**
-     * Gets the highest priority instance among the instances of the given type which
+     * Gets the highest ranking instance among the instances of the given type which
      * are successfully loaded and
      * are not currently [reserved]{@link pentaho.type.spec.InstanceReservation} and
      * that, optionally, match a specified filter.
@@ -692,7 +684,7 @@ define([
       return baseTypeId;
     },
 
-    // Holders are already sorted by priority.
+    // Holders are already sorted by ranking.
     // It is assumed that the resulting array cannot be modified/made public.
     __getHolders: function(baseTypeId) {
 
@@ -1008,9 +1000,9 @@ define([
     // endregion
   });
 
-  // By Descending priority and then By Ascending definition index.
+  // By Descending ranking and then By Ascending definition index.
   function __holderComparer(holderA, holderB) {
-    return F.compare(holderB.priority, holderA.priority) || F.compare(holderA.index, holderB.index);
+    return F.compare(holderB.ranking, holderA.ranking) || F.compare(holderA.index, holderB.index);
   }
 
   function __collectDependencyRefsRecursive(instRef, depIdsSet, depRefs) {

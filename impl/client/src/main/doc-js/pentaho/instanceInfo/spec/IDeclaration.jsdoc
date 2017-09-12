@@ -15,24 +15,18 @@
  */
 
 /**
- * The `spec.Declarations` interface is the configuration of the Type Info API.
+ * @classDesc The `spec.IDeclaration` interface declares an instance.
  *
- * An object whose keys are type identifiers and whose values are type declarations.
+ * @name IDeclaration
+ * @memberOf pentaho.instanceInfo.spec
+ * @interface
+ * @see pentaho.instanceInfo.IService
+ */
+
+/**
+ * The alias or identifier of the instance's type.
  *
- * The following is a Type Info API configuration that declares two types,
- * `my/Abstract` and `my/Basic`,
- * where the latter is a subtype of the former:
- *
- * ```js
- * require.config({
- *   config: {
- *     "pentaho/typeInfo": {
- *       "my/Abstract": {alias: "A"},
- *       "my/Basic": {base: "A"}
- *     }
- *   }
- * });
- * ```
- *
- * @typedef {Object.<string, pentaho.typeInfo.spec.IDeclaration>} pentaho.typeInfo.spec.Declarations
+ * @name type
+ * @memberOf pentaho.instanceInfo.spec.IDeclaration#
+ * @type {nonEmptyString}
  */

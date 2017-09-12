@@ -55,16 +55,6 @@ define([
 
           var container = new InstancesContainer(context);
         });
-
-        it("should call #configure(spec) when spec is provided", function() {
-
-          var configure = spyOn(InstancesContainer.prototype, "configure");
-
-          var config = {};
-          var container = new InstancesContainer(context, config);
-
-          expect(configure).toHaveBeenCalledWith(config);
-        });
       });
 
       describe("#context", function() {
@@ -75,56 +65,49 @@ define([
         });
       });
 
-      describe("#declare(id, instanceSpec)", function() {
+      describe("#declare(id, typeId, instanceConfig)", function() {
 
         // region id
         it("should throw if the identifier is falsy", function() {
 
           expect(function() {
-            container.declare(null, {type: Complex});
+            container.declare(null);
           }).toThrow(errorMatch.argRequired("id"));
         });
 
         it("should register an instance with the given identifier", function() {
 
-          container.declare("foo", {type: Complex});
+          container.declare("foo", "complex");
 
           expect(container.__instanceById.foo.id).toBe("foo");
         });
         // endregion
 
-        it("should throw if the spec is falsy", function() {
+        // region spec.type
+        it("should throw if the typeId is falsy", function() {
 
           expect(function() {
             container.declare("foo", null);
-          }).toThrow(errorMatch.argRequired("instances['foo']"));
-        });
-
-        // region spec.type
-        it("should throw if spec.type is falsy", function() {
-
-          expect(function() {
-            container.declare("foo", {type: null});
-          }).toThrow(errorMatch.argRequired("instances['foo'].type"));
+          }).toThrow(errorMatch.argRequired("typeId"));
         });
 
         it("should register an instance with the given type", function() {
 
-          container.declare("foo", {type: "pentaho/type/complex"});
+          container.declare("foo", "pentaho/type/complex");
 
           expect(container.__instanceById.foo.typeId).toBe("pentaho/type/complex");
         });
 
         it("should register an instance with the given type alias and resolve it", function() {
 
-          container.declare("foo", {type: "complex"});
+          container.declare("foo", "complex");
 
           expect(container.__instanceById.foo.typeId).toBe("pentaho/type/complex");
         });
 
         it("should register an instance with the given type in the instancesByType map", function() {
 
-          container.declare("foo", {type: "pentaho/type/complex"});
+          container.declare("foo", "pentaho/type/complex");
 
           var list = container.__instancesByType["pentaho/type/complex"];
           expect(list != null).toBe(true);
@@ -134,46 +117,46 @@ define([
         // Fails only when the instance is loaded...
         it("should allow registering an instance of a non-existing type", function() {
 
-          container.declare("foo", {type: "bar"});
+          container.declare("foo", "bar");
 
           expect(container.__instanceById.foo.typeId).toBe("bar");
         });
         // endregion
 
-        // region spec.priority
-        it("should register an instance with the default priority of 0", function() {
+        // region spec.ranking
+        it("should register an instance with the default ranking of 0", function() {
 
-          container.declare("foo", {type: "complex"});
+          container.declare("foo", "complex");
 
-          expect(container.__instanceById.foo.priority).toBe(0);
+          expect(container.__instanceById.foo.ranking).toBe(0);
         });
 
-        it("should register an instance with the given priority", function() {
+        it("should register an instance with the given ranking", function() {
 
-          container.declare("foo", {type: "complex", priority: 1});
+          container.declare("foo", "complex", {ranking: 1});
 
-          expect(container.__instanceById.foo.priority).toBe(1);
+          expect(container.__instanceById.foo.ranking).toBe(1);
         });
 
-        it("should register an instance and be able to parse a string priority", function() {
+        it("should register an instance and be able to parse a string ranking", function() {
 
-          container.declare("foo", {type: "complex", priority: "1"});
+          container.declare("foo", "complex", {ranking: "1"});
 
-          expect(container.__instanceById.foo.priority).toBe(1);
+          expect(container.__instanceById.foo.ranking).toBe(1);
         });
 
-        it("should register an instance and convert an invalid priority to 0", function() {
+        it("should register an instance and convert an invalid ranking to 0", function() {
 
-          container.declare("foo", {type: "complex", priority: "a"});
+          container.declare("foo", "complex", {ranking: "a"});
 
-          expect(container.__instanceById.foo.priority).toBe(0);
+          expect(container.__instanceById.foo.ranking).toBe(0);
         });
 
-        it("should register an instance with the given type and priority in the instancesByType map", function() {
+        it("should register an instance with the given type and ranking in the instancesByType map", function() {
 
-          container.declare("foo3", {type: "pentaho/type/complex", priority:  1});
-          container.declare("foo1", {type: "pentaho/type/complex", priority: 10});
-          container.declare("foo2", {type: "pentaho/type/complex", priority:  1});
+          container.declare("foo3", "pentaho/type/complex", {ranking:  1});
+          container.declare("foo1", "pentaho/type/complex", {ranking: 10});
+          container.declare("foo2", "pentaho/type/complex", {ranking:  1});
 
           var list = container.__instancesByType["pentaho/type/complex"];
           expect(list != null).toBe(true);
@@ -186,54 +169,14 @@ define([
 
         it("should not start loading the instance", function() {
 
-          container.declare("foo", {type: "Foo"});
+          container.declare("foo", "Foo");
 
           expect(container.__instanceById.foo.__promise).toBe(null);
         });
 
         it("should return this", function() {
 
-          var result = container.declare("foo", {type: "Foo"});
-
-          expect(result).toBe(container);
-        });
-      });
-
-      describe("#configure(spec)", function() {
-
-        it("should call #declare(id, oneSpec) for each key/value pair of spec", function() {
-          var config = {
-            "foo": {type: "Foo"},
-            "bar": {type: "Bar"}
-          };
-
-          spyOn(container, "declare");
-
-          container.configure(config);
-
-          expect(container.declare).toHaveBeenCalledTimes(2);
-          expect(container.declare).toHaveBeenCalledWith("foo", config.foo);
-          expect(container.declare).toHaveBeenCalledWith("bar", config.bar);
-        });
-
-        it("should register instances with the given type and priority in the instancesByType map", function() {
-
-          container.configure({
-            "foo3": {type: "pentaho/type/complex", priority:  1},
-            "foo1": {type: "pentaho/type/complex", priority: 10},
-            "foo2": {type: "pentaho/type/complex", priority:  1}
-          });
-
-          var list = container.__instancesByType["pentaho/type/complex"];
-          expect(list != null).toBe(true);
-          expect(list.length).toBe(3);
-          expect(list[0].id).toBe("foo1");
-          expect(list[1].id).toBe("foo3");
-          expect(list[2].id).toBe("foo2");
-        });
-
-        it("should return this", function() {
-          var result = container.configure({});
+          var result = container.declare("foo", "Foo");
 
           expect(result).toBe(container);
         });
@@ -507,12 +450,8 @@ define([
     describe("tests with a shared container configuration", function() {
 
       var containerConfig = {
-        "myFoo": {type: "Foo"},
-        "myFoo2": {type: "Foo", priority: 10},
-        "myBar": {type: "Bar", priority: 20},
-        "myAliased": {type: "A"}, // registered using its type alias...
-        "missing": {type: "Guu"},
-        "folder/dependentRelativeType": {type: "folder/Relative"}
+        "myFoo2": {ranking: 10},
+        "myBar": {ranking: 20}
       };
 
       function configAmd(localRequire) {
@@ -601,11 +540,65 @@ define([
               "Bar":  {base: "Root"},
               "Aliased": {base: "simple", alias: "A"},
               "NoInstances": {base: "simple"},
-              "Relative": {base: "simple"}
+              "folder/Relative": {base: "simple"}
+            },
+            "pentaho/instanceInfo": {
+              "myFoo": {type: "Foo"},
+              "myFoo2": {type: "Foo"},
+              "myBar": {type: "Bar"},
+              "myAliased": {type: "A"}, // registered using its type alias...
+              "missing": {type: "Guu"},
+              "folder/dependentRelativeType": {type: "folder/Relative"}
             }
           }
         });
       }
+
+      describe("#configure(spec)", function() {
+
+        it("should call #declare(id, oneSpec) for each key/value pair of spec", function() {
+
+          return require.using([
+            "pentaho/type/Context",
+            "pentaho/type/InstancesContainer"
+          ], configAmd, function(Context, InstancesContainer) {
+
+            return Context.createAsync()
+                .then(function(context) {
+
+                  spyOn(InstancesContainer.prototype, "declare");
+
+                  var container = new InstancesContainer(context, containerConfig);
+
+                  expect(InstancesContainer.prototype.declare).toHaveBeenCalledWith("myFoo", "Foo", undefined);
+                  expect(InstancesContainer.prototype.declare).toHaveBeenCalledWith("myFoo2", "Foo", {ranking: 10});
+                  expect(InstancesContainer.prototype.declare).toHaveBeenCalledWith("myBar", "Bar", {ranking: 20});
+                });
+          });
+        });
+
+        it("should register instances with the given type and ranking in the instancesByType map", function() {
+
+          return require.using([
+            "pentaho/type/Context",
+            "pentaho/type/InstancesContainer"
+          ], configAmd, function(Context, InstancesContainer) {
+
+            return Context.createAsync()
+                .then(function(context) {
+
+                  var container = new InstancesContainer(context, containerConfig);
+
+                  var list = container.__instancesByType["Foo"];
+
+                  expect(list != null).toBe(true);
+                  expect(list.length).toBe(2);
+                  expect(list[0].id).toBe("myFoo2");
+                  expect(list[1].id).toBe("myFoo");
+                });
+          });
+        });
+      });
 
       describe("#getByIdAsync(id)", function() {
 
@@ -1103,7 +1096,7 @@ define([
           });
         });
 
-        it("should return registered instances of a direct type ordered by desc priority", function() {
+        it("should return registered instances of a direct type ordered by desc ranking", function() {
 
           var container;
 
@@ -1155,7 +1148,7 @@ define([
           });
         });
 
-        it("should return registered instances of a base type ordered by desc priority", function() {
+        it("should return registered instances of a base type ordered by desc ranking", function() {
 
           var container;
 
@@ -1206,8 +1199,6 @@ define([
                     container.getById("myFoo2"),
                     container.getById("myBar")
                   ]));
-
-                  expect(results.length).toBe(3);
                 });
           });
         });
@@ -1350,7 +1341,7 @@ define([
           });
         });
 
-        it("should return registered and loaded instances of a direct type ordered by desc priority", function() {
+        it("should return registered and loaded instances of a direct type ordered by desc ranking", function() {
 
           var container;
 
@@ -1542,7 +1533,7 @@ define([
                             var roots = container.getAllByType("Root");
 
                             expect(roots.length).toBe(2);
-                            expect(roots[0]).toBe(foosAndBar[2]); // myBar, has higher priority
+                            expect(roots[0]).toBe(foosAndBar[2]); // myBar, has higher ranking
                             expect(roots[1]).toBe(foosAndBar[1]); // myFoo2
                           }
                         }
@@ -1628,7 +1619,7 @@ define([
         });
 
         it("should return the registered instance whose type is baseTypeId and " +
-            "that has the highest priority", function() {
+            "that has the highest ranking", function() {
 
           var container;
 
@@ -1651,7 +1642,7 @@ define([
         });
 
         it("should return the registered instance whose type is a subtype of baseTypeId and " +
-            "that has the highest priority", function() {
+            "that has the highest ranking", function() {
 
           var container;
 
@@ -1849,7 +1840,7 @@ define([
         });
 
         it("should return the registered and loaded instance whose type is baseTypeId and " +
-            "that has the highest priority", function() {
+            "that has the highest ranking", function() {
 
           var container;
 
@@ -1901,7 +1892,7 @@ define([
         });
 
         it("should return the registered instance whose type is a subtype of baseTypeId and " +
-            "that has the highest priority", function() {
+            "that has the highest ranking", function() {
 
           var container;
 

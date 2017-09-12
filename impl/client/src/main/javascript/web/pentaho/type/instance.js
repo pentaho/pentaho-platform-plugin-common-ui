@@ -67,31 +67,34 @@ define([
      *   <code>greeting</code> and a method <code>doSomething</code>.
      * </caption>
      *
-     * require(["pentaho/type/context!"], function(context) {
+     * require(["pentaho/type/Context"], function(Context) {
      *
-     *   var Instance = context.get("instance");
+     *   Context.createAsync(function(context) {
      *
-     *   var Derived = Instance.extend({
-     *     constructor: function(label) {
-     *       this.label = label;
-     *     },
-     *     $type: { // type specification
-     *       greeting: "Hello, ",
-     *       veryLongString: "..."
-     *     },
-     *     saySomething: function() {
-     *       console.log(this.$type.greeting + this.label + "!");
-     *     }
+     *     var Instance = context.get("instance");
+     *
+     *     var Derived = Instance.extend({
+     *       constructor: function(label) {
+     *         this.label = label;
+     *       },
+     *       $type: { // type specification
+     *         greeting: "Hello, ",
+     *         veryLongString: "..."
+     *       },
+     *       saySomething: function() {
+     *         console.log(this.$type.greeting + this.label + "!");
+     *       }
+     *     });
+     *
+     *     var a = new Derived("Alice");
+     *     a.saySomething(); // "Hello, Alice!"
+     *
+     *     var b = new Derived("Bob");
+     *     b.saySomething(); // "Hello, Bob!"
+     *
+     *     // All instances share the same _type_:
+     *     b.$type.greeting ===  a.$type.greeting // true
      *   });
-     *
-     *   var a = new Derived("Alice");
-     *   a.saySomething(); // "Hello, Alice!"
-     *
-     *   var b = new Derived("Bob");
-     *   b.saySomething(); // "Hello, Bob!"
-     *
-     *   // All instances share the same _type_:
-     *   b.$type.greeting ===  a.$type.greeting // true
      * });
      *
      * @description Creates an instance of this type.

@@ -55,7 +55,7 @@
  *     // Enable it, only for the dev user, "john", and the "super-app" application.
  *     {
  *       "select": {
- *         "type ":        "my.foo.component",
+ *         "type":        "my.foo.component",
  *         "user":        "john",
  *         "application": "super-app"
  *       },

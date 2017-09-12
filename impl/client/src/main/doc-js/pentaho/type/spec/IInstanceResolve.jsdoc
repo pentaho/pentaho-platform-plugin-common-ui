@@ -33,7 +33,7 @@
  *
  * ##### Resolve instance by element type syntax
  *
- * Denotes the highest priority registered instance of a given [element]{@link pentaho.type.Element} type.
+ * Denotes the highest ranking registered instance of a given [element]{@link pentaho.type.Element} type.
  *
  * ```json
  * {$instance: {type: "my/Service"}}
@@ -49,7 +49,7 @@
  *
  * Denotes the list of all of the registered instances of
  * the given list type's [element type]{@link pentaho.type.List.Type#of},
- * ordered from highest to lowest [priority]{@link pentaho.type.spec.IInstanceDeclaration#priority}.
+ * ordered from highest to lowest [ranking]{@link pentaho.type.spec.IInstanceConfiguration#ranking}.
  *
  * ```json
  * {$instance: {type: ["my/Service"]}}

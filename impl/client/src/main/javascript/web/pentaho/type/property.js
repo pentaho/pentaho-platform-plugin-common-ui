@@ -530,22 +530,22 @@ define([
               }
             }
           } else {
-            var dvf;
+            var defaultValueFun;
             if(value === null) {
-              dvf = null;
+              defaultValueFun = null;
             } else if(F.is(value)) {
               // wrap it with cast function
-              dvf = function propertyDefaultValue(propType) {
+              defaultValueFun = function propertyDefaultValue(propType) {
                 return propType.toValueOn(null, value.apply(this, arguments));
               };
             } else {
               // Cast it now (throwing if not possible) and wrap it in a constant function.
               value = this.toValueOn(null, value);
-              dvf = F.constant(value);
+              defaultValueFun = F.constant(value);
             }
 
             this.__defaultValue = value;
-            this.__defaultValueFun = dvf;
+            this.__defaultValueFun = defaultValueFun;
           }
         },
 

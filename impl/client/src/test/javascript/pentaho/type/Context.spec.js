@@ -112,6 +112,12 @@ define([
             config: {
               "pentaho/service": {
                 "myConfigModule": "pentaho.config.spec.IRuleSet"
+              },
+              "pentaho/typeInfo": {
+                "Foo": {"base": "complex"}
+              },
+              "pentaho/instanceInfo": {
+                "myFoo": {"type": "Foo"}
               }
             }
           });
@@ -124,7 +130,7 @@ define([
                   select: {type: "pentaho/type/Context"},
                   apply: {
                     instances: {
-                      "myFoo": {type: "Foo"}
+                      "myFoo": {ranking: 3}
                     }
                   }
                 }
@@ -138,13 +144,11 @@ define([
           "pentaho/type/InstancesContainer"
         ], configAmd, function(Context, InstancesContainer) {
 
-          var configure = spyOn(InstancesContainer.prototype, "configure").and.callThrough();
+          var declare = spyOn(InstancesContainer.prototype, "declare").and.callThrough();
 
           return Context.createAsync().then(function(context) {
 
-            expect(configure).toHaveBeenCalledWith(jasmine.objectContaining({
-              "myFoo": {type: "Foo"}
-            }));
+            expect(declare).toHaveBeenCalledWith("myFoo", "Foo", {ranking: 3});
           });
         });
       });

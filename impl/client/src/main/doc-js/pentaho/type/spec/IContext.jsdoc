@@ -18,7 +18,7 @@
  * The `spec.IContext` interface describes the configuration of a Type API [context]{@link pentaho.type.Context}.
  *
  * The following is a sample [configuration rule set]{@link pentaho.config.spec.IRuleSet} that
- * configures the Type API context for the Analyzer application with the hypothetical
+ * configures the Type API context for the Analyzer application with the ranking of the hypothetical
  * instance `"my/customSpecialService"`:
  *
  * ```json
@@ -32,7 +32,6 @@
  *       "apply": {
  *         "instances": {
  *           "my/customSpecialService": {
- *             "type": "my/SpecialService",
  *             "priority": 10
  *           }
  *         }

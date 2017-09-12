@@ -12,6 +12,7 @@
   var requireMap      = requireCfg.map;
   var requireTypes    = requireCfg.config["pentaho/service"];
   var requireTypeInfo = requireCfg.config["pentaho/typeInfo"];
+  var requireInstInfo = requireCfg.config["pentaho/instanceInfo"];
 
   requirePaths["dojo"] = depWebJars + "/dojo/${dojo.version}";
   requirePaths["dijit"] = depWebJars + "/dijit/${dojo.version}";
@@ -49,6 +50,7 @@
   requirePaths["pentaho/lang"] = basePath + "/pentaho/lang";
   requirePaths["pentaho/type"] = basePath + "/pentaho/type";
   requirePaths["pentaho/typeInfo"] = basePath + "/pentaho/typeInfo";
+  requirePaths["pentaho/instanceInfo"] = basePath + "/pentaho/instanceInfo";
   requirePaths["pentaho/util"] = basePath + "/pentaho/util";
   requirePaths["pentaho/visual"] = basePath + "/pentaho/visual";
   requirePaths["pentaho/service"] = basePath + "/pentaho/service";
@@ -213,9 +215,25 @@
   requireTypeInfo["pentaho/visual/action/select"] = {alias: "select", base: "pentaho/visual/action/data"};
   requireTypeInfo["pentaho/visual/action/execute"] = {alias: "execute", base: "pentaho/visual/action/data"};
 
-  // Color Palette
+  // Color Palettes
   requireTypeInfo["pentaho/visual/color/palette"] = {base: "complex"};
 
-  requireTypes["pentaho/visual/config/vizApi.conf"] = "pentaho.config.spec.IRuleSet";
+  [
+    "pentaho/visual/color/palettes/nominalPrimary",
+    "pentaho/visual/color/palettes/nominalNeutral",
+    "pentaho/visual/color/palettes/nominalLight",
+    "pentaho/visual/color/palettes/nominalDark",
+    "pentaho/visual/color/palettes/quantitativeBlue3",
+    "pentaho/visual/color/palettes/quantitativeBlue5",
+    "pentaho/visual/color/palettes/quantitativeGray3",
+    "pentaho/visual/color/palettes/quantitativeGray5",
+    "pentaho/visual/color/palettes/divergentRyg3",
+    "pentaho/visual/color/palettes/divergentRyg5",
+    "pentaho/visual/color/palettes/divergentRyb3",
+    "pentaho/visual/color/palettes/divergentRyb5"
+  ].forEach(function(id) {
+    requireInstInfo[id] = {type: "pentaho/visual/color/palette"};
+  });
 
+  requireTypes["pentaho/visual/config/vizApi.conf"] = "pentaho.config.spec.IRuleSet";
 })();
