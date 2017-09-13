@@ -18,7 +18,6 @@ define([
   "module",
   "../typeInfo",
   "../i18n!types",
-  "./InstanceConstructionContext",
   "./SpecificationContext",
   "./SpecificationScope",
   "./InstancesContainer",
@@ -38,7 +37,7 @@ define([
   "../debug/Levels",
   "../util/logger",
   "./standard" // so that r.js sees otherwise invisible dependencies.
-], function(localRequire, module, typeInfo, bundle, InstanceConstructionContext,
+], function(localRequire, module, typeInfo, bundle,
     SpecificationContext, SpecificationScope,
     InstancesContainer, mainPlatformEnv, configurationService,
     Transaction, TransactionScope, CommittedScope,
@@ -433,10 +432,6 @@ define([
        * @private
        */
       this.__instances = new InstancesContainer(this, configSpec && configSpec.instances);
-
-      // The context is placed here instead of in the InstancesContainer to reduce the number of de-refs
-      // that each complex/list needs to do to get to it.
-      this.__construction = new InstanceConstructionContext();
 
       /**
        * The root [Instance]{@link pentaho.type.Instance} constructor.
@@ -868,7 +863,7 @@ define([
       if((specialSpec = depRef.$instance)) {
         // TODO: dependentId for id and type
 
-        // specialSpec: {id, isRequired, reservation} | {type, isRequired, filter, reservation}
+        // specialSpec: {id, isRequired} | {type, isRequired, filter}
         // instKeyArgs is used only when creating a list of results
         return this.__instances.__getSpecial(specialSpec, /* instKeyArgs: */ null, /* typeDefault */null, sync);
       }

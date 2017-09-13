@@ -26,9 +26,7 @@
  * {$instance: {id: "my/service"}}
  * ```
  *
- * The properties
- * [isRequired]{@link pentaho.type.spec.IInstanceResolve#isRequired} and
- * [reservation]{@link pentaho.type.spec.IInstanceResolve#reservation},
+ * The [isRequired]{@link pentaho.type.spec.IInstanceResolve#isRequired} property
  * can also be specified.
  *
  * ##### Resolve instance by element type syntax
@@ -40,9 +38,8 @@
  * ```
  *
  * The properties
- * [filter]{@link pentaho.type.spec.IInstanceResolve#filter},
- * [isRequired]{@link pentaho.type.spec.IInstanceResolve#isRequired} and
- * [reservation]{@link pentaho.type.spec.IInstanceResolve#reservation},
+ * [filter]{@link pentaho.type.spec.IInstanceResolve#filter} and
+ * [isRequired]{@link pentaho.type.spec.IInstanceResolve#isRequired}
  * can also be specified.
  *
  * ##### Resolve instance by list type syntax
@@ -56,9 +53,8 @@
  * ```
  *
  * The properties
- * [filter]{@link pentaho.type.spec.IInstanceResolve#filter},
- * [isRequired]{@link pentaho.type.spec.IInstanceResolve#isRequired} and
- * [reservation]{@link pentaho.type.spec.IInstanceResolve#reservation},
+ * [filter]{@link pentaho.type.spec.IInstanceResolve#filter} and
+ * [isRequired]{@link pentaho.type.spec.IInstanceResolve#isRequired}
  * can also be specified.
  *
  * @name pentaho.type.spec.IInstanceResolve
@@ -99,13 +95,4 @@
  * @name isRequired
  * @memberOf pentaho.type.spec.IInstanceResolve#
  * @type {boolean}
- */
-
-/**
- * The reservation to use when resolving the denoted instance.
- *
- * @name reservation
- * @memberOf pentaho.type.spec.IInstanceResolve#
- * @type {pentaho.type.spec.InstanceReservation}
- * @default {"none"}
  */

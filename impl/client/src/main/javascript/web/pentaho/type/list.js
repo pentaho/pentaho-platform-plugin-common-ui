@@ -64,7 +64,6 @@ define([
      * @constructor
      * @param {pentaho.type.spec.UList} [spec] The list specification or another compatible list instance.
      * @param {Object} [keyArgs] - The keyword arguments.
-     * @param {boolean} [keyArgs.isOwned=false] - Indicates that the list is owned by a complex value.
      * @param {boolean} [keyArgs.isBoundary=false] - Indicates if the list should be a _boundary list_.
      * @param {boolean} [keyArgs.isReadOnly=false] - Indicates if the list should be a _read-only list_.
      *
@@ -99,18 +98,7 @@ define([
               null;
 
           if(elemSpecs) {
-            if(keyArgs && keyArgs.isOwned) {
-              this.__load(elemSpecs);
-            } else {
-              var construction = this.$type.context.__construction;
-              construction.enter();
-
-              try {
-                this.__load(elemSpecs);
-              } finally {
-                construction.exit();
-              }
-            }
+            this.__load(elemSpecs);
           }
         }
       },

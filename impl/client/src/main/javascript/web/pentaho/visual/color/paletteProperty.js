@@ -70,16 +70,15 @@ define([
 
           defaultValue: function(propType) {
 
+            // TODO: Don't assign the same palette twice in the same top-level resolve
+            // (assuming the creation of a single Model instance).
+
             var validLevels = propType.levels;
 
             return propType.context.instances.getByType(propType.valueType, {
 
               // Consider only palettes which would make the property valid.
-              filter: function(palette) { return validLevels.has(palette.level); },
-
-              // Don't assign the same palette twice in the same top-level resolve
-              // (assuming the creation of a single Model instance).
-              reservation: "subtree"
+              filter: function(palette) { return validLevels.has(palette.level); }
             });
           },
 
@@ -168,23 +167,24 @@ define([
 
             var errors = this.base(model);
             if(!errors) {
-              var addErrors = function(newErrors) {
-                errors = typeUtil.combineErrors(errors, newErrors);
-              };
-
               var palette = model.get(this);
+              if(palette) {
+                var addErrors = function(newErrors) {
+                  errors = typeUtil.combineErrors(errors, newErrors);
+                };
 
-              // Validate palette's level is one of the property's allowed levels.
-              var level = palette.get("level"); // want Simple value
-              if(level && !this.levels.has(level.$key)) {
-                // Should be one of the property's levels.
-                addErrors(new ValidationError(bundle.format(
-                  bundle.structured.errors.property.levelIsNotOneOfPalettePropertyLevels,
-                  {
-                    property: this,
-                    level: level,
-                    propertyLevels: ("'" + this.levels.toArray().join("', '") + "'")
-                  })));
+                // Validate palette's level is one of the property's allowed levels.
+                var level = palette.get("level"); // want Simple value
+                if(level && !this.levels.has(level.$key)) {
+                  // Should be one of the property's levels.
+                  addErrors(new ValidationError(bundle.format(
+                    bundle.structured.errors.property.levelIsNotOneOfPalettePropertyLevels,
+                    {
+                      property: this,
+                      level: level,
+                      propertyLevels: ("'" + this.levels.toArray().join("', '") + "'")
+                    })));
+                }
               }
             }
 

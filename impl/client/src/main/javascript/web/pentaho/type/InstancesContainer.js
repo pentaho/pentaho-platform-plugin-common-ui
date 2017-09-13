@@ -236,39 +236,6 @@ define([
       this.__Boolean = null;
       this.__String = null;
 
-      /**
-       * Indicates that a container instance is not being created.
-       *
-       * Set and unset by the top-most container of a creation operation.
-       *
-       * The set of two properties: `__isNotCreating` and `__reservations` achieves
-       * the minimum code-path and memory use.
-       *
-       * See the code in the {@link pentaho.type.Complex} and {@link pentaho.type.List} constructors,
-       * managing `__isNotCreating` and `__reservations`.
-       *
-       * Also see the code that actually uses these in {@link pentaho.type.InstancesContainer#get}.
-       *
-       * @type {boolean}
-       * @private
-       */
-      this.__isNotCreating = true;
-
-      /**
-       * The set of tree-level reserved containers,
-       * indexed by {@link pentaho.type.mixins.Container#$uid}.
-       *
-       * If a type is in the map, then:
-       * * used - value 1
-       * * reserved - value 2
-       *
-       * Lazily created by {@link pentaho.type.InstancesContainer#__getFilterAndReserve}.
-       *
-       * @type {Object.<string, number>}
-       * @private
-       */
-      this.__reservations = null;
-
       var instanceIds = instanceInfo.getAllByType("pentaho/type/instance", {includeDescendants: true});
       if(instanceIds) {
         instanceIds.forEach(function(instanceId) {
@@ -357,11 +324,6 @@ define([
      * An instance can only be requested synchronously if it has already been requested asynchronously before.
      *
      * @param {string} id - The instance identifier.
-     * @param {Object} [keyArgs] - The keyword arguments.
-     * @param {pentaho.type.spec.InstanceReservation} [keyArgs.reservation="none"] - Indicates that the returned
-     * instance should become reserved in a certain way.
-     * @param {boolean} [keyArgs.isRequired=false] - Indicates that an error should be thrown if there is no matching
-     * result.
      *
      * @return {pentaho.type.Instance} The requested instance, or `null`, when reserved.
      *
@@ -374,7 +336,7 @@ define([
      * an instance of the defined type.
      * @throws {Error} When the requested instance or its type are not defined as a module in the AMD module system.
      */
-    getById: function(id, keyArgs) {
+    getById: function(id) {
 
       if(!id) throw error.argRequired("id");
 
@@ -390,17 +352,7 @@ define([
 
       var instance = holder.instance;
       if(instance) {
-
-        var filterAndReserve = this.__getFilterAndReserve(keyArgs, /* noFilter: */true);
-        if(filterAndReserve(instance)) {
-          return instance;
-        }
-
-        if(O.getOwn(keyArgs, "isRequired")) {
-          throw error.operInvalid("The instance of id '" + id + "' is reserved.");
-        }
-
-        return null;
+        return instance;
       }
 
       throw holder.error;
@@ -466,61 +418,27 @@ define([
     },
 
     /**
-     * Gets a function which filters and reserves passing results.
+     * Gets a function which filters results.
      *
      * @param {Object} [keyArgs] - The keyword arguments.
      * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
      * whether an instance can be the result.
-     * @param {pentaho.type.spec.InstanceReservation} [keyArgs.reservation="none"] - Indicates that the returned
-     * instance should become reserved in a certain way.
-     * @param {boolean} [ignoreFilter=false] Indicates that `keyArgs.filter` should be ignored.
      *
      * @return {function(!pentaho.type.Instance) : boolean} A function that returns `true` if the instance is selected
      * by the filter and returns `false`, otherwise.
      * @private
      */
-    __getFilterAndReserve: function(keyArgs, ignoreFilter) {
+    __getFilter: function(keyArgs) {
 
-      var filter = ignoreFilter ? null : O.getOwn(keyArgs, "filter");
-
-      var startReserve;
-      var construction = this.context.__construction;
-      switch(O.getOwn(keyArgs, "reservation")) {
-        case "tree": startReserve = construction.startReserveTree; break;
-        case "subtree": startReserve = construction.startReserveSubtree; break;
-        // case "none":
-        default: startReserve = construction.startUse;
-      }
+      var filter = O.getOwn(keyArgs, "filter");
 
       return function(instance) {
-
-        if(!instance) {
-          return false;
-        }
-
-        var endReserve;
-
-        if(instance.$type.isContainer && !(endReserve = startReserve(instance))) {
-          return false;
-        }
-
-        // Passes the user filter?
-        if(filter && !filter(instance)) {
-          return false;
-        }
-
-        if(endReserve) {
-          endReserve();
-        }
-
-        return true;
+        return !!instance && (!filter || filter(instance));
       };
     },
 
     /**
-     * Gets the highest ranking instance among the instances of the given type which
-     * are successfully loaded and
-     * are not currently [reserved]{@link pentaho.type.spec.InstanceReservation} and
+     * Gets the highest ranking instance among the instances of the given type which are successfully loaded and
      * that, optionally, match a specified filter.
      *
      * @param {string|Class.<pentaho.type.Instance>|pentaho.type.Type} baseTypeId - The identifier of the base type or
@@ -528,8 +446,6 @@ define([
      * @param {Object} [keyArgs] - The keyword arguments.
      * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
      * whether an instance can be the result.
-     * @param {pentaho.type.spec.InstanceReservation} [keyArgs.reservation="none"] - Indicates that the returned
-     * instance should become reserved in a certain way.
      * @param {boolean} [keyArgs.isRequired=false] - Indicates that an error should be thrown if there is no matching
      * result.
      *
@@ -545,13 +461,13 @@ define([
 
       var holders = this.__getHolders(baseTypeId);
       if(holders) {
-        var filterAndReserve = this.__getFilterAndReserve(keyArgs);
+        var filter = this.__getFilter(keyArgs);
 
         var L = holders.length;
         var i = -1;
         while(++i < L) {
           var instance = holders[i].instance;
-          if(filterAndReserve(instance)) {
+          if(filter(instance)) {
             return instance;
           }
         }
@@ -574,8 +490,6 @@ define([
      * @param {Object} [keyArgs] - The keyword arguments.
      * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
      * whether an instance can be part of the result.
-     * @param {pentaho.type.spec.InstanceReservation} [keyArgs.reservation="none"] - Indicates that the returned
-     * instance should become reserved in a certain way.
      * @param {boolean} [keyArgs.isRequired=false] - Indicates that an error should be thrown if there are no matching
      * results.
      *
@@ -591,14 +505,14 @@ define([
 
       var holders = this.__getHolders(baseTypeId);
       if(holders) {
-        var filterAndReserve = this.__getFilterAndReserve(keyArgs);
+        var filter = this.__getFilter(keyArgs);
 
         var instances = holders
             .map(function(holder) {
               // NotLoaded/Failed instances return null.
               return holder.instance;
             })
-            .filter(filterAndReserve);
+            .filter(filter);
 
         if(instances.length) {
           return instances;
@@ -895,16 +809,16 @@ define([
       var value;
 
       if((value = specialSpec.id)) {
-        // specialSpec: {id, reservation, isRequired}
+        // specialSpec: {id}
 
         // Always required.
         return sync
-            ? this.getById(value, specialSpec)
-            : this.getByIdAsync(value); // no need for keyArgs as there are no async reservations.
+            ? this.getById(value)
+            : this.getByIdAsync(value);
       }
 
       if((value = specialSpec.type || typeDefault)) {
-        // specialSpec: {type, isRequired, filter, reservation}
+        // specialSpec: {type, isRequired, filter}
 
         // (Async) Take care not to `context.get` a type given as a string (or an array-wrapped one)
         // as these may not be loaded. Always calling context.get does not do.

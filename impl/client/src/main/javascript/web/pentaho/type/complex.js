@@ -108,14 +108,7 @@ define([
 
         this._initContainer();
 
-        var construction = this.$type.context.__construction;
-        construction.enter();
-
-        try {
-          this._initProperties(spec);
-        } finally {
-          construction.exit();
-        }
+        this._initProperties(spec);
       },
 
       /**

@@ -603,7 +603,6 @@ define([
 
         __buildListCreateKeyArgs: function() {
           return (this.__listCreateKeyArgs = {
-            isOwned:    true,
             isBoundary: this.__isBoundary,
             isReadOnly: this.__isReadOnly
           });
