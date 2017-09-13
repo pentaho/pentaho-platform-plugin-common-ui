@@ -41,10 +41,11 @@ define([
      * @constructor
      * @param {!pentaho.type.Property.Type} propType - The property type.
      * @param {pentaho.type.Element} value - The proposed value of the property.
+     * @param {number} state - The proposed state of the property.
      *
      * @description Creates an instance.
      */
-    constructor: function(propType, value) {
+    constructor: function(propType, value, state) {
       /**
        * Gets the property whose value is replaced.
        *
@@ -56,6 +57,7 @@ define([
       O.setConst(this, "property", propType);
 
       this.__value = value;
+      this.__state = state;
     },
 
     /** @inheritDoc */
@@ -69,15 +71,17 @@ define([
      * @param {!pentaho.type.changes.Transaction} txn - The ambient transaction, provided for performance.
      * @param {!pentaho.type.Complex} complex - The complex instance.
      * @param {pentaho.type.Element} value - The new proposed value of the property.
+     * @param {number} state - The new proposed state of the property.
      * @private
      * @internal
      * @see pentaho.type.changes.ComplexChangeset.__setElement
      */
-    __updateValue: function(txn, complex, value) {
+    __updateValue: function(txn, complex, value, state) {
 
       this.__replaceRefs(txn, complex, this.__value, value);
 
       this.__value = value;
+      this.__state = state;
     },
 
     /** @inheritDoc */
@@ -113,9 +117,21 @@ define([
       return this.__value;
     },
 
+    /**
+     * Gets the state that will replace the current state of the property.
+     *
+     * @type {number}
+     * @readOnly
+     */
+    get state() {
+      return this.__state;
+    },
+
     /** @inheritDoc */
     _apply: function(target) {
-      target.__values[this.property.name] = this.__value;
+      var name = this.property.name;
+      target.__values[name] = this.__value;
+      target.__valuesState[name] = this.__state;
     }
   });
 });

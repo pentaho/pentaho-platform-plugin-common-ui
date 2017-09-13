@@ -32,6 +32,8 @@ define([
   "use strict";
 
   var O_hasOwn = Object.prototype.hasOwnProperty;
+  var PROP_VALUE_DEFAULT = 0;
+  var PROP_VALUE_SPECIFIED = 1;
 
   // TODO: self-recursive complexes won't work if we don't handle them specially:
   // Component.parent : Component
@@ -129,13 +131,19 @@ define([
         var L = propTypes.length;
         var readSpec = !spec ? undefined : (Array.isArray(spec) ? __readSpecByIndex : __readSpecByNameOrAlias);
         var values = {};
+        var valuesState = {};
         var propType;
         var value;
+        var name;
         var i = -1;
         while(++i < L) {
           propType = propTypes[i];
+          name = propType.name;
 
-          values[propType.name] = value = propType.toValueOn(this, readSpec && readSpec(spec, propType));
+          value = readSpec && readSpec(spec, propType);
+
+          valuesState[name] = value == null ? PROP_VALUE_DEFAULT : PROP_VALUE_SPECIFIED;
+          values[name] = value = propType.toValueOn(this, value);
 
           if(value != null && value.__addReference) {
             this.__initPropertyValueRelation(propType, value);
@@ -143,6 +151,7 @@ define([
         }
 
         this.__values = values;
+        this.__valuesState = valuesState;
       },
 
       /**
@@ -214,19 +223,39 @@ define([
        */
       get: function(name, sloppy) {
         var pType = this.$type.get(name, sloppy);
-        if(pType) return this.__getByType(pType);
+        if(pType) return this.__getAmbientByType(pType);
+      },
+
+      /**
+       * Gets a value that indicates if a given property has assumed a default value.
+       *
+       * @param {string|!pentaho.type.Property.Type} [name] The property name or type object.
+       * @return {boolean} Returns `true` if the property has been defaulted; `false`, otherwise.
+       */
+      isDefaultedOf: function(name) {
+        var pType = this.$type.get(name);
+        return this.__getAmbientStateByType(pType) === PROP_VALUE_DEFAULT;
       },
 
       // @internal friend Property.Type
-      __getByType: function(pType) {
+      __getAmbientByType: function(pType) {
         // List values are never changed directly, only within,
         // so there's no need to waste time asking the changeset for changes.
         return (pType.isList ? this : (this.__cset || this)).__getByName(pType.name);
       },
 
+      __getAmbientStateByType: function(pType) {
+        return (this.__cset || this).__getStateByName(pType.name);
+      },
+
       // @internal
+      // ATTENTION: This method's name and signature must be in sync with that of ComplexChangeset#__getByName
       __getByName: function(name) {
         return this.__values[name];
+      },
+
+      __getStateByName: function(name) {
+        return this.__valuesState[name];
       },
 
       /**
@@ -360,7 +389,7 @@ define([
         var pType = this.$type.get(name, sloppy);
         if(!pType) return 0;
 
-        var value = this.__getByType(pType);
+        var value = this.__getAmbientByType(pType);
         return pType.isList ? value.count : (value ? 1 : 0);
       },
       // endregion
@@ -491,28 +520,9 @@ define([
 
           if(omitProps && omitProps[name] === true) return;
 
-          var value = this.__getByType(propType);
+          var value = this.__getAmbientByType(propType);
 
-          var includeValue = includeDefaults;
-          if(!includeValue) {
-            var defaultValue = propType.defaultValue;
-            if(F.is(defaultValue)) {
-              // Because there is no "using default bit", it is now needed to
-              // generate a new default for comparison :-(
-              defaultValue = propType.defaultValueOn(this);
-            }
-
-            // Isn't equal to the default value?
-            if(propType.isList) {
-              // TODO: This is not perfect... In a way lists are always created by us.
-              // If a default list has been specified, this fails to not serialize a default list with count > 0.
-              // However, this prevents serializing an empty list when the default is also empty.
-              includeValue = (defaultValue && defaultValue.count > 0) || (value.count > 0);
-            } else {
-              includeValue = !type.areEqual(defaultValue, value);
-            }
-          }
-
+          var includeValue = includeDefaults || this.__getAmbientStateByType(propType) === PROP_VALUE_SPECIFIED;
           if(includeValue) {
             var valueSpec;
             if(value) {
@@ -811,6 +821,7 @@ define([
         var source = (this.__cset || this);
         var i = propTypes.length;
         var cloneValues = {};
+        var cloneValuesState = {};
         var propType;
         var name;
         var value;
@@ -818,14 +829,17 @@ define([
         while(i--) {
           propType = propTypes[i];
           name  = propType.name;
-          cloneValues[name] = value = propType.isList ? this.__getByName(name).clone() : source.__getByName(name);
 
-          if(value && value.__addReference) {
+          cloneValues[name] = value = propType.isList ? this.__getByName(name).clone() : source.__getByName(name);
+          cloneValuesState[name] = this.__valuesState[name];
+
+          if(value != null && value.__addReference) {
             clone.__initPropertyValueRelation(propType, value);
           }
         }
 
         clone.__values = cloneValues;
+        clone.__valuesState = cloneValuesState;
       },
 
       /** @inheritDoc */

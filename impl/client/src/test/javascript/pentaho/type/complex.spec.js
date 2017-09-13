@@ -441,6 +441,112 @@ define([
           expect(value.value).toBe("1");
         });
 
+        it("should set the state of a defaulted element property to 'specified', " +
+            "when set to the same value", function() {
+          var Derived = Complex.extend({
+            $type: {props: [{name: "x", valueType: "number", defaultValue: 1}]}
+          });
+
+          var derived = new Derived();
+
+          expect(derived.isDefaultedOf("x")).toBe(true);
+
+          derived.set("x", 1);
+
+          expect(derived.isDefaultedOf("x")).toBe(false);
+        });
+
+        it("should set the state of a defaulted element property to 'specified', " +
+            "when set to a different value", function() {
+          var Derived = Complex.extend({
+            $type: {props: [{name: "x", valueType: "number", defaultValue: 1}]}
+          });
+
+          var derived = new Derived();
+
+          expect(derived.isDefaultedOf("x")).toBe(true);
+
+          derived.set("x", 2);
+
+          expect(derived.isDefaultedOf("x")).toBe(false);
+        });
+
+        it("should set the state of a specified element property to 'defaulted', when set to null", function() {
+          var Derived = Complex.extend({
+            $type: {props: [{name: "x", valueType: "number", defaultValue: 1}]}
+          });
+
+          var derived = new Derived({x: 1});
+
+          expect(derived.isDefaultedOf("x")).toBe(false);
+
+          derived.set("x", null);
+
+          expect(derived.isDefaultedOf("x")).toBe(true);
+        });
+
+        it("should set the state of a defaulted complex property to 'specified', " +
+            "when a nested change occurs", function() {
+
+          var MyValue = Complex.extend({
+            $type: {props: [{name: "y", valueType: "number", defaultValue: 1}]}
+          });
+
+          var Derived = Complex.extend({
+            $type: {props: [{name: "x", valueType: MyValue, defaultValue: function() { return {}; }}]}
+          });
+
+          var derived = new Derived();
+
+          expect(derived.isDefaultedOf("x")).toBe(true);
+
+          derived.x.set("y", 2);
+
+          expect(derived.isDefaultedOf("x")).toBe(false);
+        });
+
+        it("should set the state of a defaulted list property to 'specified', " +
+            "when a nested change occurs", function() {
+
+          var MyValue = Complex.extend({
+            $type: {props: [{name: "y", valueType: "number", defaultValue: 1}]}
+          });
+
+          var Derived = Complex.extend({
+            $type: {props: [{name: "x", valueType: [MyValue], defaultValue: function() {
+              return [new MyValue()];
+            }}]}
+          });
+
+          var derived = new Derived();
+
+          expect(derived.isDefaultedOf("x")).toBe(true);
+
+          derived.x.at(0).set("y", 2);
+
+          expect(derived.isDefaultedOf("x")).toBe(false);
+        });
+
+        it("should set the state of a defaulted list property to 'specified', " +
+            "when a new element is added", function() {
+
+          var MyValue = Complex.extend({
+            $type: {props: [{name: "y", valueType: "number", defaultValue: 1}]}
+          });
+
+          var Derived = Complex.extend({
+            $type: {props: [{name: "x", valueType: [MyValue]}]}
+          });
+
+          var derived = new Derived();
+
+          expect(derived.isDefaultedOf("x")).toBe(true);
+
+          derived.x.add(new MyValue());
+
+          expect(derived.isDefaultedOf("x")).toBe(false);
+        });
+
         it("should throw a TypeError if the property is read-only", function() {
 
           var Derived = Complex.extend({

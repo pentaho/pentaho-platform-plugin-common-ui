@@ -799,7 +799,7 @@ define([
               errors = typeUtil.combineErrors(errors, newErrors);
             };
 
-            var value = owner.__getByType(this);
+            var value = owner.__getAmbientByType(this);
             if(value) {
               // Intrinsic value validation.
               if(!this.isBoundary) {
