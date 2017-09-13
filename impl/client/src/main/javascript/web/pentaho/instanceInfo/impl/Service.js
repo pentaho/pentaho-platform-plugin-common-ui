@@ -61,7 +61,9 @@ define([
     configure: function(spec) {
 
       O.eachOwn(spec, function(decl, id) {
-        this.declare(id, decl);
+        if(decl) {
+          this.declare(id, decl);
+        }
       }, this);
     },
 
@@ -110,6 +112,10 @@ define([
             });
           }
         }, this);
+      } else {
+        O.eachOwn(this.__declById, function(decl) {
+          instances.push(decl.id);
+        });
       }
 
       return instances;

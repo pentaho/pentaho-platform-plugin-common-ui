@@ -35,9 +35,6 @@
   var requireShim = requireCfg.shim;
   var requireMap = requireCfg.map;
 
-  // TODO: This fallback logic is temporary, and can be removed when the remaining
-  //    parts of the system rename the "service" plugin id to "pentaho/service".
-  var requireTypes = requireCfg.config["pentaho/service"] || (requireCfg.config["pentaho/service"] = {});
   var requireTypeInfo = requireCfg.config["pentaho/typeInfo"] || (requireCfg.config["pentaho/typeInfo"] = {});
   var requireInstInfo = requireCfg.config["pentaho/instanceInfo"] || (requireCfg.config["pentaho/instanceInfo"] = {});
 
@@ -63,7 +60,7 @@
   });
 
   // Named instances
-  requireTypes["pentaho/config/impl/instanceOfAmdLoadedService"] = "pentaho.config.IService";
+  requireInstInfo["pentaho/config/impl/instanceOfAmdLoadedService"] = {type: "pentaho.config.IService"};
 
   requireTypeInfo["pentaho/type/instance"] = {alias: "instance"};
   requireTypeInfo["pentaho/type/value"] = {alias: "value", base: "instance"};
@@ -277,7 +274,7 @@
   // sample/calc theme
   mapTheme("pentaho/visual/samples/calc", "themes", ["ruby"]);
 
-  requireTypes["pentaho/visual/config/vizApi.conf"] = "pentaho.config.spec.IRuleSet";
+  requireInstInfo["pentaho/visual/config/vizApi.conf"] = {type: "pentaho.config.spec.IRuleSet"};
 
   requireTypeInfo["pentaho/visual/models/abstract"] = {base: "pentaho/visual/base/model"};
   requireTypeInfo["pentaho/visual/samples/calc/model"] = {base: "pentaho/visual/base/model"};

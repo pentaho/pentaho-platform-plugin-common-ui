@@ -36,7 +36,7 @@ define([
 
       // Reset current service configuration
       localRequire.config({
-        config: {"pentaho/service": null}
+        config: {"pentaho/service": null, "pentaho/instanceInfo": null}
       });
     }
 
@@ -333,37 +333,6 @@ define([
 
           expect(singletonService.normalize("Foo?")).toBe(singletonService.normalize("Foo"));
           expect(singletonService.normalize("Foo?&&&&")).toBe(singletonService.normalize("Foo"));
-        });
-      });
-    });
-
-    describe("#getRegisteredIds(name)", function() {
-      it("should be able to use the synchronous require syntax to get just the module ids", function() {
-
-        return require.using(["pentaho/service"], requireConfigFoos, function(singletonService) {
-          var foos = singletonService.getRegisteredIds("IFoo");
-
-          expect(foos.length).toBe(2);
-          expect(foos).toContain("Foo1");
-          expect(foos).toContain("Foo2");
-        });
-      });
-
-      it("should returned an array copy every time", function() {
-
-        return require.using(["pentaho/service"], requireConfigFoos, function(singletonService) {
-          var foos1 = singletonService.getRegisteredIds("IFoo");
-          var foos2 = singletonService.getRegisteredIds("IFoo");
-
-          expect(foos1).not.toBe(foos2);
-        });
-      });
-
-      it("should returned an empty array when there are no registrations", function() {
-
-        return require.using(["pentaho/service"], requireConfigFoos, function(singletonService) {
-          var foos = singletonService.getRegisteredIds("IGuGuDaDa");
-          expect(foos).toEqual([]);
         });
       });
     });

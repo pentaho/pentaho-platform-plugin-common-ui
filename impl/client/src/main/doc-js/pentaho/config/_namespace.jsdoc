@@ -30,8 +30,8 @@
  * Typically,
  * configurations are provided as the value returned by an AMD/RequireJS module.
  * This module needs to be advertised to the configuration system by registering it
- * with [pentaho/service]{@link pentaho.service},
- * as a service of type `pentaho.config.spec.IRuleSet`.
+ * with [pentaho/instanceInfo]{@link pentaho.instanceInfo},
+ * as an instance of type `pentaho.config.spec.IRuleSet`.
  *
  * **Configuration rules** specify the _type_ or _instance_ and the values of any
  * [platform environmental variables]{@link pentaho.environment.IEnvironment}

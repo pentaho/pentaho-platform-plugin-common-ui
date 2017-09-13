@@ -100,10 +100,10 @@ define(function() {
         // Reset current service configuration
         localRequire.config({
           config: {
-            "pentaho/service": {
-              "test/config/3": "pentaho.config.spec.IRuleSet",
-              "test/config/2": "pentaho.config.spec.IRuleSet",
-              "test/config/1": "pentaho.config.spec.IRuleSet"
+            "pentaho/instanceInfo": {
+              "test/config/3": {type: "pentaho.config.spec.IRuleSet"},
+              "test/config/2": {type: "pentaho.config.spec.IRuleSet"},
+              "test/config/1": {type: "pentaho.config.spec.IRuleSet"}
             }
           }
         });

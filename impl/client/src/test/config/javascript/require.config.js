@@ -10,7 +10,6 @@
   var requirePaths    = requireCfg.paths;
   var requireShim     = requireCfg.shim;
   var requireMap      = requireCfg.map;
-  var requireTypes    = requireCfg.config["pentaho/service"];
   var requireTypeInfo = requireCfg.config["pentaho/typeInfo"];
   var requireInstInfo = requireCfg.config["pentaho/instanceInfo"];
 
@@ -63,7 +62,7 @@
   requirePaths["pentaho/ccc"] = basePath + "/pentaho/ccc";
 
   // Named instances
-  requireTypes["pentaho/config/impl/instanceOfAmdLoadedService"] = "pentaho.config.IService";
+  requireInstInfo["pentaho/config/impl/instanceOfAmdLoadedService"] = {type: "pentaho.config.IService"};
 
   requireTypeInfo["pentaho/type/instance"] = {alias: "instance"};
   requireTypeInfo["pentaho/type/value"] = {alias: "value", base: "instance"};
@@ -235,5 +234,5 @@
     requireInstInfo[id] = {type: "pentaho/visual/color/palette"};
   });
 
-  requireTypes["pentaho/visual/config/vizApi.conf"] = "pentaho.config.spec.IRuleSet";
+  requireInstInfo["pentaho/visual/config/vizApi.conf"] = {type: "pentaho.config.spec.IRuleSet"};
 })();

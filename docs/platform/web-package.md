@@ -81,19 +81,19 @@ match the absolute module identifier listed in the config object.
 Modules with a matching module identifier can access the configuration object via `module.config`.
 
 In particular, 
-this is used to configure the [`pentaho/service`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.service'}}) plugin, 
-used as a basic inversion-of-control mechanism to inject the package resources into the system.
+this is used to configure the [`pentaho/instanceInfo`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.instanceInfo'}}) 
+plugin, used as a basic inversion-of-control mechanism to inject the package resources into the system.
 
 For instance, to declare that the resource `"my-viz/config.js"` 
-implements the service named `"pentaho.config.spec.IRuleSet"`, 
+is an instance of type `"pentaho.config.spec.IRuleSet"`, 
 you would need:
 ```json
 { 
   "name": "baz",
   "version": "1.0.0",
   "config": {
-    "pentaho/service": {
-      "baz_1.0.0/my-viz/config": "pentaho.config.spec.IRuleSet"
+    "pentaho/instanceInfo": {
+      "baz_1.0.0/my-viz/config": {"type": "pentaho.config.spec.IRuleSet"}
     }
   }
 }

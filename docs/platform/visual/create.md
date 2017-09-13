@@ -43,7 +43,7 @@ with [`pentaho/typeInfo`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type
 as a subtype of `pentaho/visual/base/model`.
 
 The default configuration module that you developed also needs to be advertised to the configuration system,
-by registering it with `pentaho/service` as a service of type `pentaho.config.spec.IRuleSet`.
+by registering it with `pentaho/instanceInfo` as an instance of type `pentaho.config.spec.IRuleSet`.
 
 The result is the following `package.json` content:
 
@@ -56,8 +56,8 @@ The result is the following `package.json` content:
     "pentaho/typeInfo": {
       "pentaho-visual-samples-bar_0.0.1/model": {"base": "pentaho/visual/base/model"}
     },
-    "pentaho/service": {
-      "pentaho-visual-samples-bar_0.0.1/config": "pentaho.config.spec.IRuleSet"
+    "pentaho/instanceInfo": {
+      "pentaho-visual-samples-bar_0.0.1/config": {"type": "pentaho.config.spec.IRuleSet"}
     }
   },
   

@@ -17,6 +17,11 @@
 /**
  * The _main_ service locator service of the JavaScript Pentaho platform.
  *
+ * This service uses the [Instance Info API]{@link pentaho.instanceInfo} to query for instances that
+ * provide a given service type.
+ *
+ * Alternatively, the service can also be explicitly configured.
+ *
  * #### Configuration
  *
  * To register a module that provides a service, you configure this module, `pentaho/service`.
@@ -52,8 +57,9 @@
  */
 define([
   "module",
-  "pentaho/util/object"
-], function(module, O) {
+  "pentaho/util/object",
+  "pentaho/instanceInfo"
+], function(module, O, instanceInfo) {
   "use strict";
 
   var A_slice = Array.prototype.slice;
@@ -78,7 +84,7 @@ define([
         onLoad();
       } else {
         var nameAndOptions = __parseNameAndOptions(name);
-        var modules = __getLogicalModule(nameAndOptions.name);
+        var modules = __lookupLogicalModule(nameAndOptions.name);
 
         var modulesCount = modules.length;
         var isSingle = nameAndOptions.options.single === "true";
@@ -129,11 +135,6 @@ define([
       var nameAndOptions = __parseNameAndOptions(name);
 
       return __stringifyNameAndOptions(nameAndOptions);
-    },
-
-    getRegisteredIds: function(logicalModuleName) {
-      var ids = O.getOwn(__logicalModules, logicalModuleName);
-      return ids ? ids.slice() : [];
     }
   };
 
@@ -146,6 +147,12 @@ define([
   function __getLogicalModule(logicalModuleName) {
     return O.getOwn(__logicalModules, logicalModuleName) ||
            (__logicalModules[logicalModuleName] = []);
+  }
+
+  function __lookupLogicalModule(logicalModuleName) {
+    var localIds = O.getOwn(__logicalModules, logicalModuleName) || [];
+    var instIds = instanceInfo.getAllByType(logicalModuleName, {includeDescendants: true});
+    return localIds.concat(instIds);
   }
 
   /**

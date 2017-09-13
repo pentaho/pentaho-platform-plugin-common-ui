@@ -110,14 +110,12 @@ define([
 
           localRequire.config({
             config: {
-              "pentaho/service": {
-                "myConfigModule": "pentaho.config.spec.IRuleSet"
-              },
               "pentaho/typeInfo": {
                 "Foo": {"base": "complex"}
               },
               "pentaho/instanceInfo": {
-                "myFoo": {"type": "Foo"}
+                "myFoo": {"type": "Foo"},
+                "myConfigModule": {"type": "pentaho.config.spec.IRuleSet"}
               }
             }
           });

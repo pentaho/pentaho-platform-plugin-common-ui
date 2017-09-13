@@ -70,8 +70,8 @@ with the following:
         "d3": "./node_modules/d3/build/d3"
       },
       config: {
-        "pentaho/service": {
-          "pentaho/visual/samples/bar/config": "pentaho.config.spec.IRuleSet"
+        "pentaho/instanceInfo": {
+          "pentaho/visual/samples/bar/config": {type: "pentaho.config.spec.IRuleSet"}
         }
       }
     });
