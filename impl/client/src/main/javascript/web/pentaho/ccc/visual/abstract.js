@@ -567,14 +567,6 @@ define([
           crossLayout.rows.forEach(addStructurePosition.bind(this, "row"));
           crossLayout.cols.forEach(addStructurePosition.bind(this, "column"));
           crossLayout.meas.forEach(addStructurePosition.bind(this, "measure"));
-        } else {
-          // Table in plain layout
-          var C = dataTable.getNumberOfColumns();
-          var j = -1;
-          while(++j < C) {
-            var attr = dataTable.getColumnAttribute(j);
-            indexAttributeByAxis(/* axisId */attr.type !== "number" ? "row" : "measure", attr);
-          }
         }
 
         // ----
@@ -602,6 +594,8 @@ define([
           var mapping  = this.model.get(roleName);
 
           if(mapping.isMapped) {
+            var isVisualKey = propType.isVisualKeyOn(this.model);
+
             var cccRoleName = this._roleToCccRole[roleName];
             if(cccRoleName)
               def.array.lazy(rolesByCccVisualRole, cccRoleName).push(roleName);
@@ -611,7 +605,7 @@ define([
               var attrName = mappingAttr.name;
               var attr = attributes.get(attrName);
               var attrColIndex = dataView.getColumnIndexByAttribute(attr);
-              var axisId = axisIdByAttrName[attrName];
+              var axisId = axisIdByAttrName[attrName] || (isVisualKey ? "row" : "measure");
 
               // Create an intelligible MappingAttrInfo id.
               // The "_" prefix prevents CCC auto binding to visual roles.
