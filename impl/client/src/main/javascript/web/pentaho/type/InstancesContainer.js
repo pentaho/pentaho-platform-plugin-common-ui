@@ -330,8 +330,6 @@ define([
      * @throws {pentaho.lang.ArgumentRequiredError} When `id` is an empty string or {@link Nully}.
      * @throws {pentaho.lang.OperationInvalidError} When `id` is not the identifier of a defined instance.
      * @throws {pentaho.lang.OperationInvalidError} When the requested instance has not been loaded yet.
-     * @throws {pentaho.lang.OperationInvalidError} When the requested instance is reserved and `keyArgs.isRequired`
-     * is specified as `true`.
      * @throws {pentaho.lang.OperationInvalidError} When the requested instance's AMD module did not return
      * an instance of the defined type.
      * @throws {Error} When the requested instance or its type are not defined as a module in the AMD module system.
@@ -377,6 +375,8 @@ define([
      * @rejects {pentaho.lang.ArgumentRequiredError} When `baseTypeId` is an empty string or {@link Nully}.
      * @rejects {pentaho.lang.ArgumentInvalidError} When `baseTypeId` is an instance constructor or type object of
      * an anonymous type.
+     * @rejects {pentaho.lang.OperationInvalidError} When `keyArgs.isRequired` is `true` and
+     * there is no matching result.
      */
     getByTypeAsync: function(baseTypeId, keyArgs) {
 
@@ -407,6 +407,8 @@ define([
      * @rejects {pentaho.lang.ArgumentRequiredError} When `baseTypeId` is an empty string or {@link Nully}.
      * @rejects {pentaho.lang.ArgumentInvalidError} When `baseTypeId` is an instance constructor or type object of
      * an anonymous type.
+     * @rejects {pentaho.lang.OperationInvalidError} When `keyArgs.isRequired` is `true` and
+     * there are no matching results.
      */
     getAllByTypeAsync: function(baseTypeId, keyArgs) {
 
@@ -453,7 +455,7 @@ define([
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When `baseTypeId` is an instance constructor or type object of
      * an anonymous type.
-     * @throws {pentaho.lang.OperationInvalidError} When there is no matching result and `keyArgs.isRequired` is `true`.
+     * @throws {pentaho.lang.OperationInvalidError} When `keyArgs.isRequired` is `true` and there is no matching result.
      */
     getByType: function(baseTypeId, keyArgs) {
 

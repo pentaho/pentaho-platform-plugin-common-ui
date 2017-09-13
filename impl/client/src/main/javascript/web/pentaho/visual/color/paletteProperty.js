@@ -70,16 +70,39 @@ define([
 
           defaultValue: function(propType) {
 
-            // TODO: Don't assign the same palette twice in the same top-level resolve
-            // (assuming the creation of a single Model instance).
+            var otherUsedPaletteIds = propType.__collectOtherUsedPalettesIdsOn(this);
 
             var validLevels = propType.levels;
 
             return propType.context.instances.getByType(propType.valueType, {
 
               // Consider only palettes which would make the property valid.
-              filter: function(palette) { return validLevels.has(palette.level); }
+              filter: function(palette) {
+                return validLevels.has(palette.level) && !O.hasOwn(otherUsedPaletteIds, palette.$uid);
+              }
             });
+          },
+
+          /**
+           * Gets a set of used palette identifiers on the given owner.
+           *
+           * @param {!pentaho.type.Complex} owner - The owner complex.
+           * @return {!Object.<string, boolean>} The set of used identifiers.
+           */
+          __collectOtherUsedPalettesIdsOn: function(owner) {
+
+            var paletteIds = Object.create(null);
+
+            owner.$type.each(function(propType) {
+              if(propType !== this && propType instanceof PaletteProperty.Type) {
+                var palette = owner.get(propType);
+                if(palette) {
+                  paletteIds[palette.$uid] = true;
+                }
+              }
+            }, this);
+
+            return paletteIds;
           },
 
           // region Levels

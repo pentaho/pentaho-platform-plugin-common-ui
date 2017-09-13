@@ -156,7 +156,7 @@ define([
      * @param {!pentaho.config.spec.IRuleSet} config - A configuration rule set to add.
      */
     add: function(config) {
-      if(config.rules) {
+      if(config && config.rules) {
         config.rules.forEach(function(rule) {
           this.addRule(rule);
         }, this);

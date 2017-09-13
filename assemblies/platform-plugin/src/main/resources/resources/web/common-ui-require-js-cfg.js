@@ -18,6 +18,10 @@
 
   /* eslint dot-notation: 0, require-jsdoc: 0 */
 
+  // ATTENTION: the parts of this AMD information related with the Type API and the Viz API
+  // are duplicated in cgg's define-cfg.js. Keep all in sync.
+  // Also, it is duplicated in the testing require.config.js.
+
   var basePath =
       // environment configured
       (typeof ENVIRONMENT_CONFIG !== "undefined" && typeof ENVIRONMENT_CONFIG.paths !== "undefined" &&
