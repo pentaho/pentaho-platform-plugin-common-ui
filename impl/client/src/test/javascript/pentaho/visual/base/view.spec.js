@@ -14,23 +14,18 @@
  * limitations under the License.
  */
 define([
-  "pentaho/visual/base/view",
-  "pentaho/visual/base/model",
-  "pentaho/visual/action/select",
-  "pentaho/visual/action/execute",
   "pentaho/data/Table",
   "pentaho/type/Context",
   "pentaho/type/events/DidChange",
   "tests/test-utils",
   "tests/pentaho/util/errorMatch"
-], function(viewFactory, modelFactory, selectActionFactory, executeActionFactory,
-            Table, Context, DidChange, testUtils, errorMatch) {
+], function(Table, Context, DidChange, testUtils, errorMatch) {
 
   "use strict";
 
   /* globals document, Promise, TypeError, spyOn, expect, jasmine, describe, it */
 
-  /* eslint max-nested-callbacks: 0 */
+  /* eslint dot-notation: 0, max-nested-callbacks: 0 */
 
   var it = testUtils.itAsync;
 
@@ -41,7 +36,7 @@ define([
     var dataTable;
     var context;
 
-    beforeEach(function() {
+    beforeEach(function(done) {
 
       var dataTableSpec = {
         model: [
@@ -54,14 +49,24 @@ define([
         ]
       };
 
-      context = new Context();
-      var BaseModel = context.get(modelFactory);
-      View = context.get(viewFactory);
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
 
-      Model = BaseModel.extend(); // not abstract
+            return context.getDependencyApplyAsync([
+              "pentaho/visual/base/view",
+              "pentaho/visual/base/model"
+            ], function(BaseView, BaseModel) {
 
-      dataTable = new Table(dataTableSpec);
-      model = new Model({data: dataTable});
+              View = BaseView;
+
+              Model = BaseModel.extend(); // not abstract
+
+              dataTable = new Table(dataTableSpec);
+              model = new Model({data: dataTable});
+            });
+          })
+          .then(done, done.fail);
     });
 
     describe("new (viewSpec)", function() {
@@ -168,12 +173,17 @@ define([
       });
     });
 
-    it("should preload the filter/standard module", function() {
+    it("should preload registered filter types", function() {
 
-      return require.using(["pentaho/type/Context", "pentaho/visual/base/view"], function(Context, viewFactory) {
+      return require.using(["pentaho/type/Context"], function(Context) {
 
-        var context = new Context();
-        context.get("pentaho/data/filter/standard");
+        return Context.createAsync().then(function(context) {
+
+          return context.getDependencyApplyAsync(["pentaho/visual/base/view"], function(BaseView) {
+
+            context.get("pentaho/data/filter/or");
+          });
+        });
       });
     });
 
@@ -819,7 +829,7 @@ define([
         // _updateSize is still updating
 
         // Change the view's selection
-        view.selectionFilter = null;
+        view.selectionFilter = {_: "or"};
 
         expect((view.__dirtyPropGroups.get() & View.PropertyGroups.Selection) !== 0).toBe(true);
 
@@ -907,7 +917,7 @@ define([
       });
 
       it("should set the Selection bit  when 'selectionFilter' changes", function() {
-        view.selectionFilter = null;
+        view.selectionFilter = {_: "or"};
         expect(view.__dirtyPropGroups.is(View.PropertyGroups.Selection)).toBe(true);
       });
 
@@ -1477,8 +1487,9 @@ define([
       var ExecuteAction;
 
       beforeEach(function() {
-        SelectAction = context.get(selectActionFactory);
-        ExecuteAction = context.get(executeActionFactory);
+        // Assuming pre-loaded with View
+        SelectAction = context.get("pentaho/visual/action/select");
+        ExecuteAction = context.get("pentaho/visual/action/execute");
       });
 
       it("should call all _onActionPhase<Phase> methods", function() {
@@ -1643,18 +1654,6 @@ define([
       });
 
       it("should return a promise that is fulfilled with the view constructor of " +
-         "the registered default view type", function() {
-
-        var SubView  = View.extend();
-        var SubModel = Model.extend({$type: {defaultView: SubView}});
-
-        return View.getClassAsync(SubModel.type)
-            .then(function(ViewCtor) {
-              expect(ViewCtor).toBe(SubView);
-            });
-      });
-
-      it("should return a promise that is fulfilled with the view constructor of " +
           "the registered default view type identifier", function() {
 
         var SubModel = Model.extend({$type: {defaultView: "pentaho/visual/base/view"}});
@@ -1703,34 +1702,32 @@ define([
 
         function config(localRequire) {
 
-          localRequire.define("test/foo/view", ["pentaho/visual/base/view"], function(baseViewFactory) {
+          localRequire.define("test/foo/view", [], function() {
 
-            return function(context) {
+            return ["pentaho/visual/base/view", function(BaseView) {
 
-              var View = context.get(baseViewFactory);
-
-              return View.extend({
+              return BaseView.extend({
                 $type: {
                   id: "test/foo/view"
                 }
               });
-            };
+            }];
           });
         }
 
-        return require.using(
-            ["pentaho/type/Context", "pentaho/visual/base/view"],
-            config,
-            function(Context, baseViewFactory) {
+        return require.using(["pentaho/type/Context"], config, function(Context) {
 
-              var context = new Context();
-              var View = context.get(baseViewFactory);
+          return Context.createAsync().then(function(context) {
+
+            return context.getDependencyApplyAsync(["pentaho/visual/base/view"], function(View) {
 
               return View.createAsync({_: "test/foo/view"}).then(function(fooView) {
                 expect(fooView instanceof View).toBe(true);
                 expect(fooView.$type.id).toBe("test/foo/view");
               });
             });
+          });
+        });
       });
 
       it("should return a promise that resolves to a view of the default type of the model type id" +
@@ -1738,44 +1735,38 @@ define([
 
         function config(localRequire) {
 
-          localRequire.define("test/foo/view", ["pentaho/visual/base/view"], function(baseViewFactory) {
+          localRequire.define("test/foo/view", [], function() {
 
-            return function(context) {
+            return ["pentaho/visual/base/view", function(BaseView) {
 
-              var View = context.get(baseViewFactory);
-
-              return View.extend({
+              return BaseView.extend({
                 $type: {
                   id: "test/foo/view",
                   props: {a: {valueType: "string"}}
                 }
               });
-            };
+            }];
           });
 
-          localRequire.define("test/foo/model", ["pentaho/visual/base/model"], function(baseModelFactory) {
+          localRequire.define("test/foo/model", [], function() {
 
-            return function(context) {
+            return ["pentaho/visual/base/model", function(BaseModel) {
 
-              var Model = context.get(baseModelFactory);
-
-              return Model.extend({
+              return BaseModel.extend({
                 $type: {
                   id: "test/foo/model",
                   defaultView: "test/foo/view"
                 }
               });
-            };
+            }];
           });
         }
 
-        return require.using(
-            ["pentaho/type/Context", "pentaho/visual/base/view"],
-            config,
-            function(Context, baseViewFactory) {
+        return require.using(["pentaho/type/Context"], config, function(Context) {
 
-              var context = new Context();
-              var View = context.get(baseViewFactory);
+          return Context.createAsync().then(function(context) {
+
+            return context.getDependencyApplyAsync(["pentaho/visual/base/view"], function(View) {
 
               var viewSpec = {
                 a: "b",
@@ -1789,6 +1780,8 @@ define([
                 expect(fooView.a).toBe("b");
               });
             });
+          });
+        });
       });
 
       it("should return a promise that resolves to a view of the default type of the model instance " +
@@ -1796,45 +1789,39 @@ define([
 
         function config(localRequire) {
 
-          localRequire.define("test/foo/view", ["pentaho/visual/base/view"], function(baseViewFactory) {
+          localRequire.define("test/foo/view", [], function() {
 
-            return function(context) {
+            return ["pentaho/visual/base/view", function(BaseView) {
 
-              var View = context.get(baseViewFactory);
-
-              return View.extend({
+              return BaseView.extend({
                 $type: {
                   id: "test/foo/view",
                   props: {a: {valueType: "string"}}
                 }
               });
-            };
+            }];
           });
 
-          localRequire.define("test/foo/model", ["pentaho/visual/base/model"], function(baseModelFactory) {
+          localRequire.define("test/foo/model", [], function() {
 
-            return function(context) {
+            return ["pentaho/visual/base/model", function(BaseModel) {
 
-              var Model = context.get(baseModelFactory);
-
-              return Model.extend({
+              return BaseModel.extend({
                 $type: {
                   id: "test/foo/model",
                   defaultView: "test/foo/view"
                 }
               });
-            };
+            }];
           });
         }
 
-        return require.using(
-            ["pentaho/type/Context", "pentaho/visual/base/view", "test/foo/model"],
-            config,
-            function(Context, baseViewFactory, fooModelFactory) {
+        return require.using(["pentaho/type/Context"], config, function(Context) {
 
-              var context = new Context();
-              var View = context.get(baseViewFactory);
-              var FooModel = context.get(fooModelFactory);
+          return Context.createAsync().then(function(context) {
+
+            return context.getDependencyApplyAsync(["pentaho/visual/base/view", "test/foo/model"], function(View, FooModel) {
+
               var fooModel = new FooModel();
               var viewSpec = {
                 a: "b",
@@ -1848,6 +1835,8 @@ define([
                 expect(fooView.model).toBe(fooModel);
               });
             });
+          });
+        });
       });
     });
 

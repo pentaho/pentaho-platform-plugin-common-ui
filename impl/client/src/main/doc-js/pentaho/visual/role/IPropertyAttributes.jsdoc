@@ -33,7 +33,7 @@
  *
  * @name isRequired
  * @memberOf pentaho.visual.role.IPropertyAttributes#
- * @type {undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>}
+ * @type {undefined | boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
  */
 
 /**
@@ -45,7 +45,7 @@
  *
  * @name countMin
  * @memberOf pentaho.visual.role.IPropertyAttributes#
- * @type {undefined | number | pentaho.type.PropertyDynamicAttribute.<number>}
+ * @type {undefined | number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
  */
 
 /**
@@ -57,7 +57,7 @@
  *
  * @name countMax
  * @memberOf pentaho.visual.role.IPropertyAttributes#
- * @type {undefined | number | pentaho.type.PropertyDynamicAttribute.<number>}
+ * @type {undefined | number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
  */
 
 /**

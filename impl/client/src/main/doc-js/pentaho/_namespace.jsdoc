@@ -43,6 +43,7 @@
  *   * JavaScript Language support — {@link pentaho.lang}
  *   * Configuration — {@link pentaho.config}
  *   * Type information — {@link pentaho.typeInfo}
+ *   * Instance information — {@link pentaho.instanceInfo}
  *   * Localization — {@link pentaho.i18n}
  *   * Services — {@link pentaho.service}
  * 2. Data — {@link pentaho.data}

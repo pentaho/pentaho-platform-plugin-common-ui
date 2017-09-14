@@ -29,9 +29,21 @@ define([
   var it = testUtils.itAsync;
 
   describe("pentaho.type.Type", function() {
+    var context;
+    var Instance;
 
-    var context = new Context();
-    var Instance = context.get("instance");
+    function getInstance() {
+      return Instance;
+    }
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Instance = context.get("instance");
+          })
+          .then(done, done.fail);
+    });
 
     describe("#toSpec(keyArgs)", function() {
       var derivedType;
@@ -184,70 +196,70 @@ define([
 
       describe("#label", function() {
         // Label is either local an not-null, not-empty or is inherited.
-        serializationUtil.itFillSpecAttribute(Instance, "label", "foo", true);
-        serializationUtil.itFillSpecAttribute(Instance, "label", null, false);
-        serializationUtil.itFillSpecAttribute(Instance, "label", undefined, false);
+        serializationUtil.itFillSpecAttribute(getInstance, "label", "foo", true);
+        serializationUtil.itFillSpecAttribute(getInstance, "label", null, false);
+        serializationUtil.itFillSpecAttribute(getInstance, "label", undefined, false);
       });
 
       describe("#description", function() {
         // Description can be null or a non-empty string, or not local.
 
-        serializationUtil.itFillSpecAttribute(Instance, "description", "foo", true);
-        serializationUtil.itFillSpecAttribute(Instance, "description", null,  true);
-        serializationUtil.itFillSpecAttribute(Instance, "description", undefined, false);
+        serializationUtil.itFillSpecAttribute(getInstance, "description", "foo", true);
+        serializationUtil.itFillSpecAttribute(getInstance, "description", null,  true);
+        serializationUtil.itFillSpecAttribute(getInstance, "description", undefined, false);
       });
 
       describe("#category", function() {
         // Category can be null or a non-empty string, or not local.
 
-        serializationUtil.itFillSpecAttribute(Instance, "category", "foo", true);
-        serializationUtil.itFillSpecAttribute(Instance, "category", null,  true);
-        serializationUtil.itFillSpecAttribute(Instance, "category", undefined, false);
+        serializationUtil.itFillSpecAttribute(getInstance, "category", "foo", true);
+        serializationUtil.itFillSpecAttribute(getInstance, "category", null,  true);
+        serializationUtil.itFillSpecAttribute(getInstance, "category", undefined, false);
       });
 
       describe("#helpUrl", function() {
         // HelpUrl can be null or a non-empty string, or not local.
 
-        serializationUtil.itFillSpecAttribute(Instance, "helpUrl", "foo", true);
-        serializationUtil.itFillSpecAttribute(Instance, "helpUrl", null,  true);
-        serializationUtil.itFillSpecAttribute(Instance, "helpUrl", undefined, false);
+        serializationUtil.itFillSpecAttribute(getInstance, "helpUrl", "foo", true);
+        serializationUtil.itFillSpecAttribute(getInstance, "helpUrl", null,  true);
+        serializationUtil.itFillSpecAttribute(getInstance, "helpUrl", undefined, false);
       });
 
       describe("#isBrowsable", function() {
         // isBrowsable can be true, false or not local.
 
-        serializationUtil.itFillSpecAttribute(Instance, "isBrowsable", true,  true);
-        serializationUtil.itFillSpecAttribute(Instance, "isBrowsable", false, true);
-        serializationUtil.itFillSpecAttribute(Instance, "isBrowsable", null, false);
-        serializationUtil.itFillSpecAttribute(Instance, "isBrowsable", undefined, false);
+        serializationUtil.itFillSpecAttribute(getInstance, "isBrowsable", true,  true);
+        serializationUtil.itFillSpecAttribute(getInstance, "isBrowsable", false, true);
+        serializationUtil.itFillSpecAttribute(getInstance, "isBrowsable", null, false);
+        serializationUtil.itFillSpecAttribute(getInstance, "isBrowsable", undefined, false);
       });
 
       describe("#isAdvanced", function() {
         // isAdvanced can be true, false or not local.
 
-        serializationUtil.itFillSpecAttribute(Instance, "isAdvanced", true,  true);
-        serializationUtil.itFillSpecAttribute(Instance, "isAdvanced", false, true);
-        serializationUtil.itFillSpecAttribute(Instance, "isAdvanced", null, false);
-        serializationUtil.itFillSpecAttribute(Instance, "isAdvanced", undefined, false);
+        serializationUtil.itFillSpecAttribute(getInstance, "isAdvanced", true,  true);
+        serializationUtil.itFillSpecAttribute(getInstance, "isAdvanced", false, true);
+        serializationUtil.itFillSpecAttribute(getInstance, "isAdvanced", null, false);
+        serializationUtil.itFillSpecAttribute(getInstance, "isAdvanced", undefined, false);
       });
 
       describe("#ordinal", function() {
         // ordinal can be a number or not local.
 
-        serializationUtil.itFillSpecAttribute(Instance, "ordinal", 1, true);
-        serializationUtil.itFillSpecAttribute(Instance, "ordinal", 2, true);
-        serializationUtil.itFillSpecAttribute(Instance, "ordinal", null, false);
-        serializationUtil.itFillSpecAttribute(Instance, "ordinal", undefined, false);
+        serializationUtil.itFillSpecAttribute(getInstance, "ordinal", 1, true);
+        serializationUtil.itFillSpecAttribute(getInstance, "ordinal", 2, true);
+        serializationUtil.itFillSpecAttribute(getInstance, "ordinal", null, false);
+        serializationUtil.itFillSpecAttribute(getInstance, "ordinal", undefined, false);
       });
 
       describe("#defaultView", function() {
         // view can be null, function or string, or not local.
         var f = function() {};
 
-        serializationUtil.itFillSpecAttribute(Instance, "defaultView", f, true);
-        serializationUtil.itFillSpecAttribute(Instance, "defaultView", "/my/view", true);
-        serializationUtil.itFillSpecAttribute(Instance, "defaultView", null, true);
-        serializationUtil.itFillSpecAttribute(Instance, "defaultView", undefined, false);
+        serializationUtil.itFillSpecAttribute(getInstance, "defaultView", f, true);
+        serializationUtil.itFillSpecAttribute(getInstance, "defaultView", "/my/view", true);
+        serializationUtil.itFillSpecAttribute(getInstance, "defaultView", null, true);
+        serializationUtil.itFillSpecAttribute(getInstance, "defaultView", undefined, false);
 
         it("should not output a local defaultView constructor when isJson: true", function() {
           var spec = {};
@@ -271,11 +283,9 @@ define([
 
         function defineSampleMixins(localRequire) {
 
-          localRequire.define("tests/mixins/A", ["pentaho/type/value"], function(valueFactory) {
+          localRequire.define("tests/mixins/A", [], function() {
 
-            return function(context) {
-
-              var Value = context.get(valueFactory);
+            return ["pentaho/type/value", function(Value) {
 
               return Value.extend({
                 testMethodAInst: function() {},
@@ -284,14 +294,12 @@ define([
                   testMethodA: function() {}
                 }
               });
-            };
+            }];
           });
 
-          localRequire.define("tests/mixins/B", ["pentaho/type/value"], function(valueFactory) {
+          localRequire.define("tests/mixins/B", [], function() {
 
-            return function(context) {
-
-              var Value = context.get(valueFactory);
+            return ["pentaho/type/value", function(Value) {
 
               return Value.extend({
                 testMethodBInst: function() {},
@@ -300,44 +308,47 @@ define([
                   testMethodB: function() {}
                 }
               });
-            };
+            }];
           });
         }
 
         it("should include all local mixin ids", function() {
 
-          return require.using([
-            "pentaho/type/Context",
-            "tests/mixins/A",
-            "tests/mixins/B"
-          ], defineSampleMixins, function(Context, mixinFactoryA, mixinFactoryB) {
+          return require.using(["pentaho/type/Context"], defineSampleMixins, function(Context) {
 
-            var context = new Context();
-            var Value = context.get("pentaho/type/value");
+            return Context.createAsync().then(function(context) {
 
-            var DerivedValue1 = Value.extend({
-              $type: {
-                id: "tests/types/foo1",
-                mixins: [mixinFactoryA]
-              }
+              return context.getDependencyApplyAsync([
+                "pentaho/type/value",
+                "tests/mixins/A",
+                "tests/mixins/B"
+              ], function(Value, MixinA, MixinB) {
+
+                var DerivedValue1 = Value.extend({
+                  $type: {
+                    id: "tests/types/foo1",
+                    mixins: [MixinA]
+                  }
+                });
+
+                var DerivedValue2 = DerivedValue1.extend({
+                  $type: {
+                    id: "tests/types/foo2",
+                    mixins: [MixinB]
+                  }
+                });
+
+                var scope = new SpecificationScope();
+                var spec = {};
+
+                var result = DerivedValue2.type._fillSpecInContext(spec, {});
+
+                scope.dispose();
+
+                expect(result).toBe(true);
+                expect(spec.mixins).toEqual(["tests/mixins/B"]);
+              });
             });
-
-            var DerivedValue2 = DerivedValue1.extend({
-              $type: {
-                id: "tests/types/foo2",
-                mixins: [mixinFactoryB]
-              }
-            });
-
-            var scope = new SpecificationScope();
-            var spec = {};
-
-            var result = DerivedValue2.type._fillSpecInContext(spec, {});
-
-            scope.dispose();
-
-            expect(result).toBe(true);
-            expect(spec.mixins).toEqual(["tests/mixins/B"]);
           });
         });
       });

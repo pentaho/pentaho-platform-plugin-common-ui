@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 define([
-  "module",
-  "./areaAbstract"
-], function(module, baseViewFactory) {
+  "module"
+], function(module) {
 
   "use strict";
 
-  return function(context) {
-
-    var BaseView = context.get(baseViewFactory);
+  return ["pentaho/ccc/visual/areaAbstract", function(BaseView) {
 
     return BaseView.extend({
       $type: {
         id: module.id
       }
     });
-  };
+  }];
 });

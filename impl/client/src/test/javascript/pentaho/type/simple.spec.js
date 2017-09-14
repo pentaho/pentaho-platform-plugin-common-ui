@@ -23,11 +23,12 @@ define([
 
   /* global describe:true, it:true, expect:true, beforeEach:true*/
 
-  var context = new Context(),
-      Element = context.get("pentaho/type/element"),
-      Simple  = context.get("pentaho/type/simple");
-
   describe("pentaho.type.Simple -", function() {
+
+    var context;
+    var Element;
+    var Simple;
+
     function expectThrow(spec, errorMatch) {
       expect(function() {
         var foo = new Simple(spec);
@@ -67,6 +68,16 @@ define([
       expect(simpleType.value).toBe(value);
       expect(simpleType.formatted).toBe(formatted);
     }
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Element = context.get("pentaho/type/element");
+            Simple  = context.get("pentaho/type/simple");
+          })
+          .then(done, done.fail);
+    });
 
     it("should be a function", function() {
       expect(typeof Simple).toBe("function");
@@ -256,7 +267,12 @@ define([
     });
 
     describe(".Type -", function() {
-      var ElemType = Simple.Type;
+
+      var ElemType;
+
+      beforeEach(function() {
+        ElemType = Simple.Type;
+      });
 
       it("should be a function", function() {
         expect(typeof ElemType).toBe("function");

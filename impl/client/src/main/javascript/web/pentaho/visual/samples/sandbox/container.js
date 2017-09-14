@@ -15,9 +15,8 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/visual/base/View",
   "pentaho/data/Table"
-], function(Context, viewBaseFactory, Table) {
+], function(Context, Table) {
 
   "use strict";
 
@@ -39,7 +38,7 @@ define([
     height: 100,
     domContainer: sandboxContainer,
     model: {
-      _: "pentaho/visual/samples/calc",
+      _: "pentaho/visual/samples/calc/model",
       data: dataTable,
       levels: {
         attributes: ["family"]
@@ -51,19 +50,27 @@ define([
     }
   };
 
-  var context = new Context();
-  var View = context.get(viewBaseFactory);
+  // Export for users to play with.
+  window.app = {context: null, view: null};
 
-  View.createAsync(viewSpec).then(function(view) {
+  Context.createAsync()
+      .then(function(context) {
 
-    view.update().then(function() {
-      console.log("view update finished");
-    });
+        window.app.context = context;
 
-    // Export for users to play with.
-    window.app = {
-      context: context,
-      view: view
-    };
-  });
+        return context.getAsync("pentaho/visual/base/view");
+      })
+      .then(function(View) {
+        return View.createAsync(viewSpec);
+      })
+      .then(function(view) {
+
+        window.app.view = view;
+
+        return view.update();
+      })
+      .then(function() {
+        console.log("view update finished");
+      });
+
 });

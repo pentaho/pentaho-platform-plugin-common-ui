@@ -15,10 +15,9 @@
  */
 define([
   "module",
-  "./simple",
   "../util/object",
   "../i18n!types"
-], function(module, simpleFactory, O, bundle) {
+], function(module, O, bundle) {
 
   "use strict";
 
@@ -31,21 +30,19 @@ define([
     enumerable:   false
   };
 
-  return function(context) {
-
-    var __Simple = context.get(simpleFactory);
+  return ["simple", function(Simple) {
 
     /**
      * @name pentaho.type.Object
      * @class
      * @extends pentaho.type.Simple
-     * @amd {pentaho.type.Factory<pentaho.type.Object>} pentaho/type/object
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Object>} pentaho/type/object
      *
      * @classDesc The class that represents primitive, JavaScript {@link object} values.
      *
      * @description Creates an object instance.
      */
-    var PenObject = __Simple.extend(/** @lends pentaho.type.Object# */{
+    var PenObject = Simple.extend(/** @lends pentaho.type.Object# */{
 
       constructor: function(spec) {
 
@@ -93,5 +90,5 @@ define([
     });
 
     return PenObject;
-  };
+  }];
 });

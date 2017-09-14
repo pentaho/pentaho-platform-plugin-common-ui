@@ -26,10 +26,23 @@ define([
 
   /* eslint max-nested-callbacks: 0 */
 
-  var context = new Context();
-  var Value = context.get("pentaho/type/value");
-
   describe("pentaho.type.Value.Type", function() {
+
+    var context;
+    var Value;
+
+    function getValue() {
+      return Value;
+    }
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Value = context.get("pentaho/type/value");
+          })
+          .then(done, done.fail);
+    });
 
     describe("#toSpecInContext(keyArgs)", function() {
 
@@ -223,8 +236,8 @@ define([
       describe("#isAbstract", function() {
         // isAbstract is always local. Non-nullable. false by default.
 
-        serializationUtil.itFillSpecAttribute(Value, "isAbstract", true, true);
-        serializationUtil.itFillSpecAttribute(Value, "isAbstract", false, false);
+        serializationUtil.itFillSpecAttribute(getValue, "isAbstract", true, true);
+        serializationUtil.itFillSpecAttribute(getValue, "isAbstract", false, false);
       });
     });
   });

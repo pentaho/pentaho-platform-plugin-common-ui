@@ -14,34 +14,56 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/filter/abstract",
-  "pentaho/data/filter/and",
-  "pentaho/data/filter/or",
-  "pentaho/data/filter/not",
-  "pentaho/type/Context",
-  "pentaho/type/complex"
-], function(abstractFactory, andFactory, orFactory, notFactory, Context, complexFactory) {
+  "pentaho/type/Context"
+], function(Context) {
 
   "use strict";
 
   describe("pentaho.data.filter.Or", function() {
 
-    var context = new Context();
-    var AbstractFilter = context.get(abstractFactory);
-    var AndFilter = context.get(andFactory);
-    var OrFilter = context.get(orFactory);
-    var NotFilter = context.get(notFactory);
-    var Complex = context.get(complexFactory);
-    var CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
+    var context;
+    var Complex;
+    var AbstractFilter;
+    var NotFilter;
+    var AndFilter;
+    var OrFilter;
+    var CustomFilter;
+    var ProductSummary;
 
-    var ProductSummary = Complex.extend({
-      $type: {
-        props: [
-          {name: "name", valueType: "string", label: "Name"},
-          {name: "sales", valueType: "number", label: "Sales"},
-          {name: "inStock", valueType: "boolean", label: "In Stock"}
-        ]
-      }
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+
+            context = _context;
+            Complex = context.get("complex");
+
+            ProductSummary = Complex.extend({
+              $type: {
+                props: [
+                  {name: "name", valueType: "string", label: "Name"},
+                  {name: "sales", valueType: "number", label: "Sales"},
+                  {name: "inStock", valueType: "boolean", label: "In Stock"}
+                ]
+              }
+            });
+
+            return context.getDependencyApplyAsync([
+              "pentaho/data/filter/abstract",
+              "pentaho/data/filter/not",
+              "pentaho/data/filter/and",
+              "pentaho/data/filter/or",
+              "pentaho/data/filter/isEqual"
+            ], function(Abstract, Not, And, Or) {
+              AbstractFilter = Abstract;
+              NotFilter = Not;
+              AndFilter = And;
+              OrFilter = Or;
+
+              CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
+            });
+          })
+          .then(done, done.fail);
+
     });
 
     describe("#kind", function() {
@@ -54,7 +76,11 @@ define([
 
     describe("#contains(elem)", function() {
 
-      var elem = new ProductSummary({name: "A", sales: 12000, inStock: true});
+      var elem;
+
+      beforeEach(function() {
+        elem = new ProductSummary({name: "A", sales: 12000, inStock: true});
+      });
 
       it("should return `false` if `operands` is empty", function() {
 

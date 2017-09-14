@@ -21,11 +21,22 @@ define([
 
   /* global describe:true, it:true, expect:true, beforeEach:true*/
 
-  var context = new Context(),
-      Value   = context.get("pentaho/type/value"),
-      Element = context.get("pentaho/type/element");
-
   describe("pentaho.type.Element -", function() {
+
+    var context;
+    var Value;
+    var Element;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Value = context.get("pentaho/type/value");
+            Element = context.get("pentaho/type/element");
+          })
+          .then(done, done.fail);
+    });
+
     it("should be a function", function() {
       expect(typeof Element).toBe("function");
     });
@@ -35,7 +46,12 @@ define([
     });
 
     describe("Type -", function() {
-      var ElemType = Element.Type;
+
+      var ElemType;
+
+      beforeEach(function() {
+        ElemType = Element.Type;
+      });
 
       it("should be a function", function() {
         expect(typeof ElemType).toBe("function");

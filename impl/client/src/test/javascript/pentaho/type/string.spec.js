@@ -14,26 +14,29 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/string",
   "pentaho/type/Context",
   "tests/pentaho/util/errorMatch"
-], function(stringFactory, Context, errorMatch) {
+], function(Context, errorMatch) {
 
   "use strict";
 
   /* global describe:true, it:true, expect:true, beforeEach:true*/
 
   describe("pentaho.type.String -", function() {
-    it("is a function", function() {
-      expect(typeof stringFactory).toBe("function");
+
+    var context;
+    var PentahoString;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            PentahoString = context.get("pentaho/type/string");
+          })
+          .then(done, done.fail);
     });
 
     describe("new String() -", function() {
-      var PentahoString;
-
-      beforeEach(function() {
-        PentahoString = stringFactory(new Context());
-      });
 
       it("should be a function", function() {
         expect(typeof PentahoString).toBe("function");

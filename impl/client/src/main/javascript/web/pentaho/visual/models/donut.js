@@ -15,15 +15,12 @@
  */
 define([
   "module",
-  "./pie",
   "pentaho/i18n!./i18n/model"
-], function(module, baseModelFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
-
-    var BaseModel = context.get(baseModelFactory);
+  return ["./pie", function(BaseModel) {
 
     return BaseModel.extend({
       $type: {
@@ -32,5 +29,5 @@ define([
       }
     })
     .implement({$type: bundle.structured.donut});
-  };
+  }];
 });

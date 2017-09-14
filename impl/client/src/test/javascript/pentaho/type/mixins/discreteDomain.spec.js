@@ -33,14 +33,18 @@ define([
     var DiscreteDomain;
     var Property;
 
-    beforeEach(function() {
-      context = new Context();
-      List = context.get("pentaho/type/list");
-      Complex = context.get("pentaho/type/complex");
-      PentahoNumber = context.get("pentaho/type/number");
-      PentahoString = context.get("pentaho/type/string");
-      DiscreteDomain = context.get("pentaho/type/mixins/discreteDomain");
-      Property = context.get("pentaho/type/property");
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            List = context.get("pentaho/type/list");
+            Complex = context.get("pentaho/type/complex");
+            PentahoNumber = context.get("pentaho/type/number");
+            PentahoString = context.get("pentaho/type/string");
+            DiscreteDomain = context.get("pentaho/type/mixins/discreteDomain");
+            Property = context.get("pentaho/type/property");
+          })
+          .then(done, done.fail);
     });
 
     it("should be a function", function() {

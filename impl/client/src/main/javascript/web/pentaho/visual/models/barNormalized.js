@@ -15,25 +15,25 @@
  */
 define([
   "module",
-  "./barNormalizedAbstract",
   "pentaho/i18n!./i18n/model"
-], function(module, baseModelFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "./barNormalizedAbstract",
+    function(BaseModel) {
 
-    var BaseModel = context.get(baseModelFactory);
+      return BaseModel.extend({
+        $type: {
+          id: module.id,
+          v2Id: "ccc_barnormalized",
+          category: "barchart",
 
-    return BaseModel.extend({
-      $type: {
-        id: module.id,
-        v2Id: "ccc_barnormalized",
-        category: "barchart",
-
-        defaultView: "pentaho/ccc/visual/barNormalized"
-      }
-    })
-    .implement({$type: bundle.structured.barNormalized});
-  };
+          defaultView: "pentaho/ccc/visual/barNormalized"
+        }
+      })
+      .implement({$type: bundle.structured.barNormalized});
+    }
+  ];
 });

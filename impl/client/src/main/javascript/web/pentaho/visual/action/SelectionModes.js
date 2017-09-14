@@ -28,7 +28,7 @@ define([
   /**
    * The `SelectionModes` enumeration contains the collection of standard selection mode functions.
    *
-   * @enum {pentaho.visual.action.SelectionMode}
+   * @enum {function}
    * @memberOf pentaho.visual.action
    * @readonly
    */

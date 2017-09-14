@@ -18,6 +18,10 @@
 
   /* eslint dot-notation: 0, require-jsdoc: 0 */
 
+  // ATTENTION: the parts of this AMD information related with the Type API and the Viz API
+  // are duplicated in cgg's define-cfg.js. Keep all in sync.
+  // Also, it is duplicated in the testing require.config.js.
+
   var basePath =
       // environment configured
       (typeof ENVIRONMENT_CONFIG !== "undefined" && typeof ENVIRONMENT_CONFIG.paths !== "undefined" &&
@@ -34,12 +38,9 @@
   var requirePaths = requireCfg.paths;
   var requireShim = requireCfg.shim;
   var requireMap = requireCfg.map;
-  var requirePackages = requireCfg.packages;
 
-  // TODO: This fallback logic is temporary, and can be removed when the remaining
-  //    parts of the system rename the "service" plugin id to "pentaho/service".
-  var requireTypes = requireCfg.config["pentaho/service"] || (requireCfg.config["pentaho/service"] = {});
   var requireTypeInfo = requireCfg.config["pentaho/typeInfo"] || (requireCfg.config["pentaho/typeInfo"] = {});
+  var requireInstInfo = requireCfg.config["pentaho/instanceInfo"] || (requireCfg.config["pentaho/instanceInfo"] = {});
 
   // region common-ui
   requirePaths["common-ui"] = basePath;
@@ -56,14 +57,14 @@
   // E.g. requirePaths["pentaho/util"] = basePath + "/pentaho/util";
   [
     "shim", "util", "lang",
-    "i18n", "service", "data", "type", "typeInfo",
+    "i18n", "service", "data", "type", "typeInfo", "instanceInfo",
     "visual", "config", "environment", "debug", "ccc"
   ].forEach(function(name) {
     requirePaths["pentaho/" + name] = basePath + "/pentaho/" + name;
   });
 
   // Named instances
-  requireTypes["pentaho/config/impl/instanceOfAmdLoadedService"] = "pentaho.config.IService";
+  requireInstInfo["pentaho/config/impl/instanceOfAmdLoadedService"] = {type: "pentaho.config.IService"};
 
   requireTypeInfo["pentaho/type/instance"] = {alias: "instance"};
   requireTypeInfo["pentaho/type/value"] = {alias: "value", base: "instance"};
@@ -81,6 +82,7 @@
   requireTypeInfo["pentaho/type/object"] = {alias: "object", base: "simple"};
   requireTypeInfo["pentaho/type/function"] = {alias: "function", base: "simple"};
   requireTypeInfo["pentaho/type/mixins/enum"] = {alias: "enum", base: "element"};
+  requireTypeInfo["pentaho/type/action/base"] = {base: "element"};
 
   requireTypeInfo["pentaho/data/filter/abstract"] = {base: "complex"};
   requireTypeInfo["pentaho/data/filter/true"] = {alias: "true", base: "pentaho/data/filter/abstract"};
@@ -98,11 +100,11 @@
   requireTypeInfo["pentaho/data/filter/isLessOrEqual"] = {alias: "<=", base: "pentaho/data/filter/property"};
   requireTypeInfo["pentaho/data/filter/isLike"] = {alias: "like", base: "pentaho/data/filter/property"};
 
-  requireTypeInfo["pentaho/visual/base"] = {base: "model"};
+  requireTypeInfo["pentaho/visual/base/model"] = {base: "model"};
   requireTypeInfo["pentaho/visual/base/view"] = {
     base: "complex",
     props: {
-      model: {valueType: "pentaho/visual/base"}
+      model: {valueType: "pentaho/visual/base/model"}
     }
   };
   // endregion
@@ -267,10 +269,6 @@
     requireMap["*"][mid + "/theme"] = mid + "/" + themeRoot + "/" + theme;
   }
 
-  function registerViz(name) {
-    requireTypes[name] = "pentaho/visual/base";
-  }
-
   // Type API Base Theme
   mapTheme("pentaho/type", "themes", ["ruby"]);
 
@@ -280,20 +278,11 @@
   // sample/calc theme
   mapTheme("pentaho/visual/samples/calc", "themes", ["ruby"]);
 
-  requireTypes["pentaho/visual/config/vizApi.conf"] = "pentaho.config.spec.IRuleSet";
+  requireInstInfo["pentaho/visual/config/vizApi.conf"] = {type: "pentaho.config.spec.IRuleSet"};
 
-  requirePackages.push({"name": "pentaho/visual/base", "main": "model"});
-  requirePackages.push({"name": "pentaho/visual/samples/calc", "main": "model"});
-
+  requireTypeInfo["pentaho/visual/models/abstract"] = {base: "pentaho/visual/base/model"};
+  requireTypeInfo["pentaho/visual/samples/calc/model"] = {base: "pentaho/visual/base/model"};
   [
-    // base visual
-    "pentaho/visual/base",
-
-    // calc viz
-    "pentaho/visual/samples/calc",
-
-    // ccc vizs
-    "pentaho/visual/models/abstract",
     "pentaho/visual/models/cartesianAbstract",
     "pentaho/visual/models/categoricalContinuousAbstract",
     "pentaho/visual/models/barAbstract",
@@ -315,7 +304,9 @@
     "pentaho/visual/models/donut",
     "pentaho/visual/models/scatter",
     "pentaho/visual/models/bubble"
-  ].forEach(registerViz);
+  ].forEach(function(name) {
+    requireTypeInfo[name] = {base: "pentaho/visual/models/abstract"};
+  });
   // endregion
 
   // TODO: this should be removed from here, and to the GEO plugin's package.json
@@ -324,7 +315,29 @@
   requireMap["*"]["pentaho/geo/visual/map"] = "pentaho/geo/visual_${project.version}/view";
 
   // VizAPI actions
-  requireTypeInfo["pentaho/visual/action/select"] = {alias: "select"};
-  requireTypeInfo["pentaho/visual/action/execute"] = {alias: "execute"};
+  requireTypeInfo["pentaho/visual/action/base"] = {base: "pentaho/type/action/base"};
+  requireTypeInfo["pentaho/visual/action/data"] = {base: "pentaho/visual/action/base"};
+  requireTypeInfo["pentaho/visual/action/select"] = {alias: "select", base: "pentaho/visual/action/data"};
+  requireTypeInfo["pentaho/visual/action/execute"] = {alias: "execute", base: "pentaho/visual/action/data"};
+
+  // Color Palettes
+  requireTypeInfo["pentaho/visual/color/palette"] = {base: "complex"};
+
+  [
+    "pentaho/visual/color/palettes/nominalPrimary",
+    "pentaho/visual/color/palettes/nominalNeutral",
+    "pentaho/visual/color/palettes/nominalLight",
+    "pentaho/visual/color/palettes/nominalDark",
+    "pentaho/visual/color/palettes/quantitativeBlue3",
+    "pentaho/visual/color/palettes/quantitativeBlue5",
+    "pentaho/visual/color/palettes/quantitativeGray3",
+    "pentaho/visual/color/palettes/quantitativeGray5",
+    "pentaho/visual/color/palettes/divergentRyg3",
+    "pentaho/visual/color/palettes/divergentRyg5",
+    "pentaho/visual/color/palettes/divergentRyb3",
+    "pentaho/visual/color/palettes/divergentRyb5"
+  ].forEach(function(id) {
+    requireInstInfo[id] = {type: "pentaho/visual/color/palette"};
+  });
 
 })(this);

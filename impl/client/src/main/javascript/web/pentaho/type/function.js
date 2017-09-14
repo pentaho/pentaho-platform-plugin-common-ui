@@ -15,12 +15,11 @@
  */
 define([
   "module",
-  "./simple",
   "../util/object",
   "../util/fun",
   "../util/logger",
   "../i18n!types"
-], function(module, simpleFactory, O, F, logger, bundle) {
+], function(module, O, F, logger, bundle) {
 
   "use strict";
 
@@ -35,15 +34,13 @@ define([
     enumerable:   false
   };
 
-  return function(context) {
-
-    var Simple = context.get(simpleFactory);
+  return ["simple", function(Simple) {
 
     /**
      * @name pentaho.type.Function
      * @class
      * @extends pentaho.type.Simple
-     * @amd {pentaho.type.Factory<pentaho.type.Function>} pentaho/type/function
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Function>} pentaho/type/function
      *
      * @classDesc The class that represents primitive, JavaScript {@link function} values.
      *
@@ -113,5 +110,5 @@ define([
     });
 
     return PenFunction;
-  };
+  }];
 });

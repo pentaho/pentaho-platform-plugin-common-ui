@@ -14,31 +14,46 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/filter/isLike",
   "pentaho/type/Context",
-  "pentaho/type/complex",
   "./propertyUtils"
-], function(isLikeFactory, Context, complexFactory, propertyUtils) {
+], function(Context, propertyUtils) {
 
   "use strict";
 
   describe("pentaho.data.filter.IsLike", function() {
 
-    var context = new Context();
-    var IsLikeFilter = context.get(isLikeFactory);
-    var Complex = context.get(complexFactory);
+    var context;
+    var Complex;
+    var IsLikeFilter;
+    var ProductSummary;
 
-    var ProductSummary = Complex.extend({
-      $type: {
-        props: [
-          {name: "name", valueType: "string", label: "Name"},
-          {name: "sales", valueType: "number", label: "Sales"},
-          {name: "inStock", valueType: "boolean", label: "In Stock"}
-        ]
-      }
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+
+            context = _context;
+            Complex = context.get("complex");
+
+            ProductSummary = Complex.extend({
+              $type: {
+                props: [
+                  {name: "name", valueType: "string", label: "Name"},
+                  {name: "sales", valueType: "number", label: "Sales"},
+                  {name: "inStock", valueType: "boolean", label: "In Stock"}
+                ]
+              }
+            });
+
+            return context.getDependencyApplyAsync([
+              "pentaho/data/filter/isLike"
+            ], function(IsLike) {
+              IsLikeFilter = IsLike;
+            });
+          })
+          .then(done, done.fail);
     });
 
-    propertyUtils.behavesLikeProperty(IsLikeFilter, {
+    propertyUtils.behavesLikeProperty(function() { return IsLikeFilter; }, {
       valueType: "string",
       rawValue: "match",
       kind: "isLike",
@@ -47,7 +62,11 @@ define([
 
     describe("#contains(elem)", function() {
 
-      var elem = new ProductSummary({name: {v: "acme", f: "test"}, sales: 12000, inStock: true});
+      var elem;
+
+      beforeEach(function() {
+        elem = new ProductSummary({name: {v: "acme", f: "test"}, sales: 12000, inStock: true});
+      });
 
       it("should return `true` if `elem` has property `property` with a value matching an affix of `value`", function() {
 

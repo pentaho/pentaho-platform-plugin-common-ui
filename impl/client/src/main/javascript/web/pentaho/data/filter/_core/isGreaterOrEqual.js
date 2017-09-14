@@ -35,7 +35,7 @@ define([
      * @name pentaho.data.filter.IsGreaterOrEqual
      * @class
      * @extends pentaho.data.filter.Property
-     * @amd {pentaho.type.Factory<pentaho.data.filter.IsGreaterOrEqual>} pentaho/data/filter/isGreaterOrEqual
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.IsGreaterOrEqual>} pentaho/data/filter/isGreaterOrEqual
      *
      * @classDesc The `IsGreaterOrEqual` class represents a filter for being greater than or equal to a given value.
      * The filter selects elements having the value of a certain property greater or equal to a reference

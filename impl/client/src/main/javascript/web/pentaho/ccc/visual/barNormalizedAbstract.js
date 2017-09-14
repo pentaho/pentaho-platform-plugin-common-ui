@@ -14,36 +14,36 @@
  * limitations under the License.
  */
 define([
-  "module",
-  "pentaho/visual/models/barNormalizedAbstract",
-  "./barAbstract"
-], function(module, modelFactory, baseViewFactory) {
+  "module"
+], function(module) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/ccc/visual/barAbstract",
+    "pentaho/visual/models/barNormalizedAbstract",
+    function(BaseView, Model) {
 
-    var BaseView = context.get(baseViewFactory);
+      return BaseView.extend({
+        $type: {
+          id: module.id,
+          props: {
+            model: {valueType: Model}
+          }
+        },
+        _options: {
+          valuesNormalized: true,
+          stacked: true
+        },
 
-    return BaseView.extend({
-      $type: {
-        id: module.id,
-        props: {
-          model: {valueType: modelFactory}
+        _configureOptions: function() {
+          this.base();
+
+          this.options.orthoAxisTickFormatter = formatTickPercent;
         }
-      },
-      _options: {
-        valuesNormalized: true,
-        stacked: true
-      },
-
-      _configureOptions: function() {
-        this.base();
-
-        this.options.orthoAxisTickFormatter = formatTickPercent;
-      }
-    });
-  };
+      });
+    }
+  ];
 
   function formatTickPercent(v) {
     return v + "%";

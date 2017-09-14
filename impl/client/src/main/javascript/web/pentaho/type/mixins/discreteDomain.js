@@ -23,7 +23,9 @@ define([
 
   "use strict";
 
-  return function(context) {
+  // This should be Property, however, because the mixin is applied to Property itself,
+  // we have to derive from Instance instead (or a cycle would be formed).
+  return ["instance", function(Instance) {
 
     /**
      * @name pentaho.type.mixins.DiscreteDomain.Type
@@ -40,7 +42,7 @@ define([
      * @class
      * @extends pentaho.type.Instance
      * @abstract
-     * @amd {pentaho.type.Factory<pentaho.type.mixins.DiscreteDomain>} pentaho/type/mixins/discreteDomain
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.mixins.DiscreteDomain>} pentaho/type/mixins/discreteDomain
      *
      * @classDesc A mixin type that adds to properties the ability to specify a discrete set of values
      * that are valid as property values.
@@ -56,11 +58,8 @@ define([
      * @description This class was not designed to be constructed directly.
      */
 
-    // This should be Property, however, because the mixin is applied to Property itself,
-    // we have to derive from Instance instead (or a cycle would be formed).
-    var Instance = context.get("instance");
-
     return Instance.extend(/** @lends pentaho.type.mixins.DiscreteDomain# */{
+
       $type: /** @lends pentaho.type.mixins.DiscreteDomain.Type# */{
         id: module.id,
 
@@ -133,14 +132,14 @@ define([
            * @name domain
            * @memberOf pentaho.type.Property.Type#
            * @type {undefined | Array.<pentaho.type.Element> |
-           *        pentaho.type.PropertyDynamicAttribute.<Array.<pentaho.type.Element>>}
+           *        pentaho.type.spec.PropertyDynamicAttribute.<Array.<pentaho.type.Element>>}
            *
            * @see pentaho.type.Complex#domainOf
            * @see pentaho.type.mixins.spec.IDiscreteDomainTypeProto#domain
            */
           "domain": {
 
-            /* @type pentaho.type.PropertyDynamicAttribute */
+            /* @type pentaho.type.spec.PropertyDynamicAttribute */
             value: function(propType) {
 
               // The initial domain is that of the property's valueType's domain, if any.
@@ -212,5 +211,5 @@ define([
         }
       }
     });
-  };
+  }];
 });

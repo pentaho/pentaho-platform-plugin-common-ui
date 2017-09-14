@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 define([
-  "module",
-  "pentaho/visual/models/donut",
-  "./pie"
-], function(module, modelFactory, baseViewFactory) {
+  "module"
+], function(module) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/ccc/visual/pie",
+    "pentaho/visual/models/donut",
+    function(BaseView, Model) {
 
-    var BaseView = context.get(baseViewFactory);
-
-    return BaseView.extend({
-      $type: {
-        id: module.id,
-        props: {
-          model: {valueType: modelFactory}
+      return BaseView.extend({
+        $type: {
+          id: module.id,
+          props: {
+            model: {valueType: Model}
+          }
         }
-      }
-    });
-  };
+      });
+    }
+  ];
 });

@@ -64,7 +64,7 @@ relative to the _previous_ stock visualizations.
 
 1. Visualizations scroll horizontally and vertically when too many axis categories exist, 
    instead of shrinking to available space.
-2. Selection is either enabled or not, depending on whether there are no gems in the 
+2. Selection is either enabled or not, depending on whether there are no _gems_ in the 
    Pivot "Column" gem bar, while there used to be an intermediate selection state where some 
    partial selections were possible if only one gem was in the Pivot "Column" gem bar.
 3. General styling of visualizations changed to be aligned platform-wide (e.g. PDI, CDF).
@@ -79,12 +79,9 @@ relative to the _previous_ stock visualizations.
 
 ### Work In Progress
 
-1. Printing of scrolled charts shrinks them to fit, breaking their aspect-ratio.
-2. Printing does not reflect custom configurations.
-3. The Analyzer property used to configure a custom color palette, 
-   `chart.series.colors`, is not supported for new visualizations and, 
-   currently, there is no direct counterpart.
-
+1. Printing of scrolled charts shrinks them to fit (while preserving their aspect-ratio).
+2. Printing only reflects custom configurations that are located in
+   the [Global Configuration File](../configuration#global-configuration-file).
 
 ## Changing the visualization format of stock visualizations.
 
@@ -175,6 +172,35 @@ the possible _maximum number of results_ for "Bar chart" visualizations.
             application: {
               maxValues: [250, 500, 1000, 5000]
             }
+          }
+        }
+      ];
+    });
+    ```
+
+### The `chart.series.colors` property
+
+This property allows changing the default discrete color palette.
+
+1. Previous format, in `analyzer.properties`:
+
+    ```properties
+    chart.series.colors=#0045a1,#5f9e00,#ffc20f,#ff6600,#3c008f
+    ```
+    
+2. New format, in a platform configuration file:
+    ```js
+    define(function() {
+      return [
+        {
+          select: {
+            application: "pentaho-analyzer",
+            instance: "pentaho/visual/color/palettes/nominalPrimary"
+          },
+          apply: {
+            colors: [
+              "#0045a1","#5f9e00","#ffc20f","#ff6600","#3c008f"
+            ]
           }
         }
       ];

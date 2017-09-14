@@ -15,85 +15,85 @@
  */
 define([
   "module",
-  "pentaho/visual/models/metricPointAbstract",
-  "./cartesianAbstract",
   "./_trends"
-], function(module, modelFactory, baseViewFactory) {
+], function(module) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/ccc/visual/cartesianAbstract",
+    "pentaho/visual/models/metricPointAbstract",
+    function(BaseView, Model) {
 
-    var BaseView = context.get(baseViewFactory);
+      return BaseView.extend({
+        $type: {
+          id: module.id,
+          props: {
+            model: {valueType: Model}
+          }
+        },
 
-    return BaseView.extend({
-      $type: {
-        id: module.id,
-        props: {
-          model: {valueType: modelFactory}
+        _cccClass: "MetricDotChart",
+
+        _supportsTrends: true,
+
+        /* Override Default map */
+        _roleToCccRole: {
+          "multi": "multiChart",
+          "rows": "category",
+          "x": "x",
+          "y": "y",
+          "color": "color"
+        },
+
+        _discreteColorRole: "color",
+
+        // Roles already in the axis' titles
+        _noRoleInTooltipMeasureRoles: {
+          "x": true,
+          "y": true,
+          "measures": false
+        },
+
+        _getColorScaleKind: function() {
+          var isDiscrete = this._isColorDiscrete();
+          return isDiscrete == null ? undefined  :
+                 isDiscrete         ? "discrete" : "continuous";
+        },
+
+        _configureOptions: function() {
+
+          this.base();
+
+          this._configureAxisRange(/* isPrimary: */true, "base");
+          this._configureAxisRange(/* isPrimary: */false, "ortho");
+        },
+
+        _isLegendVisible: function() {
+          // Add to default behavior, that hides the legend when there are no series.
+          // Hide the legend even if there is only one "series".
+          var isLegendVisible = this.base();
+
+          // TODO: this is not the proper way to do this cause it's tied to Analyzer's data format...
+          return isLegendVisible && (!this._dataTable.isCrossTable || this._dataTable.implem.cols.length > 1);
+        },
+
+        _getOrthoAxisTitle: function() {
+          return this._getMeasureRoleTitle("y");
+        },
+
+        _getBaseAxisTitle: function() {
+          return this._getMeasureRoleTitle("x");
+        },
+
+        _configureDisplayUnits: function() {
+
+          this.base();
+
+          this._configureAxisDisplayUnits(/* isPrimary: */true, "base",  /* allowFractional: */true);
+          this._configureAxisDisplayUnits(/* isPrimary: */false, "ortho", /* allowFractional: */true);
         }
-      },
-
-      _cccClass: "MetricDotChart",
-
-      _supportsTrends: true,
-
-      /* Override Default map */
-      _roleToCccRole: {
-        "multi": "multiChart",
-        "rows": "category",
-        "x": "x",
-        "y": "y",
-        "color": "color"
-      },
-
-      _discreteColorRole: "color",
-
-      // Roles already in the axis' titles
-      _noRoleInTooltipMeasureRoles: {
-        "x": true,
-        "y": true,
-        "measures": false
-      },
-
-      _getColorScaleKind: function() {
-        var isDiscrete = this._isColorDiscrete();
-        return isDiscrete == null ? undefined  :
-               isDiscrete         ? "discrete" : "continuous";
-      },
-
-      _configureOptions: function() {
-
-        this.base();
-
-        this._configureAxisRange(/* isPrimary: */true, "base");
-        this._configureAxisRange(/* isPrimary: */false, "ortho");
-      },
-
-      _isLegendVisible: function() {
-        // Add to default behavior, that hides the legend when there are no series.
-        // Hide the legend even if there is only one "series".
-        var isLegendVisible = this.base();
-
-        // TODO: this is not the proper way to do this cause it's tied to Analyzer's data format...
-        return isLegendVisible && (!this._dataTable.isCrossTable || this._dataTable.implem.cols.length > 1);
-      },
-
-      _getOrthoAxisTitle: function() {
-        return this._getMeasureRoleTitle("y");
-      },
-
-      _getBaseAxisTitle: function() {
-        return this._getMeasureRoleTitle("x");
-      },
-
-      _configureDisplayUnits: function() {
-
-        this.base();
-
-        this._configureAxisDisplayUnits(/* isPrimary: */true, "base",  /* allowFractional: */true);
-        this._configureAxisDisplayUnits(/* isPrimary: */false, "ortho", /* allowFractional: */true);
-      }
-    });
-  };
+      });
+    }
+  ];
 });

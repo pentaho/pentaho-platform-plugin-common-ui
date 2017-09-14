@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 define([
-  "./paletteRegistry"
-], function(paletteRegistry) {
+  "pentaho/util/error"
+], function(error) {
 
   var reRgbColor = /^rgb\((\d+),(\d+),(\d+)\)$/i;
 
@@ -306,29 +306,47 @@ define([
   //  =>
   //   scalingType:  "linear" | <--   "discrete"  -->
   //  =>
-  //   suffix:       "-5"     | "-3"      | "-5"
+  //   suffix:        "5"     | "3"       | "5"
   //
-  // paletteName:  "ryg-3", "ryg-5", "ryb-3", "ryb-5", "blue-3", "blue-5", "gray-3", "gray-5"
+  // pentaho/visual/color/palettes/ +
+  // paletteId:  "divergentRyg3", "divergentRyg5", "divergentRyb3", "divergentRyb5",
+  //             "quantitativeBlue3", "quantitativeBlue5", "quantitativeGray3", "quantitativeGray5"
 
-  function buildPalette(colorSet, pattern, reversed) {
+  function buildPalette(context, colorSet, pattern, reversed) {
+
     var colors = null;
 
     if(colorSet) {
       var suffix;
-      pattern = pattern.toLowerCase();
 
+      // ----
+
+      switch(colorSet.toLowerCase()) {
+        case "ryg": suffix = "divergentRyg"; break;
+        case "ryb": suffix = "divergentRyb"; break;
+        case "blue": suffix = "quantitativeBlue"; break;
+        case "gray": suffix = "quantitativeGray"; break;
+        default: throw error.argInvalid("colorSet");
+      }
+
+      // ----
+
+      pattern = pattern.toLowerCase();
       if(pattern === "gradient") {
-        suffix = "-5";
+        suffix += "5";
       } else {
         var m = reNumColorPattern.exec(pattern);
-        suffix = m ? ("-" + m[1]) : pattern;
+        suffix += m ? m[1] : ""; // "3", "5", ""
       }
 
-      var palette = paletteRegistry.get(colorSet + suffix);
-      if(palette) {
-        colors = palette.colors.slice();
-        if(reversed) colors = colors.reverse();
-      }
+      // ----
+      var paletteId = "pentaho/visual/color/palettes/" + suffix;
+
+      var palette = context.instances.getById(paletteId);
+
+      colors = palette.colors.toArray(function(color) { return color.value; });
+
+      if(reversed) colors = colors.reverse();
     }
 
     return colors;

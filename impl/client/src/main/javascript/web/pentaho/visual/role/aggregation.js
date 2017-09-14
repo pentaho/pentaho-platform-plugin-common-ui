@@ -20,9 +20,7 @@ define([
 
   "use strict";
 
-  return function(context) {
-
-    var PentahoString = context.get("string");
+  return ["string", "enum", function(PentahoString, Enum) {
 
     /**
      * @name pentaho.visual.role.Aggregation
@@ -30,7 +28,7 @@ define([
      * @extends pentaho.type.String
      * @extends pentaho.type.mixins.DiscreteDomain
      *
-     * @amd {pentaho.type.Factory<pentaho.visual.role.Aggregation>} pentaho/visual/role/aggregation
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.Aggregation>} pentaho/visual/role/aggregation
      *
      * @classDesc The `Aggregation` class is [String]{@link pentaho.type.String} based enumeration
      * that represents an **aggregation** operation.
@@ -46,10 +44,10 @@ define([
     return PentahoString.extend({
       $type: {
         id: module.id,
-        mixins: ["enum"],
+        mixins: [Enum],
         domain: ["sum", "avg", "min", "max", "first", "last"]
       }
     })
     .implement({$type: bundle.structured.aggregation});
-  };
+  }];
 });

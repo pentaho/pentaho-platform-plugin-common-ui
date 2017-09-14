@@ -100,10 +100,10 @@ define(function() {
         // Reset current service configuration
         localRequire.config({
           config: {
-            "pentaho/service": {
-              "test/config/3": "pentaho.config.spec.IRuleSet",
-              "test/config/2": "pentaho.config.spec.IRuleSet",
-              "test/config/1": "pentaho.config.spec.IRuleSet"
+            "pentaho/instanceInfo": {
+              "test/config/3": {type: "pentaho.config.spec.IRuleSet"},
+              "test/config/2": {type: "pentaho.config.spec.IRuleSet"},
+              "test/config/1": {type: "pentaho.config.spec.IRuleSet"}
             }
           }
         });
@@ -116,7 +116,7 @@ define(function() {
       it("should add loaded rules", function(done) {
         localRequire(["pentaho/config/impl/AmdLoadedService"], function(ConfigService) {
           var cf = new ConfigService();
-          expect(cf.__ruleStore["A"].length).toBe(6);
+          expect(cf.__ruleStore["type:A"].length).toBe(6);
           done();
         });
       });
@@ -125,7 +125,7 @@ define(function() {
         localRequire(["pentaho/config/impl/AmdLoadedService"], function(ConfigService) {
           var cf = new ConfigService();
 
-          var Ids = cf.__ruleStore["A"].map(function(rule) {
+          var Ids = cf.__ruleStore["type:A"].map(function(rule) {
             return rule.apply.testId;
           });
 

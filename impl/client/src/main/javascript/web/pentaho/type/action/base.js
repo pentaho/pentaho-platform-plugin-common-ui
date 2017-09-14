@@ -15,7 +15,6 @@
  */
 define([
   "module",
-  "../element",
   "./States",
   "pentaho/lang/ArgumentRequiredError",
   "pentaho/lang/ArgumentInvalidTypeError",
@@ -26,16 +25,16 @@ define([
   "pentaho/debug/Levels",
   "pentaho/util/logger",
   "pentaho/util/object"
-], function(module, elementFactory, States, ArgumentRequiredError, ArgumentInvalidTypeError, OperationInvalidError,
+], function(module, States, ArgumentRequiredError, ArgumentInvalidTypeError, OperationInvalidError,
             UserError, RuntimeError, debugMgr, DebugLevels, logger, O) {
 
   "use strict";
 
   /* eslint dot-notation: 0 */
 
-  var actionType;
+  return ["element", function(Element) {
 
-  var Action = function(context) {
+    var actionType;
 
     /**
      * @name pentaho.type.action.Base.Type
@@ -68,14 +67,12 @@ define([
      * @see pentaho.type.Instance.extend
      */
 
-    var Element = context.get(elementFactory);
-
     var executingStates = States.init | States.will | States["do"];
     var rejectedStates = States.canceled | States.failed;
     var finishedStates = States.did | rejectedStates;
     var cancelableStates = States.init | States.will;
 
-    return Element.extend(/** @lends pentaho.type.action.Base# */{
+    var Action = Element.extend(/** @lends pentaho.type.action.Base# */{
 
       $type: /** @lends pentaho.type.action.Base.Type# */{
         id: module.id,
@@ -127,7 +124,7 @@ define([
        * @extends pentaho.type.Element
        * @abstract
        *
-       * @amd {pentaho.type.Factory<pentaho.type.action.Base>} pentaho/type/action/base
+       * @amd {pentaho.type.spec.UTypeModule<pentaho.type.action.Base>} pentaho/type/action/base
        *
        * @classDesc The `action.Base` class represents a certain model of actions.
        *
@@ -1232,11 +1229,11 @@ define([
       }
       // endregion
     });
-  };
 
-  actionType = Action.type;
+    actionType = Action.type;
 
-  return Action;
+    return Action;
+  }];
 
   function __nonEmptyString(value) {
     return value == null ? null : (String(value) || null);

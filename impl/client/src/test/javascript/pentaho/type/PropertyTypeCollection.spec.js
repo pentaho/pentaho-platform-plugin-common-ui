@@ -23,19 +23,33 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  var context = new Context();
-  var Property = context.get("property");
-  var PentahoBoolean = context.get("boolean");
-  var PentahoString = context.get("string");
-  var Complex = context.get("complex");
-  var PostalCode = PentahoString.extend();
-  var Derived = Complex.extend({
-    $type: {
-      props: ["foo", "guru"]
-    }
-  });
-
   describe("pentaho/type/PropertyTypeCollection -", function() {
+
+    var context;
+    var Property;
+    var PentahoBoolean;
+    var PentahoString;
+    var Complex;
+    var PostalCode;
+    var Derived;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Property = context.get("property");
+            PentahoBoolean = context.get("boolean");
+            PentahoString = context.get("string");
+            Complex = context.get("complex");
+            PostalCode = PentahoString.extend();
+            Derived = Complex.extend({
+              $type: {
+                props: ["foo", "guru"]
+              }
+            });
+          })
+          .then(done, done.fail);
+    });
 
     it("is a function", function() {
       expect(typeof PropertyTypeCollection).toBe("function");
@@ -259,16 +273,18 @@ define([
     });
 
     describe("property inheritance", function() {
-      var MoreDerived = Derived.extend({
-        $type: {
-          label: "MoreDerived",
-          props: ["bar"]
-        }
-      });
+      var MoreDerived;
 
       var props;
 
       beforeEach(function() {
+        MoreDerived = Derived.extend({
+          $type: {
+            label: "MoreDerived",
+            props: ["bar"]
+          }
+        });
+
         props = PropertyTypeCollection.to([], MoreDerived.type);
       });
 

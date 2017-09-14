@@ -42,12 +42,13 @@ define([
       /**
        * A map of type declarations by type id and alias.
        *
-       * @type {Object.<string, pentaho.typeInfo.IDeclaration>}
+       * @type {Object.<string, pentaho.typeInfo.spec.IDeclaration>}
        * @private
        */
       this.__declById = {};
     },
 
+    /** @inheritDoc */
     configure: function(spec) {
       var declsNew = [];
       var declsNewById = {};
@@ -79,7 +80,8 @@ define([
         var declNew = {
           id: id,
           alias: alias,
-          base: base
+          base: base,
+          subs: []
         };
 
         declsNew.push(declNew);
@@ -97,8 +99,11 @@ define([
         var base = declNew.base;
         if(base) {
           var baseDecl = declNew.base = declById[base] || declsNewById[base];
+
           // assert baseDecl
           declNew = O.setPrototypeOf(declNew, baseDecl);
+
+          baseDecl.subs.push(declNew);
         }
 
         declById[declNew.id] = declNew;
@@ -106,6 +111,7 @@ define([
       }
     },
 
+    /** @inheritDoc */
     declare: function(id, decl) {
       if(!id)
         throw new ArgumentRequiredError("id");
@@ -120,27 +126,61 @@ define([
       return O.getOwn(this.__declById, idOrAlias);
     },
 
+    /** @inheritDoc */
     getAliasOf: function(idOrAlias) {
       var decl = this.__get(idOrAlias);
       if(decl) return decl.alias;
     },
 
+    /** @inheritDoc */
     getIdOf: function(aliasOrId) {
       var decl = this.__get(aliasOrId);
       if(decl) return decl.id;
     },
 
+    /** @inheritDoc */
     getBaseOf: function(idOrAlias) {
       var base;
       var decl = this.__get(idOrAlias);
       if(decl) return (base = decl.base) ? base.id : null;
     },
 
+    /** @inheritDoc */
     isSubtypeOf: function(idOrAliasSub, idOrAliasBase) {
       var declSub = this.__get(idOrAliasSub);
       var declBase = this.__get(idOrAliasBase);
 
       if(declSub && declBase) return declSub === declBase || O_isProtoOf.call(declBase, declSub);
+    },
+
+    /** @inheritDoc */
+    getSubtypesOf: function(idOrAliasBase, keyArgs) {
+      var declBase = this.__get(idOrAliasBase);
+      if(!declBase) return;
+
+      var results = [];
+
+      if(O.getOwn(keyArgs, "includeSelf")) {
+        results.push(declBase.id);
+      }
+
+      var isRecursive = O.getOwn(keyArgs, "includeDescendants", false);
+
+      collectSubtypesOfRecursive(declBase);
+
+      return results;
+
+      function collectSubtypesOfRecursive(declParent) {
+        var subs = declParent.subs;
+        if(subs.length) {
+          subs.forEach(function(declChild) {
+            results.push(declChild.id);
+            if(isRecursive) {
+              collectSubtypesOfRecursive(declChild);
+            }
+          });
+        }
+      }
     }
   });
 });

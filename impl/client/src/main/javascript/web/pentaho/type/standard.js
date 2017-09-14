@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+// This exists only so that r.js sees otherwise invisible dependencies.
 define([
   "./instance",
   "./value",
@@ -29,31 +31,7 @@ define([
   "./property",
   "./model",
   "./application",
-  "./mixins/standard"
-], function(instanceFactory, valueFactory, elementFactory, listFactory,
-    simpleFactory, complexFactory, stringFactory, numberFactory, booleanFactory,
-    dateFactory, objectFactory, functionFactory, propertyFactory,
-    modelFactory, applicationFactory, standardMixins) {
-
+  "./mixins/enum"
+], function() {
   "use strict";
-
-  return {
-    // types
-    "instance": instanceFactory,
-    "value":    valueFactory,
-    "element":  elementFactory,
-    "list":     listFactory,
-    "simple":   simpleFactory,
-    "string":   stringFactory,
-    "number":   numberFactory,
-    "boolean":  booleanFactory,
-    "date":     dateFactory,
-    "complex":  complexFactory,
-    "object":   objectFactory,
-    "function": functionFactory,
-    "property": propertyFactory,
-    "model":    modelFactory,
-    "application": applicationFactory,
-    "mixins":   standardMixins
-  };
 });

@@ -17,14 +17,12 @@ define(["module"], function(module) {
 
   "use strict";
 
-  return function(context) {
-
-    var PentahoString = context.get("string");
+  return ["string", function(PentahoString) {
 
     return PentahoString.extend({
       $type: {
         id: module.id
       }
     });
-  };
+  }];
 });

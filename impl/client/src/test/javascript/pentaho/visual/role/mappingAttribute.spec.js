@@ -1,11 +1,8 @@
 define([
   "pentaho/type/Context",
-  "pentaho/visual/base/model",
-  "pentaho/visual/role/mapping",
-  "pentaho/visual/role/mappingAttribute",
   "pentaho/type/SpecificationScope",
   "pentaho/data/Table"
-], function(Context, visualModelFactory, mappingFactory, mappingAttributeFactory, SpecificationScope, Table) {
+], function(Context, SpecificationScope, Table) {
 
   "use strict";
 
@@ -32,12 +29,23 @@ define([
     var Mapping;
     var MappingAttribute;
 
-    beforeEach(function() {
+    beforeEach(function(done) {
 
-      var context = new Context();
-      VisualModel = context.get(visualModelFactory);
-      Mapping = context.get(mappingFactory);
-      MappingAttribute = context.get(mappingAttributeFactory);
+      Context.createAsync()
+          .then(function(context) {
+
+            return context.getDependencyApplyAsync([
+              "pentaho/visual/base/model",
+              "pentaho/visual/role/mapping",
+              "pentaho/visual/role/mappingAttribute"
+            ], function(_Model, _Mapping, _MappingAttribute) {
+              VisualModel = _Model;
+              Mapping = _Mapping;
+              MappingAttribute = _MappingAttribute;
+            });
+          })
+          .then(done, done.fail);
+
     });
 
     describe("constructor(name|spec)", function() {

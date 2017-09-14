@@ -23,13 +23,25 @@ define([
 
   /* global describe:true, it:true, expect:true, beforeEach:true*/
 
-  var context = new Context();
-  var List = context.get("pentaho/type/list");
-  var PentahoNumber = context.get("pentaho/type/number");
-  var PentahoString = context.get("pentaho/type/string");
-  var Enum = context.get("pentaho/type/mixins/enum");
-
   describe("pentaho.type.mixins.Enum", function() {
+
+    var context;
+    var List;
+    var PentahoNumber;
+    var PentahoString;
+    var Enum;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            List = context.get("pentaho/type/list");
+            PentahoNumber = context.get("pentaho/type/number");
+            PentahoString = context.get("pentaho/type/string");
+            Enum = context.get("pentaho/type/mixins/enum");
+          })
+          .then(done, done.fail);
+    });
 
     it("should be a function", function() {
       expect(typeof Enum).toBe("function");

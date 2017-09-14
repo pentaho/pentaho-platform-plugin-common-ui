@@ -14,27 +14,43 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/filter/isEqual",
-  "pentaho/type/Context",
-  "pentaho/type/complex"
-], function(isEqualFactory, Context, complexFactory) {
+  "pentaho/type/Context"
+], function(Context) {
 
   "use strict";
 
   describe("pentaho.data.filter.IsEqual", function() {
 
-    var context = new Context();
-    var IsEqualFilter = context.get(isEqualFactory);
-    var Complex = context.get(complexFactory);
+    var context;
+    var Complex;
+    var IsEqualFilter;
+    var ProductSummary;
 
-    var ProductSummary = Complex.extend({
-      $type: {
-        props: [
-          {name: "name", valueType: "string", label: "Name"},
-          {name: "sales", valueType: "number", label: "Sales"},
-          {name: "inStock", valueType: "boolean", label: "In Stock"}
-        ]
-      }
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+
+            context = _context;
+            Complex = context.get("complex");
+
+            ProductSummary = Complex.extend({
+              $type: {
+                props: [
+                  {name: "name", valueType: "string", label: "Name"},
+                  {name: "sales", valueType: "number", label: "Sales"},
+                  {name: "inStock", valueType: "boolean", label: "In Stock"}
+                ]
+              }
+            });
+
+            return context.getDependencyApplyAsync([
+              "pentaho/data/filter/isEqual"
+            ], function(IsEqual) {
+              IsEqualFilter = IsEqual;
+            });
+          })
+          .then(done, done.fail);
+
     });
 
     describe("new ({property, value})", function() {
@@ -184,8 +200,12 @@ define([
     }); // #value
 
     describe("#contains(elem)", function() {
+      var elem;
 
-      var elem = new ProductSummary({name: "A", sales: 12000, inStock: true});
+      beforeEach(function() {
+        elem = new ProductSummary({name: "A", sales: 12000, inStock: true});
+      });
+
 
       it("should return `true` if `elem` has property `property` with a value = `value`", function() {
 

@@ -14,31 +14,47 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/filter/isGreaterOrEqual",
   "pentaho/type/Context",
-  "pentaho/type/complex",
   "./propertyUtils"
-], function(isGreaterOrEqualFactory, Context, complexFactory, propertyUtils) {
+], function(Context, propertyUtils) {
 
   "use strict";
 
   describe("pentaho.data.filter.IsGreaterOrEqual", function() {
 
-    var context = new Context();
-    var IsGreaterOrEqualFilter = context.get(isGreaterOrEqualFactory);
-    var Complex = context.get(complexFactory);
+    var context;
+    var Complex;
+    var IsGreaterOrEqualFilter;
+    var ProductSummary;
 
-    var ProductSummary = Complex.extend({
-      $type: {
-        props: [
-          {name: "name", valueType: "string", label: "Name"},
-          {name: "sales", valueType: "number", label: "Sales"},
-          {name: "inStock", valueType: "boolean", label: "In Stock"}
-        ]
-      }
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+
+            context = _context;
+            Complex = context.get("complex");
+
+            ProductSummary = Complex.extend({
+              $type: {
+                props: [
+                  {name: "name", valueType: "string", label: "Name"},
+                  {name: "sales", valueType: "number", label: "Sales"},
+                  {name: "inStock", valueType: "boolean", label: "In Stock"}
+                ]
+              }
+            });
+
+            return context.getDependencyApplyAsync([
+              "pentaho/data/filter/isGreaterOrEqual"
+            ], function(IsGreaterOrEqual) {
+              IsGreaterOrEqualFilter = IsGreaterOrEqual;
+            });
+          })
+          .then(done, done.fail);
+
     });
 
-    propertyUtils.behavesLikeProperty(IsGreaterOrEqualFilter, {
+    propertyUtils.behavesLikeProperty(function() { return IsGreaterOrEqualFilter; }, {
       valueType: "number",
       rawValue: 42,
       kind: "isGreaterOrEqual",
@@ -47,7 +63,11 @@ define([
 
     describe("#contains(elem)", function() {
 
-      var elem = new ProductSummary({name: "A", sales: 12000, inStock: true});
+      var elem;
+
+      beforeEach(function() {
+        elem = new ProductSummary({name: "A", sales: 12000, inStock: true});
+      });
 
       it("should return `true` if `elem` has property `property` with a value > `value`", function() {
 

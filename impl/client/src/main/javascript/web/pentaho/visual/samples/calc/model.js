@@ -15,16 +15,13 @@
  */
 define([
   "module",
-  "pentaho/visual/base/model",
   "pentaho/i18n!model",
   "./theme/model"
-], function(module, baseModelFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
-
-    var BaseModel = context.get(baseModelFactory);
+  return ["pentaho/visual/base/model", function(BaseModel) {
 
     var operDomain = bundle.structured.operation.domain;
 
@@ -32,12 +29,11 @@ define([
      * @name pentaho.visual.samples.calc.Model
      * @class
      * @extends pentaho.visual.base.Model
-     * @amd {pentaho.type.Factory<pentaho.visual.samples.calc.Model>} pentaho/visual/samples/calc
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.samples.calc.Model>} pentaho/visual/samples/calc
      */
     return BaseModel.extend({
       $type: {
-        sourceId: module.id,
-        id: module.id.replace(/.\w+$/, ""),
+        id: module.id,
         v2Id: "sample_calc",
         defaultView: "./view",
 
@@ -69,5 +65,5 @@ define([
       }
     })
     .implement({$type: bundle.structured.type});
-  };
+  }];
 });

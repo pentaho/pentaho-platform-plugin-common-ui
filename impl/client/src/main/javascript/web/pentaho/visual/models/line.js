@@ -15,43 +15,43 @@
  */
 define([
   "module",
-  "./pointAbstract",
-  "pentaho/i18n!./i18n/model",
-  "./types/shape",
-  "./types/lineWidth",
-  "./mixins/trended"
-], function(module, baseModelFactory, bundle, shapeFactory, lineWidthFactory, trendedFactory) {
+  "pentaho/i18n!./i18n/model"
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "./pointAbstract",
+    "./types/shape",
+    "./types/lineWidth",
+    "./mixins/trended",
+    function(BaseModel, Shape, LineWidth, TrendedModel) {
 
-    var BaseModel = context.get(baseModelFactory);
+      return BaseModel.extend({
+        $type: {
+          id: module.id,
+          mixins: [TrendedModel],
 
-    return BaseModel.extend({
-      $type: {
-        id: module.id,
-        mixins: [trendedFactory],
-
-        v2Id: "ccc_line",
-        category: "linechart",
-        defaultView: "pentaho/ccc/visual/line",
-        props: [
-          {
-            name: "lineWidth",
-            valueType: lineWidthFactory,
-            isRequired: true,
-            defaultValue: 1
-          },
-          {
-            name: "shape",
-            valueType: shapeFactory,
-            isRequired: true,
-            defaultValue: "circle"
-          }
-        ]
-      }
-    })
-    .implement({$type: bundle.structured.line});
-  };
+          v2Id: "ccc_line",
+          category: "linechart",
+          defaultView: "pentaho/ccc/visual/line",
+          props: [
+            {
+              name: "lineWidth",
+              valueType: LineWidth,
+              isRequired: true,
+              defaultValue: 1
+            },
+            {
+              name: "shape",
+              valueType: Shape,
+              isRequired: true,
+              defaultValue: "circle"
+            }
+          ]
+        }
+      })
+      .implement({$type: bundle.structured.line});
+    }
+  ];
 });

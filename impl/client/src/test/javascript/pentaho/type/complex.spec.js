@@ -25,14 +25,25 @@ define([
 
   /* eslint max-nested-callbacks: 0 */
 
-  var context = new Context();
-  var Value = context.get("value");
-  var Complex = context.get("complex");
-  var Property = context.get("property");
-  var PentahoString = context.get("string");
-  var List = context.get("list");
-
   describe("pentaho.type.Complex", function() {
+
+    var context;
+    var Value;
+    var Complex;
+    var Property;
+    var List;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Value = context.get("value");
+            Complex = context.get("complex");
+            Property = context.get("property");
+            List = context.get("list");
+          })
+          .then(done, done.fail);
+    });
 
     describe("anatomy", function() {
       it("is a function", function() {
@@ -101,7 +112,9 @@ define([
             props: [
               "x",
               "y",
-              {name: "z", valueType: ["string"]}
+              {name: "z", valueType: ["string"]},
+              {name: "w", valueType: "string", defaultValue: "foo"},
+              {name: "q", valueType: "string", defaultValue: function() { return "bar"; }}
             ]
           }
         });
@@ -118,6 +131,8 @@ define([
           expect(derived.get("x")).toBe(null);
           expect(derived.get("y")).toBe(null);
           expect(derived.get("z").toArray()).toEqual([]);
+          expect(derived.get("w").value).toBe("foo");
+          expect(derived.get("q").value).toBe("bar");
         });
       });
 
@@ -166,6 +181,34 @@ define([
           expect(derived.get("z").at(0).formatted).toBe("0.0 POUNDS");
         });
       });
+
+      describe("when setting a property to null", function() {
+
+        it("should call the defaultValue factory function each time and use its result", function() {
+
+          var f = jasmine.createSpy().and.returnValue("bar");
+          Derived.type.add({
+            name: "t",
+            valueType: "string",
+            defaultValue: f
+          });
+
+          var derived = new Derived();
+
+          expect(f).toHaveBeenCalledTimes(1);
+          expect(derived.t).toBe("bar");
+
+          derived.t = null;
+
+          expect(f).toHaveBeenCalledTimes(2);
+          expect(derived.t).toBe("bar");
+
+          derived.t = null;
+
+          expect(f).toHaveBeenCalledTimes(3);
+          expect(derived.t).toBe("bar");
+        });
+      });
     });
 
     describe("#$uid", function() {
@@ -185,15 +228,25 @@ define([
     });
 
     describe("#$key", function() {
-      it("should return the value of #uid", function() {
+
+      it("should return the value of #$uid", function() {
+
         var value = new Complex();
-        expect(value.$uid).toBe(value.$key);
+
+        expect(value.$key).toBe(value.$uid);
       });
     });
 
     describe("Property As Raw", function() {
 
       describe("#get(name[, sloppy])", function() {
+
+        var derived2;
+
+        function getter(args) {
+          return derived2.get.apply(derived2, args);
+        }
+
         it("should return the `Value` of an existing singular property", function() {
           var Derived = Complex.extend({
             $type: {props: [{name: "x", valueType: "string"}]}
@@ -247,12 +300,11 @@ define([
         });
 
         describe("when name is not specified", function() {
-          var Derived = Complex.extend();
-          var derived = new Derived();
 
-          var getter = function(args) {
-            return derived.get.apply(derived, args);
-          };
+          beforeEach(function() {
+            var Derived = Complex.extend();
+            derived2 = new Derived();
+          });
 
           var strictError = errorMatch.argRequired("name");
 
@@ -261,15 +313,13 @@ define([
         });
 
         describe("when given the name of an undefined property", function() {
-          var Derived = Complex.extend({
-            $type: {props: [{name: "x"}]}
+
+          beforeEach(function() {
+            var Derived = Complex.extend({
+              $type: {props: [{name: "x"}]}
+            });
+            derived2 = new Derived();
           });
-
-          var derived = new Derived();
-
-          var getter = function(args) {
-            return derived.get.apply(derived, args);
-          };
 
           var sloppyResult;// = undefined;
           var strictError  = errorMatch.argInvalid("name");
@@ -280,11 +330,15 @@ define([
 
       describe("#getv(name[, sloppy])", function() {
 
-        var Derived = Complex.extend({
-          $type: {props: [
-            {name: "x", valueType: "string"},
-            {name: "z", valueType: "object"}
-          ]}
+        var Derived;
+
+        beforeEach(function() {
+          Derived = Complex.extend({
+            $type: {props: [
+              {name: "x", valueType: "string"},
+              {name: "z", valueType: "object"}
+            ]}
+          });
         });
 
         it("should call `get` with the given arguments", function() {
@@ -325,12 +379,16 @@ define([
 
       describe("#getf(name[, sloppy])", function() {
 
-        var Derived = Complex.extend({$type: {
-          props: [
-            {name: "x", valueType: "string"},
-            {name: "z", valueType: "object"}
-          ]
-        }});
+        var Derived;
+
+        beforeEach(function() {
+          Derived = Complex.extend({$type: {
+            props: [
+              {name: "x", valueType: "string"},
+              {name: "z", valueType: "object"}
+            ]
+          }});
+        });
 
         it("should call `get` with the given arguments", function() {
 
@@ -381,6 +439,112 @@ define([
 
           var value = derived.get("x");
           expect(value.value).toBe("1");
+        });
+
+        it("should set the state of a defaulted element property to 'specified', " +
+            "when set to the same value", function() {
+          var Derived = Complex.extend({
+            $type: {props: [{name: "x", valueType: "number", defaultValue: 1}]}
+          });
+
+          var derived = new Derived();
+
+          expect(derived.isDefaultedOf("x")).toBe(true);
+
+          derived.set("x", 1);
+
+          expect(derived.isDefaultedOf("x")).toBe(false);
+        });
+
+        it("should set the state of a defaulted element property to 'specified', " +
+            "when set to a different value", function() {
+          var Derived = Complex.extend({
+            $type: {props: [{name: "x", valueType: "number", defaultValue: 1}]}
+          });
+
+          var derived = new Derived();
+
+          expect(derived.isDefaultedOf("x")).toBe(true);
+
+          derived.set("x", 2);
+
+          expect(derived.isDefaultedOf("x")).toBe(false);
+        });
+
+        it("should set the state of a specified element property to 'defaulted', when set to null", function() {
+          var Derived = Complex.extend({
+            $type: {props: [{name: "x", valueType: "number", defaultValue: 1}]}
+          });
+
+          var derived = new Derived({x: 1});
+
+          expect(derived.isDefaultedOf("x")).toBe(false);
+
+          derived.set("x", null);
+
+          expect(derived.isDefaultedOf("x")).toBe(true);
+        });
+
+        it("should set the state of a defaulted complex property to 'specified', " +
+            "when a nested change occurs", function() {
+
+          var MyValue = Complex.extend({
+            $type: {props: [{name: "y", valueType: "number", defaultValue: 1}]}
+          });
+
+          var Derived = Complex.extend({
+            $type: {props: [{name: "x", valueType: MyValue, defaultValue: function() { return {}; }}]}
+          });
+
+          var derived = new Derived();
+
+          expect(derived.isDefaultedOf("x")).toBe(true);
+
+          derived.x.set("y", 2);
+
+          expect(derived.isDefaultedOf("x")).toBe(false);
+        });
+
+        it("should set the state of a defaulted list property to 'specified', " +
+            "when a nested change occurs", function() {
+
+          var MyValue = Complex.extend({
+            $type: {props: [{name: "y", valueType: "number", defaultValue: 1}]}
+          });
+
+          var Derived = Complex.extend({
+            $type: {props: [{name: "x", valueType: [MyValue], defaultValue: function() {
+              return [new MyValue()];
+            }}]}
+          });
+
+          var derived = new Derived();
+
+          expect(derived.isDefaultedOf("x")).toBe(true);
+
+          derived.x.at(0).set("y", 2);
+
+          expect(derived.isDefaultedOf("x")).toBe(false);
+        });
+
+        it("should set the state of a defaulted list property to 'specified', " +
+            "when a new element is added", function() {
+
+          var MyValue = Complex.extend({
+            $type: {props: [{name: "y", valueType: "number", defaultValue: 1}]}
+          });
+
+          var Derived = Complex.extend({
+            $type: {props: [{name: "x", valueType: [MyValue]}]}
+          });
+
+          var derived = new Derived();
+
+          expect(derived.isDefaultedOf("x")).toBe(true);
+
+          derived.x.add(new MyValue());
+
+          expect(derived.isDefaultedOf("x")).toBe(false);
         });
 
         it("should throw a TypeError if the property is read-only", function() {
@@ -460,14 +624,17 @@ define([
           var listeners;
           var complex;
           var THREE = 3;
-          var Derived = Complex.extend({
-            $type: {props: [
-              {name: "x", valueType: "number"},
-              {name: "y", valueType: ["number"]}
-            ]}
-          });
+          var Derived;
 
           beforeEach(function() {
+
+            Derived = Complex.extend({
+              $type: {props: [
+                {name: "x", valueType: "number"},
+                {name: "y", valueType: ["number"]}
+              ]}
+            });
+
             listeners = jasmine.createSpyObj("listeners", [
               "will", "did", "rejected"
             ]);
@@ -620,66 +787,85 @@ define([
 
       describe("#countOf(name[, sloppy])", function() {
 
-        function buildGetter(derived) {
-          return function(args) {
-            return derived.countOf.apply(derived, args);
-          };
+        var derived;
+
+        function getter(args) {
+          return derived.countOf.apply(derived, args);
         }
 
         describe("when `name` is not that of a defined property", function() {
-          var Derived = Complex.extend();
-          var derived = new Derived();
-          var getter = buildGetter(derived);
 
           var sloppyResult = 0;
           var strictError  = errorMatch.argInvalid("name");
+
+          beforeEach(function() {
+            var Derived = Complex.extend();
+            derived = new Derived();
+          });
+
           sloppyModeUtil.itShouldBehaveStrictlyUnlessSloppyIsTrue(getter, ["y"], sloppyResult, strictError);
         });
 
         describe("when `name` is that of an element property", function() {
-          var Derived = Complex.extend({
-            $type: {props: [{name: "x"}]}
+          var Derived;
+
+          beforeEach(function() {
+            Derived = Complex.extend({
+              $type: {props: [{name: "x"}]}
+            });
           });
 
+
           describe("when the property value is null", function() {
-            var derived = new Derived();
-            var getter = buildGetter(derived);
 
             var result = 0;
+
+            beforeEach(function() {
+              derived = new Derived();
+            });
+
             sloppyModeUtil.itShouldReturnValueWhateverTheSloppyValue(getter, ["x"], result);
           });
 
           describe("when the property value is not null", function() {
-            var derived = new Derived([1]);
-            var getter = buildGetter(derived);
 
             var result = 1;
+
+            beforeEach(function() {
+              derived = new Derived([1]);
+            });
+
             sloppyModeUtil.itShouldReturnValueWhateverTheSloppyValue(getter, ["x"], result);
           });
         });
 
         describe("when `name` is that of a list property", function() {
-          var Derived = Complex.extend({
-            $type: {props: [{name: "x", valueType: ["string"]}]}
+
+          var Derived;
+
+          beforeEach(function() {
+            Derived = Complex.extend({
+              $type: {props: [{name: "x", valueType: ["string"]}]}
+            });
           });
 
-          var result;
-          var derived;
-          var getter;
+          describe("test 1", function() {
+            beforeEach(function() {
+              derived = new Derived([[1]]);
+            });
 
-          // ---
-          derived = new Derived([[1]]);
-          getter = buildGetter(derived);
+            var result = 1;
+            sloppyModeUtil.itShouldReturnValueWhateverTheSloppyValue(getter, ["x"], result);
+          });
 
-          result = 1;
-          sloppyModeUtil.itShouldReturnValueWhateverTheSloppyValue(getter, ["x"], result);
+          describe("test 2", function() {
+            beforeEach(function() {
+              derived = new Derived([[1, 2]]);
+            });
 
-          // ---
-          derived = new Derived([[1, 2]]);
-          getter = buildGetter(derived);
-
-          result = 2;
-          sloppyModeUtil.itShouldReturnValueWhateverTheSloppyValue(getter, ["x"], result);
+            var result = 2;
+            sloppyModeUtil.itShouldReturnValueWhateverTheSloppyValue(getter, ["x"], result);
+          });
         });
       }); // end countOf
     });
@@ -1074,7 +1260,6 @@ define([
         expect(aList.at(1)).toBe(bList.at(1));
         expect(aList.at(2)).toBe(bList.at(2));
       });
-
     });
 
     describe("#_configure(config)", function() {

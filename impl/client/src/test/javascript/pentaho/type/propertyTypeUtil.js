@@ -63,9 +63,16 @@ define([
 
     var Complex;
 
-    beforeEach(function() {
-      var context = new Context();
-      Complex = context.get("pentaho/type/complex");
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(context) {
+            Complex = context.get("pentaho/type/complex");
+
+            if(base) {
+              return context.getAsync(base);
+            }
+          })
+          .then(done, done.fail);
     });
 
     it("should not serialize when not specified", function() {

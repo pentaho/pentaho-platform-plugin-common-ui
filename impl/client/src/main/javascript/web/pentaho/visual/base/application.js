@@ -15,15 +15,12 @@
  */
 define([
   "module",
-  "pentaho/type/application",
   "pentaho/i18n!model"
-], function(module, applicationFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
-
-    var Application = context.get(applicationFactory);
+  return ["pentaho/type/application", function(Application) {
 
     /**
      * @name pentaho.visual.base.Application.Type
@@ -40,7 +37,7 @@ define([
      * @class
      * @extends pentaho.type.Application
      *
-     * @amd {pentaho.type.Factory<pentaho.visual.Application>} pentaho/visual/base/application
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.Application>} pentaho/visual/base/application
      *
      * @classDesc The base class of visual applications.
      *
@@ -59,5 +56,5 @@ define([
     });
 
     return VisualApplication;
-  };
+  }];
 });

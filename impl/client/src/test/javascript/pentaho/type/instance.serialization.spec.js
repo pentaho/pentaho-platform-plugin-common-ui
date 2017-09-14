@@ -22,8 +22,17 @@ define([
   /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false */
 
   describe("pentaho.type.Instance", function() {
-    var context = new Context();
-    var Instance = context.get("instance");
+    var context;
+    var Instance;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Instance = context.get("instance");
+          })
+          .then(done, done.fail);
+    });
 
     describe("#toSpec(keyArgs)", function() {
       var value;

@@ -35,7 +35,7 @@ define([
      * @name pentaho.data.filter.IsGreater
      * @class
      * @extends pentaho.data.filter.Property
-     * @amd {pentaho.type.Factory<pentaho.data.filter.IsGreater>} pentaho/data/filter/isGreater
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.IsGreater>} pentaho/data/filter/isGreater
      *
      * @classDesc The `IsGreater` class represents a filter for being strictly greater than a given value.
      * The filter selects elements having the value of a certain property strictly greater than a reference

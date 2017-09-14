@@ -25,12 +25,17 @@ define([
 
     var context, Derived, ComplexOfComplex, propY;
 
-    beforeEach(function() {
-      context = new Context();
-      Derived = context.get({props: ["x"]});
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
 
-      ComplexOfComplex = context.get({props: [{name: "y", valueType: Derived}]});
-      propY = ComplexOfComplex.type.get("y");
+            Derived = context.get({props: ["x"]});
+
+            ComplexOfComplex = context.get({props: [{name: "y", valueType: Derived}]});
+            propY = ComplexOfComplex.type.get("y");
+          })
+          .then(done, done.fail);
     });
 
     it("should be defined", function() {

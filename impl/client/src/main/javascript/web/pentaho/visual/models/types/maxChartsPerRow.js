@@ -20,9 +20,7 @@ define([
 
   "use strict";
 
-  return function(context) {
-
-    var PentahoNumber = context.get("number");
+  return ["number", function(PentahoNumber) {
 
     return PentahoNumber.extend({
       $type: {
@@ -32,5 +30,5 @@ define([
       }
     })
     .implement({$type: bundle.structured.maxChartsPerRow});
-  };
+  }];
 });

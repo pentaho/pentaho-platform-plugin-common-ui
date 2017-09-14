@@ -24,8 +24,17 @@ define([
 
   describe("pentaho.type.List.Type", function() {
 
-    var context = new Context();
-    var List = context.get("pentaho/type/list");
+    var context;
+    var List;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            List = context.get("pentaho/type/list");
+          })
+          .then(done, done.fail);
+    });
 
     describe("#toSpecInScope(keyArgs)", function() {
 

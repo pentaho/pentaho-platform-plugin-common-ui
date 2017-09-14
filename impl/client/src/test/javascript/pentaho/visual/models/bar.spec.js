@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,34 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/data/Table",
-  "pentaho/visual/models/abstract",
-  "pentaho/visual/models/bar"
+  "pentaho/data/Table"
 ], function(Context, Table) {
 
   "use strict";
 
   /* global describe:true, it:true, expect:true, beforeEach:true*/
 
-  var context = new Context();
-  var AbstractModel = context.get("pentaho/visual/models/abstract");
-  var BarModel = context.get("pentaho/visual/models/bar");
-
   describe("pentaho.visual.ccc.bar.Model", function() {
+
+    var AbstractModel;
+    var BarModel;
+
+    beforeEach(function(done) {
+
+      Context.createAsync()
+          .then(function(context) {
+
+            return context.getDependencyApplyAsync([
+              "pentaho/visual/models/abstract",
+              "pentaho/visual/models/bar"
+            ], function(_AbstractModel, _BarModel) {
+              AbstractModel = _AbstractModel;
+              BarModel = _BarModel;
+            });
+          })
+          .then(done, done.fail);
+
+    });
 
     it("should be a function", function() {
       expect(typeof BarModel).toBe("function");
@@ -51,8 +65,6 @@ define([
       });
 
       var model = new BarModel({
-        width:    1,
-        height:   1,
         data:     {v: dataTable},
         measures: {attributes: [{name: "foo"}]}
       });
@@ -60,19 +72,9 @@ define([
       expect(model.validate()).toBe(null);
     });
 
-    it("should have a default view", function(done) {
+    it("should have a default view", function() {
 
       expect(!!BarModel.type.defaultView).toBe(true);
-
-      BarModel.type.defaultViewClass.then(function(BarView) {
-
-        expect(typeof BarView).toBe("function");
-
-        done();
-      }, function(error) {
-        fail(error);
-        done();
-      });
     });
   });
 });

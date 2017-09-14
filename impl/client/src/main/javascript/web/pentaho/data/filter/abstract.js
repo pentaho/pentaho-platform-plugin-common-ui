@@ -15,7 +15,6 @@
  */
 define([
   "module",
-  "pentaho/type/complex",
   "./_core/tree",
   "./_core/and",
   "./_core/or",
@@ -36,7 +35,7 @@ define([
   "pentaho/util/logger",
   "pentaho/debug",
   "pentaho/debug/Levels"
-], function(module, complexFactory, treeFactory, andFactory, orFactory, notFactory, trueFactory, falseFactory,
+], function(module, treeFactory, andFactory, orFactory, notFactory, trueFactory, falseFactory,
             propertyFactory, isEqFactory, isInFactory, isGtFactory, isLtFactory, isGteFactory, isLteFactory,
             isLikeFactory, arg, error, O, logger, debugMgr, DebugLevels) {
 
@@ -44,11 +43,9 @@ define([
 
   var __isDebugMode = debugMgr.testLevel(DebugLevels.debug, module);
 
-  return function(context) {
+  return ["complex", function(Complex) {
 
     var __filter = {};
-
-    var Complex = context.get(complexFactory);
 
     /**
      * @name pentaho.data.filter.Abstract.Type
@@ -65,7 +62,7 @@ define([
      * @class
      * @extends pentaho.type.Complex
      * @abstract
-     * @amd {pentaho.type.Factory<pentaho.data.filter.Abstract>} pentaho/data/filter/abstract
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.Abstract>} pentaho/data/filter/abstract
      *
      * @classDesc The base class of filter types.
      *
@@ -870,9 +867,9 @@ define([
 
       return results.length ? results : null;
     }
+  }];
 
-    function __equalValues(v1, v2) {
-      return v1 === v2 || (v1 != null && v2 != null && v1.valueOf() === v2.valueOf());
-    }
-  };
+  function __equalValues(v1, v2) {
+    return v1 === v2 || (v1 != null && v2 != null && v1.valueOf() === v2.valueOf());
+  }
 });

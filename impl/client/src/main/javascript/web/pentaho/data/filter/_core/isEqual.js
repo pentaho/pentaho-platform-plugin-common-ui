@@ -35,7 +35,7 @@ define([
      * @name pentaho.data.filter.IsEqual
      * @class
      * @extends pentaho.data.filter.Property
-     * @amd {pentaho.type.Factory<pentaho.data.filter.IsEqual>} pentaho/data/filter/isEqual
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.IsEqual>} pentaho/data/filter/isEqual
      *
      * @classDesc The `IsEqual` class represents an equality filter.
      * This filter selects elements having the value of a certain property equal to

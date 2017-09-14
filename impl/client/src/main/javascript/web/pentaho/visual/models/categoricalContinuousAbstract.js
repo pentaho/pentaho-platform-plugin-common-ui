@@ -15,44 +15,46 @@
  */
 define([
   "module",
-  "./cartesianAbstract",
   "pentaho/i18n!./i18n/model"
-], function(module, baseModelFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "./cartesianAbstract",
+    "./mixins/scaleColorDiscrete",
+    function(BaseModel, ScaleColorDiscreteModel) {
 
-    var BaseModel = context.get(baseModelFactory);
+      return BaseModel.extend({
+        $type: {
+          id: module.id,
+          isAbstract: true,
+          mixins: [ScaleColorDiscreteModel],
 
-    return BaseModel.extend({
-      $type: {
-        id: module.id,
-        isAbstract: true,
-
-        props: [
-          {
-            name: "columns", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["ordinal"],
-            ordinal: 6
-          },
-          {
-            name: "multi", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["ordinal"],
-            ordinal: 10
-          },
-          {
-            name: "measures", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["quantitative"],
-            dataType: "number",
-            ordinal: 7
-          }
-        ]
-      }
-    })
-    .implement({$type: bundle.structured.categoricalContinuousAbstract});
-  };
+          props: [
+            {
+              name: "columns", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["ordinal"],
+              ordinal: 6
+            },
+            {
+              name: "multi", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["ordinal"],
+              ordinal: 10
+            },
+            {
+              name: "measures", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["quantitative"],
+              dataType: "number",
+              ordinal: 7
+            }
+          ]
+        }
+      })
+      .implement({$type: bundle.structured.categoricalContinuousAbstract});
+    }
+  ];
 });

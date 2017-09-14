@@ -15,82 +15,81 @@
  */
 define([
   "module",
-  "./barAbstract",
-  "pentaho/i18n!./i18n/model",
-  "./types/labelsOption",
-  "./types/shape",
-  "./types/lineWidth",
-  "./mixins/interpolated"
-], function(module, baseModelFactory, bundle, labelsOptionFactory, shapeFactory, lineWidthFactory,
-    interpolatedFactory) {
+  "pentaho/i18n!./i18n/model"
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "./barAbstract",
+    "./types/labelsOption",
+    "./types/shape",
+    "./types/lineWidth",
+    "./mixins/interpolated",
+    function(BaseModel, LabelsOption, Shape, LineWidth, InterpolatedModel) {
 
-    var BaseModel = context.get(baseModelFactory);
+      return BaseModel.extend({
 
-    return BaseModel.extend({
+        $type: {
+          id: module.id,
+          mixins: [InterpolatedModel],
 
-      $type: {
-        id: module.id,
-        mixins: [interpolatedFactory],
+          v2Id: "ccc_barline",
+          category: "barchart",
+          defaultView: "pentaho/ccc/visual/barLine",
 
-        v2Id: "ccc_barline",
-        category: "barchart",
-        defaultView: "pentaho/ccc/visual/barLine",
+          props: [
+            {
+              name: "measures", // VISUAL_ROLE
+              attributes: {isRequired: __requiredOneMeasure}
+            },
+            {
+              name: "measuresLine", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["quantitative"],
+              dataType: "number",
+              attributes: {isRequired: __requiredOneMeasure},
+              ordinal: 7
+            },
 
-        props: [
-          {
-            name: "measures", // VISUAL_ROLE
-            attributes: {isRequired: __requiredOneMeasure}
-          },
-          {
-            name: "measuresLine", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["quantitative"],
-            dataType: "number",
-            attributes: {isRequired: __requiredOneMeasure},
-            ordinal: 7
-          },
+            {
+              name: "lineWidth",
+              valueType: LineWidth,
+              isApplicable: __hasAttributesMeasuresLine,
+              isRequired: true,
+              defaultValue: 1
+            },
+            {
+              name: "labelsOption",
+              valueType: LabelsOption,
+              domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"],
+              isApplicable: __hasAttributesMeasures,
+              isRequired: true,
+              defaultValue: "none"
+            },
 
-          {
-            name: "lineWidth",
-            valueType: lineWidthFactory,
-            isApplicable: __hasAttributesMeasuresLine,
-            isRequired: true,
-            defaultValue: 1
-          },
-          {
-            name: "labelsOption",
-            valueType: labelsOptionFactory,
-            domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"],
-            isApplicable: __hasAttributesMeasures,
-            isRequired: true,
-            defaultValue: "none"
-          },
+            {
+              name: "lineLabelsOption",
+              valueType: LabelsOption,
+              domain: ["none", "center", "left", "right", "top", "bottom"],
+              isApplicable: __hasAttributesMeasuresLine,
+              isRequired: true,
+              defaultValue: "none"
+            },
 
-          {
-            name: "lineLabelsOption",
-            valueType: labelsOptionFactory,
-            domain: ["none", "center", "left", "right", "top", "bottom"],
-            isApplicable: __hasAttributesMeasuresLine,
-            isRequired: true,
-            defaultValue: "none"
-          },
-
-          {
-            name: "shape",
-            valueType: shapeFactory,
-            isRequired: true,
-            defaultValue: "circle",
-            isApplicable: __hasAttributesMeasuresLine
-          }
-        ]
-      }
-    })
-    .implement({$type: bundle.structured.barLine});
-  };
+            {
+              name: "shape",
+              valueType: Shape,
+              isRequired: true,
+              defaultValue: "circle",
+              isApplicable: __hasAttributesMeasuresLine
+            }
+          ]
+        }
+      })
+      .implement({$type: bundle.structured.barLine});
+    }
+  ];
 
   function __requiredOneMeasure() {
     /* jshint validthis:true*/

@@ -15,38 +15,38 @@
  */
 define([
   "module",
-  "./barAbstract",
-  "pentaho/i18n!./i18n/model",
-  "./types/labelsOption"
-], function(module, baseModelFactory, bundle, labelsOptionFactory) {
+  "pentaho/i18n!./i18n/model"
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "./barAbstract",
+    "./types/labelsOption",
+    function(BaseModel, LabelsOption) {
 
-    var BaseModel = context.get(baseModelFactory);
+      return BaseModel.extend({
+        $type: {
+          id: module.id,
+          isAbstract: true,
 
-    return BaseModel.extend({
-      $type: {
-        id: module.id,
-        isAbstract: true,
+          props: [
+            {
+              name: "measures", // VISUAL_ROLE
+              attributes: {isRequired: true}
+            },
+            {
+              name: "labelsOption",
+              valueType: LabelsOption,
+              domain: ["none", "center", "insideEnd", "insideBase"],
+              isRequired: true,
+              defaultValue: "none"
+            }
+          ]
+        }
 
-        props: [
-          {
-            name: "measures", // VISUAL_ROLE
-            attributes: {isRequired: true}
-          },
-          {
-            name: "labelsOption",
-            valueType: labelsOptionFactory,
-            domain: ["none", "center", "insideEnd", "insideBase"],
-            isRequired: true,
-            defaultValue: "none"
-          }
-        ]
-      }
-
-    })
-    .implement({$type: bundle.structured.barNormalizedAbstract});
-  };
+      })
+      .implement({$type: bundle.structured.barNormalizedAbstract});
+    }
+  ];
 });

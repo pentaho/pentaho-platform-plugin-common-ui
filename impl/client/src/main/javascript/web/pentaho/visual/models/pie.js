@@ -15,57 +15,58 @@
  */
 define([
   "module",
-  "./abstract",
-  "pentaho/i18n!./i18n/model",
-  "./types/labelsOption",
-  "./mixins/multiCharted"
-], function(module, baseModelFactory, bundle, labelsOptionFactory, multiChartedFactory) {
+  "pentaho/i18n!./i18n/model"
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "./abstract",
+    "./types/labelsOption",
+    "./mixins/multiCharted",
+    "./mixins/scaleColorDiscrete",
+    function(BaseModel, LabelsOption, MultiChartedModel, ScaleColorDiscreteModel) {
 
-    var BaseModel = context.get(baseModelFactory);
+      return BaseModel.extend({
+        $type: {
+          id: module.id,
+          mixins: [MultiChartedModel, ScaleColorDiscreteModel],
 
-    return BaseModel.extend({
-      $type: {
-        id: module.id,
-        mixins: [multiChartedFactory],
+          v2Id: "ccc_pie",
+          category: "piechart",
+          defaultView: "pentaho/ccc/visual/pie",
 
-        v2Id: "ccc_pie",
-        category: "piechart",
-        defaultView: "pentaho/ccc/visual/pie",
-
-        props: [
-          {
-            name: "rows", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["ordinal"]
-          },
-          {
-            name: "columns", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["ordinal"],
-            ordinal: 6
-          },
-          {
-            name: "measures", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["quantitative"],
-            dataType: "number",
-            attributes: {isRequired: true},
-            ordinal: 7
-          },
-          {
-            name: "labelsOption",
-            valueType: labelsOptionFactory,
-            domain: ["none", "outside", "inside"],
-            isRequired: true,
-            defaultValue: "outside"
-          }
-        ]
-      }
-    })
-    .implement({$type: bundle.structured.pie});
-  };
+          props: [
+            {
+              name: "rows", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["ordinal"]
+            },
+            {
+              name: "columns", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["ordinal"],
+              ordinal: 6
+            },
+            {
+              name: "measures", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["quantitative"],
+              dataType: "number",
+              attributes: {isRequired: true},
+              ordinal: 7
+            },
+            {
+              name: "labelsOption",
+              valueType: LabelsOption,
+              domain: ["none", "outside", "inside"],
+              isRequired: true,
+              defaultValue: "outside"
+            }
+          ]
+        }
+      })
+      .implement({$type: bundle.structured.pie});
+    }
+  ];
 });

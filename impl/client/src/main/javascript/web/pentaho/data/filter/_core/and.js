@@ -36,7 +36,7 @@ define([
      * @class
      * @extends pentaho.data.filter.Tree
      *
-     * @amd {pentaho.type.Factory<pentaho.data.filter.And>} pentaho/data/filter/and
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.And>} pentaho/data/filter/and
      *
      * @classDesc
      * @classDesc The `And` filter represents a boolean conjunction (an And) filter.

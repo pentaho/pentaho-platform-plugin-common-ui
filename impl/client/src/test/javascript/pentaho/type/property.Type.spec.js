@@ -34,14 +34,18 @@ define([
     var PentahoString;
     var PentahoNumber;
 
-    beforeEach(function() {
-      context = new Context();
-      Property = context.get("property");
-      PropertyType = Property.Type;
-      PentahoBoolean = context.get("pentaho/type/boolean");
-      Complex = context.get("pentaho/type/complex");
-      PentahoString = context.get("pentaho/type/string");
-      PentahoNumber  = context.get("pentaho/type/number");
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Property = context.get("property");
+            PropertyType = Property.Type;
+            PentahoBoolean = context.get("pentaho/type/boolean");
+            Complex = context.get("pentaho/type/complex");
+            PentahoString = context.get("pentaho/type/string");
+            PentahoNumber  = context.get("pentaho/type/number");
+          })
+          .then(done, done.fail);
     });
 
     it("is a function", function() {
@@ -149,18 +153,22 @@ define([
           expect(propType.ancestor).toBe(null);
         });
 
-        it("should throw if `declaringType` is of a different context", function() {
-          var context2 = new Context();
-          var Complex2 = context2.get("complex");
-          expect(function() {
-            Property.extend({
-              $type: {name: "foo"}
-            }, null, {
-              declaringType: Complex2.type,
-              index: 1,
-              isRoot: true
-            });
-          }).toThrow(errorMatch.argInvalid("declaringType"));
+        it("should throw if `declaringType` is of a different context", function(done) {
+          Context.createAsync()
+              .then(function(context2) {
+
+                var Complex2 = context2.get("complex");
+                expect(function() {
+                  Property.extend({
+                    $type: {name: "foo"}
+                  }, null, {
+                    declaringType: Complex2.type,
+                    index: 1,
+                    isRoot: true
+                  });
+                }).toThrow(errorMatch.argInvalid("declaringType"));
+              })
+              .then(done, done.fail);
         });
       }); // end when spec is an object
 
@@ -629,6 +637,17 @@ define([
           expect(propType.defaultValue).toBe(null);
         });
 
+        it("should allow setting to a function value, whatever the valueType", function() {
+          var f = function() { return "Foo"; };
+          var propType = propertyTypeUtil.createRoot(Derived.type, {
+            name: "foo",
+            valueType: "string",
+            defaultValue: f
+          });
+
+          expect(propType.defaultValue).toBe(f);
+        });
+
         it("should throw when set and property already has descendant properties", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", valueType: "string"});
 
@@ -643,21 +662,7 @@ define([
             propType.defaultValue = null;
           }).toThrow(errorMatch.operInvalid());
         });
-
-        /* Not possible to do anymore since now, the default pre-loaded context
-           has derived complex classes with properties, and has thus already derived the
-           Property class...
-        it("should not delete when set to undefined at Property.type", function() {
-          // Must obtain a fresh Property such that hasDescendants is false.
-          var context2 = new Context();
-          var Property2 = context2.get("property");
-
-          Property2.type.defaultValue = undefined;
-
-          expect(Property2.type.hasOwnProperty("__defaultValue")).toBe(true);
-        });
-        */
-      }); // end #value
+      }); // end #defaultValue
       // endregion
 
       describe("#isReadOnly - ", function() {
@@ -1392,35 +1397,39 @@ define([
 
       describe("dynamic attribute", function() {
 
-        it("should allow defining and setting to a function an attribute that has no cast function", function() {
+        it("should allow defining and setting to a function an attribute that has no cast function", function(done) {
 
-          var context2 = new Context();
-          var Property2 = context2.get("property")
-                .implement({
-                  $type: {
-                    dynamicAttributes: {
-                      isFoo: {
-                        defaultValue: false,
-                        // cast: null. // <<---- no cast function
-                        combine: function(baseEval, localEval) {
-                          return function() {
-                            // localEval is skipped if base is true.
-                            return baseEval.call(this) || localEval.call(this);
-                          };
+          Context.createAsync()
+              .then(function(context2) {
+
+                var Property2 = context2.get("property")
+                      .implement({
+                        $type: {
+                          dynamicAttributes: {
+                            isFoo: {
+                              defaultValue: false,
+                              // cast: null. // <<---- no cast function
+                              combine: function(baseEval, localEval) {
+                                return function() {
+                                  // localEval is skipped if base is true.
+                                  return baseEval.call(this) || localEval.call(this);
+                                };
+                              }
+                            }
+                          }
                         }
-                      }
-                    }
+                      });
+
+                var fValue = function() { return true; };
+                var SubProperty2 = Property2.extend({
+                  $type: {
+                    isFoo: fValue
                   }
                 });
 
-          var fValue = function() { return true; };
-          var SubProperty2 = Property2.extend({
-            $type: {
-              isFoo: fValue
-            }
-          });
-
-          expect(SubProperty2.type.isFoo).toBe(fValue);
+                expect(SubProperty2.type.isFoo).toBe(fValue);
+              })
+              .then(done, done.fail);
         });
       }); // end dynamic attribute
       // endregion
@@ -2292,10 +2301,11 @@ define([
 
       // Cannot change if has descendants.
       describe("defaultValue -", function() {
-        it("should get null if an inherited default value is not an instance of the local value type", function() {
-          var Integer = PentahoNumber.extend();
 
-          var dv = new PentahoNumber(1);
+        it("should get null and not inherit if locally unspecified and there is a local value type", function() {
+
+          var Integer = PentahoNumber.extend();
+          var dv = new Integer(1);
 
           var Base = Complex.extend();
           Base.type.add({name: "baseNum", valueType: PentahoNumber, defaultValue: dv});
@@ -2308,24 +2318,22 @@ define([
           expect(propType.defaultValue).toBe(null);
         });
 
-        it("should get null if an inherited default value is not an instance of the inherited value type", function() {
-          var Integer = PentahoNumber.extend();
+        it("should inherit if locally unspecified and there is no local value type", function() {
 
           var dv = new PentahoNumber(1);
 
           var Base = Complex.extend();
           Base.type.add({name: "baseNum", valueType: PentahoNumber, defaultValue: dv});
 
-          var Derived1 = Base.extend();
-          Derived1.type.add({name: "baseNum", valueType: Integer.type});
+          expect(Base.type.get("baseNum").defaultValue).toBe(dv);
 
-          var Derived2 = Derived1.extend();
-          var propType2 = propertyTypeUtil.extend(Derived2.type, "baseNum", {name: "baseNum"});
+          var Derived = Base.extend();
+          var propType = propertyTypeUtil.extend(Derived.type, "baseNum", {name: "baseNum"});
 
-          expect(propType2.defaultValue).toBe(null);
+          expect(propType.defaultValue).toBe(dv);
         });
 
-        describe("test group", function() {
+        describe("test group -", function() {
           var Derived;
 
           beforeEach(function() {
@@ -2333,6 +2341,7 @@ define([
 
             Base.type.add({name: "baseNum", valueType: PentahoNumber});
             Base.type.add({name: "baseStr", valueType: PentahoString, defaultValue: "a"});
+            Base.type.add({name: "baseStrFun", valueType: PentahoString, defaultValue: function() { return "a"; }});
 
             Derived = Base.extend();
           });
@@ -2345,6 +2354,11 @@ define([
 
             propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr"});
             expect(propType.defaultValue.value).toBe("a");
+          });
+
+          it("should inherit the base function default value when unspecified", function() {
+            var propType = propertyTypeUtil.extend(Derived.type, "baseStrFun", {name: "baseStrFun"});
+            expect(propType.defaultValue()).toBe("a");
           });
 
           it("should inherit the base default value when specified as undefined", function() {

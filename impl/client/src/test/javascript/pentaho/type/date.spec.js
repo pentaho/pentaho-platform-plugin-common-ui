@@ -25,16 +25,19 @@ define([
 
   describe("pentaho.type.Date -", function() {
 
-    it("is a function", function() {
-      expect(typeof dateFactory).toBe("function");
+    var context;
+    var PentahoDate;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            PentahoDate = context.get("pentaho/type/date");
+          })
+          .then(done, done.fail);
     });
 
     describe("new Date()", function() {
-      var PentahoDate;
-
-      beforeEach(function() {
-        PentahoDate = dateFactory(new Context());
-      });
 
       it("should be a function", function() {
         expect(typeof PentahoDate).toBe("function");
@@ -74,11 +77,6 @@ define([
     });
 
     describe("#toJSON()", function() {
-      var PentahoDate;
-
-      beforeEach(function() {
-        PentahoDate = dateFactory(new Context());
-      });
 
       it("should return the date's ISO string", function() {
         var testDate = new Date("1960-01-25");

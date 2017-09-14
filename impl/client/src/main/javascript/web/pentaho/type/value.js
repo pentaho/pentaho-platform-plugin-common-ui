@@ -15,7 +15,6 @@
  */
 define([
   "module",
-  "./instance",
   "./util",
   "./ValidationError",
   "./SpecificationContext",
@@ -23,13 +22,11 @@ define([
   "../util/arg",
   "../util/error",
   "../i18n!types"
-], function(module, instanceFactory, typeUtil, ValidationError, SpecificationContext, O, arg, error, bundle) {
+], function(module, typeUtil, ValidationError, SpecificationContext, O, arg, error, bundle) {
 
   "use strict";
 
-  return function(context) {
-
-    var __Instance = context.get(instanceFactory);
+  return ["instance", function(Instance) {
 
     /**
      * @name pentaho.type.Value.Type
@@ -52,7 +49,7 @@ define([
      * @extends pentaho.type.Instance
      * @implements pentaho.lang.IConfigurable
      * @implements pentaho.lang.ISpecifiable
-     * @amd {pentaho.type.Factory<pentaho.type.Value>} pentaho/type/value
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Value>} pentaho/type/value
      *
      * @classDesc The base, abstract class of [instances]{@link pentaho.type.Instance} which
      * are the _value of_ [properties]{@link pentaho.type.Property}.
@@ -67,7 +64,7 @@ define([
      * @see pentaho.type.spec.IValueProto
      * @see pentaho.type.spec.IValueTypeProto
      */
-    var Value = __Instance.extend(/** @lends pentaho.type.Value# */{
+    var Value = Instance.extend(/** @lends pentaho.type.Value# */{
 
       /**
        * Gets the key of the value.
@@ -452,5 +449,5 @@ define([
      */
 
     return Value;
-  };
+  }];
 });

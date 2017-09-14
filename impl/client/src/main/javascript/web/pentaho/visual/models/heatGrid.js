@@ -15,81 +15,80 @@
  */
 define([
   "module",
-  "./cartesianAbstract",
-  "pentaho/i18n!./i18n/model",
-  "./types/shape",
-  "./types/labelsOption",
-  "./mixins/scaleSizeContinuous",
-  "./mixins/scaleColorContinuous"
-], function(module, baseModelFactory, bundle, shapeFactory, labelsOptionFactory,
-    scaleSizeContinuousFactory, scaleColorContinuousFactory) {
+  "pentaho/i18n!./i18n/model"
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "./cartesianAbstract",
+    "./types/shape",
+    "./types/labelsOption",
+    "./mixins/scaleSizeContinuous",
+    "./mixins/scaleColorContinuous",
+    function(BaseModel, Shape, LabelsOption, ScaleSizeContinuousModel, ScaleColorContinuousModel) {
 
-    var BaseModel = context.get(baseModelFactory);
+      return BaseModel.extend({
+        $type: {
+          id: module.id,
+          mixins: [ScaleSizeContinuousModel, ScaleColorContinuousModel],
 
-    return BaseModel.extend({
-      $type: {
-        id: module.id,
-        mixins: [scaleColorContinuousFactory, scaleSizeContinuousFactory],
+          v2Id: "ccc_heatgrid",
+          category: "heatgrid",
+          defaultView: "pentaho/ccc/visual/heatGrid",
 
-        v2Id: "ccc_heatgrid",
-        category: "heatgrid",
-        defaultView: "pentaho/ccc/visual/heatGrid",
+          props: [
+            {
+              name: "rows", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["ordinal"],
+              attributes: {isRequired: true},
+              ordinal: 5
+            },
+            {
+              name: "columns", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["ordinal"],
+              ordinal: 6
+            },
+            {
+              name: "color", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["quantitative"],
+              dataType: "number",
+              attributes: {isRequired: __requiredOneMeasure, countMax: 1},
+              ordinal: 7
+            },
+            {
+              name: "size", // VISUAL_ROLE
+              base: "pentaho/visual/role/property",
+              levels: ["quantitative"],
+              dataType: "number",
+              attributes: {isRequired: __requiredOneMeasure, countMax: 1},
+              ordinal: 8
+            },
+            {
+              name: "labelsOption",
+              valueType: LabelsOption,
+              domain: ["none", "center"],
+              isRequired: true,
+              defaultValue: "none"
+            },
+            {
+              name: "shape",
+              valueType: Shape,
+              domain: ["none", "circle", "square"],
+              isRequired: true,
+              defaultValue: "square"
+            }
+          ]
+        }
+      })
+      .implement({$type: bundle.structured.heatGrid});
+    }
+  ];
 
-        props: [
-          {
-            name: "rows", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["ordinal"],
-            attributes: {isRequired: true},
-            ordinal: 5
-          },
-          {
-            name: "columns", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["ordinal"],
-            ordinal: 6
-          },
-          {
-            name: "color", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["quantitative"],
-            dataType: "number",
-            attributes: {isRequired: requiredOneMeasure, countMax: 1},
-            ordinal: 7
-          },
-          {
-            name: "size", // VISUAL_ROLE
-            base: "pentaho/visual/role/property",
-            levels: ["quantitative"],
-            dataType: "number",
-            attributes: {isRequired: requiredOneMeasure, countMax: 1},
-            ordinal: 8
-          },
-          {
-            name: "labelsOption",
-            valueType: labelsOptionFactory,
-            domain: ["none", "center"],
-            isRequired: true,
-            defaultValue: "none"
-          },
-          {
-            name: "shape",
-            valueType: shapeFactory,
-            domain: ["none", "circle", "square"],
-            isRequired: true,
-            defaultValue: "square"
-          }
-        ]
-      }
-    })
-    .implement({$type: bundle.structured.heatGrid});
-  };
-
-  function requiredOneMeasure() {
+  function __requiredOneMeasure() {
     /* jshint validthis:true*/
     return !this.size.attributes.count && !this.color.attributes.count;
   }

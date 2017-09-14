@@ -15,16 +15,15 @@
  */
 define([
   "module",
-  "./value",
   "../i18n!types",
   "../util/object",
   "../util/error",
   "../util/fun"
-], function(module, valueFactory, bundle, O, error, fun) {
+], function(module, bundle, O, error, fun) {
 
   "use strict";
 
-  return function(context) {
+  return ["value", function(Value) {
 
     var __elemType = null;
 
@@ -38,13 +37,11 @@ define([
      * For more information see {@link pentaho.type.Element}.
      */
 
-    var Value = context.get(valueFactory);
-
     /**
      * @name pentaho.type.Element
      * @class
      * @extends pentaho.type.Value
-     * @amd {pentaho.type.Factory<pentaho.type.Element>} pentaho/type/element
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Element>} pentaho/type/element
      *
      * @classDesc The base class of singular values.
      *
@@ -195,5 +192,5 @@ define([
     __elemType = Element.type;
 
     return Element;
-  };
+  }];
 });

@@ -15,12 +15,11 @@
  */
 define([
   "module",
-  "./property",
   "../lang/Collection",
   "../util/arg",
   "../util/error",
   "../util/object"
-], function(module, propertyFactory, Collection, arg, error, O) {
+], function(module, Collection, arg, error, O) {
 
   "use strict";
 
@@ -102,7 +101,7 @@ define([
      */
     get __propertyType() {
       var propertyType = this.__propType;
-      if(!propertyType) this.__propType = propertyType = this.__context.get(propertyFactory).type;
+      if(!propertyType) this.__propType = propertyType = this.__context.get("property").type;
       return propertyType;
     },
 

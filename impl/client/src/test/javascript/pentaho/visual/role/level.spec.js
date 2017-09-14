@@ -1,16 +1,28 @@
 define([
-  "pentaho/type/Context",
-  "pentaho/visual/role/level"
-], function(Context, levelFactory) {
+  "pentaho/type/Context"
+], function(Context) {
+
   "use strict";
 
-  describe("pentaho.visual.role.MeasurementLevel.Type", function() {
+  describe("pentaho.visual.role.Level.Type", function() {
 
-    var context, MeasurementLevel;
+    var context;
+    var MeasurementLevel;
 
-    beforeEach(function () {
-      context = new Context();
-      MeasurementLevel = context.get(levelFactory);
+    beforeEach(function(done) {
+
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+
+            return context.getDependencyApplyAsync([
+              "pentaho/visual/role/level"
+            ], function(_MeasurementLevel) {
+              MeasurementLevel = _MeasurementLevel;
+            });
+          })
+          .then(done, done.fail);
+
     });
 
     describe("#isQuantitative(level)", function() {

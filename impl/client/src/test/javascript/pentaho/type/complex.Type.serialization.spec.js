@@ -26,11 +26,16 @@ define([
   describe("pentaho.type.Complex.Type", function() {
 
     describe("#_fillSpecInContext(spec, keyArgs)", function() {
-      var context, Complex;
+      var context;
+      var Complex;
 
-      beforeEach(function() {
-        context = new Context();
-        Complex = context.get("pentaho/type/complex");
+      beforeEach(function(done) {
+        Context.createAsync()
+            .then(function(_context) {
+              context = _context;
+              Complex = context.get("pentaho/type/complex");
+            })
+            .then(done, done.fail);
       });
 
       it("should return false when there are no properties to serialize", function() {

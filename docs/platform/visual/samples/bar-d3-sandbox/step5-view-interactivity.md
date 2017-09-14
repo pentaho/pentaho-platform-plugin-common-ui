@@ -37,18 +37,23 @@ in this case, the bars.
 ### Declare the dependency on the `execute` action
 
 The `execute` action type module needs to be loaded with the view module.
-Modify the AMD module declaration of the `view-d3.js` file to the following:
+Modify the factory declaration of the `view-d3.js` file to the following:
 
 ```js
 define([
   "module",
-  "pentaho/visual/base/view",
-  "./model",
-  "pentaho/visual/action/execute",
   "d3",
   "css!./css/view-d3",
-], function(module, baseViewFactory, barModelFactory, executeActionFactory, d3) {
-  // ...
+], function(module, d3) {
+  
+  return [
+    "pentaho/visual/base/view",
+    "./model",
+    "pentaho/visual/action/execute",
+    function(BaseView, Model, ExecuteAction) {
+      // ...
+    }
+  ];
 });
 ```
 
@@ -66,13 +71,11 @@ function() {
   
   // Part 3
   var view = this;
-  var context = this.$type.context;
-
+  
   bar.on("dblclick", function(d) {
     
     var filterSpec = {_: "=", property: categoryAttribute, value: d.category};
 
-    var ExecuteAction = context.get(executeActionFactory);
     var action = new ExecuteAction({dataFilter: filterSpec});
 
     view.act(action);
@@ -134,19 +137,24 @@ You'll let the user _select_ bars by clicking on them.
 ### Declare the dependency on the `select` action
 
 The `select` action type module needs to be loaded with the view module.
-Modify the AMD module declaration of the `view-d3.js` file to the following:
+Modify the type factory declaration of the `view-d3.js` file to the following:
 
 ```js
 define([
   "module",
-  "pentaho/visual/base/view",
-  "./model",
-  "pentaho/visual/action/execute",
-  "pentaho/visual/action/select",
   "d3",
   "css!./css/view-d3",
-], function(module, baseViewFactory, barModelFactory, executeActionFactory, selectActionFactory, d3) {
-  // ...
+], function(module, d3) {
+  
+  return [
+    "pentaho/visual/base/view",
+    "./model",
+    "pentaho/visual/action/execute",
+    "pentaho/visual/action/select",
+    function(BaseView, Model, ExecuteAction, SelectAction) {
+      // ...
+    }
+  ];
 });
 ```
 
@@ -167,7 +175,6 @@ function() {
     
     var filterSpec = {_: "=", property: categoryAttribute, value: d.category};
 
-    var SelectAction = context.get(selectActionFactory);
     var action = new SelectAction({dataFilter: filterSpec, selectionMode: "replace"});
 
     view.act(action);

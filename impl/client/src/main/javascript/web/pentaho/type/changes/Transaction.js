@@ -384,7 +384,7 @@ define([
      * @private
      * @internal
      *
-     * @see pentaho.type.changes.AbstractTransactionScope#_exit
+     * @see pentaho.type.changes.AbstractTransactionScope#__exit
      */
     __scopeExit: function() {
       this.__scopeCount--;

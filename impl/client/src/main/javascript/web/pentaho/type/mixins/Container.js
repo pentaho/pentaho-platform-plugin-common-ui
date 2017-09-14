@@ -99,7 +99,7 @@ define([
      *
      * All property values or elements are shared with the clone.
      *
-     * @return {!pentaho.type.ContainerMixin} The cloned container.
+     * @return {!pentaho.type.mixins.Container} The cloned container.
      */
     clone: function() {
       var clone = Object.create(Object.getPrototypeOf(this));
@@ -112,7 +112,7 @@ define([
      *
      * The default implementation calls {@link pentaho.type.mixins.Container#_initContainer}.
      *
-     * @param {!pentaho.type.ContainerMixin} clone - The cloned container to initialize.
+     * @param {!pentaho.type.mixins.Container} clone - The cloned container to initialize.
      *
      * @protected
      */

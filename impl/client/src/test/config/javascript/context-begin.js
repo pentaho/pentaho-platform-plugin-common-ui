@@ -74,6 +74,8 @@ var requireCfg = {
     },
     "pentaho/typeInfo": {
     },
+    "pentaho/instanceInfo": {
+    },
     "pentaho/environment": {
       locale: SESSION_LOCALE,
       server: {

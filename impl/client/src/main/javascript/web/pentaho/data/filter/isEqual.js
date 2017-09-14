@@ -13,16 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./abstract"
-], function(abstractFactory) {
+define(function() {
 
   "use strict";
 
-  return function(context) {
-
-    var Abstract = context.get(abstractFactory);
+  return ["pentaho/data/filter/abstract", function(Abstract) {
 
     return Abstract._core.IsEqual;
-  };
+  }];
 });

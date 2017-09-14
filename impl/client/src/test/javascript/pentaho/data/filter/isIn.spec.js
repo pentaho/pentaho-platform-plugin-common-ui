@@ -23,18 +23,35 @@ define([
 
   describe("pentaho.data.filter.IsIn", function() {
 
-    var context = new Context();
-    var IsInFilter = context.get(isInFactory);
-    var Complex = context.get(complexFactory);
+    var context;
+    var Complex;
+    var IsInFilter;
+    var ProductSummary;
 
-    var ProductSummary = Complex.extend({
-      $type: {
-        props: [
-          {name: "name", valueType: "string", label: "Name"},
-          {name: "sales", valueType: "number", label: "Sales"},
-          {name: "inStock", valueType: "boolean", label: "In Stock"}
-        ]
-      }
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+
+            context = _context;
+            Complex = context.get("complex");
+
+            ProductSummary = Complex.extend({
+              $type: {
+                props: [
+                  {name: "name", valueType: "string", label: "Name"},
+                  {name: "sales", valueType: "number", label: "Sales"},
+                  {name: "inStock", valueType: "boolean", label: "In Stock"}
+                ]
+              }
+            });
+
+            return context.getDependencyApplyAsync([
+              "pentaho/data/filter/isIn"
+            ], function(IsIn) {
+              IsInFilter = IsIn;
+            });
+          })
+          .then(done, done.fail);
     });
 
     describe("new ({property, values})", function() {
@@ -107,7 +124,11 @@ define([
 
     describe("#contains(elem)", function() {
 
-      var elem = new ProductSummary({name: "A", sales: 12000, inStock: true});
+      var elem;
+
+      beforeEach(function() {
+        elem = new ProductSummary({name: "A", sales: 12000, inStock: true});
+      });
 
       it("should return `true` if `elem` has property `property` whose value is one of `values`", function() {
 

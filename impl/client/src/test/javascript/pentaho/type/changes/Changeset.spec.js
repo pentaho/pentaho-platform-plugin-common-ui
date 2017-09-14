@@ -28,9 +28,13 @@ define([
     var context;
     var Complex;
 
-    beforeEach(function() {
-      context = new Context();
-      Complex = context.get("complex");
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Complex = context.get("complex");
+          })
+          .then(done, done.fail);
     });
 
     it("should be defined", function() {

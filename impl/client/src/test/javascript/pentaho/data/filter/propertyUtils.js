@@ -19,7 +19,7 @@ define(function() {
     behavesLikeProperty: behavesLikeProperty
   };
 
-  function behavesLikeProperty(Constructor, params) {
+  function behavesLikeProperty(getConstructor, params) {
     var filterName = params.kind;
     var valueType = params.valueType;
     var rawValue = params.rawValue;
@@ -32,6 +32,7 @@ define(function() {
         it("should be possible to create an instance " +
           "by specifying the properties by #name and value specification", function() {
 
+          var Constructor = getConstructor();
           var filter = new Constructor({property: "foo", value: {_: valueType, v: rawValue}});
           expect(filter instanceof Constructor).toBe(true);
         });
@@ -39,12 +40,14 @@ define(function() {
         it("should be possible to create an instance " +
           "by specifying the properties by #nameAlias and value specification", function() {
 
+          var Constructor = getConstructor();
           var filter = new Constructor({p: "foo", v: {_: valueType, v: rawValue}});
           expect(filter instanceof Constructor).toBe(true);
         });
 
         it("should be possible to create an instance by specifying the properties by #nameAlias and value", function() {
 
+          var Constructor = getConstructor();
           var filter = new Constructor({p: "foo", v: rawValue});
           expect(filter instanceof Constructor).toBe(true);
         });
@@ -54,6 +57,7 @@ define(function() {
 
         it("should return '" + filterName + "'", function() {
 
+          var Constructor = getConstructor();
           var filter = new Constructor();
           expect(filter.kind).toBe(filterName);
         });
@@ -63,12 +67,14 @@ define(function() {
 
         it("should return the property name specified at construction", function() {
 
+          var Constructor = getConstructor();
           var filter = new Constructor({property: "foo"});
           expect(filter.property).toBe("foo");
         });
 
         it("should return the property name specified at construction via #nameAlias", function() {
 
+          var Constructor = getConstructor();
           var filter = new Constructor({p: "foo"});
           expect(filter.property).toBe("foo");
         });
@@ -78,6 +84,7 @@ define(function() {
         var filter;
 
         beforeEach(function() {
+          var Constructor = getConstructor();
           filter = new Constructor({property: "foo", value: {_: valueType, v: rawValue}});
         });
 
@@ -139,24 +146,24 @@ define(function() {
             expect(filterSpec._).toBe("pentaho/data/filter/" + filterName);
           });
         });
-
       }); // #toSpec
 
       describe("#value", function() {
 
         it("should return the value specified at construction", function() {
 
+          var Constructor = getConstructor();
           var filter = new Constructor({value: {_: valueType, v: rawValue}});
           expect(filter.value).toBe(rawValue);
         });
 
         it("should return the value specified at construction via #nameAlias", function() {
 
+          var Constructor = getConstructor();
           var filter = new Constructor({v: {_: valueType, v: rawValue}});
           expect(filter.value).toBe(rawValue);
         });
       }); // #value
-
     });
   }
 });

@@ -20,9 +20,7 @@ define([
 
   "use strict";
 
-  return function(context) {
-
-    var PentahoString = context.get("string");
+  return ["string", function(PentahoString) {
 
     return PentahoString.extend({
       $type: {
@@ -39,5 +37,5 @@ define([
       }
     })
     .implement({$type: bundle.structured.labelsOption});
-  };
+  }];
 });

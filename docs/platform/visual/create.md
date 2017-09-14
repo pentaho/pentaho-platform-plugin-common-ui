@@ -39,11 +39,11 @@ The D3 library dependency, is declared similarly to how it was declared.
 Your visualization must be advertised to the platform so that applications like Analyzer and PDI can offer it to users.
 This is done by registering 
 the visualization's [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) module
-with [`pentaho/service`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.service'}}),
-as a service of type `pentaho/visual/base`.
+with [`pentaho/typeInfo`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.typeInfo'}}),
+as a subtype of `pentaho/visual/base/model`.
 
 The default configuration module that you developed also needs to be advertised to the configuration system,
-by registering it with `pentaho/service` as a service of type `pentaho.config.spec.IRuleSet`.
+by registering it with `pentaho/instanceInfo` as an instance of type `pentaho.config.spec.IRuleSet`.
 
 The result is the following `package.json` content:
 
@@ -53,9 +53,11 @@ The result is the following `package.json` content:
   "version": "0.0.1",
   
   "config": {
-    "pentaho/service": {
-      "pentaho-visual-samples-bar_0.0.1/model": "pentaho/visual/base",
-      "pentaho-visual-samples-bar_0.0.1/config": "pentaho.config.spec.IRuleSet"
+    "pentaho/typeInfo": {
+      "pentaho-visual-samples-bar_0.0.1/model": {"base": "pentaho/visual/base/model"}
+    },
+    "pentaho/instanceInfo": {
+      "pentaho-visual-samples-bar_0.0.1/config": {"type": "pentaho.config.spec.IRuleSet"}
     }
   },
   

@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+// This exists only so that r.js sees otherwise invisible dependencies.
+
 define([
   "./abstract",
   "./tree",
@@ -29,28 +32,7 @@ define([
   "./isLike",
   "./true",
   "./false"
-], function(
-    abstractFactory, treeFactory, propFactory,
-    andFactory, orFactory, notFactory, isEqFactory, isInFactory, isGtFactory, isLtFactory, isGteFactory, isLteFactory,
-    isLikeFactory, trueFactory, falseFactory) {
+], function() {
 
   "use strict";
-
-  return {
-    "abstract": abstractFactory,
-    "tree": treeFactory,
-    "property": propFactory,
-    "and": andFactory,
-    "or": orFactory,
-    "not": notFactory,
-    "isEqual": isEqFactory,
-    "isIn": isInFactory,
-    "isGreater": isGtFactory,
-    "isLess": isLtFactory,
-    "isGreaterOrEqual": isGteFactory,
-    "isLessOrEqual": isLteFactory,
-    "isLike": isLikeFactory,
-    "true": trueFactory,
-    "false": falseFactory
-  };
 });

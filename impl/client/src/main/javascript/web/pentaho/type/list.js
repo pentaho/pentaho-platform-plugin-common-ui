@@ -17,8 +17,6 @@ define([
   "module",
   "./mixins/Container",
   "./changes/ListChangeset",
-  "./value",
-  "./element",
   "./util",
   "./SpecificationContext",
   "../i18n!types",
@@ -26,16 +24,12 @@ define([
   "../util/error",
   "../util/object"
 ], function(module, ContainerMixin, ListChangeset,
-            valueFactory, elemFactory, typeUtil, SpecificationContext,
+            typeUtil, SpecificationContext,
             bundle, arg, error, O) {
 
   "use strict";
 
-  return function(context) {
-
-    var Value = context.get(valueFactory);
-    var Element = context.get(elemFactory);
-
+  return ["value", "element", function(Value, Element) {
     /**
      * @name pentaho.type.List.Type
      * @class
@@ -53,7 +47,7 @@ define([
      * @extends pentaho.type.Value
      * @extends pentaho.type.mixins.Container
      *
-     * @amd {pentaho.type.Factory<pentaho.type.List>} pentaho/type/list
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.List>} pentaho/type/list
      *
      * @classDesc The base class of plural values.
      *
@@ -64,14 +58,14 @@ define([
      *
      * When a derived class overrides the constructor
      * and creates additional instance properties,
-     * the {@link pentaho.type.List#_clone} method should
+     * the {@link pentaho.type.List#_initClone} method should
      * also be overridden to copy those properties.
      *
      * @constructor
      * @param {pentaho.type.spec.UList} [spec] The list specification or another compatible list instance.
      * @param {Object} [keyArgs] - The keyword arguments.
-     * @param {boolean} [keyArgs.isBoundary] - Indicates if the list should be a _boundary list_.
-     * @param {boolean} [keyArgs.isReadOnly] - Indicates if the list should be a _read-only list_.
+     * @param {boolean} [keyArgs.isBoundary=false] - Indicates if the list should be a _boundary list_.
+     * @param {boolean} [keyArgs.isReadOnly=false] - Indicates if the list should be a _read-only list_.
      *
      * @see pentaho.type.Element
      * @see pentaho.type.spec.IList
@@ -103,7 +97,9 @@ define([
               (spec instanceof List) ? spec.__elems :
               null;
 
-          if(elemSpecs) this.__load(elemSpecs);
+          if(elemSpecs) {
+            this.__load(elemSpecs);
+          }
         }
       },
 
@@ -789,5 +785,5 @@ define([
      */
 
     return List;
-  };
+  }];
 });

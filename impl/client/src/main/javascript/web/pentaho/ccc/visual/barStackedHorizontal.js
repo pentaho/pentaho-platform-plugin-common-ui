@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 define([
-  "module",
-  "pentaho/visual/models/barStackedHorizontal",
-  "./barAbstract"
-], function(module, modelFactory, baseViewFactory) {
+  "module"
+], function(module) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/ccc/visual/barAbstract",
+    "pentaho/visual/models/barStackedHorizontal",
+    function(BaseView, Model) {
 
-    var BaseView = context.get(baseViewFactory);
+      return BaseView.extend({
+        $type: {
+          id: module.id,
+          props: {
+            model: {valueType: Model}
+          }
+        },
 
-    return BaseView.extend({
-      $type: {
-        id: module.id,
-        props: {
-          model: {valueType: modelFactory}
+        _options: {
+          orientation: "horizontal",
+          stacked: true
         }
-      },
-
-      _options: {
-        orientation: "horizontal",
-        stacked: true
-      }
-    });
-  };
+      });
+    }
+  ];
 });

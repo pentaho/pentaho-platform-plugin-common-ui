@@ -15,47 +15,127 @@
  */
 define([
   "module",
-  "./data",
   "./SelectionModes",
-  "../../type/function",
-  "../../util/object",
-  "../../util/fun",
-  "../../lang/ArgumentInvalidError",
-  "../../lang/ArgumentInvalidTypeError"
-], function(module, dataActionFactory, SelectionModes, funFactory, O, F, ArgumentInvalidError, ArgumentInvalidTypeError) {
+  "pentaho/util/object",
+  "pentaho/util/fun",
+  "pentaho/lang/ArgumentInvalidError",
+  "pentaho/lang/ArgumentInvalidTypeError"
+], function(module, SelectionModes, O, F, ArgumentInvalidError, ArgumentInvalidTypeError) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/visual/action/data",
+    "pentaho/type/function",
+    function(DataAction, PenFunction) {
 
-    var __PenFunction = context.get(funFactory);
+      /**
+       * @name pentaho.visual.action.Select.Type
+       * @class
+       * @extends pentaho.visual.action.Data.Type
+       *
+       * @classDesc The type class of selection actions.
+       *
+       * For more information see {@link pentaho.visual.action.Select}.
+       */
 
-    /**
-     * @name pentaho.visual.action.Select.Type
-     * @class
-     * @extends pentaho.visual.action.Data.Type
-     *
-     * @classDesc The type class of selection actions.
-     *
-     * For more information see {@link pentaho.visual.action.Select}.
-     */
+      return DataAction.extend(/** @lends pentaho.visual.action.Select# */{
+        $type: /** @lends pentaho.visual.action.Select.Type# */{
+          id: module.id,
+          alias: "select",
 
-    var DataAction = context.get(dataActionFactory);
+          // region defaultSelectionMode
+          __defaultSelectionMode: null,
 
-    return DataAction.extend(/** @lends pentaho.visual.action.Select# */{
-      $type: /** @lends pentaho.visual.action.Select.Type# */{
-        id: module.id,
-        alias: "select",
+          /**
+           * Gets or sets the _default selection mode_ of actions of this type.
+           *
+           * The default value is {@link pentaho.visual.action.SelectionModes#replace}.
+           *
+           * When set to a {@link Nully} value, the default value is assumed.
+           *
+           * Can be set to the name of one of the standard selection modes,
+           * [SelectionModes]{@link pentaho.visual.action.SelectionModes},
+           * to assume the corresponding selection mode function.
+           *
+           * @type {!pentaho.visual.action.SelectionMode}
+           *
+           * @throws {pentaho.lang.ArgumentInvalidError} When set to a `string` which is not one of the
+           * standard selection mode names, [SelectionModes]{@link pentaho.visual.action.SelectionModes}.
+           *
+           * @throws {pentaho.lang.ArgumentInvalidTypeError} When set to a value which is not a `string`
+           * or a `function`.
+           */
+          get defaultSelectionMode() {
 
-        // region defaultSelectionMode
-        __defaultSelectionMode: null,
+            var fun = this.__defaultSelectionMode;
+            return fun ? fun.valueOf() : SelectionModes.replace;
+          },
+
+          set defaultSelectionMode(value) {
+
+            this.__defaultSelectionMode = __getSelectionMode(value, "defaultSelectionMode");
+          },
+          // endregion
+
+          // region serialization
+          /** @inheritDoc */
+          _fillSpecInContext: function(spec, keyArgs) {
+
+            var any = this.base(spec, keyArgs);
+
+            if(this.__defaultSelectionMode) {
+              spec.defaultSelectionMode = __serializeSelectionMode(this.__defaultSelectionMode, keyArgs);
+              any = true;
+            }
+
+            return any;
+          }
+          // endregion
+        },
 
         /**
-         * Gets or sets the _default selection mode_ of actions of this type.
+         * @alias Select
+         * @memberOf pentaho.visual.action
+         * @class
+         * @extends pentaho.visual.action.Data
          *
-         * The default value is {@link pentaho.visual.action.SelectionModes#replace}.
+         * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.action.Select>} pentaho/visual/action/select
          *
-         * When set to a {@link Nully} value, the default value is assumed.
+         * @classDesc The `Select` action is a synchronous action that
+         * is performed when the user interacts with a visual element, typically by clicking on it.
+
+         * This action has the *alias* `"select"`,
+         * which can also be specified as the event name
+         * when calling [on]{@link pentaho.lang,IEventSource#on} of action targets.
+         *
+         * See also the default action performed by this action type,
+         * [_doDefault]{@link pentaho.visual.action.Select#_doDefault}.
+         *
+         * @description Creates a data action instance given its specification.
+         * @param {pentaho.visual.action.spec.ISelect} [spec] A selection action specification.
+         * @constructor
+         *
+         * @see pentaho.visual.action.spec.ISelect
+         * @see pentaho.visual.action.spec.ISelectProto
+         * @see pentaho.visual.action.spec.ISelectTypeProto
+         */
+        constructor: function(spec) {
+
+          this.base(spec);
+
+          this.selectionMode = spec && spec.selectionMode;
+        },
+
+        /**
+         * Gets or sets the _selection mode_ of this action.
+         *
+         * Can only be set while the action is in an [editable]{@link pentaho.type.action.Base#isEditable} state.
+         *
+         * The default value is the value of
+         * [defaultSelectionMode]{@link pentaho.visual.action.Select.Type#defaultSelectionMode}.
+         *
+         * Setting to a {@link Nully} value assumes the default value.
          *
          * Can be set to the name of one of the standard selection modes,
          * [SelectionModes]{@link pentaho.visual.action.SelectionModes},
@@ -63,211 +143,130 @@ define([
          *
          * @type {!pentaho.visual.action.SelectionMode}
          *
+         * @throws {pentaho.lang.OperationInvalidError} When set and the action is not in an editable state.
+         *
          * @throws {pentaho.lang.ArgumentInvalidError} When set to a `string` which is not one of the
          * standard selection mode names, [SelectionModes]{@link pentaho.visual.action.SelectionModes}.
          *
          * @throws {pentaho.lang.ArgumentInvalidTypeError} When set to a value which is not a `string` or a `function`.
          */
-        get defaultSelectionMode() {
+        get selectionMode() {
 
-          var fun = this.__defaultSelectionMode;
-          return fun ? fun.valueOf() : SelectionModes.replace;
+          var fun = this.__selectionMode;
+          return fun ? fun.valueOf() : this.$type.defaultSelectionMode;
         },
 
-        set defaultSelectionMode(value) {
+        set selectionMode(value) {
 
-          this.__defaultSelectionMode = __getSelectionMode(value, "defaultSelectionMode");
+          this._assertEditable();
+
+          /**
+           * The selection mode of the action.
+           *
+           * A simple function value that wraps a {@link pentaho.visual.action.SelectionMode} function.
+           *
+           * @alias __selectionMode
+           * @memberOf pentaho.visual.action.Select#
+           * @type {?pentaho.type.Function}
+           * @private
+           */
+          this.__selectionMode = __getSelectionMode(value, "selectionMode");
         },
-        // endregion
+
+        /**
+         * Applies the action's [selectionMode]{@link pentaho.visual.action.Select#selectionMode} function to
+         * the [target view]{@link pentaho.visual.action.Select#target}'s
+         * [selectionFilter]{@link pentaho.visual.base.View#selectionFilter} and
+         * the action's [dataFilter]{@link pentaho.visual.action.Select#dataFilter}.
+         *
+         * The resulting data filter is set as the view's new `selectionFilter`.
+         *
+         * @return {?Promise} - The value `null`.
+         */
+        _doDefault: function() {
+
+          var view = this.target;
+
+          var selectionFilter = this.selectionMode.call(view, view.selectionFilter, this.dataFilter);
+
+          // NOTE: see related comment on View#selectionFilter.
+          view.selectionFilter = selectionFilter && selectionFilter.toDnf();
+
+          return null;
+        },
 
         // region serialization
         /** @inheritDoc */
-        _fillSpecInContext: function(spec, keyArgs) {
+        toSpecInContext: function(keyArgs) {
 
-          var any = this.base(spec, keyArgs);
+          var spec = this.base(keyArgs);
 
-          if(this.__defaultSelectionMode) {
-            spec.defaultSelectionMode = __serializeSelectionMode(this.__defaultSelectionMode, keyArgs);
-            any = true;
-          }
+          if(this.__selectionMode) spec.selectionMode = __serializeSelectionMode(this.__selectionMode, keyArgs);
 
-          return any;
+          return spec;
         }
         // endregion
-      },
+      });
 
       /**
-       * @alias Select
-       * @memberOf pentaho.visual.action
-       * @class
-       * @extends pentaho.visual.action.Data
+       * Gets a selection mode given its standard name and validates that, otherwise, it is a function.
        *
-       * @amd {pentaho.type.Factory<pentaho.visual.action.Select>} pentaho/visual/action/select
+       * @param {string|pentaho.visual.action.SelectionMode} value - The selection mode designator.
+       * @param {string} argName - The argument name, for error purposes.
        *
-       * @classDesc The `Select` action is a synchronous action that
-       * is performed when the user interacts with a visual element, typically by clicking on it.
-
-       * This action has the *alias* `"select"`,
-       * which can also be specified as the event name
-       * when calling [on]{@link pentaho.lang,IEventSource#on} of action targets.
+       * @return {pentaho.type.Function} A selection mode function wrapped in a simple function value.
        *
-       * See also the default action performed by this action type,
-       * [_doDefault]{@link pentaho.visual.action.Select#_doDefault}.
+       * @throws {pentaho.lang.ArgumentInvalidError} When `value` is a `string` which is not one of the
+       * [standard selection mode names]{@link pentaho.visual.action.SelectionModes}.
        *
-       * @description Creates a data action instance given its specification.
-       * @param {pentaho.visual.action.spec.ISelect} [spec] A selection action specification.
-       * @constructor
+       * @throws {pentaho.lang.ArgumentInvalidTypeError} When `value` is neither a `string` nor a `function`.
        *
-       * @see pentaho.visual.action.spec.ISelect
-       * @see pentaho.visual.action.spec.ISelectProto
-       * @see pentaho.visual.action.spec.ISelectTypeProto
+       * @private
        */
-      constructor: function(spec) {
+      function __getSelectionMode(value, argName) {
+        if(value != null) {
 
-        this.base(spec);
+          var name;
 
-        this.selectionMode = spec && spec.selectionMode;
-      },
-
-      /**
-       * Gets or sets the _selection mode_ of this action.
-       *
-       * Can only be set while the action is in an [editable]{@link pentaho.type.action.Base#isEditable} state.
-       *
-       * The default value is the value of
-       * [defaultSelectionMode]{@link pentaho.visual.action.Select.Type#defaultSelectionMode}.
-       *
-       * Setting to a {@link Nully} value assumes the default value.
-       *
-       * Can be set to the name of one of the standard selection modes,
-       * [SelectionModes]{@link pentaho.visual.action.SelectionModes},
-       * to assume the corresponding selection mode function.
-       *
-       * @type {!pentaho.visual.action.SelectionMode}
-       *
-       * @throws {pentaho.lang.OperationInvalidError} When set and the action is not in an editable state.
-       *
-       * @throws {pentaho.lang.ArgumentInvalidError} When set to a `string` which is not one of the
-       * standard selection mode names, [SelectionModes]{@link pentaho.visual.action.SelectionModes}.
-       *
-       * @throws {pentaho.lang.ArgumentInvalidTypeError} When set to a value which is not a `string` or a `function`.
-       */
-      get selectionMode() {
-
-        var fun = this.__selectionMode;
-        return fun ? fun.valueOf() : this.$type.defaultSelectionMode;
-      },
-
-      set selectionMode(value) {
-
-        this._assertEditable();
-
-        /**
-         * The selection mode of the action.
-         *
-         * A simple function value that wraps a {@link pentaho.visual.action.SelectionMode} function.
-         *
-         * @alias __selectionMode
-         * @memberOf pentaho.visual.action.Select#
-         * @type {?pentaho.type.Function}
-         * @private
-         */
-        this.__selectionMode = __getSelectionMode(value, "selectionMode");
-      },
-
-      /**
-       * Applies the action's [selectionMode]{@link pentaho.visual.action.Select#selectionMode} function to
-       * the [target view]{@link pentaho.visual.action.Select#target}'s
-       * [selectionFilter]{@link pentaho.visual.base.View#selectionFilter} and
-       * the action's [dataFilter]{@link pentaho.visual.action.Select#dataFilter}.
-       *
-       * The resulting data filter is set as the view's new `selectionFilter`.
-       *
-       * @return {?Promise} - The value `null`.
-       */
-      _doDefault: function() {
-
-        var view = this.target;
-
-        var selectionFilter = this.selectionMode.call(view, view.selectionFilter, this.dataFilter);
-
-        // NOTE: see related comment on View#selectionFilter.
-        view.selectionFilter = selectionFilter && selectionFilter.toDnf();
-
-        return null;
-      },
-
-      // region serialization
-      /** @inheritDoc */
-      toSpecInContext: function(keyArgs) {
-
-        var spec = this.base(keyArgs);
-
-        if(this.__selectionMode) spec.selectionMode = __serializeSelectionMode(this.__selectionMode, keyArgs);
-
-        return spec;
-      }
-      // endregion
-    });
-
-    /**
-     * Gets a selection mode given its standard name and validates that, otherwise, it is a function.
-     *
-     * @param {string|pentaho.visual.action.SelectionMode} value - The selection mode designator.
-     * @param {string} argName - The argument name, for error purposes.
-     *
-     * @return {pentaho.type.Function} A selection mode function wrapped in a simple function value.
-     *
-     * @throws {pentaho.lang.ArgumentInvalidError} When `value` is a `string` which is not one of the
-     * [standard selection mode names]{@link pentaho.visual.action.SelectionModes}.
-     *
-     * @throws {pentaho.lang.ArgumentInvalidTypeError} When `value` is neither a `string` nor a `function`.
-     *
-     * @private
-     */
-    function __getSelectionMode(value, argName) {
-      if(value != null) {
-
-        var name;
-
-        if(typeof value === "string") {
-          if(!O.hasOwn(SelectionModes, value)) {
-            throw new ArgumentInvalidError(argName, "Not one of the standard selection mode names.");
+          if(typeof value === "string") {
+            if(!O.hasOwn(SelectionModes, value)) {
+              throw new ArgumentInvalidError(argName, "Not one of the standard selection mode names.");
+            }
+            name = value;
+            value = SelectionModes[value];
+          } else if(!F.is(value)) {
+            throw new ArgumentInvalidTypeError(argName, ["string", "function"], typeof value);
           }
-          name = value;
-          value = SelectionModes[value];
-        } else if(!F.is(value)) {
-          throw new ArgumentInvalidTypeError(argName, ["string", "function"], typeof value);
+
+          var fun = new PenFunction(value);
+
+          // For serialization purposes
+          fun.selectionModeName = name;
+
+          return fun;
         }
 
-        var fun = new __PenFunction(value);
-
-        // For serialization purposes
-        fun.selectionModeName = name;
-
-        return fun;
+        return null;
       }
 
-      return null;
+      /**
+       * Serializes a simple function value constructed by `__getSelectionMode`.
+       *
+       * @param {!pentaho.type.Function} fun - A selection mode function wrapped in a simple function value.
+       * @param {?object} keyArgs - The serialization keyword arguments.
+       * @return {string} The function serialization.
+       * @private
+       */
+      function __serializeSelectionMode(fun, keyArgs) {
+
+        if(fun.selectionModeName) return fun.selectionModeName;
+
+        keyArgs = keyArgs ? Object.create(keyArgs) : {};
+
+        keyArgs.declaredType = PenFunction.type;
+
+        return this.__selectionMode.toSpecInContext(keyArgs);
+      }
     }
-
-    /**
-     * Serializes a simple function value constructed by `__getSelectionMode`.
-     *
-     * @param {!pentaho.type.Function} fun - A selection mode function wrapped in a simple function value.
-     * @param {?object} keyArgs - The serialization keyword arguments.
-     * @return {string} The function serialization.
-     * @private
-     */
-    function __serializeSelectionMode(fun, keyArgs) {
-
-      if(fun.selectionModeName) return fun.selectionModeName;
-
-      keyArgs = keyArgs ? Object.create(keyArgs) : {};
-
-      keyArgs.declaredType = __PenFunction.type;
-
-      return this.__selectionMode.toSpecInContext(keyArgs);
-    }
-  };
+  ];
 });

@@ -27,15 +27,12 @@ Create a file named `model.js` and place the following code in it:
 
 ```js
 define([
-  "module",
-  "pentaho/visual/base"
-], function(module, baseModelFactory) {
+  "module"
+], function(module) {
   
   "use strict";
   
-  return function(context) {
-    
-    var BaseModel = context.get(baseModelFactory);
+  return ["pentaho/visual/base/model", function(BaseModel) {
     
     var BarModel = BaseModel.extend({
       $type: {
@@ -68,16 +65,17 @@ define([
     });
     
     return BarModel;
-  };
+  }];
 });
 ```
 
 Remarks:
-  - The value of the AMD module is a factory function of Bar model classes.
+  - The value of the AMD module is an array of dependencies and of a factory function 
+    of Bar model classes.
   - Defines a visualization (model) whose id is the file's AMD module identifier
     (depending on how AMD is configured, it can be, for example: `pentaho/visual/samples/bar/model`).
   - Inherits directly from the base visualization model, 
-    [pentaho/visual/base]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}).
+    [pentaho/visual/base/model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}).
   - Specifies the [styleClass]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#styleClass'}}),
     which will later be useful to style the component using CSS.
   - Specifies the

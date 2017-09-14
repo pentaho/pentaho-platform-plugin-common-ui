@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 define([
-  "module",
-  "./data"
-], function(module, dataActionFactory) {
+  "module"
+], function(module) {
 
   "use strict";
 
-  return function(context) {
+  return ["pentaho/visual/action/data", function(DataAction) {
 
     /**
      * @name pentaho.visual.action.Execute.Type
@@ -32,15 +31,13 @@ define([
      * For more information see {@link pentaho.visual.action.Execute}.
      */
 
-    var DataAction = context.get(dataActionFactory);
-
     /**
      * @name Execute
      * @memberOf pentaho.visual.action
      * @class
      * @extends pentaho.visual.action.Data
      *
-     * @amd {pentaho.type.Factory<pentaho.visual.action.Execute>} pentaho/visual/action/execute
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.action.Execute>} pentaho/visual/action/execute
      *
      * @classDesc The `Execute` action is a synchronous action that is performed when
      * the user interacts with a visual element, typically by double clicking it.
@@ -55,5 +52,5 @@ define([
         alias: "execute"
       }
     });
-  };
+  }];
 });

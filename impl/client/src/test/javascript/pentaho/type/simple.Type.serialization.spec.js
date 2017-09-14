@@ -24,9 +24,19 @@ define([
 
   describe("pentaho.type.Simple.Type", function() {
 
+    var context;
+    var Simple;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Simple  = context.get("pentaho/type/simple");
+          })
+          .then(done, done.fail);
+    });
+
     describe("#_fillSpecInContext(spec, keyArgs)", function() {
-      var context = new Context();
-      var Simple  = context.get("pentaho/type/simple");
 
       it("should return false when there are no attributes to serialize", function() {
         var spec = {};
@@ -42,7 +52,7 @@ define([
       });
 
       describe("#cast", function() {
-        serializationUtil.itFillSpecMethodAttribute(Simple, "cast");
+        serializationUtil.itFillSpecMethodAttribute(function() { return Simple; }, "cast");
 
         it("should not serialize when value is local and isJson: true", function() {
           var spec = {};

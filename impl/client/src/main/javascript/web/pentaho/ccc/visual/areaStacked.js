@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 define([
-  "module",
-  "pentaho/visual/models/areaStacked",
-  "./areaAbstract"
-], function(module, modelFactory, baseViewFactory) {
+  "module"
+], function(module) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/ccc/visual/areaAbstract",
+    "pentaho/visual/models/areaStacked",
+    function(BaseView, Model) {
 
-    var BaseView = context.get(baseViewFactory);
+      return BaseView.extend({
+        _cccClass: "StackedAreaChart",
 
-    return BaseView.extend({
-      _cccClass: "StackedAreaChart",
-
-      $type: {
-        id: module.id,
-        props: {
-          model: {valueType: modelFactory}
+        $type: {
+          id: module.id,
+          props: {
+            model: {valueType: Model}
+          }
         }
-      }
-    });
-  };
+      });
+    }
+  ];
 });

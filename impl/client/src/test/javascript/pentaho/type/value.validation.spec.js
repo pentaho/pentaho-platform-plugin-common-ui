@@ -23,11 +23,22 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
 
-  var context = new Context(),
-      Value = context.get("pentaho/type/value"),
-      PentahoNumber = context.get("pentaho/type/number");
-
   describe("pentaho.type.Value -", function() {
+
+    var context;
+    var Value;
+    var PentahoNumber;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Value = context.get("pentaho/type/value");
+            PentahoNumber = context.get("pentaho/type/number")
+          })
+          .then(done, done.fail);
+    });
+
     describe("#validate()", function() {
       it("should return null", function() {
         var va = new Value();
@@ -105,6 +116,20 @@ define([
 
   describe("pentaho.type.Value.Type -", function() {
 
+    var context;
+    var Value;
+    var PentahoNumber;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Value = context.get("pentaho/type/value");
+            PentahoNumber = context.get("pentaho/type/number")
+          })
+          .then(done, done.fail);
+    });
+
     describe("#isValid(value) -", function() {
       it("should call .validate(.)", function() {
         var va = new Value();
@@ -162,6 +187,7 @@ define([
       });
 
       it("should call the _validate method with the value when it is an instance of the type", function() {
+
         spyOn(Value.type, "_validate").and.callThrough();
 
         var value = new Value();

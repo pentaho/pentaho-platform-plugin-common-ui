@@ -17,12 +17,13 @@
 /**
  * The `config.spec.IRuleSelector` interface describes
  * the criteria map that determines if a rule is selected
- * for a given type and environment variables.
+ * for a given instance or type and environment variables.
  *
  * It is the type of the [select]{@link pentaho.config.spec.IRule#select} property
  * of a configuration rule.
  *
- * Besides the [type]{@link pentaho.config.spec.IRuleSelector#type} property,
+ * Besides the [instance]{@link pentaho.config.spec.IRuleSelector#instance} and
+ * [type]{@link pentaho.config.spec.IRuleSelector#type} properties,
  * this interface allows filtering on any of the [context properties]{@link pentaho.environment.IEnvironment}.
  *
  * @name pentaho.config.spec.IRuleSelector
@@ -32,9 +33,21 @@
  */
 
 /**
+ * The identifier or identifiers of the instances that the rule applies to.
+ *
+ * Either this property or [type]{@link pentaho.config.spec.IRuleSelector#type} must be specified.
+ * When both are specified, `type` is ignored.
+ *
+ * @name instance
+ * @memberOf pentaho.config.spec.IRuleSelector#
+ * @type {pentaho.type.spec.UEnvironmentPropFilter<string>}
+ */
+
+/**
  * The identifier or identifiers of the types that the rule applies to.
  *
- * This property is required.
+ * Either this property or [instance]{@link pentaho.config.spec.IRuleSelector#instance} must be specified.
+ * When both are specified, this one is ignored.
  *
  * @name type
  * @memberOf pentaho.config.spec.IRuleSelector#

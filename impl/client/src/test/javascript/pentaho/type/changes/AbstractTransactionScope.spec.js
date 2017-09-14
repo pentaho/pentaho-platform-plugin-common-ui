@@ -36,11 +36,21 @@ define([
       });
     }
 
+    var context;
+
     describe("new(context, transaction)", function() {
-      var context, scope, txn;
+      var scope;
+      var txn;
+
+      beforeEach(function(done) {
+        Context.createAsync()
+            .then(function(_context) {
+              context = _context;
+            })
+            .then(done, done.fail);
+      });
 
       beforeEach(function() {
-        context = new Context();
         txn = new Transaction(context);
       });
 
@@ -50,7 +60,6 @@ define([
           scope = null;
         }
         txn = null;
-        context = null;
       });
 
       it("should be defined", function () {
@@ -129,17 +138,27 @@ define([
 
     describe("#exit({sloppy})", function() {
 
-      it("should set isInside to false after being called", function() {
+      describe("with context", function() {
 
-        var context = new Context();
-        var txn = new Transaction(context);
-        var scope = new AbstractTransactionScope(context, txn);
+        beforeEach(function(done) {
+          Context.createAsync()
+              .then(function(_context) {
+                context = _context;
+              })
+              .then(done, done.fail);
+        });
 
-        expect(scope.isInside).toBe(true);
+        it("should set isInside to false after being called", function() {
 
-        scope.exit();
+          var txn = new Transaction(context);
+          var scope = new AbstractTransactionScope(context, txn);
 
-        expect(scope.isInside).toBe(false);
+          expect(scope.isInside).toBe(true);
+
+          scope.exit();
+
+          expect(scope.isInside).toBe(false);
+        });
       });
 
       testUtils.itAsync("should log a warning when called and already exited from", function() {
@@ -151,22 +170,23 @@ define([
           "pentaho/util/logger"
         ], mockLogger, function(Context, Transaction, AbstractTransactionScope, logger) {
 
-          var context = new Context();
-          var txn     = new Transaction(context);
-          var scope   = new AbstractTransactionScope(context, txn);
+          return Context.createAsync().then(function(context) {
+            var txn = new Transaction(context);
+            var scope = new AbstractTransactionScope(context, txn);
 
-          // This call is legal and should not log.
-          scope.exit();
-          expect(scope.isInside).toBe(false);
+            // This call is legal and should not log.
+            scope.exit();
+            expect(scope.isInside).toBe(false);
 
-          // ----
+            // ----
 
-          // This call should log a warning.
-          scope.exit();
+            // This call should log a warning.
+            scope.exit();
 
-          // ---
+            // ---
 
-          expect(logger.warn).toHaveBeenCalled();
+            expect(logger.warn).toHaveBeenCalled();
+          });
         });
       });
 
@@ -180,22 +200,24 @@ define([
           "pentaho/util/logger"
         ], mockLogger, function(Context, Transaction, AbstractTransactionScope, logger) {
 
-          var context = new Context();
-          var txn     = new Transaction(context);
-          var scope   = new AbstractTransactionScope(context, txn);
+          return Context.createAsync().then(function(context) {
 
-          // This call is legal and should not log.
-          scope.exit();
-          expect(scope.isInside).toBe(false);
+            var txn = new Transaction(context);
+            var scope = new AbstractTransactionScope(context, txn);
 
-          // ----
+            // This call is legal and should not log.
+            scope.exit();
+            expect(scope.isInside).toBe(false);
 
-          // This call would log a warning.
-          scope.exit({sloppy: true});
+            // ----
 
-          // ---
+            // This call would log a warning.
+            scope.exit({sloppy: true});
 
-          expect(logger.warn).not.toHaveBeenCalled();
+            // ---
+
+            expect(logger.warn).not.toHaveBeenCalled();
+          });
         });
       });
 
@@ -208,24 +230,26 @@ define([
           "pentaho/util/logger"
         ], mockLogger, function(Context, Transaction, AbstractTransactionScope, logger) {
 
-          var context = new Context();
-          var txn     = new Transaction(context);
-          var scope1  = new AbstractTransactionScope(context, txn);
-          var scope2  = new AbstractTransactionScope(context, txn);
+          return Context.createAsync().then(function(context) {
 
-          expect(scope1.isInside ).toBe(true);
-          expect(scope1.isCurrent).toBe(false);
+            var txn    = new Transaction(context);
+            var scope1 = new AbstractTransactionScope(context, txn);
+            var scope2 = new AbstractTransactionScope(context, txn);
 
-          expect(scope2.isCurrent).toBe(true);
+            expect(scope1.isInside ).toBe(true);
+            expect(scope1.isCurrent).toBe(false);
 
-          // This call is not legal and should log a warning.
-          scope1.exit();
+            expect(scope2.isCurrent).toBe(true);
 
-          // ---
+            // This call is not legal and should log a warning.
+            scope1.exit();
 
-          expect(logger.warn).toHaveBeenCalled();
+            // ---
 
-          scope2.exit();
+            expect(logger.warn).toHaveBeenCalled();
+
+            scope2.exit();
+          });
         });
       });
 
@@ -238,33 +262,42 @@ define([
           "pentaho/util/logger"
         ], mockLogger, function(Context, Transaction, AbstractTransactionScope, logger) {
 
-          var context = new Context();
-          var txn     = new Transaction(context);
-          var scope1  = new AbstractTransactionScope(context, txn);
-          var scope2  = new AbstractTransactionScope(context, txn);
+          return Context.createAsync().then(function(context) {
 
-          expect(scope1.isInside ).toBe(true);
-          expect(scope1.isCurrent).toBe(false);
+            var txn    = new Transaction(context);
+            var scope1 = new AbstractTransactionScope(context, txn);
+            var scope2 = new AbstractTransactionScope(context, txn);
 
-          expect(scope2.isCurrent).toBe(true);
+            expect(scope1.isInside ).toBe(true);
+            expect(scope1.isCurrent).toBe(false);
 
-          // This call is not legal and should log a warning.
-          scope1.exit({sloppy: true});
+            expect(scope2.isCurrent).toBe(true);
 
-          // ---
+            // This call is not legal and should log a warning.
+            scope1.exit({sloppy: true});
 
-          expect(logger.warn).not.toHaveBeenCalled();
+            // ---
 
-          scope2.exit();
+            expect(logger.warn).not.toHaveBeenCalled();
+
+            scope2.exit();
+          });
         });
       });
     });
 
     describe("#dispose()", function() {
 
+      beforeEach(function(done) {
+        Context.createAsync()
+            .then(function(_context) {
+              context = _context;
+            })
+            .then(done, done.fail);
+      });
+
       it("should call exit with keyArgs.sloppy = true", function() {
 
-        var context = new Context();
         var txn = new Transaction(context);
         var scope = new AbstractTransactionScope(context, txn);
 
@@ -282,10 +315,18 @@ define([
     });
 
     describe("#using(fun, ctx)", function() {
-      var context, txn, scope;
+      var txn;
+      var scope;
+
+      beforeEach(function(done) {
+        Context.createAsync()
+            .then(function(_context) {
+              context = _context;
+            })
+            .then(done, done.fail);
+      });
 
       beforeEach(function() {
-        context = new Context();
         txn = new Transaction(context);
         scope = new AbstractTransactionScope(context, txn);
       });
@@ -379,8 +420,15 @@ define([
 
     describe("#_assertInsideAndCurrent()", function() {
 
+      beforeEach(function(done) {
+        Context.createAsync()
+            .then(function(_context) {
+              context = _context;
+            })
+            .then(done, done.fail);
+      });
+
       it("should not throw when inside and current", function() {
-        var context = new Context();
         var txn = new Transaction(context);
         var scope = new AbstractTransactionScope(context, txn);
 
@@ -392,7 +440,6 @@ define([
       });
 
       it("should throw when inside but not current", function() {
-        var context = new Context();
         var txn = new Transaction(context);
         var scope1 = new AbstractTransactionScope(context, txn);
         var scope2 = new AbstractTransactionScope(context, txn);
@@ -406,7 +453,6 @@ define([
       });
 
       it("should throw when not inside", function() {
-        var context = new Context();
         var txn = new Transaction(context);
         var scope = new AbstractTransactionScope(context, txn);
 

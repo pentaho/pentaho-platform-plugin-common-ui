@@ -24,7 +24,8 @@ define(function() {
    * Known Application Ids:
    * 1. PDI Data Inspection - "pentaho-det"
    * 2. Pentaho Analyzer - "pentaho-analyzer"
-   * 3. Pentaho CDF/CDE - "pentaho-cdf"
+   * 3. Pentaho Analyzer in Dashboards - "pentaho-dashboards"
+   * 4. Pentaho CDF/CDE - "pentaho-cdf"
    *
    * Pentaho stock visualizations' model ids:
    * 1. Pie - "pentaho/visual/models/areaStacked"
@@ -61,7 +62,21 @@ define(function() {
    * 15. Geo Map - "pentaho/geo/visual/map"
    *
    * Sample visualization model ids:
-   * 1. Calculator - "pentaho/visual/samples/calc"
+   * 1. Calculator - "pentaho/visual/samples/calc/model"
+   *
+   * Pentaho stock color palettes' ids:
+   * 1. pentaho/visual/color/palettes/nominalPrimary
+   * 2. pentaho/visual/color/palettes/nominalNeutral
+   * 3. pentaho/visual/color/palettes/nominalLight
+   * 4. pentaho/visual/color/palettes/nominalDark
+   * 5. pentaho/visual/color/palettes/quantitativeBlue3
+   * 6. pentaho/visual/color/palettes/quantitativeBlue5
+   * 7. pentaho/visual/color/palettes/quantitativeGray3
+   * 8. pentaho/visual/color/palettes/quantitativeGray5
+   * 9. pentaho/visual/color/palettes/divergentRyb3
+   * 10. pentaho/visual/color/palettes/divergentRyb5
+   * 11. pentaho/visual/color/palettes/divergentRyg3
+   * 12. pentaho/visual/color/palettes/divergentRyg5
    */
   return {
     rules: [
@@ -112,7 +127,7 @@ define(function() {
       },
       */
 
-      // Example Rule 4 - Use CCC extension points to change the Donut CCC view's inner radius.
+      // Example Rule 4 - Use CCC extension points to change the Donut CCC view's inner radius, in Pentaho Analyzer.
       /*
       {
         select: {
@@ -122,6 +137,73 @@ define(function() {
         apply: {
           extension: {
             slice_innerRadiusEx: "40%"
+          }
+        }
+      },
+      */
+
+      // Example Rule 5 - Change the colors of the default discrete color palette, in any application.
+      /*
+      {
+        select: {
+          instance: "pentaho/visual/color/palettes/nominalPrimary"
+        },
+        apply: {
+          colors: [
+            "red", "#00FF00", "rgb(0, 0, 255)"
+          ]
+        }
+      },
+      */
+
+      // Example Rule 6 - Change the colors of the bar chart visualization, in any application
+      /*
+      {
+        select: {
+          type: "pentaho/visual/models/bar"
+        },
+        apply: {
+          props: {
+            palette: {
+              defaultValue: {
+                level: "nominal",
+                colors: ["red", "#00FF00", "rgb(0, 0, 255)"]
+              }
+            }
+          }
+        }
+      },
+      */
+
+      // Example Rule 7 - Change the colors of the bar chart visualization, in any application,
+      // by using a registered palette
+      /*
+       {
+        select: {
+          type: "pentaho/visual/models/bar"
+        },
+        apply: {
+          props: {
+            palette: {
+              defaultValue: {
+                $instance: {id: "pentaho/visual/color/palettes/nominalLight"}
+              }
+            }
+          }
+        }
+      },
+      */
+
+      // Example Rule 8 - Reduce the ranking of the "nominalPrimary" palette,
+      // so that another palette gets chosen first instead.
+      /*
+      {
+        select: {
+          type: "pentaho/type/Context"
+        },
+        apply: {
+          instances: {
+            "pentaho/visual/color/palettes/nominalPrimary": {ranking: -1000}
           }
         }
       }

@@ -15,87 +15,87 @@
  */
 define([
   "module",
-  "pentaho/visual/models/categoricalContinuousAbstract",
-  "./cartesianAbstract",
   "cdf/lib/CCC/def"
-], function(module, modelFactory, baseViewFactory, def) {
+], function(module, def) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/ccc/visual/cartesianAbstract",
+    "pentaho/visual/models/categoricalContinuousAbstract",
+    function(BaseView, Model) {
 
-    var BaseView = context.get(baseViewFactory);
-
-    return BaseView.extend({
-      $type: {
-        id: module.id,
-        props: {
-          model: {valueType: modelFactory}
-        }
-      },
-
-      _genericMeasureCccVisualRole: "value",
-
-      _isAxisTitleVisible: function(type) {
-        return !this._hasMultiChartColumns || type === "ortho";
-      },
-
-      _getOrthoAxisTitle: function() {
-        var roleNames = def.getOwn(this._rolesByCccVisualRole, this._genericMeasureCccVisualRole);
-        return roleNames ? this._getMeasureRoleTitle(roleNames[0]) : "";
-      },
-
-      _getBaseAxisTitle: function() {
-        var roleNames = def.getOwn(this._rolesByCccVisualRole, "category");
-        return roleNames ? this._getDiscreteRolesTitle(roleNames) : "";
-      },
-
-      _isBaseAxisQualitative: function() {
-        var roleNames = def.getOwn(this._rolesByCccVisualRole, "category");
-        return !!roleNames && this._isRoleQualitative(roleNames[0]);
-      },
-
-      _configureOptions: function() {
-
-        this.base();
-
-        this._configureAxisRange(/* isPrimary: */true, "ortho");
-
-        var options = this.options;
-        if(options.orientation === "vertical") {
-          if(this._isBaseAxisQualitative()) {
-            options.xAxisLabel_textAngle = -Math.PI / 4;
-            options.xAxisLabel_textAlign = "right";
-            options.xAxisLabel_textBaseline = "top";
+      return BaseView.extend({
+        $type: {
+          id: module.id,
+          props: {
+            model: {valueType: Model}
           }
-        } else {
-          options.xAxisPosition = "top";
+        },
+
+        _genericMeasureCccVisualRole: "value",
+
+        _isAxisTitleVisible: function(type) {
+          return !this._hasMultiChartColumns || type === "ortho";
+        },
+
+        _getOrthoAxisTitle: function() {
+          var roleNames = def.getOwn(this._rolesByCccVisualRole, this._genericMeasureCccVisualRole);
+          return roleNames ? this._getMeasureRoleTitle(roleNames[0]) : "";
+        },
+
+        _getBaseAxisTitle: function() {
+          var roleNames = def.getOwn(this._rolesByCccVisualRole, "category");
+          return roleNames ? this._getDiscreteRolesTitle(roleNames) : "";
+        },
+
+        _isBaseAxisQualitative: function() {
+          var roleNames = def.getOwn(this._rolesByCccVisualRole, "category");
+          return !!roleNames && this._isRoleQualitative(roleNames[0]);
+        },
+
+        _configureOptions: function() {
+
+          this.base();
+
+          this._configureAxisRange(/* isPrimary: */true, "ortho");
+
+          var options = this.options;
+          if(options.orientation === "vertical") {
+            if(this._isBaseAxisQualitative()) {
+              options.xAxisLabel_textAngle = -Math.PI / 4;
+              options.xAxisLabel_textAlign = "right";
+              options.xAxisLabel_textBaseline = "top";
+            }
+          } else {
+            options.xAxisPosition = "top";
+          }
+        },
+
+        _configureDisplayUnits: function() {
+          this.base();
+
+          this._configureAxisDisplayUnits(/* isPrimary: */true, "ortho");
+        },
+
+        _createChart: function(ChartClass, options) {
+
+          var chart = this.base(ChartClass, options);
+
+          var visualElemsCountMax = this._getVisualElementsCountMax();
+          if(visualElemsCountMax > 0) {
+            var me = this;
+            chart.override("_onWillCreatePlotPanelScene", function(plotPanel, data, axisSeriesDatas, axisCategDatas) {
+              var S = axisSeriesDatas.length;
+              var C = axisCategDatas.length;
+              var visualElemsCount = S * C;
+              me._validateVisualElementsCount(visualElemsCount, visualElemsCountMax);
+            });
+          }
+
+          return chart;
         }
-      },
-
-      _configureDisplayUnits: function() {
-        this.base();
-
-        this._configureAxisDisplayUnits(/* isPrimary: */true, "ortho");
-      },
-
-      _createChart: function(ChartClass, options) {
-
-        var chart = this.base(ChartClass, options);
-
-        var visualElemsCountMax = this._getVisualElementsCountMax();
-        if(visualElemsCountMax > 0) {
-          var me = this;
-          chart.override("_onWillCreatePlotPanelScene", function(plotPanel, data, axisSeriesDatas, axisCategDatas) {
-            var S = axisSeriesDatas.length;
-            var C = axisCategDatas.length;
-            var visualElemsCount = S * C;
-            me._validateVisualElementsCount(visualElemsCount, visualElemsCountMax);
-          });
-        }
-
-        return chart;
-      }
-    });
-  };
+      });
+    }
+  ];
 });

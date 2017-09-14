@@ -23,9 +23,19 @@ define([
 
   describe("pentaho.type.Instance -", function() {
 
-    var context = new Context();
-    var Instance = context.get("instance");
-    var Type = Instance.Type;
+    var context;
+    var Instance;
+    var Type;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Instance = context.get("instance");
+            Type = Instance.Type;
+          })
+          .then(done, done.fail);
+    });
 
     it("is a function", function() {
       expect(typeof Instance).toBe("function");

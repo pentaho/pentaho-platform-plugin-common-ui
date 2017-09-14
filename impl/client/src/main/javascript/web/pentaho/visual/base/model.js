@@ -15,141 +15,160 @@
  */
 define([
   "module",
+  "pentaho/i18n!model",
+
+  // so that r.js sees otherwise invisible dependencies.
   "pentaho/type/model",
-  "./application",
-  "../role/property",
-  "pentaho/i18n!model"
-], function(module, modelFactory, visualApplicationFactory, rolePropertyFactory, bundle) {
+  "pentaho/visual/role/property",
+  "pentaho/visual/color/paletteProperty",
+  "pentaho/visual/base/application"
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/type/model",
+    "pentaho/visual/role/property",
+    "pentaho/visual/color/paletteProperty",
+    "pentaho/visual/base/application",
+    function(Model, RoleProperty, PaletteProperty, VisualApplication) {
 
-    var Model = context.get(modelFactory);
-    var _rolePropertyType = context.get(rolePropertyFactory).type;
+      var _rolePropertyType = RoleProperty.type;
+      var _palettePropertyType = PaletteProperty.type;
 
-    /**
-     * @name pentaho.visual.base.Model.Type
-     * @class
-     * @extends pentaho.type.Model.Type
-     *
-     * @classDesc The base class of visual model types.
-     *
-     * For more information see {@link pentaho.visual.base.Model}.
-     */
+      /**
+       * @name pentaho.visual.base.Model.Type
+       * @class
+       * @extends pentaho.type.Model.Type
+       *
+       * @classDesc The base class of visual model types.
+       *
+       * For more information see {@link pentaho.visual.base.Model}.
+       */
 
-    /**
-     * @name Model
-     * @memberOf pentaho.visual.base
-     * @class
-     * @extends pentaho.type.Model
-     * @abstract
-     *
-     * @amd {pentaho.type.Factory<pentaho.visual.base.Model>} pentaho/visual/base
-     *
-     * @classDesc The `Model` class is the abstract base class of visualization models.
-     *
-     * @constructor
-     * @description Creates a visualization `Model` instance.
-     * @param {pentaho.visual.base.spec.IModel} [modelSpec] A plain object containing the model specification.
-     */
-    var VisualModel = Model.extend(/** @lends pentaho.visual.base.Model# */{
+      /**
+       * @name Model
+       * @memberOf pentaho.visual.base
+       * @class
+       * @extends pentaho.type.Model
+       * @abstract
+       *
+       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.base.Model>} pentaho/visual/base/model
+       *
+       * @classDesc The `Model` class is the abstract base class of visualization models.
+       *
+       * @constructor
+       * @description Creates a visualization `Model` instance.
+       * @param {pentaho.visual.base.spec.IModel} [modelSpec] A plain object containing the model specification.
+       */
+      var VisualModel = Model.extend(/** @lends pentaho.visual.base.Model# */{
 
-      // region serialization
-      /** @inheritDoc */
-      toSpecInContext: function(keyArgs) {
+        // region serialization
+        /** @inheritDoc */
+        toSpecInContext: function(keyArgs) {
 
-        if(keyArgs && keyArgs.isJson) {
-          keyArgs = keyArgs ? Object.create(keyArgs) : {};
+          if(keyArgs && keyArgs.isJson) {
+            keyArgs = keyArgs ? Object.create(keyArgs) : {};
 
-          var omitProps = keyArgs.omitProps;
-          keyArgs.omitProps = omitProps = omitProps ? Object.create(omitProps) : {};
+            var omitProps = keyArgs.omitProps;
+            keyArgs.omitProps = omitProps = omitProps ? Object.create(omitProps) : {};
 
-          // Only isJson serialization does not work with the value of `data`
-          // due to the circular dependencies it contains.
-          if(omitProps.data == null) omitProps.data = true;
-        }
+            // Only isJson serialization does not work with the value of `data`
+            // due to the circular dependencies it contains.
+            if(omitProps.data == null) omitProps.data = true;
+          }
 
-        return this.base(keyArgs);
-      },
-      // endregion
+          return this.base(keyArgs);
+        },
+        // endregion
 
-      $type: /** @lends pentaho.visual.base.Model.Type# */{
-        sourceId: module.id,
-        id: module.id.replace(/.\w+$/, ""),
-        defaultView: "./view",
-        isAbstract: true,
+        $type: /** @lends pentaho.visual.base.Model.Type# */{
+          id: module.id,
+          defaultView: "./view",
+          isAbstract: true,
 
-        props: [
+          props: [
+            /**
+             * Gets or sets the visual application object.
+             *
+             * The application object represents the relevant state and
+             * interface of the application in which a model is being used.
+             *
+             * This property does not serialize to JSON by default.
+             *
+             * @name application
+             * @memberOf pentaho.visual.base.Model#
+             * @type {pentaho.visual.base.Application}
+             */
+            {
+              name: "application",
+              valueType: VisualApplication
+            },
+
+            /**
+             * Gets or sets the data of the visualization.
+             *
+             * This property does not serialize to JSON by default.
+             *
+             * @name data
+             * @memberOf pentaho.visual.base.Model#
+             * @type {pentaho.data.ITable}
+             */
+            {
+              name: "data",
+              valueType: "object",
+              isRequired: true
+            }
+          ],
+
           /**
-           * Gets or sets the visual application object.
+           * Calls a function for each defined visual role property type.
            *
-           * The application object represents the relevant state and
-           * interface of the application in which a model is being used.
+           * A visual role property type is a property type which is a subtype of {@link pentaho.visual.role.Property}.
            *
-           * This property does not serialize to JSON by default.
+           * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} f - The mapping
+           * function. Return `false` to break iteration.
            *
-           * @name application
-           * @memberOf pentaho.visual.base.Model#
-           * @type {pentaho.visual.base.Application}
+           * @param {Object} [x] The JS context object on which `f` is called.
+           *
+           * @return {!pentaho.visual.base.Model} This object.
            */
-          {
-            name: "application",
-            valueType: visualApplicationFactory
+          eachVisualRole: function(f, x) {
+            var j = 0;
+            this.each(function(propType) {
+              if(this.isVisualRole(propType) && f.call(x, propType, j++, this) === false) {
+                return false;
+              }
+            }, this);
+            return this;
           },
 
           /**
-           * Gets or sets the data of the visualization.
+           * Gets a value that indicates if a given property type is a subtype of
+           * {@link pentaho.visual.role.Property.Type}.
            *
-           * This property does not serialize to JSON by default.
-           *
-           * @name data
-           * @memberOf pentaho.visual.base.Model#
-           * @type {pentaho.data.ITable}
+           * @param {!pentaho.type.Property.Type} propType - The property type to test.
+           * @return {boolean} `true` if `type` is a visual role property type; or `false`, otherwise.
            */
-          {
-            name: "data",
-            valueType: "object",
-            isRequired: true
+          isVisualRole: function(propType) {
+            return propType.isSubtypeOf(_rolePropertyType);
+          },
+
+          /**
+           * Gets a value that indicates if a given property type is a subtype of
+           * {@link pentaho.visual.color.PaletteProperty.Type}.
+           *
+           * @param {!pentaho.type.Property.Type} propType - The property type to test.
+           * @return {boolean} `true` if `type` is a color palette property type; or `false`, otherwise.
+           */
+          isColorPalette: function(propType) {
+            return propType.isSubtypeOf(_palettePropertyType);
           }
-        ],
-
-        /**
-         * Calls a function for each defined visual role property type.
-         *
-         * A visual role property type is a property type which is a subtype of {@link pentaho.visual.role.Property}.
-         *
-         * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} f - The mapping
-         * function. Return `false` to break iteration.
-         *
-         * @param {Object} [x] The JS context object on which `f` is called.
-         *
-         * @return {!pentaho.visual.base.Model} This object.
-         */
-        eachVisualRole: function(f, x) {
-          var j = 0;
-          this.each(function(propType) {
-            if(this.isVisualRole(propType) && f.call(x, propType, j++, this) === false) {
-              return false;
-            }
-          }, this);
-          return this;
-        },
-
-        /**
-         * Gets a value that indicates if a given property type is a subtype of
-         * {@link pentaho.visual.role.Property.Type}.
-         *
-         * @param {!pentaho.type.Property.Type} propType - The property type to test.
-         * @return {boolean} `true` if `type` is a visual role property type; or `false`, otherwise.
-         */
-        isVisualRole: function(propType) {
-          return propType.isSubtypeOf(_rolePropertyType);
         }
-      }
-    })
-    .implement({$type: bundle.structured.type});
+      })
+      .implement({$type: bundle.structured.type});
 
-    return VisualModel;
-  };
+      return VisualModel;
+    }
+  ];
 });

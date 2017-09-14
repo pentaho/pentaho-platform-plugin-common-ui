@@ -22,7 +22,9 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, spyOn:false, jasmine:false*/
 
-  describe("pentaho.util.promise -", function() {
+  /* eslint dot-notation: 0 */
+
+  describe("pentaho.util.promise", function() {
 
     describe("wrapCall(fun(, ctx))", function() {
 
@@ -185,9 +187,15 @@ define([
     });
 
     describe("finally(promise, fun(, ctx))", function() {
-      var promise = Promise.resolve(1);
+
+      var promise;
+
+      beforeEach(function() {
+        promise = Promise.resolve(1);
+      });
 
       it("should throw if promise is not specified", function() {
+
         function expectIt(args) {
           expect(function() {
 
@@ -222,7 +230,7 @@ define([
       it("should return a new promise", function() {
         var result = promiseUtil["finally"](promise, function() {});
         expect(result).not.toBe(promise);
-        expect(result instanceof Promise).toBe(true);
+        expect(typeof result.then).toBe("function");
       });
 
       it("should call function when the promise gets fulfilled", function(done) {

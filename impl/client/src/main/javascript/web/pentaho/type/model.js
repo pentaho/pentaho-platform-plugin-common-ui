@@ -15,15 +15,12 @@
  */
 define([
   "module",
-  "./complex",
   "../i18n!types"
-], function(module, complexFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
-
-    var Complex = context.get(complexFactory);
+  return ["complex", "application", function(Complex, Application) {
 
     /**
      * @name pentaho.type.Model.Type
@@ -40,7 +37,7 @@ define([
      * @class
      * @extends pentaho.type.Complex
      *
-     * @amd {pentaho.type.Factory<pentaho.type.Model>} pentaho/type/model
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Model>} pentaho/type/model
      *
      * @classDesc The base class of model values.
      *
@@ -90,7 +87,7 @@ define([
            */
           {
             name: "application",
-            valueType: "pentaho/type/application"
+            valueType: Application
           }
         ]
       }
@@ -100,5 +97,5 @@ define([
     });
 
     return Model;
-  };
+  }];
 });

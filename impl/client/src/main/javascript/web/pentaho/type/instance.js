@@ -25,15 +25,15 @@ define([
 
   "use strict";
 
-  return function(context) {
+  return [function() {
 
-    var Type = typeFactory(context);
+    var Type = typeFactory.call(this);
 
     /**
      * @name pentaho.type.Instance
      * @class
      * @abstract
-     * @amd {pentaho.type.Factory<pentaho.type.Instance>} pentaho/type/instance
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Instance>} pentaho/type/instance
      *
      * @classDesc The root, abstract class of things that can be represented by the Pentaho Type API.
      *
@@ -68,39 +68,44 @@ define([
      * </caption>
      *
      * require(["pentaho/type/Context"], function(Context) {
-     *   var context = new Context();
-     *   var Instance = context.get("instance");
      *
-     *   var Derived = Instance.extend({
-     *     constructor: function(label) {
-     *       this.label = label;
-     *     },
-     *     $type: { // type specification
-     *       greeting: "Hello, ",
-     *       veryLongString: "..."
-     *     },
-     *     saySomething: function() {
-     *       console.log(this.$type.greeting + this.label + "!");
-     *     }
+     *   Context.createAsync(function(context) {
+     *
+     *     var Instance = context.get("instance");
+     *
+     *     var Derived = Instance.extend({
+     *       constructor: function(label) {
+     *         this.label = label;
+     *       },
+     *       $type: { // type specification
+     *         greeting: "Hello, ",
+     *         veryLongString: "..."
+     *       },
+     *       saySomething: function() {
+     *         console.log(this.$type.greeting + this.label + "!");
+     *       }
+     *     });
+     *
+     *     var a = new Derived("Alice");
+     *     a.saySomething(); // "Hello, Alice!"
+     *
+     *     var b = new Derived("Bob");
+     *     b.saySomething(); // "Hello, Bob!"
+     *
+     *     // All instances share the same _type_:
+     *     b.$type.greeting ===  a.$type.greeting // true
      *   });
-     *
-     *   var a = new Derived("Alice");
-     *   a.saySomething(); // "Hello, Alice!"
-     *
-     *   var b = new Derived("Bob");
-     *   b.saySomething(); // "Hello, Bob!"
-     *
-     *   // All instances share the same _type_:
-     *   b.$type.greeting ===  a.$type.greeting // true
      * });
      *
      * @description Creates an instance of this type.
      *
+     * @see pentaho.type.spec.UInstanceModule
+     * @see pentaho.type.spec.UTypeModule
      * @see pentaho.type.spec.IInstance
      * @see pentaho.type.spec.IInstanceProto
      * @see pentaho.type.spec.ITypeProto
      */
-    var Instance = Base.extend("pentaho.type.instance", /** @lends pentaho.type.Instance# */{
+    var Instance = Base.extend("pentaho.type.Instance", /** @lends pentaho.type.Instance# */{
       // NOTE: not calling base to block default Base.js from copying 1st argument into `this`.
       constructor: function() {
       },
@@ -296,5 +301,5 @@ define([
     Type.implement(bundle.structured.instance);
 
     return Instance;
-  };
+  }];
 });

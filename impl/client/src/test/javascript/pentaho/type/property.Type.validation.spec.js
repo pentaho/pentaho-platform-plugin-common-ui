@@ -27,9 +27,13 @@ define([
     var context;
     var Complex;
 
-    beforeEach(function() {
-      context = new Context();
-      Complex = context.get("pentaho/type/complex");
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Complex = context.get("pentaho/type/complex");
+          })
+          .then(done, done.fail);
     });
 
     describe("#validateOn(owner) -", function() {

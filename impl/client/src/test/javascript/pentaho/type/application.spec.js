@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/application",
   "pentaho/type/Context"
-], function(applicationFactory, Context) {
+], function(Context) {
 
   "use strict";
 
@@ -24,15 +23,17 @@ define([
 
   describe("pentaho.type.Application -", function() {
 
-    it("is a function", function() {
-      expect(typeof applicationFactory).toBe("function");
-    });
-
     describe("new Application()", function() {
+
       var Application;
 
-      beforeEach(function() {
-        Application = applicationFactory(new Context());
+      beforeEach(function(done) {
+        Context.createAsync()
+            .then(function(context) {
+              return context.getAsync("pentaho/type/application");
+            }).then(function(_Application) {
+              Application = _Application;
+            }).then(done, done.fail);
       });
 
       it("should be a function", function() {

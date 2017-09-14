@@ -15,21 +15,18 @@
  */
 define([
   "module",
-  "./simple",
   "../i18n!types"
-], function(module, simpleFactory, bundle) {
+], function(module, bundle) {
 
   "use strict";
 
-  return function(context) {
-
-    var Simple = context.get(simpleFactory);
+  return ["simple", function(Simple) {
 
     /**
      * @name pentaho.type.Number
      * @class
      * @extends pentaho.type.Simple
-     * @amd {pentaho.type.Factory<pentaho.type.Number>} pentaho/type/number
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Number>} pentaho/type/number
      *
      * @classDesc The class of number values.
      *
@@ -58,5 +55,5 @@ define([
       v = +v;
       return isNaN(v) ? null : v;
     }
-  };
+  }];
 });

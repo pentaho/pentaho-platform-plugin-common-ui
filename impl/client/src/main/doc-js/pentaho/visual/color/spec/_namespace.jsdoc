@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Pentaho Corporation. All rights reserved.
+ * Copyright 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./base",
-  "./data",
-  "./select",
-  "./execute"
-], function(baseActionFactory, dataActionFactory, selectActionFactory, executeActionFactory) {
 
-  "use strict";
-
-  return {
-    base: baseActionFactory,
-    data: dataActionFactory,
-    select: selectActionFactory,
-    execute: executeActionFactory
-  };
-});
+/**
+ * @name pentaho.visual.color.spec
+ * @namespace
+ *
+ * @description The `visual.color.spec` namespace contains specification interfaces for the `visual.color` namespace types.
+ */

@@ -35,7 +35,7 @@ define([
      * @name pentaho.data.filter.IsLessOrEqual
      * @class
      * @extends pentaho.data.filter.Property
-     * @amd {pentaho.type.Factory<pentaho.data.filter.IsLessOrEqual>} pentaho/data/filter/isLessOrEqual
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.IsLessOrEqual>} pentaho/data/filter/isLessOrEqual
      *
      * @classDesc The `IsLessOrEqual` class represents a filter for being less than or equal to a given value.
      * The filter selects elements having the value of a certain property less or equal than a reference

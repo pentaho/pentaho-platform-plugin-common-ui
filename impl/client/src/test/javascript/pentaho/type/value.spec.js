@@ -22,8 +22,18 @@ define([
   /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
 
   describe("pentaho/type/value -", function() {
-    var context = new Context();
-    var Value = context.get("pentaho/type/value");
+
+    var context;
+    var Value;
+
+    beforeEach(function(done) {
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+            Value = context.get("pentaho/type/value");
+          })
+          .then(done, done.fail);
+    });
 
     it("should be a function", function() {
       expect(typeof Value).toBe("function");
@@ -36,7 +46,11 @@ define([
     });
 
     describe(".Type -", function() {
-      var valueType = Value.type;
+      var valueType;
+
+      beforeEach(function() {
+        valueType = Value.type;
+      });
 
       it("should be a function", function() {
         expect(typeof Value.Type).toBe("function");
@@ -53,13 +67,13 @@ define([
       });
 
       describe("#isValue", function() {
-        it("should have `isValue` equal to `true`", function () {
+        it("should have `isValue` equal to `true`", function() {
           expect(valueType.isValue).toBe(true);
         });
       });
 
       describe("#isAbstract", function() {
-        it("should have `isAbstract` equal to `true`", function () {
+        it("should have `isAbstract` equal to `true`", function() {
           expect(valueType.isAbstract).toBe(true);
         });
       }); // end #isAbstract
@@ -183,10 +197,21 @@ define([
 
     describe(".extend({...}) returns a value that -", function() {
 
-      var context = new Context(),
-          Instance = context.get("instance"),
-          Type = Instance.Type,
-          Value = context.get("pentaho/type/value");
+      var context;
+      var Instance;
+      var Type;
+      var Value;
+
+      beforeEach(function(done) {
+        Context.createAsync()
+            .then(function(_context) {
+              context = _context;
+              Instance = context.get("instance");
+              Type = Instance.Type;
+              Value = context.get("pentaho/type/value");
+            })
+            .then(done, done.fail);
+      });
 
       it("should be a function", function() {
         var Derived = Value.extend();

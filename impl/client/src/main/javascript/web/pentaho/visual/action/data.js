@@ -15,107 +15,114 @@
  */
 define([
   "module",
+
+  // This exists only so that r.js sees otherwise invisible dependencies.
   "pentaho/visual/action/base",
   "pentaho/data/filter/standard"
-], function(module, baseActionFactory, filterFactories) {
+], function(module) {
 
   "use strict";
 
-  return function(context) {
+  /* eslint dot-notation: 0 */
 
-    /* eslint dot-notation: 0 */
+  return [
+    "pentaho/visual/action/base",
+    "pentaho/data/filter/abstract",
 
-    // Load all standard filter factories so that any of these can be safely resolved.
-    var __abstractFilterType = context.get(filterFactories["abstract"]).type;
+    // Pre-load all registered filter types so that it is safe to request them synchronously.
+    {$types: {base: "pentaho/data/filter/abstract"}},
 
-    /**
-     * @name pentaho.visual.action.Data.Type
-     * @class
-     * @extends pentaho.visual.action.Base.Type
-     *
-     * @classDesc The base type class of data actions.
-     *
-     * For more information see {@link pentaho.visual.action.Data}.
-     */
+    function(ActionBase, AbstractFilter) {
 
-    var ActionBase = context.get(baseActionFactory);
-
-    return ActionBase.extend(/** @lends pentaho.visual.action.Data# */{
-      $type: /** @lends pentaho.visual.action.Data.Type# */{
-        id: module.id,
-        isAbstract: true
-      },
+      var __abstractFilterType = AbstractFilter.type;
 
       /**
-       * @alias Data
-       * @memberOf pentaho.visual.action
+       * @name pentaho.visual.action.Data.Type
        * @class
-       * @extends pentaho.visual.action.Base
-       * @abstract
+       * @extends pentaho.visual.action.Base.Type
        *
-       * @amd {pentaho.type.Factory<pentaho.visual.action.Data>} pentaho/visual/action/data
+       * @classDesc The base type class of data actions.
        *
-       * @classDesc The `visual.action.Data` class is the base class of action types
-       * which are performed on a subset of a dataset and
-       * whose [target]{@link pentaho.visual.action.Base#target} is a [View]{@link pentaho.visual.base.View}.
-       *
-       * The actual subset is determined by the [data filter]{@link pentaho.visual.action.Data#dataFilter} property.
-       *
-       * @description Creates a data action instance given its specification.
-       * @param {pentaho.visual.action.spec.IData} [spec] A data action specification.
-       * @constructor
+       * For more information see {@link pentaho.visual.action.Data}.
        */
-      constructor: function(spec) {
 
-        this.base(spec);
-
-        this.dataFilter = spec && spec.dataFilter;
-      },
-
-      /**
-       * Gets or sets the _data filter_ of this action.
-       *
-       * Can only be set while the action is in an [editable]{@link pentaho.type.action.Base#isEditable} state.
-       *
-       * When set to a filter specification, {@link pentaho.data.filter.spec.IAbstract},
-       * it is converted into a filter object.
-       * Any standard filter can be safely loaded synchronously.
-       *
-       * @type {pentaho.data.filter.Abstract}
-       *
-       * @throws {pentaho.lang.OperationInvalidError} When set and the action is not in an editable state.
-       */
-      get dataFilter() {
-
-        return this.__dataFilter;
-      },
-
-      set dataFilter(value) {
-
-        this._assertEditable();
+      return ActionBase.extend(/** @lends pentaho.visual.action.Data# */{
+        $type: /** @lends pentaho.visual.action.Data.Type# */{
+          id: module.id,
+          isAbstract: true
+        },
 
         /**
-         * The data filter of the action.
+         * @alias Data
+         * @memberOf pentaho.visual.action
+         * @class
+         * @extends pentaho.visual.action.Base
+         * @abstract
          *
-         * @alias __dataFilter
-         * @type {pentaho.data.filter.Abstract}
-         * @memberOf pentaho.visual.action.Data#
-         * @private
+         * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.action.Data>} pentaho/visual/action/data
+         *
+         * @classDesc The `visual.action.Data` class is the base class of action types
+         * which are performed on a subset of a dataset and
+         * whose [target]{@link pentaho.visual.action.Base#target} is a [View]{@link pentaho.visual.base.View}.
+         *
+         * The actual subset is determined by the [data filter]{@link pentaho.visual.action.Data#dataFilter} property.
+         *
+         * @description Creates a data action instance given its specification.
+         * @param {pentaho.visual.action.spec.IData} [spec] A data action specification.
+         * @constructor
          */
-        this.__dataFilter = __abstractFilterType.to(value);
-      },
+        constructor: function(spec) {
 
-      // region serialization
-      /** @inheritDoc */
-      toSpecInContext: function(keyArgs) {
+          this.base(spec);
 
-        var spec = this.base(keyArgs);
+          this.dataFilter = spec && spec.dataFilter;
+        },
 
-        if(this.__dataFilter) spec.dataFilter = this.__dataFilter.toSpecInContext(keyArgs);
+        /**
+         * Gets or sets the _data filter_ of this action.
+         *
+         * Can only be set while the action is in an [editable]{@link pentaho.type.action.Base#isEditable} state.
+         *
+         * When set to a filter specification, {@link pentaho.data.filter.spec.IAbstract},
+         * it is converted into a filter object.
+         * Any registered visual filter type can be safely loaded synchronously.
+         *
+         * @type {pentaho.data.filter.Abstract}
+         *
+         * @throws {pentaho.lang.OperationInvalidError} When set and the action is not in an editable state.
+         */
+        get dataFilter() {
 
-        return spec;
-      }
-      // endregion
-    });
-  };
+          return this.__dataFilter;
+        },
+
+        set dataFilter(value) {
+
+          this._assertEditable();
+
+          /**
+           * The data filter of the action.
+           *
+           * @alias __dataFilter
+           * @type {pentaho.data.filter.Abstract}
+           * @memberOf pentaho.visual.action.Data#
+           * @private
+           */
+          this.__dataFilter = __abstractFilterType.to(value);
+        },
+
+        // region serialization
+        /** @inheritDoc */
+        toSpecInContext: function(keyArgs) {
+
+          var spec = this.base(keyArgs);
+
+          if(this.__dataFilter) spec.dataFilter = this.__dataFilter.toSpecInContext(keyArgs);
+
+          return spec;
+        }
+        // endregion
+      });
+    }
+  ];
 });

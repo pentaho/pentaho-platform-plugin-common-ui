@@ -27,9 +27,10 @@ define([
   "../util/promise",
   "../util/text",
   "../util/spec",
+  "./util",
   "./theme/model"
 ], function(localRequire, SpecificationScope, SpecificationContext, bundle, Base,
-    AnnotatableLinked, error, arg, O, F, promiseUtil, text, specUtil) {
+    AnnotatableLinked, error, arg, O, F, promiseUtil, text, specUtil, typeUtil) {
 
   "use strict";
 
@@ -45,8 +46,9 @@ define([
   ];
   var O_isProtoOf = Object.prototype.isPrototypeOf;
 
-  return function(context) {
+  return function() {
 
+    var context = this;
     var __type = null;
     var __Number = null;
     var __Boolean = null;
@@ -476,31 +478,7 @@ define([
        * @see pentaho.type.Type#sourceId
        */
       buildSourceRelativeId: function(id) {
-        // Relative:
-        //   ./view
-        // Absolute:
-        //   view
-        //   foo.js
-        //   ./foo.js
-        //   /view
-        //   http:
-        if(/^\./.test(id) && !/\.js$/.test(id)) {
-          // Considered relative.
-          // ./ and ../ work fine cause RequireJs later normalizes those.
-          var sourceId = this.sourceId;
-          if(sourceId) {
-            // "foo/bar"  -> "foo"
-            // "foo/bar/" -> "foo"
-            // "foo" -> ""
-            // "foo/" -> ""
-            var baseId = sourceId.replace(/\/?([^\/]*)\/?$/, "");
-            if(baseId) {
-              id = baseId + "/" + id;
-            }
-          }
-        }
-
-        return id;
+        return typeUtil.__absolutizeDependencyOf(id, this.sourceId);
       },
 
       // -> nonEmptyString, Optional(null), Immutable, Shared (note: not Inherited)
@@ -592,7 +570,7 @@ define([
           addMixinType.call(this, values);
 
         function addMixinType(MixinType) {
-          var MixinInst = this.context.get(MixinType);
+          var MixinInst = context.get(MixinType);
           Instance.mix(MixinInst);
         }
       },
@@ -976,8 +954,7 @@ define([
      /**
       * Gets or sets the default view for instances of this type.
       *
-      * When a string,
-      * it is the identifier of the view's AMD module.
+      * The identifier of the view's AMD module.
       * If the identifier is relative, it is relative to [sourceId]{@link pentaho.type.Type#sourceId}.
       *
       * Setting this to `undefined` causes the default view to be inherited from the ancestor type,
@@ -986,13 +963,9 @@ define([
       * Setting this to a _falsy_ value (like `null` or an empty string),
       * clears the value of the attribute and sets it to `null`, ignoring any inherited value.
       *
-      * When a function,
-      * it is the class or factory of the default view.
-      *
-      * @see pentaho.type.Type#defaultViewClass
       * @see pentaho.type.Type#buildSourceRelativeId
       *
-      * @type {string | function}
+      * @type {string}
 
       * @throws {pentaho.lang.ArgumentInvalidTypeError} When the set value is not
       * a string, a function or {@link Nully}.
@@ -1014,58 +987,36 @@ define([
 
           this.__defaultView = null;
 
-        } else if(typeof value === "string") {
-
+        } else {
           defaultViewInfo = O.getOwn(this, "__defaultView");
           if(!defaultViewInfo || (defaultViewInfo.value !== value && defaultViewInfo.fullValue !== value)) {
-            this.__defaultView = {value: value, promise: null, fullValue: this.buildSourceRelativeId(value)};
+            this.__defaultView = {value: value, fullValue: this.buildSourceRelativeId(value)};
           }
-        } else if(typeof value === "function") {
-
-          // Assume it is the View class itself, already fulfilled.
-          defaultViewInfo = O.getOwn(this, "__defaultView");
-          if(!defaultViewInfo || defaultViewInfo.value !== value) {
-            this.__defaultView = {value: value, promise: Promise.resolve(value), fullValue: value};
-          }
-        } else {
-
-          throw error.argInvalidType("defaultView", ["nully", "string", "function"], typeof value);
         }
       },
 
       /**
-       * Gets a promise for the default view class or factory, if any; or `null`.
+       * Gets the absolute view module identifier, if any.
        *
        * A default view exists if property {@link pentaho.type.Type#defaultView}
        * has a non-null value.
        *
-       * @type {Promise.<?function>}
+       * @type {string}
        * @readOnly
        * @see pentaho.type.Type#defaultView
        */
-      get defaultViewClass() {
-        /* jshint laxbreak:true*/
+      get defaultViewAbs() {
         var defaultView = this.__defaultView;
-        return defaultView
-            ? (defaultView.promise || (defaultView.promise = promiseUtil.require(defaultView.fullValue, localRequire)))
-            : Promise.resolve(null);
+        return defaultView ? defaultView.fullValue : null;
       },
       // endregion
 
       // region creation
       /**
-       * Creates an instance of this type, given an instance specification.
+       * Creates or resolves an instance of this type given an instance reference.
        *
-       * If the instance specification contains an inline type reference,
-       * in property `"_"`, the referenced type is used to create the instance
-       * (as long as it is a subtype of this type).
-       *
-       * If the specified instance specification does not contain an inline type reference,
-       * the type is assumed to be `this` type.
-       *
-       * @see pentaho.type.Type#createAsync
-       * @see pentaho.type.Type#isSubtypeOf
-       * @see pentaho.type.Context#get
+       * This method delegates to [InstancesContainer#get]{@link pentaho.type.InstancesContainer#get}
+       * with this type as the `typeBase` argument.
        *
        * @example
        * <caption>
@@ -1074,21 +1025,23 @@ define([
        *
        * require(["pentaho/type/Context"], function(Context) {
        *
-       *   var context = new Context({application: "data-explorer-101"});
-       *   var Value   = context.get("value");
+       *   Context.createAsync({application: "data-explorer-101"})
+       *       .then(function(context) {
        *
-       *   var product = Value.type.create({
-       *         _: {
-       *           props: ["id", "name", {name: "price", valueType: "number"}]
-       *         },
+       *         var Value = context.get("value");
        *
-       *         id:    "mpma",
-       *         name:  "Principia Mathematica",
-       *         price: 1200
+       *         var product = Value.type.create({
+       *           _: {
+       *             props: ["id", "name", {name: "price", valueType: "number"}]
+       *           },
+       *
+       *           id:    "mpma",
+       *           name:  "Principia Mathematica",
+       *           price: 1200
+       *         });
+       *
+       *         // ...
        *       });
-       *
-       *   // ...
-       *
        * });
        *
        * @example
@@ -1098,22 +1051,24 @@ define([
        *
        * require(["pentaho/type/Context"], function(Context) {
        *
-       *   var context = new Context({application: "data-explorer-101"});
-       *   var Value   = context.get("value");
+       *   Context.createAsync({application: "data-explorer-101"})
+       *       .then(function(context) {
        *
-       *   var productList = Value.type.create({
-       *         _: [{
-       *           props: ["id", "name", {name: "price", valueType: "number"}]
-       *         }],
+       *         var Value = context.get("value");
        *
-       *         d: [
-       *           {id: "mpma", name: "Principia Mathematica", price: 1200},
-       *           {id: "flot", name: "The Laws of Thought",   price:  500}
-       *         ]
+       *         var productList = Value.type.create({
+       *           _: [{
+       *             props: ["id", "name", {name: "price", valueType: "number"}]
+       *           }],
+       *
+       *           d: [
+       *             {id: "mpma", name: "Principia Mathematica", price: 1200},
+       *             {id: "flot", name: "The Laws of Thought",   price:  500}
+       *           ]
+       *         });
+       *
+       *         // ...
        *       });
-       *
-       *   // ...
-       *
        * });
        *
        * @example
@@ -1123,133 +1078,63 @@ define([
        *
        * require(["pentaho/type/Context"], function(Context) {
        *
-       *   var context = new Context({application: "data-explorer-101"});
-       *   var ProductList = context.get([{
-       *           props: [
-       *             "id",
-       *             "name",
-       *             {name: "price", valueType: "number"}
-       *           ]
-       *         }]);
+       *   Context.createAsync({application: "data-explorer-101"})
+       *       .then(function(context) {
        *
-       *   // Provide the default type, in case the instance spec doesn't provide one.
-       *   var productList = ProductList.type.create(
-       *          [
-       *            {id: "mpma", name: "Principia Mathematica", price: 1200},
-       *            {id: "flot", name: "The Laws of Thought",   price:  500}
-       *         ]);
+       *         var ProductList = context.get([{
+       *             props: [
+       *               "id",
+       *               "name",
+       *               {name: "price", valueType: "number"}
+       *             ]
+       *           }]);
        *
-       *   // ...
+       *         // Provide the default type, in case the instance spec doesn't provide one.
+       *         var productList = ProductList.type.create(
+       *           [
+       *             {id: "mpma", name: "Principia Mathematica", price: 1200},
+       *             {id: "flot", name: "The Laws of Thought",   price:  500}
+       *           ]);
        *
+       *         // ...
+       *       });
        * });
        *
-       * @param {pentaho.type.spec.UInstance} [instSpec] An instance specification.
-       * @param {Object} [keyArgs] - The keyword arguments passed to the instance constructor.
+       * @param {pentaho.type.spec.UInstanceReference} [instRef] - An instance reference.
+       * @param {Object} [instKeyArgs] - The keyword arguments passed to the instance constructor, when one is created.
        *
-       * @return {!pentaho.type.Instance} The created instance.
+       * @return {pentaho.type.Instance} The created instance or the resolved instance (possibly `null`).
        *
-       * @throws {pentaho.lang.OperationInvalidError} When `instSpec` contains an inline type reference
-       * that refers to a type that is not a subtype of this one.
+       * @throws {Error} Other errors, as documented in:
+       * [InstancesContainer#get]{@link pentaho.type.InstancesContainer#get}.
        *
-       * @throws {Error} When `instSpec` contains an inline type reference which is not defined as a module in the
-       * AMD module system (specified directly in `instSpec`, or present in an generic type specification).
-       *
-       * @throws {Error} When `instSpec` contains an inline type reference which is from a module that the
-       * AMD module system has not loaded yet.
-       *
-       * @throws {pentaho.lang.OperationInvalidError} When the determined type for the specified `instSpec`
-       * is an [abstract]{@link pentaho.type.Value.Type#isAbstract} type.
+       * @see pentaho.type.Type#createAsync
+       * @see pentaho.type.Type#to
+       * @see pentaho.type.Type#is
        */
-      create: function(instSpec, keyArgs) {
-        var Instance;
-        var typeSpec;
-        var instType;
-
-        // If it is a plain Object, does it have the inline type property, "_"?
-        if(instSpec && typeof instSpec === "object" && (typeSpec = instSpec._) && instSpec.constructor === Object) {
-
-          Instance = context.get(typeSpec);
-
-          instType = this.__assertSubtype(Instance.type);
-
-          if(instType.isAbstract) instType.__throwAbstractType();
-
-        } else if(this.isAbstract) {
-
-          /* eslint default-case: 0 */
-          switch(typeof instSpec) {
-            case "string": Instance = __String || (__String = context.get("string")); break;
-            case "number": Instance = __Number || (__Number = context.get("number")); break;
-            case "boolean": Instance = __Boolean || (__Boolean = context.get("boolean")); break;
-          }
-
-          // Must still respect the base type: `this`.
-          if(Instance && !Instance.type.isSubtypeOf(this)) Instance = null;
-
-          if(!Instance) this.__throwAbstractType();
-
-        } else {
-          Instance = this.instance.constructor;
-        }
-
-        return O.make(Instance, arguments);
+      create: function(instRef, instKeyArgs) {
+        return context.instances.get(instRef, instKeyArgs, this);
       },
 
       /**
-       * Creates an instance of this type, asynchronously, given an instance specification.
+       * Creates or resolves an instance of this type, asynchronously, given an instance reference.
        *
-       * If the instance specification contains an inline type reference,
-       * in property `"_"`, the referenced type is used to create the instance
-       * (as long as it is a subtype of this type).
+       * This method delegates to [InstancesContainer#getAsync]{@link pentaho.type.InstancesContainer#getAsync}
+       * with this type as the `typeBase` argument.
        *
-       * If the specified instance specification does not contain an inline type reference,
-       * the type is assumed to be `this` type.
+       * @param {pentaho.type.spec.UInstanceReference} [instRef] - An instance reference.
+       * @param {Object} [instKeyArgs] - The keyword arguments passed to the instance constructor, when one is created.
        *
-       * @param {pentaho.type.spec.UInstance} [instSpec] - An instance specification.
-       * @param {Object} [keyArgs] - The keyword arguments passed to `create`.
+       * @return {!Promise.<pentaho.type.Instance>} A promise to the created instance or resolved instance
+       * (possibly `null`).
        *
-       * @return {!Promise.<pentaho.type.Instance>} A promise to the created instance.
-       *
-       * @rejects {pentaho.lang.OperationInvalidError} When `instSpec` contains an inline type reference
-       * that refers to a type that is not a subtype of this one.
-       *
-       * @rejects {Error} When `instSpec` contains an inline type reference which is not defined as a module in the
-       * AMD module system (specified directly in `instSpec`, or present in an generic type specification).
-       *
-       * @rejects {pentaho.lang.OperationInvalidError} When the determined type for the specified `instSpec`
-       * is an [abstract]{@link pentaho.type.Value.Type#isAbstract} type.
+       * @rejects {Error} Other errors, as documented in:
+       * [InstancesContainer#getAsync]{@link pentaho.type.InstancesContainer#getAsync}.
        *
        * @see pentaho.type.Type#create
-       * @see pentaho.type.Type#isSubtypeOf
-       * @see pentaho.type.Context#get
        */
-      createAsync: function(instSpec, keyArgs) {
-
-        var customTypeIds = Object.keys(this.__collectInstSpecTypeIds(instSpec));
-
-        return customTypeIds.length
-            // Require them all and only then invoke the synchronous BaseType.extend method.
-            ? promiseUtil.require(customTypeIds, localRequire).then(resolveSync.bind(this))
-            // All types are standard and can be assumed to be already loaded.
-            // However, we should behave asynchronously as requested.
-            : promiseUtil.wrapCall(resolveSync, this);
-
-        function resolveSync() {
-          return this.create(instSpec, keyArgs);
-        }
-      },
-
-      /**
-       * Recursively collects the module ids of custom types used within an instance specification.
-       *
-       * @param {pentaho.type.spec.UInstance} instSpec - An instance specification.
-       * @return {!Object.<string, string>} A possibly empty object whose own keys are type module ids.
-       * @private
-       */
-      __collectInstSpecTypeIds: function(instSpec) {
-        var customTypeIds = {};
-        __collectTypeIdsRecursive.call(this, instSpec, customTypeIds);
-        return customTypeIds;
+      createAsync: function(instRef, instKeyArgs) {
+        return context.instances.getAsync(instRef, instKeyArgs, this);
       },
 
       /**
@@ -1875,7 +1760,7 @@ define([
    */
   function __wrapWithCast(fun, cast, defaultValue) {
     /*
-     * @type {pentaho.type.PropertyDynamicAttribute}
+     * @type {pentaho.type.spec.PropertyDynamicAttribute}
      */
     return function(propType) {
 
@@ -1883,24 +1768,5 @@ define([
 
       return __castAndNormalize.call(propType, value, cast, defaultValue);
     };
-  }
-
-  function __collectTypeIdsRecursive(instSpec, outIds) {
-    if(instSpec && typeof instSpec === "object") {
-      if(Array.isArray(instSpec)) {
-        instSpec.forEach(function(elemSpec) {
-          __collectTypeIdsRecursive.call(this, elemSpec, outIds);
-        }, this);
-      } else if(instSpec.constructor === Object) {
-        Object.keys(instSpec).forEach(function(name) {
-          var elemSpec = instSpec[name];
-          if(name === "_")
-            this.context.__collectTypeSpecTypeIds(elemSpec, outIds);
-          else
-            __collectTypeIdsRecursive.call(this, elemSpec, outIds);
-
-        }, this);
-      }
-    }
   }
 });

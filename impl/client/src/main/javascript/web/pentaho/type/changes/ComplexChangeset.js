@@ -24,6 +24,9 @@ define([
 
   "use strict";
 
+  var PROP_VALUE_DEFAULT = 0;
+  var PROP_VALUE_SPECIFIED = 1;
+
   /**
    * @name ComplexChangeset
    * @memberOf pentaho.type.changes
@@ -165,13 +168,29 @@ define([
     },
 
     // TODO: Document me!
+    // ATTENTION: This method's name and signature must be in sync with that of Complex#__getByName.
+    // NOTE: Only called for element properties.
     __getByName: function(name) {
-      // NOTE: Only called for element properties.
       var change = O.getOwn(this._changes, name);
       if(!change) return this.owner.__getByName(name);
 
-      // If it's a changeset, it's a ComplexChangeset. Otherwise, it's a `Replace` change.
+      // If it's a changeset, it's a ComplexChangeset, bubbling. Otherwise, it's a `Replace` change.
       return (change instanceof Changeset) ? change.owner : change.value;
+    },
+
+    // ATTENTION: This method's name and signature must be in sync with that of Complex#__getStateByName.
+    // NOTE: Can be called for both list and element properties.
+    // TODO: this method may not work well before Transaction#__buildGraph runs (acceptwill)...
+    // until then, bubbled changes may not be detected.
+    // Would need the graph to be built as Changesets are being created...
+    __getStateByName: function(name) {
+      var change = O.getOwn(this._changes, name);
+      if(!change) return this.owner.__getStateByName(name);
+
+      // If it's a changeset, it's either a ComplexChangeset or a ListChangeset,
+      // bubbling, which is considered _specifying_ the value.
+      // Otherwise, it's a `Replace` change.
+      return (change instanceof Changeset) ? PROP_VALUE_SPECIFIED : change.state;
     },
 
     /**
@@ -192,7 +211,12 @@ define([
     _apply: function(target) {
       this.propertyNames.forEach(function(property) {
         var change = this[property];
-        if(!(change instanceof Changeset)) change._apply(target);
+        if((change instanceof Changeset)) {
+          // Nested changes are considered as if they were locally specified.
+          target.__valuesState[property] = PROP_VALUE_SPECIFIED;
+        } else {
+          change._apply(target);
+        }
       }, this._changes);
     }
     // endregion
@@ -210,35 +234,38 @@ define([
      */
     __setElement: function(complex, propType, valueSpec) {
 
-      // NOTE: For performance reasons, this function inlines code that would otherwise be available from.
-      // For example: Container#usingChangeset(.) and TransactionScope.
+      // NOTE: For performance reasons, this function inlines code that would otherwise be available from,
+      // for example, Container#usingChangeset(.) and TransactionScope.
       var type = complex.$type;
       var name = propType.name;
 
       // New value. Cast spec.
-      var valueNew = propType.toValue(valueSpec);
+      var stateNew = valueSpec == null ? PROP_VALUE_DEFAULT : PROP_VALUE_SPECIFIED;
+      var valueNew = propType.toValueOn(complex, valueSpec);
 
       // Original/Initial value.
       var valueIni = complex.__getByName(name);
+      var stateIni = complex.__getStateByName(name);
 
       // Ambient value.
       var cset = complex.$changeset;
-      var change;
-      var valueAmb = (cset && (change = O.getOwn(cset._changes, name))) ? change.value : valueIni;
+      var change = cset && O.getOwn(cset._changes, name);
+      var valueAmb = change ? change.value : valueIni;
+      var stateAmb = change ? change.state : stateIni;
 
-      // Doesn't change the ambient value?
-      if(type.areEqual(valueNew, valueAmb))
+      // Doesn't change the ambient value/state?
+      if(stateNew === stateAmb && type.areEqual(valueNew, valueAmb))
         return;
 
       if(change) {
-        // Goes back to the initial value?
-        if(type.areEqual(valueNew, valueIni)) {
+        // Goes back to the initial value/state?
+        if(stateNew === stateIni && type.areEqual(valueNew, valueIni)) {
           // Remove the change.
           delete cset._changes[name];
           change._cancelRefs(cset.transaction, complex, valueIni);
         } else {
           // Update its value.
-          change.__updateValue(cset.transaction, complex, valueNew);
+          change.__updateValue(cset.transaction, complex, valueNew, stateNew);
         }
         return;
       }
@@ -251,7 +278,7 @@ define([
       if(!cset) cset = complex._createChangeset(txn);
 
       // Create a change
-      cset._changes[name] = change = new Replace(propType, valueNew);
+      cset._changes[name] = change = new Replace(propType, valueNew, stateNew);
       change._prepareRefs(txn, complex, valueIni);
 
       scope.accept();

@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
-  "pentaho/visual/base",
-  "pentaho/lang/UserError",
-  "pentaho/visual/role/property"
-], function(Context, modelFactory, UserError, rolePropFactory) {
+  "pentaho/type/Context"
+], function(Context) {
+
   "use strict";
 
   /* globals jasmine, console, expect, it, describe, beforeEach */
@@ -27,12 +25,27 @@ define([
 
     var context;
     var Model;
+    var RoleProperty;
+    var PaletteProperty;
     var dataSpec;
 
-    beforeEach(function() {
+    beforeEach(function(done) {
 
-      context = new Context();
-      Model = context.get(modelFactory);
+      Context.createAsync()
+          .then(function(_context) {
+            context = _context;
+
+            return context.getDependencyApplyAsync([
+              "pentaho/visual/base/model",
+              "pentaho/visual/role/property",
+              "pentaho/visual/color/paletteProperty"
+            ], function(_Model, _RoleProperty, _PaletteProperty) {
+              Model = _Model;
+              RoleProperty = _RoleProperty;
+              PaletteProperty = _PaletteProperty;
+            });
+          })
+          .then(done, done.fail);
 
       var data = {
         model: [
@@ -44,6 +57,7 @@ define([
           {c: [{v: "Ireland"}, {v: 6000}]}
         ]
       };
+
       dataSpec = {
         v: data
       };
@@ -66,7 +80,7 @@ define([
     it("should pre-load all standard visual role related modules", function() {
       function expectIt(lid) {
         expect(function() {
-          expect(typeof require("pentaho/visual/role/" + lid)).toBe("function");
+          expect(typeof context.get("pentaho/visual/role/" + lid)).toBe("function");
         }).not.toThrow();
       }
 
@@ -161,7 +175,6 @@ define([
 
         it("should return true if property type is a role.Property", function() {
 
-          var RoleProperty = context.get(rolePropFactory);
           var SubRoleProperty = RoleProperty.extend();
 
           expect(Model.type.isVisualRole(RoleProperty.type)).toBe(true);
@@ -172,6 +185,24 @@ define([
           var NotRoleProp = context.get("complex");
 
           expect(Model.type.isVisualRole(NotRoleProp.type)).toBe(false);
+        });
+      });
+
+      describe("#isColorPalette()", function() {
+
+        it("should return true if property type is a color.PaletteProperty", function() {
+
+          var SubColorPaletteProperty = PaletteProperty.extend();
+
+          expect(Model.type.isColorPalette(PaletteProperty.type)).toBe(true);
+          expect(Model.type.isColorPalette(SubColorPaletteProperty.type)).toBe(true);
+        });
+
+        it("should return false if type is not a Color Palette", function() {
+
+          var NotPaletteProp = context.get("complex");
+
+          expect(Model.type.isColorPalette(NotPaletteProp.type)).toBe(false);
         });
       });
 
@@ -186,9 +217,9 @@ define([
 
           DerivedModel = Model.extend({$type: {
             props: [
-              {name: "vr1", base: rolePropFactory},
-              {name: "vr2", base: rolePropFactory},
-              {name: "vr3", base: rolePropFactory}
+              {name: "vr1", base: RoleProperty},
+              {name: "vr2", base: RoleProperty},
+              {name: "vr3", base: RoleProperty}
             ]
           }});
 

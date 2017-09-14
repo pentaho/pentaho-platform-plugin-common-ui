@@ -14,125 +14,125 @@
  * limitations under the License.
  */
 define([
-  "module",
-  "pentaho/visual/models/pie",
-  "./abstract"
-], function(module, modelFactory, baseViewFactory) {
+  "module"
+], function(module) {
 
   "use strict";
 
-  return function(context) {
+  return [
+    "pentaho/ccc/visual/abstract",
+    "pentaho/visual/models/pie",
+    function(BaseView, Model) {
 
-    var BaseView = context.get(baseViewFactory);
+      return BaseView.extend({
+        $type: {
+          id: module.id,
+          props: {
+            model: {valueType: Model}
+          }
+        },
 
-    return BaseView.extend({
-      $type: {
-        id: module.id,
-        props: {
-          model: {valueType: modelFactory}
-        }
-      },
+        _cccClass: "PieChart",
 
-      _cccClass: "PieChart",
+        _roleToCccRole: {
+          "columns": "multiChart",
+          "rows": "category",
+          "measures": "value"
+        },
 
-      _roleToCccRole: {
-        "columns": "multiChart",
-        "rows": "category",
-        "measures": "value"
-      },
+        _genericMeasureCccVisualRole: "value",
 
-      _genericMeasureCccVisualRole: "value",
+        _multiRole: "columns",
 
-      _multiRole: "columns",
+        _discreteColorRole: "rows",
 
-      _discreteColorRole: "rows",
+        _tooltipHidePercentageOnPercentAttributes: true,
 
-      _tooltipHidePercentageOnPercentAttributes: true,
+        _configureOptions: function() {
 
-      _configureOptions: function() {
+          this.base();
 
-        this.base();
+          if(this.options.valuesVisible) this._configureValuesMask();
+        },
 
-        if(this.options.valuesVisible) this._configureValuesMask();
-      },
+        _isLegendVisible: function() {
+          return this._getRoleDepth("rows") > 0;
+        },
 
-      _isLegendVisible: function() {
-        return this._getRoleDepth("rows") > 0;
-      },
+        _configureLabels: function(options, model) {
+          this.base.apply(this, arguments);
 
-      _configureLabels: function(options, model) {
-        this.base.apply(this, arguments);
+          if(options.valuesVisible) {
+            options.valuesLabelStyle = model.labelsOption === "outside" ? "linked" : model.labelsOption;
+          }
+        },
 
-        if(options.valuesVisible) {
-          options.valuesLabelStyle = model.labelsOption === "outside" ? "linked" : model.labelsOption;
-        }
-      },
+        _configureLabelsAnchor: function(options, model) {
+          // NOOP
+        },
 
-      _configureLabelsAnchor: function(options, model) {
-        // NOOP
-      },
+        _configureMultiChart: function() {
+          this.base();
 
-      _configureMultiChart: function() {
-        this.base();
+          this.options.legendSizeMax = "50%";
+        },
 
-        this.options.legendSizeMax = "50%";
-      },
+        _configureValuesMask: function() {
+          // Change values mask according to each category's
+          // discriminated measure being isPercent or not
+          if(this._isGenericMeasureMode) {
+            var genericMeasureAttrsByName = this._selectGenericMeasureMappingAttrInfos()
+                .uniqueIndex(function(maInfo) {
+                  return maInfo.attr.name;
+                });
 
-      _configureValuesMask: function() {
-        // Change values mask according to each category's
-        // discriminated measure being isPercent or not
-        if(this._isGenericMeasureMode) {
-          var genericMeasureAttrsByName = this._selectGenericMeasureMappingAttrInfos()
-              .uniqueIndex(function(maInfo) {
-                return maInfo.attr.name;
-              });
+            var genericMeasureDiscrimName = this.GENERIC_MEASURE_DISCRIM_DIM_NAME;
 
-          var genericMeasureDiscrimName = this.GENERIC_MEASURE_DISCRIM_DIM_NAME;
+            this.options.pie = {
+              scenes: {
+                category: {
+                  sliceLabelMask: function() {
+                    var meaAtom = this.atoms[genericMeasureDiscrimName];
+                    var meaMAName;
+                    var meaMAInfo;
+                    if(meaAtom && (meaMAName = meaAtom.value) &&
+                        (meaMAInfo = genericMeasureAttrsByName[meaMAName]) && meaMAInfo.isPercent) {
+                      return "{value}"; // the value is the percentage itself;
+                    }
 
-          this.options.pie = {
-            scenes: {
-              category: {
-                sliceLabelMask: function() {
-                  var meaAtom = this.atoms[genericMeasureDiscrimName];
-                  var meaMAName;
-                  var meaMAInfo;
-                  if(meaAtom && (meaMAName = meaAtom.value) &&
-                      (meaMAInfo = genericMeasureAttrsByName[meaMAName]) && meaMAInfo.isPercent) {
-                    return "{value}"; // the value is the percentage itself;
+                    return "{value} ({value.percent})";
                   }
-
-                  return "{value} ({value.percent})";
                 }
               }
-            }
-          };
-        } else {
-          var meaMAInfo = this._getMappingAttrInfosByRole("measures")[0];
-          this.options.valuesMask = meaMAInfo.isPercent ? "{value}" : "{value} ({value.percent})";
-        }
-      },
+            };
+          } else {
+            var meaMAInfo = this._getMappingAttrInfosByRole("measures")[0];
+            this.options.valuesMask = meaMAInfo.isPercent ? "{value}" : "{value} ({value.percent})";
+          }
+        },
 
-      _getDiscreteColorMap: function() {
-        var memberPalette = this._getMemberPalette();
-        var colorMap;
-        if(memberPalette) {
-          var colorMAInfos = this._getDiscreteColorMappingAttrInfos();
-          var C = colorMAInfos.length;
-          // C >= 0 (color -> "rows" -> is optional)
-          // When multiple measures exist, the pie chart shows them as multiple charts
-          // and if these would affect color, each small chart would have a single color.
-          // => consider M = 0;
-          // If C, use the members' colors of the last color attribute.
-          if(C) {
-            var maInfo = colorMAInfos[C - 1];
-            if(maInfo && maInfo.attr) {
-              colorMap = this._copyColorMap(null, memberPalette[maInfo.attr.name]);
+        _getDiscreteColorMap: function() {
+          var memberPalette = this._getMemberPalette();
+          var colorMap;
+          if(memberPalette) {
+            var colorMAInfos = this._getDiscreteColorMappingAttrInfos();
+            var C = colorMAInfos.length;
+            // C >= 0 (color -> "rows" -> is optional)
+            // When multiple measures exist, the pie chart shows them as multiple charts
+            // and if these would affect color, each small chart would have a single color.
+            // => consider M = 0;
+            // If C, use the members' colors of the last color attribute.
+            if(C) {
+              var maInfo = colorMAInfos[C - 1];
+              if(maInfo && maInfo.attr) {
+                colorMap = this._copyColorMap(null, memberPalette[maInfo.attr.name]);
+              }
             }
           }
-        }
 
-        return colorMap;
-      }
-    });
-  };
+          return colorMap;
+        }
+      });
+    }
+  ];
 });
