@@ -123,8 +123,14 @@ define([
         var propTypes = this.$type.__getProps();
         var L = propTypes.length;
         var readSpec = !spec ? undefined : (Array.isArray(spec) ? __readSpecByIndex : __readSpecByNameOrAlias);
+
         var values = {};
         var valuesState = {};
+
+        // These need to be set before any defaultValue function is evaluated.
+        this.__values = values;
+        this.__valuesState = valuesState;
+
         var propType;
         var value;
         var name;
@@ -142,9 +148,6 @@ define([
             this.__initPropertyValueRelation(propType, value);
           }
         }
-
-        this.__values = values;
-        this.__valuesState = valuesState;
       },
 
       /**
