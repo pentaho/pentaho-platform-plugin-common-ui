@@ -58,6 +58,11 @@ define([
        * The [valueType]{@link pentaho.type.PaletteProperty.Type#valueType} of a property of this type is
        * [Palette]{@link pentaho.visual.color.Palette}.
        *
+       * The [defaultValue]{@link pentaho.type.PaletteProperty.Type#defaultValue} of a property of this type is
+       * initialized to a function that queries registered palette instances for one with a compatible level.
+       * It does not choose a palette that another palette property in the same visualization model is already using.
+       * During construction, this exclusion rule only covers properties which are defined before it.
+       *
        * @description This class was not designed to be constructed directly.
        */
       var PaletteProperty = Property.extend(/** @lends pentaho.visual.color.PaletteProperty# */{

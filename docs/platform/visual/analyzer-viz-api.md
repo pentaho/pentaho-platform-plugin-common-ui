@@ -79,8 +79,9 @@ relative to the _previous_ stock visualizations.
 
 ### Work In Progress
 
-1. Printing of scrolled charts shrinks them to fit, breaking their aspect-ratio.
-2. Printing does not reflect custom configurations.
+1. Printing of scrolled charts shrinks them to fit (while preserving their aspect-ratio).
+2. Printing only reflects custom configurations that are located in
+   the [Global Configuration File](../configuration#global-configuration-file).
 
 ## Changing the visualization format of stock visualizations.
 

@@ -233,6 +233,49 @@ var ruleSpec = {
 };
 ```
 
+### Change the colors used by a certain visualization
+
+The following rule changes the default value of the "palette" property
+of the bar chart visualization, in any application, 
+so that a specific _ad hoc_ palette is used:
+
+```js
+var ruleSpec = {
+  select: {
+    type: "pentaho/visual/models/bar"
+  },
+  apply: {
+    props: {
+      palette: {
+        defaultValue: {
+          level: "nominal",
+          colors: ["red", "#00FF00", "rgb(0, 0, 255)"]
+        }
+      }
+    }
+  }
+};
+```
+
+If, instead, you want to use a registered palette:
+
+```js
+var ruleSpec = {
+  select: {
+    type: "pentaho/visual/models/bar"
+  },
+  apply: {
+    props: {
+      palette: {
+        defaultValue: {
+          $instance: {id: "pentaho/visual/color/palettes/nominalLight"}
+        }
+      }
+    }
+  }
+};
+```
+
 ## Identifiers of Stock Visualizations
 
 The models of stock visualizations are all sub-modules of `pentaho/visual/models`. 

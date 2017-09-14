@@ -153,6 +153,59 @@ define(function() {
             "red", "#00FF00", "rgb(0, 0, 255)"
           ]
         }
+      },
+      */
+
+      // Example Rule 6 - Change the colors of the bar chart visualization, in any application
+      /*
+      {
+        select: {
+          type: "pentaho/visual/models/bar"
+        },
+        apply: {
+          props: {
+            palette: {
+              defaultValue: {
+                level: "nominal",
+                colors: ["red", "#00FF00", "rgb(0, 0, 255)"]
+              }
+            }
+          }
+        }
+      },
+      */
+
+      // Example Rule 7 - Change the colors of the bar chart visualization, in any application,
+      // by using a registered palette
+      /*
+       {
+        select: {
+          type: "pentaho/visual/models/bar"
+        },
+        apply: {
+          props: {
+            palette: {
+              defaultValue: {
+                $instance: {id: "pentaho/visual/color/palettes/nominalLight"}
+              }
+            }
+          }
+        }
+      },
+      */
+
+      // Example Rule 8 - Reduce the ranking of the "nominalPrimary" palette,
+      // so that another palette gets chosen first instead.
+      /*
+      {
+        select: {
+          type: "pentaho/type/Context"
+        },
+        apply: {
+          instances: {
+            "pentaho/visual/color/palettes/nominalPrimary": {ranking: -1000}
+          }
+        }
       }
       */
     ]
