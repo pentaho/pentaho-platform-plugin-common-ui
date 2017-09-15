@@ -429,6 +429,59 @@ define([
         return result;
       },
 
+      /**
+       * Gets the [extensional]{@link https://en.wikipedia.org/wiki/Extensional_definition} representation of a [Filter]{@link pentaho.data.filter.spec.IFilter}.
+       *
+       * @param {!pentaho.data.AbstractTable} dataTable
+       * @param {!String[]} keyColumnNames
+       *
+       * @return {!pentaho.data.filter.Or|!pentaho.data.filter.False}
+       */
+      toExtensional: function(dataTable, keyColumnNames) {
+        var filteredData = dataTable.filter(this);
+        var columnNameToIdx = getColumnIdToIndexMap( filteredData, keyColumnNames );
+
+        var orOperands = [];
+        var numRows = filteredData.getNumberOfRows();
+        for(var rowIdx = 0; rowIdx < numRows; rowIdx++) {
+          var andOperands = keyColumnNames.map(function(keyColumnName) {
+            var cellValue = filteredData.getValue(rowIdx, columnNameToIdx[keyColumnName]);
+            var columnType = filteredData.getColumnType(columnNameToIdx[keyColumnName]);
+            return new __filter.IsEqual({property: keyColumnName, value: {_: columnType, v: cellValue}});
+          });
+
+          if(andOperands.length > 0) {
+            orOperands.push(new __filter.And({operands: andOperands}));
+          }
+        }
+
+        if(orOperands.length > 0) {
+          return new __filter.Or({operands: orOperands});
+        }
+
+        // no conditions were specified
+        return __filter.False.instance;
+
+
+        /**
+         * Gets an object where the keys are the column names and the values the respective column index.
+         *
+         * @param {!pentaho.data.ITable} dataTable
+         * @param {!string[]} columnNames
+         *
+         * @returns {!{}} key
+         */
+        function getColumnIdToIndexMap( dataTable, columnNames ) {
+          var columnNameToIdx = {};
+
+          columnNames.forEach( function (columnName) {
+            columnNameToIdx[columnName] = dataTable.getColumnIndexByAttribute(columnName);
+          });
+
+          return columnNameToIdx;
+        }
+      },
+
       $type: /** @lends pentaho.data.filter.Abstract.Type# */{
         id: module.id,
 
