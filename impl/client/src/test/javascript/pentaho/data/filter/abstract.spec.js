@@ -15,8 +15,9 @@
  */
 define([
   "pentaho/type/Context",
+  "pentaho/data/Table",
   "tests/pentaho/util/errorMatch"
-], function(Context, errorMatch) {
+], function(Context, DataTable, errorMatch) {
 
   "use strict";
 
@@ -28,6 +29,8 @@ define([
     var AndFilter;
     var OrFilter;
     var CustomFilter;
+    var TrueFilter;
+    var FalseFilter;
 
     beforeEach(function(done) {
       Context.createAsync()
@@ -40,14 +43,18 @@ define([
               "pentaho/data/filter/not",
               "pentaho/data/filter/and",
               "pentaho/data/filter/or",
+              "pentaho/data/filter/true",
+              "pentaho/data/filter/false",
               "pentaho/data/filter/isEqual",
               "pentaho/data/filter/isGreater",
               "pentaho/data/filter/isLess"
-            ], function(Abstract, Not, And, Or) {
+            ], function(Abstract, Not, And, Or, True, False) {
               AbstractFilter = Abstract;
               NotFilter = Not;
               AndFilter = And;
               OrFilter = Or;
+              TrueFilter = True;
+              FalseFilter = False;
 
               CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
             });
@@ -663,6 +670,95 @@ define([
          expectAndNot(originalSpec, subtractSpec, expected);
 
         });
+      });
+
+      describe("#toExtensional()", function() {
+
+        /**
+         *
+         * @return {pentaho.data.AbstractTable}
+         */
+        function getTable() {
+          return new DataTable({
+            model: [
+              {name: "Country", type: "string"},
+              {name: "Sales", type: "number"},
+              {name: "Years", type: "number"}
+            ],
+            rows: [
+              {c: [{v: "Portugal"}, {v: 12000}, {v: 2003}]},
+              {c: [{v: "Portugal"}, {v: 6000}, {v: 2004}]},
+              {c: [{v: "Spain"}, {v: 12000}, {v: 2003}]},
+              {c: [{v: "Spain"}, {v: 1000}, {v: 2005}]}
+            ]
+          });
+        }
+
+        it("Adds a condition on a property not explicitly included in the intentional filter", function () {
+          var intentionalFilter = createFilter({_: "=", p: "Country", v: "Portugal"});
+          var table = getTable();
+          var keyColumns = ["Country", "Years"];
+
+          var actualExtensionalFilter = intentionalFilter.toExtensional(table, keyColumns);
+          var expectedExtensionalFilterSpec = {
+            _: "or",
+            o: [ {_: "and",
+                  o: [ {_: "=", p: "Country", v:"Portugal"},
+                       {_: "=", p: "Years",   v:2003}]}, // Years added
+                 {_: "and",
+                  o: [ {_: "=", p: "Country", v:"Portugal"},
+                       {_: "=", p: "Years",   v:2004}]}]}; // Years added
+
+          expect(actualExtensionalFilter.toSpec({forceType: true})).toEqual(expectedExtensionalFilterSpec);
+        });
+
+        it("An Or filter without operands is considered as False", function () {
+          var table = getTable();
+          var keyColumns = ["Country"];
+          var intentionalFilter = createFilter({_: "or"});
+
+          var actualExtensionalFilter = intentionalFilter.toExtensional(table, keyColumns);
+
+          expect(actualExtensionalFilter instanceof FalseFilter).toBe(true);
+        });
+
+        it("If the provided data is empty then the extensional filter should be False", function () {
+          var emptyTable = new DataTable();
+          var keyColumns = ["Country"];
+          var intentionalFilter = createFilter({_: "=", p: "Country", v: "Portugal"});
+
+          var actualExtensionalFilter = intentionalFilter.toExtensional(emptyTable, keyColumns);
+
+          expect(actualExtensionalFilter instanceof FalseFilter).toBe(true);
+        });
+
+        it("If the resulting filtered data of the intentional filter is empty then the extensional filter should be False", function () {
+          var table = getTable();
+          var keyColumns = ["Country"];
+          var intentionalFilter = createFilter({_: "=", p: "Country", v: "NonExistingCountry"});
+
+          //verifying assumptions
+          expect(table.filter(intentionalFilter).getNumberOfRows()).toEqual(0);
+
+          var actualExtensionalFilter = intentionalFilter.toExtensional(table, keyColumns);
+
+          expect(actualExtensionalFilter instanceof FalseFilter).toBe(true);
+        });
+
+
+        it("If there is data that passes the filter but no KeyColumns are specified then Throw error", function () {
+          var table = getTable();
+          var emptyKeyColumns = [];
+          var intentionalFilter = createFilter({_: "=", p: "Country", v: "Portugal"});
+
+          //verifying assumptions
+          expect(table.filter(intentionalFilter).getNumberOfRows()).toBeGreaterThan(0);
+
+          expect(function() {
+            intentionalFilter.toExtensional(table, emptyKeyColumns);
+          }).toThrow(errorMatch.argInvalid("keyColumnNames"));
+        });
+
       });
     });
 

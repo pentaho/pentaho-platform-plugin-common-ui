@@ -429,6 +429,72 @@ define([
         return result;
       },
 
+      /**
+       * Gets the [extensional]{@link https://en.wikipedia.org/wiki/Extensional_definition} representation of a
+       * [Filter]{@link pentaho.data.filter.spec.IFilter} by specifying the clauses that select data by inclusion.
+       * If the resulting filtered data of a filter is empty then the [false filter]{@link pentaho.data.filter.False}
+       * is returned
+       *
+       * @param {!pentaho.data.ITable} dataTable - The data to be used when determining the values of the key columns
+       * used in the extensional representation of the filter.
+       * @param {String[]} keyColumnNames - The names of the columns from the {@code dataTable} that are considered key.
+       *
+       * @return {!pentaho.data.filter.Or|!pentaho.data.filter.False}
+       *
+       * @throws {pentaho.lang.ArgumentInvalidError} When the resulting filtered data is not empty and keyColumnNames
+       * is empty.
+       */
+      toExtensional: function(dataTable, keyColumnNames) {
+        var filteredData = dataTable.filter(this);
+        var numRows = filteredData.getNumberOfRows();
+        // applying the filter returns no data therefore select nothing (False filter)
+        if(numRows === 0) {
+          return __filter.False.instance;
+        }
+
+        // If some data passes the filter and no key columns are specified then we have
+        // no way of making an extensional filter to represent those lines
+        if(keyColumnNames.length === 0) {
+          throw error.argInvalid("keyColumnNames", "At least one key column must be specified." );
+        }
+
+        var columnNameToIdx = getColumnIdToIndexMap(filteredData, keyColumnNames);
+        var orOperands = [];
+        for(var rowIdx = 0; rowIdx < numRows; rowIdx++) {
+          var andOperands = keyColumnNames.map(function(keyColumnName) {
+            var cellValue = filteredData.getValue(rowIdx, columnNameToIdx[keyColumnName]);
+            var columnType = filteredData.getColumnType(columnNameToIdx[keyColumnName]);
+            return new __filter.IsEqual({property: keyColumnName, value: {_: columnType, v: cellValue}});
+          });
+
+          orOperands.push(new __filter.And({operands: andOperands}));
+        }
+
+        return new __filter.Or({operands: orOperands});
+
+        /**
+         * Gets an object where the keys are the column names and the values the respective column index.
+         *
+         * @param {!pentaho.data.ITable} dataTable
+         * @param {string[]} keyColumnNames
+         *
+         * @returns {!Object.<string, number>} key
+         */
+        function getColumnIdToIndexMap( dataTable, keyColumnNames ) {
+          var columnNameToIdx = {};
+
+          keyColumnNames.forEach( function (columnName) {
+            var colIdx = dataTable.getColumnIndexByAttribute(columnName);
+            if(colIdx === -1) {
+              throw error.argInvalid("keyColumnNames", "The column name " + columnName + " is not in the dataTable.")
+            }
+            columnNameToIdx[columnName] = colIdx;
+          });
+
+          return columnNameToIdx;
+        }
+      },
+
       $type: /** @lends pentaho.data.filter.Abstract.Type# */{
         id: module.id,
 

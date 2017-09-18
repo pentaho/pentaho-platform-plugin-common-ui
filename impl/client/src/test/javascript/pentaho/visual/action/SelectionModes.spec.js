@@ -140,7 +140,7 @@ define([
 
         var args = SelectionModes.add.calls.first().args;
         expect(args[0]).toBe(currentFilter);
-        expect(args[1]).not.toBe(inputFilter); // should be "not yet selected input"
+        expect(args[1]).toBe(inputFilter);
 
         expect(result instanceof OrFilter).toBe(true);
       });
@@ -166,7 +166,7 @@ define([
 
         var args = SelectionModes.add.calls.first().args;
         expect(args[0]).toBe(currentFilter);
-        expect(args[1]).not.toBe(inputFilter); // should be "not yet selected input"
+        expect(args[1]).toBe(inputFilter);
 
         expect(result instanceof OrFilter).toBe(true);
       });
