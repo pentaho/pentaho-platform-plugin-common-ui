@@ -52,17 +52,32 @@ define([
       if(!input) return current;
 
       // Determine if all rows in input are currently selected.
-      // current.include(input) ?
-      // input \ current = 0
-      var unselectedInput = input.andNot(current).toDnf();
+      //
+      // In times, we did this test intentionally:
+      // * current.include(input) ?
+      // * <=> input \ current = 0
+      // * <=> unselectedInput = input.andNot(current).toDnf();
+      //
+      // However, this approach proved wrong in cases where `current` and `input` have
+      // a different structure (or intentionality character).
+      // In particular, admit that `current` and `input` select the same rows of data,
+      // with the current data.
+      // Additionally, `current = input.toExtensional(data, keys)`.
+      // The above test would not return an empty set, but, instead, something like
+      // `input - row2 - row1`, cause the algorithm has no way to know that, with the current data,
+      // the `input` filter includes only `row1` and `row2`.
 
-      if(_isDebugMode) logger.log(unselectedInput.kind === "false" ? "removing" : "adding");
+      var data = this.model.data;
+      if(!data) return current;
 
-      var result = unselectedInput.kind === "false"
-          // all input is already selected, so, actually, toggle it all
-          ? SelectionModes.remove.call(this, current, input)
-          // not all input is already selected, so, add what's missing first, before actually toggling.
-          : SelectionModes.add.call(this, current, unselectedInput);
+      data = data.toPlainTable();
+
+      var inputData = data.filter(input);
+      var currentInputData = inputData.filter(current);
+      var isAllInputSelected = (inputData.getNumberOfRows() === currentInputData.getNumberOfRows());
+
+      var selectionMode = isAllInputSelected ? SelectionModes.remove : SelectionModes.add;
+      var result = selectionMode.call(this, current, input);
 
       if(_isDebugMode) logger.log("TOGGLE END");
 
