@@ -142,6 +142,21 @@
  * the first error returned by the `validate` method.
  */
 
+
+/**
+ * Returns a view for the subset of rows of a data table
+ * that are selected by this filter.
+ *
+ * @name pentaho.data.ITable#filter
+ * @method
+ * @param {!pentaho.data.filter.Abstract} filter - The filter.
+ *
+ * @return {!pentaho.data.TableView} A view of the filtered data table.
+ *
+ * @throws {pentaho.type.ValidationError} When the filter is not valid,
+ * the first error returned by the `validate` method.
+ */
+
 /**
  * Gets the index of the first column having a given attribute.
  *

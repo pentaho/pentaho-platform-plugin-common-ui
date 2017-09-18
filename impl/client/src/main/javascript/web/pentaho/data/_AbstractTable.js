@@ -288,15 +288,7 @@ define([
     },
 
     /**
-     * Returns a view for the subset of rows of a data table
-     * that are selected by this filter.
-     *
-     * @param {!pentaho.data.filter.Abstract} filter - The filter.
-     *
-     * @return {!pentaho.data.TableView} A view of the filtered data table.
-     *
-     * @throws {pentaho.type.ValidationError} When the filter is not valid,
-     * the first error returned by the `validate` method.
+     * @inheritDoc
      */
     filter: function(filter) {
 

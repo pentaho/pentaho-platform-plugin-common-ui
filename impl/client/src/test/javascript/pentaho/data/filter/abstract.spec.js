@@ -29,6 +29,7 @@ define([
     var AndFilter;
     var OrFilter;
     var CustomFilter;
+    var TrueFilter;
     var FalseFilter;
 
     beforeEach(function(done) {
@@ -42,15 +43,17 @@ define([
               "pentaho/data/filter/not",
               "pentaho/data/filter/and",
               "pentaho/data/filter/or",
+              "pentaho/data/filter/true",
               "pentaho/data/filter/false",
               "pentaho/data/filter/isEqual",
               "pentaho/data/filter/isGreater",
               "pentaho/data/filter/isLess"
-            ], function(Abstract, Not, And, Or, False) {
+            ], function(Abstract, Not, And, Or, True, False) {
               AbstractFilter = Abstract;
               NotFilter = Not;
               AndFilter = And;
               OrFilter = Or;
+              TrueFilter = True;
               FalseFilter = False;
 
               CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
@@ -743,14 +746,17 @@ define([
         });
 
 
-        it("If there are no KeyColumns then the extensional filter should be False", function () {
+        it("If there is data that passes the filter but no KeyColumns are specified then Throw error", function () {
           var table = getTable();
           var emptyKeyColumns = [];
-          var intentionalFilter = createFilter({_: "=", p: "Country", v: "NonExistingCountry"});
+          var intentionalFilter = createFilter({_: "=", p: "Country", v: "Portugal"});
 
-          var actualExtensionalFilter = intentionalFilter.toExtensional(table, emptyKeyColumns);
+          //verifying assumptions
+          expect(table.filter(intentionalFilter).getNumberOfRows()).toBeGreaterThan(0);
 
-          expect(actualExtensionalFilter instanceof FalseFilter).toBe(true);
+          expect(function() {
+            intentionalFilter.toExtensional(table, emptyKeyColumns);
+          }).toThrow(errorMatch.argInvalid("keyColumnNames"));
         });
 
       });
