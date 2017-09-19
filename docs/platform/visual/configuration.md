@@ -227,7 +227,7 @@ var ruleSpec = {
   },
   apply: {
     colors: [
-      "red", "#00FF00", "rgb(0, 0, 255)"
+      "red", "#00FF00", "rgb(0,0,255)"
     ]
   }
 };
@@ -249,7 +249,7 @@ var ruleSpec = {
       palette: {
         defaultValue: {
           level: "nominal",
-          colors: ["red", "#00FF00", "rgb(0, 0, 255)"]
+          colors: ["red", "#00FF00", "rgb(0,0,255)"]
         }
       }
     }
