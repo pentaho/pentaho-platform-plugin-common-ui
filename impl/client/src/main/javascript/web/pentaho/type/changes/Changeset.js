@@ -71,28 +71,35 @@ define([
       this.__isReadOnly = false;
       this.__ownerVersion = owner.$version;
 
-      // The longest path by which this changeset can be reached following the path of changesets
-      // and their owner's references.
+      // The longest path by which this changeset can be reached following the path of children changesets.
       this._netOrder = 0;
 
       transaction.__addChangeset(this);
     },
 
     /**
-     * Updates the order of this changeset to reflect its topological sort order.
+     * Updates the order of this changeset, and of any child changesets, to reflect its topological sort order.
      *
      * @param {number} netOrder - The net order.
-     * @return {boolean} `true` if the order was updated; `false`, otherwise.
      * @private
      * @internal
      */
     __updateNetOrder: function(netOrder) {
       if(this._netOrder < netOrder) {
         this._netOrder = netOrder;
-        return true;
+        this.__updateChildChangesetsNetOrder(netOrder + 1);
       }
-      return false;
     },
+
+    /**
+     * Updates the topological order of any child changesets.
+     *
+     * @name pentaho.type.changes.Changeset#__updateChildChangesetsNetOrder
+     * @param {number} childrenNetOrder - The minimum net order of children.
+     *
+     * @private
+     * @internal
+     */
 
     // Should be marked protected abstract, but that would show in the docs.
     /**

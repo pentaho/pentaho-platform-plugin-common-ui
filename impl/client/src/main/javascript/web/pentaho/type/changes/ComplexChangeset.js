@@ -111,6 +111,19 @@ define([
     },
 
     /** @inheritDoc */
+    __updateChildChangesetsNetOrder: function(childrenNetOrder) {
+      var changes = this._changes;
+      for(var name in changes) {
+        if(O.hasOwn(changes, name)) {
+          var change = changes[name];
+          if(change instanceof Changeset) {
+            change.__updateNetOrder(childrenNetOrder);
+          }
+        }
+      }
+    },
+
+    /** @inheritDoc */
     __setNestedChangeset: function(csetNested, propType) {
       // Cannot set changesets like this over Replace changes, or the latter would be, well... , overwritten.
       // this._changes[propType.name] = csetNested;
@@ -180,9 +193,6 @@ define([
 
     // ATTENTION: This method's name and signature must be in sync with that of Complex#__getStateByName.
     // NOTE: Can be called for both list and element properties.
-    // TODO: this method may not work well before Transaction#__buildGraph runs (acceptwill)...
-    // until then, bubbled changes may not be detected.
-    // Would need the graph to be built as Changesets are being created...
     __getStateByName: function(name) {
       var change = O.getOwn(this._changes, name);
       if(!change) return this.owner.__getStateByName(name);
