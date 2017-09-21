@@ -211,6 +211,17 @@ define([
       this.__csets.push(changeset);
 
       if(this.__isCurrent) owner.__cset = changeset;
+
+      // Traverse references and create changesets, connecting them along the way.
+      // TODO: Should be being careful not to create changeset cycles when there are reference cycles...
+      var refs = owner.__refs;
+      if(refs) refs.forEach(function(aref) {
+
+        var container = aref.container;
+        var containerChangeset = O.getOwn(this.__csetByUid, container.$uid) || container._createChangeset(this);
+
+        containerChangeset.__setNestedChangeset(changeset, aref.property);
+      }, this);
     },
 
     /**
@@ -228,89 +239,20 @@ define([
       while(++i < L) fun.call(this, changesets[i]);
     },
 
-    // At least initially, the leafs of the graph are those changesets that have local, primitive changes.
-    __buildGraph: function() {
-      // owner uid : true
-      var visitedSet = Object.create(null);
+    __sortGraph: function() {
+      // 1. Changesets have already been propagated — all references to current containers were traversed
+      //    each time individual leaf changesets were created. Changesets have no cycles.
+      // 2. Now, changesets are traversed recursively and their net order is updated.
+      // 3. There is one gotcha with the approach of traversing child changesets: a Replace change
+      //    shadows an existing changeset in the same property; that subtree's net order will be untouched.
+      //    In a way, because the two trees will become disconnected after committing, it might be ok that
+      //    the order of evaluation between the two is undefined...
+      //    Otherwise, shadowed changesets would need to be traversed as well.
 
-      this.__eachChangeset(function(cset) {
-        this.__exploreContainer(cset.owner, 0, visitedSet);
-      }, this);
+      this.__eachChangeset(function(cset) { cset.__updateNetOrder(0); });
 
-      // Sort the changesets according to topological order.
+      // Sort the changesets according to inverse topological order (leafs first, roots last).
       this.__csets.sort(__compareChangesets);
-    },
-
-    __exploreContainer: function(container, netOrder, visitedSet) {
-      var cset = container.__cset;
-      var uid = container.$uid;
-
-      // Already been here?
-      if(uid in visitedSet) {
-        // Yes...
-
-        // Is it a cycle? Is this container already being explored in the stack?
-        if(visitedSet[uid]) {
-          // This is a loop!
-          // 1. We can't explore further.
-          // 2. Don't update the net order - it would keep increasing ad infinitum - so keep initial order.
-          // 3. Return null, so that _addNestedChangeset below is not called;
-          //    this leaves the cycle out of changesets and makes user's lifes' easier.
-          return null;
-        }
-
-        // This isn't a loop.
-        this.__updateContainerNetOrder(container, netOrder, visitedSet);
-        return cset;
-      }
-
-      // 1st time here
-      visitedSet[uid] = true;
-
-      if(!cset) cset = container._createChangeset(this);
-
-      cset.__updateNetOrder(netOrder);
-
-      // Follow refs
-      var refs = container.__refs;
-      if(refs) refs.forEach(function(aref) {
-
-        var containerRef = this.__exploreContainer(aref.container, netOrder + 1, visitedSet);
-        if(containerRef)
-          // Not a cycle, so hook up the two.
-          containerRef.__setNestedChangeset(cset, aref.property);
-
-      }, this);
-
-      // Mark as not in path anymore.
-      // Keep the fact that we've been there, by not deleting the property.
-      visitedSet[uid] = false;
-
-      return cset;
-    },
-
-    __updateContainerNetOrder: function(container, netOrder, visitedSet) {
-      // 1. Must update the net order of cset to the highest one with which one can get to it, from leafs.
-      // 2. If the net order increases, must then propagate the change to its references,
-      //    until it does not increase anymore or the graph ends.
-      // 3. The fact that it isn't a loop up until now, doesn't mean that, ahead, there isn't a loop...
-      // 4. Because we're already been here, surely all paths forward already have changesets.
-
-      var uid = container.$uid;
-      if(!visitedSet[uid]) {
-        visitedSet[uid] = true;
-
-        if(container.__cset.__updateNetOrder(netOrder)) {
-          // Propagate through references...
-
-          var refs = container.__refs;
-          if(refs) refs.forEach(function(aref) {
-            this.__updateContainerNetOrder(aref.container, netOrder + 1, visitedSet);
-          }, this);
-        }
-
-        visitedSet[uid] = false;
-      }
     },
     // endregion
 
@@ -549,7 +491,7 @@ define([
 
     // @private
     __commitWillCore: function() {
-      this.__buildGraph();
+      this.__sortGraph();
 
       var result = this.__resultWill = this.__notifyChangeWill();
 
@@ -674,6 +616,6 @@ define([
   });
 
   function __compareChangesets(csa, csb) {
-    return csa._netOrder - csb._netOrder;
+    return csb._netOrder - csa._netOrder;
   }
 });

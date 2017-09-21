@@ -1199,6 +1199,101 @@ define([
         });
       }); // end domainOf
 
+      describe("#isDefaultedOf(name)", function() {
+
+        var Derived;
+
+        beforeEach(function() {
+          Derived = Complex.extend({
+            $type: {
+              props: [
+                {name: "x", valueType: "string"},
+                {name: "y", valueType: ["string"]}
+              ]
+            }
+          });
+        });
+
+        describe("element valueType property", function() {
+
+          it("should be true when a value has not been specified", function() {
+
+            var derived = new Derived();
+
+            expect(derived.isDefaultedOf("x")).toBe(true);
+          });
+
+          it("should be false when a value has been specified", function() {
+
+            var derived = new Derived({"x": "a"});
+
+            expect(derived.isDefaultedOf("x")).toBe(false);
+          });
+
+          it("should be true after being set", function() {
+
+            var derived = new Derived();
+
+            derived.x = "a";
+
+            expect(derived.isDefaultedOf("x")).toBe(false);
+          });
+
+          it("should be true after being set, within a transaction", function() {
+
+            var derived = new Derived();
+
+            var txnScope = context.enterChange();
+            try {
+              derived.x = "a";
+
+              expect(derived.isDefaultedOf("x")).toBe(false);
+            } finally {
+              txnScope.dispose();
+            }
+          });
+        });
+
+        describe("list valueType property", function() {
+
+          it("should be true when a value has not been specified", function() {
+
+            var derived = new Derived();
+
+            expect(derived.isDefaultedOf("y")).toBe(true);
+          });
+
+          it("should be false when a value has been specified", function() {
+
+            var derived = new Derived({"y": ["a"]});
+
+            expect(derived.isDefaultedOf("y")).toBe(false);
+          });
+
+          it("should be true after being set", function() {
+
+            var derived = new Derived();
+
+            derived.y = ["a"];
+
+            expect(derived.isDefaultedOf("y")).toBe(false);
+          });
+
+          it("should be true after being set, within a transaction", function() {
+
+            var derived = new Derived();
+
+            var txnScope = context.enterChange();
+            try {
+              derived.y = ["a"];
+
+              expect(derived.isDefaultedOf("y")).toBe(false);
+            } finally {
+              txnScope.dispose();
+            }
+          });
+        });
+      }); // isDefaultedOf
     });
 
     describe("#clone", function() {

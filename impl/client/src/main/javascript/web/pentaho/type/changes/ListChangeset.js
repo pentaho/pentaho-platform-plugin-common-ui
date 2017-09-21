@@ -133,6 +133,16 @@ define([
     },
 
     /** @inheritDoc */
+    __updateChildChangesetsNetOrder: function(childrenNetOrder) {
+      var changesByKey = this._changesByElemKey;
+      for(var key in changesByKey) { // nully tolerant
+        if(O.hasOwn(changesByKey, key)) {
+          changesByKey[key].__updateNetOrder(childrenNetOrder);
+        }
+      }
+    },
+
+    /** @inheritDoc */
     __setNestedChangeset: function(csetNested) {
       this._changesByElemKey[csetNested.owner.$key] = csetNested;
     },
