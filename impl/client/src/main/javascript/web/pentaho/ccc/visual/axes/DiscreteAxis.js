@@ -30,15 +30,22 @@ define([
 
       this.getSelectionMappingAttrInfos().each(function(maInfo) {
         var atom = complex.atoms[maInfo.cccDimName];
-        var value = atom.value == null ? atom.rawValue : atom.value;
+        var value = atom.value === null ? atom.rawValue : atom.value;
 
-        if(value != null) {
+        var isNullValue = value === null;
+        var isDefaultNullMember = isNullValue && complex.isAtomRootDefault(atom);
+
+        if(!isDefaultNullMember) {
           if(!IsEqual) IsEqual = context.get("=");
 
           var attrType = maInfo.attr.type;
           var valueType = attrType === "number" ? attrType : "string";
 
-          var operand = new IsEqual({property: maInfo.attr.name, value: {_: valueType, v: value, f: atom.label}});
+          var operand = new IsEqual({
+            property: maInfo.attr.name,
+            value: isNullValue ? null : {_: valueType, v: value, f: atom.label}
+          });
+
           filter = filter ? filter.and(operand) : operand;
         }
       });
