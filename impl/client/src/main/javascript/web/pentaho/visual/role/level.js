@@ -50,7 +50,7 @@ define([
        * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.Level>} pentaho/visual/role/level
        *
        * @classDesc The `Level` class is [String]{@link pentaho.type.String} based enumeration
-       * that represents a **Level or Measurement**,
+       * that represents a **Level of Measurement**,
        * as understood by [S. S. Steven]{@link https://en.wikipedia.org/wiki/Level_of_measurement}.
        *
        * Currently, the following levels of measurement are supported:
