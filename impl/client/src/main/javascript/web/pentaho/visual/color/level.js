@@ -38,7 +38,7 @@ define([
    * @amd {pentaho.type.Factory<pentaho.visual.color.Level>} pentaho/visual/color/level
    *
    * @classDesc The `Level` class is [String]{@link pentaho.type.String} based enumeration
-   * that represents a **Level or Measurement**,
+   * that represents a **Level of Measurement**,
    * as understood by [S. S. Steven]{@link https://en.wikipedia.org/wiki/Level_of_measurement}
    * and as applied to the visual representation capabilities of a color palette.
    *
