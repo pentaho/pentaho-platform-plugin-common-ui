@@ -39,7 +39,7 @@ define([
           if(!IsEqual) IsEqual = context.get("=");
 
           var attrType = maInfo.attr.type;
-          var valueType = attrType === "number" ? attrType : "string";
+          var valueType = attrType;
 
           var operand = new IsEqual({
             property: maInfo.attr.name,
