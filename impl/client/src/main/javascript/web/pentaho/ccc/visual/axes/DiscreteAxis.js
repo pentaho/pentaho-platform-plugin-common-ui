@@ -29,21 +29,19 @@ define([
       var IsEqual;
 
       this.getSelectionMappingAttrInfos().each(function(maInfo) {
-        var atom = complex.atoms[maInfo.cccDimName];
-        var value = atom.value === null ? atom.rawValue : atom.value;
 
-        var isNullValue = value === null;
-        var isDefaultNullMember = isNullValue && complex.isAtomRootDefault(atom);
-
-        if(!isDefaultNullMember) {
+        var atom = complex.getSpecifiedAtom(maInfo.cccDimName);
+        if(atom) {
           if(!IsEqual) IsEqual = context.get("=");
+
+          var value = atom.value === null ? atom.rawValue : atom.value;
 
           var attrType = maInfo.attr.type;
           var valueType = attrType;
 
           var operand = new IsEqual({
             property: maInfo.attr.name,
-            value: isNullValue ? null : {_: valueType, v: value, f: atom.label}
+            value: value === null ? null : {_: valueType, v: value, f: atom.label}
           });
 
           filter = filter ? filter.and(operand) : operand;
