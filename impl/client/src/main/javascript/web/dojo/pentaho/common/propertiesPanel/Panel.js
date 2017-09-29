@@ -1078,18 +1078,23 @@ define([
 
     postCreate: function() {
       this.menuHandle = query("div.gemMenuHandle", this.domNode)[0];
-
+      if(!this.menuHandle){
+        this.menuHandle=query(".gemMenuHandle", this.domNode)[0];
+      }
       var gemLabel = query("div.gem-label", this.domNode)[0];
+      if(!gemLabel){
+        gemLabel=query(".gem-label", this.domNode)[0];
+      }
       gemLabel.innerHTML = this.model.value;
 
       this.own(
         on(this.domNode, "contextmenu", lang.hitch(this, "onContextMenu")),
-        on(query("div.gemMenuHandle",  this.domNode)[0], "mouseover",  function(e) {
+        on(this.menuHandle, "mouseover",  function(e) {
           if(!ManagerClass.manager().source) {
             domClass.add(e.target, "over");
           }
         }),
-        on(query("div.gemMenuHandle", this.domNode)[0], "mouseout", function(e) {
+        on(this.menuHandle, "mouseout", function(e) {
           if(!ManagerClass.manager().source) {
             domClass.remove(e.target, "over");
           }
