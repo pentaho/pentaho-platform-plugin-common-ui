@@ -70,7 +70,7 @@ npm install
         </style>
        
         <!-- Load RequireJS. -->
-        <script type="text/javascript" src="node_modules/RequireJS/require.js"></script>
+        <script type="text/javascript" src="node_modules/requirejs/require.js"></script>
     
         <!-- Load the VizAPI dev bootstrap helper. -->
         <script type="text/javascript" src="node_modules/@pentaho/viz-api/dev-bootstrap.js"></script>

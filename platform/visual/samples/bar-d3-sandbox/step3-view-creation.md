@@ -82,7 +82,7 @@ Edit the `index.html` file and place the following code in it:
     }
   </style>
 
-  <script type="text/javascript" src="node_modules/RequireJS/require.js"></script>
+  <script type="text/javascript" src="node_modules/requirejs/require.js"></script>
 
   <script type="text/javascript" src="node_modules/@pentaho/viz-api/dev-bootstrap.js"></script>
 
