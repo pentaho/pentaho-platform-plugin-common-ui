@@ -125,7 +125,11 @@ define(["pentaho/util/has"], function(has) {
         host: m[3] + (m[4] != null ? m[4] : ""),
         port: (m[4] != null ? m[4].substring(1) : ""),
         origin: m[1] + "//" + m[3] + (m[4] != null ? m[4] : ""),
-        pathname: m[5]
+        pathname: m[5],
+
+        toString: function() {
+          return url;
+        }
       };
     }
 
