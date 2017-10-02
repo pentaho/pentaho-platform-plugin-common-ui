@@ -26,8 +26,6 @@ define([
 
   // TODO: This class does not have unit tests.
 
-  var O_isProtoOf = Object.prototype.isPrototypeOf;
-
   return Base.extend(module.id, /** @lends pentaho.instanceInfo.impl.Service# */{
 
     /**

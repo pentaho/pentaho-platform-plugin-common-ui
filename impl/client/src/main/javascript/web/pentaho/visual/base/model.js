@@ -20,7 +20,13 @@ define([
   // so that r.js sees otherwise invisible dependencies.
   "pentaho/type/model",
   "pentaho/visual/role/property",
+  "pentaho/visual/role/mapping",
+  "pentaho/visual/role/mappingAttribute",
+  "pentaho/visual/role/aggregation",
+  "pentaho/visual/role/level",
   "pentaho/visual/color/paletteProperty",
+  "pentaho/visual/color/palette",
+  "pentaho/visual/color/level",
   "pentaho/visual/base/application"
 ], function(module, bundle) {
 
