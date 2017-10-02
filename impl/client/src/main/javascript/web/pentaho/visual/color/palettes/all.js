@@ -16,23 +16,18 @@
 
 // This exists only so that r.js sees otherwise invisible dependencies.
 define([
-  "./instance",
-  "./value",
-  "./element",
-  "./list",
-  "./simple",
-  "./complex",
-  "./string",
-  "./number",
-  "./boolean",
-  "./date",
-  "./object",
-  "./function",
-  "./property",
-  "./model",
-  "./application",
-  "./mixins/enum",
-  "./mixins/discreteDomain"
+  "./divergentRyb3",
+  "./divergentRyb5",
+  "./divergentRyg3",
+  "./divergentRyg5",
+  "./nominalDark",
+  "./nominalLight",
+  "./nominalNeutral",
+  "./nominalPrimary",
+  "./quantitativeBlue3",
+  "./quantitativeBlue5",
+  "./quantitativeGray3",
+  "./quantitativeGray5"
 ], function() {
   "use strict";
 });

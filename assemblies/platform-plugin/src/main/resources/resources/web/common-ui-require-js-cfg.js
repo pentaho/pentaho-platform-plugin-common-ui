@@ -154,6 +154,9 @@
   requirePaths["dojo/store/Memory"] = dojoOverrides + "dojo/store/Memory";
   requirePaths["dijit/_HasDropDown"] = dojoOverrides + "dijit/_HasDropDown";
   requirePaths["dijit/_CssStateMixin"] = dojoOverrides + "dijit/_CssStateMixin";
+  requirePaths["dojo/selector/_loader"] = dojoOverrides + "dojo/selector/_loader";
+  requirePaths["dojo/i18n"] = dojoOverrides + "dojo/i18n";
+  requirePaths["dojo/request/default"] = dojoOverrides + "dojo/request/default";
   // endregion
 
   // region Plugin Handler
