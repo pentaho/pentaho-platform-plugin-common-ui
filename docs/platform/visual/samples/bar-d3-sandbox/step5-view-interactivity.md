@@ -265,7 +265,7 @@ You should see the selected bar exhibiting different colors.
 You might have noticed that, when double-clicking, apart from the `dblclick` event, 
 two other `click` events are being triggered. 
 This is a known issue of DOM events and there are multiple solutions to it.
-Here's one solution, specifically for D3: 
-[Distinguishing click and double-click in D3](http://bl.ocks.org/couchand/6394506).
+Here's one solution, specifically for D3:
+[Distinguishing click and double-click in D3](http://bl.ocks.org/ropeladder/83915942ac42f17c087a82001418f2ee).
 
 **Continue** to [Adding a default configuration](step6-default-configuration).
