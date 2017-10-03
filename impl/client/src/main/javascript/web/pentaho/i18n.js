@@ -35,10 +35,7 @@ define([
       } else {
         var bundleInfo = getBundleInfo(localRequire, bundlePath);
         var serverUrl = context.server.url;
-
-        // Taking into account embedded scenarios when the host
-        // is not the Pentaho Server / PDI
-        var bundleUrl = "json!" + serverUrl +
+        var bundleUrl = "json!" + ((serverUrl && serverUrl.pathname) || "") +
             "i18n?plugin=" + bundleInfo.pluginId + "&name=" + bundleInfo.name;
 
         localRequire([bundleUrl], function(bundle) {
@@ -107,14 +104,11 @@ define([
 
     var absBundleUrl = localRequire.toUrl(bundleMid);
 
-    var serverUrl = context.server.url;
-
     // Remove basePath from bundle url
-    // Taking into account embedded scenarios, where it will be a full URL - "http://host:port/..."
-    var reminderUrlRegX = new RegExp("^(?:" + serverUrl + "|" + serverUrl.origin + "|" + serverUrl.pathname + ")(.*)");
-    var reminderUrlMatch = reminderUrlRegX.exec(absBundleUrl);
-
-    absBundleUrl = reminderUrlMatch ? reminderUrlMatch[1] : absBundleUrl;
+    var serverUrl = context.server.url;
+    var basePath = (serverUrl && serverUrl.pathname) || "";
+    if(basePath && absBundleUrl.indexOf(basePath) === 0)
+      absBundleUrl = absBundleUrl.substr(basePath.length);
 
     // The same for content/
     if(absBundleUrl.indexOf("content/") === 0)
