@@ -152,14 +152,14 @@ define([
             return Promise.reject(error.argInvalid("typeModule", "Not an array whose last position is a function."));
           }
 
-          return this.__loadFactory(factory, deps);
+          return this.__loadFactoryAsync(factory, deps);
         }
       }
 
       return Promise.reject(error.argInvalidType("typeModule", "Array", typeof typeModule));
     },
 
-    __loadFactory: function(factory, depRefs) {
+    __loadFactoryAsync: function(factory, depRefs) {
 
       if(depRefs.length) {
 
@@ -173,7 +173,9 @@ define([
     __createFromFactoryAsync: function(factory, deps) {
       var InstCtor;
       try {
-        InstCtor = factory.apply(this.context, deps);
+        InstCtor = this.context.__creatingType(this.id, function() {
+          return factory.apply(this, deps);
+        });
       } catch(ex) {
         // TODO: contextual error message.
         return Promise.reject(ex);
@@ -184,8 +186,8 @@ define([
     // endregion
 
     // region load from factory
-    loadFactory: function(factory, depRefs) {
-      return this.__finalizeCtorAsync(this.__loadFactory(factory, depRefs));
+    loadFactoryAsync: function(factory, depRefs) {
+      return this.__finalizeCtorAsync(this.__loadFactoryAsync(factory, depRefs));
     },
     // endregion
 
@@ -376,6 +378,14 @@ define([
        * @see pentaho.type.Context#__getByObjectSpec
        */
       this.__configDepth = 0;
+
+      /**
+       * The identifier of the type being created by a factory function.
+       * @type {string}
+       * @private
+       * @see pentaho.type.Context#__creatingType
+       */
+      this.__creatingTypeId = null;
 
       /**
        * The ambient/current transaction, if any, or `null`.
@@ -1433,7 +1443,7 @@ define([
 
         // When sync, it should be the case that every referenced id is already loaded,
         // or an error will be thrown when getting these.
-        return typeFactory.call(this);
+        return this.__creatingType(id, typeFactory);
       }
 
       // if id, may have configuration.
@@ -1441,7 +1451,7 @@ define([
       // Collect the refs of all dependencies used within typeSpec.
       var depRefs = this.__getDependencyRefs(typeSpec);
 
-      return new TypeHolder(id, this).loadFactory(typeFactory, depRefs);
+      return new TypeHolder(id, this).loadFactoryAsync(typeFactory, depRefs);
 
       function typeFactory() {
 
@@ -1504,6 +1514,16 @@ define([
 
       } finally {
         this.__configDepth--;
+      }
+    },
+
+    __creatingType: function(id, factory) {
+      var previousCreatingTypeId = this.__creatingTypeId;
+      this.__creatingTypeId = id; // may be null
+      try {
+        return factory.call(this);
+      } finally {
+        this.__creatingTypeId = previousCreatingTypeId;
       }
     }
     // endregion

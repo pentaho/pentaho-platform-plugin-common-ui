@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context"
-], function(Context) {
+  "pentaho/type/Context",
+  "tests/test-utils"
+], function(Context, testUtils) {
 
   "use strict";
 
   /* global describe:true, it:true, expect:true, beforeEach:true*/
+
+  /* eslint max-nested-callbacks: 0 */
+
+  // Use alternate, promise-aware version of `it`.
+  var it = testUtils.itAsync;
 
   describe("pentaho.type.Instance -", function() {
 
@@ -151,7 +157,7 @@ define([
 
       it("sets/gets some type attribute correctly", function() {
         expect(inst.$type.someAttribute).toBeUndefined();
-        inst.$type= {someAttribute: "someValue"};
+        inst.$type = {someAttribute: "someValue"};
         expect(inst.$type.someAttribute).toBe("someValue");
       });
 
@@ -170,4 +176,152 @@ define([
       });
     });
   }); // pentaho.type.Instance
+
+  describe("pentaho.type.Instance - custom AMD context", function() {
+
+    describe(".extend()", function() {
+
+      describe("$type.id defaulting", function() {
+
+        it("should not default $type.id when it is specified", function() {
+
+          function configAmd(localRequire) {
+            localRequire.define("test/module/id", function() {
+
+              return ["complex", function(Complex) {
+                return Complex.extend({
+                  $type: {
+                    id: "test/type/id"
+                  }
+                });
+              }];
+            });
+          }
+
+          return require.using(["pentaho/type/Context"], configAmd, function(Context) {
+
+            return Context.createAsync()
+              .then(function(context) {
+                return context.getAsync("test/module/id");
+              })
+              .then(function(TestType) {
+
+                expect(TestType.type.id).toBe("test/type/id");
+              });
+          });
+        });
+
+        it("should not default $type.id when $type.sourceId is specified", function() {
+
+          function configAmd(localRequire) {
+            localRequire.define("test/module/id", function() {
+
+              return ["complex", function(Complex) {
+                return Complex.extend({
+                  $type: {
+                    sourceId: "test/module/sourceId"
+                  }
+                });
+              }];
+            });
+          }
+
+          return require.using(["pentaho/type/Context"], configAmd, function(Context) {
+
+            return Context.createAsync()
+                .then(function(context) {
+                  return context.getAsync("test/module/id");
+                })
+                .then(function(TestType) {
+
+                  expect(TestType.type.sourceId).toBe("test/module/sourceId");
+                  expect(TestType.type.id).toBe("test/module/sourceId");
+                });
+          });
+        });
+
+        it("should default $type.id when instSpec is not specified", function() {
+
+          function configAmd(localRequire) {
+            localRequire.define("test/module/id", function() {
+
+              return ["complex", function(Complex) {
+                return Complex.extend();
+              }];
+            });
+          }
+
+          return require.using(["pentaho/type/Context"], configAmd, function(Context) {
+
+            return Context.createAsync()
+                .then(function(context) {
+                  return context.getAsync("test/module/id");
+                })
+                .then(function(TestType) {
+                  expect(TestType.type.id).toBe("test/module/id");
+                });
+          });
+        });
+
+        it("should default $type.id when instSpec is specified but not instSpec.$type", function() {
+
+          var instSpec = {};
+
+          function configAmd(localRequire) {
+            localRequire.define("test/module/id", function() {
+
+              return ["complex", function(Complex) {
+                return Complex.extend(instSpec);
+              }];
+            });
+          }
+
+          return require.using(["pentaho/type/Context"], configAmd, function(Context) {
+
+            return Context.createAsync()
+                .then(function(context) {
+                  return context.getAsync("test/module/id");
+                })
+                .then(function(TestType) {
+                  expect(TestType.type.id).toBe("test/module/id");
+
+                  // Should not modify instSpec
+                  expect(instSpec).toEqual({});
+                });
+          });
+        });
+
+        it("should default $type.id when instSpec.$type is specified but id and sourceId aren't", function() {
+
+          // Must not modify instSpec or typeSpec
+          var typeSpec = {};
+          var instSpec = {$type: typeSpec};
+
+          function configAmd(localRequire) {
+            localRequire.define("test/module/id", function() {
+
+              return ["complex", function(Complex) {
+                return Complex.extend(instSpec);
+              }];
+            });
+          }
+
+          return require.using(["pentaho/type/Context"], configAmd, function(Context) {
+
+            return Context.createAsync()
+                .then(function(context) {
+                  return context.getAsync("test/module/id");
+                })
+                .then(function(TestType) {
+                  expect(TestType.type.id).toBe("test/module/id");
+
+                  // Should not modify instSpec or typeSpec
+                  expect(instSpec).toEqual({$type: {}});
+                  expect(typeSpec).toEqual({});
+                });
+          });
+        });
+      });
+    });
+  });
 });
