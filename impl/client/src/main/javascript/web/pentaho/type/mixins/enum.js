@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 define([
-  "module",
   "../util",
   "../ValidationError",
   "../../i18n!../i18n/types",
   "../../util/error"
-], function(module, typeUtil, ValidationError, bundle, error) {
+], function(typeUtil, ValidationError, bundle, error) {
 
   "use strict";
 
@@ -56,13 +55,12 @@ define([
      * @example <caption>Defining an enumeration type</caption>
      *
      * ```js
-     * define(["module"], function(module) {
+     * define(function() {
      *
      *   return ["string", function(PenString) {
      *
      *     return PenString.extend({
      *       $type: {
-     *         id: module.id,
      *         mixins: ["enum"],
      *         domain: [
      *           {v: "bad", f: "Bad"},
@@ -81,7 +79,6 @@ define([
 
       $type: /** @lends pentaho.type.mixins.Enum.Type# */{
 
-        id: module.id,
         alias: "enum",
 
         /** @inheritDoc */

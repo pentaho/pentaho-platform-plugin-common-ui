@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "module",
   "pentaho/i18n!model"
-], function(module, bundle) {
+], function(bundle) {
 
   "use strict";
 
@@ -46,11 +45,7 @@ define([
      * @constructor
      * @param {pentaho.visual.base.spec.IApplication} [spec] A visual application specification.
      */
-    var VisualApplication = Application.extend(/** @lends pentaho.visual.base.Application# */{
-      $type: /** @lends pentaho.visual.base.Application.Type# */{
-        id: module.id
-      }
-    })
+    var VisualApplication = Application.extend()
     .implement({
       $type: bundle.structured.application.type
     });

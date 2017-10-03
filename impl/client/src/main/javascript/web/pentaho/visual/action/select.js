@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 define([
-  "module",
   "./SelectionModes",
   "pentaho/util/object",
   "pentaho/util/fun",
   "pentaho/lang/ArgumentInvalidError",
   "pentaho/lang/ArgumentInvalidTypeError"
-], function(module, SelectionModes, O, F, ArgumentInvalidError, ArgumentInvalidTypeError) {
+], function(SelectionModes, O, F, ArgumentInvalidError, ArgumentInvalidTypeError) {
 
   "use strict";
 
@@ -41,7 +40,6 @@ define([
 
       return DataAction.extend(/** @lends pentaho.visual.action.Select# */{
         $type: /** @lends pentaho.visual.action.Select.Type# */{
-          id: module.id,
           alias: "select",
 
           // region defaultSelectionMode

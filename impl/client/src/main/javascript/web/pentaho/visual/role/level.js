@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "module",
   "pentaho/i18n!messages"
-], function(module, bundle) {
+], function(bundle) {
 
   "use strict";
 
@@ -94,7 +93,6 @@ define([
 
         $type: /** @lends pentaho.visual.role.Level.Type# */{
 
-          id: module.id,
           mixins: [Enum],
           domain: ["nominal", "ordinal", "quantitative"],
 

@@ -75,7 +75,6 @@ define([
     var Action = Element.extend(/** @lends pentaho.type.action.Base# */{
 
       $type: /** @lends pentaho.type.action.Base.Type# */{
-        id: module.id,
         isAbstract: true,
 
         _init: function(spec, keyArgs) {

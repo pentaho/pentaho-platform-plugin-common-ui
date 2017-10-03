@@ -13,18 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "module"
-], function(module) {
+define(function() {
 
   "use strict";
 
   return ["./areaAbstract", function(BaseView) {
 
-    return BaseView.extend({
-      $type: {
-        id: module.id
-      }
-    });
+    return BaseView.extend();
   }];
 });

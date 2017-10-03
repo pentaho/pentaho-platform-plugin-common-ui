@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 define([
-  "module",
   "../i18n!types",
   "../util/object",
   "../util/error",
   "../util/fun"
-], function(module, bundle, O, error, fun) {
+], function(bundle, O, error, fun) {
 
   "use strict";
 
@@ -64,7 +63,6 @@ define([
 
       $type: /** @lends pentaho.type.Element.Type# */{
 
-        id: module.id,
         alias: "element",
         isAbstract: true,
 

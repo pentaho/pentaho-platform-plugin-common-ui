@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 define([
-  "module",
   "pentaho/i18n!messages",
   "pentaho/type/util"
-], function(module, bundle, typeUtil) {
+], function(bundle, typeUtil) {
 
   "use strict";
 
@@ -157,8 +156,6 @@ define([
         },
 
         $type: {
-          id: module.id,
-
           props: [
             /**
              * Gets or sets the name of the data property.

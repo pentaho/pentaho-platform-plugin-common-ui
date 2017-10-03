@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "module",
   "pentaho/i18n!./i18n/model"
-], function(module, bundle) {
+], function(bundle) {
 
   "use strict";
 
@@ -33,7 +32,6 @@ define([
 
       return BaseModel.extend({
         $type: {
-          id: module.id,
           isAbstract: true,
           // TODO: scaleColor... should only be applicable when color is continuous
           mixins: [TrendedModel, ScaleColorDiscreteModel, ScaleColorContinuousModel, MultiChartedModel],

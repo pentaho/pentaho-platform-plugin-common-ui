@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 define([
-  "module",
   "pentaho/i18n!messages",
   "pentaho/i18n!/pentaho/type/i18n/types",
   "pentaho/type/ValidationError",
   "pentaho/type/util",
   "pentaho/util/object",
   "pentaho/util/error"
-], function(module, bundle, bundleTypes, ValidationError, typeUtil, O, error) {
+], function(bundle, bundleTypes, ValidationError, typeUtil, O, error) {
 
   "use strict";
 
@@ -75,8 +74,6 @@ define([
       var VisualRoleProperty = __Property.extend(/** @lends pentaho.visual.role.Property# */{
 
         $type: /** @lends pentaho.visual.role.Property.Type# */{
-
-          id: module.id,
 
           valueType: Mapping,
 

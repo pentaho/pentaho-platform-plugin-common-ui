@@ -480,10 +480,10 @@ define([
          *
          * @returns {!Object.<string, number>} key
          */
-        function getColumnIdToIndexMap( dataTable, keyColumnNames ) {
+        function getColumnIdToIndexMap(dataTable, keyColumnNames) {
           var columnNameToIdx = {};
 
-          keyColumnNames.forEach( function (columnName) {
+          keyColumnNames.forEach(function(columnName) {
             var colIdx = dataTable.getColumnIndexByAttribute(columnName);
             if(colIdx === -1) {
               throw error.argInvalid("keyColumnNames", "The column name " + columnName + " is not in the dataTable.")
@@ -496,8 +496,6 @@ define([
       },
 
       $type: /** @lends pentaho.data.filter.Abstract.Type# */{
-        id: module.id,
-
         isAbstract: true
       }
     });

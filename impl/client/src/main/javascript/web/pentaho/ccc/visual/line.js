@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "module",
   "./_trends"
-], function(module) {
+], function() {
 
   "use strict";
 
@@ -27,7 +26,6 @@ define([
 
       return BaseView.extend({
         $type: {
-          id: module.id,
           props: {
             model: {valueType: Model}
           }

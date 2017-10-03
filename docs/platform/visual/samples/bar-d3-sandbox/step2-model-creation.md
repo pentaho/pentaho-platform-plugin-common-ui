@@ -26,7 +26,7 @@ position, size, orientation or color.
 Create a file named `model.js` and place the following code in it:
 
 ```js
-define(function(module) {
+define(function() {
   
   "use strict";
   

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 define([
-  "module",
   "pentaho/type/changes/ComplexChangeset",
   "pentaho/i18n!view",
   "./events/WillUpdate",
@@ -39,7 +38,7 @@ define([
   "pentaho/visual/action/data",
   "pentaho/visual/action/select",
   "pentaho/visual/action/execute"
-], function(module, ComplexChangeset, bundle, WillUpdate, DidUpdate, RejectedUpdate, UserError,
+], function(ComplexChangeset, bundle, WillUpdate, DidUpdate, RejectedUpdate, UserError,
             O, arg, F, BitSet, error, logger, promise, specUtil) {
 
   "use strict";
@@ -1026,7 +1025,6 @@ define([
         // endregion
 
         $type: /** @lends pentaho.visual.base.View.Type# */{
-          id: module.id,
           isAbstract: true,
           props: [
             {

@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 define([
-  "module",
   "pentaho/i18n!./i18n/model",
   "./theme/model"
-], function(module, bundle) {
+], function(bundle) {
 
   "use strict";
 
@@ -37,8 +36,6 @@ define([
 
       return BaseModel.extend({
         $type: {
-          id: module.id,
-
           isAbstract: true,
 
           defaultView: "pentaho/ccc/visual/abstract",

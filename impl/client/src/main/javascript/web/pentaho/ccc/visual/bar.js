@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "module",
   "./_trends"
-], function(module) {
+], function() {
 
   "use strict";
 
@@ -29,7 +28,6 @@ define([
         _supportsTrends: true,
 
         $type: {
-          id: module.id,
           props: {
             model: {valueType: Model}
           }

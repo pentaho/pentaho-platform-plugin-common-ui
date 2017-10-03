@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 define([
-  "module",
   "pentaho/visual/action/SelectionModes",
   "cdf/lib/CCC/def",
   "cdf/lib/CCC/pvc",
@@ -27,7 +26,7 @@ define([
   "pentaho/visual/color/utils",
   "pentaho/data/TableView",
   "pentaho/i18n!view"
-], function(module, SelectionModes, def, pvc, cdo, pv, Axis, util, O, logger, visualColorUtils, DataView, bundle) {
+], function(SelectionModes, def, pvc, cdo, pv, Axis, util, O, logger, visualColorUtils, DataView, bundle) {
 
   "use strict";
 
@@ -113,7 +112,6 @@ define([
       return BaseView.extend(/** @lends pentaho.visual.ccc.visual.Abstract# */{
 
         $type: {
-          id: module.id,
           props: {
             model: {valueType: Model}
           }

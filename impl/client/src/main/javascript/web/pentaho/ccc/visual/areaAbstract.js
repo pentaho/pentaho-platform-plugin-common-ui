@@ -13,20 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "module"
-], function(module) {
+define(function() {
 
   "use strict";
 
   return ["./pointAbstract", function(BaseView) {
 
     return BaseView.extend({
-      _cccClass: "AreaChart",
-
-      $type: {
-        id: module.id
-      }
+      _cccClass: "AreaChart"
     });
   }];
 });

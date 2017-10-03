@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "module",
   "pentaho/i18n!messages"
-], function(module, bundle) {
+], function(bundle) {
 
   "use strict";
 
@@ -43,7 +42,6 @@ define([
      */
     return PentahoString.extend({
       $type: {
-        id: module.id,
         mixins: [Enum],
         domain: ["sum", "avg", "min", "max", "first", "last"]
       }

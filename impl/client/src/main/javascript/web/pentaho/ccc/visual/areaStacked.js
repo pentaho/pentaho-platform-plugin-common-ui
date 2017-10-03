@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "module"
-], function(module) {
+define(function() {
 
   "use strict";
 
@@ -28,7 +26,6 @@ define([
         _cccClass: "StackedAreaChart",
 
         $type: {
-          id: module.id,
           props: {
             model: {valueType: Model}
           }

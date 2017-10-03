@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 define([
-  "module",
   "./mixins/Container",
   "./changes/ListChangeset",
   "./util",
@@ -23,7 +22,7 @@ define([
   "../util/arg",
   "../util/error",
   "../util/object"
-], function(module, ContainerMixin, ListChangeset,
+], function(ContainerMixin, ListChangeset,
             typeUtil, SpecificationContext,
             bundle, arg, error, O) {
 
@@ -621,7 +620,6 @@ define([
           if(!O.hasOwn(this, "__elemType")) this.__elemType = this.__elemType;
         },
 
-        id: module.id,
         alias: "list",
 
         get isList() { return true; },

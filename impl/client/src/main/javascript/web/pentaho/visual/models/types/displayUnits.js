@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "module",
   "pentaho/i18n!../i18n/model"
-], function(module, bundle) {
+], function(bundle) {
 
   "use strict";
 
@@ -24,7 +23,6 @@ define([
 
     return PentahoString.extend({
       $type: {
-        id: module.id,
         mixins: ["enum"],
         domain: ["units_0", "units_2", "units_3", "units_4", "units_5", "units_6"],
 

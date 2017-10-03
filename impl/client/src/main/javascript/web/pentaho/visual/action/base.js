@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "module",
   "pentaho/lang/ArgumentInvalidTypeError"
-], function(module, ArgumentInvalidTypeError) {
+], function(ArgumentInvalidTypeError) {
 
   "use strict";
 
@@ -39,7 +38,6 @@ define([
 
     return ActionBase.extend(/** @lends pentaho.visual.action.Base# */{
       $type: /** @lends pentaho.visual.action.Base.Type# */{
-        id: module.id,
         isAbstract: true
       },
 
