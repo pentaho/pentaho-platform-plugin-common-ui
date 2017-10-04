@@ -19,7 +19,7 @@ define([
 
   "use strict";
 
-  return ["pentaho/ccc/visual/pointAbstract", function(BaseView) {
+  return ["./pointAbstract", function(BaseView) {
 
     return BaseView.extend({
       _cccClass: "AreaChart",

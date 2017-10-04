@@ -35,7 +35,10 @@ define([
   "pentaho/visual/base/model",
   "pentaho/type/action/base",
   "pentaho/data/filter/abstract",
-  "pentaho/visual/action/base"
+  "pentaho/visual/action/base",
+  "pentaho/visual/action/data",
+  "pentaho/visual/action/select",
+  "pentaho/visual/action/execute"
 ], function(module, ComplexChangeset, bundle, WillUpdate, DidUpdate, RejectedUpdate, UserError,
             O, arg, F, BitSet, error, logger, promise, specUtil) {
 

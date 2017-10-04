@@ -20,7 +20,7 @@ define([
   "use strict";
 
   return [
-    "pentaho/ccc/visual/barNormalizedAbstract",
+    "./barNormalizedAbstract",
     "pentaho/visual/models/barNormalizedHorizontal",
     function(BaseView, Model) {
 
