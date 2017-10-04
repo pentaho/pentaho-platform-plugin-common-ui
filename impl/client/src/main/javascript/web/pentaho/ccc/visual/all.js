@@ -13,39 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+// This exists only so that r.js sees otherwise invisible dependencies.
 define([
-  "module"
-], function(module) {
-
+  "./abstract",
+  "./axes/Axis",
+  "./area",
+  "./areaAbstract",
+  "./areaStacked",
+  "./bar",
+  "./barAbstract",
+  "./barHorizontal",
+  "./barLine",
+  "./barNormalized",
+  "./barNormalizedAbstract",
+  "./barNormalizedHorizontal",
+  "./barStacked",
+  "./barStackedHorizontal",
+  "./boxplot",
+  "./bubble",
+  "./cartesianAbstract",
+  "./categoricalContinuousAbstract",
+  "./donut",
+  "./heatGrid",
+  "./line",
+  "./metricPointAbstract",
+  "./pie",
+  "./pointAbstract",
+  "./scatter",
+  "./sunburst",
+  "./treemap",
+  "./waterfall"
+], function() {
   "use strict";
-
-  return [
-    "./barAbstract",
-    "pentaho/visual/models/barNormalizedAbstract",
-    function(BaseView, Model) {
-
-      return BaseView.extend({
-        $type: {
-          id: module.id,
-          props: {
-            model: {valueType: Model}
-          }
-        },
-        _options: {
-          valuesNormalized: true,
-          stacked: true
-        },
-
-        _configureOptions: function() {
-          this.base();
-
-          this.options.orthoAxisTickFormatter = formatTickPercent;
-        }
-      });
-    }
-  ];
-
-  function formatTickPercent(v) {
-    return v + "%";
-  }
 });

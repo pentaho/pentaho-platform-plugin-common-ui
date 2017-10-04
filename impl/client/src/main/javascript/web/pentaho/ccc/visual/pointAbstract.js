@@ -20,7 +20,7 @@ define([
   "use strict";
 
   return [
-    "pentaho/ccc/visual/categoricalContinuousAbstract",
+    "./categoricalContinuousAbstract",
     "pentaho/visual/models/pointAbstract",
     function(BaseView, Model) {
 

@@ -22,7 +22,7 @@ define([
   "use strict";
 
   return [
-    "pentaho/ccc/visual/abstract",
+    "./abstract",
     "pentaho/visual/models/cartesianAbstract",
     function(BaseView, Model) {
 

@@ -20,7 +20,7 @@ define([
   "use strict";
 
   return [
-    "pentaho/ccc/visual/metricPointAbstract",
+    "./metricPointAbstract",
     "pentaho/visual/models/scatter",
     function(BaseView, Model) {
 

@@ -20,7 +20,7 @@ define([
   "use strict";
 
   return [
-    "pentaho/ccc/visual/categoricalContinuousAbstract",
+    "./categoricalContinuousAbstract",
     function(BaseView) {
 
       return BaseView.extend({

@@ -19,7 +19,7 @@ define([
 
   "use strict";
 
-  return ["pentaho/ccc/visual/areaAbstract", function(BaseView) {
+  return ["./areaAbstract", function(BaseView) {
 
     return BaseView.extend({
       $type: {

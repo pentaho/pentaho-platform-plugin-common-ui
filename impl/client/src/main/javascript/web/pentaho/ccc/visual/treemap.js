@@ -20,7 +20,7 @@ define([
   "use strict";
 
   return [
-    "pentaho/ccc/visual/abstract",
+    "./abstract",
     function(BaseView) {
 
       return BaseView.extend({

@@ -20,7 +20,7 @@ define([
   "use strict";
 
   return [
-    "pentaho/ccc/visual/areaAbstract",
+    "./areaAbstract",
     "pentaho/visual/models/areaStacked",
     function(BaseView, Model) {
 
