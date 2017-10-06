@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "module",
   "../i18n!types"
-], function(module, bundle) {
+], function(bundle) {
 
   "use strict";
 
@@ -46,7 +45,6 @@ define([
      */
     var Application = Complex.extend(/** @lends pentaho.type.Application# */{
       $type: /** @lends pentaho.type.Application.Type# */{
-        id: module.id,
         alias: "application"
       }
     })

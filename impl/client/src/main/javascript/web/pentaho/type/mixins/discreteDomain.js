@@ -15,11 +15,10 @@
  */
 
 define([
-  "module",
   "pentaho/util/object",
   "../ValidationError",
   "../../i18n!../i18n/types"
-], function(module, O, ValidationError, bundle) {
+], function(O, ValidationError, bundle) {
 
   "use strict";
 
@@ -61,7 +60,6 @@ define([
     return Instance.extend(/** @lends pentaho.type.mixins.DiscreteDomain# */{
 
       $type: /** @lends pentaho.type.mixins.DiscreteDomain.Type# */{
-        id: module.id,
 
         dynamicAttributes: {
           /**

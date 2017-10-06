@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 define([
-  "module",
   "../util/object",
   "../util/fun",
   "../util/logger",
   "../i18n!types"
-], function(module, O, F, logger, bundle) {
+], function(O, F, logger, bundle) {
 
   "use strict";
 
@@ -101,7 +100,6 @@ define([
       // endregion
 
       $type: /** @lends pentaho.type.Function.Type# */{
-        id: module.id,
         alias: "function",
         cast: F.as
       }

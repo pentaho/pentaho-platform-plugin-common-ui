@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "module",
   "../i18n!types"
-], function(module, bundle) {
+], function(bundle) {
 
   "use strict";
 
@@ -67,7 +66,6 @@ define([
       // endregion
 
       $type: /** @lends pentaho.type.Model.Type# */{
-        id: module.id,
         alias: "model",
 
         props: [

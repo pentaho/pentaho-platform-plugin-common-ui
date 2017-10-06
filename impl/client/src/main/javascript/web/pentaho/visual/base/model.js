@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 define([
-  "module",
   "pentaho/i18n!model",
 
   // so that r.js sees otherwise invisible dependencies.
@@ -28,7 +27,7 @@ define([
   "pentaho/visual/color/palette",
   "pentaho/visual/color/level",
   "pentaho/visual/base/application"
-], function(module, bundle) {
+], function(bundle) {
 
   "use strict";
 
@@ -89,7 +88,6 @@ define([
         // endregion
 
         $type: /** @lends pentaho.visual.base.Model.Type# */{
-          id: module.id,
           defaultView: "./view",
           isAbstract: true,
 

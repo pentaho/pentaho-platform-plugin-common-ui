@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "module",
   "../i18n!types"
-], function(module, bundle) {
+], function(bundle) {
 
   "use strict";
 
@@ -41,7 +40,6 @@ define([
        */
 
       $type: /** @lends pentaho.type.Boolean.Type# */{
-        id: module.id,
         alias: "boolean",
         cast: Boolean
       }

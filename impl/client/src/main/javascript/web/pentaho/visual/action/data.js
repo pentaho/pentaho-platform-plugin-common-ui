@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 define([
-  "module",
-
   // This exists only so that r.js sees otherwise invisible dependencies.
   "pentaho/visual/action/base",
   "pentaho/data/filter/standard"
-], function(module) {
+], function() {
 
   "use strict";
 
@@ -48,7 +46,6 @@ define([
 
       return ActionBase.extend(/** @lends pentaho.visual.action.Data# */{
         $type: /** @lends pentaho.visual.action.Data.Type# */{
-          id: module.id,
           isAbstract: true
         },
 

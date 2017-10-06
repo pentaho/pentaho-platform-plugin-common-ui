@@ -28,6 +28,7 @@ define([
   return [function() {
 
     var Type = typeFactory.call(this);
+    var context = this;
 
     /**
      * @name pentaho.type.Instance
@@ -256,12 +257,38 @@ define([
        */
 
       /*
-       * Defaults `name` from `classSpec.$type.sourceId` or `classSpec.$type.id`, if any.
+       * If $type.sourceId and $type.id are both unspecified, then defaults $type.id to the currently
+       * loading type, if any. Takes care not to mutate `instSpec` or `instSpec.$type`, when specified.
+       *
+       * Defaults `name` from `instSpec.$type.sourceId` or `instSpec.$type.id`, if any.
        *
        * @ignore
        */
       _extend: function(name, instSpec, classSpec, keyArgs) {
+
         var typeSpec;
+
+        var creatingTypeId = context.__creatingTypeId;
+        if(creatingTypeId) {
+          if(!instSpec) {
+
+            typeSpec = {id: creatingTypeId};
+            instSpec = {$type: typeSpec};
+
+          } else if(!(typeSpec = instSpec.$type)) {
+
+            instSpec = Object.create(instSpec);
+            typeSpec = {id: creatingTypeId};
+            Object.defineProperty(instSpec, "$type", {value: typeSpec, enumerable: true});
+
+          } else if(!typeSpec.sourceId && !typeSpec.id) {
+            instSpec = Object.create(instSpec);
+            typeSpec = Object.create(typeSpec);
+            Object.defineProperty(typeSpec, "id", {value: creatingTypeId, enumerable: true});
+            Object.defineProperty(instSpec, "$type", {value: typeSpec, enumerable: true});
+          }
+        }
+
         if(name == null && (typeSpec = (instSpec && instSpec.$type))) {
           name = typeSpec.sourceId || typeSpec.id || null;
           if(name) name = name.toString();

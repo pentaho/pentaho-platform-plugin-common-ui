@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "module",
   "pentaho/i18n!messages"
-], function(module, bundle) {
+], function(bundle) {
 
   "use strict";
 
@@ -79,7 +78,6 @@ define([
 
       $type: /** @lends pentaho.visual.color.Level.Type# */{
 
-        id: module.id,
         mixins: ["enum"],
         domain: ["nominal", "quantitative", "divergent"]
       }

@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 define([
-  "module",
   "pentaho/i18n!messages",
   "pentaho/type/ValidationError",
   "pentaho/type/util",
   "pentaho/util/object",
   "pentaho/util/error"
-], function(module, bundle, ValidationError, typeUtil, O, error) {
+], function(bundle, ValidationError, typeUtil, O, error) {
 
   "use strict";
 
@@ -68,8 +67,6 @@ define([
       var PaletteProperty = Property.extend(/** @lends pentaho.visual.color.PaletteProperty# */{
 
         $type: /** @lends pentaho.visual.color.PaletteProperty.Type# */{
-
-          id: module.id,
 
           valueType: Palette,
 

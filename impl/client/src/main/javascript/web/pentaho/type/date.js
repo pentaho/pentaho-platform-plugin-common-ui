@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 define([
-  "module",
   "../util/date",
   "../i18n!types"
-], function(module, date, bundle) {
+], function(date, bundle) {
 
   "use strict";
 
@@ -53,7 +52,6 @@ define([
       // endregion
 
       $type: /** @lends pentaho.type.Date.Type# */{
-        id: module.id,
         alias: "date",
 
         cast: function(v) {

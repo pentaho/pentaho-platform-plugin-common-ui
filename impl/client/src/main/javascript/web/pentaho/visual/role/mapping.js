@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 define([
-  "module",
   "pentaho/i18n!messages",
   "pentaho/type/util"
-], function(module, bundle, typeUtil) {
+], function(bundle, typeUtil) {
 
   "use strict";
 
@@ -82,8 +81,6 @@ define([
         },
 
         $type: /** @lends pentaho.visual.role.Mapping.Type# */{
-          id: module.id,
-
           props: [
             /**
              * Gets or sets the fixed measurement level on which the associated visual role is to operate.

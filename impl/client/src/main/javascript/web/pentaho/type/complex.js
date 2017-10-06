@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 define([
-  "module",
   "./PropertyTypeCollection",
   "./util",
   "./mixins/Container",
@@ -25,7 +24,7 @@ define([
   "../util/object",
   "../util/error",
   "../util/fun"
-], function(module, PropertyTypeCollection, typeUtil,
+], function(PropertyTypeCollection, typeUtil,
             ContainerMixin, ActionResult, UserError,
             ComplexChangeset, bundle, O, error, F) {
 
@@ -96,7 +95,7 @@ define([
      * @see pentaho.type.spec.IComplexProto
      * @see pentaho.type.spec.IComplexTypeProto
      */
-    var Complex = Element.extend("pentaho.type.Complex", /** @lends pentaho.type.Complex# */{
+    var Complex = Element.extend(/** @lends pentaho.type.Complex# */{
 
       // NOTE 1: neither `Value` or `Instance` do anything in their constructor,
       // so, in the name of performance, we're purposely not calling base.
@@ -554,7 +553,6 @@ define([
       // endregion
 
       $type: /** @lends pentaho.type.Complex.Type# */{
-        id: module.id,
         alias: "complex",
 
         isAbstract: true,

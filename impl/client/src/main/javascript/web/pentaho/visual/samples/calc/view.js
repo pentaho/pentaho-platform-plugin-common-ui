@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "module",
   "pentaho/i18n!view"
-], function(module, bundle) {
+], function(bundle) {
 
   "use strict";
 
@@ -39,7 +38,6 @@ define([
 
       return BaseView.extend(/** @lends pentaho.visual.samples.calc.View# */{
         $type: {
-          id: module.id,
           props: {
             model: {valueType: Model}
           }

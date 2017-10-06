@@ -1215,6 +1215,56 @@ define([
                 });
           });
         });
+
+        it("should have __creatingTypeId set to the identifier of the type module being loaded", function() {
+
+          return testGetAsync(function(context, localRequire) {
+
+            var mid = "pentaho/foo/bar2";
+
+            localRequire.define(mid, [], function() {
+              return ["pentaho/type/simple", function(Simple) {
+
+                expect(this.__creatingTypeId).toBe(mid);
+
+                return Simple.extend();
+              }];
+            });
+
+            return context.getAsync(mid)
+                .then(function() {
+                  expect(context.__creatingTypeId).toBe(null);
+                });
+          });
+        });
+
+        it("should have __creatingTypeId be set to null if a generic unnamed type is defined within", function() {
+
+          return testGetAsync(function(context, localRequire) {
+
+            var mid = "pentaho/foo/bar2";
+
+            localRequire.define(mid, [], function() {
+              return ["pentaho/type/complex", function(Complex) {
+
+                return Complex.extend({
+                  $type: {
+                    props: [
+                      {name: "foo", valueType: {base: "complex"}}
+                    ]
+                  }
+                });
+              }];
+            });
+
+            return context.getAsync(mid)
+                .then(function(MyComplex) {
+                  var fooPropValueType = MyComplex.type.get("foo").valueType;
+
+                  expect(fooPropValueType.id).toBe(null);
+                });
+          });
+        });
       });
 
       it("should collect non-standard type ids in getAsync", function() {

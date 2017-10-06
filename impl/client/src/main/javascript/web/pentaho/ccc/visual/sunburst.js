@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 define([
-  "module",
   "cdf/lib/CCC/protovis",
   "cdf/lib/CCC/def",
   "./_util",
   "pentaho/i18n!./i18n/view"
-], function(module, pv, def, util, bundle) {
+], function(pv, def, util, bundle) {
 
   "use strict";
 
@@ -30,7 +29,6 @@ define([
 
       return BaseView.extend({
         $type: {
-          id: module.id,
           props: {
             model: {valueType: Model}
           }

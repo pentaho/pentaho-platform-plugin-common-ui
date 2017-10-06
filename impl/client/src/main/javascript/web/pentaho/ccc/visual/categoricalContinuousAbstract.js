@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "module",
   "cdf/lib/CCC/def"
-], function(module, def) {
+], function(def) {
 
   "use strict";
 
@@ -27,7 +26,6 @@ define([
 
       return BaseView.extend({
         $type: {
-          id: module.id,
           props: {
             model: {valueType: Model}
           }

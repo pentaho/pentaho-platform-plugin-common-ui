@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 define([
-  "module",
   "../util/object",
   "../i18n!types"
-], function(module, O, bundle) {
+], function(O, bundle) {
 
   "use strict";
 
@@ -81,7 +80,6 @@ define([
        */
 
       $type: /** @lends pentaho.type.Object.Type# */{
-        id:   module.id,
         alias: "object",
         cast: Object
       }

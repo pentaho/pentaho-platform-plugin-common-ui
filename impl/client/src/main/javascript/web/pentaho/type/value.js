@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 define([
-  "module",
   "./util",
   "./ValidationError",
   "./SpecificationContext",
@@ -22,7 +21,7 @@ define([
   "../util/arg",
   "../util/error",
   "../i18n!types"
-], function(module, typeUtil, ValidationError, SpecificationContext, O, arg, error, bundle) {
+], function(typeUtil, ValidationError, SpecificationContext, O, arg, error, bundle) {
 
   "use strict";
 
@@ -245,7 +244,6 @@ define([
        * @readonly
        */
       $type: /** @lends pentaho.type.Value.Type# */{
-        id: module.id,
         alias: "value",
         isAbstract: true,
 

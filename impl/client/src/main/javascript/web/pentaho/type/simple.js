@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 define([
-  "module",
   "./util",
   "../util/object",
   "../util/error",
   "../util/fun",
   "../i18n!types"
-], function(module, typeUtil, O, error, F, bundle) {
+], function(typeUtil, O, error, F, bundle) {
 
   "use strict";
 
@@ -365,7 +364,6 @@ define([
       // endregion
 
       $type: /** pentaho.type.Simple.Type# */{
-        id: module.id,
         alias: "simple",
         isAbstract: true,
 

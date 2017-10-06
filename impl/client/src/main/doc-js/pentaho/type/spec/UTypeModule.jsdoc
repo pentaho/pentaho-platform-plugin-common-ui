@@ -33,7 +33,7 @@
  * that depends on all registered instances of its special type `my/SpecialService`.
  *
  * ```js
- * define(["module"], function() {
+ * define(function() {
  *
  *   return [
  *     "complex",
@@ -42,8 +42,6 @@
  *
  *       return Complex.extend({
  *         $type: {
- *           id: module.id,
- *
  *           // ...
  *         }
  *       });

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 define([
-  "module",
   "./util",
   "./ValidationError",
   "../i18n!types",
@@ -24,7 +23,7 @@ define([
   "../util/object",
   "../util/text",
   "../util/fun"
-], function(module, typeUtil, ValidationError, bundle, AnnotatableLinked, arg, error, O, text, F) {
+], function(typeUtil, ValidationError, bundle, AnnotatableLinked, arg, error, O, text, F) {
 
   "use strict";
 
@@ -84,7 +83,6 @@ define([
         // Note: constructor/_init is only called on sub-classes of Property.Type,
         // and not on Property.Type itself.
 
-        id: module.id,
         alias: "property",
         isAbstract: true,
         styleClass: null,

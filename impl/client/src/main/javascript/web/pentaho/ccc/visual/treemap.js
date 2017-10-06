@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "module"
-], function(module) {
+define(function() {
 
   "use strict";
 
@@ -24,11 +22,7 @@ define([
     function(BaseView) {
 
       return BaseView.extend({
-        _cccClass: "TreemapChart",
-
-        $type: {
-          id: module.id
-        }
+        _cccClass: "TreemapChart"
       });
     }
   ];
