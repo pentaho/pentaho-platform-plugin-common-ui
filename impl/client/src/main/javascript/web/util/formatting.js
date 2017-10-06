@@ -220,7 +220,7 @@ define("common-ui/util/formatting", ['common-ui/util/timeutil', 'common-ui/util/
     convertTimeStampToTimeZone: function(value, timezone) {
       this._initDateFormatters();
       // Lookup the offset in minutes
-      var offset = ReportTimeUtil.getOffset(timezone, date);
+      var offset = ReportTimeUtil.getOffset(timezone, value);
 
       var localDate = this.parseDateWithoutTimezoneInfo(value);
       var utcDate = this.dateFormatters['with-timezone'].parse(value);
