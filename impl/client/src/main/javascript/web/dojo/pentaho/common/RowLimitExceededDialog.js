@@ -12,7 +12,7 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
- * Copyright (c) 2002-2016 Pentaho Corporation. All rights reserved.
+ * Copyright (c) 2002-2017 Hitachi Vantara. All rights reserved.
  */
 define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/_base/lang", 'dijit/_WidgetBase',
       'dijit/_TemplatedMixin', 'pentaho/common/button', 'pentaho/common/Dialog', "dojo/dom-style", "dojo/dom-attr", "dojo/text!pentaho/common/RowLimitExceededDialog.html"],

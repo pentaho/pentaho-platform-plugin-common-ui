@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Pentaho Corporation. All rights reserved.
+ * Copyright 2017 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ define(function() {
    * 3. Pentaho Analyzer in Dashboards - "pentaho-dashboards"
    * 4. Pentaho CDF/CDE - "pentaho-cdf"
    *
-   * Pentaho stock visualizations' model ids:
+   * Hitachi Vantara stock visualizations' model ids:
    * 1. Pie - "pentaho/visual/models/areaStacked"
    * 2. Column - "pentaho/visual/models/bar"
    * 3. Bar - "pentaho/visual/models/barHorizontal"
@@ -44,7 +44,7 @@ define(function() {
    * 14. Heat Grid - "pentaho/visual/models/heatGrid"
    * 15. Geo Map - "pentaho/visual/models/geoMap"
    *
-   * Pentaho stock visualizations' view ids:
+   * Hitachi Vantara stock visualizations' view ids:
    * 1. Pie - "pentaho/ccc/visual/areaStacked"
    * 2. Column - "pentaho/ccc/visual/bar"
    * 3. Bar - "pentaho/ccc/visual/barHorizontal"  Normalized
@@ -64,7 +64,7 @@ define(function() {
    * Sample visualization model ids:
    * 1. Calculator - "pentaho/visual/samples/calc/model"
    *
-   * Pentaho stock color palettes' ids:
+   * Hitachi Vantara stock color palettes' ids:
    * 1. pentaho/visual/color/palettes/nominalPrimary
    * 2. pentaho/visual/color/palettes/nominalNeutral
    * 3. pentaho/visual/color/palettes/nominalLight

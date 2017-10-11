@@ -12,7 +12,7 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
- * Copyright 2014 Pentaho Corporation. All rights reserved.
+ * Copyright 2014 - 2017 Hitachi Vantara. All rights reserved.
  */
 /**
  * This module supports the pentaho-specific URL encoding scheme for templated URLs. The characters / and \ are
