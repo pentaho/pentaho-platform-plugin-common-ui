@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,8 +117,7 @@
     return global[name] || null;
   }
   function getUrl() {
-    return getVar("FULL_QUALIFIED_URL") ||
-           getVar("CONTEXT_PATH") ||
+    return getVar("CONTEXT_PATH") ||
            getVar("SERVER_PROTOCOL");
   }
   // endregion
