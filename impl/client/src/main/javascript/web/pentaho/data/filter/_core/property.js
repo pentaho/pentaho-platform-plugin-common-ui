@@ -63,32 +63,6 @@ define(function() {
         return true;
       },
 
-      /**
-       * Determines if a property value is such that the owner element is selected by this filter.
-       *
-       * @name _operation
-       * @memberOf pentaho.data.filter.Property#
-       * @method
-       *
-       * @param {!pentaho.type.Element} elem - The element to be tested
-       *
-       * @returns {boolean} `true` if the element is selected; `false`, otherwise.
-       *
-       * @protected
-       * @abstract
-       */
-
-      /**
-       * Determines if an element is selected by this filter.
-       *
-       * @param {!pentaho.type.Element} elem - The element to be tested.
-       *
-       * @return {boolean} `true` if `elem` is selected; `false`, otherwise.
-       */
-      _contains: function(elem) {
-        return elem.$type.has(this.property) && this._operation(elem);
-      },
-
       $type: /** @lends pentaho.data.filter.Property.Type# */{
         id: "pentaho/data/filter/property",
         isAbstract: true,

@@ -160,8 +160,8 @@ define([
       /**
        * Determines if an element is selected by this filter.
        *
-       * When the filter is not valid, an error is thrown.
-       * Otherwise, this method delegates to the [_contains]{@link pentaho.data.filter.Abstract#_contains} method.
+       * This method applies the predicate function returned by {@link pentaho.data.filter.Abstract#compile}
+       * to the given element.
        *
        * @param {!pentaho.type.Element} elem - The candidate dataset element.
        *
@@ -173,28 +173,57 @@ define([
        * @final
        */
       contains: function(elem) {
-        this.assertValid();
-
-        return this._contains(elem);
+        return this.compile()(elem);
       },
 
       /**
-       * Actual implementation that determines if an element is selected by this filter.
+       * The compiled predicate function. Lazily created.
        *
-       * This method assumes that the filter is valid.
+       * @type {?function(!pentaho.type.Element) : boolean}
+       */
+      __compiled: null,
+
+      /**
+       * Compiles a predicate function that tests if the filter contains a given element.
        *
-       * @name _contains
+       * When the filter is not valid, an error is thrown.
+       * Otherwise, this method delegates to the [_compile]{@link pentaho.data.filter.Abstract#_compile} method.
+       *
+       * The result of this method is cached.
+       *
+       * @return {function(!pentaho.type.Element) : boolean} The predicate function.
+       *
+       * @throws {pentaho.type.ValidationError} When the filter is not valid,
+       * the first error returned by the `validate` method.
+       *
+       * @final
+       */
+      compile: function() {
+
+        var compiled = this.__compiled;
+        if(compiled === null) {
+
+          this.assertValid();
+
+          this.__compiled = compiled = this._compile();
+        }
+
+        return compiled;
+      },
+
+      /**
+       * Compiles a predicate function that tests if the filter contains a given element.
+       *
+       * This method can assume that the filter is valid.
+       *
+       * @name _compile
        * @memberOf pentaho.data.filter.Abstract#
        * @method
        *
-       * @param {!pentaho.type.Element} elem - The candidate dataset element.
-       *
-       * @return {boolean} `true` if this filter contains `element`, or `false` otherwise.
+       * @return {function(!pentaho.type.Element) : boolean} The predicate function.
        *
        * @abstract
        * @protected
-       *
-       * @see pentaho.data.filter.Abstract#contains
        */
 
       /**
@@ -437,56 +466,64 @@ define([
        *
        * @param {!pentaho.data.ITable} dataTable - The data to be used when determining the values of the key columns
        * used in the extensional representation of the filter.
-       * @param {String[]} keyColumnNames - The names of the columns from the {@code dataTable} that are considered key.
+       * @param {string[]} keyColumnNames - The names of the columns from the {@code dataTable} that are considered key.
        *
-       * @return {!pentaho.data.filter.Or|!pentaho.data.filter.False}
+       * @return {!pentaho.data.filter.Or|!pentaho.data.filter.False} The extensional filter.
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When the resulting filtered data is not empty and keyColumnNames
        * is empty.
        */
       toExtensional: function(dataTable, keyColumnNames) {
-        var filteredData = dataTable.filter(this);
-        var numRows = filteredData.getNumberOfRows();
-        // applying the filter returns no data therefore select nothing (False filter)
-        if(numRows === 0) {
-          return __filter.False.instance;
+
+        if(__isDebugMode) logger.log("toExtensional BEGIN");
+        try {
+          var filteredData = dataTable.filter(this);
+          var numRows = filteredData.getNumberOfRows();
+          // applying the filter returns no data therefore select nothing (False filter)
+          if(numRows === 0) {
+            return __filter.False.instance;
+          }
+
+          // If some data passes the filter and no key columns are specified then we have
+          // no way of making an extensional filter to represent those lines
+          if(keyColumnNames.length === 0) {
+            throw error.argInvalid("keyColumnNames", "At least one key column must be specified." );
+          }
+
+          var columnNameToIdx = getColumnIdToIndexMap(filteredData, keyColumnNames);
+          var orOperands = [];
+          for(var rowIdx = 0; rowIdx < numRows; rowIdx++) {
+            var andOperands = keyColumnNames.map(function(keyColumnName) {
+              var cellValue = filteredData.getValue(rowIdx, columnNameToIdx[keyColumnName]);
+              var columnType = filteredData.getColumnType(columnNameToIdx[keyColumnName]);
+              return new __filter.IsEqual({property: keyColumnName, value: {_: columnType, v: cellValue}});
+            });
+
+            orOperands.push(new __filter.And({operands: andOperands}));
+          }
+
+          return new __filter.Or({operands: orOperands});
+
+        } finally {
+          if(__isDebugMode) logger.log("toExtensional END");
         }
-
-        // If some data passes the filter and no key columns are specified then we have
-        // no way of making an extensional filter to represent those lines
-        if(keyColumnNames.length === 0) {
-          throw error.argInvalid("keyColumnNames", "At least one key column must be specified." );
-        }
-
-        var columnNameToIdx = getColumnIdToIndexMap(filteredData, keyColumnNames);
-        var orOperands = [];
-        for(var rowIdx = 0; rowIdx < numRows; rowIdx++) {
-          var andOperands = keyColumnNames.map(function(keyColumnName) {
-            var cellValue = filteredData.getValue(rowIdx, columnNameToIdx[keyColumnName]);
-            var columnType = filteredData.getColumnType(columnNameToIdx[keyColumnName]);
-            return new __filter.IsEqual({property: keyColumnName, value: {_: columnType, v: cellValue}});
-          });
-
-          orOperands.push(new __filter.And({operands: andOperands}));
-        }
-
-        return new __filter.Or({operands: orOperands});
 
         /**
          * Gets an object where the keys are the column names and the values the respective column index.
          *
-         * @param {!pentaho.data.ITable} dataTable
-         * @param {string[]} keyColumnNames
+         * @param {!pentaho.data.ITable} dataTable - The data table.
+         * @param {string[]} keyColumnNames - The column names.
          *
-         * @returns {!Object.<string, number>} key
+         * @return {!Object.<string, number>} The map.
          */
         function getColumnIdToIndexMap(dataTable, keyColumnNames) {
+
           var columnNameToIdx = {};
 
           keyColumnNames.forEach(function(columnName) {
             var colIdx = dataTable.getColumnIndexByAttribute(columnName);
             if(colIdx === -1) {
-              throw error.argInvalid("keyColumnNames", "The column name " + columnName + " is not in the dataTable.")
+              throw error.argInvalid("keyColumnNames", "The column name " + columnName + " is not in the dataTable.");
             }
             columnNameToIdx[columnName] = colIdx;
           });

@@ -207,7 +207,8 @@ define([
 
       // region __equalityLiteralsByPropertyName
       get __equalityLiteralsByPropertyName() {
-        return this.__equalityLiteralsByName || (this.__equalityLiteralsByName = Object.freeze(this.__buildEqualityLiteralsByName()));
+        return this.__equalityLiteralsByName ||
+            (this.__equalityLiteralsByName = Object.freeze(this.__buildEqualityLiteralsByName()));
       },
 
       __equalityLiteralsByName: null,

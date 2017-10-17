@@ -61,12 +61,19 @@ define([
       },
 
       /** @inheritDoc */
-      _contains: function(elem) {
-        var ops = this.operands;
-        var i = -1;
-        var L = ops.count;
-        while(++i < L) if(!ops.at(i)._contains(elem)) return false;
-        return true;
+      _compile: function() {
+
+        var compiledOps = this.operands.toArray(function(op) {
+          return op.compile();
+        });
+
+        var L = compiledOps.length;
+
+        return function andContains(elem) {
+          var i = -1;
+          while(++i < L) if(!compiledOps[i](elem)) return false;
+          return true;
+        };
       },
 
       /**

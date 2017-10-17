@@ -49,34 +49,62 @@ define([
 
       if(_isDebugMode) logger.log("TOGGLE BEGIN");
 
-      if(!input) return current;
-
-      // Determine if all rows in input are currently selected.
-      //
-      // In times, we did this test intentionally:
-      // * current.include(input) ?
-      // * <=> input \ current = 0
-      // * <=> unselectedInput = input.andNot(current).toDnf();
-      //
-      // However, this approach proved wrong in cases where `current` and `input` have
-      // a different structure (or intentionality character).
-      // In particular, admit that `current` and `input` select the same rows of data,
-      // with the current data.
-      // Additionally, `current = input.toExtensional(data, keys)`.
-      // The above test would not return an empty set, but, instead, something like
-      // `input - row2 - row1`, cause the algorithm has no way to know that, with the current data,
-      // the `input` filter includes only `row1` and `row2`.
+      if(!input) {
+        return current;
+      }
 
       var data = this.model.data;
-      if(!data) return current;
+      if(!data) {
+        return current;
+      }
 
-      data = data.toPlainTable();
+      var isAllInputSelected = null;
 
-      var inputData = data.filter(input);
-      var currentInputData = inputData.filter(current);
-      var isAllInputSelected = (inputData.getNumberOfRows() === currentInputData.getNumberOfRows());
+      /* eslint default-case: 0 */
+      switch(current.kind) {
+        case "true":
+          isAllInputSelected = true;
+          break;
+
+        case "false":
+          isAllInputSelected = false;
+          break;
+
+        case "or":
+          if(current.operands.count === 0) {
+            // <=> false
+            isAllInputSelected = false;
+          }
+          break;
+      }
+
+      if(isAllInputSelected === null) {
+        // Determine if all rows in input are currently selected.
+        //
+        // In times, we did this test intentionally:
+        // * current.include(input) ?
+        // * <=> input \ current = 0
+        // * <=> unselectedInput = input.andNot(current).toDnf();
+        //
+        // However, this approach proved wrong in cases where `current` and `input` have
+        // a different structure (or intentionality character).
+        // In particular, admit that `current` and `input` select the same rows of data,
+        // with the current data.
+        // Additionally, `current = input.toExtensional(data, keys)`.
+        // The above test would not return an empty set, but, instead, something like
+        // `input - row2 - row1`, cause the algorithm has no way to know that, with the current data,
+        // the `input` filter includes only `row1` and `row2`.
+
+        // Skipping rows with all null measures, when converting from cross-tab, can speed up things a lot.
+        data = data.toPlainTable({skipRowsWithAllNullMeasures: true});
+
+        var inputData = data.filter(input);
+        var currentInputData = inputData.filter(current);
+        isAllInputSelected = (inputData.getNumberOfRows() === currentInputData.getNumberOfRows());
+      }
 
       var selectionMode = isAllInputSelected ? SelectionModes.remove : SelectionModes.add;
+
       var result = selectionMode.call(this, current, input);
 
       if(_isDebugMode) logger.log("TOGGLE END");

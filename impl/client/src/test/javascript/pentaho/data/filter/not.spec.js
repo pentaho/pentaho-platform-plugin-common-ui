@@ -28,6 +28,9 @@ define([
     var CustomFilter;
     var ProductSummary;
 
+    function isTrue() { return true; }
+    function isFalse() { return false; }
+
     beforeEach(function(done) {
       Context.createAsync()
           .then(function(_context) {
@@ -53,7 +56,11 @@ define([
               AbstractFilter = Abstract;
               NotFilter = Not;
 
-              CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
+              CustomFilter = AbstractFilter.extend({
+                compile: function() {
+                  return isFalse;
+                }
+              });
             });
           })
           .then(done, done.fail);
@@ -113,7 +120,7 @@ define([
 
         var oper1 = new CustomFilter();
 
-        spyOn(oper1, "_contains").and.returnValue(false);
+        spyOn(oper1, "compile").and.returnValue(isFalse);
 
         var filter  = new NotFilter({operand: oper1});
 
@@ -126,7 +133,7 @@ define([
 
         var oper1 = new CustomFilter();
 
-        spyOn(oper1, "_contains").and.returnValue(true);
+        spyOn(oper1, "compile").and.returnValue(isTrue);
 
         var filter  = new NotFilter({operand: oper1});
 

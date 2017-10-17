@@ -287,22 +287,21 @@ define([
       return rows;
     },
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     filter: function(filter) {
-
-      filter.assertValid();
 
       var filteredRows = [];
       var L = this.getNumberOfRows();
-      if(L) {
+      if(L > 0) {
+        var predicate = filter.compile();
+
         var elem = new ElementMock(this, null);
         var i = -1;
         while(++i < L) {
           elem.rowIdx = i;
-          // TODO: Ugly, but until isValid is cached...
-          if(filter._contains(elem)) filteredRows.push(i);
+          if(predicate(elem)) {
+            filteredRows.push(i);
+          }
         }
       }
 
@@ -313,10 +312,9 @@ define([
 
     filterMatchesRow: function(filter, rowIndex) {
 
-      filter.assertValid();
-
       var elem = new ElementMock(this, rowIndex);
-      return filter._contains(elem);
+
+      return filter.contains(elem);
     },
 
     /**

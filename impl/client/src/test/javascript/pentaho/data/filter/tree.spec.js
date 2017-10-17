@@ -32,6 +32,8 @@ define([
     var CustomTreeFilter;
     var ProductSummary;
 
+    function isFalse() { return false; }
+
     beforeEach(function(done) {
       Context.createAsync()
           .then(function(_context) {
@@ -56,8 +58,16 @@ define([
               AbstractFilter = Abstract;
               TreeFilter = Tree;
 
-              CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
-              CustomTreeFilter = TreeFilter.extend({_contains: function() { return false; }});
+              CustomFilter = AbstractFilter.extend({
+                compile: function() {
+                  return isFalse;
+                }
+              });
+              CustomTreeFilter = TreeFilter.extend({
+                compile: function() {
+                  return isFalse;
+                }
+              });
             });
           })
           .then(done, done.fail);

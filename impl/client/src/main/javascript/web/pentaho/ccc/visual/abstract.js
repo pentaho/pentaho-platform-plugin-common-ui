@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 define([
+  "module",
   "pentaho/visual/action/SelectionModes",
   "cdf/lib/CCC/def",
   "cdf/lib/CCC/pvc",
@@ -22,15 +23,19 @@ define([
   "./axes/Axis",
   "./_util",
   "pentaho/util/object",
-  "pentaho/util/logger",
   "pentaho/visual/color/utils",
   "pentaho/data/TableView",
+  "pentaho/util/logger",
+  "pentaho/debug",
+  "pentaho/debug/Levels",
   "pentaho/i18n!view"
-], function(SelectionModes, def, pvc, cdo, pv, Axis, util, O, logger, visualColorUtils, DataView, bundle) {
+], function(module, SelectionModes, def, pvc, cdo, pv, Axis, util, O, visualColorUtils, DataView, logger, debugMgr, DebugLevels, bundle) {
 
   "use strict";
 
   /* globals Promise */
+
+  var _isDebugMode = debugMgr.testLevel(DebugLevels.debug, module);
 
   var extensionBlacklist = {
     "compatVersion": 1,
@@ -187,7 +192,6 @@ define([
           this._dataTable = this.model.data;
 
           // Ensure we have a plain data table
-          // TODO: with nulls preserved, because of order...
           this._dataView = this._dataTable.toPlainTable();
 
           // ----------
@@ -232,48 +236,58 @@ define([
 
         /** @inheritDoc */
         _updateSelection: function() {
-          var dataFilter = this.selectionFilter;
-          var selectedItems = this._dataView.filter(dataFilter);
 
-          // Get information on the axes
-          var props = def.query(this._keyAxesIds)
-                .selectMany(function(axisId) {
-                  return this.axes[axisId].getSelectionMappingAttrInfos();
-                }, this)
-                .select(function(maInfo) {
-                  return {
-                    attr: maInfo.attr,
-                    cccDimName: maInfo.cccDimName
-                  };
-                })
-                .array();
+          if(_isDebugMode) logger.log("_updateSelection BEGIN");
+          try {
+            var dataFilter = this.selectionFilter;
 
-          // Build a CCC filter (whereSpec)
-          var whereSpec = [];
-          var alreadyIn = {};
-          for(var k = 0, N = selectedItems.getNumberOfRows(); k < N; k++) {
+            // Skipping rows with all null measures, when converting from cross-tab, can speed up things a lot.
+            // The dataView sourceColumns are not relevant as filter uses the attribute names.
+            var dataTable = this._dataTable.toPlainTable({skipRowsWithAllNullMeasures: true});
+            var selectedDataView = dataTable.filter(dataFilter);
 
-            /* eslint no-loop-func: 0 */
-            var datumFilterSpec = props.reduce(function(datumFilter, prop) {
-              var value = selectedItems.getValue(k, selectedItems.getColumnIndexByAttribute(prop.attr));
-              datumFilter[prop.cccDimName] = value;
-              return datumFilter;
-            }, {});
+            // Get information on the axes
+            var props = def.query(this._keyAxesIds)
+                  .selectMany(function(axisId) {
+                    return this.axes[axisId].getSelectionMappingAttrInfos();
+                  }, this)
+                  .select(function(maInfo) {
+                    return {
+                      attr: maInfo.attr,
+                      cccDimName: maInfo.cccDimName
+                    };
+                  })
+                  .array();
 
-            // Prevent repeated terms.
-            var key = specToKey(datumFilterSpec);
-            if(!O.hasOwn(alreadyIn, key)) {
-              alreadyIn[key] = true;
-              whereSpec.push(datumFilterSpec);
+            // Build a CCC filter (whereSpec)
+            var whereSpec = [];
+            var alreadyIn = {};
+            for(var k = 0, N = selectedDataView.getNumberOfRows(); k < N; k++) {
+
+              /* eslint no-loop-func: 0 */
+              var datumFilterSpec = props.reduce(function(datumFilter, prop) {
+                var value = selectedDataView.getValue(k, selectedDataView.getColumnIndexByAttribute(prop.attr));
+                datumFilter[prop.cccDimName] = value;
+                return datumFilter;
+              }, {});
+
+              // Prevent repeated terms.
+              var key = specToKey(datumFilterSpec);
+              if(!O.hasOwn(alreadyIn, key)) {
+                alreadyIn[key] = true;
+                whereSpec.push(datumFilterSpec);
+              }
             }
+
+            if(!whereSpec.length)
+              return this._chart.clearSelections();
+
+            this._chart.data.replaceSelected(this._chart.data.datums(whereSpec));
+
+            this._chart.updateSelections();
+          } finally {
+            if(_isDebugMode) logger.log("_updateSelection END");
           }
-
-          if(!whereSpec.length)
-            return this._chart.clearSelections();
-
-          this._chart.data.replaceSelected(this._chart.data.datums(whereSpec));
-
-          this._chart.updateSelections();
 
           function specToKey(spec) {
             var entries = Object.keys(spec).sort();
@@ -560,7 +574,7 @@ define([
             crossLayout.rows.forEach(addStructurePosition.bind(this, "row"));
             crossLayout.cols.forEach(addStructurePosition.bind(this, "column"));
             crossLayout.meas.forEach(addStructurePosition.bind(this, "measure"));
-        }
+          }
 
           // ----
           // Phase 2 - Build MappingAttributeInfo part 1...
@@ -586,12 +600,12 @@ define([
             var roleName = propType.name;
             var mapping  = this.model.get(roleName);
 
-          if(mapping.isMapped) {
-            var isVisualKey = propType.isVisualKeyOn(this.model);
+            if(mapping.isMapped) {
+              var isVisualKey = propType.isVisualKeyOn(this.model);
 
-            var cccRoleName = this._roleToCccRole[roleName];
-            if(cccRoleName)
-              def.array.lazy(rolesByCccVisualRole, cccRoleName).push(roleName);
+              var cccRoleName = this._roleToCccRole[roleName];
+              if(cccRoleName)
+                def.array.lazy(rolesByCccVisualRole, cccRoleName).push(roleName);
 
               var dataView = this._dataView;
               visualMap[roleName] = mapping.attributes.toArray(function(mappingAttr, mappingAttrIndex) {

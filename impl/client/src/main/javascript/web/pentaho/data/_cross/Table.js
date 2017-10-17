@@ -575,6 +575,7 @@ define([
             rowsAxis.structure.toSpec(keyArgs),
             colsAxis.structure.toSpec(keyArgs),
             meas.structure.toSpec(keyArgs));
+      var skipRowsWithAllNullMeasures = xM > 0 && !!O.getOwn(keyArgs, "skipRowsWithAllNullMeasures");
       var r = -1;
 
       while(++r < R1) {
@@ -598,12 +599,21 @@ define([
           }
 
           k = xM;
+          var isAllNullMeasures = skipRowsWithAllNullMeasures;
           while(k--) {
             var cell = meas.get(r, c, k, true);
-            plainRowCellSpecs[RC + k] = cell && cell.toSpec();
+            var value = cell && cell.toSpec();
+
+            if(isAllNullMeasures && value !== null) {
+              isAllNullMeasures = false;
+            }
+
+            plainRowCellSpecs[RC + k] = value;
           }
 
-          plainRowSpecs.push({c: plainRowCellSpecs});
+          if(!isAllNullMeasures) {
+            plainRowSpecs.push({c: plainRowCellSpecs});
+          }
         }
       }
 
