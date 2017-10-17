@@ -56,7 +56,11 @@ define([
               TrueFilter = True;
               FalseFilter = False;
 
-              CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
+              CustomFilter = AbstractFilter.extend({
+                compile: function() {
+                  return function() { return false; };
+                }
+              });
             });
           })
           .then(done, done.fail);

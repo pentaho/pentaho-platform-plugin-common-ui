@@ -71,8 +71,8 @@ define([
       },
 
       /** @inheritDoc */
-      _contains: function() {
-        return false;
+      _compile: function() {
+        return function() { return false; };
       },
 
       /** @inheritDoc */

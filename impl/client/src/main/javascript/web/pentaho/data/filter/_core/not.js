@@ -89,8 +89,13 @@ define([
       },
 
       /** @inheritDoc */
-      _contains: function(elem) {
-        return !this.operand._contains(elem);
+      _compile: function() {
+
+        var compiledOp = this.operand.compile();
+
+        return function notContains(elem) {
+          return !compiledOp(elem);
+        };
       },
 
       /**

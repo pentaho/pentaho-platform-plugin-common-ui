@@ -20,8 +20,9 @@ define([
   "./_plain/Table",
   "./_cross/Table",
   "./AtomicTypeName",
-  "../util/arg"
-], function(AbstractTable, Model, PlainTable, CrossTable, AtomicTypeName, arg) {
+  "../util/arg",
+  "../util/object"
+], function(AbstractTable, Model, PlainTable, CrossTable, AtomicTypeName, arg, O) {
 
   // Map of CDA lowercase colType to DataTable type
   // CDA column types (method AbstractExporter.getColTypes)
@@ -242,16 +243,29 @@ define([
      * with the same keyword arguments,
      * and is returned.
      *
+     * @param {Object} [keyArgs] Keyword arguments.
+     * @param {boolean} [keyArgs.skipRowsWithAllNullMeasures=false] Indicates that rows whose
+     *    cross-tab measure cells are all null can be skipped from the output.
+     *
      * @return {pentaho.data.Table} A table with a plain structure.
      * @see pentaho.data.Table#toSpecPlain
      */
-    toPlainTable: function() {
+    toPlainTable: function(keyArgs) {
       if(this.isPlainTable) return this;
 
       // assert this.isCrossTable
 
-      var plainTable = this._cachedPlainTable;
-      if(!plainTable) plainTable = this._cachedPlainTable = new Table(this.toSpecPlain({shareModel: true}));
+      var skipRowsWithAllNullMeasures = !!O.getOwn(keyArgs, "skipRowsWithAllNullMeasures");
+      var cacheProp = skipRowsWithAllNullMeasures ? "_cachedPlainTableNoNulls" : "_cachedPlainTable";
+
+      var plainTable = this[cacheProp];
+      if(!plainTable) {
+        plainTable = this[cacheProp] = new Table(this.toSpecPlain({
+          shareModel: true,
+          skipRowsWithAllNullMeasures: skipRowsWithAllNullMeasures
+        }));
+      }
+
       return plainTable;
     },
 
@@ -275,6 +289,9 @@ define([
      * @param {boolean} [keyArgs.shareModel=false] Indicates that
      *    the model of the resulting specification will be
      *    the model object itself and not its specification.
+     * @param {boolean} [keyArgs.skipRowsWithAllNullMeasures=false] Indicates that rows whose
+     *    cross-tab measure cells are all null can be skipped from the output.
+     *
      * @return {pentaho.data.spec.IPlainTable} A plain-structure specification of the table.
      * @see pentaho.data.Table#toPlainTable
      */
@@ -290,6 +307,8 @@ define([
      * @param {boolean} [keyArgs.shareModel=false] Indicates that
      *    the model of the resulting specification will be
      *    the model object itself and not its specification.
+     * @param {boolean} [keyArgs.skipRowsWithAllNullMeasures=false] Indicates that rows whose
+     *    cross-tab measure cells are all null can be skipped from the output.
      *
      * @return {pentaho.data.spec.ITable} A specification of the table.
      */

@@ -67,9 +67,16 @@ define([
        */
 
       /** @inheritDoc */
-      _operation: function(elem) {
-        var value = elem.getv(this.property);
-        return this.value === value;
+      _compile: function() {
+
+        var property = this.property;
+        // Can be null.
+        var referenceValue = this.value;
+
+        return function isEqualContains(elem) {
+          var value = elem.getv(property, true);
+          return value === referenceValue;
+        };
       },
 
       /** @inheritDoc */

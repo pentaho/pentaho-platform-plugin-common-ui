@@ -67,24 +67,27 @@ define([
        */
 
       /** @inheritDoc */
-      _operation: function(elem) {
-        var value = elem.getv(this.property);
-        var formattedValue = elem.getf(this.property);
-        var anchorStart = this.getv("anchorStart");
-        var anchorEnd = this.getv("anchorEnd");
-        var caption = this.getf("value") || this.getv("value");
+      _compile: function() {
 
-        var reference = formattedValue;
-        if(reference == null) {
-          reference = value;
-        }
+        var property = this.property;
+        var anchorStart = this.anchorStart;
+        var anchorEnd = this.anchorEnd;
+        var referenceFormatted = this.getf("value") || this.value.toString();
 
-        var firstOccurrence = reference.indexOf(caption);
+        return function isLikeContains(elem) {
 
-        return firstOccurrence > -1 &&
-          (!anchorStart || firstOccurrence === 0) &&
-          (!anchorEnd || firstOccurrence + caption.length === reference.length);
+          var formatted;
+          if((formatted = elem.getf(property, true)) == null &&
+             (formatted = elem.getv(property, true)) == null) {
+            return false;
+          }
 
+          var firstOccurrence = formatted.indexOf(referenceFormatted);
+
+          return firstOccurrence > -1 &&
+              (!anchorStart || firstOccurrence === 0) &&
+              (!anchorEnd   || (firstOccurrence + referenceFormatted.length === formatted.length));
+        };
       },
 
       /** @inheritDoc */

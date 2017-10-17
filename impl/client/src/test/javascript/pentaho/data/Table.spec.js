@@ -305,7 +305,11 @@ define([
 
                 return context.getDependencyApplyAsync(["pentaho/data/filter/abstract"], function(AbstractFilter) {
 
-                  CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
+                  CustomFilter = AbstractFilter.extend({
+                    compile: function() {
+                      return function() { return false; };
+                    }
+                  });
                 });
               })
               .then(done, done.fail);
@@ -347,7 +351,7 @@ define([
         it("should return a view with a single result", function() {
           var filter = new CustomFilter();
 
-          spyOn(filter, "_contains").and.callFake(function(elem) {
+          spyOn(filter, "compile").and.returnValue(function(elem) {
             return elem.getv("product") === "A";
           });
 
@@ -369,7 +373,7 @@ define([
         it("should return a view with multiple results", function() {
           var filter = new CustomFilter();
 
-          spyOn(filter, "_contains").and.callFake(function(elem) {
+          spyOn(filter, "compile").and.returnValue(function(elem) {
             return elem.$type.has("sales") && elem.getv("sales") === 12000;
           });
 
@@ -395,7 +399,11 @@ define([
 
                 return context.getDependencyApplyAsync(["pentaho/data/filter/abstract"], function(AbstractFilter) {
 
-                  CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
+                  CustomFilter = AbstractFilter.extend({
+                    compile: function() {
+                      return function() { return false; };
+                    }
+                  });
                 });
               })
               .then(done, done.fail);
@@ -429,7 +437,7 @@ define([
         it("should return `true` when a filter does select the row", function() {
           var filter = new CustomFilter();
 
-          spyOn(filter, "_contains").and.callFake(function(elem) {
+          spyOn(filter, "compile").and.returnValue(function(elem) {
             return elem.getv("product") === "A";
           });
 
@@ -441,7 +449,7 @@ define([
         it("should return `false` when a filter selects another row", function() {
           var filter = new CustomFilter();
 
-          spyOn(filter, "_contains").and.callFake(function(elem) {
+          spyOn(filter, "compile").and.returnValue(function(elem) {
             return elem.getv("product") === "A";
           });
 

@@ -77,16 +77,21 @@ define([
       },
 
       /** @inheritDoc */
-      _operation: function(elem) {
-        var value = elem.getv(this.property);
-        if(value != null) {
-          var values = this.values;
-          var L = values.count;
-          var i = -1;
-          while(++i < L) if(values.at(i).valueOf() === value) return true;
-        }
+      _compile: function() {
 
-        return false;
+        var property = this.property;
+        var values = this.values.toArray(function(value) { return value.valueOf(); });
+        var L = values.length;
+
+        return function isInContains(elem) {
+          var value = elem.getv(property, true);
+          if(value !== null) {
+            var i = -1;
+            while(++i < L) if(values[i] === value) return true;
+          }
+
+          return false;
+        };
       },
 
       /** @inheritDoc */

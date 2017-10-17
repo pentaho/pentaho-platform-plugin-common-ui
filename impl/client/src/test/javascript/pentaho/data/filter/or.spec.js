@@ -30,6 +30,9 @@ define([
     var CustomFilter;
     var ProductSummary;
 
+    function isTrue() { return true; }
+    function isFalse() { return false; }
+
     beforeEach(function(done) {
       Context.createAsync()
           .then(function(_context) {
@@ -59,7 +62,11 @@ define([
               AndFilter = And;
               OrFilter = Or;
 
-              CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
+              CustomFilter = AbstractFilter.extend({
+                compile: function() {
+                  return isFalse;
+                }
+              });
             });
           })
           .then(done, done.fail);
@@ -96,8 +103,8 @@ define([
         var oper1 = new CustomFilter();
         var oper2 = new CustomFilter();
 
-        spyOn(oper1, "_contains").and.returnValue(true);
-        spyOn(oper2, "_contains").and.returnValue(true);
+        spyOn(oper1, "compile").and.returnValue(isTrue);
+        spyOn(oper2, "compile").and.returnValue(isTrue);
 
         var filter  = new OrFilter({operands: [oper1, oper2]});
 
@@ -111,8 +118,8 @@ define([
         var oper1 = new CustomFilter();
         var oper2 = new CustomFilter();
 
-        spyOn(oper1, "_contains").and.returnValue(true);
-        spyOn(oper2, "_contains").and.returnValue(false);
+        spyOn(oper1, "compile").and.returnValue(isTrue);
+        spyOn(oper2, "compile").and.returnValue(isFalse);
 
         var filter  = new OrFilter({operands: [oper1, oper2]});
 
@@ -126,8 +133,8 @@ define([
         var oper1 = new CustomFilter();
         var oper2 = new CustomFilter();
 
-        spyOn(oper1, "_contains").and.returnValue(true);
-        spyOn(oper2, "_contains").and.returnValue(false);
+        spyOn(oper1, "compile").and.returnValue(isTrue);
+        spyOn(oper2, "compile").and.returnValue(isFalse);
 
         var filter  = new OrFilter({operands: [oper1, oper2]});
 
@@ -147,8 +154,8 @@ define([
         var oper1 = new CustomFilter();
         var oper2 = new CustomFilter();
 
-        spyOn(oper1, "_contains").and.returnValue(false);
-        spyOn(oper2, "_contains").and.returnValue(false);
+        spyOn(oper1, "compile").and.returnValue(isFalse);
+        spyOn(oper2, "compile").and.returnValue(isFalse);
 
         var filter  = new OrFilter({operands: [oper1, oper2]});
 
