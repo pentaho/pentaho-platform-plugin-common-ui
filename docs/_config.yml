@@ -29,7 +29,7 @@ safe: true
 # * TypeDef:   {{site.refDocsUrlPattern | replace: '$', 'pentaho.type' | append: '#Factory'}}
 # * Class:     {{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex'}}
 # * Property:  {{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex' | append: '#changeset'}}
-refDocsUrlPattern: https://help.pentaho.com/Documentation/7.1/0R0/070/javascript-apis/platform/$
+refDocsUrlPattern: https://help.pentaho.com/Documentation/8.0/Developer_Center/JavaScript_API/platform/$
 
 # Base URL for Platform samples:
 platformSamplesBaseUrl: https://github.com/pentaho/pentaho-engineering-samples/tree/master/Samples_for_Extending_Pentaho/
