@@ -16,23 +16,23 @@
   },
   "plugins": [
     "plugins/markdown",
-    "${basedir}/src/doc/javascript/config/customPlugins/defineTags",
-    "${basedir}/src/doc/javascript/config/customPlugins/eventHandlers"
+    "${docjs.config.template.plugins}/defineTags",
+    "${docjs.config.template.plugins}/eventHandlers"
   ],
   "templates": {
     "cleverLinks": true,
     "monospaceLinks": false
   },
   "opts": {
-    "template": "${docjs.config.templateDirectory}/vizApi",
+    "template": "${docjs.config.template.directory}",
     "encoding": "utf8",
     "outputSourceFiles": false,
     "recurse": true,
     "verbose": false,
 
     "githubConfig": {
-      "name": "common-ui",
       "url": "https://github.com/pentaho/pentaho-platform-plugin-common-ui/",
+      "name": "common-ui",
       "company": "pentaho",
       "branch": "${docjs.config.github.branch}"
     },

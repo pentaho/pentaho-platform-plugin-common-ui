@@ -17,6 +17,7 @@
     Because the mavenization process should maintain the old group and artifact identifiers in order to reduce the number
     of changes downstream, this module also produces the zip for the javascript sources (js classifier) and the
     java sources (sources classifier).</description>
+
   <properties>
     <webjars.target.directory>${prepared.assembly.directory}/webjars/META-INF/resources/webjars</webjars.target.directory>
     <js.assembly.directory>${project.build.directory}/${js.assembly.name}</js.assembly.directory>
@@ -32,6 +33,7 @@
     <js.assembly.name>${project.artifactId}-${project.version}-js</js.assembly.name>
     <gwt-widgets.directory>${prepared.assembly.directory}/gwt-widgets</gwt-widgets.directory>
   </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.pentaho</groupId>
@@ -177,6 +179,7 @@
       <classifier>src</classifier>
     </dependency>
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
