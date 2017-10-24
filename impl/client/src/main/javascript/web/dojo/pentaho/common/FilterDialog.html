@@ -12,7 +12,7 @@
              dojoAttachEvent="onclick:_filterTypeChanged">
       <span class="filterDialogTypePicklistText"
             data-dojo-attach-point="typePicklistSpan">!Select from a list!</span>
-      <span class="filterDialogTypePicklistCombinationTypeLinksSpan">(<a href="#" onclick="return false;" data-dojo-attach-point="typePicklistCombinationTypeLinksIncludeLink">!Includes!</a>,&nbsp;<a href="#" onclick="return false;" data-dojo-attach-point="typePicklistCombinationTypeLinksExcludeLink">!Excludes!</a>)</span>
+      <span class="filterDialogTypePicklistCombinationTypeLinksSpan">(<a href="#" dojoAttachEvent="onclick:_setInclusivePicklistFilter" data-dojo-attach-point="typePicklistCombinationTypeLinksIncludeLink">!Includes!</a>,&nbsp;<a href="#" dojoAttachEvent="onclick:_setExclusivePicklistFilter" data-dojo-attach-point="typePicklistCombinationTypeLinksExcludeLink">!Excludes!</a>)</span>
       <br/>
     </div>
     <div data-dojo-attach-point="typeMatchContainer">
