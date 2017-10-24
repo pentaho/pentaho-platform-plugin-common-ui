@@ -511,6 +511,7 @@ pentaho.pda.Column.CONDITION_TYPES.ENDSWITH = 'ENDS WITH';
 pentaho.pda.Column.CONDITION_TYPES.CONTAINS = 'CONTAINS';
 pentaho.pda.Column.CONDITION_TYPES.NOT_CONTAINS = 'DOES NOT CONTAIN';
 pentaho.pda.Column.CONDITION_TYPES.EQUAL = 'EQUAL';
+pentaho.pda.Column.CONDITION_TYPES.IN = "IN";
 pentaho.pda.Column.CONDITION_TYPES.LESS_THAN = '<';
 pentaho.pda.Column.CONDITION_TYPES.LESS_THAN_OR_EQUAL = '<=';
 pentaho.pda.Column.CONDITION_TYPES.MORE_THAN = '>';

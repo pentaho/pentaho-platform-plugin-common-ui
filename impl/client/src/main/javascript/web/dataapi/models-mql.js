@@ -916,7 +916,7 @@ pentaho.pda.query.mql.prototype.getFilterConditionString = function( columnId, c
   else if( operator == pentaho.pda.Column.CONDITION_TYPES.EQUAL && (!isArrayValues || value.length == 1)) {
     return 'EQUALS('+operand+';'+this.getFilterValueString(column, value, parameterName, parameters) + ')';
   }
-  else if( operator == pentaho.pda.Column.CONDITION_TYPES.EQUAL && isArrayValues) {
+  else if( operator == pentaho.pda.Column.CONDITION_TYPES.IN || (operator == pentaho.pda.Column.CONDITION_TYPES.EQUAL && isArrayValues)) {
     return 'IN('+operand+';'+this.getFilterValueString(column, value, parameterName, parameters)+")";
   }
   else if( operator == pentaho.pda.Column.CONDITION_TYPES.LESS_THAN ) {
