@@ -54,14 +54,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   postCreate: function() {
     this.inherited(arguments);
     Messages.addUrlBundle('pentaho.common',CONTEXT_PATH+'i18n?plugin=common-ui&name=resources/web/dojo/pentaho/common/nls/messages');
-    // Capture all attempts to close the dialog and redirect them
-    on(this.typePicklistCombinationTypeLinksIncludeLink, "click", this, function() {
-      this._setPicklistCombinationTypeLink(pentaho.pda.Column.OPERATOR_TYPES.AND);
-    });
-    on(this.typePicklistCombinationTypeLinksExcludeLink, "click", this, function() {
-      this._setPicklistCombinationTypeLink(pentaho.pda.Column.OPERATOR_TYPES.AND_NOT);
-    });
-    
+
     this.picklistCombinationTypeIncludeOption.setAttribute("value", pentaho.pda.Column.OPERATOR_TYPES.AND);
     this.picklistCombinationTypeExcludeOption.setAttribute("value", pentaho.pda.Column.OPERATOR_TYPES.AND_NOT);
     
@@ -117,6 +110,16 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
     this.setFilterType(event.target.value);
   },
 
+  _setInclusivePicklistFilter: function(event) {
+    this._setPicklistCombinationTypeLink(pentaho.pda.Column.OPERATOR_TYPES.AND);
+    this.picklistCombinationType.options[0].selected = true;
+  },
+
+  _setExclusivePicklistFilter: function(event) {
+    this._setPicklistCombinationTypeLink(pentaho.pda.Column.OPERATOR_TYPES.AND_NOT);
+    this.picklistCombinationType.options[1].selected = true;
+  },
+
   configureFor: function(filter) {
     this.currentFilter = filter;
     this.currentColumn = this.datasource.getColumnById(this.currentFilter.column);
@@ -125,7 +128,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
     this.configureFilterTypesFor(this.currentColumn.dataType);
     
-    if (this.currentColumn.dataType === pentaho.pda.Column.DATA_TYPES.STRING && (this.currentFilter.combinationType != pentaho.pda.Column.OPERATOR_TYPES.AND || (this.currentFilter.value instanceof Array && this.currentFilter.value.length > 1))) {
+    if (this.currentFilter.operator === "IN") {
       this.setFilterType("PICKLIST");
     } else {
       this.setFilterType("MATCH");
@@ -280,7 +283,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 //        this._configureDateRangeContainer();
 //        break;
       default:
-        console.log("Unknown filter type: " + type);
+        if(typeof console !== "undefined") {
+          console.log("Unknown filter type: " + type);
+        }
         return;
     }
     this.filterType = type;
@@ -317,7 +322,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
         }
         break;
       default:
-        console.log("Unknown filter type: " + type);
+        if(typeof console !== "undefined") {
+          console.log("Unknown filter type: " + type);
+        }
         return;
     }
 
@@ -334,7 +341,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
       try {
         this._onSuccessCallback(this.currentFilter);
       } catch (e) {
-        console.warn("Error in onSuccessCallback of Filter Dialog: " + e);
+        if(typeof console !== "undefined") {
+          console.warn("Error in onSuccessCallback of Filter Dialog: " + e);
+        }
       }
     }
     this.hide();
@@ -354,7 +363,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
       try {
         this._onCancelCallback(this.currentFilter);
       } catch (e) {
-        console.warn("Error in onCancelCallback of Filter Dialog: " + e);
+        if(typeof console !== "undefined") {
+          console.warn("Error in onCancelCallback of Filter Dialog: " + e);
+        }
       }
     }
     this.hide();
@@ -365,6 +376,11 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
     construct.empty(this.picklistUsedValues.domNode);
 
     this.picklistCombinationType.setAttribute( "value", this.currentFilter.combinationType);
+    if (this.currentFilter.combinationType === pentaho.pda.Column.OPERATOR_TYPES.AND) {
+      this.picklistCombinationType.options[0].selected = true;
+    } else {
+      this.picklistCombinationType.options[1].selected = true;
+    }
 
     // Set the used values
     var values = this.currentFilter.value instanceof Array ? this.currentFilter.value : [this.currentFilter.value];
@@ -441,7 +457,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
       this.showErrorDialog(this.getLocaleString('filterDialogMissingValueError_title'), this.getLocaleString('filterDialogMissingValueError_message'));
       return false;
     }
-    this.currentFilter.operator = pentaho.pda.Column.CONDITION_TYPES.EQUAL;
+    this.currentFilter.operator = pentaho.pda.Column.CONDITION_TYPES.IN;
     this.currentFilter.value = values;
     this.currentFilter.combinationType = dojo.attr(this.picklistCombinationType, "value");
     return true;
@@ -543,7 +559,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
       this.options[idx] = new Option(cArray[0], cArray[1]);
       this.options[idx].title = cArray[0];
     }, this.matchComparator);
-    this.matchComparator.value = this.currentFilter.operator;
+    this.matchComparator.value = this.currentFilter.operator === pentaho.pda.Column.CONDITION_TYPES.IN ? pentaho.pda.Column.CONDITION_TYPES.EQUAL : this.currentFilter.operator;
     this._matchComparatorChanged();
   },
 
@@ -624,7 +640,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
     this.dateRangeValueInputDate2.value = null;
   },
   _dateRangeComparatorChanged: function() {
-    console.log("_dateRangeComparatorChanged() Not yet implemented");
+    if(typeof console !== "undefined") {
+      console.log("_dateRangeComparatorChanged() Not yet implemented");
+    }
   },
   
   /**
@@ -635,29 +653,38 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   buildFilterText: function(filter, prompt) {
     var column = this.datasource.getColumnById(filter.column);
     var friendlyOperator = filter.operator;
-    if (filter.combinationType != pentaho.pda.Column.OPERATOR_TYPES.AND || (filter.operator == pentaho.pda.Column.CONDITION_TYPES.EQUAL && filter.value instanceof Array && filter.value.length > 1)) {
-      switch (filter.combinationType) {
-        case pentaho.pda.Column.OPERATOR_TYPES.AND:
-          friendlyOperator = this.getLocaleString("FilterCombinationTypeIn");
-          break;
-        case pentaho.pda.Column.OPERATOR_TYPES.AND_NOT:
-          friendlyOperator = this.getLocaleString("FilterCombinationTypeNotIn");
-          break;
-        default:
-          console.log("Unknown filter combination type for IN condition type: " + filter.combinationType);
-      }
-    } else {
-      // Treat pentaho.pda.Column.DATA_TYPES.UNKNOWN as pentaho.pda.Column.DATA_TYPES.STRING
-      var dataType = column.dataType == pentaho.pda.Column.DATA_TYPES.UNKNOWN ? pentaho.pda.Column.DATA_TYPES.STRING : column.dataType;
-      var comparatorMapping = pentaho.pda.Column.COMPARATOR[dataType];
-      if (comparatorMapping) {
-        array.some(comparatorMapping, function(cArray) {
-          if (cArray[1] === filter.operator) {
-            friendlyOperator = cArray[0];
-            return true;
-          }
-        });
-      }
+    switch (filter.operator) {
+      case pentaho.pda.Column.CONDITION_TYPES.IN:
+        switch (filter.combinationType) {
+          case pentaho.pda.Column.OPERATOR_TYPES.AND:
+            friendlyOperator = this.getLocaleString("FilterCombinationTypeIn");
+            break;
+          case pentaho.pda.Column.OPERATOR_TYPES.AND_NOT:
+            friendlyOperator = this.getLocaleString("FilterCombinationTypeNotIn");
+            break;
+          default:
+            if(typeof console !== "undefined") {
+              console.log("Unknown filter combination type for IN condition type: " + filter.combinationType);
+            }
+        }
+        break;
+      case pentaho.pda.Column.CONDITION_TYPES.EQUAL:
+        // Treat pentaho.pda.Column.DATA_TYPES.UNKNOWN as pentaho.pda.Column.DATA_TYPES.STRING
+        var dataType = column.dataType == pentaho.pda.Column.DATA_TYPES.UNKNOWN ? pentaho.pda.Column.DATA_TYPES.STRING : column.dataType;
+        var comparatorMapping = pentaho.pda.Column.COMPARATOR[dataType];
+        if (comparatorMapping) {
+          array.some(comparatorMapping, function(cArray) {
+            if (cArray[1] === filter.operator) {
+              friendlyOperator = cArray[0];
+              return true;
+            }
+          });
+        }
+        break;
+      default:
+        if(typeof console !== "undefined") {
+          console.log("Unknown filter type: " + this.filterType);
+        }
     }
     var values = "";
 
