@@ -8,25 +8,29 @@ exports.handlers = {
 // ---- Events
 
 function newDoclet( event ) {
-  let doclet = event.doclet;
+  const doclet = event.doclet;
 
+  let description = null;
   switch ( doclet.kind ) {
     case "class":
       doclet.classSummary = _getSummary( doclet.classdesc );
       doclet.constructorSummary = _getSummary( doclet.description );
       break;
     case "interface":
-      if ( !doclet.summary ) doclet.summary = _getSummary( doclet.description || doclet.classdesc );
+      description = doclet.description || doclet.classdesc;
       break;
     default:
-      if ( !doclet.summary ) doclet.summary = _getSummary( doclet.description );
+      description = doclet.description;
   }
+
+  if ( !doclet.summary ) doclet.summary = _getSummary( description );
 }
 
 // ---- Private
 
 function _getSummary( description ) {
-  if ( !description ) return "";
+  const isDescriptionEmpty = description == null || description === "";
+  if ( isDescriptionEmpty ) return "";
 
   const SUMMARY = 0;
   const SUMMARY_END = 1;

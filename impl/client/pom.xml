@@ -23,7 +23,7 @@
 
     <docjs.config.file>jsdoc-vizapi.json</docjs.config.file>
     <docjs.config.github.branch>master</docjs.config.github.branch>
-    <docjs.config.templateDirectory>${project.basedir}/src/doc/javascript/template</docjs.config.templateDirectory>
+    <docjs.config.template.directory>${project.basedir}/src/doc/javascript/template</docjs.config.template.directory>
   </properties>
 
   <dependencies>
