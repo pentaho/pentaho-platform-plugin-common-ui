@@ -24,7 +24,7 @@
     "monospaceLinks": false
   },
   "opts": {
-    "template": "${docjs.config.templateDirectory}/vizApi",
+    "template": "${docjs.config.template.directory}/vizApi",
     "encoding": "utf8",
     "outputSourceFiles": false,
     "recurse": true,

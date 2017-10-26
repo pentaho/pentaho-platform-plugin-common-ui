@@ -38,9 +38,9 @@
         
     <?js } ?>
 
-    <?js if ( isClassOrConstructor ) { ?>
-        <?js= self.partial('amd.tmpl', doc) ?>
-    <?js } else { ?>
+    <?js= self.partial('amd.tmpl', doc) ?>
+
+    <?js if ( !isClassOrConstructor ) { ?>
         <?js if ( doc.description ) { ?>
             <div class="description"><?js= doc.description ?></div>
         <?js } ?>

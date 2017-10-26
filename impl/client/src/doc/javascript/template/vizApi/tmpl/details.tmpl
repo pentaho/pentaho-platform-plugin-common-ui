@@ -26,8 +26,7 @@ if (properties && properties.length && properties.forEach) { ?>
 
 <?js if (data.inherited && data.inherits && !data.overrides) { ?>
     <p>
-        <strong>Inherited From:</strong>
-        <?js= this.linkto(data.inherits, data.inherits.split('"').join('')) ?>
+        <strong>Inherited From:</strong> <?js= this.linkto(data.inherits, data.inherits.split('"').join('')) ?>
     </p>
 <?js } ?>
 
@@ -58,8 +57,7 @@ if (properties && properties.length && properties.forEach) { ?>
 
 <?js if (data.overrides) { ?>
     <p>
-        <strong>Overrides: </strong>
-        <?js= this.linkto(data.overrides, this.htmlsafe(data.overrides)) ?>
+        <strong>Overrides: </strong> <?js= this.linkto(data.overrides, this.htmlsafe(data.overrides)) ?>
     </p>
 <?js } ?>
 
