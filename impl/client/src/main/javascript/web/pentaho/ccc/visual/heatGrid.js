@@ -62,9 +62,13 @@ define([
           options.axisComposite = def.get(this._validExtensionOptions, "axisComposite", options.axisComposite);
 
           if(options.axisComposite) {
-            var measureCount = this._getRoleDepth("size") + this._getRoleDepth("color");
-            var catsDepth = this._getRoleDepth("rows");
-            var sersDepth = this._getRoleDepth("columns");
+            var model = this.model;
+            var measureCount = model.size.attributes.count + model.color.attributes.count;
+            var catsDepth = model.rows.attributes.count;
+            var sersDepth = model.columns.attributes.count;
+
+            // Need CCC auto-layout for the composite axis.
+            // TODO: Analyzer CrossTable Layout specific
             var catsBreadth = Math.max(1, this._dataTable.getNumberOfRows() - 1);
             var sersBreadth = this._dataTable.getNumberOfColumns() - catsDepth;
 
@@ -129,13 +133,13 @@ define([
         },
 
         _getBaseAxisTitle: function() {
-          var roleNames = def.getOwn(this._rolesByCccVisualRole, "category");
-          return roleNames ? this._getDiscreteRolesTitle(roleNames) : "";
+          var roleNames = this._getRolesMappedToCccRole("category");
+          return roleNames && roleNames.length > 0 ? this._getDiscreteRolesTitle(roleNames) : "";
         },
 
         _getOrthoAxisTitle: function() {
-          var roleNames = def.getOwn(this._rolesByCccVisualRole, "series");
-          return roleNames ? this._getDiscreteRolesTitle(roleNames) : "";
+          var roleNames = this._getRolesMappedToCccRole("series");
+          return roleNames && roleNames.length > 0 ? this._getDiscreteRolesTitle(roleNames) : "";
         }
       });
     }

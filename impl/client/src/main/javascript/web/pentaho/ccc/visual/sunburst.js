@@ -68,11 +68,11 @@ define([
 
           var labelColor = this.model.labelColor;
           if(labelColor != null) {
-            options.label_textStyle= labelColor;
+            options.label_textStyle = labelColor;
           }
 
           // Determine whether to show values label
-          if(model.labelsOption !== "none" && this.axes.measure.boundRoles.size) {
+          if(model.labelsOption !== "none" && this.model.size.isMapped) {
             options.label_textBaseline = "bottom";
             options.label_textMargin = 2;
 
@@ -126,8 +126,8 @@ define([
                     /* jshint laxbreak:true*/
                     var pvMainLabel = this.proto;
                     if(!pvMainLabel.text()) return "";
-                    var sizeCccDimName = me._getMappingAttrInfosByRole("size")[0].cccDimName;
-                    return me._formatSize(scene.vars.size, scene.firstAtoms[sizeCccDimName].dimension);
+                    var sizeDimName = me._getAttributeInfosOfRole("size")[0].name;
+                    return me._formatSize(scene.vars.size, scene.firstAtoms[sizeDimName].dimension);
                   })
                   .textBaseline("top");
             };
@@ -198,16 +198,19 @@ define([
             // The color role, "rows" is required, so necessarily C > 0.
             // Also, there can be at most one measure gem, "size", so M <= 1.
             // Use member colors of all of the color attributes.
-            this._getDiscreteColorMappingAttrInfos().forEach(function(colorMAInfo) {
-              // TODO: Mondrian/Analyzer specific
-              // Copy map values to colorMap.
-              // All color maps are joined together and there will be no
-              // value collisions because Mondrian keys are prefixed with the dimensions they belong to...
-              if(colorMAInfo && colorMAInfo.attr) {
-                var map = memberPalette[colorMAInfo.attr.name];
-                if(map) this._copyColorMap(colorMap, map);
-              }
-            }, this);
+            var colorAttrInfos = this._getAttributeInfosOfRole(this._discreteColorRole, /* excludeMeasureDiscrim: */true);
+            if(colorAttrInfos) {
+              colorAttrInfos.forEach(function(colorAttrInfo) {
+                // TODO: Mondrian/Analyzer specific
+                // Copy map values to colorMap.
+                // All color maps are joined together and there will be no
+                // value collisions because Mondrian keys are prefixed with the dimensions they belong to...
+                var map = memberPalette[colorAttrInfo.attr.name];
+                if(map) {
+                  this._copyColorMap(colorMap, map);
+                }
+              }, this);
+            }
           }
 
           return colorMap;

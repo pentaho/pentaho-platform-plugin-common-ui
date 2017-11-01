@@ -17,7 +17,6 @@
 // This exists only so that r.js sees otherwise invisible dependencies.
 define([
   "./abstract",
-  "./axes/Axis",
   "./area",
   "./areaAbstract",
   "./areaStacked",
