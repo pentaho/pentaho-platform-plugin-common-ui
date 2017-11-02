@@ -1,1 +1,1 @@
-# Pentaho Visualization API Reference Documentation
+# Hitachi Vantara Visualization API Reference Documentation

@@ -150,7 +150,7 @@ Component authors may also wish to provide a default configuration beside the co
 included and registered in the same [Pentaho Web Package](web-package). 
 
 
-## Known Values of Pentaho Environment Variables
+## Known Values of Hitachi Vantara Environment Variables
 ### `application`
 
 | Description             | Value                |
