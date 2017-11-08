@@ -38,6 +38,7 @@ define(function() {
         },
 
         _genericMeasureCccVisualRole: "value",
+        _genericMeasureDiscrimCccVisualRole: "multiChart",
 
         _multiRole: "columns",
 
@@ -49,11 +50,9 @@ define(function() {
 
           this.base();
 
-          if(this.options.valuesVisible) this._configureValuesMask();
-        },
-
-        _isLegendVisible: function() {
-          return this._getRoleDepth("rows") > 0;
+          if(this.options.valuesVisible) {
+            this._configureValuesMask();
+          }
         },
 
         _configureLabels: function(options, model) {
@@ -69,6 +68,7 @@ define(function() {
         },
 
         _configureMultiChart: function() {
+
           this.base();
 
           this.options.legendSizeMax = "50%";
@@ -78,23 +78,21 @@ define(function() {
           // Change values mask according to each category's
           // discriminated measure being isPercent or not
           if(this._isGenericMeasureMode) {
-            var genericMeasureAttrsByName = this._selectGenericMeasureMappingAttrInfos()
-                .uniqueIndex(function(maInfo) {
-                  return maInfo.attr.name;
-                });
+            var attributeInfosByName = this.attributeInfosByName;
 
-            var genericMeasureDiscrimName = this.GENERIC_MEASURE_DISCRIM_DIM_NAME;
+            // e.g. sizeRole.dim
+            var genericMeasureDiscrimName = this._genericMeasureDiscrimCccDimName;
 
             this.options.pie = {
               scenes: {
                 category: {
                   sliceLabelMask: function() {
-                    var meaAtom = this.atoms[genericMeasureDiscrimName];
-                    var meaMAName;
-                    var meaMAInfo;
-                    if(meaAtom && (meaMAName = meaAtom.value) &&
-                        (meaMAInfo = genericMeasureAttrsByName[meaMAName]) && meaMAInfo.isPercent) {
-                      return "{value}"; // the value is the percentage itself;
+
+                    var meaAttrName = this.atoms[genericMeasureDiscrimName].value;
+
+                    if(attributeInfosByName[meaAttrName].isPercent) {
+                      // the value is the percentage itself;
+                      return "{value}";
                     }
 
                     return "{value} ({value.percent})";
@@ -103,8 +101,8 @@ define(function() {
               }
             };
           } else {
-            var meaMAInfo = this._getMappingAttrInfosByRole("measures")[0];
-            this.options.valuesMask = meaMAInfo.isPercent ? "{value}" : "{value} ({value.percent})";
+            var meaAttrInfo = this._getAttributeInfosOfRole("measures")[0];
+            this.options.valuesMask = meaAttrInfo.isPercent ? "{value}" : "{value} ({value.percent})";
           }
         },
 
@@ -112,18 +110,16 @@ define(function() {
           var memberPalette = this._getMemberPalette();
           var colorMap;
           if(memberPalette) {
-            var colorMAInfos = this._getDiscreteColorMappingAttrInfos();
-            var C = colorMAInfos.length;
+            var colorAttrInfos = this._getAttributeInfosOfRole(this._discreteColorRole, /* excludeMeasureDiscrim: */true) || [];
+            var C = colorAttrInfos.length;
             // C >= 0 (color -> "rows" -> is optional)
             // When multiple measures exist, the pie chart shows them as multiple charts
             // and if these would affect color, each small chart would have a single color.
             // => consider M = 0;
             // If C, use the members' colors of the last color attribute.
             if(C) {
-              var maInfo = colorMAInfos[C - 1];
-              if(maInfo && maInfo.attr) {
-                colorMap = this._copyColorMap(null, memberPalette[maInfo.attr.name]);
-              }
+              var attrInfo = colorAttrInfos[C - 1];
+              colorMap = this._copyColorMap(null, memberPalette[attrInfo.attr.name]);
             }
           }
 

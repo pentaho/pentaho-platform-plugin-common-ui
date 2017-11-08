@@ -20,7 +20,6 @@ define([
   "cdf/lib/CCC/pvc",
   "cdf/lib/CCC/cdo",
   "cdf/lib/CCC/protovis",
-  "./axes/Axis",
   "./_util",
   "pentaho/util/object",
   "pentaho/visual/color/utils",
@@ -29,7 +28,8 @@ define([
   "pentaho/debug",
   "pentaho/debug/Levels",
   "pentaho/i18n!view"
-], function(module, SelectionModes, def, pvc, cdo, pv, Axis, util, O, visualColorUtils, DataView, logger, debugMgr, DebugLevels, bundle) {
+], function(module, SelectionModes, def, pvc, cdo, pv, util, O, visualColorUtils, DataView,
+            logger, debugMgr, DebugLevels, bundle) {
 
   "use strict";
 
@@ -61,49 +61,6 @@ define([
     "dataCategoriesCount": 1
   };
 
-  var baseOptions = {
-    // Chart
-    compatVersion: 2, // use CCC version 2
-    compatFlags: {
-      discreteTimeSeriesTickFormat: false
-    },
-
-    format: {
-      percent: "#,0.00%"
-    },
-
-    // Interaction
-    clearSelectionMode: "manual",
-
-    // Tooltip
-    tooltipEnabled: true,
-    tooltip: {
-      className: "pentaho-visual-ccc",
-      delayIn: 200,
-      delayOut: 80,
-      offset: 2,
-      html: true,
-      gravity: "nw",
-      fade: false,
-      followMouse: true,
-      useCorners: true,
-      arrowVisible: false,
-      opacity: 1
-    },
-    trendDot_ibits: 0,
-    trendDot_imask: "ShowsActivity",
-    trendLine_ibits: 0,
-    trendLine_imask: "ShowsActivity",
-
-    // Data source
-    isMultiValued: false,
-    seriesInRows: false,
-
-    // Data
-    dataTypeCheckingMode: "none",
-    ignoreNulls: false
-  };
-
   return [
     "pentaho/visual/base/view",
     "pentaho/visual/models/abstract",
@@ -123,13 +80,55 @@ define([
         },
 
         // region PROPERTIES
-        _options: baseOptions,
+        _options: {
+          // Chart
+          compatVersion: 2, // use CCC version 2
+          compatFlags: {
+            discreteTimeSeriesTickFormat: false
+          },
+
+          format: {
+            percent: "#,0.00%"
+          },
+
+          // Interaction
+          clearSelectionMode: "manual",
+
+          // Tooltip
+          tooltipEnabled: true,
+          tooltip: {
+            className: "pentaho-visual-ccc",
+            delayIn: 200,
+            delayOut: 80,
+            offset: 2,
+            html: true,
+            gravity: "nw",
+            fade: false,
+            followMouse: true,
+            useCorners: true,
+            arrowVisible: false,
+            opacity: 1
+          },
+          trendDot_ibits: 0,
+          trendDot_imask: "ShowsActivity",
+          trendLine_ibits: 0,
+          trendLine_imask: "ShowsActivity",
+
+          // Data Source
+          crosstabMode: false,
+          isMultiValued: true,
+          seriesInRows: false,
+
+          // Data
+          dataTypeCheckingMode: "none",
+          ignoreNulls: false
+        },
 
         // Hide discrete null members in tooltip.
         _hideNullMembers: false,
 
-        // Default mapping from gembarId to CCC dimension group.
-        // From requirement visual roles to CCC visual roles...
+        // Maps Viz. API visual roles to CCC visual roles.
+        // Sub-classes can override.
         _roleToCccRole: {
           "multi": "multiChart",
           "columns": "series",
@@ -137,10 +136,10 @@ define([
           "measures": "value"
         },
 
-        /* There can be one special CCC dimension into which
-         * the attributes of one or more Viz measure roles are mapped.
+        /* Some CCC measure visual roles accept multiple attributes.
+         * We call them generic measure visual roles...
          *
-         * e.g.:
+         * Also, more than one Viz measure visual role can map to a CCC measure visual role:
          *
          *   Viz Visual Role  -> Generic Measure CCC Visual Role
          *   ---------------------------------------------------
@@ -149,25 +148,26 @@ define([
          *
          * Each of the Viz visual roles may support more than one attribute.
          *
-         * In the end, if more than one measure attribute were mapped to the same
-         * CCC visual role, either multiple CCC dimensions would be created,
-         * one for each of the attributes (e.g.: value, value2, value3...)
-         * or - the current solution - an auxiliary measure discriminator dimension is added to
-         * distinguish which of the measure attributes is in the CCC visual role (e.g.: "value").
+         * When, a CCC measure visual role is mapped to more than one attribute,
+         * a special "measure discriminator attribute" must be bound to one of the
+         * discrete visual roles. This attribute indicates the active measure.
          *
          * To activate the measure discriminator mode, a chart class has to specify the
-         * prototype property `_genericMeasureCccVisualRole` with the name of the target CCC visual role.
+         * prototype property `_genericMeasureCccVisualRole` with the name of the multiple measures CCC visual role
+         * and `_genericMeasureDiscrimCccVisualRole` with the name of the discrete CCC visual role that should receive
+         * the discriminator attribute.
          *
          * When multiple source roles exist,
          * these are sorted alphabetically and the within role attribute order is preserved.
          */
         _genericMeasureCccVisualRole: null,
+        _genericMeasureDiscrimCccVisualRole: null,
 
-        GENERIC_MEASURE_DIM_NAME: "__GENERIC_MEASURE__",
-        GENERIC_MEASURE_DISCRIM_DIM_NAME: "__GENERIC_MEASURE_DISCRIM__",
-
-        _keyAxesIds: ["column", "row"],
-        _axesIds: ["column", "row", "measure"],
+        // e.g. valueRole.dim
+        get _genericMeasureDiscrimCccDimName() {
+          var roleName = this._genericMeasureCccVisualRole;
+          return roleName !== null ? (roleName + "Role.dim") : null;
+        },
 
         // Measure roles that do not show the role in the tooltip.
         // Essentially, those measures that are represented by cartesian axes...
@@ -181,8 +181,6 @@ define([
 
         // The name of the role that represents the "discrete color" concept.
         _discreteColorRole: "columns",
-
-        _useLabelColor: true,
         // endregion
 
         // region VizAPI implementation
@@ -237,6 +235,9 @@ define([
         /** @inheritDoc */
         _updateSelection: function() {
 
+          // TODO: Re-implement this to filter datums by directly applying the selectionFilter.
+          // Create some kind of element adapter for that, like the data table does.
+
           if(_isDebugMode) logger.log("_updateSelection BEGIN");
           try {
             var dataFilter = this.selectionFilter;
@@ -247,14 +248,11 @@ define([
             var selectedDataView = dataTable.filter(dataFilter);
 
             // Get information on the axes
-            var props = def.query(this._keyAxesIds)
-                  .selectMany(function(axisId) {
-                    return this.axes[axisId].getSelectionMappingAttrInfos();
-                  }, this)
-                  .select(function(maInfo) {
+            var props = def.query(this._getRealKeyAttributeInfos())
+                  .select(function(attrInfo) {
                     return {
-                      attr: maInfo.attr,
-                      cccDimName: maInfo.cccDimName
+                      attr: attrInfo.attr,
+                      name: attrInfo.name
                     };
                   })
                   .array();
@@ -267,7 +265,7 @@ define([
               /* eslint no-loop-func: 0 */
               var datumFilterSpec = props.reduce(function(datumFilter, prop) {
                 var value = selectedDataView.getValue(k, selectedDataView.getColumnIndexByAttribute(prop.attr));
-                datumFilter[prop.cccDimName] = value;
+                datumFilter[prop.name] = value;
                 return datumFilter;
               }, {});
 
@@ -325,59 +323,45 @@ define([
             "width", this.width || 400,
             "dimensions", {},
             "visualRoles", {},
-            "readers", [],
-            "calculations", []);
+            "readers", []);
         },
         // endregion
 
-        // region VISUAL MAP
-        _getMappingAttrInfosByRole: function(roleName) {
-          return def.getOwn(this._visualMapInfo, roleName);
-        },
-
-        _getRoleDepth: function(roleName, includeMeasureDiscrim) {
-          var depth = 0;
-          var maInfos = this._getMappingAttrInfosByRole(roleName);
-          if(maInfos) {
-            depth = maInfos.length;
-            if(!includeMeasureDiscrim && this._isGenericMeasureMode &&
-               this._genericMeasureDiscrimMappingAttrInfo.role === roleName) {
-              depth -= 1;
-            }
+        // region ATTRIBUTE INFOS / VISUAL MAP
+        _getAttributeInfosOfRole: function(roleName, excludeMeasureDiscrim) {
+          var attrInfos = def.getOwn(this.visualMap, roleName, null);
+          if(attrInfos !== null && excludeMeasureDiscrim) {
+            attrInfos = attrInfos.filter(function(attrInfo) { return !attrInfo.isMeasureDiscrim; });
           }
-
-          return depth;
-        },
-
-        _isRoleBound: function(roleName) {
-          return !!this._getMappingAttrInfosByRole(roleName);
+          return attrInfos;
         },
 
         _isRoleQualitative: function(roleName) {
-          if(this._isGenericMeasureRole(roleName)) return false;
+
+          // TODO: Can't this use levelEffectiveOn alone?
+
+          // Is generic visual role?
+          var cccGenericRoleName = this._genericMeasureCccVisualRole;
+          if(!!cccGenericRoleName && def.getOwn(this._roleToCccRole, roleName) === cccGenericRoleName) {
+            return false;
+          }
 
           var mapping = this.model.get(roleName);
-          if(mapping.attributes.count > 1) return true;
+          if(mapping.attributes.count > 1) {
+            return true;
+          }
 
           var rolePropType = this.model.$type.get(roleName);
           var level = rolePropType.levelEffectiveOn(this.model);
           return !level || MeasurementLevel.type.isQualitative(level);
         },
 
-        _isGenericMeasureRole: function(roleName) {
-          var cccGenericRoleName = this._genericMeasureCccVisualRole;
-          return !!cccGenericRoleName && def.getOwn(this._roleToCccRole, roleName) === cccGenericRoleName;
+        _getRolesMappedToCccRole: function(cccRoleName) {
+          return def.getOwn(this._rolesByCccVisualRole, cccRoleName, null);
         },
 
-        _getGenericMeasureRoleNames: function() {
-          var cccRole = this._genericMeasureCccVisualRole;
-          return (cccRole && def.getOwn(this._rolesByCccVisualRole, cccRole)) || [];
-        },
-
-        _selectGenericMeasureMappingAttrInfos: function() {
-          return def.query(this._getGenericMeasureRoleNames())
-              .selectMany(this._getMappingAttrInfosByRole, this)
-              .where(def.notNully);
+        _getRealKeyAttributeInfos: function() {
+          return def.query(this.axes.key).where(function(attrInfo) { return !attrInfo.isMeasureDiscrim; });
         },
         // endregion
 
@@ -391,7 +375,7 @@ define([
           if(value && value !== "none") {
             var fillStyle;
             if(value === "gradient") {
-              if(this._hasMultiChartColumns) {
+              if(this._isMultiChartMode) {
                 // Use the first color with half of the saturation
                 var bgColor = pv.color(model.backgroundColor).rgb();
                 bgColor = pv.rgb(
@@ -425,7 +409,7 @@ define([
 
             options.axisTitleFont = options.axisFont = labelFont;
 
-            if(this._hasMultiChartColumns) {
+            if(this._isMultiChartMode) {
               var labelFontFamily = model.labelFontFamily;
               options.titleFont = (value + 2) + "px " + labelFontFamily;
             }
@@ -478,6 +462,30 @@ define([
           options.sizeAxisUseAbs = value === "useAbs";
         },
 
+        // region initData
+        /**
+         * Initializes the view in what concerns to the current data table's data and metadata.
+         *
+         * * Creates the local `MappingAttributeInfo` instances,
+         *   one per `MappingAttribute` of visual role properties of the model
+         *   (one more for the special measure discriminator attribute added in certain circumstances).
+         *   Sets {@link pentaho.ccc.visual.Abstract#attributeInfos} and
+         *   {@link pentaho.ccc.visual.Abstract#visualMap}.
+         *
+         * * Determines if the visualization will operate in "generic measure mode",
+         *   which happens when there is more than one attribute mapped to the generic measure visual role, if any.
+         *   In this case, also, creates the special measure discriminator attribute.
+         *   Sets {@link pentaho.ccc.visual.Abstract#_isGenericMeasureMode} and
+         *   {@link pentaho.ccc.visual.Abstract#_genericMeasuresCount}.
+         *
+         * * Determines if the visualization will operate in multi-chart mode or not.
+         *
+         * * Creates a `DataView` that selects and reorders columns of the data table.
+         *
+         * * Configures CCC readers, dimensions and visual roles.
+         *
+         * * Creates the axes map, {@link pentaho.ccc.visual.Abstract#axes}.
+         */
         _initData: function() {
           var dataTable = this._dataTable;
           var attributes = dataTable.model.attributes;
@@ -486,28 +494,19 @@ define([
           var genericMeasureCccVisualRole = this._genericMeasureCccVisualRole;
 
           // Multiple ways to store and index MappingAttributeInfo...
-          var mappingAttrInfos = [];
+          var attributeInfos = [];
+
+          // attributeName -> MappingAttributeInfo
+          var attributeInfosByName = {};
 
           // axisId -> MappingAttributeInfo[]
-          var mappingAttrInfosByAxisId = {
-            row:     [],
-            column:  [],
+          var axes = {
+            key: [],
             measure: []
           };
 
-          // mappingAttrName -> MappingAttributeInfo
-          var mappingAttrInfosByName = {};
-
           // roleName -> MappingAttributeInfo[]
-          var visualMapInfo = {};
-
-          // ----
-
-          // roleName -> attrName[]
           var visualMap = {};
-
-          // attrName -> roleName[]
-          var invVisualMap = {};
 
           var rolesByCccVisualRole = {};
 
@@ -516,68 +515,24 @@ define([
           /**
            * Registers a mapping attribute info.
            *
-           * @param {MappingAttributeInfo} mappingAttrInfo The mapping attribure info to add.
-           * @return {MappingAttributeInfo} The same as `mappingAttrInfo`.
+           * @param {!MappingAttributeInfo} mappingAttrInfo - The mapping attribute info to add.
            */
           var addMappingAttrInfo = function(mappingAttrInfo) {
 
-            // Complete
-            var isMeasureGeneric = !!genericMeasureCccVisualRole &&
-                (mappingAttrInfo.cccRole === genericMeasureCccVisualRole);
+            if(mappingAttrInfo.cccRole === genericMeasureCccVisualRole) {
+              genericMeasuresCount++;
+            }
 
-            mappingAttrInfo.isMeasureGeneric = isMeasureGeneric;
+            attributeInfos.push(mappingAttrInfo);
+            attributeInfosByName[mappingAttrInfo.name] = mappingAttrInfo;
 
-            // Not final; see below. When genericMeasuresCount.length > 1,
-            // all isMeasureGeneric mappingAttrInfo will share a single CCC dimension.
-            mappingAttrInfo.cccDimName = mappingAttrInfo.name;
+            axes[mappingAttrInfo.axis].push(mappingAttrInfo);
 
-            // Store/Index in multiple ways
-            mappingAttrInfos.push(mappingAttrInfo);
-
-            if(isMeasureGeneric) genericMeasuresCount++;
-
-            mappingAttrInfosByName[mappingAttrInfo.name] = mappingAttrInfo;
-
-            mappingAttrInfosByAxisId[mappingAttrInfo.axis].push(mappingAttrInfo);
-
-            var roleName = mappingAttrInfo.role;
-            def.array.lazy(visualMapInfo, roleName).push(mappingAttrInfo);
-
-            var attr = mappingAttrInfo.attr;
-            if(attr) def.array.lazy(invVisualMap, attr.name).push(roleName);
-
-            return mappingAttrInfo;
+            def.array.lazy(visualMap, mappingAttrInfo.role).push(mappingAttrInfo);
           };
 
           // ----
-          // Phase 1 - Determine the AxisId of each data table column.
-
-          // An Attribute can only belong to one axis.
-          // attrName -> axisId
-          var axisIdByAttrName = {};
-
-          var indexAttributeByAxis = function(axisId, attr) {
-            var attrName = attr.name;
-            if(!def.hasOwn(axisIdByAttrName, attrName))
-              axisIdByAttrName[attrName] = axisId;
-          };
-
-          if(dataTable.isCrossTable) {
-            // The axis of an attribute is tied to the first cross-tab layout role where the attribute participates
-            // Ideally, an attribute would either be in one of rows, columns or measures...
-            var crossLayout = dataTable.implem.layout;
-
-            var addStructurePosition = function(axisId, structPos) {
-              indexAttributeByAxis(axisId, structPos.attribute);
-            };
-
-            crossLayout.rows.forEach(addStructurePosition.bind(this, "row"));
-            crossLayout.cols.forEach(addStructurePosition.bind(this, "column"));
-            crossLayout.meas.forEach(addStructurePosition.bind(this, "measure"));
-          }
-
-          // ----
-          // Phase 2 - Build MappingAttributeInfo part 1...
+          // Phase 1 - Build MappingAttributeInfo part 1...
 
           // For each visual role mapping attribute,
           // build a corresponding "visual role mapping attribute info", pointing to the corresponding
@@ -596,25 +551,27 @@ define([
           // This is because, otherwise, we would not be able to specify valueType and isDiscrete differently
           // for different visual roles...
 
-          this.model.$type.eachVisualRole(function(propType) {
-            var roleName = propType.name;
+          this.model.$type.eachVisualRole(function(visualRolePropType) {
+
+            var roleName = visualRolePropType.name;
             var mapping  = this.model.get(roleName);
 
+            // Could this be done only at construction time?
+            var cccRoleName = this._roleToCccRole[roleName];
+            if(!cccRoleName) {
+              throw def.error.operationInvalid("No CCC Role for '{0}'", [roleName]);
+            }
+
+            def.array.lazy(rolesByCccVisualRole, cccRoleName).push(roleName);
+
             if(mapping.isMapped) {
-              var isVisualKey = propType.isVisualKeyOn(this.model);
+              var isKeyVisualRole = visualRolePropType.isVisualKeyOn(this.model);
 
-              var cccRoleName = this._roleToCccRole[roleName];
-              if(cccRoleName)
-                def.array.lazy(rolesByCccVisualRole, cccRoleName).push(roleName);
-
-              var dataView = this._dataView;
-              visualMap[roleName] = mapping.attributes.toArray(function(mappingAttr, mappingAttrIndex) {
+              mapping.attributes.each(function(mappingAttr, mappingAttrIndex) {
                 var attrName = mappingAttr.name;
                 var attr = attributes.get(attrName);
-                var attrColIndex = dataView.getColumnIndexByAttribute(attr);
-                var axisId = axisIdByAttrName[attrName] || (isVisualKey ? "row" : "measure");
 
-                // Create an intelligible MappingAttrInfo id.
+                // Create an intelligible MappingAttrInfo name.
                 // The "_" prefix prevents CCC auto binding to visual roles.
                 var name = "_" + roleName + "_" + (mappingAttrIndex + 1);
 
@@ -627,94 +584,61 @@ define([
                   mappingAttr: mappingAttr,
 
                   attr: attr,
-                  attrColIndex: attrColIndex,
 
                   isPercent: !!attr.isPercent,
 
                   cccRole: cccRoleName,
 
-                  axis: axisId,
+                  axis: isKeyVisualRole ? "key" : "measure",
                   isMeasureDiscrim: false
                 });
-
-                return attrName;
-              }, this);
+              });
             }
           }, this);
 
           // ----
-          // Phase 3 - 2nd passage stuff
+          // Phase 2 - 2nd passage stuff
 
-          // Must have a stable order for laying out multiple roles that map to a single CCC dimension group.
+          // Must have a stable order for laying out multiple roles that map to a single CCC visual role.
           Object.keys(rolesByCccVisualRole).forEach(function(cccRoleName) {
             rolesByCccVisualRole[cccRoleName].sort();
           });
 
-          // Generic Measure Mode?
-          var isGenericMeasureMode = this._isGenericMeasureMode = genericMeasuresCount > 1;
-          if(isGenericMeasureMode) {
-            this._genericMeasureDiscrimMappingAttrInfo = this._createGenericMeasureDiscriminator();
-            addMappingAttrInfo(this._genericMeasureDiscrimMappingAttrInfo);
-          } else {
-            this._genericMeasureDiscrimMappingAttrInfo = null;
-          }
+          // ----
 
-          var cccDims = this.options.dimensions;
-          var cccVisualRoles = this.options.visualRoles;
-          var addToCCCVisualRole = function(cccRoleName, cccDimName) {
-            var cccRole = def.lazy(cccVisualRoles, cccRoleName);
-            def.array.lazy(cccRole, "dimensions").push(cccDimName);
-          };
+          // Publish the created stores/indexes.
+          this.attributeInfos = attributeInfos; // list
+          this.attributeInfosByName = attributeInfosByName; // map by name
+          this.axes = axes; // index by axis
+          this.visualMap = visualMap; // index by role
 
-          // Configure the generic measure visual role
-          if(isGenericMeasureMode)
-            addToCCCVisualRole(genericMeasureCccVisualRole, this.GENERIC_MEASURE_DIM_NAME);
-
-          // mappingAttrInfos is filled above, in visual role mapping attribute order;
-          // this enables its use for configuring the CCC visual roles.
-          mappingAttrInfos.forEach(function(maInfo) {
-
-            // i) Fix CCC dim names of generic measures if there is more than one.
-            var isMeasureGeneric = isGenericMeasureMode && maInfo.isMeasureGeneric;
-            if(isMeasureGeneric)
-              maInfo.cccDimName = this.GENERIC_MEASURE_DIM_NAME;
-
-            if(maInfo.cccDimName) {
-              // Exclude measure discriminator
-              var cccDim;
-              if(maInfo.attr) {
-                // ii) Configure CCC dimension options.
-                cccDim = def.lazy(cccDims, maInfo.cccDimName);
-                cccDim.valueType  = this._getAttributeCccValueType(maInfo.attr);
-                cccDim.isDiscrete = this._isRoleQualitative(maInfo.role);
-                cccDim.comparer   = null;
-                if(cccDim.valueType === Date) {
-                  // Change the default formatter to use JavaScript's default serialization.
-                  // Affects tooltips and discrete axes.
-                  cccDim.formatter = function(v) { return v == null ? "" : v.toString(); };
-                }
-              }
-
-              if(maInfo.isMeasureDiscrim) {
-                cccDim = def.lazy(cccDims, maInfo.cccDimName);
-                cccDim.isHidden = true;
-              }
-
-              // iii) Add to corresponding CCC visual role
-              if(!isMeasureGeneric) addToCCCVisualRole(maInfo.cccRole, maInfo.cccDimName);
-            }
-          }, this);
-
-          // Publish the created stores/indexes
-          this._mappingAttrInfos = mappingAttrInfos;
-          this._mappingAttrInfoByName = mappingAttrInfosByName;
-          this._visualMap = visualMap;
-          this._visualMapInfo = visualMapInfo;
-          this._invVisualMap = invVisualMap;
           this._rolesByCccVisualRole = rolesByCccVisualRole;
           this._genericMeasuresCount = genericMeasuresCount;
 
-          this._initAxes(mappingAttrInfosByAxisId);
+          // ----
+
+          // Generic Measure Mode?
+          // Needs to be done after publishing _rolesByCccVisualRole.
+          if((this._isGenericMeasureMode = genericMeasuresCount > 1)) {
+            // Create the measure discriminator attribute.
+            // Will be the last attribute of its discrete role.
+            addMappingAttrInfo(this._createGenericMeasureDiscriminator());
+          }
+
+          // ----
+
+          // 1. Hide columns not bound to visual roles and reorder attributes of the plain data table.
+          this._transformData(attributeInfos);
+
+          // 2. Configure CCC dimensions.
+          this._configureCccDimensions(attributeInfos);
+
+          // 3. Configure CCC visual roles.
+          this._configureCccVisualRoles(attributeInfos);
+
+          // 4. Determine if there is a multi-chart role and if it is bound.
+          // (ignoring the measure discrim, if any)
+          this._isMultiChartMode = !!this._multiRole && this.model.get(this._multiRole).isMapped;
         },
 
         /**
@@ -723,111 +647,52 @@ define([
          * When a measure visual role like "measures" or "measuresLine" accepts multiple attributes, and
          * it is desired that each of these displays as if it were a different series
          * (different line, different color etc.),
-         * we trick CCC into interpreting each measure attribute column as a _column value_ in cross-table format.
+         * we use CCC's measure visual roles' discriminator dimensions.
          *
-         * This is done by using CCC's crosstab format (with measuresInColumns=false).
-         * All measures' values end up in a single CCC "value" dimension.
-         * The name of the original measure column ends up in the special CCC dimension we
-         * call "the measure discriminator".
-         *
-         * This has the following restrictions/consequences:
-         * * all measure attributes have to be in the rightmost columns of the data table
-         * * and the ability to have different formatting per measure attribute, as there is
-         *   a single CCC dimension that holds the values of all measure attributes, is lost.
-         *   The formatting configuration of the first measure in the measure role is used.
+         * For example,
+         * if the CCC multiple measures visual role is `value`,
+         * then we would map the special `valueRole.dim` attribute to CCC's
+         * `series` visual role, to make series unfold for each attribute bound to `value`.
          *
          * @return {MappingAttrInfo} The created generic measure discriminator.
          * @private
          */
         _createGenericMeasureDiscriminator: function() {
-          // In which of the discrete axes should we add the discriminator to?
-          // To the first whose defaultRole is mapped to a ccc dim group.
-          // (not all vizs have/use both axis; see Pie chart, for example).
-          var me = this;
-          var roleToCccVisualRole = this._roleToCccRole;
-          return tryCreateInAxis("column") || tryCreateInAxis("row") ||
-                def.assert("Need a mapped discrete axis to hold the measure discriminator.");
 
-          // ----
+          var discrimCccRoleName = this._genericMeasureDiscrimCccVisualRole;
+          var discrimRoleName = this._getRolesMappedToCccRole(discrimCccRoleName)[0];
 
-          function tryCreateInAxis(axisId) {
-            // DefaultRole of axis
-            var roleName = axisId + "s";
-            var cccRoleName = def.getOwn(roleToCccVisualRole, roleName);
-            if(cccRoleName)
-              return createAttributeInfo(axisId, roleName, cccRoleName);
-          }
-
-          function createAttributeInfo(axisId, roleName, cccRoleName) {
-            return {
-              name: me.GENERIC_MEASURE_DISCRIM_DIM_NAME,
-              label: "Generic Measure Discriminator",
-              role: roleName,
-              mapping: null,
-              mappingAttr: null,
-              attr: null,
-              isPercent: false,
-              cccRole: cccRoleName,
-              axis: axisId,
-              isMeasureDiscrim: true
-            };
-          }
-        },
-
-        _getAttributeCccValueType: function(attr) {
-          /* eslint default-case: 0 */
-          switch(attr.type) {
-            case "string": return String;
-            case "number": return Number;
-            case "date": return Date;
-          }
-          return null; // any
-        },
-
-        _initAxes: function(mappingAttrInfosByAxisId) {
-          // 1. Create axes.
-
-          // axisId -> Axis
-          this.axes = {};
-
-          // Order is not relevant.
-          this._axesIds.forEach(function(axisId) {
-            this.axes[axisId] = Axis.create(this, axisId, mappingAttrInfosByAxisId[axisId]);
-          }, this);
-
-          // 2. Hide columns not bound to visual roles and reorder attributes of the plain data table.
-          this._transformData();
-
-          // 3. Determine if there are any multi-chart playing roles
-          // (ignoring the measure discrim, if any)
-          // TODO: refactor this check by using the model directly? Would not need to account for measure discrim...
-          var hasMulti = false;
-          if(this._multiRole) {
-            var maInfos = this._getMappingAttrInfosByRole(this._multiRole);
-            if(maInfos)
-              hasMulti = !this._isGenericMeasureMode ||
-                  maInfos.some(function(maInfo) { return !maInfo.isMeasureDiscrim; });
-          }
-          this._hasMultiChartColumns = hasMulti;
+          return {
+            // e.g. valueRole.dim
+            name: this._genericMeasureDiscrimCccDimName,
+            label: "Generic Measure Discriminator",
+            role: discrimRoleName,
+            cccRole: discrimCccRoleName,
+            axis: "key",
+            mapping: null,
+            mappingAttr: null,
+            attr: null,
+            isPercent: false,
+            isMeasureDiscrim: true
+          };
         },
 
         /**
          * Removes _unmapped_ attributes and reorders attributes of the plain data table.
          *
-         * Gets array of _mapped_ column indexes of the plain table to set in a data view.
+         * Builds an array of _mapped_ column indexes of the plain table and sets it in a data view.
          *
-         * Column reordering serves two purposes:
-         * 1. All generic measures are placed last to satisfy the cross-tab/generic measure discriminator scenario
-         * 2. All measures are placed last so that CCC doesn't reorder the "logical row", discrete columns first
+         * Columns are reordered here, placing discrete columns first,
+         * so that we don't get tricked by CCC doing so.
+         * This way we ensure a stable logical row layout.
          *
          * Specifies readers (and measuresIndexes and dataCategoriesCount)
          * because this is the only way to bind specific columns to arbitrary, specific dimensions.
-         * With all the plain table transformations in place,
-         * and apart from the measure discriminator,
-         * which always takes the first position in CCC's logical row,
-         * the CCC readers mapping is 1-1.
+         * With all the plain table transformations in place, the CCC readers mapping is 1-1.
+         *
+         * @param {MappingAttributeInfo[]} attrInfos - The array of mapping attribute info objects.
          */
-        _transformData: function() {
+        _transformData: function(attrInfos) {
           // For DataView source columns
           var categoriesSourceIndexes = [];
           var measuresSourceIndexes   = [];
@@ -836,69 +701,101 @@ define([
           var categoriesDimNames = [];
           var measuresDimNames   = [];
 
-          // If there are generic measures, then the cross-tab format is used.
-          if(this._isGenericMeasureMode) {
-            this.options.crosstabMode  = true;
-            this.options.isMultiValued = false;
+          // The use of the relational translator with the following options
+          // is the most reliable way to "control" the translator code and avoid unexpected shuffling of columns
+          // crosstabMode = false
+          // isMultiValued = true
+          // measuresIndexes...
+          // readers...
 
-            categoriesDimNames.push(this.GENERIC_MEASURE_DISCRIM_DIM_NAME);
+          var dataView = this._dataView;
 
-            this._mappingAttrInfos.forEach(function(maInfo) {
-              if(maInfo.attr) {
-                var sourceIndexes = maInfo.isMeasureGeneric ? measuresSourceIndexes : categoriesSourceIndexes;
-                sourceIndexes.push(maInfo.attrColIndex);
+          attrInfos.forEach(function(attrInfo) {
 
-                if(!maInfo.isMeasureDiscrim && !maInfo.isMeasureGeneric) {
-                  categoriesDimNames.push(maInfo.cccDimName);
-                }
+            if(!attrInfo.isMeasureDiscrim) {
+              var sourceIndexes;
+              var dimNames;
+
+              if(attrInfo.attr.type === "number") {
+                sourceIndexes = measuresSourceIndexes;
+                dimNames = measuresDimNames;
+              } else {
+                sourceIndexes = categoriesSourceIndexes;
+                dimNames = categoriesDimNames;
               }
-            });
 
-            measuresDimNames.push(this.GENERIC_MEASURE_DIM_NAME);
-          } else {
-            // The use of the relational translator with the following options
-            // is the most reliable way to "control" the translator code and avoid unexpected shuffling of columns
-            this.options.crosstabMode = false;
-            this.options.isMultiValued = true;
+              var attrColIndex = dataView.getColumnIndexByAttribute(attrInfo.attr);
 
-            this._mappingAttrInfos.forEach(function(maInfo) {
-              if(maInfo.attr) {
-                var sourceIndexes;
-                var dimNames;
+              sourceIndexes.push(attrColIndex);
+              dimNames.push(attrInfo.name);
+            }
+          });
 
-                if(maInfo.attr.type === "number") {
-                  sourceIndexes = measuresSourceIndexes;
-                  dimNames = measuresDimNames;
-                } else {
-                  sourceIndexes = categoriesSourceIndexes;
-                  dimNames = categoriesDimNames;
-                }
+          // Indexes of measures in the data view (already mapped with source columns).
+          // Start index for first measure:
+          var i = categoriesSourceIndexes.length;
+          var M = measuresSourceIndexes.length;
+          var afterMappingColumnIndexesMeasures = [];
+          while(M--) afterMappingColumnIndexesMeasures.push(i++);
 
-                sourceIndexes.push(maInfo.attrColIndex);
-                dimNames.push(maInfo.cccDimName);
-              }
-            });
+          this.options.measuresIndexes = afterMappingColumnIndexesMeasures;
 
-            // The already mapped data view indexes of measures.
-            var i = categoriesSourceIndexes.length;
-            var C = measuresSourceIndexes.length;
-            var afterMappingColumnIndexesMeasures = [];
-            while(C--) afterMappingColumnIndexesMeasures.push(i++);
-
-            this.options.measuresIndexes = afterMappingColumnIndexesMeasures;
-
-            // dataCategoriesCount is sort of irrelevant in this case, but it is set anyway, J.I.C.
-            // It is only used to split discrete columns among series and categories
-            // which, because readers are fully specified, does not affect the mapping.
-          }
-
-          this._dataView = new DataView(this._dataView);
+          this._dataView = new DataView(dataView);
           this._dataView.setSourceColumns(categoriesSourceIndexes.concat(measuresSourceIndexes));
-
-          this.options.dataCategoriesCount = categoriesSourceIndexes.length;
 
           this.options.readers = categoriesDimNames.concat(measuresDimNames);
         },
+
+        /**
+         * Configure CCC `dimensions`.
+         *
+         * @param {MappingAttributeInfo[]} attrInfos - The array of mapping attribute info objects.
+         */
+        _configureCccDimensions: function(attrInfos) {
+
+          var cccDimSpecs = this.options.dimensions;
+
+          // MappingAttrInfos is filled above, in visual role mapping attribute order.
+          // This enables its use for configuring the CCC visual roles.
+          attrInfos.forEach(function(attrInfo) {
+
+            // Configure CCC main dimensions' options.
+            if(attrInfo.attr) {
+              var cccDimSpec = def.lazy(cccDimSpecs, attrInfo.name);
+
+              cccDimSpec.valueType  = util.getCccValueTypeOfAttribute(attrInfo.attr);
+              cccDimSpec.isDiscrete = this._isRoleQualitative(attrInfo.role);
+              cccDimSpec.comparer   = null;
+              if(cccDimSpec.valueType === Date) {
+                // Change the default formatter to use JavaScript's default serialization.
+                // Affects tooltips and discrete axes.
+                cccDimSpec.formatter = function(v) { return v == null ? "" : v.toString(); };
+              }
+            }
+          }, this);
+        },
+
+        /**
+         * Configure CCC `visualRoles`.
+         *
+         * @param {MappingAttributeInfo[]} attrInfos - The array of mapping attribute info objects.
+         * @overridable
+         * @protected
+         */
+        _configureCccVisualRoles: function(attrInfos) {
+
+          var cccRoleSpecs = this.options.visualRoles;
+
+          // MappingAttrInfos is filled above, in visual role mapping attribute order.
+          // This enables its use for configuring the CCC visual roles.
+          attrInfos.forEach(function(attrInfo) {
+
+            var cccRoleSpec = def.lazy(cccRoleSpecs, attrInfo.cccRole);
+
+            def.array.lazy(cccRoleSpec, "dimensions").push(attrInfo.name);
+          });
+        },
+        // endregion
 
         _configureOptions: function() {
           var options = this.options;
@@ -909,7 +806,7 @@ define([
           if(def.get(this._validExtensionOptions, "legendAreaVisible", options.legendAreaVisible))
             this._configureLegend();
 
-          if(this._hasMultiChartColumns)
+          if(this._isMultiChartMode)
             this._configureMultiChart();
 
           this._configureTrends();
@@ -932,66 +829,84 @@ define([
         },
 
         // region COLOR SCALE
+        /**
+         * Gets a value that indicates if a color role is defined, and mapped, and, if so,
+         * if it is qualitative or not.
+         *
+         * @protected
+         *
+         * @return {undefined|boolean} `undefined` if there is no color role,
+         * or if it is not mapped;
+         * otherwise, `true` if its effective level of measurement is qualitative; `false` otherwise.
+         */
+        _isColorDiscrete: function() {
+          var colorRole = this._discreteColorRole;
+          if(colorRole && this.model[colorRole].isMapped) {
+            return this._isRoleQualitative(colorRole);
+          }
+        },
+
         _getColorScaleKind: function() {
           return "discrete";
         },
 
         _configureColor: function() {
-          var colorScaleKind = this._getColorScaleKind();
-          if(colorScaleKind) {
-            var options = this.options;
-            var model = this.model;
+          switch(this._getColorScaleKind()) {
+            case "discrete":
+              this._configureDiscreteColors();
+              break;
 
-            switch(colorScaleKind) {
-              case "discrete":
-                options.colors = this._getDiscreteColors();
-                break;
-
-              case "continuous":
-                options.colorScaleType = model.pattern === "gradient" ? "linear" : "discrete";
-
-                var paletteQuantitative = model.paletteQuantitative;
-                if(paletteQuantitative) {
-                  options.colors = paletteQuantitative.colors.toArray(function(color) { return color.value; });
-                } else {
-                  options.colors = visualColorUtils.buildPalette(
-                      model.$type.context,
-                      model.colorSet,
-                      model.pattern,
-                      model.reverseColors);
-                }
-                break;
-            }
+            case "continuous":
+              this._configureContinuousColors();
+              break;
           }
         },
 
         /**
-         * Gets the final color scale, color scale factory or array of colors to use
-         * for the current discrete color role.
-         *
-         * @return {pv.Scale|Array.<string|pv.Color>|function():pv.Scale} The final color scale.
+         * Configures the discrete color scale for the discrete color role.
          *
          * @protected
          */
-        _getDiscreteColors: function() {
-          var defaultScale = pv.colors(this._getDefaultDiscreteColors());
+        _configureDiscreteColors: function() {
 
+          var defaultScale = pv.colors(this._getDefaultDiscreteColors());
           var scale;
+
           if(this._discreteColorRole) {
             var colorMap = this._getDiscreteColorMap();
             if(colorMap) {
               // Final?
-              if(def.fun.is(colorMap)) { return colorMap; }
+              if(def.fun.is(colorMap)) {
+                scale = colorMap;
+              } else {
+                var colorMapScale = function(key) {
+                  return def.getOwn(colorMap, key);
+                };
 
-              var colorMapScale = function(key) {
-                return def.getOwn(colorMap, key);
-              };
-
-              scale = this._createDiscreteColorMapScaleFactory(colorMapScale, defaultScale);
+                scale = this._createDiscreteColorMapScaleFactory(colorMapScale, defaultScale);
+              }
             }
           }
 
-          return scale || defaultScale;
+          this.options.colors = scale || defaultScale;
+        },
+
+        _configureContinuousColors: function() {
+
+          var model = this.model;
+
+          this.options.colorScaleType = model.pattern === "gradient" ? "linear" : "discrete";
+
+          var paletteQuantitative = model.paletteQuantitative;
+          if(paletteQuantitative) {
+            this.options.colors = paletteQuantitative.colors.toArray(function(color) { return color.value; });
+          } else {
+            this.options.colors = visualColorUtils.buildPalette(
+                model.$type.context,
+                model.colorSet,
+                model.pattern,
+                model.reverseColors);
+          }
         },
 
         /**
@@ -1026,8 +941,8 @@ define([
           //     the color role.
           // 2 - When a measure discrim is used and there is only one measure, the CCC dim name of the discriminator is
           //      not of the "series" group; so in this case, there's no discriminator in the key.
-          var colorMAInfos = this._getDiscreteColorMappingAttrInfos();
-          var C = colorMAInfos.length;
+          var colorAttrInfos = this._getAttributeInfosOfRole(this._discreteColorRole, /* excludeMeasureDiscrim: */true);
+          var C = colorAttrInfos ? colorAttrInfos.length : 0;
           var M = this._genericMeasuresCount;
           var colorMap;
 
@@ -1058,19 +973,11 @@ define([
 
               // If C > 0, Pie chart always ends up here...
               // Use the members' colors of the last color attribute.
-              colorMap = this._copyColorMap(null, memberPalette[colorMAInfos[C - 1].attr.name]);
+              colorMap = this._copyColorMap(null, memberPalette[colorAttrInfos[C - 1].attr.name]);
             }
           }
 
           return colorMap;
-        },
-
-        _getDiscreteColorMappingAttrInfos: function() {
-          /* jshint laxbreak:true*/
-          var colorAttrInfos = this._getMappingAttrInfosByRole(this._discreteColorRole);
-          return colorAttrInfos
-              ? colorAttrInfos.filter(function(mappingAttrInfo) { return !mappingAttrInfo.isMeasureDiscrim; })
-              : [];
         },
 
         _getMemberPalette: function() {
@@ -1229,39 +1136,20 @@ define([
           }
 
           // Attribute/dimension-level format info
-          var dims = this.options.dimensions;
+          var cccDimSpecs = this.options.dimensions;
 
-          // 1. Handle all mapped, non-generic measure attributes
-          def.query(Object.keys(this._mappingAttrInfoByName))
-            .select(function(attrName) { return this._mappingAttrInfoByName[attrName]; }, this)
-            .where(function(maInfo) {
-              return !!maInfo.attr && !maInfo.attr.isDiscrete &&
-                  (!this._isGenericMeasureMode || !maInfo.isMeasureGeneric);
-            }, this)
-            .each(setCccDimFormatInfo);
+          var continuousAttrInfos = def.query(this.attributeInfos)
+                .where(function(attrInfo) {
+                  return !attrInfo.isMeasureDiscrim && !attrInfo.attr.isDiscrete;
+                });
 
-          // 2. Handle generic measure dimension name, if any.
-          //    As there are multiple measure attributes in a single CCC dimension,
-          //    (as when both Sales and Quantity are placed on the "Measure" gem bar),
-          //    only the format of the first of these can be specified.
-          //    Also, note, there may be more than one generic measure role,
-          //    so only the first attribute of the first bound generic measure role is used...
-          if(this._isGenericMeasureMode) {
-            // e.g.
-            // roles:
-            //   "measures":     unbound
-            //   "measuresLine": "sales", "quantity"
-            var firstMappingAttrInfo = this._selectGenericMeasureMappingAttrInfos().first();
-            if(firstMappingAttrInfo) setCccDimFormatInfo(firstMappingAttrInfo);
-          }
-
-          // ---
-
-          function setCccDimFormatInfo(maInfo) {
-            var format = maInfo.attr.format;
+          continuousAttrInfos.each(function(attrInfo) {
+            var format = attrInfo.attr.format;
             var mask = format && format.number && format.number.mask;
-            if(mask) def.lazy(dims, maInfo.cccDimName).format = mask;
-          }
+            if(mask) {
+              def.lazy(cccDimSpecs, attrInfo.name).format = mask;
+            }
+          });
         },
 
         // region LABELS
@@ -1276,9 +1164,9 @@ define([
 
             options.valuesFont = util.defaultFont(util.readFontModel(model, "label"));
 
-            if(this._useLabelColor) {
-              var labelColor = model.labelColor;
-              if(labelColor) options.label_textStyle = model.labelColor;
+            var labelColor = model.labelColor;
+            if(labelColor) {
+              options.label_textStyle = model.labelColor;
             }
           }
         },
@@ -1315,77 +1203,160 @@ define([
 
         // region TOOLTIP
         _configureTooltip: function() {
-          var me = this;
-          this.options.tooltipFormat = function(scene) {
-            return me._getTooltipText(scene.datum, this);
+          var view = this;
+          this.options.tooltipFormat = function() {
+            return view._getTooltipHtml(this);
           };
         },
 
-        _getTooltipText: function(complex, context) {
+        _getTooltipHtml: function(cccContext) {
+
+          if(this.isDirty) {
+            return;
+          }
+
           var tooltipLines = [];
           var msg;
 
-          this._axesIds.forEach(function(axisId) {
-            this.axes[axisId].buildHtmlTooltip(tooltipLines, complex, context);
+          // Show key attributes first.
+          this.axes.key.forEach(function(attrInfo) {
+            this._buildTooltipHtmlAttribute(tooltipLines, attrInfo, cccContext);
           }, this);
 
-          if(!complex.isVirtual) {
+          this.axes.measure.forEach(function(attrInfo) {
+            this._buildTooltipHtmlAttribute(tooltipLines, attrInfo, cccContext);
+          }, this);
+
+          // What happens when executed information.
+          var cccDatum = cccContext.scene.datum;
+          if(!cccDatum.isVirtual) {
 
             // TODO: Generalize getDoubleClickTooltip somehow.
             var app = this.model.application;
             if(app && app.getDoubleClickTooltip) {
-              var pointFilter = this._complexToFilter(context.scene.group || complex);
-              msg = app.getDoubleClickTooltip(pointFilter);
+              // Drilling preferably uses the group, if it exists (e.g. scatter does not have it).
+              var drillOnFilter = this._getExecuteFilter(cccContext);
+              msg = app.getDoubleClickTooltip(drillOnFilter);
               if(msg) {
                 tooltipLines.push(msg);
               }
             }
           }
 
-          /* Add selection information */
+          // Selection filter information.
           // Not the data point count, but the selection count (a single column selection may select many data points).
-          // var selectedCount = this._chart && this._chart.data.selectedCount();
-          var selectionFilter = this.selectionFilter;
-          if(selectionFilter) {
-            selectionFilter = selectionFilter.toDnf();
-            if(selectionFilter.kind === "or") {
-              var selectedCount = selectionFilter.operands.count;
-              if(selectedCount) {
-                var msgId = selectedCount === 1 ? "tooltip.footer.selectedOne" : "tooltip.footer.selectedMany";
+          var clauseCount = util.getFilterClauseCount(this.selectionFilter);
+          if(clauseCount > 0) {
+            var msgId = clauseCount === 1 ? "tooltip.footer.selectedOne" : "tooltip.footer.selectedMany";
 
-                msg = bundle.get(msgId, [selectedCount]);
+            msg = bundle.get(msgId, [clauseCount]);
 
-                tooltipLines.push(msg);
-              }
-            }
+            tooltipLines.push(msg);
           }
 
           return tooltipLines.join("<br />");
         },
+
+        _buildTooltipHtmlAttribute: function(lines, attrInfo, cccContext) {
+          // This attribute is not real.
+          if(attrInfo.isMeasureDiscrim) {
+            return;
+          }
+
+          // Don't show hidden CCC dimensions.
+          var dimType = cccContext.chart.data.type.dimensions(attrInfo.name);
+          if(dimType.isHidden) {
+            return;
+          }
+
+          if(attrInfo.attr.type === "number") {
+            this._buildTooltipHtmlAttributeNumeric(lines, attrInfo, cccContext);
+          } else {
+            this._buildTooltipHtmlAttributeNonNumeric(lines, attrInfo, cccContext);
+          }
+        },
+
+        _buildTooltipHtmlAttributeNonNumeric: function(lines, attrInfo, cccContext) {
+          // Multi-chart formulas are not shown in the tooltip because
+          // they're on the small chart's title.
+          if(attrInfo.role === this._multiRole) {
+            return;
+          }
+
+          var cccDatum = cccContext.scene.datum;
+          var cccAtom = cccDatum.atoms[attrInfo.name];
+          var value = cccAtom.value;
+
+          // If the chart hides null **members**...
+          if(this._hideNullMembers && util.isNullMember(value)) {
+            return;
+          }
+
+          // TODO: null trend value?
+          if(cccDatum.isTrend && value == null) {
+            return;
+          }
+
+          // ex: "Line: Ships"
+          lines.push(def.html.escape(attrInfo.label) + ": " + def.html.escape(cccAtom.label));
+        },
+
+        _buildTooltipHtmlAttributeNumeric: function(lines, attrInfo, cccContext) {
+
+          var dimName = attrInfo.name;
+          var cccActiveRoles = util.getCccContextActiveVisualRolesOfMeasureDimension(cccContext, dimName);
+          if(cccActiveRoles === null) {
+            // Attribute does not have an active visual role.
+            // This includes attributes mapped to generic measure visual roles which are
+            // not active in this scene.
+            return;
+          }
+
+          var cccComplex = cccContext.scene.datum;
+          var cccAtom = cccComplex.atoms[dimName];
+
+          // TODO: null trend value?
+          if(cccComplex.isTrend && cccAtom.value == null) {
+            return;
+          }
+
+          // ex: "Attribute-Label (Role-Label): 200 (10%)"
+          var tooltipLine = def.html.escape(attrInfo.label);
+
+          // Role Label
+          if(this._noRoleInTooltipMeasureRoles[attrInfo.role] !== true)
+            tooltipLine += " (" + def.html.escape(attrInfo.role) + ")";
+
+          tooltipLine += ": " + def.html.escape(util.getCccContextAtomLabel(cccContext, cccAtom));
+
+          if(!attrInfo.isPercent || !this._tooltipHidePercentageOnPercentAttributes) {
+            var pctLabel = util.findCccContextPercentRoleLabel(cccContext, cccActiveRoles);
+            if(pctLabel !== null) {
+              tooltipLine += " (" + def.html.escape(pctLabel) + ")";
+            }
+          }
+
+          var cccInterpolationLabel = util.getCccContextInterpolationLabelOfDimension(cccContext, dimName);
+          if(cccInterpolationLabel !== null) {
+            tooltipLine += " " + bundle.get("tooltip.dim.interpolation." + cccInterpolationLabel);
+          }
+
+          if(cccComplex.isTrend) {
+            tooltipLine += " (" + this.options.trendLabel + ")";
+            // bundle.get("tooltip.dim.interpolation." + complex.trendType);
+          }
+
+          lines.push(tooltipLine);
+        },
         // endregion
 
         // region LEGEND
-        /**
-         * Gets a value that indicates if a color role is defined, and mapped, and, if so,
-         * if it is qualitative or not.
-         *
-         * @private
-         *
-         * @return {undefined|boolean} `undefined` if there is no color role,
-         * or if it is not mapped;
-         * otherwise, `true` if its effective level of measurement is qualitative; `false` otherwise.
-         */
-        _isColorDiscrete: function() {
-          var colorRole = this._discreteColorRole;
-          if(colorRole && this.model[colorRole].isMapped) return this._isRoleQualitative(colorRole);
-        },
-
         _isLegendVisible: function() {
           // When the measureDiscrim is accounted for,
           // it is not necessary to have a mapped color role to have a legend...
-          // It is only needed that, if it is mapped, that it it qualitative.
-          return (this._isColorDiscrete() !== false) &&
-              this._getRoleDepth(this._discreteColorRole, /* includeMeasureDiscrim: */true) > 0;
+          // It is only needed that, if it is mapped, that it is qualitative.
+          var isContinuousColor = this._isColorDiscrete() === false;
+          return !isContinuousColor && !!this._getAttributeInfosOfRole(this._discreteColorRole);
         },
 
         _configureLegend: function() {
@@ -1401,7 +1372,7 @@ define([
           } else {
             options.legendAlign = "top";
 
-            if(this._hasMultiChartColumns) {
+            if(this._isMultiChartMode) {
               // Ensure that legend margins is an object.
               // Preserve already specified margins.
               // CCC's default adds a left or right 5 px margin,
@@ -1438,7 +1409,9 @@ define([
         // endregion
 
         // Logic that depends on width and height
-        _prepareLayout: function(options) { /* Default Does Nothing */ },
+        _prepareLayout: function(options) {
+          /* Default Does Nothing */
+        },
 
         /**
          * Processes extension properties and stores the valid ones in `_validExtensionOptions`.
@@ -1515,116 +1488,189 @@ define([
 
           // Render may fail due to required visual roles, invalid data, etc.
           var error = this._chart.getLastRenderError();
-          if(error) return Promise.reject(error);
+          if(error) {
+            return Promise.reject(error);
+          }
 
-          // This test should be needed after the no error check above,
-          // but we're being extra-cautious because the last check was a post-code-freeze change.
-          // Se we're preserving the original check that prevents clearSelection (called from within _updateSelection)
-          // from throwing.
-          if(this._chart.data) this._updateSelection();
+          this._updateSelection();
         },
 
         // region SELECTION
         _configureSelection: function() {
-          var me = this;
-          this.options.userSelectionAction = function(cccSelections, cccGroup) {
-            return me._onUserSelection(cccSelections, cccGroup, this.event);
+
+          var view = this;
+
+          this.options.userSelectionAction = function(cccSelectingDatums, cccSelectingGroup) {
+            return view._onUserSelection(this, cccSelectingDatums, cccSelectingGroup);
           };
+
           this.options.base_event = [["click", function() {
-            me._onUserSelection([]);
+            view._onUserSelection(this, []);
           }]];
         },
 
-        _onUserSelection: function(selectingDatums, selectingGroup, srcEvent) {
-          // Duplicates may occur due to excluded dimensions like the discriminator
+        _onUserSelection: function(cccContext, cccSelectingDatums, cccSelectingGroup) {
+
+          if(this.isDirty) {
+            // Explicitly cancel CCC's own selection handling.
+            return [];
+          }
+
+          var selectFilter = this._getSelectFilter(cccSelectingDatums, cccSelectingGroup);
+
+          var srcEvent = cccContext.event;
+
+          this.act(new SelectAction({
+            dataFilter: selectFilter,
+            position: srcEvent ? {x: srcEvent.clientX, y: srcEvent.clientY} : null
+          }));
+
+          // Explicitly cancel CCC's own selection handling.
+          return [];
+        },
+
+        _getSelectFilter: function(cccSelectingDatums, cccSelectingGroup) {
 
           // TODO: improve detection of viz without attributes.
 
-          var alreadyIn = {};
           var operands = [];
 
-          if(selectingGroup) {
-            var operand = this._complexToFilter(selectingGroup);
+          if(cccSelectingGroup) {
+            var operand = this._convertCccComplexToFilter(cccSelectingGroup);
             if(operand) {
               operands.push(operand);
             }
           } else {
-            operands = selectingDatums.reduce(function(memo, datum) {
-              if(!datum.isVirtual && !datum.isNull) {
-                // When there are no attributes (e.g. bar chart with measures alone),
-                // operand is null...
-                var operand = this._complexToFilter(datum);
-                if(operand) {
-                  // Check if there's already a selection with the same key.
-                  // If not, add a new selection to the selections list.
-                  var key = JSON.stringify(operand.toSpec()); // TODO: improve key
-                  if(alreadyIn[key]) return memo;
-                  alreadyIn[key] = true;
+            // There can be no duplicate filters...
+            // * There are no a priori duplicate rows in the viz's data table, w.r.t key visual roles.
+            // * Datums do not contain the special discriminator dimension.
+            // * CCC's special "dataPart" dimension only comes up with a different value
+            //   for trend datums, which are excluded by the below !isVirtual test.
+            // * Interpolated datums could also generate duplicate filters,
+            //   but are also excluded by the below !isVirtual test.
+            var operandsByContentKey = {};
 
-                  memo.push(operand);
+            cccSelectingDatums.forEach(function(cccDatum) {
+
+              // Virtual (interpolated or trended) datums or datums with
+              // all-null-measures are not used to create selection filters.
+              if(!cccDatum.isVirtual && !cccDatum.isNull) {
+
+                // Operand is null when there are no key attributes
+                // (e.g. bar chart with measures alone).
+                var operand = this._convertCccComplexToFilter(cccDatum);
+                if(operand) {
+
+                  // TODO: delete this and the operandsByContentKey variable
+                  // after testing proves the assumption is correct.
+                  // BEGIN
+                  var key = operand.contentKey;
+                  if(def.hasOwn(operandsByContentKey, key))
+                    throw def.error.operationInvalid("Bad programmer.");
+                  operandsByContentKey[key] = true;
+                  // END
+
+                  operands.push(operand);
                 }
               }
-
-              return memo;
-            }.bind(this), []);
+            }, this);
           }
 
           var Or = this.$type.context.get("or");
-          this.act(new SelectAction({
-            dataFilter: new Or({operands: operands}),
-            position: srcEvent ? {x: srcEvent.clientX, y: srcEvent.clientY} : null
-          }));
 
-          // Explicitly cancel CCC's native selection handling.
-          return [];
+          return new Or({operands: operands});
         },
-
         // endregion
 
-        // region DOUBLE-CLICK
+        // region DOUBLE-CLICK / EXECUTE
         _configureDoubleClick: function() {
-          var me = this;
-          this.options.doubleClickAction = function(scene) {
-            me._onDoubleClick(scene.group || scene.datum, this.event);
+
+          var view = this;
+
+          this.options.doubleClickAction = function() {
+            view._executeOn(this);
           };
 
-          this.options.axisDoubleClickAction = function(scene) {
-            var group = scene.group;
-            if(group) return me._onDoubleClick(group, this.event);
+          // Only discrete cartesian axes are clickable (composite or not).
+          // Scenes of discrete axes always have one or more groups.
+          this.options.axisDoubleClickAction = function() {
+            view._executeOn(this);
           };
         },
 
-        _onDoubleClick: function(complex, srcEvent) {
-          var dataFilter = this._complexToFilter(complex);
-          if(dataFilter != null) {
-            var Or = this.$type.context.get("or");
-            this.act(new ExecuteAction({
-              dataFilter: new Or({operands: [dataFilter]}),
-              position: srcEvent ? {x: srcEvent.clientX, y: srcEvent.clientY} : null
-            }));
+        _executeOn: function(cccContext) {
+
+          if(this.isDirty) {
+            return;
           }
+
+          var executeFilter = this._getExecuteFilter(cccContext);
+          if(executeFilter === null) {
+            return;
+          }
+
+          var Or = this.$type.context.get("or");
+
+          executeFilter = new Or({operands: [executeFilter]});
+
+          var srcEvent = cccContext.event;
+
+          this.act(new ExecuteAction({
+            dataFilter: executeFilter,
+            position: srcEvent ? {x: srcEvent.clientX, y: srcEvent.clientY} : null
+          }));
+        },
+
+        _getExecuteFilter: function(cccContext) {
+          var cccScene = cccContext.scene;
+
+          if(cccScene.groups !== null && cccScene.groups.length > 1) {
+            // If there is more than one group in a scene, then there is not well-defined execution target.
+            // This happens in scenes of the discrete non-composite axis that are the result of
+            // merging several ticks and their data sets (groups), due to lack of space.
+            return null;
+          }
+
+          // Not all scenes have a group (e.g. scatter does not have it).
+          // We prefer the group if it exists over datum,
+          // because datums have atoms which are not relevant for the execution operation.
+          // The group will contain only relevant atoms.
+          // However, not sure if there is one case in which always using datum would cause problems.
+          var cccComplex = cccScene.group || cccScene.datum;
+
+          // May still be null.
+          return this._convertCccComplexToFilter(cccComplex);
         },
         // endregion
 
         // region UTILITY
 
-        _complexToFilter: function(complex) {
-          // Add each axis' formulas to the selection
+        _convertCccComplexToFilter: function(cccComplex) {
           var filter = null;
 
-          this._keyAxesIds.forEach(function(axisId) {
-            var operand = this.axes[axisId].complexToFilter(complex);
-            if(operand)
-              filter = filter ? filter.and(operand) : operand;
-          }, this);
+          var context = this.$type.context;
+          var IsEqual = context.get("=");
+          var And = context.get("and");
 
-          // Enforce that the returned filter is wrapped by an And
-          if(filter != null && filter.kind !== "and") {
-            var And = this.$type.context.get("and");
-            return new And({
-              operands: [filter]
-            });
-          }
+          this._getRealKeyAttributeInfos().each(function(attrInfo) {
+
+            var cccAtom = cccComplex.getSpecifiedAtom(attrInfo.name);
+            if(cccAtom) {
+              // TODO: Is this rawValue recovery still needed?
+              var value = cccAtom.value === null ? cccAtom.rawValue : cccAtom.value;
+
+              // The Data attribute types for "string", "date", "number" are the same
+              // as the Type API aliases of those types.
+              var valueType = attrInfo.attr.type;
+
+              var operand = new IsEqual({
+                property: attrInfo.attr.name,
+                value: value === null ? null : {_: valueType, v: value, f: cccAtom.label}
+              });
+
+              filter = filter !== null ? filter.and(operand) : new And({operands: [operand]});
+            }
+          });
 
           return filter;
         }

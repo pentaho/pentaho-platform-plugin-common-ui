@@ -14,7 +14,12 @@
 * limitations under the License.
 */
 
-define(function() {
+define([
+  "cdf/lib/CCC/def"
+], function(def) {
+
+  "use strict";
+
   // TODO: Analyzer specific
   // Null Members:  {v: "...[#null]", f: "Not Available"}
   // Null Values:   come as a null cell or null cell value ("-" report setting only affects the pivot table view).
@@ -43,6 +48,97 @@ define(function() {
 
         return style + size + "px " + model.getv(prefix + "FontFamily");
       }
+    },
+
+    getFilterClauseCount: function(filter) {
+      if(filter) {
+        filter = filter.toDnf();
+        if(filter.kind === "or") {
+          return filter.operands.count;
+        }
+      }
+      // undefined
+    },
+
+    // region CCC helpers
+    getCccValueTypeOfAttribute: function(attr) {
+      /* eslint default-case: 0 */
+      switch(attr.type) {
+        case "string": return String;
+        case "number": return Number;
+        case "date": return Date;
+      }
+      return null; // any
+    },
+
+    getCccContextActiveVisualRolesOfMeasureDimension: function(cccContext, dimName) {
+      var cccRoles = null;
+      var cccScene = cccContext.scene;
+      var cccGroup = cccScene.group;
+      var isSingleGroup = !!cccGroup && cccScene.groups.length === 1;
+      if(isSingleGroup) {
+        // Only want measure visual roles, which only exist at the plot-level.
+        cccRoles = cccScene.panel().visualRolesOf(dimName);
+        if(cccRoles !== null) {
+          cccRoles = cccRoles.filter(function(cccRole) {
+            return cccRole.isMeasureEffective && cccRole.isBoundDimensionName(cccGroup, dimName);
+          });
+          if(cccRoles.length === 0) {
+            cccRoles = null;
+          }
+        }
+      }
+
+      return cccRoles;
+    },
+
+    getCccContextInterpolationLabelOfDimension: function(cccContext, dimName) {
+
+      // It can happen that the scene has more than one datum.
+      // One is a null one and the other an interpolated one.
+      // We may receive the null one in `complex` and
+      // miss detecting that the scene is actually interpolated.
+
+      var cccInterpolatedDatum = cccContext.scene.datums()
+          .where(function(d) {
+            return d.isInterpolated && d.interpDimName === dimName;
+          })
+          .first();
+
+      return cccInterpolatedDatum ? cccInterpolatedDatum.interpolation : null;
+    },
+
+    getCccContextAtomLabel: function(cccContext, cccAtom) {
+      var cccGroup;
+      if(cccContext && (cccGroup = cccContext.scene.group)) {
+        var isMultiDatumGroup = cccGroup && cccGroup.count() > 1;
+        if(isMultiDatumGroup) {
+          var cccDim = cccGroup.dimensions(cccAtom.dimension.name);
+          return cccDim.format(cccDim.value({visible: true}));
+        }
+      }
+
+      // Default, for scenes of single datums.
+      return cccAtom.label;
+    },
+
+    findCccContextPercentRoleLabel: function(cccContext, cccRoles) {
+
+      var cccScene = cccContext.scene;
+
+      var percentVar = def.query(cccRoles)
+          .select(function(cccRole) {
+            if(cccRole.isPercent) {
+              var sceneVar = cccScene.vars[cccRole.name];
+              if(sceneVar && sceneVar.percent != null) {
+                return sceneVar.percent;
+              }
+            }
+          })
+          .first();
+
+      return percentVar != null ? percentVar.label : null;
     }
+    // endregion
   };
 });

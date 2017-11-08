@@ -72,6 +72,7 @@ define([
           // Hide the legend even if there is only one "series".
           var isLegendVisible = this.base();
 
+          // Need CCC legendItemCountMin...
           // TODO: this is not the proper way to do this cause it's tied to Analyzer's data format...
           return isLegendVisible && (!this._dataTable.isCrossTable || this._dataTable.implem.cols.length > 1);
         },
