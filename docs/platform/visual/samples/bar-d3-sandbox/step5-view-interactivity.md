@@ -45,9 +45,10 @@ Modify the factory declaration of the `view-d3.js` file to the following:
 
 ```js
 define([
+  "module",
   "d3",
   "css!./css/view-d3",
-], function(d3) {
+], function(module, d3) {
   
   return [
     "pentaho/visual/base/view",
@@ -144,9 +145,10 @@ Modify the type factory declaration of the `view-d3.js` file to the following:
 
 ```js
 define([
+  "module",
   "d3",
   "css!./css/view-d3",
-], function(d3) {
+], function(module, d3) {
   
   return [
     "pentaho/visual/base/view",

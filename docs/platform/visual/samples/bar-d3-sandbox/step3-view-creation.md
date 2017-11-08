@@ -15,7 +15,7 @@ layout: default
 Create a file named `view-d3.js` and place the following code in it:
 
 ```js
-define(["d3"], function(d3) {
+define(["module", "d3"], function(module, d3) {
 
   "use strict";
 
@@ -26,6 +26,7 @@ define(["d3"], function(d3) {
 
       var BarView = BaseView.extend({
         $type: {
+          id: module.id,
           props: [
             {
               name: "model",

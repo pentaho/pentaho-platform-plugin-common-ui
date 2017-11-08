@@ -31,5 +31,7 @@ safe: true
 # * Property:  {{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex' | append: '#changeset'}}
 refDocsUrlPattern: https://help.pentaho.com/Documentation/8.0/Developer_Center/JavaScript_API/platform/$
 
+starNew: ⭐
+
 # Base URL for Platform samples:
 platformSamplesBaseUrl: https://github.com/pentaho/pentaho-engineering-samples/tree/master/Samples_for_Extending_Pentaho/
