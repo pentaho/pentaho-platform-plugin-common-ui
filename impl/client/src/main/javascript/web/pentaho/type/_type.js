@@ -408,7 +408,7 @@ define([
        *
        * When unspecified, defaults to the value of [sourceId]{@link pentaho.type.Type#sourceId}.
        *
-       * @type {?__nonEmptyString}
+       * @type {?nonEmptyString}
        * @readonly
        *
        * @see pentaho.type.Type#sourceId
@@ -438,7 +438,7 @@ define([
        *
        * When unspecified, defaults to the value of [id]{@link pentaho.type.Type#id}.
        *
-       * @type {?__nonEmptyString}
+       * @type {?nonEmptyString}
        * @readonly
        * @see pentaho.type.Type#id
        * @see pentaho.type.Type#defaultView
@@ -453,7 +453,7 @@ define([
        * The short identifier of a type is equal to its alias, provided it is defined.
        * Otherwise, it is equal to the identifier.
        *
-       * @type {?__nonEmptyString}
+       * @type {?nonEmptyString}
        * @readOnly
        * @see pentaho.type.Type#id
        * @see pentaho.type.Type#alias
@@ -495,7 +495,7 @@ define([
        *
        * When unspecified, defaults to `null`.
        *
-       * @type {?__nonEmptyString}
+       * @type {?nonEmptyString}
        * @readonly
        *
        * @see pentaho.type.Type#id
@@ -596,7 +596,7 @@ define([
        *
        * The _initial value_ of the attribute on the top-root type is `"instance"`.
        *
-       * @type {__nonEmptyString}
+       * @type {nonEmptyString}
        */
       get label() {
         return this.__label;
@@ -682,7 +682,7 @@ define([
        * Setting this to `null` or to an empty string clears the attribute and sets it to `null`,
        * ignoring any inherited value.
        *
-       * @type {?__nonEmptyString}
+       * @type {?nonEmptyString}
        */
       get description() {
         return this.__description;
@@ -720,7 +720,7 @@ define([
        * Setting this to `null` or to an empty string clears the attribute and sets it to `null`,
        * thus ignoring any inherited value.
        *
-       * @type {?__nonEmptyString}
+       * @type {?nonEmptyString}
        * @see pentaho.type.Type#isBrowsable
        * @see pentaho.type.Type#ordinal
        */
@@ -758,7 +758,7 @@ define([
        * Setting this to `null` or to an empty string clears the attribute and sets it to `null`,
        * ignoring any inherited value.
        *
-       * @type {?__nonEmptyString}
+       * @type {?nonEmptyString}
        */
       get helpUrl() {
         return this.__helpUrl;
@@ -869,7 +869,7 @@ define([
        * `styleClass` of: `"pentaho-visual-ccc-heat-grid"`.
        * The default value of an anonymous type is `null`.
        *
-       * @type {?__nonEmptyString}
+       * @type {?nonEmptyString}
        */
       get styleClass() {
         return this.__styleClass;

@@ -26,7 +26,7 @@ position, size, orientation or color.
 Create a file named `model.js` and place the following code in it:
 
 ```js
-define(function() {
+define(["module"], function(module) {
   
   "use strict";
   
@@ -34,6 +34,7 @@ define(function() {
     
     var BarModel = BaseModel.extend({
       $type: {
+        id: module.id,
         styleClass: "pentaho-visual-samples-bar",
         label: "D3 Bar Chart",
         defaultView: "./view-d3",

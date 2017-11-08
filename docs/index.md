@@ -4,6 +4,16 @@ description: The Pentaho Platform JavaScript APIs support the development of Jav
 layout: intro
 ---
 
+{% include callout.html content="<p>
+This documentation refers to the Pentaho Platform JavaScript APIs beta 2,
+which comes with the 8.0 Pentaho platform.
+If you want to know what's new and changed from the beta 1 version that
+is shipped with the 7.1 Pentaho platform,
+see <a title='What is new and changed in the Pentaho Platform JavaScript APIs beta 2' 
+       href='./platform/whats-new-beta-2'>What's new and changed in the Pentaho Platform JavaScript APIs beta 2</a>.
+</p>
+" type="warning" %}
+
 The **Platform JavaScript APIs** support the development of JavaScript components for the **Pentaho** platform:
 1. Standardizes in cross-cutting areas, such as data and visualization, 
    but also on lower-level areas, such as configuration, localization and services. 
