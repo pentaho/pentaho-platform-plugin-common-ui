@@ -409,8 +409,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   _updatePicklistAvailableValues: function(values) {
     construct.empty(this.picklistAvailableValues.domNode);
     array.forEach(values, function (result, idx) {
-      this.containerNode.options[idx] = new Option(result, result);
-      this.containerNode.options[idx].title = result;
+      var value = result.replace(/&amp;/g, '&');
+      this.containerNode.options[idx] = new Option(value, value);
+      this.containerNode.options[idx].title = value;
     }, this.picklistAvailableValues);
     this.picklistLoaded = true;
   },
