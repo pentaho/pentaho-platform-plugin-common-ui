@@ -198,7 +198,8 @@ define([
             // The color role, "rows" is required, so necessarily C > 0.
             // Also, there can be at most one measure gem, "size", so M <= 1.
             // Use member colors of all of the color attributes.
-            var colorAttrInfos = this._getAttributeInfosOfRole(this._discreteColorRole, /* excludeMeasureDiscrim: */true);
+            var colorAttrInfos =
+                this._getAttributeInfosOfRole(this._discreteColorRole, /* excludeMeasureDiscrim: */true);
             if(colorAttrInfos) {
               colorAttrInfos.forEach(function(colorAttrInfo) {
                 // TODO: Mondrian/Analyzer specific
