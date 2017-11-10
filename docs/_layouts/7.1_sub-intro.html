@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="{{ page.lang | default: site.lang | default: "en-us" }}">
 <head>
-  {% include default-html-headers.html %}
+  {% include 7.1_default-html-headers.html %}
 </head>
 <body class="intro-layout">
-  {% include default-site-header.html %}
+  {% include 7.1_default-site-header.html %}
 
   <section class="page-header intro-page-header">
     <div class="page-header-wrapper">
@@ -21,12 +21,12 @@
   </section>
 
   <section class="main-content">
-    {% include callout.html content="This documentation targets the API <b>shipped with Pentaho 8.0</b>. <a href=\"/7.1\">Click here for the documentation about the version shipped with Pentaho 7.1</a>." type="success" %}
+    {% include callout.html content="This documentation targets the API <b>shipped with Pentaho 7.1</b>. <a href=\"/\">Click here for the updated version shipped with Pentaho 8.0</a>." type="danger" %}
     
     {{ content }}
   </section>
 
-  {% include default-footer-learn-more.html %}
-  {% include default-footer-community.html %}
+  {% include 7.1_default-footer-learn-more.html %}
+  {% include 7.1_default-footer-community.html %}
 </body>
 </html>

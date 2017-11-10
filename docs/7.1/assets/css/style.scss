@@ -1,0 +1,28 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+.main-content h1 {
+  color: #005DA6;
+}
+
+.main-content h2, .main-content h3, .main-content h4, .main-content h5, .main-content h6 {
+  color: #333333;
+}
+
+a { color: #005DA6; text-decoration: none; }
+
+.api-list li.ground-layer {
+  background-color: #DDDDE1;
+}
+
+@import "7.1/site-header";
+@import "7.1/page-header";
+@import "7.1/footer-learn-more";
+@import "7.1/footer-community";
+
+@import "7.1/intro-page-header";
+
+@import "7.1/api-list";
+@import "7.1/callout";

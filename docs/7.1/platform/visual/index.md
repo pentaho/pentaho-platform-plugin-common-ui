@@ -1,10 +1,16 @@
 ---
 title: Visualization API
 description: A unified way to visualize data across the Pentaho suite.
-layout: sub-intro
+layout: 7.1_sub-intro
 ---
 
 # Overview
+
+{% include 7.1_callout.html content="<p>As of version 7.1, 
+the Pentaho platform ships with a <em>new</em>, <b>beta</b> version of the Visualization API, 
+<b>side-by-side</b> with the <em>previous</em> version. 
+This documentation relates to the new version.</p>
+" type="warning" %}
 
 The [Visualization API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual'}}) 
 provides a unified way to visualize data across the Pentaho suite 
@@ -63,11 +69,12 @@ The [Create a Custom Visualization](create) walk-through shows you how to develo
 how to create an OSGi artifact containing the visualization, 
 so that it can be deployed to a Pentaho product.
 
-{% include callout.html content="<h2>Fast-lane</h2>
+{% include 7.1_callout.html content="<h2>Fast-lane</h2>
 <p>If you prefer, you can skip the walk-through and get the final Pentaho Web Project, and build it. First make sure that you have git and maven 3+ installed and that this <a href='https://github.com/pentaho/maven-parent-poms/blob/master/maven-support-files/settings.xml'>settings.xml</a> is in your USER_HOME/.m2 directory.</p>
 
 <pre class='highlight'><code># Clone the repository.
 git clone https://github.com/pentaho/pentaho-engineering-samples
+git checkout -b 7.1
 
 # Go to the sample's directory.
 cd pentaho-engineering-samples
@@ -102,6 +109,7 @@ as well as be able to use it in a [CDE](http://community.pentaho.com/ctools/cde/
    
    You can get the following dashboard from the
    `https://github.com/pentaho/pentaho-engineering-samples` repository,
+   `7.1` branch, 
    at the location:
    `Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/bar-d3-cde`.
    

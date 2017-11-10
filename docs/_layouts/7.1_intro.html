@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="{{ page.lang | default: site.lang | default: "en-us" }}">
 <head>
-  {% include default-html-headers.html %}
+  {% include 7.1_default-html-headers.html %}
 </head>
 <body class="intro-layout">
   <header class="site-header">
     <a class="logo" href="{{ '/' | relative_url }}">
-      <img src="{{ '/assets/img/logo.svg' | relative_url }}" alt="Pentaho" onerror="this.src='http://www.pentaho.com/sites/all/themes/pentaho_resp/logo.svg';">
+      <img src="{{ '/7.1/assets/img/logo.svg' | relative_url }}" alt="Pentaho" onerror="this.src='http://www.pentaho.com/sites/all/themes/pentaho_resp/logo.svg';">
     </a>
   </header>
 
@@ -24,15 +24,13 @@
     </div>
   </section>
 
-<div style="margin: 0 1em;">{% include callout.html content="This documentation targets the API <b>shipped with Pentaho 8.0</b>. <a href=\"/\">Click here for the documentation about the version shipped with Pentaho 7.1</a>." type="success" %}</div>
-
   <section class="main-content">
-    {% include callout.html content="This documentation targets the API <b>shipped with Pentaho 8.0</b>. <a href=\"/7.1\">Click here for the documentation about the version shipped with Pentaho 7.1</a>." type="success" %}
+    {% include callout.html content="This documentation targets the API <b>shipped with Pentaho 7.1</b>. <a href=\"/\">Click here for the updated version shipped with Pentaho 8.0</a>." type="danger" %}
     
     {{ content }}
   </section>
 
-  {% include default-footer-learn-more.html %}
-  {% include default-footer-community.html %}
+  {% include 7.1_default-footer-learn-more.html %}
+  {% include 7.1_default-footer-community.html %}
 </body>
 </html>

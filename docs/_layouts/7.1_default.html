@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "en-us" }}">
+<head>
+  {% include 7.1_default-html-headers.html %}
+</head>
+<body class="default-layout">
+  {% include 7.1_default-site-header.html %}
+
+  {% include 7.1_default-page-header.html %}
+
+  <section class="main-content">
+    {% include callout.html content="This documentation targets the API <b>shipped with Pentaho 7.1</b>. <a href=\"/\">Click here for the updated version shipped with Pentaho 8.0</a>." type="danger" %}
+
+    {{ content }}
+  </section>
+
+  {% include 7.1_default-footer-learn-more.html %}
+  {% include 7.1_default-footer-community.html %}
+</body>
+</html>
