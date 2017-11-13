@@ -71,7 +71,7 @@ define([
     {$types: {base: "pentaho/data/filter/abstract"}},
     function(BaseView, Model, SelectAction, ExecuteAction, MeasurementLevel) {
 
-      return BaseView.extend(/** @lends pentaho.visual.ccc.visual.Abstract# */{
+      return BaseView.extend(/** @lends pentaho.ccc.visual.Abstract# */{
 
         $type: {
           props: {
@@ -327,7 +327,8 @@ define([
         },
         // endregion
 
-        // region ATTRIBUTE INFOS / VISUAL MAP
+        // region ATTRIBUTE INFO / VISUAL MAP
+
         _getAttributeInfosOfRole: function(roleName, excludeMeasureDiscrim) {
           var attrInfos = def.getOwn(this.visualMap, roleName, null);
           if(attrInfos !== null && excludeMeasureDiscrim) {
@@ -851,6 +852,9 @@ define([
         },
 
         _configureColor: function() {
+
+          /* eslint default-case: 0 */
+
           switch(this._getColorScaleKind()) {
             case "discrete":
               this._configureDiscreteColors();
@@ -928,6 +932,20 @@ define([
          * The default implementation may return a color scale with one color when there is a single measure
          * and no color attributes.
          *
+         * SPEC
+         * - Viz. has a discrete color scale and:
+         * - Pie
+         *   - Ignores measures’ colors.
+         *   - Uses the member colors of the last Slices attribute.
+         * - Sunburst
+         *   - Ignores measure colors.
+         *   - Creates a combined map of all attributes with colors.
+         * - All Other
+         *   - When no Color attributes Or there is more than one generic measure:
+         *   - Use the measures’ colors (even if only one measure and no color attributes).
+         *   - When there are Color attributes and at most one generic measure:
+         *   - Uses the member colors of the last Color attribute, if any.
+         *
          * @return {Object.<string, pv.Color>|pv.Scale} The color map, if any or _nully_.
          *
          * @protected
@@ -947,23 +965,20 @@ define([
           var colorMap;
 
           // Possible to create colorMap based on memberPalette?
-          if(C || M) {
-            if(!C || M > 1) {
-              // TODO: Mondrian/Analyzer specific
-              colorMap = memberPalette["[Measures].[MeasuresLevel]"];
-
+          if(C > 0 || M > 0) {
+            if(C === 0 || M > 1) {
               // Use measure colors
+              //
               // a) C == 0 && M > 0
               // b) C >  0 && M > 1
 
-              // More than one measure MappingAttributeInfo or no color MappingAttributeInfos.
-              // var keyIncludesMeasureDiscriminator = M > 1 && C > 0;
-              // When the measure discriminator exists, it is the last MappingAttributeInfo.
+              // TODO: Mondrian/Analyzer specific
+              colorMap = memberPalette["[Measures].[MeasuresLevel]"];
 
               if(M === 1) {
                 // => C == 0
                 // The color key is empty... so need to do it this way.
-                var c = colorMap && colorMap[this.axes.measure.mappingAttrInfos[0].attr.name];
+                var c = colorMap && colorMap[this.axes.measure[0].name];
                 return c ? pv.colors([c]) : null;
               }
 
@@ -971,7 +986,7 @@ define([
             } else {
               // a) C > 0 && M <= 1
 
-              // If C > 0, Pie chart always ends up here...
+              // If C > 0
               // Use the members' colors of the last color attribute.
               colorMap = this._copyColorMap(null, memberPalette[colorAttrInfos[C - 1].attr.name]);
             }
@@ -1014,17 +1029,50 @@ define([
             def.lazy(memberPalette, dimName)[memberValue] = color;
           }
 
+          // Index generic measure attribute infos by data table attribute name.
+          // @type Object.<string, AttributeInfo[]>
+          var genericMeasureAttrInfosByAttrName = null;
+
+          // Index even if only one measure, as may want to show the color of that measure.
+          if(this._genericMeasuresCount > 0) {
+            genericMeasureAttrInfosByAttrName = Object.create(null);
+
+            this._getRolesMappedToCccRole(this._genericMeasureCccVisualRole)
+                .forEach(function(genericMeasureVisualRole) {
+                  var genericMeasureAttrInfos = this._getAttributeInfosOfRole(genericMeasureVisualRole);
+                  if(genericMeasureAttrInfos !== null) {
+                    genericMeasureAttrInfos.forEach(function(attrInfo) {
+                      def.array.lazy(genericMeasureAttrInfosByAttrName, attrInfo.attr.name).push(attrInfo);
+                    });
+                  }
+                }, this);
+          }
+
           this._dataTable.model.attributes.forEach(function(attr) {
             if(attr.members) {
               // Level
               attr.members.forEach(function(member) {
                 var color = member.property("color");
-                if(color) setColor(attr.name, member.value, color);
+                if(color) {
+                  setColor(attr.name, member.value, color);
+                }
               });
-            } else {
+            } else if(genericMeasureAttrInfosByAttrName !== null) {
               // Measure
               var color = attr.property("color");
-              if(color) setColor("[Measures].[MeasuresLevel]", attr.name, color);
+              if(color) {
+                // Measure colors are used when a generic measure visual role exists,
+                // and thus a measure ends up as a "series" and taking part in the color scale.
+                // Use the name of the dimension which will be used by CCC in valueRole.dim dimensions;
+                // not the data table attribute name.
+                var attrInfos = def.getOwn(genericMeasureAttrInfosByAttrName, attr.name, null);
+                if(attrInfos !== null) {
+                  // TODO: Mondrian/Analyzer specific
+                  attrInfos.forEach(function(attrInfo) {
+                    setColor("[Measures].[MeasuresLevel]", attrInfo.name, color);
+                  });
+                }
+              }
             }
           });
 
@@ -1039,6 +1087,7 @@ define([
          * The actual key used by color scales with color maps is *the value of the last attribute*
          * that belongs to the color role. This applies both to values that are fixed in the color map and
          * to those that have to resource to the base color scale.
+         * This key scheme satisfies the requirements of member palettes.
          *
          * @param {function(string) : pv.Color | pv.Scale} colorMapScale - The color map scale.
          * @param {pv.Scale} baseScale - The base scale.
@@ -1209,6 +1258,17 @@ define([
           };
         },
 
+        /* SPEC
+         * - Correct measure shows up when multiple measures are used.
+         * - Percentage is displayed on Stacked/100% Column/Bar, Stacked Area, Sunburst and Pie.
+         *   - Except does not show when measures are percentages already.
+         * - Shows number of clauses of the selection filter.
+         * - Shows drilling information when it is possible to drill.
+         *   - Does not show drill info on trend-line points.
+         * - Does not show attributes in the multi-chart role.
+         * - Shows trend label besides trended measures.
+         * - Shows interpolation label besides interpolated measures (according to empty cell mode).
+         */
         _getTooltipHtml: function(cccContext) {
 
           if(this.isDirty) {
@@ -1236,9 +1296,11 @@ define([
             if(app && app.getDoubleClickTooltip) {
               // Drilling preferably uses the group, if it exists (e.g. scatter does not have it).
               var drillOnFilter = this._getExecuteFilter(cccContext);
-              msg = app.getDoubleClickTooltip(drillOnFilter);
-              if(msg) {
-                tooltipLines.push(msg);
+              if(drillOnFilter !== null) {
+                msg = app.getDoubleClickTooltip(drillOnFilter);
+                if(msg) {
+                  tooltipLines.push(msg);
+                }
               }
             }
           }
@@ -1279,7 +1341,7 @@ define([
         _buildTooltipHtmlAttributeNonNumeric: function(lines, attrInfo, cccContext) {
           // Multi-chart formulas are not shown in the tooltip because
           // they're on the small chart's title.
-          if(attrInfo.role === this._multiRole) {
+          if(this._multiRole !== null && attrInfo.role === this._multiRole) {
             return;
           }
 
@@ -1312,11 +1374,11 @@ define([
             return;
           }
 
-          var cccComplex = cccContext.scene.datum;
-          var cccAtom = cccComplex.atoms[dimName];
+          var cccDatum = cccContext.scene.datum;
+          var cccAtom = cccDatum.atoms[dimName];
 
           // TODO: null trend value?
-          if(cccComplex.isTrend && cccAtom.value == null) {
+          if(cccDatum.isTrend && cccAtom.value == null) {
             return;
           }
 
@@ -1341,7 +1403,7 @@ define([
             tooltipLine += " " + bundle.get("tooltip.dim.interpolation." + cccInterpolationLabel);
           }
 
-          if(cccComplex.isTrend) {
+          if(cccDatum.isTrend) {
             tooltipLine += " (" + this.options.trendLabel + ")";
             // bundle.get("tooltip.dim.interpolation." + complex.trendType);
           }
@@ -1351,6 +1413,20 @@ define([
         // endregion
 
         // region LEGEND
+        /* SPEC
+         * The color legend is displayed iff all of the following conditions are met:
+         * - It is not the Sunburst visualization
+         * - The color visual role is working in a discrete/qualitative mode.
+         * - There should be one or more attributes in the color visual role and/or
+         *   two or more attributes in the generic measure visual role
+         *   (when the visualization has a generic "Measures" visual role).
+         * - The number of legend items should be one or more.
+         *   The Scatter chart requires that there are two or more legend items.
+         * - The number of legend items should be no more than 20. Otherwise, hide the legend.
+         * - The length of the side which is orthogonal to the side of the legend panel
+         *   which is anchored should be no more than 30% of the corresponding length of the chart.
+         *   The Pie chart, in multi-pie mode, uses a limit of 50%.
+         */
         _isLegendVisible: function() {
           // When the measureDiscrim is accounted for,
           // it is not necessary to have a mapped color role to have a legend...
@@ -1675,13 +1751,13 @@ define([
           return filter;
         }
         // endregion
-      }, /** @lends pentaho.visual.ccc.base.View */{
+      }, /** @lends pentaho.ccc.visual.Abstract */{
 
         /**
          * Core extend functionality for CCC View subclasses.
          *
          * Inherits and merges the shared,
-         * prototype [_options]{@link pentaho.visual.ccc.base.View#_options} property.
+         * prototype [_options]{@link pentaho.ccc.visual.Abstract#_options} property.
          *
          * @param {?string} name - The name of the created class.
          * @param {Object} instSpec - The instance spec.

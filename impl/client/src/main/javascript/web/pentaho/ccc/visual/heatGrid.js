@@ -40,6 +40,9 @@ define([
           "size": "size"
         },
 
+        // HG does not support multi-charting.
+        _multiRole: null,
+
         _configureOptions: function() {
 
           this.base();

@@ -110,14 +110,15 @@ define(function() {
           var memberPalette = this._getMemberPalette();
           var colorMap;
           if(memberPalette) {
-            var colorAttrInfos = this._getAttributeInfosOfRole(this._discreteColorRole, /* excludeMeasureDiscrim: */true) || [];
+            var colorAttrInfos =
+                this._getAttributeInfosOfRole(this._discreteColorRole, /* excludeMeasureDiscrim: */true) || [];
             var C = colorAttrInfos.length;
             // C >= 0 (color -> "rows" -> is optional)
-            // When multiple measures exist, the pie chart shows them as multiple charts
-            // and if these would affect color, each small chart would have a single color.
+            // When multiple measures exist, the pie chart shows them as multiple charts.
+            // If measures would affect color, each small chart would have a single color.
             // => consider M = 0;
-            // If C, use the members' colors of the last color attribute.
-            if(C) {
+            // If C > 0, use the members' colors of the last color attribute.
+            if(C > 0) {
               var attrInfo = colorAttrInfos[C - 1];
               colorMap = this._copyColorMap(null, memberPalette[attrInfo.attr.name]);
             }
