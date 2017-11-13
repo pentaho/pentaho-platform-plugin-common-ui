@@ -27,10 +27,10 @@ define([
   "../util/promise",
   "../util/text",
   "../util/spec",
-  "./util",
+  "../util/module",
   "./theme/model"
 ], function(localRequire, SpecificationScope, SpecificationContext, bundle, Base,
-    AnnotatableLinked, error, arg, O, F, promiseUtil, text, specUtil, typeUtil) {
+    AnnotatableLinked, error, arg, O, F, promiseUtil, text, specUtil, moduleUtil) {
 
   "use strict";
 
@@ -478,7 +478,7 @@ define([
        * @see pentaho.type.Type#sourceId
        */
       buildSourceRelativeId: function(id) {
-        return typeUtil.__absolutizeDependencyOf(id, this.sourceId);
+        return moduleUtil.absolutizeIdRelativeToSibling(id, this.sourceId);
       },
 
       // -> nonEmptyString, Optional(null), Immutable, Shared (note: not Inherited)
