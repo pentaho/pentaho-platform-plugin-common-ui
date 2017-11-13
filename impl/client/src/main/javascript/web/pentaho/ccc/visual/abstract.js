@@ -932,6 +932,20 @@ define([
          * The default implementation may return a color scale with one color when there is a single measure
          * and no color attributes.
          *
+         * SPEC
+         * - Viz. has a discrete color scale and:
+         * - Pie
+         *   - Ignores measures’ colors.
+         *   - Uses the member colors of the last Slices attribute.
+         * - Sunburst
+         *   - Ignores measure colors.
+         *   - Creates a combined map of all attributes with colors.
+         * - All Other
+         *   - When no Color attributes Or there is more than one generic measure:
+         *   - Use the measures’ colors (even if only one measure and no color attributes).
+         *   - When there are Color attributes and at most one generic measure:
+         *   - Uses the member colors of the last Color attribute, if any.
+         *
          * @return {Object.<string, pv.Color>|pv.Scale} The color map, if any or _nully_.
          *
          * @protected
@@ -1244,6 +1258,17 @@ define([
           };
         },
 
+        /* SPEC
+         * - Correct measure shows up when multiple measures are used.
+         * - Percentage is displayed on Stacked/100% Column/Bar, Stacked Area, Sunburst and Pie.
+         *   - Except does not show when measures are percentages already.
+         * - Shows number of clauses of the selection filter.
+         * - Shows drilling information when it is possible to drill.
+         *   - Does not show drill info on trend-line points.
+         * - Does not show attributes in the multi-chart role.
+         * - Shows trend label besides trended measures.
+         * - Shows interpolation label besides interpolated measures (according to empty cell mode).
+         */
         _getTooltipHtml: function(cccContext) {
 
           if(this.isDirty) {
@@ -1388,6 +1413,20 @@ define([
         // endregion
 
         // region LEGEND
+        /* SPEC
+         * The color legend is displayed iff all of the following conditions are met:
+         * - It is not the Sunburst visualization
+         * - The color visual role is working in a discrete/qualitative mode.
+         * - There should be one or more attributes in the color visual role and/or
+         *   two or more attributes in the generic measure visual role
+         *   (when the visualization has a generic "Measures" visual role).
+         * - The number of legend items should be one or more.
+         *   The Scatter chart requires that there are two or more legend items.
+         * - The number of legend items should be no more than 20. Otherwise, hide the legend.
+         * - The length of the side which is orthogonal to the side of the legend panel
+         *   which is anchored should be no more than 30% of the corresponding length of the chart.
+         *   The Pie chart, in multi-pie mode, uses a limit of 50%.
+         */
         _isLegendVisible: function() {
           // When the measureDiscrim is accounted for,
           // it is not necessary to have a mapped color role to have a legend...
