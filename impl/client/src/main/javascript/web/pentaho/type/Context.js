@@ -33,6 +33,7 @@ define([
   "../util/error",
   "../util/object",
   "../util/fun",
+  "../util/module",
   "../debug",
   "../debug/Levels",
   "../util/logger",
@@ -41,7 +42,7 @@ define([
     SpecificationContext, SpecificationScope,
     InstancesContainer, mainPlatformEnv, configurationService,
     Transaction, TransactionScope, CommittedScope,
-    Base, typeUtil, promiseUtil, arg, error, O, F, debugMgr, DebugLevels, logger) {
+    Base, typeUtil, promiseUtil, arg, error, O, F, moduleUtil, debugMgr, DebugLevels, logger) {
 
   "use strict";
 
@@ -840,7 +841,7 @@ define([
 
       switch(typeof depRef) {
         case "string":
-          depRef = typeUtil.__absolutizeDependencyOf(depRef, O.getOwn(keyArgs, "dependentId"));
+          depRef = moduleUtil.absolutizeIdRelativeToSibling(depRef, O.getOwn(keyArgs, "dependentId"));
 
           return sync ? this.get(depRef) : this.getAsync(depRef);
 

@@ -119,48 +119,6 @@ define([
       }
 
       return any;
-    },
-
-    __baseIdOf: function(id) {
-      return id && id.replace(/.[^\/]+$/, "");
-    },
-
-    __absolutizeDependencyOf: function(id, siblingId) {
-
-      return this.__absolutizeId(id, this.__baseIdOf(siblingId));
-    },
-
-    __absolutizeId: function(id, baseId) {
-      if(id && /^\./.test(id) && !/\.js$/.test(id)) {
-        var baseIds = baseId ? baseId.split("/") : [];
-        var ids = id.split("/");
-        var needsBase = false;
-
-        while(ids.length) {
-          var segment = ids[0];
-          if(segment === ".") {
-            ids.shift();
-            needsBase = true;
-          } else if(segment === "..") {
-            if(!baseIds.pop()) {
-              throw error.operInvalid("Invalid path: '" + id + "'.");
-            }
-            ids.shift();
-            needsBase = true;
-          } else {
-            break;
-          }
-        }
-
-        if(needsBase) {
-          baseId = baseIds.join("/");
-          id = ids.join("/");
-
-          return (baseId && id) ? (baseId + "/" + id) : (baseId || id);
-        }
-      }
-
-      return id;
     }
   };
 
