@@ -1,7 +1,6 @@
 ---
 title: OSGi Artifacts Deployment
 description: Explains how to deploy OSGi/Karaf artifacts to the Pentaho Platform.
-parent-title: ""
 layout: default
 ---
 

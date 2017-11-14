@@ -3,6 +3,10 @@ title: Step 2 - Creating the model
 description: Walks you through the creation of the Bar visualization model.
 parent-path: .
 parent-title: Bar/D3 Visualization in Sandbox
+grand-parent-title: Create a Custom Visualization
+grand-parent-path: ../../create
+grand-grand-parent-title: Visualization API
+grand-grand-parent-path: ../..
 layout: default
 ---
 

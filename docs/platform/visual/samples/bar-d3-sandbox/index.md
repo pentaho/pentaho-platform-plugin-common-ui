@@ -1,8 +1,10 @@
 ---
 title: Bar/D3 Visualization in Sandbox
 description: Walks you through the development of a simple Bar chart visualization that uses the D3 graphics library, under a controlled sandbox environment.
-parent-title: Visualization API
-parent-path: ../..
+parent-title: Create a Custom Visualization
+parent-path: ../../create
+grand-parent-title: Visualization API
+grand-parent-path: ../..
 layout: default
 ---
 

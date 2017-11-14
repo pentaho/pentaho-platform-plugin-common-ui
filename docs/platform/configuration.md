@@ -1,7 +1,6 @@
 ---
 title: Configuration API
 description: The Configuration API provides a means for types and instances to be configured by third-parties.
-parent-title: ""
 layout: default
 ---
 
@@ -150,7 +149,7 @@ Component authors may also wish to provide a default configuration beside the co
 included and registered in the same [Pentaho Web Package](web-package). 
 
 
-## Known Values of Hitachi Vantara Environment Variables
+## Known Values of Pentaho Platform Environment Variables
 ### `application`
 
 | Description             | Value                |

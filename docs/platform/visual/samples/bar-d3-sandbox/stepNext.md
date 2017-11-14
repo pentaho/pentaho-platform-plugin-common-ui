@@ -3,6 +3,10 @@ title: Next Steps
 description: Concludes the walk-through by showing what else you can learn.
 parent-path: .
 parent-title: Bar/D3 Visualization in Sandbox
+grand-parent-title: Create a Custom Visualization
+grand-parent-path: ../../create
+grand-grand-parent-title: Visualization API
+grand-grand-parent-path: ../..
 layout: default
 ---
 

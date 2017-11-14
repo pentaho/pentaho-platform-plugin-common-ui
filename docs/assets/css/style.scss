@@ -3,24 +3,37 @@
 
 @import "{{ site.theme }}";
 
-.main-content h1 {
-  color: #005DA6;
+.main-content {
+  h1 {
+      font-weight: 300;
+      font-size: 275%;
+      color: #414141;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      margin: 0;
+      border-bottom: 1px solid #CCC;
+      clear: both;
+    }
+
+  h2 {
+      font-size: 225%;
+      font-weight: 300;
+  }
+
+  h2, h3, h4, h5, h6 {
+    color: #414141;
+  }
 }
 
-.main-content h2, .main-content h3, .main-content h4, .main-content h5, .main-content h6 {
-  color: #333333;
-}
-
-a { color: #005DA6; text-decoration: none; }
+a { color: #C00; text-decoration: none; }
 
 .api-list li.ground-layer {
   background-color: #DDDDE1;
 }
 
+@import "hitachi";
 @import "site-header";
 @import "page-header";
-@import "footer-learn-more";
-@import "footer-community";
 
 @import "intro-page-header";
 

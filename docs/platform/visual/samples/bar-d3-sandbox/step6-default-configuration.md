@@ -3,6 +3,10 @@ title: Step 6 - Adding a default configuration
 description: Walks you through adding a default configuration to the visualization.
 parent-path: .
 parent-title: Bar/D3 Visualization in Sandbox
+grand-parent-title: Create a Custom Visualization
+grand-parent-path: ../../create
+grand-grand-parent-title: Visualization API
+grand-grand-parent-path: ../..
 layout: default
 ---
 
