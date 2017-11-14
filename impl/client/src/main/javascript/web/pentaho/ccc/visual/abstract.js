@@ -1374,11 +1374,17 @@ define([
             return;
           }
 
-          var cccDatum = cccContext.scene.datum;
-          var cccAtom = cccDatum.atoms[dimName];
+          // Obtain the first datum which is not null on the given dimName.
+          // This can happen on trend scenes with measure discriminator,
+          // where there will be one datum per trended measure in the scene,
+          // but where only one of which is actually non-null for the active
+          // measure of the scene...
+          var cccDatum = cccContext.scene.datums().first(function(datum) {
+            return datum.atoms[dimName].value !== null;
+          });
 
-          // TODO: null trend value?
-          if(cccDatum.isTrend && cccAtom.value == null) {
+          // Don't think that this happens, but it is better to be safe.
+          if(cccDatum == null) {
             return;
           }
 
@@ -1389,7 +1395,7 @@ define([
           if(this._noRoleInTooltipMeasureRoles[attrInfo.role] !== true)
             tooltipLine += " (" + def.html.escape(attrInfo.role) + ")";
 
-          tooltipLine += ": " + def.html.escape(util.getCccContextAtomLabel(cccContext, cccAtom));
+          tooltipLine += ": " + def.html.escape(util.getCccContextAtomLabel(cccContext, cccDatum.atoms[dimName]));
 
           if(!attrInfo.isPercent || !this._tooltipHidePercentageOnPercentAttributes) {
             var pctLabel = util.findCccContextPercentRoleLabel(cccContext, cccActiveRoles);
