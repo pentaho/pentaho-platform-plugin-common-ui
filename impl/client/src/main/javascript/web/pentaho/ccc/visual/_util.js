@@ -72,20 +72,25 @@ define([
     },
 
     getCccContextActiveVisualRolesOfMeasureDimension: function(cccContext, dimName) {
-      var cccRoles = null;
       var cccScene = cccContext.scene;
-      var cccGroup = cccScene.group;
-      var isSingleGroup = !!cccGroup && cccScene.groups.length === 1;
-      if(isSingleGroup) {
-        // Only want measure visual roles, which only exist at the plot-level.
-        cccRoles = cccScene.panel().visualRolesOf(dimName);
-        if(cccRoles !== null) {
-          cccRoles = cccRoles.filter(function(cccRole) {
-            return cccRole.isMeasureEffective && cccRole.isBoundDimensionName(cccGroup, dimName);
-          });
-          if(cccRoles.length === 0) {
-            cccRoles = null;
-          }
+
+      // Only want measure visual roles, which only exist at the plot-level.
+      var cccRoles = cccScene.panel().visualRolesOf(dimName);
+      if(cccRoles !== null) {
+
+        // Scatter chart has one scene per datum, not group...
+        // On the other hand, discrete cartesian axes may have multiple groups per scene.
+        // cccScene.data() gets the closest ancestor common data.
+        var cccGroup = cccScene.group && cccScene.groups.length === 1
+            ? cccScene.group
+            : cccScene.data();
+
+        cccRoles = cccRoles.filter(function(cccRole) {
+          return cccRole.isMeasureEffective && cccRole.isBoundDimensionName(cccGroup, dimName);
+        });
+
+        if(cccRoles.length === 0) {
+          cccRoles = null;
         }
       }
 
