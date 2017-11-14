@@ -2,7 +2,7 @@ title: Pentaho Platform JavaScript APIs
 description: > # this means to ignore newlines in this property's value
   JavaScript component development for the Pentaho platform.
 
-titleHtml: Platform JavaScript APIs <sup><em>beta</em></sup>
+titleHtml: Platform JavaScript APIs <sup><em>beta 2</em></sup>
 
 theme: jekyll-theme-cayman
 
@@ -30,6 +30,8 @@ safe: true
 # * Class:     {{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex'}}
 # * Property:  {{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex' | append: '#changeset'}}
 refDocsUrlPattern: https://help.pentaho.com/Documentation/8.0/Developer_Center/JavaScript_API/platform/$
+
+starNew: ⭐
 
 # Base URL for Platform samples:
 platformSamplesBaseUrl: https://github.com/pentaho/pentaho-engineering-samples/tree/master/Samples_for_Extending_Pentaho/

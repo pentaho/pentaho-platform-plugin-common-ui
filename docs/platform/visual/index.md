@@ -9,7 +9,16 @@ layout: sub-intro
 {% include callout.html content="<p>As of version 7.1, 
 the Pentaho platform ships with a <em>new</em>, <b>beta</b> version of the Visualization API, 
 <b>side-by-side</b> with the <em>previous</em> version. 
-This documentation relates to the new version.</p>
+This documentation relates to the new, beta 2 version.</p>
+" type="warning" %}
+
+{% include callout.html content="<p>If you implemented a visualization for the 7.1 Pentaho platform,
+Visualization API beta 1,
+and want to know what's new and changed in the Visualization API beta 2, 
+that comes with the 8.0 Pentaho platform,
+see <a title='What is new and changed in Visualization API beta 2' 
+       href='./whats-new-beta-2'>What's new and changed in Visualization API beta 2</a>.
+</p>
 " type="warning" %}
 
 The [Visualization API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual'}}) 
@@ -70,7 +79,10 @@ how to create an OSGi artifact containing the visualization,
 so that it can be deployed to a Pentaho product.
 
 {% include callout.html content="<h2>Fast-lane</h2>
-<p>If you prefer, you can skip the walk-through and get the final Pentaho Web Project, and build it. First make sure that you have git and maven 3+ installed and that this <a href='https://github.com/pentaho/maven-parent-poms/blob/master/maven-support-files/settings.xml'>settings.xml</a> is in your USER_HOME/.m2 directory.</p>
+<p>If you prefer, you can skip the walk-through and get the final Pentaho Web Project, and build it.
+First make sure that you have git and maven 3+ installed and that 
+this <a href='https://github.com/pentaho/maven-parent-poms/blob/master/maven-support-files/settings.xml'>settings.xml</a> is 
+in your USER_HOME/.m2 directory.</p>
 
 <pre class='highlight'><code># Clone the repository.
 git clone https://github.com/pentaho/pentaho-engineering-samples

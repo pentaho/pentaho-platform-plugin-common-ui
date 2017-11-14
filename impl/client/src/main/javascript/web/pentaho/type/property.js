@@ -251,7 +251,7 @@ define([
          * When set to a non-{@link Nully} and non-{@link String} value,
          * the value is first replaced by the result of calling its `toString` method.
          *
-         * @type {!__nonEmptyString}
+         * @type {!nonEmptyString}
          *
          * @throws {pentaho.lang.ArgumentRequiredError} When set to an empty string or a _nully_ value.
          * @throws {TypeError} When set to a value different from the current one.
@@ -296,7 +296,7 @@ define([
          * When set to a non-{@link Nully} and non-{@link String} value,
          * the value is first replaced by the result of calling its `toString` method.
          *
-         * @type {!__nonEmptyString}
+         * @type {!nonEmptyString}
          *
          * @throws {TypeError} When attempting to set a value and the property is not a root property.
          * @throws {pentaho.lang.ArgumentRequiredError} When set to an empty string or a _nully_ value.
@@ -1030,6 +1030,7 @@ define([
            *
            * @name isRequiredOn
            * @memberOf pentaho.type.Property.Type#
+           * @method
            * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
            * @return {boolean} The evaluated value of the `isRequired` attribute.
            *
@@ -1119,6 +1120,7 @@ define([
            *
            * @name countMinOn
            * @memberOf pentaho.type.Property.Type#
+           * @method
            * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
            * @return {number} The evaluated value of the `countMin` attribute.
            *
@@ -1205,6 +1207,7 @@ define([
            *
            * @name countMaxOn
            * @memberOf pentaho.type.Property.Type#
+           * @method
            * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
            * @return {number} The evaluated value of the `countMax` attribute.
            *
@@ -1287,6 +1290,7 @@ define([
            *
            * @name isApplicableOn
            * @memberOf pentaho.type.Property.Type#
+           * @method
            * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
            * @return {boolean} The evaluated value of the `isApplicable` attribute.
            *
@@ -1367,6 +1371,7 @@ define([
            *
            * @name isEnabledOn
            * @memberOf pentaho.type.Property.Type#
+           * @method
            * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
            * @return {boolean} The evaluated value of the `isEnabled` attribute.
            *
