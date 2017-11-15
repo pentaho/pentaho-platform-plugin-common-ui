@@ -11,8 +11,7 @@ from developing the visualization itself to building an OSGi Artifact that can b
 ## 1. Develop the Visualization in a Sandbox
 
 You will start by developing the visualization in a controlled sandbox environment.
-Then, you will drop the sandbox and package the visualization's files in a way that
-it can be deployed to Pentaho products.
+Then, you will package your visualization's files so it can be deployed to Pentaho products.
 
 Do the [Bar/D3 Visualization in Sandbox](samples/bar-d3-sandbox) walk-through, 
 which guides you through the development of a custom visualization having a [D3](https://d3js.org/)-based view.
@@ -21,89 +20,23 @@ which guides you through the development of a custom visualization having a [D3]
 
 In the previous section you developed a custom visualization and tested it in a controlled sandbox environment.
 
-If you exclude the sandbox specific files, 
-you are left with `model.js`, `view-d3.js`, `config.js` and a `css` folder.
-However, note, one important feature — the AMD/RequireJS configuration — was part of the sandbox `index.html` file.
-Also, the D3 dependency was declared in the sandbox's `npm` `package.json` file.
- 
-When developing for the Pentaho platform, 
-equivalent information needs to be provided in a _Pentaho Web Package descriptor_ file, 
-which, not coincidentally, is called `package.json`.
-We call the set of web resources plus its package descriptor a [Pentaho Web Package](../web-package).
+If you exclude the sandbox specific files, you are left with the `package.json`, `model.js`, `view-d3.js`, `config.js`
+files and a `css` folder. Those are the files to be packaged.
 
-At a minimum, the `package.json` file requires the `name` and `version` fields.
-We choose the package name to match the AMD/RequireJS identifier prefix by which we want the resources to be available.
+Additionally, any runtime client-side dependencies must also be provided to the platform. In this case, D3 (@pentaho/viz-api is a dev-time dependency).
+Dependencies can be provided separately in their own package or bundled together with your visualization.
 
-The D3 library dependency, is declared similarly to how it was declared.
+In short, for packaging your visualization you just need to zip your files and runtime dependencies.
 
-Your visualization must be advertised to the platform so that applications like Analyzer and PDI can offer it to users.
-This is done by registering 
-the visualization's [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) module
-with [`pentaho/typeInfo`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.typeInfo'}}),
-as a subtype of `pentaho/visual/base/model`.
+Care must be taken not to include temporary files, dev-time dependencies, etc..
+By using the `npm pack` command you ensure only your files **and** bundled dependencies are compressed in the resulting tgz file.
 
-The default configuration module that you developed also needs to be advertised to the configuration system,
-by registering it with `pentaho/instanceInfo` as an instance of type `pentaho.config.spec.IRuleSet`.
-
-The result is the following `package.json` content:
-
-```json
-{ 
-  "name": "pentaho-visual-samples-bar",
-  "version": "0.0.1",
-  
-  "config": {
-    "pentaho/typeInfo": {
-      "pentaho-visual-samples-bar_0.0.1/model": {"base": "pentaho/visual/base/model"}
-    },
-    "pentaho/instanceInfo": {
-      "pentaho-visual-samples-bar_0.0.1/config": {"type": "pentaho.config.spec.IRuleSet"}
-    }
-  },
-  
-  "dependencies": {
-    "d3": "^4.8.0"
-  }
-}
+```xml
+# Package your files.
+npm pack
 ```
 
-## 3. Create the Pentaho Web Project
-
-The Pentaho platform is built on top of an OSGi container, 
-so developers must provide their code as an OSGi/Karaf artifact. 
-Additionally, any client-side dependencies must also be provided to the platform as OSGi bundles.
-
-The recommended way is to put the visualization bundle, its dependencies, 
-and corresponding feature definition together into a single KAR file.
-
-If you are not familiar with  details about Pentaho Web projects please see [Create a Pentaho Web Project for a Web Package and its Dependencies](../web-project).
-
-To do so we've prepared a maven project that can be used as the foundation to create the KAR file for the
-D3 visualization developed in the previous sections.
-
-1. Clone the repository `https://github.com/pentaho/pentaho-engineering-samples`.
-1. Copy the stub maven project at `Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/web-project/` to a folder of your choice, e.g. `myWebProject`. Make sure the folder path does not contain whitespaces. 
-1. Do a recursive find and replace for the following strings:
-   1. _myGroupId_ - Replace with the group identifier of your choice. Commonly associated with the company or organization where the artifact was developed.
-   1. _myArtifactId_ - Replace with the `name` set in your `package.json` (i.e. `pentaho-visual-samples-bar`).
-1. Copy the resources developed during the [Bar/D3 Visualization in Sandbox](samples/bar-d3-sandbox) walk-through. Put the css folder and `model.js`, `view-d3.js` and `config.js` files at `impl/src/main/javascript/web`.
-1. Create a `package.json` file at `impl/src/main/resources/META-INF/js` with the content defined in the [previous section](#2-create-the-pentaho-web-package).
-1. Edit the feature descriptor at `assemblies/src/main/feature/feature.xml` to include the dependency on D3:
-   
-   ```xml
-   <features name="${project.artifactId}-repo" xmlns="http://karaf.apache.org/xmlns/features/v1.2.1">
-     <feature name="${project.artifactId}" version="${project.version}">
-       <feature>pentaho-requirejs-osgi-manager</feature>
-       <feature>pentaho-deployers</feature>
-       <bundle>pentaho-webjars:mvn:org.webjars.npm/d3/4.8.0</bundle>
-     </feature>
-   </features>
-   ```
-1. Run `mvn package` at the root maven project (e.g. `myWebProject`).
-1. Your KAR file for deployment should now be available at `assemblies/target`.
-
-
-## 4. Next Steps
+## 3. Next Steps
 
 To learn how to deploy the visualization,
 continue reading at [Deploy the visualization](.#deploying-the-visualization).

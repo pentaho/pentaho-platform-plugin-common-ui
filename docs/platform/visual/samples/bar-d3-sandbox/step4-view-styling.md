@@ -65,6 +65,6 @@ define([
 });
 ```
 
-Now, refresh the `index.html` page in the browser, and you should see a more colorful Bar chart!
+Now, refresh the `sandbox.html` page in the browser, and you should see a more colorful Bar chart!
 
 **Continue** to [Adding interactivity to the view](step5-view-interactivity).

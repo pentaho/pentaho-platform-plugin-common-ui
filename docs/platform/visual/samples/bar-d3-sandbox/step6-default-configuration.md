@@ -21,8 +21,7 @@ the developer of `V1` may package it a configuration module so that it better in
 out-of-the-box.
 
 If you do not have any knowledge about JavaScript configuration in the Pentaho Platform, 
-you might want to read 
-[Configuring a visualization](../../configuration) before continuing.
+you might want to read [Configuring a visualization](../../configuration) before continuing.
 
 ## Create the configuration module
 
@@ -32,7 +31,7 @@ Now, create a configuration file, called `config.js`, and place the following co
 define(["module"], function(module) {
   
   // Replace /config by /model.
-  // e.g. "pentaho/visual/samples/bar/model".
+  // e.g. "pentaho-visual-samples-bar-d3/model".
   var vizId = module.id.replace(/(\w+)$/, "model");
   
   return {
@@ -62,69 +61,42 @@ We'll use the Sandbox environment to make sure.
 ## Register the configuration module in the sandbox
 
 It is still necessary to register the configuration module with the configuration system.
-For such, edit the `index.html` file and replace the script tag where the AMD/RequireJS system is configured
-with the following:
+For such, edit the `package.json` file and add a [`pentaho/instanceInfo`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.instanceInfo'}})
+configuration so that your file looks like this:
 
-```html
-  <script>
-    // Needed only in a sandbox environment.
-    require.config({
-      paths: {
-        "pentaho/visual/samples/bar": ".",
-        "d3": "./node_modules/d3/build/d3"
-      },
-      config: {
-        "pentaho/instanceInfo": {
-          "pentaho/visual/samples/bar/config": {type: "pentaho.config.spec.IRuleSet"}
-        }
+```json
+{
+  "name": "pentaho-visual-samples-bar-d3",
+  "version": "0.0.1",
+
+  "config": {
+    "pentaho/typeInfo": {
+      "pentaho-visual-samples-bar-d3/model": {
+        "base": "pentaho/visual/base/model"
       }
-    });
-  </script>
+    },
+    "pentaho/instanceInfo": {
+      "pentaho-visual-samples-bar-d3/config": {
+        "type": "pentaho.config.spec.IRuleSet"
+      }
+    }
+  },
+
+  "dependencies": {
+    "d3": "^4.11.0"
+  },
+  "bundleDependencies": [
+    "d3"
+  ],
+  "devDependencies": {
+    "@pentaho/viz-api": "https://github.com/pentaho/pentaho-platform-plugin-common-ui/releases/download/v3.0.0-beta2/pentaho-viz-api-v3.0.0.tgz"
+  }
+}
 ```
 
-Note the added `config` property.
+Note the modified `config` property.
 
-Now, refresh the `index.html` page in the browser, and you should see a Bar chart with wider bars.
+Now, refresh the `sandbox.html` page in the browser, and you should see a Bar chart with wider bars.
 Go ahead and experiment with different values.
-
-## Analyzer Integration
-
-In [Analyzer](http://www.pentaho.com/product/business-visualization-analytics), 
-when drilling-down, the default behaviour is to _add_ the child attribute to the visual role 
-where the parent attribute is.
-However, the _Category_ visual role of the Bar visualization you developed only accepts a single attribute 
-being mapped to it. This results in that, when drilling-down, Analzyer leads the visualization into an invalid
-state, forcing the user the remove the parent attribute by hand.
-
-While this behaviour will probably be fixed in a future version, until then, 
-the Analyzer-specific metadata property, `application.keepLevelOnDrilldown` can be used to force replacing the
-parent attribute with the child attribute when drilling-down.
-Add the following rule to the `config.js` file:
-
-```js
-define(["module"], function(module) {
-  // ...
-  return {
-    rules: [
-      // ..,
-      {
-        priority: -1,
-        select: {
-          type: vizId,
-          application: "pentaho-analyzer"
-        },
-        apply: {
-          application: {
-            keepLevelOnDrilldown: false
-          }
-        }
-      }
-    ]
-  };
-});
-```
-
-Note that this rule has no effect when testing your visualization in the sandbox environment, 
-but is important if you package and bundle your visualization for deployment.
 
 **Continue** to [Next steps](stepNext).

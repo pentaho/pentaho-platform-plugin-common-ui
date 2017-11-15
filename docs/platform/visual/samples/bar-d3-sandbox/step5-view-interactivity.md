@@ -92,13 +92,12 @@ Remarks:
     filter is being created; `=` is the alias of the filter type. 
   - The action is being dispatched through the view, where action listeners can handle it. 
 
-### Handle the `execute` action event
+### Handling of the `execute` action event
 
-Finally, you'll handle the `execute` action event from the sandbox side, 
-so that it is clear that the action is being dispatched.
+The `execute` action event is already being handled on the sandbox side, 
+helping you to easly check that the action is being dispatched.
 
-In `index.html`, find the statement `view.update()`. 
-Just before it, add the following:
+In the `sandbox.html` file you can find the following statements:
 
 ```js
 view.on("pentaho/visual/action/execute", {
@@ -117,7 +116,7 @@ Remarks:
     property provides an easy way to get a human-readable description of a filter.
 
 What are you waiting for? 
-Refresh the `index.html` page in the browser, and double-click a bar!
+Refresh the `sandbox.html` page in the browser, and double-click a bar!
 
 ## Implementing the `select` action
 
@@ -191,20 +190,11 @@ Remarks:
     [replaced]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action' | append: '#.SelectionModes'}})
     with the data filter associated with the clicked bar.
 
-### Handle the `select` action event
+### Handling of the `select` action event
 
-You'll handle the `select` action event from the sandbox side, 
-so that it is clear that the action is being dispatched.
+The `select` action event is also being handled on the sandbox side.
 
-In `index.html`, find the markup `<div id="viz_div"></div>`. 
-Immediately after it, add the following:
-
-```html
-   <div id="messages_div"></div>
-```
-
-Again, in `index.html`, find the statement `view.update()`. 
-Just before it, add the following:
+In `sandbox.html` you can analyze this block of code:
 
 ```js
 view.on("pentaho/visual/action/select", {
@@ -221,7 +211,7 @@ Remarks:
     automatically processes the action's `dataFilter` and `selectionMode` and applies it to the view's
     `selectionFilter`. Alternatively, you could show the content's of the view's `selectionFilter` property.
 
-Refresh the `index.html` page in the browser, and click a bar!
+Refresh the `sandbox.html` page in the browser, and click a bar!
 You should see a text under the visualization showing the selected data's filter.
 
 ### Render selected bars differently
@@ -261,7 +251,7 @@ function() {
 }
 ```
 
-Refresh the `index.html` page in the browser, and click a bar!
+Refresh the `sandbox.html` page in the browser, and click a bar!
 You should see the selected bar exhibiting different colors.
 
 ## Conflicting Click and Double-click events

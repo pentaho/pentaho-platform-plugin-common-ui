@@ -154,18 +154,6 @@ The APIs are organized as follows:
                     <li>
                         <dl>
                             <dt>
-                                <a title="Pentaho Web Project" href="platform/web-project">Pentaho Web Project</a>
-                            </dt>
-                            <dd>A Maven project that contains a Pentaho Web Package and 
-                                information of WebJar dependencies, 
-                                and compiles into an OSGi Artifact.</dd>
-                        </dl>
-                    </li>
-                </ul>
-                <ul>
-                    <li>
-                        <dl>
-                            <dt>
                                 <a title="OSGi Artifacts Deployment" href="platform/osgi-deployment">
                                 OSGi Artifacts Deployment
                                 </a>

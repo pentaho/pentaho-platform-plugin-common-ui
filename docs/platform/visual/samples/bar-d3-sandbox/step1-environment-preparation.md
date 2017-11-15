@@ -23,7 +23,6 @@ cd Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples
 
 # Install the dependencies.
 npm install
-# or: yarn install
 </code></pre>
 
 <p>Go directly to <a title='Visualize it' href='#visualize-it'>Visualize it</a>.</p>
@@ -31,116 +30,159 @@ npm install
 
 ## Setup the sandbox environment
 
-1. Create a folder and then initialize it:
-   ```shell
-   # Create the package.json file.
-   npm init
-    
-   # Add and install the Visualization API dev dependency.
-   # (the runtime dependency is provided by the platform)
-   npm install https://github.com/pentaho/pentaho-platform-plugin-common-ui/releases/download/v3.0.0-beta/pentaho-viz-api-v3.0.0.tgz --save-dev
-   # or: yarn add https://github.com/pentaho/pentaho-platform-plugin-common-ui/releases/download/v3.0.0-beta/pentaho-viz-api-v3.0.0.tgz --dev
-   ```
+1. Create an empty folder and then initialize it:
+  ```shell
+    # Create the package.json file.
+    npm init
+    # Write "pentaho-visual-samples-bar-d3" as package name.
+    # Accept the default for the other fields or write whatever you want.
 
-2. Create a file named `sales-by-product-family.json` and place the following content in it:
-    ```json
-    {
-      "model": [
-           {"name": "productFamily", "type": "string", "label": "Product Family"},
-           {"name": "sales",         "type": "number", "label": "Sales"}
-      ],
-      "rows": [
-           {"c": [{"v": "cars-classic", "f": "Classic Cars"}, 2746782]},
-           {"c": [{"v": "motorcycles", "f": "Motorcycles"}, 753753]},
-           {"c": [{"v": "planes", "f": "Planes"}, 748324]},
-           {"c": [{"v": "ships", "f": "Ships"}, 538982]},
-           {"c": [{"v": "trains", "f": "Trains"}, 165215]},
-           {"c": [{"v": "trucks-and-buses", "f": "Trucks and Buses"}, 756438]},
-           {"c": [{"v": "cars-vintage", "f": "Vintage Cars"}, 1308470]}
-      ]
-    }
-    ```
+    # Add and install the Visualization API dev dependency.
+    # (the runtime dependency is provided by the platform)
+    npm install https://github.com/pentaho/pentaho-platform-plugin-common-ui/releases/download/v3.0.0-beta/pentaho-viz-api-v3.0.0.tgz --save-dev
 
-3. Create a file named `index.html` and place the following content in it:
-    ```html
-    <!doctype html>
-    <html>
-      <head>
-        <style>
-          .pentaho-visual-base {
-            border: solid 1px #005da6;
-          }
-        </style>
-       
-        <!-- Load RequireJS. -->
-        <script type="text/javascript" src="node_modules/RequireJS/require.js"></script>
-    
-        <!-- Load the VizAPI dev bootstrap helper. -->
-        <script type="text/javascript" src="node_modules/@pentaho/viz-api/dev-bootstrap.js"></script>
-    
-        <script>
-          require([
-            "pentaho/type/Context",
-            "pentaho/data/Table",
-            "json!./sales-by-product-family.json"
-          ], function(Context, Table, dataSpec) {
-            
-            // Setup up a VizAPI context.
-            Context.createAsync({application: "viz-api-sandbox"})
-               .then(function(context) {
-                 // Get the calc model and base view types
-                 return context.getDependencyAsync({
-                    CalcModel: "pentaho/visual/samples/calc/model",
-                    BaseView: "pentaho/visual/base/view"
-                 });
-               })
-               .then(function(types) {
-                 // Create the visualization model.
-                 var modelSpec = {
-                   "data": new Table(dataSpec),
-                   "levels": {attributes: ["productFamily"]},
-                   "measure": {attributes: ["sales"]},
-                   "operation": "avg"
-                 };
-                                       
-                 var model = new types.CalcModel(modelSpec);
-                                     
-                 // Create the visualization view.
-                 var viewSpec = {
-                   width: 400,
-                   height: 200,
-                   domContainer: document.getElementById("viz_div"),
-                   model: model
-                 };
+    # Copy the sandbox files.
+    ./node_modules/@pentaho/viz-api/init-sandbox
+  ```
+
+    To follow this tutorial you should use `pentaho-visual-samples-bar-d3` as your package name, as it will become your AMD/RequireJS module ID.
+
+    Alternatively you can choose a different name but will have to change all references to `pentaho-visual-samples-bar-d3` throughout the tutorial.
+
+2. You should now have the `sandbox.html` and `sandbox-data.json` files.
+
+    Those files provide a minimal sandbox from which sandboxes for specific samples or experiments may be derived.
+    As is, it simply displays the `pentaho/visual/samples/calc` visualization — the only visualization that comes bundled with the Visualization API.
+
+    If you prefer you can create the files yourself:
+
+    1. Create a file named `sandbox-data.json` and place the following content in it:
+      ```json
+        {
+          "model": [
+              {"name": "productFamily", "type": "string", "label": "Product Family"},
+              {"name": "sales",         "type": "number", "label": "Sales"}
+          ],
+          "rows": [
+              {"c": [{"v": "cars-classic", "f": "Classic Cars"}, 2746782]},
+              {"c": [{"v": "motorcycles", "f": "Motorcycles"}, 753753]},
+              {"c": [{"v": "planes", "f": "Planes"}, 748324]},
+              {"c": [{"v": "ships", "f": "Ships"}, 538982]},
+              {"c": [{"v": "trains", "f": "Trains"}, 165215]},
+              {"c": [{"v": "trucks-and-buses", "f": "Trucks and Buses"}, 756438]},
+              {"c": [{"v": "cars-vintage", "f": "Vintage Cars"}, 1308470]}
+          ]
+        }
+      ```
+
+    2. Create a file named `sandbox.html` and place the following content in it:
+      ```html
+        <!doctype html>
+        <html>
+
+        <head>
+          <style>
+            .pentaho-visual-base-model {
+              border: solid 1px #005da6;
+            }
+          </style>
+
+          <!-- load requirejs -->
+          <script type="text/javascript" src="node_modules/requirejs/require.js"></script>
+
+          <!-- load the VizAPI dev bootstrap helper -->
+          <script type="text/javascript" src="node_modules/@pentaho/viz-api/dev-bootstrap.js"></script>
+
+          <!-- configure AMD for the sample visualization -->
+          <script>
+            require([
+              "vizapi-dev-init",
+              "json!./package.json"
+            ], function (devInit, package) {
+              devInit(package);
+
+              require([
+                "pentaho/type/Context",
+                "pentaho/data/Table",
+                "json!./sandbox-data.json"
+              ], function (Context, Table, dataSpec) {
+
+                // Setup up a VizAPI context.
+                Context.createAsync({ application: "viz-api-sandbox" })
+                  .then(function (context) {
+                    // Get the model and base view types
+                    return context.getDependencyAsync({
+                      CalcModel: "pentaho/visual/samples/calc/model",
+                      BaseView: "pentaho/visual/base/view"
+                    });
+                  })
+                  .then(function (types) {
+
+                    // Create the visualization model.
+                    var modelSpec = {
+                      "data": new Table(dataSpec),
+                      "levels": {attributes: ["productFamily"]},
+                      "measure": {attributes: ["sales"]},
+                      "operation": "avg"
+                    };
+                                                
+                    var model = new types.CalcModel(modelSpec);
                                               
-                 // These are responsibilities of the visualization container application:
-                 // 1. Mark the container with the model's CSS classes, for styling purposes.
-                 viewSpec.domContainer.className = model.type.inheritedStyleClasses.join(" ");
-                                          
-                 // 2. Set the DOM container dimensions.
-                 viewSpec.domContainer.style.width = viewSpec.width + "px";
-                 viewSpec.domContainer.style.height = viewSpec.height + "px";
-                   
-                 return types.BaseView.createAsync(viewSpec);
-               })
-               .then(function(view) {
-                 // Render the visualization.
-                 return view.update();
-               });
-          });
-        </script>
-      </head>
-    
-      <body>
-        <!-- Div that will contain the visualization. -->
-        <div id="viz_div"></div>
-      </body>
-    </html>
-    ```
+                    // Create the visualization view.
+                    var viewSpec = {
+                      width: 400,
+                      height: 200,
+                      domContainer: document.getElementById("viz_div"),
+                      model: model
+                    };
+                                                        
+                    // These are responsibilities of the visualization container application:
+                    // 1. Mark the container with the model's CSS classes, for styling purposes.
+                    viewSpec.domContainer.className = model.$type.inheritedStyleClasses.join(" ");
+                                                    
+                    // 2. Set the DOM container dimensions.
+                    viewSpec.domContainer.style.width = viewSpec.width + "px";
+                    viewSpec.domContainer.style.height = viewSpec.height + "px";
+                            
+                    return types.BaseView.createAsync(viewSpec);
+                  })
+                  .then(function (view) {
+                    // Handle the execute action.
+                    view.on("pentaho/visual/action/execute", {
+                      "do": function (action) {
+                        alert("Executed " + action.dataFilter.contentKey);
+                      }
+                    });
+
+                    // Handle the select action.
+                    view.on("pentaho/visual/action/select", {
+                      "finally": function (action) {
+                        document.getElementById("messages_div").innerText = "Selected: " + action.dataFilter.contentKey;
+                      }
+                    });
+
+                    // Render the visualization.
+                    return view.update();
+                  });
+              });
+            });
+          </script>
+        </head>
+
+        <body>
+          <!-- div that will contain the visualization -->
+          <div id="viz_div"></div>
+
+          <!-- div that will display messages -->
+          <div id="messages_div"></div>
+        </body>
+
+        </html>
+      ```
 
 ## Visualize it
 
-Open `index.html` in a browser.
+Open `sandbox.html` in a browser.
 You should see the result of the average operation: `The result is 1002566.2857142857`.
 
 The page shows the simplest (and kind of useless) visualization: a
@@ -166,6 +208,8 @@ static -p 8000</code></pre>
 <b>Python 3:</b><pre class='highlight'><code>python -m http.server 8000</code></pre>
 
 <b>Ruby:</b><pre class='highlight'><code>ruby -run -e httpd . -p 8000</code></pre>
+
+After one of the above, you can open <a href='http://localhost:8000/sandbox.html' target='_blank'>http://localhost:8000/sandbox.html</a> in the browser.
 " type="warning" %}
 
 

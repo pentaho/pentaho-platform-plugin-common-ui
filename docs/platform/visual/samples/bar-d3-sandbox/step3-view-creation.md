@@ -21,7 +21,7 @@ define(["module", "d3"], function(module, d3) {
 
   return [
     "pentaho/visual/base/view",
-    "pentaho/visual/samples/bar/model",
+    "./model",
     function(BaseView, Model) {
 
       var BarView = BaseView.extend({
@@ -65,108 +65,136 @@ Remarks:
 Execute the following:
 
 ```shell
-# Add and install the D3 dependency.
-npm install d3 --save
-# or: yarn add d3
+# Add and install the D3 dependency
+# (also set it as a bundled dependency).
+npm install d3 --save --save-bundle
 ```
 
 ## Adapting the HTML sandbox
 
-Edit the `index.html` file and place the following code in it:
+Edit the `sandbox.html` file and place the following code in it:
 
 ```html
+<!doctype html>
 <html>
+
 <head>
   <style>
-    .pentaho-visual-base {
+    .pentaho-visual-base-model {
       border: solid 1px #005da6;
     }
   </style>
 
-  <script type="text/javascript" src="node_modules/RequireJS/require.js"></script>
+  <!-- load requirejs -->
+  <script type="text/javascript" src="node_modules/requirejs/require.js"></script>
 
+  <!-- load the VizAPI dev bootstrap helper -->
   <script type="text/javascript" src="node_modules/@pentaho/viz-api/dev-bootstrap.js"></script>
 
-  <script>
-    // Needed only in a sandbox environment.
-    require.config({
-      paths: {
-        "pentaho/visual/samples/bar": ".",
-        "d3": "./node_modules/d3/build/d3"
-      }
-    });
-  </script>
-
+  <!-- configure AMD for the sample visualization -->
   <script>
     require([
-      "pentaho/type/Context",
-      "pentaho/data/Table",
-      "json!./sales-by-product-family.json"
-    ], function(Context, Table, dataSpec) {
+      "vizapi-dev-init",
+      "json!./package.json"
+    ], function (devInit, package) {
+      devInit(package);
 
-      // Setup up a VizAPI context.
-      Context.createAsync({application: "viz-api-sandbox"})
-          .then(function(context) {
-             // Get the model and base view types
-             return context.getDependencyAsync({
-                BarModel: "pentaho/visual/samples/bar/model",
-                BaseView: "pentaho/visual/base/view"
-             });
-           })
-           .then(function(types) {
-             
-             // Create the visualization model.
-             var modelSpec = {
-               "data": new Table(dataSpec),
-               "category": {attributes: ["productFamily"]},
-               "measure": {attributes: ["sales"]}
-             };
-      
-             var model = new types.BarModel(modelSpec);
+      require.config({
+        paths: {
+          "d3": "./node_modules/d3/build/d3"
+        }
+      });
 
-             // Create the visualization view
-             var viewSpec = {
-               width: 700,
-               height: 300,
-               domContainer: document.getElementById("viz_div"),
-               model: model
-             };
+      require([
+        "pentaho/type/Context",
+        "pentaho/data/Table",
+        "json!./sandbox-data.json"
+      ], function (Context, Table, dataSpec) {
 
-             // These are responsibilities of the visualization container application:
-             // 1. Mark the container with the model's CSS classes, for styling purposes.
-             viewSpec.domContainer.className = model.$type.inheritedStyleClasses.join(" ");
-       
-             // 2. Set the DOM container dimensions.
-             viewSpec.domContainer.style.width = viewSpec.width + "px";
-             viewSpec.domContainer.style.height = viewSpec.height + "px";
-       
-             // Create the visualization view.
-             return types.BaseView.createAsync(viewSpec);
-           })
-           .then(function(view) {
-             // Render the visualization.
-             return view.update();
-           });
+        // Setup up a VizAPI context.
+        Context.createAsync({ application: "viz-api-sandbox" })
+          .then(function (context) {
+            // Get the model and base view types
+            return context.getDependencyAsync({
+              BarModel: "pentaho-visual-samples-bar-d3/model",
+              BaseView: "pentaho/visual/base/view"
+            });
+          })
+          .then(function (types) {
+
+            // Create the visualization model.
+            var modelSpec = {
+              "data": new Table(dataSpec),
+              "category": { attributes: ["productFamily"] },
+              "measure": { attributes: ["sales"] }
+            };
+
+            var model = new types.BarModel(modelSpec);
+
+            // Create the visualization view
+            var viewSpec = {
+              width: 700,
+              height: 300,
+              domContainer: document.getElementById("viz_div"),
+              model: model
+            };
+
+            // These are responsibilities of the visualization container application:
+            // 1. Mark the container with the model's CSS classes, for styling purposes.
+            viewSpec.domContainer.className = model.$type.inheritedStyleClasses.join(" ");
+
+            // 2. Set the DOM container dimensions.
+            viewSpec.domContainer.style.width = viewSpec.width + "px";
+            viewSpec.domContainer.style.height = viewSpec.height + "px";
+
+            // Create the visualization view.
+            return types.BaseView.createAsync(viewSpec);
+          })
+          .then(function (view) {
+            // Handle the execute action.
+            view.on("pentaho/visual/action/execute", {
+              "do": function (action) {
+                alert("Executed " + action.dataFilter.contentKey);
+              }
+            });
+
+            // Handle the select action.
+            view.on("pentaho/visual/action/select", {
+              "finally": function (action) {
+                document.getElementById("messages_div").innerText = "Selected: " + action.dataFilter.contentKey;
+              }
+            });
+
+            // Render the visualization.
+            return view.update();
+          });
+      });
     });
   </script>
 </head>
 
 <body>
+  <!-- div that will contain the visualization -->
   <div id="viz_div"></div>
+
+  <!-- div that will display messages -->
+  <div id="messages_div"></div>
 </body>
+
 </html>
 ```
 
 Remarks:
-  - A script block was added with the AMD/RequireJS configuration of the Bar and D3 packages.
+  - A script block was added with the AMD/RequireJS configuration of the D3 path.
     This step is only needed in a sandbox environment. 
     When inside the Pentaho platform, these configurations are provided automatically,
     built from the web package information.
-  - The used visualization model is now `pentaho/visual/samples/bar/model`.
+  - The used visualization model is now `pentaho-visual-samples-bar-d3/model`
+    (or other, if you choose a different package name on step 1).
   - The model now contains visual role mappings for the `category` and `measure` visual roles.
   - The dimensions of the visualization were increased.
 
-Now, refresh the `index.html` page in the browser, and you should read `Hello World!`.
+Now, refresh the `sandbox.html` page in the browser, and you should read `Hello World!`.
 
 ## Implementing the render code
 
@@ -331,6 +359,6 @@ Remarks:
     [getColumnLabel]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.ITable' | append: '#getColumnLabel'}}).
   - The Bar model's `barSize` property is being used to limit the width of bars.
 
-Now, refresh the `index.html` page in the browser, and you should finally see a Bar chart!
+Now, refresh the `sandbox.html` page in the browser, and you should finally see a Bar chart!
 
 **Continue** to [Styling the view](step4-view-styling).

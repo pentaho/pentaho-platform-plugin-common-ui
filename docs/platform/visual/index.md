@@ -65,25 +65,26 @@ so that it can be deployed to a Pentaho product.
 
 {% include callout.html content="<h2>Fast-lane</h2>
 <p>If you prefer, you can skip the walk-through and get the final Pentaho Web Project, and build it.
-First make sure that you have git and maven 3+ installed and that 
-this <a href='https://github.com/pentaho/maven-parent-poms/blob/master/maven-support-files/settings.xml'>settings.xml</a> is 
-in your USER_HOME/.m2 directory.</p>
+First make sure that you have git and npm installed.</p>
 
 <pre class='highlight'><code># Clone the repository.
 git clone https://github.com/pentaho/pentaho-engineering-samples
 
 # Go to the sample's directory.
 cd pentaho-engineering-samples
-cd Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/bar-d3-bundle
+cd Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/bar-d3-sandbox
 
-# Build the Web Project
-mvn package
+# Install the dependencies.
+npm install
+
+# Package your files.
+npm pack
 </code></pre>" type="warning" %}
 
 # Deploying the visualization
 
 To deploy the visualization to a Pentaho product (Pentaho Server or PDI), 
-copy the KAR file you just built (located at `assemblies/target`) into its `system/karaf/deploy` folder.
+copy the tgz file you just built into its `system/karaf/deploy` folder.
 See [OSGi Artifacts Deployment](../osgi-deployment) if you need more information.
 
 If everything went well, you should now see your visualization being offered in Analyzer and PDI, 
@@ -109,8 +110,6 @@ as well as be able to use it in a [CDE](http://community.pentaho.com/ctools/cde/
    `Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/bar-d3-cde`.
    
    <img src="img/sample-bar-d3-cde.png" alt="Bar/D3 in CDE" style="width: 777px;">
-
-<!-- TODO: Explain how to distribute it using marketplace? -->
 
 # Configuring the visualization
 

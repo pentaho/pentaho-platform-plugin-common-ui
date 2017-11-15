@@ -165,6 +165,43 @@ and
 The [dataType]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Mapping.Type' | append: '#dataType'}})
 property is used to only allow mapping to data attributes of type `number`.
 
+## Register the model module
+
+Your visualization must be advertised to the platform so that applications like Analyzer and PDI can offer it to users.
+This is done by registering 
+the visualization's [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) module
+with [`pentaho/typeInfo`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.typeInfo'}}),
+as a subtype of `pentaho/visual/base/model`.
+
+For such, edit the `package.json` file and make sure it looks like this:
+
+```json
+{
+  "name": "pentaho-visual-samples-bar-d3",
+  "version": "0.0.1",
+
+  "config": {
+    "pentaho/typeInfo": {
+      "pentaho-visual-samples-bar-d3/model": {
+        "base": "pentaho/visual/base/model"
+      }
+    }
+  },
+
+  "dependencies": {
+    "d3": "^4.11.0"
+  },
+  "bundleDependencies": [
+    "d3"
+  ],
+  "devDependencies": {
+    "@pentaho/viz-api": "https://github.com/pentaho/pentaho-platform-plugin-common-ui/releases/download/v3.0.0-beta2/pentaho-viz-api-v3.0.0.tgz"
+  }
+}
+```
+
+Note the added `config` property.
+
 ## Additional model metadata
 
 The model could still be enriched in several ways, such as:

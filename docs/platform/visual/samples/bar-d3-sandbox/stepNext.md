@@ -11,7 +11,7 @@ layout: default
 ---
 
 You've covered the basics of developing a visualization for the Pentaho Visualization API.
-Many features, such as color palettes, localization, theming and configuration, were purposely left out, 
+Many features, such as localization, theming and advanced configuration, were purposely left out, 
 to keep things as simple as possible.
 
 To learn how to create a Pentaho Web Package for your visualization,
