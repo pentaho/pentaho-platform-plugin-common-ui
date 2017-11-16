@@ -16,18 +16,18 @@ Create a file named `view-d3.js` and place the following code in it:
 
 ```js
 define(["module", "d3"], function(module, d3) {
-
   "use strict";
 
   return [
     "pentaho/visual/base/view",
     "./model",
     function(BaseView, Model) {
-
+      // Create the Bar View subclass
       var BarView = BaseView.extend({
         $type: {
           id: module.id,
           props: [
+            // Specialize the inherited model property to the Bar model type
             {
               name: "model",
               valueType: Model
@@ -48,7 +48,7 @@ define(["module", "d3"], function(module, d3) {
 
 Remarks:
   - Defines a visualization view whose id is the file's AMD module identifier
-    (depending on how AMD is configured, it can be, for example: `pentaho/visual/samples/bar/view-d3`).
+    (depending on how AMD is configured, it can be, for example: `pentaho-visual-samples-bar-d3/view-d3`).
   - Inherits directly from the base visualization view, 
     [pentaho/visual/base/view]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}}).
   - The inherited 
@@ -66,7 +66,7 @@ Execute the following:
 
 ```shell
 # Add and install the D3 dependency
-# (also set it as a bundled dependency).
+# (also set it as a bundled dependency)
 npm install d3 --save --save-bundle
 ```
 
@@ -161,7 +161,7 @@ Edit the `sandbox.html` file and place the following code in it:
             // Handle the select action.
             view.on("pentaho/visual/action/select", {
               "finally": function (action) {
-                document.getElementById("messages_div").innerText = "Selected: " + action.dataFilter.contentKey;
+                document.getElementById("messages_div").innerText = "Selected: " + view.selectionFilter.contentKey;
               }
             });
 
@@ -312,14 +312,20 @@ function() {
               " per " +
               dataTable.getColumnLabel(categoryColumn);
 
+  var selectColor = function(d) {
+    return model.palette.colors.at(d.rowIndex % model.palette.colors.count).value;
+  };
+
   svg.append("text")
       .attr("class", "title")
+      .attr("fill", selectColor)
+      .attr("stroke", selectColor)
       .attr("y", margin.top / 2)
       .attr("x", this.width / 2)
       .attr("dy", "0.35em")
       .attr("text-anchor", "middle")
       .text(title);
-  
+
   // Content
   var g = svg.append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -358,6 +364,7 @@ Remarks:
   - The chart title is build with the labels of the mapped attributes, by calling 
     [getColumnLabel]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.ITable' | append: '#getColumnLabel'}}).
   - The Bar model's `barSize` property is being used to limit the width of bars.
+  - The rowIndex is being used to cycle through and select the bar color from the `palette` property.
 
 Now, refresh the `sandbox.html` page in the browser, and you should finally see a Bar chart!
 

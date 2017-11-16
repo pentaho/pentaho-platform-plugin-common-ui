@@ -77,11 +77,13 @@ function() {
   var view = this;
   
   bar.on("dblclick", function(d) {
-    
-    var filterSpec = {_: "=", property: categoryAttribute, value: d.category};
+    // A filter that would select the data that the bar visually represents
+    var filterSpec = { _: "=", property: categoryAttribute, value: d.category };
 
-    var action = new ExecuteAction({dataFilter: filterSpec});
+    // Create the action.
+    var action = new ExecuteAction({ dataFilter: filterSpec });
 
+    // Dispatch the action through the view.
     view.act(action);
   });
 }
@@ -95,7 +97,7 @@ Remarks:
 ### Handling of the `execute` action event
 
 The `execute` action event is already being handled on the sandbox side, 
-helping you to easly check that the action is being dispatched.
+helping you to easily check that the action is being dispatched.
 
 In the `sandbox.html` file you can find the following statements:
 
@@ -175,11 +177,13 @@ function() {
   
   // Part 4
   bar.on("click", function(d) {
-    
-    var filterSpec = {_: "=", property: categoryAttribute, value: d.category};
+    // A filter that would select the data that the bar visually represents
+    var filterSpec = { _: "=", property: categoryAttribute, value: d.category };
 
-    var action = new SelectAction({dataFilter: filterSpec, selectionMode: "replace"});
+    // Create the action.
+    var action = new SelectAction({dataFilter: filterSpec, selectionMode: event.ctrlKey || event.metaKey ? "toggle" : "replace"});
 
+    // Dispatch the action through the view.
     view.act(action);
   });
 }
@@ -188,7 +192,8 @@ function() {
 Remarks:
   - Each time a bar is clicked, the current view's `selectionFilter` will be 
     [replaced]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action' | append: '#.SelectionModes'}})
-    with the data filter associated with the clicked bar.
+    with the data filter associated with the clicked bar, or [toggled]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action' | append: '#.SelectionModes'}})
+    if the ctrl/cmd key is pressed.
 
 ### Handling of the `select` action event
 
@@ -199,7 +204,7 @@ In `sandbox.html` you can analyze this block of code:
 ```js
 view.on("pentaho/visual/action/select", {
   "finally": function(action) {
-    document.getElementById("messages_div").innerText = "Selected: " + action.dataFilter.contentKey;
+    document.getElementById("messages_div").innerText = "Selected: " + view.selectionFilter.contentKey;
   }
 });
 ```
@@ -209,7 +214,7 @@ Remarks:
   - The `select` action's 
     [default action]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select' | append: '#_doDefault'}})
     automatically processes the action's `dataFilter` and `selectionMode` and applies it to the view's
-    `selectionFilter`. Alternatively, you could show the content's of the view's `selectionFilter` property.
+    `selectionFilter`. We are using the content's of the view's `selectionFilter` property for displaying the final result.
 
 Refresh the `sandbox.html` page in the browser, and click a bar!
 You should see a text under the visualization showing the selected data's filter.
@@ -224,11 +229,12 @@ Edit the `view-d3.css` file. Append the following rules to it:
 
 ```css
 .pentaho-visual-samples-bar .bar.selected {
-  fill: #97372d;
+  stroke-opacity: 0.4;
+  fill-opacity: 0.6;
 }
 
 .pentaho-visual-samples-bar .bar.selected:hover {
-  fill: #970a05;
+  stroke-opacity: 0.8;
 }
 ```
 

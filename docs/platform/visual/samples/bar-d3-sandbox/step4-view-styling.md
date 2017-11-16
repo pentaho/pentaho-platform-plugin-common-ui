@@ -19,11 +19,11 @@ Create a folder named `css` and, in it, create a file named `view-d3.css`. Add t
 
 ```css
 .pentaho-visual-samples-bar .bar {
-  fill: #007297;
+  stroke-width: 2px;
 }
 
 .pentaho-visual-samples-bar .bar:hover {
-  fill: #1973bc;
+  fill-opacity: 0.8;
 }
 
 .pentaho-visual-samples-bar .axis path,
@@ -65,6 +65,6 @@ define([
 });
 ```
 
-Now, refresh the `sandbox.html` page in the browser, and you should see a more colorful Bar chart!
+Now, refresh the `sandbox.html` page in the browser, and you should see a better styled title and hover effects on the bars!
 
 **Continue** to [Adding interactivity to the view](step5-view-interactivity).

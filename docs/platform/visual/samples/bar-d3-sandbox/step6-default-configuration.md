@@ -29,13 +29,13 @@ Now, create a configuration file, called `config.js`, and place the following co
 
 ```js
 define(["module"], function(module) {
-  
   // Replace /config by /model.
   // e.g. "pentaho-visual-samples-bar-d3/model".
   var vizId = module.id.replace(/(\w+)$/, "model");
-  
+
   return {
     rules: [
+      // Sample rule
       {
         priority: -1,
         select: {
@@ -43,7 +43,7 @@ define(["module"], function(module) {
         },
         apply: {
           props: {
-            barSize: {defaultValue: 50}
+            barSize: { defaultValue: 50 }
           }
         }
       }
