@@ -79,11 +79,11 @@ Remarks:
   - Defines a visualization (model) whose id is the file's AMD module identifier
     (depending on how AMD is configured, it can be, for example: `pentaho/visual/samples/bar/model`).
   - Inherits directly from the base visualization model, 
-    [pentaho/visual/base]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}).
-  - Specifies the [styleClass]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#styleClass'}}),
+    [pentaho/visual/base]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.base.Model'}}).
+  - Specifies the [styleClass]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.type.Type' | append: '#styleClass'}}),
     which will later be useful to style the component using CSS.
   - Specifies the
-    [default view]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#defaultView'}}) 
+    [default view]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.type.Type' | append: '#defaultView'}}) 
     to use with this model (which you'll create in a moment).
   - Two main types of property exist: general and visual roles.
   
@@ -102,11 +102,11 @@ specification = {
 
 A general property which determines the constant width of bars. 
 It is of 
-[type]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#type'}})
-[number]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Number'}}), 
-is [required]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#isRequired'}}) and 
+[type]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.type.Property.Type' | append: '#type'}})
+[number]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.type.Number'}}), 
+is [required]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.type.Property.Type' | append: '#isRequired'}}) and 
 has a 
-[default value]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#value'}}) 
+[default value]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.type.Property.Type' | append: '#value'}}) 
 of `30`.
 That's as simple as it gets.
 
@@ -123,21 +123,21 @@ specification = {
 ```
 
 Represents the _Category_ visual role.
-Being [ordinal]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.OrdinalMapping'}}) 
+Being [ordinal]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.role.OrdinalMapping'}}) 
 means that it can visually encode discrete values 
 and their relative order.
 
-The [data]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model' | append: '#data'}}) property, 
+The [data]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.base.Model' | append: '#data'}}) property, 
 which is inherited from the base visualization model, 
 is given a dataset containing data for attributes such as _Product Family_ and _Sales_.
 The value of a visual role contains the names of the data attributes that are _mapped_ to it,
 e.g.: `{attributes: ["productFamily"]}`. 
 So, the value of a visual role is an object with a list property named 
-[attributes]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Mapping' | append: '#attributes'}}).
+[attributes]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.role.Mapping' | append: '#attributes'}}).
 
 Because by default, any number of data attributes can be mapped to a visual role, including 0 or 10, 
 it is necessary to derive the 
-[pentaho/visual/role/ordinal]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.OrdinalMapping'}}) 
+[pentaho/visual/role/ordinal]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.role.OrdinalMapping'}}) 
 visual role type to limit the cardinality 
 limits of its `attributes` property, so that it accepts and requires a single data attribute.
 
@@ -155,13 +155,13 @@ specification = {
 ```
 
 Represents the _Measure_ visual role. 
-Being [quantitative]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.QuantitativeMapping'}}) 
+Being [quantitative]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.role.QuantitativeMapping'}}) 
 means that it can visually represent the proportion between values (_this is twice that_).
 The quantitative data types are 
-[date]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Date'}})
+[date]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.type.Date'}})
 and 
-[number]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Number'}}).
-The [dataType]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Mapping.Type' | append: '#dataType'}})
+[number]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.type.Number'}}).
+The [dataType]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.role.Mapping.Type' | append: '#dataType'}})
 property is used to only allow mapping to data attributes of type `number`.
 
 ## Additional model metadata

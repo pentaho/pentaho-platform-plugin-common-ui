@@ -81,7 +81,7 @@ match the absolute module identifier listed in the config object.
 Modules with a matching module identifier can access the configuration object via `module.config`.
 
 In particular, 
-this is used to configure the [`pentaho/service`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.service'}}) plugin, 
+this is used to configure the [`pentaho/service`]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.service'}}) plugin, 
 used as an inversion-of-control mechanism to inject the package resources into the system.
 
 For instance, to declare that the resource `"my-viz/model.js"` implements the service named `pentaho/visual/base`, 

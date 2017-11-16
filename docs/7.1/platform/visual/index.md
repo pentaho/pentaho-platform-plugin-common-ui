@@ -12,7 +12,7 @@ the Pentaho platform ships with a <em>new</em>, <b>beta</b> version of the Visua
 This documentation relates to the new version.</p>
 " type="warning" %}
 
-The [Visualization API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual'}}) 
+The [Visualization API]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual'}}) 
 provides a unified way to visualize data across the Pentaho suite 
 (e.g.
 [Analyzer](http://www.pentaho.com/product/business-visualization-analytics), 
@@ -24,11 +24,11 @@ applications, visualizations and business logic.
 
 The Visualization API is built on top of other Platform JavaScript APIs:
 
-- The [Data API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data'}}) 
+- The [Data API]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.data'}}) 
   ensures seamless integration with data sources in the Pentaho platform, 
   as well as with other client-side component frameworks.
 
-- The [Type API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type'}}) 
+- The [Type API]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.type'}}) 
   provides to visualizations out-of-the-box features such as class inheritance, metadata support, configuration, 
   validation and serialization.
 
@@ -52,17 +52,17 @@ to [configuring it](#configuring-the-visualization).
 
 Creating a visualization boils down to creating:
 
-- One [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) — 
+- One [`Model`]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.base.Model'}}) — 
   which _identifies_ the visualization and 
   _defines_ it in terms of its data requirements, 
   such as the visual degrees of freedom it has (e.g. _X position_, _color_ and _size_) and 
   any major options that affect its rendering, — and
 
-- One [`View`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}}) (at least) — 
+- One [`View`]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.base.View'}}) (at least) — 
   which implements the actual rendering using chosen technologies 
   (e.g. [HTML](https://www.w3.org/TR/html/), [SVG](https://www.w3.org/TR/SVG/), [D3](https://d3js.org/)),
   and handle user interaction, 
-  dispatching [actions]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action'}}) and, 
+  dispatching [actions]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.action'}}) and, 
   for example, showing tooltips.
 
 The [Create a Custom Visualization](create) walk-through shows you how to develop these and 

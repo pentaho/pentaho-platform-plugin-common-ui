@@ -49,13 +49,13 @@ Remarks:
   - Defines a visualization view whose id is the file's AMD module identifier
     (depending on how AMD is configured, it can be, for example: `pentaho/visual/samples/bar/view-d3`).
   - Inherits directly from the base visualization view, 
-    [pentaho/visual/base/view]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}}).
+    [pentaho/visual/base/view]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.base.View'}}).
   - The inherited 
-    [model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#model'}}) 
+    [model]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.base.View' | append: '#model'}}) 
     property is overridden so that its 
-    [type]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#type'}}) 
+    [type]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.type.Property.Type' | append: '#type'}}) 
     is the Bar model you previously created.
-  - The [_updateAll]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#_updateAll'}})
+  - The [_updateAll]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.base.View' | append: '#_updateAll'}})
     method is where the code that fully renders the visualization must go,
     and, for now, it simply uses D3 to output `"Hello World!"` in the view's DOM element, `domContainer`.
 
@@ -168,7 +168,7 @@ To make it easy, we'll adapt the code of following D3 block:
 [https://bl.ocks.org/mbostock/3885304](https://bl.ocks.org/mbostock/3885304).
 
 We'll now go through the view's
-[_updateAll]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#_updateAll'}})
+[_updateAll]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.base.View' | append: '#_updateAll'}})
 code, piece by piece.
 
 ### Method `_updateAll`, part 1
@@ -199,13 +199,13 @@ function() {
 ```
 
 Remarks:
-  - [this.model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#model'}}) 
+  - [this.model]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.base.View' | append: '#model'}}) 
     gives you access to the visualization model object.
   - Both the visual roles are required, so it is safe to directly read the first mapped attribute.
   - Most data table methods accept column indexes, so attribute names are converted into column indexes.
   - The data in the data table needs to be converted into an "array of plain objects" form, 
     so that then it can be directly consumed by D3.
-  - [this.domContainer]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#domContainer'}})
+  - [this.domContainer]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.base.View' | append: '#domContainer'}})
     gives you access to the DIV where rendering should take place.
 
 Now, you'll make a small detour to create that new `__buildScenes` method.
@@ -236,9 +236,9 @@ function(dataTable, categoryColumn, measureColumn) {
 
 Remarks:
   - Note the data table methods which can be used to traverse it:
-    [getNumberOfRows]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.ITable' | append: '#getNumberOfRows'}}),
-    [getValue]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.ITable' | append: '#getValue'}}) and
-    [getFormattedValue]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.ITable' | append: '#getFormattedValue'}}).
+    [getNumberOfRows]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.data.ITable' | append: '#getNumberOfRows'}}),
+    [getValue]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.data.ITable' | append: '#getValue'}}) and
+    [getFormattedValue]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.data.ITable' | append: '#getFormattedValue'}}).
   - In the X axis, you'll be displaying the value of `categoryLabel`, 
     but the value of `category` (and of `rowIndex`) will be useful, later, 
     for adding interactivity to the visualization. 
@@ -318,10 +318,10 @@ function() {
 
 Remarks:
   - The view dimensions are available through 
-    [this.width]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#width'}}) and 
-    [this.height]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#height'}}).
+    [this.width]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.base.View' | append: '#width'}}) and 
+    [this.height]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.base.View' | append: '#height'}}).
   - The chart title is build with the labels of the mapped attributes, by calling 
-    [getColumnLabel]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.ITable' | append: '#getColumnLabel'}}).
+    [getColumnLabel]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.data.ITable' | append: '#getColumnLabel'}}).
   - The Bar model's `barSize` property is being used to limit the width of bars.
 
 Now, refresh the `index.html` page in the browser, and you should finally see a Bar chart!

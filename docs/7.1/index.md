@@ -23,7 +23,7 @@ The APIs are organized as follows:
         <dl>
             <dt>
                 <a title="Pentaho JavaScript Data API" 
-                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.data'}}">Data</a>
+                   href="{{site.refDocsUrlPattern7 | replace: '$', 'pentaho.data'}}">Data</a>
             </dt>
             <dd>Abstractions for data exchange among components, applications and data sources.
                 <ul style="display: none;">
@@ -43,7 +43,7 @@ The APIs are organized as follows:
         <dl>
             <dt>
                 <a title="Pentaho JavaScript Type API" 
-                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.type'}}">Type</a>
+                   href="{{site.refDocsUrlPattern7 | replace: '$', 'pentaho.type'}}">Type</a>
             </dt>
             <dd><em>Types</em> offer out-of-the-box features such as class inheritance, metadata support, 
                 configuration, validation and serialization.
@@ -70,7 +70,7 @@ The APIs are organized as follows:
                         <dl>
                             <dt>
                                 <a title="Pentaho JavaScript Service API" 
-                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.service'}}">Service</a>
+                                   href="{{site.refDocsUrlPattern7 | replace: '$', 'pentaho.service'}}">Service</a>
                             </dt>
                             <dd>Service provider AMD/RequireJS plugin.</dd>
                         </dl>
@@ -79,7 +79,7 @@ The APIs are organized as follows:
                         <dl>
                             <dt>
                                 <a title="Pentaho JavaScript Localization API"
-                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.i18n'}}">Localization</a>
+                                   href="{{site.refDocsUrlPattern7 | replace: '$', 'pentaho.i18n'}}">Localization</a>
                             </dt>
                             <dd>Resource bundle loader AMD/RequireJS plugin.</dd>
                         </dl>
@@ -88,7 +88,7 @@ The APIs are organized as follows:
                         <dl>
                             <dt>
                                 <a title="Pentaho JavaScript Language Support API"
-                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.lang'}}">Language Support</a>
+                                   href="{{site.refDocsUrlPattern7 | replace: '$', 'pentaho.lang'}}">Language Support</a>
                             </dt>
                             <dd>API building blocks for JavaScript.</dd>
                         </dl>
@@ -97,7 +97,7 @@ The APIs are organized as follows:
                         <dl>
                             <dt>
                                 <a title="Pentaho JavaScript Environment API" 
-                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.context'}}">Environment</a>
+                                   href="{{site.refDocsUrlPattern7 | replace: '$', 'pentaho.context'}}">Environment</a>
                             </dt>
                             <dd>Platform environmental information.</dd>
                         </dl>
@@ -106,7 +106,7 @@ The APIs are organized as follows:
                         <dl>
                             <dt>
                                 <a title="Pentaho JavaScript Debugging Control API"
-                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.debug'}}">Debugging</a>
+                                   href="{{site.refDocsUrlPattern7 | replace: '$', 'pentaho.debug'}}">Debugging</a>
                             </dt>
                             <dd>Controls the debugging level of components.</dd>
                         </dl>

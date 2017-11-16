@@ -42,7 +42,7 @@ Create a folder named `css` and, in it, create a file named `view-d3.css`. Add t
 
 Remarks:
   - The CSS rules are scoped with the visualization model's
-    CSS [style class]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#styleClass'}}), 
+    CSS [style class]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.type.Type' | append: '#styleClass'}}), 
     previously specified when defining the model.
 
 ## Loading the CSS file with the view

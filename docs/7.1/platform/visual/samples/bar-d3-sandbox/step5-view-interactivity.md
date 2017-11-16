@@ -8,18 +8,18 @@ layout: 7.1_default
 
 Visualizations can be much more fun and useful if the user is able to interact with them.
 The Visualization API defines two standard types of actions: 
-[execute]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Execute'}}) and
-[select]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select'}}).
+[execute]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.action.Execute'}}) and
+[select]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.action.Select'}}).
 Most container applications handle these in some useful way.
 
 ## On data actions and filters...
 
 Visualization API 
-[data actions]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Data'}}) 
+[data actions]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.action.Data'}}) 
 carry information that _identifies_ the visual element with which the user interacted 
 in terms of the subset of data that it visually represents.
 This is conveyed in their
-[dataFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Data' | append: '#dataFilter'}})
+[dataFilter]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.action.Data' | append: '#dataFilter'}})
 property.
 
 In this visualization, 
@@ -81,7 +81,7 @@ function() {
 ```
 
 Remarks:
-  - An [isEqual]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.filter.IsEqual'}}) 
+  - An [isEqual]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.type.filter.IsEqual'}}) 
     filter is being created; `=` is the alias of the filter type. 
   - The action is being dispatched through the view, where action listeners can handle it. 
 
@@ -106,7 +106,7 @@ Remarks:
   - Actions emit _structured_ events, composed of multiple phases; you're handling its `do` phase.
   - Action listener functions receive the action as argument.
   - The filter's 
-    [contentKey]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.filter.Abstract' | append: '#contentKey'}})
+    [contentKey]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.type.filter.Abstract' | append: '#contentKey'}})
     property provides an easy way to get a human-readable description of a filter.
 
 What are you waiting for? 
@@ -117,13 +117,13 @@ Refresh the `index.html` page in the browser, and double-click a bar!
 The `select` action is an _auxiliary_ action.
 Its goal is to mark a subset of data on which, later, a _real_ action, such as drilling-down, is performed.
 The current set of selected data is stored in the view's 
-[selectionFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#selectionFilter'}})
+[selectionFilter]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.base.View' | append: '#selectionFilter'}})
 property.
 For each `select` action that is performed, 
-its [dataFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Data' | append: '#dataFilter'}}), 
+its [dataFilter]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.action.Data' | append: '#dataFilter'}}), 
 may be removed from, be added to, replace or toggled in the view's current `selectionFilter`, 
 according to the action's 
-[selectionMode]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select' | append: '#selectionMode'}}).
+[selectionMode]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.action.Select' | append: '#selectionMode'}}).
 
 Visualizations typically highlight visual elements that represent data that is selected.
 Container applications typically expose actions, from which the user can choose,
@@ -177,7 +177,7 @@ function() {
 
 Remarks:
   - Each time a bar is clicked, the current view's `selectionFilter` will be 
-    [replaced]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action' | append: '#.SelectionModes'}})
+    [replaced]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.action' | append: '#.SelectionModes'}})
     with the data filter associated with the clicked bar.
 
 ### Handle the `select` action event
@@ -206,7 +206,7 @@ view.on("pentaho/visual/action/select", {
 Remarks:
   - You're handling the `finally` phase of the `select` action, the last phase, that is called whatever happens.
   - The `select` action's 
-    [default action]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select' | append: '#_doDefault'}})
+    [default action]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.action.Select' | append: '#_doDefault'}})
     automatically processes the action's `dataFilter` and `selectionMode` and applies it to the view's
     `selectionFilter`. Alternatively, you could show the content's of the view's `selectionFilter` property.
 

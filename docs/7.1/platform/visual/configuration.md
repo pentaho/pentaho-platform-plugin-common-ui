@@ -13,19 +13,19 @@ If not, you should first read [Configuration API](../configuration) and
 [Creating a visualization](./#creating-a-visualization).
 
 Visualizations are constituted by one 
-[`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) 
+[`Model`]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.base.Model'}}) 
 type and (at least) one 
-[`View`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}})
+[`View`]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.base.View'}})
 type,
 any of which is a 
-[Type API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type'}}) complex type 
+[Type API]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.type'}}) complex type 
 that can be configured.
 
 Section [Identifiers of Stock Visualizations](#identifiers-of-stock-visualizations) contains the list
 of identifiers of stock `Model` and `View` types.
 
 The following sections show examples of typical `Model` and `View` configurations.
-A single [IRule]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule'}}) object 
+A single [IRule]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.config.spec.IRule'}}) object 
 is provided in each example, 
 but it should be interpreted as being part of the following generic configuration module:
 
@@ -45,7 +45,7 @@ define(function() {
 ### Hiding a visualization from an application's visualization list
 
 The following rule configures the 
-[isBrowsable]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#isBrowsable'}}) 
+[isBrowsable]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.type.Type' | append: '#isBrowsable'}}) 
 type attribute to hide the stock _Pie_ visualization (and any visualizations that derive from it) 
 from the [Analyzer](http://www.pentaho.com/product/business-visualization-analytics) application's
 visualizations menu, effectively preventing the user from creating new visualizations of this type:
@@ -118,7 +118,7 @@ var ruleSpec = {
 ### Changing the name of a visualization, as shown in the menu of an application
 
 The following rule changes the 
-[label]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#label'}})
+[label]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.type.Type' | append: '#label'}})
 type attribute of the _Bar_ stock visualization, 
 affecting how it is displayed in the visualizations menu of the Analyzer and 
 [PDI](http://www.pentaho.com/product/data-integration) applications:
@@ -139,13 +139,13 @@ var ruleSpec = {
 ```
 
 Note that it is a best practice to load localizable text from a resource bundle. 
-See [pentaho/i18n]({{site.refDocsUrlPattern | replace: '$', 'pentaho.i18n'}}).
+See [pentaho/i18n]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.i18n'}}).
 
 ## Examples of typical View configurations
 
 Note that view configuration is typically tied to the technology with which views are built.
 The 
-[View.Type#extension]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View.Type' | append: '#extension'}})
+[View.Type#extension]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.base.View.Type' | append: '#extension'}})
 type attribute exists to satisfy the pass-through of such options of the underlying technology.
 You should consult the view type documentation to find out about which extension properties it supports.
 

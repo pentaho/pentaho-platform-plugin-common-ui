@@ -10,7 +10,7 @@ This walk-through will guide you through the development of a simple Bar chart v
 using the Pentaho Visualization API and the amazing [D3](https://d3js.org/) graphics library.
  
 The complete code of this sample is available at 
-[pentaho/pentaho-engineering-samples]({{site.platformSamplesBaseUrl | append: "javascript-apis/platform/pentaho/visual/samples/bar-d3-sandbox"}}).
+[pentaho/pentaho-engineering-samples]({{site.platformSamplesBaseUrl7 | append: "javascript-apis/platform/pentaho/visual/samples/bar-d3-sandbox"}}).
 
 ## Prerequisites
 

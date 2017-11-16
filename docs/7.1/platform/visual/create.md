@@ -38,8 +38,8 @@ The D3 library dependency, is declared similarly to how it was declared.
 
 Your visualization must be advertised to the platform so that applications like Analyzer and PDI can offer it to users.
 This is done by registering 
-the visualization's [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) module
-with [`pentaho/service`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.service'}}),
+the visualization's [`Model`]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.base.Model'}}) module
+with [`pentaho/service`]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.service'}}),
 as a service of type `pentaho/visual/base`.
 
 The default configuration module that you developed also needs to be advertised to the configuration system,
