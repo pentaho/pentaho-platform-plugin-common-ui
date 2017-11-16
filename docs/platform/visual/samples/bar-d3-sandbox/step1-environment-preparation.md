@@ -19,7 +19,7 @@ git clone https://github.com/pentaho/pentaho-engineering-samples
 
 # Go to the complete sample's directory.
 cd pentaho-engineering-samples
-cd Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/bar-d3-sandbox
+cd Samples_for_Extending_Pentaho/javascript-apis/platform/visual-samples-bar-d3
 
 # Install the dependencies.
 npm install
@@ -39,7 +39,7 @@ npm install
 
     # Add and install the Visualization API dev dependency.
     # (the runtime dependency is provided by the platform)
-    npm install https://github.com/pentaho/pentaho-platform-plugin-common-ui/releases/download/v3.0.0-beta/pentaho-viz-api-v3.0.0.tgz --save-dev
+    npm install https://github.com/pentaho/pentaho-platform-plugin-common-ui/releases/download/v3.0.0-beta2/pentaho-viz-api-v3.0.0.tgz --save-dev
 
     # Copy the sandbox files.
     ./node_modules/@pentaho/viz-api/init-sandbox

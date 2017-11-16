@@ -72,7 +72,7 @@ git clone https://github.com/pentaho/pentaho-engineering-samples
 
 # Go to the sample's directory.
 cd pentaho-engineering-samples
-cd Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/bar-d3-sandbox
+cd Samples_for_Extending_Pentaho/javascript-apis/platform/visual-samples-bar-d3
 
 # Install the dependencies.
 npm install
@@ -107,7 +107,7 @@ as well as be able to use it in a [CDE](http://community.pentaho.com/ctools/cde/
    You can get the following dashboard from the
    `https://github.com/pentaho/pentaho-engineering-samples` repository,
    at the location:
-   `Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/bar-d3-cde`.
+   `Samples_for_Extending_Pentaho/javascript-apis/platform/visual-samples-bar-d3-cde`.
    
    <img src="img/sample-bar-d3-cde.png" alt="Bar/D3 in CDE" style="width: 777px;">
 
