@@ -2,7 +2,7 @@
 title: Create a Pentaho Web Project for a Web Package and its Dependencies
 description: Explains the core concepts and walks through the creation of a KAR file for deploying a web package and its dependencies in the Pentaho Platform.
 parent-title: ""
-layout: default
+layout: 7.1_default
 ---
 
 The Pentaho platform is built on top of an [OSGi](https://www.osgi.org/) container 

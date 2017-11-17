@@ -1,16 +1,17 @@
 ---
 title: Configuration API
-description: The Configuration API provides a means for types to be configured by third-parties.
-parent-title: ""
+description: The Configuration API provides a means for types and instances to be configured by third-parties.
 layout: default
 ---
 
 The 
 [Configuration API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config'}}) 
-provides a means for _types_ to be configured by third-parties.
+provides a means for _types_ and _instances_ to be configured by third-parties.
 
 **Types** are known by their _string_ identifier and are, for all other purposes, opaque entities
 — these may or may not exist as actual JavaScript classes; these may simply represent an interface type.
+In the same manner, **instances** are known only by their _string_ identifier
+— it may or may not exist as an actual JavaScript variable or module.
 
 **Configurations** are JavaScript objects that conform to the 
 [`pentaho.config.spec.IRuleSet`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRuleSet'}}) interface
@@ -19,26 +20,28 @@ provides a means for _types_ to be configured by third-parties.
 Typically, 
 configurations are provided as the value returned by an AMD/RequireJS module.
 This module needs to be advertised to the configuration system by registering it
-with [`pentaho/service`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.service'}}),
-as a service of type [`pentaho.config.spec.IRuleSet`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRuleSet'}}).
+with [`pentaho/instanceInfo`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.instanceInfo'}}),
+as an instance of type [`pentaho.config.spec.IRuleSet`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRuleSet'}}).
 
 **Configuration Rules** are composed of the following parts:
 
 1. The [**select**]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule#select'}}) object
-   specifies the targeted _type_ (or _types_) and the values of any 
-   [Pentaho environment variables]({{site.refDocsUrlPattern | replace: '$', 'pentaho.context.IContext'}})
+   specifies the targeted _type_ (or _types_), or _instance_ (or _instances_), 
+   and the values of any 
+   [Pentaho environment variables]({{site.refDocsUrlPattern | replace: '$', 'pentaho.environment.IEnvironment'}})
    to which it applies. Alternative values for a variable can be specified using a JavaScript array. 
    The most useful environment variable is 
-   [application]({{site.refDocsUrlPattern | replace: '$', 'pentaho.context.IContext#application'}}),
-   as it allows creating rules that are only applied when a _type_ is being used by a certain _application_,
-   like, for example, 
+   [application]({{site.refDocsUrlPattern | replace: '$', 'pentaho.environment.IEnvironment#application'}}),
+   as it allows creating rules that are only applied when a _type_ or _instance_ is being used by 
+   a certain _application_, like, for example, 
    [CDF](http://community.pentaho.com/ctools/cdf/) or 
    [Analyzer](http://www.pentaho.com/product/business-visualization-analytics).
    See also [Known Values of Pentaho Environment Variables](#known-values-of-pentaho-environment-variables).
    
 2. The [**apply**]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule#apply'}}) object
    specifies the actual configuration properties and their values.
-   You will need to consult the reference documentation of the target _type_ to know the list of available properties.
+   You will need to consult the reference documentation of the target _type_ or _instance_ to know 
+   the list of available properties.
    For example, the [Visualization API](visual)'s 
    [Model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) type,
    being a [Complex]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex'}}) type,
@@ -46,7 +49,7 @@ as a service of type [`pentaho.config.spec.IRuleSet`]({{site.refDocsUrlPattern |
    [IComplexTypeProto]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.spec.IComplexTypeProto'}}) interface.
 
 3. The [**priority**]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule#priority'}}) 
-   allows fine-tuning the order by which rules that target the same _type_ are merged.
+   allows fine-tuning the order by which rules that target the same _type_ or _instance_ are merged.
    Higher values have higher priority. It is optional and defaults to `0`.
 
 See 
@@ -65,6 +68,13 @@ and specifies the value of its `tireSize` and `exteriorColor` properties.
 2. The second rule, has a higher-than-default _priority_, targets the _type_ `my.ICandy`,
 whatever the _application_ using it,
 and specifies the value of its `cocoaPercentage` and `fillingFlavour` properties.
+
+3. The third rule targets the _instance_ `my.friend.john1`,
+whatever the _application_ using it,
+and specifies the value of its `empathyFactor` property. 
+Note the use of a different property,
+[**instance**]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRuleSelector#instance'}}),
+to identify the rule's target.
 
 ```js
 define(function() {
@@ -96,12 +106,21 @@ define(function() {
           cocoaPercentage: 0.9,
           fillingFlavour: "orange"
         }
+      },
+      
+      // IRule 3
+      {
+        select: {
+          instance: "my.friend.john1"
+        },
+        apply: {
+          empathyFactor: 0.6
+        }
       }
     ]
   }
 });
 ```
-
 
 ## Global Configuration File
 
@@ -130,14 +149,15 @@ Component authors may also wish to provide a default configuration beside the co
 included and registered in the same [Pentaho Web Package](web-package). 
 
 
-## Known Values of Pentaho Environment Variables
+## Known Values of Pentaho Platform Environment Variables
 ### `application`
 
-| Description | Value              |
-|-------------|--------------------|
-| CDF         | `pentaho-cdf`      |
-| Analyzer    | `pentaho-analyzer` |
-| PDI         | `pentaho-det`      |
+| Description             | Value                |
+|-------------------------|----------------------|
+| CDF                     | `pentaho-cdf`        |
+| Analyzer                | `pentaho-analyzer`   |
+| Analyzer in Dashboards  | `pentaho-dashboards` |
+| PDI                     | `pentaho-det`        |
 
 ### `theme`
 
@@ -145,6 +165,7 @@ included and registered in the same [Pentaho Web Package](web-package).
 |-------------|
 |`saphire`    |
 |`crystal`    |
+|`ruby`       |
 
 ### `locale`
 

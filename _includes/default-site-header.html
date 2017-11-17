@@ -1,6 +1,27 @@
-  <header class="site-header">
-    <a class="logo" href="{{ '/' | relative_url }}">
-      <img src="{{ '/assets/img/logo.svg' | relative_url }}" alt="Pentaho" onerror="this.src='http://www.pentaho.com/sites/all/themes/pentaho_resp/logo.svg';">
-    </a>
-    <h1><a href="{{ '/' | relative_url }}">{{ site.titleHtml | default: site.github.repository_name }}</a></h1>
-  </header>
+<a class="elm-skip-link" href="#main-content" tabindex="1" title="Press enter to skip to the main content">Skip to main content</a>
+
+<header class="elm-header">
+  <div class="elm-header-custom">
+    <div class="elm-nav-container">
+      <div class="primary-branding-bar">
+        <a class="internal" href="{{ '/' | relative_url }}" rel="internal">
+          <img class="mt-cdn" src="{{ '/assets/img/logo.png' | relative_url }}" alt="Hitachi - Inspire the Next">
+        </a>
+        <ul class="hidden">
+          <li>
+            <a target="_blank" href="http://www.pentaho.com/" rel="external nofollow" class="external">Pentaho.com</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://support.pentaho.com/" rel="external nofollow" class="link-https">Support</a>
+          </li>
+        </ul>
+      </div>
+      <div class="secondary-branding-bar">
+        <div class="brand-names">
+          <a target="_blank" href="https://www.hitachivantara.com" rel="external nofollow" class="company-name link-https">Hitachi Vantara</a>
+          <a class="product-name internal" href="{{ '/' | relative_url }}" rel="internal">{{ site.titleHtml | default: site.github.repository_name }}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
