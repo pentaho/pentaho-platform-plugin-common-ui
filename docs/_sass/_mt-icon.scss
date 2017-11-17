@@ -1,0 +1,44 @@
+@font-face {
+  font-family: icomoon;
+  font-style: normal;
+  font-weight: 400;
+  src: url(../img/icomoon.eot);
+  src: url(../img/icomoon.eot?#iefix) format('embedded-opentype'),url(../img/icomoon.woff2) format('woff2'),url(../img/icomoon.woff) format('woff'),url(../img/icomoon.ttf) format('truetype'),url(../img/icomoon.svg#icomoon) format('svg')
+}
+
+[class*=' mt-icon-']:after,[class*=' mt-icon-']:before,[class*=' mt-icon-tab']:after,[class*=' mt-icon-tab']:before,[class^=mt-icon-]:after,[class^=mt-icon-]:before,[class^=mt-icon-tab]:after,[class^=mt-icon-tab]:before {
+  font-family: icomoon;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 400;
+  line-height: 1;
+  speak: none;
+  text-decoration: none;
+  text-transform: none
+}
+
+.mt-icon-article-category:before,.mt-icon-article-topic-category:before {
+  content: '\e62a'
+}
+
+.mt-icon-article-home:before {
+  content: '\e835'
+}
+
+.mt-icon-linkedin3:before {
+  content: '\e914'
+}
+
+.mt-icon-facebook3:before {
+  content: '\e76c'
+}
+
+.mt-icon-twitter3:before {
+  content: '\e770'
+}
+
+.mt-icon-feed4:before {
+  content: '\e773'
+}

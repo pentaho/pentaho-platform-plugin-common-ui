@@ -3,6 +3,10 @@ title: Step 4 - Styling the view
 description: Walks you through the styling of the Bar visualization view.
 parent-path: .
 parent-title: Bar/D3 Visualization in Sandbox
+grand-parent-title: Create a Custom Visualization
+grand-parent-path: ../../create
+grand-grand-parent-title: Visualization API
+grand-grand-parent-path: ../..
 layout: default
 ---
 
@@ -14,25 +18,25 @@ Let's then give some love to the Bar chart by styling these elements with CSS.
 Create a folder named `css` and, in it, create a file named `view-d3.css`. Add the following content to it:
 
 ```css
-.pentaho-visual-samples-bar .bar {
-  fill: #007297;
+.pentaho-visual-samples-bar-d3 .bar {
+  stroke-width: 2px;
 }
 
-.pentaho-visual-samples-bar .bar:hover {
-  fill: #1973bc;
+.pentaho-visual-samples-bar-d3 .bar:hover {
+  fill-opacity: 0.8;
 }
 
-.pentaho-visual-samples-bar .axis path,
-.pentaho-visual-samples-bar .tick line {
+.pentaho-visual-samples-bar-d3 .axis path,
+.pentaho-visual-samples-bar-d3 .tick line {
   stroke: #cbdde8;
 }
 
-.pentaho-visual-samples-bar .tick text {
+.pentaho-visual-samples-bar-d3 .tick text {
   font-family: OpenSansLight, Helvetica, Arial, Sans serif;
   fill: #26363d;
 }
 
-.pentaho-visual-samples-bar .title {
+.pentaho-visual-samples-bar-d3 .title {
   font-family: OpenSansLight, Helvetica, Arial, Sans serif;
   font-size: 18px;
   font-style: normal;
@@ -52,14 +56,15 @@ Modify the AMD module declaration of the `view-d3.js` file to the following:
 
 ```js
 define([
+  "module",
   "d3",
   "css!./css/view-d3"
-], function(d3) {
+], function(module, d3) {
 
   // ...
 });
 ```
 
-Now, refresh the `index.html` page in the browser, and you should see a more colorful Bar chart!
+Now, refresh the `sandbox.html` page in the browser, and you should see a better styled title and hover effects on the bars!
 
-**Continue** to [Adding interactivity to the view](step5-view-interactivity).
+**Continue** to [Model styling for applications](step5-model-styling).

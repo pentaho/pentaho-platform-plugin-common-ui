@@ -317,7 +317,7 @@ define([
         /**
          * The label of the action instance.
          *
-         * @type {__nonEmptyString}
+         * @type {nonEmptyString}
          * @private
          */
         this.__label = __nonEmptyString(spec && spec.label);
@@ -325,7 +325,7 @@ define([
         /**
          * The description of the action instance.
          *
-         * @type {!__nonEmptyString}
+         * @type {!nonEmptyString}
          * @private
          */
         this.__description = __nonEmptyString(spec && spec.description);
@@ -353,7 +353,7 @@ define([
        *
        * Can only be set while the action is in an [editable]{@link pentaho.type.action.Base#isEditable} state.
        *
-       * @type {__nonEmptyString}
+       * @type {nonEmptyString}
        * @throws {pentaho.lang.OperationInvalidError} When set and the action is not in an editable state.
        */
       get label() {
@@ -374,7 +374,7 @@ define([
        *
        * Can only be set while the action is in an [editable]{@link pentaho.type.action.Base#isEditable} state.
        *
-       * @type {__nonEmptyString}
+       * @type {nonEmptyString}
        * @throws {pentaho.lang.OperationInvalidError} When set and the action is not in an editable state.
        */
       get description() {
