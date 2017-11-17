@@ -43,24 +43,24 @@ In the `css` folder, create a file named `model.css`. Add the following content 
 /* -- Analyzer -- */
 
 /* Canvas placeholder image */
-.pentaho-visual-samples-bar.component-icon-landscape {
+.pentaho-visual-samples-bar-d3.component-icon-landscape {
   background-image: url("./images/analyzer-bar-d3-placeholder.png");
 }
 
 /* -- PDI -- */
 
 /* Viz Type Selector - Selected Viz Button */
-.pentaho-visual-samples-bar.visualization-switcher-button-icon {
+.pentaho-visual-samples-bar-d3.visualization-switcher-button-icon {
   background-image: url("./images/pdi-bar-d3-button.svg");
 }
 
 /* Viz Type Selector - Drop-down icons */
-.visualization-selector .pentaho-visual-samples-bar.component-icon-sprite {
+.visualization-selector .pentaho-visual-samples-bar-d3.component-icon-sprite {
   background-image: url("./images/pdi-bar-d3-sprite.svg");
 }
 
 /* Canvas placeholder image */
-.pentaho-visual-samples-bar .canvas.message .icon {
+.pentaho-visual-samples-bar-d3 .canvas.message .icon {
   background-image: url("images/pdi-bar-d3-placeholder.svg");
 }
 ```

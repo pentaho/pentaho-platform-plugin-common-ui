@@ -126,12 +126,12 @@ Also, note the use of the new visual base model identifier.
 
 ```json
 { 
-  "name": "pentaho-visual-samples-bar",
+  "name": "pentaho-visual-samples-bar-d3",
   "version": "0.0.1",
   "config": {
     "pentaho/service": {
-      "pentaho-visual-samples-bar_0.0.1/model": "pentaho/visual/base",
-      "pentaho-visual-samples-bar_0.0.1/config": "pentaho.config.spec.IRuleSet"
+      "pentaho-visual-samples-bar-d3_0.0.1/model": "pentaho/visual/base",
+      "pentaho-visual-samples-bar-d3_0.0.1/config": "pentaho.config.spec.IRuleSet"
     }
   }
 }
@@ -141,14 +141,14 @@ Also, note the use of the new visual base model identifier.
 
 ```json
 { 
-  "name": "pentaho-visual-samples-bar",
+  "name": "pentaho-visual-samples-bar-d3",
   "version": "0.0.1",
   "config": {
     "pentaho/typeInfo": {
-      "pentaho-visual-samples-bar_0.0.1/model": {"base": "pentaho/visual/base/model"}
+      "pentaho-visual-samples-bar-d3/model": {"base": "pentaho/visual/base/model"}
     },
     "pentaho/instanceInfo": {
-      "pentaho-visual-samples-bar_0.0.1/config": {"type": "pentaho.config.spec.IRuleSet"}
+      "pentaho-visual-samples-bar-d3/config": {"type": "pentaho.config.spec.IRuleSet"}
     }
   }
 }

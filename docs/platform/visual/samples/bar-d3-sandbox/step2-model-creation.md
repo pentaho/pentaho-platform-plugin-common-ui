@@ -42,7 +42,7 @@ define([
         id: module.id,
 
         // CSS class
-        styleClass: "pentaho-visual-samples-bar",
+        styleClass: "pentaho-visual-samples-bar-d3",
 
         // The label may show up in menus
         label: "D3 Bar Chart",

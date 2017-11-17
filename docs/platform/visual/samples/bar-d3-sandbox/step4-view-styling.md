@@ -18,25 +18,25 @@ Let's then give some love to the Bar chart by styling these elements with CSS.
 Create a folder named `css` and, in it, create a file named `view-d3.css`. Add the following content to it:
 
 ```css
-.pentaho-visual-samples-bar .bar {
+.pentaho-visual-samples-bar-d3 .bar {
   stroke-width: 2px;
 }
 
-.pentaho-visual-samples-bar .bar:hover {
+.pentaho-visual-samples-bar-d3 .bar:hover {
   fill-opacity: 0.8;
 }
 
-.pentaho-visual-samples-bar .axis path,
-.pentaho-visual-samples-bar .tick line {
+.pentaho-visual-samples-bar-d3 .axis path,
+.pentaho-visual-samples-bar-d3 .tick line {
   stroke: #cbdde8;
 }
 
-.pentaho-visual-samples-bar .tick text {
+.pentaho-visual-samples-bar-d3 .tick text {
   font-family: OpenSansLight, Helvetica, Arial, Sans serif;
   fill: #26363d;
 }
 
-.pentaho-visual-samples-bar .title {
+.pentaho-visual-samples-bar-d3 .title {
   font-family: OpenSansLight, Helvetica, Arial, Sans serif;
   font-size: 18px;
   font-style: normal;

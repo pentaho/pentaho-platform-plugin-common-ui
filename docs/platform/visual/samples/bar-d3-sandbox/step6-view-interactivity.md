@@ -228,12 +228,12 @@ It would be much nicer if bars where highlighted with a different color when sel
 Edit the `view-d3.css` file. Append the following rules to it:
 
 ```css
-.pentaho-visual-samples-bar .bar.selected {
+.pentaho-visual-samples-bar-d3 .bar.selected {
   stroke-opacity: 0.4;
   fill-opacity: 0.6;
 }
 
-.pentaho-visual-samples-bar .bar.selected:hover {
+.pentaho-visual-samples-bar-d3 .bar.selected:hover {
   stroke-opacity: 0.8;
 }
 ```
