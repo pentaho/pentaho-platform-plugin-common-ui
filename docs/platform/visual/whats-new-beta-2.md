@@ -9,7 +9,7 @@ Be sure to also read [What's new and changed in the Platform JavaScript APIs bet
 
 ## New and changed features
 
-### Color Palettes {{site.starNew}}
+### Color Palettes{{site.starNew}}
 
 The Visualization API beta 1 did not offer visualizations a serious and standard way to 
 represent the color palettes of color scales. 

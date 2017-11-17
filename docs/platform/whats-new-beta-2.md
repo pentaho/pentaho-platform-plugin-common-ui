@@ -19,8 +19,8 @@ layout: default
 
 2. Services are no longer registered with 
    [pentaho/service]({{site.refDocsUrlPattern | replace: '$', 'pentaho/service'}}) but instead with
-   one of the {{site.starNew}}[pentaho/instanceInfo]({{site.refDocsUrlPattern | replace: '$', 'pentaho.instanceInfo'}}) or 
-   {{site.starNew}}[pentaho/typeInfo]({{site.refDocsUrlPattern | replace: '$', 'pentaho.typeInfo'}}) modules,
+   one of the [pentaho/instanceInfo]({{site.refDocsUrlPattern | replace: '$', 'pentaho.instanceInfo'}}){{site.starNew}} or 
+   [pentaho/typeInfo]({{site.refDocsUrlPattern | replace: '$', 'pentaho.typeInfo'}}){{site.starNew}} modules,
    depending on whether the registered module provides an _instance_ or a _type_, respectively.
    `pentaho/service` is still used as an AMD loader plugin to obtain registered instances of a given type.
 
@@ -30,8 +30,8 @@ layout: default
 1. Filter types have moved from `pentaho/type/filter` to 
    [pentaho/data/filter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.filter'}}).
 
-2. {{site.starNew}}New property filter types
-   (e.g. {{site.starNew}}[pentaho/data/filter/isLess]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.filter.IsLess'}})).
+2. New property filter types
+   (e.g. [pentaho/data/filter/isLess]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.filter.IsLess'}})).{{site.starNew}}
 
 
 ### Type API
@@ -68,13 +68,16 @@ layout: default
    });
    ```
    
-3. To avoid generating configuration files having functions, possibly with AMD dependencies on other modules, 
-   it is now possible to apply {{site.starNew}}[mixins]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type#mixins'}})
-   to Type API types, through configuration.
-   This allows configurations constituted by non-trivial code to be moved to a separate module which is only loaded
+3. It is now possible to apply [mixins]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type#mixins'}})
+   to Type API types, through configuration.{{site.starNew}}
+   
+   This is to avoid generating configuration files having functions, possibly with AMD dependencies on other modules. 
+   Any non-trivial code can be moved to a separate module which is only loaded
    if and when the target type is actually used. This also makes it easier to test configuration code.
 
-4. The Type API now supports {{site.starNew}}_instance_ modules, the _instances_ dual of _type modules_.
+4. The Type API now supports _instance modules_.{{site.starNew}}
+
+   Instance modules are _instances_ dual of _type modules_.
    Just like types, instances also support configuration.
    The following illustrates a color palette instance:
    
@@ -96,8 +99,9 @@ layout: default
    ```
 
 5. The [defaultValue]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type#defaultValue'}}) 
-   attribute of a complex type property can now be a {{site.starNew}}function which is evaluated 
-   when the complex is constructed and whenever the property is set to `null`.
+   attribute of a complex type property can now be a function.{{site.starNew}}
+   
+   The function is evaluated when the complex is constructed and whenever the property is set to `null`.
    Due to this, default values of properties having a `valueType` of `function` 
    now need to wrap the value in an auxiliary function.
 
@@ -136,7 +140,8 @@ layout: default
    the [domain]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type#domain'}})
    attribute can be used to dynamically filter the domain of an enumeration type.
    
-9. {{site.starNew}}Load tolerance to failure of individual types. 
+9. Load tolerance to failure of individual types.{{site.starNew}}
+ 
    When all of the subtypes of a given base type are requested and loaded, 
    and one of the subtypes fails to load, the whole operation still succeeds.
    This happens, for example, when loading all registered Visualization API models,
