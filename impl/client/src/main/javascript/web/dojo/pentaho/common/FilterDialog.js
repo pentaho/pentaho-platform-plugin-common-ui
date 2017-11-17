@@ -426,7 +426,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
       str.replace(/&amp;/g, '&');
     }
     return str;
-  }
+  },
 
   _picklistAddSelected: function() {
     array.forEach(this.picklistAvailableValues.getSelected(), function(option) {
