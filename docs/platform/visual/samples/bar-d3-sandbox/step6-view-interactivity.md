@@ -260,12 +260,13 @@ function() {
 Refresh the `sandbox.html` page in the browser, and click a bar!
 You should see the selected bar exhibiting different colors.
 
-## Conflicting Click and Double-click events
-
-You might have noticed that, when double-clicking, apart from the `dblclick` event, 
-two other `click` events are being triggered. 
-This is a known issue of DOM events and there are multiple solutions to it.
-Here's one solution, specifically for D3:
-[Distinguishing click and double-click in D3](http://bl.ocks.org/ropeladder/83915942ac42f17c087a82001418f2ee).
+{% include callout.html content='
+<h2 id="conflicting-click-and-double-click-events">Conflicting Click and Double-click events</h2>
+<p>You might have noticed that when double-clicking, apart from the <code class="highlighter-rouge">dblclick</code> event, 
+two other <code class="highlighter-rouge">click</code> events are being triggered. 
+This is a known issue of DOM events and there are multiple workarounds.</p>
+<p>Check the code at the sample repository for a possible solution, based on
+<a href="http://bl.ocks.org/ropeladder/83915942ac42f17c087a82001418f2ee" target="_black">Distinguishing click and double-click in D3</a>.</p>
+' type="warning" %}
 
 **Continue** to [Adding a default configuration](step7-default-configuration).

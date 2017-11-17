@@ -4,13 +4,15 @@ description: Describes the new and changed features in the beta 2 of the Platfor
 layout: default
 ---
 
-## All Platform JavaScript APIs
+## Platform JavaScript APIs
+
+### Global changes
 
 1. All class members documented as private are now consistently named, by having a `__` prefix.
    Likewise, all protected class members now have a `_` prefix.
 
 
-## Core APIs
+### Core APIs
 
 1. The `pentaho/context` module has been renamed to 
    [pentaho/environment]({{site.refDocsUrlPattern | replace: '$', 'pentaho.environment'}}).
@@ -23,7 +25,7 @@ layout: default
    `pentaho/service` is still used as an AMD loader plugin to obtain registered instances of a given type.
 
 
-## Data API
+### Data API
 
 1. Filter types have moved from `pentaho/type/filter` to 
    [pentaho/data/filter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.filter'}}).
@@ -32,7 +34,7 @@ layout: default
    (e.g. {{site.starNew}}[pentaho/data/filter/isLess]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.filter.IsLess'}})).
 
 
-## Type API
+### Type API
 
 1. Some class members were _renamed_ to improve readability and/or reduce clashing likelihood:
 
@@ -141,6 +143,18 @@ layout: default
    to display in the menu of an application.
 
 
-## Visualization API
+### Visualization API
 
-See [What's new and changed in the Visualization API beta 2](./visual/whats-new-beta-2).
+See [What's new and changed in the Visualization API beta 2]({{ "/platform/visual/whats-new-beta-2" | relative_url }}).
+
+
+## Pentaho Web Platform
+
+### Pentaho Web Package deployer
+
+The {{site.starNew}}Pentaho Web Package deployer allows to easily deploy web resources in the Pentaho Platform,
+without the need to build a OSGi bundle JAR file.
+
+Previously you needed to setup a Maven project, deal with assemblies, KAR files, etc. With Pentaho 8.0
+you can simply create an archive with your files and directly deploy it. Check [OSGi Artifacts Deployment]({{ "/platform/osgi-deployment" | relative_url }})
+for more information.

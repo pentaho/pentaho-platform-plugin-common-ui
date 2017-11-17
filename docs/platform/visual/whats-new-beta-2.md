@@ -120,7 +120,10 @@ common visualization written for beta 1.
 ### Convert the `package.json` file
    
 Change `pentaho/service` registrations to `pentaho/typeInfo` or `pentaho/instanceInfo` registrations.
-Also, note the use of the new visual base model identifier.
+Note the use of the new visual base model identifier.
+
+Also, you no longer need to use the complete final module identifier 
+(<code>"pentaho-visual-samples-bar-d3_0.0.1"</code>).
 
 **Before**
 
