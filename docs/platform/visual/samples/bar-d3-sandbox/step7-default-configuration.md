@@ -99,4 +99,43 @@ Note the modified `config` property.
 Now, refresh the `sandbox.html` page in the browser, and you should see a Bar chart with wider bars.
 Go ahead and experiment with different values.
 
+## Analyzer Integration
+
+In [Analyzer](http://www.pentaho.com/product/business-visualization-analytics), 
+when drilling-down, the default behaviour is to _add_ the child attribute to the visual role 
+where the parent attribute is.
+However, the _Category_ visual role of the Bar visualization you developed only accepts a single attribute 
+being mapped to it. This results in Analyzer not allowing to drill-down.
+
+However, it is possible to configure the Analyzer-specific metadata property, 
+`application.keepLevelOnDrilldown` to force replacing the
+parent attribute with the child attribute when drilling-down.
+Add the following rule to the `config.js` file:
+
+```js
+define(["module"], function(module) {
+  // ...
+  return {
+    rules: [
+      // ..,
+      {
+        priority: -1,
+        select: {
+          type: vizId,
+          application: "pentaho-analyzer"
+        },
+        apply: {
+          application: {
+            keepLevelOnDrilldown: false
+          }
+        }
+      }
+    ]
+  };
+});
+```
+
+Again, note that this rule has no effect when testing your visualization in the sandbox environment, 
+but is important if you package your visualization for deployment.
+
 **Continue** to [Next steps](stepNext).
