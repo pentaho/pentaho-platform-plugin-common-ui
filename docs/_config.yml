@@ -32,7 +32,7 @@ safe: true
 refDocsUrlPattern: https://help.pentaho.com/Documentation/8.0/Developer_Center/JavaScript_API/platform/$
 refDocsUrlPattern7: https://help.pentaho.com/Documentation/7.1/0R0/070/javascript-apis/platform/$
 
-starNew: '<span style="font-size: 55%; vertical-align: middle;">⭐</span>'
+starNew: '<sup>&thinsp;⭐</sup>'
 
 # Base URL for Platform samples:
 platformSamplesBaseUrl: https://github.com/pentaho/pentaho-engineering-samples/tree/master/Samples_for_Extending_Pentaho/

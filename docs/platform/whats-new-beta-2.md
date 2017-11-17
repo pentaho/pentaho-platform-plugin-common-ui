@@ -155,9 +155,9 @@ See [What's new and changed in the Visualization API beta 2]({{ "/platform/visua
 
 ## Pentaho Web Platform
 
-### Pentaho Web Package deployer
+### Pentaho Web Package deployer{{site.starNew}}
 
-The {{site.starNew}}Pentaho Web Package deployer allows to easily deploy web resources in the Pentaho Platform,
+The Pentaho Web Package deployer allows to easily deploy web resources in the Pentaho Platform,
 without the need to build a OSGi bundle JAR file.
 
 Previously you needed to setup a Maven project, deal with assemblies, KAR files, etc. With Pentaho 8.0
