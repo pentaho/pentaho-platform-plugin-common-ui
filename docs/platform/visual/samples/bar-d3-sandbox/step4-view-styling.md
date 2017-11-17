@@ -67,4 +67,4 @@ define([
 
 Now, refresh the `sandbox.html` page in the browser, and you should see a better styled title and hover effects on the bars!
 
-**Continue** to [Adding interactivity to the view](step5-view-interactivity).
+**Continue** to [Model styling for applications](step5-model-styling).

@@ -90,15 +90,19 @@ See [OSGi Artifacts Deployment](../osgi-deployment) if you need more information
 If everything went well, you should now see your visualization being offered in Analyzer and PDI, 
 as well as be able to use it in a [CDE](http://community.pentaho.com/ctools/cde/) dashboard:
 
-1. Your Bar/D3 visualization in Analyzer:
+1. Your Bar/D3 visualization in Analyzer, showing off the menu and placeholder icon:
+   
+   <img src="img/sample-bar-d3-analyzer-placeholder-styled.png" alt="Bar/D3 in Analyzer - Menu and Placeholder" style="width: 767px;">
+   
+1. Your Bar/D3 visualization in Analyzer, rendering:
    
    <img src="img/sample-bar-d3-analyzer.png" alt="Bar/D3 in Analyzer" style="width: 767px;">
 
-2. Your Bar/D3 visualization in the PDI menu:
+2. Your Bar/D3 visualization in PDI, showing off the menu and placeholder icon:
    
-   <img src="img/sample-bar-d3-pdi-menu.png" alt="Bar/D3 in PDI - menu" style="width: 365px;">
+   <img src="img/sample-bar-d3-pdi-menu-selected-styled.png" alt="Bar/D3 in PDI - Menu and Placeholder" style="width: 767px;">
    
-3. Your Bar/D3 visualization in PDI:
+3. Your Bar/D3 visualization in PDI, rendering:
    
    <img src="img/sample-bar-d3-pdi.png" alt="Bar/D3 in PDI" style="width: 777px;">
 

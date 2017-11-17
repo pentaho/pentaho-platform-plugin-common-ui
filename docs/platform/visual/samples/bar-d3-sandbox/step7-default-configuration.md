@@ -1,5 +1,5 @@
 ---
-title: Step 6 - Adding a default configuration
+title: Step 7 - Adding a default configuration
 description: Walks you through adding a default configuration to the visualization.
 parent-path: .
 parent-title: Bar/D3 Visualization in Sandbox

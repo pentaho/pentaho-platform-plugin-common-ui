@@ -1,5 +1,5 @@
 ---
-title: Step 5 - Adding interactivity to the view
+title: Step 6 - Adding interactivity to the view
 description: Walks you through adding interactivity to the Bar visualization view.
 parent-path: .
 parent-title: Bar/D3 Visualization in Sandbox
@@ -268,4 +268,4 @@ This is a known issue of DOM events and there are multiple solutions to it.
 Here's one solution, specifically for D3:
 [Distinguishing click and double-click in D3](http://bl.ocks.org/ropeladder/83915942ac42f17c087a82001418f2ee).
 
-**Continue** to [Adding a default configuration](step6-default-configuration).
+**Continue** to [Adding a default configuration](step7-default-configuration).
