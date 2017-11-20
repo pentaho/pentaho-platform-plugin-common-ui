@@ -52,7 +52,7 @@ layout: default
 2. The format of type modules has changed.
    Dependencies on other Type API types are not declared as AMD dependencies anymore, in the `define` call,
    but are instead declared in an array which is returned, together with the type factory function
-   (see [UTypeModule]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.spec.UTypeModule'}})):
+   (see [UTypeModule]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.spec' | append: '#.UTypeModule'}})):
    
    ```js
    define(["module"], function(module) {
