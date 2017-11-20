@@ -4,10 +4,21 @@
 @import "{{ site.theme }}";
 
 .main-content {
+  font-family: OpenSansLight, Helvetica, Arial, Sans serif;
+
+  padding: 2rem 1rem;
+
+  font-size: 1rem;
+  color: #333333;
+
+  p {
+    text-align: justify;
+  }
+
   h1 {
       font-weight: 300;
       font-size: 275%;
-      color: #414141;
+      color: #333333;
       padding-top: 10px;
       padding-bottom: 10px;
       margin: 0;
@@ -34,6 +45,12 @@ a { color: #C00; text-decoration: none; }
 
 .api-list li.ground-layer {
   background-color: #DDDDE1;
+}
+
+@media screen and (max-width: 64em) and (min-width: 42em) {
+  .main-content {
+    padding: 2rem 1rem;
+  }
 }
 
 @import "hitachi";
