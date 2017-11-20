@@ -18,7 +18,7 @@ safe: true
 # JsDoc 3 Urls are like:
 #
 # * Namespace: http://localhost:8000/pentaho.type.html
-# * TypeDef:   http://localhost:8000/pentaho.type.html#Factory
+# * TypeDef:   http://localhost:8000/pentaho.type.html#.UContainer
 # * Class:     http://localhost:8000/pentaho.type.Complex.html
 # * Property:  http://localhost:8000/pentaho.type.Complex.html#changeset
 #
@@ -26,7 +26,7 @@ safe: true
 #
 # Usage is like:
 # * Namespace: {{site.refDocsUrlPattern | replace: '$', 'pentaho.type'}}
-# * TypeDef:   {{site.refDocsUrlPattern | replace: '$', 'pentaho.type' | append: '#Factory'}}
+# * TypeDef:   {{site.refDocsUrlPattern | replace: '$', 'pentaho.type' | append: '#.UContainer'}}
 # * Class:     {{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex'}}
 # * Property:  {{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex' | append: '#changeset'}}
 refDocsUrlPattern: https://help.pentaho.com/Documentation/8.0/Developer_Center/JavaScript_API/platform/$
