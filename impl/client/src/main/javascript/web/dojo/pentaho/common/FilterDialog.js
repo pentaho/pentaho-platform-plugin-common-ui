@@ -390,9 +390,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
         value = this._unescapeAmpIfExist(value);
         var opt =  new Option(value, value);
         opt.title = value;
-        this.containerNode.options[idx++] = opt;
+        this.picklistUsedValues.containerNode.options[idx++] = opt;
       }
-    }, this.picklistUsedValues);
+    }, this);
 
     // Load all valuesz
     if (this.picklistLoaded != true) {
@@ -411,9 +411,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
     construct.empty(this.picklistAvailableValues.domNode);
     array.forEach(values, function (result, idx) {
       result = this._unescapeAmpIfExist(result);
-      this.containerNode.options[idx] = new Option(result, result);
-      this.containerNode.options[idx].title = result;
-    }, this.picklistAvailableValues);
+      this.picklistAvailableValues.containerNode.options[idx] = new Option(result, result);
+      this.picklistAvailableValues.containerNode.options[idx].title = result;
+    }, this);
     this.picklistLoaded = true;
   },
 
