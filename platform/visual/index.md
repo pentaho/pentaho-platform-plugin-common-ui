@@ -4,7 +4,7 @@ description: A unified way to visualize data across the Pentaho suite.
 layout: sub-intro
 ---
 
-# Overview
+## Overview
 
 The [Visualization API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual'}}) 
 provides a unified way to visualize data across the Pentaho suite 
@@ -30,7 +30,7 @@ The Visualization API is built on top of other Platform JavaScript APIs:
   services registration and consumption.
 
 A set of stock visualizations is included, covering the most common chart types.
-Based on the [CCC](http://community.pentaho.com/ctools/ccc/) charting library, 
+Based on the [CCC](https://community.hds.com/docs/DOC-1009860-ccc-chart-components) charting library, 
 they're customizable and extensible to fit your organization's desired look and feel.
 
 If you want to know more about the specifics of how Analyzer exposes the Visualization API, 
@@ -42,7 +42,7 @@ from [developing it](#creating-a-visualization),
 to [deploying it](#deploying-the-visualization) to Pentaho products and 
 to [configuring it](#configuring-the-visualization).
  
-# Creating a visualization
+## Creating a visualization
 
 Creating a visualization boils down to creating:
 
@@ -81,7 +81,7 @@ npm install
 npm pack
 </code></pre>" type="warning" %}
 
-# Deploying the visualization
+## Deploying the visualization
 
 To deploy the visualization to a Pentaho product (Pentaho Server or PDI), 
 copy the tgz file you just built into its `system/karaf/deploy` folder.
@@ -115,7 +115,7 @@ as well as be able to use it in a [CDE](http://community.pentaho.com/ctools/cde/
    
    <img src="img/sample-bar-d3-cde.png" alt="Bar/D3 in CDE" style="width: 777px;">
 
-# Configuring the visualization
+## Configuring the visualization
 
 A visualization can be configured by third-parties using configuration rules in external configuration files.
 These configurations are merged with any default configuration that is included with the visualization.
