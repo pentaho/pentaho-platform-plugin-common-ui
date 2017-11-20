@@ -69,10 +69,28 @@ The APIs are organized as follows:
                     <li>
                         <dl>
                             <dt>
+                                <a title="Pentaho JavaScript Type Info API" 
+                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.typeInfo'}}">Type Info</a>
+                            </dt>
+                            <dd>Provides information about existing types.</dd>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl>
+                            <dt>
+                                <a title="Pentaho JavaScript Instance Info API" 
+                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.instanceInfo'}}">Instance Info</a>
+                            </dt>
+                            <dd>Provides information about existing instances.</dd>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl>
+                            <dt>
                                 <a title="Pentaho JavaScript Service API" 
                                    href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.service'}}">Service</a>
                             </dt>
-                            <dd>Service provider AMD/RequireJS plugin.</dd>
+                            <dd>Service provider AMD/RequireJS loader plugin.</dd>
                         </dl>
                     </li>
                     <li>
@@ -97,7 +115,7 @@ The APIs are organized as follows:
                         <dl>
                             <dt>
                                 <a title="Pentaho JavaScript Environment API" 
-                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.context'}}">Environment</a>
+                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.environment'}}">Environment</a>
                             </dt>
                             <dd>Platform environmental information.</dd>
                         </dl>
@@ -129,18 +147,6 @@ The APIs are organized as follows:
                             </dt>
                             <dd>The dependency and versioning unit for JavaScript resources
                                 in the Pentaho platform.</dd>
-                        </dl>
-                    </li>
-                </ul>
-                <ul>
-                    <li>
-                        <dl>
-                            <dt>
-                                <a title="Pentaho Web Project" href="platform/web-project">Pentaho Web Project</a>
-                            </dt>
-                            <dd>A Maven project that contains a Pentaho Web Package and 
-                                information of WebJar dependencies, 
-                                and compiles into an OSGi Artifact.</dd>
                         </dl>
                     </li>
                 </ul>
