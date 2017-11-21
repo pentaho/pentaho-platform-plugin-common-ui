@@ -150,7 +150,7 @@ See [pentaho/i18n]({{site.refDocsUrlPattern | replace: '$', 'pentaho.i18n'}}).
 Note that view configuration is typically tied to the technology with which views are built.
 The 
 [View.Type#extension]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View.Type' | append: '#extension'}})
-type attribute exists to satisfy the pass-through of such options of the underlying technology.
+attribute exists to satisfy the pass-through of such options of the underlying technology.
 You should consult the view type documentation to find out about which extension properties it supports.
 
 The views of stock visualizations are implemented using the 
@@ -160,9 +160,9 @@ and can be customized using its rich set of extension points.
 ### Thicken the axes rules of stock visualizations
 
 The following rule changes the 
-[lineWidth](http://community.pentaho.com/ctools/ccc/charts/jsdoc/symbols/pvc.options.marks.RuleExtensionPoint.html#lineWidth)
+[lineWidth](http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.marks.RuleExtensionPoint.html#lineWidth)
 property of the 
-[baseAxisRule_](http://community.pentaho.com/ctools/ccc/charts/jsdoc/symbols/pvc.options.ext.FlattenedDiscreteCartesianAxisExtensionPoints.html#rule)
+[baseAxisRule_](http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.ext.FlattenedDiscreteCartesianAxisExtensionPoints.html#rule)
 and
 `orthoAxisRule_` 
 extension points,
@@ -186,9 +186,9 @@ var ruleSpec = {
 ### Change the default label font of axes' ticks of stock visualizations
 
 The following rule changes the 
-[font](http://community.pentaho.com/ctools/ccc/charts/jsdoc/symbols/pvc.options.marks.LabelExtensionPoint.html#font)
+[font](http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.marks.LabelExtensionPoint.html#font)
 property of the 
-[baseAxisLabel_](http://community.pentaho.com/ctools/ccc/charts/jsdoc/symbols/pvc.options.ext.FlattenedDiscreteCartesianAxisExtensionPoints.html#label)
+[baseAxisLabel_](http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.ext.FlattenedDiscreteCartesianAxisExtensionPoints.html#label)
 and
 `orthoAxisLabel_` 
 extension points,
@@ -217,7 +217,7 @@ var ruleSpec = {
 The following rule changes the 
 [Palette#colors]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.Palette' | append: '#colors'}})
 property of default nominal color palette,
-[pentaho.visual.color.palettes.nominalPrimary]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.palettes.nominalPrimary'}}),
+[pentaho.visual.color.palettes.nominalPrimary]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.palettes' | append: '#.nominalPrimary'}}),
 in any application:
 
 ```js
