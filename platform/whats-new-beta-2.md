@@ -18,7 +18,7 @@ layout: default
    [pentaho/environment]({{site.refDocsUrlPattern | replace: '$', 'pentaho.environment'}}).
 
 2. Services are no longer registered with 
-   [pentaho/service]({{site.refDocsUrlPattern | replace: '$', 'pentaho/service'}}) but instead with
+   [pentaho/service]({{site.refDocsUrlPattern | replace: '$', 'pentaho.service'}}) but instead with
    one of the [pentaho/instanceInfo]({{site.refDocsUrlPattern | replace: '$', 'pentaho.instanceInfo'}}){{site.starNew}} or 
    [pentaho/typeInfo]({{site.refDocsUrlPattern | replace: '$', 'pentaho.typeInfo'}}){{site.starNew}} modules,
    depending on whether the registered module provides an _instance_ or a _type_, respectively.
@@ -52,7 +52,7 @@ layout: default
 2. The format of type modules has changed.
    Dependencies on other Type API types are not declared as AMD dependencies anymore, in the `define` call,
    but are instead declared in an array which is returned, together with the type factory function
-   (see [UTypeModule]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.spec.UTypeModule'}})):
+   (see [UTypeModule]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.spec' | append: '#.UTypeModule'}})):
    
    ```js
    define(["module"], function(module) {
