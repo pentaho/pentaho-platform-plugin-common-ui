@@ -312,14 +312,8 @@ function() {
               " per " +
               dataTable.getColumnLabel(categoryColumn);
 
-  var selectColor = function(d) {
-    return model.palette.colors.at(d.rowIndex % model.palette.colors.count).value;
-  };
-
   svg.append("text")
       .attr("class", "title")
-      .attr("fill", selectColor)
-      .attr("stroke", selectColor)
       .attr("y", margin.top / 2)
       .attr("x", this.width / 2)
       .attr("dy", "0.35em")
@@ -346,10 +340,16 @@ function() {
   var barWidth  = Math.min(model.barSize, bandWidth);
   var barOffset = bandWidth / 2 - barWidth / 2 + 0.5;
 
+  var selectColor = function(d) {
+    return model.palette.colors.at(d.rowIndex % model.palette.colors.count).value;
+  };
+
   var bar = g.selectAll(".bar")
       .data(scenes)
       .enter().append("rect")
       .attr("class", "bar")
+      .attr("fill", selectColor)
+      .attr("stroke", selectColor)
       .attr("x", function(d) { return x(d.categoryLabel) + barOffset; })
       .attr("y", function(d) { return y(d.measure); })
       .attr("width", barWidth)
