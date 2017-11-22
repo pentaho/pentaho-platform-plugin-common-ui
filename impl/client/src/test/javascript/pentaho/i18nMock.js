@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(["pentaho/i18n/MessageBundle", "json"], function(MessageBundle) {
+define(["pentaho/i18n/MessageBundle"], function(MessageBundle) {
   return {
     load: function(bundlePath, require, onLoad, config) {
       var bundleUrl = require.toUrl(bundlePath) + ".properties";
