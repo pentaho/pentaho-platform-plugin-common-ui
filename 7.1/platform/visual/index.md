@@ -36,7 +36,7 @@ The Visualization API is built on top of other Platform JavaScript APIs:
   services registration and consumption.
 
 A set of stock visualizations is included, covering the most common chart types.
-Based on the [CCC](http://community.pentaho.com/ctools/ccc/) charting library, 
+Based on the [CCC](https://community.hds.com/docs/DOC-1009860) charting library, 
 they're customizable and extensible to fit your organization's desired look and feel.
 
 If you want to know more about the specifics of how Analyzer exposes the Visualization API, 
