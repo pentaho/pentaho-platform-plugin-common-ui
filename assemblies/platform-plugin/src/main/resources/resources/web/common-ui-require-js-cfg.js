@@ -314,8 +314,8 @@
 
   // TODO: this should be removed from here, and to the GEO plugin's package.json
   // when it is possible to specify global maps or an option that achieves the same effect.
-  requireMap["*"]["pentaho/visual/models/geoMap"] = "pentaho/geo/visual_${project.version}/model";
-  requireMap["*"]["pentaho/geo/visual/map"] = "pentaho/geo/visual_${project.version}/view";
+  requireMap["*"]["pentaho/visual/models/geoMap"] = "pentaho-geo-visual_${project.version}/model";
+  requireMap["*"]["pentaho/geo/visual/map"] = "pentaho-geo-visual_${project.version}/view";
 
   // VizAPI actions
   requireTypeInfo["pentaho/visual/action/base"] = {base: "pentaho/type/action/base"};
