@@ -76,10 +76,10 @@ define(["cdf/components/SelectComponent", "./ValueBasedParameterWidgetBuilder", 
         $.extend(widget, {
           type: "SelectComponent",
           preExecution: function() {
-            // SelectComponent defines defaultIfEmpty = true for non-multi selects.
+            // SelectComponent defines useFirstValue as `true` for non-multi selects.
             // We can't override any properties of the component so we must set them just before update() is called. :(
             // Only select the first item if we have no selection and are not ignoring BISERVER-5538
-            this.defaultIfEmpty = !args.promptPanel.paramDefn.ignoreBiServer5538 && !args.param.hasSelection();
+            this.useFirstValue = !args.promptPanel.paramDefn.ignoreBiServer5538 && !args.param.hasSelection();
           },
           externalPlugin: args.param.attributes.externalPlugin,
           extraOptions: args.param.attributes.extraOptions
