@@ -69,44 +69,6 @@ define([
       });
     });
 
-    describe("#keyQualitative", function() {
-
-      it("should be equal if the names are equal", function() {
-
-        var a = new MappingAttribute({name: "a"});
-        var b = new MappingAttribute({name: "a"});
-
-        expect(a.keyQualitative).toBe(b.keyQualitative);
-      });
-
-      it("should be different if the names are different", function() {
-        var a = new MappingAttribute({name: "a"});
-        var b = new MappingAttribute({name: "b"});
-
-        expect(a.keyQualitative).not.toBe(b.keyQualitative);
-      });
-    });
-
-    describe("#keyQuantitative", function() {
-
-      it("should be equal if the names are equal", function() {
-
-        var a = new MappingAttribute({name: "a"});
-        var b = new MappingAttribute({name: "a"});
-
-        expect(a.keyQuantitative).toBe(b.keyQuantitative);
-      });
-
-      it("should be different if the names are different", function() {
-
-        var a = new MappingAttribute({name: "a"});
-        var b = new MappingAttribute({name: "b"});
-
-        expect(a.keyQuantitative).not.toBe(b.keyQuantitative);
-      });
-
-    });
-
     describe("#model and #mapping", function() {
 
       var derived;

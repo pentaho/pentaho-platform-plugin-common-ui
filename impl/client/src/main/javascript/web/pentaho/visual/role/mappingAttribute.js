@@ -123,35 +123,6 @@ define([
           return spec;
         },
 
-        /**
-         * Gets a key of this mapping attribute for use when
-         * the containing mapping's [levelEffective]{@link pentaho.visual.role.Mapping#levelEffective}
-         * is [qualitative]{@link pentaho.visual.role.Level.Type#isQualitative}.
-         *
-         * This key is composed by the value of the [name]{@link pentaho.visual.role.MappingAttribute#name} property.
-         *
-         * @type {string}
-         * @readOnly
-         */
-        get keyQualitative() {
-          var name = this.get("name");
-          return name ? name.$key : "";
-        },
-
-        /**
-         * Gets a key of this mapping attribute for use when
-         * the containing mapping's [levelEffective]{@link pentaho.visual.role.Mapping#levelEffective}
-         * is [quantitative]{@link pentaho.visual.role.Level.Type#isQuantitative}.
-         *
-         * This key is composed by the value of the [name]{@link pentaho.visual.role.MappingAttribute#name} property.
-         *
-         * @type {string}
-         * @readOnly
-         */
-        get keyQuantitative() {
-          return this.keyQualitative;
-        },
-
         $type: {
           props: [
             /**

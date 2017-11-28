@@ -901,22 +901,20 @@ define([
             var data = mapping.model.data;
             var dataAttrs = data && data.model.attributes;
 
-            var isQuant = __levelType.isQuantitative(levelEffective);
-
             var byKey = {};
             var i = -1;
             while(++i < L) {
               var roleAttr = roleAttrs.at(i);
-              var key = isQuant ? roleAttr.keyQuantitative : roleAttr.keyQualitative;
+              var key = roleAttr.name;
               if(O.hasOwn(byKey, key)) {
                 var dataAttr = dataAttrs.get(roleAttr.name);
                 var attributeDuplicateMessage = bundle.structured.errors.property.attributeDuplicate;
-                var erroMessage = bundle.format(attributeDuplicateMessage, {
+                var errorMessage = bundle.format(attributeDuplicateMessage, {
                   name: dataAttr,
                   role: this
                 });
 
-                addErrors(new ValidationError(erroMessage));
+                addErrors(new ValidationError(errorMessage));
                 continue;
               }
 
