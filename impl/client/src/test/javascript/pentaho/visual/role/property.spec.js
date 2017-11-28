@@ -1699,7 +1699,7 @@ define([
             });
 
             it("should be invalid, when a mapping with an effective level of quantitative has " +
-                "duplicate names and aggregation", function() {
+                "duplicate names", function() {
 
               var model = createFullValidQuantitativeMapping();
 
@@ -1710,21 +1710,6 @@ define([
               assertIsInvalid(model);
             });
 
-            it("should be valid, when a mapping with an effective level of quantitative has duplicate names " +
-                "but != aggregations", function() {
-
-              var model = createFullValidQuantitativeMapping();
-
-              var attribute1 = model.propRole.attributes.at(0);
-              attribute1.aggregation = "sum";
-
-              var attribute2 = attribute1.clone(); // same name
-              attribute2.aggregation = "avg";
-
-              model.propRole.attributes.add(attribute2);
-
-              assertIsValid(model);
-            });
           });
         }
       });

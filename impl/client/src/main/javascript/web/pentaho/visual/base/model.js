@@ -21,7 +21,6 @@ define([
   "pentaho/visual/role/property",
   "pentaho/visual/role/mapping",
   "pentaho/visual/role/mappingAttribute",
-  "pentaho/visual/role/aggregation",
   "pentaho/visual/role/level",
   "pentaho/visual/color/paletteProperty",
   "pentaho/visual/color/palette",

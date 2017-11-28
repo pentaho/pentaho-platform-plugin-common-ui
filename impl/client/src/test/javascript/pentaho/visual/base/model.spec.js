@@ -86,7 +86,6 @@ define([
 
       expectIt("property");
       expectIt("level");
-      expectIt("aggregation");
     });
 
     describe("#validate()", function() {

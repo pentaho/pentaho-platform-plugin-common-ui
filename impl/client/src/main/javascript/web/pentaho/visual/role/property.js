@@ -717,13 +717,8 @@ define([
            *    [countMin]{@link pentaho.type.Property.Type#countMin} and
            *    [countMax]{@link pentaho.type.Property.Type#countMax}
            * 4. Currently mapped attributes must not be duplicates:
-           *   1. If the mapping has a quantitative
-           *      [effective level of measurement]{@link pentaho.visual.role.Property.Type#levelEffectiveOn},
-           *      then there can be no two mapping attributes with the same
-           *      [name]{@link pentaho.visual.role.MappingAttribute#name} and
-           *      [aggregation]{@link pentaho.visual.role.MappingAttribute#aggregation}
-           *   2. Otherwise, there can be no two mapping attributes with the same
-           *      [name]{@link pentaho.visual.role.MappingAttribute#name}
+           *   1. There can be no two mapping attributes with the same
+           *      [name]{@link pentaho.visual.role.MappingAttribute#name}.
            *
            * @param {!pentaho.visual.base.Model} model - The visualization model.
            *
@@ -906,35 +901,20 @@ define([
             var data = mapping.model.data;
             var dataAttrs = data && data.model.attributes;
 
-            var isQuant = __levelType.isQuantitative(levelEffective);
-
             var byKey = {};
             var i = -1;
             while(++i < L) {
               var roleAttr = roleAttrs.at(i);
-              var key = isQuant ? roleAttr.keyQuantitative : roleAttr.keyQualitative;
+              var key = roleAttr.name;
               if(O.hasOwn(byKey, key)) {
                 var dataAttr = dataAttrs.get(roleAttr.name);
-                var message;
-                if(isQuant) {
-                  message = bundle.format(
-                    bundle.structured.errors.property.attributeAndAggregationDuplicate,
-                    {
-                      name: dataAttr,
-                      aggregation: roleAttr.get("aggregation"),
-                      role: this
-                    });
+                var attributeDuplicateMessage = bundle.structured.errors.property.attributeDuplicate;
+                var errorMessage = bundle.format(attributeDuplicateMessage, {
+                  name: dataAttr,
+                  role: this
+                });
 
-                } else {
-                  message = bundle.format(
-                    bundle.structured.errors.property.attributeDuplicate,
-                    {
-                      name: dataAttr,
-                      role: this
-                    });
-                }
-
-                addErrors(new ValidationError(message));
+                addErrors(new ValidationError(errorMessage));
                 continue;
               }
 
