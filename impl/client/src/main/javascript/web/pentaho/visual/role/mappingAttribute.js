@@ -22,8 +22,7 @@ define([
 
   return [
     "complex",
-    "pentaho/visual/role/aggregation",
-    function(Complex, Aggregation) {
+    function(Complex) {
 
       /**
        * @name pentaho.visual.role.MappingAttribute
@@ -144,15 +143,13 @@ define([
          * the containing mapping's [levelEffective]{@link pentaho.visual.role.Mapping#levelEffective}
          * is [quantitative]{@link pentaho.visual.role.Level.Type#isQuantitative}.
          *
-         * This key is composed by the value of the [name]{@link pentaho.visual.role.MappingAttribute#name} and
-         * the [aggregation]{@link pentaho.visual.role.MappingAttribute#aggregation} properties.
+         * This key is composed by the value of the [name]{@link pentaho.visual.role.MappingAttribute#name} property.
          *
          * @type {string}
          * @readOnly
          */
         get keyQuantitative() {
-          var aggregation = this.get("aggregation");
-          return this.keyQualitative + "|" + (aggregation ? aggregation.$key : "");
+          return this.keyQualitative;
         },
 
         $type: {
@@ -166,34 +163,7 @@ define([
              * @type {string}
              * @see pentaho.visual.role.spec.IMappingAttribute#name
              */
-            {name: "name", valueType: "string", isRequired: true},
-
-            // Not defaulted because only "first" and "last" are compatible with any type.
-            // Applies to quantitative or qualitative mappings.
-            /**
-             * Gets or sets the aggregation that is performed on the data attribute.
-             *
-             * The value must be one of the supported [Aggregation]{@link pentaho.visual.role.Aggregation} values.
-             *
-             * The aggregation must be compatible with the data type of the data attribute.
-             *
-             * @name pentaho.visual.role.MappingAttribute#aggregation
-             * @type {string}
-             * @see pentaho.visual.role.spec.IMappingAttribute#aggregation
-             */
-            {name: "aggregation", valueType: Aggregation},
-
-            /**
-             * Gets or sets a value that indicates if the data property contributes to the
-             * default order of an _ordinal_ visual role
-             * by using the **reverse** natural order of the data attribute.
-             *
-             * @name pentaho.visual.role.MappingAttribute#isReverseOrder
-             * @type {boolean}
-             * @default false
-             * @see pentaho.visual.role.spec.IMappingAttribute#isReverseOrder
-             */
-            {name: "isReverseOrder", valueType: "boolean", defaultValue: false}
+            {name: "name", valueType: "string", isRequired: true}
           ]
         }
       })

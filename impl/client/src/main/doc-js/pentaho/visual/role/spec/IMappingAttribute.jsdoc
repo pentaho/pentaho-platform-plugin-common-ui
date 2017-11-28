@@ -20,14 +20,7 @@
  *
  * @example
  * {
- *   name: "sales",
- *   aggregation: "sum"
- * }
- *
- * @example
- * {
- *   name: "product",
- *   isReverseOrder: true
+ *   name: "sales"
  * }
  *
  * @name pentaho.visual.role.spec.IMappingAttribute
@@ -47,27 +40,4 @@
  * @name pentaho.visual.role.spec.IMappingAttribute#name
  * @type {string}
  * @see pentaho.visual.role.MappingAttribute#name
- */
-
-/**
- * The aggregation that is performed on the data property.
- *
- * The value must be one of the supported [Aggregation]{@link pentaho.visual.role.Aggregation} values.
- *
- * The aggregation must be compatible with the data type of the data property.
- *
- * @name pentaho.visual.role.spec.IMappingAttribute#aggregation
- * @type {string}
- * @see pentaho.visual.role.MappingAttribute#aggregation
- */
-
-/**
- * Indicates if the data property contributes to the
- * default order of an _ordinal_ visual role mapping
- * by using the **reverse** natural order of the data property.
- *
- * @name pentaho.visual.role.spec.IMappingAttribute#isReverseOrder
- * @type {boolean}
- * @default false
- * @see pentaho.visual.role.MappingAttribute#isReverseOrder
  */
