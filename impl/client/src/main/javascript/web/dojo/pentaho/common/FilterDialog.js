@@ -419,11 +419,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
   _unescapeAmpIfExist: function(str) {
     if (Array.isArray(str)) {
-      str.forEach(function(val) {
-        val.replace(/&amp;/g, '&');
+      str.forEach(function(val, index) {
+        if (typeof val === 'string' || val instanceof String) {
+          str[index] = val.replace(/&amp;/g, '&');
+        }
       });
     } else if (typeof str === 'string' || str instanceof String) {
-      str.replace(/&amp;/g, '&');
+      str = str.replace(/&amp;/g, '&');
     }
     return str;
   },
