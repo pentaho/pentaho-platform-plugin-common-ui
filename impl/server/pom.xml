@@ -19,21 +19,21 @@
     <jmock-junit4.version>2.5.1</jmock-junit4.version>
     <pentaho-connections.version>8.1-SNAPSHOT</pentaho-connections.version>
     <commons-beanutils.version>1.9.3</commons-beanutils.version>
-    <libformula.version>8.1-SNAPSHOT</libformula.version>
+    <pentaho-reporting.version>8.1-SNAPSHOT</pentaho-reporting.version>
     <pentaho-metadata.version>8.1-SNAPSHOT</pentaho-metadata.version>
     <commons-io.version>2.1</commons-io.version>
-    <libbase.version>8.1-SNAPSHOT</libbase.version>
+    <pentaho-reporting.version>8.1-SNAPSHOT</pentaho-reporting.version>
     <maven-failsafe-plugin.forkCount>1</maven-failsafe-plugin.forkCount>
     <maven-failsafe-plugin.reuseForks>false</maven-failsafe-plugin.reuseForks>
     <hsqldb.version>2.3.2</hsqldb.version>
     <pentaho-xul.version>8.1-SNAPSHOT</pentaho-xul.version>
     <mockito-all.version>1.8.4</mockito-all.version>
     <pentaho-database-model.version>8.1-SNAPSHOT</pentaho-database-model.version>
-    <pentaho-kettle.version>8.1-SNAPSHOT</pentaho-kettle.version>
+    <pdi.version>8.1-SNAPSHOT</pdi.version>
     <flexjson.version>2.1</flexjson.version>
     <org.json.version>3.1.1</org.json.version>
     <jug-lgpl.version>2.0.0</jug-lgpl.version>
-    <pentaho-platform.version>8.1-SNAPSHOT</pentaho-platform.version>
+    <platform.version>8.1-SNAPSHOT</platform.version>
     <commons-logging.version>1.1</commons-logging.version>
     <commons-lang.version>2.2</commons-lang.version>
   </properties>
@@ -124,7 +124,7 @@
     <dependency>
       <groupId>pentaho</groupId>
       <artifactId>pentaho-platform-api</artifactId>
-      <version>${pentaho-platform.version}</version>
+      <version>${platform.version}</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -136,7 +136,7 @@
     <dependency>
       <groupId>pentaho</groupId>
       <artifactId>pentaho-platform-core</artifactId>
-      <version>${pentaho-platform.version}</version>
+      <version>${platform.version}</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -148,7 +148,7 @@
     <dependency>
       <groupId>pentaho</groupId>
       <artifactId>pentaho-platform-extensions</artifactId>
-      <version>${pentaho-platform.version}</version>
+      <version>${platform.version}</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -160,7 +160,7 @@
     <dependency>
       <groupId>pentaho</groupId>
       <artifactId>pentaho-platform-repository</artifactId>
-      <version>${pentaho-platform.version}</version>
+      <version>${platform.version}</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -196,7 +196,7 @@
     <dependency>
       <groupId>pentaho</groupId>
       <artifactId>pentaho-platform-core</artifactId>
-      <version>${pentaho-platform.version}</version>
+      <version>${platform.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
@@ -215,7 +215,7 @@
     <dependency>
       <groupId>org.pentaho.reporting.library</groupId>
       <artifactId>libformula</artifactId>
-      <version>${libformula.version}</version>
+      <version>${pentaho-reporting.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -227,7 +227,7 @@
     <dependency>
       <groupId>pentaho-kettle</groupId>
       <artifactId>kettle-core</artifactId>
-      <version>${pentaho-kettle.version}</version>
+      <version>${pdi.version}</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -239,7 +239,7 @@
     <dependency>
       <groupId>pentaho-kettle</groupId>
       <artifactId>kettle-engine</artifactId>
-      <version>${pentaho-kettle.version}</version>
+      <version>${pdi.version}</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -281,7 +281,7 @@
     <dependency>
       <groupId>org.pentaho.reporting.library</groupId>
       <artifactId>libbase</artifactId>
-      <version>${libbase.version}</version>
+      <version>${pentaho-reporting.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
