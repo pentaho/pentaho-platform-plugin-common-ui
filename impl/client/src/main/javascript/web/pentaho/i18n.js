@@ -112,11 +112,9 @@ define([
 
     var absBundleUrl = localRequire.toUrl(bundleMid);
 
-    var serverUrl = env.server.root;
-
     // Remove basePath from bundle url
     // Taking into account embedded scenarios, where it will be a full URL - "http://host:port/..."
-    var reminderUrlRegX = new RegExp("^(?:" + serverUrl + "|" + serverUrl.origin + "|" + serverUrl.pathname + ")(.*)");
+    var reminderUrlRegX = getReminderUrlRegx();
     var reminderUrlMatch = reminderUrlRegX.exec(absBundleUrl);
 
     absBundleUrl = reminderUrlMatch ? reminderUrlMatch[1] : absBundleUrl;
@@ -147,5 +145,31 @@ define([
     }
 
     throw new Error("[pentaho/messages!] Bundle path argument is invalid: '" + bundlePath + "'.");
+  }
+
+  function getReminderUrlRegx() {
+    var defaultSchemePorts = {
+      "http:": 80,
+      "https:": 443
+    };
+
+    var url = env.server.root;
+
+    var origin = url.origin;
+    var port = url.port;
+    var pathname = url.pathname;
+
+    var isDefaultPort = port == null || port.length === 0;
+    if ( isDefaultPort ) {
+      var scheme = url.protocol;
+      var host = url.host;
+
+      port = defaultSchemePorts[scheme];
+
+      origin = scheme + "//" + host + ":" + port;
+      url = origin + pathname;
+    }
+
+    return new RegExp("^(?:" + url + "|" + origin + "|" + pathname + ")(.*)");
   }
 });
