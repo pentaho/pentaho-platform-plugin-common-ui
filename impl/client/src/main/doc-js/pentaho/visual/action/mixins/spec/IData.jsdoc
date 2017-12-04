@@ -15,8 +15,21 @@
  */
 
 /**
- * The `events` namespace contains event classes used by the Visualization API.
+ * The `visual.action.spec.IData` interface describes the
+ * data properties of a visual action using a generic, _object_ form.
  *
- * @name pentaho.visual.base.events
- * @namespace
+ * @name pentaho.visual.action.mixins.spec.IData
+ *
+ * @interface
+ * @extends pentaho.visual.action.spec.IBase
+ */
+
+/**
+ * The data filter of the action instance.
+ *
+ * When unspecified, the action targets the whole data set.
+ *
+ * @name dataFilter
+ * @memberOf pentaho.visual.action.mixins.spec.IData#
+ * @type {pentaho.data.filter.spec.IAbstract|pentaho.data.filter.Abstract}
  */

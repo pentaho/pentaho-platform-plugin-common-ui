@@ -243,7 +243,7 @@ define([
           O.setConst(foo, "dude", "cde");
         }).toThrowError(TypeError);
       });
-    }); //setConst
+    }); // setConst
 
     describe("`eachOwn` -", function() {
       var foo;
@@ -437,7 +437,7 @@ define([
         });
       });
 
-    }); //cloneShallow
+    }); // cloneShallow
 
     describe("`getPropertyDescriptor` -", function() {
 
@@ -605,7 +605,7 @@ define([
         expect(mutatedSpam.eggs).toBe("eggs");
       });
 
-    }); //applyClass
+    }); // applyClass
 
     describe("using(disposable, fun, context) -", function() {
 
@@ -673,7 +673,7 @@ define([
           O.using(disposable, fun);
         }).toThrow(error);
       });
-    }); //using
+    }); // using
 
     describe("lca(o1, o2)", function() {
 
@@ -732,6 +732,6 @@ define([
 
         expect(O.lca(oa_1_1, oa_2_1_1)).toBe(oa);
       });
-    });
+    }); // lca
   }); // pentaho.util.object
 });

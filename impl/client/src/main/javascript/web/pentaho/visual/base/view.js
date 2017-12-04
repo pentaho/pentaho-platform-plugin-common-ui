@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 define([
+  "pentaho/type/action/Execution",
   "pentaho/type/changes/ComplexChangeset",
   "pentaho/i18n!view",
-  "./events/WillUpdate",
-  "./events/DidUpdate",
-  "./events/RejectedUpdate",
   "pentaho/lang/UserError",
   "pentaho/util/object",
   "pentaho/util/arg",
@@ -34,40 +32,127 @@ define([
   "pentaho/visual/base/model",
   "pentaho/type/action/base",
   "pentaho/data/filter/abstract",
-  "pentaho/visual/action/base",
-  "pentaho/visual/action/data",
-  "pentaho/visual/action/select",
-  "pentaho/visual/action/execute"
-], function(ComplexChangeset, bundle, WillUpdate, DidUpdate, RejectedUpdate, UserError,
-            O, arg, F, BitSet, error, logger, promise, specUtil) {
+  "../action/base",
+  "../action/update",
+  "../action/select",
+  "../action/execute",
+  "../action/mixins/data",
+  "../action/mixins/positioned"
+], function(ActionExecution, ComplexChangeset, bundle, UserError, O, arg, F, BitSet, error, logger, promise, specUtil) {
 
   "use strict";
 
-  /* global Promise:false */
+  /* globals Promise */
 
   var __reUpdateMethodName = /^_update(.+)$/;
 
-  var __emitActionKeyArgs = {
-    errorHandler: function(ex, action) { action.fail(ex); },
-    isCanceled: function(action) { return action.isCanceled; }
-  };
+  var UpdateActionExecution = ActionExecution.extend({
+    // @override
+    _onPhaseInit: function() {
+      var view = this.target;
+
+      if(view.__domContainer === null) {
+        throw error.operInvalid("The view has no domContainer.");
+      }
+
+      if(view.__updateActionExecution !== null) {
+        throw error.operInvalid("The view is already updating.");
+      }
+
+      view.__updateActionExecution = this;
+
+      view._onUpdateInit(this);
+    },
+
+    // @override
+    _onPhaseWill: function() {
+      this.target._onUpdateWill(this);
+    },
+
+    // @override
+    _onPhaseDo: function() {
+      return this.target._onUpdateDo(this);
+    },
+
+    // @override
+    _onPhaseFinally: function() {
+
+      // assert this.__updateActionExecution === updateActionExecution;
+      var view = this.target;
+
+      view.__updateActionExecution = null;
+
+      if(this.isDone) {
+        // J.I.C.
+        view.__dirtyPropGroups.clear();
+      }
+
+      view._onUpdateFinally(this);
+    }
+  });
 
   return [
     "pentaho/type/complex",
     "pentaho/visual/base/model",
-    "pentaho/type/action/base",
+    "pentaho/type/action/impl/target",
+    "../action/update",
+    "../action/select",
     "pentaho/data/filter/abstract",
 
     // Pre-load all registered visual action types so that it is safe to request them synchronously.
     {$types: {base: "pentaho/visual/action/base"}},
 
-    // The latter, in turn, already pre-load all registered filter types...
+    // The latter, in turn, already pre-loads all registered filter types...
     // {$types: {base: "pentaho/data/filter/abstract"}},
 
-    function(__Complex, VisualModel, ActionBase, AbstractFilter) {
+    function(__Complex, VisualModel, TargetMixin, UpdateAction, SelectAction, AbstractFilter) {
 
       var context = this;
-      var __actionBaseType = ActionBase.type;
+
+      /**
+       * @name SelectExecution
+       * @memberOf pentaho.visual.action
+       * @class
+       * @extends pentaho.type.action.Execution
+       * @private
+       *
+       * @classDesc The execution class for a
+       * [Select]{@link pentaho.visual.action.Select} action in a
+       * [View]{@link pentaho.visual.base.View}.
+       *
+       * @description Creates a select action execution instance for a given select action and view.
+       *
+       * @constructor
+       * @param {!pentaho.visual.action.Select} action - The select action.
+       * @param {!pentaho.visual.base.View} view - The target view.
+       */
+      var SelectActionExecution = TargetMixin.GenericActionExecution.extend({
+        /**
+         * Applies the associated action's
+         * [selectionMode]{@link pentaho.visual.action.Select#selectionMode}
+         * function to the target view's
+         * [selectionFilter]{@link pentaho.visual.base.View#selectionFilter} and
+         * the action's [dataFilter]{@link pentaho.visual.action.Select#dataFilter}.
+         *
+         * The resulting data filter is set as the view's new `selectionFilter`.
+         *
+         * @return {?Promise} - The value `null`.
+         * @memberOf pentaho.visual.action.SelectExecution#
+         * @protected
+         * @override
+         */
+        _doDefault: function() {
+
+          var view = this.target;
+
+          var selectionFilter = this.action.selectionMode.call(view, view.selectionFilter, this.action.dataFilter);
+
+          // NOTE: see related comment on View#selectionFilter.
+          view.selectionFilter = selectionFilter && selectionFilter.toDnf();
+
+          return null;
+        }
+      });
 
       var View = __Complex.extend(/** @lends pentaho.visual.base.View# */{
 
@@ -87,8 +172,8 @@ define([
          *
          * @class
          * @extends pentaho.type.Complex
-         * @implements pentaho.lang.IDisposable
-         * @implements pentaho.type.action.ITarget
+         * @extends pentaho.type.action.impl.Target
+         * @implements {pentaho.lang.IDisposable}
          *
          * @abstract
          * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.base.View>} pentaho/visual/base/view
@@ -149,14 +234,6 @@ define([
           this.__domContainer = null;
 
           /**
-           * The promise for the completion of the current update operation, if any; or `null`.
-           *
-           * @type {Promise}
-           * @private
-           */
-          this.__updatingPromise = null;
-
-          /**
            * Indicates if the view is automatically updated whenever the model is changed.
            *
            * @type {boolean}
@@ -174,9 +251,17 @@ define([
            */
           this.__dirtyPropGroups = new BitSet(View.PropertyGroups.All); // mark view as initially dirty
 
+          /**
+           * The current update action execution, if any; `null`, otherwise.
+           *
+           * @type {pentaho.type.action.Execution}
+           * @private
+           */
+          this.__updateActionExecution = null;
+
           // Initialize any special properties provided directly in viewSpec.
           if(viewSpec) {
-            if(viewSpec.domContainer) this.domContainer = viewSpec.domContainer;
+            if(viewSpec.domContainer != null) this.domContainer = viewSpec.domContainer;
             if(viewSpec.isAutoUpdate != null) this.isAutoUpdate = viewSpec.isAutoUpdate;
           }
 
@@ -312,7 +397,7 @@ define([
          * @see pentaho.visual.base.View#update
          */
         get isUpdating() {
-          return !!this.__updatingPromise;
+          return this.__updateActionExecution !== null;
         },
 
         /**
@@ -434,94 +519,112 @@ define([
         },
         // endregion
 
+        // @override
+        _createActionExecution: function(action) {
+
+          if(action instanceof UpdateAction) {
+            // Already updating?
+            if(this.__updateActionExecution !== null) {
+              throw error.operInvalid("An update action is already executing.");
+            }
+
+            return new UpdateActionExecution(action, this);
+          }
+
+          if(action instanceof SelectAction) {
+            return new SelectActionExecution(action, this);
+          }
+
+          return this.base(action);
+        },
+
         // region Update
         /**
-         * Updates the view to match its model's latest state.
+         * Updates the view to match its latest state.
+         *
+         * The [model]{@link pentaho.visual.base.View#model} is part of the state of the view.
          *
          * When [isAutoUpdate]{@link pentaho.visual.base.View#isAutoUpdate} is `true`,
-         * any change to the view's model automatically triggers a view update by calling this method.
+         * any change to the view automatically triggers its update,
+         * through a call to this method.
          *
-         * The update operation is _generally_ asynchronous.
-         * Even if the view implementation completes its update synchronously,
-         * the completion is only advertised asynchronously,
-         * through the emission of one of the events
-         * [did:update]{@link pentaho.visual.base.events.DidUpdate} or
-         * [rejected:update]{@link pentaho.visual.base.events.RejectedUpdate} and
+         * The update operation is asynchronous.
+         * Even if the implementation completes the update synchronously,
+         * completion is only advertised later, asynchronously,
+         * through
+         * the emission of the action execution's `finally` phase event and
          * the resolution of the returned promise.
          *
-         * The [isUpdating]{@link pentaho.visual.base.View#isUpdating} property is `true` while the
-         * update operation is considered in progress,
-         * a period during which calling [update]{@link pentaho.visual.base.View#update} again
-         * returns the same promise that was returned by the initial `update` call.
+         * If the update method is called when the view is already
+         * [being updated]{@link pentaho.visual.base.View#isUpdating},
+         * the same promise that was returned from the initial call is returned.
          *
-         * If the view is not currently updating and is also not [dirty]{@link pentaho.visual.base.View#isDirty},
-         * then calling `update` _immediately_ returns a fulfilled promise.
+         * Otherwise, if the update method is called and
+         * the view is not [dirty]{@link pentaho.visual.base.View#isDirty},
+         * a fulfilled promise is returned.
          *
-         * Otherwise, by this time, [isUpdating]{@link pentaho.visual.base.View#isUpdating} will be `true`,
-         * and the update operation proceeds to the **Will phase**.
+         * Otherwise,
+         * the update method creates an [Update]{@link pentaho.visual.action.Update}
+         * action and executes it.
+         * This is done by passing the action to the [act]{@link pentaho.visual.base.View#act},
+         * and then returning back the [promise]{@link pentaho.type.action.Execution#promise}
+         * of the returned [action execution]{@link pentaho.type.action.Execution}.
          *
-         * #### Will phase
+         * The update then goes through all of the phases of the execution of an action:
+         * `init`, `will`, `do` and `finally`.
+         * In each of this phases, the following corresponding methods are called:
+         * 1. [_onUpdateInit]{@link pentaho.visual.base.View#_onUpdateInit};
+         *    the default implementation does nothing;
+         * 2. [_onUpdateWill]{@link pentaho.visual.base.View#_onUpdateWill};
+         *    the default implementation emits the `will` phase event of the action's execution;
+         * 3. [_onUpdateDo]{@link pentaho.visual.base.View#_onUpdateDo};
+         *    the default implementation updates the view, proper;
+         * 4. [_onUpdateFinally]{@link pentaho.visual.base.View#_onUpdateFinally};
+         *    the default implementation emits the `finally` phase event of the action's execution.
          *
-         * Initially, the [_updateWill]{@link pentaho.visual.base.View#_updateWill} method is called,
-         * which by default emits the [will:update]{@link pentaho.visual.base.events.WillUpdate} event.
-         * Either the implementation or the event listeners are allowed to cancel the update or further modify the model.
+         * Note that no events are emitted for the `init` and `do` phases.
          *
-         * If the update is _canceled_, the update is rejected with the cancel reason,
-         * and enters the **Rejected phase**.
+         * During the `init`, `will` and `do` phases,
+         * the [isUpdating]{@link pentaho.visual.base.View#isUpdating} property
+         * returns `true`.
          *
-         * #### Loop phase
+         * During the `finally` phase, `isUpdating` returns `false`.
+         * Also, if the implementation or the event listeners further modify the model,
+         * a subsequent update action will eventually be executed.
          *
-         * If the update is not canceled, the view enters an **update loop**
-         * that only ends when either the view is up to date with the model
-         * (in which case surely [isDirty]{@link pentaho.visual.base.View#isDirty} will be `false`),
-         * or after some error occurs.
+         * #### Update proper
+         *
+         * If the update action is not canceled or doesn't fail in the `init` and `will` phases,
+         * the `do` phase is entered.
+         * It is constituted by an **update loop** which is only exited
+         * when either
+         * the view is not [dirty]{@link pentaho.visual.base.View#isDirty} anymore
+         * or an error occurs.
          *
          * On each iteration of the update loop:
-         * 1. If the model is invalid, the update loop ends with a validation error and
-         *    then the update operation proceeds to the **Rejected phase**;
+         * 1. If the view is invalid, the update loop ends with a validation error and
+         *    the update action is rejected;
          * 2. Otherwise, the "best fit" partial update method is selected and called to update the view;
          * 3. If the selected update method throws an error or returns a rejected promise,
-         *    the update loop ends and the update operation proceeds to the **Rejected phase**;
+         *    the update action is rejected;
          * 4. If the view is not [dirty]{@link pentaho.visual.base.View#isDirty} anymore,
          *    the update loop ends with success;
          * 5. Repeat.
          *
          * Over the view's lifetime, the very first "partial" update method that is selected is always the
          * full update method: [_updateAll]{@link pentaho.visual.base.View#_updateAll}.
-         * Subsequent iterations may select _proper_ partial update methods, like
+         * Subsequent iterations may select _proper_ partial update methods,
+         * such as
          * [_updateSize]{@link pentaho.visual.base.View#_updateSize} or
          * [_updateSelection]{@link pentaho.visual.base.View#_updateSelection}.
          *
-         * #### Did phase
+         * @return {!Promise} A promise that is fulfilled when the visualization is
+         * updated or is rejected in case some error occurs.
          *
-         * The [isUpdating]{@link pentaho.visual.base.View#isUpdating} property will now be `false`.
+         * @fires "pentaho/visual/action/update:{will}"
+         * @fires "pentaho/visual/action/update:{finally}"
          *
-         * The [_onUpdateDid]{@link pentaho.visual.base.View#_onUpdateDid} method is called,
-         * which by default emits the [did:update]{@link pentaho.visual.base.events.DidUpdate} event.
-         *
-         * The implementation or the event listeners are allowed to modify the model and thus trigger **new** updates
-         * while in the _did_ phase.
-         *
-         * Lastly, the returned promise is fulfilled.
-         *
-         * #### Rejected phase
-         *
-         * The [isUpdating]{@link pentaho.visual.base.View#isUpdating} property will now be `false`.
-         *
-         * The [_onUpdateRejected]{@link pentaho.visual.base.View#_onUpdateRejected} method is called,
-         * which by default emits the [rejected:update]{@link pentaho.visual.base.events.RejectedUpdate} event.
-         *
-         * The implementation or the event listeners are allowed to modify the model and thus trigger **new** updates
-         * while in the _rejected_ phase.
-         *
-         * Lastly, the returned promise is rejected with the original error.
-         *
-         * @return {Promise} A promise that is fulfilled when the visualization is completely updated or
-         * is rejected in case some error occurs.
-         *
-         * @fires "will:update"
-         * @fires "rejected:update"
-         * @fires "did:update"
+         * @see pentaho.type.action.Execution
          *
          * @see pentaho.visual.base.View#isAutoUpdate
          * @see pentaho.visual.base.View#isUpdating
@@ -533,68 +636,83 @@ define([
          * @see pentaho.visual.base.View#_updateSelection
          * @see pentaho.visual.base.View#_updateGeneral
          *
+         * @see pentaho.visual.base.View#_onUpdateInit
          * @see pentaho.visual.base.View#_onUpdateWill
-         * @see pentaho.visual.base.View#_onUpdateDid
-         * @see pentaho.visual.base.View#_onUpdateRejected
+         * @see pentaho.visual.base.View#_onUpdateDo
+         * @see pentaho.visual.base.View#_onUpdateFinally
          */
         update: function() {
 
-          var p = this.__updatingPromise;
-          if(!p) {
-            // Nothing to do?
+          // Already updating?
+          var updateActionExecution = this.__updateActionExecution;
+          if(updateActionExecution === null) {
+            // Anything to do?
             if(this.__dirtyPropGroups.isEmpty) {
-              p = Promise.resolve();
-            } else {
-              var _resolve = null;
-              var _reject = null;
-
-              this.__updatingPromise = p = new Promise(function(resolve, reject) {
-                // ignore the fulfillment value of returned promises
-                _resolve = function() { resolve(); };
-                _reject  = reject;
-              });
-
-              // Protect against overrides failing.
-              var cancelReason;
-              try {
-                cancelReason = this._onUpdateWill();
-              } catch(ex) { cancelReason = ex; }
-
-              (cancelReason ? Promise.reject(cancelReason) : this.__updateLoop())
-                .then(this.__onUpdateDidOuter.bind(this), this.__onUpdateRejectedOuter.bind(this))
-                .then(_resolve, _reject);
+              return Promise.resolve();
             }
+
+            updateActionExecution = this.act(new UpdateAction());
           }
 
-          return p;
+          // Create and execute an update action.
+          return updateActionExecution.promise;
         },
 
         /**
-         * Called when an update operation is going to be performed.
+         * Performs the _init_ phase of an update action execution.
          *
-         * The default implementation emits the [will:update]{@link pentaho.visual.base.events.WillUpdate} event.
+         * The default implementation does nothing.
          *
-         * Either the implementation or the event listeners are allowed to cancel the update or further modify the model.
-         *
-         * The implementation can cancel the update by returning or throwing an error.
-         *
-         * @return {pentaho.lang.UserError} An error, containing the cancellation reason; or `null`.
+         * @param {!pentaho.type.action.Execution} updateActionExecution - The update action execution.
          *
          * @protected
-         *
-         * @fires "will:update"
          */
-        _onUpdateWill: function() {
+        _onUpdateInit: function(updateActionExecution) {
+        },
 
-          if(this._hasListeners(WillUpdate.type)) {
+        /**
+         * Performs the _will_ phase of an update action execution.
+         *
+         * The default implementation calls
+         * [_emitActionPhaseWillEvent]{@link pentaho.type.action.impl.Target#_emitActionPhaseWillEvent}.
+         *
+         * @param {!pentaho.type.action.Execution} updateActionExecution - The update action execution.
+         *
+         * @protected
+         */
+        _onUpdateWill: function(updateActionExecution) {
+          this._emitActionPhaseWillEvent(updateActionExecution);
+        },
 
-            var willUpdate = new WillUpdate(this);
+        /**
+         * Performs the _do_ phase of an update action execution.
+         *
+         * The default implementation finally updates the view,
+         * if it is [dirty]{@link pentaho.visual.base.View#isDirty} and
+         * [valid]{@link pentaho.visual.base.View#$isValid}.
+         *
+         * @param {!pentaho.type.action.Execution} updateActionExecution - The update action execution.
+         *
+         * @return {!Promise} A promise that is fulfilled when the update action has completed successfully.
+         *
+         * @protected
+         */
+        _onUpdateDo: function(updateActionExecution) {
+          return this.__updateLoop();
+        },
 
-            if(!this._emitSafe(willUpdate))
-              return willUpdate.cancelReason;
-          }
-
-          return null;
+        /**
+         * Performs the _finally_ phase of an update action execution.
+         *
+         * The default implementation calls
+         * [_emitActionPhaseFinallyEvent]{@link pentaho.type.action.impl.Target#_emitActionPhaseFinallyEvent}.
+         *
+         * @param {!pentaho.type.action.Execution} updateActionExecution - The update action execution.
+         *
+         * @protected
+         */
+        _onUpdateFinally: function(updateActionExecution) {
+          this._emitActionPhaseFinallyEvent(updateActionExecution);
         },
 
         /**
@@ -617,15 +735,20 @@ define([
          */
         __updateLoop: function() {
 
-          // assert !this.__dirtyPropGroups.isEmpty;
+          var dirtyPropGroups = this.__dirtyPropGroups;
+
+          if(dirtyPropGroups.isEmpty) {
+            this.__updateActionExecution.done();
+            return Promise.resolve();
+          }
 
           var validationErrors = this.validate();
-          if(validationErrors)
+          if(validationErrors) {
             return Promise.reject(new UserError("View model is invalid:\n - " + validationErrors.join("\n - ")));
+          }
 
           // ---
 
-          var dirtyPropGroups = this.__dirtyPropGroups;
           var updateMethodInfo = this.__selectUpdateMethod(dirtyPropGroups);
 
           // Assume update succeeds.
@@ -635,9 +758,7 @@ define([
 
           return promise.wrapCall(this[updateMethodInfo.name], this)
               .then(function() {
-
-                return dirtyPropGroups.isEmpty ? Promise.resolve() : me.__updateLoop();
-
+                return me.__updateLoop();
               }, function(reason) {
 
                 // Restore
@@ -681,100 +802,9 @@ define([
 
           return methodInfo;
         },
-
-        /**
-         * Called to continue the update operation upon successful completion of the update loop.
-         *
-         * @private
-         *
-         * @fires "did:update"
-         */
-        __onUpdateDidOuter: function() {
-
-          // J.I.C.
-          this.__dirtyPropGroups.clear();
-          this.__updatingPromise =  null;
-
-          // ---
-
-          this.__callOverridableSafe("_onUpdateDid");
-        },
-
-        /**
-         * Called to continue the update operation upon update cancellation or failure of the update loop.
-         *
-         * @param {Error} reason - The error that describes why the update failed.
-         *
-         * @return {!Promise} A promise that is rejected with the given `reason`.
-         *
-         * @private
-         *
-         * @fires "rejected:update"
-         */
-        __onUpdateRejectedOuter: function(reason) {
-
-          this.__updatingPromise = null;
-
-          // ---
-
-          this.__callOverridableSafe("_onUpdateRejected", reason);
-
-          return Promise.reject(reason);
-        },
-
-        /**
-         * Called when an update operation has been performed with success.
-         *
-         * The [isUpdating]{@link pentaho.visual.base.View#isUpdating} property will now have value `false`.
-         * The [isDirty]{@link pentaho.visual.base.View#isDirty} property will also have value `false`.
-         *
-         * The default implementation emits the [did:update]{@link pentaho.visual.base.events.DidUpdate} event.
-         *
-         * The implementation or the event listeners are allowed to modify the model and thus possibly
-         * start **new** updates from the _did_ phase.
-         *
-         * If an implementation throws an error, the error is logged and
-         * the update operation is still considered successful.
-         *
-         * @protected
-         *
-         * @fires "did:update"
-         */
-        _onUpdateDid: function() {
-
-          if(this._hasListeners(DidUpdate.type))
-            this._emitSafe(new DidUpdate(this));
-        },
-
-        /**
-         * Called when an update operation has been canceled or has failed.
-         *
-         * The [isUpdating]{@link pentaho.visual.base.View#isUpdating} property will now have value `false`.
-         * The [isDirty]{@link pentaho.visual.base.View#isDirty} property **may** have value `true`.
-         *
-         * The default implementation emits the [rejected:update]{@link pentaho.visual.base.events.RejectedUpdate} event.
-         *
-         * The implementation or the event listeners are allowed to modify the model and thus possibly
-         * start **new** updates from the _rejected_ phase.
-         *
-         * If an implementation throws an error, the error is logged and
-         * the update operation is still rejected with the original error.
-         *
-         * @param {Error} reason - The reason why the update operation was canceled or has failed.
-         *
-         * @protected
-         *
-         * @fires "rejected:update"
-         */
-        _onUpdateRejected: function(reason) {
-
-          if(this._hasListeners(RejectedUpdate.type))
-            this._emitSafe(new RejectedUpdate(this, reason));
-        },
-
         // endregion
 
-        // region IActionTarget implementation
+        // region ITarget documentation specialization
         /**
          * Executes a given action with this view as its target and does not wait for its outcome.
          *
@@ -785,6 +815,9 @@ define([
          * This method can be given [synchronous]{@link pentaho.type.action.Base.Type#isSync} or asynchronous actions.
          * However, in the latter case, this method is only suitable for _fire-and-forget_ scenarios,
          * where it is not needed to know the outcome of the asynchronous action.
+         *
+         * @name pentaho.visual.base.View#act
+         * @method
          *
          * @example
          *
@@ -824,21 +857,12 @@ define([
          *
          * @return {!pentaho.type.action.Base} The given action.
          *
+         * @override
          * @see pentaho.visual.base.View#actAsync
          */
-        act: function(action) {
-
-          if(!action) throw error.argRequired("action");
-
-          action = __actionBaseType.to(action);
-
-          action.execute(this, this.__getActionController(action));
-
-          return action;
-        },
 
         /**
-         * Executes a given action in this view as its target and waits for its outcome.
+         * Executes a given action with this view as its target and waits for its outcome.
          *
          * Emits a structured event of a type equal to the action type's id,
          * with the action as event payload,
@@ -848,107 +872,32 @@ define([
          * and can be used when uniformity in treatment is desired and it is needed to know the outcome of the
          * asynchronous action.
          *
+         * @name pentaho.visual.base.View#actAsync
+         * @method
+         *
          * @param {!pentaho.type.action.Base} action - The action to execute.
          *
          * @return {!Promise} A promise that is fulfilled with the action's
          * [result]{@link pentaho.type.action.Base#result} or rejected with the action's
          * [error]{@link pentaho.type.action.Base#error}.
          *
+         * @override
          * @see pentaho.visual.base.View#act
          */
-        actAsync: function(action) {
-
-          if(!action) throw error.argRequired("action");
-
-          action = __actionBaseType.to(action);
-
-          return action.executeAsync(this, this.__getActionController(action));
-        },
-
-        __genericActionController: null,
-
-        __getActionController: function(action) {
-          return this.__genericActionController ||
-              (this.__genericActionController = this.__createGenericActionController());
-        },
-
-        __createGenericActionController: function() {
-          return {
-            init: this._onActionPhaseInit.bind(this),
-            will: this._onActionPhaseWill.bind(this),
-            "do": this._onActionPhaseDo.bind(this),
-            "finally": this._onActionPhaseFinally.bind(this)
-          };
-        },
-        // endregion
-
-        // region Actions
-        __emitActionPhase: function(action, phase, isFinal) {
-          var eventType = action.$type.id;
-
-          // TODO: emitGenericAsync when action is async.
-
-          this._emitGeneric(action, eventType, phase, isFinal ? null : __emitActionKeyArgs);
-        },
-
-        /**
-         * Performs an action's _initialize_ phase, by calling any registered action `init` observers.
-         *
-         * @param {!pentaho.type.action.Base} action - The action.
-         *
-         * @protected
-         */
-        _onActionPhaseInit: function(action) {
-          this.__emitActionPhase(action, "init");
-        },
-
-        /**
-         * Performs an action's _will_ phase, by calling any registered action `will` observers.
-         *
-         * @param {!pentaho.type.action.Base} action - The action.
-         *
-         * @protected
-         */
-        _onActionPhaseWill: function(action) {
-          this.__emitActionPhase(action, "will");
-        },
-
-        /**
-         * Performs an action's _do_ phase, by calling any registered action `do` observers.
-         *
-         * @param {!pentaho.type.action.Base} action - The action.
-         *
-         * @return {?Promise} A promise to the completion of the asynchronous `do` listener,
-         * of an [asynchronous]{@link pentaho.type.action.Base.Type#isSync} action, or `null`.
-         *
-         * @protected
-         */
-        _onActionPhaseDo: function(action) {
-          return this.__emitActionPhase(action, "do");
-        },
-
-        /**
-         * Performs an action's _finally_ phase, by calling any registered action `finally` observers.
-         *
-         * @param {!pentaho.type.action.Base} action - The action.
-         *
-         * @protected
-         */
-        _onActionPhaseFinally: function(action) {
-          this.__emitActionPhase(action, "finally", /* isFinal: */ true);
-        },
         // endregion
 
         /**
          * Disposes the view by freeing external resources held by the view.
          *
-         * The default implementation calls [_releaseDomContainer]{@link pentaho.visual.base.View#_releaseDomContainer}
+         * The default implementation calls
+         * [_releaseDomContainer]{@link pentaho.visual.base.View#_releaseDomContainer}
          * to release the DOM container.
          */
         dispose: function() {
 
-          if(this.__domContainer)
+          if(this.__domContainer) {
             this._releaseDomContainer();
+          }
         },
 
         // region Property groups - instance
@@ -988,31 +937,13 @@ define([
         },
         // endregion
 
-        /**
-         * Calls an overridable method and swallows and logs an error it throws.
-         *
-         * @param {string} methodName - The name of the overridable method to call.
-         * @param {...any} args - The arguments to pass to the method.
-         *
-         * @return {any} The value returned by the method; or `undefined`, if it throws an error.
-         *
-         * @private
-         */
-        __callOverridableSafe: function(methodName) {
-          var args = arg.slice(arguments, 1);
-          try {
-            return this[methodName].apply(this, args);
-          } catch(ex) {
-            logger.error("Exception thrown by 'View#" + methodName + "' override:" + ex + "\n" + ex.stack);
-          }
-        },
-
         // region serialization
         /** @inheritDoc */
         toSpecInContext: function(keyArgs) {
 
           if(keyArgs && keyArgs.isJson) {
-            keyArgs = keyArgs ? Object.create(keyArgs) : {};
+
+            keyArgs = Object.create(keyArgs);
 
             var omitProps = keyArgs.omitProps;
             keyArgs.omitProps = omitProps = omitProps ? Object.create(omitProps) : {};
@@ -1026,6 +957,9 @@ define([
 
         $type: /** @lends pentaho.visual.base.View.Type# */{
           isAbstract: true,
+
+          mixins: [TargetMixin],
+
           props: [
             {
               /**
@@ -1507,10 +1441,14 @@ define([
   /**
    * Parses the custom part of the name of partial update method (like *_updateXyz*).
    *
+   * @memberOf pentaho.visual.base.View~
+   *
    * @param {Class.<View>} ViewClass - The view class.
    * @param {string} groupNamesText - The part of the method name following the prefix "_update".
    *
    * @return {number} The property group bits corresponding to the method name.
+   *
+   * @private
    */
   function __parsePropertyGroupsText(ViewClass, groupNamesText) {
 

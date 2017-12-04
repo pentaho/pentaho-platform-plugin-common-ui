@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 define([
+  "module",
   // This exists only so that r.js sees otherwise invisible dependencies.
-  "pentaho/visual/action/base",
   "pentaho/data/filter/standard"
-], function() {
+], function(module) {
 
   "use strict";
 
@@ -35,40 +35,46 @@ define([
       var __abstractFilterType = AbstractFilter.type;
 
       /**
-       * @name pentaho.visual.action.Data.Type
+       * @name pentaho.visual.action.mixins.Data.Type
        * @class
        * @extends pentaho.visual.action.Base.Type
        *
-       * @classDesc The base type class of data actions.
+       * @classDesc The type class of the data action mixin.
        *
-       * For more information see {@link pentaho.visual.action.Data}.
+       * For more information see {@link pentaho.visual.action.mixins.Data}.
        */
 
-      return ActionBase.extend(/** @lends pentaho.visual.action.Data# */{
-        $type: /** @lends pentaho.visual.action.Data.Type# */{
+      /**
+       * @name Data
+       * @memberOf pentaho.visual.action.mixins
+       * @class
+       * @extends pentaho.visual.action.Base
+       * @abstract
+       *
+       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.action.mixins.Data>} pentaho/visual/action/mixins/data
+       *
+       * @classDesc The `visual.action.mixins.Data` class is a mixin class for visual actions
+       * which are performed on a subset of a data set.
+       *
+       * The actual subset is determined by the
+       * [data filter]{@link pentaho.visual.action.mixins.Data#dataFilter} property.
+       *
+       * The mixin adds [spec.IData]{@link pentaho.visual.action.mixins.spec.IData}
+       * to the specification of an action.
+       *
+       * @description This class was not designed to be constructed directly.
+       * It was designed to be used as a **mixin**.
+       * @constructor
+       */
+
+      return ActionBase.extend(/** @lends pentaho.visual.action.mixins.Data# */{
+        $type: {
+          id: module.id,
           isAbstract: true
         },
 
-        /**
-         * @alias Data
-         * @memberOf pentaho.visual.action
-         * @class
-         * @extends pentaho.visual.action.Base
-         * @abstract
-         *
-         * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.action.Data>} pentaho/visual/action/data
-         *
-         * @classDesc The `visual.action.Data` class is the base class of action types
-         * which are performed on a subset of a dataset and
-         * whose [target]{@link pentaho.visual.action.Base#target} is a [View]{@link pentaho.visual.base.View}.
-         *
-         * The actual subset is determined by the [data filter]{@link pentaho.visual.action.Data#dataFilter} property.
-         *
-         * @description Creates a data action instance given its specification.
-         * @param {pentaho.visual.action.spec.IData} [spec] A data action specification.
-         * @constructor
-         */
-        constructor: function(spec) {
+        // @override
+        _init: function(spec) {
 
           this.base(spec);
 
@@ -78,43 +84,42 @@ define([
         /**
          * Gets or sets the _data filter_ of this action.
          *
-         * Can only be set while the action is in an [editable]{@link pentaho.type.action.Base#isEditable} state.
-         *
          * When set to a filter specification, {@link pentaho.data.filter.spec.IAbstract},
          * it is converted into a filter object.
          * Any registered visual filter type can be safely loaded synchronously.
          *
          * @type {pentaho.data.filter.Abstract}
-         *
-         * @throws {pentaho.lang.OperationInvalidError} When set and the action is not in an editable state.
          */
         get dataFilter() {
-
           return this.__dataFilter;
         },
 
         set dataFilter(value) {
-
-          this._assertEditable();
 
           /**
            * The data filter of the action.
            *
            * @alias __dataFilter
            * @type {pentaho.data.filter.Abstract}
-           * @memberOf pentaho.visual.action.Data#
+           * @memberOf pentaho.visual.action.mixins.Data#
            * @private
            */
           this.__dataFilter = __abstractFilterType.to(value);
         },
 
         // region serialization
-        /** @inheritDoc */
         toSpecInContext: function(keyArgs) {
 
           var spec = this.base(keyArgs);
 
-          if(this.__dataFilter) spec.dataFilter = this.__dataFilter.toSpecInContext(keyArgs);
+          if(this.__dataFilter) {
+
+            keyArgs = keyArgs ? Object.create(keyArgs) : {};
+
+            keyArgs.declaredType = __abstractFilterType;
+
+            spec.dataFilter = this.__dataFilter.toSpecInContext(keyArgs);
+          }
 
           return spec;
         }

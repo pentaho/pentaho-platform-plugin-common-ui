@@ -18,8 +18,14 @@
  * The `ITarget` interface represents the entity which is acted upon
  * or the place where the [action]{@link pentaho.type.action.Base} takes place.
  *
- * In turn, commonly, an action target will emit events for each of the action's phases,
- * events in which it is its _source_.
+ * A target controls the execution of actions in it.
+ * Depending on the target and type of action,
+ * events may be emitted for each of the action execution's phases.
+ * Consult the documentation of the target type to know how it handles
+ * the execution of a given action.
+ *
+ * It is advisable that when a target does not know a specific action type
+ * that it executes it generically, by delegating all of its phases to events.
  *
  * @name pentaho.type.action.ITarget
  *
@@ -29,45 +35,18 @@
  */
 
 /**
- * Executes a given action in this target and does not wait for its outcome.
+ * Executes or starts execution of a given action in this target and returns the
+ * corresponding action execution instance.
  *
  * This method can be given [synchronous or asynchronous]{@link pentaho.type.action.Base.Type#isSync} actions.
- * However, in the latter case, this method is only suitable for _fire-and-forget_ scenarios,
- * where it is not needed to know the outcome of the asynchronous action.
- *
- * It is up to the action target implementation to
- * call the given action's [execute]{@link pentaho.type.action.Base#execute} method
- * with itself as target and, optionally, with an appropriate action executor.
+ * To wait for the result of an asynchronous action,
+ * obtain the [promise]{@link pentaho.type.action.Execution#promise} property
+ * of the returned action execution instance.
  *
  * @name act
  * @memberOf pentaho.type.action.ITarget#
  * @method
  * @param {!pentaho.type.action.Base|!pentaho.type.action.spec.IBase} action - The action or
  * action specification to execute.
- * @return {!pentaho.type.action.Base} The given action.
- *
- * @see pentaho.type.action.ITarget#actAsync
- */
-
-/**
- * Executes a given action in this target and waits for its outcome.
- *
- * This method can be given either [synchronous or asynchronous]{@link pentaho.type.action.Base.Type#isSync}
- * actions which allows for uniform treatment regardless of the synchronous nature of the action.
- * This method can also be used when the outcome of an asynchronous action must be known.
- *
- * It is up to the action target implementation to
- * call the given action's [executeAsync]{@link pentaho.type.action.Base#executeAsync} method
- * with itself as target and, optionally, with an appropriate action executor.
- *
- * @name actAsync
- * @memberOf pentaho.type.action.ITarget#
- * @method
- * @param {!pentaho.type.action.Base|!pentaho.type.action.spec.IBase} action - The action or
- * action specification to execute.
- * @return {!Promise} A promise that is fulfilled with the action's
- * [result]{@link pentaho.type.action.Base#result} or rejected with the action's
- * [error]{@link pentaho.type.action.Base#error}.
- *
- * @see pentaho.type.action.ITarget#act
+ * @return {!pentaho.type.action.Execution} The resulting action execution.
  */

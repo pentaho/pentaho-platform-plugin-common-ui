@@ -460,7 +460,7 @@ define([
 
       /**
        * Gets the [extensional]{@link https://en.wikipedia.org/wiki/Extensional_definition} representation of a
-       * [Filter]{@link pentaho.data.filter.spec.IFilter} by specifying the clauses that select data by inclusion.
+       * [Filter]{@link pentaho.data.filter.spec.IAbstract} by specifying the clauses that select data by inclusion.
        * If the resulting filtered data of a filter is empty then the [false filter]{@link pentaho.data.filter.False}
        * is returned
        *

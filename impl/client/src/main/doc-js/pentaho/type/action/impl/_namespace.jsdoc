@@ -15,11 +15,9 @@
  */
 
 /**
- * The `visual.action.spec.IBase` interface describes
- * a base action instance using a generic, _object_ form.
+ * @name pentaho.type.action.impl
+ * @namespace
  *
- * @name pentaho.visual.action.spec.IBase
- *
- * @interface
- * @extends pentaho.type.action.spec.IBase
+ * @description The `action.impl` namespace contains implementations related with the action concept.
  */
+

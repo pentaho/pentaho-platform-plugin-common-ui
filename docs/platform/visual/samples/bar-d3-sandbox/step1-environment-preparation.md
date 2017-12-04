@@ -150,14 +150,14 @@ npm install
                   .then(function (view) {
                     // Handle the execute action.
                     view.on("pentaho/visual/action/execute", {
-                      "do": function (action) {
+                      "do": function (event, action) {
                         alert("Executed " + action.dataFilter.contentKey);
                       }
                     });
 
                     // Handle the select action.
                     view.on("pentaho/visual/action/select", {
-                      "finally": function (action) {
+                      "finally": function (event, action) {
                         document.getElementById("messages_div").innerText = "Selected: " + view.selectionFilter.contentKey;
                       }
                     });
