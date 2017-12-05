@@ -15,11 +15,19 @@
  */
 
 /**
- * The `visual.action.spec.IBase` interface describes
- * a base action instance using a generic, _object_ form.
+ * The `visual.action.mixins.spec.IPositioned` interface the
+ * position properties of a visual action using a generic, _object_ form.
  *
- * @name pentaho.visual.action.spec.IBase
+ * @name pentaho.visual.action.mixins.spec.IPositioned
  *
  * @interface
  * @extends pentaho.type.action.spec.IBase
+ */
+
+/**
+ * The position where the action took place, in screen coordinates.
+ *
+ * @name position
+ * @memberOf pentaho.visual.action.mixins.spec.IPositioned#
+ * @type {pentaho.visual.spec.IPoint}
  */

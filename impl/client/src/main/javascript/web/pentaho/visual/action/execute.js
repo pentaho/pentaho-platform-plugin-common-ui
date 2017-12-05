@@ -17,37 +17,41 @@ define(function() {
 
   "use strict";
 
-  return ["pentaho/visual/action/data", function(DataAction) {
+  return [
+    "./base",
+    "./mixins/data",
+    "./mixins/positioned",
+    function(BaseAction, DataActionMixin, PositionedActionMixin) {
 
-    /**
-     * @name pentaho.visual.action.Execute.Type
-     * @class
-     * @extends pentaho.visual.action.Data.Type
-     *
-     * @classDesc The type class of "execute" actions.
-     *
-     * For more information see {@link pentaho.visual.action.Execute}.
-     */
+      /**
+       * @name pentaho.visual.action.Execute.Type
+       * @class
+       * @extends pentaho.visual.action.Base.Type
+       * @extends pentaho.visual.action.mixins.Data.Type
+       * @extends pentaho.visual.action.mixins.Positioned.Type
+       *
+       * @classDesc The type class of {@link pentaho.visual.action.Execute}.
+       */
 
-    /**
-     * @name Execute
-     * @memberOf pentaho.visual.action
-     * @class
-     * @extends pentaho.visual.action.Data
-     *
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.action.Execute>} pentaho/visual/action/execute
-     *
-     * @classDesc The `Execute` action is a synchronous action that is performed when
-     * the user interacts with a visual element, typically by double clicking it.
-     *
-     * This action has the *alias* `"execute"`,
-     * which can also be specified as the event name
-     * when calling [on]{@link pentaho.lang,IEventSource#on} of action targets.
-     */
-    return DataAction.extend(/** @lends  pentaho.visual.action.Execute# */{
-      $type: {
-        alias: "execute"
-      }
-    });
-  }];
+      /**
+       * @name Execute
+       * @memberOf pentaho.visual.action
+       * @class
+       * @extends pentaho.visual.action.Base
+       * @extends pentaho.visual.action.mixins.Data
+       * @extends pentaho.visual.action.mixins.Positioned
+       *
+       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.action.Execute>} pentaho/visual/action/execute
+       *
+       * @classDesc The `Execute` action is a synchronous, data and positioned action that
+       * is performed when the user interacts with a visual element,
+       * typically by double clicking it.
+       */
+      return BaseAction.extend(/** @lends  pentaho.visual.action.Execute# */{
+        $type: {
+          mixins: [DataActionMixin, PositionedActionMixin]
+        }
+      });
+    }
+  ];
 });

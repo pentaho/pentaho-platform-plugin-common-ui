@@ -18,7 +18,7 @@ define(function() {
   "use strict";
 
   /**
-   * The `States` enum is the class of names of _action states_.
+   * The `States` enum is the class of names of _action execution states_.
    *
    * @memberOf pentaho.type.action
    * @enum {number}
@@ -26,43 +26,43 @@ define(function() {
    */
   var States = {
     /**
-     * The `candidate` action state.
+     * The `unstarted` action execution state.
      * @default
      */
-    candidate: 1,
+    unstarted: 1,
 
     /**
-     * The `init` action state.
+     * The `init` action execution state.
      * @default
      */
     init: 2,
 
     /**
-     * The `will` action state.
+     * The `will` action execution state.
      * @default
      */
     will: 4,
 
     /**
-     * The `do` action state.
+     * The `do` action execution state.
      * @default
      */
     "do": 8,
 
     /**
-     * The `did` action state.
+     * The `did` action execution state.
      * @default
      */
     did: 16,
 
     /**
-     * The `canceled` action state.
+     * The `canceled` action execution state.
      * @default
      */
     canceled: 32,
 
     /**
-     * The `failed` action state.
+     * The `failed` action execution state.
      * @default
      */
     failed: 64

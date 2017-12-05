@@ -16,10 +16,9 @@
 define([
   "pentaho/data/Table",
   "pentaho/type/Context",
-  "pentaho/type/events/DidChange",
   "tests/test-utils",
   "tests/pentaho/util/errorMatch"
-], function(Table, Context, DidChange, testUtils, errorMatch) {
+], function(Table, Context, testUtils, errorMatch) {
 
   "use strict";
 
@@ -35,6 +34,15 @@ define([
     var model;
     var dataTable;
     var context;
+
+    function createValidAndDirtyView() {
+      return new View({
+        width: 100,
+        height: 100,
+        domContainer: document.createElement("div"),
+        model: model
+      });
+    }
 
     beforeEach(function(done) {
 
@@ -199,122 +207,92 @@ define([
       });
     });
 
-    describe("#update()", function() {
+    describe("#update() and UpdateActionExecution", function() {
 
-      describe("Will phase", function() {
+      it("should call the _onUpdate* methods, with the action execution instance", function() {
 
-        function createView() {
-          var view = new View({
-            width: 100,
-            height: 100,
-            domContainer: document.createElement("div"),
-            model: model
-          });
+        var view = createValidAndDirtyView();
 
-          // Silence these
-          spyOn(view, "__onUpdateDidOuter");
-          spyOn(view, "__onUpdateRejectedOuter").and.callFake(function(error) { return Promise.reject(error); });
-          spyOn(view, "__updateLoop").and.returnValue(Promise.resolve());
+        var actionExecution;
 
-          spyOn(view, "_onUpdateWill");
+        spyOn(view, "_onUpdateInit").and.callFake(function(_actionExecution) {
+          actionExecution = _actionExecution;
+          expect(!!actionExecution).toBe(true);
+        });
+        spyOn(view, "_onUpdateWill").and.callThrough();
+        spyOn(view, "_onUpdateDo").and.returnValue(Promise.resolve());
+        spyOn(view, "_onUpdateFinally").and.callThrough();
 
-          return view;
-        }
+        var promise = view.update();
 
-        it("should call the '_onUpdateWill' method before the update loop", function() {
+        promise.then(function() {
+          expect(view._onUpdateInit).toHaveBeenCalled();
+          expect(view._onUpdateWill).toHaveBeenCalledWith(actionExecution);
+          expect(view._onUpdateDo).toHaveBeenCalledWith(actionExecution);
+          expect(view._onUpdateFinally).toHaveBeenCalledWith(actionExecution);
+        });
+      });
 
-          var view = createView();
+      it("should emit the 'pentaho/visual/action/update:will' event from within the _onUpdateWill method", function() {
 
-          view.__updateLoop.and.callFake(function() {
+        var originalOnUpdateWill = View.prototype._onUpdateWill;
 
-            expect(view._onUpdateWill).toHaveBeenCalledTimes(1);
+        var view = createValidAndDirtyView();
 
-            return Promise.resolve();
-          });
+        spyOn(view, "_onUpdateInit");
+        spyOn(view, "_onUpdateWill");
+        spyOn(view, "_onUpdateDo").and.returnValue(Promise.resolve());
+        spyOn(view, "_onUpdateFinally");
 
-          return view.update().then(function() {
-            expect(view.__updateLoop).toHaveBeenCalledTimes(1);
-            expect(view._onUpdateWill).toHaveBeenCalledTimes(1);
-          });
+        var listener = jasmine.createSpy("will:update");
+
+        view.on("pentaho/visual/action/update", {will: listener});
+
+        view._onUpdateWill.and.callFake(function() {
+
+          expect(listener).not.toHaveBeenCalled();
+
+          var result = originalOnUpdateWill.apply(this, arguments);
+
+          expect(listener).toHaveBeenCalledTimes(1);
+
+          return result;
         });
 
-        it("should reject the update and not perform the update loop if '_onUpdateWill' returns an error", function() {
+        return view.update().then(function() {
+          expect(view._onUpdateWill).toHaveBeenCalled();
+        });
+      });
 
-          var view = createView();
+      it("should emit the 'pentaho/visual/action/update:finally' event " +
+         "from within the _onUpdateFinally method", function() {
 
-          var errorWill = new Error();
+        var originalOnUpdateFinally = View.prototype._onUpdateFinally;
 
-          view._onUpdateWill.and.returnValue(errorWill);
+        var view = createValidAndDirtyView();
 
-          return view.update().then(function() {
-            fail("Expected update to have been rejected.");
-          }, function(reason) {
-            expect(view.__updateLoop).not.toHaveBeenCalled();
-            expect(reason).toBe(errorWill);
-          });
+        spyOn(view, "_onUpdateInit");
+        spyOn(view, "_onUpdateWill");
+        spyOn(view, "_onUpdateDo").and.returnValue(Promise.resolve());
+        spyOn(view, "_onUpdateFinally");
+
+        var listener = jasmine.createSpy("finally:update");
+
+        view.on("pentaho/visual/action/update", {"finally": listener});
+
+        view._onUpdateFinally.and.callFake(function() {
+
+          expect(listener).not.toHaveBeenCalled();
+
+          var result = originalOnUpdateFinally.apply(this, arguments);
+
+          expect(listener).toHaveBeenCalledTimes(1);
+
+          return result;
         });
 
-        it("should reject the update and not perform the update loop if '_onUpdateWill' throws an error", function() {
-
-          var view = createView();
-
-          var errorWill = new Error();
-
-          view._onUpdateWill.and.throwError(errorWill);
-
-          return view.update().then(function() {
-            fail("Expected update to have been rejected.");
-          }, function(reason) {
-            expect(view.__updateLoop).not.toHaveBeenCalled();
-            expect(reason).toBe(errorWill);
-          });
-        });
-
-        it("should emit the 'will:update' event from within the _onUpdateWill method", function() {
-
-          var view = createView();
-
-          var listener = jasmine.createSpy("will:update");
-          view.on("will:update", listener);
-
-          var originalMethod = View.prototype._onUpdateWill;
-
-          view._onUpdateWill.and.callFake(function() {
-
-            expect(listener).not.toHaveBeenCalled();
-
-            var result = originalMethod.apply(this, arguments);
-
-            expect(listener).toHaveBeenCalledTimes(1);
-
-            return result;
-          });
-
-          return view.update().then(function() {
-            expect(view._onUpdateWill).toHaveBeenCalled();
-          });
-        });
-
-        it("should reject the update if the 'will:update' event is canceled", function() {
-
-          var view = createView();
-
-          view._onUpdateWill.and.callThrough();
-
-          var cancelReason;
-          var listener = jasmine.createSpy("will:update").and.callFake(function(event) {
-            event.cancel("I was canceled");
-            cancelReason = event.cancelReason;
-          });
-
-          view.on("will:update", listener);
-
-          return view.update().then(function() {
-            fail("Expected update to have been rejected.");
-          }, function(reason) {
-            expect(listener).toHaveBeenCalled();
-            expect(cancelReason).toBe(reason);
-          });
+        return view.update().then(function() {
+          expect(view._onUpdateFinally).toHaveBeenCalled();
         });
       });
 
@@ -322,18 +300,9 @@ define([
 
         function createView() {
 
-          var view = new View({
-            width: 100,
-            height: 100,
-            domContainer: document.createElement("div"),
-            model: model
-          });
+          var view = createValidAndDirtyView();
 
-          // Silence these
           spyOn(view, "_onUpdateWill");
-          spyOn(view, "__onUpdateDidOuter");
-
-          spyOn(view, "__onUpdateRejectedOuter").and.callFake(function(error) { return Promise.reject(error); });
           spyOn(view, "__updateLoop").and.callThrough();
           spyOn(view, "_updateAll");
 
@@ -438,218 +407,11 @@ define([
         });
       });
 
-      describe("Did phase", function() {
-
-        function createView() {
-
-          var view = new View({
-            width: 100,
-            height: 100,
-            domContainer: document.createElement("div"),
-            model: model
-          });
-
-          // Silence these
-          spyOn(view, "_onUpdateWill");
-          spyOn(view, "_onUpdateDid");
-
-          spyOn(view, "__onUpdateRejectedOuter").and.callFake(function(error) {
-            this.__updatingPromise = null;
-            return Promise.reject(error);
-          });
-          spyOn(view, "__updateLoop").and.returnValue(Promise.resolve());
-
-          return view;
-        }
-
-        it("should call _onUpdateDid if the update succeeds", function() {
-
-          var view = createView();
-
-          return view.update().then(function() {
-            expect(view._onUpdateDid).toHaveBeenCalled();
-          });
-        });
-
-        it("should not call _onUpdateDid if the update is rejected", function() {
-
-          var view = createView();
-          view.__updateLoop.and.returnValue(Promise.reject(new Error("Failed")));
-
-          return view.update().then(function() {
-            fail("Expected update to have been rejected.");
-          }, function() {
-            expect(view._onUpdateDid).not.toHaveBeenCalled();
-          });
-        });
-
-        it("should call _onUpdateDid after the update loop", function() {
-
-          var view = createView();
-
-          view.__updateLoop.and.callFake(function() {
-            expect(view._onUpdateDid).not.toHaveBeenCalled();
-            return Promise.resolve();
-          });
-
-          return view.update().then(function() {
-            expect(view.__updateLoop).toHaveBeenCalledTimes(1);
-          });
-        });
-
-        it("should fulfill the update even if '_onUpdateDid' throws an error", function() {
-
-          console.log("TEST: expect console error.");
-          var view = createView();
-
-          view._onUpdateDid.and.throwError(new Error());
-
-          return view.update();
-        });
-
-        it("should emit the 'did:update' event from within the _onUpdateDid method", function() {
-
-          var view = createView();
-
-          var listener = jasmine.createSpy("did:update");
-          view.on("did:update", listener);
-
-          var originalMethod = View.prototype._onUpdateDid;
-
-          view._onUpdateDid.and.callFake(function() {
-
-            expect(listener).not.toHaveBeenCalled();
-
-            var result = originalMethod.apply(this, arguments);
-
-            expect(listener).toHaveBeenCalledTimes(1);
-
-            return result;
-          });
-
-          return view.update().then(function() {
-            expect(view._onUpdateDid).toHaveBeenCalled();
-          });
-        });
-      });
-
-      describe("Rejected phase", function() {
-
-        function createView() {
-
-          var view = new View({
-            width: 100,
-            height: 100,
-            domContainer: document.createElement("div"),
-            model: model
-          });
-
-          // Silence these
-          spyOn(view, "_onUpdateWill");
-          spyOn(view, "__updateLoop").and.returnValue(Promise.reject(new Error("Failed")));
-          spyOn(view, "_onUpdateRejected").and.callThrough();
-          spyOn(view, "__onUpdateDidOuter").and.callFake(function() {
-            this.__updatingPromise = null;
-          });
-          return view;
-        }
-
-        it("should call _onUpdateRejected if the update is rejected", function() {
-
-          var view = createView();
-
-          return view.update().then(function() {
-            fail("Expected update to have been rejected.");
-          }, function() {
-            expect(view._onUpdateRejected).toHaveBeenCalled();
-          });
-        });
-
-        it("should not call _onUpdateRejected if the update is fulfilled", function() {
-
-          var view = createView();
-          view.__updateLoop.and.returnValue(Promise.resolve());
-
-          return view.update().then(function() {
-            expect(view._onUpdateRejected).not.toHaveBeenCalled();
-          });
-        });
-
-        it("should call _onUpdateRejected after the update loop", function() {
-
-          var view = createView();
-
-          view.__updateLoop.and.callFake(function() {
-            expect(view._onUpdateRejected).not.toHaveBeenCalled();
-            return Promise.reject(new Error("Failed."));
-          });
-
-          return view.update().then(function() {
-            expect(view.__updateLoop).toHaveBeenCalled();
-          }, function() {
-            expect(view.__updateLoop).toHaveBeenCalled();
-          });
-        });
-
-        it("should reject the update with the original error, even if '_onUpdateRejected' throws an error", function() {
-
-          var error0 = new Error("Failed");
-          var view = createView();
-          view.__updateLoop.and.returnValue(Promise.reject(error0));
-
-          view._onUpdateRejected.and.throwError(new Error());
-
-          console.log("TEST: expect console error.");
-
-          return view.update().then(function() {
-            fail("Expected update to have been rejected.");
-          }, function(reason) {
-            expect(reason).toBe(error0);
-          });
-        });
-
-        it("should emit the 'rejected:update' event from within the _onUpdateRejected method", function() {
-
-          var view = createView();
-
-          var listener = jasmine.createSpy("rejected:update");
-          view.on("rejected:update", listener);
-
-          var originalMethod = View.prototype._onUpdateRejected;
-
-          view._onUpdateRejected.and.callFake(function() {
-
-            expect(listener).not.toHaveBeenCalled();
-
-            var result = originalMethod.apply(this, arguments);
-
-            expect(listener).toHaveBeenCalledTimes(1);
-
-            return result;
-          });
-
-          return view.update().then(function() {
-            fail("Expected update to have been rejected.");
-          }, function() {
-            expect(view._onUpdateRejected).toHaveBeenCalled();
-          });
-        });
-      });
-
       describe("Concurrency", function() {
-
-        function createView() {
-          return new View({
-            width: 100,
-            height: 100,
-            domContainer: document.createElement("div"),
-            model: model
-          });
-        }
 
         it("should be able to call update twice", function() {
 
-          var view = createView();
+          var view = createValidAndDirtyView();
 
           return view.update().then(function() {
 
@@ -662,7 +424,7 @@ define([
         it("should return a promise to the current update when an update operation " +
            "is already undergoing (nested)", function() {
 
-          var view = createView();
+          var view = createValidAndDirtyView();
 
           var pDuring = null;
 
@@ -680,7 +442,7 @@ define([
         it("should return a promise to the current update when an update operation " +
            "is already undergoing (async)", function() {
 
-          var view = createView();
+          var view = createValidAndDirtyView();
 
           var _resolve = null;
 
@@ -699,7 +461,7 @@ define([
       });
     });
 
-    describe("#update (handling of dirty bits)", function() {
+    describe("#update() - handling of dirty bits", function() {
       var DerivedView;
 
       beforeEach(function() {
@@ -711,7 +473,8 @@ define([
         });
       });
 
-      function createView() {
+      function createValidAndCleanView() {
+
         var view = new DerivedView({
           width: 100,
           height: 100,
@@ -739,7 +502,7 @@ define([
 
       it("should return immediately when the view is not updating and is not dirty", function() {
 
-        var view  = createView();
+        var view = createValidAndCleanView();
 
         spyOn(view, "_updateAll");
 
@@ -750,7 +513,7 @@ define([
 
       it("should call #_updateSize when the Size bit is set", function() {
 
-        var view  = createView();
+        var view  = createValidAndCleanView();
         var spies = createUpdateSpies(view);
 
         view.__dirtyPropGroups.set(View.PropertyGroups.Size);
@@ -765,7 +528,7 @@ define([
 
       it("should call #_updateSelection when the Selection bit is set", function() {
 
-        var view  = createView();
+        var view  = createValidAndCleanView();
         var spies = createUpdateSpies(view);
 
         view.__dirtyPropGroups.set(View.PropertyGroups.Selection);
@@ -780,7 +543,7 @@ define([
 
       it("should call #_updateSizeAndSelection when both the Size and Selection bits are set", function() {
 
-        var view  = createView();
+        var view  = createValidAndCleanView();
         var spies = createUpdateSpies(view);
 
         view.__dirtyPropGroups.set(View.PropertyGroups.Size | View.PropertyGroups.Selection);
@@ -795,7 +558,7 @@ define([
 
       it("should call #_updateAll when both the General, Size and Selection bits are set", function() {
 
-        var view  = createView();
+        var view  = createValidAndCleanView();
         var spies = createUpdateSpies(view);
 
         view.__dirtyPropGroups.set(
@@ -811,7 +574,7 @@ define([
 
       it("should allow model changes of different PropGroups during an async update operation", function() {
 
-        var view = createView();
+        var view = createValidAndCleanView();
 
         var _resolveSize = null;
 
@@ -845,7 +608,7 @@ define([
 
       it("should allow model changes of the same PropGroups during an async update operation", function() {
 
-        var view = createView();
+        var view = createValidAndCleanView();
 
         var _resolveSize1 = null;
 
@@ -980,12 +743,14 @@ define([
       }
 
       it("should get `true`, initially", function() {
+
         var view = new View();
 
         expect(view.isAutoUpdate).toBe(true);
       });
 
       it("should get a set value", function() {
+
         var view = new View();
 
         view.isAutoUpdate = false;
@@ -1077,11 +842,11 @@ define([
         }).toThrowError(TypeError);
       });
 
-      it("should be `true` when 'will:update' is called", function() {
+      it("should be `true` when 'pentaho/visual/action/update:{will}' is called", function() {
 
-        view.on("will:update", function() {
+        view.on("pentaho/visual/action/update", {will: function() {
           expect(view.isDirty).toBe(true);
-        });
+        }});
 
         return view.update();
       });
@@ -1097,22 +862,22 @@ define([
         return view.update();
       });
 
-      it("should be `false` when 'did:update' is called", function() {
+      it("should be `false` when 'pentaho/visual/action/update:{finally}' is called with success", function() {
 
-        view.on("did:update", function() {
+        view.on("pentaho/visual/action/update", {"finally": function() {
           expect(view.isDirty).toBe(false);
-        });
+        }});
 
         return view.update();
       });
 
-      it("should be `true` when 'rejected:update' is called", function() {
+      it("should be `true` when 'pentaho/visual/action/update:{finally}' is called with failure", function() {
 
         spyOn(view, "_updateAll").and.returnValue(Promise.reject("Just because."));
 
-        view.on("rejected:update", function() {
+        view.on("pentaho/visual/action/update", {"finally": function() {
           expect(view.isDirty).toBe(true);
-        });
+        }});
 
         return view.update().then(function() {
           fail("Expected update to have been rejected.");
@@ -1144,9 +909,12 @@ define([
 
     describe("#isUpdating", function() {
 
+      var UpdateAction;
       var view;
 
       beforeEach(function() {
+        // Assuming pre-loaded with View
+        UpdateAction = context.get("pentaho/visual/action/update");
         view = new View({
           width: 100,
           height: 100,
@@ -1165,10 +933,12 @@ define([
         }).toThrowError(TypeError);
       });
 
-      it("should be `true` when 'will:update' is called", function() {
+      it("should be `true` when 'update/will' is called", function() {
 
-        view.on("will:update", function() {
-          expect(view.isUpdating).toBe(true);
+        view.on("pentaho/visual/action/update", {
+          will: function() {
+            expect(view.isUpdating).toBe(true);
+          }
         });
 
         return view.update();
@@ -1185,21 +955,25 @@ define([
         return view.update();
       });
 
-      it("should be `false` when 'did:udpate' is called", function() {
+      it("should be `false` when 'pentaho/visual/action/update:{finally}' is called with success", function() {
 
-        view.on("did:update", function() {
-          expect(view.isUpdating).toBe(false);
+        view.on("pentaho/visual/action/update", {
+          "finally": function() {
+            expect(view.isUpdating).toBe(false);
+          }
         });
 
         return view.update();
       });
 
-      it("should be `false` when 'rejected:update' is called", function() {
+      it("should be `false` when 'pentaho/visual/action/update:{finally}' is called with failure", function() {
 
         spyOn(view, "_updateAll").and.returnValue(Promise.reject("Just because."));
 
-        view.on("rejected:update", function() {
-          expect(view.isUpdating).toBe(false);
+        view.on("pentaho/visual/action/update", {
+          "finally": function() {
+            expect(view.isUpdating).toBe(false);
+          }
         });
 
         return view.update().then(function() {
@@ -1483,39 +1257,38 @@ define([
     });
 
     describe("#act", function() {
-      var SelectAction;
-      var ExecuteAction;
+      var CustomSyncAction;
 
       beforeEach(function() {
         // Assuming pre-loaded with View
-        SelectAction = context.get("pentaho/visual/action/select");
-        ExecuteAction = context.get("pentaho/visual/action/execute");
+        CustomSyncAction = context.get("pentaho/visual/action/base").extend({
+          $type: {
+            id: "my/test/action",
+            isAbstract: false
+          }
+        });
       });
 
-      it("should call all _onActionPhase<Phase> methods", function() {
+      it("should call all `_emitActionPhase*Event` methods with the action execution", function() {
 
         var view = new View();
 
-        var action = new ExecuteAction();
+        spyOn(view, "_emitActionPhaseInitEvent").and.callThrough();
+        spyOn(view, "_emitActionPhaseWillEvent").and.callThrough();
+        spyOn(view, "_emitActionPhaseDoEvent").and.callThrough();
+        spyOn(view, "_emitActionPhaseFinallyEvent").and.callThrough();
 
-        spyOn(view, "_onActionPhaseInit").and.callThrough();
-        spyOn(view, "_onActionPhaseWill").and.callThrough();
-        spyOn(view, "_onActionPhaseDo").and.callThrough();
-        spyOn(view, "_onActionPhaseFinally").and.callThrough();
+        var actionExecution = view.act(new CustomSyncAction());
 
-        view.act(action);
-
-        expect(view._onActionPhaseInit).toHaveBeenCalledWith(action);
-        expect(view._onActionPhaseWill).toHaveBeenCalledWith(action);
-        expect(view._onActionPhaseDo).toHaveBeenCalledWith(action);
-        expect(view._onActionPhaseFinally).toHaveBeenCalledWith(action);
+        return actionExecution.promise.then(function() {
+          expect(view._emitActionPhaseInitEvent).toHaveBeenCalledWith(actionExecution);
+          expect(view._emitActionPhaseWillEvent).toHaveBeenCalledWith(actionExecution);
+          expect(view._emitActionPhaseDoEvent).toHaveBeenCalledWith(actionExecution);
+          expect(view._emitActionPhaseFinallyEvent).toHaveBeenCalledWith(actionExecution);
+        });
       });
 
       it("should call registered view event listeners", function() {
-
-        var view = new View();
-
-        var action = new ExecuteAction();
 
         var observer = {
           init: jasmine.createSpy(),
@@ -1524,77 +1297,67 @@ define([
           "finally": jasmine.createSpy()
         };
 
-        view.on(ExecuteAction.type.id, observer);
+        var view = new View();
+        view.on(CustomSyncAction.type.id, observer);
 
-        view.act(action);
+        var actionExecution = view.act(new CustomSyncAction());
 
-        expect(observer.init).toHaveBeenCalledWith(action);
-        expect(observer.will).toHaveBeenCalledWith(action);
-        expect(observer["do"]).toHaveBeenCalledWith(action);
-        expect(observer["finally"]).toHaveBeenCalledWith(action);
+        return actionExecution.promise.then(function() {
+          expect(observer.init).toHaveBeenCalledWith(actionExecution, actionExecution.action);
+          expect(observer.will).toHaveBeenCalledWith(actionExecution, actionExecution.action);
+          expect(observer["do"]).toHaveBeenCalledWith(actionExecution, actionExecution.action);
+          expect(observer["finally"]).toHaveBeenCalledWith(actionExecution, actionExecution.action);
+        });
       });
 
       it("should allow canceling the action in the init phase", function() {
 
-        var view = new View();
-
-        var action = new ExecuteAction();
-
         var observer = {
-          init: jasmine.createSpy("init").and.callFake(function(action) {
-            action.reject();
+          init: jasmine.createSpy("init").and.callFake(function(event) {
+            event.reject();
           }),
           will: jasmine.createSpy("will"),
           "do": jasmine.createSpy("do"),
-          "finally": jasmine.createSpy("finally").and.callFake(function(action) {
-            expect(action.isRejected).toBe(true);
-            expect(action.isCanceled).toBe(true);
-            expect(action.isFailed).toBe(false);
-            expect(action.isExecuting).toBe(false);
-            expect(action.isFinished).toBe(true);
+          "finally": jasmine.createSpy("finally").and.callFake(function(event) {
+            expect(event.isCanceled).toBe(true);
           })
         };
 
-        view.on(ExecuteAction.type.id, observer);
+        var view = new View();
 
-        view.act(action);
+        view.on(CustomSyncAction.type.id, observer);
 
-        expect(observer.init).toHaveBeenCalledWith(action);
-        expect(observer.will).not.toHaveBeenCalled();
-        expect(observer["do"]).not.toHaveBeenCalled();
-        expect(observer["finally"]).toHaveBeenCalledWith(action);
+        view.act(new CustomSyncAction()).promise.then(function() {
+          expect(observer.init).toHaveBeenCalled();
+          expect(observer.will).not.toHaveBeenCalled();
+          expect(observer["do"]).not.toHaveBeenCalled();
+          expect(observer["finally"]).toHaveBeenCalled();
+        });
       });
 
       it("should allow canceling the action in the will phase", function() {
 
-        var view = new View();
-
-        var action = new ExecuteAction();
-
         var observer = {
           init: jasmine.createSpy("init"),
-          will: jasmine.createSpy("will").and.callFake(function(action) {
-            action.reject();
+          will: jasmine.createSpy("will").and.callFake(function(event) {
+            event.reject();
           }),
           "do": jasmine.createSpy("do"),
-          "finally": jasmine.createSpy("finally").and.callFake(function(action) {
-            expect(action.isRejected).toBe(true);
-            expect(action.isCanceled).toBe(true);
-            expect(action.isFailed).toBe(false);
-            expect(action.isExecuting).toBe(false);
-            expect(action.isFinished).toBe(true);
+          "finally": jasmine.createSpy("finally").and.callFake(function(event) {
+            expect(event.isCanceled).toBe(true);
           })
         };
 
-        // Use the alias.
-        view.on("execute", observer);
+        var view = new View();
 
-        view.act(action);
+        view.on(CustomSyncAction.type.id, observer);
 
-        expect(observer.init).toHaveBeenCalledWith(action);
-        expect(observer.will).toHaveBeenCalledWith(action);
-        expect(observer["do"]).not.toHaveBeenCalled();
-        expect(observer["finally"]).toHaveBeenCalledWith(action);
+        view.act(new CustomSyncAction()).promise.then(function() {
+          expect(observer.init).toHaveBeenCalled();
+          expect(observer.will).toHaveBeenCalled();
+          expect(observer["do"]).not.toHaveBeenCalled();
+          expect(observer["finally"]).toHaveBeenCalled();
+        });
       });
     });
 
@@ -1621,7 +1384,7 @@ define([
 
       it("should return a rejected promise when given no modelType", function() {
 
-        return testUtils.expectToRejectWith(View.getClassAsync(null), {
+        return testUtils.expectToRejectWith(function() { return View.getClassAsync(null); }, {
           asymmetricMatch: function(error) { return error instanceof Error; }
         });
       });
@@ -1631,7 +1394,7 @@ define([
 
         var SubModel = Model.extend({$type: {defaultView: null}});
 
-        return testUtils.expectToRejectWith(View.getClassAsync(SubModel.type), {
+        return testUtils.expectToRejectWith(function() { return View.getClassAsync(SubModel.type); }, {
           asymmetricMatch: function(error) { return error instanceof Error; }
         });
       });
@@ -1641,14 +1404,14 @@ define([
 
         var SubModel = Model.extend({$type: {defaultView: "test/foo/bar/view"}});
 
-        return testUtils.expectToRejectWith(View.getClassAsync(SubModel.type), {
+        return testUtils.expectToRejectWith(function() { return View.getClassAsync(SubModel.type); }, {
           asymmetricMatch: function(error) { return error instanceof Error; }
         });
       });
 
       it("should return a promise that is rejected when the model type identifier does not exist", function() {
 
-        return testUtils.expectToRejectWith(View.getClassAsync("test/foo/bar"), {
+        return testUtils.expectToRejectWith(function() { return View.getClassAsync("test/foo/bar"); }, {
           asymmetricMatch: function(error) { return error instanceof Error; }
         });
       });
@@ -1820,7 +1583,10 @@ define([
 
           return Context.createAsync().then(function(context) {
 
-            return context.getDependencyApplyAsync(["pentaho/visual/base/view", "test/foo/model"], function(View, FooModel) {
+            return context.getDependencyApplyAsync([
+              "pentaho/visual/base/view",
+              "test/foo/model"
+            ], function(View, FooModel) {
 
               var fooModel = new FooModel();
               var viewSpec = {

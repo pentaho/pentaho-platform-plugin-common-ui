@@ -23,34 +23,47 @@ define([
   "../util/object",
   "../util/fun",
   "../util/logger"
-], function(module, Base, Event, typeInfo, error, O, F, logger) {
+],
+function(module, Base, Event, typeInfo, error, O, F, logger) {
 
   "use strict";
 
-  /* eslint new-cap: 0 */
+  /* eslint new-cap: 0, dot-notation: 0 */
 
   var O_hasOwn = Object.prototype.hasOwnProperty;
   var keyArgsEmitEventUnsafe = {isCanceled: __event_isCanceled, errorHandler: null};
-  var keyArgsEmitEventSafe = {isCanceled: __event_isCanceled, errorHandler: __errorHandlerLog};
+  var keyArgsEmitEventSafe = {isCanceled: __event_isCanceled, errorHandler: __defaultErrorHandlerLog};
 
+  // region EventRegistrationHandle
   /**
-   * @classDesc The `EventRegistrationHandle` class handles creating the alias, `remove`,
+   * @classDesc The `EventRegistrationHandle` class handles creating the `remove` alias,
    * for the `dispose` method.
    *
-   * @name pentaho.lang.EventRegistrationHandle
+   * @alias EventRegistrationHandle
+   * @memberOf pentaho.lang
    * @class
-   * @implements pentaho.lang.IEventRegistrationHandle
+   * @implements {pentaho.lang.IEventRegistrationHandle}
    * @private
+   *
+   * @constructor
+   * @description Creates a registration handle with a given dispose method.
+   * @param {function} dispose - The dispose method.
    */
-
   function pentaho_lang_IEventRegistrationHandle(dispose) {
     this.dispose = dispose;
   }
 
+  /**
+   * Removes the registration.
+   * @alias remove
+   * @memberOf pentaho.lang.EventRegistrationHandle#
+   */
   pentaho_lang_IEventRegistrationHandle.prototype.remove = function() {
-    return this.dispose();
+    this.dispose();
   };
+  // endregion
 
+  // region IEventObserverRegistration
   /**
    * Holds registration information about an observer.
    *
@@ -61,11 +74,7 @@ define([
    * @property {number} index - The index of the observer in the event's observers list.
    * @private
    */
-
-  // ---
-
-  // TODO: Move this to the pentaho.lang.impl namespace; possibly along with Event ?
-  // TODO: remove @description and @constructor when jsdocs handles mixins properly.
+  // endregion
 
   /**
    * @classDesc The `EventSource` class is an implementation [IEventSource]{@link pentaho.lang.IEventSource}
@@ -75,20 +84,20 @@ define([
    * unregistration of event listeners/observers.
    * The ability to emit events is, however, only exposed via the protected interface, through the methods:
    * [_emit]{@link pentaho.lang.EventSource#_emit},
-   * [_emitSafe]{@link pentaho.lang.EventSource#_emitSafe} and
-   * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
-   * The methods `_emit` and `_emitSafe` can only be used with events of the [Event]{@link pentaho.lang.Event} type,
-   * while the `_emitGeneric` method can be used with any event type and exposes more control options.
+   * [_emitSafe]{@link pentaho.lang.EventSource#_emitSafe},
+   * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric} and
+   * [_emitGenericAllAsync]{@link pentaho.lang.EventSource#_emitGenericAllAsync}.
+   * The methods `_emit` and `_emitSafe` are to be used with events of the [Event]{@link pentaho.lang.Event} type.
+   * The methods `_emitGeneric` and `_emitGenericAllAsync` can be used with any event type and
+   * expose more control options.
    *
-   * To ascertain whether any listeners are registered for a certain event type and phase,
-   * use: [_hasListeners]{@link pentaho.lang.EventSource#_hasListeners}.
-   * To ascertain whether any listeners are registered for any of the phases of a certain event type, use:
-   * [_hasObservers]{@link pentaho.lang.EventSource#_hasObservers}.
+   * To ascertain whether any listeners are registered for a certain event type and, optionally, phase,
+   * use [_hasListeners]{@link pentaho.lang.EventSource#_hasListeners}.
    *
    * @name EventSource
    * @memberOf pentaho.lang
    * @class
-   * @implements pentaho.lang.IEventSource
+   * @implements {pentaho.lang.IEventSource}
    * @amd pentaho/lang/EventSource
    *
    * @description This class was not designed to be constructed directly.
@@ -98,6 +107,7 @@ define([
 
   return Base.extend(module.id, /** @lends pentaho.lang.EventSource# */{
 
+    // region Registration
     /**
      * The registry of event observers by event type.
      *
@@ -162,80 +172,72 @@ define([
     },
 
     /**
-     * Determines if there are any registrations for a given event type and phase.
+     * Determines if there are any registrations for a given event type and, optionally, phase.
      *
      * This method can be used to avoid creating expensive event objects
-     * for event type and phase pairs that don't have registrations.
+     * for an event type and, optionally, phase, that don't have registrations.
      *
      * @example
      *
-     * if(this._hasListeners("select", "will")) {
+     * if(this._hasListeners("click")) {
      *
-     *   var event = new Event("select", this);
+     *   var event = new Event("click", this, true);
      *
      *   if(this._emit(event)) {
-     *     // Select Will phase
+     *     // ...
+     *   }
+     * }
+     *
+     * @example
+     *
+     * if(this._hasListeners("select")) {
+     *
+     *   var event = new Event("select");
+     *
+     *   if(this._emitGeneric(this, [event], "select", "will")) {
+     *
+     *     // Select ...
+     *
+     *     this._emitGeneric(this, [event], "select", "finally");
      *   }
      * }
      *
      * @param {nonEmptyString} type - The type of the event.
      * @param {?nonEmptyString} [phase] - The phase of a structured event.
      * For unstructured events don't specify this argument.
+     * For structured events, if this argument is not specified,
+     * the result will be `true` if there are any listeners, for any of the phases.
      *
      * @return {boolean} `true` if the event has any listeners for the given event type and phase; `false`, otherwise.
      *
      * @protected
      */
     _hasListeners: function(type, phase) {
+
       // Resolve alias
       type = typeInfo.getIdOf(type) || type;
 
-      var queue = O.getOwn(this.__observersRegistry, type);
-      if(queue) {
-        if(!phase) phase = "__";
+      var queue = O.getOwn(this.__observersRegistry, type, null);
+      if(queue !== null) {
+        if(!phase) {
+          return true;
+        }
 
         // Find at least one observer with the desired phase.
         var i = -1;
         var L = queue.length;
-        while(++i < L) if(O_hasOwn.call(queue[i].observer, phase)) return true;
+        while(++i < L) {
+          if(O_hasOwn.call(queue[i].observer, phase)) {
+            return true;
+          }
+        }
       }
 
       return false;
     },
+    // endregion
 
-    /**
-     * Determines if there are any registrations for a given event type,
-     * for at least one of its phases.
-     *
-     * This method can be used to avoid creating expensive event objects
-     * for event types that currently have no registrations.
-     *
-     * @example
-     *
-     * if(this._hasObservers("select")) {
-     *
-     *   var event = new Event("select");
-     *
-     *   if(this._emitGeneric(event, "select", "will")) {
-     *     // Select Will
-     *
-     *     this._emitGeneric(event, "select", "did");
-     *   }
-     * }
-     *
-     * @param {nonEmptyString} type - The type of the event.
-     *
-     * @return {boolean} `true` if the event has any observers for the given event type; `false`, otherwise.
-     *
-     * @protected
-     */
-    _hasObservers: function(type) {
-      // Resolve alias
-      type = typeInfo.getIdOf(type) || type;
-
-      return O.hasOwn(this.__observersRegistry, type);
-    },
-
+    // region Emission
     /**
      * Emits an unstructured event and returns it, unless it was canceled.
      *
@@ -262,7 +264,7 @@ define([
       if(!event) throw error.argRequired("event");
       if(!(event instanceof Event)) throw error.argInvalidType("event", "pentaho.type.Event");
 
-      return this._emitGeneric(event, event.type, null, keyArgsEmitEventUnsafe);
+      return this._emitGeneric(this, [event], event.type, null, keyArgsEmitEventUnsafe) ? event : null;
     },
 
     /**
@@ -284,54 +286,232 @@ define([
       if(!event) throw error.argRequired("event");
       if(!(event instanceof Event)) throw error.argInvalidType("event", "pentaho.type.Event");
 
-      return this._emitGeneric(event, event.type, null, keyArgsEmitEventSafe);
+      return this._emitGeneric(this, [event], event.type, null, keyArgsEmitEventSafe) ? event : null;
     },
 
     /**
      * Emits an event given an arbitrary payload object, its type and phase.
      * Returns the event payload object, unless the event is canceled.
      *
-     * @param {object} event - The event object.
+     * @param {object} source - The `this` value of listener functions.
+     * @param {Array} eventArgs - The arguments of listener functions.
      * @param {nonEmptyString} type - The type of the event.
      * @param {?nonEmptyString} [phase] - The phase of the event. For unstructured events don't specify this argument
      * (or specify a {@link Nully} value).
      *
      * @param {Object} [keyArgs] - The keyword arguments' object.
-     * @param {function(object):boolean} [keyArgs.isCanceled] - A predicate that indicates if a given event object
-     * is in a canceled state.
-     * @param {function(any, object, nonEmptyString, nonEmptyString)} [keyArgs.errorHandler] -
+     * @param {function(...any):boolean} [keyArgs.isCanceled] - A predicate that indicates if the given event args
+     * are in a canceled state. Its `this` value is the value of `source`.
+     * @param {function(any, Array, nonEmptyString, nonEmptyString)} [keyArgs.errorHandler] -
      * When specified with a `null` value,
      * no error handling is performed and errors thrown by listeners are thrown back to this method's caller.
-     * When unspecified or specified as `undefined`, defaults to a function that simply log the listener errors,
-     * and let execution continue to following listeners.
-     * The function arguments are: the error, the event, the event type and the event phase.
+     * When unspecified or specified as `undefined`, defaults to a function that simply logs the listener errors,
+     * and lets execution continue to the following listeners.
+     * The function arguments are: the error, the eventArgs, the event type and the event phase.
+     * Its `this` value is the value of `source`.
      *
-     * @return {?object} The event payload object or `null`, when the event is canceled.
+     * @return {boolean} `false` when the event is canceled; `true`, otherwise.
      *
      * @protected
      */
-    _emitGeneric: function(event, type, phase, keyArgs) {
+    _emitGeneric: function(source, eventArgs, type, phase, keyArgs) {
 
-      // Performance
-      // if(!event) throw error.argRequired("event");
-      // if(!type) throw error.argRequired("type");
+      if(!source) throw error.argRequired("source");
+      if(!eventArgs) throw error.argRequired("eventArgs");
+      if(!type) throw error.argRequired("type");
 
       var isCanceled;
-      var queue;
-
-      if((isCanceled = keyArgs && keyArgs.isCanceled) && isCanceled(event)) {
-        return null;
+      if((isCanceled = keyArgs && keyArgs.isCanceled) && isCanceled.apply(source, eventArgs)) {
+        return false;
       }
 
       // Resolve alias
       type = typeInfo.getIdOf(type) || type;
 
-      if((queue = O.getOwn(this.__observersRegistry, type))) {
-        return __emitQueue.call(this, event, queue, type, phase || "__", isCanceled, keyArgs && keyArgs.errorHandler);
+      var queue;
+      if((queue = O.getOwn(this.__observersRegistry, type, null)) === null) {
+        return true;
       }
 
-      return event;
+      var phaseEf;
+      if(!phase || phase === "__") {
+        phase = null;
+        phaseEf = "__";
+      } else {
+        phaseEf = phase;
+      }
+
+      // Use `null` to force no error handling.
+      var errorHandler = keyArgs && keyArgs.errorHandler;
+      if(errorHandler === undefined) {
+        errorHandler = __defaultErrorHandlerLog;
+      }
+
+      // ---
+
+      queue.emittingLevel++;
+
+      try {
+        var i = queue.length;
+        var listener;
+
+        if(errorHandler) {
+
+          while(i--) if((listener = queue[i].observer[phaseEf])) {
+
+            try {
+              listener.apply(source, eventArgs);
+            } catch(ex) {
+
+              errorHandler.call(source, ex, eventArgs, type, phase);
+            }
+
+            // error handler can decide to cancel the event.
+            if(isCanceled && isCanceled.apply(source, eventArgs)) return false;
+          }
+
+        } else {
+
+          while(i--) if((listener = queue[i].observer[phaseEf])) {
+
+            listener.apply(source, eventArgs);
+
+            if(isCanceled && isCanceled.apply(source, eventArgs)) return false;
+          }
+
+        }
+      } finally {
+        queue.emittingLevel--;
+      }
+
+      return true;
+    },
+
+    /**
+     * Emits an event asynchronously, given an arbitrary payload object, its type and phase,
+     * and succeeding if every listener succeeds.
+     *
+     * Listeners are called in parallel.
+     *
+     * Returns a promise that is fulfilled or rejected with the event payload object.
+     * If any listener throws or rejects, the returned promise is rejected as well.
+     *
+     * @param {object} source - The `this` value of listener functions.
+     * @param {Array} eventArgs - The arguments of listener functions.
+     * @param {nonEmptyString} type - The type of the event.
+     * @param {?nonEmptyString} [phase] - The phase of the event. For unstructured events don't specify this argument
+     * (or specify a {@link Nully} value).
+     *
+     * @param {Object} [keyArgs] - The keyword arguments' object.
+     * @param {function(...any):boolean} [keyArgs.isCanceled] - A predicate that indicates if the given event args
+     * are in a canceled state. Its `this` value is the value of `source`.
+     * @param {function(...any):any} [keyArgs.getCancellationReason] - A function that given the event args
+     * returns its a cancellation reason, usually an {@link Error}.  Its `this` value is the value of `source`.
+     * @param {function(any, Array, nonEmptyString, nonEmptyString) : Promise} [keyArgs.errorHandler] -
+     * When specified with a `null` value, no error handling is performed.
+     * Errors thrown by, or promises rejected by,
+     * any listeners cause the whole event to be rejected.
+     *
+     * When unspecified or specified as `undefined`,
+     * defaults to a function that simply logs any listener errors,
+     * yet always succeeding.
+     *
+     * The function arguments are: the error, the event, the event type and the event phase.
+     *
+     * @return {!Promise.<object>} A promise.
+     * When fulfilled, it is with the value `undefined`.
+     * When rejected due to a thrown error, the rejection reason is that error.
+     * When explicitly rejected by the error handler, the given rejection reason is preserved.
+     * When rejected due to a cancellation, the rejection reason is the cancellation reason, if any.
+     *
+     * @protected
+     */
+    _emitGenericAllAsync: function(source, eventArgs, type, phase, keyArgs) {
+
+      if(!source) throw error.argRequired("source");
+      if(!eventArgs) throw error.argRequired("eventArgs");
+      if(!type) throw error.argRequired("type");
+
+      var isCanceled = keyArgs && keyArgs.isCanceled;
+      var getCancellationReason = keyArgs && keyArgs.getCancellationReason;
+
+      if(isCanceled && isCanceled.apply(source, eventArgs)) {
+        return getCancellationReason != null
+            ? Promise.reject(getCancellationReason.apply(source, eventArgs))
+            : Promise.reject();
+      }
+
+      // Resolve alias
+      type = typeInfo.getIdOf(type) || type;
+
+      var queue;
+      if((queue = O.getOwn(this.__observersRegistry, type, null)) === null) {
+        return Promise.resolve();
+      }
+
+      var phaseEf;
+      if(!phase || phase === "__") {
+        phase = null;
+        phaseEf = "__";
+      } else {
+        phaseEf = phase;
+      }
+
+      // Use `null` to force no error handling.
+      var errorHandler = keyArgs && keyArgs.errorHandler;
+      if(errorHandler === undefined) {
+        errorHandler = __defaultErrorHandlerLog;
+      }
+
+      // ----
+
+      queue.emittingLevel++;
+
+      var promises = [];
+      var i = queue.length;
+      var listener;
+      while(i--) if((listener = queue[i].observer[phaseEf]) != null) {
+        // Calls listener, synchronously,
+        // so `queue` is externally observable while in this loop.
+        promises.push(emitOne(listener));
+      }
+
+      queue.emittingLevel--;
+
+      return Promise.all(promises).then(function() {});
+
+      function emitOne(listener) {
+        // Call listener wrapped so that any thrown errors are converted into rejections.
+        var promiseOne = new Promise(function(resolveInner) {
+          resolveInner(listener.apply(source, eventArgs));
+        });
+
+        if(errorHandler !== null) {
+          // Let the errorHandler resolve the failure.
+          promiseOne = promiseOne["catch"](function(ex) {
+            return errorHandler.call(source, ex, eventArgs, type, phase);
+          });
+        }
+        // else, don't know how to affect `event` to mark it failed.
+        // Just let the rejection pass-through.
+
+        if(isCanceled != null) {
+
+          // error handler may cancel the event...
+
+          promiseOne = promiseOne.then(function() {
+            if(isCanceled.apply(source, eventArgs)) {
+              return getCancellationReason != null
+                  ? Promise.reject(getCancellationReason.apply(source, eventArgs))
+                  : Promise.reject();
+            }
+          });
+        }
+
+        return promiseOne;
+      }
     }
+    // endregion
   });
 
   /**
@@ -352,6 +532,7 @@ define([
   /**
    * Creates a queue of observer registrations.
    *
+   * @memberOf pentaho.lang.EventSource~
    * @return {!Array.<pentaho.lang.IEventObserverRegistration>} An empty queue of event observer registrations.
    *
    * @private
@@ -365,7 +546,7 @@ define([
   /**
    * Register an observer given its event type and priority.
    *
-   * @this pentaho.lang.EventSource
+   * @memberOf pentaho.lang.EventSource#
    *
    * @param {nonEmptyString} type - The event tyoe.
    * @param {!pentaho.lang.IEventObserver} observer - The event observer.
@@ -417,7 +598,7 @@ define([
   /**
    * Removes an event observer registration.
    *
-   * @this pentaho.lang.EventSource
+   * @memberOf pentaho.lang.EventSource#
    *
    * @param {nonEmptyString} type - The event type.
    * @param {!pentaho.lang.IEventObserverRegistration} observerRegistration - The event observer registration.
@@ -448,12 +629,15 @@ define([
       }
     } else {
       // Was last observer registration.
+      // Remove, as _hasListeners depends on this.
       delete this.__observersRegistry[type];
     }
   }
 
   /**
    * Disposes a given array of event registration handles.
+   *
+   * @memberOf pentaho.lang.EventSource~
    *
    * @param {!Array.<pentaho.lang.IEventRegistrationHandle>} handles - The array of event registration handles.
    *
@@ -468,7 +652,7 @@ define([
   /**
    * Finds the first unstructured event observer registration for the given event type and listener.
    *
-   * @this pentaho.lang.EventSource
+   * @memberOf pentaho.lang.EventSource#
    *
    * @param {nonEmptyString} type - The event type.
    * @param {function} listener - The event listener.
@@ -491,7 +675,7 @@ define([
   /**
    * Finds the first structured event observer registration for the given event type and observer.
    *
-   * @this pentaho.lang.EventSource
+   * @memberOf pentaho.lang.EventSource#
    *
    * @param {nonEmptyString} type - The event type.
    * @param {!pentaho.lang.IEventObserver} observer - The event observer.
@@ -516,6 +700,8 @@ define([
    *
    * When a string, multiple event types can be specified separated by a comma, `,`.
    *
+   * @memberOf pentaho.lang.EventSource~
+   *
    * @param {nonEmptyString|nonEmptyString[]} type - The event type specification.
    *
    * @return {nonEmptyString[]} An array of event types.
@@ -539,75 +725,9 @@ define([
   }
 
   /**
-   * Emits an event.
-   *
-   * @this pentaho.lang.EventSource
-   *
-   * @param {object} event - The event payload object.
-   * @param {!Array.<pentaho.lang.IEventObserverRegistration>} queue - The queue of event observer registrations.
-   * @param {nonEmptyString} type - The event type.
-   * @param {nonEmptyString} phase - The event phase.
-   * @param {function(object):boolean} [isCanceled] - A predicate that indicates if a given event object
-   * is in a canceled state.
-   * @param {function(any, object, nonEmptyString, nonEmptyString)} [errorHandler] -
-   * When specified with a `null` value,
-   * no error handling is performed and errors thrown by listeners are thrown back to this method's caller.
-   * When unspecified or specified as `undefined`, defaults to a function that simply logs the listener errors,
-   * and lets execution continue to following listeners.
-   * The function arguments are: the error, the event, the event type and the event phase.
-   *
-   * @return {?object} The event payload object or `null`, when the event is canceled.
-   *
-   * @private
-   */
-  function __emitQueue(event, queue, type, phase, isCanceled, errorHandler) {
-
-    // Performance
-    // if(!event) throw error.argRequired("event");
-    // if(!queue) throw error.argRequired("queue");
-    // if(!type) throw error.argRequired("type");
-    // if(!phase) throw error.argRequired("phase");
-
-    // Use `null` to force no error handling.
-    if(errorHandler === undefined) errorHandler = __errorHandlerLog;
-
-    queue.emittingLevel++;
-
-    try {
-      var i = queue.length;
-      var listener;
-
-      if(errorHandler) {
-
-        while(i--) if((listener = queue[i].observer[phase])) {
-
-          try {
-            listener.call(this, event);
-          } catch(ex) {
-
-            errorHandler.call(this, ex, event, type, phase);
-          }
-
-          if(isCanceled && isCanceled(event)) return null;
-        }
-      } else {
-
-        while(i--) if((listener = queue[i].observer[phase])) {
-
-          listener.call(this, event);
-
-          if(isCanceled && isCanceled(event)) return null;
-        }
-      }
-    } finally {
-      queue.emittingLevel--;
-    }
-
-    return event;
-  }
-
-  /**
    * Determines if a given event object is canceled.
+   *
+   * @memberOf pentaho.lang.EventSource~
    *
    * @param {!pentaho.lang.Event} event - The event object.
    *
@@ -624,14 +744,18 @@ define([
   /**
    * Logs an error thrown by an event listener.
    *
+   * The `this` value is the source of the event.
+   *
+   * @memberOf pentaho.lang.EventSource~
+   *
    * @param {any} error - The thrown value.
-   * @param {pentaho.lang.Event} event - The event object.
+   * @param {Array} eventArgs - The arguments of listener functions.
    * @param {nonEmptyString} type - The event type.
    * @param {nonEmptyString} phase - The event phase.
    *
    * @private
    */
-  function __errorHandlerLog(error, event, type, phase) {
+  function __defaultErrorHandlerLog(error, eventArgs, type, phase) {
 
     var eventTypeId = type + (phase !== "__" ? (":" + phase) : "");
     var errorDesc = error ? (" Error: " + error.message) : "";

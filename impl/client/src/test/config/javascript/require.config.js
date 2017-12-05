@@ -213,9 +213,9 @@
 
   // VizAPI actions
   requireTypeInfo["pentaho/visual/action/base"] = {base: "pentaho/type/action/base"};
-  requireTypeInfo["pentaho/visual/action/data"] = {base: "pentaho/visual/action/base"};
-  requireTypeInfo["pentaho/visual/action/select"] = {alias: "select", base: "pentaho/visual/action/data"};
-  requireTypeInfo["pentaho/visual/action/execute"] = {alias: "execute", base: "pentaho/visual/action/data"};
+  requireTypeInfo["pentaho/visual/action/select"] = {alias: "select", base: "pentaho/visual/action/base"};
+  requireTypeInfo["pentaho/visual/action/execute"] = {alias: "execute", base: "pentaho/visual/action/base"};
+  requireTypeInfo["pentaho/visual/action/update"] = {base: "pentaho/visual/action/base"};
 
   // Color Palettes
   requireTypeInfo["pentaho/visual/color/palette"] = {base: "complex"};

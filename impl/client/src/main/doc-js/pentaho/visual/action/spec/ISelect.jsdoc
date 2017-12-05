@@ -20,7 +20,9 @@
  * @name pentaho.visual.action.spec.ISelect
  *
  * @interface
- * @extends pentaho.visual.action.spec.IData
+ * @extends pentaho.visual.action.spec.IBase
+ * @extends pentaho.visual.action.mixins.spec.IData
+ * @extends pentaho.visual.action.mixins.spec.IPositioned
  */
 
 /**

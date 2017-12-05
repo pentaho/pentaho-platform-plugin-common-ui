@@ -226,7 +226,8 @@ define(["./has"], function(has) {
      * @param {string} property - The name of property.
      * @param {Object} lcaExclude - A lowest-common-ancestor object whose inherited properties should
      * not be returned.
-     * @return {?Object} The [property descriptor]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty}.
+     * @return {?Object} The
+     * [property descriptor]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty}.
      * @method
      */
     getPropertyDescriptor: getPropertyDescriptor,

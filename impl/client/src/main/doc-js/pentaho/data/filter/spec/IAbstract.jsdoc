@@ -15,7 +15,7 @@
  */
 
 /**
- * The `spec.IFilter` interface describes the information associated with a filter.
+ * The `spec.IAbstract` interface describes the information associated with a filter.
  *
  * @example
  * <caption>
@@ -43,7 +43,7 @@
  *   ]
  * }
  *
- * @name pentaho.data.filter.spec.IFilter
+ * @name pentaho.data.filter.spec.IAbstract
  *
  * @interface
  * @extends pentaho.type.spec.IComplex

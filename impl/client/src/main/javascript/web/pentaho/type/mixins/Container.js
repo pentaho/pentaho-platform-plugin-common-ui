@@ -72,7 +72,7 @@ define([
       this.__version = 0;
 
       /**
-       * Ambient Changeset. Set whenever this container has a changeset in the ambient transaction.
+       * Ambient changeset. Set whenever this container has a changeset in the ambient transaction.
        *
        * @memberOf pentaho.type.mixins.Container#
        * @type {pentaho.type.changes.Changeset}
