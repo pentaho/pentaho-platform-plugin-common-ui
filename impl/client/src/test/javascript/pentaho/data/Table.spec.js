@@ -577,6 +577,23 @@ define([
         });
       });
 
+      describe("#getColumnProperty(j, name) -", function() {
+        it("should return the column property of the given column index and name", function() {
+          var foo = {},
+              bar = {},
+              dataTable = new DataTable({
+                model: [
+                  {name: "A", p: {foo: foo}},
+                  {name: "B", p: {bar: bar}}
+                ],
+                rows: []
+              });
+
+          expect(dataTable.getColumnProperty(0, "foo")).toBe(foo);
+          expect(dataTable.getColumnProperty(1, "bar")).toBe(bar);
+        });
+      });
+
       describe("#getColumnRange(j) -", function() {
         it("should return a range object with both min and max `undefined` when there is no data", function() {
 

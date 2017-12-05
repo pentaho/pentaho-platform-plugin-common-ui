@@ -78,7 +78,7 @@ define([
                 // consider it nominal, and not quantitative as the base code does.
                 // Currently, CCC does not like dates in continuous color scales...
                 if(mapping.attributes.count === 1) {
-                  var dataAttr = mapping.attributes.at(0).dataAttribute;
+                  var dataAttr = mapping.attributes.at(0).__dataAttribute;
                   if(dataAttr && dataAttr.type === "date")
                     return "nominal";
                 }

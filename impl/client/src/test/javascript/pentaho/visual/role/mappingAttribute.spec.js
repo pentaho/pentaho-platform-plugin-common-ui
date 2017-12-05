@@ -135,12 +135,12 @@ define([
 
       it("should return null if the mapping attribute has no name", function() {
 
-        expect(new MappingAttribute().dataAttribute).toBe(null);
+        expect(new MappingAttribute().__dataAttribute).toBe(null);
       });
 
       it("should return null if the mapping attribute has name but no parent mapping", function() {
 
-        expect(new MappingAttribute({name: "a"}).dataAttribute).toBe(null);
+        expect(new MappingAttribute({name: "a"}).__dataAttribute).toBe(null);
       });
 
       it("should return null if the mapping attribute has name, parent mapping, but no model", function() {
@@ -149,12 +149,12 @@ define([
           attributes: ["a", "b", "c"]
         });
 
-        expect(mappingWithNoModel.attributes.at(0).dataAttribute).toBe(null);
+        expect(mappingWithNoModel.attributes.at(0).__dataAttribute).toBe(null);
       });
 
       it("should return null if the mapping attribute has name, parent mapping, model but no data", function() {
 
-        expect(mapping.attributes.at(0).dataAttribute).toBe(null);
+        expect(mapping.attributes.at(0).__dataAttribute).toBe(null);
       });
 
       it("should return null if the mapping attribute has name, parent mapping, model, data, " +
@@ -162,7 +162,7 @@ define([
 
         derived.data = new Table(getDataSpec1());
 
-        expect(mapping.attributes.at(0).dataAttribute).toBe(null);
+        expect(mapping.attributes.at(0).__dataAttribute).toBe(null);
       });
 
       it("should return the data table attribute if the mapping attribute has name, parent mapping, model, data, " +
@@ -170,7 +170,7 @@ define([
 
         var data = derived.data = new Table(getDataSpec1());
 
-        expect(mapping.attributes.at(1).dataAttribute).toBe(data.model.attributes.get("country"));
+        expect(mapping.attributes.at(1).__dataAttribute).toBe(data.model.attributes.get("country"));
       });
     });
 

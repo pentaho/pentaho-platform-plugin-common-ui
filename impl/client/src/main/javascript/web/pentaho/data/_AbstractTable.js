@@ -149,6 +149,17 @@ define([
     },
 
     /**
+     * @inheritDoc
+     */
+    getColumnProperty: function(colIndex, propName) {
+
+      var attr = this.model.attributes[colIndex];
+      if(attr) {
+        return attr.property(propName);
+      }
+    },
+
+    /**
      * Gets the value range of a column, given its index.
      *
      * When there is no data, or the values of the given column are all `null`, `undefined` or `NaN`,

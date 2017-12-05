@@ -86,7 +86,7 @@ define([
          * @see pentaho.visual.role.MappingAttribute#mapping
          * @see pentaho.visual.role.MappingAttribute#model
          */
-        get dataAttribute() {
+        get __dataAttribute() {
           var name = this.name;
           if(name) {
             var data;

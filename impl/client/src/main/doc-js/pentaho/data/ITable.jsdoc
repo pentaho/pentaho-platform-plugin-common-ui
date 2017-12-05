@@ -65,6 +65,16 @@
  */
 
 /**
+ * Gets a metadata property of a column, given its name and column index.
+ *
+ * @name pentaho.data.ITable#getColumnProperty
+ * @method
+ * @param {number} colIndex The column index (zero-based).
+ * @param {string} propName The metadata property name.
+ * @return {any} The metadata property value.
+ */
+
+/**
  * Gets the value of a cell, given its row and column indexes.
  *
  * When a cell is missing or has a `null` or `undefined` value,
