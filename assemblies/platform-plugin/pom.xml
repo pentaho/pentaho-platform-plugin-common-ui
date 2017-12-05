@@ -27,7 +27,7 @@
     <angular-translate.version>2.2.0-canary-pentaho-modified</angular-translate.version>
     <pentaho-modeler.version>8.1.0.0-SNAPSHOT</pentaho-modeler.version>
     <prepared.assembly.directory>${project.build.directory}/${prepared.assembly.name}</prepared.assembly.directory>
-    <pentaho-gwt-widgets.version>8.1.0.0-SNAPSHOT</pentaho-gwt-widgets.version>
+    <commons-gwt.version>8.1.0.0-SNAPSHOT</commons-gwt.version>
     <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
     <js.assembly.name>${project.artifactId}-${project.version}-js</js.assembly.name>
     <gwt-widgets.directory>${prepared.assembly.directory}/gwt-widgets</gwt-widgets.directory>
@@ -61,9 +61,9 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>pentaho</groupId>
-      <artifactId>pentaho-gwt-widgets</artifactId>
-      <version>${pentaho-gwt-widgets.version}</version>
+      <groupId>org.pentaho</groupId>
+      <artifactId>commons-gwt-widgets</artifactId>
+      <version>${commons-gwt.version}</version>
       <exclusions>
         <exclusion>
           <artifactId>*</artifactId>
@@ -72,10 +72,10 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>pentaho</groupId>
-      <artifactId>pentaho-gwt-widgets-package</artifactId>
-      <version>${pentaho-gwt-widgets.version}</version>
-      <type>zip</type>
+      <groupId>org.pentaho</groupId>
+      <artifactId>commons-gwt-widgets-package</artifactId>
+      <version>${commons-gwt.version}</version>
+      <type>war</type>
     </dependency>
     <dependency>
       <groupId>org.pentaho</groupId>

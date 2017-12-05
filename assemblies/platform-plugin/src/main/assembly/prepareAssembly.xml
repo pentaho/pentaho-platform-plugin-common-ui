@@ -25,7 +25,7 @@
     <!-- GWT -->
     <dependencySet>
       <includes>
-        <include>pentaho:pentaho-gwt-widgets</include>
+        <include>org.pentaho:commons-gwt-widgets</include>
       </includes>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <unpack>true</unpack>
@@ -39,7 +39,7 @@
     </dependencySet>
     <dependencySet>
       <includes>
-        <include>pentaho:pentaho-gwt-widgets-package:zip</include>
+        <include>org.pentaho:commons-gwt-widgets-package:war</include>
       </includes>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <unpack>true</unpack>
