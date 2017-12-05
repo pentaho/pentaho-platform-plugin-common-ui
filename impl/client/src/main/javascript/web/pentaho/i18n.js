@@ -112,14 +112,12 @@ define([
 
     var absBundleUrl = localRequire.toUrl(bundleMid);
 
-    var serverUrl = env.server.root;
-
     // Remove basePath from bundle url
     // Taking into account embedded scenarios, where it will be a full URL - "http://host:port/..."
-    var reminderUrlRegX = new RegExp("^(?:" + serverUrl + "|" + serverUrl.origin + "|" + serverUrl.pathname + ")(.*)");
-    var reminderUrlMatch = reminderUrlRegX.exec(absBundleUrl);
+    var reminderBundleUrlRegX = getReminderBundleUrlRegx();
+    var reminderBundleUrlMatch = reminderBundleUrlRegX.exec(absBundleUrl);
 
-    absBundleUrl = reminderUrlMatch ? reminderUrlMatch[1] : absBundleUrl;
+    absBundleUrl = reminderBundleUrlMatch ? reminderBundleUrlMatch[1] : absBundleUrl;
 
     // The same for content/
     if(absBundleUrl.indexOf("content/") === 0)
@@ -147,5 +145,58 @@ define([
     }
 
     throw new Error("[pentaho/messages!] Bundle path argument is invalid: '" + bundlePath + "'.");
+  }
+
+  /**
+   * Get a {@link RegExp} to remove the web server application [root]{@link pentaho.environment.IServer#root}
+   * from the i18n resource {@link URL}.
+   *
+   * When the server is running on a protocol scheme's default port, because {@link URL} omits default ports,
+   * it has to be included in the {@link RegExp} to match the output of `require.toUrl` which always
+   * includes the url port.
+   *
+   * @return {RegExp} the reminder bundle url RegExp.
+   */
+  function getReminderBundleUrlRegx() {
+    var defaultSchemePorts = {
+      "http:": 80,
+      "https:": 443
+    };
+
+    var url = env.server.root;
+
+    var origin = url.origin;
+    var port = url.port;
+    var pathname = url.pathname;
+
+    var isDefaultPort = port == null || port.length === 0;
+    if ( isDefaultPort ) {
+      var scheme = url.protocol;
+      var host = url.host;
+
+      port = defaultSchemePorts[scheme];
+
+      origin = scheme + "//" + host + ":" + port;
+      url = origin + pathname;
+    }
+
+    // escape before creating Regx
+    url = regxEscape(url);
+    origin = regxEscape(origin);
+    pathname = regxEscape(pathname);
+
+    return new RegExp("^(?:" + url + "|" + origin + "|" + pathname + ")(.*)");
+  }
+
+  /**
+   * Escapes special RegExp characters, with the exception of the forward slash `/`,
+   * that is escaped by [RegExp's]{@link RegExp} constructor.
+   *
+   * @param {any} value - value to include in a RegExp.
+   *
+   * @return {String} the escaped value.
+   */
+  function regxEscape(value) {
+    return String(value).replace (/[-\\^$*+?.()|[\]{}]/g, '\\$&');
   }
 });
