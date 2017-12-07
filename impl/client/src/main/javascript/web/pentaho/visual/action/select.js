@@ -234,7 +234,7 @@ define([
 
         keyArgs.declaredType = PenFunction.type;
 
-        return this.__selectionMode.toSpecInContext(keyArgs);
+        return fun.toSpecInContext(keyArgs);
       }
     }
   ];
