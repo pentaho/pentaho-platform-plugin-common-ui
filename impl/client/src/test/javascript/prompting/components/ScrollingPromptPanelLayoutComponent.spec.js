@@ -15,7 +15,7 @@
  *
  */
 
-define([ 'common-ui/prompting/components/ScrollingPromptPanelLayoutComponent', 'common-ui/jquery-clean' ], function(
+define(["common-ui/prompting/components/ScrollingPromptPanelLayoutComponent", "common-ui/jquery-clean"], function(
   ScrollingPromptPanelLayoutComponent, $) {
 
   describe("ScrollingPromptPanelLayoutComponent", function() {
@@ -24,6 +24,10 @@ define([ 'common-ui/prompting/components/ScrollingPromptPanelLayoutComponent', '
       var id = "test_id";
       var testSpan = "<span>test internal div</span>";
       var comp;
+      var paramDefn = {
+        removeSubmitPanel: false
+      };
+
       beforeEach(function() {
         comp = new ScrollingPromptPanelLayoutComponent();
         comp.htmlObject = id;
@@ -55,9 +59,33 @@ define([ 'common-ui/prompting/components/ScrollingPromptPanelLayoutComponent', '
         promptComponent.promptType = "prompt";
         var submitComponent = jasmine.createSpy("submitComponent");
         submitComponent.promptType = "submit";
-        comp.components = [ promptComponent, submitComponent ];
-        var expectedHtml = '<div class="prompt-panel">' + testSpan + '</div><div class="submit-panel">' + testSpan
-          + '</div>';
+        comp.components = [promptComponent, submitComponent];
+        comp.promptPanel = {};
+
+        comp.promptPanel.paramDefn = paramDefn;
+
+        var expectedHtml = '<div class="prompt-panel">' + testSpan + '</div><div class="submit-panel">' + testSpan +
+          "</div>";
+
+        comp.update();
+
+        expect(comp.getMarkupFor.calls.count()).toBe(2);
+        expect($.fn.empty).not.toHaveBeenCalled();
+        expect($.fn.html).toHaveBeenCalledWith(expectedHtml);
+      });
+
+      it("should not add submit panel", function() {
+        var promptComponent = jasmine.createSpy("promptComponent");
+        promptComponent.promptType = "prompt";
+        var submitComponent = jasmine.createSpy("submitComponent");
+        submitComponent.promptType = "submit";
+        comp.components = [promptComponent, submitComponent];
+
+        comp.promptPanel = {};
+        comp.promptPanel.paramDefn = paramDefn;
+        comp.promptPanel.paramDefn.removeSubmitPanel = true;
+
+        var expectedHtml = '<div class="prompt-panel">' + testSpan + "</div>";
 
         comp.update();
 
