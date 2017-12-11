@@ -46,7 +46,7 @@ define([
                 // consider it ordinal, and not quantitative as the base code does.
                 var count = mapping.attributes.count;
                 if(count === 1) {
-                  var dataAttr = mapping.attributes.at(0).dataAttribute;
+                  var dataAttr = mapping.attributes.at(0).__dataAttribute;
                   if(dataAttr && dataAttr.type === "number") {
                     return "ordinal";
                   }
