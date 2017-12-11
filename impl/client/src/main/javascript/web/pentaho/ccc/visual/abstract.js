@@ -16,6 +16,7 @@
 define([
   "module",
   "pentaho/visual/action/SelectionModes",
+  "pentaho/lang/UserError",
   "cdf/lib/CCC/def",
   "cdf/lib/CCC/pvc",
   "cdf/lib/CCC/cdo",
@@ -28,7 +29,7 @@ define([
   "pentaho/debug",
   "pentaho/debug/Levels",
   "pentaho/i18n!view"
-], function(module, SelectionModes, def, pvc, cdo, pv, util, O, visualColorUtils, DataView,
+], function(module, SelectionModes, UserError, def, pvc, cdo, pv, util, O, visualColorUtils, DataView,
             logger, debugMgr, DebugLevels, bundle) {
 
   "use strict";
@@ -1571,10 +1572,22 @@ define([
           // Render may fail due to required visual roles, invalid data, etc.
           var error = this._chart.getLastRenderError();
           if(error) {
-            return Promise.reject(error);
+            return Promise.reject(this._convertCccError(error));
           }
 
           this._updateSelection();
+        },
+
+        _convertCccError: function(error) {
+          var typeError;
+          if((error instanceof pvc.InvalidDataException) || (error instanceof pvc.NoDataException)) {
+            typeError = new UserError(error.message);
+            Object.defineProperty(typeError, "name", {value: error.name});
+          } else {
+            typeError = new Error(error.toString());
+          }
+
+          return typeError;
         },
 
         // region SELECTION
