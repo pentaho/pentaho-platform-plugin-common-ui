@@ -65,7 +65,22 @@ define(function() {
      * The `failed` action execution state.
      * @default
      */
-    failed: 64
+    failed: 64,
+
+    /**
+     * The `finished` action execution state bit.
+     *
+     * Can be on when
+     * one of
+     * [did]{@link pentaho.type.action.States.did},
+     * [failed]{@link pentaho.type.action.States.failed} or
+     * [canceled]{@link pentaho.type.action.States.canceled}
+     * is also on.
+     *
+     * Indicates that all finalization tasks have been completed.
+     * @default
+     */
+    finished: 128
   };
 
   return Object.freeze(States);

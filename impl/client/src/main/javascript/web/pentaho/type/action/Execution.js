@@ -41,13 +41,13 @@ function(module, Base, States,
   var MSG_STATE_REJECT = "The `reject` method can only be called while in the 'init', 'will' or 'do' states.";
 
   /** @type pentaho.type.action.States */
-  var executingStates = States.init | States.will | States["do"];
+  var executingUnsettledStates = States.init | States.will | States["do"];
 
   /** @type pentaho.type.action.States */
   var rejectedStates = States.canceled | States.failed;
 
   /** @type pentaho.type.action.States */
-  var finishedStates = States.did | rejectedStates;
+  var settledStates = States.did | rejectedStates;
 
   return Base.extend(/** @lends pentaho.type.action.Execution# */{
     /**
@@ -86,7 +86,7 @@ function(module, Base, States,
      * The following is a detailed description of the action execution model:
      *
      * 1. When an action execution is constructed,
-     *    it is in the [unstarted]{@link pentaho.type.action.States#unstarted} state.
+     *    it is in the [unstarted]{@link pentaho.type.action.States.unstarted} state.
      *
      *    The action's
      *    [label]{@link pentaho.type.action.Base#label} and
@@ -96,29 +96,34 @@ function(module, Base, States,
      *
      *    In this state,
      *    the execution cannot be
-     *    [marked done]{@link pentaho.type.action.Execution#done} or
-     *    [be rejected]{@link pentaho.type.action.Execution#reject}.
+     *    settled by marking it
+     *    [done]{@link pentaho.type.action.Execution#done} or
+     *    [rejected]{@link pentaho.type.action.Execution#reject}.
      *
      * 2. When the [execute]{@link pentaho.type.action.Execution#execute} method is called,
      *    the execution enters the **init** phase:
-     *    -  its state is set to [init]{@link pentaho.type.action.States#init};
+     *    -  the state is set to [init]{@link pentaho.type.action.States.init};
      *    -  the [_onPhaseInit]{@link pentaho.type.action.Execution#_onPhaseInit} method is called.
      *
      *    The action's
      *    [label]{@link pentaho.type.action.Base#label} and
      *    [description]{@link pentaho.type.action.Base#description} properties,
      *    and any other property which defines what it ultimately does,
-     *    can still be freely modified.
+     *    can be freely modified at this stage.
      *
-     *    The execution can
-     *    [be rejected]{@link pentaho.type.action.Execution#reject}
+     *    The execution can be settled by marking it [rejected]{@link pentaho.type.action.Execution#reject}
      *    in which case it transits to the _finally_ phase.
      *
-     *    Otherwise, the execution automatically transits to the _will_ phase.
+     *    Otherwise,
+     *    if the associated action is not [valid]{@link pentaho.type.action.Base#validate},
+     *    the execution is automatically rejected with the first reported validation error.
+     *
+     *    Otherwise,
+     *    the execution automatically transits to the _will_ phase.
      *
      * 3. In the **will** phase,
-     *    what the associated action will do is already settled and cannot change anymore:
-     *    - the execution's state is set to [will]{@link pentaho.type.action.States#will};
+     *    what the associated action will do is already determined and cannot change anymore:
+     *    - the state is set to [will]{@link pentaho.type.action.States.will};
      *    - the associated action is frozen, using {@link Object.freeze},
      *      and should **not** be modified anymore (e.g. by modifying nested objects);
      *      trying to modify direct properties of the action will throw a {@link TypeError};
@@ -127,45 +132,48 @@ function(module, Base, States,
      *    From this point on, an execution can be canceled based on what exactly
      *    the associated action will do.
      *
-     *    The execution can
-     *    [be rejected]{@link pentaho.type.action.Execution#reject},
+     *    The execution can be settled by marking it [rejected]{@link pentaho.type.action.Execution#reject},
      *    in which case it transits to the _finally_ phase.
      *
      *    Otherwise, the execution automatically transits to the _do_ phase.
      *
      * 4. In the **do** phase, the execution, proper, is carried out:
-     *    - the execution's state is set to [do]{@link pentaho.type.action.States#do};
+     *    - the state is set to [do]{@link pentaho.type.action.States.do};
      *    - the [_onPhaseDo]{@link pentaho.type.action.Execution#_onPhaseDo} method is called.
      *    - if after calling `_onPhaseDo`, the execution is not yet done or rejected,
      *      the [_doDefault]{@link pentaho.type.action.Execution#_doDefault} method is called,
      *      allowing the action execution class to clearly handle a default behaviour.
      *
-     *    The execution can
-     *    [be rejected]{@link pentaho.type.action.Execution#reject}.
-     *    Alternatively,
-     *    the execution can be [marked done]{@link pentaho.type.action.Execution#done}.
+     *    The execution can be settled by marking it
+     *    [rejected]{@link pentaho.type.action.Execution#reject} or,
+     *    alternatively,
+     *    [done]{@link pentaho.type.action.Execution#done}.
      *
      *    In either case, the execution transits to the _finally_ phase.
      *
-     * 5. In the **finally** phase,
-     *    the execution is considered [finished]{@link pentaho.type.action.Execution#isFinished},
+     * 5. In the beginning of the **finally** phase,
+     *    the execution is considered [settled]{@link pentaho.type.action.Execution#isSettled},
      *    with or without success.
      *
      *    If this phase was entered due to a rejection,
      *    the execution is in one of the states
-     *    [canceled]{@link pentaho.type.action.States#canceled} or
-     *    [failed]{@link pentaho.type.action.States#failed},
+     *    [canceled]{@link pentaho.type.action.States.canceled} or
+     *    [failed]{@link pentaho.type.action.States.failed},
      *    depending on the type of rejection reason,
      *    [isRejected]{@link pentaho.type.action.Execution#isRejected} is `true`,
      *    and an [error]{@link pentaho.type.action.Execution#error} may be available.
      *
      *    Otherwise,
-     *    the execution was successful,
-     *    it is in the [did]{@link pentaho.type.action.States#did} state,
-     *    [isDone]{@link pentaho.type.action.Execution#isDone} is `true`,
-     *    and a [result]{@link pentaho.type.action.Execution#result} may be available.
+     *    the execution was successful and
+     *    it is in the [did]{@link pentaho.type.action.States.did} state.
+     *    Property [isDone]{@link pentaho.type.action.Execution#isDone} now returns `true` and
+     *    a [result]{@link pentaho.type.action.Execution#result} may be available.
      *
      *    The [_onPhaseFinally]{@link pentaho.type.action.Execution#_onPhaseFinally} method is called.
+     *
+     *    The [finished]{@link pentaho.type.action.States.finished}
+     *    [state]{@link pentaho.type.action.Execution#state} bit is set to on.
+     *    Property [isFinished]{@link pentaho.type.action.Execution#isFinished} now returns `true`.
      *
      * @description Creates an action execution instance for a given action and target.
      *
@@ -174,6 +182,9 @@ function(module, Base, States,
      * @param {!pentaho.type.action.ITarget} target - The target on which to execute.
      */
     constructor: function(action, target) {
+
+      if(!action) throw new ArgumentRequiredError("action");
+      if(!target) throw new ArgumentRequiredError("target");
 
       // Clone action so that it can be safely frozen and
       // still allow the original action to be re-executed.
@@ -230,7 +241,7 @@ function(module, Base, States,
     /**
      * Gets the action of the action execution.
      *
-     * This property contains a clone of the `action` argument passed to the constructor.
+     * This property returns a clone of the `action` argument passed to the constructor.
      *
      * Once the action execution enters the `will` phase,
      * this object gets frozen and can no longer be modified.
@@ -245,7 +256,7 @@ function(module, Base, States,
     /**
      * Gets the target of the action execution.
      *
-     * This property contains the value of the `target` argument passed to the constructor.
+     * This property returns the value of the `target` argument passed to the constructor.
      *
      * @type {!pentaho.type.action.ITarget}
      * @readonly
@@ -261,6 +272,15 @@ function(module, Base, States,
      *
      * @type {pentaho.type.action.States}
      * @readonly
+     *
+     * @see pentaho.type.action.Execution#isUnstarted
+     * @see pentaho.type.action.Execution#isExecuting
+     * @see pentaho.type.action.Execution#isSettled
+     * @see pentaho.type.action.Execution#isDone
+     * @see pentaho.type.action.Execution#isRejected
+     * @see pentaho.type.action.Execution#isCanceled
+     * @see pentaho.type.action.Execution#isFailed
+     * @see pentaho.type.action.Execution#isFinished
      */
     get state() {
       return this.__state;
@@ -269,7 +289,7 @@ function(module, Base, States,
     /**
      * Asserts that the action is in one of a set of states.
      *
-     * Optionally, receives an error message to use when the assertion fails.
+     * Receives an error message to use when the assertion fails.
      *
      * @param {pentaho.type.action.States} states - The possible states.
      * @param {string} message - The error message.
@@ -287,8 +307,8 @@ function(module, Base, States,
     /**
      * Gets the result of a successful action execution, if any.
      *
-     * This property can only return a non-undefined value if
-     * {@link pentaho.type.action.Execution#isDone} is `true`.
+     * This property only returns a non-undefined value if
+     * [isDone]{@link pentaho.type.action.Execution#isDone} is `true`.
      *
      * @type {any}
      * @readonly
@@ -300,8 +320,8 @@ function(module, Base, States,
     /**
      * Gets the reason for a rejected action execution, or `null`.
      *
-     * This property can only return a non-null value if
-     * {@link pentaho.type.action.Execution#isRejected} is `true`.
+     * This property only returns a non-null value if
+     * [isRejected]{@link pentaho.type.action.Execution#isRejected} is `true`.
      *
      * @type {Error|pentaho.lang.UserError}
      * @readonly
@@ -311,7 +331,8 @@ function(module, Base, States,
     },
 
     /**
-     * Gets a value that indicates if the action execution is in a unstarted state.
+     * Gets a value that indicates if the action execution is in the
+     * [unstarted]{@link pentaho.type.action.States.unstarted} state.
      *
      * @type {boolean}
      * @readonly
@@ -321,11 +342,15 @@ function(module, Base, States,
     },
 
     /**
-     * Gets a value that indicates if the action execution has been rejected.
+     * Gets a value that indicates if the action execution has been settled.
      *
-     * An action execution is considered rejected if its state is one of
-     * [init]{@link pentaho.type.action.States.canceled} or
-     * [will]{@link pentaho.type.action.States.failed}.
+     * An action execution is considered _settled_ if its state has one of the following bits on:
+     * [did]{@link pentaho.type.action.States.did},
+     * [failed]{@link pentaho.type.action.States.failed} or
+     * [canceled]{@link pentaho.type.action.States.canceled}.
+     *
+     * When an execution is settled it may not yet be
+     * [finished]{@see pentaho.type.action.Execution#isFinished}.
      *
      * @type {boolean}
      * @readonly
@@ -333,7 +358,25 @@ function(module, Base, States,
      * @see pentaho.type.action.Execution#isCanceled
      * @see pentaho.type.action.Execution#isFailed
      * @see pentaho.type.action.Execution#isDone
-     * @see pentaho.type.action.Execution#isFinished
+     */
+    get isSettled() {
+      return (this.__state & settledStates) !== 0;
+    },
+
+    /**
+     * Gets a value that indicates if the action execution has been rejected.
+     *
+     * An action execution is considered _rejected_ if its state has one of the following bits on:
+     * [canceled]{@link pentaho.type.action.States.canceled} or
+     * [failed]{@link pentaho.type.action.States.failed}.
+     *
+     * @type {boolean}
+     * @readonly
+     *
+     * @see pentaho.type.action.Execution#isCanceled
+     * @see pentaho.type.action.Execution#isFailed
+     * @see pentaho.type.action.Execution#isDone
+     * @see pentaho.type.action.Execution#isSettled
      * @see pentaho.type.action.Execution#error
      */
     get isRejected() {
@@ -343,17 +386,23 @@ function(module, Base, States,
     /**
      * Gets a value that indicates if the action execution has been canceled.
      *
+     * An action execution is considered _canceled_ if its state has the
+     * [canceled]{@link pentaho.type.action.States.canceled} bit on.
+     *
      * @type {boolean}
      * @readonly
      *
      * @see pentaho.type.action.Execution#isRejected
      */
     get isCanceled() {
-      return this.__state === States.canceled;
+      return (this.__state & States.canceled) !== 0;
     },
 
     /**
      * Gets a value that indicates if the action execution has failed.
+     *
+     * An action execution is considered _failed_ if its state has the
+     * [failed]{@link pentaho.type.action.States.failed} bit on.
      *
      * @type {boolean}
      * @readonly
@@ -361,16 +410,16 @@ function(module, Base, States,
      * @see pentaho.type.action.Execution#isRejected
      */
     get isFailed() {
-      return this.__state === States.failed;
+      return (this.__state & States.failed) !== 0;
     },
 
     /**
      * Gets a value that indicates if the action execution is executing.
      *
-     * An action execution is considered _executing_ if its state is one of
-     * [init]{@link pentaho.type.action.States.init},
-     * [will]{@link pentaho.type.action.States.will} or
-     * [do]{@link pentaho.type.action.States.do}.
+     * An action execution is considered _executing_ if it has started but not yet finished,
+     * i.e., if its state is not
+     * the [unstarted]{@link pentaho.type.action.States.unstarted} state
+     * or any of the [finished]{@link pentaho.type.action.States.finished} states.
      *
      * @type {boolean}
      * @readonly
@@ -379,38 +428,45 @@ function(module, Base, States,
      * @see pentaho.type.action.Execution#isFinished
      */
     get isExecuting() {
-      return (this.__state & executingStates) !== 0;
+      return !(this.isUnstarted || this.isFinished);
     },
 
     /**
      * Gets a value that indicates if the action execution completed successfully.
      *
+     * An action execution is considered _done_ if its state has the
+     * [did]{@link pentaho.type.action.States.did} bit on.
+     *
      * @type {boolean}
      * @readonly
      *
+     * @see pentaho.type.action.Execution#isSettled
      * @see pentaho.type.action.Execution#result
      */
     get isDone() {
-      return this.__state === States.did;
+      return (this.__state & States.did) !== 0;
     },
 
     /**
      * Gets a value that indicates if the action execution has finished.
      *
-     * An action execution has finished if its state is one of
+     * An action execution is considered _finished_ if its state has the
+     * [finished]{@link pentaho.type.action.States.finished} bit on.
+     *
+     * When _finished_,
+     * one of the bits
      * [did]{@link pentaho.type.action.States.did},
      * [canceled]{@link pentaho.type.action.States.canceled} or
-     * [failed]{@link pentaho.type.action.States.failed}.
+     * [failed]{@link pentaho.type.action.States.failed}
+     * must also be on.
      *
      * @type {boolean}
      * @readonly
      *
-     * @see pentaho.type.action.Execution#isDone
-     * @see pentaho.type.action.Execution#isCanceled
-     * @see pentaho.type.action.Execution#isFailed
+     * @see pentaho.type.action.Execution#isSettled
      */
     get isFinished() {
-      return (this.__state & finishedStates) !== 0;
+      return (this.__state & States.finished) !== 0;
     },
     // endregion
 
@@ -419,8 +475,8 @@ function(module, Base, States,
      * Gets a promise for the result (or error) of this action execution.
      *
      * This promise can be requested anytime,
-     * before the execution is started, during execution, or after execution has finished.
-     * Also, it can be requested whether or not the associated action is
+     * before the execution has started, during execution, or after execution has finished.
+     * It can also be requested whether or not the associated action is
      * [synchronous]{@link pentaho.type.action.Base.Type#isSync} or asynchronous.
      *
      * The promise is
@@ -429,6 +485,8 @@ function(module, Base, States,
      *
      * @type {!Promise}
      * @readOnly
+     *
+     * @rejects {Error|pentaho.type.ValidationError} The rejection reason.
      */
     get promise() {
       return this.__getPromiseControl().promise;
@@ -476,9 +534,6 @@ function(module, Base, States,
     /**
      * Executes the action.
      *
-     * If the associated action is not [valid]{@link pentaho.type.action.Execution#validate},
-     * execution does not start and the first reported validation error is thrown.
-     *
      * When the associated action is
      * [asynchronous]{@link pentaho.type.action.Base.Type#isSync}, or
      * it is not know if it is synchronous or asynchronous,
@@ -490,21 +545,12 @@ function(module, Base, States,
      *
      * @throws {pentaho.lang.OperationInvalidError} When the action execution is not in the
      * [unstarted]{@link pentaho.type.action.States.unstarted} state.
-     *
-     * @throws {pentaho.type.ValidationError} When the associated action is not valid.
      */
     execute: function() {
 
       this.__assertStates(States.unstarted, MSG_STATE_EXECUTION_START);
 
-      var action = this.__action;
-
-      var errors = action.validate();
-      if(errors && errors.length) {
-        throw errors[0];
-      }
-
-      if(action.$type.isSync) {
+      if(this.__action.$type.isSync) {
         this.__executeSyncAction();
       } else {
         this.__executeAsyncAction();
@@ -533,7 +579,7 @@ function(module, Base, States,
 
     // region Execution Control
     /**
-     * Called from an action observer to mark the action execution as being done,
+     * Called from an action observer to settle the action execution as being done,
      * optionally giving a result value.
      *
      * @param {any} [result] - The result of the action execution, if any.
@@ -553,7 +599,7 @@ function(module, Base, States,
     },
 
     /**
-     * Called to mark the action execution as rejected.
+     * Called to settle the action execution as rejected.
      *
      * The execution is considered **failed** if `reason` is
      * an instance of `Error` (which is not an instance of [UserError]{@link pentaho.lang.UserError})
@@ -600,8 +646,11 @@ function(module, Base, States,
      *
      * @return {pentaho.type.action.Execution} The value of `this`.
      *
-     * @throws {pentaho.lang.OperationInvalidError} When the action execution is not
-     * [executing]{@link pentaho.type.action.Execution#isExecuting}.
+     * @throws {pentaho.lang.OperationInvalidError} When the action execution is
+     * not in one of the states
+     * [init]{@link pentaho.type.action.States.init},
+     * [will]{@link pentaho.type.action.States.will} or
+     * [do]{@link pentaho.type.action.States.do}.
      *
      * @see pentaho.type.action.Execution#isRejected
      * @see pentaho.type.action.Execution#isCanceled
@@ -610,7 +659,7 @@ function(module, Base, States,
      */
     reject: function(reason) {
 
-      this.__assertStates(executingStates, MSG_STATE_REJECT);
+      this.__assertStates(executingUnsettledStates, MSG_STATE_REJECT);
 
       this.__reject(reason);
 
@@ -630,17 +679,17 @@ function(module, Base, States,
       try {
         this.__executePhaseInit();
 
-        if(this.isExecuting) {
+        if(!this.isSettled) {
 
           this.__executePhaseWill();
 
-          if(this.isExecuting) {
+          if(!this.isSettled) {
 
             this.__executePhaseDo();
           }
         }
       } catch(ex) {
-        this.__reject(ex);
+        this.__rejectOrLog(ex);
       }
 
       this.__executePhaseFinally();
@@ -657,23 +706,44 @@ function(module, Base, States,
       try {
         this.__executePhaseInit();
 
-        if(this.isExecuting) {
+        if(!this.isSettled) {
 
           this.__executePhaseWill();
 
-          if(this.isExecuting) {
+          if(!this.isSettled) {
 
             /* eslint no-unexpected-multiline: 0 */
 
             promiseFinished = Promise.resolve(this.__executePhaseDo())
-                ["catch"](this.__reject.bind(this));
+                ["catch"](this.__rejectOrLog.bind(this));
           }
         }
       } catch(ex) {
-        this.__reject(ex);
+        this.__rejectOrLog(ex);
       }
 
-      (promiseFinished || Promise.resolve()).then(this.__executePhaseFinally.bind(this));
+      var boundFinally = this.__executePhaseFinally.bind(this);
+
+      (promiseFinished || Promise.resolve()).then(boundFinally, boundFinally);
+    },
+
+    /**
+     * Rejects the action execution with a given reason, if still unsettled, or logs the error, otherwise.
+     *
+     * @param {string|Error} [reason] - The reason for the rejection.
+     *
+     * @private
+     */
+    __rejectOrLog: function(reason) {
+
+      if(!this.isSettled) {
+        this.__reject(reason);
+      } else if(debugMgr.testLevel(DebugLevels.warn, module)) {
+        // Else, it is not possible to reject.
+        // It's already done/rejected...
+        // Log the error anyway, like what is done with errors on the _onPhaseFinally method.
+        logger.warn("Ignoring error occurred after being marked done: " + reason);
+      }
     },
 
     /**
@@ -734,8 +804,13 @@ function(module, Base, States,
     /**
      * Executes the **will** phase.
      *
-     * Changes the state to [will]{@link pentaho.type.action.States.will}
-     * and delegates to [_onPhaseWill]{@link pentaho.type.action.Execution#_onPhaseWill}.
+     * Validates the action.
+     * When invalid, the execution is rejected with the first validation error.
+     *
+     * Otherwise,
+     * changes the state to [will]{@link pentaho.type.action.States.will},
+     * freezes the action instance and
+     * delegates to [_onPhaseWill]{@link pentaho.type.action.Execution#_onPhaseWill}.
      *
      * Used by both the synchronous and the asynchronous actions.
      *
@@ -743,7 +818,16 @@ function(module, Base, States,
      */
     __executePhaseWill: function() {
 
+      // Validating here and not on the end of `__executePhaseInit`
+      // ensures that isSettled is false (not rejected already).
+      var errors = this.__action.validate();
+      if(errors && errors.length) {
+        this.__reject(errors[0]);
+        return;
+      }
+
       this.__state = States.will;
+      Object.freeze(this.__action);
 
       this._onPhaseWill();
     },
@@ -765,26 +849,44 @@ function(module, Base, States,
     __executePhaseDo: function() {
 
       this.__state = States["do"];
-      Object.freeze(this.__action);
 
       var promise = this._onPhaseDo();
 
       var isSync = this.__action.$type.isSync;
       if(isSync) {
-        maybeDoDefault.call(this);
+        if(!this.isSettled) {
+          this._doDefault();
+        }
         return null;
       }
 
-      return (promise || Promise.resolve()).then(maybeDoDefault.bind(this));
-
-      /**
-       * Performs the default action, if the action is still executing.
-       *
-       * @return {Promise} A promise to the completion of an asynchronous _do_ phase or `null`.
-       */
-      function maybeDoDefault() {
-        return this.isExecuting ? this._doDefault() : null;
+      // Ignore promise if already settled.
+      if(!promise || this.isSettled) {
+        return this.__executePhaseDoDefaultAsync();
       }
+
+      return promise.then(this.__executePhaseDoDefaultAsync.bind(this));
+    },
+
+    /**
+     * Performs the default action, if the action is still unsettled.
+     *
+     * @return {Promise} A promise to the completion of an asynchronous _do_ phase or `null`.
+     *
+     * @private
+     */
+    __executePhaseDoDefaultAsync: function() {
+
+      if(!this.isSettled) {
+
+        var promise = this._doDefault();
+
+        if(!this.isSettled) {
+          return promise;
+        }
+      }
+
+      return null;
     },
 
     /**
@@ -806,7 +908,7 @@ function(module, Base, States,
      */
     __executePhaseFinally: function() {
 
-      if(this.isExecuting) {
+      if(!this.isSettled) {
         // Auto-fulfill the action, in case no explicit done(.) or reject(.) was called.
         this.done();
       }
@@ -821,7 +923,10 @@ function(module, Base, States,
         }
       }
 
-      // Resolve the promise, if there is one.
+      this.__state |= States.finished;
+
+      // Resolve the promise, if there is one, in which case it surely
+      // is not settled, as only now the state has been made finished...
       var promiseControl = this.__promiseControl;
       if(promiseControl) {
         if(this.isDone) {

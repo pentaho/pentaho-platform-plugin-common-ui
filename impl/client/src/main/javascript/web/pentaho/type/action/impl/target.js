@@ -87,11 +87,11 @@ define([
      *   the default error handler does this.
      */
     var __emitActionKeyArgs = {
-      errorHandler: function(ex, action) {
-        action.fail(ex);
+      errorHandler: function(ex, actionExecution) {
+        actionExecution.fail(ex);
       },
-      isCanceled: function(action) {
-        return action.isCanceled;
+      isCanceled: function(actionExecution) {
+        return actionExecution.isCanceled;
       }
     };
 

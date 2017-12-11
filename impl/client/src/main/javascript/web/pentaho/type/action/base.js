@@ -16,9 +16,10 @@
 define([
   "module",
   "pentaho/lang/OperationInvalidError",
-  "pentaho/util/object"
+  "pentaho/util/object",
+  "pentaho/i18n!../i18n/types"
 ],
-function(module, OperationInvalidError, O) {
+function(module, OperationInvalidError, O, bundle) {
 
   "use strict";
 
@@ -62,6 +63,8 @@ function(module, OperationInvalidError, O) {
       $type: /** @lends pentaho.type.action.Base.Type# */{
 
         isAbstract: true,
+        label: null,
+        description: null,
 
         /** @inheritDoc */
         _init: function(spec, keyArgs) {
@@ -167,7 +170,7 @@ function(module, OperationInvalidError, O) {
          * @type {nonEmptyString}
          * @private
          */
-        this.__label = __nonEmptyString(spec && spec.label);
+        this.label = spec && spec.label;
 
         /**
          * The description of the action instance.
@@ -175,7 +178,7 @@ function(module, OperationInvalidError, O) {
          * @type {!nonEmptyString}
          * @private
          */
-        this.__description = __nonEmptyString(spec && spec.description);
+        this.description = spec && spec.description;
 
         // Let mixins take part.
         this._init(spec);
@@ -242,13 +245,14 @@ function(module, OperationInvalidError, O) {
               (!!(declaredType = keyArgs.declaredType) && this.$type !== declaredType);
 
         if(includeType) spec._ = this.$type.toRefInContext(keyArgs);
-        if(this.label) spec.label = this.label;
-        if(this.description) spec.description = this.description;
+        if(this.__label !== null) spec.label = this.label;
+        if(this.__description !== null) spec.description = this.description;
 
         return spec;
       }
       // endregion
-    });
+    })
+    .implement({$type: bundle.structured.action});
 
     actionType = Action.type;
 
