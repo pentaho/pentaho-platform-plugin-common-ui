@@ -65,7 +65,7 @@
  */
 
 /**
- * Gets a metadata property of a column, given its name and column index.
+ * Gets a metadata property of a column, given the column index and property name.
  *
  * @name pentaho.data.ITable#getColumnProperty
  * @method
