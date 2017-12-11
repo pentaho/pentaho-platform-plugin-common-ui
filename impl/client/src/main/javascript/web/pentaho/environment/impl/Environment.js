@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(["pentaho/util/has"], function(has) {
+define([
+  "pentaho/util/url"
+], function(url) {
 
   "use strict";
 
@@ -75,9 +77,9 @@ define(["pentaho/util/has"], function(has) {
       // href
       // protocol
       // pathname
-      root: createURL(readVar(propSpec, "root", propSpecDef)),
-      packages: createURL(readVar(propSpec, "packages", propSpecDef)),
-      services: createURL(readVar(propSpec, "services", propSpecDef))
+      root: url.create(readVar(propSpec, "root", propSpecDef)),
+      packages: url.create(readVar(propSpec, "packages", propSpecDef)),
+      services: url.create(readVar(propSpec, "services", propSpecDef))
     };
 
     this.reservedChars = readVar(spec, "reservedChars", defaultSpec);
@@ -118,55 +120,4 @@ define(["pentaho/util/has"], function(has) {
     return (spec && spec[name]) || (defaultSpec && defaultSpec[name]) || null;
   }
 
-  function createURL(url) {
-    if(url) {
-      if(has("URL")) {
-        return new URL(url, document.location);
-      }
-
-      // Return a MOCK URL
-      var m = parseUrl(url) ||
-
-          // tests can reach here, as URL is fed from CONTEXT_PATH, which is usually not absolute
-          parseUrl((url = makeAbsoluteUrl(url))) ||
-
-          // TODO: CGG/rhino can reach here, as its createElement is mocked. Remove the latter dies.
-          // Assume the whole url is the pathname.
-          [url, "", null, "", null, url];
-
-      var auth = m[2] != null ? m[2].slice(0, -1).split(":") : [];
-      return {
-        href:     url,
-        protocol: m[1],
-        username: auth.length > 0 ? auth[0] : "",
-        password: auth.length > 1 ? auth[1] : "",
-        hostname: m[3],
-        host: m[3] + (m[4] != null ? m[4] : ""),
-        port: (m[4] != null ? m[4].substring(1) : ""),
-        origin: m[1] + "//" + m[3] + (m[4] != null ? m[4] : ""),
-        pathname: m[5],
-
-        toString: function() {
-          return url;
-        }
-      };
-    }
-
-    return null;
-  }
-
-  function parseUrl(url) {
-    // 1 - protocol (required)
-    // 2 - authority (userName:password) (optional)
-    // 3 - host (optional)
-    // 4 - port (optional)
-    // 5 - pathname (optional)
-    return /^\s*([^:\/?#]+:)\/\/([^@]*@)?([^:\/?#]*)(:\d*)?(\/[^?#]*)+/.exec(url);
-  }
-
-  function makeAbsoluteUrl(url) {
-    var aElem = document.createElement("a");
-    aElem.href = url;
-    return aElem.href;
-  }
 });

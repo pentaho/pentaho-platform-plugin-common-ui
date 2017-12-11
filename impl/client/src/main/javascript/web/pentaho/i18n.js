@@ -25,8 +25,9 @@
 define([
   "./environment",
   "./i18n/MessageBundle",
+  "./util/url",
   "json"
-], function(env, MessageBundle) {
+], function(env, MessageBundle, url) {
 
   "use strict";
 
@@ -44,7 +45,7 @@ define([
         // Taking into account embedded scenarios when the host
         // is not the Pentaho Server / PDI
         var bundleUrl = "json!" + serverUrl +
-            "i18n?plugin=" + bundleInfo.pluginId + "&name=" + bundleInfo.name;
+          "i18n?plugin=" + bundleInfo.pluginId + "&name=" + bundleInfo.name;
 
         localRequire([bundleUrl], function(bundle) {
 
@@ -109,94 +110,57 @@ define([
     // bundleName: resources/web/dojo/pentaho/common/nls/messages
 
     var bundleMid = __getBundleId(bundlePath);
-
-    var absBundleUrl = localRequire.toUrl(bundleMid);
-
-    // Remove basePath from bundle url
-    // Taking into account embedded scenarios, where it will be a full URL - "http://host:port/..."
-    var reminderBundleUrlRegX = getReminderBundleUrlRegx();
-    var reminderBundleUrlMatch = reminderBundleUrlRegX.exec(absBundleUrl);
-
-    absBundleUrl = reminderBundleUrlMatch ? reminderBundleUrlMatch[1] : absBundleUrl;
-
-    // The same for content/
-    if(absBundleUrl.indexOf("content/") === 0)
-      absBundleUrl = absBundleUrl.substr("content/".length);
-
-    // In CGG, these type of URLs arise:
-    // absBundleUrl: "res:../../common-ui/resources/web/pentaho/type/i18n/types"
-    // or
-    // absBundleUrl: "/plugin/common-ui/resources/web/pentaho/type/i18n/types"
-    var m = /^res:[\.\/]*(.*)$/.exec(absBundleUrl);
-    if(m) {
-      absBundleUrl = m[1];
-    } else if(absBundleUrl.indexOf("/plugin/") === 0) {
-      absBundleUrl = absBundleUrl.substr("/plugin/".length);
-    }
+    var bundleUrlPath = getBundleUrlPath(localRequire, bundleMid);
 
     // Split the url into pluginId and bundleName
     // "pluginId/...bundleName..."
-    var i = absBundleUrl.indexOf("/");
-    if(i > 0 || i < absBundleUrl.length - 1) {
-      return {
-        pluginId: absBundleUrl.substr(0, i),
-        name: absBundleUrl.substr(i + 1)
-      };
+    var separatorIndex = bundleUrlPath.indexOf("/");
+
+    // Catch invalid bundle url paths and throw when
+    // the bundleUrlPath 1) starts or 2) ends with a forward slash (/)
+    var isValidBundleUrlPath = separatorIndex > 0 || separatorIndex < bundleUrlPath.length - 1;
+    if (!isValidBundleUrlPath) {
+      throw new Error("[pentaho/messages!] Bundle path argument is invalid: '" + bundlePath + "'.");
     }
 
-    throw new Error("[pentaho/messages!] Bundle path argument is invalid: '" + bundlePath + "'.");
-  }
-
-  /**
-   * Get a {@link RegExp} to remove the web server application [root]{@link pentaho.environment.IServer#root}
-   * from the i18n resource {@link URL}.
-   *
-   * When the server is running on a protocol scheme's default port, because {@link URL} omits default ports,
-   * it has to be included in the {@link RegExp} to match the output of `require.toUrl` which always
-   * includes the url port.
-   *
-   * @return {RegExp} the reminder bundle url RegExp.
-   */
-  function getReminderBundleUrlRegx() {
-    var defaultSchemePorts = {
-      "http:": 80,
-      "https:": 443
+    return {
+      pluginId: bundleUrlPath.substr(0, separatorIndex),
+      name: bundleUrlPath.substr(separatorIndex + 1)
     };
+  }
 
-    var url = env.server.root;
+  function getBundleUrlPath(localRequire, bundleMid) {
+    var SERVER_ROOT_PATH = env.server.root.pathname;
+    var CONTENT_PATH = "content/";
+    var PLUGIN_PATH = "/plugin/";
 
-    var origin = url.origin;
-    var port = url.port;
-    var pathname = url.pathname;
+    var bundleUrl = url.create(localRequire.toUrl(bundleMid));
+    var bundleUrlPath = bundleUrl.pathname;
+    var bundleUrlScheme = bundleUrl.protocol;
 
-    var isDefaultPort = port == null || port.length === 0;
-    if ( isDefaultPort ) {
-      var scheme = url.protocol;
-      var host = url.host;
-
-      port = defaultSchemePorts[scheme];
-
-      origin = scheme + "//" + host + ":" + port;
-      url = origin + pathname;
+    var startWithServerRoot = !bundleUrlPath.indexOf(SERVER_ROOT_PATH);
+    if (startWithServerRoot) {
+      bundleUrlPath = bundleUrlPath.substring(SERVER_ROOT_PATH.length);
     }
 
-    // escape before creating Regx
-    url = regxEscape(url);
-    origin = regxEscape(origin);
-    pathname = regxEscape(pathname);
+    var startsWithContent = !bundleUrlPath.indexOf(CONTENT_PATH);
+    if(startsWithContent) {
+      bundleUrlPath = bundleUrlPath.substr(CONTENT_PATH.length);
+    }
 
-    return new RegExp("^(?:" + url + "|" + origin + "|" + pathname + ")(.*)");
+    // In CGG, these type of URLs arise:
+    // bundleUrl: "res:../../common-ui/resources/web/pentaho/type/i18n/types"
+    // or
+    // bundleUrl: "/plugin/common-ui/resources/web/pentaho/type/i18n/types"
+    var startsWithPlugin = !bundleUrlPath.indexOf(PLUGIN_PATH);
+    var isCggBundleRequest = bundleUrlScheme === "res:";
+    if (isCggBundleRequest && (match = /^[./]*(.*)$/.exec(bundleUrlPath))) {
+      bundleUrlPath = match[1];
+    } else if (startsWithPlugin) {
+      bundleUrlPath = bundleUrlPath.substr(PLUGIN_PATH.length);
+    }
+
+    return bundleUrlPath;
   }
 
-  /**
-   * Escapes special RegExp characters, with the exception of the forward slash `/`,
-   * that is escaped by [RegExp's]{@link RegExp} constructor.
-   *
-   * @param {any} value - value to include in a RegExp.
-   *
-   * @return {String} the escaped value.
-   */
-  function regxEscape(value) {
-    return String(value).replace (/[-\\^$*+?.()|[\]{}]/g, '\\$&');
-  }
 });
