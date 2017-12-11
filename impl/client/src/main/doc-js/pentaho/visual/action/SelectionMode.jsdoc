@@ -16,7 +16,7 @@
 
 /**
  * The selection mode is a function that determines how the selection made by the user,
- * contained in [dataFilter]{@link pentaho.visual.action.Data#dataFilter},
+ * contained in [dataFilter]{@link pentaho.visual.action.mixins.Data#dataFilter},
  * is merged with the view's current selection,
  * [selectionFilter]{@link pentaho.visual.base.View#selectionFilter}.
  *
