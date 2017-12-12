@@ -18,7 +18,7 @@ layout: default
    [pentaho/environment]({{site.refDocsUrlPattern | replace: '$', 'pentaho.environment'}}).
 
 2. Services are no longer registered with 
-   [pentaho/service]({{site.refDocsUrlPattern | replace: '$', 'pentaho/service'}}) but instead with
+   [pentaho/service]({{site.refDocsUrlPattern | replace: '$', 'pentaho.service'}}) but instead with
    one of the [pentaho/instanceInfo]({{site.refDocsUrlPattern | replace: '$', 'pentaho.instanceInfo'}}){{site.starNew}} or 
    [pentaho/typeInfo]({{site.refDocsUrlPattern | replace: '$', 'pentaho.typeInfo'}}){{site.starNew}} modules,
    depending on whether the registered module provides an _instance_ or a _type_, respectively.

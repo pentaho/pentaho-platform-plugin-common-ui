@@ -6,26 +6,15 @@
 <body class="intro-layout">
   {% include default-site-header.html %}
 
-  <div class="mt-custom-home-new page-header intro-page-header">
-    <div class="page-header-wrapper">
-      <h1 class="project-name">{{ page.title | default: site.github.repository_name }}</h1>
-      <h2 class="project-tagline">{{ page.description | default: site.github.project_tagline }}</h2>
-      {% if site.github.is_project_page %}
-      <a href="{{ site.github.repository_url }}" class="btn">View on GitHub</a>
-      {% endif %} {% if site.show_downloads %}
-      <a href="{{ site.github.zip_url }}" class="btn">Download .zip</a>
-      <a href="{{ site.github.tar_url }}" class="btn">Download .tar.gz</a>
-      {% endif %}  
-    </div>
-  </div>
-
-  <section class="main-content">
+  <section id="main-content" class="main-content">
     <div class="callout callout-success">
       <p>This documentation targets the API <b>shipped with Pentaho 8.0</b>. <a href="{{ "/7.1/platform/visual" | relative_url }}">Click here for the documentation about the version shipped with Pentaho 7.1</a>.</p>
       <p>You can also check <a title="What's new and changed in Visualization API beta 2" href="{{ "/platform/visual/whats-new-beta-2" | relative_url }}">What's new and changed in the Visualization API beta 2</a>,
-        specially if you implemented a visualization for Pentaho 7.1.</p>
+        specially if you implemented a visualization for 7.1.</p>
     </div>
     
+    <h1 class="page-title">{{ page.title }}</h1>
+
     {{ content }}
   </section>
 

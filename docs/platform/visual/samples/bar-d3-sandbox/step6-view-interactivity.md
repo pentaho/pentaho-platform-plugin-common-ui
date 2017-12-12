@@ -19,11 +19,11 @@ Most container applications handle these in some useful way.
 ## On data actions and filters...
 
 Visualization API 
-[data actions]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.mixins.Data'}}) 
+[data actions]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Data'}}) 
 carry information that _identifies_ the visual element with which the user interacted 
 in terms of the subset of data that it visually represents.
 This is conveyed in their
-[dataFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.mixins.Data' | append: '#dataFilter'}})
+[dataFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Data' | append: '#dataFilter'}})
 property.
 
 In this visualization, 
@@ -128,7 +128,7 @@ The current set of selected data is stored in the view's
 [selectionFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#selectionFilter'}})
 property.
 For each `select` action that is performed, 
-its [dataFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select' | append: '#dataFilter'}}), 
+its [dataFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Data' | append: '#dataFilter'}}), 
 may be removed from, be added to, replace or toggled in the view's current `selectionFilter`, 
 according to the action's 
 [selectionMode]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select' | append: '#selectionMode'}}).

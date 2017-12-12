@@ -6,8 +6,11 @@
   flex-wrap: wrap;
   justify-content: space-around;
   list-style: none;
-  margin: 0 -1em;
-  padding: 0;
+
+  border: 1px solid #DDDDE1;
+  padding: 1.5rem 0.5rem 0rem 0.5rem;
+  background-color: #FDFDFD;
+
   color: #333;
   line-height: 169%;
 
@@ -17,6 +20,10 @@
 
     background: 0 0;
     background-color: #FCFCFC;
+
+    &.api-box {
+      background-color: #ffffff;
+    }
 
     dd {
       color: #606c71;
@@ -79,11 +86,9 @@
               margin: 0.5em 0.25em;
             }
 
-            background-color: #ffffff;
             margin: 0.5em 0.25em;
           }
         }
-
       }
     }
   }
