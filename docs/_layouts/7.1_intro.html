@@ -25,8 +25,10 @@
   </section>
 
   <section class="main-content">
-    {% include callout.html content="This documentation targets the API <b>shipped with Pentaho 7.1</b>. <a href=\"/\">Click here for the updated version shipped with Pentaho 8.0</a>." type="danger" %}
-    
+    <div class="callout callout-danger">
+      <p>This documentation targets the API <b>shipped with Pentaho 7.1</b>. <a href="{{ "/" | relative_url }}">Click here for the updated version shipped with Pentaho 8.0</a>.</p>
+    </div>
+
     {{ content }}
   </section>
 

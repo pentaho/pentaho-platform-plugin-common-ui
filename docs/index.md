@@ -11,7 +11,7 @@ The **Platform JavaScript APIs** support the development of JavaScript component
 
 The APIs are organized as follows:
 <ul class="api-list">
-    <li class="bigger">
+    <li class="bigger api-box">
         <dl>
             <dt>
                 <a title="Pentaho JavaScript Visualization API" href="platform/visual">Visualization</a>
@@ -19,7 +19,7 @@ The APIs are organized as follows:
             <dd>A unified way to visualize data across the Pentaho suite.</dd>
         </dl>
     </li>
-    <li>
+    <li class="api-box">
         <dl>
             <dt>
                 <a title="Pentaho JavaScript Data API" 
@@ -39,7 +39,7 @@ The APIs are organized as follows:
             </dd>
         </dl>
     </li>
-    <li>
+    <li class="api-box">
         <dl>
             <dt>
                 <a title="Pentaho JavaScript Type API" 
