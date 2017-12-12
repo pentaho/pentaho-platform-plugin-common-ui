@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context"
-], function(Context) {
+  "pentaho/type/Context",
+  "tests/test-utils"
+], function(Context, testUtils) {
 
   "use strict";
+
+  // Use alternate, promise-aware version of `it`.
+  var it = testUtils.itAsync;
 
   var context;
   var BaseAction;
@@ -65,9 +69,40 @@ define([
 
       // ---
 
-      var IsEqualFilter = context.get("=");
+      function defineCustomFilter(localRequire) {
 
-      expect(typeof IsEqualFilter).toBe("function");
+        localRequire.define("tests/filter/custom", [], function() {
+
+          return ["pentaho/data/filter/abstract", function(AbstractFilter) {
+
+            return AbstractFilter.extend({
+              $type: {
+                id: "tests/filter/custom"
+              }
+            });
+          }];
+        });
+
+        localRequire.config({
+          config: {
+            "pentaho/typeInfo": {
+              "tests/filter/custom": {base: "pentaho/data/filter/abstract"}
+            }
+          }
+        });
+      }
+
+      return require.using(["pentaho/type/Context"], defineCustomFilter, function(Context) {
+
+        return Context.createAsync()
+            .then(function(context) {
+              return context.getAsync("pentaho/visual/action/mixins/data");
+            })
+            .then(function(DataActionMixin) {
+              var CustomFilter = DataActionMixin.type.context.get("tests/filter/custom");
+              expect(typeof CustomFilter).toBe("function");
+            });
+      });
     });
 
     describe("#_init({dataFilter})", function() {
