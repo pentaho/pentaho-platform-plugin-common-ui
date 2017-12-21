@@ -5,10 +5,10 @@
   <parent>
     <groupId>org.pentaho</groupId>
     <artifactId>common-ui-impl</artifactId>
-    <version>8.0-SNAPSHOT</version>
+    <version>8.0.0.1-99</version>
   </parent>
   <artifactId>common-ui-impl-server</artifactId>
-  <version>8.0-SNAPSHOT</version>
+  <version>8.0.0.1-99</version>
   <name>Common UI server side</name>
   <description>Java portion of the Common UI codebase</description>
   <url>http://www.pentaho.com</url>
@@ -17,23 +17,23 @@
     <commons-vfs2.version>2.1-20150824</commons-vfs2.version>
     <simple-jndi.version>0.11.1</simple-jndi.version>
     <jmock-junit4.version>2.5.1</jmock-junit4.version>
-    <pentaho-connections.version>8.0-SNAPSHOT</pentaho-connections.version>
+    <pentaho-connections.version>8.0.0.1-99</pentaho-connections.version>
     <commons-beanutils.version>1.9.3</commons-beanutils.version>
-    <libformula.version>8.0-SNAPSHOT</libformula.version>
-    <pentaho-metadata.version>8.0-SNAPSHOT</pentaho-metadata.version>
+    <libformula.version>8.0.0.1-99</libformula.version>
+    <pentaho-metadata.version>8.0.0.1-99</pentaho-metadata.version>
     <commons-io.version>2.1</commons-io.version>
-    <libbase.version>8.0-SNAPSHOT</libbase.version>
+    <libbase.version>8.0.0.1-99</libbase.version>
     <maven-failsafe-plugin.forkCount>1</maven-failsafe-plugin.forkCount>
     <maven-failsafe-plugin.reuseForks>false</maven-failsafe-plugin.reuseForks>
     <hsqldb.version>2.3.2</hsqldb.version>
-    <pentaho-xul.version>8.0-SNAPSHOT</pentaho-xul.version>
+    <pentaho-xul.version>8.0.0.1-99</pentaho-xul.version>
     <mockito-all.version>1.8.4</mockito-all.version>
-    <pentaho-database-model.version>8.0-SNAPSHOT</pentaho-database-model.version>
-    <pentaho-kettle.version>8.0-SNAPSHOT</pentaho-kettle.version>
+    <pentaho-database-model.version>8.0.0.1-99</pentaho-database-model.version>
+    <pentaho-kettle.version>8.0.0.1-99</pentaho-kettle.version>
     <flexjson.version>2.1</flexjson.version>
     <org.json.version>3.1.1</org.json.version>
     <jug-lgpl.version>2.0.0</jug-lgpl.version>
-    <pentaho-platform.version>8.0-SNAPSHOT</pentaho-platform.version>
+    <pentaho-platform.version>8.0.0.1-99</pentaho-platform.version>
     <commons-logging.version>1.1</commons-logging.version>
     <commons-lang.version>2.2</commons-lang.version>
   </properties>
