@@ -1440,7 +1440,9 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
       this._initializeParameterValue(paramDefn, param);
 
       // add the label widget
-      panelComponents.push(_createWidgetForLabel.call(this, param));
+      if(!paramDefn.removeParameterLabel) {
+        panelComponents.push(_createWidgetForLabel.call(this, param));
+      }
 
       // add the error widgets
       var errors = paramDefn.errors[param.name];
