@@ -39,7 +39,7 @@ define([
         // This resource will be resolved dynamically during run time in the web browser.
         onLoad();
       } else {
-        var bundleInfo = __getBundleInfo(localRequire, bundlePath);
+        var bundleInfo = _getBundleInfo(localRequire, bundlePath);
         var serverUrl = env.server.root;
 
         // Taking into account embedded scenarios when the host
@@ -55,7 +55,9 @@ define([
     },
     normalize: function(name, normalize) {
       return normalize(__getBundleId(name));
-    }
+    },
+
+    _getBundleInfo: _getBundleInfo
   };
 
   /**
@@ -95,12 +97,13 @@ define([
    *
    * @param {function} localRequire - The require-js function.
    * @param {string} bundlePath - The specified bundle path argument.
+   *
    * @return {Object} A bundle info object.
    *
    * @throws {Error} If the specified module identifier cannot be resolved
    *   to a plugin identifier and bundle name.
    */
-  function __getBundleInfo(localRequire, bundlePath) {
+  function _getBundleInfo(localRequire, bundlePath) {
     // e.g.:
     // bundlePath: pentaho/common/nls/messages
     // bundleMid:  pentaho/common/nls/messages
@@ -110,7 +113,7 @@ define([
     // bundleName: resources/web/dojo/pentaho/common/nls/messages
 
     var bundleMid = __getBundleId(bundlePath);
-    var bundleUrlPath = getBundleUrlPath(localRequire, bundleMid);
+    var bundleUrlPath = __getBundleUrlPath(localRequire, bundleMid);
 
     // Split the url into pluginId and bundleName
     // "pluginId/...bundleName..."
@@ -129,7 +132,7 @@ define([
     };
   }
 
-  function getBundleUrlPath(localRequire, bundleMid) {
+  function __getBundleUrlPath(localRequire, bundleMid) {
     var SERVER_ROOT_PATH = env.server.root.pathname;
     var CONTENT_PATH = "content/";
     var PLUGIN_PATH = "/plugin/";
