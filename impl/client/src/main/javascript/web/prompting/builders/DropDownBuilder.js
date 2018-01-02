@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,13 +74,15 @@ define(['cdf/components/SelectComponent', './ValueBasedParameterWidgetBuilder', 
       }
 
       $.extend(widget, {
-        type: 'SelectComponent',
+        type: "SelectComponent",
         preExecution: function() {
-          // SelectComponent defines defaultIfEmpty = true for non-multi selects.
+          // SelectComponent defines useFirstValue as `true` for non-multi selects.
           // We can't override any properties of the component so we must set them just before update() is called. :(
           // Only select the first item if we have no selection and are not ignoring BISERVER-5538
-          this.defaultIfEmpty = !args.promptPanel.paramDefn.ignoreBiServer5538 && !args.param.hasSelection();
-        }
+          this.useFirstValue = !args.promptPanel.paramDefn.ignoreBiServer5538 && !args.param.hasSelection();
+        },
+        externalPlugin: args.param.attributes.externalPlugin,
+        extraOptions: args.param.attributes.extraOptions
       });
 
       return new SelectComponent(widget);

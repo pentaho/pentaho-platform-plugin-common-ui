@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,13 +73,13 @@ define(['common-ui/prompting/builders/DropDownBuilder'], function(DropDownBuilde
       expect(component.valuesArray[1][1]).toEqual("");
     });
 
-    it ("should set defaultIfEmpty to true for non-multi select on preExecution", function() {
+    it("should set useFirstValue to true for non-multi select on preExecution", function() {
       var component = dropDownBuilder.build(args);
 
       spyOn(component, 'preExecution').and.callThrough();     
       component.preExecution();
       expect(component.preExecution).toHaveBeenCalled();
-      expect(component.defaultIfEmpty).toBeFalsy();
+      expect(component.useFirstValue).toBeFalsy();
     });
 
   });
