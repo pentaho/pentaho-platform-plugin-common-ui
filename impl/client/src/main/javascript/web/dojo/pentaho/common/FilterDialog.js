@@ -668,8 +668,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   buildFilterText: function(filter, prompt) {
     var column = this.datasource.getColumnById(filter.column);
     var friendlyOperator = filter.operator;
-    switch (filter.operator) {
-      case pentaho.pda.Column.CONDITION_TYPES.IN:
+    if (filter.operator == pentaho.pda.Column.CONDITION_TYPES.IN) {
         switch (filter.combinationType) {
           case pentaho.pda.Column.OPERATOR_TYPES.AND:
             friendlyOperator = this.getLocaleString("FilterCombinationTypeIn");
@@ -682,24 +681,18 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               console.log("Unknown filter combination type for IN condition type: " + filter.combinationType);
             }
         }
-        break;
-      case pentaho.pda.Column.CONDITION_TYPES.EQUAL:
-        // Treat pentaho.pda.Column.DATA_TYPES.UNKNOWN as pentaho.pda.Column.DATA_TYPES.STRING
-        var dataType = column.dataType == pentaho.pda.Column.DATA_TYPES.UNKNOWN ? pentaho.pda.Column.DATA_TYPES.STRING : column.dataType;
-        var comparatorMapping = pentaho.pda.Column.COMPARATOR[dataType];
-        if (comparatorMapping) {
-          array.some(comparatorMapping, function(cArray) {
-            if (cArray[1] === filter.operator) {
-              friendlyOperator = cArray[0];
-              return true;
-            }
-          });
-        }
-        break;
-      default:
-        if(typeof console !== "undefined") {
-          console.log("Unknown filter type: " + this.filterType);
-        }
+    } else {
+      // Treat pentaho.pda.Column.DATA_TYPES.UNKNOWN as pentaho.pda.Column.DATA_TYPES.STRING
+      var dataType = column.dataType == pentaho.pda.Column.DATA_TYPES.UNKNOWN ? pentaho.pda.Column.DATA_TYPES.STRING : column.dataType;
+      var comparatorMapping = pentaho.pda.Column.COMPARATOR[dataType];
+      if (comparatorMapping) {
+        array.some(comparatorMapping, function(cArray) {
+          if (cArray[1] === filter.operator) {
+            friendlyOperator = cArray[0];
+            return true;
+          }
+        });
+      }
     }
     var values = "";
 
