@@ -684,6 +684,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
         }
         break;
       case pentaho.pda.Column.CONDITION_TYPES.EQUAL:
+      default:
         // Treat pentaho.pda.Column.DATA_TYPES.UNKNOWN as pentaho.pda.Column.DATA_TYPES.STRING
         var dataType = column.dataType == pentaho.pda.Column.DATA_TYPES.UNKNOWN ? pentaho.pda.Column.DATA_TYPES.STRING : column.dataType;
         var comparatorMapping = pentaho.pda.Column.COMPARATOR[dataType];
@@ -696,10 +697,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           });
         }
         break;
-      default:
-        if(typeof console !== "undefined") {
-          console.log("Unknown filter type: " + this.filterType);
-        }
     }
     var values = "";
 
