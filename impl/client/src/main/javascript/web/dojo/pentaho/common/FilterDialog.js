@@ -255,6 +255,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   },
 
   setFilterType: function(type) {
+    domClass.remove(this.parameterContainer, "filterDialogHidden");
     switch (type) {
       case null:
         domClass.add(this.picklistContainer, "filterDialogHidden");
@@ -522,6 +523,11 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
       domClass.remove(node, "filterDialogHidden");
     } else {
       domClass.add(node, "filterDialogHidden");
+    }
+    if (this.matchComparator.value === pentaho.pda.Column.CONDITION_TYPES.IS_NULL || this.matchComparator.value === pentaho.pda.Column.CONDITION_TYPES.NOT_NULL) {
+      domClass.add(this.parameterContainer, "filterDialogHidden");
+    } else {
+      domClass.remove(this.parameterContainer, "filterDialogHidden");
     }
   },
 
