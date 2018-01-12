@@ -39,7 +39,7 @@ define([
         // This resource will be resolved dynamically during run time in the web browser.
         onLoad();
       } else {
-        var bundleInfo = _getBundleInfo(localRequire, bundlePath);
+        var bundleInfo = __getBundleInfo(localRequire, bundlePath);
         var serverUrl = env.server.root;
 
         // Taking into account embedded scenarios when the host
@@ -57,7 +57,7 @@ define([
       return normalize(__getBundleId(name));
     },
 
-    _getBundleInfo: _getBundleInfo
+      __getBundleInfo: __getBundleInfo
   };
 
   /**
@@ -103,7 +103,7 @@ define([
    * @throws {Error} If the specified module identifier cannot be resolved
    *   to a plugin identifier and bundle name.
    */
-  function _getBundleInfo(localRequire, bundlePath) {
+  function __getBundleInfo(localRequire, bundlePath) {
     // e.g.:
     // bundlePath: pentaho/common/nls/messages
     // bundleMid:  pentaho/common/nls/messages
@@ -136,6 +136,7 @@ define([
     var SERVER_ROOT_PATH = env.server.root.pathname;
     var CONTENT_PATH = "content/";
     var PLUGIN_PATH = "/plugin/";
+    var CGG_URL_SCHEME = "res:";
 
     var bundleUrl = url.create(localRequire.toUrl(bundleMid));
     var bundleUrlPath = bundleUrl.pathname;
@@ -155,9 +156,18 @@ define([
     // bundleUrl: "res:../../common-ui/resources/web/pentaho/type/i18n/types"
     // or
     // bundleUrl: "/plugin/common-ui/resources/web/pentaho/type/i18n/types"
+    var startsWithCggUrlScheme = !bundleUrlPath.indexOf(CGG_URL_SCHEME);
+    if (startsWithCggUrlScheme) {
+      bundleUrlPath = bundleUrlPath.substr(CGG_URL_SCHEME.length);
+    }
+
+    var relativeBundleRegx = /^[./]*(.*)$/;
+
+    var isCggResBundleRequest = startsWithCggUrlScheme || bundleUrlScheme === CGG_URL_SCHEME;
     var startsWithPlugin = !bundleUrlPath.indexOf(PLUGIN_PATH);
-    var isCggBundleRequest = bundleUrlScheme === "res:";
-    if (isCggBundleRequest && (match = /^[./]*(.*)$/.exec(bundleUrlPath))) {
+
+    if (isCggResBundleRequest && relativeBundleRegx.test(bundleUrlPath)) {
+      var match = relativeBundleRegx.exec(bundleUrlPath);
       bundleUrlPath = match[1];
     } else if (startsWithPlugin) {
       bundleUrlPath = bundleUrlPath.substr(PLUGIN_PATH.length);
