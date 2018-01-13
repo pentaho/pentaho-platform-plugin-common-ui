@@ -55,7 +55,9 @@ define([
     },
     normalize: function(name, normalize) {
       return normalize(__getBundleId(name));
-    }
+    },
+
+      __getBundleInfo: __getBundleInfo
   };
 
   /**
@@ -95,6 +97,7 @@ define([
    *
    * @param {function} localRequire - The require-js function.
    * @param {string} bundlePath - The specified bundle path argument.
+   *
    * @return {Object} A bundle info object.
    *
    * @throws {Error} If the specified module identifier cannot be resolved
@@ -110,7 +113,7 @@ define([
     // bundleName: resources/web/dojo/pentaho/common/nls/messages
 
     var bundleMid = __getBundleId(bundlePath);
-    var bundleUrlPath = getBundleUrlPath(localRequire, bundleMid);
+    var bundleUrlPath = __getBundleUrlPath(localRequire, bundleMid);
 
     // Split the url into pluginId and bundleName
     // "pluginId/...bundleName..."
@@ -129,10 +132,11 @@ define([
     };
   }
 
-  function getBundleUrlPath(localRequire, bundleMid) {
+  function __getBundleUrlPath(localRequire, bundleMid) {
     var SERVER_ROOT_PATH = env.server.root.pathname;
     var CONTENT_PATH = "content/";
     var PLUGIN_PATH = "/plugin/";
+    var CGG_URL_SCHEME = "res:";
 
     var bundleUrl = url.create(localRequire.toUrl(bundleMid));
     var bundleUrlPath = bundleUrl.pathname;
@@ -152,9 +156,18 @@ define([
     // bundleUrl: "res:../../common-ui/resources/web/pentaho/type/i18n/types"
     // or
     // bundleUrl: "/plugin/common-ui/resources/web/pentaho/type/i18n/types"
+    var startsWithCggUrlScheme = !bundleUrlPath.indexOf(CGG_URL_SCHEME);
+    if (startsWithCggUrlScheme) {
+      bundleUrlPath = bundleUrlPath.substr(CGG_URL_SCHEME.length);
+    }
+
+    var relativeBundleRegx = /^[./]*(.*)$/;
+
+    var isCggResBundleRequest = startsWithCggUrlScheme || bundleUrlScheme === CGG_URL_SCHEME;
     var startsWithPlugin = !bundleUrlPath.indexOf(PLUGIN_PATH);
-    var isCggBundleRequest = bundleUrlScheme === "res:";
-    if (isCggBundleRequest && (match = /^[./]*(.*)$/.exec(bundleUrlPath))) {
+
+    if (isCggResBundleRequest && relativeBundleRegx.test(bundleUrlPath)) {
+      var match = relativeBundleRegx.exec(bundleUrlPath);
       bundleUrlPath = match[1];
     } else if (startsWithPlugin) {
       bundleUrlPath = bundleUrlPath.substr(PLUGIN_PATH.length);

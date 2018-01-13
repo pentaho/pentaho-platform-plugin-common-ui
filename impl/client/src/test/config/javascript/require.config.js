@@ -56,6 +56,9 @@
   requirePaths["pentaho/util"] = basePath + "/pentaho/util";
   requirePaths["pentaho/visual"] = basePath + "/pentaho/visual";
   requirePaths["pentaho/service"] = basePath + "/pentaho/service";
+  // We need to map the original i18n src file to a different amd module
+  // so that we can test it, as well use the mock that is need for the test environment
+  requirePaths["pentaho/i18n-src"] = basePath + "/pentaho/i18n";
   requirePaths["pentaho/i18n"] = baseTest + "/pentaho/i18nMock";
   requirePaths["pentaho/i18n/MessageBundle"] = basePath + "/pentaho/i18n/MessageBundle";
   requirePaths["pentaho/shim"] = basePath + "/pentaho/shim";
