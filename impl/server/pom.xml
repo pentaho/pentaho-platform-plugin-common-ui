@@ -26,7 +26,7 @@
     <maven-failsafe-plugin.forkCount>1</maven-failsafe-plugin.forkCount>
     <maven-failsafe-plugin.reuseForks>false</maven-failsafe-plugin.reuseForks>
     <hsqldb.version>2.3.2</hsqldb.version>
-    <pentaho-xul.version>8.1.0.0-SNAPSHOT</pentaho-xul.version>
+    <commons-xul.version>8.1.0.0-SNAPSHOT</commons-xul.version>
     <mockito-all.version>1.8.4</mockito-all.version>
     <pentaho-database-model.version>8.1.0.0-SNAPSHOT</pentaho-database-model.version>
     <pdi.version>8.1.0.0-SNAPSHOT</pdi.version>
@@ -261,9 +261,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>pentaho</groupId>
-      <artifactId>pentaho-xul-core</artifactId>
-      <version>${pentaho-xul.version}</version>
+      <groupId>org.pentaho</groupId>
+      <artifactId>commons-xul-core</artifactId>
+      <version>${commons-xul.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
