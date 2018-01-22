@@ -182,7 +182,7 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>pentaho</groupId>
+      <groupId>org.pentaho</groupId>
       <artifactId>pentaho-metadata</artifactId>
       <version>${pentaho-metadata.version}</version>
       <scope>provided</scope>
