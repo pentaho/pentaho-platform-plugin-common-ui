@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+* Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -58,6 +58,7 @@
         this.connect(this.pageNumberInput, "onKeyUp", this._pageNumberKeyUp);
         this.connect(this.prevPageControl, "onclick", this._prevPage);
         this.connect(this.nextPageControl, "onclick", this._nextPage);
+        this.connect(this.pageTotalSpan, "mousedown", this._pageTotalMouseDown);
       },
 
       registerLocalizationLookup: function(f) {
@@ -135,6 +136,10 @@
           return;
         }
         this.setPageNumber(this.pageNumberInput.get("value"));
+      },
+
+      _pageTotalMouseDown: function(e) {
+        e.preventDefault();
       },
 
       _updateInternalPageNumber: function(pageNumber) {
