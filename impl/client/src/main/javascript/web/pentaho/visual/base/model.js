@@ -72,7 +72,7 @@ define([
         toSpecInContext: function(keyArgs) {
 
           if(keyArgs && keyArgs.isJson) {
-            keyArgs = keyArgs ? Object.create(keyArgs) : {};
+            keyArgs = Object.create(keyArgs);
 
             var omitProps = keyArgs.omitProps;
             keyArgs.omitProps = omitProps = omitProps ? Object.create(omitProps) : {};

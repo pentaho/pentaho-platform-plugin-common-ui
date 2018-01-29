@@ -50,9 +50,6 @@ define([
 
     var context = this;
     var __type = null;
-    var __Number = null;
-    var __Boolean = null;
-    var __String = null;
 
     /**
      * @name pentaho.type.Type
@@ -92,15 +89,15 @@ define([
         // excluded from extend: id, sourceId, alias and isAbstract
         // are here handled one by one.
 
-        var id = __nonEmptyString(spec.id);
+        var id = text.nonEmptyString(spec.id);
         // Is it a temporary id? If so, ignore it.
         if(SpecificationContext.isIdTemporary(id)) id = null;
 
-        var sourceId = __nonEmptyString(spec.sourceId);
+        var sourceId = text.nonEmptyString(spec.sourceId);
         if(!sourceId) sourceId = id;
         else if(!id) id = sourceId;
 
-        var alias = __nonEmptyString(spec.alias);
+        var alias = text.nonEmptyString(spec.alias);
         if(alias != null && id == null) throw error.argInvalid("alias", "Anonymous types cannot have an alias");
 
         O.setConst(this, "__id", id);
@@ -476,6 +473,9 @@ define([
        * @return {string} An absolute module identifier.
        *
        * @see pentaho.type.Type#sourceId
+       *
+       * @throws {OperationInvalidError} When `id` is a relative identifier and this type is anonymous,
+       * or when `id` refers to an inexistent ascendant location.
        */
       buildSourceRelativeId: function(id) {
         return moduleUtil.absolutizeIdRelativeToSibling(id, this.sourceId);
@@ -603,11 +603,11 @@ define([
       },
 
       set label(value) {
-        value = __nonEmptyString(value);
+        value = text.nonEmptyString(value);
         if(value === null) {
           this.__labelIsSet = false;
           if(this !== __type) {
-            value = __nonEmptyString(this._getLabelDefault());
+            value = text.nonEmptyString(this._getLabelDefault());
             if(value == null) {
               delete this.__label;
             } else {
@@ -694,7 +694,7 @@ define([
             delete this.__description;
           }
         } else {
-          this.__description = __nonEmptyString(value);
+          this.__description = text.nonEmptyString(value);
         }
       },
       // endregion
@@ -734,7 +734,7 @@ define([
             delete this.__category;
           }
         } else {
-          this.__category = __nonEmptyString(value);
+          this.__category = text.nonEmptyString(value);
         }
       },
       // endregion
@@ -770,7 +770,7 @@ define([
             delete this.__helpUrl;
           }
         } else {
-          this.__helpUrl = __nonEmptyString(value);
+          this.__helpUrl = text.nonEmptyString(value);
         }
       },
       // endregion
@@ -969,6 +969,9 @@ define([
 
       * @throws {pentaho.lang.ArgumentInvalidTypeError} When the set value is not
       * a string, a function or {@link Nully}.
+      *
+      * @throws {OperationInvalidError} When `defaultView` is a relative identifier and this type is anonymous,
+      * or when `defaultView` refers to an inexistent ascendant location.
       */
       get defaultView() {
         return this.__defaultView && this.__defaultView.value;
@@ -1735,10 +1738,6 @@ define([
 
     return Type;
   };
-
-  function __nonEmptyString(value) {
-    return value == null ? null : (String(value) || null);
-  }
 
   /*
    * @this {pentaho.type.Property.Type}

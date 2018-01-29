@@ -26,12 +26,27 @@ define(function() {
    * @private
    */
   var text = {
+
+    /**
+     * Obtains a non-empty string representation of a given value.
+     *
+     * If `value` is {@link Nully}, `null` is returned.
+     * Otherwise, `value` is given to the {@link String} function.
+     * If the result is the empty string, `null` is returned.
+     * Otherwise the string value is returned.
+     *
+     * @param {any} value - The value to convert to a non-empty string.
+     * @return {nonEmptyString} A non-empty string or `null`.
+     */
+    nonEmptyString: function(value) {
+      return value == null ? null : (String(value) || null);
+    },
+
     /**
      * Ensures the first letter is upper case.
      *
      * @param {string} s The string to format.
      * @return {string} The formatted string.
-     * @ignore
      */
     firstUpperCase: function(s) {
       if(s) {
@@ -47,7 +62,6 @@ define(function() {
      *
      * @param {string} name The string to convert to a title.
      * @return {string} The title/label appropriate string.
-     * @ignore
      */
     titleFromName: function(name) {
       if(name) {
@@ -65,7 +79,6 @@ define(function() {
      *
      * @param {string} name - The string to convert to snake-case.
      * @return {string} The snake-case string.
-     * @ignore
      */
     toSnakeCase: function(name) {
       if(name) {
