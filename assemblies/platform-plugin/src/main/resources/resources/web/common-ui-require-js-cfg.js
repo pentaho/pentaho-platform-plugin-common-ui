@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,6 +81,7 @@
   requireTypeInfo["pentaho/type/date"] = {alias: "date", base: "simple"};
   requireTypeInfo["pentaho/type/object"] = {alias: "object", base: "simple"};
   requireTypeInfo["pentaho/type/function"] = {alias: "function", base: "simple"};
+  requireTypeInfo["pentaho/type/typeDescriptor"] = {alias: "type", base: "simple"};
   requireTypeInfo["pentaho/type/mixins/enum"] = {alias: "enum", base: "element"};
   requireTypeInfo["pentaho/type/action/base"] = {base: "element"};
 

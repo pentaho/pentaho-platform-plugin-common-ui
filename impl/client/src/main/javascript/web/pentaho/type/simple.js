@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ define([
     var numberType;
     var stringType;
     var booleanType;
-    var objectType;
 
     /**
      * @name pentaho.type.Simple.Type
@@ -325,9 +324,7 @@ define([
 
         // Plain objects cannot be output without cell format or would not be recognized
         // properly by the constructor code.
-        if(!objectType) objectType = context.get("object").type;
-
-        var isPlainObject = type.isSubtypeOf(objectType) && (value.constructor === Object);
+        var isPlainObject = value.constructor === Object;
 
         // Don't need a cell/object spec?
         if(!(isPlainObject || addFormatted || includeType))
