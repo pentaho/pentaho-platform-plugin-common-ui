@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,19 +116,29 @@ define([
        */
       this.type = type;
 
-      var isDiscrete = type !== "number" && type !== "date";
-      if(!isDiscrete && spec.isDiscrete != null)
-        isDiscrete = !!spec.isDiscrete;
+      var isContinuous;
+      if(type === "string" || type === "boolean") {
+        isContinuous = false;
+      } else if(spec.isContinuous == null) {
+        isContinuous = type === "number" || type === "date";
+      } else {
+        isContinuous = !!spec.isContinuous;
+      }
 
       /**
-       * Indicates if the attribute is considered discrete.
+       * Indicates if the attribute is considered **continuous**, or,
+       * on the other hand, **categorical**.
        *
        * When the attribute's type is one of
        * {@link pentaho.data.AtomicTypeName.STRING} or
        * {@link pentaho.data.AtomicTypeName.BOOLEAN}
-       * this property is always `true`.
+       * this property is **ignored** and the attribute is necessarily **categorical**.
        *
-       * A non-discrete attribute is said to be a _continuous_ attribute.
+       * When the attribute's type is one of
+       * {@link pentaho.data.AtomicTypeName.NUMBER} or
+       * {@link pentaho.data.AtomicTypeName.DATE}
+       * this property's _default value_ is `true`.
+       * Otherwise, the property's default value is `false`.
        *
        * @type boolean
        * @readonly
@@ -136,7 +146,7 @@ define([
        * @see pentaho.data.Attribute#members
        * @see pentaho.data.Attribute#isPercent
        */
-      this.isDiscrete = isDiscrete;
+      this.isContinuous = isContinuous;
 
       this._cast = type === "number" ? castToNumber : (type === "date" ? date.parseDateEcma262v7 : identity);
 
@@ -146,11 +156,11 @@ define([
       this.cellBase = new Cell.Adhoc({}, attrKeyArgs);
       this.structurePositionBase = new StructurePosition.Adhoc(attrKeyArgs);
 
-      if(isDiscrete) {
+      if(!isContinuous) {
         /**
          * Gets the members collection of the attribute.
          *
-         * This property is only defined when the attribute is discrete,
+         * This property is only defined when the attribute is categorical,
          * in which case it is never `null`.
          *
          * The position of members in the members collection **is relevant**.
@@ -159,7 +169,7 @@ define([
          *
          * @type pentaho.data.MemberCollection
          * @readonly
-         * @see pentaho.data.Attribute#isDiscrete
+         * @see pentaho.data.Attribute#isContinuous
          */
         this.members = MemberCollection.to(spec.members || [], attrKeyArgs);
       } else if(type === "number") {
@@ -235,7 +245,7 @@ define([
      * @readOnly
      */
     get level() {
-      return this.isDiscrete ? "ordinal" : "quantitative";
+      return !this.isContinuous ? "ordinal" : "quantitative";
     },
 
     /**
@@ -317,10 +327,10 @@ define([
         format: this.format
       };
 
-      if(this.isDiscrete)
-        attrSpec.members = this.members.toSpec();
-      else
+      if(this.isContinuous)
         attrSpec.isPercent = this.isPercent;
+      else
+        attrSpec.members = this.members.toSpec();
 
       Annotatable.toSpec(this, attrSpec);
 

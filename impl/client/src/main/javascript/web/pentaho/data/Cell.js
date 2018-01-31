@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -168,12 +168,12 @@ define([
         this.v = null; // undefined to null normalization
         k = "";
       } else {
-        // auto-create member
-        if(a.isDiscrete) {
+        if(a.isContinuous) {
+          k = v.toString();
+        } else {
+          // auto-create member
           var m = a.members.getOrAdd(typeof v === "object" ? {v: v} : v);
           k = m.key;
-        } else {
-          k = v.toString();
         }
 
         this.v = v;
@@ -214,12 +214,12 @@ define([
       var v = this.v;
       if(v == null) return null;
 
-      if(this.attribute.isDiscrete)
+      if(!this.attribute.isContinuous)
         return this.attribute.members.get(v);
     },
 
     set referent(member) {
-      if(!this.attribute.isDiscrete) throw new Error("Invalid operation");
+      if(this.attribute.isContinuous) throw new Error("Invalid operation");
 
       if(member == null) {
         this.v = null;
