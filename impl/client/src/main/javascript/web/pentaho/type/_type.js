@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -383,6 +383,22 @@ define([
        * @readOnly
        */
       get isSimple() { return false; },
+      // endregion
+
+      // region isContinuous property
+      /**
+       * Gets a value that indicates if this is a continuous type.
+       *
+       * A non-continuous type is said to be _categorical_.
+       *
+       * The default implementation returns false.
+       *
+       * The types {@link pentaho.type.Number} and {@link pentaho.type.Date} are known to be continuous.
+       *
+       * @type {boolean}
+       * @readOnly
+       */
+      get isContinuous() { return false; },
       // endregion
       // endregion
 
