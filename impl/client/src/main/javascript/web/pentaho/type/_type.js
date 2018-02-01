@@ -117,7 +117,7 @@ define([
 
         // ---
 
-        this._init(spec, keyArgs);
+        spec = this._init(spec, keyArgs) || spec;
 
         var Ctor = this.constructor;
         if(Ctor.prototype === this) {
@@ -125,6 +125,7 @@ define([
           // Also, using mix records the applied instSpec, while #extend does not.
           Ctor.mix(spec, null, keyArgs);
         } else {
+          // TODO: Lightweight types don't exist anymore, right?
           // Lightweight type.
           this.extend(spec, keyArgs);
         }
@@ -142,6 +143,10 @@ define([
        * @param {!pentaho.type.Instance} keyArgs.instance - The _prototype_ of the `Instance` class associated with
        * this type.
        * @param {boolean} [keyArgs.isRoot=false] If `true`, creates a _root_ type.
+       *
+       * @return {pentaho.type.spec.ITypeProto} A specification to use instead of the given `spec` argument to extend
+       * the type, or `undefined`, to use the given specification.
+       *
        * @protected
        */
       _init: function(spec, keyArgs) {

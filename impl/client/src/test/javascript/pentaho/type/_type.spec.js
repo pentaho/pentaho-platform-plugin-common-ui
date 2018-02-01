@@ -1172,8 +1172,9 @@ define([
               $type: {
                 id: "tests/mixins/C",
                 _init: function(spec, ka) {
-                  this.base(spec, ka);
+                  spec = this.base(spec, ka) || spec;
                   this.__hasBeenInInit = true;
+                  return spec;
                 }
               }
             });

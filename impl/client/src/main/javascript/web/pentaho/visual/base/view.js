@@ -1044,13 +1044,15 @@ define([
           /** @inheritDoc */
           _init: function(spec, keyArgs) {
 
-            this.base.apply(this, arguments);
+            spec = this.base(spec, keyArgs) || spec;
 
             // ----
             // Block inheritance, with default values
 
             this.__extension = null;
             this.__extensionEf = undefined;
+
+            return spec;
           },
 
           // region Extension
