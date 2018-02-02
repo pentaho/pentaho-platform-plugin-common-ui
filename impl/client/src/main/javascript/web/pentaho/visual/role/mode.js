@@ -64,7 +64,7 @@ define([
           return this.get("dataType").$key + "|" + this.isContinuous;
         },
 
-        $type: /** @lends pentaho.visual.role.Mapping.Type# */{
+        $type: /** @lends pentaho.visual.role.Mode.Type# */{
           id: module.id,
           props: [
             /**
