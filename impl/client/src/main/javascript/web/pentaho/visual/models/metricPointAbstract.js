@@ -26,9 +26,8 @@ define([
     "./mixins/scaleColorDiscrete",
     "./mixins/multiCharted",
     "./mixins/trended",
-    "pentaho/visual/role/level",
     function(BaseModel, LabelsOption, ScaleColorContinuousModel, ScaleColorDiscreteModel,
-             MultiChartedModel, TrendedModel, MeasurementLevel) {
+             MultiChartedModel, TrendedModel) {
 
       return BaseModel.extend({
         $type: {

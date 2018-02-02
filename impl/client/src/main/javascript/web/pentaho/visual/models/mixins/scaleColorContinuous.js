@@ -23,11 +23,10 @@ define([
 
   return [
     "pentaho/visual/base/model",
-    "pentaho/visual/role/level",
     "../types/colorSet",
     "../types/pattern",
     "../types/multiChartOverflow",
-    function(BaseModel, MeasurementLevel, ColorSet, Pattern) {
+    function(BaseModel, ColorSet, Pattern) {
 
       return BaseModel.extend({
         $type: {

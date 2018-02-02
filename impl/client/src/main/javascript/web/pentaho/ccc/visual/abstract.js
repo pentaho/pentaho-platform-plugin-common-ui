@@ -67,10 +67,9 @@ define([
     "pentaho/visual/models/abstract",
     "pentaho/visual/action/select",
     "pentaho/visual/action/execute",
-    "pentaho/visual/role/level",
     // Pre-load all registered filter types
     {$types: {base: "pentaho/data/filter/abstract"}},
-    function(BaseView, Model, SelectAction, ExecuteAction, MeasurementLevel) {
+    function(BaseView, Model, SelectAction, ExecuteAction) {
 
       return BaseView.extend(/** @lends pentaho.ccc.visual.Abstract# */{
 
