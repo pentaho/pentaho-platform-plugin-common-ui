@@ -237,18 +237,6 @@ define([
     // endregion
 
     /**
-     * Gets the measurement level of this attribute.
-     *
-     * One of the values: `"nominal"`, `"ordinal"`, `"quantitative"`.
-     *
-     * @type {string}
-     * @readOnly
-     */
-    get level() {
-      return !this.isContinuous ? "ordinal" : "quantitative";
-    },
-
-    /**
      * Converts a value to the type of value supported by the attribute.
      *
      * If the given value is not supported, `null` is returned.
