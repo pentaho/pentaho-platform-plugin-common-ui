@@ -111,7 +111,7 @@ define([
       });
     });
 
-    describe("#dataAttribute", function() {
+    describe("#__dataAttribute", function() {
 
       var derived;
       var mapping;
