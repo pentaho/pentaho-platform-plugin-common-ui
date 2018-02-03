@@ -22,6 +22,7 @@ define([
   /* global describe:true, it:true, expect:true, beforeEach:true, Object:true*/
 
   describe("pentaho.util.object -", function() {
+
     it("is an object containing the advertised functions", function() {
       expect(typeof O).toBe("object");
       [
@@ -733,5 +734,188 @@ define([
         expect(O.lca(oa_1_1, oa_2_1_1)).toBe(oa);
       });
     }); // lca
+
+    describe("getUniqueId(inst, assignIfMissing)", function() {
+
+      describe("when assignIfMissing: true", function() {
+
+        it("should return a string", function() {
+          var o1 = {};
+          var id = O.getUniqueId(o1, true);
+
+          expect(typeof id).toBe("string");
+        });
+
+        it("should return the same value for the same object each time", function() {
+
+          var o1 = {};
+          var id1 = O.getUniqueId(o1, true);
+          var id2 = O.getUniqueId(o1, true);
+
+          expect(id1).toBe(id2);
+        });
+
+        it("should not create a non-numerable property", function() {
+
+          var o1 = {};
+          O.getUniqueId(o1, true);
+
+          var count = 0;
+          // eslint-disable-next-line guard-for-in
+          for(var propName in o1) {
+            count++;
+          }
+
+          expect(count).toBe(0);
+        });
+
+        it("should return different values for different objects", function() {
+
+          var o1 = {};
+          var o2 = {};
+          var id1 = O.getUniqueId(o1, true);
+          var id2 = O.getUniqueId(o2, true);
+
+          expect(id1).not.toBe(id2);
+        });
+      });
+
+      describe("when assignIfMissing: falsy", function() {
+
+        it("should return `null` if the object has no assigned id", function() {
+          var o1 = {};
+          var id = O.getUniqueId(o1, false);
+
+          expect(id).toBe(null);
+
+          // ---
+
+          o1 = {};
+          id = O.getUniqueId(o1);
+
+          expect(id).toBe(null);
+        });
+
+        it("should return the id if the object has an assigned id", function() {
+          var o1 = {};
+          var id1 = O.getUniqueId(o1, true);
+
+          var id2 = O.getUniqueId(o1, false);
+
+          expect(id2).toBe(id1);
+        });
+      });
+    }); // getUniqueId
+
+    describe("getSameTypeKey(value)", function() {
+
+      function testValueType(typeName, v1, v2) {
+
+        describe("when given a " + typeName, function() {
+
+          it("should return a string", function() {
+
+            var key = O.getSameTypeKey(v1, true);
+
+            expect(typeof key).toBe("string");
+          });
+
+          it("should return the same value, for the same value, each time", function() {
+
+            var key1 = O.getSameTypeKey(v1, true);
+            var key2 = O.getSameTypeKey(v1, true);
+
+            expect(key1).toBe(key2);
+          });
+
+          if(typeName === "object") {
+            it("should not create a non-enumerable property", function() {
+
+              O.getSameTypeKey(v1, true);
+
+              var count = 0;
+              // eslint-disable-next-line guard-for-in
+              for(var propName in v1) {
+                count++;
+              }
+
+              expect(count).toBe(0);
+            });
+          }
+
+          it("should return different values, for different values", function() {
+
+            var key1 = O.getSameTypeKey(v1, true);
+            var key2 = O.getSameTypeKey(v2, true);
+
+            expect(key1).not.toBe(key2);
+          });
+        });
+      }
+
+      testValueType("number", 1, 2);
+      testValueType("boolean", true, false);
+      testValueType("string", "a", "b");
+      testValueType("object", {}, {});
+    });
+
+    describe("getSameTypeKeyFun(typeName)", function() {
+
+      function testValueType(typeName, v1, v2) {
+
+        describe("when given a " + typeName, function() {
+
+          var keyFun;
+
+          beforeEach(function() {
+            keyFun = O.getSameTypeKeyFun(typeName);
+          });
+
+          it("should return a string", function() {
+
+            var key = keyFun(v1, true);
+
+            expect(typeof key).toBe("string");
+          });
+
+          it("should return the same value, for the same value, each time", function() {
+
+            var key1 = keyFun(v1);
+            var key2 = keyFun(v1);
+
+            expect(key1).toBe(key2);
+          });
+
+          if(typeName === "object" || typeName === "date") {
+            it("should not create a non-enumerable property", function() {
+
+              keyFun(v1);
+
+              var count = 0;
+              // eslint-disable-next-line guard-for-in
+              for(var propName in v1) {
+                count++;
+              }
+
+              expect(count).toBe(0);
+            });
+          }
+
+          it("should return different values, for different values", function() {
+
+            var key1 = keyFun(v1);
+            var key2 = keyFun(v2);
+
+            expect(key1).not.toBe(key2);
+          });
+        });
+      }
+
+      testValueType("number", 1, 2);
+      testValueType("boolean", true, false);
+      testValueType("string", "a", "b");
+      testValueType("object", {}, {});
+      testValueType("date", new Date(Date.UTC(2018, 2, 1, 2, 3, 4)), new Date(Date.UTC(2018, 2, 1, 2, 3, 5)));
+    });
   }); // pentaho.util.object
 });
