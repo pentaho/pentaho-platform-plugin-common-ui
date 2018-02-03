@@ -26,14 +26,19 @@ define([
 
   return [
     "property",
-    "pentaho/visual/role/mode",
-    "pentaho/visual/role/mapping",
-    function(__Property, Mode, Mapping) {
+    "./mode",
+    "./strategies/base",
+    "./mapping",
+    "./strategies/identity",
+    "./strategies/combine",
+    "./strategies/tuple",
+    function(__Property, Mode, BaseStrategy, Mapping, IdentityStrategy, CombineStrategy, TupleStrategy) {
 
       var context = this;
 
       var __modeType = Mode.type;
       var ListOfModeType = this.get([Mode]);
+      var ListOfStrategyType = this.get([BaseStrategy]);
 
       /**
        * @name pentaho.visual.role.Property.Type
@@ -90,13 +95,24 @@ define([
             if(this.isRoot) {
 
               // Assume default values.
-              // Anticipate setting `modes` and `isVisualKey`.
+              // Anticipate setting `modes`, `strategies` and `isVisualKey`.
 
               var modes = spec.modes;
               if(modes != null) {
-                this.modes = modes;
+                this.__setModes(modes);
               } else {
                 this.__setModes([{dataType: "string"}], /* isDefault: */true);
+              }
+
+              var strategies = spec.strategies;
+              if(strategies != null) {
+                this.__setStrategies(strategies);
+              } else {
+                this.__setStrategies([
+                  new IdentityStrategy(),
+                  new CombineStrategy(),
+                  new TupleStrategy()
+                ], /* isDefault: */true);
               }
 
               var isVisualKey = spec.isVisualKey;
@@ -109,6 +125,24 @@ define([
             }
 
             return spec;
+          },
+
+          /**
+           * Asserts that the type has no subtypes.
+           *
+           * @param {string} attributeName - The name of the attribute being set.
+           *
+           * @throws {pentaho.lang.OperationInvalidError} When setting and the visual role property
+           * already has [subtypes]{@link pentaho.type.Type#hasDescendants}.
+           *
+           * @private
+           */
+          __assertNoDescendants: function(attributeName) {
+
+            if(this.hasDescendants) {
+              throw error.operInvalid(
+                  bundle.get("errors.property.attributeLockedWhenTypeHasDescendants", [attributeName]));
+            }
           },
 
           // region modes
@@ -160,20 +194,20 @@ define([
           },
 
           set modes(values) {
+
+            this.__assertNoDescendants("modes");
+
+            if(values == null) return;
+
             this.__setModes(values, false);
           },
 
           __setModes: function(values, isDefault) {
 
-            if(values == null) return;
-
             // Validation Rules
             // 1. Cannot change if already have descendants
             // 2. Cannot remove all modes.
             // 3. Cannot add new modes. Can only restrict, by removing some of the inherited/current modes.
-
-            if(this.hasDescendants)
-              throw error.operInvalid(bundle.structured.errors.property.modesLockedWhenTypeHasDescendants);
 
             if(!Array.isArray(values)) values = [values];
 
@@ -187,8 +221,9 @@ define([
               modesNew = __modeType.__intersect(this.__modes.toArray(), modes);
             }
 
-            if(!modesNew.length)
+            if(!modesNew.length) {
               throw error.argInvalid("modes", bundle.structured.errors.property.noModes);
+            }
 
             this.__modes = new ListOfModeType(modesNew, {isReadOnly: true});
             this.__isModesDefault = !!isDefault;
@@ -232,6 +267,56 @@ define([
               }
             });
             return any;
+          },
+          // endregion
+
+          // region strategies
+          __strategies: null,
+          __isStrategiesDefault: true,
+
+          /**
+           * Gets or sets the array of mapping strategies used by the visual role.
+           *
+           * Visual roles need to have at least one mapping strategy.
+           *
+           * When set to a {@link Nully} value, the set operation is ignored.
+           *
+           * If not specified at the root [visual.role.Property]{@link pentaho.visual.role.Property},
+           * the `strategies` attribute is initialized with
+           * an [Identity]{@link pentaho.visual.role.strategies.Identity} strategy,
+           * a [Combine]{@link pentaho.visual.role.strategies.Combine} strategy and
+           * a [Tuple]{@link pentaho.visual.role.strategies.Tuple} strategy,
+           * in that order.
+           *
+           * The returned list or its elements should not be modified.
+           *
+           * @type {!pentaho.type.List.<pentaho.visual.role.strategies.Base>}
+           *
+           * @throws {pentaho.lang.OperationInvalidError} When setting and the type already has
+           * [subtypes]{@link pentaho.type.Type#hasDescendants}.
+           */
+          get strategies() {
+            return this.__strategies;
+          },
+
+          set strategies(values) {
+
+            this.__assertNoDescendants("strategies");
+
+            if(values == null) return;
+
+            this.__setStrategies(values, /* isDefault: */false);
+          },
+
+          __setStrategies: function(values, isDefault) {
+            var strategies = new ListOfStrategyType(values, {isReadOnly: true});
+            if(strategies.count === 0) {
+              throw error.argInvalid("strategies", bundle.structured.errors.property.noStrategies);
+            }
+
+            this.__strategies = strategies;
+
+            this.__isStrategiesDefault = !!isDefault;
           },
           // endregion
 
@@ -280,8 +365,7 @@ define([
 
           set isVisualKey(value) {
 
-            if(this.hasDescendants)
-              throw error.operInvalid(bundle.structured.errors.property.isVisualKeyLockedWhenTypeHasDescendants);
+            this.__assertNoDescendants("isVisualKey");
 
             if(value == null) return;
 
@@ -401,11 +485,9 @@ define([
             if("isRequired" in value) attrs.isRequired = value.isRequired;
             if("countMin" in value) attrs.countMin = value.countMin;
             if("countMax" in value) attrs.countMax = value.countMax;
-          }
+          },
           // endregion
-        }
-      }).implement({
-        $type: /** @lends pentaho.visual.role.Property.Type# */{
+
           // region Validation
 
           // TODO: reimplement validateOn
@@ -649,6 +731,12 @@ define([
             if(modes && !this.__isModesDefault) {
               any = true;
               spec.modes = modes.toSpecInContext(keyArgs);
+            }
+
+            var strategies = O.getOwn(this, "__strategies");
+            if(strategies && !this.__isStrategiesDefault) {
+              any = true;
+              spec.strategies = strategies.toSpecInContext(keyArgs);
             }
 
             // Only serialize if not the default value.
