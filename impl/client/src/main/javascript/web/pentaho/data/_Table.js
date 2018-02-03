@@ -167,6 +167,16 @@ define([
     },
 
     /** @inheritdoc */
+    isColumnContinuous: function(colIndex) {
+      return this.implem.isColumnContinuous(colIndex);
+    },
+
+    /** @inheritdoc */
+    isColumnKey: function(colIndex) {
+      return this.implem.isColumnKey(colIndex);
+    },
+
+    /** @inheritdoc */
     getColumnLabel: function(colIndex) {
       return this.implem.getColumnLabel(colIndex);
     },
@@ -217,7 +227,7 @@ define([
 
       // NOTE: `eval` is used instead of `JSON.parse` to be tolerant of Analyzer's comment headers...
       // This is an undocumented feature. Don't depend on it, cause it may change anytime.
-      /* eshint no-eval: 0 */
+      /* eslint no-eval: 0 */
       if(typeof table === "string") table = eval("(" + table + ")");
 
       return table.metadata ? Table.convertJsonCdaToTableSpec(table) : table;
@@ -334,7 +344,7 @@ define([
      *   require("pentaho/data/Table", function(Table) {
      *     var cdaTableSpec = {
      *        metadata: [
-     *          {colName: "country", colType: "STRING",  colLabel: "Country"},
+     *          {colName: "country", colType: "STRING",  colLabel: "Country", colIsKey: false, colIsContinuous: false},
      *          {colName: "sales",   colType: "NUMERIC", colLabel: "Sales"  }
      *        ],
      *        resultset: [
@@ -379,11 +389,19 @@ define([
         if(COLTYPE_CDA_DT.hasOwnProperty(colType))
           colType = COLTYPE_CDA_DT[colType];
 
-        attrSpecs[j] = {
+        var attrSpec = attrSpecs[j] = {
           name:  cdaCol.colName,
           type:  colType,
           label: cdaCol.colLabel || cdaCol.colName
         };
+
+        if(cdaCol.colIsKey != null) {
+          attrSpec.isKey = cdaCol.colIsKey;
+        }
+
+        if(cdaCol.colIsContinuous != null) {
+          attrSpec.isContinuous = cdaCol.colIsContinuous;
+        }
       }
 
       // Rows

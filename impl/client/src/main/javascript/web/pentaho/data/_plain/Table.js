@@ -66,6 +66,14 @@ define([
       return this.getColumnAttribute(colIndex).label;
     },
 
+    isColumnContinuous: function(colIndex) {
+      return this.getColumnAttribute(colIndex).isContinuous;
+    },
+
+    isColumnKey: function(colIndex) {
+      return this.getColumnAttribute(colIndex).isKey;
+    },
+
     // cells
     getValue: function(rowIndex, colIndex) {
       return this.getCell(rowIndex, colIndex).value;

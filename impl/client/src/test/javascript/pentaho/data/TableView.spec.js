@@ -25,9 +25,9 @@ define([
   function getDatasetDT1() {
     return {
       model: [
-        {name: "country", type: "string",  label: "Country", p: {foo: fooValue}},
-        {name: "sales",   type: "number",  label: "Sales",   p: {bar: barValue}},
-        {name: "euro",    type: "boolean", label: "Euro"   }
+        {name: "country", type: "string",  label: "Country", p: {foo: fooValue}, isKey: true},
+        {name: "sales",   type: "number",  label: "Sales",   p: {bar: barValue}, isContinuous: true},
+        {name: "euro",    type: "boolean", label: "Euro"}
       ],
       rows: [
         {c: [ {v: "Portugal"}, {v: 12000, f: "1.2"},  true] },
@@ -331,6 +331,22 @@ define([
           expect(dataView2.getDistinctFormattedValues(0)).toEqual(["true", "false"]);
           expect(dataView2.getDistinctFormattedValues(1)).toEqual(["Italy", "Ireland", "France", "Portugal"]);
           expect(dataView2.getDistinctFormattedValues(2)).toEqual(["1.0", "0.6", "2.4", "1.2"]);
+        });
+      });
+
+      describe("#isColumnContinuous(j) -", function() {
+        it("should return the column isContinuous of the given column index", function() {
+          expect(dataView.isColumnContinuous(0)).toBe(false);
+          expect(dataView.isColumnContinuous(1)).toBe(false);
+          expect(dataView.isColumnContinuous(2)).toBe(true);
+        });
+      });
+
+      describe("#isColumnKey(j) -", function() {
+        it("should return the column isKey of the given column index", function() {
+          expect(dataView.isColumnKey(0)).toBe(false);
+          expect(dataView.isColumnKey(1)).toBe(true);
+          expect(dataView.isColumnKey(2)).toBe(false);
         });
       });
 

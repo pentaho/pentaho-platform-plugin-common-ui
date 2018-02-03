@@ -142,11 +142,24 @@ define([
        *
        * @type boolean
        * @readonly
+       * @see pentaho.data.IAttribute#isContinuous
+       * @see pentaho.data.ITable#isColumnContinuous
        * @see pentaho.data.Attribute#type
        * @see pentaho.data.Attribute#members
        * @see pentaho.data.Attribute#isPercent
        */
       this.isContinuous = isContinuous;
+
+      /**
+       * Indicates if the attribute identifies rows, together with other key attributes.
+       *
+       * @type boolean
+       * @readonly
+       * @default false
+       * @see pentaho.data.IAttribute#isKey
+       * @see pentaho.data.ITable#isColumnKey
+       */
+      this.isKey = !!spec.isKey;
 
       this._cast = type === "number" ? castToNumber : (type === "date" ? date.parseDateEcma262v7 : identity);
 
@@ -312,7 +325,9 @@ define([
         name:  this.name,
         label: this.label,
         type:  this.type,
-        format: this.format
+        format: this.format,
+        isContinuous: this.isContinuous,
+        isKey: this.isKey
       };
 
       if(this.isContinuous)

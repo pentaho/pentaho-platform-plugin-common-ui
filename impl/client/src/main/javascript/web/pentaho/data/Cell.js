@@ -18,8 +18,9 @@ define([
   "./Member",
   "../lang/Base",
   "../lang/_Annotatable",
-  "../util/error"
-], function(OfAttribute, Member, Base, Annotatable, error) {
+  "../util/error",
+  "../util/object"
+], function(OfAttribute, Member, Base, Annotatable, error, O) {
 
   // A cell is like a place or location or position.
   // A cell has an address in a given subject.
@@ -169,7 +170,7 @@ define([
         k = "";
       } else {
         if(a.isContinuous) {
-          k = v.toString();
+          k = O.getSameTypeKey(v);
         } else {
           // auto-create member
           var m = a.members.getOrAdd(typeof v === "object" ? {v: v} : v);

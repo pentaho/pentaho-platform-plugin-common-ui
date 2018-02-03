@@ -148,9 +148,7 @@ define([
       return -1;
     },
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     getColumnProperty: function(colIndex, propName) {
 
       var attr = this.model.attributes[colIndex];
@@ -350,7 +348,9 @@ define([
           colIndex: j,
           colName:  this.getColumnId(j),
           colLabel: this.getColumnLabel(j),
-          colType:  writeCdaColType(this.getColumnType(j))
+          colType:  writeCdaColType(this.getColumnType(j)),
+          colIsKey: this.isColumnKey(j),
+          colIsContinuous: this.isColumnContinuous(j)
         };
       }
 
