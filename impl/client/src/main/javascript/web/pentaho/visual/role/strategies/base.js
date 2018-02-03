@@ -46,7 +46,7 @@ define([
        *
        * @description Creates a visual role mapping strategy instance.
        * @constructor
-       * @param {pentaho.type.spec.UComplex} [spec] A mapping strategy specification.
+       * @param {pentaho.visual.role.strategies.spec.IBase} [spec] A mapping strategy specification.
        */
       var MappingStrategy = Complex.extend(/** @lends pentaho.visual.role.strategies.Base# */{
         $type: /** @lends pentaho.visual.role.strategies.Base.Type# */{
@@ -54,14 +54,14 @@ define([
         },
 
         /**
-         * Gets a suitable mapper for the given visual role property, data set, column list and visual role mode.
+         * Gets a suitable mapper for the given visual role property, data set view and visual role mode.
          *
          * If the strategy is not suitable for mapping the given arguments, `null` should be returned.
          *
          * When the returned mapper is not `null`, it must be such that:
          *
-         * 1. Its [inputData]{@link pentaho.visual.role.strategies.IMapper#inputData} property
-         *    is a table view of the given `columnIndexes` of `data`;
+         * 1. Its [inputData]{@link pentaho.visual.role.strategies.IMapper#inputData} property is
+         *    the given `inputData` argument;
          * 2. Its [mode]{@link pentaho.visual.role.strategies.IMapper#mode} is the given `mode` argument.
          * 3. Its [dataType]{@link pentaho.visual.role.strategies.IMapper#dataType} is a subtype of the
          *    [dataType]{@link pentaho.visual.role.Mode#dataType} of the `mode` argument.
@@ -70,8 +70,7 @@ define([
          * @memberOf pentaho.visual.role.strategies.Base#
          * @method
          * @param {!pentaho.type.visual.role.Property.Type} propType - The visual role property type.
-         * @param {!pentaho.data.ITable} data - The data set to be mapped.
-         * @param {!number[]} columnIndexes - The list of columns.
+         * @param {!pentaho.data.ITable} inputData - The data set view to be mapped.
          * @param {!pentaho.visual.role.Mode} mode - The visual role mode of `propType` which will be used.
          *
          * @return {pentaho.visual.role.strategies.IMapper} A suitable mapper, or,

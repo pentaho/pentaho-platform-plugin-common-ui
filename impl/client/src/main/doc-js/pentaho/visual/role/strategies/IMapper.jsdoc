@@ -43,6 +43,14 @@
  */
 
 /**
+ * Gets a label that describes the visual role as it is mapped.
+ *
+ * @name pentaho.visual.role.strategies.IMapper#label
+ * @type {string}
+ * @readOnly
+ */
+
+/**
  * Gets the data type of the mapped visual role value.
  *
  * @name pentaho.visual.role.strategies.IMapper#dataType
@@ -75,7 +83,7 @@
  * [number of rows]{@link pentaho.data.ITable#getNumberOfRows} of the
  * [input data set]{@link pentaho.visual.role.strategies.IMapper#inputData}.
  *
- * @return {any} The mapped value.
+ * @return {string|string[]} The mapped formatted value.
  */
 
 /**
