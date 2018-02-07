@@ -24,7 +24,7 @@ define([
 
   "use strict";
 
-  /* globals describe, it, beforeEach, afterEach, spyOn */
+  /* globals describe, it, beforeAll, beforeEach, afterEach, spyOn */
 
   describe("pentaho.visual.role.Property", function() {
 
@@ -32,9 +32,14 @@ define([
 
       var VisualModel;
       var RoleProperty;
+      var BaseStrategy;
+      var NullStrategy;
+      var IdentityStrategy;
+      var CombineStrategy;
+      var TupleStrategy;
       var context;
 
-      beforeEach(function(done) {
+      beforeAll(function(done) {
 
         Context.createAsync()
             .then(function(_context) {
@@ -42,10 +47,24 @@ define([
 
               return context.getDependencyApplyAsync([
                 "pentaho/visual/base/model",
-                "pentaho/visual/role/property"
-              ], function(_Model, _RoleProperty) {
+                "pentaho/visual/role/property",
+                "pentaho/visual/role/strategies/base",
+                "pentaho/visual/role/strategies/identity",
+                "pentaho/visual/role/strategies/combine",
+                "pentaho/visual/role/strategies/tuple"
+              ], function(_Model, _RoleProperty, _BaseStrategy, _IdentityStrategy, _CombineStrategy, _TupleStrategy) {
                 VisualModel = _Model;
                 RoleProperty = _RoleProperty;
+                BaseStrategy = _BaseStrategy;
+                IdentityStrategy = _IdentityStrategy;
+                CombineStrategy = _CombineStrategy;
+                TupleStrategy = _TupleStrategy;
+
+                NullStrategy = BaseStrategy.extend({
+                  getMapper: function() {
+                    return null;
+                  }
+                });
               });
             })
             .then(done, done.fail);
@@ -75,7 +94,8 @@ define([
             props: {
               propRole: {
                 base: "pentaho/visual/role/property",
-                levels: ["nominal", "ordinal"],
+                modes: [{valueType: "string"}],
+                strategies: [new IdentityStrategy(), new CombineStrategy(), new TupleStrategy()],
                 dataType: "string"
               }
             }
@@ -83,33 +103,10 @@ define([
         });
 
         var data = new Table(getDataSpec1());
+
         var model = new DerivedVisualModel({
           data: data,
           propRole: {attributes: ["country", "product"]}
-        });
-
-        assertIsValid(model);
-
-        return model;
-      }
-
-      function createFullValidQuantitativeMapping() {
-
-        var DerivedVisualModel = VisualModel.extend({
-          $type: {
-            props: {
-              propRole: {
-                base: "pentaho/visual/role/property",
-                levels: ["quantitative"]
-              }
-            }
-          }
-        });
-
-        var data = new Table(getDataSpec1());
-        var model = new DerivedVisualModel({
-          data: data,
-          propRole: {attributes: ["sales"]}
         });
 
         assertIsValid(model);
@@ -839,8 +836,411 @@ define([
       });
       // endregion
 
-      // TODO: reimplement validateOn
-      xdescribe("validateOn(model)", function() {
+      describe("#getMapperOn(model)", function() {
+
+        it("should return null if the role is not mapped", function() {
+
+          var CustomModel = VisualModel.extend({
+            $type: {
+              props: {
+                roleA: {
+                  base: "pentaho/visual/role/property",
+                  modes: [{dataType: "string"}],
+                  strategies: [
+                    new IdentityStrategy()
+                  ]
+                }
+              }
+            }
+          });
+
+          var propType = CustomModel.type.get("roleA");
+          var model = new CustomModel({
+            data: new Table(getDataSpec1())
+          });
+
+          var mapper = propType.getMapperOn(model);
+
+          expect(mapper).toBe(null);
+        });
+
+        it("should return null if the model has no data", function() {
+
+          var CustomModel = VisualModel.extend({
+            $type: {
+              props: {
+                roleA: {
+                  base: "pentaho/visual/role/property",
+                  modes: [{dataType: "string"}],
+                  strategies: [
+                    new IdentityStrategy()
+                  ]
+                }
+              }
+            }
+          });
+
+          var propType = CustomModel.type.get("roleA");
+          var model = new CustomModel({
+            roleA: {attributes: ["country"]}
+          });
+
+          var mapper = propType.getMapperOn(model);
+
+          expect(mapper).toBe(null);
+        });
+
+        it("should return null if one of the mapped attributes is not defined", function() {
+
+          var CustomModel = VisualModel.extend({
+            $type: {
+              props: {
+                roleA: {
+                  base: "pentaho/visual/role/property",
+                  modes: [{dataType: "string"}],
+                  strategies: [
+                    new IdentityStrategy()
+                  ]
+                }
+              }
+            }
+          });
+
+          var propType = CustomModel.type.get("roleA");
+          var model = new CustomModel({
+            roleA: {attributes: ["foo"]}
+          });
+
+          var mapper = propType.getMapperOn(model);
+
+          expect(mapper).toBe(null);
+        });
+
+        describe("mapping has a specified modeFixed", function() {
+
+          it("should return null if there is no applicable strategy", function() {
+
+            var CustomModel = VisualModel.extend({
+              $type: {
+                props: {
+                  roleA: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "string"}
+                    ],
+                    strategies: [
+                      new NullStrategy()
+                    ]
+                  }
+                }
+              }
+            });
+
+            var propType = CustomModel.type.get("roleA");
+            var model = new CustomModel({
+              data: new Table(getDataSpec1()),
+              roleA: {
+                modeFixed: {dataType: "string"},
+                attributes: ["country"]
+              }
+            });
+
+            var mapper = propType.getMapperOn(model);
+
+            expect(mapper).toBe(null);
+          });
+
+          it("should return a mapper with the specified mode", function() {
+
+            var CustomModel = VisualModel.extend({
+              $type: {
+                props: {
+                  roleA: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "string"},
+                      {dataType: "number"}
+                    ],
+                    strategies: [
+                      new IdentityStrategy()
+                    ]
+                  }
+                }
+              }
+            });
+
+            var propType = CustomModel.type.get("roleA");
+            var model = new CustomModel({
+              data: new Table(getDataSpec1()),
+              roleA: {
+                modeFixed: {dataType: "string"},
+                attributes: ["country"]
+              }
+            });
+
+            var mapper = propType.getMapperOn(model);
+
+            expect(mapper).not.toBe(null);
+            expect(mapper.mode).toBe(model.roleA.modeFixed);
+          });
+
+          it("should return a mapper from the first applicable strategy", function() {
+
+            var nullStrategy = new NullStrategy();
+            var identityStrategy1 = new IdentityStrategy();
+            var identityStrategy2 = new IdentityStrategy();
+
+            spyOn(nullStrategy, "getMapper").and.callThrough();
+            spyOn(identityStrategy1, "getMapper").and.callThrough();
+            spyOn(identityStrategy2, "getMapper").and.callThrough();
+
+            var CustomModel = VisualModel.extend({
+              $type: {
+                props: {
+                  roleA: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "string"}
+                    ],
+                    strategies: [
+                      nullStrategy,
+                      identityStrategy1,
+                      identityStrategy2
+                    ]
+                  }
+                }
+              }
+            });
+
+            var propType = CustomModel.type.get("roleA");
+            var model = new CustomModel({
+              data: new Table(getDataSpec1()),
+              roleA: {
+                modeFixed: {dataType: "string"},
+                attributes: ["country"]
+              }
+            });
+
+            var mapper = propType.getMapperOn(model);
+
+            expect(mapper).not.toBe(null);
+            expect(nullStrategy.getMapper).toHaveBeenCalledTimes(1);
+            expect(identityStrategy1.getMapper).toHaveBeenCalledTimes(1);
+            expect(identityStrategy2.getMapper).not.toHaveBeenCalled();
+          });
+        });
+
+        describe("mapping has a specified isContinuousFixed", function() {
+
+          it("should return null if there is no compatible mode (isContinuousFixed=true)", function() {
+
+            var CustomModel = VisualModel.extend({
+              $type: {
+                props: {
+                  roleA: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "string", isContinuous: false},
+                      {dataType: "number", isContinuous: false}
+                    ],
+                    strategies: [
+                      new IdentityStrategy()
+                    ]
+                  }
+                }
+              }
+            });
+
+            var propType = CustomModel.type.get("roleA");
+            var model = new CustomModel({
+              data: new Table(getDataSpec1()),
+              roleA: {
+                isContinuousFixed: true,
+                attributes: ["country"]
+              }
+            });
+
+            var mapper = propType.getMapperOn(model);
+
+            expect(mapper).toBe(null);
+          });
+
+          it("should return null if there is no compatible mode (isContinuousFixed=false)", function() {
+
+            var CustomModel = VisualModel.extend({
+              $type: {
+                props: {
+                  roleA: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "string", isContinuous: true},
+                      {dataType: "number", isContinuous: true}
+                    ]
+                  }
+                }
+              }
+            });
+
+            var propType = CustomModel.type.get("roleA");
+            var model = new CustomModel({
+              data: new Table(getDataSpec1()),
+              roleA: {
+                isContinuousFixed: false,
+                attributes: ["country"]
+              }
+            });
+
+            var mapper = propType.getMapperOn(model);
+
+            expect(mapper).toBe(null);
+          });
+
+          it("should return a mapper if there is a compatible mode (isContinuousFixed=true)", function() {
+
+            var CustomModel = VisualModel.extend({
+              $type: {
+                props: {
+                  roleA: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "number", isContinuous: true}
+                    ],
+                    strategies: [
+                      new IdentityStrategy()
+                    ]
+                  }
+                }
+              }
+            });
+
+            var propType = CustomModel.type.get("roleA");
+            var model = new CustomModel({
+              data: new Table(getDataSpec1()),
+              roleA: {
+                isContinuousFixed: true,
+                attributes: ["sales"]
+              }
+            });
+
+            var mapper = propType.getMapperOn(model);
+
+            expect(mapper).not.toBe(null);
+          });
+
+          it("should return a mapper if there is a compatible mode (isContinuousFixed=false)", function() {
+
+            var CustomModel = VisualModel.extend({
+              $type: {
+                props: {
+                  roleA: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "string", isContinuous: false}
+                    ],
+                    strategies: [
+                      new IdentityStrategy()
+                    ]
+                  }
+                }
+              }
+            });
+
+            var propType = CustomModel.type.get("roleA");
+            var model = new CustomModel({
+              data: new Table(getDataSpec1()),
+              roleA: {
+                isContinuousFixed: false,
+                attributes: ["country"]
+              }
+            });
+
+            var mapper = propType.getMapperOn(model);
+
+            expect(mapper).not.toBe(null);
+          });
+        });
+
+        describe("mapping has no modeFixed or isContinuousFixed", function() {
+
+          it("should return null if there is no applicable strategy for any of the modes", function() {
+
+            var CustomModel = VisualModel.extend({
+              $type: {
+                props: {
+                  roleA: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "string"},
+                      {dataType: "number"}
+                    ],
+                    strategies: [
+                      new NullStrategy(),
+                      new IdentityStrategy()
+                    ]
+                  }
+                }
+              }
+            });
+
+            var propType = CustomModel.type.get("roleA");
+            var model = new CustomModel({
+              data: new Table(getDataSpec1()),
+              roleA: {
+                attributes: ["country", "sales"]
+              }
+            });
+
+            var mapper = propType.getMapperOn(model);
+
+            expect(mapper).toBe(null);
+          });
+
+          it("should return the mapper of the first applicable strategy and mode", function() {
+
+            var nullStrategy = new NullStrategy();
+            var identityStrategy1 = new IdentityStrategy();
+            var identityStrategy2 = new IdentityStrategy();
+
+            spyOn(nullStrategy, "getMapper").and.callThrough();
+            spyOn(identityStrategy1, "getMapper").and.callThrough();
+            spyOn(identityStrategy2, "getMapper").and.callThrough();
+
+            var CustomModel = VisualModel.extend({
+              $type: {
+                props: {
+                  roleA: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "number"},
+                      {dataType: "string"}
+                    ],
+                    strategies: [
+                      nullStrategy,
+                      identityStrategy1,
+                      identityStrategy2
+                    ]
+                  }
+                }
+              }
+            });
+
+            var propType = CustomModel.type.get("roleA");
+            var model = new CustomModel({
+              data: new Table(getDataSpec1()),
+              roleA: {
+                attributes: ["country"]
+              }
+            });
+
+            var mapper = propType.getMapperOn(model);
+
+            expect(mapper).not.toBe(null);
+            expect(mapper.mode).toBe(propType.modes.at(1));
+          });
+        });
+      });
+
+      describe("validateOn(model)", function() {
 
         doValidateTests(false);
         doValidateTests(true);
@@ -859,13 +1259,6 @@ define([
               if(txnScope) txnScope.dispose();
             });
 
-            function assertIsValid(model) {
-              if(txnScope) txnScope.acceptWill();
-
-              // this way, errors are shown in the console...
-              expect(model.$type.get("propRole").validateOn(model)).toBe(null);
-            }
-
             function assertIsInvalid(model) {
               if(txnScope) txnScope.acceptWill();
 
@@ -878,8 +1271,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property",
-                      levels: ["nominal"]
+                      base: "pentaho/visual/role/property"
                     }
                   }
                 }
@@ -906,7 +1298,6 @@ define([
                   props: {
                     propRole: {
                       base: "pentaho/visual/role/property",
-                      levels: ["nominal"],
                       attributes: {
                         isRequired: true
                       }
@@ -934,7 +1325,8 @@ define([
                   props: {
                     propRole: {
                       base: "pentaho/visual/role/property",
-                      levels: ["nominal"],
+                      modes: [{valueType: "string"}],
+                      strategies: [new IdentityStrategy()],
                       attributes: {
                         isRequired: true
                       }
@@ -962,7 +1354,8 @@ define([
                   props: {
                     propRole: {
                       base: "pentaho/visual/role/property",
-                      levels: ["nominal"],
+                      modes: [{valueType: "string"}],
+                      strategies: [new IdentityStrategy()],
                       attributes: {
                         countMin: 2
                       }
@@ -990,7 +1383,8 @@ define([
                   props: {
                     propRole: {
                       base: "pentaho/visual/role/property",
-                      levels: ["nominal"],
+                      modes: [{valueType: "string"}],
+                      strategies: [new CombineStrategy()],
                       attributes: {
                         countMin: 2
                       }
@@ -1018,7 +1412,8 @@ define([
                   props: {
                     propRole: {
                       base: "pentaho/visual/role/property",
-                      levels: ["nominal"],
+                      modes: [{valueType: "string"}],
+                      strategies: [new CombineStrategy()],
                       attributes: {
                         countMax: 1
                       }
@@ -1047,7 +1442,8 @@ define([
                   props: {
                     propRole: {
                       base: "pentaho/visual/role/property",
-                      levels: ["nominal"],
+                      modes: [{valueType: "string"}],
+                      strategies: [new IdentityStrategy()],
                       attributes: {
                         countMax: 1
                       }
@@ -1068,37 +1464,6 @@ define([
               expect(errors).toBe(null);
             });
 
-            it("should be invalid, when the mapping's level is not one of the role's levels (qualitative)", function() {
-
-              var model = createFullValidQualitativeMapping();
-
-              model.propRole.level = "quantitative";
-
-              assertIsInvalid(model);
-            });
-
-            it("should be invalid, when its level is not one of the role's levels (quantitative)", function() {
-
-              var model = createFullValidQuantitativeMapping();
-
-              model.propRole.level = "ordinal";
-
-              assertIsInvalid(model);
-            });
-
-            it("should be valid, when its level is one of the role's levels", function() {
-
-              var model = createFullValidQualitativeMapping();
-
-              model.propRole.level = "nominal";
-
-              assertIsValid(model);
-
-              model.propRole.level = "ordinal";
-
-              assertIsValid(model);
-            });
-
             it("should be invalid, when the model has no data", function() {
 
               var model = createFullValidQualitativeMapping();
@@ -1116,67 +1481,7 @@ define([
               assertIsInvalid(model);
             });
 
-            it("should be invalid, when the type of the mapped attribute is not a subtype of " +
-                "the role's dataType", function() {
-
-              var model = createFullValidQualitativeMapping();
-
-              // quantitative measurement level would be compatible with the qualitative role.
-              // but this role specifies the data type.
-              model.propRole.attributes.add({name: "sales"});
-
-              assertIsInvalid(model);
-            });
-
-            it("should be invalid, when the attributes level is the same, " +
-                "but its data type is not a subtype", function() {
-
-              var Model = VisualModel.extend({
-                $type: {
-                  props: {
-                    propRole: {
-                      base: "pentaho/visual/role/property",
-                      levels: ["quantitative"],
-                      dataType: "date"
-                    }
-                  }
-                }
-              });
-
-              var model = new Model({
-                data: new Table(getDataSpec1()),
-                // an existing attribute whose measurement level is compatible with
-                propRole: {attributes: ["sales"]}
-              });
-
-              assertIsInvalid(model);
-            });
-
-            it("should be invalid, when dataType is null and the attributes level is not " +
-                "compatible with the role's levels", function() {
-
-              var Model = VisualModel.extend({
-                $type: {
-                  props: {
-                    propRole: {
-                      base: "pentaho/visual/role/property",
-                      levels: ["quantitative"]
-                    }
-                  }
-                }
-              });
-
-              var model = new Model({
-                data: new Table(getDataSpec1()),
-                // an existing attribute whose measurement level is compatible with
-                propRole: {attributes: ["product"]}
-              });
-
-              assertIsInvalid(model);
-            });
-
-            it("should be invalid, when a mapping with an effective " +
-                "level of qualitative has duplicate names", function() {
+            it("should be invalid when a mapping has duplicate names", function() {
 
               var model = createFullValidQualitativeMapping();
 
@@ -1187,18 +1492,14 @@ define([
               assertIsInvalid(model);
             });
 
-            it("should be invalid, when a mapping with an effective level of quantitative has " +
-                "duplicate names", function() {
+            it("should be invalid when a mapping has a modeFixed which is not one of the property's modes", function() {
 
-              var model = createFullValidQuantitativeMapping();
+              var model = createFullValidQualitativeMapping();
 
-              var containedAttribute = model.propRole.attributes.at(0);
-
-              model.propRole.attributes.add(containedAttribute.clone());
+              model.propRole.modeFixed = {dataType: "number"};
 
               assertIsInvalid(model);
             });
-
           });
         }
       });

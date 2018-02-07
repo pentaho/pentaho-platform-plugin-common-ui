@@ -17,10 +17,11 @@ define([
   "pentaho/i18n!messages",
   "pentaho/i18n!/pentaho/type/i18n/types",
   "pentaho/type/ValidationError",
+  "pentaho/data/TableView",
   "pentaho/type/util",
   "pentaho/util/object",
   "pentaho/util/error"
-], function(bundle, bundleTypes, ValidationError, typeUtil, O, error) {
+], function(bundle, bundleTypes, ValidationError, DataView, typeUtil, O, error) {
 
   "use strict";
 
@@ -33,8 +34,6 @@ define([
     "./strategies/combine",
     "./strategies/tuple",
     function(__Property, Mode, BaseStrategy, Mapping, IdentityStrategy, CombineStrategy, TupleStrategy) {
-
-      var context = this;
 
       var __modeType = Mode.type;
       var ListOfModeType = this.get([Mode]);
@@ -488,6 +487,108 @@ define([
           },
           // endregion
 
+          // region getMapperOn
+          /**
+           * Obtains an applicable mapper to the given model.
+           *
+           * If the current mapping is such that its [modeFixed]{@link pentaho.visual.role.Mapping#modeFixed} is
+           * specified, then only that mode is considered.
+           * Otherwise, every mode of the [modes]{@link pentaho.visual.role.Property.Type#modes} of this property
+           * is tried, in turn.
+           *
+           * For each mode,
+           * every [strategy]{@link pentaho.visual.role.Property.Type#strategies} is queried for an applicable mapper.
+           * The first mapper returned by a strategy is used.
+           *
+           * @param {!pentaho.visual.base.Model} model - The visualization model.
+           *
+           * @return {pentaho.visual.role.strategies.IMapper} A mapper if one applies, or `null`, if not.
+           */
+          getMapperOn: function(model) {
+
+            var mapping = model.get(this);
+            var attributes = mapping.attributes;
+
+            if(attributes.count === 0) {
+              return null;
+            }
+
+            var dataTable = model.data;
+            if(dataTable === null) {
+              return null;
+            }
+
+            // Obtain column indexes of attributes.
+            var anyInvalidAttribute = false;
+
+            var columnIndexes = attributes.toArray(function(attr) {
+
+              var index = dataTable.getColumnIndexByAttribute(attr.name);
+
+              anyInvalidAttribute |= (index < 0);
+
+              return index;
+            });
+
+            // Leave if any invalid attribute names.
+            if(anyInvalidAttribute) {
+              return null;
+            }
+
+            var inputData = new DataView(dataTable).setSourceColumns(columnIndexes);
+
+            var mode = mapping.modeFixed;
+            if(mode !== null) {
+              return this.__getMapperForMode(inputData, mode);
+            }
+
+            var modes = this.modes;
+            var M = modes.count;
+            var m = -1;
+            var isContinuousFixed = mapping.isContinuousFixed;
+            while(++m < M) {
+              mode = modes.at(m);
+
+              if(isContinuousFixed === null || isContinuousFixed === mode.isContinuous) {
+
+                var mapper = this.__getMapperForMode(inputData, mode);
+                if(mapper !== null) {
+                  return mapper;
+                }
+              }
+            }
+
+            return null;
+          },
+
+          /**
+           * Gets a mapper for given input data and mode.
+           *
+           * Every [strategy]{@link pentaho.visual.role.Property.Type#strategies} is queried for an applicable mapper.
+           * The first mapper returned by a strategy is used.
+           *
+           * @param {!pentaho.data.ITable} inputData - The data set view to be mapped.
+           * @param {!pentaho.visual.role.Mode} mode - The visual role mode which will be used.
+           *
+           * @return {pentaho.visual.role.strategies.IMapper} A mapper if one applies, or `null`, if not.
+           *
+           * @private
+           */
+          __getMapperForMode: function(inputData, mode) {
+            var strategies = this.strategies;
+            var S = strategies.count;
+            var s = -1;
+            var mapper;
+            while(++s < S) {
+              if((mapper = strategies.at(s).getMapper(this, inputData, mode)) != null) {
+                return mapper;
+              }
+            }
+
+            return null;
+          },
+          // endregion
+
           // region Validation
 
           // TODO: reimplement validateOn
@@ -504,16 +605,14 @@ define([
            *    [attributes]{@link pentaho.visual.role.Mapping#attributes} is considered undefined and invalid
            * 2. Otherwise, if the visual model has a non-`null` [data]{@link pentaho.visual.base.Model#data},
            *    then each data property in the current mapping's
-           *    [attributes]{@link pentaho.visual.role.Mapping#attributes}:
-           *   1. Must be defined in `data`
-           *   2. Must be compatible with the visual role, in terms of data type and measurement level
+           *    [attributes]{@link pentaho.visual.role.Mapping#attributes} must be defined in `data`
            * 3. The number of currently mapped [attributes]{@link pentaho.visual.role.Mapping#attributes} must satisfy
            *    the usual property cardinality constraints,
-           *    like [isRequired]{@link pentaho.type.Property.Type#isRequired},
-           *    [countMin]{@link pentaho.type.Property.Type#countMin} and
-           *    [countMax]{@link pentaho.type.Property.Type#countMax}
+           *    according to [Property.Type#attributes]{@link pentaho.visual.role.Property.Type#attributes}
            * 4. There can be no two mapping attributes with the same
-           *    [name]{@link pentaho.visual.role.MappingAttribute#name}.
+           *    [name]{@link pentaho.visual.role.MappingAttribute#name}
+           * 5. One of the defined strategies must be able to map the specified attributes to one of the visual role's
+           *    modes.
            *
            * @param {!pentaho.visual.base.Model} model - The visualization model.
            *
@@ -551,17 +650,31 @@ define([
                     ])));
               }
 
-              if(!errors) {
+              if(!errors && count > 0) {
                 // Data props are defined in data and of a type compatible with the role's dataType.
                 this.__validateDataPropsOn(model, mapping, addErrors);
-
-                // Validate level is one of the visual role's levels.
-                this.__validateLevelOn(model, mapping, addErrors);
 
                 // Duplicate mapped attributes.
                 // Only possible to validate when the rest of the stuff is valid.
                 if(!errors) {
                   this.__validateDuplMappingAttrsOn(model, mapping, addErrors);
+
+                  if(!errors) {
+                    // modeFixed must be defined.
+                    var modeFixed = mapping.modeFixed;
+                    if(modeFixed !== null && !this.modes.has(modeFixed.$key)) {
+                      addErrors(new ValidationError(
+                          bundle.format(bundle.structured.errors.property.modeFixedInvalid, {role: this})));
+                    }
+
+                    if(!errors) {
+                      // Can map.
+                      if(mapping.mapper === null) {
+                        addErrors(new ValidationError(
+                            bundle.format(bundle.structured.errors.property.noMapper, {role: this})));
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -570,61 +683,8 @@ define([
           },
 
           /**
-           * Validates the level property and that the levels of attributes are compatible with
-           * the visual role's levels.
-           *
-           * @param {!pentaho.visual.base.Model} model - The visualization model.
-           * @param {!pentaho.visual.role.Mapping} mapping - The mapping.
-           * @param {function} addErrors - Called to add errors.
-           * @private
-           */
-          __validateLevelOn: function(model, mapping, addErrors) {
-
-            var allRoleLevels = this.levels;
-            var level = mapping.get("level"); // want Simple value
-            var roleLevels = null; // defaults to all role levels
-            if(level) {
-              // Fixed level.
-              // Must be one of the role's levels.
-              if(!allRoleLevels.has(level.$key)) {
-                addErrors(new ValidationError(bundle.format(
-                  bundle.structured.errors.property.levelIsNotOneOfRoleLevels,
-                  {
-                    role: this,
-                    level: level,
-                    roleLevels: ("'" + allRoleLevels.toArray().join("', '") + "'")
-                  })));
-                return;
-              }
-
-              roleLevels = [level];
-            } else {
-              // Auto level.
-              // Check there is a possible auto-level.
-              roleLevels = allRoleLevels.toArray();
-            }
-
-            // Data Attributes, if any, must be compatible with level.
-            var dataAttrLevel = this.getAttributesMaxLevelOf(model);
-            if(dataAttrLevel) {
-              var roleLevel = this.getLevelCompatibleWith(dataAttrLevel, roleLevels);
-              if(!roleLevel) {
-                addErrors(new ValidationError(
-                  bundle.format(
-                    bundle.structured.errors.property.attributesLevelNotCompatibleWithRoleLevels,
-                    {
-                      role: this,
-                      // Try to provide a label for dataAttrLevel.
-                      dataLevel: __modeType.domain.get(dataAttrLevel),
-                      roleLevels: ("'" + allRoleLevels.toArray().join("', '") + "'")
-                    })));
-              }
-            }
-          },
-
-          /**
            * Validates that every mapped attribute references a defined data property in the
-           * data of the visual model and that its type is compatible with the visual role's `dataType`.
+           * data of the visual model.
            *
            * Assumes the mapping is valid according to the base complex validation.
            *
@@ -637,8 +697,6 @@ define([
 
             var data = model.data;
             var dataAttrs = data && data.model.attributes;
-
-            var roleDataType = this.dataType;
 
             var i = -1;
             var roleAttrs = mapping.attributes;
@@ -657,21 +715,7 @@ define([
                       name: name,
                       role: this
                     })));
-                continue;
-              }
-
-              // Attribute of an incompatible data type.
-              var dataAttrType = context.get(dataAttr.type).type;
-              if(!dataAttrType.isSubtypeOf(roleDataType)) {
-                addErrors(new ValidationError(
-                  bundle.format(
-                    bundle.structured.errors.property.attributeDataTypeNotSubtypeOfRoleType,
-                    {
-                      name: name,
-                      dataType: dataAttrType,
-                      role: this,
-                      roleDataType: roleDataType
-                    })));
+                // continue;
               }
             }
           },
@@ -685,9 +729,6 @@ define([
            * @private
            */
           __validateDuplMappingAttrsOn: function(model, mapping, addErrors) {
-
-            var levelEffective = this.levelEffectiveOn(model);
-            if(!levelEffective) return;
 
             var roleAttrs = mapping.attributes;
             var L = roleAttrs.count;
@@ -703,8 +744,7 @@ define([
               var key = roleAttr.name;
               if(O.hasOwn(byKey, key)) {
                 var dataAttr = dataAttrs.get(roleAttr.name);
-                var attributeDuplicateMessage = bundle.structured.errors.property.attributeDuplicate;
-                var errorMessage = bundle.format(attributeDuplicateMessage, {
+                var errorMessage = bundle.format(bundle.structured.errors.property.attributeDuplicate, {
                   name: dataAttr,
                   role: this
                 });

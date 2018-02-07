@@ -26,6 +26,8 @@ define([
     "pentaho/visual/role/mode",
     function(Complex, MappingAttribute, Mode) {
 
+      var context = this;
+
       /**
        * @name pentaho.visual.role.Mapping.Type
        * @class
@@ -59,6 +61,29 @@ define([
        */
       var VisualRoleMapping = Complex.extend(/** @lends pentaho.visual.role.Mapping# */{
 
+        constructor: function(spec) {
+
+          this.base(spec);
+
+          /**
+           * The cached mapper.
+           *
+           * @type {undefined|null|pentaho.visual.role.strategies.IMapper}
+           * @private
+           */
+          this.__mapper = undefined;
+        },
+
+        /**
+         * Resets the existing mapper, if any.
+         *
+         * @private
+         * @friend pentaho.visual.base.Model
+         */
+        __resetMapper: function() {
+          this.__mapper = undefined;
+        },
+
         /**
          * Gets the visual model that owns this visual role mapping, if any, or `null`.
          *
@@ -68,6 +93,50 @@ define([
         get model() {
           // TODO: Test it is a visual Model (cyclic dependency)
           return typeUtil.__getFirstRefContainer(this);
+        },
+
+        /**
+         * Gets the current mapper used to obtain the values of the visual role, if any, or `null`.
+         *
+         * A mapper exists if the mapping is associated with a model, under a certain visual role property,
+         * and the currently mapped attributes exist in the data set
+         * and can be mapped to one of the visual role's modes.
+         *
+         * @type {pentaho.visual.role.strategies.IMapper}
+         * @readOnly
+         * @see pentaho.visual.role.Property.Type#getMapperOn
+         */
+        get mapper() {
+          var mapper;
+
+          // Within a transaction?
+          if(context.transaction !== null) {
+            // Do not cache or use cache.
+            // Covers will phase of change actions, in which multiple iterations can occur.
+            // There would be no way to reset mappers cached during the process.
+            mapper = this.__getMapper();
+
+          } else if((mapper = this.__mapper) === undefined) {
+
+            mapper = this.__mapper = this.__getMapper();
+          }
+
+          return mapper || null;
+        },
+
+        /**
+         * Obtains the current mapper from the referring model and visual role property.
+         *
+         * @return {pentaho.visual.role.strategies.IMapper} A mapper, or `null`.
+         */
+        __getMapper: function() {
+          var refs = this.$references;
+          if(refs && refs.length) {
+            var iref = refs[0];
+            return iref.property.getMapperOn(iref.container) || null;
+          }
+
+          return null;
         },
 
         /**

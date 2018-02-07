@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
+  "pentaho/util/object",
+  "pentaho/type/changes/ComplexChangeset",
   "pentaho/i18n!model",
-
   // so that r.js sees otherwise invisible dependencies.
   "pentaho/type/model",
   "pentaho/visual/role/property",
@@ -26,9 +27,64 @@ define([
   "pentaho/visual/color/palette",
   "pentaho/visual/color/level",
   "pentaho/visual/base/application"
-], function(bundle) {
+], function(O, ComplexChangeset, bundle) {
 
   "use strict";
+
+  // NOTE: Doing it this way, no did:change listener can observe an invalid cached mapper.
+  /**
+   * @classDesc Manages the lifetime of the cached mappers of the mapping instances associated with a target model.
+   * @memberOf pentaho.visual.base
+   * @class
+   * @extends pentaho.type.changes.ComplexChangeset
+   * @private
+   */
+  var ModelChangeset = ComplexChangeset.extend({
+
+    /** @inheritDoc */
+    _apply: function(model) {
+
+      this.base(model);
+
+      var modelType = model.$type;
+      if(this.__canChangesAffectMappers(modelType)) {
+        modelType.eachVisualRole(function(propType) {
+          model.get(propType).__resetMapper();
+        });
+      }
+    },
+
+    /**
+     * Determines if the changeset can invalidate the cached mappers.
+     *
+     * The implementation determines if the changeset
+     * contains the `data` property or any other visual role property.
+     *
+     * @param {!pentaho.visual.base.Model.Type} modelType - The target model type.
+     *
+     * @return {boolean} `true`, if it contains; `false`, if not.
+     *
+     * @private
+     */
+    __canChangesAffectMappers: function(modelType) {
+
+      var propNames = this.propertyNames;
+      var i = -1;
+      var P = propNames.length;
+      while(++i < P) {
+        var propName = propNames[i];
+        if(propName === "data") {
+          return true;
+        }
+
+        if(modelType.isVisualRole(modelType.get(propName))) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+  });
 
   return [
     "pentaho/type/model",
@@ -66,6 +122,11 @@ define([
        * @param {pentaho.visual.base.spec.IModel} [modelSpec] A plain object containing the model specification.
        */
       var VisualModel = Model.extend(/** @lends pentaho.visual.base.Model# */{
+
+        /** @inheritDoc */
+        _createChangeset: function(txn) {
+          return new ModelChangeset(txn, this);
+        },
 
         // region serialization
         /** @inheritDoc */
