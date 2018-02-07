@@ -1297,7 +1297,7 @@ define([
             if(app && app.getDoubleClickTooltip) {
               // Drilling preferably uses the group, if it exists (e.g. scatter does not have it).
               var drillOnFilter = this._getExecuteFilter(cccContext);
-              if(drillOnFilter !== null) {
+              if(drillOnFilter !== null && !cv.getActiveReport().isEditDisabled()) {
                 msg = app.getDoubleClickTooltip(drillOnFilter);
                 if(msg) {
                   tooltipLines.push(msg);
@@ -1606,7 +1606,7 @@ define([
 
         _onUserSelection: function(cccContext, cccSelectingDatums, cccSelectingGroup) {
 
-          if(this.isDirty) {
+          if(this.isDirty || cv.getActiveReport().isEditDisabled()) {
             // Explicitly cancel CCC's own selection handling.
             return [];
           }
@@ -1695,7 +1695,7 @@ define([
 
         _executeOn: function(cccContext) {
 
-          if(this.isDirty) {
+          if(this.isDirty || cv.getActiveReport().isEditDisabled()) {
             return;
           }
 
