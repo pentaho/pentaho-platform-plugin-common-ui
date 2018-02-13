@@ -260,6 +260,19 @@ define([
       this.f = f == null ? undefined : String(f);
     },
 
+    get formatted() {
+      var label = this.label;
+      return label !== undefined ? label : null;
+    },
+
+    set formatted(label) {
+      this.label = label;
+    },
+
+    valueOf: function() {
+      return this.v;
+    },
+
     /**
      * Gets a best-effort string representation of the cell.
      *

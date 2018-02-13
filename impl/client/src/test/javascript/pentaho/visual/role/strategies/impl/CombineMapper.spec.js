@@ -177,8 +177,11 @@ define([
           var i = -1;
           var L = columnIndexes.length;
           var formattedValues = [];
-          while(++i < L) { formattedValues.push(dataTable.getFormattedValue(rowIndex, columnIndexes[i])); }
-          var realFormatted = formattedValues.join(formattedSeparator);
+          while(++i < L) {
+            var formattedValue = dataTable.getFormattedValue(rowIndex, columnIndexes[i]);
+            if(formattedValue) formattedValues.push(formattedValue);
+          }
+          var realFormatted = formattedValues.length ? formattedValues.join(formattedSeparator) : null;
 
           expect(formatted).toBe(realFormatted);
         }
