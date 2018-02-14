@@ -15,14 +15,14 @@
  */
 define([
   "module",
-  "pentaho/lang/DomNode",
+  "pentaho/lang/Base",
   "./util",
   "./impl/Variable",
   "pentaho/util/object",
   "pentaho/util/error"
-], function(module, DomNode, sceneUtil, Variable, O, error) {
+], function(module, Base, sceneUtil, Variable, O, error) {
 
-  var Scene = DomNode.extend(module.id, /** @lends pentaho.visual.scene.Base# */{
+  var Scene = Base.extend(module.id, /** @lends pentaho.visual.scene.Base# */{
 
     /**
      * @classDesc The `Scene` class represents one distinct visual state which is represented
@@ -54,7 +54,7 @@ define([
      * @alias Base
      * @memberOf pentaho.visual.scene
      * @class
-     * @extends pentaho.lang.DomNode
+     * @extends pentaho.lang.Base
      *
      * @description Creates a scene instance.
      * @constructor
@@ -65,20 +65,58 @@ define([
 
       var hasParent = parent != null;
       if(hasParent) {
-        // Signal "constructing" to _onParentChange.
-        this.vars = null;
+        this.parent = parent;
+        this.index = parent.__appendChildCore(this);
+        this.vars = Object.create(parent.vars);
 
-        parent.appendChild(this);
       } else {
+        this.parent = null;
+        this.index = -1;
         this.vars = Object.create(null);
 
-        this.__setAsRoot();
+        O.setConst(this.vars, "$root", this);
 
         if(view == null) {
           throw error.argRequired("view");
         }
         this.__view = view;
       }
+    },
+
+    /**
+     * Gets the parent scene, if any, or `null` if none.
+     *
+     * @type {pentaho.visual.scene.Base}
+     * @readOnly
+     */
+    parent: null,
+
+    /**
+     * Gets the child index of this scene, if it has a parent, or `-1` if not.
+     *
+     * @type {number}
+     * @readOnly
+     */
+    index: -1,
+
+    /**
+     * Gets the array of child scenes.
+     *
+     * The returned array cannot be modified directly.
+     *
+     * @type {!Array.<!pentaho.visual.scene.Base>}
+     * @readOnly
+     */
+    children: Object.freeze([]),
+
+    /**
+     * Gets the root scene of the tree that this scene belongs to.
+     *
+     * @type {!pentaho.visual.base.Scene}
+     * @readOnly
+     */
+    get root() {
+      return this.vars.$root;
     },
 
     /**
@@ -92,21 +130,20 @@ define([
     },
 
     /**
-     * Gets the root scene of the tree that this scene belongs to.
+     * Appends a given child scene in the local children array, creating one if this is the first child.
      *
-     * @type {!pentaho.visual.base.Scene}
-     * @readOnly
-     */
-    get root() {
-      return this.vars.$root;
-    },
-
-    /**
-     * Marks this node's `$root` "variable" with `this` as a value.
+     * @param {!pentaho.visual.scene.Base} child - The child scene.
+     * @return {number} The index at which the given child scene was inserted.
      * @private
      */
-    __setAsRoot: function() {
-      O.setConst(this.vars, "$root", this);
+    __appendChildCore: function(child) {
+
+      var children = O.getOwn(this, "children") || (this.children = []);
+      var index = children.length;
+
+      children.push(child);
+
+      return index;
     },
 
     /**
@@ -161,90 +198,8 @@ define([
      */
     invert: function(keyArgs) {
       return sceneUtil.invertVars(this.vars, this.view.model, keyArgs);
-    },
-
-    /** @override */
-    _onParentChange: function(newParent, newIndex, oldParent, oldIndex) {
-
-      var oldView;
-      if(newParent === null) {
-        // Loosing parent. Capture the old view.
-        // assert oldParent !== null. Was not root.
-        // Must steal the old parent's view, or we'd be without view.
-        oldView = oldParent.view;
-      }
-
-      this.base(newParent, newIndex, oldParent, oldIndex);
-
-      // Ensure `vars` are chained to those of newParent.
-
-      if(newParent !== null) {
-
-        // Constructing?
-        if(this.vars === null) {
-          this.vars = Object.create(newParent.vars);
-        } else {
-          // Avoid using setPrototypeOf. Prefer recreating the subtree of vars.
-
-          // Note that even if we're now root, recreating the vars ignores the $root property,
-          // thus letting the new root pass-through.
-          this.__recreateVarsRecursive(newParent.vars);
-        }
-      } else {
-        // Loosing parent.
-        this.__view = oldView;
-        this.__recreateVarsRecursive(null);
-        this.__setAsRoot();
-      }
-    },
-
-    /**
-     * Recursively recreates the scenes' map of visual variables.
-     *
-     * @param {!Object.<string, any|pentaho.visual.role.scene.IVariable>} parentVars - The parent's
-     * map of visual variables.
-     *
-     * @private
-     */
-    __recreateVarsRecursive: function(parentVars) {
-
-      var newVars = Object.create(parentVars);
-
-      // A local $root property would not be copied because it is not enumerable.
-      this.vars = O.assignOwn(newVars, this.vars);
-
-      var children = this.children;
-      var childCount = children.length;
-      if(childCount > 0) {
-        var childIndex = -1;
-        while(++childIndex < childCount) {
-          children[childIndex].__recreateVarsRecursive(newVars);
-        }
-      }
     }
   }, /** @lends pentaho.visual.scene.Base*/ {
-    /*
-     * Sample static code.
-     *
-     __buildScenes: function() {
-          var scenes = [];
-          var model = this.model;
-          var categoryMapper = model.category.mapper;
-          var measureMapper = model.measure.mapper;
-
-          for(var i = 0, R = model.data.getNumberOfRows(); i < R; i++) {
-            scenes.push({
-              category: categoryMapper.getValue(i),
-              categoryLabel: categoryMapper.getFormatted(i),
-              measure: measureMapper.getValue(i),
-              rowIndex: i
-            });
-          }
-
-          return scenes;
-        },
-     */
-
     /**
      * Builds a flat, single-level scene tree according to the data and visual roles of the model of a given view.
      *
