@@ -764,8 +764,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
-                  levels: ["quantitative"]
+                  base: "pentaho/visual/role/property"
                 }
               }
             }
@@ -787,8 +786,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
-                  levels: ["quantitative"]
+                  base: "pentaho/visual/role/property"
                 }
               }
             }
@@ -814,7 +812,6 @@ define([
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
-                  levels: ["quantitative"],
                   attributes: attrsSpec0
                 }
               }
