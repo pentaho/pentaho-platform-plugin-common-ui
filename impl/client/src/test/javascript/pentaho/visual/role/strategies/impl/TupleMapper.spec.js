@@ -29,6 +29,7 @@ define([
     var propType;
     var dataTable;
     var modes = {};
+    var strategy;
 
     var valueSeparator = "^";
     var formattedSeparator = " ^ ";
@@ -81,7 +82,7 @@ define([
 
       var dataView = new DataView(dataTable).setSourceColumns(columnIndexes);
 
-      return new Mapper(propType, dataView, mode, valueSeparator, formattedSeparator);
+      return new Mapper(strategy, propType, dataView, mode, valueSeparator, formattedSeparator);
     }
 
     beforeAll(function(done) {
@@ -104,6 +105,9 @@ define([
                         {dataType: ["date"], isContinuous: true},
                         {dataType: ["element"], isContinuous: false},
                         {dataType: ["element"], isContinuous: true}
+                      ],
+                      strategies: [
+                        {_: "pentaho/visual/role/strategies/tuple"}
                       ]
                     }
                   ]
@@ -118,6 +122,7 @@ define([
               modes.DateListContinuous = propType.modes.at(2);
               modes.ElementListCategorical = propType.modes.at(3);
               modes.ElementListContinuous = propType.modes.at(4);
+              strategy = propType.strategies.at(0);
             });
           })
           .then(done, done.fail);

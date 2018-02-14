@@ -98,7 +98,7 @@ define([
             }
           }
 
-          return new TupleMapper(propType, inputData, mode);
+          return new TupleMapper(this, propType, inputData, mode);
         }
       });
 

@@ -27,6 +27,28 @@
  */
 
 /**
+ * Gets the mapping strategy that generated this mapper.
+ *
+ * @name pentaho.visual.role.strategies.IMapper#strategy
+ * @type {!pentaho.visual.role.strategies.Base}
+ * @readOnly
+ * @see pentaho.visual.role.strategies.IMapper#kind
+ */
+
+/**
+ * Gets a mapper kind, relative to its mapping strategy.
+ *
+ * When a strategy can return more than one kind of mapper,
+ * this field allows distinguishing between them.
+ * Otherwise, its value can be `null`.
+ *
+ * @name pentaho.visual.role.strategies.IMapper#kind
+ * @type {?string}
+ * @readOnly
+ * @see pentaho.visual.role.strategies.IMapper#strategy
+ */
+
+/**
  * Gets the input data set.
  *
  * @name pentaho.visual.role.strategies.IMapper#inputData
@@ -35,7 +57,7 @@
  */
 
 /**
- * Gets the mode of operation of the associated visual role.
+ * Gets the mode of operation of the associated visual role that the mapping is targeting.
  *
  * @name pentaho.visual.role.strategies.IMapper#mode
  * @type {!pentaho.visual.role.Mode}
@@ -43,17 +65,21 @@
  */
 
 /**
- * Gets a label that describes the visual role as it is mapped.
+ * Gets the data type of the mapped visual role value.
  *
- * @name pentaho.visual.role.strategies.IMapper#label
- * @type {string}
+ * @name pentaho.visual.role.strategies.IMapper#dataType
+ * @type {!pentaho.type.Type}
  * @readOnly
  */
 
 /**
- * Gets the data type of the mapped visual role value.
+ * Gets the type of scale, continuous or categorical,
+ * used by the associated visual role to encode values when operating in this mode.
  *
- * @name pentaho.visual.role.strategies.IMapper#dataType
+ * This property is sugar for [isContinuous]{pentaho.visual.role.Mode#isContinuous}
+ * of [mode]{@link pentaho.visual.role.strategies.IMapper#mode}.
+ *
+ * @name pentaho.visual.role.strategies.IMapper#isContinuous
  * @type {!pentaho.type.Type}
  * @readOnly
  */

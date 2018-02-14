@@ -106,7 +106,7 @@ define([
             return null;
           }
 
-          return new CombineMapper(propType, inputData, mode, this.valueSeparator, this.formattedSeparator);
+          return new CombineMapper(this, propType, inputData, mode, this.valueSeparator, this.formattedSeparator);
         }
       });
 

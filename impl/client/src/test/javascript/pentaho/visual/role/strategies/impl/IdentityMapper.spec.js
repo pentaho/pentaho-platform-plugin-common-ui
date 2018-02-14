@@ -29,6 +29,7 @@ define([
     var propType;
     var dataTable;
     var modes = {};
+    var strategy;
 
     var datasetColumns = {
       StringCategorical: 0,
@@ -70,7 +71,7 @@ define([
 
       var columnType = propType.context.get(dataView.getColumnType(0)).type;
 
-      return new Mapper(propType, dataView, mode, columnType);
+      return new Mapper(strategy, propType, dataView, mode, columnType);
     }
 
     beforeAll(function(done) {
@@ -93,6 +94,9 @@ define([
                         {dataType: "string", isContinuous: false},
                         {dataType: "element", isContinuous: false},
                         {dataType: "element", isContinuous: true}
+                      ],
+                      strategies: [
+                        {_: "pentaho/visual/role/strategies/identity"}
                       ]
                     }
                   ]
@@ -107,6 +111,7 @@ define([
               modes.StringCategorical = propType.modes.at(2);
               modes.ElementCategorical = propType.modes.at(3);
               modes.ElementContinuous = propType.modes.at(4);
+              strategy = propType.strategies.at(0);
             });
           })
           .then(done, done.fail);

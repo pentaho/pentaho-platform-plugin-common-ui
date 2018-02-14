@@ -30,6 +30,7 @@ define([
      * @private
      * @see pentaho.visual.role.strategies.Combine
      * @description Creates a _combine_ mapper instance.
+     * @param {!pentaho.type.visual.role.strategies.Base} strategy - The strategy.
      * @param {!pentaho.type.visual.role.Property.Type} propType - The visual role property type.
      * @param {!pentaho.data.ITable} inputData - The data set view to be mapped.
      * @param {!pentaho.visual.role.Mode} mode - The visual role mode of `propType` which will be used.
@@ -37,9 +38,9 @@ define([
      * @param {string} formattedSeparator - The text to use to separate combined formatted values.
      * this.formattedSeparator
      */
-    constructor: function(propType, inputData, mode, valueSeparator, formattedSeparator) {
+    constructor: function(strategy, propType, inputData, mode, valueSeparator, formattedSeparator) {
 
-      this.base(propType, inputData, mode);
+      this.base(strategy, propType, inputData, mode);
 
       /**
        * A map from key to row index.

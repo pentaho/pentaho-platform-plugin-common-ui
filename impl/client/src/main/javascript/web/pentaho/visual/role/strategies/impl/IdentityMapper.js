@@ -31,14 +31,15 @@ define([
      * @private
      * @see pentaho.visual.role.strategies.Identity
      * @description Creates an identity mapper instance.
+     * @param {!pentaho.type.visual.role.strategies.Base} strategy - The strategy.
      * @param {!pentaho.type.visual.role.Property.Type} propType - The visual role property type.
      * @param {!pentaho.data.ITable} inputData - The data set view to be mapped.
      * @param {!pentaho.visual.role.Mode} mode - The visual role mode of `propType` which will be used.
      * @param {!pentaho.type.Type} attributeType - The type of the mapped attribute's value.
      */
-    constructor: function(propType, inputData, mode, attributeType) {
+    constructor: function(strategy, propType, inputData, mode, attributeType) {
 
-      this.base(propType, inputData, mode);
+      this.base(strategy, propType, inputData, mode);
 
       /**
        * A map from key to row index.

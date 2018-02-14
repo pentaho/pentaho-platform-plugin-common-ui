@@ -32,12 +32,14 @@ define([
      * @abstract
      * @private
      * @description Creates a mapper instance.
+     * @param {!pentaho.type.visual.role.strategies.Base} strategy - The strategy.
      * @param {!pentaho.type.visual.role.Property.Type} propType - The visual role property type.
      * @param {!pentaho.data.ITable} inputData - The data set view to be mapped.
      * @param {!pentaho.visual.role.Mode} mode - The visual role mode of `propType` which will be used.
      */
-    constructor: function(propType, inputData, mode) {
+    constructor: function(strategy, propType, inputData, mode) {
 
+      O.setConst(this, "strategy", strategy);
       O.setConst(this, "inputData", inputData);
       O.setConst(this, "mode", mode);
 
@@ -50,6 +52,11 @@ define([
        * @readOnly
        */
       O.setConst(this, "_propType", propType);
+    },
+
+    /** @inheritDoc */
+    get kind() {
+      return null;
     },
 
     /**
@@ -66,24 +73,9 @@ define([
       return this.mode.dataType;
     },
 
-    /**
-     * Gets a label that describes the visual role.
-     *
-     * The default implementation concatenates the mapped attributes' labels using a `,` as a separator.
-     *
-     * @type {?string}
-     */
-    get label() {
-
-      var labels = [];
-      var inputData = this.inputData;
-      var columnIndex = -1;
-      var columnCount = inputData.getNumberOfColumns();
-      while(++columnIndex < columnCount) {
-        labels.push(inputData.getColumnLabel(columnIndex));
-      }
-
-      return labels.join(", ");
+    /** @inheritDoc */
+    get isContinuous() {
+      return this.mode.isContinuous;
     }
   });
 

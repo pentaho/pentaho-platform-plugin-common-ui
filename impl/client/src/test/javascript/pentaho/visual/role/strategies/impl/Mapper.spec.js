@@ -28,6 +28,7 @@ define([
     var propType;
     var dataTable;
     var mode;
+    var strategy;
 
     beforeAll(function(done) {
 
@@ -50,6 +51,7 @@ define([
             propType = CustomVisualModel.type.get("roleA");
             dataTable = new DataTable();
             mode = propType.modes.at(0);
+            strategy = propType.strategies.at(0);
           })
           .then(done, done.fail);
 
@@ -57,37 +59,58 @@ define([
 
     it("should be possible to create an instance", function() {
 
-      var mapper = new Mapper(propType, dataTable, mode);
+      var mapper = new Mapper(strategy, propType, dataTable, mode);
 
       expect(mapper instanceof Mapper).toBe(true);
     });
 
     it("should respect and expose the specified `propType` argument in `_propType`", function() {
 
-      var mapper = new Mapper(propType, dataTable, mode);
+      var mapper = new Mapper(strategy, propType, dataTable, mode);
 
       expect(mapper._propType).toBe(propType);
     });
 
     it("should respect and expose the specified `inputData` argument in `inputData`", function() {
 
-      var mapper = new Mapper(propType, dataTable, mode);
+      var mapper = new Mapper(strategy, propType, dataTable, mode);
 
       expect(mapper.inputData).toBe(dataTable);
     });
 
     it("should respect and expose the specified `mode` argument in `mode`", function() {
 
-      var mapper = new Mapper(propType, dataTable, mode);
+      var mapper = new Mapper(strategy, propType, dataTable, mode);
 
       expect(mapper.mode).toBe(mode);
     });
 
+    it("should respect and expose the specified `strategy` argument in `strategy`", function() {
+
+      var mapper = new Mapper(strategy, propType, dataTable, mode);
+
+      expect(mapper.strategy).toBe(strategy);
+    });
+
+    it("should have `kind` be null", function() {
+
+      var mapper = new Mapper(strategy, propType, dataTable, mode);
+
+      expect(mapper.kind).toBe(null);
+    });
+
     it("should have `dataType` get the mode.dataType", function() {
 
-      var mapper = new Mapper(propType, dataTable, mode);
+      var mapper = new Mapper(strategy, propType, dataTable, mode);
 
       expect(mapper.dataType).toBe(mode.dataType);
+    });
+
+    it("should have `isContinuous` get the mode.isContinuous", function() {
+
+      var mapper = new Mapper(strategy, propType, dataTable, mode);
+
+      expect(mapper.isContinuous).toBe(mode.isContinuous);
     });
   });
 });

@@ -79,7 +79,7 @@ define([
             return null;
           }
 
-          return new IdentityMapper(propType, inputData, mode, columnType);
+          return new IdentityMapper(this, propType, inputData, mode, columnType);
         }
       });
 

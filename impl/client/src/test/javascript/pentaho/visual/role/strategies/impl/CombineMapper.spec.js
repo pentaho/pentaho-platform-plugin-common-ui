@@ -29,6 +29,7 @@ define([
     var propType;
     var dataTable;
     var modes = {};
+    var strategy;
 
     var valueSeparator = "^";
     var formattedSeparator = " ^ ";
@@ -81,7 +82,7 @@ define([
 
       var dataView = new DataView(dataTable).setSourceColumns(columnIndexes);
 
-      return new Mapper(propType, dataView, mode, valueSeparator, formattedSeparator);
+      return new Mapper(strategy, propType, dataView, mode, valueSeparator, formattedSeparator);
     }
 
     beforeAll(function(done) {
@@ -101,6 +102,9 @@ define([
                       modes: [
                         {dataType: "string", isContinuous: false},
                         {dataType: "element", isContinuous: false}
+                      ],
+                      strategies: [
+                        {_: "pentaho/visual/role/strategies/combine"}
                       ]
                     }
                   ]
@@ -112,6 +116,7 @@ define([
               propType = CustomVisualModel.type.get("roleA");
               modes.StringCategorical = propType.modes.at(0);
               modes.ElementCategorical = propType.modes.at(1);
+              strategy = propType.strategies.at(0);
             });
           })
           .then(done, done.fail);
