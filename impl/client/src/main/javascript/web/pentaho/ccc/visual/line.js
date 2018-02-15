@@ -35,8 +35,11 @@ define([
 
         _supportsTrends: true,
 
-        _readUserOptions: function(options) {
-          this.base.apply(this, arguments);
+        _configureOptions: function() {
+
+          this.base();
+
+          var options = this.options;
 
           var shape = this.model.shape;
           if(shape && shape === "none") {

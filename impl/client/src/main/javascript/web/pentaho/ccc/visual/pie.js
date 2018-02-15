@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "./_util"
+], function(util) {
 
   "use strict";
 
@@ -44,7 +46,7 @@ define(function() {
 
         _discreteColorRole: "rows",
 
-        _tooltipHidePercentageOnPercentAttributes: true,
+        _tooltipHidePercentageOnPercentFields: true,
 
         _configureOptions: function() {
 
@@ -55,15 +57,16 @@ define(function() {
           }
         },
 
-        _configureLabels: function(options, model) {
-          this.base.apply(this, arguments);
+        _configureLabels: function() {
 
-          if(options.valuesVisible) {
-            options.valuesLabelStyle = model.labelsOption === "outside" ? "linked" : model.labelsOption;
+          this.base();
+
+          if(this.options.valuesVisible) {
+            this.options.valuesLabelStyle = this.model.labelsOption === "outside" ? "linked" : this.model.labelsOption;
           }
         },
 
-        _configureLabelsAnchor: function(options, model) {
+        _configureLabelsAnchor: function() {
           // NOOP
         },
 
@@ -78,7 +81,7 @@ define(function() {
           // Change values mask according to each category's
           // discriminated measure being isPercent or not
           if(this._isGenericMeasureMode) {
-            var attributeInfosByName = this.attributeInfosByName;
+            var mappingFieldInfosByName = this._mappingFieldInfosByName;
 
             // e.g. sizeRole.dim
             var genericMeasureDiscrimName = this._genericMeasureDiscrimCccDimName;
@@ -88,9 +91,9 @@ define(function() {
                 category: {
                   sliceLabelMask: function() {
 
-                    var meaAttrName = this.atoms[genericMeasureDiscrimName].value;
+                    var meaasureMappingFieldInfoName = this.atoms[genericMeasureDiscrimName].value;
 
-                    if(attributeInfosByName[meaAttrName].isPercent) {
+                    if(mappingFieldInfosByName[meaasureMappingFieldInfoName].sourceIsPercent) {
                       // the value is the percentage itself;
                       return "{value}";
                     }
@@ -101,8 +104,8 @@ define(function() {
               }
             };
           } else {
-            var meaAttrInfo = this._getAttributeInfosOfRole("measures")[0];
-            this.options.valuesMask = meaAttrInfo.isPercent ? "{value}" : "{value} ({value.percent})";
+            var measureMappingFieldInfo = this._getMappingFieldInfosOfRole("measures")[0];
+            this.options.valuesMask = measureMappingFieldInfo.sourceIsPercent ? "{value}" : "{value} ({value.percent})";
           }
         },
 
@@ -110,17 +113,17 @@ define(function() {
           var memberPalette = this._getMemberPalette();
           var colorMap;
           if(memberPalette) {
-            var colorAttrInfos =
-                this._getAttributeInfosOfRole(this._discreteColorRole, /* excludeMeasureDiscrim: */true) || [];
-            var C = colorAttrInfos.length;
+            var colorMappingFieldInfos =
+                this._getMappingFieldInfosOfRole(this._discreteColorRole, /* excludeMeasureDiscrim: */true) || [];
+            var C = colorMappingFieldInfos.length;
             // C >= 0 (color -> "rows" -> is optional)
             // When multiple measures exist, the pie chart shows them as multiple charts.
             // If measures would affect color, each small chart would have a single color.
             // => consider M = 0;
-            // If C > 0, use the members' colors of the last color attribute.
+            // If C > 0, use the members' colors of the last color field.
             if(C > 0) {
-              var attrInfo = colorAttrInfos[C - 1];
-              colorMap = this._copyColorMap(null, memberPalette[attrInfo.attr.name]);
+              var mappingFieldInfo = colorMappingFieldInfos[C - 1];
+              colorMap = util.copyColorMap(null, memberPalette[mappingFieldInfo.sourceName]);
             }
           }
 

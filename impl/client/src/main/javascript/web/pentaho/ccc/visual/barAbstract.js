@@ -43,12 +43,14 @@ define([
             def.lazy(options.visualRoles, "category").isReversed = true;
         },
 
-        _configureLabelsAnchor: function(options, visualSpec) {
+        _configureLabelsAnchor: function() {
+
+          var options = this.options;
 
           options.label_textMargin = 7;
 
           /* eslint default-case: 0 */
-          switch(visualSpec.labelsOption) {
+          switch(this.model.labelsOption) {
             case "center":
               options.valuesAnchor = "center";
               break;

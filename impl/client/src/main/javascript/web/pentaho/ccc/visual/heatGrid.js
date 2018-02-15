@@ -54,26 +54,28 @@ define([
           return "continuous";
         },
 
-        _prepareLayout: function(options) {
+        _prepareLayout: function() {
 
-          this.base(options);
+          this.base();
 
           var xAxisSize;
           var yAxisSize;
+          var options = this.options;
 
           options.axisTitleSize = def.get(this._validExtensionOptions, "axisTitleSize", 0);
           options.axisComposite = def.get(this._validExtensionOptions, "axisComposite", options.axisComposite);
 
           if(options.axisComposite) {
             var model = this.model;
-            var measureCount = model.size.attributes.count + model.color.attributes.count;
-            var catsDepth = model.rows.attributes.count;
-            var sersDepth = model.columns.attributes.count;
+            var measureCount = model.size.fields.count + model.color.fields.count;
+            var catsDepth = model.rows.fields.count;
+            var sersDepth = model.columns.fields.count;
 
             // Need CCC auto-layout for the composite axis.
             // TODO: Analyzer CrossTable Layout specific
-            var catsBreadth = Math.max(1, this._dataTable.getNumberOfRows() - 1);
-            var sersBreadth = this._dataTable.getNumberOfColumns() - catsDepth;
+            var dataTable = this.model.data;
+            var catsBreadth = Math.max(1, dataTable.getNumberOfRows() - 1);
+            var sersBreadth = dataTable.getNumberOfColumns() - catsDepth;
 
             if(measureCount > 0) sersBreadth /= measureCount;
 
@@ -117,9 +119,9 @@ define([
           options.yAxisSize = yAxisSize;
         },
 
-        _createChart: function(ChartClass, options) {
+        _createChart: function(ChartClass) {
 
-          var chart = this.base(ChartClass, options);
+          var chart = this.base(ChartClass);
 
           var visualElemsCountMax = this._getVisualElementsCountMax();
           if(visualElemsCountMax > 0) {

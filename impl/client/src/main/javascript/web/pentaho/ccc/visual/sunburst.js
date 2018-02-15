@@ -49,108 +49,111 @@ define([
           return sizeVar.label;
         },
 
-        _readUserOptions: function(options) {
+        _configureOptions: function() {
 
-          this.base.apply(this, arguments);
+          this.base();
 
           var model = this.model;
 
           var value = model.sliceOrder;
-          if(value) options.sliceOrder = value;
+          if(value) {
+            this.options.sliceOrder = value;
+          }
 
           var emptySlicesHidden = model.emptySlicesHidden;
           this._hideNullMembers = emptySlicesHidden;
 
-          if(emptySlicesHidden)
-            options.slice_visible = function(scene) {
+          if(emptySlicesHidden) {
+            this.options.slice_visible = function(scene) {
               return !util.isNullMember(scene.vars.category.value);
             };
-
-          var labelColor = this.model.labelColor;
-          if(labelColor != null) {
-            options.label_textStyle = labelColor;
           }
-
-          // Determine whether to show values label
-          if(model.labelsOption !== "none" && this.model.size.isMapped) {
-            options.label_textBaseline = "bottom";
-            options.label_textMargin = 2;
-
-            options.label_visible = function(scene) {
-              // Only show the size label if the size-value label also fits
-              var pvLabel = this.pvMark;
-              var ir = scene.innerRadius;
-              var irmin = ir;
-              var or = scene.outerRadius;
-              var tm = pvLabel.textMargin();
-              var a = scene.angle; // angle span
-              var m = pv.Text.measure(scene.vars.size.label, pvLabel.font());
-              var twMax;
-
-              if(a < Math.PI) {
-                var th = m.height * 0.85; // tight text bounding box
-
-                // The effective height of text that must be covered.
-                // one text margin, for the anchor,
-                // half text margin for the anchor's opposite side.
-                // All on only one of the sides of the wedge.
-                var thEf = 2 * (th + 3 * tm / 2);
-
-                // Minimum inner radius whose straight-arc has a length `thEf`
-                irmin = Math.max(irmin, thEf / (2 * Math.tan(a / 2)));
-              }
-
-              // Here, on purpose, we're not including two `tm`, for left and right,
-              // cause we don't want that the clipping by height, the <= 0 test below,
-              // takes into account the inner margin. I.e., text is allowed to be shorter,
-              // in the inner margin zone, which, after all, is supposed to not have any text!
-              twMax = (or - tm) - irmin;
-
-              // If with this angle-span only at a very far
-              // radius would `th` be achieved, then text will never fit,
-              // not even trimmed.
-              if(twMax <= 0 || m.width > twMax - tm) return false;
-
-              // Continue with normal processing for the main label.
-              return null;
-            };
-
-            var me = this;
-            options.label_add = function() {
-              return new pv.Label()
-                  .visible(function(scene) {
-                    var pvMainLabel = this.proto;
-                    return pvMainLabel.visible();
-                  })
-                  .text(function(scene) {
-                    /* jshint laxbreak:true*/
-                    var pvMainLabel = this.proto;
-                    if(!pvMainLabel.text()) return "";
-                    var sizeDimName = me._getAttributeInfosOfRole("size")[0].name;
-                    return me._formatSize(scene.vars.size, scene.firstAtoms[sizeDimName].dimension);
-                  })
-                  .textBaseline("top");
-            };
-          }
-        },
-
-        _configureOptions: function() {
-
-          this.base();
 
           this.options.rootCategoryLabel = bundle.get("sunburst.rootCategoryLabel");
 
           this._configureDisplayUnits();
         },
 
-        _configureLabels: function(options) {
+        _configureLabels: function() {
+
+          var model = this.model;
+          var options = this.options;
+
           // Sunburst shows category labels unless overridden through extension points.
           var valuesVisible = !!def.get(this._validExtensionOptions, "valuesVisible", options.valuesVisible);
 
           options.valuesVisible = valuesVisible;
 
           if(valuesVisible) {
-            options.valuesFont = util.defaultFont(util.readFontModel(this.model, "label"));
+
+            options.valuesFont = this._labelFont;
+
+            var labelColor = model.labelColor;
+            if(labelColor != null) {
+              options.label_textStyle = labelColor;
+            }
+
+            // Determine whether to show values label
+            if(model.labelsOption !== "none" && this.model.size.isMapped) {
+              options.label_textBaseline = "bottom";
+              options.label_textMargin = 2;
+
+              options.label_visible = function(scene) {
+                // Only show the category label if the size label would also fit.
+                // Simulate required size by accounting for two lines of text.
+                var pvLabel = this.pvMark;
+                var innerRadiusMin = scene.innerRadius;
+                var outerRadius = scene.outerRadius;
+                var textMargin = pvLabel.textMargin();
+                var angleSpan = scene.angle;
+                var sizeTextMeasureBox = pv.Text.measure(scene.vars.size.label, pvLabel.font());
+                var textWidthMax;
+
+                if(angleSpan < Math.PI) {
+                  var sizeTextHeight = sizeTextMeasureBox.height * 0.85; // tight text bounding box
+
+                  // The effective height of text that must be covered.
+                  // one text margin, for the anchor,
+                  // half text margin for the anchor's opposite side.
+                  // All on only one of the sides of the wedge.
+                  var textHeightEffective = 2 * (sizeTextHeight + 3 * textMargin / 2);
+
+                  // Minimum inner radius whose straight-arc has a length `textHeightEffective`
+                  innerRadiusMin = Math.max(innerRadiusMin, textHeightEffective / (2 * Math.tan(angleSpan / 2)));
+                }
+
+                // Here, on purpose, we're not including two `textMargin`, for left and right,
+                // cause we don't want that the clipping by height, the <= 0 test below,
+                // takes into account the inner margin. I.e., text is allowed to be shorter,
+                // in the inner margin zone, which, after all, is supposed to not have any text!
+                textWidthMax = (outerRadius - textMargin) - innerRadiusMin;
+
+                // If with this angle-span only at a very far
+                // radius would `sizeTextHeight` be achieved, then text will never fit,
+                // not even trimmed.
+                if(textWidthMax <= 0 || sizeTextMeasureBox.width > textWidthMax - textMargin) return false;
+
+                // Continue with normal processing for the main label.
+                return null;
+              };
+
+              var me = this;
+              options.label_add = function() {
+                return new pv.Label()
+                    .visible(function(scene) {
+                      var pvMainLabel = this.proto;
+                      return pvMainLabel.visible();
+                    })
+                    .text(function(scene) {
+                      /* jshint laxbreak:true*/
+                      var pvMainLabel = this.proto;
+                      if(!pvMainLabel.text()) return "";
+                      var sizeDimName = me._getMappingFieldInfosOfRole("size")[0].name;
+                      return me._formatSize(scene.vars.size, scene.firstAtoms[sizeDimName].dimension);
+                    })
+                    .textBaseline("top");
+              };
+            }
           }
         },
 
@@ -197,18 +200,18 @@ define([
           if(memberPalette) {
             // The color role, "rows" is required, so necessarily C > 0.
             // Also, there can be at most one measure gem, "size", so M <= 1.
-            // Use member colors of all of the color attributes.
-            var colorAttrInfos =
-                this._getAttributeInfosOfRole(this._discreteColorRole, /* excludeMeasureDiscrim: */true);
-            if(colorAttrInfos) {
-              colorAttrInfos.forEach(function(colorAttrInfo) {
+            // Use member colors of all of the color fields.
+            var colorMappingFieldInfos =
+                this._getMappingFieldInfosOfRole(this._discreteColorRole, /* excludeMeasureDiscrim: */true);
+            if(colorMappingFieldInfos) {
+              colorMappingFieldInfos.forEach(function(colorMappingFieldInfo) {
                 // TODO: Mondrian/Analyzer specific
                 // Copy map values to colorMap.
                 // All color maps are joined together and there will be no
                 // value collisions because Mondrian keys are prefixed with the dimensions they belong to...
-                var map = memberPalette[colorAttrInfo.attr.name];
+                var map = memberPalette[colorMappingFieldInfo.sourceName];
                 if(map) {
-                  this._copyColorMap(colorMap, map);
+                  util.copyColorMap(colorMap, map);
                 }
               }, this);
             }
