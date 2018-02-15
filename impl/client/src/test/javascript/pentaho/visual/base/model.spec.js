@@ -85,7 +85,7 @@ define([
       }
 
       expectIt("property");
-      expectIt("level");
+      expectIt("mode");
     });
 
     describe("#validate()", function() {

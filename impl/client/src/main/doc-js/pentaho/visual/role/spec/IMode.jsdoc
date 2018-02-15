@@ -1,0 +1,62 @@
+/*!
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.IMode` interface describes the _object_ form of a
+ * [visual role operating mode]{@link pentaho.visual.role.Mode} instance.
+ *
+ * @example
+ * {
+ *   dataType: "number",
+ *   isCategorical: true
+ * }
+ *
+ * @name pentaho.visual.role.spec.IMode
+ *
+ * @interface
+ * @extends pentaho.type.spec.IComplex
+ */
+
+/**
+ * The data type of the visual role value when operating in this mode.
+ *
+ * When unspecified, or specified as `null`,
+ * the default value is {@link pentaho.type.Instance},
+ * meaning that values of any data type are accepted.
+ *
+ * @name pentaho.visual.role.spec.IMode#dataType
+ * @type {pentaho.type.spec.ITypeDescriptor}
+ *
+ * @see pentaho.visual.role.Mode#dataType
+ */
+
+/**
+ * Indicates type of scale, continuous or categorical,
+ * used by the associated visual role to encode values when operating in this mode.
+ *
+ * This property is immutable and can only be specified at construction time.
+ *
+ * When unspecified, or specified as `null`,
+ * defaults to the value of [isContinuous]{@link pentaho.type.Type#isContinuous} of
+ * [dataType]{@link pentaho.visual.role.Mode#dataType}.
+ *
+ * The types {@link pentaho.type.Number} and {@link pentaho.type.Date} are known to be continuous.
+ *
+ * @name pentaho.visual.role.spec.IMode#isContinuous
+ * @type {?boolean}
+ *
+ * @see pentaho.visual.role.Mode#isContinuous
+ */

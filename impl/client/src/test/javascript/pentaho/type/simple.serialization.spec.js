@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ define([
     var PentahoObject;
     var PentahoBoolean;
 
-    beforeEach(function(done) {
+    beforeAll(function(done) {
       Context.createAsync()
           .then(function(_context) {
             context = _context;
@@ -212,6 +212,7 @@ define([
       });
 
       describe("#_toJSONValue", function() {
+
         it("should return the value property", function() {
           var scope = new SpecificationScope();
 
@@ -236,14 +237,16 @@ define([
 
     // region Other Simple Types Test Helpers
 
-    function testSimple(getSimpleClass, primitiveValue, isPlainObject, isNumOrBoolOrStr) {
+    function testSimple(getSimpleClass, getPrimitiveValue, isPlainObject, isNumOrBoolOrStr) {
 
       var SimpleClass;
+      var primitiveValue;
 
       describe("when declaredType is unspecified", function() {
 
         beforeEach(function() {
           SimpleClass = getSimpleClass();
+          primitiveValue = getPrimitiveValue();
         });
 
         describe("when forceType: true", function() {
@@ -307,6 +310,7 @@ define([
 
         beforeEach(function() {
           SimpleClass = getSimpleClass();
+          primitiveValue = getPrimitiveValue();
         });
 
         describe("when forceType: true", function() {
@@ -369,6 +373,7 @@ define([
 
         beforeEach(function() {
           SimpleClass = getSimpleClass();
+          primitiveValue = getPrimitiveValue();
         });
 
         describe("when forceType: true", function() {
@@ -454,9 +459,11 @@ define([
         return context.get("pentaho/type/boolean");
       }
 
-      var primitiveValue = true;
+      function getPrimitiveValue() {
+        return true;
+      }
 
-      testSimple(getSimpleClass, primitiveValue, false, true);
+      testSimple(getSimpleClass, getPrimitiveValue, false, true);
     });
 
     describe("pentaho.type.Number", function() {
@@ -465,9 +472,11 @@ define([
         return context.get("pentaho/type/number");
       }
 
-      var primitiveValue = 10;
+      function getPrimitiveValue() {
+        return 10;
+      }
 
-      testSimple(getSimpleClass, primitiveValue, false, true);
+      testSimple(getSimpleClass, getPrimitiveValue, false, true);
     });
 
     describe("pentaho.type.String", function() {
@@ -476,9 +485,11 @@ define([
         return context.get("pentaho/type/string");
       }
 
-      var primitiveValue = "hello";
+      function getPrimitiveValue() {
+        return "hello";
+      }
 
-      testSimple(getSimpleClass, primitiveValue, false, true);
+      testSimple(getSimpleClass, getPrimitiveValue, false, true);
     });
 
     describe("pentaho.type.Function", function() {
@@ -487,9 +498,11 @@ define([
         return context.get("pentaho/type/function");
       }
 
-      var primitiveValue = function() {};
+      function getPrimitiveValue() {
+        return function() {};
+      }
 
-      testSimple(getSimpleClass, primitiveValue, false, false);
+      testSimple(getSimpleClass, getPrimitiveValue, false, false);
     });
 
     describe("pentaho.type.Date", function() {
@@ -498,9 +511,11 @@ define([
         return context.get("pentaho/type/date");
       }
 
-      var primitiveValue = new Date();
+      function getPrimitiveValue() {
+        return new Date();
+      }
 
-      testSimple(getSimpleClass, primitiveValue, false, false);
+      testSimple(getSimpleClass, getPrimitiveValue, false, false);
     });
 
     describe("pentaho.type.Object", function() {
@@ -509,17 +524,34 @@ define([
         return context.get("pentaho/type/object");
       }
 
-      var primitiveValue = {foo: "bar"};
+      function getPrimitiveValue1() {
+        return {foo: "bar"};
+      }
 
-      testSimple(getSimpleClass, primitiveValue, true, false);
+      testSimple(getSimpleClass, getPrimitiveValue1, true, false);
 
       // ----
 
       function NonPlainClass() {}
 
-      primitiveValue = new NonPlainClass();
+      function getPrimitiveValue2() {
+        return new NonPlainClass();
+      }
 
-      testSimple(getSimpleClass, primitiveValue, false, false);
+      testSimple(getSimpleClass, getPrimitiveValue2, false, false);
+    });
+
+    describe("pentaho.type.TypeDescriptor", function() {
+
+      function getSimpleClass() {
+        return context.get("pentaho/type/typeDescriptor");
+      }
+
+      function getPrimitiveValue() {
+        return context.get("pentaho/type/boolean").type;
+      }
+
+      testSimple(getSimpleClass, getPrimitiveValue, false, false);
     });
   });
 });

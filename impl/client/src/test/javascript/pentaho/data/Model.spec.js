@@ -173,5 +173,76 @@ define([
         });
       });
     });
+
+    describe("#keyAttributes -", function() {
+
+      it("should be an array", function() {
+        var model = new Model([
+          {name: "A", type: "string"},
+          {name: "B", type: "number"},
+          {name: "C", type: "boolean"}
+        ]);
+
+        expect(Array.isArray(model.keyAttributes)).toBe(true);
+      });
+
+      it("should be an empty array when there are no attributes", function() {
+        var model = new Model([
+        ]);
+
+        expect(model.keyAttributes.length).toBe(0);
+      });
+
+      it("should be an empty array when there are no key attributes", function() {
+        var model = new Model([
+          {name: "A", type: "string"},
+          {name: "B", type: "number"},
+          {name: "C", type: "boolean"}
+        ]);
+
+        expect(model.keyAttributes.length).toBe(0);
+      });
+
+      it("should be an array with the key attributes", function() {
+        var model = new Model([
+          {name: "A", type: "string", isKey: true},
+          {name: "B", type: "number"},
+          {name: "C", type: "boolean", isKey: true}
+        ]);
+
+        expect(model.keyAttributes.length).toBe(2);
+        expect(model.keyAttributes[0]).toBe(model.attributes[0]);
+        expect(model.keyAttributes[1]).toBe(model.attributes[2]);
+      });
+    });
+
+    describe("#hasAnyKeyAttributes -", function() {
+
+      it("should be a `false` when there are no attributes", function() {
+        var model = new Model([]);
+
+        expect(model.hasAnyKeyAttributes).toBe(false);
+      });
+
+      it("should be a `false` when there are no key attributes", function() {
+        var model = new Model([
+          {name: "A", type: "string"},
+          {name: "B", type: "number"},
+          {name: "C", type: "boolean"}
+        ]);
+
+        expect(model.hasAnyKeyAttributes).toBe(false);
+      });
+
+      it("should be a `true` when there is at least one key attribute", function() {
+        var model = new Model([
+          {name: "A", type: "string"},
+          {name: "B", type: "number", isKey: true},
+          {name: "C", type: "boolean"}
+        ]);
+
+        expect(model.hasAnyKeyAttributes).toBe(true);
+      });
+    });
   });
 });

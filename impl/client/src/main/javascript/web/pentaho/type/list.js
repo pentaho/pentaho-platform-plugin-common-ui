@@ -703,6 +703,7 @@ define([
          * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
          *
          * @protected
+         * @override
          */
         _validate: function(value) {
           return value.__projectedMock.__elems.reduce(function(errors, elem) {

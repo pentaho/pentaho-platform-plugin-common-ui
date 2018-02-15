@@ -69,7 +69,7 @@ function(module, OperationInvalidError, O, bundle) {
         /** @inheritDoc */
         _init: function(spec, keyArgs) {
 
-          this.base(spec, keyArgs);
+          spec = this.base(spec, keyArgs) || spec;
 
           var isSync = spec && spec.isSync;
           isSync = isSync == null ? this.__isSync : !!isSync;

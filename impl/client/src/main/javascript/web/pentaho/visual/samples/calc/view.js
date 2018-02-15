@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,43 +79,44 @@ define([
 
         __calculate: function() {
           var dataTable = this.model.data;
-          var R = dataTable.getNumberOfRows();
-          var measureAttrName = this.model.measure.attributes.at(0).name;
-          var jMeasure = dataTable.getColumnIndexByAttribute(measureAttrName);
+          var rowCount = dataTable.getNumberOfRows();
+          var measureMapper = this.model.measure.mapper;
+
           var getValue = function(k) {
-            var v = dataTable.getValue(k, jMeasure);
+            var v = measureMapper.getValue(k);
             return !isNaN(v) && v != null ? v : null;
           };
-          var value = null;
-          var i;
-          var vi;
+
+          var aggregatedValue = null;
+          var rowIndex;
+          var value;
 
           /* eslint default-case: 0 */
           switch(this.model.operation) {
             case "max":
-              for(i = 0; i < R; i++)
-                if((vi = getValue(i)) != null)
-                  value = value == null ? vi : Math.max(value, vi);
+              for(rowIndex = 0; rowIndex < rowCount; rowIndex++)
+                if((value = getValue(rowIndex)) != null)
+                  aggregatedValue = aggregatedValue == null ? value : Math.max(aggregatedValue, value);
               break;
 
             case "min":
-              for(i = 0; i < R; i++)
-                if((vi = getValue(i)) != null)
-                  value = value == null ? vi : Math.min(value, vi);
+              for(rowIndex = 0; rowIndex < rowCount; rowIndex++)
+                if((value = getValue(rowIndex)) != null)
+                  aggregatedValue = aggregatedValue == null ? value : Math.min(aggregatedValue, value);
               break;
 
             case "avg":
-              var total = value = 0;
-              if(R) {
-                for(i = 0; i < R; i++)
-                  if((vi = getValue(i)) != null)
-                    total += vi;
-                value = total / R;
+              var total = aggregatedValue = 0;
+              if(rowCount) {
+                for(rowIndex = 0; rowIndex < rowCount; rowIndex++)
+                  if((value = getValue(rowIndex)) != null)
+                    total += value;
+                aggregatedValue = total / rowCount;
               }
               break;
           }
 
-          return value;
+          return aggregatedValue;
         }
       });
     }

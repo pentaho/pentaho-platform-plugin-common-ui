@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,6 +82,15 @@ define([
         var testDate = new Date("1960-01-25");
         var date = new PentahoDate(testDate);
         expect(date.toJSON()).toBe(date.value.toISOString());
+      });
+    });
+
+    describe(".Type", function() {
+
+      describe("#isContinuous", function() {
+        it("should have `isContinuous` equal to `true`", function() {
+          expect(PentahoDate.type.isContinuous).toBe(true);
+        });
       });
     });
   }); // pentaho.type.Date

@@ -24,14 +24,14 @@ define(function() {
   // 3 -     [day]
   // 4 - [time]
   // 5 - [timezone]
-  var RE_ECMA_DATE = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?(?:T([\d\:\.]+))?([Z+\-][\d:]*)?$/;
+  var RE_ECMA_DATE = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?(?:T([\d:\.]+))?([Z+\-][\d:]*)?$/;
 
   // 0 - full string
   // 1 -  hours
   // 2 -    [minutes]
   // 3 -       [seconds]
   // 4 -          [milliseconds]
-  var RE_ECMA_TIME = /^(\d{2})\:(\d{2})(?:\:(\d{2})(?:\.(\d{3}))?)?$/;
+  var RE_ECMA_TIME = /^(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{3}))?)?$/;
 
   // 0 - full string
   // 1 - Z
@@ -39,7 +39,7 @@ define(function() {
   // 2 - +/-
   // 3 - hour
   // 4 - minutes
-  var RE_ECMA_TIMEZONE = /^(?:(Z)|(?:([+\-])(\d{2})\:(\d{2})))$/;
+  var RE_ECMA_TIMEZONE = /^(?:(Z)|(?:([+\-])(\d{2}):(\d{2})))$/;
 
   /**
    * The `date` namespace contains utility functions for

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,20 @@ define([
 
       $type: /** @lends pentaho.type.Number.Type# */{
         alias: "number",
-        cast: __toNumber
+        cast: __toNumber,
+
+        /**
+         * Gets a value that indicates if this is a continuous type.
+         *
+         * The {@link pentaho.type.Number} type is continuous.
+         *
+         * @type {boolean}
+         * @readOnly
+         * @override
+         */
+        get isContinuous() {
+          return true;
+        }
       }
     }).implement(/** @lends pentaho.type.Number# */{
       $type: bundle.structured["number"] // eslint-disable-line dot-notation

@@ -1,0 +1,140 @@
+/*!
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `IMapper` interface describes an object that can map
+ * certain attributes of a certain data set to the value of a visual role,
+ * which is operating in a certain [mode]{@link pentaho.visual.role.strategies.IMapper#mode}.
+ *
+ * @name pentaho.visual.role.strategies.IMapper
+ *
+ * @interface
+ *
+ * @see pentaho.visual.role.strategies.Base
+ */
+
+/**
+ * Gets the mapping strategy that generated this mapper.
+ *
+ * @name pentaho.visual.role.strategies.IMapper#strategy
+ * @type {!pentaho.visual.role.strategies.Base}
+ * @readOnly
+ * @see pentaho.visual.role.strategies.IMapper#kind
+ */
+
+/**
+ * Gets a mapper kind, relative to its mapping strategy.
+ *
+ * When a strategy can return more than one kind of mapper,
+ * this field allows distinguishing between them.
+ * Otherwise, its value can be `null`.
+ *
+ * @name pentaho.visual.role.strategies.IMapper#kind
+ * @type {?string}
+ * @readOnly
+ * @see pentaho.visual.role.strategies.IMapper#strategy
+ */
+
+/**
+ * Gets the input data set.
+ *
+ * @name pentaho.visual.role.strategies.IMapper#inputData
+ * @type {!pentaho.data.ITable}
+ * @readOnly
+ */
+
+/**
+ * Gets the mode of operation of the associated visual role that the mapping is targeting.
+ *
+ * @name pentaho.visual.role.strategies.IMapper#mode
+ * @type {!pentaho.visual.role.Mode}
+ * @readOnly
+ */
+
+/**
+ * Gets the data type of the mapped visual role value.
+ *
+ * @name pentaho.visual.role.strategies.IMapper#dataType
+ * @type {!pentaho.type.Type}
+ * @readOnly
+ */
+
+/**
+ * Gets the type of scale, continuous or categorical,
+ * used by the associated visual role to encode values when operating in this mode.
+ *
+ * This property is sugar for [isContinuous]{pentaho.visual.role.Mode#isContinuous}
+ * of [mode]{@link pentaho.visual.role.strategies.IMapper#mode}.
+ *
+ * @name pentaho.visual.role.strategies.IMapper#isContinuous
+ * @type {!pentaho.type.Type}
+ * @readOnly
+ */
+
+/**
+ * Gets the mapped visual role value of a row, given its index.
+ *
+ * @name pentaho.visual.role.strategies.IMapper#getValue
+ * @method
+ *
+ * @param {number} rowIndex - The index of the desired row.
+ * A number greater or equal than `0` and less than the
+ * [number of rows]{@link pentaho.data.ITable#getNumberOfRows} of the
+ * [input data set]{@link pentaho.visual.role.strategies.IMapper#inputData}.
+ *
+ * @return {any} The mapped value.
+ */
+
+/**
+ * Gets the mapped visual role formatted value of a row, given its index.
+ *
+ * @name pentaho.visual.role.strategies.IMapper#getFormatted
+ * @method
+ *
+ * @param {number} rowIndex - The index of the desired row.
+ * A number greater or equal than `0` and less than the
+ * [number of rows]{@link pentaho.data.ITable#getNumberOfRows} of the
+ * [input data set]{@link pentaho.visual.role.strategies.IMapper#inputData}.
+ *
+ * @return {string|string[]} The mapped formatted value.
+ */
+
+/**
+ * Gets a row index corresponding to a given visual role value.
+ *
+ * It must be the case that the given `value` is the result (or "equal" to it) of a previous call
+ * to this instance's [getValue]{@link pentaho.visual.role.strategies.IMapper#getValue} method;
+ * otherwise, the consequences are undefined.
+ *
+ * If the associated visual role is not key,
+ * the same visual role value may be returned for several input rows.
+ * In that case,
+ * the inverse method can return the index of any one of those rows.
+ *
+ * In the case of mapping strategies,
+ * such as the [tuple]{@link pentaho.visual.role.strategies.Tuple},
+ * whose visual role value, as returned by `getValue`,
+ * is an array of the multiple input values,
+ * the same exact array need not be given back.
+ * However, it does need to be an array with the exact same elements.
+ *
+ * @name pentaho.visual.role.strategies.IMapper#invertValue
+ * @method
+ *
+ * @param {any} value - The visual role value.
+ *
+ * @return {number} One of the row indexes for which `getValue` returns the given visual role `value`.
+ */

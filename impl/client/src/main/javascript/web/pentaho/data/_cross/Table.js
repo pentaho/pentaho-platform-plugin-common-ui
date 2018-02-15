@@ -476,6 +476,16 @@ define([
       if(attr) return attr.type;
     },
 
+    isColumnContinuous: function(colIndexOrName) {
+      var attr = this.getColumnAttribute(colIndexOrName);
+      if(attr) return attr.isContinuous;
+    },
+
+    isColumnKey: function(colIndexOrName) {
+      var attr = this.getColumnAttribute(colIndexOrName);
+      if(attr) return attr.isKey;
+    },
+
     getColumnId: function(colIndex) {
       var k = colIndex - this._xR;
       return k < 0

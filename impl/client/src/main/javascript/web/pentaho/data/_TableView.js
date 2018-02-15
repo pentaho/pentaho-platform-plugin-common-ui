@@ -218,6 +218,16 @@ define([
       return this._source.getColumnLabel(this.getSourceColumnIndex(colIndex));
     },
 
+    /** @inheritdoc */
+    isColumnContinuous: function(colIndex) {
+      return this._source.isColumnContinuous(this.getSourceColumnIndex(colIndex));
+    },
+
+    /** @inheritdoc */
+    isColumnKey: function(colIndex) {
+      return this._source.isColumnKey(this.getSourceColumnIndex(colIndex));
+    },
+
     // cells
     /** @inheritdoc */
     getValue: function(rowIndex, colIndex) {
