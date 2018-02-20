@@ -28,7 +28,7 @@
     <hsqldb.version>2.3.2</hsqldb.version>
     <commons-xul.version>8.1.0.0-SNAPSHOT</commons-xul.version>
     <mockito-all.version>1.8.4</mockito-all.version>
-    <pentaho-database-model.version>8.1.0.0-SNAPSHOT</pentaho-database-model.version>
+    <commons-database.version>8.1.0.0-SNAPSHOT</commons-database.version>
     <pdi.version>8.1.0.0-SNAPSHOT</pdi.version>
     <flexjson.version>2.1</flexjson.version>
     <org.json.version>3.1.1</org.json.version>
@@ -267,9 +267,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>pentaho</groupId>
-      <artifactId>pentaho-database-model</artifactId>
-      <version>${pentaho-database-model.version}</version>
+      <groupId>org.pentaho</groupId>
+      <artifactId>commons-database-model</artifactId>
+      <version>${commons-database.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
