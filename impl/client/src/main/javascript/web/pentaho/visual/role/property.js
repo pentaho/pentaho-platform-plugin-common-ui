@@ -501,6 +501,8 @@ define([
            * The first mapper returned by a strategy is used.
            *
            * @param {!pentaho.visual.base.Model} model - The visualization model.
+           * @param {pentaho.data.ITable} [dataTable] - A data table to use instead of the existing model's data table.
+           * It must have the same schema (or a subset of) as that of the model.
            *
            * @return {pentaho.visual.role.strategies.IMapper} A mapper if one applies, or `null`, if not.
            */

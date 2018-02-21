@@ -36,8 +36,9 @@ define([
      * must have been loaded already.
      *
      * If the given variables map entails no distinguishing attributes
-     * (in the sense of being _effective keys_, as defined in [invertVars]{@link pentaho.visual.scene.util.invertVars})
-     * of the associated data table, then the returned filter will be `null`.
+     * (in the sense of being _effective keys_, as defined in
+     * [isColumnKeyEffective]{@link pentaho.data.util.isColumnKeyEffective}) of the associated data table,
+     * then the returned filter will be `null`.
      *
      * @param {!Object.<string, any|pentaho.visual.role.scene.IVariable>} varsMap - A map of visual role names
      * to corresponding _variables_. All variables, even those from inherited keys are considered.
@@ -61,11 +62,8 @@ define([
     /**
      * Creates a data cells map corresponding to the values of the specified visual role variables.
      *
-     * By default, only data cells for attributes which are **effective keys** are considered.
-     * An attribute is considered an _effective key_
-     * if [isColumnKey]{@link pentaho.data.ITable#isColumnKey} returns `true` for the corresponding column or,
-     * in the case when the data table has no actual key attributes,
-     * if the attribute is categorical (not [isColumnContinuous]{@link pentaho.data.ITable#isColumnContinuous}).
+     * By default, only data cells for attributes which are **effective keys** are considered,
+     * as defined in [isColumnKeyEffective]{@link pentaho.data.util.isColumnKeyEffective}.
      * Specify `keyArgs.includeMeasureAttributes` as `true` to include all attributes.
      *
      * @param {!Object.<string, any|pentaho.visual.role.scene.IVariable>} varsMap - A map of visual role names
@@ -173,7 +171,7 @@ define([
   function __getIsColumnKeyEffectiveFilter(dataTable, hasDataKeyColumns) {
 
     return function isColumnKeyEffective(columnIndex) {
-      return hasDataKeyColumns ? dataTable.isColumnKey(columnIndex) : !dataTable.isColumnContinuous(columnIndex);
+      return dataUtil.isColumnKeyEffective(dataTable, columnIndex, hasDataKeyColumns);
     };
   }
 });

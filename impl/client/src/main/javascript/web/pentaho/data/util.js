@@ -49,6 +49,31 @@ define(function() {
     },
 
     /**
+     * Gets a value that indicates if a column is an _effective key_.
+     *
+     * A column is considered an _effective key_
+     * if [isColumnKey]{@link pentaho.data.ITable#isColumnKey} returns `true` for the corresponding column or,
+     * in the case when the data table has no actual key attributes,
+     * if the attribute is categorical (not [isColumnContinuous]{@link pentaho.data.ITable#isColumnContinuous}).
+     *
+     * @param {!pentaho.data.ITable} dataTable - The data table.
+     * @param {number} columnIndex - The column index.
+     * @param {boolean} [hasDataKeyColumns] - Indicates if `dataTable`, or its source table,
+     * contain any (real) key columns.
+     * Defaults to the result of calling [hasAnyKeyColumns]{@link pentaho.data.util.hasAnyKeyColumns} on `dataTable`.
+     * For performance reasons, if this method is being called repeatedly on the same data table,
+     * this value should be pre-calculated and specified each time.
+     *
+     * @return {boolean} `true` if the column is an effective key; `false`, if not.
+     */
+    isColumnKeyEffective: function(dataTable, columnIndex, hasDataKeyColumns) {
+      if(hasDataKeyColumns == null) {
+        hasDataKeyColumns = dataUtil.hasAnyKeyColumns(dataTable);
+      }
+      return hasDataKeyColumns ? dataTable.isColumnKey(columnIndex) : !dataTable.isColumnContinuous(columnIndex);
+    },
+
+    /**
      * Creates a data filter from the given cells map, source data table and Type API context.
      *
      * @param {!Object.<string, any|pentaho.data.ICell>} cellsMap - The data cells map.
