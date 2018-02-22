@@ -126,69 +126,6 @@ define([
       });
     });
 
-    describe("#__dataAttribute", function() {
-
-      var derived;
-      var mapping;
-
-      beforeEach(function() {
-
-        var DerivedModel = VisualModel.extend({$type: {
-          props: [
-            {name: "propRole", base: "pentaho/visual/role/property"}
-          ]
-        }});
-
-        derived = new DerivedModel({
-          propRole: {
-            fields: ["undefined", "country", "date"]
-          }
-        });
-
-        mapping = derived.propRole;
-      });
-
-      it("should return null if the mapping field has no name", function() {
-
-        expect(new MappingField().__dataAttribute).toBe(null);
-      });
-
-      it("should return null if the mapping field has name but no parent mapping", function() {
-
-        expect(new MappingField({name: "a"}).__dataAttribute).toBe(null);
-      });
-
-      it("should return null if the mapping field has name, parent mapping, but no model", function() {
-
-        var mappingWithNoModel = new Mapping({
-          fields: ["a", "b", "c"]
-        });
-
-        expect(mappingWithNoModel.fields.at(0).__dataAttribute).toBe(null);
-      });
-
-      it("should return null if the mapping field has name, parent mapping, model but no data", function() {
-
-        expect(mapping.fields.at(0).__dataAttribute).toBe(null);
-      });
-
-      it("should return null if the mapping field has name, parent mapping, model, data, " +
-         "but field is not defined", function() {
-
-        derived.data = new Table(getDataSpec1());
-
-        expect(mapping.fields.at(0).__dataAttribute).toBe(null);
-      });
-
-      it("should return the data table attribute if the mapping field has name, parent mapping, model, data, " +
-          "and exists in the data table", function() {
-
-        var data = derived.data = new Table(getDataSpec1());
-
-        expect(mapping.fields.at(1).__dataAttribute).toBe(data.model.attributes.get("country"));
-      });
-    });
-
     describe("#toSpecInContext(keyArgs)", function() {
 
       var specScope;

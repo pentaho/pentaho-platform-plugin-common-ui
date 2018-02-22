@@ -72,31 +72,6 @@ define([
           return mapping && mapping.model;
         },
 
-        /**
-         * Gets the _data attribute_ referenced by this visual role mapping field.
-         *
-         * @type {pentaho.data.Attribute}
-         * @private
-         * @readonly
-         * @deprecated
-         *
-         * @see pentaho.visual.role.MappingField#name
-         * @see pentaho.visual.role.MappingField#mapping
-         * @see pentaho.visual.role.MappingField#model
-         */
-        get __dataAttribute() {
-          var name = this.name;
-          if(name) {
-            var data;
-            var model = this.model;
-            if(model && (data = model.data)) {
-              return data.model.attributes.get(name);
-            }
-          }
-
-          return null;
-        },
-
         /** @inheritDoc */
         toSpecInContext: function(keyArgs) {
 
