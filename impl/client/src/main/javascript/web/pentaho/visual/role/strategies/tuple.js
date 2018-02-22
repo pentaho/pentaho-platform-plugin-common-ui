@@ -46,11 +46,11 @@ define([
        * The strategy targets:
        * 1. modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} is a
        *   [list]{@link pentaho.type.Type#isList}, and
-       * 2. mappings of attributes whose [type][@link pentaho.data.ITable#getColumnType] can be assigned to the
+       * 2. mappings of fields whose [type][@link pentaho.data.ITable#getColumnType] can be assigned to the
        *   [element type]{@link pentaho.type.List.Type#of} of the mode's list data type.
-       * 3. mappings of attributes whose [continuous][@link pentaho.data.ITable#isColumnContinuous] nature
+       * 3. mappings of fields whose [continuous][@link pentaho.data.ITable#isColumnContinuous] nature
        *   is compatible with the mode's [continuous]{@link pentaho.visual.role.Mode#isContinuous} nature;
-       *   if the mode is continuous, then all mapped attributes need to be as well.
+       *   if the mode is continuous, then all mapped fields need to be as well.
        *
        * @description Creates a _tuple_ mapping strategy instance.
        * @constructor

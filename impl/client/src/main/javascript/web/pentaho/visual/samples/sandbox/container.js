@@ -41,10 +41,10 @@ define([
       _: "pentaho/visual/samples/calc/model",
       data: dataTable,
       levels: {
-        attributes: ["family"]
+        fields: ["family"]
       },
       measure: {
-        attributes: ["sales"]
+        fields: ["sales"]
       },
       operation: "avg"
     }

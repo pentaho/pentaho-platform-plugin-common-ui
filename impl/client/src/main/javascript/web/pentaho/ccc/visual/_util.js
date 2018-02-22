@@ -61,9 +61,9 @@ define([
     },
 
     // region CCC helpers
-    getCccValueTypeOfAttribute: function(attr) {
+    getCccValueTypeOfField: function(field) {
       /* eslint default-case: 0 */
-      switch(attr.type) {
+      switch(field.type) {
         case "string": return String;
         case "number": return Number;
         case "date": return Date;

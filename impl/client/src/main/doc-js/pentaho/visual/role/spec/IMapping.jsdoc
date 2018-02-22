@@ -20,7 +20,7 @@
  *
  * @example
  * {
- *   attributes: ["family", "product"]
+ *   fields: ["family", "product"]
  * }
  *
  * @name pentaho.visual.role.spec.IMapping
@@ -28,7 +28,7 @@
  * @interface
  * @extends pentaho.type.spec.IComplex
  *
- * @see pentaho.visual.role.spec.IMappingAttribute
+ * @see pentaho.visual.role.spec.IMappingField
  */
 
 /**
@@ -72,9 +72,9 @@
  */
 
 /**
- * The attributes of the visual role mapping.
+ * The fields of the visual role mapping.
  *
- * @name pentaho.visual.role.spec.IMapping#attributes
- * @type {Array.<pentaho.visual.role.spec.UMappingAttribute>}
- * @see pentaho.visual.role.Mapping#attributes
+ * @name pentaho.visual.role.spec.IMapping#fields
+ * @type {Array.<pentaho.visual.role.spec.UMappingField>}
+ * @see pentaho.visual.role.Mapping#fields
  */

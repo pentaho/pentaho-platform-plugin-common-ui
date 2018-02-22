@@ -22,9 +22,9 @@ define([
 
   return [
     "complex",
-    "pentaho/visual/role/mappingAttribute",
+    "pentaho/visual/role/mappingField",
     "pentaho/visual/role/mode",
-    function(Complex, MappingAttribute, Mode) {
+    function(Complex, MappingField, Mode) {
 
       var context = this;
 
@@ -44,16 +44,14 @@ define([
        * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.Mapping>} pentaho/visual/role/mapping
        *
        * @classDesc The `Mapping` class holds the association between
-       * a specific visual role and the data properties, here named _data attributes_,
-       * of a visualization's current dataset.
+       * a specific visual role and the data fields of a visualization's current data set.
        *
        * The mapping allows specifying three pieces of information:
        *
        * 1. an optional, fixed mode of operation, [modeFixed]{@link pentaho.visual.role.Mapping#modeFixed};
        * 2. an optional, fixed scale type, [isContinuousFixed]{@link pentaho.visual.role.Mapping#isContinuousFixed};
-       * 3. a list of associations to data properties,
-       *    [attributes]{@link pentaho.visual.role.Mapping#attributes},
-       *    each of the type {@link pentaho.visual.role.MappingAttribute}.
+       * 3. a list of associations to [fields]{@link pentaho.visual.role.Mapping#fields},
+       *    each of the type {@link pentaho.visual.role.MappingField}.
        *
        * @description Creates a visual role mapping instance.
        * @constructor
@@ -99,7 +97,7 @@ define([
          * Gets the current mapper used to obtain the values of the visual role, if any, or `null`.
          *
          * A mapper exists if the mapping is associated with a model, under a certain visual role property,
-         * and the currently mapped attributes exist in the data set
+         * and the currently mapped fields exist in the data set
          * and can be mapped to one of the visual role's modes.
          *
          * @type {pentaho.visual.role.strategies.IMapper}
@@ -140,13 +138,13 @@ define([
         },
 
         /**
-         * Gets a value that indicates if the mapping has any attributes.
+         * Gets a value that indicates if the mapping has any fields.
          *
          * @type {boolean}
          * @readonly
          */
         get isMapped() {
-          return this.attributes.count > 0;
+          return this.fields.count > 0;
         },
 
         $type: /** @lends pentaho.visual.role.Mapping.Type# */{
@@ -194,12 +192,12 @@ define([
             {name: "isContinuousFixed", valueType: "boolean"},
 
             /**
-             * Gets or sets the attributes of the visual role mapping.
+             * Gets or sets the fields of the visual role mapping.
              *
-             * @name pentaho.visual.role.Mapping#attributes
-             * @type {pentaho.type.List<pentaho.visual.role.MappingAttribute>}
+             * @name pentaho.visual.role.Mapping#fields
+             * @type {pentaho.type.List<pentaho.visual.role.MappingField>}
              */
-            {name: "attributes", valueType: [MappingAttribute]}
+            {name: "fields", valueType: [MappingField]}
           ]
         }
       })

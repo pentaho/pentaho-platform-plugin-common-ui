@@ -205,4 +205,19 @@
  * @param {string} attr - The name of an attribute.
  * @return {number} The (0-based) index of the column having the specified attribute,
  * if any, or `-1`, if none.
+ *
+ * @deprecated Use `getColumnIndexById` instead.
+ *
+ * @see pentaho.data.ITable#getColumnIndexById
+ */
+
+/**
+ * Gets the index of the first column having a given identifier.
+ *
+ * @name pentaho.data.ITable#getColumnIndexById
+ * @method
+ *
+ * @param {string} id - The column identifier.
+ * @return {number} The (0-based) index of the first column having the specified identifier,
+ * if any, or `-1`, if none.
  */

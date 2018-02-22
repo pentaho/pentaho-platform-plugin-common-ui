@@ -29,9 +29,9 @@ property.
 In this visualization, 
 because 
 each bar represents a category of the data, 
-and the _Category_ visual role is mapped to a single data attribute, 
+and the _Category_ visual role is mapped to a single field, 
 then 
-each bar corresponds to a distinct value of the mapped data attribute.
+each bar corresponds to a distinct value of the mapped field.
 
 ## Implementing the `execute` action
 
@@ -78,7 +78,7 @@ function() {
   
   bar.on("dblclick", function(d) {
     // A filter that would select the data that the bar visually represents
-    var filterSpec = { _: "=", property: categoryAttribute, value: d.category };
+    var filterSpec = { _: "=", property: categoryField, value: d.category };
 
     // Create the action.
     var action = new ExecuteAction({ dataFilter: filterSpec });
@@ -178,7 +178,7 @@ function() {
   // Part 4
   bar.on("click", function(d) {
     // A filter that would select the data that the bar visually represents
-    var filterSpec = { _: "=", property: categoryAttribute, value: d.category };
+    var filterSpec = { _: "=", property: categoryField, value: d.category };
 
     // Create the action.
     var action = new SelectAction({dataFilter: filterSpec, selectionMode: event.ctrlKey || event.metaKey ? "toggle" : "replace"});

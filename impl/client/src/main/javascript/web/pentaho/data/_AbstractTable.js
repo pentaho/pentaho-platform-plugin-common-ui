@@ -121,7 +121,7 @@ define([
     },
 
     /**
-     * Gets the index of the first column having a given attribute.
+     * Gets the index of the first column having a given name or attribute.
      *
      * Returns `-1` when:
      * * `attr` is not specified
@@ -146,6 +146,17 @@ define([
         }
       }
       return -1;
+    },
+
+    /**
+     * Gets the index of the first column having a given identifier.
+     *
+     * @param {string} id - The column identifier.
+     * @return {number} The (0-based) index of the first column having the specified identifier,
+     * if any, or `-1`, if none.
+     */
+    getColumnIndexById: function(id) {
+      return this.getColumnIndexByAttribute(id);
     },
 
     /** @inheritDoc */

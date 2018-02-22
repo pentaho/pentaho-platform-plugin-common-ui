@@ -15,29 +15,15 @@
  */
 
 /**
- * The `spec.IMappingAttribute` interface describes the _object_ form of a
- * [visual role mapping attribute]{@link pentaho.visual.role.MappingAttribute} instance.
+ * A `spec.UMappingField` represents the union of JS types that can be used to describe a
+ * [visual role mapping field]{@link pentaho.visual.role.MappingField} instance.
  *
- * @example
- * {
- *   name: "sales"
- * }
+ * When an instance is described using _object form_,
+ * its specification is of the type [spec.IMappingField]{@link pentaho.visual.role.spec.IMappingField}.
  *
- * @name pentaho.visual.role.spec.IMappingAttribute
+ * Alternatively, a single string can be used to describe an instance,
+ * in which case it is taken to be the value of
+ * the [name]{@link pentaho.visual.role.spec.IMappingField#name} property.
  *
- * @interface
- * @extends pentaho.type.spec.IComplex
- *
- * @see pentaho.visual.role.spec.IMapping
- * @see pentaho.visual.role.spec.UMappingAttribute
- */
-
-/**
- * The name of the data property.
- *
- * This property is required.
- *
- * @name pentaho.visual.role.spec.IMappingAttribute#name
- * @type {string}
- * @see pentaho.visual.role.MappingAttribute#name
+ * @typedef {pentaho.visual.role.spec.IMappingField|string} pentaho.visual.role.spec.UMappingField
  */

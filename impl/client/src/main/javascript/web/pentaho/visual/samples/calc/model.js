@@ -39,13 +39,13 @@ define([
           {
             name: "levels",
             base: "pentaho/visual/role/property",
-            attributes: {isRequired: true}
+            fields: {isRequired: true}
           },
           {
             name: "measure",
             base: "pentaho/visual/role/property",
             modes: [{dataType: "number"}],
-            attributes: {countMin: 1, countMax: 1}
+            fields: {countMin: 1, countMax: 1}
           },
           {
             name: "operation",

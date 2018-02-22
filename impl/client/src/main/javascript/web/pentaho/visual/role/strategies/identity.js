@@ -44,12 +44,12 @@ define([
        * from the data space to the visual space, and back.
        *
        * The _identity_ strategy targets:
-       * 1. Mappings with a single attribute;
+       * 1. Mappings with a single field;
        * 2. Modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} can
-       *    be assigned to the data type of the mapped attribute;
+       *    be assigned to the data type of the mapped field;
        * 3. Modes whose [continuous]{@link pentaho.visual.role.Mode#isContinuous} nature is compatible
-       *    with the [continuous]{@link pentaho.data.ITable#isColumnContinuous} nature of the mapped attribute:
-       *    if the mapped attribute is categorical it cannot be mapped to a continuous mode.
+       *    with the [continuous]{@link pentaho.data.ITable#isColumnContinuous} nature of the mapped field:
+       *    if the mapped field is categorical it cannot be mapped to a continuous mode.
        *
        * @description Creates an _identity_ mapping strategy instance.
        * @constructor

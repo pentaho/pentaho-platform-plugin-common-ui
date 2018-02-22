@@ -454,10 +454,10 @@ define([
         model = new CustomModel({
           data: new DataTable(getDatasetDT1WithTwoKeyColumns()),
           category: {
-            attributes: ["country", "city"]
+            fields: ["country", "city"]
           },
           measure: {
-            attributes: ["sales"]
+            fields: ["sales"]
           }
         });
 

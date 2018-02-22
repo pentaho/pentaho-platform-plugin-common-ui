@@ -15,59 +15,59 @@
  */
 
 /**
- * Exposes members related to the [data attributes]{@link pentaho.visual.role.Mapping#attributes}
+ * Exposes members related to the [fields]{@link pentaho.visual.role.Mapping#fields}
  * of visual roles' mappings.
  *
- * @name IPropertyAttributes
+ * @name IPropertyFields
  * @memberOf pentaho.visual.role
  * @interface
- * @see pentaho.visual.role.Mapping#attributes
+ * @see pentaho.visual.role.Mapping#fields
  */
 
 /**
- * Gets or sets a value that indicates if at least one [data attribute]{@link pentaho.visual.role.Mapping#attributes}
+ * Gets or sets a value that indicates if at least one [field]{@link pentaho.visual.role.Mapping#fields}
  * must be mapped for the visual role to be valid.
  *
  * For more information on this property see
  * [Property.Type#isRequired]{@link pentaho.type.Property.Type#isRequired}.
  *
  * @name isRequired
- * @memberOf pentaho.visual.role.IPropertyAttributes#
+ * @memberOf pentaho.visual.role.IPropertyFields#
  * @type {undefined | boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
  */
 
 /**
- * Gets or sets the minimum number of [data attributes]{@link pentaho.visual.role.Mapping#attributes}
+ * Gets or sets the minimum number of [fields]{@link pentaho.visual.role.Mapping#fields}
  * that must be mapped for the visual role to be valid.
  *
  * For more information on this property see
  * [Property.Type#countMin]{@link pentaho.type.Property.Type#countMin}.
  *
  * @name countMin
- * @memberOf pentaho.visual.role.IPropertyAttributes#
+ * @memberOf pentaho.visual.role.IPropertyFields#
  * @type {undefined | number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
  */
 
 /**
- * Gets or sets the maximum number of [data attributes]{@link pentaho.visual.role.Mapping#attributes}
+ * Gets or sets the maximum number of [fields]{@link pentaho.visual.role.Mapping#fields}
  * that can be mapped for the visual role to be valid.
  *
  * For more information on this property see
  * [Property.Type#countMax]{@link pentaho.type.Property.Type#countMax}.
  *
  * @name countMax
- * @memberOf pentaho.visual.role.IPropertyAttributes#
+ * @memberOf pentaho.visual.role.IPropertyFields#
  * @type {undefined | number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
  */
 
 /**
- * Evaluates the _data attributes count range_ of the visual role on a given visualization model.
+ * Evaluates the _fields count range_ of the visual role on a given visualization model.
  *
  * For more information on this property see
  * [Property.Type#countRangeOn]{@link pentaho.type.Property.Type#countRangeOn}.
  *
  * @name countRangeOn
- * @memberOf pentaho.visual.role.IPropertyAttributes#
+ * @memberOf pentaho.visual.role.IPropertyFields#
  * @method
  * @param {pentaho.visual.base.Model} model - The visualization model.
  * @return {pentaho.IRange<number>} The evaluated element count range.

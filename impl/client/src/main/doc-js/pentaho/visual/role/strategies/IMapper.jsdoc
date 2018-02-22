@@ -16,7 +16,7 @@
 
 /**
  * The `IMapper` interface describes an object that can map
- * certain attributes of a certain data set to the value of a visual role,
+ * certain fields of a certain data set to the value of a visual role,
  * which is operating in a certain [mode]{@link pentaho.visual.role.strategies.IMapper#mode}.
  *
  * @name pentaho.visual.role.strategies.IMapper

@@ -521,7 +521,7 @@ define([
           var columnNameToIdx = {};
 
           keyColumnNames.forEach(function(columnName) {
-            var colIdx = dataTable.getColumnIndexByAttribute(columnName);
+            var colIdx = dataTable.getColumnIndexById(columnName);
             if(colIdx === -1) {
               throw error.argInvalid("keyColumnNames", "The column name " + columnName + " is not in the dataTable.");
             }

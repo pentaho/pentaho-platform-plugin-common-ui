@@ -63,15 +63,13 @@ define([
        *
        * The [valueType]{@link pentaho.type.Property.Type#valueType} of a property of this type is
        * [Mapping]{@link pentaho.visual.role.Mapping} and
-       * stores the association between the visual role and the data properties, here named _data attributes_,
-       * of a visualization's current dataset.
+       * stores the association between the visual role and the data fields of a visualization's current dataset.
        * The mapping holds two pieces of information:
        *
        * 1. an optional, fixed [level of measurement]{@link pentaho.visual.role.Mapping#level}
        *    in which the visual role should operate
-       * 2. a list of associations to data properties,
-       *    [attributes]{@link pentaho.visual.role.Mapping#attributes},
-       *    each of the type {@link pentaho.visual.role.MappingAttribute}.
+       * 2. a list of associations to [fields]{@link pentaho.visual.role.Mapping#fields},
+       *    each of the type {@link pentaho.visual.role.MappingField}.
        *
        * @description This class was not designed to be constructed directly.
        */
@@ -377,12 +375,12 @@ define([
           // endregion
 
           dynamicAttributes: {
-            // Exposed through IPropertyAttributes.isRequired
-            // Additionally defines __attrsIsRequiredOn
-            __attrsIsRequired: {
+            // Exposed through IPropertyFields.isRequired
+            // Additionally defines __fieldsIsRequiredOn
+            __fieldsIsRequired: {
               value: false,
               cast: Boolean,
-              group: "attributes",
+              group: "fields",
               localName: "isRequired",
               combine: function(baseEval, localEval) {
                 return function(propType) {
@@ -392,12 +390,12 @@ define([
               }
             },
 
-            // Exposed through IPropertyAttributes.countMin
-            // Additionally defines __attrsCountMinOn
-            __attrsCountMin: {
+            // Exposed through IPropertyFields.countMin
+            // Additionally defines __fieldsCountMinOn
+            __fieldsCountMin: {
               value: 0,
               cast: __castCount,
-              group: "attributes",
+              group: "fields",
               localName: "countMin",
               combine: function(baseEval, localEval) {
                 return function(propType) {
@@ -406,12 +404,12 @@ define([
               }
             },
 
-            // Exposed through IPropertyAttributes.countMax
-            // Additionally defines __attrsCountMaxOn
-            __attrsCountMax: {
+            // Exposed through IPropertyFields.countMax
+            // Additionally defines __fieldsCountMaxOn
+            __fieldsCountMax: {
               value: Infinity,
               cast: __castCount,
-              group: "attributes",
+              group: "fields",
               localName: "countMax",
               combine: function(baseEval, localEval) {
                 return function(propType) {
@@ -421,14 +419,14 @@ define([
             }
           },
 
-          // region attributes
+          // region fields
           /*
-           * Actually implements IPropertyAttributes#countRangeOn.
+           * Actually implements IPropertyFields#countRangeOn.
            */
-          __attrsCountRangeOn: function(model) {
-            var isRequired = this.__attrsIsRequiredOn(model);
-            var countMin = this.__attrsCountMinOn(model);
-            var countMax = this.__attrsCountMaxOn(model);
+          __fieldsCountRangeOn: function(model) {
+            var isRequired = this.__fieldsIsRequiredOn(model);
+            var countMin = this.__fieldsCountMinOn(model);
+            var countMax = this.__fieldsCountMaxOn(model);
 
             if(isRequired && countMin < 1) countMin = 1;
 
@@ -438,52 +436,52 @@ define([
           },
 
           /**
-           * Gets or sets the attributes metadata related with this visual role property.
+           * Gets or sets the fields metadata related with this visual role property.
            *
-           * @type {!pentaho.visual.role.IPropertyAttributes}
+           * @type {!pentaho.visual.role.IPropertyFields}
            */
-          get attributes() {
-            var attrs = O.getOwn(this, "__attrs");
-            if(!attrs) {
+          get fields() {
+            var fields = O.getOwn(this, "__fields");
+            if(!fields) {
 
               var propType = this;
 
-              this.__attrs = attrs = {
+              this.__fields = fields = {
                 get isRequired() {
-                  return propType.__attrsIsRequired;
+                  return propType.__fieldsIsRequired;
                 },
                 set isRequired(value) {
-                  propType.__attrsIsRequired = value;
+                  propType.__fieldsIsRequired = value;
                 },
                 get countMin() {
-                  return propType.__attrsCountMin;
+                  return propType.__fieldsCountMin;
                 },
                 set countMin(value) {
-                  propType.__attrsCountMin = value;
+                  propType.__fieldsCountMin = value;
                 },
                 get countMax() {
-                  return propType.__attrsCountMax;
+                  return propType.__fieldsCountMax;
                 },
                 set countMax(value) {
-                  propType.__attrsCountMax = value;
+                  propType.__fieldsCountMax = value;
                 },
                 countRangeOn: function(model) {
-                  return propType.__attrsCountRangeOn(model);
+                  return propType.__fieldsCountRangeOn(model);
                 }
               };
             }
-            return attrs;
+            return fields;
           },
 
-          set attributes(value) {
+          set fields(value) {
 
             if(!value) return;
 
-            var attrs = this.attributes;
+            var fields = this.fields;
 
-            if("isRequired" in value) attrs.isRequired = value.isRequired;
-            if("countMin" in value) attrs.countMin = value.countMin;
-            if("countMax" in value) attrs.countMax = value.countMax;
+            if("isRequired" in value) fields.isRequired = value.isRequired;
+            if("countMin" in value) fields.countMin = value.countMin;
+            if("countMax" in value) fields.countMax = value.countMax;
           },
           // endregion
 
@@ -509,9 +507,9 @@ define([
           getMapperOn: function(model) {
 
             var mapping = model.get(this);
-            var attributes = mapping.attributes;
+            var fields = mapping.fields;
 
-            if(attributes.count === 0) {
+            if(fields.count === 0) {
               return null;
             }
 
@@ -520,20 +518,20 @@ define([
               return null;
             }
 
-            // Obtain column indexes of attributes.
-            var anyInvalidAttribute = false;
+            // Obtain column indexes of fields.
+            var anyInvalidField = false;
 
-            var columnIndexes = attributes.toArray(function(attr) {
+            var columnIndexes = fields.toArray(function(field) {
 
-              var index = dataTable.getColumnIndexByAttribute(attr.name);
+              var index = dataTable.getColumnIndexById(field.name);
 
-              anyInvalidAttribute |= (index < 0);
+              anyInvalidField |= (index < 0);
 
               return index;
             });
 
-            // Leave if any invalid attribute names.
-            if(anyInvalidAttribute) {
+            // Leave if any invalid field names.
+            if(anyInvalidField) {
               return null;
             }
 
@@ -604,16 +602,16 @@ define([
            *
            * 1. If the visualization model has a `null` [data]{@link pentaho.visual.base.Model#data},
            *    then every data property in the current mapping's
-           *    [attributes]{@link pentaho.visual.role.Mapping#attributes} is considered undefined and invalid
+           *    [fields]{@link pentaho.visual.role.Mapping#fields} is considered undefined and invalid
            * 2. Otherwise, if the visual model has a non-`null` [data]{@link pentaho.visual.base.Model#data},
-           *    then each data property in the current mapping's
-           *    [attributes]{@link pentaho.visual.role.Mapping#attributes} must be defined in `data`
-           * 3. The number of currently mapped [attributes]{@link pentaho.visual.role.Mapping#attributes} must satisfy
+           *    then each field in the current mapping's
+           *    [fields]{@link pentaho.visual.role.Mapping#fields} must be defined in `data`
+           * 3. The number of currently mapped [fields]{@link pentaho.visual.role.Mapping#fields} must satisfy
            *    the usual property cardinality constraints,
-           *    according to [Property.Type#attributes]{@link pentaho.visual.role.Property.Type#attributes}
-           * 4. There can be no two mapping attributes with the same
-           *    [name]{@link pentaho.visual.role.MappingAttribute#name}
-           * 5. One of the defined strategies must be able to map the specified attributes to one of the visual role's
+           *    according to [Property.Type#fields]{@link pentaho.visual.role.Property.Type#fields}
+           * 4. There can be no two mapping fields with the same
+           *    [name]{@link pentaho.visual.role.MappingField#name}
+           * 5. One of the defined strategies must be able to map the specified fields to one of the visual role's
            *    modes.
            *
            * @param {!pentaho.visual.base.Model} model - The visualization model.
@@ -631,12 +629,12 @@ define([
               var mapping = model.get(this);
 
               // Cardinality validation
-              var range = this.__attrsCountRangeOn(model);
-              var count = mapping.attributes.count;
+              var range = this.__fieldsCountRangeOn(model);
+              var count = mapping.fields.count;
               if(count < range.min) {
                 addErrors(new ValidationError(
                     bundleTypes.get("errors.property.countOutOfRange", [
-                      this.label + " " + mapping.$type.get("attributes").label,
+                      this.label + " " + mapping.$type.get("fields").label,
                       count,
                       range.min,
                       range.max
@@ -645,7 +643,7 @@ define([
               } else if(count > range.max) {
                 addErrors(new ValidationError(
                     bundleTypes.get("errors.property.countOutOfRange", [
-                      this.label + " " + mapping.$type.get("attributes").label,
+                      this.label + " " + mapping.$type.get("fields").label,
                       count,
                       range.min,
                       range.max
@@ -653,13 +651,13 @@ define([
               }
 
               if(!errors && count > 0) {
-                // Data props are defined in data and of a type compatible with the role's dataType.
-                this.__validateDataPropsOn(model, mapping, addErrors);
+                // Fields are defined in data and of a type compatible with the role's dataType.
+                this.__validateFieldsOn(model, mapping, addErrors);
 
-                // Duplicate mapped attributes.
+                // Duplicate mapped fields.
                 // Only possible to validate when the rest of the stuff is valid.
                 if(!errors) {
-                  this.__validateDuplMappingAttrsOn(model, mapping, addErrors);
+                  this.__validateDuplMappingFieldsOn(model, mapping, addErrors);
 
                   if(!errors) {
                     // modeFixed must be defined.
@@ -685,7 +683,7 @@ define([
           },
 
           /**
-           * Validates that every mapped attribute references a defined data property in the
+           * Validates that every mapped field references a defined column in the
            * data of the visual model.
            *
            * Assumes the mapping is valid according to the base complex validation.
@@ -695,24 +693,24 @@ define([
            * @param {function} addErrors - Called to add errors.
            * @private
            */
-          __validateDataPropsOn: function(model, mapping, addErrors) {
+          __validateFieldsOn: function(model, mapping, addErrors) {
 
             var data = model.data;
             var dataAttrs = data && data.model.attributes;
 
             var i = -1;
-            var roleAttrs = mapping.attributes;
-            var L = roleAttrs.count;
+            var mappingFields = mapping.fields;
+            var L = mappingFields.count;
             while(++i < L) {
-              var roleAttr = roleAttrs.at(i);
-              var name = roleAttr.name;
+              var mappingField = mappingFields.at(i);
+              var name = mappingField.name;
 
-              // Attribute with no definition?
+              // Field with no definition?
               var dataAttr = dataAttrs && dataAttrs.get(name);
               if(!dataAttr) {
                 addErrors(new ValidationError(
                   bundle.format(
-                    bundle.structured.errors.property.attributeIsNotDefinedInVisualModelData,
+                    bundle.structured.errors.property.fieldIsNotDefinedInVisualModelData,
                     {
                       name: name,
                       role: this
@@ -723,17 +721,17 @@ define([
           },
 
           /**
-           * Validates that mapped attributes are not duplicates.
+           * Validates that the mapping fields have no duplicates.
            *
            * @param {!pentaho.visual.base.Model} model - The visualization model.
            * @param {!pentaho.visual.role.Mapping} mapping - The mapping.
            * @param {function} addErrors - Called to add errors.
            * @private
            */
-          __validateDuplMappingAttrsOn: function(model, mapping, addErrors) {
+          __validateDuplMappingFieldsOn: function(model, mapping, addErrors) {
 
-            var roleAttrs = mapping.attributes;
-            var L = roleAttrs.count;
+            var mappingFields = mapping.fields;
+            var L = mappingFields.count;
             if(L <= 1) return;
 
             var data = mapping.model.data;
@@ -742,11 +740,11 @@ define([
             var byKey = {};
             var i = -1;
             while(++i < L) {
-              var roleAttr = roleAttrs.at(i);
-              var key = roleAttr.name;
+              var mappingField = mappingFields.at(i);
+              var key = mappingField.name;
               if(O.hasOwn(byKey, key)) {
-                var dataAttr = dataAttrs.get(roleAttr.name);
-                var errorMessage = bundle.format(bundle.structured.errors.property.attributeDuplicate, {
+                var dataAttr = dataAttrs.get(mappingField.name);
+                var errorMessage = bundle.format(bundle.structured.errors.property.fieldDuplicate, {
                   name: dataAttr,
                   role: this
                 });
@@ -755,7 +753,7 @@ define([
                 continue;
               }
 
-              byKey[key] = roleAttr;
+              byKey[key] = mappingField;
             }
           },
           // endregion
@@ -764,7 +762,7 @@ define([
           /** @inheritDoc */
           _fillSpecInContext: function(spec, keyArgs) {
 
-            // The dynamic attributes: attributes.countMin/countMax/isRequired are handled
+            // The dynamic attributes: fields.countMin/countMax/isRequired are handled
             // by the Type base class.
 
             var any = this.base(spec, keyArgs);

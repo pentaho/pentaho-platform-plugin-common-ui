@@ -23,7 +23,7 @@ define([
 
   /* globals describe, it, beforeEach, spyOn */
 
-  describe("pentaho.visual.role.MappingAttribute", function() {
+  describe("pentaho.visual.role.MappingField", function() {
 
     function getDataSpec1() {
       return {
@@ -42,7 +42,7 @@ define([
 
     var VisualModel;
     var Mapping;
-    var MappingAttribute;
+    var MappingField;
 
     beforeEach(function(done) {
 
@@ -52,11 +52,11 @@ define([
             return context.getDependencyApplyAsync([
               "pentaho/visual/base/model",
               "pentaho/visual/role/mapping",
-              "pentaho/visual/role/mappingAttribute"
-            ], function(_Model, _Mapping, _MappingAttribute) {
+              "pentaho/visual/role/mappingField"
+            ], function(_Model, _Mapping, _MappingField) {
               VisualModel = _Model;
               Mapping = _Mapping;
-              MappingAttribute = _MappingAttribute;
+              MappingField = _MappingField;
             });
           })
           .then(done, done.fail);
@@ -68,8 +68,8 @@ define([
       it("should allow creating with a spec object", function() {
 
         var name = "foo";
-        var mapping = new MappingAttribute({name: name});
-        expect(mapping instanceof MappingAttribute).toBe(true);
+        var mapping = new MappingField({name: name});
+        expect(mapping instanceof MappingField).toBe(true);
 
         expect(mapping.name).toBe(name);
       });
@@ -77,8 +77,8 @@ define([
       it("should allow creating with a string and recognize it as the name property", function() {
 
         var name = "foo";
-        var mapping = new MappingAttribute(name);
-        expect(mapping instanceof MappingAttribute).toBe(true);
+        var mapping = new MappingField(name);
+        expect(mapping instanceof MappingField).toBe(true);
 
         expect(mapping.name).toBe(name);
       });
@@ -98,31 +98,31 @@ define([
         }});
 
         derived = new DerivedModel({
-          propRole: {attributes: ["a", "b", "c"]}
+          propRole: {fields: ["a", "b", "c"]}
         });
         mapping = derived.propRole;
       });
 
       it("should have #mapping return the parent mapping", function() {
-        expect(mapping.attributes.at(0).mapping).toBe(mapping);
+        expect(mapping.fields.at(0).mapping).toBe(mapping);
       });
 
       it("should have #mapping return `null` when there is no parent mapping", function() {
-        expect(new MappingAttribute().mapping).toBe(null);
+        expect(new MappingField().mapping).toBe(null);
       });
 
       it("should have #model return the parent mapping's model", function() {
-        expect(mapping.attributes.at(0).model).toBe(derived);
+        expect(mapping.fields.at(0).model).toBe(derived);
       });
 
       it("should have #model return `null` when there is no parent mapping", function() {
-        expect(new MappingAttribute().model).toBe(null);
+        expect(new MappingField().model).toBe(null);
       });
 
       it("should have #model return `null` when the parent mapping has no model", function() {
-        var mappingNoModel = new Mapping({attributes: ["a", "b", "c"]});
+        var mappingNoModel = new Mapping({fields: ["a", "b", "c"]});
 
-        expect(mappingNoModel.attributes.at(0).model).toBe(null);
+        expect(mappingNoModel.fields.at(0).model).toBe(null);
       });
     });
 
@@ -141,51 +141,51 @@ define([
 
         derived = new DerivedModel({
           propRole: {
-            attributes: ["undefined", "country", "date"]
+            fields: ["undefined", "country", "date"]
           }
         });
 
         mapping = derived.propRole;
       });
 
-      it("should return null if the mapping attribute has no name", function() {
+      it("should return null if the mapping field has no name", function() {
 
-        expect(new MappingAttribute().__dataAttribute).toBe(null);
+        expect(new MappingField().__dataAttribute).toBe(null);
       });
 
-      it("should return null if the mapping attribute has name but no parent mapping", function() {
+      it("should return null if the mapping field has name but no parent mapping", function() {
 
-        expect(new MappingAttribute({name: "a"}).__dataAttribute).toBe(null);
+        expect(new MappingField({name: "a"}).__dataAttribute).toBe(null);
       });
 
-      it("should return null if the mapping attribute has name, parent mapping, but no model", function() {
+      it("should return null if the mapping field has name, parent mapping, but no model", function() {
 
         var mappingWithNoModel = new Mapping({
-          attributes: ["a", "b", "c"]
+          fields: ["a", "b", "c"]
         });
 
-        expect(mappingWithNoModel.attributes.at(0).__dataAttribute).toBe(null);
+        expect(mappingWithNoModel.fields.at(0).__dataAttribute).toBe(null);
       });
 
-      it("should return null if the mapping attribute has name, parent mapping, model but no data", function() {
+      it("should return null if the mapping field has name, parent mapping, model but no data", function() {
 
-        expect(mapping.attributes.at(0).__dataAttribute).toBe(null);
+        expect(mapping.fields.at(0).__dataAttribute).toBe(null);
       });
 
-      it("should return null if the mapping attribute has name, parent mapping, model, data, " +
-         "but attribute is not defined", function() {
+      it("should return null if the mapping field has name, parent mapping, model, data, " +
+         "but field is not defined", function() {
 
         derived.data = new Table(getDataSpec1());
 
-        expect(mapping.attributes.at(0).__dataAttribute).toBe(null);
+        expect(mapping.fields.at(0).__dataAttribute).toBe(null);
       });
 
-      it("should return the data table attribute if the mapping attribute has name, parent mapping, model, data, " +
+      it("should return the data table attribute if the mapping field has name, parent mapping, model, data, " +
           "and exists in the data table", function() {
 
         var data = derived.data = new Table(getDataSpec1());
 
-        expect(mapping.attributes.at(1).__dataAttribute).toBe(data.model.attributes.get("country"));
+        expect(mapping.fields.at(1).__dataAttribute).toBe(data.model.attributes.get("country"));
       });
     });
 
@@ -201,7 +201,7 @@ define([
       it("should return a string when only the name property is serialized", function() {
         function expectIt(serializeOptions) {
           var name = "foo";
-          var mapping = new MappingAttribute({name: name});
+          var mapping = new MappingField({name: name});
 
           var result = mapping.toSpecInContext(serializeOptions);
 
@@ -216,7 +216,7 @@ define([
 
       it("should return an array when the base serialization is an array", function() {
 
-        var mapping = new MappingAttribute({name: "foo"});
+        var mapping = new MappingField({name: "foo"});
 
         var result = mapping.toSpecInContext({includeDefaults: false, preferPropertyArray: true});
 

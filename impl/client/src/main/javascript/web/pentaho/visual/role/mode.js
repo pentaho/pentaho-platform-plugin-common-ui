@@ -90,7 +90,7 @@ define([
             // Non-consistency example 1: {dataType: "geoName", isContinuous: true}
             // The visualization does the geo localization itself...
             // Non-consistency example 2: {dataType: ["number"], isContinuous: true}
-            // Generic measure use case. Each attribute is handled directly.
+            // Generic measure use case. Each field is handled directly.
             /**
              * Gets the type of scale, continuous or categorical,
              * used by the associated visual role to encode values when operating in this mode.

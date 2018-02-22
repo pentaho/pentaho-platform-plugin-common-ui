@@ -67,21 +67,21 @@ define([
 
     describe("#isMapped", function() {
 
-      it("should be false when it has zero attributes", function() {
+      it("should be false when it has zero fields", function() {
 
         var mapping = new Mapping();
         expect(mapping.isMapped).toBe(false);
       });
 
-      it("should be true when it has one attribute", function() {
+      it("should be true when it has one field", function() {
 
-        var mapping = new Mapping({attributes: ["foo"]});
+        var mapping = new Mapping({fields: ["foo"]});
         expect(mapping.isMapped).toBe(true);
       });
 
-      it("should be true when it has two attributes", function() {
+      it("should be true when it has two fields", function() {
 
-        var mapping = new Mapping({attributes: ["foo", "bar"]});
+        var mapping = new Mapping({fields: ["foo", "bar"]});
         expect(mapping.isMapped).toBe(true);
       });
     });
@@ -134,7 +134,7 @@ define([
 
           var model = new CustomModel({
             data: new Table(getDataSpec1()),
-            propRoleA: {attributes: ["country"]}
+            propRoleA: {fields: ["country"]}
           });
           var mapping = model.propRoleA;
 
@@ -170,7 +170,7 @@ define([
 
           var model = new CustomModel({
             data: new Table(getDataSpec1()),
-            propRoleA: {attributes: ["country"]}
+            propRoleA: {fields: ["country"]}
           });
           var mapping = model.propRoleA;
 
@@ -207,7 +207,7 @@ define([
 
           var model = new CustomModel({
             data: new Table(getDataSpec1()),
-            propRoleA: {attributes: ["country"]}
+            propRoleA: {fields: ["country"]}
           });
           var mapping = model.propRoleA;
 
@@ -252,7 +252,7 @@ define([
 
           model = new CustomModel({
             data: new Table(getDataSpec1()),
-            propRoleA: {attributes: ["country"]}
+            propRoleA: {fields: ["country"]}
           });
 
           propType = CustomModel.type.get("propRoleA");
@@ -324,7 +324,7 @@ define([
           var mapper = {};
           spyOn(propType, "getMapperOn").and.returnValue(mapper);
 
-          model.propRoleA.attributes = ["product"];
+          model.propRoleA.fields = ["product"];
 
           txnScope.accept();
 

@@ -92,7 +92,7 @@ define(function() {
 
       Object.keys(cellsMap).forEach(function(columnId) {
 
-        var columnIndex = dataTable.getColumnIndexByAttribute(columnId);
+        var columnIndex = dataTable.getColumnIndexById(columnId);
         if(columnIndex >= 0) {
 
           var cell = cellsMap[columnId];

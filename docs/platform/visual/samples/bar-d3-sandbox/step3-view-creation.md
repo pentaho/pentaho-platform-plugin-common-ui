@@ -125,8 +125,8 @@ Edit the `sandbox.html` file and place the following code in it:
             // Create the visualization model.
             var modelSpec = {
               "data": new Table(dataSpec),
-              "category": { attributes: ["productFamily"] },
-              "measure": { attributes: ["sales"] }
+              "category": {fields: ["productFamily"]},
+              "measure": {fields: ["sales"]}
             };
 
             var model = new types.BarModel(modelSpec);
@@ -219,11 +219,11 @@ function() {
   var model = this.model;
   var dataTable = model.data;
     
-  var categoryAttribute = model.category.attributes.at(0).name;
-  var measureAttribute = model.measure.attributes.at(0).name;
+  var categoryField = model.category.fields.at(0).name;
+  var measureField = model.measure.fields.at(0).name;
     
-  var categoryColumn = dataTable.getColumnIndexByAttribute(categoryAttribute);
-  var measureColumn = dataTable.getColumnIndexByAttribute(measureAttribute);
+  var categoryColumn = dataTable.getColumnIndexById(categoryField);
+  var measureColumn = dataTable.getColumnIndexById(measureField);
     
   var scenes = this.__buildScenes(dataTable, categoryColumn, measureColumn);
     
@@ -236,8 +236,8 @@ function() {
 Remarks:
   - [this.model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#model'}}) 
     gives you access to the visualization model object.
-  - Both the visual roles are required, so it is safe to directly read the first mapped attribute.
-  - Most data table methods accept column indexes, so attribute names are converted into column indexes.
+  - Both the visual roles are required, so it is safe to directly read the first mapped field.
+  - Most data table methods accept column indexes, so field names are converted into column indexes.
   - The data in the data table needs to be converted into an "array of plain objects" form, 
     so that then it can be directly consumed by D3.
   - [this.domContainer]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#domContainer'}})
@@ -361,7 +361,7 @@ Remarks:
   - The view dimensions are available through 
     [this.width]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#width'}}) and 
     [this.height]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#height'}}).
-  - The chart title is build with the labels of the mapped attributes, by calling 
+  - The chart title is build with the labels of the mapped fields, by calling 
     [getColumnLabel]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.ITable' | append: '#getColumnLabel'}}).
   - The Bar model's `barSize` property is being used to limit the width of bars.
   - The rowIndex is being used to cycle through and select the bar color from the `palette` property.

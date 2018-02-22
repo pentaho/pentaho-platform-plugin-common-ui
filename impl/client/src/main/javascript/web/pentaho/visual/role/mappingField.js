@@ -25,22 +25,22 @@ define([
     function(Complex) {
 
       /**
-       * @name pentaho.visual.role.MappingAttribute
+       * @name pentaho.visual.role.MappingField
        * @class
        * @extends pentaho.type.Complex
        *
-       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.MappingAttribute>} pentaho/visual/role/mappingAttribute
+       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.MappingField>} pentaho/visual/role/mappingField
        *
-       * @classDesc The `MappingAttribute` class represents a data property in a
+       * @classDesc The `MappingField` class represents a data property in a
        * [visual role mapping]{@link pentaho.visual.role.Mapping}.
        *
        * @see pentaho.visual.role.Mapping
        *
-       * @description Creates a visual role mapping attribute instance.
+       * @description Creates a visual role mapping field instance.
        * @constructor
-       * @param {pentaho.visual.role.spec.UMappingAttribute} [spec] A visual role mapping attribute specification.
+       * @param {pentaho.visual.role.spec.UMappingField} [spec] A visual role mapping field specification.
        */
-      return Complex.extend("pentaho.visual.role.MappingAttribute", /** @lends pentaho.visual.role.MappingAttribute# */{
+      return Complex.extend("pentaho.visual.role.MappingField", /** @lends pentaho.visual.role.MappingField# */{
 
         constructor: function(spec, keyArgs) {
           // The name property?
@@ -50,19 +50,19 @@ define([
         },
 
         /**
-         * Gets the visual role mapping that owns this mapping attribute, if any, or `null`.
+         * Gets the visual role mapping that owns this mapping field, if any, or `null`.
          *
          * @type {pentaho.visual.base.role.Mapping}
          * @readonly
          */
         get mapping() {
-          // TODO: Test it is an attributes list of a mapping...
-          var attrsList = typeUtil.__getFirstRefContainer(this);
-          return attrsList && typeUtil.__getFirstRefContainer(attrsList);
+          // TODO: Test it is a fields list of a mapping...
+          var fieldsList = typeUtil.__getFirstRefContainer(this);
+          return fieldsList && typeUtil.__getFirstRefContainer(fieldsList);
         },
 
         /**
-         * Gets the visual model that owns this visual role mapping attribute, if any, or `null`.
+         * Gets the visual model that owns this visual role mapping field, if any, or `null`.
          *
          * @type {pentaho.visual.base.Model}
          * @readonly
@@ -73,15 +73,16 @@ define([
         },
 
         /**
-         * Gets the data attribute referenced by this visual role mapping attribute.
+         * Gets the _data attribute_ referenced by this visual role mapping field.
          *
          * @type {pentaho.data.Attribute}
          * @private
          * @readonly
+         * @deprecated
          *
-         * @see pentaho.visual.role.MappingAttribute#name
-         * @see pentaho.visual.role.MappingAttribute#mapping
-         * @see pentaho.visual.role.MappingAttribute#model
+         * @see pentaho.visual.role.MappingField#name
+         * @see pentaho.visual.role.MappingField#mapping
+         * @see pentaho.visual.role.MappingField#model
          */
         get __dataAttribute() {
           var name = this.name;
@@ -127,15 +128,15 @@ define([
              *
              * This property is required.
              *
-             * @name pentaho.visual.role.MappingAttribute#name
+             * @name pentaho.visual.role.MappingField#name
              * @type {string}
-             * @see pentaho.visual.role.spec.IMappingAttribute#name
+             * @see pentaho.visual.role.spec.IMappingField#name
              */
             {name: "name", valueType: "string", isRequired: true}
           ]
         }
       })
-      .implement({$type: bundle.structured.mappingAttribute});
+      .implement({$type: bundle.structured.MappingField});
     }
   ];
 });

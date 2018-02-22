@@ -106,7 +106,7 @@ define([
 
         var model = new DerivedVisualModel({
           data: data,
-          propRole: {attributes: ["country", "product"]}
+          propRole: {fields: ["country", "product"]}
         });
 
         assertIsValid(model);
@@ -120,7 +120,7 @@ define([
       }
       // endregion
 
-      // region role property attributes
+      // region role property modes
       describe("#modes", function() {
 
         it("should default to a single mode having data type string and isContinuous false", function() {
@@ -756,9 +756,9 @@ define([
         });
       });
 
-      describe("#attributes", function() {
+      describe("#fields", function() {
 
-        it("should get an object that conforms to the interface IPropertyAttributes", function() {
+        it("should get an object that conforms to the interface IPropertyFields", function() {
 
           var Model = VisualModel.extend({
             $type: {
@@ -771,13 +771,13 @@ define([
           });
 
           var rolePropType = Model.type.get("propRole");
-          var attrs = rolePropType.attributes;
+          var fields = rolePropType.fields;
 
-          expect(attrs instanceof Object).toBe(true);
-          expect("isRequired" in attrs).toBe(true);
-          expect("countMin" in attrs).toBe(true);
-          expect("countMax" in attrs).toBe(true);
-          expect("countRangeOn" in attrs).toBe(true);
+          expect(fields instanceof Object).toBe(true);
+          expect("isRequired" in fields).toBe(true);
+          expect("countMin" in fields).toBe(true);
+          expect("countMax" in fields).toBe(true);
+          expect("countRangeOn" in fields).toBe(true);
         });
 
         it("should get the same object each time", function() {
@@ -793,15 +793,15 @@ define([
           });
 
           var rolePropType = Model.type.get("propRole");
-          var attrs1 = rolePropType.attributes;
-          var attrs2 = rolePropType.attributes;
+          var fields1 = rolePropType.fields;
+          var fields2 = rolePropType.fields;
 
-          expect(attrs1).toBe(attrs2);
+          expect(fields1).toBe(fields2);
         });
 
         it("should set only the specified properties", function() {
 
-          var attrsSpec0 = {
+          var fieldsSpec0 = {
             isRequired: function() {},
             countMin: function() {},
             countMax: function() {}
@@ -812,23 +812,23 @@ define([
               props: {
                 propRole: {
                   base: "pentaho/visual/role/property",
-                  attributes: attrsSpec0
+                  fields: fieldsSpec0
                 }
               }
             }
           });
 
-          var attrsSpec1 = {
+          var fieldsSpec1 = {
             isRequired: function() {}
           };
 
           var rolePropType = Model.type.get("propRole");
 
-          rolePropType.attributes = attrsSpec1;
+          rolePropType.fields = fieldsSpec1;
 
-          expect(rolePropType.attributes.isRequired).toBe(attrsSpec1.isRequired);
-          expect(rolePropType.attributes.countMin).toBe(attrsSpec0.countMin);
-          expect(rolePropType.attributes.countMax).toBe(attrsSpec0.countMax);
+          expect(rolePropType.fields.isRequired).toBe(fieldsSpec1.isRequired);
+          expect(rolePropType.fields.countMin).toBe(fieldsSpec0.countMin);
+          expect(rolePropType.fields.countMax).toBe(fieldsSpec0.countMax);
         });
       });
       // endregion
@@ -879,7 +879,7 @@ define([
 
           var propType = CustomModel.type.get("roleA");
           var model = new CustomModel({
-            roleA: {attributes: ["country"]}
+            roleA: {fields: ["country"]}
           });
 
           var mapper = propType.getMapperOn(model);
@@ -887,7 +887,7 @@ define([
           expect(mapper).toBe(null);
         });
 
-        it("should return null if one of the mapped attributes is not defined", function() {
+        it("should return null if one of the mapped fields is not defined", function() {
 
           var CustomModel = VisualModel.extend({
             $type: {
@@ -905,7 +905,7 @@ define([
 
           var propType = CustomModel.type.get("roleA");
           var model = new CustomModel({
-            roleA: {attributes: ["foo"]}
+            roleA: {fields: ["foo"]}
           });
 
           var mapper = propType.getMapperOn(model);
@@ -938,7 +938,7 @@ define([
               data: new Table(getDataSpec1()),
               roleA: {
                 modeFixed: {dataType: "string"},
-                attributes: ["country"]
+                fields: ["country"]
               }
             });
 
@@ -971,7 +971,7 @@ define([
               data: new Table(getDataSpec1()),
               roleA: {
                 modeFixed: {dataType: "string"},
-                attributes: ["country"]
+                fields: ["country"]
               }
             });
 
@@ -1014,7 +1014,7 @@ define([
               data: new Table(getDataSpec1()),
               roleA: {
                 modeFixed: {dataType: "string"},
-                attributes: ["country"]
+                fields: ["country"]
               }
             });
 
@@ -1053,7 +1053,7 @@ define([
               data: new Table(getDataSpec1()),
               roleA: {
                 isContinuousFixed: true,
-                attributes: ["country"]
+                fields: ["country"]
               }
             });
 
@@ -1083,7 +1083,7 @@ define([
               data: new Table(getDataSpec1()),
               roleA: {
                 isContinuousFixed: false,
-                attributes: ["country"]
+                fields: ["country"]
               }
             });
 
@@ -1115,7 +1115,7 @@ define([
               data: new Table(getDataSpec1()),
               roleA: {
                 isContinuousFixed: true,
-                attributes: ["sales"]
+                fields: ["sales"]
               }
             });
 
@@ -1147,7 +1147,7 @@ define([
               data: new Table(getDataSpec1()),
               roleA: {
                 isContinuousFixed: false,
-                attributes: ["country"]
+                fields: ["country"]
               }
             });
 
@@ -1183,7 +1183,7 @@ define([
             var model = new CustomModel({
               data: new Table(getDataSpec1()),
               roleA: {
-                attributes: ["country", "sales"]
+                fields: ["country", "sales"]
               }
             });
 
@@ -1225,7 +1225,7 @@ define([
             var model = new CustomModel({
               data: new Table(getDataSpec1()),
               roleA: {
-                attributes: ["country"]
+                fields: ["country"]
               }
             });
 
@@ -1277,10 +1277,10 @@ define([
               var rolePropType = Model.type.get("propRole");
 
               var model = new Model({
-                propRole: {attributes: [{}]}
+                propRole: {fields: [{}]}
               });
 
-              expect(model.propRole.attributes.count).toBe(1);
+              expect(model.propRole.fields.count).toBe(1);
 
               // Assumptions
               var errors = rolePropType.validateOn(model);
@@ -1288,14 +1288,14 @@ define([
               expect(errors.length).toBe(1);
             });
 
-            it("should be invalid when attributes.isRequired and there are no attributes", function() {
+            it("should be invalid when fields.isRequired and there are no fields", function() {
 
               var Model = VisualModel.extend({
                 $type: {
                   props: {
                     propRole: {
                       base: "pentaho/visual/role/property",
-                      attributes: {
+                      fields: {
                         isRequired: true
                       }
                     }
@@ -1315,7 +1315,7 @@ define([
               ]);
             });
 
-            it("should be valid when attributes.isRequired and there are attributes", function() {
+            it("should be valid when fields.isRequired and there are fields", function() {
 
               var Model = VisualModel.extend({
                 $type: {
@@ -1324,7 +1324,7 @@ define([
                       base: "pentaho/visual/role/property",
                       modes: [{valueType: "string"}],
                       strategies: [new IdentityStrategy()],
-                      attributes: {
+                      fields: {
                         isRequired: true
                       }
                     }
@@ -1336,7 +1336,7 @@ define([
 
               var model = new Model({
                 data: new Table(getDataSpec1()),
-                propRole: {attributes: ["country"]}
+                propRole: {fields: ["country"]}
               });
 
               var errors = rolePropType.validateOn(model);
@@ -1344,7 +1344,7 @@ define([
               expect(errors).toBe(null);
             });
 
-            it("should be invalid when attributes.countMin = 2 and there are no attributes", function() {
+            it("should be invalid when fields.countMin = 2 and there are no fields", function() {
 
               var Model = VisualModel.extend({
                 $type: {
@@ -1353,7 +1353,7 @@ define([
                       base: "pentaho/visual/role/property",
                       modes: [{valueType: "string"}],
                       strategies: [new IdentityStrategy()],
-                      attributes: {
+                      fields: {
                         countMin: 2
                       }
                     }
@@ -1373,7 +1373,7 @@ define([
               ]);
             });
 
-            it("should be valid when attributes.countMin = 2 and there are 2 attributes", function() {
+            it("should be valid when fields.countMin = 2 and there are 2 fields", function() {
 
               var Model = VisualModel.extend({
                 $type: {
@@ -1382,7 +1382,7 @@ define([
                       base: "pentaho/visual/role/property",
                       modes: [{valueType: "string"}],
                       strategies: [new CombineStrategy()],
-                      attributes: {
+                      fields: {
                         countMin: 2
                       }
                     }
@@ -1394,7 +1394,7 @@ define([
 
               var model = new Model({
                 data: new Table(getDataSpec1()),
-                propRole: {attributes: ["country", "product"]}
+                propRole: {fields: ["country", "product"]}
               });
 
               var errors = rolePropType.validateOn(model);
@@ -1402,7 +1402,7 @@ define([
               expect(errors).toBe(null);
             });
 
-            it("should be invalid when attributes.countMax = 1 and there are 2 attributes", function() {
+            it("should be invalid when fields.countMax = 1 and there are 2 fields", function() {
 
               var Model = VisualModel.extend({
                 $type: {
@@ -1411,7 +1411,7 @@ define([
                       base: "pentaho/visual/role/property",
                       modes: [{valueType: "string"}],
                       strategies: [new CombineStrategy()],
-                      attributes: {
+                      fields: {
                         countMax: 1
                       }
                     }
@@ -1423,7 +1423,7 @@ define([
 
               var model = new Model({
                 data: new Table(getDataSpec1()),
-                propRole: {attributes: ["country", "product"]}
+                propRole: {fields: ["country", "product"]}
               });
 
               var errors = rolePropType.validateOn(model);
@@ -1432,7 +1432,7 @@ define([
               ]);
             });
 
-            it("should be valid when attributes.countMax = 1 and there are 1 attributes", function() {
+            it("should be valid when fields.countMax = 1 and there are 1 fields", function() {
 
               var Model = VisualModel.extend({
                 $type: {
@@ -1441,7 +1441,7 @@ define([
                       base: "pentaho/visual/role/property",
                       modes: [{valueType: "string"}],
                       strategies: [new IdentityStrategy()],
-                      attributes: {
+                      fields: {
                         countMax: 1
                       }
                     }
@@ -1453,7 +1453,7 @@ define([
 
               var model = new Model({
                 data: new Table(getDataSpec1()),
-                propRole: {attributes: ["country"]}
+                propRole: {fields: ["country"]}
               });
 
               var errors = rolePropType.validateOn(model);
@@ -1470,10 +1470,10 @@ define([
               assertIsInvalid(model);
             });
 
-            it("should be invalid, when the name of a mapping attribute is not defined in the model data", function() {
+            it("should be invalid, when the name of a mapping field is not defined in the model data", function() {
 
               var model = createFullValidQualitativeMapping();
-              model.propRole.attributes.add({name: "mugambo"});
+              model.propRole.fields.add({name: "mugambo"});
 
               assertIsInvalid(model);
             });
@@ -1482,9 +1482,9 @@ define([
 
               var model = createFullValidQualitativeMapping();
 
-              var containedAttribute = model.propRole.attributes.at(0);
+              var containedField = model.propRole.fields.at(0);
 
-              model.propRole.attributes.add(containedAttribute.clone());
+              model.propRole.fields.add(containedField.clone());
 
               assertIsInvalid(model);
             });
@@ -1727,23 +1727,23 @@ define([
 
         });
 
-        describe("#attributes", function() {
+        describe("#fields", function() {
 
           describe("countMin", function() {
 
-            propertyTypeUtil.itDynamicAttribute("countMin", 1, "pentaho/visual/role/property", "attributes");
+            propertyTypeUtil.itDynamicAttribute("countMin", 1, "pentaho/visual/role/property", "fields");
 
           });
 
           describe("countMax", function() {
 
-            propertyTypeUtil.itDynamicAttribute("countMax", 2, "pentaho/visual/role/property", "attributes");
+            propertyTypeUtil.itDynamicAttribute("countMax", 2, "pentaho/visual/role/property", "fields");
 
           });
 
           describe("isRequired", function() {
 
-            propertyTypeUtil.itDynamicAttribute("isRequired", true, "pentaho/visual/role/property", "attributes");
+            propertyTypeUtil.itDynamicAttribute("isRequired", true, "pentaho/visual/role/property", "fields");
 
           });
         });

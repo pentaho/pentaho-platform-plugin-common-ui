@@ -192,7 +192,7 @@ define([
       describe("when the data table has key columns", function() {
 
         it("should return a cells map with the inverted key column values " +
-            "(one visual role with two attributes)", function() {
+            "(one visual role with two fields)", function() {
 
           var CustomModel = VisualModel.extend({
             $type: {
@@ -207,7 +207,7 @@ define([
 
           var model = new CustomModel({
             data: new DataTable(getDatasetDT2WithTwoKeyColumns()),
-            category: {attributes: ["country", "city"]}
+            category: {fields: ["country", "city"]}
           });
 
           // Must read at least once to be able to invert!
@@ -232,7 +232,7 @@ define([
         });
 
         it("should return a cells map with the inverted key column values " +
-            "(one visual role with two attributes) (given direct valueOf/toString values)", function() {
+            "(one visual role with two fields) (given direct valueOf/toString values)", function() {
 
           var CustomModel = VisualModel.extend({
             $type: {
@@ -247,7 +247,7 @@ define([
 
           var model = new CustomModel({
             data: new DataTable(getDatasetDT2WithTwoKeyColumns()),
-            category: {attributes: ["country", "city"]}
+            category: {fields: ["country", "city"]}
           });
 
           // Must read at least once to be able to invert!
@@ -274,7 +274,7 @@ define([
         });
 
         it("should return a cells map with the inverted key column values " +
-            "(two visual roles each with one attribute)", function() {
+            "(two visual roles each with one field)", function() {
 
           var CustomModel = VisualModel.extend({
             $type: {
@@ -293,8 +293,8 @@ define([
 
           var model = new CustomModel({
             data: new DataTable(getDatasetDT2WithTwoKeyColumns()),
-            category1: {attributes: ["country"]},
-            category2: {attributes: ["city"]}
+            category1: {fields: ["country"]},
+            category2: {fields: ["city"]}
           });
 
           // Must read at least once to be able to invert!
@@ -323,7 +323,7 @@ define([
         });
 
         it("should return a cells map with the inverted key column values " +
-            "(two visual roles each with one attribute, split across the varsMap prototype chain)", function() {
+            "(two visual roles each with one field, split across the varsMap prototype chain)", function() {
 
           var CustomModel = VisualModel.extend({
             $type: {
@@ -342,8 +342,8 @@ define([
 
           var model = new CustomModel({
             data: new DataTable(getDatasetDT2WithTwoKeyColumns()),
-            category1: {attributes: ["country"]},
-            category2: {attributes: ["city"]}
+            category1: {fields: ["country"]},
+            category2: {fields: ["city"]}
           });
 
           // Must read at least once to be able to invert!
@@ -375,7 +375,7 @@ define([
           expect(cell.formatted).toBe("Lisboa");
         });
 
-        it("should return a cells map with all column values (keyArgs.includeMeasureAttributes: true)", function() {
+        it("should return a cells map with all column values (keyArgs.includeMeasureFields: true)", function() {
 
           var CustomModel = VisualModel.extend({
             $type: {
@@ -395,8 +395,8 @@ define([
 
           var model = new CustomModel({
             data: new DataTable(getDatasetDT2WithTwoKeyColumns()),
-            category: {attributes: ["country"]},
-            measure: {attributes: ["sales"]}
+            category: {fields: ["country"]},
+            measure: {fields: ["sales"]}
           });
 
           // Must read at least once to be able to invert!
@@ -410,7 +410,7 @@ define([
           };
 
           var keyArgs = {
-            includeMeasureAttributes: true
+            includeMeasureFields: true
           };
 
           var cellsMap = sceneUtil.invertVars(varsMap, model, keyArgs);
@@ -432,7 +432,7 @@ define([
       describe("when the data table has no key columns", function() {
 
         it("should return a cells map with the inverted category column values " +
-            "(one visual role with two attributes)", function() {
+            "(one visual role with two fields)", function() {
 
           var CustomModel = VisualModel.extend({
             $type: {
@@ -447,7 +447,7 @@ define([
 
           var model = new CustomModel({
             data: new DataTable(getDatasetDT3WithTwoCategoricalColumns()),
-            category: {attributes: ["country", "city"]}
+            category: {fields: ["country", "city"]}
           });
 
           // Must read at least once to be able to invert!
@@ -472,7 +472,7 @@ define([
         });
 
         it("should return a cells map with the inverted category column values " +
-            "(two visual role each with one attribute)", function() {
+            "(two visual role each with one field)", function() {
 
           var CustomModel = VisualModel.extend({
             $type: {
@@ -491,8 +491,8 @@ define([
 
           var model = new CustomModel({
             data: new DataTable(getDatasetDT3WithTwoCategoricalColumns()),
-            category1: {attributes: ["country"]},
-            category2: {attributes: ["city"]}
+            category1: {fields: ["country"]},
+            category2: {fields: ["city"]}
           });
 
           // Must read at least once to be able to invert!
@@ -520,7 +520,7 @@ define([
           expect(cell.formatted).toBe("Lisboa");
         });
 
-        it("should return a cells map with all column values (keyArgs.includeMeasureAttributes: true)", function() {
+        it("should return a cells map with all column values (keyArgs.includeMeasureFields: true)", function() {
 
           var CustomModel = VisualModel.extend({
             $type: {
@@ -540,8 +540,8 @@ define([
 
           var model = new CustomModel({
             data: new DataTable(getDatasetDT3WithTwoCategoricalColumns()),
-            category: {attributes: ["country"]},
-            measure: {attributes: ["sales"]}
+            category: {fields: ["country"]},
+            measure: {fields: ["sales"]}
           });
 
           // Must read at least once to be able to invert!
@@ -555,7 +555,7 @@ define([
           };
 
           var keyArgs = {
-            includeMeasureAttributes: true
+            includeMeasureFields: true
           };
 
           var cellsMap = sceneUtil.invertVars(varsMap, model, keyArgs);
@@ -592,7 +592,7 @@ define([
 
         var model = new CustomModel({
           data: new DataTable(getDatasetDT2WithTwoKeyColumns()),
-          category: {attributes: ["country", "city"]}
+          category: {fields: ["country", "city"]}
         });
 
         // Must read at least once to be able to invert!

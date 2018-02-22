@@ -42,7 +42,7 @@ define([
        *
        * @classDesc The `Combine` class describes the strategy of mapping one or more data properties
        * to a single _string_ visual value by concatenating the string representation of the values of
-       * multiple attributes with a special
+       * multiple fields with a special
        * [separator character]{@link pentaho.visual.role.strategies.Combine#valueSeparator}, and back.
        *
        * Formatted values are combined using the
@@ -63,7 +63,7 @@ define([
           id: module.id,
           props: [
             /**
-             * Gets or sets the text separator used to combine the keys of each attribute.
+             * Gets or sets the text separator used to combine the keys of each field.
              *
              * @name pentaho.visual.role.strategies.Combine#valueSeparator
              * @type {string}
@@ -77,7 +77,7 @@ define([
             },
 
             /**
-             * Gets or sets the text separator used to combine the formatted values of each attribute.
+             * Gets or sets the text separator used to combine the formatted values of each field.
              *
              * @name pentaho.visual.role.strategies.Combine#formattedSeparator
              * @type {string}

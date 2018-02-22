@@ -25,7 +25,7 @@
  */
 
 /**
- * The text separator used to combine the keys of each attribute.
+ * The text separator used to combine the keys of each field.
  *
  * @name valueSeparator
  * @memberOf pentaho.visual.role.strategies.spec.ICombine#
@@ -35,7 +35,7 @@
  */
 
 /**
- * The text separator used to combine the formatted values of each attribute.
+ * The text separator used to combine the formatted values of each field.
  *
  * @name formattedSeparator
  * @memberOf pentaho.visual.role.strategies.spec.ICombine#

@@ -35,7 +35,7 @@ define([
      * The types {@link pentaho.data.filter.IsEqual} and {@link pentaho.data.filter.And}
      * must have been loaded already.
      *
-     * If the given variables map entails no distinguishing attributes
+     * If the given variables map entails no distinguishing fields
      * (in the sense of being _effective keys_, as defined in
      * [isColumnKeyEffective]{@link pentaho.data.util.isColumnKeyEffective}) of the associated data table,
      * then the returned filter will be `null`.
@@ -62,9 +62,9 @@ define([
     /**
      * Creates a data cells map corresponding to the values of the specified visual role variables.
      *
-     * By default, only data cells for attributes which are **effective keys** are considered,
+     * By default, only data cells for fields which are **effective keys** are considered,
      * as defined in [isColumnKeyEffective]{@link pentaho.data.util.isColumnKeyEffective}.
-     * Specify `keyArgs.includeMeasureAttributes` as `true` to include all attributes.
+     * Specify `keyArgs.includeMeasureFields` as `true` to include all fields.
      *
      * @param {!Object.<string, any|pentaho.visual.role.scene.IVariable>} varsMap - A map of visual role names
      * to corresponding _variables_. All variables, even those from inherited keys are considered.
@@ -75,9 +75,9 @@ define([
      * @param {!pentaho.visual.base.Model} model - The associated visual model. Must be valid.
      *
      * @param {Object} [keyArgs] The keyword arguments object.
-     * @param {boolean} [keyArgs.includeMeasureAttributes=false] Indicates that measure attributes should also
+     * @param {boolean} [keyArgs.includeMeasureFields=false] Indicates that measure fields should also
      * be included.
-     * In practice, indicates that all attributes should be included.
+     * In practice, indicates that all fields should be included.
      *
      * @return {!Object.<string, pentaho.data.ICell>} A data cells map, possibly empty.
      *
@@ -92,8 +92,8 @@ define([
         throw error.argInvalid("model", "No data.");
       }
 
-      var includeKeyAttributesOnly = !(keyArgs && keyArgs.includeMeasureAttributes);
-      var hasDataKeyColumns = includeKeyAttributesOnly ? dataUtil.hasAnyKeyColumns(data) : null;
+      var includeKeyFieldsOnly = !(keyArgs && keyArgs.includeMeasureFields);
+      var hasDataKeyColumns = includeKeyFieldsOnly ? dataUtil.hasAnyKeyColumns(data) : null;
 
       var modelType = model.$type;
       var cellsMap = {};
@@ -118,7 +118,7 @@ define([
             var rowIndex = mapper.invertValue(varValue);
             if(rowIndex != null && rowIndex >= 0) {
               var inputData = mapper.inputData;
-              var isKeyColumnFilter = includeKeyAttributesOnly
+              var isKeyColumnFilter = includeKeyFieldsOnly
                   ? __getIsColumnKeyEffectiveFilter(inputData, hasDataKeyColumns)
                   : null;
 

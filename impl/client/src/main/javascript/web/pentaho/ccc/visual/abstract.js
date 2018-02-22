@@ -173,7 +173,7 @@ define([
         // Essentially, those measures that are represented by cartesian axes...
         _noRoleInTooltipMeasureRoles: {"measures": true},
 
-        // Do not show percentage value in front of a "percent measure" MappingAttributeInfo.
+        // Do not show percentage value in front of a "percent measure" MappingFieldInfo.
         _tooltipHidePercentageOnPercentAttributes: false,
 
         // The name of the role that represents the "multi-chart" concept.
@@ -467,8 +467,8 @@ define([
         /**
          * Initializes the view in what concerns to the current data table's data and metadata.
          *
-         * * Creates the local `MappingAttributeInfo` instances,
-         *   one per `MappingAttribute` of visual role properties of the model
+         * * Creates the local `MappingFieldInfo` instances,
+         *   one per `MappingField` of visual role properties of the model
          *   (one more for the special measure discriminator attribute added in certain circumstances).
          *   Sets {@link pentaho.ccc.visual.Abstract#attributeInfos} and
          *   {@link pentaho.ccc.visual.Abstract#visualMap}.
@@ -494,19 +494,19 @@ define([
           var genericMeasuresCount = 0;
           var genericMeasureCccVisualRole = this._genericMeasureCccVisualRole;
 
-          // Multiple ways to store and index MappingAttributeInfo...
+          // Multiple ways to store and index MappingFieldInfo...
           var attributeInfos = [];
 
-          // attributeName -> MappingAttributeInfo
+          // attributeName -> MappingFieldInfo
           var attributeInfosByName = {};
 
-          // axisId -> MappingAttributeInfo[]
+          // axisId -> MappingFieldInfo[]
           var axes = {
             key: [],
             measure: []
           };
 
-          // roleName -> MappingAttributeInfo[]
+          // roleName -> MappingFieldInfo[]
           var visualMap = {};
 
           var rolesByCccVisualRole = {};
@@ -516,7 +516,7 @@ define([
           /**
            * Registers a mapping attribute info.
            *
-           * @param {!MappingAttributeInfo} mappingAttrInfo - The mapping attribute info to add.
+           * @param {!MappingFieldInfo} mappingAttrInfo - The mapping attribute info to add.
            */
           var addMappingAttrInfo = function(mappingAttrInfo) {
 
@@ -533,7 +533,7 @@ define([
           };
 
           // ----
-          // Phase 1 - Build MappingAttributeInfo part 1...
+          // Phase 1 - Build MappingFieldInfo part 1...
 
           // For each visual role mapping attribute,
           // build a corresponding "visual role mapping attribute info", pointing to the corresponding
@@ -691,7 +691,7 @@ define([
          * because this is the only way to bind specific columns to arbitrary, specific dimensions.
          * With all the plain table transformations in place, the CCC readers mapping is 1-1.
          *
-         * @param {MappingAttributeInfo[]} attrInfos - The array of mapping attribute info objects.
+         * @param {MappingFieldInfo[]} attrInfos - The array of mapping attribute info objects.
          */
         _transformData: function(attrInfos) {
           // For DataView source columns
@@ -750,7 +750,7 @@ define([
         /**
          * Configure CCC `dimensions`.
          *
-         * @param {MappingAttributeInfo[]} attrInfos - The array of mapping attribute info objects.
+         * @param {MappingFieldInfo[]} attrInfos - The array of mapping attribute info objects.
          */
         _configureCccDimensions: function(attrInfos) {
 
@@ -779,7 +779,7 @@ define([
         /**
          * Configure CCC `visualRoles`.
          *
-         * @param {MappingAttributeInfo[]} attrInfos - The array of mapping attribute info objects.
+         * @param {MappingFieldInfo[]} attrInfos - The array of mapping attribute info objects.
          * @overridable
          * @protected
          */

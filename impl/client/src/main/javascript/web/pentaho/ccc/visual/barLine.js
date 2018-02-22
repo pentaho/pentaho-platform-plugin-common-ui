@@ -64,7 +64,7 @@ define([
         /**
          * Configure CCC `visualRoles`.
          *
-         * @param {MappingAttributeInfo[]} attrInfos - The array of mapping attribute info objects.
+         * @param {MappingFieldInfo[]} attrInfos - The array of mapping attribute info objects.
          * @override
          * @protected
          */

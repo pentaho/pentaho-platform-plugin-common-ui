@@ -21,7 +21,7 @@ define([
   "pentaho/type/model",
   "pentaho/visual/role/property",
   "pentaho/visual/role/mapping",
-  "pentaho/visual/role/mappingAttribute",
+  "pentaho/visual/role/mappingField",
   "pentaho/visual/role/mode",
   "pentaho/visual/color/paletteProperty",
   "pentaho/visual/color/palette",

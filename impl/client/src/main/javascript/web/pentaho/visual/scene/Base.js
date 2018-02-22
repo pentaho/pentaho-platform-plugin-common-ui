@@ -42,14 +42,14 @@ define([
      * For handling *user interaction*,
      * the scene instances' [createFilter]{@link pentaho.visual.scene.Base#createFilter} method provides
      * an easy way to create a filter that selects the data from which the scene was generated based on its
-     * distinguishing attribute values.
+     * distinguishing field values.
      * This filter can then be passed to a [data action]{@link pentaho.visual.action.mixins.Data.Type} such as
      * [Select]{@link pentaho.visual.action.Select} or [Execute]{@link pentaho.visual.action.Execute}.
      *
-     * When *communicating with external parties*, attribute values must be used and visual variable values are not
+     * When *communicating with external parties*, field values must be used and visual variable values are not
      * generally meaningful.
      * The [invert]{@link pentaho.visual.scene.Base#invert} method allows directly obtaining the distinguishing
-     * attribute values that are associated with a scene.
+     * field values that are associated with a scene.
      *
      * @alias Base
      * @memberOf pentaho.visual.scene
@@ -164,13 +164,13 @@ define([
      * Creates a filter that selects the data represented by this scene.
      *
      * This method provides an easy way to create a filter that selects the data that this scene visually represents
-     * based on its distinguishing attribute values.
+     * based on its distinguishing field values.
      *
      * This filter can then be passed to a [data action]{@link pentaho.visual.action.mixins.Data.Type} such as
      * [Select]{@link pentaho.visual.action.Select} or [Execute]{@link pentaho.visual.action.Execute}.
      *
      * In certain circumstances, the returned value may be `null`. A filter can only be created for a scene
-     * if its variables entail distinguishing attributes (in the sense of being _effective keys_, as defined in
+     * if its variables entail distinguishing fields (in the sense of being _effective keys_, as defined in
      * [scene.util.invertVars]{@link pentaho.visual.scene.util.invertVars}) of the associated model's data.
      *
      * @return {pentaho.data.filter.Abstract} The filter, if one can be created; `null`, otherwise.
@@ -184,13 +184,13 @@ define([
     /**
      * Gets a data cells map which corresponds to the values of visual role variables of this scene.
      *
-     * When *communicating with external parties*, attribute values must be used and visual variable values are not
-     * generally meaningful. Use this method to obtain the distinguishing attribute values represented by this scene.
+     * When *communicating with external parties*, field values must be used and visual variable values are not
+     * generally meaningful. Use this method to obtain the distinguishing field values represented by this scene.
      *
      * @param {Object} [keyArgs] The keyword arguments object.
-     * @param {boolean} [keyArgs.includeMeasureAttributes=false] Indicates that measure attributes should also
+     * @param {boolean} [keyArgs.includeMeasureFields=false] Indicates that measure fields should also
      * be included.
-     * In practice, indicates that all attributes should be included.
+     * In practice, indicates that all fields should be included.
      *
      * @return {!Object.<string, pentaho.data.ICell>} A data cells map, possibly empty.
      *
