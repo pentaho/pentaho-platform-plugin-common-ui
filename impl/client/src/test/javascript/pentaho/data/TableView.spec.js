@@ -334,14 +334,6 @@ define([
         });
       });
 
-      describe("#isColumnContinuous(j) -", function() {
-        it("should return the column isContinuous of the given column index", function() {
-          expect(dataView.isColumnContinuous(0)).toBe(false);
-          expect(dataView.isColumnContinuous(1)).toBe(false);
-          expect(dataView.isColumnContinuous(2)).toBe(true);
-        });
-      });
-
       describe("#isColumnKey(j) -", function() {
         it("should return the column isKey of the given column index", function() {
           expect(dataView.isColumnKey(0)).toBe(false);

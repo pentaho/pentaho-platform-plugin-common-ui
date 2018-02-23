@@ -65,15 +65,6 @@
  */
 
 /**
- * Gets a value that indicates if a column's values can be considered continuous, given its index.
- *
- * @name pentaho.data.ITable#isColumnContinuous
- * @method
- * @param {number} colIndex - The column index (zero-based).
- * @return {boolean} `true`, if the column's values are considered continuous; `false`, otherwise.
- */
-
-/**
  * Gets a value that indicates if a column's values identify each row, together with other key columns, given its index.
  *
  * @name pentaho.data.ITable#isColumnKey

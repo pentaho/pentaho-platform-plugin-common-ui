@@ -32,11 +32,11 @@ define([
     };
   }
 
-  function getDatasetCDA2WithKeyAndContinuous() {
+  function getDatasetCDA2WithKey() {
     return {
       metadata: [
         {colName: "country", colType: "STRING", colLabel: "Country", colIsKey: true},
-        {colName: "sales", colType: "NUMERIC", colLabel: "Sales", colIsContinuous: false}
+        {colName: "sales", colType: "NUMERIC", colLabel: "Sales"}
       ],
       resultset: [
         ["Portugal", 12000],
@@ -71,11 +71,11 @@ define([
     };
   }
 
-  function getDatasetDT2NormalizedWithKeyAndContinuous() {
+  function getDatasetDT2NormalizedWithKey() {
     return {
       model: [
         {name: "country", type: "string", label: "Country", isKey: true},
-        {name: "sales", type: "number", label: "Sales", isContinuous: false}
+        {name: "sales", type: "number", label: "Sales"}
       ],
       rows: [
         {c: [{v: "Portugal", f: null}, {v: 12000, f: null}]},
@@ -294,8 +294,8 @@ define([
         });
 
         it("should return a data table with the expected metadata and data (ii)", function() {
-          var jsTable = DataTable.convertJsonCdaToTableSpec(getDatasetCDA2WithKeyAndContinuous());
-          expect(jsTable).toEqual(getDatasetDT2NormalizedWithKeyAndContinuous());
+          var jsTable = DataTable.convertJsonCdaToTableSpec(getDatasetCDA2WithKey());
+          expect(jsTable).toEqual(getDatasetDT2NormalizedWithKey());
         });
       });
 
@@ -1106,23 +1106,6 @@ define([
               distinctValues = dataTable.getDistinctFormattedValues(0);
 
           expect(distinctValues).toEqual(["Portugal", "", "null", "Italy"]);
-        });
-      });
-
-      describe("#isColumnContinuous(j) -", function() {
-        it("should return the attribute isContinuous of the attribute of given column index", function() {
-          var dataTable = new DataTable({
-            model: [
-              {name: "A", label: "ABC"},
-              {name: "B", label: "DEF", type:"number", isContinuous: true},
-              {name: "C", label: "GHI"}
-            ],
-            rows: []
-          });
-
-          expect(dataTable.isColumnContinuous(0)).toBe(false);
-          expect(dataTable.isColumnContinuous(1)).toBe(true);
-          expect(dataTable.isColumnContinuous(2)).toBe(false);
         });
       });
 

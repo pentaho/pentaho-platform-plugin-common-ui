@@ -167,11 +167,6 @@ define([
     },
 
     /** @inheritdoc */
-    isColumnContinuous: function(colIndex) {
-      return this.implem.isColumnContinuous(colIndex);
-    },
-
-    /** @inheritdoc */
     isColumnKey: function(colIndex) {
       return this.implem.isColumnKey(colIndex);
     },
@@ -397,10 +392,6 @@ define([
 
         if(cdaCol.colIsKey != null) {
           attrSpec.isKey = cdaCol.colIsKey;
-        }
-
-        if(cdaCol.colIsContinuous != null) {
-          attrSpec.isContinuous = cdaCol.colIsContinuous;
         }
       }
 

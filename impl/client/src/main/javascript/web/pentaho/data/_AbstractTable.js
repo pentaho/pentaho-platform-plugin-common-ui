@@ -360,8 +360,7 @@ define([
           colName:  this.getColumnId(j),
           colLabel: this.getColumnLabel(j),
           colType:  writeCdaColType(this.getColumnType(j)),
-          colIsKey: this.isColumnKey(j),
-          colIsContinuous: this.isColumnContinuous(j)
+          colIsKey: this.isColumnKey(j)
         };
       }
 

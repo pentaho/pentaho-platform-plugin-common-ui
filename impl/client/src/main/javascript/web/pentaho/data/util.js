@@ -54,7 +54,7 @@ define(function() {
      * A column is considered an _effective key_
      * if [isColumnKey]{@link pentaho.data.ITable#isColumnKey} returns `true` for the corresponding column or,
      * in the case when the data table has no actual key attributes,
-     * if the attribute is categorical (not [isColumnContinuous]{@link pentaho.data.ITable#isColumnContinuous}).
+     * if the attribute is categorical (see [isColumnTypeContinuous]{@link pentaho.data.util.isColumnTypeContinuous}).
      *
      * @param {!pentaho.data.ITable} dataTable - The data table.
      * @param {number} columnIndex - The column index.
@@ -70,7 +70,22 @@ define(function() {
       if(hasDataKeyColumns == null) {
         hasDataKeyColumns = dataUtil.hasAnyKeyColumns(dataTable);
       }
-      return hasDataKeyColumns ? dataTable.isColumnKey(columnIndex) : !dataTable.isColumnContinuous(columnIndex);
+      return hasDataKeyColumns
+          ? dataTable.isColumnKey(columnIndex)
+          : !dataUtil.isColumnTypeContinuous(dataTable.getColumnType(columnIndex));
+    },
+
+    /**
+     * Gets a value that indicates if a given column data type has the _continuous_ capability.
+     *
+     * The data types `"date"` and `"number"` are considered continuous and all others categorical.
+     *
+     * @param {string} dataType - The data type name.
+     *
+     * @return {boolean} `true` if the data type is _continuous_; `false`, otherwise.
+     */
+    isColumnTypeContinuous: function(dataType) {
+      return dataType === "number" || dataType === "date";
     },
 
     /**

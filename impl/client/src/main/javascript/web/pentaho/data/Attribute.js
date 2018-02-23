@@ -116,39 +116,24 @@ define([
        */
       this.type = type;
 
-      var isContinuous;
-      if(type === "string" || type === "boolean") {
-        isContinuous = false;
-      } else if(spec.isContinuous == null) {
-        isContinuous = type === "number" || type === "date";
-      } else {
-        isContinuous = !!spec.isContinuous;
-      }
-
       /**
        * Indicates if the attribute is considered **continuous**, or,
        * on the other hand, **categorical**.
        *
        * When the attribute's type is one of
-       * {@link pentaho.data.AtomicTypeName.STRING} or
-       * {@link pentaho.data.AtomicTypeName.BOOLEAN}
-       * this property is **ignored** and the attribute is necessarily **categorical**.
-       *
-       * When the attribute's type is one of
        * {@link pentaho.data.AtomicTypeName.NUMBER} or
        * {@link pentaho.data.AtomicTypeName.DATE}
-       * this property's _default value_ is `true`.
-       * Otherwise, the property's default value is `false`.
+       * this property is `true`.
+       * Otherwise, it is `false`.
        *
        * @type boolean
        * @readonly
        * @see pentaho.data.IAttribute#isContinuous
-       * @see pentaho.data.ITable#isColumnContinuous
        * @see pentaho.data.Attribute#type
        * @see pentaho.data.Attribute#members
        * @see pentaho.data.Attribute#isPercent
        */
-      this.isContinuous = isContinuous;
+      this.isContinuous = type === "number" || type === "date";
 
       /**
        * Indicates if the attribute identifies rows, together with other key attributes.
@@ -169,7 +154,7 @@ define([
       this.cellBase = new Cell.Adhoc({}, attrKeyArgs);
       this.structurePositionBase = new StructurePosition.Adhoc(attrKeyArgs);
 
-      if(!isContinuous) {
+      if(!this.isContinuous) {
         /**
          * Gets the members collection of the attribute.
          *
@@ -326,7 +311,6 @@ define([
         label: this.label,
         type:  this.type,
         format: this.format,
-        isContinuous: this.isContinuous,
         isKey: this.isKey
       };
 

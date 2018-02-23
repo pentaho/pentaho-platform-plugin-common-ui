@@ -66,10 +66,6 @@ define([
       return this.getColumnAttribute(colIndex).label;
     },
 
-    isColumnContinuous: function(colIndex) {
-      return this.getColumnAttribute(colIndex).isContinuous;
-    },
-
     isColumnKey: function(colIndex) {
       return this.getColumnAttribute(colIndex).isKey;
     },

@@ -90,14 +90,6 @@ define([
           attr = expectAttribute({name: "test", isKey: false});
           expect(attr.isKey).toBe(false);
         });
-
-        it("should create an attribute with the value in property `isContinuous`", function() {
-          var attr = expectAttribute({name: "test", type: "number", isContinuous: false});
-          expect(attr.isContinuous).toBe(false);
-
-          attr = expectAttribute({name: "test", type: "number", isContinuous: true});
-          expect(attr.isContinuous).toBe(true);
-        });
       });
     });
 
@@ -134,65 +126,34 @@ define([
 
     describe("#isContinuous", function() {
 
-      describe("default value", function() {
-
-        it("should default to `true` when type is 'number'", function() {
-          var attr = expectAttribute({name: "test", type: "number"});
-          expect(attr.isContinuous).toBe(true);
-        });
-
-        it("should default to `true` when type is 'date'", function() {
-          var attr = expectAttribute({name: "test", type: "date"});
-          expect(attr.isContinuous).toBe(true);
-        });
-
-        it("should default to `true` when type is 'Date' — unaffected by non-lower case", function() {
-          var attr = expectAttribute({name: "test", type: "Date"});
-          expect(attr.isContinuous).toBe(true);
-        });
-
-        it("should default to `false` when type is 'string'", function() {
-          var attr = expectAttribute({name: "test", type: "string"});
-          expect(attr.isContinuous).toBe(false);
-        });
-
-        it("should default to `false` when type is 'boolean'", function() {
-          var attr = expectAttribute({name: "test", type: "boolean"});
-          expect(attr.isContinuous).toBe(false);
-        });
-
-        it("should default to `false` when type is 'foo'", function() {
-          var attr = expectAttribute({name: "test", type: "foo"});
-          expect(attr.isContinuous).toBe(false);
-        });
+      it("should be `true` when type is 'number'", function() {
+        var attr = expectAttribute({name: "test", type: "number"});
+        expect(attr.isContinuous).toBe(true);
       });
 
-      describe("specified value", function() {
+      it("should be `true` when type is 'date'", function() {
+        var attr = expectAttribute({name: "test", type: "date"});
+        expect(attr.isContinuous).toBe(true);
+      });
 
-        it("should be `false` when type is 'string' and isContinuous is specified as true", function() {
-          var attr = expectAttribute({name: "test", type: "string", isContinuous: true});
-          expect(attr.isContinuous).toBe(false);
-        });
+      it("should be `true` when type is 'Date' — unaffected by non-lower case", function() {
+        var attr = expectAttribute({name: "test", type: "Date"});
+        expect(attr.isContinuous).toBe(true);
+      });
 
-        it("should be `false` when type is 'boolean' and isContinuous is specified as true", function() {
-          var attr = expectAttribute({name: "test", type: "boolean", isContinuous: true});
-          expect(attr.isContinuous).toBe(false);
-        });
+      it("should be `false` when type is 'string'", function() {
+        var attr = expectAttribute({name: "test", type: "string"});
+        expect(attr.isContinuous).toBe(false);
+      });
 
-        it("should be `false` when type is 'number' and isContinuous is specified as false", function() {
-          var attr = expectAttribute({name: "test", type: "number", isContinuous: false});
-          expect(attr.isContinuous).toBe(false);
-        });
+      it("should be `false` when type is 'boolean'", function() {
+        var attr = expectAttribute({name: "test", type: "boolean"});
+        expect(attr.isContinuous).toBe(false);
+      });
 
-        it("should be `false` when type is 'date' and isContinuous is specified as false", function() {
-          var attr = expectAttribute({name: "test", type: "date", isContinuous: false});
-          expect(attr.isContinuous).toBe(false);
-        });
-
-        it("should be `true` when type is 'foo' and isContinuous is specified as true", function() {
-          var attr = expectAttribute({name: "test", type: "foo", isContinuous: true});
-          expect(attr.isContinuous).toBe(true);
-        });
+      it("should be `false` when type is 'foo'", function() {
+        var attr = expectAttribute({name: "test", type: "foo"});
+        expect(attr.isContinuous).toBe(false);
       });
     });
 
@@ -254,7 +215,7 @@ define([
         var attr = expectAttribute({name: "test", type: "string"});
         expect(attr.isPercent).toBe(undefined);
 
-        attr = expectAttribute({name: "test", type: "number", isContinuous: false});
+        attr = expectAttribute({name: "test", type: "foo", isContinuous: false});
         expect(attr.isPercent).toBe(undefined);
       });
 

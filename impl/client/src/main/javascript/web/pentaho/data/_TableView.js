@@ -219,11 +219,6 @@ define([
     },
 
     /** @inheritdoc */
-    isColumnContinuous: function(colIndex) {
-      return this._source.isColumnContinuous(this.getSourceColumnIndex(colIndex));
-    },
-
-    /** @inheritdoc */
     isColumnKey: function(colIndex) {
       return this._source.isColumnKey(this.getSourceColumnIndex(colIndex));
     },
