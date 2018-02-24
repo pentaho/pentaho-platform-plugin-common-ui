@@ -439,6 +439,7 @@ define([
 
             // Don't inherit the default value if valueType is local.
             // Don't preserve the default value if it no longer is an instance of valueType.
+            // When dv is a function, do not take the change as well.
             var dv;
             if(!O.hasOwn(this, "__defaultValue") ||
                (((dv = this.__defaultValue) != null) && !newType.is(dv))) {

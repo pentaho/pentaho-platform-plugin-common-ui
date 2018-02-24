@@ -69,6 +69,9 @@ define([
 
           valueType: ExternalMapping,
 
+          // Setting the value type resets the inherited defaultValue.
+          defaultValue: function() { return {}; },
+
           /** @inheritDoc */
           _init: function(spec, keyArgs) {
 
