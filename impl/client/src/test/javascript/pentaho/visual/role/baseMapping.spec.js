@@ -25,8 +25,9 @@ define([
 
     var context;
     var Mapping;
+    var Model;
 
-    beforeEach(function(done) {
+    beforeAll(function(done) {
 
       Context.createAsync()
           .then(function(_context) {
@@ -34,8 +35,10 @@ define([
             context = _context;
 
             return context.getDependencyApplyAsync([
+              "pentaho/visual/base/abstractModel",
               "pentaho/visual/role/baseMapping"
-            ], function(_Mapping) {
+            ], function(_AbstractModel, _Mapping) {
+              Model = _AbstractModel.extend();
               Mapping = _Mapping;
             });
           })
@@ -61,6 +64,33 @@ define([
 
         var mapping = new Mapping({fields: ["foo", "bar"]});
         expect(mapping.hasFields).toBe(true);
+      });
+    });
+
+    describe("#_modelReference", function() {
+
+      it("should return null when there is no container", function() {
+
+        var mapping = new Mapping();
+        expect(mapping._modelReference).toBe(null);
+      });
+
+      it("should return the reference to the container abstract model", function() {
+
+        var Derived = Model.extend({
+          $type: {
+            props: [
+              {name: "foo", base: "pentaho/visual/role/baseProperty"}
+            ]
+          }
+        });
+
+        var derived = new Derived();
+        var mapping = derived.foo;
+
+        expect(mapping._modelReference).not.toBe(null);
+        expect(mapping._modelReference.container).toBe(derived);
+        expect(mapping._modelReference.property).toBe(Derived.type.get("foo"));
       });
     });
   });

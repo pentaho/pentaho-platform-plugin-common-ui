@@ -30,6 +30,8 @@ define([
     "./mode",
     function(BaseMapping, MappingField, Mode) {
 
+      var context = this;
+
       /**
        * @name pentaho.visual.role.Mapping.Type
        * @class
@@ -90,18 +92,36 @@ define([
          * @see pentaho.visual.role.Property.Type#getModeEffectiveOn
          */
         get mode() {
-          var mode = this.__mode;
-          if(mode === undefined) {
-            var iref = this._modelReference;
-            if(iref !== null) {
-              // Cache the mode.
-              this.__mode = mode = iref.property.getModeEffectiveOn(iref.container);
-            } else {
-              mode = null;
-            }
+          var mode;
+
+          // Within a transaction?
+          if(context.transaction !== null) {
+            // Do not cache or use cache.
+            // Doing this covers the will phase of change actions, in which multiple iterations can occur.
+            // There would be no way to reset the mode cached during the process.
+            mode = this.__getMode();
+          } else if((mode = this.__mode) === undefined) {
+            // When undefined, it's like not caching.
+            this.__mode = mode = this.__getMode();
           }
 
-          return mode;
+          return mode || null;
+        },
+
+        /**
+         * Gets the mode from the referring container abstract model and property.
+         *
+         * When there is no container, `undefined` is returned.
+         *
+         * @return {undefined|pentaho.visual.role.Mode} The mode, `null` or `undefined`.
+         *
+         * @private
+         */
+        __getMode: function() {
+          var iref = this._modelReference;
+          if(iref !== null) {
+            return iref.property.getModeEffectiveOn(iref.container);
+          }
         },
         // endregion
 
