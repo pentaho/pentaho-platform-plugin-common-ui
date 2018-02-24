@@ -83,7 +83,7 @@ define([
           });
         });
       })
-          .then(done, done.fail);
+      .then(done, done.fail);
     });
   });
 });

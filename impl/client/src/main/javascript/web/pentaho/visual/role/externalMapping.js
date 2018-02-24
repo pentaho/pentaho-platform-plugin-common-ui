@@ -84,7 +84,7 @@ define([
         },
 
         /**
-         * Resets any existing adaptation related cached information.
+         * Resets any existing data or mapping related cached information.
          *
          * Called by the containing abstract model whenever its data or visual role properties change.
          *
@@ -93,17 +93,6 @@ define([
          */
         _onDataOrMappingChanged: function() {
           this.__adapter = undefined;
-        },
-
-        /**
-         * Gets the visualization that owns this external mapping, if any, or `null`.
-         *
-         * @type {pentaho.visual.base.Visualization}
-         * @readOnly
-         */
-        get visualization() {
-          // TODO: Test it is a Viz (cyclic dependency)
-          return typeUtil.__getFirstRefContainer(this);
         },
 
         /**
@@ -125,7 +114,7 @@ define([
           // Within a transaction?
           if(context.transaction !== null) {
             // Do not cache or use cache.
-            // Covers will phase of change actions, in which multiple iterations can occur.
+            // Doing this covers the will phase of change actions, in which multiple iterations can occur.
             // There would be no way to reset adapters cached during the process.
             adapter = this.__getAdapter();
 

@@ -26,7 +26,6 @@ define([
 
     var context;
     var VisualModel;
-    var Mapping;
     var IdentityStrategy;
 
     beforeEach(function(done) {
@@ -38,11 +37,10 @@ define([
 
             return context.getDependencyApplyAsync([
               "pentaho/visual/base/model",
-              "pentaho/visual/role/mapping",
-              "pentaho/visual/role/strategies/identity"
-            ], function(_Model, _Mapping, _IdentityStrategy) {
+              "pentaho/visual/role/strategies/identity",
+              "pentaho/visual/role/mapping"
+            ], function(_Model, _IdentityStrategy) {
               VisualModel = _Model;
-              Mapping = _Mapping;
               IdentityStrategy = _IdentityStrategy;
             });
           })
@@ -65,30 +63,11 @@ define([
       };
     }
 
-    describe("#model", function() {
-
-      it("should return the container model", function() {
-
-        var Derived = VisualModel.extend({
-          $type: {
-            props: [
-              {name: "foo", base: "pentaho/visual/role/property"}
-            ]
-          }
-        });
-
-        var derived = new Derived();
-        var mapping = derived.foo;
-
-        expect(mapping.model).toBe(derived);
-      });
-    });
-
-    describe("#mapper", function() {
+    describe("#adapter", function() {
 
       describe("when not under a transaction", function() {
 
-        it("should call prop.getMapperOn(model) and return its result", function() {
+        it("should call prop.getAdapterOn(model) and return its result", function() {
 
           var CustomModel = VisualModel.extend({
             $type: {
@@ -108,8 +87,8 @@ define([
           });
 
           var propType = CustomModel.type.get("propRoleA");
-          var mapper = {};
-          spyOn(propType, "getMapperOn").and.returnValue(mapper);
+          var adapter = {};
+          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
 
           var model = new CustomModel({
             data: new Table(getDataSpec1()),
@@ -117,14 +96,14 @@ define([
           });
           var mapping = model.propRoleA;
 
-          var result = mapping.mapper;
+          var result = mapping.adapter;
 
-          expect(result).toBe(mapper);
-          expect(propType.getMapperOn).toHaveBeenCalledTimes(1);
-          expect(propType.getMapperOn).toHaveBeenCalledWith(model);
+          expect(result).toBe(adapter);
+          expect(propType.getAdapterOn).toHaveBeenCalledTimes(1);
+          expect(propType.getAdapterOn).toHaveBeenCalledWith(model);
         });
 
-        it("should cache and return the mapper instance of the first prop.getMapperOn call", function() {
+        it("should cache and return the adapter instance of the first prop.getAdapterOn call", function() {
 
           var CustomModel = VisualModel.extend({
             $type: {
@@ -144,8 +123,8 @@ define([
           });
 
           var propType = CustomModel.type.get("propRoleA");
-          var mapper = {};
-          spyOn(propType, "getMapperOn").and.returnValue(mapper);
+          var adapter = {};
+          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
 
           var model = new CustomModel({
             data: new Table(getDataSpec1()),
@@ -153,15 +132,15 @@ define([
           });
           var mapping = model.propRoleA;
 
-          var result1 = mapping.mapper;
-          var result2 = mapping.mapper;
+          var result1 = mapping.adapter;
+          var result2 = mapping.adapter;
 
-          expect(result1).toBe(mapper);
-          expect(result2).toBe(mapper);
-          expect(propType.getMapperOn).toHaveBeenCalledTimes(1);
+          expect(result1).toBe(adapter);
+          expect(result2).toBe(adapter);
+          expect(propType.getAdapterOn).toHaveBeenCalledTimes(1);
         });
 
-        it("should cache and return a returned null mapper", function() {
+        it("should cache and return a returned null adapter", function() {
 
           var CustomModel = VisualModel.extend({
             $type: {
@@ -181,8 +160,8 @@ define([
           });
 
           var propType = CustomModel.type.get("propRoleA");
-          var mapper = null;
-          spyOn(propType, "getMapperOn").and.returnValue(mapper);
+          var adapter = null;
+          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
 
           var model = new CustomModel({
             data: new Table(getDataSpec1()),
@@ -190,12 +169,12 @@ define([
           });
           var mapping = model.propRoleA;
 
-          var result1 = mapping.mapper;
-          var result2 = mapping.mapper;
+          var result1 = mapping.adapter;
+          var result2 = mapping.adapter;
 
-          expect(result1).toBe(mapper);
-          expect(result2).toBe(mapper);
-          expect(propType.getMapperOn).toHaveBeenCalledTimes(1);
+          expect(result1).toBe(adapter);
+          expect(result2).toBe(adapter);
+          expect(propType.getAdapterOn).toHaveBeenCalledTimes(1);
         });
       });
 
@@ -236,8 +215,8 @@ define([
 
           propType = CustomModel.type.get("propRoleA");
 
-          // Cache the mapper.
-          mapper0 = model.propRoleA.mapper;
+          // Cache the adapter.
+          mapper0 = model.propRoleA.adapter;
 
           // Start the transaction.
           txnScope = context.enterChange();
@@ -247,86 +226,86 @@ define([
           txnScope.dispose();
         });
 
-        it("should ignore the cached value and call prop.getMapperOn again", function() {
+        it("should ignore the cached value and call prop.getAdapterOn again", function() {
 
-          var mapper = {};
-          spyOn(propType, "getMapperOn").and.returnValue(mapper);
+          var adapter = {};
+          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
 
-          var result = model.propRoleA.mapper;
+          var result = model.propRoleA.adapter;
 
-          expect(result).toBe(mapper);
-          expect(propType.getMapperOn).toHaveBeenCalledTimes(1);
+          expect(result).toBe(adapter);
+          expect(propType.getAdapterOn).toHaveBeenCalledTimes(1);
         });
 
-        it("should not cache values and call prop.getMapperOn each time", function() {
+        it("should not cache values and call prop.getAdapterOn each time", function() {
 
-          var mapper = {};
-          spyOn(propType, "getMapperOn").and.returnValue(mapper);
+          var adapter = {};
+          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
 
-          var result1 = model.propRoleA.mapper;
-          var result2 = model.propRoleA.mapper;
+          var result1 = model.propRoleA.adapter;
+          var result2 = model.propRoleA.adapter;
 
-          expect(propType.getMapperOn).toHaveBeenCalledTimes(2);
+          expect(propType.getAdapterOn).toHaveBeenCalledTimes(2);
         });
 
         it("should return the original cached value if the transaction causes no changes", function() {
 
-          var mapper = {};
-          spyOn(propType, "getMapperOn").and.returnValue(mapper);
+          var adapter = {};
+          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
 
           txnScope.accept();
 
-          var result = model.propRoleA.mapper;
+          var result = model.propRoleA.adapter;
 
           expect(result).toBe(mapper0);
-          expect(propType.getMapperOn).not.toHaveBeenCalled();
+          expect(propType.getAdapterOn).not.toHaveBeenCalled();
         });
 
         it("should return a new value if the transaction changes the `data` property", function() {
 
-          var mapper = {};
-          spyOn(propType, "getMapperOn").and.returnValue(mapper);
+          var adapter = {};
+          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
 
           model.data = new Table(getDataSpec1());
 
           txnScope.accept();
 
-          var result = model.propRoleA.mapper;
+          var result = model.propRoleA.adapter;
 
-          expect(result).toBe(mapper);
+          expect(result).toBe(adapter);
           expect(result).not.toBe(mapper0);
-          expect(propType.getMapperOn).toHaveBeenCalledTimes(1);
+          expect(propType.getAdapterOn).toHaveBeenCalledTimes(1);
         });
 
         it("should return a new value if the transaction changes a visual role property", function() {
 
-          var mapper = {};
-          spyOn(propType, "getMapperOn").and.returnValue(mapper);
+          var adapter = {};
+          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
 
           model.propRoleA.fields = ["product"];
 
           txnScope.accept();
 
-          var result = model.propRoleA.mapper;
+          var result = model.propRoleA.adapter;
 
-          expect(result).toBe(mapper);
+          expect(result).toBe(adapter);
           expect(result).not.toBe(mapper0);
-          expect(propType.getMapperOn).toHaveBeenCalledTimes(1);
+          expect(propType.getAdapterOn).toHaveBeenCalledTimes(1);
         });
 
         it("should return the original cached value if the transaction changes normal properties", function() {
 
-          var mapper = {};
-          spyOn(propType, "getMapperOn").and.returnValue(mapper);
+          var adapter = {};
+          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
 
           model.propNormal = "new-value";
 
           txnScope.accept();
 
-          var result = model.propRoleA.mapper;
+          var result = model.propRoleA.adapter;
 
           expect(result).toBe(mapper0);
-          expect(propType.getMapperOn).not.toHaveBeenCalled();
+          expect(propType.getAdapterOn).not.toHaveBeenCalled();
         });
       });
     });
