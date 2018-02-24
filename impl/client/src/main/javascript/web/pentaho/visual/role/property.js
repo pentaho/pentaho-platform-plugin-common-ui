@@ -238,11 +238,14 @@ define([
 
             var modes = this.modes;
             var modeCount = modes.count;
-            if(modeCount === 0) {
-              return null;
-            }
+
+            // assert modeCount > 0
 
             var fieldTypes = this.__getMappingFieldTypes(data, mapping);
+            if(fieldTypes === null) {
+              // There's at least one invalid field.
+              return null;
+            }
 
             var modeIndex = -1;
             while(++modeIndex < modeCount) {

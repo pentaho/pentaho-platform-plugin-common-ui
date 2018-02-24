@@ -28,7 +28,7 @@ define([
 
     describe(".Type", function() {
 
-      var VisualModel;
+      var Model;
       var RoleProperty;
       var context;
 
@@ -42,7 +42,7 @@ define([
                 "pentaho/visual/base/model",
                 "pentaho/visual/role/property"
               ], function(_Model, _RoleProperty) {
-                VisualModel = _Model;
+                Model = _Model;
                 RoleProperty = _RoleProperty;
               });
             })
@@ -68,12 +68,12 @@ define([
 
       function createFullValidQualitativeMapping() {
 
-        var DerivedVisualModel = VisualModel.extend({
+        var DerivedModel = Model.extend({
           $type: {
             props: {
               propRole: {
                 base: "pentaho/visual/role/property",
-                modes: [{valueType: ["string"]}]
+                modes: [{dataType: ["string"]}]
               }
             }
           }
@@ -81,7 +81,7 @@ define([
 
         var data = new Table(getDataSpec1());
 
-        var model = new DerivedVisualModel({
+        var model = new DerivedModel({
           data: data,
           propRole: {fields: ["country", "product"]}
         });
@@ -97,12 +97,12 @@ define([
       }
       // endregion
 
-      // region role property modes
+      // region #modes et. al.
       describe("#modes", function() {
 
         it("should default to a single mode having data type string and isContinuous false", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -112,7 +112,7 @@ define([
             }
           });
 
-          var actualModes = Model.type.get("propRole").modes.toJSON();
+          var actualModes = DerivedModel.type.get("propRole").modes.toJSON();
 
           expect(actualModes).toEqual([
             {dataType: "string"}
@@ -126,7 +126,7 @@ define([
             {dataType: "string"}
           ];
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -137,7 +137,7 @@ define([
             }
           });
 
-          var actualModes = Model.type.get("propRole").modes.toJSON();
+          var actualModes = DerivedModel.type.get("propRole").modes.toJSON();
 
           expect(actualModes).toEqual(initialModes);
         });
@@ -149,7 +149,7 @@ define([
             {dataType: "string"}
           ];
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -164,7 +164,7 @@ define([
             {dataType: "number"}
           ];
 
-          var rolePropType = Model.type.get("propRole");
+          var rolePropType = DerivedModel.type.get("propRole");
 
           rolePropType.modes = finalModes;
 
@@ -177,7 +177,7 @@ define([
 
           expect(function() {
 
-            VisualModel.extend({
+            Model.extend({
               $type: {
                 props: {
                   propRole: {
@@ -197,7 +197,7 @@ define([
             {dataType: "string"}
           ];
 
-          var ModelA = VisualModel.extend({
+          var ModelA = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -234,7 +234,7 @@ define([
             {dataType: "string"}
           ];
 
-          var ModelA = VisualModel.extend({
+          var ModelA = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -263,7 +263,7 @@ define([
               {dataType: "string"}
             ];
 
-            var Model = VisualModel.extend({
+            var DerivedModel = Model.extend({
               $type: {
                 props: {
                   propRole: {
@@ -274,7 +274,7 @@ define([
               }
             });
 
-            var rolePropType = Model.type.get("propRole");
+            var rolePropType = DerivedModel.type.get("propRole");
 
             rolePropType.modes = nullyValue;
 
@@ -301,7 +301,7 @@ define([
             {dataType: "string"}
           ];
 
-          var ModelA = VisualModel.extend({
+          var ModelA = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -348,7 +348,7 @@ define([
 
         it("should be true if any level is quantitative", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -362,14 +362,14 @@ define([
             }
           });
 
-          var rolePropType = Model.type.get("propRole");
+          var rolePropType = DerivedModel.type.get("propRole");
 
           expect(rolePropType.hasAnyContinuousModes).toBe(true);
         });
 
         it("should be false if every level is categorical", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -383,7 +383,7 @@ define([
             }
           });
 
-          var rolePropType = Model.type.get("propRole");
+          var rolePropType = DerivedModel.type.get("propRole");
 
           expect(rolePropType.hasAnyContinuousModes).toBe(false);
         });
@@ -393,7 +393,7 @@ define([
 
         it("should be true if any mode is categorical", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRoleA: {
@@ -421,14 +421,14 @@ define([
             }
           });
 
-          expect(Model.type.get("propRoleA").hasAnyCategoricalModes).toBe(true);
-          expect(Model.type.get("propRoleB").hasAnyCategoricalModes).toBe(true);
-          expect(Model.type.get("propRoleC").hasAnyCategoricalModes).toBe(true);
+          expect(DerivedModel.type.get("propRoleA").hasAnyCategoricalModes).toBe(true);
+          expect(DerivedModel.type.get("propRoleB").hasAnyCategoricalModes).toBe(true);
+          expect(DerivedModel.type.get("propRoleC").hasAnyCategoricalModes).toBe(true);
         });
 
         it("should be false if every mode is continuous", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -441,7 +441,7 @@ define([
             }
           });
 
-          expect(Model.type.get("propRole").hasAnyCategoricalModes).toBe(false);
+          expect(DerivedModel.type.get("propRole").hasAnyCategoricalModes).toBe(false);
         });
       });
 
@@ -454,7 +454,7 @@ define([
 
         it("should default to true if there is at least one categorical mode", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -468,14 +468,14 @@ define([
             }
           });
 
-          var rolePropType = Model.type.get("propRole");
+          var rolePropType = DerivedModel.type.get("propRole");
 
           expect(rolePropType.isVisualKey).toBe(true);
         });
 
         it("should default to true if modes is unspecified", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -485,14 +485,14 @@ define([
             }
           });
 
-          var rolePropType = Model.type.get("propRole");
+          var rolePropType = DerivedModel.type.get("propRole");
 
           expect(rolePropType.isVisualKey).toBe(true);
         });
 
         it("should default to false if there is no categorical mode", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -505,14 +505,14 @@ define([
             }
           });
 
-          var rolePropType = Model.type.get("propRole");
+          var rolePropType = DerivedModel.type.get("propRole");
 
           expect(rolePropType.isVisualKey).toBe(false);
         });
 
         it("should respect a specified boolean false value if there are categorical modes", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -527,14 +527,14 @@ define([
             }
           });
 
-          var rolePropType = Model.type.get("propRole");
+          var rolePropType = DerivedModel.type.get("propRole");
 
           expect(rolePropType.isVisualKey).toBe(false);
         });
 
         it("should respect a specified boolean true value if there are categorical modes", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -549,14 +549,14 @@ define([
             }
           });
 
-          var rolePropType = Model.type.get("propRole");
+          var rolePropType = DerivedModel.type.get("propRole");
 
           expect(rolePropType.isVisualKey).toBe(true);
         });
 
         it("should respect a specified boolean false value if there are no categorical modes", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -570,14 +570,14 @@ define([
             }
           });
 
-          var rolePropType = Model.type.get("propRole");
+          var rolePropType = DerivedModel.type.get("propRole");
 
           expect(rolePropType.isVisualKey).toBe(false);
         });
 
         it("should respect a specified boolean true value if there are no categorical modes", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -591,14 +591,14 @@ define([
             }
           });
 
-          var rolePropType = Model.type.get("propRole");
+          var rolePropType = DerivedModel.type.get("propRole");
 
           expect(rolePropType.isVisualKey).toBe(true);
         });
 
         it("should ignore a specified null value", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -612,14 +612,14 @@ define([
             }
           });
 
-          var rolePropType = Model.type.get("propRole");
+          var rolePropType = DerivedModel.type.get("propRole");
 
           expect(rolePropType.isVisualKey).toBe(true);
         });
 
         it("should ignore a specified undefined value", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -633,14 +633,14 @@ define([
             }
           });
 
-          var rolePropType = Model.type.get("propRole");
+          var rolePropType = DerivedModel.type.get("propRole");
 
           expect(rolePropType.isVisualKey).toBe(true);
         });
 
         it("should ignore setting to an undefined value", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -654,7 +654,7 @@ define([
             }
           });
 
-          var rolePropType = Model.type.get("propRole");
+          var rolePropType = DerivedModel.type.get("propRole");
 
           expect(rolePropType.isVisualKey).toBe(false);
 
@@ -665,7 +665,7 @@ define([
 
         it("should ignore setting to an null value", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -679,7 +679,7 @@ define([
             }
           });
 
-          var rolePropType = Model.type.get("propRole");
+          var rolePropType = DerivedModel.type.get("propRole");
 
           expect(rolePropType.isVisualKey).toBe(false);
 
@@ -690,7 +690,7 @@ define([
 
         it("should respect setting to the value true", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -703,7 +703,7 @@ define([
             }
           });
 
-          var rolePropType = Model.type.get("propRole");
+          var rolePropType = DerivedModel.type.get("propRole");
 
           rolePropType.isVisualKey = true;
 
@@ -712,7 +712,7 @@ define([
 
         it("should ignore setting to the value false after being true", function() {
 
-          var Model = VisualModel.extend({
+          var DerivedModel = Model.extend({
             $type: {
               props: {
                 propRole: {
@@ -725,7 +725,7 @@ define([
             }
           });
 
-          var rolePropType = Model.type.get("propRole");
+          var rolePropType = DerivedModel.type.get("propRole");
 
           rolePropType.isVisualKey = false;
 
@@ -733,6 +733,198 @@ define([
         });
       });
       // endregion
+
+      describe("#getModeEffectiveOn(model)", function() {
+
+        it("should return mapping.modeFixed if it is specified", function() {
+
+          var DerivedModel = Model.extend({
+            $type: {
+              props: {
+                propRole: {
+                  base: "pentaho/visual/role/property",
+                  modes: [
+                    {dataType: "element"},
+                    {dataType: "string"}
+                  ]
+                }
+              }
+            }
+          });
+
+          var rolePropType = DerivedModel.type.get("propRole");
+
+          var model = new DerivedModel({
+            data: new Table(getDataSpec1()),
+            propRole: {
+              modeFixed: {dataType: "string"},
+              fields: [{name: "country"}]
+            }
+          });
+
+          var result = rolePropType.getModeEffectiveOn(model);
+
+          expect(result).toBe(model.propRole.modeFixed);
+        });
+
+        describe("when mapping.modeFixed is not specified", function() {
+
+          it("should return null if model has no data", function() {
+
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  propRole: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "string"}
+                    ]
+                  }
+                }
+              }
+            });
+
+            var rolePropType = DerivedModel.type.get("propRole");
+
+            var model = new DerivedModel({
+              propRole: {
+                fields: [{name: "country"}]
+              }
+            });
+
+            var result = rolePropType.getModeEffectiveOn(model);
+
+            expect(result).toBe(null);
+          });
+
+          describe("when data is specified", function() {
+
+            it("should return null when the mapping references an undefined field", function() {
+
+              var DerivedModel = Model.extend({
+                $type: {
+                  props: {
+                    propRole: {
+                      base: "pentaho/visual/role/property",
+                      modes: [
+                        {dataType: "string"}
+                      ]
+                    }
+                  }
+                }
+              });
+
+              var rolePropType = DerivedModel.type.get("propRole");
+
+              var model = new DerivedModel({
+                data: new Table(getDataSpec1()),
+                propRole: {
+                  fields: [{name: "country"}, {name: "foo"}]
+                }
+              });
+
+              var result = rolePropType.getModeEffectiveOn(model);
+
+              expect(result).toBe(null);
+            });
+
+            describe("when all fields are defined", function() {
+
+              it("should return the first mode which is applicable to the mapped fields' types (i)", function() {
+
+                var DerivedModel = Model.extend({
+                  $type: {
+                    props: {
+                      propRole: {
+                        base: "pentaho/visual/role/property",
+                        modes: [
+                          {dataType: "number"},
+                          {dataType: "element"},
+                          {dataType: "string"}
+                        ]
+                      }
+                    }
+                  }
+                });
+
+                var rolePropType = DerivedModel.type.get("propRole");
+
+                var model = new DerivedModel({
+                  data: new Table(getDataSpec1()),
+                  propRole: {
+                    fields: [{name: "country"}]
+                  }
+                });
+
+                var result = rolePropType.getModeEffectiveOn(model);
+
+                expect(result).toBe(rolePropType.modes.at(1));
+              });
+
+              it("should return the first mode which is applicable to the mapped fields' types (ii)", function() {
+
+                var DerivedModel = Model.extend({
+                  $type: {
+                    props: {
+                      propRole: {
+                        base: "pentaho/visual/role/property",
+                        modes: [
+                          {dataType: "string"},
+                          {dataType: "element"},
+                          {dataType: ["string"]}
+                        ]
+                      }
+                    }
+                  }
+                });
+
+                var rolePropType = DerivedModel.type.get("propRole");
+
+                var model = new DerivedModel({
+                  data: new Table(getDataSpec1()),
+                  propRole: {
+                    fields: [{name: "country"}, {name: "product"}]
+                  }
+                });
+
+                var result = rolePropType.getModeEffectiveOn(model);
+
+                expect(result).toBe(rolePropType.modes.at(2));
+              });
+
+              it("should return null when there is no applicable mode to the mapped fields' types", function() {
+
+                var DerivedModel = Model.extend({
+                  $type: {
+                    props: {
+                      propRole: {
+                        base: "pentaho/visual/role/property",
+                        modes: [
+                          {dataType: "string"},
+                          {dataType: "element"}
+                        ]
+                      }
+                    }
+                  }
+                });
+
+                var rolePropType = DerivedModel.type.get("propRole");
+
+                var model = new DerivedModel({
+                  data: new Table(getDataSpec1()),
+                  propRole: {
+                    fields: [{name: "country"}, {name: "product"}]
+                  }
+                });
+
+                var result = rolePropType.getModeEffectiveOn(model);
+
+                expect(result).toBe(null);
+              });
+            });
+          });
+        });
+      });
 
       describe("#validateOn(model)", function() {
 
@@ -761,7 +953,7 @@ define([
 
             it("should stop validation if base validation returns errors", function() {
 
-              var Model = VisualModel.extend({
+              var DerivedModel = Model.extend({
                 $type: {
                   props: {
                     propRole: {
@@ -771,9 +963,9 @@ define([
                 }
               });
 
-              var rolePropType = Model.type.get("propRole");
+              var rolePropType = DerivedModel.type.get("propRole");
 
-              var model = new Model({
+              var model = new DerivedModel({
                 propRole: {fields: [{}]}
               });
 
@@ -805,7 +997,7 @@ define([
 
             var scope = new SpecificationScope();
 
-            var DerivedVisualModel = VisualModel.extend({
+            var DerivedModel = Model.extend({
               $type: {
                 props: {
                   propRole: {
@@ -815,7 +1007,7 @@ define([
               }
             });
 
-            var rolePropType = DerivedVisualModel.type.get("propRole");
+            var rolePropType = DerivedModel.type.get("propRole");
             var spec = {};
             var ka = {};
             var any = rolePropType._fillSpecInContext(spec, ka);
@@ -831,7 +1023,7 @@ define([
 
             var scope = new SpecificationScope();
 
-            var DerivedVisualModel = VisualModel.extend({
+            var DerivedModel = Model.extend({
               $type: {
                 props: {
                   propRole: {
@@ -844,7 +1036,7 @@ define([
               }
             });
 
-            var rolePropType = DerivedVisualModel.type.get("propRole");
+            var rolePropType = DerivedModel.type.get("propRole");
             var spec = {};
             var ka = {};
             var any = rolePropType._fillSpecInContext(spec, ka);
@@ -860,7 +1052,7 @@ define([
 
             var scope = new SpecificationScope();
 
-            var DerivedVisualModel = VisualModel.extend({
+            var DerivedModel = Model.extend({
               $type: {
                 props: {
                   propRole: {
@@ -874,7 +1066,7 @@ define([
               }
             });
 
-            var DerivedVisualModel2 = DerivedVisualModel.extend({
+            var DerivedModel2 = DerivedModel.extend({
               $type: {
                 props: {
                   propRole: {
@@ -887,7 +1079,7 @@ define([
               }
             });
 
-            var rolePropType = DerivedVisualModel2.type.get("propRole");
+            var rolePropType = DerivedModel2.type.get("propRole");
             var spec = {};
             var ka = {};
             var any = rolePropType._fillSpecInContext(spec, ka);
@@ -908,7 +1100,7 @@ define([
 
               var scope = new SpecificationScope();
 
-              var DerivedVisualModel = VisualModel.extend({
+              var DerivedModel = Model.extend({
                 $type: {
                   props: {
                     propRole: {
@@ -918,7 +1110,7 @@ define([
                 }
               });
 
-              var rolePropType = DerivedVisualModel.type.get("propRole");
+              var rolePropType = DerivedModel.type.get("propRole");
               var spec = {};
               var ka = {};
               var any = rolePropType._fillSpecInContext(spec, ka);
@@ -934,7 +1126,7 @@ define([
 
               var scope = new SpecificationScope();
 
-              var DerivedVisualModel = VisualModel.extend({
+              var DerivedModel = Model.extend({
                 $type: {
                   props: {
                     propRole: {
@@ -945,7 +1137,7 @@ define([
                 }
               });
 
-              var rolePropType = DerivedVisualModel.type.get("propRole");
+              var rolePropType = DerivedModel.type.get("propRole");
               var spec = {};
               var ka = {};
               var any = rolePropType._fillSpecInContext(spec, ka);
@@ -959,7 +1151,7 @@ define([
 
               var scope = new SpecificationScope();
 
-              var DerivedVisualModel = VisualModel.extend({
+              var DerivedModel = Model.extend({
                 $type: {
                   props: {
                     propRole: {
@@ -970,7 +1162,7 @@ define([
                 }
               });
 
-              var rolePropType = DerivedVisualModel.type.get("propRole");
+              var rolePropType = DerivedModel.type.get("propRole");
               var spec = {};
               var ka = {};
               var any = rolePropType._fillSpecInContext(spec, ka);
@@ -988,7 +1180,7 @@ define([
 
               var scope = new SpecificationScope();
 
-              var DerivedVisualModel = VisualModel.extend({
+              var DerivedModel = Model.extend({
                 $type: {
                   props: {
                     propRole: {
@@ -999,7 +1191,7 @@ define([
                 }
               });
 
-              var DerivedVisualModel2 = DerivedVisualModel.extend({
+              var DerivedModel2 = DerivedModel.extend({
                 $type: {
                   props: {
                     propRole: {
@@ -1009,7 +1201,7 @@ define([
                 }
               });
 
-              var rolePropType = DerivedVisualModel2.type.get("propRole");
+              var rolePropType = DerivedModel2.type.get("propRole");
               var spec = {};
               var ka = {};
               var any = rolePropType._fillSpecInContext(spec, ka);

@@ -89,7 +89,7 @@ define([
             props: {
               propRole: {
                 base: "pentaho/visual/role/property",
-                modes: [{valueType: "string"}],
+                modes: [{dataType: "string"}],
                 strategies: [new IdentityStrategy(), new CombineStrategy(), new TupleStrategy()],
                 dataType: "string"
               }

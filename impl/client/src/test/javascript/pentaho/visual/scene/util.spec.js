@@ -387,7 +387,7 @@ define([
                 {
                   name: "measure",
                   base: "pentaho/visual/role/property",
-                  modes: [{valueType: "number"}]
+                  modes: [{dataType: "number"}]
                 }
               ]
             }
@@ -532,7 +532,7 @@ define([
                 {
                   name: "measure",
                   base: "pentaho/visual/role/property",
-                  modes: [{valueType: "number"}]
+                  modes: [{dataType: "number"}]
                 }
               ]
             }

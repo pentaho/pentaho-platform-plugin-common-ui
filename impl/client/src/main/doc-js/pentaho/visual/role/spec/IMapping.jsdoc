@@ -21,7 +21,7 @@
  * @example
  * {
  *   fields: ["family", "product"],
- *   modeFixed: {valueType: ["string"]}
+ *   modeFixed: {dataType: ["string"]}
  * }
  *
  * @name pentaho.visual.role.spec.IMapping
