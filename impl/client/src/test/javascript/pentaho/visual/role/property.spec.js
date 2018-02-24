@@ -344,6 +344,93 @@ define([
         });
       });
 
+      describe("#hasAnyListModes", function() {
+
+        it("should be true if any mode is list", function() {
+
+          var DerivedModel = Model.extend({
+            $type: {
+              props: {
+                propRoleA: {
+                  base: "pentaho/visual/role/property",
+                  modes: [
+                    {dataType: "number"},
+                    {dataType: ["string"]}
+                  ]
+                },
+                propRoleB: {
+                  base: "pentaho/visual/role/property",
+                  modes: [
+                    {dataType: "string"},
+                    {dataType: ["number"]}
+                  ]
+                },
+                propRoleC: {
+                  base: "pentaho/visual/role/property",
+                  modes: [
+                    {dataType: "list"}
+                  ]
+                }
+              }
+            }
+          });
+
+          expect(DerivedModel.type.get("propRoleA").hasAnyListModes).toBe(true);
+          expect(DerivedModel.type.get("propRoleB").hasAnyListModes).toBe(true);
+          expect(DerivedModel.type.get("propRoleC").hasAnyListModes).toBe(true);
+        });
+
+        it("should be false if every mode is not a list, value or instance", function() {
+
+          var DerivedModel = Model.extend({
+            $type: {
+              props: {
+                propRole: {
+                  base: "pentaho/visual/role/property",
+                  modes: [
+                    {dataType: "number"}
+                  ]
+                }
+              }
+            }
+          });
+
+          expect(DerivedModel.type.get("propRole").hasAnyListModes).toBe(false);
+        });
+
+        it("should be true if some mode is of type value or instance", function() {
+
+          var DerivedModel1 = Model.extend({
+            $type: {
+              props: {
+                propRole: {
+                  base: "pentaho/visual/role/property",
+                  modes: [
+                    {dataType: "value"}
+                  ]
+                }
+              }
+            }
+          });
+
+          var DerivedModel2 = Model.extend({
+            $type: {
+              props: {
+                propRole: {
+                  base: "pentaho/visual/role/property",
+                  modes: [
+                    {dataType: "instance"}
+                  ]
+                }
+              }
+            }
+          });
+
+          expect(DerivedModel1.type.get("propRole").hasAnyListModes).toBe(true);
+          expect(DerivedModel2.type.get("propRole").hasAnyListModes).toBe(true);
+        });
+      });
+
       describe("#hasAnyContinuousModes", function() {
 
         it("should be true if any level is quantitative", function() {
@@ -734,6 +821,64 @@ define([
       });
       // endregion
 
+      describe("#fields", function() {
+
+        describe("#countRangeOn(model)", function() {
+
+          it("should return max = 1 if there are no list modes", function() {
+
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  propRole: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "element"},
+                      {dataType: "string"}
+                    ]
+                  }
+                }
+              }
+            });
+
+            var rolePropType = DerivedModel.type.get("propRole");
+
+            var model = new DerivedModel();
+
+            var result = rolePropType.fields.countRangeOn(model);
+
+            expect(result instanceof Object).toBe(true);
+            expect(result.max).toBe(1);
+          });
+
+          it("should return max = Infinity if there is at least one list mode", function() {
+
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  propRole: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "element"},
+                      {dataType: "list"}
+                    ]
+                  }
+                }
+              }
+            });
+
+            var rolePropType = DerivedModel.type.get("propRole");
+
+            var model = new DerivedModel();
+
+            var result = rolePropType.fields.countRangeOn(model);
+
+            expect(result instanceof Object).toBe(true);
+            expect(result.max).toBe(Infinity);
+          });
+        });
+      });
+
       describe("#getModeEffectiveOn(model)", function() {
 
         it("should return mapping.modeFixed if it is specified", function() {
@@ -982,6 +1127,15 @@ define([
               var model = createFullValidQualitativeMapping();
 
               model.propRole.modeFixed = {dataType: "number"};
+
+              assertIsInvalid(model);
+            });
+
+            it("should be invalid when there is no applicable mode", function() {
+
+              var model = createFullValidQualitativeMapping();
+
+              model.propRole.fields = ["sales"];
 
               assertIsInvalid(model);
             });

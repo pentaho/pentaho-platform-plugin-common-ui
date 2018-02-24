@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 define([
+  "./_util",
   "cdf/lib/CCC/def",
   "pentaho/i18n!./i18n/view"
-], function(def, bundle) {
+], function(util, def, bundle) {
 
   "use strict";
 

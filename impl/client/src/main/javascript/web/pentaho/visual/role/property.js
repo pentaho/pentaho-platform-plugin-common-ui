@@ -72,6 +72,11 @@ define([
           // Setting the value type resets the inherited defaultValue.
           defaultValue: function() { return {}; },
 
+          // It's limited to 1 if it has no list modes.
+          __fieldsCountMax: function(propType) {
+            return propType.hasAnyListModes ? Infinity : 1;
+          },
+
           /** @inheritDoc */
           _init: function(spec, keyArgs) {
 
@@ -383,6 +388,13 @@ define([
                 if(!this.modes.has(modeFixed.$key)) {
                   addErrors(new ValidationError(
                       bundle.format(bundle.structured.errors.property.modeFixedInvalid, {role: this})));
+                }
+              }
+
+              if(!errors) {
+                if(mapping.mode == null) {
+                  addErrors(new ValidationError(
+                      bundle.format(bundle.structured.errors.property.noApplicableMode, {role: this})));
                 }
               }
             }

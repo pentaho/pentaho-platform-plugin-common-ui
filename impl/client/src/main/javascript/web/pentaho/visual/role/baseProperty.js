@@ -85,6 +85,28 @@ define([
            */
 
           /**
+           * Gets a value that indicates if the visual role has any list modes.
+           *
+           * @type {boolean}
+           * @readOnly
+           * @see pentaho.visual.role.Mode#dataType
+           * @see pentaho.type.Type#isList
+           * @see pentaho.type.Type#isElement
+           */
+          get hasAnyListModes() {
+            var any = false;
+            this.modes.each(function(mode) {
+              var dataType = mode.dataType;
+              // it's either a list type or not an element as well (e.g. instance or value).
+              if(dataType.isList || !dataType.isElement) {
+                any = true;
+                return false;
+              }
+            });
+            return any;
+          },
+
+          /**
            * Gets a value that indicates if the visual role has any categorical modes.
            *
            * @type {boolean}
@@ -190,6 +212,10 @@ define([
           // region fields
           /*
            * Actually implements IFieldsConstraints#countRangeOn.
+           *
+           * TODO: Shouldn't this also integrate the underlying `fields` property's own isRequired, countMin, countMax
+           * attributes? Can be a problem if anyone creates a subclass of property (outside of configuration)
+           * and changes the defaults.
            */
           __fieldsCountRangeOn: function(model) {
             var isRequired = this.__fieldsIsRequiredOn(model);
