@@ -114,16 +114,14 @@ define([
 
           var actualModes = DerivedModel.type.get("propRole").modes.toJSON();
 
-          expect(actualModes).toEqual([
-            {dataType: "string"}
-          ]);
+          expect(actualModes).toEqual(["string"]);
         });
 
         it("should respect the values specified on the spec", function() {
 
           var initialModes = [
-            {dataType: "number"},
-            {dataType: "string"}
+            "number",
+            "string"
           ];
 
           var DerivedModel = Model.extend({
@@ -145,8 +143,8 @@ define([
         it("should allow removing modes by setting", function() {
 
           var initialModes = [
-            {dataType: "number"},
-            {dataType: "string"}
+            "number",
+            "string"
           ];
 
           var DerivedModel = Model.extend({
@@ -161,7 +159,7 @@ define([
           });
 
           var finalModes = [
-            {dataType: "number"}
+            "number"
           ];
 
           var rolePropType = DerivedModel.type.get("propRole");
@@ -193,8 +191,8 @@ define([
         it("should allow a derived property to remove modes", function() {
 
           var initialModes = [
-            {dataType: "number"},
-            {dataType: "string"}
+            "number",
+            "string"
           ];
 
           var ModelA = Model.extend({
@@ -209,7 +207,7 @@ define([
           });
 
           var finalModes = [
-            {dataType: "string"}
+            "string"
           ];
 
           var ModelB = ModelA.extend({
@@ -230,8 +228,8 @@ define([
         it("should inherit the modes of the ancestor property type, when modes is unspecified", function() {
 
           var initialModes = [
-            {dataType: "number"},
-            {dataType: "string"}
+            "number",
+            "string"
           ];
 
           var ModelA = Model.extend({
@@ -259,8 +257,8 @@ define([
           function expectNopOnNullyValue(nullyValue) {
 
             var initialModes = [
-              {dataType: "number"},
-              {dataType: "string"}
+              "number",
+              "string"
             ];
 
             var DerivedModel = Model.extend({
@@ -297,8 +295,8 @@ define([
         it("should throw an error, when modes is set and the property type already has descendants.", function() {
 
           var initialModes = [
-            {dataType: "number"},
-            {dataType: "string"}
+            "number",
+            "string"
           ];
 
           var ModelA = Model.extend({
@@ -321,7 +319,7 @@ define([
           });
 
           var finalModes = [
-            {dataType: "string"}
+            "string"
           ];
 
           var roleAPropType = ModelA.type.get("propRole");
@@ -398,7 +396,7 @@ define([
           expect(DerivedModel.type.get("propRole").hasAnyListModes).toBe(false);
         });
 
-        it("should be true if some mode is of type value or instance", function() {
+        it("should be false if some mode is of type value or instance", function() {
 
           var DerivedModel1 = Model.extend({
             $type: {
@@ -426,8 +424,8 @@ define([
             }
           });
 
-          expect(DerivedModel1.type.get("propRole").hasAnyListModes).toBe(true);
-          expect(DerivedModel2.type.get("propRole").hasAnyListModes).toBe(true);
+          expect(DerivedModel1.type.get("propRole").hasAnyListModes).toBe(false);
+          expect(DerivedModel2.type.get("propRole").hasAnyListModes).toBe(false);
         });
       });
 
@@ -1199,7 +1197,7 @@ define([
 
             expect(any).toBe(true);
             expect(spec.modes.length).toBe(1);
-            expect(spec.modes[0].dataType.id).toBe("pentaho/type/string");
+            expect(spec.modes[0].id).toBe("pentaho/type/string");
           });
 
           it("should serialize modes when locally specified in a derived class", function() {
@@ -1242,7 +1240,7 @@ define([
 
             expect(any).toBe(true);
             expect(spec.modes.length).toBe(1);
-            expect(spec.modes[0].dataType.id).toBe("pentaho/type/string");
+            expect(spec.modes[0].id).toBe("pentaho/type/string");
           });
         });
 

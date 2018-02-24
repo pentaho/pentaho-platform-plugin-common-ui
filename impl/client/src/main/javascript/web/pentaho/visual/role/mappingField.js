@@ -43,7 +43,9 @@ define([
 
         constructor: function(spec, keyArgs) {
           // The name property?
-          if(typeof spec === "string") spec = {name: spec};
+          if(typeof spec === "string") {
+            spec = {name: spec};
+          }
 
           this.base(spec, keyArgs);
         },
@@ -66,7 +68,9 @@ define([
               name = spec.name;
             }
 
-            if(name && count === 1) spec = name;
+            if(name && count === 1) {
+              spec = name;
+            }
           }
 
           return spec;

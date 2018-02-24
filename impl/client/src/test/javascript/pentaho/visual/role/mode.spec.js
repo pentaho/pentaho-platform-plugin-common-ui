@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context"
-], function(Context) {
+  "pentaho/type/Context",
+  "pentaho/type/SpecificationScope"
+], function(Context, SpecificationScope) {
 
   "use strict";
 
@@ -30,7 +31,6 @@ define([
     var numberType;
     var booleanType;
     var dateType;
-    var objectType;
     var listType;
     var elementType;
 
@@ -44,7 +44,6 @@ define([
             numberType = context.get("number").type;
             booleanType = context.get("boolean").type;
             dateType = context.get("date").type;
-            objectType = context.get("object").type;
             elementType = context.get("element").type;
             listType = context.get("list").type;
 
@@ -121,6 +120,33 @@ define([
           var mode = new Mode({dataType: numberType, isContinuous: false});
           expect(mode.isContinuous).toBe(false);
         });
+      });
+
+      it("should allow creating given a string as spec and recognize it as the dataType property", function() {
+
+        var spec = "string";
+        var mode = new Mode(spec);
+        expect(mode instanceof Mode).toBe(true);
+
+        expect(mode.dataType.alias).toBe(spec);
+      });
+
+      it("should allow creating given an instance constructor as spec " +
+          "and recognize it as the dataType property", function() {
+
+        var mode = new Mode(stringType.instance.constructor);
+        expect(mode instanceof Mode).toBe(true);
+
+        expect(mode.dataType).toBe(stringType);
+      });
+
+      it("should allow creating given an Type instance as spec " +
+          "and recognize it as the dataType property", function() {
+
+        var mode = new Mode(stringType);
+        expect(mode instanceof Mode).toBe(true);
+
+        expect(mode.dataType).toBe(stringType);
       });
     });
 
@@ -360,6 +386,49 @@ define([
         it("should return true when given [string, string]", function() {
           expect(mode.canApplyToFieldTypes([stringType, stringType])).toBe(true);
         });
+      });
+    });
+
+    describe("#toSpecInContext(keyArgs)", function() {
+
+      var specScope;
+
+      beforeEach(function() {
+
+        specScope = new SpecificationScope();
+      });
+
+      it("should return a string when only the dataType property is serialized", function() {
+
+        var mode = new Mode({dataType: stringType});
+
+        var result = mode.toSpecInContext({includeDefaults: false});
+
+        specScope.dispose();
+
+        expect(result).toBe(stringType);
+      });
+
+      it("should return an object when not only the dataType property is serialized", function() {
+
+        var mode = new Mode({dataType: stringType});
+
+        var result = mode.toSpecInContext({includeDefaults: true});
+
+        specScope.dispose();
+
+        expect(result.constructor).toBe(Object);
+      });
+
+      it("should return an array when the base serialization is an array", function() {
+
+        var mode = new Mode({dataType: stringType});
+
+        var result = mode.toSpecInContext({includeDefaults: false, preferPropertyArray: true});
+
+        specScope.dispose();
+
+        expect(Array.isArray(result)).toBe(true);
       });
     });
   });

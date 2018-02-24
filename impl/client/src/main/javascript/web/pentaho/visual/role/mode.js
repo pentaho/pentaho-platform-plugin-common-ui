@@ -50,6 +50,15 @@ define([
        */
       var VisualRoleMode = Complex.extend(/** @lends pentaho.visual.role.Mode# */{
 
+        constructor: function(spec, keyArgs) {
+          // The name property?
+          if(spec != null && spec.constructor !== Object) {
+            spec = {dataType: spec};
+          }
+
+          this.base(spec, keyArgs);
+        },
+
         /**
          * Gets the (immutable) key of the visual role mode.
          *
@@ -91,6 +100,32 @@ define([
           return fieldTypes.every(function(fieldType) {
             return fieldType.isSubtypeOf(elementType);
           });
+        },
+
+        /** @inheritDoc */
+        toSpecInContext: function(keyArgs) {
+
+          var spec = this.base(keyArgs);
+
+          if(spec.constructor === Object) {
+            // If only the dataType is output, then return it directly.
+            var count = 0;
+            var dataType = null;
+
+            /* eslint guard-for-in: 0 */
+            for(var p in spec) {
+              count++;
+              if(count > 1 || p !== "dataType") break;
+              // count === 0 && p === name
+              dataType = spec.dataType;
+            }
+
+            if(dataType !== null && count === 1) {
+              spec = dataType;
+            }
+          }
+
+          return spec;
         },
 
         $type: /** @lends pentaho.visual.role.Mode.Type# */{
