@@ -80,10 +80,11 @@ define([
         __calculate: function() {
           var dataTable = this.model.data;
           var rowCount = dataTable.getNumberOfRows();
-          var measureMapper = this.model.measure.mapper;
+          var measureFieldName = this.model.measure.fields.at(0).name;
+          var measureIndex = dataTable.getColumnIndexById(measureFieldName);
 
           var getValue = function(k) {
-            var v = measureMapper.getValue(k);
+            var v = dataTable.getValue(k, measureIndex);
             return !isNaN(v) && v != null ? v : null;
           };
 
