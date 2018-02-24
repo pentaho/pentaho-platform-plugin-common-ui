@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,21 +38,25 @@ define([
           props: [
             {
               name: "rows", // VISUAL_ROLE
-              levels: ["ordinal"],
-              attributes: {isRequired: true}
+              modes: [
+                {dataType: "list"}
+              ],
+              fields: {isRequired: true}
             },
             {
               name: "size", // VISUAL_ROLE
               base: "pentaho/visual/role/property",
-              levels: ["quantitative"],
-              dataType: "number",
-              attributes: {countMax: 1},
+              modes: [
+                {dataType: "number"}
+              ],
               ordinal: 7
             },
             {
               name: "multi", // VISUAL_ROLE
               base: "pentaho/visual/role/property",
-              levels: ["ordinal"],
+              modes: [
+                {dataType: "list"}
+              ],
               ordinal: 10
             },
             {
@@ -65,7 +69,7 @@ define([
               name: "labelsOption",
               valueType: LabelsOption,
               domain: ["none", "center"],
-              isApplicable: __isSizeMapped,
+              isApplicable: __hasFieldsSize,
               isRequired: true,
               defaultValue: "none"
             },
@@ -78,7 +82,7 @@ define([
             {
               name: "sliceOrder",
               valueType: SliceOrder,
-              isApplicable: __isSizeMapped,
+              isApplicable: __hasFieldsSize,
               isRequired: true,
               defaultValue: "bySizeDescending"
             }
@@ -89,7 +93,7 @@ define([
     }
   ];
 
-  function __isSizeMapped() {
-    return this.size.attributes.count > 0;
+  function __hasFieldsSize() {
+    return this.size.hasFields;
   }
 });

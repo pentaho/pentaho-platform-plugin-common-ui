@@ -36,7 +36,7 @@ define([
           props: [
             {
               name: "measures", // VISUAL_ROLE
-              attributes: {isRequired: true},
+              fields: {isRequired: true},
               ordinal: 7
             },
             {
