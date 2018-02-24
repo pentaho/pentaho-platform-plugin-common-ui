@@ -83,7 +83,7 @@ define([
      *
      * @see pentaho.data.util.hasAnyKeyColumns
      * @see pentaho.data.ITable#isColumnKey
-     * @see pentaho.data.ITable#isColumnContinuous
+     * @see pentaho.data.util#isColumnTypeContinuous
      */
     invertVars: function(varsMap, model, keyArgs) {
 

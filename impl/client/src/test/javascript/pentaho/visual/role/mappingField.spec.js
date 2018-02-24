@@ -15,9 +15,8 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/SpecificationScope",
-  "pentaho/data/Table"
-], function(Context, SpecificationScope, Table) {
+  "pentaho/type/SpecificationScope"
+], function(Context, SpecificationScope) {
 
   "use strict";
 
@@ -25,23 +24,6 @@ define([
 
   describe("pentaho.visual.role.MappingField", function() {
 
-    function getDataSpec1() {
-      return {
-        model: [
-          {name: "country", type: "string", label: "Country"},
-          {name: "product", type: "string", label: "Product"},
-          {name: "sales", type: "number", label: "Sales"},
-          {name: "date", type: "date", label: "Date"}
-        ],
-        rows: [
-          {c: ["Portugal", "fish", 100, "2016-01-01"]},
-          {c: ["Ireland", "beer", 200, "2016-01-02"]}
-        ]
-      };
-    }
-
-    var VisualModel;
-    var Mapping;
     var MappingField;
 
     beforeEach(function(done) {
@@ -50,12 +32,8 @@ define([
           .then(function(context) {
 
             return context.getDependencyApplyAsync([
-              "pentaho/visual/base/model",
-              "pentaho/visual/role/mapping",
               "pentaho/visual/role/mappingField"
-            ], function(_Model, _Mapping, _MappingField) {
-              VisualModel = _Model;
-              Mapping = _Mapping;
+            ], function(_MappingField) {
               MappingField = _MappingField;
             });
           })
@@ -81,48 +59,6 @@ define([
         expect(mapping instanceof MappingField).toBe(true);
 
         expect(mapping.name).toBe(name);
-      });
-    });
-
-    describe("#model and #mapping", function() {
-
-      var derived;
-      var mapping;
-
-      beforeEach(function() {
-
-        var DerivedModel = VisualModel.extend({$type: {
-          props: [
-            {name: "propRole", base: "pentaho/visual/role/property"}
-          ]
-        }});
-
-        derived = new DerivedModel({
-          propRole: {fields: ["a", "b", "c"]}
-        });
-        mapping = derived.propRole;
-      });
-
-      it("should have #mapping return the parent mapping", function() {
-        expect(mapping.fields.at(0).mapping).toBe(mapping);
-      });
-
-      it("should have #mapping return `null` when there is no parent mapping", function() {
-        expect(new MappingField().mapping).toBe(null);
-      });
-
-      it("should have #model return the parent mapping's model", function() {
-        expect(mapping.fields.at(0).model).toBe(derived);
-      });
-
-      it("should have #model return `null` when there is no parent mapping", function() {
-        expect(new MappingField().model).toBe(null);
-      });
-
-      it("should have #model return `null` when the parent mapping has no model", function() {
-        var mappingNoModel = new Mapping({fields: ["a", "b", "c"]});
-
-        expect(mappingNoModel.fields.at(0).model).toBe(null);
       });
     });
 

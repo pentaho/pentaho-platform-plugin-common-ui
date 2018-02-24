@@ -24,7 +24,7 @@ define([
 
   /* globals describe, it, beforeEach, beforeAll, spyOn */
 
-  describe("pentaho.visual.role.strategies.impl.TupleMapper", function() {
+  xdescribe("pentaho.visual.role.strategies.impl.TupleMapper", function() {
 
     var propType;
     var dataTable;

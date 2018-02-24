@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,48 +15,48 @@
  */
 
 /**
- * Exposes members related to the [fields]{@link pentaho.visual.role.Mapping#fields}
+ * Exposes members related to the [fields]{@link pentaho.visual.role.BaseMapping#fields}
  * of visual roles' mappings.
  *
- * @name IPropertyFields
+ * @name IFieldsConstraints
  * @memberOf pentaho.visual.role
  * @interface
- * @see pentaho.visual.role.Mapping#fields
+ * @see pentaho.visual.role.BaseMapping#fields
  */
 
 /**
- * Gets or sets a value that indicates if at least one [field]{@link pentaho.visual.role.Mapping#fields}
+ * Gets or sets a value that indicates if at least one [field]{@link pentaho.visual.role.BaseMapping#fields}
  * must be mapped for the visual role to be valid.
  *
  * For more information on this property see
  * [Property.Type#isRequired]{@link pentaho.type.Property.Type#isRequired}.
  *
  * @name isRequired
- * @memberOf pentaho.visual.role.IPropertyFields#
+ * @memberOf pentaho.visual.role.IFieldsConstraints#
  * @type {undefined | boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
  */
 
 /**
- * Gets or sets the minimum number of [fields]{@link pentaho.visual.role.Mapping#fields}
+ * Gets or sets the minimum number of [fields]{@link pentaho.visual.role.BaseMapping#fields}
  * that must be mapped for the visual role to be valid.
  *
  * For more information on this property see
  * [Property.Type#countMin]{@link pentaho.type.Property.Type#countMin}.
  *
  * @name countMin
- * @memberOf pentaho.visual.role.IPropertyFields#
+ * @memberOf pentaho.visual.role.IFieldsConstraints#
  * @type {undefined | number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
  */
 
 /**
- * Gets or sets the maximum number of [fields]{@link pentaho.visual.role.Mapping#fields}
+ * Gets or sets the maximum number of [fields]{@link pentaho.visual.role.BaseMapping#fields}
  * that can be mapped for the visual role to be valid.
  *
  * For more information on this property see
  * [Property.Type#countMax]{@link pentaho.type.Property.Type#countMax}.
  *
  * @name countMax
- * @memberOf pentaho.visual.role.IPropertyFields#
+ * @memberOf pentaho.visual.role.IFieldsConstraints#
  * @type {undefined | number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
  */
 
@@ -67,7 +67,7 @@
  * [Property.Type#countRangeOn]{@link pentaho.type.Property.Type#countRangeOn}.
  *
  * @name countRangeOn
- * @memberOf pentaho.visual.role.IPropertyFields#
+ * @memberOf pentaho.visual.role.IFieldsConstraints#
  * @method
  * @param {pentaho.visual.base.Model} model - The visualization model.
  * @return {pentaho.IRange<number>} The evaluated element count range.

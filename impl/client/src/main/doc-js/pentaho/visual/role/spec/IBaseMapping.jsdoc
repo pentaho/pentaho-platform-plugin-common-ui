@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,26 @@
  */
 
 /**
- * The `spec.IApplication` interface describes a visual application instance in object form.
+ * The `spec.IMapping` interface describes the _object_ form of a
+ * [visual role mapping]{@link pentaho.visual.role.BaseMapping} instance.
  *
- * @name pentaho.visual.base.spec.IApplication
+ * @example
+ * {
+ *   fields: ["family", "product"]
+ * }
+ *
+ * @name pentaho.visual.role.spec.IBaseMapping
  *
  * @interface
  * @extends pentaho.type.spec.IComplex
  *
- * @see pentaho.visual.base.spec.IAbstractModel#application
+ * @see pentaho.visual.role.spec.IMappingField
+ */
+
+/**
+ * The fields of the visual role mapping.
+ *
+ * @name pentaho.visual.role.spec.IBaseMapping#fields
+ * @type {Array.<pentaho.visual.role.spec.UMappingField>}
+ * @see pentaho.visual.role.BaseMapping#fields
  */

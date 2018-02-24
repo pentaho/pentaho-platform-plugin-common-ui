@@ -181,32 +181,6 @@ define([
       });
     });
 
-    it("should preload registered filter types", function() {
-
-      return require.using(["pentaho/type/Context"], function(Context) {
-
-        return Context.createAsync().then(function(context) {
-
-          return context.getDependencyApplyAsync(["pentaho/visual/base/view"], function(BaseView) {
-
-            context.get("pentaho/data/filter/or");
-          });
-        });
-      });
-    });
-
-    describe("#selectionFilter", function() {
-
-      it("should have a default selectionFilter", function() {
-        var view = new View();
-        var selectionFilter = view.selectionFilter;
-
-        var AbstractFilter = context.get("pentaho/data/filter/abstract");
-        expect(selectionFilter).toBeDefined();
-        expect(selectionFilter instanceof AbstractFilter).toBe(true);
-      });
-    });
-
     describe("#update() and UpdateActionExecution", function() {
 
       it("should call the _onUpdate* methods, with the action execution instance", function() {
@@ -591,8 +565,8 @@ define([
 
         // _updateSize is still updating
 
-        // Change the view's selection
-        view.selectionFilter = {_: "or"};
+        // Change the model's selection
+        view.model.selectionFilter = {_: "or"};
 
         expect((view.__dirtyPropGroups.get() & View.PropertyGroups.Selection) !== 0).toBe(true);
 
@@ -680,7 +654,7 @@ define([
       });
 
       it("should set the Selection bit  when 'selectionFilter' changes", function() {
-        view.selectionFilter = {_: "or"};
+        view.model.selectionFilter = {_: "or"};
         expect(view.__dirtyPropGroups.is(View.PropertyGroups.Selection)).toBe(true);
       });
 
@@ -1190,39 +1164,6 @@ define([
       });
     });
 
-    describe("#toJSON()", function() {
-
-      it("should not serialize the `selectionFilter` property by default", function() {
-        var view = new View({
-          width: 1,
-          height: 1,
-          selectionFilter: {_: "pentaho/data/filter/and"}
-        });
-
-        expect(!!view.get("selectionFilter")).toBe(true);
-
-        var json = view.toJSON();
-
-        expect(json instanceof Object).toBe(true);
-        expect("selectionFilter" in json).toBe(false);
-      });
-
-      it("should serialize the `selectionFilter` property if keyArgs.omitProps.selectionFilter = false", function() {
-        var view = new View({
-          width: 1,
-          height: 1,
-          selectionFilter: {_: "pentaho/data/filter/and"}
-        });
-
-        expect(!!view.get("selectionFilter")).toBe(true);
-
-        var json = view.toSpec({isJson: true, omitProps: {selectionFilter: false}});
-
-        expect(json instanceof Object).toBe(true);
-        expect("selectionFilter" in json).toBe(true);
-      });
-    });
-
     describe("#toSpec()", function() {
 
       it("should serialize the `model` property", function() {
@@ -1238,21 +1179,6 @@ define([
 
         expect(json instanceof Object).toBe(true);
         expect("model" in json).toBe(true);
-      });
-
-      it("should serialize the `selectionFilter` property", function() {
-        var view = new View({
-          width: 1,
-          height: 1,
-          selectionFilter: {_: "pentaho/data/filter/and"}
-        });
-
-        expect(!!view.get("selectionFilter")).toBe(true);
-
-        var json = view.toSpec();
-
-        expect(json instanceof Object).toBe(true);
-        expect("selectionFilter" in json).toBe(true);
       });
     });
 

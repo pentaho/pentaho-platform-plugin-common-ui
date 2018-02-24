@@ -22,7 +22,7 @@ define([
 
   /* globals describe, it, beforeEach, beforeAll, spyOn */
 
-  describe("pentaho.visual.role.strategies.Base", function() {
+  xdescribe("pentaho.visual.role.strategies.Base", function() {
 
     var BaseStrategy;
     var CustomStrategy;

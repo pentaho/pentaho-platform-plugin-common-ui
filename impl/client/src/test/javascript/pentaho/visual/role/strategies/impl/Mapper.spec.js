@@ -23,7 +23,7 @@ define([
 
   /* globals describe, it, beforeEach, beforeAll, spyOn */
 
-  describe("pentaho.visual.role.strategies.impl.Mapper", function() {
+  xdescribe("pentaho.visual.role.strategies.impl.Mapper", function() {
 
     var propType;
     var dataTable;

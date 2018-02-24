@@ -24,7 +24,7 @@ define([
 
   /* globals describe, it, beforeEach, beforeAll, spyOn */
 
-  describe("pentaho.visual.role.strategies.Identity", function() {
+  xdescribe("pentaho.visual.role.strategies.Identity", function() {
 
     var Strategy;
 

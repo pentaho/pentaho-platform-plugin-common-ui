@@ -80,7 +80,7 @@ define([
 
   // ---
 
-  describe("pentaho.visual.scene.util", function() {
+  xdescribe("pentaho.visual.scene.util", function() {
 
     var context;
     var AbstractFilter;

@@ -15,30 +15,33 @@
  */
 
 /**
- * The `spec.IMapping` interface describes the _object_ form of
- * an [internal visual role mapping]{@link pentaho.visual.role.Mapping} instance.
+ * The `spec.IExternalMapping` interface describes the _object_ form of
+ * an [external visual role mapping]{@link pentaho.visual.role.ExternalMapping} instance.
  *
  * @example
  * {
  *   fields: ["family", "product"],
- *   modeFixed: {valueType: ["string"]}
+ *   isCategoricalFixed: true
  * }
  *
- * @name pentaho.visual.role.spec.IMapping
+ * @name pentaho.visual.role.spec.IExternalMapping
+ *
  * @interface
  * @extends pentaho.visual.role.spec.IBaseMapping
  */
 
 /**
- * The fixed mode of operation in which the associated visual role is to operate.
+ * Indicates that only categorical modes of operation should be considered.
  *
- * When specified,
- * it must be equal to one of the operation [modes]{@link pentaho.visual.role.Property.Type#modes}
- * of the associated visual role property;
- * otherwise, the mapping is considered _invalid_.
+ * This option only takes effect if the visual role
+ * has any continuous [modes]{@link pentaho.visual.role.BaseProperty.Type#modes}.
  *
- * @name pentaho.visual.role.spec.IMapping#modeFixed
- * @type {pentaho.visual.role.spec.IMode}
+ * When the value is `true`,
+ * only the categorical modes of [modes]{@link pentaho.visual.role.BaseProperty.Type#modes} are considered.
  *
- * @see pentaho.visual.role.Mapping#modeFixed
+ * @name pentaho.visual.role.spec.IExternalMapping#isCategoricalFixed
+ * @type {?boolean}
+ * @default false
+ *
+ * @see pentaho.visual.role.ExternalMapping#isCategoricalFixed
  */

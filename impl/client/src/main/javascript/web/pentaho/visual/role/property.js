@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,34 +15,34 @@
  */
 define([
   "pentaho/i18n!messages",
-  "pentaho/i18n!/pentaho/type/i18n/types",
-  "pentaho/type/ValidationError",
-  "pentaho/data/TableView",
   "pentaho/type/util",
+  "pentaho/type/ValidationError",
   "pentaho/util/object",
-  "pentaho/util/error"
-], function(bundle, bundleTypes, ValidationError, DataView, typeUtil, O, error) {
+  "pentaho/util/error",
+
+  // so that r.js sees otherwise invisible dependencies.
+  "./baseProperty",
+  "./mapping",
+  "./mode"
+], function(bundle, typeUtil, ValidationError, O, error) {
 
   "use strict";
 
   return [
-    "property",
-    "./mode",
-    "./strategies/base",
+    "./baseProperty",
     "./mapping",
-    "./strategies/identity",
-    "./strategies/combine",
-    "./strategies/tuple",
-    function(__Property, Mode, BaseStrategy, Mapping, IdentityStrategy, CombineStrategy, TupleStrategy) {
+    "./mode",
+    function(BaseProperty, Mapping, Mode) {
+
+      var context = this;
 
       var __modeType = Mode.type;
       var ListOfModeType = this.get([Mode]);
-      var ListOfStrategyType = this.get([BaseStrategy]);
 
       /**
        * @name pentaho.visual.role.Property.Type
        * @class
-       * @extends pentaho.type.Property.Type
+       * @extends pentaho.visual.role.BaseProperty.Type
        *
        * @classDesc The type class of {@link pentaho.visual.role.Property}.
        */
@@ -50,39 +50,24 @@ define([
       /**
        * @name pentaho.visual.role.Property
        * @class
-       * @extends pentaho.type.Property
+       * @extends pentaho.visual.role.BaseProperty
        *
        * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.Property>} pentaho/visual/role/property
        *
        * @classDesc The `Property` class represents a visual role of a visualization and defines its capabilities.
        *
-       * The capabilities of the visual role are described by the following attributes:
+       * A visual role is described by:
        *
-       * 1. [levels]{@link pentaho.visual.role.Property.Type#levels}
-       * 2. [dataType]{@link pentaho.visual.role.Property.Type#dataType}.
-       *
-       * The [valueType]{@link pentaho.type.Property.Type#valueType} of a property of this type is
-       * [Mapping]{@link pentaho.visual.role.Mapping} and
-       * stores the association between the visual role and the data fields of a visualization's current dataset.
-       * The mapping holds two pieces of information:
-       *
-       * 1. an optional, fixed [level of measurement]{@link pentaho.visual.role.Mapping#level}
-       *    in which the visual role should operate
-       * 2. a list of associations to [fields]{@link pentaho.visual.role.Mapping#fields},
-       *    each of the type {@link pentaho.visual.role.MappingField}.
+       * 1. [modes]{@link pentaho.visual.role.Property.Type#modes}
+       * 2. [isVisualKey]{@link pentaho.visual.role.Property.Type#isVisualKey}.
        *
        * @description This class was not designed to be constructed directly.
        */
-      var VisualRoleProperty = __Property.extend(/** @lends pentaho.visual.role.Property# */{
+      var VisualRoleProperty = BaseProperty.extend(/** @lends pentaho.visual.role.Property# */{
 
         $type: /** @lends pentaho.visual.role.Property.Type# */{
 
           valueType: Mapping,
-
-          // Create a new Mapping each time.
-          defaultValue: function() { return {}; },
-
-          isRequired: true,
 
           /** @inheritDoc */
           _init: function(spec, keyArgs) {
@@ -99,17 +84,6 @@ define([
                 this.__setModes(modes);
               } else {
                 this.__setModes([{dataType: "string"}], /* isDefault: */true);
-              }
-
-              var strategies = spec.strategies;
-              if(strategies != null) {
-                this.__setStrategies(strategies);
-              } else {
-                this.__setStrategies([
-                  new IdentityStrategy(),
-                  new CombineStrategy(),
-                  new TupleStrategy()
-                ], /* isDefault: */true);
               }
 
               var isVisualKey = spec.isVisualKey;
@@ -185,6 +159,8 @@ define([
            *
            * @throws {pentaho.lang.OperationInvalidError} When setting and the type already has
            * [subtypes]{@link pentaho.type.Type#hasDescendants}.
+           *
+           * @override
            */
           get modes() {
             return this.__modes;
@@ -227,93 +203,84 @@ define([
           },
 
           /**
-           * Gets a value that indicates if the visual role has any categorical modes.
+           * Determines the effective operation mode of the visual role on the given visual model.
            *
-           * @type {boolean}
-           * @readOnly
-           * @see pentaho.visual.role.Property.Type#hasAnyContinuousModes
-           * @see pentaho.visual.role.Mode#isContinuous
+           * When the associated mapping has a specified [modeFixed]{@link pentaho.visual.role.Mapping#modeFixed}
+           * (whether or not it is applicable), then that operation mode is used.
+           *
+           * Otherwise, the first operation mode in [modes]{@link pentaho.visual.role.Property.Type#modes}
+           * which is applicable to the mapping's fields is used.
+           * If there are no applicable modes, `null` is returned.
+           *
+           * @param {!pentaho.visual.base.Model} model - The visual model.
+           *
+           * @return {pentaho.visual.role.Mode} The effective operation mode, if one exists; `null` if not.
+           *
+           * @see pentaho.visual.role.Mapping#modeFixed
            * @see pentaho.visual.role.Property.Type#modes
            */
-          get hasAnyCategoricalModes() {
-            var any = false;
-            this.modes.each(function(mode) {
-              if(!mode.isContinuous) {
-                any = true;
-                return false;
-              }
-            });
-            return any;
-          },
+          getModeEffectiveOn: function(model) {
 
-          /**
-           * Gets a value that indicates if the visual role has any continuous modes.
-           *
-           * @type {boolean}
-           * @readOnly
-           * @see pentaho.visual.role.Property.Type#hasAnyCategoricalModes
-           * @see pentaho.visual.role.Mode#isContinuous
-           * @see pentaho.visual.role.Property.Type#modes
-           */
-          get hasAnyContinuousModes() {
-            var any = false;
-            this.modes.each(function(mode) {
-              if(mode.isContinuous) {
-                any = true;
-                return false;
-              }
-            });
-            return any;
-          },
-          // endregion
+            var mapping = model.get(this);
 
-          // region strategies
-          __strategies: null,
-          __isStrategiesDefault: true,
-
-          /**
-           * Gets or sets the array of mapping strategies used by the visual role.
-           *
-           * Visual roles need to have at least one mapping strategy.
-           *
-           * When set to a {@link Nully} value, the set operation is ignored.
-           *
-           * If not specified at the root [visual.role.Property]{@link pentaho.visual.role.Property},
-           * the `strategies` attribute is initialized with
-           * an [Identity]{@link pentaho.visual.role.strategies.Identity} strategy,
-           * a [Combine]{@link pentaho.visual.role.strategies.Combine} strategy and
-           * a [Tuple]{@link pentaho.visual.role.strategies.Tuple} strategy,
-           * in that order.
-           *
-           * The returned list or its elements should not be modified.
-           *
-           * @type {!pentaho.type.List.<pentaho.visual.role.strategies.Base>}
-           *
-           * @throws {pentaho.lang.OperationInvalidError} When setting and the type already has
-           * [subtypes]{@link pentaho.type.Type#hasDescendants}.
-           */
-          get strategies() {
-            return this.__strategies;
-          },
-
-          set strategies(values) {
-
-            this.__assertNoDescendants("strategies");
-
-            if(values == null) return;
-
-            this.__setStrategies(values, /* isDefault: */false);
-          },
-
-          __setStrategies: function(values, isDefault) {
-            var strategies = new ListOfStrategyType(values, {isReadOnly: true});
-            if(strategies.count === 0) {
-              throw error.argInvalid("strategies", bundle.structured.errors.property.noStrategies);
+            var mode = mapping.modeFixed;
+            if(mode !== null) {
+              return mode;
             }
 
-            this.__strategies = strategies;
+            var data = model.data;
+            if(data === null) {
+              return null;
+            }
 
-            this.__isStrategiesDefault = !!isDefault;
+            var modes = this.modes;
+            var modeCount = modes.count;
+            if(modeCount === 0) {
+              return null;
+            }
+
+            var fieldTypes = this.__getMappingFieldTypes(data, mapping);
+
+            var modeIndex = -1;
+            while(++modeIndex < modeCount) {
+              mode = modes.at(modeIndex);
+              if(mode.canApplyToFieldTypes(fieldTypes)) {
+                return mode;
+              }
+            }
+
+            return null;
+          },
+
+          /**
+           * Gets the list of types of the fields of a mapping of this property.
+           *
+           * @param {!pentaho.data.ITable} data - The data set.
+           * @param {!pentaho.visual.role.Mapping} mapping - The visual role mapping.
+           *
+           * @return {!Array.<pentaho.type.Type>} The list of field types.
+           * @private
+           */
+          __getMappingFieldTypes: function(data, mapping) {
+            var mappingFields = mapping.fields;
+            var fieldCount = mappingFields.count;
+            var fieldTypes = new Array(fieldCount);
+            var fieldIndex = -1;
+            while(++fieldIndex < fieldCount) {
+              var mappingField = mappingFields.at(fieldIndex);
+              var name = mappingField.name;
+
+              // Field with no corresponding column?
+              var columnIndex = data.getColumnIndexById(name);
+              if(columnIndex == null || columnIndex < 0) {
+                return null;
+              }
+
+              var columnTypeName = data.getColumnType(columnIndex);
+              fieldTypes[fieldIndex] = context.get(columnTypeName).type;
+            }
+
+            return fieldTypes;
           },
           // endregion
 
@@ -355,6 +322,8 @@ define([
            *
            * @throws {pentaho.lang.OperationInvalidError} When setting and the visual role property
            * already has [subtypes]{@link pentaho.type.Type#hasDescendants}.
+           *
+           * @override
            */
           get isVisualKey() {
             return this.__isVisualKey;
@@ -374,247 +343,20 @@ define([
 
           // endregion
 
-          dynamicAttributes: {
-            // Exposed through IPropertyFields.isRequired
-            // Additionally defines __fieldsIsRequiredOn
-            __fieldsIsRequired: {
-              value: false,
-              cast: Boolean,
-              group: "fields",
-              localName: "isRequired",
-              combine: function(baseEval, localEval) {
-                return function(propType) {
-                  // localEval is skipped if base is true.
-                  return baseEval.call(this, propType) || localEval.call(this, propType);
-                };
-              }
-            },
-
-            // Exposed through IPropertyFields.countMin
-            // Additionally defines __fieldsCountMinOn
-            __fieldsCountMin: {
-              value: 0,
-              cast: __castCount,
-              group: "fields",
-              localName: "countMin",
-              combine: function(baseEval, localEval) {
-                return function(propType) {
-                  return Math.max(baseEval.call(this, propType), localEval.call(this, propType));
-                };
-              }
-            },
-
-            // Exposed through IPropertyFields.countMax
-            // Additionally defines __fieldsCountMaxOn
-            __fieldsCountMax: {
-              value: Infinity,
-              cast: __castCount,
-              group: "fields",
-              localName: "countMax",
-              combine: function(baseEval, localEval) {
-                return function(propType) {
-                  return Math.min(baseEval.call(this, propType), localEval.call(this, propType));
-                };
-              }
-            }
-          },
-
-          // region fields
-          /*
-           * Actually implements IPropertyFields#countRangeOn.
-           */
-          __fieldsCountRangeOn: function(model) {
-            var isRequired = this.__fieldsIsRequiredOn(model);
-            var countMin = this.__fieldsCountMinOn(model);
-            var countMax = this.__fieldsCountMaxOn(model);
-
-            if(isRequired && countMin < 1) countMin = 1;
-
-            if(countMax < countMin) countMax = countMin;
-
-            return {min: countMin, max: countMax};
-          },
-
-          /**
-           * Gets or sets the fields metadata related with this visual role property.
-           *
-           * @type {!pentaho.visual.role.IPropertyFields}
-           */
-          get fields() {
-            var fields = O.getOwn(this, "__fields");
-            if(!fields) {
-
-              var propType = this;
-
-              this.__fields = fields = {
-                get isRequired() {
-                  return propType.__fieldsIsRequired;
-                },
-                set isRequired(value) {
-                  propType.__fieldsIsRequired = value;
-                },
-                get countMin() {
-                  return propType.__fieldsCountMin;
-                },
-                set countMin(value) {
-                  propType.__fieldsCountMin = value;
-                },
-                get countMax() {
-                  return propType.__fieldsCountMax;
-                },
-                set countMax(value) {
-                  propType.__fieldsCountMax = value;
-                },
-                countRangeOn: function(model) {
-                  return propType.__fieldsCountRangeOn(model);
-                }
-              };
-            }
-            return fields;
-          },
-
-          set fields(value) {
-
-            if(!value) return;
-
-            var fields = this.fields;
-
-            if("isRequired" in value) fields.isRequired = value.isRequired;
-            if("countMin" in value) fields.countMin = value.countMin;
-            if("countMax" in value) fields.countMax = value.countMax;
-          },
-          // endregion
-
-          // region getMapperOn
-          /**
-           * Obtains an applicable mapper to the given model.
-           *
-           * If the current mapping is such that its [modeFixed]{@link pentaho.visual.role.Mapping#modeFixed} is
-           * specified, then only that mode is considered.
-           * Otherwise, every mode of the [modes]{@link pentaho.visual.role.Property.Type#modes} of this property
-           * is tried, in turn.
-           *
-           * For each mode,
-           * every [strategy]{@link pentaho.visual.role.Property.Type#strategies} is queried for an applicable mapper.
-           * The first mapper returned by a strategy is used.
-           *
-           * @param {!pentaho.visual.base.Model} model - The visualization model.
-           * @param {pentaho.data.ITable} [dataTable] - A data table to use instead of the existing model's data table.
-           * It must have the same schema (or a subset of) as that of the model.
-           *
-           * @return {pentaho.visual.role.strategies.IMapper} A mapper if one applies, or `null`, if not.
-           */
-          getMapperOn: function(model) {
-
-            var mapping = model.get(this);
-            var fields = mapping.fields;
-
-            if(fields.count === 0) {
-              return null;
-            }
-
-            var dataTable = model.data;
-            if(dataTable === null) {
-              return null;
-            }
-
-            // Obtain column indexes of fields.
-            var anyInvalidField = false;
-
-            var columnIndexes = fields.toArray(function(field) {
-
-              var index = dataTable.getColumnIndexById(field.name);
-
-              anyInvalidField |= (index < 0);
-
-              return index;
-            });
-
-            // Leave if any invalid field names.
-            if(anyInvalidField) {
-              return null;
-            }
-
-            var inputData = new DataView(dataTable).setSourceColumns(columnIndexes);
-
-            var mode = mapping.modeFixed;
-            if(mode !== null) {
-              return this.__getMapperForMode(inputData, mode);
-            }
-
-            var modes = this.modes;
-            var M = modes.count;
-            var m = -1;
-            var isContinuousFixed = mapping.isContinuousFixed;
-            while(++m < M) {
-              mode = modes.at(m);
-
-              if(isContinuousFixed === null || isContinuousFixed === mode.isContinuous) {
-
-                var mapper = this.__getMapperForMode(inputData, mode);
-                if(mapper !== null) {
-                  return mapper;
-                }
-              }
-            }
-
-            return null;
-          },
-
-          /**
-           * Gets a mapper for given input data and mode.
-           *
-           * Every [strategy]{@link pentaho.visual.role.Property.Type#strategies} is queried for an applicable mapper.
-           * The first mapper returned by a strategy is used.
-           *
-           * @param {!pentaho.data.ITable} inputData - The data set view to be mapped.
-           * @param {!pentaho.visual.role.Mode} mode - The visual role mode which will be used.
-           *
-           * @return {pentaho.visual.role.strategies.IMapper} A mapper if one applies, or `null`, if not.
-           *
-           * @private
-           */
-          __getMapperForMode: function(inputData, mode) {
-            var strategies = this.strategies;
-            var S = strategies.count;
-            var s = -1;
-            var mapper;
-            while(++s < S) {
-              if((mapper = strategies.at(s).getMapper(this, inputData, mode)) != null) {
-                return mapper;
-              }
-            }
-
-            return null;
-          },
-          // endregion
-
           // region Validation
-
-          // TODO: reimplement validateOn
 
           /**
            * Determines if this visual role is valid on the given visualization model.
            *
-           * If generic property validation fails, those errors are returned.
+           * If base property validation fails, those errors are returned.
            *
            * Otherwise, validity is further determined as follows:
            *
-           * 1. If the visualization model has a `null` [data]{@link pentaho.visual.base.Model#data},
-           *    then every data property in the current mapping's
-           *    [fields]{@link pentaho.visual.role.Mapping#fields} is considered undefined and invalid
-           * 2. Otherwise, if the visual model has a non-`null` [data]{@link pentaho.visual.base.Model#data},
-           *    then each field in the current mapping's
-           *    [fields]{@link pentaho.visual.role.Mapping#fields} must be defined in `data`
-           * 3. The number of currently mapped [fields]{@link pentaho.visual.role.Mapping#fields} must satisfy
-           *    the usual property cardinality constraints,
-           *    according to [Property.Type#fields]{@link pentaho.visual.role.Property.Type#fields}
-           * 4. There can be no two mapping fields with the same
-           *    [name]{@link pentaho.visual.role.MappingField#name}
-           * 5. One of the defined strategies must be able to map the specified fields to one of the visual role's
-           *    modes.
+           * 1. When specified, the value of [modeFixed]{@link pentaho.visual.role.ExternalProperty.Type#modeFixed}
+           *    must be one of the corresponding internal visual role's
+           *    [modes]{@link pentaho.visual.role.Property.Type#modes}.
            *
-           * @param {!pentaho.visual.base.Model} model - The visualization model.
+           * @param {!pentaho.visual.base.Model} model - The visual model.
            *
            * @return {Array.<pentaho.type.ValidationError>} A non-empty array of `ValidationError` or `null`.
            */
@@ -628,133 +370,18 @@ define([
 
               var mapping = model.get(this);
 
-              // Cardinality validation
-              var range = this.__fieldsCountRangeOn(model);
-              var count = mapping.fields.count;
-              if(count < range.min) {
-                addErrors(new ValidationError(
-                    bundleTypes.get("errors.property.countOutOfRange", [
-                      this.label + " " + mapping.$type.get("fields").label,
-                      count,
-                      range.min,
-                      range.max
-                    ])));
+              // modeFixed must exist in modes, when specified.
+              var modeFixed = mapping.modeFixed;
+              if(modeFixed !== null) {
 
-              } else if(count > range.max) {
-                addErrors(new ValidationError(
-                    bundleTypes.get("errors.property.countOutOfRange", [
-                      this.label + " " + mapping.$type.get("fields").label,
-                      count,
-                      range.min,
-                      range.max
-                    ])));
-              }
-
-              if(!errors && count > 0) {
-                // Fields are defined in data and of a type compatible with the role's dataType.
-                this.__validateFieldsOn(model, mapping, addErrors);
-
-                // Duplicate mapped fields.
-                // Only possible to validate when the rest of the stuff is valid.
-                if(!errors) {
-                  this.__validateDuplMappingFieldsOn(model, mapping, addErrors);
-
-                  if(!errors) {
-                    // modeFixed must be defined.
-                    var modeFixed = mapping.modeFixed;
-                    if(modeFixed !== null && !this.modes.has(modeFixed.$key)) {
-                      addErrors(new ValidationError(
-                          bundle.format(bundle.structured.errors.property.modeFixedInvalid, {role: this})));
-                    }
-
-                    if(!errors) {
-                      // Can map.
-                      if(mapping.mapper === null) {
-                        addErrors(new ValidationError(
-                            bundle.format(bundle.structured.errors.property.noMapper, {role: this})));
-                      }
-                    }
-                  }
+                if(!this.modes.has(modeFixed.$key)) {
+                  addErrors(new ValidationError(
+                      bundle.format(bundle.structured.errors.property.modeFixedInvalid, {role: this})));
                 }
               }
             }
 
             return errors;
-          },
-
-          /**
-           * Validates that every mapped field references a defined column in the
-           * data of the visual model.
-           *
-           * Assumes the mapping is valid according to the base complex validation.
-           *
-           * @param {!pentaho.visual.base.Model} model - The visualization model.
-           * @param {!pentaho.visual.role.Mapping} mapping - The mapping.
-           * @param {function} addErrors - Called to add errors.
-           * @private
-           */
-          __validateFieldsOn: function(model, mapping, addErrors) {
-
-            var data = model.data;
-            var dataAttrs = data && data.model.attributes;
-
-            var i = -1;
-            var mappingFields = mapping.fields;
-            var L = mappingFields.count;
-            while(++i < L) {
-              var mappingField = mappingFields.at(i);
-              var name = mappingField.name;
-
-              // Field with no definition?
-              var dataAttr = dataAttrs && dataAttrs.get(name);
-              if(!dataAttr) {
-                addErrors(new ValidationError(
-                  bundle.format(
-                    bundle.structured.errors.property.fieldIsNotDefinedInVisualModelData,
-                    {
-                      name: name,
-                      role: this
-                    })));
-                // continue;
-              }
-            }
-          },
-
-          /**
-           * Validates that the mapping fields have no duplicates.
-           *
-           * @param {!pentaho.visual.base.Model} model - The visualization model.
-           * @param {!pentaho.visual.role.Mapping} mapping - The mapping.
-           * @param {function} addErrors - Called to add errors.
-           * @private
-           */
-          __validateDuplMappingFieldsOn: function(model, mapping, addErrors) {
-
-            var mappingFields = mapping.fields;
-            var L = mappingFields.count;
-            if(L <= 1) return;
-
-            var data = mapping.model.data;
-            var dataAttrs = data && data.model.attributes;
-
-            var byKey = {};
-            var i = -1;
-            while(++i < L) {
-              var mappingField = mappingFields.at(i);
-              var key = mappingField.name;
-              if(O.hasOwn(byKey, key)) {
-                var dataAttr = dataAttrs.get(mappingField.name);
-                var errorMessage = bundle.format(bundle.structured.errors.property.fieldDuplicate, {
-                  name: dataAttr,
-                  role: this
-                });
-
-                addErrors(new ValidationError(errorMessage));
-                continue;
-              }
-
-              byKey[key] = mappingField;
-            }
           },
           // endregion
 
@@ -762,21 +389,12 @@ define([
           /** @inheritDoc */
           _fillSpecInContext: function(spec, keyArgs) {
 
-            // The dynamic attributes: fields.countMin/countMax/isRequired are handled
-            // by the Type base class.
-
             var any = this.base(spec, keyArgs);
 
             var modes = O.getOwn(this, "__modes");
             if(modes && !this.__isModesDefault) {
               any = true;
               spec.modes = modes.toSpecInContext(keyArgs);
-            }
-
-            var strategies = O.getOwn(this, "__strategies");
-            if(strategies && !this.__isStrategiesDefault) {
-              any = true;
-              spec.strategies = strategies.toSpecInContext(keyArgs);
             }
 
             // Only serialize if not the default value.
@@ -802,10 +420,4 @@ define([
       return VisualRoleProperty;
     }
   ];
-
-  function __castCount(v) {
-    v = +v;
-    if(isNaN(v) || v < 0) return; // undefined;
-    return Math.floor(v);
-  }
 });

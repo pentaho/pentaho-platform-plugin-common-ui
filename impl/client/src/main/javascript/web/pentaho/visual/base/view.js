@@ -31,7 +31,6 @@ define([
   "pentaho/type/complex",
   "pentaho/visual/base/model",
   "pentaho/type/action/base",
-  "pentaho/data/filter/abstract",
   "../action/base",
   "../action/update",
   "../action/select",
@@ -97,15 +96,11 @@ define([
     "pentaho/type/action/impl/target",
     "../action/update",
     "../action/select",
-    "pentaho/data/filter/abstract",
 
     // Pre-load all registered visual action types so that it is safe to request them synchronously.
     {$types: {base: "pentaho/visual/action/base"}},
 
-    // The latter, in turn, already pre-loads all registered filter types...
-    // {$types: {base: "pentaho/data/filter/abstract"}},
-
-    function(__Complex, VisualModel, TargetMixin, UpdateAction, SelectAction, AbstractFilter) {
+    function(Complex, VisualModel, TargetMixin, UpdateAction, SelectAction) {
 
       var context = this;
 
@@ -130,11 +125,11 @@ define([
         /**
          * Applies the associated action's
          * [selectionMode]{@link pentaho.visual.action.Select#selectionMode}
-         * function to the target view's
-         * [selectionFilter]{@link pentaho.visual.base.View#selectionFilter} and
+         * function to the associated model's
+         * [selectionFilter]{@link pentaho.visual.base.Model#selectionFilter} and
          * the action's [dataFilter]{@link pentaho.visual.action.Select#dataFilter}.
          *
-         * The resulting data filter is set as the view's new `selectionFilter`.
+         * The resulting data filter is set as the model's new `selectionFilter`.
          *
          * @return {?Promise} - The value `null`.
          * @memberOf pentaho.visual.action.SelectExecution#
@@ -143,18 +138,18 @@ define([
          */
         _doDefault: function() {
 
-          var view = this.target;
+          var model = this.target.model;
 
-          var selectionFilter = this.action.selectionMode.call(view, view.selectionFilter, this.action.dataFilter);
+          var selectionFilter = this.action.selectionMode.call(model, model.selectionFilter, this.action.dataFilter);
 
-          // NOTE: see related comment on View#selectionFilter.
-          view.selectionFilter = selectionFilter && selectionFilter.toDnf();
+          // NOTE: see related comment on AbstractModel#selectionFilter.
+          model.selectionFilter = selectionFilter && selectionFilter.toDnf();
 
           return null;
         }
       });
 
-      var View = __Complex.extend(/** @lends pentaho.visual.base.View# */{
+      var View = Complex.extend(/** @lends pentaho.visual.base.View# */{
 
         /**
          * @name pentaho.visual.base.View.Type
@@ -937,24 +932,6 @@ define([
         },
         // endregion
 
-        // region serialization
-        /** @inheritDoc */
-        toSpecInContext: function(keyArgs) {
-
-          if(keyArgs && keyArgs.isJson) {
-
-            keyArgs = Object.create(keyArgs);
-
-            var omitProps = keyArgs.omitProps;
-            keyArgs.omitProps = omitProps = omitProps ? Object.create(omitProps) : {};
-
-            if(omitProps.selectionFilter == null) omitProps.selectionFilter = true;
-          }
-
-          return this.base(keyArgs);
-        },
-        // endregion
-
         $type: /** @lends pentaho.visual.base.View.Type# */{
           isAbstract: true,
 
@@ -989,40 +966,6 @@ define([
                */
               name: "height",
               valueType: "number",
-              isRequired: true
-            },
-
-            // TODO: Currently, the type system provides no easy way to normalize a set value,
-            // without defining a subtype. Ideally, we'd use some "cast" hook provided
-            // by property types. Because of this, the conversion to DNF (or simply calling toDnf() to make sure
-            // non-termination is caught early) is not being ensured when the property is set but only on
-            // the Select action's _doDefault.
-            {
-              /**
-               * Gets or sets the current data selection filter.
-               *
-               * This property is required.
-               *
-               * This property is not serialized by default.
-               * To serialize it, specify the argument `keyArgs.omitProps.selectionFilter` of
-               * [toSpec]{@link pentaho.visual.base.View#toSpec} to `false`.
-               *
-               * When set to a filter specification, {@link pentaho.data.filter.spec.IAbstract},
-               * it is converted into a filter object.
-               * Any standard filter can be safely loaded synchronously.
-               *
-               * **ATTENTION**: The current implementation only supports filters that can be
-               * converted to [DNF]{@link pentaho.data.filter.Abstract#toDnf} _in a reasonable amount of time_.
-               *
-               * @name selectionFilter
-               * @memberOf pentaho.visual.base.View#
-               * @type {pentaho.data.filter.Abstract}
-               */
-              name: "selectionFilter",
-              valueType: AbstractFilter,
-
-              // Can be a shared instance - filters are immutable.
-              defaultValue: {_: "or"},
               isRequired: true
             },
             {
@@ -1300,7 +1243,7 @@ define([
              * The group of selection-related properties.
              *
              * By default, the only property of this group is
-             * the view's [selectionFilter]{@link pentaho.visual.base.View#selectionFilter} property.
+             * the model's [selectionFilter]{@link pentaho.visual.base.Model#selectionFilter} property.
              */
             Selection:  8
           }),
@@ -1310,11 +1253,11 @@ define([
           "selectionMode":   "Ignored",
           "model": {
             "_": "All",
-            "data": "Data"
+            "data": "Data",
+            "selectionFilter": "Selection"
           },
           "width":           "Size",
-          "height":          "Size",
-          "selectionFilter": "Selection"
+          "height":          "Size"
         }),
 
         // bits -> {name: , mask: }

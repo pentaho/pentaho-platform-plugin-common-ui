@@ -48,7 +48,7 @@ define([
        *   [list]{@link pentaho.type.Type#isList}, and
        * 2. mappings of fields whose [type][@link pentaho.data.ITable#getColumnType] can be assigned to the
        *   [element type]{@link pentaho.type.List.Type#of} of the mode's list data type.
-       * 3. mappings of fields whose [continuous][@link pentaho.data.ITable#isColumnContinuous] nature
+       * 3. mappings of fields whose data type is [continuous][@link pentaho.type.Type#isContinuous] nature
        *   is compatible with the mode's [continuous]{@link pentaho.visual.role.Mode#isContinuous} nature;
        *   if the mode is continuous, then all mapped fields need to be as well.
        *
@@ -73,6 +73,8 @@ define([
           var columnIndex;
           var columnCount = inputData.getNumberOfColumns();
 
+          var columnType;
+
           // 2) The data type of each column must be assignable to the element type.
           var elemType = dataType.of;
           if(elemType.alias !== "element") {
@@ -80,7 +82,7 @@ define([
 
             columnIndex = -1;
             while(++columnIndex < columnCount) {
-              var columnType = context.get(inputData.getColumnType(columnIndex)).type;
+              columnType = context.get(inputData.getColumnType(columnIndex)).type;
               if(!columnType.isSubtypeOf(elemType)) {
                 return null;
               }
@@ -92,7 +94,8 @@ define([
             // All columns need to be continuous as well.
             columnIndex = -1;
             while(++columnIndex < columnCount) {
-              if(!inputData.isColumnContinuous(columnIndex)) {
+              columnType = context.get(inputData.getColumnType(columnIndex)).type;
+              if(!columnType.isContinuous) {
                 return null;
               }
             }

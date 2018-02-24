@@ -1,0 +1,108 @@
+/*!
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `IAdapter` interface describes a type that adapts a
+ * [data set]{@link pentaho.visual.role.IAdapter#data}
+ * into a form that can
+ * be consumed by a certain visual role and
+ * make it operate in a certain [mode]{@link pentaho.visual.role.IMapper#mode}.
+ *
+ * The [input fields]{@link pentaho.visual.role.IAdapter#inputColumns},
+ * which are initially present in the data set,
+ * are transformed into [output fields]{@link pentaho.visual.role.IAdapter#outputColumns}
+ * which are added to the data set.
+ *
+ * @name pentaho.visual.role.IAdapter
+ *
+ * @interface
+ *
+ * @see pentaho.visual.role.strategy.Base
+ */
+
+/**
+ * Gets the adaptation strategy that generated this adapter.
+ *
+ * @name pentaho.visual.role.IAdapter#strategy
+ * @type {!pentaho.visual.role.strategy.Base}
+ * @readOnly
+ * @see pentaho.visual.role.IAdapter#kind
+ */
+
+/**
+ * Gets the kind of this adapter.
+ *
+ * The adapter kind is relative/local to its adaptation strategy.
+ * When a strategy can return more than one kind of adapter,
+ * this field allows distinguishing between them.
+ * Otherwise, its value can be `null`.
+ *
+ * @name pentaho.visual.role.IAdapter#kind
+ * @type {?string}
+ * @readOnly
+ * @see pentaho.visual.role.IAdapter#strategy
+ */
+
+/**
+ * Gets the data set of this adapter
+ *
+ * @name pentaho.visual.role.IAdapter#data
+ * @type {!pentaho.data.ITable}
+ * @readOnly
+ */
+
+/**
+ * Gets the indexes of the external, input columns.
+ *
+ * @name pentaho.visual.role.IAdapter#inputColumns
+ * @type {!Array.<number>}
+ * @readOnly
+ */
+
+/**
+ * Gets the indexes of the internal, output columns.
+ *
+ * When the adapter is an _identity adapter_,
+ * then `outputColumns` is equal to `inputColumns`.
+ *
+ * @name pentaho.visual.role.IAdapter#outputColumns
+ * @type {!Array.<number>}
+ * @readOnly
+ */
+
+/**
+ * Gets the visual role operation mode satisfied by the adapter.
+ *
+ * @name pentaho.visual.role.IAdapter#mode
+ * @type {!pentaho.visual.role.Mode}
+ * @readOnly
+ */
+
+/**
+ * Gets the index of the first row of `data` that contains the given internal, output values.
+ *
+ * In the case of adaptation strategies,
+ * such as the [tuple]{@link pentaho.visual.role.strategies.Tuple} strategy,
+ * that have more than one [output column]{@link pentaho.visual.role.IAdapter#outputColumns},
+ * the values or cells of all of the output columns (or a left-aligned part of these) should be provided.
+ *
+ * @name pentaho.visual.role.IAdapter#invert
+ * @method
+ *
+ * @param {...(any|pentaho.data.ICell)} outputValues - The output value(s).
+ *
+ * @return {number} A data row index, when the output values are present; `-1`, otherwise.
+ */

@@ -64,6 +64,35 @@ define([
           return this.get("dataType").$key + "|" + this.isContinuous;
         },
 
+        /**
+         * Gets a value that indicates this operation mode is applicable to
+         * a given list of field types.
+         *
+         * @param {!Array.<pentaho.type.Type>} fieldTypes - The list of field types.
+         *
+         * @return {boolean} `true` if this operation mode is applicable to `fieldTypes`; `false` otherwise.
+         */
+        canApplyToFieldTypes: function(fieldTypes) {
+          var dataType = this.dataType;
+          var elementType;
+
+          if(dataType.isList) {
+            elementType =  dataType.of;
+          } else if(dataType.isElement) {
+            if(fieldTypes.length > 1) {
+              return false;
+            }
+            elementType = dataType;
+          } else {
+            // abstract instance
+            return true;
+          }
+
+          return fieldTypes.every(function(fieldType) {
+            return fieldType.isSubtypeOf(elementType);
+          });
+        },
+
         $type: /** @lends pentaho.visual.role.Mode.Type# */{
           id: module.id,
           props: [

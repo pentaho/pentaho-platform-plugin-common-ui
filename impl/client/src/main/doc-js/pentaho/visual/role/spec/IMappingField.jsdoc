@@ -28,12 +28,12 @@
  * @interface
  * @extends pentaho.type.spec.IComplex
  *
- * @see pentaho.visual.role.spec.IMapping
+ * @see pentaho.visual.role.spec.IBaseMapping
  * @see pentaho.visual.role.spec.UMappingField
  */
 
 /**
- * The name of the data property.
+ * The name of the field.
  *
  * This property is required.
  *

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ define([
 
   /* globals describe, it, beforeEach, afterEach, beforeAll, spyOn */
 
-  describe("pentaho.visual.role.Mapping", function() {
+  describe("pentaho.visual.role.BaseMapping", function() {
 
     var context;
     var Mapping;
@@ -34,7 +34,7 @@ define([
             context = _context;
 
             return context.getDependencyApplyAsync([
-              "pentaho/visual/role/mapping"
+              "pentaho/visual/role/baseMapping"
             ], function(_Mapping) {
               Mapping = _Mapping;
             });
@@ -43,6 +43,25 @@ define([
 
     });
 
-    // TODO: mode = modeFixed || prop.modes[0]
+    describe("#hasFields", function() {
+
+      it("should be false when it has zero fields", function() {
+
+        var mapping = new Mapping();
+        expect(mapping.hasFields).toBe(false);
+      });
+
+      it("should be true when it has one field", function() {
+
+        var mapping = new Mapping({fields: ["foo"]});
+        expect(mapping.hasFields).toBe(true);
+      });
+
+      it("should be true when it has two fields", function() {
+
+        var mapping = new Mapping({fields: ["foo", "bar"]});
+        expect(mapping.hasFields).toBe(true);
+      });
+    });
   });
 });

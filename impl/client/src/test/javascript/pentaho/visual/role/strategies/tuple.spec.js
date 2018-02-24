@@ -24,7 +24,7 @@ define([
 
   /* globals describe, it, beforeEach, beforeAll, spyOn */
 
-  describe("pentaho.visual.role.strategies.Tuple", function() {
+  xdescribe("pentaho.visual.role.strategies.Tuple", function() {
 
     var Strategy;
 

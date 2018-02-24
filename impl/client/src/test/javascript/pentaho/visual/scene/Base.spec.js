@@ -39,7 +39,7 @@ define([
     };
   }
 
-  describe("pentaho.visual.scene.Base", function() {
+  xdescribe("pentaho.visual.scene.Base", function() {
 
     var AbstractFilter;
     var VisualModel;

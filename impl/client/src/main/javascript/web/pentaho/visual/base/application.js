@@ -47,7 +47,7 @@ define([
      */
     var VisualApplication = Application.extend()
     .implement({
-      $type: bundle.structured.application.type
+      $type: bundle.structured.application
     });
 
     return VisualApplication;

@@ -48,7 +48,7 @@ define([
        * 2. Modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} can
        *    be assigned to the data type of the mapped field;
        * 3. Modes whose [continuous]{@link pentaho.visual.role.Mode#isContinuous} nature is compatible
-       *    with the [continuous]{@link pentaho.data.ITable#isColumnContinuous} nature of the mapped field:
+       *    with the [continuous]{@link pentaho.type.Type#isContinuous} nature of the mapped field:
        *    if the mapped field is categorical it cannot be mapped to a continuous mode.
        *
        * @description Creates an _identity_ mapping strategy instance.
@@ -75,7 +75,7 @@ define([
           }
 
           // 3) Compatible continuous nature.
-          if(mode.isContinuous && !inputData.isColumnContinuous(0)) {
+          if(mode.isContinuous && !columnType.isContinuous) {
             return null;
           }
 

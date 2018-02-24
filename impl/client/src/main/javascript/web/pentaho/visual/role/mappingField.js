@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "pentaho/i18n!messages",
-  "pentaho/type/util"
-], function(bundle, typeUtil) {
+  "pentaho/i18n!messages"
+], function(bundle) {
 
   "use strict";
 
@@ -31,10 +30,10 @@ define([
        *
        * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.MappingField>} pentaho/visual/role/mappingField
        *
-       * @classDesc The `MappingField` class represents a data property in a
-       * [visual role mapping]{@link pentaho.visual.role.Mapping}.
+       * @classDesc The `MappingField` class represents a field in a
+       * [visual role mapping]{@link pentaho.visual.role.BaseMapping}.
        *
-       * @see pentaho.visual.role.Mapping
+       * @see pentaho.visual.role.BaseMapping
        *
        * @description Creates a visual role mapping field instance.
        * @constructor
@@ -47,29 +46,6 @@ define([
           if(typeof spec === "string") spec = {name: spec};
 
           this.base(spec, keyArgs);
-        },
-
-        /**
-         * Gets the visual role mapping that owns this mapping field, if any, or `null`.
-         *
-         * @type {pentaho.visual.base.role.Mapping}
-         * @readonly
-         */
-        get mapping() {
-          // TODO: Test it is a fields list of a mapping...
-          var fieldsList = typeUtil.__getFirstRefContainer(this);
-          return fieldsList && typeUtil.__getFirstRefContainer(fieldsList);
-        },
-
-        /**
-         * Gets the visual model that owns this visual role mapping field, if any, or `null`.
-         *
-         * @type {pentaho.visual.base.Model}
-         * @readonly
-         */
-        get model() {
-          var mapping = this.mapping;
-          return mapping && mapping.model;
         },
 
         /** @inheritDoc */
@@ -99,7 +75,7 @@ define([
         $type: {
           props: [
             /**
-             * Gets or sets the name of the data property.
+             * Gets or sets the name of the field.
              *
              * This property is required.
              *

@@ -47,16 +47,3 @@
  * @type {number}
  * @see pentaho.visual.base.View#height
  */
-
-/**
- * The current selection filter.
- *
- * This property is not serialized by default.
- * To serialize it, specify the argument `keyArgs.omitProps.selectionFilter` of
- * [toSpec]{@link pentaho.visual.base.View#toSpec} to `false`.
- *
- * @name selectionFilter
- * @memberOf pentaho.visual.base.spec.IView#
- * @type {pentaho.data.filter.Abstract}
- * @see pentaho.visual.base.View#selectionFilter
- */
