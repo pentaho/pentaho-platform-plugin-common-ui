@@ -342,6 +342,8 @@ define([
         });
       });
 
+      // The following are actually of BaseProperty, but easier to test here.
+
       describe("#hasAnyListModes", function() {
 
         it("should be true if any mode is list", function() {
@@ -529,6 +531,386 @@ define([
           expect(DerivedModel.type.get("propRole").hasAnyCategoricalModes).toBe(false);
         });
       });
+
+      describe("#hasAnyModes({isContinuous, isList, elementDataType})", function() {
+
+        describe("spec.isContinuous: false", function() {
+
+          it("should be true if any mode is categorical", function() {
+
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  propRoleA: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "number", isContinuous: true},
+                      {dataType: "string", isContinuous: false}
+                    ]
+                  },
+                  propRoleB: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "string", isContinuous: false},
+                      {dataType: "number", isContinuous: true}
+                    ]
+                  },
+                  propRoleC: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "string", isContinuous: false},
+                      {dataType: "object", isContinuous: false}
+                    ]
+                  }
+                }
+              }
+            });
+
+            expect(DerivedModel.type.get("propRoleA").hasAnyModes({isContinuous: false})).toBe(true);
+            expect(DerivedModel.type.get("propRoleB").hasAnyModes({isContinuous: false})).toBe(true);
+            expect(DerivedModel.type.get("propRoleC").hasAnyModes({isContinuous: false})).toBe(true);
+          });
+
+          it("should be false if every mode is continuous", function() {
+
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  propRole: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "number", isContinuous: true}
+                    ]
+                  }
+                }
+              }
+            });
+
+            expect(DerivedModel.type.get("propRole").hasAnyModes({isContinuous: false})).toBe(false);
+          });
+        });
+
+        describe("spec.isContinuous: true", function() {
+
+          it("should be true if any level is quantitative", function() {
+
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  propRole: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "string", isContinuous: false},
+                      {dataType: "number", isContinuous: true}
+                    ]
+                  }
+                }
+              }
+            });
+
+            var rolePropType = DerivedModel.type.get("propRole");
+
+            expect(rolePropType.hasAnyModes({isContinuous: true})).toBe(true);
+          });
+
+          it("should be false if every level is categorical", function() {
+
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  propRole: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "string", isContinuous: false},
+                      {dataType: "number", isContinuous: false}
+                    ]
+                  }
+                }
+              }
+            });
+
+            var rolePropType = DerivedModel.type.get("propRole");
+
+            expect(rolePropType.hasAnyModes({isContinuous: true})).toBe(false);
+          });
+        });
+
+        describe("spec.isList: false", function() {
+
+          it("should be false if every mode is list", function() {
+
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  propRoleA: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: ["string"]}
+                    ]
+                  },
+                  propRoleB: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: ["number"]}
+                    ]
+                  },
+                  propRoleC: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "list"}
+                    ]
+                  }
+                }
+              }
+            });
+
+            expect(DerivedModel.type.get("propRoleA").hasAnyModes({isList: false})).toBe(false);
+            expect(DerivedModel.type.get("propRoleB").hasAnyModes({isList: false})).toBe(false);
+            expect(DerivedModel.type.get("propRoleC").hasAnyModes({isList: false})).toBe(false);
+          });
+
+          it("should be true if any mode is not a list, value or instance", function() {
+
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  propRole: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "number"}
+                    ]
+                  }
+                }
+              }
+            });
+
+            expect(DerivedModel.type.get("propRole").hasAnyModes({isList: false})).toBe(true);
+          });
+
+          it("should be true if any mode is of type value or instance", function() {
+
+            var DerivedModel1 = Model.extend({
+              $type: {
+                props: {
+                  propRole: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "value"}
+                    ]
+                  }
+                }
+              }
+            });
+
+            var DerivedModel2 = Model.extend({
+              $type: {
+                props: {
+                  propRole: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "instance"}
+                    ]
+                  }
+                }
+              }
+            });
+
+            expect(DerivedModel1.type.get("propRole").hasAnyModes({isList: false})).toBe(true);
+            expect(DerivedModel2.type.get("propRole").hasAnyModes({isList: false})).toBe(true);
+          });
+        });
+
+        describe("spec.isList: true", function() {
+
+          it("should be true if any mode is list", function() {
+
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  propRoleA: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "number"},
+                      {dataType: ["string"]}
+                    ]
+                  },
+                  propRoleB: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "string"},
+                      {dataType: ["number"]}
+                    ]
+                  },
+                  propRoleC: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "list"}
+                    ]
+                  }
+                }
+              }
+            });
+
+            expect(DerivedModel.type.get("propRoleA").hasAnyModes({isList: true})).toBe(true);
+            expect(DerivedModel.type.get("propRoleB").hasAnyModes({isList: true})).toBe(true);
+            expect(DerivedModel.type.get("propRoleC").hasAnyModes({isList: true})).toBe(true);
+          });
+
+          it("should be false if every mode is not a list, value or instance", function() {
+
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  propRole: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "number"}
+                    ]
+                  }
+                }
+              }
+            });
+
+            expect(DerivedModel.type.get("propRole").hasAnyModes({isList: true})).toBe(false);
+          });
+
+          it("should be false if some mode is of type value or instance", function() {
+
+            var DerivedModel1 = Model.extend({
+              $type: {
+                props: {
+                  propRole: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "value"}
+                    ]
+                  }
+                }
+              }
+            });
+
+            var DerivedModel2 = Model.extend({
+              $type: {
+                props: {
+                  propRole: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "instance"}
+                    ]
+                  }
+                }
+              }
+            });
+
+            expect(DerivedModel1.type.get("propRole").hasAnyModes({isList: true})).toBe(false);
+            expect(DerivedModel2.type.get("propRole").hasAnyModes({isList: true})).toBe(false);
+          });
+        });
+
+        describe("spec.elementDataType", function() {
+
+          it("should be true if at least one list type mode exists and has the specified element type", function() {
+
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  propRoleA: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: ["string"]}
+                    ]
+                  },
+                  propRoleB: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: ["number"]}
+                    ]
+                  }
+                }
+              }
+            });
+
+            expect(DerivedModel.type.get("propRoleA").hasAnyModes({elementDataType: "string"})).toBe(true);
+            expect(DerivedModel.type.get("propRoleB").hasAnyModes({elementDataType: "number"})).toBe(true);
+          });
+
+          it("should be true if at least one list type mode exists and has an element type which is a subtype of " +
+              "the specified element type", function() {
+
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  propRoleA: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "list"},
+                      {dataType: "number"}
+                    ]
+                  }
+                }
+              }
+            });
+
+            expect(DerivedModel.type.get("propRoleA").hasAnyModes({elementDataType: "string"})).toBe(true);
+          });
+
+          it("should be true if at least one element type mode exists and is the specified element type", function() {
+
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  propRoleA: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "string"}
+                    ]
+                  }
+                }
+              }
+            });
+
+            expect(DerivedModel.type.get("propRoleA").hasAnyModes({elementDataType: "string"})).toBe(true);
+          });
+
+          it("should be true if at least one element type mode exists and is a subtype of " +
+              "the specified element type", function() {
+
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  propRoleA: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "element"}
+                    ]
+                  }
+                }
+              }
+            });
+
+            expect(DerivedModel.type.get("propRoleA").hasAnyModes({elementDataType: "string"})).toBe(true);
+          });
+
+          it("should be false if no element type mode exists with the specified element type", function() {
+
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  propRoleA: {
+                    base: "pentaho/visual/role/property",
+                    modes: [
+                      {dataType: "number"}
+                    ]
+                  }
+                }
+              }
+            });
+
+            expect(DerivedModel.type.get("propRoleA").hasAnyModes({elementDataType: "string"})).toBe(false);
+          });
+        });
+      });
+      // endregion
 
       describe("#isVisualKey", function() {
 
@@ -817,7 +1199,6 @@ define([
           expect(rolePropType.isVisualKey).toBe(true);
         });
       });
-      // endregion
 
       describe("#fields", function() {
 

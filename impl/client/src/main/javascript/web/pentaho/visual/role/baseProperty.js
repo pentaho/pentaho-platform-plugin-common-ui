@@ -32,6 +32,8 @@ define([
     "./baseMapping",
     function(Property, BaseMapping) {
 
+    var context = this;
+
       /**
        * @name pentaho.visual.role.BaseProperty.Type
        * @class
@@ -141,6 +143,55 @@ define([
                 return false;
               }
             });
+            return any;
+          },
+
+          /**
+           * Gets a value that indicates if the visual role has any modes having the specified properties.
+           *
+           * @param {object} keyArgs - The keyword arguments.
+           * @param {?boolean} [keyArgs.isContinuous] - Indicates that matching modes are continuous.
+           * @param {?boolean} [keyArgs.isList] - Indicates that the data type of matching modes are list data types.
+           * @param {pentaho.type.UTypeReference} [keyArgs.elementDataType] - The element data type (or a subtype of)
+           * of matching modes.
+           *
+           * @return {boolean} `true` if a mode having the specified properties exists; `false` otherwise.
+           *
+           * @see pentaho.visual.role.BaseProperty.Type#hasAnyContinuousModes
+           * @see pentaho.visual.role.BaseProperty.Type#hasAnyCategoricalModes
+           * @see pentaho.visual.role.BaseProperty.Type#hasAnyListModes
+           *
+           * @see pentaho.visual.role.BaseProperty.Type#modes
+           * @see pentaho.visual.role.Mode#isContinuous
+           * @see pentaho.visual.role.Mode#elementDataType
+           * @see pentaho.type.Type#isList
+           * @see pentaho.visual.role.Mode#dataType
+           */
+          hasAnyModes: function(keyArgs) {
+            var isContinuous = keyArgs.isContinuous;
+            var isList = keyArgs.isList;
+            var elementDataType = keyArgs.elementDataType ? context.get(keyArgs.elementDataType).type : null;
+
+            var any = false;
+
+            this.modes.each(function(mode) {
+              if(isContinuous != null && mode.isContinuous !== isContinuous) {
+                return;
+              }
+
+              if(isList != null && mode.dataType.isList !== isList) {
+                return;
+              }
+
+              if(elementDataType != null && !elementDataType.isSubtypeOf(mode.elementDataType)) {
+                return;
+              }
+
+              // Found. Stop.
+              any = true;
+              return false;
+            });
+
             return any;
           },
           // endregion

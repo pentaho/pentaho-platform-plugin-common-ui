@@ -177,6 +177,19 @@ define([
       });
     });
 
+    describe("#elementDataType", function() {
+
+      it("should return number if dataType is number", function() {
+        var mode = new Mode({dataType: numberType});
+        expect(mode.elementDataType).toBe(numberType);
+      });
+
+      it("should return number if dataType is [number]", function() {
+        var mode = new Mode({dataType: [numberType]});
+        expect(mode.elementDataType).toBe(numberType);
+      });
+    });
+
     describe("#canApplyToFieldTypes(fieldTypes)", function() {
 
       describe("when dataType: instance", function() {

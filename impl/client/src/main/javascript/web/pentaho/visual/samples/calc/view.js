@@ -80,8 +80,7 @@ define([
         __calculate: function() {
           var dataTable = this.model.data;
           var rowCount = dataTable.getNumberOfRows();
-          var measureFieldName = this.model.measure.fields.at(0).name;
-          var measureIndex = dataTable.getColumnIndexById(measureFieldName);
+          var measureIndex = this.model.measure.fieldIndexes[0];
 
           var getValue = function(k) {
             var v = dataTable.getValue(k, measureIndex);

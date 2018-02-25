@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context"
-], function(Context) {
+  "pentaho/type/Context",
+  "pentaho/data/Table"
+], function(Context, Table) {
 
   "use strict";
 
@@ -26,6 +27,21 @@ define([
     var context;
     var Mapping;
     var Model;
+
+    function getDataSpec1() {
+      return {
+        model: [
+          {name: "country", type: "string", label: "Country"},
+          {name: "product", type: "string", label: "Product"},
+          {name: "sales", type: "number", label: "Sales"},
+          {name: "date", type: "date", label: "Date"}
+        ],
+        rows: [
+          {c: ["Portugal", "fish", 100, "2016-01-01"]},
+          {c: ["Ireland", "beer", 200, "2016-01-02"]}
+        ]
+      };
+    }
 
     beforeAll(function(done) {
 
@@ -91,6 +107,63 @@ define([
         expect(mapping._modelReference).not.toBe(null);
         expect(mapping._modelReference.container).toBe(derived);
         expect(mapping._modelReference.property).toBe(Derived.type.get("foo"));
+      });
+    });
+
+    describe("#fieldIndexes", function() {
+
+      it("should return null when there is no container", function() {
+
+        var mapping = new Mapping();
+        expect(mapping.fieldIndexes).toBe(null);
+      });
+
+      it("should return null if any field is not defined", function() {
+
+        var Derived = Model.extend({
+          $type: {
+            props: [
+              {
+                name: "propRole",
+                base: "pentaho/visual/role/baseProperty",
+                modes: ["list"]
+              }
+            ]
+          }
+        });
+
+        var derived = new Derived({
+          data: new Table(getDataSpec1()),
+          propRole: {fields: ["sales", "foo"]}
+        });
+        var mapping = derived.propRole;
+        var result = mapping.fieldIndexes;
+
+        expect(result).toBe(null);
+      });
+
+      it("should return an array with the correct indexes", function() {
+
+        var Derived = Model.extend({
+          $type: {
+            props: [
+              {
+                name: "propRole",
+                base: "pentaho/visual/role/baseProperty",
+                modes: ["list"]
+              }
+            ]
+          }
+        });
+
+        var derived = new Derived({
+          data: new Table(getDataSpec1()),
+          propRole: {fields: ["sales", "country"]}
+        });
+        var mapping = derived.propRole;
+        var result = mapping.fieldIndexes;
+
+        expect(result).toEqual([2, 0]);
       });
     });
   });

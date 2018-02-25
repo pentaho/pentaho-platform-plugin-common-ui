@@ -241,16 +241,21 @@ define([
               return null;
             }
 
+            var fieldIndexes = mapping.fieldIndexes;
+            if(fieldIndexes === null) {
+              // There's at least one invalid field.
+              return null;
+            }
+
+            var fieldTypes = fieldIndexes.map(function(fieldIndex) {
+              var columnTypeName = data.getColumnType(fieldIndex);
+              return context.get(columnTypeName).type;
+            });
+
             var modes = this.modes;
             var modeCount = modes.count;
 
             // assert modeCount > 0
-
-            var fieldTypes = this.__getMappingFieldTypes(data, mapping);
-            if(fieldTypes === null) {
-              // There's at least one invalid field.
-              return null;
-            }
 
             var modeIndex = -1;
             while(++modeIndex < modeCount) {
@@ -261,37 +266,6 @@ define([
             }
 
             return null;
-          },
-
-          /**
-           * Gets the list of types of the fields of a mapping of this property.
-           *
-           * @param {!pentaho.data.ITable} data - The data set.
-           * @param {!pentaho.visual.role.Mapping} mapping - The visual role mapping.
-           *
-           * @return {!Array.<pentaho.type.Type>} The list of field types.
-           * @private
-           */
-          __getMappingFieldTypes: function(data, mapping) {
-            var mappingFields = mapping.fields;
-            var fieldCount = mappingFields.count;
-            var fieldTypes = new Array(fieldCount);
-            var fieldIndex = -1;
-            while(++fieldIndex < fieldCount) {
-              var mappingField = mappingFields.at(fieldIndex);
-              var name = mappingField.name;
-
-              // Field with no corresponding column?
-              var columnIndex = data.getColumnIndexById(name);
-              if(columnIndex == null || columnIndex < 0) {
-                return null;
-              }
-
-              var columnTypeName = data.getColumnType(columnIndex);
-              fieldTypes[fieldIndex] = context.get(columnTypeName).type;
-            }
-
-            return fieldTypes;
           },
           // endregion
 

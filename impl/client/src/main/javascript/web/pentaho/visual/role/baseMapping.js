@@ -102,6 +102,44 @@ define([
           return null;
         },
 
+        /**
+         * Gets an array of the indexes of data set columns of the mapped fields.
+         *
+         * If there is no container model, or the model has no data set, `null` is returned.
+         * If any of the mapped fields is not defined in the data set, `null` is returned.
+         *
+         * @type {!Array.<number>}
+         * @readOnly
+         */
+        get fieldIndexes() {
+
+          var fieldIndexes = null;
+
+          var iref = this._modelReference;
+          if(iref !== null) {
+            var data = iref.container.data;
+            if(data !== null) {
+              var mappingFields = this.fields;
+              var fieldCount = mappingFields.count;
+              var mappingFieldIndex = -1;
+
+              fieldIndexes = new Array(fieldCount);
+
+              while(++mappingFieldIndex < fieldCount) {
+                var fieldName = mappingFields.at(mappingFieldIndex).name;
+                var fieldIndex = data.getColumnIndexById(fieldName);
+                if(fieldIndex < 0) {
+                  return null;
+                }
+
+                fieldIndexes[mappingFieldIndex] = fieldIndex;
+              }
+            }
+          }
+
+          return fieldIndexes;
+        },
+
         $type: /** @lends pentaho.visual.role.BaseMapping.Type# */{
           props: [
             /**

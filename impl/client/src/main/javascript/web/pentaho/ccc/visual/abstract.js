@@ -237,7 +237,7 @@ define([
 
           if(_isDebugMode) logger.log("_updateSelection BEGIN");
           try {
-            var dataFilter = this.selectionFilter;
+            var dataFilter = this.model.selectionFilter;
 
             // Skipping rows with all null measures, when converting from cross-tab, can speed up things a lot.
             // The dataView sourceColumns are not relevant as filter uses the field names.
@@ -1277,7 +1277,7 @@ define([
 
           // Selection filter information.
           // Not the data point count, but the selection count (a single column selection may select many data points).
-          var clauseCount = util.getFilterClauseCount(this.selectionFilter);
+          var clauseCount = util.getFilterClauseCount(this.model.selectionFilter);
           if(clauseCount > 0) {
             var msgId = clauseCount === 1 ? "tooltip.footer.selectedOne" : "tooltip.footer.selectedMany";
 

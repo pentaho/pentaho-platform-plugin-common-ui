@@ -246,38 +246,36 @@ define([
 
   function createMapper(mapping, data) {
 
-    var columnIndexes = mapping.fields.toArray(function(mappingField) {
-      return data.getColumnIndexById(mappingField.name);
-    });
+    var fieldIndexes = mapping.fieldIndexes;
 
     var mode = mapping.mode;
 
     // assert mode != null;
 
     if(mode.dataType.isList) {
-      return createMultipleCellsMapper(data, columnIndexes);
+      return createMultipleFieldsMapper(data, fieldIndexes);
     }
 
-    return createSingleCellMapper(data, columnIndexes[0]);
+    return createSingleFieldMapper(data, fieldIndexes[0]);
   }
 
-  function createSingleCellMapper(data, columnIndex) {
+  function createSingleFieldMapper(data, fieldIndex) {
 
-    return function singleCellMapper(rowIndex) {
-      return data.getCell(rowIndex, columnIndex);
+    return function singleFieldMapper(rowIndex) {
+      return data.getCell(rowIndex, fieldIndex);
     };
   }
 
-  function createMultipleCellsMapper(data, columnIndexes) {
+  function createMultipleFieldsMapper(data, fieldIndexes) {
 
-    var columnCount = columnIndexes.length;
+    var fieldCount = fieldIndexes.length;
 
-    return function multipleCellsMapper(rowIndex) {
-      var cells = new Array(columnCount);
+    return function multipleFieldsMapper(rowIndex) {
+      var cells = new Array(fieldCount);
 
-      var columnIndex = columnCount;
-      while(columnIndex--) {
-        cells[columnIndex] = data.getCell(rowIndex, columnIndex);
+      var fieldIndex = fieldCount;
+      while(fieldIndex--) {
+        cells[fieldIndex] = data.getCell(rowIndex, fieldIndex);
       }
 
       return cells;

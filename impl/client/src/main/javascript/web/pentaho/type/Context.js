@@ -1603,6 +1603,8 @@ define([
     //   Custom types with own type attributes would need special handling.
     //   Something like a two phase protocol?
 
+    // TODO: visual.role.Property.Type#modes -> visual.role.Mode#dataType is not being collected.
+
     // {[base: "complex", ] [of: "..."] , [props: []]}
     __collectDependencyRefsRecursive.call(this, typeSpec.base, depIdsSet, depRefs);
 

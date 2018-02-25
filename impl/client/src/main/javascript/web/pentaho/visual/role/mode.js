@@ -102,6 +102,22 @@ define([
           });
         },
 
+        /**
+         * Gets the element type of the mode's data type.
+         *
+         * If [dataType]{@link pentaho.visual.role.Mode#dataType} is a
+         * [list]{@link pentaho.type.Type#isList} type,
+         * then returns its [of]{@link pentaho.type.List.Type#of} type.
+         * Otherwise, returns `dataType` itself.
+         *
+         * @return {!pentaho.type.Element.Type} The element data type.
+         * @readOnly
+         */
+        get elementDataType() {
+          var dataType = this.dataType;
+          return dataType.isList ? dataType.of : dataType;
+        },
+
         /** @inheritDoc */
         toSpecInContext: function(keyArgs) {
 
@@ -170,7 +186,7 @@ define([
              *
              * When unspecified, or specified as `null`,
              * defaults to the value of [isContinuous]{@link pentaho.type.Type#isContinuous} of
-             * [dataType]{@link pentaho.visual.role.Mode#dataType}.
+             * [elementDataType]{@link pentaho.visual.role.Mode#elementDataType}.
              *
              * The types {@link pentaho.type.Number} and {@link pentaho.type.Date} are known to be continuous.
              *
@@ -186,7 +202,7 @@ define([
               isReadOnly: true,
               defaultValue: function() {
                 // Surely, `dataType` has already been initialized, based on property definition order.
-                return this.dataType.isContinuous;
+                return this.elementDataType.isContinuous;
               }
             }
           ]
