@@ -49,7 +49,7 @@ define(function() {
 
           /* jshint laxbreak:true*/
           // ~ DOT SIZE
-          this.options.axisOffset = this.model.size.isMapped
+          this.options.axisOffset = this.model.size.hasFields
               ? (1.1 * this.options.sizeAxisRatio / 2) // Axis offset like legacy analyzer
               : 0;
         }

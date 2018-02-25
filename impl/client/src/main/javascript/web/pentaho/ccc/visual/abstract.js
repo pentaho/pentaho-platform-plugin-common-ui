@@ -188,7 +188,7 @@ define([
         _updateAll: function() {
 
           // Determine if there is a multi-chart role and if it is bound (ignoring the measure discrim, if any).
-          this._isMultiChartMode = !!this._multiRole && this.model.get(this._multiRole).isMapped;
+          this._isMultiChartMode = !!this._multiRole && this.model.get(this._multiRole).hasFields;
 
           this._initOptions();
 
@@ -456,7 +456,7 @@ define([
 
             def.array.lazy(rolesByCccVisualRole, cccRoleName).push(roleName);
 
-            if(mapping.isMapped) {
+            if(mapping.hasFields) {
 
               mapping.fields.each(function(mappingField, mappingFieldIndex) {
                 var dataAttributeName = mappingField.name;
@@ -792,7 +792,7 @@ define([
          */
         _isColorCategorical: function() {
           var colorRole = this._discreteColorRole;
-          if(colorRole && this.model[colorRole].isMapped) {
+          if(colorRole && this.model[colorRole].hasFields) {
             return this._isRoleCategorical(colorRole);
           }
         },

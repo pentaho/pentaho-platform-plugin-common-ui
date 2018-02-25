@@ -72,7 +72,7 @@ define([
           var cccMainRoleSpecs = this.options.visualRoles;
           var cccPlot2RoleSpecs = null;
 
-          this.plot2 = this.model.measuresLine.isMapped;
+          this.plot2 = this.model.measuresLine.hasFields;
           if(this.plot2) {
             // Creating this here prevents changing a shared nested object.
             this.options.plots = [

@@ -94,7 +94,7 @@ define([
             }
 
             // Determine whether to show values label
-            if(model.labelsOption !== "none" && this.model.size.isMapped) {
+            if(model.labelsOption !== "none" && this.model.size.hasFields) {
               options.label_textBaseline = "bottom";
               options.label_textMargin = 2;
 
