@@ -65,22 +65,22 @@ define([
 
   // ---
 
-  function Variable(value, formatted) {
+  function Cell(value, formatted) {
     this.value = value;
-    this.formatted = formatted;
+    this.formatted = formatted || null;
   }
 
-  Variable.prototype.valueOf = function() {
+  Cell.prototype.valueOf = function() {
     return this.value;
   };
 
-  Variable.prototype.toString = function() {
+  Cell.prototype.toString = function() {
     return this.formatted;
   };
 
   // ---
 
-  xdescribe("pentaho.visual.scene.util", function() {
+  describe("pentaho.visual.scene.util", function() {
 
     var context;
     var AbstractFilter;
@@ -109,18 +109,6 @@ define([
 
     describe(".invertVars(varsMap, model, keyArgs)", function() {
 
-      it("should throw if the given model has a null data set", function() {
-
-        var CustomModel = VisualModel.extend();
-
-        var model = new CustomModel();
-        var varsMap = {};
-
-        expect(function() {
-          sceneUtil.invertVars(varsMap, model);
-        }).toThrow(errorMatch.argInvalid("model"));
-      });
-
       it("should return an empty cells map if the given vars map is empty", function() {
 
         var CustomModel = VisualModel.extend();
@@ -139,7 +127,7 @@ define([
 
         var model = new CustomModel({data: new DataTable(getDatasetDT1WithNoKeyColumns())});
 
-        var varsMap = {"category": new Variable("a", "A")};
+        var varsMap = {"category": new Cell("a", "A")};
 
         var cellsMap = sceneUtil.invertVars(varsMap, model);
 
@@ -159,7 +147,7 @@ define([
 
         var model = new CustomModel({data: new DataTable(getDatasetDT1WithNoKeyColumns())});
 
-        var varsMap = {"category": new Variable("a", "A")};
+        var varsMap = {"category": new Cell("a", "A")};
 
         var cellsMap = sceneUtil.invertVars(varsMap, model);
 
@@ -182,7 +170,7 @@ define([
 
         var model = new CustomModel({data: new DataTable(getDatasetDT2WithTwoKeyColumns())});
 
-        var varsMap = {"category": new Variable("a", "A")};
+        var varsMap = {"category": new Cell("a", "A")};
 
         var cellsMap = sceneUtil.invertVars(varsMap, model);
 
@@ -210,52 +198,12 @@ define([
             category: {fields: ["country", "city"]}
           });
 
-          // Must read at least once to be able to invert!
-          model.category.mapper.getValue(0);
-
-          // Row 0 combined data.
-          var varsMap = {"category": new Variable("Portugal~Lisbon", "Portucale ~ Lisbon")};
-
-          var cellsMap = sceneUtil.invertVars(varsMap, model);
-
-          expect(Object.keys(cellsMap).length).toBe(2);
-
-          var cell = cellsMap.country;
-          expect(cell != null).toBe(true);
-          expect(cell.value).toBe("Portugal");
-          expect(cell.formatted).toBe("Portucale");
-
-          cell = cellsMap.city;
-          expect(cell != null).toBe(true);
-          expect(cell.value).toBe("Lisbon");
-          expect(cell.formatted).toBe("Lisboa");
-        });
-
-        it("should return a cells map with the inverted key column values " +
-            "(one visual role with two fields) (given direct valueOf/toString values)", function() {
-
-          var CustomModel = VisualModel.extend({
-            $type: {
-              props: [
-                {
-                  name: "category",
-                  base: "pentaho/visual/role/property"
-                }
-              ]
-            }
-          });
-
-          var model = new CustomModel({
-            data: new DataTable(getDatasetDT2WithTwoKeyColumns()),
-            category: {fields: ["country", "city"]}
-          });
-
-          // Must read at least once to be able to invert!
-          model.category.mapper.getValue(0);
-
           // Row 0 combined data.
           var varsMap = {
-            "category": "Portugal~Lisbon"
+            "category": [
+              new Cell("Portugal", "Portucale"),
+              new Cell("Lisbon", "Lisboa")
+            ]
           };
 
           var cellsMap = sceneUtil.invertVars(varsMap, model);
@@ -297,14 +245,10 @@ define([
             category2: {fields: ["city"]}
           });
 
-          // Must read at least once to be able to invert!
-          model.category1.mapper.getValue(0);
-          model.category2.mapper.getValue(0);
-
           // Row 0 data.
           var varsMap = {
-            "category1": new Variable("Portugal", "Portucale"),
-            "category2": new Variable("Lisbon", "Lisbon")
+            "category1": new Cell("Portugal", "Portucale"),
+            "category2": new Cell("Lisbon", "Lisboa")
           };
 
           var cellsMap = sceneUtil.invertVars(varsMap, model);
@@ -346,19 +290,15 @@ define([
             category2: {fields: ["city"]}
           });
 
-          // Must read at least once to be able to invert!
-          model.category1.mapper.getValue(0);
-          model.category2.mapper.getValue(0);
-
           // Row 0 data.
           var baseVarsMap = {
-            "category1": new Variable("Portugal", "Portucale"),
-            "category2": new Variable("Wrong", "Errado")
+            "category1": new Cell("Portugal", "Portucale"),
+            "category2": new Cell("Wrong", "Errado")
           };
 
           var varsMap = Object.create(baseVarsMap);
           // Shadows base category2
-          varsMap.category2 = new Variable("Lisbon", "Lisbon");
+          varsMap.category2 = new Cell("Lisbon", "Lisboa");
 
           var cellsMap = sceneUtil.invertVars(varsMap, model);
 
@@ -399,14 +339,10 @@ define([
             measure: {fields: ["sales"]}
           });
 
-          // Must read at least once to be able to invert!
-          model.category.mapper.getValue(1);
-          model.measure.mapper.getValue(1);
-
           // Row 1 data.
           var varsMap = {
-            "category": new Variable("Ireland"),
-            "measure": new Variable(6000)
+            "category": new Cell("Ireland"),
+            "measure": new Cell(6000)
           };
 
           var keyArgs = {
@@ -450,11 +386,13 @@ define([
             category: {fields: ["country", "city"]}
           });
 
-          // Must read at least once to be able to invert!
-          model.category.mapper.getValue(0);
-
           // Row 0 combined data.
-          var varsMap = {"category": new Variable("Portugal~Lisbon", "Portucale ~ Lisbon")};
+          var varsMap = {
+            "category": [
+              new Cell("Portugal", "Portucale"),
+              new Cell("Lisbon", "Lisboa")
+            ]
+          };
 
           var cellsMap = sceneUtil.invertVars(varsMap, model);
 
@@ -495,14 +433,10 @@ define([
             category2: {fields: ["city"]}
           });
 
-          // Must read at least once to be able to invert!
-          model.category1.mapper.getValue(0);
-          model.category2.mapper.getValue(0);
-
           // Row 0 combined data.
           var varsMap = {
-            "category1": new Variable("Portugal", "Portucale"),
-            "category2": new Variable("Lisbon", "Lisbon")
+            "category1": new Cell("Portugal", "Portucale"),
+            "category2": new Cell("Lisbon", "Lisboa")
           };
 
           var cellsMap = sceneUtil.invertVars(varsMap, model);
@@ -544,14 +478,10 @@ define([
             measure: {fields: ["sales"]}
           });
 
-          // Must read at least once to be able to invert!
-          model.category.mapper.getValue(1);
-          model.measure.mapper.getValue(1);
-
           // Row 1 data.
           var varsMap = {
-            "category": new Variable("Ireland"),
-            "measure": new Variable(6000)
+            "category": new Cell("Ireland"),
+            "measure": new Cell(6000)
           };
 
           var keyArgs = {
@@ -575,7 +505,7 @@ define([
       });
     });
 
-    describe(".createFilterForVars(varsMap, model)", function() {
+    describe(".createFilterFromVars(varsMap, model)", function() {
 
       it("should return a filter with the inverted key column values", function() {
 
@@ -595,13 +525,15 @@ define([
           category: {fields: ["country", "city"]}
         });
 
-        // Must read at least once to be able to invert!
-        model.category.mapper.getValue(0);
-
         // Row 0 combined data.
-        var varsMap = {"category": new Variable("Portugal~Lisbon", "Portucale ~ Lisbon")};
+        var varsMap = {
+          "category": [
+            new Cell("Portugal", "Portucale"),
+            new Cell("Lisbon", "Lisboa")
+          ]
+        };
 
-        var filter = sceneUtil.createFilterForVars(varsMap, model);
+        var filter = sceneUtil.createFilterFromVars(varsMap, model);
 
         expect(filter instanceof AbstractFilter).toBe(true);
         expect(filter.kind).toBe("and");

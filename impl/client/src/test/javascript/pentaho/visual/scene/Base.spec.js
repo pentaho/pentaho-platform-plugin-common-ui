@@ -39,9 +39,8 @@ define([
     };
   }
 
-  xdescribe("pentaho.visual.scene.Base", function() {
+  describe("pentaho.visual.scene.Base", function() {
 
-    var AbstractFilter;
     var VisualModel;
     var View;
 
@@ -51,11 +50,9 @@ define([
           .then(function(context) {
 
             return context.getDependencyApplyAsync([
-              "pentaho/data/filter/abstract",
               "pentaho/visual/base/model",
               "pentaho/visual/base/view"
-            ], function(_AbstractFilter, _VisualModel, _View) {
-              AbstractFilter = _AbstractFilter;
+            ], function(_VisualModel, _View) {
               VisualModel = _VisualModel;
               View = _View;
             });
@@ -222,115 +219,6 @@ define([
       });
     });
 
-    describe("#setVar(name, value, formatted)", function() {
-
-      var CustomView;
-      var view;
-      var parentScene;
-      var childScene;
-
-      beforeAll(function() {
-        CustomView = View.extend();
-      });
-
-      beforeEach(function() {
-        view = new CustomView();
-        parentScene = new Scene(null, view);
-        childScene = new Scene(parentScene);
-      });
-
-      it("should create a local variable", function() {
-        parentScene.setVar("category", "Portugal", "Portucale");
-
-        // `vars` has a null prototype!
-        expect(Object.prototype.hasOwnProperty.call(parentScene.vars, "category"));
-      });
-
-      it("should create an enumerable local variable", function() {
-
-        parentScene.setVar("category", "Portugal", "Portucale");
-
-        expect(Object.keys(parentScene.vars).length).toBe(1);
-      });
-
-      it("should create a deletable local variable", function() {
-
-        parentScene.setVar("category", "Portugal", "Portucale");
-
-        delete parentScene.vars.category;
-
-        expect(Object.keys(parentScene.vars).length).toBe(0);
-      });
-
-      it("should create a variable that exposes the given values according to IVariable", function() {
-
-        parentScene.setVar("category", "Portugal", "Portucale");
-
-        var categoryVar = parentScene.vars.category;
-
-        expect(categoryVar instanceof Object).toBe(true);
-
-        expect(categoryVar.value).toBe("Portugal");
-        expect(categoryVar.valueOf()).toBe("Portugal");
-
-        expect(categoryVar.formatted).toBe("Portucale");
-        expect(categoryVar.toString()).toBe("Portucale");
-      });
-
-      it("should convert a missing formatted argument to null", function() {
-
-        parentScene.setVar("category", "Portugal");
-
-        var categoryVar = parentScene.vars.category;
-
-        expect(categoryVar instanceof Object).toBe(true);
-
-        expect(categoryVar.value).toBe("Portugal");
-        expect(categoryVar.valueOf()).toBe("Portugal");
-
-        expect(categoryVar.formatted).toBe(null);
-        expect(categoryVar.toString()).toBe(null);
-      });
-
-      it("should return the scene", function() {
-        var result = parentScene.setVar("category", "Portugal", "Portucale");
-        expect(result).toBe(parentScene);
-      });
-
-      it("should shadow a same named parent variable", function() {
-
-        parentScene.setVar("category", "Portugal", "Portucale");
-        childScene.setVar("category", "Ireland", "Irlanda");
-
-        var parentCategoryVar = parentScene.vars.category;
-        var childCategoryVar = childScene.vars.category;
-
-        expect(parentCategoryVar.value).toBe("Portugal");
-        expect(parentCategoryVar.formatted).toBe("Portucale");
-
-        expect(childCategoryVar.value).toBe("Ireland");
-        expect(childCategoryVar.formatted).toBe("Irlanda");
-      });
-
-      it("should replace an existing variable with the same name", function() {
-
-        parentScene.setVar("category", "Portugal", "Portucale");
-
-        var categoryVar1 = parentScene.vars.category;
-
-        parentScene.setVar("category", "Ireland", "Irlanda");
-
-        var categoryVar2 = parentScene.vars.category;
-
-        expect(categoryVar2 instanceof Object).toBe(true);
-
-        expect(categoryVar2).not.toBe(categoryVar1);
-
-        expect(categoryVar2.value).toBe("Ireland");
-        expect(categoryVar2.formatted).toBe("Irlanda");
-      });
-    });
-
     describe("#createFilter()", function() {
 
       var CustomView;
@@ -353,19 +241,19 @@ define([
         parentScene = new Scene(null, view);
       });
 
-      it("should call scene.util.createFilterForVars with this vars and this view's model", function() {
+      it("should call scene.util.createFilterFromVars with this vars and this view's model", function() {
 
-        spyOn(sceneUtil, "createFilterForVars");
+        spyOn(sceneUtil, "createFilterFromVars");
 
         parentScene.createFilter();
 
-        expect(sceneUtil.createFilterForVars).toHaveBeenCalledWith(parentScene.vars, model);
+        expect(sceneUtil.createFilterFromVars).toHaveBeenCalledWith(parentScene.vars, model);
       });
 
-      it("should call scene.util.createFilterForVars and return the returned filter", function() {
+      it("should call scene.util.createFilterFromVars and return the returned filter", function() {
 
         var filter = {};
-        spyOn(sceneUtil, "createFilterForVars").and.returnValue(filter);
+        spyOn(sceneUtil, "createFilterFromVars").and.returnValue(filter);
 
         var result = parentScene.createFilter();
 
@@ -433,7 +321,8 @@ define([
             props: [
               {
                 name: "category",
-                base: "pentaho/visual/role/property"
+                base: "pentaho/visual/role/property",
+                modes: ["list"]
               },
               {
                 name: "series",
@@ -499,25 +388,39 @@ define([
 
         var childScene = parentScene.children[0];
 
-        expect(childScene.vars.category.value).toBe("Portugal~Lisbon");
-        expect(childScene.vars.category.formatted).toBe("Portucale ~ Lisboa");
+        var categoryCells = childScene.vars.category;
+        expect(Array.isArray(categoryCells)).toBe(true);
+        expect(categoryCells.length).toBe(2);
+
+        expect(categoryCells[0].value).toBe("Portugal");
+        expect(categoryCells[0].toString()).toBe("Portucale");
+
+        expect(categoryCells[1].value).toBe("Lisbon");
+        expect(categoryCells[1].toString()).toBe("Lisboa");
 
         expect(Object.prototype.hasOwnProperty.call(childScene.vars, "series")).toBe(false);
 
         expect(childScene.vars.measure.value).toBe(12000);
-        expect(childScene.vars.measure.formatted).toBe("12000");
+        expect(childScene.vars.measure.toString()).toBe("12000");
 
         // ---
 
         childScene = parentScene.children[1];
 
-        expect(childScene.vars.category.value).toBe("Ireland~Edinburgh");
-        expect(childScene.vars.category.formatted).toBe("Ireland ~ Edinburgh");
+        categoryCells = childScene.vars.category;
+        expect(Array.isArray(categoryCells)).toBe(true);
+        expect(categoryCells.length).toBe(2);
+
+        expect(categoryCells[0].value).toBe("Ireland");
+        expect(categoryCells[0].toString()).toBe("Ireland");
+
+        expect(categoryCells[1].value).toBe("Edinburgh");
+        expect(categoryCells[1].toString()).toBe("Edinburgh");
 
         expect(Object.prototype.hasOwnProperty.call(childScene.vars, "series")).toBe(false);
 
         expect(childScene.vars.measure.value).toBe(6000);
-        expect(childScene.vars.measure.formatted).toBe("6000");
+        expect(childScene.vars.measure.toString()).toBe("6000");
       });
     });
   });

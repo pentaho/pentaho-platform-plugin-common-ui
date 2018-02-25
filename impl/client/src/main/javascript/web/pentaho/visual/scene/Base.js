@@ -147,20 +147,6 @@ define([
     },
 
     /**
-     * Creates and sets a variable with the given name, value and formatted value.
-     *
-     * @param {string} name - The name under which the variable is set.
-     * @param {any} value - The value of the variable.
-     * @param {?string} [formatted] - The formatted value of the variable.
-     *
-     * @return {!pentaho.visual.scene.Base} This instance.
-     */
-    setVar: function(name, value, formatted) {
-      this.vars[name] = new Variable(value, formatted);
-      return this;
-    },
-
-    /**
      * Creates a filter that selects the data represented by this scene.
      *
      * This method provides an easy way to create a filter that selects the data that this scene visually represents
@@ -174,11 +160,9 @@ define([
      * [scene.util.invertVars]{@link pentaho.visual.scene.util.invertVars}) of the associated model's data.
      *
      * @return {pentaho.data.filter.Abstract} The filter, if one can be created; `null`, otherwise.
-     *
-     * @see pentaho.visual.scene.util.createFilterForVars
      */
     createFilter: function() {
-      return sceneUtil.createFilterForVars(this.vars, this.view.model);
+      return sceneUtil.createFilterFromVars(this.vars, this.view.model);
     },
 
     /**
@@ -214,20 +198,27 @@ define([
      */
     buildScenesFlat: function(view) {
 
+      var parentScene = new Scene(/* parent: */null, view);
+
       var model = view.model;
 
-      // Collect visual role mappers from model.
+      // assert model.isValid
+
+      var data = model.data;
+
+      // Collect visual role mapperInfos from model.
       var mapperInfos = [];
       model.$type.eachVisualRole(function(propType) {
-        var mapper = model.get(propType).mapper;
-        if(mapper !== null) {
-          mapperInfos.push({name: propType.name, mapper: mapper});
+        var mapping = model.get(propType);
+        if(mapping.hasFields) {
+          mapperInfos.push({
+            name: propType.name,
+            mapper: createMapper(mapping, data)
+          });
         }
       });
 
       // ---
-
-      var parentScene = new Scene(/* parent: */null, view);
 
       var rowIndex = -1;
       var rowCount = model.data.getNumberOfRows();
@@ -242,10 +233,8 @@ define([
         while(++mapperIndex < mapperCount) {
 
           var mapperInfo = mapperInfos[mapperIndex];
-          childScene.setVar(
-              mapperInfo.name,
-              mapperInfo.mapper.getValue(rowIndex),
-              mapperInfo.mapper.getFormatted(rowIndex));
+
+          childScene.vars[mapperInfo.name] = mapperInfo.mapper(rowIndex);
         }
       }
 
@@ -254,4 +243,44 @@ define([
   });
 
   return Scene;
+
+  function createMapper(mapping, data) {
+
+    var columnIndexes = mapping.fields.toArray(function(mappingField) {
+      return data.getColumnIndexById(mappingField.name);
+    });
+
+    var mode = mapping.mode;
+
+    // assert mode != null;
+
+    if(mode.dataType.isList) {
+      return createMultipleCellsMapper(data, columnIndexes);
+    }
+
+    return createSingleCellMapper(data, columnIndexes[0]);
+  }
+
+  function createSingleCellMapper(data, columnIndex) {
+
+    return function singleCellMapper(rowIndex) {
+      return data.getCell(rowIndex, columnIndex);
+    };
+  }
+
+  function createMultipleCellsMapper(data, columnIndexes) {
+
+    var columnCount = columnIndexes.length;
+
+    return function multipleCellsMapper(rowIndex) {
+      var cells = new Array(columnCount);
+
+      var columnIndex = columnCount;
+      while(columnIndex--) {
+        cells[columnIndex] = data.getCell(rowIndex, columnIndex);
+      }
+
+      return cells;
+    };
+  }
 });

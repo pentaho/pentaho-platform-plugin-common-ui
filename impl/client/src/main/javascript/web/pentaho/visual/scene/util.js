@@ -40,7 +40,7 @@ define([
      * [isColumnKeyEffective]{@link pentaho.data.util.isColumnKeyEffective}) of the associated data table,
      * then the returned filter will be `null`.
      *
-     * @param {!Object.<string, any|pentaho.visual.role.scene.IVariable>} varsMap - A map of visual role names
+     * @param {!Object.<string, any|pentaho.data.ICell>} varsMap - A map of visual role names
      * to corresponding _variables_. All variables, even those from inherited keys are considered.
      *
      * Map keys which are not the name of a mapper visual role property of `model` are ignored.
@@ -52,7 +52,7 @@ define([
      *
      * @see pentaho.data.util.createFilterFromCellsMap
      */
-    createFilterForVars: function(varsMap, model) {
+    createFilterFromVars: function(varsMap, model) {
 
       var keyDataCellsMap = sceneUtil.invertVars(varsMap, model);
 
@@ -66,11 +66,10 @@ define([
      * as defined in [isColumnKeyEffective]{@link pentaho.data.util.isColumnKeyEffective}.
      * Specify `keyArgs.includeMeasureFields` as `true` to include all fields.
      *
-     * @param {!Object.<string, any|pentaho.visual.role.scene.IVariable>} varsMap - A map of visual role names
+     * @param {!Object.<string, pentaho.data.ICell|Array.<pentaho.data.ICell>>} varsMap - A map of visual role names
      * to corresponding _variables_. All variables, even those from inherited keys are considered.
      *
      * Map keys which are not the name of a mapper visual role property of `model` are ignored.
-     * Map values can be any value that supports the JavaScript's `valueOf` method.
      *
      * @param {!pentaho.visual.base.Model} model - The associated visual model. Must be valid.
      *
@@ -81,21 +80,17 @@ define([
      *
      * @return {!Object.<string, pentaho.data.ICell>} A data cells map, possibly empty.
      *
-     * @see pentaho.data.util.hasAnyKeyColumns
-     * @see pentaho.data.ITable#isColumnKey
-     * @see pentaho.data.util#isColumnTypeContinuous
+     * @see pentaho.data.util.isColumnKeyEffective
      */
     invertVars: function(varsMap, model, keyArgs) {
 
       var data = model.data;
-      if(data === null) {
-        throw error.argInvalid("model", "No data.");
-      }
-
       var includeKeyFieldsOnly = !(keyArgs && keyArgs.includeMeasureFields);
       var hasDataKeyColumns = includeKeyFieldsOnly ? dataUtil.hasAnyKeyColumns(data) : null;
 
       var modelType = model.$type;
+      var columnIndexes;
+      var columnNames;
       var cellsMap = {};
 
       // All enumerable properties, even inherited ones, should be considered.
@@ -107,71 +102,53 @@ define([
         if(propType !== null && modelType.isVisualRole(propType)) {
 
           // Ignore unmapped visual roles.
-          var mapper = model.get(varName).mapper;
-          if(mapper !== null) {
-            // This allows specifying either IVariable or direct values :-)
+          var mapping = model.get(varName);
+          if(mapping.hasFields) {
+
+            columnIndexes = includeKeyFieldsOnly ? [] : null;
+            columnNames = [];
+
+            // eslint-disable-next-line no-loop-func
+            mapping.fields.each(function(mappingField) {
+              var fieldName = mappingField.name;
+
+              columnNames.push(fieldName);
+
+              if(includeKeyFieldsOnly) {
+                columnIndexes.push(data.getColumnIndexById(fieldName));
+              }
+            });
+
             var varValue = varsMap[varName];
-            if(varValue != null) {
-              varValue = varValue.valueOf();
-            }
-
-            var rowIndex = mapper.invertValue(varValue);
-            if(rowIndex != null && rowIndex >= 0) {
-              var inputData = mapper.inputData;
-              var isKeyColumnFilter = includeKeyFieldsOnly
-                  ? __getIsColumnKeyEffectiveFilter(inputData, hasDataKeyColumns)
-                  : null;
-
-              __collectDataRowCells(cellsMap, inputData, rowIndex, isKeyColumnFilter);
+            if(Array.isArray(varValue)) {
+              // eslint-disable-next-line no-loop-func
+              varValue.forEach(addField);
+            } else {
+              addField(varValue, 0);
             }
           }
         }
       }
 
       return cellsMap;
+
+      /**
+       * Adds a field.
+       *
+       * Takes care to respect `includeKeyFieldsOnly`.
+       *
+       * @param {pentaho.data.ICell} cell - The cell value, possibly `null`.
+       * @param {number} index - The index of the cell.
+       */
+      function addField(cell, index) {
+
+        if(!includeKeyFieldsOnly || dataUtil.isColumnKeyEffective(data, columnIndexes[index], hasDataKeyColumns)) {
+
+          cellsMap[columnNames[index]] = cell;
+        }
+      }
     }
   };
 
   return sceneUtil;
-
-  /**
-   * Collects cells from a row of data set into a given data cells map.
-   *
-   * @memberOf pentaho.visual.scene.util~
-   * @private
-   *
-   * @param {!Object.<string, pentaho.data.ICell>} dataCellsMap - A data cells map, where collected cells are placed.
-   * @param {!pentaho.data.ITable} dataTable - The data set.
-   * @param {number} rowIndex - The index of the row to collect cells from.
-   * @param {?(function(number):boolean)} [columnFilter] - A column filter.
-   */
-  function __collectDataRowCells(dataCellsMap, dataTable, rowIndex, columnFilter) {
-
-    var columnIndex = -1;
-    var columnCount = dataTable.getNumberOfColumns();
-
-    while(++columnIndex < columnCount) {
-      if(columnFilter === null || columnFilter(columnIndex)) {
-        dataCellsMap[dataTable.getColumnId(columnIndex)] = dataTable.getCell(rowIndex, columnIndex);
-      }
-    }
-  }
-
-  /**
-   * Creates an effective key column filter function for a given data set with the indication
-   * of whether the (source) data set has any real key columns
-   *
-   * @memberOf pentaho.visual.scene.util~
-   * @private
-   *
-   * @param {!pentaho.data.ITable} dataTable - The data set.
-   * @param {boolean} hasDataKeyColumns - Indicates if the data set or its source data set includes any key columns.
-   * @return {(function(number):boolean)} A column filter.
-   */
-  function __getIsColumnKeyEffectiveFilter(dataTable, hasDataKeyColumns) {
-
-    return function isColumnKeyEffective(columnIndex) {
-      return dataUtil.isColumnKeyEffective(dataTable, columnIndex, hasDataKeyColumns);
-    };
-  }
 });
