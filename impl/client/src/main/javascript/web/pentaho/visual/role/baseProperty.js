@@ -96,9 +96,7 @@ define([
           get hasAnyListModes() {
             var any = false;
             this.modes.each(function(mode) {
-              var dataType = mode.dataType;
-              // it's either a list type or not an element as well (e.g. instance or value).
-              if(dataType.isList || !dataType.isElement) {
+              if(mode.dataType.isList) {
                 any = true;
                 return false;
               }
