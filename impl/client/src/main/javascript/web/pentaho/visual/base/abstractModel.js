@@ -89,11 +89,12 @@ define([
     "../color/paletteProperty",
     "./application",
     "pentaho/data/filter/abstract",
+    "object",
 
     // Pre-load all registered filter types.
     {$types: {base: "pentaho/data/filter/abstract"}},
 
-    function(Model, RoleBaseProperty, PaletteProperty, VisualApplication, AbstractFilter) {
+    function(Model, RoleBaseProperty, PaletteProperty, VisualApplication, AbstractFilter, PentahoObject) {
 
       var _roleBasePropertyType = RoleBaseProperty.type;
       var _palettePropertyType = PaletteProperty.type;
@@ -190,7 +191,18 @@ define([
             {
               name: "data",
               valueType: "object",
-              isRequired: true
+              isRequired: true,
+
+              // @override
+              toValueOn: function(defaultValueOwner, valueSpec) {
+                var simpleTable = this.base(defaultValueOwner, valueSpec);
+                if(simpleTable !== null) {
+                  var table = simpleTable.value.toPlainTable();
+                  // wrap as simple again
+                  return new PentahoObject(table);
+                }
+                return simpleTable;
+              }
             },
 
             // TODO: Currently, the type system provides no easy way to normalize a set value,

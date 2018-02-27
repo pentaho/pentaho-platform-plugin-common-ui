@@ -269,6 +269,11 @@ define([
           shareModel: true,
           skipRowsWithAllNullMeasures: skipRowsWithAllNullMeasures
         }));
+
+        // TODO: HACK: Find a way around this.
+        // This is a hack that enables some CCC views (HeatGrid and Scatter)
+        // to use cross-tab information layout things...
+        plainTable.originalCrossTable = this;
       }
 
       return plainTable;

@@ -122,7 +122,6 @@ define([
               var mappingFields = this.fields;
               var fieldCount = mappingFields.count;
               var mappingFieldIndex = -1;
-
               fieldIndexes = new Array(fieldCount);
 
               while(++mappingFieldIndex < fieldCount) {

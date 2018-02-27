@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context"
-], function(Context) {
+  "pentaho/type/Context",
+  "pentaho/data/Table"
+], function(Context, Table) {
 
   "use strict";
 
@@ -61,7 +62,7 @@ define([
       };
 
       dataSpec = {
-        v: data
+        v: new Table(data)
       };
     });
 
@@ -161,7 +162,7 @@ define([
     describe("#toJSON()", function() {
       it("should not serialize the `data` property by default", function() {
         var model = new Model({
-          data: {v: {}}
+          data: {v: new Table({})}
         });
 
         expect(!!model.get("data")).toBe(true);
@@ -174,7 +175,7 @@ define([
 
       it("should serialize the `data` property if keyArgs.omitProps.data = false", function() {
         var model = new Model({
-          data: {v: {}}
+          data: {v: new Table({})}
         });
 
         expect(!!model.get("data")).toBe(true);
@@ -216,7 +217,7 @@ define([
 
       it("should serialize the `data` property", function() {
         var model = new Model({
-          data: {v: {}}
+          data: {v: new Table({})}
         });
 
         expect(!!model.get("data")).toBe(true);

@@ -66,8 +66,8 @@ define([
       .implement({$type: bundle.structured.scaleColorContinuous});
 
       function __isColorInContinuousMode() {
-        var mapper = this.model.color.mapper;
-        return mapper !== null && mapper.isContinuous;
+        var mode = this.color.mode;
+        return mode !== null && mode.isContinuous;
       }
     }
   ];

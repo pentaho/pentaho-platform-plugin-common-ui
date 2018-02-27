@@ -74,10 +74,17 @@ define([
             // Need CCC auto-layout for the composite axis.
             // TODO: Analyzer CrossTable Layout specific
             var dataTable = this.model.data;
+            if(dataTable.originalCrossTable) {
+              dataTable = dataTable.originalCrossTable;
+            }
+
+            // TODO: These calculations only really apply to CrossTab...
             var catsBreadth = Math.max(1, dataTable.getNumberOfRows() - 1);
             var sersBreadth = dataTable.getNumberOfColumns() - catsDepth;
 
-            if(measureCount > 0) sersBreadth /= measureCount;
+            if(measureCount > 0) {
+              sersBreadth /= measureCount;
+            }
 
             var width = Math.max(0, options.width - options.axisTitleSize);
             var height = Math.max(0, options.height - options.axisTitleSize);

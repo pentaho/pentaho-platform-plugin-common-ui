@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context"
-], function(Context) {
+  "pentaho/type/Context",
+  "pentaho/data/Table"
+], function(Context, Table) {
 
   "use strict";
 
@@ -53,7 +54,7 @@ define([
       };
 
       dataSpec = {
-        v: data
+        v: new Table(data)
       };
     });
 

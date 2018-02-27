@@ -59,7 +59,7 @@ define([
 
     it("should be possible to create an instance given a model", function() {
       var model = new BarModel({
-        data:     {v: {}},
+        data:     {v: new Table({})},
         measures: {fields: [{name: "foo"}]}
       });
 

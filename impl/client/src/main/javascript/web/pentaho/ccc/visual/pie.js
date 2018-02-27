@@ -123,7 +123,7 @@ define([
             // If C > 0, use the members' colors of the last color field.
             if(C > 0) {
               var mappingFieldInfo = colorMappingFieldInfos[C - 1];
-              colorMap = util.copyColorMap(null, memberPalette[mappingFieldInfo.sourceName]);
+              colorMap = util.copyColorMap(null, memberPalette[mappingFieldInfo.name]);
             }
           }
 

@@ -105,9 +105,11 @@ define(function() {
 
       var andOperands = [];
 
+      var dataPlain = dataTable.toPlainTable();
+
       Object.keys(cellsMap).forEach(function(columnId) {
 
-        var columnIndex = dataTable.getColumnIndexById(columnId);
+        var columnIndex = dataPlain.getColumnIndexById(columnId);
         if(columnIndex >= 0) {
 
           var cell = cellsMap[columnId];
@@ -118,13 +120,13 @@ define(function() {
           } else {
             // Adding the expected data type.
             filterValue = {
-              _: dataTable.getColumnType(columnIndex),
+              _: dataPlain.getColumnType(columnIndex),
               value: cell.valueOf(),
               formatted: cell.toString()
             };
           }
 
-          var equalFilter = new IsEqual({property: dataTable.getColumnId(columnIndex), value: filterValue});
+          var equalFilter = new IsEqual({property: dataPlain.getColumnId(columnIndex), value: filterValue});
 
           andOperands.push(equalFilter);
         }

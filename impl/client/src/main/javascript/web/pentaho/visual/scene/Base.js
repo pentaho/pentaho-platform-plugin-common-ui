@@ -221,7 +221,7 @@ define([
       // ---
 
       var rowIndex = -1;
-      var rowCount = model.data.getNumberOfRows();
+      var rowCount = data.getNumberOfRows();
       var mapperCount = mapperInfos.length;
 
       while(++rowIndex < rowCount) {

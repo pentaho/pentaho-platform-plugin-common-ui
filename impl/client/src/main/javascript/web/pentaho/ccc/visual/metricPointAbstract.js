@@ -78,6 +78,10 @@ define([
           // Need CCC legendItemCountMin...
           // TODO: this is not the proper way to do this cause it's tied to Analyzer's data format...
           var dataTable = this.model.data;
+          if(dataTable.originalCrossTable) {
+            dataTable = dataTable.originalCrossTable;
+          }
+
           return !dataTable.isCrossTable || dataTable.implem.cols.length > 1;
         },
 

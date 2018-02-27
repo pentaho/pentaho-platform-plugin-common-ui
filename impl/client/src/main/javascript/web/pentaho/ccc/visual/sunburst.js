@@ -209,7 +209,7 @@ define([
                 // Copy map values to colorMap.
                 // All color maps are joined together and there will be no
                 // value collisions because Mondrian keys are prefixed with the dimensions they belong to...
-                var map = memberPalette[colorMappingFieldInfo.sourceName];
+                var map = memberPalette[colorMappingFieldInfo.name];
                 if(map) {
                   util.copyColorMap(colorMap, map);
                 }

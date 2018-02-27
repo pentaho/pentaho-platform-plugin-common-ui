@@ -414,7 +414,6 @@ define([
           __validateFieldsOn: function(model, mapping, addErrors) {
 
             var data = model.data;
-            var dataAttrs = data && data.model.attributes;
 
             var i = -1;
             var mappingFields = mapping.fields;
@@ -424,8 +423,8 @@ define([
               var name = mappingField.name;
 
               // Field with no definition?
-              var dataAttr = dataAttrs && dataAttrs.get(name);
-              if(!dataAttr) {
+              var columnIndex = data ? data.getColumnIndexById(name) : -1;
+              if(columnIndex < 0) {
                 addErrors(new ValidationError(
                   bundle.format(
                     bundle.structured.errors.property.fieldIsNotDefinedInAbstractModelData,
@@ -452,18 +451,14 @@ define([
             var L = mappingFields.count;
             if(L <= 1) return;
 
-            var data = model.data;
-            var dataAttrs = data && data.model.attributes;
-
             var byKey = {};
             var i = -1;
             while(++i < L) {
               var mappingField = mappingFields.at(i);
               var key = mappingField.name;
               if(O.hasOwn(byKey, key)) {
-                var dataAttr = dataAttrs.get(mappingField.name);
                 var errorMessage = bundle.format(bundle.structured.errors.property.fieldDuplicate, {
-                  name: dataAttr,
+                  name: mappingField.name,
                   role: this
                 });
 

@@ -138,9 +138,10 @@ define([
          */
         _doDefault: function() {
 
-          var model = this.target.model;
+          var view = this.target;
+          var model = view.model;
 
-          var selectionFilter = this.action.selectionMode.call(model, model.selectionFilter, this.action.dataFilter);
+          var selectionFilter = this.action.selectionMode.call(view, model.selectionFilter, this.action.dataFilter);
 
           // NOTE: see related comment on AbstractModel#selectionFilter.
           model.selectionFilter = selectionFilter && selectionFilter.toDnf();

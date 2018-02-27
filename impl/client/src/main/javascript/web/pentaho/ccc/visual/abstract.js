@@ -241,7 +241,13 @@ define([
 
             // Skipping rows with all null measures, when converting from cross-tab, can speed up things a lot.
             // The dataView sourceColumns are not relevant as filter uses the field names.
-            var dataTable = this.model.data.toPlainTable({skipRowsWithAllNullMeasures: true});
+            // TODO: replace by a view of plain table without all null measures rows.
+            // There's a similar construct in Analyzer cv.Report#displayClientSideReport / will:change handler
+            // and in pentaho.visual.action.SelectionModes.toggle
+            var dataTable = this.model.data;
+            if(dataTable.originalCrossTable) {
+              dataTable = dataTable.originalCrossTable.toPlainTable({skipRowsWithAllNullMeasures: true});
+            }
 
             // Get information on the axes
 
@@ -374,11 +380,9 @@ define([
          */
         _initData: function() {
 
-          // Ensure we work on a plain data table.
-          var dataPlain = this._dataPlain = this.model.data.toPlainTable();
-          var hasDataKeyColumns = this._hasDataKeyColumns = dataUtil.hasAnyKeyColumns(dataPlain);
+          var data = this.model.data;
 
-          var dataAttributes = dataPlain.model.attributes;
+          var hasDataKeyColumns = this._hasDataKeyColumns = dataUtil.hasAnyKeyColumns(data);
 
           var genericMeasuresCount = 0;
           var genericMeasureCccVisualRole = this._genericMeasureCccVisualRole;
@@ -410,7 +414,8 @@ define([
            */
           var addMappingFieldInfo = function(mappingFieldInfo) {
 
-            if(mappingFieldInfo.cccRoleName === genericMeasureCccVisualRole) {
+            mappingFieldInfo.isGenericMeasure = mappingFieldInfo.cccRoleName === genericMeasureCccVisualRole;
+            if(mappingFieldInfo.isGenericMeasure) {
               genericMeasuresCount++;
             }
 
@@ -460,7 +465,8 @@ define([
 
               mapping.fields.each(function(mappingField, mappingFieldIndex) {
                 var dataAttributeName = mappingField.name;
-                var dataAttribute = dataAttributes.get(dataAttributeName);
+                var columnIndex = data.getColumnIndexById(dataAttributeName);
+                var dataAttribute = data.getColumnAttribute(columnIndex);
 
                 // Create an intelligible MappingFieldInfo name.
                 // The "_" prefix prevents CCC auto binding to visual roles.
@@ -476,11 +482,12 @@ define([
 
                   sourceName: dataAttribute.name,
                   sourceType: dataAttribute.type,
-                  sourceIndex: dataPlain.getColumnIndexById(dataAttribute.name),
+                  sourceIndex: data.getColumnIndexById(dataAttribute.name),
                   sourceIsContinuous: dataAttribute.isContinuous,
                   sourceFormat: dataAttribute.format,
                   sourceMembers: dataAttribute.members,
                   sourceIsPercent: !!dataAttribute.isPercent,
+                  sourceColor: dataAttribute.property("color"),
 
                   cccRoleName: cccRoleName,
 
@@ -565,6 +572,7 @@ define([
             sourceFormat: null,
             sourceMembers: null,
             sourceIsPercent: false,
+            sourceColor: null,
 
             isMeasureDiscrim: true
           };
@@ -600,7 +608,7 @@ define([
           // measuresIndexes...
           // readers...
 
-          var dataPlain = this._dataPlain;
+          var data = this.model.data;
 
           this._mappingFieldInfos.forEach(function(mappingFieldInfo) {
 
@@ -632,7 +640,7 @@ define([
 
           this.options.measuresIndexes = afterMappingColumnIndexesMeasures;
 
-          this._dataView = new DataView(dataPlain);
+          this._dataView = new DataView(data);
           this._dataView.setSourceColumns(categoriesSourceIndexes.concat(measuresSourceIndexes));
 
           this.options.readers = categoriesDimNames.concat(measuresDimNames);
@@ -939,7 +947,7 @@ define([
 
               // If C > 0
               // Use the members' colors of the last color field.
-              colorMap = util.copyColorMap(null, memberPalette[colorMappingFieldInfos[C - 1].sourceName]);
+              colorMap = util.copyColorMap(null, memberPalette[colorMappingFieldInfos[C - 1].name]);
             }
           }
 
@@ -980,52 +988,27 @@ define([
             def.lazy(memberPalette, dimName)[memberValue] = color;
           }
 
-          // Index generic measure field infos by data table field name.
-          // @type Object.<string, MappingFieldInfo[]>
-          var genericMeasureMappingFieldInfosByDataAttributeName = null;
+          this._mappingFieldInfos.forEach(function(mappingFieldInfo) {
 
-          // Index even if only one measure, as may want to show the color of that measure.
-          if(this._genericMeasuresCount > 0) {
-            genericMeasureMappingFieldInfosByDataAttributeName = Object.create(null);
+            if(!mappingFieldInfo.isMeasureDiscrim) {
 
-            this._getRolesMappedToCccRole(this._genericMeasureCccVisualRole)
-                .forEach(function(genericMeasureVisualRole) {
-                  var genericMeasureMappingFieldInfos = this._getMappingFieldInfosOfRole(genericMeasureVisualRole);
-                  if(genericMeasureMappingFieldInfos !== null) {
-                    genericMeasureMappingFieldInfos.forEach(function(mappingFieldInfo) {
-                      def.array.lazy(
-                          genericMeasureMappingFieldInfosByDataAttributeName,
-                          mappingFieldInfo.sourceName)
-                          .push(mappingFieldInfo);
-                    });
+              if(mappingFieldInfo.sourceMembers) {
+                // Level
+                mappingFieldInfo.sourceMembers.forEach(function(member) {
+                  var color = member.property("color");
+                  if(color) {
+                    setColor(mappingFieldInfo.name, member.value, color);
                   }
-                }, this);
-          }
+                });
+              } else if(mappingFieldInfo.isGenericMeasure && mappingFieldInfo.sourceColor) {
 
-          this.model.data.model.attributes.forEach(function(attr) {
-            if(attr.members) {
-              // Level
-              attr.members.forEach(function(member) {
-                var color = member.property("color");
-                if(color) {
-                  setColor(attr.name, member.value, color);
-                }
-              });
-            } else if(genericMeasureMappingFieldInfosByDataAttributeName !== null) {
-              // Measure
-              var color = attr.property("color");
-              if(color) {
                 // Measure colors are used when a generic measure visual role exists,
                 // and thus a measure ends up as a "series" and taking part in the color scale.
                 // Use the name of the dimension which will be used by CCC in valueRole.dim dimensions;
                 // not the data table field name.
-                var mappingFieldInfos = def.getOwn(genericMeasureMappingFieldInfosByDataAttributeName, attr.name, null);
-                if(mappingFieldInfos !== null) {
-                  // TODO: Mondrian/Analyzer specific
-                  mappingFieldInfos.forEach(function(mappingFieldInfo) {
-                    setColor("[Measures].[MeasuresLevel]", mappingFieldInfo.name, color);
-                  });
-                }
+
+                // TODO: Mondrian/Analyzer specific
+                setColor("[Measures].[MeasuresLevel]", mappingFieldInfo.name, mappingFieldInfo.sourceColor);
               }
             }
           });
@@ -1107,6 +1090,7 @@ define([
 
         _configureFormats: function() {
           // Top-level format info
+          // TODO: accessing Data API private stuff
           var formatInfo = this.model.data.model.format;
           if(formatInfo) {
             // Recursively inherit from class format default.
