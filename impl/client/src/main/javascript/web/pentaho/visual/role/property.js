@@ -74,7 +74,9 @@ define([
 
           // It's limited to 1 if it has no list modes.
           __fieldsCountMax: function(propType) {
-            return propType.hasAnyListModes ? Infinity : 1;
+            var mapping = this.get(propType);
+            var mode = mapping.mode;
+            return (mode !== null ? mode.dataType.isList : propType.hasAnyListModes) ? Infinity : 1;
           },
 
           /** @inheritDoc */

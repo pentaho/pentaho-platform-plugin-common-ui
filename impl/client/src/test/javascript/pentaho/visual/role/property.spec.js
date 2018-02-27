@@ -1204,56 +1204,128 @@ define([
 
         describe("#countRangeOn(model)", function() {
 
-          it("should return max = 1 if there are no list modes", function() {
+          describe("when there is no current mode", function() {
 
-            var DerivedModel = Model.extend({
-              $type: {
-                props: {
-                  propRole: {
-                    base: "pentaho/visual/role/property",
-                    modes: [
-                      {dataType: "element"},
-                      {dataType: "string"}
-                    ]
+            it("should return max = 1 if there are no list modes", function() {
+
+              var DerivedModel = Model.extend({
+                $type: {
+                  props: {
+                    propRole: {
+                      base: "pentaho/visual/role/property",
+                      modes: [
+                        {dataType: "element"},
+                        {dataType: "string"}
+                      ]
+                    }
                   }
                 }
-              }
+              });
+
+              var rolePropType = DerivedModel.type.get("propRole");
+
+              var model = new DerivedModel();
+
+              var result = rolePropType.fields.countRangeOn(model);
+
+              expect(result instanceof Object).toBe(true);
+              expect(result.max).toBe(1);
             });
 
-            var rolePropType = DerivedModel.type.get("propRole");
+            it("should return max = Infinity if there is at least one list mode", function() {
 
-            var model = new DerivedModel();
+              var DerivedModel = Model.extend({
+                $type: {
+                  props: {
+                    propRole: {
+                      base: "pentaho/visual/role/property",
+                      modes: [
+                        {dataType: "element"},
+                        {dataType: "list"}
+                      ]
+                    }
+                  }
+                }
+              });
 
-            var result = rolePropType.fields.countRangeOn(model);
+              var rolePropType = DerivedModel.type.get("propRole");
 
-            expect(result instanceof Object).toBe(true);
-            expect(result.max).toBe(1);
+              var model = new DerivedModel();
+
+              var result = rolePropType.fields.countRangeOn(model);
+
+              expect(result instanceof Object).toBe(true);
+              expect(result.max).toBe(Infinity);
+            });
           });
 
-          it("should return max = Infinity if there is at least one list mode", function() {
+          describe("when there is a current mode", function() {
 
-            var DerivedModel = Model.extend({
-              $type: {
-                props: {
-                  propRole: {
-                    base: "pentaho/visual/role/property",
-                    modes: [
-                      {dataType: "element"},
-                      {dataType: "list"}
-                    ]
+            it("should return max = 1 if it is not a list mode", function() {
+
+              var DerivedModel = Model.extend({
+                $type: {
+                  props: {
+                    propRole: {
+                      base: "pentaho/visual/role/property",
+                      modes: [
+                        {dataType: "element"},
+                        {dataType: "list"}
+                      ]
+                    }
                   }
                 }
-              }
+              });
+
+              var rolePropType = DerivedModel.type.get("propRole");
+
+              var data = new Table(getDataSpec1());
+
+              var model = new DerivedModel({
+                data: data,
+                propRole: {
+                  fields: ["country"]
+                }
+              });
+
+              var result = rolePropType.fields.countRangeOn(model);
+
+              expect(result instanceof Object).toBe(true);
+              expect(result.max).toBe(1);
             });
 
-            var rolePropType = DerivedModel.type.get("propRole");
+            it("should return max = Infinity if it is a list mode", function() {
 
-            var model = new DerivedModel();
+              var DerivedModel = Model.extend({
+                $type: {
+                  props: {
+                    propRole: {
+                      base: "pentaho/visual/role/property",
+                      modes: [
+                        {dataType: "element"},
+                        {dataType: "list"}
+                      ]
+                    }
+                  }
+                }
+              });
 
-            var result = rolePropType.fields.countRangeOn(model);
+              var rolePropType = DerivedModel.type.get("propRole");
 
-            expect(result instanceof Object).toBe(true);
-            expect(result.max).toBe(Infinity);
+              var data = new Table(getDataSpec1());
+
+              var model = new DerivedModel({
+                data: data,
+                propRole: {
+                  fields: ["country", "product"]
+                }
+              });
+
+              var result = rolePropType.fields.countRangeOn(model);
+
+              expect(result instanceof Object).toBe(true);
+              expect(result.max).toBe(Infinity);
+            });
           });
         });
       });
