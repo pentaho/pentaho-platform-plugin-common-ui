@@ -1614,7 +1614,7 @@ define([
           var operands = [];
 
           if(cccSelectingGroup) {
-            var operand = this._createFilterFromCccComplex(cccSelectingGroup);
+            var operand = this._convertCccComplexToFilter(cccSelectingGroup);
             if(operand) {
               operands.push(operand);
             }
@@ -1636,7 +1636,7 @@ define([
 
                 // Operand is null when there are no key fields
                 // (e.g. bar chart with measures alone).
-                var operand = this._createFilterFromCccComplex(cccDatum);
+                var operand = this._convertCccComplexToFilter(cccDatum);
                 if(operand) {
 
                   // TODO: delete this and the operandsByContentKey variable
@@ -1718,13 +1718,14 @@ define([
           var cccComplex = cccScene.group || cccScene.datum;
 
           // May still be null.
-          return this._createFilterFromCccComplex(cccComplex);
+          return this._convertCccComplexToFilter(cccComplex);
         },
         // endregion
 
         // region UTILITY
 
-        _createFilterFromCccComplex: function(cccComplex) {
+        // The CCC extension DET Tooltip hacks into this method. Beware if changed.
+        _convertCccComplexToFilter: function(cccComplex) {
 
           var filter = null;
 

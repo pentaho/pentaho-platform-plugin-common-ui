@@ -84,20 +84,24 @@ define([
 
             spec = this.base(spec, keyArgs) || spec;
 
-            if(this.isRoot) {
+            if(!this.declaringType || this.isRoot) {
 
               // Assume default values.
-              // Anticipate setting `modes`, `strategies` and `isVisualKey`.
+              // Anticipate setting `modes` and `isVisualKey`.
 
               var modes = spec.modes;
               if(modes != null) {
                 this.__setModes(modes);
-              } else {
+              } else if(this.isRoot && this.__modes === null) {
                 this.__setModes([{dataType: "string"}], /* isDefault: */true);
               }
 
               var isVisualKey = spec.isVisualKey;
-              this.isVisualKey = isVisualKey != null ? isVisualKey : this.hasAnyCategoricalModes;
+              if(isVisualKey != null) {
+                this.isVisualKey = isVisualKey;
+              } else if(this.isRoot && this.__isVisualKey === null) {
+                this.isVisualKey = this.hasAnyCategoricalModes;
+              }
 
               // Prevent being applied again.
               spec = Object.create(spec);
@@ -272,7 +276,7 @@ define([
           // endregion
 
           // region isVisualKey
-          __isVisualKey: false,
+          __isVisualKey: null,
 
           /**
            * Gets or sets a value that indicates if the visual role is a key property of the visual space.
@@ -313,7 +317,7 @@ define([
            * @override
            */
           get isVisualKey() {
-            return this.__isVisualKey;
+            return !!this.__isVisualKey;
           },
 
           set isVisualKey(value) {
@@ -322,8 +326,10 @@ define([
 
             if(value == null) return;
 
-            // Can only become true. Else ignore.
-            if(value && !this.__isVisualKey) {
+            // Can only become true (from false or null). Else ignore.
+            if(this.__isVisualKey === null) {
+              this.__isVisualKey = !!value;
+            } else if(value && !this.__isVisualKey) {
               this.__isVisualKey = true;
             }
           },
@@ -392,16 +398,12 @@ define([
             }
 
             // Only serialize if not the default value.
-            var isVisualKey;
-            if(this.isRoot) {
-              isVisualKey = this.isVisualKey;
-              if(isVisualKey !== this.hasAnyCategoricalModes) {
+            var isVisualKey = O.getOwn(this, "__isVisualKey");
+            if(isVisualKey !== null) {
+              if(!this.isRoot || isVisualKey !== this.hasAnyCategoricalModes) {
                 any = true;
                 spec.isVisualKey = isVisualKey;
               }
-            } else if((isVisualKey = O.getOwn(this, "__isVisualKey")) != null) {
-              any = true;
-              spec.isVisualKey = isVisualKey;
             }
 
             return any;

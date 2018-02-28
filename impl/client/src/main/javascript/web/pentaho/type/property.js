@@ -216,6 +216,8 @@ define([
         get isProperty() { return true; },
 
         // region declaringType attribute
+        __declaringType: null,
+
         /**
          * Gets the complex type that declares this property type.
          *

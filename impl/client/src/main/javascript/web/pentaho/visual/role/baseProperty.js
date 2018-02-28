@@ -32,7 +32,7 @@ define([
     "./baseMapping",
     function(Property, BaseMapping) {
 
-    var context = this;
+      var context = this;
 
       /**
        * @name pentaho.visual.role.BaseProperty.Type
