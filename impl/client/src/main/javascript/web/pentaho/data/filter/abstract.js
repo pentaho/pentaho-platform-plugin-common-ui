@@ -477,7 +477,7 @@ define([
 
         if(__isDebugMode) logger.log("toExtensional BEGIN");
         try {
-          var filteredData = dataTable.filter(this);
+          var filteredData = dataTable.toPlainTable().filter(this);
           var numRows = filteredData.getNumberOfRows();
           // applying the filter returns no data therefore select nothing (False filter)
           if(numRows === 0) {
@@ -487,7 +487,7 @@ define([
           // If some data passes the filter and no key columns are specified then we have
           // no way of making an extensional filter to represent those lines
           if(keyColumnNames.length === 0) {
-            throw error.argInvalid("keyColumnNames", "At least one key column must be specified." );
+            throw error.argInvalid("keyColumnNames", "At least one key column must be specified.");
           }
 
           var columnNameToIdx = getColumnIdToIndexMap(filteredData, keyColumnNames);
@@ -521,7 +521,7 @@ define([
           var columnNameToIdx = {};
 
           keyColumnNames.forEach(function(columnName) {
-            var colIdx = dataTable.getColumnIndexByAttribute(columnName);
+            var colIdx = dataTable.getColumnIndexById(columnName);
             if(colIdx === -1) {
               throw error.argInvalid("keyColumnNames", "The column name " + columnName + " is not in the dataTable.");
             }

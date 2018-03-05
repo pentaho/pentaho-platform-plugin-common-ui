@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,21 +39,22 @@ define([
           props: [
             {
               name: "measures", // VISUAL_ROLE
-              attributes: {isRequired: __requiredOneMeasure}
+              fields: {isRequired: __isRequiredOneMeasure}
             },
             {
               name: "measuresLine", // VISUAL_ROLE
               base: "pentaho/visual/role/property",
-              levels: ["quantitative"],
-              dataType: "number",
-              attributes: {isRequired: __requiredOneMeasure},
+              modes: [
+                {dataType: ["number"]}
+              ],
+              fields: {isRequired: __isRequiredOneMeasure},
               ordinal: 7
             },
 
             {
               name: "lineWidth",
               valueType: LineWidth,
-              isApplicable: __hasAttributesMeasuresLine,
+              isApplicable: __hasFieldsMeasuresLine,
               isRequired: true,
               defaultValue: 1
             },
@@ -61,7 +62,7 @@ define([
               name: "labelsOption",
               valueType: LabelsOption,
               domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"],
-              isApplicable: __hasAttributesMeasures,
+              isApplicable: __hasFieldsMeasures,
               isRequired: true,
               defaultValue: "none"
             },
@@ -70,7 +71,7 @@ define([
               name: "lineLabelsOption",
               valueType: LabelsOption,
               domain: ["none", "center", "left", "right", "top", "bottom"],
-              isApplicable: __hasAttributesMeasuresLine,
+              isApplicable: __hasFieldsMeasuresLine,
               isRequired: true,
               defaultValue: "none"
             },
@@ -80,7 +81,7 @@ define([
               valueType: Shape,
               isRequired: true,
               defaultValue: "circle",
-              isApplicable: __hasAttributesMeasuresLine
+              isApplicable: __hasFieldsMeasuresLine
             }
           ]
         }
@@ -89,18 +90,18 @@ define([
     }
   ];
 
-  function __requiredOneMeasure() {
+  function __isRequiredOneMeasure() {
     /* jshint validthis:true*/
-    return !this.measures.attributes.count && !this.measuresLine.attributes.count;
+    return !this.measures.hasFields && !this.measuresLine.hasFields;
   }
 
-  function __hasAttributesMeasuresLine() {
+  function __hasFieldsMeasuresLine() {
     /* jshint validthis:true*/
-    return this.measuresLine.attributes.count > 0;
+    return this.measuresLine.hasFields;
   }
 
-  function __hasAttributesMeasures() {
+  function __hasFieldsMeasures() {
     /* jshint validthis:true*/
-    return this.measures.attributes.count > 0;
+    return this.measures.hasFields;
   }
 });

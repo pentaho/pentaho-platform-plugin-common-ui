@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,9 +48,9 @@ define([
           return roleNames && roleNames.length > 0 ? this._getDiscreteRolesTitle(roleNames) : "";
         },
 
-        _isBaseAxisQualitative: function() {
+        _isBaseAxisCategorical: function() {
           var roleNames = this._getRolesMappedToCccRole("category");
-          return !!roleNames && roleNames.length > 0 && this._isRoleQualitative(roleNames[0]);
+          return !!roleNames && roleNames.length > 0 && this._isRoleCategorical(roleNames[0]);
         },
 
         _configureOptions: function() {
@@ -61,7 +61,7 @@ define([
 
           var options = this.options;
           if(options.orientation === "vertical") {
-            if(this._isBaseAxisQualitative()) {
+            if(this._isBaseAxisCategorical()) {
               options.xAxisLabel_textAngle = -Math.PI / 4;
               options.xAxisLabel_textAlign = "right";
               options.xAxisLabel_textBaseline = "top";
@@ -77,9 +77,9 @@ define([
           this._configureAxisDisplayUnits(/* isPrimary: */true, "ortho");
         },
 
-        _createChart: function(ChartClass, options) {
+        _createChart: function(ChartClass) {
 
-          var chart = this.base(ChartClass, options);
+          var chart = this.base(ChartClass);
 
           var visualElemsCountMax = this._getVisualElementsCountMax();
           if(visualElemsCountMax > 0) {

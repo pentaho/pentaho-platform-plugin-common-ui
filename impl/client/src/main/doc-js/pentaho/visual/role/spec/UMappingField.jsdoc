@@ -15,15 +15,15 @@
  */
 
 /**
- * A `spec.UMappingAttribute` represents the union of JS types that can be used to describe a
- * [visual role mapping attribute]{@link pentaho.visual.role.MappingAttribute} instance.
+ * A `spec.UMappingField` represents the union of JS types that can be used to describe a
+ * [visual role mapping field]{@link pentaho.visual.role.MappingField} instance.
  *
  * When an instance is described using _object form_,
- * its specification is of the type [spec.IMappingAttribute]{@link pentaho.visual.role.spec.IMappingAttribute}.
+ * its specification is of the type [spec.IMappingField]{@link pentaho.visual.role.spec.IMappingField}.
  *
  * Alternatively, a single string can be used to describe an instance,
  * in which case it is taken to be the value of
- * the [name]{@link pentaho.visual.role.spec.IMappingAttribute#name} property.
+ * the [name]{@link pentaho.visual.role.spec.IMappingField#name} property.
  *
- * @typedef {pentaho.visual.role.spec.IMappingAttribute|string} pentaho.visual.role.spec.UMappingAttribute
+ * @typedef {pentaho.visual.role.spec.IMappingField|string} pentaho.visual.role.spec.UMappingField
  */

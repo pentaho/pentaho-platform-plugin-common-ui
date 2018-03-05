@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 
 /**
- * The `IModel` interface represents the set of options used to initialize the model of a visualization.
+ * The `IAbstractModel` interface represents the set of options used to initialize an abstract visual model.
  *
- * @name pentaho.visual.base.spec.IModel
+ * @name pentaho.visual.base.spec.IAbstractModel
  * @interface
  * @extends pentaho.type.spec.IModel
  *
- * @see pentaho.visual.base.Model
+ * @see pentaho.visual.base.AbstractModel
  */
 
 /**
@@ -36,10 +36,10 @@
  *
  * This property is not serialized by default.
  * To serialize it, specify the argument `keyArgs.omitProps.application` of
- * [toSpec]{@link pentaho.visual.base.Model#toSpec} to `false`.
+ * [toSpec]{@link pentaho.visual.base.AbstractModel#toSpec} to `false`.
  *
  * @name application
- * @memberOf pentaho.visual.base.spec.IModel#
+ * @memberOf pentaho.visual.base.spec.IAbstractModel#
  * @type {pentaho.visual.base.spec.IApplication}
  */
 
@@ -50,9 +50,22 @@
  *
  * This property is not serialized by default.
  * To serialize it, specify the argument `keyArgs.omitProps.data` of
- * [toSpec]{@link pentaho.visual.base.Model#toSpec} to `false`.
+ * [toSpec]{@link pentaho.visual.base.AbstractModel#toSpec} to `false`.
  *
  * @name data
- * @memberOf pentaho.visual.base.spec.IModel#
+ * @memberOf pentaho.visual.base.spec.IAbstractModel#
  * @type {pentaho.data.ITable}
+ */
+
+/**
+ * The current selection filter.
+ *
+ * This property is not serialized by default.
+ * To serialize it, specify the argument `keyArgs.omitProps.selectionFilter` of
+ * [toSpec]{@link pentaho.visual.AbstractModel.View#toSpec} to `false`.
+ *
+ * @name selectionFilter
+ * @memberOf pentaho.visual.base.spec.IAbstractModel#
+ * @type {pentaho.data.filter.Abstract}
+ * @see pentaho.visual.base.AbstractModel#selectionFilter
  */

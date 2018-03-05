@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -376,6 +376,7 @@ define([
               "pentaho/type/complex",
               "pentaho/type/object",
               "pentaho/type/function",
+              "pentaho/type/typeDescriptor",
               "pentaho/type/property",
               "pentaho/type/model",
               "pentaho/type/application",
@@ -422,6 +423,7 @@ define([
             "complex": "pentaho/type/complex",
             "object": "pentaho/type/object",
             "function": "pentaho/type/function",
+            "type": "pentaho/type/typeDescriptor",
             "property": "pentaho/type/property",
             "model": "pentaho/type/model",
             "application": "pentaho/type/application",

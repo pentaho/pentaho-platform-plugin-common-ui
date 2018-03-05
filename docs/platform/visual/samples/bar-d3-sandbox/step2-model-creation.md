@@ -22,7 +22,7 @@ in which the height of the bar encodes the measure value.
 Thus, the simplest Bar chart has two main data-bound visual degrees of freedom, or, 
 as they are called in the Visualization API, **visual roles**: 
 _Category_ and _Measure_.
-The values of the attributes mapped to visual roles are visually encoded using visual variables/properties such as 
+The values of the fields mapped to visual roles are visually encoded using visual variables/properties such as 
 position, size, orientation or color.
 
 ## Complete model code
@@ -66,14 +66,14 @@ define([
             name: "category",
             base: "pentaho/visual/role/property",
             levels: "ordinal",
-            attributes: { isRequired: true, countMax: 1 }
+            fields: { isRequired: true, countMax: 1 }
           },
           {
             name: "measure",
             base: "pentaho/visual/role/property",
             levels: "quantitative",
             dataType: "number",
-            attributes: { isRequired: true, countMax: 1 }
+            fields: { isRequired: true, countMax: 1 }
           },
 
           // Palette property
@@ -136,7 +136,7 @@ specification = {
   name: "category",
   base: "pentaho/visual/role/property",
   levels: ["ordinal"],
-  attributes: {isRequired: true, countMax: 1}
+  fields: {isRequired: true, countMax: 1}
 }
 ```
 
@@ -150,17 +150,17 @@ and their relative order.
 
 The [data]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model' | append: '#data'}}) property, 
 which is inherited from the base visualization model, 
-is given a dataset containing data for attributes such as _Product Family_ and _Sales_.
-The value of a visual role contains the names of the data attributes that are _mapped_ to it,
-e.g.: `{attributes: ["productFamily"]}`. 
+is given a dataset containing data for fields such as _Product Family_ and _Sales_.
+The value of a visual role contains the names of the fields that are _mapped_ to it,
+e.g.: `{fields: ["productFamily"]}`. 
 So, the value of a visual role is an object with a list property named 
-[attributes]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Mapping' | append: '#attributes'}}).
+[fields]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Mapping' | append: '#fields'}}).
 
-Because by default, any number of data attributes can be mapped to a visual role, including 0 or 10, 
-it is necessary to limit the cardinality limits of the internal `attributes` list, 
-so that it accepts and requires a single data attribute.
+Because by default, any number of fields can be mapped to a visual role, including 0 or 10, 
+it is necessary to limit the cardinality limits of the internal `fields` list, 
+so that it accepts and requires a single field.
 For that we use the special 
-[attributes]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property.Type' | append: '#attributes'}})
+[fields]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property.Type' | append: '#fields'}})
 syntax that this property type provides.
 
 ## The `measure` property
@@ -171,7 +171,7 @@ specification = {
   base: "pentaho/visual/role/property",
   levels: ["quantitative"],
   dataType: "number",
-  attributes: {isRequired: true, countMax: 1}
+  fields: {isRequired: true, countMax: 1}
 }
 ```
 
@@ -184,7 +184,7 @@ The quantitative data types are
 and 
 [number]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Number'}}).
 The [dataType]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Mapping.Type' | append: '#dataType'}})
-property is used to only allow mapping to data attributes of type `number`.
+property is used to only allow mapping to fields of type `number`.
 
 ## The `palette` property
 

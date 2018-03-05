@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 define([
+  "./_util",
   "cdf/lib/CCC/def",
   "pentaho/i18n!./i18n/view"
-], function(def, bundle) {
+], function(util, def, bundle) {
 
   "use strict";
 
@@ -37,7 +38,26 @@ define([
         },
 
         _configureOptions: function() {
+
           this.base();
+
+          var options = this.options;
+          var model = this.model;
+
+          // Axis Tick and Title Labels
+          var value = model.labelColor;
+          if(value != null) {
+            options.axisLabel_textStyle = options.axisTitleLabel_textStyle = value;
+          }
+
+          value = model.labelSize;
+          if(value) {
+            options.axisTitleFont = options.axisFont = this._labelFont;
+          } else {
+            options.axisTitleFont = options.axisFont = util.defaultFont(null, 12);
+          }
+
+          // ---
 
           this._configureDisplayUnits();
 
@@ -63,32 +83,36 @@ define([
         },
 
         /*
-         * Builds a title composed of the label of the single attribute
-         * of the role, or empty, if the role has more than one attribute.
+         * Builds a title composed of the label of the single field
+         * of the role, or empty, if the role has more than one field.
          */
         _getMeasureRoleTitle: function(measureRole) {
-          var attrInfos = this._getAttributeInfosOfRole(measureRole);
-          return (attrInfos && attrInfos.length === 1) ? attrInfos[0].label : "";
+          var mappingFieldInfos = this._getMappingFieldInfosOfRole(measureRole);
+          return (mappingFieldInfos && mappingFieldInfos.length === 1) ? mappingFieldInfos[0].label : "";
         },
 
         _getDiscreteRolesTitle: function(roleNames) {
-          var q = def.query(roleNames);
 
-          if(this._multiRole) q = q.where(function(rn) {
-            return rn !== this._multiRole;
-          }, this);
+          var queryRoleNames = def.query(roleNames);
 
-          var labels = q.selectMany(function(rn) {
-            return this._getAttributeInfosOfRole(rn);
-          }, this)
-          .distinct(function(attrInfo) {
-            return attrInfo.name;
-          })
-          .select(function(attrInfo) {
-            return attrInfo.label;
-          })
-          .where(def.truthy)
-          .array();
+          if(this._multiRole) {
+            queryRoleNames = queryRoleNames.where(function(rn) {
+              return rn !== this._multiRole;
+            }, this);
+          }
+
+          var labels = queryRoleNames
+              .selectMany(function(rn) {
+                return this._getMappingFieldInfosOfRole(rn);
+              }, this)
+              .distinct(function(mappingFieldInfo) {
+                return mappingFieldInfo.name;
+              })
+              .select(function(mappingFieldInfo) {
+                return mappingFieldInfo.label;
+              })
+              .where(def.truthy)
+              .array();
 
           var last = labels.pop();
           var first = labels.join(", ");

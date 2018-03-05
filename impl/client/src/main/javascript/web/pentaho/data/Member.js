@@ -18,10 +18,9 @@ define([
   "../lang/Base",
   "../lang/_Annotatable",
   "../util/arg",
-  "../util/error"
-], function(OfAttribute, Base, Annotatable, arg, error) {
-
-  var _nextGuid = 1;
+  "../util/error",
+  "../util/object"
+], function(OfAttribute, Base, Annotatable, arg, error, O) {
 
   var Member = Base.extend("pentaho.data.Member", /** @lends pentaho.data.Member# */{
     /**
@@ -156,7 +155,7 @@ define([
     set value(v) {
       if(v == null) throw error.argInvalid("value", "Cannot be nully.");
       this.v = v;
-      this._key = (typeof v === "object") ? ("_mid_" + (_nextGuid++)) : v.toString();
+      this._key = O.getSameTypeKey(v);
     },
 
     /**

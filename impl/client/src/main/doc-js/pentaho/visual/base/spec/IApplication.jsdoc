@@ -22,5 +22,5 @@
  * @interface
  * @extends pentaho.type.spec.IComplex
  *
- * @see pentaho.visual.base.spec.IModel#application
+ * @see pentaho.visual.base.spec.IAbstractModel#application
  */

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,29 +15,11 @@
  */
 
 /**
- * The `spec.IMappingAttribute` interface describes the _object_ form of a
- * [visual role mapping attribute]{@link pentaho.visual.role.MappingAttribute} instance.
+ * The `spec.IBase` interface represents the specification of a mapping strategy.
  *
- * @example
- * {
- *   name: "sales"
- * }
- *
- * @name pentaho.visual.role.spec.IMappingAttribute
- *
+ * @name pentaho.visual.role.strategies.spec.IBase
  * @interface
  * @extends pentaho.type.spec.IComplex
  *
- * @see pentaho.visual.role.spec.IMapping
- * @see pentaho.visual.role.spec.UMappingAttribute
- */
-
-/**
- * The name of the data property.
- *
- * This property is required.
- *
- * @name pentaho.visual.role.spec.IMappingAttribute#name
- * @type {string}
- * @see pentaho.visual.role.MappingAttribute#name
+ * @see pentaho.visual.role.strategies.Base
  */

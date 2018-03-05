@@ -59,8 +59,8 @@ define([
 
     it("should be possible to create an instance given a model", function() {
       var model = new BarModel({
-        data:     {v: {}},
-        measures: {attributes: [{name: "foo"}]}
+        data:     {v: new Table({})},
+        measures: {fields: [{name: "foo"}]}
       });
 
       var view = new BarView({
@@ -84,8 +84,8 @@ define([
       };
 
       var model = new BarModel({
-        rows:     {attributes: [{name: "country"}]},
-        measures: {attributes: [{name: "sales"}]},
+        rows:     {fields: [{name: "country"}]},
+        measures: {fields: [{name: "sales"}]},
         data:     new Table(tableSpec),
         showLegend: true
       });

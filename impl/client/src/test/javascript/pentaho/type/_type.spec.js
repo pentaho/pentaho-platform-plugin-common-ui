@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1014,6 +1014,12 @@ define([
       });
     });
 
+    describe("#isContinuous", function() {
+      it("should have default `false`", function() {
+        expect(Instance.type.isContinuous).toBe(false);
+      });
+    });
+
     describe("#create(instRef, instKeyArgs)", function() {
 
       it("should call the instance container #get with type as the base type", function() {
@@ -1166,8 +1172,9 @@ define([
               $type: {
                 id: "tests/mixins/C",
                 _init: function(spec, ka) {
-                  this.base(spec, ka);
+                  spec = this.base(spec, ka) || spec;
                   this.__hasBeenInInit = true;
+                  return spec;
                 }
               }
             });

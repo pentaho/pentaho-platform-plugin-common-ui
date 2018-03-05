@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,31 +38,36 @@ define([
           props: [
             {
               name: "rows", // VISUAL_ROLE
-              base: "pentaho/visual/role/property",
-              levels: ["ordinal"],
-              attributes: {isRequired: true},
+              modes: [
+                {dataType: "list"}
+              ],
+              fields: {isRequired: true},
               ordinal: 5
             },
             {
               name: "columns", // VISUAL_ROLE
               base: "pentaho/visual/role/property",
-              levels: ["ordinal"],
+              modes: [
+                {dataType: "list"}
+              ],
               ordinal: 6
             },
             {
               name: "color", // VISUAL_ROLE
               base: "pentaho/visual/role/property",
-              levels: ["quantitative"],
-              dataType: "number",
-              attributes: {isRequired: __requiredOneMeasure, countMax: 1},
+              modes: [
+                {dataType: "number"}
+              ],
+              fields: {isRequired: __isRequiredOneMeasure},
               ordinal: 7
             },
             {
               name: "size", // VISUAL_ROLE
               base: "pentaho/visual/role/property",
-              levels: ["quantitative"],
-              dataType: "number",
-              attributes: {isRequired: __requiredOneMeasure, countMax: 1},
+              modes: [
+                {dataType: "number"}
+              ],
+              fields: {isRequired: __isRequiredOneMeasure},
               ordinal: 8
             },
             {
@@ -86,8 +91,8 @@ define([
     }
   ];
 
-  function __requiredOneMeasure() {
+  function __isRequiredOneMeasure() {
     /* jshint validthis:true*/
-    return !this.size.attributes.count && !this.color.attributes.count;
+    return !this.size.hasFields && !this.color.hasFields;
   }
 });

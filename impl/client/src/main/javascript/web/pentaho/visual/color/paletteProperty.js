@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,21 @@ define([
   "pentaho/type/ValidationError",
   "pentaho/type/util",
   "pentaho/util/object",
-  "pentaho/util/error"
+  "pentaho/util/error",
+
+  // so that r.js sees otherwise invisible dependencies.
+  "./level",
+  "./palette"
 ], function(bundle, ValidationError, typeUtil, O, error) {
 
   "use strict";
 
   return [
     "property",
-    "pentaho/visual/color/level",
-    "pentaho/visual/color/palette",
+    "./level",
+    "./palette",
     {$instance: {type: ["pentaho/visual/color/palette"]}},
+
     function(Property, PaletteLevel, Palette, allPalettesList) {
 
       var __paletteLevelType = PaletteLevel.type;

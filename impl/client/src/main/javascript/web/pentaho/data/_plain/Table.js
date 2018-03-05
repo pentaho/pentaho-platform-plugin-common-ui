@@ -66,6 +66,10 @@ define([
       return this.getColumnAttribute(colIndex).label;
     },
 
+    isColumnKey: function(colIndex) {
+      return this.getColumnAttribute(colIndex).isKey;
+    },
+
     // cells
     getValue: function(rowIndex, colIndex) {
       return this.getCell(rowIndex, colIndex).value;

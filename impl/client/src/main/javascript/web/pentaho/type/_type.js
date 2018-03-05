@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,9 +50,6 @@ define([
 
     var context = this;
     var __type = null;
-    var __Number = null;
-    var __Boolean = null;
-    var __String = null;
 
     /**
      * @name pentaho.type.Type
@@ -92,15 +89,15 @@ define([
         // excluded from extend: id, sourceId, alias and isAbstract
         // are here handled one by one.
 
-        var id = __nonEmptyString(spec.id);
+        var id = text.nonEmptyString(spec.id);
         // Is it a temporary id? If so, ignore it.
         if(SpecificationContext.isIdTemporary(id)) id = null;
 
-        var sourceId = __nonEmptyString(spec.sourceId);
+        var sourceId = text.nonEmptyString(spec.sourceId);
         if(!sourceId) sourceId = id;
         else if(!id) id = sourceId;
 
-        var alias = __nonEmptyString(spec.alias);
+        var alias = text.nonEmptyString(spec.alias);
         if(alias != null && id == null) throw error.argInvalid("alias", "Anonymous types cannot have an alias");
 
         O.setConst(this, "__id", id);
@@ -120,7 +117,7 @@ define([
 
         // ---
 
-        this._init(spec, keyArgs);
+        spec = this._init(spec, keyArgs) || spec;
 
         var Ctor = this.constructor;
         if(Ctor.prototype === this) {
@@ -128,6 +125,7 @@ define([
           // Also, using mix records the applied instSpec, while #extend does not.
           Ctor.mix(spec, null, keyArgs);
         } else {
+          // TODO: Lightweight types don't exist anymore, right?
           // Lightweight type.
           this.extend(spec, keyArgs);
         }
@@ -145,6 +143,10 @@ define([
        * @param {!pentaho.type.Instance} keyArgs.instance - The _prototype_ of the `Instance` class associated with
        * this type.
        * @param {boolean} [keyArgs.isRoot=false] If `true`, creates a _root_ type.
+       *
+       * @return {pentaho.type.spec.ITypeProto} A specification to use instead of the given `spec` argument to extend
+       * the type, or `undefined`, to use the given specification.
+       *
        * @protected
        */
       _init: function(spec, keyArgs) {
@@ -387,6 +389,22 @@ define([
        */
       get isSimple() { return false; },
       // endregion
+
+      // region isContinuous property
+      /**
+       * Gets a value that indicates if this is a continuous type.
+       *
+       * A non-continuous type is said to be _categorical_.
+       *
+       * The default implementation returns false.
+       *
+       * The types {@link pentaho.type.Number} and {@link pentaho.type.Date} are known to be continuous.
+       *
+       * @type {boolean}
+       * @readOnly
+       */
+      get isContinuous() { return false; },
+      // endregion
       // endregion
 
       // region id, sourceId and alias properties
@@ -476,6 +494,9 @@ define([
        * @return {string} An absolute module identifier.
        *
        * @see pentaho.type.Type#sourceId
+       *
+       * @throws {OperationInvalidError} When `id` is a relative identifier and this type is anonymous,
+       * or when `id` refers to an inexistent ascendant location.
        */
       buildSourceRelativeId: function(id) {
         return moduleUtil.absolutizeIdRelativeToSibling(id, this.sourceId);
@@ -603,11 +624,11 @@ define([
       },
 
       set label(value) {
-        value = __nonEmptyString(value);
+        value = text.nonEmptyString(value);
         if(value === null) {
           this.__labelIsSet = false;
           if(this !== __type) {
-            value = __nonEmptyString(this._getLabelDefault());
+            value = text.nonEmptyString(this._getLabelDefault());
             if(value == null) {
               delete this.__label;
             } else {
@@ -694,7 +715,7 @@ define([
             delete this.__description;
           }
         } else {
-          this.__description = __nonEmptyString(value);
+          this.__description = text.nonEmptyString(value);
         }
       },
       // endregion
@@ -734,7 +755,7 @@ define([
             delete this.__category;
           }
         } else {
-          this.__category = __nonEmptyString(value);
+          this.__category = text.nonEmptyString(value);
         }
       },
       // endregion
@@ -770,7 +791,7 @@ define([
             delete this.__helpUrl;
           }
         } else {
-          this.__helpUrl = __nonEmptyString(value);
+          this.__helpUrl = text.nonEmptyString(value);
         }
       },
       // endregion
@@ -969,6 +990,9 @@ define([
 
       * @throws {pentaho.lang.ArgumentInvalidTypeError} When the set value is not
       * a string, a function or {@link Nully}.
+      *
+      * @throws {OperationInvalidError} When `defaultView` is a relative identifier and this type is anonymous,
+      * or when `defaultView` refers to an inexistent ascendant location.
       */
       get defaultView() {
         return this.__defaultView && this.__defaultView.value;
@@ -1735,10 +1759,6 @@ define([
 
     return Type;
   };
-
-  function __nonEmptyString(value) {
-    return value == null ? null : (String(value) || null);
-  }
 
   /*
    * @this {pentaho.type.Property.Type}

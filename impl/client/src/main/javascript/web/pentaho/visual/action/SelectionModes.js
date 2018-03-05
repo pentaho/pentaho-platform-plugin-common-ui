@@ -96,7 +96,12 @@ define([
         // the `input` filter includes only `row1` and `row2`.
 
         // Skipping rows with all null measures, when converting from cross-tab, can speed up things a lot.
-        data = data.toPlainTable({skipRowsWithAllNullMeasures: true});
+        // TODO: replace by a view of plain table without all null measures rows.
+        // There's a similar construct in Analyzer cv.Report#displayClientSideReport / will:change handler
+        // and in pentaho.ccc.visual.Abstract#_updateSelection.
+        if(data.originalCrossTable) {
+          data = data.originalCrossTable.toPlainTable({skipRowsWithAllNullMeasures: true});
+        }
 
         var inputData = data.filter(input);
         var currentInputData = inputData.filter(current);

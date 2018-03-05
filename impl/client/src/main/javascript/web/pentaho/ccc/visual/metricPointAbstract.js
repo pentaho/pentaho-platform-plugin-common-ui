@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,9 +54,9 @@ define([
         },
 
         _getColorScaleKind: function() {
-          var isDiscrete = this._isColorDiscrete();
-          return isDiscrete == null ? undefined  :
-                 isDiscrete         ? "discrete" : "continuous";
+          var isCategorical = this._isColorCategorical();
+          return isCategorical == null ? undefined  :
+                 isCategorical         ? "discrete" : "continuous";
         },
 
         _configureOptions: function() {
@@ -67,14 +67,22 @@ define([
           this._configureAxisRange(/* isPrimary: */false, "ortho");
         },
 
-        _isLegendVisible: function() {
+        _shouldShowLegend: function() {
           // Add to default behavior, that hides the legend when there are no series.
           // Hide the legend even if there is only one "series".
           var isLegendVisible = this.base();
+          if(!isLegendVisible) {
+            return false;
+          }
 
           // Need CCC legendItemCountMin...
           // TODO: this is not the proper way to do this cause it's tied to Analyzer's data format...
-          return isLegendVisible && (!this._dataTable.isCrossTable || this._dataTable.implem.cols.length > 1);
+          var dataTable = this.model.data;
+          if(dataTable.originalCrossTable) {
+            dataTable = dataTable.originalCrossTable;
+          }
+
+          return !dataTable.isCrossTable || dataTable.implem.cols.length > 1;
         },
 
         _getOrthoAxisTitle: function() {

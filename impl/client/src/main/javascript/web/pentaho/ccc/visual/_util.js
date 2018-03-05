@@ -30,6 +30,16 @@ define([
       return member == null || _nullMemberRe.test(member);
     },
 
+    copyColorMap: function(mapOut, mapIn) {
+      if(mapIn) {
+        if(!mapOut) mapOut = {};
+        for(var key in mapIn) // tolerates nully
+          if(def.hasOwn(mapIn, key))
+            mapOut[key] = pv.color(mapIn[key]);
+      }
+      return mapOut;
+    },
+
     defaultFont: function(font, defaultSize) {
       if(!font) return (defaultSize || 10) + "px OpenSansRegular, sans-serif";
 
@@ -61,9 +71,9 @@ define([
     },
 
     // region CCC helpers
-    getCccValueTypeOfAttribute: function(attr) {
+    getCccValueTypeOfFieldType: function(fieldType) {
       /* eslint default-case: 0 */
-      switch(attr.type) {
+      switch(fieldType) {
         case "string": return String;
         case "number": return Number;
         case "date": return Date;

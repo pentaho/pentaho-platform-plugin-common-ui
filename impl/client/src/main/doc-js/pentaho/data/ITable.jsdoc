@@ -65,6 +65,15 @@
  */
 
 /**
+ * Gets a value that indicates if a column's values identify each row, together with other key columns, given its index.
+ *
+ * @name pentaho.data.ITable#isColumnKey
+ * @method
+ * @param {number} colIndex - The column index (zero-based).
+ * @return {boolean} `true`, if the column is a _key_ column; `false`, otherwise.
+ */
+
+/**
  * Gets a metadata property of a column, given the column index and property name.
  *
  * @name pentaho.data.ITable#getColumnProperty
@@ -72,6 +81,18 @@
  * @param {number} colIndex The column index (zero-based).
  * @param {string} propName The metadata property name.
  * @return {any} The metadata property value.
+ */
+
+/**
+ * Gets a cell, given its row and column indexes.
+ *
+ * Depending on the underlying implementation, this method may allocate memory.
+ *
+ * @name pentaho.data.ITable#getCell
+ * @method
+ * @param {number} rowIndex The row index (zero-based).
+ * @param {number} colIndex The column index (zero-based).
+ * @return {!pentaho.data.ICell} The specified cell object.
  */
 
 /**
@@ -102,8 +123,8 @@
 /**
  * Gets the formatted value _property_ of a cell, given its row and column indexes.
  *
- * This method returns the string representation of the value of the cell's `f` property,
- * when the value is defined, or `undefined`, otherwise.
+ * This method returns the string representation of the cell's `f` property,
+ * when it is defined, or `undefined`, otherwise.
  *
  * Contrast this method with {@link pentaho.data.ITable#getFormattedValue},
  * that returns a best-effort formatted value in all cases.
@@ -174,5 +195,20 @@
  * @method
  * @param {string} attr - The name of an attribute.
  * @return {number} The (0-based) index of the column having the specified attribute,
+ * if any, or `-1`, if none.
+ *
+ * @deprecated Use `getColumnIndexById` instead.
+ *
+ * @see pentaho.data.ITable#getColumnIndexById
+ */
+
+/**
+ * Gets the index of the first column having a given identifier.
+ *
+ * @name pentaho.data.ITable#getColumnIndexById
+ * @method
+ *
+ * @param {string} id - The column identifier.
+ * @return {number} The (0-based) index of the first column having the specified identifier,
  * if any, or `-1`, if none.
  */

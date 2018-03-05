@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,6 +71,7 @@ define([
     "complex",
     "object",
     "function",
+    "typeDescriptor",
     "property",
     "model",
     "application",
@@ -1601,6 +1602,8 @@ define([
     // TODO: this method only supports standard types deserialization.
     //   Custom types with own type attributes would need special handling.
     //   Something like a two phase protocol?
+
+    // TODO: visual.role.Property.Type#modes -> visual.role.Mode#dataType is not being collected.
 
     // {[base: "complex", ] [of: "..."] , [props: []]}
     __collectDependencyRefsRecursive.call(this, typeSpec.base, depIdsSet, depRefs);

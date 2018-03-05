@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,42 +15,30 @@
  */
 
 /**
- * The `spec.IMapping` interface describes the _object_ form of a
- * [visual role mapping]{@link pentaho.visual.role.Mapping} instance.
+ * The `spec.IMapping` interface describes the _object_ form of
+ * an [internal visual role mapping]{@link pentaho.visual.role.Mapping} instance.
  *
  * @example
  * {
- *   level: "ordinal",
- *   attributes: ["family", "product"]
+ *   fields: ["family", "product"],
+ *   modeFixed: {dataType: ["string"]}
  * }
  *
  * @name pentaho.visual.role.spec.IMapping
- *
  * @interface
- * @extends pentaho.type.spec.IComplex
- *
- * @see pentaho.visual.role.spec.IMappingAttribute
+ * @extends pentaho.visual.role.spec.IBaseMapping
  */
 
 /**
- * The fixed measurement level on which the associated visual role is to operate.
- *
- * When `null` or unspecified,
- * the associated visual role operates in an automatically determined measurement level.
+ * The fixed mode of operation in which the associated visual role is to operate.
  *
  * When specified,
- * it must be one of the measurement levels supported by the associated visual role,
- * as defined in [levels]{@link pentaho.visual.role.Mapping.Type#levels}.
+ * it must be equal to one of the operation [modes]{@link pentaho.visual.role.Property.Type#modes}
+ * of the associated visual role property;
+ * otherwise, the mapping is considered _invalid_.
  *
- * @name pentaho.visual.role.spec.IMapping#level
- * @type {string}
- * @see pentaho.visual.role.Mapping#level
- */
-
-/**
- * The attributes of the visual role mapping.
+ * @name pentaho.visual.role.spec.IMapping#modeFixed
+ * @type {pentaho.visual.role.spec.IMode}
  *
- * @name pentaho.visual.role.spec.IMapping#attributes
- * @type {Array.<pentaho.visual.role.spec.UMappingAttribute>}
- * @see pentaho.visual.role.Mapping#attributes
+ * @see pentaho.visual.role.Mapping#modeFixed
  */

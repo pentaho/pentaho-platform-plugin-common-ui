@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,27 @@
  */
 define([
   "pentaho/i18n!messages",
-  "pentaho/type/util"
-], function(bundle, typeUtil) {
+
+  // so that r.js sees otherwise invisible dependencies.
+  "./baseMapping",
+  "./mappingField",
+  "./mode"
+], function(bundle) {
 
   "use strict";
 
   return [
-    "complex",
-    "pentaho/visual/role/mappingAttribute",
-    "pentaho/visual/role/level",
-    function(Complex, MappingAttribute, MeasurementLevel) {
+    "./baseMapping",
+    "./mappingField",
+    "./mode",
+    function(BaseMapping, MappingField, Mode) {
+
+      var context = this;
 
       /**
        * @name pentaho.visual.role.Mapping.Type
        * @class
-       * @extends pentaho.type.Complex.Type
+       * @extends pentaho.visual.role.BaseMapping.Type
        *
        * @classDesc The type class of {@link pentaho.visual.role.Mapping}.
        */
@@ -37,83 +43,114 @@ define([
       /**
        * @name pentaho.visual.role.Mapping
        * @class
-       * @extends pentaho.type.Complex
+       * @extends pentaho.visual.role.BaseMapping
+       * @abstract
        *
        * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.Mapping>} pentaho/visual/role/mapping
        *
        * @classDesc The `Mapping` class holds the association between
-       * a specific visual role and the data properties, here named _data attributes_,
-       * of a visualization's current dataset.
+       * a specific visual role and the data fields of a model's current data set,
+       * as seen internally to the visualization, by the view.
        *
-       * The mapping holds two pieces of information:
+       * It extends the base [Mapping]{@link pentaho.visual.role.BaseMapping} class to add
+       * the [mode]{@link pentaho.visual.role.Mapping#mode} of operation of the visual role;
        *
-       * 1. an optional, fixed [level of measurement]{@link pentaho.visual.role.Mapping#level}
-       *    in which the visual role should operate
-       * 2. a list of associations to data properties,
-       *    [attributes]{@link pentaho.visual.role.Mapping#attributes},
-       *    each of the type {@link pentaho.visual.role.MappingAttribute}.
-       *
-       * @description Creates a visual role mapping instance.
+       * @description Creates a visual role internal mapping instance.
        * @constructor
-       * @param {pentaho.visual.role.spec.IMapping} [spec] A visual role mapping specification.
+       * @param {pentaho.visual.role.spec.IMapping} [spec] A visual role internal mapping specification.
        */
-      var VisualRoleMapping = Complex.extend(/** @lends pentaho.visual.role.Mapping# */{
+      var Mapping = BaseMapping.extend(/** @lends pentaho.visual.role.Mapping# */{
 
         /**
-         * Gets the visual model that owns this visual role mapping, if any, or `null`.
+         * Resets any existing data or mapping related cached information.
          *
-         * @type {pentaho.visual.base.Model}
-         * @readOnly
+         * Called by the containing abstract model whenever its data or visual role properties change.
+         *
+         * @protected
+         * @friend pentaho.visual.base.AbstractModel
          */
-        get model() {
-          // TODO: Test it is a visual Model (cyclic dependency)
-          return typeUtil.__getFirstRefContainer(this);
+        _onDataOrMappingChanged: function() {
+          // Clear any cached mode.
+          this.__mode = undefined;
         },
 
+        // region mode
+        __mode: undefined,
+
         /**
-         * Gets a value that indicates if the mapping has any attributes.
+         * Gets the _effective_ operation mode in which the associated visual role is to operate.
          *
-         * @type {boolean}
+         * Calling this property is equivalent to calling
+         * [getModeEffectiveOn]{@link pentaho.visual.role.Property.Type#getModeEffectiveOn}
+         * on the the containing visual role property.
+         * However, the results are cached for performance reasons.
+         *
+         * @name pentaho.visual.role.Mapping#mode
+         * @type {pentaho.visual.role.Mode}
          * @readonly
+         *
+         * @see pentaho.visual.role.Property.Type#getModeEffectiveOn
          */
-        get isMapped() {
-          return this.attributes.count > 0;
+        get mode() {
+          var mode;
+
+          // Within a transaction?
+          if(context.transaction !== null) {
+            // Do not cache or use cache.
+            // Doing this covers the will phase of change actions, in which multiple iterations can occur.
+            // There would be no way to reset the mode cached during the process.
+            mode = this.__getMode();
+          } else if((mode = this.__mode) === undefined) {
+            // When undefined, it's like not caching.
+            this.__mode = mode = this.__getMode();
+          }
+
+          return mode || null;
         },
+
+        /**
+         * Gets the mode from the referring container abstract model and property.
+         *
+         * When there is no container, `undefined` is returned.
+         *
+         * @return {undefined|pentaho.visual.role.Mode} The mode, `null` or `undefined`.
+         *
+         * @private
+         */
+        __getMode: function() {
+          var iref = this._modelReference;
+          if(iref !== null) {
+            return iref.property.getModeEffectiveOn(iref.container);
+          }
+        },
+        // endregion
 
         $type: /** @lends pentaho.visual.role.Mapping.Type# */{
           props: [
             /**
-             * Gets or sets the fixed measurement level on which the associated visual role is to operate.
-             *
-             * When `null` or unspecified,
-             * the associated visual role operates in an automatically determined measurement level,
-             * as returned by [levelAutoOn]{@link pentaho.visual.role.Property.Type#levelAutoOn}.
+             * Gets or sets the _fixed_ operation mode in which the associated visual role is to operate.
              *
              * When specified,
-             * it must be one of the measurement levels supported by the associated visual role,
-             * as defined in [levels]{@link pentaho.visual.role.Property.Type#levels};
+             * it must be equal to one of the operation [modes]{@link pentaho.visual.role.Property.Type#modes}
+             * of the associated visual role property;
              * otherwise, the mapping is considered _invalid_.
              *
-             * @name pentaho.visual.role.Mapping#level
-             * @type {pentaho.visual.role.Level}
+             * The effective mode in which the visual role operates is given by
+             * the [mode]{@link pentaho.visual.role.Mapping#mode}.
              *
-             * @see pentaho.visual.role.spec.IMapping#level
-             */
-            {name: "level", valueType: MeasurementLevel},
-
-            /**
-             * Gets or sets the attributes of the visual role mapping.
+             * @name pentaho.visual.role.Mapping#modeFixed
+             * @type {pentaho.visual.role.Mode}
              *
-             * @name pentaho.visual.role.Mapping#attributes
-             * @type {pentaho.type.List<pentaho.visual.role.MappingAttribute>}
+             * @see pentaho.visual.role.spec.IMapping#modeFixed
+             * @see pentaho.visual.role.Mapping#mode
              */
-            {name: "attributes", valueType: [MappingAttribute]}
+            {name: "modeFixed", valueType: Mode}
           ]
         }
       })
       .implement({$type: bundle.structured.mapping});
 
-      return VisualRoleMapping;
+      return Mapping;
     }
   ];
 });

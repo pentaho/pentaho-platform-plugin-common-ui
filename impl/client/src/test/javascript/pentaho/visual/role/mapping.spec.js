@@ -1,72 +1,299 @@
+/*!
+ * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 define([
   "pentaho/type/Context",
-  "pentaho/visual/base/model",
-  "pentaho/visual/role/mapping"
-], function(Context, visualModelFactory, mappingFactory) {
+  "pentaho/data/Table"
+], function(Context, Table) {
 
   "use strict";
 
-  /* globals describe, it, beforeEach, spyOn */
+  /* globals describe, it, beforeEach, afterEach, beforeAll, spyOn */
 
   describe("pentaho.visual.role.Mapping", function() {
 
-    var VisualModel;
-    var Mapping;
+    var context;
+    var Model;
 
     beforeEach(function(done) {
 
       Context.createAsync()
-          .then(function(context) {
+          .then(function(_context) {
+
+            context = _context;
 
             return context.getDependencyApplyAsync([
               "pentaho/visual/base/model",
               "pentaho/visual/role/mapping"
-            ], function(_Model, _Mapping) {
-              VisualModel = _Model;
-              Mapping = _Mapping;
+            ], function(_Model) {
+              Model = _Model;
             });
           })
           .then(done, done.fail);
 
     });
 
-    describe("#isMapped", function() {
+    function getDataSpec1() {
+      return {
+        model: [
+          {name: "country", type: "string", label: "Country"},
+          {name: "product", type: "string", label: "Product"},
+          {name: "sales", type: "number", label: "Sales"},
+          {name: "date", type: "date", label: "Date"}
+        ],
+        rows: [
+          {c: ["Portugal", "fish", 100, "2016-01-01"]},
+          {c: ["Ireland", "beer", 200, "2016-01-02"]}
+        ]
+      };
+    }
 
-      it("should be false when it has zero attributes", function() {
+    // TODO: mode = modeFixed || prop.modes[0].
+    // Uses cache except when under a transaction.
+    describe("#mode", function() {
 
-        var mapping = new Mapping();
-        expect(mapping.isMapped).toBe(false);
-      });
+      describe("when not under a transaction", function() {
 
-      it("should be true when it has one attribute", function() {
+        it("should call prop.getModeEffectiveOn(model) and return its result", function() {
 
-        var mapping = new Mapping({attributes: ["foo"]});
-        expect(mapping.isMapped).toBe(true);
-      });
+          var CustomModel = Model.extend({
+            $type: {
+              props: [
+                {
+                  name: "propRoleA",
+                  base: "pentaho/visual/role/property",
+                  modes: [
+                    {dataType: "string"}
+                  ]
+                }
+              ]
+            }
+          });
 
-      it("should be true when it has two attributes", function() {
+          var propType = CustomModel.type.get("propRoleA");
+          var mode = {};
+          spyOn(propType, "getModeEffectiveOn").and.returnValue(mode);
 
-        var mapping = new Mapping({attributes: ["foo", "bar"]});
-        expect(mapping.isMapped).toBe(true);
-      });
-    });
+          var model = new CustomModel({
+            data: new Table(getDataSpec1()),
+            propRoleA: {fields: ["country"]}
+          });
+          var mapping = model.propRoleA;
 
-    describe("#model", function() {
+          var result = mapping.mode;
 
-      it("should have #model return the container `derived`", function() {
-
-        var Derived = VisualModel.extend({
-          $type: {
-            props: [
-              {name: "foo", base: "pentaho/visual/role/property"}
-            ]
-          }
+          expect(result).toBe(mode);
+          expect(propType.getModeEffectiveOn).toHaveBeenCalledTimes(1);
+          expect(propType.getModeEffectiveOn).toHaveBeenCalledWith(model);
         });
 
-        var derived = new Derived();
-        var mapping = derived.foo;
+        it("should cache and return the mode of the first prop.getModeEffectiveOn call", function() {
 
-        expect(mapping.model).toBe(derived);
+          var CustomModel = Model.extend({
+            $type: {
+              props: [
+                {
+                  name: "propRoleA",
+                  base: "pentaho/visual/role/property",
+                  modes: [
+                    {dataType: "string"}
+                  ]
+                }
+              ]
+            }
+          });
+
+          var propType = CustomModel.type.get("propRoleA");
+          var mode = {};
+          spyOn(propType, "getModeEffectiveOn").and.returnValue(mode);
+
+          var model = new CustomModel({
+            data: new Table(getDataSpec1()),
+            propRoleA: {fields: ["country"]}
+          });
+          var mapping = model.propRoleA;
+
+          var result1 = mapping.mode;
+          var result2 = mapping.mode;
+
+          expect(result1).toBe(mode);
+          expect(result2).toBe(mode);
+          expect(propType.getModeEffectiveOn).toHaveBeenCalledTimes(1);
+        });
+
+        it("should cache and return a returned null mode", function() {
+
+          var CustomModel = Model.extend({
+            $type: {
+              props: [
+                {
+                  name: "propRoleA",
+                  base: "pentaho/visual/role/property",
+                  modes: [
+                    {dataType: "number"}
+                  ]
+                }
+              ]
+            }
+          });
+
+          var propType = CustomModel.type.get("propRoleA");
+          var mode = null;
+          spyOn(propType, "getModeEffectiveOn").and.returnValue(mode);
+
+          var model = new CustomModel({
+            data: new Table(getDataSpec1()),
+            propRoleA: {fields: ["country"]}
+          });
+          var mapping = model.propRoleA;
+
+          var result1 = mapping.mode;
+          var result2 = mapping.mode;
+
+          expect(result1).toBe(mode);
+          expect(result2).toBe(mode);
+          expect(propType.getModeEffectiveOn).toHaveBeenCalledTimes(1);
+        });
+      });
+
+      describe("when under a transaction", function() {
+
+        var txnScope;
+        var mode0;
+        var propType;
+        var model;
+
+        beforeEach(function() {
+
+          var CustomModel = Model.extend({
+            $type: {
+              props: [
+                {
+                  name: "propNormal",
+                  valueType: "string"
+                },
+                {
+                  name: "propRoleA",
+                  base: "pentaho/visual/role/property",
+                  modes: [
+                    {dataType: "string"}
+                  ]
+                }
+              ]
+            }
+          });
+
+          model = new CustomModel({
+            data: new Table(getDataSpec1()),
+            propRoleA: {fields: ["country"]}
+          });
+
+          propType = CustomModel.type.get("propRoleA");
+
+          // Cache the mode.
+          mode0 = model.propRoleA.mode;
+
+          // Start the transaction.
+          txnScope = context.enterChange();
+        });
+
+        afterEach(function() {
+          txnScope.dispose();
+        });
+
+        it("should ignore the cached value and call prop.getModeEffectiveOn again", function() {
+
+          var mode = {};
+          spyOn(propType, "getModeEffectiveOn").and.returnValue(mode);
+
+          var result = model.propRoleA.mode;
+
+          expect(result).toBe(mode);
+          expect(propType.getModeEffectiveOn).toHaveBeenCalledTimes(1);
+        });
+
+        it("should not cache values and call prop.getModeEffectiveOn each time", function() {
+
+          var mode = {};
+          spyOn(propType, "getModeEffectiveOn").and.returnValue(mode);
+
+          var result1 = model.propRoleA.mode;
+          var result2 = model.propRoleA.mode;
+
+          expect(propType.getModeEffectiveOn).toHaveBeenCalledTimes(2);
+        });
+
+        it("should return the original cached value if the transaction causes no changes", function() {
+
+          var mode = {};
+          spyOn(propType, "getModeEffectiveOn").and.returnValue(mode);
+
+          txnScope.accept();
+
+          var result = model.propRoleA.mode;
+
+          expect(result).toBe(mode0);
+          expect(propType.getModeEffectiveOn).not.toHaveBeenCalled();
+        });
+
+        it("should return a new value if the transaction changes the `data` property", function() {
+
+          var mode = {};
+          spyOn(propType, "getModeEffectiveOn").and.returnValue(mode);
+
+          model.data = new Table(getDataSpec1());
+
+          txnScope.accept();
+
+          var result = model.propRoleA.mode;
+
+          expect(result).toBe(mode);
+          expect(result).not.toBe(mode0);
+          expect(propType.getModeEffectiveOn).toHaveBeenCalledTimes(1);
+        });
+
+        it("should return a new value if the transaction changes a visual role property", function() {
+
+          var mode = {};
+          spyOn(propType, "getModeEffectiveOn").and.returnValue(mode);
+
+          model.propRoleA.fields = ["product"];
+
+          txnScope.accept();
+
+          var result = model.propRoleA.mode;
+
+          expect(result).toBe(mode);
+          expect(result).not.toBe(mode0);
+          expect(propType.getModeEffectiveOn).toHaveBeenCalledTimes(1);
+        });
+
+        it("should return the original cached value if the transaction changes normal properties", function() {
+
+          var mode = {};
+          spyOn(propType, "getModeEffectiveOn").and.returnValue(mode);
+
+          model.propNormal = "new-value";
+
+          txnScope.accept();
+
+          var result = model.propRoleA.mode;
+
+          expect(result).toBe(mode0);
+          expect(propType.getModeEffectiveOn).not.toHaveBeenCalled();
+        });
       });
     });
   });

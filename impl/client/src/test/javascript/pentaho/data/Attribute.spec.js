@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,6 +82,14 @@ define([
           var attr = expectAttribute({name: "test", format: format});
           expect(attr.format).toBe(format);
         });
+
+        it("should create an attribute with the value in property `isKey`", function() {
+          var attr = expectAttribute({name: "test", isKey: true});
+          expect(attr.isKey).toBe(true);
+
+          attr = expectAttribute({name: "test", isKey: false});
+          expect(attr.isKey).toBe(false);
+        });
       });
     });
 
@@ -116,88 +124,130 @@ define([
       });
     });
 
-    describe("#isDiscrete", function() {
-      it("should be `false` when type is 'number'", function() {
+    describe("#isContinuous", function() {
+
+      it("should be `true` when type is 'number'", function() {
         var attr = expectAttribute({name: "test", type: "number"});
-        expect(attr.isDiscrete).toBe(false);
+        expect(attr.isContinuous).toBe(true);
       });
 
-      it("should be `false` when type is 'date'", function() {
+      it("should be `true` when type is 'date'", function() {
         var attr = expectAttribute({name: "test", type: "date"});
-        expect(attr.isDiscrete).toBe(false);
+        expect(attr.isContinuous).toBe(true);
       });
 
       it("should be `true` when type is 'Date' — unaffected by non-lower case", function() {
         var attr = expectAttribute({name: "test", type: "Date"});
-        expect(attr.isDiscrete).toBe(false);
+        expect(attr.isContinuous).toBe(true);
       });
 
-      it("should be `true` when type is 'string'", function() {
+      it("should be `false` when type is 'string'", function() {
         var attr = expectAttribute({name: "test", type: "string"});
-        expect(attr.isDiscrete).toBe(true);
+        expect(attr.isContinuous).toBe(false);
       });
 
-      it("should be `true` when type is 'boolean'", function() {
+      it("should be `false` when type is 'boolean'", function() {
         var attr = expectAttribute({name: "test", type: "boolean"});
-        expect(attr.isDiscrete).toBe(true);
+        expect(attr.isContinuous).toBe(false);
       });
 
-      it("should be `true` when type is 'foo'", function() {
+      it("should be `false` when type is 'foo'", function() {
         var attr = expectAttribute({name: "test", type: "foo"});
-        expect(attr.isDiscrete).toBe(true);
+        expect(attr.isContinuous).toBe(false);
+      });
+    });
+
+    describe("#isKey", function() {
+
+      describe("default value", function() {
+
+        it("should default to `false` when type is 'number'", function() {
+          var attr = expectAttribute({name: "test", type: "number"});
+          expect(attr.isKey).toBe(false);
+        });
+
+        it("should default to `false` when type is 'date'", function() {
+          var attr = expectAttribute({name: "test", type: "date"});
+          expect(attr.isKey).toBe(false);
+        });
+
+        it("should default to `false` when type is 'string'", function() {
+          var attr = expectAttribute({name: "test", type: "string"});
+          expect(attr.isKey).toBe(false);
+        });
+
+        it("should default to `false` when type is 'boolean'", function() {
+          var attr = expectAttribute({name: "test", type: "boolean"});
+          expect(attr.isKey).toBe(false);
+        });
+
+        it("should default to `false` when type is 'foo'", function() {
+          var attr = expectAttribute({name: "test", type: "foo"});
+          expect(attr.isKey).toBe(false);
+        });
       });
 
-      // if isDiscrete=false by default, can override to isDiscrete=true
-      it("should be `true` when type is 'number' and isDiscrete is specified as true", function() {
-        var attr = expectAttribute({name: "test", type: "number", isDiscrete: true});
-        expect(attr.isDiscrete).toBe(true);
-      });
+      describe("specified value", function() {
+        it("should be `false` when type is 'number' and isKey is specified as false", function() {
+          var attr = expectAttribute({name: "test", type: "number", isKey: false});
+          expect(attr.isKey).toBe(false);
+        });
 
-      // if isDiscrete=true by default, cannot override to isDiscrete=false
-      it("should be `true` when type is 'string' and isDiscrete is specified as false", function() {
-        var attr = expectAttribute({name: "test", type: "string", isDiscrete: false});
-        expect(attr.isDiscrete).toBe(true);
+        it("should be `true` when type is 'number' and isKey is specified as true", function() {
+          var attr = expectAttribute({name: "test", type: "number", isKey: true});
+          expect(attr.isKey).toBe(true);
+        });
+
+        it("should be `false` when type is 'string' and isKey is specified as false", function() {
+          var attr = expectAttribute({name: "test", type: "string", isKey: false});
+          expect(attr.isKey).toBe(false);
+        });
+
+        it("should be `true` when type is 'string' and isKey is specified as true", function() {
+          var attr = expectAttribute({name: "test", type: "string", isKey: true});
+          expect(attr.isKey).toBe(true);
+        });
       });
     });
 
     describe("#isPercent", function() {
-      it("should be undefined for discrete attributes", function() {
+      it("should be undefined for categorical attributes", function() {
         var attr = expectAttribute({name: "test", type: "string"});
         expect(attr.isPercent).toBe(undefined);
 
-        attr = expectAttribute({name: "test", type: "number", isDiscrete: true});
+        attr = expectAttribute({name: "test", type: "foo", isContinuous: false});
         expect(attr.isPercent).toBe(undefined);
       });
 
-      it("should be false when unspecified for a non-discrete attribute", function() {
+      it("should be false when unspecified for a continuous attribute", function() {
         var attr = expectAttribute({name: "test", type: "number"});
         expect(attr.isPercent).toBe(false);
       });
 
-      it("should be false when specified false for a non-discrete attribute", function() {
+      it("should be false when specified false for a continuous attribute", function() {
         var attr = expectAttribute({name: "test", type: "number", isPercent: false});
         expect(attr.isPercent).toBe(false);
       });
 
-      it("should be true when specified true for a non-discrete attribute", function() {
+      it("should be true when specified true for a continuous attribute", function() {
         var attr = expectAttribute({name: "test", type: "number", isPercent: true});
         expect(attr.isPercent).toBe(true);
       });
     });
 
     describe("#members", function() {
-      it("should be undefined for non-discrete attributes", function() {
+      it("should be undefined for continuous attributes", function() {
         var attr = expectAttribute({name: "test", type: "number"});
         expect(attr.members).toBe(undefined);
       });
 
-      it("should be an empty array for discrete attributes, when unspecified", function() {
+      it("should be an empty array for categorical attributes, when unspecified", function() {
         var attr = expectAttribute({name: "test", type: "string"});
         expect(attr.members instanceof Array).toBe(true);
         expect(attr.members.length).toBe(0);
       });
 
-      it("should create a specified member for a discrete attribute", function() {
+      it("should create a specified member for a categorical attribute", function() {
         var attr = expectAttribute({
           name: "test",
           type: "string",

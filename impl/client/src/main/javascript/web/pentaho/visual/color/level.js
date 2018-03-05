@@ -69,7 +69,6 @@ define([
    *
    *  @see pentaho.visual.color.Palette#level
    *  @see pentaho.visual.color.PaletteProperty.Type#levels
-   *  @see pentaho.visual.role.Level
    */
 
   return ["string", function(PentahoString) {

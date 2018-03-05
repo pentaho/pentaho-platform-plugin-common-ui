@@ -66,7 +66,7 @@ define([
 
       var model = new BarModel({
         data:     {v: dataTable},
-        measures: {attributes: [{name: "foo"}]}
+        measures: {fields: [{name: "foo"}]}
       });
 
       expect(model.validate()).toBe(null);

@@ -133,7 +133,7 @@ is given a dataset containing data for attributes such as _Product Family_ and _
 The value of a visual role contains the names of the data attributes that are _mapped_ to it,
 e.g.: `{attributes: ["productFamily"]}`. 
 So, the value of a visual role is an object with a list property named 
-[attributes]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.role.Mapping' | append: '#attributes'}}).
+[attributes]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual.role.BaseMapping' | append: '#attributes'}}).
 
 Because by default, any number of data attributes can be mapped to a visual role, including 0 or 10, 
 it is necessary to derive the 

@@ -78,6 +78,36 @@ define([
       Annotatable.call(this, spec);
     },
 
+    /**
+     * Gets an array with the key attributes.
+     *
+     * Key attributes are attributes whose [isKey]{@link pentaho.data.Attribute#isKey} is `true`.
+     *
+     * The returned array will be empty when there are no key attributes.
+     *
+     * @type {!Array.<pentaho.data.Attribute>}
+     * @readOnly
+     * @see pentaho.data.Model#attributes
+     * @see pentaho.data.Attribute#isKey
+     */
+    get keyAttributes() {
+      return this.attributes.filter(function(attr) { return attr.isKey; });
+    },
+
+    /**
+     * Gets a value that indicates if there are any key attributes.
+     *
+     * Key attributes are attributes whose [isKey]{@link pentaho.data.Attribute#isKey} is `true`.
+     *
+     * @type {boolean}
+     * @readOnly
+     * @see pentaho.data.Model#keyAttributes
+     * @see pentaho.data.Attribute#isKey
+     */
+    get hasAnyKeyAttributes() {
+      return this.attributes.some(function(attr) { return attr.isKey; });
+    },
+
     // region ISpecifiable implementation
     /**
      * Creates a specification of the model.

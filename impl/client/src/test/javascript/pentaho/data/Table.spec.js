@@ -32,6 +32,19 @@ define([
     };
   }
 
+  function getDatasetCDA2WithKey() {
+    return {
+      metadata: [
+        {colName: "country", colType: "STRING", colLabel: "Country", colIsKey: true},
+        {colName: "sales", colType: "NUMERIC", colLabel: "Sales"}
+      ],
+      resultset: [
+        ["Portugal", 12000],
+        ["Ireland", 6000]
+      ]
+    };
+  }
+
   function getDatasetDT1() {
     return {
       model: [
@@ -54,6 +67,19 @@ define([
       rows: [
         {c: [ {v: "Portugal", f: null}, {v: 12000, f: null}] },
         {c: [ {v: "Ireland",  f: null}, {v:  6000, f: null}] }
+      ]
+    };
+  }
+
+  function getDatasetDT2NormalizedWithKey() {
+    return {
+      model: [
+        {name: "country", type: "string", label: "Country", isKey: true},
+        {name: "sales", type: "number", label: "Sales"}
+      ],
+      rows: [
+        {c: [{v: "Portugal", f: null}, {v: 12000, f: null}]},
+        {c: [{v: "Ireland", f: null}, {v: 6000, f: null}]}
       ]
     };
   }
@@ -98,7 +124,8 @@ define([
     "integer": "number"
   };
 
-  function expectDataTableContentJsonCda(dataTable, sourceData) {
+  function expectDataTableContentJsonCda(sourceData) {
+
     var dataTable = new DataTable(sourceData);
 
     // Compare cda columns to columns and attributes
@@ -247,27 +274,28 @@ define([
         });
 
         it("should return a data table having the same data as the source JSON string", function() {
-          var dataTable = new DataTable(sourceData);
 
-          expectDataTableContentJsonCda(dataTable, sourceData);
+          expectDataTableContentJsonCda(sourceData);
         });
       });
     });
 
     describe("table -", function() {
+
       describe("#convertJsonCdaToTableSpec() -", function() {
-        var jsTable;
-
-        beforeEach(function() {
-          jsTable = DataTable.convertJsonCdaToTableSpec(getDatasetCDA1());
-        });
-
         it("should return an Object", function() {
+          var jsTable = DataTable.convertJsonCdaToTableSpec(getDatasetCDA1());
           expect(jsTable instanceof Object).toBe(true);
         });
 
-        it("should return a data table with the expected metadata and data", function() {
+        it("should return a data table with the expected metadata and data (i)", function() {
+          var jsTable = DataTable.convertJsonCdaToTableSpec(getDatasetCDA1());
           expect(jsTable).toEqual(getDatasetDT1Normalized());
+        });
+
+        it("should return a data table with the expected metadata and data (ii)", function() {
+          var jsTable = DataTable.convertJsonCdaToTableSpec(getDatasetCDA2WithKey());
+          expect(jsTable).toEqual(getDatasetDT2NormalizedWithKey());
         });
       });
 
@@ -1080,6 +1108,23 @@ define([
           expect(distinctValues).toEqual(["Portugal", "", "null", "Italy"]);
         });
       });
+
+      describe("#isColumnKey(j) -", function() {
+        it("should return the attribute isKey of the attribute of given column index", function() {
+          var dataTable = new DataTable({
+            model: [
+              {name: "A", label: "ABC"},
+              {name: "B", label: "DEF", isKey: true},
+              {name: "C", label: "GHI"}
+            ],
+            rows: []
+          });
+
+          expect(dataTable.isColumnKey(0)).toBe(false);
+          expect(dataTable.isColumnKey(1)).toBe(true);
+          expect(dataTable.isColumnKey(2)).toBe(false);
+        });
+      });
     });
 
     describe("cells -", function() {
@@ -1164,7 +1209,7 @@ define([
           ],
           rows: [
             {c: ["Ireland",  1, true, date1, {v: {foo: "bar"}, f:  "foo-bar"}]},
-            {c: []}
+            {c: [null, null, null, null, {v: {bar: "foo"}}]}
           ]
         });
 
@@ -1184,13 +1229,22 @@ define([
           expect(dataTable.getValueKey(1, 0)).toBe("");
         });
 
-        it("should return the string representation of a date value of the specified row and column", function() {
-          expect(dataTable.getValueKey(0, 3)).toBe(date1.toString());
+        it("should return the ISO string representation of a date value of the specified row and column", function() {
+          expect(dataTable.getValueKey(0, 3)).toBe(date1.toISOString());
         });
 
         it("should return an auto-generated id when the value is an object", function() {
-          var v = dataTable.getValueKey(0, 4);
-          expect(v.substr(0, "_mid_".length)).toBe("_mid_");
+          var k1 = dataTable.getValueKey(0, 4);
+
+          expect(typeof k1).toBe("string");
+          expect(k1.length).toBeGreaterThan(0);
+
+          var k2 = dataTable.getValueKey(1, 4);
+
+          expect(typeof k2).toBe("string");
+          expect(k2.length).toBeGreaterThan(0);
+
+          expect(k1).not.toBe(k2);
         });
       });
 

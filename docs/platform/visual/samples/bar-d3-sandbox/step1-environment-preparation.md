@@ -122,8 +122,8 @@ npm install
                     // Create the visualization model.
                     var modelSpec = {
                       "data": new Table(dataSpec),
-                      "levels": {attributes: ["productFamily"]},
-                      "measure": {attributes: ["sales"]},
+                      "levels": {fields: ["productFamily"]},
+                      "measure": {fields: ["sales"]},
                       "operation": "avg"
                     };
                                                 

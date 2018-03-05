@@ -129,11 +129,14 @@ define([
          * @param {!pentaho.type.Complex.Type} keyArgs.declaringType - The complex type that declares the property.
          * @param {number} keyArgs.index - The index of the property within its complex type.
          *
+         * @return {pentaho.type.spec.ITypeProto} A specification to use instead of the given `spec` argument to extend
+         * the type, or `undefined`, to use the given specification.
+         *
          * @protected
          */
         _init: function(spec, keyArgs) {
 
-          this.base.apply(this, arguments);
+          spec = this.base(spec, keyArgs) || spec;
 
           this.__isConstructing = true;
 
@@ -159,6 +162,8 @@ define([
                 this.valueType = _defaultTypeMid;
             }
           }
+
+          return spec;
         },
 
         /** @inheritDoc */
@@ -211,6 +216,8 @@ define([
         get isProperty() { return true; },
 
         // region declaringType attribute
+        __declaringType: null,
+
         /**
          * Gets the complex type that declares this property type.
          *
@@ -434,6 +441,7 @@ define([
 
             // Don't inherit the default value if valueType is local.
             // Don't preserve the default value if it no longer is an instance of valueType.
+            // When dv is a function, do not take the change as well.
             var dv;
             if(!O.hasOwn(this, "__defaultValue") ||
                (((dv = this.__defaultValue) != null) && !newType.is(dv))) {

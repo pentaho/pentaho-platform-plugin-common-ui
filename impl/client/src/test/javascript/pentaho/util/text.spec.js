@@ -26,6 +26,32 @@ define([
       expect(typeof text).toBe("object");
     });
 
+    describe("nonEmptyString(value)", function() {
+      it("should return a non-empty string unaffected", function() {
+        expect(text.nonEmptyString("text")).toBe("text");
+      });
+
+      it("should return null when given null", function() {
+        expect(text.nonEmptyString(null)).toBe(null);
+      });
+
+      it("should return null when given undefined", function() {
+        expect(text.nonEmptyString(undefined)).toBe(null);
+      });
+
+      it("should return null when given an empty string", function() {
+        expect(text.nonEmptyString("")).toBe(null);
+      });
+
+      it("should convert a non-string to a string and return null if it is the empty string", function() {
+        expect(text.nonEmptyString({toString: function() { return ""; }})).toBe(null);
+      });
+
+      it("should convert a non-string to a string and return it if it is not the empty string", function() {
+        expect(text.nonEmptyString({toString: function() { return "foo"; }})).toBe("foo");
+      });
+    });
+
     describe("firstUpperCase(text)", function() {
       it("should ensure the first letter of a string is upper case", function() {
         expect(text.firstUpperCase("text")).toBe("Text");

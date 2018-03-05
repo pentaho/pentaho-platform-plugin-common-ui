@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,8 @@ define([
     "./mixins/scaleColorDiscrete",
     "./mixins/multiCharted",
     "./mixins/trended",
-    "pentaho/visual/role/level",
     function(BaseModel, LabelsOption, ScaleColorContinuousModel, ScaleColorDiscreteModel,
-             MultiChartedModel, TrendedModel, MeasurementLevel) {
+             MultiChartedModel, TrendedModel) {
 
       return BaseModel.extend({
         $type: {
@@ -41,56 +40,48 @@ define([
           props: [
             {
               name: "rows", // VISUAL_ROLE
-              base: "pentaho/visual/role/property",
-              levels: ["ordinal"],
-              attributes: {isRequired: true}
+              modes: [
+                {dataType: "list"}
+              ],
+              fields: {isRequired: true}
             },
             {
               name: "x", // VISUAL_ROLE
               base: "pentaho/visual/role/property",
-              levels: ["quantitative"],
-              attributes: {countMin: 1, countMax: 1},
+              modes: [
+                {dataType: "number"},
+                {dataType: "date"}
+              ],
+              fields: {isRequired: true},
               ordinal: 1
             },
             {
               name: "y", // VISUAL_ROLE
               base: "pentaho/visual/role/property",
-              levels: ["quantitative"],
-              attributes: {countMin: 1, countMax: 1},
+              modes: [
+                {dataType: "number"},
+                {dataType: "date"}
+              ],
+              fields: {isRequired: true},
               ordinal: 2
             },
             {
               // Modal visual role
               name: "color", // VISUAL_ROLE
               base: "pentaho/visual/role/property",
-              levels: ["nominal", "quantitative"],
-              attributes: {
-                countMax: function(rolePropType) {
-                  var level = rolePropType.levelEffectiveOn(this);
-                  return MeasurementLevel.type.isQuantitative(level) ? 1 : null;
-                }
-                // TODO: should only be applicable when color is continuous
-              },
-              getAttributesMaxLevelOf: function(model) {
-                var mapping = model.get(this);
-
-                // If the mapping contains a single `date` attribute,
-                // consider it nominal, and not quantitative as the base code does.
-                // Currently, CCC does not like dates in continuous color scales...
-                if(mapping.attributes.count === 1) {
-                  var dataAttr = mapping.attributes.at(0).__dataAttribute;
-                  if(dataAttr && dataAttr.type === "date")
-                    return "nominal";
-                }
-
-                return this.base(model);
-              },
+              isVisualKey: false,
+              modes: [
+                {dataType: "number"},
+                {dataType: "list"} // catch-all
+              ],
               ordinal: 6
             },
             {
               name: "multi", // VISUAL_ROLE
               base: "pentaho/visual/role/property",
-              levels: ["ordinal"],
+              modes: [
+                {dataType: "list"}
+              ],
               ordinal: 10
             },
             {

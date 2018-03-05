@@ -29,8 +29,8 @@ define(function() {
           }
         },
 
-        _setNullInterpolationMode: function(options, value) {
-          options.nullInterpolationMode = value;
+        _setNullInterpolationMode: function(value) {
+          this.options.nullInterpolationMode = value;
         }
       });
     }

@@ -84,11 +84,13 @@ define([
         /** @inheritDoc */
         _init: function(spec, keyArgs) {
 
-          this.base(spec, keyArgs);
+          spec = this.base(spec, keyArgs) || spec;
 
-          // Create the elements list.
+          // Domain is required.
           var domain = spec.domain;
           if(!domain) throw error.argRequired("spec.domain");
+
+          return spec;
         },
 
         /** @inheritDoc */

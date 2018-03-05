@@ -57,23 +57,22 @@ define([
           // options.color2AxisTransform = null;
         },
 
-        _setNullInterpolationMode: function(options, value) {
-          options.plot2NullInterpolationMode = value;
+        _setNullInterpolationMode: function(value) {
+          this.options.plot2NullInterpolationMode = value;
         },
 
         /**
          * Configure CCC `visualRoles`.
          *
-         * @param {MappingAttributeInfo[]} attrInfos - The array of mapping attribute info objects.
          * @override
          * @protected
          */
-        _configureCccVisualRoles: function(attrInfos) {
+        _configureCccVisualRoles: function() {
 
           var cccMainRoleSpecs = this.options.visualRoles;
           var cccPlot2RoleSpecs = null;
 
-          this.plot2 = this.model.measuresLine.isMapped;
+          this.plot2 = this.model.measuresLine.hasFields;
           if(this.plot2) {
             // Creating this here prevents changing a shared nested object.
             this.options.plots = [
@@ -88,26 +87,28 @@ define([
             this.options.plots = null;
           }
 
-          // MappingAttrInfos is filled above, in visual role mapping attribute order.
+          // MappingFieldInfos is filled above, in visual role mapping attribute order.
           // This enables its use for configuring the CCC visual roles.
-          attrInfos.forEach(function(attrInfo) {
+          this._mappingFieldInfos.forEach(function(mappingFieldInfo) {
             var cccRoleSpecs;
-            if(attrInfo.role === "measuresLine") {
+            if(mappingFieldInfo.roleName === "measuresLine") {
               // Plot2 visual role.
               cccRoleSpecs = cccPlot2RoleSpecs;
             } else {
               cccRoleSpecs = cccMainRoleSpecs;
             }
 
-            var cccRoleSpec = def.lazy(cccRoleSpecs, attrInfo.cccRole);
+            var cccRoleSpec = def.lazy(cccRoleSpecs, mappingFieldInfo.cccRoleName);
 
-            def.array.lazy(cccRoleSpec, "dimensions").push(attrInfo.name);
+            def.array.lazy(cccRoleSpec, "dimensions").push(mappingFieldInfo.name);
           });
         },
 
-        _readUserOptions: function(options) {
+        _configureOptions: function() {
 
-          this.base.apply(this, arguments);
+          this.base();
+
+          var options = this.options;
 
           var shape = this.model.shape;
           if(shape && shape === "none") {
@@ -116,27 +117,27 @@ define([
             options.pointDotsVisible = true;
             options.pointDot_shape = shape;
           }
-        },
-
-        _configureOptions: function() {
-
-          this.base();
 
           this._configureAxisRange(/* isPrimary: */false, "ortho2");
 
           this._configureAxisTitle("ortho2", "");
         },
 
-        _configureLabels: function(options, model) {
+        _configureLabels: function() {
 
-          this.base.apply(this, arguments);
+          this.base();
+
+          var model = this.model;
 
           // Plot2
           var lineLabelsAnchor = model.lineLabelsOption;
           if(lineLabelsAnchor && lineLabelsAnchor !== "none") {
+
+            var options = this.options;
+
             options.plot2ValuesVisible = true;
             options.plot2ValuesAnchor = lineLabelsAnchor;
-            options.plot2ValuesFont = util.defaultFont(util.readFontModel(model, "label"));
+            options.plot2ValuesFont = this._labelFont;
 
             var labelColor = model.labelColor;
             if(labelColor != null) {
