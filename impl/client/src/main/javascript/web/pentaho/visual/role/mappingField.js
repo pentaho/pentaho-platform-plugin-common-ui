@@ -32,11 +32,11 @@ define([
        * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.MappingField>} pentaho/visual/role/mappingField
        *
        * @classDesc The `MappingField` class represents a field in a
-       * [visual role mapping]{@link pentaho.visual.role.BaseMapping}.
+       * [visual role mapping]{@link pentaho.visual.role.AbstractMapping}.
        *
        * The `Mode` type is an [entity]{@link pentaho.type.Value.Type#isEntity} type.
        *
-       * @see pentaho.visual.role.BaseMapping
+       * @see pentaho.visual.role.AbstractMapping
        *
        * @description Creates a visual role mapping field instance.
        * @constructor

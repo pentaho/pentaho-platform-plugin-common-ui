@@ -25,7 +25,7 @@ define([
 
   /* globals describe, it, beforeAll, beforeEach, afterEach, spyOn */
 
-  describe("pentaho.visual.role.BaseProperty", function() {
+  describe("pentaho.visual.role.AbstractProperty", function() {
 
     describe(".Type", function() {
 
@@ -70,7 +70,7 @@ define([
           $type: {
             props: {
               propRole: {
-                base: "pentaho/visual/role/baseProperty"
+                base: "pentaho/visual/role/abstractProperty"
               }
             }
           }
@@ -102,7 +102,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/baseProperty"
+                  base: "pentaho/visual/role/abstractProperty"
                 }
               }
             }
@@ -124,7 +124,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/baseProperty"
+                  base: "pentaho/visual/role/abstractProperty"
                 }
               }
             }
@@ -149,7 +149,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/baseProperty",
+                  base: "pentaho/visual/role/abstractProperty",
                   fields: fieldsSpec0
                 }
               }
@@ -201,7 +201,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/baseProperty"
+                      base: "pentaho/visual/role/abstractProperty"
                     }
                   }
                 }
@@ -227,7 +227,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/baseProperty",
+                      base: "pentaho/visual/role/abstractProperty",
                       fields: {
                         isRequired: true
                       }
@@ -254,7 +254,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/baseProperty",
+                      base: "pentaho/visual/role/abstractProperty",
                       fields: {
                         isRequired: true
                       }
@@ -281,7 +281,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/baseProperty",
+                      base: "pentaho/visual/role/abstractProperty",
                       fields: {
                         countMin: 2
                       }
@@ -308,7 +308,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/baseProperty",
+                      base: "pentaho/visual/role/abstractProperty",
                       fields: {
                         countMin: 2
                       }
@@ -335,7 +335,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/baseProperty",
+                      base: "pentaho/visual/role/abstractProperty",
                       fields: {
                         countMax: 1
                       }
@@ -363,7 +363,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/baseProperty",
+                      base: "pentaho/visual/role/abstractProperty",
                       fields: {
                         countMax: 1
                       }
@@ -410,19 +410,19 @@ define([
 
           describe("countMin", function() {
 
-            propertyTypeUtil.itDynamicAttribute("countMin", 1, "pentaho/visual/role/baseProperty", "fields");
+            propertyTypeUtil.itDynamicAttribute("countMin", 1, "pentaho/visual/role/abstractProperty", "fields");
 
           });
 
           describe("countMax", function() {
 
-            propertyTypeUtil.itDynamicAttribute("countMax", 2, "pentaho/visual/role/baseProperty", "fields");
+            propertyTypeUtil.itDynamicAttribute("countMax", 2, "pentaho/visual/role/abstractProperty", "fields");
 
           });
 
           describe("isRequired", function() {
 
-            propertyTypeUtil.itDynamicAttribute("isRequired", true, "pentaho/visual/role/baseProperty", "fields");
+            propertyTypeUtil.itDynamicAttribute("isRequired", true, "pentaho/visual/role/abstractProperty", "fields");
 
           });
         });

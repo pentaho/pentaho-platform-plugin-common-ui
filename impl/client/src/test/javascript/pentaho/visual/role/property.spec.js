@@ -342,7 +342,7 @@ define([
         });
       });
 
-      // The following are actually of BaseProperty, but easier to test here.
+      // The following are actually of AbstractProperty, but easier to test here.
 
       describe("#hasAnyListModes", function() {
 

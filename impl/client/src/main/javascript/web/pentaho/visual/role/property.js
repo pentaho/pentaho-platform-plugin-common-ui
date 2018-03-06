@@ -21,7 +21,7 @@ define([
   "pentaho/util/error",
 
   // so that r.js sees otherwise invisible dependencies.
-  "./baseProperty",
+  "./abstractProperty",
   "./mapping",
   "./mode"
 ], function(bundle, typeUtil, ValidationError, O, error) {
@@ -29,10 +29,10 @@ define([
   "use strict";
 
   return [
-    "./baseProperty",
+    "./abstractProperty",
     "./mapping",
     "./mode",
-    function(BaseProperty, Mapping, Mode) {
+    function(AbstractProperty, Mapping, Mode) {
 
       var context = this;
 
@@ -42,7 +42,7 @@ define([
       /**
        * @name pentaho.visual.role.Property.Type
        * @class
-       * @extends pentaho.visual.role.BaseProperty.Type
+       * @extends pentaho.visual.role.AbstractProperty.Type
        *
        * @classDesc The type class of {@link pentaho.visual.role.Property}.
        */
@@ -50,7 +50,7 @@ define([
       /**
        * @name pentaho.visual.role.Property
        * @class
-       * @extends pentaho.visual.role.BaseProperty
+       * @extends pentaho.visual.role.AbstractProperty
        *
        * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.Property>} pentaho/visual/role/property
        *
@@ -63,7 +63,7 @@ define([
        *
        * @description This class was not designed to be constructed directly.
        */
-      var VisualRoleProperty = BaseProperty.extend(/** @lends pentaho.visual.role.Property# */{
+      var Property = AbstractProperty.extend(/** @lends pentaho.visual.role.Property# */{
 
         $type: /** @lends pentaho.visual.role.Property.Type# */{
 
@@ -392,10 +392,9 @@ define([
           }
           // endregion
         }
-      })
-      .implement({$type: bundle.structured.property});
+      });
 
-      return VisualRoleProperty;
+      return Property;
     }
   ];
 });

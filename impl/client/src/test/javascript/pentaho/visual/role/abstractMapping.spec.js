@@ -22,7 +22,7 @@ define([
 
   /* globals describe, it, beforeEach, afterEach, beforeAll, spyOn */
 
-  describe("pentaho.visual.role.BaseMapping", function() {
+  describe("pentaho.visual.role.AbstractMapping", function() {
 
     var context;
     var Mapping;
@@ -52,7 +52,7 @@ define([
 
             return context.getDependencyApplyAsync([
               "pentaho/visual/base/abstractModel",
-              "pentaho/visual/role/baseMapping"
+              "pentaho/visual/role/abstractMapping"
             ], function(_AbstractModel, _Mapping) {
               Model = _AbstractModel.extend();
               Mapping = _Mapping;
@@ -96,7 +96,7 @@ define([
         var Derived = Model.extend({
           $type: {
             props: [
-              {name: "foo", base: "pentaho/visual/role/baseProperty"}
+              {name: "foo", base: "pentaho/visual/role/abstractProperty"}
             ]
           }
         });
@@ -125,7 +125,7 @@ define([
             props: [
               {
                 name: "propRole",
-                base: "pentaho/visual/role/baseProperty",
+                base: "pentaho/visual/role/abstractProperty",
                 modes: ["list"]
               }
             ]
@@ -149,7 +149,7 @@ define([
             props: [
               {
                 name: "propRole",
-                base: "pentaho/visual/role/baseProperty",
+                base: "pentaho/visual/role/abstractProperty",
                 modes: ["list"]
               }
             ]

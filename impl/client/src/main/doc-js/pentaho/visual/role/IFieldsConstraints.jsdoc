@@ -15,17 +15,17 @@
  */
 
 /**
- * Exposes members related to the [fields]{@link pentaho.visual.role.BaseMapping#fields}
+ * Exposes members related to the [fields]{@link pentaho.visual.role.AbstractMapping#fields}
  * of visual roles' mappings.
  *
  * @name IFieldsConstraints
  * @memberOf pentaho.visual.role
  * @interface
- * @see pentaho.visual.role.BaseMapping#fields
+ * @see pentaho.visual.role.AbstractMapping#fields
  */
 
 /**
- * Gets or sets a value that indicates if at least one [field]{@link pentaho.visual.role.BaseMapping#fields}
+ * Gets or sets a value that indicates if at least one [field]{@link pentaho.visual.role.AbstractMapping#fields}
  * must be mapped for the visual role to be valid.
  *
  * For more information on this property see
@@ -37,7 +37,7 @@
  */
 
 /**
- * Gets or sets the minimum number of [fields]{@link pentaho.visual.role.BaseMapping#fields}
+ * Gets or sets the minimum number of [fields]{@link pentaho.visual.role.AbstractMapping#fields}
  * that must be mapped for the visual role to be valid.
  *
  * For more information on this property see
@@ -49,7 +49,7 @@
  */
 
 /**
- * Gets or sets the maximum number of [fields]{@link pentaho.visual.role.BaseMapping#fields}
+ * Gets or sets the maximum number of [fields]{@link pentaho.visual.role.AbstractMapping#fields}
  * that can be mapped for the visual role to be valid.
  *
  * For more information on this property see

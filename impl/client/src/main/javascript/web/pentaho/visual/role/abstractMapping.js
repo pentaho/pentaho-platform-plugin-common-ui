@@ -28,32 +28,32 @@ define([
     function(Complex, MappingField) {
 
       /**
-       * @name pentaho.visual.role.BaseMapping.Type
+       * @name pentaho.visual.role.AbstractMapping.Type
        * @class
        * @extends pentaho.type.Complex.Type
        *
-       * @classDesc The type class of {@link pentaho.visual.role.BaseMapping}.
+       * @classDesc The type class of {@link pentaho.visual.role.AbstractMapping}.
        */
 
       /**
-       * @name pentaho.visual.role.BaseMapping
+       * @name pentaho.visual.role.AbstractMapping
        * @class
        * @extends pentaho.type.Complex
        * @abstract
        *
-       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.BaseMapping>} pentaho/visual/role/baseMapping
+       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.AbstractMapping>} pentaho/visual/role/abstractMapping
        *
-       * @classDesc The `BaseMapping` class is the base class for associations between
+       * @classDesc The `AbstractMapping` class is the base class for associations between
        * a visual role and data fields of a visualization's current data set.
        *
-       * A mapping contains a list of [fields]{@link pentaho.visual.role.BaseMapping#fields},
+       * A mapping contains a list of [fields]{@link pentaho.visual.role.AbstractMapping#fields},
        * each of the type [MappingField]{@link pentaho.visual.role.MappingField}.
        *
        * @description Creates a visual role mapping instance.
        * @constructor
-       * @param {pentaho.visual.role.spec.IBaseMapping} [spec] A visual role mapping specification.
+       * @param {pentaho.visual.role.spec.IAbstractMapping} [spec] A visual role mapping specification.
        */
-      var Mapping = Complex.extend(/** @lends pentaho.visual.role.BaseMapping# */{
+      var AbstractMapping = Complex.extend(/** @lends pentaho.visual.role.AbstractMapping# */{
 
         /**
          * Gets a value that indicates if the mapping has any fields.
@@ -90,7 +90,7 @@ define([
         /**
          * Gets the reference corresponding to the containing abstract model and visual role property, if any.
          *
-         * @type {?({container: pentaho.visual.base.AbstractModel, property: pentaho.visual.role.BaseProperty})}
+         * @type {?({container: pentaho.visual.base.AbstractModel, property: pentaho.visual.role.AbstractProperty})}
          * @readOnly
          * @protected
          */
@@ -139,21 +139,21 @@ define([
           return fieldIndexes;
         },
 
-        $type: /** @lends pentaho.visual.role.BaseMapping.Type# */{
+        $type: /** @lends pentaho.visual.role.AbstractMapping.Type# */{
           props: [
             /**
              * Gets or sets the fields of the visual role mapping.
              *
-             * @name pentaho.visual.role.BaseMapping#fields
+             * @name pentaho.visual.role.AbstractMapping#fields
              * @type {pentaho.type.List<pentaho.visual.role.MappingField>}
              */
             {name: "fields", valueType: [MappingField]}
           ]
         }
       })
-      .implement({$type: bundle.structured.baseMapping});
+      .implement({$type: bundle.structured.abstractMapping});
 
-      return Mapping;
+      return AbstractMapping;
     }
   ];
 });

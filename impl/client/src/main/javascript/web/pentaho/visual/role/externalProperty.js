@@ -22,7 +22,7 @@ define([
   "pentaho/util/error",
 
   // so that r.js sees otherwise invisible dependencies.
-  "./baseProperty",
+  "./abstractProperty",
   "./externalMapping",
   "./strategy/base"
 ], function(bundle, ValidationError, DataView, typeUtil, O, error) {
@@ -30,12 +30,12 @@ define([
   "use strict";
 
   return [
-    "./baseProperty",
+    "./abstractProperty",
     "./externalMapping",
     "./strategy/base",
     {$instance: {type: ["pentaho/visual/role/strategy/base"]}},
 
-    function(BaseProperty, ExternalMapping, BaseStrategy, allStrategiesList) {
+    function(AbstractProperty, ExternalMapping, BaseStrategy, allStrategiesList) {
 
       var allStrategies = allStrategiesList.toArray();
 
@@ -44,7 +44,7 @@ define([
       /**
        * @name pentaho.visual.role.ExternalProperty.Type
        * @class
-       * @extends pentaho.visual.role.BaseProperty.Type
+       * @extends pentaho.visual.role.AbstractProperty.Type
        *
        * @classDesc The type class of {@link pentaho.visual.role.ExternalProperty}.
        */
@@ -52,7 +52,7 @@ define([
       /**
        * @name pentaho.visual.role.ExternalProperty
        * @class
-       * @extends pentaho.visual.role.BaseProperty
+       * @extends pentaho.visual.role.AbstractProperty
        *
        * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.ExternalProperty>} pentaho/visual/role/externalProperty
        *
@@ -63,7 +63,7 @@ define([
        *
        * @description This class was not designed to be constructed directly.
        */
-      var ExternalProperty = BaseProperty.extend(/** @lends pentaho.visual.role.ExternalProperty# */{
+      var ExternalProperty = AbstractProperty.extend(/** @lends pentaho.visual.role.ExternalProperty# */{
 
         $type: /** @lends pentaho.visual.role.ExternalProperty.Type# */{
 

@@ -18,7 +18,7 @@ define([
   "pentaho/type/changes/ComplexChangeset",
   "pentaho/i18n!model",
   // so that r.js sees otherwise invisible dependencies.
-  "../role/baseProperty",
+  "../role/abstractProperty",
   "../color/paletteProperty",
   "./application",
   "pentaho/data/filter/abstract"
@@ -84,7 +84,7 @@ define([
 
   return [
     "complex",
-    "../role/baseProperty",
+    "../role/abstractProperty",
     "../color/paletteProperty",
     "./application",
     "pentaho/data/filter/abstract",
@@ -93,9 +93,9 @@ define([
     // Pre-load all registered filter types.
     {$types: {base: "pentaho/data/filter/abstract"}},
 
-    function(Complex, RoleBaseProperty, PaletteProperty, VisualApplication, AbstractFilter, PentahoObject) {
+    function(Complex, RoleAbstractProperty, PaletteProperty, VisualApplication, AbstractFilter, PentahoObject) {
 
-      var _roleBasePropertyType = RoleBaseProperty.type;
+      var _roleAbstractPropertyType = RoleAbstractProperty.type;
       var _palettePropertyType = PaletteProperty.type;
 
       /**
@@ -245,7 +245,7 @@ define([
            * Calls a function for each defined visual role property type.
            *
            * A visual role property type is a property type which is a subtype of
-           * {@link pentaho.visual.role.BaseProperty}.
+           * {@link pentaho.visual.role.AbstractProperty}.
            *
            * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} f - The mapping
            * function. Return `false` to break iteration.
@@ -266,13 +266,13 @@ define([
 
           /**
            * Gets a value that indicates if a given property type is a subtype of
-           * {@link pentaho.visual.role.BaseProperty.Type}.
+           * {@link pentaho.visual.role.AbstractProperty.Type}.
            *
            * @param {!pentaho.type.Property.Type} propType - The property type to test.
            * @return {boolean} `true` if `type` is a visual role property type; or `false`, otherwise.
            */
           isVisualRole: function(propType) {
-            return propType.isSubtypeOf(_roleBasePropertyType);
+            return propType.isSubtypeOf(_roleAbstractPropertyType);
           },
 
           /**

@@ -28,7 +28,7 @@
  * @interface
  * @extends pentaho.type.spec.IComplex
  *
- * @see pentaho.visual.role.spec.IBaseMapping
+ * @see pentaho.visual.role.spec.IAbstractMapping
  * @see pentaho.visual.role.spec.UMappingField
  */
 

@@ -16,14 +16,14 @@
 
 /**
  * The `spec.IMapping` interface describes the _object_ form of a
- * [visual role mapping]{@link pentaho.visual.role.BaseMapping} instance.
+ * [visual role mapping]{@link pentaho.visual.role.AbstractMapping} instance.
  *
  * @example
  * {
  *   fields: ["family", "product"]
  * }
  *
- * @name pentaho.visual.role.spec.IBaseMapping
+ * @name pentaho.visual.role.spec.IAbstractMapping
  *
  * @interface
  * @extends pentaho.type.spec.IComplex
@@ -34,7 +34,7 @@
 /**
  * The fields of the visual role mapping.
  *
- * @name pentaho.visual.role.spec.IBaseMapping#fields
+ * @name pentaho.visual.role.spec.IAbstractMapping#fields
  * @type {Array.<pentaho.visual.role.spec.UMappingField>}
- * @see pentaho.visual.role.BaseMapping#fields
+ * @see pentaho.visual.role.AbstractMapping#fields
  */

@@ -18,21 +18,21 @@ define([
   "pentaho/type/util",
 
   // so that r.js sees otherwise invisible dependencies.
-  "./baseMapping"
+  "./abstractMapping"
 ], function(bundle, typeUtil) {
 
   "use strict";
 
   return [
-    "./baseMapping",
-    function(BaseMapping) {
+    "./abstractMapping",
+    function(AbstractMapping) {
 
       var context = this;
 
       /**
        * @name pentaho.visual.role.ExternalMapping.Type
        * @class
-       * @extends pentaho.visual.role.BaseMapping.Type
+       * @extends pentaho.visual.role.AbstractMapping.Type
        *
        * @classDesc The type class of {@link pentaho.visual.role.ExternalMapping}.
        */
@@ -40,7 +40,7 @@ define([
       /**
        * @name pentaho.visual.role.ExternalMapping
        * @class
-       * @extends pentaho.visual.role.BaseMapping
+       * @extends pentaho.visual.role.AbstractMapping
        *
        * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.ExternalMapping>} pentaho/visual/role/externalMapping
        *
@@ -48,14 +48,14 @@ define([
        * a specific visual role and the data fields of a visualization's current data set,
        * as seen by parties external to a visualization, such as a container.
        *
-       * It extends the base [Mapping]{@link pentaho.visual.role.BaseMapping} class to add
+       * It extends the base [Mapping]{@link pentaho.visual.role.AbstractMapping} class to add
        * the optional [isCategoricalFixed]{@link pentaho.visual.role.ExternalMapping#isCategoricalFixed} property.
        *
        * @description Creates a visual role external mapping instance.
        * @constructor
        * @param {pentaho.visual.role.spec.IExternalMapping} [spec] An external mapping specification.
        */
-      var ExternalMapping = BaseMapping.extend(/** @lends pentaho.visual.role.ExternalMapping# */{
+      var ExternalMapping = AbstractMapping.extend(/** @lends pentaho.visual.role.ExternalMapping# */{
 
         constructor: function(spec) {
 
@@ -135,10 +135,10 @@ define([
              * Gets or sets a value that indicates that only categorical modes of operation should be considered.
              *
              * This option only takes effect if the visual role
-             * has any continuous [modes]{@link pentaho.visual.role.BaseProperty.Type#modes}.
+             * has any continuous [modes]{@link pentaho.visual.role.AbstractProperty.Type#modes}.
              *
              * When the value is `true`,
-             * only the categorical modes of [modes]{@link pentaho.visual.role.BaseProperty.Type#modes} are considered.
+             * only the categorical modes of [modes]{@link pentaho.visual.role.AbstractProperty.Type#modes} are considered.
              *
              * @name pentaho.visual.role.ExternalMapping#isCategoricalFixed
              * @type {boolean}

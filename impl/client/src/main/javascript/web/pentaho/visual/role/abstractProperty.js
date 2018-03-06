@@ -22,48 +22,48 @@ define([
   "pentaho/util/object",
 
   // so that r.js sees otherwise invisible dependencies.
-  "./baseMapping"
+  "./abstractMapping"
 ], function(bundle, bundleTypes, ValidationError, DataView, typeUtil, O) {
 
   "use strict";
 
   return [
     "property",
-    "./baseMapping",
-    function(Property, BaseMapping) {
+    "./abstractMapping",
+    function(Property, AbstractMapping) {
 
       var context = this;
 
       /**
-       * @name pentaho.visual.role.BaseProperty.Type
+       * @name pentaho.visual.role.AbstractProperty.Type
        * @class
        * @extends pentaho.type.Property.Type
        * @abstract
        *
-       * @classDesc The type class of {@link pentaho.visual.role.BaseProperty}.
+       * @classDesc The type class of {@link pentaho.visual.role.AbstractProperty}.
        */
 
       /**
-       * @name pentaho.visual.role.BaseProperty
+       * @name pentaho.visual.role.AbstractProperty
        * @class
        * @extends pentaho.type.Property
        *
-       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.BaseProperty>} pentaho/visual/role/baseProperty
+       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.AbstractProperty>} pentaho/visual/role/abstractProperty
        *
-       * @classDesc The `BaseProperty` class is the base class of properties that represent a visual role of a
+       * @classDesc The `AbstractProperty` class is the base class of properties that represent a visual role of a
        * visualization and defines its capabilities.
        *
        * The [valueType]{@link pentaho.type.Property.Type#valueType} of a property of this type is
-       * [Mapping]{@link pentaho.visual.role.BaseMapping} and
+       * [Mapping]{@link pentaho.visual.role.AbstractMapping} and
        * stores the association between the visual role and the data fields of a visualization's current data set.
        *
        * @description This class was not designed to be constructed directly.
        */
-      var BaseProperty = Property.extend(/** @lends pentaho.visual.role.BaseProperty# */{
+      var AbstractProperty = Property.extend(/** @lends pentaho.visual.role.AbstractProperty# */{
 
-        $type: /** @lends pentaho.visual.role.BaseProperty.Type# */{
+        $type: /** @lends pentaho.visual.role.AbstractProperty.Type# */{
 
-          valueType: BaseMapping,
+          valueType: AbstractMapping,
 
           // Create a new Mapping each time.
           defaultValue: function() { return {}; },
@@ -80,7 +80,7 @@ define([
            *
            * The returned list or its elements should not be modified.
            *
-           * @name pentaho.visual.role.BaseProperty.Type#modes
+           * @name pentaho.visual.role.AbstractProperty.Type#modes
            * @type {!pentaho.type.List.<pentaho.visual.role.Mode>}
            * @readOnly
            * @abstract
@@ -111,9 +111,9 @@ define([
            *
            * @type {boolean}
            * @readOnly
-           * @see pentaho.visual.role.BaseProperty.Type#hasAnyContinuousModes
+           * @see pentaho.visual.role.AbstractProperty.Type#hasAnyContinuousModes
            * @see pentaho.visual.role.Mode#isContinuous
-           * @see pentaho.visual.role.BaseProperty.Type#modes
+           * @see pentaho.visual.role.AbstractProperty.Type#modes
            */
           get hasAnyCategoricalModes() {
             var any = false;
@@ -131,9 +131,9 @@ define([
            *
            * @type {boolean}
            * @readOnly
-           * @see pentaho.visual.role.BaseProperty.Type#hasAnyCategoricalModes
+           * @see pentaho.visual.role.AbstractProperty.Type#hasAnyCategoricalModes
            * @see pentaho.visual.role.Mode#isContinuous
-           * @see pentaho.visual.role.BaseProperty.Type#modes
+           * @see pentaho.visual.role.AbstractProperty.Type#modes
            */
           get hasAnyContinuousModes() {
             var any = false;
@@ -157,11 +157,11 @@ define([
            *
            * @return {boolean} `true` if a mode having the specified properties exists; `false` otherwise.
            *
-           * @see pentaho.visual.role.BaseProperty.Type#hasAnyContinuousModes
-           * @see pentaho.visual.role.BaseProperty.Type#hasAnyCategoricalModes
-           * @see pentaho.visual.role.BaseProperty.Type#hasAnyListModes
+           * @see pentaho.visual.role.AbstractProperty.Type#hasAnyContinuousModes
+           * @see pentaho.visual.role.AbstractProperty.Type#hasAnyCategoricalModes
+           * @see pentaho.visual.role.AbstractProperty.Type#hasAnyListModes
            *
-           * @see pentaho.visual.role.BaseProperty.Type#modes
+           * @see pentaho.visual.role.AbstractProperty.Type#modes
            * @see pentaho.visual.role.Mode#isContinuous
            * @see pentaho.type.Type#isList
            * @see pentaho.visual.role.Mode#dataType
@@ -206,7 +206,7 @@ define([
            * When a visual model has no key visual roles,
            * then it is assumed that one visual element is rendered per input row of data.
            *
-           * @name pentaho.visual.role.BaseProperty.Type#isVisualKey
+           * @name pentaho.visual.role.AbstractProperty.Type#isVisualKey
            * @type {boolean}
            * @readOnly
            * @abstract
@@ -339,13 +339,13 @@ define([
            *
            * 1. If the abstract model has a `null` [data]{@link pentaho.visual.base.AbstractModel#data},
            *    then every field in the current mapping's
-           *    [fields]{@link pentaho.visual.role.BaseMapping#fields} is considered undefined and invalid
+           *    [fields]{@link pentaho.visual.role.AbstractMapping#fields} is considered undefined and invalid
            * 2. Otherwise, if the model has a non-`null` [data]{@link pentaho.visual.base.AbstractModel#data},
            *    then each field in the current mapping's
-           *    [fields]{@link pentaho.visual.role.BaseMapping#fields} must be defined in `data`
-           * 3. The number of currently mapped [fields]{@link pentaho.visual.role.BaseMapping#fields} must satisfy
+           *    [fields]{@link pentaho.visual.role.AbstractMapping#fields} must be defined in `data`
+           * 3. The number of currently mapped [fields]{@link pentaho.visual.role.AbstractMapping#fields} must satisfy
            *    the usual property cardinality constraints,
-           *    according to [BaseProperty.Type#fields]{@link pentaho.visual.role.BaseProperty.Type#fields}
+           *    according to [AbstractProperty.Type#fields]{@link pentaho.visual.role.AbstractProperty.Type#fields}
            * 4. There can be no two mapping fields with the same
            *    [name]{@link pentaho.visual.role.MappingField#name}
            *
@@ -407,7 +407,7 @@ define([
            * Assumes the mapping is valid according to the base complex validation.
            *
            * @param {!pentaho.visual.base.AbstractModel} model - The abstract model.
-           * @param {!pentaho.visual.role.BaseMapping} mapping - The mapping.
+           * @param {!pentaho.visual.role.AbstractMapping} mapping - The mapping.
            * @param {function} addErrors - Called to add errors.
            * @private
            */
@@ -441,7 +441,7 @@ define([
            * Validates that the mapping fields have no duplicates.
            *
            * @param {!pentaho.visual.base.AbstractModel} model - The abstract model.
-           * @param {!pentaho.visual.role.BaseMapping} mapping - The mapping.
+           * @param {!pentaho.visual.role.AbstractMapping} mapping - The mapping.
            * @param {function} addErrors - Called to add errors.
            * @private
            */
@@ -472,9 +472,9 @@ define([
           // endregion
         }
       })
-      .implement({$type: bundle.structured.property});
+      .implement({$type: bundle.structured.abstractProperty});
 
-      return BaseProperty;
+      return AbstractProperty;
     }
   ];
 
