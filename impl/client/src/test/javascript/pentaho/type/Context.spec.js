@@ -378,8 +378,6 @@ define([
               "pentaho/type/function",
               "pentaho/type/typeDescriptor",
               "pentaho/type/property",
-              "pentaho/type/model",
-              "pentaho/type/application",
               "pentaho/type/mixins/enum"
             ].forEach(function(id) {
               expect(!!context.get(id)).toBe(true);
@@ -425,8 +423,6 @@ define([
             "function": "pentaho/type/function",
             "type": "pentaho/type/typeDescriptor",
             "property": "pentaho/type/property",
-            "model": "pentaho/type/model",
-            "application": "pentaho/type/application",
             "enum": "pentaho/type/mixins/enum"
           };
 

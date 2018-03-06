@@ -110,6 +110,14 @@ define([
       .then(done, done.fail);
     });
 
+    describe("#application", function() {
+
+      it("should have a default application of null", function() {
+        var model = new Model();
+        expect(model.application).toBe(null);
+      });
+    });
+
     describe("#selectionFilter", function() {
 
       it("should have a default selectionFilter", function() {
@@ -199,6 +207,23 @@ define([
         expect("selectionFilter" in json).toBe(false);
       });
 
+      it("should not serialize the `application` property by default", function() {
+        var model = new Model({application: {}});
+        expect(model.application != null).toBe(true);
+
+        var result = model.toSpec({isJson: true});
+        expect("application" in result).toBe(false);
+      });
+
+      it("should serialize the `application` property if keyArgs.omitProps.application = false", function() {
+        var model = new Model({application: {}});
+        expect(model.application != null).toBe(true);
+
+        var result = model.toSpec({isJson: true, omitProps: {application: false}});
+        expect(result.application != null).toBe(true);
+        expect(typeof result.application).toBe("object");
+      });
+
       it("should serialize the `selectionFilter` property if keyArgs.omitProps.selectionFilter = false", function() {
         var model = new Model({
           selectionFilter: {_: "pentaho/data/filter/and"}
@@ -241,6 +266,15 @@ define([
 
         expect(json instanceof Object).toBe(true);
         expect("selectionFilter" in json).toBe(true);
+      });
+
+      it("should serialize the `application` property", function() {
+        var model = new Model({application: {}});
+        expect(model.application != null).toBe(true);
+
+        var result = model.toSpec();
+        expect(result.application != null).toBe(true);
+        expect(typeof result.application).toBe("object");
       });
     });
 

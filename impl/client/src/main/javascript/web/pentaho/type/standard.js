@@ -30,8 +30,6 @@ define([
   "./function",
   "./typeDescriptor",
   "./property",
-  "./model",
-  "./application",
   "./mixins/enum",
   "./mixins/discreteDomain"
 ], function() {

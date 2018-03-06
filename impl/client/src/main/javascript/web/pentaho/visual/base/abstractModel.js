@@ -18,7 +18,6 @@ define([
   "pentaho/type/changes/ComplexChangeset",
   "pentaho/i18n!model",
   // so that r.js sees otherwise invisible dependencies.
-  "pentaho/type/model",
   "../role/baseProperty",
   "../color/paletteProperty",
   "./application",
@@ -84,7 +83,7 @@ define([
   });
 
   return [
-    "pentaho/type/model",
+    "complex",
     "../role/baseProperty",
     "../color/paletteProperty",
     "./application",
@@ -94,7 +93,7 @@ define([
     // Pre-load all registered filter types.
     {$types: {base: "pentaho/data/filter/abstract"}},
 
-    function(Model, RoleBaseProperty, PaletteProperty, VisualApplication, AbstractFilter, PentahoObject) {
+    function(Complex, RoleBaseProperty, PaletteProperty, VisualApplication, AbstractFilter, PentahoObject) {
 
       var _roleBasePropertyType = RoleBaseProperty.type;
       var _palettePropertyType = PaletteProperty.type;
@@ -102,7 +101,7 @@ define([
       /**
        * @name pentaho.visual.base.AbstractModel.Type
        * @class
-       * @extends pentaho.type.Model.Type
+       * @extends pentaho.type.Complex.Type
        *
        * @classDesc The base class of visual model types.
        *
@@ -113,7 +112,7 @@ define([
        * @name AbstractModel
        * @memberOf pentaho.visual.base
        * @class
-       * @extends pentaho.type.Model
+       * @extends pentaho.type.Complex
        * @abstract
        *
        * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.base.AbstractModel>} pentaho/visual/base/abstractModel
@@ -125,7 +124,7 @@ define([
        * @param {pentaho.visual.base.spec.IAbstractModel} [modelSpec] A plain object containing the abstract model
        * specification.
        */
-      var VisualModel = Model.extend(/** @lends pentaho.visual.base.AbstractModel# */{
+      var AbstractModel = Complex.extend(/** @lends pentaho.visual.base.AbstractModel# */{
 
         /** @inheritDoc */
         _createChangeset: function(txn) {
@@ -147,6 +146,8 @@ define([
             if(omitProps.data == null) omitProps.data = true;
 
             if(omitProps.selectionFilter == null) omitProps.selectionFilter = true;
+
+            if(omitProps.application == null) omitProps.application = true;
           }
 
           return this.base(keyArgs);
@@ -288,7 +289,7 @@ define([
       })
       .implement({$type: bundle.structured.abstractModel});
 
-      return VisualModel;
+      return AbstractModel;
     }
   ];
 });

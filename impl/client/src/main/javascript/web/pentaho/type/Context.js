@@ -73,8 +73,6 @@ define([
     "function",
     "typeDescriptor",
     "property",
-    "model",
-    "application",
     "mixins/enum"
   ].map(function(id) { return "pentaho/type/" + id; }));
 
@@ -503,8 +501,6 @@ define([
      *     * [pentaho/type/list]{@link pentaho.type.List}
      *     * [pentaho/type/element]{@link pentaho.type.Element}
      *       * [pentaho/type/complex]{@link pentaho.type.Complex}
-     *         * [pentaho/type/application]{@link pentaho.type.Application}
-     *         * [pentaho/type/model]{@link pentaho.type.Model}
      *       * [pentaho/type/simple]{@link pentaho.type.Simple}
      *         * [pentaho/type/string]{@link pentaho.type.String}
      *         * [pentaho/type/number]{@link pentaho.type.Number}
