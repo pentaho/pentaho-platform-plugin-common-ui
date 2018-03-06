@@ -15,6 +15,7 @@
  */
 define([
   "pentaho/i18n!messages",
+  "pentaho/i18n!/pentaho/type/i18n/types",
   "pentaho/type/util",
   "pentaho/type/ValidationError",
   "pentaho/util/object",
@@ -24,7 +25,7 @@ define([
   "./abstractProperty",
   "./mapping",
   "./mode"
-], function(bundle, typeUtil, ValidationError, O, error) {
+], function(bundle, bundleTypes, typeUtil, ValidationError, O, error) {
 
   "use strict";
 
@@ -71,13 +72,6 @@ define([
 
           // Setting the value type resets the inherited defaultValue.
           defaultValue: function() { return {}; },
-
-          // It's limited to 1 if it has no list modes.
-          __fieldsCountMax: function(propType) {
-            var mapping = this.get(propType);
-            var mode = mapping.mode;
-            return (mode !== null ? mode.dataType.isList : propType.hasAnyListModes) ? Infinity : 1;
-          },
 
           /** @inheritDoc */
           _init: function(spec, keyArgs) {
@@ -318,6 +312,145 @@ define([
 
           // endregion
 
+          // region fields
+          /**
+           * Gets or updates the metadata about the fields property of mappings of this visual role property.
+           *
+           * @type {!pentaho.visual.role.IFieldsConstraints}
+           * @override
+           */
+          get fields() {
+            var fields = O.getOwn(this, "__fields");
+            if(!fields) {
+
+              var propType = this;
+
+              this.__fields = fields = Object.freeze({
+                get isRequired() {
+                  return propType.__fieldsIsRequired;
+                },
+                set isRequired(value) {
+                  propType.__fieldsIsRequired = value;
+                },
+                get countMin() {
+                  return propType.__fieldsCountMin;
+                },
+                set countMin(value) {
+                  propType.__fieldsCountMin = value;
+                },
+                get countMax() {
+                  return propType.__fieldsCountMax;
+                },
+                set countMax(value) {
+                  propType.__fieldsCountMax = value;
+                },
+                countRangeOn: function(model) {
+                  return propType.__fieldsCountRangeOn(model);
+                }
+              });
+            }
+            return fields;
+          },
+
+          set fields(fieldsSpec) {
+
+            if(fieldsSpec == null) return;
+
+            var fields = this.fields;
+
+            if("isRequired" in fieldsSpec) fields.isRequired = fieldsSpec.isRequired;
+            if("countMin" in fieldsSpec) fields.countMin = fieldsSpec.countMin;
+            if("countMax" in fieldsSpec) fields.countMax = fieldsSpec.countMax;
+          },
+
+          dynamicAttributes: {
+            // Exposed through IFieldsConstraints.isRequired
+            // Additionally defines __fieldsIsRequiredOn
+            __fieldsIsRequired: {
+              value: false,
+              cast: Boolean,
+              group: "fields",
+              localName: "isRequired",
+              combine: function(baseEval, localEval) {
+                return function(propType) {
+                  // localEval is skipped if base is true.
+                  return baseEval.call(this, propType) || localEval.call(this, propType);
+                };
+              }
+            },
+
+            // Exposed through IFieldsConstraints.countMin
+            // Additionally defines __fieldsCountMinOn
+            __fieldsCountMin: {
+              value: 0,
+              cast: __castCount,
+              group: "fields",
+              localName: "countMin",
+              combine: function(baseEval, localEval) {
+                return function(propType) {
+                  return Math.max(baseEval.call(this, propType), localEval.call(this, propType));
+                };
+              }
+            },
+
+            // Exposed through IFieldsConstraints.countMax
+            // Additionally defines __fieldsCountMaxOn
+            __fieldsCountMax: {
+              /*
+               * Overrides the method automatically defined by `dynamicAttributes`.
+               *
+               * Limits maximum count to 1 if it the current mode is not a list mode or,
+               * when there is no current mode,
+               * if the visual role property has no list modes.
+               *
+               * @type pentaho.type.spec.PropertyDynamicAttribute
+               */
+              value: function(propType) {
+
+                var mapping = this.get(propType);
+
+                // In unit-tests, these properties are used outside of a real model. So mapping can be null.
+                var mode = mapping && mapping.mode;
+                return (mode !== null ? mode.dataType.isList : propType.hasAnyListModes) ? Infinity : 1;
+              },
+              cast: __castCount,
+              group: "fields",
+              localName: "countMax",
+              combine: function(baseEval, localEval) {
+                return function(propType) {
+                  return Math.min(baseEval.call(this, propType), localEval.call(this, propType));
+                };
+              }
+            }
+          },
+
+          /**
+           * Actually implements IFieldsConstraints#countRangeOn.
+           *
+           * @param {pentaho.visual.base.AbstractModel} model - The model.
+           * @return {pentaho.IRange<number>} The field count range.
+           * @private
+           */
+          __fieldsCountRangeOn: function(model) {
+            // TODO: Shouldn't this also integrate the underlying `fields` property's own isRequired, countMin, countMax
+            // attributes? Can be a problem if anyone creates a subclass of property (outside of configuration)
+            // and changes the defaults.
+            var isRequired = this.__fieldsIsRequiredOn(model);
+            var countMin = this.__fieldsCountMinOn(model);
+            var countMax = this.__fieldsCountMaxOn(model);
+
+            if(isRequired && countMin < 1) {
+              countMin = 1;
+            }
+
+            if(countMax < countMin) {
+              countMax = countMin;
+            }
+
+            return {min: countMin, max: countMax};
+          },
+          // endregion
+
           // region Validation
 
           /**
@@ -327,9 +460,13 @@ define([
            *
            * Otherwise, validity is further determined as follows:
            *
-           * 1. When specified, the value of [modeFixed]{@link pentaho.visual.role.ExternalProperty.Type#modeFixed}
+           * 1. The number of currently mapped [fields]{@link pentaho.visual.role.Mapping#fields} must satisfy
+           *    the property cardinality constraints,
+           *    according to [Property.Type#fields]{@link pentaho.visual.role.Property.Type#fields}
+           *
+           * 2. When specified, the value of [modeFixed]{@link pentaho.visual.role.ExternalProperty.Type#modeFixed}
            *    must be one of the corresponding internal visual role's
-           *    [modes]{@link pentaho.visual.role.Property.Type#modes}.
+           *    [modes]{@link pentaho.visual.role.Property.Type#modes}
            *
            * @param {!pentaho.visual.base.Model} model - The visual model.
            *
@@ -345,20 +482,45 @@ define([
 
               var mapping = model.get(this);
 
-              // modeFixed must exist in modes, when specified.
-              var modeFixed = mapping.modeFixed;
-              if(modeFixed !== null) {
+              // Cardinality validation
+              var range = this.__fieldsCountRangeOn(model);
+              var count = mapping.fields.count;
+              if(count < range.min) {
+                addErrors(new ValidationError(
+                    bundleTypes.get("errors.property.countOutOfRange", [
+                      this.label + " " + mapping.$type.get("fields").label,
+                      count,
+                      range.min,
+                      range.max
+                    ])));
 
-                if(!this.modes.has(modeFixed.$key)) {
-                  addErrors(new ValidationError(
-                      bundle.format(bundle.structured.errors.property.modeFixedInvalid, {role: this})));
-                }
+              } else if(count > range.max) {
+                addErrors(new ValidationError(
+                    bundleTypes.get("errors.property.countOutOfRange", [
+                      this.label + " " + mapping.$type.get("fields").label,
+                      count,
+                      range.min,
+                      range.max
+                    ])));
               }
 
               if(!errors) {
-                if(mapping.mode == null) {
-                  addErrors(new ValidationError(
-                      bundle.format(bundle.structured.errors.property.noApplicableMode, {role: this})));
+
+                // modeFixed must exist in modes, when specified.
+                var modeFixed = mapping.modeFixed;
+                if(modeFixed !== null) {
+
+                  if(!this.modes.has(modeFixed.$key)) {
+                    addErrors(new ValidationError(
+                        bundle.format(bundle.structured.errors.property.modeFixedInvalid, {role: this})));
+                  }
+                }
+
+                if(!errors && count > 0) {
+                  if(mapping.mode == null) {
+                    addErrors(new ValidationError(
+                        bundle.format(bundle.structured.errors.property.noApplicableMode, {role: this})));
+                  }
                 }
               }
             }
@@ -380,7 +542,7 @@ define([
             }
 
             // Only serialize if not the default value.
-            var isVisualKey = O.getOwn(this, "__isVisualKey");
+            var isVisualKey = O.getOwn(this, "__isVisualKey", null);
             if(isVisualKey !== null) {
               if(!this.isRoot || isVisualKey !== this.hasAnyCategoricalModes) {
                 any = true;
@@ -397,4 +559,10 @@ define([
       return Property;
     }
   ];
+
+  function __castCount(v) {
+    v = +v;
+    if(isNaN(v) || v < 0) return; // undefined;
+    return Math.floor(v);
+  }
 });

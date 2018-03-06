@@ -60,17 +60,6 @@ define([
          *
          * @type {boolean}
          * @readonly
-         * @deprecated
-         */
-        get isMapped() {
-          return this.fields.count > 0;
-        },
-
-        /**
-         * Gets a value that indicates if the mapping has any fields.
-         *
-         * @type {boolean}
-         * @readonly
          */
         get hasFields() {
           return this.fields.count > 0;

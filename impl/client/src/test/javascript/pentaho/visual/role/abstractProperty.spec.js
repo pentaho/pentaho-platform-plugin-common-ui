@@ -17,9 +17,8 @@ define([
   "tests/pentaho/util/errorMatch",
   "pentaho/type/Context",
   "pentaho/type/ValidationError",
-  "pentaho/data/Table",
-  "tests/pentaho/type/propertyTypeUtil"
-], function(errorMatch, Context, ValidationError, Table, propertyTypeUtil) {
+  "pentaho/data/Table"
+], function(errorMatch, Context, ValidationError, Table) {
 
   "use strict";
 
@@ -94,82 +93,6 @@ define([
       }
       // endregion
 
-      describe("#fields", function() {
-
-        it("should get an object that conforms to the interface IFieldsConstraints", function() {
-
-          var Model = AbstractModel.extend({
-            $type: {
-              props: {
-                propRole: {
-                  base: "pentaho/visual/role/abstractProperty"
-                }
-              }
-            }
-          });
-
-          var rolePropType = Model.type.get("propRole");
-          var fields = rolePropType.fields;
-
-          expect(fields instanceof Object).toBe(true);
-          expect("isRequired" in fields).toBe(true);
-          expect("countMin" in fields).toBe(true);
-          expect("countMax" in fields).toBe(true);
-          expect("countRangeOn" in fields).toBe(true);
-        });
-
-        it("should get the same object each time", function() {
-
-          var Model = AbstractModel.extend({
-            $type: {
-              props: {
-                propRole: {
-                  base: "pentaho/visual/role/abstractProperty"
-                }
-              }
-            }
-          });
-
-          var rolePropType = Model.type.get("propRole");
-          var fields1 = rolePropType.fields;
-          var fields2 = rolePropType.fields;
-
-          expect(fields1).toBe(fields2);
-        });
-
-        it("should set only the specified properties", function() {
-
-          var fieldsSpec0 = {
-            isRequired: function() {},
-            countMin: function() {},
-            countMax: function() {}
-          };
-
-          var Model = AbstractModel.extend({
-            $type: {
-              props: {
-                propRole: {
-                  base: "pentaho/visual/role/abstractProperty",
-                  fields: fieldsSpec0
-                }
-              }
-            }
-          });
-
-          var fieldsSpec1 = {
-            isRequired: function() {}
-          };
-
-          var rolePropType = Model.type.get("propRole");
-
-          rolePropType.fields = fieldsSpec1;
-
-          expect(rolePropType.fields.isRequired).toBe(fieldsSpec1.isRequired);
-          expect(rolePropType.fields.countMin).toBe(fieldsSpec0.countMin);
-          expect(rolePropType.fields.countMax).toBe(fieldsSpec0.countMax);
-        });
-      });
-
       describe("#validateOn(model)", function() {
 
         doValidateTests(false);
@@ -221,170 +144,7 @@ define([
               expect(errors.length).toBe(1);
             });
 
-            it("should be invalid when fields.isRequired and there are no fields", function() {
-
-              var Model = AbstractModel.extend({
-                $type: {
-                  props: {
-                    propRole: {
-                      base: "pentaho/visual/role/abstractProperty",
-                      fields: {
-                        isRequired: true
-                      }
-                    }
-                  }
-                }
-              });
-
-              var rolePropType = Model.type.get("propRole");
-
-              var model = new Model({
-                data: new Table(getDataSpec1())
-              });
-
-              var errors = rolePropType.validateOn(model);
-              expect(errors).toEqual([
-                jasmine.any(ValidationError)
-              ]);
-            });
-
-            it("should be valid when fields.isRequired and there are fields", function() {
-
-              var Model = AbstractModel.extend({
-                $type: {
-                  props: {
-                    propRole: {
-                      base: "pentaho/visual/role/abstractProperty",
-                      fields: {
-                        isRequired: true
-                      }
-                    }
-                  }
-                }
-              });
-
-              var rolePropType = Model.type.get("propRole");
-
-              var model = new Model({
-                data: new Table(getDataSpec1()),
-                propRole: {fields: ["country"]}
-              });
-
-              var errors = rolePropType.validateOn(model);
-
-              expect(errors).toBe(null);
-            });
-
-            it("should be invalid when fields.countMin = 2 and there are no fields", function() {
-
-              var Model = AbstractModel.extend({
-                $type: {
-                  props: {
-                    propRole: {
-                      base: "pentaho/visual/role/abstractProperty",
-                      fields: {
-                        countMin: 2
-                      }
-                    }
-                  }
-                }
-              });
-
-              var rolePropType = Model.type.get("propRole");
-
-              var model = new Model({
-                data: new Table(getDataSpec1())
-              });
-
-              var errors = rolePropType.validateOn(model);
-              expect(errors).toEqual([
-                jasmine.any(ValidationError)
-              ]);
-            });
-
-            it("should be valid when fields.countMin = 2 and there are 2 fields", function() {
-
-              var Model = AbstractModel.extend({
-                $type: {
-                  props: {
-                    propRole: {
-                      base: "pentaho/visual/role/abstractProperty",
-                      fields: {
-                        countMin: 2
-                      }
-                    }
-                  }
-                }
-              });
-
-              var rolePropType = Model.type.get("propRole");
-
-              var model = new Model({
-                data: new Table(getDataSpec1()),
-                propRole: {fields: ["country", "product"]}
-              });
-
-              var errors = rolePropType.validateOn(model);
-
-              expect(errors).toBe(null);
-            });
-
-            it("should be invalid when fields.countMax = 1 and there are 2 fields", function() {
-
-              var Model = AbstractModel.extend({
-                $type: {
-                  props: {
-                    propRole: {
-                      base: "pentaho/visual/role/abstractProperty",
-                      fields: {
-                        countMax: 1
-                      }
-                    }
-                  }
-                }
-              });
-
-              var rolePropType = Model.type.get("propRole");
-
-              var model = new Model({
-                data: new Table(getDataSpec1()),
-                propRole: {fields: ["country", "product"]}
-              });
-
-              var errors = rolePropType.validateOn(model);
-              expect(errors).toEqual([
-                jasmine.any(ValidationError)
-              ]);
-            });
-
-            it("should be valid when fields.countMax = 1 and there are 1 fields", function() {
-
-              var Model = AbstractModel.extend({
-                $type: {
-                  props: {
-                    propRole: {
-                      base: "pentaho/visual/role/abstractProperty",
-                      fields: {
-                        countMax: 1
-                      }
-                    }
-                  }
-                }
-              });
-
-              var rolePropType = Model.type.get("propRole");
-
-              var model = new Model({
-                data: new Table(getDataSpec1()),
-                propRole: {fields: ["country"]}
-              });
-
-              var errors = rolePropType.validateOn(model);
-
-              expect(errors).toBe(null);
-            });
-
-            it("should be invalid, when the model has no data", function() {
+            it("should be invalid, when there are fields and the model has no data", function() {
 
               var model = createFullValidQualitativeMapping();
 
@@ -402,30 +162,6 @@ define([
             });
           });
         }
-      });
-
-      describe("#_fillSpecInContext(spec, keyArgs)", function() {
-
-        describe("#fields", function() {
-
-          describe("countMin", function() {
-
-            propertyTypeUtil.itDynamicAttribute("countMin", 1, "pentaho/visual/role/abstractProperty", "fields");
-
-          });
-
-          describe("countMax", function() {
-
-            propertyTypeUtil.itDynamicAttribute("countMax", 2, "pentaho/visual/role/abstractProperty", "fields");
-
-          });
-
-          describe("isRequired", function() {
-
-            propertyTypeUtil.itDynamicAttribute("isRequired", true, "pentaho/visual/role/abstractProperty", "fields");
-
-          });
-        });
       });
     });
   });

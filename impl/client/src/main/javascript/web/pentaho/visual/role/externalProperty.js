@@ -125,6 +125,55 @@ define([
             return this._internalProperty.isVisualKey;
           },
 
+          // region fields
+          /**
+           * Gets the metadata about the fields property of mappings of this visual role property.
+           *
+           * @type {!pentaho.visual.role.IFieldsMetadata}
+           * @readOnly
+           * @override
+           */
+          get fields() {
+            var fields = O.getOwn(this, "__fields");
+            if(!fields) {
+
+              var propType = this;
+
+              this.__fields = fields = Object.freeze({
+                countRangeOn: function(model) {
+                  return propType.__fieldsCountRangeOn(model);
+                }
+              });
+            }
+
+            return fields;
+          },
+
+          // TODO: Implement __fieldsCountRangeOn on the external property.
+          // This is informative only and will be derived from:
+          // * isRequired: the internal property's countRange
+          // * isList/countMax = {1, Infinity}
+          //   * if there is a current strategy
+          //      * derive from its mode's data type
+          //
+          //   * otherwise
+          //      * derived from all modes' data types
+          /*
+           * Implements IFieldsMetadata#countRangeOn.
+           */
+          __fieldsCountRangeOn: function(modelAdapter) {
+            var isRequired = this.__fieldsIsRequiredOn(modelAdapter);
+            var countMin = this.__fieldsCountMinOn(modelAdapter);
+            var countMax = this.__fieldsCountMaxOn(modelAdapter);
+
+            if(isRequired && countMin < 1) countMin = 1;
+
+            if(countMax < countMin) countMax = countMin;
+
+            return {min: countMin, max: countMax};
+          },
+          // endregion
+
           // region strategies
           __strategies: null,
           __isStrategiesDefault: true,

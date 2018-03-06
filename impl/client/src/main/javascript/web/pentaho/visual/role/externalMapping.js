@@ -138,7 +138,8 @@ define([
              * has any continuous [modes]{@link pentaho.visual.role.AbstractProperty.Type#modes}.
              *
              * When the value is `true`,
-             * only the categorical modes of [modes]{@link pentaho.visual.role.AbstractProperty.Type#modes} are considered.
+             * only the categorical modes of [modes]{@link pentaho.visual.role.AbstractProperty.Type#modes}
+             * are considered.
              *
              * @name pentaho.visual.role.ExternalMapping#isCategoricalFixed
              * @type {boolean}

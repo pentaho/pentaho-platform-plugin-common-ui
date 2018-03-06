@@ -1333,7 +1333,7 @@ define([
                         $type: {
                           dynamicAttributes: {
                             isFoo: {
-                              defaultValue: false,
+                              value: false,
                               // cast: null. // <<---- no cast function
                               combine: function(baseEval, localEval) {
                                 return function() {

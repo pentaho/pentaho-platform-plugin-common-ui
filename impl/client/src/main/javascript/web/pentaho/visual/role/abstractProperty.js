@@ -15,7 +15,6 @@
  */
 define([
   "pentaho/i18n!messages",
-  "pentaho/i18n!/pentaho/type/i18n/types",
   "pentaho/type/ValidationError",
   "pentaho/data/TableView",
   "pentaho/type/util",
@@ -23,7 +22,7 @@ define([
 
   // so that r.js sees otherwise invisible dependencies.
   "./abstractMapping"
-], function(bundle, bundleTypes, ValidationError, DataView, typeUtil, O) {
+], function(bundle, ValidationError, DataView, typeUtil, O) {
 
   "use strict";
 
@@ -196,7 +195,6 @@ define([
           },
           // endregion
 
-          // region isVisualKey
           /**
            * Gets a value that indicates if the visual role is a key property of the visual space.
            *
@@ -211,122 +209,15 @@ define([
            * @readOnly
            * @abstract
            */
-          // endregion
-
-          dynamicAttributes: {
-            // Exposed through IFieldsConstraints.isRequired
-            // Additionally defines __fieldsIsRequiredOn
-            __fieldsIsRequired: {
-              value: false,
-              cast: Boolean,
-              group: "fields",
-              localName: "isRequired",
-              combine: function(baseEval, localEval) {
-                return function(propType) {
-                  // localEval is skipped if base is true.
-                  return baseEval.call(this, propType) || localEval.call(this, propType);
-                };
-              }
-            },
-
-            // Exposed through IFieldsConstraints.countMin
-            // Additionally defines __fieldsCountMinOn
-            __fieldsCountMin: {
-              value: 0,
-              cast: __castCount,
-              group: "fields",
-              localName: "countMin",
-              combine: function(baseEval, localEval) {
-                return function(propType) {
-                  return Math.max(baseEval.call(this, propType), localEval.call(this, propType));
-                };
-              }
-            },
-
-            // Exposed through IFieldsConstraints.countMax
-            // Additionally defines __fieldsCountMaxOn
-            __fieldsCountMax: {
-              value: Infinity,
-              cast: __castCount,
-              group: "fields",
-              localName: "countMax",
-              combine: function(baseEval, localEval) {
-                return function(propType) {
-                  return Math.min(baseEval.call(this, propType), localEval.call(this, propType));
-                };
-              }
-            }
-          },
-
-          // region fields
-          /*
-           * Actually implements IFieldsConstraints#countRangeOn.
-           *
-           * TODO: Shouldn't this also integrate the underlying `fields` property's own isRequired, countMin, countMax
-           * attributes? Can be a problem if anyone creates a subclass of property (outside of configuration)
-           * and changes the defaults.
-           */
-          __fieldsCountRangeOn: function(model) {
-            var isRequired = this.__fieldsIsRequiredOn(model);
-            var countMin = this.__fieldsCountMinOn(model);
-            var countMax = this.__fieldsCountMaxOn(model);
-
-            if(isRequired && countMin < 1) countMin = 1;
-
-            if(countMax < countMin) countMax = countMin;
-
-            return {min: countMin, max: countMax};
-          },
 
           /**
-           * Gets or sets the fields metadata related with this visual role property.
+           * Gets the metadata about the fields property of mappings of this visual role property.
            *
-           * @type {!pentaho.visual.role.IFieldsConstraints}
+           * @name pentaho.visual.role.AbstractProperty.Type#fields
+           * @type {!pentaho.visual.role.IFieldsMetadata}
+           * @readOnly
+           * @abstract
            */
-          get fields() {
-            var fields = O.getOwn(this, "__fields");
-            if(!fields) {
-
-              var propType = this;
-
-              this.__fields = fields = {
-                get isRequired() {
-                  return propType.__fieldsIsRequired;
-                },
-                set isRequired(value) {
-                  propType.__fieldsIsRequired = value;
-                },
-                get countMin() {
-                  return propType.__fieldsCountMin;
-                },
-                set countMin(value) {
-                  propType.__fieldsCountMin = value;
-                },
-                get countMax() {
-                  return propType.__fieldsCountMax;
-                },
-                set countMax(value) {
-                  propType.__fieldsCountMax = value;
-                },
-                countRangeOn: function(model) {
-                  return propType.__fieldsCountRangeOn(model);
-                }
-              };
-            }
-            return fields;
-          },
-
-          set fields(value) {
-
-            if(!value) return;
-
-            var fields = this.fields;
-
-            if("isRequired" in value) fields.isRequired = value.isRequired;
-            if("countMin" in value) fields.countMin = value.countMin;
-            if("countMax" in value) fields.countMax = value.countMax;
-          },
-          // endregion
 
           // region Validation
 
@@ -343,10 +234,7 @@ define([
            * 2. Otherwise, if the model has a non-`null` [data]{@link pentaho.visual.base.AbstractModel#data},
            *    then each field in the current mapping's
            *    [fields]{@link pentaho.visual.role.AbstractMapping#fields} must be defined in `data`
-           * 3. The number of currently mapped [fields]{@link pentaho.visual.role.AbstractMapping#fields} must satisfy
-           *    the usual property cardinality constraints,
-           *    according to [AbstractProperty.Type#fields]{@link pentaho.visual.role.AbstractProperty.Type#fields}
-           * 4. There can be no two mapping fields with the same
+           * 3. There can be no two mapping fields with the same
            *    [name]{@link pentaho.visual.role.MappingField#name}
            *
            * @param {!pentaho.visual.base.AbstractModel} model - The abstract model.
@@ -363,29 +251,7 @@ define([
 
               var mapping = model.get(this);
 
-              // Cardinality validation
-              var range = this.__fieldsCountRangeOn(model);
-              var count = mapping.fields.count;
-              if(count < range.min) {
-                addErrors(new ValidationError(
-                    bundleTypes.get("errors.property.countOutOfRange", [
-                      this.label + " " + mapping.$type.get("fields").label,
-                      count,
-                      range.min,
-                      range.max
-                    ])));
-
-              } else if(count > range.max) {
-                addErrors(new ValidationError(
-                    bundleTypes.get("errors.property.countOutOfRange", [
-                      this.label + " " + mapping.$type.get("fields").label,
-                      count,
-                      range.min,
-                      range.max
-                    ])));
-              }
-
-              if(!errors && count > 0) {
+              if(!errors && mapping.hasFields) {
                 // Fields are defined in data and of a type compatible with the role's dataType.
                 this.__validateFieldsOn(model, mapping, addErrors);
 
@@ -477,10 +343,4 @@ define([
       return AbstractProperty;
     }
   ];
-
-  function __castCount(v) {
-    v = +v;
-    if(isNaN(v) || v < 0) return; // undefined;
-    return Math.floor(v);
-  }
 });

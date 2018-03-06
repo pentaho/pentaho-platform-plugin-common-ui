@@ -16,9 +16,11 @@
 define([
   "tests/pentaho/util/errorMatch",
   "pentaho/type/Context",
+  "pentaho/type/ValidationError",
   "pentaho/type/SpecificationScope",
-  "pentaho/data/Table"
-], function(errorMatch, Context, SpecificationScope, Table) {
+  "pentaho/data/Table",
+  "tests/pentaho/type/propertyTypeUtil"
+], function(errorMatch, Context, ValidationError, SpecificationScope, Table, propertyTypeUtil) {
 
   "use strict";
 
@@ -1202,6 +1204,79 @@ define([
 
       describe("#fields", function() {
 
+        it("should get an object that conforms to the interface IFieldsConstraints", function() {
+
+          var DerivedModel = Model.extend({
+            $type: {
+              props: {
+                propRole: {
+                  base: "pentaho/visual/role/property"
+                }
+              }
+            }
+          });
+
+          var rolePropType = DerivedModel.type.get("propRole");
+          var fields = rolePropType.fields;
+
+          expect(fields instanceof Object).toBe(true);
+          expect("isRequired" in fields).toBe(true);
+          expect("countMin" in fields).toBe(true);
+          expect("countMax" in fields).toBe(true);
+          expect("countRangeOn" in fields).toBe(true);
+        });
+
+        it("should get the same object each time", function() {
+
+          var DerivedModel = Model.extend({
+            $type: {
+              props: {
+                propRole: {
+                  base: "pentaho/visual/role/property"
+                }
+              }
+            }
+          });
+
+          var rolePropType = DerivedModel.type.get("propRole");
+          var fields1 = rolePropType.fields;
+          var fields2 = rolePropType.fields;
+
+          expect(fields1).toBe(fields2);
+        });
+
+        it("should set only the specified properties", function() {
+
+          var fieldsSpec0 = {
+            isRequired: function() {},
+            countMin: function() {},
+            countMax: function() {}
+          };
+
+          var DerivedModel = Model.extend({
+            $type: {
+              props: {
+                propRole: {
+                  base: "pentaho/visual/role/property",
+                  fields: fieldsSpec0
+                }
+              }
+            }
+          });
+
+          var fieldsSpec1 = {
+            isRequired: function() {}
+          };
+
+          var rolePropType = DerivedModel.type.get("propRole");
+
+          rolePropType.fields = fieldsSpec1;
+
+          expect(rolePropType.fields.isRequired).toBe(fieldsSpec1.isRequired);
+          expect(rolePropType.fields.countMin).toBe(fieldsSpec0.countMin);
+          expect(rolePropType.fields.countMax).toBe(fieldsSpec0.countMax);
+        });
+
         describe("#countRangeOn(model)", function() {
 
           describe("when there is no current mode", function() {
@@ -1553,7 +1628,8 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property"
+                      base: "pentaho/visual/role/property",
+                      modes: [{dataType: ["string"]}]
                     }
                   }
                 }
@@ -1571,6 +1647,175 @@ define([
               var errors = rolePropType.validateOn(model);
               expect(Array.isArray(errors)).toBe(true);
               expect(errors.length).toBe(1);
+            });
+
+            it("should be invalid when fields.isRequired and there are no fields", function() {
+
+              var DerivedModel = Model.extend({
+                $type: {
+                  props: {
+                    propRole: {
+                      base: "pentaho/visual/role/property",
+                      modes: [{dataType: ["string"]}],
+                      fields: {
+                        isRequired: true
+                      }
+                    }
+                  }
+                }
+              });
+
+              var rolePropType = DerivedModel.type.get("propRole");
+
+              var model = new DerivedModel({
+                data: new Table(getDataSpec1())
+              });
+
+              var errors = rolePropType.validateOn(model);
+              expect(errors).toEqual([
+                jasmine.any(ValidationError)
+              ]);
+            });
+
+            it("should be valid when fields.isRequired and there are fields", function() {
+
+              var DerivedModel = Model.extend({
+                $type: {
+                  props: {
+                    propRole: {
+                      base: "pentaho/visual/role/property",
+                      modes: [{dataType: ["string"]}],
+                      fields: {
+                        isRequired: true
+                      }
+                    }
+                  }
+                }
+              });
+
+              var rolePropType = DerivedModel.type.get("propRole");
+
+              var model = new DerivedModel({
+                data: new Table(getDataSpec1()),
+                propRole: {fields: ["country"]}
+              });
+
+              var errors = rolePropType.validateOn(model);
+
+              expect(errors).toBe(null);
+            });
+
+            it("should be invalid when fields.countMin = 2 and there are no fields", function() {
+
+              var DerivedModel = Model.extend({
+                $type: {
+                  props: {
+                    propRole: {
+                      base: "pentaho/visual/role/property",
+                      modes: [{dataType: ["string"]}],
+                      fields: {
+                        countMin: 2
+                      }
+                    }
+                  }
+                }
+              });
+
+              var rolePropType = DerivedModel.type.get("propRole");
+
+              var model = new DerivedModel({
+                data: new Table(getDataSpec1())
+              });
+
+              var errors = rolePropType.validateOn(model);
+              expect(errors).toEqual([
+                jasmine.any(ValidationError)
+              ]);
+            });
+
+            it("should be valid when fields.countMin = 2 and there are 2 fields", function() {
+
+              var DerivedModel = Model.extend({
+                $type: {
+                  props: {
+                    propRole: {
+                      base: "pentaho/visual/role/property",
+                      modes: [{dataType: ["string"]}],
+                      fields: {
+                        countMin: 2
+                      }
+                    }
+                  }
+                }
+              });
+
+              var rolePropType = DerivedModel.type.get("propRole");
+
+              var model = new DerivedModel({
+                data: new Table(getDataSpec1()),
+                propRole: {fields: ["country", "product"]}
+              });
+
+              var errors = rolePropType.validateOn(model);
+
+              expect(errors).toBe(null);
+            });
+
+            it("should be invalid when fields.countMax = 1 and there are 2 fields", function() {
+
+              var DerivedModel = Model.extend({
+                $type: {
+                  props: {
+                    propRole: {
+                      base: "pentaho/visual/role/property",
+                      modes: [{dataType: ["string"]}],
+                      fields: {
+                        countMax: 1
+                      }
+                    }
+                  }
+                }
+              });
+
+              var rolePropType = DerivedModel.type.get("propRole");
+
+              var model = new DerivedModel({
+                data: new Table(getDataSpec1()),
+                propRole: {fields: ["country", "product"]}
+              });
+
+              var errors = rolePropType.validateOn(model);
+              expect(errors).toEqual([
+                jasmine.any(ValidationError)
+              ]);
+            });
+
+            it("should be valid when fields.countMax = 1 and there is 1 field", function() {
+
+              var DerivedModel = Model.extend({
+                $type: {
+                  props: {
+                    propRole: {
+                      base: "pentaho/visual/role/property",
+                      modes: [{dataType: ["string"]}],
+                      fields: {
+                        countMax: 1
+                      }
+                    }
+                  }
+                }
+              });
+
+              var rolePropType = DerivedModel.type.get("propRole");
+
+              var model = new DerivedModel({
+                data: new Table(getDataSpec1()),
+                propRole: {fields: ["country"]}
+              });
+
+              var errors = rolePropType.validateOn(model);
+
+              expect(errors).toBe(null);
             });
 
             it("should be invalid when a mapping has a modeFixed which is not one of the property's modes", function() {
@@ -1816,6 +2061,62 @@ define([
               expect(any).toBe(true);
               expect(spec.isVisualKey).toBe(true);
             });
+
+            it("should not serialize when not locally specified", function() {
+
+              var scope = new SpecificationScope();
+
+              var DerivedModel = Model.extend({
+                $type: {
+                  props: {
+                    propRole: {
+                      base: "pentaho/visual/role/property",
+                      isVisualKey: false
+                    }
+                  }
+                }
+              });
+
+              var DerivedModel2 = DerivedModel.extend({
+                $type: {
+                  props: {
+                    propRole: {
+                      // Make the property locally declared.
+                    }
+                  }
+                }
+              });
+
+              var rolePropType = DerivedModel2.type.get("propRole");
+              var spec = {};
+              var ka = {};
+              var any = rolePropType._fillSpecInContext(spec, ka);
+
+              scope.dispose();
+
+              expect(any).toBe(false);
+            });
+          });
+        });
+
+        describe("#fields", function() {
+
+          describe("countMin", function() {
+
+            propertyTypeUtil.itDynamicAttribute("countMin", 1, "pentaho/visual/role/property", "fields");
+
+          });
+
+          describe("countMax", function() {
+
+            propertyTypeUtil.itDynamicAttribute("countMax", 2, "pentaho/visual/role/property", "fields");
+
+          });
+
+          describe("isRequired", function() {
+
+            propertyTypeUtil.itDynamicAttribute("isRequired", true, "pentaho/visual/role/property", "fields");
+
           });
         });
       });
