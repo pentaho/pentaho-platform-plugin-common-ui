@@ -15,8 +15,9 @@
 */
 
 define([
-  "cdf/lib/CCC/def"
-], function(def) {
+  "cdf/lib/CCC/def",
+  "cdf/lib/CCC/protovis"
+], function(def, pv) {
 
   "use strict";
 
