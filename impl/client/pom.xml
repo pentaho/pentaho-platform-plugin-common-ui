@@ -19,6 +19,7 @@
   <properties>
     <js.project.list>dojo,dijit,jquery,pentaho-cdf-js,dojo-release,angular,angular-mocks,angular-resource,angular-route,angular-animate</js.project.list>
     <build.javascriptReportDirectory>target/js-reports</build.javascriptReportDirectory>
+    <maven-clean-plugin.version>2.5</maven-clean-plugin.version>
     <pentaho-cdf-plugin.version>8.1.0.0-SNAPSHOT</pentaho-cdf-plugin.version>
 
     <docjs.config.file>jsdoc-vizapi.json</docjs.config.file>
@@ -102,6 +103,18 @@
       </testResource>
     </testResources>
     <plugins>
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>${maven-clean-plugin.version}</version>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>../../node_modules</directory>
+              <followSymlinks>false</followSymlinks>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
