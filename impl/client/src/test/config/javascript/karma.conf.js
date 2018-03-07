@@ -14,15 +14,15 @@ module.exports = function(config) {
     files: [
       "${project.build.directory}/context-begin.js",
 
-      {pattern: "${build.dependenciesDirectory}/*/**/*",       included: false}, // /target/dependency/
-      {pattern: "${build.javascriptTestOutputDirectory}/**/*", included: false}, // target/test-javascript/
-      {pattern: "${build.javascriptTestSourceDirectory}/**/*", included: false}, // src/test/javascript/
-
       "${build.dependenciesDirectory}/cdf/cdf-require-js-cfg.js",
       "${build.javascriptTestConfigDirectory}/require-test.js",
       "${project.build.directory}/require.config.js",
 
-      "${project.build.directory}/context-end.js"
+      "${project.build.directory}/context-end.js",
+
+      {pattern: "${build.dependenciesDirectory}/*/**/*", included: false}, // /target/dependency/
+      {pattern: "${build.javascriptTestOutputDirectory}/**/*", included: false}, // target/test-javascript/
+      {pattern: "${build.javascriptTestSourceDirectory}/**/*", included: false} // src/test/javascript/
     ],
 
     exclude: [

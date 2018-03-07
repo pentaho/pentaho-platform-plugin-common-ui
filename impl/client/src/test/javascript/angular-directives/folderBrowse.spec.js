@@ -22,6 +22,7 @@ define([
   'common-ui/jquery-clean'
 ], function (angular, folderBrowser) {
 
+  /*
   xdescribe('unit testing angular tree control directive', function () {
     var $compile, $rootScope, element, sampleData;
 
@@ -233,4 +234,5 @@ define([
       });
     });
   });
+  */
 });

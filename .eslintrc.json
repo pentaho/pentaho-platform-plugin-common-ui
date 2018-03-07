@@ -1,12 +1,18 @@
 {
   "extends": "google",
-  "installedESLint": true,
   "env": {
     "amd" : true,
     "jasmine": true,
     "browser": true
   },
   "rules": {
+    "indent": ["error", 2, {
+      "SwitchCase": 1,
+      "flatTernaryExpressions": true,
+      "MemberExpression": "off",
+      "FunctionDeclaration": {"parameters": "first"},
+      "FunctionExpression": {"parameters": "first"}
+    }],
     "no-warning-comments": 0,
     "no-unneeded-ternary": ["error", {"defaultAssignment": false}],
     "no-nested-ternary": 0,

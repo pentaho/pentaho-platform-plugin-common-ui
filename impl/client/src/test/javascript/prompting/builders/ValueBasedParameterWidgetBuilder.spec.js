@@ -18,19 +18,21 @@ define(['common-ui/prompting/builders/ValueBasedParameterWidgetBuilder'], functi
 
   describe("ValueBasedParameterWidgetBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { },
-        getParameterName: function() { }
-      }, 
-      param:  {
-        values: []
-      }
-    };
+    var args;
 
     var valueBasedParameterWidgetBuilder;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { },
+          getParameterName: function() { }
+        },
+        param:  {
+          values: []
+        }
+      };
+
       valueBasedParameterWidgetBuilder = new ValueBasedParameterWidgetBuilder();
     });
 

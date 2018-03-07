@@ -18,21 +18,21 @@ define(['common-ui/prompting/builders/LabelBuilder'], function(LabelBuilder) {
 
   describe("LabelBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { },
-        getParameterName: function() { }
-      }, 
-      param:  {
-        values: { },
-        attributes: { },
-        name: 'label-test'
-      }
-    };
-
+    var args;
     var labelBuilder;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { },
+          getParameterName: function() { }
+        },
+        param:  {
+          values: { },
+          attributes: { },
+          name: 'label-test'
+        }
+      };
       labelBuilder = new LabelBuilder();
     });
 

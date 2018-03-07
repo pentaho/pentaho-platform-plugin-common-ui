@@ -18,20 +18,21 @@ define(['common-ui/prompting/builders/RadioBuilder'], function(RadioBuilder) {
 
   describe("RadioBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { },
-        getParameterName: function() { }
-      }, 
-      param:  {
-        values: { },
-        attributes: { }
-      }
-    };
+    var args;
 
     var radioBuilder;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { },
+          getParameterName: function() { }
+        },
+        param:  {
+          values: { },
+          attributes: { }
+        }
+      };
       radioBuilder = new RadioBuilder();
     });
 

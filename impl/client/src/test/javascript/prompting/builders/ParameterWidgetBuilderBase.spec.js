@@ -18,21 +18,21 @@ define(['common-ui/prompting/builders/ParameterWidgetBuilderBase', 'common-ui/jq
 
   describe("ParameterWidgetBuilderBase", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { },
-        getParameterName: function() { }
-      }, 
-      param:  {
-        values: [],
-        attributes: {}
-      }
-    };
-
+    var args;
     var parameterWidgetBuilderBase;
     var component;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { },
+          getParameterName: function() { }
+        },
+        param:  {
+          values: [],
+          attributes: {}
+        }
+      };
       parameterWidgetBuilderBase = new ParameterWidgetBuilderBase();
       component = parameterWidgetBuilderBase.build(args);
       component.base = function() {};
@@ -50,11 +50,11 @@ define(['common-ui/prompting/builders/ParameterWidgetBuilderBase', 'common-ui/jq
 
     it("should not set the tooltip on postExecution if no tooltip is passed", function() {
       spyOn(component, 'postExecution').and.callThrough();
-      spyOn(component, 'base').and.callThrough();      
-      spyOn($.fn, 'attr'); 
+      spyOn(component, 'base').and.callThrough();
+      spyOn($.fn, 'attr');
 
       component.postExecution();
-      
+
       expect(component.postExecution).toHaveBeenCalled();
       expect(component.base).toHaveBeenCalled();
       expect($.fn.attr).not.toHaveBeenCalled();
@@ -64,11 +64,11 @@ define(['common-ui/prompting/builders/ParameterWidgetBuilderBase', 'common-ui/jq
       args.param.attributes['tooltip'] = 'tooltip';
 
       spyOn(component, 'postExecution').and.callThrough();
-      spyOn(component, 'base').and.callThrough();      
-      spyOn($.fn, 'attr');      
-      
+      spyOn(component, 'base').and.callThrough();
+      spyOn($.fn, 'attr');
+
       component.postExecution();
-      
+
       expect(component.postExecution).toHaveBeenCalled();
       expect(component.base).toHaveBeenCalled();
       expect($.fn.attr).toHaveBeenCalled();

@@ -18,18 +18,19 @@ define(['common-ui/prompting/builders/PromptPanelBuilder'], function(PromptPanel
 
   describe("PromptPanelBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { },
-        getParameterName: function() { },
-        buildPanelComponents: function() { },
-        _ready: function() { }
-      }
-    };
+    var args;
 
     var promptPanelBuilder;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { },
+          getParameterName: function() { },
+          buildPanelComponents: function() { },
+          _ready: function() { }
+        }
+      };
       promptPanelBuilder = new PromptPanelBuilder();
     });
 
@@ -44,7 +45,7 @@ define(['common-ui/prompting/builders/PromptPanelBuilder'], function(PromptPanel
     });
 
     it("should execute _ready on postExecution", function() {
-      var component = promptPanelBuilder.build(args.promptPanel); 
+      var component = promptPanelBuilder.build(args.promptPanel);
       spyOn(args.promptPanel, '_ready').and.callThrough();
       component.postExecution();
       expect(args.promptPanel._ready).toHaveBeenCalled();

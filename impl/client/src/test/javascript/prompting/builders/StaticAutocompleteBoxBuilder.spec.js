@@ -18,20 +18,21 @@ define(['common-ui/prompting/builders/StaticAutocompleteBoxBuilder'], function(S
 
   describe("StaticAutocompleteBoxBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { },
-        getParameterName: function() { }
-      }, 
-      param:  {
-        values: { },
-        attributes: { }
-      }
-    };
+    var args;
 
     var staticAutocompleteBoxBuilder;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { },
+          getParameterName: function() { }
+        },
+        param:  {
+          values: { },
+          attributes: { }
+        }
+      };
       staticAutocompleteBoxBuilder = new StaticAutocompleteBoxBuilder();
     });
 

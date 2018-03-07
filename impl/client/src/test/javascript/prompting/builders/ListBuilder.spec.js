@@ -18,21 +18,21 @@ define(['common-ui/prompting/builders/ListBuilder'], function(ListBuilder) {
 
   describe("ListBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { },
-        getParameterName: function() { }
-      }, 
-      param:  {
-        values: { },
-        attributes: { },
-        multiSelect: false
-      }
-    };
-
+    var args;
     var listBuilder;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { },
+          getParameterName: function() { }
+        },
+        param:  {
+          values: { },
+          attributes: { },
+          multiSelect: false
+        }
+      };
       listBuilder = new ListBuilder();
     });
 
@@ -77,7 +77,7 @@ define(['common-ui/prompting/builders/ListBuilder'], function(ListBuilder) {
     it("should set defaultIfEmpty to false on preExecution for non-multi selects", function() {
       var component = listBuilder.build(args);
       spyOn(component, 'preExecution').and.callThrough();
-      
+
       component.preExecution();
       expect(component.preExecution).toHaveBeenCalled();
       expect(component.defaultIfEmpty).toBeFalsy();

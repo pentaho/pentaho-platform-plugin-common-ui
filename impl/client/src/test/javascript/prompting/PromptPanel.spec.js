@@ -16,13 +16,15 @@
  */
 
 define(["dojo/number", "dojo/i18n", "common-ui/prompting/PromptPanel",
-"common-ui/prompting/parameters/ParameterDefinition", "common-ui/prompting/parameters/ParameterGroup",
-"common-ui/prompting/parameters/Parameter", "common-ui/prompting/parameters/ParameterValue", "common-ui/jquery-clean", "common-ui/underscore"], function(DojoNumber,
-  i18n, PromptPanel, ParameterDefinition, ParameterGroup, Parameter, ParameterValue, $, _) {
+  "common-ui/prompting/parameters/ParameterDefinition", "common-ui/prompting/parameters/ParameterGroup",
+  "common-ui/prompting/parameters/Parameter", "common-ui/prompting/parameters/ParameterValue",
+  "common-ui/jquery", "common-ui/underscore"
+], function(DojoNumber, i18n, PromptPanel, ParameterDefinition, ParameterGroup, Parameter, ParameterValue, $, _) {
 
   describe("PromptPanel", function() {
 
   var testId = "test_id";
+
   describe("constructor", function() {
     it("should not create prompt panel without destination id", function() {
       var fn = function() {

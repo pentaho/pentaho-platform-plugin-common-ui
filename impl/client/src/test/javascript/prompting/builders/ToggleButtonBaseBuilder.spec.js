@@ -18,22 +18,24 @@ define(['common-ui/prompting/builders/ToggleButtonBaseBuilder'], function(Toggle
 
   describe("ToggleButtonBaseBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { },
-        getParameterName: function() { }
-      }, 
-      param:  {
-        values: { },
-        attributes: {
-          'parameter-layout': 'vertical'
-        }
-      }
-    };
+    var args;
 
     var toggleButtonBaseBuilder;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { },
+          getParameterName: function() { }
+        },
+        param:  {
+          values: { },
+          attributes: {
+            'parameter-layout': 'vertical'
+          }
+        }
+      };
+
       toggleButtonBaseBuilder = new ToggleButtonBaseBuilder();
     });
 

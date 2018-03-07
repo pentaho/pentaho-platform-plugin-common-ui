@@ -18,32 +18,33 @@ define(['common-ui/prompting/builders/SubmitPanelBuilder'], function(SubmitPanel
 
   describe("SubmitPanelBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { },
-        getParameterName: function() { },
-        getString: function() { },
-        createWidgetForSubmitComponent: function() { }
-      }, 
-      param:  {
-        values: { },
-        attributes: { }
-      }
-    };
+    var args;
 
     var submitPanelBuilder;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { },
+          getParameterName: function() { },
+          getString: function() { },
+          createWidgetForSubmitComponent: function() { }
+        },
+        param:  {
+          values: { },
+          attributes: { }
+        }
+      };
       submitPanelBuilder = new SubmitPanelBuilder();
     });
 
     it("should throw an error building component with no parameters", function() {
       var component;
-      try { 
-        component = submitPanelBuilder.build(); 
+      try {
+        component = submitPanelBuilder.build();
       }
       catch(ex) {
-      } 
+      }
       expect(component).toBe(undefined);
     });
 

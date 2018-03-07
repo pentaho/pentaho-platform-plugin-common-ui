@@ -5,7 +5,7 @@ define([
   'common-ui/angular-ui-bootstrap',
   'common-ui/angular-directives/recurrence/recurrence'
 ], function (angular, templateUtil) {
-
+  /*
   xdescribe('weeklyRecurrence', function () {
     var $scope, httpBackend, templateCache;
 
@@ -286,4 +286,5 @@ define([
 
     });
   });
+  */
 });

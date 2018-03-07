@@ -18,20 +18,20 @@ define(['common-ui/prompting/builders/CheckBuilder'], function(CheckBuilder) {
 
   describe("CheckBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { },
-        getParameterName: function() { }
-      }, 
-      param:  {
-        values: { },
-        attributes: { }
-      }
-    };
-
+    var args;
     var checkBuilder;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { },
+          getParameterName: function() { }
+        },
+        param:  {
+          values: { },
+          attributes: { }
+        }
+      };
       checkBuilder = new CheckBuilder();
     });
 
