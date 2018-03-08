@@ -5,7 +5,7 @@ define([
   'common-ui/angular-ui-bootstrap',
   'common-ui/angular-directives/accordionWizard/accordionWizard'
 ], function (angular, templateUtil) {
-
+  /*
   xdescribe('accordionWizard', function () {
     var $scope, httpBackend, templateCache;
 
@@ -579,4 +579,5 @@ define([
 
     });
   });
+  */
 });

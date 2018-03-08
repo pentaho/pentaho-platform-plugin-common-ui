@@ -18,20 +18,22 @@ define(['common-ui/prompting/builders/TextAreaBuilder', 'common-ui/jquery-clean'
 
   describe("TextAreaBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { return "12345" },
-        getParameterName: function() { }
-      }, 
-      param:  {
-        values: { },
-        attributes: { }
-      }
-    };
+    var args;
 
     var textAreaBuilder;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { return "12345" },
+          getParameterName: function() { }
+        },
+        param:  {
+          values: { },
+          attributes: { }
+        }
+      };
+
       textAreaBuilder = new TextAreaBuilder();
       spyOn(textAreaBuilder, '_createFormatter').and.returnValue(null);
       spyOn(textAreaBuilder, '_createDataTransportFormatter').and.returnValue(null);
@@ -49,7 +51,7 @@ define(['common-ui/prompting/builders/TextAreaBuilder', 'common-ui/jquery-clean'
     //check if it needs to go to CDF
     it("should fire a change in the dashboard on enter keypress", function() {
       var component = textAreaBuilder.build(args);
-      component.dashboard = { 
+      component.dashboard = {
         processChange: function() { },
         getParameterValue: function() { return 'test' }
       };
@@ -62,38 +64,38 @@ define(['common-ui/prompting/builders/TextAreaBuilder', 'common-ui/jquery-clean'
 
       spyOn(component.dashboard, 'processChange');
       $('textarea', component.ph).trigger($.Event( 'keypress', { which: 13 } ));
-      
-      expect(component.dashboard.processChange).toHaveBeenCalled();  
-      
-      ph.remove(); 
+
+      expect(component.dashboard.processChange).toHaveBeenCalled();
+
+      ph.remove();
     });
 
     //check if it needs to go to CDF
     it("should fire a change in the dashboard on focusout", function() {
       var component = textAreaBuilder.build(args);
-      component.dashboard = { 
+      component.dashboard = {
         processChange: function() { },
         getParameterValue: function() { return 'test' }
       };
-      
+
       var ph = $('<div>').attr('id', component.htmlObject);
       $('body').append(ph);
 
       component.update();
       component.postExecution();
 
-      spyOn(component, 'getValue');      
+      spyOn(component, 'getValue');
       $('textarea', component.ph).trigger($.Event( 'focusout', { } ));
 
-      expect(component.getValue).toHaveBeenCalled();  
-      
+      expect(component.getValue).toHaveBeenCalled();
+
       ph.remove();
     });
 
     it("should get value of component with no formatter present", function() {
       var component = textAreaBuilder.build(args);
       var parameterValue = 'test';
-      component.dashboard = { 
+      component.dashboard = {
         processChange: function() { },
         getParameterValue: function() { return parameterValue }
       };
@@ -112,7 +114,7 @@ define(['common-ui/prompting/builders/TextAreaBuilder', 'common-ui/jquery-clean'
     it("should get value of component with formatter present", function() {
       var component = textAreaBuilder.build(args);
       var parameterValue = 'test';
-      component.dashboard = { 
+      component.dashboard = {
         processChange: function() { },
         getParameterValue: function() { return parameterValue; }
       };
@@ -133,7 +135,7 @@ define(['common-ui/prompting/builders/TextAreaBuilder', 'common-ui/jquery-clean'
 
       ph.remove();
     });
-  
+
   });
 
 });

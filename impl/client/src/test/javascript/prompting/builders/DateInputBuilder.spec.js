@@ -18,20 +18,20 @@ define(['common-ui/prompting/builders/DateInputBuilder'], function(DateInputBuil
 
   describe("DateInputBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { },
-        getParameterName: function() { }
-      }, 
-      param:  {
-        values: { },
-        attributes: { }
-      }
-    };
-
+    var args;
     var dateInputBuilder;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { },
+          getParameterName: function() { }
+        },
+        param:  {
+          values: { },
+          attributes: { }
+        }
+      };
       dateInputBuilder = new DateInputBuilder();
       spyOn(dateInputBuilder, '_createFormatter').and.returnValue(null);
       spyOn(dateInputBuilder, '_createDataTransportFormatter').and.returnValue(null);
@@ -41,7 +41,7 @@ define(['common-ui/prompting/builders/DateInputBuilder'], function(DateInputBuil
       expect(dateInputBuilder.build).toThrow();
     });
 
-    it("should return a DojoDateTextBoxComponent", function() {           
+    it("should return a DojoDateTextBoxComponent", function() {
       var component = dateInputBuilder.build(args);
       expect(component.type).toBe('DojoDateTextBoxComponent');
     });

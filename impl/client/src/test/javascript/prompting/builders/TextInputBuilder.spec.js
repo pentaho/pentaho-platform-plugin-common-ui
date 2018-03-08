@@ -18,22 +18,23 @@ define(['common-ui/prompting/builders/TextInputBuilder', 'dojo/number', 'common-
 
   describe("TextInputBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { return "12345" },
-        getParameterName: function() { }
-      },
-      param:  {
-        values: { },
-        attributes: { }
-      }
-    };
-
+    var args;
     var textInputBuilder;
     var component;
     var ph;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { return "12345"; },
+          getParameterName: function() { }
+        },
+        param:  {
+          values: { },
+          attributes: { }
+        }
+      };
+
       textInputBuilder = new TextInputBuilder();
       spyOn(textInputBuilder, '_createFormatter').and.returnValue(null);
       spyOn(textInputBuilder, '_createDataTransportFormatter').and.returnValue(null);

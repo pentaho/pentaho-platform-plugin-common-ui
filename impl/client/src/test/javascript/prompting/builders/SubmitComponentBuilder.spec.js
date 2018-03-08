@@ -18,21 +18,22 @@ define(['common-ui/prompting/builders/SubmitComponentBuilder'], function(SubmitC
 
   describe("SubmitComponentBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { },
-        getParameterName: function() { },
-        getString: function() { }
-      }, 
-      param:  {
-        values: { },
-        attributes: { }
-      }
-    };
+    var args;
 
     var submitComponentBuilder;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { },
+          getParameterName: function() { },
+          getString: function() { }
+        },
+        param:  {
+          values: { },
+          attributes: { }
+        }
+      };
       submitComponentBuilder = new SubmitComponentBuilder();
     });
 

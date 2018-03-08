@@ -106,14 +106,15 @@ define([
     });
 
     describe(".predicate(attrs)", function() {
-      var predicate = null,
-          attrs = {
-            "test": 123,
-            "foo":  "bar"
-          },
-          inc_attrs = {
-            "test": 123
-          };
+
+      var attrs = {
+        "test": 123,
+        "foo":  "bar"
+      };
+
+      var inc_attrs = {
+        "test": 123
+      };
 
       it("should return null when attrs is nully", function() {
         expect(fun.predicate(null)).toBe(null);
@@ -125,11 +126,12 @@ define([
       });
 
       it("should return a function", function() {
-        predicate = fun.predicate(attrs);
+        var predicate = fun.predicate(attrs);
         expect(typeof predicate).toBe("function");
       });
 
       it("should only return true when the given value passes all the conditions", function() {
+        var predicate = fun.predicate(attrs);
         expect(predicate(attrs)).toBe(true);
         expect(predicate(inc_attrs)).toBe(false);
         expect(predicate()).toBe(false);

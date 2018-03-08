@@ -22,13 +22,17 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
 
     describe("clear", function() {
       var comp;
-      var dijitElement = jasmine.createSpyObj("dijitElement", [ "destroyRecursive" ]);
-      var changeHandler = jasmine.createSpyObj("changeHandler", [ "remove" ]);
+      var dijitElement;
+      var changeHandler;
+
       beforeEach(function() {
         comp = new DojoDateTextBoxComponent();
+        dijitElement = jasmine.createSpyObj("dijitElement", ["destroyRecursive"]);
+        changeHandler = jasmine.createSpyObj("changeHandler", ["remove"]);
       });
 
       it("should not clear if not exist dijitId", function() {
+
         comp.clear();
 
         expect(comp.dijitId).not.toBeDefined();
@@ -106,7 +110,7 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
 
       it("should init date text box with undefined param", function() {
         comp.update();
-        
+
         expect(dashboard.getParameterValue).toHaveBeenCalledWith(testParam);
         expect(transportFormatter.parse).not.toHaveBeenCalled();
         expect(comp.dijitId).toBe(testId + '_input');
@@ -223,6 +227,7 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
     });
 
     describe("_convertFormat", function(){
+      var comp;
       beforeEach(function(){
         comp = new DojoDateTextBoxComponent();
       });

@@ -14,28 +14,32 @@
  * limitations under the License.
  *
  */
-define(["common-ui/prompting/builders/DropDownBuilder"], function(DropDownBuilder) {
+define([
+  "common-ui/prompting/builders/DropDownBuilder",
+  "pentaho/shim/es6-promise"
+], function(DropDownBuilder) {
 
   describe("DropDownBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { },
-        getParameterName: function() { },
-        paramDefn: {
-          ignoreBiServer5538: true
-        }
-      },
-      param:  {
-        values: { },
-        attributes: { },
-        hasSelection: function() { return true; }
-      }
-    };
-
+    var args;
     var dropDownBuilder;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { },
+          getParameterName: function() { },
+          paramDefn: {
+            ignoreBiServer5538: true
+          }
+        },
+        param:  {
+          values: { },
+          attributes: { },
+          hasSelection: function() { return true; }
+        }
+      };
+
       dropDownBuilder = new DropDownBuilder();
     });
 
@@ -83,14 +87,17 @@ define(["common-ui/prompting/builders/DropDownBuilder"], function(DropDownBuilde
     });
 
     describe("build", function() {
+
       var mockSelectComponent;
       var _dropDownBuilder;
 
       function createMockSelectComponent(localRequire) {
+
         localRequire.define("cdf/components/SelectComponent", function() {
           mockSelectComponent = jasmine.createSpy("SelectComponent");
           return mockSelectComponent;
         });
+
       }
 
       beforeAll(function(done) {

@@ -24,11 +24,13 @@ define(["common-ui/prompting/components/ScrollingPromptPanelLayoutComponent", "c
       var id = "test_id";
       var testSpan = "<span>test internal div</span>";
       var comp;
-      var paramDefn = {
-        removeSubmitPanel: false
-      };
+      var paramDefn;
 
       beforeEach(function() {
+        paramDefn = {
+          removeSubmitPanel: false
+        };
+
         comp = new ScrollingPromptPanelLayoutComponent();
         comp.htmlObject = id;
         spyOn(comp, "getMarkupFor").and.returnValue(testSpan);

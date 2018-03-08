@@ -10,6 +10,7 @@ define([
   "common-ui/angular-directives/angular-dojo/angular-dojo"
 ], function (angular, templateUtil, dojoParser, ready, registry) {
 
+  /*
   xdescribe("dateTimePicker", function () {
     var scope, isolateScope, element, httpBackend, templateCache, timeout;
 
@@ -154,4 +155,5 @@ define([
     });
 
   });
+  */
 });

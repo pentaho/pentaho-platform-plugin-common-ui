@@ -18,20 +18,22 @@ define(['common-ui/prompting/builders/MultiButtonBuilder', 'common-ui/jquery-cle
 
   describe("MultiButtonBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { },
-        getParameterName: function() { }
-      }, 
-      param:  {
-        values: { },
-        attributes: { }
-      }
-    };
+    var args;
 
-    var multiButtonBuilder
+    var multiButtonBuilder;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { },
+          getParameterName: function() { }
+        },
+        param:  {
+          values: { },
+          attributes: { }
+        }
+      };
+
       multiButtonBuilder = new MultiButtonBuilder();
     });
 
@@ -59,7 +61,7 @@ define(['common-ui/prompting/builders/MultiButtonBuilder', 'common-ui/jquery-cle
       component.dashboard.getParameterValue = function() { };
 
       spyOn(component.dashboard, 'getParameterValue').and.callThrough();
-      
+
       component.expression();
       expect(component.dashboard.getParameterValue).toHaveBeenCalled();
     });

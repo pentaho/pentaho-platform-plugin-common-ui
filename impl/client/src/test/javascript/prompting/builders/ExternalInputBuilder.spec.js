@@ -18,28 +18,29 @@ define(['common-ui/prompting/builders/ExternalInputBuilder'], function(ExternalI
 
   describe("ExternalInputBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { },
-        getParameterName: function() { },
-        createFormatter: function() { },
-        createDataTransportFormatter: function() { }
-      }, 
-      param:  {
-        values: { },
-        attributes: { }
-      }
-    };
-
+    var args;
     var externalInputBuilder;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { },
+          getParameterName: function() { },
+          createFormatter: function() { },
+          createDataTransportFormatter: function() { }
+        },
+        param:  {
+          values: { },
+          attributes: { }
+        }
+      };
+
       externalInputBuilder = new ExternalInputBuilder();
       spyOn(externalInputBuilder, '_createFormatter').and.returnValue(null);
       spyOn(externalInputBuilder, '_createDataTransportFormatter').and.returnValue(null);
     });
 
-    it("should throw an error building component with no parameters", function() {      
+    it("should throw an error building component with no parameters", function() {
       expect(externalInputBuilder.build).toThrow();
     });
 

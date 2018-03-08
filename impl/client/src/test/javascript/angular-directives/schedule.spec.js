@@ -21,7 +21,7 @@ define([
   'common-ui/angular-directives/schedule/scheduleSelector',
   './commonFiltersMock'
 ], function (angular) {
-
+  /*
   xdescribe("Schedule Directives", function () {
 
     beforeEach(module('common.schedule'));
@@ -158,5 +158,5 @@ define([
     });
 
   })
-
+  */
 });

@@ -86,7 +86,9 @@ define([
               application: "1"
             }
           };
+        });
 
+        beforeEach(function() {
           configurationService = new ConfigurationService();
         });
 

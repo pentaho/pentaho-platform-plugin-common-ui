@@ -18,24 +18,24 @@ define(['common-ui/prompting/builders/ErrorLabelBuilder'], function(ErrorLabelBu
 
   describe("ErrorLabelBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { },
-        getParameterName: function() { }
-      }, 
-      param:  {
-        values: { },
-        attributes: { 
-          label: 'test-label'
-        }
-      },
-      errorMessage: 'error message'
-    };
-
+    var args;
     var errorLabelBuilder;
     var component;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { },
+          getParameterName: function() { }
+        },
+        param:  {
+          values: { },
+          attributes: {
+            label: 'test-label'
+          }
+        },
+        errorMessage: 'error message'
+      };
       errorLabelBuilder = new ErrorLabelBuilder();
       component = errorLabelBuilder.build(args);
     });
@@ -52,7 +52,7 @@ define(['common-ui/prompting/builders/ErrorLabelBuilder'], function(ErrorLabelBu
 
     it("should return the error message on the expression", function() {
       spyOn(component, 'expression').and.callThrough();
-      
+
       expect(component.expression()).toEqual(args.errorMessage);
       expect(component.expression).toHaveBeenCalled();
     })

@@ -18,17 +18,19 @@ define(['common-ui/prompting/builders/ParameterPanelBuilder'], function(Paramete
 
   describe("ParameterPanelBuilder", function() {
 
-    var args = {
-      promptPanel: {
-        generateWidgetGUID: function() { },
-        getParameterName: function() { },
-        buildPanelComponents: function() { }
-      }
-    };
+    var args;
 
     var parameterPanelBuilder;
 
     beforeEach(function() {
+      args = {
+        promptPanel: {
+          generateWidgetGUID: function() { },
+          getParameterName: function() { },
+          buildPanelComponents: function() { }
+        }
+      };
+
       parameterPanelBuilder = new ParameterPanelBuilder();
     });
 
