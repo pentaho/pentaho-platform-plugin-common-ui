@@ -555,26 +555,6 @@ define([
         });
       }); // end #valueType
 
-      describe("#elemType - ", function() {
-        it("for singular values, should provide same output as `type`", function() {
-          ["string", "number", "boolean", "date", "complex"].forEach(function(type) {
-            var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", valueType: type});
-            expect(propType.elemType).toBe(propType.valueType);
-          });
-        });
-
-        it("for list values, should return the type of its elements (base/of syntax)", function() {
-          ["string", "number", "boolean", "date", "complex"].forEach(function(type) {
-            var propType = propertyTypeUtil.createRoot(Derived.type, {
-              name: "foo1",
-              valueType: {base: "list", of: type}
-            });
-            expect(propType.elemType).toBe(propType.valueType.of);
-          });
-        });
-
-      }); // end #elemType
-
       describe("#defaultValue", function() {
 
         it("should default to `null`, when unspecified", function() {

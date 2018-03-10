@@ -70,6 +70,10 @@ define([
         expect(NumberList.type.of).toBe(PentahoNumber.type);
       });
 
+      it("should have the same value as the #elementType property", function() {
+        expect(NumberList.type.of).toBe(NumberList.type.elementType);
+      });
+
       it("should throw if given a nully `of` property", function() {
         expect(function() {
           List.extend({

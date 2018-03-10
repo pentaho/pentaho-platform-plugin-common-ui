@@ -68,7 +68,7 @@ define([
       it("should add an element and be visible as an ambient value", function() {
 
         var list = new NumberList();
-        var elem = list.$type.of.to(0);
+        var elem = list.$type.elementType.to(0);
 
         // ---
 
@@ -83,7 +83,7 @@ define([
       it("should add an element and be visible if txn is committed", function() {
 
         var list = new NumberList();
-        var elem = list.$type.of.to(0);
+        var elem = list.$type.elementType.to(0);
 
         // ---
 
@@ -102,7 +102,7 @@ define([
       it("should add an element and cancel it if txn is rejected", function() {
 
         var list = new NumberList();
-        var elem = list.$type.of.to(0);
+        var elem = list.$type.elementType.to(0);
 
         // ---
 
@@ -120,7 +120,7 @@ define([
       it("should add an element and not be there as an ambient value if changes are cleared", function() {
 
         var list = new NumberList();
-        var elem = list.$type.of.to(0);
+        var elem = list.$type.elementType.to(0);
 
         // ---
 
@@ -138,7 +138,7 @@ define([
       it("should add an element and not be there if changes are cleared and the txn committed", function() {
 
         var list = new NumberList();
-        var elem = list.$type.of.to(0);
+        var elem = list.$type.elementType.to(0);
 
         // ---
 
@@ -158,7 +158,7 @@ define([
       it("should add an element and, if removed again, it should stop being there as an ambient value", function() {
 
         var list = new NumberList();
-        var elem = list.$type.of.to(0);
+        var elem = list.$type.elementType.to(0);
 
         // ---
 
@@ -173,7 +173,7 @@ define([
       it("should add an element and, if removed again, it should stop being there when committed", function() {
 
         var list = new NumberList();
-        var elem = list.$type.of.to(0);
+        var elem = list.$type.elementType.to(0);
 
         // ---
 
@@ -192,7 +192,7 @@ define([
       it("should add an element and, if removed again, it should stop being there when txn is rejected", function() {
 
         var list = new NumberList();
-        var elem = list.$type.of.to(0);
+        var elem = list.$type.elementType.to(0);
 
         // ---
 

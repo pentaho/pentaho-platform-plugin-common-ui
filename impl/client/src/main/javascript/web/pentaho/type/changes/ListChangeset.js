@@ -244,7 +244,7 @@ define([
       var list = this.__projectedMock; // Calculate relative to the last change.
       var elems = list.__elems;
       var keys = list.__keys;
-      var elemType = this.owner.$type.of;
+      var elemType = this.owner.$type.elementType;
       var existing;
       var elem;
       var key;
@@ -420,8 +420,8 @@ define([
 
       this._assertWritable();
 
-      var list = this.__projectedMock; // calculate relative to the last change
-      var elemType = this.owner.$type.of;
+      var list = this.__projectedMock; // Calculate relative to the last change.
+      var elemType = this.owner.$type.elementType;
       var elems = list.__elems;
       var keys = list.__keys;
       var removeElems = Array.isArray(fragment)

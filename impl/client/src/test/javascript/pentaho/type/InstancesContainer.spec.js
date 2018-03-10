@@ -1964,7 +1964,7 @@ define([
 
                 expect(result).toEqual(jasmine.any(List));
                 expect(result.$type.isSubtypeOf(List.type)).toBe(true);
-                expect(result.$type.of).toBe(PenObject.type);
+                expect(result.$type.elementType).toBe(PenObject.type);
 
                 expect(result.at(0)).toBe(instances[0]);
                 expect(result.at(1)).toBe(instances[1]);
@@ -2002,7 +2002,7 @@ define([
 
                 expect(result).toEqual(jasmine.any(List));
                 expect(result.$type.isSubtypeOf(List.type)).toBe(true);
-                expect(result.$type.of).toBe(PenObject.type);
+                expect(result.$type.elementType).toBe(PenObject.type);
 
                 expect(result.at(0)).toBe(instances[0]);
                 expect(result.at(1)).toBe(instances[1]);
@@ -2292,7 +2292,7 @@ define([
 
                 expect(result).toEqual(jasmine.any(List));
                 expect(result.$type.isSubtypeOf(List.type)).toBe(true);
-                expect(result.$type.of).toBe(PenObject.type);
+                expect(result.$type.elementType).toBe(PenObject.type);
 
                 expect(result.at(0)).toBe(instances[0]);
                 expect(result.at(1)).toBe(instances[1]);
@@ -2337,7 +2337,7 @@ define([
 
                 expect(result).toEqual(jasmine.any(List));
                 expect(result.$type.isSubtypeOf(List.type)).toBe(true);
-                expect(result.$type.of).toBe(PenObject.type);
+                expect(result.$type.elementType).toBe(PenObject.type);
 
                 expect(result.at(0)).toBe(instances[0]);
                 expect(result.at(1)).toBe(instances[1]);

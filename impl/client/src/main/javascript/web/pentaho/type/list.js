@@ -106,7 +106,7 @@ define([
         var isBoundary = this.__isBoundary;
         var i = -1;
         var L = elemSpecs.length;
-        var elemType = this.$type.of;
+        var elemType = this.$type.elementType;
         var elems = this.__elems;
         var keys  = this.__keys;
         var elem;
@@ -591,7 +591,7 @@ define([
           // Reset.
           keyArgs.forceType = false;
 
-          var elemType = listType.of;
+          var elemType = listType.elementType;
 
           elemSpecs = this.toArray(function(elem) {
             keyArgs.declaredType = elemType; // JIC it is changed by elem.toSpecInContext
@@ -619,7 +619,10 @@ define([
           this.base.apply(this, arguments);
 
           // Force base value inheritance. Cannot change after being set locally...
-          if(!O.hasOwn(this, "__elemType")) this.__elemType = this.__elemType;
+          if(!O.hasOwn(this, "__elemType")) {
+            // noinspection JSAnnotator
+            this.__elemType = this.__elemType;
+          }
         },
 
         alias: "list",
@@ -629,6 +632,11 @@ define([
 
         // region of / element type attribute
         __elemType: Element.type,
+
+        /** @inheritDoc */
+        get elementType() {
+          return this.__elemType;
+        },
 
         /**
          * Gets or sets the type of the elements that this type of list can contain.

@@ -941,11 +941,11 @@ define([
 
               expect(InstCtor.prototype instanceof context.get("list")).toBe(true);
 
-              var ofType = InstCtor.type.of;
-              expect(ofType.instance instanceof context.get("complex")).toBe(true);
-              expect(ofType.count).toBe(2);
-              expect(ofType.has("a")).toBe(true);
-              expect(ofType.has("b")).toBe(true);
+              var elemType = InstCtor.type.elementType;
+              expect(elemType.instance instanceof context.get("complex")).toBe(true);
+              expect(elemType.count).toBe(2);
+              expect(elemType.has("a")).toBe(true);
+              expect(elemType.has("b")).toBe(true);
             });
           });
         });
@@ -962,11 +962,11 @@ define([
 
               expect(InstCtor.prototype instanceof context.get("list")).toBe(true);
 
-              var ofType = InstCtor.type.of;
-              expect(ofType.instance instanceof context.get("complex")).toBe(true);
-              expect(ofType.count).toBe(2);
-              expect(ofType.has("a")).toBe(true);
-              expect(ofType.has("b")).toBe(true);
+              var elementType = InstCtor.type.elementType;
+              expect(elementType.instance instanceof context.get("complex")).toBe(true);
+              expect(elementType.count).toBe(2);
+              expect(elementType.has("a")).toBe(true);
+              expect(elementType.has("b")).toBe(true);
             });
           });
         });
@@ -1344,8 +1344,8 @@ define([
 
                   expect(InstCtor.type.get("prop1").valueType.id).toBe("pentaho/test/type1");
                   expect(InstCtor.type.get("prop2").valueType.ancestor.id).toBe("pentaho/test/type2");
-                  expect(InstCtor.type.get("prop3").valueType.of.id).toBe("pentaho/test/type3");
-                  expect(InstCtor.type.get("prop4").valueType.of.id).toBe("pentaho/test/type3");
+                  expect(InstCtor.type.get("prop3").valueType.elementType.id).toBe("pentaho/test/type3");
+                  expect(InstCtor.type.get("prop4").valueType.elementType.id).toBe("pentaho/test/type3");
                   expect(InstCtor.type.get("prop5").valueType.get("a").valueType.id).toBe("pentaho/test/type4");
                   expect(InstCtor.type.get("prop6").valueType.mixins[0]).toBe(mixin1Type);
                   expect(InstCtor.type.get("prop7").isSubtypeOf(prop1Type)).toBe(true);

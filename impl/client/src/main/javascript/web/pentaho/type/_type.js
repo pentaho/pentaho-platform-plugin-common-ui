@@ -406,6 +406,25 @@ define([
       // endregion
       // endregion
 
+      // region elementType property
+      /**
+       * Gets the element type of this type.
+       *
+       * If this type is a [list]{@link pentaho.type.Type#isList} type,
+       * returns its [of]{@link pentaho.type.List.Type#of} attribute.
+       * Otherwise, this type is an element type, and it returns itself.
+       *
+       * @type {!pentaho.type.Type}
+       * @readonly
+       * @see pentaho.type.Type#isList
+       * @see pentaho.type.Type#isElement
+       * @see pentaho.type.List.Type#of
+       */
+      get elementType() {
+        return this;
+      },
+      // endregion
+
       // region id, sourceId and alias properties
 
       // -> nonEmptyString, Optional(null), Immutable, Shared (note: not Inherited)

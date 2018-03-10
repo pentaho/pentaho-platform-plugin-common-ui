@@ -83,16 +83,13 @@ define([
          */
         canApplyToFieldTypes: function(fieldTypes) {
           var dataType = this.dataType;
-          var elementType;
+          var elementType = dataType.elementType;
 
-          if(dataType.isList) {
-            elementType =  dataType.of;
-          } else if(dataType.isElement) {
+          if(dataType.isElement) {
             if(fieldTypes.length > 1) {
               return false;
             }
-            elementType = dataType;
-          } else {
+          } else if(!dataType.isList) {
             // abstract instance
             return true;
           }
@@ -100,22 +97,6 @@ define([
           return fieldTypes.every(function(fieldType) {
             return fieldType.isSubtypeOf(elementType);
           });
-        },
-
-        /**
-         * Gets the element type of the mode's data type.
-         *
-         * If [dataType]{@link pentaho.visual.role.Mode#dataType} is a
-         * [list]{@link pentaho.type.Type#isList} type,
-         * then returns its [of]{@link pentaho.type.List.Type#of} type.
-         * Otherwise, returns `dataType` itself.
-         *
-         * @return {!pentaho.type.Element.Type} The element data type.
-         * @readOnly
-         */
-        get elementDataType() {
-          var dataType = this.dataType;
-          return dataType.isList ? dataType.of : dataType;
         },
 
         /** @inheritDoc */
@@ -185,8 +166,10 @@ define([
              * is able to convert the categorical data type into a continuous value.
              *
              * When unspecified, or specified as `null`,
-             * defaults to the value of [isContinuous]{@link pentaho.type.Type#isContinuous} of
-             * [elementDataType]{@link pentaho.visual.role.Mode#elementDataType}.
+             * defaults to the value of [isContinuous]{@link pentaho.type.Type#isContinuous} of the
+             * [element type]{@link pentaho.type.Type#elementType}
+             * of the mode's
+             * [data type]{@link pentaho.visual.role.Mode#dataType}.
              *
              * The types {@link pentaho.type.Number} and {@link pentaho.type.Date} are known to be continuous.
              *
@@ -194,6 +177,8 @@ define([
              * @type {boolean}
              *
              * @see pentaho.visual.role.spec.IMode#isContinuous
+             * @see pentaho.type.Type#elementType
+             * @see pentaho.visual.role.Mode#dataType
              */
             {
               name: "isContinuous",
@@ -202,7 +187,7 @@ define([
               isReadOnly: true,
               defaultValue: function() {
                 // Surely, `dataType` has already been initialized, based on property definition order.
-                return this.elementDataType.isContinuous;
+                return this.dataType.elementType.isContinuous;
               }
             }
           ]

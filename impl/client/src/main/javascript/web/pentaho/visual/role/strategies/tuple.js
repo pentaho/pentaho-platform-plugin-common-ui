@@ -76,7 +76,7 @@ define([
           var columnType;
 
           // 2) The data type of each column must be assignable to the element type.
-          var elemType = dataType.of;
+          var elemType = dataType.elementType;
           if(elemType.alias !== "element") {
             var context = dataType.context;
 

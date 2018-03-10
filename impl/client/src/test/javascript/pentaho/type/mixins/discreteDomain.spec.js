@@ -141,7 +141,7 @@ define([
             expect(Array.isArray(propA.domain)).toBe(true);
           });
 
-          it("should cast non-function spec values to the property's elemType", function() {
+          it("should cast non-function spec values to the property's valueType elementType", function() {
 
             var ComplexA = Complex.extend({
               $type: {
@@ -154,7 +154,7 @@ define([
             expect(PentahoNumber.type.is(propA.domain[0])).toBe(true);
           });
 
-          it("should cast non-function spec values to the property's elemType when a list", function() {
+          it("should cast non-function spec values to the property's valueType elementType when a list", function() {
 
             var ComplexA = Complex.extend({
               $type: {
