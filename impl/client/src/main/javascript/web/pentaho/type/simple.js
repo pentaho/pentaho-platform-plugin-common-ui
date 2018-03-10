@@ -146,6 +146,16 @@ define([
       },
 
       /**
+       * Gets the content key of the simple value.
+       *
+       * @type {string}
+       * @readonly
+       */
+      get $contentKey() {
+        return this.$key + (this.formatted !== null ? (" [" + this.formatted + "]") : "");
+      },
+
+      /**
        * Gets a value that indicates if a given distinct, non-null value of the same type represents the same entity.
        *
        * This method checks if the primitive value of one is equal to the primitive value of the other.

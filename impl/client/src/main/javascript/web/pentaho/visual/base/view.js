@@ -828,7 +828,7 @@ define([
          *
          *       var dataFilter = action.dataFilter;
          *
-         *       alert("Executed on rows where " + (dataFilter && dataFilter.contentKey));
+         *       alert("Executed on rows where " + (dataFilter && dataFilter.$contentKey));
          *
          *       // Mark action as done.
          *       action.done();

@@ -56,9 +56,14 @@ define([
               AbstractFilter = Abstract;
               NotFilter = Not;
 
+              var count = 1;
+
               CustomFilter = AbstractFilter.extend({
                 compile: function() {
-                  return isFalse;
+                  return function() { return false; };
+                },
+                _buildContentKey: function() {
+                  return String(count++);
                 }
               });
             });
@@ -275,13 +280,13 @@ define([
       it("should return '(not filter)'", function() {
         var filter  = new NotFilter({operand: {_: "=", p: "a", v: 1}});
 
-        expect(filter.contentKey).toBe("(not (= a 1))");
+        expect(filter.$contentKey).toBe("(not (= a 1))");
       });
 
       it("should return '(not) when operand is not set'", function() {
         var filter  = new NotFilter({});
 
-        expect(filter.contentKey).toBe("(not)");
+        expect(filter.$contentKey).toBe("(not)");
       });
     });
   }); // pentaho.data.filter.Not

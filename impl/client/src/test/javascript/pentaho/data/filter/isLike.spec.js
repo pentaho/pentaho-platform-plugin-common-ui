@@ -135,26 +135,26 @@ define([
         var filter  = new IsLikeFilter({property: "name", value: "str"});
         var anotherFilter = new IsLikeFilter({property: "name", value: "str", anchorStart: true, anchorEnd: true});
 
-        expect(filter.contentKey).toBe("(like name str false false)");
-        expect(anotherFilter.contentKey).toBe("(like name str true true)");
+        expect(filter.$contentKey).toBe("(like name str false false)");
+        expect(anotherFilter.$contentKey).toBe("(like name str true true)");
       });
 
       it("should return '(like propName  false false)' when no value is set'", function() {
         var filter  = new IsLikeFilter({property: "name"});
 
-        expect(filter.contentKey).toBe("(like name  false false)");
+        expect(filter.$contentKey).toBe("(like name  false false)");
       });
 
       it("should return '(like  valueKey false false)' when no property is set'", function() {
         var filter  = new IsLikeFilter({value: "str"});
 
-        expect(filter.contentKey).toBe("(like  str false false)");
+        expect(filter.$contentKey).toBe("(like  str false false)");
       });
 
       it("should return '(like   false false)' when no property or value are set'", function() {
         var filter  = new IsLikeFilter();
 
-        expect(filter.contentKey).toBe("(like   false false)");
+        expect(filter.$contentKey).toBe("(like   false false)");
       });
     });
   }); // pentaho.data.filter.IsLike

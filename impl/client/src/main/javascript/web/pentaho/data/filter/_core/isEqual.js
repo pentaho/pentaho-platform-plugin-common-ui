@@ -90,11 +90,10 @@ define([
         alias: "=",
         props: [
           {
-            // may be `null`
+            // May be `null`
             name: "value",
             nameAlias: "v",
             valueType: "element",
-            isReadOnly: true,
             isBoundary: true
           }
         ]

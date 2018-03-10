@@ -517,6 +517,14 @@ define([
           }).toThrow(errorMatch.argInvalid("valueType"));
         });
 
+        it("should not throw if the specified value is not read-only " +
+           "but is abstract and the declaring type is", function() {
+
+          var Derived2 = Derived.extend({$type: {isReadOnly: true}});
+
+          propertyTypeUtil.createRoot(Derived2.type, {name: "foo", valueType: "element"});
+        });
+
         it("should reset an inherited default value", function() {
 
           var SubProperty = Property.extend({
@@ -617,8 +625,8 @@ define([
           var Derived2 = Derived.extend();
 
           propType.instance.constructor.extend(
-              {$type: {name: "foo1"}}, null,
-              {declaringType: Derived2.type}); // keyArgs
+            {$type: {name: "foo1"}}, null,
+            {declaringType: Derived2.type}); // keyArgs
 
           expect(function() {
             propType.defaultValue = null;
@@ -662,9 +670,9 @@ define([
 
           // Create a descendant property
           propType.instance.constructor.extend(
-              {$type: {name: "foo"}}, // spec
-              null,
-              {declaringType: Derived2.type}); // keyArgs
+            {$type: {name: "foo"}}, // spec
+            null,
+            {declaringType: Derived2.type}); // keyArgs
 
           expect(function() {
             propType.isRequired = true;
@@ -861,9 +869,9 @@ define([
 
           // Create a descendant property
           propType.instance.constructor.extend(
-              {$type: {name: "foo"}}, // spec
-              null,
-              {declaringType: Derived2.type}); // keyArgs
+            {$type: {name: "foo"}}, // spec
+            null,
+            {declaringType: Derived2.type}); // keyArgs
 
           expect(function() {
             propType.countMin = 2;
@@ -980,9 +988,9 @@ define([
 
           // Create a descendant property
           propType.instance.constructor.extend(
-              {$type: {name: "foo"}}, // spec
-              null,
-              {declaringType: Derived2.type}); // keyArgs
+            {$type: {name: "foo"}}, // spec
+            null,
+            {declaringType: Derived2.type}); // keyArgs
 
           expect(function() {
             propType.countMax = 2;
@@ -1082,9 +1090,9 @@ define([
 
           // Create a descendant property
           propType.instance.constructor.extend(
-              {$type: {name: "foo"}}, // spec
-              null,
-              {declaringType: Derived2.type}); // keyArgs
+            {$type: {name: "foo"}}, // spec
+            null,
+            {declaringType: Derived2.type}); // keyArgs
 
           expect(function() {
             propType.isApplicable = false;
@@ -1184,9 +1192,9 @@ define([
 
           // Create a descendant property
           propType.instance.constructor.extend(
-              {$type: {name: "foo"}}, // spec
-              null,
-              {declaringType: Derived2.type}); // keyArgs
+            {$type: {name: "foo"}}, // spec
+            null,
+            {declaringType: Derived2.type}); // keyArgs
 
           expect(function() {
             propType.isEnabled = false;
@@ -3051,5 +3059,94 @@ define([
       // endregion
     }); // end override a property
 
-  }); // pentaho.type.Property.Type
+    describe("#toValueOn(model, valueSpec)", function() {
+
+      describe("when property is element", function() {
+
+        describe("when the property's declaringType is of a read-only type", function() {
+
+          var ReadOnlyComplexWithElement;
+          var NotReadOnlyComplex;
+
+          beforeEach(function() {
+
+            ReadOnlyComplexWithElement = Complex.extend({
+              $type: {
+                isReadOnly: true,
+                props: [
+                  {name: "a", valueType: "element"}
+                ]
+              }
+            });
+
+            NotReadOnlyComplex = Complex.extend();
+
+          });
+
+          it("should throw if the specified value is not of a read-only type", function() {
+
+            var value = new ReadOnlyComplexWithElement();
+            var propType = ReadOnlyComplexWithElement.type.get("a");
+            var propValue = new NotReadOnlyComplex();
+
+            expect(function() {
+              propType.toValueOn(value, propValue);
+            }).toThrowError(TypeError);
+          });
+
+          it("should not throw if the specified value is of a read-only type", function() {
+
+            var value = new ReadOnlyComplexWithElement();
+            var propType = ReadOnlyComplexWithElement.type.get("a");
+            var propValue = new PentahoNumber(1);
+
+            propType.toValueOn(value, propValue);
+          });
+        });
+      });
+
+      describe("when property is list", function() {
+
+        describe("when the property's declaringType is of a read-only type", function() {
+
+          var ReadOnlyComplexWithList;
+          var NotReadOnlyComplex;
+
+          beforeEach(function() {
+
+            ReadOnlyComplexWithList = Complex.extend({
+              $type: {
+                isReadOnly: true,
+                props: [
+                  {name: "as", valueType: "list"}
+                ]
+              }
+            });
+
+            NotReadOnlyComplex = Complex.extend();
+          });
+
+          it("should throw if a specified element is not of a read-only type", function() {
+
+            var value = new ReadOnlyComplexWithList();
+            var propType = ReadOnlyComplexWithList.type.get("as");
+            var propValue = new NotReadOnlyComplex();
+
+            expect(function() {
+              propType.toValueOn(value, [propValue]);
+            }).toThrowError(TypeError);
+          });
+
+          it("should not throw if the specified value is of a read-only type", function() {
+
+            var value = new ReadOnlyComplexWithList();
+            var propType = ReadOnlyComplexWithList.type.get("as");
+            var propValue = new PentahoNumber(1);
+
+            propType.toValueOn(value, [propValue]);
+          });
+        });
+      });
+    });
+  }); // end pentaho.type.Property.Type
 });

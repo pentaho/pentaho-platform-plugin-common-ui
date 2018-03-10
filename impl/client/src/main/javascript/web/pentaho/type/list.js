@@ -92,6 +92,7 @@ define([
         if(keyArgs) {
           if(keyArgs.isBoundary) this.__isBoundary = true;
           if(keyArgs.isReadOnly) this.__isReadOnly = true;
+          if(keyArgs.needReadOnlyElementValidation) this.__needReadOnlyElementValidation = true;
         }
 
         if(instSpec != null) {
@@ -111,8 +112,14 @@ define([
         var keys  = this.__keys;
         var elem;
         var key;
+        var needReadOnlyElementValidation = this.__needReadOnlyElementValidation;
+
         while(++i < L) {
           if((elem = elemType.to(elemSpecs[i])) != null && !O.hasOwn(keys, (key = elem.$key))) {
+            if(needReadOnlyElementValidation && !elem.$type.isReadOnly) {
+              throw new TypeError("List requires elements of a read-only type.");
+            }
+
             elems.push(elem);
             keys[key] = elem;
 
@@ -120,6 +127,14 @@ define([
           }
         }
       },
+
+      /**
+       * Gets a value that indicates if this list requires validation that the type of each element is read-only.
+       *
+       * @type {boolean}
+       * @private
+       */
+      __needReadOnlyElementValidation: false,
 
       // region $isReadOnly
       __isReadOnly: false,

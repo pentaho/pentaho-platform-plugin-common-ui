@@ -252,6 +252,7 @@ define([
       var elem;
       var key;
       var isOwnerReadOnly = this.owner.$isReadOnly;
+      var needReadOnlyElementValidation = this.owner.__needReadOnlyElementValidation;
 
       // Next insert index.
       // It will be corrected with the removes
@@ -385,6 +386,10 @@ define([
 
           if(isOwnerReadOnly) {
             this.owner.__assertEditable();
+          }
+
+          if(needReadOnlyElementValidation && !action.value.$type.isReadOnly) {
+            throw new TypeError("List requires elements of a read-only type.");
           }
 
           this.__addChange(new Add(action.value, newIndex));

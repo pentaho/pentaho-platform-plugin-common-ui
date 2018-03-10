@@ -270,6 +270,8 @@ define([
 
         var creatingTypeId = context.__creatingTypeId;
         if(creatingTypeId) {
+          // Consume, so no other nested anonymous types (like Properties) catch it too.
+          context.__creatingTypeId = null;
           if(!instSpec) {
 
             typeSpec = {id: creatingTypeId};

@@ -71,8 +71,7 @@ define(function() {
             name: "property",
             nameAlias: "p",
             valueType: "string",
-            isRequired: true,
-            isReadOnly: true
+            isRequired: true
           }
         ]
       }

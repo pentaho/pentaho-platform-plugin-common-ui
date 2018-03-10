@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ define([
   /* globals document, Promise, TypeError, spyOn, expect, jasmine, describe, it */
 
   /* eslint dot-notation: 0, max-nested-callbacks: 0 */
-
-  var it = testUtils.itAsync;
 
   describe("pentaho.visual.base.View", function() {
     var View;
@@ -68,7 +66,7 @@ define([
 
               View = BaseView;
 
-              Model = BaseModel.extend(); // not abstract
+              Model = BaseModel.extend(); // Not abstract.
 
               dataTable = new Table(dataTableSpec);
               model = new Model({data: dataTable});
@@ -536,7 +534,7 @@ define([
         var spies = createUpdateSpies(view);
 
         view.__dirtyPropGroups.set(
-            View.PropertyGroups.General | View.PropertyGroups.Size | View.PropertyGroups.Selection);
+          View.PropertyGroups.General | View.PropertyGroups.Size | View.PropertyGroups.Selection);
 
         return view.update().then(function() {
           expect(spies.updateSize).not.toHaveBeenCalled();
@@ -966,7 +964,7 @@ define([
       });
     }); // #isUpdating
 
-    describe("#dispose", function() {
+    describe("#dispose()", function() {
 
       function createView() {
 
@@ -1019,7 +1017,7 @@ define([
       });
     }); // #dispose
 
-    describe("#_releaseDomContainer", function() {
+    describe("#_releaseDomContainer()", function() {
 
       function createView() {
         return new View({
@@ -1182,6 +1180,74 @@ define([
       });
     });
 
+    describe("#configure(config)", function() {
+
+      it("should not emit change events if configured with its current spec", function() {
+
+        function config(localRequire) {
+
+          localRequire.define("test/foo/view", [], function() {
+
+            return ["pentaho/visual/base/view", "test/foo/model", function(BaseView, Model) {
+
+              return BaseView.extend({
+                $type: {
+                  id: "test/foo/view",
+                  props: {
+                    a: {valueType: "string"},
+                    model: {valueType: Model}
+                  }
+                }
+              });
+            }];
+          });
+
+          localRequire.define("test/foo/model", [], function() {
+
+            return ["pentaho/visual/base/model", function(BaseModel) {
+
+              return BaseModel.extend({
+                $type: {
+                  id: "test/foo/model",
+                  props: {b: {valueType: "string"}}
+                }
+              });
+            }];
+          });
+        }
+
+        return require.using(["pentaho/type/Context"], config, function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            return context.getDependencyApplyAsync(["test/foo/view"], function(View) {
+
+              var viewSpec = {
+                a: "a1",
+                model: {
+                  b: "b1",
+                  data: dataTable,
+                  selectionFilter: {_: "or", o: [{_: "=", p: "country", v: "Portugal"}]}
+                }
+              };
+
+              var view = new View(viewSpec);
+
+              var viewSpec2 = view.toSpec();
+              expect(viewSpec2).toEqual(viewSpec);
+
+              var didChangeSpy = jasmine.createSpy("did:change");
+              view.on("did:change", didChangeSpy);
+
+              view.configure(viewSpec);
+
+              expect(didChangeSpy).not.toHaveBeenCalled();
+            });
+          });
+        });
+      });
+    });
+
     describe("#act", function() {
       var CustomSyncAction;
 
@@ -1287,7 +1353,7 @@ define([
       });
     });
 
-    describe("getClassAsync(modelType)", function() {
+    describe(".getClassAsync(modelType)", function() {
 
       it("should be defined", function() {
 
@@ -1354,7 +1420,7 @@ define([
       });
     });
 
-    describe("createAsync(domContainer, model)", function() {
+    describe(".createAsync(domContainer, model)", function() {
       it("should be defined", function() {
         expect(typeof View.createAsync).toBe("function");
       });
@@ -1368,23 +1434,23 @@ define([
       it("should return a rejected promise when given no spec", function() {
 
         return testUtils.expectToRejectWith(
-            function() { return View.createAsync(); },
-            errorMatch.argRequired("viewSpec"));
+          function() { return View.createAsync(); },
+          errorMatch.argRequired("viewSpec"));
       });
 
       it("should return a rejected promise when given a spec with no view type id and no model", function() {
 
         return testUtils.expectToRejectWith(
-            function() { return View.createAsync({}); },
-            errorMatch.argRequired("viewSpec.model"));
+          function() { return View.createAsync({}); },
+          errorMatch.argRequired("viewSpec.model"));
       });
 
       it("should return a rejected promise when given a spec with no view type id and a model " +
          "with no type id", function() {
 
         return testUtils.expectToRejectWith(
-            function() { return View.createAsync({model: {}}); },
-            errorMatch.argRequired("viewSpec.model._"));
+          function() { return View.createAsync({model: {}}); },
+          errorMatch.argRequired("viewSpec.model._"));
       });
 
       it("should return a promise that resolves to a view when given a spec with a view type id", function() {

@@ -62,9 +62,14 @@ define([
               AndFilter = And;
               OrFilter = Or;
 
+              var count = 1;
+
               CustomFilter = AbstractFilter.extend({
                 compile: function() {
-                  return isFalse;
+                  return function() { return false; };
+                },
+                _buildContentKey: function() {
+                  return String(count++);
                 }
               });
             });
@@ -335,13 +340,13 @@ define([
           {_: "=", p: "b", v: 2}
         ]});
 
-        expect(filter.contentKey).toBe("(or (= a 1) (= b 2))");
+        expect(filter.$contentKey).toBe("(or (= a 1) (= b 2))");
       });
 
       it("should return '(or) when there are no operands'", function() {
         var filter  = new OrFilter({});
 
-        expect(filter.contentKey).toBe("(or)");
+        expect(filter.$contentKey).toBe("(or)");
       });
 
       it("should sort child content keys alphabetically", function() {
@@ -350,7 +355,7 @@ define([
           {_: "=", p: "a", v: 1}
         ]});
 
-        expect(filter.contentKey).toBe("(or (= a 1) (= b 2))");
+        expect(filter.$contentKey).toBe("(or (= a 1) (= b 2))");
       });
     });
   }); // pentaho.data.filter.Or

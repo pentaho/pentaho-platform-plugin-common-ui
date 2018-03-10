@@ -71,7 +71,7 @@
     "object-curly-spacing": ["error", "never"],
     "block-scoped-var": 0,
     "consistent-return": "warn",
-    "capitalized-comments": ["error", "always", {
+    "capitalized-comments": ["warn", "always", {
       "ignoreInlineComments": true,
       "ignoreConsecutiveComments": true,
       "ignorePattern": "region|endregion|assert|noinspection|end|break|null|undefined|nully"

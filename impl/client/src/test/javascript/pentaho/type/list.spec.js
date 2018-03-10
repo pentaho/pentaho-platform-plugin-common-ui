@@ -64,7 +64,7 @@ define([
       expect(typeof List).toBe("function");
     });
 
-    describe("#of -", function() {
+    describe(".Type#of -", function() {
 
       it("accepts an `of` property be given a type derived from `Element`", function() {
         expect(NumberList.type.of).toBe(PentahoNumber.type);
@@ -594,6 +594,30 @@ define([
         }).toThrowError(TypeError);
 
         expect(list.count).toBe(0);
+      });
+
+      it("should throw a TypeError if list only accepts read-only elements and the added element" +
+        "is not of a read-only type", function() {
+
+        var list = new List(null, {needReadOnlyElementValidation: true});
+
+        var elem = new Complex();
+
+        expect(function() {
+          list.add([elem]);
+        }).toThrowError(TypeError);
+
+        expect(list.count).toBe(0);
+      });
+
+      it("should not throw an error if list only accepts read-only elements and the added element" +
+        "is of a read-only type", function() {
+
+        var list = new List(null, {needReadOnlyElementValidation: true});
+
+        var elem = new PentahoNumber(1);
+
+        list.add([elem]);
       });
 
       it("should append a given array of convertible values to a non-empty list", function() {

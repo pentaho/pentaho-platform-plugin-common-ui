@@ -113,25 +113,25 @@ define([
       it("should return '(<= propName valueKey)'", function() {
         var filter  = new IsLessOrEqualFilter({property: "name", value: 1});
 
-        expect(filter.contentKey).toBe("(<= name 1)");
+        expect(filter.$contentKey).toBe("(<= name 1)");
       });
 
       it("should return '(<= propName )' when no value is set'", function() {
         var filter  = new IsLessOrEqualFilter({property: "name"});
 
-        expect(filter.contentKey).toBe("(<= name )");
+        expect(filter.$contentKey).toBe("(<= name )");
       });
 
       it("should return '(<=  valueKey)' when no property is set'", function() {
         var filter  = new IsLessOrEqualFilter({value: 1});
 
-        expect(filter.contentKey).toBe("(<=  1)");
+        expect(filter.$contentKey).toBe("(<=  1)");
       });
 
       it("should return '(<=  )' when no property or value are set'", function() {
         var filter  = new IsLessOrEqualFilter();
 
-        expect(filter.contentKey).toBe("(<=  )");
+        expect(filter.$contentKey).toBe("(<=  )");
       });
     });
   }); // pentaho.data.filter.IsLessOrEqual

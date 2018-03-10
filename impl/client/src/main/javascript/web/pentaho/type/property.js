@@ -155,7 +155,7 @@ define([
               // Required stuff
               if(!("name" in spec)) {
                 this.name = null;
-              } // throws
+              } // Throws
 
               // Must be set before valueType, because if read-only, so must be the value type.
               this.__setIsReadOnly(declaringType.isReadOnly || spec.isReadOnly);
@@ -496,9 +496,20 @@ define([
          * value type would not be read-only and the declaring complex type is read-only.
          */
         __assertValueTypeReadOnlyConsistent: function(valueType) {
+
+          this.__needReadOnlyElementValidation = false;
+
           var declaringType = this.declaringType;
-          if(declaringType !== null && declaringType.isReadOnly && !valueType.elementType.isReadOnly) {
-            throw error.argInvalid("valueType", bundle.structured.errors.property.valueTypeNotReadOnly);
+          if(declaringType !== null && declaringType.isReadOnly) {
+            var elementType = valueType.elementType;
+            if(!valueType.elementType.isReadOnly) {
+              if(elementType.isAbstract) {
+                // When abstract, validation needs to be performed on each property instance.
+                this.__needReadOnlyElementValidation = true;
+              } else {
+                throw error.argInvalid("valueType", bundle.structured.errors.property.valueTypeNotReadOnly);
+              }
+            }
           }
         },
         // endregion
@@ -591,7 +602,7 @@ define([
             if(value === null) {
               defaultValueFun = null;
             } else if(F.is(value)) {
-              // wrap it with cast function
+              // Wrap it with cast function.
               defaultValueFun = function propertyDefaultValue(propType) {
                 return propType.toValueOn(null, value.apply(this, arguments));
               };
@@ -634,10 +645,24 @@ define([
             return this.__valueType.create(valueSpec, this.__listCreateKeyArgs || this.__buildListCreateKeyArgs());
           }
 
+          // ---
+
+          var value;
           if(valueSpec == null) {
-            return defaultValueOwner ? this.defaultValueOn(defaultValueOwner) : null;
+            value = defaultValueOwner ? this.defaultValueOn(defaultValueOwner) : null;
+          } else {
+            value = this.__valueType.to(valueSpec);
           }
-          return this.__valueType.to(valueSpec);
+
+          if(value !== null && this.__needReadOnlyElementValidation) {
+            // When property.valueType is abstract,
+            // validation needs to be performed on each property instance.
+            if(!value.$type.isReadOnly) {
+              throw new TypeError("Property '" + this.label + "' requires a value of a read-only type.");
+            }
+          }
+
+          return value;
         },
 
         /**
@@ -652,8 +677,8 @@ define([
           var dv = this.__defaultValueFun;
 
           return dv
-              ? dv.call(owner, this)
-              : (this.isList ? this.__valueType.create(null) : dv);
+            ? dv.call(owner, this)
+            : (this.isList ? this.__valueType.create(null) : dv);
         },
 
         __listCreateKeyArgs: null,
@@ -661,7 +686,8 @@ define([
         __buildListCreateKeyArgs: function() {
           return (this.__listCreateKeyArgs = {
             isBoundary: this.__isBoundary,
-            isReadOnly: this.__isReadOnly
+            isReadOnly: this.__isReadOnly,
+            needReadOnlyElementValidation: this.__needReadOnlyElementValidation
           });
         },
         // endregion
@@ -680,8 +706,6 @@ define([
           if(this.isRoot) {
             return text.titleFromName(this.name);
           }
-
-          // return undefined;
         },
         // endregion
 
@@ -883,6 +907,7 @@ define([
               }
             }
           }
+
           return errors;
         },
 
@@ -907,7 +932,7 @@ define([
 
           if(!keyArgs) keyArgs = {};
 
-          // no id and no base
+          // No id and no base.
           var spec = {};
           var baseType;
 
@@ -958,7 +983,7 @@ define([
                 count++;
               }
             }
-            // else
+            // Else
             // Non-abstract, non-root property types
             // have `base` always equal to the _declaring type's base type_ corresponding property type,
             // so it is never included.
@@ -1001,7 +1026,7 @@ define([
                 keyArgs.declaredType = this.__valueType;
                 spec.defaultValue = defaultValue.toSpecInContext(keyArgs);
               }
-            } else if(!O.hasOwn(this, "__valueType")) { // resets defaultValue inheritance
+            } else if(!O.hasOwn(this, "__valueType")) { // Resets defaultValue inheritance.
               any = true;
               spec.defaultValue = null;
             }
@@ -1516,7 +1541,8 @@ define([
           return {min: countMin, max: countMax};
         }
       }
-    }).implement({
+    })
+    .implement({
       $type: /** @lends pentaho.type.Property.Type# */{
         // These are applied last so that mixins see any of the methods above as base implementations.
         mixins: [DiscreteDomain]
