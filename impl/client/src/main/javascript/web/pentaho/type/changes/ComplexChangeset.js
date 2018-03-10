@@ -167,17 +167,20 @@ define([
      */
     hasChange: function(name) {
       var pName = this.owner.$type.get(name).name;
-      return O.hasOwn(this._changes, pName);
+      return O.hasOwn(this._changes, pName) && __hasChanges(this._changes[pName]);
     },
 
     /**
-     * Gets an array with all of the property names contained in this changeset.
+     * Gets an array with the names of all of the changed properties contained in this changeset.
      *
      * @type {!Array.<string>}
      * @readonly
      */
     get propertyNames() {
-      return Object.keys(this._changes);
+      return Object.keys(this._changes)
+          .filter(function(pName) {
+            return __hasChanges(this._changes[pName]);
+          }, this);
     },
 
     // TODO: Document me!
