@@ -634,6 +634,25 @@ define([
          * @final
          */
 
+        /**
+         * Gets a value that indicates
+         * whether this type, and all of the types of any contained values, cannot be changed, from the outside.
+         *
+         * [List]{@link pentaho.type.List} types are never, a priori, and directly read-only.
+         * This property is _final_ and always returns `false`.
+         *
+         * However, if a complex property is read-only and has a list value type,
+         * then the value of the property itself, the list instance,
+         * is marked [read-only]{@link pentaho.type.List#$isReadOnly}.
+         * Also, the [element type]{@link pentaho.type.List.Type#of} of a list type can be read-only.
+         *
+         * @name pentaho.type.List.Type#isReadOnly
+         * @type {boolean}
+         * @readOnly
+         * @override
+         * @final
+         */
+
         // region of / element type attribute
         __elemType: Element.type,
 

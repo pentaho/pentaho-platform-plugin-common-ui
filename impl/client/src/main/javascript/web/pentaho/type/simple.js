@@ -59,25 +59,46 @@ define([
     var Simple = Element.extend(/** @lends pentaho.type.Simple# */{
 
       constructor: function(spec) {
+        var value;
+        var formatted;
 
         if(spec instanceof Object) {
           // A plain object?
           if(spec.constructor === Object) {
-            this.__configureFromObject(spec);
-
-            // Required validation
-            if(this.__value == null) this.value = null;
-            return;
+            if((value = spec.value) === undefined) {
+              value = spec.v;
           }
-
-          // Another Simple? Clone or Downcast.
-          if(spec instanceof Simple) {
-            this.__configureFromSimple(spec);
-            return;
+            if((formatted = spec.formatted) === undefined) {
+              formatted = spec.f;
           }
+          } else if(spec instanceof Simple) {
+            // Implicit "downcast" of simple values.
+            value = spec.value;
+            formatted = spec.formatted;
+          } else {
+            value = spec;
+          }
+        } else {
+          value = spec;
         }
 
-        this.value = spec;
+      /**
+       * Gets the underlying JavaScript value represented by the _simple_ value.
+       *
+         * @name pentaho.type.Simple#value
+       * @type {!any}
+       * @readonly
+       */
+        O.setConst(this, "value", this.$type.toValue(value));
+
+        /**
+         * Gets the formatted value of the property.
+       *
+         * @name pentaho.type.Simple#formatted
+         * @type {?nonEmptyString}
+         * @readonly
+       */
+        O.setConst(this, "formatted", __nonEmptyString(formatted));
       },
 
       /**
@@ -91,88 +112,23 @@ define([
         return new SimpleClass(this);
       },
 
-      // region value attribute
-      __value: undefined,
-
-      /**
-       * Gets the underlying JavaScript value represented by the _simple_ value.
-       *
-       * @type {!any}
-       * @readonly
-       */
-      get value() {
-        return this.__value;
-      },
-
-      set value(_) {
-        // Value is immutable. Can only be set once.
-
-        // Throws if nully.
-        _ = this.$type.toValue(_);
-
-        if(this.__value == null) {
-          // First set
-          this.__value = _;
-        } else if(this.__value !== _) {
-          throw error.argInvalid("value", bundle.structured.errors.value.cannotChangeValue);
-        }
-      },
-
-      /*
-       * Configuration alias that sets the underlying primitive value of the _simple_ value.
-       * {@link pentaho.type.Simple#value}
-       *
-       * @ignore
-       */
-      set v(value) {
-        this.value = value;
-      }, // jshint -W078
-      // endregion
-
-      // region formatted attribute
-      __formatted: null,
-
-      /**
-       * Gets or sets the formatted value of the property.
-       *
-       * @type {?string}
-       */
-      get formatted() {
-        return this.__formatted;
-      },
-
-      set formatted(value) {
-        this.__formatted = __nonEmptyString(value);
-      },
-
-      /*
-       * Configuration alias that sets the formatted value of the property
-       * {@link pentaho.type.Simple#formatted}
-       *
-       * @ignore
-       */
-      set f(value) {
-        this.formatted = value;
-      }, // jshint -W078
-      // endregion
-
       /**
        * Gets the underlying primitive value of the _simple_ value.
        *
-       * @return {*} The underlying value.
+       * @return {!any} The underlying value.
        */
       valueOf: function() {
-        return this.__value;
+        return this.value;
       },
 
       /**
-       * Returns a string that represents the current _simple_ value.
+       * Gets a string that represents the current _simple_ value.
        *
        * @return {String} The string representation.
        */
       toString: function() {
-        var f = this.__formatted;
-        return f != null ? f : String(this.__value);
+        var f = this.formatted;
+        return f != null ? f : String(this.value);
       },
 
       /**
@@ -186,7 +142,7 @@ define([
        * @see pentaho.type.Simple.Type#isEntity
        */
       get $key() {
-        return this.__value.toString();
+        return this.value.toString();
       },
 
       /**
@@ -282,7 +238,7 @@ define([
       toSpecInContext: function(keyArgs) {
         if(!keyArgs) keyArgs = {};
 
-        var addFormatted = !keyArgs.omitFormatted && !!this.__formatted;
+        var addFormatted = !keyArgs.omitFormatted && this.formatted !== null;
 
         var type = this.$type;
 
@@ -310,7 +266,7 @@ define([
           if(value == null) return null;
 
         } else {
-          value = this.__value;
+          value = this.value;
         }
 
         // Plain objects cannot be output without cell format or would not be recognized
@@ -327,7 +283,7 @@ define([
             ? {_: type.toRefInContext(keyArgs), v: value}
             : {v: value};
 
-        if(addFormatted) spec.f = this.__formatted;
+        if(addFormatted) spec.f = this.formatted;
 
         return spec;
       },
@@ -347,7 +303,7 @@ define([
        * @protected
        */
       _toJSONValue: function(keyArgs) {
-        return this.__value;
+        return this.value;
       },
       // endregion
 
@@ -375,6 +331,26 @@ define([
           return true;
         },
         // endregion
+
+        // region isReadOnly attribute
+        /**
+         * Gets a value that indicates
+         * whether this type cannot be changed, from the outside.
+         *
+         * [Simple]{@link pentaho.type.Simple} types are inherently read-only.
+         * This property is _final_ and always returns `true`.
+         * Moreover, simple values are immutable.
+         *
+         * @type {boolean}
+         * @readOnly
+         * @override
+         * @final
+         */
+        get isReadOnly() {
+          return true;
+        },
+        // endregion
+
         // region cast method
         /**
          * Converts an external value to the type stored by the simple type
@@ -405,7 +381,8 @@ define([
 
           value = this.cast(value);
           if(value == null)
-            throw error.argInvalid("value",
+            throw error.argInvalid(
+              "value",
                 bundle.format(bundle.structured.errors.value.cannotConvertToType, [this.label]));
 
           return value;

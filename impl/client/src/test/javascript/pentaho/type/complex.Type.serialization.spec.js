@@ -56,6 +56,16 @@ define([
         expect("props" in spec).toBe(false);
       });
 
+      it("should return true when isReadOnly is specified", function() {
+        expect(serializationUtil.fillSpec(Complex, {}, {isReadOnly: true})).toBe(true);
+      });
+
+      it("should create property isReadOnly when isReadOnly is specified", function() {
+        var spec = {};
+        serializationUtil.fillSpec(Complex, spec, {isReadOnly: true});
+        expect(spec.isReadOnly).toBe(true);
+      });
+
       it("should return true when isEntity is specified", function() {
         expect(serializationUtil.fillSpec(Complex, {}, {isEntity: true})).toBe(true);
       });

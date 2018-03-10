@@ -275,6 +275,36 @@ define([
         get isEntity() { return false; },
         // endregion
 
+        // region isReadOnly attribute
+        /**
+         * Gets a value that indicates
+         * whether this type, and all of the types of any contained values, cannot be changed, from the outside.
+         *
+         * [Simple]{@link pentaho.type.Simple} types are inherently read-only.
+         *
+         * A [Complex]{@link pentaho.type.Complex} type can be _marked_ read-only when defined.
+         * All of the properties of a read-only complex type are
+         * implicitly marked [read-only]{@link pentaho.type.Property.Type#isReadOnly}.
+         * When the [valueType]{@link pentaho.type.Property.Type#valueType} of a property
+         * is an element type, it must be a read-only type.
+         * When the `valueType` of a property is a list type, then its
+         * [element type]{@link pentaho.type.List.Type#of} must be read-only.
+         *
+         * [List]{@link pentaho.type.List} types are never, a priori, and directly read-only.
+         * However, if a property of a complex type is read-only and has a list value type,
+         * then the value of the property itself, the list instance,
+         * is marked [read-only]{@link pentaho.type.List#$isReadOnly}.
+         *
+         * The default implementation returns `false`.
+         *
+         * @type {boolean}
+         * @readOnly
+         */
+        get isReadOnly() {
+          return false;
+        },
+        // endregion
+
         // region equality
         /**
          * Gets a value that indicates if two given values are considered equal.

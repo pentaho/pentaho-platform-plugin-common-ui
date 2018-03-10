@@ -66,25 +66,6 @@ define([
         Derived = Complex.extend();
       });
 
-      it("should be able to change the valueType of a root property", function() {
-        var typeSpec = {
-          name: "a",
-          label: "foo"
-        };
-
-        var pType = propertyTypeUtil.createRoot(Complex.type, typeSpec);
-
-        var baseValueType = pType.valueType;
-
-        pType.valueType = {
-          // base: previous base type
-          label: "bar"
-        };
-
-        expect(pType.valueType).not.toBe(baseValueType);
-        expect(pType.valueType.isSubtypeOf(baseValueType)).toBe(true);
-      });
-
       describe("when spec is a string", function() {
         var propType;
 
@@ -419,16 +400,78 @@ define([
       }); // end #isList
 
       // Monotonic
-      describe("#valueType - ", function() {
+      describe("#isReadOnly", function() {
+
+        // TODO: Test that can be specified on an abstract/detached property type.
+
+        it("should default to false", function() {
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
+          expect(propType.isReadOnly).toBe(false);
+        });
+
+        it("should default to true if the declaring type is read-only", function() {
+
+          var Derived2 = Derived.extend({$type: {isReadOnly: true}});
+
+          var propType = propertyTypeUtil.createRoot(Derived2.type, {name: "foo"});
+          expect(propType.isReadOnly).toBe(true);
+        });
+
+        it("should ignore undefined", function() {
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isReadOnly: undefined});
+          expect(propType.isReadOnly).toBe(false);
+        });
+
+        it("should ignore null", function() {
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isReadOnly: null});
+          expect(propType.isReadOnly).toBe(false);
+        });
+
+        it("should ignore the specified value when the declaring type is read-only", function() {
+
+          var Derived2 = Derived.extend({$type: {isReadOnly: true}});
+
+          var propType = propertyTypeUtil.createRoot(Derived2.type, {name: "foo", isReadOnly: false});
+          expect(propType.isReadOnly).toBe(true);
+
+          propType = propertyTypeUtil.createRoot(Derived2.type, {name: "foo", isReadOnly: true});
+          expect(propType.isReadOnly).toBe(true);
+        });
+
+        it("should cast other values to boolean", function() {
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isReadOnly: 1});
+          expect(propType.isReadOnly).toBe(true);
+
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", isReadOnly: 0});
+          expect(propType.isReadOnly).toBe(false);
+
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo3", isReadOnly: ""});
+          expect(propType.isReadOnly).toBe(false);
+
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo4", isReadOnly: true});
+          expect(propType.isReadOnly).toBe(true);
+
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo5", isReadOnly: "yes"});
+          expect(propType.isReadOnly).toBe(true);
+
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo6", isReadOnly: "no"});
+          expect(propType.isReadOnly).toBe(true);
+        });
+      }); // end #isReadOnly
+
+      // Monotonic
+      describe("#valueType", function() {
 
         // NOTE: tests of Context#get test type resolution more thoroughly.
 
-        it("should default to String", function() {
+        it("should default to String when unspecified on a root property", function() {
+
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
           expect(propType.valueType).toBe(PentahoString.type);
         });
 
-        it("ignore a nully value specification and assume the default", function() {
+        it("should default to String when specified with a nully value on a root property", function() {
+
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", valueType: null});
 
           expect(propType.valueType).toBe(PentahoString.type);
@@ -438,43 +481,7 @@ define([
           expect(propType.valueType).toBe(PentahoString.type);
         });
 
-        it("should throw when set and property already has descendant properties", function() {
-          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", valueType: "string"});
-
-          var Derived2 = Derived.extend();
-
-          // Create a descendant property
-          propType.instance.constructor.extend({
-            $type: {name: "foo1"}
-          }, null, {
-            declaringType: Derived2.type
-          }); // keyArgs
-
-          var PostalCode = PentahoString.extend();
-
-          expect(function() {
-            propType.valueType = PostalCode.type;
-          }).toThrow(errorMatch.operInvalid());
-        });
-
-        it("should throw when set from configuration on an existing property", function() {
-          var propType = propertyTypeUtil.createRoot(Derived.type, {
-            name: "foo",
-            valueType: "string"
-          });
-
-          var PostalCode = PentahoString.extend();
-
-          Object.defineProperty(context, "isConfiguring", {
-            value: true
-          });
-
-          expect(function() {
-            propType.valueType = PostalCode.type;
-          }).toThrow(errorMatch.operInvalid());
-        });
-
-        it("should throw when set from configuration on a new property", function() {
+        it("should not throw when specified on a new property, from configuration", function() {
           Object.defineProperty(context, "isConfiguring", {
             value: true
           });
@@ -487,7 +494,7 @@ define([
           }).not.toThrow(errorMatch.operInvalid());
         });
 
-        it("should resolve the specified spec value", function() {
+        it("should resolve the specified value", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", valueType: "string"});
           expect(propType.valueType).toBe(PentahoString.type);
 
@@ -495,61 +502,36 @@ define([
           expect(propType.valueType).toBe(PentahoBoolean.type);
         });
 
-        it("should throw if the specified spec value is the id of an unloaded module", function() {
+        it("should throw if the specified value is the id of an unloaded module", function() {
           expect(function() {
             propertyTypeUtil.createRoot(Derived.type, {name: "foo", valueType: "bar/oof"});
           }).toThrowError(/bar\/oof/);
         });
 
-        it("should allow changing to a subtype of the previous type", function() {
-          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", valueType: "number"});
+        it("should throw if the specified value is not read-only and the declaring type is", function() {
 
-          var Integer = PentahoNumber.extend();
-          propType.valueType = Integer.type;
-          expect(propType.valueType).toBe(Integer.type);
-        });
-
-        it("should throw when changing to a type that is not a subtype of the previous type", function() {
-          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", valueType: "number"});
+          var Derived2 = Derived.extend({$type: {isReadOnly: true}});
 
           expect(function() {
-            propType.valueType = PentahoString.type;
+            propertyTypeUtil.createRoot(Derived2.type, {name: "foo", valueType: Derived});
           }).toThrow(errorMatch.argInvalid("valueType"));
-
         });
 
-        it("should preserve a local default value " +
-           "when changing to a subtype of the previous type, if it is an instance of the new type", function() {
+        it("should reset an inherited default value", function() {
 
-          var Integer = PentahoNumber.extend();
-          var dv = new Integer(1);
-          var propType = propertyTypeUtil.createRoot(Derived.type, {
-            name: "foo1",
-            valueType: "number",
-            defaultValue: dv
+          var SubProperty = Property.extend({
+            $type: {
+              defaultValue: 1
+            }
           });
 
-          expect(propType.defaultValue).toBe(dv);
+          expect(SubProperty.type.defaultValue.value).toBe(1);
 
-          propType.valueType = Integer.type;
-
-          expect(propType.defaultValue).toBe(dv);
-        });
-
-        it("should set a local default value to null " +
-            "when changing to a subtype of the previous type, if it is not an instance of the new type", function() {
-
-          var Integer = PentahoNumber.extend();
-          var dv = new PentahoNumber(1);
           var propType = propertyTypeUtil.createRoot(Derived.type, {
+            base: SubProperty,
             name: "foo1",
-            valueType: "number",
-            defaultValue: dv
+            valueType: "number"
           });
-
-          expect(propType.defaultValue).toBe(dv);
-
-          propType.valueType = Integer.type;
 
           expect(propType.defaultValue).toBe(null);
         });
@@ -644,50 +626,6 @@ define([
         });
       }); // end #defaultValue
       // endregion
-
-      describe("#isReadOnly - ", function() {
-        it("should default to false", function() {
-          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
-          expect(propType.isReadOnly).toBe(false);
-        });
-
-        it("should ignore undefined", function() {
-          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isReadOnly: undefined});
-          expect(propType.isReadOnly).toBe(false);
-        });
-
-        it("should ignore null", function() {
-          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isReadOnly: null});
-          expect(propType.isReadOnly).toBe(false);
-        });
-
-        it("should not allow changing the Property.type attribute value", function() {
-          var propType = Property.type;
-          var isReadOnly = propType.isReadOnly;
-          propType.isReadOnly = !isReadOnly;
-          expect(propType.isReadOnly).toBe(isReadOnly);
-        });
-
-        it("should cast other values to boolean", function() {
-          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isReadOnly: 1});
-          expect(propType.isReadOnly).toBe(true);
-
-          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", isReadOnly: 0});
-          expect(propType.isReadOnly).toBe(false);
-
-          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo3", isReadOnly: ""});
-          expect(propType.isReadOnly).toBe(false);
-
-          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo4", isReadOnly: true});
-          expect(propType.isReadOnly).toBe(true);
-
-          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo5", isReadOnly: "yes"});
-          expect(propType.isReadOnly).toBe(true);
-
-          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo6", isReadOnly: "no"});
-          expect(propType.isReadOnly).toBe(true);
-        });
-      }); // end #isReadOnly
 
       // region Dynamic & Monotonic Attributes
       describe("#isRequired", function() {
@@ -2169,27 +2107,6 @@ define([
           expect(propType.valueType).toBe(PentahoString.type);
         });
 
-        it("should ignore setting to a nully value", function() {
-          var Base = Complex.extend();
-          Base.type.add({name: "postalCode", valueType: PentahoString});
-
-          var Derived = Base.extend();
-
-          var propType = propertyTypeUtil.extend(Derived.type, "postalCode", {name: "postalCode"});
-
-          expect(propType.valueType).toBe(PentahoString.type);
-
-          propType.valueType = null;
-
-          expect(propType.valueType).toBe(PentahoString.type);
-
-          // ---
-
-          propType.valueType = undefined;
-
-          expect(propType.valueType).toBe(PentahoString.type);
-        });
-
         it("should accept a spec type that is a sub-type of the base property's type", function() {
           var PostalCode = PentahoString.extend();
 
@@ -2207,27 +2124,6 @@ define([
           expect(propType.valueType).toBe(PostalCode.type);
         });
 
-        it("should allow a _set_ type that is a sub-type of the property's **previous** type", function() {
-          var PostalCode1 = PentahoString.extend();
-          var PostalCode2 = PostalCode1.extend();
-
-          // ----
-
-          var Base = Complex.extend();
-
-          Base.type.add({name: "postalCode", valueType: PentahoString});
-
-          var Derived = Base.extend();
-
-          var propType = propertyTypeUtil.extend(Derived.type, "postalCode", {name: "postalCode"});
-
-          propType.valueType = PostalCode1;
-          expect(propType.valueType).toBe(PostalCode1.type);
-
-          propType.valueType = PostalCode2;
-          expect(propType.valueType).toBe(PostalCode2.type);
-        });
-
         it("should throw on a spec type that is not a sub-type of the base property's type", function() {
 
           var Base = Complex.extend();
@@ -2238,23 +2134,6 @@ define([
 
           expect(function() {
             propertyTypeUtil.extend(Derived.type, "num", {name: "num", valueType: PentahoNumber});
-          }).toThrow(errorMatch.argInvalid("valueType"));
-        });
-
-        it("should throw on a set type that is not a sub-type of the property's previous type", function() {
-
-          var Base = Complex.extend();
-
-          Base.type.add({name: "num", valueType: PentahoString});
-
-          var PostalCode1 = PentahoString.extend();
-
-          var Derived = Base.extend();
-
-          var propType = propertyTypeUtil.extend(Derived.type, "num", {name: "num", valueType: PostalCode1});
-
-          expect(function() {
-            propType.valueType = PentahoNumber;
           }).toThrow(errorMatch.argInvalid("valueType"));
         });
 
@@ -2424,118 +2303,6 @@ define([
           var propType = propertyTypeUtil.extend(Derived.type, "baseNum", {name: "baseNum"});
 
           expect(propType.isReadOnly).toBe(true);
-        });
-
-        it("should ignore a nully value specification", function() {
-          var Base = Complex.extend();
-          Base.type.add({name: "postalCode", isReadOnly: true});
-
-          var Derived = Base.extend();
-
-          var propType = propertyTypeUtil.extend(Derived.type, "postalCode", {name: "postalCode", isReadOnly: null});
-
-          expect(propType.isReadOnly).toBe(true);
-
-          // ---
-
-          Derived = Base.extend();
-
-          propType = propertyTypeUtil.extend(Derived.type, "postalCode", {name: "postalCode", isReadOnly: undefined});
-
-          expect(propType.isReadOnly).toBe(true);
-        });
-
-        it("should ignore setting to a nully value", function() {
-          var Base = Complex.extend();
-          Base.type.add({name: "postalCode", isReadOnly: true});
-
-          var Derived = Base.extend();
-
-          var propType = propertyTypeUtil.extend(Derived.type, "postalCode", {name: "postalCode"});
-
-          expect(propType.isReadOnly).toBe(true);
-
-          propType.isReadOnly = null;
-
-          expect(propType.isReadOnly).toBe(true);
-
-          // ---
-
-          propType.isReadOnly = undefined;
-
-          expect(propType.isReadOnly).toBe(true);
-        });
-
-        it("should accept setting to true if the base property is not read-only", function() {
-          var Base = Complex.extend();
-
-          Base.type.add({name: "postalCode"});
-
-          var Derived = Base.extend();
-
-          var propType = propertyTypeUtil.extend(Derived.type, "postalCode", {name: "postalCode", isReadOnly: true});
-
-          expect(propType.isReadOnly).toBe(true);
-        });
-
-        it("should accept setting to true if the property's **previous** value is false", function() {
-          var Base = Complex.extend();
-
-          Base.type.add({name: "postalCode"});
-
-          var Derived = Base.extend();
-
-          var propType = propertyTypeUtil.extend(Derived.type, "postalCode", {name: "postalCode"});
-
-          propType.isReadOnly = true;
-          expect(propType.isReadOnly).toBe(true);
-        });
-
-        it("should ignore when specifying false and the base property is read-only", function() {
-
-          var Base = Complex.extend();
-
-          Base.type.add({name: "num", isReadOnly: true});
-
-          var Derived = Base.extend();
-
-          var propType = propertyTypeUtil.extend(Derived.type, "num", {name: "num", isReadOnly: false});
-
-          expect(propType.isReadOnly).toBe(true);
-        });
-
-        it("should ignore when set to false and the property's previous value is true", function() {
-
-          var Base = Complex.extend();
-
-          Base.type.add({name: "num", isReadOnly: false});
-
-          var Derived = Base.extend();
-
-          var propType = propertyTypeUtil.extend(Derived.type, "num", {name: "num"});
-
-          propType.isReadOnly = true;
-
-          expect(propType.isReadOnly).toBe(true);
-
-          propType.isReadOnly = false;
-
-          expect(propType.isReadOnly).toBe(true);
-        });
-
-        it("should throw if changed and the property hasDescendants", function() {
-
-          var Base = Complex.extend();
-
-          Base.type.add({name: "num", isReadOnly: false});
-
-          var Derived = Base.extend();
-
-          var propType = propertyTypeUtil.extend(Derived.type, "num", {name: "num"});
-
-          expect(function() {
-            Base.type.get("num").isReadOnly = true;
-          }).toThrow(errorMatch.operInvalid());
         });
       });
 

@@ -959,6 +959,70 @@ define([
       });
     });
 
+    describe("#isReadOnly", function() {
+
+      it("should default to `false`", function() {
+        expect(Complex.type.isReadOnly).toBe(false);
+      });
+
+      it("should respect a specified value when the base value is false", function() {
+
+        var Derived = Complex.extend({
+          $type: {isReadOnly: true}
+        });
+
+        expect(Derived.type.isReadOnly).toBe(true);
+      });
+
+      it("should ignore a specified value when the base value is true", function() {
+
+        var Derived = Complex.extend({
+          $type: {isReadOnly: true}
+        });
+
+        var Derived2 = Derived.extend({
+          $type: {isReadOnly: false}
+        });
+
+        expect(Derived2.type.isReadOnly).toBe(true);
+      });
+
+      it("should inherit the base value", function() {
+
+        var Derived = Complex.extend({
+          $type: {isReadOnly: true}
+        });
+
+        var Derived2 = Derived.extend();
+
+        expect(Derived2.type.isReadOnly).toBe(true);
+      });
+
+      it("should throw if true and the base complex type already has properties", function() {
+
+        var Derived = Complex.extend({
+          $type: {props: ["a"]}
+        });
+
+        expect(function() {
+          var Derived2 = Derived.extend({
+            $type: {isReadOnly: true}
+          });
+        }).toThrow(errorMatch.argInvalid("isReadOnly"));
+      });
+
+      it("should allow if true and the base complex type does not have properties", function() {
+
+        var Derived = Complex.extend();
+
+        var Derived2 = Derived.extend({
+          $type: {isReadOnly: true}
+        });
+
+        expect(Derived2.type.isReadOnly).toBe(true);
+      });
+    }); // end isReadOnly
+
     describe("#isEntity", function() {
 
       it("should default to `false`", function() {

@@ -543,6 +543,24 @@ define([
       // endregion
 
       $type: /** @lends pentaho.type.Complex.Type# */{
+
+        /** @inheritDoc */
+        _init: function(spec, keyArgs) {
+
+          spec = this.base(spec, keyArgs) || spec;
+
+          if(!this.__isReadOnly && spec.isReadOnly) {
+            // Cannot have any properties.
+            if(this.ancestor.count > 0) {
+              throw error.argInvalid("isReadOnly");
+            }
+
+            this.__isReadOnly = true;
+          }
+
+          return spec;
+        },
+
         alias: "complex",
 
         isAbstract: true,
@@ -602,6 +620,35 @@ define([
           if(!this.__isEntity && value) {
             this.__isEntity = true;
           }
+        },
+        // endregion
+
+        // region isReadOnly attribute
+        __isReadOnly: false,
+
+        /**
+         * Gets a value that indicates
+         * whether this type, and all of the value types of any property values, cannot be changed,
+         * from the outside.
+         *
+         * The value of `Complex#isReadOnly` is `false`.
+         *
+         * A [Complex]{@link pentaho.type.Complex} type is necessarily read-only if its base complex type is read-only.
+         * Otherwise, a `Complex` type can be _marked_ read-only,
+         * but only upon definition and if the base complex type does not have any properties.
+         *
+         * All of the properties of a read-only complex type are
+         * implicitly marked [read-only]{@link pentaho.type.Property.Type#isReadOnly}.
+         * When the [valueType]{@link pentaho.type.Property.Type#valueType} of a property
+         * is an element type, it must be a read-only type.
+         * When the `valueType` of a property is a list type, then its
+         * [element type]{@link pentaho.type.List.Type#of} must be read-only.
+         *
+         * @type {boolean}
+         * @readOnly
+         */
+        get isReadOnly() {
+          return this.__isReadOnly;
         },
         // endregion
         // region properties property
@@ -785,6 +832,10 @@ define([
 
           var any = this.base(spec, keyArgs);
 
+          if(O.hasOwn(this, "__isReadOnly")) {
+            any = true;
+            spec.isReadOnly = this.isReadOnly;
+          }
 
           if(O.hasOwn(this, "__isEntity")) {
             any = true;

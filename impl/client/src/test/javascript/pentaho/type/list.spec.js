@@ -1418,6 +1418,12 @@ define([
         });
       });
 
+      describe("#isReadOnly", function() {
+        it("should return the value `false`", function() {
+          expect(List.type.isReadOnly).toBe(false);
+        });
+      });
+
     });
   });
 });
