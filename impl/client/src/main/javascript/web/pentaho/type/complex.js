@@ -760,7 +760,13 @@ define([
           return this.__isReadOnly;
         },
         // endregion
+
+        // region properties
+
         // region properties property
+
+        // TODO: Don't allow adding properties if the type has descendants.
+
         __props: null,
 
         // Used for configuration only.
@@ -806,9 +812,13 @@ define([
           var ps;
           // !__props could only occur if accessing #get directly on Complex.type and it had no derived classes yet...
           return (!name || !(ps = this.__props)) ? null :
-                 (typeof name === "string") ? ps.get(name) :
-                 (ps.get(name.name) === name) ? name :
-                 null;
+            (typeof name === "string") ? ps.get(name) :
+            (ps.get(name.name) === name) ? name :
+            null;
+        },
+
+        __getByAlias: function(nameAlias) {
+          return this.__props !== null ? this.__props.getByAlias(nameAlias) : null;
         },
 
         /**
