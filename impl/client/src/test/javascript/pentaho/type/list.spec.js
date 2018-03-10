@@ -306,7 +306,16 @@ define([
           expectNoChanges(new NumberList({d: null}));
         });
       });
-    }); // endregion constructor
+
+      describe("given a spec of some other type", function() {
+
+        it("it should throw", function() {
+          expect(function() {
+            var list = new NumberList(3);
+          }).toThrow(errorMatch.argInvalidType("instSpec", ["Array", "Object", "pentaho.type.List"], "number"));
+        });
+      });
+    });
 
     // region read methods
     describe("#$uid -", function() {
@@ -1424,6 +1433,78 @@ define([
         });
       });
 
+      describe("#_normalizeInstanceSpec(instSpec)", function() {
+
+        it("should accept and return a plain Object spec", function() {
+          var spec = {};
+          var result = List.type._normalizeInstanceSpec(spec);
+
+          expect(result).toBe(spec);
+        });
+
+        it("should accept and wrap an Array spec", function() {
+          var spec = [];
+          var result = List.type._normalizeInstanceSpec(spec);
+
+          expect(result.constructor).toBe(Object);
+          expect(result.d).toBe(spec);
+        });
+
+        it("should accept and wrap a List spec", function() {
+          var spec = new NumberList([1, 2, 3]);
+          var result = List.type._normalizeInstanceSpec(spec);
+
+          expect(result.constructor).toBe(Object);
+          expect(result.d).toBe(spec.__elems);
+        });
+
+        it("should throw for other spec types", function() {
+          var spec = 1;
+
+          expect(function() {
+            List.type._normalizeInstanceSpec(spec);
+          }).toThrow(errorMatch.argInvalidType("instSpec", ["Array", "Object", "pentaho.type.List"], "number"));
+        });
+      });
+
+      describe("#__getElementSpecsFromInstanceSpec(instSpec)", function() {
+
+        it("should accept and a plain Object spec no `d` property and return null", function() {
+          var spec = {};
+          var result = List.type.__getElementSpecsFromInstanceSpec(spec);
+
+          expect(result).toBe(null);
+        });
+
+        it("should accept and a plain Object spec with `d` property", function() {
+          var spec = {d: []};
+          var result = List.type.__getElementSpecsFromInstanceSpec(spec);
+
+          expect(result).toBe(spec.d);
+        });
+
+        it("should accept and return an Array spec", function() {
+          var spec = [];
+          var result = List.type.__getElementSpecsFromInstanceSpec(spec);
+
+          expect(result).toBe(spec);
+        });
+
+        it("should accept a List spec and return its elements array", function() {
+          var spec = new NumberList([1, 2, 3]);
+          var result = List.type.__getElementSpecsFromInstanceSpec(spec);
+
+          expect(result).toBe(spec.__elems);
+        });
+
+        it("should throw for other spec types", function() {
+          var spec = 1;
+
+          expect(function() {
+            List.type.__getElementSpecsFromInstanceSpec(spec);
+          }).toThrow(errorMatch.argInvalidType("instSpec", ["Array", "Object", "pentaho.type.List"], "number"));
+        });
+      });
     });
   });
 });

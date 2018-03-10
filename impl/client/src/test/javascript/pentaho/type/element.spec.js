@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,50 @@ define([
     var context;
     var Value;
     var Element;
+    var PentahoNumber;
+    var Complex;
+    var ComplexEntity;
+    var ComplexNonEntity;
+    var ComplexNonEntityReadOnly;
 
-    beforeEach(function(done) {
+    beforeAll(function(done) {
       Context.createAsync()
           .then(function(_context) {
             context = _context;
             Value = context.get("pentaho/type/value");
             Element = context.get("pentaho/type/element");
+            PentahoNumber = context.get("pentaho/type/number");
+            Complex = context.get("pentaho/type/complex");
+
+            ComplexEntity = Complex.extend({
+              get $key() {
+                return this.name;
+              },
+              $type: {
+                isEntity: true,
+                props: [
+                  "name",
+                  {name: "age", valueType: "number"}
+                ]
+              }
+            });
+
+            ComplexNonEntity = Complex.extend({
+              $type: {
+                props: [
+                  "name", {name: "age", valueType: "number"}
+                ]
+              }
+            });
+
+            ComplexNonEntityReadOnly = Complex.extend({
+              $type: {
+                isReadOnly: true,
+                props: [
+                  "name", {name: "age", valueType: "number"}
+                ]
+              }
+            });
           })
           .then(done, done.fail);
     });
@@ -45,6 +82,80 @@ define([
       expect(Element.prototype instanceof Value).toBe(true);
     });
 
+    // region compare
+    describe("compare(other)", function() {
+
+      it("should return 1 if other is nully", function() {
+
+        expect(new Element().compare(null)).toBe(1);
+        expect(new Element().compare(undefined)).toBe(1);
+      });
+
+      it("should return 0 if other is identical to this", function() {
+        var instance = new Element();
+        var other = instance;
+        expect(instance.compare(other)).toBe(0);
+      });
+
+      it("should return 0 if other has a different constructor than this", function() {
+        var instance = new Element();
+
+        var Element2 = Element.extend();
+        var other = new Element2();
+
+        expect(instance.compare(other)).toBe(0);
+      });
+
+      it("should return 0 if other is equals to this", function() {
+
+        var instance = new Element();
+
+        spyOn(instance, "_equals").and.returnValue(true);
+
+        var other = new Element();
+
+        expect(instance.compare(other)).toBe(0);
+      });
+
+      it("should delegate to _compare if other is distinct has the same constructor and is not equal", function() {
+
+        var instance = new Element();
+
+        spyOn(instance, "_equals").and.returnValue(false);
+        spyOn(instance, "_compare").and.returnValue(-1);
+
+        var other = new Element();
+
+        expect(instance.compare(other)).toBe(-1);
+
+        expect(instance._compare).toHaveBeenCalledWith(other);
+      });
+    });
+
+    describe("_compare(other)", function() {
+
+      it("should sort according to the elements' $key lexicographically", function() {
+        var first = new Element();
+        var second = new Element();
+
+        var spyFirst = spyOnProperty(first, "$key", "get").and.returnValue(1);
+        var spySecond = spyOnProperty(second, "$key", "get").and.returnValue(2);
+        expect(first._compare(second)).toBe(-1);
+
+        // ---
+
+        spyFirst.and.returnValue("10");
+        spySecond.and.returnValue("2");
+        expect(first._compare(second)).toBe(-1);
+
+        // ---
+
+        spyFirst.and.returnValue("B");
+        spySecond.and.returnValue("A");
+        expect(first._compare(second)).toBe(1);
+      });
+    });
+    // endregion
     describe("Type -", function() {
 
       var ElemType;
@@ -61,75 +172,70 @@ define([
         expect(ElemType.prototype instanceof Value.Type).toBe(true);
       });
 
-      describe("isElement", function() {
+      describe("#isElement", function() {
 
         it("should return the value `true`", function() {
           expect(Element.type.isElement).toBe(true);
         });
       });
 
-      describe("compare(va, vb)", function() {
+      describe("#compareElements(va, vb)", function() {
 
         it("should return 0 if both are nully", function() {
 
-          expect(Element.type.compare(null, null)).toBe(0);
-          expect(Element.type.compare(null, undefined)).toBe(0);
-          expect(Element.type.compare(undefined, null)).toBe(0);
-          expect(Element.type.compare(undefined, undefined)).toBe(0);
+          expect(Element.type.compareElements(null, null)).toBe(0);
+          expect(Element.type.compareElements(null, undefined)).toBe(0);
+          expect(Element.type.compareElements(undefined, null)).toBe(0);
+          expect(Element.type.compareElements(undefined, undefined)).toBe(0);
         });
 
         it("should return -1 if the first is nully and the second not", function() {
 
-          expect(Element.type.compare(null, new Element())).toBe(-1);
-          expect(Element.type.compare(undefined, new Element())).toBe(-1);
+          expect(Element.type.compareElements(null, new Element())).toBe(-1);
+          expect(Element.type.compareElements(undefined, new Element())).toBe(-1);
         });
 
-        it("should return +1 if the second is nully and the first not", function() {
+        it("should delegate to the first value's compare method, " +
+            "if the first is not nully but the second is", function() {
+          var first = new Element();
+          var second = null;
 
-          expect(Element.type.compare(new Element(), null)).toBe(1);
-          expect(Element.type.compare(new Element(), undefined)).toBe(1);
+          spyOn(first, "compare").and.returnValue(1);
+
+          var result = Element.type.compareElements(first, second);
+
+          expect(result).toBe(1);
+
+          expect(first.compare).toHaveBeenCalledWith(second);
         });
 
-        it("should return 0 if neither is null are _areEqual returns true", function() {
+        it("should delegate to the first value's compare method, if both are not nully", function() {
+          var first = new Element();
+          var second = new Element();
 
-          spyOn(Element.type, "_areEqual").and.returnValue(true);
+          spyOn(first, "compare").and.returnValue(1);
 
-          var va = new Element();
-          var vb = new Element();
+          var result = Element.type.compareElements(first, second);
 
-          expect(Element.type.compare(va, vb)).toBe(0);
+          expect(result).toBe(1);
 
-          expect(Element.type._areEqual).toHaveBeenCalledWith(va, vb);
-        });
-
-        it("should call _compare if neither is null are _areEqual returns false", function() {
-
-          spyOn(Element.type, "_areEqual").and.returnValue(false);
-          spyOn(Element.type, "_compare").and.callThrough();
-
-          var va = new Element();
-          var vb = new Element();
-
-          Element.type.compare(va, vb);
-
-          expect(Element.type._compare).toHaveBeenCalledWith(va, vb);
+          expect(first.compare).toHaveBeenCalledWith(second);
         });
       });
 
-      describe("_compare(va, vb)", function() {
+      describe("#createLike(value, config)", function() {
 
-        it("should sort numbers numerically", function() {
+        it("should create another value of the same type and with the configuration applied", function() {
 
-          expect(Element.type._compare(1, 2)).toBe(-1);
-          expect(Element.type._compare(1, 1)).toBe(0);
-          expect(Element.type._compare(2, 1)).toBe(+1);
-        });
+          var value = new ComplexEntity({name: "John", age: 12});
+          var config = {age: 10};
 
-        it("should sort strings lexicographically", function() {
+          var result = Element.type.createLike(value, config);
 
-          expect(Element.type._compare("10", "2")).toBe(-1);
-          expect(Element.type._compare("5", "2")).toBe(+1);
-          expect(Element.type._compare("2", "2")).toBe(0);
+          expect(result).not.toBe(value);
+          expect(result).not.toBe(config);
+          expect(result instanceof ComplexEntity).toBe(true);
+          expect(result.age).toBe(10);
         });
       });
 

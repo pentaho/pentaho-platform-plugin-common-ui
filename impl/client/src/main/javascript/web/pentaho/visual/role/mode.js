@@ -53,12 +53,7 @@ define([
       var VisualRoleMode = Complex.extend(/** @lends pentaho.visual.role.Mode# */{
 
         constructor: function(spec, keyArgs) {
-          // The name property?
-          if(spec != null && spec.constructor !== Object) {
-            spec = {dataType: spec};
-          }
-
-          this.base(spec, keyArgs);
+          this.base(this.$type.normalizeInstanceSpec(spec), keyArgs);
         },
 
         /**
@@ -132,6 +127,17 @@ define([
           id: module.id,
 
           isEntity: true,
+
+          // @override
+          _normalizeInstanceSpec: function(valueSpec) {
+            // The dataType property?
+            return valueSpec.constructor !== Object ? {dataType: valueSpec} : valueSpec;
+          },
+
+          // @override
+          hasNormalizedInstanceSpecKeyData: function(valueSpec) {
+            return valueSpec.dataType !== undefined || valueSpec.isContinuous !== undefined;
+          },
 
           props: [
             /**

@@ -206,7 +206,7 @@ define([
       });
     });
 
-    describe(".Type#compare(a, b)", function() {
+    describe(".Type#compareElements(a, b)", function() {
       var MyString;
 
       beforeEach(function() {
@@ -219,23 +219,22 @@ define([
       });
 
       it("should return negative if only `a` is not a valid enum value", function() {
-        expect(MyString.type.compare("foo", "Xau")).toBeLessThan(0);
+        expect(MyString.type.compareElements(new MyString("foo"), new MyString("Xau"))).toBeLessThan(0);
       });
 
       it("should return positive if only `b` is not a valid enum value", function() {
-        expect(MyString.type.compare("Xau", "foo")).toBeGreaterThan(0);
+        expect(MyString.type.compareElements(new MyString("Xau"), new MyString("foo"))).toBeGreaterThan(0);
       });
 
       it("should return 0 if both `a` and `b` are not valid enum values", function() {
-        expect(MyString.type.compare("bar", "foo")).toBe(0);
+        expect(MyString.type.compareElements(new MyString("bar"), new MyString("foo"))).toBe(0);
       });
 
       it("should return 0 if `a` and `b` are equal valid enum values", function() {
+
         function expectIt(value) {
 
-          expect(MyString.type.compare(value, value)).toBe(0);
-
-          expect(MyString.type.compare(
+          expect(MyString.type.compareElements(
               new MyString(value),
               new MyString(value))).toBe(0);
         }
@@ -246,9 +245,9 @@ define([
       });
 
       it("should return negative if `a` is before and `b` is after", function() {
+
         function expectIt(a, b) {
-          expect(MyString.type.compare(a, b)).toBeLessThan(0);
-          expect(MyString.type.compare(new MyString(a), new MyString(b))).toBeLessThan(0);
+          expect(MyString.type.compareElements(new MyString(a), new MyString(b))).toBeLessThan(0);
         }
 
         expectIt("Xau", "Wow");
@@ -257,9 +256,9 @@ define([
       });
 
       it("should return positive if `a` is after and `b` is before", function() {
+
         function expectIt(a, b) {
-          expect(MyString.type.compare(a, b)).toBeGreaterThan(0);
-          expect(MyString.type.compare(new MyString(a), new MyString(b))).toBeGreaterThan(0);
+          expect(MyString.type.compareElements(new MyString(a), new MyString(b))).toBeGreaterThan(0);
         }
 
         expectIt("Wow", "Xau");

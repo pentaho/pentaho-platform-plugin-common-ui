@@ -61,5 +61,5 @@
  * null
  * ```
  *
- * @typedef {pentaho.type.spec.IList|Array.<pentaho.type.spec.UInstance>|Nully} pentaho.type.spec.UList
+ * @typedef {pentaho.type.spec.IList|Array.<pentaho.type.spec.UElement>|Nully} pentaho.type.spec.UList
  */

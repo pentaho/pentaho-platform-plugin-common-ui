@@ -29,6 +29,9 @@ define([
   "use strict";
 
   return ["value", "element", function(Value, Element) {
+
+    var __listType;
+
     /**
      * @name pentaho.type.List.Type
      * @class
@@ -61,10 +64,14 @@ define([
      * also be overridden to copy those properties.
      *
      * @constructor
-     * @param {pentaho.type.spec.UList} [spec] The list specification or another compatible list instance.
+     * @param {pentaho.type.spec.UList|pentaho.type.List|Array.<pentaho.type.Element>} [instSpec] The
+     * list specification or a compatible list instance or element's array.
      * @param {Object} [keyArgs] - The keyword arguments.
      * @param {boolean} [keyArgs.isBoundary=false] - Indicates if the list should be a _boundary list_.
      * @param {boolean} [keyArgs.isReadOnly=false] - Indicates if the list should be a _read-only list_.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidTypeError} When the type of `instSpec` is not
+     * {@link Object}, {@link Array} or {@link pentaho.type.List}.
      *
      * @see pentaho.type.Element
      * @see pentaho.type.spec.IList
@@ -73,7 +80,7 @@ define([
      */
     var List = Value.extend(/** @lends pentaho.type.List# */{
 
-      constructor: function(spec, keyArgs) {
+      constructor: function(instSpec, keyArgs) {
 
         this._initContainer();
 
@@ -87,16 +94,9 @@ define([
           if(keyArgs.isReadOnly) this.__isReadOnly = true;
         }
 
-        if(spec != null) {
-          // An array of element specs?
-          // A plain Object with a `d` array property?
-          var elemSpecs =
-              Array.isArray(spec) ? spec :
-              (spec.constructor === Object && Array.isArray(spec.d)) ? spec.d :
-              (spec instanceof List) ? spec.__elems :
-              null;
-
-          if(elemSpecs) {
+        if(instSpec != null) {
+          var elemSpecs = __listType.__getElementSpecsFromInstanceSpec(instSpec);
+          if(elemSpecs != null) {
             this.__load(elemSpecs);
           }
         }
@@ -317,7 +317,7 @@ define([
        * @return {number} `true` if the element is present in the list; `false`, otherwise.
        */
       indexOf: function(elem) {
-        return elem && this.has(elem.$key) ? this.__projectedMock.__elems.indexOf(elem) : -1;
+        return elem != null && this.has(elem.$key) ? this.__projectedMock.__elems.indexOf(elem) : -1;
       },
 
       /**
@@ -330,8 +330,8 @@ define([
       get: function(key) {
         // jshint laxbreak:true
         return (key != null && (key = this.__castKey(key)) != null)
-            ? O.getOwn(this.__projectedMock.__keys, key, null)
-            : null;
+          ? O.getOwn(this.__projectedMock.__keys, key, null)
+          : null;
       },
 
       /**
@@ -747,6 +747,69 @@ define([
         // endregion
 
         // region serialization
+        /**
+         * Normalizes a given non-{@link Nully} value specification.
+         *
+         * @param {!any} instSpec - The value specification.
+         *
+         * @return {!any} The normalized value specification.
+         *
+         * @throws {pentaho.lang.ArgumentInvalidTypeError} When the type of `instSpec` is not
+         * {@link Object}, {@link Array} or {@link pentaho.type.List}.
+         *
+         * @protected
+         * @override
+         *
+         * @see pentaho.type.Value.Type#normalizeInstanceSpec
+         */
+        _normalizeInstanceSpec: function(instSpec) {
+
+          if(instSpec.constructor === Object) {
+            return instSpec;
+          }
+
+          if(Array.isArray(instSpec)) {
+            return {d: instSpec};
+          }
+
+          if(instSpec instanceof List) {
+            return {d: instSpec.__elems};
+          }
+
+          throw error.argInvalidType("instSpec", ["Array", "Object", "pentaho.type.List"], typeof instSpec);
+        },
+
+        /**
+         * Obtains the array of elements' specifications given the list instance specification.
+         *
+         * @param {pentaho.type.spec.UList|pentaho.type.List|Array.<pentaho.type.Element>} [instSpec] The
+         * list specification or a compatible list instance or element's array.
+         *
+         * @return {Array.<pentaho.type.Element|pentaho.type.spec.UElement>} The array of elements, possibly `null`.
+         *
+         * @throws {pentaho.lang.ArgumentInvalidTypeError} When the type of `instSpec` is not
+         * {@link Object}, {@link Array} or {@link pentaho.type.List}.
+         *
+         * @private
+         * @internal
+         */
+        __getElementSpecsFromInstanceSpec: function(instSpec) {
+
+          if(Array.isArray(instSpec)) {
+            return instSpec;
+          }
+
+          if(instSpec.constructor === Object) {
+            return Array.isArray(instSpec.d) ? instSpec.d : null;
+          }
+
+          if(instSpec instanceof List) {
+            return instSpec.__elems;
+          }
+
+          throw error.argInvalidType("instSpec", ["Array", "Object", "pentaho.type.List"], typeof instSpec);
+        },
+
         // * "list" has an id and toRefInContext immediately returns that
         // * ["string"] -> anonymous list type, equivalent to {base: "list", of: "string"}
         //   toRefInContext calls the toSpecInContext, cause it has no id and because a temporary id is also
@@ -816,6 +879,8 @@ define([
      *
      * @see pentaho.type.Value.extend
      */
+
+    __listType = List.type;
 
     return List;
   }];

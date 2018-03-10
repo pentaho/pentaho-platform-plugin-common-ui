@@ -45,12 +45,21 @@ define([
       return Complex.extend(/** @lends pentaho.visual.role.MappingField# */{
 
         constructor: function(spec, keyArgs) {
-          // The name property?
-          if(typeof spec === "string") {
-            spec = {name: spec};
-          }
+          this.base(this.$type.normalizeInstanceSpec(spec), keyArgs);
+        },
 
-          this.base(spec, keyArgs);
+        /**
+         * Gets the (immutable) key of the visual role mapping field.
+         *
+         * The key is the value of the [name]{@link pentaho.visual.role.MappingField#name} property.
+         *
+         * @type {string}
+         * @readOnly
+         * @override
+         * @see pentaho.type.Value.Type#isEntity
+         */
+        get $key() {
+          return this.name;
         },
 
         /** @inheritDoc */
@@ -82,6 +91,17 @@ define([
         $type: /** @lends pentaho.visual.role.MappingField.Type# */{
 
           id: module.id,
+
+          // @override
+          _normalizeInstanceSpec: function(valueSpec) {
+            // The name property?
+            return (typeof valueSpec === "string") ? {name: valueSpec} : valueSpec;
+          },
+
+          // @override
+          hasNormalizedInstanceSpecKeyData: function(valueSpec) {
+            return valueSpec.name !== undefined;
+          },
 
           props: [
             /**

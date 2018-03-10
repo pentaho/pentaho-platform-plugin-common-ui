@@ -175,10 +175,10 @@ define([
         // endregion
 
         /** @inheritDoc */
-        _compareValues: function(a, b) {
+        comparePrimitiveValues: function(valueA, valueB) {
           /* eslint no-multi-spaces: 0 */
-          var indexA = this.__domainPrimitive.indexOf(a);
-          var indexB = this.__domainPrimitive.indexOf(b);
+          var indexA = this.__domainPrimitive.indexOf(valueA);
+          var indexB = this.__domainPrimitive.indexOf(valueB);
           return indexA === indexB ?  0 : // includes both negative
                  indexA < 0        ? -1 : // undefined is lowest
                  indexB < 0        ? +1 : // idem

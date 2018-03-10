@@ -48,17 +48,62 @@ define([
      *
      * @see pentaho.type.List
      */
-    var Element = Value.extend({
+    var Element = Value.extend(/** @lends pentaho.type.Element# */{
 
-      // @override
       /**
-       * Determines if a given value, of the same type, represents the same entity with the same content.
+       * Compares this element to another according to its relative order.
        *
-       * @param {!pentaho.type.Value} other - A value to test for equality.
-       * @return {boolean} `true` if the values have the same content; or, `false`, oterhwise.
+       * Execution proceeds as follows:
+       * 1. If `other` is {@link Nully}, it is considered to occur _before_ this one;
+       * 2. If `other` is identical to this one, as per JavaScript's `===` operator, it has the same order;
+       * 3. If `other` does not have the same constructor as this one, it has the same order;
+       * 4. If `other` is [_equals]{@link pentaho.type.Value#_equals} to this one, it has the same order;
+       * 5. Otherwise, the operation is delegated to the first value's
+       *   [_compare]{@link pentaho.type.Element#_compare} method.
+       *
+       * @param {pentaho.type.Element|undefined} other - The other element value.
+       *
+       * @return {number} `-1` if this value is _before_ `other`; `1` if this value is _after_ `other`;
+       * `0`, otherwise.
+       *
+       * @final
+       *
+       * @see pentaho.type.Element#_compare
+       * @see pentaho.type.Value#equals
        */
-      equalsContent: function(other) {
-        return false;
+      compare: function(other) {
+
+        if(other == null) {
+          return 1;
+        }
+
+        if(other === this || this.constructor !== other.constructor || this._equals(other)) {
+          return 0;
+        }
+
+        return this._compare(other);
+      },
+
+      /**
+       * Compares this element to a distinct, non-equal element of the same type according to its relative order.
+       *
+       * The default implementation does a lexicographical comparison of the elements'
+       * [keys]{@link pentaho.type.Value#$key}.
+       *
+       * @param {!pentaho.type.Element} other - The other element value.
+       *
+       * @return {number} `-1` if this value is _before_ `other`; `1` if this value is _after_ `other`;
+       * `0`, otherwise.
+       *
+       * @protected
+       *
+       * @see pentaho.type.Element#compare
+       * @see pentaho.type.Value#equals
+       */
+      _compare: function(other) {
+        return fun.compare(this.$key, other.$key);
+      },
+
       },
 
       $type: /** @lends pentaho.type.Element.Type# */{
@@ -93,51 +138,26 @@ define([
         },
         // endregion
 
-        // region compare method
+        // region compareElements method
         /**
-         * Compares two values according to their order.
+         * Compares two element values according to their order.
          *
-         * If the two values are identical, as per JavaScript's `===` operator, they have the same order.
-         * If both values are {@link Nully}, they have the same order.
-         * If only one of the values is {@link Nully},
-         * that value is considered to occur _before_, and the other, _after_.
-         * If the two values are considered equal according to {@link pentaho.type.Value.Type#_areEqual},
-         * then they have the same order.
-         * Otherwise, the operation is delegated to {@link pentaho.type.Element.Type#_compare}.
+         * Execution proceeds as follows:
+         * 1. If both values are {@link Nully}, they have the same order.
+         * 2. Otherwise, if the first value is {@link Nully} (and the second is not), it is _before_ the second one.
+         * 3. Othewise, the operation is delegated to the first value's {@link pentaho.type.Element#compare} method.
          *
-         * @param {any} va - The first value.
-         * @param {any} vb - The second value.
+         * @param {pentaho.type.Element} valueA - The first element value.
+         * @param {pentaho.type.Element} valueB - The second element value.
          *
-         * @return {number} `-1` if `va` is considered _before_ `vb`; `1` is `va` is considered _after_ `vb`;
-         * `0`, otherwise.
+         * @return {number} `-1` if `valueA` is _before_ `valueB`; `1` is `valueA` is _after_ `valueB`; `0`, otherwise.
          */
-        compare: function(va, vb) {
-          // Quick bailout tests
-          if(va === vb) return 0;
-          if(va == null) return vb == null ? 0 : -1;
-          if(vb == null) return 1;
+        compareElements: function(valueA, valueB) {
 
-          return this._areEqual(va, vb) ? 0 : this._compare(va, vb);
-        },
+          // Quick bailout test
+          if(valueA == null) return valueB == null ? 0 : -1;
 
-        /**
-         * Compares two non-equal, non-{@link Nully} values according to their order.
-         *
-         * The default implementation compares the two values
-         * by natural ascending order of their data type.
-         * If both values are numbers, numeric order is used.
-         * Otherwise, their string representations are compared in lexicographical order.
-         *
-         * @param {any} va - The first value.
-         * @param {any} vb - The second value.
-         *
-         * @return {number} `-1` if `va` is considered _before_ `vb`; `1` is `va` is considered _after_ `vb`;
-         * `0`, otherwise.
-         *
-         * @protected
-         */
-        _compare: function(va, vb) {
-          return fun.compare(va, vb);
+          return valueA.compare(valueB);
         },
         // endregion
 
@@ -181,6 +201,43 @@ define([
           }
 
           return elemsC;
+        },
+
+        /**
+         * Creates a value of this type based on a given value except with a given configuration applied.
+         *
+         * If this is an entity type,
+         * it can only be called if either
+         * the given configuration does not contain entity key information or
+         * if it contains the same entity key information as the given value.
+         *
+         * The default implementation obtains the specification of the given value,
+         * merges it with the given configuration, and creates a new value from the resulting specification.
+         *
+         * @param {!pentaho.type.Element} value - The value to configure.
+         * @param {!any} config - The configuration
+         *
+         * @return {!pentaho.type.Element} The new value.
+         *
+         * @see pentaho.type.Value.Type#isEntity
+         * @see pentaho.type.Value#$key
+         * @see pentaho.type.Type#hasNormalizedInstanceSpecKeyData
+         */
+        createLike: function(value, config) {
+
+          // TODO: Caveat: #toSpec can not include all properties by default.
+          // TODO: Caveat: aliases of complex properties don't work well this way.
+
+          var valueSpec = value.toSpec();
+
+          // TODO: Use an actual merge...
+          O.eachOwn(config, function(value, propName) {
+            if(value !== undefined) {
+              valueSpec[propName] = value;
+            }
+          });
+
+          return value.$type.create(valueSpec);
         }
       }
     }).implement({

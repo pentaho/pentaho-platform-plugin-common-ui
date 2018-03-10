@@ -40,7 +40,9 @@ define([
   // Need to recognize requests for the currently being built _top-level_ complex in a special way -
   // the one that cannot be built and have a module id.
 
-  return ["element", "property", function(Element) {
+  return ["value", "element", "property", function(Value, Element) {
+
+    var valueType = Value.type;
 
     /**
      * @name pentaho.type.Complex.Type
@@ -184,6 +186,42 @@ define([
        */
       get $key() {
         return this.$uid;
+      },
+
+      /**
+       * Gets a value that indicates if a given equal value has the same content as this one.
+       *
+       * This method checks if the values of all of the properties are equal and content-equal.
+       *
+       * @param {!pentaho.type.Complex} other - An equal complex value to test for content-equality.
+       *
+       * @return {boolean} `true` if the given value is equal in content to this one; `false`, otherwise.
+       *
+       * @override
+       */
+      equalsContent: function(other) {
+
+        var isEqual = true;
+
+        // eslint-disable-next-line consistent-return
+        this.$type.each(function(propType) {
+
+          var propValue = this.get(propType);
+          var propValueOther = other.get(propType);
+
+          // List instances are never `equals`. Only their elements are checked.
+
+          isEqual = propType.isList
+            ? valueType.areEqualContentElements(propValue, propValueOther)
+            : valueType.areEqualContent(propValue, propValueOther);
+
+          if(!isEqual) {
+            // break;
+            return false;
+          }
+        }, this);
+
+        return isEqual;
       },
 
       // region As Raw

@@ -155,7 +155,7 @@ define([
       it("should ignore `f` if `formatted` is specified", function() {
         var simple = new Simple({value: 1, formatted: "One", f: "two"});
         expect(simple.formatted).toBe("One");
-    });
+      });
 
       it("should convert a specified empty or undefined value to null", function() {
         var simple = new Simple({value: 1, formatted: ""});
@@ -208,52 +208,69 @@ define([
       });
     });
 
-    describe("#configure(config)", function() {
-      it("should configure the Simple when given a plain object", function() {
-        var simple1 = new Simple(123);
-        expect(simple1.formatted).toBe(null);
+    describe("#_equals(other)", function() {
 
-        simple1.configure({formatted: "ABC"});
+      it("should return true if the simple values have identical value properties", function() {
 
-        expect(simple1.formatted).toBe("ABC");
+        var valueA = new Simple({value: "a"});
+        var valueB = new Simple({value: "a"});
+
+        expect(valueA._equals(valueB)).toBe(true);
       });
 
-      it("should configure the Simple when given another Simple of equal value", function() {
-        var simple1 = new Simple(123);
-        var simple2 = new Simple({v: 123, f: "ABC"});
+      it("should return false if the simple values do not have identical value properties", function() {
 
-        simple1.configure(simple2);
+        var valueA = new Simple({value: "a"});
+        var valueB = new Simple({value: "b"});
 
-        expect(simple1.formatted).toBe("ABC");
+        expect(valueA._equals(valueB)).toBe(false);
+      });
+    });
+
+    describe("#equalsContent(other)", function() {
+
+      it("should return true if the simple values have identical formatted properties", function() {
+
+        var valueA = new Simple({value: "a", formatted: "A"});
+        var valueB = new Simple({value: "a", formatted: "A"});
+
+        expect(valueA.equalsContent(valueB)).toBe(true);
       });
 
-      it("should throw when given another Simple of different value", function() {
-        expect(function() {
-          var simple1 = new Simple(123);
-          var simple2 = new Simple({v: 234, f: "ABC"});
+      it("should return false if the simple values do not have identical formatted properties", function() {
 
-          simple1.configure(simple2);
+        var valueA = new Simple({value: "a", formatted: "A"});
+        var valueB = new Simple({value: "a", formatted: "AA"});
 
-        }).toThrow(errorMatch.argInvalid("value"));
+        expect(valueA.equalsContent(valueB)).toBe(false);
+      });
+    });
+
+    describe("#_compare(other)", function() {
+
+      it("should delegate to $type.comparePrimitiveValues of their value properties", function() {
+
+        var valueA = new Simple({value: "a"});
+        var valueB = new Simple({value: "b"});
+
+        spyOn(Simple.type, "comparePrimitiveValues");
+
+        valueA._compare(valueB);
+
+        expect(Simple.type.comparePrimitiveValues).toHaveBeenCalledTimes(1);
+        expect(Simple.type.comparePrimitiveValues).toHaveBeenCalledWith("a", "b");
       });
 
-      it("should throw when not given a plain object or another Simple", function() {
-        expect(function() {
-          var simple1 = new Simple(123);
-          simple1.configure("foo");
-        }).toThrow(errorMatch.argInvalidType("config", ["Object", "pentaho.type.Simple"], "string"));
+      it("should return what $type.comparePrimitiveValues returns", function() {
 
-        expect(function() {
-          var simple1 = new Simple(123);
-          simple1.configure(new Date());
-        }).toThrow(errorMatch.argInvalidType("config", ["Object", "pentaho.type.Simple"], "object"));
-      });
+        var valueA = new Simple({value: "a"});
+        var valueB = new Simple({value: "b"});
 
-      it("should do nothing when given itself", function() {
-        // dummy test
-        var simple1 = new Simple(123);
-        simple1.configure(simple1);
-        expect(simple1.value).toBe(123);
+        spyOn(Simple.type, "comparePrimitiveValues").and.returnValue(-Infinity);
+
+        var result = valueA._compare(valueB);
+
+        expect(result).toBe(-Infinity);
       });
     });
 
@@ -384,6 +401,136 @@ define([
           expect(function() {
             Derived.type.toValue({});
           }).toThrow(error);
+        });
+      });
+
+      describe("#comparePrimitiveValues(valueA, valueB)", function() {
+
+        it("should sort strings lexicographically", function() {
+          var result = ["2", "10"].sort(Simple.type.comparePrimitiveValues.bind(Simple.type));
+
+          expect(result).toEqual(["10", "2"]);
+        });
+
+        it("should sort numbers numerically", function() {
+
+          var result = [2, 20, 10].sort(Simple.type.comparePrimitiveValues.bind(Simple.type));
+
+          expect(result).toEqual([2, 10, 20]);
+        });
+      });
+
+      describe("#hasNormalizedInstanceSpecKeyData(instSpec)", function() {
+
+        it("should return true if the instSpec has a non-undefined value property", function() {
+
+          var result = Simple.type.hasNormalizedInstanceSpecKeyData({value: 1});
+          expect(result).toBe(true);
+        });
+
+        it("should return true if the instSpec has a non-undefined v property", function() {
+
+          var result = Simple.type.hasNormalizedInstanceSpecKeyData({v: 1});
+          expect(result).toBe(true);
+        });
+
+        it("should return false if the instSpec has an undefined value property", function() {
+
+          var result = Simple.type.hasNormalizedInstanceSpecKeyData({value: undefined});
+          expect(result).toBe(false);
+        });
+
+        it("should return false if the instSpec has an undefined v property", function() {
+
+          var result = Simple.type.hasNormalizedInstanceSpecKeyData({v: undefined});
+          expect(result).toBe(false);
+        });
+
+        it("should return false if the instSpec has no value or v property", function() {
+
+          var result = Simple.type.hasNormalizedInstanceSpecKeyData({foo: true});
+          expect(result).toBe(false);
+        });
+      });
+
+      describe("#_normalizeInstanceSpec(instSpec)", function() {
+
+        it("should return a plain object directly", function() {
+          var instSpec = {};
+          var result = Simple.type._normalizeInstanceSpec(instSpec);
+          expect(result).toBe(instSpec);
+        });
+
+        it("should return a spec when given a simple", function() {
+          var instSpec = new Simple({value: 1, formatted: "one"});
+          var result = Simple.type._normalizeInstanceSpec(instSpec);
+          expect(result).toEqual({value: 1, formatted: "one"});
+        });
+
+        it("should return a wrapped value when given something else", function() {
+          var instSpec = 1;
+          var result = Simple.type._normalizeInstanceSpec(instSpec);
+          expect(result).toEqual({value: 1});
+        });
+      });
+
+      describe("#createLike(value, instSpec)", function() {
+
+        it("should create a simple instance of the same type", function() {
+          var Simple2 = Simple.extend();
+
+          var value = new Simple2({value: 1, formatted: "one"});
+          var instSpec = {};
+          var result = Simple.type.createLike(value, instSpec);
+          expect(result).not.toBe(value);
+          expect(result instanceof Simple2).toBe(true);
+        });
+
+        it("should create a simple with the same value", function() {
+          var value = new Simple({value: 1, formatted: "one"});
+          var instSpec = {};
+          var result = Simple.type.createLike(value, instSpec);
+          expect(result.value).toBe(1);
+        });
+
+        describe("when instSpec contains a defined formatted", function() {
+
+          it("should create a simple with instSpec.formatted", function() {
+            var value = new Simple({value: 1, formatted: "one"});
+            var instSpec = {value: 1, formatted: "ONE"};
+            var result = Simple.type.createLike(value, instSpec);
+            expect(result.formatted).toBe("ONE");
+          });
+        });
+
+        describe("when instSpec contains a defined f", function() {
+
+          it("should create a simple with instSpec.f", function() {
+            var value = new Simple({value: 1, formatted: "one"});
+            var instSpec = {value: 1, f: "ONE"};
+            var result = Simple.type.createLike(value, instSpec);
+            expect(result.formatted).toBe("ONE");
+          });
+        });
+
+        describe("when instSpec does not contain a defined formatted or f", function() {
+
+          it("should create a simple with value.formatted", function() {
+            var value = new Simple({value: 1, formatted: "one"});
+            var instSpec = {value: 1};
+            var result = Simple.type.createLike(value, instSpec);
+            expect(result.formatted).toBe("one");
+          });
+        });
+
+        describe("when instSpec contains both defined formatted and f", function() {
+
+          it("should create a simple with instSpec.formatted", function() {
+            var value = new Simple({value: 1, formatted: "one"});
+            var instSpec = {value: 1, formatted: "ONE", f: "TWO"};
+            var result = Simple.type.createLike(value, instSpec);
+            expect(result.formatted).toBe("ONE");
+          });
         });
       });
     });

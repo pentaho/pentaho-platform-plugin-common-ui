@@ -97,20 +97,58 @@ define([
        */
 
       /**
-       * Determines if a given value, of the same type, represents the same entity.
+       * Determines if a given value represents the same entity.
        *
-       * The default implementation delegates the operation to the
-       * [_isEqual]{@link pentaho.type.Value.Type#_isEqual} method.
+       * This method checks if the given value is identical to this one.
+       * Otherwise, if not {@link Nully} and has the same constructor,
+       * execution is delegated to this value's [_equals]{@link pentaho.type.Value#_equals} method.
        *
-       * @param {any} other - A value to test for equality.
+       * @param {pentaho.type.Value} other - A value to test for equality.
+       *
        * @return {boolean} `true` if the given value is equal to this one; or, `false`, otherwise.
        *
-       * @see pentaho.type.Value#$key
-       * @see pentaho.type.Value.Type#areEqual
+       * @see pentaho.type.Value#_equals
+       *
        * @final
        */
       equals: function(other) {
-        return this === other || (other != null && this.$type._isEqual(this, other));
+        return this === other ||
+            (other != null && (this.constructor === other.constructor) && this._equals(other));
+      },
+
+      /**
+       * Gets a value that indicates if a given distinct, non-null value of the same type represents the same entity.
+       *
+       * The default implementation considers two values equal if they have the equal keys.
+       *
+       * @param {!pentaho.type.Value} other - A distinct value to test for equality.
+       *
+       * @return {boolean} `true` if the given value is equal to this one; `false`, otherwise.
+       *
+       * @protected
+       *
+       * @see pentaho.type.Value#equals
+       * @see pentaho.type.Value#$key
+       */
+      _equals: function(other) {
+        return this.$key === other.$key;
+      },
+
+      /**
+       * Gets a value that indicates if a given equal value has the same content as this one.
+       *
+       * This method must only be called if the [equals]{@link pentaho.type.Value#equals} method returns `true`.
+       *
+       * The default implementation returns `false`.
+       *
+       * @param {!pentaho.type.Value} other - An equal value to test for content-equality.
+       *
+       * @return {boolean} `true` if the given value is equal in content to this one; `false`, otherwise.
+       *
+       * @see pentaho.type.Value#equals
+       */
+      equalsContent: function(other) {
+        return false;
       },
 
       // region validation
@@ -156,7 +194,9 @@ define([
        */
       assertValid: function() {
         var errors = this.validate();
-        if(errors) throw errors[0];
+        if(errors != null) {
+          throw errors[0];
+        }
       },
       // endregion
 
@@ -311,68 +351,135 @@ define([
          *
          * Two values are considered equal if they represent the same real-world entity.
          *
-         * If two values are considered equal,
-         * their value instances must have an equal [key]{@link pentaho.type.Value#$key}.
-         * Conversely, if they are considered different,
-         * their value instances must have a different `$key`.
+         * The execution proceeds as follows:
+         * 1. If either of the values is {@link Nully}, then they're equal only if both are {@link Nully};
+         * 2. Otherwise, execution is delegated to the first value's {@link pentaho.type.Value#equals} method.
          *
-         * If the values are identical as per JavaScript's `===` operator, `true` is returned.
-         * If both values are {@link Nully}, `true` is returned.
-         * If only one is {@link Nully}, `false` is returned.
-         * Otherwise, the operation is delegated to the {@link pentaho.type.Value#_areEqual} method.
+         * @param {pentaho.type.Value|undefined} valueA - The first value.
+         * @param {pentaho.type.Value|undefined} valueB - The second value.
          *
-         * @param {any} va - The first value.
-         * @param {any} vb - The second value.
-         *
-         * @return {boolean} `true` if two values are considered equal; `false`, otherwise.
+         * @return {boolean} `true` if two values are equal; `false`, otherwise.
          *
          * @see pentaho.type.Value#$key
-         * @see pentaho.type.Value.Type#_areEqual
-         * @see pentaho.type.Value.Type#_isEqual
+         * @see pentaho.type.Value#equals
+         * @final
          */
-        areEqual: function(va, vb) {
-          return va === vb || (va == null && vb == null) || (va != null && vb != null && this._areEqual(va, vb));
+        areEqual: function(valueA, valueB) {
+
+          return (valueA == null || valueB == null)
+            ? (valueA == null && valueB == null)
+            : valueA.equals(valueB);
         },
 
         /**
-         * Gets a value that indicates if two distinct, non-{@link Nully} values are, nonetheless, considered equal.
+         * Gets a value that indicates if two values are *equal* and *content-equal*.
          *
-         * The default implementation checks if one of the values is a value instance, and, if so,
-         * delegates the operation to its type's {@link pentaho.type.Value#_isEqual} method.
+         * Checks that both values are [equals]{@link pentaho.type.Value#equals}
+         * and [equalsContent]{@link pentaho.type.Value#equalsContent}.
          *
-         * @param {!any} va - The first value.
-         * @param {!any} vb - The second value.
+         * @param {any} valueA - The first value.
+         * @param {any} valueB - The second value.
          *
-         * @return {boolean} `true` if two values are considered equal; `false`, otherwise.
+         * @return {boolean} `true` if two values are considered equal and content-equal; `false`, otherwise.
          *
-         * @protected
-         *
-         * @see pentaho.type.Value.Type#areEqual
+         * @final
          */
-        _areEqual: function(va, vb) {
-          return (va instanceof Value) ? va.$type._isEqual(va, vb) :
-                 (vb instanceof Value) ? vb.$type._isEqual(vb, va) :
-                 false;
+        areEqualContent: function(valueA, valueB) {
+          return this.areEqual(valueA, valueB) && valueA.equalsContent(valueB);
         },
 
         /**
-         * Gets a value that indicates if one instance of this type is considered equal to a distinct,
-         * non-nully value, but possibly not a value instance.
+         * Gets a value that indicates if all of the elements of two lists of the same type are *content-equal*.
          *
-         * The default implementation considers two values equal if
-         * they have the same constructor and equal keys.
+         * @param {!pentaho.type.List} listA - One list instance.
+         * @param {!pentaho.type.List} listB - Another list instance.
          *
-         * @param {!pentaho.type.Value} va - The value instance.
-         * @param {any} vb - The other value.
+         * @return {boolean} `true` if the elements of the two lists are content-equal; `false`, otherwise.
          *
-         * @return {boolean} `true` if two values are considered equal; `false`, otherwise.
+         * @final
+         */
+        areEqualContentElements: function(listA, listB) {
+
+          var areAll = true;
+
+          listA.each(function(valueA, index) {
+            var valueB = listB.at(index);
+            if(!this.areEqualContent(valueA, valueB)) {
+              areAll = false;
+              // break;
+              return false;
+            }
+          }, this);
+
+          return areAll;
+        },
+
+        // region value specification
+
+        /**
+         * Normalizes a given value specification.
+         *
+         * Usually, "deserialization" is handled in a type's constructor.
+         * However,
+         * for proper handling of the [configure]{@link pentaho.type.Value#configure} operation,
+         * the Type API needs to normalize new value specifications to decide whether it can
+         * [configure]{@link pentaho.type.Complex#configure} operations an existing instance
+         * instead of constructing a new one. This, obviously, has to be done outside of a constructor.
+         *
+         * For example, some complex types can serialize as a single _string_ if only its _main_ property is specified.
+         * In such cases, this method would return a normal, object, generic specification containing the given value
+         * as the value of the main property.
+         *
+         * This method calls the [_normalizeInstanceSpec]{@link pentaho.type.Value.Type#_normalizeInstanceSpec}
+         * when the specified value specification is not {@link Nully}.
+         *
+         * @param {any} instSpec - The value specification.
+         *
+         * @return {?object} The normalized value specification or `null`
+         *
+         * @final
+         *
+         * @see pentaho.type.Value.Type#_normalizeInstanceSpec
+         */
+        normalizeInstanceSpec: function(instSpec) {
+          return instSpec != null ? this._normalizeInstanceSpec(instSpec) : null;
+        },
+
+        /**
+         * Actually normalizes a given non-{@link Nully} value specification.
+         *
+         * Override this method to improve the Type API support for types that have a
+         * non-generic serialization format.
+         *
+         * The default implementation simply returns the given value specification.
+         *
+         * @param {!any} instSpec - The value specification.
+         *
+         * @return {!any} The normalized value specification.
          *
          * @protected
          *
-         * @see pentaho.type.Value.Type#areEqual
+         * @see pentaho.type.Value.Type#normalizeInstanceSpec
          */
-        _isEqual: function(va, vb) {
-          return (va.constructor === vb.constructor) && (va.$key === vb.$key);
+        _normalizeInstanceSpec: function(instSpec) {
+          return instSpec;
+        },
+
+        /**
+         * Gets a value that indicates if a given normalized value specification has any key information.
+         *
+         * The default implementation returns `false`.
+         *
+         * @param {object} instSpec - The entity normalized specification.
+         *
+         * @return {boolean} `true` if the specification contains key information; `false`, otherwise.
+         *
+         * @see pentaho.type.Value.Type#isEntity
+         * @see pentaho.type.Value.Type#normalizeInstanceSpec
+         * @see pentaho.type.Value#$key
+         */
+        hasNormalizedInstanceSpecKeyData: function(instSpec) {
+          return false;
         },
         // endregion
 

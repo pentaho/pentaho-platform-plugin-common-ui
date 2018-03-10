@@ -67,10 +67,10 @@ define([
           if(spec.constructor === Object) {
             if((value = spec.value) === undefined) {
               value = spec.v;
-          }
+            }
             if((formatted = spec.formatted) === undefined) {
               formatted = spec.f;
-          }
+            }
           } else if(spec instanceof Simple) {
             // Implicit "downcast" of simple values.
             value = spec.value;
@@ -82,22 +82,22 @@ define([
           value = spec;
         }
 
-      /**
-       * Gets the underlying JavaScript value represented by the _simple_ value.
-       *
+        /**
+         * Gets the underlying JavaScript value represented by the _simple_ value.
+         *
          * @name pentaho.type.Simple#value
-       * @type {!any}
-       * @readonly
-       */
+         * @type {!any}
+         * @readonly
+         */
         O.setConst(this, "value", this.$type.toValue(value));
 
         /**
          * Gets the formatted value of the property.
-       *
+         *
          * @name pentaho.type.Simple#formatted
          * @type {?nonEmptyString}
          * @readonly
-       */
+         */
         O.setConst(this, "formatted", __nonEmptyString(formatted));
       },
 
@@ -146,92 +146,60 @@ define([
       },
 
       /**
-       * Determines if a given value, of the same type, represents the same entity with the same content.
+       * Gets a value that indicates if a given distinct, non-null value of the same type represents the same entity.
        *
-       * The given value **must** be of the same concrete type (or the result is undefined).
+       * This method checks if the primitive value of one is equal to the primitive value of the other.
        *
-       * If two values are equal, they must have an equal [key]{@link pentaho.type.Simple#$key},
-       * [value]{@link pentaho.type.Simple#value}, [formatted value]{@link pentaho.type.Simple#formatted}.
+       * @param {!pentaho.type.Simple} other - A distinct value to test for equality.
        *
-       * @param {!pentaho.type.Simple} other - A simple value to test for equality.
-       * @return {boolean} `true` if the given simple value is equal to this one; `false`, otherwise.
+       * @return {boolean} `true` if the given value is equal to this one; `false`, otherwise.
+       *
+       * @protected
+       * @override
+       * @final
+       *
+       * @see pentaho.type.Value#equals
        */
-      equalsContent: function(other) {
-        if(!this.equals(other)) return false;
-
-        // TODO: generic metadata
-        return this.__value === other.__value && this.__formatted === other.__formatted;
+      _equals: function(other) {
+        return this.value === other.value;
       },
-
-      // region configuration
-
-      // TODO: unify constructor, cloning and configuration code somehow?
 
       /**
-       * Configures this value with a given configuration.
+       * Gets a value that indicates if a given equal value has the same content as this one.
        *
-       * If `config` is {@link Nully}, it is ignored.
+       * This method checks if the [formatted]{@link pentaho.type.Simple#formatted} value of the
+       * given value is the same as that of this one.
        *
-       * If `config` is a plain object, its properties, `v`, `f`, `value` and `formatted`
-       * are set on this simple's corresponding properties. It is an error if the properties `v` or `value`
-       * contain a primitive value which is different from of this simple.
+       * @param {!pentaho.type.Simple} other - An equal simple value to test for content-equality.
        *
-       * If `config` is another simple value, it can be of any simple type.
-       * However, its primitive value must be the same as that of this simple.
-       * If the formatted value of `config` is not {@link Nully}, it updates this simple's formatted value.
+       * @return {boolean} `true` if the given value is equal in content to this one; `false`, otherwise.
        *
-       * An error is thrown if `config` is of another type.
-       *
-       * @name configure
-       * @memberOf pentaho.type.Simple#
-       *
-       * @param {Object|pentaho.type.Simple} config - The configuration.
-       *
-       * @return {!pentaho.type.Simple} This instance.
-       *
-       * @throws {pentaho.lang.ArgumentInvalidError} When `config` is not either a plain object or a simple value.
+       * @override
+       * @final
        */
-
-      /** @inheritDoc */
-      _configure: function(config) {
-        // Nothing configurable at this level
-        if(config instanceof Object) {
-          // A plain object?
-          if(config.constructor === Object) {
-            this.__configureFromObject(config);
-            return;
-          }
-
-          // Another Simple? Clone or Downcast.
-          if(config instanceof Simple) {
-            this.__configureFromSimple(config);
-            return;
-          }
-        }
-
-        throw error.argInvalidType("config", ["Object", "pentaho.type.Simple"], typeof config);
+      equalsContent: function(other) {
+        return this.formatted === other.formatted;
       },
 
-      __configureFromSimple: function(other) {
-        if(other !== this) {
+      // TODO: consider creating a key counterpart for order: `ordinal` to use in comparisons.
 
-          // TODO: same simple class?
-          // Implicit "downcast" of simple values.
-
-          // Inits or ensures value is the same (and throws otherwise).
-          this.value = other.value;
-          var f = other.formatted;
-          if(f != null) {
-            this.formatted = f;
-          }
-        }
+      /**
+       * Compares this element to a distinct, non-equal element of the same type according to its relative order.
+       *
+       * This method compares the primitive value of this value with that of `other` by delegating to
+       * the [comparePrimitiveValues]{@link pentaho.type.Simple.Type#comparePrimitiveValues} method.
+       *
+       * @param {!pentaho.type.Simple} other - The other value.
+       *
+       * @return {number} `-1` if this value is _before_ `other`; `1` if this value is _after_ `other`;
+       * `0`, otherwise.
+       *
+       * @protected
+       * @see pentaho.type.Simple.Type#comparePrimitiveValues
+       */
+      _compare: function(other) {
+        return this.$type.comparePrimitiveValues(this.value, other.value);
       },
-
-      __configureFromObject: function(config) {
-        // TODO: more efficient implementation?
-        this.extend(config);
-      },
-      // endregion
 
       // region serialization
       /** @inheritDoc */
@@ -280,8 +248,8 @@ define([
         // Need one. Ensure _ is the first property
         /* jshint laxbreak:true*/
         var spec = (includeType || (declaredType && type !== declaredType))
-            ? {_: type.toRefInContext(keyArgs), v: value}
-            : {v: value};
+          ? {_: type.toRefInContext(keyArgs), v: value}
+          : {v: value};
 
         if(addFormatted) spec.f = this.formatted;
 
@@ -383,7 +351,7 @@ define([
           if(value == null)
             throw error.argInvalid(
               "value",
-                bundle.format(bundle.structured.errors.value.cannotConvertToType, [this.label]));
+              bundle.format(bundle.structured.errors.value.cannotConvertToType, [this.label]));
 
           return value;
         },
@@ -411,104 +379,63 @@ define([
         },
         // endregion
 
-        // region equality and comparison
-        /**
-         * Gets a value that indicates if two distinct, non {@link Nully} simple values are, nonetheless,
-         * considered equal.
-         *
-         * The default implementation considers two values equal if the
-         * primitive value of one is equal to the primitive value of the other.
-         * If both values are simple values, then they must have the same constructor.
-         *
-         * @param {any} va - The first value.
-         * @param {any} vb - The second value.
-         *
-         * @return {boolean} `true` if two simple values are considered equal; `false`, otherwise.
-         *
-         * @protected
-         */
-        _areEqual: function(va, vb) {
-          if((va instanceof Simple) && (vb instanceof Simple)) {
-            if(va.constructor !== vb.constructor) {
-              return false;
-            }
-          }
-          return va.valueOf() === vb.valueOf();
-        },
-
-        /**
-         * Gets a value that indicates if one simple value of this type is considered equal to a distinct,
-         * non-nully value, but possibly not a value instance.
-         *
-         * The default implementation considers two values equal if the
-         * primitive value of one is equal to the primitive value of the other.
-         * If `vb` is also a simple value, then it must have the same constructor as `va`.
-         *
-         * @param {!pentaho.type.Value} va - The value instance.
-         * @param {any} vb - The other value.
-         *
-         * @return {boolean} `true` if two values are considered equal; `false`, otherwise.
-         *
-         * @protected
-         *
-         * @see pentaho.type.Simple.Type#_areEqual
-         */
-        _isEqual: function(va, vb) {
-          if(vb instanceof Simple) {
-            if(va.constructor !== vb.constructor) {
-              return false;
-            }
-          }
-          return va.__value === vb.valueOf();
-        },
-
-        // TODO: consider creating a key counterpart for order: `ordinal` to use in comparisons.
-
-        /**
-         * Compares two non-equal, non-{@link Nully} values according to their order.
-         *
-         * If both values are simple values and their constructors are different,
-         * then they're assumed to have the same order.
-         * Otherwise, the two values are compared by the natural ascending order of their primitive value.
-         * If both primitive values are numbers or {@link Date} objects, numeric order is used.
-         * Otherwise, their string representations are compared in lexicographical order.
-         *
-         * @param {any} va - The first value.
-         * @param {any} vb - The second value.
-         *
-         * @return {number} `-1` if `va` is considered _before_ `vb`; `1` is `va` is considered _after_ `vb`;
-         * `0`, otherwise.
-         *
-         * @protected
-         */
-        _compare: function(va, vb) {
-          // Dunno how to compare apples and bananas.
-          if((va instanceof Simple) && (vb instanceof Simple)) {
-            if(va.constructor !== vb.constructor) {
-              return 0;
-            }
-          }
-
-          return this._compareValues(va.valueOf(), vb.valueOf());
-        },
-
         /**
          * Compares two primitive values according to their order.
          *
-         * @param {any} va - The first value.
-         * @param {any} vb - The second value.
+         * If primitive values are numbers or {@link Date} objects, numeric order is used.
+         * Otherwise, their string representations are compared using lexicographical ordering.
          *
-         * @return {number} `-1` if `va` is considered _before_ `vb`; `1` is `va` is considered _after_ `vb`;
-         * `0`, otherwise.
+         * @param {!any} valueA - The first value.
+         * @param {!any} valueB - The second value.
          *
-         * @protected
+         * @return {number} `-1` if `valueA` is _before_ `valueB`; `1` is `valueA` is _after_ `valueB`; `0`, otherwise.
          */
-        _compareValues: function(va, vb) {
-          return F.compare(va, vb);
+        comparePrimitiveValues: function(valueA, valueB) {
+          return F.compare(valueA, valueB);
         },
-        // endregion
+
+        /** @inheritDoc */
+        hasNormalizedInstanceSpecKeyData: function(instSpec) {
+          return instSpec.value !== undefined || instSpec.v !== undefined;
+        },
+
+        /** @inheritDoc */
+        createLike: function(value, config) {
+          // 1. config.formatted
+          // 2. config.f
+          // 3. value.formatted
+          var formatted = config.formatted;
+          if(formatted === undefined && (formatted = config.f) === undefined) {
+            formatted = value.formatted;
+          }
+
+          var SimpleClass = value.constructor;
+          return new SimpleClass({value: value.value, formatted: formatted});
+        },
 
         // region serialization
+
+        /** @inheritDoc */
+        _normalizeInstanceSpec: function(instSpec) {
+
+          if(instSpec instanceof Object) {
+
+            if(instSpec.constructor === Object) {
+              return instSpec;
+            }
+
+            if(instSpec instanceof Simple) {
+              // Copy, Downcast, Discard type info...
+              return {
+                value: instSpec.value,
+                formatted: instSpec.formatted
+              };
+            }
+          }
+
+          return {value: instSpec};
+        },
+
         /** @inheritDoc */
         _fillSpecInContext: function(spec, keyArgs) {
 
