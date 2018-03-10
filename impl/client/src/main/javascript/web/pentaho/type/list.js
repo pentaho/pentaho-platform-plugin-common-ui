@@ -254,16 +254,6 @@ define([
       /**
        * Gets the key of the list value.
        *
-       * The key of a value identifies it among values of the same concrete type.
-       *
-       * If two values have the same concrete type and their
-       * keys are equal, then it must also be the case that
-       * {@link pentaho.type.Value.Type#areEqual}
-       * returns `true` when given the two values.
-       * The opposite should be true as well.
-       * If two values of the same concrete type have distinct keys,
-       * then {@link pentaho.type.Value.Type#areEqual} should return `false`.
-       *
        * The default list implementation, returns the value of the
        * list instance's {@link pentaho.type.List#$uid}.
        *
@@ -628,7 +618,21 @@ define([
         alias: "list",
 
         get isList() { return true; },
+
         get isContainer() { return true; },
+
+        /**
+         * Gets a value that indicates if this type is an _entity_ type.
+         *
+         * [List]{@link pentaho.type.List} types are inherently non-entity types.
+         *
+         * @name pentaho.type.List.Type#isEntity
+         * @type {boolean}
+         * @readOnly
+         * @see pentaho.type.Value#$key
+         * @override
+         * @final
+         */
 
         // region of / element type attribute
         __elemType: Element.type,

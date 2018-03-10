@@ -44,6 +44,8 @@ define([
        * of the [type of scale]{@link pentaho.visual.role.Mode#isContinuous}, continuous or categorical,
        * used to encode it.
        *
+       * The `Mode` type is an [entity]{@link pentaho.type.Value.Type#isEntity} type.
+       *
        * @description Creates a visual role operating mode instance.
        * @constructor
        * @param {pentaho.visual.role.spec.IMode} [spec] A visual role operating mode specification.
@@ -68,6 +70,7 @@ define([
          * @type {string}
          * @readOnly
          * @override
+         * @see pentaho.type.Value.Type#isEntity
          */
         get $key() {
           return this.get("dataType").$key + "|" + this.isContinuous;
@@ -127,9 +130,14 @@ define([
 
         $type: /** @lends pentaho.visual.role.Mode.Type# */{
           id: module.id,
+
+          isEntity: true,
+
           props: [
             /**
              * Gets the data type of the visual role value when operating in this mode.
+             *
+             * This property is immutable and can only be specified at construction time.
              *
              * When unspecified, or specified as `null`,
              * the default value is {@link pentaho.type.Instance},

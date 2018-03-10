@@ -177,16 +177,6 @@ define([
       /**
        * Gets the key of the complex value.
        *
-       * The key of a value identifies it among values of the same concrete type.
-       *
-       * If two values have the same concrete type and their
-       * keys are equal, then it must also be the case that
-       * {@link pentaho.type.Value.Type#areEqual}
-       * returns `true` when given the two values.
-       * The opposite should be true as well.
-       * If two values of the same concrete type have distinct keys,
-       * then {@link pentaho.type.Value.Type#areEqual} should return `false`.
-       *
        * The default complex implementation returns the value of the [$uid]{@link pentaho.type.Complex#$uid} property.
        *
        * @type {string}
@@ -558,8 +548,62 @@ define([
         isAbstract: true,
 
         get isComplex() { return true; },
+
         get isContainer() { return true; },
 
+        // region isEntity attribute
+        __isEntity: false,
+
+        /**
+         * Gets or sets a value that indicates if this type is an _entity_ type.
+         *
+         * [Complex]{@link pentaho.type.Complex} types can set this property to true,
+         * and override the `$key` property, to become entity types.
+         *
+         * ### This attribute is *Monotonic*
+         *
+         * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
+         *
+         * In this case, a _complex type_ which is not an entity type can later be marked as an entity type.
+         * However, a _complex type_ which is an entity type can no longer go back to not being a non-entity type.
+         *
+         * ### This attribute is *Inherited*
+         *
+         * When there is no _local value_, the _effective value_ of the attribute is the _inherited effective value_.
+         *
+         * ### Other characteristics
+         *
+         * When a {@link Nully} value is specified, the set operation is ignored.
+         *
+         * When set and the type already has [subtypes]{@link pentaho.type.Type#hasDescendants},
+         * an error is thrown.
+         *
+         * The default (root) `isEntity` attribute value is `false`.
+         *
+         * @type {boolean}
+         * @override
+         * @final
+         *
+         * @throws {pentaho.lang.OperationInvalidError} When setting and the type
+         * already has [subtypes]{@link pentaho.type.Type#hasDescendants}.
+         *
+         * @see pentaho.type.Value#$key
+         */
+        get isEntity() {
+          return this.__isEntity;
+        },
+
+        set isEntity(value) {
+
+          this._assertNoSubtypesAttribute("isEntity");
+
+          if(value == null) return;
+
+          if(!this.__isEntity && value) {
+            this.__isEntity = true;
+          }
+        },
+        // endregion
         // region properties property
         __props: null,
 
@@ -740,6 +784,12 @@ define([
         _fillSpecInContext: function(spec, keyArgs) {
 
           var any = this.base(spec, keyArgs);
+
+
+          if(O.hasOwn(this, "__isEntity")) {
+            any = true;
+            spec.isEntity = this.isEntity;
+          }
 
           if(this.count) {
             var props;

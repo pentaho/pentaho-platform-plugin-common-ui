@@ -289,6 +289,13 @@ define([
         });
       });
 
+
+      describe("#isEntity", function() {
+        it("should return the value `true`", function() {
+          expect(Simple.type.isEntity).toBe(true);
+        });
+      });
+
       describe("#cast", function() {
 
         it("should default to an identity method", function() {

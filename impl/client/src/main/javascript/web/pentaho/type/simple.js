@@ -178,21 +178,12 @@ define([
       /**
        * Gets the key of the simple value.
        *
-       * The key of a value identifies it among values of the same concrete type.
-       *
-       * If two values have the same concrete type and their
-       * keys are equal, then it must also be the case that
-       * {@link pentaho.type.Value.Type#areEqual}
-       * returns `true` when given the two values.
-       * The opposite should be true as well.
-       * If two values of the same concrete type have distinct keys,
-       * then {@link pentaho.type.Value.Type#areEqual} should return `false`.
-       *
        * The default simple value implementation, returns the result of calling
        * `toString()` on {@link pentaho.type.Simple#value}.
        *
        * @type {string}
        * @readonly
+       * @see pentaho.type.Simple.Type#isEntity
        */
       get $key() {
         return this.__value.toString();
@@ -364,8 +355,26 @@ define([
         alias: "simple",
         isAbstract: true,
 
+        // @override
         get isSimple() { return true; },
 
+        // region isEntity attribute
+        /**
+         * Gets a value that indicates if this type is an _entity_ type.
+         *
+         * [Simple]{@link pentaho.type.Simple} types are inherently entity types.
+         * This property is _final_ and always returns `true`.
+         *
+         * @type {boolean}
+         * @readOnly
+         * @override
+         * @final
+         * @see pentaho.type.Value#$key
+         */
+        get isEntity() {
+          return true;
+        },
+        // endregion
         // region cast method
         /**
          * Converts an external value to the type stored by the simple type

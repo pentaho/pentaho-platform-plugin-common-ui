@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -958,5 +958,46 @@ define([
         expect(f).not.toHaveBeenCalled();
       });
     });
-  }); // pentaho.type.Complex.Type
+
+    describe("#isEntity", function() {
+
+      it("should default to `false`", function() {
+        expect(Complex.type.isEntity).toBe(false);
+      });
+
+      it("should respect a specified value when the base value is false", function() {
+
+        var Derived = Complex.extend({
+          $type: {isEntity: true}
+        });
+
+        expect(Derived.type.isEntity).toBe(true);
+      });
+
+      it("should ignore a specified value when the base value is true", function() {
+
+        var Derived = Complex.extend({
+          $type: {isEntity: true}
+        });
+
+        var Derived2 = Derived.extend({
+          $type: {isEntity: false}
+        });
+
+        expect(Derived2.type.isEntity).toBe(true);
+      });
+
+      it("should inherit the base value", function() {
+
+        var Derived = Complex.extend({
+          $type: {isEntity: true}
+        });
+
+        var Derived2 = Derived.extend();
+
+        expect(Derived2.type.isEntity).toBe(true);
+      });
+    }); // end isEntity
+
+  }); // end pentaho.type.Complex.Type
 });

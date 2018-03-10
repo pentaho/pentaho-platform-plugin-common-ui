@@ -71,13 +71,18 @@ define([
        * The key of a value must identify it among values of the same concrete type.
        * Two values of the same concrete type and with the same key represent the same entity.
        *
+       * If two values have the same concrete type and their
+       * keys are equal, then it must also be the case that {@link pentaho.type.Value#equals} returns `true`.
+       * The opposite should be true as well.
+       * If two values of the same concrete type have distinct keys,
+       * then it must be the case that {@link pentaho.type.Value#equals} returns `false`.
+       *
        * The default implementation returns the result of calling `toString()`.
        *
        * @type {string}
        * @readonly
        *
        * @see pentaho.type.Value#equals
-       * @see pentaho.type.Value.Type#areEqual
        */
       get $key() {
         return this.toString();
@@ -251,6 +256,24 @@ define([
         get isValue() {
           return true;
         },
+
+        /**
+         * Gets a value that indicates if this type is an _entity_ type.
+         *
+         * An _entity_ type is an [element]{@link pentaho.type.Element.Type} type
+         * that represents a _business_ entity whose identity is reflected
+         * by the [$key]{@link pentaho.type.Value#$key} property.
+         *
+         * [Simple]{@link pentaho.type.Simple} types are inherently entity types.
+         * [Complex]{@link pentaho.type.Complex} types can set this property to true,
+         * and override the `$key` property, to become entity types.
+         *
+         * @type {boolean}
+         * @readOnly
+         * @see pentaho.type.Value#$key
+         */
+        get isEntity() { return false; },
+        // endregion
 
         // region equality
         /**
