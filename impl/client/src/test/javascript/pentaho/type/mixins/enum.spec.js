@@ -151,7 +151,7 @@ define([
       });
     }); // #domain
 
-    describe(".Type#validate(value)", function() {
+    describe("#validate(value)", function() {
 
       it("should return null on a value that is equal to one of `domain`", function() {
 
@@ -164,7 +164,7 @@ define([
 
         var v = new MyNumber(1);
 
-        expect(MyNumber.type.validate(v)).toBe(null);
+        expect(v.validate()).toBe(null);
       });
 
       it("should return an Error on a value that is not equal to one of `domain`", function() {
@@ -178,7 +178,7 @@ define([
 
         var v = new MyNumber(4);
 
-        var errors = MyNumber.type.validate(v);
+        var errors = v.validate();
         expect(errors.length).toBe(1);
         expect(errors[0] instanceof Error).toBe(true);
       });

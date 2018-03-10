@@ -39,41 +39,23 @@ define([
 
     describe("#validate() -", function() {
 
-      it("should call _validate(.) of the list element type with each of its members", function() {
+      it("should call #validate() on each of its elements", function() {
 
         var NumberList = List.extend({
           $type: {of: PentahoNumber}
         });
-
-        spyOn(PentahoNumber.type, "_validate");
 
         var list = new NumberList([1, 2, 3]);
 
-        list.validate();
-
-        expect(PentahoNumber.type._validate).toHaveBeenCalledWith(list.at(0));
-        expect(PentahoNumber.type._validate).toHaveBeenCalledWith(list.at(1));
-        expect(PentahoNumber.type._validate).toHaveBeenCalledWith(list.at(2));
-      });
-
-      it("should call _validate(.) of each of the list elements' type " +
-         "when the list element type is of a base type", function() {
-
-        var PentahoInteger = PentahoNumber.extend();
-
-        var NumberList = List.extend({
-          $type: {of: PentahoNumber}
-        });
-
-        spyOn(PentahoInteger.type, "_validate");
-
-        var list = new NumberList([new PentahoInteger(1), new PentahoInteger(2), new PentahoInteger(3)]);
+        spyOn(list.at(0), "validate").and.returnValue(true);
+        spyOn(list.at(1), "validate").and.returnValue(true);
+        spyOn(list.at(2), "validate").and.returnValue(true);
 
         list.validate();
 
-        expect(PentahoInteger.type._validate).toHaveBeenCalledWith(list.at(0));
-        expect(PentahoInteger.type._validate).toHaveBeenCalledWith(list.at(1));
-        expect(PentahoInteger.type._validate).toHaveBeenCalledWith(list.at(2));
+        expect(list.at(0).validate).toHaveBeenCalledTimes(1);
+        expect(list.at(1).validate).toHaveBeenCalledTimes(1);
+        expect(list.at(2).validate).toHaveBeenCalledTimes(1);
       });
     });
   });

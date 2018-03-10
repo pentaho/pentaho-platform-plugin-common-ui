@@ -623,6 +623,29 @@ define([
       },
       // endregion
 
+      // region validation
+      /**
+       * Determines if the given list value is valid.
+       *
+       * The default implementation validates each element against the
+       * list's [element type]{@link pentaho.type.List.Type#of}
+       * and collects and returns any reported errors.
+       * Override to complement with a type's specific validation logic.
+       *
+       * You can use the error utilities in {@link pentaho.type.Util} to
+       * help in the implementation.
+       *
+       * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
+       *
+       * @override
+       */
+      validate: function() {
+        return this.__projectedMock.__elems.reduce(function(errors, elem) {
+          return typeUtil.combineErrors(errors, elem.validate());
+        }, null);
+      },
+      // endregion
+
       $type: /** @lends pentaho.type.List.Type# */{
 
         /** @inheritDoc */
@@ -739,32 +762,6 @@ define([
           // noinspection JSAnnotator
           this.__elemType = elemType;
 
-        },
-        // endregion
-
-        // region validation
-        /**
-         * Determines if the given list value is a **valid instance** of this type.
-         *
-         * The default implementation validates each element against the
-         * list's [element type]{@link pentaho.type.List.Type#of}
-         * and collects and returns any reported errors.
-         * Override to complement with a type's specific validation logic.
-         *
-         * You can use the error utilities in {@link pentaho.type.Util} to
-         * help in the implementation.
-         *
-         * @param {!pentaho.type.Value} value - The value to validate.
-         *
-         * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
-         *
-         * @protected
-         * @override
-         */
-        _validate: function(value) {
-          return value.__projectedMock.__elems.reduce(function(errors, elem) {
-            return typeUtil.combineErrors(errors, elem.validate());
-          }, null);
         },
         // endregion
 

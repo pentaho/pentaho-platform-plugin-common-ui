@@ -58,13 +58,13 @@ define([
 
         it("should return null", function() {
           var derived = new Derived({x: "1", y: ["1", "2", "3"], z: ["1", "2"]});
-          expect(Derived.type.validate(derived)).toBe(null);
+          expect(derived.validate()).toBe(null);
         });
 
         it("should return three errors", function() {
           var derived = new Derived({y: ["1"], z: ["1", "2", "3"]});
 
-          expect(Derived.type.validate(derived).length).toBe(3);
+          expect(derived.validate().length).toBe(3);
         });
       });
 

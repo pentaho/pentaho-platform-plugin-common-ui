@@ -156,7 +156,7 @@ define([
       // region validation
 
       /**
-       * Determines if this value is a **valid instance** of its type.
+       * Determines if this value is a valid.
        *
        * This attribute calls [validate]{@link pentaho.type.Value#validate} and
        * returns a boolean value indicating if it returned no errors.
@@ -166,21 +166,26 @@ define([
        * @final
        */
       get $isValid() {
-        return !this.validate();
+        return this.validate() == null;
       },
 
       /**
-       * Determines if this value is a **valid instance** of its type.
+       * Determines if this value is valid.
        *
-       * The default implementation delegates to {@link pentaho.type.Value.Type#_validate}.
+       * The default implementation does nothing and considers the instance valid.
+       * Override to implement a type's specific validation logic.
+       *
+       * You can use the error utilities in {@link pentaho.type.Util} to
+       * help in the implementation.
        *
        * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
        *
-       * @see pentaho.type.Value#$isValid
        * @final
+       *
+       * @see pentaho.type.Value#$isValid
        */
       validate: function() {
-        return this.$type.validate(this);
+        return null;
       },
 
       /**
@@ -518,82 +523,6 @@ define([
          */
         hasNormalizedInstanceSpecKeyData: function(instSpec) {
           return false;
-        },
-        // endregion
-
-        // region validation
-        /**
-         * Determines if a value is a **valid instance** of this type.
-         *
-         * This method calls [validate]{@link pentaho.type.Value.Type#validate} and
-         * returns a boolean value indicating if it returned no errors.
-         *
-         * The `isValid` method can be seen as a stronger version
-         * of {@link pentaho.type.Value.Type#is}.
-         *
-         * @param {any} value - The value to validate.
-         *
-         * @return {boolean} `true` if the value is a valid instance of this type, `false` if not.
-         * @final
-         */
-        isValid: function(value) {
-          return !this.validate(value);
-        },
-
-        /**
-         * Determines if a value is a **valid instance** of this type.
-         *
-         * Validation of `value` proceeds as follows:
-         * 1. If it is {@link Nully}, an error is returned
-         * 2. If it does not satisfy [is]{@link pentaho.type.Value.Type#is}, an error is returned
-         * 3. Validation is delegated to [_validate]{@link pentaho.type.Value.Type#_validate}.
-         *
-         * @param {?any} value - The value to validate.
-         *
-         * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
-         *
-         * @see pentaho.type.Value#validate
-         * @see pentaho.type.Value.Type#isValid
-         * @see pentaho.type.Value.Type#_validate
-         *
-         * @final
-         */
-        validate: function(value) {
-          if(value == null)
-            return [new ValidationError(bundle.structured.errors.value.cannotBeNull)];
-
-          if(!this.is(value))
-            return [new ValidationError(bundle.format(bundle.structured.errors.value.notOfType, [this.label]))];
-
-          return value.$type._validate(value);
-        },
-
-        /**
-         * Determines if a value,
-         * that **is an instance of this type**,
-         * is also a **valid instance** of this type.
-         *
-         * Thus, `this === value.$type` must be true.
-         *
-         * The default implementation does nothing and considers the instance valid.
-         * Override to implement a type's specific validation logic.
-         *
-         * You can use the error utilities in {@link pentaho.type.Util} to
-         * help in the implementation.
-         *
-         * @param {!pentaho.type.Value} value - The value to validate.
-         *
-         * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
-         *
-         * @protected
-         *
-         * @see pentaho.type.Value.Type#validate
-         */
-        _validate: function(value) {
-
-          // assert this === value.$type
-
-          return null;
         },
         // endregion
 

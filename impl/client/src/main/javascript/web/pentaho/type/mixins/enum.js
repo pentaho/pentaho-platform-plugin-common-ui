@@ -77,6 +77,13 @@ define([
      */
     var Enum = Simple.extend(/** @lends pentaho.type.mixins.Enum# */{
 
+      /** @inheritDoc */
+      validate: function() {
+        return typeUtil.combineErrors(
+          this.base(),
+          this.$type.__validateDomain(this));
+      },
+
       $type: /** @lends pentaho.type.mixins.Enum.Type# */{
 
         alias: "enum",
@@ -93,13 +100,6 @@ define([
           return spec;
         },
 
-        /** @inheritDoc */
-        _validate: function(value) {
-          return typeUtil.combineErrors(
-              this.base(value),
-              this.__validateDomain(value));
-        },
-
         /**
          * Validates a value w.r.t. the restricted domain.
          *
@@ -110,8 +110,8 @@ define([
         __validateDomain: function(value) {
           var domain = this.__domain;
           return (!domain || domain.has(value.$key))
-              ? null
-              : new ValidationError(bundle.structured.errors.enum.notInDomain);
+            ? null
+            : new ValidationError(bundle.structured.errors.enum.notInDomain);
         },
 
         /** @inheritDoc */
@@ -184,10 +184,10 @@ define([
           /* eslint no-multi-spaces: 0 */
           var indexA = this.__domainPrimitive.indexOf(valueA);
           var indexB = this.__domainPrimitive.indexOf(valueB);
-          return indexA === indexB ?  0 : // includes both negative
-                 indexA < 0        ? -1 : // undefined is lowest
-                 indexB < 0        ? +1 : // idem
-                 indexA - indexB;         // compare two non-negative indexes
+          return indexA === indexB ?  0 : // Includes both negative.
+            indexA < 0 ? -1 : // Undefined is lowest.
+            indexB < 0 ? +1 : // Idem.
+            indexA - indexB;  // Compare two non-negative indexes.
         }
       }
     }, /** @lends pentaho.type.mixins.Enum */{

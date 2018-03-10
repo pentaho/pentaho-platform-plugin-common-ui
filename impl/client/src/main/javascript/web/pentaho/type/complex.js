@@ -176,6 +176,7 @@ define([
         }
       },
 
+      // region equality
       /**
        * Gets the key of the complex value.
        *
@@ -223,6 +224,7 @@ define([
 
         return isEqual;
       },
+      // endregion
 
       // region As Raw
       /**
@@ -695,6 +697,36 @@ define([
       },
       // endregion
 
+      // region validation
+      // @override
+      /**
+       * Determines if the given complex value is valid.
+       *
+       * The default implementation
+       * validates each property's value against
+       * the property's [valueType]{@link pentaho.type.Property.Type#valueType}
+       * and collects and returns any reported errors.
+       * Override to complement with a type's specific validation logic.
+       *
+       * You can use the error utilities in {@link pentaho.type.Util} to
+       * help in the implementation.
+       *
+       * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
+       *
+       * @override
+       */
+      validate: function() {
+
+        var errors = null;
+
+        this.$type.each(function(pType) {
+          errors = typeUtil.combineErrors(errors, pType.validateOn(this));
+        }, this);
+
+        return errors;
+      },
+      // endregion
+
       $type: /** @lends pentaho.type.Complex.Type# */{
 
         /** @inheritDoc */
@@ -998,38 +1030,6 @@ define([
           if(!Array.isArray(propTypeSpec)) propTypeSpec = [propTypeSpec];
           this.__getProps().configure(propTypeSpec);
           return this;
-        },
-        // endregion
-
-        // region validation
-        // @override
-        /**
-         * Determines if the given complex value is a **valid instance** of this type.
-         *
-         * The default implementation
-         * validates each property's value against
-         * the property's [valueType]{@link pentaho.type.Property.Type#valueType}
-         * and collects and returns any reported errors.
-         * Override to complement with a type's specific validation logic.
-         *
-         * You can use the error utilities in {@link pentaho.type.Util} to
-         * help in the implementation.
-         *
-         * @param {!pentaho.type.Value} value - The value to validate.
-         *
-         * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
-         *
-         * @protected
-         * @override
-         */
-        _validate: function(value) {
-          var errors = null;
-
-          this.each(function(pType) {
-            errors = typeUtil.combineErrors(errors, pType.validateOn(value));
-          });
-
-          return errors;
         },
         // endregion
 
