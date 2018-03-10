@@ -1033,8 +1033,8 @@ define([
           },
 
           set extension(value) {
-            if(this.hasDescendants)
-              throw error.operInvalid("Cannot change the 'extension' of a view type that has descendants.");
+
+            this._assertNoSubtypesAttribute("extension");
 
             this.__extension = value ? Object(value) : null;
             this.__extensionEf = undefined;

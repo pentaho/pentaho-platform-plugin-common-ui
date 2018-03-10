@@ -516,8 +516,8 @@ define([
         },
 
         set defaultValue(value) {
-          if(this.hasDescendants)
-            throw error.operInvalid("Cannot change the default value of a property type that has descendants.");
+
+          this._assertNoSubtypesAttribute("defaultValue");
 
           if(value === undefined) {
             if(this !== __propType) {
@@ -740,8 +740,7 @@ define([
           if(!this.isRoot)
             throw error.operInvalid("Cannot only change the isBoundary attribute on a root property type.");
 
-          if(this.hasDescendants)
-            throw error.operInvalid("Cannot change the isBoundary attribute of a property type that has descendants.");
+          this._assertNoSubtypesAttribute("isBoundary");
 
           if(value != null) {
             this.__isBoundary = !!value;

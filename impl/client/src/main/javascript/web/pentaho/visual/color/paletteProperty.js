@@ -159,8 +159,7 @@ define([
             // 2. Cannot remove all measurement levels.
             // 3. Cannot add new levels. Can only restrict, by removing some of the inherited/current levels.
 
-            if(this.hasDescendants)
-              throw error.operInvalid(bundle.structured.errors.property.levelsLockedWhenTypeHasDescendants);
+            this._assertNoSubtypesAttribute("levels");
 
             if(!Array.isArray(values)) values = [values];
 

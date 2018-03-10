@@ -160,7 +160,7 @@ define([
 
           set strategies(values) {
 
-            this.__assertNoDescendants("strategies");
+            this._assertNoSubtypesAttribute("strategies");
 
             if(values == null) return;
 

@@ -112,24 +112,6 @@ define([
             return spec;
           },
 
-          /**
-           * Asserts that the type has no subtypes.
-           *
-           * @param {string} attributeName - The name of the attribute being set.
-           *
-           * @throws {pentaho.lang.OperationInvalidError} When setting and the visual role property
-           * already has [subtypes]{@link pentaho.type.Type#hasDescendants}.
-           *
-           * @private
-           */
-          __assertNoDescendants: function(attributeName) {
-
-            if(this.hasDescendants) {
-              throw error.operInvalid(
-                  bundle.get("errors.property.attributeLockedWhenTypeHasDescendants", [attributeName]));
-            }
-          },
-
           // region modes
           __modes: null,
           __isModesDefault: true,
@@ -182,7 +164,7 @@ define([
 
           set modes(values) {
 
-            this.__assertNoDescendants("modes");
+            this._assertNoSubtypesAttribute("modes");
 
             if(values == null) return;
 
@@ -322,7 +304,7 @@ define([
 
           set isVisualKey(value) {
 
-            this.__assertNoDescendants("isVisualKey");
+            this._assertNoSubtypesAttribute("isVisualKey");
 
             if(value == null) return;
 
