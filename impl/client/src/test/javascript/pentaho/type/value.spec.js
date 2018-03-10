@@ -21,7 +21,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
 
-  describe("pentaho/type/value -", function() {
+  describe("pentaho.type.Value", function() {
 
     var context;
     var Value;
@@ -45,7 +45,8 @@ define([
       expect(Value.prototype instanceof Instance).toBe(true);
     });
 
-    describe(".Type -", function() {
+    describe(".Type", function() {
+
       var valueType;
 
       beforeEach(function() {
@@ -76,7 +77,7 @@ define([
         it("should have `isAbstract` equal to `true`", function() {
           expect(valueType.isAbstract).toBe(true);
         });
-      }); // end #isAbstract
+      });
 
       describe("_isEqual(va, vb)", function() {
 
@@ -238,7 +239,7 @@ define([
         });
       });
 
-    }); // .extend({...})
+    });
 
     describe("#$key", function() {
       it("should return the result of toString()", function() {
@@ -249,9 +250,11 @@ define([
         expect(va.$key).toBe("FOOO");
         expect(va.toString).toHaveBeenCalled();
       });
-    });// end #$key
+    });
 
-    describe("#equals", function() {
+    // region equality
+    describe("#equals(other)", function() {
+
       it("should return `true` if given the same value", function() {
         var va = new Value();
 
@@ -277,6 +280,7 @@ define([
     }); // end #equals
 
     describe("#configure(config)", function() {
+
       it("should call #_configure if config is non-nully", function() {
         var va = new Value();
 

@@ -219,7 +219,7 @@ define([
 
     /**
      * Decomposes the modifications into a set of operations and
-     * populates [#changes]{@link pentaho.type.changes.ListChangeset#_changes} with
+     * populates [_changes]{@link pentaho.type.changes.ListChangeset#_changes} with
      * the relevant [PrimitiveChange]{@link pentaho.type.changes.PrimitiveChange} objects.
      *
      * @param {any|Array} fragment - The element or elements to set.
@@ -239,11 +239,9 @@ define([
      */
     __set: function(fragment, add, update, remove, move, index) {
 
-      // TODO: don't convert elements twice (elemType.to)
-
       this._assertWritable();
 
-      var list = this.__projectedMock; // calculate relative the last change
+      var list = this.__projectedMock; // Calculate relative to the last change.
       var elems = list.__elems;
       var keys = list.__keys;
       var elemType = this.owner.$type.of;
@@ -337,7 +335,7 @@ define([
             computed.push(key);
           }
         } else {
-          // baseIndex value is the lowest index
+          // The baseIndex value is the lowest index
           // of an already existing element
           if(baseIndex == null) {
             baseIndex = i - removeCount;
@@ -347,8 +345,8 @@ define([
         }
       }
 
-      // if not set above and adding elements, baseIndex
-      // value is the current corrected insertion index
+      // If not set above and adding elements, baseIndex
+      // value is the current corrected insertion index.
       if(baseIndex == null && newElements.length > 0) {
         baseIndex = index;
       }
@@ -507,7 +505,7 @@ define([
 
       this._assertWritable();
 
-      if(count < 0) return; // noop
+      if(count < 0) return; // Noop.
 
       var list = this.__projectedMock;
 
@@ -515,7 +513,7 @@ define([
 
       var L = list.__elems.length;
 
-      if(start >= L) return; // noop
+      if(start >= L) return; // Noop.
 
       if(start < 0) start = Math.max(0, L + start);
 

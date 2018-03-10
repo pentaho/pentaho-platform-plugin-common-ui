@@ -28,7 +28,7 @@ define([
    * @memberOf pentaho.type
    * @class
    * @extends pentaho.lang.Collection
-   * @implements pentaho.lang.IConfigurable
+   * @implements {pentaho.lang.IConfigurable}
    *
    * @classDesc A collection of properties.
    *

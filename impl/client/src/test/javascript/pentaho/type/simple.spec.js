@@ -23,7 +23,7 @@ define([
 
   /* global describe:true, it:true, expect:true, beforeEach:true*/
 
-  describe("pentaho.type.Simple -", function() {
+  describe("pentaho.type.Simple", function() {
 
     var context;
     var Element;
@@ -88,7 +88,8 @@ define([
     });
 
     describe("new Simple() -", function() {
-      it("Creating with a Object", function() {
+
+      it("creating with a Object", function() {
         constructWithObject();
         constructWithObject(null);
         constructWithObject(true, "true");
@@ -96,13 +97,13 @@ define([
         constructWithObject("simple", "simple");
       });
 
-      it("Creating with other Simple", function() {
+      it("creating with other Simple", function() {
         constructWithSimple(true, "true");
         constructWithSimple(123, "123");
         constructWithSimple("simple", "Simple");
       });
 
-      it("Creating with a value", function() {
+      it("creating with a value", function() {
         constructWithValue();
         constructWithValue(null);
         constructWithValue(true);
@@ -112,8 +113,8 @@ define([
       });
     });
 
-    describe("#clone -", function() {
-      it("The cloned object should be equal to the original", function() {
+    describe("#clone()", function() {
+      it("should create an object which is equal to the original", function() {
         var original = new Simple(constructWithObject(true, "true"));
         var clone = original.clone();
 
@@ -191,27 +192,27 @@ define([
       });
     });
 
-    describe("#valueOf() -", function() {
-      it("Should return the given value in the constructor", function() {
+    describe("#valueOf()", function() {
+      it("should return the same value as `#value`", function() {
         var simpleType = new Simple(123);
         expect(simpleType.valueOf()).toBe(123);
       });
     });
 
-    describe("#toString() -", function() {
-      it("Should return the same value as formatted", function() {
+    describe("#toString()", function() {
+      it("should return the same value as formatted", function() {
         var simpleType = new Simple(constructWithObject(123, "123"));
         expect(simpleType.toString()).toBe(simpleType.formatted);
       });
 
-      it("Should return the value converted to a string if 'formatted' is not defined", function() {
+      it("should return the value converted to a string if 'formatted' is not defined", function() {
         var simpleType = new Simple(123);
         expect(simpleType.toString()).toBe("123");
       });
     });
 
-    describe("#$key -", function() {
-      it("Should convert the given value to a string", function() {
+    describe("#$key", function() {
+      it("should convert the `#value` to a string", function() {
         var simple1 = new Simple(123);
         expect(simple1.$key).toBe(String(123));
       });
@@ -266,7 +267,7 @@ define([
       });
     });
 
-    describe(".Type -", function() {
+    describe(".Type", function() {
 
       var ElemType;
 
@@ -325,6 +326,7 @@ define([
       });
 
       describe("#toValue(value)", function() {
+
         function expectCastError(type, value, errorMatch) {
           expect(function() {
             type.toValue(value);

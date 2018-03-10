@@ -142,7 +142,9 @@ define([
        * @private
        */
       __assertEditable: function() {
-        if(this.__isReadOnly) throw new TypeError("The list is read-only.");
+        if(this.__isReadOnly) {
+          throw new TypeError("The list is read-only.");
+        }
       },
       // endregion
 
@@ -586,7 +588,7 @@ define([
         var elemSpecs;
 
         if(this.count) {
-          // reset
+          // Reset.
           keyArgs.forceType = false;
 
           var elemType = listType.of;
@@ -653,7 +655,7 @@ define([
           return this.__elemType;
         },
 
-        // supports configuration
+        // Supports configuration.
         set of(value) {
           if(value === undefined) return;
           if(!value) throw error.argRequired("of");
@@ -681,6 +683,7 @@ define([
             throw error.argInvalid("of", bundle.structured.errors.list.elemTypeNotSubtypeOfBaseElemType);
 
           // Mark set locally even if it is the same...
+          // noinspection JSAnnotator
           this.__elemType = elemType;
 
         },
@@ -762,7 +765,7 @@ define([
       $type: bundle.structured.list
     });
 
-    // override the documentation to specialize the argument types.
+    // Override the documentation to specialize the argument types.
     /**
      * Creates a subtype of this one.
      *

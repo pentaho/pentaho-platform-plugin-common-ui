@@ -17,13 +17,12 @@ define([
   "./util",
   "./ValidationError",
   "../i18n!types",
-  "../lang/_AnnotatableLinked",
   "../util/arg",
   "../util/error",
   "../util/object",
   "../util/text",
   "../util/fun"
-], function(typeUtil, ValidationError, bundle, AnnotatableLinked, arg, error, O, text, F) {
+], function(typeUtil, ValidationError, bundle, arg, error, O, text, F) {
 
   "use strict";
 
@@ -75,9 +74,6 @@ define([
      */
 
     var Property = Instance.extend(/** @lends pentaho.type.Property# */{
-
-      // TODO: value, members?
-      // TODO: p -> AnnotatableLinked.configure(this, config);
 
       $type: /** @lends pentaho.type.Property.Type# */{
         // Note: constructor/_init is only called on sub-classes of Property.Type,

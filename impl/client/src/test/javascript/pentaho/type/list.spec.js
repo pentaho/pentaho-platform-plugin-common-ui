@@ -64,7 +64,6 @@ define([
       expect(typeof List).toBe("function");
     });
 
-    // region #of
     describe("#of -", function() {
 
       it("accepts an `of` property be given a type derived from `Element`", function() {
@@ -118,9 +117,8 @@ define([
         SubList.type.of = elemType;
         expect(SubList.type.of).toBe(elemType);
       });
-    }); // endregion #of
+    });
 
-    // region constructor
     describe("new (spec) -", function() {
 
       describe("given no arguments", function() {
@@ -547,7 +545,6 @@ define([
     });
     // endregion
 
-    // region $isReadOnly
     describe("#$isReadOnly", function() {
 
       it("should be false by default", function() {
@@ -563,13 +560,9 @@ define([
         expect(list.$isReadOnly).toBe(true);
       });
     });
-    // endregion
 
     // region write methods
-
-    // add or update
-    // region #add(fragment)
-    describe("#add(fragment) -", function() {
+    describe("#add(fragment)", function() {
 
       it("should add a given array of convertible values to an empty list", function() {
 
@@ -671,11 +664,9 @@ define([
         list.add([5, 11, 2, 3, 1, 10]);
         expectEqualValueAt(list, [1, 5, 10, 11, 40, 2, 3]);
       });
-    }); // endregion #add
 
-    // insert or update
-    // region #insert(fragment, index)
-    describe("#insert(fragment, index) -", function() {
+    describe("#insert(fragment, index)", function() {
+
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
@@ -704,8 +695,8 @@ define([
         expect(listeners.rejected).not.toHaveBeenCalled();
       });
 
-      it("should append a given array of convertible values, to an empty list, when index is not specified",
-      function() {
+      it("should append a given array of convertible values, to an empty list, " +
+         "when index is not specified", function() {
 
         var list = new NumberList();
 
@@ -724,8 +715,8 @@ define([
         expect(list.count).toBe(0);
       });
 
-      it("should append a given array of convertible values to a non-empty list, when index is not specified",
-      function() {
+      it("should append a given array of convertible values to a non-empty list, " +
+         "when index is not specified", function() {
 
         var list = new NumberList([1, 2, 3]);
 
@@ -835,10 +826,8 @@ define([
         list.insert([5, 11, 2, 3, 1, 10], 1);
         expectEqualValueAt(list, [1, 2, 3, 5, 10, 11, 40]);
       });
-    }); // endregion #insert
 
-    // region #remove(fragment)
-    describe("#remove(fragment) -", function() {
+    describe("#remove(fragment)", function() {
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
@@ -945,10 +934,10 @@ define([
         expect(list.count).toBe(4);
       });
 
-    }); // endregion #remove
+    });
 
-    // region #clear()
-    describe("#clear() -", function() {
+    describe("#clear()", function() {
+
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
@@ -1149,10 +1138,8 @@ define([
 
         expectEqualValueAt(list, [1, 2, 4]);
       });
-    }); // endregion #removeAt
 
-    // region #set(fragment, {noAdd, noUpdate, noRemove, noMove, index})
-    describe("#set(fragment, {noAdd, noUpdate, noRemove, noMove, index}) -", function() {
+    describe("#set(fragment, {noAdd, noUpdate, noRemove, noMove, index})", function() {
 
       it("should throw a TypeError if list is read-only", function() {
 
@@ -1283,9 +1270,8 @@ define([
 
         expect(list.count).toBe(0);
       });
-    }); // endregion set
+    });
 
-    // region #toArray
     describe("#toArray()", function() {
       it("should return an empty array when the list is empty", function() {
         expect(new NumberList().toArray()).toEqual([]);
@@ -1319,10 +1305,9 @@ define([
 
         expect(spy.calls.first().object).toBe(ctx);
       });
-    }); // endregion #toArray
+    });
 
-    // region #sort(comparer[, silent])
-    describe("#sort(comparer[, silent]) -", function() {
+    describe("#sort(comparer[, silent])", function() {
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
@@ -1369,10 +1354,9 @@ define([
         expect(list.at(1).value).toBe(1);
         expect(list.at(2).value).toBe(3);
       });
-    }); // endregion #sort
+    });
     // endregion
 
-    // region #clone
     describe("#clone()", function() {
       it("should return a different list instance", function() {
         var list = new List();
@@ -1408,11 +1392,11 @@ define([
         expect(clone.at(1)).toBe(list.at(1));
         expect(clone.at(2)).toBe(list.at(2));
       });
-    }); // endregion #clone
+    });
 
-    // region Type
-    describe("Type -", function() {
-      describe("#isList -", function() {
+    describe(".Type", function() {
+
+      describe("#isList", function() {
         it("should return the value `true`", function() {
           expect(List.type.isList).toBe(true);
         });

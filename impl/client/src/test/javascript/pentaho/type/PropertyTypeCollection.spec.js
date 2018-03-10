@@ -155,7 +155,8 @@ define([
           expect(props[0] instanceof DerivedProperty.Type).toBe(true);
         });
 
-        it("should throw is the property type specified in the `base` attribute is not a subtype of property", function() {
+        it("should throw is the property type specified in " +
+            "the `base` attribute is not a subtype of property", function() {
 
           expect(function() {
             props.add({base: Complex, name: "foo", valueType: "boolean"});

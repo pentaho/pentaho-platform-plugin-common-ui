@@ -69,7 +69,7 @@ define([
 
         expect(Complex.type.description).not.toBe(Value.type.description);
       });
-    }); // anatomy
+    }); // end anatomy
 
     describe(".extend(...)", function() {
       it("should return a function", function() {
@@ -686,7 +686,7 @@ define([
               expect(complex.x).toBe(0);
             });
 
-            // coverage
+            // Coverage.
             it("should support having no rejected change listener when unsuccessful", function() {
               complex.off("rejected:change", listeners.rejected);
 
@@ -705,7 +705,7 @@ define([
               listeners.will.and.callFake(function(event) {
                 expect(function() {
                   event.source.x = 2;
-                }).not.toThrow(); // listeners errors are swallowed
+                }).not.toThrow(); // Listeners errors are swallowed.
               });
 
               complex.x = 1;
@@ -768,7 +768,7 @@ define([
               listeners.will.and.callFake(function(event) {
                 expect(function() {
                   event.source.y.add(2);
-                }).not.toThrow(); // listeners errors are swallowed
+                }).not.toThrow(); // Listeners errors are swallowed.
               });
 
               complex.y = [1];
@@ -814,7 +814,6 @@ define([
               $type: {props: [{name: "x"}]}
             });
           });
-
 
           describe("when the property value is null", function() {
 
@@ -1293,7 +1292,7 @@ define([
             }
           });
         });
-      }); // isDefaultedOf
+      }); // end isDefaultedOf
     });
 
     describe("#clone", function() {
@@ -1538,5 +1537,5 @@ define([
         expect(value.__addReference).toHaveBeenCalledWith(container.as);
       });
     });
-  }); // pentaho.type.Complex
+  }); // end pentaho.type.Complex
 });

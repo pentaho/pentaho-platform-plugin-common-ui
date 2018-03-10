@@ -200,7 +200,7 @@ define([
        * @type {number}
        * @readonly
        */
-      uid: -1, // set in _init
+      uid: -1, // Set in _init.
       // endregion
 
       // region root property
@@ -364,7 +364,6 @@ define([
        * @readOnly
        */
       get isElement() { return false; },
-      // endregion
 
       // region isComplex property
       /**
@@ -577,7 +576,7 @@ define([
         return [];
       },
 
-      // for configuration only
+      // For configuration only.
       set mixins(values) {
 
         if(!values) return;
@@ -690,7 +689,7 @@ define([
       // -> nonEmptyString, Optional, Inherited, Configurable, Localized
       // "" -> null conversion
 
-      __description: null, // set through implement bundle, below
+      __description: null, // Set through implement bundle, below.
 
       /**
        * Gets or sets the description of this type.
@@ -987,7 +986,7 @@ define([
       * @see pentaho.type.Type#buildSourceRelativeId
       *
       * @type {string}
-
+       *
       * @throws {pentaho.lang.ArgumentInvalidTypeError} When the set value is not
       * a string, a function or {@link Nully}.
       *
@@ -1007,7 +1006,7 @@ define([
             delete this.__defaultView;
           }
 
-        } else if(!value) { // null || ""
+        } else if(!value) { // Is null || ""
 
           this.__defaultView = null;
 
@@ -1381,7 +1380,7 @@ define([
         }
 
         var defaultViewInfo = O.getOwn(this, "__defaultView");
-        if(defaultViewInfo !== undefined) { // can be null
+        if(defaultViewInfo !== undefined) { // Can be null.
           var defaultView = defaultViewInfo && defaultViewInfo.value;
           if(!defaultView || !isJson || !F.is(defaultView)) {
             any = true;
@@ -1638,7 +1637,7 @@ define([
           if(!declaringType) return;
 
           if(declaringType !== __type) {
-            // ancestor, in properties, wouldn't reach __type.
+            // Ancestor, in properties, wouldn't reach __type.
             fillSpecRecursive(Object.getPrototypeOf(declaringType));
           }
 

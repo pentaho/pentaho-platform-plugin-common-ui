@@ -540,7 +540,7 @@ define([
       $type: bundle.structured.simple
     });
 
-    // override the documentation to specialize the argument types.
+    // Override the documentation to specialize the argument types.
     /**
      * Creates a subtype of this one.
      *

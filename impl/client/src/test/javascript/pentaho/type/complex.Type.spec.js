@@ -108,7 +108,7 @@ define([
             expect(A.type.at(0)).toBe(B.type.at(0));
             expect(A.type.at(1)).toBe(B.type.at(1));
           });
-        }); // when not specified or specified empty
+        }); // When not specified or specified empty.
 
         describe("when specified with a single 'string' entry", function() {
           var Derived;

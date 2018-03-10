@@ -279,7 +279,7 @@ define([
        * @see pentaho.type.Complex#getf
        */
       getv: function(name, sloppy) {
-        var v1 = this.get(name, sloppy); // undefined or nully
+        var v1 = this.get(name, sloppy); // Is undefined or nully.
         return v1 && v1.valueOf(); // .valueOf() should/must be non-nully
       },
 
@@ -498,7 +498,7 @@ define([
         var includeDefaults = !!keyArgs.includeDefaults;
         var type = this.$type;
 
-        // reset
+        // Reset.
         keyArgs.forceType = false;
 
         type.each(propToSpec, this);
@@ -876,7 +876,7 @@ define([
   function __readSpecByNameOrAlias(spec, propType) {
     var name;
     return O_hasOwn.call(spec, (name = propType.name)) ? spec[name] :
-           ((name = propType.nameAlias) && O_hasOwn.call(spec, name)) ? spec[name] :
+      ((name = propType.nameAlias) !== null && O_hasOwn.call(spec, name)) ? spec[name] :
            undefined;
   }
 });

@@ -24,7 +24,7 @@ define([
   /* globals describe, it, expect, beforeEach, jasmine */
   /* eslint max-nested-callbacks: 0, require-jsdoc: 0 */
 
-  describe("pentaho.type.Property.Type -", function() {
+  describe("pentaho.type.Property.Type", function() {
 
     var context;
     var Property;
@@ -58,7 +58,7 @@ define([
       });
     });
 
-    describe("define a root property -", function() {
+    describe("define a root property", function() {
 
       var Derived;
 
@@ -85,7 +85,7 @@ define([
         expect(pType.valueType.isSubtypeOf(baseValueType)).toBe(true);
       });
 
-      describe("when spec is a string -", function() {
+      describe("when spec is a string", function() {
         var propType;
 
         beforeEach(function() {
@@ -129,7 +129,7 @@ define([
         });
       }); // end when spec is a string
 
-      describe("when spec is an object -", function() {
+      describe("when spec is an object", function() {
 
         var propType;
 
@@ -174,7 +174,7 @@ define([
 
       // region Type Attributes
       // TODO: unify with value tests
-      describe("#label - ", function() {
+      describe("#label", function() {
         it("should default to the capitalization of `name`", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
           expect(propType.label).toBe("Foo");
@@ -201,7 +201,7 @@ define([
         });
       }); // end #label
 
-      describe("#description - ", function() {
+      describe("#description", function() {
         it("should default to null", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1"});
           expect(propType.description).toBe(null);
@@ -226,7 +226,7 @@ define([
         });
       }); // end #description
 
-      describe("#category - ", function() {
+      describe("#category", function() {
         it("should default to null", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1"});
           expect(propType.category).toBe(null);
@@ -251,7 +251,7 @@ define([
         });
       }); // end #category
 
-      describe("#helpUrl - ", function() {
+      describe("#helpUrl", function() {
         it("should default to null", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1"});
           expect(propType.helpUrl).toBe(null);
@@ -276,7 +276,7 @@ define([
         });
       }); // end #helpUrl
 
-      describe("#isBrowsable - ", function() {
+      describe("#isBrowsable", function() {
         it("should default to true", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
           expect(propType.isBrowsable).toBe(true);
@@ -313,7 +313,7 @@ define([
         });
       }); // end #isBrowsable
 
-      describe("#isAdvanced - ", function() {
+      describe("#isAdvanced", function() {
         it("should default to false", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
           expect(propType.isAdvanced).toBe(false);
@@ -352,7 +352,7 @@ define([
       // endregion
 
       // region Defining Attributes
-      describe("#name - ", function() {
+      describe("#name", function() {
 
         it("should throw when spec is falsy", function() {
           function expectIt(name) {
@@ -376,7 +376,7 @@ define([
           }).toThrow(errorMatch.argRequired("name"));
         });
 
-        it("should respect a truthy spec value -", function() {
+        it("should respect a truthy spec value", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {
             name: "fooBar",
             valueType: "string"
@@ -406,7 +406,7 @@ define([
         });
       }); // end #name
 
-      describe("#isList - ", function() {
+      describe("#isList", function() {
         it("should return `true` when the type is a list type", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", valueType: ["string"]});
           expect(propType.isList).toBe(true);
@@ -575,7 +575,7 @@ define([
 
       }); // end #elemType
 
-      describe("#defaultValue - ", function() {
+      describe("#defaultValue", function() {
 
         it("should default to `null`, when unspecified", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", valueType: "string"});
@@ -710,7 +710,7 @@ define([
       }); // end #isReadOnly
 
       // region Dynamic & Monotonic Attributes
-      describe("#isRequired - ", function() {
+      describe("#isRequired", function() {
         it("should not allow changing the Property.type attribute value", function() {
           var propType = Property.type;
           var isRequired = propType.isRequired;
@@ -840,7 +840,7 @@ define([
         });
       }); // end #isRequired
 
-      describe("#countMin - ", function() {
+      describe("#countMin", function() {
         it("should not allow changing the Property.type attribute value", function() {
           var propType = Property.type;
           var countMin = propType.countMin;
@@ -953,7 +953,7 @@ define([
         });
       }); // end #countMin
 
-      describe("#countMax - ", function() {
+      describe("#countMax", function() {
         it("should not allow changing the Property.type attribute value", function() {
           var propType = Property.type;
           var countMax = propType.countMax;
@@ -1072,7 +1072,7 @@ define([
         });
       }); // end #countMax
 
-      describe("#isApplicable - ", function() {
+      describe("#isApplicable", function() {
         it("should not allow changing the Property.type attribute value", function() {
           var propType = Property.type;
           var isApplicable = propType.isApplicable;
@@ -1174,7 +1174,7 @@ define([
         });
       }); // end #isApplicable
 
-      describe("#isEnabled - ", function() {
+      describe("#isEnabled", function() {
         it("should not allow changing the Property.type attribute value", function() {
           var propType = Property.type;
           var isEnabled = propType.isEnabled;
@@ -1276,7 +1276,7 @@ define([
         });
       }); // end #isEnabled
 
-      describe("#countRange -", function() {
+      describe("#countRange", function() {
         // 1. when !isList => min and max <= 1
         // 2. required => countMin >= 1
         // 3. min <= max
@@ -1492,7 +1492,7 @@ define([
       });
     }); // end define a root property
 
-    describe("override a property -", function() {
+    describe("override a property", function() {
 
       it("should throw if spec.name is not the name of the base property", function() {
         var Base = Complex.extend();
@@ -1506,7 +1506,7 @@ define([
         }).toThrowError(TypeError);
       });
 
-      describe("basic characteristics -", function() {
+      describe("basic characteristics", function() {
         var propType;
         var basePropType;
         var Derived;
@@ -1542,7 +1542,7 @@ define([
       });
 
       // region Type attributes
-      describe("label -", function() {
+      describe("#label", function() {
         it("should inherit the base value, by default", function() {
           var Base = Complex.extend();
 
@@ -1613,7 +1613,7 @@ define([
         });
       }); // end label
 
-      describe("description -", function() {
+      describe("#description", function() {
         it("should inherit the base value, by default", function() {
           var Base = Complex.extend();
 
@@ -1710,7 +1710,7 @@ define([
         });
       }); // end description
 
-      describe("category -", function() {
+      describe("#category", function() {
         it("should inherit the base value, by default", function() {
           var Base = Complex.extend();
 
@@ -1807,7 +1807,7 @@ define([
         });
       }); // end category
 
-      describe("helpUrl -", function() {
+      describe("#helpUrl", function() {
         it("should inherit the base value, by default", function() {
           var Base = Complex.extend();
 
@@ -1904,7 +1904,7 @@ define([
         });
       }); // end helpUrl
 
-      describe("isBrowsable -", function() {
+      describe("#isBrowsable", function() {
         it("should inherit the base value, by default", function() {
           var Base = Complex.extend();
 
@@ -2014,7 +2014,7 @@ define([
         });
       }); // end isBrowsable
 
-      describe("isAdvanced -", function() {
+      describe("#isAdvanced", function() {
         it("should inherit the base value, by default", function() {
           var Base = Complex.extend();
 
@@ -2127,7 +2127,7 @@ define([
 
       // region Defining attributes
       // Cannot change.
-      describe("name - ", function() {
+      describe("#name", function() {
         var propType;
 
         beforeEach(function() {
@@ -2155,8 +2155,9 @@ define([
         });
       }); // end name
 
-      // Monotonic. Cannot change if has descendants.
-      describe("valueType - ", function() {
+      // Monotonic + Can only be set when defining a property.
+      describe("#valueType", function() {
+
         it("should inherit base type value by default", function() {
           var Base = Complex.extend();
 
@@ -2300,7 +2301,7 @@ define([
       });
 
       // Cannot change if has descendants.
-      describe("defaultValue -", function() {
+      describe("#defaultValue", function() {
 
         it("should get null and not inherit if locally unspecified and there is a local value type", function() {
 
@@ -2333,7 +2334,7 @@ define([
           expect(propType.defaultValue).toBe(dv);
         });
 
-        describe("test group -", function() {
+        describe("test group", function() {
           var Derived;
 
           beforeEach(function() {
@@ -2430,9 +2431,10 @@ define([
       });
       // endregion
 
-      // Monotonic. Cannot change if has descendants.
-      describe("isReadOnly - ", function() {
-        it("should inherit base isReadOnly value by default", function() {
+      // Inherited. Can only be set when defining a root property.
+      describe("#isReadOnly", function() {
+
+        it("should inherit base isReadOnly value", function() {
           var Base = Complex.extend();
 
           Base.type.add({name: "baseNum", isReadOnly: true});
@@ -2560,7 +2562,7 @@ define([
       // region Dynamic & Monotonic attributes
       // Dynamic. Monotonic. Cannot change if has descendants.
 
-      describe("isRequired -", function() {
+      describe("#isRequired", function() {
         it("should default to an unset local value", function() {
           var Base = Complex.extend();
 
@@ -2708,7 +2710,7 @@ define([
         });
       }); // end isRequired
 
-      describe("countMin -", function() {
+      describe("#countMin", function() {
         it("should default to an unset local value", function() {
           var Base = Complex.extend();
 
@@ -2856,7 +2858,7 @@ define([
         });
       }); // end countMin
 
-      describe("countMax -", function() {
+      describe("#countMax", function() {
         it("should default to an unset local value", function() {
           var Base = Complex.extend();
 
@@ -3004,7 +3006,7 @@ define([
         });
       }); // end countMax
 
-      describe("isApplicable -", function() {
+      describe("#isApplicable", function() {
         it("should default to an unset local value", function() {
           var Base = Complex.extend();
 
@@ -3152,7 +3154,7 @@ define([
         });
       }); // end isApplicable
 
-      describe("isEnabled -", function() {
+      describe("#isEnabled", function() {
         it("should default to an unset local value", function() {
           var Base = Complex.extend();
 
