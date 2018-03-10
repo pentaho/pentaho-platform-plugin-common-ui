@@ -186,53 +186,6 @@ define([
         return clone;
       },
 
-      // region configuration
-
-      /**
-       * Configures a list instance with a given configuration.
-       *
-       * When `config` is another list, an error is thrown.
-       *
-       * When `config` is a plain object, its keys are the keys of list elements,
-       * which must belong to the list, and the values are the configuration values,
-       * which are then passed to the element's [configure]{@link pentaho.type.Element#configure} method.
-       *
-       * @name pentaho.type.List#configure
-       *
-       * @param {?any} config - The configuration.
-       *
-       * @return {!pentaho.type.Value} This instance.
-       *
-       * @throws {pentaho.lang.ArgumentInvalidError} When `config` is a plain object that contains a key that is
-       * not the key of an element in the list.
-       *
-       * @throws {pentaho.lang.ArgumentInvalidType} When `config` is not a list or a plain object.
-       */
-
-      /** @inheritDoc */
-      _configure: function(config) {
-        this.__usingChangeset(function() {
-
-          if(config instanceof List) {
-            // TODO: when differences between `configure` and `set` are revisited, try to decide what makes sense here.
-            throw error.notImplemented("Behaviour not yet defined.");
-
-          } else if(config.constructor === Object) {
-
-            O.eachOwn(config, function(v, key) {
-              var elem = this.get(key);
-              if(!elem) throw error.argInvalid("domain", "An element with key '" + key + "' is not defined.");
-
-              elem.configure(v);
-            }, this);
-
-          } else {
-            throw error.argInvalidType("config", ["pentaho.type.List", "Object"], typeof config);
-          }
-        });
-      },
-      // endregion
-
       /**
        * Gets a mock projection of the updated list value.
        *
@@ -549,6 +502,88 @@ define([
           cset.__set(fragment, add, update, remove, move, index);
         });
       },
+
+      /**
+       * Configures this list with a given distinct and non-{@link Nully} configuration.
+       *
+       * This method can only be called when there is an ambient transaction.
+       *
+       * The argument `config` accepts the same types of values given which
+       * a `List` instance can be constructed from.
+       *
+       * An additional configuration input format is supported,
+       * the key map configuration format,
+       * in which `config.d` is a map from
+       * element keys to element configurations, instead of,
+       * an array of element specifications.
+       * In this case, each targeted element is individually configured
+       * with the corresponding element configuration
+       * by using its [configureOrCreate]{@link pentaho.type.Element#configureOrCreate} method.
+       * If the latter returns a distinct element,
+       * then the original element is replaced in the list.
+       *
+       * With all of the other configuration formats,
+       * a list of element specifications is obtained and
+       * passed to the [set]{@link pentaho.type.List#set} method.
+       *
+       * @param {!pentaho.type.spec.UList|!pentaho.type.List|!Array.<!pentaho.type.Element>} config - The list
+       * specification or a compatible list instance or element's array.
+       *
+       * @throws {pentaho.lang.ArgumentInvalidTypeError} When the type of `config` is not
+       * {@link Object}, {@link Array} or {@link pentaho.type.List}.
+       *
+       * @throws {TypeError} When the list would be changed and it is [read-only]{@link pentaho.type.List#$isReadOnly}.
+       *
+       * @throws {pentaho.lang.ArgumentInvalidError} When `config.d` is an object that contains a key
+       * which is not the key of an element in the list.
+       *
+       * @protected
+       * @override
+       *
+       * @see pentaho.type.Value#configure
+       * @see pentaho.type.List#set
+       * @see pentaho.type.Complex#_configure
+       * @see pentaho.type.Element#configureOrCreate
+       */
+      _configure: function(config) {
+
+        // assert config !== null && config !== this
+
+        config = this.$type._normalizeInstanceSpec(config);
+        // assert config.constructor === Object
+
+        var data = config.d;
+        if(data != null) {
+
+          if(data.constructor === Object) {
+
+            O.eachOwn(data, function(elementConfig, key) {
+
+              if(elementConfig != null) {
+
+                var elem = this.get(key);
+                if(elem === null) {
+                  throw error.argInvalid("config", "There is no element with key '" + key + "'.");
+                }
+
+                var elem2 = elem._configureOrCreate(elementConfig);
+                if(elem2 !== elem) {
+                  // Replace
+                  var index = this.indexOf(elem);
+                  this.removeAt(index, 1);
+                  this.insert(elem2, index);
+                }
+              }
+            }, this);
+
+          } else if(Array.isArray(data)) {
+            this.set(data, {noUpdate: false});
+          } else {
+            throw error.argInvalidType("config", ["Array", "Object", "pentaho.type.List"], typeof config);
+          }
+        }
+      },
+
       // endregion
 
       // region serialization

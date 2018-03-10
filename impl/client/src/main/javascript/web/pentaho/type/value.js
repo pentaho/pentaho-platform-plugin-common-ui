@@ -27,6 +27,8 @@ define([
 
   return ["instance", function(Instance) {
 
+    var context = this;
+
     /**
      * @name pentaho.type.Value.Type
      * @class
@@ -203,25 +205,61 @@ define([
       // region configuration
       /**
        * Configures this value with a given configuration.
-       * @param {?any} config - The configuration.
-       * @return {!pentaho.type.Value} This instance.
+       *
+       * This method ensures a transaction exists and then delegates to
+       * [_configure]{@link pentaho.type.Value#_configure}.
+       *
+       * For more information on the semantics of configuration,
+       * see [Complex#_configure]{@link pentaho.type.Complex#_configure}
+       * and [List#_configure]{@link pentaho.type.List#_configure}.
+       *
+       * @param {any} config - The value configuration.
+       *
+       * @throws {TypeError} When the value would be changed and
+       * its type is [read-only]{@link pentaho.type.Value.Type#isReadOnly}.
+       *
        * @final
+       *
+       * @see pentaho.type.Element#configureOrCreate
+       * @see pentaho.type.Complex#_configure
+       * @see pentaho.type.List#_configure
        */
       configure: function(config) {
-        if(config != null) this._configure(config);
-        return this;
+
+        if(config != null && config !== this) {
+
+          context.enterChange().using(function(scope) {
+
+            this._configure(config);
+
+            scope.accept();
+          }, this);
+        }
       },
 
       /**
-       * Configures this value with a given _non-nully_ configuration.
+       * Configures this value with a given distinct and non-{@link Nully} configuration.
        *
-       * The default implementation does nothing.
+       * This method can only be called when there is an ambient transaction.
        *
-       * @param {any} config - The configuration.
+       * The default implementation throws an error if this value's type is
+       * [read-only]{@link pentaho.type.Value.Type#isReadOnly}.
+       *
+       * @param {!any} config - The distinct, non-{@link Nully} configuration.
+       *
+       * @throws {TypeError} When the value would be changed and
+       * its type is [read-only]{@link pentaho.type.Value.Type#isReadOnly}.
+       *
        * @protected
+       *
+       * @see pentaho.type.Value#configure
+       * @see pentaho.type.Complex#_configure
+       * @see pentaho.type.List#_configure
        */
       _configure: function(config) {
-        // Nothing configurable at this level
+        if(this.$type.isReadOnly) {
+          throw new TypeError("Type '" + this.$type.id + "' is read-only.");
+        }
       },
       // endregion
 

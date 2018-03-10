@@ -1495,6 +1495,103 @@ define([
         expect(list.at(2).value).toBe(3);
       });
     });
+
+    describe("#_configure(config)", function() {
+
+      it("should configure when given an array", function() {
+
+        var config = [2, 1, 3];
+        var list = new NumberList([1, 2, 3]);
+
+        spyOn(list, "set");
+
+        list.configure(config);
+
+        expect(list.set).toHaveBeenCalledTimes(1);
+        expect(list.set).toHaveBeenCalledWith(config, jasmine.objectContaining({noUpdate: false}));
+      });
+
+      it("should configure when given another list", function() {
+
+        var list = new NumberList([1, 2, 3]);
+        var config = new NumberList([2, 1, 3]);
+
+        spyOn(list, "set");
+
+        list.configure(config);
+
+        expect(list.set).toHaveBeenCalledTimes(1);
+        expect(list.set).toHaveBeenCalledWith(list.__elems, jasmine.objectContaining({noUpdate: false}));
+      });
+
+      it("should configure when given a list specification with an array `d` property", function() {
+
+        var list = new NumberList([1, 2, 3]);
+        var config = {d: [2, 1, 3]};
+
+        spyOn(list, "set");
+
+        list.configure(config);
+
+        expect(list.set).toHaveBeenCalledTimes(1);
+        expect(list.set).toHaveBeenCalledWith(config.d, jasmine.objectContaining({noUpdate: false}));
+      });
+
+      it("should configure elements when given a list specification " +
+          "with a plain object `d` property", function() {
+
+        var list = new NumberList([1, 2, 3]);
+        var config = {d: {
+          2: {f: "Two"}
+        }};
+
+        var elem2 = list.at(1);
+        spyOn(elem2, "_configureOrCreate").and.returnValue(elem2);
+
+        list.configure(config);
+
+        expect(elem2._configureOrCreate).toHaveBeenCalledTimes(1);
+        expect(elem2._configureOrCreate).toHaveBeenCalledWith(config.d["2"]);
+      });
+
+      it("should replace an element when, given a list specification " +
+         "with a plain object `d` property, _configureOrCreate " +
+         "returns a distinct element", function() {
+
+        var list = new NumberList([1, 2, 3]);
+        var config = {d: {
+          2: {f: "Two"}
+        }};
+
+        var elem2 = list.at(1);
+        var other2 = new PentahoNumber(2);
+
+        spyOn(elem2, "_configureOrCreate").and.returnValue(other2);
+        spyOn(list, "removeAt");
+        spyOn(list, "insert");
+
+        list.configure(config);
+
+        expect(list.removeAt).toHaveBeenCalledTimes(1);
+        expect(list.removeAt).toHaveBeenCalledWith(1, 1);
+
+        expect(list.insert).toHaveBeenCalledTimes(1);
+        expect(list.insert).toHaveBeenCalledWith(other2, 1);
+      });
+
+      it("should throw when given a list specification with a plain object `d` " +
+         "property has an undefined key", function() {
+
+        var list = new NumberList([1, 2, 3]);
+        var config = {d: {
+          4: {f: "Four"}
+        }};
+
+        expect(function() {
+          list.configure(config);
+        }).toThrow(errorMatch.argInvalid("config"));
+      });
+    });
     // endregion
 
     describe("#clone()", function() {

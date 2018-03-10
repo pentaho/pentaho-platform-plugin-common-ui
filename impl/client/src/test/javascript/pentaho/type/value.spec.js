@@ -440,11 +440,34 @@ define([
         expect(va._configure).not.toHaveBeenCalled();
       });
 
-      it("should return this", function() {
+      it("should not call #_configure if the given config is this", function() {
         var va = new Value();
-        expect(va.configure({})).toBe(va);
-        expect(va.configure(null)).toBe(va);
+        spyOn(va, "_configure");
+
+        var config = va;
+        va.configure(config);
+        expect(va._configure).not.toHaveBeenCalled();
       });
-    }); // end #configure
+    });
+
+    describe("#_configure(config)", function() {
+
+      it("should do nothing if type is not read-only", function() {
+
+        var va = new Value();
+        va._configure({});
+      });
+
+      it("should throw if type is read-only", function() {
+
+        spyOnProperty(Value.type, "isReadOnly", "get").and.returnValue(true);
+
+        var va = new Value();
+        expect(function() {
+          va._configure({});
+        }).toThrowError(TypeError);
+      });
+    });
+    // endregion
   });
 });

@@ -24,6 +24,8 @@ define([
 
   return ["value", function(Value) {
 
+    var context = this;
+
     var __elemType = null;
 
     /**
@@ -104,7 +106,147 @@ define([
         return fun.compare(this.$key, other.$key);
       },
 
+      // region element configuration
+      /**
+       * Configures this value with a given configuration, if it is possible.
+       * Otherwise creates and returns a new value based on this one, but with the configuration applied.
+       *
+       * If the given configuration is {@link Nully} or identical to `this`, then `this` is immediately returned.
+       * Otherwise,
+       * this method ensures that a transaction exists and
+       * delegates to the [_configureOrCreate]{@link pentaho.type.Element#_configureOrCreate} method.
+       *
+       * This method considers configuration to not be possible in the following situations:
+       *
+       * 1. this instance is of a [read-only]{@link pentaho.type.Value.Type#isReadOnly} type;
+       * 2. `config` is of an [isEntity]{@link pentaho.type.Value#isEntity} type and is
+       *     not [equals]{@link pentaho.type.Value#equals} to this value;
+       * 3. `config` is not an instance of an [isEntity]{@link pentaho.type.Value#isEntity} type
+       *     but is an instance of [Value]{@link pentaho.type.Value} and its constructor is not the same as this;
+       * 4. `config` is not an instance of  `Value` - it is a specification and:
+       *    4.1. it contains an inline type property, `_`, identifying a different type than that of this instance;
+       *    4.2. this instance is of an `isEntity` type and `config` contains key properties that
+       *         reference another entity.
+       *
+       * If configuration is considered possible,
+       * the actual configuration is delegated to the [configure]{@link pentaho.type.Value#configure} method.
+       *
+       * @param {any} config - The value configuration.
+       *
+       * @return {!pentaho.type.Element} `this` value, if the configuration could be applied to it;
+       * a new, configured value, if not.
+       *
+       * @final
+       */
+      configureOrCreate: function(config) {
+
+        if(config == null || config === this) {
+          return this;
+        }
+
+        var value;
+
+        context.enterChange().using(function(scope) {
+
+          value = this._configureOrCreate(config);
+
+          scope.accept();
+        }, this);
+
+        return value;
       },
+
+      /**
+       * Configures this value with a given distinct and non-{@link Nully} configuration, if it is possible.
+       * Otherwise creates and returns a new value based on this one, but with the configuration applied.
+       *
+       * This method can only be called when there is an ambient transaction.
+       *
+       * @param {!any} config - The non-{@link Nully} configuration. Assumed distinct from `this`.
+       *
+       * @return {!pentaho.type.Element} `this`, already configured, or a new value.
+       *
+       * @protected
+       * @override
+       *
+       * @see pentaho.type.Element#configureOrCreate
+       * @see pentaho.type.Value#configure
+       */
+      _configureOrCreate: function(config) {
+
+        var type = this.$type;
+
+        if(config instanceof Value) {
+          // Configuration uses a weak form of equality.
+          var isEqual = type.isEntity ? this.equals(config) : this.constructor === config.constructor;
+          if(!isEqual) {
+            return config;
+          }
+
+          // Same "entity".
+          // assert this.$type.isEntity
+
+          if(type.isReadOnly) {
+            return this.equalsContent(config) ? this : config;
+          }
+
+          // Same "entity", but possibly != content.
+
+        } else {
+          // Config is a specification.
+
+          config = type._normalizeInstanceSpec(config);
+          // assert config.constructor === Object
+          // config is now a plain object.
+
+          // They cannot be equal if they have different types.
+
+          // In a property that has an abstract valueType,
+          // complex.toSpec() will include the inline type of the current value.
+          // To achieve no changes when this.configure(this.toSpec()),
+          // having an inline type must not unconditionally build a new object.
+          if(config._ && context.get(config._).type !== type) {
+            return __create(config);
+          }
+
+          // An untyped object specification or one having a type = this.$type.
+
+          var value2;
+
+          if(type.isEntity && type.hasNormalizedInstanceSpecKeyData(config)) {
+
+            // Must create to know if they represent the same entity.
+            value2 = __createWithDefaultType(config, type);
+
+            if(!this.equals(value2)) {
+              // Config better be a complete specification.
+              return value2;
+            }
+
+            // Same entity, but possibly != content.
+          }
+
+          // !type.isEntity || this.equals(config)
+
+          if(type.isReadOnly) {
+            // Cannot configure this.
+            value2 = type.createLike(this, config);
+
+            // For entities, this must create an equals entity.
+            // assert !type.isEntity || this.equals(value2)
+
+            // Prefer `value` if they have the same content.
+            return this.equalsContent(value2) ? this : value2;
+          }
+        }
+
+        // Can configure value with config.
+
+        this._configure(config);
+
+        return this;
+      },
+      // endregion
 
       $type: /** @lends pentaho.type.Element.Type# */{
 
@@ -247,5 +389,13 @@ define([
     __elemType = Element.type;
 
     return Element;
+
+    function __createWithDefaultType(instSpec, defaultType) {
+      return instSpec._ ? context.instances.get(instSpec) : defaultType.create(instSpec);
+    }
+
+    function __create(instSpec) {
+      return context.instances.get(instSpec);
+    }
   }];
 });

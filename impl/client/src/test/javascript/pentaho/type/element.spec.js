@@ -156,6 +156,429 @@ define([
       });
     });
     // endregion
+
+    // region configureOrCreate
+    describe("#configureOrCreate(config)", function() {
+
+      it("should call #_configureOrCreate if config is non-nully", function() {
+        var va = new Element();
+
+        spyOn(va, "_configureOrCreate");
+
+        va.configureOrCreate({});
+
+        expect(va._configureOrCreate).toHaveBeenCalled();
+      });
+
+      it("should call #_configureOrCreate with the given non-nully config", function() {
+        var va = new Element();
+        var config = {};
+        spyOn(va, "_configureOrCreate");
+
+        va.configureOrCreate(config);
+
+        expect(va._configureOrCreate).toHaveBeenCalledWith(config);
+      });
+
+      it("should not call #_configureOrCreate if the given config is nully", function() {
+        var va = new Element();
+        spyOn(va, "_configureOrCreate");
+
+        var config = null;
+        va.configureOrCreate(config);
+        expect(va._configureOrCreate).not.toHaveBeenCalled();
+
+        config = undefined;
+        va.configure(config);
+        expect(va._configureOrCreate).not.toHaveBeenCalled();
+      });
+
+      it("should not call #_configureOrCreate if the given config is this", function() {
+        var va = new Element();
+        spyOn(va, "_configureOrCreate");
+
+        var config = va;
+        va.configureOrCreate(config);
+        expect(va._configureOrCreate).not.toHaveBeenCalled();
+      });
+
+      it("should return what _configureOrCreate returns", function() {
+        var va = new Element();
+
+        var result = {};
+
+        spyOn(va, "_configureOrCreate").and.returnValue(result);
+
+        expect(va.configureOrCreate({})).toBe(result);
+      });
+    }); // end #configureOrCreate
+
+    describe("#_configureOrCreate(config)", function() {
+
+      describe("when config is a Value", function() {
+
+        describe("when the value type is isEntity", function() {
+
+          describe("when config does not equals value", function() {
+
+            it("should return config", function() {
+
+              var value = new PentahoNumber(1);
+              var config = new PentahoNumber(2);
+
+              spyOn(value, "equals").and.returnValue(false);
+
+              var result = value.configureOrCreate(config);
+
+              expect(result).toBe(config);
+            });
+          });
+
+          describe("when config equals value", function() {
+
+            describe("when value type is read-only", function() {
+
+              it("should return config if not content-equals value", function() {
+
+                var value = new PentahoNumber(2);
+                var config = new PentahoNumber(2);
+
+                spyOn(value, "equals").and.returnValue(true);
+                spyOn(value, "equalsContent").and.returnValue(false);
+
+                var result = value.configureOrCreate(config);
+
+                expect(result).toBe(config);
+              });
+
+              it("should return value if config content-equals value", function() {
+
+                var value = new PentahoNumber(2);
+                var config = new PentahoNumber(2);
+
+                spyOn(value, "equals").and.returnValue(true);
+                spyOn(value, "equalsContent").and.returnValue(true);
+
+                var result = value.configureOrCreate(config);
+
+                expect(result).toBe(value);
+              });
+            });
+
+            describe("when value type is not read-only", function() {
+
+              it("should call _configure and return value (even when content-equals)", function() {
+
+                var value = new ComplexEntity({name: "John", age: 20});
+                var config = new ComplexEntity({name: "John", age: 20});
+
+                spyOn(value, "equals").and.returnValue(true);
+                spyOn(value, "equalsContent").and.returnValue(true);
+
+                spyOn(value, "_configure");
+
+                var result = value.configureOrCreate(config);
+
+                expect(value._configure).toHaveBeenCalledWith(config);
+                expect(result).toBe(value);
+              });
+
+              it("should call _configure (even when not content-equals)", function() {
+
+                var value = new ComplexEntity({name: "John", age: 20});
+                var config = new ComplexEntity({name: "John", age: 30});
+
+                spyOn(value, "equals").and.returnValue(true);
+                spyOn(value, "equalsContent").and.returnValue(false);
+
+                spyOn(value, "_configure");
+
+                var result = value.configureOrCreate(config);
+
+                expect(value._configure).toHaveBeenCalledWith(config);
+                expect(result).toBe(value);
+              });
+            });
+          });
+        });
+
+        describe("when the value type is not isEntity", function() {
+
+          describe("when config does not have the same constructor as value", function() {
+
+            it("should return config", function() {
+
+              var value = new ComplexNonEntity();
+              var config = new PentahoNumber(1);
+
+              var result = value.configureOrCreate(config);
+
+              expect(result).toBe(config);
+            });
+          });
+
+          describe("when config has the same constructor as value", function() {
+
+            describe("when value type is read-only", function() {
+
+              it("should return config if not content-equals value", function() {
+
+                var value = new ComplexNonEntityReadOnly({name: "John"});
+                var config = new ComplexNonEntityReadOnly({name: "Sophia"});
+
+                spyOn(value, "equalsContent").and.returnValue(false);
+
+                var result = value.configureOrCreate(config);
+
+                expect(result).toBe(config);
+              });
+
+              it("should return value if config content-equals value", function() {
+
+                var value = new ComplexNonEntityReadOnly({name: "John"});
+                var config = new ComplexNonEntityReadOnly({name: "John"});
+
+                spyOn(value, "equalsContent").and.returnValue(true);
+
+                var result = value.configureOrCreate(config);
+
+                expect(result).toBe(value);
+              });
+            });
+
+            describe("when value type is not read-only", function() {
+
+              it("should call _configure and return value (even when content-equals)", function() {
+
+                var value = new ComplexNonEntity({name: "John", age: 20});
+                var config = new ComplexNonEntity({name: "John", age: 20});
+
+                spyOn(value, "equalsContent").and.returnValue(true);
+
+                spyOn(value, "_configure");
+
+                var result = value.configureOrCreate(config);
+
+                expect(value._configure).toHaveBeenCalledWith(config);
+                expect(result).toBe(value);
+              });
+
+              it("should call _configure (even when not content-equals)", function() {
+
+                var value = new ComplexNonEntity({name: "John", age: 20});
+                var config = new ComplexNonEntity({name: "John", age: 30});
+
+                spyOn(value, "equalsContent").and.returnValue(true);
+
+                spyOn(value, "_configure");
+
+                var result = value.configureOrCreate(config);
+
+                expect(value._configure).toHaveBeenCalledWith(config);
+                expect(result).toBe(value);
+              });
+            });
+          });
+        });
+      });
+
+      describe("when config is a specification", function() {
+
+        it("should normalize the specification with value type", function() {
+
+          var value = new Element();
+          var config = {};
+
+          spyOn(Element.type, "_normalizeInstanceSpec").and.callThrough();
+          spyOn(value, "_configure");
+
+          value.configureOrCreate(config);
+
+          expect(Element.type._normalizeInstanceSpec).toHaveBeenCalledWith(config);
+        });
+
+        it("should use the normalized specification", function() {
+
+          var value = new Element();
+          var config = {};
+          var normalizedConfig = {};
+          spyOn(Element.type, "_normalizeInstanceSpec").and.returnValue(normalizedConfig);
+          spyOn(value, "_configure");
+
+          value.configureOrCreate(config);
+
+          expect(value._configure).toHaveBeenCalledWith(normalizedConfig);
+        });
+
+        describe("when config has an inline type", function() {
+
+          it("should create and return a config whose inline type is different from value type", function() {
+
+            var value = new Element();
+            var config = {_: "number", v: 1};
+
+            var result = value.configureOrCreate(config);
+
+            expect(result).not.toBe(value);
+            expect(result instanceof PentahoNumber).toBe(true);
+            expect(result.$type).toBe(PentahoNumber.type);
+            expect(result.value).toBe(1);
+          });
+
+          it("should not create a config whose inline type is the same as value type", function() {
+
+            var value = new Element();
+            var config = {_: "element"};
+
+            spyOn(value, "_configure");
+
+            value.configureOrCreate(config);
+
+            expect(value._configure).toHaveBeenCalledWith(config);
+          });
+        });
+
+        describe("when the value type is isEntity", function() {
+
+          describe("when config has key data", function() {
+
+            it("should create the config and check if it equals value", function() {
+
+              var value = new ComplexEntity();
+              var config = {};
+
+              spyOn(ComplexEntity.type, "hasNormalizedInstanceSpecKeyData").and.returnValue(true);
+              spyOn(value, "equals").and.returnValue(false);
+
+              value.configureOrCreate(config);
+
+              expect(value.equals).toHaveBeenCalled();
+            });
+
+            describe("when the created config does not equals value", function() {
+
+              it("should return the created config of type equal to value type", function() {
+
+                var value = new ComplexEntity({name: "John", age: 10});
+                var config = {name: "Sophia", age: 11};
+
+                spyOn(ComplexEntity.type, "hasNormalizedInstanceSpecKeyData").and.returnValue(true);
+                spyOn(value, "equals").and.returnValue(false);
+
+                var result = value.configureOrCreate(config);
+
+                expect(result).not.toBe(value);
+                expect(result instanceof ComplexEntity).toBe(true);
+                expect(result.name).toBe(config.name);
+                expect(result.age).toBe(config.age);
+              });
+            });
+
+            describe("when the created config equals value", function() {
+
+              it("should go through and call _configure", function() {
+
+                var value = new ComplexEntity({name: "John", age: 10});
+                var config = {name: "Sophia", age: 11};
+
+                spyOn(ComplexEntity.type, "hasNormalizedInstanceSpecKeyData").and.returnValue(true);
+                spyOn(value, "equals").and.returnValue(true);
+                spyOn(value, "_configure");
+
+                var result = value.configureOrCreate(config);
+
+                expect(result).toBe(value);
+                expect(value._configure).toHaveBeenCalledWith(config);
+              });
+            });
+          });
+
+          describe("when config has no key data", function() {
+
+            it("should go through and call _configure", function() {
+
+              var value = new ComplexEntity({name: "John", age: 10});
+              var config = {name: "Sophia", age: 11};
+
+              spyOn(ComplexEntity.type, "hasNormalizedInstanceSpecKeyData").and.returnValue(false);
+              spyOn(value, "_configure");
+
+              var result = value.configureOrCreate(config);
+
+              expect(result).toBe(value);
+              expect(value._configure).toHaveBeenCalledWith(config);
+            });
+          });
+        });
+
+        describe("when the value type is read-only", function() {
+
+          it("should call value type createLike with value and config", function() {
+
+            var value = new ComplexNonEntityReadOnly();
+            var config = {};
+
+            spyOn(ComplexNonEntityReadOnly.type, "createLike");
+            spyOn(value, "equalsContent").and.returnValue(true);
+
+            value.configureOrCreate(config);
+
+            expect(ComplexNonEntityReadOnly.type.createLike).toHaveBeenCalledWith(value, config);
+          });
+
+          describe("when the created config is equalsContent with value", function() {
+
+            it("should return value", function() {
+
+              var value = new ComplexNonEntityReadOnly();
+              var config = {};
+
+              spyOn(ComplexNonEntityReadOnly.type, "createLike");
+              spyOn(value, "equalsContent").and.returnValue(true);
+
+              var result = value.configureOrCreate(config);
+
+              expect(result).toBe(value);
+            });
+          });
+
+          describe("when the created config is not equalsContent with value", function() {
+
+            it("should return the created config", function() {
+
+              var value = new ComplexNonEntityReadOnly();
+              var config = {};
+              var created = new ComplexNonEntityReadOnly();
+
+              spyOn(ComplexNonEntityReadOnly.type, "createLike").and.returnValue(created);
+              spyOn(value, "equalsContent").and.returnValue(false);
+
+              var result = value.configureOrCreate(config);
+
+              expect(result).toBe(created);
+            });
+          });
+        });
+
+        describe("when the value type is not read-only", function() {
+
+          it("should go through and call _configure", function() {
+
+            var value = new Element();
+            var config = {};
+
+            spyOn(value, "_configure");
+
+            var result = value.configureOrCreate(config);
+
+            expect(value._configure).toHaveBeenCalledWith(config);
+            expect(result).toBe(value);
+          });
+        });
+      });
+    }); // end #_configureOrCreate
+    // endregion
+
     describe("Type -", function() {
 
       var ElemType;

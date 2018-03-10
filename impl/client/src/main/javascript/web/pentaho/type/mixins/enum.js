@@ -160,14 +160,19 @@ define([
           if(!this.__domain) {
             // List can only be configured (to allow for simple element's configuration of `formatted` field),
             // but is, for all other purposes, read-only.
+
+            // TODO: Had to remove the {isReadOnly: true}.
+            // Find a way to only allow updating/replacing existing elements without
+            // letting to add new keys or remove existing keys.
+
             var ListType = List.extend({$type: {of: this}});
-            this.__domain = new ListType(values, {isReadOnly: true});
+            this.__domain = new ListType(values);
             this.__domainPrimitive = this.__domain.toArray(function(v) { return v.value; });
 
             if(!this.__domain.count) throw error.argRequired("spec.domain");
 
           } else if(values.constructor === Object) {
-            this.__domain.configure(values);
+            this.__domain.configure({d: values});
           } else {
             throw error.argInvalidType("domain", ["Object"], typeof values);
           }

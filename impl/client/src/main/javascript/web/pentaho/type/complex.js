@@ -438,28 +438,72 @@ define([
 
       /** @inheritDoc */
       _configure: function(config) {
-        this.__usingChangeset(function() {
+        if(config instanceof Value) {
+          __configureFromValue.call(this, config);
+        } else {
+          __configureFromSpec.call(this, config);
+        }
+      },
 
-          if(config instanceof Complex) {
+      /**
+       * Configures a property with a given value specification.
+       *
+       * Execution proceeds as follows:
+       *
+       * 1. If the property is a list property:
+       *   1. If the config value is `null`,
+       *      the list is cleared by calling the [List#clear]{@link pentaho.type.List#clear} method;
+       *   2. Otherwise, if the config value is distinct from the current list value,
+       *      execution is delegated to the [List.configure]{@link pentaho.type.List#configure} method;
+       *
+       * 2. If the property is an element property:
+       *   1. If either the current value or the config value are `null`,
+       *      then the config value replaces the current value;
+       *   2. Otherwise, execution is delegated to the
+       *      [Element#configureOrCreate]{@link pentaho.type.Element#configureOrCreate} method;
+       *      if it returns an element distinct from the current value,
+       *      then that value replaces the current value.
+       *
+       * If in any of the described steps,
+       * an error is thrown if a change would result to the property's value and
+       * the property is [read-only]{@link pentaho.type.Property.Type#isReadOnly}.
+       * Also, an error is thrown if the value itself would have to be mutated and
+       * its type is [read-only]{@link pentaho.type.Value.Type#isReadOnly}.
+       *
+       * @param {!pentaho.type.Property.Type} propType - The property to configure.
+       * @param {any} valueConfig - A value specification. Not `undefined`.
+       *
+       * @throws {TypeError} When the property value would be replaced or, in case of list properties,
+       * its elements would be added, moved or removed and the
+       * property is [read-only]{@link pentaho.type.Property.Type#isReadOnly}.
+       *
+       * @throws {TypeError} When the property's current value would be mutated and
+       * its type is [read-only]{@link pentaho.type.Value.Type#isReadOnly}.
+       *
+       * @protected
+       */
+      _configureProperty: function(propType, valueConfig) {
 
-            // TODO: should copy only the properties of the LCA type?
+        // assert valueConfig !== undefined
 
-            // Copy common properties, if it is a subtype of this one.
-            if(config.$type.isSubtypeOf(this.$type))
-              this.$type.each(function(propType) {
-                this.set(propType, config.get(propType.name));
-              }, this);
+        var valueAmb = this.__getAmbientByType(propType);
+        if(valueAmb !== valueConfig) {
+          if(propType.isList) {
 
+            // assert valueAmb !== null
+            // Configure. Replace is not possible.
+
+            if(valueConfig === null) {
+              // Throws if property is read-only.
+              valueAmb.clear();
+            } else {
+              // Let List#_configure handle any needed conversions and compatibility issues.
+              valueAmb._configure(valueConfig);
+            }
           } else {
-
-            // TODO: should it be sloppy in this case?
-
-            for(var name in config)
-              if(O.hasOwn(config, name))
-                this.set(name, config[name]);
-
+            __configurePropertyElement.call(this, propType, valueAmb, valueConfig);
           }
-        });
+        }
       },
       // endregion
 
@@ -896,6 +940,49 @@ define([
                 break;
             }
           }
+
+          return this;
+        },
+
+        /**
+         * Calls a function for each defined property type that this type shares with another given type
+         * and whose value can, in principle, be copied from it.
+         *
+         * This method finds the lowest common ancestor of both types.
+         * If it is a complex type, each of the corresponding local properties is yielded.
+         *
+         * @param {!pentaho.type.Type} otherType - The other type.
+         * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} fun -
+         * The mapping function. Return `false` to break iteration.
+         *
+         * @param {Object} [ctx] - The JS context object on which `fun` is called.
+         *
+         * @return {!pentaho.type.Complex} This object.
+         */
+        eachCommonWith: function(otherType, fun, ctx) {
+          var lca;
+          if(otherType.isComplex && (lca = O.lca(this, otherType)) && lca.isComplex) {
+
+            // eslint-disable-next-line consistent-return
+            lca.each(function(basePropType, i) {
+              var name = basePropType.name;
+              var localPropType = this.get(name);
+
+              /* A property is yielded if the value-type of the other type's property is a subtype of
+               * the value-type of the local property.
+               *
+               *  var otherPropType = otherType.get(name);
+               *
+               * // assert basePropType === O.lca(localPropType, otherPropType)
+               *
+               * if(otherPropType.valueType.isSubtypeOf(localPropType.valueType))
+               */
+              if(fun.call(ctx, localPropType, i, this) === false)
+                return false;
+
+            }, this);
+          }
+
           return this;
         },
 
@@ -912,6 +999,7 @@ define([
           this.__getProps().configure(propTypeSpec);
           return this;
         },
+        // endregion
 
         // region validation
         // @override
@@ -977,49 +1065,8 @@ define([
           }
 
           return any;
-        },
-        // endregion
-
-        /**
-         * Calls a function for each defined property type that this type shares with another given type
-         * and whose value can, in principle, be copied from it.
-         *
-         * This method finds the lowest common ancestor of both types.
-         * If it is a complex type, each of the corresponding local properties is yielded.
-         *
-         * @param {!pentaho.type.Type} otherType - The other type.
-         * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} fun -
-         * The mapping function. Return `false` to break iteration.
-         *
-         * @param {Object} [ctx] - The JS context object on which `fun` is called.
-         *
-         * @return {!pentaho.type.Complex} This object.
-         */
-        eachCommonWith: function(otherType, fun, ctx) {
-          var lca;
-          if(otherType.isComplex && (lca = O.lca(this, otherType)) && lca.isComplex) {
-
-            lca.each(function(basePropType, i) {
-              var name = basePropType.name;
-              var localPropType = this.get(name);
-
-              /* A property is yielded if the value-type of the other type's property is a subtype of
-               * the value-type of the local property.
-               *
-               *  var otherPropType = otherType.get(name);
-               *
-               * // assert basePropType === O.lca(localPropType, otherPropType)
-               *
-               * if(otherPropType.valueType.isSubtypeOf(localPropType.valueType))
-               */
-              if(fun.call(ctx, localPropType, i, this) === false)
-                return false;
-
-            }, this);
-          }
-
-          return this;
         }
+        // endregion
       }
     })
     .implement(ContainerMixin)
@@ -1086,6 +1133,107 @@ define([
      */
 
     return Complex;
+
+    // region configure
+    /**
+     * Configures this value with a distinct, non-{@link Nully} value.
+     *
+     * @memberOf pentaho.type.Complex#
+     * @param {!pentaho.type.Value} other - The other value.
+     * @private
+     */
+    function __configureFromValue(other) {
+
+      // assert other != null && other !== this
+
+      // Copy common properties.
+
+      this.$type.eachCommonWith(other.$type, function(localPropType) {
+
+        var otherValue = other.get(localPropType.name);
+
+        this._configureProperty(localPropType, otherValue);
+      }, this);
+    }
+
+    /**
+     * Configures this value with a distinct, non-{@link Nully} specification.
+     *
+     * @memberOf pentaho.type.Complex#
+     * @param {!any} valueSpec - A value specification.
+     * @private
+     */
+    function __configureFromSpec(valueSpec) {
+
+      var type = this.$type;
+
+      // assert valueSpec !== null && valueSpec !== this
+
+      valueSpec = type._normalizeInstanceSpec(valueSpec);
+      // assert valueSpec.constructor === Object
+
+      var propValueSpec;
+
+      for(var propNameOrAlias in valueSpec) {
+        // "_" is the inline type property and should not even be considered / logged as not existing.
+        if(O.hasOwn(valueSpec, propNameOrAlias) &&
+           (propNameOrAlias !== "_") &&
+           (propValueSpec = valueSpec[propNameOrAlias]) !== undefined) {
+
+          var propType = type.get(propNameOrAlias, /* sloppy: */true);
+          if(propType === null) {
+            propType = type.__getByAlias(propNameOrAlias);
+
+            // Ignore the alias if the name is also present.
+            if(propType !== null && O.hasOwn(valueSpec, propType.name)) {
+              propType = null;
+            }
+          }
+
+          if(propType !== null) {
+            this._configureProperty(propType, propValueSpec);
+          } else {
+            // Log. Undefined property name or alias.
+          }
+        }
+      }
+    }
+
+    /**
+     * Configures an element property with a given non-undefined, distinct, value specification.
+     *
+     * @memberOf pentaho.type.Complex#
+     * @param {!pentaho.type.Property.Type} propType - The property to configure.
+     * @param {pentaho.type.Value} valueAmb - The current, ambient value, possibly `null`.
+     * @param {any} valueConfig - A specification. Not `undefined`. Distinct from `valueAmb`.
+     * @private
+     */
+    function __configurePropertyElement(propType, valueAmb, valueConfig) {
+
+      // assert valueConfig !== undefined
+      // assert valueAmb !== undefined
+      // assert valueAmb !== valueConfig
+
+      if(valueAmb === null || valueConfig === null) {
+        // Throws if changed property is read-only.
+        // If valueAmb is null, set to valueConfig.
+        // If valueAmb is not null, set to null.
+        ComplexChangeset.__setElement(this, propType, valueConfig);
+        return;
+      }
+
+      // Both ambient and new are defined.
+
+      // Configure valueAmb with valueConfig, if possible...
+      valueConfig = valueAmb._configureOrCreate(valueConfig);
+
+      if(valueConfig !== valueAmb) {
+        // Throws if changed property is read-only.
+        // Force replace: valueAmb and valueConfig may be equals yet still differ on content.
+        ComplexChangeset.__setElement(this, propType, valueConfig, /* forceReplace: */true);
+      }
+    }
+    // endregion
   }];
 
   // Constructor's helper functions
