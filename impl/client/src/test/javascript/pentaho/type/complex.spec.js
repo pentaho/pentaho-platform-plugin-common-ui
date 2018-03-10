@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 define([
   "pentaho/type/Context",
   "pentaho/type/PropertyTypeCollection",
+  "pentaho/type/changes/ComplexChangeset",
   "tests/pentaho/util/errorMatch",
   "tests/pentaho/type/sloppyModeUtil"
-], function(Context, PropertyTypeCollection, errorMatch, sloppyModeUtil) {
+], function(Context, PropertyTypeCollection, ComplexChangeset, errorMatch, sloppyModeUtil) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
@@ -30,15 +31,17 @@ define([
     var context;
     var Value;
     var Complex;
+    var PentahoNumber;
     var Property;
     var List;
 
-    beforeEach(function(done) {
+    beforeAll(function(done) {
       Context.createAsync()
           .then(function(_context) {
             context = _context;
             Value = context.get("value");
             Complex = context.get("complex");
+            PentahoNumber = context.get("number");
             Property = context.get("property");
             List = context.get("list");
           })
@@ -428,196 +431,284 @@ define([
       }); // end getf
 
       describe("#set(name, valueSpec)", function() {
-        it("should set the value of an existing property", function() {
-          var Derived = Complex.extend({
-            $type: {props: [{name: "x", valueType: "string"}]}
+
+        var ComplexWithString;
+        var ComplexWithNumber;
+        var ComplexWithReadOnlyString;
+        var ComplexWithStringList;
+
+        beforeAll(function() {
+          ComplexWithString = Complex.extend({
+            $type: {
+              props: [
+                {name: "x", valueType: "string"}
+              ]
+            }
           });
 
-          var derived = new Derived();
-
-          derived.set("x", "1");
-
-          var value = derived.get("x");
-          expect(value.value).toBe("1");
-        });
-
-        it("should set the state of a defaulted element property to 'specified', " +
-            "when set to the same value", function() {
-          var Derived = Complex.extend({
-            $type: {props: [{name: "x", valueType: "number", defaultValue: 1}]}
+          ComplexWithReadOnlyString = Complex.extend({
+            $type: {
+              props: [
+                {name: "x", valueType: "string", isReadOnly: true}
+              ]
+            }
           });
 
-          var derived = new Derived();
-
-          expect(derived.isDefaultedOf("x")).toBe(true);
-
-          derived.set("x", 1);
-
-          expect(derived.isDefaultedOf("x")).toBe(false);
-        });
-
-        it("should set the state of a defaulted element property to 'specified', " +
-            "when set to a different value", function() {
-          var Derived = Complex.extend({
-            $type: {props: [{name: "x", valueType: "number", defaultValue: 1}]}
+          ComplexWithNumber = Complex.extend({
+            $type: {
+              props: [
+                {name: "x", valueType: "number", defaultValue: 1}
+              ]
+            }
           });
 
-          var derived = new Derived();
-
-          expect(derived.isDefaultedOf("x")).toBe(true);
-
-          derived.set("x", 2);
-
-          expect(derived.isDefaultedOf("x")).toBe(false);
-        });
-
-        it("should set the state of a specified element property to 'defaulted', when set to null", function() {
-          var Derived = Complex.extend({
-            $type: {props: [{name: "x", valueType: "number", defaultValue: 1}]}
+          ComplexWithStringList = Complex.extend({
+            $type: {
+              props: [
+                {name: "xs", valueType: ["string"]}
+              ]
+            }
           });
-
-          var derived = new Derived({x: 1});
-
-          expect(derived.isDefaultedOf("x")).toBe(false);
-
-          derived.set("x", null);
-
-          expect(derived.isDefaultedOf("x")).toBe(true);
-        });
-
-        it("should set the state of a defaulted complex property to 'specified', " +
-            "when a nested change occurs", function() {
-
-          var MyValue = Complex.extend({
-            $type: {props: [{name: "y", valueType: "number", defaultValue: 1}]}
-          });
-
-          var Derived = Complex.extend({
-            $type: {props: [{name: "x", valueType: MyValue, defaultValue: function() { return {}; }}]}
-          });
-
-          var derived = new Derived();
-
-          expect(derived.isDefaultedOf("x")).toBe(true);
-
-          derived.x.set("y", 2);
-
-          expect(derived.isDefaultedOf("x")).toBe(false);
-        });
-
-        it("should set the state of a defaulted list property to 'specified', " +
-            "when a nested change occurs", function() {
-
-          var MyValue = Complex.extend({
-            $type: {props: [{name: "y", valueType: "number", defaultValue: 1}]}
-          });
-
-          var Derived = Complex.extend({
-            $type: {props: [{name: "x", valueType: [MyValue], defaultValue: function() {
-              return [new MyValue()];
-            }}]}
-          });
-
-          var derived = new Derived();
-
-          expect(derived.isDefaultedOf("x")).toBe(true);
-
-          derived.x.at(0).set("y", 2);
-
-          expect(derived.isDefaultedOf("x")).toBe(false);
-        });
-
-        it("should set the state of a defaulted list property to 'specified', " +
-            "when a new element is added", function() {
-
-          var MyValue = Complex.extend({
-            $type: {props: [{name: "y", valueType: "number", defaultValue: 1}]}
-          });
-
-          var Derived = Complex.extend({
-            $type: {props: [{name: "x", valueType: [MyValue]}]}
-          });
-
-          var derived = new Derived();
-
-          expect(derived.isDefaultedOf("x")).toBe(true);
-
-          derived.x.add(new MyValue());
-
-          expect(derived.isDefaultedOf("x")).toBe(false);
-        });
-
-        it("should throw a TypeError if the property is read-only", function() {
-
-          var Derived = Complex.extend({
-            $type: {props: [{name: "x", valueType: "string", isReadOnly: true, defaultValue: "2"}]}
-          });
-
-          var derived = new Derived();
-
-          expect(function() {
-            derived.set("x", "1");
-          }).toThrowError(TypeError);
-
-          expect(derived.x).toBe("2");
-        });
-
-        it("should set the value of an existing list property", function() {
-          var Derived = Complex.extend({
-            $type: {props: [{name: "x", valueType: ["string"]}]}
-          });
-
-          var derived = new Derived();
-
-          derived.set("x", ["1", "2"]);
-
-          var value = derived.get("x");
-          expect(value instanceof List).toBe(true);
-          expect(value.count).toBe(2);
-        });
-
-        it("should keep the value of property if the new is equals", function() {
-          var Derived = Complex.extend({
-            $type: {props: [{name: "x", valueType: "string"}]}
-          });
-
-          var derived = new Derived({"x": "1"});
-
-          var beforeValue = derived.get("x");
-
-          derived.set("x", "1");
-
-          var afterValue = derived.get("x");
-
-          expect(beforeValue).toBe(afterValue);
-        });
-
-        it("should replace the value of property if the new is different", function() {
-          var Derived = Complex.extend({
-            $type: {props: [{name: "x", valueType: "string"}]}
-          });
-
-          var derived = new Derived({"x": "1"});
-
-          var beforeValue = derived.get("x");
-
-          derived.set("x", "2");
-
-          var afterValue = derived.get("x");
-
-          expect(beforeValue).not.toBe(afterValue);
         });
 
         it("should throw when given the name of an undefined property", function() {
-          var Derived = Complex.extend({
-            $type: {props: [{name: "x"}]}
-          });
 
-          var derived = new Derived();
+          var value = new ComplexWithString();
 
           expect(function() {
-            derived.set("y", "1");
+            value.set("y", "1");
           }).toThrow(errorMatch.argInvalid("name"));
+        });
+
+        describe("element property", function() {
+
+          it("should set the value of an existing property", function() {
+
+            var value = new ComplexWithString();
+
+            value.set("x", "1");
+
+            var propValue = value.get("x");
+            expect(propValue.value).toBe("1");
+          });
+
+          it("should set the state of a defaulted element property to 'specified', " +
+              "when set to the same value", function() {
+
+            var value = new ComplexWithNumber();
+
+            expect(value.isDefaultedOf("x")).toBe(true);
+
+            value.set("x", 1);
+
+            expect(value.isDefaultedOf("x")).toBe(false);
+          });
+
+          it("should set the state of a defaulted element property to 'specified', " +
+              "when set to a different value", function() {
+
+            var value = new ComplexWithNumber();
+
+            expect(value.isDefaultedOf("x")).toBe(true);
+
+            value.set("x", 2);
+
+            expect(value.isDefaultedOf("x")).toBe(false);
+          });
+
+          it("should set the state of a specified element property to 'defaulted', when set to null", function() {
+
+            var value = new ComplexWithNumber({x: 1});
+
+            expect(value.isDefaultedOf("x")).toBe(false);
+
+            value.set("x", null);
+
+            expect(value.isDefaultedOf("x")).toBe(true);
+          });
+
+          it("should set the state of a defaulted complex property to 'specified', " +
+              "when a nested change occurs", function() {
+
+            var Derived = Complex.extend({
+              $type: {
+                props: [
+                  {
+                    name: "y",
+                    valueType: ComplexWithNumber,
+                    defaultValue: function() { return {}; }
+                  }
+                ]
+              }
+            });
+
+            var derived = new Derived();
+
+            expect(derived.isDefaultedOf("y")).toBe(true);
+
+            derived.y.set("x", 2);
+
+            expect(derived.isDefaultedOf("y")).toBe(false);
+          });
+
+          it("should throw a TypeError if the property is read-only and a change would occur", function() {
+
+            var value = new ComplexWithReadOnlyString({x: "2"});
+
+            expect(function() {
+              value.set("x", "1");
+            }).toThrowError(TypeError);
+
+            expect(value.x).toBe("2");
+          });
+
+          it("should not throw a TypeError if the property is read-only and a change would not occur", function() {
+
+            var value = new ComplexWithReadOnlyString({x: "2"});
+
+            value.set("x", "2");
+
+            expect(value.x).toBe("2");
+          });
+
+          it("should keep the current value of a property if the new value is equals", function() {
+
+            var value = new ComplexWithString({x: "1"});
+
+            var beforePropValue = value.get("x");
+
+            value.set("x", "1");
+
+            var afterPropValue = value.get("x");
+
+            expect(beforePropValue).toBe(afterPropValue);
+          });
+
+          it("should replace the current value of property if the new value is not equals", function() {
+
+            var value = new ComplexWithString({x: "1"});
+
+            var beforePropValue = value.get("x");
+
+            value.set("x", "2");
+
+            var afterPropValue = value.get("x");
+
+            expect(beforePropValue).not.toBe(afterPropValue);
+          });
+        });
+
+        describe("list property", function() {
+
+          it("should set the state of a defaulted list property to 'specified', " +
+             "when a nested change occurs", function() {
+
+            var MyValue = Complex.extend({
+              $type: {props: [{name: "y", valueType: "number", defaultValue: 1}]}
+            });
+
+            var Derived = Complex.extend({
+              $type: {props: [{name: "x", valueType: [MyValue], defaultValue: function() {
+                return [new MyValue()];
+              }}]}
+            });
+
+            var derived = new Derived();
+
+            expect(derived.isDefaultedOf("x")).toBe(true);
+
+            derived.x.at(0).set("y", 2);
+
+            expect(derived.isDefaultedOf("x")).toBe(false);
+          });
+
+          it("should set the state of a defaulted list property to 'specified', " +
+             "when a new element is added", function() {
+
+            var MyValue = Complex.extend({
+              $type: {props: [{name: "y", valueType: "number", defaultValue: 1}]}
+            });
+
+            var Derived = Complex.extend({
+              $type: {props: [{name: "x", valueType: [MyValue]}]}
+            });
+
+            var derived = new Derived();
+
+            expect(derived.isDefaultedOf("x")).toBe(true);
+
+            derived.x.add(new MyValue());
+
+            expect(derived.isDefaultedOf("x")).toBe(false);
+          });
+
+          it("should clear a list property if the new value is null", function() {
+
+            var value = new ComplexWithStringList({xs: ["1", "2"]});
+
+            var list = value.get("xs");
+            expect(list.count).toBe(2);
+
+            value.set("xs", null);
+
+            expect(list.count).toBe(0);
+            expect(value.get("xs")).toBe(list);
+          });
+
+          it("should set the value of a list property when given an array of specs", function() {
+
+            var value = new ComplexWithStringList();
+
+            value.set("xs", ["1", "2"]);
+
+            var list = value.get("xs");
+            expect(list.count).toBe(2);
+          });
+
+          it("should set the value of a list property when given a spec with a d array property", function() {
+
+            var value = new ComplexWithStringList();
+
+            value.set("xs", {d: ["1", "2"]});
+
+            var list = value.get("xs");
+            expect(list.count).toBe(2);
+          });
+
+          it("should clear the list property when given a spec with a null d property", function() {
+
+            var value = new ComplexWithStringList({xs: ["1", "2"]});
+
+            value.set("xs", {d: null});
+
+            var list = value.get("xs");
+            expect(list.count).toBe(0);
+          });
+
+          it("should set the value of a list property when given another List", function() {
+
+            var value = new ComplexWithStringList();
+
+            var list = value.get("xs");
+
+            var list2 = list.$type.create(["3", "4"]);
+
+            value.set("xs", list2);
+
+            expect(value.get("xs")).toBe(list);
+            expect(list.count).toBe(2);
+            expect(list.at(0).value).toBe("3");
+            expect(list.at(1).value).toBe("4");
+          });
+
+          it("should throw when given another type of spec", function() {
+
+            var value = new ComplexWithStringList();
+
+            expect(function() {
+              value.set("xs", 2);
+            }).toThrow(errorMatch.argInvalidType("instSpec", ["Array", "Object", "pentaho.type.List"], "number"));
+          });
         });
 
         describe("events -", function() {

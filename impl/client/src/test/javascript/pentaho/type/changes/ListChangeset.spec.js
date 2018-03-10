@@ -209,8 +209,19 @@ define([
       });
 
       describe("#__clear -", function() {
+
+        it("should not append a `clear` change to the changeset if list is empty", function() {
+
+          changeset.__clear(); // Create clear change.
+
+          expect(changeset.changes.length).toBe(0);
+        });
+
         it("should append a `clear` change to the changeset", function() {
-          changeset.__clear(); // create clear change
+
+          changeset = new ListChangeset(context.transaction, new NumberList([1, 2]));
+
+          changeset.__clear(); // Create clear change.
 
           expect(changeset.changes.length).toBe(1);
           expect(changeset.changes[0].type).toBe("clear");
@@ -323,7 +334,7 @@ define([
       describe("#__removeAt -", function() {
         var list;
 
-        beforeEach(function(){
+        beforeEach(function() {
           list = new NumberList([1, 2, 3, 4]);
           changeset = new ListChangeset(context.transaction, list);
         });

@@ -343,26 +343,97 @@ define([
       /**
        * Sets the value of a property.
        *
+       * The value of [List]{@link pentaho.type.Property.Type#isList} properties is automatically created,
+       * when complex instance is constructed, and is never replaced by another list value.
+       * However, its contents can be modified.
+       * On the other hand, for element properties, their value can be replaced.
+       *
+       * Execution proceeds as follows:
+       *
+       * 1. If the property is a list property:
+       *   1. If `value` is {@link Nully},
+       *      the list is cleared by calling the [List#clear]{@link pentaho.type.List#clear} method;
+       *      however, if the property is [read-only]{@link pentaho.type.Property.Type#isReadOnly} and
+       *      the list has any elements, an error is thrown instead;
+       *   2. Otherwise, if `value` is distinct from the current list value,
+       *      an elements list is extracted from the given value
+       *      (see [List.Type#_normalizeInstanceSpec]{@link pentaho.type.List.Type#_normalizeInstanceSpec})
+       *      and execution is delegated to the [List#set]{@link pentaho.type.List#set} method;
+       *      likewise, if changes to the list would result and
+       *      the property is [read-only]{@link pentaho.type.Property.Type#isReadOnly},
+       *      an error is thrown;
+       *
+       * 2. If the property is an element property:
+       *   1. If `value` is {@link Nully},
+       *      the property's [default value]{@link pentaho.type.Property.Type#defaultValue}, if any,
+       *      is evaluated and `value` is set to it;
+       *      the property's new [defaulted status]{@link pentaho.type.Complex#isDefaultedOf} will be `true`.
+       *
+       *   2. Otherwise, if the specified `value` is not {@link Nully},
+       *      the property's new defaulted status will be `false`.
+       *
+       *   3. If `value` is not [equal]{@link pentaho.type.Value#equals} to the current value and/or
+       *      the property's defaulted status changes:
+       *      1. If the property is [read-only]{@link pentaho.type.Property.Type#isReadOnly}, an error is thrown.
+       *      2. Otherwise, the current value and the defaulted status are replaced by the new ones.
+       *      3. A change action is executed, resulting in the change events `will:change` and
+       *         `did:change` or `rejected:change` being emitted.
+       *
+       *   4. Otherwise, if `value` and the defaulted status do not change, nothing is done.
+       *
+       * In both cases, of element and list properties,
+       * when the given value(s) is a specification,
+       * it is first constructed,
+       * before any comparison with the current value(s) is performed.
+       *
+       * Contrast this behavior with that of the [configure]{@link pentaho.type.Value#configure} method,
+       * in which specifications aren't considered to have an identity, a priori.
+       * Only if these explicitly identify an entity or value which is incompatible with the current value
+       * are they assumed to represent a new value that needs to be constructed.
+       *
+       * For element properties, specifications are constructed
+       * having as default type the [valueType]{@link pentaho.type.Property.Type#valueType} of the property.
+       *
+       * For list properties, each element's specification is constructed
+       * having as default type the
+       * [elementType]{@link pentaho.type.Type#elementType}
+       * of the property's [valueType]{@link pentaho.type.Property.Type#valueType}.
+       *
        * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
        * @param {any?} [valueSpec=null] A value specification.
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
-       * @throws {TypeError} When property is read-only.
+       * @throws {TypeError} When the property is read-only and its value would change.
+       *
+       * @see pentaho.type.Value#configure
+       * @see pentaho.type.Value#isReadOnly
        *
        * @fires "will:change"
        * @fires "did:change"
        * @fires "rejected:change"
        */
       set: function(name, valueSpec) {
+
         var propType = this.$type.get(name);
+        if(propType.isList) {
+          var valueAmb = this.__getAmbientByType(propType);
+          if(valueAmb === valueSpec) {
+            return;
+          }
 
-        if(propType.isReadOnly) throw new TypeError("'" + name + "' is read-only");
+          if(valueSpec != null) {
+            valueSpec = valueAmb.$type.__getElementSpecsFromInstanceSpec(valueSpec);
+            if(valueSpec != null) {
+              valueAmb.set(valueSpec);
+              return;
+            }
+          }
 
-        if(propType.isList)
-          // Delegate to List#set.
-          this.__values[propType.name].set(valueSpec);
-        else
+          // TODO: List property default value?
+          valueAmb.clear();
+        } else {
           ComplexChangeset.__setElement(this, propType, valueSpec);
+        }
       },
 
       /** @inheritDoc */
@@ -1016,6 +1087,6 @@ define([
     var name;
     return O_hasOwn.call(spec, (name = propType.name)) ? spec[name] :
       ((name = propType.nameAlias) !== null && O_hasOwn.call(spec, name)) ? spec[name] :
-           undefined;
+      undefined;
   }
 });

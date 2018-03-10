@@ -347,41 +347,41 @@ define([
        * @param {boolean} [keyArgs.noAdd=false] Prevents adding new elements to the list.
        * @param {boolean} [keyArgs.noRemove=false] Prevents removing elements not present in `fragment` from the list.
        * @param {boolean} [keyArgs.noMove=false] Prevents moving elements inside the list.
-       * @param {boolean} [keyArgs.noUpdate=false] Prevents updating elements already present in the list.
+       * @param {boolean} [keyArgs.noUpdate=true] Prevents updating elements already present in the list.
        *
        * @param {number} [keyArgs.index] The index at which to add new elements.
        * When unspecified, new elements are appended to the list.
        * This argument is ignored when `noAdd` is `true`.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
+       * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       set: function(fragment, keyArgs) {
 
         this.__set(
-            fragment,
-            !arg.optional(keyArgs, "noAdd"),
-            !arg.optional(keyArgs, "noUpdate"),
-            !arg.optional(keyArgs, "noRemove"),
-            !arg.optional(keyArgs, "noMove"),
-            arg.optional(keyArgs, "index"));
+          fragment,
+          !arg.optional(keyArgs, "noAdd"),
+          !arg.optional(keyArgs, "noUpdate", true),
+          !arg.optional(keyArgs, "noRemove"),
+          !arg.optional(keyArgs, "noMove"),
+          arg.optional(keyArgs, "index"));
       },
 
       /**
-       * Adds and/or updates one or more elements to the _end_ of the list.
+       * Adds one or more elements to the _end_ of the list.
        *
        * The element or elements specified in argument `fragment`
        * are converted to the list's element class.
        *
        * @param {any|Array} fragment - Value or values to add.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
+       * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       add: function(fragment) {
-        this.__set(fragment, /* add: */true, /* update: */true, /* remove: */false, /* move: */false);
+        this.__set(fragment, /* add: */true, /* update: */false, /* remove: */false, /* move: */false);
       },
 
       /**
-       * Inserts and/or updates one or more elements, starting at the given index.
+       * Inserts one or more elements, starting at the given index.
        *
        * If `index` is negative,
        * it means the position at that many elements from the end (`index' = count - index`).
@@ -392,11 +392,11 @@ define([
        * @param {any|Array} fragment - Element or elements to add.
        * @param {number} index - The index at which to start inserting new elements.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
+       * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       insert: function(fragment, index) {
-        this.__set(fragment,
-            /* add: */true, /* update: */true, /* remove: */false, /* move: */false, /* index: */index);
+        this.__set(
+          fragment, /* add: */true, /* update: */false, /* remove: */false, /* move: */false, /* index: */index);
       },
 
       /**
@@ -406,11 +406,9 @@ define([
        *
        * @param {any|Array} fragment - Element or elements to remove.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
+       * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       remove: function(fragment) {
-
-        this.__assertEditable();
 
         this.__usingChangeset(function(cset) {
           cset.__remove(fragment);
@@ -423,11 +421,9 @@ define([
        * @param {any} elemSpec - An element specification.
        * @param {number} indexNew - The new index of the element.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
+       * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       move: function(elemSpec, indexNew) {
-
-        this.__assertEditable();
 
         this.__usingChangeset(function(cset) {
           cset.__move(elemSpec, indexNew);
@@ -447,11 +443,9 @@ define([
        * @param {number} start - The index at which to start removing.
        * @param {number} [count=1] The number of elements to remove.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
+       * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       removeAt: function(start, count) {
-
-        this.__assertEditable();
 
         this.__usingChangeset(function(cset) {
           cset.__removeAt(start, count);
@@ -467,8 +461,6 @@ define([
        */
       sort: function(comparer) {
 
-        this.__assertEditable();
-
         this.__usingChangeset(function(cset) {
           cset.__sort(comparer);
         });
@@ -477,11 +469,9 @@ define([
       /**
        * Removes all elements from the list.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
+       * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       clear: function() {
-
-        this.__assertEditable();
 
         this.__usingChangeset(function(cset) {
           cset.__clear();
@@ -553,10 +543,7 @@ define([
         return new ListChangeset(txn, this);
       },
 
-      // @internal
       __set: function(fragment, add, update, remove, move, index) {
-
-        this.__assertEditable();
 
         this.__usingChangeset(function(cset) {
           cset.__set(fragment, add, update, remove, move, index);
