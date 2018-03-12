@@ -1200,7 +1200,8 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
             // Create new widget to get properly formatted values array
             var newValuesArray = this.widgetBuilder.build({
               param: param,
-              promptPanel: this
+              promptPanel: this,
+              changed: true
             }, param.attributes["parameter-render-type"]).valuesArray;
 
             if(JSON.stringify(component.valuesArray) !== JSON.stringify(newValuesArray) || param.forceUpdate) {
@@ -1226,12 +1227,13 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
               }
 
               updateNeeded = _areParamsDifferent(dashboardParameter, paramSelectedValues, param.type);
-              if(!updateNeeded && param.isErrorChanged) {
+              if(param.isErrorChanged) {
                 updateNeeded = true;
               }
             }
 
-            if(updateNeeded) {
+            // if the CDF component has `isManaged` set to `false` don't execute the update
+            if(updateNeeded && component.isManaged !== false) {
               var groupPanel = this.dashboard.getComponentByName(groupName);
               _mapComponents(groupPanel, function(component) {
                 this.dashboard.updateComponent(component);
