@@ -152,6 +152,13 @@ define([
         return this.__contentKey || (this.__contentKey = this.__buildContentKeyOuter());
       },
 
+      /** @inheritDoc */
+      equalsContent: function(other) {
+        // `equalsContent` can only be called if `this.equals(other)`.
+        // Because $key is already the $contentKey, then this must be true as well.
+        return true;
+      },
+
       /**
        * Wraps the result of calling `_buildContentKey` with information on the kind of filter.
        *
