@@ -96,7 +96,7 @@ define([
 
       /** @inheritDoc */
       _buildContentKey: function() {
-        return (this.property || "") + " " + this.values.toArray(function(v) { return v.$key; }).join(" ");
+        return (this.property || "") + " " + this.values.toArray(function(v) { return v.$contentKey; }).join(" ");
       },
 
       $type: /** @lends pentaho.data.filter.IsIn.Type# */{
@@ -104,11 +104,10 @@ define([
         alias: "in",
         props: [
           {
-            // may be empty
+            // May be empty.
             name: "values",
             nameAlias: "v",
             valueType: ["element"],
-            isReadOnly: true,
             isBoundary: true
           }
         ]

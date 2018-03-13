@@ -29,6 +29,9 @@ define([
   "use strict";
 
   return ["value", "element", function(Value, Element) {
+
+    var __listType;
+
     /**
      * @name pentaho.type.List.Type
      * @class
@@ -61,10 +64,14 @@ define([
      * also be overridden to copy those properties.
      *
      * @constructor
-     * @param {pentaho.type.spec.UList} [spec] The list specification or another compatible list instance.
+     * @param {pentaho.type.spec.UList|pentaho.type.List|Array.<pentaho.type.Element>} [instSpec] The
+     * list specification or a compatible list instance or element's array.
      * @param {Object} [keyArgs] - The keyword arguments.
      * @param {boolean} [keyArgs.isBoundary=false] - Indicates if the list should be a _boundary list_.
      * @param {boolean} [keyArgs.isReadOnly=false] - Indicates if the list should be a _read-only list_.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidTypeError} When the type of `instSpec` is not
+     * {@link Object}, {@link Array} or {@link pentaho.type.List}.
      *
      * @see pentaho.type.Element
      * @see pentaho.type.spec.IList
@@ -73,7 +80,7 @@ define([
      */
     var List = Value.extend(/** @lends pentaho.type.List# */{
 
-      constructor: function(spec, keyArgs) {
+      constructor: function(instSpec, keyArgs) {
 
         this._initContainer();
 
@@ -85,18 +92,12 @@ define([
         if(keyArgs) {
           if(keyArgs.isBoundary) this.__isBoundary = true;
           if(keyArgs.isReadOnly) this.__isReadOnly = true;
+          if(keyArgs.needReadOnlyElementValidation) this.__needReadOnlyElementValidation = true;
         }
 
-        if(spec != null) {
-          // An array of element specs?
-          // A plain Object with a `d` array property?
-          var elemSpecs =
-              Array.isArray(spec) ? spec :
-              (spec.constructor === Object && Array.isArray(spec.d)) ? spec.d :
-              (spec instanceof List) ? spec.__elems :
-              null;
-
-          if(elemSpecs) {
+        if(instSpec != null) {
+          var elemSpecs = __listType.__getElementSpecsFromInstanceSpec(instSpec);
+          if(elemSpecs != null) {
             this.__load(elemSpecs);
           }
         }
@@ -106,13 +107,19 @@ define([
         var isBoundary = this.__isBoundary;
         var i = -1;
         var L = elemSpecs.length;
-        var elemType = this.$type.of;
+        var elemType = this.$type.elementType;
         var elems = this.__elems;
         var keys  = this.__keys;
         var elem;
         var key;
+        var needReadOnlyElementValidation = this.__needReadOnlyElementValidation;
+
         while(++i < L) {
           if((elem = elemType.to(elemSpecs[i])) != null && !O.hasOwn(keys, (key = elem.$key))) {
+            if(needReadOnlyElementValidation && !elem.$type.isReadOnly) {
+              throw new TypeError("List requires elements of a read-only type.");
+            }
+
             elems.push(elem);
             keys[key] = elem;
 
@@ -120,6 +127,14 @@ define([
           }
         }
       },
+
+      /**
+       * Gets a value that indicates if this list requires validation that the type of each element is read-only.
+       *
+       * @type {boolean}
+       * @private
+       */
+      __needReadOnlyElementValidation: false,
 
       // region $isReadOnly
       __isReadOnly: false,
@@ -142,7 +157,9 @@ define([
        * @private
        */
       __assertEditable: function() {
-        if(this.__isReadOnly) throw new TypeError("The list is read-only.");
+        if(this.__isReadOnly) {
+          throw new TypeError("The list is read-only.");
+        }
       },
       // endregion
 
@@ -184,53 +201,6 @@ define([
         return clone;
       },
 
-      // region configuration
-
-      /**
-       * Configures a list instance with a given configuration.
-       *
-       * When `config` is another list, an error is thrown.
-       *
-       * When `config` is a plain object, its keys are the keys of list elements,
-       * which must belong to the list, and the values are the configuration values,
-       * which are then passed to the element's [configure]{@link pentaho.type.Element#configure} method.
-       *
-       * @name pentaho.type.List#configure
-       *
-       * @param {?any} config - The configuration.
-       *
-       * @return {!pentaho.type.Value} This instance.
-       *
-       * @throws {pentaho.lang.ArgumentInvalidError} When `config` is a plain object that contains a key that is
-       * not the key of an element in the list.
-       *
-       * @throws {pentaho.lang.ArgumentInvalidType} When `config` is not a list or a plain object.
-       */
-
-      /** @inheritDoc */
-      _configure: function(config) {
-        this.__usingChangeset(function() {
-
-          if(config instanceof List) {
-            // TODO: when differences between `configure` and `set` are revisited, try to decide what makes sense here.
-            throw error.notImplemented("Behaviour not yet defined.");
-
-          } else if(config.constructor === Object) {
-
-            O.eachOwn(config, function(v, key) {
-              var elem = this.get(key);
-              if(!elem) throw error.argInvalid("domain", "An element with key '" + key + "' is not defined.");
-
-              elem.configure(v);
-            }, this);
-
-          } else {
-            throw error.argInvalidType("config", ["pentaho.type.List", "Object"], typeof config);
-          }
-        });
-      },
-      // endregion
-
       /**
        * Gets a mock projection of the updated list value.
        *
@@ -251,16 +221,6 @@ define([
 
       /**
        * Gets the key of the list value.
-       *
-       * The key of a value identifies it among values of the same concrete type.
-       *
-       * If two values have the same concrete type and their
-       * keys are equal, then it must also be the case that
-       * {@link pentaho.type.Value.Type#areEqual}
-       * returns `true` when given the two values.
-       * The opposite should be true as well.
-       * If two values of the same concrete type have distinct keys,
-       * then {@link pentaho.type.Value.Type#areEqual} should return `false`.
        *
        * The default list implementation, returns the value of the
        * list instance's {@link pentaho.type.List#$uid}.
@@ -325,7 +285,7 @@ define([
        * @return {number} `true` if the element is present in the list; `false`, otherwise.
        */
       indexOf: function(elem) {
-        return elem && this.has(elem.$key) ? this.__projectedMock.__elems.indexOf(elem) : -1;
+        return elem != null && this.has(elem.$key) ? this.__projectedMock.__elems.indexOf(elem) : -1;
       },
 
       /**
@@ -338,8 +298,8 @@ define([
       get: function(key) {
         // jshint laxbreak:true
         return (key != null && (key = this.__castKey(key)) != null)
-            ? O.getOwn(this.__projectedMock.__keys, key, null)
-            : null;
+          ? O.getOwn(this.__projectedMock.__keys, key, null)
+          : null;
       },
 
       /**
@@ -355,41 +315,41 @@ define([
        * @param {boolean} [keyArgs.noAdd=false] Prevents adding new elements to the list.
        * @param {boolean} [keyArgs.noRemove=false] Prevents removing elements not present in `fragment` from the list.
        * @param {boolean} [keyArgs.noMove=false] Prevents moving elements inside the list.
-       * @param {boolean} [keyArgs.noUpdate=false] Prevents updating elements already present in the list.
+       * @param {boolean} [keyArgs.noUpdate=true] Prevents updating elements already present in the list.
        *
        * @param {number} [keyArgs.index] The index at which to add new elements.
        * When unspecified, new elements are appended to the list.
        * This argument is ignored when `noAdd` is `true`.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
+       * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       set: function(fragment, keyArgs) {
 
         this.__set(
-            fragment,
-            !arg.optional(keyArgs, "noAdd"),
-            !arg.optional(keyArgs, "noUpdate"),
-            !arg.optional(keyArgs, "noRemove"),
-            !arg.optional(keyArgs, "noMove"),
-            arg.optional(keyArgs, "index"));
+          fragment,
+          !arg.optional(keyArgs, "noAdd"),
+          !arg.optional(keyArgs, "noUpdate", true),
+          !arg.optional(keyArgs, "noRemove"),
+          !arg.optional(keyArgs, "noMove"),
+          arg.optional(keyArgs, "index"));
       },
 
       /**
-       * Adds and/or updates one or more elements to the _end_ of the list.
+       * Adds one or more elements to the _end_ of the list.
        *
        * The element or elements specified in argument `fragment`
        * are converted to the list's element class.
        *
        * @param {any|Array} fragment - Value or values to add.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
+       * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       add: function(fragment) {
-        this.__set(fragment, /* add: */true, /* update: */true, /* remove: */false, /* move: */false);
+        this.__set(fragment, /* add: */true, /* update: */false, /* remove: */false, /* move: */false);
       },
 
       /**
-       * Inserts and/or updates one or more elements, starting at the given index.
+       * Inserts one or more elements, starting at the given index.
        *
        * If `index` is negative,
        * it means the position at that many elements from the end (`index' = count - index`).
@@ -400,11 +360,11 @@ define([
        * @param {any|Array} fragment - Element or elements to add.
        * @param {number} index - The index at which to start inserting new elements.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
+       * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       insert: function(fragment, index) {
-        this.__set(fragment,
-            /* add: */true, /* update: */true, /* remove: */false, /* move: */false, /* index: */index);
+        this.__set(
+          fragment, /* add: */true, /* update: */false, /* remove: */false, /* move: */false, /* index: */index);
       },
 
       /**
@@ -414,11 +374,9 @@ define([
        *
        * @param {any|Array} fragment - Element or elements to remove.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
+       * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       remove: function(fragment) {
-
-        this.__assertEditable();
 
         this.__usingChangeset(function(cset) {
           cset.__remove(fragment);
@@ -431,11 +389,9 @@ define([
        * @param {any} elemSpec - An element specification.
        * @param {number} indexNew - The new index of the element.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
+       * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       move: function(elemSpec, indexNew) {
-
-        this.__assertEditable();
 
         this.__usingChangeset(function(cset) {
           cset.__move(elemSpec, indexNew);
@@ -455,11 +411,9 @@ define([
        * @param {number} start - The index at which to start removing.
        * @param {number} [count=1] The number of elements to remove.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
+       * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       removeAt: function(start, count) {
-
-        this.__assertEditable();
 
         this.__usingChangeset(function(cset) {
           cset.__removeAt(start, count);
@@ -475,8 +429,6 @@ define([
        */
       sort: function(comparer) {
 
-        this.__assertEditable();
-
         this.__usingChangeset(function(cset) {
           cset.__sort(comparer);
         });
@@ -485,11 +437,9 @@ define([
       /**
        * Removes all elements from the list.
        *
-       * @throws {TypeError} When the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
+       * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
        */
       clear: function() {
-
-        this.__assertEditable();
 
         this.__usingChangeset(function(cset) {
           cset.__clear();
@@ -561,15 +511,94 @@ define([
         return new ListChangeset(txn, this);
       },
 
-      // @internal
       __set: function(fragment, add, update, remove, move, index) {
-
-        this.__assertEditable();
 
         this.__usingChangeset(function(cset) {
           cset.__set(fragment, add, update, remove, move, index);
         });
       },
+
+      /**
+       * Configures this list with a given distinct and non-{@link Nully} configuration.
+       *
+       * This method can only be called when there is an ambient transaction.
+       *
+       * The argument `config` accepts the same types of values given which
+       * a `List` instance can be constructed from.
+       *
+       * An additional configuration input format is supported,
+       * the key map configuration format,
+       * in which `config.d` is a map from
+       * element keys to element configurations, instead of,
+       * an array of element specifications.
+       * In this case, each targeted element is individually configured
+       * with the corresponding element configuration
+       * by using its [configureOrCreate]{@link pentaho.type.Element#configureOrCreate} method.
+       * If the latter returns a distinct element,
+       * then the original element is replaced in the list.
+       *
+       * With all of the other configuration formats,
+       * a list of element specifications is obtained and
+       * passed to the [set]{@link pentaho.type.List#set} method.
+       *
+       * @param {!pentaho.type.spec.UList|!pentaho.type.List|!Array.<!pentaho.type.Element>} config - The list
+       * specification or a compatible list instance or element's array.
+       *
+       * @throws {pentaho.lang.ArgumentInvalidTypeError} When the type of `config` is not
+       * {@link Object}, {@link Array} or {@link pentaho.type.List}.
+       *
+       * @throws {TypeError} When the list would be changed and it is [read-only]{@link pentaho.type.List#$isReadOnly}.
+       *
+       * @throws {pentaho.lang.ArgumentInvalidError} When `config.d` is an object that contains a key
+       * which is not the key of an element in the list.
+       *
+       * @protected
+       * @override
+       *
+       * @see pentaho.type.Value#configure
+       * @see pentaho.type.List#set
+       * @see pentaho.type.Complex#_configure
+       * @see pentaho.type.Element#configureOrCreate
+       */
+      _configure: function(config) {
+
+        // assert config !== null && config !== this
+
+        config = this.$type._normalizeInstanceSpec(config);
+        // assert config.constructor === Object
+
+        var data = config.d;
+        if(data != null) {
+
+          if(data.constructor === Object) {
+
+            O.eachOwn(data, function(elementConfig, key) {
+
+              if(elementConfig != null) {
+
+                var elem = this.get(key);
+                if(elem === null) {
+                  throw error.argInvalid("config", "There is no element with key '" + key + "'.");
+                }
+
+                var elem2 = elem._configureOrCreate(elementConfig);
+                if(elem2 !== elem) {
+                  // Replace
+                  var index = this.indexOf(elem);
+                  this.removeAt(index, 1);
+                  this.insert(elem2, index);
+                }
+              }
+            }, this);
+
+          } else if(Array.isArray(data)) {
+            this.set(data, {noUpdate: false});
+          } else {
+            throw error.argInvalidType("config", ["Array", "Object", "pentaho.type.List"], typeof config);
+          }
+        }
+      },
+
       // endregion
 
       // region serialization
@@ -586,10 +615,10 @@ define([
         var elemSpecs;
 
         if(this.count) {
-          // reset
+          // Reset.
           keyArgs.forceType = false;
 
-          var elemType = listType.of;
+          var elemType = listType.elementType;
 
           elemSpecs = this.toArray(function(elem) {
             keyArgs.declaredType = elemType; // JIC it is changed by elem.toSpecInContext
@@ -609,6 +638,29 @@ define([
       },
       // endregion
 
+      // region validation
+      /**
+       * Determines if the given list value is valid.
+       *
+       * The default implementation validates each element against the
+       * list's [element type]{@link pentaho.type.List.Type#of}
+       * and collects and returns any reported errors.
+       * Override to complement with a type's specific validation logic.
+       *
+       * You can use the error utilities in {@link pentaho.type.Util} to
+       * help in the implementation.
+       *
+       * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
+       *
+       * @override
+       */
+      validate: function() {
+        return this.__projectedMock.__elems.reduce(function(errors, elem) {
+          return typeUtil.combineErrors(errors, elem.validate());
+        }, null);
+      },
+      // endregion
+
       $type: /** @lends pentaho.type.List.Type# */{
 
         /** @inheritDoc */
@@ -617,16 +669,57 @@ define([
           this.base.apply(this, arguments);
 
           // Force base value inheritance. Cannot change after being set locally...
-          if(!O.hasOwn(this, "__elemType")) this.__elemType = this.__elemType;
+          if(!O.hasOwn(this, "__elemType")) {
+            // noinspection JSAnnotator
+            this.__elemType = this.__elemType;
+          }
         },
 
         alias: "list",
 
         get isList() { return true; },
+
         get isContainer() { return true; },
+
+        /**
+         * Gets a value that indicates if this type is an _entity_ type.
+         *
+         * [List]{@link pentaho.type.List} types are inherently non-entity types.
+         *
+         * @name pentaho.type.List.Type#isEntity
+         * @type {boolean}
+         * @readOnly
+         * @see pentaho.type.Value#$key
+         * @override
+         * @final
+         */
+
+        /**
+         * Gets a value that indicates
+         * whether this type, and all of the types of any contained values, cannot be changed, from the outside.
+         *
+         * [List]{@link pentaho.type.List} types are never, a priori, and directly read-only.
+         * This property is _final_ and always returns `false`.
+         *
+         * However, if a complex property is read-only and has a list value type,
+         * then the value of the property itself, the list instance,
+         * is marked [read-only]{@link pentaho.type.List#$isReadOnly}.
+         * Also, the [element type]{@link pentaho.type.List.Type#of} of a list type can be read-only.
+         *
+         * @name pentaho.type.List.Type#isReadOnly
+         * @type {boolean}
+         * @readOnly
+         * @override
+         * @final
+         */
 
         // region of / element type attribute
         __elemType: Element.type,
+
+        /** @inheritDoc */
+        get elementType() {
+          return this.__elemType;
+        },
 
         /**
          * Gets or sets the type of the elements that this type of list can contain.
@@ -653,7 +746,7 @@ define([
           return this.__elemType;
         },
 
-        // supports configuration
+        // Supports configuration.
         set of(value) {
           if(value === undefined) return;
           if(!value) throw error.argRequired("of");
@@ -681,38 +774,76 @@ define([
             throw error.argInvalid("of", bundle.structured.errors.list.elemTypeNotSubtypeOfBaseElemType);
 
           // Mark set locally even if it is the same...
+          // noinspection JSAnnotator
           this.__elemType = elemType;
 
         },
         // endregion
 
-        // region validation
+        // region serialization
         /**
-         * Determines if the given list value is a **valid instance** of this type.
+         * Normalizes a given non-{@link Nully} value specification.
          *
-         * The default implementation validates each element against the
-         * list's [element type]{@link pentaho.type.List.Type#of}
-         * and collects and returns any reported errors.
-         * Override to complement with a type's specific validation logic.
+         * @param {!any} instSpec - The value specification.
          *
-         * You can use the error utilities in {@link pentaho.type.Util} to
-         * help in the implementation.
+         * @return {!any} The normalized value specification.
          *
-         * @param {!pentaho.type.Value} value - The value to validate.
-         *
-         * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
+         * @throws {pentaho.lang.ArgumentInvalidTypeError} When the type of `instSpec` is not
+         * {@link Object}, {@link Array} or {@link pentaho.type.List}.
          *
          * @protected
          * @override
+         *
+         * @see pentaho.type.Value.Type#normalizeInstanceSpec
          */
-        _validate: function(value) {
-          return value.__projectedMock.__elems.reduce(function(errors, elem) {
-            return typeUtil.combineErrors(errors, elem.validate());
-          }, null);
-        },
-        // endregion
+        _normalizeInstanceSpec: function(instSpec) {
 
-        // region serialization
+          if(instSpec.constructor === Object) {
+            return instSpec;
+          }
+
+          if(Array.isArray(instSpec)) {
+            return {d: instSpec};
+          }
+
+          if(instSpec instanceof List) {
+            return {d: instSpec.__elems};
+          }
+
+          throw error.argInvalidType("instSpec", ["Array", "Object", "pentaho.type.List"], typeof instSpec);
+        },
+
+        /**
+         * Obtains the array of elements' specifications given the list instance specification.
+         *
+         * @param {pentaho.type.spec.UList|pentaho.type.List|Array.<pentaho.type.Element>} [instSpec] The
+         * list specification or a compatible list instance or element's array.
+         *
+         * @return {Array.<pentaho.type.Element|pentaho.type.spec.UElement>} The array of elements, possibly `null`.
+         *
+         * @throws {pentaho.lang.ArgumentInvalidTypeError} When the type of `instSpec` is not
+         * {@link Object}, {@link Array} or {@link pentaho.type.List}.
+         *
+         * @private
+         * @internal
+         */
+        __getElementSpecsFromInstanceSpec: function(instSpec) {
+
+          if(Array.isArray(instSpec)) {
+            return instSpec;
+          }
+
+          if(instSpec.constructor === Object) {
+            return Array.isArray(instSpec.d) ? instSpec.d : null;
+          }
+
+          if(instSpec instanceof List) {
+            return instSpec.__elems;
+          }
+
+          throw error.argInvalidType("instSpec", ["Array", "Object", "pentaho.type.List"], typeof instSpec);
+        },
+
         // * "list" has an id and toRefInContext immediately returns that
         // * ["string"] -> anonymous list type, equivalent to {base: "list", of: "string"}
         //   toRefInContext calls the toSpecInContext, cause it has no id and because a temporary id is also
@@ -762,7 +893,7 @@ define([
       $type: bundle.structured.list
     });
 
-    // override the documentation to specialize the argument types.
+    // Override the documentation to specialize the argument types.
     /**
      * Creates a subtype of this one.
      *
@@ -782,6 +913,8 @@ define([
      *
      * @see pentaho.type.Value.extend
      */
+
+    __listType = List.type;
 
     return List;
   }];

@@ -856,7 +856,7 @@ define([
           if(type.isList) {
             isList = true;
             listType = type;
-            elemTypeId = type.of.id;
+            elemTypeId = type.elementType.id;
           } else {
             isList = false;
             elemTypeId = type.id;

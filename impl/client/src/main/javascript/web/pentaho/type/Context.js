@@ -1521,7 +1521,7 @@ define([
 
     __creatingType: function(id, factory) {
       var previousCreatingTypeId = this.__creatingTypeId;
-      this.__creatingTypeId = id; // may be null
+      this.__creatingTypeId = id; // May be null.
       try {
         return factory.call(this);
       } finally {

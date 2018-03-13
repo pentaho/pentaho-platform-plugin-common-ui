@@ -72,7 +72,7 @@ define([
       /** @inheritDoc */
       _buildContentKey: function() {
         var o = this.operand;
-        return o ? o.contentKey : "";
+        return o ? o.$contentKey : "";
       },
 
       /**
@@ -143,7 +143,6 @@ define([
             nameAlias: "o",
             valueType: filter.Abstract,
             isRequired: true,
-            isReadOnly: true,
             isBoundary: true
           }
         ]

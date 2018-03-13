@@ -56,9 +56,14 @@ define([
               TrueFilter = True;
               FalseFilter = False;
 
+              var count = 1;
+
               CustomFilter = AbstractFilter.extend({
                 compile: function() {
                   return function() { return false; };
+                },
+                _buildContentKey: function() {
+                  return String(count++);
                 }
               });
             });

@@ -62,20 +62,9 @@ define([
       /** @inheritDoc */
       _buildContentKey: function() {
         // Sorting makes content equality be independent of operand order.
-        return this.operands.toArray(function(o) { return o.contentKey; }).sort().join(" ");
-      },
-
-      /**
-       * Gets the list of operands of this filter.
-       *
-       * This getter is a shorthand for `this.get("operands")`.
-       *
-       * @type {pentaho.type.List<pentaho.data.filter.Abstract>}
-       *
-       * @readonly
-       */
-      get operands() {
-        return this.get("operands");
+        return this.operands.toArray(function(o) { return o.$contentKey; })
+          .sort()
+          .join(" ");
       },
 
       /**
@@ -237,10 +226,19 @@ define([
         isAbstract: true,
         props: [
           {
+            /**
+             * Gets the list of operands of this filter.
+             *
+             * This getter is a shorthand for `this.get("operands")`.
+             *
+             * @name operands
+             * @memberOf pentaho.data.filter.Tree#
+             * @type {pentaho.type.List<pentaho.data.filter.Abstract>}
+             * @readOnly
+             */
             name: "operands",
             nameAlias: "o",
             valueType: [filter.Abstract],
-            isReadOnly: true,
             isBoundary: true
           }
         ]

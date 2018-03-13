@@ -1642,7 +1642,7 @@ define([
                   // TODO: delete this and the operandsByContentKey variable
                   // after testing proves the assumption is correct.
                   // BEGIN
-                  var key = operand.contentKey;
+                  var key = operand.$contentKey;
                   if(def.hasOwn(operandsByContentKey, key))
                     throw def.error.operationInvalid("Bad programmer.");
                   operandsByContentKey[key] = true;

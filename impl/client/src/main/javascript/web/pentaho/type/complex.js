@@ -40,7 +40,9 @@ define([
   // Need to recognize requests for the currently being built _top-level_ complex in a special way -
   // the one that cannot be built and have a module id.
 
-  return ["element", "property", function(Element) {
+  return ["value", "element", "property", function(Value, Element) {
+
+    var valueType = Value.type;
 
     /**
      * @name pentaho.type.Complex.Type
@@ -174,18 +176,9 @@ define([
         }
       },
 
+      // region equality
       /**
        * Gets the key of the complex value.
-       *
-       * The key of a value identifies it among values of the same concrete type.
-       *
-       * If two values have the same concrete type and their
-       * keys are equal, then it must also be the case that
-       * {@link pentaho.type.Value.Type#areEqual}
-       * returns `true` when given the two values.
-       * The opposite should be true as well.
-       * If two values of the same concrete type have distinct keys,
-       * then {@link pentaho.type.Value.Type#areEqual} should return `false`.
        *
        * The default complex implementation returns the value of the [$uid]{@link pentaho.type.Complex#$uid} property.
        *
@@ -195,6 +188,43 @@ define([
       get $key() {
         return this.$uid;
       },
+
+      /**
+       * Gets a value that indicates if a given equal value has the same content as this one.
+       *
+       * This method checks if the values of all of the properties are equal and content-equal.
+       *
+       * @param {!pentaho.type.Complex} other - An equal complex value to test for content-equality.
+       *
+       * @return {boolean} `true` if the given value is equal in content to this one; `false`, otherwise.
+       *
+       * @override
+       */
+      equalsContent: function(other) {
+
+        var isEqual = true;
+
+        // eslint-disable-next-line consistent-return
+        this.$type.each(function(propType) {
+
+          var propValue = this.get(propType);
+          var propValueOther = other.get(propType);
+
+          // List instances are never `equals`. Only their elements are checked.
+
+          isEqual = propType.isList
+            ? valueType.areEqualContentElements(propValue, propValueOther)
+            : valueType.areEqualContent(propValue, propValueOther);
+
+          if(!isEqual) {
+            // break;
+            return false;
+          }
+        }, this);
+
+        return isEqual;
+      },
+      // endregion
 
       // region As Raw
       /**
@@ -279,7 +309,7 @@ define([
        * @see pentaho.type.Complex#getf
        */
       getv: function(name, sloppy) {
-        var v1 = this.get(name, sloppy); // undefined or nully
+        var v1 = this.get(name, sloppy); // Is undefined or nully.
         return v1 && v1.valueOf(); // .valueOf() should/must be non-nully
       },
 
@@ -315,52 +345,167 @@ define([
       /**
        * Sets the value of a property.
        *
+       * The value of [List]{@link pentaho.type.Property.Type#isList} properties is automatically created,
+       * when complex instance is constructed, and is never replaced by another list value.
+       * However, its contents can be modified.
+       * On the other hand, for element properties, their value can be replaced.
+       *
+       * Execution proceeds as follows:
+       *
+       * 1. If the property is a list property:
+       *   1. If `value` is {@link Nully},
+       *      the list is cleared by calling the [List#clear]{@link pentaho.type.List#clear} method;
+       *      however, if the property is [read-only]{@link pentaho.type.Property.Type#isReadOnly} and
+       *      the list has any elements, an error is thrown instead;
+       *   2. Otherwise, if `value` is distinct from the current list value,
+       *      an elements list is extracted from the given value
+       *      (see [List.Type#_normalizeInstanceSpec]{@link pentaho.type.List.Type#_normalizeInstanceSpec})
+       *      and execution is delegated to the [List#set]{@link pentaho.type.List#set} method;
+       *      likewise, if changes to the list would result and
+       *      the property is [read-only]{@link pentaho.type.Property.Type#isReadOnly},
+       *      an error is thrown;
+       *
+       * 2. If the property is an element property:
+       *   1. If `value` is {@link Nully},
+       *      the property's [default value]{@link pentaho.type.Property.Type#defaultValue}, if any,
+       *      is evaluated and `value` is set to it;
+       *      the property's new [defaulted status]{@link pentaho.type.Complex#isDefaultedOf} will be `true`.
+       *
+       *   2. Otherwise, if the specified `value` is not {@link Nully},
+       *      the property's new defaulted status will be `false`.
+       *
+       *   3. If `value` is not [equal]{@link pentaho.type.Value#equals} to the current value and/or
+       *      the property's defaulted status changes:
+       *      1. If the property is [read-only]{@link pentaho.type.Property.Type#isReadOnly}, an error is thrown.
+       *      2. Otherwise, the current value and the defaulted status are replaced by the new ones.
+       *      3. A change action is executed, resulting in the change events `will:change` and
+       *         `did:change` or `rejected:change` being emitted.
+       *
+       *   4. Otherwise, if `value` and the defaulted status do not change, nothing is done.
+       *
+       * In both cases, of element and list properties,
+       * when the given value(s) is a specification,
+       * it is first constructed,
+       * before any comparison with the current value(s) is performed.
+       *
+       * Contrast this behavior with that of the [configure]{@link pentaho.type.Value#configure} method,
+       * in which specifications aren't considered to have an identity, a priori.
+       * Only if these explicitly identify an entity or value which is incompatible with the current value
+       * are they assumed to represent a new value that needs to be constructed.
+       *
+       * For element properties, specifications are constructed
+       * having as default type the [valueType]{@link pentaho.type.Property.Type#valueType} of the property.
+       *
+       * For list properties, each element's specification is constructed
+       * having as default type the
+       * [elementType]{@link pentaho.type.Type#elementType}
+       * of the property's [valueType]{@link pentaho.type.Property.Type#valueType}.
+       *
        * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
        * @param {any?} [valueSpec=null] A value specification.
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
-       * @throws {TypeError} When property is read-only.
+       * @throws {TypeError} When the property is read-only and its value would change.
+       *
+       * @see pentaho.type.Value#configure
+       * @see pentaho.type.Value#isReadOnly
        *
        * @fires "will:change"
        * @fires "did:change"
        * @fires "rejected:change"
        */
       set: function(name, valueSpec) {
+
         var propType = this.$type.get(name);
+        if(propType.isList) {
+          var valueAmb = this.__getAmbientByType(propType);
+          if(valueAmb === valueSpec) {
+            return;
+          }
 
-        if(propType.isReadOnly) throw new TypeError("'" + name + "' is read-only");
+          if(valueSpec != null) {
+            valueSpec = valueAmb.$type.__getElementSpecsFromInstanceSpec(valueSpec);
+            if(valueSpec != null) {
+              valueAmb.set(valueSpec);
+              return;
+            }
+          }
 
-        if(propType.isList)
-          // Delegate to List#set.
-          this.__values[propType.name].set(valueSpec);
-        else
+          // TODO: List property default value?
+          valueAmb.clear();
+        } else {
           ComplexChangeset.__setElement(this, propType, valueSpec);
+        }
       },
 
       /** @inheritDoc */
       _configure: function(config) {
-        this.__usingChangeset(function() {
+        if(config instanceof Value) {
+          __configureFromValue.call(this, config);
+        } else {
+          __configureFromSpec.call(this, config);
+        }
+      },
 
-          if(config instanceof Complex) {
+      /**
+       * Configures a property with a given value specification.
+       *
+       * Execution proceeds as follows:
+       *
+       * 1. If the property is a list property:
+       *   1. If the config value is `null`,
+       *      the list is cleared by calling the [List#clear]{@link pentaho.type.List#clear} method;
+       *   2. Otherwise, if the config value is distinct from the current list value,
+       *      execution is delegated to the [List.configure]{@link pentaho.type.List#configure} method;
+       *
+       * 2. If the property is an element property:
+       *   1. If either the current value or the config value are `null`,
+       *      then the config value replaces the current value;
+       *   2. Otherwise, execution is delegated to the
+       *      [Element#configureOrCreate]{@link pentaho.type.Element#configureOrCreate} method;
+       *      if it returns an element distinct from the current value,
+       *      then that value replaces the current value.
+       *
+       * If in any of the described steps,
+       * an error is thrown if a change would result to the property's value and
+       * the property is [read-only]{@link pentaho.type.Property.Type#isReadOnly}.
+       * Also, an error is thrown if the value itself would have to be mutated and
+       * its type is [read-only]{@link pentaho.type.Value.Type#isReadOnly}.
+       *
+       * @param {!pentaho.type.Property.Type} propType - The property to configure.
+       * @param {any} valueConfig - A value specification. Not `undefined`.
+       *
+       * @throws {TypeError} When the property value would be replaced or, in case of list properties,
+       * its elements would be added, moved or removed and the
+       * property is [read-only]{@link pentaho.type.Property.Type#isReadOnly}.
+       *
+       * @throws {TypeError} When the property's current value would be mutated and
+       * its type is [read-only]{@link pentaho.type.Value.Type#isReadOnly}.
+       *
+       * @protected
+       */
+      _configureProperty: function(propType, valueConfig) {
 
-            // TODO: should copy only the properties of the LCA type?
+        // assert valueConfig !== undefined
 
-            // Copy common properties, if it is a subtype of this one.
-            if(config.$type.isSubtypeOf(this.$type))
-              this.$type.each(function(propType) {
-                this.set(propType, config.get(propType.name));
-              }, this);
+        var valueAmb = this.__getAmbientByType(propType);
+        if(valueAmb !== valueConfig) {
+          if(propType.isList) {
 
+            // assert valueAmb !== null
+            // Configure. Replace is not possible.
+
+            if(valueConfig === null) {
+              // Throws if property is read-only.
+              valueAmb.clear();
+            } else {
+              // Let List#_configure handle any needed conversions and compatibility issues.
+              valueAmb._configure(valueConfig);
+            }
           } else {
-
-            // TODO: should it be sloppy in this case?
-
-            for(var name in config)
-              if(O.hasOwn(config, name))
-                this.set(name, config[name]);
-
+            __configurePropertyElement.call(this, propType, valueAmb, valueConfig);
           }
-        });
+        }
       },
       // endregion
 
@@ -498,7 +643,7 @@ define([
         var includeDefaults = !!keyArgs.includeDefaults;
         var type = this.$type;
 
-        // reset
+        // Reset.
         keyArgs.forceType = false;
 
         type.each(propToSpec, this);
@@ -552,15 +697,152 @@ define([
       },
       // endregion
 
+      // region validation
+      // @override
+      /**
+       * Determines if the given complex value is valid.
+       *
+       * The default implementation
+       * validates each property's value against
+       * the property's [valueType]{@link pentaho.type.Property.Type#valueType}
+       * and collects and returns any reported errors.
+       * Override to complement with a type's specific validation logic.
+       *
+       * You can use the error utilities in {@link pentaho.type.Util} to
+       * help in the implementation.
+       *
+       * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
+       *
+       * @override
+       */
+      validate: function() {
+
+        var errors = null;
+
+        this.$type.each(function(pType) {
+          errors = typeUtil.combineErrors(errors, pType.validateOn(this));
+        }, this);
+
+        return errors;
+      },
+      // endregion
+
       $type: /** @lends pentaho.type.Complex.Type# */{
+
+        /** @inheritDoc */
+        _init: function(spec, keyArgs) {
+
+          spec = this.base(spec, keyArgs) || spec;
+
+          if(!this.__isReadOnly && spec.isReadOnly) {
+            // Cannot have any properties.
+            if(this.ancestor.count > 0) {
+              throw error.argInvalid("isReadOnly");
+            }
+
+            this.__isReadOnly = true;
+          }
+
+          return spec;
+        },
+
         alias: "complex",
 
         isAbstract: true,
 
         get isComplex() { return true; },
+
         get isContainer() { return true; },
 
+        // region isEntity attribute
+        __isEntity: false,
+
+        /**
+         * Gets or sets a value that indicates if this type is an _entity_ type.
+         *
+         * [Complex]{@link pentaho.type.Complex} types can set this property to true,
+         * and override the `$key` property, to become entity types.
+         *
+         * ### This attribute is *Monotonic*
+         *
+         * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
+         *
+         * In this case, a _complex type_ which is not an entity type can later be marked as an entity type.
+         * However, a _complex type_ which is an entity type can no longer go back to not being a non-entity type.
+         *
+         * ### This attribute is *Inherited*
+         *
+         * When there is no _local value_, the _effective value_ of the attribute is the _inherited effective value_.
+         *
+         * ### Other characteristics
+         *
+         * When a {@link Nully} value is specified, the set operation is ignored.
+         *
+         * When set and the type already has [subtypes]{@link pentaho.type.Type#hasDescendants},
+         * an error is thrown.
+         *
+         * The default (root) `isEntity` attribute value is `false`.
+         *
+         * @type {boolean}
+         * @override
+         * @final
+         *
+         * @throws {pentaho.lang.OperationInvalidError} When setting and the type
+         * already has [subtypes]{@link pentaho.type.Type#hasDescendants}.
+         *
+         * @see pentaho.type.Value#$key
+         */
+        get isEntity() {
+          return this.__isEntity;
+        },
+
+        set isEntity(value) {
+
+          this._assertNoSubtypesAttribute("isEntity");
+
+          if(value == null) return;
+
+          if(!this.__isEntity && value) {
+            this.__isEntity = true;
+          }
+        },
+        // endregion
+
+        // region isReadOnly attribute
+        __isReadOnly: false,
+
+        /**
+         * Gets a value that indicates
+         * whether this type, and all of the value types of any property values, cannot be changed,
+         * from the outside.
+         *
+         * The value of `Complex#isReadOnly` is `false`.
+         *
+         * A [Complex]{@link pentaho.type.Complex} type is necessarily read-only if its base complex type is read-only.
+         * Otherwise, a `Complex` type can be _marked_ read-only,
+         * but only upon definition and if the base complex type does not have any properties.
+         *
+         * All of the properties of a read-only complex type are
+         * implicitly marked [read-only]{@link pentaho.type.Property.Type#isReadOnly}.
+         * When the [valueType]{@link pentaho.type.Property.Type#valueType} of a property
+         * is an element type, it must be a read-only type.
+         * When the `valueType` of a property is a list type, then its
+         * [element type]{@link pentaho.type.List.Type#of} must be read-only.
+         *
+         * @type {boolean}
+         * @readOnly
+         */
+        get isReadOnly() {
+          return this.__isReadOnly;
+        },
+        // endregion
+
+        // region properties
+
         // region properties property
+
+        // TODO: Don't allow adding properties if the type has descendants.
+
         __props: null,
 
         // Used for configuration only.
@@ -606,9 +888,13 @@ define([
           var ps;
           // !__props could only occur if accessing #get directly on Complex.type and it had no derived classes yet...
           return (!name || !(ps = this.__props)) ? null :
-                 (typeof name === "string") ? ps.get(name) :
-                 (ps.get(name.name) === name) ? name :
-                 null;
+            (typeof name === "string") ? ps.get(name) :
+            (ps.get(name.name) === name) ? name :
+            null;
+        },
+
+        __getByAlias: function(nameAlias) {
+          return this.__props !== null ? this.__props.getByAlias(nameAlias) : null;
         },
 
         /**
@@ -686,79 +972,9 @@ define([
                 break;
             }
           }
+
           return this;
         },
-
-        /**
-         * Adds, overrides or configures properties to/of the complex type.
-         *
-         * @param {pentaho.type.spec.IPropertyTypeProto|pentaho.type.spec.IPropertyTypeProto[]} propTypeSpec
-         * - A property type specification or an array of them.
-         *
-         * @return {pentaho.type.Complex} This object.
-         */
-        add: function(propTypeSpec) {
-          if(!Array.isArray(propTypeSpec)) propTypeSpec = [propTypeSpec];
-          this.__getProps().configure(propTypeSpec);
-          return this;
-        },
-
-        // region validation
-        // @override
-        /**
-         * Determines if the given complex value is a **valid instance** of this type.
-         *
-         * The default implementation
-         * validates each property's value against
-         * the property's [valueType]{@link pentaho.type.Property.Type#valueType}
-         * and collects and returns any reported errors.
-         * Override to complement with a type's specific validation logic.
-         *
-         * You can use the error utilities in {@link pentaho.type.Util} to
-         * help in the implementation.
-         *
-         * @param {!pentaho.type.Value} value - The value to validate.
-         *
-         * @return {Array.<pentaho.type.ValidationError>} A non-empty array of errors or `null`.
-         *
-         * @protected
-         * @override
-         */
-        _validate: function(value) {
-          var errors = null;
-
-          this.each(function(pType) {
-            errors = typeUtil.combineErrors(errors, pType.validateOn(value));
-          });
-
-          return errors;
-        },
-        // endregion
-
-        // region serialization
-        /** @inheritDoc */
-        _fillSpecInContext: function(spec, keyArgs) {
-
-          var any = this.base(spec, keyArgs);
-
-          if(this.count) {
-            var props;
-
-            this.each(function(propType) {
-              // Root or overridden property type. Exclude simply inherited.
-              if(propType.declaringType === this) {
-                if(!props) {
-                  any = true;
-                  props = spec.props = [];
-                }
-                props.push(propType.toSpecInContext(keyArgs));
-              }
-            }, this);
-          }
-
-          return any;
-        },
-        // endregion
 
         /**
          * Calls a function for each defined property type that this type shares with another given type
@@ -779,6 +995,7 @@ define([
           var lca;
           if(otherType.isComplex && (lca = O.lca(this, otherType)) && lca.isComplex) {
 
+            // eslint-disable-next-line consistent-return
             lca.each(function(basePropType, i) {
               var name = basePropType.name;
               var localPropType = this.get(name);
@@ -799,7 +1016,57 @@ define([
           }
 
           return this;
+        },
+
+        /**
+         * Adds, overrides or configures properties to/of the complex type.
+         *
+         * @param {pentaho.type.spec.IPropertyTypeProto|pentaho.type.spec.IPropertyTypeProto[]} propTypeSpec
+         * - A property type specification or an array of them.
+         *
+         * @return {pentaho.type.Complex} This object.
+         */
+        add: function(propTypeSpec) {
+          if(!Array.isArray(propTypeSpec)) propTypeSpec = [propTypeSpec];
+          this.__getProps().configure(propTypeSpec);
+          return this;
+        },
+        // endregion
+
+        // region serialization
+        /** @inheritDoc */
+        _fillSpecInContext: function(spec, keyArgs) {
+
+          var any = this.base(spec, keyArgs);
+
+          if(O.hasOwn(this, "__isReadOnly")) {
+            any = true;
+            spec.isReadOnly = this.isReadOnly;
+          }
+
+          if(O.hasOwn(this, "__isEntity")) {
+            any = true;
+            spec.isEntity = this.isEntity;
+          }
+
+          if(this.count) {
+            var props;
+
+            this.each(function(propType) {
+              // Root or overridden property type. Exclude simply inherited.
+              if(propType.declaringType === this) {
+                if(!props) {
+                  any = true;
+                  props = spec.props = [];
+                }
+                props.push(propType.toSpecInContext(keyArgs));
+              }
+            }, this);
+          }
+
+          return any;
         }
+        // endregion
       }
     })
     .implement(ContainerMixin)
@@ -866,6 +1133,107 @@ define([
      */
 
     return Complex;
+
+    // region configure
+    /**
+     * Configures this value with a distinct, non-{@link Nully} value.
+     *
+     * @memberOf pentaho.type.Complex#
+     * @param {!pentaho.type.Value} other - The other value.
+     * @private
+     */
+    function __configureFromValue(other) {
+
+      // assert other != null && other !== this
+
+      // Copy common properties.
+
+      this.$type.eachCommonWith(other.$type, function(localPropType) {
+
+        var otherValue = other.get(localPropType.name);
+
+        this._configureProperty(localPropType, otherValue);
+      }, this);
+    }
+
+    /**
+     * Configures this value with a distinct, non-{@link Nully} specification.
+     *
+     * @memberOf pentaho.type.Complex#
+     * @param {!any} valueSpec - A value specification.
+     * @private
+     */
+    function __configureFromSpec(valueSpec) {
+
+      var type = this.$type;
+
+      // assert valueSpec !== null && valueSpec !== this
+
+      valueSpec = type._normalizeInstanceSpec(valueSpec);
+      // assert valueSpec.constructor === Object
+
+      var propValueSpec;
+
+      for(var propNameOrAlias in valueSpec) {
+        // "_" is the inline type property and should not even be considered / logged as not existing.
+        if(O.hasOwn(valueSpec, propNameOrAlias) &&
+           (propNameOrAlias !== "_") &&
+           (propValueSpec = valueSpec[propNameOrAlias]) !== undefined) {
+
+          var propType = type.get(propNameOrAlias, /* sloppy: */true);
+          if(propType === null) {
+            propType = type.__getByAlias(propNameOrAlias);
+
+            // Ignore the alias if the name is also present.
+            if(propType !== null && O.hasOwn(valueSpec, propType.name)) {
+              propType = null;
+            }
+          }
+
+          if(propType !== null) {
+            this._configureProperty(propType, propValueSpec);
+          } else {
+            // Log. Undefined property name or alias.
+          }
+        }
+      }
+    }
+
+    /**
+     * Configures an element property with a given non-undefined, distinct, value specification.
+     *
+     * @memberOf pentaho.type.Complex#
+     * @param {!pentaho.type.Property.Type} propType - The property to configure.
+     * @param {pentaho.type.Value} valueAmb - The current, ambient value, possibly `null`.
+     * @param {any} valueConfig - A specification. Not `undefined`. Distinct from `valueAmb`.
+     * @private
+     */
+    function __configurePropertyElement(propType, valueAmb, valueConfig) {
+
+      // assert valueConfig !== undefined
+      // assert valueAmb !== undefined
+      // assert valueAmb !== valueConfig
+
+      if(valueAmb === null || valueConfig === null) {
+        // Throws if changed property is read-only.
+        // If valueAmb is null, set to valueConfig.
+        // If valueAmb is not null, set to null.
+        ComplexChangeset.__setElement(this, propType, valueConfig);
+        return;
+      }
+
+      // Both ambient and new are defined.
+
+      // Configure valueAmb with valueConfig, if possible...
+      valueConfig = valueAmb._configureOrCreate(valueConfig);
+
+      if(valueConfig !== valueAmb) {
+        // Throws if changed property is read-only.
+        // Force replace: valueAmb and valueConfig may be equals yet still differ on content.
+        ComplexChangeset.__setElement(this, propType, valueConfig, /* forceReplace: */true);
+      }
+    }
+    // endregion
   }];
 
   // Constructor's helper functions
@@ -876,7 +1244,7 @@ define([
   function __readSpecByNameOrAlias(spec, propType) {
     var name;
     return O_hasOwn.call(spec, (name = propType.name)) ? spec[name] :
-           ((name = propType.nameAlias) && O_hasOwn.call(spec, name)) ? spec[name] :
-           undefined;
+      ((name = propType.nameAlias) !== null && O_hasOwn.call(spec, name)) ? spec[name] :
+      undefined;
   }
 });

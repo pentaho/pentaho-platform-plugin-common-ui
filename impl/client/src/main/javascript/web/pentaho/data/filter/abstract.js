@@ -66,6 +66,8 @@ define([
      *
      * @classDesc The base class of filter types.
      *
+     * This is an [entity]{@link pentaho.type.Value.Type#isEntity} type.
+     *
      * @description Creates a filter instance.
      *
      * @constructor
@@ -122,6 +124,23 @@ define([
         return false;
       },
 
+      /** @inheritDoc */
+      get $key() {
+        return this.$contentKey;
+      },
+
+      /**
+       * Gets a key that identifies the content of this filter.
+       *
+       * @type {string}
+       * @readOnly
+       * @final
+       * @deprecated Use `$contentKey` instead.
+       */
+      get contentKey() {
+        return this.$contentKey;
+      },
+
       /**
        * Gets a key that identifies the content of this filter.
        *
@@ -129,8 +148,15 @@ define([
        * @readOnly
        * @final
        */
-      get contentKey() {
+      get $contentKey() {
         return this.__contentKey || (this.__contentKey = this.__buildContentKeyOuter());
+      },
+
+      /** @inheritDoc */
+      equalsContent: function(other) {
+        // `equalsContent` can only be called if `this.equals(other)`.
+        // Because $key is already the $contentKey, then this must be true as well.
+        return true;
       },
 
       /**
@@ -334,17 +360,17 @@ define([
         var currentDnf = this.toDnf();
         switch(currentDnf.kind) {
           case "false":
-            return currentDnf; // false \ ? = false
+            return currentDnf; // Is false \ ? = false
           case "true":
-            return exclude.negate(); // true \ ?  = !?
+            return exclude.negate(); // Is true \ ?  = !?
         }
 
         var excludeDnf = exclude.toDnf();
         switch(excludeDnf.kind) {
           case "false":
-            return this; // ? \ false = ?
+            return this; // Is ? \ false = ?
           case "true":
-            return __filter.False.instance; // ? \ true = false
+            return __filter.False.instance; // Is ? \ true = false
         }
 
         // Remove from `current`, any `and` that also exists exactly in exclude.
@@ -354,17 +380,17 @@ define([
 
         if(__isDebugMode) {
           logger.log("-----------------------------------------");
-          // logger.log("currentDnf #=" + currentDnf.operands.count + " " + currentDnf.contentKey);
-          // logger.log("excludeDnf #=" + excludeDnf.operands.count + " " + excludeDnf.contentKey);
+          // logger.log("currentDnf #=" + currentDnf.operands.count + " " + currentDnf.$contentKey);
+          // logger.log("excludeDnf #=" + excludeDnf.operands.count + " " + excludeDnf.$contentKey);
         }
 
         // Index exclude Ands by contentKey.
         var excludeKeys = {};
-        excludeDnf.operands.each(function(and) { excludeKeys[and.contentKey] = and; });
+        excludeDnf.operands.each(function(and) { excludeKeys[and.$contentKey] = and; });
 
         currentDnf.operands.each(function(and) {
           // Exact match?
-          if(!O.hasOwn(excludeKeys, and.contentKey)) {
+          if(!O.hasOwn(excludeKeys, and.$contentKey)) {
             remainders.push(and);
           }
         });
@@ -385,7 +411,7 @@ define([
                 remainders.splice(i, 1);
                 if(!remainders.length) return false;
               } else {
-                // replace at i and insert the remaining ands, afterwards.
+                // Replace at i and insert the remaining ands, afterwards.
                 // "Gained" how many ands?
                 // var extra = ands.length - 1;
                 result.unshift(i, 1);
@@ -400,10 +426,10 @@ define([
         }
 
         var result = remainders.length
-            ? new __filter.Or({operands: remainders})
-            : __filter.False.instance;
+          ? new __filter.Or({operands: remainders})
+          : __filter.False.instance;
 
-        // if(__isDebugMode) logger.log("result = " + result.contentKey);
+        // if(__isDebugMode) logger.log("result = " + result.$contentKey);
 
         return result;
       },
@@ -455,6 +481,7 @@ define([
 
           result.__toDnfCache = result;
         }
+
         return result;
       },
 
@@ -479,7 +506,7 @@ define([
         try {
           var filteredData = dataTable.toPlainTable().filter(this);
           var numRows = filteredData.getNumberOfRows();
-          // applying the filter returns no data therefore select nothing (False filter)
+          // Applying the filter returns no data therefore select nothing (False filter)
           if(numRows === 0) {
             return __filter.False.instance;
           }
@@ -533,7 +560,9 @@ define([
       },
 
       $type: /** @lends pentaho.data.filter.Abstract.Type# */{
-        isAbstract: true
+        isAbstract: true,
+        isEntity: true,
+        isReadOnly: true
       }
     });
 
@@ -674,7 +703,7 @@ define([
           var osFlattened = [];
 
           while(++i < L) {
-            // recurse in pre-order
+            // Recurse in pre-order
             var o = os.at(i).visit(__flattenTree);
             if(o.kind === kind) {
               osFlattened.push.apply(osFlattened, o.operands.toArray());
@@ -704,7 +733,7 @@ define([
           while(++i < L) {
             var o = os.at(i);
             switch(o.kind) {
-              // early true/false detection
+              // Early true/false detection
               case "true": return __filter.True.instance;
               case "false": continue;
               case "and": osAnds.push(o); break;
@@ -785,7 +814,7 @@ define([
 
         // assert o.kind === "and"
 
-        var key = o.contentKey;
+        var key = o.$contentKey;
 
         // 2) Duplicate And? -> Ignore.
         if(O.hasOwn(andsByKey, key)) continue;
@@ -830,7 +859,7 @@ define([
           case "not": isNot = true; break;
         }
 
-        var key = o.contentKey;
+        var key = o.$contentKey;
 
         // 2) Duplicate operand? -> Ignore.
         if(O.hasOwn(osByKey, key)) continue;
@@ -839,7 +868,7 @@ define([
           var oo = o.operand;
           if(oo) {
             // 9) Law of non-contradiction
-            if(O.hasOwn(osByKey, oo.contentKey)) {
+            if(O.hasOwn(osByKey, oo.$contentKey)) {
               // Already have non-negated operand
               return __filter.False.instance;
             }
@@ -880,7 +909,7 @@ define([
             if(notEquals) {
               notEquals.forEach(function(notEqual) {
                 osNew.splice(osNew.indexOf(notEqual), 1);
-                delete osByKey[notEqual.contentKey];
+                delete osByKey[notEqual.$contentKey];
               });
               delete equalsByPropName["-" + p];
             }

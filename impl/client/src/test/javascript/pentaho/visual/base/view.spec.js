@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,17 +26,16 @@ define([
 
   /* eslint dot-notation: 0, max-nested-callbacks: 0 */
 
-  var it = testUtils.itAsync;
-
   describe("pentaho.visual.base.View", function() {
-    var View;
+    var BaseView;
     var Model;
+    var BaseModel;
     var model;
     var dataTable;
     var context;
 
     function createValidAndDirtyView() {
-      return new View({
+      return new BaseView({
         width: 100,
         height: 100,
         domContainer: document.createElement("div"),
@@ -44,9 +43,8 @@ define([
       });
     }
 
-    beforeEach(function(done) {
-
-      var dataTableSpec = {
+    function getDataTableSpec1() {
+      return {
         model: [
           {name: "country", type: "string", label: "Country"},
           {name: "sales", type: "number", label: "Sales"}
@@ -56,6 +54,9 @@ define([
           {c: [{v: "Ireland"}, {v: 6000}]}
         ]
       };
+    }
+
+    beforeEach(function(done) {
 
       Context.createAsync()
           .then(function(_context) {
@@ -64,13 +65,14 @@ define([
             return context.getDependencyApplyAsync([
               "pentaho/visual/base/view",
               "pentaho/visual/base/model"
-            ], function(BaseView, BaseModel) {
+            ], function(_BaseView, _BaseModel) {
 
-              View = BaseView;
+              BaseView = _BaseView;
+              BaseModel = _BaseModel;
 
-              Model = BaseModel.extend(); // not abstract
+              Model = BaseModel.extend(); // Not abstract.
 
-              dataTable = new Table(dataTableSpec);
+              dataTable = new Table(getDataTableSpec1());
               model = new Model({data: dataTable});
             });
           })
@@ -81,23 +83,23 @@ define([
 
       it("should be possible to invoke without arguments", function() {
 
-        var view = new View();
+        var view = new BaseView();
         expect(view != null).toBe(true);
       });
 
       it("should be possible to specify viewSpec.domContainer", function() {
 
         var elem = document.createElement("div");
-        var view = new View({domContainer: elem});
+        var view = new BaseView({domContainer: elem});
         expect(view.domContainer).toBe(elem);
       });
 
       it("should be possible to specify viewSpec.isAutoUpdate", function() {
 
-        var view = new View({isAutoUpdate: false});
+        var view = new BaseView({isAutoUpdate: false});
         expect(view.isAutoUpdate).toBe(false);
 
-        view = new View({isAutoUpdate: true});
+        view = new BaseView({isAutoUpdate: true});
         expect(view.isAutoUpdate).toBe(true);
       });
 
@@ -116,7 +118,7 @@ define([
           model: true
         }].forEach(function(spec) {
           expect(function() {
-            return new View(spec);
+            return new BaseView(spec);
           }).toThrow();
         });
       });
@@ -125,14 +127,14 @@ define([
     describe("#domContainer", function() {
 
       it("should get null, initially", function() {
-        var view = new View();
+        var view = new BaseView();
 
         expect(view.domContainer).toBe(null);
       });
 
       it("should get a set domContainer", function() {
 
-        var view = new View();
+        var view = new BaseView();
 
         var element = document.createElement("div");
 
@@ -143,7 +145,7 @@ define([
 
       it("should throw if set to null after set to an element", function() {
 
-        var view = new View();
+        var view = new BaseView();
 
         var element = document.createElement("div");
 
@@ -156,7 +158,7 @@ define([
 
       it("should throw if set to another element", function() {
 
-        var view = new View();
+        var view = new BaseView();
 
         var element = document.createElement("div");
 
@@ -169,7 +171,7 @@ define([
 
       it("should call _initDomContainer when set to the first non-null value", function() {
 
-        var view = new View();
+        var view = new BaseView();
 
         spyOn(view, "_initDomContainer").and.callThrough();
 
@@ -209,7 +211,7 @@ define([
 
       it("should emit the 'pentaho/visual/action/update:will' event from within the _onUpdateWill method", function() {
 
-        var originalOnUpdateWill = View.prototype._onUpdateWill;
+        var originalOnUpdateWill = BaseView.prototype._onUpdateWill;
 
         var view = createValidAndDirtyView();
 
@@ -241,7 +243,7 @@ define([
       it("should emit the 'pentaho/visual/action/update:finally' event " +
          "from within the _onUpdateFinally method", function() {
 
-        var originalOnUpdateFinally = View.prototype._onUpdateFinally;
+        var originalOnUpdateFinally = BaseView.prototype._onUpdateFinally;
 
         var view = createValidAndDirtyView();
 
@@ -440,7 +442,7 @@ define([
 
       beforeEach(function() {
 
-        DerivedView = View.extend({
+        DerivedView = BaseView.extend({
           _updateSize: function() {},
           _updateSelection: function() {},
           _updateSizeAndSelection: function() {}
@@ -490,7 +492,7 @@ define([
         var view  = createValidAndCleanView();
         var spies = createUpdateSpies(view);
 
-        view.__dirtyPropGroups.set(View.PropertyGroups.Size);
+        view.__dirtyPropGroups.set(BaseView.PropertyGroups.Size);
 
         return view.update().then(function() {
           expect(spies.updateSize).toHaveBeenCalled();
@@ -505,7 +507,7 @@ define([
         var view  = createValidAndCleanView();
         var spies = createUpdateSpies(view);
 
-        view.__dirtyPropGroups.set(View.PropertyGroups.Selection);
+        view.__dirtyPropGroups.set(BaseView.PropertyGroups.Selection);
 
         return view.update().then(function() {
           expect(spies.updateSize).not.toHaveBeenCalled();
@@ -520,7 +522,7 @@ define([
         var view  = createValidAndCleanView();
         var spies = createUpdateSpies(view);
 
-        view.__dirtyPropGroups.set(View.PropertyGroups.Size | View.PropertyGroups.Selection);
+        view.__dirtyPropGroups.set(BaseView.PropertyGroups.Size | BaseView.PropertyGroups.Selection);
 
         return view.update().then(function() {
           expect(spies.updateSize).not.toHaveBeenCalled();
@@ -536,7 +538,7 @@ define([
         var spies = createUpdateSpies(view);
 
         view.__dirtyPropGroups.set(
-            View.PropertyGroups.General | View.PropertyGroups.Size | View.PropertyGroups.Selection);
+          BaseView.PropertyGroups.General | BaseView.PropertyGroups.Size | BaseView.PropertyGroups.Selection);
 
         return view.update().then(function() {
           expect(spies.updateSize).not.toHaveBeenCalled();
@@ -559,7 +561,7 @@ define([
         spyOn(view, "_updateSelection");
 
         // Simulate a size change
-        view.__dirtyPropGroups.set(View.PropertyGroups.Size);
+        view.__dirtyPropGroups.set(BaseView.PropertyGroups.Size);
 
         var p = view.update();
 
@@ -568,7 +570,7 @@ define([
         // Change the model's selection
         view.model.selectionFilter = {_: "or"};
 
-        expect((view.__dirtyPropGroups.get() & View.PropertyGroups.Selection) !== 0).toBe(true);
+        expect((view.__dirtyPropGroups.get() & BaseView.PropertyGroups.Selection) !== 0).toBe(true);
 
         // Finish _updateSize
         _resolveSize();
@@ -593,7 +595,7 @@ define([
           }
         });
 
-        view.__dirtyPropGroups.set(View.PropertyGroups.Size);
+        view.__dirtyPropGroups.set(BaseView.PropertyGroups.Size);
 
         var p = view.update();
 
@@ -612,12 +614,141 @@ define([
       });
     });
 
+    describe("#update() - integration", function() {
+
+      function createUpdateSpies(view) {
+        return {
+          updateData:      spyOn(view, "_updateData"),
+          updateSize:      spyOn(view, "_updateSize"),
+          updateSelection: spyOn(view, "_updateSelection"),
+          updateSizeAndSelection: spyOn(view, "_updateSizeAndSelection"),
+          updateAll:       spyOn(view, "_updateAll")
+        };
+      }
+
+      function configRequireJs(localRequire) {
+
+        localRequire.define("test/foo/view", [], function() {
+
+          return ["pentaho/visual/base/view", "test/foo/model", function(BaseView, Model) {
+
+            return BaseView.extend({
+              _updateData: function() {},
+              _updateSize: function() {},
+              _updateSelection: function() {},
+              _updateSizeAndSelection: function() {},
+              $type: {
+                id: "test/foo/view",
+                props: {
+                  a: {valueType: "string"},
+                  model: {valueType: Model}
+                }
+              }
+            });
+          }];
+        });
+
+        localRequire.define("test/foo/model", [], function() {
+
+          return ["pentaho/visual/base/model", function(BaseModel) {
+
+            return BaseModel.extend({
+              $type: {
+                id: "test/foo/model",
+                props: [
+                  {
+                    name: "x",
+                    base: "pentaho/visual/role/property"
+                  },
+                  {
+                    name: "y",
+                    base: "pentaho/visual/role/property",
+                    modes: [{dataType: "number"}]
+                  }
+                ]
+              }
+            });
+          }];
+        });
+      }
+
+      function testView(tester) {
+
+        return require.using(["pentaho/type/Context"], configRequireJs, function(Context) {
+
+          return Context.createAsync().then(function(context) {
+            return context.getDependencyApplyAsync(["test/foo/view"], function(FooView) {
+
+              var viewSpec = {
+                width: 100,
+                height: 100,
+                domContainer: document.createElement("div"),
+                isAutoUpdate: false,
+                model: {
+                  data: new Table(getDataTableSpec1()),
+                  selectionFilter: {_: "or", o: [{_: "=", p: "country", v: "Portugal"}]},
+                  x: {fields: ["country"]},
+                  y: {fields: ["sales"]}
+                }
+              };
+
+              var view = new FooView(viewSpec);
+
+              // View is clean.
+              view.__dirtyPropGroups.clear();
+
+              return tester(view);
+            });
+          });
+        });
+      }
+
+      describe("when configured with a full specification", function() {
+
+        it("should only set the data bit as dirty if only data has changed", function() {
+
+          return testView(function(view) {
+
+            var viewSpec = view.toSpec();
+
+            viewSpec.model.data = new Table(getDataTableSpec1());
+
+            view.configure(viewSpec);
+
+            expect(view.__dirtyPropGroups.is(BaseView.PropertyGroups.Data)).toBe(true);
+          });
+        });
+
+        it("should call _updateData when only data has changed", function() {
+
+          return testView(function(view) {
+
+            var viewSpec = view.toSpec();
+
+            viewSpec.model.data = new Table(getDataTableSpec1());
+
+            var spies = createUpdateSpies(view);
+
+            view.configure(viewSpec);
+
+            return view.update().then(function() {
+              expect(spies.updateData).toHaveBeenCalled();
+              expect(spies.updateSize).not.toHaveBeenCalled();
+              expect(spies.updateSelection).not.toHaveBeenCalled();
+              expect(spies.updateSizeAndSelection).not.toHaveBeenCalled();
+              expect(spies.updateAll).not.toHaveBeenCalled();
+            });
+          });
+        });
+      });
+    });
+
     describe("#_onChangeClassify", function() {
       var view;
       var SubView;
 
       beforeEach(function() {
-        SubView = View.extend({
+        SubView = BaseView.extend({
           $type: {
             props: [
               {name: "foo", valueType: "string"}
@@ -640,28 +771,28 @@ define([
 
       it("should set the Size bit when 'height' changes", function() {
         view.height = 200;
-        expect(view.__dirtyPropGroups.is(View.PropertyGroups.Size)).toBe(true);
+        expect(view.__dirtyPropGroups.is(BaseView.PropertyGroups.Size)).toBe(true);
       });
 
       it("should set the Size bit when 'width' changes", function() {
         view.width = 200;
-        expect(view.__dirtyPropGroups.is(View.PropertyGroups.Size)).toBe(true);
+        expect(view.__dirtyPropGroups.is(BaseView.PropertyGroups.Size)).toBe(true);
       });
 
       it("should set the Data bit when 'model.data' changes", function() {
         view.model.data = new Table();
-        expect(view.__dirtyPropGroups.is(View.PropertyGroups.Data)).toBe(true);
+        expect(view.__dirtyPropGroups.is(BaseView.PropertyGroups.Data)).toBe(true);
       });
 
       it("should set the Selection bit  when 'selectionFilter' changes", function() {
         view.model.selectionFilter = {_: "or"};
-        expect(view.__dirtyPropGroups.is(View.PropertyGroups.Selection)).toBe(true);
+        expect(view.__dirtyPropGroups.is(BaseView.PropertyGroups.Selection)).toBe(true);
       });
 
       it("should set the General bit when a property other than " +
          "'height', 'width' or 'selectionFilter' changes", function() {
         view.foo = "bar";
-        expect(view.__dirtyPropGroups.is(View.PropertyGroups.General)).toBe(true);
+        expect(view.__dirtyPropGroups.is(BaseView.PropertyGroups.General)).toBe(true);
       });
 
       it("should call '_onChangeClassify' to classify the change", function() {
@@ -682,11 +813,11 @@ define([
 
       it("should call 'update' even if '_onChangeClassify' marks changes that already existed", function() {
 
-        view.__dirtyPropGroups.set(View.PropertyGroups.General);
+        view.__dirtyPropGroups.set(BaseView.PropertyGroups.General);
         view.isAutoUpdate = true;
 
         spyOn(view, "_onChangeClassify").and.callFake(function(dirtyPropGroups) {
-          dirtyPropGroups.set(View.PropertyGroups.General);
+          dirtyPropGroups.set(BaseView.PropertyGroups.General);
         });
 
         spyOn(view, "update").and.returnValue(Promise.resolve());
@@ -700,7 +831,7 @@ define([
     describe("#isAutoUpdate", function() {
 
       function createValidCleanView() {
-        var view = new View({
+        var view = new BaseView({
           width:  100,
           height: 100,
           domContainer: document.createElement("div"),
@@ -718,14 +849,14 @@ define([
 
       it("should get `true`, initially", function() {
 
-        var view = new View();
+        var view = new BaseView();
 
         expect(view.isAutoUpdate).toBe(true);
       });
 
       it("should get a set value", function() {
 
-        var view = new View();
+        var view = new BaseView();
 
         view.isAutoUpdate = false;
 
@@ -748,7 +879,7 @@ define([
       it("should not call #update when #isAutoUpdate is `true` and the view's properties change but " +
          "no dom container is set", function() {
 
-        var view = new View({
+        var view = new BaseView({
           width:  100,
           height: 100,
           model: model
@@ -798,7 +929,7 @@ define([
 
       beforeEach(function() {
 
-        view = new View({
+        view = new BaseView({
           width: 100,
           height: 100,
           domContainer: document.createElement("div"),
@@ -889,7 +1020,7 @@ define([
       beforeEach(function() {
         // Assuming pre-loaded with View
         UpdateAction = context.get("pentaho/visual/action/update");
-        view = new View({
+        view = new BaseView({
           width: 100,
           height: 100,
           domContainer: document.createElement("div"),
@@ -966,11 +1097,11 @@ define([
       });
     }); // #isUpdating
 
-    describe("#dispose", function() {
+    describe("#dispose()", function() {
 
       function createView() {
 
-        return new View({
+        return new BaseView({
           width: 100,
           height: 100,
           domContainer: document.createElement("div"),
@@ -1019,10 +1150,10 @@ define([
       });
     }); // #dispose
 
-    describe("#_releaseDomContainer", function() {
+    describe("#_releaseDomContainer()", function() {
 
       function createView() {
-        return new View({
+        return new BaseView({
           width: 100,
           height: 100,
           domContainer: document.createElement("div"),
@@ -1044,7 +1175,7 @@ define([
       // coverage
       it("should be possible to extend without passing an instSpec argument", function() {
 
-        var view = new View({
+        var view = new BaseView({
           width: 100,
           height: 100,
           domContainer: document.createElement("div"),
@@ -1057,13 +1188,13 @@ define([
       it("should register _updateXyz method with the corresponding mask", function() {
 
         var updateSize = function() {};
-        var DerivedView = View.extend({
+        var DerivedView = BaseView.extend({
           _updateSize: updateSize
         });
 
-        var info = DerivedView.__UpdateMethods[View.PropertyGroups.Size];
+        var info = DerivedView.__UpdateMethods[BaseView.PropertyGroups.Size];
         expect(info.name).toBe("_updateSize");
-        expect(info.mask).toBe(View.PropertyGroups.Size);
+        expect(info.mask).toBe(BaseView.PropertyGroups.Size);
 
         expect(DerivedView.__UpdateMethodsList.indexOf(info)).toBeGreaterThan(-1);
       });
@@ -1071,15 +1202,15 @@ define([
       it("should register _updateXyz method with the corresponding mask when using 'implement'", function() {
 
         var updateSize = function() {};
-        var DerivedView = View.extend({});
+        var DerivedView = BaseView.extend({});
 
         DerivedView.implement({
           _updateSize: updateSize
         });
 
-        var info = DerivedView.__UpdateMethods[View.PropertyGroups.Size];
+        var info = DerivedView.__UpdateMethods[BaseView.PropertyGroups.Size];
         expect(info.name).toBe("_updateSize");
-        expect(info.mask).toBe(View.PropertyGroups.Size);
+        expect(info.mask).toBe(BaseView.PropertyGroups.Size);
 
         expect(DerivedView.__UpdateMethodsList.indexOf(info)).toBeGreaterThan(-1);
       });
@@ -1087,10 +1218,10 @@ define([
       // TODO: should also test it logs a warning...
       it("should ignore an _updateXyz method which has no known property groups", function() {
 
-        var count = View.__UpdateMethodsList.length;
+        var count = BaseView.__UpdateMethodsList.length;
 
         var updateBarAndFoo = function() {};
-        var DerivedView = View.extend({
+        var DerivedView = BaseView.extend({
           _updateBarAndFoo: updateBarAndFoo
         });
 
@@ -1101,13 +1232,13 @@ define([
          "under the known mask", function() {
 
         var updateSizeAndFoo = function() {};
-        var DerivedView = View.extend({
+        var DerivedView = BaseView.extend({
           _updateSizeAndFoo: updateSizeAndFoo
         });
 
-        var info = DerivedView.__UpdateMethods[View.PropertyGroups.Size];
+        var info = DerivedView.__UpdateMethods[BaseView.PropertyGroups.Size];
         expect(info.name).toBe("_updateSizeAndFoo");
-        expect(info.mask).toBe(View.PropertyGroups.Size);
+        expect(info.mask).toBe(BaseView.PropertyGroups.Size);
 
         expect(DerivedView.__UpdateMethodsList.indexOf(info)).toBeGreaterThan(-1);
       });
@@ -1115,18 +1246,18 @@ define([
       it("should not re-register an update method that is already declared in the base class", function() {
 
         var updateSize = function() {};
-        var DerivedView = View.extend({
+        var DerivedView = BaseView.extend({
           _updateSize: updateSize
         });
 
-        var info = DerivedView.__UpdateMethods[View.PropertyGroups.Size];
+        var info = DerivedView.__UpdateMethods[BaseView.PropertyGroups.Size];
 
         var DerivedView2 = DerivedView.extend({
           // Override
           _updateSize: function() {}
         });
 
-        var info2 = DerivedView2.__UpdateMethods[View.PropertyGroups.Size];
+        var info2 = DerivedView2.__UpdateMethods[BaseView.PropertyGroups.Size];
 
         expect(info2).toBe(info);
       });
@@ -1135,7 +1266,7 @@ define([
     describe("#validate()", function() {
 
       it("a view spec is valid if all (declared) properties (required and optional) are properly defined", function() {
-        var view = new View({
+        var view = new BaseView({
           width: 1,
           height: 1,
           model: model
@@ -1145,18 +1276,18 @@ define([
       });
 
       it("a model spec is invalid if at least one required property is omitted", function() {
-        var view = new View();
+        var view = new BaseView();
         expect(view.validate()).not.toBeNull();
 
-        view = new View({});
+        view = new BaseView({});
         expect(view.validate()).not.toBeNull();
 
-        view = new View({
+        view = new BaseView({
           width: 1
         });
         expect(view.validate()).not.toBeNull();
 
-        view = new View({
+        view = new BaseView({
           width: 1,
           height: 1
         });
@@ -1167,7 +1298,7 @@ define([
     describe("#toSpec()", function() {
 
       it("should serialize the `model` property", function() {
-        var view = new View({
+        var view = new BaseView({
           width:  1,
           height: 1,
           model: model
@@ -1179,6 +1310,74 @@ define([
 
         expect(json instanceof Object).toBe(true);
         expect("model" in json).toBe(true);
+      });
+    });
+
+    describe("#configure(config)", function() {
+
+      it("should not emit change events if configured with its current spec", function() {
+
+        function config(localRequire) {
+
+          localRequire.define("test/foo/view", [], function() {
+
+            return ["pentaho/visual/base/view", "test/foo/model", function(BaseView, Model) {
+
+              return BaseView.extend({
+                $type: {
+                  id: "test/foo/view",
+                  props: {
+                    a: {valueType: "string"},
+                    model: {valueType: Model}
+                  }
+                }
+              });
+            }];
+          });
+
+          localRequire.define("test/foo/model", [], function() {
+
+            return ["pentaho/visual/base/model", function(BaseModel) {
+
+              return BaseModel.extend({
+                $type: {
+                  id: "test/foo/model",
+                  props: {b: {valueType: "string"}}
+                }
+              });
+            }];
+          });
+        }
+
+        return require.using(["pentaho/type/Context"], config, function(Context) {
+
+          return Context.createAsync().then(function(context) {
+
+            return context.getDependencyApplyAsync(["test/foo/view"], function(View) {
+
+              var viewSpec = {
+                a: "a1",
+                model: {
+                  b: "b1",
+                  data: dataTable,
+                  selectionFilter: {_: "or", o: [{_: "=", p: "country", v: "Portugal"}]}
+                }
+              };
+
+              var view = new View(viewSpec);
+
+              var viewSpec2 = view.toSpec();
+              expect(viewSpec2).toEqual(viewSpec);
+
+              var didChangeSpy = jasmine.createSpy("did:change");
+              view.on("did:change", didChangeSpy);
+
+              view.configure(viewSpec);
+
+              expect(didChangeSpy).not.toHaveBeenCalled();
+            });
+          });
+        });
       });
     });
 
@@ -1197,7 +1396,7 @@ define([
 
       it("should call all `_emitActionPhase*Event` methods with the action execution", function() {
 
-        var view = new View();
+        var view = new BaseView();
 
         spyOn(view, "_emitActionPhaseInitEvent").and.callThrough();
         spyOn(view, "_emitActionPhaseWillEvent").and.callThrough();
@@ -1223,7 +1422,7 @@ define([
           "finally": jasmine.createSpy()
         };
 
-        var view = new View();
+        var view = new BaseView();
         view.on(CustomSyncAction.type.id, observer);
 
         var actionExecution = view.act(new CustomSyncAction());
@@ -1249,7 +1448,7 @@ define([
           })
         };
 
-        var view = new View();
+        var view = new BaseView();
 
         view.on(CustomSyncAction.type.id, observer);
 
@@ -1274,7 +1473,7 @@ define([
           })
         };
 
-        var view = new View();
+        var view = new BaseView();
 
         view.on(CustomSyncAction.type.id, observer);
 
@@ -1287,30 +1486,30 @@ define([
       });
     });
 
-    describe("getClassAsync(modelType)", function() {
+    describe(".getClassAsync(modelType)", function() {
 
       it("should be defined", function() {
 
-        expect(typeof View.getClassAsync).toBe("function");
+        expect(typeof BaseView.getClassAsync).toBe("function");
       });
 
       it("should be defined in subclasses of View", function() {
 
-        var SubView = View.extend();
+        var SubView = BaseView.extend();
 
         expect(typeof SubView.getClassAsync).toBe("function");
       });
 
       it("should return a promise", function() {
 
-        var p = View.getClassAsync(model.$type);
+        var p = BaseView.getClassAsync(model.$type);
 
         expect(p instanceof Promise).toBe(true);
       });
 
       it("should return a rejected promise when given no modelType", function() {
 
-        return testUtils.expectToRejectWith(function() { return View.getClassAsync(null); }, {
+        return testUtils.expectToRejectWith(function() { return BaseView.getClassAsync(null); }, {
           asymmetricMatch: function(error) { return error instanceof Error; }
         });
       });
@@ -1320,7 +1519,7 @@ define([
 
         var SubModel = Model.extend({$type: {defaultView: null}});
 
-        return testUtils.expectToRejectWith(function() { return View.getClassAsync(SubModel.type); }, {
+        return testUtils.expectToRejectWith(function() { return BaseView.getClassAsync(SubModel.type); }, {
           asymmetricMatch: function(error) { return error instanceof Error; }
         });
       });
@@ -1330,14 +1529,14 @@ define([
 
         var SubModel = Model.extend({$type: {defaultView: "test/foo/bar/view"}});
 
-        return testUtils.expectToRejectWith(function() { return View.getClassAsync(SubModel.type); }, {
+        return testUtils.expectToRejectWith(function() { return BaseView.getClassAsync(SubModel.type); }, {
           asymmetricMatch: function(error) { return error instanceof Error; }
         });
       });
 
       it("should return a promise that is rejected when the model type identifier does not exist", function() {
 
-        return testUtils.expectToRejectWith(function() { return View.getClassAsync("test/foo/bar"); }, {
+        return testUtils.expectToRejectWith(function() { return BaseView.getClassAsync("test/foo/bar"); }, {
           asymmetricMatch: function(error) { return error instanceof Error; }
         });
       });
@@ -1347,20 +1546,20 @@ define([
 
         var SubModel = Model.extend({$type: {defaultView: "pentaho/visual/base/view"}});
 
-        return View.getClassAsync(SubModel.type)
+        return BaseView.getClassAsync(SubModel.type)
             .then(function(ViewCtor) {
-              expect(ViewCtor).toBe(View);
+              expect(ViewCtor).toBe(BaseView);
             });
       });
     });
 
-    describe("createAsync(domContainer, model)", function() {
+    describe(".createAsync(domContainer, model)", function() {
       it("should be defined", function() {
-        expect(typeof View.createAsync).toBe("function");
+        expect(typeof BaseView.createAsync).toBe("function");
       });
 
       it("should be defined in subclasses of View", function() {
-        var SubView = View.extend();
+        var SubView = BaseView.extend();
 
         expect(typeof SubView.createAsync).toBe("function");
       });
@@ -1368,23 +1567,23 @@ define([
       it("should return a rejected promise when given no spec", function() {
 
         return testUtils.expectToRejectWith(
-            function() { return View.createAsync(); },
-            errorMatch.argRequired("viewSpec"));
+          function() { return BaseView.createAsync(); },
+          errorMatch.argRequired("viewSpec"));
       });
 
       it("should return a rejected promise when given a spec with no view type id and no model", function() {
 
         return testUtils.expectToRejectWith(
-            function() { return View.createAsync({}); },
-            errorMatch.argRequired("viewSpec.model"));
+          function() { return BaseView.createAsync({}); },
+          errorMatch.argRequired("viewSpec.model"));
       });
 
       it("should return a rejected promise when given a spec with no view type id and a model " +
          "with no type id", function() {
 
         return testUtils.expectToRejectWith(
-            function() { return View.createAsync({model: {}}); },
-            errorMatch.argRequired("viewSpec.model._"));
+          function() { return BaseView.createAsync({model: {}}); },
+          errorMatch.argRequired("viewSpec.model._"));
       });
 
       it("should return a promise that resolves to a view when given a spec with a view type id", function() {
@@ -1537,7 +1736,7 @@ define([
 
         it("should respect a specified object value", function() {
           var ext = {foo: "bar"};
-          var DerivedView = View.extend({$type: {
+          var DerivedView = BaseView.extend({$type: {
             extension: ext
           }});
 
@@ -1545,7 +1744,7 @@ define([
         });
 
         it("should convert a falsy value to null", function() {
-          var DerivedView = View.extend({$type: {
+          var DerivedView = BaseView.extend({$type: {
             extension: false
           }});
 
@@ -1554,7 +1753,7 @@ define([
 
         it("should read the local value and not an inherited base value", function() {
           var ext = {foo: "bar"};
-          var DerivedView = View.extend({$type: {
+          var DerivedView = BaseView.extend({$type: {
             extension: ext
           }});
 
@@ -1565,7 +1764,7 @@ define([
 
         it("should throw if set and the type already has descendants", function() {
 
-          var DerivedView  = View.extend();
+          var DerivedView  = BaseView.extend();
           var DerivedView2 = DerivedView.extend();
 
           expect(function() {
@@ -1579,7 +1778,7 @@ define([
         it("should reflect a locally specified object value", function() {
           var ext = {foo: "bar"};
 
-          var DerivedView = View.extend({
+          var DerivedView = BaseView.extend({
             $type: {
               extension: ext
             }
@@ -1591,7 +1790,7 @@ define([
         it("should reuse the initially determined object value", function() {
           var ext = {foo: "bar"};
 
-          var DerivedView = View.extend({
+          var DerivedView = BaseView.extend({
             $type: {
               extension: ext
             }
@@ -1606,7 +1805,7 @@ define([
         it("should reflect an inherited object value", function() {
 
           var ext = {foo: "bar"};
-          var DerivedView = View.extend({$type: {
+          var DerivedView = BaseView.extend({$type: {
             extension: ext
           }});
 
@@ -1617,7 +1816,7 @@ define([
 
         it("should merge local and inherited object values", function() {
 
-          var DerivedView = View.extend({$type: {
+          var DerivedView = BaseView.extend({$type: {
             extension: {foo: "bar"}
           }});
 
@@ -1633,7 +1832,7 @@ define([
 
         it("should override inherited properties with local properties", function() {
 
-          var DerivedView = View.extend({$type: {
+          var DerivedView = BaseView.extend({$type: {
             extension: {foo: "bar"}
           }});
 

@@ -140,7 +140,7 @@ define([
       it("should return '(true)'", function() {
         var filter  = new TrueFilter();
 
-        expect(filter.contentKey).toBe("(true)");
+        expect(filter.$contentKey).toBe("(true)");
       });
     });
   }); // pentaho.data.filter.True

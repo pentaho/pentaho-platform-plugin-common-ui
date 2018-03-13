@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -167,17 +167,20 @@ define([
      */
     hasChange: function(name) {
       var pName = this.owner.$type.get(name).name;
-      return O.hasOwn(this._changes, pName);
+      return O.hasOwn(this._changes, pName) && __hasChanges(this._changes[pName]);
     },
 
     /**
-     * Gets an array with all of the property names contained in this changeset.
+     * Gets an array with the names of all of the changed properties contained in this changeset.
      *
      * @type {!Array.<string>}
      * @readonly
      */
     get propertyNames() {
-      return Object.keys(this._changes);
+      return Object.keys(this._changes)
+          .filter(function(pName) {
+            return __hasChanges(this._changes[pName]);
+          }, this);
     },
 
     // TODO: Document me!
@@ -236,38 +239,45 @@ define([
      *
      * @param {!pentaho.type.Complex} complex - The complex instance.
      * @param {!pentaho.type.Property.Type} propType - The element property type.
-     * @param {any?} [valueSpec=null] The new value specification.
+     * @param {?any} valueNewSpec The new value specification.
+     * @param {?boolean} [forceReplace=false] Forces replace to occur even when values are equal.
      *
      * @private
      * @internal
      * @see pentaho.type.Complex#set
      */
-    __setElement: function(complex, propType, valueSpec) {
+    __setElement: function(complex, propType, valueNewSpec, forceReplace) {
 
       // NOTE: For performance reasons, this function inlines code that would otherwise be available from,
       // for example, Container#usingChangeset(.) and TransactionScope.
       var type = complex.$type;
       var name = propType.name;
 
-      // New value. Cast spec.
-      var stateNew = valueSpec == null ? PROP_VALUE_DEFAULT : PROP_VALUE_SPECIFIED;
-      var valueNew = propType.toValueOn(complex, valueSpec);
-
       // Original/Initial value.
       var valueIni = complex.__getByName(name);
       var stateIni = complex.__getStateByName(name);
 
+      // New value. Cast spec.
+      var stateNew = valueNewSpec == null ? PROP_VALUE_DEFAULT : PROP_VALUE_SPECIFIED;
+      var valueNew = propType.toValueOn(complex, valueNewSpec);
+
       // Ambient value.
       var cset = complex.$changeset;
-      var change = cset && O.getOwn(cset._changes, name);
-      var valueAmb = change ? change.value : valueIni;
-      var stateAmb = change ? change.state : stateIni;
+      var change = cset !== null ? O.getOwn(cset._changes, name, null) : null;
+      var valueAmb = change !== null ? change.value : valueIni;
+      var stateAmb = change !== null ? change.state : stateIni;
+      var isEqualValue = forceReplace ? false : type.areEqual(valueNew, valueAmb);
 
       // Doesn't change the ambient value/state?
-      if(stateNew === stateAmb && type.areEqual(valueNew, valueAmb))
+      if(stateNew === stateAmb && isEqualValue) {
         return;
+      }
 
-      if(change) {
+      if(propType.isReadOnly) {
+        throw new TypeError("'" + name + "' is read-only.");
+      }
+
+      if(change !== null) {
         // Goes back to the initial value/state?
         if(stateNew === stateIni && type.areEqual(valueNew, valueIni)) {
           // Remove the change.
@@ -275,7 +285,8 @@ define([
           change._cancelRefs(cset.transaction, complex, valueIni);
         } else {
           // Update its value.
-          change.__updateValue(cset.transaction, complex, valueNew, stateNew);
+          // Preserve original instance if unchanged.
+          change.__updateValue(cset.transaction, complex, isEqualValue ? valueAmb : valueNew, stateNew);
         }
         return;
       }
@@ -288,7 +299,8 @@ define([
       if(!cset) cset = complex._createChangeset(txn);
 
       // Create a change
-      cset._changes[name] = change = new Replace(propType, valueNew, stateNew);
+      // Preserve original instance if unchanged.
+      cset._changes[name] = change = new Replace(propType, isEqualValue ? valueAmb : valueNew, stateNew);
       change._prepareRefs(txn, complex, valueIni);
 
       scope.accept();

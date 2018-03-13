@@ -186,7 +186,7 @@ define([
       it("should remove the input selection from the current selection", function() {
         var result = SelectionModes.remove.call(view, sales12k, inStock);
 
-        expect(result.toDnf().contentKey).toBe("(or (and (in sales 12000) (not (= inStock true))))");
+        expect(result.toDnf().$contentKey).toBe("(or (and (in sales 12000) (not (= inStock true))))");
       });
     });
 

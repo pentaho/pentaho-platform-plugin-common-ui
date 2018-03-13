@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ define([
     expect(list.$changeset).toBe(null);
   }
 
-  function expectEqualValueAt(list, checkValues) {
+  function expectListValues(list, checkValues) {
     var L = checkValues.length;
     expect(list.count).toBe(L);
     for(var i = 0; i < L; i++) {
@@ -45,7 +45,7 @@ define([
     var PentahoNumber;
     var NumberList;
 
-    beforeEach(function(done) {
+    beforeAll(function(done) {
       Context.createAsync()
           .then(function(_context) {
             context = _context;
@@ -64,11 +64,14 @@ define([
       expect(typeof List).toBe("function");
     });
 
-    // region #of
-    describe("#of -", function() {
+    describe(".Type#of -", function() {
 
       it("accepts an `of` property be given a type derived from `Element`", function() {
         expect(NumberList.type.of).toBe(PentahoNumber.type);
+      });
+
+      it("should have the same value as the #elementType property", function() {
+        expect(NumberList.type.of).toBe(NumberList.type.elementType);
       });
 
       it("should throw if given a nully `of` property", function() {
@@ -118,9 +121,8 @@ define([
         SubList.type.of = elemType;
         expect(SubList.type.of).toBe(elemType);
       });
-    }); // endregion #of
+    });
 
-    // region constructor
     describe("new (spec) -", function() {
 
       describe("given no arguments", function() {
@@ -304,7 +306,16 @@ define([
           expectNoChanges(new NumberList({d: null}));
         });
       });
-    }); // endregion constructor
+
+      describe("given a spec of some other type", function() {
+
+        it("it should throw", function() {
+          expect(function() {
+            var list = new NumberList(3);
+          }).toThrow(errorMatch.argInvalidType("instSpec", ["Array", "Object", "pentaho.type.List"], "number"));
+        });
+      });
+    });
 
     // region read methods
     describe("#$uid -", function() {
@@ -547,7 +558,6 @@ define([
     });
     // endregion
 
-    // region $isReadOnly
     describe("#$isReadOnly", function() {
 
       it("should be false by default", function() {
@@ -563,20 +573,16 @@ define([
         expect(list.$isReadOnly).toBe(true);
       });
     });
-    // endregion
 
     // region write methods
-
-    // add or update
-    // region #add(fragment)
-    describe("#add(fragment) -", function() {
+    describe("#add(fragment)", function() {
 
       it("should add a given array of convertible values to an empty list", function() {
 
         var list = new NumberList();
 
         list.add([1, 2, 3]);
-        expectEqualValueAt(list, [1, 2, 3]);
+        expectListValues(list, [1, 2, 3]);
       });
 
       it("should throw a TypeError if list is read-only", function() {
@@ -590,6 +596,30 @@ define([
         expect(list.count).toBe(0);
       });
 
+      it("should throw a TypeError if list only accepts read-only elements and the added element" +
+        "is not of a read-only type", function() {
+
+        var list = new List(null, {needReadOnlyElementValidation: true});
+
+        var elem = new Complex();
+
+        expect(function() {
+          list.add([elem]);
+        }).toThrowError(TypeError);
+
+        expect(list.count).toBe(0);
+      });
+
+      it("should not throw an error if list only accepts read-only elements and the added element" +
+        "is of a read-only type", function() {
+
+        var list = new List(null, {needReadOnlyElementValidation: true});
+
+        var elem = new PentahoNumber(1);
+
+        list.add([elem]);
+      });
+
       it("should append a given array of convertible values to a non-empty list", function() {
 
         var list = new NumberList([1, 2, 3]);
@@ -597,7 +627,7 @@ define([
         expect(list.count).toBe(3);
 
         list.add([4, 5, 6]);
-        expectEqualValueAt(list, [1, 2, 3, 4, 5, 6]);
+        expectListValues(list, [1, 2, 3, 4, 5, 6]);
       });
 
       it("should ignore nully elements in the given array", function() {
@@ -607,7 +637,7 @@ define([
         expect(list.count).toBe(3);
 
         list.add([4, null, undefined, 6]);
-        expectEqualValueAt(list, [1, 2, 3, 4, 6]);
+        expectListValues(list, [1, 2, 3, 4, 6]);
       });
 
       it("should filter out duplicate values in the given array", function() {
@@ -617,18 +647,7 @@ define([
         expect(list.count).toBe(3);
 
         list.add([4, 4, 5]);
-        expectEqualValueAt(list, [1, 2, 3, 4, 5]);
-      });
-
-      // TODO: test _update_ on complex type list
-      it("should update values in the given array that are already present in the list", function() {
-
-        var list = new NumberList([1, 2, 3]);
-
-        expect(list.count).toBe(3);
-
-        list.add([4, 2, 5]);
-        expectEqualValueAt(list, [1, 2, 3, 4, 5]);
+        expectListValues(list, [1, 2, 3, 4, 5]);
       });
 
       it("should add a distinct convertible value to an empty list", function() {
@@ -638,7 +657,7 @@ define([
         expect(list.count).toBe(0);
 
         list.add(4);
-        expectEqualValueAt(list, [4]);
+        expectListValues(list, [4]);
       });
 
       it("should add a distinct convertible value to a non-empty list", function() {
@@ -648,7 +667,7 @@ define([
         expect(list.count).toBe(3);
 
         list.add(4);
-        expectEqualValueAt(list, [1, 2, 3, 4]);
+        expectListValues(list, [1, 2, 3, 4]);
       });
 
       it("should be able to get() an added element by key", function() {
@@ -662,20 +681,22 @@ define([
         expect(list.get("4").value).toBe(4);
       });
 
-      it("should only append the values not present in the list and update the values already present", function() {
+      it("should only append the values not present in the list and leave the values already present", function() {
 
         var list = new NumberList([1, 5, 10, 11, 40]);
 
         expect(list.count).toBe(5);
 
-        list.add([5, 11, 2, 3, 1, 10]);
-        expectEqualValueAt(list, [1, 5, 10, 11, 40, 2, 3]);
-      });
-    }); // endregion #add
+        list.add([5, 11, 2, 3, 1, {v: 10, f: "Ten"}]);
 
-    // insert or update
-    // region #insert(fragment, index)
-    describe("#insert(fragment, index) -", function() {
+        expectListValues(list, [1, 5, 10, 11, 40, 2, 3]);
+
+        expect(list.get("10").formatted).toBe(null);
+      });
+    });
+
+    describe("#insert(fragment, index)", function() {
+
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
@@ -704,13 +725,13 @@ define([
         expect(listeners.rejected).not.toHaveBeenCalled();
       });
 
-      it("should append a given array of convertible values, to an empty list, when index is not specified",
-      function() {
+      it("should append a given array of convertible values, to an empty list, " +
+         "when index is not specified", function() {
 
         var list = new NumberList();
 
         list.insert([1, 2, 3]);
-        expectEqualValueAt(list, [1, 2, 3]);
+        expectListValues(list, [1, 2, 3]);
       });
 
       it("should throw a TypeError if list is read-only", function() {
@@ -724,26 +745,26 @@ define([
         expect(list.count).toBe(0);
       });
 
-      it("should append a given array of convertible values to a non-empty list, when index is not specified",
-      function() {
+      it("should append a given array of convertible values to a non-empty list, " +
+         "when index is not specified", function() {
 
         var list = new NumberList([1, 2, 3]);
 
         expect(list.count).toBe(3);
 
         list.insert([4, 5, 6]);
-        expectEqualValueAt(list, [1, 2, 3, 4, 5, 6]);
+        expectListValues(list, [1, 2, 3, 4, 5, 6]);
       });
 
-      it("should insert a given array of convertible values to a non-empty list, at the specified existing index",
-      function() {
+      it("should insert a given array of convertible values to a non-empty list, " +
+        "at the specified existing index", function() {
 
         var list = new NumberList([1, 2, 3]);
 
         expect(list.count).toBe(3);
 
         list.insert([4, 5, 6], 2);
-        expectEqualValueAt(list, [1, 2, 4, 5, 6, 3]);
+        expectListValues(list, [1, 2, 4, 5, 6, 3]);
       });
 
       it("should insert at the given index, yet ignoring nully elements in the given array", function() {
@@ -753,7 +774,7 @@ define([
         expect(list.count).toBe(3);
 
         list.insert([4, null, undefined, 6], 2);
-        expectEqualValueAt(list, [1, 2, 4, 6, 3]);
+        expectListValues(list, [1, 2, 4, 6, 3]);
       });
 
       it("should insert at the given index, yet filter out duplicate values in the given array", function() {
@@ -763,18 +784,20 @@ define([
         expect(list.count).toBe(3);
 
         list.insert([4, 4, 5], 2);
-        expectEqualValueAt(list, [1, 2, 4, 5, 3]);
+        expectListValues(list, [1, 2, 4, 5, 3]);
       });
 
-      // TODO: test _update_ on complex type list
-      it("should update values in the given array that are already present in the list", function() {
+      it("should not update values in the given array that are already present in the list", function() {
 
         var list = new NumberList([1, 2, 3]);
 
         expect(list.count).toBe(3);
 
-        list.insert([4, 2, 5], 2);
-        expectEqualValueAt(list, [1, 2, 4, 5, 3]);
+        list.insert([4, {v: 2, f: "Two"}, 5], 2);
+
+        expectListValues(list, [1, 2, 4, 5, 3]);
+
+        expect(list.at(1).formatted).toBe(null);
       });
 
       it("should insert a distinct convertible value to a non-empty list", function() {
@@ -784,7 +807,7 @@ define([
         expect(list.count).toBe(3);
 
         list.insert(4, 2);
-        expectEqualValueAt(list, [1, 2, 4, 3]);
+        expectListValues(list, [1, 2, 4, 3]);
       });
 
       it("should append when the given index is the length of the list", function() {
@@ -794,7 +817,7 @@ define([
         expect(list.count).toBe(3);
 
         list.insert(4, list.count);
-        expectEqualValueAt(list, [1, 2, 3, 4]);
+        expectListValues(list, [1, 2, 3, 4]);
       });
 
       it("should insert at count + index when the given index is negative", function() {
@@ -804,14 +827,14 @@ define([
         expect(list.count).toBe(3);
 
         list.insert(4, -1);
-        expectEqualValueAt(list, [1, 2, 4, 3]);
+        expectListValues(list, [1, 2, 4, 3]);
 
         list.insert(5, -4);
-        expectEqualValueAt(list, [5, 1, 2, 4, 3]);
+        expectListValues(list, [5, 1, 2, 4, 3]);
 
-        // min is 0. doesn't go around
+        // Value of min is 0. doesn't go around.
         list.insert(6, -6);
-        expectEqualValueAt(list, [6, 5, 1, 2, 4, 3]);
+        expectListValues(list, [6, 5, 1, 2, 4, 3]);
       });
 
       it("should be able to get() an inserted element by key", function() {
@@ -833,12 +856,11 @@ define([
         expect(list.count).toBe(5);
 
         list.insert([5, 11, 2, 3, 1, 10], 1);
-        expectEqualValueAt(list, [1, 2, 3, 5, 10, 11, 40]);
+        expectListValues(list, [1, 2, 3, 5, 10, 11, 40]);
       });
-    }); // endregion #insert
+    });
 
-    // region #remove(fragment)
-    describe("#remove(fragment) -", function() {
+    describe("#remove(fragment)", function() {
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
@@ -890,7 +912,7 @@ define([
         // ----
 
         expect(list.has("1")).toBe(false);
-        expectEqualValueAt(list, [2, 3]);
+        expectListValues(list, [2, 3]);
       });
 
       it("should remove two elements, given in an array, that are present in the list", function() {
@@ -907,7 +929,7 @@ define([
 
         expect(list.has("1")).toBe(false);
         expect(list.has("2")).toBe(false);
-        expectEqualValueAt(list, [0, 3]);
+        expectListValues(list, [0, 3]);
       });
 
       it("should remove two blocks of two elements, given in an array, that are present in the list", function() {
@@ -929,7 +951,7 @@ define([
         expect(list.has("3")).toBe(true);
         expect(list.has("4")).toBe(false);
         expect(list.has("5")).toBe(false);
-        expectEqualValueAt(list, [3]);
+        expectListValues(list, [3]);
       });
 
       it("should ignore a given element that is not present in the list", function() {
@@ -945,10 +967,10 @@ define([
         expect(list.count).toBe(4);
       });
 
-    }); // endregion #remove
+    });
 
-    // region #clear()
-    describe("#clear() -", function() {
+    describe("#clear()", function() {
+
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
@@ -989,7 +1011,7 @@ define([
         expect(list.count).toBe(0);
       });
 
-      it("should throw a TypeError if list is read-only", function() {
+      it("should throw a TypeError if the list is not empty and is read-only", function() {
 
         var list = new NumberList([1, 2, 3], {isReadOnly: true});
 
@@ -999,10 +1021,16 @@ define([
 
         expect(list.count).toBe(3);
       });
-    }); // endregion #clear
 
-    // region #removeAt(start, count[, silent])
-    describe("#removeAt(start, count[, silent]) -", function() {
+      it("should not throw a TypeError if the list is empty and is read-only", function() {
+
+        var list = new NumberList([], {isReadOnly: true});
+
+        list.clear();
+      });
+    });
+
+    describe("#removeAt(start, count[, silent])", function() {
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
@@ -1050,7 +1078,7 @@ define([
 
         // ----
 
-        expectEqualValueAt(list, [1, 3, 4]);
+        expectListValues(list, [1, 3, 4]);
       });
 
       it("should remove one element at the given in-range index when count is unspecified or nully", function() {
@@ -1063,7 +1091,7 @@ define([
 
         // ----
 
-        expectEqualValueAt(list, [1, 3, 4]);
+        expectListValues(list, [1, 3, 4]);
 
         // ===
 
@@ -1072,7 +1100,7 @@ define([
 
         list.removeAt(1, undefined);
 
-        expectEqualValueAt(list, [1, 3, 4]);
+        expectListValues(list, [1, 3, 4]);
 
         // ===
 
@@ -1081,7 +1109,7 @@ define([
 
         list.removeAt(1, null);
 
-        expectEqualValueAt(list, [1, 3, 4]);
+        expectListValues(list, [1, 3, 4]);
       });
 
       it("should remove nothing when count is less than 1", function() {
@@ -1128,7 +1156,7 @@ define([
 
         // ----
 
-        expectEqualValueAt(list, [1, 2]);
+        expectListValues(list, [1, 2]);
 
         list.removeAt(0, 3);
 
@@ -1147,14 +1175,13 @@ define([
 
         // ----
 
-        expectEqualValueAt(list, [1, 2, 4]);
+        expectListValues(list, [1, 2, 4]);
       });
-    }); // endregion #removeAt
+    });
 
-    // region #set(fragment, {noAdd, noUpdate, noRemove, noMove, index})
-    describe("#set(fragment, {noAdd, noUpdate, noRemove, noMove, index}) -", function() {
+    describe("#set(fragment, {noAdd, noUpdate, noRemove, noMove, index})", function() {
 
-      it("should throw a TypeError if list is read-only", function() {
+      it("should throw a TypeError if list is read-only and changes would occur", function() {
 
         var list = new NumberList([1, 2, 3], {isReadOnly: true});
 
@@ -1165,7 +1192,14 @@ define([
         expect(list.count).toBe(3);
       });
 
-      it("preserves the order of new elements when they are simple objects", function() {
+      it("should not throw a TypeError if list is read-only and no changes would occur", function() {
+
+        var list = new NumberList([1, 2, 3], {isReadOnly: true});
+
+        list.set([1, 2, 3]);
+      });
+
+      it("should preserve the order of new elements when they are simple objects", function() {
 
         var list = new NumberList();
         var spec = [1, 2, 3, 4];
@@ -1173,7 +1207,8 @@ define([
         expect(list.toSpec()).toEqual(spec);
       });
 
-      it("preserves the order of new elements when they are complex objects", function() {
+      it("should preserve the order of new elements when they are complex objects", function() {
+
         var MyComplex = Complex.extend({
           $type: {
             props: [{
@@ -1201,22 +1236,27 @@ define([
         expect(list.toSpec()).toEqual(spec);
       });
 
-      // TODO: test update on complexes
-      it("should append, update, remove and move, when no options are specified", function() {
+      it("should append, remove and move, but not update, when no options are specified", function() {
+
         var list = new NumberList([1, 5, 10, 11, 40]);
+
         expect(list.count).toBe(5);
 
         // ---
 
-        list.set([5, 11, 2, 3, 1, 10]);
+        list.set([{v: 5, f: "Five"}, 11, 2, 3, 1, 10]);
 
         // ---
 
-        expectEqualValueAt(list, [5, 11, 2, 3, 1, 10]);
+        expectListValues(list, [5, 11, 2, 3, 1, 10]);
+
+        expect(list.at(0).formatted).toBe(null);
       });
 
-      it("should append and update but not remove when {noRemove: true}", function() {
+      it("should append but not remove when {noRemove: true}", function() {
+
         var list = new NumberList([1, 2, 3, 4]);
+
         expect(list.count).toBe(4);
 
         // ---
@@ -1225,11 +1265,12 @@ define([
 
         // ---
 
-        expectEqualValueAt(list, [1, 2, 3, 4, 5]);
+        expectListValues(list, [1, 2, 3, 4, 5]);
       });
 
-      it("should update and remove but not add when {noAdd: true}", function() {
+      it("should remove but not add when {noAdd: true}", function() {
         var list = new NumberList([1, 2, 3, 4]);
+
         expect(list.count).toBe(4);
 
         // ---
@@ -1238,20 +1279,130 @@ define([
 
         // ---
 
-        expectEqualValueAt(list, [1, 3]);
+        expectListValues(list, [1, 3]);
       });
 
-      it("should add or remove but not update when {noUpdate: true}", function() {
-        var list = new NumberList([1, 2, 3, 4]);
-        expect(list.count).toBe(4);
+      describe("when element type is read-only", function() {
 
-        // ---
+        it("should add, remove and update when {noUpdate: false}", function() {
 
-        list.set([5, 1, 3], {noUpdate: true});
+          var list = new NumberList([1, 2, 3, 4]);
 
-        // ---
+          expect(list.count).toBe(4);
 
-        expectEqualValueAt(list, [5, 1, 3]);
+          // ---
+
+          list.set([5, {v: 1, f: "One"}, 3], {noUpdate: false});
+
+          // ---
+
+          expectListValues(list, [5, 1, 3]);
+
+          expect(list.get(1).formatted).toBe("One");
+        });
+
+        // Would need to replace the existing element with another.
+        it("should not update when {noUpdate: false, noAdd: true}", function() {
+
+          var list = new NumberList([1, 2, 3, 4]);
+
+          expect(list.count).toBe(4);
+
+          // ---
+
+          list.set([{v: 1, f: "One"}, 3], {noUpdate: false, noAdd: true});
+
+          // ---
+
+          expectListValues(list, [1, 3]);
+
+          expect(list.get(1).formatted).toBe(null);
+        });
+
+        // Would need to replace the existing element with another.
+        it("should not update when {noUpdate: false, noRemove: true}", function() {
+
+          var list = new NumberList([1, 2, 3, 4]);
+
+          expect(list.count).toBe(4);
+
+          // ---
+
+          list.set([{v: 1, f: "One"}, 3], {noUpdate: false, noRemove: true});
+
+          // ---
+
+          expectListValues(list, [1, 2, 3, 4]);
+
+          expect(list.get(1).formatted).toBe(null);
+        });
+      });
+
+      describe("when element type is not read-only", function() {
+
+        var ComplexEntityList;
+
+        beforeAll(function() {
+          var ComplexEntity = Complex.extend({
+            get $key() {
+              return this.name;
+            },
+            $type: {
+              isEntity: true,
+              props: [
+                {
+                  name: "name",
+                  valueType: "string"
+                },
+                {
+                  name: "age",
+                  valueType: "number"
+                }
+              ]
+            }
+          });
+
+          ComplexEntityList = List.extend({
+            $type: {of: ComplexEntity}
+          });
+        });
+
+        it("should add, remove and update when {noUpdate: false}", function() {
+
+          var list = new ComplexEntityList([{name: "John", age: 10}, {name: "Bob", age: 20}]);
+
+          // ---
+
+          list.set([
+            {name: "John", age: 12},
+            {name: "Sophia", age: 30}
+          ], {noUpdate: false});
+
+          // ---
+
+          expect(list.count).toBe(2);
+          expect(list.at(0).name).toBe("John");
+          expect(list.at(0).age).toBe(12);
+          expect(list.at(1).name).toBe("Sophia");
+          expect(list.at(1).age).toBe(30);
+        });
+
+        it("should update when {noUpdate: false, noAdd: true, noRemove: true}", function() {
+
+          var list = new ComplexEntityList([{name: "John", age: 10}, {name: "Bob", age: 20}]);
+
+          // ---
+
+          list.set([
+            {name: "John", age: 12}
+          ], {noUpdate: false, noAdd: true, noRemove: true});
+
+          // ---
+
+          expect(list.count).toBe(2);
+          expect(list.at(0).name).toBe("John");
+          expect(list.at(0).age).toBe(12);
+        });
       });
 
       it("should modify the ordering of the elements", function() {
@@ -1259,7 +1410,7 @@ define([
 
         list.set([1, 3, 2, 4]);
 
-        expectEqualValueAt(list, [1, 3, 2, 4]);
+        expectListValues(list, [1, 3, 2, 4]);
       });
 
       it("should modify the ordering of the elements when {noRemove: true}", function() {
@@ -1267,7 +1418,7 @@ define([
 
         list.set([3, 2], {noRemove: true});
 
-        expectEqualValueAt(list, [1, 3, 2, 4]);
+        expectListValues(list, [1, 3, 2, 4]);
       });
 
       it("should empty the list when given an empty array", function() {
@@ -1283,9 +1434,8 @@ define([
 
         expect(list.count).toBe(0);
       });
-    }); // endregion set
+    });
 
-    // region #toArray
     describe("#toArray()", function() {
       it("should return an empty array when the list is empty", function() {
         expect(new NumberList().toArray()).toEqual([]);
@@ -1319,10 +1469,9 @@ define([
 
         expect(spy.calls.first().object).toBe(ctx);
       });
-    }); // endregion #toArray
+    });
 
-    // region #sort(comparer[, silent])
-    describe("#sort(comparer[, silent]) -", function() {
+    describe("#sort(comparer[, silent])", function() {
       it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
@@ -1354,7 +1503,7 @@ define([
 
         // ----
 
-        expectEqualValueAt(list, [1, 2, 3, 4]);
+        expectListValues(list, [1, 2, 3, 4]);
       });
 
       it("should throw a TypeError if list is read-only", function() {
@@ -1369,10 +1518,106 @@ define([
         expect(list.at(1).value).toBe(1);
         expect(list.at(2).value).toBe(3);
       });
-    }); // endregion #sort
+    });
+
+    describe("#_configure(config)", function() {
+
+      it("should configure when given an array", function() {
+
+        var config = [2, 1, 3];
+        var list = new NumberList([1, 2, 3]);
+
+        spyOn(list, "set");
+
+        list.configure(config);
+
+        expect(list.set).toHaveBeenCalledTimes(1);
+        expect(list.set).toHaveBeenCalledWith(config, jasmine.objectContaining({noUpdate: false}));
+      });
+
+      it("should configure when given another list", function() {
+
+        var list = new NumberList([1, 2, 3]);
+        var config = new NumberList([2, 1, 3]);
+
+        spyOn(list, "set");
+
+        list.configure(config);
+
+        expect(list.set).toHaveBeenCalledTimes(1);
+        expect(list.set).toHaveBeenCalledWith(list.__elems, jasmine.objectContaining({noUpdate: false}));
+      });
+
+      it("should configure when given a list specification with an array `d` property", function() {
+
+        var list = new NumberList([1, 2, 3]);
+        var config = {d: [2, 1, 3]};
+
+        spyOn(list, "set");
+
+        list.configure(config);
+
+        expect(list.set).toHaveBeenCalledTimes(1);
+        expect(list.set).toHaveBeenCalledWith(config.d, jasmine.objectContaining({noUpdate: false}));
+      });
+
+      it("should configure elements when given a list specification " +
+          "with a plain object `d` property", function() {
+
+        var list = new NumberList([1, 2, 3]);
+        var config = {d: {
+          2: {f: "Two"}
+        }};
+
+        var elem2 = list.at(1);
+        spyOn(elem2, "_configureOrCreate").and.returnValue(elem2);
+
+        list.configure(config);
+
+        expect(elem2._configureOrCreate).toHaveBeenCalledTimes(1);
+        expect(elem2._configureOrCreate).toHaveBeenCalledWith(config.d["2"]);
+      });
+
+      it("should replace an element when, given a list specification " +
+         "with a plain object `d` property, _configureOrCreate " +
+         "returns a distinct element", function() {
+
+        var list = new NumberList([1, 2, 3]);
+        var config = {d: {
+          2: {f: "Two"}
+        }};
+
+        var elem2 = list.at(1);
+        var other2 = new PentahoNumber(2);
+
+        spyOn(elem2, "_configureOrCreate").and.returnValue(other2);
+        spyOn(list, "removeAt");
+        spyOn(list, "insert");
+
+        list.configure(config);
+
+        expect(list.removeAt).toHaveBeenCalledTimes(1);
+        expect(list.removeAt).toHaveBeenCalledWith(1, 1);
+
+        expect(list.insert).toHaveBeenCalledTimes(1);
+        expect(list.insert).toHaveBeenCalledWith(other2, 1);
+      });
+
+      it("should throw when given a list specification with a plain object `d` " +
+         "property has an undefined key", function() {
+
+        var list = new NumberList([1, 2, 3]);
+        var config = {d: {
+          4: {f: "Four"}
+        }};
+
+        expect(function() {
+          list.configure(config);
+        }).toThrow(errorMatch.argInvalid("config"));
+      });
+    });
     // endregion
 
-    // region #clone
     describe("#clone()", function() {
       it("should return a different list instance", function() {
         var list = new List();
@@ -1408,11 +1653,11 @@ define([
         expect(clone.at(1)).toBe(list.at(1));
         expect(clone.at(2)).toBe(list.at(2));
       });
-    }); // endregion #clone
+    });
 
-    // region Type
-    describe("Type -", function() {
-      describe("#isList -", function() {
+    describe(".Type", function() {
+
+      describe("#isList", function() {
         it("should return the value `true`", function() {
           expect(List.type.isList).toBe(true);
         });
@@ -1423,7 +1668,91 @@ define([
           expect(List.type.isContainer).toBe(true);
         });
       });
-    }); // endregion Type
 
+      describe("#isEntity", function() {
+        it("should return the value `false`", function() {
+          expect(List.type.isEntity).toBe(false);
+        });
+      });
+
+      describe("#isReadOnly", function() {
+        it("should return the value `false`", function() {
+          expect(List.type.isReadOnly).toBe(false);
+        });
+      });
+
+      describe("#_normalizeInstanceSpec(instSpec)", function() {
+
+        it("should accept and return a plain Object spec", function() {
+          var spec = {};
+          var result = List.type._normalizeInstanceSpec(spec);
+
+          expect(result).toBe(spec);
+        });
+
+        it("should accept and wrap an Array spec", function() {
+          var spec = [];
+          var result = List.type._normalizeInstanceSpec(spec);
+
+          expect(result.constructor).toBe(Object);
+          expect(result.d).toBe(spec);
+        });
+
+        it("should accept and wrap a List spec", function() {
+          var spec = new NumberList([1, 2, 3]);
+          var result = List.type._normalizeInstanceSpec(spec);
+
+          expect(result.constructor).toBe(Object);
+          expect(result.d).toBe(spec.__elems);
+        });
+
+        it("should throw for other spec types", function() {
+          var spec = 1;
+
+          expect(function() {
+            List.type._normalizeInstanceSpec(spec);
+          }).toThrow(errorMatch.argInvalidType("instSpec", ["Array", "Object", "pentaho.type.List"], "number"));
+        });
+      });
+
+      describe("#__getElementSpecsFromInstanceSpec(instSpec)", function() {
+
+        it("should accept and a plain Object spec no `d` property and return null", function() {
+          var spec = {};
+          var result = List.type.__getElementSpecsFromInstanceSpec(spec);
+
+          expect(result).toBe(null);
+        });
+
+        it("should accept and a plain Object spec with `d` property", function() {
+          var spec = {d: []};
+          var result = List.type.__getElementSpecsFromInstanceSpec(spec);
+
+          expect(result).toBe(spec.d);
+        });
+
+        it("should accept and return an Array spec", function() {
+          var spec = [];
+          var result = List.type.__getElementSpecsFromInstanceSpec(spec);
+
+          expect(result).toBe(spec);
+        });
+
+        it("should accept a List spec and return its elements array", function() {
+          var spec = new NumberList([1, 2, 3]);
+          var result = List.type.__getElementSpecsFromInstanceSpec(spec);
+
+          expect(result).toBe(spec.__elems);
+        });
+
+        it("should throw for other spec types", function() {
+          var spec = 1;
+
+          expect(function() {
+            List.type.__getElementSpecsFromInstanceSpec(spec);
+          }).toThrow(errorMatch.argInvalidType("instSpec", ["Array", "Object", "pentaho.type.List"], "number"));
+        });
+      });
+    });
   });
 });

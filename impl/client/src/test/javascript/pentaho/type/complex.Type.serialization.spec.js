@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,26 @@ define([
         var spec = {};
         serializationUtil.fillSpec(Derived, spec, {});
         expect("props" in spec).toBe(false);
+      });
+
+      it("should return true when isReadOnly is specified", function() {
+        expect(serializationUtil.fillSpec(Complex, {}, {isReadOnly: true})).toBe(true);
+      });
+
+      it("should create property isReadOnly when isReadOnly is specified", function() {
+        var spec = {};
+        serializationUtil.fillSpec(Complex, spec, {isReadOnly: true});
+        expect(spec.isReadOnly).toBe(true);
+      });
+
+      it("should return true when isEntity is specified", function() {
+        expect(serializationUtil.fillSpec(Complex, {}, {isEntity: true})).toBe(true);
+      });
+
+      it("should create property isEntity when isEntity is specified", function() {
+        var spec = {};
+        serializationUtil.fillSpec(Complex, spec, {isEntity: true});
+        expect(spec.isEntity).toBe(true);
       });
 
       it("should return true when there are properties to serialize", function() {

@@ -86,7 +86,7 @@ define([
       /** @inheritDoc */
       _buildContentKey: function() {
         var v = this.get("value");
-        return (this.property || "") + " " + (v ? v.$key : "");
+        return (this.property || "") + " " + (v ? v.$contentKey : "");
       },
 
       $type: /** @lends pentaho.data.filter.IsLess.Type# */{
@@ -98,7 +98,6 @@ define([
             nameAlias: "v",
             valueType: "element",
             isRequired: true,
-            isReadOnly: true,
             isBoundary: true
           }
         ]

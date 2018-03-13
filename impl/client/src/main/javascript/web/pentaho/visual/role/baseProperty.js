@@ -163,9 +163,9 @@ define([
            *
            * @see pentaho.visual.role.BaseProperty.Type#modes
            * @see pentaho.visual.role.Mode#isContinuous
-           * @see pentaho.visual.role.Mode#elementDataType
            * @see pentaho.type.Type#isList
            * @see pentaho.visual.role.Mode#dataType
+           * @see pentaho.type.Type#elementType
            */
           hasAnyModes: function(keyArgs) {
             var isContinuous = keyArgs.isContinuous;
@@ -183,7 +183,7 @@ define([
                 return;
               }
 
-              if(elementDataType != null && !elementDataType.isSubtypeOf(mode.elementDataType)) {
+              if(elementDataType != null && !elementDataType.isSubtypeOf(mode.dataType.elementType)) {
                 return;
               }
 

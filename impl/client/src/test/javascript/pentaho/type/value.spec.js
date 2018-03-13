@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,18 +21,20 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
 
-  describe("pentaho/type/value -", function() {
+  describe("pentaho.type.Value", function() {
 
     var context;
     var Value;
+    var NumberList;
 
-    beforeEach(function(done) {
+    beforeAll(function(done) {
       Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Value = context.get("pentaho/type/value");
-          })
-          .then(done, done.fail);
+        .then(function(_context) {
+          context = _context;
+          Value = context.get("pentaho/type/value");
+          NumberList = context.get(["pentaho/type/number"]);
+        })
+        .then(done, done.fail);
     });
 
     it("should be a function", function() {
@@ -45,25 +47,12 @@ define([
       expect(Value.prototype instanceof Instance).toBe(true);
     });
 
-    describe(".Type -", function() {
+    describe(".Type", function() {
+
       var valueType;
 
-      beforeEach(function() {
+      beforeAll(function() {
         valueType = Value.type;
-      });
-
-      it("should be a function", function() {
-        expect(typeof Value.Type).toBe("function");
-      });
-
-      it("should be a sub-class of `Type`", function() {
-        var Instance = context.get("instance");
-        expect(valueType instanceof Instance.Type).toBe(true);
-      });
-
-      it("should have an `uid`", function() {
-        expect(valueType.uid != null).toBe(true);
-        expect(typeof valueType.uid).toBe("number");
       });
 
       describe("#isValue", function() {
@@ -76,87 +65,17 @@ define([
         it("should have `isAbstract` equal to `true`", function() {
           expect(valueType.isAbstract).toBe(true);
         });
-      }); // end #isAbstract
+      });
 
-      describe("_isEqual(va, vb)", function() {
-
-        it("should return `true` if two distinct values have the same constructor and the same key", function() {
-          var va = new Value();
-          var vb = new Value();
-
-          // Override/Redefine getter property
-          Object.defineProperty(va, "key", {value: "A"});
-          Object.defineProperty(vb, "key", {value: "A"});
-
-          expect(va.$type._isEqual(va, vb)).toBe(true);
-        });
-
-        it("should return `false` if two distinct values have different constructors and the same key", function() {
-          var Value2 = Value.extend();
-          var va = new Value();
-          var vb = new Value2();
-
-          // Override/Redefine getter property
-          Object.defineProperty(va, "key", {value: "A"});
-          Object.defineProperty(vb, "key", {value: "A"});
-
-          expect(va.$type._isEqual(va, vb)).toBe(false);
-        });
-
-        it("should return `false` if two distinct values have the same constructor and different keys", function() {
-          var va = new Value();
-          var vb = new Value();
-
-          // Override/Redefine getter property
-          Object.defineProperty(va, "$key", {value: "A"});
-          Object.defineProperty(vb, "$key", {value: "B"});
-
-          expect(va.$type._isEqual(va, vb)).toBe(false);
+      describe("#isReadOnly", function() {
+        it("should return the value `false`", function() {
+          expect(valueType.isReadOnly).toBe(false);
         });
       });
 
-      describe("_areEqual(va, vb)", function() {
+      // region equality
+      describe("#areEqual(va, vb)", function() {
 
-        it("should call va.$type._isEqual if va is a Value", function() {
-          var Value2 = Value.extend();
-
-          spyOn(Value2.type, "_isEqual").and.returnValue(true);
-
-          var va = new Value2();
-          var vb = new Value2();
-
-          Value.type._areEqual(va, vb);
-
-          expect(va.$type._isEqual).toHaveBeenCalledWith(va, vb);
-        });
-
-        it("should call vb.$type._isEqual if va is not a Value but vb is", function() {
-          var Value2 = Value.extend();
-
-          spyOn(Value2.type, "_isEqual").and.returnValue(true);
-
-          var va = "A";
-          var vb = new Value2();
-
-          Value.type._areEqual(va, vb);
-
-          expect(vb.$type._isEqual).toHaveBeenCalledWith(vb, va);
-        });
-
-        it("should return false and not call Value.type._isEqual if neither va nor vb are Value instances", function() {
-
-          spyOn(Value.type, "_isEqual").and.returnValue(true);
-
-          var va = "A";
-          var vb = "B";
-
-          expect(Value.type._areEqual(va, vb)).toBe(false);
-
-          expect(Value.type._isEqual).not.toHaveBeenCalled();
-        });
-      });
-
-      describe("areEqual(va, vb)", function() {
         it("should return `true` if both values are nully", function() {
           expect(Value.type.areEqual(null, null)).toBe(true);
           expect(Value.type.areEqual(undefined, undefined)).toBe(true);
@@ -173,27 +92,188 @@ define([
           expect(Value.type.areEqual(va, null)).toBe(false);
         });
 
-        it("should return `true` when given the same value instances and not call the _areEqual method", function() {
-          var va = new Value();
+        it("should delegate to the equals method of the first value", function() {
 
-          spyOn(va.$type, "_areEqual").and.callThrough();
-
-          expect(Value.type.areEqual(va, va)).toBe(true);
-          expect(va.$type._areEqual).not.toHaveBeenCalled();
-        });
-
-        it("should call the _areEqual method when given two distinct, non-nully arguments", function() {
           var va = new Value();
           var vb = new Value();
 
-          spyOn(Value.type, "_areEqual").and.callThrough();
+          spyOn(va, "equals").and.callThrough();
 
           Value.type.areEqual(va, vb);
 
-          expect(Value.type._areEqual).toHaveBeenCalledWith(va, vb);
+          expect(va.equals).toHaveBeenCalledWith(vb);
         });
-      }); // end #areEqual
-    }); // "Type"
+      });
+
+      describe("#areEqualContent(va, vb)", function() {
+
+        it("should call #areEqual(va, vb)", function() {
+
+          spyOn(Value.type, "areEqual").and.returnValue(false);
+
+          var va = {};
+          var vb = {};
+
+          Value.type.areEqualContent(va, vb);
+
+          expect(Value.type.areEqual).toHaveBeenCalledTimes(1);
+          expect(Value.type.areEqual).toHaveBeenCalledWith(va, vb);
+        });
+
+        it("should call vA.equalsContent(vb) if #areEqual returns true", function() {
+
+          var va = new Value();
+          var vb = new Value();
+
+          spyOn(Value.type, "areEqual").and.returnValue(true);
+          spyOn(va, "equalsContent").and.returnValue(true);
+
+          var result = Value.type.areEqualContent(va, vb);
+
+          expect(va.equalsContent).toHaveBeenCalledTimes(1);
+          expect(va.equalsContent).toHaveBeenCalledWith(vb);
+
+          expect(result).toBe(true);
+        });
+
+        it("should not call vA.equalsContent(vb) if #areEqual returns false", function() {
+
+          var va = new Value();
+          var vb = new Value();
+
+          spyOn(Value.type, "areEqual").and.returnValue(false);
+          spyOn(va, "equalsContent");
+
+          var result = Value.type.areEqualContent(va, vb);
+
+          expect(va.equalsContent).not.toHaveBeenCalled();
+
+          expect(result).toBe(false);
+        });
+      });
+
+      describe("#areEqualContentElements(listA, listB)", function() {
+
+        it("should call #areEqualContent(elemA, elemB) for every element until false is returned", function() {
+
+          var listA = new NumberList([1, 2, 3]);
+          var listB = new NumberList([1, 2, 3]);
+
+          spyOn(valueType, "areEqualContent").and.returnValue(true);
+
+          valueType.areEqualContentElements(listA, listB);
+
+          expect(valueType.areEqualContent).toHaveBeenCalledWith(listA.at(0), listB.at(0));
+          expect(valueType.areEqualContent).toHaveBeenCalledWith(listA.at(1), listB.at(1));
+          expect(valueType.areEqualContent).toHaveBeenCalledWith(listA.at(2), listB.at(2));
+        });
+
+        it("should return true if every element pairs is equals and equals content", function() {
+
+          var listA = new NumberList([1, 2, 3]);
+          var listB = new NumberList([1, 2, 3]);
+
+          spyOn(valueType, "areEqualContent").and.returnValue(true);
+
+          var result = valueType.areEqualContentElements(listA, listB);
+
+          expect(result).toBe(true);
+        });
+
+        it("should return false if any element pair is not equals or not equals content", function() {
+
+          var listA = new NumberList([1, 2, 3]);
+          var listB = new NumberList([1, 2, 3]);
+
+          spyOn(valueType, "areEqualContent")
+            .and.returnValue(true)
+            .withArgs(listA.at(1), listB.at(1))
+            .and.returnValue(false);
+
+          var result = valueType.areEqualContentElements(listA, listB);
+
+          expect(result).toBe(false);
+        });
+      });
+      // endregion
+
+      // region instance spec
+      describe("#normalizeInstanceSpec(instSpec)", function() {
+
+        it("should not call _normalizeInstanceSpec if instSpec is nully", function() {
+
+          spyOn(valueType, "_normalizeInstanceSpec");
+
+          valueType.normalizeInstanceSpec(null);
+
+          expect(valueType._normalizeInstanceSpec).not.toHaveBeenCalled();
+
+          valueType.normalizeInstanceSpec(undefined);
+
+          expect(valueType._normalizeInstanceSpec).not.toHaveBeenCalled();
+        });
+
+        it("should return null if instSpec is nully", function() {
+
+          spyOn(valueType, "_normalizeInstanceSpec");
+
+          var result = valueType.normalizeInstanceSpec(null);
+
+          expect(result).toBe(null);
+
+          result = valueType.normalizeInstanceSpec(undefined);
+
+          expect(result).toBe(null);
+        });
+
+        it("should call _normalizeInstanceSpec if instSpec is not nully", function() {
+
+          spyOn(valueType, "_normalizeInstanceSpec");
+
+          var instSpec = {};
+
+          valueType.normalizeInstanceSpec(instSpec);
+
+          expect(valueType._normalizeInstanceSpec).toHaveBeenCalledWith(instSpec);
+        });
+
+        it("should return what _normalizeInstanceSpec returns", function() {
+
+          var normalizedSpec = {};
+
+          spyOn(valueType, "_normalizeInstanceSpec").and.returnValue(normalizedSpec);
+
+          var instSpec = {};
+
+          var result = valueType.normalizeInstanceSpec(instSpec);
+
+          expect(result).toBe(normalizedSpec);
+        });
+      });
+
+      describe("#_normalizeInstanceSpec(instSpec)", function() {
+
+        it("should return instSpec", function() {
+          var instSpec = {};
+
+          var result = valueType.normalizeInstanceSpec(instSpec);
+
+          expect(result).toBe(instSpec);
+        });
+      });
+
+      describe("#hasNormalizedInstanceSpecKeyData(instSpec)", function() {
+
+        it("should return false", function() {
+          var instSpec = {};
+
+          var result = valueType.hasNormalizedInstanceSpecKeyData(instSpec);
+
+          expect(result).toBe(false);
+        });
+      });
+      // endregion
+    });
 
     describe(".extend({...}) returns a value that -", function() {
 
@@ -238,7 +318,7 @@ define([
         });
       });
 
-    }); // .extend({...})
+    });
 
     describe("#$key", function() {
       it("should return the result of toString()", function() {
@@ -249,9 +329,11 @@ define([
         expect(va.$key).toBe("FOOO");
         expect(va.toString).toHaveBeenCalled();
       });
-    });// end #$key
+    });
 
-    describe("#equals", function() {
+    // region equality
+    describe("#equals(other)", function() {
+
       it("should return `true` if given the same value", function() {
         var va = new Value();
 
@@ -265,18 +347,66 @@ define([
         expect(va.equals(undefined)).toBe(false);
       });
 
-      it("should call type._isEqual if not the same value and the other is not null", function() {
+      it("should call #_equals if not the same value and the other is not null", function() {
         var va = new Value();
         var vb = new Value();
 
-        spyOn(va.$type, "_isEqual").and.returnValue(false);
+        spyOn(va, "_equals").and.returnValue(false);
 
         expect(va.equals(vb)).toBe(false);
-        expect(va.$type._isEqual).toHaveBeenCalledWith(va, vb);
+        expect(va._equals).toHaveBeenCalledWith(vb);
       });
-    }); // end #equals
+    });
 
+    describe("#_equals(other)", function() {
+
+      it("should return `true` if two distinct values have the same constructor and the same key", function() {
+        var va = new Value();
+        var vb = new Value();
+
+        // Override/Redefine getter property
+        Object.defineProperty(va, "key", {value: "A"});
+        Object.defineProperty(vb, "key", {value: "A"});
+
+        expect(va.equals(vb)).toBe(true);
+      });
+
+      it("should return `false` if two distinct values have different constructors and the same key", function() {
+        var Value2 = Value.extend();
+        var va = new Value();
+        var vb = new Value2();
+
+        // Override/Redefine getter property
+        Object.defineProperty(va, "key", {value: "A"});
+        Object.defineProperty(vb, "key", {value: "A"});
+
+        expect(va.equals(vb)).toBe(false);
+      });
+
+      it("should return `false` if two distinct values have the same constructor and different keys", function() {
+        var va = new Value();
+        var vb = new Value();
+
+        // Override/Redefine getter property
+        Object.defineProperty(va, "$key", {value: "A"});
+        Object.defineProperty(vb, "$key", {value: "B"});
+
+        expect(va.equals(vb)).toBe(false);
+      });
+    });
+
+    describe("#equalsContent(other)", function() {
+
+      it("should return false", function() {
+
+        expect(new Value().equalsContent(null)).toBe(false);
+      });
+    });
+    // endregion
+
+    // region configure
     describe("#configure(config)", function() {
+
       it("should call #_configure if config is non-nully", function() {
         var va = new Value();
 
@@ -310,11 +440,34 @@ define([
         expect(va._configure).not.toHaveBeenCalled();
       });
 
-      it("should return this", function() {
+      it("should not call #_configure if the given config is this", function() {
         var va = new Value();
-        expect(va.configure({})).toBe(va);
-        expect(va.configure(null)).toBe(va);
+        spyOn(va, "_configure");
+
+        var config = va;
+        va.configure(config);
+        expect(va._configure).not.toHaveBeenCalled();
       });
-    }); // end #configure
+    });
+
+    describe("#_configure(config)", function() {
+
+      it("should do nothing if type is not read-only", function() {
+
+        var va = new Value();
+        va._configure({});
+      });
+
+      it("should throw if type is read-only", function() {
+
+        spyOnProperty(Value.type, "isReadOnly", "get").and.returnValue(true);
+
+        var va = new Value();
+        expect(function() {
+          va._configure({});
+        }).toThrowError(TypeError);
+      });
+    });
+    // endregion
   });
 });

@@ -21,9 +21,9 @@ define([
 
   "use strict";
 
-  /* global describe:true, it:true, expect:true, beforeEach:true*/
+  /* global describe:true, it:true, expect:true, beforeAll:true*/
 
-  describe("pentaho.type.Simple -", function() {
+  describe("pentaho.type.Simple", function() {
 
     var context;
     var Element;
@@ -37,8 +37,8 @@ define([
 
     function constructWithValue(spec) {
       if(spec != null) {
-        var simpleType = new Simple(spec);
-        expect(simpleType.value).toBe(spec);
+        var simple = new Simple(spec);
+        expect(simple.value).toBe(spec);
       } else {
         expectThrow(spec, errorMatch.argRequired("value"));
       }
@@ -51,9 +51,9 @@ define([
       }
 
       if(v != null) {
-        var simpleType = new Simple(spec);
-        expect(simpleType.value).toBe(v);
-        expect(simpleType.formatted).toBe(f);
+        var simple = new Simple(spec);
+        expect(simple.value).toBe(v);
+        expect(simple.formatted).toBe(f);
       } else {
         expectThrow(spec, errorMatch.argRequired("value"));
       }
@@ -62,14 +62,14 @@ define([
     }
 
     function constructWithSimple(value, formatted) {
-      var spec = new Simple(constructWithObject(value, formatted));
-      var simpleType = new Simple(spec);
+      var other = new Simple(constructWithObject(value, formatted));
+      var simple = new Simple(other);
 
-      expect(simpleType.value).toBe(value);
-      expect(simpleType.formatted).toBe(formatted);
+      expect(simple.value).toBe(value);
+      expect(simple.formatted).toBe(formatted);
     }
 
-    beforeEach(function(done) {
+    beforeAll(function(done) {
       Context.createAsync()
           .then(function(_context) {
             context = _context;
@@ -88,7 +88,8 @@ define([
     });
 
     describe("new Simple() -", function() {
-      it("Creating with a Object", function() {
+
+      it("creating with a Object", function() {
         constructWithObject();
         constructWithObject(null);
         constructWithObject(true, "true");
@@ -96,13 +97,13 @@ define([
         constructWithObject("simple", "simple");
       });
 
-      it("Creating with other Simple", function() {
+      it("creating with other Simple", function() {
         constructWithSimple(true, "true");
         constructWithSimple(123, "123");
         constructWithSimple("simple", "Simple");
       });
 
-      it("Creating with a value", function() {
+      it("creating with a value", function() {
         constructWithValue();
         constructWithValue(null);
         constructWithValue(true);
@@ -112,8 +113,8 @@ define([
       });
     });
 
-    describe("#clone -", function() {
-      it("The cloned object should be equal to the original", function() {
+    describe("#clone()", function() {
+      it("should create an object which is equal to the original", function() {
         var original = new Simple(constructWithObject(true, "true"));
         var clone = original.clone();
 
@@ -123,154 +124,161 @@ define([
       });
     });
 
-    describe("#value -", function() {
-      var simpleType;
+    describe("#value", function() {
 
-      beforeEach(function() {
-        simpleType = new Simple(123);
-      });
-
-      function setValueExpectedThrow(value, errorMatch) {
-        expect(function() {
-          simpleType.value = value;
-        }).toThrow(errorMatch);
+      it("should throw when set", function() {
+        var simple = new Simple({value: 1, formatted: "One"});
 
         expect(function() {
-          simpleType.v = value;
-        }).toThrow(errorMatch);
-      }
-
-      it("Should return the given value in the constructor", function() {
-        expect(simpleType.value).toBe(123);
-      });
-
-      it("Cannot change the primitive value of a simple value", function() {
-        setValueExpectedThrow(456, errorMatch.argInvalid("value"));
-      });
-
-      it("Nothing should happen when setting the underlying primitive value with the same value", function() {
-        expect(function() {
-          simpleType.value = 123;
-        }).not.toThrow();
-        expect(simpleType.value).toBe(123);
-      });
-
-      it("Simple value cannot contain null", function() {
-        setValueExpectedThrow(null, errorMatch.argRequired("value"));
+          simple.value = 1;
+        }).toThrowError(TypeError);
       });
     });
 
-    describe("#formatted -", function() {
-      var simpleType;
-      beforeEach(function() {
-        simpleType = new Simple(123);
+    describe("#formatted", function() {
+
+      it("should default to null", function() {
+        var simple = new Simple({value: 1});
+        expect(simple.formatted).toBe(null);
       });
 
-      function testNullValue(value) {
-        simpleType.formatted = value;
-        expect(simpleType.formatted).toBe(null);
-        simpleType.f = value;
-        expect(simpleType.formatted).toBe(null);
-      }
-
-      function testFormattedValue(value) {
-        simpleType.formatted = value;
-        expect(simpleType.formatted).toBe(value);
-        simpleType.f = value + "f";
-        expect(simpleType.formatted).toBe(value + "f");
-      }
-
-      it("Should return null if set with nully or empty values", function() {
-        testNullValue(null);
-        testNullValue(undefined);
-        testNullValue("");
+      it("should respect a specified non-empty value", function() {
+        var simple = new Simple({value: 1, formatted: "One"});
+        expect(simple.formatted).toBe("One");
       });
 
-      it("Should return the formatted value if set with a non empty String", function() {
-        testFormattedValue("foobar");
+      it("should respect a specified non-empty value in the `f` property", function() {
+        var simple = new Simple({value: 1, f: "One"});
+        expect(simple.formatted).toBe("One");
+      });
+
+      it("should ignore `f` if `formatted` is specified", function() {
+        var simple = new Simple({value: 1, formatted: "One", f: "two"});
+        expect(simple.formatted).toBe("One");
+      });
+
+      it("should convert a specified empty or undefined value to null", function() {
+        var simple = new Simple({value: 1, formatted: ""});
+        expect(simple.formatted).toBe(null);
+
+        simple = new Simple({value: 1, formatted: undefined});
+        expect(simple.formatted).toBe(null);
+
+        simple = new Simple({value: 1, formatted: null});
+        expect(simple.formatted).toBe(null);
+      });
+
+      it("should convert a non-empty non-string value to a string", function() {
+        var simple = new Simple({value: 1, formatted: 123});
+        expect(simple.formatted).toBe("123");
+      });
+
+      it("should throw when set", function() {
+        var simple = new Simple({value: 1, formatted: "One"});
+
+        expect(function() {
+          simple.formatted = "One";
+        }).toThrowError(TypeError);
       });
     });
 
-    describe("#valueOf() -", function() {
-      it("Should return the given value in the constructor", function() {
+    describe("#valueOf()", function() {
+      it("should return the same value as `#value`", function() {
         var simpleType = new Simple(123);
         expect(simpleType.valueOf()).toBe(123);
       });
     });
 
-    describe("#toString() -", function() {
-      it("Should return the same value as formatted", function() {
+    describe("#toString()", function() {
+      it("should return the same value as formatted", function() {
         var simpleType = new Simple(constructWithObject(123, "123"));
         expect(simpleType.toString()).toBe(simpleType.formatted);
       });
 
-      it("Should return the value converted to a string if 'formatted' is not defined", function() {
+      it("should return the value converted to a string if 'formatted' is not defined", function() {
         var simpleType = new Simple(123);
         expect(simpleType.toString()).toBe("123");
       });
     });
 
-    describe("#$key -", function() {
-      it("Should convert the given value to a string", function() {
+    describe("#$key", function() {
+      it("should convert the `#value` to a string", function() {
         var simple1 = new Simple(123);
         expect(simple1.$key).toBe(String(123));
       });
     });
 
-    describe("#configure(config)", function() {
-      it("should configure the Simple when given a plain object", function() {
-        var simple1 = new Simple(123);
-        expect(simple1.formatted).toBe(null);
+    describe("#_equals(other)", function() {
 
-        simple1.configure({formatted: "ABC"});
+      it("should return true if the simple values have identical value properties", function() {
 
-        expect(simple1.formatted).toBe("ABC");
+        var valueA = new Simple({value: "a"});
+        var valueB = new Simple({value: "a"});
+
+        expect(valueA._equals(valueB)).toBe(true);
       });
 
-      it("should configure the Simple when given another Simple of equal value", function() {
-        var simple1 = new Simple(123);
-        var simple2 = new Simple({v: 123, f: "ABC"});
+      it("should return false if the simple values do not have identical value properties", function() {
 
-        simple1.configure(simple2);
+        var valueA = new Simple({value: "a"});
+        var valueB = new Simple({value: "b"});
 
-        expect(simple1.formatted).toBe("ABC");
-      });
-
-      it("should throw when given another Simple of different value", function() {
-        expect(function() {
-          var simple1 = new Simple(123);
-          var simple2 = new Simple({v: 234, f: "ABC"});
-
-          simple1.configure(simple2);
-
-        }).toThrow(errorMatch.argInvalid("value"));
-      });
-
-      it("should throw when not given a plain object or another Simple", function() {
-        expect(function() {
-          var simple1 = new Simple(123);
-          simple1.configure("foo");
-        }).toThrow(errorMatch.argInvalidType("config", ["Object", "pentaho.type.Simple"], "string"));
-
-        expect(function() {
-          var simple1 = new Simple(123);
-          simple1.configure(new Date());
-        }).toThrow(errorMatch.argInvalidType("config", ["Object", "pentaho.type.Simple"], "object"));
-      });
-
-      it("should do nothing when given itself", function() {
-        // dummy test
-        var simple1 = new Simple(123);
-        simple1.configure(simple1);
-        expect(simple1.value).toBe(123);
+        expect(valueA._equals(valueB)).toBe(false);
       });
     });
 
-    describe(".Type -", function() {
+    describe("#equalsContent(other)", function() {
+
+      it("should return true if the simple values have identical formatted properties", function() {
+
+        var valueA = new Simple({value: "a", formatted: "A"});
+        var valueB = new Simple({value: "a", formatted: "A"});
+
+        expect(valueA.equalsContent(valueB)).toBe(true);
+      });
+
+      it("should return false if the simple values do not have identical formatted properties", function() {
+
+        var valueA = new Simple({value: "a", formatted: "A"});
+        var valueB = new Simple({value: "a", formatted: "AA"});
+
+        expect(valueA.equalsContent(valueB)).toBe(false);
+      });
+    });
+
+    describe("#_compare(other)", function() {
+
+      it("should delegate to $type.comparePrimitiveValues of their value properties", function() {
+
+        var valueA = new Simple({value: "a"});
+        var valueB = new Simple({value: "b"});
+
+        spyOn(Simple.type, "comparePrimitiveValues");
+
+        valueA._compare(valueB);
+
+        expect(Simple.type.comparePrimitiveValues).toHaveBeenCalledTimes(1);
+        expect(Simple.type.comparePrimitiveValues).toHaveBeenCalledWith("a", "b");
+      });
+
+      it("should return what $type.comparePrimitiveValues returns", function() {
+
+        var valueA = new Simple({value: "a"});
+        var valueB = new Simple({value: "b"});
+
+        spyOn(Simple.type, "comparePrimitiveValues").and.returnValue(-Infinity);
+
+        var result = valueA._compare(valueB);
+
+        expect(result).toBe(-Infinity);
+      });
+    });
+
+    describe(".Type", function() {
 
       var ElemType;
 
-      beforeEach(function() {
+      beforeAll(function() {
         ElemType = Simple.Type;
       });
 
@@ -285,6 +293,18 @@ define([
       describe("#isSimple", function() {
         it("should have `isSimple` equal to `true`", function() {
           expect(Simple.type.isSimple).toBe(true);
+        });
+      });
+
+      describe("#isReadOnly", function() {
+        it("should return the value `false`", function() {
+          expect(Simple.type.isReadOnly).toBe(true);
+        });
+      });
+
+      describe("#isEntity", function() {
+        it("should return the value `true`", function() {
+          expect(Simple.type.isEntity).toBe(true);
         });
       });
 
@@ -325,6 +345,7 @@ define([
       });
 
       describe("#toValue(value)", function() {
+
         function expectCastError(type, value, errorMatch) {
           expect(function() {
             type.toValue(value);
@@ -380,6 +401,136 @@ define([
           expect(function() {
             Derived.type.toValue({});
           }).toThrow(error);
+        });
+      });
+
+      describe("#comparePrimitiveValues(valueA, valueB)", function() {
+
+        it("should sort strings lexicographically", function() {
+          var result = ["2", "10"].sort(Simple.type.comparePrimitiveValues.bind(Simple.type));
+
+          expect(result).toEqual(["10", "2"]);
+        });
+
+        it("should sort numbers numerically", function() {
+
+          var result = [2, 20, 10].sort(Simple.type.comparePrimitiveValues.bind(Simple.type));
+
+          expect(result).toEqual([2, 10, 20]);
+        });
+      });
+
+      describe("#hasNormalizedInstanceSpecKeyData(instSpec)", function() {
+
+        it("should return true if the instSpec has a non-undefined value property", function() {
+
+          var result = Simple.type.hasNormalizedInstanceSpecKeyData({value: 1});
+          expect(result).toBe(true);
+        });
+
+        it("should return true if the instSpec has a non-undefined v property", function() {
+
+          var result = Simple.type.hasNormalizedInstanceSpecKeyData({v: 1});
+          expect(result).toBe(true);
+        });
+
+        it("should return false if the instSpec has an undefined value property", function() {
+
+          var result = Simple.type.hasNormalizedInstanceSpecKeyData({value: undefined});
+          expect(result).toBe(false);
+        });
+
+        it("should return false if the instSpec has an undefined v property", function() {
+
+          var result = Simple.type.hasNormalizedInstanceSpecKeyData({v: undefined});
+          expect(result).toBe(false);
+        });
+
+        it("should return false if the instSpec has no value or v property", function() {
+
+          var result = Simple.type.hasNormalizedInstanceSpecKeyData({foo: true});
+          expect(result).toBe(false);
+        });
+      });
+
+      describe("#_normalizeInstanceSpec(instSpec)", function() {
+
+        it("should return a plain object directly", function() {
+          var instSpec = {};
+          var result = Simple.type._normalizeInstanceSpec(instSpec);
+          expect(result).toBe(instSpec);
+        });
+
+        it("should return a spec when given a simple", function() {
+          var instSpec = new Simple({value: 1, formatted: "one"});
+          var result = Simple.type._normalizeInstanceSpec(instSpec);
+          expect(result).toEqual({value: 1, formatted: "one"});
+        });
+
+        it("should return a wrapped value when given something else", function() {
+          var instSpec = 1;
+          var result = Simple.type._normalizeInstanceSpec(instSpec);
+          expect(result).toEqual({value: 1});
+        });
+      });
+
+      describe("#createLike(value, instSpec)", function() {
+
+        it("should create a simple instance of the same type", function() {
+          var Simple2 = Simple.extend();
+
+          var value = new Simple2({value: 1, formatted: "one"});
+          var instSpec = {};
+          var result = Simple.type.createLike(value, instSpec);
+          expect(result).not.toBe(value);
+          expect(result instanceof Simple2).toBe(true);
+        });
+
+        it("should create a simple with the same value", function() {
+          var value = new Simple({value: 1, formatted: "one"});
+          var instSpec = {};
+          var result = Simple.type.createLike(value, instSpec);
+          expect(result.value).toBe(1);
+        });
+
+        describe("when instSpec contains a defined formatted", function() {
+
+          it("should create a simple with instSpec.formatted", function() {
+            var value = new Simple({value: 1, formatted: "one"});
+            var instSpec = {value: 1, formatted: "ONE"};
+            var result = Simple.type.createLike(value, instSpec);
+            expect(result.formatted).toBe("ONE");
+          });
+        });
+
+        describe("when instSpec contains a defined f", function() {
+
+          it("should create a simple with instSpec.f", function() {
+            var value = new Simple({value: 1, formatted: "one"});
+            var instSpec = {value: 1, f: "ONE"};
+            var result = Simple.type.createLike(value, instSpec);
+            expect(result.formatted).toBe("ONE");
+          });
+        });
+
+        describe("when instSpec does not contain a defined formatted or f", function() {
+
+          it("should create a simple with value.formatted", function() {
+            var value = new Simple({value: 1, formatted: "one"});
+            var instSpec = {value: 1};
+            var result = Simple.type.createLike(value, instSpec);
+            expect(result.formatted).toBe("one");
+          });
+        });
+
+        describe("when instSpec contains both defined formatted and f", function() {
+
+          it("should create a simple with instSpec.formatted", function() {
+            var value = new Simple({value: 1, formatted: "one"});
+            var instSpec = {value: 1, formatted: "ONE", f: "TWO"};
+            var result = Simple.type.createLike(value, instSpec);
+            expect(result.formatted).toBe("ONE");
+          });
         });
       });
     });

@@ -400,17 +400,6 @@ define([
 
               assertIsInvalid(model);
             });
-
-            it("should be invalid when a mapping has duplicate names", function() {
-
-              var model = createFullValidQualitativeMapping();
-
-              var containedField = model.propRole.fields.at(0);
-
-              model.propRole.fields.add(containedField.clone());
-
-              assertIsInvalid(model);
-            });
           });
         }
       });

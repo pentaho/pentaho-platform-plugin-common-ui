@@ -95,7 +95,8 @@ define([
         var v = this.get("value");
         var s = this.get("anchorStart");
         var e = this.get("anchorEnd");
-        return (this.property || "") + " " + (v ? v.$key : "") + " " + (s ? s.$key : "") + " " + (e ? e.$key : "");
+        return (this.property || "") +
+          " " + (v ? v.$contentKey : "") + " " + (s ? s.$key : "") + " " + (e ? e.$key : "");
       },
 
       $type: /** @lends pentaho.data.filter.IsLike.Type# */{
@@ -107,22 +108,19 @@ define([
             nameAlias: "v",
             valueType: "element",
             isRequired: true,
-            isReadOnly: true,
             isBoundary: true
           },
           {
             name: "anchorStart",
             nameAlias: "s",
             valueType: "boolean",
-            defaultValue: false,
-            isReadOnly: true
+            defaultValue: false
           },
           {
             name: "anchorEnd",
             nameAlias: "e",
             valueType: "boolean",
-            defaultValue: false,
-            isReadOnly: true
+            defaultValue: false
           }
         ]
       }

@@ -71,19 +71,6 @@ define([
         },
 
         /**
-         * Gets the (immutable) key of the external mapping.
-         *
-         * The key is the value of the [name]{@link pentaho.visual.role.ExternalMapping#name} property.
-         *
-         * @type {string}
-         * @readOnly
-         * @override
-         */
-        get $key() {
-          return this.name;
-        },
-
-        /**
          * Resets any existing data or mapping related cached information.
          *
          * Called by the containing abstract model whenever its data or visual role properties change.

@@ -7,11 +7,17 @@
   },
   "rules": {
     "indent": ["error", 2, {
+      "VariableDeclarator": {
+        "var": 2,
+        "let": 2,
+        "const": 3
+      },
       "SwitchCase": 1,
       "flatTernaryExpressions": true,
       "MemberExpression": "off",
       "FunctionDeclaration": {"parameters": "first"},
-      "FunctionExpression": {"parameters": "first"}
+      "FunctionExpression": {"parameters": "first"},
+      "CallExpression": {"arguments": "first"}
     }],
     "no-warning-comments": 0,
     "no-unneeded-ternary": ["error", {"defaultAssignment": false}],
@@ -63,7 +69,19 @@
     "padded-blocks": "off",
     "quotes": ["error", "double", { "avoidEscape": true }],
     "object-curly-spacing": ["error", "never"],
-    "block-scoped-var": 0
+    "block-scoped-var": 0,
+    "consistent-return": "warn",
+    "capitalized-comments": ["warn", "always", {
+      "ignoreInlineComments": true,
+      "ignoreConsecutiveComments": true,
+      "ignorePattern": "region|endregion|assert|noinspection|end|break|null|undefined|nully"
+    }],
+    "newline-per-chained-call": ["error", {"ignoreChainWithDepth": 2}],
+    "padding-line-between-statements": ["error",
+      {"blankLine": "always", "prev": "block-like", "next": "return"},
+      {"blankLine": "always", "prev": "directive", "next": "*"},
+      {"blankLine": "any",    "prev": "directive", "next": "directive"}
+    ]
   },
   "globals": {
     "inject": true,

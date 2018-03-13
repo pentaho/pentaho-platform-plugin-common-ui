@@ -135,12 +135,12 @@ define([
       });
     }); // #toSpec
 
-    describe("#contentKey", function() {
+    describe("#$contentKey", function() {
 
       it("should return '(false)'", function() {
         var filter  = new FalseFilter();
 
-        expect(filter.contentKey).toBe("(false)");
+        expect(filter.$contentKey).toBe("(false)");
       });
     });
   }); // pentaho.data.filter.False

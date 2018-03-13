@@ -17,13 +17,12 @@ define([
   "./util",
   "./ValidationError",
   "../i18n!types",
-  "../lang/_AnnotatableLinked",
   "../util/arg",
   "../util/error",
   "../util/object",
   "../util/text",
   "../util/fun"
-], function(typeUtil, ValidationError, bundle, AnnotatableLinked, arg, error, O, text, F) {
+], function(typeUtil, ValidationError, bundle, arg, error, O, text, F) {
 
   "use strict";
 
@@ -76,9 +75,6 @@ define([
 
     var Property = Instance.extend(/** @lends pentaho.type.Property# */{
 
-      // TODO: value, members?
-      // TODO: p -> AnnotatableLinked.configure(this, config);
-
       $type: /** @lends pentaho.type.Property.Type# */{
         // Note: constructor/_init is only called on sub-classes of Property.Type,
         // and not on Property.Type itself.
@@ -106,7 +102,7 @@ define([
          * @type string[]
          * @ignore
          */
-        extend_order: ["name", "label", "type"],
+        extend_order: ["name", "label", "valueType"],
 
         /**
          * Gets a value that indicates if the type is under construction.
@@ -144,6 +140,8 @@ define([
 
           // Abstract Property types don't yet have an associated declaringType.
           // e.g. Property.extend()
+          var valueType = spec.valueType;
+
           var declaringType = keyArgs && keyArgs.declaringType;
           if(declaringType) {
             if(declaringType.context !== context)
@@ -155,12 +153,26 @@ define([
               O.setConst(this, "__index", keyArgs.index || 0);
 
               // Required stuff
-              if(!("name" in spec)) this.name = null; // throws
+              if(!("name" in spec)) {
+                this.name = null;
+              } // Throws
+
+              // Must be set before valueType, because if read-only, so must be the value type.
+              this.__setIsReadOnly(declaringType.isReadOnly || spec.isReadOnly);
 
               // Assume the _default_ type _before_ extend, to make sure `defaultValue` can be validated against it.
-              if(!spec.valueType && (this.__valueType === __propType.__valueType))
-                this.valueType = _defaultTypeMid;
+              if(!valueType && (this.__valueType === __propType.__valueType)) {
+                valueType = _defaultTypeMid;
+              }
             }
+          } else if(this.declaringType === null) {
+            // Defining a still detached property type.
+
+            this.__setIsReadOnly(spec.isReadOnly);
+          }
+
+          if(valueType != null) {
+            this.__setValueType(valueType);
           }
 
           return spec;
@@ -172,6 +184,11 @@ define([
           this.base.apply(this, arguments);
 
           if(this.isRoot) {
+            // If we ended up inheriting the valueType, must be sure.
+            if(!O.hasOwn(this, "__valueType")) {
+              this.__assertValueTypeReadOnlyConsistent(this.valueType);
+            }
+
             if(!this._isLabelSet) { this.label = null; }
 
             this.__createValueAccessor();
@@ -269,6 +286,7 @@ define([
           return this.__name;
         },
 
+        // TODO: simplify code, by removing the setter.
         set name(value) {
           value = __nonEmptyString(value);
 
@@ -315,6 +333,7 @@ define([
           return this.__nameAlias;
         },
 
+        // TODO: simplify code, by removing the setter.
         set nameAlias(value) {
           if(!this.isRoot)
             throw new TypeError("The 'nameAlias' attribute can only be assigned to a root property.");
@@ -343,24 +362,42 @@ define([
         },
         // endregion
 
-        // region (value) element type attribute
+        // region isReadOnly attribute
+        __isReadOnly: false,
+
         /**
-         * The base element type of the _singular_ values that the property can hold.
+         * Gets whether the value of properties of this type cannot be changed, from the outside.
          *
-         * When the property is a list property,
-         * that list type's element type,
-         * {@link pentaho.type.List.Type#of},
-         * is returned.
+         * If the _value type_ is a [list]{@link pentaho.type.Value.Type#isList} type,
+         * then this property effectively makes the list read-only.
          *
-         * Otherwise,
-         * {@link pentaho.type.Property.type} is returned.
+         * This attribute can only be set when defining a root property or an abstract property type.
          *
-         * @type {!pentaho.type.Element.Type}
-         * @readonly
+         * When the property belongs to a [read-only]{@link pentaho.type.Value.Type#isReadOnly} complex type,
+         * then the property is necessarily read-only,
+         * as well as the [element type]{@link pentaho.type.Type#elementType} of the property's
+         * [value type]{@link pentaho.type.Property.Type#valueType}.
+         *
+         * The default _read-only_ value of `false`.
+         *
+         * @type {boolean}
+         *
+         * @see pentaho.type.Value.Type#isReadOnly
+         * @see pentaho.type.Property.Type#valueType
          */
-        get elemType() {
-          var valueType = this.__valueType;
-          return valueType.isList ? valueType.of : valueType;
+        get isReadOnly() {
+          return this.__isReadOnly;
+        },
+
+        /**
+         * Sets the `isReadOnly` property value.
+         * @param {any} value - The new value.
+         * @private
+         */
+        __setIsReadOnly: function(value) {
+          if(!this.__isReadOnly && value) {
+            O.setConst(this, "__isReadOnly", true);
+          }
         },
         // endregion
 
@@ -370,60 +407,60 @@ define([
         __valueType: undefined,
 
         /**
-         * Gets or sets the type of value that properties of this type can hold.
+         * Gets the type of value that properties of this type can hold.
          *
          * If the _value type_ is a [list]{@link pentaho.type.Value.Type#isList} type,
          * then this property will be a _list_ (or multiple-elements) property;
          * otherwise, this property will be an _element_ (or single-element) property.
          *
-         * ### Get
-         *
          * The _default value type_ is the _inherited value type_.
          *
          * A root _property type_ has a default _value type_ of [string]{@link pentaho.type.String}.
          *
-         * ### Set
+         * This attribute can only be specified upon property definition.
          *
-         * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants} properties,
-         * an error is thrown.
+         * When a {@link Nully} value is specified, it is ignored.
          *
-         * When set to a {@link Nully} value, the set operation is ignored.
-         *
-         * Otherwise, the set value is assumed to be an [spec.UTypeReference]{@link pentaho.type.spec.UTypeReference}
+         * Otherwise, the specified value is assumed to be an
+         * [spec.UTypeReference]{@link pentaho.type.spec.UTypeReference}
          * and is first resolved using [this.context.get]{@link pentaho.type.Context#get}.
          *
-         * When set to a _value type_ that is _not_ a
-         * [subtype]{@link pentaho.type.Type#isSubtypeOf} of the attribute's current _value type_,
-         * an error is thrown.
+         * An error is thrown
+         * when the specified value is _not_ a [subtype]{@link pentaho.type.Type#isSubtypeOf} of
+         * the attribute's current _value type_.
+         *
+         * An error is thrown
+         * when the specified value is such that its
+         * [element type]{@link pentaho.type.Type#elementType}
+         * would not be read-only and
+         * the property belongs to a [read-only]{@link pentaho.type.Value.Type#isReadOnly} complex type.
          *
          * ### Relation to the `defaultValue` attribute
          *
-         * When set and the [defaultValue]{@link pentaho.type.Property.Type#defaultValue} attribute
-         * is not _locally_ set, it is set to `null`, blocking inheritance.
-         *
-         * Otherwise, if it is locally set, it is checked against the new _value type_,
-         * and set to `null`, if it's not an instance of it.
+         * When specified, any inherited [defaultValue]{@link pentaho.type.Property.Type#defaultValue} is ignored.
          *
          * @type {!pentaho.type.Value.Type}
          *
-         * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
-         * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
-         * @throws {pentaho.lang.OperationInvalidError} When setting on an existing property from configuration.
-         * @throws {pentaho.lang.ArgumentInvalidError} When setting to a _value type_ that is not a subtype
-         * of the current _value type_.
-         *
          * @see pentaho.type.spec.IPropertyTypeProto#valueType
+         * @see pentaho.type.Type#elementType
+         * @see pentaho.type.Value.Type#isReadOnly
          */
         get valueType() {
           return this.__valueType;
         },
 
-        set valueType(value) {
-          if(this.hasDescendants)
-            throw error.operInvalid("Cannot change the value type of a property type that has descendants.");
-
-          if(!this.__isConstructing && context.isConfiguring)
-            throw error.operInvalid("Cannot change the value type of an existing property type from configuration.");
+        /**
+         * Sets the value type of the property.
+         *
+         * @param {pentaho.type.spec.UTypeReference} value - A value type reference.
+         *
+         * @throws {pentaho.lang.ArgumentInvalidError} When setting to a _value type_ that is not a subtype
+         * of the inherited _value type_.
+         *
+         * @throws {pentaho.lang.ArgumentInvalidError} When setting and the corresponding _element type_ would not
+         * be read-only and the declaring complex type is read-only.
+         */
+        __setValueType: function(value) {
 
           if(value == null) return;
 
@@ -433,20 +470,45 @@ define([
           var defaultBaseType = this.isRoot ? O.getOwn(this, "__valueType") : oldType;
           var newType = context.get(value, {defaultBase: defaultBaseType}).type;
           if(newType !== oldType) {
-            // Hierarchy/PreviousValue consistency
+
+            // Hierarchy consistency
             if(oldType && !newType.isSubtypeOf(oldType))
-              throw error.argInvalid("valueType", bundle.structured.errors.property.typeNotSubtypeOfBaseType);
+              throw error.argInvalid("valueType", bundle.structured.errors.property.valueTypeNotSubtypeOfBaseType);
+
+            // Read-only consistency
+            this.__assertValueTypeReadOnlyConsistent(newType);
 
             this.__valueType = newType;
 
-            // Don't inherit the default value if valueType is local.
-            // Don't preserve the default value if it no longer is an instance of valueType.
-            // When dv is a function, do not take the change as well.
-            var dv;
-            if(!O.hasOwn(this, "__defaultValue") ||
-               (((dv = this.__defaultValue) != null) && !newType.is(dv))) {
-              this.__defaultValue = null;
-              this.__defaultValueFun  = null;
+            // Don't inherit default value if valueType is local.
+            // Locally, default value is always set after valueType.
+            this.__defaultValue = null;
+            this.__defaultValueFun  = null;
+          }
+        },
+
+        /**
+         * Asserts that a given value type is consistent with the `isReadOnly` status of the declaring type.
+         *
+         * @param {pentaho.type.Value.Type} valueType - The value type.@
+         *
+         * @throws {pentaho.lang.ArgumentInvalidError} When the _element type_ corresponding to the given
+         * value type would not be read-only and the declaring complex type is read-only.
+         */
+        __assertValueTypeReadOnlyConsistent: function(valueType) {
+
+          this.__needReadOnlyElementValidation = false;
+
+          var declaringType = this.declaringType;
+          if(declaringType !== null && declaringType.isReadOnly) {
+            var elementType = valueType.elementType;
+            if(!valueType.elementType.isReadOnly) {
+              if(elementType.isAbstract) {
+                // When abstract, validation needs to be performed on each property instance.
+                this.__needReadOnlyElementValidation = true;
+              } else {
+                throw error.argInvalid("valueType", bundle.structured.errors.property.valueTypeNotReadOnly);
+              }
             }
           }
         },
@@ -490,7 +552,7 @@ define([
          * causing it to assume its default value (yes, the default value of the _default value_ attribute...):
          *
          * * for [root]{@link pentaho.type.Type#root} _property types_ or
-         *   properties with a locally set [valueType]{@link pentaho.type.Property.Type#defaultValue},
+         *   properties with a locally specified [valueType]{@link pentaho.type.Property.Type#defaultValue},
          *   the default value is `null`
          * * for other _property types_, the default value is the _inherited value_.
          *
@@ -520,8 +582,8 @@ define([
         },
 
         set defaultValue(value) {
-          if(this.hasDescendants)
-            throw error.operInvalid("Cannot change the default value of a property type that has descendants.");
+
+          this._assertNoSubtypesAttribute("defaultValue");
 
           if(value === undefined) {
             if(this !== __propType) {
@@ -540,7 +602,7 @@ define([
             if(value === null) {
               defaultValueFun = null;
             } else if(F.is(value)) {
-              // wrap it with cast function
+              // Wrap it with cast function.
               defaultValueFun = function propertyDefaultValue(propType) {
                 return propType.toValueOn(null, value.apply(this, arguments));
               };
@@ -583,10 +645,24 @@ define([
             return this.__valueType.create(valueSpec, this.__listCreateKeyArgs || this.__buildListCreateKeyArgs());
           }
 
+          // ---
+
+          var value;
           if(valueSpec == null) {
-            return defaultValueOwner ? this.defaultValueOn(defaultValueOwner) : null;
+            value = defaultValueOwner ? this.defaultValueOn(defaultValueOwner) : null;
+          } else {
+            value = this.__valueType.to(valueSpec);
           }
-          return this.__valueType.to(valueSpec);
+
+          if(value !== null && this.__needReadOnlyElementValidation) {
+            // When property.valueType is abstract,
+            // validation needs to be performed on each property instance.
+            if(!value.$type.isReadOnly) {
+              throw new TypeError("Property '" + this.label + "' requires a value of a read-only type.");
+            }
+          }
+
+          return value;
         },
 
         /**
@@ -601,8 +677,8 @@ define([
           var dv = this.__defaultValueFun;
 
           return dv
-              ? dv.call(owner, this)
-              : (this.isList ? this.__valueType.create(null) : dv);
+            ? dv.call(owner, this)
+            : (this.isList ? this.__valueType.create(null) : dv);
         },
 
         __listCreateKeyArgs: null,
@@ -610,7 +686,8 @@ define([
         __buildListCreateKeyArgs: function() {
           return (this.__listCreateKeyArgs = {
             isBoundary: this.__isBoundary,
-            isReadOnly: this.__isReadOnly
+            isReadOnly: this.__isReadOnly,
+            needReadOnlyElementValidation: this.__needReadOnlyElementValidation
           });
         },
         // endregion
@@ -628,59 +705,6 @@ define([
         _getLabelDefault: function() {
           if(this.isRoot) {
             return text.titleFromName(this.name);
-          }
-
-          // return undefined;
-        },
-        // endregion
-
-        // region isReadOnly attribute
-        // TODO: shouldn't this only be settable on the root property??
-        __isReadOnly: false,
-
-        /**
-         * Gets or sets whether the value of properties of this type can be changed.
-         *
-         * If the _value type_ is a [list]{@link pentaho.type.Value.Type#isList} type,
-         * then this property effectively makes the list read-only.
-         *
-         * ### Get
-         *
-         * The _default read-only_ value is the _inherited read-only_ value.
-         *
-         * A root _property type_ has a default _read-only_ value of `false`.
-         *
-         * ### Set
-         *
-         * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants} properties,
-         * an error is thrown.
-         *
-         * When set to a {@link Nully} value, the set operation is ignored.
-         *
-         * Otherwise, the set value is converted to boolean, by using {@link Boolean}.
-         *
-         * This property is monotonic. Once set to `true`, it can no longer be set to `false`.
-         *
-         * @type {boolean}
-         *
-         * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
-         * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
-         */
-        get isReadOnly() {
-          return this.__isReadOnly;
-        },
-
-        set isReadOnly(value) {
-          // Cannot change the root value.
-          // Testing this here, instead of after the descendants test,
-          // because, otherwise, it would be very hard to test.
-          if(this === __propType) return;
-
-          if(this.hasDescendants)
-            throw error.operInvalid("Cannot change the isReadOnly attribute of a property type that has descendants.");
-
-          if(value != null && !!value) {
-            this.__isReadOnly = true;
           }
         },
         // endregion
@@ -744,8 +768,7 @@ define([
           if(!this.isRoot)
             throw error.operInvalid("Cannot only change the isBoundary attribute on a root property type.");
 
-          if(this.hasDescendants)
-            throw error.operInvalid("Cannot change the isBoundary attribute of a property type that has descendants.");
+          this._assertNoSubtypesAttribute("isBoundary");
 
           if(value != null) {
             this.__isBoundary = !!value;
@@ -884,6 +907,7 @@ define([
               }
             }
           }
+
           return errors;
         },
 
@@ -908,7 +932,7 @@ define([
 
           if(!keyArgs) keyArgs = {};
 
-          // no id and no base
+          // No id and no base.
           var spec = {};
           var baseType;
 
@@ -959,7 +983,7 @@ define([
                 count++;
               }
             }
-            // else
+            // Else
             // Non-abstract, non-root property types
             // have `base` always equal to the _declaring type's base type_ corresponding property type,
             // so it is never included.
@@ -1002,10 +1026,16 @@ define([
                 keyArgs.declaredType = this.__valueType;
                 spec.defaultValue = defaultValue.toSpecInContext(keyArgs);
               }
-            } else if(!O.hasOwn(this, "__valueType")) { // resets defaultValue inheritance
+            } else if(!O.hasOwn(this, "__valueType")) { // Resets defaultValue inheritance.
               any = true;
               spec.defaultValue = null;
             }
+          }
+
+          var isReadOnly = O.getOwn(this, "__isReadOnly");
+          if(isReadOnly !== undefined) {
+            any = true;
+            spec.isReadOnly = isReadOnly;
           }
 
           return any;
@@ -1511,7 +1541,8 @@ define([
           return {min: countMin, max: countMax};
         }
       }
-    }).implement({
+    })
+    .implement({
       $type: /** @lends pentaho.type.Property.Type# */{
         // These are applied last so that mixins see any of the methods above as base implementations.
         mixins: [DiscreteDomain]
@@ -1521,7 +1552,7 @@ define([
     __propType = Property.type;
 
     // Root property valueType.
-    __propType.valueType = "value";
+    __propType.__setValueType("value");
 
     return Property;
   }];

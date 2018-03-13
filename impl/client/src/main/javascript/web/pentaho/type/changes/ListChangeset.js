@@ -219,7 +219,7 @@ define([
 
     /**
      * Decomposes the modifications into a set of operations and
-     * populates [#changes]{@link pentaho.type.changes.ListChangeset#_changes} with
+     * populates [_changes]{@link pentaho.type.changes.ListChangeset#_changes} with
      * the relevant [PrimitiveChange]{@link pentaho.type.changes.PrimitiveChange} objects.
      *
      * @param {any|Array} fragment - The element or elements to set.
@@ -233,23 +233,26 @@ define([
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
+     * @throws {TypeError} When a change would occur and the owner list
+     * is [read-only]{@link pentaho.type.List#$isReadOnly}.
+     *
      * @private
      * @internal
      * @friend pentaho.type.List
      */
     __set: function(fragment, add, update, remove, move, index) {
 
-      // TODO: don't convert elements twice (elemType.to)
-
       this._assertWritable();
 
-      var list = this.__projectedMock; // calculate relative the last change
+      var list = this.__projectedMock; // Calculate relative to the last change.
       var elems = list.__elems;
       var keys = list.__keys;
-      var elemType = this.owner.$type.of;
+      var elemType = this.owner.$type.elementType;
       var existing;
       var elem;
       var key;
+      var isOwnerReadOnly = this.owner.$isReadOnly;
+      var needReadOnlyElementValidation = this.owner.__needReadOnlyElementValidation;
 
       // Next insert index.
       // It will be corrected with the removes
@@ -263,9 +266,11 @@ define([
           : Math.min(index, elems.length);
       }
 
+      // TODO: why should we accept null elements? Do these mess up the indexes?
+
       var setElems = Array.isArray(fragment)
-            ? fragment.map(elemType.to, elemType)
-            : [elemType.to(fragment)];
+        ? fragment.map(elemType.to, elemType)
+        : [elemType.to(fragment)];
 
       // Index of elements in setElems, by key.
       // This is used to detect duplicate values and to efficiently
@@ -289,15 +294,27 @@ define([
         if((elem = setElems[i]) != null) {
           key = elem.$key;
 
-          var repeated = O.hasOwn(setKeys, key);
-
           if((existing = O.getOwn(keys, key))) {
-            if(update && existing !== elem && !existing.equalsContent(elem)) {
+            // Same "entity".
+
+            // Different instances and different content?
+            if(update && existing !== elem) {
+              // Preserve the existing one. Configure it with the new one.
               setKeys[key] = 2;
+
+              // This may create a new changeset, that gets hooked up into this.
+              var elem2 = existing.configureOrCreate(elem);
+              if(elem2 !== existing && add && remove) {
+                // Replace existing by elem.
+                setKeys[key] = 4;
+                newElements.push({value: elem2, to: newElements.length});
+              }
+
             } else {
+              // Same instances. Preserve. Don't remove.
               setKeys[key] = 1;
             }
-          } else if(!repeated && add) {
+          } else if(add && !O.hasOwn(setKeys, key)) { // If add && !repeated
             setKeys[key] = 3;
             newElements.push({value: elem, to: newElements.length});
           } else {
@@ -324,10 +341,15 @@ define([
         elem = elems[i];
         key = elem.$key;
 
-        if(!O.hasOwn(setKeys, key)) {
+        // Not present anymore, or is to be replaced by the new one.
+        if(!O.hasOwn(setKeys, key) || setKeys[key] === 4) {
           if(remove) {
             if(i < index) {
               --index;
+            }
+
+            if(isOwnerReadOnly) {
+              this.owner.__assertEditable();
             }
 
             this.__addChange(new Remove([elem], i - removeCount));
@@ -337,7 +359,7 @@ define([
             computed.push(key);
           }
         } else {
-          // baseIndex value is the lowest index
+          // The baseIndex value is the lowest index
           // of an already existing element
           if(baseIndex == null) {
             baseIndex = i - removeCount;
@@ -347,8 +369,8 @@ define([
         }
       }
 
-      // if not set above and adding elements, baseIndex
-      // value is the current corrected insertion index
+      // If not set above and adding elements, baseIndex
+      // value is the current corrected insertion index.
       if(baseIndex == null && newElements.length > 0) {
         baseIndex = index;
       }
@@ -362,44 +384,47 @@ define([
 
           var newIndex = index + action.to;
 
+          if(isOwnerReadOnly) {
+            this.owner.__assertEditable();
+          }
+
+          if(needReadOnlyElementValidation && !action.value.$type.isReadOnly) {
+            throw new TypeError("List requires elements of a read-only type.");
+          }
+
           this.__addChange(new Add(action.value, newIndex));
 
           computed.splice(newIndex, 0, action.value.$key);
         }
       }
 
-      // IV - Process moves and updates
+      // IV - Process moves
       var lastDestinationIndex = 0;
-      if(move || update) {
+      if(move) {
         i = -1;
         L = setElems.length;
         while(++i < L) {
           if((elem = setElems[i]) != null) {
             var currentIndex = computed.indexOf(elem.$key);
-            if(move) {
-              if(currentIndex < baseIndex) {
-                --baseIndex;
-              }
-
-              if(currentIndex < baseIndex + i || currentIndex < lastDestinationIndex) {
-                var destinationIndex = Math.max(baseIndex + i, lastDestinationIndex);
-
-                this.__addChange(new Move([elem], currentIndex, destinationIndex));
-
-                computed.splice(destinationIndex, 0, computed.splice(currentIndex, 1)[0]);
-
-                currentIndex = destinationIndex;
-              }
-
-              lastDestinationIndex = currentIndex;
+            if(currentIndex < baseIndex) {
+              --baseIndex;
             }
 
-            if(update && setKeys[elem.$key] === 2) {
-              existing = O.getOwn(keys, elem.$key);
+            if(currentIndex < baseIndex + i || currentIndex < lastDestinationIndex) {
+              var destinationIndex = Math.max(baseIndex + i, lastDestinationIndex);
 
-              // This may create a new changeset, that gets hooked up into this.
-              existing.configure(elem);
+              if(isOwnerReadOnly) {
+                this.owner.__assertEditable();
+              }
+
+              this.__addChange(new Move([elem], currentIndex, destinationIndex));
+
+              computed.splice(destinationIndex, 0, computed.splice(currentIndex, 1)[0]);
+
+              currentIndex = destinationIndex;
             }
+
+            lastDestinationIndex = currentIndex;
           }
         }
       }
@@ -413,6 +438,9 @@ define([
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
+     * @throws {TypeError} When a change would occur and the owner list
+     * is [read-only]{@link pentaho.type.List#$isReadOnly}.
+     *
      * @see pentaho.type.changes.Remove
      * @private
      * @internal
@@ -422,8 +450,8 @@ define([
 
       this._assertWritable();
 
-      var list = this.__projectedMock; // calculate relative to the last change
-      var elemType = this.owner.$type.of;
+      var list = this.__projectedMock; // Calculate relative to the last change.
+      var elemType = this.owner.$type.elementType;
       var elems = list.__elems;
       var keys = list.__keys;
       var removeElems = Array.isArray(fragment)
@@ -458,6 +486,8 @@ define([
       }
 
       if((L = removedInfos.length)) {
+
+        this.owner.__assertEditable();
 
         // II - Order descending so indexes keep valid
         removedInfos.sort(function(info1, info2) {
@@ -498,6 +528,9 @@ define([
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
+     * @throws {TypeError} When a change would occur and the owner list
+     * is [read-only]{@link pentaho.type.List#$isReadOnly}.
+     *
      * @see pentaho.type.changes.Remove
      * @private
      * @internal
@@ -507,7 +540,7 @@ define([
 
       this._assertWritable();
 
-      if(count < 0) return; // noop
+      if(count < 0) return; // Noop.
 
       var list = this.__projectedMock;
 
@@ -515,9 +548,11 @@ define([
 
       var L = list.__elems.length;
 
-      if(start >= L) return; // noop
+      if(start >= L) return; // Noop.
 
       if(start < 0) start = Math.max(0, L + start);
+
+      this.owner.__assertEditable();
 
       var removed = list.__elems.slice(start, start + count);
 
@@ -532,6 +567,9 @@ define([
      * @param {number} indexNew - The new index of the element.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
+     *
+     * @throws {TypeError} When a change would occur and the owner list
+     * is [read-only]{@link pentaho.type.List#$isReadOnly}.
      *
      * @see pentaho.type.changes.Move
      * @private
@@ -554,8 +592,12 @@ define([
 
         indexNew = indexNew < 0 ? Math.max(0, L + indexNew) : Math.min(indexNew, L);
 
-        if(indexOld !== indexNew)
+        if(indexOld !== indexNew) {
+
+          this.owner.__assertEditable();
+
           this.__addChange(new Move(elem, indexOld, indexNew));
+        }
       }
     },
 
@@ -567,6 +609,9 @@ define([
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
+     * @throws {TypeError} When a change would occur and the owner list
+     * is [read-only]{@link pentaho.type.List#$isReadOnly}.
+     *
      * @see pentaho.type.changes.Sort
      * @private
      * @internal
@@ -575,6 +620,8 @@ define([
     __sort: function(comparer) {
 
       this._assertWritable();
+
+      this.owner.__assertEditable();
 
       this.__addChange(new Sort(comparer));
     },
@@ -585,6 +632,9 @@ define([
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
+     * @throws {TypeError} When a change would occur and the owner list
+     * is [read-only]{@link pentaho.type.List#$isReadOnly}.
+     *
      * @see pentaho.type.changes.Clear
      * @private
      * @internal
@@ -593,6 +643,12 @@ define([
     __clear: function() {
 
       this._assertWritable();
+
+      if(this.owner.count === 0) {
+        return;
+      }
+
+      this.owner.__assertEditable();
 
       // See #__applyFrom
       this._lastClearIndex = this._changes.length;

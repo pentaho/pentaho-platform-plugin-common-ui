@@ -30,7 +30,7 @@ define([
   "../util/module",
   "./theme/model"
 ], function(localRequire, SpecificationScope, SpecificationContext, bundle, Base,
-    AnnotatableLinked, error, arg, O, F, promiseUtil, text, specUtil, moduleUtil) {
+            AnnotatableLinked, error, arg, O, F, promiseUtil, text, specUtil, moduleUtil) {
 
   "use strict";
 
@@ -200,7 +200,7 @@ define([
        * @type {number}
        * @readonly
        */
-      uid: -1, // set in _init
+      uid: -1, // Set in _init.
       // endregion
 
       // region root property
@@ -364,7 +364,6 @@ define([
        * @readOnly
        */
       get isElement() { return false; },
-      // endregion
 
       // region isComplex property
       /**
@@ -405,6 +404,25 @@ define([
        */
       get isContinuous() { return false; },
       // endregion
+      // endregion
+
+      // region elementType property
+      /**
+       * Gets the element type of this type.
+       *
+       * If this type is a [list]{@link pentaho.type.Type#isList} type,
+       * returns its [of]{@link pentaho.type.List.Type#of} attribute.
+       * Otherwise, this type is an element type, and it returns itself.
+       *
+       * @type {!pentaho.type.Type}
+       * @readonly
+       * @see pentaho.type.Type#isList
+       * @see pentaho.type.Type#isElement
+       * @see pentaho.type.List.Type#of
+       */
+      get elementType() {
+        return this;
+      },
       // endregion
 
       // region id, sourceId and alias properties
@@ -577,7 +595,7 @@ define([
         return [];
       },
 
-      // for configuration only
+      // For configuration only.
       set mixins(values) {
 
         if(!values) return;
@@ -690,7 +708,7 @@ define([
       // -> nonEmptyString, Optional, Inherited, Configurable, Localized
       // "" -> null conversion
 
-      __description: null, // set through implement bundle, below
+      __description: null, // Set through implement bundle, below.
 
       /**
        * Gets or sets the description of this type.
@@ -972,28 +990,28 @@ define([
 
       __defaultView: null, // {value: any, promise: Promise.<Class.<View>>}
 
-     /**
-      * Gets or sets the default view for instances of this type.
-      *
-      * The identifier of the view's AMD module.
-      * If the identifier is relative, it is relative to [sourceId]{@link pentaho.type.Type#sourceId}.
-      *
-      * Setting this to `undefined` causes the default view to be inherited from the ancestor type,
-      * except for the root type, `Instance.type` (which has no ancestor), where the attribute is `null`.
-      *
-      * Setting this to a _falsy_ value (like `null` or an empty string),
-      * clears the value of the attribute and sets it to `null`, ignoring any inherited value.
-      *
-      * @see pentaho.type.Type#buildSourceRelativeId
-      *
-      * @type {string}
-
-      * @throws {pentaho.lang.ArgumentInvalidTypeError} When the set value is not
-      * a string, a function or {@link Nully}.
-      *
-      * @throws {OperationInvalidError} When `defaultView` is a relative identifier and this type is anonymous,
-      * or when `defaultView` refers to an inexistent ascendant location.
-      */
+      /**
+       * Gets or sets the default view for instances of this type.
+       *
+       * The identifier of the view's AMD module.
+       * If the identifier is relative, it is relative to [sourceId]{@link pentaho.type.Type#sourceId}.
+       *
+       * Setting this to `undefined` causes the default view to be inherited from the ancestor type,
+       * except for the root type, `Instance.type` (which has no ancestor), where the attribute is `null`.
+       *
+       * Setting this to a _falsy_ value (like `null` or an empty string),
+       * clears the value of the attribute and sets it to `null`, ignoring any inherited value.
+       *
+       * @see pentaho.type.Type#buildSourceRelativeId
+       *
+       * @type {string}
+       *
+       * @throws {pentaho.lang.ArgumentInvalidTypeError} When the set value is not
+       * a string, a function or {@link Nully}.
+       *
+       * @throws {OperationInvalidError} When `defaultView` is a relative identifier and this type is anonymous,
+       * or when `defaultView` refers to an inexistent ascendant location.
+       */
       get defaultView() {
         return this.__defaultView && this.__defaultView.value;
       },
@@ -1007,7 +1025,7 @@ define([
             delete this.__defaultView;
           }
 
-        } else if(!value) { // null || ""
+        } else if(!value) { // Is null || ""
 
           this.__defaultView = null;
 
@@ -1175,7 +1193,7 @@ define([
       __assertSubtype: function(subtype) {
         if(!subtype.isSubtypeOf(this)) {
           throw error.operInvalid(
-              bundle.format(bundle.structured.errors.instance.notOfExpectedBaseType, [this]));
+            bundle.format(bundle.structured.errors.instance.notOfExpectedBaseType, [this]));
         }
 
         return subtype;
@@ -1190,9 +1208,27 @@ define([
        */
       __throwAbstractType: function() {
         throw error.operInvalid(bundle.format(
-            bundle.structured.errors.instance.cannotCreateInstanceOfAbstractType, [this]));
+          bundle.structured.errors.instance.cannotCreateInstanceOfAbstractType, [this]));
       },
       // endregion
+
+      /**
+       * Asserts that the type has no subtypes and that as such the given attribute can be set.
+       *
+       * @param {string} attributeName - The name of the attribute being set.
+       *
+       * @throws {pentaho.lang.OperationInvalidError} When setting and the type
+       * already has [subtypes]{@link pentaho.type.Type#hasDescendants}.
+       *
+       * @protected
+       */
+      _assertNoSubtypesAttribute: function(attributeName) {
+
+        if(this.hasDescendants) {
+          throw error.operInvalid(
+            bundle.get("errors.attributeLockedWhenTypeHasSubtypes", [attributeName]));
+        }
+      },
 
       /**
        * Determines if a value is an instance of this type.
@@ -1235,8 +1271,8 @@ define([
        */
       to: function(value, keyArgs) {
         return value == null ? null :
-               this.is(value) ? value :
-               this.create(value, keyArgs);
+          this.is(value) ? value :
+          this.create(value, keyArgs);
       },
 
       // region serialization
@@ -1381,7 +1417,7 @@ define([
         }
 
         var defaultViewInfo = O.getOwn(this, "__defaultView");
-        if(defaultViewInfo !== undefined) { // can be null
+        if(defaultViewInfo !== undefined) { // Can be null.
           var defaultView = defaultViewInfo && defaultViewInfo.value;
           if(!defaultView || !isJson || !F.is(defaultView)) {
             any = true;
@@ -1558,9 +1594,7 @@ define([
             // because, otherwise, it would be very hard to test.
             if(this === root) return;
 
-            if(this.hasDescendants)
-              throw error.operInvalid(
-                  "Cannot change the '" + name + "' attribute of a type that has descendants.");
+            this._assertNoSubtypesAttribute(name);
 
             // Cannot reset, using null or undefined (but can have a null default),
             //  cause it would break **monotonicity**.
@@ -1638,7 +1672,7 @@ define([
           if(!declaringType) return;
 
           if(declaringType !== __type) {
-            // ancestor, in properties, wouldn't reach __type.
+            // Ancestor, in properties, wouldn't reach __type.
             fillSpecRecursive(Object.getPrototypeOf(declaringType));
           }
 
@@ -1646,11 +1680,11 @@ define([
           if(dynAttrInfos) {
             dynAttrInfos.forEach(function(info) {
               if(type.__fillSpecInContextDynamicAttribute(spec,
-                      info.name,
-                      info.spec.group,
-                      info.spec.localName,
-                      info.spec.toSpec,
-                      keyArgs)) {
+                                                          info.name,
+                                                          info.spec.group,
+                                                          info.spec.localName,
+                                                          info.spec.toSpec,
+                                                          keyArgs)) {
                 any = true;
               }
             });

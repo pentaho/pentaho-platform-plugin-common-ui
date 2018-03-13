@@ -143,7 +143,7 @@ define([
               // The initial domain is that of the property's valueType's domain, if any.
 
               // TODO: Check for Enum mixin.
-              var elems = propType.elemType.domain;
+              var elems = propType.valueType.elementType.domain;
               return elems ? elems.toArray() : null;
             },
 
@@ -154,7 +154,7 @@ define([
 
               return domain.map(function(v) {
                 return this.to(v);
-              }, this.elemType);
+              }, this.valueType.elementType);
             },
 
             combine: function(baseEval, localEval) {
@@ -172,7 +172,7 @@ define([
                 if(!baseDomain || !localDomain.length)
                   return localDomain;
 
-                return propType.elemType.__intersect(baseDomain, localDomain);
+                return propType.valueType.elementType.__intersect(baseDomain, localDomain);
               };
             },
 

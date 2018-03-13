@@ -159,8 +159,7 @@ define([
             // 2. Cannot remove all measurement levels.
             // 3. Cannot add new levels. Can only restrict, by removing some of the inherited/current levels.
 
-            if(this.hasDescendants)
-              throw error.operInvalid(bundle.structured.errors.property.levelsLockedWhenTypeHasDescendants);
+            this._assertNoSubtypesAttribute("levels");
 
             if(!Array.isArray(values)) values = [values];
 
@@ -172,9 +171,12 @@ define([
             if(!levelsNew.length)
               throw error.argInvalid("levels", bundle.structured.errors.property.noLevels);
 
-            levelsNew.sort(__paletteLevelType.compare.bind(__paletteLevelType));
+            levelsNew.sort(__paletteLevelType.compareElements.bind(__paletteLevelType));
 
-            this.__levels = new __ListLevelType(levelsNew, {isReadOnly: true});
+            // TODO: Had to remove the {isReadOnly: true}.
+            // Find a way to only allow updating/replacing existing elements without
+            // letting to add new keys or remove existing keys.
+            this.__levels = new __ListLevelType(levelsNew);
           },
           // endregion
 

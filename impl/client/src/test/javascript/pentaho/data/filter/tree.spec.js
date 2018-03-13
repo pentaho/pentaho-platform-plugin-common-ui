@@ -58,11 +58,17 @@ define([
               AbstractFilter = Abstract;
               TreeFilter = Tree;
 
+              var count = 1;
+
               CustomFilter = AbstractFilter.extend({
                 compile: function() {
                   return isFalse;
+                },
+                _buildContentKey: function() {
+                  return String(count++);
                 }
               });
+
               CustomTreeFilter = TreeFilter.extend({
                 compile: function() {
                   return isFalse;
@@ -216,5 +222,5 @@ define([
         expect(result[1]).toBe(oper3);
       });
     }); // #visitOperands
-  }); // pentaho.data.filter.Tree
+  }); // end pentaho.data.filter.Tree
 });

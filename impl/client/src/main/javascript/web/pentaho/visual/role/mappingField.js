@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
+  "module",
   "pentaho/i18n!messages"
-], function(bundle) {
+], function(module, bundle) {
 
   "use strict";
 
@@ -33,21 +34,32 @@ define([
        * @classDesc The `MappingField` class represents a field in a
        * [visual role mapping]{@link pentaho.visual.role.BaseMapping}.
        *
+       * The `Mode` type is an [entity]{@link pentaho.type.Value.Type#isEntity} type.
+       *
        * @see pentaho.visual.role.BaseMapping
        *
        * @description Creates a visual role mapping field instance.
        * @constructor
        * @param {pentaho.visual.role.spec.UMappingField} [spec] A visual role mapping field specification.
        */
-      return Complex.extend("pentaho.visual.role.MappingField", /** @lends pentaho.visual.role.MappingField# */{
+      return Complex.extend(/** @lends pentaho.visual.role.MappingField# */{
 
         constructor: function(spec, keyArgs) {
-          // The name property?
-          if(typeof spec === "string") {
-            spec = {name: spec};
-          }
+          this.base(this.$type.normalizeInstanceSpec(spec), keyArgs);
+        },
 
-          this.base(spec, keyArgs);
+        /**
+         * Gets the (immutable) key of the visual role mapping field.
+         *
+         * The key is the value of the [name]{@link pentaho.visual.role.MappingField#name} property.
+         *
+         * @type {string}
+         * @readOnly
+         * @override
+         * @see pentaho.type.Value.Type#isEntity
+         */
+        get $key() {
+          return this.name;
         },
 
         /** @inheritDoc */
@@ -76,10 +88,26 @@ define([
           return spec;
         },
 
-        $type: {
+        $type: /** @lends pentaho.visual.role.MappingField.Type# */{
+
+          id: module.id,
+
+          // @override
+          _normalizeInstanceSpec: function(valueSpec) {
+            // The name property?
+            return (typeof valueSpec === "string") ? {name: valueSpec} : valueSpec;
+          },
+
+          // @override
+          hasNormalizedInstanceSpecKeyData: function(valueSpec) {
+            return valueSpec.name !== undefined;
+          },
+
           props: [
             /**
              * Gets or sets the name of the field.
+             *
+             * This property is immutable and can only be specified at construction time.
              *
              * This property is required.
              *
@@ -87,7 +115,7 @@ define([
              * @type {string}
              * @see pentaho.visual.role.spec.IMappingField#name
              */
-            {name: "name", valueType: "string", isRequired: true}
+            {name: "name", valueType: "string", isRequired: true, isReadOnly: true}
           ]
         }
       })

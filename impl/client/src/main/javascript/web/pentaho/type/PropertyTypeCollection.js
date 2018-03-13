@@ -28,7 +28,7 @@ define([
    * @memberOf pentaho.type
    * @class
    * @extends pentaho.lang.Collection
-   * @implements pentaho.lang.IConfigurable
+   * @implements {pentaho.lang.IConfigurable}
    *
    * @classDesc A collection of properties.
    *
@@ -53,6 +53,13 @@ define([
         index:  -1,
         isRoot: false
       };
+
+      /**
+       * Map of property types by nameAlias.
+       * @type {!Object.<string, pentaho.type.Property.Type>}
+       * @private
+       */
+      this.__propTypesByAlias = Object.create(null);
 
       // Caches Property.Type
       this.__propType = null;
@@ -79,6 +86,22 @@ define([
         // Default: calls `addMany` on contained specs.
         this.base();
       }
+    },
+
+    // @override
+    copyTo: function(col) {
+      this.base(col);
+      O.assignOwn(col.__propTypesByAlias, this.__propTypesByAlias);
+    },
+
+    /**
+     * Gets a property type having a given name alias.
+     *
+     * @param {string} nameAlias - The name alias.
+     * @return {pentaho.type.Property.Type} The property type or `null`.
+     */
+    getByAlias: function(nameAlias) {
+      return O.getOwn(this.__propTypesByAlias, nameAlias, null);
     },
 
     /**
@@ -116,6 +139,7 @@ define([
      * @param {string} spec - The name of the property.
      * @param {number} index - The location of the property in the collection.
      * @param {Object} ka - The keyword arguments.
+     * @return {pentaho.type.Property.Type} The property type to add.
      * @protected
      */
     _adding: function(spec, index, ka) {
@@ -148,6 +172,7 @@ define([
      * @param {string} spec - The name of the property.
      * @param {number} index - The location of the property in the collection.
      * @param {Object} existing - The keyword arguments.
+     * @return {!pentaho.type.Property.Type} The replacement property type.
      * @protected
      */
     _replacing: function(spec, index, existing) {
@@ -175,6 +200,26 @@ define([
       return Replacement.type;
     },
 
+    _added: function(elem) {
+
+      this.base.apply(this, arguments);
+
+      var nameAlias = elem.nameAlias;
+      if(nameAlias !== null) {
+        this.__propTypesByAlias[nameAlias] = elem;
+      }
+    },
+
+    _replaced: function(elem) {
+
+      this.base.apply(this, arguments);
+
+      var nameAlias = elem.nameAlias;
+      if(nameAlias !== null) {
+        this.__propTypesByAlias[nameAlias] = elem;
+      }
+    },
+
     /**
      * Cast a property from the collection.
      *
@@ -182,6 +227,7 @@ define([
      *
      * @param {string} spec - The name of the property.
      * @param {string} index - The location of the property in the collection.
+     * @return {!pentaho.type.Property.Type} The new property type.
      * @protected
      */
     _cast: function(spec, index) {

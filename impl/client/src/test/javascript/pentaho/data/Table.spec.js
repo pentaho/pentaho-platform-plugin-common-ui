@@ -333,9 +333,14 @@ define([
 
                 return context.getDependencyApplyAsync(["pentaho/data/filter/abstract"], function(AbstractFilter) {
 
+                  var count = 1;
+
                   CustomFilter = AbstractFilter.extend({
                     compile: function() {
                       return function() { return false; };
+                    },
+                    _buildContentKey: function() {
+                      return String(count++);
                     }
                   });
                 });
@@ -427,9 +432,14 @@ define([
 
                 return context.getDependencyApplyAsync(["pentaho/data/filter/abstract"], function(AbstractFilter) {
 
+                  var count = 1;
+
                   CustomFilter = AbstractFilter.extend({
                     compile: function() {
                       return function() { return false; };
+                    },
+                    _buildContentKey: function() {
+                      return String(count++);
                     }
                   });
                 });

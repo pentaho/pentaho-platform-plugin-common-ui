@@ -77,6 +77,13 @@ define([
      */
     var Enum = Simple.extend(/** @lends pentaho.type.mixins.Enum# */{
 
+      /** @inheritDoc */
+      validate: function() {
+        return typeUtil.combineErrors(
+          this.base(),
+          this.$type.__validateDomain(this));
+      },
+
       $type: /** @lends pentaho.type.mixins.Enum.Type# */{
 
         alias: "enum",
@@ -93,13 +100,6 @@ define([
           return spec;
         },
 
-        /** @inheritDoc */
-        _validate: function(value) {
-          return typeUtil.combineErrors(
-              this.base(value),
-              this.__validateDomain(value));
-        },
-
         /**
          * Validates a value w.r.t. the restricted domain.
          *
@@ -110,8 +110,8 @@ define([
         __validateDomain: function(value) {
           var domain = this.__domain;
           return (!domain || domain.has(value.$key))
-              ? null
-              : new ValidationError(bundle.structured.errors.enum.notInDomain);
+            ? null
+            : new ValidationError(bundle.structured.errors.enum.notInDomain);
         },
 
         /** @inheritDoc */
@@ -160,14 +160,19 @@ define([
           if(!this.__domain) {
             // List can only be configured (to allow for simple element's configuration of `formatted` field),
             // but is, for all other purposes, read-only.
+
+            // TODO: Had to remove the {isReadOnly: true}.
+            // Find a way to only allow updating/replacing existing elements without
+            // letting to add new keys or remove existing keys.
+
             var ListType = List.extend({$type: {of: this}});
-            this.__domain = new ListType(values, {isReadOnly: true});
+            this.__domain = new ListType(values);
             this.__domainPrimitive = this.__domain.toArray(function(v) { return v.value; });
 
             if(!this.__domain.count) throw error.argRequired("spec.domain");
 
           } else if(values.constructor === Object) {
-            this.__domain.configure(values);
+            this.__domain.configure({d: values});
           } else {
             throw error.argInvalidType("domain", ["Object"], typeof values);
           }
@@ -175,14 +180,14 @@ define([
         // endregion
 
         /** @inheritDoc */
-        _compareValues: function(a, b) {
+        comparePrimitiveValues: function(valueA, valueB) {
           /* eslint no-multi-spaces: 0 */
-          var indexA = this.__domainPrimitive.indexOf(a);
-          var indexB = this.__domainPrimitive.indexOf(b);
-          return indexA === indexB ?  0 : // includes both negative
-                 indexA < 0        ? -1 : // undefined is lowest
-                 indexB < 0        ? +1 : // idem
-                 indexA - indexB;         // compare two non-negative indexes
+          var indexA = this.__domainPrimitive.indexOf(valueA);
+          var indexB = this.__domainPrimitive.indexOf(valueB);
+          return indexA === indexB ?  0 : // Includes both negative.
+            indexA < 0 ? -1 : // Undefined is lowest.
+            indexB < 0 ? +1 : // Idem.
+            indexA - indexB;  // Compare two non-negative indexes.
         }
       }
     }, /** @lends pentaho.type.mixins.Enum */{

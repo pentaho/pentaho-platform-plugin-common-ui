@@ -112,26 +112,26 @@ define([
       it("should return '(> propName valueKey)'", function() {
         var filter  = new IsGreaterFilter({property: "name", value: 1});
 
-        expect(filter.contentKey).toBe("(> name 1)");
+        expect(filter.$contentKey).toBe("(> name 1)");
       });
 
       it("should return '(> propName )' when no value is set'", function() {
         var filter  = new IsGreaterFilter({property: "name"});
 
-        expect(filter.contentKey).toBe("(> name )");
+        expect(filter.$contentKey).toBe("(> name )");
       });
 
       it("should return '(>  valueKey)' when no property is set'", function() {
         var filter  = new IsGreaterFilter({value: 1});
 
-        expect(filter.contentKey).toBe("(>  1)");
+        expect(filter.$contentKey).toBe("(>  1)");
       });
 
       it("should return '(>  )' when no property or value are set'", function() {
         var filter  = new IsGreaterFilter();
 
-        expect(filter.contentKey).toBe("(>  )");
+        expect(filter.$contentKey).toBe("(>  )");
       });
     });
-  }); // pentaho.data.filter.IsGreater
+  }); // end pentaho.data.filter.IsGreater
 });
