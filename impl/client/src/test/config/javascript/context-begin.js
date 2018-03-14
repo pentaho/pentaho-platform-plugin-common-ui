@@ -112,4 +112,4 @@ var KARMA_DEBUG = false;
  * // Only pentaho/type spec files
  * var DEV_SPEC_FILTER = /^pentaho\/type/;
  */
-var DEV_SPEC_FILTER = null;
+var DEV_SPEC_FILTER = /^pentaho\//;

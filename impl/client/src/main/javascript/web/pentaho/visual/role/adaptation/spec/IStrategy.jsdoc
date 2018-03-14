@@ -15,8 +15,11 @@
  */
 
 /**
- * The `strategies.spec` namespace contains sepecification types for describing visual role mapping strategies.
+ * The `spec.IStrategy` interface represents the specification of a visual role adaptation strategy.
  *
- * @name pentaho.visual.role.strategies.spec
- * @namespace
+ * @name pentaho.visual.role.adaptation.spec.IStrategy
+ * @interface
+ * @extends pentaho.type.spec.IComplex
+ *
+ * @see pentaho.visual.role.adaptation.Strategy
  */

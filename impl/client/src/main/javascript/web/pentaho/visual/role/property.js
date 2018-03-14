@@ -349,6 +349,7 @@ define([
                 }
               });
             }
+
             return fields;
           },
 

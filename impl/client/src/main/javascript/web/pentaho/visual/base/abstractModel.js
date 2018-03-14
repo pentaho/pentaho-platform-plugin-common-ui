@@ -42,11 +42,8 @@ define([
 
       this.base(model);
 
-      var modelType = model.$type;
-      if(this.__areDataOrMappingsChanged(modelType)) {
-        modelType.eachVisualRole(function(propType) {
-          model.get(propType)._onDataOrMappingChanged();
-        });
+      if(this.__areDataOrMappingsChanged(model.$type)) {
+        model._onDataOrMappingsChanged();
       }
     },
 
@@ -103,9 +100,7 @@ define([
        * @class
        * @extends pentaho.type.Complex.Type
        *
-       * @classDesc The base class of visual model types.
-       *
-       * For more information see {@link pentaho.visual.base.AbstractModel}.
+       * @classDesc The type class of {@link pentaho.visual.base.AbstractModel}.
        */
 
       /**
@@ -129,6 +124,22 @@ define([
         /** @inheritDoc */
         _createChangeset: function(txn) {
           return new AbstractModelChangeset(txn, this);
+        },
+
+        /**
+         * Called when the data property or any of the visual role properties has changed,
+         * but before notifying any `did:change` listeners.
+         *
+         * The default implementation calls the
+         * [_onDataOrMappingChanged]{@link pentaho.visual.role.AbstractMapping#_onDataOrMappingChanged}
+         * method of child visual role mappings.
+         *
+         * @protected
+         */
+        _onDataOrMappingsChanged: function() {
+          this.$type.eachVisualRole(function(propType) {
+            this.get(propType)._onDataOrMappingChanged();
+          }, this);
         },
 
         // region serialization
@@ -196,12 +207,15 @@ define([
 
               // @override
               toValueOn: function(defaultValueOwner, valueSpec) {
+
                 var simpleTable = this.base(defaultValueOwner, valueSpec);
                 if(simpleTable !== null) {
                   var table = simpleTable.value.toPlainTable();
-                  // wrap as simple again
+
+                  // Wrap as simple again.
                   return new PentahoObject(table);
                 }
+
                 return simpleTable;
               }
             },

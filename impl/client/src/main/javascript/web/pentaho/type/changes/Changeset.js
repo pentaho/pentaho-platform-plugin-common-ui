@@ -444,7 +444,7 @@ define([
     },
 
     /**
-     * Actually removes all changes in the changeset.
+     * Actually removes all changes from this changeset.
      *
      * @name pentaho.type.changes.Changeset#_clearChanges
      * @method

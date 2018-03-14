@@ -15,11 +15,9 @@
  */
 
 /**
- * The `spec.IBase` interface represents the specification of a mapping strategy.
+ * The `adaptation` namespace contains classes for describing visual role adaptation strategies
+ * between external and internal visual models.
  *
- * @name pentaho.visual.role.strategies.spec.IBase
- * @interface
- * @extends pentaho.type.spec.IComplex
- *
- * @see pentaho.visual.role.strategies.Base
+ * @name pentaho.visual.role.adaptation
+ * @namespace
  */

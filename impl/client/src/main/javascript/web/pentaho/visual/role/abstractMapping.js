@@ -88,6 +88,7 @@ define([
           if(refs && refs.length) {
             return refs[0];
           }
+
           return null;
         },
 
@@ -127,6 +128,14 @@ define([
 
           return fieldIndexes;
         },
+
+        /**
+         * Gets the _effective_ operation mode in which the associated visual role is to operate.
+         *
+         * @name pentaho.visual.role.AbstractMapping#mode
+         * @type {pentaho.visual.role.Mode}
+         * @readonly
+         */
 
         $type: /** @lends pentaho.visual.role.AbstractMapping.Type# */{
           props: [

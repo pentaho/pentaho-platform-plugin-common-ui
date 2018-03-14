@@ -22,7 +22,7 @@ define([
 
   /* globals describe, it, beforeEach, beforeAll, spyOn */
 
-  xdescribe("pentaho.visual.role.strategies.Base", function() {
+  xdescribe("pentaho.visual.role.adaptation.Strategy", function() {
 
     var BaseStrategy;
     var CustomStrategy;
@@ -32,7 +32,7 @@ define([
       Context.createAsync()
           .then(function(context) {
 
-            return context.getAsync("pentaho/visual/role/strategies/base");
+            return context.getAsync("pentaho/visual/role/adaptation/base");
           })
           .then(function(_BaseStrategy) {
             BaseStrategy = _BaseStrategy;

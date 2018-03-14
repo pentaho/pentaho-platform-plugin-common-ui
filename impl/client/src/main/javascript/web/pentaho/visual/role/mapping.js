@@ -85,9 +85,9 @@ define([
          * on the the containing visual role property.
          * However, the results are cached for performance reasons.
          *
-         * @name pentaho.visual.role.Mapping#mode
          * @type {pentaho.visual.role.Mode}
          * @readonly
+         * @override
          *
          * @see pentaho.visual.role.Property.Type#getModeEffectiveOn
          */

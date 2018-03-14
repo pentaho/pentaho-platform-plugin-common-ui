@@ -27,12 +27,14 @@ define([
     "./abstractMapping",
     function(AbstractMapping) {
 
-      var context = this;
+      // NOTE: these will be kept private until it is decided between the adapter and the viz concept.
 
       /**
        * @name pentaho.visual.role.ExternalMapping.Type
        * @class
        * @extends pentaho.visual.role.AbstractMapping.Type
+       *
+       * @private
        *
        * @classDesc The type class of {@link pentaho.visual.role.ExternalMapping}.
        */
@@ -41,6 +43,8 @@ define([
        * @name pentaho.visual.role.ExternalMapping
        * @class
        * @extends pentaho.visual.role.AbstractMapping
+       *
+       * @private
        *
        * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.ExternalMapping>} pentaho/visual/role/externalMapping
        *
@@ -57,76 +61,40 @@ define([
        */
       var ExternalMapping = AbstractMapping.extend(/** @lends pentaho.visual.role.ExternalMapping# */{
 
-        constructor: function(spec) {
-
-          this.base(spec);
-
-          /**
-           * The cached role adapter.
-           *
-           * @type {undefined|null|pentaho.visual.role.IAdapter}
-           * @private
-           */
-          this.__adapter = undefined;
-        },
-
-        /**
-         * Resets any existing data or mapping related cached information.
-         *
-         * Called by the containing abstract model whenever its data or visual role properties change.
-         *
-         * @protected
-         * @override
-         */
-        _onDataOrMappingChanged: function() {
-          this.__adapter = undefined;
-        },
-
+        // region adapter
         /**
          * Gets the current adapter, if any, or `null`.
          *
-         * An adapter exists if:
-         * 1. the mapping is associated with a visualization,
-         * 2. the mapping refers to an existing visual role property of the visualization's model,
-         * 3. the mapped fields exist in the visualization's data set
-         * 4. the mapped fields can be adapted into one of the modes of the visual role property.
-         *
-         * @type {pentaho.visual.role.IAdapter}
+         * @type {pentaho.visual.role.adaptation.IAdapter}
          * @readOnly
-         * @see pentaho.visual.role.ExternalProperty.Type#getAdapterOn
          */
         get adapter() {
-          var adapter;
-
-          // Within a transaction?
-          if(context.transaction !== null) {
-            // Do not cache or use cache.
-            // Doing this covers the will phase of change actions, in which multiple iterations can occur.
-            // There would be no way to reset adapters cached during the process.
-            adapter = this.__getAdapter();
-
-          } else if((adapter = this.__adapter) === undefined) {
-
-            adapter = this.__adapter = this.__getAdapter();
-          }
-
-          return adapter || null;
-        },
-
-        /**
-         * Obtains the current adapter from the referring visualization and visual role property.
-         *
-         * @return {pentaho.visual.role.IAdapter} An adapter, or `null`.
-         * @private
-         */
-        __getAdapter: function() {
           var iref = this._modelReference;
           if(iref !== null) {
-            return iref.property.getAdapterOn(iref.container) || null;
+            return iref.container.__getAmbientRoleAdapter(iref.property.name);
           }
 
           return null;
         },
+        // endregion
+
+        // region mode
+        /**
+         * Gets the operation mode in which the associated visual role is to operate.
+         *
+         * @type {pentaho.visual.role.Mode}
+         * @readonly
+         * @override
+         */
+        get mode() {
+          var iref = this._modelReference;
+          if(iref !== null) {
+            return iref.container.__getAmbientRoleMode(iref.property.name);
+          }
+
+          return null;
+        },
+        // endregion
 
         $type: /** @lends pentaho.visual.role.ExternalMapping.Type# */{
 

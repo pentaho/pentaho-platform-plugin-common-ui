@@ -18,11 +18,10 @@ define([
   "pentaho/type/ValidationError",
   "pentaho/data/TableView",
   "pentaho/type/util",
-  "pentaho/util/object",
 
   // so that r.js sees otherwise invisible dependencies.
   "./abstractMapping"
-], function(bundle, ValidationError, DataView, typeUtil, O) {
+], function(bundle, ValidationError, DataView, typeUtil) {
 
   "use strict";
 
@@ -188,6 +187,7 @@ define([
 
               // Found. Stop.
               any = true;
+              // eslint-disable-next-line consistent-return
               return false;
             });
 
@@ -230,12 +230,10 @@ define([
            *
            * 1. If the abstract model has a `null` [data]{@link pentaho.visual.base.AbstractModel#data},
            *    then every field in the current mapping's
-           *    [fields]{@link pentaho.visual.role.AbstractMapping#fields} is considered undefined and invalid
+           *    [fields]{@link pentaho.visual.role.AbstractMapping#fields} is considered undefined and invalid;
            * 2. Otherwise, if the model has a non-`null` [data]{@link pentaho.visual.base.AbstractModel#data},
            *    then each field in the current mapping's
-           *    [fields]{@link pentaho.visual.role.AbstractMapping#fields} must be defined in `data`
-           * 3. There can be no two mapping fields with the same
-           *    [name]{@link pentaho.visual.role.MappingField#name}
+           *    [fields]{@link pentaho.visual.role.AbstractMapping#fields} must be defined in `data`.
            *
            * @param {!pentaho.visual.base.AbstractModel} model - The abstract model.
            *
@@ -254,12 +252,6 @@ define([
               if(!errors && mapping.hasFields) {
                 // Fields are defined in data and of a type compatible with the role's dataType.
                 this.__validateFieldsOn(model, mapping, addErrors);
-
-                // Duplicate mapped fields.
-                // Only possible to validate when the rest of the stuff is valid.
-                if(!errors) {
-                  this.__validateDuplMappingFieldsOn(model, mapping, addErrors);
-                }
               }
             }
 
@@ -298,41 +290,10 @@ define([
                       name: name,
                       role: this
                     })));
-                // continue;
-              }
-            }
-          },
-
-          /**
-           * Validates that the mapping fields have no duplicates.
-           *
-           * @param {!pentaho.visual.base.AbstractModel} model - The abstract model.
-           * @param {!pentaho.visual.role.AbstractMapping} mapping - The mapping.
-           * @param {function} addErrors - Called to add errors.
-           * @private
-           */
-          __validateDuplMappingFieldsOn: function(model, mapping, addErrors) {
-
-            var mappingFields = mapping.fields;
-            var L = mappingFields.count;
-            if(L <= 1) return;
-
-            var byKey = {};
-            var i = -1;
-            while(++i < L) {
-              var mappingField = mappingFields.at(i);
-              var key = mappingField.name;
-              if(O.hasOwn(byKey, key)) {
-                var errorMessage = bundle.format(bundle.structured.errors.property.fieldDuplicate, {
-                  name: mappingField.name,
-                  role: this
-                });
-
-                addErrors(new ValidationError(errorMessage));
-                continue;
+                // Continue
               }
 
-              byKey[key] = mappingField;
+              // TODO: Validate isVisualKey and isKey
             }
           }
           // endregion

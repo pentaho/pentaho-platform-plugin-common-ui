@@ -15,8 +15,9 @@
  */
 
 /**
- * The `strategies` namespace contains classes for describing visual role mapping strategies.
+ * The `impl` namespace contains implementation classes of visual role adaptation strategies and adapters.
  *
- * @name pentaho.visual.role.strategies
+ * @name pentaho.visual.role.adaptation.impl
  * @namespace
+ * @private
  */

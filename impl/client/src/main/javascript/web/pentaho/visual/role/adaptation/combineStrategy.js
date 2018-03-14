@@ -15,38 +15,38 @@
  */
 define([
   "module",
-  "./impl/CombineMapper"
-], function(module, CombineMapper) {
+  "./impl/CombineAdapter"
+], function(module, CombineAdapter) {
 
   "use strict";
 
   return [
-    "./base",
-    function(Base) {
+    "./strategy",
+    function(Strategy) {
 
       /**
-       * @name pentaho.visual.role.strategies.Combine.Type
+       * @name pentaho.visual.role.adaptation.CombineStrategy.Type
        * @class
-       * @extends pentaho.visual.role.strategies.Base.Type
+       * @extends pentaho.visual.role.adaptation.Strategy.Type
        *
-       * @classDesc The type class of {@link pentaho.visual.role.strategies.Combine}.
+       * @classDesc The type class of {@link pentaho.visual.role.adaptation.CombineStrategy}.
        */
 
       /**
-       * @name pentaho.visual.role.strategies.Combine
+       * @name pentaho.visual.role.adaptation.CombineStrategy
        * @class
-       * @extends pentaho.visual.role.strategies.Base
+       * @extends pentaho.visual.role.adaptation.Strategy
        * @abstract
        *
-       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.strategies.Combine>} pentaho/visual/role/strategies/combine
+       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.adaptation.CombineStrategy>} pentaho/visual/role/adaptation/combineStrategy
        *
-       * @classDesc The `Combine` class describes the strategy of mapping one or more data properties
+       * @classDesc The `CombineStrategy` class describes the strategy of mapping one or more data properties
        * to a single _string_ visual value by concatenating the string representation of the values of
        * multiple fields with a special
-       * [separator character]{@link pentaho.visual.role.strategies.Combine#valueSeparator}, and back.
+       * [separator character]{@link pentaho.visual.role.adaptation.CombineStrategy#valueSeparator}, and back.
        *
        * Formatted values are combined using the
-       * [formattedSeparator]{@link pentaho.visual.role.strategies.Combine#formattedSeparator} text.
+       * [formattedSeparator]{@link pentaho.visual.role.adaptation.CombineStrategy#formattedSeparator} text.
        *
        * The _combine_ strategy targets:
        * 1. Visual roles which are [visual keys]{@link pentaho.visual.role.Property.Type#isVisualKey};
@@ -56,16 +56,16 @@ define([
        *
        * @description Creates a _combine_ mapping strategy instance.
        * @constructor
-       * @param {pentaho.visual.role.strategies.spec.IBase} [spec] A _combine_ mapping strategy specification.
+       * @param {pentaho.visual.role.adaptation.spec.IStrategy} [spec] A _combine_ mapping strategy specification.
        */
-      var Combine = Base.extend(/** @lends pentaho.visual.role.strategies.Combine# */{
-        $type: /** @lends pentaho.visual.role.strategies.Combine.Type# */{
+      var CombineStrategy = Strategy.extend(/** @lends pentaho.visual.role.adaptation.CombineStrategy# */{
+        $type: /** @lends pentaho.visual.role.adaptation.CombineStrategy.Type# */{
           id: module.id,
           props: [
             /**
              * Gets or sets the text separator used to combine the keys of each field.
              *
-             * @name pentaho.visual.role.strategies.Combine#valueSeparator
+             * @name pentaho.visual.role.adaptation.CombineStrategy#valueSeparator
              * @type {string}
              * @default "~"
              */
@@ -79,7 +79,7 @@ define([
             /**
              * Gets or sets the text separator used to combine the formatted values of each field.
              *
-             * @name pentaho.visual.role.strategies.Combine#formattedSeparator
+             * @name pentaho.visual.role.adaptation.CombineStrategy#formattedSeparator
              * @type {string}
              * @default " ~ "
              */
@@ -106,11 +106,11 @@ define([
             return null;
           }
 
-          return new CombineMapper(this, propType, inputData, mode, this.valueSeparator, this.formattedSeparator);
+          return new CombineAdapter(this, propType, inputData, mode, this.valueSeparator, this.formattedSeparator);
         }
       });
 
-      return Combine;
+      return CombineStrategy;
     }
   ];
 });

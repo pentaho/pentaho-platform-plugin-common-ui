@@ -15,32 +15,32 @@
  */
 define([
   "module",
-  "./impl/TupleMapper"
-], function(module, TupleMapper) {
+  "./impl/TupleAdapter"
+], function(module, TupleAdapter) {
 
   "use strict";
 
   return [
-    "./base",
-    function(Base) {
+    "./strategy",
+    function(Strategy) {
 
       /**
-       * @name pentaho.visual.role.strategies.Tuple.Type
+       * @name pentaho.visual.role.adaptation.TupleStrategy.Type
        * @class
-       * @extends pentaho.visual.role.strategies.Base.Type
+       * @extends pentaho.visual.role.adaptation.Strategy.Type
        *
-       * @classDesc The type class of {@link pentaho.visual.role.strategies.Tuple}.
+       * @classDesc The type class of {@link pentaho.visual.role.adaptation.TupleStrategy}.
        */
 
       /**
-       * @name pentaho.visual.role.strategies.Tuple
+       * @name pentaho.visual.role.adaptation.TupleStrategy
        * @class
-       * @extends pentaho.visual.role.strategies.Base
+       * @extends pentaho.visual.role.adaptation.Strategy
        * @abstract
        *
-       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.strategies.Tuple>} pentaho/visual/role/strategies/tuple
+       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.adaptation.TupleStrategy>} pentaho/visual/role/adaptation/tupleStrategy
        *
-       * @classDesc The `Tuple` class describes the strategy of mapping one or more data properties
+       * @classDesc The `TupleStrategy` class describes the strategy of mapping one or more data properties
        * to an array of those values, and back.
        *
        * The strategy targets:
@@ -54,10 +54,10 @@ define([
        *
        * @description Creates a _tuple_ mapping strategy instance.
        * @constructor
-       * @param {pentaho.visual.role.strategies.spec.IBase} [spec] A _tuple_ mapping strategy specification.
+       * @param {pentaho.visual.role.adaptation.spec.IStrategy} [spec] A _tuple_ mapping strategy specification.
        */
-      var Tuple = Base.extend(/** @lends pentaho.visual.role.strategies.Tuple# */{
-        $type: /** @lends pentaho.visual.role.strategies.Tuple.Type# */{
+      var TupleStrategy = Strategy.extend(/** @lends pentaho.visual.role.adaptation.TupleStrategy# */{
+        $type: /** @lends pentaho.visual.role.adaptation.TupleStrategy.Type# */{
           id: module.id
         },
 
@@ -101,11 +101,11 @@ define([
             }
           }
 
-          return new TupleMapper(this, propType, inputData, mode);
+          return new TupleAdapter(this, propType, inputData, mode);
         }
       });
 
-      return Tuple;
+      return TupleStrategy;
     }
   ];
 });

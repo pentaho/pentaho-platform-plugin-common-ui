@@ -15,9 +15,8 @@
  */
 
 /**
- * The `impl` namespace contains implementation classes of visual role mapping strategies and mappers.
+ * The `adaptation.spec` namespace contains specification types for describing visual role adaptation strategies.
  *
- * @name pentaho.visual.role.strategies.impl
+ * @name pentaho.visual.role.adaptation.spec
  * @namespace
- * @private
  */

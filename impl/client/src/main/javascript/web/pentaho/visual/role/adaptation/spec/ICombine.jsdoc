@@ -15,31 +15,31 @@
  */
 
 /**
- * The `spec.ICombine` interface represents the specification of the _combine_ mapping strategy.
+ * The `spec.ICombineStrategy` interface represents the specification of the _combine_ visual role adaptation strategy.
  *
- * @name pentaho.visual.role.strategies.spec.ICombine
+ * @name pentaho.visual.role.adaptation.spec.ICombineStrategy
  * @interface
- * @extends pentaho.visual.role.strategies.spec.IBase
+ * @extends pentaho.visual.role.adaptation.spec.IStrategy
  *
- * @see pentaho.visual.role.strategies.Combine
+ * @see pentaho.visual.role.adaptation.CombineStrategy
  */
 
 /**
  * The text separator used to combine the keys of each field.
  *
  * @name valueSeparator
- * @memberOf pentaho.visual.role.strategies.spec.ICombine#
+ * @memberOf pentaho.visual.role.adaptation.spec.ICombineStrategy#
  * @type {string}
  * @default "~"
- * @see pentaho.visual.role.strategies.Combine#valueSeparator
+ * @see pentaho.visual.role.adaptation.CombineStrategy#valueSeparator
  */
 
 /**
  * The text separator used to combine the formatted values of each field.
  *
  * @name formattedSeparator
- * @memberOf pentaho.visual.role.strategies.spec.ICombine#
+ * @memberOf pentaho.visual.role.adaptation.spec.ICombineStrategy#
  * @type {string}
  * @default " ~ "
- * @see pentaho.visual.role.strategies.Combine#formattedSeparator
+ * @see pentaho.visual.role.adaptation.CombineStrategy#formattedSeparator
  */

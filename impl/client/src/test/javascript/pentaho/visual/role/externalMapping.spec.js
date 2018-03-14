@@ -37,7 +37,7 @@ define([
 
             return context.getDependencyApplyAsync([
               "pentaho/visual/base/model",
-              "pentaho/visual/role/strategies/identity",
+              "pentaho/visual/role/adaptation/identity",
               "pentaho/visual/role/mapping"
             ], function(_Model, _IdentityStrategy) {
               VisualModel = _Model;

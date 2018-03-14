@@ -1,0 +1,83 @@
+/*!
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `IAdapter` interface describes a type that
+ * adapts certain [input fields]{@link pentaho.visual.role.adaptation.IAdapter#inputFieldIndexes} of
+ * a [data set]{@link pentaho.visual.role.adaptation.IAdapter#data}
+ * into certain [output fields]{@link pentaho.visual.role.adaptation.IAdapter#outputFieldIndexes} of
+ * the same data set.
+ *
+ * @name pentaho.visual.role.adaptation.IAdapter
+ *
+ * @interface
+ *
+ * @see pentaho.visual.role.adaptation.Strategy
+ */
+
+/**
+ * Gets the adaptation strategy method from which this adapter was derived.
+ *
+ * @name pentaho.visual.role.adaptation.IAdapter#method
+ * @type {!pentaho.visual.role.adaptation.IStrategyMethod}
+ * @readOnly
+ * @see pentaho.visual.role.adaptation.IAdapter#kind
+ */
+
+/**
+ * Gets the data set of this adapter.
+ *
+ * @name pentaho.visual.role.adaptation.IAdapter#data
+ * @type {!pentaho.data.ITable}
+ * @readOnly
+ */
+
+/**
+ * Gets the indexes of the input fields.
+ *
+ * @name pentaho.visual.role.adaptation.IAdapter#inputFieldIndexes
+ * @type {!Array.<number>}
+ * @readOnly
+ */
+
+/**
+ * Gets the indexes of the output fields.
+ *
+ * When the corresponding
+ * [adaptation strategy method]{@link pentaho.visual.role.adaptation.IAdapter#method}
+ * is an [identity]{@link pentaho.visual.role.adaptation.IStrategyMethod#isIdentity} method,
+ * then `outputFieldIndexes` is equal to `inputFieldIndexes`.
+ *
+ * @name pentaho.visual.role.adaptation.IAdapter#outputFieldIndexes
+ * @type {!Array.<number>}
+ * @readOnly
+ */
+
+/**
+ * Gets the input data cells of that correspond to the given output values or cells.
+ *
+ * In the case of adaptation strategies,
+ * such as the [tuple]{@link pentaho.visual.role.adaptation.TupleStrategy} strategy,
+ * that have more than one [output field]{@link pentaho.visual.role.adaptation.IAdapter#outputFieldIndexes},
+ * the values or cells of all of the output fields (or a left-aligned part of these) should be provided.
+ *
+ * @name pentaho.visual.role.adaptation.IAdapter#invert
+ * @method
+ *
+ * @param {Array.<any|!pentaho.data.ICell>} outputValues - The output value(s) or cell(s).
+ *
+ * @return {Array.<!pentaho.data.ICell>} The input cells, when the given output values are present; `null`, otherwise.
+ */
