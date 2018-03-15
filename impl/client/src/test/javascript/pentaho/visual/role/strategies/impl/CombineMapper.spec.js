@@ -15,16 +15,16 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/visual/role/strategies/impl/CombineMapper",
+  "pentaho/visual/role/adaptation/impl/CombineAdapter",
   "pentaho/data/Table",
   "pentaho/data/TableView"
-], function(Context, Mapper, DataTable, DataView) {
+], function(Context, Adapter, DataTable, DataView) {
 
   "use strict";
 
   /* globals describe, it, beforeEach, beforeAll, spyOn */
 
-  xdescribe("pentaho.visual.role.strategies.impl.CombineMapper", function() {
+  xdescribe("pentaho.visual.role.adaptation.impl.CombineAdapter", function() {
 
     var propType;
     var dataTable;
@@ -82,7 +82,7 @@ define([
 
       var dataView = new DataView(dataTable).setSourceColumns(columnIndexes);
 
-      return new Mapper(strategy, propType, dataView, mode, valueSeparator, formattedSeparator);
+      return new Adapter(strategy, propType, dataView, mode, valueSeparator, formattedSeparator);
     }
 
     beforeAll(function(done) {
@@ -104,7 +104,7 @@ define([
                         {dataType: "element", isContinuous: false}
                       ],
                       strategies: [
-                        {_: "pentaho/visual/role/strategies/combine"}
+                        {_: "pentaho/visual/role/adaptation/combine"}
                       ]
                     }
                   ]
@@ -127,7 +127,7 @@ define([
 
       var mapper = buildMapper([datasetColumns.StringCategorical1], modes.StringCategorical);
 
-      expect(mapper instanceof Mapper).toBe(true);
+      expect(mapper instanceof Adapter).toBe(true);
     });
 
     it("should have dataType equal to string", function() {

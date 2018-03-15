@@ -15,16 +15,16 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/visual/role/strategies/impl/IdentityMapper",
+  "pentaho/visual/role/adaptation/impl/IdentityAdapter",
   "pentaho/data/Table",
   "pentaho/data/TableView"
-], function(Context, Mapper, DataTable, DataView) {
+], function(Context, Adapter, DataTable, DataView) {
 
   "use strict";
 
   /* globals describe, it, beforeEach, beforeAll, spyOn */
 
-  xdescribe("pentaho.visual.role.strategies.Identity", function() {
+  xdescribe("pentaho.visual.role.adaptation.IdentityStrategy", function() {
 
     var Strategy;
 
@@ -58,7 +58,7 @@ define([
           .then(function(context) {
             return context.getDependencyApplyAsync([
               "pentaho/visual/base/model",
-              "pentaho/visual/role/strategies/identity"
+              "pentaho/visual/role/adaptation/identity"
             ], function(_VisualModel, _Strategy) {
 
               var CustomVisualModel = _VisualModel.extend({
@@ -129,7 +129,7 @@ define([
         });
 
         // Can downgrade continuous column into a categorical mode.
-        it("should return an IdentityMapper if given a number / continuous column " +
+        it("should return an IdentityAdapter if given a number / continuous column " +
             "and a number / categorical mode", function() {
 
           var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.NumberContinuous]);
@@ -137,11 +137,11 @@ define([
           var strategy = new Strategy();
           var mapper = strategy.getMapper(propType, dataView, modes.NumberCategorical);
 
-          expect(mapper instanceof Mapper).toBe(true);
+          expect(mapper instanceof Adapter).toBe(true);
         });
 
         // Exact match
-        it("should return an IdentityMapper if given a number / continuous column " +
+        it("should return an IdentityAdapter if given a number / continuous column " +
             "and a number / continuous mode", function() {
 
           var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.NumberContinuous]);
@@ -149,11 +149,11 @@ define([
           var strategy = new Strategy();
           var mapper = strategy.getMapper(propType, dataView, modes.NumberContinuous);
 
-          expect(mapper instanceof Mapper).toBe(true);
+          expect(mapper instanceof Adapter).toBe(true);
         });
 
         // Exact match
-        it("should return an IdentityMapper if given a number / categorical column " +
+        it("should return an IdentityAdapter if given a number / categorical column " +
             "and a number / categorical mode", function() {
 
           var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.NumberCategorical]);
@@ -161,10 +161,10 @@ define([
           var strategy = new Strategy();
           var mapper = strategy.getMapper(propType, dataView, modes.NumberCategorical);
 
-          expect(mapper instanceof Mapper).toBe(true);
+          expect(mapper instanceof Adapter).toBe(true);
         });
 
-        it("should return an IdentityMapper if given a string / categorical column " +
+        it("should return an IdentityAdapter if given a string / categorical column " +
             "and a string / categorical mode", function() {
 
           var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.StringCategorical]);
@@ -172,7 +172,7 @@ define([
           var strategy = new Strategy();
           var mapper = strategy.getMapper(propType, dataView, modes.StringCategorical);
 
-          expect(mapper instanceof Mapper).toBe(true);
+          expect(mapper instanceof Adapter).toBe(true);
         });
 
         it("should return a mapper with the given inputData and mode", function() {

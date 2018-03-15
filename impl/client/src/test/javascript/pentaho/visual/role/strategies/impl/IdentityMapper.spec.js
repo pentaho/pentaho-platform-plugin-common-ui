@@ -15,16 +15,16 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/visual/role/strategies/impl/IdentityMapper",
+  "pentaho/visual/role/adaptation/impl/IdentityAdapter",
   "pentaho/data/Table",
   "pentaho/data/TableView"
-], function(Context, Mapper, DataTable, DataView) {
+], function(Context, Adapter, DataTable, DataView) {
 
   "use strict";
 
   /* globals describe, it, beforeEach, beforeAll, spyOn */
 
-  xdescribe("pentaho.visual.role.strategies.impl.IdentityMapper", function() {
+  xdescribe("pentaho.visual.role.adaptation.impl.IdentityAdapter", function() {
 
     var propType;
     var dataTable;
@@ -71,7 +71,7 @@ define([
 
       var columnType = propType.context.get(dataView.getColumnType(0)).type;
 
-      return new Mapper(strategy, propType, dataView, mode, columnType);
+      return new Adapter(strategy, propType, dataView, mode, columnType);
     }
 
     beforeAll(function(done) {
@@ -96,7 +96,7 @@ define([
                         {dataType: "element", isContinuous: true}
                       ],
                       strategies: [
-                        {_: "pentaho/visual/role/strategies/identity"}
+                        {_: "pentaho/visual/role/adaptation/identity"}
                       ]
                     }
                   ]
@@ -122,7 +122,7 @@ define([
 
       var mapper = buildMapper(datasetColumns.StringCategorical, modes.StringCategorical);
 
-      expect(mapper instanceof Mapper).toBe(true);
+      expect(mapper instanceof Adapter).toBe(true);
     });
 
     it("should have dataType equal to the mapped column's data type", function() {

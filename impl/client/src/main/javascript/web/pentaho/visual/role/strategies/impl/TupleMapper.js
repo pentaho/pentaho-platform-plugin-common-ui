@@ -16,15 +16,15 @@
 define([
   "module",
   "pentaho/util/object",
-  "./Mapper"
-], function(module, O, Mapper) {
+  "./Adapter"
+], function(module, O, Adapter) {
 
   "use strict";
 
   /**
    * @classDesc A tree index.
    * @class
-   * @memberOf pentaho.visual.role.strategies.impl.TupleMapper~
+   * @memberOf pentaho.visual.role.adaptation.impl.TupleAdapter~
    * @private
    *
    * @constructor
@@ -48,7 +48,7 @@ define([
 
     /**
      * Gets the child nodes of this node, if any, or `null` if none.
-     * @type {Array.<pentaho.visual.role.strategies.impl.TupleMapper~IndexNode>}
+     * @type {Array.<pentaho.visual.role.adaptation.impl.TupleAdapter~IndexNode>}
      */
     this.children = null;
   }
@@ -56,7 +56,7 @@ define([
   /**
    * Gets the index of the first indexed row having the given keys.
    *
-   * @memberOf pentaho.visual.role.strategies.impl.TupleMapper~IndexNode
+   * @memberOf pentaho.visual.role.adaptation.impl.TupleAdapter~IndexNode
    * @param {!Array.<any>} values - The values from which corresponding keys are obtained.
    * @param {!Array.<(function(any):string)>} keyFuns - The array of key functions which obtain the
    * key of each value.
@@ -84,7 +84,7 @@ define([
   /**
    * Indexes a row, given the data set, row index and array of functions which obtain the key of each value.
    *
-   * @memberOf pentaho.visual.role.strategies.impl.TupleMapper~IndexNode
+   * @memberOf pentaho.visual.role.adaptation.impl.TupleAdapter~IndexNode
    * @param {!pentaho.data.ITable} inputData - The data set whose row is to be indexed.
    * @param {number} rowIndex - The row to index.
    * @param {!Array.<(function(any):string)>} keyFuns - The array of key functions which obtain the
@@ -119,17 +119,17 @@ define([
     return values;
   };
 
-  var TupleMapper = Mapper.extend(/** @lends pentaho.visual.role.strategies.impl.TupleMapper# */{
+  var TupleAdapter = Adapter.extend(/** @lends pentaho.visual.role.adaptation.impl.TupleAdapter# */{
     /**
-     * @classDesc The `TupleMapper` class is the mapper implementation class of the `Tuple` strategy.
-     * @alias TupleMapper
-     * @memberOf pentaho.visual.role.strategies.impl
+     * @classDesc The `TupleAdapter` class is the mapper implementation class of the `Tuple` strategy.
+     * @alias TupleAdapter
+     * @memberOf pentaho.visual.role.adaptation.impl
      * @class
-     * @extends pentaho.visual.role.strategies.impl.Mapper
+     * @extends pentaho.visual.role.adaptation.impl.Adapter
      * @private
-     * @see pentaho.visual.role.strategies.Tuple
+     * @see pentaho.visual.role.adaptation.TupleStrategy
      * @description Creates a _tuple_ mapper instance.
-     * @param {!pentaho.type.visual.role.strategies.Base} strategy - The strategy.
+     * @param {!pentaho.type.visual.role.adaptation.Strategy} strategy - The strategy.
      * @param {!pentaho.type.visual.role.Property.Type} propType - The visual role property type.
      * @param {!pentaho.data.ITable} inputData - The data set view to be mapped.
      * @param {!pentaho.visual.role.Mode} mode - The visual role mode of `propType` which will be used.
@@ -152,7 +152,7 @@ define([
       /**
        * Gets the tree index.
        *
-       * @type {pentaho.visual.role.strategies.impl.TupleMapper~IndexNode}
+       * @type {pentaho.visual.role.adaptation.impl.TupleAdapter~IndexNode}
        * @readOnly
        * @private
        */
@@ -185,12 +185,12 @@ define([
     }
   });
 
-  return TupleMapper;
+  return TupleAdapter;
 
   /**
    * Creates the key functions for the values of all of the columns.
    *
-   * @memberOf pentaho.visual.role.strategies.impl.TupleMapper~
+   * @memberOf pentaho.visual.role.adaptation.impl.TupleAdapter~
    *
    * @param {!pentaho.data.ITable} inputData - The data set view to be mapped.
    * @param {number} columnCount - The number of columns.

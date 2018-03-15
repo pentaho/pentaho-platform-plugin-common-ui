@@ -15,16 +15,16 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/visual/role/strategies/impl/TupleMapper",
+  "pentaho/visual/role/adaptation/impl/TupleAdapter",
   "pentaho/data/Table",
   "pentaho/data/TableView"
-], function(Context, Mapper, DataTable, DataView) {
+], function(Context, Adapter, DataTable, DataView) {
 
   "use strict";
 
   /* globals describe, it, beforeEach, beforeAll, spyOn */
 
-  xdescribe("pentaho.visual.role.strategies.impl.TupleMapper", function() {
+  xdescribe("pentaho.visual.role.adaptation.impl.TupleAdapter", function() {
 
     var propType;
     var dataTable;
@@ -82,7 +82,7 @@ define([
 
       var dataView = new DataView(dataTable).setSourceColumns(columnIndexes);
 
-      return new Mapper(strategy, propType, dataView, mode, valueSeparator, formattedSeparator);
+      return new Adapter(strategy, propType, dataView, mode, valueSeparator, formattedSeparator);
     }
 
     beforeAll(function(done) {
@@ -107,7 +107,7 @@ define([
                         {dataType: ["element"], isContinuous: true}
                       ],
                       strategies: [
-                        {_: "pentaho/visual/role/strategies/tuple"}
+                        {_: "pentaho/visual/role/adaptation/tuple"}
                       ]
                     }
                   ]
@@ -133,7 +133,7 @@ define([
 
       var mapper = buildMapper([datasetColumns.StringCategorical1], modes.StringListCategorical);
 
-      expect(mapper instanceof Mapper).toBe(true);
+      expect(mapper instanceof Adapter).toBe(true);
     });
 
     it("should have dataType equal to that of the mode", function() {

@@ -15,16 +15,16 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/visual/role/strategies/impl/CombineMapper",
+  "pentaho/visual/role/adaptation/impl/CombineAdapter",
   "pentaho/data/Table",
   "pentaho/data/TableView"
-], function(Context, Mapper, DataTable, DataView) {
+], function(Context, Adapter, DataTable, DataView) {
 
   "use strict";
 
   /* globals describe, it, beforeEach, beforeAll, spyOn */
 
-  xdescribe("pentaho.visual.role.strategies.Combine", function() {
+  xdescribe("pentaho.visual.role.adaptation.CombineStrategy", function() {
 
     var Strategy;
 
@@ -65,7 +65,7 @@ define([
           .then(function(context) {
             return context.getDependencyApplyAsync([
               "pentaho/visual/base/model",
-              "pentaho/visual/role/strategies/combine"
+              "pentaho/visual/role/adaptation/combine"
             ], function(_VisualModel, _Strategy) {
 
               var CustomVisualModel = _VisualModel.extend({
@@ -149,24 +149,24 @@ define([
             expect(mapper).toBe(null);
           });
 
-          it("should return a CombineMapper if given a mode having an element data type", function() {
+          it("should return a CombineAdapter if given a mode having an element data type", function() {
 
             var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.NumberCategorical1]);
 
             var strategy = new Strategy();
             var mapper = strategy.getMapper(propTypeKey, dataView, modes.ElementCategorical);
 
-            expect(mapper instanceof Mapper).toBe(true);
+            expect(mapper instanceof Adapter).toBe(true);
           });
 
-          it("should return a CombineMapper if given a mode having a string data type", function() {
+          it("should return a CombineAdapter if given a mode having a string data type", function() {
 
             var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.NumberContinuous1]);
 
             var strategy = new Strategy();
             var mapper = strategy.getMapper(propTypeKey, dataView, modes.StringCategorical);
 
-            expect(mapper instanceof Mapper).toBe(true);
+            expect(mapper instanceof Adapter).toBe(true);
           });
 
           describe("when given a mode having a string data type", function() {
@@ -178,7 +178,7 @@ define([
               var strategy = new Strategy();
               var mapper = strategy.getMapper(propTypeKey, dataView, modes.StringCategorical);
 
-              expect(mapper instanceof Mapper).toBe(true);
+              expect(mapper instanceof Adapter).toBe(true);
             });
 
             it("should return a mapper when given one number / categorical column", function() {
@@ -188,7 +188,7 @@ define([
               var strategy = new Strategy();
               var mapper = strategy.getMapper(propTypeKey, dataView, modes.StringCategorical);
 
-              expect(mapper instanceof Mapper).toBe(true);
+              expect(mapper instanceof Adapter).toBe(true);
             });
 
             it("should return a mapper when given more than one column, " +
@@ -204,7 +204,7 @@ define([
               var strategy = new Strategy();
               var mapper = strategy.getMapper(propTypeKey, dataView, modes.StringCategorical);
 
-              expect(mapper instanceof Mapper).toBe(true);
+              expect(mapper instanceof Adapter).toBe(true);
             });
 
             it("should return a mapper with the given inputData and mode", function() {

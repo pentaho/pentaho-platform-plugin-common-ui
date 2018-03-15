@@ -15,16 +15,16 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/visual/role/strategies/impl/TupleMapper",
+  "pentaho/visual/role/adaptation/impl/TupleAdapter",
   "pentaho/data/Table",
   "pentaho/data/TableView"
-], function(Context, Mapper, DataTable, DataView) {
+], function(Context, Adapter, DataTable, DataView) {
 
   "use strict";
 
   /* globals describe, it, beforeEach, beforeAll, spyOn */
 
-  xdescribe("pentaho.visual.role.strategies.Tuple", function() {
+  xdescribe("pentaho.visual.role.adaptation.TupleStrategy", function() {
 
     var Strategy;
 
@@ -65,7 +65,7 @@ define([
           .then(function(context) {
             return context.getDependencyApplyAsync([
               "pentaho/visual/base/model",
-              "pentaho/visual/role/strategies/tuple"
+              "pentaho/visual/role/adaptation/tuple"
             ], function(_VisualModel, _Strategy) {
 
               var CustomVisualModel = _VisualModel.extend({
@@ -165,7 +165,7 @@ define([
 
             describe("when all columns are continuous", function() {
 
-              it("should return a TupleMapper", function() {
+              it("should return a TupleAdapter", function() {
 
                 var dataView = new DataView(dataTable).setSourceColumns([
                   datasetColumns.NumberContinuous1,
@@ -175,14 +175,14 @@ define([
                 var strategy = new Strategy();
                 var mapper = strategy.getMapper(propTypeKey, dataView, modes.NumberListContinuous);
 
-                expect(mapper instanceof Mapper).toBe(true);
+                expect(mapper instanceof Adapter).toBe(true);
               });
             });
           });
 
           describe("when the mode is categorical", function() {
 
-            it("should return a TupleMapper, even if some columns are continuous", function() {
+            it("should return a TupleAdapter, even if some columns are continuous", function() {
 
               var dataView = new DataView(dataTable).setSourceColumns([
                 datasetColumns.NumberCategorical1,
@@ -193,10 +193,10 @@ define([
               var strategy = new Strategy();
               var mapper = strategy.getMapper(propTypeKey, dataView, modes.ElementListCategorical);
 
-              expect(mapper instanceof Mapper).toBe(true);
+              expect(mapper instanceof Adapter).toBe(true);
             });
 
-            it("should return a TupleMapper, even if the visual role is not key", function() {
+            it("should return a TupleAdapter, even if the visual role is not key", function() {
 
               var dataView = new DataView(dataTable).setSourceColumns([
                 datasetColumns.NumberContinuous1
@@ -206,7 +206,7 @@ define([
               // mode: [number] / continuous
               var mapper = strategy.getMapper(propTypeNonKey, dataView, propTypeNonKey.modes.at(0));
 
-              expect(mapper instanceof Mapper).toBe(true);
+              expect(mapper instanceof Adapter).toBe(true);
             });
 
             it("should return a mapper with the given inputData and mode", function() {

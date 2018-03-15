@@ -15,15 +15,15 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/visual/role/strategies/impl/Mapper",
+  "pentaho/visual/role/adaptation/impl/Adapter",
   "pentaho/data/Table"
-], function(Context, Mapper, DataTable) {
+], function(Context, Adapter, DataTable) {
 
   "use strict";
 
   /* globals describe, it, beforeEach, beforeAll, spyOn */
 
-  xdescribe("pentaho.visual.role.strategies.impl.Mapper", function() {
+  xdescribe("pentaho.visual.role.adaptation.impl.Adapter", function() {
 
     var propType;
     var dataTable;
@@ -59,56 +59,56 @@ define([
 
     it("should be possible to create an instance", function() {
 
-      var mapper = new Mapper(strategy, propType, dataTable, mode);
+      var mapper = new Adapter(strategy, propType, dataTable, mode);
 
-      expect(mapper instanceof Mapper).toBe(true);
+      expect(mapper instanceof Adapter).toBe(true);
     });
 
     it("should respect and expose the specified `propType` argument in `_propType`", function() {
 
-      var mapper = new Mapper(strategy, propType, dataTable, mode);
+      var mapper = new Adapter(strategy, propType, dataTable, mode);
 
       expect(mapper._propType).toBe(propType);
     });
 
     it("should respect and expose the specified `inputData` argument in `inputData`", function() {
 
-      var mapper = new Mapper(strategy, propType, dataTable, mode);
+      var mapper = new Adapter(strategy, propType, dataTable, mode);
 
       expect(mapper.inputData).toBe(dataTable);
     });
 
     it("should respect and expose the specified `mode` argument in `mode`", function() {
 
-      var mapper = new Mapper(strategy, propType, dataTable, mode);
+      var mapper = new Adapter(strategy, propType, dataTable, mode);
 
       expect(mapper.mode).toBe(mode);
     });
 
     it("should respect and expose the specified `strategy` argument in `strategy`", function() {
 
-      var mapper = new Mapper(strategy, propType, dataTable, mode);
+      var mapper = new Adapter(strategy, propType, dataTable, mode);
 
       expect(mapper.strategy).toBe(strategy);
     });
 
     it("should have `kind` be null", function() {
 
-      var mapper = new Mapper(strategy, propType, dataTable, mode);
+      var mapper = new Adapter(strategy, propType, dataTable, mode);
 
       expect(mapper.kind).toBe(null);
     });
 
     it("should have `dataType` get the mode.dataType", function() {
 
-      var mapper = new Mapper(strategy, propType, dataTable, mode);
+      var mapper = new Adapter(strategy, propType, dataTable, mode);
 
       expect(mapper.dataType).toBe(mode.dataType);
     });
 
     it("should have `isContinuous` get the mode.isContinuous", function() {
 
-      var mapper = new Mapper(strategy, propType, dataTable, mode);
+      var mapper = new Adapter(strategy, propType, dataTable, mode);
 
       expect(mapper.isContinuous).toBe(mode.isContinuous);
     });

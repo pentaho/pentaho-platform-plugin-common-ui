@@ -15,22 +15,22 @@
  */
 define([
   "module",
-  "./Mapper"
-], function(module, Mapper) {
+  "./Adapter"
+], function(module, Adapter) {
 
   "use strict";
 
-  var CombineMapper = Mapper.extend(/** @lends pentaho.visual.role.strategies.impl.CombineMapper# */{
+  var CombineAdapter = Adapter.extend(/** @lends pentaho.visual.role.adaptation.impl.CombineAdapter# */{
     /**
-     * @classDesc The `CombineMapper` class is the mapper implementation class of the `Combine` strategy.
-     * @alias CombineMapper
-     * @memberOf pentaho.visual.role.strategies.impl
+     * @classDesc The `CombineAdapter` class is the mapper implementation class of the `Combine` strategy.
+     * @alias CombineAdapter
+     * @memberOf pentaho.visual.role.adaptation.impl
      * @class
-     * @extends pentaho.visual.role.strategies.impl.Mapper
+     * @extends pentaho.visual.role.adaptation.impl.Adapter
      * @private
-     * @see pentaho.visual.role.strategies.Combine
+     * @see pentaho.visual.role.adaptation.CombineStrategy
      * @description Creates a _combine_ mapper instance.
-     * @param {!pentaho.type.visual.role.strategies.Base} strategy - The strategy.
+     * @param {!pentaho.type.visual.role.adaptation.Strategy} strategy - The strategy.
      * @param {!pentaho.type.visual.role.Property.Type} propType - The visual role property type.
      * @param {!pentaho.data.ITable} inputData - The data set view to be mapped.
      * @param {!pentaho.visual.role.Mode} mode - The visual role mode of `propType` which will be used.
@@ -109,7 +109,7 @@ define([
     }
   });
 
-  return CombineMapper;
+  return CombineAdapter;
 
   /**
    * Creates a value combiner function for a given input data and separator.
