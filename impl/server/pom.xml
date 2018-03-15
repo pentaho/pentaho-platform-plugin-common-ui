@@ -14,7 +14,7 @@
   <url>http://www.pentaho.com</url>
   <properties>
     <spring.version>4.3.2.RELEASE</spring.version>
-    <commons-vfs2.version>2.1-20150824</commons-vfs2.version>
+    <commons-vfs2.version>2.2</commons-vfs2.version>
     <simple-jndi.version>0.11.1</simple-jndi.version>
     <jmock-junit4.version>2.5.1</jmock-junit4.version>
     <pentaho-connections.version>8.1.0.0-SNAPSHOT</pentaho-connections.version>
