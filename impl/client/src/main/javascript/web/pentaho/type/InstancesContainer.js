@@ -72,9 +72,11 @@ define([
       // Convert an alias to its id.
       this.typeId = typeInfo.getIdOf(typeId) || typeId;
 
-
       this.id = id;
       this.ranking = (instanceConfig && +instanceConfig.ranking) || 0;
+
+      var isEnabled = instanceConfig && instanceConfig.isEnabled;
+      this.isEnabled = isEnabled == null || !!isEnabled;
 
       // Set lazily, when loading.
       this.__promise = null;
@@ -468,9 +470,12 @@ define([
         var L = holders.length;
         var i = -1;
         while(++i < L) {
-          var instance = holders[i].instance;
-          if(filter(instance)) {
-            return instance;
+          var holder = holders[i];
+          if(holder.isEnabled) {
+            var instance = holder.instance;
+            if(filter(instance)) {
+              return instance;
+            }
           }
         }
       }
@@ -512,7 +517,7 @@ define([
         var instances = holders
             .map(function(holder) {
               // NotLoaded/Failed instances return null.
-              return holder.instance;
+              return holder.isEnabled ? holder.instance : null;
             })
             .filter(filter);
 
@@ -542,6 +547,7 @@ define([
 
         promiseAll = Promise.all(holders.map(function(holder) {
           // Convert failed instances to null
+          if(!holder.isEnabled) return null;
           return holder.promise["catch"](function() { return null; });
         }))
         .then(function(instances) {
@@ -590,9 +596,9 @@ define([
       }
 
       throw error.argInvalidType(
-          "baseTypeId",
-          ["string", "Class<pentaho.type.Instance>", "pentaho.type.Type"],
-          typeof baseTypeId);
+        "baseTypeId",
+        ["string", "Class<pentaho.type.Instance>", "pentaho.type.Type"],
+        typeof baseTypeId);
     },
 
     __validateTypeId: function(baseTypeId) {
@@ -815,8 +821,8 @@ define([
 
         // Always required.
         return sync
-            ? this.getById(value)
-            : this.getByIdAsync(value);
+          ? this.getById(value)
+          : this.getByIdAsync(value);
       }
 
       if((value = specialSpec.type || typeDefault)) {
@@ -874,8 +880,8 @@ define([
 
           var getListCtorSync = function() {
             return listType
-                ? listType.instance.constructor
-                : context.get([elemTypeId]);
+              ? listType.instance.constructor
+              : context.get([elemTypeId]);
           };
 
           var createList = function(ListCtor, results) {
@@ -893,8 +899,8 @@ define([
         }
 
         return sync
-            ? this.getByType(elemTypeId, specialSpec)
-            : this.getByTypeAsync(elemTypeId, specialSpec);
+          ? this.getByType(elemTypeId, specialSpec)
+          : this.getByTypeAsync(elemTypeId, specialSpec);
       }
 
       return promiseUtil.error(error.operInvalid("Cannot resolve instance for an unspecified type."), sync);

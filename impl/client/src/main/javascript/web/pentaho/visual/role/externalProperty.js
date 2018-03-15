@@ -20,12 +20,13 @@ define([
   "pentaho/type/util",
   "pentaho/util/object",
   "pentaho/util/error",
+  "pentaho/util/arg",
 
   // so that r.js sees otherwise invisible dependencies.
   "./abstractProperty",
   "./externalMapping",
   "./strategy/base"
-], function(bundle, ValidationError, DataView, typeUtil, O, error) {
+], function(bundle, ValidationError, DataView, typeUtil, O, error, arg) {
 
   "use strict";
 
@@ -33,18 +34,34 @@ define([
     "./abstractProperty",
     "./externalMapping",
     "./strategy/base",
+    "./mode",
     {$instance: {type: ["pentaho/visual/role/strategy/base"]}},
 
-    function(AbstractProperty, ExternalMapping, BaseStrategy, allStrategiesList) {
+    function(AbstractProperty, ExternalMapping, BaseStrategy, Mode, allStrategiesList) {
 
       var allStrategies = allStrategiesList.toArray();
 
       var ListOfStrategyType = this.get([BaseStrategy]);
+      var ListOfModeType = this.get([Mode]);
+
+      // This one should remain private
+      /**
+       * @name pentaho.visual.role.IStrategyMethodInfo
+       * @interface
+       * @private
+       * @property {!pentaho.visual.role.Mode} internalMode - The internal mode.
+       * @property {!pentaho.visual.role.Mode} externalMode - The external mode.
+       * @property {!pentaho.visual.role.adaptation.IStrategyMethod} method - The adaptation strategy method.
+       */
+
+      // NOTE: these will be kept private until it is decided between the adapter and the viz concept.
 
       /**
        * @name pentaho.visual.role.ExternalProperty.Type
        * @class
        * @extends pentaho.visual.role.AbstractProperty.Type
+       *
+       * @private
        *
        * @classDesc The type class of {@link pentaho.visual.role.ExternalProperty}.
        */
@@ -53,6 +70,8 @@ define([
        * @name pentaho.visual.role.ExternalProperty
        * @class
        * @extends pentaho.visual.role.AbstractProperty
+       *
+       * @private
        *
        * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.ExternalProperty>} pentaho/visual/role/externalProperty
        *
@@ -79,12 +98,7 @@ define([
 
             if(this.isRoot) {
 
-              var internalProperty = keyArgs && keyArgs.internalProperty;
-              if(internalProperty == null) {
-                throw error.argRequired("keyArgs.internalProperty");
-              }
-
-              O.setConst(this, "_internalProperty", internalProperty);
+              O.setConst(this, "_internalProperty", arg.required(keyArgs, "internalProperty", "keyArgs"));
 
               // Assume default values.
               // Anticipate setting `strategies`.
@@ -115,10 +129,15 @@ define([
           _internalProperty: null,
           // endregion
 
-          // @override
+          // region modes
+          // Initialized in #__setStrategies
+          __modes: null,
+
+          /** @inheritDoc */
           get modes() {
-            return this._internalProperty.modes;
+            return this.__modes;
           },
+          // endregion
 
           // @override
           get isVisualKey() {
@@ -149,28 +168,28 @@ define([
             return fields;
           },
 
-          // TODO: Implement __fieldsCountRangeOn on the external property.
-          // This is informative only and will be derived from:
-          // * isRequired: the internal property's countRange
-          // * isList/countMax = {1, Infinity}
-          //   * if there is a current strategy
-          //      * derive from its mode's data type
-          //
-          //   * otherwise
-          //      * derived from all modes' data types
-          /*
+          /**
+           * The property is required if its internal property is required.
+           * The property is a list if its current mode is a list or, when there is no current mode,
+           * if it has any list modes.
+           *
            * Implements IFieldsMetadata#countRangeOn.
+           *
+           * @param {!pentaho.visual.base.ModelAdapter} modelAdapter - The model adapter.
+           * @return {pentaho.IRange<number>} The field count range.
+           * @private
            */
           __fieldsCountRangeOn: function(modelAdapter) {
-            var isRequired = this.__fieldsIsRequiredOn(modelAdapter);
-            var countMin = this.__fieldsCountMinOn(modelAdapter);
-            var countMax = this.__fieldsCountMaxOn(modelAdapter);
 
-            if(isRequired && countMin < 1) countMin = 1;
+            var isRequired = this._internalProperty.fields.countRangeOn(modelAdapter.model).min > 0;
 
-            if(countMax < countMin) countMax = countMin;
+            // In unit-tests, these properties are used outside of a real model. So mapping can be null.
+            var externalMapping = modelAdapter.get(this);
+            var mode = externalMapping && externalMapping.mode;
 
-            return {min: countMin, max: countMax};
+            var countMax = (mode !== null ? mode.dataType.isList : this.hasAnyListModes) ? Infinity : 1;
+
+            return {min: isRequired ? 1 : 0, max: countMax};
           },
           // endregion
 
@@ -179,26 +198,33 @@ define([
           __isStrategiesDefault: true,
 
           /**
+           * List of a applicable strategy methods along with corresponding internal and external modes.
+           * @type {Array.<pentaho.visual.role.IStrategyMethodInfo>}
+           * @private
+           */
+          __strategyMethodInfos: null,
+
+          /**
            * Gets or sets the array of adaptation strategies used to adapt the
            * fields mapped to the visual role to those required by one of its modes.
            *
-           * Visual roles need to have at least one mapping strategy.
+           * Visual roles _should_ have at least one mapping strategy.
            *
            * When set to a {@link Nully} value, the set operation is ignored.
            *
            * If not specified at the root [visual.role.Property]{@link pentaho.visual.role.ExternalProperty},
            * the `strategies` attribute is initialized with all registered
-           * [strategy]{@link pentaho.visual.role.strategy.Base} instances
-           * (registered as instances of the type `pentaho/visual/role/strategy/base`).
+           * [strategy]{@link pentaho.visual.role.adaptation.Strategy} instances
+           * (registered as instances of the type `pentaho/visual/role/adaptation/strategy`).
            *
-           * The Viz. API pre-registers the following standard strategies, in the given order:
-           * 1. [Identity]{@link pentaho.visual.role.strategies.Identity} strategy
-           * 2. [Combine]{@link pentaho.visual.role.strategies.Combine} strategy
-           * 3. [Tuple]{@link pentaho.visual.role.strategies.Tuple} strategy.
+           * The Viz. API pre-registers instances of the following standard strategy types, in the given order:
+           * 1. [IdentityStrategy]{@link pentaho.visual.role.adaptation.IdentityStrategy} strategy
+           * 2. [CombineStrategy]{@link pentaho.visual.role.adaptation.CombineStrategy} strategy
+           * 3. [TupleStrategy]{@link pentaho.visual.role.adaptation.TupleStrategy} strategy.
            *
            * The returned list or its elements should not be modified.
            *
-           * @type {!pentaho.type.List.<pentaho.visual.role.strategy.Base>}
+           * @type {!pentaho.type.List.<pentaho.visual.role.adaptation.Strategy>}
            *
            * @throws {pentaho.lang.OperationInvalidError} When setting and the type already has
            * [subtypes]{@link pentaho.type.Type#hasDescendants}.
@@ -217,78 +243,122 @@ define([
           },
 
           __setStrategies: function(values, isDefault) {
+
             var strategies = new ListOfStrategyType(values, {isReadOnly: true});
-            if(strategies.count === 0) {
-              throw error.argInvalid("strategies", bundle.structured.errors.property.noStrategies);
-            }
+
+            // Collect role adapter factories from the strategies, for each internal mode.
+            // Determine external modes.
+
+            var strategyMethodInfos = [];
+
+            var externalModes = new ListOfModeType();
+
+            var isVisualKey = this.isVisualKey;
+
+            this._internalProperty.modes.each(function(internalMode) {
+
+              strategies.each(function(strategy) {
+                // Strategy
+                //   selectMethods(outputDataType, isVisualKey) : IStrategyMethod[] ?
+                //
+                // IStrategyMethod
+                //   (strategy)
+                //   name
+                //   (isVisualKey)
+                //   isIdentity
+                //   isInvertible
+                //   inputDataType
+                //   outputDataType
+                //   validateApplication(schemaDataTable, inputFieldIndexes) ?
+                //
+                // IStrategyMethodValidApplication
+                //   method
+                //   schemaData
+                //   inputFieldIndexes
+                //   apply(dataTable)
+                //
+                // IAdapter
+                //   method
+                //   dataTable
+                //   inputFieldIndexes
+                //   ----
+                //   outputFieldIndexes
+                //   invert(outputValuesOrCells) : inputCells
+
+                var strategyMethods = strategy.selectMethods(internalMode.dataType, isVisualKey);
+                if(strategyMethods != null) {
+
+                  var isContinuous = internalMode.isContinuous;
+
+                  strategyMethods.forEach(function(strategyMethod) {
+
+                    var externalMode = new Mode({dataType: strategyMethod.inputDataType, isContinuous: isContinuous});
+
+                    externalModes.add(externalMode);
+                    externalMode = externalModes.get(externalMode.$key);
+
+                    strategyMethodInfos.push(/** @type {pentaho.visual.role.IStrategyMethodInfo} */{
+                      externalMode: externalMode,
+                      method: strategyMethod,
+                      internalMode: internalMode
+                    });
+                  });
+                }
+              });
+            });
+
+            this.__modes = externalModes;
 
             this.__strategies = strategies;
 
             this.__isStrategiesDefault = !!isDefault;
+
+            this.__strategyMethodInfos = strategyMethodInfos;
           },
           // endregion
 
-          // region getAdapterOn
+          // region selectAdaptationStrategyMethodOn
           /**
-           * Obtains an applicable adapter for the given visualization.
+           * Selects a valid adaptation strategy method for the corresponding visual role of the given model adapter.
            *
            * If the current external mapping is such that its
            * [isCategoricalFixed]{@link pentaho.visual.role.ExternalMapping#isCategoricalFixed} is `true`,
-           * then only categorical modes of [modes]{@link pentaho.visual.role.Property.Type#modes} are considered.
-           * Otherwise, all modes are considered.
+           * then only the categorical modes of [internal modes]{@link pentaho.visual.role.Property.Type#modes}
+           * are considered.
+           * Otherwise, all internal modes are considered.
            *
-           * Modes are tried, in turn. For each mode, registered strategies are queried for an applicable adapter.
-           * The first returned adapter is used.
+           * @param {!pentaho.visual.base.ModelAdapter} modelAdapter - The model adapter.
            *
-           * @param {!pentaho.visual.base.Visualization} visualization - The visualization.
-           *
-           * @return {pentaho.visual.role.IAdapter} An adapter if one is applicable, or `null`, if not.
+           * @return {pentaho.visual.role.IAdaptationStrategyMethodSelection} A strategy method selection instance,
+           * if a method can be applied; `null`, otherwise.
            */
-          getAdapterOn: function(visualization) {
+          selectAdaptationStrategyMethodOn: function(modelAdapter) {
 
-            var mapping = visualization.get(this);
-            var fields = mapping.fields;
-
-            if(fields.count === 0) {
+            var externalMapping = modelAdapter.get(this);
+            if(!externalMapping.hasFields) {
               return null;
             }
 
-            var dataTable = visualization.data;
-            if(dataTable === null) {
+            // Leave if no data or if there are any invalid external field names.
+            var externalFieldIndexes = externalMapping.fieldIndexes;
+            if(externalFieldIndexes === null) {
               return null;
             }
 
-            // Obtain column indexes of fields.
-            var anyInvalidField = false;
-
-            var columnIndexes = fields.toArray(function(field) {
-
-              var index = dataTable.getColumnIndexById(field.name);
-
-              anyInvalidField |= (index < 0);
-
-              return index;
-            });
-
-            // Leave if any invalid field names.
-            if(anyInvalidField) {
-              return null;
-            }
-
-            var inputData = new DataView(dataTable).setSourceColumns(columnIndexes);
-
-            var modes = this.modes;
-            var M = modes.count;
+            var schemaData = modelAdapter.data;
+            var strategyMethodInfos = this.__strategyMethodInfos;
+            var M = strategyMethodInfos.length;
             var m = -1;
-            var isCategoricalFixed = mapping.isCategoricalFixed;
+            var isCategoricalFixed = externalMapping.isCategoricalFixed;
             while(++m < M) {
-              var mode = modes.at(m);
+              var strategyMethodInfo = strategyMethodInfos.at(m);
+              if(!isCategoricalFixed || !strategyMethodInfo.externalMode.isContinuous) {
 
-              if(!isCategoricalFixed || !mode.isContinuous) {
+                var selection = this.__validateAdaptationStrategyMethod(
+                  strategyMethodInfo, schemaData, externalFieldIndexes);
 
-                var adapter = this.__getAdapterForMode(inputData, mode);
-                if(adapter !== null) {
-                  return adapter;
+                if(selection !== null) {
+                  return selection;
                 }
               }
             }
@@ -297,31 +367,48 @@ define([
           },
 
           /**
-           * Gets an adapter for a given input data and mode.
+           * Performs basic validation that the external fields are compatible with the method's external data type,
+           * and if so, calls the strategy method's own validation.
            *
-           * Every registered strategy is queried for an applicable adapter.
-           * The first returned adapter is used.
+           * @param {!pentaho.visual.role.IStrategyMethodInfo} strategyMethodInfo - The adaptation strategy method info.
+           * @param {!pentaho.data.Table} schemaData - The schema data table.
+           * @param {!Array.<number>} externalFieldIndexes - The indexes of the external fields.
            *
-           * @param {!pentaho.data.ITable} inputData - The data set view to be adapter.
-           * @param {!pentaho.visual.role.Mode} mode - The mode which will be used.
-           *
-           * @return {pentaho.visual.role.IAdapter} An adapter if one is applicable, or `null`, if not.
-           *
-           * @private
+           * @return {pentaho.visual.role.IAdaptationStrategyMethodSelection} A strategy method selection,
+           * if the application is valid; `null`, otherwise.
            */
-          __getAdapterForMode: function(inputData, mode) {
+          __validateAdaptationStrategyMethod: function(strategyMethodInfo, schemaData, externalFieldIndexes) {
 
-            var strategies = this.strategies;
-            var S = strategies.count;
-            var s = -1;
-            var adapter;
-            while(++s < S) {
-              if((adapter = strategies.at(s).getAdapter(this, inputData, mode)) != null) {
-                return adapter;
+            var externalDataType = strategyMethodInfo.method.inputDataType;
+            var externalFieldCount = externalFieldIndexes.length;
+
+            // 1) Non-list input data types can only handle a single field.
+            if(!externalDataType.isList && externalFieldCount > 1) {
+              return null;
+            }
+
+            // 2) Compatible field data types.
+            var externalElementDataType = externalDataType.elementType;
+            var externalFieldIndex = -1;
+            var context = externalDataType.context;
+            while(++externalFieldIndex < externalFieldCount) {
+              var actualIndex = externalFieldIndexes[externalFieldIndex];
+              var fieldDataType = context.get(schemaData.getColumnType(actualIndex)).type;
+              if(!fieldDataType.isSubtypeOf(externalElementDataType)) {
+                return null;
               }
             }
 
-            return null;
+            var application = strategyMethodInfo.method.validateApplication(schemaData, externalFieldIndexes);
+            if(application === null) {
+              return null;
+            }
+
+            return /** @type {!pentaho.visual.role.IAdaptationStrategyMethodSelection} */Object.freeze({
+              externalMode: strategyMethodInfo.externalMode,
+              validMethodApplication: application,
+              internalMode: strategyMethodInfo.internalMode
+            });
           },
           // endregion
 
@@ -337,24 +424,24 @@ define([
            * 1. One of the registered strategies must be able to adapt the specified fields to one of the
            *    visual role's modes.
            *
-           * @param {!pentaho.visual.base.Visualization} visualization - The visualization.
+           * @param {!pentaho.visual.base.ModelAdapter} modelAdapter - The model adapter.
            *
            * @return {Array.<pentaho.type.ValidationError>} A non-empty array of `ValidationError` or `null`.
            */
-          validateOn: function(visualization) {
+          validateOn: function(modelAdapter) {
 
-            var errors = this.base(visualization);
+            var errors = this.base(modelAdapter);
             if(!errors) {
               var addErrors = function(newErrors) {
                 errors = typeUtil.combineErrors(errors, newErrors);
               };
 
-              var mapping = visualization.get(this);
+              var mapping = modelAdapter.get(this);
 
               // Can adapt.
               if(mapping.adapter === null) {
                 addErrors(new ValidationError(
-                    bundle.format(bundle.structured.errors.property.noAdapter, {role: this})));
+                  bundle.format(bundle.structured.errors.property.noAdapter, {role: this})));
               }
             }
 

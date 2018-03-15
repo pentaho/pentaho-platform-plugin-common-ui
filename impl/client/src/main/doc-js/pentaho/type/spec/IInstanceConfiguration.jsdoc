@@ -34,3 +34,12 @@
  * @type {number}
  * @default 0
  */
+
+/**
+ * Indicates if the instance is enabled.
+ *
+ * @name isEnabled
+ * @memberOf pentaho.type.spec.IInstanceConfiguration#
+ * @type {boolean}
+ * @default true
+ */

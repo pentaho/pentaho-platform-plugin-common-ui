@@ -167,6 +167,36 @@ define([
         });
         // endregion
 
+        // region spec.isEnabled
+        it("should register an instance with the default isEnabled of true", function() {
+
+          container.declare("foo", "complex");
+
+          expect(container.__instanceById.foo.isEnabled).toBe(true);
+        });
+
+        it("should register an instance with the given ranking", function() {
+
+          container.declare("foo", "complex", {isEnabled: false});
+
+          expect(container.__instanceById.foo.isEnabled).toBe(false);
+        });
+
+        it("should register an instance and convert isEnabled to a boolean", function() {
+
+          container.declare("foo", "complex", {isEnabled: "false"});
+
+          expect(container.__instanceById.foo.isEnabled).toBe(true);
+        });
+
+        it("should register an instance and use the default isEnabled if it is nully", function() {
+
+          container.declare("foo", "complex", {isEnabled: null});
+
+          expect(container.__instanceById.foo.isEnabled).toBe(true);
+        });
+        // endregion
+
         it("should not start loading the instance", function() {
 
           container.declare("foo", "Foo");
@@ -451,7 +481,8 @@ define([
 
       var containerConfig = {
         "myFoo2": {ranking: 10},
-        "myBar": {ranking: 20}
+        "myBar": {ranking: 20},
+        "myFooDisabled": {isEnabled: false}
       };
 
       function configAmd(localRequire) {
@@ -486,6 +517,14 @@ define([
 
         // myFoo instance
         localRequire.define("myFoo", function() {
+          return [
+            "Foo",
+            function(Foo) { return new Foo(); }
+          ];
+        });
+
+        // myFooDisabled instance
+        localRequire.define("myFooDisabled", function() {
           return [
             "Foo",
             function(Foo) { return new Foo(); }
@@ -545,6 +584,7 @@ define([
             "pentaho/instanceInfo": {
               "myFoo": {type: "Foo"},
               "myFoo2": {type: "Foo"},
+              "myFooDisabled": {type: "Foo"},
               "myBar": {type: "Bar"},
               "myAliased": {type: "A"}, // registered using its type alias...
               "missing": {type: "Guu"},
@@ -592,9 +632,10 @@ define([
                   var list = container.__instancesByType["Foo"];
 
                   expect(list != null).toBe(true);
-                  expect(list.length).toBe(2);
+                  expect(list.length).toBe(3);
                   expect(list[0].id).toBe("myFoo2");
                   expect(list[1].id).toBe("myFoo");
+                  expect(list[2].id).toBe("myFooDisabled");
                 });
           });
         });
@@ -661,6 +702,28 @@ define([
                 .then(function(foo) {
                   expect(foo != null).toBe(true);
                 });
+          });
+        });
+
+        it("should return the requested instance, even if disabled (scope=singleton)", function() {
+
+          var container;
+
+          return require.using([
+            "pentaho/type/Context",
+            "pentaho/type/InstancesContainer"
+          ], configAmd, function(Context, InstancesContainer) {
+
+            return Context.createAsync()
+              .then(function(context) {
+
+                container = new InstancesContainer(context, containerConfig);
+
+                return container.getByIdAsync("myFooDisabled");
+              })
+              .then(function(foo) {
+                expect(foo != null).toBe(true);
+              });
           });
         });
 
@@ -802,6 +865,31 @@ define([
 
                   expect(foo2).toBe(foo);
                 });
+          });
+        });
+
+        it("should return a previously loaded instance, even if not enabled", function() {
+
+          var container;
+
+          return require.using([
+            "pentaho/type/Context",
+            "pentaho/type/InstancesContainer"
+          ], configAmd, function(Context, InstancesContainer) {
+
+            return Context.createAsync()
+              .then(function(context) {
+
+                container = new InstancesContainer(context, containerConfig);
+
+                return container.getByIdAsync("myFooDisabled");
+              })
+              .then(function(foo) {
+
+                var foo2 = container.getById("myFooDisabled");
+
+                expect(foo2).toBe(foo);
+              });
           });
         });
 
@@ -947,7 +1035,7 @@ define([
           });
         });
 
-        it("should return registered instances of a direct type (not yet loaded)", function() {
+        it("should return enabled registered instances of a direct type (not yet loaded)", function() {
 
           var container;
 
@@ -974,7 +1062,7 @@ define([
           });
         });
 
-        it("should return registered instances of a direct type ordered by desc ranking", function() {
+        it("should return enabled registered instances of a direct type ordered by desc ranking", function() {
 
           var container;
 
@@ -999,7 +1087,7 @@ define([
           });
         });
 
-        it("should return registered instances of a base type", function() {
+        it("should return enabled registered instances of a base type", function() {
 
           var container;
 
@@ -1026,7 +1114,7 @@ define([
           });
         });
 
-        it("should return registered instances of a base type ordered by desc ranking", function() {
+        it("should return enabled registered instances of a base type ordered by desc ranking", function() {
 
           var container;
 
@@ -1054,7 +1142,7 @@ define([
           });
         });
 
-        it("should return registered instances of a base type ignoring failed ones", function() {
+        it("should return enabled registered instances of a base type ignoring failed ones", function() {
 
           var container;
 
@@ -1194,7 +1282,7 @@ define([
           });
         });
 
-        it("should return all registered and loaded instances of a direct type", function() {
+        it("should return all enabled, registered and loaded instances of a direct type", function() {
 
           var container;
 
@@ -1208,18 +1296,22 @@ define([
 
                   container = new InstancesContainer(context, containerConfig);
 
-                  return container.getByIdAsync("myFoo");
+                  return Promise.all([
+                    container.getByIdAsync("myFoo"),
+                    container.getByIdAsync("myFooDisabled")
+                  ]);
                 })
-                .then(function(foo) {
+                .then(function(foos) {
 
                   var results = container.getAllByType("Foo");
 
-                  expect(results).toEqual([foo]);
+                  expect(results).toEqual([foos[0]]);
                 });
           });
         });
 
-        it("should return registered and loaded instances of a direct type ordered by desc ranking", function() {
+        it("should return enabled, registered and loaded instances of " +
+          "a direct type ordered by desc ranking", function() {
 
           var container;
 
@@ -1246,7 +1338,7 @@ define([
           });
         });
 
-        it("should return registered and loaded instances of a base type", function() {
+        it("should return enabled, registered and loaded instances of a base type", function() {
 
           var container;
 
@@ -1273,7 +1365,7 @@ define([
           });
         });
 
-        it("should return registered and loaded instances of a base type ignoring failed ones", function() {
+        it("should return enabled, registered and loaded instances of a base type ignoring failed ones", function() {
 
           var container;
 
@@ -1589,7 +1681,8 @@ define([
 
                   return Promise.all([
                     container.getByIdAsync("myFoo"),
-                    container.getByIdAsync("myFoo2")
+                    container.getByIdAsync("myFoo2"),
+                    container.getByIdAsync("myFooDisabled")
                   ]);
                 })
                 .then(function(foos) {
