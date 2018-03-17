@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ define([
      * @description Creates an empty `Changeset` for a given owner value.
      *
      * @param {!pentaho.type.changes.Transaction} transaction - The owning transaction.
-     * @param {!pentaho.type.UContainer} owner - The container instance where the changes take place.
+     * @param {!pentaho.type.mixins.Container} owner - The container instance where the changes take place.
      */
     constructor: function(transaction, owner) {
       if(!transaction) throw error.argRequired("transaction");
@@ -71,8 +71,11 @@ define([
       this.__isReadOnly = false;
       this.__ownerVersion = owner.$version;
 
-      // The longest path by which this changeset can be reached following the path of children changesets.
+      // The longest path by which this changeset can be reached following the paths from parent to children changesets.
       this._netOrder = 0;
+
+      this.__txnVersion = transaction.__version;
+      this.__txnVersionDirty = false;
 
       transaction.__addChangeset(this);
     },
@@ -87,31 +90,39 @@ define([
     __updateNetOrder: function(netOrder) {
       if(this._netOrder < netOrder) {
         this._netOrder = netOrder;
-        this.__updateChildChangesetsNetOrder(netOrder + 1);
+
+        var childNetOrder = netOrder + 1;
+        this._eachChildChangeset(function(changeset) {
+          changeset.__updateNetOrder(childNetOrder);
+        });
       }
     },
 
-    /**
-     * Updates the topological order of any child changesets.
-     *
-     * @name pentaho.type.changes.Changeset#__updateChildChangesetsNetOrder
-     * @param {number} childrenNetOrder - The minimum net order of children.
-     *
-     * @private
-     * @internal
-     */
-
     // Should be marked protected abstract, but that would show in the docs.
     /**
-     * Sets a nested changeset of this changeset.
+     * Adds a new child changeset to this parent changeset.
      *
-     * @name pentaho.type.changes.Changeset#__setNestedChangeset
-     * @param {!pentaho.type.changes.Changeset} csetNested - The nested changeset.
+     * @name pentaho.type.changes.Changeset#__onChildChangesetCreated
+     * @method
+     * @param {!pentaho.type.changes.Changeset} childChangeset - The child changeset.
      * @param {pentaho.type.Property.Type} propType - The property type whose value is the changeset owner.
      * Only applies when this changeset is a complex changeset.
      *
      * @private
      * @internal
+     * @see pentaho.type.changes.Transaction#__addChangeset
+     */
+
+    /**
+     * Calls a function once per child changeset.
+     *
+     * @name pentaho.type.changes.Changeset#_eachChildChangeset
+     * @method
+     * @param {function(pentaho.type.changeset.Changeset) : undefined|boolean} fun - The function to call.
+     * @param {any} ctx - The `this` context on which to call `fun`.
+     *
+     * @protected
+     * @abstract
      */
 
     /**
@@ -158,6 +169,109 @@ define([
       return this.__ownerVersion;
     },
 
+    // region Transaction Version
+    /**
+     * Gets the transaction version of this changeset.
+     *
+     * This number is at least as high as the transaction version of any child changesets and primitive changes.
+     *
+     * @type {number}
+     * @readOnly
+     */
+    get transactionVersion() {
+
+      if(this.__txnVersionDirty) {
+        this.__txnVersion = this.__calcCleanTransactionVersion();
+        this.__txnVersionDirty = false;
+      }
+
+      return this.__txnVersion;
+    },
+
+    /**
+     * Calculates the transaction version by taking the maximum
+     * of the local value and that of the child changesets.
+     *
+     * @return {number} The new transaction version.
+     * @private
+     */
+    __calcCleanTransactionVersion: function() {
+
+      var txnVersion = this.__txnVersion;
+
+      this._eachChildChangeset(function(changeset) {
+
+        var childTxnVersion = changeset.transactionVersion;
+        if(childTxnVersion > txnVersion) {
+          txnVersion = childTxnVersion;
+        }
+      });
+
+      return txnVersion;
+    },
+
+    /**
+     * Updates the transaction version to a given value, if it is greater than the current one.
+     * Notifies all parents, except the optionally specified one,
+     * that their version is dirty.
+     *
+     * @param {number} txnVersion - The new transaction version.
+     * @param {pentaho.type.changes.Changeset} [noNotifyParentChangeset=null] - The parent changeset that should not
+     * be notified.
+     *
+     * @protected
+     * @final
+     */
+    _setTransactionVersion: function(txnVersion, noNotifyParentChangeset) {
+
+      if(txnVersion > this.__txnVersion) {
+
+        // Force update dirty transaction version or we could loose
+        // the dirty state
+        this.__txnVersion = txnVersion;
+        this.__txnVersionDirty = false;
+
+        // Notify all parents except noNotifyParentChangeset.
+        this.__notifyParentsTxnVersionDirty(noNotifyParentChangeset);
+      }
+    },
+
+    /**
+     * Notifies all parent changesets, except the optionally specified one,
+     * that their version is dirty.
+     *
+     * @param {pentaho.type.changes.Changeset} noNotifyParentChangeset - A parent changeset that should not
+     * be notified.
+     *
+     * @private
+     */
+    __notifyParentsTxnVersionDirty: function(noNotifyParentChangeset) {
+
+      var irefs = this.transaction.getAmbientReferences(this.owner);
+      if(irefs !== null) {
+        var L = irefs.length;
+        var i = -1;
+        while(++i < L) {
+          var parentChangeset = irefs[i].container.__cset;
+          if(parentChangeset !== noNotifyParentChangeset) {
+            // assert parentChangeset !== null
+            parentChangeset.__onChildTxnVersionDirty();
+          }
+        }
+      }
+    },
+
+    /**
+     * Called by a child changeset when its version changes or becomes dirty.
+     */
+    __onChildTxnVersionDirty: function() {
+      if(!this.__txnVersionDirty) {
+        this.__txnVersionDirty = true;
+        this.__notifyParentsTxnVersionDirty(null);
+      }
+    },
+    // endregion
+
     /**
      * Gets a value that indicates if this changeset contains any changes,
      * whether they are primitive or in contained changesets.
@@ -168,22 +282,51 @@ define([
      * @abstract
      */
 
+    // region clearChanges
+
+    // TODO: Define clearChanges semantics.
+    // Should it clear child changesets as seen before or after clearing local changes?
+
     /**
      * Removes all changes from this changeset.
      *
      * Primitive changes are removed, while contained changesets are cleared.
      *
      * This method validates that the changeset is in a valid state and then delegates actual
-     * work to the [_clearChanges]{@link pentaho.type.changes.Changeset#_clearChanges} method.
+     * work to the [_clearChangesRecursive]{@link pentaho.type.changes.Changeset#_clearChangesRecursive} method.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset or any of its contained changesets
      * have been marked [read-only]{@link pentaho.type.changes.Changeset#isReadOnly}.
      *
      * @see pentaho.type.changes.Changeset#_clearChanges
+     * @see pentaho.type.changes.Changeset#_clearChangesRecursive
      */
     clearChanges: function() {
 
       this._assertWritable();
+
+      this._clearChangesRecursive(null);
+    },
+
+    /**
+     * Called by a parent changeset on its child changeset, this, for it to clear its changes.
+     *
+     * This method updates the transaction version of this changeset to match the parent's version
+     * and then delegates to the [_clearChanges]{@link pentaho.type.changes.Changeset#_clearChanges} method.
+     *
+     * @param {pentaho.type.changes.Changeset} parentChangeset - The parent changeset.
+     *
+     * @protected
+     * @see pentaho.type.changes.Changeset#transactionVersion
+     * @see pentaho.type.changes.Changeset#clearChanges
+     */
+    _clearChangesRecursive: function(parentChangeset) {
+
+      var txnVersion = parentChangeset != null
+        ? parentChangeset.transactionVersion
+        : this.transaction.__takeNextVersion();
+
+      this._setTransactionVersion(txnVersion, parentChangeset);
 
       this._clearChanges();
     },
@@ -197,6 +340,7 @@ define([
      * @protected
      * @see pentaho.type.changes.Changeset#clearChanges
      */
+    // endregion
 
     /**
      * Applies the contained changes to the owner value and updates its version

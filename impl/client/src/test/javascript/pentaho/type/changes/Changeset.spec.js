@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,6 +98,17 @@ define([
         expect(changeset.isReadOnly).toBe(false);
       });
 
+      describe("#transactionVersion", function() {
+
+        it("should be initialized with its transaction's current version number", function() {
+
+          var transaction = scope.transaction;
+          var transactionVersion = transaction.version;
+
+          expect(changeset.transactionVersion).toBe(transactionVersion);
+        });
+      });
+
       // region #owner
       describe("#owner -", function() {
         it("should return the same owner that was passed to the constructor", function() {
@@ -161,6 +172,7 @@ define([
       describe("#clearChanges -", function() {
 
         it("should call _clearChanges", function() {
+
           changeset._clearChanges = jasmine.createSpy();
 
           changeset.clearChanges();
@@ -169,11 +181,23 @@ define([
         });
 
         it("should throw when read-only", function() {
+
           changeset.__setReadOnlyInternal();
 
           expect(function() {
             changeset.clearChanges();
           }).toThrow(errorMatch.operInvalid());
+        });
+
+        it("should increment #transactionVersion", function() {
+
+          changeset._clearChanges = jasmine.createSpy();
+
+          var transactionVersion = changeset.transactionVersion;
+
+          changeset.clearChanges();
+
+          expect(changeset.transactionVersion).toBeGreaterThan(transactionVersion);
         });
       }); // endregion #clearChanges
     });

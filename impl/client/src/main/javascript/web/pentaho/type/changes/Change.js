@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ define([
    * @abstract
    *
    * @classDesc The `Change` class is the abstract base class of classes that
-   * describe changes in [structured value instances]{@link pentaho.type.UContainer}.
+   * describe changes in [structured value instances]{@link pentaho.type.mixins.Container}.
    *
    * @description Creates a `Change` instance.
    */
@@ -44,6 +44,16 @@ define([
      * @memberOf pentaho.type.changes.Change#
      * @type {string}
      * @readonly
+     * @abstract
+     */
+
+    /**
+     * Gets the transaction version of this change.
+     *
+     * @name transactionVersion
+     * @memberOf pentaho.type.changes.Change#
+     * @type {number}
+     * @readOnly
      * @abstract
      */
 

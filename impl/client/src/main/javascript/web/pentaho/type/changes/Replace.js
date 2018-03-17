@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,12 +40,12 @@ define([
      *
      * @constructor
      * @param {!pentaho.type.Property.Type} propType - The property type.
-     * @param {pentaho.type.Element} value - The proposed value of the property.
-     * @param {number} state - The proposed state of the property.
+     * @param {pentaho.type.Element} valueNew - The proposed value of the property.
+     * @param {number} stateNew - The proposed state of the property.
      *
      * @description Creates an instance.
      */
-    constructor: function(propType, value, state) {
+    constructor: function(propType, valueNew, stateNew) {
       /**
        * Gets the property whose value is replaced.
        *
@@ -56,43 +56,55 @@ define([
        */
       O.setConst(this, "property", propType);
 
-      this.__value = value;
-      this.__state = state;
-    },
-
-    /** @inheritDoc */
-    _prepareRefs: function(txn, complex, valueIni) {
-      this.__replaceRefs(txn, complex, valueIni, this.__value);
+      this.__value = valueNew;
+      this.__state = stateNew;
     },
 
     /**
      * Updates the value that will replace the current value.
      *
-     * @param {!pentaho.type.changes.Transaction} txn - The ambient transaction, provided for performance.
-     * @param {!pentaho.type.Complex} complex - The complex instance.
+     * @param {!pentaho.type.changes.Transaction} transaction - The ambient transaction, provided for performance.
+     * @param {!pentaho.type.Complex} container - The complex instance.
      * @param {pentaho.type.Element} value - The new proposed value of the property.
      * @param {number} state - The new proposed state of the property.
      * @private
      * @internal
      * @see pentaho.type.changes.ComplexChangeset.__setElement
      */
-    __updateValue: function(txn, complex, value, state) {
+    __updateValue: function(transaction, container, value, state) {
 
-      this.__replaceRefs(txn, complex, this.__value, value);
+      // It may be that only state has changed.
+      if(this.__value !== value) {
+        this.__replaceRefs(transaction, container, this.__value, value);
+      }
 
       this.__value = value;
       this.__state = state;
+
+      this._setTransactionVersion(transaction.__takeNextVersion());
     },
 
     /** @inheritDoc */
-    _cancelRefs: function(txn, complex, valueIni) {
-      this.__replaceRefs(txn, complex, this.__value, valueIni);
+    _prepare: function(changeset) {
+      var container = changeset.owner;
+      this.__replaceRefs(changeset.transaction, container, container.__getByName(this.property.name), this.__value);
     },
 
-    __replaceRefs: function(txn, complex, v1, v2) {
+    /** @inheritDoc */
+    _cancel: function(changeset) {
+      var container = changeset.owner;
+      this.__replaceRefs(changeset.transaction, container, this.__value, container.__getByName(this.property.name));
+    },
+
+    __replaceRefs: function(transaction, container, valueOld, valueNew) {
       if(!this.property.isBoundary) {
-        if(v1 && v1.__addReference) txn.__ensureChangeRef(v1).removeReference(complex, this.property);
-        if(v2 && v2.__addReference) txn.__ensureChangeRef(v2).addReference(complex, this.property);
+        if(valueOld && valueOld.__addReference) {
+          transaction.__ensureChangeRef(valueOld).removeReference(container, this.property);
+        }
+
+        if(valueNew && valueNew.__addReference) {
+          transaction.__ensureChangeRef(valueNew).addReference(container, this.property);
+        }
       }
     },
 

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,12 @@ define([
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
   describe("pentaho.type.ComplexChangeset -", function() {
-    var context, Complex, List, PentahoNumber, NumberList, Derived;
+    var context;
+    var Complex;
+    var List;
+    var PentahoNumber;
+    var NumberList;
+    var Derived;
 
     beforeEach(function(done) {
       Context.createAsync()
@@ -54,13 +59,17 @@ define([
           .then(done, done.fail);
     });
 
-    it("should be defined.", function () {
+    it("should be defined.", function() {
       expect(typeof ComplexChangeset).toBeDefined();
     });
 
     describe("instance -", function() {
-      var changeset, owner, listChangeset, myList, scope,
-          properties = ["foo", "myList"];
+      var changeset;
+      var owner;
+      var listChangeset;
+      var myList;
+      var scope;
+      var properties = ["foo", "myList"];
 
       beforeEach(function() {
         owner = new Derived({
@@ -86,6 +95,70 @@ define([
         }
       });
 
+      describe("#transactionVersion", function() {
+
+        it("should be initialized with its transaction's current version number", function() {
+
+          var transaction = scope.transaction;
+          var transactionVersion = transaction.version;
+
+          var owner = new Derived();
+
+          var changeset = new ComplexChangeset(transaction, owner);
+
+          expect(changeset.transactionVersion).toBe(transactionVersion);
+        });
+
+        it("should be incremented when the value of a property is changed", function() {
+
+          var transactionVersion = changeset.transactionVersion;
+
+          owner.bar = 20;
+
+          expect(changeset.transactionVersion).toBeGreaterThan(transactionVersion);
+        });
+
+        it("should be incremented when the value of a property goes back to its initial value", function() {
+
+          owner.bar = 20;
+
+          var transactionVersion = changeset.transactionVersion;
+
+          owner.bar = 5;
+
+          expect(changeset.transactionVersion).toBeGreaterThan(transactionVersion);
+        });
+
+        it("should be incremented when changes are cleared", function() {
+
+          owner.bar = 20;
+
+          var transactionVersion = changeset.transactionVersion;
+
+          changeset.clearChanges();
+
+          expect(changeset.transactionVersion).toBeGreaterThan(transactionVersion);
+        });
+
+        it("should be incremented when a nested changeset has a new change", function() {
+
+          var transactionVersion = changeset.transactionVersion;
+
+          owner.myList.add(4);
+
+          expect(changeset.transactionVersion).toBeGreaterThan(transactionVersion);
+        });
+
+        it("should be incremented when a nested changeset is cleared", function() {
+
+          var transactionVersion = changeset.transactionVersion;
+
+          owner.myList.$changeset.clearChanges();
+
+          expect(changeset.transactionVersion).toBeGreaterThan(transactionVersion);
+        });
+      });
+
       // region #type
       describe("#type", function() {
         it("should return a string with the value `complex`", function() {
@@ -100,20 +173,20 @@ define([
         });
 
         it("should return `false` if the ComplexChangeset does not have changes", function() {
-          var emptyChangeset = new ComplexChangeset(context.transaction, {});
+          var emptyChangeset = new ComplexChangeset(context.transaction, new Derived());
           expect(emptyChangeset.hasChanges).toBe(false);
         });
 
         it("should return `false` if the ComplexChangeset has a ListChangeset that doesn't have changes", function() {
-          var cset = new ComplexChangeset(context.transaction, {});
-          cset._changes = {"myList" : new ListChangeset(context.transaction, myList)};
+          var cset = new ComplexChangeset(context.transaction, new Derived());
+          cset._changes = {"myList": new ListChangeset(context.transaction, myList)};
 
           expect(cset.hasChanges).toBe(false);
         });
 
         it("should return `true` if the ComplexChangeset has a ListChangeset that has changes", function() {
-          var cset = new ComplexChangeset(context.transaction, {});
-          cset._changes = {"myList" : {hasChanges: true}};
+          var cset = new ComplexChangeset(context.transaction, new Derived());
+          cset._changes = {"myList": {hasChanges: true}};
 
           expect(cset.hasChanges).toBe(true);
         });
@@ -145,11 +218,6 @@ define([
 
       // region #hasChange
       describe("#hasChange -", function() {
-        beforeEach(function() {
-          // required for connecting changesets
-          scope.acceptWill();
-        });
-
         it("should throw an error if the property does not exist in the owner of the changeset", function() {
           expect(function() {
             changeset.hasChange("baz");
@@ -195,6 +263,7 @@ define([
 
       // region #owner.set()
       describe("#owner.set() -", function() {
+
         beforeEach(function() {
           if(scope.isCurrent) scope.exit();
         });
@@ -275,14 +344,110 @@ define([
           expect(changeset.hasChange("foo")).toBe(true);
           txnScope.dispose();
         });
-      }); // endregion #__setElement
+
+        it("should substitute a previous child changeset with a replace change", function() {
+
+          var txnScope = context.enterChange();
+
+          var ComplexValue = Complex.extend({
+            $type: {
+              props: [
+                {name: "a", valueType: "number"},
+                {name: "b", valueType: "number"}
+              ]
+            }
+          });
+
+          var Derived = Complex.extend({
+            $type: {
+              props: [
+                {name: "foo", valueType: ComplexValue}
+              ]
+            }
+          });
+
+          var derived = new Derived({foo: {a: 1, b: 2}});
+
+          var changeset = new ComplexChangeset(txnScope.transaction, derived);
+          expect(changeset.hasChanges).toBe(false);
+          expect(changeset.owner).toBe(derived);
+
+          // ---
+
+          // Create a child changeset that gets hooked up to changeset
+          derived.foo.a = 3;
+
+          // ---
+
+          expect(changeset.getChange("foo") instanceof ComplexChangeset).toBe(true);
+
+          // ---
+          // Replace the child changeset with a replace change.
+
+          var newFooValue = new ComplexValue({a: 4, b: 5});
+
+          derived.foo = newFooValue;
+
+          expect(changeset.getChange("foo").type).toBe("replace");
+
+          txnScope.dispose();
+        });
+
+        it("should preserve a previous replace over a new child changeset", function() {
+
+          var txnScope = context.enterChange();
+
+          var ComplexValue = Complex.extend({
+            $type: {
+              props: [
+                {name: "a", valueType: "number"},
+                {name: "b", valueType: "number"}
+              ]
+            }
+          });
+
+          var Derived = Complex.extend({
+            $type: {
+              props: [
+                {name: "foo", valueType: ComplexValue}
+              ]
+            }
+          });
+
+          var derived = new Derived({foo: {a: 1, b: 2}});
+
+          var changeset = new ComplexChangeset(txnScope.transaction, derived);
+          expect(changeset.hasChanges).toBe(false);
+          expect(changeset.owner).toBe(derived);
+
+          // ---
+          // Replace foo.
+          var newFooValue = new ComplexValue({a: 4, b: 5});
+
+          derived.foo = newFooValue;
+
+          expect(changeset.getChange("foo").type).toBe("replace");
+
+          var transactionVersion = changeset.transactionVersion;
+
+          // ---
+          // Create a child changeset but do not hook into it.
+
+          newFooValue.a = 2;
+
+          expect(changeset.getChange("foo").type).toBe("replace");
+
+          // ---
+          // However, it should increment the transaction version.
+          expect(changeset.transactionVersion).toBeGreaterThan(transactionVersion);
+
+          txnScope.dispose();
+        });
+
+      }); // endregion #owner.set()
 
       // region #propertyNames
       describe("#propertyNames -", function() {
-        beforeEach(function() {
-          // required for connecting changesets
-          scope.acceptWill();
-        });
 
         it("should return an array with all property names of the changeset", function() {
           var propertyNames = changeset.propertyNames;
@@ -334,6 +499,7 @@ define([
 
       // region #_clearChanges()
       describe("#_clearChanges()", function() {
+
         it("cannot be called after acceptWill", function() {
 
           scope.acceptWill();
@@ -379,8 +545,8 @@ define([
         });
       }); // endregion #_clearChanges()
 
-    }); //end instance
+    }); // end instance
 
-  }); //end pentaho.lang.ComplexChangeset
+  }); // end pentaho.lang.ComplexChangeset
 
 });

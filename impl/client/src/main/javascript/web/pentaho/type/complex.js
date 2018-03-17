@@ -162,7 +162,7 @@ define([
        * Lists have special semantics: isBoundary applies to the relation between the list and its elements.
        * Adding/Removing elements in an isList and isBoundary property
        * still generates events in the containing complex.
-       * We could, however, not addRef is the prop (and, thus, the list) is also isReadOnly?
+       * We could, however, not addRef if the prop (and, thus, the list) is also isReadOnly?
        *
        * @param {!pentaho.type.Property.Type} propType - The property type.
        * @param {!pentaho.type.mixins.Container} value - The container value.

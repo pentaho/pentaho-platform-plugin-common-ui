@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,56 +19,67 @@ define([
 ], function(Change) {
   "use strict";
 
-  /**
-   * @name PrimitiveChange
-   * @memberOf pentaho.type.changes
-   * @class
-   * @abstract
-   * @extends pentaho.type.changes.Change
-   * @amd pentaho/type/changes/PrimitiveChange
-   *
-   * @classDesc The `PrimitiveChange` class is the abstract base class of changes
-   * that are the direct consequence of performing **primitive operations** on a
-   * [structured value]{@link pentaho.type.UContainer}.
-   *
-   * Primitive changes always exist in the context of a [Changeset]{@link pentaho.type.changes.Changeset}.
-   *
-   * Example primitive changes are
-   * the [Replace]{@link pentaho.type.changes.Replace} operation on a [Complex]{@link pentaho.type.Complex} value, and
-   * the [Add]{@link pentaho.type.changes.Add} and [Clear]{@link pentaho.type.changes.Clear} operations on a
-   * [List]{@link pentaho.type.List} value.
-   *
-   * @description Creates a `PrimitiveChange` instance.
-   */
-
   return Change.extend("pentaho.type.changes.PrimitiveChange", /** @lends pentaho.type.changes.PrimitiveChange# */{
+
     /**
-     * Register reference changes caused by the change.
+     * @name PrimitiveChange
+     * @memberOf pentaho.type.changes
+     * @class
+     * @abstract
+     * @extends pentaho.type.changes.Change
+     * @amd pentaho/type/changes/PrimitiveChange
      *
-     * @param {!pentaho.type.changes.Transaction} transaction - The ambient transaction, provided for performance.
-     * @param {!pentaho.type.mixins.Container} container - The container instance.
+     * @classDesc The `PrimitiveChange` class is the abstract base class of changes
+     * that are the direct consequence of performing **primitive operations** on a
+     * [structured value]{@link pentaho.type.mixins.Container}.
      *
-     * @protected
+     * Primitive changes always exist in the context of a [Changeset]{@link pentaho.type.changes.Changeset}.
      *
-     * @see pentaho.type.changes.ListChangeset.__addChange
-     * @see pentaho.type.changes.ComplexChangeset.__setElement
+     * Example primitive changes are
+     * the [Replace]{@link pentaho.type.changes.Replace} operation on a [Complex]{@link pentaho.type.Complex} value, and
+     * the [Add]{@link pentaho.type.changes.Add} and [Clear]{@link pentaho.type.changes.Clear} operations on a
+     * [List]{@link pentaho.type.List} value.
+     *
+     * @constructor
+     * @description Creates a `PrimitiveChange` instance.
      */
-    _prepareRefs: function(transaction, container) {
+
+    /** @inheritDoc */
+    get transactionVersion() {
+      return this.__txnVersion;
     },
 
     /**
-     * Unregisters reference changes caused by the change.
+     * Sets the new transaction version of this change.
      *
-     * @param {!pentaho.type.changes.Transaction} transaction - The ambient transaction, provided for performance.
-     * @param {!pentaho.type.mixins.Container} container - The container instance.
+     * @param {number} txnVersion - The transaction version.
+     * @protected
+     * @internal
+     */
+    _setTransactionVersion: function(txnVersion) {
+      this.__txnVersion = txnVersion;
+    },
+
+    /**
+     * Registers reference changes caused by this change.
+     *
+     * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
      *
      * @protected
-     *
-     * @see pentaho.type.changes.ListChangeset#_clearChanges
-     * @see pentaho.type.changes.ComplexChangeset#_clearChanges
-     * @see pentaho.type.changes.ComplexChangeset.__setElement
+     * @internal
      */
-    _cancelRefs: function(transaction, container) {
+    _prepare: function(changeset) {
+    },
+
+    /**
+     * Unregisters reference changes caused by this change.
+     *
+     * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
+     *
+     * @protected
+     * @internal
+     */
+    _cancel: function(changeset) {
     }
   });
 });

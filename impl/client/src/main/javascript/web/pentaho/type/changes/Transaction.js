@@ -98,6 +98,45 @@ define([
        * @internal
        */
       this.__scopeCount = 0;
+
+      /**
+       * The version number within the transaction.
+       *
+       * The number of changes performed within the transaction.
+       *
+       * @type {number}
+       * @private
+       * @internal
+       */
+      this.__version = 0;
+    },
+
+    /**
+     * Increments the version number and returns the new version number.
+     *
+     * @return {number} The current version number.
+     * @private
+     * @internal
+     */
+    __takeNextVersion: function() {
+      return ++this.__version;
+    },
+
+    /**
+     * Gets the current transaction version.
+     *
+     * Beware, this version number is not the same as that of {@link pentaho.type.mixins.Container#$version}.
+     *
+     * Initially, a transaction has version `0`.
+     * This number is then incremented per each individual made change.
+     * Each change indicates the version it caused the transaction to assume:
+     * {@link pentaho.type.changes.Change#transactionVersion}.
+     *
+     * @type {number}
+     * @readOnly
+     */
+    get version() {
+      return this.__version;
     },
 
     // region State
@@ -210,29 +249,39 @@ define([
      *
      * @private
      * @internal
+     *
+     * @see pentaho.type.changes.Changeset#__onChildChangesetCreated
      */
     __addChangeset: function(changeset) {
       if(this.isReadOnly)
         throw error.operInvalid(
-            "Transaction cannot change because it has already been previewed, committed or rejected.");
+          "Transaction cannot change because it has already been previewed, committed or rejected.");
 
       var owner = changeset.owner;
 
       this.__csetByUid[owner.$uid] = changeset;
       this.__csets.push(changeset);
 
-      if(this.__isCurrent) owner.__cset = changeset;
+      if(this.__isCurrent) {
+        owner.__cset = changeset;
+      }
 
       // Traverse references and create changesets, connecting them along the way.
       // TODO: Should be being careful not to create changeset cycles when there are reference cycles...
-      var refs = owner.__refs;
-      if(refs) refs.forEach(function(aref) {
 
-        var container = aref.container;
-        var containerChangeset = O.getOwn(this.__csetByUid, container.$uid) || container._createChangeset(this);
+      // Note that a ChangeRef can already exist before the ChangeSet, so that __refs may be outdated.
+      // Take care to hook to the ambient parents.
+      var irefs = this.getAmbientReferences(owner);
+      if(irefs !== null) {
+        irefs.forEach(function(iref) {
+          // Recursive, when _createChangeset is called.
+          // The base Changeset constructor calls __addChangeset.
+          var container = iref.container;
+          var containerChangeset = O.getOwn(this.__csetByUid, container.$uid) || container._createChangeset(this);
 
-        containerChangeset.__setNestedChangeset(changeset, aref.property);
-      }, this);
+          containerChangeset.__onChildChangesetCreated(changeset, iref.property);
+        }, this);
+      }
     },
 
     /**
@@ -534,8 +583,15 @@ define([
         if(L === (L1 = changesets.length)) break;
 
         // TODO: How to order new changesets?
+        // Re-run all changesets that, after net sorting, are placed after an added one?
+        // What about modifications to existing changesets?
+        // Start with leaf changesets.
+        // After processing a changeset,
+        // place its iref's changesets at the end of the queue.
+        // Every changeset which is modified is put back in the queue.
 
         // Changesets were added.
+        // Run the will listeners of the owners of the added changesets.
         i--;
         // i === L - 1
         L = L1;
@@ -616,8 +672,8 @@ define([
 
       // jshint laxbreak:true
       var mapper = reason
-          ? function(cset) { cset.owner._onChangeRejected(cset, reason); }
-          : function(cset) { cset.owner._onChangeDid(cset); };
+        ? function(cset) { cset.owner._onChangeRejected(cset, reason); }
+        : function(cset) { cset.owner._onChangeDid(cset); };
 
       // Make sure to execute listeners without an active transaction.
       this.context.enterCommitted().using(this.__eachChangeset.bind(this, mapper));

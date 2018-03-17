@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,10 @@ define([
 
   describe("pentaho.type.changes.Replace", function() {
 
-    var context, Derived, ComplexOfComplex, propY;
+    var context;
+    var Derived;
+    var ComplexOfComplex;
+    var propY;
 
     beforeEach(function(done) {
       Context.createAsync()
@@ -147,8 +150,8 @@ define([
         expect(derived.x).toBe("0");
       });
 
-      it("should replace the property value but have the original value if changes cleared, as ambient value",
-      function() {
+      it("should replace the property value but have the original value if changes cleared, " +
+        "as ambient value", function() {
 
         var derived = new Derived({x: "0"});
 
@@ -165,8 +168,8 @@ define([
         expect(derived.x).toBe("0");
       });
 
-      it("should replace the property value but have the original value if changes cleared and committed",
-      function() {
+      it("should replace the property value but have the original value if changes " +
+        "cleared and committed", function() {
 
         var derived = new Derived({x: "0"});
 
@@ -186,7 +189,9 @@ define([
     });
 
     describe("references", function() {
+
       function expectSingleRefTo(elem, to, prop) {
+
         var refs = elem.$references;
 
         expect(refs.length).toBe(1);
@@ -195,6 +200,7 @@ define([
       }
 
       function expectNoRefs(elem) {
+
         var refs = elem.$references;
 
         expect(!refs || !refs.length).toBe(true);

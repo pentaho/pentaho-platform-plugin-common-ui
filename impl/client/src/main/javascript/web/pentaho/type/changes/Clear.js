@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +19,22 @@ define([
 ], function(PrimitiveChange) {
   "use strict";
 
-  /**
-   * @name Clear
-   * @memberOf pentaho.type.changes
-   * @class
-   * @extends pentaho.type.changes.PrimitiveChange
-   * @amd pentaho/type/changes/Clear
-   *
-   * @classDesc The `Clear` class describes the primitive operation that clears every element of a list.
-   *
-   * This type of change is always part of a {@link pentaho.type.changes.ListChangeset}.
-   *
-   * @constructor
-   * @description Creates an instance.
-   */
   return PrimitiveChange.extend("pentaho.type.changes.Clear", /** @lends pentaho.type.changes.Clear# */{
+
+    /**
+     * @name Clear
+     * @memberOf pentaho.type.changes
+     * @class
+     * @extends pentaho.type.changes.PrimitiveChange
+     * @amd pentaho/type/changes/Clear
+     *
+     * @classDesc The `Clear` class describes the primitive operation that clears every element of a list.
+     *
+     * This type of change is always part of a {@link pentaho.type.changes.ListChangeset}.
+     *
+     * @constructor
+     * @description Creates an instance.
+     */
 
     /**
      * Gets the type of change.
@@ -46,29 +47,43 @@ define([
       return "clear";
     },
 
-    _prepareRefs: function(txn, target) {
-      if(!target.$isBoundary && target.$type.elementType.isComplex) {
+    /** @inheritDoc */
+    _prepare: function(changeset) {
+
+      var container = changeset.owner;
+
+      if(!container.$isBoundary && !container.$type.elementType.isSimple) {
+        var transaction = changeset.transaction;
         var i = -1;
-        var elems = target.__elems;
-        var L = elems.length;
-        var elem;
+        var elements = container.__elems;
+        var L = elements.length;
+        var element;
         while(++i < L) {
-          if((elem = elems[i]).__addReference) {
-            txn.__ensureChangeRef(elem).removeReference(target);
+          element = elements[i];
+          if(element.__addReference) {
+            transaction.__ensureChangeRef(element).removeReference(container);
+            changeset.__removeComplexElement(element);
           }
         }
       }
     },
 
-    _cancelRefs: function(txn, target) {
-      if(!target.$isBoundary && target.$type.elementType.isComplex) {
+    /** @inheritDoc */
+    _cancel: function(changeset) {
+
+      var container = changeset.owner;
+
+      if(!container.$isBoundary && !container.$type.elementType.isSimple) {
+        var transaction = changeset.transaction;
         var i = -1;
-        var elems = target.__elems;
-        var L = elems.length;
-        var elem;
+        var elements = container.__elems;
+        var L = elements.length;
+        var element;
         while(++i < L) {
-          if((elem = elems[i]).__addReference) {
-            txn.__ensureChangeRef(elem).addReference(target);
+          element = elements[i];
+          if(element.__addReference) {
+            transaction.__ensureChangeRef(element).addReference(container);
+            changeset.__addComplexElement(element);
           }
         }
       }
