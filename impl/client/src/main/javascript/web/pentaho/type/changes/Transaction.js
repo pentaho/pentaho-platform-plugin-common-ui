@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ define([
      * @class
      * @friend {pentaho.type.Context}
      * @friend {pentaho.type.changes.TransactionScope}
-     * @implements pentaho.lang.IDisposable
+     * @implements {pentaho.lang.IDisposable}
      *
      * @amd pentaho/type/Transaction
      *
@@ -151,7 +151,7 @@ define([
      * @return {pentaho.type.changes.Changeset} The changeset, or `null`.
      */
     getChangeset: function(uid) {
-      return O.getOwn(this.__csetByUid, uid) || null;
+      return O.getOwn(this.__csetByUid, uid, null);
     },
 
     /**
@@ -186,7 +186,18 @@ define([
      * @internal
      */
     __getChangeRef: function(uid) {
-      return O.getOwn(this.__crefByUid, uid) || null;
+      return O.getOwn(this.__crefByUid, uid, null);
+    },
+
+    /**
+     * Gets the ambient references of a given container, if any.
+     *
+     * @param {!pentaho.type.mixins.Container} container - The container.
+     * @return {pentaho.type.ReferenceList} The reference list, or `null`.
+     */
+    getAmbientReferences: function(container) {
+      var changeRef = O.getOwn(this.__crefByUid, container.__uid, null);
+      return (changeRef && changeRef.projectedReferences) || container.__refs;
     },
 
     /**

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,9 @@ define([
      * @classDesc The `ChangeRef` holds changes to the references list of a container instance.
      *
      * Reusing the changesets for this type of internal changes would create and expose changesets
-     * with no visible changes to the user.
+     * having no visible changes to the user.
+     * For example, if a list element is removed, only a changeset is needed for the list, not for the element.
+     * The latter only needs a ChangeRef...
      *
      * It does not store the container instance to save memory.
      * It is passed again on the relevant methods.
@@ -43,6 +45,7 @@ define([
 
       this.__refsAdd = null;
       this.__refsRem = null;
+      this.__refsCache = undefined;
     },
 
     /**
@@ -53,9 +56,9 @@ define([
      * the property type whose value contains the owner of this changeset.
      */
     addReference: function(container, propType) {
-      if(!(this.__refsRem && this.__refsRem.remove(container, propType))) {
-
-        (this.__refsAdd || (this.__refsAdd = ReferenceList.to([]))).add(container, propType);
+      if((this.__refsRem !== null && this.__refsRem.remove(container, propType)) ||
+         (this.__refsAdd || (this.__refsAdd = ReferenceList.to([]))).add(container, propType)) {
+        this.__refsCache = undefined;
       }
     },
 
@@ -67,24 +70,34 @@ define([
      * the property type whose value used to contain this instance.
      */
     removeReference: function(container, propType) {
-      if(!(this.__refsAdd && this.__refsAdd.remove(container, propType))) {
-
-        (this.__refsRem || (this.__refsRem = ReferenceList.to([]))).add(container, propType);
+      if((this.__refsAdd !== null && this.__refsAdd.remove(container, propType)) ||
+         (this.__refsRem || (this.__refsRem = ReferenceList.to([]))).add(container, propType)) {
+        this.__refsCache = undefined;
       }
     },
 
     /**
-     * Gets the projected references array.
+     * Gets the projected references array, possibly `null`.
      *
-     * @type {!pentaho.type.ReferenceList}
+     * @type {pentaho.type.ReferenceList}
      * @readOnly
      */
     get projectedReferences() {
-      return this._updateReferences(this.owner.__refs, /* mutate: */false);
+      var refsCache = this.__refsCache;
+      if(refsCache === undefined) {
+        this.__refsCache = refsCache = this.__updateReferences(this.owner.__refs, /* mutate: */false);
+      }
+
+      return refsCache;
     },
 
     apply: function() {
-      this.owner.__refs = this._updateReferences(this.owner.__refs, /* mutate: */true);
+      var refsCache = this.__refsCache;
+      if(refsCache === undefined) {
+        this.owner.__refs = this.__updateReferences(this.owner.__refs, /* mutate: */true);
+      } else {
+        this.owner.__refs = refsCache;
+      }
     },
 
     /**
@@ -95,10 +108,10 @@ define([
      * @param {pentaho.type.ReferenceList} refs - The references list to update, or `null`.
      * @param {boolean} mutate - Indicates if the given list can be mutated, or if a copy must be created.
      *
-     * @return {!pentaho.type.ReferenceList} The updated references list.
+     * @return {pentaho.type.ReferenceList} The updated references list.
      * @private
      */
-    _updateReferences: function(refs, mutate) {
+    __updateReferences: function(refs, mutate) {
       var refsRem = this.__refsRem;
       var refsAdd = this.__refsAdd;
       if(refsRem || refsAdd) {

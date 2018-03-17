@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ define([
       /**
        * References (from others) to this container.
        *
-       * Maintained by Container#__addReference and Changeset#_updateReferences.
+       * Maintained by Container#__addReference and ChangeRef#__updateReferences.
        *
        * @memberOf pentaho.type.mixins.Container#
        * @type {pentaho.type.ReferenceList}
@@ -143,16 +143,15 @@ define([
      * @readOnly
      */
     get $references() {
-      var cref;
       var txn = this.$type.context.transaction;
-      return (txn && (cref = txn.__getChangeRef(this.__uid))) ? cref.projectedReferences : this.__refs;
+      return txn !== null ? txn.getAmbientReferences(this) : this.__refs;
     },
 
     /**
      * Adds a reference to this instance.
      *
      * This method is only used internally by Complex#constructor, List#constructor and Complex#clone,
-     * for when the internal fields are updated directly, for performance and for working
+     * for when the internal fields are updated directly, which is done for performance and for working
      * outside of any ambient txn. The _removeReference counterpart is not needed.
      *
      * @param {!pentaho.type.mixins.Container} container - The container that refers this one.
