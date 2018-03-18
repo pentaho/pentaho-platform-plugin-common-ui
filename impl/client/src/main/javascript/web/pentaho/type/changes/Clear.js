@@ -53,16 +53,12 @@ define([
       var container = changeset.owner;
 
       if(!container.$isBoundary && !container.$type.elementType.isSimple) {
-        var transaction = changeset.transaction;
         var i = -1;
         var elements = container.__elems;
         var L = elements.length;
-        var element;
         while(++i < L) {
-          element = elements[i];
-          if(element.__addReference) {
-            transaction.__ensureChangeRef(element).removeReference(container);
-            changeset.__removeComplexElement(element);
+          if(elements[i].__addReference) {
+            changeset.__removeComplexElement(elements[i]);
           }
         }
       }
@@ -74,16 +70,12 @@ define([
       var container = changeset.owner;
 
       if(!container.$isBoundary && !container.$type.elementType.isSimple) {
-        var transaction = changeset.transaction;
         var i = -1;
         var elements = container.__elems;
         var L = elements.length;
-        var element;
         while(++i < L) {
-          element = elements[i];
-          if(element.__addReference) {
-            transaction.__ensureChangeRef(element).addReference(container);
-            changeset.__addComplexElement(element);
+          if(elements[i].__addReference) {
+            changeset.__addComplexElement(elements[i]);
           }
         }
       }

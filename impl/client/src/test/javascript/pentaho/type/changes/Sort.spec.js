@@ -24,7 +24,11 @@ define([
 
   describe("pentaho.type.changes.Sort -", function() {
 
-    var context, List, NumberList, DerivedComplex, ComplexList;
+    var context;
+    var List;
+    var NumberList;
+    var DerivedComplex;
+    var ComplexList;
 
     beforeEach(function(done) {
       Context.createAsync()
@@ -207,7 +211,7 @@ define([
 
           // ---
 
-          list.sort(function(a, b) { return a.foo - b.foo});
+          list.sort(function(a, b) { return a.foo - b.foo; });
 
           // ---
 
@@ -229,7 +233,7 @@ define([
 
           // ---
 
-          list.sort(function(a, b) { return a.foo - b.foo});
+          list.sort(function(a, b) { return a.foo - b.foo; });
 
           // ---
 

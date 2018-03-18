@@ -331,7 +331,10 @@ define([
           var Derived = Complex.extend({$type: {props: ["foo"]}});
           var derived = new Derived({foo: "bar"});
 
-          var changeset = new ComplexChangeset(txnScope.transaction, derived);
+          spyOn(derived, "_createChangeset").and.returnValue(new ComplexChangeset(txnScope.transaction, derived));
+
+          var changeset = txnScope.transaction.ensureChangeset(derived);
+
           expect(changeset.hasChanges).toBe(false);
           expect(changeset.owner).toBe(derived);
 
@@ -368,7 +371,10 @@ define([
 
           var derived = new Derived({foo: {a: 1, b: 2}});
 
-          var changeset = new ComplexChangeset(txnScope.transaction, derived);
+          spyOn(derived, "_createChangeset").and.returnValue(new ComplexChangeset(txnScope.transaction, derived));
+
+          var changeset = txnScope.transaction.ensureChangeset(derived);
+
           expect(changeset.hasChanges).toBe(false);
           expect(changeset.owner).toBe(derived);
 
@@ -416,7 +422,10 @@ define([
 
           var derived = new Derived({foo: {a: 1, b: 2}});
 
-          var changeset = new ComplexChangeset(txnScope.transaction, derived);
+          spyOn(derived, "_createChangeset").and.returnValue(new ComplexChangeset(txnScope.transaction, derived));
+
+          var changeset = txnScope.transaction.ensureChangeset(derived);
+
           expect(changeset.hasChanges).toBe(false);
           expect(changeset.owner).toBe(derived);
 

@@ -73,19 +73,17 @@ define([
 
     /** @inheritDoc */
     _prepare: function(changeset) {
-      var elem = this.element;
-      if(elem.__addReference && !changeset.owner.$isBoundary) {
-        changeset.transaction.__ensureChangeRef(elem).addReference(changeset.owner);
-        changeset.__addComplexElement(elem);
+      var element = this.element;
+      if(element.__addReference && !changeset.owner.$isBoundary) {
+        changeset.__addComplexElement(element);
       }
     },
 
     /** @inheritDoc */
     _cancel: function(changeset) {
-      var elem = this.element;
-      if(elem.__addReference && !changeset.owner.$isBoundary) {
-        changeset.transaction.__ensureChangeRef(elem).removeReference(changeset.owner);
-        changeset.__removeComplexElement(elem);
+      var element = this.element;
+      if(element.__addReference && !changeset.owner.$isBoundary) {
+        changeset.__removeComplexElement(element);
       }
     },
 

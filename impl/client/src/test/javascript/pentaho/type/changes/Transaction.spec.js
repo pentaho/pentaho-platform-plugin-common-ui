@@ -131,14 +131,14 @@ define([
       });
     });
 
-    describe("#__addChangeset(changeset)", function() {
+    describe("#ensureChangeset(changeset)", function() {
       var Derived;
 
       beforeEach(function() {
         Derived = context.get({props: ["x"]});
       });
 
-      it("should throw if transaction is already read-only", function() {
+      it("should throw if transaction is already read-only and a changeset does not yet exist", function() {
         var txn = new Transaction(context);
         var scope = txn.enter();
         scope.acceptWill();
@@ -148,9 +148,8 @@ define([
         expect(txn.isProposed).toBe(true);
 
         var container = new Derived();
-
         expect(function() {
-          var cset = new Changeset(txn, container);
+          txn.ensureChangeset(container);
         }).toThrow(errorMatch.operInvalid());
       });
 
@@ -158,7 +157,7 @@ define([
         var txn = new Transaction(context);
         var container = new Derived();
 
-        var cset = new Changeset(txn, container);
+        var cset = txn.ensureChangeset(container);
 
         var cset2 = txn.getChangeset(container.$uid);
 
@@ -168,17 +167,20 @@ define([
       it("should add the changeset and not sync the container's changeset if txn is not current", function() {
         var txn = new Transaction(context);
         var container = new Derived();
-        var cset = new Changeset(txn, container);
+
+        txn.ensureChangeset(container);
 
         expect(container.$changeset).toBe(null);
       });
 
       it("should add the changeset and sync the container's changeset if txn is current", function() {
         var txn = new Transaction(context);
+
         var scope = txn.enter();
 
         var container = new Derived();
-        var cset = new Changeset(txn, container);
+
+        var cset = txn.ensureChangeset(container);
 
         expect(container.$changeset).toBe(cset);
 

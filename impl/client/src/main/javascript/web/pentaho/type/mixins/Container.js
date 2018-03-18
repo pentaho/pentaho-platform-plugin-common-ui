@@ -222,7 +222,7 @@ define([
 
       return scope.using(function() {
 
-        cset = this._createChangeset(scope.transaction);
+        cset = scope.transaction.ensureChangeset(this);
 
         // assert this.__cset === cset
 

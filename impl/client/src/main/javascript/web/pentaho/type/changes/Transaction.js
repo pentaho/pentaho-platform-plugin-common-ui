@@ -240,24 +240,41 @@ define([
     },
 
     /**
-     * Called by the changeset constructor to register it with the transaction.
+     * Called to obtain a changeset for a given container in this transaction.
      *
-     * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
+     * @param {!pentaho.type.mixins.Container} owner - The changeset owner container.
+     *
+     * @return {!pentaho.type.changes.Changeset} The existing or created changeset.
+     *
+     * @throws {pentaho.lang.OperationInvalidError} When the transaction has already been previewed,
+     * committed or rejected, and thus can no longer be changed.
+     *
+     * @see pentaho.type.changes.Changeset#__onChildChangesetCreated
+     */
+    ensureChangeset: function(owner) {
+      return O.getOwn(this.__csetByUid, owner.$uid) || this.__createChangeset(owner);
+    },
+
+    /**
+     * Creates a changeset for a given container in this transaction.
+     *
+     * @param {!pentaho.type.mixins.Container} owner - The changeset owner container.
+     *
+     * @return {!pentaho.type.changes.Changeset} The existing or created changeset.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the transaction has already been previewed,
      * committed or rejected, and thus can no longer be changed.
      *
      * @private
-     * @internal
-     *
-     * @see pentaho.type.changes.Changeset#__onChildChangesetCreated
      */
-    __addChangeset: function(changeset) {
-      if(this.isReadOnly)
+    __createChangeset: function(owner) {
+
+      if(this.isReadOnly) {
         throw error.operInvalid(
           "Transaction cannot change because it has already been previewed, committed or rejected.");
+      }
 
-      var owner = changeset.owner;
+      var changeset = owner._createChangeset(this);
 
       this.__csetByUid[owner.$uid] = changeset;
       this.__csets.push(changeset);
@@ -267,21 +284,18 @@ define([
       }
 
       // Traverse references and create changesets, connecting them along the way.
+
       // TODO: Should be being careful not to create changeset cycles when there are reference cycles...
 
-      // Note that a ChangeRef can already exist before the ChangeSet, so that __refs may be outdated.
-      // Take care to hook to the ambient parents.
       var irefs = this.getAmbientReferences(owner);
       if(irefs !== null) {
         irefs.forEach(function(iref) {
-          // Recursive, when _createChangeset is called.
-          // The base Changeset constructor calls __addChangeset.
-          var container = iref.container;
-          var containerChangeset = O.getOwn(this.__csetByUid, container.$uid) || container._createChangeset(this);
-
-          containerChangeset.__onChildChangesetCreated(changeset, iref.property);
+          // Recursive call, when container changeset does not exist yet.
+          this.ensureChangeset(iref.container).__onChildChangesetCreated(changeset, iref.property);
         }, this);
       }
+
+      return changeset;
     },
 
     /**
@@ -300,18 +314,12 @@ define([
     },
 
     __sortGraph: function() {
-      // 1. Changesets have already been propagated — all references to current containers were traversed
-      //    each time individual leaf changesets were created. Changesets have no cycles.
-      // 2. Now, changesets are traversed recursively and their net order is updated.
-      // 3. There is one gotcha with the approach of traversing child changesets: a Replace change
-      //    shadows an existing changeset in the same property; that subtree's net order will be untouched.
-      //    In a way, because the two trees will become disconnected after committing, it might be ok that
-      //    the order of evaluation between the two is undefined...
-      //    Otherwise, shadowed changesets would need to be traversed as well.
-
-      this.__eachChangeset(function(cset) { cset.__updateNetOrder(0); });
-
-      // Sort the changesets according to inverse topological order (leafs first, roots last).
+      // 1. Changesets are all created.
+      //    Whenever a leaf changeset is created,
+      //    all of the changesets accessible through inverse references are created as well,
+      //    and their topological order updated.
+      //    Also, whenever refs are added and removed by primitive actions.
+      // 2. Now, sort the changesets according to inverse topological order (leafs first, roots last).
       this.__csets.sort(__compareChangesets);
     },
     // endregion

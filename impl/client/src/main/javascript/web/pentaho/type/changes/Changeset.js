@@ -74,14 +74,13 @@ define([
       // The longest path by which this changeset can be reached following the paths from parent to children changesets.
       this._netOrder = 0;
 
-      this.__txnVersion = transaction.__version;
+      this.__txnVersion = transaction.version;
       this.__txnVersionDirty = false;
-
-      transaction.__addChangeset(this);
     },
 
     /**
-     * Updates the order of this changeset, and of any child changesets, to reflect its topological sort order.
+     * Updates the topological order of this changeset, and of any child changesets,
+     * to the given value, if it's less than it.
      *
      * @param {number} netOrder - The net order.
      * @private
@@ -96,6 +95,48 @@ define([
           changeset.__updateNetOrder(childNetOrder);
         });
       }
+    },
+
+    /**
+     * Resets the topological order of this changeset,
+     * and of any child changesets,
+     * by calculating it based on its current containers.
+     *
+     * @private
+     * @see pentaho.type.changes.Changeset#__calculateNetOrder
+     */
+    _resetNetOrder: function() {
+
+      this._netOrder = this.__calculateNetOrder();
+
+      this._eachChildChangeset(function(changeset) {
+        changeset.__resetNetOrder();
+      });
+    },
+
+    /**
+     * Calculates the topological order of this changeset based on the topological order of its current containers.
+     *
+     * @return {number} The topological order.
+     *
+     * @private
+     */
+    __calculateNetOrder: function() {
+
+      var maxParentOrder = 0;
+      var transaction = this.transaction;
+      var irefs = transaction.getAmbientReferences(this.owner);
+      if(irefs !== null) {
+        var i = irefs.length;
+        while(i--) {
+          var containerChangeset = transaction.getChangeset(irefs[i].container.$uid);
+          if(containerChangeset !== null && containerChangeset._netOrder >= maxParentOrder) {
+            maxParentOrder = containerChangeset._netOrder;
+          }
+        }
+      }
+
+      return maxParentOrder + 1;
     },
 
     // Should be marked protected abstract, but that would show in the docs.

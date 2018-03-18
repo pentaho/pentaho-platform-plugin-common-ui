@@ -154,27 +154,43 @@ define([
 
     /**
      * Marks an element as added by a change or cancels a previous removal.
-     * @param {!pentaho.type.Complex} elem - The added element.
+     * @param {!pentaho.type.Complex} element - The added element.
      * @private
      * @internal
      */
-    __addComplexElement: function(elem) {
-      if(elem.__cset) {
-        // The version is already affected by the add operation (or remove cancellation) itself.
-        this.__changesetByKey[elem.$key] = elem.__cset;
+    __addComplexElement: function(element) {
+
+      // The transaction version is already affected by the __addChange or _clearChanges methods.
+
+      this.transaction.__ensureChangeRef(element).addReference(this.owner);
+
+      var childChangeset = element.__cset;
+      if(childChangeset !== null) {
+        this.__changesetByKey[element.$key] = childChangeset;
+
+        // Make sure that the new changeset descendants have at least our topological order.
+        childChangeset.__updateNetOrder(this._netOrder + 1);
       }
     },
 
     /**
      * Marks an element as removed by a change or cancels a previous addition.
-     * @param {!pentaho.type.Element} elem - The removed element.
+     * @param {!pentaho.type.Complex} element - The removed element.
      * @private
      * @internal
      */
-    __removeComplexElement: function(elem) {
-      if(elem.__cset) {
-        // The version is already affected by the remove operation (or add cancellation) itself.
-        delete this.__changesetByKey[elem.$key];
+    __removeComplexElement: function(element) {
+      // The transaction version is already affected by the __addChange or _clearChanges methods.
+
+      this.transaction.__ensureChangeRef(element).removeReference(this.owner);
+
+      var childChangeset = element.__cset;
+      if(childChangeset !== null) {
+
+        delete this.__changesetByKey[element.$key];
+
+        // Make sure that the changeset descendants update its new topological order.
+        childChangeset._resetNetOrder();
       }
     },
 
@@ -189,7 +205,7 @@ define([
     },
 
     /** @inheritDoc */
-    __onChildChangesetCreated: function(childChangeset) {
+    __onChildChangesetCreated: function(childChangeset, propType) {
       // This is called when the child changeset is a current child.
       // However, if a remove or clear change is added,
       // this child changeset is not being removed...
@@ -199,6 +215,8 @@ define([
       // In its constructor, its transaction version is set to the latest of the transaction.
       // So, surely, its version is >= ours.
       this._setTransactionVersion(childChangeset.transactionVersion);
+
+      childChangeset.__updateNetOrder(this._netOrder + 1);
     },
 
     /**

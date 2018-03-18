@@ -247,6 +247,8 @@ define([
 
         this._setTransactionVersion(childChangeset.transactionVersion);
       }
+
+      childChangeset.__updateNetOrder(this._netOrder + 1);
     },
 
     /**
@@ -303,9 +305,51 @@ define([
 
       var replaceChange = this._changes[name];
 
-      replaceChange.__updateValue(this.transaction, this.owner, valueNew, stateNew);
+      replaceChange.__updateValue(this, valueNew, stateNew);
 
       this._setTransactionVersion(replaceChange.transactionVersion);
+    },
+
+    /**
+     * Marks an element as added by a change or cancels a previous removal.
+     * @param {!pentaho.type.Complex} element - The added element.
+     * @param {!pentaho.type.Property.Type} propType - The property type.
+     * @private
+     * @internal
+     */
+    __addComplexElement: function(element, propType) {
+
+      // The transaction version is already affected by the
+      // __setPrimitiveChange, __removePrimitiveChange and __updateReplaceChange methods.
+
+      this.transaction.__ensureChangeRef(element).addReference(this.owner, propType);
+
+      var childChangeset = element.__cset;
+      if(childChangeset !== null) {
+        // Make sure that the new changeset descendants have at least our topological order.
+        childChangeset.__updateNetOrder(this._netOrder + 1);
+      }
+    },
+
+    /**
+     * Marks an element as removed by a change or cancels a previous addition.
+     * @param {!pentaho.type.Complex} element - The removed element.
+     * @param {!pentaho.type.Property.Type} propType - The property type.
+     * @private
+     * @internal
+     */
+    __removeComplexElement: function(element, propType) {
+
+      // The transaction version is already affected by the
+      // __setPrimitiveChange, __removePrimitiveChange and __updateReplaceChange methods.
+
+      this.transaction.__ensureChangeRef(element).removeReference(this.owner, propType);
+
+      var childChangeset = element.__cset;
+      if(childChangeset !== null) {
+        // Make sure that the changeset descendants update its new topological order.
+        childChangeset._resetNetOrder();
+      }
     },
 
     /**
@@ -437,7 +481,7 @@ define([
       var context = type.context;
       var scope = context.enterChange();
       if(changeset === null) {
-        changeset = complex._createChangeset(scope.transaction);
+        changeset = scope.transaction.ensureChangeset(complex);
       }
 
       // Create a change. Preserve original instance if unchanged.
