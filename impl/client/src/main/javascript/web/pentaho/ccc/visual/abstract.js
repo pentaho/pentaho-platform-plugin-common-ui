@@ -120,7 +120,10 @@ define([
 
           // Data
           dataTypeCheckingMode: "none",
-          ignoreNulls: false
+          ignoreNulls: false,
+
+          // Axis
+          baseAxisOriginIsZero: false
         },
 
         // Hide discrete null members in tooltip.
