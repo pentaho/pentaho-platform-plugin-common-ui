@@ -1,0 +1,441 @@
+{
+  "name": "@pentaho/common-ui",
+  "version": "${project.version}",
+
+  "preferGlobal": true,
+
+  "paths": {
+    "common-ui": "/",
+    "common-repo": "/repo",
+    "common-data": "/dataapi",
+
+    "pentaho/common": "/dojo/pentaho/common",
+
+    "pentaho/i18n": "/i18nMock",
+    "pentaho/i18n/MessageBundle": "/pentaho/i18n/MessageBundle",
+
+    "pentaho/shim": "/pentaho/shim",
+    "pentaho/util": "/pentaho/util",
+    "pentaho/lang": "/pentaho/lang",
+    "pentaho/service": "/pentaho/service",
+    "pentaho/data": "/pentaho/data",
+    "pentaho/type": "/pentaho/type",
+    "pentaho/typeInfo": "/pentaho/typeInfo",
+    "pentaho/instanceInfo": "/pentaho/instanceInfo",
+    "pentaho/visual": "/pentaho/visual",
+    "pentaho/config": "/pentaho/config",
+    "pentaho/environment": "/pentaho/environment",
+    "pentaho/debug": "/pentaho/debug",
+    "pentaho/ccc": "/pentaho/ccc",
+
+    "local": "/util/local",
+    "json": "/util/require-json/json",
+    "text": "/util/require-text/text",
+    "common-ui/util/require-css/css": "/util/require-css/css.min",
+
+    "pentaho/shim/_es6-promise/es6-promise": "/pentaho/shim/_es6-promise/es6-promise.min",
+
+    "dojo": "/dojo/dojo",
+    "dojox": "/dojo/dojox",
+    "dijit": "/dojo/dijit",
+
+    "dojo/on": "/dojo/pentaho/common/overrides/dojo/on",
+    "dojo/dom-geometry": "/dojo/pentaho/common/overrides/dojo/dom-geometry",
+    "dojo/dom-prop": "/dojo/pentaho/common/overrides/dojo/dom-prop",
+    "dojox/layout/ResizeHandle": "/dojo/pentaho/common/overrides/dojox/layout/ResizeHandle",
+    "dojox/grid/_View": "/dojo/pentaho/common/overrides/dojox/grid/_View",
+    "dojox/xml/parser": "/dojo/pentaho/common/overrides/dojox/xml/parser",
+    "dojox/grid/Selection": "/dojo/pentaho/common/overrides/dojox/grid/Selection",
+    "dojox/grid/_FocusManager": "/dojo/pentaho/common/overrides/dojox/grid/_FocusManager",
+    "dojox/grid/_Scroller": "/dojo/pentaho/common/overrides/dojox/grid/_Scroller",
+    "dojox/storage": "/dojo/pentaho/common/overrides/dojox/storage",
+    "dojox/json": "/dojo/pentaho/common/overrides/dojox/json",
+    "dojox/rpc": "/dojo/pentaho/common/overrides/dojox/rpc",
+    "dojo/_base/kernel": "/dojo/pentaho/common/overrides/dojo/_base/kernel",
+    "dojo/_base/config": "/dojo/pentaho/common/overrides/dojo/_base/config",
+    "dojo/store/Memory": "/dojo/pentaho/common/overrides/dojo/store/Memory",
+    "dijit/_HasDropDown": "/dojo/pentaho/common/overrides/dijit/_HasDropDown",
+    "dijit/_CssStateMixin": "/dojo/pentaho/common/overrides/dijit/_CssStateMixin",
+    "dojo/selector/_loader": "/dojo/pentaho/common/overrides/dojo/selector/_loader",
+    "dojo/i18n": "/dojo/pentaho/common/overrides/dojo/i18n",
+    "dojo/request/default": "/dojo/pentaho/common/overrides/dojo/request/default",
+
+    "common-ui/PluginHandler": "/plugin-handler/pluginHandler",
+    "common-ui/Plugin": "/plugin-handler/plugin",
+    "common-ui/AngularPluginHandler": "/plugin-handler/angularPluginHandler",
+    "common-ui/AngularPlugin": "/plugin-handler/angularPlugin",
+    "common-ui/AnimatedAngularPluginHandler": "/plugin-handler/animatedAngularPluginHandler",
+    "common-ui/AnimatedAngularPlugin": "/plugin-handler/animatedAngularPlugin",
+
+    "common-ui/jquery": "/jquery/jquery.conflict",
+    "common-ui/jquery-clean": "/jquery/jquery.min",
+    "common-ui/handlebars": "/handlebars/handlebars-v4.0.5",
+    "common-ui/jquery-i18n": "/jquery/jquery.i18n.properties-min",
+    "common-ui/jquery-pentaho-i18n": "/jquery/jquery.i18n.properties.supported.languages",
+    "common-ui/bootstrap": "/bootstrap/bootstrap.min",
+    "common-ui/ring": "/ring/ring",
+    "common-ui/underscore": "/underscore/underscore.min",
+    "common-ui/angular": "/angular/angular.min",
+    "common-ui/angular-i18n": "/angular/i18n",
+    "common-ui/angular-resource": "/angular/angular-resource.min",
+    "common-ui/angular-route": "/angular/angular-route.min",
+    "common-ui/angular-animate": "/angular/angular-animate.min",
+    "common-ui/angular-sanitize": "/angular/angular-sanitize.min",
+    "common-ui/properties-parser": "/angular-translate/properties-parser",
+    "common-ui/angular-translate": "/angular-translate/angular-translate",
+    "common-ui/angular-translate-loader-partial": "/angular-translate/angular-translate-loader-partial",
+    "common-ui/angular-translate-loader-static": "/angular-translate/angular-translate-loader-static-files",
+    "common-ui/angular-ui-bootstrap": "/bootstrap/ui-bootstrap-tpls-0.6.0.min",
+    "common-ui/angular-directives": "/angular-directives"
+  },
+
+  "map": {
+    "common-ui": {
+      "css": "common-ui/util/require-css/css",
+      "underscore": "common-ui/underscore"
+    }
+  },
+
+  "config": {
+    "pentaho/typeInfo": {
+      "pentaho/type/instance": {
+        "alias": "instance"
+      },
+      "pentaho/type/value": {
+        "alias": "value",
+        "base": "instance"
+      },
+      "pentaho/type/property": {
+        "alias": "property",
+        "base": "instance"
+      },
+      "pentaho/type/list": {
+        "alias": "list",
+        "base": "value"
+      },
+      "pentaho/type/element": {
+        "alias": "element",
+        "base": "value"
+      },
+      "pentaho/type/complex": {
+        "alias": "complex",
+        "base": "element"
+      },
+      "pentaho/type/application": {
+        "alias": "application",
+        "base": "complex"
+      },
+      "pentaho/type/model": {
+        "alias": "model",
+        "base": "complex"
+      },
+      "pentaho/type/simple": {
+        "alias": "simple",
+        "base": "element"
+      },
+      "pentaho/type/number": {
+        "alias": "number",
+        "base": "simple"
+      },
+      "pentaho/type/string": {
+        "alias": "string",
+        "base": "simple"
+      },
+      "pentaho/type/boolean": {
+        "alias": "boolean",
+        "base": "simple"
+      },
+      "pentaho/type/date": {
+        "alias": "date",
+        "base": "simple"
+      },
+      "pentaho/type/object": {
+        "alias": "object",
+        "base": "simple"
+      },
+      "pentaho/type/function": {
+        "alias": "function",
+        "base": "simple"
+      },
+      "pentaho/type/mixins/enum": {
+        "alias": "enum",
+        "base": "element"
+      },
+      "pentaho/type/action/base": {
+        "base": "element"
+      },
+      "pentaho/data/filter/abstract": {
+        "base": "complex"
+      },
+      "pentaho/data/filter/true": {
+        "alias": "true",
+        "base": "pentaho/data/filter/abstract"
+      },
+      "pentaho/data/filter/false": {
+        "alias": "false",
+        "base": "pentaho/data/filter/abstract"
+      },
+      "pentaho/data/filter/tree": {
+        "base": "pentaho/data/filter/abstract"
+      },
+      "pentaho/data/filter/or": {
+        "alias": "or",
+        "base": "pentaho/data/filter/tree"
+      },
+      "pentaho/data/filter/and": {
+        "alias": "and",
+        "base": "pentaho/data/filter/tree"
+      },
+      "pentaho/data/filter/not": {
+        "alias": "not",
+        "base": "pentaho/data/filter/abstract"
+      },
+      "pentaho/data/filter/property": {
+        "base": "pentaho/data/filter/abstract"
+      },
+      "pentaho/data/filter/isEqual": {
+        "alias": "=",
+        "base": "pentaho/data/filter/property"
+      },
+      "pentaho/data/filter/isIn": {
+        "alias": "in",
+        "base": "pentaho/data/filter/property"
+      },
+      "pentaho/data/filter/isGreater": {
+        "alias": ">",
+        "base": "pentaho/data/filter/property"
+      },
+      "pentaho/data/filter/isGreaterOrEqual": {
+        "alias": ">=",
+        "base": "pentaho/data/filter/property"
+      },
+      "pentaho/data/filter/isLess": {
+        "alias": "<",
+        "base": "pentaho/data/filter/property"
+      },
+      "pentaho/data/filter/isLessOrEqual": {
+        "alias": "<=",
+        "base": "pentaho/data/filter/property"
+      },
+      "pentaho/data/filter/isLike": {
+        "alias": "like",
+        "base": "pentaho/data/filter/property"
+      },
+      "pentaho/visual/base/model": {
+        "base": "model"
+      },
+      "pentaho/visual/base/view": {
+        "base": "complex",
+        "props": {
+          "model": {
+            "valueType": "pentaho/visual/base/model"
+          }
+        }
+      },
+      "pentaho/visual/models/abstract": {
+        "base": "pentaho/visual/base/model"
+      },
+      "pentaho/visual/samples/calc/model": {
+        "base": "pentaho/visual/base/model"
+      },
+      "pentaho/visual/models/cartesianAbstract": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/categoricalContinuousAbstract": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/barAbstract": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/barNormalizedAbstract": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/barHorizontal": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/bar": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/barStacked": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/barStackedHorizontal": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/barNormalized": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/barNormalizedHorizontal": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/barLine": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/line": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/pointAbstract": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/metricPointAbstract": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/areaStacked": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/pie": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/heatGrid": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/sunburst": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/donut": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/scatter": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/models/bubble": {
+        "base": "pentaho/visual/models/abstract"
+      },
+      "pentaho/visual/action/base": {
+        "base": "pentaho/type/action/base"
+      },
+      "pentaho/visual/action/select": {
+        "alias": "select",
+        "base": "pentaho/visual/action/base"
+      },
+      "pentaho/visual/action/execute": {
+        "alias": "execute",
+        "base": "pentaho/visual/action/base"
+      },
+      "pentaho/visual/action/update": {
+        "base": "pentaho/visual/action/base"
+      },
+      "pentaho/visual/color/palette": {
+        "base": "complex"
+      }
+    },
+    "pentaho/instanceInfo": {
+      "pentaho/config/impl/instanceOfAmdLoadedService": {
+        "type": "pentaho.config.IService"
+      },
+      "pentaho/visual/config/vizApi.conf": {
+        "type": "pentaho.config.spec.IRuleSet"
+      },
+      "pentaho/visual/color/palettes/nominalPrimary": {
+        "type": "pentaho/visual/color/palette"
+      },
+      "pentaho/visual/color/palettes/nominalNeutral": {
+        "type": "pentaho/visual/color/palette"
+      },
+      "pentaho/visual/color/palettes/nominalLight": {
+        "type": "pentaho/visual/color/palette"
+      },
+      "pentaho/visual/color/palettes/nominalDark": {
+        "type": "pentaho/visual/color/palette"
+      },
+      "pentaho/visual/color/palettes/quantitativeBlue3": {
+        "type": "pentaho/visual/color/palette"
+      },
+      "pentaho/visual/color/palettes/quantitativeBlue5": {
+        "type": "pentaho/visual/color/palette"
+      },
+      "pentaho/visual/color/palettes/quantitativeGray3": {
+        "type": "pentaho/visual/color/palette"
+      },
+      "pentaho/visual/color/palettes/quantitativeGray5": {
+        "type": "pentaho/visual/color/palette"
+      },
+      "pentaho/visual/color/palettes/divergentRyg3": {
+        "type": "pentaho/visual/color/palette"
+      },
+      "pentaho/visual/color/palettes/divergentRyg5": {
+        "type": "pentaho/visual/color/palette"
+      },
+      "pentaho/visual/color/palettes/divergentRyb3": {
+        "type": "pentaho/visual/color/palette"
+      },
+      "pentaho/visual/color/palettes/divergentRyb5": {
+        "type": "pentaho/visual/color/palette"
+      }
+    }
+  },
+
+  "shim": {
+    "common-ui/handlebars": {
+      "deps": [
+        "common-ui/jquery"
+      ]
+    },
+    "common-ui/jquery-i18n": {
+      "deps": [
+        "common-ui/jquery"
+      ]
+    },
+    "common-ui/bootstrap": {
+      "deps": [
+        "common-ui/jquery"
+      ]
+    },
+    "common-ui/ring": {
+      "deps": [
+        "common-ui/underscore"
+      ],
+      "exports": "ring"
+    },
+    "common-ui/angular-resource": {
+      "deps": [
+        "common-ui/angular"
+      ]
+    },
+    "common-ui/angular-route": {
+      "deps": [
+        "common-ui/angular"
+      ]
+    },
+    "common-ui/angular-animate": {
+      "deps": [
+        "common-ui/angular"
+      ]
+    },
+    "common-ui/angular-sanitize": {
+      "deps": [
+        "common-ui/angular"
+      ]
+    },
+    "common-ui/angular-translate": {
+      "deps": [
+        "pentaho/shim/es5",
+        "common-ui/angular"
+      ]
+    },
+    "common-ui/angular-translate-loader-partial": {
+      "deps": [
+        "common-ui/angular-translate"
+      ]
+    },
+    "common-ui/angular-translate-loader-static": {
+      "deps": [
+        "common-ui/angular-translate"
+      ]
+    },
+    "common-ui/angular-ui-bootstrap": {
+      "deps": [
+        "common-ui/angular"
+      ]
+    },
+    "common-ui/angular-directives": {
+      "deps": [
+        "common-ui/angular-ui-bootstrap"
+      ]
+    }
+  },
+
+  "scripts": {
+    "preconfig": "preconfig.js"
+  }
+}

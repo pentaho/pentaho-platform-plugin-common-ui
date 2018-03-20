@@ -14,5 +14,6 @@
   <modules>
     <module>platform-plugin</module>
     <module>client-config</module>
+    <module>webpackage</module>
   </modules>
 </project>
