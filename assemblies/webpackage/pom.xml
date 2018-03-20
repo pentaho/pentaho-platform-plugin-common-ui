@@ -34,7 +34,7 @@
 
         <executions>
           <execution>
-            <id>unpack-karaf-pkg</id>
+            <id>unpack-common-ui-pkg</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>unpack-dependencies</goal>
