@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
-    <artifactId>common-ui-impl-client-config-umbrella</artifactId>
     <groupId>org.pentaho</groupId>
-    <version>7.1-SNAPSHOT</version>
+    <artifactId>common-ui-impl-client-config-umbrella</artifactId>
+    <version>7.1.0.10-106</version>
   </parent>
-
   <artifactId>common-ui-impl-client-config-folder-enabler</artifactId>
+  <version>7.1.0.10-106</version>
   <packaging>bundle</packaging>
-
   <properties>
     <osgi.version>4.3.1</osgi.version>
     <felix-configadmin.version>1.8.8</felix-configadmin.version>
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.osgi</groupId>
@@ -32,7 +28,6 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
@@ -48,5 +43,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>
