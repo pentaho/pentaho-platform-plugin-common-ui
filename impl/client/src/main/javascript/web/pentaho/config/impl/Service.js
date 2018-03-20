@@ -62,7 +62,7 @@ define([
      * @memberOf pentaho.config.impl
      *
      * @extends pentaho.lang.Base
-     * @implements pentaho.config.IConfiguration
+     * @implements {pentaho.config.IConfiguration}
      * @private
      *
      * @description Creates a configuration for the given service and environment.
@@ -113,6 +113,7 @@ define([
             select2.instance = select.instance;
           }
         }
+
         return ruleClone;
       });
     },
@@ -206,7 +207,7 @@ define([
 
         var list = this.__ruleStore[fullItemId];
         if(!list) {
-          this.__ruleStore[fullItemId] = list = new SortedList({"comparer": _ruleComparer});
+          this.__ruleStore[fullItemId] = list = new SortedList({comparer: _ruleComparer});
         }
 
         list.push(rule);

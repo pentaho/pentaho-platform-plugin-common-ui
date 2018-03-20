@@ -204,8 +204,9 @@ define([
     },
 
     /** @inheritDoc */
-    _eachChildChangeset: function(fun, ctx) {
+    eachChildChangeset: function(fun, ctx) {
       var changes = this._changes;
+      var isTxnCurrent = this.transaction.isCurrent;
       for(var name in changes) {
         if(O.hasOwn(changes, name)) {
           var change = changes[name];
@@ -218,7 +219,7 @@ define([
             var value = change.value;
             if(value !== null &&
                value.__addReference &&
-               (change = this.transaction.getChangeset(value.$uid)) !== null) {
+               (change = (isTxnCurrent ? value.__cset : this.transaction.getChangeset(value.$uid))) !== null) {
 
               if(fun.call(ctx, change) === false) {
                 return;
@@ -231,16 +232,8 @@ define([
 
     /** @inheritDoc */
     __onChildChangesetCreated: function(childChangeset, propType) {
-      // Cannot set changesets like this over Replace changes, or the latter would be, well... , overwritten.
-      // this._changes[propType.name] = childChangeset;
 
-      // getChange("foo") -> PrimitiveChange or Changeset
-      // Case I - Replace without changes within the new value (apart from ref changes)
-      // Replace
-      //   (new) value : Value .$changeset = null
-
-      // Lists, are never changed, and must always be copied.
-      // The asymmetry comes from the fact that complex changesets cannot coexist with replaced values...
+      // Cannot set changesets over Replace changes
 
       if(this.__getChange(propType.name) === null) {
         this._changes[propType.name] = childChangeset;
@@ -269,7 +262,7 @@ define([
 
       var txnVersion = this.transaction.__takeNextVersion();
       change._setTransactionVersion(txnVersion);
-      this._setTransactionVersion(txnVersion);
+      this._setTransactionVersionLocal(txnVersion);
     },
 
     /**
@@ -287,7 +280,7 @@ define([
 
       delete this._changes[name];
 
-      this._setTransactionVersion(this.transaction.__takeNextVersion());
+      this._setTransactionVersionLocal(this.transaction.__takeNextVersion());
     },
 
     /**
@@ -307,7 +300,7 @@ define([
 
       replaceChange.__updateValue(this, valueNew, stateNew);
 
-      this._setTransactionVersion(replaceChange.transactionVersion);
+      this._setTransactionVersionLocal(replaceChange.transactionVersion);
     },
 
     /**

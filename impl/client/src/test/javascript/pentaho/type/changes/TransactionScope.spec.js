@@ -91,7 +91,8 @@ define([
     });
 
     describe("#using(fun, ctx)", function() {
-      var txn, scope;
+      var txn;
+      var scope;
 
       beforeEach(function() {
         txn = new Transaction(context);
@@ -178,8 +179,8 @@ define([
         scope = null;
       });
 
-      it("should not call reject, if the specified function throws an error but scope is not current",
-      function() {
+      it("should not call reject, if the specified function throws an error but " +
+        "scope is not current", function() {
         var ex  = new Error();
         var fun = function() {
           scope.exit();
@@ -223,8 +224,8 @@ define([
         scope = null;
       });
 
-      it("should throw back the transaction rejection error if it was not thrown by the specified function",
-      function() {
+      it("should throw back the transaction rejection error if it was not thrown " +
+        "by the specified function", function() {
 
         var ex = new Error();
 
@@ -249,7 +250,7 @@ define([
 
     describe("#acceptWill()", function() {
 
-      it("should call txn _preview if current", function() {
+      it("should call txn __commitWill if current", function() {
 
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);
@@ -262,7 +263,7 @@ define([
         scope.exit();
       });
 
-      it("should call txn _preview and return its value if current", function() {
+      it("should call txn __commitWill and return its value if current", function() {
 
         var txn = new Transaction(context);
         var scope = new TransactionScope(context, txn);

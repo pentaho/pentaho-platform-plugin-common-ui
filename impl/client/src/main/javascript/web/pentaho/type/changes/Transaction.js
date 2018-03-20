@@ -17,11 +17,12 @@ define([
   "./ChangeRef",
   "./TransactionScope",
   "./TransactionRejectedError",
-  "../../lang/Base",
-  "../../lang/ActionResult",
-  "../../util/object",
-  "../../util/error"
-], function(ChangeRef, TransactionScope, TransactionRejectedError, Base, ActionResult, O, error) {
+  "pentaho/lang/Base",
+  "pentaho/lang/ActionResult",
+  "pentaho/lang/SortedList",
+  "pentaho/util/object",
+  "pentaho/util/error"
+], function(ChangeRef, TransactionScope, TransactionRejectedError, Base, ActionResult, SortedList, O, error) {
 
   "use strict";
 
@@ -83,10 +84,37 @@ define([
       this.__crefByUid = {};
       this.__crefs = [];
 
-      this.__actionLockTaken = false;
+      this.__commitLockTaken = false;
       this.__resultWill = null;
       this.__result = null;
       this.__isCurrent = false;
+
+      /**
+       * The queue of changesets for the evaluation of the commit will phase.
+       *
+       * Changesets are inserted in inverse topological order.
+       *
+       * @type {pentaho.lang.SortedList.<!pentaho.type.changes.Changeset>}
+       * @private
+       * @see pentaho.type.changes.Transaction#__doCommitWillCore
+       */
+      this.__commitWillQueue = null;
+
+      /**
+       * The set of the owner uids of changesets which are present in the changesets `__commitWillQueue`.
+       *
+       * @type {Object.<string, boolean>}
+       * @private
+       */
+      this.__commitWillQueueSet = null;
+
+      /**
+       * The current changeset being evaluated in the commit will phase.
+       *
+       * @type {pentaho.type.changes.Changeset}
+       * @private
+       */
+      this.__commitWillChangeset = null;
 
       /**
        * The number of active scopes of this transaction.
@@ -235,7 +263,7 @@ define([
      * @return {pentaho.type.ReferenceList} The reference list, or `null`.
      */
     getAmbientReferences: function(container) {
-      var changeRef = O.getOwn(this.__crefByUid, container.__uid, null);
+      var changeRef = O.getOwn(this.__crefByUid, container.$uid, null);
       return (changeRef && changeRef.projectedReferences) || container.__refs;
     },
 
@@ -311,16 +339,6 @@ define([
       var L = changesets.length;
       var i = -1;
       while(++i < L) fun.call(this, changesets[i]);
-    },
-
-    __sortGraph: function() {
-      // 1. Changesets are all created.
-      //    Whenever a leaf changeset is created,
-      //    all of the changesets accessible through inverse references are created as well,
-      //    and their topological order updated.
-      //    Also, whenever refs are added and removed by primitive actions.
-      // 2. Now, sort the changesets according to inverse topological order (leafs first, roots last).
-      this.__csets.sort(__compareChangesets);
     },
     // endregion
 
@@ -437,7 +455,7 @@ define([
 
     // region Action Lock
     /**
-     * Tries to acquire the _action_ lock, throwing if it is already taken.
+     * Tries to acquire the _commit_ lock, throwing if it is already taken.
      *
      * @throws {pentaho.lang.OperationInvalidError} When this method is called while one of
      *  [__commitWill]{@link pentaho.type.changes.Transaction#__commitWill},
@@ -447,13 +465,13 @@ define([
      *
      * @private
      */
-    __acquireActionLock: function() {
-      this.__assertActionLockFree();
-      this.__actionLockTaken = true;
+    __acquireCommitLock: function() {
+      this.__assertCommitLockFree();
+      this.__commitLockTaken = true;
     },
 
     /**
-     * Asserts that the _action lock_ is not taken.
+     * Asserts that the _commit_ lock is not taken.
      *
      * @throws {pentaho.lang.OperationInvalidError} When this method is called while one of
      * [__commitWill]{@link pentaho.type.changes.Transaction#__commitWill},
@@ -463,17 +481,19 @@ define([
      *
      * @private
      */
-    __assertActionLockFree: function() {
-      if(this.__actionLockTaken) throw error.operInvalid("Already in the __commit or __commitWill methods.");
+    __assertCommitLockFree: function() {
+      if(this.__commitLockTaken) {
+        throw error.operInvalid("Already in the __commit or __commitWill methods.");
+      }
     },
 
     /**
-     * Releases a previously acquired action lock.
+     * Releases a previously acquired _commit_ lock.
      *
      * @private
      */
-    __releaseActionLock: function() {
-      this.__actionLockTaken = false;
+    __releaseCommitLock: function() {
+      this.__commitLockTaken = false;
     },
     // endregion
 
@@ -494,7 +514,7 @@ define([
      */
     __reject: function(reason) {
 
-      this.__assertActionLockFree();
+      this.__assertCommitLockFree();
 
       throw this.__resolve(ActionResult.reject(reason || "Transaction canceled."));
     },
@@ -547,21 +567,27 @@ define([
 
       var result = this.__result || this.__resultWill;
       if(!result) {
-        this.__acquireActionLock();
+        this.__acquireCommitLock();
 
-        result = this.__commitWillCore();
+        result = this.__doCommitWill();
 
-        this.__releaseActionLock();
+        this.__releaseCommitLock();
       }
 
       return result;
     },
 
-    // @private
-    __commitWillCore: function() {
-      this.__sortGraph();
+    /**
+     * Performs the commit-will evaluation phase
+     * by delegating to `__doCommitWillCore`.
+     * Stores the "will" result and marks all changesets as read-only.
+     *
+     * @return {!pentaho.lang.ActionResult} The commit-will result of the transaction.
+     * @private
+     */
+    __doCommitWill: function() {
 
-      var result = this.__resultWill = this.__notifyChangeWill();
+      var result = this.__resultWill = this.__doCommitWillCore();
 
       // Lock changes, whatever the result.
       this.__eachChangeset(function(cset) {
@@ -571,41 +597,267 @@ define([
       return result;
     },
 
-    // @private
-    __notifyChangeWill: function() {
-      var changesets = this.__csets;
-      var L = changesets.length;
-      var i = -1;
-      var cset;
-      var cancelReason;
-      var L1;
-      while(true) {
-        while(++i < L) {
-          cset = changesets[i];
-          if((cancelReason = cset.owner._onChangeWill(cset)))
-            return ActionResult.reject(cancelReason);
-        }
+    /**
+     * Actually performs the commit-will evaluation phase,
+     * going through `will:change` listeners of the owners of the changesets in this transaction.
+     *
+     * Evaluation proceeds as follows:
+     *
+     * 1. Create a queue of changesets, in which changesets are ordered so that leafs are placed beore roots.
+     * 2. Add all of the leaf changesets to the queue.
+     * 3. If there are no changesets in the queue go to 4.
+     *    Otherwise, do:
+     * 3.1. Take the first changeset from the queue.
+     * 3.2. For each of its will:change listeners, in order, do:
+     * 3.2.1. If its transaction version is equal to the current changeset transaction version,
+     *        go directly to step 3.3.
+     * 3.2.2. Execute the listener.
+     * 3.2.3. If a listener cancels the change, exit in error.
+     * 3.2.4. Record the changeset transaction version after each listener executes and associate it to it.
+     * 3.2.5. If the changeset being processed gets directly modified during the execution of a listener,
+     *        restart the execution of its listeners.
+     * 3.2.6. If another changeset gets directly modified during the execution of a listener,
+     *        and if it is not in the queue, place it in the queue, in its current net order.
+     * 3.2.7. If the net order of another changeset gets modified and it is in the queue,
+     *        then move it to the new position in the queue, according to the rules:
+     *        * If it decreased net order, move it backward in the queue, but staying ahead of others of same order.
+     *        * If it increased net order, move it forward in the queue, but staying behind of others of same order.
+     * 3.2.8. Go to 3.2.
+     * 3.3. Add the changeset's current parent changesets to the queue.
+     * 3.4. Go to 3.
+     * 4. Exit with success.
+     *
+     * @return {!pentaho.lang.ActionResult} The commit-will result of the transaction.
+     * @private
+     */
+    __doCommitWillCore: function() {
 
-        // i === L
-
-        if(L === (L1 = changesets.length)) break;
-
-        // TODO: How to order new changesets?
-        // Re-run all changesets that, after net sorting, are placed after an added one?
-        // What about modifications to existing changesets?
-        // Start with leaf changesets.
-        // After processing a changeset,
-        // place its iref's changesets at the end of the queue.
-        // Every changeset which is modified is put back in the queue.
-
-        // Changesets were added.
-        // Run the will listeners of the owners of the added changesets.
-        i--;
-        // i === L - 1
-        L = L1;
+      if(this.version === 0) {
+        // NOOP
+        return ActionResult.fulfill();
       }
 
+      if(this.__initCommitWillQueue()) {
+
+        var changesetQueue = this.__commitWillQueue;
+        var changesetQueueSet = this.__commitWillQueueSet;
+
+        // @type owner.uid -> [ lastChangesetVersionSeenByListener ]
+        var listenersVersionsByUid = Object.create(null);
+
+        var currentChangeset;
+        var currentChangesetVersionLocal;
+        var currentOwner;
+        var currentListenersVersions;
+        var isChangesetRestart;
+
+        var keyArgsOnChangeWill = {
+          isCanceled: __event_isCanceled,
+          interceptor: function(listener, owner, eventArgs, index) {
+
+            // Take care to only allocate `currentListenersVersions` if owner has at least one listener,
+            // which is now surely the case...
+            if(currentListenersVersions === null) {
+              currentListenersVersions =
+                listenersVersionsByUid[currentOwner.$uid] || (listenersVersionsByUid[currentOwner.$uid] = []);
+            }
+
+            if((currentListenersVersions[index] || 0) < currentChangeset.transactionVersion) {
+              try {
+                listener.apply(owner, eventArgs);
+              } finally {
+                if(!eventArgs[0].isCanceled) {
+                  // Store for later.
+                  currentListenersVersions[index] = currentChangeset.transactionVersion;
+
+                  // If the current changeset was modified, restart its processing.
+                  if(currentChangeset.transactionVersionLocal > currentChangesetVersionLocal) {
+
+                    isChangesetRestart = true;
+
+                    // Break. Don't notify any more listeners.
+                    eventArgs[0].cancel("changeset restart");
+
+                    // In case an error is being thrown, the error handler is invoked (EventSource#_emitGeneric).
+                    // The error is not caught here to reuse the default error handler, which console-logs the error.
+                  }
+                }
+              }
+            }
+          }
+        };
+
+        while((currentChangeset = changesetQueue.shift()) !== undefined) {
+
+          currentOwner = currentChangeset.owner;
+
+          delete changesetQueueSet[currentOwner.$uid];
+
+          this.__commitWillChangeset = currentChangeset;
+
+          currentListenersVersions = null;
+
+          while(true) {
+            // Restart processing the changeset if any local changes are performed in it.
+            // Changes to other changesets, instead, result in them being added to the queue.
+            isChangesetRestart = false;
+            currentChangesetVersionLocal = currentChangeset.transactionVersionLocal;
+
+            var cancelReason = currentOwner._onChangeWill(currentChangeset, keyArgsOnChangeWill);
+
+            if(!isChangesetRestart) {
+              if(cancelReason != null) {
+                this.__finalizeCommitWillQueue();
+                return ActionResult.reject(cancelReason);
+              }
+
+              break;
+            }
+          }
+
+          this.__addParentsToCommitWillQueue(currentOwner);
+        }
+      }
+
+      this.__finalizeCommitWillQueue();
       return ActionResult.fulfill();
+    },
+
+    /**
+     * Creates the queue data structures that support the commit-will evaluation phase.
+     *
+     * @return {boolean} `true` if there are any changesets with `will:change` event listeners; `false`, otherwise.
+     *
+     * @private
+     */
+    __initCommitWillQueue: function() {
+
+      var transaction = this;
+
+      this.__commitWillQueue = new SortedList({comparer: __compareChangesets});
+      this.__commitWillQueueSet = Object.create(null);
+      this.__commitWillChangeset = null;
+
+      var anyChangeWillListeners = false;
+
+      this.__csets.forEach(collectLeafChangesetsRecursive);
+
+      return anyChangeWillListeners;
+
+      function collectLeafChangesetsRecursive(changeset) {
+
+        var isParent = false;
+
+        if(!anyChangeWillListeners && changeset.owner._hasListeners("will:change")) {
+          anyChangeWillListeners = true;
+        }
+
+        changeset.eachChildChangeset(function() {
+          isParent = true;
+          // Break.
+          return false;
+        });
+
+        if(!isParent) {
+          transaction.__addToCommitWillQueue(changeset);
+        }
+      }
+    },
+
+    /**
+     * Releases the queue data structures that support the commit-will evaluation phase.
+     * @private
+     */
+    __finalizeCommitWillQueue: function() {
+      this.__commitWillQueue = this.__commitWillQueueSet = this.__commitWillChangeset = null;
+    },
+
+    /**
+     * Adds the parent changesets of a changeset to the commit-will queue,
+     * given the child changeset owner.
+     *
+     * @param {!pentaho.type.mixins.Container} childOwner - The owner of the child changeset.
+     * @private
+     */
+    __addParentsToCommitWillQueue: function(childOwner) {
+      var irefs = this.getAmbientReferences(childOwner);
+      if(irefs !== null) {
+        var L = irefs.length;
+        var i = -1;
+        while(++i < L) {
+          var parentChangeset = irefs[i].container.__cset;
+          if(parentChangeset !== null) {
+            this.__addToCommitWillQueue(parentChangeset);
+          }
+        }
+      }
+    },
+
+    /**
+     * Adds a changeset to the commit-will queue, if it isn't there yet.
+     *
+     * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
+     * @private
+     */
+    __addToCommitWillQueue: function(changeset) {
+      // Safe to not use O.hasOwn because container uids are numeric strings (cannot be "__proto__").
+      var uid = changeset.owner.$uid;
+      if(!this.__commitWillQueueSet[uid]) {
+
+        this.__commitWillQueue.push(changeset);
+        this.__commitWillQueueSet[uid] = true;
+      }
+    },
+
+    /**
+     * Called by a changeset when its `transactionVersionLocal` changes.
+     *
+     * When the commit-will phase is evaluating,
+     * this method adds the given changeset to the evaluation queue,
+     * if it isn't the current changeset being evaluated.
+     *
+     * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
+     * @private
+     */
+    __onChangesetLocalVersionChangeDid: function(changeset) {
+      if(this.__commitWillChangeset !== changeset && this.__commitWillQueue !== null) {
+        this.__addToCommitWillQueue(changeset);
+      }
+    },
+
+    /**
+     * Called by a changeset when its topological order is about to change.
+     *
+     * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
+     *
+     * @return {?function} A function that should be called after the change, or `null`.
+     *
+     * @private
+     */
+    __onChangesetNetOrderChangeWill: function(changeset) {
+      // Remove from the queue if it's there.
+      // Leave it in the set though.
+      var commitWillQueue = this.__commitWillQueue;
+      if(commitWillQueue !== null && this.__commitWillQueueSet[changeset.owner.$uid]) {
+        var index = commitWillQueue.search(changeset);
+        if(index >= 0) {
+          commitWillQueue.splice(index, 1);
+          return this.__onChangesetNetOrderChangeDid.bind(this, changeset);
+        }
+      }
+
+      return null;
+    },
+
+    /**
+     * Called to finish the topological order change of a changeset.
+     *
+     * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
+     *
+     * @private
+     */
+    __onChangesetNetOrderChangeDid: function(changeset) {
+      this.__commitWillQueue.push(changeset);
     },
     // endregion
 
@@ -626,13 +878,18 @@ define([
      */
     __commit: function() {
 
-      this.__acquireActionLock();
+      this.__acquireCommitLock();
 
-      var result = this.__commitWillCore();
-      if(result.isFulfilled)
+      var result = this.__resultWill;
+      if(!result) {
+        result = this.__doCommitWill();
+      }
+
+      if(result.isFulfilled) {
         result = this.__applyChanges();
+      }
 
-      this.__releaseActionLock();
+      this.__releaseCommitLock();
 
       this.__resolve(result);
 
@@ -692,5 +949,20 @@ define([
 
   function __compareChangesets(csa, csb) {
     return csb._netOrder - csa._netOrder;
+  }
+
+  /**
+   * Determines if a given event object is canceled.
+   *
+   * @memberOf pentaho.type.changes.Transaction~
+   *
+   * @param {!pentaho.lang.Event} event - The event object.
+   *
+   * @return {boolean} `true` if it is canceled; `false`, otherwise.
+   *
+   * @private
+   */
+  function __event_isCanceled(event) {
+    return event.isCanceled;
   }
 });

@@ -195,7 +195,7 @@ define([
     },
 
     /** @inheritDoc */
-    _eachChildChangeset: function(fun, ctx) {
+    eachChildChangeset: function(fun, ctx) {
       var changesByKey = this.__changesetByKey;
       for(var key in changesByKey) {
         if(O.hasOwn(changesByKey, key) && fun.call(ctx, changesByKey[key]) === false) {
@@ -746,7 +746,7 @@ define([
 
       var txnVersion = this.transaction.__takeNextVersion();
       change._setTransactionVersion(txnVersion);
-      this._setTransactionVersion(txnVersion);
+      this._setTransactionVersionLocal(txnVersion);
     }
     // endregion
   });

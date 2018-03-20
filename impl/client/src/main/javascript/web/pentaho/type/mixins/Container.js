@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 define([
-  "../../lang/Base",
-  "../../lang/EventSource",
+  "pentaho/lang/Base",
+  "pentaho/lang/EventSource",
   "../ReferenceList",
   "../changes/Transaction",
   "../events/WillChange",
   "../events/RejectedChange",
-  "../events/DidChange"
-], function(Base, EventSource, ReferenceList, Transaction, WillChange, RejectedChange, DidChange) {
+  "../events/DidChange",
+  "pentaho/util/object"
+], function(Base, EventSource, ReferenceList, Transaction, WillChange, RejectedChange, DidChange, O) {
 
   "use strict";
 
@@ -52,13 +53,13 @@ define([
      */
     _initContainer: function() {
       /**
-       * Container unique identifier.
+       * Gets the unique identifier of the instance.
        *
+       * @name $uid
        * @memberOf pentaho.type.mixins.Container#
        * @type {string}
-       * @private
        */
-      this.__uid = String(__nextUid++);
+      O.setConst(this, "$uid", String(__nextUid++));
 
       /**
        * Version number.
@@ -118,16 +119,6 @@ define([
      */
     _initClone: function(clone) {
       clone._initContainer();
-    },
-
-    /**
-     * Gets the unique identifier of the instance.
-     *
-     * @type {string}
-     * @readonly
-     */
-    get $uid() {
-      return this.__uid;
     },
 
     // region References
@@ -258,18 +249,31 @@ define([
      * When overriding, be sure to call the base implementation.
      *
      * @param {!pentaho.type.changes.Changeset} changeset - The set of changes.
+     * @param {Object} [keyArgs] - The keyword arguments' object.
+     * See [EventSource#_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
      *
-     * @return {pentaho.lang.UserError|undefined} An error if the changeset was canceled; or, `undefined` otherwise.
+     * @return {pentaho.lang.UserError} An error if the changeset was canceled; `null` otherwise.
      *
      * @protected
      * @internal
      * @friend {pentaho.type.changes.Transaction}
      */
-    _onChangeWill: function(changeset) {
-      var event;
-      if(this._hasListeners("will:change") &&
-         !this._emitSafe((event = new WillChange(this, changeset))))
-        return event.cancelReason;
+    _onChangeWill: function(changeset, keyArgs) {
+
+      if(this._hasListeners("will:change")) {
+
+        var event = new WillChange(this, changeset);
+
+        var result = keyArgs == null
+          ? this._emitSafe(event)
+          : this._emitGeneric(this, [event], event.type, null, keyArgs);
+
+        if(!result) {
+          return event.cancelReason;
+        }
+      }
+
+      return null;
     },
 
     /**

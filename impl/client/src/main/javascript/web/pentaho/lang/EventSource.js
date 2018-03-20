@@ -23,8 +23,7 @@ define([
   "../util/object",
   "../util/fun",
   "../util/logger"
-],
-function(module, Base, Event, typeInfo, error, O, F, logger) {
+], function(module, Base, Event, typeInfo, error, O, F, logger) {
 
   "use strict";
 
@@ -135,8 +134,8 @@ function(module, Base, Event, typeInfo, error, O, F, logger) {
         }, this);
 
         return handles.length > 1
-            ? new pentaho_lang_IEventRegistrationHandle(__disposeHandles.bind(this, handles))
-            : handles[0];
+          ? new pentaho_lang_IEventRegistrationHandle(__disposeHandles.bind(this, handles))
+          : handles[0];
       }
 
       return null;
@@ -309,6 +308,8 @@ function(module, Base, Event, typeInfo, error, O, F, logger) {
      * and lets execution continue to the following listeners.
      * The function arguments are: the error, the eventArgs, the event type and the event phase.
      * Its `this` value is the value of `source`.
+     * @param {function} [keyArgs.interceptor=null] A function which is called for each event listener function,
+     * with the arguments `listener`, `source`, `eventArgs` and the index of the listener.
      *
      * @return {boolean} `false` when the event is canceled; `true`, otherwise.
      *
@@ -347,6 +348,8 @@ function(module, Base, Event, typeInfo, error, O, F, logger) {
         errorHandler = __defaultErrorHandlerLog;
       }
 
+      var interceptor = (keyArgs && keyArgs.interceptor) || null;
+
       // ---
 
       queue.emittingLevel++;
@@ -360,7 +363,11 @@ function(module, Base, Event, typeInfo, error, O, F, logger) {
           while(i--) if((listener = queue[i].observer[phaseEf])) {
 
             try {
-              listener.apply(source, eventArgs);
+              if(interceptor === null) {
+                listener.apply(source, eventArgs);
+              } else {
+                interceptor(listener, source, eventArgs, i);
+              }
             } catch(ex) {
 
               errorHandler.call(source, ex, eventArgs, type, phase);
@@ -374,7 +381,11 @@ function(module, Base, Event, typeInfo, error, O, F, logger) {
 
           while(i--) if((listener = queue[i].observer[phaseEf])) {
 
-            listener.apply(source, eventArgs);
+            if(interceptor === null) {
+              listener.apply(source, eventArgs);
+            } else {
+              interceptor(listener, source, eventArgs, i);
+            }
 
             if(isCanceled && isCanceled.apply(source, eventArgs)) return false;
           }
@@ -437,8 +448,8 @@ function(module, Base, Event, typeInfo, error, O, F, logger) {
 
       if(isCanceled && isCanceled.apply(source, eventArgs)) {
         return getCancellationReason != null
-            ? Promise.reject(getCancellationReason.apply(source, eventArgs))
-            : Promise.reject();
+          ? Promise.reject(getCancellationReason.apply(source, eventArgs))
+          : Promise.reject();
       }
 
       // Resolve alias
@@ -502,8 +513,8 @@ function(module, Base, Event, typeInfo, error, O, F, logger) {
           promiseOne = promiseOne.then(function() {
             if(isCanceled.apply(source, eventArgs)) {
               return getCancellationReason != null
-                  ? Promise.reject(getCancellationReason.apply(source, eventArgs))
-                  : Promise.reject();
+                ? Promise.reject(getCancellationReason.apply(source, eventArgs))
+                : Promise.reject();
             }
           });
         }

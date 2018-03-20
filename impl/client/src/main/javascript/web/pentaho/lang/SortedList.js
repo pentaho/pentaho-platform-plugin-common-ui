@@ -24,6 +24,10 @@ define([
 
   // TODO: This class has several undocumented methods.
 
+  var ORDERING_MODE_TOTAL = 0;
+  var ORDERING_MODE_PARTIAL_INSERT_BEFORE = 1;
+  var ORDERING_MODE_PARTIAL_INSERT_AFTER = 2;
+
   return List.extend("pentaho.lang.SortedList", /** @lends  pentaho.lang.SortedList# */{
     /**
      * @classdesc The `SortedList` class is an abstract base class for ordered arrays.
@@ -55,14 +59,24 @@ define([
      * to help in their construction.
      *
      * @param {Object}   [keyArgs]         The keyword arguments.
-     * @param {?Function} [keyArgs.comparer] Specifies a function that defines the sort order.
+     * @param {number} [keyArgs.orderingMode=0] `0` if the ordering is total;
+     * `1` if the ordering is partial and new elements should be placed before existing elements;
+     * `2` if the ordering is partial and new elements should be placed after existing elements.
+     *
+     * @param {?function} [keyArgs.comparer] Specifies a function that defines the sort order.
      *
      * `keyArgs` is also passed-through to the methods that handle
      * the initialization of each list element.
      */
     constructor: function(keyArgs) {
-      if(keyArgs != null && typeof keyArgs.comparer === "function") {
-        this.comparer = keyArgs.comparer;
+      if(keyArgs != null) {
+        if(keyArgs.orderingMode != null) {
+          this.__orderingMode = +keyArgs.orderingMode;
+        }
+
+        if(typeof keyArgs.comparer === "function") {
+          this.comparer = keyArgs.comparer;
+        }
       }
 
       this.base(keyArgs);
@@ -87,6 +101,12 @@ define([
       return v1 === v2 ? 0 : (v1 > v2 ? 1 : -1);
     },
 
+    __orderingMode: ORDERING_MODE_PARTIAL_INSERT_AFTER,
+
+    get orderingMode() {
+      return this.__orderingMode;
+    },
+
     get comparer() {
       return this.__comparer;
     },
@@ -105,11 +125,11 @@ define([
     },
 
     sort: function(comparer) {
-      if(comparer != null && comparer !== this.comparer) {
+      if(comparer != null && comparer !== this.__comparer) {
         throw new Error("Can't specify a different sorting function in a sorted list.");
       }
 
-      this.base(this.comparer);
+      this.base(this.__comparer);
     },
 
     /**
@@ -129,7 +149,7 @@ define([
         // x | 0 is equivalent to Math.floor(x)
         var i = (left + right) / 2 | 0;
 
-        var comparison = this.comparer(this[i], elem);
+        var comparison = this.__comparer(this[i], elem);
 
         if(comparison < 0) {
           left = i + 1;
@@ -142,7 +162,7 @@ define([
 
       // two's complement operation being used to
       // return (x+1)*-1 in a hackish way
-      return ~right;
+      return ~left;
     },
 
     copyWithin: function() {
@@ -181,8 +201,38 @@ define([
       var elem2 = this._adding(elem, null, keyArgs);
 
       if(elem2 !== undefined) {
-        var index = Math.abs(this.search(elem2));
-        // Direct call base proto splice to avoid sorted list restrictions
+        var index = this.search(elem2);
+        if(index < 0) {
+          index = ~index;
+        } else {
+          // eslint-disable-next-line default-case
+          switch(O.getOwn(keyArgs, "orderingMode", this.__orderingMode)) {
+            case ORDERING_MODE_PARTIAL_INSERT_BEFORE:
+              // Ensure index is the first with the same comparison order.
+
+              while(index > 0 && this.__comparer(this[index - 1], elem2) === 0) {
+                index--;
+              }
+
+              break;
+
+            case ORDERING_MODE_PARTIAL_INSERT_AFTER:
+              // Ensure index is the last with the same comparison order.
+              var lastIndex = this.length - 1;
+              while(index < lastIndex && this.__comparer(elem2, this[index + 1]) === 0) {
+                index++;
+              }
+
+              // After the last equal one.
+              index++;
+              break;
+
+            // default:
+            // should really not happen, if order is total; but just let index be as is.
+          }
+        }
+
+        // Directly call base proto splice to avoid sorted list restrictions
         baseProto.splice.call(this, index, 0, elem2);
 
         if(this._added) {
@@ -209,8 +259,8 @@ define([
           var elem2 = this._adding(elem, i, keyArgs);
 
           if(elem2 === undefined) {
-            // Not added afterall
-            // Remove from the array
+            // Not added after all.
+            // Remove from the array.
             this.splice(i, 1);
 
             LE--;
@@ -237,6 +287,17 @@ define([
       }
 
       return LE;
+    },
+
+    /** @inheritDoc */
+    add: function(elem, keyArgs) {
+      this.__insertInOrder(elem, keyArgs);
+    }
+  }, {
+    OrderingMode: {
+      Total: ORDERING_MODE_TOTAL,
+      PartialInsertBefore: ORDERING_MODE_PARTIAL_INSERT_BEFORE,
+      PartialInsertAfter: ORDERING_MODE_PARTIAL_INSERT_AFTER
     }
   });
 });

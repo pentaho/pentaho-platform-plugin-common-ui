@@ -74,10 +74,11 @@ define([
       // The longest path by which this changeset can be reached following the paths from parent to children changesets.
       this._netOrder = 0;
 
-      this.__txnVersion = transaction.version;
+      this.__txnVersion = this.__txnVersionLocal = transaction.version;
       this.__txnVersionDirty = false;
     },
 
+    // region Topological order
     /**
      * Updates the topological order of this changeset, and of any child changesets,
      * to the given value, if it's less than it.
@@ -88,10 +89,11 @@ define([
      */
     __updateNetOrder: function(netOrder) {
       if(this._netOrder < netOrder) {
-        this._netOrder = netOrder;
+
+        this.__setNetOrder(netOrder);
 
         var childNetOrder = netOrder + 1;
-        this._eachChildChangeset(function(changeset) {
+        this.eachChildChangeset(function(changeset) {
           changeset.__updateNetOrder(childNetOrder);
         });
       }
@@ -100,22 +102,47 @@ define([
     /**
      * Resets the topological order of this changeset,
      * and of any child changesets,
-     * by calculating it based on its current containers.
+     * by calculating it based on its current parents.
      *
-     * @private
+     * @protected
      * @see pentaho.type.changes.Changeset#__calculateNetOrder
      */
     _resetNetOrder: function() {
 
-      this._netOrder = this.__calculateNetOrder();
+      this.__setNetOrder(this.__calculateNetOrder());
 
-      this._eachChildChangeset(function(changeset) {
+      this.eachChildChangeset(function(changeset) {
         changeset.__resetNetOrder();
       });
     },
 
     /**
-     * Calculates the topological order of this changeset based on the topological order of its current containers.
+     * Sets the topological order of this changeset to the given value.
+     *
+     * Notifies the transaction by calling `__onChangesetNetOrderChangeWill`.
+     *
+     * @param {number} netOrder - The topological order.
+     *
+     * @private
+     */
+    __setNetOrder: function(netOrder) {
+
+      var previousNetOrder = this._netOrder;
+      if(previousNetOrder !== netOrder) {
+        // Notify transaction in case the commit-will phase is evaluating.
+
+        var callbackChangeDid = this.transaction.__onChangesetNetOrderChangeWill(this);
+
+        this._netOrder = netOrder;
+
+        if(callbackChangeDid !== null) {
+          callbackChangeDid();
+        }
+      }
+    },
+
+    /**
+     * Calculates the topological order of this changeset based on the topological order of its current parents.
      *
      * @return {number} The topological order.
      *
@@ -129,7 +156,7 @@ define([
       if(irefs !== null) {
         var i = irefs.length;
         while(i--) {
-          var containerChangeset = transaction.getChangeset(irefs[i].container.$uid);
+          var containerChangeset = irefs[i].container.__cset;
           if(containerChangeset !== null && containerChangeset._netOrder >= maxParentOrder) {
             maxParentOrder = containerChangeset._netOrder;
           }
@@ -138,6 +165,7 @@ define([
 
       return maxParentOrder + 1;
     },
+    // endregion
 
     // Should be marked protected abstract, but that would show in the docs.
     /**
@@ -157,15 +185,15 @@ define([
     /**
      * Calls a function once per child changeset.
      *
-     * @name pentaho.type.changes.Changeset#_eachChildChangeset
+     * @name pentaho.type.changes.Changeset#eachChildChangeset
      * @method
      * @param {function(pentaho.type.changeset.Changeset) : undefined|boolean} fun - The function to call.
      * @param {any} ctx - The `this` context on which to call `fun`.
      *
-     * @protected
      * @abstract
      */
 
+    // region Read-only / Writable
     /**
      * Throws an error if the changeset is read-only.
      *
@@ -199,7 +227,9 @@ define([
     __setReadOnlyInternal: function() {
       this.__isReadOnly = true;
     },
+    // endregion
 
+    // region Versions
     /**
      * Gets the version of the owner at the time when the changeset was created.
      *
@@ -210,7 +240,18 @@ define([
       return this.__ownerVersion;
     },
 
-    // region Transaction Version
+    /**
+     * Gets the local transaction version of this changeset.
+     *
+     * This number is the maximum transaction version of the contained primitive changes.
+     *
+     * @type {number}
+     * @readOnly
+     */
+    get transactionVersionLocal() {
+      return this.__txnVersionLocal;
+    },
+
     /**
      * Gets the transaction version of this changeset.
      *
@@ -238,9 +279,9 @@ define([
      */
     __calcCleanTransactionVersion: function() {
 
-      var txnVersion = this.__txnVersion;
+      var txnVersion = this.__txnVersionLocal;
 
-      this._eachChildChangeset(function(changeset) {
+      this.eachChildChangeset(function(changeset) {
 
         var childTxnVersion = changeset.transactionVersion;
         if(childTxnVersion > txnVersion) {
@@ -274,6 +315,35 @@ define([
 
         // Notify all parents except noNotifyParentChangeset.
         this.__notifyParentsTxnVersionDirty(noNotifyParentChangeset);
+      }
+    },
+
+    /**
+     * Updates the local transaction version to a given value due to a local, primitive change,
+     * if it is greater than the current one.
+     * Then, it calls [_setTransactionVersion]{@link pentaho.type.changes.Changeset#_setTransactionVersion}
+     * with the same arguments.
+     *
+     * @param {number} txnVersionLocal - The new local transaction version.
+     * @param {pentaho.type.changes.Changeset} [noNotifyParentChangeset=null] - The parent changeset that should not
+     * be notified.
+     *
+     * @protected
+     * @final
+     */
+    _setTransactionVersionLocal: function(txnVersionLocal, noNotifyParentChangeset) {
+
+      if(txnVersionLocal > this.__txnVersionLocal) {
+
+        // Force update dirty transaction version or we could loose
+        // the dirty state
+        this.__txnVersionLocal = txnVersionLocal;
+
+        // Notify all parents except noNotifyParentChangeset.
+        this._setTransactionVersion(txnVersionLocal, noNotifyParentChangeset);
+
+        // Notify the transaction, in case the commit will phase is evaluating.
+        this.transaction.__onChangesetLocalVersionChangeDid(this);
       }
     },
 
@@ -367,7 +437,8 @@ define([
         ? parentChangeset.transactionVersion
         : this.transaction.__takeNextVersion();
 
-      this._setTransactionVersion(txnVersion, parentChangeset);
+      // This is also a local change.
+      this._setTransactionVersionLocal(txnVersion, parentChangeset);
 
       this._clearChanges();
     },
