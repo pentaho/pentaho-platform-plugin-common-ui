@@ -10,8 +10,7 @@
   </parent>
 
   <artifactId>common-ui-webpackage</artifactId>
-  <version>8.1.0.0-SNAPSHOT</version>
-
+         
   <packaging>bundle</packaging>
 
   <properties>
