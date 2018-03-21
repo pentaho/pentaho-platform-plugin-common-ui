@@ -95,8 +95,10 @@ define([
         var v = this.get("value");
         var s = this.get("anchorStart");
         var e = this.get("anchorEnd");
-        return (this.property || "") +
-          " " + (v ? v.$contentKey : "") + " " + (s ? s.$key : "") + " " + (e ? e.$key : "");
+        return (this.property || "") + " " +
+          (v ? (v.$type.isSimple ? v.$contentKey : v.$key) : "") + " " +
+          (s ? s.$key : "") + " " +
+          (e ? e.$key : "");
       },
 
       $type: /** @lends pentaho.data.filter.IsLike.Type# */{

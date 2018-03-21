@@ -25,7 +25,7 @@ define([
   // so that r.js sees otherwise invisible dependencies.
   "./abstractProperty",
   "./externalMapping",
-  "./strategy/base"
+  "./adaptation/strategy"
 ], function(bundle, ValidationError, DataView, typeUtil, O, error, arg) {
 
   "use strict";
@@ -33,9 +33,9 @@ define([
   return [
     "./abstractProperty",
     "./externalMapping",
-    "./strategy/base",
+    "./adaptation/strategy",
     "./mode",
-    {$instance: {type: ["pentaho/visual/role/strategy/base"]}},
+    {$instance: {type: ["pentaho/visual/role/adaptation/strategy"]}},
 
     function(AbstractProperty, ExternalMapping, BaseStrategy, Mode, allStrategiesList) {
 
@@ -88,31 +88,26 @@ define([
 
           valueType: ExternalMapping,
 
-          // Setting the value type resets the inherited defaultValue.
-          defaultValue: function() { return {}; },
-
           /** @inheritDoc */
           _init: function(spec, keyArgs) {
 
             spec = this.base(spec, keyArgs) || spec;
 
+            var declaringType = this.declaringType;
+            if(declaringType !== null) {
+              var internalModelType = declaringType.get("model").valueType;
+              O.setConst(this, "_internalProperty", internalModelType.get(this.name));
+            }
+
             if(this.isRoot) {
+              // Assume root default values.
 
-              O.setConst(this, "_internalProperty", arg.required(keyArgs, "internalProperty", "keyArgs"));
-
-              // Assume default values.
               // Anticipate setting `strategies`.
-
               var strategies = spec.strategies;
-              if(strategies != null) {
-                this.__setStrategies(strategies);
-              } else {
+              if(strategies == null) {
+                // Set even if allStrategies is empty, as this initializes the data structures.
                 this.__setStrategies(allStrategies, /* isDefault: */true);
               }
-
-              // Prevent being applied again.
-              spec = Object.create(spec);
-              spec.strategies = undefined;
             }
 
             return spec;
@@ -127,16 +122,6 @@ define([
            * @protected
            */
           _internalProperty: null,
-          // endregion
-
-          // region modes
-          // Initialized in #__setStrategies
-          __modes: null,
-
-          /** @inheritDoc */
-          get modes() {
-            return this.__modes;
-          },
           // endregion
 
           // @override
@@ -193,7 +178,8 @@ define([
           },
           // endregion
 
-          // region strategies
+          // region strategies & modes
+          __modes: null,
           __strategies: null,
           __isStrategiesDefault: true,
 
@@ -203,6 +189,11 @@ define([
            * @private
            */
           __strategyMethodInfos: null,
+
+          /** @inheritDoc */
+          get modes() {
+            return this.__modes;
+          },
 
           /**
            * Gets or sets the array of adaptation strategies used to adapt the
@@ -257,38 +248,12 @@ define([
 
             this._internalProperty.modes.each(function(internalMode) {
 
+              var isContinuous = internalMode.isContinuous;
+
               strategies.each(function(strategy) {
-                // Strategy
-                //   selectMethods(outputDataType, isVisualKey) : IStrategyMethod[] ?
-                //
-                // IStrategyMethod
-                //   (strategy)
-                //   name
-                //   (isVisualKey)
-                //   isIdentity
-                //   isInvertible
-                //   inputDataType
-                //   outputDataType
-                //   validateApplication(schemaDataTable, inputFieldIndexes) ?
-                //
-                // IStrategyMethodValidApplication
-                //   method
-                //   schemaData
-                //   inputFieldIndexes
-                //   apply(dataTable)
-                //
-                // IAdapter
-                //   method
-                //   dataTable
-                //   inputFieldIndexes
-                //   ----
-                //   outputFieldIndexes
-                //   invert(outputValuesOrCells) : inputCells
 
                 var strategyMethods = strategy.selectMethods(internalMode.dataType, isVisualKey);
                 if(strategyMethods != null) {
-
-                  var isContinuous = internalMode.isContinuous;
 
                   strategyMethods.forEach(function(strategyMethod) {
 
@@ -351,7 +316,7 @@ define([
             var m = -1;
             var isCategoricalFixed = externalMapping.isCategoricalFixed;
             while(++m < M) {
-              var strategyMethodInfo = strategyMethodInfos.at(m);
+              var strategyMethodInfo = strategyMethodInfos[m];
               if(!isCategoricalFixed || !strategyMethodInfo.externalMode.isContinuous) {
 
                 var selection = this.__validateAdaptationStrategyMethod(
@@ -376,6 +341,8 @@ define([
            *
            * @return {pentaho.visual.role.IAdaptationStrategyMethodSelection} A strategy method selection,
            * if the application is valid; `null`, otherwise.
+           *
+           * @private
            */
           __validateAdaptationStrategyMethod: function(strategyMethodInfo, schemaData, externalFieldIndexes) {
 
@@ -443,6 +410,8 @@ define([
                 addErrors(new ValidationError(
                   bundle.format(bundle.structured.errors.property.noAdapter, {role: this})));
               }
+
+              // TODO: Validate internal property?
             }
 
             return errors;

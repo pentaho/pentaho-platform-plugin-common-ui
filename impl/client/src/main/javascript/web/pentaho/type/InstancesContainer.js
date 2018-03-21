@@ -171,7 +171,7 @@ define([
         me.instance = instance;
         me.error = null;
 
-        if(debugMgr.testLevel(DebugLevels.info, module)) {
+        if(debugMgr.testLevel(DebugLevels.debug, module)) {
           logger.info("Loaded named instance '" + me.id + "'.");
         }
 
@@ -892,7 +892,7 @@ define([
             return createList(getListCtorSync(), this.getAllByType(elemTypeId, specialSpec));
           }
 
-          return Promise.all([elemTypeId, this.getAllByTypeAsync(elemTypeId, specialSpec)])
+          return Promise.all([this.context.getAsync(elemTypeId), this.getAllByTypeAsync(elemTypeId, specialSpec)])
               .then(function(values) {
                 return createList(getListCtorSync(), values[1]);
               });

@@ -270,7 +270,6 @@ define([
           var Number = context.get("pentaho/type/number");
           var result = container.get({_: "pentaho/type/number", v: 1});
 
-
           expect(result).toEqual(jasmine.any(Number));
           expect(result.value).toBe(1);
         });
@@ -458,8 +457,7 @@ define([
 
           return expectToRejectWith(function() {
             return container.getAsync({_: "pentaho/type/number", v: 1}, null, String.type);
-          },
-          errorMatch.operInvalid());
+          }, errorMatch.operInvalid());
         });
 
         it("should throw if given a type annotated value and an abstract typeBase", function() {

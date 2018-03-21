@@ -89,14 +89,15 @@ define([
      *
      * This class must implement the {@link pentaho.lang.ICollectionElement} interface.
      *
-     * @name pentaho.lang.Collection#elemClass
      * @type {Class}
-     * @abstract
      * @readonly
      */
+    elemClass: null,
+
+    // ---
 
     _getKeyName: function() {
-      return this.elemClass.prototype.keyName;
+      return this.elemClass ? this.elemClass.prototype.keyName : "key";
     },
 
     _getElemKey: function(elem) {
@@ -118,6 +119,7 @@ define([
         if(key == null) throw new Error(this._sayElemCannotHaveNullyKey());
         if(this.has(key)) throw new Error(this._sayElemWithKey(key) + " is already included.");
       }
+
       return elem2;
     },
 
@@ -127,6 +129,7 @@ define([
         var key = this._getElemKey(elem2);
         if(key == null) throw new Error(this._sayElemCannotHaveNullyKey());
       }
+
       return elem2;
     },
 
@@ -149,6 +152,7 @@ define([
         var key = this._getElemKey(elem);
         if(key != null) return this.get(key) === elem;
       }
+
       return false;
     },
 

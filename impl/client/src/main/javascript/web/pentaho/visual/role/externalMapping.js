@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/i18n!../i18n/messages",
+  "pentaho/i18n!messages",
   "pentaho/type/util",
 
   // so that r.js sees otherwise invisible dependencies.
@@ -114,7 +114,7 @@ define([
              * @default false
              * @see pentaho.visual.role.spec.IExternalMapping#isCategoricalFixed
              */
-            {name: "isCategoricalFixed", valueType: "boolean", isRequired: true, defautValue: false}
+            {name: "isCategoricalFixed", valueType: "boolean", isRequired: true, defaultValue: false}
           ]
         }
       })

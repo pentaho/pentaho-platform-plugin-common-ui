@@ -97,8 +97,8 @@ define([
 
           this.base();
 
-          this._configureAxisDisplayUnits(/* isPrimary: */true, "base",  /* allowFractional: */true);
-          this._configureAxisDisplayUnits(/* isPrimary: */false, "ortho", /* allowFractional: */true);
+          this._configureAxisDisplayUnits(/* isPrimary: */true, "base");
+          this._configureAxisDisplayUnits(/* isPrimary: */false, "ortho");
         }
       });
     }

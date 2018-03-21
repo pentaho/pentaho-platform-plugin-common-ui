@@ -82,6 +82,12 @@ var requireCfg = {
         root: CONTEXT_PATH,
         services: CONTEXT_PATH + "cxf/"
       }
+    },
+    "pentaho/debug": {
+      // "level": "debug",
+      // modules: {
+      //   "pentaho/type/Context": "debug"
+      // }
     }
   },
   packages: []
@@ -112,4 +118,4 @@ var KARMA_DEBUG = false;
  * // Only pentaho/type spec files
  * var DEV_SPEC_FILTER = /^pentaho\/type/;
  */
-var DEV_SPEC_FILTER = /^pentaho\//;
+var DEV_SPEC_FILTER = null;

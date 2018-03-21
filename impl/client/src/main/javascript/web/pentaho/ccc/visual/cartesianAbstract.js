@@ -144,10 +144,7 @@ define([
           this._cartesianAxesDisplayUnitsText = {};
         },
 
-        _configureAxisDisplayUnits: function(primary, axisType, allowFractional) {
-          if(!allowFractional && axisType !== "ortho") {
-            this.options[axisType + "AxisTickExponentMin"] = 0; // 10^0 => 1
-          }
+        _configureAxisDisplayUnits: function(primary, axisType) {
 
           var propName = "displayUnits" + (primary ? "" : "Secondary");
           var displayUnits = this.model.getv(propName);
@@ -157,8 +154,8 @@ define([
           // Unfortunately the stored element value usually has no formatted value associated,
           // so that we need to read it from the corresponding domain element.
           this._cartesianAxesDisplayUnitsText[axisType] = scaleFactor > 1
-              ? displayUnitsType.domain.get(displayUnits).toString()
-              : "";
+            ? displayUnitsType.domain.get(displayUnits).toString()
+            : "";
         }
       });
     }

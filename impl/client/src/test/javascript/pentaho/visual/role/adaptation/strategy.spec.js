@@ -32,7 +32,7 @@ define([
       Context.createAsync()
           .then(function(context) {
 
-            return context.getAsync("pentaho/visual/role/adaptation/base");
+            return context.getAsync("pentaho/visual/role/adaptation/strategy");
           })
           .then(function(_BaseStrategy) {
             BaseStrategy = _BaseStrategy;

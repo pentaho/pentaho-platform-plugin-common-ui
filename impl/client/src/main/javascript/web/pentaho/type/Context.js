@@ -39,10 +39,10 @@ define([
   "../util/logger",
   "./standard" // so that r.js sees otherwise invisible dependencies.
 ], function(localRequire, module, typeInfo, bundle,
-    SpecificationContext, SpecificationScope,
-    InstancesContainer, mainPlatformEnv, configurationService,
-    Transaction, TransactionScope, CommittedScope,
-    Base, typeUtil, promiseUtil, arg, error, O, F, moduleUtil, debugMgr, DebugLevels, logger) {
+            SpecificationContext, SpecificationScope,
+            InstancesContainer, mainPlatformEnv, configurationService,
+            Transaction, TransactionScope, CommittedScope,
+            Base, typeUtil, promiseUtil, arg, error, O, F, moduleUtil, debugMgr, DebugLevels, logger) {
 
   "use strict";
 

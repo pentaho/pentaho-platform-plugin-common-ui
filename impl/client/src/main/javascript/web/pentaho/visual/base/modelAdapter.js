@@ -17,13 +17,14 @@ define([
   "pentaho/type/changes/ComplexChangeset",
   "pentaho/data/Table",
   "pentaho/util/object",
+  "pentaho/util/error",
   "pentaho/i18n!model",
   // so that r.js sees otherwise invisible dependencies.
   "./abstractModel",
   "./model",
   "pentaho/data/filter/and",
   "pentaho/data/filter/isEqual"
-], function(ComplexChangeset, Table, O, bundle) {
+], function(ComplexChangeset, Table, O, error, bundle) {
 
   "use strict";
 
@@ -78,11 +79,15 @@ define([
   return [
     "./abstractModel",
     "./model",
+    "../role/externalProperty",
+    "pentaho/data/filter/true",
+    "pentaho/data/filter/or",
     "pentaho/data/filter/and",
     "pentaho/data/filter/isEqual",
-    function(AbstractModel, Model, AndFilter, IsEqualFilter) {
+    function(AbstractModel, Model, ExternalProperty, TrueFilter, OrFilter, AndFilter, IsEqualFilter) {
 
-      var context = this;
+      var __context = this;
+      var __externalPropertyType = ExternalProperty.type;
 
       // NOTE: these will be kept private until it is decided between the adapter and the viz concept.
 
@@ -120,7 +125,12 @@ define([
 
           this.base.apply(this, arguments);
 
-          // assert this.model !== null (has a default value)
+          // Although model has a default value,
+          // changing the valueType of the property resets the default value.
+          // So, model can be null, after all.
+          if(this.model === null) {
+            throw error.argRequired("spec.model");
+          }
 
           this.__adaptationModel =
             __createAdaptationModel(this, /* previousAdaptationModel: */null, /* changeset: */null);
@@ -257,7 +267,7 @@ define([
           var internalSelectionFilter = this.__calcInternalSelectionFilter();
 
           // Synchronize internal model.
-          context.enterChange().using(function(scope) {
+          __context.enterChange().using(function(scope) {
 
             internalModel.data = adaptationModel.internalData;
             internalModel.selectionFilter = internalSelectionFilter;
@@ -309,17 +319,49 @@ define([
          * Converts an external filter into a corresponding internal filter.
          *
          * @param {!pentaho.data.filter.Abstract} externalFilter - The external filter.
-         * @return {!pentaho.data.filter.Abstract} The corresponding internal filter.
+         * @return {pentaho.data.filter.Abstract} The corresponding internal filter.
          * @private
          */
         __convertFilterToInternal: function(externalFilter) {
+
+          var adaptationModel = this.__getAmbientAdaptationModel();
+          var internalData = adaptationModel.internalData;
+          if(internalData === null) {
+            return null;
+          }
+
           // Find isProperty filters and convert their property equals', name and value to the internal data space.
           return externalFilter.visit(function(filter) {
+
+            var operands;
+
+            if(filter.kind === "or") {
+              // a or b
+              // (a1 and a2) or (b1 and b2)
+              // Each isEqual must be separately converted into either a single isEqual or
+              // into a conjunction of isEquals.
+
+              operands = [];
+
+              filter.operands.each(function(operandFilter) {
+                if(operandFilter.kind === "isEqual") {
+                  operandFilter = __convertFilterIsEqualToInternal.call(this, internalData, operandFilter);
+                  if(operandFilter !== null) {
+                    operands.push(operandFilter);
+                  }
+                } else {
+                  operands.push(operandFilter);
+                }
+              });
+
+              return new OrFilter({operands: operands});
+            }
+
             if(filter.kind === "and") {
               // Collect and replace all isProperty children
 
               var equalsMap = null;
-              var otherOperands = [];
+              operands = [];
 
               filter.operands.each(function(operandFilter) {
 
@@ -331,7 +373,7 @@ define([
 
                   equalsMap[operandFilter.property] = operandFilter.value;
                 } else {
-                  otherOperands.push(operandFilter);
+                  operands.push(operandFilter);
                 }
               });
 
@@ -342,14 +384,19 @@ define([
               // Map external values to internal values.
               equalsMap = this.__convertValuesMapToInternal(equalsMap);
 
-              otherOperands.push.apply(otherOperands, Object.keys(equalsMap).map(function(propName) {
-                return new IsEqualFilter({
-                  property: propName,
-                  value: equalsMap[propName]
-                });
+              operands.push.apply(operands, Object.keys(equalsMap).map(function(propName) {
+                return __createFilterIsEqualFromCell(internalData, propName, equalsMap[propName]);
               }));
 
-              return new AndFilter({operands: otherOperands});
+              return operands.length === 1 ? operands[0] : new AndFilter({operands: operands});
+            }
+
+            // Top-level isEqual or child of not(.)
+            if(filter.kind === "isEqual") {
+
+              filter = __convertFilterIsEqualToInternal.call(this, internalData, filter);
+
+              return filter !== null ? filter : TrueFilter.instance;
             }
           }.bind(this));
         },
@@ -429,9 +476,128 @@ define([
           ]
         }
       })
+      .implement({
+        $type: /** @lends pentaho.visual.base.ModelAdapter.Type# */{
+          // Declare in a separate specification group so as to not be triggered by the above props specification.
+          /** @inheritDoc */
+          _configureProperties: function(propTypesSpec) {
+
+            // `propTypeSpecs` is a copy of the original value.
+            var normalizedPropTypeSpecs = this._normalizePropertiesSpec(propTypesSpec);
+
+            // Expand the model property into the associated VR properties.
+
+            // Index by property name.
+            var propTypeInfoMap = Object.create(null);
+
+            normalizedPropTypeSpecs.forEach(function(propTypeSpec, index) {
+              if(!O.hasOwn(propTypeInfoMap, propTypeSpec.name)) {
+                propTypeInfoMap[propTypeSpec.name] = {
+                  spec: propTypeSpec,
+                  index: index
+                };
+              }
+            });
+
+            var modelPropInfo = propTypeInfoMap.model;
+            if(modelPropInfo != null) {
+              // Process the model valueType, if specified.
+              var internalModelTypeSpec = modelPropInfo.spec.valueType;
+              if(internalModelTypeSpec != null) {
+                var internalModelTypeBase = this.get("model").valueType;
+                var internalModelType = __context.get(internalModelTypeSpec).type;
+
+                if(internalModelTypeBase !== internalModelType &&
+                  internalModelType.isSubtypeOf(internalModelTypeBase)) {
+
+                  // Expand model.
+                  var newRolePropTypeSpecs = [];
+
+                  internalModelType.eachVisualRole(function(internalPropType) {
+                    var roleName = internalPropType.name;
+                    var internalPropTypeBase = internalModelTypeBase.get(roleName, /* sloppy: */true);
+                    if(internalPropType !== internalPropTypeBase) {
+                      // New or something changed. So, need to create/override locally as well.
+
+                      var propTypeSpec;
+                      var rolePropInfo = O.getOwn(propTypeInfoMap, roleName, null);
+                      if(rolePropInfo !== null) {
+                        // Extend and replace existing spec.
+                        propTypeSpec = Object.create(rolePropInfo.spec);
+                        if(!this.has(roleName)) {
+                          propTypeSpec.base = __externalPropertyType;
+                        }
+
+                        // Clear out, to not change indexes. Filtered at the end.
+                        propTypesSpec[rolePropInfo.index] = null;
+                      } else {
+                        propTypeSpec = {
+                          name: roleName,
+                          base: this.has(roleName) ? undefined : __externalPropertyType
+                        };
+                      }
+
+                      newRolePropTypeSpecs.push(propTypeSpec);
+                    }
+                  }, this);
+
+                  if(newRolePropTypeSpecs.length > 0) {
+                    // Insert new/changed role props after the model property.
+                    newRolePropTypeSpecs.unshift(modelPropInfo.index + 1, 0);
+                    normalizedPropTypeSpecs.splice.apply(normalizedPropTypeSpecs, newRolePropTypeSpecs);
+
+                    // Filter out nulls.
+                    propTypesSpec = normalizedPropTypeSpecs.filter(function(propTypeSpec) {
+                      return propTypeSpec !== null;
+                    });
+                  }
+                }
+              }
+            }
+
+            this.base(propTypesSpec);
+          }
+        }
+      })
       .implement({$type: bundle.structured.modelAdapter});
 
       return ModelAdapter;
+
+      // region Filter Conversion
+      function __createFilterIsEqualFromCell(data, fieldName, cell) {
+        var columnIndex = data.getColumnIndexById(fieldName);
+        var simpleValue = cell !== null
+          ? {
+            // Matches type alias corresponding simple types for all column types.
+            _: data.getColumnType(columnIndex),
+            value: cell.value,
+            formatted: cell.formatted
+          }
+          : null;
+
+        return new IsEqualFilter({property: fieldName, value: simpleValue});
+      }
+
+      function __convertFilterIsEqualToInternal(internalData, isEqualFilter) {
+
+        var map = {};
+        map[isEqualFilter.property] = isEqualFilter.value;
+
+        map = this.__convertValuesMapToInternal(map);
+
+        var operands = Object.keys(map).map(function(propName) {
+          return __createFilterIsEqualFromCell(internalData, propName, map[propName]);
+        });
+
+        if(operands.length > 0) {
+          return operands.length === 1
+            ? operands[0]
+            : new AndFilter({operands: operands});
+        }
+
+        return null;
+      }
+      // endregion
     }
   ];
 
@@ -462,7 +628,6 @@ define([
     var nextRoleInfoMap = Object.create(null);
     var nextRoleInfoList = [];
 
-    var areAllIdentityMethods = true;
     var forceNewInternalData = false;
 
     modelAdapter.$type.eachVisualRole(function(propType) {
@@ -511,12 +676,6 @@ define([
         nextRoleInfo.transactionVersion = change.transactionVersion;
       }
 
-      if(areAllIdentityMethods) {
-        if(__isMethodSelectionNotIdentity(nextRoleInfo.methodSelection)) {
-          areAllIdentityMethods = false;
-        }
-      }
-
       nextRoleInfoMap[propName] = nextRoleInfo;
       nextRoleInfoList.push(nextRoleInfo);
     });
@@ -528,16 +687,19 @@ define([
       }
 
       if(internalData === null) {
-        internalData = new Table(nextExternalData.toSpec());
+        internalData = forceNewInternalData ? new Table(nextExternalData.toSpec()) : nextExternalData;
       }
     }
 
     // Create missing adapters or recreate all adapters (if new internal data).
     if(internalData !== null) {
       nextRoleInfoList.forEach(function(roleInfo) {
+
         var methodSelection = roleInfo.methodSelection;
+
         if(methodSelection !== null && (forceNewInternalData || roleInfo.adapter === null)) {
-          roleInfo.adapter = methodSelection.apply(internalData);
+
+          roleInfo.adapter = methodSelection.validMethodApplication.apply(internalData);
         }
       });
     }
@@ -551,10 +713,23 @@ define([
   }
 
   function __areEqualMethodSelections(methodSelectionA, methodSelectionB) {
-    return (methodSelectionA === methodSelectionB) ||
-      (methodSelectionA !== null && methodSelectionB !== null &&
-        methodSelectionA.validMethodApplication.method.fullName !==
-        methodSelectionB.validMethodApplication.method.fullName);
+
+    if(methodSelectionA === methodSelectionB) {
+      return true;
+    }
+
+    if(methodSelectionA == null ||
+       methodSelectionB == null ||
+       !methodSelectionA.internalMode.equals(methodSelectionB.internalMode) ||
+       !methodSelectionA.externalMode.equals(methodSelectionB.externalMode)) {
+      return false;
+    }
+
+    var applicationA = methodSelectionA.validMethodApplication;
+    var applicationB = methodSelectionB.validMethodApplication;
+
+    return applicationA.method.fullName === applicationB.method.fullName &&
+           applicationA.inputFieldIndexes.join("") === applicationB.inputFieldIndexes.join("");
   }
 
   function __isMethodSelectionNotIdentity(methodSelection) {

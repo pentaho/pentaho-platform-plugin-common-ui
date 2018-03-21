@@ -15,18 +15,24 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/data/Table"
-], function(Context, Table) {
+  "pentaho/data/Table",
+  "../role/adaptationUtil"
+], function(Context, Table, adaptationUtil) {
 
   "use strict";
 
   /* globals describe, it, beforeEach, afterEach, beforeAll, spyOn */
 
-  xdescribe("pentaho.visual.role.ExternalMapping", function() {
+  var context;
+  var Model;
+  var ModelAdapter;
+  var buildAdapter = adaptationUtil.buildAdapter;
+  var ModelWithStringRole;
+  var ElementIdentityStrategy;
+
+  describe("pentaho.visual.role.ExternalMapping", function() {
 
     var context;
-    var VisualModel;
-    var IdentityStrategy;
 
     beforeEach(function(done) {
 
@@ -37,11 +43,17 @@ define([
 
             return context.getDependencyApplyAsync([
               "pentaho/visual/base/model",
-              "pentaho/visual/role/adaptation/identity",
-              "pentaho/visual/role/mapping"
-            ], function(_Model, _IdentityStrategy) {
-              VisualModel = _Model;
-              IdentityStrategy = _IdentityStrategy;
+              "pentaho/visual/base/modelAdapter",
+              "pentaho/visual/role/adaptation/strategy"
+            ], function(_Model, _ModelAdapter, _BaseStrategy) {
+              Model = _Model;
+              ModelAdapter = _ModelAdapter;
+
+              var mocks = adaptationUtil.createMocks(Model, ModelAdapter, _BaseStrategy);
+
+              ModelWithStringRole = mocks.ModelWithStringRole;
+              ElementIdentityStrategy = mocks.ElementIdentityStrategy;
+
             });
           })
           .then(done, done.fail);
@@ -65,248 +77,111 @@ define([
 
     describe("#adapter", function() {
 
-      describe("when not under a transaction", function() {
+      it("should get the current role adapter if the mapping is valid", function() {
 
-        it("should call prop.getAdapterOn(model) and return its result", function() {
+        var strategies = [new ElementIdentityStrategy()];
 
-          var CustomModel = VisualModel.extend({
-            $type: {
-              props: [
-                {
-                  name: "propRoleA",
-                  base: "pentaho/visual/role/property",
-                  modes: [
-                    {dataType: "string"}
-                  ],
-                  strategies: [
-                    new IdentityStrategy()
-                  ]
-                }
-              ]
-            }
-          });
+        var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+          {
+            name: "roleA",
+            strategies: strategies
+          }
+        ]);
 
-          var propType = CustomModel.type.get("propRoleA");
-          var adapter = {};
-          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
+        var model = new ModelWithStringRole();
 
-          var model = new CustomModel({
-            data: new Table(getDataSpec1()),
-            propRoleA: {fields: ["country"]}
-          });
-          var mapping = model.propRoleA;
-
-          var result = mapping.adapter;
-
-          expect(result).toBe(adapter);
-          expect(propType.getAdapterOn).toHaveBeenCalledTimes(1);
-          expect(propType.getAdapterOn).toHaveBeenCalledWith(model);
+        var modelAdapter = new DerivedModelAdapter({
+          model: model,
+          data: new Table(getDataSpec1()),
+          roleA: {
+            fields: ["country"]
+          }
         });
 
-        it("should cache and return the adapter instance of the first prop.getAdapterOn call", function() {
+        var adapter1 = modelAdapter.roleA.adapter;
 
-          var CustomModel = VisualModel.extend({
-            $type: {
-              props: [
-                {
-                  name: "propRoleA",
-                  base: "pentaho/visual/role/property",
-                  modes: [
-                    {dataType: "string"}
-                  ],
-                  strategies: [
-                    new IdentityStrategy()
-                  ]
-                }
-              ]
-            }
-          });
-
-          var propType = CustomModel.type.get("propRoleA");
-          var adapter = {};
-          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
-
-          var model = new CustomModel({
-            data: new Table(getDataSpec1()),
-            propRoleA: {fields: ["country"]}
-          });
-          var mapping = model.propRoleA;
-
-          var result1 = mapping.adapter;
-          var result2 = mapping.adapter;
-
-          expect(result1).toBe(adapter);
-          expect(result2).toBe(adapter);
-          expect(propType.getAdapterOn).toHaveBeenCalledTimes(1);
-        });
-
-        it("should cache and return a returned null adapter", function() {
-
-          var CustomModel = VisualModel.extend({
-            $type: {
-              props: [
-                {
-                  name: "propRoleA",
-                  base: "pentaho/visual/role/property",
-                  modes: [
-                    {dataType: "number"}
-                  ],
-                  strategies: [
-                    new IdentityStrategy()
-                  ]
-                }
-              ]
-            }
-          });
-
-          var propType = CustomModel.type.get("propRoleA");
-          var adapter = null;
-          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
-
-          var model = new CustomModel({
-            data: new Table(getDataSpec1()),
-            propRoleA: {fields: ["country"]}
-          });
-          var mapping = model.propRoleA;
-
-          var result1 = mapping.adapter;
-          var result2 = mapping.adapter;
-
-          expect(result1).toBe(adapter);
-          expect(result2).toBe(adapter);
-          expect(propType.getAdapterOn).toHaveBeenCalledTimes(1);
-        });
+        expect(adapter1).not.toBe(null);
       });
 
-      describe("when under a transaction", function() {
+      it("should get null if the mapping is valid", function() {
 
-        var txnScope;
-        var mapper0;
-        var propType;
-        var model;
+        var strategies = [new ElementIdentityStrategy()];
 
-        beforeEach(function() {
+        var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+          {
+            name: "roleA",
+            strategies: strategies
+          }
+        ]);
 
-          var CustomModel = VisualModel.extend({
-            $type: {
-              props: [
-                {
-                  name: "propNormal",
-                  valueType: "string"
-                },
-                {
-                  name: "propRoleA",
-                  base: "pentaho/visual/role/property",
-                  modes: [
-                    {dataType: "string"}
-                  ],
-                  strategies: [
-                    new IdentityStrategy()
-                  ]
-                }
-              ]
-            }
-          });
+        var model = new ModelWithStringRole();
 
-          model = new CustomModel({
-            data: new Table(getDataSpec1()),
-            propRoleA: {fields: ["country"]}
-          });
-
-          propType = CustomModel.type.get("propRoleA");
-
-          // Cache the adapter.
-          mapper0 = model.propRoleA.adapter;
-
-          // Start the transaction.
-          txnScope = context.enterChange();
+        var modelAdapter = new DerivedModelAdapter({
+          model: model,
+          data: new Table(getDataSpec1()),
+          roleA: {
+            fields: ["sales"]
+          }
         });
 
-        afterEach(function() {
-          txnScope.dispose();
+        var adapter1 = modelAdapter.roleA.adapter;
+
+        expect(adapter1).toBe(null);
+      });
+    });
+
+    describe("#mode", function() {
+
+      it("should get the current mode if the mapping is valid", function() {
+
+        var strategies = [new ElementIdentityStrategy()];
+
+        var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+          {
+            name: "roleA",
+            strategies: strategies
+          }
+        ]);
+
+        var model = new ModelWithStringRole();
+
+        var modelAdapter = new DerivedModelAdapter({
+          model: model,
+          data: new Table(getDataSpec1()),
+          roleA: {
+            fields: ["country"]
+          }
         });
 
-        it("should ignore the cached value and call prop.getAdapterOn again", function() {
+        var mode = modelAdapter.roleA.mode;
 
-          var adapter = {};
-          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
+        expect(mode).toBe(DerivedModelAdapter.type.get("roleA").modes.at(0));
+      });
 
-          var result = model.propRoleA.adapter;
+      it("should get null if the mapping is valid", function() {
 
-          expect(result).toBe(adapter);
-          expect(propType.getAdapterOn).toHaveBeenCalledTimes(1);
+        var strategies = [new ElementIdentityStrategy()];
+
+        var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+          {
+            name: "roleA",
+            strategies: strategies
+          }
+        ]);
+
+        var model = new ModelWithStringRole();
+
+        var modelAdapter = new DerivedModelAdapter({
+          model: model,
+          data: new Table(getDataSpec1()),
+          roleA: {
+            fields: ["sales"]
+          }
         });
 
-        it("should not cache values and call prop.getAdapterOn each time", function() {
+        var mode = modelAdapter.roleA.mode;
 
-          var adapter = {};
-          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
-
-          var result1 = model.propRoleA.adapter;
-          var result2 = model.propRoleA.adapter;
-
-          expect(propType.getAdapterOn).toHaveBeenCalledTimes(2);
-        });
-
-        it("should return the original cached value if the transaction causes no changes", function() {
-
-          var adapter = {};
-          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
-
-          txnScope.accept();
-
-          var result = model.propRoleA.adapter;
-
-          expect(result).toBe(mapper0);
-          expect(propType.getAdapterOn).not.toHaveBeenCalled();
-        });
-
-        it("should return a new value if the transaction changes the `data` property", function() {
-
-          var adapter = {};
-          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
-
-          model.data = new Table(getDataSpec1());
-
-          txnScope.accept();
-
-          var result = model.propRoleA.adapter;
-
-          expect(result).toBe(adapter);
-          expect(result).not.toBe(mapper0);
-          expect(propType.getAdapterOn).toHaveBeenCalledTimes(1);
-        });
-
-        it("should return a new value if the transaction changes a visual role property", function() {
-
-          var adapter = {};
-          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
-
-          model.propRoleA.fields = ["product"];
-
-          txnScope.accept();
-
-          var result = model.propRoleA.adapter;
-
-          expect(result).toBe(adapter);
-          expect(result).not.toBe(mapper0);
-          expect(propType.getAdapterOn).toHaveBeenCalledTimes(1);
-        });
-
-        it("should return the original cached value if the transaction changes normal properties", function() {
-
-          var adapter = {};
-          spyOn(propType, "getAdapterOn").and.returnValue(adapter);
-
-          model.propNormal = "new-value";
-
-          txnScope.accept();
-
-          var result = model.propRoleA.adapter;
-
-          expect(result).toBe(mapper0);
-          expect(propType.getAdapterOn).not.toHaveBeenCalled();
-        });
+        expect(mode).toBe(null);
       });
     });
   });

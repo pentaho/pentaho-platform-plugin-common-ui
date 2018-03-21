@@ -374,16 +374,18 @@ define([
 
           expect(function() {
             propType.name = "fooBar2";
-          }).toThrow(); // message varies with JS engine...
+          }).toThrowError(TypeError);
         });
 
-        it("should not throw when set but not changed", function() {
+        it("should throw when set but not changed", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {
             name: "fooBar",
             valueType: "string"
           });
 
-          propType.name = "fooBar";
+          expect(function() {
+            propType.name = "fooBar";
+          }).toThrowError(TypeError);
         });
       }); // end #name
 
@@ -2076,8 +2078,10 @@ define([
           }).toThrowError(TypeError);
         });
 
-        it("should not throw when set but not changed", function() {
-          propType.name = "baseStr";
+        it("should throw when set but not changed", function() {
+          expect(function() {
+            propType.name = "baseStr";
+          }).toThrowError(TypeError);
         });
       }); // end name
 
@@ -2184,6 +2188,22 @@ define([
           var propType = propertyTypeUtil.extend(Derived.type, "baseNum", {name: "baseNum", valueType: Integer.type});
 
           expect(propType.defaultValue).toBe(null);
+        });
+
+        it("should inherit if a function and locally unspecified and there is a local value type", function() {
+
+          var Integer = PentahoNumber.extend();
+          var dv = new Integer(1);
+
+          var Base = Complex.extend();
+          Base.type.add({name: "baseNum", valueType: PentahoNumber, defaultValue: function() { return dv; }});
+
+          var dvf = Base.type.get("baseNum").defaultValue;
+
+          var Derived = Base.extend();
+          var propType = propertyTypeUtil.extend(Derived.type, "baseNum", {name: "baseNum", valueType: Integer.type});
+
+          expect(propType.defaultValue).toBe(dvf);
         });
 
         it("should inherit if locally unspecified and there is no local value type", function() {

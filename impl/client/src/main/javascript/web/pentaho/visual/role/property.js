@@ -70,9 +70,6 @@ define([
 
           valueType: Mapping,
 
-          // Setting the value type resets the inherited defaultValue.
-          defaultValue: function() { return {}; },
-
           /** @inheritDoc */
           _init: function(spec, keyArgs) {
 
@@ -488,21 +485,21 @@ define([
               var count = mapping.fields.count;
               if(count < range.min) {
                 addErrors(new ValidationError(
-                    bundleTypes.get("errors.property.countOutOfRange", [
-                      this.label + " " + mapping.$type.get("fields").label,
-                      count,
-                      range.min,
-                      range.max
-                    ])));
+                  bundleTypes.get("errors.property.countOutOfRange", [
+                    this.label + " " + mapping.$type.get("fields").label,
+                    count,
+                    range.min,
+                    range.max
+                  ])));
 
               } else if(count > range.max) {
                 addErrors(new ValidationError(
-                    bundleTypes.get("errors.property.countOutOfRange", [
-                      this.label + " " + mapping.$type.get("fields").label,
-                      count,
-                      range.min,
-                      range.max
-                    ])));
+                  bundleTypes.get("errors.property.countOutOfRange", [
+                    this.label + " " + mapping.$type.get("fields").label,
+                    count,
+                    range.min,
+                    range.max
+                  ])));
               }
 
               if(!errors) {
@@ -513,14 +510,14 @@ define([
 
                   if(!this.modes.has(modeFixed.$key)) {
                     addErrors(new ValidationError(
-                        bundle.format(bundle.structured.errors.property.modeFixedInvalid, {role: this})));
+                      bundle.format(bundle.structured.errors.property.modeFixedInvalid, {role: this})));
                   }
                 }
 
                 if(!errors && count > 0) {
                   if(mapping.mode == null) {
                     addErrors(new ValidationError(
-                        bundle.format(bundle.structured.errors.property.noApplicableMode, {role: this})));
+                      bundle.format(bundle.structured.errors.property.noApplicableMode, {role: this})));
                   }
                 }
               }

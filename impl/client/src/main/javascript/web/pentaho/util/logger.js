@@ -91,7 +91,7 @@ define(function() {
   function __log(m, type, css) {
     type = type || "info";
 
-    if(logger.logLevels.indexOf(type) < logger.logLevels.indexOf(logger.logLevel)) return;
+    // if(logger.logLevels.indexOf(type) < logger.logLevels.indexOf(logger.logLevel)) return;
 
     if(typeof console !== "undefined") {
       if(!console[type]) type = "log";
