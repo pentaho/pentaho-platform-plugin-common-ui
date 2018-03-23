@@ -15,10 +15,9 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/visual/role/adaptation/impl/IdentityAdapter",
   "pentaho/data/Table",
   "pentaho/data/TableView"
-], function(Context, Adapter, DataTable, DataView) {
+], function(Context, DataTable, DataView) {
 
   "use strict";
 

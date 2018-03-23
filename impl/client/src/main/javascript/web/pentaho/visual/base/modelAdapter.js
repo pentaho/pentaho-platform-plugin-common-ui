@@ -46,7 +46,7 @@ define([
       this.__adaptationModel = owner.__adaptationModel;
 
       // Unfortunately, a new adaptation model is always created, even if it has the same data and
-      // selection methods/adapters. This will set the initial transactionVersion properties at the several levels.
+      // strategies. This will set the initial transactionVersion properties at the several levels.
       // Subsequent calls reuse the adaptationModel, if nothing changed.
       this.__getAdaptationModel();
     },
@@ -89,7 +89,7 @@ define([
       var __context = this;
       var __externalPropertyType = ExternalProperty.type;
 
-      // NOTE: these will be kept private until it is decided between the adapter and the viz concept.
+      // NOTE: these will be kept private until it is decided between the model adapter and the viz concept.
 
       /**
        * @name pentaho.visual.base.ModelAdapter.Type
@@ -200,7 +200,7 @@ define([
          *
          * @param {string} roleName - The visual role name.
          *
-         * @return {pentaho.visual.role.adaptation.IAdapter} The visual role adapter, if one is established;
+         * @return {pentaho.visual.role.Mode} The visual role operation mode, if one is established;
          * `null`, otherwise.
          *
          * @private
@@ -208,23 +208,24 @@ define([
          * @see pentaho.visual.role.ExternalMapping#mode
          */
         __getAmbientRoleMode: function(roleName) {
-          var methodSelection = this.__getAmbientAdaptationModel().roleInfoMap[roleName].methodSelection;
-          return methodSelection && methodSelection.externalMode;
+          var strategyApplication = this.__getAmbientAdaptationModel().roleInfoMap[roleName].strategyApplication;
+          return strategyApplication && strategyApplication.externalMode;
         },
 
         /**
-         * Gets the ambient adapter of a visual role, given its name.
+         * Gets the ambient strategy of a visual role, given its name.
          *
          * @param {string} roleName - The visual role name.
          *
-         * @return {pentaho.visual.role.Mode} The operation mode, if one is established; `null`, otherwise.
+         * @return {pentaho.visual.role.adaptation.Strategy} The current strategy, if one is established;
+         * `null`, otherwise.
          *
          * @private
          *
-         * @see pentaho.visual.role.ExternalMapping#adapter
+         * @see pentaho.visual.role.ExternalMapping#strategy
          */
-        __getAmbientRoleAdapter: function(roleName) {
-          return this.__getAmbientAdaptationModel().roleInfoMap[roleName].adapter;
+        __getAmbientRoleStrategy: function(roleName) {
+          return this.__getAmbientAdaptationModel().roleInfoMap[roleName].strategy;
         },
 
         /**
@@ -275,12 +276,12 @@ define([
             Object.keys(roleInfoMap).forEach(function(propName) {
 
               var roleInfo = roleInfoMap[propName];
-              var methodSelection = roleInfo.methodSelection;
+              var strategyApplication = roleInfo.strategyApplication;
 
               var internalMapping = internalModel.get(propName);
 
-              internalMapping.modeFixed = methodSelection && methodSelection.internalMode;
-              internalMapping.fields = methodSelection !== null ? __getAdapterOutputFieldNames(roleInfo.adapter) : [];
+              internalMapping.modeFixed = strategyApplication && strategyApplication.internalMode;
+              internalMapping.fields = strategyApplication !== null ? roleInfo.strategy.outputFieldNames : [];
             });
 
             scope.accept();
@@ -405,9 +406,9 @@ define([
          * Converts a given map of external property names to values and/or cells into
          * a map of internal property names to cells.
          *
-         * External properties which are mapped to visual roles which are not currently valid (have no defined adapter),
+         * External properties which are mapped to visual roles which are not currently valid (have no defined strategy),
          * are skipped.
-         * External properties whose values are not known to the current adapter are skipped.
+         * External properties whose values are not known to the current strategy are skipped.
          *
          * @param {!Object.<string, any|pentaho.data.ICell>} externalValuesMap - The map of external property names to
          * values and/or cells.
@@ -424,21 +425,19 @@ define([
           this.$type.eachVisualRole(function(propType) {
 
             var externalMapping = this.get(propType);
-            var adapter;
+            var strategy;
 
-            if(externalMapping.hasFields && (adapter = ambientRoleInfoMap[propType.name].adapter) !== null) {
+            if(externalMapping.hasFields && (strategy = ambientRoleInfoMap[propType.name].strategy) !== null) {
 
               var externalFieldValues = __collectExternalFieldValues(externalMapping, externalValuesMap);
               if(externalFieldValues !== null) {
 
-                var internalFieldCells = adapter.adapt(externalFieldValues);
+                var internalFieldCells = strategy.map(externalFieldValues);
                 if(internalFieldCells !== null) {
-
-                  var internalData = adapter.data;
-                  var outputFieldIndexes = adapter.outputFieldIndexes;
+                  var outputFieldNames = strategy.outputFieldNames;
 
                   internalFieldCells.forEach(function(internalFieldCell, index) {
-                    internalValuesMap[internalData.getColumnId(outputFieldIndexes[index])] = internalFieldCell;
+                    internalValuesMap[outputFieldNames[index]] = internalFieldCell;
                   });
                 }
               }
@@ -623,7 +622,7 @@ define([
     var previousRoleInfoMap = hasDataChanged ? null : previousAdaptationModel.roleInfoMap;
 
     // If, for any VR, the selected method changes and it was or is not an identity method,
-    // then a new data set needs to be determined and all adapters need to be recreated.
+    // then a new data set needs to be determined and all strategies need to be recreated.
 
     var nextRoleInfoMap = Object.create(null);
     var nextRoleInfoList = [];
@@ -635,35 +634,35 @@ define([
       var propName = propType.name;
 
       // If first time or data changed, a new role info is created.
-      // Otherwise, try to reuse the existing method/adapter.
+      // Otherwise, try to reuse the existing method/strategy.
       // Be sure to clone the existing object, because, at a minimum, its transactionVersion will be updated,
       // and this can be from the committed adaptation model.
       var nextRoleInfo = previousRoleInfoMap === null
-        ? {transactionVersion: 0, methodSelection: null, adapter: null}
+        ? {transactionVersion: 0, strategyApplication: null, strategy: null}
         : O.cloneShallow(previousRoleInfoMap[propName]);
 
       // Only re-evaluate the visual role if it has changed since previousAdaptationModel was created.
       var change = changeset !== null ? changeset.getChange(propType) : null;
 
       // If no externalData (and data has not changed),
-      // then all reused roleInfo already have null methodSelection and adapter.
+      // then all reused roleInfo already have null strategyApplication and strategy.
       if(nextExternalData !== null) {
 
         if(change === null || nextRoleInfo.transactionVersion < change.transactionVersion) {
           // Select the visual role strategies' methods.
-          var nextMethodSelection = propType.selectAdaptationStrategyMethodOn(modelAdapter);
+          var nextStrategyApplication = propType.selectAdaptationStrategyOn(modelAdapter);
 
-          var oldMethodSelection = nextRoleInfo.methodSelection;
+          var previousStrategyApplication = nextRoleInfo.strategyApplication;
 
-          if(!__areEqualMethodSelections(nextMethodSelection, oldMethodSelection)) {
-            nextRoleInfo.methodSelection = nextMethodSelection; // Possibly null.
-            nextRoleInfo.adapter = null;
+          if(!__equalStrategyApplications(nextStrategyApplication, previousStrategyApplication)) {
+            nextRoleInfo.strategyApplication = nextStrategyApplication; // Possibly null.
+            nextRoleInfo.strategy = null;
 
-            // If next or previous method was not identity,
-            // then the data table needs to be changed and new adapters need to be created.
+            // If next or previous application add fields,
+            // then the data table needs to be changed and new strategies need to be created.
             if(!forceNewInternalData) {
-              if(__isMethodSelectionNotIdentity(oldMethodSelection) ||
-                 __isMethodSelectionNotIdentity(nextMethodSelection)) {
+              if((previousStrategyApplication !== null && previousStrategyApplication.addsFields) ||
+                 (nextStrategyApplication !== null && nextStrategyApplication.addsFields)) {
                 forceNewInternalData = true;
               }
             }
@@ -691,15 +690,15 @@ define([
       }
     }
 
-    // Create missing adapters or recreate all adapters (if new internal data).
+    // Create missing strategies or recreate all strategies (if new internal data).
     if(internalData !== null) {
       nextRoleInfoList.forEach(function(roleInfo) {
 
-        var methodSelection = roleInfo.methodSelection;
+        var strategyApplication = roleInfo.strategyApplication;
 
-        if(methodSelection !== null && (forceNewInternalData || roleInfo.adapter === null)) {
-
-          roleInfo.adapter = methodSelection.validMethodApplication.apply(internalData);
+        if(strategyApplication !== null && (forceNewInternalData || roleInfo.strategy === null)) {
+          roleInfo.strategy =
+            strategyApplication.strategyType.apply(internalData, strategyApplication.externalFieldIndexes);
         }
       });
     }
@@ -712,37 +711,16 @@ define([
     };
   }
 
-  function __areEqualMethodSelections(methodSelectionA, methodSelectionB) {
+  function __equalStrategyApplications(strategyApplicationA, strategyApplicationB) {
 
-    if(methodSelectionA === methodSelectionB) {
+    if(strategyApplicationA === strategyApplicationB) {
       return true;
     }
 
-    if(methodSelectionA == null ||
-       methodSelectionB == null ||
-       !methodSelectionA.internalMode.equals(methodSelectionB.internalMode) ||
-       !methodSelectionA.externalMode.equals(methodSelectionB.externalMode)) {
-      return false;
-    }
-
-    var applicationA = methodSelectionA.validMethodApplication;
-    var applicationB = methodSelectionB.validMethodApplication;
-
-    return applicationA.method.fullName === applicationB.method.fullName &&
-           applicationA.inputFieldIndexes.join("") === applicationB.inputFieldIndexes.join("");
-  }
-
-  function __isMethodSelectionNotIdentity(methodSelection) {
-    return methodSelection !== null && !methodSelection.validMethodApplication.method.isIdentity;
-  }
-
-  function __getAdapterOutputFieldNames(adapter) {
-
-    var internalData = adapter.data;
-
-    return adapter.outputFieldIndexes.map(function(outputFieldIndex) {
-      return internalData.getColumnId(outputFieldIndex);
-    });
+    return strategyApplicationA != null && strategyApplicationB != null &&
+      strategyApplicationA.internalMode.equals(strategyApplicationB.internalMode) &&
+      strategyApplicationA.externalMode.equals(strategyApplicationB.externalMode) &&
+      strategyApplicationA.strategyType === strategyApplicationB.strategyType;
   }
   // endregion
 

@@ -32,8 +32,6 @@ define([
 
   describe("pentaho.visual.role.ExternalMapping", function() {
 
-    var context;
-
     beforeEach(function(done) {
 
       Context.createAsync()
@@ -53,7 +51,6 @@ define([
 
               ModelWithStringRole = mocks.ModelWithStringRole;
               ElementIdentityStrategy = mocks.ElementIdentityStrategy;
-
             });
           })
           .then(done, done.fail);
@@ -75,11 +72,11 @@ define([
       };
     }
 
-    describe("#adapter", function() {
+    describe("#strategy", function() {
 
-      it("should get the current role adapter if the mapping is valid", function() {
+      it("should get the current strategy if the mapping is valid", function() {
 
-        var strategies = [new ElementIdentityStrategy()];
+        var strategies = [ElementIdentityStrategy.type];
 
         var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
           {
@@ -98,14 +95,14 @@ define([
           }
         });
 
-        var adapter1 = modelAdapter.roleA.adapter;
+        var strategy1 = modelAdapter.roleA.strategy;
 
-        expect(adapter1).not.toBe(null);
+        expect(strategy1).not.toBe(null);
       });
 
       it("should get null if the mapping is valid", function() {
 
-        var strategies = [new ElementIdentityStrategy()];
+        var strategies = [ElementIdentityStrategy.type];
 
         var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
           {
@@ -124,9 +121,9 @@ define([
           }
         });
 
-        var adapter1 = modelAdapter.roleA.adapter;
+        var strategy = modelAdapter.roleA.strategy;
 
-        expect(adapter1).toBe(null);
+        expect(strategy).toBe(null);
       });
     });
 
@@ -134,7 +131,7 @@ define([
 
       it("should get the current mode if the mapping is valid", function() {
 
-        var strategies = [new ElementIdentityStrategy()];
+        var strategies = [ElementIdentityStrategy.type];
 
         var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
           {
@@ -160,7 +157,7 @@ define([
 
       it("should get null if the mapping is valid", function() {
 
-        var strategies = [new ElementIdentityStrategy()];
+        var strategies = [ElementIdentityStrategy.type];
 
         var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
           {

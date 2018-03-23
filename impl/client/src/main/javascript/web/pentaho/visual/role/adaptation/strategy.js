@@ -83,6 +83,8 @@ define([
            * @name pentaho.visual.role.adaptation.Strategy#outputFieldIndexes
            * @type {!Array.<number>}
            * @readOnly
+           *
+           * @see pentaho.visual.role.adaptation.Strategy#outputFieldNames
            */
           O.setConst(this, "outputFieldIndexes", arg.required(instSpec, "outputFieldIndexes", "instSpec"));
         },
@@ -98,6 +100,23 @@ define([
          */
         get isInvertible() {
           return false;
+        },
+
+        /**
+         * Gets the names of the output fields.
+         *
+         * @type {!Array.<string>}
+         * @readOnly
+         *
+         * @see pentaho.visual.role.adaptation.Strategy#outputFieldIndexes
+         */
+        get outputFieldNames() {
+
+          var data = this.data;
+
+          return this.outputFieldIndexes.map(function(outputFieldIndex) {
+            return data.getColumnId(outputFieldIndex);
+          });
         },
 
         /**

@@ -33,9 +33,7 @@ define([
     var buildAdapter = adaptationUtil.buildAdapter;
     var ModelWithStringRole;
     var ElementIdentityStrategy;
-    var IdentityRoleAdapter;
     var CombineStrategy;
-    var CombineRoleAdapter;
 
     beforeAll(function() {
       return Context.createAsync()
@@ -57,9 +55,7 @@ define([
 
             ModelWithStringRole = mocks.ModelWithStringRole;
             ElementIdentityStrategy = mocks.ElementIdentityStrategy;
-            IdentityRoleAdapter = mocks.IdentityRoleAdapter;
             CombineStrategy = mocks.CombineStrategy;
-            CombineRoleAdapter = mocks.CombineRoleAdapter;
           });
         });
     });
@@ -329,7 +325,7 @@ define([
 
           it("should update the modeFixed of the internal mapping", function() {
 
-            var strategies = [new ElementIdentityStrategy()];
+            var strategies = [ElementIdentityStrategy.type];
 
             var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
               {
@@ -357,7 +353,7 @@ define([
 
           it("should update the fields of the internal mapping (identity strategy)", function() {
 
-            var strategies = [new ElementIdentityStrategy()];
+            var strategies = [ElementIdentityStrategy.type];
 
             var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
               {
@@ -382,7 +378,7 @@ define([
 
           it("should update the fields of the internal mapping (many to one strategy)", function() {
 
-            var strategies = [new CombineStrategy()];
+            var strategies = [CombineStrategy.type];
 
             var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
               {
@@ -411,7 +407,7 @@ define([
 
           it("should update the data of the internal model with the external data (identity strategy)", function() {
 
-            var strategies = [new ElementIdentityStrategy()];
+            var strategies = [ElementIdentityStrategy.type];
 
             var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
               {
@@ -437,7 +433,7 @@ define([
 
           it("should update the data of the internal model with a copy (many to one strategy)", function() {
 
-            var strategies = [new CombineStrategy()];
+            var strategies = [CombineStrategy.type];
 
             var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
               {
@@ -466,7 +462,7 @@ define([
 
           it("should update the selectionFilter of the internal model (identity strategy)", function() {
 
-            var strategies = [new ElementIdentityStrategy()];
+            var strategies = [ElementIdentityStrategy.type];
 
             var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
               {
@@ -477,7 +473,7 @@ define([
 
             var model = new ModelWithStringRole();
 
-            spyOn(IdentityRoleAdapter.prototype, "adapt").and.callFake(function() {
+            spyOn(ElementIdentityStrategy.prototype, "map").and.callFake(function() {
               return [{value: "PT2", formatted: "Portugal"}];
             });
 
@@ -499,7 +495,7 @@ define([
 
           it("should update the selectionFilter of the internal model (many to one strategy)", function() {
 
-            var strategies = [new CombineStrategy()];
+            var strategies = [CombineStrategy.type];
 
             var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
               {
@@ -510,7 +506,7 @@ define([
 
             var model = new ModelWithStringRole();
 
-            spyOn(CombineRoleAdapter.prototype, "adapt").and.callFake(function() {
+            spyOn(CombineStrategy.prototype, "map").and.callFake(function() {
               return [{value: "PT~fish", formatted: "Portugal ~ Fish"}];
             });
 
@@ -560,7 +556,7 @@ define([
             }
           });
 
-          var strategies = [new ElementIdentityStrategy()];
+          var strategies = [ElementIdentityStrategy.type];
 
           DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, [
             {
@@ -607,12 +603,12 @@ define([
           expect(internalFields.at(0).name).toBe("sales");
         });
 
-        it("should update the adapter even if the same strategy method is being used", function() {
+        it("should update the strategy even if the same strategy type is being used", function() {
 
-          var adapter1 = modelAdapter.roleA.adapter;
-          var method1 = modelAdapter.__adaptationModel.roleInfoMap.roleA.methodSelection.validMethodApplication.method;
+          var strategy1 = modelAdapter.roleA.strategy;
+          var strategyType1 = modelAdapter.__adaptationModel.roleInfoMap.roleA.strategyApplication.strategyType;
 
-          expect(adapter1).not.toBe(null);
+          expect(strategy1).not.toBe(null);
 
           // ---
 
@@ -620,13 +616,13 @@ define([
 
           // ---
 
-          var adapter2 = modelAdapter.roleA.adapter;
-          var method2 = modelAdapter.__adaptationModel.roleInfoMap.roleA.methodSelection.validMethodApplication.method;
+          var strategy2 = modelAdapter.roleA.adapter;
+          var strategyType2 = modelAdapter.__adaptationModel.roleInfoMap.roleA.strategyApplication.strategyType;
 
-          expect(adapter2).not.toBe(null);
+          expect(strategy2).not.toBe(null);
 
-          expect(method2.fullName).toBe(method1.fullName);
-          expect(adapter2).not.toBe(adapter1);
+          expect(strategyType2).toBe(strategyType1);
+          expect(strategy2).not.toBe(strategy1);
         });
 
         it("should not update the data of the internal model if the new strategies " +
@@ -648,7 +644,7 @@ define([
 
         beforeAll(function() {
 
-          var strategies = [new ElementIdentityStrategy()];
+          var strategies = [ElementIdentityStrategy.type];
 
           DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
             {
@@ -673,10 +669,10 @@ define([
           });
         });
 
-        it("should update the adapter even if the same strategy method is being used", function() {
+        it("should update the strategy even if the same strategy type is being used", function() {
 
-          var adapter1 = modelAdapter.roleA.adapter;
-          expect(adapter1).not.toBe(null);
+          var strategy1 = modelAdapter.roleA.strategy;
+          expect(strategy1).not.toBe(null);
 
           // ---
 
@@ -684,10 +680,10 @@ define([
 
           // ---
 
-          var adapter2 = modelAdapter.roleA.adapter;
-          expect(adapter2).not.toBe(null);
+          var strategy2 = modelAdapter.roleA.strategy;
+          expect(strategy2).not.toBe(null);
 
-          expect(adapter2).not.toBe(adapter1);
+          expect(strategy2).not.toBe(strategy1);
         });
 
         it("should not update the modeFixed of the internal mapping", function() {
@@ -731,7 +727,7 @@ define([
 
         it("should update the selectionFilter of the internal model", function() {
 
-          var strategies = [new ElementIdentityStrategy()];
+          var strategies = [ElementIdentityStrategy.type];
 
           var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
             {
@@ -742,7 +738,7 @@ define([
 
           var model = new ModelWithStringRole();
 
-          spyOn(IdentityRoleAdapter.prototype, "adapt").and.callFake(function() {
+          spyOn(ElementIdentityStrategy.prototype, "map").and.callFake(function() {
             return [{value: "PT2", formatted: "Portugal"}];
           });
 
@@ -759,7 +755,7 @@ define([
 
           expect(selectionFilter1).not.toBe(null);
 
-          IdentityRoleAdapter.prototype.adapt.and.callFake(function() {
+          ElementIdentityStrategy.prototype.map.and.callFake(function() {
             return [{value: "PT4", formatted: "Portugal"}];
           });
 
@@ -776,9 +772,9 @@ define([
           expect(selectionFilter2).not.toBe(selectionFilter1);
         });
 
-        it("should not change the adapter", function() {
+        it("should not change the strategy", function() {
 
-          var strategies = [new ElementIdentityStrategy()];
+          var strategies = [ElementIdentityStrategy.type];
 
           var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
             {
@@ -789,7 +785,7 @@ define([
 
           var model = new ModelWithStringRole();
 
-          spyOn(IdentityRoleAdapter.prototype, "adapt").and.callFake(function() {
+          spyOn(ElementIdentityStrategy.prototype, "map").and.callFake(function() {
             return [{value: "PT2", formatted: "Portugal"}];
           });
 
@@ -802,12 +798,12 @@ define([
             selectionFilter: {_: "=", p: "country", v: "PT"}
           });
 
-          IdentityRoleAdapter.prototype.adapt.and.callFake(function() {
+          ElementIdentityStrategy.prototype.map.and.callFake(function() {
             return [{value: "PT4", formatted: "Portugal"}];
           });
 
-          var adapter1 = modelAdapter.roleA.adapter;
-          expect(adapter1).not.toBe(null);
+          var strategy1 = modelAdapter.roleA.strategy;
+          expect(strategy1).not.toBe(null);
 
           // ---
 
@@ -815,15 +811,15 @@ define([
 
           // ---
 
-          var adapter2 = modelAdapter.roleA.adapter;
-          expect(adapter2).not.toBe(null);
+          var strategy2 = modelAdapter.roleA.strategy;
+          expect(strategy2).not.toBe(null);
 
-          expect(adapter2).toBe(adapter1);
+          expect(strategy2).toBe(strategy1);
         });
 
         it("should not change the data of the internal model", function() {
 
-          var strategies = [new ElementIdentityStrategy()];
+          var strategies = [ElementIdentityStrategy.type];
 
           var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
             {
@@ -834,7 +830,7 @@ define([
 
           var model = new ModelWithStringRole();
 
-          spyOn(IdentityRoleAdapter.prototype, "adapt").and.callFake(function() {
+          spyOn(ElementIdentityStrategy.prototype, "map").and.callFake(function() {
             return [{value: "PT2", formatted: "Portugal"}];
           });
 
@@ -847,7 +843,7 @@ define([
             selectionFilter: {_: "=", p: "country", v: "PT"}
           });
 
-          IdentityRoleAdapter.prototype.adapt.and.callFake(function() {
+          ElementIdentityStrategy.prototype.map.and.callFake(function() {
             return [{value: "PT4", formatted: "Portugal"}];
           });
 

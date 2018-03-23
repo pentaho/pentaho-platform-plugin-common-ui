@@ -19,42 +19,35 @@ define([
   "pentaho/data/TableView",
   "pentaho/type/util",
   "pentaho/util/object",
-  "pentaho/util/error",
-  "pentaho/util/arg",
 
   // so that r.js sees otherwise invisible dependencies.
   "./abstractProperty",
   "./externalMapping",
+  "./mode",
   "./adaptation/strategy"
-], function(bundle, ValidationError, DataView, typeUtil, O, error, arg) {
+], function(bundle, ValidationError, DataView, typeUtil, O) {
 
   "use strict";
 
   return [
     "./abstractProperty",
     "./externalMapping",
-    "./adaptation/strategy",
     "./mode",
-    {$instance: {type: ["pentaho/visual/role/adaptation/strategy"]}},
+    "./adaptation/strategy",
+    {$types: {base: "pentaho/visual/role/adaptation/strategy"}},
 
-    function(AbstractProperty, ExternalMapping, BaseStrategy, Mode, allStrategiesList) {
+    function(AbstractProperty, ExternalMapping, Mode, BaseStrategy, allStrategyCtorsList) {
 
-      var allStrategies = allStrategiesList.toArray();
+      var __context = this;
 
-      var ListOfStrategyType = this.get([BaseStrategy]);
+      // TODO: enhance the special ref $types with an includeSelf argument...
+      var allStrategiesTypes = allStrategyCtorsList
+        .filter(function(Strategy) { return Strategy !== BaseStrategy; })
+        .map(function(Strategy) { return Strategy.type; });
+
       var ListOfModeType = this.get([Mode]);
 
-      // This one should remain private
-      /**
-       * @name pentaho.visual.role.IStrategyMethodInfo
-       * @interface
-       * @private
-       * @property {!pentaho.visual.role.Mode} internalMode - The internal mode.
-       * @property {!pentaho.visual.role.Mode} externalMode - The external mode.
-       * @property {!pentaho.visual.role.adaptation.IStrategyMethod} method - The adaptation strategy method.
-       */
-
-      // NOTE: these will be kept private until it is decided between the adapter and the viz concept.
+      // NOTE: these will be kept private until it is decided between the model adapter and the viz concept.
 
       /**
        * @name pentaho.visual.role.ExternalProperty.Type
@@ -106,7 +99,7 @@ define([
               var strategies = spec.strategies;
               if(strategies == null) {
                 // Set even if allStrategies is empty, as this initializes the data structures.
-                this.__setStrategies(allStrategies, /* isDefault: */true);
+                this.__setStrategyTypes(allStrategiesTypes, /* isDefault: */true);
               }
             }
 
@@ -180,15 +173,18 @@ define([
 
           // region strategies & modes
           __modes: null,
-          __strategies: null,
-          __isStrategiesDefault: true,
+          __strategyTypeList: null,
+          __isStrategyTypesDefault: true,
 
           /**
-           * List of a applicable strategy methods along with corresponding internal and external modes.
-           * @type {Array.<pentaho.visual.role.IStrategyMethodInfo>}
+           * List of a priori applicable strategy type applications,
+           * along with corresponding internal and external modes.
+           * These do not have the `addFields` and `externalFieldIndexes` properties defined yet.
+           *
+           * @type {Array.<pentaho.visual.role.adaptation.IStrategyApplication>}
            * @private
            */
-          __strategyMethodInfos: null,
+          __strategyTypeApplicationList: null,
 
           /** @inheritDoc */
           get modes() {
@@ -196,32 +192,32 @@ define([
           },
 
           /**
-           * Gets or sets the array of adaptation strategies used to adapt the
+           * Gets or sets the array of adaptation strategy types used to adapt the
            * fields mapped to the visual role to those required by one of its modes.
            *
-           * Visual roles _should_ have at least one mapping strategy.
+           * Visual roles _should_ have at least one mapping strategy type.
            *
            * When set to a {@link Nully} value, the set operation is ignored.
            *
            * If not specified at the root [visual.role.Property]{@link pentaho.visual.role.ExternalProperty},
            * the `strategies` attribute is initialized with all registered
-           * [strategy]{@link pentaho.visual.role.adaptation.Strategy} instances
-           * (registered as instances of the type `pentaho/visual/role/adaptation/strategy`).
+           * [strategy]{@link pentaho.visual.role.adaptation.Strategy} types
+           * (registered as subtypes of the type `pentaho/visual/role/adaptation/strategy`).
            *
-           * The Viz. API pre-registers instances of the following standard strategy types, in the given order:
-           * 1. [IdentityStrategy]{@link pentaho.visual.role.adaptation.IdentityStrategy} strategy
-           * 2. [CombineStrategy]{@link pentaho.visual.role.adaptation.CombineStrategy} strategy
-           * 3. [TupleStrategy]{@link pentaho.visual.role.adaptation.TupleStrategy} strategy.
+           * The Viz. API pre-registers the following standard strategy types, in the given order:
+           * 1. [IdentityStrategy]{@link pentaho.visual.role.adaptation.IdentityStrategy}
+           * 2. [CombineStrategy]{@link pentaho.visual.role.adaptation.CombineStrategy}
+           * 3. [TupleStrategy]{@link pentaho.visual.role.adaptation.TupleStrategy}.
            *
            * The returned list or its elements should not be modified.
            *
-           * @type {!pentaho.type.List.<pentaho.visual.role.adaptation.Strategy>}
+           * @type {!Array.<pentaho.visual.role.adaptation.Strategy.Type>}
            *
            * @throws {pentaho.lang.OperationInvalidError} When setting and the type already has
            * [subtypes]{@link pentaho.type.Type#hasDescendants}.
            */
           get strategies() {
-            return this.__strategies;
+            return this.__strategyTypeList;
           },
 
           set strategies(values) {
@@ -230,17 +226,27 @@ define([
 
             if(values == null) return;
 
-            this.__setStrategies(values, /* isDefault: */false);
+            this.__setStrategyTypes(values, /* isDefault: */false);
           },
 
-          __setStrategies: function(values, isDefault) {
+          __setStrategyTypes: function(values, isDefault) {
 
-            var strategies = new ListOfStrategyType(values, {isReadOnly: true});
+            var strategyTypeList = [];
+            var strategyTypeSet = Object.create(null);
 
-            // Collect role adapter factories from the strategies, for each internal mode.
+            values.forEach(function(value) {
+              var strategyType = __context.get(value).type;
+
+              if(!O.hasOwn(strategyTypeSet, strategyType.uid)) {
+                strategyTypeSet[strategyType.uid] = true;
+                strategyTypeList.push(strategyType);
+              }
+            });
+
+            // Collect strategies that apply, for each internal mode.
             // Determine external modes.
 
-            var strategyMethodInfos = [];
+            var strategyTypeApplicationList = [];
 
             var externalModes = new ListOfModeType();
 
@@ -250,39 +256,37 @@ define([
 
               var isContinuous = internalMode.isContinuous;
 
-              strategies.each(function(strategy) {
+              strategyTypeList.forEach(function(strategyType) {
 
-                var strategyMethods = strategy.selectMethods(internalMode.dataType, isVisualKey);
-                if(strategyMethods != null) {
+                var inputType = strategyType.getInputTypeFor(internalMode.dataType, isVisualKey);
+                if(inputType != null) {
 
-                  strategyMethods.forEach(function(strategyMethod) {
+                  var externalMode = new Mode({dataType: inputType, isContinuous: isContinuous});
 
-                    var externalMode = new Mode({dataType: strategyMethod.inputDataType, isContinuous: isContinuous});
+                  externalModes.add(externalMode);
+                  externalMode = externalModes.get(externalMode.$key);
 
-                    externalModes.add(externalMode);
-                    externalMode = externalModes.get(externalMode.$key);
-
-                    strategyMethodInfos.push(/** @type {pentaho.visual.role.IStrategyMethodInfo} */{
+                  strategyTypeApplicationList.push(
+                    /** @type {pentaho.visual.role.adaptation.IStrategyApplication} */Object.freeze({
                       externalMode: externalMode,
-                      method: strategyMethod,
+                      strategyType: strategyType,
                       internalMode: internalMode
-                    });
-                  });
+                    }));
                 }
               });
             });
 
             this.__modes = externalModes;
 
-            this.__strategies = strategies;
+            this.__strategyTypeList = strategyTypeList;
 
-            this.__isStrategiesDefault = !!isDefault;
+            this.__isStrategyTypesDefault = !!isDefault;
 
-            this.__strategyMethodInfos = strategyMethodInfos;
+            this.__strategyTypeApplicationList = strategyTypeApplicationList;
           },
           // endregion
 
-          // region selectAdaptationStrategyMethodOn
+          // region selectAdaptationStrategyOn
           /**
            * Selects a valid adaptation strategy method for the corresponding visual role of the given model adapter.
            *
@@ -294,10 +298,10 @@ define([
            *
            * @param {!pentaho.visual.base.ModelAdapter} modelAdapter - The model adapter.
            *
-           * @return {pentaho.visual.role.IAdaptationStrategyMethodSelection} A strategy method selection instance,
-           * if a method can be applied; `null`, otherwise.
+           * @return {pentaho.visual.role.adaptation.IStrategyApplication} A valid strategy method application,
+           * if one can be applied; `null`, otherwise.
            */
-          selectAdaptationStrategyMethodOn: function(modelAdapter) {
+          selectAdaptationStrategyOn: function(modelAdapter) {
 
             var externalMapping = modelAdapter.get(this);
             if(!externalMapping.hasFields) {
@@ -311,19 +315,19 @@ define([
             }
 
             var schemaData = modelAdapter.data;
-            var strategyMethodInfos = this.__strategyMethodInfos;
-            var M = strategyMethodInfos.length;
+            var strategyApplicationList = this.__strategyTypeApplicationList;
+            var M = strategyApplicationList.length;
             var m = -1;
             var isCategoricalFixed = externalMapping.isCategoricalFixed;
             while(++m < M) {
-              var strategyMethodInfo = strategyMethodInfos[m];
-              if(!isCategoricalFixed || !strategyMethodInfo.externalMode.isContinuous) {
+              var strategyApplication = strategyApplicationList[m];
+              if(!isCategoricalFixed || !strategyApplication.externalMode.isContinuous) {
 
-                var selection = this.__validateAdaptationStrategyMethod(
-                  strategyMethodInfo, schemaData, externalFieldIndexes);
+                var validStrategyApplication = this.__validateStrategyApplication(
+                  strategyApplication, schemaData, externalFieldIndexes);
 
-                if(selection !== null) {
-                  return selection;
+                if(validStrategyApplication !== null) {
+                  return validStrategyApplication;
                 }
               }
             }
@@ -332,21 +336,22 @@ define([
           },
 
           /**
-           * Performs basic validation that the external fields are compatible with the method's external data type,
-           * and if so, calls the strategy method's own validation.
+           * Performs basic validation that the external fields are compatible with the strategy's external data type,
+           * and if so, calls the strategy type's own validation.
            *
-           * @param {!pentaho.visual.role.IStrategyMethodInfo} strategyMethodInfo - The adaptation strategy method info.
+           * @param {!pentaho.visual.role.adaptation.IStrategyApplication} strategyApplication - The strategy type
+           * application.
            * @param {!pentaho.data.Table} schemaData - The schema data table.
            * @param {!Array.<number>} externalFieldIndexes - The indexes of the external fields.
            *
-           * @return {pentaho.visual.role.IAdaptationStrategyMethodSelection} A strategy method selection,
+           * @return {pentaho.visual.role.adaptation.IStrategyApplication} A valid strategy type application,
            * if the application is valid; `null`, otherwise.
            *
            * @private
            */
-          __validateAdaptationStrategyMethod: function(strategyMethodInfo, schemaData, externalFieldIndexes) {
+          __validateStrategyApplication: function(strategyApplication, schemaData, externalFieldIndexes) {
 
-            var externalDataType = strategyMethodInfo.method.inputDataType;
+            var externalDataType = strategyApplication.externalMode.dataType;
             var externalFieldCount = externalFieldIndexes.length;
 
             // 1) Non-list input data types can only handle a single field.
@@ -366,16 +371,16 @@ define([
               }
             }
 
-            var application = strategyMethodInfo.method.validateApplication(schemaData, externalFieldIndexes);
-            if(application === null) {
+            var validation = strategyApplication.strategyType.validateApplication(schemaData, externalFieldIndexes);
+            if(!validation.isValid) {
               return null;
             }
 
-            return /** @type {!pentaho.visual.role.IAdaptationStrategyMethodSelection} */Object.freeze({
-              externalMode: strategyMethodInfo.externalMode,
-              validMethodApplication: application,
-              internalMode: strategyMethodInfo.internalMode
-            });
+            var result = Object.create(strategyApplication);
+            result.externalFieldIndexes = externalFieldIndexes;
+            result.addsFields = validation.addsFields;
+
+            return /** @type {!pentaho.visual.role.adaptation.IStrategyApplication} */Object.freeze(result);
           },
           // endregion
 
@@ -406,9 +411,9 @@ define([
               var mapping = modelAdapter.get(this);
 
               // Can adapt.
-              if(mapping.adapter === null) {
+              if(mapping.strategy === null) {
                 addErrors(new ValidationError(
-                  bundle.format(bundle.structured.errors.property.noAdapter, {role: this})));
+                  bundle.format(bundle.structured.errors.property.noStrategy, {role: this})));
               }
 
               // TODO: Validate internal property?
@@ -424,10 +429,12 @@ define([
 
             var any = this.base(spec, keyArgs);
 
-            var strategies = O.getOwn(this, "__strategies");
-            if(strategies && !this.__isStrategiesDefault) {
+            var strategyTypesList = O.getOwn(this, "__strategyTypeList");
+            if(strategyTypesList && !this.__isStrategyTypesDefault) {
               any = true;
-              spec.strategies = strategies.toSpecInContext(keyArgs);
+              spec.strategies = strategyTypesList.map(function(strategyType) {
+                return strategyType.toRefInContext(keyArgs);
+              });
             }
 
             return any;

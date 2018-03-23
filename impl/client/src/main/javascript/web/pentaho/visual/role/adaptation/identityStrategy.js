@@ -58,7 +58,7 @@ define([
         constructor: function(instSpec) {
 
           instSpec = Object.create(instSpec);
-          instSpec.outputFieldIndexes = instSpec.fieldIndexes;
+          instSpec.outputFieldIndexes = instSpec.inputFieldIndexes;
 
           this.base(instSpec);
 

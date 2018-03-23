@@ -40,7 +40,6 @@ define([
       var NullStrategy;
       var ListIdentityStrategy;
       var ElementIdentityStrategy;
-      var ElementIdentityStrategyMethod;
 
       beforeAll(function() {
         return Context.createAsync()
@@ -93,7 +92,6 @@ define([
 
               NullStrategy = mocks.NullStrategy;
               ListIdentityStrategy = mocks.ListIdentityStrategy;
-              ElementIdentityStrategyMethod = mocks.ElementIdentityStrategyMethod;
               ElementIdentityStrategy = mocks.ElementIdentityStrategy;
             });
           });
@@ -143,39 +141,38 @@ define([
 
           function configAmd(localRequire) {
 
-            localRequire.define("CustomStrategy", function() {
+            localRequire.define("CustomStrategyA", function() {
               return [
                 "pentaho/visual/role/adaptation/strategy",
                 function(Strategy) {
                   return Strategy.extend({
-                    selectMethods: function() { return null; }
+                    $type: {
+                      getInputTypeFor: function() { return null; }
+                    }
                   });
                 }
               ];
             });
 
-            localRequire.define("strategyA", function() {
+            localRequire.define("CustomStrategyB", function() {
               return [
-                "CustomStrategy",
-                function(CustomStrategy) { return new CustomStrategy(); }
-              ];
-            });
-
-            localRequire.define("strategyB", function() {
-              return [
-                "CustomStrategy",
-                function(CustomStrategy) { return new CustomStrategy(); }
+                "pentaho/visual/role/adaptation/strategy",
+                function(Strategy) {
+                  return Strategy.extend({
+                    $type: {
+                      getInputTypeFor: function() { return null; }
+                    }
+                  });
+                }
               ];
             });
 
             localRequire.config({
               config: {
                 "pentaho/typeInfo": {
-                  "pentaho/visual/role/adaptation/strategy": {base: "pentaho/type/instance"}
-                },
-                "pentaho/instanceInfo": {
-                  "strategyA": {type: "pentaho/visual/role/adaptation/strategy"},
-                  "strategyB": {type: "pentaho/visual/role/adaptation/strategy"}
+                  "pentaho/visual/role/adaptation/strategy": {base: "pentaho/type/instance"},
+                  "CustomStrategyA": {base: "pentaho/visual/role/adaptation/strategy"},
+                  "CustomStrategyB": {base: "pentaho/visual/role/adaptation/strategy"}
                 }
               }
             });
@@ -204,15 +201,15 @@ define([
                     }
                   });
 
-                  spyOn(ExternalProperty.type, "__setStrategies");
+                  spyOn(ExternalProperty.type, "__setStrategyTypes");
 
                   var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel);
 
                   var propType = DerivedModelAdapter.type.get("stringKeyRole");
 
-                  var strategies = propType.__setStrategies.calls.argsFor(0)[0];
+                  var strategyTypes = propType.__setStrategyTypes.calls.argsFor(0)[0];
 
-                  expect(strategies.length).toBe(2);
+                  expect(strategyTypes.length).toBe(2);
                 });
               });
           });
@@ -220,7 +217,9 @@ define([
 
         it("should respect the specified #strategies", function() {
 
-          var strategies = [new NullStrategy(), new NullStrategy()];
+          var NullStrategy2 = NullStrategy.extend();
+
+          var strategies = [NullStrategy.type, NullStrategy2.type];
 
           var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
             {
@@ -231,7 +230,7 @@ define([
 
           var externalPropType = DerivedModelAdapter.type.get("stringKeyRole");
 
-          expect(externalPropType.strategies.toArray()).toEqual(strategies);
+          expect(externalPropType.strategies).toEqual(strategies);
         });
 
         it("should generate an empty #modes list when there are no strategies", function() {
@@ -252,7 +251,7 @@ define([
 
         it("should generate an empty #modes list when no strategy methods are selected", function() {
 
-          var strategies = [new NullStrategy()];
+          var strategies = [NullStrategy.type];
 
           var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
             {
@@ -268,7 +267,7 @@ define([
 
         it("should generate an external mode when an element identity strategy method is selected", function() {
 
-          var strategies = [new ElementIdentityStrategy()];
+          var strategies = [ElementIdentityStrategy.type];
 
           var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
             {
@@ -284,7 +283,7 @@ define([
 
         it("should generate an external mode distinct from the internal mode", function() {
 
-          var strategies = [new ElementIdentityStrategy()];
+          var strategies = [ElementIdentityStrategy.type];
           var internalPropType = DerivedModel.type.get("stringKeyRole");
 
           var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
@@ -301,7 +300,7 @@ define([
 
         it("should generate a categorical external mode if the internal mode is categorical", function() {
 
-          var strategies = [new ElementIdentityStrategy()];
+          var strategies = [ElementIdentityStrategy.type];
           var internalPropType = DerivedModel.type.get("stringKeyRole");
 
           var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
@@ -318,7 +317,7 @@ define([
 
         it("should generate a continuous external mode if the internal mode is continuous", function() {
 
-          var strategies = [new ElementIdentityStrategy()];
+          var strategies = [ElementIdentityStrategy.type];
 
           var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
             {
@@ -334,7 +333,7 @@ define([
 
         it("should generate external modes in order of internal modes", function() {
 
-          var strategies = [new ElementIdentityStrategy()];
+          var strategies = [ElementIdentityStrategy.type];
 
           var internalPropType = DerivedModel.type.get("stringAndNumberRole");
 
@@ -354,7 +353,7 @@ define([
 
         it("should generate distinct external modes", function() {
 
-          var strategies = [new ElementIdentityStrategy(), new ElementIdentityStrategy()];
+          var strategies = [ElementIdentityStrategy.type, ElementIdentityStrategy.type];
 
           var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
             {
@@ -421,7 +420,7 @@ define([
 
             it("should have countRange.max = 1 if there are only element modes", function() {
 
-              var strategies = [new ElementIdentityStrategy()];
+              var strategies = [ElementIdentityStrategy.type];
 
               var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
                 {
@@ -444,7 +443,7 @@ define([
 
             it("should have countRange.max = Infinity if there is at least one list mode", function() {
 
-              var strategies = [new ElementIdentityStrategy(), new ListIdentityStrategy()];
+              var strategies = [ElementIdentityStrategy.type, ListIdentityStrategy.type];
 
               var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringListRole, [
                 {
@@ -470,7 +469,7 @@ define([
 
             it("should have countRange.min = 1 if internal role is required", function() {
 
-              var strategies = [new ElementIdentityStrategy()];
+              var strategies = [ElementIdentityStrategy.type];
 
               var CustomModel = Model.extend({
                 $type: {
@@ -510,7 +509,7 @@ define([
 
             it("should have countRange.min = 0 if internal role is not required", function() {
 
-              var strategies = [new ElementIdentityStrategy()];
+              var strategies = [ElementIdentityStrategy.type];
 
               var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
                 {
@@ -538,7 +537,7 @@ define([
 
             it("should have countRange.max = 1 if the current mode is an element mode", function() {
 
-              var strategies = [new ElementIdentityStrategy()];
+              var strategies = [ElementIdentityStrategy.type];
 
               var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
                 {
@@ -567,7 +566,7 @@ define([
 
             it("should have countRange.max = Infinity if the current mode is a list mode", function() {
 
-              var strategies = [new ListIdentityStrategy()];
+              var strategies = [ListIdentityStrategy.type];
 
               var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringListRole, [
                 {
@@ -597,11 +596,11 @@ define([
         });
       });
 
-      describe("#selectAdaptationStrategyMethodOn(modelAdapter)", function() {
+      describe("#selectAdaptationStrategyOn(modelAdapter)", function() {
 
         it("should return null if the role is not mapped", function() {
 
-          var strategies = [new ElementIdentityStrategy()];
+          var strategies = [ElementIdentityStrategy.type];
 
           var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
             {
@@ -616,14 +615,14 @@ define([
             data: new Table(getDataSpec1())
           });
 
-          var methodSelection = externalPropType.selectAdaptationStrategyMethodOn(modelAdapter);
+          var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-          expect(methodSelection).toBe(null);
+          expect(strategyApplication).toBe(null);
         });
 
         it("should return null if the model has no data", function() {
 
-          var strategies = [new ElementIdentityStrategy()];
+          var strategies = [ElementIdentityStrategy.type];
 
           var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
             {
@@ -638,14 +637,14 @@ define([
             stringKeyRole: {fields: ["country"]}
           });
 
-          var methodSelection = externalPropType.selectAdaptationStrategyMethodOn(modelAdapter);
+          var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-          expect(methodSelection).toBe(null);
+          expect(strategyApplication).toBe(null);
         });
 
         it("should return null if one of the mapped fields is not defined", function() {
 
-          var strategies = [new ElementIdentityStrategy()];
+          var strategies = [ElementIdentityStrategy.type];
 
           var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
             {
@@ -661,16 +660,16 @@ define([
             stringKeyRole: {fields: ["foo"]}
           });
 
-          var methodSelection = externalPropType.selectAdaptationStrategyMethodOn(modelAdapter);
+          var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-          expect(methodSelection).toBe(null);
+          expect(strategyApplication).toBe(null);
         });
 
         describe("mapping has a specified isCategoricalFixed", function() {
 
           it("should return null if there is no compatible mode (isCategoricalFixed=true)", function() {
 
-            var strategies = [new ElementIdentityStrategy()];
+            var strategies = [ElementIdentityStrategy.type];
 
             var CustomModel = Model.extend({
               $type: {
@@ -703,15 +702,15 @@ define([
               }
             });
 
-            var methodSelection = externalPropType.selectAdaptationStrategyMethodOn(modelAdapter);
+            var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-            expect(methodSelection).toBe(null);
+            expect(strategyApplication).toBe(null);
           });
 
           it("should return a method selection if there are compatible modes " +
             "(isCategoricalFixed=false)", function() {
 
-            var strategies = [new ElementIdentityStrategy()];
+            var strategies = [ElementIdentityStrategy.type];
 
             var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
               {
@@ -730,17 +729,17 @@ define([
               }
             });
 
-            var methodSelection = externalPropType.selectAdaptationStrategyMethodOn(modelAdapter);
+            var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-            expect(methodSelection).not.toBe(null);
-            expect(methodSelection.internalMode).toBe(ModelWithStringRole.type.get("roleA").modes.at(0));
-            expect(methodSelection.externalMode).toBe(externalPropType.modes.at(0));
+            expect(strategyApplication).not.toBe(null);
+            expect(strategyApplication.internalMode).toBe(ModelWithStringRole.type.get("roleA").modes.at(0));
+            expect(strategyApplication.externalMode).toBe(externalPropType.modes.at(0));
           });
 
           it("should return a method selection if there are compatible modes " +
             "(isCategoricalFixed=true)", function() {
 
-            var strategies = [new ElementIdentityStrategy()];
+            var strategies = [ElementIdentityStrategy.type];
 
             var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
               {
@@ -759,11 +758,11 @@ define([
               }
             });
 
-            var methodSelection = externalPropType.selectAdaptationStrategyMethodOn(modelAdapter);
+            var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-            expect(methodSelection).not.toBe(null);
-            expect(methodSelection.internalMode).toBe(ModelWithStringRole.type.get("roleA").modes.at(0));
-            expect(methodSelection.externalMode).toBe(externalPropType.modes.at(0));
+            expect(strategyApplication).not.toBe(null);
+            expect(strategyApplication.internalMode).toBe(ModelWithStringRole.type.get("roleA").modes.at(0));
+            expect(strategyApplication.externalMode).toBe(externalPropType.modes.at(0));
           });
         });
 
@@ -771,7 +770,7 @@ define([
 
           it("should return null if there is more than one field and the mode data type is not list", function() {
 
-            var strategies = [new ElementIdentityStrategy()];
+            var strategies = [ElementIdentityStrategy.type];
 
             var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
               {
@@ -789,14 +788,14 @@ define([
               }
             });
 
-            var methodSelection = externalPropType.selectAdaptationStrategyMethodOn(modelAdapter);
+            var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-            expect(methodSelection).toBe(null);
+            expect(strategyApplication).toBe(null);
           });
 
           it("should return null if the field data type is not a subtype of the mode data type", function() {
 
-            var strategies = [new ElementIdentityStrategy()];
+            var strategies = [ElementIdentityStrategy.type];
 
             var CustomModel = Model.extend({
               $type: {
@@ -827,14 +826,14 @@ define([
               }
             });
 
-            var methodSelection = externalPropType.selectAdaptationStrategyMethodOn(modelAdapter);
+            var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-            expect(methodSelection).toBe(null);
+            expect(strategyApplication).toBe(null);
           });
 
           it("should return null if one the fields' data type is not a subtype of the mode data type", function() {
 
-            var strategies = [new ListIdentityStrategy()];
+            var strategies = [ListIdentityStrategy.type];
 
             var CustomModel = Model.extend({
               $type: {
@@ -865,15 +864,15 @@ define([
               }
             });
 
-            var methodSelection = externalPropType.selectAdaptationStrategyMethodOn(modelAdapter);
+            var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-            expect(methodSelection).toBe(null);
+            expect(strategyApplication).toBe(null);
           });
 
           it("should return a method selection for a list mode and multiple fields " +
             "of compatible data type", function() {
 
-            var strategies = [new ListIdentityStrategy()];
+            var strategies = [ListIdentityStrategy.type];
 
             var CustomModel = Model.extend({
               $type: {
@@ -904,14 +903,14 @@ define([
               }
             });
 
-            var methodSelection = externalPropType.selectAdaptationStrategyMethodOn(modelAdapter);
+            var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-            expect(methodSelection).not.toBe(null);
+            expect(strategyApplication).not.toBe(null);
           });
 
           it("should call the #validateApplication method of each compatible strategy method", function() {
 
-            var strategies = [new ElementIdentityStrategy()];
+            var strategies = [ElementIdentityStrategy.type];
 
             var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
               {
@@ -929,12 +928,12 @@ define([
               }
             });
 
-            spyOn(ElementIdentityStrategyMethod.prototype, "validateApplication").and.returnValue(null);
+            spyOn(ElementIdentityStrategy.Type.prototype, "validateApplication").and.returnValue({isValid: false});
 
-            externalPropType.selectAdaptationStrategyMethodOn(modelAdapter);
+            externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
             var fieldsIndexes = [0];
-            expect(ElementIdentityStrategyMethod.prototype.validateApplication).toHaveBeenCalledWith(
+            expect(ElementIdentityStrategy.Type.prototype.validateApplication).toHaveBeenCalledWith(
               modelAdapter.data,
               fieldsIndexes
             );
@@ -942,7 +941,7 @@ define([
 
           it("should return the method selection for the first compatible strategy", function() {
 
-            var strategies = [new ListIdentityStrategy(), new ElementIdentityStrategy(), new ElementIdentityStrategy()];
+            var strategies = [ListIdentityStrategy.type, ElementIdentityStrategy.type, ElementIdentityStrategy.type];
 
             var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
               {
@@ -960,10 +959,10 @@ define([
               }
             });
 
-            var methodSelection = externalPropType.selectAdaptationStrategyMethodOn(modelAdapter);
+            var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-            expect(methodSelection).not.toBe(null);
-            expect(methodSelection.validMethodApplication.method.strategy).toBe(strategies[1]);
+            expect(strategyApplication).not.toBe(null);
+            expect(strategyApplication.strategyType).toBe(strategies[1]);
           });
         });
       });
@@ -989,7 +988,7 @@ define([
 
             it("should stop validation if base validation returns errors", function() {
 
-              var strategies = [new ElementIdentityStrategy()];
+              var strategies = [ElementIdentityStrategy.type];
 
               var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
                 {
@@ -1045,7 +1044,7 @@ define([
 
             it("should be valid, when there is a selected strategy method", function() {
 
-              var strategies = [new ElementIdentityStrategy()];
+              var strategies = [ElementIdentityStrategy.type];
 
               var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
                 {
@@ -1100,7 +1099,7 @@ define([
 
             var scope = new SpecificationScope();
 
-            var strategies = [new ElementIdentityStrategy()];
+            var strategies = [ElementIdentityStrategy.type];
 
             var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
               {

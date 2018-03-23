@@ -15,11 +15,10 @@
  */
 define([
   "pentaho/i18n!messages",
-  "pentaho/type/util",
 
   // so that r.js sees otherwise invisible dependencies.
   "./abstractMapping"
-], function(bundle, typeUtil) {
+], function(bundle) {
 
   "use strict";
 
@@ -27,7 +26,7 @@ define([
     "./abstractMapping",
     function(AbstractMapping) {
 
-      // NOTE: these will be kept private until it is decided between the adapter and the viz concept.
+      // NOTE: these will be kept private until it is decided between the model adapter and the viz concept.
 
       /**
        * @name pentaho.visual.role.ExternalMapping.Type
@@ -61,20 +60,16 @@ define([
        */
       var ExternalMapping = AbstractMapping.extend(/** @lends pentaho.visual.role.ExternalMapping# */{
 
-        // region adapter
+        // region strategy
         /**
-         * Gets the current adapter, if any, or `null`.
+         * Gets the current strategy, if any, or `null`.
          *
-         * @type {pentaho.visual.role.adaptation.IAdapter}
+         * @type {pentaho.visual.role.adaptation.Strategy}
          * @readOnly
          */
-        get adapter() {
+        get strategy() {
           var iref = this._modelReference;
-          if(iref !== null) {
-            return iref.container.__getAmbientRoleAdapter(iref.property.name);
-          }
-
-          return null;
+          return iref !== null ? iref.container.__getAmbientRoleStrategy(iref.property.name) : null;
         },
         // endregion
 
@@ -88,11 +83,7 @@ define([
          */
         get mode() {
           var iref = this._modelReference;
-          if(iref !== null) {
-            return iref.container.__getAmbientRoleMode(iref.property.name);
-          }
-
-          return null;
+          return iref !== null ? iref.container.__getAmbientRoleMode(iref.property.name) : null;
         },
         // endregion
 

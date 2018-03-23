@@ -23,8 +23,6 @@
  * @name pentaho.visual.role.adaptation.IStrategyApplicationValidation
  *
  * @interface
- *
- * @see pentaho.visual.adaptation.IStrategyMethod
  */
 
 /**

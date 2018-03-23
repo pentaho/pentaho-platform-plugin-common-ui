@@ -62,103 +62,87 @@ define([
       });
 
       exports.NullStrategy = BaseStrategy.extend({
-        selectMethods: function() {
-          return null;
+        $type: {
+          getInputTypeFor: function() {
+            return null;
+          }
         }
-      });
-
-      exports.IdentityRoleAdapter = Base.extend({
-        constructor: function(method, data, inputFieldIndexes) {
-          this.method = method;
-          this.data = data;
-          this.inputFieldIndexes = inputFieldIndexes;
-          this.outputFieldIndexes = inputFieldIndexes;
-        },
-        adapt: function() {}
       });
 
       // ---
-
-      exports.ElementIdentityStrategyMethod = Base.extend({
-        constructor: function(strategy, outputDataType) {
-          this.strategy = strategy;
-          this.name = null;
-          this.fullName = strategy.$type.uid;
-          this.isIdentity = true;
-          this.isInvertible = false;
-          this.inputDataType = outputDataType;
-          this.outputDataType = outputDataType;
-        },
-
-        validateApplication: function(schemaData, inputFieldIndexes) {
-          return {
-            method: this,
-            schemaData: schemaData,
-            inputFieldIndexes: inputFieldIndexes,
-
-            apply: function(data) {
-              return new exports.IdentityRoleAdapter(this.method, data, this.inputFieldIndexes);
-            }
-          };
-        }
-      });
 
       exports.ElementIdentityStrategy = BaseStrategy.extend({
+        constructor: function(instSpec) {
 
-        selectMethods: function(outputDataType, isVisualKey) {
-          if(outputDataType.isList) {
-            return null;
-          }
+          instSpec = Object.create(instSpec);
+          instSpec.outputFieldIndexes = instSpec.inputFieldIndexes;
 
-          // List of strategy methods
-          return [new exports.ElementIdentityStrategyMethod(this, outputDataType)];
-        }
-      });
-
-      // ---
-
-      exports.ListIdentityStrategyMethod = Base.extend({
-        constructor: function(strategy, outputDataType) {
-          this.strategy = strategy;
-          this.name = null;
-          this.fullName = strategy.$type.uid;
-          this.isIdentity = true;
-          this.isInvertible = false;
-          this.inputDataType = outputDataType;
-          this.outputDataType = outputDataType;
+          this.base(instSpec);
         },
 
-        validateApplication: function(schemaData, inputFieldIndexes) {
-          return {
-            method: this,
-            schemaData: schemaData,
-            inputFieldIndexes: inputFieldIndexes,
+        map: function() {},
 
-            apply: function(data) {
-              return new exports.IdentityRoleAdapter(this.method, data, this.inputFieldIndexes);
+        $type: {
+          getInputTypeFor: function(outputDataType, isVisualKey) {
+            if(outputDataType.isList) {
+              return null;
             }
-          };
-        }
-      });
 
-      exports.ListIdentityStrategy = BaseStrategy.extend({
-        selectMethods: function(outputDataType, isVisualKey) {
-          if(!outputDataType.isList) {
-            return null;
+            return outputDataType;
+          },
+          validateApplication: function(schemaData, inputFieldIndexes) {
+            return {isValid: true, addsFields: false};
+          },
+          apply: function(data, inputFieldIndexes) {
+            return new exports.ElementIdentityStrategy({
+              data: data,
+              inputFieldIndexes: inputFieldIndexes
+            });
           }
-
-          // List of strategy methods
-          return [new exports.ListIdentityStrategyMethod(this, outputDataType)];
         }
       });
 
       // ---
 
-      exports.CombineRoleAdapter = Base.extend({
-        constructor: function(method, data, inputFieldIndexes) {
-          this.method = method;
-          this.data = data;
-          this.inputFieldIndexes = inputFieldIndexes;
+      exports.ListIdentityStrategy = BaseStrategy.extend({
+        constructor: function(instSpec) {
+
+          instSpec = Object.create(instSpec);
+          instSpec.outputFieldIndexes = instSpec.inputFieldIndexes;
+
+          this.base(instSpec);
+        },
+
+        map: function() {},
+
+        $type: {
+          getInputTypeFor: function(outputDataType, isVisualKey) {
+            if(!outputDataType.isList) {
+              return null;
+            }
+
+            return outputDataType;
+          },
+          validateApplication: function(schemaData, inputFieldIndexes) {
+            return {isValid: true, addsFields: false};
+          },
+          apply: function(data, inputFieldIndexes) {
+            return new exports.ListIdentityStrategy({
+              data: data,
+              inputFieldIndexes: inputFieldIndexes
+            });
+          }
+        }
+      });
+
+      // ---
+
+      exports.CombineStrategy = BaseStrategy.extend({
+        constructor: function(instSpec) {
+
+          instSpec = Object.create(instSpec);
+
+          var data = instSpec.data;
 
           data.model.attributes.add({
             name: "combinedCol",
@@ -168,46 +152,32 @@ define([
 
           var outputFieldIndex = data.addColumn("combinedCol");
 
-          this.outputFieldIndexes = [outputFieldIndex];
-        },
-        adapt: function() {}
-      });
+          instSpec.outputFieldIndexes = [outputFieldIndex];
 
-      exports.CombineStrategyMethod = Base.extend({
-        constructor: function(strategy, outputDataType) {
-          this.strategy = strategy;
-          this.name = null;
-          this.fullName = strategy.$type.uid;
-          this.isIdentity = false;
-          this.isInvertible = false;
-          this.inputDataType = outputDataType.context.get("list").type;
-          this.outputDataType = outputDataType;
+          this.base(instSpec);
         },
 
-        validateApplication: function(schemaData, inputFieldIndexes) {
-          return {
-            method: this,
-            schemaData: schemaData,
-            inputFieldIndexes: inputFieldIndexes,
+        map: function() {},
 
-            apply: function(data) {
-              return new exports.CombineRoleAdapter(this.method, data, this.inputFieldIndexes);
+        $type: {
+          getInputTypeFor: function(outputDataType, isVisualKey) {
+            var stringType = outputDataType.context.get("string").type;
+
+            if(!stringType.isSubtypeOf(outputDataType)) {
+              return null;
             }
-          };
-        }
-      });
 
-      exports.CombineStrategy = BaseStrategy.extend({
-        selectMethods: function(outputDataType, isVisualKey) {
-
-          var stringType = outputDataType.context.get("string").type;
-
-          if(!stringType.isSubtypeOf(outputDataType)) {
-            return null;
+            return outputDataType.context.get("list").type;
+          },
+          validateApplication: function(schemaData, inputFieldIndexes) {
+            return {isValid: true, addsFields: true};
+          },
+          apply: function(data, inputFieldIndexes) {
+            return new exports.CombineStrategy({
+              data: data,
+              inputFieldIndexes: inputFieldIndexes
+            });
           }
-
-          // List of strategy methods
-          return [new exports.CombineStrategyMethod(this, stringType)];
         }
       }, {
         columnName: "combinedCol"
