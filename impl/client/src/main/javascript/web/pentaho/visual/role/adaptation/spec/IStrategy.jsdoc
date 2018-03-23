@@ -23,3 +23,27 @@
  *
  * @see pentaho.visual.role.adaptation.Strategy
  */
+
+/**
+ * The data set to be adapted.
+ *
+ * @name data
+ * @memberOf pentaho.visual.role.adaptation.spec.IStrategy#
+ * @type {!pentaho.data.ITable}
+ */
+
+/**
+ * The indexes of the input fields.
+ *
+ * @name inputFieldIndexes
+ * @memberOf pentaho.visual.role.adaptation.spec.IStrategy#
+ * @type {!Array.<number>}
+ */
+
+/**
+ * The indexes of the output fields.
+ *
+ * @name outputFieldIndexes
+ * @memberOf pentaho.visual.role.adaptation.spec.IStrategy#
+ * @type {!Array.<number>}
+ */

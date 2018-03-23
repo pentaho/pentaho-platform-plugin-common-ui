@@ -15,9 +15,11 @@
  */
 define([
   "module",
-  "pentaho/lang/NotImplementedError",
+  "pentaho/util/object",
+  "pentaho/util/arg",
+  "pentaho/lang/OperationInvalidError",
   "pentaho/i18n!../i18n/messages"
-], function(module, NotImplementedError, bundle) {
+], function(module, O, arg, OperationInvalidError, bundle) {
 
   "use strict";
 
@@ -33,56 +35,173 @@ define([
        * @classDesc The type class of {@link pentaho.visual.role.adaptation.Strategy}.
        */
 
-      /**
-       * @name pentaho.visual.role.adaptation.Strategy
-       * @class
-       * @extends pentaho.type.Complex
-       * @abstract
-       *
-       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.adaptation.Strategy>} pentaho/visual/role/adaptation/strategy
-       *
-       * @classDesc The `Strategy` class describes a strategy for mapping the data mapped to a visual role
-       * from the external data space to the internal data space, and back.
-       *
-       * @description Creates a visual role adaptation strategy instance.
-       * @constructor
-       * @param {pentaho.visual.role.adaptation.spec.IStrategy} [spec] An adaptation strategy specification.
-       */
       var Strategy = Complex.extend(/** @lends pentaho.visual.role.adaptation.Strategy# */{
+
+        /**
+         * @alias Strategy
+         * @memberOf pentaho.visual.role.adaptation
+         * @class
+         * @extends pentaho.type.Complex
+         * @abstract
+         *
+         * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.adaptation.Strategy>} pentaho/visual/role/adaptation/strategy
+         *
+         * @classDesc The `Strategy` class describes a strategy for mapping the data mapped to a visual role
+         * from the external data space to the internal data space, and back.
+         *
+         * @description Creates a visual role adaptation strategy instance.
+         * @constructor
+         * @param {!pentaho.visual.role.adaptation.spec.IStrategy} instSpec - An adaptation strategy specification.
+         */
+        constructor: function(instSpec) {
+
+          this.base(instSpec);
+
+          /**
+           * Gets the data set of this strategy.
+           *
+           * @name pentaho.visual.role.adaptation.Strategy#data
+           * @type {!pentaho.data.ITable}
+           * @readOnly
+           */
+          O.setConst(this, "data", arg.required(instSpec, "data", "instSpec"));
+
+          /**
+           * Gets the indexes of the input fields.
+           *
+           * @name pentaho.visual.role.adaptation.Strategy#inputFieldIndexes
+           * @type {!Array.<number>}
+           * @readOnly
+           */
+          O.setConst(this, "inputFieldIndexes", arg.required(instSpec, "inputFieldIndexes", "instSpec"));
+
+          /**
+           * Gets the indexes of the output fields.
+           *
+           * In identity-like strategies, `outputFieldIndexes` are equal to `inputFieldIndexes`.
+           *
+           * @name pentaho.visual.role.adaptation.Strategy#outputFieldIndexes
+           * @type {!Array.<number>}
+           * @readOnly
+           */
+          O.setConst(this, "outputFieldIndexes", arg.required(instSpec, "outputFieldIndexes", "instSpec"));
+        },
+
+        /**
+         * Gets a value that indicates if the strategy is invertible.
+         *
+         * The default implementation returns `false`.
+         *
+         * @name pentaho.visual.role.adaptation.Strategy#isInvertible
+         * @type {boolean}
+         * @readOnly
+         */
+        get isInvertible() {
+          return false;
+        },
+
+        /**
+         * Gets the output data cells that correspond to the given input values or cells.
+         *
+         * In the case of adaptation strategies,
+         * such as the [tuple]{@link pentaho.visual.role.adaptation.TupleStrategy} strategy,
+         * that have more than one [output field]{@link pentaho.visual.role.adaptation.Strategy#outputFieldIndexes},
+         * the values or cells of all of the output fields (or a left-aligned part of these) should be provided.
+         *
+         * @name pentaho.visual.role.adaptation.Strategy#map
+         * @method
+         *
+         * @param {Array.<any|!pentaho.data.ICell>} inputValues - The output value(s) or cell(s).
+         *
+         * @return {Array.<!pentaho.data.ICell>} The output cells, when the given input values are present;
+         * `null`, otherwise.
+         *
+         * @abstract
+         */
+
+        /**
+         * Gets the input data cells that correspond to the given output values or cells.
+         *
+         * In the case of adaptation strategies,
+         * such as the [tuple]{@link pentaho.visual.role.adaptation.TupleStrategy} strategy,
+         * that have more than one [output field]{@link pentaho.visual.role.adaptation.Strategy#outputFieldIndexes},
+         * the values or cells of all of the output fields (or a left-aligned part of these) should be provided.
+         *
+         * @name pentaho.visual.role.adaptation.Strategy#invert
+         * @method
+         *
+         * @param {Array.<any|!pentaho.data.ICell>} outputValues - The output value(s) or cell(s).
+         *
+         * @return {Array.<!pentaho.data.ICell>} The input cells, when the given output values are present;
+         * `null`, otherwise.
+         */
+        invert: function(outputValues) {
+          throw new OperationInvalidError("Not supported.");
+        },
 
         $type: /** @lends pentaho.visual.role.adaptation.Strategy.Type# */{
           id: module.id,
 
           isAbstract: true
-        },
 
-        /**
-         * Selects the methods of this strategy that are compatible with the given output data type and
-         * visual key nature.
-         *
-         * If no methods apply to the given arguments, `null` should be returned.
-         *
-         * The actual output data type of the returned methods may be a [subtype]{@link pentaho.type.Type#isSubtypeOf}
-         * of the given `outputDataType`.
-         *
-         * @name selectMethods
-         * @memberOf pentaho.visual.role.adaptation.Strategy#
-         * @method
-         * @param {!pentaho.type.Type} outputDataType - The output data type.
-         * @param {boolean} isVisualKey - Indicates that the returned method must preserve the key nature
-         * of input fields. The returned method must be
-         * [invertible]{@link pentaho.visual.role.adaptation.IStrategyMethod#isInvertible}.
-         *
-         * @return {Array.<!pentaho.visual.role.adaptation.IStrategyMethod>} A list of methods, if any apply;
-         * `null`, if none.
-         *
-         * @abstract
-         */
+          /**
+           * Gets the input data type that would be required for this strategy to output a
+           * given output data type and visual key nature.
+           *
+           * If the strategy cannot be applied to the given arguments, `null` should be returned.
+           *
+           * @name getInputTypeFor
+           * @memberOf pentaho.visual.role.adaptation.Strategy.Type#
+           * @method
+           *
+           * @param {!pentaho.type.Type} outputDataType - The output data type.
+           * @param {boolean} isVisualKey - Indicates that the strategy should be able to preserve the key nature
+           * of input fields. Created strategies should be
+           * [invertible]{@link pentaho.visual.role.adaptation.Strategy#isInvertible}.
+           *
+           * @return {pentaho.type.Type} The input type, if the strategy can be applied; `null`, if not.
+           *
+           * @abstract
+           */
 
-        // ---
+          /**
+           * Validates if the strategy is applicable to the given fields of a schema data table.
+           *
+           * This method can only be called if the data types of the given fields are compatible with the result of
+           * a previous call to [getInputTypeFor]{@link pentaho.visual.role.adaptation.Strategy.Type#getInputTypeFor}.
+           *
+           * @name validateApplication
+           * @memberOf pentaho.visual.role.adaptation.Strategy.Type#
+           * @method
+           *
+           * @param {!pentaho.data.Table} schemaData - A data table representative of the schema of the data.
+           * @param {!Array.<number>} inputFieldIndexes - The indexes of the input fields.
+           *
+           * @return {!pentaho.visual.role.adaptation.IStrategyApplicationValidation} A method application
+           * validation object.
+           *
+           * @abstract
+           */
 
-        selectMethods: function() {
-          throw new NotImplementedError();
+          /**
+           * Applies the strategy to the given data and fields.
+           *
+           * This method can only be called if a previous call to
+           * [validateApplication]{@link pentaho.visual.role.adaptation.Strategy.Type#validateApplication}
+           * with compatible arguments returned a
+           * [valid]{@link pentaho.visual.role.adaptation.IStrategyApplicationValidation#isValid} application object.
+           *
+           * @name apply
+           * @memberOf pentaho.visual.role.adaptation.Strategy.Type#
+           * @method
+           *
+           * @param {!pentaho.data.Table} data - A data table.
+           * @param {!Array.<number>} inputFieldIndexes - The indexes of the input fields.
+           *
+           * @return {!pentaho.visual.role.adaptation.Strategy} A strategy instance.
+           *
+           * @abstract
+           */
         }
       })
       .implement({$type: bundle.structured.adaptation.strategy});
