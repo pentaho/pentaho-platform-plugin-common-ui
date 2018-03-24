@@ -396,7 +396,8 @@ define([
          *
          * @param {!Object.<string, any|pentaho.data.ICell>} originalValuesMap - The map of property names to
          * values and/or cells.
-         * @param {boolean} toExternal If true converts from internal to external properties, the other way around if false.
+         * @param {boolean} toExternal If true converts from internal to external properties,
+         * the other way around if false.
          *
          * @return {!Object.<string, pentaho.data.ICell>} The corresponding map of internal property names to cells.
          *
@@ -427,48 +428,6 @@ define([
           });
 
           return convertedValuesMap;
-        },
-
-        /**
-         * Converts a given map of internal property names to values and/or cells into
-         * a map of external property names to cells.
-         *
-         * Internal properties which are mapped to visual roles which are not currently valid
-         * (have no defined strategy), are skipped.
-         * Internal properties whose values are not known to the current strategy are skipped.
-         *
-         * @param {!Object.<string, any|pentaho.data.ICell>} internalValuesMap - The map of internal property names to
-         * values and/or cells.
-         *
-         * @return {!Object.<string, pentaho.data.ICell>} The corresponding map of external property names to cells.
-         *
-         * @private
-         */
-        __convertValuesMapToExternal: function(internalValuesMap) {
-          var ambientRoleInfoMap = this.__getAmbientAdaptationModel().roleInfoMap;
-          var externalValuesMap = Object.create(null);
-
-          this.model.$type.eachVisualRole(function(propType) {
-            var internalMapping = this.model.get(propType);
-            var strategy;
-
-            if(internalMapping.hasFields && (strategy = ambientRoleInfoMap[propType.name].strategy) !== null) {
-              var internalFieldValues = __collectFieldValues(internalMapping, internalValuesMap);
-              if(internalFieldValues !== null) {
-
-                var externalFieldCells = strategy.invert(internalFieldValues);
-                if(externalFieldCells !== null) {
-                  var inputFieldNames = strategy.inputFieldNames;
-
-                  externalFieldCells.forEach(function(externalFieldCell, index) {
-                    externalValuesMap[inputFieldNames[index]] = externalFieldCell;
-                  });
-                }
-              }
-            }
-          }, this);
-
-          return externalValuesMap;
         },
         // endregion
 
@@ -589,6 +548,7 @@ define([
       // region Filter Conversion
       function __transformFilter(filter, internalData, toExternal) {
         var operands;
+        var equalsMap;
 
         if(filter.kind === "or") {
           // a or b
@@ -609,7 +569,7 @@ define([
 
         if(filter.kind === "and") {
           // Collect and replace all isEqual children.
-          var equalsMap = null;
+          equalsMap = null;
           operands = [];
 
           filter.operands.each(function(operandFilter) {
@@ -620,7 +580,7 @@ define([
 
               equalsMap[operandFilter.property] = operandFilter.value;
             } else {
-              // passthrough other filter kinds
+              // Pass-through other filter kinds.
               operands.push(operandFilter);
             }
           });
@@ -641,7 +601,7 @@ define([
 
         // Top-level isEqual
         if(filter.kind === "isEqual") {
-          var equalsMap = {};
+          equalsMap = {};
           equalsMap[filter.property] = IsEqualFilter.value;
 
           equalsMap = this.__convertValuesMap(equalsMap);
@@ -651,7 +611,7 @@ define([
           return filter !== null ? filter : TrueFilter.instance;
         }
 
-        // passthrough other filter kinds
+        // Pass-through other filter kinds.
         return filter;
       }
       // endregion
@@ -799,7 +759,7 @@ define([
         if(fieldValues == null) {
           fieldValues = [value];
         } else {
-          fieldValues.push(externalValue);
+          fieldValues.push(value);
         }
       } else {
         // break on the first field which is not present.
