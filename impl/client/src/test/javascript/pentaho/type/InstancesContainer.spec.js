@@ -32,7 +32,6 @@ define([
     describe("tests with a shared context instance", function() {
 
       var context;
-      var Complex;
       var Instance;
       var container;
 
@@ -42,8 +41,6 @@ define([
             .then(function(_context) {
               context = _context;
               container = context.instances;
-
-              Complex = context.get("complex");
               Instance = context.get("instance");
             })
             .then(done, done.fail);

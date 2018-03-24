@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,31 +15,21 @@
  */
 
 /**
- * The `spec.IInstanceConfiguration` interface declares an instance
- * in a Type API [instance container]{@link pentaho.type.InstancesContainer}
- * and is part of a [context]{@link pentaho.type.IContext} specification.
+ * The `spec.IContextTypeConfiguration` interface contains the
+ * [context]{@link pentaho.type.IContext} configuration of a Type API type.
  *
- * @name pentaho.type.spec.IInstanceConfiguration
+ * @name pentaho.type.spec.IContextTypeConfiguration
  * @interface
  *
  * @see pentaho.type.IContext
- * @see pentaho.type.spec.InstancesContainer
+ * @see pentaho.type.spec.ContextTypesConfiguration
  */
 
 /**
- * The resolution ranking of the instance.
+ * The resolution ranking of the type.
  *
  * @name ranking
- * @memberOf pentaho.type.spec.IInstanceConfiguration#
+ * @memberOf pentaho.type.spec.IContextTypeConfiguration#
  * @type {number}
  * @default 0
- */
-
-/**
- * Indicates if the instance is enabled.
- *
- * @name isEnabled
- * @memberOf pentaho.type.spec.IInstanceConfiguration#
- * @type {boolean}
- * @default true
  */

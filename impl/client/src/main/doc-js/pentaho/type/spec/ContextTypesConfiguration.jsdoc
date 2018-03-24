@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,10 @@
  */
 
 /**
- * The `spec.InstancesContainer` interface is the configuration of a
- * Type API [instances container]{@link pentaho.type.InstancesContainer}
+ * The `spec.ContextTypesConfiguration` interface contains the configuration of Type API types
  * and is part of a [spec.IContext]{@link pentaho.type.IContext} specification.
  *
- * An object whose keys are instance identifiers and whose values are instance declarations.
+ * An object whose keys are type identifiers and whose values are type context configurations.
  *
- * @typedef {Object.<string, pentaho.type.spec.IInstanceConfiguration>} pentaho.type.spec.InstancesContainer
+ * @typedef {Object.<string, pentaho.type.spec.ITypeConfiguration>} pentaho.type.spec.ContextTypesConfiguration
  */

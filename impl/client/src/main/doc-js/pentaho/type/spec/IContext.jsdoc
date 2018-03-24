@@ -19,7 +19,8 @@
  *
  * The following is a sample [configuration rule set]{@link pentaho.config.spec.IRuleSet} that
  * configures the Type API context for the Analyzer application with the ranking of the hypothetical
- * instance `"my/customSpecialService"`:
+ * instance `"my/customServiceWithLogging"` and
+ * type `"my/CustomType"`:
  *
  * ```json
  * {
@@ -31,8 +32,13 @@
  *       },
  *       "apply": {
  *         "instances": {
- *           "my/customSpecialService": {
- *             "priority": 10
+ *           "my/customServiceWithLogging": {
+ *             "ranking": 10
+ *           }
+ *         },
+ *         "types": {
+ *           "my/CustomType": {
+ *             "ranking": 10
  *           }
  *         }
  *       }
@@ -44,13 +50,22 @@
  * @name pentaho.type.spec.IContext
  * @interface
  *
- * @see pentaho.type.spec.InstancesContainer
+ * @see pentaho.type.spec.ContextInstancesConfiguration
+ * @see pentaho.type.spec.ContextTypesConfiguration
  */
 
 /**
- * The instances' container configuration of the context.
+ * The instances' configuration of the context.
  *
  * @name instances
  * @memberOf pentaho.type.spec.IContext#
- * @type {pentaho.type.spec.InstancesContainer}
+ * @type {pentaho.type.spec.ContextInstancesConfiguration}
+ */
+
+/**
+ * The types' configuration of the context.
+ *
+ * @name types
+ * @memberOf pentaho.type.spec.IContext#
+ * @type {pentaho.type.spec.ContextTypesConfiguration}
  */

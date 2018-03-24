@@ -46,7 +46,7 @@
  *
  * Denotes the list of all of the registered instances of
  * the given list type's [element type]{@link pentaho.type.List.Type#of},
- * ordered from highest to lowest [ranking]{@link pentaho.type.spec.IInstanceConfiguration#ranking}.
+ * ordered from highest to lowest [ranking]{@link pentaho.type.spec.IContextInstanceConfiguration#ranking}.
  *
  * ```json
  * {$instance: {type: ["my/Service"]}}

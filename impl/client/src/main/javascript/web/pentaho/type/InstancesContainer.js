@@ -202,7 +202,7 @@ define([
      *
      * @constructor
      * @param {!pentaho.type.Context} context - The associated type context.
-     * @param {pentaho.type.spec.InstancesContainer} spec - The container specification.
+     * @param {pentaho.type.spec.ContextInstancesConfiguration} spec - The instances' context configuration.
      */
     constructor: function(context, spec) {
 
@@ -264,7 +264,7 @@ define([
      *
      * @param {string} id - The instance identifier.
      * @param {string} typeId - The type identifier.
-     * @param {pentaho.type.spec.IInstanceConfiguration} instanceConfig — The instance's container configuration.
+     * @param {pentaho.type.spec.IContextInstanceConfiguration} instanceConfig — The instance's container configuration.
      *
      * @return {!pentaho.type.InstancesContainer} This instance container.
      */
