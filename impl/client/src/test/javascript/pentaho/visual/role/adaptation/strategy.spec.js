@@ -15,43 +15,128 @@
  */
 define([
   "pentaho/type/Context",
+  "pentaho/data/Table",
   "tests/pentaho/util/errorMatch"
-], function(Context, errorMatch) {
+], function(Context, DataTable, errorMatch) {
 
   "use strict";
 
   /* globals describe, it, beforeEach, beforeAll, spyOn */
 
-  xdescribe("pentaho.visual.role.adaptation.Strategy", function() {
+  describe("pentaho.visual.role.adaptation.Strategy", function() {
 
-    var BaseStrategy;
-    var CustomStrategy;
+    var Strategy;
+    var dataTable;
 
-    beforeAll(function(done) {
+    function getDataSpec1() {
+      return {
+        model: [
+          {name: "country", type: "string", label: "Country"},
+          {name: "sales", type: "number", label: "Sales"},
+          {name: "category", type: "string", label: "Code"}
+        ],
+        rows: [
+          {c: [{v: "PT", f: "Portugal"}, {v: 12000}, {v: "A", f: "AA1"}]},
+          {c: [{v: "UK", f: "United Kingdom"}, {v: 6000}, {v: "B", f: "BB1"}]},
+          {c: [{v: "ES", f: "Spain"}, {v: 60000}, {v: "A", f: "AA2"}]},
+          {c: [{v: "FR", f: "France"}, {v: 20000}, null]},
+          {c: [{v: "IT", f: "Italy"}, {v: 30000}, {v: null}]}
+        ]
+      };
+    }
 
-      Context.createAsync()
-          .then(function(context) {
+    // ---
 
-            return context.getAsync("pentaho/visual/role/adaptation/strategy");
-          })
-          .then(function(_BaseStrategy) {
-            BaseStrategy = _BaseStrategy;
-            CustomStrategy = BaseStrategy.extend();
-          })
-          .then(done, done.fail);
+    beforeAll(function() {
 
+      dataTable = new DataTable(getDataSpec1());
+
+      return Context.createAsync()
+        .then(function(context) {
+
+          return context.getDependencyApplyAsync([
+            "pentaho/visual/role/adaptation/strategy"
+          ], function(_Strategy) {
+            Strategy = _Strategy;
+          });
+        });
     });
 
-    it("should be possible to create an instance", function() {
-      var strategy = new CustomStrategy();
-      expect(strategy instanceof BaseStrategy).toBe(true);
+    describe("new (instSpec)", function() {
+
+      it("should throw if instSpec.data is not specified", function() {
+        expect(function() {
+          // eslint-disable-next-line no-new
+          new Strategy({
+            inputFieldIndexes: [1],
+            outputFieldIndexes: [2]
+          });
+        }).toThrow(errorMatch.argRequired("instSpec.data"));
+      });
+
+      it("should throw if instSpec.inputFieldIndexes is not specified", function() {
+        expect(function() {
+          // eslint-disable-next-line no-new
+          new Strategy({
+            data: dataTable,
+            outputFieldIndexes: [2]
+          });
+        }).toThrow(errorMatch.argRequired("instSpec.inputFieldIndexes"));
+      });
+
+      it("should throw if instSpec.outputFieldIndexes is not specified", function() {
+        expect(function() {
+          // eslint-disable-next-line no-new
+          new Strategy({
+            data: dataTable,
+            inputFieldIndexes: [1]
+          });
+        }).toThrow(errorMatch.argRequired("instSpec.outputFieldIndexes"));
+      });
     });
 
-    it("should throw when calling getMapper", function() {
-      var strategy = new CustomStrategy();
-      expect(function() {
-        strategy.getMapper();
-      }).toThrow(errorMatch.notImplemented());
+    describe("#isInvertible", function() {
+
+      it("should return false", function() {
+
+        var strategy = new Strategy({
+          data: dataTable,
+          inputFieldIndexes: [1],
+          outputFieldIndexes: [2]
+        });
+
+        expect(strategy.isInvertible).toBe(false);
+      });
+    });
+
+    describe("#outputFieldNames", function() {
+
+      it("should return an array of the corresponding field names", function() {
+
+        var strategy = new Strategy({
+          data: dataTable,
+          inputFieldIndexes: [1],
+          outputFieldIndexes: [2, 1]
+        });
+
+        expect(strategy.outputFieldNames).toEqual(["category", "sales"]);
+      });
+    });
+
+    describe("#invert(outputValues)", function() {
+
+      it("should throw not implemented", function() {
+
+        var strategy = new Strategy({
+          data: dataTable,
+          inputFieldIndexes: [1],
+          outputFieldIndexes: [2]
+        });
+
+        expect(function() {
+          strategy.invert();
+        }).toThrow(errorMatch.operInvalid());
+      });
     });
   });
 });

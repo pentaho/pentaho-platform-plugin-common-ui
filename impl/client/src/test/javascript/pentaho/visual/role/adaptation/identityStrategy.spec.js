@@ -15,9 +15,8 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/data/Table",
-  "pentaho/data/TableView"
-], function(Context, DataTable, DataView) {
+  "pentaho/data/Table"
+], function(Context, DataTable) {
 
   "use strict";
 
