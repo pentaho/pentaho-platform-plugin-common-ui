@@ -587,16 +587,6 @@ define([
       return ModelAdapter;
 
       // region Filter Conversion
-      function __convertFilterIsEqualToInternal(internalData, isEqualFilter) {
-
-        var map = {};
-        map[isEqualFilter.property] = isEqualFilter.value;
-
-        map = this.__convertValuesMap(map, false);
-
-        return dataUtil.createFilterFromCellsMap(map, internalData, __context);
-      }
-
       function __transformFilter(filter, internalData, toExternal) {
         var operands;
 
@@ -652,7 +642,7 @@ define([
         // Top-level isEqual
         if(filter.kind === "isEqual") {
           var equalsMap = {};
-          equalsMap[filter.property] = isEqualFilter.value;
+          equalsMap[filter.property] = IsEqualFilter.value;
 
           equalsMap = this.__convertValuesMap(equalsMap);
 
