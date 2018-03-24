@@ -243,6 +243,11 @@ define([
           var propertyNames = event.changeset.propertyNames;
           if(propertyNames.length === 1 && propertyNames[0] === "selectionFilter") {
             this.__updateInternalSelection();
+          } else if(propertyNames.length === 1 && propertyNames[0] === "model") {
+            var modelChangedPropertyNames = event.changeset.getChange("model").propertyNames;
+            if(modelChangedPropertyNames.length === 1 && modelChangedPropertyNames[0] === "selectionFilter") {
+              this.__updateExternalSelection();
+            }
           } else {
             this.__updateInternalModel();
           }
@@ -299,6 +304,16 @@ define([
 
           this.model.selectionFilter = this.__calcInternalSelectionFilter();
         },
+
+        /**
+         * Updates the [selectionFilter]{@link pentaho.visual.base.Model#selectionFilter} property of
+         * the external model.
+         *
+         * @private
+         */
+        __updateExternalSelection: function() {
+          this.selectionFilter = this.__calcExternalSelectionFilter();
+        },
         // endregion
 
         // region filter conversion
@@ -316,6 +331,20 @@ define([
 
           return null;
         },
+        /**
+         * Calculates the external selection filter based on the internal one.
+         *
+         * @return {pentaho.data.filter.Abstract} The external filter, possibly `null`.
+         * @private
+         */
+        __calcExternalSelectionFilter: function() {
+          var internalSelectionFilter = this.model.selectionFilter;
+          if(internalSelectionFilter !== null) {
+            return this.__convertFilterToExternal(internalSelectionFilter);
+          }
+
+          return null;
+        },
 
         /**
          * Converts an external filter into a corresponding internal filter.
@@ -325,7 +354,6 @@ define([
          * @private
          */
         __convertFilterToInternal: function(externalFilter) {
-
           var adaptationModel = this.__getAmbientAdaptationModel();
           var internalData = adaptationModel.internalData;
           if(internalData === null) {
@@ -334,118 +362,113 @@ define([
 
           // Find isProperty filters and convert their property equals', name and value to the internal data space.
           return externalFilter.visit(function(filter) {
-
-            var operands;
-
-            if(filter.kind === "or") {
-              // ` a or b
-              // (a1 and a2) or (b1 and b2)
-              // Each isEqual must be separately converted into either a single isEqual or
-              // into a conjunction of isEquals.
-
-              operands = [];
-
-              filter.operands.each(function(operandFilter) {
-                if(operandFilter.kind === "isEqual") {
-                  operandFilter = __convertFilterIsEqualToInternal.call(this, internalData, operandFilter);
-                  if(operandFilter !== null) {
-                    operands.push(operandFilter);
-                  }
-                } else {
-                  operands.push(operandFilter);
-                }
-              });
-
-              return new OrFilter({operands: operands});
-            }
-
-            if(filter.kind === "and") {
-              // Collect and replace all isEqual children.
-
-              var equalsMap = null;
-              operands = [];
-
-              filter.operands.each(function(operandFilter) {
-
-                if(operandFilter.kind === "isEqual") {
-
-                  if(equalsMap === null) {
-                    equalsMap = Object.create(null);
-                  }
-
-                  equalsMap[operandFilter.property] = operandFilter.value;
-                } else {
-                  operands.push(operandFilter);
-                }
-              });
-
-              if(equalsMap === null) {
-                return filter;
-              }
-
-              // Map external values to internal values.
-              equalsMap = this.__convertValuesMapToInternal(equalsMap);
-
-              operands.push.apply(operands, Object.keys(equalsMap).map(function(propName) {
-                return dataUtil.createFilterIsEqualFromCell(internalData, propName, equalsMap[propName], __context);
-              }));
-
-              return operands.length === 1 ? operands[0] : new AndFilter({operands: operands});
-            }
-
-            // Top-level isEqual or child of not(.)
-            if(filter.kind === "isEqual") {
-
-              filter = __convertFilterIsEqualToInternal.call(this, internalData, filter);
-
-              return filter !== null ? filter : TrueFilter.instance;
-            }
+            return __transformFilter.call(this, filter, internalData, false);
           }.bind(this));
         },
 
         /**
-         * Converts a given map of external property names to values and/or cells into
-         * a map of internal property names to cells.
+         * Converts an internal filter into a corresponding external filter.
          *
-         * External properties which are mapped to visual roles which are not currently valid
+         * @param {!pentaho.data.filter.Abstract} internalFilter - The internal filter.
+         * @return {pentaho.data.filter.Abstract} The corresponding external filter.
+         * @private
+         */
+        __convertFilterToExternal: function(internalFilter) {
+          var adaptationModel = this.__getAmbientAdaptationModel();
+          var internalData = adaptationModel.internalData;
+          if(internalData === null) {
+            return null;
+          }
+
+          // Find isProperty filters and convert their property equals', name and value to the external data space.
+          return internalFilter.visit(function(filter) {
+            return __transformFilter.call(this, filter, internalData, true);
+          }.bind(this));
+        },
+
+        /**
+         * Converts a given map of property names to values and/or cells into
+         * a map of property names to cells on the opposite model.
+         *
+         * Properties which are mapped to visual roles which are not currently valid
          * (have no defined strategy), are skipped.
-         * External properties whose values are not known to the current strategy are skipped.
+         * Properties whose values are not known to the current strategy are skipped.
          *
-         * @param {!Object.<string, any|pentaho.data.ICell>} externalValuesMap - The map of external property names to
+         * @param {!Object.<string, any|pentaho.data.ICell>} originalValuesMap - The map of property names to
          * values and/or cells.
+         * @param {boolean} toExternal If true converts from internal to external properties, the other way around if false.
          *
          * @return {!Object.<string, pentaho.data.ICell>} The corresponding map of internal property names to cells.
          *
          * @private
          */
-        __convertValuesMapToInternal: function(externalValuesMap) {
-
+        __convertValuesMap: function(originalValuesMap, toExternal) {
           var ambientRoleInfoMap = this.__getAmbientAdaptationModel().roleInfoMap;
-          var internalValuesMap = Object.create(null);
+          var convertedValuesMap = Object.create(null);
+          var model = toExternal ? this.model : this;
 
-          this.$type.eachVisualRole(function(propType) {
-
-            var externalMapping = this.get(propType);
+          model.eachVisualRole(function(propType) {
+            var mapping = model.get(propType);
             var strategy;
 
-            if(externalMapping.hasFields && (strategy = ambientRoleInfoMap[propType.name].strategy) !== null) {
+            if(mapping.hasFields && (strategy = ambientRoleInfoMap[propType.name].strategy) !== null) {
+              var fieldValues = __collectFieldValues(mapping, originalValuesMap);
+              if(fieldValues !== null) {
+                var fieldCells = toExternal ? strategy.invert(fieldValues) : strategy.map(fieldValues);
+                if(fieldCells !== null) {
+                  var fieldNames = toExternal ? strategy.inputFieldNames : strategy.outputFieldNames;
 
-              var externalFieldValues = __collectExternalFieldValues(externalMapping, externalValuesMap);
-              if(externalFieldValues !== null) {
+                  fieldCells.forEach(function(fieldCell, index) {
+                    convertedValuesMap[fieldNames[index]] = fieldCell;
+                  });
+                }
+              }
+            }
+          });
 
-                var internalFieldCells = strategy.map(externalFieldValues);
-                if(internalFieldCells !== null) {
-                  var outputFieldNames = strategy.outputFieldNames;
+          return convertedValuesMap;
+        },
 
-                  internalFieldCells.forEach(function(internalFieldCell, index) {
-                    internalValuesMap[outputFieldNames[index]] = internalFieldCell;
+        /**
+         * Converts a given map of internal property names to values and/or cells into
+         * a map of external property names to cells.
+         *
+         * Internal properties which are mapped to visual roles which are not currently valid
+         * (have no defined strategy), are skipped.
+         * Internal properties whose values are not known to the current strategy are skipped.
+         *
+         * @param {!Object.<string, any|pentaho.data.ICell>} internalValuesMap - The map of internal property names to
+         * values and/or cells.
+         *
+         * @return {!Object.<string, pentaho.data.ICell>} The corresponding map of external property names to cells.
+         *
+         * @private
+         */
+        __convertValuesMapToExternal: function(internalValuesMap) {
+          var ambientRoleInfoMap = this.__getAmbientAdaptationModel().roleInfoMap;
+          var externalValuesMap = Object.create(null);
+
+          this.model.$type.eachVisualRole(function(propType) {
+            var internalMapping = this.model.get(propType);
+            var strategy;
+
+            if(internalMapping.hasFields && (strategy = ambientRoleInfoMap[propType.name].strategy) !== null) {
+              var internalFieldValues = __collectFieldValues(internalMapping, internalValuesMap);
+              if(internalFieldValues !== null) {
+
+                var externalFieldCells = strategy.invert(internalFieldValues);
+                if(externalFieldCells !== null) {
+                  var inputFieldNames = strategy.inputFieldNames;
+
+                  externalFieldCells.forEach(function(externalFieldCell, index) {
+                    externalValuesMap[inputFieldNames[index]] = externalFieldCell;
                   });
                 }
               }
             }
           }, this);
 
-          return internalValuesMap;
+          return externalValuesMap;
         },
         // endregion
 
@@ -569,9 +592,77 @@ define([
         var map = {};
         map[isEqualFilter.property] = isEqualFilter.value;
 
-        map = this.__convertValuesMapToInternal(map);
+        map = this.__convertValuesMap(map, false);
 
         return dataUtil.createFilterFromCellsMap(map, internalData, __context);
+      }
+
+      function __transformFilter(filter, internalData, toExternal) {
+        var operands;
+
+        if(filter.kind === "or") {
+          // a or b
+          // (a1 and a2) or (b1 and b2)
+          // Each isEqual must be separately converted into either a single isEqual or
+          // into a conjunction of isEquals.
+          operands = [];
+
+          filter.operands.each(function(operandFilter) {
+            operandFilter = __transformFilter.call(this, operandFilter, internalData, toExternal);
+            if(operandFilter !== null) {
+              operands.push(operandFilter);
+            }
+          }.bind(this));
+
+          return new OrFilter({operands: operands});
+        }
+
+        if(filter.kind === "and") {
+          // Collect and replace all isEqual children.
+          var equalsMap = null;
+          operands = [];
+
+          filter.operands.each(function(operandFilter) {
+            if(operandFilter.kind === "isEqual") {
+              if(equalsMap === null) {
+                equalsMap = Object.create(null);
+              }
+
+              equalsMap[operandFilter.property] = operandFilter.value;
+            } else {
+              // passthrough other filter kinds
+              operands.push(operandFilter);
+            }
+          });
+
+          if(equalsMap === null) {
+            return filter;
+          }
+
+          // Map internal values to external values.
+          equalsMap = this.__convertValuesMap(equalsMap);
+
+          operands.push.apply(operands, Object.keys(equalsMap).map(function(propName) {
+            return dataUtil.createFilterIsEqualFromCell(internalData, propName, equalsMap[propName], __context);
+          }));
+
+          return operands.length === 1 ? operands[0] : new AndFilter({operands: operands});
+        }
+
+        // Top-level isEqual
+        if(filter.kind === "isEqual") {
+          var equalsMap = {};
+          equalsMap[filter.property] = isEqualFilter.value;
+
+          equalsMap = this.__convertValuesMap(equalsMap);
+
+          filter = dataUtil.createFilterFromCellsMap(equalsMap, internalData, __context);
+
+          return filter !== null ? filter : TrueFilter.instance;
+        }
+
+        // passthrough other filter kinds
+        return filter;
       }
       // endregion
     }
@@ -702,25 +793,23 @@ define([
   // endregion
 
   // region Filter conversion
-  function __collectExternalFieldValues(externalMapping, externalValuesMap) {
+  function __collectFieldValues(mapping, valuesMap) {
+    var fieldValues = null;
 
-    var externalFieldValues = null;
-
-    externalMapping.fields.each(function(mappingField) {
-
+    mapping.fields.each(function(mappingField) {
       var name = mappingField.name;
 
-      var externalValue = externalValuesMap[name];
-      if(externalValue !== undefined) {
+      var value = valuesMap[name];
+      if(value !== undefined) {
         // Accept cells as well.
-        if(externalValue !== null) {
-          externalValue = externalValue.valueOf();
+        if(value !== null) {
+          value = value.valueOf();
         }
 
-        if(externalFieldValues == null) {
-          externalFieldValues = [externalValue];
+        if(fieldValues == null) {
+          fieldValues = [value];
         } else {
-          externalFieldValues.push(externalValue);
+          fieldValues.push(externalValue);
         }
       } else {
         // break on the first field which is not present.
@@ -728,7 +817,7 @@ define([
       }
     });
 
-    return externalFieldValues;
+    return fieldValues;
   }
   // endregion
 });

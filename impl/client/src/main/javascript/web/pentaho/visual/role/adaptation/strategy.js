@@ -120,6 +120,23 @@ define([
         },
 
         /**
+         * Gets the names of the input fields.
+         *
+         * @type {!Array.<string>}
+         * @readOnly
+         *
+         * @see pentaho.visual.role.adaptation.Strategy#inputFieldIndexes
+         */
+        get inputFieldNames() {
+
+          var data = this.data;
+
+          return this.inputFieldIndexes.map(function(inputFieldIndex) {
+            return data.getColumnId(inputFieldIndex);
+          });
+        },
+
+        /**
          * Gets the output data cells that correspond to the given input values or cells.
          *
          * In the case of adaptation strategies,
