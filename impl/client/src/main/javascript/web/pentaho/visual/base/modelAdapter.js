@@ -16,6 +16,7 @@
 define([
   "pentaho/type/changes/ComplexChangeset",
   "pentaho/data/Table",
+  "pentaho/data/util",
   "pentaho/util/object",
   "pentaho/util/error",
   "pentaho/i18n!model",
@@ -24,7 +25,7 @@ define([
   "./model",
   "pentaho/data/filter/and",
   "pentaho/data/filter/isEqual"
-], function(ComplexChangeset, Table, O, error, bundle) {
+], function(ComplexChangeset, Table, dataUtil, O, error, bundle) {
 
   "use strict";
 
@@ -337,7 +338,7 @@ define([
             var operands;
 
             if(filter.kind === "or") {
-              // a or b
+              // ` a or b
               // (a1 and a2) or (b1 and b2)
               // Each isEqual must be separately converted into either a single isEqual or
               // into a conjunction of isEquals.
@@ -359,7 +360,7 @@ define([
             }
 
             if(filter.kind === "and") {
-              // Collect and replace all isProperty children
+              // Collect and replace all isEqual children.
 
               var equalsMap = null;
               operands = [];
@@ -386,7 +387,7 @@ define([
               equalsMap = this.__convertValuesMapToInternal(equalsMap);
 
               operands.push.apply(operands, Object.keys(equalsMap).map(function(propName) {
-                return __createFilterIsEqualFromCell(internalData, propName, equalsMap[propName]);
+                return dataUtil.createFilterIsEqualFromCell(internalData, propName, equalsMap[propName], __context);
               }));
 
               return operands.length === 1 ? operands[0] : new AndFilter({operands: operands});
@@ -406,8 +407,8 @@ define([
          * Converts a given map of external property names to values and/or cells into
          * a map of internal property names to cells.
          *
-         * External properties which are mapped to visual roles which are not currently valid (have no defined strategy),
-         * are skipped.
+         * External properties which are mapped to visual roles which are not currently valid
+         * (have no defined strategy), are skipped.
          * External properties whose values are not known to the current strategy are skipped.
          *
          * @param {!Object.<string, any|pentaho.data.ICell>} externalValuesMap - The map of external property names to
@@ -563,20 +564,6 @@ define([
       return ModelAdapter;
 
       // region Filter Conversion
-      function __createFilterIsEqualFromCell(data, fieldName, cell) {
-        var columnIndex = data.getColumnIndexById(fieldName);
-        var simpleValue = cell !== null
-          ? {
-            // Matches type alias corresponding simple types for all column types.
-            _: data.getColumnType(columnIndex),
-            value: cell.value,
-            formatted: cell.formatted
-          }
-          : null;
-
-        return new IsEqualFilter({property: fieldName, value: simpleValue});
-      }
-
       function __convertFilterIsEqualToInternal(internalData, isEqualFilter) {
 
         var map = {};
@@ -584,17 +571,7 @@ define([
 
         map = this.__convertValuesMapToInternal(map);
 
-        var operands = Object.keys(map).map(function(propName) {
-          return __createFilterIsEqualFromCell(internalData, propName, map[propName]);
-        });
-
-        if(operands.length > 0) {
-          return operands.length === 1
-            ? operands[0]
-            : new AndFilter({operands: operands});
-        }
-
-        return null;
+        return dataUtil.createFilterFromCellsMap(map, internalData, __context);
       }
       // endregion
     }

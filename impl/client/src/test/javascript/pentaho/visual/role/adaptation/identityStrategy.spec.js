@@ -64,7 +64,7 @@ define([
     };
 
     Cell.prototype.toString = function() {
-      return this.formatted || String(this.value);
+      return this.formatted;
     };
 
     // ---

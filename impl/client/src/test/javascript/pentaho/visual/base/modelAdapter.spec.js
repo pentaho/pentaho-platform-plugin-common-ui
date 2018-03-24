@@ -77,6 +77,23 @@ define([
     }
     // endregion
 
+    // ---
+
+    function Cell(value, formatted) {
+      this.value = value;
+      this.formatted = formatted;
+    }
+
+    Cell.prototype.valueOf = function() {
+      return this.value;
+    };
+
+    Cell.prototype.toString = function() {
+      return this.formatted;
+    };
+
+    // ---
+
     describe(".extend(...)", function() {
 
       it("should define a model adapter subtype when no internal model is specified", function() {
@@ -474,7 +491,7 @@ define([
             var model = new ModelWithStringRole();
 
             spyOn(ElementIdentityStrategy.prototype, "map").and.callFake(function() {
-              return [{value: "PT2", formatted: "Portugal"}];
+              return [new Cell("PT2", "Portugal")];
             });
 
             var modelAdapter = new DerivedModelAdapter({
@@ -507,7 +524,7 @@ define([
             var model = new ModelWithStringRole();
 
             spyOn(CombineStrategy.prototype, "map").and.callFake(function() {
-              return [{value: "PT~fish", formatted: "Portugal ~ Fish"}];
+              return [new Cell("PT~fish", "Portugal ~ Fish")];
             });
 
             var modelAdapter = new DerivedModelAdapter({
@@ -639,7 +656,6 @@ define([
       describe("when external data changes (same metadata)", function() {
 
         var DerivedModelAdapter;
-        var internalPropType;
         var modelAdapter;
 
         beforeAll(function() {
@@ -652,8 +668,6 @@ define([
               strategies: strategies
             }
           ]);
-
-          internalPropType = ModelWithStringRole.type.get("roleA");
         });
 
         beforeEach(function() {
@@ -739,7 +753,7 @@ define([
           var model = new ModelWithStringRole();
 
           spyOn(ElementIdentityStrategy.prototype, "map").and.callFake(function() {
-            return [{value: "PT2", formatted: "Portugal"}];
+            return [new Cell("PT2", "Portugal")];
           });
 
           var modelAdapter = new DerivedModelAdapter({
@@ -756,7 +770,7 @@ define([
           expect(selectionFilter1).not.toBe(null);
 
           ElementIdentityStrategy.prototype.map.and.callFake(function() {
-            return [{value: "PT4", formatted: "Portugal"}];
+            return [new Cell("PT4", "Portugal")];
           });
 
           // ---
@@ -786,7 +800,7 @@ define([
           var model = new ModelWithStringRole();
 
           spyOn(ElementIdentityStrategy.prototype, "map").and.callFake(function() {
-            return [{value: "PT2", formatted: "Portugal"}];
+            return [new Cell("PT2", "Portugal")];
           });
 
           var modelAdapter = new DerivedModelAdapter({
@@ -799,7 +813,7 @@ define([
           });
 
           ElementIdentityStrategy.prototype.map.and.callFake(function() {
-            return [{value: "PT4", formatted: "Portugal"}];
+            return [new Cell("PT4", "Portugal")];
           });
 
           var strategy1 = modelAdapter.roleA.strategy;
@@ -831,7 +845,7 @@ define([
           var model = new ModelWithStringRole();
 
           spyOn(ElementIdentityStrategy.prototype, "map").and.callFake(function() {
-            return [{value: "PT2", formatted: "Portugal"}];
+            return [new Cell("PT2", "Portugal")];
           });
 
           var modelAdapter = new DerivedModelAdapter({
@@ -844,7 +858,7 @@ define([
           });
 
           ElementIdentityStrategy.prototype.map.and.callFake(function() {
-            return [{value: "PT4", formatted: "Portugal"}];
+            return [new Cell("PT4", "Portugal")];
           });
 
           var internalData1 = modelAdapter.model.data;

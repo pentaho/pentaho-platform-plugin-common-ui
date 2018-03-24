@@ -70,9 +70,10 @@ define(function() {
       if(hasDataKeyColumns == null) {
         hasDataKeyColumns = dataUtil.hasAnyKeyColumns(dataTable);
       }
+
       return hasDataKeyColumns
-          ? dataTable.isColumnKey(columnIndex)
-          : !dataUtil.isColumnTypeContinuous(dataTable.getColumnType(columnIndex));
+        ? dataTable.isColumnKey(columnIndex)
+        : !dataUtil.isColumnTypeContinuous(dataTable.getColumnType(columnIndex));
     },
 
     /**
@@ -92,55 +93,78 @@ define(function() {
      * Creates a data filter from the given cells map, source data table and Type API context.
      *
      * @param {!Object.<string, any|pentaho.data.ICell>} cellsMap - The data cells map.
-     * @param {!pentaho.data.ITable} dataTable - The associated source data table.
+     * @param {!pentaho.data.ITable} dataPlain - The associated source, plain data table.
      * @param {!pentaho.type.Context} context - The Type API context from which to obtain the filter types.
      * The types {@link pentaho.data.filter.IsEqual} and {@link pentaho.data.filter.And}
      * must have been loaded already.
      *
      * @return {!pentaho.data.filter.Abstract} A data filter.
      */
-    createFilterFromCellsMap: function(cellsMap, dataTable, context) {
+    createFilterFromCellsMap: function(cellsMap, dataPlain, context) {
 
-      var IsEqual = context.get("=");
+      var IsEqualFilter = context.get("=");
 
       var andOperands = [];
 
-      var dataPlain = dataTable.toPlainTable();
-
       Object.keys(cellsMap).forEach(function(columnId) {
 
-        var columnIndex = dataPlain.getColumnIndexById(columnId);
-        if(columnIndex >= 0) {
-
-          var cell = cellsMap[columnId];
-
-          var filterValue;
-          if(cell == null) {
-            filterValue = null;
-          } else {
-            // Adding the expected data type.
-            filterValue = {
-              _: dataPlain.getColumnType(columnIndex),
-              value: cell.valueOf(),
-              formatted: cell.toString()
-            };
-          }
-
-          var equalFilter = new IsEqual({property: dataPlain.getColumnId(columnIndex), value: filterValue});
-
+        var equalFilter = __createFilterIsEqualFromCell(dataPlain, columnId, cellsMap[columnId], IsEqualFilter);
+        if(equalFilter !== null) {
           andOperands.push(equalFilter);
         }
       });
 
-      if(andOperands.length === 0) {
-        return null;
+      switch(andOperands.length) {
+        case 0: return null;
+        case 1: return andOperands[0];
+        default:
+          var And = context.get("and");
+          return new And({operands: andOperands});
       }
+    },
 
-      var And = context.get("and");
+    /**
+     * Creates an `IsEqual` data filter having the given column and data cell value.
+     *
+     * Returns `null` if the given `columnId` is not a defined column of `dataPlain`.
+     *
+     * @param {!pentaho.data.ITable} dataPlain - The associated source, plain data table.
+     * @param {string} columnId - The column identifier.
+     * @param {any|pentaho.data.ICell} cell - The data cell.
+     * @param {!pentaho.type.Context} context - The Type API context from which to obtain the filter types.
+     * The type {@link pentaho.data.filter.IsEqual} must have been loaded already.
+     *
+     * @return {pentaho.data.filter.IsEqual} An `IsEqual` data filter or `null`.
+     */
+    createFilterIsEqualFromCell: function(dataPlain, columnId, cell, context) {
 
-      return new And({operands: andOperands});
+      var IsEqualFilter = context.get("=");
+
+      return __createFilterIsEqualFromCell(dataPlain, columnId, cell, IsEqualFilter);
     }
   };
+
+  function __createFilterIsEqualFromCell(dataPlain, columnId, cell, IsEqualFilter) {
+    var columnIndex = dataPlain.getColumnIndexById(columnId);
+    if(columnIndex >= 0) {
+      var filterValue;
+      if(cell == null) {
+        filterValue = null;
+      } else {
+        // Adding the expected data type.
+        filterValue = {
+          // Matches type alias corresponding simple types for all column types.
+          _: dataPlain.getColumnType(columnIndex),
+          value: cell.valueOf(),
+          formatted: cell.toString()
+        };
+      }
+
+      return new IsEqualFilter({property: columnId, value: filterValue});
+    }
+
+    return null;
+  }
 
   return dataUtil;
 });
