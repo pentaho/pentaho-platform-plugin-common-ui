@@ -23,167 +23,244 @@ define([
 
   /* globals describe, it, beforeEach, beforeAll, spyOn */
 
-  xdescribe("pentaho.visual.role.adaptation.IdentityStrategy", function() {
+  describe("pentaho.visual.role.adaptation.IdentityStrategy", function() {
 
     var Strategy;
-
-    var propType;
+    var List;
+    var Complex;
     var dataTable;
-    var modes = {};
 
-    var datasetColumns = {
-      StringCategorical: 0,
-      NumberContinuous: 1,
-      NumberCategorical: 2
+    var datasetFieldIndexes = {
+      country: 0,
+      sales: 1,
+      category: 2
     };
 
-    function getJSONDataset() {
+    function getDataSpec1() {
       return {
         model: [
-          {name: "country", type: "string", label: "Country", isContinuous: false},
-          {name: "sales", type: "number", label: "Sales", isContinuous: true},
-          {name: "code", type: "number", label: "Code", isContinuous: false}
+          {name: "country", type: "string", label: "Country"},
+          {name: "sales", type: "number", label: "Sales"},
+          {name: "category", type: "string", label: "Code"}
         ],
         rows: [
-          {c: [{v: "Portugal"}, {v: 12000}]},
-          {c: [{v: "Ireland"}, {v: 6000}]}
+          {c: [{v: "PT", f: "Portugal"}, {v: 12000}, {v: "A", f: "AA1"}]},
+          {c: [{v: "UK", f: "United Kingdom"}, {v: 6000}, {v: "B", f: "BB1"}]},
+          {c: [{v: "ES", f: "Spain"}, {v: 60000}, {v: "A", f: "AA2"}]},
+          {c: [{v: "FR", f: "France"}, {v: 20000}, null]},
+          {c: [{v: "IT", f: "Italy"}, {v: 30000}, {v: null}]}
         ]
       };
     }
 
-    beforeAll(function(done) {
+    // ---
 
-      Context.createAsync()
-          .then(function(context) {
-            return context.getDependencyApplyAsync([
-              "pentaho/visual/base/model",
-              "pentaho/visual/role/adaptation/identity"
-            ], function(_VisualModel, _Strategy) {
+    function Cell(value, formatted) {
+      this.value = value;
+      this.formatted = formatted;
+    }
 
-              var CustomVisualModel = _VisualModel.extend({
-                $type: {
-                  props: [
-                    {
-                      name: "roleA",
-                      base: "pentaho/visual/role/property",
-                      modes: [
-                        {dataType: "number", isContinuous: true},
-                        {dataType: "number", isContinuous: false},
-                        {dataType: "string", isContinuous: false}
-                      ]
-                    }
-                  ]
-                }
-              });
+    Cell.prototype.valueOf = function() {
+      return this.value;
+    };
 
-              Strategy = _Strategy;
+    Cell.prototype.toString = function() {
+      return this.formatted || String(this.value);
+    };
 
-              dataTable = new DataTable(getJSONDataset());
+    // ---
 
-              propType = CustomVisualModel.type.get("roleA");
-              modes.NumberContinuous = propType.modes.at(0);
-              modes.NumberCategorical = propType.modes.at(1);
-              modes.StringCategorical = propType.modes.at(2);
-            });
-          })
-          .then(done, done.fail);
+    beforeAll(function() {
 
+      dataTable = new DataTable(getDataSpec1());
+
+      return Context.createAsync()
+        .then(function(context) {
+
+          List = context.get("list");
+          Complex = context.get("complex");
+
+          return context.getDependencyApplyAsync([
+            "pentaho/visual/role/adaptation/identityStrategy"
+          ], function(_Strategy) {
+
+            Strategy = _Strategy;
+          });
+        });
     });
 
-    it("should be possible to create an instance", function() {
-      var strategy = new Strategy();
-      expect(strategy instanceof Strategy).toBe(true);
-    });
+    describe(".Type", function() {
 
-    describe("#getMapper(propType, inputData, mode)", function() {
+      describe("#getInputTypeFor(outputDataType, isVisualKey)", function() {
 
-      it("should return null if given a table with more than one column", function() {
+        it("should return null if given a list type", function() {
 
-        var strategy = new Strategy();
-        var mapper = strategy.getMapper(propType, dataTable, modes.NumberCategorical);
+          var inputType = Strategy.type.getInputTypeFor(List.type, true);
+          expect(inputType).toBe(null);
 
-        expect(mapper).toBe(null);
+          inputType = Strategy.type.getInputTypeFor(List.type, false);
+          expect(inputType).toBe(null);
+        });
+
+        it("should return the same, given type, if it is not a list type", function() {
+
+          var Foo = Complex.extend();
+
+          var inputType = Strategy.type.getInputTypeFor(Foo.type, true);
+          expect(inputType).toBe(Foo.type);
+
+          inputType = Strategy.type.getInputTypeFor(Foo.type, false);
+          expect(inputType).toBe(Foo.type);
+        });
       });
 
-      describe("when given a table with a single column", function() {
+      describe("#validateApplication(schemaData, inputFieldIndexes)", function() {
 
-        it("should return null if given a number / categorical column and a number / continuous mode", function() {
-
-          var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.NumberCategorical]);
-
-          var strategy = new Strategy();
-          var mapper = strategy.getMapper(propType, dataView, modes.NumberContinuous);
-
-          expect(mapper).toBe(null);
+        it("should return an object with isValid: true", function() {
+          var result = Strategy.type.validateApplication(dataTable, [0]);
+          expect(result).toEqual(jasmine.objectContaining({isValid: true}));
         });
 
-        it("should return null if given a string / categorical column and a number / categorical mode", function() {
+        it("should return an object with addsFields: false", function() {
+          var result = Strategy.type.validateApplication(dataTable, [0]);
+          expect(result).toEqual(jasmine.objectContaining({addsFields: false}));
+        });
+      });
 
-          var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.StringCategorical]);
+      describe("#apply(data, inputFieldIndexes)", function() {
 
-          var strategy = new Strategy();
-          var mapper = strategy.getMapper(propType, dataView, modes.NumberCategorical);
+        it("should return a strategy instance", function() {
 
-          expect(mapper).toBe(null);
+          var strategy = Strategy.type.apply(dataTable, [0]);
+          expect(strategy instanceof Strategy).toBe(true);
         });
 
-        // Can downgrade continuous column into a categorical mode.
-        it("should return an IdentityAdapter if given a number / continuous column " +
-            "and a number / categorical mode", function() {
+        it("should return a strategy having the given data", function() {
 
-          var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.NumberContinuous]);
-
-          var strategy = new Strategy();
-          var mapper = strategy.getMapper(propType, dataView, modes.NumberCategorical);
-
-          expect(mapper instanceof Adapter).toBe(true);
+          var strategy = Strategy.type.apply(dataTable, [0]);
+          expect(strategy.data).toBe(dataTable);
         });
 
-        // Exact match
-        it("should return an IdentityAdapter if given a number / continuous column " +
-            "and a number / continuous mode", function() {
-
-          var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.NumberContinuous]);
-
-          var strategy = new Strategy();
-          var mapper = strategy.getMapper(propType, dataView, modes.NumberContinuous);
-
-          expect(mapper instanceof Adapter).toBe(true);
+        it("should return a strategy having the given inputFieldIndexes", function() {
+          var inputFieldIndexes = [0];
+          var strategy = Strategy.type.apply(dataTable, inputFieldIndexes);
+          expect(strategy.inputFieldIndexes).toEqual(inputFieldIndexes);
         });
 
-        // Exact match
-        it("should return an IdentityAdapter if given a number / categorical column " +
-            "and a number / categorical mode", function() {
-
-          var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.NumberCategorical]);
-
-          var strategy = new Strategy();
-          var mapper = strategy.getMapper(propType, dataView, modes.NumberCategorical);
-
-          expect(mapper instanceof Adapter).toBe(true);
+        it("should return a strategy with the given inputFieldIndexes as outputFieldIndexes", function() {
+          var inputFieldIndexes = [0];
+          var strategy = Strategy.type.apply(dataTable, inputFieldIndexes);
+          expect(strategy.outputFieldIndexes).toEqual(inputFieldIndexes);
         });
+      });
+    });
 
-        it("should return an IdentityAdapter if given a string / categorical column " +
-            "and a string / categorical mode", function() {
+    describe("#isInvertible", function() {
 
-          var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.StringCategorical]);
+      it("should return true", function() {
 
-          var strategy = new Strategy();
-          var mapper = strategy.getMapper(propType, dataView, modes.StringCategorical);
+        var strategy = Strategy.type.apply(dataTable, [0]);
 
-          expect(mapper instanceof Adapter).toBe(true);
-        });
+        expect(strategy.isInvertible).toBe(true);
+      });
+    });
 
-        it("should return a mapper with the given inputData and mode", function() {
+    describe("#map(inputValues)", function() {
 
-          var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.StringCategorical]);
+      var strategy;
 
-          var strategy = new Strategy();
-          var mapper = strategy.getMapper(propType, dataView, modes.StringCategorical);
+      beforeEach(function() {
+        strategy = Strategy.type.apply(dataTable, [datasetFieldIndexes.category]);
+      });
 
-          expect(mapper.inputData).toBe(dataView);
-          expect(mapper.mode).toBe(modes.StringCategorical);
-        });
+      it("should return a cell corresponding to a given existing value", function() {
+
+        var inputCells = strategy.map(["A"]);
+
+        expect(inputCells).toEqual([
+          jasmine.objectContaining({value: "A", formatted: "AA1"})
+        ]);
+      });
+
+      it("should return a cell corresponding to a given (equal) existing cell", function() {
+
+        var inputCells = strategy.map([new Cell("A", "Dummy")]);
+
+        expect(inputCells).toEqual([
+          jasmine.objectContaining({value: "A", formatted: "AA1"})
+        ]);
+      });
+
+      it("should return null if given a non-existing value", function() {
+
+        var inputCells = strategy.map(["C"]);
+
+        expect(inputCells).toBe(null);
+      });
+
+      it("should return null if given an existing null", function() {
+
+        var inputCells = strategy.map([null]);
+
+        expect(inputCells).toBe(null);
+      });
+
+      it("should create the index only once", function() {
+
+        spyOn(strategy, "__installIndex").and.callThrough();
+
+        strategy.map(["A"]);
+
+        expect(strategy.__installIndex).toHaveBeenCalledTimes(1);
+
+        strategy.map(["A"]);
+
+        expect(strategy.__installIndex).toHaveBeenCalledTimes(1);
+
+        strategy.invert(["A"]);
+
+        expect(strategy.__installIndex).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe("#invert(outputValues)", function() {
+
+      var strategy;
+
+      beforeEach(function() {
+        strategy = Strategy.type.apply(dataTable, [datasetFieldIndexes.category]);
+      });
+
+      it("should return a cell corresponding to a given existing value", function() {
+
+        var outputCells = strategy.invert(["A"]);
+
+        expect(outputCells).toEqual([
+          jasmine.objectContaining({value: "A", formatted: "AA1"})
+        ]);
+      });
+
+      it("should return a cell corresponding to a given (equal) existing cell", function() {
+
+        var outputCells = strategy.invert([new Cell("A", "Dummy")]);
+
+        expect(outputCells).toEqual([
+          jasmine.objectContaining({value: "A", formatted: "AA1"})
+        ]);
+      });
+
+      it("should return null if given a non-existing value", function() {
+
+        var outputCells = strategy.invert(["C"]);
+
+        expect(outputCells).toBe(null);
+      });
+
+      it("should return null if given an existing null", function() {
+
+        var outputCells = strategy.invert([null]);
+
+        expect(outputCells).toBe(null);
       });
     });
   });
