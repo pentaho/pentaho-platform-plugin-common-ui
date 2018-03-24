@@ -110,6 +110,10 @@
       model: {valueType: "pentaho/visual/base/model"}
     }
   };
+  requireTypeInfo["pentaho/visual/role/adaptation/strategy"] = {base: "complex"};
+  requireTypeInfo["pentaho/visual/role/adaptation/identityStrategy"] = {
+    base: "pentaho/visual/role/adaptation/strategy"
+  };
 
   requirePaths["json"] = basePath + "/util/require-json/json";
 

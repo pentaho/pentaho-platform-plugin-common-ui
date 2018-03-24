@@ -170,7 +170,6 @@ define([
             localRequire.config({
               config: {
                 "pentaho/typeInfo": {
-                  "pentaho/visual/role/adaptation/strategy": {base: "pentaho/type/instance"},
                   "CustomStrategyA": {base: "pentaho/visual/role/adaptation/strategy"},
                   "CustomStrategyB": {base: "pentaho/visual/role/adaptation/strategy"}
                 }
@@ -186,8 +185,10 @@ define([
                 return context.getDependencyApplyAsync([
                   "pentaho/visual/base/model",
                   "pentaho/visual/base/modelAdapter",
-                  "pentaho/visual/role/externalProperty"
-                ], function(Model, ModelAdapter, ExternalProperty) {
+                  "pentaho/visual/role/externalProperty",
+                  "CustomStrategyA",
+                  "CustomStrategyB"
+                ], function(Model, ModelAdapter, ExternalProperty, CustomStrategyA, CustomStrategyB) {
 
                   var DerivedModel = Model.extend({
                     $type: {
@@ -209,7 +210,10 @@ define([
 
                   var strategyTypes = propType.__setStrategyTypes.calls.argsFor(0)[0];
 
-                  expect(strategyTypes.length).toBe(2);
+                  expect(strategyTypes).toEqual(jasmine.arrayContaining([
+                    CustomStrategyA.type,
+                    CustomStrategyB.type
+                  ]));
                 });
               });
           });

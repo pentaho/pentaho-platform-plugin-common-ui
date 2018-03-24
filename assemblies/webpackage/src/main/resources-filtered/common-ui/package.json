@@ -121,14 +121,6 @@
         "alias": "complex",
         "base": "element"
       },
-      "pentaho/type/application": {
-        "alias": "application",
-        "base": "complex"
-      },
-      "pentaho/type/model": {
-        "alias": "model",
-        "base": "complex"
-      },
       "pentaho/type/simple": {
         "alias": "simple",
         "base": "element"
@@ -222,7 +214,7 @@
         "base": "pentaho/data/filter/property"
       },
       "pentaho/visual/base/model": {
-        "base": "model"
+        "base": "complex"
       },
       "pentaho/visual/base/view": {
         "base": "complex",
@@ -231,6 +223,12 @@
             "valueType": "pentaho/visual/base/model"
           }
         }
+      },
+      "pentaho/visual/role/adaptation/strategy": {
+        "base": "complex"
+      },
+      "pentaho/visual/role/adaptation/identityStrategy": {
+        "base": "pentaho/visual/role/adaptation/strategy"
       },
       "pentaho/visual/models/abstract": {
         "base": "pentaho/visual/base/model"
