@@ -611,7 +611,7 @@ define([
 
         // Top-level isEqual
         if(filter.kind === "isEqual") {
-          var equalsMap = {};
+          equalsMap = {};
           equalsMap[filter.property] = filter.value;
 
           equalsMap = this.__convertValuesMap(equalsMap, toExternal);

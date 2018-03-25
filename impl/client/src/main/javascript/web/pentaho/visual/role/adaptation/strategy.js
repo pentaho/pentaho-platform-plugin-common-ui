@@ -44,7 +44,8 @@ define([
          * @extends pentaho.type.Complex
          * @abstract
          *
-         * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.adaptation.Strategy>} pentaho/visual/role/adaptation/strategy
+         * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.adaptation.Strategy>}
+         *   pentaho/visual/role/adaptation/strategy
          *
          * @classDesc The `Strategy` class describes a strategy for mapping the data mapped to a visual role
          * from the external data space to the internal data space, and back.
@@ -173,6 +174,35 @@ define([
          */
         invert: function(outputValues) {
           throw new OperationInvalidError("Not supported.");
+        },
+
+        /**
+         * Gets an array of cells of a given row.
+         *
+         * When the given row is negative, `null` is returned.
+         *
+         * @param {number} rowIndex - The row index.
+         * @param {!Array.<number>} columnIndexes - The column indexes.
+         *
+         * @return {Array.<!pentaho.data.ICell>} The cell array.
+         *
+         * @protected
+         */
+        _getDataRowCells: function(rowIndex, columnIndexes) {
+
+          if(rowIndex < 0) {
+            return null;
+          }
+
+          var index = columnIndexes.length;
+          var cells = new Array(index);
+
+          var dataTable = this.data;
+          while(index--) {
+            cells[index] = dataTable.getCell(rowIndex, columnIndexes[index]);
+          }
+
+          return cells;
         },
 
         $type: /** @lends pentaho.visual.role.adaptation.Strategy.Type# */{

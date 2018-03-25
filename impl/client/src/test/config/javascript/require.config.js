@@ -114,6 +114,9 @@
   requireTypeInfo["pentaho/visual/role/adaptation/identityStrategy"] = {
     base: "pentaho/visual/role/adaptation/strategy"
   };
+  requireTypeInfo["pentaho/visual/role/adaptation/tupleStrategy"] = {
+    base: "pentaho/visual/role/adaptation/strategy"
+  };
 
   requirePaths["json"] = basePath + "/util/require-json/json";
 

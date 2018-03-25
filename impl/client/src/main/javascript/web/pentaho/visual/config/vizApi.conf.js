@@ -66,7 +66,8 @@ define(function() {
             "pentaho/visual/color/palettes/divergentRyb5":     {ranking: -10}
           },
           types: {
-            "pentaho/visual/role/adaptation/identityStrategy": {ranking: -10}
+            "pentaho/visual/role/adaptation/identityStrategy": {ranking: -10},
+            "pentaho/visual/role/adaptation/tupleStrategy":    {ranking: -20}
           }
         }
       },

@@ -411,7 +411,7 @@ define([
               var mapping = modelAdapter.get(this);
 
               // Can adapt.
-              if(mapping.strategy === null) {
+              if(mapping.hasFields && mapping.strategy === null) {
                 addErrors(new ValidationError(
                   bundle.format(bundle.structured.errors.property.noStrategy, {role: this})));
               }
