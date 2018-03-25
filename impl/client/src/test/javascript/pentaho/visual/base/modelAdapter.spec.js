@@ -988,5 +988,76 @@ define([
         });
       });
     });
+
+    describe("#_convertFilter", function() {
+      it("should convert the filter's internal model namespace to the external model namespace (many to one strategy)", function() {
+        var strategies = [CombineStrategy.type];
+
+        var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+          {
+            name: "roleA",
+            strategies: strategies
+          }
+        ]);
+
+        var model = new ModelWithStringRole();
+
+        spyOn(CombineStrategy.prototype, "map").and.callFake(function() {
+          return [new Cell("PT~fish", "Portugal ~ Fish")];
+        });
+
+        var modelAdapter = new DerivedModelAdapter({
+          model: model,
+          data: new Table(getDataSpec1()),
+          roleA: {
+            fields: ["country", "product"]
+          },
+          selectionFilter: {
+            _: "and",
+            o: [
+              {_: "=", p: "country", v: "PT"},
+              {_: "=", p: "product", v: "fish"}
+            ]
+          }
+        });
+
+        var selectionFilter1 = modelAdapter.selectionFilter;
+        expect(selectionFilter1).not.toBe(null);
+
+        var selectionInternalFilter1 = modelAdapter.model.selectionFilter;
+        expect(selectionInternalFilter1).not.toBe(null);
+
+        spyOn(CombineStrategy.prototype, "invert").and.callFake(function() {
+          return [new Cell("PT4", "Portugal"), new Cell("bird", "Bird")];
+        });
+        // ---
+
+        var filterToConvert = context.instances.get({_: "=", p: CombineStrategy.columnName, v: "PT4~bird"});
+        var translatedFilter = modelAdapter._convertFilter(filterToConvert);
+
+        // ---
+
+        var selectionFilter2 = modelAdapter.selectionFilter;
+        expect(selectionFilter2).not.toBe(null);
+
+        var selectionInternalFilter2 = modelAdapter.model.selectionFilter;
+        expect(selectionInternalFilter2).not.toBe(null);
+
+        // filter conversion does not affect selection
+        expect(selectionFilter2).toBe(selectionFilter1);
+        expect(selectionInternalFilter2).toBe(selectionInternalFilter1);
+
+        expect(translatedFilter).not.toBe(null);
+
+        var expectedFilter = context.instances.get({
+          _: "and",
+          o: [
+            {_: "=", p: "country", v: "PT4"},
+            {_: "=", p: "product", v: "bird"}
+          ]
+        });
+        expect(translatedFilter.equals(expectedFilter)).toBe(true);
+      });
+    });
   });
 });

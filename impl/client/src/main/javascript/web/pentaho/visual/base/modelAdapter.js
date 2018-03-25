@@ -159,6 +159,16 @@ define([
           return new ModelAdapterChangeset(txn, this);
         },
 
+        /**
+         * Converts a filter from the internal model namespace into the model adapter namespace.
+         *
+         * @param {!pentaho.data.filter.Abstract} filter - The filter.
+         * @return {pentaho.data.filter.Abstract} The translated filter.
+         */
+        _convertFilter: function(filter) {
+          return this.__convertFilterToExternal(filter);
+        },
+
         // region Adaptation
         __adaptationModel: null,
 
