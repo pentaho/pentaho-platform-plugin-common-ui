@@ -876,6 +876,117 @@ define([
           expect(internalData2).toBe(internalData1);
         });
       });
+
+      describe("when internal selectionFilter changes", function() {
+
+        it("should update the selectionFilter of the external model (identity strategy)", function() {
+          var strategies = [ElementIdentityStrategy.type];
+
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+            {
+              name: "roleA",
+              strategies: strategies
+            }
+          ]);
+
+          var model = new ModelWithStringRole();
+
+          spyOn(ElementIdentityStrategy.prototype, "map").and.callFake(function() {
+            return [new Cell("PT2", "Portugal")];
+          });
+
+          var modelAdapter = new DerivedModelAdapter({
+            model: model,
+            data: new Table(getDataSpec1()),
+            roleA: {
+              fields: ["country"]
+            },
+            selectionFilter: {_: "=", p: "country", v: "PT"}
+          });
+
+          var selectionFilter1 = modelAdapter.selectionFilter;
+
+          expect(selectionFilter1).not.toBe(null);
+
+          spyOn(ElementIdentityStrategy.prototype, "invert").and.callFake(function() {
+            return [new Cell("PT4", "Portugal")];
+          });
+
+          // ---
+
+          modelAdapter.model.selectionFilter = {_: "=", p: "country", v: "PT3"};
+
+          // ---
+
+          var selectionFilter2 = modelAdapter.selectionFilter;
+
+          expect(selectionFilter2).not.toBe(null);
+
+          expect(selectionFilter2).not.toBe(selectionFilter1);
+
+          var expectedFilter = context.instances.get({_: "=", p: "country", v: "PT4"});
+          expect(selectionFilter2.equals(expectedFilter)).toBe(true);
+        });
+
+        it("should update the selectionFilter of the external model (many to one strategy)", function() {
+          var strategies = [CombineStrategy.type];
+
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+            {
+              name: "roleA",
+              strategies: strategies
+            }
+          ]);
+
+          var model = new ModelWithStringRole();
+
+          spyOn(CombineStrategy.prototype, "map").and.callFake(function() {
+            return [new Cell("PT~fish", "Portugal ~ Fish")];
+          });
+
+          var modelAdapter = new DerivedModelAdapter({
+            model: model,
+            data: new Table(getDataSpec1()),
+            roleA: {
+              fields: ["country", "product"]
+            },
+            selectionFilter: {
+              _: "and",
+              o: [
+                {_: "=", p: "country", v: "PT"},
+                {_: "=", p: "product", v: "fish"}
+              ]
+            }
+          });
+
+          var selectionFilter1 = modelAdapter.model.selectionFilter;
+          expect(selectionFilter1).not.toBe(null);
+
+          spyOn(CombineStrategy.prototype, "invert").and.callFake(function() {
+            return [new Cell("PT4", "Portugal"), new Cell("bird", "Bird")];
+          });
+          // ---
+
+          modelAdapter.model.selectionFilter = {_: "=", p: CombineStrategy.columnName, v: "PT4~bird"};
+
+          // ---
+
+          var selectionFilter2 = modelAdapter.selectionFilter;
+
+          expect(selectionFilter2).not.toBe(null);
+
+          expect(selectionFilter2).not.toBe(selectionFilter1);
+
+          var expectedFilter = context.instances.get({
+            _: "and",
+            o: [
+              {_: "=", p: "country", v: "PT4"},
+              {_: "=", p: "product", v: "bird"}
+            ]
+          });
+          expect(selectionFilter2.equals(expectedFilter)).toBe(true);
+        });
+      });
     });
   });
 });
