@@ -406,10 +406,10 @@ define([
         __convertValuesMap: function(originalValuesMap, toExternal) {
           var ambientRoleInfoMap = this.__getAmbientAdaptationModel().roleInfoMap;
           var convertedValuesMap = Object.create(null);
-          var model = toExternal ? this.model : this;
+          var originModel = toExternal ? this.model : this;
 
-          model.eachVisualRole(function(propType) {
-            var mapping = model.get(propType);
+          originModel.$type.eachVisualRole(function(propType) {
+            var mapping = originModel.get(propType);
             var strategy;
 
             if(mapping.hasFields && (strategy = ambientRoleInfoMap[propType.name].strategy) !== null) {
@@ -590,7 +590,7 @@ define([
           }
 
           // Map internal values to external values.
-          equalsMap = this.__convertValuesMap(equalsMap);
+          equalsMap = this.__convertValuesMap(equalsMap, toExternal);
 
           operands.push.apply(operands, Object.keys(equalsMap).map(function(propName) {
             return dataUtil.createFilterIsEqualFromCell(internalData, propName, equalsMap[propName], __context);
@@ -601,10 +601,10 @@ define([
 
         // Top-level isEqual
         if(filter.kind === "isEqual") {
-          equalsMap = {};
-          equalsMap[filter.property] = IsEqualFilter.value;
+          var equalsMap = {};
+          equalsMap[filter.property] = filter.value;
 
-          equalsMap = this.__convertValuesMap(equalsMap);
+          equalsMap = this.__convertValuesMap(equalsMap, toExternal);
 
           filter = dataUtil.createFilterFromCellsMap(equalsMap, internalData, __context);
 
