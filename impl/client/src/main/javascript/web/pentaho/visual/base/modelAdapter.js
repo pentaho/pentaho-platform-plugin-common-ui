@@ -801,7 +801,7 @@ define([
       var value = valuesMap[name];
       if(value !== undefined) {
         // Accept cells as well.
-        if(!value instanceof Date) {
+        if(!(value instanceof Date)) {
           value = value.valueOf();
         }
 

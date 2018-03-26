@@ -28,6 +28,9 @@ define([
     "pentaho/type/date",
     "pentaho/type/list",
     function(Strategy, TimeIntervalDurationEnum, DateType, ListType) {
+
+      var NULL_KEY = "NULL";
+
       /**
        * @name pentaho.visual.role.adaptation.EntityWithTimeIntervalKeyStrategy.Type
        * @class
@@ -121,13 +124,19 @@ define([
             var mainInputCell = inputCells[this.mainInputPosition];
 
             var startDateTime = mainInputCell.referent.property("startDateTime");
-            var dateValue = startDateTime != null ? new Date(startDateTime) : null;
+            var dateValue = null;
+            if(startDateTime != null) {
+              dateValue = new Date(startDateTime);
+              if(isNaN(dateValue.getTime())) {
+                dateValue = null;
+              }
+            }
 
             var outputCell = dataTable.getCell(rowIndex, outputColIndex);
             outputCell.value = dateValue;
             outputCell.label = cellLabels.join(", ");
 
-            this.__backIndex[this.__keyFun.call(null, dateValue)] = rowIndex;
+            this.__backIndex[dateValue != null ? this.__keyFun.call(null, dateValue) : NULL_KEY] = rowIndex;
             this.__forwardIndex[mainInputCell.value] = rowIndex;
           }
 
@@ -144,16 +153,34 @@ define([
 
         /** @inheritDoc */
         map: function(inputValues) {
-          return this._getDataRowCells(
-            this.__forwardIndex[inputValues[this.mainInputPosition]],
-            this.outputFieldIndexes);
+          var lookupValue = inputValues[this.mainInputPosition];
+          if(lookupValue != null) {
+            lookupValue = lookupValue.valueOf();
+          }
+
+          var rowIndex = this.__forwardIndex[lookupValue];
+          if(rowIndex != null) {
+            return this._getDataRowCells(rowIndex, this.outputFieldIndexes);
+          }
+
+          return null;
         },
 
         /** @inheritDoc */
         invert: function(outputValues) {
-          return this._getDataRowCells(
-            this.__backIndex[this.__keyFun.call(null, outputValues[0])],
-            this.inputFieldIndexes);
+          var lookupValue = outputValues[0];
+          if(lookupValue != null && !(lookupValue instanceof Date)) {
+            lookupValue = lookupValue.valueOf();
+          }
+
+          lookupValue = lookupValue != null ? this.__keyFun.call(null, lookupValue) : NULL_KEY;
+
+          var rowIndex = this.__backIndex[lookupValue];
+          if(rowIndex != null) {
+            return this._getDataRowCells(rowIndex, this.inputFieldIndexes);
+          }
+
+          return null;
         },
 
         $type: /** @lends pentaho.visual.role.adaptation.EntityWithTimeIntervalKeyStrategy.Type# */{
@@ -172,7 +199,7 @@ define([
           validateApplication: function(schemaData, inputFieldIndexes) {
             var mainInputFieldIndex = this.__getMainInputFieldPosition(inputFieldIndexes, schemaData);
 
-            return {isValid: mainInputFieldIndex != null, addsFields: true};
+            return {isValid: mainInputFieldIndex > -1, addsFields: true};
           },
 
           __getMainInputFieldPosition: function(inputFieldIndexes, schemaData) {
