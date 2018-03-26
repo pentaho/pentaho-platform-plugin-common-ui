@@ -416,6 +416,15 @@ define([
       this.__txnScopes = [];
 
       /**
+       * The stack of transactions performing the `did:change` phase.
+       *
+       * @type {!Array.<!pentaho.type.changes.Transaction>}
+       * @readOnly
+       * @private
+       */
+      this.__txnInCommitDid = [];
+
+      /**
        * The version of the next committed/fulfilled transaction.
        *
        * @type {number}
@@ -1099,12 +1108,56 @@ define([
       while(i--) {
         var scope = scopes[i];
         if(scope.transaction === txnCurrent) {
-          scopes.pop();
+          scopes.splice(i, 1);
           scope.__exitLocal();
-          if(scope.isRoot)
+          if(scope.isRoot) {
             break;
+          }
         }
       }
+    },
+
+    // @internal
+    __transactionEnterCommitDid: function(transaction) {
+      this.__txnInCommitDid.push(transaction);
+    },
+
+    // @internal
+    __transactionExitCommitDid: function(transaction) {
+      var txn = this.__txnInCommitDid.pop();
+      if(txn !== transaction) {
+        throw error.operInvalid("Unbalanced transaction exit commit did.");
+      }
+    },
+
+    /**
+     * Gets any changesets still being delivered through notifications in the commit phase
+     * of transactions.
+     *
+     * If a transaction is started and committed from within the `did:change` listener of another,
+     * then multiple changesets may be returned.
+     *
+     * @param {!pentaho.type.mixins.Container} container - The container.
+     *
+     * @return {Array.<pentaho.type.changes.Changeset>} An array of changesets, if any changeset exists;
+     * `null` otherwise.
+     */
+    getChangesetsPending: function(container) {
+      var changesets = null;
+      var L = this.__txnInCommitDid.length;
+      if(L > 0) {
+        var i = -1;
+        var uid = container.$uid;
+        while(++i < L) {
+          var transaction = this.__txnInCommitDid[i];
+          var changeset = transaction.getChangeset(uid);
+          if(changeset !== null) {
+            (changesets || (changesets = [])).push(changeset);
+          }
+        }
+      }
+
+      return changesets;
     },
 
     /**

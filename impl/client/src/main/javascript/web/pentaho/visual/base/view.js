@@ -241,11 +241,21 @@ define([
           /**
            * The set of dirty property groups of the view.
            *
+           * View is initially fully dirty.
+           *
            * @type {!pentaho.util.BitSet}
            * @readOnly
            * @private
            */
-          this.__dirtyPropGroups = new BitSet(View.PropertyGroups.All); // mark view as initially dirty
+          this.__dirtyPropGroups = new BitSet(View.PropertyGroups.All);
+
+          /**
+           * The view $version when `__dirtyPropGroups` was updated for the last time.
+           *
+           * @type {number}
+           * @private
+           */
+          this.__dirtyLastVersion = this.$version;
 
           /**
            * The current update action execution, if any; `null`, otherwise.
@@ -412,7 +422,42 @@ define([
         get isDirty() {
           // Because dirty prop groups are cleared optimistically before update methods run,
           // it is needed to use isUpdating to not let that transient non-dirty state show through.
-          return this.isUpdating || !this.__dirtyPropGroups.isEmpty;
+          return this.isUpdating || this.__getIsDirty();
+        },
+
+        /**
+         * Gets a value that indicates if the view is dirty.
+         *
+         * This method always returns the most real and up-to-date value.
+         *
+         * @return {boolean} `true` if dirty; `false`, otherwise.
+         * @private
+         */
+        __getIsDirty: function() {
+
+          var changesetsPending = context.getChangesetsPending(this);
+          if(changesetsPending !== null) {
+
+            var L = changesetsPending.length;
+            var i = -1;
+            while(++i < L) {
+              var changesetPending = changesetsPending[i];
+              if(changesetPending.ownerVersion > this.__dirtyLastVersion) {
+
+                var bitSetNew = new BitSet();
+
+                this._onChangeClassify(bitSetNew, changesetPending);
+
+                if(!bitSetNew.isEmpty) {
+                  this.__dirtyPropGroups.set(bitSetNew.get());
+                }
+
+                this.__dirtyLastVersion = changesetPending.ownerVersion;
+              }
+            }
+          }
+
+          return !this.__dirtyPropGroups.isEmpty;
         },
         // endregion
 
@@ -423,18 +468,11 @@ define([
         /** @inheritDoc */
         _onChangeDid: function(changeset) {
 
-          var bitSetNew = new BitSet();
-
-          this._onChangeClassify(bitSetNew, changeset);
-
-          if(!bitSetNew.isEmpty) {
-
-            this.__dirtyPropGroups.set(bitSetNew.get());
-
-            this._onChangeDirty(bitSetNew);
+          if(this.__getIsDirty()) {
+            this._onChangeDirty(this.__dirtyPropGroups);
           }
 
-          // emit event
+          // Emit event.
 
           this.base(changeset);
         },
@@ -643,7 +681,7 @@ define([
           var updateActionExecution = this.__updateActionExecution;
           if(updateActionExecution === null) {
             // Anything to do?
-            if(this.__dirtyPropGroups.isEmpty) {
+            if(!this.__getIsDirty()) {
               return Promise.resolve();
             }
 

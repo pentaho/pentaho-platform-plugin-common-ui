@@ -151,7 +151,10 @@ define([
           // to only call a listener if things changed below it since the last time it was called.
           // On the other hand, this will cause the commitWill evaluation phase to always have to execute its
           // lengthier path.
-          this.on("will:change", this.__onChangeWillHandler.bind(this));
+          //
+          // 3. Must be the last will:change listener, or the internal model is not guaranteed to be in sync.
+          //    TODO: find a way to ensure that we're really the last listener.
+          this.on("will:change", this.__onChangeWillHandler.bind(this), {priority: -Infinity});
         },
 
         /** @inheritDoc */
@@ -250,15 +253,43 @@ define([
          * @private
          */
         __onChangeWillHandler: function(event) {
-          var propertyNames = event.changeset.propertyNames;
-          if(propertyNames.length === 1 && propertyNames[0] === "selectionFilter") {
+
+          var changeset = event.changeset;
+          var propertyNames = changeset.propertyNames;
+
+          if(__hasSingleChange(propertyNames, "selectionFilter")) {
+            // a) selectionFilter only
+            //    updates model.selectionFilter and will re-entry in c)
+
             this.__updateInternalSelection();
-          } else if(propertyNames.length === 1 && propertyNames[0] === "model") {
-            var modelChangedPropertyNames = event.changeset.getChange("model").propertyNames;
-            if(modelChangedPropertyNames.length === 1 && modelChangedPropertyNames[0] === "selectionFilter") {
+
+          } else if(__hasSingleChange(propertyNames, "model")) {
+            var modelChangedPropertyNames = changeset.getChange("model").propertyNames;
+
+            if(__hasSingleChange(modelChangedPropertyNames, "selectionFilter")) {
+              // b) model.selectionFilter only
+              //    updates selectionFilter and will re-entry in c)
+
               this.__updateExternalSelection();
             }
+            // else might have updated internal VRs or something.
+
+          } else if(propertyNames.length === 2 &&
+                    changeset.hasChange("selectionFilter") &&
+                    changeset.hasChange("model") &&
+                    __hasSingleChange(changeset.getChange("model").propertyNames, "selectionFilter")) {
+
+            // c) selectionFilter + model.selectionFilter only
+
+            if(changeset.getChange("model").getChange("selectionFilter").transactionVersion >
+               changeset.getChange("selectionFilter").transactionVersion) {
+              this.__updateExternalSelection();
+            } else {
+              this.__updateInternalSelection();
+            }
+
           } else {
+
             this.__updateInternalModel();
           }
         },
@@ -336,7 +367,7 @@ define([
         __calcInternalSelectionFilter: function() {
           var externalSelectionFilter = this.selectionFilter;
           if(externalSelectionFilter !== null) {
-            return this.__convertFilterToInternal(externalSelectionFilter);
+            return this.convertFilterToInternal(externalSelectionFilter);
           }
 
           return null;
@@ -350,7 +381,7 @@ define([
         __calcExternalSelectionFilter: function() {
           var internalSelectionFilter = this.model.selectionFilter;
           if(internalSelectionFilter !== null) {
-            return this.__convertFilterToExternal(internalSelectionFilter);
+            return this.convertFilterToExternal(internalSelectionFilter);
           }
 
           return null;
@@ -361,9 +392,8 @@ define([
          *
          * @param {!pentaho.data.filter.Abstract} externalFilter - The external filter.
          * @return {pentaho.data.filter.Abstract} The corresponding internal filter.
-         * @private
          */
-        __convertFilterToInternal: function(externalFilter) {
+        convertFilterToInternal: function(externalFilter) {
           var adaptationModel = this.__getAmbientAdaptationModel();
           var internalData = adaptationModel.internalData;
           if(internalData === null) {
@@ -381,9 +411,8 @@ define([
          *
          * @param {!pentaho.data.filter.Abstract} internalFilter - The internal filter.
          * @return {pentaho.data.filter.Abstract} The corresponding external filter.
-         * @private
          */
-        __convertFilterToExternal: function(internalFilter) {
+        convertFilterToExternal: function(internalFilter) {
           var adaptationModel = this.__getAmbientAdaptationModel();
           var internalData = adaptationModel.internalData;
           if(internalData === null) {
@@ -627,6 +656,10 @@ define([
       // endregion
     }
   ];
+
+  function __hasSingleChange(propertyNames, propertyName) {
+    return propertyNames.length === 1 && propertyNames[0] === propertyName;
+  }
 
   // region Adaptation Model
   function __createAdaptationModel(modelAdapter, previousAdaptationModel, changeset) {

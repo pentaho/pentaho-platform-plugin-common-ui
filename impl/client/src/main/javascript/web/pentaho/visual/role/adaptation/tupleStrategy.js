@@ -97,7 +97,7 @@ define([
    */
   IndexNode.prototype.add = function(inputData, rowIndex, columnIndexes, keyFuns) {
     var level = -1;
-    var levelCount = inputData.getNumberOfColumns();
+    var levelCount = columnIndexes.length;
     var values = new Array(levelCount);
     var parentNode = this;
     while(++level < levelCount) {

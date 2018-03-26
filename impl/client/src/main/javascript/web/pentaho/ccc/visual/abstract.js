@@ -1629,8 +1629,6 @@ define([
             //   for trend datums, which are excluded by the below !isVirtual test.
             // * Interpolated datums could also generate duplicate filters,
             //   but are also excluded by the below !isVirtual test.
-            var operandsByContentKey = {};
-
             cccSelectingDatums.forEach(function(cccDatum) {
 
               // Virtual (interpolated or trended) datums or datums with
@@ -1641,16 +1639,6 @@ define([
                 // (e.g. bar chart with measures alone).
                 var operand = this._convertCccComplexToFilter(cccDatum);
                 if(operand) {
-
-                  // TODO: delete this and the operandsByContentKey variable
-                  // after testing proves the assumption is correct.
-                  // BEGIN
-                  var key = operand.$contentKey;
-                  if(def.hasOwn(operandsByContentKey, key))
-                    throw def.error.operationInvalid("Bad programmer.");
-                  operandsByContentKey[key] = true;
-                  // END
-
                   operands.push(operand);
                 }
               }

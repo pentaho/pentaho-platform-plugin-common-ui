@@ -117,6 +117,14 @@ define([
       this.__commitWillChangeset = null;
 
       /**
+       * The set of owner uids of changesets which have ran at least once.
+       *
+       * @type {Object.<string, boolean>}
+       * @private
+       */
+      this.__commitWillRanSet = null;
+
+      /**
        * The number of active scopes of this transaction.
        *
        * The transaction can be committed only when it has a single scope.
@@ -692,7 +700,7 @@ define([
           currentOwner = currentChangeset.owner;
 
           delete changesetQueueSet[currentOwner.$uid];
-
+          this.__commitWillRanSet[currentOwner.$uid] = true;
           this.__commitWillChangeset = currentChangeset;
 
           currentListenersVersions = null;
@@ -736,6 +744,7 @@ define([
 
       this.__commitWillQueue = new SortedList({comparer: __compareChangesets});
       this.__commitWillQueueSet = Object.create(null);
+      this.__commitWillRanSet = Object.create(null);
       this.__commitWillChangeset = null;
 
       var anyChangeWillListeners = false;
@@ -769,7 +778,7 @@ define([
      * @private
      */
     __finalizeCommitWillQueue: function() {
-      this.__commitWillQueue = this.__commitWillQueueSet = this.__commitWillChangeset = null;
+      this.__commitWillQueue = this.__commitWillQueueSet = this.__commitWillChangeset = this.__commitWillRanSet = null;
     },
 
     /**
@@ -787,7 +796,7 @@ define([
         while(++i < L) {
           var parentChangeset = irefs[i].container.__cset;
           if(parentChangeset !== null) {
-            this.__addToCommitWillQueue(parentChangeset);
+            this.__addToCommitWillQueue(parentChangeset, /* forceIfRan: */true);
           }
         }
       }
@@ -797,12 +806,13 @@ define([
      * Adds a changeset to the commit-will queue, if it isn't there yet.
      *
      * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
+     * @param {boolean} forceIfRan - Indicates that the changeset should be added even if it already ran.
      * @private
      */
-    __addToCommitWillQueue: function(changeset) {
+    __addToCommitWillQueue: function(changeset, forceIfRan) {
       // Safe to not use O.hasOwn because container uids are numeric strings (cannot be "__proto__").
       var uid = changeset.owner.$uid;
-      if(!this.__commitWillQueueSet[uid]) {
+      if(!this.__commitWillQueueSet[uid] && (forceIfRan || !this.__commitWillRanSet[uid])) {
 
         this.__commitWillQueue.push(changeset);
         this.__commitWillQueueSet[uid] = true;
@@ -940,8 +950,14 @@ define([
         ? function(cset) { cset.owner._onChangeRejected(cset, reason); }
         : function(cset) { cset.owner._onChangeDid(cset); };
 
+      var context = this.context;
+
+      context.__transactionEnterCommitDid(this);
+
       // Make sure to execute listeners without an active transaction.
-      this.context.enterCommitted().using(this.__eachChangeset.bind(this, mapper));
+      context.enterCommitted().using(this.__eachChangeset.bind(this, mapper));
+
+      context.__transactionExitCommitDid(this);
 
       return reason;
     }
