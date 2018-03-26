@@ -113,6 +113,9 @@
   requireTypeInfo["pentaho/visual/role/adaptation/tupleStrategy"] = {
     base: "pentaho/visual/role/adaptation/strategy"
   };
+  requireTypeInfo["pentaho/visual/role/adaptation/entityWithTimeIntervalKey"] = {
+    base: "pentaho/visual/role/adaptation/strategy"
+  };
   // endregion
 
   // region Base AMD Plugins

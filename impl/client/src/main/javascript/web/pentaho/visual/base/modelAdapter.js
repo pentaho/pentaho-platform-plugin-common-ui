@@ -782,25 +782,26 @@ define([
   function __collectFieldValues(mapping, valuesMap) {
     var fieldValues = null;
 
+    var i = 0;
+    var count = mapping.fields.count;
     mapping.fields.each(function(mappingField) {
       var name = mappingField.name;
 
       var value = valuesMap[name];
       if(value !== undefined) {
         // Accept cells as well.
-        if(value !== null) {
+        if(!value instanceof Date) {
           value = value.valueOf();
         }
 
         if(fieldValues == null) {
-          fieldValues = [value];
-        } else {
-          fieldValues.push(value);
+          fieldValues = new Array(count);
         }
-      } else {
-        // break on the first field which is not present.
-        return false;
+
+        fieldValues[i] = value;
       }
+
+      ++i;
     });
 
     return fieldValues;

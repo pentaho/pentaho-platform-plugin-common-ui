@@ -233,6 +233,9 @@
       "pentaho/visual/role/adaptation/tupleStrategy": {
         "base": "pentaho/visual/role/adaptation/strategy"
       },
+      "pentaho/visual/role/adaptation/entityWithTimeIntervalKey": {
+        "base": "pentaho/visual/role/adaptation/strategy"
+      },
       "pentaho/visual/models/abstract": {
         "base": "pentaho/visual/base/model"
       },
