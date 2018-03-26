@@ -189,7 +189,7 @@ define([
 
                 if(annotation != null) {
                   // equal duration replaces mostSpecific, because we're looping backwards
-                  if(mostSpecific == null || TimeIntervalDurationEnum.type.comparePrimitiveValues(mostSpecific.duration.toLowerCase(), annotation.duration.toLowerCase()) < 1) {
+                  if(mostSpecific == null || TimeIntervalDurationEnum.type.comparePrimitiveValues(mostSpecific.duration, annotation.duration) < 1) {
                     mostSpecific = annotation;
                     mostSpecificIndex = index;
                   }

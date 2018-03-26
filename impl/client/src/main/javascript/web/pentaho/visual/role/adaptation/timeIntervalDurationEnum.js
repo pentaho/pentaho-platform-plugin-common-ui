@@ -4,9 +4,16 @@ define(function() {
       $type: {
         mixins: ["enum"],
         domain: [
-          "year",
-          "month",
-          "day"
+          "YEAR",
+          "HALFYEAR",
+          "QUARTER",
+          "MONTH",
+          "WEEK",
+          "DAY",
+          "HOUR",
+          "MINUTE",
+          "SECOND",
+          "MILLISECOND"
         ]
       }
     });
