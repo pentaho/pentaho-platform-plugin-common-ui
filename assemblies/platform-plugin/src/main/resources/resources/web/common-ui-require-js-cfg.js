@@ -113,7 +113,7 @@
   requireTypeInfo["pentaho/visual/role/adaptation/tupleStrategy"] = {
     base: "pentaho/visual/role/adaptation/strategy"
   };
-  requireTypeInfo["pentaho/visual/role/adaptation/entityWithTimeIntervalKey"] = {
+  requireTypeInfo["pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy"] = {
     base: "pentaho/visual/role/adaptation/strategy"
   };
   // endregion

@@ -24,10 +24,10 @@ define([
 
   return [
     "./strategy",
+    "./timeIntervalDurationEnum",
     "pentaho/type/date",
     "pentaho/type/list",
-    function(Strategy, DateType, ListType) {
-
+    function(Strategy, TimeIntervalDurationEnum, DateType, ListType) {
       /**
        * @name pentaho.visual.role.adaptation.EntityWithTimeIntervalKeyStrategy.Type
        * @class
@@ -90,19 +90,10 @@ define([
            * @readOnly
            * @private
            */
-          this.mainInputPosition = inputFieldIndexes.length - 1;
-
-          /**
-           * The index of the main input field in the data table.
-           *
-           * @type {Object}
-           * @readOnly
-           * @private
-           */
-          this.mainInputColIndex = inputFieldIndexes[this.mainInputPosition];
+          this.mainInputPosition = this.$type.__getMainInputFieldPosition(inputFieldIndexes, dataTable);
 
           var attributeName;
-          var baseAttributeName = attributeName = this.__getOutputFieldName(inputFieldIndexes);
+          var baseAttributeName = attributeName = this.$type.__getOutputFieldName(inputFieldIndexes);
           while(dataTable.model.attributes.get(attributeName) != null) {
             attributeName = baseAttributeName + "_" + new Date();
           }
@@ -110,7 +101,7 @@ define([
           dataTable.model.attributes.add({
             name: attributeName,
             type: "date",
-            label: this.__getOutputFieldLabel(inputFieldIndexes, dataTable),
+            label: this.$type.__getOutputFieldLabel(inputFieldIndexes, dataTable),
             isKey: true
           });
 
@@ -127,9 +118,10 @@ define([
               cellLabels[cellIndex] = inputCells[cellIndex].label;
             }
 
-            var mainInputCell = inputCells[this.mainInputColIndex];
+            var mainInputCell = inputCells[this.mainInputPosition];
 
-            var dateValue = new Date(mainInputCell.referent.property("startDateTime"));
+            var startDateTime = mainInputCell.referent.property("startDateTime");
+            var dateValue = startDateTime != null ? new Date(startDateTime) : null;
 
             var outputCell = dataTable.getCell(rowIndex, outputColIndex);
             outputCell.value = dateValue;
@@ -143,22 +135,6 @@ define([
           instSpec.outputFieldIndexes = [outputColIndex];
 
           this.base(instSpec);
-        },
-
-        __getOutputFieldName: function(inputFieldIndexes) {
-          return inputFieldIndexes.join("_");
-        },
-
-        __getOutputFieldLabel: function(inputFieldIndexes, dataTable) {
-          var index = inputFieldIndexes.length;
-          var labels = new Array(index);
-
-          while(index--) {
-            var colAttribute = dataTable.getColumnAttribute(inputFieldIndexes[index]);
-            labels[index] = colAttribute.label;
-          }
-
-          return labels.join(", ");
         },
 
         /** @inheritDoc */
@@ -194,33 +170,56 @@ define([
 
           /** @inheritDoc */
           validateApplication: function(schemaData, inputFieldIndexes) {
-            var hasStartDateTime = false;
+            var mainInputFieldIndex = this.__getMainInputFieldPosition(inputFieldIndexes, schemaData);
+
+            return {isValid: mainInputFieldIndex != null, addsFields: true};
+          },
+
+          __getMainInputFieldPosition: function(inputFieldIndexes, schemaData) {
+            var mostSpecific = null;
+            var mostSpecificIndex = null;
 
             var index = inputFieldIndexes.length;
 
             while(index--) {
               var colAttribute = schemaData.getColumnAttribute(inputFieldIndexes[index]);
+
               if(colAttribute != null) {
                 var annotation = colAttribute.property("EntityWithTimeIntervalKey");
+
                 if(annotation != null) {
-                  if(!hasStartDateTime && annotation.isStartDateTimeProvided) {
-                    hasStartDateTime = true;
-                    continue;
+                  // equal duration replaces mostSpecific, because we're looping backwards
+                  if(mostSpecific == null || TimeIntervalDurationEnum.type.comparePrimitiveValues(mostSpecific.duration.toLowerCase(), annotation.duration.toLowerCase()) < 1) {
+                    mostSpecific = annotation;
+                    mostSpecificIndex = index;
                   }
 
-                  if(hasStartDateTime) {
-                    continue;
-                  }
+                  continue;
                 }
               }
 
-              // if the leaf field provides no start date time *or*
-              // any of the fields doesn't have the EntityWithTimeIntervalKey annotation
-              // then the strategy doesn't apply.
-              return {isValid: false};
+              // if we reach here, one of the fields has no annotation, so we must reject the mapping
+              mostSpecific = null;
+              break;
             }
 
-            return {isValid: true, addsFields: true};
+            return mostSpecific != null && mostSpecific.isStartDateTimeProvided ? mostSpecificIndex : -1;
+          },
+
+          __getOutputFieldName: function(inputFieldIndexes) {
+            return inputFieldIndexes.join("_");
+          },
+
+          __getOutputFieldLabel: function(inputFieldIndexes, dataTable) {
+            var index = inputFieldIndexes.length;
+            var labels = new Array(index);
+
+            while(index--) {
+              var colAttribute = dataTable.getColumnAttribute(inputFieldIndexes[index]);
+              labels[index] = colAttribute.label;
+            }
+
+            return labels.join(", ");
           },
 
           /** @inheritDoc */
