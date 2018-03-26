@@ -22,7 +22,7 @@ define([
 
   "use strict";
 
-  /* globals describe, it, beforeAll, beforeEach, afterEach, spyOn */
+  /* globals describe, it, beforeAll, beforeEach, afterEach, spyOn, jasmine */
 
   describe("pentaho.visual.role.ExternalProperty", function() {
 
@@ -214,6 +214,89 @@ define([
                     CustomStrategyA.type,
                     CustomStrategyB.type
                   ]));
+                });
+              });
+          });
+        });
+
+        it("should default #strategies to the registered and browsable strategy instances if a root property", function() {
+
+          function configAmd(localRequire) {
+
+            localRequire.define("CustomStrategyA", function() {
+              return [
+                "pentaho/visual/role/adaptation/strategy",
+                function(Strategy) {
+                  return Strategy.extend({
+                    $type: {
+                      getInputTypeFor: function() { return null; }
+                    }
+                  });
+                }
+              ];
+            });
+
+            localRequire.config({
+              config: {
+                "pentaho/typeInfo": {
+                  "CustomStrategyA": {base: "pentaho/visual/role/adaptation/strategy"}
+                },
+
+                "pentaho/instanceInfo": {
+                  "my/configModule": {"type": "pentaho.config.spec.IRuleSet"}
+                }
+              }
+            });
+
+            localRequire.define("my/configModule", function() {
+
+              return {
+                rules: [{
+                  select: {type: "CustomStrategyA"},
+                  apply: {
+                    isBrowsable: false
+                  }
+                }]
+              };
+            });
+          }
+
+          return require.using(["pentaho/type/Context"], configAmd, function(Context) {
+
+            return Context.createAsync()
+              .then(function(context) {
+
+                return context.getDependencyApplyAsync([
+                  "pentaho/visual/base/model",
+                  "pentaho/visual/base/modelAdapter",
+                  "pentaho/visual/role/externalProperty",
+                  "CustomStrategyA"
+                ], function(Model, ModelAdapter, ExternalProperty, CustomStrategyA) {
+
+                  var DerivedModel = Model.extend({
+                    $type: {
+                      props: {
+                        "stringKeyRole": {
+                          base: "pentaho/visual/role/property",
+                          isVisualKey: true,
+                          modes: [{dataType: "string"}]
+                        }
+                      }
+                    }
+                  });
+
+                  spyOn(ExternalProperty.type, "__setStrategyTypes");
+
+                  var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel);
+
+                  var propType = DerivedModelAdapter.type.get("stringKeyRole");
+
+                  var strategyTypes = propType.__setStrategyTypes.calls.argsFor(0)[0];
+
+                  expect(strategyTypes).not.toEqual(jasmine.arrayContaining([
+                    CustomStrategyA.type
+                  ]));
+
                 });
               });
           });

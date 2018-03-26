@@ -42,7 +42,7 @@ define([
 
       // TODO: enhance the special ref $types with an includeSelf argument...
       var allStrategiesTypes = allStrategyCtorsList
-        .filter(function(Strategy) { return Strategy !== BaseStrategy; })
+        .filter(function(Strategy) { return Strategy.type.isBrowsable && Strategy !== BaseStrategy; })
         .map(function(Strategy) { return Strategy.type; });
 
       var ListOfModeType = this.get([Mode]);

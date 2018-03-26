@@ -98,7 +98,7 @@
  * {
  *   fruits: {
  *     $op:   "add"
- *     value: ["banana", apple""]
+ *     value: ["banana", "apple"]
  *   }
  * }
  * ```
