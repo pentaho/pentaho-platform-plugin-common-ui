@@ -98,6 +98,7 @@ define([
               this.ordinal = internalProperty.ordinal;
               this.category = internalProperty.category;
               this.helpUrl = internalProperty.helpUrl;
+              this.isBrowsable = internalProperty.isBrowsable;
             }
 
             if(this.isRoot) {
@@ -128,6 +129,11 @@ define([
           // @override
           get isVisualKey() {
             return this._internalProperty.isVisualKey;
+          },
+
+          // @override
+          isApplicableOn: function(modelAdapter) {
+            return this.base(modelAdapter) && this._internalProperty.isApplicableOn(modelAdapter.model);
           },
 
           // region fields
