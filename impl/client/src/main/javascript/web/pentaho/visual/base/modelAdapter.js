@@ -155,21 +155,13 @@ define([
           // 3. Must be the last will:change listener, or the internal model is not guaranteed to be in sync.
           //    TODO: find a way to ensure that we're really the last listener.
           this.on("will:change", this.__onChangeWillHandler.bind(this), {priority: -Infinity});
+
+          this.model.on("will:change", this.__onModelChangeWillHandler.bind(this));
         },
 
         /** @inheritDoc */
         _createChangeset: function(txn) {
           return new ModelAdapterChangeset(txn, this);
-        },
-
-        /**
-         * Converts a filter from the internal model namespace into the model adapter namespace.
-         *
-         * @param {!pentaho.data.filter.Abstract} filter - The filter.
-         * @return {pentaho.data.filter.Abstract} The translated filter.
-         */
-        _convertFilter: function(filter) {
-          return this.__convertFilterToExternal(filter);
         },
 
         // region Adaptation
@@ -243,11 +235,7 @@ define([
         },
 
         /**
-         * Event handler for the `will:change` event.
-         *
-         * Handles the special case of when only the `selectionFilter` property has changed
-         * by then delegating to the lighter weight `__updateInternalSelection` method.
-         * Otherwise, delegates to the full synchronization method, `__updateInternalModel`.
+         * Event handler for the `will:change` event as emitted by this object.
          *
          * @param {!pentaho.type.events.WillChange} event - The will change event.
          * @private
@@ -258,39 +246,35 @@ define([
           var propertyNames = changeset.propertyNames;
 
           if(__hasSingleChange(propertyNames, "selectionFilter")) {
-            // a) selectionFilter only
-            //    updates model.selectionFilter and will re-entry in c)
+
+            // console.log("[ModelAdapter] will:change modelAdapter.selectionFilter " +
+            //   (this.selectionFilter && this.selectionFilter.$contentKey));
 
             this.__updateInternalSelection();
 
-          } else if(__hasSingleChange(propertyNames, "model")) {
-            var modelChangedPropertyNames = changeset.getChange("model").propertyNames;
-
-            if(__hasSingleChange(modelChangedPropertyNames, "selectionFilter")) {
-              // b) model.selectionFilter only
-              //    updates selectionFilter and will re-entry in c)
-
-              this.__updateExternalSelection();
-            }
-            // else might have updated internal VRs or something.
-
-          } else if(propertyNames.length === 2 &&
-                    changeset.hasChange("selectionFilter") &&
-                    changeset.hasChange("model") &&
-                    __hasSingleChange(changeset.getChange("model").propertyNames, "selectionFilter")) {
-
-            // c) selectionFilter + model.selectionFilter only
-
-            if(changeset.getChange("model").getChange("selectionFilter").transactionVersion >
-               changeset.getChange("selectionFilter").transactionVersion) {
-              this.__updateExternalSelection();
-            } else {
-              this.__updateInternalSelection();
-            }
-
           } else {
 
+            // console.log("[ModelAdapter] will:change other");
+
             this.__updateInternalModel();
+          }
+        },
+
+        /**
+         * Event handler for the `will:change` event as emitted by this.model.
+         *
+         * @param {!pentaho.type.events.WillChange} event - The will change event.
+         * @private
+         */
+        __onModelChangeWillHandler: function(event) {
+
+          var changeset = event.changeset;
+
+          if(changeset.hasChange("selectionFilter")) {
+
+            // console.log("[ModelAdapter] will:change model.selectionFilter");
+
+            this.__updateExternalSelection();
           }
         },
 
@@ -342,7 +326,6 @@ define([
          * @private
          */
         __updateInternalSelection: function() {
-
           this.model.selectionFilter = this.__calcInternalSelectionFilter();
         },
 
@@ -367,7 +350,7 @@ define([
         __calcInternalSelectionFilter: function() {
           var externalSelectionFilter = this.selectionFilter;
           if(externalSelectionFilter !== null) {
-            return this.convertFilterToInternal(externalSelectionFilter);
+            return this._convertFilterToInternal(externalSelectionFilter);
           }
 
           return null;
@@ -381,19 +364,20 @@ define([
         __calcExternalSelectionFilter: function() {
           var internalSelectionFilter = this.model.selectionFilter;
           if(internalSelectionFilter !== null) {
-            return this.convertFilterToExternal(internalSelectionFilter);
+            return this._convertFilterToExternal(internalSelectionFilter);
           }
 
           return null;
         },
 
         /**
-         * Converts an external filter into a corresponding internal filter.
+         * Converts a filter from the model adapter namespace into the internal model namespace.
          *
          * @param {!pentaho.data.filter.Abstract} externalFilter - The external filter.
          * @return {pentaho.data.filter.Abstract} The corresponding internal filter.
+         * @protected
          */
-        convertFilterToInternal: function(externalFilter) {
+        _convertFilterToInternal: function(externalFilter) {
           var adaptationModel = this.__getAmbientAdaptationModel();
           var internalData = adaptationModel.internalData;
           if(internalData === null) {
@@ -407,12 +391,13 @@ define([
         },
 
         /**
-         * Converts an internal filter into a corresponding external filter.
+         * Converts a filter from the internal model namespace into the model adapter namespace.
          *
          * @param {!pentaho.data.filter.Abstract} internalFilter - The internal filter.
          * @return {pentaho.data.filter.Abstract} The corresponding external filter.
+         * @protected
          */
-        convertFilterToExternal: function(internalFilter) {
+        _convertFilterToExternal: function(internalFilter) {
           var adaptationModel = this.__getAmbientAdaptationModel();
           var internalData = adaptationModel.internalData;
           if(internalData === null) {
@@ -489,6 +474,7 @@ define([
                */
               name: "model",
               valueType: Model,
+              isBoundary: true,
               isRequired: true,
               isReadOnly: true,
               // Create a new instance each time.
@@ -530,6 +516,13 @@ define([
 
                 if(internalModelTypeBase !== internalModelType &&
                   internalModelType.isSubtypeOf(internalModelTypeBase)) {
+
+                  // Sync description and such.
+                  this.label = internalModelType.label;
+                  this.description = internalModelType.description;
+                  this.ordinal = internalModelType.ordinal;
+                  this.category = internalModelType.category;
+                  this.helpUrl = internalModelType.helpUrl;
 
                   // Expand model.
                   var newRolePropTypeSpecs = [];

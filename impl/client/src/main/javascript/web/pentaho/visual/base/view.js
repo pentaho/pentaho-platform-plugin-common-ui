@@ -442,7 +442,7 @@ define([
             var i = -1;
             while(++i < L) {
               var changesetPending = changesetsPending[i];
-              if(changesetPending.ownerVersion > this.__dirtyLastVersion) {
+              if(changesetPending.ownerVersion >= this.__dirtyLastVersion) {
 
                 var bitSetNew = new BitSet();
 
@@ -451,9 +451,9 @@ define([
                 if(!bitSetNew.isEmpty) {
                   this.__dirtyPropGroups.set(bitSetNew.get());
                 }
-
-                this.__dirtyLastVersion = changesetPending.ownerVersion;
               }
+
+              this.__dirtyLastVersion = this.$version;
             }
           }
 

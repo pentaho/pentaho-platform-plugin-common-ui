@@ -980,7 +980,7 @@ define([
 
             describe("when a changeset which is before the current one in the graph is locally changed", function() {
 
-              it("should be added to the queue and be executed again", function() {
+              it("should not be added to the queue and be executed again if it already ran once", function() {
 
                 var neighborhood = scenarioNeighborhood();
 
@@ -997,13 +997,34 @@ define([
 
                 transaction.__doCommitWillCore();
 
-                expect(neighborhood.graph3.dog1._onChangeWill).toHaveBeenCalledTimes(2);
-
-                // Although called twice, the listener is only called once because in the second time,
-                // it is in the same version!
-                expect(neighborhood.graph3.person1.pets._onChangeWill).toHaveBeenCalledTimes(2);
+                expect(neighborhood.graph3.dog1._onChangeWill).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.person1.pets._onChangeWill).toHaveBeenCalledTimes(1);
 
                 expect(neighborhood.graph3.person1._onChangeWill).toHaveBeenCalledTimes(1);
+              });
+
+              it("should be added to the queue and be executed if it did not yet ran", function() {
+
+                var neighborhood = scenarioNeighborhood();
+
+                neighborhood.graph3.person1.on("will:change", jasmine.createSpy("will:change"));
+
+                spyOn(neighborhood.graph3.dog1, "_onChangeWill");
+                spyOn(neighborhood.graph3.person1.pets, "_onChangeWill");
+                spyOn(neighborhood.graph3.person1, "_onChangeWill").and.callFake(function() {
+                  // => 3 changesets (net order 2)
+                  neighborhood.graph3.dog1.name = "can2";
+                });
+
+                neighborhood.graph3.person1.name = "Trash2";
+
+                transaction.__doCommitWillCore();
+
+                expect(neighborhood.graph3.dog1._onChangeWill).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.person1.pets._onChangeWill).toHaveBeenCalledTimes(1);
+
+                // _onChangeWill called twice, but listener only once.
+                expect(neighborhood.graph3.person1._onChangeWill).toHaveBeenCalledTimes(2);
               });
 
               it("should not call the listener that changed the before changeset twice " +
@@ -1025,34 +1046,6 @@ define([
                 transaction.__doCommitWillCore();
 
                 expect(person1PetsChangeWill).toHaveBeenCalledTimes(1);
-              });
-
-              it("should call the listener that changed the before changeset again, " +
-                "if other changes occurred", function() {
-
-                var neighborhood = scenarioNeighborhood();
-
-                // => 3 changesets (net order 2)
-                neighborhood.graph3.dog1.name = "can2";
-
-                var dog1ChangeWill = jasmine.createSpy("dog1 will:change").and.callFake(function() {
-                  if(neighborhood.graph3.dog1.name === "can3") {
-                    neighborhood.graph3.dog1.age = 10;
-                  }
-                });
-                neighborhood.graph3.dog1.on("will:change", dog1ChangeWill);
-
-                var person1PetsChangeWill = jasmine.createSpy("person1 will:change").and.callFake(function() {
-                  neighborhood.graph3.dog1.name = "can3";
-                });
-                neighborhood.graph3.person1.pets.on("will:change", person1PetsChangeWill);
-
-                spyOn(neighborhood.graph3.person1, "_onChangeWill");
-
-                transaction.__doCommitWillCore();
-
-                expect(dog1ChangeWill).toHaveBeenCalledTimes(2);
-                expect(person1PetsChangeWill).toHaveBeenCalledTimes(2);
               });
             });
           });

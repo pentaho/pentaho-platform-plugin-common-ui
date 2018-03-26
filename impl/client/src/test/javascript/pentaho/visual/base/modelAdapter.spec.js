@@ -989,8 +989,10 @@ define([
       });
     });
 
-    describe("#_convertFilter", function() {
-      it("should convert the filter's internal model namespace to the external model namespace (many to one strategy)", function() {
+    describe("#_convertFilterToExternal", function() {
+
+      it("should convert the filter's internal model namespace to " +
+        "the external model namespace (many to one strategy)", function() {
         var strategies = [CombineStrategy.type];
 
         var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
@@ -1033,7 +1035,7 @@ define([
         // ---
 
         var filterToConvert = context.instances.get({_: "=", p: CombineStrategy.columnName, v: "PT4~bird"});
-        var translatedFilter = modelAdapter._convertFilter(filterToConvert);
+        var translatedFilter = modelAdapter._convertFilterToExternal(filterToConvert);
 
         // ---
 

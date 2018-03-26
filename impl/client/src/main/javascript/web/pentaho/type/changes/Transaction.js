@@ -679,16 +679,16 @@ define([
                   currentListenersVersions[index] = currentChangeset.transactionVersion;
 
                   // If the current changeset was modified, restart its processing.
-                  if(currentChangeset.transactionVersionLocal > currentChangesetVersionLocal) {
-
-                    isChangesetRestart = true;
-
-                    // Break. Don't notify any more listeners.
-                    eventArgs[0].cancel("changeset restart");
-
-                    // In case an error is being thrown, the error handler is invoked (EventSource#_emitGeneric).
-                    // The error is not caught here to reuse the default error handler, which console-logs the error.
-                  }
+                  // if(currentChangeset.transactionVersionLocal > currentChangesetVersionLocal) {
+                  //
+                  //   isChangesetRestart = true;
+                  //
+                  //   // Break. Don't notify any more listeners.
+                  //   eventArgs[0].cancel("changeset restart");
+                  //
+                  //   // In case an error is being thrown, the error handler is invoked (EventSource#_emitGeneric).
+                  //   // The error is not caught here to reuse the default error handler, which console-logs the error.
+                  // }
                 }
               }
             }

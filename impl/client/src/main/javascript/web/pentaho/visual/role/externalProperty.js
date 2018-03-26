@@ -89,7 +89,15 @@ define([
             var declaringType = this.declaringType;
             if(declaringType !== null) {
               var internalModelType = declaringType.get("model").valueType;
-              O.setConst(this, "_internalProperty", internalModelType.get(this.name));
+              var internalProperty = internalModelType.get(this.name);
+
+              O.setConst(this, "_internalProperty", internalProperty);
+
+              this.label = internalProperty.label;
+              this.description = internalProperty.description;
+              this.ordinal = internalProperty.ordinal;
+              this.category = internalProperty.category;
+              this.helpUrl = internalProperty.helpUrl;
             }
 
             if(this.isRoot) {
@@ -416,7 +424,10 @@ define([
                   bundle.format(bundle.structured.errors.property.noStrategy, {role: this})));
               }
 
-              // TODO: Validate internal property?
+              // Validate internal property on internal model.
+              // This enables a more complete single property validation.
+              // On the other hand, we end up validating internal props twice when model itself is validated...
+              addErrors(this._internalProperty.validateOn(modelAdapter.model));
             }
 
             return errors;
