@@ -174,34 +174,34 @@ define([
 
       it("should return a cell corresponding to a given existing value", function() {
 
-        var inputCells = strategy.map(["A"]);
+        var outputCells = strategy.map(["A"]);
 
-        expect(inputCells).toEqual([
+        expect(outputCells).toEqual([
           jasmine.objectContaining({value: "A", formatted: "AA1"})
         ]);
       });
 
       it("should return a cell corresponding to a given (equal) existing cell", function() {
 
-        var inputCells = strategy.map([new Cell("A", "Dummy")]);
+        var outputCells = strategy.map([new Cell("A", "Dummy")]);
 
-        expect(inputCells).toEqual([
+        expect(outputCells).toEqual([
           jasmine.objectContaining({value: "A", formatted: "AA1"})
         ]);
       });
 
       it("should return null if given a non-existing value", function() {
 
-        var inputCells = strategy.map(["C"]);
+        var outputCells = strategy.map(["C"]);
 
-        expect(inputCells).toBe(null);
+        expect(outputCells).toBe(null);
       });
 
-      it("should return null if given an existing null", function() {
+      it("should return [null] if given an existing null", function() {
 
-        var inputCells = strategy.map([null]);
+        var outputCells = strategy.map([null]);
 
-        expect(inputCells).toBe(null);
+        expect(outputCells).toEqual([null]);
       });
 
       it("should create the index only once", function() {
@@ -232,34 +232,34 @@ define([
 
       it("should return a cell corresponding to a given existing value", function() {
 
-        var outputCells = strategy.invert(["A"]);
+        var inputCells = strategy.invert(["A"]);
 
-        expect(outputCells).toEqual([
+        expect(inputCells).toEqual([
           jasmine.objectContaining({value: "A", formatted: "AA1"})
         ]);
       });
 
       it("should return a cell corresponding to a given (equal) existing cell", function() {
 
-        var outputCells = strategy.invert([new Cell("A", "Dummy")]);
+        var inputCells = strategy.invert([new Cell("A", "Dummy")]);
 
-        expect(outputCells).toEqual([
+        expect(inputCells).toEqual([
           jasmine.objectContaining({value: "A", formatted: "AA1"})
         ]);
       });
 
       it("should return null if given a non-existing value", function() {
 
-        var outputCells = strategy.invert(["C"]);
+        var inputCells = strategy.invert(["C"]);
 
-        expect(outputCells).toBe(null);
+        expect(inputCells).toBe(null);
       });
 
-      it("should return null if given an existing null", function() {
+      it("should return [null] if given an existing null", function() {
 
-        var outputCells = strategy.invert([null]);
+        var inputCells = strategy.invert([null]);
 
-        expect(outputCells).toBe(null);
+        expect(inputCells).toEqual([null]);
       });
     });
   });

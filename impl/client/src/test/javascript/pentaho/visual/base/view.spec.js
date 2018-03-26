@@ -1001,7 +1001,7 @@ define([
         });
       });
 
-      fit("should mark the view as dirty when 'isAutoUpdate' is `false` and a change has taken place", function() {
+      it("should mark the view as dirty when 'isAutoUpdate' is `false` and a change has taken place", function() {
 
         view.__dirtyPropGroups.clear();
 

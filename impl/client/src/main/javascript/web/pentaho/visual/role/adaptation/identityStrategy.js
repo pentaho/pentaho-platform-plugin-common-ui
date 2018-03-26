@@ -77,7 +77,7 @@ define([
 
           var outputCell = this.__getCellByValue(inputValues[0]);
 
-          return outputCell && [outputCell];
+          return outputCell === undefined ? null : [outputCell];
         },
 
         /** @inheritDoc */
@@ -85,7 +85,7 @@ define([
 
           var inputCell = this.__getCellByValue(outputValues[0]);
 
-          return inputCell && [inputCell];
+          return inputCell === undefined ? null : [inputCell];
         },
 
         /**
@@ -109,7 +109,7 @@ define([
 
           var rowIndex = rowIndexByValueKey[valueKey];
           if(rowIndex === undefined) {
-            return null;
+            return undefined;
           }
 
           return this.data.getCell(rowIndex, this.inputFieldIndexes[0]);
