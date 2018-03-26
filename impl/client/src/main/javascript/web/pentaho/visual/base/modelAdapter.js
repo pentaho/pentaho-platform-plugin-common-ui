@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 define([
+  "module",
   "pentaho/type/changes/ComplexChangeset",
   "pentaho/data/Table",
   "pentaho/data/util",
   "pentaho/util/object",
   "pentaho/util/error",
+  "pentaho/util/logger",
+  "pentaho/debug",
+  "pentaho/debug/Levels",
   "pentaho/i18n!model",
   // so that r.js sees otherwise invisible dependencies.
   "./abstractModel",
   "./model",
   "pentaho/data/filter/and",
   "pentaho/data/filter/isEqual"
-], function(ComplexChangeset, Table, dataUtil, O, error, bundle) {
+], function(module, ComplexChangeset, Table, dataUtil, O, error, logger, debugMgr, DebugLevels, bundle) {
 
   "use strict";
 
@@ -61,19 +65,26 @@ define([
 
       this.base(model);
 
-      // Make sure to use an up to date adaptation model.
-      var adaptationModel = this.__getAdaptationModel();
+      // Cannot throw in this delicate phase...
+      try {
+        // Make sure to use an up to date adaptation model.
+        var adaptationModel = this.__getAdaptationModel();
 
-      // Reset all transactionVersion references, cause these are only meaningful within the current transaction.
-      adaptationModel.transactionVersion = 0;
+        // Reset all transactionVersion references, cause these are only meaningful within the current transaction.
+        adaptationModel.transactionVersion = 0;
 
-      var roleInfoMap = adaptationModel.roleInfoMap;
-      Object.keys(roleInfoMap).forEach(function(roleName) {
-        roleInfoMap[roleName].transactionVersion = 0;
-      });
+        var roleInfoMap = adaptationModel.roleInfoMap;
+        Object.keys(roleInfoMap).forEach(function(roleName) {
+          roleInfoMap[roleName].transactionVersion = 0;
+        });
 
-      // Update model.
-      model.__adaptationModel = adaptationModel;
+        // Update model.
+        model.__adaptationModel = adaptationModel;
+      } catch(ex) {
+        if(debugMgr.testLevel(DebugLevels.error, module)) {
+          logger.log("ModelAdapterChangeset apply failed: " + (ex && ex.message));
+        }
+      }
     }
   });
 
