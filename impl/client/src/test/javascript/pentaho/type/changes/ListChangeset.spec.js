@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ define([
 
         it("should store changes that are created", function() {
           var elem = {"foo": "bar"};
-          changeset.__addChange(new Add(elem, 0)); // Create add change.
+          changeset.__addChange(new Add(elem, 0)); // Create and add change.
 
           var changes = changeset.changes;
           expect(changes).toBeDefined();
@@ -114,7 +114,7 @@ define([
           var cset = new ComplexChangeset(context.transaction, elem);
           Object.defineProperty(cset, "hasChanges", {value: true});
 
-          changeset.__setNestedChangeset(cset);
+          changeset.__onChildChangesetCreated(cset);
 
           expect(changeset.hasChanges).toBe(true);
         });
@@ -124,7 +124,7 @@ define([
           var elem = new Derived();
           var cset = new ComplexChangeset(context.transaction, elem);
 
-          changeset.__setNestedChangeset(cset);
+          changeset.__onChildChangesetCreated(cset);
 
           expect(changeset.hasChanges).toBe(false);
         });
@@ -177,7 +177,7 @@ define([
       describe("#clearChanges -", function() {
         it("should remove any created changes from the changeset during the 'will' phase", function() {
           var elem = {"foo": "bar"};
-          changeset.__addChange(new Add(elem, 0)); // Create add change.
+          changeset.__addChange(new Add(elem, 0)); // Create and add change.
           changeset.clearChanges();
 
           expect(changeset.hasChanges).toBe(false);
@@ -186,20 +186,20 @@ define([
         it("should clear changes of a nested changeset", function() {
           var Derived = Complex.extend();
           var elem = new Derived();
-          var cset = new ComplexChangeset(context.transaction, elem);
+          var childChangeset = new ComplexChangeset(context.transaction, elem);
 
-          changeset.__setNestedChangeset(cset);
+          changeset.__onChildChangesetCreated(childChangeset);
 
-          spyOn(cset, "clearChanges");
+          spyOn(childChangeset, "_clearChangesRecursive");
 
           changeset.clearChanges();
 
-          expect(cset.clearChanges).toHaveBeenCalled();
+          expect(childChangeset._clearChangesRecursive).toHaveBeenCalled();
         });
 
         it("should throw when attempting to clear the changes from the changeset after becoming read-only", function() {
           var elem = {"foo": "bar"};
-          changeset.__addChange(new Add(elem, 0)); // Create add change.
+          changeset.__addChange(new Add(elem, 0)); // Create and add change.
           changeset.__setReadOnlyInternal();
 
           expect(function() {

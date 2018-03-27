@@ -17,7 +17,7 @@ define([
   "pentaho/i18n!messages",
 
   // so that r.js sees otherwise invisible dependencies.
-  "./baseMapping",
+  "./abstractMapping",
   "./mappingField",
   "./mode"
 ], function(bundle) {
@@ -25,17 +25,17 @@ define([
   "use strict";
 
   return [
-    "./baseMapping",
+    "./abstractMapping",
     "./mappingField",
     "./mode",
-    function(BaseMapping, MappingField, Mode) {
+    function(AbstractMapping, MappingField, Mode) {
 
       var context = this;
 
       /**
        * @name pentaho.visual.role.Mapping.Type
        * @class
-       * @extends pentaho.visual.role.BaseMapping.Type
+       * @extends pentaho.visual.role.AbstractMapping.Type
        *
        * @classDesc The type class of {@link pentaho.visual.role.Mapping}.
        */
@@ -43,7 +43,7 @@ define([
       /**
        * @name pentaho.visual.role.Mapping
        * @class
-       * @extends pentaho.visual.role.BaseMapping
+       * @extends pentaho.visual.role.AbstractMapping
        * @abstract
        *
        * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.Mapping>} pentaho/visual/role/mapping
@@ -52,14 +52,14 @@ define([
        * a specific visual role and the data fields of a model's current data set,
        * as seen internally to the visualization, by the view.
        *
-       * It extends the base [Mapping]{@link pentaho.visual.role.BaseMapping} class to add
+       * It extends the [AbstractMapping]{@link pentaho.visual.role.AbstractMapping} class to add
        * the [mode]{@link pentaho.visual.role.Mapping#mode} of operation of the visual role;
        *
        * @description Creates a visual role internal mapping instance.
        * @constructor
        * @param {pentaho.visual.role.spec.IMapping} [spec] A visual role internal mapping specification.
        */
-      var Mapping = BaseMapping.extend(/** @lends pentaho.visual.role.Mapping# */{
+      var Mapping = AbstractMapping.extend(/** @lends pentaho.visual.role.Mapping# */{
 
         /**
          * Resets any existing data or mapping related cached information.
@@ -85,9 +85,9 @@ define([
          * on the the containing visual role property.
          * However, the results are cached for performance reasons.
          *
-         * @name pentaho.visual.role.Mapping#mode
          * @type {pentaho.visual.role.Mode}
          * @readonly
+         * @override
          *
          * @see pentaho.visual.role.Property.Type#getModeEffectiveOn
          */

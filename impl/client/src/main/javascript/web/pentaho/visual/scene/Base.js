@@ -112,7 +112,7 @@ define([
     /**
      * Gets the root scene of the tree that this scene belongs to.
      *
-     * @type {!pentaho.visual.base.Scene}
+     * @type {!pentaho.visual.scene.Base}
      * @readOnly
      */
     get root() {

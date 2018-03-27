@@ -1,0 +1,44 @@
+/*!
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `IFieldsMetadata` interface exposes metadata information about
+ * the [fields]{@link pentaho.visual.role.AbstractMapping#fields} of visual roles' mappings.
+ *
+ * Objects of this interface are part of visual role properties and
+ * are exposed in the [AbstractProperty.Type#fields]{@link pentaho.visual.role.AbstractProperty.Type#fields}
+ * property.
+ *
+ * @name IFieldsMetadata
+ * @memberOf pentaho.visual.role
+ * @interface
+ * @see pentaho.visual.role.AbstractMapping#fields
+ */
+
+/**
+ * Evaluates the _field count range_ of a visual role property on a given model.
+ *
+ * The count range constraints the valid number of elements
+ * of the [fields]{@link pentaho.visual.role.AbstractMapping#fields} property
+ * of mappings of the associated visual role.
+ *
+ * @name countRangeOn
+ * @memberOf pentaho.visual.role.IFieldsMetadata#
+ * @method
+ * @param {pentaho.visual.base.AbstractModel} model - The model.
+ * @return {pentaho.IRange<number>} The field count range.
+ * @see pentaho.type.Property.Type#countRangeOn
+ */

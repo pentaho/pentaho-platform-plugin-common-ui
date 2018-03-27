@@ -19,7 +19,7 @@
  *
  * @name pentaho.visual.base.spec.IAbstractModel
  * @interface
- * @extends pentaho.type.spec.IModel
+ * @extends pentaho.type.spec.IComplex
  *
  * @see pentaho.visual.base.AbstractModel
  */

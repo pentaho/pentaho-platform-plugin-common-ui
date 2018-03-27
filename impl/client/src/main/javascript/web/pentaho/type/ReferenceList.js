@@ -46,10 +46,13 @@ define([
      * @param {pentaho.type.Property.Type} [propType] When `container` is a complex,
      * the property type whose value contains the owner of this reference list.
      *
+     * @return {boolean} `true` if the reference did not exist and was added; `false`, otherwise.
      * @private
      */
     add: function(container, propType) {
+      var L = this.length;
       this.push({container: container, property: propType || null});
+      return this.length > L;
     },
 
     /**
@@ -74,6 +77,7 @@ define([
           return true;
         }
       }
+
       return false;
     }
   });

@@ -76,8 +76,6 @@
   requireTypeInfo["pentaho/type/list"] = {alias: "list", base: "value"};
   requireTypeInfo["pentaho/type/element"] = {alias: "element", base: "value"};
   requireTypeInfo["pentaho/type/complex"] = {alias: "complex", base: "element"};
-  requireTypeInfo["pentaho/type/application"] = {alias: "application", base: "complex"};
-  requireTypeInfo["pentaho/type/model"] = {alias: "model", base: "complex"};
   requireTypeInfo["pentaho/type/simple"] = {alias: "simple", base: "element"};
   requireTypeInfo["pentaho/type/number"] = {alias: "number", base: "simple"};
   requireTypeInfo["pentaho/type/string"] = {alias: "string", base: "simple"};
@@ -105,12 +103,22 @@
   requireTypeInfo["pentaho/data/filter/isLessOrEqual"] = {alias: "<=", base: "pentaho/data/filter/property"};
   requireTypeInfo["pentaho/data/filter/isLike"] = {alias: "like", base: "pentaho/data/filter/property"};
 
-  requireTypeInfo["pentaho/visual/base/model"] = {base: "model"};
+  requireTypeInfo["pentaho/visual/base/model"] = {base: "complex"};
   requireTypeInfo["pentaho/visual/base/view"] = {
     base: "complex",
     props: {
       model: {valueType: "pentaho/visual/base/model"}
     }
+  };
+  requireTypeInfo["pentaho/visual/role/adaptation/strategy"] = {base: "complex"};
+  requireTypeInfo["pentaho/visual/role/adaptation/identityStrategy"] = {
+    base: "pentaho/visual/role/adaptation/strategy"
+  };
+  requireTypeInfo["pentaho/visual/role/adaptation/tupleStrategy"] = {
+    base: "pentaho/visual/role/adaptation/strategy"
+  };
+  requireTypeInfo["pentaho/visual/role/adaptation/entityWithTimeIntervalKeyStrategy"] = {
+    base: "pentaho/visual/role/adaptation/strategy"
   };
 
   requirePaths["json"] = basePath + "/util/require-json/json";

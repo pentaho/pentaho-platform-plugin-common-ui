@@ -61,14 +61,14 @@
  *    ```
  *
  * 7. The registered instance of type `"my/Service"` (or of a subtype of) which has the
- *    highest registration [ranking]{@link pentaho.type.spec.IInstanceConfiguration#ranking}:
+ *    highest registration [ranking]{@link pentaho.type.spec.IContextInstanceConfiguration#ranking}:
  *
  *    ```json
  *    {"$instance": {"type": "my/Service"}}
  *    ```
  *
  * 8. The [list]{@link pentaho.type.List} of registered instances of type `"my/Service"` (or of a subtype of)
- *    ordered from highest to lowest registration [ranking]{@link pentaho.type.spec.IInstanceConfiguration#ranking}:
+ *    ordered from highest to lowest registration [ranking]{@link pentaho.type.spec.IContextInstanceConfiguration#ranking}:
  *
  *    ```json
  *    {"$instance": {"type": "my/Service"}

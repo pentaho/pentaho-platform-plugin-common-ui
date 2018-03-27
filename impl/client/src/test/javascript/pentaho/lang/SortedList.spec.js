@@ -36,7 +36,6 @@ define([
       };
 
       var unsortedValues;
-
       var expectedDefaultOrder;
       var expectedCustomOrder;
 
@@ -151,7 +150,7 @@ define([
           var list;
 
           beforeEach(function() {
-            list = SortedList.to(unsortedValues, {"comparer": reverseSort});
+            list = SortedList.to(unsortedValues, {comparer: reverseSort});
           });
 
           it("should be sorted", function() {
@@ -163,7 +162,7 @@ define([
           var list;
 
           beforeEach(function() {
-            list = new SortedList({"comparer": reverseSort});
+            list = new SortedList({comparer: reverseSort});
           });
 
           it("should sort on push", function() {
@@ -178,24 +177,25 @@ define([
     });
 
     describe("typed use", function() {
+
       var elementSort = function(e1, e2) {
-        if (e1 == null || e2 == null) {
-          if (e1 != null) {
+        if(e1 == null || e2 == null) {
+          if(e1 != null) {
             return 1;
           }
 
-          if (e2 != null) {
+          if(e2 != null) {
             return -1;
           }
 
           return 0;
         }
 
-        // order by increment and only then by index
+        // Order by increment and only then by index.
         var v1 = e1.increment;
         var v2 = e2.increment;
 
-        if (v1 === v2) {
+        if(v1 === v2) {
           v1 = e1.index;
           v2 = e2.index;
         }
@@ -217,15 +217,15 @@ define([
         }
       }, {
         to: function(value) {
-          if (value instanceof Element) {
+          if(value instanceof Element) {
             return value;
           }
 
-          if (typeof value === 'number') {
+          if(typeof value === "number") {
             return new Element(value);
           }
 
-          if (value === null) {
+          if(value === null) {
             return null;
           }
         }
@@ -238,136 +238,222 @@ define([
       var e5 = new Element(5, 2);
       var e6 = new Element(6, 3);
 
-      var unsortedValues;
-
-      var expectedDefaultOrder;
-      var expectedCustomOrder;
-
       var SortedElements = SortedList.extend({
         elemClass: Element
       });
 
-      beforeEach(function() {
-        unsortedValues = [e5, e2, e3, e6, e1, e4];
-        expectedDefaultOrder = [e1, e2, e3, e4, e5, e6];
-        expectedCustomOrder = [e3, e1, e2, e5, e4, e6];
+      describe("total order", function() {
+        var unsortedValues;
+        var expectedDefaultOrder;
+        var expectedCustomOrder;
+
+        beforeEach(function() {
+          unsortedValues = [e5, e2, e3, e6, e1, e4];
+          expectedDefaultOrder = [e1, e2, e3, e4, e5, e6];
+          expectedCustomOrder = [e3, e1, e2, e5, e4, e6];
+        });
+
+        describe("construction", function() {
+          describe("constructor", function() {
+            var list;
+
+            beforeEach(function() {
+              list = new SortedElements();
+            });
+
+            it("should be defined", function() {
+              expect(list).toBeDefined();
+            });
+
+            it("should be a SortedElements", function() {
+              expect(list instanceof SortedElements).toBe(true);
+            });
+
+            it("should be a SortedList", function() {
+              expect(list instanceof SortedList).toBe(true);
+            });
+
+            it("should be a List", function() {
+              expect(list instanceof List).toBe(true);
+            });
+
+            it("should be a Array", function() {
+              expect(list instanceof Array).toBe(true);
+            });
+          });
+
+          describe("cast with .to(...)", function() {
+            var list;
+
+            beforeEach(function() {
+              list = SortedElements.to([1, 2]);
+            });
+
+            it("should be a SortedElements", function() {
+              expect(list instanceof SortedElements).toBe(true);
+            });
+
+            it("should be a SortedList", function() {
+              expect(list instanceof SortedList).toBe(true);
+            });
+
+            it("should be a List", function() {
+              expect(list instanceof List).toBe(true);
+            });
+
+            it("should be a Array", function() {
+              expect(list instanceof Array).toBe(true);
+            });
+
+            it("should cast elements", function() {
+              expect(list[0] instanceof Element).toBe(true);
+              expect(list[1] instanceof Element).toBe(true);
+            });
+          });
+        });
+
+        describe("default sort", function() {
+          describe("sort on cast with .to(...)", function() {
+            var list;
+
+            beforeEach(function() {
+              list = SortedElements.to(unsortedValues);
+            });
+
+            it("should be sorted", function() {
+              expect(list.slice()).toEqual(expectedDefaultOrder);
+            });
+          });
+
+          describe("sort on push", function() {
+            var list;
+
+            beforeEach(function() {
+              list = new SortedElements();
+            });
+
+            it("should sort on push", function() {
+              unsortedValues.forEach(function(e) {
+                list.push(e);
+              });
+
+              expect(list.slice()).toEqual(expectedDefaultOrder);
+            });
+          });
+        });
+
+        describe("custom sort", function() {
+          describe("sort on cast with .to(...)", function() {
+            var list;
+
+            beforeEach(function() {
+              list = SortedElements.to(unsortedValues, {comparer: elementSort});
+            });
+
+            it("should be sorted", function() {
+              expect(list.slice()).toEqual(expectedCustomOrder);
+            });
+          });
+
+          describe("sort on push", function() {
+            var list;
+
+            beforeEach(function() {
+              list = new SortedElements({comparer: elementSort});
+            });
+
+            it("should sort on push", function() {
+              unsortedValues.forEach(function(e) {
+                list.push(e);
+              });
+
+              expect(list.slice()).toEqual(expectedCustomOrder);
+            });
+          });
+        });
       });
 
-      describe("construction", function() {
-        describe("constructor", function() {
-          var list;
+      describe("partial order", function() {
 
-          beforeEach(function() {
-            list = new SortedElements();
-          });
+        var unsortedValues;
+        var expectedInsertBefore;
+        var expectedInsertAfter;
 
-          it("should be defined", function() {
-            expect(list).toBeDefined();
-          });
+        var e1_2 = new Element(1, 2);
+        var e1_3 = new Element(1, 2);
+        var e1_4 = new Element(1, 2);
 
-          it("should be a SortedElements", function() {
-            expect(list instanceof SortedElements).toBe(true);
-          });
+        var e2_2 = new Element(2, 2);
+        var e2_3 = new Element(2, 2);
+        var e2_4 = new Element(2, 2);
 
-          it("should be a SortedList", function() {
-            expect(list instanceof SortedList).toBe(true);
-          });
+        var e3_2 = new Element(3, 1);
+        var e3_3 = new Element(3, 1);
+        var e3_4 = new Element(3, 1);
 
-          it("should be a List", function() {
-            expect(list instanceof List).toBe(true);
-          });
+        var e4_2 = new Element(4, 3);
+        var e4_3 = new Element(4, 3);
+        var e4_4 = new Element(4, 3);
 
-          it("should be a Array", function() {
-            expect(list instanceof Array).toBe(true);
-          });
+        var e5_2 = new Element(5, 2);
+        var e5_3 = new Element(5, 2);
+        var e5_4 = new Element(5, 2);
+
+        var e6_2 = new Element(6, 3);
+        var e6_3 = new Element(6, 3);
+        var e6_4 = new Element(6, 3);
+
+        beforeEach(function() {
+
+          unsortedValues = [
+            e5, e2, e5_2, e3, e2_2, e5_3, e6, e3_2, e6_2, e2_3, e5_4, e1, e2_4, e6_3, e1_2, e1_3, e3_3, e6_4,
+            e4, e4_2, e3_4, e4_3, e1_4, e4_4
+          ];
+
+          expectedInsertAfter = [
+            e1, e1_2, e1_3, e1_4,
+            e2, e2_2, e2_3, e2_4,
+            e3, e3_2, e3_3, e3_4,
+            e4, e4_2, e4_3, e4_4,
+            e5, e5_2, e5_3, e5_4,
+            e6, e6_2, e6_3, e6_4
+          ];
+
+          expectedInsertBefore = [
+            e1_4, e1_3, e1_2, e1,
+            e2_4, e2_3, e2_2, e2,
+            e3_4, e3_3, e3_2, e3,
+            e4_4, e4_3, e4_2, e4,
+            e5_4, e5_3, e5_2, e5,
+            e6_4, e6_3, e6_2, e6
+          ];
         });
 
-        describe("cast with .to(...)", function() {
-          var list;
-
-          beforeEach(function() {
-            list = SortedElements.to([1, 2]);
-          });
-
-          it("should be a SortedElements", function() {
-            expect(list instanceof SortedElements).toBe(true);
-          });
-
-          it("should be a SortedList", function() {
-            expect(list instanceof SortedList).toBe(true);
-          });
-
-          it("should be a List", function() {
-            expect(list instanceof List).toBe(true);
-          });
-
-          it("should be a Array", function() {
-            expect(list instanceof Array).toBe(true);
-          });
-
-          it("should cast elements", function() {
-            expect(list[0] instanceof Element).toBe(true);
-            expect(list[1] instanceof Element).toBe(true);
-          });
-        });
-      });
-
-      describe("default sort", function() {
-        describe("sort on cast with .to(...)", function() {
-          var list;
-
-          beforeEach(function() {
-            list = SortedElements.to(unsortedValues);
-          });
-
-          it("should be sorted", function() {
-            expect(list.slice()).toEqual(expectedDefaultOrder);
-          });
-        });
-
-        describe("sort on push", function() {
-          var list;
-
-          beforeEach(function() {
-            list = new SortedElements();
-          });
+        describe("when orderingMode: OrderingMode.PartialInsertAfter", function() {
 
           it("should sort on push", function() {
+
+            var list = new SortedElements({orderingMode: SortedList.OrderingMode.PartialInsertAfter});
+
             unsortedValues.forEach(function(e) {
               list.push(e);
             });
 
-            expect(list.slice()).toEqual(expectedDefaultOrder);
-          });
-        });
-      });
-
-      describe("custom sort", function() {
-        describe("sort on cast with .to(...)", function() {
-          var list;
-
-          beforeEach(function() {
-            list = SortedElements.to(unsortedValues, {"comparer": elementSort});
-          });
-
-          it("should be sorted", function() {
-            expect(list.slice()).toEqual(expectedCustomOrder);
+            expect(list.slice()).toEqual(expectedInsertAfter);
           });
         });
 
-        describe("sort on push", function() {
-          var list;
-
-          beforeEach(function() {
-            list = new SortedElements({"comparer": elementSort});
-          });
+        describe("when orderingMode: OrderingMode.PartialInsertBefore", function() {
 
           it("should sort on push", function() {
+
+            var list = new SortedElements({orderingMode: SortedList.OrderingMode.PartialInsertBefore});
+
             unsortedValues.forEach(function(e) {
               list.push(e);
             });
 
-            expect(list.slice()).toEqual(expectedCustomOrder);
+            expect(list.slice()).toEqual(expectedInsertBefore);
           });
         });
       });
@@ -378,7 +464,7 @@ define([
 
       it("should call sort when changing", function() {
         var list = new SortedList();
-        spyOn(list, 'sort');
+        spyOn(list, "sort");
 
         list.comparer = customSortFunction;
 
@@ -390,8 +476,8 @@ define([
       });
 
       it("should not call sort when not changing", function() {
-        var list = new SortedList({"comparer": customSortFunction});
-        spyOn(list, 'sort');
+        var list = new SortedList({comparer: customSortFunction});
+        spyOn(list, "sort");
 
         list.comparer = customSortFunction;
 
@@ -399,7 +485,7 @@ define([
       });
 
       it("should return to the default function when setting null", function() {
-        var list = new SortedList({"comparer": customSortFunction});
+        var list = new SortedList({comparer: customSortFunction});
 
         expect(list.comparer).not.toEqual(SortedList.prototype.comparer);
 
@@ -409,7 +495,7 @@ define([
       });
 
       it("should return to default function when setting undefined", function() {
-        var list = new SortedList({"comparer": customSortFunction});
+        var list = new SortedList({comparer: customSortFunction});
 
         expect(list.comparer).not.toEqual(SortedList.prototype.comparer);
 
@@ -447,7 +533,7 @@ define([
       var list;
 
       beforeEach(function() {
-        list = new SortedList({"comparer": sortingFunction});
+        list = new SortedList({comparer: sortingFunction});
       });
 
       it("should throw if calling insert", function() {

@@ -16,54 +16,85 @@
 define([
   "pentaho/type/Context",
   "pentaho/data/Table",
-  "pentaho/type/SpecificationScope"
-], function(Context, Table, SpecificationScope) {
+  "pentaho/type/SpecificationScope",
+  "./adaptationUtil"
+], function(Context, Table, SpecificationScope, adaptationUtil) {
 
   "use strict";
 
-  /* globals describe, it, beforeAll, beforeEach, afterEach, spyOn */
+  /* globals describe, it, beforeAll, beforeEach, afterEach, spyOn, jasmine */
 
-  xdescribe("pentaho.visual.role.ExternalProperty", function() {
+  describe("pentaho.visual.role.ExternalProperty", function() {
 
     describe(".Type", function() {
 
-      var VisualModel;
-      var BaseStrategy;
-      var NullStrategy;
-      var IdentityStrategy;
-      var CombineStrategy;
-      var TupleStrategy;
       var context;
+      var buildAdapter = adaptationUtil.buildAdapter;
+      var Model;
+      var DerivedModel;
+      var ModelWithStringRole;
+      var ModelWithStringListRole;
 
-      beforeAll(function(done) {
+      var ModelAdapter;
 
-        Context.createAsync()
-            .then(function(_context) {
-              context = _context;
+      var NullStrategy;
+      var ListIdentityStrategy;
+      var ElementIdentityStrategy;
 
-              return context.getDependencyApplyAsync([
-                "pentaho/visual/base/model",
-                "pentaho/visual/role/strategies/base",
-                "pentaho/visual/role/strategies/identity",
-                "pentaho/visual/role/strategies/combine",
-                "pentaho/visual/role/strategies/tuple"
-              ], function(_Model, _BaseStrategy, _IdentityStrategy, _CombineStrategy, _TupleStrategy) {
-                VisualModel = _Model;
+      beforeAll(function() {
+        return Context.createAsync()
+          .then(function(_context) {
+            context = _context;
 
-                BaseStrategy = _BaseStrategy;
-                IdentityStrategy = _IdentityStrategy;
-                CombineStrategy = _CombineStrategy;
-                TupleStrategy = _TupleStrategy;
+            return context.getDependencyApplyAsync([
+              "pentaho/visual/base/model",
+              "pentaho/visual/base/modelAdapter",
+              "pentaho/visual/role/adaptation/strategy"
+            ], function(_Model, _ModelAdapter, BaseStrategy) {
 
-                NullStrategy = BaseStrategy.extend({
-                  getAdapter: function() {
-                    return null;
+              Model = _Model;
+              ModelAdapter = _ModelAdapter;
+
+              DerivedModel = Model.extend({
+                $type: {
+                  props: {
+                    "stringKeyRole": {
+                      base: "pentaho/visual/role/property",
+                      isVisualKey: true,
+                      modes: [{dataType: "string"}]
+                    },
+                    "numberRole": {
+                      base: "pentaho/visual/role/property",
+                      isVisualKey: false,
+                      modes: [{dataType: "number"}]
+                    },
+                    "elementKeyRole": {
+                      base: "pentaho/visual/role/property",
+                      isVisualKey: true,
+                      modes: [{dataType: "element"}]
+                    },
+                    "stringAndNumberRole": {
+                      base: "pentaho/visual/role/property",
+                      isVisualKey: false,
+                      modes: [
+                        {dataType: "string"},
+                        {dataType: "number"}
+                      ]
+                    }
                   }
-                });
+                }
               });
-            })
-            .then(done, done.fail);
 
+              var mocks = adaptationUtil.createMocks(Model, ModelAdapter, BaseStrategy);
+
+              ModelWithStringRole = mocks.ModelWithStringRole;
+              ModelWithStringListRole = mocks.ModelWithStringListRole;
+
+              NullStrategy = mocks.NullStrategy;
+              ListIdentityStrategy = mocks.ListIdentityStrategy;
+              ElementIdentityStrategy = mocks.ElementIdentityStrategy;
+            });
+          });
       });
 
       // region helper methods
@@ -81,158 +112,653 @@ define([
           ]
         };
       }
-
-      function createFullValidQualitativeMapping() {
-
-        var DerivedVisualModel = VisualModel.extend({
-          $type: {
-            props: {
-              propRole: {
-                base: "pentaho/visual/role/property",
-                modes: [{dataType: "string"}],
-                strategies: [new IdentityStrategy(), new CombineStrategy(), new TupleStrategy()],
-                dataType: "string"
-              }
-            }
-          }
-        });
-
-        var data = new Table(getDataSpec1());
-
-        var model = new DerivedVisualModel({
-          data: data,
-          propRole: {fields: ["country", "product"]}
-        });
-
-        assertIsValid(model);
-
-        return model;
-      }
-
-      function assertIsValid(complex) {
-        // this way, errors are shown in the console...
-        expect(complex.validate()).toBe(null);
-      }
       // endregion
 
-      describe("#getAdapterOn(model)", function() {
+      describe("#isVisualKey", function() {
+
+        it("should be `true` if the internal property is a visual key", function() {
+
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel);
+
+          var propType = DerivedModelAdapter.type.get("stringKeyRole");
+
+          expect(propType.isVisualKey).toBe(true);
+        });
+
+        it("should be `false` if the internal property is not a visual key", function() {
+
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel);
+
+          var propType = DerivedModelAdapter.type.get("numberRole");
+
+          expect(propType.isVisualKey).toBe(false);
+        });
+      });
+
+      describe("#strategies and #modes", function() {
+
+        it("should default #strategies to the registered strategy instances if a root property", function() {
+
+          function configAmd(localRequire) {
+
+            localRequire.define("CustomStrategyA", function() {
+              return [
+                "pentaho/visual/role/adaptation/strategy",
+                function(Strategy) {
+                  return Strategy.extend({
+                    $type: {
+                      getInputTypeFor: function() { return null; }
+                    }
+                  });
+                }
+              ];
+            });
+
+            localRequire.define("CustomStrategyB", function() {
+              return [
+                "pentaho/visual/role/adaptation/strategy",
+                function(Strategy) {
+                  return Strategy.extend({
+                    $type: {
+                      getInputTypeFor: function() { return null; }
+                    }
+                  });
+                }
+              ];
+            });
+
+            localRequire.config({
+              config: {
+                "pentaho/typeInfo": {
+                  "CustomStrategyA": {base: "pentaho/visual/role/adaptation/strategy"},
+                  "CustomStrategyB": {base: "pentaho/visual/role/adaptation/strategy"}
+                }
+              }
+            });
+          }
+
+          return require.using(["pentaho/type/Context"], configAmd, function(Context) {
+
+            return Context.createAsync()
+              .then(function(context) {
+
+                return context.getDependencyApplyAsync([
+                  "pentaho/visual/base/model",
+                  "pentaho/visual/base/modelAdapter",
+                  "pentaho/visual/role/externalProperty",
+                  "CustomStrategyA",
+                  "CustomStrategyB"
+                ], function(Model, ModelAdapter, ExternalProperty, CustomStrategyA, CustomStrategyB) {
+
+                  var DerivedModel = Model.extend({
+                    $type: {
+                      props: {
+                        "stringKeyRole": {
+                          base: "pentaho/visual/role/property",
+                          isVisualKey: true,
+                          modes: [{dataType: "string"}]
+                        }
+                      }
+                    }
+                  });
+
+                  spyOn(ExternalProperty.type, "__setStrategyTypes");
+
+                  var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel);
+
+                  var propType = DerivedModelAdapter.type.get("stringKeyRole");
+
+                  var strategyTypes = propType.__setStrategyTypes.calls.argsFor(0)[0];
+
+                  expect(strategyTypes).toEqual(jasmine.arrayContaining([
+                    CustomStrategyA.type,
+                    CustomStrategyB.type
+                  ]));
+                });
+              });
+          });
+        });
+
+        it("should default #strategies to the registered and browsable strategy instances if a root property", function() {
+
+          function configAmd(localRequire) {
+
+            localRequire.define("CustomStrategyA", function() {
+              return [
+                "pentaho/visual/role/adaptation/strategy",
+                function(Strategy) {
+                  return Strategy.extend({
+                    $type: {
+                      getInputTypeFor: function() { return null; }
+                    }
+                  });
+                }
+              ];
+            });
+
+            localRequire.config({
+              config: {
+                "pentaho/typeInfo": {
+                  "CustomStrategyA": {base: "pentaho/visual/role/adaptation/strategy"}
+                },
+
+                "pentaho/instanceInfo": {
+                  "my/configModule": {"type": "pentaho.config.spec.IRuleSet"}
+                }
+              }
+            });
+
+            localRequire.define("my/configModule", function() {
+
+              return {
+                rules: [{
+                  select: {type: "CustomStrategyA"},
+                  apply: {
+                    isBrowsable: false
+                  }
+                }]
+              };
+            });
+          }
+
+          return require.using(["pentaho/type/Context"], configAmd, function(Context) {
+
+            return Context.createAsync()
+              .then(function(context) {
+
+                return context.getDependencyApplyAsync([
+                  "pentaho/visual/base/model",
+                  "pentaho/visual/base/modelAdapter",
+                  "pentaho/visual/role/externalProperty",
+                  "CustomStrategyA"
+                ], function(Model, ModelAdapter, ExternalProperty, CustomStrategyA) {
+
+                  var DerivedModel = Model.extend({
+                    $type: {
+                      props: {
+                        "stringKeyRole": {
+                          base: "pentaho/visual/role/property",
+                          isVisualKey: true,
+                          modes: [{dataType: "string"}]
+                        }
+                      }
+                    }
+                  });
+
+                  spyOn(ExternalProperty.type, "__setStrategyTypes");
+
+                  var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel);
+
+                  var propType = DerivedModelAdapter.type.get("stringKeyRole");
+
+                  var strategyTypes = propType.__setStrategyTypes.calls.argsFor(0)[0];
+
+                  expect(strategyTypes).not.toEqual(jasmine.arrayContaining([
+                    CustomStrategyA.type
+                  ]));
+
+                });
+              });
+          });
+        });
+
+        it("should respect the specified #strategies", function() {
+
+          var NullStrategy2 = NullStrategy.extend();
+
+          var strategies = [NullStrategy.type, NullStrategy2.type];
+
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+            {
+              name: "stringKeyRole",
+              strategies: strategies
+            }
+          ]);
+
+          var externalPropType = DerivedModelAdapter.type.get("stringKeyRole");
+
+          expect(externalPropType.strategies).toEqual(strategies);
+        });
+
+        it("should generate an empty #modes list when there are no strategies", function() {
+
+          var strategies = [];
+
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+            {
+              name: "stringKeyRole",
+              strategies: strategies
+            }
+          ]);
+
+          var externalPropType = DerivedModelAdapter.type.get("stringKeyRole");
+
+          expect(externalPropType.modes.count).toBe(0);
+        });
+
+        it("should generate an empty #modes list when no strategy methods are selected", function() {
+
+          var strategies = [NullStrategy.type];
+
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+            {
+              name: "stringKeyRole",
+              strategies: strategies
+            }
+          ]);
+
+          var externalPropType = DerivedModelAdapter.type.get("stringKeyRole");
+
+          expect(externalPropType.modes.count).toBe(0);
+        });
+
+        it("should generate an external mode when an element identity strategy method is selected", function() {
+
+          var strategies = [ElementIdentityStrategy.type];
+
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+            {
+              name: "stringKeyRole",
+              strategies: strategies
+            }
+          ]);
+
+          var externalPropType = DerivedModelAdapter.type.get("stringKeyRole");
+
+          expect(externalPropType.modes.count).toBe(1);
+        });
+
+        it("should generate an external mode distinct from the internal mode", function() {
+
+          var strategies = [ElementIdentityStrategy.type];
+          var internalPropType = DerivedModel.type.get("stringKeyRole");
+
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+            {
+              name: "stringKeyRole",
+              strategies: strategies
+            }
+          ]);
+
+          var externalPropType = DerivedModelAdapter.type.get("stringKeyRole");
+
+          expect(externalPropType.modes.at(0)).not.toBe(internalPropType.modes.at(0));
+        });
+
+        it("should generate a categorical external mode if the internal mode is categorical", function() {
+
+          var strategies = [ElementIdentityStrategy.type];
+          var internalPropType = DerivedModel.type.get("stringKeyRole");
+
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+            {
+              name: "stringKeyRole",
+              strategies: strategies
+            }
+          ]);
+
+          var externalPropType = DerivedModelAdapter.type.get("stringKeyRole");
+
+          expect(externalPropType.modes.at(0).isContinuous).toBe(false);
+        });
+
+        it("should generate a continuous external mode if the internal mode is continuous", function() {
+
+          var strategies = [ElementIdentityStrategy.type];
+
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+            {
+              name: "numberRole",
+              strategies: strategies
+            }
+          ]);
+
+          var externalPropType = DerivedModelAdapter.type.get("numberRole");
+
+          expect(externalPropType.modes.at(0).isContinuous).toBe(true);
+        });
+
+        it("should generate external modes in order of internal modes", function() {
+
+          var strategies = [ElementIdentityStrategy.type];
+
+          var internalPropType = DerivedModel.type.get("stringAndNumberRole");
+
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+            {
+              name: "stringAndNumberRole",
+              strategies: strategies
+            }
+          ]);
+
+          var externalPropType = DerivedModelAdapter.type.get("stringAndNumberRole");
+
+          expect(externalPropType.modes.count).toBe(2);
+          expect(externalPropType.modes.at(0).equals(internalPropType.modes.at(0))).toBe(true);
+          expect(externalPropType.modes.at(1).equals(internalPropType.modes.at(1))).toBe(true);
+        });
+
+        it("should generate distinct external modes", function() {
+
+          var strategies = [ElementIdentityStrategy.type, ElementIdentityStrategy.type];
+
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+            {
+              name: "numberRole",
+              strategies: strategies
+            }
+          ]);
+
+          var externalPropType = DerivedModelAdapter.type.get("numberRole");
+
+          expect(externalPropType.modes.count).toBe(1);
+        });
+      });
+
+      describe("#fields", function() {
+
+        describe(".countRangeOn(modelAdapter)", function() {
+
+          describe("when there is no current mode", function() {
+
+            it("should have countRange.min = 1 if internal role is required", function() {
+
+              var CustomModel = Model.extend({
+                $type: {
+                  props: {
+                    roleA: {
+                      base: "pentaho/visual/role/property",
+                      modes: ["string"],
+                      fields: {isRequired: true}
+                    }
+                  }
+                }
+              });
+
+              var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel);
+
+              var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+              var modelAdapter = new DerivedModelAdapter();
+
+              expect(modelAdapter.roleA.mode).toBe(null);
+              expect(modelAdapter.model.roleA.modeFixed).toBe(null);
+
+              var range = externalPropType.fields.countRangeOn(modelAdapter);
+
+              expect(range.min).toBe(1);
+            });
+
+            it("should have countRange.min = 0 if internal role is not required", function() {
+
+              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole);
+
+              var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+              var modelAdapter = new DerivedModelAdapter();
+
+              expect(modelAdapter.roleA.mode).toBe(null);
+              expect(modelAdapter.model.roleA.modeFixed).toBe(null);
+
+              var range = externalPropType.fields.countRangeOn(modelAdapter);
+
+              expect(range.min).toBe(0);
+            });
+
+            it("should have countRange.max = 1 if there are only element modes", function() {
+
+              var strategies = [ElementIdentityStrategy.type];
+
+              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+                {
+                  name: "roleA",
+                  strategies: strategies
+                }
+              ]);
+
+              var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+              var modelAdapter = new DerivedModelAdapter();
+
+              expect(modelAdapter.roleA.mode).toBe(null);
+              expect(modelAdapter.model.roleA.modeFixed).toBe(null);
+
+              var range = externalPropType.fields.countRangeOn(modelAdapter);
+
+              expect(range.max).toBe(1);
+            });
+
+            it("should have countRange.max = Infinity if there is at least one list mode", function() {
+
+              var strategies = [ElementIdentityStrategy.type, ListIdentityStrategy.type];
+
+              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringListRole, [
+                {
+                  name: "roleA",
+                  strategies: strategies
+                }
+              ]);
+
+              var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+              var modelAdapter = new DerivedModelAdapter();
+
+              expect(modelAdapter.roleA.mode).toBe(null);
+              expect(modelAdapter.model.roleA.modeFixed).toBe(null);
+
+              var range = externalPropType.fields.countRangeOn(modelAdapter);
+
+              expect(range.max).toBe(Infinity);
+            });
+          });
+
+          describe("when there is a current mode", function() {
+
+            it("should have countRange.min = 1 if internal role is required", function() {
+
+              var strategies = [ElementIdentityStrategy.type];
+
+              var CustomModel = Model.extend({
+                $type: {
+                  props: {
+                    roleA: {
+                      base: "pentaho/visual/role/property",
+                      modes: ["string"],
+                      fields: {isRequired: true}
+                    }
+                  }
+                }
+              });
+
+              var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, [
+                {
+                  name: "roleA",
+                  strategies: strategies
+                }
+              ]);
+
+              var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+              var modelAdapter = new DerivedModelAdapter({
+                data: new Table(getDataSpec1()),
+                roleA: {
+                  fields: ["country"]
+                }
+              });
+
+              expect(modelAdapter.roleA.mode).not.toBe(null);
+              expect(modelAdapter.model.roleA.modeFixed).not.toBe(null);
+
+              var range = externalPropType.fields.countRangeOn(modelAdapter);
+
+              expect(range.min).toBe(1);
+            });
+
+            it("should have countRange.min = 0 if internal role is not required", function() {
+
+              var strategies = [ElementIdentityStrategy.type];
+
+              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+                {
+                  name: "roleA",
+                  strategies: strategies
+                }
+              ]);
+
+              var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+              var modelAdapter = new DerivedModelAdapter({
+                data: new Table(getDataSpec1()),
+                roleA: {
+                  fields: ["country"]
+                }
+              });
+
+              expect(modelAdapter.roleA.mode).not.toBe(null);
+              expect(modelAdapter.model.roleA.modeFixed).not.toBe(null);
+
+              var range = externalPropType.fields.countRangeOn(modelAdapter);
+
+              expect(range.min).toBe(0);
+            });
+
+            it("should have countRange.max = 1 if the current mode is an element mode", function() {
+
+              var strategies = [ElementIdentityStrategy.type];
+
+              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+                {
+                  name: "roleA",
+                  strategies: strategies
+                }
+              ]);
+
+              var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+              var modelAdapter = new DerivedModelAdapter({
+                data: new Table(getDataSpec1()),
+                roleA: {
+                  fields: ["country"]
+                }
+              });
+
+              expect(modelAdapter.roleA.mode).not.toBe(null);
+              expect(modelAdapter.roleA.mode.dataType.isElement).toBe(true);
+              expect(modelAdapter.model.roleA.modeFixed).not.toBe(null);
+
+              var range = externalPropType.fields.countRangeOn(modelAdapter);
+
+              expect(range.max).toBe(1);
+            });
+
+            it("should have countRange.max = Infinity if the current mode is a list mode", function() {
+
+              var strategies = [ListIdentityStrategy.type];
+
+              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringListRole, [
+                {
+                  name: "roleA",
+                  strategies: strategies
+                }
+              ]);
+
+              var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+              var modelAdapter = new DerivedModelAdapter({
+                data: new Table(getDataSpec1()),
+                roleA: {
+                  fields: ["country", "product"]
+                }
+              });
+
+              expect(modelAdapter.roleA.mode).not.toBe(null);
+              expect(modelAdapter.roleA.mode.dataType.isList).toBe(true);
+              expect(modelAdapter.model.roleA.modeFixed).not.toBe(null);
+
+              var range = externalPropType.fields.countRangeOn(modelAdapter);
+
+              expect(range.max).toBe(Infinity);
+            });
+          });
+        });
+      });
+
+      describe("#selectAdaptationStrategyOn(modelAdapter)", function() {
 
         it("should return null if the role is not mapped", function() {
 
-          var CustomModel = VisualModel.extend({
-            $type: {
-              props: {
-                roleA: {
-                  base: "pentaho/visual/role/property",
-                  modes: [{dataType: "string"}],
-                  strategies: [
-                    new IdentityStrategy()
-                  ]
-                }
-              }
-            }
-          });
+          var strategies = [ElementIdentityStrategy.type];
 
-          var propType = CustomModel.type.get("roleA");
-          var model = new CustomModel({
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+            {
+              name: "numberRole",
+              strategies: strategies
+            }
+          ]);
+
+          var externalPropType = DerivedModelAdapter.type.get("numberRole");
+
+          var modelAdapter = new DerivedModelAdapter({
             data: new Table(getDataSpec1())
           });
 
-          var adapter = propType.getAdapterOn(model);
+          var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-          expect(adapter).toBe(null);
+          expect(strategyApplication).toBe(null);
         });
 
         it("should return null if the model has no data", function() {
 
-          var CustomModel = VisualModel.extend({
-            $type: {
-              props: {
-                roleA: {
-                  base: "pentaho/visual/role/property",
-                  modes: [{dataType: "string"}],
-                  strategies: [
-                    new IdentityStrategy()
-                  ]
-                }
-              }
+          var strategies = [ElementIdentityStrategy.type];
+
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+            {
+              name: "stringKeyRole",
+              strategies: strategies
             }
+          ]);
+
+          var externalPropType = DerivedModelAdapter.type.get("stringKeyRole");
+
+          var modelAdapter = new DerivedModelAdapter({
+            stringKeyRole: {fields: ["country"]}
           });
 
-          var propType = CustomModel.type.get("roleA");
-          var model = new CustomModel({
-            roleA: {fields: ["country"]}
-          });
+          var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-          var adapter = propType.getAdapterOn(model);
-
-          expect(adapter).toBe(null);
+          expect(strategyApplication).toBe(null);
         });
 
         it("should return null if one of the mapped fields is not defined", function() {
 
-          var CustomModel = VisualModel.extend({
-            $type: {
-              props: {
-                roleA: {
-                  base: "pentaho/visual/role/property",
-                  modes: [{dataType: "string"}],
-                  strategies: [
-                    new IdentityStrategy()
-                  ]
-                }
-              }
+          var strategies = [ElementIdentityStrategy.type];
+
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+            {
+              name: "stringKeyRole",
+              strategies: strategies
             }
+          ]);
+
+          var externalPropType = DerivedModelAdapter.type.get("stringKeyRole");
+
+          var modelAdapter = new DerivedModelAdapter({
+            data: new Table(getDataSpec1()),
+            stringKeyRole: {fields: ["foo"]}
           });
 
-          var propType = CustomModel.type.get("roleA");
-          var model = new CustomModel({
-            roleA: {fields: ["foo"]}
-          });
+          var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-          var adapter = propType.getAdapterOn(model);
-
-          expect(adapter).toBe(null);
+          expect(strategyApplication).toBe(null);
         });
 
         describe("mapping has a specified isCategoricalFixed", function() {
 
-          it("should return null if there is no compatible mode (isCategoricalFixed=false)", function() {
+          it("should return null if there is no compatible mode (isCategoricalFixed=true)", function() {
 
-            var CustomModel = VisualModel.extend({
-              $type: {
-                props: {
-                  roleA: {
-                    base: "pentaho/visual/role/property",
-                    modes: [
-                      {dataType: "string", isContinuous: false},
-                      {dataType: "number", isContinuous: false}
-                    ],
-                    strategies: [
-                      new IdentityStrategy()
-                    ]
-                  }
-                }
-              }
-            });
+            var strategies = [ElementIdentityStrategy.type];
 
-            var propType = CustomModel.type.get("roleA");
-            var model = new CustomModel({
-              data: new Table(getDataSpec1()),
-              roleA: {
-                isContinuousFixed: true,
-                fields: ["country"]
-              }
-            });
-
-            var adapter = propType.getAdapterOn(model);
-
-            expect(adapter).toBe(null);
-          });
-
-          it("should return null if there is no compatible mode (isContinuousFixed=false)", function() {
-
-            var CustomModel = VisualModel.extend({
+            var CustomModel = Model.extend({
               $type: {
                 props: {
                   roleA: {
@@ -246,161 +772,284 @@ define([
               }
             });
 
-            var propType = CustomModel.type.get("roleA");
-            var model = new CustomModel({
+            var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, [
+              {
+                name: "roleA",
+                strategies: strategies
+              }
+            ]);
+
+            var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+            var modelAdapter = new DerivedModelAdapter({
               data: new Table(getDataSpec1()),
               roleA: {
-                isContinuousFixed: false,
+                isCategoricalFixed: true,
                 fields: ["country"]
               }
             });
 
-            var adapter = propType.getAdapterOn(model);
+            var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-            expect(adapter).toBe(null);
+            expect(strategyApplication).toBe(null);
           });
 
-          it("should return an adapter if there is a compatible mode (isContinuousFixed=true)", function() {
+          it("should return a method selection if there are compatible modes " +
+            "(isCategoricalFixed=false)", function() {
 
-            var CustomModel = VisualModel.extend({
+            var strategies = [ElementIdentityStrategy.type];
+
+            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+              {
+                name: "roleA",
+                strategies: strategies
+              }
+            ]);
+
+            var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+            var modelAdapter = new DerivedModelAdapter({
+              data: new Table(getDataSpec1()),
+              roleA: {
+                isCategoricalFixed: false,
+                fields: ["country"]
+              }
+            });
+
+            var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
+
+            expect(strategyApplication).not.toBe(null);
+            expect(strategyApplication.internalMode).toBe(ModelWithStringRole.type.get("roleA").modes.at(0));
+            expect(strategyApplication.externalMode).toBe(externalPropType.modes.at(0));
+          });
+
+          it("should return a method selection if there are compatible modes " +
+            "(isCategoricalFixed=true)", function() {
+
+            var strategies = [ElementIdentityStrategy.type];
+
+            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+              {
+                name: "roleA",
+                strategies: strategies
+              }
+            ]);
+
+            var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+            var modelAdapter = new DerivedModelAdapter({
+              data: new Table(getDataSpec1()),
+              roleA: {
+                isCategoricalFixed: true,
+                fields: ["country"]
+              }
+            });
+
+            var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
+
+            expect(strategyApplication).not.toBe(null);
+            expect(strategyApplication.internalMode).toBe(ModelWithStringRole.type.get("roleA").modes.at(0));
+            expect(strategyApplication.externalMode).toBe(externalPropType.modes.at(0));
+          });
+        });
+
+        describe("mapping has no isCategoricalFixed", function() {
+
+          it("should return null if there is more than one field and the mode data type is not list", function() {
+
+            var strategies = [ElementIdentityStrategy.type];
+
+            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+              {
+                name: "roleA",
+                strategies: strategies
+              }
+            ]);
+
+            var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+            var modelAdapter = new DerivedModelAdapter({
+              data: new Table(getDataSpec1()),
+              roleA: {
+                fields: ["country", "product"]
+              }
+            });
+
+            var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
+
+            expect(strategyApplication).toBe(null);
+          });
+
+          it("should return null if the field data type is not a subtype of the mode data type", function() {
+
+            var strategies = [ElementIdentityStrategy.type];
+
+            var CustomModel = Model.extend({
               $type: {
                 props: {
                   roleA: {
                     base: "pentaho/visual/role/property",
                     modes: [
-                      {dataType: "number", isContinuous: true}
-                    ],
-                    strategies: [
-                      new IdentityStrategy()
+                      {dataType: "string", isContinuous: true}
                     ]
                   }
                 }
               }
             });
 
-            var propType = CustomModel.type.get("roleA");
-            var model = new CustomModel({
+            var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, [
+              {
+                name: "roleA",
+                strategies: strategies
+              }
+            ]);
+
+            var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+            var modelAdapter = new DerivedModelAdapter({
               data: new Table(getDataSpec1()),
               roleA: {
-                isContinuousFixed: true,
                 fields: ["sales"]
               }
             });
 
-            var adapter = propType.getAdapterOn(model);
+            var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-            expect(adapter).not.toBe(null);
+            expect(strategyApplication).toBe(null);
           });
 
-          it("should return an adapter if there is a compatible mode (isContinuousFixed=false)", function() {
+          it("should return null if one the fields' data type is not a subtype of the mode data type", function() {
 
-            var CustomModel = VisualModel.extend({
+            var strategies = [ListIdentityStrategy.type];
+
+            var CustomModel = Model.extend({
               $type: {
                 props: {
                   roleA: {
                     base: "pentaho/visual/role/property",
                     modes: [
-                      {dataType: "string", isContinuous: false}
-                    ],
-                    strategies: [
-                      new IdentityStrategy()
+                      {dataType: ["string"], isContinuous: true}
                     ]
                   }
                 }
               }
             });
 
-            var propType = CustomModel.type.get("roleA");
-            var model = new CustomModel({
+            var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, [
+              {
+                name: "roleA",
+                strategies: strategies
+              }
+            ]);
+
+            var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+            var modelAdapter = new DerivedModelAdapter({
               data: new Table(getDataSpec1()),
               roleA: {
-                isContinuousFixed: false,
-                fields: ["country"]
+                fields: ["product", "sales"]
               }
             });
 
-            var adapter = propType.getAdapterOn(model);
+            var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-            expect(adapter).not.toBe(null);
+            expect(strategyApplication).toBe(null);
           });
-        });
 
-        describe("mapping has no isContinuousFixed", function() {
+          it("should return a method selection for a list mode and multiple fields " +
+            "of compatible data type", function() {
 
-          it("should return null if there is no applicable strategy for any of the modes", function() {
+            var strategies = [ListIdentityStrategy.type];
 
-            var CustomModel = VisualModel.extend({
+            var CustomModel = Model.extend({
               $type: {
                 props: {
                   roleA: {
                     base: "pentaho/visual/role/property",
                     modes: [
-                      {dataType: "string"},
-                      {dataType: "number"}
-                    ],
-                    strategies: [
-                      new NullStrategy(),
-                      new IdentityStrategy()
+                      {dataType: ["string"], isContinuous: true}
                     ]
                   }
                 }
               }
             });
 
-            var propType = CustomModel.type.get("roleA");
-            var model = new CustomModel({
+            var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, [
+              {
+                name: "roleA",
+                strategies: strategies
+              }
+            ]);
+
+            var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+            var modelAdapter = new DerivedModelAdapter({
               data: new Table(getDataSpec1()),
               roleA: {
-                fields: ["country", "sales"]
+                fields: ["country", "product"]
               }
             });
 
-            var adapter = propType.getAdapterOn(model);
+            var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
 
-            expect(adapter).toBe(null);
+            expect(strategyApplication).not.toBe(null);
           });
 
-          it("should return the adapter of the first applicable strategy and mode", function() {
+          it("should call the #validateApplication method of each compatible strategy method", function() {
 
-            var nullStrategy = new NullStrategy();
-            var identityStrategy1 = new IdentityStrategy();
-            var identityStrategy2 = new IdentityStrategy();
+            var strategies = [ElementIdentityStrategy.type];
 
-            spyOn(nullStrategy, "getMapper").and.callThrough();
-            spyOn(identityStrategy1, "getMapper").and.callThrough();
-            spyOn(identityStrategy2, "getMapper").and.callThrough();
-
-            var CustomModel = VisualModel.extend({
-              $type: {
-                props: {
-                  roleA: {
-                    base: "pentaho/visual/role/property",
-                    modes: [
-                      {dataType: "number"},
-                      {dataType: "string"}
-                    ],
-                    strategies: [
-                      nullStrategy,
-                      identityStrategy1,
-                      identityStrategy2
-                    ]
-                  }
-                }
+            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+              {
+                name: "roleA",
+                strategies: strategies
               }
-            });
+            ]);
 
-            var propType = CustomModel.type.get("roleA");
-            var model = new CustomModel({
+            var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+            var modelAdapter = new DerivedModelAdapter({
               data: new Table(getDataSpec1()),
               roleA: {
                 fields: ["country"]
               }
             });
 
-            var adapter = propType.getAdapterOn(model);
+            spyOn(ElementIdentityStrategy.Type.prototype, "validateApplication").and.returnValue({isValid: false});
 
-            expect(adapter).not.toBe(null);
-            expect(adapter.mode).toBe(propType.modes.at(1));
+            externalPropType.selectAdaptationStrategyOn(modelAdapter);
+
+            var fieldsIndexes = [0];
+            expect(ElementIdentityStrategy.Type.prototype.validateApplication).toHaveBeenCalledWith(
+              modelAdapter.data,
+              fieldsIndexes
+            );
+          });
+
+          it("should return the method selection for the first compatible strategy", function() {
+
+            var strategies = [ListIdentityStrategy.type, ElementIdentityStrategy.type, ElementIdentityStrategy.type];
+
+            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+              {
+                name: "roleA",
+                strategies: strategies
+              }
+            ]);
+
+            var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+            var modelAdapter = new DerivedModelAdapter({
+              data: new Table(getDataSpec1()),
+              roleA: {
+                fields: ["country"]
+              }
+            });
+
+            var strategyApplication = externalPropType.selectAdaptationStrategyOn(modelAdapter);
+
+            expect(strategyApplication).not.toBe(null);
+            expect(strategyApplication.strategyType).toBe(strategies[1]);
           });
         });
       });
@@ -424,45 +1073,87 @@ define([
               if(txnScope) txnScope.dispose();
             });
 
-            function assertIsInvalid(model) {
-              if(txnScope) txnScope.acceptWill();
-
-              expect(model.$type.get("propRole").validateOn(model) != null).toBe(true);
-            }
-
             it("should stop validation if base validation returns errors", function() {
 
-              var Model = VisualModel.extend({
-                $type: {
-                  props: {
-                    propRole: {
-                      base: "pentaho/visual/role/property"
-                    }
-                  }
+              var strategies = [ElementIdentityStrategy.type];
+
+              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+                {
+                  name: "roleA",
+                  strategies: strategies
+                }
+              ]);
+
+              var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+              var modelAdapter = new DerivedModelAdapter({
+                data: new Table(getDataSpec1()),
+                roleA: {
+                  fields: [{ /* field name is missing */ }]
                 }
               });
 
-              var rolePropType = Model.type.get("propRole");
-
-              var model = new Model({
-                propRole: {fields: [{}]}
-              });
-
-              expect(model.propRole.fields.count).toBe(1);
+              expect(modelAdapter.roleA.fields.count).toBe(1);
 
               // Assumptions
-              var errors = rolePropType.validateOn(model);
+              var errors = externalPropType.validateOn(modelAdapter);
               expect(Array.isArray(errors)).toBe(true);
               expect(errors.length).toBe(1);
             });
 
-            it("should be invalid, when the model has no data", function() {
+            it("should be invalid, when there is no selected strategy method", function() {
 
-              var model = createFullValidQualitativeMapping();
+              var strategies = [];
 
-              model.data = null;
+              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+                {
+                  name: "roleA",
+                  strategies: strategies
+                }
+              ]);
 
-              assertIsInvalid(model);
+              var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+              var modelAdapter = new DerivedModelAdapter({
+                data: new Table(getDataSpec1()),
+                roleA: {
+                  fields: ["country"]
+                }
+              });
+
+              expect(modelAdapter.roleA.fields.count).toBe(1);
+
+              // Assumptions
+              var errors = externalPropType.validateOn(modelAdapter);
+              expect(Array.isArray(errors)).toBe(true);
+              expect(errors.length).toBe(1);
+            });
+
+            it("should be valid, when there is a selected strategy method", function() {
+
+              var strategies = [ElementIdentityStrategy.type];
+
+              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+                {
+                  name: "roleA",
+                  strategies: strategies
+                }
+              ]);
+
+              var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+              var modelAdapter = new DerivedModelAdapter({
+                data: new Table(getDataSpec1()),
+                roleA: {
+                  fields: ["country"]
+                }
+              });
+
+              expect(modelAdapter.roleA.fields.count).toBe(1);
+
+              // Assumptions
+              var errors = externalPropType.validateOn(modelAdapter);
+              expect(errors).toBe(null);
             });
           });
         }
@@ -476,20 +1167,13 @@ define([
 
             var scope = new SpecificationScope();
 
-            var DerivedVisualModel = VisualModel.extend({
-              $type: {
-                props: {
-                  propRole: {
-                    base: "pentaho/visual/role/property"
-                  }
-                }
-              }
-            });
+            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole);
 
-            var rolePropType = DerivedVisualModel.type.get("propRole");
+            var externalPropType = DerivedModelAdapter.type.get("roleA");
+
             var spec = {};
             var ka = {};
-            var any = rolePropType._fillSpecInContext(spec, ka);
+            var any = externalPropType._fillSpecInContext(spec, ka);
 
             scope.dispose();
 
@@ -502,29 +1186,25 @@ define([
 
             var scope = new SpecificationScope();
 
-            var DerivedVisualModel = VisualModel.extend({
-              $type: {
-                props: {
-                  propRole: {
-                    base: "pentaho/visual/role/property",
-                    strategies: [
-                      new IdentityStrategy()
-                    ]
-                  }
-                }
-              }
-            });
+            var strategies = [ElementIdentityStrategy.type];
 
-            var rolePropType = DerivedVisualModel.type.get("propRole");
+            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+              {
+                name: "roleA",
+                strategies: strategies
+              }
+            ]);
+
+            var externalPropType = DerivedModelAdapter.type.get("roleA");
+
             var spec = {};
             var ka = {};
-            var any = rolePropType._fillSpecInContext(spec, ka);
+            var any = externalPropType._fillSpecInContext(spec, ka);
 
             scope.dispose();
 
             expect(any).toBe(true);
             expect(spec.strategies.length).toBe(1);
-            expect(spec.strategies[0].$type).toBe(IdentityStrategy.type);
           });
         });
       });

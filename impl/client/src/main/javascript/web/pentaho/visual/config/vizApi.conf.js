@@ -44,7 +44,7 @@ define(function() {
 
   return {
     rules: [
-      // region Viz API Standard Color Palettes Context Priorities Registration
+      // region Viz API Visual Roles' Strategies and Standard Color Palettes Context Priorities Registration
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
@@ -64,6 +64,10 @@ define(function() {
             "pentaho/visual/color/palettes/divergentRyg5":     {ranking: -10},
             "pentaho/visual/color/palettes/divergentRyb3":     {ranking: -10},
             "pentaho/visual/color/palettes/divergentRyb5":     {ranking: -10}
+          },
+          types: {
+            "pentaho/visual/role/adaptation/identityStrategy": {ranking: -10},
+            "pentaho/visual/role/adaptation/tupleStrategy":    {ranking: -20}
           }
         }
       },

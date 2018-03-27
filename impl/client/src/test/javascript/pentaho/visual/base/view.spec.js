@@ -1002,6 +1002,7 @@ define([
       });
 
       it("should mark the view as dirty when 'isAutoUpdate' is `false` and a change has taken place", function() {
+
         view.__dirtyPropGroups.clear();
 
         view.isAutoUpdate = false;

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,25 +19,25 @@ define([
 ], function(PrimitiveChange) {
   "use strict";
 
-  /**
-   * @name Sort
-   * @memberOf pentaho.type.changes
-   * @class
-   * @extends pentaho.type.changes.PrimitiveChange
-   * @amd pentaho/type/changes/sort
-   *
-   * @classDesc The `Sort` class describes the primitive operation that sorts the element in a list.
-   *
-   * This type of change is always part of a {@link pentaho.type.changes.ListChangeset}.
-   *
-   * @constructor
-   * @description Creates an instance.
-   *
-   * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer - The
-   * function used for comparing elements in the list.
-   */
   return PrimitiveChange.extend("pentaho.type.changes.Sort", /** @lends pentaho.type.changes.Sort# */{
 
+    /**
+     * @alias Sort
+     * @memberOf pentaho.type.changes
+     * @class
+     * @extends pentaho.type.changes.PrimitiveChange
+     * @amd pentaho/type/changes/sort
+     *
+     * @classDesc The `Sort` class describes the primitive operation that sorts the element in a list.
+     *
+     * This type of change is always part of a {@link pentaho.type.changes.ListChangeset}.
+     *
+     * @constructor
+     * @description Creates an instance.
+     *
+     * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer - The
+     * function used for comparing elements in the list.
+     */
     constructor: function(comparer) {
       this.comparer = comparer;
     },

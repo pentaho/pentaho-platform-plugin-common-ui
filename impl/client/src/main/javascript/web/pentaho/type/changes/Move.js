@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ define([
     // a b d e f C
 
     /**
-     * @name Move
+     * @alias Move
      * @memberOf pentaho.type.changes
      * @class
      * @extends pentaho.type.changes.PrimitiveChange
@@ -51,6 +51,7 @@ define([
      * @param {number} indexNew - The new index of the element in the list.
      */
     constructor: function(elem, indexOld, indexNew) {
+
       /**
        * Gets the element that is about to be moved in the list.
        *

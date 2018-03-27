@@ -26,7 +26,7 @@ define([
 
     var context;
     var Model;
-    var RoleBaseProperty;
+    var RoleAbstractProperty;
     var PaletteProperty;
     var dataSpec;
 
@@ -38,11 +38,11 @@ define([
 
             return context.getDependencyApplyAsync([
               "pentaho/visual/base/abstractModel",
-              "pentaho/visual/role/baseProperty",
+              "pentaho/visual/role/abstractProperty",
               "pentaho/visual/color/paletteProperty"
-            ], function(_AbstractModel, _RoleBaseProperty, _PaletteProperty) {
+            ], function(_AbstractModel, _RoleAbstractProperty, _PaletteProperty) {
               var AbstractModel = _AbstractModel;
-              RoleBaseProperty = _RoleBaseProperty;
+              RoleAbstractProperty = _RoleAbstractProperty;
               PaletteProperty = _PaletteProperty;
 
               Model = AbstractModel.extend();
@@ -103,11 +103,19 @@ define([
 
           return context.getDependencyApplyAsync(["pentaho/visual/base/abstractModel"], function() {
 
-            context.get("pentaho/visual/role/baseProperty");
+            context.get("pentaho/visual/role/abstractProperty");
           });
         });
       })
       .then(done, done.fail);
+    });
+
+    describe("#application", function() {
+
+      it("should have a default application of null", function() {
+        var model = new Model();
+        expect(model.application).toBe(null);
+      });
     });
 
     describe("#selectionFilter", function() {
@@ -199,6 +207,23 @@ define([
         expect("selectionFilter" in json).toBe(false);
       });
 
+      it("should not serialize the `application` property by default", function() {
+        var model = new Model({application: {}});
+        expect(model.application != null).toBe(true);
+
+        var result = model.toSpec({isJson: true});
+        expect("application" in result).toBe(false);
+      });
+
+      it("should serialize the `application` property if keyArgs.omitProps.application = false", function() {
+        var model = new Model({application: {}});
+        expect(model.application != null).toBe(true);
+
+        var result = model.toSpec({isJson: true, omitProps: {application: false}});
+        expect(result.application != null).toBe(true);
+        expect(typeof result.application).toBe("object");
+      });
+
       it("should serialize the `selectionFilter` property if keyArgs.omitProps.selectionFilter = false", function() {
         var model = new Model({
           selectionFilter: {_: "pentaho/data/filter/and"}
@@ -242,6 +267,15 @@ define([
         expect(json instanceof Object).toBe(true);
         expect("selectionFilter" in json).toBe(true);
       });
+
+      it("should serialize the `application` property", function() {
+        var model = new Model({application: {}});
+        expect(model.application != null).toBe(true);
+
+        var result = model.toSpec();
+        expect(result.application != null).toBe(true);
+        expect(typeof result.application).toBe("object");
+      });
     });
 
     describe(".Type", function() {
@@ -250,9 +284,9 @@ define([
 
         it("should return true if property type is a role.Property", function() {
 
-          var SubRoleProperty = RoleBaseProperty.extend();
+          var SubRoleProperty = RoleAbstractProperty.extend();
 
-          expect(Model.type.isVisualRole(RoleBaseProperty.type)).toBe(true);
+          expect(Model.type.isVisualRole(RoleAbstractProperty.type)).toBe(true);
           expect(Model.type.isVisualRole(SubRoleProperty.type)).toBe(true);
         });
 
@@ -292,9 +326,9 @@ define([
 
           DerivedModel = Model.extend({$type: {
             props: [
-              {name: "vr1", base: RoleBaseProperty},
-              {name: "vr2", base: RoleBaseProperty},
-              {name: "vr3", base: RoleBaseProperty}
+              {name: "vr1", base: RoleAbstractProperty},
+              {name: "vr2", base: RoleAbstractProperty},
+              {name: "vr3", base: RoleAbstractProperty}
             ]
           }});
 

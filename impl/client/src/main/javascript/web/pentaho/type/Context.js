@@ -27,6 +27,7 @@ define([
   "./changes/TransactionScope",
   "./changes/CommittedScope",
   "../lang/Base",
+  "../lang/SortedList",
   "./util",
   "../util/promise",
   "../util/arg",
@@ -39,10 +40,10 @@ define([
   "../util/logger",
   "./standard" // so that r.js sees otherwise invisible dependencies.
 ], function(localRequire, module, typeInfo, bundle,
-    SpecificationContext, SpecificationScope,
-    InstancesContainer, mainPlatformEnv, configurationService,
-    Transaction, TransactionScope, CommittedScope,
-    Base, typeUtil, promiseUtil, arg, error, O, F, moduleUtil, debugMgr, DebugLevels, logger) {
+            SpecificationContext, SpecificationScope,
+            InstancesContainer, mainPlatformEnv, configurationService,
+            Transaction, TransactionScope, CommittedScope,
+            Base, SortedList, typeUtil, promiseUtil, arg, error, O, F, moduleUtil, debugMgr, DebugLevels, logger) {
 
   "use strict";
 
@@ -73,10 +74,10 @@ define([
     "function",
     "typeDescriptor",
     "property",
-    "model",
-    "application",
     "mixins/enum"
   ].map(function(id) { return "pentaho/type/" + id; }));
+
+  var __nextTypeIndex = 1;
 
   /**
    * @name pentaho.type.ITypeHolder
@@ -96,13 +97,17 @@ define([
 
   var TypeHolder = Base.extend({
 
-    constructor: function(id, context) {
+    constructor: function(id, context, typeConfig) {
 
       // assert !id || !temporary(id)
+
+      this.index = __nextTypeIndex++;
 
       // Set on construction.
       this.context = context;
       this.id = id || null; // anonymous type
+
+      this.ranking = (typeConfig && +typeConfig.ranking) || 0;
 
       // Set when loading/creating.
       this.promise = null;
@@ -202,6 +207,8 @@ define([
     loadCtorFinished: function(InstCtor) {
       this.Ctor = InstCtor;
       this.promise = Promise.resolve(InstCtor);
+
+      this.context.__typesList.add(this);
     },
 
     // region set constructor
@@ -215,6 +222,8 @@ define([
         if(me.id === __instanceTypeId) {
           me.context.__Instance = InstCtor;
         }
+
+        me.context.__typesList.add(me);
 
         if(me.id && debugMgr.testLevel(DebugLevels.debug, module)) {
           logger.debug("Loaded named type '" + me.id + "'.");
@@ -407,6 +416,15 @@ define([
       this.__txnScopes = [];
 
       /**
+       * The stack of transactions performing the `did:change` phase.
+       *
+       * @type {!Array.<!pentaho.type.changes.Transaction>}
+       * @readOnly
+       * @private
+       */
+      this.__txnInCommitDid = [];
+
+      /**
        * The version of the next committed/fulfilled transaction.
        *
        * @type {number}
@@ -416,7 +434,7 @@ define([
       this.__nextVersion = 1;
 
       /**
-       * Map of instance constructors by [type uid]{@link pentaho.type.Type#uid}.
+       * Map of type holders by [type uid]{@link pentaho.type.Type#uid}.
        *
        * @type {!Object.<string, !pentaho.type.ITypeHolder>}
        * @readOnly
@@ -424,7 +442,18 @@ define([
        */
       this.__byTypeUid = {};
 
-      // non-anonymous types
+      /**
+       * List of type holders ordered by ranking and then by subtype relationship.
+       *
+       * Only holders of already loaded types are present in this list.
+       *
+       * @type {!pentaho.lang.SortedList.<!pentaho.type.ITypeHolder>}
+       * @readOnly
+       * @private
+       */
+      this.__typesList = new SortedList({comparer: __typeHolderComparer});
+
+      // Non-anonymous types.
       /**
        * Map of instance constructors by [type id]{@link pentaho.type.Type#id}
        * and by [type alias]{@link pentaho.type.Type#alias}
@@ -439,6 +468,7 @@ define([
       var configSpec = config.selectType(module.id);
 
       /**
+       * The instances container.
        * @type {!pentaho.type.InstancesContainer}
        * @readOnly
        * @private
@@ -452,6 +482,15 @@ define([
        * @private
        */
       this.__Instance = null;
+
+      // Pre-create holders for configured types.
+      var typesConfig = configSpec && configSpec.types;
+      if(typesConfig) {
+        Object.keys(typesConfig).forEach(function(typeId) {
+          // eslint-disable-next-line no-new
+          new TypeHolder(typeId, this, typesConfig[typeId]);
+        }, this);
+      }
     },
 
     /**
@@ -503,8 +542,6 @@ define([
      *     * [pentaho/type/list]{@link pentaho.type.List}
      *     * [pentaho/type/element]{@link pentaho.type.Element}
      *       * [pentaho/type/complex]{@link pentaho.type.Complex}
-     *         * [pentaho/type/application]{@link pentaho.type.Application}
-     *         * [pentaho/type/model]{@link pentaho.type.Model}
      *       * [pentaho/type/simple]{@link pentaho.type.Simple}
      *         * [pentaho/type/string]{@link pentaho.type.String}
      *         * [pentaho/type/number]{@link pentaho.type.Number}
@@ -885,8 +922,8 @@ define([
 
         // specialSpec: {base}
         return sync
-            ? this.getAll(specialSpec.base)
-            : this.getAllAsync(specialSpec.base);
+          ? this.getAll(specialSpec.base)
+          : this.getAllAsync(specialSpec.base);
       }
 
       // Just a shell object.
@@ -1071,12 +1108,56 @@ define([
       while(i--) {
         var scope = scopes[i];
         if(scope.transaction === txnCurrent) {
-          scopes.pop();
+          scopes.splice(i, 1);
           scope.__exitLocal();
-          if(scope.isRoot)
+          if(scope.isRoot) {
             break;
+          }
         }
       }
+    },
+
+    // @internal
+    __transactionEnterCommitDid: function(transaction) {
+      this.__txnInCommitDid.push(transaction);
+    },
+
+    // @internal
+    __transactionExitCommitDid: function(transaction) {
+      var txn = this.__txnInCommitDid.pop();
+      if(txn !== transaction) {
+        throw error.operInvalid("Unbalanced transaction exit commit did.");
+      }
+    },
+
+    /**
+     * Gets any changesets still being delivered through notifications in the commit phase
+     * of transactions.
+     *
+     * If a transaction is started and committed from within the `did:change` listener of another,
+     * then multiple changesets may be returned.
+     *
+     * @param {!pentaho.type.mixins.Container} container - The container.
+     *
+     * @return {Array.<pentaho.type.changes.Changeset>} An array of changesets, if any changeset exists;
+     * `null` otherwise.
+     */
+    getChangesetsPending: function(container) {
+      var changesets = null;
+      var L = this.__txnInCommitDid.length;
+      if(L > 0) {
+        var i = -1;
+        var uid = container.$uid;
+        while(++i < L) {
+          var transaction = this.__txnInCommitDid[i];
+          var changeset = transaction.getChangeset(uid);
+          if(changeset !== null) {
+            (changesets || (changesets = [])).push(changeset);
+          }
+        }
+      }
+
+      return changesets;
     },
 
     /**
@@ -1095,17 +1176,13 @@ define([
     // region get* support
     __getAllLoadedSubtypesOf: function(baseType, predicate) {
 
-      var byTypeUid = this.__byTypeUid;
-
       var result = [];
 
-      Object.keys(byTypeUid).forEach(function(typeUid) {
-        var InstCtor = byTypeUid[typeUid].Ctor; // may be null (loading or failed)
-        if(InstCtor) { // created successfully
-          var type = InstCtor.type;
-          if(type.isSubtypeOf(baseType) && (!predicate || predicate(type))) {
-            result.push(InstCtor);
-          }
+      this.__typesList.forEach(function(typeHolder) {
+        var InstCtor = typeHolder.Ctor;
+        var type = InstCtor.type;
+        if(type.isSubtypeOf(baseType) && (!predicate || predicate(type))) {
+          result.push(InstCtor);
         }
       });
 
@@ -1142,8 +1219,8 @@ define([
         case "string": return this.__getById(typeRef, sync);
         case "function": return this.__getByFun(typeRef, sync);
         case "object": return Array.isArray(typeRef)
-            ? this.__getByListSpec(typeRef, sync)
-            : this.__getByObjectSpec(typeRef, defaultBase, sync);
+          ? this.__getByListSpec(typeRef, sync)
+          : this.__getByObjectSpec(typeRef, defaultBase, sync);
       }
 
       return promiseUtil.error(error.argInvalid("typeRef"), sync);
@@ -1158,6 +1235,7 @@ define([
           }
         }
       }
+
       return id;
     },
 
@@ -1176,11 +1254,11 @@ define([
           }
 
           return promiseUtil.error(
-              error.argInvalid("typeRef", "Temporary ids cannot occur outside of a generic type specification."),
-              sync);
+            error.argInvalid("typeRef", "Temporary ids cannot occur outside of a generic type specification."),
+            sync);
         }
 
-        // id must exist at the specification context, or it's invalid.
+        // Id must exist at the specification context, or it's invalid.
         var type = specContext.get(id);
         if(!type) {
           if(canDefineSpecId) {
@@ -1188,8 +1266,8 @@ define([
           }
 
           return promiseUtil.error(
-              error.argInvalid("typeRef", "Temporary id does not correspond to an existing type."),
-              sync);
+            error.argInvalid("typeRef", "Temporary id does not correspond to an existing type."),
+            sync);
         }
 
         return promiseUtil["return"](type.instance.constructor, sync);
@@ -1207,14 +1285,14 @@ define([
             throw typeHolder.error;
           }
         } else {
-          return typeHolder.promise;
+          return typeHolder.loadModuleAsync();
         }
       }
 
       if(sync) {
         return promiseUtil.error(
-            error.argInvalid("typeRef", "Type '" + id + "' has not been loaded yet."),
-            true);
+          error.argInvalid("typeRef", "Type '" + id + "' has not been loaded yet."),
+          true);
       }
 
       return null;
@@ -1301,7 +1379,7 @@ define([
         return this.__getByInstCtor(fun, sync);
 
       return promiseUtil.error(
-          error.argInvalid("typeRef", "Function is not a 'pentaho.type.Instance' constructor."), sync);
+        error.argInvalid("typeRef", "Function is not a 'pentaho.type.Instance' constructor."), sync);
     },
 
     /**
@@ -1357,7 +1435,7 @@ define([
         // Error'ed | Loading
 
         if(!sync) {
-          return typeHolder.promise;
+          return typeHolder.loadModuleAsync();
         }
 
         if(typeHolder.error) {
@@ -1377,9 +1455,10 @@ define([
           // uid is not registered, but id is...
           // so, the type must still be loading (the factory is being evaluated)
           // and its constructor is being used in some nested/recursive structure.
+          // The type may also be a configured type whose loading has not started yet.
 
           if(!sync) {
-            return typeHolder.promise;
+            return typeHolder.loadModuleAsync();
           }
 
           // Return the constructor, although it is not yet configured by now and hope for the best.
@@ -1414,10 +1493,10 @@ define([
 
         if(typeSpec instanceof Instance)
           return promiseUtil.error(
-              error.argInvalid("typeRef", "Instances are not supported as type references."), sync);
+            error.argInvalid("typeRef", "Instances are not supported as type references."), sync);
 
         return promiseUtil.error(
-            error.argInvalid("typeRef", "Object is not a 'pentaho.type.Type' instance or a plain object."), sync);
+          error.argInvalid("typeRef", "Object is not a 'pentaho.type.Type' instance or a plain object."), sync);
       }
 
       var id = typeSpec.id;
@@ -1448,7 +1527,7 @@ define([
         return this.__creatingType(id, typeFactory);
       }
 
-      // if id, may have configuration.
+      // If id, may have configuration.
 
       // Collect the refs of all dependencies used within typeSpec.
       var depRefs = this.__getDependencyRefs(typeSpec);
@@ -1496,8 +1575,8 @@ define([
       var elemTypeSpec;
       if(typeSpec.length !== 1 || !(elemTypeSpec = typeSpec[0]))
         return promiseUtil.error(
-            error.argInvalid("typeRef", "List type specification must have a single child element type spec."),
-            sync);
+          error.argInvalid("typeRef", "List type specification must have a single child element type spec."),
+          sync);
 
       // Expand compact list type spec syntax and delegate to the generic handler.
       return this.__getByObjectSpec({base: "list", of: elemTypeSpec}, null, sync);
@@ -1547,8 +1626,8 @@ define([
     createAsync: function(envSpec) {
 
       var env = !envSpec ? mainPlatformEnv :
-                envSpec.createChild ? envSpec :
-                mainPlatformEnv.createChild(envSpec);
+        envSpec.createChild ? envSpec :
+        mainPlatformEnv.createChild(envSpec);
 
       var standardIds = this.standardIds;
 
@@ -1566,6 +1645,23 @@ define([
 
   return Context;
 
+  /**
+   * Compares two type holders.
+   *
+   * By inverse ranking and then by definition/loading index.
+   *
+   * @param {!pentaho.type.ITypeHolder} holderA - The holder of the first type.
+   * @param {!pentaho.type.ITypeHolder} holderB - The holder of the second type.
+   *
+   * @return {number} `-1` if `holderA` is _before_ `holderB`; `1` if `holderA` is _after_ `holderB`; `0`, otherwise.
+   *
+   * @memberOf pentaho.type.Context~__typeHolderComparer
+   * @private
+   */
+  function __typeHolderComparer(holderA, holderB) {
+    return F.compare(holderB.ranking, holderA.ranking) || F.compare(holderA.index, holderB.index);
+  }
+
   // region __collectTypeIds
   function __collectDependencyRefsRecursive(typeSpec, depIdsSet, depRefs) {
     if(!typeSpec) return;
@@ -1582,6 +1678,7 @@ define([
           depIdsSet[typeSpec] = 1;
           depRefs.push(typeSpec);
         }
+
         return;
 
       case "object":

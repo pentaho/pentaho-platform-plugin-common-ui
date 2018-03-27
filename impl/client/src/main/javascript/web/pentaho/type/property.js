@@ -144,8 +144,9 @@ define([
 
           var declaringType = keyArgs && keyArgs.declaringType;
           if(declaringType) {
-            if(declaringType.context !== context)
+            if(declaringType.context !== context) {
               throw error.argInvalid("declaringType", "Invalid context");
+            }
 
             O.setConst(this, "__declaringType", declaringType);
 
@@ -153,9 +154,7 @@ define([
               O.setConst(this, "__index", keyArgs.index || 0);
 
               // Required stuff
-              if(!("name" in spec)) {
-                this.name = null;
-              } // Throws
+              this.__setName(spec.name);
 
               // Must be set before valueType, because if read-only, so must be the value type.
               this.__setIsReadOnly(declaringType.isReadOnly || spec.isReadOnly);
@@ -163,6 +162,11 @@ define([
               // Assume the _default_ type _before_ extend, to make sure `defaultValue` can be validated against it.
               if(!valueType && (this.__valueType === __propType.__valueType)) {
                 valueType = _defaultTypeMid;
+              }
+            } else {
+              // Ensure same name.
+              if(spec.name) {
+                this.__setName(spec.name);
               }
             }
           } else if(this.declaringType === null) {
@@ -286,8 +290,7 @@ define([
           return this.__name;
         },
 
-        // TODO: simplify code, by removing the setter.
-        set name(value) {
+        __setName: function(value) {
           value = __nonEmptyString(value);
 
           if(!value) throw error.argRequired("name");
@@ -480,10 +483,12 @@ define([
 
             this.__valueType = newType;
 
-            // Don't inherit default value if valueType is local.
+            // Don't inherit a constant default value if valueType is local.
             // Locally, default value is always set after valueType.
-            this.__defaultValue = null;
-            this.__defaultValueFun  = null;
+            if(!F.is(this.__defaultValue)) {
+              this.__defaultValue = null;
+              this.__defaultValueFun = null;
+            }
           }
         },
 

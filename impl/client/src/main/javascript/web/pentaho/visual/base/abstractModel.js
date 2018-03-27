@@ -18,8 +18,7 @@ define([
   "pentaho/type/changes/ComplexChangeset",
   "pentaho/i18n!model",
   // so that r.js sees otherwise invisible dependencies.
-  "pentaho/type/model",
-  "../role/baseProperty",
+  "../role/abstractProperty",
   "../color/paletteProperty",
   "./application",
   "pentaho/data/filter/abstract"
@@ -43,11 +42,8 @@ define([
 
       this.base(model);
 
-      var modelType = model.$type;
-      if(this.__areDataOrMappingsChanged(modelType)) {
-        modelType.eachVisualRole(function(propType) {
-          model.get(propType)._onDataOrMappingChanged();
-        });
+      if(this.__areDataOrMappingsChanged(model.$type)) {
+        model._onDataOrMappingsChanged();
       }
     },
 
@@ -84,8 +80,8 @@ define([
   });
 
   return [
-    "pentaho/type/model",
-    "../role/baseProperty",
+    "complex",
+    "../role/abstractProperty",
     "../color/paletteProperty",
     "./application",
     "pentaho/data/filter/abstract",
@@ -94,26 +90,24 @@ define([
     // Pre-load all registered filter types.
     {$types: {base: "pentaho/data/filter/abstract"}},
 
-    function(Model, RoleBaseProperty, PaletteProperty, VisualApplication, AbstractFilter, PentahoObject) {
+    function(Complex, RoleAbstractProperty, PaletteProperty, VisualApplication, AbstractFilter, PentahoObject) {
 
-      var _roleBasePropertyType = RoleBaseProperty.type;
+      var _roleAbstractPropertyType = RoleAbstractProperty.type;
       var _palettePropertyType = PaletteProperty.type;
 
       /**
        * @name pentaho.visual.base.AbstractModel.Type
        * @class
-       * @extends pentaho.type.Model.Type
+       * @extends pentaho.type.Complex.Type
        *
-       * @classDesc The base class of visual model types.
-       *
-       * For more information see {@link pentaho.visual.base.AbstractModel}.
+       * @classDesc The type class of {@link pentaho.visual.base.AbstractModel}.
        */
 
       /**
        * @name AbstractModel
        * @memberOf pentaho.visual.base
        * @class
-       * @extends pentaho.type.Model
+       * @extends pentaho.type.Complex
        * @abstract
        *
        * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.base.AbstractModel>} pentaho/visual/base/abstractModel
@@ -125,11 +119,27 @@ define([
        * @param {pentaho.visual.base.spec.IAbstractModel} [modelSpec] A plain object containing the abstract model
        * specification.
        */
-      var VisualModel = Model.extend(/** @lends pentaho.visual.base.AbstractModel# */{
+      var AbstractModel = Complex.extend(/** @lends pentaho.visual.base.AbstractModel# */{
 
         /** @inheritDoc */
         _createChangeset: function(txn) {
           return new AbstractModelChangeset(txn, this);
+        },
+
+        /**
+         * Called when the data property or any of the visual role properties has changed,
+         * but before notifying any `did:change` listeners.
+         *
+         * The default implementation calls the
+         * [_onDataOrMappingChanged]{@link pentaho.visual.role.AbstractMapping#_onDataOrMappingChanged}
+         * method of child visual role mappings.
+         *
+         * @protected
+         */
+        _onDataOrMappingsChanged: function() {
+          this.$type.eachVisualRole(function(propType) {
+            this.get(propType)._onDataOrMappingChanged();
+          }, this);
         },
 
         // region serialization
@@ -147,6 +157,8 @@ define([
             if(omitProps.data == null) omitProps.data = true;
 
             if(omitProps.selectionFilter == null) omitProps.selectionFilter = true;
+
+            if(omitProps.application == null) omitProps.application = true;
           }
 
           return this.base(keyArgs);
@@ -195,12 +207,15 @@ define([
 
               // @override
               toValueOn: function(defaultValueOwner, valueSpec) {
+
                 var simpleTable = this.base(defaultValueOwner, valueSpec);
                 if(simpleTable !== null) {
                   var table = simpleTable.value.toPlainTable();
-                  // wrap as simple again
+
+                  // Wrap as simple again.
                   return new PentahoObject(table);
                 }
+
                 return simpleTable;
               }
             },
@@ -244,7 +259,7 @@ define([
            * Calls a function for each defined visual role property type.
            *
            * A visual role property type is a property type which is a subtype of
-           * {@link pentaho.visual.role.BaseProperty}.
+           * {@link pentaho.visual.role.AbstractProperty}.
            *
            * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} f - The mapping
            * function. Return `false` to break iteration.
@@ -265,13 +280,13 @@ define([
 
           /**
            * Gets a value that indicates if a given property type is a subtype of
-           * {@link pentaho.visual.role.BaseProperty.Type}.
+           * {@link pentaho.visual.role.AbstractProperty.Type}.
            *
            * @param {!pentaho.type.Property.Type} propType - The property type to test.
            * @return {boolean} `true` if `type` is a visual role property type; or `false`, otherwise.
            */
           isVisualRole: function(propType) {
-            return propType.isSubtypeOf(_roleBasePropertyType);
+            return propType.isSubtypeOf(_roleAbstractPropertyType);
           },
 
           /**
@@ -288,7 +303,7 @@ define([
       })
       .implement({$type: bundle.structured.abstractModel});
 
-      return VisualModel;
+      return AbstractModel;
     }
   ];
 });

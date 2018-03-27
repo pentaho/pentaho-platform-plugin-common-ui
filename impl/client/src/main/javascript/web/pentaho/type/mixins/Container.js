@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 define([
-  "../../lang/Base",
-  "../../lang/EventSource",
+  "pentaho/lang/Base",
+  "pentaho/lang/EventSource",
   "../ReferenceList",
   "../changes/Transaction",
   "../events/WillChange",
   "../events/RejectedChange",
-  "../events/DidChange"
-], function(Base, EventSource, ReferenceList, Transaction, WillChange, RejectedChange, DidChange) {
+  "../events/DidChange",
+  "pentaho/util/object"
+], function(Base, EventSource, ReferenceList, Transaction, WillChange, RejectedChange, DidChange, O) {
 
   "use strict";
 
@@ -52,13 +53,13 @@ define([
      */
     _initContainer: function() {
       /**
-       * Container unique identifier.
+       * Gets the unique identifier of the instance.
        *
+       * @name $uid
        * @memberOf pentaho.type.mixins.Container#
        * @type {string}
-       * @private
        */
-      this.__uid = String(__nextUid++);
+      O.setConst(this, "$uid", String(__nextUid++));
 
       /**
        * Version number.
@@ -84,7 +85,7 @@ define([
       /**
        * References (from others) to this container.
        *
-       * Maintained by Container#__addReference and Changeset#_updateReferences.
+       * Maintained by Container#__addReference and ChangeRef#__updateReferences.
        *
        * @memberOf pentaho.type.mixins.Container#
        * @type {pentaho.type.ReferenceList}
@@ -120,16 +121,6 @@ define([
       clone._initContainer();
     },
 
-    /**
-     * Gets the unique identifier of the instance.
-     *
-     * @type {string}
-     * @readonly
-     */
-    get $uid() {
-      return this.__uid;
-    },
-
     // region References
     // TODO: document IReference...
     /**
@@ -143,16 +134,15 @@ define([
      * @readOnly
      */
     get $references() {
-      var cref;
       var txn = this.$type.context.transaction;
-      return (txn && (cref = txn.__getChangeRef(this.__uid))) ? cref.projectedReferences : this.__refs;
+      return txn !== null ? txn.getAmbientReferences(this) : this.__refs;
     },
 
     /**
      * Adds a reference to this instance.
      *
      * This method is only used internally by Complex#constructor, List#constructor and Complex#clone,
-     * for when the internal fields are updated directly, for performance and for working
+     * for when the internal fields are updated directly, which is done for performance and for working
      * outside of any ambient txn. The _removeReference counterpart is not needed.
      *
      * @param {!pentaho.type.mixins.Container} container - The container that refers this one.
@@ -223,7 +213,7 @@ define([
 
       return scope.using(function() {
 
-        cset = this._createChangeset(scope.transaction);
+        cset = scope.transaction.ensureChangeset(this);
 
         // assert this.__cset === cset
 
@@ -259,18 +249,31 @@ define([
      * When overriding, be sure to call the base implementation.
      *
      * @param {!pentaho.type.changes.Changeset} changeset - The set of changes.
+     * @param {Object} [keyArgs] - The keyword arguments' object.
+     * See [EventSource#_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
      *
-     * @return {pentaho.lang.UserError|undefined} An error if the changeset was canceled; or, `undefined` otherwise.
+     * @return {pentaho.lang.UserError} An error if the changeset was canceled; `null` otherwise.
      *
      * @protected
      * @internal
      * @friend {pentaho.type.changes.Transaction}
      */
-    _onChangeWill: function(changeset) {
-      var event;
-      if(this._hasListeners("will:change") &&
-         !this._emitSafe((event = new WillChange(this, changeset))))
-        return event.cancelReason;
+    _onChangeWill: function(changeset, keyArgs) {
+
+      if(this._hasListeners("will:change")) {
+
+        var event = new WillChange(this, changeset);
+
+        var result = keyArgs == null
+          ? this._emitSafe(event)
+          : this._emitGeneric(this, [event], event.type, null, keyArgs);
+
+        if(!result) {
+          return event.cancelReason;
+        }
+      }
+
+      return null;
     },
 
     /**

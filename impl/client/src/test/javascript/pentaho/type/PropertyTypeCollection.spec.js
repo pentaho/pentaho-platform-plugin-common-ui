@@ -97,8 +97,8 @@ define([
           expect(props[0].valueType).toBe(PentahoBoolean.type);
         });
 
-        it("should use List.add() to replace an object with the same name in the collection with updated attributes.",
-        function() {
+        it("should use List.add() to replace an object with the same name in the collection " +
+          "with updated attributes.", function() {
           props.add({name: "foo", valueType: "boolean", isRequired: false});
           props.add({name: "foo2", valueType: "string"});
 
@@ -118,8 +118,8 @@ define([
           });
         });
 
-        it("should use List.replace() to replace an object with the same name in the collection with updated type, ...",
-        function() {
+        it("should use List.replace() to replace an object with the same name in the collection " +
+          "with updated type, ...", function() {
           props.add({name: "foo", valueType: "boolean"});
           props.add({name: "foo2", valueType: "string"});
 
@@ -181,8 +181,8 @@ define([
           expect(props[1].valueType).toBe(PentahoString.type);
         });
 
-        it("should accept an array of pentaho.type.UPropertyTypeProto whose elements were previously defined",
-        function() {
+        it("should accept an array of pentaho.type.UPropertyTypeProto whose elements " +
+          "were previously defined", function() {
           var props = PropertyTypeCollection.to(["foo", {name: "eggs", valueType: "boolean"}], Derived.type);
 
           props.configure(["foo", "bar"]);

@@ -206,9 +206,12 @@ define(["./has"], function(has) {
       if(v && typeof v === "object") {
         if(v instanceof Array)
           v = v.slice();
+
+        // TODO: FIXME: take care for objects with a null prototype which do not fall into the following test.
         else if(v.constructor === Object)
           v = assignOwnDefined({}, v);
       }
+
       return v;
     },
 

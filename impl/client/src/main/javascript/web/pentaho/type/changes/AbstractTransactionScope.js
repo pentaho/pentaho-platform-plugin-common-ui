@@ -195,7 +195,7 @@ define([
 
       if(!O.getOwn(keyArgs, "sloppy", false)) {
         var error = !this.__isInside ? this.__getErrorNotInside() :
-                    !this.isCurrent ? this.__getErrorNotCurrent() : null;
+          !this.isCurrent ? this.__getErrorNotCurrent() : null;
 
         if(error) logger.warn(error.message);
       }

@@ -162,7 +162,7 @@ define([
        * Lists have special semantics: isBoundary applies to the relation between the list and its elements.
        * Adding/Removing elements in an isList and isBoundary property
        * still generates events in the containing complex.
-       * We could, however, not addRef is the prop (and, thus, the list) is also isReadOnly?
+       * We could, however, not addRef if the prop (and, thus, the list) is also isReadOnly?
        *
        * @param {!pentaho.type.Property.Type} propType - The property type.
        * @param {!pentaho.type.mixins.Container} value - The container value.
@@ -847,7 +847,7 @@ define([
 
         // Used for configuration only.
         set props(propSpecs) {
-          this.__getProps().configure(propSpecs);
+          this._configureProperties(propSpecs);
         }, // jshint -W078
 
         // @internal
@@ -857,6 +857,46 @@ define([
           var proto = this.constructor.prototype;
           return O.getOwn(proto, "__props") ||
             (proto.__props = PropertyTypeCollection.to([], /* declaringType: */this));
+        },
+
+        /**
+         * Adds, overrides or configures properties of this complex type.
+         *
+         * @param {!Array.<pentaho.type.spec.IPropertyTypeProto> |
+         *         !Object.<string, pentaho.type.spec.IPropertyTypeProto>} propTypesSpec - The
+         * properties' specification.
+         *
+         * @protected
+         */
+        _configureProperties: function(propTypesSpec) {
+          this.__getProps().configure(propTypesSpec);
+        },
+
+        /**
+         * Normalizes a properties specification.
+         *
+         * @param {!Array.<pentaho.type.spec.IPropertyTypeProto> |
+         *         !Object.<string, pentaho.type.spec.IPropertyTypeProto>} propTypesSpec - The properties specification.
+         *
+         * @return {!Array.<pentaho.type.spec.IPropertyTypeProto>} The normalized specification.
+         * @protected
+         */
+        _normalizePropertiesSpec: function(propTypesSpec) {
+
+          if(Array.isArray(propTypesSpec)) {
+            return propTypesSpec.map(function(propSpec) {
+              return typeof propSpec === "string" ? {name: propSpec} : propSpec;
+            });
+          }
+
+          var result = [];
+          O.eachOwn(propTypesSpec, function(propTypeSpec, name) {
+            propTypeSpec = Object.create(propTypeSpec);
+            propTypeSpec.name = name;
+            result.push(propTypeSpec);
+          });
+
+          return result;
         },
         // endregion
 
@@ -871,7 +911,7 @@ define([
          * @param {string|!pentaho.type.Property.Type} name - The property name or type object.
          * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
          *
-         * @return {?pentaho.type.Property.Type} The property type object.
+         * @return {pentaho.type.Property.Type} The property type object.
          *
          * @throws {pentaho.lang.ArgumentInvalidError} When `sloppy` is `false` and a property with
          * name `name` is not defined.
@@ -960,7 +1000,7 @@ define([
          *
          * @param {Object} [x] The JS context object on which `f` is called.
          *
-         * @return {!pentaho.type.Complex} This object.
+         * @return {!pentaho.type.Complex.Type} This object.
          */
         each: function(f, x) {
           var ps = this.__props;
@@ -989,7 +1029,7 @@ define([
          *
          * @param {Object} [ctx] - The JS context object on which `fun` is called.
          *
-         * @return {!pentaho.type.Complex} This object.
+         * @return {!pentaho.type.Complex.Type} This object.
          */
         eachCommonWith: function(otherType, fun, ctx) {
           var lca;
@@ -1019,16 +1059,22 @@ define([
         },
 
         /**
-         * Adds, overrides or configures properties to/of the complex type.
+         * Adds, overrides or configures properties of this complex type.
          *
-         * @param {pentaho.type.spec.IPropertyTypeProto|pentaho.type.spec.IPropertyTypeProto[]} propTypeSpec
-         * - A property type specification or an array of them.
+         * @param {!pentaho.type.spec.IPropertyTypeProto|
+         *         !Array.<pentaho.type.spec.IPropertyTypeProto>} propTypeSpec - A property type specification or
+         *         an array of them.
          *
-         * @return {pentaho.type.Complex} This object.
+         * @return {!pentaho.type.Complex.Type} This object.
          */
         add: function(propTypeSpec) {
-          if(!Array.isArray(propTypeSpec)) propTypeSpec = [propTypeSpec];
-          this.__getProps().configure(propTypeSpec);
+
+          if(!Array.isArray(propTypeSpec)) {
+            propTypeSpec = [propTypeSpec];
+          }
+
+          this._configureProperties(propTypeSpec);
+
           return this;
         },
         // endregion

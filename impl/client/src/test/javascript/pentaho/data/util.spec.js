@@ -25,11 +25,13 @@ define([
     return {
       model: [
         {name: "country", type: "string", label: "Country"},
-        {name: "sales", type: "number", label: "Sales"}
+        {name: "sales", type: "number", label: "Sales"},
+        {name: "achieved", type: "boolean", label: "Achieved"},
+        {name: "date", type: "date", label: "Date"}
       ],
       rows: [
-        {c: [{v: "Portugal"}, {v: 12000}]},
-        {c: [{v: "Ireland"}, {v: 6000}]}
+        {c: [{v: "Portugal"}, {v: 12000}, true]},
+        {c: [{v: "Ireland"}, {v: 6000}, false]}
       ]
     };
   }
@@ -61,7 +63,42 @@ define([
     };
   }
 
+  function Cell(value, formatted) {
+    this.value = value;
+    this.formatted = formatted;
+  }
+
+  Cell.prototype.valueOf = function() {
+    return this.value;
+  };
+
+  Cell.prototype.toString = function() {
+    return this.formatted;
+  };
+
   describe("pentaho.data.util", function() {
+
+    var context;
+    var AbstractFilter;
+
+    beforeAll(function(done) {
+
+      Context.createAsync()
+        .then(function(_context) {
+
+          context = _context;
+
+          return context.getDependencyApplyAsync([
+            "pentaho/data/filter/abstract",
+            // These need to be loaded for createFilterFromCellsMap to work.
+            "pentaho/data/filter/isEqual",
+            "pentaho/data/filter/and"
+          ], function(_AbstractFilter) {
+            AbstractFilter = _AbstractFilter;
+          });
+        })
+        .then(done, done.fail);
+    });
 
     it("should be a plain object", function() {
       expect(dataUtil.constructor).toBe(Object);
@@ -91,42 +128,57 @@ define([
       });
     });
 
-    describe(".createFilterFromCellsMap(cellsMap, dataTable, context)", function() {
+    describe(".getCellValue(valueOrCell)", function() {
 
-      var context;
-      var AbstractFilter;
+      it("returns null when given null", function() {
+        var value = dataUtil.getCellValue(null);
 
-      function Cell(value, formatted) {
-        this.value = value;
-        this.formatted = formatted;
-      }
-
-      Cell.prototype.valueOf = function() {
-        return this.value;
-      };
-
-      Cell.prototype.toString = function() {
-        return this.formatted;
-      };
-
-      beforeAll(function(done) {
-
-        Context.createAsync()
-            .then(function(_context) {
-
-              context = _context;
-
-              return context.getDependencyApplyAsync([
-                "pentaho/data/filter/abstract",
-                // These need to be loaded for createFilterFromCellsMap to work.
-                "pentaho/data/filter/isEqual",
-                "pentaho/data/filter/and"
-              ], function(_AbstractFilter) {
-                AbstractFilter = _AbstractFilter;
-              });
-            })
-            .then(done, done.fail);
+        expect(value).toBe(null);
       });
+
+      it("returns undefined when given undefined", function() {
+        var value = dataUtil.getCellValue(undefined);
+
+        expect(value).toBe(undefined);
+      });
+
+      it("returns a Date when given a Date", function() {
+        var valueIn = new Date();
+        var valueOut = dataUtil.getCellValue(valueIn);
+
+        expect(valueOut).toBe(valueIn);
+      });
+
+      it("returns a number when given a number", function() {
+        var valueIn = 1;
+        var valueOut = dataUtil.getCellValue(valueIn);
+
+        expect(valueOut).toBe(valueIn);
+      });
+
+      it("returns a boolean when given a boolean", function() {
+        var valueIn = true;
+        var valueOut = dataUtil.getCellValue(valueIn);
+
+        expect(valueOut).toBe(valueIn);
+      });
+
+      it("returns a string when given a string", function() {
+        var valueIn = "foo";
+        var valueOut = dataUtil.getCellValue(valueIn);
+
+        expect(valueOut).toBe(valueIn);
+      });
+
+      it("returns the value of a Cell when given a cell", function() {
+        var valueIn = new Cell("foo", "Bar");
+        var valueOut = dataUtil.getCellValue(valueIn);
+
+        expect(valueOut).toBe(valueIn.value);
+      });
+    });
+
+    describe(".createFilterFromCellsMap(cellsMap, dataTable, context)", function() {
 
       it("should return null when given an empty cell map", function() {
 
@@ -149,10 +201,11 @@ define([
         expect(result).toBe(null);
       });
 
-      it("should return an AND filter when given a cell map with at least one defined column", function() {
+      it("should return an AND filter when given a cell map with at least two defined columns", function() {
 
         var cellsMap = {
-          "country": new Cell("Portugal", "Portugal")
+          "country": new Cell("Portugal", "Portugal"),
+          "sales": new Cell(1000, "1000")
         };
 
         var dataTable = new DataTable(getDatasetDT1WithNoKeyColumns());
@@ -163,19 +216,15 @@ define([
         expect(result.kind).toBe("and");
       });
 
-      it("should return an AND filter with a single IsEqual child filter " +
-          "when given a cell map with one defined column", function() {
+      it("should return a single IsEqual filter when given a cell map with one defined column", function() {
 
         var cellsMap = {
           "country": new Cell("Portugal", "Portugal Portugal")
         };
 
         var dataTable = new DataTable(getDatasetDT1WithNoKeyColumns());
-        var result = dataUtil.createFilterFromCellsMap(cellsMap, dataTable, context);
+        var isEqual = dataUtil.createFilterFromCellsMap(cellsMap, dataTable, context);
 
-        expect(result.operands.count).toBe(1);
-
-        var isEqual = result.operands.at(0);
         expect(isEqual instanceof AbstractFilter).toBe(true);
         expect(isEqual.kind).toBe("isEqual");
         expect(isEqual.property).toBe("country");
@@ -210,19 +259,15 @@ define([
         expect(isEqual.getf("value")).toBe("Lisboa");
       });
 
-      it("should return an AND filter containing an IsEqual child filter with a null value" +
-          "when given the corresponding cell has a null value", function() {
+      it("should return an IsEqual filter with a null value when the given cell has a null value", function() {
 
         var cellsMap = {
           "country": null
         };
 
         var dataTable = new DataTable(getDatasetDT1WithNoKeyColumns());
-        var result = dataUtil.createFilterFromCellsMap(cellsMap, dataTable, context);
+        var isEqual = dataUtil.createFilterFromCellsMap(cellsMap, dataTable, context);
 
-        expect(result.operands.count).toBe(1);
-
-        var isEqual = result.operands.at(0);
         expect(isEqual instanceof AbstractFilter).toBe(true);
         expect(isEqual.kind).toBe("isEqual");
         expect(isEqual.property).toBe("country");
@@ -254,6 +299,79 @@ define([
         expect(isEqual.property).toBe("city");
         expect(isEqual.getv("value")).toBe("Lisbon");
         expect(isEqual.getf("value")).toBe("Lisbon");
+      });
+    });
+
+    describe(".createFilterIsEqualFromCell(dataPlain, columnId, cell, context)", function() {
+      var dataTable;
+
+      beforeAll(function() {
+        dataTable = new DataTable(getDatasetDT1WithNoKeyColumns());
+      });
+
+      it("should return null when given an undefined columnId", function() {
+
+        var result = dataUtil.createFilterIsEqualFromCell(dataTable, "foo", new Cell("foo", "bar"), context);
+
+        expect(result).toBe(null);
+      });
+
+      it("should return an isEqual filter when given a defined columnId", function() {
+
+        var result = dataUtil.createFilterIsEqualFromCell(dataTable, "country", new Cell("PT", "Portugal"), context);
+
+        expect(result).not.toBe(null);
+        expect(result instanceof AbstractFilter).toBe(true);
+        expect(result.kind).toBe("isEqual");
+      });
+
+      it("should return an isEqual filter whose property is the given columnId", function() {
+
+        var result = dataUtil.createFilterIsEqualFromCell(dataTable, "country", new Cell("PT", "Portugal"), context);
+
+        expect(result.property).toBe("country");
+      });
+
+      it("should return an isEqual filter whose value is null when given a null cell", function() {
+
+        var result = dataUtil.createFilterIsEqualFromCell(dataTable, "country", null, context);
+
+        expect(result.value).toBe(null);
+      });
+
+      it("should return an isEqual filter whose value is the same as that of the given cell", function() {
+
+        var result = dataUtil.createFilterIsEqualFromCell(dataTable, "country", new Cell("PT", "Portugal"), context);
+
+        expect(result.value).toBe("PT");
+      });
+
+      it("should return an isEqual filter whose formatter value is the same as that of the given cell", function() {
+
+        var result = dataUtil.createFilterIsEqualFromCell(dataTable, "country", new Cell("PT", "Portugal"), context);
+
+        expect(result.get("value").formatted).toBe("Portugal");
+      });
+
+      it("should return an isEqual filter whose value type is that of the column data type (string)", function() {
+
+        var result = dataUtil.createFilterIsEqualFromCell(dataTable, "country", new Cell("PT", "Portugal"), context);
+
+        expect(result.get("value").$type.alias).toBe("string");
+      });
+
+      it("should return an isEqual filter whose value type is that of the column data type (number)", function() {
+
+        var result = dataUtil.createFilterIsEqualFromCell(dataTable, "sales", new Cell(1000, "1000"), context);
+
+        expect(result.get("value").$type.alias).toBe("number");
+      });
+
+      it("should return an isEqual filter whose value type is that of the column data type (boolean)", function() {
+
+        var result = dataUtil.createFilterIsEqualFromCell(dataTable, "date", new Cell("2016-01-01"), context);
+
+        expect(result.get("value").$type.alias).toBe("date");
       });
     });
   });

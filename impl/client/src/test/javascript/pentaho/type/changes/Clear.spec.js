@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,11 @@ define([
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false */
 
   describe("pentaho.type.changes.Clear -", function() {
-    var context, List, NumberList, DerivedComplex, ComplexList;
+    var context;
+    var List;
+    var NumberList;
+    var DerivedComplex;
+    var ComplexList;
 
     beforeEach(function(done) {
       Context.createAsync()
@@ -102,7 +106,7 @@ define([
         expect(list.count).toBe(0);
       });
 
-      it("should remove all elements but sill be there if txn is rejected", function() {
+      it("should remove all elements but still be there if txn is rejected", function() {
 
         var list = new NumberList([1, 2, 3]);
 

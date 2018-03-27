@@ -105,20 +105,31 @@ define([
     },
 
     /**
+     * The declaring complex type
+     *
+     * @type {!pentaho.type.Complex.Type}
+     * @readOnly
+     * @private
+     */
+    get __declaringType() {
+      return this.__cachedKeyArgs.declaringType;
+    },
+
+    /**
      * The context of properties of this property collection.
      *
-     * @type {pentaho.type.Context}
+     * @type {!pentaho.type.Context}
      * @readOnly
      * @private
      */
     get __context() {
-      return this.__cachedKeyArgs.declaringType.context;
+      return this.__declaringType.context;
     },
 
     /**
      * The property type in this property collection's context.
      *
-     * @type {pentaho.type.Property.Type}
+     * @type {!pentaho.type.Property.Type}
      * @readOnly
      * @private
      */
@@ -129,7 +140,7 @@ define([
     },
 
     // region List implementation
-    // elemClass: Property.Type,
+    // elemClass: Property.Type, // Not really used.
 
     /**
      * Add a {@link pentaho.type.UPropertyTypeProto} to the properties collection.
@@ -141,6 +152,7 @@ define([
      * @param {Object} ka - The keyword arguments.
      * @return {pentaho.type.Property.Type} The property type to add.
      * @protected
+     * @override
      */
     _adding: function(spec, index, ka) {
       if(!spec) throw error.argRequired("props[i]");
@@ -151,10 +163,11 @@ define([
         // An object spec? Otherwise it's a noop - nothing to configure or override.
         // Configure existing local property or override inherited one.
         if(spec !== name) {
-          if(existing.declaringType === this.__cachedKeyArgs.declaringType)
+          if(existing.declaringType === this.__declaringType) {
             existing.extend(spec);
-          else
-            this.replace(spec, this.indexOf(existing));
+          } else {
+            this.replace(spec, this.indexOf(existing), ka);
+          }
         }
 
         // And cancel add property.
@@ -169,26 +182,37 @@ define([
      *
      * This method allows replacing elements in the collection using custom options (keyword arguments).
      *
-     * @param {string} spec - The name of the property.
+     * @param {string} spec - The specification of the property.
      * @param {number} index - The location of the property in the collection.
-     * @param {Object} existing - The keyword arguments.
+     * @param {!pentaho.type.Property.Type} existing - The existing property type.
+     * @param {Object} keyArgs - The keyword arguments.
      * @return {!pentaho.type.Property.Type} The replacement property type.
      * @protected
+     * @override
      */
-    _replacing: function(spec, index, existing) {
+    _replacing: function(spec, index, existing, keyArgs) {
       if(!spec) throw error.argRequired("props[i]");
 
       var name = __getSpecName(spec);
       if(name !== existing.name)
         throw error.argInvalid("props[i]", "Incorrect property name.");
 
-      var ka = this.__cachedKeyArgs;
-
-      if(existing.declaringType === ka.declaringType) {
+      if(existing.declaringType === this.__declaringType) {
         // Configure existing local property and cancel replace.
         // If spec is not an object, then it's a noop.
-        if(spec !== name) existing.extend(spec);
+        if(spec !== name) {
+          existing.extend(spec);
+        }
+
         return;
+      }
+
+      var ka;
+      if(keyArgs) {
+        ka = Object.create(keyArgs);
+        ka.declaringType = this.__declaringType;
+      } else {
+        ka = this.__cachedKeyArgs;
       }
 
       // Replace with overridden property.
@@ -227,10 +251,11 @@ define([
      *
      * @param {string} spec - The name of the property.
      * @param {string} index - The location of the property in the collection.
+     * @param {Object} [keyArgs] - The keyword arguments.
      * @return {!pentaho.type.Property.Type} The new property type.
      * @protected
      */
-    _cast: function(spec, index) {
+    _cast: function(spec, index, keyArgs) {
       // For new, root, local properties.
 
       // A singular string property with the specified name.
@@ -247,15 +272,24 @@ define([
           throw error.argInvalid("props[i]", "Property base type does not extend Property.");
       }
 
-      var ka = this.__cachedKeyArgs;
+      var ka;
+      if(keyArgs) {
+        ka = Object.create(keyArgs);
+        ka.declaringType = this.__declaringType;
+      } else {
+        ka = this.__cachedKeyArgs;
+      }
+
       ka.index = index;
       ka.isRoot = true;
 
       var BaseProp = basePropType.instance.constructor;
       var Prop = BaseProp.extend({$type: spec}, null, ka);
 
-      ka.index = -1;
-      ka.isRoot = false;
+      if(!keyArgs) {
+        ka.index = -1;
+        ka.isRoot = false;
+      }
 
       return Prop.type;
     },
@@ -271,12 +305,13 @@ define([
      *    having no name or a name equal to the key.
      *
      * @param {Object} config - The properties configuration.
+     * @param {Object} [keyArgs] - The keyword arguments.
      */
-    configure: function(config) {
+    configure: function(config, keyArgs) {
       if(!config) throw error.argRequired("config");
 
       if(Array.isArray(config)) {
-        this.addMany(config);
+        this.addMany(config, keyArgs);
       } else {
         O.eachOwn(config, function(propConfig, name) {
           if(propConfig && typeof propConfig === "object") {
@@ -287,7 +322,7 @@ define([
               propConfig.name = name;
             }
 
-            this.add(propConfig);
+            this.add(propConfig, keyArgs);
           }
         }, this);
       }

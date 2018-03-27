@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,24 @@ define([
 
       this.base(transaction, owner);
 
-      this._clearChanges();
+      /**
+       * Map of the existing child changesets, with current primitive changes applied.
+       *
+       * @type {!Object.<string, !pentaho.type.changes.Changeset>}
+       * @private
+       */
+      this.__changesetByKey = Object.create(null);
+
+      /**
+       * Array of primitive changes.
+       *
+       * @type {!Array.<!pentaho.type.changes.Change>}
+       * @private
+       */
+      this.__primitiveChanges = [];
+
+      this.__projMock = null;
+      this.__lastClearIndex = -1;
     },
 
     // region public interface
@@ -81,70 +98,125 @@ define([
      * @readOnly
      */
     get changes() {
-      return this._changes;
+      return this.__primitiveChanges;
     },
 
     /** @inheritDoc */
     get hasChanges() {
-      if(this._changes.length > 0)
+      if(this.__primitiveChanges.length > 0) {
         return true;
+      }
 
-      // NOTE: if an element is to be removed, it is already included above.
-      var changesByKey = this._changesByElemKey;
-      for(var key in changesByKey)
-        if(O.hasOwn(changesByKey, key) && changesByKey[key].hasChanges)
+      var changesByKey = this.__changesetByKey;
+      for(var key in changesByKey) {
+        if(O.hasOwn(changesByKey, key) && changesByKey[key].hasChanges) {
           return true;
+        }
+      }
 
       return false;
     },
 
     /**
-     * Gets the nested changeset for an element with the given key, if any.
+     * Gets the child changeset for an element with the given key, if any.
      *
      * @param {string} key - The key of the element.
      *
-     * @return {pentaho.type.changes.ComplexChangeset} The nested changeset or `null`.
+     * @return {pentaho.type.changes.ComplexChangeset} The child changeset or `null`.
      */
     getChange: function(key) {
-      // TODO: should not consider changes in elements to be removed?
-      return O.getOwn(this._changesByElemKey, key) || null;
+      return O.getOwn(this.__changesetByKey, key) || null;
     },
 
     /** @inheritDoc */
     _clearChanges: function() {
-      // NOTE: called from constructor
 
-      // Cancel all primitive changes
-      if(this._changes) this._changes.forEach(function(change) {
-        change._cancelRefs(this.transaction, this.owner);
+      // TODO: Define clearChanges semantics.
+      // Should it clear child changesets as seen before or after clearing local changes?
+
+      // Clear all primitive changes.
+      this.__primitiveChanges.forEach(function(change) {
+        change._cancel(this);
       }, this);
 
-      // Clear all nested changes
-      var changesByKey = this._changesByElemKey;
-      for(var key in changesByKey) // nully tolerant
-        if(O.hasOwn(changesByKey, key))
-          changesByKey[key].clearChanges();
+      // Clear all currently accessible child changesets.
+      var changesByKey = this.__changesetByKey;
+      for(var key in changesByKey) {
+        if(O.hasOwn(changesByKey, key)) {
+          changesByKey[key]._clearChangesRecursive(this);
+        }
+      }
 
-      this._changes = [];
-      this._changesByElemKey = {};
+      this.__primitiveChanges = [];
+      this.__projMock = null;
+      this.__lastClearIndex = -1;
+    },
 
-      this._projMock = null;
-      this._lastClearIndex = -1;
+    /**
+     * Marks an element as added by a change or cancels a previous removal.
+     * @param {!pentaho.type.Complex} element - The added element.
+     * @private
+     * @internal
+     */
+    __addComplexElement: function(element) {
+
+      // The transaction version is already affected by the __addChange or _clearChanges methods.
+
+      this.transaction.__ensureChangeRef(element).addReference(this.owner);
+
+      var childChangeset = element.__cset;
+      if(childChangeset !== null) {
+        this.__changesetByKey[element.$key] = childChangeset;
+
+        // Make sure that the new changeset descendants have at least our topological order.
+        childChangeset.__updateNetOrder(this._netOrder + 1);
+      }
+    },
+
+    /**
+     * Marks an element as removed by a change or cancels a previous addition.
+     * @param {!pentaho.type.Complex} element - The removed element.
+     * @private
+     * @internal
+     */
+    __removeComplexElement: function(element) {
+      // The transaction version is already affected by the __addChange or _clearChanges methods.
+
+      this.transaction.__ensureChangeRef(element).removeReference(this.owner);
+
+      var childChangeset = element.__cset;
+      if(childChangeset !== null) {
+
+        delete this.__changesetByKey[element.$key];
+
+        // Make sure that the changeset descendants update its new topological order.
+        childChangeset._resetNetOrder();
+      }
     },
 
     /** @inheritDoc */
-    __updateChildChangesetsNetOrder: function(childrenNetOrder) {
-      var changesByKey = this._changesByElemKey;
-      for(var key in changesByKey) { // nully tolerant
-        if(O.hasOwn(changesByKey, key)) {
-          changesByKey[key].__updateNetOrder(childrenNetOrder);
+    eachChildChangeset: function(fun, ctx) {
+      var changesByKey = this.__changesetByKey;
+      for(var key in changesByKey) {
+        if(O.hasOwn(changesByKey, key) && fun.call(ctx, changesByKey[key]) === false) {
+          return;
         }
       }
     },
 
     /** @inheritDoc */
-    __setNestedChangeset: function(csetNested) {
-      this._changesByElemKey[csetNested.owner.$key] = csetNested;
+    __onChildChangesetCreated: function(childChangeset, propType) {
+      // This is called when the child changeset is a current child.
+      // However, if a remove or clear change is added,
+      // this child changeset is not being removed...
+      this.__changesetByKey[childChangeset.owner.$key] = childChangeset;
+
+      // `childChangeset` was just created.
+      // In its constructor, its transaction version is set to the latest of the transaction.
+      // So, surely, its version is >= ours.
+      this._setTransactionVersion(childChangeset.transactionVersion);
+
+      childChangeset.__updateNetOrder(this._netOrder + 1);
     },
 
     /**
@@ -160,33 +232,35 @@ define([
      * @internal
      */
     get __projectedMock() {
-      var changeCount = this._changes.length;
-      if(!changeCount) return this.owner;
-
-      var projMock = this._projMock ||
-          (this._projMock = this.owner._cloneElementData({changeCount: 0}, /* useCommitted: */true));
-
-      if(projMock.changeCount < changeCount) {
-        this.__applyFrom(projMock, projMock.changeCount);
-        projMock.changeCount = changeCount;
+      var changeCount = this.__primitiveChanges.length;
+      if(changeCount === 0) {
+        return this.owner;
       }
 
-      return projMock;
+      var projectedMock = this.__projMock ||
+          (this.__projMock = this.owner._cloneElementData({changeCount: 0}, /* useCommitted: */true));
+
+      if(projectedMock.changeCount < changeCount) {
+        this.__applyFrom(projectedMock, projectedMock.changeCount);
+        projectedMock.changeCount = changeCount;
+      }
+
+      return projectedMock;
     },
 
     /** @inheritDoc */
     _apply: function(target) {
-      if(target === this.owner && this._projMock) {
+      if(target === this.owner && this.__projMock) {
 
-        // Reuse `_projMock`'s fields and discard it afterwards.
+        // Reuse `__projMock`'s fields and discard it afterwards.
 
         // Ensure up to date with every change.
-        var projMock = this.__projectedMock;
+        var projectedMock = this.__projectedMock;
 
-        this._projMock = null;
+        this.__projMock = null;
 
-        target.__elems = projMock.__elems;
-        target.__keys = projMock.__keys;
+        target.__elems = projectedMock.__elems;
+        target.__keys = projectedMock.__keys;
       } else {
         this.__applyFrom(target, 0);
       }
@@ -205,11 +279,11 @@ define([
     __applyFrom: function(list, startingFromIdx) {
       // assert startingFromIdx >= 0
 
-      var changes = this._changes;
+      var changes = this.__primitiveChanges;
       var N = changes.length;
 
       // Ignore changes before the last clear.
-      var k = Math.max(this._lastClearIndex, startingFromIdx);
+      var k = Math.max(this.__lastClearIndex, startingFromIdx);
 
       while(k < N) changes[k++]._apply(list);
     },
@@ -219,7 +293,7 @@ define([
 
     /**
      * Decomposes the modifications into a set of operations and
-     * populates [_changes]{@link pentaho.type.changes.ListChangeset#_changes} with
+     * populates [__primitiveChanges]{@link pentaho.type.changes.ListChangeset#__primitiveChanges} with
      * the relevant [PrimitiveChange]{@link pentaho.type.changes.PrimitiveChange} objects.
      *
      * @param {any|Array} fragment - The element or elements to set.
@@ -650,23 +724,29 @@ define([
 
       this.owner.__assertEditable();
 
-      // See #__applyFrom
-      this._lastClearIndex = this._changes.length;
+      // See #__applyFrom.
+      this.__lastClearIndex = this.__primitiveChanges.length;
 
       this.__addChange(new Clear());
     },
 
     /**
      * Appends a change to this changeset.
+     * Called by the constructor of individual primitive changes.
      *
      * @param {!pentaho.type.changes.PrimitiveChange} change - Change object to be appended to the list of changes.
      * @private
      * @internal
      */
     __addChange: function(change) {
-      this._changes.push(change);
 
-      change._prepareRefs(this.transaction, this.owner);
+      this.__primitiveChanges.push(change);
+
+      change._prepare(this);
+
+      var txnVersion = this.transaction.__takeNextVersion();
+      change._setTransactionVersion(txnVersion);
+      this._setTransactionVersionLocal(txnVersion);
     }
     // endregion
   });

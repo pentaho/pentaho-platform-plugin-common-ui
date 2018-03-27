@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,22 +69,36 @@ define([
     },
 
     /** @inheritDoc */
-    _prepareRefs: function(txn, target) {
-      if(!target.$isBoundary && target.$type.elementType.isComplex) {
-        this.elements.forEach(function(elem) {
-          if(elem.__addReference)
-            txn.__ensureChangeRef(elem).removeReference(target);
-        });
+    _prepare: function(changeset) {
+
+      var container = changeset.owner;
+
+      if(!container.$isBoundary && !container.$type.elementType.isSimple) {
+        var i = -1;
+        var elements = this.elements;
+        var L = elements.length;
+        while(++i < L) {
+          if(elements[i].__addReference) {
+            changeset.__removeComplexElement(elements[i]);
+          }
+        }
       }
     },
 
     /** @inheritDoc */
-    _cancelRefs: function(txn, target) {
-      if(!target.$isBoundary && target.$type.elementType.isComplex) {
-        this.elements.forEach(function(elem) {
-          if(elem.__addReference)
-            txn.__ensureChangeRef(elem).addReference(target);
-        });
+    _cancel: function(changeset) {
+
+      var container = changeset.owner;
+
+      if(!container.$isBoundary && !container.$type.elementType.isSimple) {
+        var i = -1;
+        var elements = this.elements;
+        var L = elements.length;
+        while(++i < L) {
+          if(elements[i].__addReference) {
+            changeset.__addComplexElement(elements[i]);
+          }
+        }
       }
     },
 

@@ -15,17 +15,26 @@
  */
 
 /**
- * Exposes members related to the [fields]{@link pentaho.visual.role.BaseMapping#fields}
- * of visual roles' mappings.
+ * The `IFieldsConstraints` interface exposes metadata information about
+ * the [fields]{@link pentaho.visual.role.AbstractMapping#fields} of visual roles' mappings.
+ *
+ * This interface extends [IFieldsMetadata]{@link pentaho.visual.role.IFieldsMetadata}
+ * and adds additional properties that allow specifying field count constraints.
+ *
+ * Objects of this interface are part of visual role properties and
+ * are exposed in the [Property.Type#fields]{@link pentaho.visual.role.Property.Type#fields}
+ * property.
  *
  * @name IFieldsConstraints
  * @memberOf pentaho.visual.role
  * @interface
- * @see pentaho.visual.role.BaseMapping#fields
+ * @extends pentaho.visual.role.IFieldsMetadata
+ *
+ * @see pentaho.visual.role.AbstractMapping#fields
  */
 
 /**
- * Gets or sets a value that indicates if at least one [field]{@link pentaho.visual.role.BaseMapping#fields}
+ * Gets or sets a value that indicates if at least one [field]{@link pentaho.visual.role.AbstractMapping#fields}
  * must be mapped for the visual role to be valid.
  *
  * For more information on this property see
@@ -37,7 +46,7 @@
  */
 
 /**
- * Gets or sets the minimum number of [fields]{@link pentaho.visual.role.BaseMapping#fields}
+ * Gets or sets the minimum number of [fields]{@link pentaho.visual.role.AbstractMapping#fields}
  * that must be mapped for the visual role to be valid.
  *
  * For more information on this property see
@@ -49,7 +58,7 @@
  */
 
 /**
- * Gets or sets the maximum number of [fields]{@link pentaho.visual.role.BaseMapping#fields}
+ * Gets or sets the maximum number of [fields]{@link pentaho.visual.role.AbstractMapping#fields}
  * that can be mapped for the visual role to be valid.
  *
  * For more information on this property see
@@ -58,17 +67,4 @@
  * @name countMax
  * @memberOf pentaho.visual.role.IFieldsConstraints#
  * @type {undefined | number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
- */
-
-/**
- * Evaluates the _fields count range_ of the visual role on a given visualization model.
- *
- * For more information on this property see
- * [Property.Type#countRangeOn]{@link pentaho.type.Property.Type#countRangeOn}.
- *
- * @name countRangeOn
- * @memberOf pentaho.visual.role.IFieldsConstraints#
- * @method
- * @param {pentaho.visual.base.Model} model - The visualization model.
- * @return {pentaho.IRange<number>} The evaluated element count range.
  */

@@ -19,12 +19,12 @@ define([
 
   "use strict";
 
-  return ["pentaho/type/application", function(Application) {
+  return ["complex", function(Complex) {
 
     /**
      * @name pentaho.visual.base.Application.Type
      * @class
-     * @extends pentaho.type.Application.Type
+     * @extends pentaho.type.Complex.Type
      *
      * @classDesc The base type class of visual application types.
      *
@@ -34,7 +34,7 @@ define([
     /**
      * @name pentaho.visual.base.Application
      * @class
-     * @extends pentaho.type.Application
+     * @extends pentaho.type.Complex
      *
      * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.Application>} pentaho/visual/base/application
      *
@@ -45,11 +45,11 @@ define([
      * @constructor
      * @param {pentaho.visual.base.spec.IApplication} [spec] A visual application specification.
      */
-    var VisualApplication = Application.extend()
+    var Application = Complex.extend()
     .implement({
       $type: bundle.structured.application
     });
 
-    return VisualApplication;
+    return Application;
   }];
 });

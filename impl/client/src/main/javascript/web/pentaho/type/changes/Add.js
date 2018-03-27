@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ define([
      * @param {number} index - The list index at which the element should be inserted.
      */
     constructor: function(elem, index) {
+
       /**
        * Gets the element that is added to the list.
        *
@@ -71,15 +72,19 @@ define([
     },
 
     /** @inheritDoc */
-    _prepareRefs: function(txn, target) {
-      var elem = this.element;
-      if(!target.$isBoundary && elem.__addReference) txn.__ensureChangeRef(elem).addReference(target);
+    _prepare: function(changeset) {
+      var element = this.element;
+      if(element.__addReference && !changeset.owner.$isBoundary) {
+        changeset.__addComplexElement(element);
+      }
     },
 
     /** @inheritDoc */
-    _cancelRefs: function(txn, target) {
-      var elem = this.element;
-      if(!target.$isBoundary && elem.__addReference) txn.__ensureChangeRef(elem).removeReference(target);
+    _cancel: function(changeset) {
+      var element = this.element;
+      if(element.__addReference && !changeset.owner.$isBoundary) {
+        changeset.__removeComplexElement(element);
+      }
     },
 
     /** @inheritDoc */

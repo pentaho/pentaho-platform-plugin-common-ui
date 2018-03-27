@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,12 +40,12 @@ define([
      *
      * @constructor
      * @param {!pentaho.type.Property.Type} propType - The property type.
-     * @param {pentaho.type.Element} value - The proposed value of the property.
-     * @param {number} state - The proposed state of the property.
+     * @param {pentaho.type.Element} valueNew - The proposed value of the property.
+     * @param {number} stateNew - The proposed state of the property.
      *
      * @description Creates an instance.
      */
-    constructor: function(propType, value, state) {
+    constructor: function(propType, valueNew, stateNew) {
       /**
        * Gets the property whose value is replaced.
        *
@@ -56,43 +56,56 @@ define([
        */
       O.setConst(this, "property", propType);
 
-      this.__value = value;
-      this.__state = state;
-    },
-
-    /** @inheritDoc */
-    _prepareRefs: function(txn, complex, valueIni) {
-      this.__replaceRefs(txn, complex, valueIni, this.__value);
+      this.__value = valueNew;
+      this.__state = stateNew;
     },
 
     /**
      * Updates the value that will replace the current value.
      *
-     * @param {!pentaho.type.changes.Transaction} txn - The ambient transaction, provided for performance.
-     * @param {!pentaho.type.Complex} complex - The complex instance.
+     * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
      * @param {pentaho.type.Element} value - The new proposed value of the property.
      * @param {number} state - The new proposed state of the property.
      * @private
      * @internal
      * @see pentaho.type.changes.ComplexChangeset.__setElement
      */
-    __updateValue: function(txn, complex, value, state) {
+    __updateValue: function(changeset, value, state) {
 
-      this.__replaceRefs(txn, complex, this.__value, value);
+      this._setTransactionVersion(changeset.transaction.__takeNextVersion());
+
+      // It may be that only state has changed.
+      if(this.__value !== value) {
+        this.__replace(changeset, this.__value, value);
+      }
 
       this.__value = value;
       this.__state = state;
     },
 
     /** @inheritDoc */
-    _cancelRefs: function(txn, complex, valueIni) {
-      this.__replaceRefs(txn, complex, this.__value, valueIni);
+    _prepare: function(changeset) {
+      var property = this.property;
+      if(!property.isBoundary && !property.valueType.isSimple) {
+        this.__replace(changeset, changeset.owner.__getByName(property.name), this.__value);
+      }
     },
 
-    __replaceRefs: function(txn, complex, v1, v2) {
-      if(!this.property.isBoundary) {
-        if(v1 && v1.__addReference) txn.__ensureChangeRef(v1).removeReference(complex, this.property);
-        if(v2 && v2.__addReference) txn.__ensureChangeRef(v2).addReference(complex, this.property);
+    /** @inheritDoc */
+    _cancel: function(changeset) {
+      var property = this.property;
+      if(!property.isBoundary && !property.valueType.isSimple) {
+        this.__replace(changeset, this.__value, changeset.owner.__getByName(property.name));
+      }
+    },
+
+    __replace: function(changeset, valueOld, valueNew) {
+      if(valueOld && valueOld.__addReference) {
+        changeset.__removeComplexElement(valueOld, this.property);
+      }
+
+      if(valueNew && valueNew.__addReference) {
+        changeset.__addComplexElement(valueNew, this.property);
       }
     },
 

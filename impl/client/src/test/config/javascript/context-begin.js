@@ -82,6 +82,12 @@ var requireCfg = {
         root: CONTEXT_PATH,
         services: CONTEXT_PATH + "cxf/"
       }
+    },
+    "pentaho/debug": {
+      // "level": "debug",
+      // modules: {
+      //   "pentaho/type/Context": "debug"
+      // }
     }
   },
   packages: []

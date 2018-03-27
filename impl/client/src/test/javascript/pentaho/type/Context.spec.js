@@ -378,8 +378,6 @@ define([
               "pentaho/type/function",
               "pentaho/type/typeDescriptor",
               "pentaho/type/property",
-              "pentaho/type/model",
-              "pentaho/type/application",
               "pentaho/type/mixins/enum"
             ].forEach(function(id) {
               expect(!!context.get(id)).toBe(true);
@@ -425,8 +423,6 @@ define([
             "function": "pentaho/type/function",
             "type": "pentaho/type/typeDescriptor",
             "property": "pentaho/type/property",
-            "model": "pentaho/type/model",
-            "application": "pentaho/type/application",
             "enum": "pentaho/type/mixins/enum"
           };
 
@@ -2260,6 +2256,89 @@ define([
           });
         });
       });
+
+      function configRequire2(localRequire) {
+
+        localRequire.define("exp/thing", [], function() {
+          return [
+            "pentaho/type/simple",
+            function(Simple) {
+              return Simple.extend({$type: {id: "exp/thing"}});
+            }
+          ];
+        });
+
+        localRequire.define("exp/foo", [], function() {
+          return [
+            "exp/thing",
+            function(Thing) {
+              return Thing.extend({$type: {id: "exp/foo"}});
+            }
+          ];
+        });
+
+        localRequire.define("exp/bar", [], function() {
+          return [
+            "exp/thing",
+            function(Thing) {
+              return Thing.extend({$type: {id: "exp/bar"}});
+            }
+          ];
+        });
+
+        localRequire.config({
+          config: {
+            "pentaho/typeInfo": {
+              "exp/thing": {},
+              "exp/foo": {base: "exp/thing"},
+              "exp/bar": {base: "exp/thing"}
+            },
+            "pentaho/instanceInfo": {
+              "myConfigModule": {"type": "pentaho.config.spec.IRuleSet"}
+            }
+          }
+        });
+
+        localRequire.define("myConfigModule", function() {
+
+          return {
+            rules: [
+              {
+                select: {type: "pentaho/type/Context"},
+                apply: {
+                  types: {
+                    "exp/thing": {ranking: 3},
+                    "exp/foo": {ranking: 0},
+                    "exp/bar": {ranking: 5}
+                  }
+                }
+              }
+            ]
+          };
+        });
+      }
+
+      it("should return types in order of ranking", function() {
+
+        return require.using(["pentaho/type/Context", "require"], configRequire2, function(Context, localRequire) {
+
+          return Context.createAsync().then(function(context) {
+            return context.getAllAsync("exp/thing")
+              .then(function(InstCtors) {
+
+                expect(InstCtors.length).toBe(3);
+
+                var typeIds = InstCtors.map(function(InstCtor) { return InstCtor.type.id; });
+
+                expect(typeIds).toEqual([
+                  "exp/bar",
+                  "exp/thing",
+                  "exp/foo"
+                ]);
+              });
+          });
+        });
+      });
     }); // #getAllAsync
 
     describe("#getAll(baseTypeId, keyArgs)", function() {
@@ -2437,6 +2516,60 @@ define([
           });
         });
       });
-    }); // #getAll
-  }); // pentaho.type.Context
+
+      function configRequire2(localRequire) {
+
+        configRequire(localRequire);
+
+        localRequire.config({
+          config: {
+            "pentaho/instanceInfo": {
+              "myConfigModule": {"type": "pentaho.config.spec.IRuleSet"}
+            }
+          }
+        });
+
+        localRequire.define("myConfigModule", function() {
+
+          return {
+            rules: [
+              {
+                select: {type: "pentaho/type/Context"},
+                apply: {
+                  types: {
+                    "exp/thing": {ranking: 3},
+                    "exp/foo": {ranking: 0},
+                    "exp/bar": {ranking: 5}
+                  }
+                }
+              }
+            ]
+          };
+        });
+      }
+
+      it("should return types in order of ranking", function() {
+
+        return require.using(["pentaho/type/Context", "require"], configRequire2, function(Context, localRequire) {
+
+          return Context.createAsync().then(function(context) {
+            return context.getDependencyAsync(["exp/thing", "exp/foo", "exp/bar"])
+              .then(function(values) {
+
+                var InstCtors = context.getAll("exp/thing");
+                expect(InstCtors.length).toBe(3);
+
+                var typeIds = InstCtors.map(function(InstCtor) { return InstCtor.type.id; });
+
+                expect(typeIds).toEqual([
+                  "exp/bar",
+                  "exp/thing",
+                  "exp/foo"
+                ]);
+              });
+          });
+        });
+      });
+    }); // end #getAll
+  }); // end pentaho.type.Context
 });
