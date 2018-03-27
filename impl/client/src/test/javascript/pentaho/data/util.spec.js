@@ -128,6 +128,56 @@ define([
       });
     });
 
+    describe(".getCellValue(valueOrCell)", function() {
+
+      it("returns null when given null", function() {
+        var value = dataUtil.getCellValue(null);
+
+        expect(value).toBe(null);
+      });
+
+      it("returns undefined when given undefined", function() {
+        var value = dataUtil.getCellValue(undefined);
+
+        expect(value).toBe(undefined);
+      });
+
+      it("returns a Date when given a Date", function() {
+        var valueIn = new Date();
+        var valueOut = dataUtil.getCellValue(valueIn);
+
+        expect(valueOut).toBe(valueIn);
+      });
+
+      it("returns a number when given a number", function() {
+        var valueIn = 1;
+        var valueOut = dataUtil.getCellValue(valueIn);
+
+        expect(valueOut).toBe(valueIn);
+      });
+
+      it("returns a boolean when given a boolean", function() {
+        var valueIn = true;
+        var valueOut = dataUtil.getCellValue(valueIn);
+
+        expect(valueOut).toBe(valueIn);
+      });
+
+      it("returns a string when given a string", function() {
+        var valueIn = "foo";
+        var valueOut = dataUtil.getCellValue(valueIn);
+
+        expect(valueOut).toBe(valueIn);
+      });
+
+      it("returns the value of a Cell when given a cell", function() {
+        var valueIn = new Cell("foo", "Bar");
+        var valueOut = dataUtil.getCellValue(valueIn);
+
+        expect(valueOut).toBe(valueIn.value);
+      });
+    });
+
     describe(".createFilterFromCellsMap(cellsMap, dataTable, context)", function() {
 
       it("should return null when given an empty cell map", function() {

@@ -90,6 +90,19 @@ define(function() {
     },
 
     /**
+     * Gets the value of a cell, or value, directly.
+     *
+     * @param {any|pentaho.data.ICell} valueOrCell - The value or cell.
+     *
+     * @return {any} The cell value.
+     */
+    getCellValue: function(valueOrCell) {
+      return (valueOrCell != null && !(valueOrCell instanceof Date))
+        ? valueOrCell.valueOf()
+        : valueOrCell;
+    },
+
+    /**
      * Creates a data filter from the given cells map, source data table and Type API context.
      *
      * @param {!Object.<string, any|pentaho.data.ICell>} cellsMap - The data cells map.
@@ -155,7 +168,7 @@ define(function() {
         filterValue = {
           // Matches type alias corresponding simple types for all column types.
           _: dataPlain.getColumnType(columnIndex),
-          value: cell.valueOf(),
+          value: dataUtil.getCellValue(cell),
           formatted: cell.toString()
         };
       }

@@ -800,10 +800,9 @@ define([
 
       var value = valuesMap[name];
       if(value !== undefined) {
+
         // Accept cells as well.
-        if(!(value instanceof Date)) {
-          value = value.valueOf();
-        }
+        value = dataUtil.getCellValue(value);
 
         if(fieldValues == null) {
           fieldValues = new Array(count);

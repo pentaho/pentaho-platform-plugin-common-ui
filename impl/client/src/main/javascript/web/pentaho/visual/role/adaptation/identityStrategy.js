@@ -16,10 +16,11 @@
 define([
   "module",
   "pentaho/util/object",
+  "pentaho/data/util",
 
   // so that r.js sees otherwise invisible dependencies.
   "./strategy"
-], function(module, O) {
+], function(module, O, dataUtil) {
 
   return [
     "./strategy",
@@ -105,7 +106,7 @@ define([
           var rowIndexByValueKey = this.__getRowIndexByValueKeyMap();
 
           // Accepts ICell or direct values.
-          var valueKey = this.__keyFun(valueOrCell && valueOrCell.valueOf());
+          var valueKey = this.__keyFun(dataUtil.getCellValue(valueOrCell));
 
           var rowIndex = rowIndexByValueKey[valueKey];
           if(rowIndex === undefined) {
