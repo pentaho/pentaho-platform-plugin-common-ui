@@ -48,7 +48,15 @@ define([
          * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.adaptation.EntityWithTimeIntervalKeyStrategy>}
          *      pentaho/visual/role/adaptation/entityWithTimeIntervalKeyStrategy
          *
-         * @classDesc The `EntityWithTimeIntervalKeyStrategy` class describes the strategy of mapping ...TODO...
+         * @classDesc The `EntityWithTimeIntervalKeyStrategy` class describes the strategy of mapping fields from a time hierarchy to a
+         * date value representing the start time of the most specific level (i.e. the smaller time interval).
+         *
+         * The strategy targets:
+         * 1. modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} is [date]{@link pentaho.type.Date}, and
+         * 2. mappings of fields whose [attributes][@link pentaho.data.ITable#getColumnAttribute] contains the property "EntityWithTimeIntervalKey".
+         *
+         * Members of the most specific level must include the property "startDateTime". That is signaled by "isStartDateTimeProvided" boolean
+         * attribute in the "EntityWithTimeIntervalKey" property.
          *
          * @description Creates a _EntityWithTimeIntervalKey_ mapping strategy instance.
          * @constructor
