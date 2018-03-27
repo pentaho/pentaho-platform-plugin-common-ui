@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
-  "pentaho/data/Table"
-], function(Context, DataTable) {
-
+         "pentaho/type/Context",
+         "pentaho/data/Table",
+         "pentaho/util/date"
+       ], function(Context, DataTable, dateUtil) {
   "use strict";
 
   /* globals describe, it, beforeEach, beforeAll, spyOn */
@@ -140,7 +140,7 @@ define([
               ],
               "p": {
                 "EntityWithTimeIntervalKey": {
-                  "duration": "MONTH",
+                  "duration": "month",
                   "isStartDateTimeProvided": true
                 }
               }
@@ -162,7 +162,7 @@ define([
               ],
               "p": {
                 "EntityWithTimeIntervalKey": {
-                  "duration": "YEAR",
+                  "duration": "year",
                   "isStartDateTimeProvided": false
                 }
               }
@@ -225,11 +225,11 @@ define([
           Complex = context.get("complex");
           PentahoDate = context.get("date");
 
-          return context.getDependencyApplyAsync([
-            "pentaho/visual/role/adaptation/entityWithTimeIntervalKeyStrategy"
-          ], function(_Strategy) {
-
-            Strategy = _Strategy;
+          return context.getDependencyApplyAsync(
+            [
+              "pentaho/visual/role/adaptation/entityWithTimeIntervalKeyStrategy"
+            ], function(_Strategy) {
+              Strategy = _Strategy;
           });
         });
     });
@@ -274,9 +274,10 @@ define([
           expect(inputType).toBe(null);
         });
 
-        it("should return the List type if given a date type and isVisualKey is true", function() {
+        it("should return the List of Strings type if given a date type and isVisualKey is true", function() {
           var inputType = Strategy.type.getInputTypeFor(PentahoDate.type, true);
-          expect(inputType).toBe(List.type);
+          expect(inputType.isList).toBe(true);
+          expect(inputType.of).toBe(PentahoString.type);
         });
 
       });
@@ -284,26 +285,45 @@ define([
       describe("#validateApplication(schemaData, inputFieldIndexes)", function() {
 
         it("should return an object with isValid: true", function() {
-          var result = Strategy.type.validateApplication(dataTable, [datasetFieldIndexes.years, datasetFieldIndexes.months]);
+          var result = Strategy.type.validateApplication(
+            dataTable,
+            [datasetFieldIndexes.years, datasetFieldIndexes.months]
+          );
           expect(result).toEqual(jasmine.objectContaining({isValid: true}));
         });
 
         it("should return an object with addsFields: true", function() {
-          var result = Strategy.type.validateApplication(dataTable, [datasetFieldIndexes.years, datasetFieldIndexes.months]);
+          var result = Strategy.type.validateApplication(
+            dataTable,
+            [datasetFieldIndexes.years, datasetFieldIndexes.months]
+          );
           expect(result).toEqual(jasmine.objectContaining({addsFields: true}));
         });
 
-        it("should return an object with isValid: false when not all fields are annotated with EntityWithTimeIntervalKey", function() {
-          var result = Strategy.type.validateApplication(dataTable, [datasetFieldIndexes.years, datasetFieldIndexes.months, datasetFieldIndexes.other]);
-          expect(result).toEqual(jasmine.objectContaining({isValid: false}));
-        });
+        it(
+          "should return an object with isValid: false when not all fields are annotated with EntityWithTimeIntervalKey",
+          function() {
+            var result = Strategy.type.validateApplication(
+              dataTable,
+              [datasetFieldIndexes.years, datasetFieldIndexes.months, datasetFieldIndexes.other]
+            );
+            expect(result).toEqual(jasmine.objectContaining({isValid: false}));
+          }
+        );
 
-        it("should return an object with isValid: false if there are no fields with isStartDateTimeProvided=true", function() {
-          dataTable.getColumnAttribute(datasetFieldIndexes.months).property("EntityWithTimeIntervalKey").isStartDateTimeProvided = false;
+        it(
+          "should return an object with isValid: false if there are no fields with isStartDateTimeProvided=true",
+          function() {
+            dataTable.getColumnAttribute(datasetFieldIndexes.months)
+              .property("EntityWithTimeIntervalKey").isStartDateTimeProvided = false;
 
-          var result = Strategy.type.validateApplication(dataTable, [datasetFieldIndexes.years, datasetFieldIndexes.months]);
-          expect(result).toEqual(jasmine.objectContaining({isValid: false}));
-        });
+            var result = Strategy.type.validateApplication(
+              dataTable,
+              [datasetFieldIndexes.years, datasetFieldIndexes.months]
+            );
+            expect(result).toEqual(jasmine.objectContaining({isValid: false}));
+          }
+        );
 
       });
 
@@ -325,30 +345,33 @@ define([
           expect(strategy.inputFieldIndexes).toEqual(inputFieldIndexes);
         });
 
-        it("should add a column of dates to the data table and return a strategy with its index as the only content of outputFieldIndexes", function() {
-          var beforeColsCount = dataTable.getNumberOfColumns();
+        it("should add a column of dates to the data table and return a strategy with its index as the only content" +
+          "of outputFieldIndexes",
+          function() {
+            var beforeColsCount = dataTable.getNumberOfColumns();
 
-          var strategy = Strategy.type.apply(dataTable, [datasetFieldIndexes.years, datasetFieldIndexes.months]);
+            var strategy = Strategy.type.apply(dataTable, [datasetFieldIndexes.years, datasetFieldIndexes.months]);
 
-          var afterColsCount = dataTable.getNumberOfColumns();
+            var afterColsCount = dataTable.getNumberOfColumns();
 
-          expect(afterColsCount).toEqual(beforeColsCount+1);
+            expect(afterColsCount).toEqual(beforeColsCount + 1);
 
-          expect(strategy.outputFieldIndexes.length).toEqual(1);
+            expect(strategy.outputFieldIndexes.length).toEqual(1);
 
-          var newColIndex = strategy.outputFieldIndexes[0];
-          var newCol = dataTable.getColumnAttribute(newColIndex);
+            var newColIndex = strategy.outputFieldIndexes[0];
+            var newCol = dataTable.getColumnAttribute(newColIndex);
 
-          expect(newCol.type).toEqual("date");
+            expect(newCol.type).toEqual("date");
 
-          var rowIndex = dataTable.getNumberOfRows();
-          while(rowIndex--) {
-            var sourceCell = dataTable.getCell(rowIndex, datasetFieldIndexes.months);
-            var newCell = dataTable.getCell(rowIndex, newColIndex);
+            var rowIndex = dataTable.getNumberOfRows();
+            while(rowIndex--) {
+              var sourceCell = dataTable.getCell(rowIndex, datasetFieldIndexes.months);
+              var newCell = dataTable.getCell(rowIndex, newColIndex);
 
-            expect(newCell.value).toEqual(new Date(sourceCell.referent.property("startDateTime")));
+              expect(newCell.value).toEqual(dateUtil.parseDateEcma262v7(sourceCell.referent.property("startDateTime")));
+            }
           }
-        });
+        );
 
         it("should deal with cells missing startDateTime value", function() {
           dataTable.getColumnAttribute(datasetFieldIndexes.months).members[1].property("startDateTime", null);
@@ -363,7 +386,10 @@ define([
         });
 
         it("should deal with cells with invalid startDateTime value", function() {
-          dataTable.getColumnAttribute(datasetFieldIndexes.months).members[1].property("startDateTime", "Something that isn't a date");
+          dataTable.getColumnAttribute(datasetFieldIndexes.months).members[1].property(
+            "startDateTime",
+            "Something that isn't a date"
+          );
 
           var strategy = Strategy.type.apply(dataTable, [datasetFieldIndexes.years, datasetFieldIndexes.months]);
 
@@ -415,25 +441,28 @@ define([
       it("should return a cell corresponding to a given existing value", function() {
         var outputCells = strategy.map(["[Time].[2003]", "[Time].[2003].[QTR1].[Jan]"]);
 
-        expect(outputCells).toEqual([
-          jasmine.objectContaining({value: new Date("2003-01-01T00:00:00")})
-        ]);
+        expect(outputCells).toEqual(
+          [jasmine.objectContaining({value: dateUtil.parseDateEcma262v7("2003-01-01T00:00:00")})]
+        );
       });
 
       it("should be ok omitting non-relevant fields", function() {
         var outputCells = strategy.map([null, "[Time].[2003].[QTR1].[Jan]"]);
 
-        expect(outputCells).toEqual([
-          jasmine.objectContaining({value: new Date("2003-01-01T00:00:00")})
-        ]);
+        expect(outputCells).toEqual(
+          [jasmine.objectContaining({value: dateUtil.parseDateEcma262v7("2003-01-01T00:00:00")})]
+        );
       });
 
       it("should return a cell corresponding to a given (equal value) existing cells", function() {
-        var outputCells = strategy.map([new Cell("[Time].[2003]", "2003"), new Cell("[Time].[2003].[QTR1].[Jan]", "Jan")]);
+        var outputCells = strategy.map([new Cell("[Time].[2003]", "2003"), new Cell(
+          "[Time].[2003].[QTR1].[Jan]",
+          "Jan"
+        )]);
 
-        expect(outputCells).toEqual([
-          jasmine.objectContaining({value: new Date("2003-01-01T00:00:00")})
-        ]);
+        expect(outputCells).toEqual(
+          [jasmine.objectContaining({value: dateUtil.parseDateEcma262v7("2003-01-01T00:00:00")})]
+        );
       });
 
       it("should return null if given a non-existing value", function() {
@@ -454,25 +483,29 @@ define([
       });
 
       it("should return a cell corresponding to a given existing value", function() {
-        var inputCells = strategy.invert([new Date("2003-01-01T00:00:00")]);
+        var inputCells = strategy.invert([dateUtil.parseDateEcma262v7("2003-01-01T00:00:00")]);
 
-        expect(inputCells).toEqual([
-          jasmine.objectContaining({value: "[Time].[2003]", formatted: "2003"}),
-          jasmine.objectContaining({value: "[Time].[2003].[QTR1].[Jan]", formatted: "Jan"})
-        ]);
+        expect(inputCells).toEqual(
+          [
+            jasmine.objectContaining({value: "[Time].[2003]", formatted: "2003"}),
+            jasmine.objectContaining({value: "[Time].[2003].[QTR1].[Jan]", formatted: "Jan"})
+          ]
+        );
       });
 
       it("should return a cell corresponding to a given (equal value) existing cell", function() {
-        var inputCells = strategy.invert([new Cell(new Date("2003-01-01T00:00:00"), "Don't care")]);
+        var inputCells = strategy.invert([new Cell(dateUtil.parseDateEcma262v7("2003-01-01T00:00:00"), "Don't care")]);
 
-        expect(inputCells).toEqual([
-          jasmine.objectContaining({value: "[Time].[2003]", formatted: "2003"}),
-          jasmine.objectContaining({value: "[Time].[2003].[QTR1].[Jan]", formatted: "Jan"})
-        ]);
+        expect(inputCells).toEqual(
+          [
+            jasmine.objectContaining({value: "[Time].[2003]", formatted: "2003"}),
+            jasmine.objectContaining({value: "[Time].[2003].[QTR1].[Jan]", formatted: "Jan"})
+          ]
+        );
       });
 
       it("should return null if given a non-existing value", function() {
-        var inputCells = strategy.invert([new Date("1981-07-27T19:00:00")]);
+        var inputCells = strategy.invert([dateUtil.parseDateEcma262v7("1981-07-27T19:00:00")]);
 
         expect(inputCells).toBe(null);
       });
@@ -480,10 +513,12 @@ define([
       it("should work with null values", function() {
         var inputCells = strategy.invert([null]);
 
-        expect(inputCells).toEqual([
-          jasmine.objectContaining({value: "[Time].[2004]", formatted: "2004"}),
-          jasmine.objectContaining({value: "[Time].[2004].[QTR1].[Feb]", formatted: "Feb"})
-        ]);
+        expect(inputCells).toEqual(
+          [
+            jasmine.objectContaining({value: "[Time].[2004]", formatted: "2004"}),
+            jasmine.objectContaining({value: "[Time].[2004].[QTR1].[Feb]", formatted: "Feb"})
+          ]
+        );
       });
 
     });

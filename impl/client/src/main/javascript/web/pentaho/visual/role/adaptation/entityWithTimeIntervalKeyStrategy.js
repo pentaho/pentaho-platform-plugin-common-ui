@@ -25,12 +25,11 @@ define([
 
   return [
     "./strategy",
-    "./timeIntervalDurationEnum",
+    "./timeIntervalDuration",
     "pentaho/type/date",
-    "pentaho/type/list",
-    function(Strategy, TimeIntervalDurationEnum, DateType, ListType) {
+    function(Strategy, TimeIntervalDuration, DateType) {
 
-      var NULL_KEY = "NULL";
+      var stringListType = this.get(["string"]);
 
       /**
        * @name pentaho.visual.role.adaptation.EntityWithTimeIntervalKeyStrategy.Type
@@ -39,227 +38,239 @@ define([
        *
        * @classDesc The type class of {@link pentaho.visual.role.adaptation.EntityWithTimeIntervalKeyStrategy}.
        */
-      var EntityWithTimeIntervalKeyStrategy = Strategy.extend(/** @lends pentaho.visual.role.adaptation.EntityWithTimeIntervalKeyStrategy# */{
-        /**
-         * @alias pentaho.visual.role.adaptation.EntityWithTimeIntervalKeyStrategy
-         * @class
-         * @extends pentaho.visual.role.adaptation.Strategy
-         * @abstract
-         *
-         * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.adaptation.EntityWithTimeIntervalKeyStrategy>}
-         *      pentaho/visual/role/adaptation/entityWithTimeIntervalKeyStrategy
-         *
-         * @classDesc The `EntityWithTimeIntervalKeyStrategy` class describes the strategy of mapping fields from a time hierarchy to a
-         * date value representing the start time of the most specific level (i.e. the smaller time interval).
-         *
-         * The strategy targets:
-         * 1. modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} is [date]{@link pentaho.type.Date}, and
-         * 2. mappings of fields whose [attributes][@link pentaho.data.ITable#getColumnAttribute] contains the property "EntityWithTimeIntervalKey".
-         *
-         * Members of the most specific level must include the property "startDateTime". That is signaled by "isStartDateTimeProvided" boolean
-         * attribute in the "EntityWithTimeIntervalKey" property.
-         *
-         * @description Creates a _EntityWithTimeIntervalKey_ mapping strategy instance.
-         * @constructor
-         * @param {pentaho.visual.role.adaptation.spec.IStrategy} [instSpec] A _EntityWithTimeIntervalKey_ mapping strategy specification.
-         */
-        constructor: function(instSpec) {
+      var EntityWithTimeIntervalKeyStrategy = Strategy.extend(
+        /** @lends pentaho.visual.role.adaptation.EntityWithTimeIntervalKeyStrategy# */
+        {
           /**
-           * The function which extract the key of the date value.
+           * @alias pentaho.visual.role.adaptation.EntityWithTimeIntervalKeyStrategy
+           * @class
+           * @extends pentaho.visual.role.adaptation.Strategy
+           * @abstract
            *
-           * @type {!function(any):string}
-           * @readOnly
-           * @private
-           */
-          this.__keyFun = O.getSameTypeKeyFun("date");
-
-          /**
-           * The mapping of original values to its first row index.
-           * Assumes only the main input field is relevant.
+           * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.adaptation.EntityWithTimeIntervalKeyStrategy>}
+           *      pentaho/visual/role/adaptation/entityWithTimeIntervalKeyStrategy
            *
-           * @type {Object}
-           * @readOnly
-           * @private
-           */
-          this.__forwardIndex = {};
-
-          /**
-           * The mapping of generated value to its first row index.
+           * @classDesc The `EntityWithTimeIntervalKeyStrategy` class describes the strategy of mapping fields from a
+           *   time hierarchy to a date value representing the start time of the most specific level (i.e. the smaller
+           *   time interval).
            *
-           * @type {Object}
-           * @readOnly
-           * @private
-           */
-          this.__backIndex = {};
-
-          var inputFieldIndexes = instSpec.inputFieldIndexes;
-          var dataTable = instSpec.data;
-
-          /**
-           * The index of the main input field in the inputFieldIndexes array.
+           * The strategy targets:
+           * 1. modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} is [date]{@link pentaho.type.Date}, and
+           * 2. mappings of fields whose [attributes][@link pentaho.data.ITable#getColumnAttribute] contains the
+           *   property "EntityWithTimeIntervalKey".
            *
-           * @type {Object}
-           * @readOnly
-           * @private
+           * Members of the most specific level must include the property "startDateTime". That is signaled by
+           *   "isStartDateTimeProvided" boolean attribute in the "EntityWithTimeIntervalKey" property.
+           *
+           * @description Creates a _EntityWithTimeIntervalKey_ mapping strategy instance.
+           * @constructor
+           * @param {pentaho.visual.role.adaptation.spec.IStrategy} [instSpec] A _EntityWithTimeIntervalKey_ mapping
+           *   strategy specification.
            */
-          this.mainInputPosition = this.$type.__getMainInputFieldPosition(inputFieldIndexes, dataTable);
+          constructor: function(instSpec) {
+            /**
+             * The function which extract the key of the date value.
+             *
+             * @type {!function(any):string}
+             * @readOnly
+             * @private
+             */
+            this.__keyFun = O.getSameTypeKeyFun("date");
 
-          var attributeName;
-          var baseAttributeName = attributeName = this.$type.__getOutputFieldName(inputFieldIndexes);
-          while(dataTable.model.attributes.get(attributeName) != null) {
-            attributeName = baseAttributeName + "_" + new Date();
-          }
+            /**
+             * The mapping of original values to its first row index.
+             * Assumes only the main input field is relevant.
+             *
+             * @type {Object}
+             * @readOnly
+             * @private
+             */
+            this.__forwardIndex = {};
 
-          dataTable.model.attributes.add({
-            name: attributeName,
-            type: "date",
-            label: this.$type.__getOutputFieldLabel(inputFieldIndexes, dataTable),
-            isKey: true
-          });
+            /**
+             * The mapping of generated value to its first row index.
+             *
+             * @type {Object}
+             * @readOnly
+             * @private
+             */
+            this.__backIndex = {};
 
-          var outputColIndex = dataTable.addColumn(attributeName);
+            var inputFieldIndexes = instSpec.inputFieldIndexes;
+            var dataTable = instSpec.data;
 
-          var rowIndex = dataTable.getNumberOfRows();
-          while(rowIndex--) {
-            var cellIndex = inputFieldIndexes.length;
-            var inputCells = new Array(cellIndex);
+            /**
+             * The index of the main input field in the inputFieldIndexes array.
+             *
+             * @type {Object}
+             * @readOnly
+             * @private
+             */
+            this.mainInputPosition = this.$type.__getMainInputFieldPosition(inputFieldIndexes, dataTable);
 
-            var cellLabels = new Array(cellIndex);
-            while(cellIndex--) {
-              inputCells[cellIndex] = dataTable.getCell(rowIndex, inputFieldIndexes[cellIndex]);
-              cellLabels[cellIndex] = inputCells[cellIndex].label;
+            var attributeName;
+            var baseAttributeName = attributeName = this.$type.__getOutputFieldName(inputFieldIndexes);
+            while(dataTable.model.attributes.get(attributeName) != null) {
+              attributeName = baseAttributeName + "_" + new Date();
             }
 
-            var mainInputCell = inputCells[this.mainInputPosition];
+            dataTable.model.attributes.add(
+              {
+                name: attributeName,
+                type: "date",
+                label: this.$type.__getOutputFieldLabel(inputFieldIndexes, dataTable),
+                isKey: true
+              }
+            );
 
-            var dateValue = dateUtil.parseDateEcma262v7(mainInputCell.referent.property("startDateTime"));
+            var outputColIndex = dataTable.addColumn(attributeName);
 
-            var outputCell = dataTable.getCell(rowIndex, outputColIndex);
-            outputCell.value = dateValue;
-            outputCell.label = cellLabels.join(", ");
+            var rowIndex = dataTable.getNumberOfRows();
+            while(rowIndex--) {
+              var cellIndex = inputFieldIndexes.length;
+              var inputCells = new Array(cellIndex);
 
-            this.__backIndex[dateValue != null ? this.__keyFun.call(null, dateValue) : NULL_KEY] = rowIndex;
-            this.__forwardIndex[mainInputCell.value] = rowIndex;
-          }
-
-          instSpec = Object.create(instSpec);
-          instSpec.outputFieldIndexes = [outputColIndex];
-
-          this.base(instSpec);
-        },
-
-        /** @inheritDoc */
-        get isInvertible() {
-          return true;
-        },
-
-        /** @inheritDoc */
-        map: function(inputValues) {
-          var lookupValue = inputValues[this.mainInputPosition];
-          if(lookupValue != null) {
-            lookupValue = lookupValue.valueOf();
-          }
-
-          var rowIndex = this.__forwardIndex[lookupValue];
-          if(rowIndex != null) {
-            return this._getDataRowCells(rowIndex, this.outputFieldIndexes);
-          }
-
-          return null;
-        },
-
-        /** @inheritDoc */
-        invert: function(outputValues) {
-          var lookupValue = outputValues[0];
-          if(lookupValue != null && !(lookupValue instanceof Date)) {
-            lookupValue = lookupValue.valueOf();
-          }
-
-          lookupValue = lookupValue != null ? this.__keyFun.call(null, lookupValue) : NULL_KEY;
-
-          var rowIndex = this.__backIndex[lookupValue];
-          if(rowIndex != null) {
-            return this._getDataRowCells(rowIndex, this.inputFieldIndexes);
-          }
-
-          return null;
-        },
-
-        $type: /** @lends pentaho.visual.role.adaptation.EntityWithTimeIntervalKeyStrategy.Type# */{
-          id: module.id,
-
-          /** @inheritDoc */
-          getInputTypeFor: function(outputDataType, isVisualKey) {
-            if(!isVisualKey || !outputDataType.isSubtypeOf(DateType.type)) {
-              return null;
-            }
-
-            return ListType.type;
-          },
-
-          /** @inheritDoc */
-          validateApplication: function(schemaData, inputFieldIndexes) {
-            var mainInputFieldIndex = this.__getMainInputFieldPosition(inputFieldIndexes, schemaData);
-
-            return {isValid: mainInputFieldIndex > -1, addsFields: true};
-          },
-
-          __getMainInputFieldPosition: function(inputFieldIndexes, schemaData) {
-            var mostSpecific = null;
-            var mostSpecificIndex = null;
-
-            var index = inputFieldIndexes.length;
-
-            while(index--) {
-              var colAttribute = schemaData.getColumnAttribute(inputFieldIndexes[index]);
-
-              if(colAttribute != null) {
-                var annotation = colAttribute.property("EntityWithTimeIntervalKey");
-
-                if(annotation != null) {
-                  // equal duration replaces mostSpecific, because we're looping backwards
-                  if(mostSpecific == null || TimeIntervalDurationEnum.type.comparePrimitiveValues(mostSpecific.duration, annotation.duration) < 1) {
-                    mostSpecific = annotation;
-                    mostSpecificIndex = index;
-                  }
-
-                  continue;
-                }
+              var cellLabels = new Array(cellIndex);
+              while(cellIndex--) {
+                inputCells[cellIndex] = dataTable.getCell(rowIndex, inputFieldIndexes[cellIndex]);
+                cellLabels[cellIndex] = inputCells[cellIndex].label;
               }
 
-              // if we reach here, one of the fields has no annotation, so we must reject the mapping
-              mostSpecific = null;
-              break;
+              var mainInputCell = inputCells[this.mainInputPosition];
+
+              var dateValue = dateUtil.parseDateEcma262v7(mainInputCell.referent.property("startDateTime"));
+
+              var outputCell = dataTable.getCell(rowIndex, outputColIndex);
+              outputCell.value = dateValue;
+              outputCell.label = cellLabels.join(", ");
+
+              this.__backIndex[this.__keyFun.call(null, dateValue)] = rowIndex;
+              this.__forwardIndex[mainInputCell.value] = rowIndex;
             }
 
-            return mostSpecific != null && mostSpecific.isStartDateTimeProvided ? mostSpecificIndex : -1;
-          },
+            instSpec = Object.create(instSpec);
+            instSpec.outputFieldIndexes = [outputColIndex];
 
-          __getOutputFieldName: function(inputFieldIndexes) {
-            return inputFieldIndexes.join("_");
-          },
-
-          __getOutputFieldLabel: function(inputFieldIndexes, dataTable) {
-            var index = inputFieldIndexes.length;
-            var labels = new Array(index);
-
-            while(index--) {
-              var colAttribute = dataTable.getColumnAttribute(inputFieldIndexes[index]);
-              labels[index] = colAttribute.label;
-            }
-
-            return labels.join(", ");
+            this.base(instSpec);
           },
 
           /** @inheritDoc */
-          apply: function(data, inputFieldIndexes) {
-            return new EntityWithTimeIntervalKeyStrategy({
-              data: data,
-              inputFieldIndexes: inputFieldIndexes
-            });
+          get isInvertible() {
+            return true;
+          },
+
+          /** @inheritDoc */
+          map: function(inputValues) {
+            var lookupValue = inputValues[this.mainInputPosition];
+            if(lookupValue != null) {
+              lookupValue = lookupValue.valueOf();
+            }
+
+            var rowIndex = this.__forwardIndex[lookupValue];
+            if(rowIndex != null) {
+              return this._getDataRowCells(rowIndex, this.outputFieldIndexes);
+            }
+
+            return null;
+          },
+
+          /** @inheritDoc */
+          invert: function(outputValues) {
+            var lookupValue = outputValues[0];
+            if(lookupValue != null && !(lookupValue instanceof Date)) {
+              lookupValue = lookupValue.valueOf();
+            }
+
+            lookupValue = this.__keyFun.call(null, lookupValue);
+
+            var rowIndex = this.__backIndex[lookupValue];
+            if(rowIndex != null) {
+              return this._getDataRowCells(rowIndex, this.inputFieldIndexes);
+            }
+
+            return null;
+          },
+
+          $type: /** @lends pentaho.visual.role.adaptation.EntityWithTimeIntervalKeyStrategy.Type# */{
+            id: module.id,
+
+            /** @inheritDoc */
+            getInputTypeFor: function(outputDataType, isVisualKey) {
+              if(!isVisualKey || !outputDataType.isSubtypeOf(DateType.type)) {
+                return null;
+              }
+
+              return stringListType.type;
+            },
+
+            /** @inheritDoc */
+            validateApplication: function(schemaData, inputFieldIndexes) {
+              var mainInputFieldIndex = this.__getMainInputFieldPosition(inputFieldIndexes, schemaData);
+
+              return {isValid: mainInputFieldIndex > -1, addsFields: true};
+            },
+
+            __getMainInputFieldPosition: function(inputFieldIndexes, schemaData) {
+              var mostSpecific = null;
+              var mostSpecificIndex = null;
+
+              var index = inputFieldIndexes.length;
+
+              while(index--) {
+                var colAttribute = schemaData.getColumnAttribute(inputFieldIndexes[index]);
+
+                if(colAttribute != null) {
+                  var annotation = colAttribute.property("EntityWithTimeIntervalKey");
+
+                  if(annotation != null) {
+                    // equal duration replaces mostSpecific, because we're looping backwards
+                    if(mostSpecific == null || TimeIntervalDuration.type.comparePrimitiveValues(
+                        mostSpecific.duration,
+                        annotation.duration
+                      ) < 1) {
+                      mostSpecific = annotation;
+                      mostSpecificIndex = index;
+                    }
+
+                    continue;
+                  }
+                }
+
+                // if we reach here, one of the fields has no annotation, so we must reject the mapping
+                mostSpecific = null;
+                break;
+              }
+
+              return mostSpecific != null && mostSpecific.isStartDateTimeProvided ? mostSpecificIndex : -1;
+            },
+
+            __getOutputFieldName: function(inputFieldIndexes) {
+              return inputFieldIndexes.join("_");
+            },
+
+            __getOutputFieldLabel: function(inputFieldIndexes, dataTable) {
+              var index = inputFieldIndexes.length;
+              var labels = new Array(index);
+
+              while(index--) {
+                var colAttribute = dataTable.getColumnAttribute(inputFieldIndexes[index]);
+                labels[index] = colAttribute.label;
+              }
+
+              return labels.join(", ");
+            },
+
+            /** @inheritDoc */
+            apply: function(data, inputFieldIndexes) {
+              return new EntityWithTimeIntervalKeyStrategy(
+                {
+                  data: data,
+                  inputFieldIndexes: inputFieldIndexes
+                }
+              );
+            }
           }
-        }
-      });
+        });
 
       return EntityWithTimeIntervalKeyStrategy;
     }
