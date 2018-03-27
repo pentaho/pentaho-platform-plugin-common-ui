@@ -20,6 +20,7 @@
  * @name pentaho.visual.role.adaptation.spec.ICombineStrategy
  * @interface
  * @extends pentaho.visual.role.adaptation.spec.IStrategy
+ * @private
  *
  * @see pentaho.visual.role.adaptation.CombineStrategy
  */

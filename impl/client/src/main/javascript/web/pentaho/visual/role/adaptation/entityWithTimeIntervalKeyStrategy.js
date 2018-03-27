@@ -17,10 +17,11 @@ define([
   "module",
   "pentaho/util/object",
   "pentaho/util/date",
+  "pentaho/data/util",
 
   // so that r.js sees otherwise invisible dependencies.
   "./strategy"
-], function(module, O, dateUtil) {
+], function(module, O, dateUtil, dataUtil) {
   "use strict";
 
   return [
@@ -161,10 +162,7 @@ define([
 
           /** @inheritDoc */
           map: function(inputValues) {
-            var lookupValue = inputValues[this.mainInputPosition];
-            if(lookupValue != null) {
-              lookupValue = lookupValue.valueOf();
-            }
+            var lookupValue = dataUtil.getCellValue(inputValues[this.mainInputPosition]);
 
             var rowIndex = this.__forwardIndex[lookupValue];
             if(rowIndex != null) {
@@ -176,10 +174,8 @@ define([
 
           /** @inheritDoc */
           invert: function(outputValues) {
-            var lookupValue = outputValues[0];
-            if(lookupValue != null && !(lookupValue instanceof Date)) {
-              lookupValue = lookupValue.valueOf();
-            }
+
+            var lookupValue = dataUtil.getCellValue(outputValues[0]);
 
             lookupValue = this.__keyFun.call(null, lookupValue);
 
@@ -223,11 +219,11 @@ define([
                   var annotation = colAttribute.property("EntityWithTimeIntervalKey");
 
                   if(annotation != null) {
-                    // equal duration replaces mostSpecific, because we're looping backwards
-                    if(mostSpecific == null || TimeIntervalDuration.type.comparePrimitiveValues(
-                        mostSpecific.duration,
-                        annotation.duration
-                      ) < 1) {
+                    // Equal duration replaces mostSpecific, because we're looping backwards.
+                    if(mostSpecific == null ||
+                       TimeIntervalDuration.type.comparePrimitiveValues(
+                         mostSpecific.duration,
+                         annotation.duration) < 1) {
                       mostSpecific = annotation;
                       mostSpecificIndex = index;
                     }
@@ -236,7 +232,7 @@ define([
                   }
                 }
 
-                // if we reach here, one of the fields has no annotation, so we must reject the mapping
+                // If we reach here, one of the fields has no annotation, so we must reject the mapping
                 mostSpecific = null;
                 break;
               }

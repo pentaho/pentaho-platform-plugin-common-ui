@@ -16,10 +16,11 @@
 define([
   "module",
   "pentaho/util/object",
+  "pentaho/data/util",
 
   // so that r.js sees otherwise invisible dependencies.
   "./strategy"
-], function(module, O) {
+], function(module, O, dataUtil) {
 
   "use strict";
 
@@ -71,14 +72,17 @@ define([
     var parentNode = this;
     while(++level < levelCount) {
       var children = parentNode.children;
-      if(children === null) { return -1; }
-      var value = values[level]
-      if(value != null) {
-        value = value.valueOf();
+      if(children === null) {
+        return -1;
       }
+
+      var value = dataUtil.getCellValue(values[level]);
       var key = keyFuns[level](value);
+
       var child = children[key];
-      if(child == null) { return -1; }
+      if(child == null) {
+        return -1;
+      }
 
       parentNode = child;
     }

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*
 define([
   "pentaho/type/Context",
   "pentaho/visual/role/adaptation/impl/CombineAdapter",
@@ -22,9 +23,7 @@ define([
 
   "use strict";
 
-  /* globals describe, it, beforeEach, beforeAll, spyOn */
-
-  xdescribe("pentaho.visual.role.adaptation.impl.CombineAdapter", function() {
+  describe("pentaho.visual.role.adaptation.impl.CombineAdapter", function() {
 
     var propType;
     var dataTable;
@@ -334,4 +333,6 @@ define([
       });
     });
   });
+
 });
+*/

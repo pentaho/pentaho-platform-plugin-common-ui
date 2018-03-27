@@ -78,7 +78,7 @@ define([
 
           var outputCell = this.__getCellByValue(inputValues[0]);
 
-          return outputCell === undefined ? null : [outputCell];
+          return outputCell && [outputCell];
         },
 
         /** @inheritDoc */
@@ -86,7 +86,7 @@ define([
 
           var inputCell = this.__getCellByValue(outputValues[0]);
 
-          return inputCell === undefined ? null : [inputCell];
+          return inputCell && [inputCell];
         },
 
         /**
@@ -98,10 +98,6 @@ define([
          */
         __getCellByValue: function(valueOrCell) {
 
-          if(valueOrCell == null) {
-            return null;
-          }
-
           // Must do upfront. Also creates this.__keyFun.
           var rowIndexByValueKey = this.__getRowIndexByValueKeyMap();
 
@@ -110,7 +106,7 @@ define([
 
           var rowIndex = rowIndexByValueKey[valueKey];
           if(rowIndex === undefined) {
-            return undefined;
+            return null;
           }
 
           return this.data.getCell(rowIndex, this.inputFieldIndexes[0]);
@@ -148,13 +144,11 @@ define([
           var rowIndex = -1;
           while(++rowIndex < rowCount) {
             var value = dataTable.getValue(rowIndex, fieldIndex);
-            if(value !== null) {
-              var valueKey = keyFun(value);
+            var valueKey = keyFun(value);
 
-              // Keep first row index.
-              if(index[valueKey] === undefined) {
-                index[valueKey] = rowIndex;
-              }
+            // Keep first row index.
+            if(index[valueKey] === undefined) {
+              index[valueKey] = rowIndex;
             }
           }
         },

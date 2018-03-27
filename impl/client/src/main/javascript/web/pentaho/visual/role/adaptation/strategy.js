@@ -183,6 +183,8 @@ define([
          *
          * @param {number} rowIndex - The row index.
          * @param {!Array.<number>} columnIndexes - The column indexes.
+         * @param {?number} [count] count - The number of columns, from the start, to consider.
+         * When unspecified, all columns are considered.
          *
          * @return {Array.<!pentaho.data.ICell>} The cell array.
          *
@@ -193,9 +195,9 @@ define([
           if(rowIndex < 0) {
             return null;
           }
-          
+
           if(count == null) {
-             count = columnIndexes.length;
+            count = columnIndexes.length;
           }
 
           var index = count;

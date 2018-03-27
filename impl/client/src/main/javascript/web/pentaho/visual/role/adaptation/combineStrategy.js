@@ -28,6 +28,7 @@ define([
        * @name pentaho.visual.role.adaptation.CombineStrategy.Type
        * @class
        * @extends pentaho.visual.role.adaptation.Strategy.Type
+       * @private
        *
        * @classDesc The type class of {@link pentaho.visual.role.adaptation.CombineStrategy}.
        */
@@ -37,6 +38,7 @@ define([
        * @class
        * @extends pentaho.visual.role.adaptation.Strategy
        * @abstract
+       * @private
        *
        * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.adaptation.CombineStrategy>} pentaho/visual/role/adaptation/combineStrategy
        *

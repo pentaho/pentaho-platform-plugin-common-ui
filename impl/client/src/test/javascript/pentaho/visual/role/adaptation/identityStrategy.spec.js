@@ -197,11 +197,11 @@ define([
         expect(outputCells).toBe(null);
       });
 
-      it("should return [null] if given an existing null", function() {
+      it("should return [{value: null}] if given an existing null", function() {
 
         var outputCells = strategy.map([null]);
 
-        expect(outputCells).toEqual([null]);
+        expect(outputCells).toEqual([jasmine.objectContaining({value: null})]);
       });
 
       it("should create the index only once", function() {
@@ -255,11 +255,11 @@ define([
         expect(inputCells).toBe(null);
       });
 
-      it("should return [null] if given an existing null", function() {
+      it("should return [{value: null}] if given an existing null", function() {
 
         var inputCells = strategy.invert([null]);
 
-        expect(inputCells).toEqual([null]);
+        expect(inputCells).toEqual([jasmine.objectContaining({value: null})]);
       });
     });
   });

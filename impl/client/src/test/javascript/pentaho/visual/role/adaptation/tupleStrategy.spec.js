@@ -177,7 +177,7 @@ define([
         var outputCells = strategy.map(["A"]);
 
         expect(outputCells).toEqual([
-          jasmine.objectContaining({value: "A", formatted: "AA1"}),
+          jasmine.objectContaining({value: "A", formatted: "AA1"})
         ]);
       });
 
@@ -197,12 +197,11 @@ define([
         expect(outputCells).toBe(null);
       });
 
-      it("should return null if given an existing null", function() {
+      it("should return [{value: null}] if given an existing null", function() {
 
         var outputCells = strategy.map([null]);
 
-        expect(outputCells.length).toBe(1);
-        expect(outputCells[0].v).toBe(null);
+        expect(outputCells).toEqual([jasmine.objectContaining({value: null})]);
       });
 
       it("should create the index only once", function() {
@@ -231,7 +230,7 @@ define([
         strategy = Strategy.type.apply(dataTable, [datasetFieldIndexes.category, datasetFieldIndexes.country]);
       });
 
-      it("should return two cell corresponding to given existing values", function() {
+      it("should return two cells corresponding to given existing values", function() {
 
         var outputCells = strategy.map(["A", "PT"]);
 
@@ -241,7 +240,7 @@ define([
         ]);
       });
 
-      it("should return two cell corresponding to given (equal) existing cells", function() {
+      it("should return two cells corresponding to given (equal) existing cells", function() {
 
         var outputCells = strategy.map([new Cell("A", "AA1"), new Cell("PT", "Portugal")]);
 
@@ -251,13 +250,15 @@ define([
         ]);
       });
 
-      it("should return null given existing nulls", function() {
+      it("should return two cells when given existing null(s)", function() {
 
-        var outputCells = strategy.map([null, null]);
+        var outputCells = strategy.map([null, "FR"]);
 
-        expect(outputCells).toBe(null);
+        expect(outputCells).toEqual([
+          jasmine.objectContaining({value: null}),
+          jasmine.objectContaining({value: "FR"})
+        ]);
       });
-
     });
 
     describe("#map(inputValues) more than one column - partial", function() {
@@ -269,7 +270,7 @@ define([
       });
 
       it("should return cell corresponding to given existing value", function() {
-        
+
         var outputCells = strategy.map(["A"]);
 
         expect(outputCells).toEqual([
@@ -286,11 +287,11 @@ define([
         ]);
       });
 
-      it("should return null given existing nulls", function() {
+      it("should return [{value: null}] when given an existing null", function() {
 
         var outputCells = strategy.map([null]);
-        
-        expect(outputCells[0].v).toBe(null);
+
+        expect(outputCells).toEqual([jasmine.objectContaining({value: null})]);
       });
     });
 
@@ -327,16 +328,15 @@ define([
         expect(inputCells).toBe(null);
       });
 
-      it("should return null if given an existing null", function() {
+      it("should return [{value: null}] if given an existing null", function() {
 
         var inputCells = strategy.invert([null]);
 
-        expect(inputCells.length).toBe(1);
-        expect(inputCells[0].v).toBe(null);
+        expect(inputCells).toEqual([jasmine.objectContaining({value: null})]);
       });
     });
 
-    describe("#invert(outputValues) more than one cell", function() {
+    describe("#invert(outputValues) more than one cell - total", function() {
 
       var strategy;
 
@@ -352,7 +352,23 @@ define([
           jasmine.objectContaining({value: "PT", formatted: "Portugal"})
         ]);
       });
+    });
 
+    describe("#invert(outputValues) more than one cell - partial", function() {
+
+      var strategy;
+
+      beforeEach(function() {
+        strategy = Strategy.type.apply(dataTable, [datasetFieldIndexes.category, datasetFieldIndexes.country]);
+      });
+
+      it("should return two cells corresponding to given existing values", function() {
+        var inputCells = strategy.invert(["A"]);
+
+        expect(inputCells).toEqual([
+          jasmine.objectContaining({value: "A", formatted: "AA1"})
+        ]);
+      });
     });
   });
 });
