@@ -16,10 +16,11 @@
 define([
   "module",
   "pentaho/util/object",
+  "pentaho/util/date",
 
   // so that r.js sees otherwise invisible dependencies.
   "./strategy"
-], function(module, O) {
+], function(module, O, dateUtil) {
   "use strict";
 
   return [
@@ -131,14 +132,7 @@ define([
 
             var mainInputCell = inputCells[this.mainInputPosition];
 
-            var startDateTime = mainInputCell.referent.property("startDateTime");
-            var dateValue = null;
-            if(startDateTime != null) {
-              dateValue = new Date(startDateTime);
-              if(isNaN(dateValue.getTime())) {
-                dateValue = null;
-              }
-            }
+            var dateValue = dateUtil.parseDateEcma262v7(mainInputCell.referent.property("startDateTime"));
 
             var outputCell = dataTable.getCell(rowIndex, outputColIndex);
             outputCell.value = dateValue;

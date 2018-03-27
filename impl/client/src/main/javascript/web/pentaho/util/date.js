@@ -120,8 +120,8 @@ define(function() {
       }
 
       var d = utcOffset
-          ? new Date(Date.UTC(comps[0], comps[1], comps[2], comps[3], comps[4], comps[5], comps[6]))
-          : new Date(comps[0], comps[1], comps[2], comps[3], comps[4], comps[5], comps[6]);
+        ? new Date(Date.UTC(comps[0], comps[1], comps[2], comps[3], comps[4], comps[5], comps[6]))
+        : new Date(comps[0], comps[1], comps[2], comps[3], comps[4], comps[5], comps[6]);
 
       return isNaN(d.getTime()) ? null : d;
     }

@@ -568,7 +568,7 @@ define([
         localRequire.config({
           config: {
             "pentaho/typeInfo": {
-              "Guu":  {base: "complex"},
+              "MissingType":  {base: "complex"},
               "Root": {base: "complex"},
               "Foo":  {base: "Root"},
               "Bar":  {base: "Root"},
@@ -582,7 +582,7 @@ define([
               "myFooDisabled": {type: "Foo"},
               "myBar": {type: "Bar"},
               "myAliased": {type: "A"}, // registered using its type alias...
-              "missing": {type: "Guu"},
+              "missing": {type: "MissingType"},
               "folder/dependentRelativeType": {type: "folder/Relative"}
             }
           }
