@@ -72,8 +72,11 @@ define([
     while(++level < levelCount) {
       var children = parentNode.children;
       if(children === null) { return -1; }
-
-      var key = keyFuns[level](values[level]);
+      var value = values[level]
+      if(value != null) {
+        value = value.valueOf();
+      }
+      var key = keyFuns[level](value);
       var child = children[key];
       if(child == null) { return -1; }
 
@@ -196,7 +199,8 @@ define([
 
           return this._getDataRowCells(
             this.__getIndex().getIndexOf(inputValues, this.__keyFuns),
-            this.outputFieldIndexes);
+            this.outputFieldIndexes,
+            inputValues.length);
 
         },
 
@@ -205,7 +209,8 @@ define([
 
           return this._getDataRowCells(
             this.__getIndex().getIndexOf(outputValues, this.__keyFuns),
-            this.inputFieldIndexes);
+            this.inputFieldIndexes,
+            outputValues.length);
         },
 
         /**

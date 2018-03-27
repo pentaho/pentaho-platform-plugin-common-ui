@@ -188,13 +188,17 @@ define([
          *
          * @protected
          */
-        _getDataRowCells: function(rowIndex, columnIndexes) {
+        _getDataRowCells: function(rowIndex, columnIndexes, count) {
 
           if(rowIndex < 0) {
             return null;
           }
+          
+          if(count == null) {
+             count = columnIndexes.length;
+          }
 
-          var index = columnIndexes.length;
+          var index = count;
           var cells = new Array(index);
 
           var dataTable = this.data;
