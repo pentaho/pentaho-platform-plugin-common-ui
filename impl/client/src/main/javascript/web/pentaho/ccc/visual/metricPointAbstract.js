@@ -99,6 +99,9 @@ define([
 
           this._configureAxisDisplayUnits(/* isPrimary: */true, "base");
           this._configureAxisDisplayUnits(/* isPrimary: */false, "ortho");
+
+          this._configureAxisTickUnits("base", "x");
+          this._configureAxisTickUnits("ortho", "y");
         }
       });
     }

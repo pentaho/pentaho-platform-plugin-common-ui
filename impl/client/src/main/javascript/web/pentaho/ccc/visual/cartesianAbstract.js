@@ -144,6 +144,21 @@ define([
           this._cartesianAxesDisplayUnitsText = {};
         },
 
+        _configureAxisTickUnits: function(axisType, roleName) {
+         var mappingFieldInfos = this._getMappingFieldInfosOfRole(roleName);
+
+         if(mappingFieldInfos != null && mappingFieldInfos.length === 1 && mappingFieldInfos[0].sourceTimeIntervalDuration != null) {
+           var sourceTimeIntervalDuration = mappingFieldInfos[0].sourceTimeIntervalDuration;
+           if(sourceTimeIntervalDuration === "halfYear") {
+             sourceTimeIntervalDuration = "6m";
+           } else if(sourceTimeIntervalDuration === "quarter") {
+             sourceTimeIntervalDuration = "3m";
+           }
+
+           this.options[axisType + "AxisTickUnitMin"] = sourceTimeIntervalDuration;
+         }
+        },
+
         _configureAxisDisplayUnits: function(primary, axisType) {
 
           var propName = "displayUnits" + (primary ? "" : "Secondary");
@@ -156,6 +171,7 @@ define([
           this._cartesianAxesDisplayUnitsText[axisType] = scaleFactor > 1
             ? displayUnitsType.domain.get(displayUnits).toString()
             : "";
+
         }
       });
     }
