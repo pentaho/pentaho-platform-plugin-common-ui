@@ -21,7 +21,7 @@ module.exports = function(config) {
     reporters: ["progress", "junit", "coverage"],
 
     preprocessors: {
-      "${build.javascriptSourceDirectory}/**/*.js": "coverage"
+      "${build.javascriptTestOutputDirectory}/**/*.js": ["coverage"]
     },
 
     junitReporter: {
