@@ -491,6 +491,7 @@ define([
                   sourceMembers: dataAttribute.members,
                   sourceIsPercent: !!dataAttribute.isPercent,
                   sourceColor: dataAttribute.property("color"),
+                  sourceTimeIntervalDuration: dataAttribute.property("timeIntervalDuration"),
 
                   cccRoleName: cccRoleName,
 

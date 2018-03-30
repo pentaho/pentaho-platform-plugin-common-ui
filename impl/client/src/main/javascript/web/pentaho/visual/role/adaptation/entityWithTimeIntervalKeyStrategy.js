@@ -109,6 +109,8 @@ define([
              */
             this.mainInputPosition = this.$type.__getMainInputFieldPosition(inputFieldIndexes, dataTable);
 
+            var mainSourceColumn = dataTable.getColumnAttribute(inputFieldIndexes[this.mainInputPosition]);
+
             var attributeName;
             var baseAttributeName = attributeName = this.$type.__getOutputFieldName(inputFieldIndexes);
             while(dataTable.model.attributes.get(attributeName) != null) {
@@ -120,7 +122,10 @@ define([
                 name: attributeName,
                 type: "date",
                 label: this.$type.__getOutputFieldLabel(inputFieldIndexes, dataTable),
-                isKey: true
+                isKey: true,
+                p: {
+                  "timeIntervalDuration": mainSourceColumn.property("EntityWithTimeIntervalKey").duration
+                }
               }
             );
 

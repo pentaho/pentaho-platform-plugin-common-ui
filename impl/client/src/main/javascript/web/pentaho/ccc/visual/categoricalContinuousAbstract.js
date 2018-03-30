@@ -75,6 +75,8 @@ define([
           this.base();
 
           this._configureAxisDisplayUnits(/* isPrimary: */true, "ortho");
+
+          this._configureAxisTickUnits("base", "rows");
         },
 
         _createChart: function(ChartClass) {
