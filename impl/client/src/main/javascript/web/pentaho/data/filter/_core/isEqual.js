@@ -75,7 +75,10 @@ define([
 
         return function isEqualContains(elem) {
           var value = elem.getv(property, true);
-          return value === referenceValue;
+
+          // valueOf fallback added allowing to compare Dates
+          return value === referenceValue
+            || value != null && referenceValue != null && value.valueOf() === referenceValue.valueOf();
         };
       },
 

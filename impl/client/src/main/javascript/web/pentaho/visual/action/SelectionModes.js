@@ -95,12 +95,27 @@ define([
         // `input - row2 - row1`, cause the algorithm has no way to know that, with the current data,
         // the `input` filter includes only `row1` and `row2`.
 
-        // Skipping rows with all null measures, when converting from cross-tab, can speed up things a lot.
-        // TODO: replace by a view of plain table without all null measures rows.
-        // There's a similar construct in Analyzer cv.Report#displayClientSideReport / will:change handler
-        // and in pentaho.ccc.visual.Abstract#_updateSelection.
-        if(data.originalCrossTable) {
-          data = data.originalCrossTable.toPlainTable({skipRowsWithAllNullMeasures: true});
+        // Filtering-out rows with all null measures.
+        var nonKeyFields = this.model._getFieldsNotMappedToKeyVisualRoles();
+        if(nonKeyFields.length > 0) {
+          var context = this.model.$type.context;
+
+          var Not = context.get("not");
+          var IsEqual = context.get("=");
+          var And = context.get("and");
+
+          var notNulls = nonKeyFields.map(function(measure) {
+            return new Not(
+              {
+                operand: new IsEqual(
+                  {
+                    property: measure,
+                    value: null
+                  })
+              });
+          });
+
+          data = data.filter(new And({operands: notNulls}));
         }
 
         var inputData = data.filter(input);

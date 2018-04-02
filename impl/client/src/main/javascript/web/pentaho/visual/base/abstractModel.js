@@ -142,6 +142,40 @@ define([
           }, this);
         },
 
+        _getFieldsMappedToKeyVisualRoles: function() {
+          var fields = [];
+
+          this.$type.eachVisualRole(function(vr) {
+            if(vr.isVisualKey) {
+              this.get(vr.name).fields.each(function(field) {
+                if(fields.indexOf(field.name) === -1) {
+                  fields.push(field.name);
+                }
+              });
+            }
+          }, this);
+
+          return fields;
+        },
+
+        _getFieldsNotMappedToKeyVisualRoles: function() {
+          var keyFields = this._getFieldsMappedToKeyVisualRoles();
+
+          var fields = [];
+
+          this.$type.eachVisualRole(function(vr) {
+            if(!vr.isVisualKey) {
+              this.get(vr.name).fields.each(function(field) {
+                if(keyFields.indexOf(field.name) === -1 && fields.indexOf(field.name) === -1) {
+                  fields.push(field.name);
+                }
+              });
+            }
+          }, this);
+
+          return fields;
+        },
+
         // region serialization
         /** @inheritDoc */
         toSpecInContext: function(keyArgs) {
