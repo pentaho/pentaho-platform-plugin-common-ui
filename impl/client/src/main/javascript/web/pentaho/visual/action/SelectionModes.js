@@ -17,8 +17,9 @@ define([
   "module",
   "pentaho/util/logger",
   "pentaho/debug",
-  "pentaho/debug/Levels"
-], function(module, logger, debugMgr, DebugLevels) {
+  "pentaho/debug/Levels",
+  "pentaho/data/util"
+], function(module, logger, debugMgr, DebugLevels, dataUtil) {
   "use strict";
 
   /* eslint valid-jsdoc: 0 */
@@ -95,27 +96,14 @@ define([
         // `input - row2 - row1`, cause the algorithm has no way to know that, with the current data,
         // the `input` filter includes only `row1` and `row2`.
 
-        // Filtering-out rows with all null measures.
-        var nonKeyFields = this.model._getFieldsNotMappedToKeyVisualRoles();
-        if(nonKeyFields.length > 0) {
-          var context = this.model.$type.context;
+        // Filtering-out rows with all null measures can speed up things a lot.
+        var measureFieldNames = this.model.measureFieldNames;
+        if(measureFieldNames.length > 0) {
+          var measureIndexes = dataUtil.getColumnIndexesByIds(data, measureFieldNames);
 
-          var Not = context.get("not");
-          var IsEqual = context.get("=");
-          var And = context.get("and");
+          var allNullMeasuresPredicate = dataUtil.buildRowPredicateNotAllNullColumns(measureIndexes);
 
-          var notNulls = nonKeyFields.map(function(measure) {
-            return new Not(
-              {
-                operand: new IsEqual(
-                  {
-                    property: measure,
-                    value: null
-                  })
-              });
-          });
-
-          data = data.filter(new And({operands: notNulls}));
+          data = dataUtil.filterByPredicate(data, allNullMeasuresPredicate);
         }
 
         var inputData = data.filter(input);

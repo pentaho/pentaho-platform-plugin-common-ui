@@ -142,38 +142,72 @@ define([
           }, this);
         },
 
-        _getFieldsMappedToKeyVisualRoles: function() {
-          var fields = [];
+        /**
+         * Gets an array of the names of fields which are mapped to _key_ visual roles.
+         *
+         * Conveniently,
+         * the returned array contains an extra property, `set`,
+         * which contains an object whose keys are the field names and
+         * whose values are the value `true`.
+         *
+         * @type {!Array.<string>} The array of field names.
+         * @readOnly
+         *
+         * @see pentaho.visual.role.AbstractProperty.Type#isVisualKey
+         */
+        get keyFieldNames() {
 
-          this.$type.eachVisualRole(function(vr) {
-            if(vr.isVisualKey) {
-              this.get(vr.name).fields.each(function(field) {
-                if(fields.indexOf(field.name) === -1) {
-                  fields.push(field.name);
+          var keyFields = [];
+          var keyFieldSet = keyFields.set = Object.create(null);
+
+          this.$type.eachVisualRole(function(propType) {
+            if(propType.isVisualKey) {
+              this.get(propType).fields.each(function(field) {
+                var name = field.name;
+                if(!O.hasOwn(keyFieldSet, name)) {
+                  keyFieldSet[name] = true;
+                  keyFields.push(name);
                 }
               });
             }
           }, this);
 
-          return fields;
+          return keyFields;
         },
 
-        _getFieldsNotMappedToKeyVisualRoles: function() {
-          var keyFields = this._getFieldsMappedToKeyVisualRoles();
+        /**
+         * Gets an array of the names of fields which are mapped to _measure_ visual roles
+         * and which are not mapped to any _key_ visual roles.
+         *
+         * Conveniently,
+         * the returned array contains an extra property, `set`,
+         * which contains an object whose keys are the field names and
+         * whose values are the value `true`.
+         *
+         * @type {!Array.<string>} The array of field names.
+         * @readOnly
+         * @see pentaho.visual.role.AbstractProperty.Type#isVisualKey
+         */
+        get measureFieldNames() {
 
-          var fields = [];
+          var keyFieldSet = this.keyFieldNames.set;
 
-          this.$type.eachVisualRole(function(vr) {
-            if(!vr.isVisualKey) {
-              this.get(vr.name).fields.each(function(field) {
-                if(keyFields.indexOf(field.name) === -1 && fields.indexOf(field.name) === -1) {
-                  fields.push(field.name);
+          var measureFields = [];
+          var measureFieldSet = measureFields.set = Object.create(null);
+
+          this.$type.eachVisualRole(function(propType) {
+            if(!propType.isVisualKey) {
+              this.get(propType).fields.each(function(field) {
+                var name = field.name;
+                if(!O.hasOwn(keyFieldSet, name) && !O.hasOwn(measureFieldSet, name)) {
+                  measureFieldSet[name] = true;
+                  measureFields.push(name);
                 }
               });
             }
           }, this);
 
-          return fields;
+          return measureFields;
         },
 
         // region serialization

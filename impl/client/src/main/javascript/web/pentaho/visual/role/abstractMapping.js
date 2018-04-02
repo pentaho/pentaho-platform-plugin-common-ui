@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 define([
+  "pentaho/data/util",
   "pentaho/i18n!messages",
 
   // so that r.js sees otherwise invisible dependencies.
   "pentaho/visual/role/mappingField"
-], function(bundle) {
+], function(dataUtil, bundle) {
 
   "use strict";
 
@@ -109,20 +110,8 @@ define([
           if(iref !== null) {
             var data = iref.container.data;
             if(data !== null) {
-              var mappingFields = this.fields;
-              var fieldCount = mappingFields.count;
-              var mappingFieldIndex = -1;
-              fieldIndexes = new Array(fieldCount);
-
-              while(++mappingFieldIndex < fieldCount) {
-                var fieldName = mappingFields.at(mappingFieldIndex).name;
-                var fieldIndex = data.getColumnIndexById(fieldName);
-                if(fieldIndex < 0) {
-                  return null;
-                }
-
-                fieldIndexes[mappingFieldIndex] = fieldIndex;
-              }
+              var mappingFieldNames = this.fields.toArray(function(mappingField) { return mappingField.name; });
+              return dataUtil.getColumnIndexesByIds(data, mappingFieldNames);
             }
           }
 

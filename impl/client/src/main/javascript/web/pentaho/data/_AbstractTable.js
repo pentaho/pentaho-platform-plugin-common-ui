@@ -145,6 +145,7 @@ define([
               return c;
         }
       }
+
       return -1;
     },
 

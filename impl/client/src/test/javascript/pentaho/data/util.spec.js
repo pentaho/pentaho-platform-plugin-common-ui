@@ -16,8 +16,9 @@
 define([
   "pentaho/data/util",
   "pentaho/data/Table",
+  "pentaho/data/TableView",
   "pentaho/type/Context"
-], function(dataUtil, DataTable, Context) {
+], function(dataUtil, DataTable, DataTableView, Context) {
 
   /* globals beforeAll, it, describe, beforeEach */
 
@@ -372,6 +373,152 @@ define([
         var result = dataUtil.createFilterIsEqualFromCell(dataTable, "date", new Cell("2016-01-01"), context);
 
         expect(result.get("value").$type.alias).toBe("date");
+      });
+    });
+
+    describe(".getColumnIndexesByIds(dataTable, columnIds)", function() {
+
+      var dataTable;
+
+      beforeAll(function() {
+        dataTable = new DataTable(getDatasetDT1WithNoKeyColumns());
+      });
+
+      it("should accept an empty array and return an empty array", function() {
+
+        var result = dataUtil.getColumnIndexesByIds(dataTable, []);
+
+        expect(result).toEqual([]);
+      });
+
+      it("should translate an array with a defined column id into the corresponding index", function() {
+
+        var result = dataUtil.getColumnIndexesByIds(dataTable, ["achieved"]);
+
+        expect(result).toEqual([2]);
+      });
+
+      it("should translate an array with all defined column ids into the corresponding indexes", function() {
+
+        var result = dataUtil.getColumnIndexesByIds(dataTable, ["achieved", "country"]);
+
+        expect(result).toEqual([2, 0]);
+      });
+
+      it("should return null if any of the ids is not defined", function() {
+
+        var result = dataUtil.getColumnIndexesByIds(dataTable, ["achieved", "foo", "country"]);
+
+        expect(result).toBe(null);
+      });
+    });
+
+    describe(".buildRowPredicateNotAllNullColumns(columnIndexes)", function() {
+
+      var dataTable;
+
+      beforeAll(function() {
+
+        dataTable = new DataTable({
+          model: [
+            {name: "country", type: "string", label: "Country"},
+            {name: "sales", type: "number", label: "Sales"},
+            {name: "achieved", type: "boolean", label: "Achieved"},
+            {name: "date", type: "date", label: "Date"}
+          ],
+          rows: [
+            {c: [{v: "Portugal"}, {v: 12000}, true]},
+            {c: [{v: "Ireland"}, {v: 6000}, false, "2016-01-01"]},
+            {c: [{v: "Spain"}, null, null, null]},
+            {c: [{v: "Russia"}, null, null, null]},
+            {c: [{v: "France"}, {v: 24000}, false]}
+          ]
+        });
+      });
+
+      it("should return a function", function() {
+
+        var predicate = dataUtil.buildRowPredicateNotAllNullColumns([1, 2, 3]);
+
+        expect(typeof predicate).toBe("function");
+      });
+
+      it("should accept an empty array of columns and should always return false", function() {
+
+        var predicate = dataUtil.buildRowPredicateNotAllNullColumns([]);
+
+        expect(predicate(dataTable, 0)).toBe(false);
+        expect(predicate(dataTable, 1)).toBe(false);
+        expect(predicate(dataTable, 2)).toBe(false);
+        expect(predicate(dataTable, 3)).toBe(false);
+      });
+
+      it("should return false if all columns are null", function() {
+
+        var predicate = dataUtil.buildRowPredicateNotAllNullColumns([1, 2, 3]);
+
+        expect(predicate(dataTable, 2)).toBe(false);
+        expect(predicate(dataTable, 3)).toBe(false);
+      });
+
+      it("should return true if not all columns are null", function() {
+
+        var predicate = dataUtil.buildRowPredicateNotAllNullColumns([1, 2, 3]);
+
+        expect(predicate(dataTable, 0)).toBe(true);
+        expect(predicate(dataTable, 1)).toBe(true);
+        expect(predicate(dataTable, 4)).toBe(true);
+      });
+    });
+
+    describe(".filterByPredicate(dataPlain, rowPredicate)", function() {
+
+      var dataTable;
+
+      beforeAll(function() {
+
+        dataTable = new DataTable({
+          model: [
+            {name: "country", type: "string", label: "Country"},
+            {name: "sales", type: "number", label: "Sales"},
+            {name: "achieved", type: "boolean", label: "Achieved"},
+            {name: "date", type: "date", label: "Date"}
+          ],
+          rows: [
+            {c: [{v: "Portugal"}, {v: 12000}, true]},
+            {c: [{v: "Ireland"}, {v: 6000}, false, "2016-01-01"]},
+            {c: [{v: "Spain"}, null, null, null]},
+            {c: [{v: "Russia"}, null, null, null]},
+            {c: [{v: "France"}, {v: 24000}, false]}
+          ]
+        });
+      });
+
+      it("should return the given data table if all rows are selected", function() {
+
+        var result = dataUtil.filterByPredicate(dataTable, function() { return true; });
+
+        expect(result).toBe(dataTable);
+      });
+
+      it("should return a data view if not all rows are selected", function() {
+
+        var result = dataUtil.filterByPredicate(dataTable, function(dataTable, rowIndex) {
+          return dataTable.getValue(rowIndex, 0) === "Portugal";
+        });
+
+        expect(result).not.toBe(dataTable);
+        expect(result instanceof DataTableView).toBe(true);
+      });
+
+      it("should return a data view with the rows for which the predicate returns true", function() {
+
+        var result = dataUtil.filterByPredicate(dataTable, function(dataTable, rowIndex) {
+          return dataTable.getValue(rowIndex, 0) === "Ireland";
+        });
+
+        expect(result.getNumberOfRows()).toBe(1);
+        expect(result.getValue(0, 0)).toBe("Ireland");
       });
     });
   });

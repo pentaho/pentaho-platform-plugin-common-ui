@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "./TableView"
+], function(TableView) {
 
   "use strict";
 
@@ -154,6 +156,84 @@ define(function() {
       var IsEqualFilter = context.get("=");
 
       return __createFilterIsEqualFromCell(dataPlain, columnId, cell, IsEqualFilter);
+    },
+
+    /**
+     * Gets the array of column indexes given a data table and an array of column identifiers.
+     *
+     * If any of the given column identifiers is not defined, `null` is returned.
+     *
+     * @param {!pentaho.data.ITable} dataTable - The data table.
+     * @param {!Array.<string>} columnIds - The column identifiers.
+     *
+     * @return {Array.<number>} The column indexes or `null`.
+     */
+    getColumnIndexesByIds: function(dataTable, columnIds) {
+
+      var columnCount = columnIds.length;
+      var columnIndexes = new Array(columnCount);
+      var index = -1;
+
+      while(++index < columnCount) {
+        var columnIndex = dataTable.getColumnIndexById(columnIds[index]);
+        if(columnIndex < 0) {
+          return null;
+        }
+
+        columnIndexes[index] = columnIndex;
+      }
+
+      return columnIndexes;
+    },
+
+    /**
+     * Filters a plain data table given a row predicate and returns a resulting data view.
+     *
+     * If all rows are selected, then the given plain table is returned, directly.
+     *
+     * @param {!pentaho.data.ITable} dataPlain - The plain data table.
+     * @param {function(!pentaho.data.ITable, number) : boolean} rowPredicate - A predicate function
+     * that, when given a plain data table and a row index, returns `true` to include the row and `false` to ignore it.
+     *
+     * @return {!pentaho.data.ITable} The resulting table view.
+     */
+    filterByPredicate: function(dataPlain, rowPredicate) {
+      var areAllSelected = true;
+      var rowIndexes = [];
+      var rowIndex = -1;
+      var rowCount = dataPlain.getNumberOfRows();
+      while(++rowIndex < rowCount) {
+        if(rowPredicate(dataPlain, rowIndex)) {
+          rowIndexes.push(rowIndex);
+        } else if(areAllSelected) {
+          areAllSelected = false;
+        }
+      }
+
+      return areAllSelected ? dataPlain : new TableView(dataPlain).setSourceRows(rowIndexes);
+    },
+
+    /**
+     * Builds a row predicate function that tests if not all of the given columns contain a null value.
+     *
+     * @param {!Array.<number>} columnIndexes - The column indexes.
+     *
+     * @return {function(!pentaho.data.ITable, number) : boolean} The row predicate function.
+     */
+    buildRowPredicateNotAllNullColumns: function(columnIndexes) {
+
+      var columnCount = columnIndexes.length;
+
+      return function rowPredicateNotAllNullColumns(dataPlain, rowIndex) {
+        var index = columnCount;
+        while(index--) {
+          if(dataPlain.getValue(rowIndex, columnIndexes[index]) !== null) {
+            return true;
+          }
+        }
+
+        return false;
+      };
     }
   };
 
