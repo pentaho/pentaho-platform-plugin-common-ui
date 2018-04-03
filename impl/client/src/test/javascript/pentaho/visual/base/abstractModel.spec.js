@@ -27,6 +27,7 @@ define([
     var context;
     var Model;
     var RoleAbstractProperty;
+    var RoleAbstractMapping;
     var PaletteProperty;
     var dataSpec;
 
@@ -39,10 +40,12 @@ define([
             return context.getDependencyApplyAsync([
               "pentaho/visual/base/abstractModel",
               "pentaho/visual/role/abstractProperty",
+              "pentaho/visual/role/abstractMapping",
               "pentaho/visual/color/paletteProperty"
-            ], function(_AbstractModel, _RoleAbstractProperty, _PaletteProperty) {
+            ], function(_AbstractModel, _RoleAbstractProperty, _RoleAbstractMapping, _PaletteProperty) {
               var AbstractModel = _AbstractModel;
               RoleAbstractProperty = _RoleAbstractProperty;
+              RoleAbstractMapping = _RoleAbstractMapping;
               PaletteProperty = _PaletteProperty;
 
               Model = AbstractModel.extend();
@@ -275,6 +278,180 @@ define([
         var result = model.toSpec();
         expect(result.application != null).toBe(true);
         expect(typeof result.application).toBe("object");
+      });
+    });
+
+    describe("#keyFieldNames", function() {
+
+      var DerivedModel;
+
+      beforeEach(function() {
+
+        var RoleMapping = RoleAbstractMapping.extend({
+          $type: {
+          }
+        });
+
+        var RoleProperty = RoleAbstractProperty.extend({
+          $type: {
+            valueType: RoleMapping
+          }
+        });
+
+        DerivedModel = Model.extend({$type: {
+          props: [
+            {name: "vr1", base: RoleProperty, get isVisualKey() { return true; }},
+            {name: "vr2", base: RoleProperty, get isVisualKey() { return false; }},
+            {name: "vr3", base: RoleProperty, get isVisualKey() { return true; }}
+          ]
+        }});
+      });
+
+      // Cannot isEqual([]) cause the array has the `set` property.
+      function expectArray(result, expected) {
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toBe(expected.length);
+
+        var i = -1;
+        var L = Math.min(result.length, expected.length);
+        while(++i < L) {
+          expect(result[i]).toBe(expected[i]);
+        }
+      }
+
+      it("should return an empty array when key visual roles are not mapped", function() {
+
+        var model = new DerivedModel();
+
+        var result = model.keyFieldNames;
+
+        expectArray(result, []);
+      });
+
+      it("should return an array of the fields mapped to key visual roles", function() {
+
+        var model = new DerivedModel({
+          vr1: {fields: ["a", "b"]},
+          vr2: {fields: ["c", "d"]},
+          vr3: {fields: ["e", "f"]}
+        });
+
+        var result = model.keyFieldNames;
+
+        expectArray(result, ["a", "b", "e", "f"]);
+      });
+
+      it("should return an array of distinct fields", function() {
+
+        var model = new DerivedModel({
+          vr1: {fields: ["a", "b"]},
+          vr2: {fields: ["c", "d"]},
+          vr3: {fields: ["a", "f"]}
+        });
+
+        var result = model.keyFieldNames;
+
+        expectArray(result, ["a", "b", "f"]);
+      });
+
+      it("should return an array of key fields even if some are also mapped to measure visual roles", function() {
+
+        var model = new DerivedModel({
+          vr1: {fields: ["a", "b"]},
+          vr2: {fields: ["b", "d"]},
+          vr3: {fields: ["e", "f"]}
+        });
+
+        var result = model.keyFieldNames;
+
+        expectArray(result, ["a", "b", "e", "f"]);
+      });
+    });
+
+    describe("#measureFieldNames", function() {
+
+      var DerivedModel;
+
+      beforeEach(function() {
+
+        var RoleMapping = RoleAbstractMapping.extend({
+          $type: {
+          }
+        });
+
+        var RoleProperty = RoleAbstractProperty.extend({
+          $type: {
+            valueType: RoleMapping
+          }
+        });
+
+        DerivedModel = Model.extend({$type: {
+          props: [
+            {name: "vr1", base: RoleProperty, get isVisualKey() { return false; }},
+            {name: "vr2", base: RoleProperty, get isVisualKey() { return true; }},
+            {name: "vr3", base: RoleProperty, get isVisualKey() { return false; }}
+          ]
+        }});
+      });
+
+      // Cannot isEqual([]) cause the array has the `set` property.
+      function expectArray(result, expected) {
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toBe(expected.length);
+
+        var i = -1;
+        var L = Math.min(result.length, expected.length);
+        while(++i < L) {
+          expect(result[i]).toBe(expected[i]);
+        }
+      }
+
+      it("should return an empty array when measure visual roles are not mapped", function() {
+
+        var model = new DerivedModel();
+
+        var result = model.measureFieldNames;
+
+        expectArray(result, []);
+      });
+
+      it("should return an array of the fields mapped to measure visual roles", function() {
+
+        var model = new DerivedModel({
+          vr1: {fields: ["a", "b"]},
+          vr2: {fields: ["c", "d"]},
+          vr3: {fields: ["e", "f"]}
+        });
+
+        var result = model.measureFieldNames;
+
+        expectArray(result, ["a", "b", "e", "f"]);
+      });
+
+      it("should return an array of distinct fields", function() {
+
+        var model = new DerivedModel({
+          vr1: {fields: ["a", "b"]},
+          vr2: {fields: ["c", "d"]},
+          vr3: {fields: ["a", "f"]}
+        });
+
+        var result = model.measureFieldNames;
+
+        expectArray(result, ["a", "b", "f"]);
+      });
+
+      it("should return an array of the measure fields not also mapped to key visual roles", function() {
+
+        var model = new DerivedModel({
+          vr1: {fields: ["a", "b"]},
+          vr2: {fields: ["b", "d"]},
+          vr3: {fields: ["e", "f"]}
+        });
+
+        var result = model.measureFieldNames;
+
+        expectArray(result, ["a", "e", "f"]);
       });
     });
 

@@ -491,8 +491,8 @@ define([
        * If the resulting filtered data of a filter is empty then the [false filter]{@link pentaho.data.filter.False}
        * is returned
        *
-       * @param {!pentaho.data.ITable} dataPlain - The data to be used when determining the values of the key columns
-       * used in the extensional representation of the filter.
+       * @param {!pentaho.data.ITable} dataPlain - The plain data table to be used when determining the values of
+       * the key columns used in the extensional representation of the filter.
        * @param {string[]} keyColumnNames - The names of the columns from the `dataPlain` that are considered key.
        *
        * @return {!pentaho.data.filter.Or|!pentaho.data.filter.False} The extensional filter.

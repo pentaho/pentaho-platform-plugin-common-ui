@@ -145,11 +145,6 @@ define([
         /**
          * Gets an array of the names of fields which are mapped to _key_ visual roles.
          *
-         * Conveniently,
-         * the returned array contains an extra property, `set`,
-         * which contains an object whose keys are the field names and
-         * whose values are the value `true`.
-         *
          * @type {!Array.<string>} The array of field names.
          * @readOnly
          *
@@ -178,11 +173,6 @@ define([
         /**
          * Gets an array of the names of fields which are mapped to _measure_ visual roles
          * and which are not mapped to any _key_ visual roles.
-         *
-         * Conveniently,
-         * the returned array contains an extra property, `set`,
-         * which contains an object whose keys are the field names and
-         * whose values are the value `true`.
          *
          * @type {!Array.<string>} The array of field names.
          * @readOnly
