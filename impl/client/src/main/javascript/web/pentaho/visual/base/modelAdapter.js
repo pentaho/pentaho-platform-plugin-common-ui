@@ -93,10 +93,11 @@ define([
     "./model",
     "../role/externalProperty",
     "pentaho/data/filter/true",
+    "pentaho/data/filter/false",
     "pentaho/data/filter/or",
     "pentaho/data/filter/and",
     "pentaho/data/filter/isEqual",
-    function(AbstractModel, Model, ExternalProperty, TrueFilter, OrFilter, AndFilter, IsEqualFilter) {
+    function(AbstractModel, Model, ExternalProperty, TrueFilter, FalseFilter, OrFilter, AndFilter, IsEqualFilter) {
 
       var __context = this;
       var __externalPropertyType = ExternalProperty.type;
@@ -395,10 +396,16 @@ define([
             return null;
           }
 
+          var filterContext = {
+            modelAdapter: this,
+            internalData: internalData,
+            toExternal: false
+          };
+
           // Find isProperty filters and convert their property equals', name and value to the internal data space.
-          return externalFilter.visit(function(filter) {
-            return __transformFilter.call(this, filter, internalData, false);
-          }.bind(this));
+          return externalFilter
+            .visit(__flattenTree)
+            .visit(__transformFilter.bind(filterContext));
         },
 
         /**
@@ -414,11 +421,16 @@ define([
           if(internalData === null) {
             return null;
           }
+          var filterContext = {
+            modelAdapter: this,
+            internalData: internalData,
+            toExternal: true
+          };
 
           // Find isProperty filters and convert their property equals', name and value to the external data space.
-          return internalFilter.visit(function(filter) {
-            return __transformFilter.call(this, filter, internalData, true);
-          }.bind(this));
+          return internalFilter
+            .visit(__flattenTree)
+            .visit(__transformFilter.bind(filterContext));
         },
 
         /**
@@ -434,7 +446,8 @@ define([
          * @param {boolean} toExternal If true converts from internal to external properties,
          * the other way around if false.
          *
-         * @return {!Object.<string, pentaho.data.ICell>} The corresponding map of internal property names to cells.
+         * @return {!Object.<string, pentaho.data.ICell>} The corresponding map of internal or external property names
+         *   to cells.
          *
          * @private
          */
@@ -451,13 +464,15 @@ define([
               var fieldValues = __collectFieldValues(mapping, originalValuesMap);
               if(fieldValues !== null) {
                 var fieldCells = toExternal ? strategy.invert(fieldValues) : strategy.map(fieldValues);
-                if(fieldCells !== null) {
-                  var fieldNames = toExternal ? strategy.inputFieldNames : strategy.outputFieldNames;
-
-                  fieldCells.forEach(function(fieldCell, index) {
-                    convertedValuesMap[fieldNames[index]] = fieldCell;
-                  });
+                if(fieldCells == null) {
+                  throw error.argInvalid("originalValuesMap", "Unable to convert values.");
                 }
+
+                var fieldNames = toExternal ? strategy.inputFieldNames : strategy.outputFieldNames;
+
+                fieldCells.forEach(function(fieldCell, index) {
+                  convertedValuesMap[fieldNames[index]] = fieldCell;
+                });
               }
             }
           });
@@ -589,77 +604,102 @@ define([
       return ModelAdapter;
 
       // region Filter Conversion
-      function __transformFilter(filter, internalData, toExternal) {
-        var operands;
+      function __transformFilter(filter) {
         var equalsMap;
 
-        if(filter.kind === "or") {
-          // a or b
-          // (a1 and a2) or (b1 and b2)
-          // Each isEqual must be separately converted into either a single isEqual or
-          // into a conjunction of isEquals.
-          operands = [];
+        switch(filter.kind) {
+          case "true":
+          case "false":
+          case "or":
+            return null;
+          case "and":
+            // Collect and replace all isEqual children.
+            equalsMap = null;
+            var operands = [];
 
-          filter.operands.each(function(operandFilter) {
-            operandFilter = __transformFilter.call(this, operandFilter, internalData, toExternal);
-            if(operandFilter !== null) {
-              operands.push(operandFilter);
-            }
-          }.bind(this));
+            var filterOperands = filter.operands;
+            var filterOperandsCount = filterOperands.count;
+            for(var iOperand = 0; iOperand < filterOperandsCount; iOperand++) {
+              var operandFilter = filterOperands.at(iOperand);
 
-          return new OrFilter({operands: operands});
-        }
+              if(operandFilter.kind === "isEqual") {
+                if(equalsMap === null) {
+                  equalsMap = Object.create(null);
+                }
 
-        if(filter.kind === "and") {
-          // Collect and replace all isEqual children.
-          equalsMap = null;
-          operands = [];
+                // The same property cannot have different values at the same time therefore return False
+                if(equalsMap[operandFilter.property] !== undefined &&
+                  equalsMap[operandFilter.property] !== operandFilter.value) {
+                  return FalseFilter.instance;
+                }
 
-          filter.operands.each(function(operandFilter) {
-            if(operandFilter.kind === "isEqual") {
-              if(equalsMap === null) {
-                equalsMap = Object.create(null);
+                equalsMap[operandFilter.property] = operandFilter.value;
+              } else {
+                // visit other filter types
+                operands.push(operandFilter.visit(__transformFilter.bind(this)));
               }
-
-              equalsMap[operandFilter.property] = operandFilter.value;
-            } else {
-              // Pass-through other filter kinds.
-              operands.push(operandFilter);
             }
-          });
 
-          if(equalsMap === null) {
-            return filter;
-          }
+            // if isEqual operands found for And filter
+            if(equalsMap !== null) {
+              // Map internal/external values to external/internal values.
+              equalsMap = this.modelAdapter.__convertValuesMap(equalsMap, this.toExternal);
 
-          // Map internal values to external values.
-          equalsMap = this.__convertValuesMap(equalsMap, toExternal);
+              operands.push.apply(operands, Object.keys(equalsMap).map(function(propName) {
+                return dataUtil.createFilterIsEqualFromCell(
+                  this.internalData,
+                  propName,
+                  equalsMap[propName],
+                  __context
+                );
+              }, this));
+            }
 
-          operands.push.apply(operands, Object.keys(equalsMap).map(function(propName) {
-            return dataUtil.createFilterIsEqualFromCell(internalData, propName, equalsMap[propName], __context);
-          }));
+            return new AndFilter({operands: operands});
+          case "isEqual":
+            equalsMap = {};
+            equalsMap[filter.property] = filter.value;
 
-          return operands.length === 1 ? operands[0] : new AndFilter({operands: operands});
+            equalsMap = this.modelAdapter.__convertValuesMap(equalsMap, this.toExternal);
+
+            filter = dataUtil.createFilterFromCellsMap(equalsMap, this.internalData, __context);
+
+            return filter !== null ? filter : TrueFilter.instance;
+          default:
+            throw error.argInvalid("filter", "Converting " + filter.kind + " filter is not supported.");
         }
-
-        // Top-level isEqual
-        if(filter.kind === "isEqual") {
-          equalsMap = {};
-          equalsMap[filter.property] = filter.value;
-
-          equalsMap = this.__convertValuesMap(equalsMap, toExternal);
-
-          filter = dataUtil.createFilterFromCellsMap(equalsMap, internalData, __context);
-
-          return filter !== null ? filter : TrueFilter.instance;
-        }
-
-        // Pass-through other filter kinds.
-        return filter;
       }
+
       // endregion
     }
   ];
+
+  function __flattenTree(f) {
+
+    var kind;
+
+    switch((kind = f.kind)) {
+      case "and":
+      case "or":
+
+        var i = -1;
+        var os = f.operands;
+        var L = os.count;
+        var osFlattened = [];
+
+        while(++i < L) {
+          // Recurse in pre-order
+          var o = os.at(i).visit(__flattenTree);
+          if(o.kind === kind) {
+            osFlattened.push.apply(osFlattened, o.operands.toArray());
+          } else {
+            osFlattened.push(o);
+          }
+        }
+
+        return new f.constructor({operands: osFlattened});
+    }
+  }
 
   function __hasSingleChange(propertyNames, propertyName) {
     return propertyNames.length === 1 && propertyNames[0] === propertyName;
@@ -727,7 +767,7 @@ define([
             // then the data table needs to be changed and new strategies need to be created.
             if(!forceNewInternalData) {
               if((previousStrategyApplication !== null && previousStrategyApplication.addsFields) ||
-                 (nextStrategyApplication !== null && nextStrategyApplication.addsFields)) {
+                (nextStrategyApplication !== null && nextStrategyApplication.addsFields)) {
                 forceNewInternalData = true;
               }
             }
@@ -787,6 +827,7 @@ define([
       strategyApplicationA.externalMode.equals(strategyApplicationB.externalMode) &&
       strategyApplicationA.strategyType === strategyApplicationB.strategyType;
   }
+
   // endregion
 
   // region Filter conversion
@@ -816,5 +857,6 @@ define([
 
     return fieldValues;
   }
+
   // endregion
 });
