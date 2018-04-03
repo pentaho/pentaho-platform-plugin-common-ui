@@ -112,9 +112,9 @@ define(function() {
         comps[3] -= utcOffset[0];
         comps[4] -= utcOffset[1];
       } else {
-        // Is date and time? It is UTC.
-        // Is date only? It is local time (utcOffset === undefined).
-        if(m[4]) utcOffset = [0, 0];
+        // Is date only? It is UTC.
+        // Is date and time? It is local time (utcOffset === undefined).
+        if(!m[4]) utcOffset = [0, 0];
 
         // else d = new Date(Number(m[1]), Number(m[2] || "1") - 1, Number(m[3] || "1"));
       }
