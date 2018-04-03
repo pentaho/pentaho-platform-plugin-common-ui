@@ -17,8 +17,9 @@ define([
   "module",
   "pentaho/util/logger",
   "pentaho/debug",
-  "pentaho/debug/Levels"
-], function(module, logger, debugMgr, DebugLevels) {
+  "pentaho/debug/Levels",
+  "pentaho/data/util"
+], function(module, logger, debugMgr, DebugLevels, dataUtil) {
   "use strict";
 
   /* eslint valid-jsdoc: 0 */
@@ -95,12 +96,14 @@ define([
         // `input - row2 - row1`, cause the algorithm has no way to know that, with the current data,
         // the `input` filter includes only `row1` and `row2`.
 
-        // Skipping rows with all null measures, when converting from cross-tab, can speed up things a lot.
-        // TODO: replace by a view of plain table without all null measures rows.
-        // There's a similar construct in Analyzer cv.Report#displayClientSideReport / will:change handler
-        // and in pentaho.ccc.visual.Abstract#_updateSelection.
-        if(data.originalCrossTable) {
-          data = data.originalCrossTable.toPlainTable({skipRowsWithAllNullMeasures: true});
+        // Filtering-out rows with all null measures can speed up things a lot.
+        var measureFieldNames = this.model.measureFieldNames;
+        if(measureFieldNames.length > 0) {
+          var measureIndexes = dataUtil.getColumnIndexesByIds(data, measureFieldNames);
+
+          var allNullMeasuresPredicate = dataUtil.buildRowPredicateNotAllNullColumns(measureIndexes);
+
+          data = dataUtil.filterByPredicate(data, allNullMeasuresPredicate);
         }
 
         var inputData = data.filter(input);

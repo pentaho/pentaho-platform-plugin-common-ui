@@ -142,6 +142,64 @@ define([
           }, this);
         },
 
+        /**
+         * Gets an array of the names of fields which are mapped to _key_ visual roles.
+         *
+         * @type {!Array.<string>} The array of field names.
+         * @readOnly
+         *
+         * @see pentaho.visual.role.AbstractProperty.Type#isVisualKey
+         */
+        get keyFieldNames() {
+
+          var keyFields = [];
+          var keyFieldSet = keyFields.set = Object.create(null);
+
+          this.$type.eachVisualRole(function(propType) {
+            if(propType.isVisualKey) {
+              this.get(propType).fields.each(function(field) {
+                var name = field.name;
+                if(!O.hasOwn(keyFieldSet, name)) {
+                  keyFieldSet[name] = true;
+                  keyFields.push(name);
+                }
+              });
+            }
+          }, this);
+
+          return keyFields;
+        },
+
+        /**
+         * Gets an array of the names of fields which are mapped to _measure_ visual roles
+         * and which are not mapped to any _key_ visual roles.
+         *
+         * @type {!Array.<string>} The array of field names.
+         * @readOnly
+         * @see pentaho.visual.role.AbstractProperty.Type#isVisualKey
+         */
+        get measureFieldNames() {
+
+          var keyFieldSet = this.keyFieldNames.set;
+
+          var measureFields = [];
+          var measureFieldSet = measureFields.set = Object.create(null);
+
+          this.$type.eachVisualRole(function(propType) {
+            if(!propType.isVisualKey) {
+              this.get(propType).fields.each(function(field) {
+                var name = field.name;
+                if(!O.hasOwn(keyFieldSet, name) && !O.hasOwn(measureFieldSet, name)) {
+                  measureFieldSet[name] = true;
+                  measureFields.push(name);
+                }
+              });
+            }
+          }, this);
+
+          return measureFields;
+        },
+
         // region serialization
         /** @inheritDoc */
         toSpecInContext: function(keyArgs) {

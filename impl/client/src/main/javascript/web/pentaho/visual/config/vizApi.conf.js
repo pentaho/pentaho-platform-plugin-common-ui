@@ -497,6 +497,7 @@ define(function() {
               if(this.panel.axes.base.isDiscrete()) {
                 return this.index > 0;
               }
+
               return this.delegate();
             },
             xAxisGrid_left: function() {
@@ -505,6 +506,7 @@ define(function() {
                 var halfStep = this.panel.axes.base.scale.range().step / 2;
                 return left - halfStep;
               }
+
               return left;
             },
 
@@ -801,7 +803,7 @@ define(function() {
             // If no line width was used, shapes such as crosses could not show.
             legend$Dot_shapeSize: 9, // = (radius - lineWidth / 2) ^ 2
             legend$Dot_lineWidth: 2,
-            legendMarkerSize:     8  // = diameter = 2 * radius
+            legendMarkerSize: 8 // = diameter = 2 * radius
 
           }
         }
@@ -970,11 +972,11 @@ define(function() {
     if(c) {
       c = c.rgb();
 
-      var istate = getInteractionState(this);
+      var iState = getInteractionState(this);
 
-      if(!istate.isActive && istate.isSelected < 0) {
+      if(!iState.isActive && iState.isSelected < 0) {
         c = getPv().color(notSelectedColor);
-      } else if(istate.isActive && istate.isSelected > -1) {
+      } else if(iState.isActive && iState.isSelected > -1) {
         // 20% darker
         c = c.hsl();
         c = c.lightness(c.l * (1 - 0.2));
@@ -991,17 +993,17 @@ define(function() {
     if(c) {
       c = c.rgb();
 
-      var istate = getInteractionState(this);
+      var iState = getInteractionState(this);
 
-      if(!istate.isActive) {
-        if (istate.isSelected < 0) {
+      if(!iState.isActive) {
+        if(iState.isSelected < 0) {
           // TODO: alpha value for non-selected items still under discussion by UX
           c = getPv().color(notSelectedColor);
           c = c.alpha(0.75);
         } else {
           c = c.alpha(0.5);
         }
-      } else if(istate.isActive && istate.isSelected > 0) {
+      } else if(iState.isActive && iState.isSelected > 0) {
         // 20% darker
         c = c.hsl();
         c = c.lightness(c.l * (1 - 0.2));
@@ -1018,11 +1020,11 @@ define(function() {
     if(c) {
       c = c.rgb();
 
-      var istate = getInteractionState(this);
+      var iState = getInteractionState(this);
 
-      if(!istate.isActive && istate.isSelected < 0) {
+      if(!iState.isActive && iState.isSelected < 0) {
         c = getPv().color(notSelectedColor);
-      } else if(istate.isActive && istate.isSelected > -1) {
+      } else if(iState.isActive && iState.isSelected > -1) {
         // 20% darker
         c = c.hsl();
         c = c.lightness(c.l * (1 - 0.2));
@@ -1031,7 +1033,6 @@ define(function() {
 
     return this.finished(c);
   }
-
 
   function getInteractionState(context) {
     var sign = context.sign;

@@ -491,20 +491,20 @@ define([
        * If the resulting filtered data of a filter is empty then the [false filter]{@link pentaho.data.filter.False}
        * is returned
        *
-       * @param {!pentaho.data.ITable} dataTable - The data to be used when determining the values of the key columns
-       * used in the extensional representation of the filter.
-       * @param {string[]} keyColumnNames - The names of the columns from the {@code dataTable} that are considered key.
+       * @param {!pentaho.data.ITable} dataPlain - The plain data table to be used when determining the values of
+       * the key columns used in the extensional representation of the filter.
+       * @param {string[]} keyColumnNames - The names of the columns from the `dataPlain` that are considered key.
        *
        * @return {!pentaho.data.filter.Or|!pentaho.data.filter.False} The extensional filter.
        *
-       * @throws {pentaho.lang.ArgumentInvalidError} When the resulting filtered data is not empty and keyColumnNames
+       * @throws {pentaho.lang.ArgumentInvalidError} When the resulting filtered data is not empty and `keyColumnNames`
        * is empty.
        */
-      toExtensional: function(dataTable, keyColumnNames) {
+      toExtensional: function(dataPlain, keyColumnNames) {
 
         if(__isDebugMode) logger.log("toExtensional BEGIN");
         try {
-          var filteredData = dataTable.toPlainTable().filter(this);
+          var filteredData = dataPlain.filter(this);
           var numRows = filteredData.getNumberOfRows();
           // Applying the filter returns no data therefore select nothing (False filter)
           if(numRows === 0) {
@@ -550,7 +550,7 @@ define([
           keyColumnNames.forEach(function(columnName) {
             var colIdx = dataTable.getColumnIndexById(columnName);
             if(colIdx === -1) {
-              throw error.argInvalid("keyColumnNames", "The column name " + columnName + " is not in the dataTable.");
+              throw error.argInvalid("keyColumnNames", "The column name " + columnName + " is not in the dataPlain.");
             }
             columnNameToIdx[columnName] = colIdx;
           });
