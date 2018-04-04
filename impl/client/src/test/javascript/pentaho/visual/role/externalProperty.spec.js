@@ -32,6 +32,7 @@ define([
       var buildAdapter = adaptationUtil.buildAdapter;
       var Model;
       var DerivedModel;
+      var CustomModel;
       var ModelWithStringRole;
       var ModelWithStringListRole;
 
@@ -112,7 +113,200 @@ define([
           ]
         };
       }
+
+      function buildCustomModel(Model, propSpec) {
+        return Model.extend({
+          $type: { props: [propSpec || {}] }
+        });
+      }
       // endregion
+
+      describe("#category", function() {
+        var category;
+
+        beforeEach(function() {
+          category = "foo category";
+
+          CustomModel = buildCustomModel(ModelWithStringRole, {
+            name: "roleA", category: category
+          })
+        });
+
+        it("should import category value correctly from '_internalProperty", function() {
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel);
+
+          var propType = DerivedModelAdapter.type.get("roleA");
+
+          expect(propType.category).toBe(category);
+        });
+
+        it("should override the category value that was imported from '_internalProperty", function() {
+          var override = category + " override";
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, {
+            name: "roleA", category: override
+          });
+
+          var propType = DerivedModelAdapter.type.get("roleA");
+
+          expect(propType.category).not.toBe(category);
+          expect(propType.category).toBe(override);
+        });
+      });
+
+      describe("#ordinal", function() {
+        var ordinal;
+
+        beforeEach(function() {
+          ordinal = 9000;
+
+          CustomModel = buildCustomModel(ModelWithStringRole, {
+            name: "roleA", ordinal: ordinal
+          });
+        });
+
+        it("should import ordinal value correctly from '_internalProperty", function () {
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel);
+
+          var propType = DerivedModelAdapter.type.get("roleA");
+          expect(propType.ordinal).toBe(ordinal);
+        });
+
+        it("should override the ordinal value that was imported from '_internalProperty", function() {
+          var override = 10000;
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, {
+            name: "roleA", ordinal: override
+          });
+
+          var propType = DerivedModelAdapter.type.get("roleA");
+
+          expect(propType.ordinal).not.toBe(ordinal);
+          expect(propType.ordinal).toBe(override);
+        });
+      });
+
+      describe("#label", function() {
+        var label;
+
+        beforeEach(function() {
+          label = "foo label";
+
+          CustomModel = buildCustomModel(ModelWithStringRole, {
+            name: "roleA", label: label
+          });
+        });
+
+        it("should import label value correctly from '_internalProperty", function () {
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel);
+
+          var propType = DerivedModelAdapter.type.get("roleA");
+          expect(propType.label).toBe(label);
+        });
+
+        it("should override the label value that was imported from '_internalProperty", function() {
+          var override = label + " override";
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, {
+            name: "roleA", label: override
+          });
+
+          var propType = DerivedModelAdapter.type.get("roleA");
+
+          expect(propType.label).not.toBe(label);
+          expect(propType.label).toBe(override);
+        });
+      });
+
+      describe("#description", function() {
+        var description;
+
+        beforeEach(function() {
+          description = "foo description";
+
+          CustomModel = buildCustomModel(ModelWithStringRole, {
+            name: "roleA", description: description
+          });
+        });
+
+        it("should import description value correctly from '_internalProperty", function () {
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel);
+
+          var propType = DerivedModelAdapter.type.get("roleA");
+          expect(propType.description).toBe(description);
+        });
+
+        it("should override the description value that was imported from '_internalProperty", function() {
+          var override = description + " override";
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, {
+            name: "roleA", description: override
+          });
+
+          var propType = DerivedModelAdapter.type.get("roleA");
+
+          expect(propType.description).not.toBe(description);
+          expect(propType.description).toBe(override);
+        });
+      });
+
+      describe("#helpUrl", function() {
+        var helpUrl;
+
+        beforeEach(function() {
+          helpUrl = "http://foo.help.com";
+
+          CustomModel = buildCustomModel(ModelWithStringRole, {
+            name: "roleA", helpUrl: helpUrl
+          });
+        });
+
+        it("should import helpUrl value correctly from '_internalProperty", function () {
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel);
+
+          var propType = DerivedModelAdapter.type.get("roleA");
+          expect(propType.helpUrl).toBe(helpUrl);
+        });
+
+        it("should override the helpUrl value that was imported from '_internalProperty", function() {
+          var override = helpUrl + "/override";
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, {
+            name: "roleA", helpUrl: override
+          });
+
+          var propType = DerivedModelAdapter.type.get("roleA");
+
+          expect(propType.helpUrl).not.toBe(helpUrl);
+          expect(propType.helpUrl).toBe(override);
+        });
+      });
+
+      describe("#isBrowsable", function() {
+        var isBrowsable;
+
+        beforeEach(function() {
+          isBrowsable = false;
+
+          CustomModel = buildCustomModel(ModelWithStringRole, {
+            name: "roleA", isBrowsable: isBrowsable
+          });
+        });
+
+        it("should import isBrowsable value correctly from '_internalProperty", function() {
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel);
+
+          var propType = DerivedModelAdapter.type.get("roleA");
+          expect(propType.isBrowsable).toBe(isBrowsable);
+        });
+
+        it("should override the isBrowsable value that was imported from '_internalProperty", function() {
+          var override = true;
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, {
+            name: "roleA", isBrowsable: override
+          });
+
+          var propType = DerivedModelAdapter.type.get("roleA");
+
+          expect(propType.isBrowsable).not.toBe(isBrowsable);
+          expect(propType.isBrowsable).toBe(override);
+        });
+      });
 
       describe("#isVisualKey", function() {
 
@@ -463,16 +657,8 @@ define([
 
             it("should have countRange.min = 1 if internal role is required", function() {
 
-              var CustomModel = Model.extend({
-                $type: {
-                  props: {
-                    roleA: {
-                      base: "pentaho/visual/role/property",
-                      modes: ["string"],
-                      fields: {isRequired: true}
-                    }
-                  }
-                }
+              CustomModel = buildCustomModel(ModelWithStringRole, {
+                name: "roleA", fields: { isRequired: true }
               });
 
               var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel);
@@ -680,6 +866,47 @@ define([
               expect(range.max).toBe(Infinity);
             });
           });
+        });
+      });
+
+      describe("#isApplicableOn(modelAdapter)", function() {
+        var externalPropType;
+        var internalProperty;
+        var modelAdapter;
+
+        beforeEach(function() {
+          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel);
+
+          externalPropType = DerivedModelAdapter.type.get("elementKeyRole");
+          internalProperty = externalPropType._internalProperty;
+
+          modelAdapter = new DerivedModelAdapter({
+            data: new Table(getDataSpec1())
+          });
+        });
+
+        it("should call `isApplicableOn` from its ancestor and from `_internalProperty`.", function() {
+          spyOn(externalPropType, 'base').and.returnValue(true);
+          spyOn(internalProperty, 'isApplicableOn').and.callFake(function(model) {
+            expect(model).toBe(modelAdapter.model);
+
+            return true;
+          });
+
+          var isApplicableOn = externalPropType.isApplicableOn(modelAdapter);
+
+          expect(internalProperty.isApplicableOn).toHaveBeenCalled();
+          expect(isApplicableOn).toBe(true);
+        });
+
+        it("should only call `isApplicableOn` from its ancestor and not from `_internalProperty`.", function() {
+          spyOn(externalPropType, 'base').and.returnValue(false);
+          spyOn(internalProperty, 'isApplicableOn').and.callThrough();
+
+          var isApplicableOn = externalPropType.isApplicableOn(modelAdapter);
+
+          expect(internalProperty.isApplicableOn).not.toHaveBeenCalled();
+          expect(isApplicableOn).toBe(false);
         });
       });
 
