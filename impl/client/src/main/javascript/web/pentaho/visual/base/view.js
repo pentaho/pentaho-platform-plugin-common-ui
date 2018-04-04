@@ -943,28 +943,32 @@ define([
 
           if(source) {
             var Subclass = this.constructor;
+            var O_proto = Object.prototype;
 
-            O.eachOwn(source, function(v, methodName) {
-              var m;
-              if(F.is(v) && (m = __reUpdateMethodName.exec(methodName))) {
+            for(var methodName in source) {
+              if(!(source in O_proto)) {
+                var v = source[methodName];
+                var m;
+                if(F.is(v) && (m = __reUpdateMethodName.exec(methodName))) {
 
-                var methodCleansBits = __parsePropertyGroupsText(Subclass, m[1]);
-                if(methodCleansBits && !Subclass.__UpdateMethods[methodCleansBits]) {
-                  var updateMethodInfo = {
-                    name: methodName,
-                    mask: methodCleansBits
-                  };
+                  var methodCleansBits = __parsePropertyGroupsText(Subclass, m[1]);
+                  if(methodCleansBits && !Subclass.__UpdateMethods[methodCleansBits]) {
+                    var updateMethodInfo = {
+                      name: methodName,
+                      mask: methodCleansBits
+                    };
 
-                  Subclass.__UpdateMethods[methodCleansBits] = updateMethodInfo;
-                  Subclass.__UpdateMethodsList.push(updateMethodInfo);
+                    Subclass.__UpdateMethods[methodCleansBits] = updateMethodInfo;
+                    Subclass.__UpdateMethodsList.push(updateMethodInfo);
 
-                  Subclass.__UpdateMethodsList.sort(function(a, b) {
-                    // Never happens: if(a.mask === b.mask) return 0;
-                    return new BitSet(a.mask).isSubsetOf(b.mask) ? -1 : 1;
-                  });
+                    Subclass.__UpdateMethodsList.sort(function(a, b) {
+                      // Never happens: if(a.mask === b.mask) return 0;
+                      return new BitSet(a.mask).isSubsetOf(b.mask) ? -1 : 1;
+                    });
+                  }
                 }
               }
-            });
+            }
           }
 
           return this;
