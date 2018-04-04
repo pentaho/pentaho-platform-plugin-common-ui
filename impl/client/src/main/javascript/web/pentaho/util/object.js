@@ -71,6 +71,7 @@ define(["./has"], function(has) {
         v = o[p];
         delete o[p];
       }
+
       return v;
     },
 

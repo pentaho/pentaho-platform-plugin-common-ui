@@ -335,6 +335,7 @@ define([
               return !mappingFieldInfo.isMeasureDiscrim;
             });
           }
+
           return mappingFieldInfos;
         },
 
@@ -713,10 +714,10 @@ define([
                 // Use the first color with half of the saturation
                 var bgColor = pv.color(model.backgroundColor).rgb();
                 bgColor = pv.rgb(
-                    Math.floor((255 + bgColor.r) / 2),
-                    Math.floor((255 + bgColor.g) / 2),
-                    Math.floor((255 + bgColor.b) / 2),
-                    bgColor.a);
+                  Math.floor((255 + bgColor.r) / 2),
+                  Math.floor((255 + bgColor.g) / 2),
+                  Math.floor((255 + bgColor.b) / 2),
+                  bgColor.a);
 
                 fillStyle = bgColor;
               } else {
@@ -868,10 +869,10 @@ define([
             this.options.colors = paletteQuantitative.colors.toArray(function(color) { return color.value; });
           } else {
             this.options.colors = visualColorUtils.buildPalette(
-                model.$type.context,
-                model.colorSet,
-                model.pattern,
-                model.reverseColors);
+              model.$type.context,
+              model.colorSet,
+              model.pattern,
+              model.reverseColors);
           }
         },
 

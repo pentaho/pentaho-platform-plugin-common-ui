@@ -198,6 +198,24 @@ define([
      * @return {!pentaho.data.ITable} The resulting table view.
      */
     filterByPredicate: function(dataPlain, rowPredicate) {
+
+      var rowIndexes = dataUtil.getFilteredRowsByPredicate(dataPlain, rowPredicate);
+
+      return rowIndexes === null ? dataPlain : new TableView(dataPlain).setSourceRows(rowIndexes);
+    },
+
+    /**
+     * Filters a plain data table given a row predicate and returns the resulting filtered row indexes.
+     *
+     * If all rows are selected, then `null` is returned instead.
+     *
+     * @param {!pentaho.data.ITable} dataPlain - The plain data table.
+     * @param {function(!pentaho.data.ITable, number) : boolean} rowPredicate - A predicate function
+     * that, when given a plain data table and a row index, returns `true` to include the row and `false` to ignore it.
+     *
+     * @return {Array.<number>} The selected row indexes, or `null`.
+     */
+    getFilteredRowsByPredicate: function(dataPlain, rowPredicate) {
       var areAllSelected = true;
       var rowIndexes = [];
       var rowIndex = -1;
@@ -210,7 +228,7 @@ define([
         }
       }
 
-      return areAllSelected ? dataPlain : new TableView(dataPlain).setSourceRows(rowIndexes);
+      return areAllSelected ? null : rowIndexes;
     },
 
     /**
