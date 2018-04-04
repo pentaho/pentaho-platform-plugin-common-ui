@@ -1011,6 +1011,24 @@ define([
 
         expect(view.isDirty).toBe(true);
       });
+
+      it("should become dirty on model change", function() {
+
+        view.__dirtyPropGroups.clear(); // view is clean
+
+        view.isAutoUpdate = false;
+
+        var didChangeHandler = jasmine.createSpy().and.callFake(function(){
+          expect(view.isDirty).toBe(true);
+        });
+
+        model.on("did:change", didChangeHandler);
+
+        model.selectionFilter = {_: "true"}; // marks the view as dirty
+
+        expect(didChangeHandler).toHaveBeenCalled();
+      });
+
     }); // #isDirty
 
     describe("#isUpdating", function() {
