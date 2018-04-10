@@ -24,7 +24,7 @@ define([
     return PentahoString.extend({
       $type: {
         mixins: ["enum"],
-        domain: ["grow", "fit", "clip"]
+        domain: ["grow", "fit", "clip", "page"]
       }
     })
     .implement({$type: bundle.structured.multiChartOverflow});

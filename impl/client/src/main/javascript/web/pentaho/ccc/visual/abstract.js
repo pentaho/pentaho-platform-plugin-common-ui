@@ -1553,9 +1553,14 @@ define([
 
         _renderCore: function() {
           this._chart = this._createChart(pvc[this._cccClass]);
-          this._chart
-            .setData(this._dataView.toJsonCda())
-            .render();
+          this._chart.setData(this._dataView.toJsonCda());
+
+          var isPaginated = this.options.multiChartOverflow === "page";
+          if(isPaginated) {
+            this._chart.renderPages();
+          } else {
+            this._chart.render();
+          }
 
           // Render may fail due to required visual roles, invalid data, etc.
           var error = this._chart.getLastRenderError();
@@ -1563,7 +1568,11 @@ define([
             return Promise.reject(this._convertCccError(error));
           }
 
-          this._updateSelection();
+          if(!isPaginated) {
+            this._updateSelection();
+          }
+
+          return null;
         },
 
         _convertCccError: function(error) {

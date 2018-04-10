@@ -64,7 +64,7 @@ define([
                 name: 'Default',
                 reqs: def.array.appendMany(
                     createDataReq('VERTICAL_BAR', {options: false}),
-                    [ createColumnDataLabelsReq({separator: false, anchors:['none', 'center', 'inside_end', 'inside_base', 'outside_end']}) ],                    
+                    [ createColumnDataLabelsReq({separator: false, anchors:['none', 'center', 'inside_end', 'inside_base', 'outside_end']}) ],
                     createTrendsDataReqs({separator: true}),
                     [ createChartOptionsDataReq(true) ])
             }],
@@ -101,7 +101,7 @@ define([
                 name: 'Default',
                 reqs: def.array.appendMany(
                     createDataReq('HORIZONTAL_BAR', {options: false}),
-                    [ createColumnDataLabelsReq({separator: false, anchors:['none', 'center', 'inside_end', 'inside_base', 'outside_end']}) ],                    
+                    [ createColumnDataLabelsReq({separator: false, anchors:['none', 'center', 'inside_end', 'inside_base', 'outside_end']}) ],
                     [ createChartOptionsDataReq(true) ])
             }],
             menuOrdinal: 130,
@@ -185,7 +185,7 @@ define([
                      createLineWidthDataReq()
                     ],
                     createTrendsDataReqs(),
-                    [ 
+                    [
                      createChartOptionsDataReq(true)
                     ]
                 )
@@ -310,7 +310,7 @@ define([
                         createMeaDataReq('VERTICAL_BAR_LINE_NUMLINE'),
                         'id', 'measuresLine',
                         'required', false),
-                    
+
                     createColumnDataLabelsReq({value_anchor: 'VALUE_COLUMN_ANCHOR',   separator: false, anchors:['none', 'center', 'inside_end', 'inside_base', 'outside_end']}),
                     createLabelsVisibleAnchorDataReq({labels_option: 'lineLabelsOption', value_anchor: 'VALUE_LINE_ANCHOR'}),
                     createMultiDataReq(),
@@ -404,7 +404,7 @@ define([
                 name: 'Default',
                 drillOrder: ['rows','columns'],
                 hyperlinkOrder: ['rows','columns'],
-                reqs : def.array.appendMany(                    
+                reqs : def.array.appendMany(
                     createDataReq("MULTIPLE_PIE", {multi: false, options: false}),
                     [
                         createLabelsVisiblePositionDataReq(),
@@ -558,7 +558,7 @@ define([
                           caption: dropZoneLabel('SUNBURST_SIZE'),
                           required: false,
                           allowMultiple: false
-                      },                      
+                      },
                       createMultiDataReq()],
                       [createLabelsVisibleAnchorDataReq({ hideOptions : ['left', 'right', 'top', 'bottom'] })],
                       createSortDataReqs(true),
@@ -804,7 +804,7 @@ define([
                     }
                 }
             }
-            
+
             return {
                     id: def.get(keyArgs, 'labels_option', 'labelsOption'),
                     dataType: 'string',
@@ -817,11 +817,11 @@ define([
                     }
                 };
         }
-        
+
         function createColumnDataLabelsReq(keyArgs){
-          
+
             var anchors = def.get(keyArgs, 'anchors');
-          
+
             return {
                 id: 'labelsOption',
                 dataType: 'string',
@@ -845,11 +845,11 @@ define([
                     group: 'options',
                     type:  'checkbox',
                     seperator: def.get(keyArgs, 'separator', true),
-                    caption: 'Labels' // TODO i18n pending....                
+                    caption: 'Labels' // TODO i18n pending....
                 }
             };
         }
-        
+
         function createChartOptionsDataReq(hasSeparator){
             return {
                 id: "optionsBtn",
@@ -1387,17 +1387,17 @@ define([
                     }
 
                     var suffix;
-                    
+
                     // It can happen that the scene has more than one datum.
                     // One is a null one and the other an interpolated one.
-                    // We may receive the null one in `complex` and 
+                    // We may receive the null one in `complex` and
                     // miss detecting that the scene is actually interpolated.
                     if(context && context.scene) {
                     	// create local variable for avoid double call datums()
                     	var datums = context.scene.datums();
                     	if (datums) {
                     		var complexInterp = datums.where(function(d) { return d.isInterpolated && d.interpDimName === cccDimName; }).first();
-                    		if(complexInterp) 
+                    		if(complexInterp)
                     			suffix = this.chart._message('chartTooltipGemInterp_' + complexInterp.interpolation);
                     		}
                     } else if(complex.isTrend/* && atom.label*/){
@@ -1437,9 +1437,9 @@ define([
                     visRoles = context.panel.visualRolesOf(cccDimName, /*includeChart*/true);
 
                 if(visRoles && visRoles.some(function(r) { return r.isPercent; })) {
-                    var group = context.scene.group, 
-                        dim   = (group || data).dimensions(cccDimName), 
-                        pct   = group 
+                    var group = context.scene.group,
+                        dim   = (group || data).dimensions(cccDimName),
+                        pct   = group
                             ? dim.percentOverParent({visible: true})
                             : dim.percent(atom.value);
 
@@ -2400,8 +2400,8 @@ define([
                                         }
 
                                         // Copy map values to ColorMap
-                                        // All color maps are joined together and there will be no 
-                                        // value collisions because the key is prefixed with the name 
+                                        // All color maps are joined together and there will be no
+                                        // value collisions because the key is prefixed with the name
                                         // of the category
                                         for (var j in map) {
                                             colorMap[j] = map[j];
@@ -2409,11 +2409,11 @@ define([
                                     }
                                 }
                             } else {
-                                colorMap = memberPalette[colorGems[C - 1].formula];    
+                                colorMap = memberPalette[colorGems[C - 1].formula];
                             }
                         } else {
                             // Use measures (M === 1)
-                            
+
                             /*
                              * "[Measures].[MeasuresLevel]": {
                              *    "[MEASURE:0]": "violet",
@@ -2467,11 +2467,11 @@ define([
                                         var keys     = compKey.split("~"),
                                             level    = keys.length - 1,
                                             keyLevel = keys[level];
-                                        
+
                                         // Obtain color for most specific key from color map.
                                         // If color map has no color and it is the 1st level,
                                         //  then reserve a color from the default color scale.
-                                        // Otherwise, return undefined, 
+                                        // Otherwise, return undefined,
                                         //  meaning that a derived color should be used.
                                         return def.getOwn(colorMap, keyLevel) ||
                                             (level ? undefined : defaultScale(keyLevel));
@@ -2736,7 +2736,12 @@ define([
                 resultset: this._resultset
             });
 
-            this._chart.render();
+            var isPaginated = this.options.multiChartOverflow === "page";
+            if(isPaginated) {
+                this._chart.renderPages();
+            } else {
+                this._chart.render();
+            }
         },
 
         /* INTERACTIVE - TOOLTIPS */
@@ -3332,12 +3337,12 @@ define([
 
             configureColumnLabelsAlignmentOptions.call(this);
         },
-        
+
         _readUserOptions: function(options, vizOptions) {
             this.base(options, vizOptions);
             options.valuesFont = defaultFont(readFont(vizOptions, 'label'));
             options.extensionPoints.label_textStyle = vizOptions.labelColor;
-        }        
+        }
     });
 
     // -------------------
@@ -3465,7 +3470,7 @@ define([
 
             options.plot2ValuesFont = defaultFont(readFont(vizOptions, 'label'));
             options.extensionPoints.plot2Label_textStyle = vizOptions.labelColor;
-            
+
             configureLabelsOptions.call(this);
         },
 
@@ -3485,7 +3490,7 @@ define([
             this._configureAxisTitle('ortho2',"");
 
             this.options.plot2OrthoAxis = 2;
-            
+
             configureLineLabelsAlignmentOptions.call(this);
 
             // Plot2 uses same color scale
@@ -3525,7 +3530,7 @@ define([
                 options.dotsVisible = true;
                 options.extensionPoints.dot_shape = shape;
             }
-            
+
             options.valuesFont = defaultFont(readFont(vizOptions, 'label'));
             options.extensionPoints.label_textStyle = vizOptions.labelColor;
 
@@ -3646,7 +3651,7 @@ define([
 
             configureLabelsAnchorOptions.call(this);
         },
-        
+
         _readUserOptions: function(options, vizOptions) {
             this.base(options, vizOptions);
             options.valuesFont = defaultFont(readFont(vizOptions, 'label'));
@@ -3718,9 +3723,9 @@ define([
        //     return this.axes.row.getAxisLabel();
        // },
 
-        
 
-        
+
+
     });
 
     def
@@ -3882,7 +3887,7 @@ define([
             // configure value label
             if(this.options.valuesVisible){
                 this._configureValuesMask();
-            }            
+            }
         },
 
         _showLegend: function(){
@@ -4122,14 +4127,14 @@ define([
                         var th = m.height * 0.85, // tight text bounding box
                             tb = pvLabel.textBaseline(),
                             // The effective height of text that must be covered.
-                            // one text margin, for the anchor, 
+                            // one text margin, for the anchor,
                             // half text margin for the anchor's opposite side.
                             // All on only one of the sides of the wedge.
                             thEf = 2 * (th + 3*tm/2);
 
                         // Minimum inner radius whose straight-arc has a length `thEf`
                         irmin = Math.max(
-                            irmin, 
+                            irmin,
                             thEf / (2 * Math.tan(a / 2)));
                     }
 
@@ -4147,7 +4152,7 @@ define([
                     // Continue with normal processing for the main label.
                     return null;
                 };
-                
+
                 var me = this;
                 eps.label_add = function() {
                     return new pv.Label()
@@ -4157,8 +4162,8 @@ define([
                         })
                         .text(function(scene) {
                             var pvMainLabel = this.proto;
-                            return !pvMainLabel.text() 
-                                ? "" 
+                            return !pvMainLabel.text()
+                                ? ""
                                 : me._formatSize(scene.vars.size, scene.firstAtoms.size.dimension);
                         })
                         .textBaseline("top");
@@ -4423,13 +4428,13 @@ define([
 
         // Set Values Visible
         if(this._vizOptions.labelsVisible) {
-            this.options.valuesVisible = this._vizOptions.labelsVisible;    
+            this.options.valuesVisible = this._vizOptions.labelsVisible;
         }
 
         if (this._vizOptions.labelsAnchor) {
-            this.options.valuesAnchor = this._vizOptions.labelsAnchor;    
+            this.options.valuesAnchor = this._vizOptions.labelsAnchor;
         }
-        
+
         if (this._vizOptions.labelsTextAlign) {
              if (!this.options.extensionPoints) {
                 this.options.extensionPoints = {};
@@ -4446,7 +4451,7 @@ define([
 
         if(!this._vizOptions.labelsOption || this._vizOptions.labelsOption == 'none') {
             return this.options.valuesVisible = false;
-        } 
+        }
 
         return this.options.valuesVisible = true;
     }
@@ -4458,7 +4463,7 @@ define([
         }
     }
 
-    
+
     function configureColumnLabelsAlignmentOptions() {
         if (configureLabelsVisibilityOptions.call(this)) {
             if (!this.options.extensionPoints) {
@@ -4468,7 +4473,7 @@ define([
             var labelsOption = this._vizOptions.labelsOption;
 
             this.options.extensionPoints.label_textMargin = 7;
-            
+
             if(labelsOption == 'center') {
                 this.options.valuesAnchor = 'center';
             }
@@ -4497,7 +4502,7 @@ define([
             }
         }
     }
-    
+
     function configureLineLabelsAlignmentOptions() {
         var lineLabelsOption = this._vizOptions.lineLabelsOption;
         if(lineLabelsOption && lineLabelsOption != 'none') {
