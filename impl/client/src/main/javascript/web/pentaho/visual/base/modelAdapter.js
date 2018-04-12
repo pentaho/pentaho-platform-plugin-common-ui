@@ -27,6 +27,7 @@ define([
   // so that r.js sees otherwise invisible dependencies.
   "./abstractModel",
   "./model",
+  "../role/externalProperty",
   "pentaho/data/filter/and",
   "pentaho/data/filter/isEqual"
 ], function(module, ComplexChangeset, Table, dataUtil, O, error, logger, debugMgr, DebugLevels, bundle) {

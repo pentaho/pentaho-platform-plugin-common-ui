@@ -20,7 +20,8 @@ define([
   "pentaho/data/util",
 
   // so that r.js sees otherwise invisible dependencies.
-  "./strategy"
+  "./strategy",
+  "./timeIntervalDuration"
 ], function(module, O, dateUtil, dataUtil) {
   "use strict";
 

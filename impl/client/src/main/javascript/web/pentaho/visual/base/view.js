@@ -31,6 +31,7 @@ define([
   "pentaho/type/complex",
   "pentaho/visual/base/model",
   "pentaho/type/action/base",
+  "pentaho/type/action/impl/target",
   "../action/base",
   "../action/update",
   "../action/select",
