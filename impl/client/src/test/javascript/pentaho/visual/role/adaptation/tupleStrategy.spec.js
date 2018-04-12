@@ -278,6 +278,15 @@ define([
         ]);
       });
 
+      it("should return cell corresponding to given existing value (with undefined positions)", function() {
+
+        var outputCells = strategy.map(["A", undefined]);
+
+        expect(outputCells).toEqual([
+          jasmine.objectContaining({value: "A", formatted: "AA1"})
+        ]);
+      });
+
       it("should return cell corresponding to given (equal) existing cell", function() {
 
         var outputCells = strategy.map([new Cell("A", "AA1")]);
@@ -290,6 +299,13 @@ define([
       it("should return [{value: null}] when given an existing null", function() {
 
         var outputCells = strategy.map([null]);
+
+        expect(outputCells).toEqual([jasmine.objectContaining({value: null})]);
+      });
+
+      it("should return [{value: null}] when given an existing null (with undefined position)", function() {
+
+        var outputCells = strategy.map([null, undefined]);
 
         expect(outputCells).toEqual([jasmine.objectContaining({value: null})]);
       });
@@ -364,6 +380,14 @@ define([
 
       it("should return two cells corresponding to given existing values", function() {
         var inputCells = strategy.invert(["A"]);
+
+        expect(inputCells).toEqual([
+          jasmine.objectContaining({value: "A", formatted: "AA1"})
+        ]);
+      });
+
+      it("should return two cells corresponding to given existing values (with undefined position)", function() {
+        var inputCells = strategy.invert(["A", undefined]);
 
         expect(inputCells).toEqual([
           jasmine.objectContaining({value: "A", formatted: "AA1"})
