@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ define([
 
       it("should return `true` if `elem` has property `property` with a value matching an affix of `value`", function() {
 
-        var filter  = new IsLikeFilter({property: "name", value: "es", anchorStart: false, anchorEnd: false});
+        var filter  = new IsLikeFilter({property: "name", value: "es", anchorStart: false, anchorEnd: false, isCaseInsensitive: false});
         var filterDefaultValues = new IsLikeFilter({property: "name", value: "es"});
 
         var result = filter.contains(elem);
@@ -91,8 +91,8 @@ define([
 
       it("should return `true` if `elem` has property `property` with a value matching a prefix of `value`", function() {
 
-        var filter  = new IsLikeFilter({property: "name", value: "tes", anchorStart: true, anchorEnd: false});
-        var negFilter = new IsLikeFilter({property: "name", value: "es", anchorStart: true, anchorEnd: false});
+        var filter  = new IsLikeFilter({property: "name", value: "tes", anchorStart: true, anchorEnd: false, isCaseInsensitive: false});
+        var negFilter = new IsLikeFilter({property: "name", value: "es", anchorStart: true, anchorEnd: false, isCaseInsensitive: false});
 
         var result = filter.contains(elem);
         var negResult = negFilter.contains(elem);
@@ -103,8 +103,8 @@ define([
 
       it("should return `true` if `elem` has property `property` with a value matching a suffix of `value`", function() {
 
-        var filter  = new IsLikeFilter({property: "name", value: "est", anchorStart:false, anchorEnd: true});
-        var negFilter = new IsLikeFilter({property: "name", value: "es", anchorStart: false, anchorEnd: true});
+        var filter  = new IsLikeFilter({property: "name", value: "est", anchorStart: false, anchorEnd: true, isCaseInsensitive: false});
+        var negFilter = new IsLikeFilter({property: "name", value: "es", anchorStart: false, anchorEnd: true, isCaseInsensitive: false});
 
         var result = filter.contains(elem);
         var negResult = negFilter.contains(elem);
@@ -115,9 +115,9 @@ define([
 
       it("should return `true` if `elem` has property `property` with a value exactly matching `value`", function() {
 
-        var filter  = new IsLikeFilter({property: "name", value: "test", anchorStart:true, anchorEnd: true});
-        var negFilter = new IsLikeFilter({property: "name", value: "tes", anchorStart: true, anchorEnd: true});
-        var negFilter2 = new IsLikeFilter({property: "name", value: "est", anchorStart: true, anchorEnd: true});
+        var filter  = new IsLikeFilter({property: "name", value: "test", anchorStart: true, anchorEnd: true, isCaseInsensitive: false});
+        var negFilter = new IsLikeFilter({property: "name", value: "tes", anchorStart: true, anchorEnd: true, isCaseInsensitive: false});
+        var negFilter2 = new IsLikeFilter({property: "name", value: "est", anchorStart: true, anchorEnd: true, isCaseInsensitive: false});
 
         var result = filter.contains(elem);
         var negResult = negFilter.contains(elem);
@@ -127,34 +127,58 @@ define([
         expect(negResult).toBe(false);
         expect(negResult2).toBe(false);
       });
+
+      it("should return `true` if `elem` has property `property` with a value matching `value` including case sensitivity", function() {
+        var filter  = new IsLikeFilter({property: "name", value: "test", anchorStart: true, anchorEnd: true, isCaseInsensitive: false});
+
+        var result = filter.contains(elem);
+
+        expect(result).toBe(true);
+      });
+
+      it("should return `false` if `elem` has property `property` with a value matching `value` including case sensitivity", function() {
+        var filter  = new IsLikeFilter({property: "name", value: "TEST", anchorStart: true, anchorEnd: true, isCaseInsensitive: false});
+
+        var result = filter.contains(elem);
+
+        expect(result).toBe(false);
+      });
+
+      it("should return `true` if `elem` has property `property` with a value matching `value` excluding case sensitivity", function() {
+        var filter  = new IsLikeFilter({property: "name", value: "TEST", anchorStart: true, anchorEnd: true, isCaseInsensitive: true});
+
+        var result = filter.contains(elem);
+
+        expect(result).toBe(true);
+      });
     }); // #contains
 
     describe("#contentKey", function() {
 
-      it("should return '(like propName valueKey anchorS anchorE)'", function() {
+      it("should return '(like propName valueKey anchorS anchorE caseI)'", function() {
         var filter  = new IsLikeFilter({property: "name", value: "str"});
-        var anotherFilter = new IsLikeFilter({property: "name", value: "str", anchorStart: true, anchorEnd: true});
+        var anotherFilter = new IsLikeFilter({property: "name", value: "str", anchorStart: true, anchorEnd: true, isCaseInsensitive: false});
 
-        expect(filter.$contentKey).toBe("(like name str false false)");
-        expect(anotherFilter.$contentKey).toBe("(like name str true true)");
+        expect(filter.$contentKey).toBe("(like name str false false false)");
+        expect(anotherFilter.$contentKey).toBe("(like name str true true false)");
       });
 
-      it("should return '(like propName  false false)' when no value is set'", function() {
+      it("should return '(like propName  false false false)' when no value is set'", function() {
         var filter  = new IsLikeFilter({property: "name"});
 
-        expect(filter.$contentKey).toBe("(like name  false false)");
+        expect(filter.$contentKey).toBe("(like name  false false false)");
       });
 
-      it("should return '(like  valueKey false false)' when no property is set'", function() {
+      it("should return '(like  valueKey false false false)' when no property is set'", function() {
         var filter  = new IsLikeFilter({value: "str"});
 
-        expect(filter.$contentKey).toBe("(like  str false false)");
+        expect(filter.$contentKey).toBe("(like  str false false false)");
       });
 
-      it("should return '(like   false false)' when no property or value are set'", function() {
+      it("should return '(like   false false false)' when no property or value are set'", function() {
         var filter  = new IsLikeFilter();
 
-        expect(filter.$contentKey).toBe("(like   false false)");
+        expect(filter.$contentKey).toBe("(like   false false false)");
       });
     });
   }); // pentaho.data.filter.IsLike

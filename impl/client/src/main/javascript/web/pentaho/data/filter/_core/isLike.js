@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,12 @@ define([
         var property = this.property;
         var anchorStart = this.anchorStart;
         var anchorEnd = this.anchorEnd;
+        var isCaseInsensitive = this.isCaseInsensitive;
         var referenceFormatted = this.getf("value") || this.value.toString();
+
+        if(isCaseInsensitive) {
+          referenceFormatted = referenceFormatted.toLowerCase();
+        }
 
         return function isLikeContains(elem) {
 
@@ -82,7 +87,13 @@ define([
             return false;
           }
 
-          var firstOccurrence = formatted.indexOf(referenceFormatted);
+          var firstOccurrence;
+
+          if(isCaseInsensitive) {
+            firstOccurrence = formatted.toLowerCase().indexOf(referenceFormatted);
+          } else {
+            firstOccurrence = formatted.indexOf(referenceFormatted);
+          }
 
           return firstOccurrence > -1 &&
               (!anchorStart || firstOccurrence === 0) &&
@@ -95,10 +106,12 @@ define([
         var v = this.get("value");
         var s = this.get("anchorStart");
         var e = this.get("anchorEnd");
+        var ci = this.get("isCaseInsensitive");
         return (this.property || "") + " " +
           (v ? (v.$type.isSimple ? v.$contentKey : v.$key) : "") + " " +
           (s ? s.$key : "") + " " +
-          (e ? e.$key : "");
+          (e ? e.$key : "") + " " +
+          (ci ? ci.$key : "");
       },
 
       $type: /** @lends pentaho.data.filter.IsLike.Type# */{
@@ -121,6 +134,12 @@ define([
           {
             name: "anchorEnd",
             nameAlias: "e",
+            valueType: "boolean",
+            defaultValue: false
+          },
+          {
+            name: "isCaseInsensitive",
+            nameAlias: "ci",
             valueType: "boolean",
             defaultValue: false
           }
