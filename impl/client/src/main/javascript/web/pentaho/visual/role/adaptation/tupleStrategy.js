@@ -201,6 +201,8 @@ define([
         /** @inheritDoc */
         map: function(inputValues) {
 
+          inputValues = __trimRightUndefined(inputValues);
+
           return this._getDataRowCells(
             this.__getIndex().getIndexOf(inputValues, this.__keyFuns),
             this.outputFieldIndexes,
@@ -210,6 +212,8 @@ define([
 
         /** @inheritDoc */
         invert: function(outputValues) {
+
+          outputValues = __trimRightUndefined(outputValues);
 
           return this._getDataRowCells(
             this.__getIndex().getIndexOf(outputValues, this.__keyFuns),
@@ -300,5 +304,25 @@ define([
     }
 
     return keys;
+  }
+
+  /**
+   * Trims `undefined` values from the right of an array.
+   * Returns a copy of the original array if any trimming is performed.
+   *
+   * @memberOf pentaho.visual.role.adaptation.TupleStrategy#
+   *
+   * @param {Array} values - The array to trime.
+   * @return {Array} The trimmed array.
+   * @private
+   */
+  function __trimRightUndefined(values) {
+    var level = values.length;
+    var count = 0;
+    while(level-- && values[level] === undefined) {
+      count++;
+    }
+
+    return count > 0 ? values.slice(0, -count) : values;
   }
 });

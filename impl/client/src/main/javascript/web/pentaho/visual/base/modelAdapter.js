@@ -471,7 +471,9 @@ define([
                 var fieldNames = toExternal ? strategy.inputFieldNames : strategy.outputFieldNames;
 
                 fieldCells.forEach(function(fieldCell, index) {
-                  convertedValuesMap[fieldNames[index]] = fieldCell;
+                  if(fieldCell !== undefined) {
+                    convertedValuesMap[fieldNames[index]] = fieldCell;
+                  }
                 });
               }
             }
@@ -612,6 +614,7 @@ define([
           case "false":
           case "or":
             return null;
+
           case "and":
             // Collect and replace all isEqual children.
             equalsMap = null;
@@ -650,12 +653,12 @@ define([
                   this.internalData,
                   propName,
                   equalsMap[propName],
-                  __context
-                );
+                  __context);
               }, this));
             }
 
             return new AndFilter({operands: operands});
+
           case "isEqual":
             equalsMap = {};
             equalsMap[filter.property] = filter.value;
@@ -678,6 +681,7 @@ define([
 
     var kind;
 
+    // eslint-disable-next-line default-case
     switch((kind = f.kind)) {
       case "and":
       case "or":
