@@ -1304,8 +1304,14 @@ define([
             return;
           }
 
-          var cccDatum = cccContext.scene.datum;
-          var cccAtom = cccDatum.atoms[mappingFieldInfo.name];
+          var cccScene = cccContext.scene;
+          var cccComplex = cccScene.group || cccScene.datum;
+
+          var cccAtom = cccComplex.getSpecifiedAtom(mappingFieldInfo.name);
+          if(cccAtom === null) {
+            return;
+          }
+
           var value = cccAtom.value;
 
           // If the chart hides null **members**...
@@ -1314,7 +1320,7 @@ define([
           }
 
           // TODO: null trend value?
-          if(cccDatum.isTrend && value == null) {
+          if(value == null && cccScene.datum !== null && cccScene.datum.isTrend) {
             return;
           }
 
