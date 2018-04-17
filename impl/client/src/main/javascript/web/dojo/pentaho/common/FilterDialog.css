@@ -3,15 +3,11 @@
 }
 
 .filterDialogContainer {
-  width: 480px;
+  width: 560px;
 }
 
 .filterDialogDetailsContainer {
   min-height: 250px;
-}
-
-.filterDialogPicklistFindInput {
-  width: 150px;
 }
 
 .filterDialogMatchContainer {
@@ -19,10 +15,39 @@
 }
 
 .filterDialogPicklistSelect {
-	height: 180px;
-  width: 210px;
+  height: 180px;
+  width: 100%;
 }
 
 .filterDialogParameterContainer {
-	padding-top: 2px;
+  margin-top: 20px;
+  margin-bottom: 15px;
+  width: 250px;
+}
+
+.typeContainerStyled {
+  margin-bottom: 10px;
+}
+
+input {
+  text-overflow: ellipsis;
+}
+
+.filterDialogPicklistContainer > table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.parameterNameInput {
+  border-radius: 4px;
+  width: 250px;
+}
+
+.secondRow > td {
+  padding-bottom: 15px;
+}
+
+.findButton {
+  flex-basis: auto;
+  flex-grow: 0;
 }

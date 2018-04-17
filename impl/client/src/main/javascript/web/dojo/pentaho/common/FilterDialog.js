@@ -27,7 +27,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   templateString: templateStr,
   filterType: "PICKLIST",
   currentFilter: null,
-  hasCloseIcon: true,
+  hasCloseIcon: false,
   // Function for retrieving localized strings
 
   buttons: ['Ok_txt','Cancel_txt'],
@@ -534,7 +534,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   },
 
   _configureMatchContainer: function() {
-    this.matchFieldName.innerHTML = this.currentColumn.name;
+    this.matchFieldName.innerHTML = this.currentColumn.name.concat(':');
     var value = this.currentFilter.value instanceof Array ? this.currentFilter.value[0] : null;
     switch(this.currentColumn.dataType) {
       case pentaho.pda.Column.DATA_TYPES.DATE:
