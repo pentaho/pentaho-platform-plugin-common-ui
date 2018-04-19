@@ -1232,8 +1232,7 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
               }
             }
 
-            // if the CDF component has `isManaged` set to `false` don't execute the update
-            if(updateNeeded && component.isManaged !== false) {
+            if(updateNeeded) {
               var groupPanel = this.dashboard.getComponentByName(groupName);
               _mapComponents(groupPanel, function(component) {
                 this.dashboard.updateComponent(component);
