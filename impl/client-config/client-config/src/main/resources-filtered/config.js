@@ -206,6 +206,19 @@ define(function() {
             "pentaho/visual/color/palettes/nominalPrimary": {ranking: -1000}
           }
         }
+      },
+      */
+
+      // Example Rule 9 - Disable hierarchical dates strategy, to revert
+      // to the old behavior (Before 8.1) that represents Time dimensions in a discrete axis.
+      /*
+      {
+        select: {
+          type: "pentaho/visual/role/adaptation/entityWithTimeIntervalKeyStrategy"
+        },
+        apply: {
+          isBrowsable: false
+        }
       }
       */
     ]
