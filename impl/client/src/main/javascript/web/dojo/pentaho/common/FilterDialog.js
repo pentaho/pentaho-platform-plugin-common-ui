@@ -27,7 +27,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   templateString: templateStr,
   filterType: "PICKLIST",
   currentFilter: null,
-  hasCloseIcon: true,
+  hasCloseIcon: false,
   // Function for retrieving localized strings
 
   buttons: ['Ok_txt','Cancel_txt'],
