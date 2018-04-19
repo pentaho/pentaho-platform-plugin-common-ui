@@ -61,7 +61,7 @@
           </td>
         </tr>
         <tr class="secondRow">
-          <td style="display: flex;flex-direction: row;flex-wrap: nowrap;">
+          <td style="display: flex">
             <input type="text" class="filterDialogPicklistFindInput" data-dojo-type="dijit.form.TextBox" data-dojo-attach-point="picklistFindInput" dojoAttachEvent="onKeyPress:_picklistFindKeyPressed" style="flex-grow: 1;margin-left: 0px;margin-right: 10px;"/>
             <button class="pentaho-button findButton" data-dojo-attach-point="picklistFindButton" dojoAttachEvent="onclick:_filterPicklistByFindInput">!Find!</button>
           </td>
@@ -119,9 +119,11 @@
     <div data-dojo-attach-point="matchContainer" class="filterDialogMatchContainer">
       <table>
         <div data-dojo-attach-point="matchFieldName">!Field name!</div>
-        <select data-dojo-attach-point="matchAggType" style="width:180px"></select>
-        <select data-dojo-attach-point="matchComparator" dojoAttachEvent="onchange:_matchComparatorChanged" style="width:180px;margin:0px 10px"></select>
-        <input type="text" data-dojo-attach-point="matchValueInput" size="10" style="width:180px"/><!--data-dojo-type="dijit.form.TextBox"-->
+        <div style="display: flex">
+          <select data-dojo-attach-point="matchAggType" style="flex-grow: 1; min-width: 170px; max-width: 180px"></select>
+          <select data-dojo-attach-point="matchComparator" dojoAttachEvent="onchange:_matchComparatorChanged" style="flex-grow: 1; min-width: 170px; max-width: 180px; margin:0px 10px"></select>
+          <input type="text" data-dojo-attach-point="matchValueInput" size="10" style="flex-grow: 1; min-width: 170px; max-width: 180px"/><!--data-dojo-type="dijit.form.TextBox"-->
+        </div>
         <!-- Date pattern to match what metadata expects. -->
         <!-- TODO Change this to locale-specific for presentation layer? -->
         <input type="text" data-dojo-attach-point="matchValueInputDate" data-dojo-type="pentaho.common.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}"/>
