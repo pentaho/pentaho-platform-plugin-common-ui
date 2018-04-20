@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,10 @@
  * @property {Function} onStateChanged Callback called if defined after state variables have been changed on the prompt panel or parameter definition
  * @property {?Function} onSubmit Callback called when the submit function executes, null if no callback is registered.
  */
-define(["cdf/lib/Base", "cdf/Logger", "dojo/number", "dojo/i18n", "common-ui/util/util", "common-ui/util/GUIDHelper", "./WidgetBuilder", "cdf/Dashboard.Clean", "./parameters/ParameterDefinitionDiffer", "common-ui/jquery-clean", "common-ui/underscore"],
-function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff, $, _) {
+define(["cdf/lib/Base", "cdf/Logger", "dojo/number", "dojo/i18n", "common-ui/util/util", "common-ui/util/GUIDHelper",
+        "./WidgetBuilder", "cdf/Dashboard.Clean", "./parameters/ParameterDefinitionDiffer", "common-ui/jquery-clean",
+        "common-ui/underscore", "./components/CompositeComponent"],
+function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff, $, _, CompositeComponent) {
 
   // Add specific prompting message bundle
   if(pentaho.common.Messages) {
@@ -1181,7 +1183,7 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
      *
      * @name PromptPanel#_changeComponentsByDiff
      * @method
-     * @param {JSON} toChangeDiff The group of parameters which need to be have their data changed
+     * @param {JSON} toChangeDiff The group of parameters which need to have their data changed
      */
     _changeComponentsByDiff: function(toChangeDiff) {
       for(var groupName in toChangeDiff) {
@@ -1194,6 +1196,7 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
           var component = _getComponentByParam.call(this, param);
           if(component != null) {
             var updateNeeded = false;
+
             // also we should check and update errors components
             this._changeErrors(param);
 
@@ -1235,7 +1238,10 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
             if(updateNeeded) {
               var groupPanel = this.dashboard.getComponentByName(groupName);
               _mapComponents(groupPanel, function(component) {
-                this.dashboard.updateComponent(component);
+                // avoid redrawing the composite container DOM
+                if(!(component instanceof CompositeComponent)) {
+                  this.dashboard.updateComponent(component);
+                }
               }.bind(this));
             }
           }
