@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+* Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -492,14 +492,18 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
     }
   },
 
-  filterPicklist: function(value) {
+  filterPicklist: function(value, reauthentication) {
     this._flagPicklistAvailableValuesLoading();
     this.datasource.searchColumn(this.currentColumn, value, this.searchListLimit, lang.hitch(this, function(values) {
       this._updatePicklistAvailableValues(values == null ? [] : values.resultset);
       if (values == null && this._reauthenticateCallback) {
-        this._reauthenticateCallback(lang.hitch(this, function() {
-          this.filterPicklist(value);
-        }));
+        if (!reauthentication) {
+          this._reauthenticateCallback(lang.hitch(this, function() {
+            this.filterPicklist(value, true);
+          }));
+        } else {
+          this.showErrorDialog(this.getLocaleString("filterDialogGeneralError_title"), this.getLocaleString("filterDialogGeneralError_message"));
+        }
       }
     }));
   },
