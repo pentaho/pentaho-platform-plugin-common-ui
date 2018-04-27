@@ -721,6 +721,35 @@ define([
           expect(strategy2).not.toBe(strategy1);
         });
 
+        it("should update the strategy even if the fields have also changed, but to the same value", function() {
+
+          var strategy1 = modelAdapter.roleA.strategy;
+          expect(strategy1).not.toBe(null);
+
+          modelAdapter.$type.context.enterChange().using(function(scope) {
+
+            // Create a changeset, but with no changes...
+            modelAdapter.roleA.fields = modelAdapter.roleA.fields.toArray(function(mappingField) {
+              return mappingField.name;
+            });
+
+            expect(modelAdapter.$changeset.getChange("roleA")).not.toBe(null);
+
+            // ---
+
+            modelAdapter.data = new Table(getDataSpec1());
+
+            scope.accept();
+          });
+
+          // ---
+
+          var strategy2 = modelAdapter.roleA.strategy;
+          expect(strategy2).not.toBe(null);
+
+          expect(strategy2).not.toBe(strategy1);
+        });
+
         it("should not update the modeFixed of the internal mapping", function() {
 
           var internalMode1 = modelAdapter.model.roleA.modeFixed;
