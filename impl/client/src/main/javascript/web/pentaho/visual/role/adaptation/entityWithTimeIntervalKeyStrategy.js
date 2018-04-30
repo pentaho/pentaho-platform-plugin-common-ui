@@ -134,25 +134,31 @@ define([
 
             var rowIndex = dataTable.getNumberOfRows();
             while(rowIndex--) {
-              var cellIndex = inputFieldIndexes.length;
-              var inputCells = new Array(cellIndex);
+              var inputFieldCount = inputFieldIndexes.length;
+              var inputCells = new Array(inputFieldCount);
 
-              var cellLabels = new Array(cellIndex);
-              while(cellIndex--) {
+              var cellLabels = [];
+              var cellIndex = -1;
+              while(++cellIndex < inputFieldCount) {
                 inputCells[cellIndex] = dataTable.getCell(rowIndex, inputFieldIndexes[cellIndex]);
-                cellLabels[cellIndex] = inputCells[cellIndex].label;
+                var label = inputCells[cellIndex].label;
+                if(label) {
+                  cellLabels.push(label);
+                }
               }
 
               var mainInputCell = inputCells[this.mainInputPosition];
-
-              var dateValue = dateUtil.parseDateEcma262v7(mainInputCell.referent.property("startDateTime"));
+              var inputValue = mainInputCell.value;
+              var dateValue = inputValue !== null
+                ? dateUtil.parseDateEcma262v7(mainInputCell.referent.property("startDateTime"))
+                : null;
 
               var outputCell = dataTable.getCell(rowIndex, outputColIndex);
               outputCell.value = dateValue;
               outputCell.label = cellLabels.join(", ");
 
               this.__backIndex[this.__keyFun.call(null, dateValue)] = rowIndex;
-              this.__forwardIndex[mainInputCell.value] = rowIndex;
+              this.__forwardIndex[inputValue === null ? "" : inputValue] = rowIndex;
             }
 
             instSpec = Object.create(instSpec);
@@ -170,7 +176,7 @@ define([
           map: function(inputValues) {
             var lookupValue = dataUtil.getCellValue(inputValues[this.mainInputPosition]);
 
-            var rowIndex = this.__forwardIndex[lookupValue];
+            var rowIndex = this.__forwardIndex[lookupValue === null ? "" : lookupValue];
             if(rowIndex != null) {
               return this._getDataRowCells(rowIndex, this.outputFieldIndexes);
             }

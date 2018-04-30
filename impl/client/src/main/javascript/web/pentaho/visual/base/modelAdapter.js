@@ -753,6 +753,9 @@ define([
 
       // Only re-evaluate the visual role if it has changed since previousAdaptationModel was created.
       var change = changeset !== null ? changeset.getChange(propType) : null;
+      if(change !== null && !change.hasChanges) {
+        change = null;
+      }
 
       // If no externalData (and data has not changed),
       // then all reused roleInfo already have null strategyApplication and strategy.

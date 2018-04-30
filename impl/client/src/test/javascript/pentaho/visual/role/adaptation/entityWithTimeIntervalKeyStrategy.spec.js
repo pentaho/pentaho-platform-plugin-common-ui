@@ -230,7 +230,7 @@ define([
               "pentaho/visual/role/adaptation/entityWithTimeIntervalKeyStrategy"
             ], function(_Strategy) {
               Strategy = _Strategy;
-          });
+            });
         });
     });
 
@@ -372,6 +372,19 @@ define([
             }
           }
         );
+
+        it("should deal with null input cells", function() {
+
+          dataTable.getCell(1, datasetFieldIndexes.months).value = null;
+
+          var strategy = Strategy.type.apply(dataTable, [datasetFieldIndexes.years, datasetFieldIndexes.months]);
+
+          var newColIndex = strategy.outputFieldIndexes[0];
+
+          var newCell = dataTable.getCell(1, newColIndex);
+
+          expect(newCell.value).toEqual(null);
+        });
 
         it("should deal with cells missing startDateTime value", function() {
           dataTable.getColumnAttribute(datasetFieldIndexes.months).members[1].property("startDateTime", null);
