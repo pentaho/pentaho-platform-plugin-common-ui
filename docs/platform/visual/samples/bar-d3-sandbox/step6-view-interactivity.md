@@ -47,8 +47,9 @@ Modify the factory declaration of the `view-d3.js` file to the following:
 define([
   "module",
   "d3",
+  "pentaho/visual/scene/Base",
   "css!./css/view-d3",
-], function(module, d3) {
+], function(module, d3, Scene) {
   
   return [
     "pentaho/visual/base/view",
@@ -76,12 +77,12 @@ function() {
   // Part 3
   var view = this;
   
-  bar.on("dblclick", function(d) {
+  bar.on("dblclick", function(scene) {
     // A filter that would select the data that the bar visually represents
-    var filterSpec = { _: "=", property: categoryField, value: d.category };
+    var filter = scene.createFilter();
 
     // Create the action.
-    var action = new ExecuteAction({ dataFilter: filterSpec });
+    var action = new ExecuteAction({dataFilter: filter});
 
     // Dispatch the action through the view.
     view.act(action);
@@ -90,8 +91,8 @@ function() {
 ```
 
 Remarks:
-  - An [isEqual]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.filter.IsEqual'}}) 
-    filter is being created; `=` is the alias of the filter type. 
+  - The scene object knows how to create a filter for the data it represents
+    (see [createFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.scene.Base' | append: '#createFilter''}})). 
   - The action is being dispatched through the view, where action listeners can handle it. 
 
 ### Handling of the `execute` action event
@@ -104,7 +105,7 @@ In the `sandbox.html` file you can find the following statements:
 ```js
 view.on("pentaho/visual/action/execute", {
   "do": function(action) {
-    alert("Executed " + action.dataFilter.contentKey);
+    alert("Executed " + action.dataFilter.$contentKey);
   }
 });
 ```
@@ -114,7 +115,7 @@ Remarks:
   - Actions emit _structured_ events, composed of multiple phases; you're handling its `do` phase.
   - Action listener functions receive the action as argument.
   - The filter's 
-    [contentKey]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.filter.Abstract' | append: '#contentKey'}})
+    [$contentKey]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.filter.Abstract' | append: '#$contentKey'}})
     property provides an easy way to get a human-readable description of a filter.
 
 What are you waiting for? 
@@ -148,8 +149,9 @@ Modify the type factory declaration of the `view-d3.js` file to the following:
 define([
   "module",
   "d3",
+  "pentaho/visual/scene/Base",
   "css!./css/view-d3",
-], function(module, d3) {
+], function(module, d3, Scene) {
   
   return [
     "pentaho/visual/base/view",
@@ -178,10 +180,13 @@ function() {
   // Part 4
   bar.on("click", function(d) {
     // A filter that would select the data that the bar visually represents
-    var filterSpec = { _: "=", property: categoryField, value: d.category };
+    var filter = scene.createFilter();
 
     // Create the action.
-    var action = new SelectAction({dataFilter: filterSpec, selectionMode: event.ctrlKey || event.metaKey ? "toggle" : "replace"});
+    var action = new SelectAction({
+      dataFilter: filter, 
+      selectionMode: event.ctrlKey || event.metaKey ? "toggle" : "replace"
+    });
 
     // Dispatch the action through the view.
     view.act(action);
@@ -192,7 +197,8 @@ function() {
 Remarks:
   - Each time a bar is clicked, the current view's `selectionFilter` will be 
     [replaced]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action' | append: '#.SelectionModes'}})
-    with the data filter associated with the clicked bar, or [toggled]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action' | append: '#.SelectionModes'}})
+    with the data filter associated with the clicked bar, or 
+    [toggled]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action' | append: '#.SelectionModes'}})
     if the ctrl/cmd key is pressed.
 
 ### Handling of the `select` action event
@@ -204,7 +210,8 @@ In `sandbox.html` you can analyze this block of code:
 ```js
 view.on("pentaho/visual/action/select", {
   "finally": function(action) {
-    document.getElementById("messages_div").innerText = "Selected: " + view.selectionFilter.contentKey;
+    document.getElementById("messages_div").innerText =
+      "Selected: " + view.selectionFilter.$contentKey;
   }
 });
 ```
@@ -250,9 +257,9 @@ function() {
   // ...
   
   // Part 5
-  bar.classed("selected", function(d) {
+  bar.classed("selected", function(scene) {
     var selectionFilter = view.selectionFilter;
-    return !!selectionFilter && dataTable.filterMatchesRow(selectionFilter, d.rowIndex);
+    return !!selectionFilter && dataTable.filterMatchesRow(selectionFilter, scene.index);
   });
 }
 ```

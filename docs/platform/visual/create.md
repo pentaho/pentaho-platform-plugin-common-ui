@@ -23,7 +23,8 @@ In the previous section you developed a custom visualization and tested it in a 
 If you exclude the sandbox specific files, you are left with the `package.json`, `model.js`, `view-d3.js`, `config.js`
 files and a `css` folder. Those are the files to be packaged.
 
-Additionally, any runtime client-side dependencies must also be provided to the platform. In this case, D3 (@pentaho/viz-api is a dev-time dependency).
+Additionally, any runtime client-side dependencies must also be provided to the platform.
+In this case, D3 (`@pentaho/viz-api` is a dev-time dependency).
 Dependencies can be provided separately in their own package or bundled together with your visualization.
 
 In short, for packaging your visualization you just need to zip your files and runtime dependencies.

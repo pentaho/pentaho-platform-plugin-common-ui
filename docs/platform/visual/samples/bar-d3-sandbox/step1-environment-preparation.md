@@ -109,7 +109,7 @@ npm install
               ], function (Context, Table, dataSpec) {
 
                 // Setup up a VizAPI context.
-                Context.createAsync({ application: "viz-api-sandbox" })
+                Context.createAsync({application: "viz-api-sandbox"})
                   .then(function (context) {
                     // Get the model and base view types
                     return context.getDependencyAsync({
@@ -151,14 +151,15 @@ npm install
                     // Handle the execute action.
                     view.on("pentaho/visual/action/execute", {
                       "do": function (event, action) {
-                        alert("Executed " + action.dataFilter.contentKey);
+                        alert("Executed " + action.dataFilter.$contentKey);
                       }
                     });
 
                     // Handle the select action.
                     view.on("pentaho/visual/action/select", {
                       "finally": function (event, action) {
-                        document.getElementById("messages_div").innerText = "Selected: " + view.selectionFilter.contentKey;
+                        document.getElementById("messages_div").innerText = 
+                          "Selected: " + view.selectionFilter.$contentKey;
                       }
                     });
 

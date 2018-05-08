@@ -58,8 +58,9 @@ Modify the AMD module declaration of the `view-d3.js` file to the following:
 define([
   "module",
   "d3",
+  "pentaho/visual/scene/Base",
   "css!./css/view-d3"
-], function(module, d3) {
+], function(module, d3, Scene) {
 
   // ...
 });

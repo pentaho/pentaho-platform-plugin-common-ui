@@ -15,7 +15,7 @@ layout: default
 Create a file named `view-d3.js` and place the following code in it:
 
 ```js
-define(["module", "d3"], function(module, d3) {
+define(["module", "d3", "pentaho/visual/scene/Base"], function(module, d3, Scene) {
   "use strict";
 
   return [
@@ -112,7 +112,7 @@ Edit the `sandbox.html` file and place the following code in it:
       ], function (Context, Table, dataSpec) {
 
         // Setup up a VizAPI context.
-        Context.createAsync({ application: "viz-api-sandbox" })
+        Context.createAsync({application: "viz-api-sandbox"})
           .then(function (context) {
             // Get the model and base view types
             return context.getDependencyAsync({
@@ -154,14 +154,15 @@ Edit the `sandbox.html` file and place the following code in it:
             // Handle the execute action.
             view.on("pentaho/visual/action/execute", {
               "do": function (action) {
-                alert("Executed " + action.dataFilter.contentKey);
+                alert("Executed " + action.dataFilter.$contentKey);
               }
             });
 
             // Handle the select action.
             view.on("pentaho/visual/action/select", {
               "finally": function (action) {
-                document.getElementById("messages_div").innerText = "Selected: " + view.selectionFilter.contentKey;
+                document.getElementById("messages_div").innerText =
+                  "Selected: " + view.selectionFilter.$contentKey;
               }
             });
 
@@ -219,13 +220,7 @@ function() {
   var model = this.model;
   var dataTable = model.data;
     
-  var categoryField = model.category.fields.at(0).name;
-  var measureField = model.measure.fields.at(0).name;
-    
-  var categoryColumn = dataTable.getColumnIndexById(categoryField);
-  var measureColumn = dataTable.getColumnIndexById(measureField);
-    
-  var scenes = this.__buildScenes(dataTable, categoryColumn, measureColumn);
+  var scenes = Scene.buildScenesFlat(this).children;
     
   var container = d3.select(this.domContainer);
     
@@ -236,51 +231,17 @@ function() {
 Remarks:
   - [this.model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#model'}}) 
     gives you access to the visualization model object.
-  - Both the visual roles are required, so it is safe to directly read the first mapped field.
-  - Most data table methods accept column indexes, so field names are converted into column indexes.
   - The data in the data table needs to be converted into an "array of plain objects" form, 
-    so that then it can be directly consumed by D3.
+    so that then it can be directly consumed by D3; 
+    to that end, 
+    the [pentaho.visual.scene.Base]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.scene.Base'}}) helper
+    class is used.
   - [this.domContainer]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#domContainer'}})
     gives you access to the DIV where rendering should take place.
 
-Now, you'll make a small detour to create that new `__buildScenes` method.
-
-### Method `__buildScenes`
-
-Add a property `__buildScenes`, after `_updateAll`, and give it the following code:
-
-```js
-// view-d3.js
-// __buildScenes: 
-function(dataTable, categoryColumn, measureColumn) {
-  
-  var scenes = [];
-  
-  for(var i = 0, R = dataTable.getNumberOfRows(); i < R; i++) {
-    scenes.push({
-      category:      dataTable.getValue(i, categoryColumn),
-      categoryLabel: dataTable.getFormattedValue(i, categoryColumn),
-      measure:       dataTable.getValue(i, measureColumn),
-      rowIndex:      i
-    });
-  }
-
-  return scenes;
-}
-```
-
-Remarks:
-  - Note the data table methods which can be used to traverse it:
-    [getNumberOfRows]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.ITable' | append: '#getNumberOfRows'}}),
-    [getValue]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.ITable' | append: '#getValue'}}) and
-    [getFormattedValue]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.ITable' | append: '#getFormattedValue'}}).
-  - In the X axis, you'll be displaying the value of `categoryLabel`, 
-    but the value of `category` (and of `rowIndex`) will be useful, later, 
-    for adding interactivity to the visualization. 
-
 ### Method `_updateAll`, part 2
 
-Having prepared the data for rendering, you'll now add the adapted D3 code:
+Now, add the following adapted D3 code:
 
 ```js
 // view-d3.js
@@ -300,17 +261,17 @@ function() {
   var x = d3.scaleBand().rangeRound([0, width]).padding(0.1);
   var y = d3.scaleLinear().rangeRound([height, 0]);
 
-  x.domain(scenes.map(function(d) { return d.categoryLabel; }));
-  y.domain([0, d3.max(scenes, function(d) { return d.measure; })]);
+  x.domain(scenes.map(function(scene) { return scene.vars.category.toString(); }));
+  y.domain([0, d3.max(scenes, function(scene) { return scene.vars.measure.value; })]);
 
   var svg = container.append("svg")
       .attr("width",  this.width)
       .attr("height", this.height);
 
   // Title
-  var title = dataTable.getColumnLabel(measureColumn) +
-              " per " +
-              dataTable.getColumnLabel(categoryColumn);
+  var title = this.__getRoleLabel(model.measure) + 
+              " per " + 
+              this.__getRoleLabel(model.category);
 
   svg.append("text")
       .attr("class", "title")
@@ -340,8 +301,8 @@ function() {
   var barWidth  = Math.min(model.barSize, bandWidth);
   var barOffset = bandWidth / 2 - barWidth / 2 + 0.5;
 
-  var selectColor = function(d) {
-    return model.palette.colors.at(d.rowIndex % model.palette.colors.count).value;
+  var selectColor = function(scene) {
+    return model.palette.colors.at(scene.index % model.palette.colors.count).value;
   };
 
   var bar = g.selectAll(".bar")
@@ -350,10 +311,10 @@ function() {
       .attr("class", "bar")
       .attr("fill", selectColor)
       .attr("stroke", selectColor)
-      .attr("x", function(d) { return x(d.categoryLabel) + barOffset; })
-      .attr("y", function(d) { return y(d.measure); })
+      .attr("x", function(scene) { return x(scene.vars.category.toString()) + barOffset; })
+      .attr("y", function(scene) { return y(scene.vars.measure.value); })
       .attr("width", barWidth)
-      .attr("height", function(d) { return height - y(d.measure); });
+      .attr("height", function(scene) { return height - y(scene.vars.measure.value); });
 }
 ```
 
@@ -361,10 +322,51 @@ Remarks:
   - The view dimensions are available through 
     [this.width]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#width'}}) and 
     [this.height]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#height'}}).
+  - The dynamic chart title is built with the help of the `__getRoleLabel` method, which will be introduced below.
   - The chart title is build with the labels of the mapped fields, by calling 
     [getColumnLabel]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.ITable' | append: '#getColumnLabel'}}).
   - The Bar model's `barSize` property is being used to limit the width of bars.
-  - The rowIndex is being used to cycle through and select the bar color from the `palette` property.
+  - The scene objects, previously built by the
+    [pentaho.visual.scene.Base]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.scene.Base'}}) helper class, 
+    contain variables, one for each visual role; each variable has a value and a formatted value, 
+    which is obtained by calling the variable's `toString` method.
+  - Scene objects have an `index` property which is being used to cycle through and select the bar color 
+    from the `palette` property.
+
+Now, you'll make a small detour to create that new `__getRoleLabel` method.
+
+### Method `__getRoleLabel`
+
+Add a property `__getRoleLabel`, after `_updateAll`, and give it the following code:
+
+```js
+// view-d3.js
+// __getRoleLabel: 
+function(mapping) {
+  
+  if(!mapping.hasFields) {
+    return "";
+  }
+
+  var data = this.model.data;
+
+  var columnLabels = mapping.fieldIndexes.map(function(fieldIndex) {
+    return data.getColumnLabel(fieldIndex);
+  });
+
+  return columnLabels.join(", ");
+}
+```
+
+Remarks:
+  - The visual role mapping object's 
+    [fieldIndexes]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Mapping' | append: '#fieldIndexes'}}),
+    property conveniently gives you the indexes of the 
+    [fields]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Mapping' | append: '#fields'}}) 
+    mapped to a visual role.
+  - The label of a field is obtained from the data table's
+    [getColumnLabel]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.ITable' | append: '#getColumnLabel'}})
+    method.
 
 Now, refresh the `sandbox.html` page in the browser, and you should finally see a Bar chart!
 

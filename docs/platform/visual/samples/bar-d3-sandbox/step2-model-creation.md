@@ -65,15 +65,13 @@ define([
           {
             name: "category",
             base: "pentaho/visual/role/property",
-            levels: "ordinal",
-            fields: { isRequired: true, countMax: 1 }
+            fields: {isRequired: true}
           },
           {
             name: "measure",
             base: "pentaho/visual/role/property",
-            levels: "quantitative",
-            dataType: "number",
-            fields: { isRequired: true, countMax: 1 }
+            modes: [{dataType: "number"}],
+            fields: {isRequired: true}
           },
 
           // Palette property
@@ -135,18 +133,13 @@ That's as simple as it gets.
 specification = {
   name: "category",
   base: "pentaho/visual/role/property",
-  levels: ["ordinal"],
-  fields: {isRequired: true, countMax: 1}
+  fields: {isRequired: true}
 }
 ```
 
 Represents the _Category_ visual role.
 The property is of a special type, 
 a [visual role property]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property'}}).
-Having `ordinal` as 
-[levels]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property.Type' | append: '#levels'}})
-means that it can visually encode discrete values 
-and their relative order.
 
 The [data]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model' | append: '#data'}}) property, 
 which is inherited from the base visualization model, 
@@ -156,12 +149,18 @@ e.g.: `{fields: ["productFamily"]}`.
 So, the value of a visual role is an object with a list property named 
 [fields]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Mapping' | append: '#fields'}}).
 
-Because by default, any number of fields can be mapped to a visual role, including 0 or 10, 
-it is necessary to limit the cardinality limits of the internal `fields` list, 
-so that it accepts and requires a single field.
-For that we use the special 
+The [modes]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property.Type' | append: '#modes'}})
+attribute was not specified. It defaults to a single mode of the `"string"` data type.
+Thus, the visual role will accept being mapped to fields of type `"string"`. 
+
+Because the default data type is `"string"`, 
+the visual role can be mapped to at most one `"string"` field 
+(for it to accept more than one `"string"` field, 
+it would need to have the "list of strings" data type: "`["string"]`).
+However, it is optional by default. To make it required, 
+the special 
 [fields]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property.Type' | append: '#fields'}})
-syntax that this property type provides.
+attribute is configured.
 
 ## The `measure` property
 
@@ -169,22 +168,14 @@ syntax that this property type provides.
 specification = {
   name: "measure",
   base: "pentaho/visual/role/property",
-  levels: ["quantitative"],
-  dataType: "number",
-  fields: {isRequired: true, countMax: 1}
+  modes: [{dataType: "number"}],
+  fields: {isRequired: true}
 }
 ```
 
 Represents the _Measure_ visual role. 
-Having `quantitative` as 
-[levels]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property.Type' | append: '#levels'}})
-means that it can visually represent the proportion between values (_this is twice that_).
-The quantitative data types are 
-[date]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Date'}})
-and 
-[number]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Number'}}).
-The [dataType]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Mapping.Type' | append: '#dataType'}})
-property is used to only allow mapping to fields of type `number`.
+Having a single mode with the `"number"` data type, 
+the visual role accepts a single field of data type `"number"`. 
 
 ## The `palette` property
 
@@ -197,7 +188,8 @@ specification = {
 }
 ```
 
-Represents a color palette (see [pentaho/visual/color/paletteProperty]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.PaletteProperty'}})). 
+Represents a color palette 
+(see [pentaho/visual/color/paletteProperty]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.PaletteProperty'}})). 
 
 The value of the property will default to the highest ranked system color palette that 
 matches the [level]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.PaletteProperty.Type#levels'}}) required by it.

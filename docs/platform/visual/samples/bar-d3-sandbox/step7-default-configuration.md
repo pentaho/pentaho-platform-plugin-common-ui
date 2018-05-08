@@ -43,7 +43,7 @@ define(["module"], function(module) {
         },
         apply: {
           props: {
-            barSize: { defaultValue: 50 }
+            barSize: {defaultValue: 50}
           }
         }
       }
