@@ -162,7 +162,7 @@ Edit the `sandbox.html` file and place the following code in it:
             view.on("pentaho/visual/action/select", {
               "finally": function (action) {
                 document.getElementById("messages_div").innerText =
-                  "Selected: " + view.selectionFilter.$contentKey;
+                  "Selected: " + view.model.selectionFilter.$contentKey;
               }
             });
 

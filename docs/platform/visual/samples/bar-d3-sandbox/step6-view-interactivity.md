@@ -125,12 +125,12 @@ Refresh the `sandbox.html` page in the browser, and double-click a bar!
 
 The `select` action is an _auxiliary_ action.
 Its goal is to mark a subset of data on which, later, a _real_ action, such as drilling-down, is performed.
-The current set of selected data is stored in the view's 
-[selectionFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#selectionFilter'}})
+The current set of selected data is stored in the model's 
+[selectionFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model' | append: '#selectionFilter'}})
 property.
 For each `select` action that is performed, 
 its [dataFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select' | append: '#dataFilter'}}), 
-may be removed from, be added to, replace or toggled in the view's current `selectionFilter`, 
+may be removed from, be added to, replace or toggled in the model's current `selectionFilter`, 
 according to the action's 
 [selectionMode]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select' | append: '#selectionMode'}}).
 
@@ -195,7 +195,7 @@ function() {
 ```
 
 Remarks:
-  - Each time a bar is clicked, the current view's `selectionFilter` will be 
+  - Each time a bar is clicked, the current model's `selectionFilter` will be 
     [replaced]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action' | append: '#.SelectionModes'}})
     with the data filter associated with the clicked bar, or 
     [toggled]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action' | append: '#.SelectionModes'}})
@@ -211,7 +211,7 @@ In `sandbox.html` you can analyze this block of code:
 view.on("pentaho/visual/action/select", {
   "finally": function(action) {
     document.getElementById("messages_div").innerText =
-      "Selected: " + view.selectionFilter.$contentKey;
+      "Selected: " + view.model.selectionFilter.$contentKey;
   }
 });
 ```
@@ -220,8 +220,8 @@ Remarks:
   - You're handling the `finally` phase of the `select` action, the last phase, that is called whatever happens.
   - The `select` action's 
     [default action]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select' | append: '#_doDefault'}})
-    automatically processes the action's `dataFilter` and `selectionMode` and applies it to the view's
-    `selectionFilter`. We are using the content's of the view's `selectionFilter` property for displaying the final result.
+    automatically processes the action's `dataFilter` and `selectionMode` and applies it to the model's
+    `selectionFilter`. We are using the content's of the model's `selectionFilter` property for displaying the final result.
 
 Refresh the `sandbox.html` page in the browser, and click a bar!
 You should see a text under the visualization showing the selected data's filter.
@@ -258,7 +258,7 @@ function() {
   
   // Part 5
   bar.classed("selected", function(scene) {
-    var selectionFilter = view.selectionFilter;
+    var selectionFilter = model.selectionFilter;
     return !!selectionFilter && dataTable.filterMatchesRow(selectionFilter, scene.index);
   });
 }

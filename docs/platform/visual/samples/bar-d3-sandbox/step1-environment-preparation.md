@@ -159,7 +159,7 @@ npm install
                     view.on("pentaho/visual/action/select", {
                       "finally": function (event, action) {
                         document.getElementById("messages_div").innerText = 
-                          "Selected: " + view.selectionFilter.$contentKey;
+                          "Selected: " + view.model.selectionFilter.$contentKey;
                       }
                     });
 
