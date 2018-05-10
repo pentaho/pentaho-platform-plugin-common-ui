@@ -321,8 +321,8 @@ Note that, additionally, the data table method `getColumnIndexByAttribute` has b
 The code of a `View` class is, in part, 
 made up of code that transforms the data in the data table into a form which is suitable for rendering.
 This form is typically written in the namespace of visual roles, such as in: 
-the value of `x` is `1` and the value of `series` is `Portugal`. 
-The fields that were mapped to visual roles are not relevant for most rendering purposes.
+the value of `x` is `1` and the value of `series` is `Portugal`.
+The name of the fields which were mapped to the visual roles are not relevant for most rendering purposes.
 
 Additionally, when handling user interaction, a view needs to, for example, 
 translate mouse events on specific visual elements into actions such as 

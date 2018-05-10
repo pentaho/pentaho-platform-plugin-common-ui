@@ -92,7 +92,7 @@ function() {
 
 Remarks:
   - The scene object knows how to create a filter for the data it represents
-    (see [createFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.scene.Base' | append: '#createFilter''}})). 
+    (see [createFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.scene.Base' | append: '#createFilter'}})). 
   - The action is being dispatched through the view, where action listeners can handle it. 
 
 ### Handling of the `execute` action event
