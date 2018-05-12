@@ -193,6 +193,7 @@
               <outputDirectory>${project.build.outputDirectory}</outputDirectory>
               <appendAssemblyId>false</appendAssemblyId>
               <finalName>web</finalName>
+              <attach>false</attach>
             </configuration>
           </execution>
         </executions>
