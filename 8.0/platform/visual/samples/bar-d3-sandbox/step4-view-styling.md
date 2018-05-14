@@ -7,7 +7,7 @@ grand-parent-title: Create a Custom Visualization
 grand-parent-path: ../../create
 grand-grand-parent-title: Visualization API
 grand-grand-parent-path: ../..
-layout: default
+layout: 8.0_default
 ---
 
 Noticed that before you added CSS classes to some of the SVG elements? 
@@ -46,7 +46,7 @@ Create a folder named `css` and, in it, create a file named `view-d3.css`. Add t
 
 Remarks:
   - The CSS rules are scoped with the visualization model's
-    CSS [style class]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#styleClass'}}), 
+    CSS [style class]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.type.Type' | append: '#styleClass'}}), 
     previously specified when defining the model.
 
 ## Loading the CSS file with the view
@@ -58,9 +58,8 @@ Modify the AMD module declaration of the `view-d3.js` file to the following:
 define([
   "module",
   "d3",
-  "pentaho/visual/scene/Base",
   "css!./css/view-d3"
-], function(module, d3, Scene) {
+], function(module, d3) {
 
   // ...
 });

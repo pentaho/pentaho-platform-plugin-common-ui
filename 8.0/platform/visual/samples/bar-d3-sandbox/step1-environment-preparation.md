@@ -7,7 +7,7 @@ grand-parent-title: Create a Custom Visualization
 grand-parent-path: ../../create
 grand-grand-parent-title: Visualization API
 grand-grand-parent-path: ../..
-layout: default
+layout: 8.0_default
 ---
 
 {% include callout.html content="<h2>Fast-lane</h2>
@@ -109,7 +109,7 @@ npm install
               ], function (Context, Table, dataSpec) {
 
                 // Setup up a VizAPI context.
-                Context.createAsync({application: "viz-api-sandbox"})
+                Context.createAsync({ application: "viz-api-sandbox" })
                   .then(function (context) {
                     // Get the model and base view types
                     return context.getDependencyAsync({
@@ -122,8 +122,8 @@ npm install
                     // Create the visualization model.
                     var modelSpec = {
                       "data": new Table(dataSpec),
-                      "levels": {fields: ["productFamily"]},
-                      "measure": {fields: ["sales"]},
+                      "levels": {attributes: ["productFamily"]},
+                      "measure": {attributes: ["sales"]},
                       "operation": "avg"
                     };
                                                 
@@ -150,16 +150,15 @@ npm install
                   .then(function (view) {
                     // Handle the execute action.
                     view.on("pentaho/visual/action/execute", {
-                      "do": function (event, action) {
-                        alert("Executed " + action.dataFilter.$contentKey);
+                      "do": function (action) {
+                        alert("Executed " + action.dataFilter.contentKey);
                       }
                     });
 
                     // Handle the select action.
                     view.on("pentaho/visual/action/select", {
-                      "finally": function (event, action) {
-                        document.getElementById("messages_div").innerText = 
-                          "Selected: " + view.model.selectionFilter.$contentKey;
+                      "finally": function (action) {
+                        document.getElementById("messages_div").innerText = "Selected: " + view.selectionFilter.contentKey;
                       }
                     });
 

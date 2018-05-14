@@ -7,7 +7,7 @@ grand-parent-title: Create a Custom Visualization
 grand-parent-path: ../../create
 grand-grand-parent-title: Visualization API
 grand-grand-parent-path: ../..
-layout: default
+layout: 8.0_default
 ---
 
 While all visualization container applications should be able to use any visualization, 
@@ -43,7 +43,7 @@ define(["module"], function(module) {
         },
         apply: {
           props: {
-            barSize: {defaultValue: 50}
+            barSize: { defaultValue: 50 }
           }
         }
       }
@@ -61,7 +61,7 @@ We'll use the Sandbox environment to make sure.
 ## Register the configuration module in the sandbox
 
 It is still necessary to register the configuration module with the configuration system.
-For such, edit the `package.json` file and add a [`pentaho/instanceInfo`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.instanceInfo'}})
+For such, edit the `package.json` file and add a [`pentaho/instanceInfo`]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.instanceInfo'}})
 configuration so that your file looks like this:
 
 ```json
@@ -102,14 +102,14 @@ Go ahead and experiment with different values.
 ## Analyzer Integration
 
 In [Analyzer](http://www.pentaho.com/product/business-visualization-analytics), 
-when drilling-down, the default behaviour is to _add_ the child field to the visual role 
-where the parent field is.
-However, the _Category_ visual role of the Bar visualization you developed only accepts a single field 
+when drilling-down, the default behaviour is to _add_ the child attribute to the visual role 
+where the parent attribute is.
+However, the _Category_ visual role of the Bar visualization you developed only accepts a single attribute 
 being mapped to it. This results in Analyzer not allowing to drill-down.
 
 However, it is possible to configure the Analyzer-specific metadata property, 
 `application.keepLevelOnDrilldown` to force replacing the
-parent field with the child field when drilling-down.
+parent attribute with the child attribute when drilling-down.
 Add the following rule to the `config.js` file:
 
 ```js
