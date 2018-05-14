@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "en-us" }}">
+<head>
+  {% include default-html-headers.html %}
+</head>
+
+<body class="intro-layout">
+  {% include default-site-header.html %}
+
+  <section id="main-content" class="main-content">
+    <div class="callout callout-danger">
+      <p>This documentation targets the API <b>shipped with Pentaho 8.0</b>. <a href="{{ "/" | relative_url }}">Click here for the updated version shipped with Pentaho 8.1</a>.</p>
+    </div>
+
+    <h1 class="page-title">{{ page.title }}</h1>
+
+    {{ content }}
+  </section>
+
+  {% include 8.0_default-footer-learn-more.html %}
+  {% include default-footer-community.html %}
+</body>
+</html>

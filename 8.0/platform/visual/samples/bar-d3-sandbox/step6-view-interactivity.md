@@ -7,31 +7,31 @@ grand-parent-title: Create a Custom Visualization
 grand-parent-path: ../../create
 grand-grand-parent-title: Visualization API
 grand-grand-parent-path: ../..
-layout: default
+layout: 8.0_default
 ---
 
 Visualizations can be much more fun and useful if the user is able to interact with them.
 The Visualization API defines two standard types of actions: 
-[execute]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Execute'}}) and
-[select]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select'}}).
+[execute]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.visual.action.Execute'}}) and
+[select]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.visual.action.Select'}}).
 Most container applications handle these in some useful way.
 
 ## On data actions and filters...
 
 Visualization API 
-[data actions]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.mixins.Data'}}) 
+[data actions]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.visual.action.Data'}}) 
 carry information that _identifies_ the visual element with which the user interacted 
 in terms of the subset of data that it visually represents.
 This is conveyed in their
-[dataFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.mixins.Data' | append: '#dataFilter'}})
+[dataFilter]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.visual.action.Data' | append: '#dataFilter'}})
 property.
 
 In this visualization, 
 because 
 each bar represents a category of the data, 
-and the _Category_ visual role is mapped to a single field, 
+and the _Category_ visual role is mapped to a single data attribute, 
 then 
-each bar corresponds to a distinct value of the mapped field.
+each bar corresponds to a distinct value of the mapped data attribute.
 
 ## Implementing the `execute` action
 
@@ -47,9 +47,8 @@ Modify the factory declaration of the `view-d3.js` file to the following:
 define([
   "module",
   "d3",
-  "pentaho/visual/scene/Base",
   "css!./css/view-d3",
-], function(module, d3, Scene) {
+], function(module, d3) {
   
   return [
     "pentaho/visual/base/view",
@@ -77,12 +76,12 @@ function() {
   // Part 3
   var view = this;
   
-  bar.on("dblclick", function(scene) {
+  bar.on("dblclick", function(d) {
     // A filter that would select the data that the bar visually represents
-    var filter = scene.createFilter();
+    var filterSpec = { _: "=", property: categoryAttribute, value: d.category };
 
     // Create the action.
-    var action = new ExecuteAction({dataFilter: filter});
+    var action = new ExecuteAction({ dataFilter: filterSpec });
 
     // Dispatch the action through the view.
     view.act(action);
@@ -91,8 +90,8 @@ function() {
 ```
 
 Remarks:
-  - The scene object knows how to create a filter for the data it represents
-    (see [createFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.scene.Base' | append: '#createFilter'}})). 
+  - An [isEqual]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.data.filter.IsEqual'}}) 
+    filter is being created; `=` is the alias of the filter type. 
   - The action is being dispatched through the view, where action listeners can handle it. 
 
 ### Handling of the `execute` action event
@@ -105,7 +104,7 @@ In the `sandbox.html` file you can find the following statements:
 ```js
 view.on("pentaho/visual/action/execute", {
   "do": function(action) {
-    alert("Executed " + action.dataFilter.$contentKey);
+    alert("Executed " + action.dataFilter.contentKey);
   }
 });
 ```
@@ -115,7 +114,7 @@ Remarks:
   - Actions emit _structured_ events, composed of multiple phases; you're handling its `do` phase.
   - Action listener functions receive the action as argument.
   - The filter's 
-    [$contentKey]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.filter.Abstract' | append: '#$contentKey'}})
+    [contentKey]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.data.filter.Abstract' | append: '#contentKey'}})
     property provides an easy way to get a human-readable description of a filter.
 
 What are you waiting for? 
@@ -125,14 +124,14 @@ Refresh the `sandbox.html` page in the browser, and double-click a bar!
 
 The `select` action is an _auxiliary_ action.
 Its goal is to mark a subset of data on which, later, a _real_ action, such as drilling-down, is performed.
-The current set of selected data is stored in the model's 
-[selectionFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model' | append: '#selectionFilter'}})
+The current set of selected data is stored in the view's 
+[selectionFilter]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.visual.base.View' | append: '#selectionFilter'}})
 property.
 For each `select` action that is performed, 
-its [dataFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select' | append: '#dataFilter'}}), 
-may be removed from, be added to, replace or toggled in the model's current `selectionFilter`, 
+its [dataFilter]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.visual.action.Data' | append: '#dataFilter'}}), 
+may be removed from, be added to, replace or toggled in the view's current `selectionFilter`, 
 according to the action's 
-[selectionMode]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select' | append: '#selectionMode'}}).
+[selectionMode]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.visual.action.Select' | append: '#selectionMode'}}).
 
 Visualizations typically highlight visual elements that represent data that is selected.
 Container applications typically expose actions, from which the user can choose,
@@ -149,9 +148,8 @@ Modify the type factory declaration of the `view-d3.js` file to the following:
 define([
   "module",
   "d3",
-  "pentaho/visual/scene/Base",
   "css!./css/view-d3",
-], function(module, d3, Scene) {
+], function(module, d3) {
   
   return [
     "pentaho/visual/base/view",
@@ -180,13 +178,10 @@ function() {
   // Part 4
   bar.on("click", function(d) {
     // A filter that would select the data that the bar visually represents
-    var filter = scene.createFilter();
+    var filterSpec = { _: "=", property: categoryAttribute, value: d.category };
 
     // Create the action.
-    var action = new SelectAction({
-      dataFilter: filter, 
-      selectionMode: event.ctrlKey || event.metaKey ? "toggle" : "replace"
-    });
+    var action = new SelectAction({dataFilter: filterSpec, selectionMode: event.ctrlKey || event.metaKey ? "toggle" : "replace"});
 
     // Dispatch the action through the view.
     view.act(action);
@@ -195,10 +190,9 @@ function() {
 ```
 
 Remarks:
-  - Each time a bar is clicked, the current model's `selectionFilter` will be 
-    [replaced]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action' | append: '#.SelectionModes'}})
-    with the data filter associated with the clicked bar, or 
-    [toggled]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action' | append: '#.SelectionModes'}})
+  - Each time a bar is clicked, the current view's `selectionFilter` will be 
+    [replaced]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.visual.action' | append: '#.SelectionModes'}})
+    with the data filter associated with the clicked bar, or [toggled]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.visual.action' | append: '#.SelectionModes'}})
     if the ctrl/cmd key is pressed.
 
 ### Handling of the `select` action event
@@ -210,8 +204,7 @@ In `sandbox.html` you can analyze this block of code:
 ```js
 view.on("pentaho/visual/action/select", {
   "finally": function(action) {
-    document.getElementById("messages_div").innerText =
-      "Selected: " + view.model.selectionFilter.$contentKey;
+    document.getElementById("messages_div").innerText = "Selected: " + view.selectionFilter.contentKey;
   }
 });
 ```
@@ -219,9 +212,9 @@ view.on("pentaho/visual/action/select", {
 Remarks:
   - You're handling the `finally` phase of the `select` action, the last phase, that is called whatever happens.
   - The `select` action's 
-    [default action]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select' | append: '#_doDefault'}})
-    automatically processes the action's `dataFilter` and `selectionMode` and applies it to the model's
-    `selectionFilter`. We are using the content's of the model's `selectionFilter` property for displaying the final result.
+    [default action]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.visual.action.Select' | append: '#_doDefault'}})
+    automatically processes the action's `dataFilter` and `selectionMode` and applies it to the view's
+    `selectionFilter`. We are using the content's of the view's `selectionFilter` property for displaying the final result.
 
 Refresh the `sandbox.html` page in the browser, and click a bar!
 You should see a text under the visualization showing the selected data's filter.
@@ -257,9 +250,9 @@ function() {
   // ...
   
   // Part 5
-  bar.classed("selected", function(scene) {
-    var selectionFilter = model.selectionFilter;
-    return !!selectionFilter && dataTable.filterMatchesRow(selectionFilter, scene.index);
+  bar.classed("selected", function(d) {
+    var selectionFilter = view.selectionFilter;
+    return !!selectionFilter && dataTable.filterMatchesRow(selectionFilter, d.rowIndex);
   });
 }
 ```

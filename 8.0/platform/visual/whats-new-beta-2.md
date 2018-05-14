@@ -2,7 +2,7 @@
 title: What's new and changed in the Visualization API beta 2
 description: Describes the new and changed features in the beta 2 of the Visualization API.
 parent-title: Visualization API
-layout: default
+layout: 8.0_default
 ---
 
 Be sure to also read [What's new and changed in the Platform JavaScript APIs beta 2](../whats-new-beta-2). 
@@ -20,9 +20,9 @@ or for configuring existing ones.
 Additionally, visualizations' views were expected to know and reach to this registry for obtaining appropriate color palettes.
 
 Color palettes are now a first class object of the Visualization API:
-[pentaho/visual/color/palette]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.Palette'}}).
+[pentaho/visual/color/palette]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.visual.color.Palette'}}).
 Depending on their intended use, 
-color palettes are classified to be of one the following [level]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.Palette#level'}})s:
+color palettes are classified to be of one the following [level]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.visual.color.Palette#level'}})s:
 
 1. `nominal`
 
@@ -37,9 +37,9 @@ color palettes are classified to be of one the following [level]({{site.refDocsU
     <img src="img/divergent1.png" alt="Divergent Color Scale" style="width: 300px;">
 
 Visualization models can now declare properties of the special `base` property type 
-[pentaho/visual/color/paletteProperty]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.PaletteProperty'}}),
+[pentaho/visual/color/paletteProperty]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.visual.color.PaletteProperty'}}),
 which declare the acceptable 
-color palette [levels]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.PaletteProperty.Type#levels'}}).
+color palette [levels]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.visual.color.PaletteProperty.Type#levels'}}).
 
 ```js
 BaseModel.extend({
@@ -66,7 +66,7 @@ To conform to the new naming rules of types,
 with respect to the equivalence between the module id and the provided type id, 
 we changed the module id of the base visual model to: `pentaho/visual/base/model`.
 This now matches the id of the type: 
-[pentaho.visual.base.Model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}).
+[pentaho.visual.base.Model]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.visual.base.Model'}}).
 
 This will impact your model types, if they extend directly from the base model.
 Also, this will impact the registration of visualizations as services. 
@@ -108,8 +108,8 @@ BaseModel.extend({
 });
 ```
 
-The `base` property type of [pentaho/visual/role/property]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property'}})
-is always used, and it is the [levels]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property.Type#levels'}}) attribute 
+The `base` property type of [pentaho/visual/role/property]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.visual.role.Property'}})
+is always used, and it is the [levels]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.visual.role.Property.Type#levels'}}) attribute 
 which is set to specify the measurement levels supported by the visual role.
 
 ## Procedure for converting a visualization from beta 1 to beta 2

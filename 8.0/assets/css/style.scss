@@ -1,0 +1,63 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+.main-content {
+  font-family: OpenSansLight, Helvetica, Arial, Sans serif;
+
+  padding: 2rem 1rem;
+
+  font-size: 1rem;
+  color: #333333;
+
+  p {
+    text-align: justify;
+  }
+
+  h1 {
+      font-weight: 300;
+      font-size: 275%;
+      color: #333333;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      margin: 0;
+      border-bottom: 1px solid #CCC;
+      clear: both;
+    }
+
+  h2 {
+      font-size: 225%;
+      font-weight: 300;
+  }
+
+  h3 {
+    font-weight: 600;
+    margin-top: 1rem;
+  }
+
+  h2, h3, h4, h5, h6 {
+    color: #414141;
+  }
+}
+
+a { color: #C00; text-decoration: none; }
+
+.api-list li.ground-layer {
+  background-color: #DDDDE1;
+}
+
+@media screen and (max-width: 64em) and (min-width: 42em) {
+  .main-content {
+    padding: 2rem 1rem;
+  }
+}
+
+@import "hitachi";
+@import "site-header";
+@import "page-header";
+
+@import "intro-page-header";
+
+@import "api-list";
+@import "callout";
