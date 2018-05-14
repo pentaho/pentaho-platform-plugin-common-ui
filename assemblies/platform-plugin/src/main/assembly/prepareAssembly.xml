@@ -52,28 +52,6 @@
       <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
 
-    <dependencySet>
-      <includes>
-        <include>org.dojotoolkit.dojo:dojo-release:zip</include>
-      </includes>
-      <useTransitiveDependencies>false</useTransitiveDependencies>
-      <unpack>true</unpack>
-      <outputDirectory>dojox</outputDirectory>
-      <useProjectArtifact>false</useProjectArtifact>
-    </dependencySet>
-
-    <dependencySet>
-      <includes>
-        <include>
-          org.webjars.*
-        </include>
-      </includes>
-      <useTransitiveDependencies>false</useTransitiveDependencies>
-      <unpack>true</unpack>
-      <outputDirectory>webjars</outputDirectory>
-      <useProjectArtifact>false</useProjectArtifact>
-    </dependencySet>
-
   </dependencySets>
 
 </assembly>

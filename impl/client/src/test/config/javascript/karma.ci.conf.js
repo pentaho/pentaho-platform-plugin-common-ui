@@ -5,6 +5,8 @@ module.exports = function(config) {
 
   config.set({
 
+    browserNoActivityTimeout: 20000,
+
     basePath: "${basedir}",
 
     frameworks: ["jasmine", "requirejs"],
@@ -21,7 +23,12 @@ module.exports = function(config) {
     reporters: ["progress", "junit", "coverage"],
 
     preprocessors: {
-      "${build.javascriptTestOutputDirectory}/**/*.js": ["coverage"]
+      // Include only the common-ui's Pentaho source code.
+      // All "bundled" external libs should be excluded.
+      "${build.outputDirectory}/web/(pentaho|angular-directives|cache|dataapi|dojo/pentaho)/**/*.js": ["coverage"],
+      "${build.outputDirectory}/web/(plugin-handler|prompting|repo|vizapi)/**/*.js": ["coverage"],
+      "${build.outputDirectory}/web/angular-translate/properties-parser.js": ["coverage"],
+      "${build.outputDirectory}/web/util/*.js": ["coverage"]
     },
 
     junitReporter: {

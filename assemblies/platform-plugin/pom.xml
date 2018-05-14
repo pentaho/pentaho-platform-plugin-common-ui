@@ -12,25 +12,29 @@
   <version>9.0.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Common-UI Platform Plugin</name>
-  <description>This module assembles the main zip file for Common-UI platform plugin. It builds it by fetching external dependencies,
-    GWT and pentaho client modules. In the process it makes sure that the required files are overwritten.
-    Because the mavenization process should maintain the old group and artifact identifiers in order to reduce the number
-    of changes downstream, this module also produces the zip for the javascript sources (js classifier) and the
-    java sources (sources classifier).</description>
+  <description>
+    This module assembles the main zip file for Common-UI platform plugin.
+    It builds it by fetching external dependencies, GWT and pentaho client modules.
+    Because the mavenization process should maintain the old group and artifact identifiers in order to reduce
+    the number of changes downstream, this module also produces the zip for the javascript sources (js classifier)
+    and the java sources (sources classifier).
+  </description>
   <properties>
-    <webjars.target.directory>${prepared.assembly.directory}/webjars/META-INF/resources/webjars</webjars.target.directory>
-    <js.assembly.directory>${project.build.directory}/${js.assembly.name}</js.assembly.directory>
-    <prepared.assembly.name>extrated-resources</prepared.assembly.name>
-    <handlebars.version>4.0.5</handlebars.version>
-    <common-ui-impl-client.directory>${prepared.assembly.directory}/common-ui-impl-client</common-ui-impl-client.directory>
-    <flexjson.version>2.1</flexjson.version>
-    <angular-translate.version>2.2.0-canary-pentaho-modified</angular-translate.version>
-    <pentaho-modeler.version>9.0.0.0-SNAPSHOT</pentaho-modeler.version>
-    <prepared.assembly.directory>${project.build.directory}/${prepared.assembly.name}</prepared.assembly.directory>
-    <commons-gwt.version>9.0.0.0-SNAPSHOT</commons-gwt.version>
-    <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
+    <!-- Directory for assembly-js-dir.xml -->
     <js.assembly.name>${project.artifactId}-${project.version}-js</js.assembly.name>
+    <js.assembly.directory>${project.build.directory}/${js.assembly.name}</js.assembly.directory>
+
+    <!-- Directory for prepareAssembly.xml -->
+    <prepared.assembly.name>extracted-resources</prepared.assembly.name>
+    <prepared.assembly.directory>${project.build.directory}/${prepared.assembly.name}</prepared.assembly.directory>
+
+    <common-ui-impl-client.directory>${prepared.assembly.directory}/common-ui-impl-client</common-ui-impl-client.directory>
     <gwt-widgets.directory>${prepared.assembly.directory}/gwt-widgets</gwt-widgets.directory>
+
+    <!-- Versions -->
+    <flexjson.version>2.1</flexjson.version>
+    <pentaho-modeler.version>9.0.0.0-SNAPSHOT</pentaho-modeler.version>
+    <commons-gwt.version>9.0.0.0-SNAPSHOT</commons-gwt.version>
   </properties>
   <dependencies>
     <dependency>
@@ -81,100 +85,6 @@
       <groupId>org.pentaho</groupId>
       <artifactId>common-ui-impl-client</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>jquery</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.bower</groupId>
-      <artifactId>jquery-i18n-properties</artifactId>
-      <version>${jquery-i18n-properties.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-animate</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-aria</artifactId>
-      <version>${angular.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-cookies</artifactId>
-      <version>${angular.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-loader</artifactId>
-      <version>${angular.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-message-format</artifactId>
-      <version>${angular.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-messages</artifactId>
-      <version>${angular.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-parse-ext</artifactId>
-      <version>${angular.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-resource</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-route</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-sanitize</artifactId>
-      <version>${angular.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-scenario</artifactId>
-      <version>${angular.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-touch</artifactId>
-      <version>${angular.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-i18n</artifactId>
-      <version>${angular.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>angular-translate</groupId>
-      <artifactId>angular-translate</artifactId>
-      <version>${angular-translate.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.bower</groupId>
-      <artifactId>dojo</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.bower</groupId>
-      <artifactId>dijit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.dojotoolkit.dojo</groupId>
-      <artifactId>dojo-release</artifactId>
-      <type>zip</type>
-      <classifier>src</classifier>
     </dependency>
   </dependencies>
   <build>

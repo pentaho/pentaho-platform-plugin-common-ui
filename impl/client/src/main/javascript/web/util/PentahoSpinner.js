@@ -41,7 +41,7 @@
     });
  */
 
-define("common-ui/util/PentahoSpinner", ['common-ui/util/spin.min', 'common-ui/util/Glasspane'], function(spinJs, glasspane) {
+define("common-ui/util/PentahoSpinner", ['common-ui/util/spin', 'common-ui/util/Glasspane'], function(spinJs, glasspane) {
 
   var local = {
 

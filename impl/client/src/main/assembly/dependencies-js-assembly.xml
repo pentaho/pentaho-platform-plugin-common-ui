@@ -1,62 +1,82 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<assembly xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3"
           xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3 http://maven.apache.org/xsd/assembly-1.1.3.xsd">
+
+  <id>common-ui-platform-plugin-js-dependencies</id>
+
+  <formats>
+    <format>dir</format>
+  </formats>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
 
   <fileSets>
 
     <fileSet>
-      <directory>${basedir}/src/main/resources/resources/web</directory>
-      <outputDirectory>common-ui</outputDirectory>
-      <filtered>true</filtered>
+      <directory>${build.javascriptSourceDirectory}/web</directory>
+      <outputDirectory>.</outputDirectory>
     </fileSet>
 
-    <!-- Fetch all the common-ui js first to make sure included dependencies are overwritten when needed. -->
     <fileSet>
-      <directory>${common-ui-impl-client.directory}/web</directory>
-      <outputDirectory>common-ui</outputDirectory>
+      <directory>${basedir}/src/main/resources-filtered/web</directory>
+      <filtered>true</filtered>
+      <outputDirectory>.</outputDirectory>
     </fileSet>
 
     <fileSet>
       <directory>${webjars.target.directory}/jquery/${jquery.version}/dist</directory>
-      <outputDirectory>common-ui/jquery</outputDirectory>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.map</exclude>
+      </excludes>
+      <outputDirectory>jquery</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/jquery/${jquery.version}</directory>
       <includes><include>LICENSE*</include></includes>
-      <outputDirectory>common-ui/jquery</outputDirectory>
+      <outputDirectory>jquery</outputDirectory>
     </fileSet>
 
     <fileSet>
       <directory>${webjars.target.directory}/angular/${angular.version}</directory>
-      <outputDirectory>common-ui/angular</outputDirectory>
+      <outputDirectory>angular</outputDirectory>
       <includes>
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
       <excludes>
         <exclude>*.gzip</exclude>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
       </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-animate/${angular.version}</directory>
-      <outputDirectory>common-ui/angular</outputDirectory>
+      <outputDirectory>angular</outputDirectory>
       <includes>
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-aria/${angular.version}</directory>
-      <outputDirectory>common-ui/angular</outputDirectory>
+      <outputDirectory>angular</outputDirectory>
       <includes>
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-cookies/${angular.version}</directory>
-      <outputDirectory>common-ui/angular</outputDirectory>
+      <outputDirectory>angular</outputDirectory>
       <includes>
         <include>angular*</include>
         <include>LICENSE*</include>
@@ -64,105 +84,134 @@
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-loader/${angular.version}</directory>
-      <outputDirectory>common-ui/angular</outputDirectory>
+      <outputDirectory>angular</outputDirectory>
       <includes>
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-message-format/${angular.version}</directory>
-      <outputDirectory>common-ui/angular</outputDirectory>
+      <outputDirectory>angular</outputDirectory>
       <includes>
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-messages/${angular.version}</directory>
-      <outputDirectory>common-ui/angular</outputDirectory>
+      <outputDirectory>angular</outputDirectory>
       <includes>
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-parse-ext/${angular.version}</directory>
-      <outputDirectory>common-ui/angular</outputDirectory>
+      <outputDirectory>angular</outputDirectory>
       <includes>
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-resource/${angular.version}</directory>
-      <outputDirectory>common-ui/angular</outputDirectory>
+      <outputDirectory>angular</outputDirectory>
       <includes>
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-route/${angular.version}</directory>
-      <outputDirectory>common-ui/angular</outputDirectory>
+      <outputDirectory>angular</outputDirectory>
       <includes>
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-sanitize/${angular.version}</directory>
-      <outputDirectory>common-ui/angular</outputDirectory>
+      <outputDirectory>angular</outputDirectory>
       <includes>
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-scenario/${angular.version}</directory>
-      <outputDirectory>common-ui/angular</outputDirectory>
+      <outputDirectory>angular</outputDirectory>
       <includes>
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-touch/${angular.version}</directory>
-      <outputDirectory>common-ui/angular</outputDirectory>
+      <outputDirectory>angular</outputDirectory>
       <includes>
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-i18n/${angular.version}</directory>
-      <outputDirectory>common-ui/angular/i18n</outputDirectory>
+      <outputDirectory>angular/i18n</outputDirectory>
       <includes>
         <include>angular*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
 
     <fileSet>
-      <directory>${webjars.target.directory}/dojo/${dojo.version}</directory>
-      <outputDirectory>common-ui/dojo/dojo</outputDirectory>
+      <directory>${build.dependenciesDirectory}/dojo-release-${dojo.version}-src</directory>
+      <outputDirectory>dojo</outputDirectory>
       <excludes>
-        <exclude>tests/**</exclude>
-      </excludes>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/dijit/${dojo.version}</directory>
-      <outputDirectory>common-ui/dojo/dijit</outputDirectory>
-      <excludes>
-        <exclude>tests/**</exclude>
-      </excludes>
-    </fileSet>
-    <fileSet>
-      <directory>${prepared.assembly.directory}/dojox/dojo-release-${dojo.version}-src/dojox</directory>
-      <outputDirectory>common-ui/dojo/dojox</outputDirectory>
-      <excludes>
-        <exclude>*/tests/**</exclude>
-        <exclude>*/*/tests/**</exclude>
-        <exclude>.gitmodules</exclude>
+        <exclude>dojox/*/tests/**</exclude>
+        <exclude>dojox/*/*/tests/**</exclude>
+        <exclude>dojox/.gitmodules</exclude>
+        <exclude>dijit/tests/**</exclude>
+        <exclude>dojo/tests/**</exclude>
+        <exclude>util/**</exclude>
       </excludes>
     </fileSet>
 
@@ -174,7 +223,7 @@
       <source>
         ${webjars.target.directory}/jquery-i18n-properties/${jquery-i18n-properties.version}/jquery.i18n.properties-min.js
       </source>
-      <outputDirectory>common-ui/jquery</outputDirectory>
+      <outputDirectory>jquery</outputDirectory>
     </file>
 
     <!-- Removed due to custom changes in the current common-ui version -->
@@ -182,7 +231,7 @@
     <!--<file>-->
     <!--<source>${webjars.target.directory}/handlebars/${handlebars.version}/dist/handlebars.js</source>-->
     <!--<destName>handlebars-v4.0.5.js</destName>-->
-    <!--<outputDirectory>common-ui/handlebars</outputDirectory>-->
+    <!--<outputDirectory>handlebars</outputDirectory>-->
     <!--</file>-->
 
   </files>
@@ -200,10 +249,10 @@
           <include>angular*</include>
         </includes>
       </unpackOptions>
-      <outputDirectory>common-ui/angular-translate</outputDirectory>
+      <outputDirectory>angular-translate</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
 
   </dependencySets>
 
-</component>
+</assembly>

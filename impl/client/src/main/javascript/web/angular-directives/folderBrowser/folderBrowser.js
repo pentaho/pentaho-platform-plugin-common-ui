@@ -23,7 +23,7 @@
 
 define([
   'common-ui/angular',
-  'common-ui/util/spin.min',
+  'common-ui/util/spin',
   'common-ui/util/PentahoSpinner'
 ],
 

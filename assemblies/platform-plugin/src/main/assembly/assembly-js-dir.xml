@@ -9,8 +9,14 @@
   </formats>
 
   <includeBaseDirectory>false</includeBaseDirectory>
-  <componentDescriptors>
-    <componentDescriptor>component-js.xml</componentDescriptor>
-  </componentDescriptors>
+  <fileSets>
+
+    <!-- Fetch all the common-ui js first to make sure included dependencies are overwritten when needed. -->
+    <fileSet>
+      <directory>${common-ui-impl-client.directory}/web</directory>
+      <outputDirectory>common-ui</outputDirectory>
+    </fileSet>
+
+  </fileSets>
 
 </assembly>
