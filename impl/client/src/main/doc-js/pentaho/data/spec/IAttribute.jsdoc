@@ -39,20 +39,6 @@
  * Specified values are recognized independently of their case.
  * The default value is {@link pentaho.data.AtomicTypeName.STRING}.
  *
- * @property {boolean} isContinuous Indicates if the attribute is considered **continuous**, or,
- * on the other hand, **categorical**.
- *
- * When the attribute's type is one of
- * {@link pentaho.data.AtomicTypeName.STRING} or
- * {@link pentaho.data.AtomicTypeName.BOOLEAN}
- * this property is **ignored** and the attribute is necessarily **categorical**.
- *
- * When the attribute's type is one of
- * {@link pentaho.data.AtomicTypeName.NUMBER} or
- * {@link pentaho.data.AtomicTypeName.DATE}
- * this property's _default value_ is `true`.
- * Otherwise, the property's default value is `false`.
- *
  * @property {Array.<pentaho.data.spec.IMember>} members
  * An array of member specifications.
  *
@@ -65,20 +51,6 @@
  * {@link pentaho.data.AtomicTypeName.NUMBER}.
  *
  * The default value is `false`.
- *
- * @property {boolean} isContinuous Indicates if the attribute is considered **continuous**, or,
- * on the other hand, **categorical**.
- *
- * When the attribute's type is one of
- * {@link pentaho.data.AtomicTypeName.STRING} or
- * {@link pentaho.data.AtomicTypeName.BOOLEAN}
- * this property is **ignored** and the attribute is necessarily **categorical**.
- *
- * When the attribute's type is one of
- * {@link pentaho.data.AtomicTypeName.NUMBER} or
- * {@link pentaho.data.AtomicTypeName.DATE}
- * this property's _default value_ is `true`.
- * Otherwise, the property's default value is `false`.
  *
  * @property {boolean} isKey Indicates if the attribute identifies rows, together with other key attributes.
  *
