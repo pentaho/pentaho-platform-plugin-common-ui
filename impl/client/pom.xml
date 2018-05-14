@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.pentaho</groupId>
     <artifactId>common-ui-impl</artifactId>
@@ -17,76 +19,105 @@
     for each of the constituents (e.g. vizapi, prompting) of the current artifact.</description>
 
   <properties>
-    <js.project.list>dojo,dijit,jquery,pentaho-cdf-js,dojo-release,angular,angular-mocks,angular-resource,angular-route,angular-animate</js.project.list>
+    <js.project.list>dojo-release,jquery,jquery-i18n-properties,pentaho-cdf-js,angular-mocks,angular,angular-resource,angular-route,angular-animate,angular-aria,angular-cookies,angular-loader,angular-message-format,angular-messages,angular-parse-ext,angular-sanitize,angular-scenario,angular-touch,angular-i18n,angular-translate</js.project.list>
     <build.javascriptReportDirectory>target/js-reports</build.javascriptReportDirectory>
-    <pentaho-cdf-plugin.version>9.0.0.0-SNAPSHOT</pentaho-cdf-plugin.version>
-
     <docjs.config.file>jsdoc-vizapi.json</docjs.config.file>
     <docjs.config.github.branch>master</docjs.config.github.branch>
     <docjs.config.template.directory>${project.basedir}/src/doc/javascript/template</docjs.config.template.directory>
+    <js.build.optimizer>uglify2</js.build.optimizer>
+    <requirejs.config.files.pattern>**/*-require-js-cfg.js</requirejs.config.files.pattern>
+    <webjars.target.directory>${build.dependenciesDirectory}/META-INF/resources/webjars</webjars.target.directory>
+
+    <!-- The parent POM declarations of these properties
+         use `project.rootdir` which does not seem to exist...
+    <frontend-maven-plugin.installDirectory>${project.basedir}/target</frontend-maven-plugin.installDirectory>
+    <frontend-maven-plugin.workingDirectory>${project.basedir}</frontend-maven-plugin.workingDirectory>
+     -->
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>org.webjars.bower</groupId>
-      <artifactId>dojo</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.bower</groupId>
-      <artifactId>dijit</artifactId>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.dojotoolkit.dojo</groupId>
       <artifactId>dojo-release</artifactId>
       <type>zip</type>
       <classifier>src</classifier>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>jquery</artifactId>
-      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.bower</groupId>
+      <artifactId>jquery-i18n-properties</artifactId>
     </dependency>
     <dependency>
       <groupId>pentaho</groupId>
       <artifactId>pentaho-cdf-js</artifactId>
-      <version>${pentaho-cdf-plugin.version}</version>
       <type>zip</type>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>*</artifactId>
-          <groupId>*</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>angular-mocks</artifactId>
-      <version>${angular.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>angular</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>angular-resource</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>angular-route</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>angular-animate</artifactId>
-      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-aria</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-cookies</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-loader</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-message-format</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-messages</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-parse-ext</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-sanitize</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-scenario</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-touch</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-i18n</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>angular-translate</groupId>
+      <artifactId>angular-translate</artifactId>
     </dependency>
   </dependencies>
 
@@ -103,76 +134,129 @@
     </testResources>
     <plugins>
       <plugin>
-        <groupId>com.github.eirslett</groupId>
-        <artifactId>frontend-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>javascript-test_npm-install</id>
-            <phase>${javascript-test_npm-install-phase}</phase>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>install</arguments>
-              <workingDirectory>${frontend-maven-plugin.installDirectory}</workingDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>javascript-test_karma</id>
-            <phase>${javascript-test_karma-phase}</phase>
-            <goals>
-              <goal>karma</goal>
-            </goals>
-            <configuration>
-              <karmaConfPath>${project.build.directory}/${karma.file.config}</karmaConfPath>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
           <execution>
-            <id>copy-javascript-resources</id>
-            <phase>process-resources</phase>
+            <!-- Need to copy common-ui-require-js-cfg.js to dependencies so it
+                 gets caught up by the `javascript-requirecfg_aggregate` parent pom execution. -->
+            <id>copy-own-config-to-dependencies</id>
+            <phase>${javascript_unpack-dependencies-phase}</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+              <outputDirectory>${build.dependenciesDirectory}/common-ui</outputDirectory>
               <resources>
                 <resource>
-                  <directory>${build.javascriptSourceDirectory}</directory>
+                  <filtering>true</filtering>
+                  <directory>${basedir}/src/main/resources-filtered/web</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>copy-requireCfg-bundles</id>
+            <phase>${javascript_unpack-dependencies-phase}</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${basedir}/src/main/config/resources</directory>
+                  <includes>
+                    <include>requireCfg.bundles.js</include>
+                  </includes>
                 </resource>
               </resources>
             </configuration>
           </execution>
         </executions>
       </plugin>
+
       <plugin>
-        <artifactId>maven-dependency-plugin</artifactId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>${maven-assembly-plugin.version}</version>
         <executions>
           <execution>
-            <id>javascript-copy-jquery-clean</id>
-            <phase>${javascript_unpack-dependencies-phase}</phase>
+            <id>bundle-common-ui-platform-plugin</id>
+            <phase>generate-sources</phase>
             <goals>
-              <goal>unpack</goal>
+              <goal>single</goal>
             </goals>
             <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.webjars.npm</groupId>
-                  <artifactId>jquery</artifactId>
-                  <version>${jquery.version}</version>
-                  <outputDirectory>${build.dependenciesDirectory}/jqueryClean</outputDirectory>
-                  <overWrite>true</overWrite>
-                </artifactItem>
-              </artifactItems>
+              <descriptors>
+                <descriptor>src/main/assembly/dependencies-js-assembly.xml</descriptor>
+              </descriptors>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+              <appendAssemblyId>false</appendAssemblyId>
+              <finalName>web</finalName>
             </configuration>
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <!-- TODO: remove this when RequireJS is upgraded to >= 2.2.0 -->
+          <excludes>
+            <exclude>web/compressed/build.txt</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
+  <!-- Need to "override" the `javascript-test` profile,
+      for a couple of reasons... -->
+  <profiles>
+    <profile>
+      <id>javascript-test-override</id>
+      <activation>
+        <property>
+          <name>!maven.test.skip</name>
+        </property>
+        <file>
+          <!-- Using ${javascriptTestSourceDirectory}, like in
+               the root pom, does not work.
+               The property seems to not have a value when this is
+               evaluated... -->
+          <exists>${basedir}/src/test/javascript</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <!-- Change the karmaConfPath. -->
+          <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>javascript-test_karma</id>
+                <configuration>
+                  <karmaConfPath>${project.build.directory}/${karma.file.config}</karmaConfPath>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <artifactId>maven-resources-plugin</artifactId>
+            <executions>
+              <!-- Not using the parent-pom defined `test-javascript` directory to run JS unit-tests.
+                   So disable the execution to not waste time copying files. -->
+              <execution>
+                <id>javascript-test_copy-resources</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

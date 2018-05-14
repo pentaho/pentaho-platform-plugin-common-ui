@@ -15,15 +15,6 @@
     <fileSet>
       <directory>${basedir}/src/main/resources</directory>
       <outputDirectory>common-ui</outputDirectory>
-      <excludes>
-        <exclude>resources/web/*</exclude>
-      </excludes>
-    </fileSet>
-
-    <fileSet>
-      <directory>${basedir}/src/main/resources/resources/web</directory>
-      <outputDirectory>common-ui/resources/web</outputDirectory>
-      <filtered>true</filtered>
     </fileSet>
 
     <fileSet>
@@ -44,22 +35,6 @@
   </fileSets>
 
   <dependencySets>
-
-    <dependencySet>
-      <includes>
-        <include>angular-translate:angular-translate</include>
-      </includes>
-      <useTransitiveDependencies>false</useTransitiveDependencies>
-      <unpack>true</unpack>
-      <unpackOptions>
-        <includes>
-          <include>angular*</include>
-        </includes>
-      </unpackOptions>
-      <outputDirectory>common-ui/resources/web/angular-translate</outputDirectory>
-      <useProjectArtifact>false</useProjectArtifact>
-    </dependencySet>
-
     <!-- Server side dependencies -->
     <dependencySet>
       <excludes>

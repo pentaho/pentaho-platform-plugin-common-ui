@@ -13,25 +13,19 @@ module.exports = function(config) {
 
     files: [
       "${project.build.directory}/context-begin.js",
-
-      "${build.dependenciesDirectory}/cdf/cdf-require-js-cfg.js",
-      "${build.javascriptTestConfigDirectory}/require-test.js",
+      "${build.dependenciesDirectory}/*/*-require-js-cfg.js",
       "${project.build.directory}/require.config.js",
-
+      "${build.javascriptTestConfigDirectory}/require-test.js",
       "${project.build.directory}/context-end.js",
 
-      {pattern: "${build.dependenciesDirectory}/*/**/*", included: false}, // /target/dependency/
-      {pattern: "${build.javascriptTestOutputDirectory}/**/*", included: false}, // target/test-javascript/
-      {pattern: "${build.javascriptTestSourceDirectory}/**/*", included: false} // src/test/javascript/
-    ],
+      // External dependencies not included in Common-UI (`/target/dependency`).
+      {pattern: "${build.dependenciesDirectory}/*/**/*", included: false},
 
-    exclude: [
-      // excluding these two folders because we are using the versions inside the webjars folder
-      "${build.dependenciesDirectory}/dojo-release-${dojo.version}-src/(dojo|dijit)/**/*",
+      // Local JS code (`target/classes/web/`).
+      {pattern: "${build.outputDirectory}/web/**/*", included: false},
 
-      // excluding test files from being included in the dependencies
-      "${build.dependenciesDirectory}/**/dojo/tests/**/*",
-      "${build.dependenciesDirectory}/*/**/*.+(.spec.js)"
+      // Unit tests (`src/test/javascript/`).
+      {pattern: "${build.javascriptTestSourceDirectory}/**/*", included: false}
     ],
 
     reporters: ["mocha"],

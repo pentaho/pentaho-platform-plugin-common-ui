@@ -15,7 +15,7 @@
 *
 */
 
-define("common-ui/util/BusyIndicator", ["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner", "common-ui/util/spin.min", "common-ui/util/tripleclick"], function(Glasspane, spin, Spinner, tripleclick) {
+define("common-ui/util/BusyIndicator", ["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner", "common-ui/util/spin", "common-ui/util/tripleclick"], function(Glasspane, spin, Spinner, tripleclick) {
 
     var busy = {
         id: "pentaho-busy-indicator",

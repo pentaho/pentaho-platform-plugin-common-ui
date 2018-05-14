@@ -47,7 +47,7 @@
 
  define("common-ui/util/BootstrappedTabLoader", [
  	"common-ui/util/PentahoSpinner",
-     "common-ui/util/spin.min",
+     "common-ui/util/spin",
  	"common-ui/util/ContextProvider",
  	"common-ui/util/HandlebarsCompiler",
  	"common-ui/bootstrap"

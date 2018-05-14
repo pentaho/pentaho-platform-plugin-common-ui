@@ -1,20 +1,18 @@
 /*!
- * This program is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License, version 2.1 as published by the Free Software
- * Foundation.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, you can obtain a copy at http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
- * or from the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Copyright 2016 - 2017 Hitachi Vantara. All rights reserved.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 "use strict";
 
 /* globals require, define */
@@ -35,7 +33,7 @@ var basePath;
   depWebJars = depDir + webjarsSubPath;
 
   baseTest = baseUrl + makeRelativeUrl("${build.javascriptTestSourceDirectory}");
-  basePath = baseUrl + makeRelativeUrl("${build.javascriptTestOutputDirectory}") + "/web";
+  basePath = baseUrl + makeRelativeUrl("${build.outputDirectory}") + "/web";
 
   function makeRelativeUrl(path) {
     var basePath = "${project.basedir}/".replace(/\\/g, "/");
@@ -56,12 +54,28 @@ var basePath;
 var ENVIRONMENT_CONFIG = {
   paths: {
     "cdf": depDir + "/cdf/js",
-    "cdf/lib": depDir + "/cdf/js/lib"
+    "cdf/lib": depDir + "/cdf/js/lib",
+    "common-ui": basePath
   }
 };
 
+/**
+ * Indicates that unit tests are being run.
+ *
+ * Can be used, for example, by RequireJS configuration files to assume different base directories.
+ *
+ * @type {boolean}
+ * @default true
+ */
 var KARMA_RUN = true;
-var CONTEXT_PATH = "/";
+
+/**
+ * Gets the base Pentaho application path.
+ *
+ * @type {?string|undefined}
+ * @default undefined
+ */
+var CONTEXT_PATH = undefined;
 var pen = {define: define, require: require};
 var SESSION_LOCALE = "en";
 var requireCfg = {
