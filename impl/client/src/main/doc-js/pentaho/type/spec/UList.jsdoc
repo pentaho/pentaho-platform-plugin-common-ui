@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@
  */
 
 /**
- * A `spec.UList` represents the union of JS types that can be used to describe a list value,
- * or the absence of one.
+ * A `spec.List` represents the union of JS types that can be used to describe a list value.
  *
  * Like with all other value types, list values can be described using the general **object form**.
  * The _object form_ conforms to {@link pentaho.type.spec.IList}.
  *
  * List values support an additional form of value specification, the **array form**:
- * an array of {@link pentaho.type.spec.UInstance},
+ * an array of {@link pentaho.type.spec.Instance},
  * each the specification of the corresponding element of the list.
  *
  * Take the following example of a number list in _object form_:
@@ -55,11 +54,5 @@
  * ]
  * ```
  *
- * When a list value is absent or empty, it can be described with a {@link Nully} JavaScript value:
- *
- * ```js
- * null
- * ```
- *
- * @typedef {pentaho.type.spec.IList|Array.<pentaho.type.spec.UElement>|Nully} pentaho.type.spec.UList
+ * @typedef {pentaho.type.spec.IList|Array.<pentaho.type.spec.Element>} pentaho.type.spec.List
  */

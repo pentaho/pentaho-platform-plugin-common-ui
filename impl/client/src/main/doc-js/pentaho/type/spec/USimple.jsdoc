@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 /**
- * A `spec.USimple` represents the union of JS types that can be used to describe a simple value,
+ * A `spec.Simple` represents the union of JS types that can be used to describe a simple value,
  * or the absence of one.
  *
  * Like with all other value types, simple values can be described using the general **object form**.
@@ -47,13 +47,7 @@
  * {v: {}}
  * ```
  *
- * When a simple value is absent, it can be described with a {@link Nully} JavaScript value:
- *
- * ```js
- * null
- * ```
- *
- * Note, also, that a simple value **cannot** have a {@link Nully} as its underlying JavaScript value,
+ * Note that a simple value **cannot** have a {@link Nully} as its underlying JavaScript value,
  * and, as such, the following example would not be valid:
  *
  * ```js
@@ -68,5 +62,5 @@
  * To know, exactly, which types of JavaScript values are accepted as specifications of
  * a specific {@link pentaho.type.spec.ISimple} subtype, see the subtype's documentation.
  *
- * @typedef {pentaho.type.spec.ISimple|pentaho.type.Simple|any} pentaho.type.spec.USimple
+ * @typedef {pentaho.type.spec.ISimple|any} pentaho.type.spec.Simple
  */

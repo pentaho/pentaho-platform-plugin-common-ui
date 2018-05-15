@@ -53,7 +53,8 @@ npm install
 2. You should now have the `sandbox.html` and `sandbox-data.json` files.
 
     Those files provide a minimal sandbox from which sandboxes for specific samples or experiments may be derived.
-    As is, it simply displays the `pentaho/visual/samples/calc` visualization — the only visualization that comes bundled with the Visualization API.
+    As is, it simply displays the `pentaho/visual/samples/calc` visualization — 
+    the only visualization that comes bundled with the Visualization API.
 
     If you prefer you can create the files yourself:
 
@@ -94,8 +95,16 @@ npm install
           <!-- load the VizAPI dev bootstrap helper -->
           <script type="text/javascript" src="node_modules/@pentaho/viz-api/dev-bootstrap.js"></script>
 
-          <!-- configure AMD for the sample visualization -->
           <script>
+            // Configure AMD for the sample visualization.
+            require.config({
+              config: {
+                "pentaho/environment": {
+                  application: "viz-api-sandbox"
+                }
+              }
+            });
+         
             require([
               "vizapi-dev-init",
               "json!./package.json"
@@ -103,61 +112,50 @@ npm install
               devInit(package);
 
               require([
-                "pentaho/type/Context",
+                "pentaho/visual/samples/calc/Model",
+                "pentaho/visual/base/View",
                 "pentaho/data/Table",
                 "json!./sandbox-data.json"
-              ], function (Context, Table, dataSpec) {
+              ], function(CalcModel, BaseView, Table, dataSpec) {
 
-                // Setup up a VizAPI context.
-                Context.createAsync({application: "viz-api-sandbox"})
-                  .then(function (context) {
-                    // Get the model and base view types
-                    return context.getDependencyAsync({
-                      CalcModel: "pentaho/visual/samples/calc/model",
-                      BaseView: "pentaho/visual/base/view"
-                    });
-                  })
-                  .then(function (types) {
-
-                    // Create the visualization model.
-                    var modelSpec = {
-                      "data": new Table(dataSpec),
-                      "levels": {fields: ["productFamily"]},
-                      "measure": {fields: ["sales"]},
-                      "operation": "avg"
-                    };
+                // Create the visualization model.
+                var modelSpec = {
+                  "data": new Table(dataSpec),
+                  "levels": {fields: ["productFamily"]},
+                  "measure": {fields: ["sales"]},
+                  "operation": "avg"
+                };
                                                 
-                    var model = new types.CalcModel(modelSpec);
+                var model = new CalcModel(modelSpec);
                                               
-                    // Create the visualization view.
-                    var viewSpec = {
-                      width: 400,
-                      height: 200,
-                      domContainer: document.getElementById("viz_div"),
-                      model: model
-                    };
-                                                        
-                    // These are responsibilities of the visualization container application:
-                    // 1. Mark the container with the model's CSS classes, for styling purposes.
-                    viewSpec.domContainer.className = model.$type.inheritedStyleClasses.join(" ");
+                // Create the visualization view.
+                var viewSpec = {
+                  width: 400,
+                  height: 200,
+                  domContainer: document.getElementById("viz_div"),
+                  model: model
+                };
                                                     
-                    // 2. Set the DOM container dimensions.
-                    viewSpec.domContainer.style.width = viewSpec.width + "px";
-                    viewSpec.domContainer.style.height = viewSpec.height + "px";
-                            
-                    return types.BaseView.createAsync(viewSpec);
-                  })
-                  .then(function (view) {
+                // These are responsibilities of the visualization container application:
+                // 1. Mark the container with the model's CSS classes, for styling purposes.
+                viewSpec.domContainer.className = model.$type.inheritedStyleClasses.join(" ");
+                                                
+                // 2. Set the DOM container dimensions.
+                viewSpec.domContainer.style.width = viewSpec.width + "px";
+                viewSpec.domContainer.style.height = viewSpec.height + "px";
+                        
+                BaseView.createAsync(viewSpec)
+                  .then(function(view) {
                     // Handle the execute action.
-                    view.on("pentaho/visual/action/execute", {
-                      "do": function (event, action) {
+                    view.on("pentaho/visual/action/Execute", {
+                      "do": function(event, action) {
                         alert("Executed " + action.dataFilter.$contentKey);
                       }
                     });
 
                     // Handle the select action.
-                    view.on("pentaho/visual/action/select", {
-                      "finally": function (event, action) {
+                    view.on("pentaho/visual/action/Select", {
+                      "finally": function(event, action) {
                         document.getElementById("messages_div").innerText = 
                           "Selected: " + view.model.selectionFilter.$contentKey;
                       }

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!../IsGreaterOrEqual",
   "../KnownFilterKind"
-], function(KnownFilterKind) {
+], function(module, KnownFilterKind) {
 
   "use strict";
 
   return function(filter) {
 
     /**
-     * @name pentaho.data.filter.IsGreaterOrEqual.Type
+     * @name pentaho.data.filter.IsGreaterOrEqualType
      * @class
-     * @extends pentaho.data.filter.Property.Type
+     * @extends pentaho.data.filter.PropertyType
      *
      * @classDesc The type class of the greater or equal than filter type.
      *
@@ -35,7 +36,7 @@ define([
      * @name pentaho.data.filter.IsGreaterOrEqual
      * @class
      * @extends pentaho.data.filter.Property
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.IsGreaterOrEqual>} pentaho/data/filter/isGreaterOrEqual
+     * @amd pentaho/data/filter/IsGreaterOrEqual
      *
      * @classDesc The `IsGreaterOrEqual` class represents a filter for being greater than or equal to a given value.
      * The filter selects elements having the value of a certain property greater or equal to a reference
@@ -89,9 +90,8 @@ define([
         return (this.property || "") + " " + (v ? v.$key : "");
       },
 
-      $type: /** @lends pentaho.data.filter.IsGreaterOrEqual.Type# */{
-        id: "pentaho/data/filter/isGreaterOrEqual",
-        alias: ">=",
+      $type: /** @lends pentaho.data.filter.IsGreaterOrEqualType# */{
+        id: module.id,
         props: [
           {
             name: "value",

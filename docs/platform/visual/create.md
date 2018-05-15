@@ -20,7 +20,7 @@ which guides you through the development of a custom visualization having a [D3]
 
 In the previous section you developed a custom visualization and tested it in a controlled sandbox environment.
 
-If you exclude the sandbox specific files, you are left with the `package.json`, `model.js`, `view-d3.js`, `config.js`
+If you exclude the sandbox specific files, you are left with the `package.json`, `Model.js`, `ViewD3.js`, `config.js`
 files and a `css` folder. Those are the files to be packaged.
 
 Additionally, any runtime client-side dependencies must also be provided to the platform.

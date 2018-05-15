@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,39 +14,22 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Property",
+  "pentaho/type/Boolean",
+  "pentaho/type/Complex",
+  "pentaho/type/String",
+  "pentaho/type/Number",
   "tests/pentaho/type/propertyTypeUtil",
   "tests/pentaho/util/errorMatch"
-], function(Context, propertyTypeUtil, errorMatch) {
+], function(Property, PentahoBoolean, Complex, PentahoString, PentahoNumber, propertyTypeUtil, errorMatch) {
 
   "use strict";
 
-  /* globals describe, it, expect, beforeEach, jasmine */
   /* eslint max-nested-callbacks: 0, require-jsdoc: 0 */
 
-  describe("pentaho.type.Property.Type", function() {
+  describe("pentaho.type.PropertyType", function() {
 
-    var context;
-    var Property;
-    var PropertyType;
-    var PentahoBoolean;
-    var Complex;
-    var PentahoString;
-    var PentahoNumber;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Property = context.get("property");
-            PropertyType = Property.Type;
-            PentahoBoolean = context.get("pentaho/type/boolean");
-            Complex = context.get("pentaho/type/complex");
-            PentahoString = context.get("pentaho/type/string");
-            PentahoNumber  = context.get("pentaho/type/number");
-          })
-          .then(done, done.fail);
-    });
+    var PropertyType = Property.Type;
 
     it("is a function", function() {
       expect(typeof PropertyType).toBe("function");
@@ -62,6 +45,7 @@ define([
 
       var Derived;
 
+      // Must be each. Accessors are created in createRoot.
       beforeEach(function() {
         Derived = Complex.extend();
       });
@@ -133,24 +117,6 @@ define([
         it("should have `ancestor` equal to `null`", function() {
           expect(propType.ancestor).toBe(null);
         });
-
-        it("should throw if `declaringType` is of a different context", function(done) {
-          Context.createAsync()
-              .then(function(context2) {
-
-                var Complex2 = context2.get("complex");
-                expect(function() {
-                  Property.extend({
-                    $type: {name: "foo"}
-                  }, null, {
-                    declaringType: Complex2.type,
-                    index: 1,
-                    isRoot: true
-                  });
-                }).toThrow(errorMatch.argInvalid("declaringType"));
-              })
-              .then(done, done.fail);
-        });
       }); // end when spec is an object
 
       // region Type Attributes
@@ -180,7 +146,7 @@ define([
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", label: "MyFoo"});
           expect(propType.label).toBe("MyFoo");
         });
-      }); // end #label
+      });
 
       describe("#description", function() {
         it("should default to null", function() {
@@ -205,7 +171,7 @@ define([
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", description: "MyFoo"});
           expect(propType.description).toBe("MyFoo");
         });
-      }); // end #description
+      });
 
       describe("#category", function() {
         it("should default to null", function() {
@@ -292,7 +258,7 @@ define([
           propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo6", isBrowsable: "no"});
           expect(propType.isBrowsable).toBe(true);
         });
-      }); // end #isBrowsable
+      });
 
       describe("#isAdvanced", function() {
         it("should default to false", function() {
@@ -329,7 +295,7 @@ define([
           propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo6", isAdvanced: "no"});
           expect(propType.isAdvanced).toBe(true);
         });
-      }); // end #isAdvanced
+      });
       // endregion
 
       // region Defining Attributes
@@ -387,7 +353,7 @@ define([
             propType.name = "fooBar";
           }).toThrowError(TypeError);
         });
-      }); // end #name
+      });
 
       describe("#isList", function() {
         it("should return `true` when the type is a list type", function() {
@@ -399,7 +365,7 @@ define([
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", valueType: "string"});
           expect(propType.isList).toBe(false);
         });
-      }); // end #isList
+      });
 
       // Monotonic
       describe("#isReadOnly", function() {
@@ -459,7 +425,7 @@ define([
           propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo6", isReadOnly: "no"});
           expect(propType.isReadOnly).toBe(true);
         });
-      }); // end #isReadOnly
+      });
 
       // Monotonic
       describe("#valueType", function() {
@@ -481,19 +447,6 @@ define([
           propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", valueType: undefined});
 
           expect(propType.valueType).toBe(PentahoString.type);
-        });
-
-        it("should not throw when specified on a new property, from configuration", function() {
-          Object.defineProperty(context, "isConfiguring", {
-            value: true
-          });
-
-          expect(function() {
-            propertyTypeUtil.createRoot(Derived.type, {
-              name: "foo",
-              valueType: "string"
-            });
-          }).not.toThrow(errorMatch.operInvalid());
         });
 
         it("should resolve the specified value", function() {
@@ -545,7 +498,7 @@ define([
 
           expect(propType.defaultValue).toBe(null);
         });
-      }); // end #valueType
+      });
 
       describe("#defaultValue", function() {
 
@@ -634,7 +587,7 @@ define([
             propType.defaultValue = null;
           }).toThrow(errorMatch.operInvalid());
         });
-      }); // end #defaultValue
+      });
       // endregion
 
       // region Dynamic & Monotonic Attributes
@@ -766,7 +719,7 @@ define([
           expect(f.calls.first().args.length).toBe(1);
           expect(f.calls.first().args[0]).toBe(propType);
         });
-      }); // end #isRequired
+      });
 
       describe("#countMin", function() {
         it("should not allow changing the Property.type attribute value", function() {
@@ -879,7 +832,7 @@ define([
             propType.countMin = 2;
           }).toThrow(errorMatch.operInvalid());
         });
-      }); // end #countMin
+      });
 
       describe("#countMax", function() {
         it("should not allow changing the Property.type attribute value", function() {
@@ -998,7 +951,7 @@ define([
             propType.countMax = 2;
           }).toThrow(errorMatch.operInvalid());
         });
-      }); // end #countMax
+      });
 
       describe("#isApplicable", function() {
         it("should not allow changing the Property.type attribute value", function() {
@@ -1100,7 +1053,7 @@ define([
             propType.isApplicable = false;
           }).toThrow(errorMatch.operInvalid());
         });
-      }); // end #isApplicable
+      });
 
       describe("#isEnabled", function() {
         it("should not allow changing the Property.type attribute value", function() {
@@ -1202,7 +1155,7 @@ define([
             propType.isEnabled = false;
           }).toThrow(errorMatch.operInvalid());
         });
-      }); // end #isEnabled
+      });
 
       describe("#countRange", function() {
         // 1. when !isList => min and max <= 1
@@ -1321,45 +1274,41 @@ define([
           expect(propType.countMax).toBe(1);
           expect(propType.countRangeOn({}).min).toBe(0);
         });
-      }); // end #countRange
+      });
 
       describe("dynamic attribute", function() {
 
-        it("should allow defining and setting to a function an attribute that has no cast function", function(done) {
+        it("should allow defining and setting to a function an attribute that has no cast function", function() {
 
-          Context.createAsync()
-              .then(function(context2) {
-
-                var Property2 = context2.get("property")
-                      .implement({
-                        $type: {
-                          dynamicAttributes: {
-                            isFoo: {
-                              value: false,
-                              // cast: null. // <<---- no cast function
-                              combine: function(baseEval, localEval) {
-                                return function() {
-                                  // localEval is skipped if base is true.
-                                  return baseEval.call(this) || localEval.call(this);
-                                };
-                              }
-                            }
-                          }
-                        }
-                      });
-
-                var fValue = function() { return true; };
-                var SubProperty2 = Property2.extend({
-                  $type: {
-                    isFoo: fValue
+          return require.using(["pentaho/type/Property"], function(Property2) {
+            Property2.implement({
+              $type: {
+                dynamicAttributes: {
+                  isFoo: {
+                    value: false,
+                    // cast: null. // <<---- no cast function
+                    combine: function(baseEval, localEval) {
+                      return function() {
+                        // localEval is skipped if base is true.
+                        return baseEval.call(this) || localEval.call(this);
+                      };
+                    }
                   }
-                });
+                }
+              }
+            });
 
-                expect(SubProperty2.type.isFoo).toBe(fValue);
-              })
-              .then(done, done.fail);
+            var fValue = function() { return true; };
+            var SubProperty2 = Property2.extend({
+              $type: {
+                isFoo: fValue
+              }
+            });
+
+            expect(SubProperty2.type.isFoo).toBe(fValue);
+          });
         });
-      }); // end dynamic attribute
+      });
       // endregion
 
       describe("property accessors", function() {
@@ -3085,12 +3034,12 @@ define([
 
         describe("when the property's declaringType is of a read-only type", function() {
 
-          var ReadOnlyComplexWithElement;
+          var ReadOnlyComplexWithElementProp;
           var NotReadOnlyComplex;
 
           beforeEach(function() {
 
-            ReadOnlyComplexWithElement = Complex.extend({
+            ReadOnlyComplexWithElementProp = Complex.extend({
               $type: {
                 isReadOnly: true,
                 props: [
@@ -3100,13 +3049,12 @@ define([
             });
 
             NotReadOnlyComplex = Complex.extend();
-
           });
 
           it("should throw if the specified value is not of a read-only type", function() {
 
-            var value = new ReadOnlyComplexWithElement();
-            var propType = ReadOnlyComplexWithElement.type.get("a");
+            var value = new ReadOnlyComplexWithElementProp();
+            var propType = ReadOnlyComplexWithElementProp.type.get("a");
             var propValue = new NotReadOnlyComplex();
 
             expect(function() {
@@ -3116,8 +3064,8 @@ define([
 
           it("should not throw if the specified value is of a read-only type", function() {
 
-            var value = new ReadOnlyComplexWithElement();
-            var propType = ReadOnlyComplexWithElement.type.get("a");
+            var value = new ReadOnlyComplexWithElementProp();
+            var propType = ReadOnlyComplexWithElementProp.type.get("a");
             var propValue = new PentahoNumber(1);
 
             propType.toValueOn(value, propValue);
@@ -3129,12 +3077,12 @@ define([
 
         describe("when the property's declaringType is of a read-only type", function() {
 
-          var ReadOnlyComplexWithList;
+          var ReadOnlyComplexWithListProp;
           var NotReadOnlyComplex;
 
           beforeEach(function() {
 
-            ReadOnlyComplexWithList = Complex.extend({
+            ReadOnlyComplexWithListProp = Complex.extend({
               $type: {
                 isReadOnly: true,
                 props: [
@@ -3148,8 +3096,8 @@ define([
 
           it("should throw if a specified element is not of a read-only type", function() {
 
-            var value = new ReadOnlyComplexWithList();
-            var propType = ReadOnlyComplexWithList.type.get("as");
+            var value = new ReadOnlyComplexWithListProp();
+            var propType = ReadOnlyComplexWithListProp.type.get("as");
             var propValue = new NotReadOnlyComplex();
 
             expect(function() {
@@ -3159,8 +3107,8 @@ define([
 
           it("should not throw if the specified value is of a read-only type", function() {
 
-            var value = new ReadOnlyComplexWithList();
-            var propType = ReadOnlyComplexWithList.type.get("as");
+            var value = new ReadOnlyComplexWithListProp();
+            var propType = ReadOnlyComplexWithListProp.type.get("as");
             var propValue = new PentahoNumber(1);
 
             propType.toValueOn(value, [propValue]);
@@ -3168,5 +3116,5 @@ define([
         });
       });
     });
-  }); // end pentaho.type.Property.Type
+  }); // end pentaho.type.PropertyType
 });

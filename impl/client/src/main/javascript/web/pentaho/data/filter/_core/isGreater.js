@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!../IsGreater",
   "../KnownFilterKind"
-], function(KnownFilterKind) {
+], function(module, KnownFilterKind) {
 
   "use strict";
 
   return function(filter) {
 
     /**
-     * @name pentaho.data.filter.IsGreater.Type
+     * @name pentaho.data.filter.IsGreaterType
      * @class
-     * @extends pentaho.data.filter.Property.Type
+     * @extends pentaho.data.filter.PropertyType
      *
      * @classDesc The type class of the strict greater than filter type.
      *
@@ -35,7 +36,7 @@ define([
      * @name pentaho.data.filter.IsGreater
      * @class
      * @extends pentaho.data.filter.Property
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.IsGreater>} pentaho/data/filter/isGreater
+     * @amd pentaho/data/filter/IsGreater
      *
      * @classDesc The `IsGreater` class represents a filter for being strictly greater than a given value.
      * The filter selects elements having the value of a certain property strictly greater than a reference
@@ -89,9 +90,8 @@ define([
         return (this.property || "") + " " + (v ? v.$key : "");
       },
 
-      $type: /** @lends pentaho.data.filter.IsGreater.Type# */{
-        id: "pentaho/data/filter/isGreater",
-        alias: ">",
+      $type: /** @lends pentaho.data.filter.IsGreaterType# */{
+        id: module.id,
         props: [
           {
             name: "value",

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 
 /**
- * The `spec.IEnumTypeProto` interface represents the
+ * The `spec.IEnumType` interface represents the
  * specification made available to an element type by the enumeration mixin.
  *
- * @name pentaho.type.mixins.spec.IEnumTypeProto
+ * @name pentaho.type.mixins.spec.IEnumType
  * @interface
  * @see pentaho.type.mixins.Enum
  */
@@ -27,8 +27,8 @@
  * The list of valid values of the type.
  *
  * @name domain
- * @memberOf pentaho.type.mixins.spec.IEnumTypeProto#
- * @type {Array.<pentaho.type.spec.USimple>}
+ * @memberOf pentaho.type.mixins.spec.IEnumType#
+ * @type {Array.<pentaho.type.spec.Simple>}
  *
- * @see pentaho.type.mixins.Enum.Type#domain
+ * @see pentaho.type.mixins.EnumType#domain
  */

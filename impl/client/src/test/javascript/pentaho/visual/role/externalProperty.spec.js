@@ -14,88 +14,69 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/changes/Transaction",
+  "pentaho/visual/base/Model",
+  "pentaho/visual/base/ModelAdapter",
   "pentaho/data/Table",
   "pentaho/type/SpecificationScope",
   "./adaptationUtil"
-], function(Context, Table, SpecificationScope, adaptationUtil) {
+], function(Transaction, Model, ModelAdapter, Table, SpecificationScope, adaptationUtil) {
 
   "use strict";
-
-  /* globals describe, it, beforeAll, beforeEach, afterEach, spyOn, jasmine */
 
   describe("pentaho.visual.role.ExternalProperty", function() {
 
     describe(".Type", function() {
 
-      var context;
       var buildAdapter = adaptationUtil.buildAdapter;
-      var Model;
       var DerivedModel;
       var CustomModel;
       var ModelWithStringRole;
       var ModelWithStringListRole;
-
-      var ModelAdapter;
 
       var NullStrategy;
       var ListIdentityStrategy;
       var ElementIdentityStrategy;
 
       beforeAll(function() {
-        return Context.createAsync()
-          .then(function(_context) {
-            context = _context;
+        DerivedModel = Model.extend({
+          $type: {
+            props: {
+              "stringKeyRole": {
+                base: "pentaho/visual/role/Property",
+                isVisualKey: true,
+                modes: [{dataType: "string"}]
+              },
+              "numberRole": {
+                base: "pentaho/visual/role/Property",
+                isVisualKey: false,
+                modes: [{dataType: "number"}]
+              },
+              "elementKeyRole": {
+                base: "pentaho/visual/role/Property",
+                isVisualKey: true,
+                modes: [{dataType: "element"}]
+              },
+              "stringAndNumberRole": {
+                base: "pentaho/visual/role/Property",
+                isVisualKey: false,
+                modes: [
+                  {dataType: "string"},
+                  {dataType: "number"}
+                ]
+              }
+            }
+          }
+        });
 
-            return context.getDependencyApplyAsync([
-              "pentaho/visual/base/model",
-              "pentaho/visual/base/modelAdapter",
-              "pentaho/visual/role/adaptation/strategy"
-            ], function(_Model, _ModelAdapter, BaseStrategy) {
+        var mocks = adaptationUtil.createMocks();
 
-              Model = _Model;
-              ModelAdapter = _ModelAdapter;
+        ModelWithStringRole = mocks.ModelWithStringRole;
+        ModelWithStringListRole = mocks.ModelWithStringListRole;
 
-              DerivedModel = Model.extend({
-                $type: {
-                  props: {
-                    "stringKeyRole": {
-                      base: "pentaho/visual/role/property",
-                      isVisualKey: true,
-                      modes: [{dataType: "string"}]
-                    },
-                    "numberRole": {
-                      base: "pentaho/visual/role/property",
-                      isVisualKey: false,
-                      modes: [{dataType: "number"}]
-                    },
-                    "elementKeyRole": {
-                      base: "pentaho/visual/role/property",
-                      isVisualKey: true,
-                      modes: [{dataType: "element"}]
-                    },
-                    "stringAndNumberRole": {
-                      base: "pentaho/visual/role/property",
-                      isVisualKey: false,
-                      modes: [
-                        {dataType: "string"},
-                        {dataType: "number"}
-                      ]
-                    }
-                  }
-                }
-              });
-
-              var mocks = adaptationUtil.createMocks(Model, ModelAdapter, BaseStrategy);
-
-              ModelWithStringRole = mocks.ModelWithStringRole;
-              ModelWithStringListRole = mocks.ModelWithStringListRole;
-
-              NullStrategy = mocks.NullStrategy;
-              ListIdentityStrategy = mocks.ListIdentityStrategy;
-              ElementIdentityStrategy = mocks.ElementIdentityStrategy;
-            });
-          });
+        NullStrategy = mocks.NullStrategy;
+        ListIdentityStrategy = mocks.ListIdentityStrategy;
+        ElementIdentityStrategy = mocks.ElementIdentityStrategy;
       });
 
       // region helper methods
@@ -133,7 +114,7 @@ define([
         });
 
         it("should import category value correctly from '_internalProperty", function() {
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel);
+          var DerivedModelAdapter = buildAdapter(CustomModel);
 
           var propType = DerivedModelAdapter.type.get("roleA");
 
@@ -142,7 +123,7 @@ define([
 
         it("should override the category value that was imported from '_internalProperty", function() {
           var override = category + " override";
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, {
+          var DerivedModelAdapter = buildAdapter(CustomModel, {
             name: "roleA", category: override
           });
 
@@ -165,7 +146,7 @@ define([
         });
 
         it("should import ordinal value correctly from '_internalProperty", function () {
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel);
+          var DerivedModelAdapter = buildAdapter(CustomModel);
 
           var propType = DerivedModelAdapter.type.get("roleA");
           expect(propType.ordinal).toBe(ordinal);
@@ -173,7 +154,7 @@ define([
 
         it("should override the ordinal value that was imported from '_internalProperty", function() {
           var override = 10000;
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, {
+          var DerivedModelAdapter = buildAdapter(CustomModel, {
             name: "roleA", ordinal: override
           });
 
@@ -196,7 +177,7 @@ define([
         });
 
         it("should import label value correctly from '_internalProperty", function () {
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel);
+          var DerivedModelAdapter = buildAdapter(CustomModel);
 
           var propType = DerivedModelAdapter.type.get("roleA");
           expect(propType.label).toBe(label);
@@ -204,7 +185,7 @@ define([
 
         it("should override the label value that was imported from '_internalProperty", function() {
           var override = label + " override";
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, {
+          var DerivedModelAdapter = buildAdapter(CustomModel, {
             name: "roleA", label: override
           });
 
@@ -227,7 +208,7 @@ define([
         });
 
         it("should import description value correctly from '_internalProperty", function () {
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel);
+          var DerivedModelAdapter = buildAdapter(CustomModel);
 
           var propType = DerivedModelAdapter.type.get("roleA");
           expect(propType.description).toBe(description);
@@ -235,7 +216,7 @@ define([
 
         it("should override the description value that was imported from '_internalProperty", function() {
           var override = description + " override";
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, {
+          var DerivedModelAdapter = buildAdapter(CustomModel, {
             name: "roleA", description: override
           });
 
@@ -258,7 +239,7 @@ define([
         });
 
         it("should import helpUrl value correctly from '_internalProperty", function () {
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel);
+          var DerivedModelAdapter = buildAdapter(CustomModel);
 
           var propType = DerivedModelAdapter.type.get("roleA");
           expect(propType.helpUrl).toBe(helpUrl);
@@ -266,7 +247,7 @@ define([
 
         it("should override the helpUrl value that was imported from '_internalProperty", function() {
           var override = helpUrl + "/override";
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, {
+          var DerivedModelAdapter = buildAdapter(CustomModel, {
             name: "roleA", helpUrl: override
           });
 
@@ -289,7 +270,7 @@ define([
         });
 
         it("should import isBrowsable value correctly from '_internalProperty", function() {
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel);
+          var DerivedModelAdapter = buildAdapter(CustomModel);
 
           var propType = DerivedModelAdapter.type.get("roleA");
           expect(propType.isBrowsable).toBe(isBrowsable);
@@ -297,7 +278,7 @@ define([
 
         it("should override the isBrowsable value that was imported from '_internalProperty", function() {
           var override = true;
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, {
+          var DerivedModelAdapter = buildAdapter(CustomModel, {
             name: "roleA", isBrowsable: override
           });
 
@@ -312,7 +293,7 @@ define([
 
         it("should be `true` if the internal property is a visual key", function() {
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel);
+          var DerivedModelAdapter = buildAdapter(DerivedModel);
 
           var propType = DerivedModelAdapter.type.get("stringKeyRole");
 
@@ -321,7 +302,7 @@ define([
 
         it("should be `false` if the internal property is not a visual key", function() {
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel);
+          var DerivedModelAdapter = buildAdapter(DerivedModel);
 
           var propType = DerivedModelAdapter.type.get("numberRole");
 
@@ -335,164 +316,123 @@ define([
 
           function configAmd(localRequire) {
 
-            localRequire.define("CustomStrategyA", function() {
-              return [
-                "pentaho/visual/role/adaptation/strategy",
-                function(Strategy) {
-                  return Strategy.extend({
-                    $type: {
-                      getInputTypeFor: function() { return null; }
-                    }
-                  });
+            localRequire.define("CustomStrategyA", ["pentaho/visual/role/adaptation/Strategy"], function(Strategy) {
+              return Strategy.extend({
+                $type: {
+                  getInputTypeFor: function() { return null; }
                 }
-              ];
+              });
             });
 
-            localRequire.define("CustomStrategyB", function() {
-              return [
-                "pentaho/visual/role/adaptation/strategy",
-                function(Strategy) {
-                  return Strategy.extend({
-                    $type: {
-                      getInputTypeFor: function() { return null; }
-                    }
-                  });
+            localRequire.define("CustomStrategyB", ["pentaho/visual/role/adaptation/Strategy"], function(Strategy) {
+              return Strategy.extend({
+                $type: {
+                  getInputTypeFor: function() { return null; }
                 }
-              ];
+              });
             });
 
             localRequire.config({
               config: {
-                "pentaho/typeInfo": {
-                  "CustomStrategyA": {base: "pentaho/visual/role/adaptation/strategy"},
-                  "CustomStrategyB": {base: "pentaho/visual/role/adaptation/strategy"}
+                "pentaho/modules": {
+                  "CustomStrategyA": {base: "pentaho/visual/role/adaptation/Strategy"},
+                  "CustomStrategyB": {base: "pentaho/visual/role/adaptation/Strategy"}
                 }
               }
             });
           }
 
-          return require.using(["pentaho/type/Context"], configAmd, function(Context) {
+          return require.using([
+            "pentaho/visual/base/Model",
+            "pentaho/visual/base/ModelAdapter",
+            "pentaho/visual/role/ExternalProperty",
+            "CustomStrategyA",
+            "CustomStrategyB",
+            "tests/pentaho/visual/role/adaptationUtil"
+          ], configAmd, function(Model, ModelAdapter, ExternalProperty, CustomStrategyA, CustomStrategyB,
+                                 adaptationUtil) {
 
-            return Context.createAsync()
-              .then(function(context) {
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  "stringKeyRole": {
+                    base: "pentaho/visual/role/Property",
+                    isVisualKey: true,
+                    modes: [{dataType: "string"}]
+                  }
+                }
+              }
+            });
 
-                return context.getDependencyApplyAsync([
-                  "pentaho/visual/base/model",
-                  "pentaho/visual/base/modelAdapter",
-                  "pentaho/visual/role/externalProperty",
-                  "CustomStrategyA",
-                  "CustomStrategyB"
-                ], function(Model, ModelAdapter, ExternalProperty, CustomStrategyA, CustomStrategyB) {
+            spyOn(ExternalProperty.type, "__setStrategyTypes");
 
-                  var DerivedModel = Model.extend({
-                    $type: {
-                      props: {
-                        "stringKeyRole": {
-                          base: "pentaho/visual/role/property",
-                          isVisualKey: true,
-                          modes: [{dataType: "string"}]
-                        }
-                      }
-                    }
-                  });
+            var DerivedModelAdapter = adaptationUtil.buildAdapter(DerivedModel);
 
-                  spyOn(ExternalProperty.type, "__setStrategyTypes");
+            var propType = DerivedModelAdapter.type.get("stringKeyRole");
 
-                  var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel);
+            var strategyTypes = propType.__setStrategyTypes.calls.argsFor(0)[0];
 
-                  var propType = DerivedModelAdapter.type.get("stringKeyRole");
-
-                  var strategyTypes = propType.__setStrategyTypes.calls.argsFor(0)[0];
-
-                  expect(strategyTypes).toEqual(jasmine.arrayContaining([
-                    CustomStrategyA.type,
-                    CustomStrategyB.type
-                  ]));
-                });
-              });
+            expect(strategyTypes).toEqual(jasmine.arrayContaining([
+              CustomStrategyA.type,
+              CustomStrategyB.type
+            ]));
           });
         });
 
-        it("should default #strategies to the registered and browsable strategy instances if a root property", function() {
+        it("should default #strategies to the registered and " +
+          "browsable strategy instances if a root property", function() {
 
           function configAmd(localRequire) {
 
-            localRequire.define("CustomStrategyA", function() {
-              return [
-                "pentaho/visual/role/adaptation/strategy",
-                function(Strategy) {
-                  return Strategy.extend({
-                    $type: {
-                      getInputTypeFor: function() { return null; }
-                    }
-                  });
+            localRequire.define("CustomStrategyA", ["pentaho/visual/role/adaptation/Strategy"], function(Strategy) {
+              return Strategy.extend({
+                $type: {
+                  getInputTypeFor: function() { return null; },
+                  isBrowsable: false
                 }
-              ];
+              });
             });
 
             localRequire.config({
               config: {
-                "pentaho/typeInfo": {
-                  "CustomStrategyA": {base: "pentaho/visual/role/adaptation/strategy"}
-                },
+                "pentaho/modules": {
+                  "CustomStrategyA": {base: "pentaho/visual/role/adaptation/Strategy"}
+                }
+              }
+            });
+          }
 
-                "pentaho/instanceInfo": {
-                  "my/configModule": {"type": "pentaho.config.spec.IRuleSet"}
+          return require.using([
+            "pentaho/visual/base/Model",
+            "pentaho/visual/base/ModelAdapter",
+            "pentaho/visual/role/ExternalProperty",
+            "CustomStrategyA",
+            "tests/pentaho/visual/role/adaptationUtil"
+          ], configAmd, function(Model, ModelAdapter, ExternalProperty, CustomStrategyA, adaptationUtil) {
+
+            var DerivedModel = Model.extend({
+              $type: {
+                props: {
+                  "stringKeyRole": {
+                    base: "pentaho/visual/role/Property",
+                    isVisualKey: true,
+                    modes: [{dataType: "string"}]
+                  }
                 }
               }
             });
 
-            localRequire.define("my/configModule", function() {
+            spyOn(ExternalProperty.type, "__setStrategyTypes");
 
-              return {
-                rules: [{
-                  select: {type: "CustomStrategyA"},
-                  apply: {
-                    isBrowsable: false
-                  }
-                }]
-              };
-            });
-          }
+            var DerivedModelAdapter = adaptationUtil.buildAdapter(DerivedModel);
 
-          return require.using(["pentaho/type/Context"], configAmd, function(Context) {
+            var propType = DerivedModelAdapter.type.get("stringKeyRole");
 
-            return Context.createAsync()
-              .then(function(context) {
+            var strategyTypes = propType.__setStrategyTypes.calls.argsFor(0)[0];
 
-                return context.getDependencyApplyAsync([
-                  "pentaho/visual/base/model",
-                  "pentaho/visual/base/modelAdapter",
-                  "pentaho/visual/role/externalProperty",
-                  "CustomStrategyA"
-                ], function(Model, ModelAdapter, ExternalProperty, CustomStrategyA) {
-
-                  var DerivedModel = Model.extend({
-                    $type: {
-                      props: {
-                        "stringKeyRole": {
-                          base: "pentaho/visual/role/property",
-                          isVisualKey: true,
-                          modes: [{dataType: "string"}]
-                        }
-                      }
-                    }
-                  });
-
-                  spyOn(ExternalProperty.type, "__setStrategyTypes");
-
-                  var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel);
-
-                  var propType = DerivedModelAdapter.type.get("stringKeyRole");
-
-                  var strategyTypes = propType.__setStrategyTypes.calls.argsFor(0)[0];
-
-                  expect(strategyTypes).not.toEqual(jasmine.arrayContaining([
-                    CustomStrategyA.type
-                  ]));
-
-                });
-              });
+            expect(strategyTypes).not.toEqual(jasmine.arrayContaining([
+              CustomStrategyA.type
+            ]));
           });
         });
 
@@ -502,7 +442,7 @@ define([
 
           var strategies = [NullStrategy.type, NullStrategy2.type];
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+          var DerivedModelAdapter = buildAdapter(DerivedModel, [
             {
               name: "stringKeyRole",
               strategies: strategies
@@ -518,7 +458,7 @@ define([
 
           var strategies = [];
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+          var DerivedModelAdapter = buildAdapter(DerivedModel, [
             {
               name: "stringKeyRole",
               strategies: strategies
@@ -534,7 +474,7 @@ define([
 
           var strategies = [NullStrategy.type];
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+          var DerivedModelAdapter = buildAdapter(DerivedModel, [
             {
               name: "stringKeyRole",
               strategies: strategies
@@ -550,7 +490,7 @@ define([
 
           var strategies = [ElementIdentityStrategy.type];
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+          var DerivedModelAdapter = buildAdapter(DerivedModel, [
             {
               name: "stringKeyRole",
               strategies: strategies
@@ -567,7 +507,7 @@ define([
           var strategies = [ElementIdentityStrategy.type];
           var internalPropType = DerivedModel.type.get("stringKeyRole");
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+          var DerivedModelAdapter = buildAdapter(DerivedModel, [
             {
               name: "stringKeyRole",
               strategies: strategies
@@ -584,7 +524,7 @@ define([
           var strategies = [ElementIdentityStrategy.type];
           var internalPropType = DerivedModel.type.get("stringKeyRole");
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+          var DerivedModelAdapter = buildAdapter(DerivedModel, [
             {
               name: "stringKeyRole",
               strategies: strategies
@@ -600,7 +540,7 @@ define([
 
           var strategies = [ElementIdentityStrategy.type];
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+          var DerivedModelAdapter = buildAdapter(DerivedModel, [
             {
               name: "numberRole",
               strategies: strategies
@@ -618,7 +558,7 @@ define([
 
           var internalPropType = DerivedModel.type.get("stringAndNumberRole");
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+          var DerivedModelAdapter = buildAdapter(DerivedModel, [
             {
               name: "stringAndNumberRole",
               strategies: strategies
@@ -636,7 +576,7 @@ define([
 
           var strategies = [ElementIdentityStrategy.type, ElementIdentityStrategy.type];
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+          var DerivedModelAdapter = buildAdapter(DerivedModel, [
             {
               name: "numberRole",
               strategies: strategies
@@ -658,10 +598,10 @@ define([
             it("should have countRange.min = 1 if internal role is required", function() {
 
               CustomModel = buildCustomModel(ModelWithStringRole, {
-                name: "roleA", fields: { isRequired: true }
+                name: "roleA", fields: {isRequired: true}
               });
 
-              var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel);
+              var DerivedModelAdapter = buildAdapter(CustomModel);
 
               var externalPropType = DerivedModelAdapter.type.get("roleA");
 
@@ -677,7 +617,7 @@ define([
 
             it("should have countRange.min = 0 if internal role is not required", function() {
 
-              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole);
+              var DerivedModelAdapter = buildAdapter(ModelWithStringRole);
 
               var externalPropType = DerivedModelAdapter.type.get("roleA");
 
@@ -695,7 +635,7 @@ define([
 
               var strategies = [ElementIdentityStrategy.type];
 
-              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+              var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
                 {
                   name: "roleA",
                   strategies: strategies
@@ -718,7 +658,7 @@ define([
 
               var strategies = [ElementIdentityStrategy.type, ListIdentityStrategy.type];
 
-              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringListRole, [
+              var DerivedModelAdapter = buildAdapter(ModelWithStringListRole, [
                 {
                   name: "roleA",
                   strategies: strategies
@@ -748,7 +688,7 @@ define([
                 $type: {
                   props: {
                     roleA: {
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       modes: ["string"],
                       fields: {isRequired: true}
                     }
@@ -756,7 +696,7 @@ define([
                 }
               });
 
-              var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, [
+              var DerivedModelAdapter = buildAdapter(CustomModel, [
                 {
                   name: "roleA",
                   strategies: strategies
@@ -784,7 +724,7 @@ define([
 
               var strategies = [ElementIdentityStrategy.type];
 
-              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+              var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
                 {
                   name: "roleA",
                   strategies: strategies
@@ -812,7 +752,7 @@ define([
 
               var strategies = [ElementIdentityStrategy.type];
 
-              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+              var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
                 {
                   name: "roleA",
                   strategies: strategies
@@ -841,7 +781,7 @@ define([
 
               var strategies = [ListIdentityStrategy.type];
 
-              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringListRole, [
+              var DerivedModelAdapter = buildAdapter(ModelWithStringListRole, [
                 {
                   name: "roleA",
                   strategies: strategies
@@ -875,7 +815,7 @@ define([
         var modelAdapter;
 
         beforeEach(function() {
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel);
+          var DerivedModelAdapter = buildAdapter(DerivedModel);
 
           externalPropType = DerivedModelAdapter.type.get("elementKeyRole");
           internalProperty = externalPropType._internalProperty;
@@ -886,8 +826,8 @@ define([
         });
 
         it("should call `isApplicableOn` from its ancestor and from `_internalProperty`.", function() {
-          spyOn(externalPropType, 'base').and.returnValue(true);
-          spyOn(internalProperty, 'isApplicableOn').and.callFake(function(model) {
+          spyOn(externalPropType, "base").and.returnValue(true);
+          spyOn(internalProperty, "isApplicableOn").and.callFake(function(model) {
             expect(model).toBe(modelAdapter.model);
 
             return true;
@@ -900,8 +840,8 @@ define([
         });
 
         it("should only call `isApplicableOn` from its ancestor and not from `_internalProperty`.", function() {
-          spyOn(externalPropType, 'base').and.returnValue(false);
-          spyOn(internalProperty, 'isApplicableOn').and.callThrough();
+          spyOn(externalPropType, "base").and.returnValue(false);
+          spyOn(internalProperty, "isApplicableOn").and.callThrough();
 
           var isApplicableOn = externalPropType.isApplicableOn(modelAdapter);
 
@@ -916,7 +856,7 @@ define([
 
           var strategies = [ElementIdentityStrategy.type];
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+          var DerivedModelAdapter = buildAdapter(DerivedModel, [
             {
               name: "numberRole",
               strategies: strategies
@@ -938,7 +878,7 @@ define([
 
           var strategies = [ElementIdentityStrategy.type];
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+          var DerivedModelAdapter = buildAdapter(DerivedModel, [
             {
               name: "stringKeyRole",
               strategies: strategies
@@ -960,7 +900,7 @@ define([
 
           var strategies = [ElementIdentityStrategy.type];
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, DerivedModel, [
+          var DerivedModelAdapter = buildAdapter(DerivedModel, [
             {
               name: "stringKeyRole",
               strategies: strategies
@@ -989,7 +929,7 @@ define([
               $type: {
                 props: {
                   roleA: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "string", isContinuous: true},
                       {dataType: "number", isContinuous: true}
@@ -999,7 +939,7 @@ define([
               }
             });
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, [
+            var DerivedModelAdapter = buildAdapter(CustomModel, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -1026,7 +966,7 @@ define([
 
             var strategies = [ElementIdentityStrategy.type];
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+            var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -1055,7 +995,7 @@ define([
 
             var strategies = [ElementIdentityStrategy.type];
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+            var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -1086,7 +1026,7 @@ define([
 
             var strategies = [ElementIdentityStrategy.type];
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+            var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -1115,7 +1055,7 @@ define([
               $type: {
                 props: {
                   roleA: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "string", isContinuous: true}
                     ]
@@ -1124,7 +1064,7 @@ define([
               }
             });
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, [
+            var DerivedModelAdapter = buildAdapter(CustomModel, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -1153,7 +1093,7 @@ define([
               $type: {
                 props: {
                   roleA: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: ["string"], isContinuous: true}
                     ]
@@ -1162,7 +1102,7 @@ define([
               }
             });
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, [
+            var DerivedModelAdapter = buildAdapter(CustomModel, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -1192,7 +1132,7 @@ define([
               $type: {
                 props: {
                   roleA: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: ["string"], isContinuous: true}
                     ]
@@ -1201,7 +1141,7 @@ define([
               }
             });
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, [
+            var DerivedModelAdapter = buildAdapter(CustomModel, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -1226,7 +1166,7 @@ define([
 
             var strategies = [ElementIdentityStrategy.type];
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+            var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -1257,7 +1197,7 @@ define([
 
             var strategies = [ListIdentityStrategy.type, ElementIdentityStrategy.type, ElementIdentityStrategy.type];
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+            var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -1293,7 +1233,7 @@ define([
             var txnScope;
 
             beforeEach(function() {
-              if(useTxn) txnScope = context.enterChange();
+              if(useTxn) txnScope = Transaction.enter();
             });
 
             afterEach(function() {
@@ -1304,7 +1244,7 @@ define([
 
               var strategies = [ElementIdentityStrategy.type];
 
-              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+              var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
                 {
                   name: "roleA",
                   strategies: strategies
@@ -1332,7 +1272,7 @@ define([
 
               var strategies = [];
 
-              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+              var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
                 {
                   name: "roleA",
                   strategies: strategies
@@ -1360,7 +1300,7 @@ define([
 
               var strategies = [ElementIdentityStrategy.type];
 
-              var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+              var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
                 {
                   name: "roleA",
                   strategies: strategies
@@ -1394,7 +1334,7 @@ define([
 
             var scope = new SpecificationScope();
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole);
+            var DerivedModelAdapter = buildAdapter(ModelWithStringRole);
 
             var externalPropType = DerivedModelAdapter.type.get("roleA");
 
@@ -1415,7 +1355,7 @@ define([
 
             var strategies = [ElementIdentityStrategy.type];
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+            var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
               {
                 name: "roleA",
                 strategies: strategies

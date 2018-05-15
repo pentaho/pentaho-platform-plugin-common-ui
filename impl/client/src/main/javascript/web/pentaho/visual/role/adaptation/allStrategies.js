@@ -16,9 +16,9 @@
 
 // This exists only so that r.js sees otherwise invisible dependencies.
 define([
-  "./identityStrategy",
-  "./tupleStrategy",
-  "./entityWithTimeIntervalKeyStrategy"
+  "./IdentityStrategy",
+  "./TupleStrategy",
+  "./EntityWithTimeIntervalKeyStrategy"
 ], function() {
   "use strict";
 });

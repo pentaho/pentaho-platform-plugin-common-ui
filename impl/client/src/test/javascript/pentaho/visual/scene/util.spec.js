@@ -15,12 +15,10 @@
  */
 define([
   "pentaho/visual/scene/util",
-  "pentaho/type/Context",
-  "pentaho/data/Table",
-  "tests/pentaho/util/errorMatch"
-], function(sceneUtil, Context, DataTable, errorMatch) {
-
-  /* globals it, describe, beforeEach, beforeAll */
+  "pentaho/data/filter/Abstract",
+  "pentaho/visual/base/Model",
+  "pentaho/data/Table"
+], function(sceneUtil, AbstractFilter, VisualModel, DataTable) {
 
   function getDatasetDT1WithNoKeyColumns() {
     return {
@@ -82,31 +80,6 @@ define([
 
   describe("pentaho.visual.scene.util", function() {
 
-    var context;
-    var AbstractFilter;
-    var VisualModel;
-
-    beforeAll(function(done) {
-
-      Context.createAsync()
-          .then(function(_context) {
-
-            context = _context;
-
-            return context.getDependencyApplyAsync([
-              "pentaho/data/filter/abstract",
-              "pentaho/visual/base/model",
-              // These need to be loaded for createFilterFromCellsMap to work.
-              "pentaho/data/filter/isEqual",
-              "pentaho/data/filter/and"
-            ], function(_AbstractFilter, _VisualModel) {
-              AbstractFilter = _AbstractFilter;
-              VisualModel = _VisualModel;
-            });
-          })
-          .then(done, done.fail);
-    });
-
     describe(".invertVars(varsMap, model, keyArgs)", function() {
 
       it("should return an empty cells map if the given vars map is empty", function() {
@@ -162,7 +135,7 @@ define([
             props: [
               {
                 name: "category",
-                base: "pentaho/visual/role/property"
+                base: "pentaho/visual/role/Property"
               }
             ]
           }
@@ -187,7 +160,7 @@ define([
               props: [
                 {
                   name: "category",
-                  base: "pentaho/visual/role/property"
+                  base: "pentaho/visual/role/Property"
                 }
               ]
             }
@@ -229,11 +202,11 @@ define([
               props: [
                 {
                   name: "category1",
-                  base: "pentaho/visual/role/property"
+                  base: "pentaho/visual/role/Property"
                 },
                 {
                   name: "category2",
-                  base: "pentaho/visual/role/property"
+                  base: "pentaho/visual/role/Property"
                 }
               ]
             }
@@ -274,11 +247,11 @@ define([
               props: [
                 {
                   name: "category1",
-                  base: "pentaho/visual/role/property"
+                  base: "pentaho/visual/role/Property"
                 },
                 {
                   name: "category2",
-                  base: "pentaho/visual/role/property"
+                  base: "pentaho/visual/role/Property"
                 }
               ]
             }
@@ -322,11 +295,11 @@ define([
               props: [
                 {
                   name: "category",
-                  base: "pentaho/visual/role/property"
+                  base: "pentaho/visual/role/Property"
                 },
                 {
                   name: "measure",
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [{dataType: "number"}]
                 }
               ]
@@ -375,7 +348,7 @@ define([
               props: [
                 {
                   name: "category",
-                  base: "pentaho/visual/role/property"
+                  base: "pentaho/visual/role/Property"
                 }
               ]
             }
@@ -417,11 +390,11 @@ define([
               props: [
                 {
                   name: "category1",
-                  base: "pentaho/visual/role/property"
+                  base: "pentaho/visual/role/Property"
                 },
                 {
                   name: "category2",
-                  base: "pentaho/visual/role/property"
+                  base: "pentaho/visual/role/Property"
                 }
               ]
             }
@@ -461,11 +434,11 @@ define([
               props: [
                 {
                   name: "category",
-                  base: "pentaho/visual/role/property"
+                  base: "pentaho/visual/role/Property"
                 },
                 {
                   name: "measure",
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [{dataType: "number"}]
                 }
               ]
@@ -514,7 +487,7 @@ define([
             props: [
               {
                 name: "category",
-                base: "pentaho/visual/role/property"
+                base: "pentaho/visual/role/Property"
               }
             ]
           }

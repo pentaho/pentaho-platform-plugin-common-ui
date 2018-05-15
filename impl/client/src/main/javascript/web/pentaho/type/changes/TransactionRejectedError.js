@@ -16,8 +16,8 @@
 
 define([
   "module",
-  "../../lang/UserError",
-  "../../util/object"
+  "pentaho/lang/UserError",
+  "pentaho/util/object"
 ], function(module, UserError, O) {
 
   "use strict";

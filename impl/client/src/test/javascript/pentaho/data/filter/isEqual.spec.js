@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,43 +14,26 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context"
-], function(Context) {
+  "pentaho/type/Complex",
+  "pentaho/data/filter/IsEqual"
+], function(Complex, IsEqualFilter) {
 
   "use strict";
 
   describe("pentaho.data.filter.IsEqual", function() {
 
-    var context;
-    var Complex;
-    var IsEqualFilter;
     var ProductSummary;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-
-            context = _context;
-            Complex = context.get("complex");
-
-            ProductSummary = Complex.extend({
-              $type: {
-                props: [
-                  {name: "name", valueType: "string", label: "Name"},
-                  {name: "sales", valueType: "number", label: "Sales"},
-                  {name: "inStock", valueType: "boolean", label: "In Stock"}
-                ]
-              }
-            });
-
-            return context.getDependencyApplyAsync([
-              "pentaho/data/filter/isEqual"
-            ], function(IsEqual) {
-              IsEqualFilter = IsEqual;
-            });
-          })
-          .then(done, done.fail);
-
+    beforeAll(function() {
+      ProductSummary = Complex.extend({
+        $type: {
+          props: [
+            {name: "name", valueType: "string", label: "Name"},
+            {name: "sales", valueType: "number", label: "Sales"},
+            {name: "inStock", valueType: "boolean", label: "In Stock"}
+          ]
+        }
+      });
     });
 
     describe("new ({property, value})", function() {
@@ -176,7 +159,7 @@ define([
             noAlias: true
           });
 
-          expect(filterSpec._).toBe("pentaho/data/filter/isEqual");
+          expect(filterSpec._).toBe("pentaho/data/filter/IsEqual");
         });
       });
 
@@ -205,7 +188,6 @@ define([
       beforeEach(function() {
         elem = new ProductSummary({name: "A", sales: 12000, inStock: true});
       });
-
 
       it("should return `true` if `elem` has property `property` with a value = `value`", function() {
 

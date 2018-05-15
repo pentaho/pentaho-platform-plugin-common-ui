@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!../IsEqual",
   "../KnownFilterKind"
-], function(KnownFilterKind) {
+], function(module, KnownFilterKind) {
 
   "use strict";
 
   return function(filter) {
 
     /**
-     * @name pentaho.data.filter.IsEqual.Type
+     * @name pentaho.data.filter.IsEqualType
      * @class
-     * @extends pentaho.data.filter.Property.Type
+     * @extends pentaho.data.filter.PropertyType
      *
      * @classDesc The type class of the equality filter type.
      *
@@ -35,7 +36,7 @@ define([
      * @name pentaho.data.filter.IsEqual
      * @class
      * @extends pentaho.data.filter.Property
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.IsEqual>} pentaho/data/filter/isEqual
+     * @amd pentaho/data/filter/IsEqual
      *
      * @classDesc The `IsEqual` class represents an equality filter.
      * This filter selects elements having the value of a certain property equal to
@@ -88,9 +89,8 @@ define([
         return (this.property || "") + " " + (v ? v.$key : "");
       },
 
-      $type: /** @lends pentaho.data.filter.IsEqual.Type# */{
-        id: "pentaho/data/filter/isEqual",
-        alias: "=",
+      $type: /** @lends pentaho.data.filter.IsEqualType# */{
+        id: module.id,
         props: [
           {
             // May be `null`

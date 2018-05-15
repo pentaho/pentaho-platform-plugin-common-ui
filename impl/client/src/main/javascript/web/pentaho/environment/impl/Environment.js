@@ -65,22 +65,22 @@ define([
 
     var propSpec = readVar(spec, "user");
     var propSpecDef = readVar(defaultSpec, "user");
-    this.user = {
+    this.user = Object.freeze({
       id:   readVar(propSpec, "id", propSpecDef),
       home: readVar(propSpec, "home", propSpecDef)
-    };
+    });
 
     // URL missing on IE11 and on PhantomJS 2.0
     propSpec = readVar(spec, "server");
     propSpecDef = readVar(defaultSpec, "server");
-    this.server = {
+    this.server = Object.freeze({
       // href
       // protocol
       // pathname
       root: url.create(readVar(propSpec, "root", propSpecDef)),
       packages: url.create(readVar(propSpec, "packages", propSpecDef)),
       services: url.create(readVar(propSpec, "services", propSpecDef))
-    };
+    });
 
     this.reservedChars = readVar(spec, "reservedChars", defaultSpec);
 

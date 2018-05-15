@@ -27,7 +27,7 @@
  * Gets the adaptation strategy type.
  *
  * @name pentaho.visual.role.adaptation.IStrategyApplication#strategyType
- * @type {!pentaho.visual.role.adaptation.Strategy.Type}
+ * @type {!pentaho.visual.role.adaptation.StrategyType}
  * @readOnly
  */
 

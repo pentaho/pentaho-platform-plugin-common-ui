@@ -14,40 +14,38 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!_",
+  "./CategoricalContinuousAbstract",
+  "./types/LabelsOption",
+  "./mixins/MultiCharted",
+  "./mixins/Interpolated",
   "pentaho/i18n!./i18n/model"
-], function(bundle) {
+], function(module, BaseModel, LabelsOption, MultiChartedModel, InterpolatedModel, bundle) {
 
   "use strict";
 
-  return [
-    "./categoricalContinuousAbstract",
-    "./types/labelsOption",
-    "./mixins/multiCharted",
-    "./mixins/interpolated",
-    function(BaseModel, LabelsOption, MultiChartedModel, InterpolatedModel) {
-
-      return BaseModel.extend({
-        $type: {
-          isAbstract: true,
-          mixins: [MultiChartedModel, InterpolatedModel],
-          props: [
-            {
-              name: "measures", // VISUAL_ROLE
-              fields: {isRequired: true},
-              ordinal: 7
-            },
-            {
-              name: "labelsOption",
-              valueType: LabelsOption,
-              domain: ["none", "center", "left", "right", "top", "bottom"],
-              isRequired: true,
-              defaultValue: "none"
-            }
-          ]
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      isAbstract: true,
+      mixins: [MultiChartedModel, InterpolatedModel],
+      props: [
+        {
+          name: "measures", // VISUAL_ROLE
+          fields: {isRequired: true},
+          ordinal: 7
+        },
+        {
+          name: "labelsOption",
+          valueType: LabelsOption,
+          domain: ["none", "center", "left", "right", "top", "bottom"],
+          isRequired: true,
+          defaultValue: "none"
         }
-
-      })
-      .implement({$type: bundle.structured.pointAbstract});
+      ]
     }
-  ];
+
+  })
+  .localize({$type: bundle.structured.PointAbstract})
+  .configure({$type: module.config});
 });

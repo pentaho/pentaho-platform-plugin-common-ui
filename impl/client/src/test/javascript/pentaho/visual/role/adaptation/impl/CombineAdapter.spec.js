@@ -89,7 +89,7 @@ define([
       Context.createAsync()
           .then(function(context) {
             return context.getDependencyApplyAsync([
-              "pentaho/visual/base/model"
+              "pentaho/visual/base/Model"
             ], function(VisualModel) {
 
               var CustomVisualModel = VisualModel.extend({
@@ -97,7 +97,7 @@ define([
                   props: [
                     {
                       name: "roleA",
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       modes: [
                         {dataType: "string", isContinuous: false},
                         {dataType: "element", isContinuous: false}

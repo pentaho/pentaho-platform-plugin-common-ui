@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,34 +14,24 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context"
-], function(Context) {
+  "pentaho/type/action/Base"
+], function(ActionBase) {
 
   "use strict";
 
   describe("pentaho.type.action.Base", function() {
 
-    var BaseAction;
     var SubAction;
 
-    beforeAll(function(done) {
+    beforeAll(function() {
 
-      Context.createAsync()
-          .then(function(context) {
-            return context.getAsync("pentaho/type/action/base");
-          })
-          .then(function(_BaseAction) {
-            BaseAction = _BaseAction;
-
-            // A derived non-abstract class, adding nothing new.
-            SubAction = BaseAction.extend({
-              $type: {
-                label: "typeDefaultLabel",
-                description: "typeDefaultDescription"
-              }
-            });
-          })
-          .then(done, done.fail);
+      // A derived non-abstract class, adding nothing new.
+      SubAction = ActionBase.extend({
+        $type: {
+          label: "typeDefaultLabel",
+          description: "typeDefaultDescription"
+        }
+      });
     });
 
     describe("new ({label, description})", function() {
@@ -256,7 +246,7 @@ define([
 
         it("should respect a specified value", function() {
 
-          var SubAction2 = BaseAction.extend({
+          var SubAction2 = ActionBase.extend({
             $type: {
               isSync: true
             }
@@ -266,7 +256,7 @@ define([
 
           // ---
 
-          SubAction2 = BaseAction.extend({
+          SubAction2 = ActionBase.extend({
             $type: {
               isSync: false
             }
@@ -280,7 +270,7 @@ define([
 
         it("should include the isSync property when different from the inherited value", function() {
 
-          var SubAction2 = BaseAction.extend({
+          var SubAction2 = ActionBase.extend({
             $type: {
               isSync: false
             }
@@ -303,7 +293,7 @@ define([
 
         it("should not include the isSync property when equal to the inherited value", function() {
 
-          var SubAction2 = BaseAction.extend({
+          var SubAction2 = ActionBase.extend({
             $type: {
               isSync: true
             }
@@ -314,7 +304,7 @@ define([
 
           // ---
 
-          SubAction2 = BaseAction.extend({
+          SubAction2 = ActionBase.extend({
             $type: {
               isSync: false
             }

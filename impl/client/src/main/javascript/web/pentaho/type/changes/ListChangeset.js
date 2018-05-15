@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 define([
+  "module",
   "./Changeset",
   "./Add",
   "./Remove",
   "./Move",
   "./Sort",
   "./Clear",
-  "../../util/arg",
-  "../../util/object"
-], function(Changeset, Add, Remove, Move, Sort, Clear, arg, O) {
+  "pentaho/util/arg",
+  "pentaho/util/object"
+], function(module, Changeset, Add, Remove, Move, Sort, Clear, arg, O) {
 
   "use strict";
 
@@ -43,7 +44,7 @@ define([
    * @param {!pentaho.type.changes.Transaction} transaction - The owning transaction.
    * @param {!pentaho.type.List} owner - The list value where the changes take place.
    */
-  return Changeset.extend("pentaho.type.changes.ListChangeset", /** @lends pentaho.type.changes.ListChangeset# */{
+  return Changeset.extend(module.id, /** @lends pentaho.type.changes.ListChangeset# */{
 
     constructor: function(transaction, owner) {
 

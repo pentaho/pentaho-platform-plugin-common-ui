@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,11 @@
  */
 
 /**
- * The `spec.IComplexTypeProto` interface represents the specification of a complex type.
+ * The `spec.IComplexType` interface represents the specification of a complex type.
  *
- * @name pentaho.type.spec.IComplexTypeProto
+ * @name pentaho.type.spec.IComplexType
  * @interface
- * @extends pentaho.type.spec.IValueTypeProto
- */
-
-/**
- * The extensible/configurable members of the prototype of complex instance classes.
- *
- * @name instance
- * @memberOf pentaho.type.spec.IComplexTypeProto#
- * @type {pentaho.type.spec.IComplexProto}
- *
- * @see pentaho.type.spec.IComplexProto#$type
+ * @extends pentaho.type.spec.IValueType
  */
 
 /**
@@ -41,10 +31,10 @@
  * the complex values' [array form serialization]{@link pentaho.type.spec.IComplex}.
  *
  * The object/map form is best suited for configuration purposes.
- * In this form, the [name]{@link pentaho.type.spec.IPropertyTypeProto#name} attribute of
+ * In this form, the [name]{@link pentaho.type.spec.IPropertyType#name} attribute of
  * each property type specification can be omitted.
  *
  * @name props
- * @memberOf pentaho.type.spec.IComplexTypeProto#
- * @type {Array.<pentaho.type.spec.IPropertyTypeProto> | Object.<string, pentaho.type.spec.IPropertyTypeProto>}
+ * @memberOf pentaho.type.spec.IComplexType#
+ * @type {Array.<pentaho.type.spec.IPropertyType> | Object.<string, pentaho.type.spec.IPropertyType>}
  */

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,23 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/List",
+  "pentaho/type/Number",
   "pentaho/type/SpecificationScope"
-], function(Context, SpecificationScope) {
+], function(List, PentahoNumber, SpecificationScope) {
 
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false, Date:false */
-
   describe("pentaho.type.List", function() {
 
-    var context;
-    var List;
-    var PentahoNumber;
     var NumberList;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            List = context.get("pentaho/type/list");
-            PentahoNumber = context.get("pentaho/type/number");
-            NumberList = context.get(["number"]);
-          })
-          .then(done, done.fail);
+    beforeAll(function() {
+      NumberList = List.extend({
+        $type: {
+          of: PentahoNumber
+        }
+      });
     });
 
     describe("#toSpec(keyArgs)", function() {

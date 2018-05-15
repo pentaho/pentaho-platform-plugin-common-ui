@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 define([
+  "pentaho/type/changes/Transaction",
   "tests/pentaho/util/errorMatch",
-  "pentaho/type/Context",
+  "pentaho/visual/base/AbstractModel",
   "pentaho/type/ValidationError",
   "pentaho/data/Table"
-], function(errorMatch, Context, ValidationError, Table) {
+], function(Transaction, errorMatch, AbstractModel, ValidationError, Table) {
 
   "use strict";
 
@@ -27,25 +28,6 @@ define([
   describe("pentaho.visual.role.AbstractProperty", function() {
 
     describe(".Type", function() {
-
-      var AbstractModel;
-      var context;
-
-      beforeAll(function(done) {
-
-        Context.createAsync()
-            .then(function(_context) {
-              context = _context;
-
-              return context.getDependencyApplyAsync([
-                "pentaho/visual/base/abstractModel"
-              ], function(_AbstractModel) {
-                AbstractModel = _AbstractModel;
-              });
-            })
-            .then(done, done.fail);
-
-      });
 
       // region helper methods
       function getDataSpec1() {
@@ -69,7 +51,7 @@ define([
           $type: {
             props: {
               propRole: {
-                base: "pentaho/visual/role/abstractProperty"
+                base: "pentaho/visual/role/AbstractProperty"
               }
             }
           }
@@ -105,7 +87,7 @@ define([
             var txnScope;
 
             beforeEach(function() {
-              if(useTxn) txnScope = context.enterChange();
+              if(useTxn) txnScope = Transaction.enter();
             });
 
             afterEach(function() {
@@ -124,7 +106,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/abstractProperty"
+                      base: "pentaho/visual/role/AbstractProperty"
                     }
                   }
                 }

@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/visual/role/adaptation/IdentityStrategy",
+  "pentaho/type/List",
+  "pentaho/type/Complex",
   "pentaho/data/Table"
-], function(Context, DataTable) {
+], function(Strategy, List, Complex, DataTable) {
 
   "use strict";
 
-  /* globals describe, it, beforeEach, beforeAll, spyOn */
-
   describe("pentaho.visual.role.adaptation.IdentityStrategy", function() {
 
-    var Strategy;
-    var List;
-    var Complex;
     var dataTable;
 
     var datasetFieldIndexes = {
@@ -70,22 +67,7 @@ define([
     // ---
 
     beforeAll(function() {
-
       dataTable = new DataTable(getDataSpec1());
-
-      return Context.createAsync()
-        .then(function(context) {
-
-          List = context.get("list");
-          Complex = context.get("complex");
-
-          return context.getDependencyApplyAsync([
-            "pentaho/visual/role/adaptation/identityStrategy"
-          ], function(_Strategy) {
-
-            Strategy = _Strategy;
-          });
-        });
     });
 
     describe(".Type", function() {

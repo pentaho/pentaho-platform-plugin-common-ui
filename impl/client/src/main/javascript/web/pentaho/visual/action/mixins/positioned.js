@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,85 +14,84 @@
  * limitations under the License.
  */
 define([
-  "module"
-], function(module) {
+  "pentaho/module!_",
+  "pentaho/visual/action/Base"
+], function(module, ActionBase) {
 
   "use strict";
 
-  return ["pentaho/visual/action/base", function(ActionBase) {
+  /**
+   * @name pentaho.visual.action.mixins.PositionedType
+   * @class
+   * @extends pentaho.visual.action.BaseType
+   *
+   * @classDesc The type class of the positioned action mixin.
+   *
+   * For more information see {@link pentaho.visual.action.mixins.Positioned}.
+   */
+
+  /**
+   * @name Positioned
+   * @memberOf pentaho.visual.action.mixins
+   * @class
+   * @extends pentaho.visual.action.Base
+   * @abstract
+   *
+   * @amd pentaho/visual/action/mixins/Positioned
+   *
+   * @classDesc The `visual.action.mixins.Positioned` class is a mixin class for visual actions
+   * which are triggered at a specific user interface position.
+   *
+   * The position is given by the
+   * [position]{@link pentaho.visual.action.mixins.Positioned#position} property.
+   *
+   * The mixin adds [spec.IPositioned]{@link pentaho.visual.action.mixins.spec.IPositioned}
+   * to the specification of an action.
+   *
+   * @description This class was not designed to be constructed directly.
+   * It was designed to be used as a **mixin**.
+   * @constructor
+   */
+
+  return ActionBase.extend(/** @lends pentaho.visual.action.mixins.Positioned# */{
+    $type: {
+      id: module.id,
+      isAbstract: true
+    },
+
+    // @override
+    _init: function(spec) {
+
+      this.base(spec);
+
+      this.position = spec && spec.position;
+    },
 
     /**
-     * @name pentaho.visual.action.mixins.Positioned.Type
-     * @class
-     * @extends pentaho.visual.action.Base.Type
+     * Gets or sets the _position_ where the action took place, in screen coordinates.
      *
-     * @classDesc The type class of the positioned action mixin.
-     *
-     * For more information see {@link pentaho.visual.action.mixins.Positioned}.
+     * @type {pentaho.visual.spec.IPoint}
      */
+    get position() {
+      return this.__position;
+    },
 
-    /**
-     * @name Positioned
-     * @memberOf pentaho.visual.action.mixins
-     * @class
-     * @extends pentaho.visual.action.Base
-     * @abstract
-     *
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.action.mixins.Positioned>} pentaho/visual/action/mixins/positioned
-     *
-     * @classDesc The `visual.action.mixins.Positioned` class is a mixin class for visual actions
-     * which are triggered at a specific user interface position.
-     *
-     * The position is given by the
-     * [position]{@link pentaho.visual.action.mixins.Positioned#position} property.
-     *
-     * The mixin adds [spec.IPositioned]{@link pentaho.visual.action.mixins.spec.IPositioned}
-     * to the specification of an action.
-     *
-     * @description This class was not designed to be constructed directly.
-     * It was designed to be used as a **mixin**.
-     * @constructor
-     */
+    set position(value) {
+      this.__position = value || null;
+    },
 
-    return ActionBase.extend(/** @lends pentaho.visual.action.mixins.Positioned# */{
-      $type: {
-        id: module.id,
-        isAbstract: true
-      },
+    // region serialization
+    toSpecInContext: function(keyArgs) {
 
-      // @override
-      _init: function(spec) {
+      var spec = this.base(keyArgs);
 
-        this.base(spec);
-
-        this.position = spec && spec.position;
-      },
-
-      /**
-       * Gets or sets the _position_ where the action took place, in screen coordinates.
-       *
-       * @type {pentaho.visual.spec.IPoint}
-       */
-      get position() {
-        return this.__position;
-      },
-
-      set position(value) {
-        this.__position = value || null;
-      },
-
-      // region serialization
-      toSpecInContext: function(keyArgs) {
-
-        var spec = this.base(keyArgs);
-
-        if(this.__position) {
-          spec.position = {x: this.__position.x, y: this.__position.y};
-        }
-
-        return spec;
+      if(this.__position) {
+        spec.position = {x: this.__position.x, y: this.__position.y};
       }
-      // endregion
-    });
-  }];
+
+      return spec;
+    }
+    // endregion
+  })
+  .configure({$type: module.config});
 });

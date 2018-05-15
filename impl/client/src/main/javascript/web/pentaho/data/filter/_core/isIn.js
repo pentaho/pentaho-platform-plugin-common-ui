@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!../IsIn",
   "../KnownFilterKind"
-], function(KnownFilterKind) {
+], function(module, KnownFilterKind) {
 
   "use strict";
 
@@ -26,9 +27,9 @@ define([
     // Also, existing containers don't currently generate filters with isIn.
 
     /**
-     * @name pentaho.data.filter.IsIn.Type
+     * @name pentaho.data.filter.IsInType
      * @class
-     * @extends pentaho.data.filter.Property.Type
+     * @extends pentaho.data.filter.PropertyType
      *
      * @classDesc The type class of the membership filter type.
      *
@@ -41,7 +42,7 @@ define([
      * @name pentaho.data.filter.IsIn
      * @class
      * @extends pentaho.data.filter.Property
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.IsIn>} pentaho/data/filter/isIn
+     * @amd pentaho/data/filter/IsIn
      *
      * @classDesc The `IsIn` class represents a membership filter.
      * This filter selects elements in which the value of a certain property belongs to
@@ -60,20 +61,6 @@ define([
       /** @inheritDoc */
       get kind() {
         return KnownFilterKind.IsIn;
-      },
-
-      // TODO: In the future, review if values should be of type pentaho.type.Value[].
-      /**
-       * Gets the possible values of the property.
-       *
-       * This getter is a shorthand for `this.get("values")`.
-       *
-       * @type {Array.<any>}
-       *
-       * @readOnly
-       */
-      get values() {
-        return this.get("values");
       },
 
       /** @inheritDoc */
@@ -99,10 +86,21 @@ define([
         return (this.property || "") + " " + this.values.toArray(function(v) { return v.$key; }).join(" ");
       },
 
-      $type: /** @lends pentaho.data.filter.IsIn.Type# */{
-        id: "pentaho/data/filter/isIn",
-        alias: "in",
+      $type: /** @lends pentaho.data.filter.IsInType# */{
+        id: module.id,
         props: [
+          // TODO: In the future, review if values should be of type pentaho.type.Value[].
+          /**
+           * Gets the possible values of the property.
+           *
+           * This getter is a shorthand for `this.get("values")`.
+           *
+           * @name values
+           * @memberOf pentaho.data.filter.IsIn#
+           * @type {Array.<any>}
+           *
+           * @readOnly
+           */
           {
             // May be empty.
             name: "values",

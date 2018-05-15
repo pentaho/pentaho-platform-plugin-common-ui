@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "pentaho/module!_",
+  "./BarNormalizedAbstract",
+  "pentaho/visual/models/BarNormalizedHorizontal"
+], function(module, BaseView, Model) {
 
   "use strict";
 
-  return [
-    "./barNormalizedAbstract",
-    "pentaho/visual/models/barNormalizedHorizontal",
-    function(BaseView, Model) {
+  return BaseView.extend({
+    $type: {
+      id: module.id,
+      props: {
+        model: {valueType: Model}
+      }
+    },
 
-      return BaseView.extend({
-        $type: {
-          props: {
-            model: {valueType: Model}
-          }
-        },
-
-        _options: {
-          orientation: "horizontal"
-        }
-      });
+    _options: {
+      orientation: "horizontal"
     }
-  ];
+  })
+  .configure({$type: module.config});
 });

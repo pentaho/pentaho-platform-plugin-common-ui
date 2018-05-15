@@ -14,24 +14,43 @@
  * limitations under the License.
  */
 define([
+  "module",
+  "./_transactionControl",
   "./ChangeRef",
   "./TransactionScope",
+  "./CommittedScope",
   "./TransactionRejectedError",
   "pentaho/lang/Base",
   "pentaho/lang/ActionResult",
   "pentaho/lang/SortedList",
   "pentaho/util/object",
   "pentaho/util/error"
-], function(ChangeRef, TransactionScope, TransactionRejectedError, Base, ActionResult, SortedList, O, error) {
+], function(module, transactionControl, ChangeRef, TransactionScope, CommittedScope, TransactionRejectedError, Base,
+            ActionResult, SortedList, O, error) {
 
   "use strict";
 
-  return Base.extend(/** @lends pentaho.type.changes.Transaction# */{
+  /**
+   * The stack of transactions performing the `did:change` phase.
+   *
+   * @type {!Array.<!pentaho.type.changes.Transaction>}
+   * @readOnly
+   */
+  var __txnInCommitDid = [];
+
+  /**
+   * The version of the next committed/fulfilled transaction.
+   *
+   * @type {number}
+   * @default 1
+   */
+  var __nextVersion = 1;
+
+  var Transaction = Base.extend(module.id, /** @lends pentaho.type.changes.Transaction# */{
     /**
      * @alias Transaction
      * @memberOf pentaho.type.changes
      * @class
-     * @friend {pentaho.type.Context}
      * @friend {pentaho.type.changes.TransactionScope}
      * @implements {pentaho.lang.IDisposable}
      *
@@ -46,7 +65,7 @@ define([
      * until the transaction is committed.
      *
      * The ambient transaction is accessible through
-     * [this.context.transaction]{@link pentaho.type.Context#transaction}.
+     * [Transaction.current]{@link pentaho.type.changes.Transaction#current}.
      *
      * All of the changes are immediately visible, through any read operations of the modified instances,
      * while the transaction is the ambient transaction.
@@ -61,20 +80,9 @@ define([
      * by delegating to a [TransactionScope]{@link pentaho.type.changes.TransactionScope} object.
      *
      * @constructor
-     * @description Creates a `Transaction` for a given context.
-     * @param {!pentaho.type.Context} context - The context of the transaction.
+     * @description Creates a `Transaction`.
      */
-    constructor: function(context) {
-      if(!context) throw error.argRequired("context");
-
-      /**
-       * Gets the associated context.
-       *
-       * @name pentaho.type.changes.Transaction#context
-       * @type {!pentaho.type.Context}
-       * @readOnly
-       */
-      O.setConst(this, "context", context);
+    constructor: function() {
 
       // Dictionary of changesets by container uid.
       this.__csetByUid = {};
@@ -353,7 +361,7 @@ define([
     // region Ambient transaction
     /**
      * Gets a value that indicates if this transaction is the
-     * [current transaction]{@link pentaho.type.Context#transaction}.
+     * [current transaction]{@link pentaho.type.changes.Transaction#current}.
      *
      * @type {boolean}
      */
@@ -372,7 +380,7 @@ define([
      * and the transaction is automatically rejected due to a concurrency error.
      */
     enter: function() {
-      return new TransactionScope(this.context, this);
+      return new TransactionScope(this);
     },
 
     /**
@@ -427,12 +435,12 @@ define([
     },
 
     /**
-     * Called by the context when this transaction becomes the ambient transaction.
+     * Called when this transaction becomes the ambient transaction.
      *
      * @private
      * @internal
      *
-     * @see pentaho.type.Context#__setTransaction
+     * @see pentaho.type.changes.Transaction#__setCurrent
      */
     __enteringAmbient: function() {
 
@@ -444,12 +452,12 @@ define([
     },
 
     /**
-     * Called by the context when this transaction will stop being the ambient transaction.
+     * Called when this transaction will stop being the ambient transaction.
      *
      * @private
      * @internal
      *
-     * @see pentaho.type.Context#__setTransaction
+     * @see pentaho.type.changes.Transaction#__setCurrent
      */
     __exitingAmbient: function() {
 
@@ -654,10 +662,8 @@ define([
         var listenersVersionsByUid = Object.create(null);
 
         var currentChangeset;
-        var currentChangesetVersionLocal;
         var currentOwner;
         var currentListenersVersions;
-        var isChangesetRestart;
 
         var keyArgsOnChangeWill = {
           isCanceled: __event_isCanceled,
@@ -677,18 +683,6 @@ define([
                 if(!eventArgs[0].isCanceled) {
                   // Store for later.
                   currentListenersVersions[index] = currentChangeset.transactionVersion;
-
-                  // If the current changeset was modified, restart its processing.
-                  // if(currentChangeset.transactionVersionLocal > currentChangesetVersionLocal) {
-                  //
-                  //   isChangesetRestart = true;
-                  //
-                  //   // Break. Don't notify any more listeners.
-                  //   eventArgs[0].cancel("changeset restart");
-                  //
-                  //   // In case an error is being thrown, the error handler is invoked (EventSource#_emitGeneric).
-                  //   // The error is not caught here to reuse the default error handler, which console-logs the error.
-                  // }
                 }
               }
             }
@@ -705,22 +699,10 @@ define([
 
           currentListenersVersions = null;
 
-          while(true) {
-            // Restart processing the changeset if any local changes are performed in it.
-            // Changes to other changesets, instead, result in them being added to the queue.
-            isChangesetRestart = false;
-            currentChangesetVersionLocal = currentChangeset.transactionVersionLocal;
-
-            var cancelReason = currentOwner._onChangeWill(currentChangeset, keyArgsOnChangeWill);
-
-            if(!isChangesetRestart) {
-              if(cancelReason != null) {
-                this.__finalizeCommitWillQueue();
-                return ActionResult.reject(cancelReason);
-              }
-
-              break;
-            }
+          var cancelReason = currentOwner._onChangeWill(currentChangeset, keyArgsOnChangeWill);
+          if(cancelReason != null) {
+            this.__finalizeCommitWillQueue();
+            return ActionResult.reject(cancelReason);
           }
 
           this.__addParentsToCommitWillQueue(currentOwner);
@@ -912,7 +894,7 @@ define([
     __applyChanges: function() {
       // Apply all changesets.
       // Includes setting owner versions to the new txn version.
-      var version = this.context.__takeNextVersion();
+      var version = __takeNextVersion();
 
       this.__crefs.forEach(function(cref) {
         cref.apply();
@@ -934,12 +916,12 @@ define([
       // Release any __commitWill result.
       this.__resultWill = null;
 
-      // Exit all context scopes, including CommittedScopes, until the isRoot scope.
+      // Exit all scopes, including CommittedScopes, until the isRoot scope.
       // The error thrown below, if rejected, should help prevent executing lines of code that would fail.
       if(this.__scopeCount) {
         this.__scopeCount = 0;
         this.__exitingAmbient();
-        this.context.__transactionExit();
+        transactionControl.exitCurrent();
       }
 
       // Any new changes arising from notification create new transactions/changesets.
@@ -950,21 +932,116 @@ define([
         ? function(cset) { cset.owner._onChangeRejected(cset, reason); }
         : function(cset) { cset.owner._onChangeDid(cset); };
 
-      var context = this.context;
-
-      context.__transactionEnterCommitDid(this);
+      __txnInCommitDid.push(this);
 
       // Make sure to execute listeners without an active transaction.
-      context.enterCommitted().using(this.__eachChangeset.bind(this, mapper));
+      Transaction.enterCommitted().using(this.__eachChangeset.bind(this, mapper));
 
-      context.__transactionExitCommitDid(this);
+      var txn = __txnInCommitDid.pop();
+      if(txn !== this) {
+        throw error.operInvalid("Unbalanced transaction exit commit did.");
+      }
 
       return reason;
     }
+  }, /** @lends pentaho.type.changes.Transaction */ {
+
+    /**
+     * Gets the ambient transaction, if any, or `null`.
+     *
+     * @type {pentaho.type.changes.Transaction}
+     * @readOnly
+     */
+    get current() {
+      return transactionControl.current;
+    },
+
+    /**
+     * Enters a scope of change.
+     *
+     * To mark the changes in the scope as error,
+     * call its [reject]{@link pentaho.type.changes.TransactionScope#reject} method.
+     *
+     * To end the scope of change successfully,
+     * dispose the returned transaction scope,
+     * by calling its [dispose]{@link pentaho.type.changes.TransactionScope#scope} method.
+     *
+     * If the scope initiated a transaction,
+     * then that transaction is committed.
+     * Otherwise,
+     * if an ambient transaction already existed when the change scope was created,
+     * that transaction is left uncommitted.
+     *
+     * To end the scope with an error,
+     * call its [reject]{@link pentaho.type.changes.TransactionScope#reject} method.
+     *
+     * @return {!pentaho.type.changes.TransactionScope} The new transaction scope.
+     */
+    enter: function() {
+      var txn = transactionControl.current || new Transaction(); // <=> new this() :-)
+      return txn.enter();
+    },
+
+    /**
+     * Enters a read-committed scope.
+     *
+     * Within this scope there is no current transaction and
+     * reading the properties of instances obtains their committed values.
+     *
+     * @return {!pentaho.type.changes.CommittedScope} The read-committed scope.
+     */
+    enterCommitted: function() {
+      return new CommittedScope();
+    },
+
+    /**
+     * Gets any changesets still being delivered through notifications in the commit phase
+     * of transactions.
+     *
+     * If a transaction is started and committed from within the `did:change` listener of another,
+     * then multiple changesets may be returned.
+     *
+     * @param {!pentaho.type.mixins.Container} container - The container.
+     *
+     * @return {Array.<pentaho.type.changes.Changeset>} An array of changesets, if any changeset exists;
+     * `null` otherwise.
+     */
+    getChangesetsPending: function(container) {
+      var changesets = null;
+      var L = __txnInCommitDid.length;
+      if(L > 0) {
+        var i = -1;
+        var uid = container.$uid;
+        while(++i < L) {
+          var transaction = __txnInCommitDid[i];
+          var changeset = transaction.getChangeset(uid);
+          if(changeset !== null) {
+            (changesets || (changesets = [])).push(changeset);
+          }
+        }
+      }
+
+      return changesets;
+    }
   });
+
+  return Transaction;
 
   function __compareChangesets(csa, csb) {
     return csb._netOrder - csa._netOrder;
+  }
+
+  /**
+   * Increments and returns the next version number for use in the
+   * [commit]{@link pentaho.type.changes.Transaction#__applyChanges} of a transaction.
+   *
+   * @memberOf pentaho.type.changes.Transaction~
+   * @private
+   *
+   * @return {number} The next version number.
+   */
+  function __takeNextVersion() {
+    return ++__nextVersion;
   }
 
   /**

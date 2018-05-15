@@ -39,7 +39,7 @@ define([
        *   by accessing the `constructor` property.
        *   For example: `"Array"`, `"Object"`, or `"HTMLElement"`.
        * * The identifier of an AMD module that returns a constructor or factory.
-       *   For example: `"pentaho/type/complex"`.
+       *   For example: `"pentaho/type/Complex"`.
        *
        * @example
        *

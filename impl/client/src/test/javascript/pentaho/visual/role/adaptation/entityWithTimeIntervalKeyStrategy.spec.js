@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 define([
-         "pentaho/type/Context",
-         "pentaho/data/Table",
-         "pentaho/util/date"
-       ], function(Context, DataTable, dateUtil) {
+  "pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy",
+  "pentaho/type/List",
+  "pentaho/type/Element",
+  "pentaho/type/String",
+  "pentaho/type/Date",
+  "pentaho/type/Complex",
+  "pentaho/data/Table",
+  "pentaho/util/date"
+], function(Strategy, List, Element, PentahoString, PentahoDate, Complex, DataTable, dateUtil) {
+
   "use strict";
 
-  /* globals describe, it, beforeEach, beforeAll, spyOn */
-
   describe("pentaho.visual.role.adaptation.EntityWithTimeIntervalKeyStrategy", function() {
-    var Strategy;
-    var List;
-    var Element;
-    var PentahoString;
-    var Complex;
-    var PentahoDate;
+
     var dataTable;
 
     var datasetFieldIndexes = {
@@ -216,24 +215,6 @@ define([
 
     // ---
 
-    beforeAll(function() {
-      return Context.createAsync()
-        .then(function(context) {
-          List = context.get("list");
-          Element = context.get("element");
-          PentahoString = context.get("string");
-          Complex = context.get("complex");
-          PentahoDate = context.get("date");
-
-          return context.getDependencyApplyAsync(
-            [
-              "pentaho/visual/role/adaptation/entityWithTimeIntervalKeyStrategy"
-            ], function(_Strategy) {
-              Strategy = _Strategy;
-            });
-        });
-    });
-
     beforeEach(function() {
       dataTable = new DataTable(getDataSpec1());
     });
@@ -300,30 +281,26 @@ define([
           expect(result).toEqual(jasmine.objectContaining({addsFields: true}));
         });
 
-        it(
-          "should return an object with isValid: false when not all fields are annotated with EntityWithTimeIntervalKey",
-          function() {
-            var result = Strategy.type.validateApplication(
-              dataTable,
-              [datasetFieldIndexes.years, datasetFieldIndexes.months, datasetFieldIndexes.other]
-            );
-            expect(result).toEqual(jasmine.objectContaining({isValid: false}));
-          }
-        );
+        it("should return an object with isValid: false when not all fields are " +
+          "annotated with EntityWithTimeIntervalKey", function() {
+          var result = Strategy.type.validateApplication(
+            dataTable,
+            [datasetFieldIndexes.years, datasetFieldIndexes.months, datasetFieldIndexes.other]
+          );
+          expect(result).toEqual(jasmine.objectContaining({isValid: false}));
+        });
 
-        it(
-          "should return an object with isValid: false if there are no fields with isStartDateTimeProvided=true",
-          function() {
-            dataTable.getColumnAttribute(datasetFieldIndexes.months)
-              .property("EntityWithTimeIntervalKey").isStartDateTimeProvided = false;
+        it("should return an object with isValid: false if there " +
+          "are no fields with isStartDateTimeProvided=true", function() {
+          dataTable.getColumnAttribute(datasetFieldIndexes.months)
+            .property("EntityWithTimeIntervalKey").isStartDateTimeProvided = false;
 
-            var result = Strategy.type.validateApplication(
-              dataTable,
-              [datasetFieldIndexes.years, datasetFieldIndexes.months]
-            );
-            expect(result).toEqual(jasmine.objectContaining({isValid: false}));
-          }
-        );
+          var result = Strategy.type.validateApplication(
+            dataTable,
+            [datasetFieldIndexes.years, datasetFieldIndexes.months]
+          );
+          expect(result).toEqual(jasmine.objectContaining({isValid: false}));
+        });
 
       });
 
@@ -345,33 +322,31 @@ define([
           expect(strategy.inputFieldIndexes).toEqual(inputFieldIndexes);
         });
 
-        it("should add a column of dates to the data table and return a strategy with its index as the only content" +
-          "of outputFieldIndexes",
-          function() {
-            var beforeColsCount = dataTable.getNumberOfColumns();
+        it("should add a column of dates to the data table and " +
+          "return a strategy with its index as the only content of outputFieldIndexes", function() {
+          var beforeColsCount = dataTable.getNumberOfColumns();
 
-            var strategy = Strategy.type.apply(dataTable, [datasetFieldIndexes.years, datasetFieldIndexes.months]);
+          var strategy = Strategy.type.apply(dataTable, [datasetFieldIndexes.years, datasetFieldIndexes.months]);
 
-            var afterColsCount = dataTable.getNumberOfColumns();
+          var afterColsCount = dataTable.getNumberOfColumns();
 
-            expect(afterColsCount).toEqual(beforeColsCount + 1);
+          expect(afterColsCount).toEqual(beforeColsCount + 1);
 
-            expect(strategy.outputFieldIndexes.length).toEqual(1);
+          expect(strategy.outputFieldIndexes.length).toEqual(1);
 
-            var newColIndex = strategy.outputFieldIndexes[0];
-            var newCol = dataTable.getColumnAttribute(newColIndex);
+          var newColIndex = strategy.outputFieldIndexes[0];
+          var newCol = dataTable.getColumnAttribute(newColIndex);
 
-            expect(newCol.type).toEqual("date");
+          expect(newCol.type).toEqual("date");
 
-            var rowIndex = dataTable.getNumberOfRows();
-            while(rowIndex--) {
-              var sourceCell = dataTable.getCell(rowIndex, datasetFieldIndexes.months);
-              var newCell = dataTable.getCell(rowIndex, newColIndex);
+          var rowIndex = dataTable.getNumberOfRows();
+          while(rowIndex--) {
+            var sourceCell = dataTable.getCell(rowIndex, datasetFieldIndexes.months);
+            var newCell = dataTable.getCell(rowIndex, newColIndex);
 
-              expect(newCell.value).toEqual(dateUtil.parseDateEcma262v7(sourceCell.referent.property("startDateTime")));
-            }
+            expect(newCell.value).toEqual(dateUtil.parseDateEcma262v7(sourceCell.referent.property("startDateTime")));
           }
-        );
+        });
 
         it("should deal with null input cells", function() {
 
@@ -430,7 +405,6 @@ define([
             expect(newCell.label).toEqual(sourceCell1.label + ", " + sourceCell2.label);
           }
         });
-
       });
     });
 
@@ -533,7 +507,6 @@ define([
           ]
         );
       });
-
     });
   });
 });

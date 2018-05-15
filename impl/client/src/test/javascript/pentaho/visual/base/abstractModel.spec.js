@@ -14,44 +14,27 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
-  "pentaho/data/Table"
-], function(Context, Table) {
+  "pentaho/visual/base/AbstractModel",
+  "pentaho/visual/role/AbstractProperty",
+  "pentaho/visual/role/AbstractMapping",
+  "pentaho/visual/color/PaletteProperty",
+  "pentaho/data/filter/Abstract",
+  "pentaho/data/Table",
+  "pentaho/type/Complex"
+], function(AbstractModel, RoleAbstractProperty, RoleAbstractMapping, PaletteProperty, AbstractFilter, Table, Complex) {
 
   "use strict";
 
-  /* globals jasmine, console, expect, it, describe, beforeEach */
-
   describe("pentaho.visual.base.AbstractModel", function() {
 
-    var context;
     var Model;
-    var RoleAbstractProperty;
-    var RoleAbstractMapping;
-    var PaletteProperty;
     var dataSpec;
 
-    beforeEach(function(done) {
+    beforeAll(function() {
+      Model = AbstractModel.extend();
+    });
 
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-
-            return context.getDependencyApplyAsync([
-              "pentaho/visual/base/abstractModel",
-              "pentaho/visual/role/abstractProperty",
-              "pentaho/visual/role/abstractMapping",
-              "pentaho/visual/color/paletteProperty"
-            ], function(_AbstractModel, _RoleAbstractProperty, _RoleAbstractMapping, _PaletteProperty) {
-              var AbstractModel = _AbstractModel;
-              RoleAbstractProperty = _RoleAbstractProperty;
-              RoleAbstractMapping = _RoleAbstractMapping;
-              PaletteProperty = _PaletteProperty;
-
-              Model = AbstractModel.extend();
-            });
-          })
-          .then(done, done.fail);
+    beforeEach(function() {
 
       var data = {
         model: [
@@ -83,34 +66,18 @@ define([
       }).not.toThrowError();
     });
 
-    it("should preload registered filter types", function(done) {
+    it("should preload registered filter types", function() {
 
-      require.using(["pentaho/type/Context"], function(Context) {
-
-        return Context.createAsync().then(function(context) {
-
-          return context.getDependencyApplyAsync(["pentaho/visual/base/abstractModel"], function() {
-
-            context.get("pentaho/data/filter/or");
-          });
-        });
-      })
-      .then(done, done.fail);
+      require.using(["require", "pentaho/visual/base/AbstractModel"], function(localRequire) {
+        localRequire("pentaho/data/filter/Or");
+      });
     });
 
-    it("should pre-load all standard base visual role related modules", function(done) {
+    it("should pre-load all standard base visual role related modules", function() {
 
-      require.using(["pentaho/type/Context"], function(Context) {
-
-        return Context.createAsync().then(function(context) {
-
-          return context.getDependencyApplyAsync(["pentaho/visual/base/abstractModel"], function() {
-
-            context.get("pentaho/visual/role/abstractProperty");
-          });
-        });
-      })
-      .then(done, done.fail);
+      require.using(["require", "pentaho/visual/base/AbstractModel"], function(localRequire) {
+        localRequire("pentaho/visual/role/AbstractProperty");
+      });
     });
 
     describe("#application", function() {
@@ -127,7 +94,6 @@ define([
         var model = new Model();
         var selectionFilter = model.selectionFilter;
 
-        var AbstractFilter = context.get("pentaho/data/filter/abstract");
         expect(selectionFilter).toBeDefined();
         expect(selectionFilter instanceof AbstractFilter).toBe(true);
       });
@@ -199,7 +165,7 @@ define([
 
       it("should not serialize the `selectionFilter` property by default", function() {
         var model = new Model({
-          selectionFilter: {_: "pentaho/data/filter/and"}
+          selectionFilter: {_: "pentaho/data/filter/And"}
         });
 
         expect(!!model.get("selectionFilter")).toBe(true);
@@ -229,7 +195,7 @@ define([
 
       it("should serialize the `selectionFilter` property if keyArgs.omitProps.selectionFilter = false", function() {
         var model = new Model({
-          selectionFilter: {_: "pentaho/data/filter/and"}
+          selectionFilter: {_: "pentaho/data/filter/And"}
         });
 
         expect(!!model.get("selectionFilter")).toBe(true);
@@ -260,7 +226,7 @@ define([
         var model = new Model({
           width: 1,
           height: 1,
-          selectionFilter: {_: "pentaho/data/filter/and"}
+          selectionFilter: {_: "pentaho/data/filter/And"}
         });
 
         expect(!!model.get("selectionFilter")).toBe(true);
@@ -468,7 +434,8 @@ define([
         });
 
         it("should return false if type is not a Mapping", function() {
-          var NotRoleProp = context.get("complex");
+
+          var NotRoleProp = Complex;
 
           expect(Model.type.isVisualRole(NotRoleProp.type)).toBe(false);
         });
@@ -486,7 +453,7 @@ define([
 
         it("should return false if type is not a Color Palette", function() {
 
-          var NotPaletteProp = context.get("complex");
+          var NotPaletteProp = Complex;
 
           expect(Model.type.isColorPalette(NotPaletteProp.type)).toBe(false);
         });

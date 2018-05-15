@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,62 +14,43 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context"
-], function(Context) {
+  "pentaho/type/Complex",
+  "pentaho/data/filter/Abstract",
+  "pentaho/data/filter/Not",
+  "pentaho/data/filter/IsEqual"
+], function(Complex, AbstractFilter, NotFilter, IsEqualFilter) {
 
   "use strict";
 
   describe("pentaho.data.filter.Not", function() {
 
-    var context;
-    var Complex;
-    var AbstractFilter;
-    var NotFilter;
     var CustomFilter;
     var ProductSummary;
 
     function isTrue() { return true; }
     function isFalse() { return false; }
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
+    beforeAll(function() {
+      ProductSummary = Complex.extend({
+        $type: {
+          props: [
+            {name: "name", valueType: "string", label: "Name"},
+            {name: "sales", valueType: "number", label: "Sales"},
+            {name: "inStock", valueType: "boolean", label: "In Stock"}
+          ]
+        }
+      });
 
-            context = _context;
-            Complex = context.get("complex");
+      var count = 1;
 
-            ProductSummary = Complex.extend({
-              $type: {
-                props: [
-                  {name: "name", valueType: "string", label: "Name"},
-                  {name: "sales", valueType: "number", label: "Sales"},
-                  {name: "inStock", valueType: "boolean", label: "In Stock"}
-                ]
-              }
-            });
-
-            return context.getDependencyApplyAsync([
-              "pentaho/data/filter/abstract",
-              "pentaho/data/filter/not",
-              "pentaho/data/filter/isEqual"
-            ], function(Abstract, Not) {
-              AbstractFilter = Abstract;
-              NotFilter = Not;
-
-              var count = 1;
-
-              CustomFilter = AbstractFilter.extend({
-                compile: function() {
-                  return function() { return false; };
-                },
-                _buildContentKey: function() {
-                  return String(count++);
-                }
-              });
-            });
-          })
-          .then(done, done.fail);
-
+      CustomFilter = AbstractFilter.extend({
+        compile: function() {
+          return function() { return false; };
+        },
+        _buildContentKey: function() {
+          return String(count++);
+        }
+      });
     });
 
     describe("new ({operand})", function() {
@@ -269,7 +250,7 @@ define([
             noAlias: true
           });
 
-          expect(filterSpec._).toBe("pentaho/data/filter/not");
+          expect(filterSpec._).toBe("pentaho/data/filter/Not");
         });
       });
 
@@ -289,5 +270,5 @@ define([
         expect(filter.$contentKey).toBe("(not)");
       });
     });
-  }); // pentaho.data.filter.Not
+  });
 });

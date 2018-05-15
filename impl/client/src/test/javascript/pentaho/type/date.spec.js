@@ -14,28 +14,13 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/date",
-  "pentaho/type/Context",
+  "pentaho/type/Date",
   "tests/pentaho/util/errorMatch"
-], function(dateFactory, Context, errorMatch) {
+], function(PentahoDate, errorMatch) {
 
   "use strict";
 
-  /* global describe:true, it:true, expect:true, beforeEach:true*/
-
   describe("pentaho.type.Date -", function() {
-
-    var context;
-    var PentahoDate;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            PentahoDate = context.get("pentaho/type/date");
-          })
-          .then(done, done.fail);
-    });
 
     describe("new Date()", function() {
 
@@ -93,5 +78,5 @@ define([
         });
       });
     });
-  }); // pentaho.type.Date
+  });
 });
