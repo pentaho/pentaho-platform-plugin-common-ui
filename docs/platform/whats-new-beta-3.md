@@ -33,7 +33,7 @@ layout: default
 ### Data / Filter API
 
 1. Added the property 
-   [pentaho.data.filter.IIsLike#isCaseInsensitive]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.filter.IIsLike#isCaseInsensitive'}}){{site.starNew}}.
+   [pentaho.data.filter.spec.IIsLike#isCaseInsensitive]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.filter.spec.IIsLike#isCaseInsensitive'}}){{site.starNew}}.
 
 ### Type API
 
