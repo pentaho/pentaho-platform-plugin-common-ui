@@ -16,7 +16,7 @@ layout: default
 
 <pre class='highlight'><code># Clone the sample repository.
 git clone https://github.com/pentaho/pentaho-engineering-samples
-git checkout -b 8.0
+git checkout -b 8.1
 
 # Go to the complete sample's directory.
 cd pentaho-engineering-samples
