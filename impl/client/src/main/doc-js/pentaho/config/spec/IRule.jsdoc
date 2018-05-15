@@ -50,10 +50,26 @@
  */
 
 /**
- * The actual configuration specification that
- * is _applied_ to the selected value type(s).
+ * The actual configuration specification that is _applied_ to the selected value type(s).
+ *
+ * Alternatively, if a function is specified,
+ * it will be called with the value of any dependencies declared in [deps]{@link pentaho.config.spec.IRule#}
+ * and it should return the final configuration object, or a {@link Nully} value, if it should be ignored.
  *
  * @name apply
  * @memberOf pentaho.config.spec.IRule#
- * @type {!Object}
+ * @type {(Object|(function(...any) : Object))}
+ */
+
+/**
+ * The absolute identifiers of the modules that should be loaded
+ * when the rule is selected for application.
+ *
+ * When relative, these are relative to {@link pentaho.config.spec.IRuleSet#baseId}.
+ *
+ * @name deps
+ * @memberOf pentaho.config.spec.IRule#
+ * @type {Array.<string>}
+ *
+ * @see pentaho.config.spec.IRuleSet#baseId
  */

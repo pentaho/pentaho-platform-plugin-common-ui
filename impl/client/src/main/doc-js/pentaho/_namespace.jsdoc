@@ -41,11 +41,9 @@
  *   * Debugging — {@link pentaho.debug}
  *   * Utilities — {@link pentaho.util}
  *   * JavaScript Language support — {@link pentaho.lang}
+ *   * Modules — {@link pentaho.module}
  *   * Configuration — {@link pentaho.config}
- *   * Type information — {@link pentaho.typeInfo}
- *   * Instance information — {@link pentaho.instanceInfo}
  *   * Localization — {@link pentaho.i18n}
- *   * Services — {@link pentaho.service}
  * 2. Data — {@link pentaho.data}
  * 3. Type — {@link pentaho.type}
  * 4. Visualization — {@link pentaho.visual}

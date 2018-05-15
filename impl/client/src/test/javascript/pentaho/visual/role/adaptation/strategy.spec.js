@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/visual/role/adaptation/Strategy",
   "pentaho/data/Table",
   "tests/pentaho/util/errorMatch"
-], function(Context, DataTable, errorMatch) {
+], function(Strategy, DataTable, errorMatch) {
 
   "use strict";
 
-  /* globals describe, it, beforeEach, beforeAll, spyOn */
-
   describe("pentaho.visual.role.adaptation.Strategy", function() {
 
-    var Strategy;
     var dataTable;
 
     function getDataSpec1() {
@@ -48,18 +45,7 @@ define([
     // ---
 
     beforeAll(function() {
-
       dataTable = new DataTable(getDataSpec1());
-
-      return Context.createAsync()
-        .then(function(context) {
-
-          return context.getDependencyApplyAsync([
-            "pentaho/visual/role/adaptation/strategy"
-          ], function(_Strategy) {
-            Strategy = _Strategy;
-          });
-        });
     });
 
     describe("new (instSpec)", function() {

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 define([
+  "module",
   "pentaho/lang/Base",
   "pentaho/lang/EventSource",
   "../ReferenceList",
@@ -22,7 +23,7 @@ define([
   "../events/RejectedChange",
   "../events/DidChange",
   "pentaho/util/object"
-], function(Base, EventSource, ReferenceList, Transaction, WillChange, RejectedChange, DidChange, O) {
+], function(module, Base, EventSource, ReferenceList, Transaction, WillChange, RejectedChange, DidChange, O) {
 
   "use strict";
 
@@ -44,7 +45,7 @@ define([
    *
    * @description This class was not designed to be constructed directly. It was designed to be used as a **mixin**.
    */
-  return Base.extend("pentaho.type.mixins.Container", /** @lends pentaho.type.mixins.Container# */{
+  return Base.extend(module.id, /** @lends pentaho.type.mixins.Container# */{
 
     /**
      * Initializes a container instance.
@@ -134,7 +135,7 @@ define([
      * @readOnly
      */
     get $references() {
-      var txn = this.$type.context.transaction;
+      var txn = Transaction.current;
       return txn !== null ? txn.getAmbientReferences(this) : this.__refs;
     },
 
@@ -146,7 +147,7 @@ define([
      * outside of any ambient txn. The _removeReference counterpart is not needed.
      *
      * @param {!pentaho.type.mixins.Container} container - The container that refers this one.
-     * @param {pentaho.type.Property.Type} [propType] When `container` is a complex,
+     * @param {pentaho.type.PropertyType} [propType] When `container` is a complex,
      * the property type whose value contains this instance.
      *
      * @private
@@ -209,7 +210,7 @@ define([
       var cset = this.__cset;
       if(cset) return fun.call(this, cset);
 
-      var scope = this.$type.context.enterChange();
+      var scope = Transaction.enter();
 
       return scope.using(function() {
 
@@ -264,11 +265,17 @@ define([
 
         var event = new WillChange(this, changeset);
 
-        var result = keyArgs == null
-          ? this._emitSafe(event)
-          : this._emitGeneric(this, [event], event.type, null, keyArgs);
+        try {
+          var result = keyArgs == null
+            ? this._emitSafe(event)
+            : this._emitGeneric(this, [event], event.type, null, keyArgs);
 
-        if(!result) {
+          if(!result) {
+            return event.cancelReason;
+          }
+        } catch(ex) {
+          // `isCritical` listeners can throw...
+          event.cancel(ex);
           return event.cancelReason;
         }
       }

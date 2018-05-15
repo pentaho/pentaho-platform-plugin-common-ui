@@ -14,29 +14,17 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context"
-], function(Context) {
+  "pentaho/type/Complex"
+], function(Complex) {
 
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
-
   describe("pentaho.type.Complex", function() {
 
-    var context;
-    var Complex;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Complex = context.get("pentaho/type/complex");
-          })
-          .then(done, done.fail);
-    });
-
     describe("#validate()", function() {
+
       it("should call each property's validateOn with the owner complex instance", function() {
+
         var Derived = Complex.extend({
           $type: {
             props: [
@@ -63,7 +51,6 @@ define([
         expect(yPropType.validateOn).toHaveBeenCalledWith(derived);
         expect(zPropType.validateOn).toHaveBeenCalledWith(derived);
       });
-
     });
-  }); // pentaho.type.Complex
+  });
 });

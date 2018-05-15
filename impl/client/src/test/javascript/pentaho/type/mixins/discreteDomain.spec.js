@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,38 +14,22 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Complex",
+  "pentaho/type/Number",
+  "pentaho/type/String",
+  "pentaho/type/mixins/DiscreteDomain",
+  "pentaho/type/Property",
   "pentaho/type/ValidationError",
   "pentaho/type/SpecificationScope",
   "tests/pentaho/util/errorMatch"
-], function(Context, ValidationError, SpecificationScope, errorMatch) {
+], function(Complex, PentahoNumber, PentahoString, DiscreteDomain, Property,
+            ValidationError, SpecificationScope, errorMatch) {
 
   "use strict";
 
   /* global describe:true, it:true, expect:true, beforeEach:true*/
 
   describe("pentaho.type.mixins.DiscreteDomain", function() {
-    var context;
-    var List;
-    var Complex;
-    var PentahoNumber;
-    var PentahoString;
-    var DiscreteDomain;
-    var Property;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            List = context.get("pentaho/type/list");
-            Complex = context.get("pentaho/type/complex");
-            PentahoNumber = context.get("pentaho/type/number");
-            PentahoString = context.get("pentaho/type/string");
-            DiscreteDomain = context.get("pentaho/type/mixins/discreteDomain");
-            Property = context.get("pentaho/type/property");
-          })
-          .then(done, done.fail);
-    });
 
     it("should be a function", function() {
       expect(typeof DiscreteDomain).toBe("function");

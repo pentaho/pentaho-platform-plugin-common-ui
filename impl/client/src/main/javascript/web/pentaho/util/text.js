@@ -67,6 +67,7 @@ define(function() {
       if(name) {
         return text.firstUpperCase(name).replace(/([a-z\d])([A-Z])/g, "$1 $2");
       }
+
       return name;
     },
 
@@ -88,6 +89,7 @@ define(function() {
             .replace(/-+/g, "-")
             .toLowerCase();
       }
+
       return name;
     },
 

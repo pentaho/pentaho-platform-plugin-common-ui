@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,14 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Instance",
   "pentaho/type/SpecificationContext",
   "tests/pentaho/util/errorMatch"
-], function(Context, SpecificationContext, errorMatch) {
+], function(Instance, SpecificationContext, errorMatch) {
 
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, spyOn:false, jasmine:false*/
-
   describe("pentaho.type.SpecificationContext", function() {
-
-    var context;
-    var Instance;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Instance = context.get("instance");
-          })
-          .then(done, done.fail);
-    });
 
     beforeEach(function() {
       // J.I.C.
@@ -184,7 +170,8 @@ define([
         expect(result[0]).toBe("_");
       });
 
-      it("should accept adding a type that has no id multiple times, always returning the same temporary id", function() {
+      it("should accept adding a type that has no id multiple times, " +
+        "always returning the same temporary id", function() {
         var Derived = Instance.extend();
         var context = new SpecificationContext();
 
@@ -343,7 +330,7 @@ define([
       it("should return false when given a standard type id", function() {
         expect(SpecificationContext.isIdTemporary("string")).toBe(false);
         expect(SpecificationContext.isIdTemporary("boolean")).toBe(false);
-        expect(SpecificationContext.isIdTemporary("pentaho/type/boolean")).toBe(false);
+        expect(SpecificationContext.isIdTemporary("pentaho/type/Boolean")).toBe(false);
       });
 
       it("should return true when given the temporary prefix", function() {

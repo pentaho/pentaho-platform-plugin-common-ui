@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 /**
- * A `spec.UInstance` represents the union of JS types that can be used to describe an instance,
+ * A `spec.Instance` represents the union of JS types that can be used to describe an instance,
  * or the absence of one.
  *
  * When an instance is described using _object form_,
@@ -23,7 +23,5 @@
  *
  * To describe an absent instance, use a {@link Nully} JavaScript value.
  *
- * @typedef {pentaho.type.spec.IInstance|
- *           pentaho.type.spec.UValue|
- *           Nully} pentaho.type.spec.UInstance
+ * @typedef {pentaho.type.spec.IInstance|pentaho.type.spec.Value|Nully} pentaho.type.spec.Instance
  */

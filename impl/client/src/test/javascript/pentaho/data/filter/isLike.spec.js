@@ -14,49 +14,34 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/data/filter/IsLike",
+  "pentaho/type/Complex",
   "./propertyUtils"
-], function(Context, propertyUtils) {
+], function(IsLikeFilter, Complex, propertyUtils) {
 
   "use strict";
 
   describe("pentaho.data.filter.IsLike", function() {
 
-    var context;
-    var Complex;
-    var IsLikeFilter;
     var ProductSummary;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-
-            context = _context;
-            Complex = context.get("complex");
-
-            ProductSummary = Complex.extend({
-              $type: {
-                props: [
-                  {name: "name", valueType: "string", label: "Name"},
-                  {name: "sales", valueType: "number", label: "Sales"},
-                  {name: "inStock", valueType: "boolean", label: "In Stock"}
-                ]
-              }
-            });
-
-            return context.getDependencyApplyAsync([
-              "pentaho/data/filter/isLike"
-            ], function(IsLike) {
-              IsLikeFilter = IsLike;
-            });
-          })
-          .then(done, done.fail);
+    beforeAll(function() {
+      ProductSummary = Complex.extend({
+        $type: {
+          props: [
+            {name: "name", valueType: "string", label: "Name"},
+            {name: "sales", valueType: "number", label: "Sales"},
+            {name: "inStock", valueType: "boolean", label: "In Stock"}
+          ]
+        }
+      });
     });
 
     propertyUtils.behavesLikeProperty(function() { return IsLikeFilter; }, {
       valueType: "string",
       rawValue: "match",
       kind: "isLike",
+      id: "IsLike",
       alias: "like"
     });
 
@@ -68,9 +53,17 @@ define([
         elem = new ProductSummary({name: {v: "acme", f: "test"}, sales: 12000, inStock: true});
       });
 
-      it("should return `true` if `elem` has property `property` with a value matching an affix of `value`", function() {
+      it("should return `true` if `elem` has property `property` " +
+        "with a value matching an affix of `value`", function() {
 
-        var filter  = new IsLikeFilter({property: "name", value: "es", anchorStart: false, anchorEnd: false, isCaseInsensitive: false});
+        var filter  = new IsLikeFilter({
+          property: "name",
+          value: "es",
+          anchorStart: false,
+          anchorEnd: false,
+          isCaseInsensitive: false
+        });
+
         var filterDefaultValues = new IsLikeFilter({property: "name", value: "es"});
 
         var result = filter.contains(elem);
@@ -89,10 +82,23 @@ define([
         expect(result).toBe(false);
       });
 
-      it("should return `true` if `elem` has property `property` with a value matching a prefix of `value`", function() {
+      it("should return `true` if `elem` has property `property` " +
+        "with a value matching a prefix of `value`", function() {
 
-        var filter  = new IsLikeFilter({property: "name", value: "tes", anchorStart: true, anchorEnd: false, isCaseInsensitive: false});
-        var negFilter = new IsLikeFilter({property: "name", value: "es", anchorStart: true, anchorEnd: false, isCaseInsensitive: false});
+        var filter  = new IsLikeFilter({
+          property: "name",
+          value: "tes",
+          anchorStart: true,
+          anchorEnd: false,
+          isCaseInsensitive: false
+        });
+        var negFilter = new IsLikeFilter({
+          property: "name",
+          value: "es",
+          anchorStart: true,
+          anchorEnd: false,
+          isCaseInsensitive: false
+        });
 
         var result = filter.contains(elem);
         var negResult = negFilter.contains(elem);
@@ -101,10 +107,23 @@ define([
         expect(negResult).toBe(false);
       });
 
-      it("should return `true` if `elem` has property `property` with a value matching a suffix of `value`", function() {
+      it("should return `true` if `elem` has property `property` " +
+        "with a value matching a suffix of `value`", function() {
 
-        var filter  = new IsLikeFilter({property: "name", value: "est", anchorStart: false, anchorEnd: true, isCaseInsensitive: false});
-        var negFilter = new IsLikeFilter({property: "name", value: "es", anchorStart: false, anchorEnd: true, isCaseInsensitive: false});
+        var filter  = new IsLikeFilter({
+          property: "name",
+          value: "est",
+          anchorStart: false,
+          anchorEnd: true,
+          isCaseInsensitive: false
+        });
+        var negFilter = new IsLikeFilter({
+          property: "name",
+          value: "es",
+          anchorStart: false,
+          anchorEnd: true,
+          isCaseInsensitive: false
+        });
 
         var result = filter.contains(elem);
         var negResult = negFilter.contains(elem);
@@ -115,9 +134,27 @@ define([
 
       it("should return `true` if `elem` has property `property` with a value exactly matching `value`", function() {
 
-        var filter  = new IsLikeFilter({property: "name", value: "test", anchorStart: true, anchorEnd: true, isCaseInsensitive: false});
-        var negFilter = new IsLikeFilter({property: "name", value: "tes", anchorStart: true, anchorEnd: true, isCaseInsensitive: false});
-        var negFilter2 = new IsLikeFilter({property: "name", value: "est", anchorStart: true, anchorEnd: true, isCaseInsensitive: false});
+        var filter  = new IsLikeFilter({
+          property: "name",
+          value: "test",
+          anchorStart: true,
+          anchorEnd: true,
+          isCaseInsensitive: false
+        });
+        var negFilter = new IsLikeFilter({
+          property: "name",
+          value: "tes",
+          anchorStart: true,
+          anchorEnd: true,
+          isCaseInsensitive: false
+        });
+        var negFilter2 = new IsLikeFilter({
+          property: "name",
+          value: "est",
+          anchorStart: true,
+          anchorEnd: true,
+          isCaseInsensitive: false
+        });
 
         var result = filter.contains(elem);
         var negResult = negFilter.contains(elem);
@@ -128,24 +165,45 @@ define([
         expect(negResult2).toBe(false);
       });
 
-      it("should return `true` if `elem` has property `property` with a value matching `value` including case sensitivity", function() {
-        var filter  = new IsLikeFilter({property: "name", value: "test", anchorStart: true, anchorEnd: true, isCaseInsensitive: false});
+      it("should return `true` if `elem` has property `property` with " +
+        "a value matching `value` including case sensitivity", function() {
+        var filter  = new IsLikeFilter({
+          property: "name",
+          value: "test",
+          anchorStart: true,
+          anchorEnd: true,
+          isCaseInsensitive: false
+        });
 
         var result = filter.contains(elem);
 
         expect(result).toBe(true);
       });
 
-      it("should return `false` if `elem` has property `property` with a value matching `value` including case sensitivity", function() {
-        var filter  = new IsLikeFilter({property: "name", value: "TEST", anchorStart: true, anchorEnd: true, isCaseInsensitive: false});
+      it("should return `false` if `elem` has property `property` with " +
+        "a value matching `value` including case sensitivity", function() {
+        var filter  = new IsLikeFilter({
+          property: "name",
+          value: "TEST",
+          anchorStart: true,
+          anchorEnd: true,
+          isCaseInsensitive: false
+        });
 
         var result = filter.contains(elem);
 
         expect(result).toBe(false);
       });
 
-      it("should return `true` if `elem` has property `property` with a value matching `value` excluding case sensitivity", function() {
-        var filter  = new IsLikeFilter({property: "name", value: "TEST", anchorStart: true, anchorEnd: true, isCaseInsensitive: true});
+      it("should return `true` if `elem` has property `property` with " +
+        "a value matching `value` excluding case sensitivity", function() {
+        var filter  = new IsLikeFilter({
+          property: "name",
+          value: "TEST",
+          anchorStart: true,
+          anchorEnd: true,
+          isCaseInsensitive: true
+        });
 
         var result = filter.contains(elem);
 
@@ -157,7 +215,13 @@ define([
 
       it("should return '(like propName valueKey anchorS anchorE caseI)'", function() {
         var filter  = new IsLikeFilter({property: "name", value: "str"});
-        var anotherFilter = new IsLikeFilter({property: "name", value: "str", anchorStart: true, anchorEnd: true, isCaseInsensitive: false});
+        var anotherFilter = new IsLikeFilter({
+          property: "name",
+          value: "str",
+          anchorStart: true,
+          anchorEnd: true,
+          isCaseInsensitive: false
+        });
 
         expect(filter.$contentKey).toBe("(like name str false false false)");
         expect(anotherFilter.$contentKey).toBe("(like name str true true false)");
@@ -181,5 +245,5 @@ define([
         expect(filter.$contentKey).toBe("(like   false false false)");
       });
     });
-  }); // pentaho.data.filter.IsLike
+  });
 });

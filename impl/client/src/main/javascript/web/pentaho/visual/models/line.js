@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,42 +14,40 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!_",
+  "./PointAbstract",
+  "./types/Shape",
+  "./types/LineWidth",
+  "./mixins/Trended",
   "pentaho/i18n!./i18n/model"
-], function(bundle) {
+], function(module, BaseModel, Shape, LineWidth, TrendedModel, bundle) {
 
   "use strict";
 
-  return [
-    "./pointAbstract",
-    "./types/shape",
-    "./types/lineWidth",
-    "./mixins/trended",
-    function(BaseModel, Shape, LineWidth, TrendedModel) {
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      mixins: [TrendedModel],
 
-      return BaseModel.extend({
-        $type: {
-          mixins: [TrendedModel],
-
-          v2Id: "ccc_line",
-          category: "linechart",
-          defaultView: "pentaho/ccc/visual/line",
-          props: [
-            {
-              name: "lineWidth",
-              valueType: LineWidth,
-              isRequired: true,
-              defaultValue: 1
-            },
-            {
-              name: "shape",
-              valueType: Shape,
-              isRequired: true,
-              defaultValue: "circle"
-            }
-          ]
+      v2Id: "ccc_line",
+      category: "linechart",
+      defaultView: "pentaho/ccc/visual/Line",
+      props: [
+        {
+          name: "lineWidth",
+          valueType: LineWidth,
+          isRequired: true,
+          defaultValue: 1
+        },
+        {
+          name: "shape",
+          valueType: Shape,
+          isRequired: true,
+          defaultValue: "circle"
         }
-      })
-      .implement({$type: bundle.structured.line});
+      ]
     }
-  ];
+  })
+  .localize({$type: bundle.structured.Line})
+  .configure({$type: module.config});
 });

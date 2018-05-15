@@ -16,7 +16,7 @@
 define([
   "module",
   "./SpecificationContext",
-  "../lang/Base"
+  "pentaho/lang/Base"
 ], function(module, SpecificationContext, Base) {
 
   "use strict";

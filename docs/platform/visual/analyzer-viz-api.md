@@ -132,7 +132,7 @@ the default value of the "Line width" property of "Line chart" visualizations.
         {
           select: {
             application: "pentaho-analyzer",
-            type: "pentaho/visual/models/line"
+            module: "pentaho/visual/models/Line"
           },
           apply: {
             props: {
@@ -166,7 +166,7 @@ the possible _maximum number of results_ for "Bar chart" visualizations.
         {
           select: {
             application: "pentaho-analyzer",
-            type: "pentaho/visual/models/barHorizontal"
+            module: "pentaho/visual/models/BarHorizontal"
           },
           apply: {
             application: {
@@ -195,7 +195,7 @@ This property allows changing the default discrete color palette.
         {
           select: {
             application: "pentaho-analyzer",
-            instance: "pentaho/visual/color/palettes/nominalPrimary"
+            module: "pentaho/visual/color/palettes/nominalPrimary"
           },
           apply: {
             colors: [
@@ -209,21 +209,21 @@ This property allows changing the default discrete color palette.
 
 ### Correspondence between visualization identifiers
 
-| Current Vis. Id.      | Future Vis. Id.                               | Description          |
-|-----------------------|-----------------------------------------------|----------------------|
-| ccc_area              | pentaho/visual/models/areaStacked             | Area Stacked         |
-| ccc_line              | pentaho/visual/models/line                    | Line                 |
-| ccc_bar               | pentaho/visual/models/bar                     | Column               |
-| ccc_barstacked        | pentaho/visual/models/barStacked              | Column Stacked       |
-| ccc_barnormalized     | pentaho/visual/models/bar                     | Column Stacked 100%  |
-| ccc_horzbar           | pentaho/visual/models/barHorizontal           | Bar                  |
-| ccc_horzbarstacked    | pentaho/visual/models/barStackedHorizontal    | Bar Stacked          |
-| ccc_horzbarnormalized | pentaho/visual/models/barNormalizedHorizontal | Bar Stacked 100%     |
-| ccc_barline           | pentaho/visual/models/barLine                 | Column/Line Combo    |
-| ccc_scatter           | pentaho/visual/models/bubble                  | X/Y Scatter/Bubble   |
-| ccc_heatgrid          | pentaho/visual/models/heatGrid                | Heat-Grid            |
-| ccc_pie               | pentaho/visual/models/pie                     | Pie                  |
-| ccc_sunburst          | pentaho/visual/models/sunburst                | Sunburst             |
+| Current Vis. Id.        | Future Vis. Id.                                 | Description          |
+|-------------------------|-------------------------------------------------|----------------------|
+| `ccc_area`              | `pentaho/visual/models/AreaStacked`             | Area Stacked         |
+| `ccc_line`              | `pentaho/visual/models/Line`                    | Line                 |
+| `ccc_bar`               | `pentaho/visual/models/Bar`                     | Column               |
+| `ccc_barstacked`        | `pentaho/visual/models/BarStacked`              | Column Stacked       |
+| `ccc_barnormalized`     | `pentaho/visual/models/Bar`                     | Column Stacked 100%  |
+| `ccc_horzbar`           | `pentaho/visual/models/BarHorizontal`           | Bar                  |
+| `ccc_horzbarstacked`    | `pentaho/visual/models/BarStackedHorizontal`    | Bar Stacked          |
+| `ccc_horzbarnormalized` | `pentaho/visual/models/BarNormalizedHorizontal` | Bar Stacked 100%     |
+| `ccc_barline`           | `pentaho/visual/models/BarLine`                 | Column/Line Combo    |
+| `ccc_scatter`           | `pentaho/visual/models/Bubble`                  | X/Y Scatter/Bubble   |
+| `ccc_heatgrid`          | `pentaho/visual/models/HeatGrid`                | Heat-Grid            |
+| `ccc_pie`               | `pentaho/visual/models/Pie`                     | Pie                  |
+| `ccc_sunburst`          | `pentaho/visual/models/Sunburst`                | Sunburst             |
 
 
 ### Correspondence between visualization property values

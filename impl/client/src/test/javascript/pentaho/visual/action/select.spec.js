@@ -14,35 +14,17 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/visual/action/Base",
+  "pentaho/visual/action/Select",
   "pentaho/visual/action/SelectionModes",
   "tests/pentaho/util/errorMatch"
-], function(Context, SelectionModes, errorMatch) {
+], function(BaseAction, SelectAction, SelectionModes, errorMatch) {
 
   "use strict";
 
   describe("pentaho.visual.action.Select", function() {
 
     var customSelectionMode = function() {};
-
-    var BaseAction;
-    var SelectAction;
-
-    beforeEach(function(done) {
-
-      Context.createAsync()
-          .then(function(context) {
-            return context.getDependencyAsync({
-              BaseAction: "pentaho/visual/action/base",
-              SelectAction: "pentaho/visual/action/select"
-            });
-          })
-          .then(function(types) {
-            BaseAction = types.BaseAction;
-            SelectAction = types.SelectAction;
-          })
-          .then(done, done.fail);
-    });
 
     it("should be defined", function() {
 
@@ -142,27 +124,30 @@ define([
 
       it("should default to defaultSelectionMode when set to a nully value", function() {
 
-        var customDefaultSelectionMode = function() {};
+        return require.using(["pentaho/visual/action/Select"], function(SelectAction) {
 
-        SelectAction.type.defaultSelectionMode = customDefaultSelectionMode;
+          var customDefaultSelectionMode = function() {};
 
-        // ---
+          SelectAction.type.defaultSelectionMode = customDefaultSelectionMode;
 
-        var selectAction = new SelectAction();
+          // ---
 
-        selectAction.selectionMode = customSelectionMode;
+          var selectAction = new SelectAction();
 
-        selectAction.selectionMode = null;
+          selectAction.selectionMode = customSelectionMode;
 
-        expect(selectAction.selectionMode).toBe(customDefaultSelectionMode);
+          selectAction.selectionMode = null;
 
-        // ---
+          expect(selectAction.selectionMode).toBe(customDefaultSelectionMode);
 
-        selectAction.selectionMode = customSelectionMode;
+          // ---
 
-        selectAction.selectionMode = undefined;
+          selectAction.selectionMode = customSelectionMode;
 
-        expect(selectAction.selectionMode).toBe(customDefaultSelectionMode);
+          selectAction.selectionMode = undefined;
+
+          expect(selectAction.selectionMode).toBe(customDefaultSelectionMode);
+        });
       });
 
       // region Serialization
@@ -213,11 +198,32 @@ define([
     });
 
     describe(".Type", function() {
+      var localRequire;
 
+      var SelectAction;
+      var SelectionModes;
       var selectActionType;
+      var errorMatch;
 
       beforeEach(function() {
-        selectActionType = SelectAction.type;
+
+        localRequire = require.new();
+
+        return localRequire.promise([
+          "pentaho/visual/action/Select",
+          "pentaho/visual/action/SelectionModes",
+          "tests/pentaho/util/errorMatch"
+        ])
+        .then(function(deps) {
+          SelectAction = deps[0].extend();
+          selectActionType = SelectAction.type;
+          SelectionModes = deps[1];
+          errorMatch = deps[2];
+        });
+      });
+
+      afterEach(function() {
+        localRequire.dispose();
       });
 
       describe("#isSync", function() {

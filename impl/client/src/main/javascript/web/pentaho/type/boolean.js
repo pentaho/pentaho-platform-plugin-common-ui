@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,39 +14,37 @@
  * limitations under the License.
  */
 define([
-  "../i18n!types"
-], function(bundle) {
+  "pentaho/module!_",
+  "./Simple",
+  "pentaho/i18n!types"
+], function(module, Simple, bundle) {
 
   "use strict";
 
-  return ["simple", function(Simple) {
+  /**
+   * @name pentaho.type.Boolean
+   * @class
+   * @extends pentaho.type.Simple
+   * @amd pentaho/type/Boolean
+   *
+   * @classDesc The class of boolean values.
+   *
+   * @description Creates a boolean instance.
+   */
 
+  return Simple.extend(/** @lends pentaho.type.Boolean# */{
     /**
-     * @name pentaho.type.Boolean
-     * @class
-     * @extends pentaho.type.Simple
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Boolean>} pentaho/type/boolean
-     *
-     * @classDesc The class of boolean values.
-     *
-     * @description Creates a boolean instance.
+     * Gets the underlying boolean primitive value of the value.
+     * @name pentaho.type.Boolean#value
+     * @type boolean
+     * @readonly
      */
-    var PenBoolean = Simple.extend(/** @lends pentaho.type.Boolean# */{
-      /**
-       * Gets the underlying boolean primitive value of the value.
-       * @name pentaho.type.Boolean#value
-       * @type boolean
-       * @readonly
-       */
 
-      $type: /** @lends pentaho.type.Boolean.Type# */{
-        alias: "boolean",
-        cast: Boolean
-      }
-    }).implement(/** @lends pentaho.type.Boolean# */{
-      $type: bundle.structured["boolean"] // eslint-disable-line dot-notation
-    });
-
-    return PenBoolean;
-  }];
+    $type: /** @lends pentaho.type.BooleanType# */{
+      id: module.id,
+      cast: Boolean
+    }
+  })
+  .localize({$type: bundle.structured.Boolean})
+  .configure({$type: module.config});
 });

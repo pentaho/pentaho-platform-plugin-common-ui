@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,14 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
-  "pentaho/type/ValidationError",
-  "pentaho/i18n!/pentaho/type/i18n/types"
-], function(Context, ValidationError, bundle) {
+  "pentaho/type/Value",
+  "pentaho/type/Number",
+  "pentaho/type/ValidationError"
+], function(Value, PentahoNumber, ValidationError) {
 
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
-
-  describe("pentaho.type.Value -", function() {
-
-    var context;
-    var Value;
-    var PentahoNumber;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Value = context.get("pentaho/type/value");
-            PentahoNumber = context.get("pentaho/type/number")
-          })
-          .then(done, done.fail);
-    });
+  describe("pentaho.type.Value", function() {
 
     describe("#validate()", function() {
       it("should return null", function() {
@@ -59,7 +43,7 @@ define([
         var d = new Derived();
         expect(d.validate()[0].message).toBe("Foo");
       });
-    }); // #validate
+    });
 
     describe("#$isValid -", function() {
       it("should call #validate()", function() {
@@ -111,6 +95,6 @@ define([
           va.assertValid();
         }).toThrow(e1);
       });
-    });// end #assertValid()
+    });
   });
 });

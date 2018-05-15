@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,30 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!_",
+  "../../base/Model",
+  "../types/EmptyCellMode",
   "pentaho/i18n!../i18n/model"
-], function(bundle) {
+], function(module, BaseModel, EmptyCellMode, bundle) {
 
   "use strict";
 
   // Used by: Line, BarLine e AreaStacked
 
-  return [
-    "pentaho/visual/base/model",
-    "../types/emptyCellMode",
-    function(BaseModel, EmptyCellMode) {
-
-      return BaseModel.extend({
-        $type: {
-          isAbstract: true,
-          props: [
-            {
-              name: "emptyCellMode",
-              valueType: EmptyCellMode,
-              isRequired: true,
-              defaultValue: "gap"
-            }
-          ]
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      isAbstract: true,
+      props: [
+        {
+          name: "emptyCellMode",
+          valueType: EmptyCellMode,
+          isRequired: true,
+          defaultValue: "gap"
         }
-      })
-      .implement({$type: bundle.structured.interpolation});
+      ]
     }
-  ];
+  })
+  .localize({$type: bundle.structured.Interpolation})
+  .configure({$type: module.config});
 });

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/changes/Transaction",
+  "pentaho/visual/base/Model",
+  "pentaho/visual/color/Palette",
+  "pentaho/visual/color/PaletteProperty",
   "tests/pentaho/util/errorMatch",
   "pentaho/type/ValidationError",
-  "pentaho/type/SpecificationScope",
-  "tests/test-utils"
-], function(Context, errorMatch, ValidationError, SpecificationScope, testUtils) {
+  "pentaho/type/SpecificationScope"
+], function(Transaction, BaseModel, Palette, PaletteProperty, errorMatch, ValidationError, SpecificationScope) {
 
   "use strict";
-
-  // Use alternate, promise-aware version of `it`.
-  var it = testUtils.itAsync;
-  var expectToRejectWith = testUtils.expectToRejectWith;
 
   // helper
   describe("pentaho.visual.color.Property", function() {
@@ -33,34 +31,8 @@ define([
     describe(".Type", function() {
 
       describe("tests using the top AMD context", function() {
-        var BaseModel;
-        var Palette;
-        var PaletteProperty;
-        var context;
-
-        beforeEach(function(done) {
-
-          Context.createAsync()
-              .then(function(_context) {
-
-                context = _context;
-
-                return context.getDependencyAsync({
-                  BaseModel: "pentaho/visual/base/model",
-                  Palette: "pentaho/visual/color/palette",
-                  PaletteProperty: "pentaho/visual/color/paletteProperty"
-                });
-              })
-              .then(function(deps) {
-                BaseModel = deps.BaseModel;
-                Palette = deps.Palette;
-                PaletteProperty = deps.PaletteProperty;
-              })
-              .then(done, done.fail);
-        });
 
         // region property attributes
-
         describe("#valueType", function() {
 
           it("should be Palette", function() {
@@ -91,7 +63,7 @@ define([
               $type: {
                 props: {
                   palette1: {
-                    base: "pentaho/visual/color/paletteProperty",
+                    base: "pentaho/visual/color/PaletteProperty",
                     levels: expectedLevels
                   }
                 }
@@ -109,7 +81,7 @@ define([
               $type: {
                 props: {
                   palette1: {
-                    base: "pentaho/visual/color/paletteProperty",
+                    base: "pentaho/visual/color/PaletteProperty",
                     levels: ["divergent", "nominal"]
                   }
                 }
@@ -127,7 +99,7 @@ define([
               $type: {
                 props: {
                   palette1: {
-                    base: "pentaho/visual/color/paletteProperty"
+                    base: "pentaho/visual/color/PaletteProperty"
                   }
                 }
               }
@@ -150,7 +122,7 @@ define([
                 $type: {
                   props: {
                     palette1: {
-                      base: "pentaho/visual/color/paletteProperty",
+                      base: "pentaho/visual/color/PaletteProperty",
                       levels: []
                     }
                   }
@@ -165,7 +137,7 @@ define([
               $type: {
                 props: {
                   palette1: {
-                    base: "pentaho/visual/color/paletteProperty",
+                    base: "pentaho/visual/color/PaletteProperty",
                     levels: ["nominal", "quantitative"]
                   }
                 }
@@ -195,7 +167,7 @@ define([
               $type: {
                 props: {
                   palette1: {
-                    base: "pentaho/visual/color/paletteProperty",
+                    base: "pentaho/visual/color/PaletteProperty",
                     levels: baseLevels
                   }
                 }
@@ -221,7 +193,7 @@ define([
                 $type: {
                   props: {
                     palette1: {
-                      base: "pentaho/visual/color/paletteProperty",
+                      base: "pentaho/visual/color/PaletteProperty",
                       levels: expectedLevels
                     }
                   }
@@ -254,7 +226,7 @@ define([
               $type: {
                 props: {
                   palette1: {
-                    base: "pentaho/visual/color/paletteProperty",
+                    base: "pentaho/visual/color/PaletteProperty",
                     levels: ["quantitative"]
                   }
                 }
@@ -294,7 +266,7 @@ define([
               var txnScope;
 
               beforeEach(function() {
-                if(useTxn) txnScope = context.enterChange();
+                if(useTxn) txnScope = Transaction.enter();
               });
 
               afterEach(function() {
@@ -320,7 +292,7 @@ define([
                   $type: {
                     props: {
                       palette1: {
-                        base: "pentaho/visual/color/paletteProperty",
+                        base: "pentaho/visual/color/PaletteProperty",
                         levels: ["nominal"],
                         isRequired: true,
                         defaultValue: null // suppress our smart default, for now
@@ -341,13 +313,14 @@ define([
                 expect(errors.length).toBe(1);
               });
 
-              it("should be invalid, when the palette's level is not one of the property's levels (nominal)", function() {
+              it("should be invalid, when the palette's level is not " +
+                "one of the property's levels (nominal)", function() {
 
                 var Model = BaseModel.extend({
                   $type: {
                     props: {
                       palette1: {
-                        base: "pentaho/visual/color/paletteProperty",
+                        base: "pentaho/visual/color/PaletteProperty",
                         levels: ["nominal"]
                       }
                     }
@@ -368,7 +341,7 @@ define([
                   $type: {
                     props: {
                       palette1: {
-                        base: "pentaho/visual/color/paletteProperty",
+                        base: "pentaho/visual/color/PaletteProperty",
                         levels: ["quantitative"]
                       }
                     }
@@ -388,7 +361,7 @@ define([
                   $type: {
                     props: {
                       palette1: {
-                        base: "pentaho/visual/color/paletteProperty",
+                        base: "pentaho/visual/color/PaletteProperty",
                         levels: ["quantitative"]
                       }
                     }
@@ -417,7 +390,7 @@ define([
                 $type: {
                   props: {
                     palette1: {
-                      base: "pentaho/visual/color/paletteProperty"
+                      base: "pentaho/visual/color/PaletteProperty"
                     }
                   }
                 }
@@ -443,7 +416,7 @@ define([
                 $type: {
                   props: {
                     palette1: {
-                      base: "pentaho/visual/color/paletteProperty",
+                      base: "pentaho/visual/color/PaletteProperty",
                       levels: ["quantitative"]
                     }
                   }
@@ -472,66 +445,63 @@ define([
 
         function configAmd(localRequire) {
 
-          // Clear all default instance registrations
           localRequire.config({
             config: {
-              "pentaho/instanceInfo": null
-            }
-          });
-
-          localRequire.config({
-            config: {
-              "pentaho/instanceInfo": {
-                // This registration is actually required for everything to work...
-                "pentaho/config/impl/instanceOfAmdLoadedService": {type: "pentaho.config.IService"},
-
-                "my/palettesContextConfig": {type: "pentaho.config.spec.IRuleSet"},
-
-                // Register palettes
-                "my/nominalPalette1": {type: "pentaho/visual/color/palette"},
-                "my/nominalPalette2": {type: "pentaho/visual/color/palette"},
-                "my/quantitativePalette1": {type: "pentaho/visual/color/palette"}
+              "pentaho/modules": {
+                // Clear all standard palette registrations.
+                "pentaho/visual/color/palettes/nominalPrimary": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/nominalNeutral": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/nominalLight": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/nominalDark": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/quantitativeBlue3": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/quantitativeBlue5": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/quantitativeGray3": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/quantitativeGray5": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/divergentRyg3": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/divergentRyg5": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/divergentRyb3": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/divergentRyb5": {
+                  "type": null
+                },
+                "my/nominalPalette1": {type: "pentaho/visual/color/Palette", ranking: 4},
+                "my/nominalPalette2": {type: "pentaho/visual/color/Palette", ranking: 3},
+                "my/quantitativePalette1": {type: "pentaho/visual/color/Palette", ranking: 2}
               }
             }
           });
 
-          localRequire.define("my/palettesContextConfig", function() {
-
-            return {
-              rules: [
-                {
-                  select: {type: "pentaho/type/Context"},
-                  apply: {
-                    instances: {
-                      "my/nominalPalette1": {ranking: 4},
-                      "my/nominalPalette2": {ranking: 3},
-                      "my/quantitativePalette1": {ranking: 2}
-                    }
-                  }
-                }
-              ]
-            };
+          localRequire.define("my/nominalPalette1", ["pentaho/visual/color/Palette"], function(Palette) {
+            return new Palette({level: "nominal", colors: ["nominalPalette1"]});
           });
 
-          localRequire.define("my/nominalPalette1", function() {
-
-            return ["pentaho/visual/color/palette", function(Palette) {
-              return new Palette({level: "nominal", colors: ["nominalPalette1"]});
-            }];
+          localRequire.define("my/nominalPalette2", ["pentaho/visual/color/Palette"], function(Palette) {
+            return new Palette({level: "nominal", colors: ["nominalPalette2"]});
           });
 
-          localRequire.define("my/nominalPalette2", function() {
-
-            return ["pentaho/visual/color/palette", function(Palette) {
-              return new Palette({level: "nominal", colors: ["nominalPalette2"]});
-            }];
-          });
-
-          localRequire.define("my/quantitativePalette1", function() {
-
-            return ["pentaho/visual/color/palette", function(Palette) {
-              return new Palette({level: "quantitative", colors: ["quantitativePalette1"]});
-            }];
+          localRequire.define("my/quantitativePalette1", ["pentaho/visual/color/Palette"], function(Palette) {
+            return new Palette({level: "quantitative", colors: ["quantitativePalette1"]});
           });
         }
 
@@ -539,69 +509,46 @@ define([
 
           it("should select a palette with a compatible level", function() {
 
-            return require.using([
-              "pentaho/type/Context"
-            ], configAmd, function(Context) {
+            return require.using(["pentaho/visual/base/Model"], configAmd, function(BaseModel) {
 
-              return Context.createAsync()
-                  .then(function(context) {
-                    return context.getDependencyAsync({
-                      BaseModel: "pentaho/visual/base/model"
-                    });
-                  })
-                  .then(function(deps) {
+              var Model = BaseModel.extend({
+                $type: {
+                  props: {
+                    palette1: {
+                      base: "pentaho/visual/color/PaletteProperty",
+                      levels: ["nominal", "divergent"]
+                    }
+                  }
+                }
+              });
 
-                    var Model = deps.BaseModel.extend({
-                      $type: {
-                        props: {
-                          palette1: {
-                            base: "pentaho/visual/color/paletteProperty",
-                            levels: ["nominal", "divergent"]
-                          }
-                        }
-                      }
-                    });
+              var model = new Model();
 
-                    var model = new Model();
+              var palette = model.palette1;
 
-                    var palette = model.palette1;
-
-                    expect(palette.colors.at(0).value).toBe("nominalPalette1");
-                  });
+              expect(palette.colors.at(0).value).toBe("nominalPalette1");
             });
           });
 
           it("should select a palette with a compatible level, and assign null if there's not one", function() {
 
-            return require.using([
-              "pentaho/type/Context"
-            ], configAmd, function(Context) {
+            return require.using(["pentaho/visual/base/Model"], configAmd, function(BaseModel) {
+              var Model = BaseModel.extend({
+                $type: {
+                  props: {
+                    palette1: {
+                      base: "pentaho/visual/color/PaletteProperty",
+                      levels: ["divergent"]
+                    }
+                  }
+                }
+              });
 
-              return Context.createAsync()
-                  .then(function(context) {
-                    return context.getDependencyAsync({
-                      BaseModel: "pentaho/visual/base/model"
-                    });
-                  })
-                  .then(function(deps) {
+              var model = new Model();
 
-                    var Model = deps.BaseModel.extend({
-                      $type: {
-                        props: {
-                          palette1: {
-                            base: "pentaho/visual/color/paletteProperty",
-                            levels: ["divergent"]
-                          }
-                        }
-                      }
-                    });
+              var palette = model.palette1;
 
-                    var model = new Model();
-
-                    var palette = model.palette1;
-
-                    expect(palette).toBe(null);
-                  });
+              expect(palette).toBe(null);
             });
           });
 
@@ -609,93 +556,74 @@ define([
               "the previous properties (when initializing)", function() {
 
             return require.using([
-              "pentaho/type/Context"
-            ], configAmd, function(Context) {
+              "pentaho/visual/base/Model",
+              "my/nominalPalette1",
+              "my/nominalPalette2",
+              "my/quantitativePalette1"
+            ], configAmd, function(BaseModel, nominalPalette1, nominalPalette2, quantitativePalette1) {
 
-              return Context.createAsync()
-                  .then(function(context) {
-                    return context.getDependencyAsync({
-                      BaseModel: "pentaho/visual/base/model",
-                      nominalPalette1: {$instance: {id: "my/nominalPalette1"}},
-                      nominalPalette2: {$instance: {id: "my/nominalPalette2"}},
-                      quantitativePalette1: {$instance: {id: "my/quantitativePalette1"}},
-                    });
-                  })
-                  .then(function(deps) {
+              var Model = BaseModel.extend({
+                $type: {
+                  props: {
+                    palette1: {
+                      base: "pentaho/visual/color/PaletteProperty"
+                    },
+                    palette2: {
+                      base: "pentaho/visual/color/PaletteProperty"
+                    },
+                    palette3: {
+                      base: "pentaho/visual/color/PaletteProperty"
+                    }
+                  }
+                }
+              });
 
-                    var Model = deps.BaseModel.extend({
-                      $type: {
-                        props: {
-                          palette1: {
-                            base: "pentaho/visual/color/paletteProperty"
-                          },
-                          palette2: {
-                            base: "pentaho/visual/color/paletteProperty"
-                          },
-                          palette3: {
-                            base: "pentaho/visual/color/paletteProperty"
-                          }
-                        }
-                      }
-                    });
+              var model = new Model({
+                palette1: nominalPalette1,
+                palette3: nominalPalette2
+              });
 
-                    var model = new Model({
-                      palette1: deps.nominalPalette1,
-                      palette3: deps.nominalPalette2
-                    });
+              var palette = model.palette2;
 
-                    var palette = model.palette2;
-
-                    expect(palette).toBe(deps.nominalPalette2);
-                  });
+              expect(palette).toBe(nominalPalette2);
             });
           });
 
-          it("should select a compatible palette which is not used in " +
-              "the other properties (when setting)", function() {
+          it("should select a compatible palette which is not used in the other properties (when setting)", function() {
 
             return require.using([
-              "pentaho/type/Context"
-            ], configAmd, function(Context) {
+              "pentaho/visual/base/Model",
+              "my/nominalPalette1",
+              "my/nominalPalette2",
+              "my/quantitativePalette1"
+            ], configAmd, function(BaseModel, nominalPalette1, nominalPalette2, quantitativePalette1) {
 
-              return Context.createAsync()
-                  .then(function(context) {
-                    return context.getDependencyAsync({
-                      BaseModel: "pentaho/visual/base/model",
-                      nominalPalette1: {$instance: {id: "my/nominalPalette1"}},
-                      nominalPalette2: {$instance: {id: "my/nominalPalette2"}},
-                      quantitativePalette1: {$instance: {id: "my/quantitativePalette1"}},
-                    });
-                  })
-                  .then(function(deps) {
+              var Model = BaseModel.extend({
+                $type: {
+                  props: {
+                    palette1: {
+                      base: "pentaho/visual/color/PaletteProperty"
+                    },
+                    palette2: {
+                      base: "pentaho/visual/color/PaletteProperty"
+                    },
+                    palette3: {
+                      base: "pentaho/visual/color/PaletteProperty"
+                    }
+                  }
+                }
+              });
 
-                    var Model = deps.BaseModel.extend({
-                      $type: {
-                        props: {
-                          palette1: {
-                            base: "pentaho/visual/color/paletteProperty"
-                          },
-                          palette2: {
-                            base: "pentaho/visual/color/paletteProperty"
-                          },
-                          palette3: {
-                            base: "pentaho/visual/color/paletteProperty"
-                          }
-                        }
-                      }
-                    });
+              var model = new Model({
+                palette1: nominalPalette1,
+                palette3: nominalPalette2
+              });
 
-                    var model = new Model({
-                      palette1: deps.nominalPalette1,
-                      palette3: deps.nominalPalette2
-                    });
+              model.palette2 = null;
 
-                    model.palette2 = null;
+              var palette = model.palette2;
 
-                    var palette = model.palette2;
-
-                    expect(palette).toBe(deps.quantitativePalette1);
-                  });
+              expect(palette).toBe(quantitativePalette1);
             });
           });
         });

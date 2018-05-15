@@ -14,39 +14,36 @@
  * limitations under the License.
  */
 define([
-  "../i18n!types"
-], function(bundle) {
+  "pentaho/module!_",
+  "./Simple",
+  "pentaho/i18n!types"
+], function(module, Simple, bundle) {
 
   "use strict";
 
-  return ["simple", function(Simple) {
-
+  /**
+   * @name pentaho.type.String
+   * @class
+   * @extends pentaho.type.Simple
+   * @amd pentaho/type/String
+   *
+   * @classDesc The class of textual values.
+   *
+   * @description Creates a string instance.
+   */
+  return Simple.extend({
     /**
-     * @name pentaho.type.String
-     * @class
-     * @extends pentaho.type.Simple
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.String>} pentaho/type/string
-     *
-     * @classDesc The class of textual values.
-     *
-     * @description Creates a string instance.
+     * Gets the underlying string primitive value of the value.
+     * @name pentaho.type.String#value
+     * @type string
+     * @readonly
      */
-    var PenString = Simple.extend({
-      /**
-       * Gets the underlying string primitive value of the value.
-       * @name pentaho.type.String#value
-       * @type string
-       * @readonly
-       */
 
-      $type: {
-        alias: "string",
-        cast: String
-      }
-    }).implement({
-      $type: bundle.structured["string"] // eslint-disable-line dot-notation
-    });
-
-    return PenString;
-  }];
+    $type: {
+      id: module.id,
+      cast: String
+    }
+  })
+  .localize({$type: bundle.structured.String})
+  .configure({$type: module.config});
 });

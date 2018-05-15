@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,34 +14,19 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/List",
+  "pentaho/type/Number",
+  "pentaho/type/String",
+  "pentaho/type/mixins/Enum",
   "pentaho/type/SpecificationScope",
   "tests/pentaho/util/errorMatch"
-], function(Context, SpecificationScope, errorMatch) {
+], function(List, PentahoNumber, PentahoString, Enum, SpecificationScope, errorMatch) {
 
   "use strict";
 
   /* global describe:true, it:true, expect:true, beforeEach:true*/
 
   describe("pentaho.type.mixins.Enum", function() {
-
-    var context;
-    var List;
-    var PentahoNumber;
-    var PentahoString;
-    var Enum;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            List = context.get("pentaho/type/list");
-            PentahoNumber = context.get("pentaho/type/number");
-            PentahoString = context.get("pentaho/type/string");
-            Enum = context.get("pentaho/type/mixins/enum");
-          })
-          .then(done, done.fail);
-    });
 
     it("should be a function", function() {
       expect(typeof Enum).toBe("function");
@@ -235,8 +220,8 @@ define([
         function expectIt(value) {
 
           expect(MyString.type.compareElements(
-              new MyString(value),
-              new MyString(value))).toBe(0);
+            new MyString(value),
+            new MyString(value))).toBe(0);
         }
 
         expectIt("Xau");

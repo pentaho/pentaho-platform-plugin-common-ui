@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!../And",
   "../KnownFilterKind"
-], function(KnownFilterKind) {
+], function(module, KnownFilterKind) {
 
   "use strict";
 
   return function(filter) {
 
     /**
-     * @name pentaho.data.filter.And.Type
+     * @name pentaho.data.filter.AndType
      * @class
-     * @extends pentaho.data.filter.Tree.Type
+     * @extends pentaho.data.filter.TreeType
      *
      * @classDesc The type class of the `And` filter type.
      *
@@ -36,7 +37,7 @@ define([
      * @class
      * @extends pentaho.data.filter.Tree
      *
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.And>} pentaho/data/filter/and
+     * @amd pentaho/data/filter/And
      *
      * @classDesc
      * @classDesc The `And` filter represents a boolean conjunction (an And) filter.
@@ -94,9 +95,8 @@ define([
         return filter.Or;
       },
 
-      $type: /** @lends pentaho.data.filter.And.Type# */{
-        id: "pentaho/data/filter/and",
-        alias: "and"
+      $type: /** @lends pentaho.data.filter.AndType# */{
+        id: module.id
       }
     });
   };

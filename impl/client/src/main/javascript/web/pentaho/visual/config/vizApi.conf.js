@@ -1,5 +1,5 @@
 /*!
- * Copyright 2016 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2016 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,44 +44,15 @@ define(function() {
 
   return {
     rules: [
-      // region Viz API Visual Roles' Strategies and Standard Color Palettes Context Priorities Registration
-      {
-        priority: RULE_PRIO_VIZ_DEFAULT,
-        select: {
-          type: "pentaho/type/Context"
-        },
-        apply: {
-          instances: {
-            "pentaho/visual/color/palettes/nominalPrimary":    {ranking: -10},
-            "pentaho/visual/color/palettes/nominalNeutral":    {ranking: -110},
-            "pentaho/visual/color/palettes/nominalLight":      {ranking: -120},
-            "pentaho/visual/color/palettes/nominalDark":       {ranking: -130},
-            "pentaho/visual/color/palettes/quantitativeBlue3": {ranking: -10},
-            "pentaho/visual/color/palettes/quantitativeBlue5": {ranking: -10},
-            "pentaho/visual/color/palettes/quantitativeGray3": {ranking: -10},
-            "pentaho/visual/color/palettes/quantitativeGray5": {ranking: -10},
-            "pentaho/visual/color/palettes/divergentRyg3":     {ranking: -10},
-            "pentaho/visual/color/palettes/divergentRyg5":     {ranking: -10},
-            "pentaho/visual/color/palettes/divergentRyb3":     {ranking: -10},
-            "pentaho/visual/color/palettes/divergentRyb5":     {ranking: -10}
-          },
-          types: {
-            "pentaho/visual/role/adaptation/identityStrategy": {ranking: -10},
-            "pentaho/visual/role/adaptation/tupleStrategy":    {ranking: -20}
-          }
-        }
-      },
-      // endregion
-
       // region Model Rules
 
       // line/barLine models
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: [
-            "pentaho/visual/models/line",
-            "pentaho/visual/models/barLine"
+          module: [
+            "pentaho/visual/models/Line",
+            "pentaho/visual/models/BarLine"
           ]
         },
         apply: {
@@ -98,7 +69,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/visual/models/heatGrid"
+          module: "pentaho/visual/models/HeatGrid"
         },
         apply: {
           props: {
@@ -113,7 +84,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/visual/models/metricPointAbstract"
+          module: "pentaho/visual/models/MetricPointAbstract"
         },
         apply: {
           props: {
@@ -130,7 +101,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/ccc/visual/abstract"
+          module: "pentaho/ccc/visual/Abstract"
         },
         apply: {
           extension: {
@@ -237,7 +208,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/ccc/visual/cartesianAbstract"
+          module: "pentaho/ccc/visual/CartesianAbstract"
         },
         apply: {
           extension: {
@@ -301,7 +272,7 @@ define(function() {
 
             axisTicks_lineWidth:   1,
             axisTicks_strokeStyle: "#999999",
-            xAxisTicks_height:     3, // account for part of the tick that gets hidden by the rule
+            xAxisTicks_height:     3, // Account for part of the tick that gets hidden by the rule
             yAxisTicks_width:      3
           }
         }
@@ -311,14 +282,14 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: [
-            "pentaho/ccc/visual/bar",
-            "pentaho/ccc/visual/barStacked",
-            "pentaho/ccc/visual/barNormalized",
-            "pentaho/ccc/visual/pointAbstract",
-            "pentaho/ccc/visual/barLine",
-            "pentaho/ccc/visual/boxplot",
-            "pentaho/ccc/visual/waterfall"
+          module: [
+            "pentaho/ccc/visual/Bar",
+            "pentaho/ccc/visual/BarStacked",
+            "pentaho/ccc/visual/BarNormalized",
+            "pentaho/ccc/visual/PointAbstract",
+            "pentaho/ccc/visual/BarLine",
+            "pentaho/ccc/visual/Boxplot",
+            "pentaho/ccc/visual/Waterfall"
           ]
         },
         apply: {
@@ -333,15 +304,15 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: [
-            "pentaho/ccc/visual/bar",
-            "pentaho/ccc/visual/barStacked",
-            "pentaho/ccc/visual/barNormalized",
-            "pentaho/ccc/visual/pointAbstract",
-            "pentaho/ccc/visual/barLine",
-            "pentaho/ccc/visual/waterfall",
-            "pentaho/ccc/visual/boxplot",
-            "pentaho/ccc/visual/metricPointAbstract"
+          module: [
+            "pentaho/ccc/visual/Bar",
+            "pentaho/ccc/visual/BarStacked",
+            "pentaho/ccc/visual/BarNormalized",
+            "pentaho/ccc/visual/PointAbstract",
+            "pentaho/ccc/visual/BarLine",
+            "pentaho/ccc/visual/Waterfall",
+            "pentaho/ccc/visual/Boxplot",
+            "pentaho/ccc/visual/MetricPointAbstract"
           ]
         },
         apply: {
@@ -359,7 +330,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/ccc/visual/metricPointAbstract"
+          module: "pentaho/ccc/visual/MetricPointAbstract"
         },
         apply: {
           extension: {
@@ -384,7 +355,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/ccc/visual/bubble"
+          module: "pentaho/ccc/visual/Bubble"
         },
         apply: {
           extension: {
@@ -416,7 +387,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/ccc/visual/scatter"
+          module: "pentaho/ccc/visual/Scatter"
         },
         apply: {
           extension: {
@@ -435,10 +406,10 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: [
-            "pentaho/ccc/visual/barHorizontal",
-            "pentaho/ccc/visual/barStackedHorizontal",
-            "pentaho/ccc/visual/barNormalizedHorizontal"
+          module: [
+            "pentaho/ccc/visual/BarHorizontal",
+            "pentaho/ccc/visual/BarStackedHorizontal",
+            "pentaho/ccc/visual/BarNormalizedHorizontal"
           ]
         },
         apply: {
@@ -448,7 +419,7 @@ define(function() {
             xAxisSize: 30,
 
             yAxisSizeMax: maxHorizontalTextWidth,
-            contentMargins: {right: 30} // merges with inherited contentMargins
+            contentMargins: {right: 30} // Merges with inherited contentMargins.
           }
         }
       },
@@ -457,7 +428,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/ccc/visual/barAbstract"
+          module: "pentaho/ccc/visual/BarAbstract"
         },
         apply: {
           extension: {
@@ -479,7 +450,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/ccc/visual/pointAbstract"
+          module: "pentaho/ccc/visual/PointAbstract"
         },
         apply: {
           extension: {
@@ -521,9 +492,9 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: [
-            "pentaho/ccc/visual/pointAbstract",
-            "pentaho/ccc/visual/barLine"
+          module: [
+            "pentaho/ccc/visual/PointAbstract",
+            "pentaho/ccc/visual/BarLine"
           ]
         },
         apply: {
@@ -594,7 +565,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/ccc/visual/areaAbstract"
+          module: "pentaho/ccc/visual/AreaAbstract"
         },
         apply: {
           extension: {
@@ -605,7 +576,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/ccc/visual/area"
+          module: "pentaho/ccc/visual/Area"
         },
         apply: {
           extension: {
@@ -616,7 +587,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/ccc/visual/areaStacked"
+          module: "pentaho/ccc/visual/AreaStacked"
         },
         apply: {
           extension: {
@@ -629,7 +600,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/ccc/visual/pie"
+          module: "pentaho/ccc/visual/Pie"
         },
         apply: {
           extension: {
@@ -659,7 +630,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/ccc/visual/donut"
+          module: "pentaho/ccc/visual/Donut"
         },
         apply: {
           extension: {
@@ -672,7 +643,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/ccc/visual/heatGrid"
+          module: "pentaho/ccc/visual/HeatGrid"
         },
         apply: {
           extension: {
@@ -718,7 +689,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/ccc/visual/sunburst"
+          module: "pentaho/ccc/visual/Sunburst"
         },
         apply: {
           extension: {
@@ -743,7 +714,7 @@ define(function() {
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          type: "pentaho/ccc/visual/treemap"
+          module: "pentaho/ccc/visual/Treemap"
         },
         apply: {
           extension: {
@@ -760,7 +731,7 @@ define(function() {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: "pentaho-det",
-          type: "pentaho/ccc/visual/abstract"
+          module: "pentaho/ccc/visual/Abstract"
         },
         apply: {
           extension: {
@@ -772,7 +743,7 @@ define(function() {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: ["pentaho-det", "pentaho-cdf"],
-          type: "pentaho/ccc/visual/abstract"
+          module: "pentaho/ccc/visual/Abstract"
         },
         apply: {
           extension: {
@@ -788,7 +759,7 @@ define(function() {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: "pentaho-cdf",
-          type: "pentaho/ccc/visual/abstract"
+          module: "pentaho/ccc/visual/Abstract"
         },
         apply: {
           extension: {
@@ -798,7 +769,7 @@ define(function() {
 
             // Legend defaults
             // By UX design spec, line-width: 2 => radius: 4
-            // [BACKLOG-15788] In "pentaho/ccc/visual/abstract.js#L1414" the code is calculating this properties' values
+            // [BACKLOG-15788] In "pentaho/ccc/visual/Abstract.js#L1414" the code is calculating this properties' values
             // and they need to match the ones in this configuration
             // If no line width was used, shapes such as crosses could not show.
             legend$Dot_shapeSize: 9, // = (radius - lineWidth / 2) ^ 2
@@ -814,7 +785,7 @@ define(function() {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: ["pentaho-det", "pentaho-cdf"],
-          type: "pentaho/ccc/visual/pointAbstract"
+          module: "pentaho/ccc/visual/PointAbstract"
         },
         apply: {
           extension: {
@@ -831,7 +802,7 @@ define(function() {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: ["pentaho-det", "pentaho-cdf"],
-          type: "pentaho/ccc/visual/cartesianAbstract"
+          module: "pentaho/ccc/visual/CartesianAbstract"
         },
         apply: {
           extension: {
@@ -854,7 +825,7 @@ define(function() {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: "pentaho-cdf",
-          type: "pentaho/ccc/visual/barAbstract"
+          module: "pentaho/ccc/visual/BarAbstract"
         },
         apply: {
           extension: {
@@ -867,7 +838,7 @@ define(function() {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: ["pentaho-analyzer", "pentaho-det"],
-          type: "pentaho/ccc/visual/cartesianAbstract"
+          module: "pentaho/ccc/visual/CartesianAbstract"
         },
         apply: {
           extension: {
@@ -901,7 +872,7 @@ define(function() {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: ["pentaho-analyzer", "pentaho-det"],
-          type: "pentaho/ccc/visual/heatGrid"
+          module: "pentaho/ccc/visual/HeatGrid"
         },
         apply: {
           extension: {
@@ -916,7 +887,7 @@ define(function() {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: "pentaho-cdf",
-          type: "pentaho/ccc/visual/metricPointAbstract"
+          module: "pentaho/ccc/visual/MetricPointAbstract"
         },
         apply: {
           extension: {
@@ -930,7 +901,7 @@ define(function() {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
           application: "pentaho-cdf",
-          type: "pentaho/ccc/visual/bubble"
+          module: "pentaho/ccc/visual/Bubble"
         },
         apply: {
           extension: {

@@ -14,74 +14,70 @@
  * limitations under the License.
  */
 define([
-  "module",
-  "../i18n!types"
-], function(module, bundle) {
+  "pentaho/module!_",
+  "./Simple",
+  "./_baseLoader",
+  "pentaho/i18n!types"
+], function(module, Simple, baseLoader, bundle) {
 
   "use strict";
 
-  return ["simple", function(Simple) {
+  // TODO: Using TypeDescriptor is not safe w.r.t. to asynchronous loading of types from the loader (getAsync).
+  // Some means to register spec scanners for type ids would need to be devised.
+  // See __collectDependencyRefsRecursive.
 
-    // TODO: Using TypeDescriptor is not safe w.r.t. to asynchronous loading of types from the context (getAsync).
-    // Some means to register spec scanners for type ids would need to be devised.
-    // See __collectDependencyRefsRecursive.
+  /**
+   * @name pentaho.type.TypeDescriptor
+   * @class
+   * @extends pentaho.type.Simple
+   * @amd pentaho/type/TypeDescriptor
+   *
+   * @classDesc The class that wraps a {@link pentaho.type.Type} object as a Type API simple value.
+   *
+   * @description Creates a type descriptor object.
+   * @constructor
+   * @param {pentaho.type.spec.ITypeDescriptor|
+   *         pentaho.type.Type|
+   *         Class.<pentaho.type.Instance>|
+   *         nonEmptyString} [spec] A type descriptor specification,
+   *         a [Type]{@link pentaho.type.Type} object,
+   *         an [Instance]{@link pentaho.type.Instance} constructor or
+   *         a (permanent) type identifier.
+   */
+  return Simple.extend(/** @lends pentaho.type.TypeDescriptor# */{
+    /**
+     * Gets the underlying type object.
+     *
+     * @name pentaho.type.TypeDescriptor#value
+     * @type {!pentaho.type.Type}
+     * @readonly
+     */
 
     /**
-     * @name pentaho.type.TypeDescriptor
-     * @class
-     * @extends pentaho.type.Simple
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.TypeDescriptor>} pentaho/type/typeDescriptor
+     * Gets the unique key of the type descriptor.
      *
-     * @classDesc The class that wraps a {@link pentaho.type.Type} object as a Type API simple value.
-     *
-     * @description Creates a type descriptor object.
-     * @constructor
-     * @param {pentaho.type.spec.ITypeDescriptor|
-     *         pentaho.type.Type|
-     *         Class.<pentaho.type.Instance>|
-     *         nonEmptyString} [spec] A type descriptor specification,
-     *         a [Type]{@link pentaho.type.Type} object,
-     *         an [Instance]{@link pentaho.type.Instance} constructor or
-     *         a (permanent) type identifier.
+     * @type {string}
+     * @readonly
      */
-    var TypeDescriptor = Simple.extend(/** @lends pentaho.type.TypeDescriptor# */{
-      /**
-       * Gets the underlying type object.
-       *
-       * @name pentaho.type.TypeDescriptor#value
-       * @type {!pentaho.type.Type}
-       * @readonly
-       */
+    get $key() {
+      return String(this.value.uid);
+    },
 
-      /**
-       * Gets the unique key of the type descriptor.
-       *
-       * @type {string}
-       * @readonly
-       */
-      get $key() {
-        return String(this.value.uid);
-      },
+    // region serialization
+    /** @inheritDoc */
+    _toJSONValue: function(keyArgs) {
+      return this.value.toSpecInContext(keyArgs);
+    },
+    // endregion
 
-      // region serialization
-      /** @inheritDoc */
-      _toJSONValue: function(keyArgs) {
-        return this.value.toRefInContext(keyArgs);
-      },
-      // endregion
+    $type: /** @lends pentaho.type.TypeDescriptorType# */{
+      id: module.id,
 
-      $type: /** @lends pentaho.type.TypeDescriptor.Type# */{
-        id: module.id,
-        alias: "type",
-
-        cast: function(value) {
-          return this.context.get(value).type;
-        }
+      cast: function(value) {
+        return baseLoader.resolveType(value).type;
       }
-    }).implement(/** @lends pentaho.type.TypeDescriptor# */{
-      $type: bundle.structured.typeDescriptor
-    });
-
-    return TypeDescriptor;
-  }];
+    }
+  })
+  .localize({$type: bundle.structured.TypeDescriptor})
+  .configure({$type: module.config});
 });

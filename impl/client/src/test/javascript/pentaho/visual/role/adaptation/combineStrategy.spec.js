@@ -15,17 +15,16 @@
  */
 /*
 define([
-  "pentaho/type/Context",
+  "pentaho/visual/base/Model",
+  "pentaho/visual/role/adaptation/Combine",
   "pentaho/visual/role/adaptation/impl/CombineAdapter",
   "pentaho/data/Table",
   "pentaho/data/TableView"
-], function(Context, Adapter, DataTable, DataView) {
+], function(Model, Strategy, Adapter, DataTable, DataView) {
 
   "use strict";
 
   describe("pentaho.visual.role.adaptation.CombineStrategy", function() {
-
-    var Strategy;
 
     var propTypeKey;
     var propTypeNonKey;
@@ -58,53 +57,40 @@ define([
       };
     }
 
-    beforeAll(function(done) {
+    beforeAll(function() {
 
-      Context.createAsync()
-          .then(function(context) {
-            return context.getDependencyApplyAsync([
-              "pentaho/visual/base/model",
-              "pentaho/visual/role/adaptation/combine"
-            ], function(_VisualModel, _Strategy) {
+      var CustomVisualModel = Model.extend({
+        $type: {
+          props: [
+            {
+              name: "roleKey",
+              base: "pentaho/visual/role/Property",
+              isVisualKey: true,
+              modes: [
+                {dataType: "string", isContinuous: false},
+                {dataType: "element", isContinuous: false},
+                {dataType: "number", isContinuous: true},
+                {dataType: "number", isContinuous: false}
+              ]
+            },
+            {
+              name: "roleNonKey",
+              base: "pentaho/visual/role/Property",
+              isVisualKey: false
+            }
+          ]
+        }
+      });
 
-              var CustomVisualModel = _VisualModel.extend({
-                $type: {
-                  props: [
-                    {
-                      name: "roleKey",
-                      base: "pentaho/visual/role/property",
-                      isVisualKey: true,
-                      modes: [
-                        {dataType: "string", isContinuous: false},
-                        {dataType: "element", isContinuous: false},
-                        {dataType: "number", isContinuous: true},
-                        {dataType: "number", isContinuous: false}
-                      ]
-                    },
-                    {
-                      name: "roleNonKey",
-                      base: "pentaho/visual/role/property",
-                      isVisualKey: false
-                    }
-                  ]
-                }
-              });
+      dataTable = new DataTable(getJSONDataset());
 
-              Strategy = _Strategy;
+      propTypeKey = CustomVisualModel.type.get("roleKey");
+      propTypeNonKey = CustomVisualModel.type.get("roleNonKey");
 
-              dataTable = new DataTable(getJSONDataset());
-
-              propTypeKey = CustomVisualModel.type.get("roleKey");
-              propTypeNonKey = CustomVisualModel.type.get("roleNonKey");
-
-              modes.StringCategorical = propTypeKey.modes.at(0);
-              modes.ElementCategorical = propTypeKey.modes.at(1);
-              modes.NumberContinuous = propTypeKey.modes.at(2);
-              modes.NumberCategorical = propTypeKey.modes.at(3);
-            });
-          })
-          .then(done, done.fail);
-
+      modes.StringCategorical = propTypeKey.modes.at(0);
+      modes.ElementCategorical = propTypeKey.modes.at(1);
+      modes.NumberContinuous = propTypeKey.modes.at(2);
+      modes.NumberCategorical = propTypeKey.modes.at(3);
     });
 
     it("should be possible to create an instance", function() {
@@ -222,5 +208,4 @@ define([
     });
   });
 });
-
-  */
+*/

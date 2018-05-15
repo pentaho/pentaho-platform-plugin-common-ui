@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,7 @@
  */
 
 /**
- * A `spec.UElement` represents the union of JS types that can be used to describe an element instance,
- * or the absence of one.
+ * A `spec.Element` represents the union of JS types that can be used to describe an element instance.
  *
- * To describe an absent instance, use a {@link Nully} JavaScript value.
- *
- * @typedef {pentaho.type.spec.UComplex|
- *           pentaho.type.spec.USimple|
- *           Nully} pentaho.type.spec.UElement
+ * @typedef {pentaho.type.spec.Complex|pentaho.type.spec.Simple} pentaho.type.spec.Element
  */

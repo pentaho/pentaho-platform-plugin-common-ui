@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,23 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/action/Base",
   "pentaho/type/action/Execution",
   "pentaho/type/action/States",
   "pentaho/type/ValidationError",
   "pentaho/lang/UserError",
   "pentaho/lang/RuntimeError",
   "tests/pentaho/util/errorMatch",
-  "tests/test-utils",
   "pentaho/debug",
   "pentaho/debug/Levels",
   "pentaho/util/logger"
-], function(Context, Execution, States, ValidationError, UserError, RuntimeError, errorMatch, testUtils,
+], function(BaseAction, Execution, States, ValidationError, UserError, RuntimeError, errorMatch,
             debugMgr, DebugLevels, logger) {
 
   "use strict";
 
   /* eslint max-nested-callbacks: 0, require-jsdoc: 0, no-unused-vars: 0,
      default-case: 0, no-fallthrough: 0, dot-notation: 0 */
-
-  // Use alternate, promise-aware version of `it`.
-  var it = testUtils.itAsync;
 
   describe("pentaho.type.action.Execution", function() {
 
@@ -44,30 +40,23 @@ define([
     var AsyncAction;
     var target;
 
-    beforeAll(function(done) {
+    beforeAll(function() {
 
       target = Object.freeze({});
 
-      Context.createAsync()
-          .then(function(context) {
-            return context.getAsync("pentaho/type/action/base");
-          })
-          .then(function(BaseAction) {
-            // A derived non-abstract class, adding nothing new.
-            SyncAction = BaseAction.extend({
-              $type: {
-                isSync: true
-              }
-            });
+      // A derived non-abstract class, adding nothing new.
+      SyncAction = BaseAction.extend({
+        $type: {
+          isSync: true
+        }
+      });
 
-            // Idem.
-            AsyncAction = BaseAction.extend({
-              $type: {
-                isSync: false
-              }
-            });
-          })
-          .then(done, done.fail);
+      // Idem.
+      AsyncAction = BaseAction.extend({
+        $type: {
+          isSync: false
+        }
+      });
     });
 
     describe("new (action, target)", function() {

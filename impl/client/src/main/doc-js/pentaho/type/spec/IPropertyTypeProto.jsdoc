@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  */
 
 /**
- * The `spec.IPropertyTypeProto` interface represents the information used to
+ * The `spec.IPropertyType` interface represents the information used to
  * define a property of a [complex]{@link pentaho.type.Complex} type.
  *
- * It is used as part of the {@link pentaho.type.spec.IComplexTypeProto} specification.
+ * It is used as part of the {@link pentaho.type.spec.IComplexType} specification.
  *
- * @name pentaho.type.spec.IPropertyTypeProto
+ * @name pentaho.type.spec.IPropertyType
  *
  * @interface
- * @extends pentaho.type.spec.ITypeProto
+ * @extends pentaho.type.spec.IType
  */
 
 /**
@@ -38,16 +38,16 @@
  * the base type of the declaring type.
  *
  * @name base
- * @memberOf pentaho.type.spec.IPropertyTypeProto#
- * @type {?pentaho.type.spec.UTypeReference}
- * @see pentaho.type.spec.IPropertyTypeProto#name
+ * @memberOf pentaho.type.spec.IPropertyType#
+ * @type {?pentaho.type.spec.TypeReference}
+ * @see pentaho.type.spec.IPropertyType#name
  */
 
 /**
  * The name of the _property type_.
  *
  * The name of a _property type_ identifies it within
- * its [declaring type]{@link pentaho.type.Property.Type#declaringType}.
+ * its [declaring type]{@link pentaho.type.PropertyType#declaringType}.
  *
  * When it is a non-{@link Nully} and non-{@link String} value,
  * the value is first replaced by the result of calling its `toString` method.
@@ -59,10 +59,10 @@
  * this property specification **configures** the existing property.
  *
  * @name name
- * @memberOf pentaho.type.spec.IPropertyTypeProto#
+ * @memberOf pentaho.type.spec.IPropertyType#
  * @type {!nonEmptyString | any}
  *
- * @see pentaho.type.Property.Type#name
+ * @see pentaho.type.PropertyType#name
  */
 
 /**
@@ -79,10 +79,10 @@
  * the value is first replaced by the result of calling its `toString` method.
  *
  * @name nameAlias
- * @memberOf pentaho.type.spec.IPropertyTypeProto#
+ * @memberOf pentaho.type.spec.IPropertyType#
  * @type {!nonEmptyString | any}
  *
- * @see pentaho.type.Property.Type#nameAlias
+ * @see pentaho.type.PropertyType#nameAlias
  */
 
 /**
@@ -95,40 +95,40 @@
  * the label is inherited from the base type.
  *
  * The default label of a root property type is a capitalization of
- * its [name]{@link pentaho.type.spec.IPropertyTypeProto#name}.
+ * its [name]{@link pentaho.type.spec.IPropertyType#name}.
  *
  * @name label
- * @memberOf pentaho.type.spec.IPropertyTypeProto#
+ * @memberOf pentaho.type.spec.IPropertyType#
  * @type {?nonEmptyString | any}
  */
 
 /**
  * The type of value that properties of this type can hold.
  *
- * If the _value type_ is a [list]{@link pentaho.type.Value.Type#isList} type,
+ * If the _value type_ is a [list]{@link pentaho.type.ValueType#isList} type,
  * then this property will be a _list_ (or multiple-elements) property,
  * otherwise, this property will be an _element_ (or single-element) property.
  *
- * When unspecified and [name]{@link pentaho.type.spec.IPropertyTypeProto#name} is that of
+ * When unspecified and [name]{@link pentaho.type.spec.IPropertyType#name} is that of
  * an existing or inherited _property type_,
  * the local or inherited _value type_ is used.
  *
  * When unspecified and `name` defines a new, _root_ property,
- * the default _value type_ is [pentaho/type/string]{@link pentaho.type.String}.
+ * the default _value type_ is [pentaho/type/String]{@link pentaho.type.String}.
  *
  * Cannot be a {@link Nully} value.
  *
- * When specified, the value is a [spec.UTypeReference]{@link pentaho.type.spec.UTypeReference}
- * and is first resolved using [Context#get]{@link pentaho.type.Context#get}.
+ * When specified, the value is a [spec.TypeReference]{@link pentaho.type.spec.TypeReference}
+ * and is first resolved using [ILoader#resolveType]{@link pentaho.type.ILoader#resolveType}.
  *
  * The resolved _value type_ must be a [subtype]{@link pentaho.type.Type#isSubtypeOf} of the
  * attribute's current (local or inherited) _value type_.
  *
  * @name valueType
- * @memberOf pentaho.type.spec.IPropertyTypeProto#
- * @type {!pentaho.type.spec.UTypeReference}
+ * @memberOf pentaho.type.spec.IPropertyType#
+ * @type {!pentaho.type.spec.TypeReference}
  *
- * @see pentaho.type.Property.Type#valueType
+ * @see pentaho.type.PropertyType#valueType
  */
 
 /**
@@ -144,21 +144,21 @@
  * causing it to assume its default value (yes, the default value of the _default value_ attribute...):
  *
  * * for [root]{@link pentaho.type.Type#root} _property types_ or
- *   properties with a locally set [valueType]{@link pentaho.type.Property.Type#defaultValue},
+ *   properties with a locally set [valueType]{@link pentaho.type.PropertyType#defaultValue},
  *   the default value is `null`
  * * for other _property types_, the default value is the _inherited value_.
  *
  * Else, the value must be either a function or a valid specification for a value of the _property type_'s
- * current (local or inherited) [valueType]{@link pentaho.type.spec.IPropertyTypeProto#valueType}.
+ * current (local or inherited) [valueType]{@link pentaho.type.spec.IPropertyType#valueType}.
  *
- * When this is a [list]{@link pentaho.type.Property.Type#isList} _property type_,
+ * When this is a [list]{@link pentaho.type.PropertyType#isList} _property type_,
  * the value must be a valid list value specification.
  *
  * @name defaultValue
- * @memberOf pentaho.type.spec.IPropertyTypeProto#
- * @type {pentaho.type.spec.UValue | pentaho.type.spec.PropertyDynamicAttribute.<pentaho.type.spec.UValue>}
+ * @memberOf pentaho.type.spec.IPropertyType#
+ * @type {pentaho.type.spec.Value | pentaho.type.spec.PropertyDynamicAttribute.<pentaho.type.spec.Value>}
  *
- * @see pentaho.type.Property.Type#defaultValue
+ * @see pentaho.type.PropertyType#defaultValue
  */
 
 /**
@@ -166,12 +166,12 @@
  *
  * When a property is of a required _property type_,
  * it is considered **invalid** if its value (in a complex instance) is `null` or,
- * in the case of a [list]{@link pentaho.type.Property.Type#isList} _property type_,
+ * in the case of a [list]{@link pentaho.type.PropertyType#isList} _property type_,
  * it has zero elements.
  *
  * Note that this attribute is taken together with
- * the [countMin]{@link pentaho.type.spec.IPropertyTypeProto#countMin} attribute
- * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeOn}
+ * the [countMin]{@link pentaho.type.spec.IPropertyType#countMin} attribute
+ * to determine the effective [element count range]{@link pentaho.type.PropertyType#countRangeOn}
  * of a _property type_.
  *
  * ### This attribute is *Dynamic*
@@ -198,13 +198,13 @@
  * The default (root) `isRequired` attribute value is `false`.
  *
  * @name isRequired
- * @memberOf pentaho.type.spec.IPropertyTypeProto#
+ * @memberOf pentaho.type.spec.IPropertyType#
  * @type {boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
  *
- * @see pentaho.type.spec.IPropertyTypeProto#valueType
- * @see pentaho.type.spec.IPropertyTypeProto#countMin
- * @see pentaho.type.Property.Type#isRequired
- * @see pentaho.type.Property.Type#countRangeOn
+ * @see pentaho.type.spec.IPropertyType#valueType
+ * @see pentaho.type.spec.IPropertyType#countMin
+ * @see pentaho.type.PropertyType#isRequired
+ * @see pentaho.type.PropertyType#countRangeOn
  */
 
 /**
@@ -241,11 +241,11 @@
  * The default (root) `isApplicable` attribute value is `true`.
  *
  * @name isApplicable
- * @memberOf pentaho.type.spec.IPropertyTypeProto#
+ * @memberOf pentaho.type.spec.IPropertyType#
  * @type {boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
  *
- * @see pentaho.type.spec.IPropertyTypeProto#isRequired
- * @see pentaho.type.Property.Type#isApplicable
+ * @see pentaho.type.spec.IPropertyType#isRequired
+ * @see pentaho.type.PropertyType#isApplicable
  */
 
 /**
@@ -279,18 +279,18 @@
  * The default (root) `isEnabled` attribute value is `true`.
  *
  * @name isEnabled
- * @memberOf pentaho.type.spec.IPropertyTypeProto#
+ * @memberOf pentaho.type.spec.IPropertyType#
  * @type {boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
  *
- * @see pentaho.type.Property.Type#isEnabled
+ * @see pentaho.type.PropertyType#isEnabled
  */
 
 /**
  * The minimum number of elements that properties of this type must have.
  *
  * Note that this attribute is taken together with
- * the [isRequired]{@link pentaho.type.spec.IPropertyTypeProto#isRequired} attribute
- * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeOn}
+ * the [isRequired]{@link pentaho.type.spec.IPropertyType#isRequired} attribute
+ * to determine the effective [element count range]{@link pentaho.type.PropertyType#countRangeOn}
  * of a _property type_.
  *
  * ### This attribute is *Dynamic*
@@ -320,20 +320,20 @@
  * The default (root) `countMin` attribute value is `0`.
  *
  * @name countMin
- * @memberOf pentaho.type.spec.IPropertyTypeProto#
+ * @memberOf pentaho.type.spec.IPropertyType#
  * @type {number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
  *
- * @see pentaho.type.spec.IPropertyTypeProto#countMax
- * @see pentaho.type.Property.Type#countMin
+ * @see pentaho.type.spec.IPropertyType#countMax
+ * @see pentaho.type.PropertyType#countMin
  */
 
 /**
  * The maximum number of elements that properties of this type can have.
  *
  * Note that this attribute is taken together with
- * the [isRequired]{@link pentaho.type.spec.IPropertyTypeProto#isRequired}
- * and the [countMin]{@link pentaho.type.IPropertyTypeProto#countMin} attributes
- * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeOn}
+ * the [isRequired]{@link pentaho.type.spec.IPropertyType#isRequired}
+ * and the [countMin]{@link pentaho.type.IPropertyType#countMin} attributes
+ * to determine the effective [element count range]{@link pentaho.type.PropertyType#countRangeOn}
  * of a _property type_.
  *
  * ### This attribute is *Dynamic*
@@ -363,9 +363,9 @@
  * The default (root) `countMax` attribute value is `Infinity`.
  *
  * @name countMax
- * @memberOf pentaho.type.spec.IPropertyTypeProto#
+ * @memberOf pentaho.type.spec.IPropertyType#
  * @type {number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
  *
- * @see pentaho.type.spec.IPropertyTypeProto#countMin
- * @see pentaho.type.Property.Type#countMax
+ * @see pentaho.type.spec.IPropertyType#countMin
+ * @see pentaho.type.PropertyType#countMax
  */

@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 define([
-  "tests/pentaho/util/errorMatch",
-  "pentaho/type/Context",
+  "pentaho/type/Complex",
+  "pentaho/type/List",
+  "pentaho/type/Number",
+  "pentaho/type/changes/Transaction",
   "pentaho/type/changes/ListChangeset",
   "pentaho/type/changes/ComplexChangeset",
-  "pentaho/type/changes/Add"
-], function(errorMatch, Context, ListChangeset, ComplexChangeset, Add) {
+  "pentaho/type/changes/Add",
+  "tests/pentaho/util/errorMatch"
+], function(Complex, List, PentahoNumber, Transaction, ListChangeset, ComplexChangeset, Add, errorMatch) {
+
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false */
 
-  describe("pentaho.type.changes.ListChangeset -", function() {
+  describe("pentaho.type.changes.ListChangeset", function() {
 
     function expectEqualValueAt(list, checkValues) {
       var L = checkValues.length;
@@ -35,28 +39,17 @@ define([
       }
     }
 
-    var context;
-    var List;
-    var Complex;
-    var PentahoNumber;
     var NumberList;
     var scope;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            List = context.get("pentaho/type/list");
-            Complex = context.get("pentaho/type/complex");
-            PentahoNumber = context.get("pentaho/type/number");
+    beforeAll(function() {
+      NumberList = List.extend({
+        $type: {of: PentahoNumber}
+      });
+    });
 
-            NumberList = List.extend({
-              $type: {of: PentahoNumber}
-            });
-
-            scope = context.enterChange();
-          })
-          .then(done, done.fail);
+    beforeEach(function() {
+      scope = Transaction.enter();
     });
 
     afterEach(function() {
@@ -72,7 +65,7 @@ define([
       var changeset;
 
       beforeEach(function() {
-        changeset = new ListChangeset(context.transaction, new NumberList([]));
+        changeset = new ListChangeset(scope.transaction, new NumberList([]));
       });
 
       describe("#type -", function() {
@@ -111,7 +104,7 @@ define([
         it("should be `true` when it contains a nested changeset with changes", function() {
           var Derived = Complex.extend();
           var elem = new Derived();
-          var cset = new ComplexChangeset(context.transaction, elem);
+          var cset = new ComplexChangeset(scope.transaction, elem);
           Object.defineProperty(cset, "hasChanges", {value: true});
 
           changeset.__onChildChangesetCreated(cset);
@@ -122,7 +115,7 @@ define([
         it("should be `false` when it contains a nested changeset without changes", function() {
           var Derived = Complex.extend();
           var elem = new Derived();
-          var cset = new ComplexChangeset(context.transaction, elem);
+          var cset = new ComplexChangeset(scope.transaction, elem);
 
           changeset.__onChildChangesetCreated(cset);
 
@@ -134,7 +127,7 @@ define([
         it("should return the original list when there are no changes", function() {
           var list = new NumberList([1, 2, 3]);
 
-          changeset = new ListChangeset(context.transaction, list);
+          changeset = new ListChangeset(scope.transaction, list);
           expect(changeset.__projectedMock).toBe(list);
         });
 
@@ -142,7 +135,7 @@ define([
           var list = new NumberList([1, 2, 3]);
           var listElems = list.__elems;
 
-          changeset = new ListChangeset(context.transaction, list);
+          changeset = new ListChangeset(scope.transaction, list);
           changeset.__addChange(new Add(list.__cast(4), 0));
 
           var mock = changeset.__projectedMock;
@@ -161,7 +154,7 @@ define([
         it("should not try to calculate the projected mock multiple times", function() {
           var list = new NumberList([1, 2, 3]);
 
-          changeset = new ListChangeset(context.transaction, list);
+          changeset = new ListChangeset(scope.transaction, list);
           changeset.__addChange(new Add(list.__cast(4), 0));
 
           spyOn(changeset, "__applyFrom").and.callThrough();
@@ -186,7 +179,7 @@ define([
         it("should clear changes of a nested changeset", function() {
           var Derived = Complex.extend();
           var elem = new Derived();
-          var childChangeset = new ComplexChangeset(context.transaction, elem);
+          var childChangeset = new ComplexChangeset(scope.transaction, elem);
 
           changeset.__onChildChangesetCreated(childChangeset);
 
@@ -219,7 +212,7 @@ define([
 
         it("should append a `clear` change to the changeset", function() {
 
-          changeset = new ListChangeset(context.transaction, new NumberList([1, 2]));
+          changeset = new ListChangeset(scope.transaction, new NumberList([1, 2]));
 
           changeset.__clear(); // Create clear change.
 
@@ -256,7 +249,7 @@ define([
 
         it("should prevent the creation of duplicates when add=true", function() {
           var list = new NumberList([1, 2, 3, 4]);
-          changeset = new ListChangeset(context.transaction, list);
+          changeset = new ListChangeset(scope.transaction, list);
           changeset.__set([9, 9, 9, 9], true);
 
           expect(changeset.changes.length).toBe(1);
@@ -265,7 +258,7 @@ define([
 
         it("for a single element, and remove=true, should append N -1 `Remove` changes to the changeset", function() {
           var list = new NumberList([1, 2, 3, 4]);
-          changeset = new ListChangeset(context.transaction, list);
+          changeset = new ListChangeset(scope.transaction, list);
 
           changeset.__set([2], false, false, true);
 
@@ -277,7 +270,7 @@ define([
 
         it("for two existing elements, and move=true, should append a `Move` change to the changeset", function() {
           var list = new NumberList([1, 2, 3, 4]);
-          changeset = new ListChangeset(context.transaction, list);
+          changeset = new ListChangeset(scope.transaction, list);
 
           changeset.__set([3, 2], false, false, false, true);
 
@@ -290,7 +283,7 @@ define([
            "composed of simple values", function() {
 
           var list = new NumberList([1, 2, 3, 4]);
-          changeset = new ListChangeset(context.transaction, list);
+          changeset = new ListChangeset(scope.transaction, list);
 
           changeset.__set([5, 2], true, true, false, true);
 
@@ -303,7 +296,7 @@ define([
       describe("#__remove -", function() {
         it("for a single element, should append a `Remove` change to the changeset", function() {
           var list = new NumberList([1, 2, 3, 4]);
-          changeset = new ListChangeset(context.transaction, list);
+          changeset = new ListChangeset(scope.transaction, list);
           changeset.__remove(2);
 
           expect(changeset.changes.length).toBe(1);
@@ -312,7 +305,7 @@ define([
 
         it("for an array of elements, should append a `Remove` change to the changeset per element", function() {
           var list = new NumberList([1, 2, 3, 4]);
-          changeset = new ListChangeset(context.transaction, list);
+          changeset = new ListChangeset(scope.transaction, list);
           changeset.__remove([2, 3]);
 
           expect(changeset.changes.length).toBe(2);
@@ -322,7 +315,7 @@ define([
 
         it("should throw when called after becoming read-only", function() {
           var list = new NumberList([1, 2, 3, 4]);
-          changeset = new ListChangeset(context.transaction, list);
+          changeset = new ListChangeset(scope.transaction, list);
           changeset.__setReadOnlyInternal();
 
           expect(function() {
@@ -336,7 +329,7 @@ define([
 
         beforeEach(function() {
           list = new NumberList([1, 2, 3, 4]);
-          changeset = new ListChangeset(context.transaction, list);
+          changeset = new ListChangeset(scope.transaction, list);
         });
 
         it("should do nothing if the number of elements to remove is negative", function() {
@@ -386,7 +379,7 @@ define([
         it("should modify the owning object", function() {
           var list = new NumberList([1, 2, 3, 4]);
 
-          changeset = new ListChangeset(context.transaction, list);
+          changeset = new ListChangeset(scope.transaction, list);
           changeset.__set([5], true); // Append an element.
 
           changeset._apply(list); // Apply to owning list.
@@ -400,7 +393,7 @@ define([
 
           var list = new NumberList([1, 2, 3, 4]);
 
-          changeset = new ListChangeset(context.transaction, list);
+          changeset = new ListChangeset(scope.transaction, list);
 
           // Append an element.
           changeset.__set([5], true);
@@ -425,6 +418,5 @@ define([
       });
 
     }); // end instance
-  }); // end pentaho.lang.ComplexChangeset
-
+  }); // end pentaho.type.changes.ListChangeset
 });

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!_",
+  "pentaho/type/String",
+  "pentaho/type/mixins/Enum",
   "pentaho/i18n!messages"
-], function(bundle) {
+], function(module, PentahoString, EnumMixin, bundle) {
 
   "use strict";
 
   /**
-   * @name pentaho.visual.color.Level.Type
+   * @name pentaho.visual.color.LevelType
    * @class
-   * @extends pentaho.type.String.Type
-   * @extends pentaho.type.mixins.DiscreteDomain.Type
+   * @extends pentaho.type.StringType
+   * @extends pentaho.type.mixins.DiscreteDomainType
    *
    * @classDesc The type class of {@link pentaho.visual.color.Level}.
    */
@@ -34,7 +37,7 @@ define([
    * @extends pentaho.type.String
    * @extends pentaho.type.mixins.DiscreteDomain
    *
-   * @amd {pentaho.type.Factory<pentaho.visual.color.Level>} pentaho/visual/color/level
+   * @amd pentaho/visual/color/Level
    *
    * @classDesc The `Level` class is [String]{@link pentaho.type.String} based enumeration
    * that represents a **Level of Measurement**,
@@ -68,19 +71,17 @@ define([
    *    See {@link pentaho.visual.color.palettes.divergentRyg5} for an example of a divergent color palette.
    *
    *  @see pentaho.visual.color.Palette#level
-   *  @see pentaho.visual.color.PaletteProperty.Type#levels
+   *  @see pentaho.visual.color.PalettePropertyType#levels
    */
 
-  return ["string", function(PentahoString) {
+  return PentahoString.extend({
 
-    return PentahoString.extend({
-
-      $type: /** @lends pentaho.visual.color.Level.Type# */{
-
-        mixins: ["enum"],
-        domain: ["nominal", "quantitative", "divergent"]
-      }
-    })
-    .implement({$type: bundle.structured.level});
-  }];
+    $type: /** @lends pentaho.visual.color.LevelType# */{
+      id: module.id,
+      mixins: [EnumMixin],
+      domain: ["nominal", "quantitative", "divergent"]
+    }
+  })
+  .localize({$type: bundle.structured.Level})
+  .configure({$type: module.config});
 });

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,11 @@
  */
 
 /**
- * The `spec.IBaseTypeProto` interface represents the specification of an action type.
+ * The `spec.IBaseType` interface represents the specification of an action type.
  *
- * @name pentaho.type.action.spec.IBaseTypeProto
+ * @name pentaho.type.action.spec.IBaseType
  * @interface
- * @extends pentaho.type.spec.IValueTypeProto
- */
-
-/**
- * The extensible/configurable members of the prototype of action instance classes.
- *
- * @name instance
- * @memberOf pentaho.type.action.spec.IBaseTypeProto#
- * @type {pentaho.type.action.spec.IBaseProto}
- *
- * @see pentaho.type.action.spec.IBaseProto#$type
+ * @extends pentaho.type.spec.IValueType
  */
 
 /**
@@ -42,6 +32,6 @@
  * If a non-boolean value is specified, it is converted to boolean by passing it to the `Boolean` function.
  *
  * @name isSync
- * @memberOf pentaho.type.action.spec.IBaseTypeProto#
+ * @memberOf pentaho.type.action.spec.IBaseType#
  * @type {boolean}
  */

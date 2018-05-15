@@ -18,12 +18,12 @@ define([
   "module",
   "./Base",
   "./Event",
-  "../typeInfo",
+  "../module/metaService",
   "../util/error",
   "../util/object",
   "../util/fun",
   "../util/logger"
-], function(module, Base, Event, typeInfo, error, O, F, logger) {
+], function(module, Base, Event, moduleMetaService, error, O, F, logger) {
 
   "use strict";
 
@@ -125,12 +125,13 @@ define([
       if(eventTypes && eventTypes.length) {
 
         var priority = (keyArgs && keyArgs.priority) || 0;
+        var isCritical = !!(keyArgs && keyArgs.isCritical);
 
         if(F.is(observer)) observer = {__: observer};
 
         /** @type pentaho.lang.IEventRegistrationHandle[] */
         var handles = eventTypes.map(function(type) {
-          return __registerOne.call(this, type, observer, priority);
+          return __registerOne.call(this, type, observer, priority, isCritical);
         }, this);
 
         return handles.length > 1
@@ -160,7 +161,10 @@ define([
         types.forEach(function(type) {
 
           // Resolve alias
-          type = typeInfo.getIdOf(type) || type;
+          var module = moduleMetaService.get(type);
+          if(module !== null) {
+            type = module.id;
+          }
 
           var observerRegistration = find.call(this, type, observer);
           if(observerRegistration) {
@@ -214,7 +218,10 @@ define([
     _hasListeners: function(type, phase) {
 
       // Resolve alias
-      type = typeInfo.getIdOf(type) || type;
+      var module = moduleMetaService.get(type);
+      if(module !== null) {
+        type = module.id;
+      }
 
       var queue = O.getOwn(this.__observersRegistry, type, null);
       if(queue !== null) {
@@ -327,7 +334,10 @@ define([
       }
 
       // Resolve alias
-      type = typeInfo.getIdOf(type) || type;
+      var module = moduleMetaService.get(type);
+      if(module !== null) {
+        type = module.id;
+      }
 
       var queue;
       if((queue = O.getOwn(this.__observersRegistry, type, null)) === null) {
@@ -369,6 +379,10 @@ define([
                 interceptor(listener, source, eventArgs, i);
               }
             } catch(ex) {
+
+              if(queue[i].isCritical) {
+                throw ex;
+              }
 
               errorHandler.call(source, ex, eventArgs, type, phase);
             }
@@ -453,7 +467,10 @@ define([
       }
 
       // Resolve alias
-      type = typeInfo.getIdOf(type) || type;
+      var module = moduleMetaService.get(type);
+      if(module !== null) {
+        type = module.id;
+      }
 
       var queue;
       if((queue = O.getOwn(this.__observersRegistry, type, null)) === null) {
@@ -562,15 +579,19 @@ define([
    * @param {nonEmptyString} type - The event tyoe.
    * @param {!pentaho.lang.IEventObserver} observer - The event observer.
    * @param {number} priority - The listening priority.
+   * @param {boolean} isCritical - Indicates that exceptions in this listener should abort the execution.
    *
    * @return {!pentaho.lang.IEventRegistrationHandle} An event registration handle that can be used for later removal.
    *
    * @private
    */
-  function __registerOne(type, observer, priority) {
+  function __registerOne(type, observer, priority, isCritical) {
 
     // Resolve alias
-    type = typeInfo.getIdOf(type) || type;
+    var module = moduleMetaService.get(type);
+    if(module !== null) {
+      type = module.id;
+    }
 
     var queue = __getObserversQueueOf.call(this, type, /* create: */true);
 
@@ -597,7 +618,8 @@ define([
     observerRegistration = {
       index: i,
       priority: priority,
-      observer: observer
+      observer: observer,
+      isCritical: isCritical
     };
 
     // Insert at index `i`.

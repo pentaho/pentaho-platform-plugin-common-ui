@@ -14,43 +14,22 @@
  * limitations under the License.
  */
 define([
+  "pentaho/visual/base/Model",
+  "pentaho/visual/role/Property",
   "tests/pentaho/util/errorMatch",
-  "pentaho/type/Context",
+  "pentaho/type/changes/Transaction",
   "pentaho/type/ValidationError",
   "pentaho/type/SpecificationScope",
   "pentaho/data/Table",
   "tests/pentaho/type/propertyTypeUtil"
-], function(errorMatch, Context, ValidationError, SpecificationScope, Table, propertyTypeUtil) {
+], function(Model, RoleProperty, errorMatch, Transaction, ValidationError,
+            SpecificationScope, Table, propertyTypeUtil) {
 
   "use strict";
-
-  /* globals describe, it, beforeAll, beforeEach, afterEach, spyOn */
 
   describe("pentaho.visual.role.Property", function() {
 
     describe(".Type", function() {
-
-      var Model;
-      var RoleProperty;
-      var context;
-
-      beforeAll(function(done) {
-
-        Context.createAsync()
-            .then(function(_context) {
-              context = _context;
-
-              return context.getDependencyApplyAsync([
-                "pentaho/visual/base/model",
-                "pentaho/visual/role/property"
-              ], function(_Model, _RoleProperty) {
-                Model = _Model;
-                RoleProperty = _RoleProperty;
-              });
-            })
-            .then(done, done.fail);
-
-      });
 
       // region helper methods
       function getDataSpec1() {
@@ -74,7 +53,7 @@ define([
           $type: {
             props: {
               propRole: {
-                base: "pentaho/visual/role/property",
+                base: "pentaho/visual/role/Property",
                 modes: [{dataType: ["string"]}]
               }
             }
@@ -94,7 +73,7 @@ define([
       }
 
       function assertIsValid(complex) {
-        // this way, errors are shown in the console...
+        // This way, errors are shown in the console...
         expect(complex.validate()).toBe(null);
       }
       // endregion
@@ -108,7 +87,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property"
+                  base: "pentaho/visual/role/Property"
                 }
               }
             }
@@ -130,7 +109,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: initialModes
                 }
               }
@@ -153,7 +132,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: initialModes
                 }
               }
@@ -181,7 +160,7 @@ define([
               $type: {
                 props: {
                   propRole: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: []
                   }
                 }
@@ -201,7 +180,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: initialModes
                 }
               }
@@ -238,7 +217,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: initialModes
                 }
               }
@@ -267,7 +246,7 @@ define([
               $type: {
                 props: {
                   propRole: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: initialModes
                   }
                 }
@@ -305,7 +284,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: initialModes
                 }
               }
@@ -354,21 +333,21 @@ define([
             $type: {
               props: {
                 propRoleA: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "number"},
                     {dataType: ["string"]}
                   ]
                 },
                 propRoleB: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "string"},
                     {dataType: ["number"]}
                   ]
                 },
                 propRoleC: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "list"}
                   ]
@@ -388,7 +367,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "number"}
                   ]
@@ -406,7 +385,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "value"}
                   ]
@@ -419,7 +398,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "instance"}
                   ]
@@ -441,7 +420,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "string", isContinuous: false},
                     {dataType: "number", isContinuous: true}
@@ -462,7 +441,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "string", isContinuous: false},
                     {dataType: "number", isContinuous: false}
@@ -486,21 +465,21 @@ define([
             $type: {
               props: {
                 propRoleA: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "number", isContinuous: true},
                     {dataType: "string", isContinuous: false}
                   ]
                 },
                 propRoleB: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "string", isContinuous: false},
                     {dataType: "number", isContinuous: true}
                   ]
                 },
                 propRoleC: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "string", isContinuous: false},
                     {dataType: "object", isContinuous: false}
@@ -521,7 +500,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "number", isContinuous: true}
                   ]
@@ -544,21 +523,21 @@ define([
               $type: {
                 props: {
                   propRoleA: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "number", isContinuous: true},
                       {dataType: "string", isContinuous: false}
                     ]
                   },
                   propRoleB: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "string", isContinuous: false},
                       {dataType: "number", isContinuous: true}
                     ]
                   },
                   propRoleC: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "string", isContinuous: false},
                       {dataType: "object", isContinuous: false}
@@ -579,7 +558,7 @@ define([
               $type: {
                 props: {
                   propRole: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "number", isContinuous: true}
                     ]
@@ -600,7 +579,7 @@ define([
               $type: {
                 props: {
                   propRole: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "string", isContinuous: false},
                       {dataType: "number", isContinuous: true}
@@ -621,7 +600,7 @@ define([
               $type: {
                 props: {
                   propRole: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "string", isContinuous: false},
                       {dataType: "number", isContinuous: false}
@@ -645,19 +624,19 @@ define([
               $type: {
                 props: {
                   propRoleA: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: ["string"]}
                     ]
                   },
                   propRoleB: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: ["number"]}
                     ]
                   },
                   propRoleC: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "list"}
                     ]
@@ -677,7 +656,7 @@ define([
               $type: {
                 props: {
                   propRole: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "number"}
                     ]
@@ -695,7 +674,7 @@ define([
               $type: {
                 props: {
                   propRole: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "value"}
                     ]
@@ -708,7 +687,7 @@ define([
               $type: {
                 props: {
                   propRole: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "instance"}
                     ]
@@ -730,21 +709,21 @@ define([
               $type: {
                 props: {
                   propRoleA: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "number"},
                       {dataType: ["string"]}
                     ]
                   },
                   propRoleB: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "string"},
                       {dataType: ["number"]}
                     ]
                   },
                   propRoleC: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "list"}
                     ]
@@ -764,7 +743,7 @@ define([
               $type: {
                 props: {
                   propRole: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "number"}
                     ]
@@ -782,7 +761,7 @@ define([
               $type: {
                 props: {
                   propRole: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "value"}
                     ]
@@ -795,7 +774,7 @@ define([
               $type: {
                 props: {
                   propRole: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "instance"}
                     ]
@@ -817,13 +796,13 @@ define([
               $type: {
                 props: {
                   propRoleA: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: ["string"]}
                     ]
                   },
                   propRoleB: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: ["number"]}
                     ]
@@ -843,7 +822,7 @@ define([
               $type: {
                 props: {
                   propRoleA: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "list"},
                       {dataType: "number"}
@@ -862,7 +841,7 @@ define([
               $type: {
                 props: {
                   propRoleA: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "string"}
                     ]
@@ -881,7 +860,7 @@ define([
               $type: {
                 props: {
                   propRoleA: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "element"}
                     ]
@@ -899,7 +878,7 @@ define([
               $type: {
                 props: {
                   propRoleA: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "number"}
                     ]
@@ -927,7 +906,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "number"},
                     {dataType: "string"}
@@ -948,7 +927,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property"
+                  base: "pentaho/visual/role/Property"
                 }
               }
             }
@@ -965,7 +944,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "number"}
                   ]
@@ -985,7 +964,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   isVisualKey: false,
                   modes: [
                     {dataType: "number"},
@@ -1007,7 +986,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   isVisualKey: true,
                   modes: [
                     {dataType: "number"},
@@ -1029,7 +1008,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   isVisualKey: false,
                   modes: [
                     {dataType: "number"}
@@ -1050,7 +1029,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   isVisualKey: true,
                   modes: [
                     {dataType: "number"}
@@ -1071,7 +1050,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "string"}
                   ],
@@ -1092,7 +1071,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "string"}
                   ],
@@ -1113,7 +1092,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "number"}
                   ],
@@ -1138,7 +1117,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "number"}
                   ],
@@ -1163,7 +1142,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "number"}
                   ]
@@ -1185,7 +1164,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "string"}
                   ]
@@ -1210,7 +1189,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property"
+                  base: "pentaho/visual/role/Property"
                 }
               }
             }
@@ -1232,7 +1211,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property"
+                  base: "pentaho/visual/role/Property"
                 }
               }
             }
@@ -1257,7 +1236,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   fields: fieldsSpec0
                 }
               }
@@ -1287,7 +1266,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       modes: [
                         {dataType: "element"},
                         {dataType: "string"}
@@ -1313,7 +1292,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       modes: [
                         {dataType: "element"},
                         {dataType: "list"}
@@ -1342,7 +1321,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       modes: [
                         {dataType: "element"},
                         {dataType: "list"}
@@ -1375,7 +1354,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       modes: [
                         {dataType: "element"},
                         {dataType: "list"}
@@ -1413,7 +1392,7 @@ define([
             $type: {
               props: {
                 propRole: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "element"},
                     {dataType: "string"}
@@ -1446,7 +1425,7 @@ define([
               $type: {
                 props: {
                   propRole: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "string"}
                     ]
@@ -1476,7 +1455,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       modes: [
                         {dataType: "string"}
                       ]
@@ -1507,7 +1486,7 @@ define([
                   $type: {
                     props: {
                       propRole: {
-                        base: "pentaho/visual/role/property",
+                        base: "pentaho/visual/role/Property",
                         modes: [
                           {dataType: "number"},
                           {dataType: "element"},
@@ -1538,7 +1517,7 @@ define([
                   $type: {
                     props: {
                       propRole: {
-                        base: "pentaho/visual/role/property",
+                        base: "pentaho/visual/role/Property",
                         modes: [
                           {dataType: "string"},
                           {dataType: "element"},
@@ -1569,7 +1548,7 @@ define([
                   $type: {
                     props: {
                       propRole: {
-                        base: "pentaho/visual/role/property",
+                        base: "pentaho/visual/role/Property",
                         modes: [
                           {dataType: "string"},
                           {dataType: "element"}
@@ -1609,7 +1588,7 @@ define([
             var txnScope;
 
             beforeEach(function() {
-              if(useTxn) txnScope = context.enterChange();
+              if(useTxn) txnScope = Transaction.enter();
             });
 
             afterEach(function() {
@@ -1628,7 +1607,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       modes: [{dataType: ["string"]}]
                     }
                   }
@@ -1655,7 +1634,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       modes: [{dataType: ["string"]}],
                       fields: {
                         isRequired: true
@@ -1683,7 +1662,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       modes: [{dataType: ["string"]}],
                       fields: {
                         isRequired: true
@@ -1711,7 +1690,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       modes: [{dataType: ["string"]}],
                       fields: {
                         countMin: 2
@@ -1739,7 +1718,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       modes: [{dataType: ["string"]}],
                       fields: {
                         countMin: 2
@@ -1767,7 +1746,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       modes: [{dataType: ["string"]}],
                       fields: {
                         countMax: 1
@@ -1796,7 +1775,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       modes: [{dataType: ["string"]}],
                       fields: {
                         countMax: 1
@@ -1851,7 +1830,7 @@ define([
               $type: {
                 props: {
                   propRole: {
-                    base: "pentaho/visual/role/property"
+                    base: "pentaho/visual/role/Property"
                   }
                 }
               }
@@ -1864,7 +1843,7 @@ define([
 
             scope.dispose();
 
-            // any can still be true because of the `base` attribute and of the base implementation.
+            // `any` can still be true because of the `base` attribute and of the base implementation.
 
             expect("modes" in spec).toBe(false);
           });
@@ -1877,7 +1856,7 @@ define([
               $type: {
                 props: {
                   propRole: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "string"}
                     ]
@@ -1895,7 +1874,7 @@ define([
 
             expect(any).toBe(true);
             expect(spec.modes.length).toBe(1);
-            expect(spec.modes[0].id).toBe("pentaho/type/string");
+            expect(spec.modes[0].id).toBe("pentaho/type/String");
           });
 
           it("should serialize modes when locally specified in a derived class", function() {
@@ -1906,7 +1885,7 @@ define([
               $type: {
                 props: {
                   propRole: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "string"},
                       {dataType: "number"}
@@ -1920,7 +1899,7 @@ define([
               $type: {
                 props: {
                   propRole: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "string"}
                     ]
@@ -1938,7 +1917,7 @@ define([
 
             expect(any).toBe(true);
             expect(spec.modes.length).toBe(1);
-            expect(spec.modes[0].id).toBe("pentaho/type/string");
+            expect(spec.modes[0].id).toBe("pentaho/type/String");
           });
         });
 
@@ -1954,7 +1933,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property"
+                      base: "pentaho/visual/role/Property"
                     }
                   }
                 }
@@ -1967,7 +1946,7 @@ define([
 
               scope.dispose();
 
-              // any can still be true because of the `base` attribute and of the base implementation.
+              // `any` can still be true because of the `base` attribute and of the base implementation.
 
               expect("isVisualKey" in spec).toBe(false);
             });
@@ -1980,7 +1959,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       isVisualKey: true
                     }
                   }
@@ -2005,7 +1984,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       isVisualKey: false
                     }
                   }
@@ -2034,7 +2013,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       isVisualKey: false
                     }
                   }
@@ -2070,7 +2049,7 @@ define([
                 $type: {
                   props: {
                     propRole: {
-                      base: "pentaho/visual/role/property",
+                      base: "pentaho/visual/role/Property",
                       isVisualKey: false
                     }
                   }
@@ -2103,19 +2082,19 @@ define([
 
           describe("countMin", function() {
 
-            propertyTypeUtil.itDynamicAttribute("countMin", 1, "pentaho/visual/role/property", "fields");
+            propertyTypeUtil.itDynamicAttribute("countMin", 1, "pentaho/visual/role/Property", "fields");
 
           });
 
           describe("countMax", function() {
 
-            propertyTypeUtil.itDynamicAttribute("countMax", 2, "pentaho/visual/role/property", "fields");
+            propertyTypeUtil.itDynamicAttribute("countMax", 2, "pentaho/visual/role/Property", "fields");
 
           });
 
           describe("isRequired", function() {
 
-            propertyTypeUtil.itDynamicAttribute("isRequired", true, "pentaho/visual/role/property", "fields");
+            propertyTypeUtil.itDynamicAttribute("isRequired", true, "pentaho/visual/role/Property", "fields");
 
           });
         });

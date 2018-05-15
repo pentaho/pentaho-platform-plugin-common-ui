@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 /**
- * The `spec.UTypeReference` union represents the set of JS types that can be used to reference one type.
+ * The `spec.TypeReference` union represents the set of JS types that can be used to reference a type.
  *
  * It can be one of the following:
  *
@@ -33,7 +33,7 @@
  *
  * Example absolute, permanent identifier:
  * ```js
- * "pentaho/type/string"
+ * "pentaho/type/String"
  * ```
  *
  * Example temporary identifier:
@@ -45,20 +45,13 @@
  *
  * A reference to an instance constructor, like [Complex]{@link pentaho.type.Complex}.
  *
- * Usually,
- * a reference to an instance constructor is obtained from a [context]{@link pentaho.type.Context} object
- * (and not used to obtain one...) by providing the type's identifier.
- * Nevertheless, it is sometimes useful to be able to use it to identify a type.
- *
  * Example:
  *
  * ```js
- * require(["pentaho/type/Context"], function(Context) {
- *   Context.createAsync().then(function(context) {
- *     var Complex = context.get("pentaho/type/complex");
+ * require(["pentaho/type/loader", "pentaho/type/Complex"], function(typeLoader, Complex) {
  *
- *     // ...
- *   });
+ *   typeLoader.resolveType(Complex);
+ *
  * });
  * ```
  *
@@ -69,30 +62,28 @@
  *
  * Example:
  * ```js
- * require(["pentaho/type/Context"], function(Context) {
- *   Context.createAsync().then(function(context) {
- *     var PentahoNumber = context.get("pentaho/type/number");
- *     var numberType = PentahoNumber.type;
+ * require(["pentaho/type/loader", "pentaho/type/Number"], function(typeLoader, PentahoNumber) {
  *
- *     // Get a number list type
- *     var NumberList = context.get([numberType]);
+ *   var numberType = PentahoNumber.type;
  *
- *     var numbers = new NumberList([1, 2, 3]);
+ *   // Create a number list type
+ *   var NumberList = typeLoader.resolveType([numberType]);
  *
- *     // ...
- *   });
+ *   var numbers = new NumberList([1, 2, 3]);
+ *
+ *   // ...
  * });
  * ```
  *
  * ##### A _generic type specification_ object
  *
  * A plain {@link Object} specification used to generically describe a type.
- * Satisfies the interface [spec.ITypeProto]{@link pentaho.type.spec.ITypeProto}.
+ * Satisfies the interface [spec.IType]{@link pentaho.type.spec.IType}.
  *
  * The special `base` attribute allows specifying the base type
- * and defaults to `"pentaho/type/complex"`,
+ * and defaults to `"pentaho/type/Complex"`,
  * on a global context, or
- * to the [valueType]{@link pentaho.type.Property.Type#valueType} of the base property,
+ * to the [valueType]{@link pentaho.type.PropertyType#valueType} of the base property,
  * when overriding it.
  * Any additional attributes are determined and processed by
  * each type's {@link pentaho.type.Type.extend} method.
@@ -100,71 +91,68 @@
  * Example:
  *
  * ```js
- * require(["pentaho/type/Context"], function(Context) {
- *   Context.createAsync().then(function(context) {
+ * require(["pentaho/type/loader"], function(typeLoader) {
  *
- *     // Obtain an anonymous, derived complex type from the context
- *     var MyProduct = context.get({
- *           base: "complex" // optional
- *           props: [
- *             {name: "id",    label: "Id",    valueType: "string"},
- *             {name: "name",  label: "Name",  valueType: "string"},
- *             {name: "price", label: "Price", valueType: "number"}
- *           ]
- *         });
- *
- *     var productA = new MyProduct({id: "mabc", name: "Principia Mathematica", price: 1200});
- *
- *     // ...
+ *   // Create an anonymous, derived complex type by using the type loader.
+ *   var MyProduct = typeLoader.resolveType({
+ *     base: "complex" // optional
+ *     props: [
+ *       {name: "id",    label: "Id",    valueType: "string"},
+ *       {name: "name",  label: "Name",  valueType: "string"},
+ *       {name: "price", label: "Price", valueType: "number"}
+ *     ]
  *   });
+ *
+ *   var productA = new MyProduct({id: "mabc", name: "Principia Mathematica", price: 1200});
+ *
+ *   // ...
+ *
  * });
  * ```
  *
  * ##### A _list type shorthand specification_ array
  *
  * A shorter specification syntax to reference the _List_ type, or
- * derived list types of varied [element types]{@link pentaho.type.List.Type#of}.
+ * derived list types of varied [element types]{@link pentaho.type.ListType#of}.
  *
  * Example:
  *
  * ```js
- * require(["pentaho/type/Context"], function(Context) {
+ * require(["pentaho/type/loader"], function(typeLoader) {
  *
- *   Context.createAsync().then(function(context) {
+ *   // Obtain the List type instance constructor
  *
- *     // Obtain the List type instance constructor
+ *   // Using the id
+ *   var ListA = typeLoader.resolveType("list");
  *
- *     // Using the id
- *     var ListA = context.get("list");
+ *   // Obtain a derived List type instance constructor
+ *   // with Number as the element type
  *
- *     // Obtain a derived List type instance constructor
- *     // with Number as the element type
+ *   // Using the generic type specification syntax
+ *   var NumberListA = typeLoader.resolveType({base: "list", of: "number"});
  *
- *     // Using the generic type specification syntax
- *     var NumberListA = context.get({base: "list", of: "number"});
+ *   // Using the shorthand syntax
+ *   var NumberListB = typeLoader.resolveType(["number"]);
  *
- *     // Using the shorthand syntax
- *     var NumberListB = context.get(["number"]);
+ *   // ...
  *
- *     // ...
+ *   // Assuming the type MyProduct from a previous example
  *
- *     // Assuming the type MyProduct from a previous example
+ *   var ProductList = typeLoader.resolveType([MyProduct]);
  *
- *     var ProductList = context.get([MyProduct]);
+ *   var productList = new ProductList([
+ *     {id: "mpma", name: "Principia Mathematica", price: 1200},
+ *     {id: "flot", name: "The Laws of Thought",   price:  500}
+ *   ]);
  *
- *     var productList = new ProductList([
- *           {id: "mpma", name: "Principia Mathematica", price: 1200},
- *           {id: "flot", name: "The Laws of Thought",   price:  500}
- *         ]);
+ *   alert("Product count: " + productList.count);
  *
- *     alert("Product count: " + productList.count);
- *   });
  * });
  * ```
  *
  * @typedef {nonEmptyString|
  *           pentaho.type.Type|
  *           Class.<pentaho.type.Instance>|
- *           Array.<pentaho.type.spec.UTypeReference>|
- *           pentaho.type.spec.ITypeProto} pentaho.type.spec.UTypeReference
+ *           Array.<pentaho.type.spec.TypeReference>|
+ *           pentaho.type.spec.IType} pentaho.type.spec.TypeReference
  */

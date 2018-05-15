@@ -14,29 +14,24 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Complex",
   "pentaho/type/SpecificationScope",
   "tests/pentaho/type/serializationUtil"
-], function(Context, SpecificationScope, serializationUtil) {
+], function(Complex, SpecificationScope, serializationUtil) {
 
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false */
 
-  describe("pentaho.type.Complex.Type", function() {
+  describe("pentaho.type.ComplexType", function() {
+
+    var CustomComplex;
+
+    beforeAll(function() {
+      CustomComplex = Complex.extend({$type: {props: ["x"]}});
+    });
 
     describe("#_fillSpecInContext(spec, keyArgs)", function() {
-      var context;
-      var Complex;
-
-      beforeEach(function(done) {
-        Context.createAsync()
-            .then(function(_context) {
-              context = _context;
-              Complex = context.get("pentaho/type/complex");
-            })
-            .then(done, done.fail);
-      });
 
       it("should return false when there are no properties to serialize", function() {
         expect(serializationUtil.fillSpec(Complex, {}, {})).toBe(false);
@@ -82,16 +77,16 @@ define([
 
       it("should create a props array when there are local properties to serialize", function() {
         var spec = {};
-        serializationUtil.fillSpec(Complex, spec, {props: ["foo"]});
+        serializationUtil.fillSpec(Complex, spec, {props: ["x"]});
         expect(Array.isArray(spec.props)).toBe(true);
       });
 
       it("should call propertyType#toSpecInContext when the property is root", function() {
 
-        var derivedType = Complex.extend({$type: {props: ["foo"]}}).type;
-        var fooPropType = derivedType.get("foo");
+        var derivedType = CustomComplex.type;
+        var xPropType = derivedType.get("x");
 
-        spyOn(fooPropType, "toSpecInContext").and.returnValue({});
+        spyOn(xPropType, "toSpecInContext").and.returnValue({});
 
         var scope = new SpecificationScope();
 
@@ -99,17 +94,16 @@ define([
 
         scope.dispose();
 
-        expect(fooPropType.toSpecInContext.calls.count()).toBe(1);
+        expect(xPropType.toSpecInContext.calls.count()).toBe(1);
       });
 
       it("should call propertyType#toSpecInContext when the property is overridden", function() {
 
-        var Derived = Complex.extend({$type: {props: ["foo"]}});
-        var Derived2 = Derived.extend({$type: {props: [{name: "foo", label: "Bar"}]}});
+        var Derived2 = CustomComplex.extend({$type: {props: [{name: "x", label: "Bar"}]}});
 
-        var fooPropType = Derived2.type.get("foo");
+        var xPropType = Derived2.type.get("x");
 
-        spyOn(fooPropType, "toSpecInContext").and.returnValue({});
+        spyOn(xPropType, "toSpecInContext").and.returnValue({});
 
         var scope = new SpecificationScope();
 
@@ -117,17 +111,16 @@ define([
 
         scope.dispose();
 
-        expect(fooPropType.toSpecInContext.calls.count()).toBe(1);
+        expect(xPropType.toSpecInContext.calls.count()).toBe(1);
       });
 
       it("should not call propertyType#toSpecInContext when the property is inherited", function() {
 
-        var Derived = Complex.extend({$type: {props: ["foo"]}});
-        var Derived2 = Derived.extend();
+        var Derived2 = CustomComplex.extend();
 
-        var fooPropType = Derived2.type.get("foo");
+        var xPropType = Derived2.type.get("x");
 
-        spyOn(fooPropType, "toSpecInContext").and.returnValue({});
+        spyOn(xPropType, "toSpecInContext").and.returnValue({});
 
         var scope = new SpecificationScope();
 
@@ -135,7 +128,7 @@ define([
 
         scope.dispose();
 
-        expect(fooPropType.toSpecInContext).not.toHaveBeenCalled();
+        expect(xPropType.toSpecInContext).not.toHaveBeenCalled();
       });
 
       it("should call propertyType#toSpecInContext and pass every keyword argument in keyArgs", function() {
@@ -144,10 +137,10 @@ define([
           bar: {}
         };
 
-        var derivedType = Complex.extend({$type: {props: ["foo"]}}).type;
-        var fooPropType = derivedType.get("foo");
+        var derivedType = CustomComplex.type;
+        var xPropType = derivedType.get("x");
 
-        spyOn(fooPropType, "toSpecInContext").and.returnValue({});
+        spyOn(xPropType, "toSpecInContext").and.returnValue({});
 
         var scope = new SpecificationScope();
 
@@ -155,15 +148,15 @@ define([
 
         scope.dispose();
 
-        var keyArgs2 = fooPropType.toSpecInContext.calls.first().args[0];
+        var keyArgs2 = xPropType.toSpecInContext.calls.first().args[0];
         expect(keyArgs2 instanceof Object).toBe(true);
         expect(keyArgs2.foo).toBe(keyArgs.foo);
         expect(keyArgs2.bar).toBe(keyArgs.bar);
       });
 
       it("should call propertyType#toSpecInContext and push its result to spec.props", function() {
-        var derivedType = Complex.extend({$type: {props: ["foo"]}}).type;
-        var fooPropType = derivedType.get("foo");
+        var derivedType = CustomComplex.type;
+        var fooPropType = derivedType.get("x");
 
         var propTypeSpec = {};
         spyOn(fooPropType, "toSpecInContext").and.returnValue(propTypeSpec);

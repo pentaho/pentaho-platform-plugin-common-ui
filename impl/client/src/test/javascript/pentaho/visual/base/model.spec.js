@@ -14,34 +14,17 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/visual/base/Model",
   "pentaho/data/Table"
-], function(Context, Table) {
+], function(Model, Table) {
 
   "use strict";
 
-  /* globals jasmine, console, expect, it, describe, beforeEach */
-
   describe("pentaho.visual.base.Model", function() {
 
-    var context;
-    var Model;
     var dataSpec;
 
-    beforeEach(function(done) {
-
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-
-            return context.getDependencyApplyAsync([
-              "pentaho/visual/base/model"
-            ], function(_Model) {
-              Model = _Model;
-            });
-          })
-          .then(done, done.fail);
-
+    beforeEach(function() {
       var data = {
         model: [
           {name: "country", type: "string", label: "Country"},
@@ -72,19 +55,12 @@ define([
       }).not.toThrowError();
     });
 
-    it("should pre-load all standard visual role related modules", function(done) {
-      require.using(["pentaho/type/Context"], function(Context) {
+    it("should pre-load all standard visual role related modules", function() {
 
-        return Context.createAsync().then(function(context) {
-
-          return context.getDependencyApplyAsync(["pentaho/visual/base/model"], function() {
-
-            context.get("pentaho/visual/role/property");
-            context.get("pentaho/visual/role/mode");
-          });
-        });
-      })
-      .then(done, done.fail);
+      require.using(["require", "pentaho/visual/base/Model"], function(localRequire) {
+        localRequire("pentaho/visual/role/Property");
+        localRequire("pentaho/visual/role/Mode");
+      });
     });
   });
 });

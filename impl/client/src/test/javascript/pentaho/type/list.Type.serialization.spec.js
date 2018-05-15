@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,31 +14,18 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/List",
   "pentaho/type/SpecificationScope"
-], function(Context, SpecificationScope) {
+], function(List, SpecificationScope) {
 
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false */
-
-  describe("pentaho.type.List.Type", function() {
-
-    var context;
-    var List;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            List = context.get("pentaho/type/list");
-          })
-          .then(done, done.fail);
-    });
+  describe("pentaho.type.ListType", function() {
 
     describe("#toSpecInScope(keyArgs)", function() {
 
       it("should call #_fillSpecInContext", function() {
+
         var derivedType = List.extend().type;
 
         spyOn(derivedType, "_fillSpecInContext");
@@ -99,8 +86,7 @@ define([
 
           scope.dispose();
 
-          expect(spec instanceof Object).toBe(true);
-          expect(spec.id).toBe(derivedType.id);
+          expect(spec).toBe(derivedType.id);
         });
 
         it("should serialize the #id of a type using #alias when an alias is defined", function() {
@@ -112,8 +98,7 @@ define([
 
           scope.dispose();
 
-          expect(spec instanceof Object).toBe(true);
-          expect(spec.id).toBe(derivedType.alias);
+          expect(spec).toBe(derivedType.alias);
         });
 
         it("should serialize with an anonymous #id when the type is anonymous", function() {
@@ -142,7 +127,7 @@ define([
 
           scope.dispose();
 
-          expect(spec2.id).toBe(spec1.id);
+          expect(spec2).toBe(spec1.id);
         });
       });
 

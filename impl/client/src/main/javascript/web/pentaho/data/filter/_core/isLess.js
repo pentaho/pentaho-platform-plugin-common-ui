@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!../IsLess",
   "../KnownFilterKind"
-], function(KnownFilterKind) {
+], function(module, KnownFilterKind) {
 
   "use strict";
 
   return function(filter) {
 
     /**
-     * @name pentaho.data.filter.IsLess.Type
+     * @name pentaho.data.filter.IsLessType
      * @class
-     * @extends pentaho.data.filter.Property.Type
+     * @extends pentaho.data.filter.PropertyType
      *
      * @classDesc The type class of the strict less than filter type.
      *
@@ -35,7 +36,7 @@ define([
      * @name pentaho.data.filter.IsLess
      * @class
      * @extends pentaho.data.filter.Property
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.IsLess>} pentaho/data/filter/isLess
+     * @amd pentaho/data/filter/IsLess
      *
      * @classDesc The `IsLess` class represents a filter for being strictly less than a given value.
      * The filter selects elements having the value of a certain property strictly less than a reference
@@ -89,9 +90,8 @@ define([
         return (this.property || "") + " " + (v ? v.$key : "");
       },
 
-      $type: /** @lends pentaho.data.filter.IsLess.Type# */{
-        id: "pentaho/data/filter/isLess",
-        alias: "<",
+      $type: /** @lends pentaho.data.filter.IsLessType# */{
+        id: module.id,
         props: [
           {
             name: "value",

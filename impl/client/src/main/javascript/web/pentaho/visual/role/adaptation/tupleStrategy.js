@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 define([
-  "module",
+  "pentaho/module!_",
+  "./Strategy",
   "pentaho/util/object",
-  "pentaho/data/util",
-
-  // so that r.js sees otherwise invisible dependencies.
-  "./strategy"
-], function(module, O, dataUtil) {
+  "pentaho/data/util"
+], function(module, Strategy, O, dataUtil) {
 
   "use strict";
 
+  // region IndexNode class
   /**
    * @classDesc A tree index.
    * @class
@@ -128,162 +127,156 @@ define([
 
     return values;
   };
+  // endregion
 
-  return [
-    "./strategy",
-    function(Strategy) {
+  /**
+   * @name pentaho.visual.role.adaptation.TupleStrategyType
+   * @class
+   * @extends pentaho.visual.role.adaptation.StrategyType
+   *
+   * @classDesc The type class of {@link pentaho.visual.role.adaptation.TupleStrategy}.
+   */
+
+  var TupleStrategy = Strategy.extend(/** @lends pentaho.visual.role.adaptation.TupleStrategy# */{
+    /**
+     * @alias pentaho.visual.role.adaptation.TupleStrategy
+     * @class
+     * @extends pentaho.visual.role.adaptation.Strategy
+     * @abstract
+     *
+     * @amd pentaho/visual/role/adaptation/TupleStrategy
+     *
+     * @classDesc The `TupleStrategy` class describes the strategy of mapping one or more data properties
+     * to an array of those values, and back.
+     *
+     * The strategy targets:
+     * 1. modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} is a
+     *   [list]{@link pentaho.type.Type#isList}, and
+     * 2. mappings of fields whose [type][@link pentaho.data.ITable#getColumnType] can be assigned to the
+     *   [element type]{@link pentaho.type.ListType#of} of the mode's list data type.
+     * 3. mappings of fields whose data type is [continuous][@link pentaho.type.Type#isContinuous] nature
+     *   is compatible with the mode's [continuous]{@link pentaho.visual.role.Mode#isContinuous} nature;
+     *   if the mode is continuous, then all mapped fields need to be as well.
+     *
+     * @description Creates a _tuple_ mapping strategy instance.
+     * @constructor
+     * @param {pentaho.visual.role.adaptation.spec.IStrategy} [instSpec] A _tuple_ mapping strategy specification.
+     */
+    constructor: function(instSpec) {
+
+      instSpec = Object.create(instSpec);
+      instSpec.outputFieldIndexes = instSpec.inputFieldIndexes;
+
+      this.base(instSpec);
 
       /**
-       * @name pentaho.visual.role.adaptation.TupleStrategy.Type
-       * @class
-       * @extends pentaho.visual.role.adaptation.Strategy.Type
+       * Gets the array of function which extract the key of the value of each column of `inputData`.
        *
-       * @classDesc The type class of {@link pentaho.visual.role.adaptation.TupleStrategy}.
+       * @type {!Array.<(function(any):string)>}
+       * @readOnly
+       * @private
        */
+      this.__keyFuns = __createKeyFuns.call(this);
 
-      var TupleStrategy = Strategy.extend(/** @lends pentaho.visual.role.adaptation.TupleStrategy# */{
-        /**
-         * @alias pentaho.visual.role.adaptation.TupleStrategy
-         * @class
-         * @extends pentaho.visual.role.adaptation.Strategy
-         * @abstract
-         *
-         * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.adaptation.TupleStrategy>}
-         *      pentaho/visual/role/adaptation/tupleStrategy
-         *
-         * @classDesc The `TupleStrategy` class describes the strategy of mapping one or more data properties
-         * to an array of those values, and back.
-         *
-         * The strategy targets:
-         * 1. modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} is a
-         *   [list]{@link pentaho.type.Type#isList}, and
-         * 2. mappings of fields whose [type][@link pentaho.data.ITable#getColumnType] can be assigned to the
-         *   [element type]{@link pentaho.type.List.Type#of} of the mode's list data type.
-         * 3. mappings of fields whose data type is [continuous][@link pentaho.type.Type#isContinuous] nature
-         *   is compatible with the mode's [continuous]{@link pentaho.visual.role.Mode#isContinuous} nature;
-         *   if the mode is continuous, then all mapped fields need to be as well.
-         *
-         * @description Creates a _tuple_ mapping strategy instance.
-         * @constructor
-         * @param {pentaho.visual.role.adaptation.spec.IStrategy} [instSpec] A _tuple_ mapping strategy specification.
-         */
-        constructor: function(instSpec) {
+      /**
+       * Gets the tree index.
+       *
+       * @type {pentaho.visual.role.adaptation.TupleStrategy~IndexNode}
+       * @readOnly
+       * @private
+       */
+      this.__index = null;
+    },
 
-          instSpec = Object.create(instSpec);
-          instSpec.outputFieldIndexes = instSpec.inputFieldIndexes;
+    /** @inheritDoc */
+    get isInvertible() {
+      return true;
+    },
 
-          this.base(instSpec);
+    /** @inheritDoc */
+    map: function(inputValues) {
 
-          /**
-           * Gets the array of function which extract the key of the value of each column of `inputData`.
-           *
-           * @type {!Array.<(function(any):string)>}
-           * @readOnly
-           * @private
-           */
-          this.__keyFuns = __createKeyFuns.call(this);
+      inputValues = __trimRightUndefined(inputValues);
 
-          /**
-           * Gets the tree index.
-           *
-           * @type {pentaho.visual.role.adaptation.TupleAdapter~IndexNode}
-           * @readOnly
-           * @private
-           */
-          this.__index = null;
-        },
+      return this._getDataRowCells(
+        this.__getIndex().getIndexOf(inputValues, this.__keyFuns),
+        this.outputFieldIndexes,
+        inputValues.length);
+    },
 
-        /** @inheritDoc */
-        get isInvertible() {
-          return true;
-        },
+    /** @inheritDoc */
+    invert: function(outputValues) {
 
-        /** @inheritDoc */
-        map: function(inputValues) {
+      outputValues = __trimRightUndefined(outputValues);
 
-          inputValues = __trimRightUndefined(inputValues);
+      return this._getDataRowCells(
+        this.__getIndex().getIndexOf(outputValues, this.__keyFuns),
+        this.inputFieldIndexes,
+        outputValues.length);
+    },
 
-          return this._getDataRowCells(
-            this.__getIndex().getIndexOf(inputValues, this.__keyFuns),
-            this.outputFieldIndexes,
-            inputValues.length);
+    /**
+     * Gets the tree index.
+     *
+     * @return {!pentaho.visual.role.adaptation.TupleStrategy~IndexNode} The tree index.
+     * @private
+     */
+    __getIndex: function() {
+      var index = this.__index;
+      if(index === null) {
+        this.__installIndex();
+        index = this.__index;
+      }
 
-        },
+      return index;
+    },
 
-        /** @inheritDoc */
-        invert: function(outputValues) {
+    /**
+     * Builds the map of row indexes by input/output value key.
+     * @private
+     */
+    __installIndex: function() {
+      var index = this.__index = new IndexNode("", -1);
+      var inputFieldIndexes = this.inputFieldIndexes;
+      var keyFuns = this.__keyFuns;
+      var dataTable = this.data;
+      var rowCount = dataTable.getNumberOfRows();
+      var rowIndex = -1;
+      while(++rowIndex < rowCount) {
+        index.add(dataTable, rowIndex, inputFieldIndexes, keyFuns);
+      }
+    },
 
-          outputValues = __trimRightUndefined(outputValues);
+    $type: /** @lends pentaho.visual.role.adaptation.TupleStrategyType# */{
+      id: module.id,
 
-          return this._getDataRowCells(
-            this.__getIndex().getIndexOf(outputValues, this.__keyFuns),
-            this.inputFieldIndexes,
-            outputValues.length);
-        },
+      /** @inheritDoc */
+      getInputTypeFor: function(outputDataType, isVisualKey) {
 
-        /**
-         * Gets the tree index.
-         *
-         * @return {!pentaho.visual.role.adaptation.TupleAdapter~IndexNode} The tree index.
-         * @private
-         */
-        __getIndex: function() {
-          var index = this.__index;
-          if(index === null) {
-            this.__installIndex();
-            index = this.__index;
-          }
-
-          return index;
-        },
-
-        /**
-         * Builds the map of row indexes by input/output value key.
-         * @private
-         */
-        __installIndex: function() {
-          var index = this.__index = new IndexNode("", -1);
-          var inputFieldIndexes = this.inputFieldIndexes;
-          var keyFuns = this.__keyFuns;
-          var dataTable = this.data;
-          var rowCount = dataTable.getNumberOfRows();
-          var rowIndex = -1;
-          while(++rowIndex < rowCount) {
-            index.add(dataTable, rowIndex, inputFieldIndexes, keyFuns);
-          }
-        },
-
-        $type: /** @lends pentaho.visual.role.adaptation.TupleStrategy.Type# */{
-          id: module.id,
-
-          /** @inheritDoc */
-          getInputTypeFor: function(outputDataType, isVisualKey) {
-
-            if(!outputDataType.isList) {
-              return null;
-            }
-
-            return outputDataType;
-          },
-
-          /** @inheritDoc */
-          validateApplication: function(schemaData, inputFieldIndexes) {
-            return {isValid: true, addsFields: false};
-          },
-
-          /** @inheritDoc */
-          apply: function(data, inputFieldIndexes) {
-            return new TupleStrategy({
-              data: data,
-              inputFieldIndexes: inputFieldIndexes
-            });
-          }
+        if(!outputDataType.isList) {
+          return null;
         }
-      });
 
-      return TupleStrategy;
+        return outputDataType;
+      },
+
+      /** @inheritDoc */
+      validateApplication: function(schemaData, inputFieldIndexes) {
+        return {isValid: true, addsFields: false};
+      },
+
+      /** @inheritDoc */
+      apply: function(data, inputFieldIndexes) {
+        return new TupleStrategy({
+          data: data,
+          inputFieldIndexes: inputFieldIndexes
+        });
+      }
     }
-  ];
+  })
+  .configure({$type: module.config});
+
+  return TupleStrategy;
 
   /**
    * Creates the key functions for the values of all of the columns.

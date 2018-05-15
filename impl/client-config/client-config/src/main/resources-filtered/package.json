@@ -2,8 +2,8 @@
   "name": "${project.amd-module}",
   "version": "${project.version}",
   "config": {
-    "pentaho/instanceInfo": {
-      "${project.amd-module}_${project.version}/config": {"type": "pentaho.config.spec.IRuleSet"}
+    "pentaho/modules": {
+      "${project.amd-module}_${project.version}/config": {"type": "pentaho/config/spec/IRuleSet"}
     }
   }
 }

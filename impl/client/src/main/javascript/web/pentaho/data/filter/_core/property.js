@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "pentaho/module!../Property"
+], function(module) {
 
   "use strict";
 
   return function(filter) {
 
     /**
-     * @name pentaho.data.filter.Property.Type
+     * @name pentaho.data.filter.PropertyType
      * @class
-     * @extends pentaho.data.filter.Abstract.Type
+     * @extends pentaho.data.filter.AbstractType
      *
      * @classDesc The base type class of filter types.
      *
@@ -34,7 +36,7 @@ define(function() {
      * @class
      * @extends pentaho.data.filter.Abstract
      * @abstract
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.Property>} pentaho/data/filter/property
+     * @amd pentaho/data/filter/Property
      *
      * @classDesc The base class of filters that filter elements in a set
      * by matching the value of a given property against a criteria/condition.
@@ -63,8 +65,8 @@ define(function() {
         return true;
       },
 
-      $type: /** @lends pentaho.data.filter.Property.Type# */{
-        id: "pentaho/data/filter/property",
+      $type: /** @lends pentaho.data.filter.PropertyType# */{
+        id: module.id,
         isAbstract: true,
         props: [
           {

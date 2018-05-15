@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,61 +14,37 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/data/filter/Abstract",
+  "pentaho/data/filter/Not",
+  "pentaho/data/filter/And",
+  "pentaho/data/filter/Or",
+  "pentaho/data/filter/True",
+  "pentaho/data/filter/False",
+  "pentaho/data/filter/IsEqual",
+  "pentaho/data/filter/IsGreater",
+  "pentaho/data/filter/IsLess",
   "pentaho/data/Table",
   "tests/pentaho/util/errorMatch"
-], function(Context, DataTable, errorMatch) {
+], function(AbstractFilter, NotFilter, AndFilter, OrFilter, TrueFilter, FalseFilter,
+            IsEqualFilter, IsGreaterFilter, IsLessFilter, DataTable, errorMatch) {
 
   "use strict";
 
+  var CustomFilter;
+
   describe("pentaho.data.filter.Abstract", function() {
 
-    var context;
-    var AbstractFilter;
-    var NotFilter;
-    var AndFilter;
-    var OrFilter;
-    var CustomFilter;
-    var TrueFilter;
-    var FalseFilter;
+    beforeAll(function() {
+      var count = 1;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-
-            context = _context;
-
-            return context.getDependencyApplyAsync([
-              "pentaho/data/filter/abstract",
-              "pentaho/data/filter/not",
-              "pentaho/data/filter/and",
-              "pentaho/data/filter/or",
-              "pentaho/data/filter/true",
-              "pentaho/data/filter/false",
-              "pentaho/data/filter/isEqual",
-              "pentaho/data/filter/isGreater",
-              "pentaho/data/filter/isLess"
-            ], function(Abstract, Not, And, Or, True, False) {
-              AbstractFilter = Abstract;
-              NotFilter = Not;
-              AndFilter = And;
-              OrFilter = Or;
-              TrueFilter = True;
-              FalseFilter = False;
-
-              var count = 1;
-
-              CustomFilter = AbstractFilter.extend({
-                compile: function() {
-                  return function() { return false; };
-                },
-                _buildContentKey: function() {
-                  return String(count++);
-                }
-              });
-            });
-          })
-          .then(done, done.fail);
+      CustomFilter = AbstractFilter.extend({
+        compile: function() {
+          return function() { return false; };
+        },
+        _buildContentKey: function() {
+          return String(count++);
+        }
+      });
     });
 
     describe("#negate()", function() {
@@ -212,17 +188,17 @@ define([
         return createFilter(spec).toDnf();
       }
 
-      describe("#toDnf()", function () {
+      describe("#toDnf()", function() {
 
         function expectDnf(specIn, specOut) {
           var fDnf = specToDnf(specIn);
 
-          if (specOut) {
+          if(specOut) {
             expect(fDnf.toSpec({forceType: true})).toEqual(specOut);
           }
         }
 
-        it("should convert an empty `or` to false", function () {
+        it("should convert an empty `or` to false", function() {
 
           expectDnf({
             _: "or"
@@ -231,7 +207,7 @@ define([
           });
         });
 
-        it("should convert an empty `and` to true", function () {
+        it("should convert an empty `and` to true", function() {
 
           expectDnf({
             _: "and"
@@ -240,7 +216,7 @@ define([
           });
         });
 
-        it("should preserve a filter already in DNF", function () {
+        it("should preserve a filter already in DNF", function() {
 
           expectDnf({
             _: "or",
@@ -261,26 +237,25 @@ define([
           });
         });
 
-        it("should apply De Morgan Rule 1 - NOT over AND", function () {
+        it("should apply De Morgan Rule 1 - NOT over AND", function() {
 
           expectDnf({
-              _: "not",
-              o: {_: "and", o: [{_: "=", p: "a", v: 1}]}
-            },
-            {
-              _: "or",
-              o: [
-                {
-                  _: "and",
-                  o: [
-                    {_: "not", o: {_: "=", p: "a", v: 1}}
-                  ]
-                }
-              ]
-            });
+            _: "not",
+            o: {_: "and", o: [{_: "=", p: "a", v: 1}]}
+          }, {
+            _: "or",
+            o: [
+              {
+                _: "and",
+                o: [
+                  {_: "not", o: {_: "=", p: "a", v: 1}}
+                ]
+              }
+            ]
+          });
         });
 
-        it("should apply De Morgan Rule 2 - NOT over OR", function () {
+        it("should apply De Morgan Rule 2 - NOT over OR", function() {
 
           expectDnf({
             _: "not",
@@ -306,7 +281,7 @@ define([
           });
         });
 
-        it("should eliminate double-negations", function () {
+        it("should eliminate double-negations", function() {
 
           expectDnf({
             _: "not",
@@ -332,7 +307,7 @@ define([
           });
         });
 
-        it("should distribute AND over OR", function () {
+        it("should distribute AND over OR", function() {
 
           expectDnf({
             _: "and",
@@ -363,7 +338,7 @@ define([
           });
         });
 
-        it("should distribute AND over OR - multiple OR terms", function () {
+        it("should distribute AND over OR - multiple OR terms", function() {
 
           expectDnf({
             _: "and",
@@ -395,7 +370,7 @@ define([
           });
         });
 
-        it("should distribute AND over OR - multiple AND and OR terms", function () {
+        it("should distribute AND over OR - multiple AND and OR terms", function() {
 
           expectDnf({
             _: "and",
@@ -450,7 +425,7 @@ define([
           });
         });
 
-        it("should allow subtraction", function () {
+        it("should allow subtraction", function() {
 
           expectDnf({
             _: "and",
@@ -472,7 +447,7 @@ define([
           });
         });
 
-        it("should allow subtraction ii", function () {
+        it("should allow subtraction ii", function() {
           // tuple 1 - {a: 1, b: 2}
           var tuple1 = {
             _: "and",
@@ -500,7 +475,7 @@ define([
             ]
           };
 
-          var originalDnf = {_: "or", o: [tuple1, tuple2]}
+          var originalDnf = {_: "or", o: [tuple1, tuple2]};
 
           var removeDnf = {
             _: "or",
@@ -512,7 +487,7 @@ define([
             {_: "or", o: [tuple2]});
         });
 
-        it("should not try to subtract or simplify literals other than isEqual", function () {
+        it("should not try to subtract or simplify literals other than isEqual", function() {
           // tuple 1 - {a=1, b=2, a>0}
           var tuple1 = {
             _: "and",
@@ -554,7 +529,7 @@ define([
             ]
           };
 
-          var originalDnf = {_: "or", o: [tuple1, tuple2]}
+          var originalDnf = {_: "or", o: [tuple1, tuple2]};
 
           var removeDnf = {
             _: "or",
@@ -574,7 +549,7 @@ define([
         });
 
       });
-      describe("#andNot()", function () {
+      describe("#andNot()", function() {
 
         function expectAndNot(specIn, specSubstract, specOut) {
           var fDnfIn = specToDnf(specIn);
@@ -582,12 +557,12 @@ define([
 
           var fOut = fDnfIn.andNot(fDnfSubtract);
 
-          if (specOut) {
+          if(specOut) {
             expect(fOut.toSpec({forceType: true})).toEqual(specOut);
           }
         }
 
-        it("correctly subtracts isEqual predicates", function () {
+        it("correctly subtracts isEqual predicates", function() {
           // (a=1) or ((a=2) and (b=3))
           var originalSpec = {
             _: "or",
@@ -635,8 +610,8 @@ define([
 
         });
 
-        it("correctly deals with terminal filters other than isEquals", function(){
-           // (b=1) or (a>0) or ((a=2) and (b=3) and (a<5))
+        it("correctly deals with terminal filters other than isEquals", function() {
+          // (b=1) or (a>0) or ((a=2) and (b=3) and (a<5))
           var originalSpec = {
             _: "or",
             o: [
@@ -665,7 +640,7 @@ define([
           // a!=2 and b!=1 and a>0 and a<=3
           var expected = {
             _: "or",
-            o:[{
+            o: [{
               _: "and",
               o: [
                 {_: ">", p: "a", v: 0},
@@ -676,16 +651,15 @@ define([
             }]
           };
 
-         expectAndNot(originalSpec, subtractSpec, expected);
-
+          expectAndNot(originalSpec, subtractSpec, expected);
         });
       });
 
       describe("#toExtensional()", function() {
 
         /**
-         *
-         * @return {pentaho.data.AbstractTable}
+         * Gets a fresh data table.
+         * @return {!pentaho.data.AbstractTable} A data table.
          */
         function getTable() {
           return new DataTable({
@@ -703,7 +677,7 @@ define([
           });
         }
 
-        it("Adds a condition on a property not explicitly included in the intentional filter", function () {
+        it("Adds a condition on a property not explicitly included in the intentional filter", function() {
           var intentionalFilter = createFilter({_: "=", p: "Country", v: "Portugal"});
           var table = getTable();
           var keyColumns = ["Country", "Years"];
@@ -711,17 +685,28 @@ define([
           var actualExtensionalFilter = intentionalFilter.toExtensional(table, keyColumns);
           var expectedExtensionalFilterSpec = {
             _: "or",
-            o: [ {_: "and",
-                  o: [ {_: "=", p: "Country", v:"Portugal"},
-                       {_: "=", p: "Years",   v:2003}]}, // Years added
-                 {_: "and",
-                  o: [ {_: "=", p: "Country", v:"Portugal"},
-                       {_: "=", p: "Years",   v:2004}]}]}; // Years added
+            o: [
+              {
+                _: "and",
+                o: [
+                  {_: "=", p: "Country", v: "Portugal"},
+                  {_: "=", p: "Years", v: 2003}
+                ]
+              }, // Years added
+              {
+                _: "and",
+                o: [
+                  {_: "=", p: "Country", v: "Portugal"},
+                  {_: "=", p: "Years", v: 2004}
+                ]
+              }
+            ]
+          }; // Years added
 
           expect(actualExtensionalFilter.toSpec({forceType: true})).toEqual(expectedExtensionalFilterSpec);
         });
 
-        it("An Or filter without operands is considered as False", function () {
+        it("An Or filter without operands is considered as False", function() {
           var table = getTable();
           var keyColumns = ["Country"];
           var intentionalFilter = createFilter({_: "or"});
@@ -731,7 +716,7 @@ define([
           expect(actualExtensionalFilter instanceof FalseFilter).toBe(true);
         });
 
-        it("If the provided data is empty then the extensional filter should be False", function () {
+        it("If the provided data is empty then the extensional filter should be False", function() {
           var emptyTable = new DataTable();
           var keyColumns = ["Country"];
           var intentionalFilter = createFilter({_: "=", p: "Country", v: "Portugal"});
@@ -741,12 +726,13 @@ define([
           expect(actualExtensionalFilter instanceof FalseFilter).toBe(true);
         });
 
-        it("If the resulting filtered data of the intentional filter is empty then the extensional filter should be False", function () {
+        it("If the resulting filtered data of the intentional filter is empty " +
+          "then the extensional filter should be False", function() {
           var table = getTable();
           var keyColumns = ["Country"];
           var intentionalFilter = createFilter({_: "=", p: "Country", v: "NonExistingCountry"});
 
-          //verifying assumptions
+          // Verifying assumptions
           expect(table.filter(intentionalFilter).getNumberOfRows()).toEqual(0);
 
           var actualExtensionalFilter = intentionalFilter.toExtensional(table, keyColumns);
@@ -754,13 +740,12 @@ define([
           expect(actualExtensionalFilter instanceof FalseFilter).toBe(true);
         });
 
-
-        it("If there is data that passes the filter but no KeyColumns are specified then Throw error", function () {
+        it("If there is data that passes the filter but no KeyColumns are specified then Throw error", function() {
           var table = getTable();
           var emptyKeyColumns = [];
           var intentionalFilter = createFilter({_: "=", p: "Country", v: "Portugal"});
 
-          //verifying assumptions
+          // Verifying assumptions
           expect(table.filter(intentionalFilter).getNumberOfRows()).toBeGreaterThan(0);
 
           expect(function() {
@@ -770,6 +755,5 @@ define([
 
       });
     });
-
-  }); // pentaho.data.filter.Abstract
+  });
 });

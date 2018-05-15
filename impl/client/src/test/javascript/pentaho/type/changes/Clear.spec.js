@@ -14,36 +14,36 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/loader",
+  "pentaho/type/Complex",
+  "pentaho/type/changes/Transaction",
   "pentaho/type/changes/Clear"
-], function(Context, Clear) {
+], function(typeLoader, Complex, Transaction, Clear) {
 
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false */
 
   describe("pentaho.type.changes.Clear -", function() {
-    var context;
+
     var List;
     var NumberList;
     var DerivedComplex;
     var ComplexList;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            List = context.get(["element"]);
-            NumberList = context.get(["number"]);
+    beforeAll(function() {
+      List = typeLoader.resolveType(["element"]);
+      NumberList = typeLoader.resolveType(["number"]);
 
-            DerivedComplex = context.get({
-              props: [
-                {name: "foo", valueType: "number"}
-              ]
-            });
-            ComplexList = context.get([DerivedComplex]);
-          })
-          .then(done, done.fail);
+      DerivedComplex = Complex.extend({
+        $type: {
+          props: [
+            {name: "foo", valueType: "number"}
+          ]
+        }
+      });
+
+      ComplexList = typeLoader.resolveType([DerivedComplex]);
     });
 
     it("should be defined", function() {
@@ -61,7 +61,7 @@ define([
       var scope;
 
       beforeEach(function() {
-        scope = context.enterChange();
+        scope = Transaction.enter();
       });
 
       afterEach(function() {
@@ -275,7 +275,7 @@ define([
       var scope;
 
       beforeEach(function() {
-        scope = context.enterChange();
+        scope = Transaction.enter();
       });
 
       afterEach(function() {

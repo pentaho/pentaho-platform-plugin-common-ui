@@ -43,7 +43,7 @@ define([
      * the scene instances' [createFilter]{@link pentaho.visual.scene.Base#createFilter} method provides
      * an easy way to create a filter that selects the data from which the scene was generated based on its
      * distinguishing field values.
-     * This filter can then be passed to a [data action]{@link pentaho.visual.action.mixins.Data.Type} such as
+     * This filter can then be passed to a [data action]{@link pentaho.visual.action.mixins.DataType} such as
      * [Select]{@link pentaho.visual.action.Select} or [Execute]{@link pentaho.visual.action.Execute}.
      *
      * When *communicating with external parties*, field values must be used and visual variable values are not
@@ -152,7 +152,7 @@ define([
      * This method provides an easy way to create a filter that selects the data that this scene visually represents
      * based on its distinguishing field values.
      *
-     * This filter can then be passed to a [data action]{@link pentaho.visual.action.mixins.Data.Type} such as
+     * This filter can then be passed to a [data action]{@link pentaho.visual.action.mixins.DataType} such as
      * [Select]{@link pentaho.visual.action.Select} or [Execute]{@link pentaho.visual.action.Execute}.
      *
      * In certain circumstances, the returned value may be `null`. A filter can only be created for a scene

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,15 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/String",
   "tests/pentaho/util/errorMatch"
-], function(Context, errorMatch) {
+], function(PentahoString, errorMatch) {
 
   "use strict";
 
-  /* global describe:true, it:true, expect:true, beforeEach:true*/
+  describe("pentaho.type.String", function() {
 
-  describe("pentaho.type.String -", function() {
-
-    var context;
-    var PentahoString;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            PentahoString = context.get("pentaho/type/string");
-          })
-          .then(done, done.fail);
-    });
-
-    describe("new String() -", function() {
+    describe("new String()", function() {
 
       it("should be a function", function() {
         expect(typeof PentahoString).toBe("function");
@@ -47,38 +33,39 @@ define([
       });
 
       it("should accept 1 as '1'", function() {
-        expect(new PentahoString(1).value).toBe('1');
+        expect(new PentahoString(1).value).toBe("1");
       });
 
       it("should accept '1' as '1'", function() {
-        expect(new PentahoString('1').value).toBe('1');
+        expect(new PentahoString("1").value).toBe("1");
       });
 
       it("should accept true as 'true'", function() {
-        expect(new PentahoString(true).value).toBe('true');
+        expect(new PentahoString(true).value).toBe("true");
       });
 
       it("should accept 'true' as 'true'", function() {
-        expect(new PentahoString('true').value).toBe('true');
+        expect(new PentahoString("true").value).toBe("true");
       });
 
       it("should accept empty string as ''", function() {
-        expect(new PentahoString('').value).toBe('');
+        expect(new PentahoString("").value).toBe("");
       });
 
       it("should accept empty array as ''", function() {
-        expect(new PentahoString([]).value).toBe('');
+        expect(new PentahoString([]).value).toBe("");
       });
 
       it("should not accept empty object literal", function() {
         expect(function() {
+          // eslint-disable-next-line no-unused-expressions
           new PentahoString({}).value;
         }).toThrow(errorMatch.argRequired("value"));
       });
 
       it("should accept the toString of an object", function() {
         var obj = {toString: function() { return "FOO"; }};
-        // needs to be specified in a cell wrapper... or taken as a spec.
+        // Needs to be specified in a cell wrapper... or taken as a spec.
         var penString = new PentahoString({v: obj});
         expect(penString.value).toBe("FOO");
       });
@@ -91,6 +78,7 @@ define([
 
       it("should not accept undefined", function() {
         expect(function() {
+          // eslint-disable-next-line no-unused-expressions
           new PentahoString(undefined);
         }).toThrow(errorMatch.argRequired("value"));
       });

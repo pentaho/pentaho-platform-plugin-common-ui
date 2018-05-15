@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,14 +42,14 @@
  * ```
  *
  * Apart from the special inline type property,
- * the _object form_ is of type `Object.<string, pentaho.type.spec.UInstance>`.
+ * the _object form_ is of type `Object.<string, pentaho.type.spec.Instance>`.
  *
  * @name pentaho.type.spec.IComplex
  *
  * @interface
  * @extends pentaho.type.spec.IValue
  *
- * @see pentaho.type.spec.UComplex
- * @see pentaho.type.spec.UValue
- * @see pentaho.type.spec.UInstance
+ * @see pentaho.type.spec.Complex
+ * @see pentaho.type.spec.Value
+ * @see pentaho.type.spec.Instance
  */

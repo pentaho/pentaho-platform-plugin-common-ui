@@ -15,13 +15,14 @@
  */
 
 define([
+  "module",
   "./PrimitiveChange",
-  "../../util/object"
-], function(PrimitiveChange, O) {
+  "pentaho/util/object"
+], function(module, PrimitiveChange, O) {
 
   "use strict";
 
-  return PrimitiveChange.extend("pentaho.type.changes.Replace", /** @lends pentaho.type.changes.Replace# */{
+  return PrimitiveChange.extend(module.id, /** @lends pentaho.type.changes.Replace# */{
 
     /**
      * @alias Replace
@@ -39,7 +40,7 @@ define([
      * This type of change is always part of a {@link pentaho.type.changes.ComplexChangeset}.
      *
      * @constructor
-     * @param {!pentaho.type.Property.Type} propType - The property type.
+     * @param {!pentaho.type.PropertyType} propType - The property type.
      * @param {pentaho.type.Element} valueNew - The proposed value of the property.
      * @param {number} stateNew - The proposed state of the property.
      *
@@ -51,7 +52,7 @@ define([
        *
        * @name property
        * @memberOf pentaho.type.changes.Replace#
-       * @type {!pentaho.type.Property.Type}
+       * @type {!pentaho.type.PropertyType}
        * @readOnly
        */
       O.setConst(this, "property", propType);

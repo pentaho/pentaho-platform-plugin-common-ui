@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,39 +14,37 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!_",
+  "./BarAbstract",
+  "./types/LabelsOption",
   "pentaho/i18n!./i18n/model"
-], function(bundle) {
+], function(module, BaseModel, LabelsOption, bundle) {
 
   "use strict";
 
-  return [
-    "./barAbstract",
-    "./types/labelsOption",
-    function(BaseModel, LabelsOption) {
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      v2Id: "ccc_horzbarstacked",
+      category: "horzbarchart",
 
-      return BaseModel.extend({
-        $type: {
-          v2Id: "ccc_horzbarstacked",
-          category: "horzbarchart",
+      defaultView: "pentaho/ccc/visual/BarStackedHorizontal",
 
-          defaultView: "pentaho/ccc/visual/barStackedHorizontal",
-
-          props: [
-            {
-              name: "measures", // VISUAL_ROLE
-              fields: {isRequired: true}
-            },
-            {
-              name: "labelsOption",
-              valueType: LabelsOption,
-              domain: ["none", "center", "insideEnd", "insideBase"],
-              isRequired: true,
-              defaultValue: "none"
-            }
-          ]
+      props: [
+        {
+          name: "measures", // VISUAL_ROLE
+          fields: {isRequired: true}
+        },
+        {
+          name: "labelsOption",
+          valueType: LabelsOption,
+          domain: ["none", "center", "insideEnd", "insideBase"],
+          isRequired: true,
+          defaultValue: "none"
         }
-      })
-      .implement({$type: bundle.structured.barStackedHorizontal});
+      ]
     }
-  ];
+  })
+  .localize({$type: bundle.structured.BarStackedHorizontal})
+  .configure({$type: module.config});
 });

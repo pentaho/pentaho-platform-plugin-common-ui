@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,16 @@
  */
 
 /**
- * A `spec.UComplex` represents the union of JS types that can be used to describe a complex value,
- * or the absence of one.
+ * A `spec.Complex` represents the union of JS types that can be used to describe a complex value.
  *
  * Like with all other value types, complex values can be described using the general **object form**.
  * The _object form_ conforms to {@link pentaho.type.spec.IComplex}.
  *
  * Complex values support an additional form of value specification, the **array form**:
- * an array of {@link pentaho.type.spec.UInstance},
+ * an array of {@link pentaho.type.spec.Instance},
  * each the specification of the value of one of a complex's properties,
  * in property definition order,
- * according to [Property.Type#index]{@link pentaho.type.Property.Type#index}.
+ * according to [PropertyType#index]{@link pentaho.type.PropertyType#index}.
  *
  * Take the following _object form_ example:
  *
@@ -46,11 +45,5 @@
  * However, note that _array form_ can only be used if
  * the [inline type]{@link pentaho.type.spec.IInstance#_} property can, in fact, be omitted.
  *
- * When a complex value is absent, it can be described with a {@link Nully} JavaScript value:
- *
- * ```js
- * null
- * ```
- *
- * @typedef {pentaho.type.spec.IComplex|Array.<pentaho.type.spec.UInstance>|Nully} pentaho.type.spec.UComplex
+ * @typedef {pentaho.type.spec.IComplex|Array.<pentaho.type.spec.Instance>} pentaho.type.spec.Complex
  */

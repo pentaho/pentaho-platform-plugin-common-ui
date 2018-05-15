@@ -14,36 +14,34 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!_",
+  "./MetricPointAbstract",
+  "./mixins/ScaleSizeContinuous",
   "pentaho/i18n!./i18n/model"
-], function(bundle) {
+], function(module, BaseModel, ScaleSizeContinuousModel, bundle) {
 
   "use strict";
 
-  return [
-    "./metricPointAbstract",
-    "./mixins/scaleSizeContinuous",
-    function(BaseModel, ScaleSizeContinuousModel) {
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      mixins: [ScaleSizeContinuousModel],
 
-      return BaseModel.extend({
-        $type: {
-          mixins: [ScaleSizeContinuousModel],
+      v2Id: "ccc_scatter",
+      defaultView: "pentaho/ccc/visual/Bubble",
 
-          v2Id: "ccc_scatter",
-          defaultView: "pentaho/ccc/visual/bubble",
-
-          props: [
-            {
-              name: "size", // VISUAL_ROLE
-              base: "pentaho/visual/role/property",
-              modes: [
-                {dataType: "number"}
-              ],
-              ordinal: 7
-            }
-          ]
+      props: [
+        {
+          name: "size", // VISUAL_ROLE
+          base: "pentaho/visual/role/Property",
+          modes: [
+            {dataType: "number"}
+          ],
+          ordinal: 7
         }
-      })
-      .implement({$type: bundle.structured.bubble});
+      ]
     }
-  ];
+  })
+  .localize({$type: bundle.structured.Bubble})
+  .configure({$type: module.config});
 });

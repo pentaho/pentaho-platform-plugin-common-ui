@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,40 +14,24 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Property",
+  "pentaho/type/Complex",
+  "pentaho/type/String",
   "pentaho/type/SpecificationScope",
   "tests/pentaho/type/propertyTypeUtil"
-], function(Context, SpecificationScope, propertyTypeUtil) {
+], function(Property, Complex, PentahoString, SpecificationScope, propertyTypeUtil) {
 
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false, jasmine:false*/
+  describe("pentaho.type.PropertyType", function() {
 
-  describe("pentaho.type.Property.Type", function() {
+    var Derived;
 
-    var context;
-    var Property;
-    var Complex;
-    var PentahoString;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Property = context.get("property");
-            Complex = context.get("pentaho/type/complex");
-            PentahoString = context.get("pentaho/type/string");
-          })
-          .then(done, done.fail);
+    beforeAll(function() {
+      Derived = Complex.extend();
     });
 
     describe("#toSpecInContext(keyArgs)", function() {
-
-      var Derived;
-
-      beforeEach(function() {
-        Derived = Complex.extend();
-      });
 
       it("should call #_fillSpecInContext", function() {
         var scope = new SpecificationScope();
@@ -143,7 +127,7 @@ define([
         expect(spec instanceof Object).toBe(true);
       });
 
-      it("should not include `base` when a root property has Property.Type as base", function() {
+      it("should not include `base` when a root property has PropertyType as base", function() {
         var scope = new SpecificationScope();
 
         var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", valueType: "number"});
@@ -157,7 +141,7 @@ define([
         expect("base" in spec).toBe(false);
       });
 
-      it("should include `base` when a root property has subtype of Property.Type as base", function() {
+      it("should include `base` when a root property has subtype of PropertyType as base", function() {
         var scope = new SpecificationScope();
 
         var SubProperty = Property.extend();
@@ -206,43 +190,21 @@ define([
       it("should not include `name` when serializing an abstract property", function() {
         var scope = new SpecificationScope();
 
-        var propType = Property.type;
-        // var SubProperty = Property.extend();
-
-        spyOn(propType, "_fillSpecInContext").and.returnValue(false);
+        var SubProperty = Property.extend();
+        var propType = SubProperty.type;
 
         var spec = propType.toSpecInContext();
 
         scope.dispose();
 
         expect("name" in spec).toBe(false);
-
-        // console.log(JSON.stringify(spec));
-        // > {"id": "property"}
-
-        // ---
-        scope = new SpecificationScope();
-
-        var SubProperty = Property.extend();
-        propType = SubProperty.type;
-
-        // spyOn(propType, "_fillSpecInContext").and.returnValue(false);
-
-        spec = propType.toSpecInContext();
-
-        scope.dispose();
-
-        expect("name" in spec).toBe(false);
-
-        // console.log(JSON.stringify(spec));
-        // > {"base":"property"}
       });
 
       it("should omit `type` equal to 'value' when serializing an abstract property", function() {
         var scope = new SpecificationScope();
 
-        var propType = Property.type;
-        // var SubProperty = Property.extend();
+        var SubProperty = Property.extend();
+        var propType = SubProperty.type;
 
         spyOn(propType, "_fillSpecInContext").and.returnValue(false);
 
@@ -251,24 +213,6 @@ define([
         scope.dispose();
 
         expect("value" in spec).toBe(false);
-
-        // console.log(JSON.stringify(spec));
-        // > {"id": "property"}
-
-        // ---
-        scope = new SpecificationScope();
-
-        var SubProperty = Property.extend();
-        propType = SubProperty.type;
-
-        spec = propType.toSpecInContext();
-
-        scope.dispose();
-
-        expect("value" in spec).toBe(false);
-
-        // console.log(JSON.stringify(spec));
-        // > {"base":"property"}
       });
 
       it("should include `type` if != from 'value' when serializing an abstract property", function() {
@@ -289,7 +233,7 @@ define([
         // > {"base": "property", "valueType": "string"}
       });
 
-      it("should include `id` if defined when serializing an abstract property", function() {
+      it("should output `id` if defined when serializing an abstract property", function() {
         var scope = new SpecificationScope();
 
         spyOn(Property.type, "_fillSpecInContext").and.returnValue(false);
@@ -301,10 +245,7 @@ define([
 
         scope.dispose();
 
-        expect(spec.id).toBe("my/foo");
-
-        // console.log(JSON.stringify(spec));
-        // > {"id": "my/foo", "base": "property"}
+        expect(spec).toBe("my/foo");
 
         // ---
 
@@ -316,18 +257,13 @@ define([
 
         scope.dispose();
 
-        expect(spec.id).toBe("property");
-
-        // console.log(JSON.stringify(spec));
-        // > {"id":"property"}
+        expect(spec).toBe("property");
       });
     });
 
     describe("_fillSpecInContext(spec, keyArgs)", function() {
 
       it("should return false, if only name and type were set", function() {
-        var Derived = Complex.extend();
-
         var scope = new SpecificationScope();
 
         var propType = propertyTypeUtil.createRoot(Derived.type, "foo");
@@ -344,8 +280,6 @@ define([
       describe("#label", function() {
 
         it("should return true when label is set to the default label", function() {
-          var Derived = Complex.extend();
-
           var scope = new SpecificationScope();
 
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", label: "Foo"});
@@ -364,8 +298,6 @@ define([
       describe("#defaultValue", function() {
 
         it("should not serialize when undefined (root)", function() {
-          var Derived = Complex.extend();
-
           var scope = new SpecificationScope();
 
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
@@ -422,7 +354,6 @@ define([
         });
 
         it("should serialize without type annotation when of the same type", function() {
-          var Derived = Complex.extend();
 
           var scope = new SpecificationScope();
 
@@ -442,7 +373,7 @@ define([
         });
 
         it("should serialize with type annotation when of different subtype", function() {
-          var Derived = Complex.extend();
+
           var PostalCode = PentahoString.extend();
 
           var scope = new SpecificationScope();

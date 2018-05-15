@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,46 +14,44 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!_",
+  "./Abstract",
+  "./types/DisplayUnits",
   "pentaho/i18n!./i18n/model"
-], function(bundle) {
+], function(module, BaseModel, DisplayUnits, bundle) {
 
   "use strict";
 
-  return [
-    "./abstract",
-    "./types/displayUnits",
-    function(BaseModel, DisplayUnits) {
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      isAbstract: true,
 
-      return BaseModel.extend({
-        $type: {
-          isAbstract: true,
+      props: [
+        // Primary axis
+        {name: "autoRange", valueType: "boolean", defaultValue: true},
+        {name: "valueAxisLowerLimit", valueType: "number"},
+        {name: "valueAxisUpperLimit", valueType: "number"},
+        {
+          name: "displayUnits",
+          valueType: DisplayUnits,
+          isRequired: true,
+          defaultValue: "units_0"
+        },
 
-          props: [
-            // Primary axis
-            {name: "autoRange", valueType: "boolean", defaultValue: true},
-            {name: "valueAxisLowerLimit", valueType: "number"},
-            {name: "valueAxisUpperLimit", valueType: "number"},
-            {
-              name: "displayUnits",
-              valueType: DisplayUnits,
-              isRequired: true,
-              defaultValue: "units_0"
-            },
-
-            // Secondary axis
-            {name: "autoRangeSecondary", valueType: "boolean", defaultValue: true},
-            {name: "valueAxisLowerLimitSecondary", valueType: "number"},
-            {name: "valueAxisUpperLimitSecondary", valueType: "number"},
-            {
-              name: "displayUnitsSecondary",
-              valueType: DisplayUnits,
-              isRequired: true,
-              defaultValue: "units_0"
-            }
-          ]
+        // Secondary axis
+        {name: "autoRangeSecondary", valueType: "boolean", defaultValue: true},
+        {name: "valueAxisLowerLimitSecondary", valueType: "number"},
+        {name: "valueAxisUpperLimitSecondary", valueType: "number"},
+        {
+          name: "displayUnitsSecondary",
+          valueType: DisplayUnits,
+          isRequired: true,
+          defaultValue: "units_0"
         }
-      })
-      .implement({$type: bundle.structured.cartesianAbstract});
+      ]
     }
-  ];
+  })
+  .localize({$type: bundle.structured.CartesianAbstract})
+  .configure({$type: module.config});
 });
