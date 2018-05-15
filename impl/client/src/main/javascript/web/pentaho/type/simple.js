@@ -262,7 +262,7 @@ define([
       // Need one. Ensure _ is the first property
       /* jshint laxbreak:true*/
       var spec = (includeType || (declaredType && type !== declaredType))
-        ? {_: type.toRefInContext(keyArgs), v: value}
+        ? {_: type.toSpecInContext(keyArgs), v: value}
         : {v: value};
 
       if(addFormatted) spec.f = this.formatted;

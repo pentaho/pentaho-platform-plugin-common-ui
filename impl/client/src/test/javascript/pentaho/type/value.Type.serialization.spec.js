@@ -99,7 +99,19 @@ define([
       });
 
       describe("#id", function() {
-        it("should serialize the #id of a type using #shortId, if an #alias is defined", function() {
+        it("should serialize the #id of a type, if an #alias is defined yet keyArgs.noAlias=true", function() {
+          var derivedType = Value.extend({$type: {id: "pentaho/type/test", alias: "testAlias"}}).type;
+
+          var scope = new SpecificationScope();
+
+          var spec = derivedType.toSpecInContext({noAlias: true});
+
+          scope.dispose();
+
+          expect(spec).toBe(derivedType.id);
+        });
+
+        it("should serialize the #alias of a type, if an #alias is defined", function() {
           var derivedType = Value.extend({$type: {id: "pentaho/type/test", alias: "testAlias"}}).type;
 
           var scope = new SpecificationScope();
@@ -108,8 +120,7 @@ define([
 
           scope.dispose();
 
-          expect(spec instanceof Object).toBe(true);
-          expect(spec.id).toBe(derivedType.id);
+          expect(spec).toBe(derivedType.alias);
         });
 
         it("should serialize the #id of a type using #shortId, if an #alias is not defined", function() {
@@ -121,8 +132,7 @@ define([
 
           scope.dispose();
 
-          expect(spec instanceof Object).toBe(true);
-          expect(spec.id).toBe(derivedType.shortId);
+          expect(spec).toBe(derivedType.shortId);
         });
 
         it("should serialize with an anonymous #id when the type is anonymous", function() {
@@ -150,16 +160,19 @@ define([
 
           scope.dispose();
 
-          expect(spec2.id).toBe(spec1.id);
+          expect(spec2).toBe(spec1.id);
         });
       });
 
       describe("#base", function() {
 
-        it("should serialize the #base type as a reference", function() {
+        it("should serialize the #base type", function() {
+
           var derivedType = Value.extend().type;
 
-          spyOn(Value.type, "toRefInContext").and.callThrough();
+          derivedType.toSpecInContext = Value.type.toSpecInContext;
+
+          spyOn(Value.type, "toSpecInContext").and.callThrough();
 
           var scope = new SpecificationScope();
 
@@ -167,15 +180,18 @@ define([
 
           scope.dispose();
 
-          expect(Value.type.toRefInContext).toHaveBeenCalled();
+          expect(Value.type.toSpecInContext).toHaveBeenCalled();
 
           expect(spec.base).toBe("value");
         });
 
         it("should serialize the #base type as a reference", function() {
+
           var derivedType = Value.extend().type;
 
-          spyOn(Value.type, "toRefInContext").and.callThrough();
+          derivedType.toSpecInContext = Value.type.toSpecInContext;
+
+          spyOn(Value.type, "toSpecInContext").and.callThrough();
 
           var scope = new SpecificationScope();
 
@@ -183,19 +199,19 @@ define([
 
           scope.dispose();
 
-          expect(Value.type.toRefInContext).toHaveBeenCalled();
+          expect(Value.type.toSpecInContext).toHaveBeenCalled();
 
           expect(spec.base).toBe("value");
         });
 
-        it("should serialize the root Value type with base 'instance'", function() {
+        it("should serialize the root Value type as 'value'", function() {
           var scope = new SpecificationScope();
 
           var spec = Value.type.toSpecInContext();
 
           scope.dispose();
 
-          expect(spec.base).toBe("instance");
+          expect(spec).toBe("value");
         });
 
         it("should not serialize base when it is Complex", function() {

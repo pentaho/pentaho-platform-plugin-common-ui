@@ -149,7 +149,7 @@ See [pentaho/i18n]({{site.refDocsUrlPattern | replace: '$', 'pentaho.i18n'}}).
 
 Note that view configuration is typically tied to the technology with which views are built.
 The 
-[View.Type#extension]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View.Type' | append: '#extension'}})
+[ViewType#extension]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.ViewType' | append: '#extension'}})
 attribute exists to satisfy the pass-through of such options of the underlying technology.
 You should consult the view type documentation to find out about which extension properties it supports.
 

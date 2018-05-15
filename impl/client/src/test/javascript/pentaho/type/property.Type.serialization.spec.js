@@ -190,43 +190,21 @@ define([
       it("should not include `name` when serializing an abstract property", function() {
         var scope = new SpecificationScope();
 
-        var propType = Property.type;
-        // var SubProperty = Property.extend();
-
-        spyOn(propType, "_fillSpecInContext").and.returnValue(false);
+        var SubProperty = Property.extend();
+        var propType = SubProperty.type;
 
         var spec = propType.toSpecInContext();
 
         scope.dispose();
 
         expect("name" in spec).toBe(false);
-
-        // console.log(JSON.stringify(spec));
-        // > {"id": "property"}
-
-        // ---
-        scope = new SpecificationScope();
-
-        var SubProperty = Property.extend();
-        propType = SubProperty.type;
-
-        // spyOn(propType, "_fillSpecInContext").and.returnValue(false);
-
-        spec = propType.toSpecInContext();
-
-        scope.dispose();
-
-        expect("name" in spec).toBe(false);
-
-        // console.log(JSON.stringify(spec));
-        // > {"base":"property"}
       });
 
       it("should omit `type` equal to 'value' when serializing an abstract property", function() {
         var scope = new SpecificationScope();
 
-        var propType = Property.type;
-        // var SubProperty = Property.extend();
+        var SubProperty = Property.extend();
+        var propType = SubProperty.type;
 
         spyOn(propType, "_fillSpecInContext").and.returnValue(false);
 
@@ -235,24 +213,6 @@ define([
         scope.dispose();
 
         expect("value" in spec).toBe(false);
-
-        // console.log(JSON.stringify(spec));
-        // > {"id": "property"}
-
-        // ---
-        scope = new SpecificationScope();
-
-        var SubProperty = Property.extend();
-        propType = SubProperty.type;
-
-        spec = propType.toSpecInContext();
-
-        scope.dispose();
-
-        expect("value" in spec).toBe(false);
-
-        // console.log(JSON.stringify(spec));
-        // > {"base":"property"}
       });
 
       it("should include `type` if != from 'value' when serializing an abstract property", function() {
@@ -273,7 +233,7 @@ define([
         // > {"base": "property", "valueType": "string"}
       });
 
-      it("should include `id` if defined when serializing an abstract property", function() {
+      it("should output `id` if defined when serializing an abstract property", function() {
         var scope = new SpecificationScope();
 
         spyOn(Property.type, "_fillSpecInContext").and.returnValue(false);
@@ -285,10 +245,7 @@ define([
 
         scope.dispose();
 
-        expect(spec.id).toBe("my/foo");
-
-        // console.log(JSON.stringify(spec));
-        // > {"id": "my/foo", "base": "property"}
+        expect(spec).toBe("my/foo");
 
         // ---
 
@@ -300,10 +257,7 @@ define([
 
         scope.dispose();
 
-        expect(spec.id).toBe("property");
-
-        // console.log(JSON.stringify(spec));
-        // > {"id":"property"}
+        expect(spec).toBe("property");
       });
     });
 

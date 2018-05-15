@@ -86,8 +86,7 @@ define([
 
           scope.dispose();
 
-          expect(spec instanceof Object).toBe(true);
-          expect(spec.id).toBe(derivedType.id);
+          expect(spec).toBe(derivedType.id);
         });
 
         it("should serialize the #id of a type using #alias when an alias is defined", function() {
@@ -99,8 +98,7 @@ define([
 
           scope.dispose();
 
-          expect(spec instanceof Object).toBe(true);
-          expect(spec.id).toBe(derivedType.alias);
+          expect(spec).toBe(derivedType.alias);
         });
 
         it("should serialize with an anonymous #id when the type is anonymous", function() {
@@ -129,7 +127,7 @@ define([
 
           scope.dispose();
 
-          expect(spec2.id).toBe(spec1.id);
+          expect(spec2).toBe(spec1.id);
         });
       });
 

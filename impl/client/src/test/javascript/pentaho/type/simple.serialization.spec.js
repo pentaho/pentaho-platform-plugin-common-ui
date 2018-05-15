@@ -60,7 +60,7 @@ define([
 
               expect(spec.v).toBe(originalSpec.v);
               expect(spec.f).toBeUndefined();
-              expect(spec._).toEqual(PentahoBoolean.type.toRefInContext());
+              expect(spec._).toEqual(PentahoBoolean.type.toSpec());
             });
           });
 
@@ -106,7 +106,7 @@ define([
 
               expect(spec.v).toBe(originalSpec.v);
               expect(spec.f).toBeUndefined();
-              expect(spec._).toEqual(PentahoBoolean.type.toRefInContext());
+              expect(spec._).toEqual(PentahoBoolean.type.toSpec());
             });
           });
 
@@ -248,7 +248,7 @@ define([
             var spec = value.toSpec({forceType: true});
 
             expect(typeof spec).toBe("object");
-            expect(spec._).toEqual(SimpleClass.type.toRefInContext());
+            expect(spec._).toEqual(SimpleClass.type.toSpec());
           });
 
           it("should output the primitive value in the 'v' property", function() {
@@ -311,7 +311,7 @@ define([
             var spec = value.toSpec({forceType: true, declaredType: SimpleClass.type});
 
             expect(typeof spec).toBe("object");
-            expect(spec._).toEqual(SimpleClass.type.toRefInContext());
+            expect(spec._).toEqual(SimpleClass.type.toSpec());
           });
 
           it("should output the primitive value in the 'v' property", function() {
@@ -374,7 +374,7 @@ define([
             var spec = value.toSpec({forceType: true, declaredType: SimpleClass.type.ancestor});
 
             expect(typeof spec).toBe("object");
-            expect(spec._).toEqual(SimpleClass.type.toRefInContext());
+            expect(spec._).toEqual(SimpleClass.type.toSpec());
           });
 
           it("should output the primitive value in the 'v' property", function() {
@@ -404,7 +404,7 @@ define([
               var spec = value.toSpec({forceType: false, omitFormatted: true, declaredType: SimpleClass.type.ancestor});
 
               expect(typeof spec).toBe("object");
-              expect(spec._).toEqual(SimpleClass.type.toRefInContext());
+              expect(spec._).toEqual(SimpleClass.type.toSpec());
             });
 
             it("should output the primitive value in the 'v' property", function() {

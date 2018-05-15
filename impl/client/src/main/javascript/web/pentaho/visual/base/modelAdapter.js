@@ -170,6 +170,9 @@ define([
     },
 
     // region Adaptation
+
+    // TODO: Document IAdaptationModel.
+
     __adaptationModel: null,
 
     /**

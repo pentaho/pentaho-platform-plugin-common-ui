@@ -54,7 +54,7 @@ Remarks:
   - The inherited 
     [model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#model'}}) 
     property is overridden so that its 
-    [valueType]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#valueType'}}) 
+    [valueType]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.PropertyType' | append: '#valueType'}}) 
     is the Bar model you previously created.
   - The [_updateAll]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#_updateAll'}})
     method is where the code that fully renders the visualization must go,

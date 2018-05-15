@@ -633,7 +633,7 @@ define([
         spec = [];
       } else {
         spec = {};
-        if(includeType) spec._ = this.$type.toRefInContext(keyArgs);
+        if(includeType) spec._ = this.$type.toSpecInContext(keyArgs);
 
         omitProps = keyArgs.omitProps;
         // Do not propagate to child values

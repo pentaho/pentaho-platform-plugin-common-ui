@@ -28,6 +28,8 @@ define([
 
   "use strict";
 
+  var TYPE_DEFAULT_BASE = "pentaho/type/Complex";
+
   /**
    * @name pentaho.type.ValueType
    * @class
@@ -526,17 +528,16 @@ define([
       // endregion
 
       // region serialization
-      toSpecInContext: function(keyArgs) {
-        if(!keyArgs) keyArgs = {};
+      _toSpecInContextCore: function(keyArgs) {
 
-        // The type's id or the temporary id in this scope.
-        var spec = {id: this.__id || SpecificationContext.current.add(this)};
+        var id = SpecificationContext.current.add(this);
+
+        var spec = {id: id};
 
         // The base type in the **current type hierarchy** (root, ancestor, isRoot).
         var baseType = Object.getPrototypeOf(this);
-        var baseRef = baseType.toRefInContext(keyArgs);
-        if(baseRef !== "complex") {
-          spec.base = baseRef;
+        if(baseType.id !== TYPE_DEFAULT_BASE) {
+          spec.base = baseType.toSpecInContext(keyArgs);
         }
 
         this._fillSpecInContext(spec, keyArgs);

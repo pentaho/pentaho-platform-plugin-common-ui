@@ -119,11 +119,11 @@ specification = {
 
 A general property which determines the constant width of bars. 
 It is of 
-[valueType]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#valueType'}})
+[valueType]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.PropertyType' | append: '#valueType'}})
 [number]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Number'}}), 
-is [required]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#isRequired'}}) and 
+is [required]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.PropertyType' | append: '#isRequired'}}) and 
 has a 
-[defaultValue]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#defaultValue'}}) 
+[defaultValue]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.PropertyType' | append: '#defaultValue'}}) 
 of `30`.
 That's as simple as it gets.
 
@@ -159,7 +159,7 @@ the visual role can be mapped to at most one `"string"` field
 it would need to have the "list of strings" data type: "`["string"]`).
 However, it is optional by default. To make it required, 
 the special 
-[fields]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property.Type' | append: '#fields'}})
+[fields]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.PropertyType' | append: '#fields'}})
 attribute is configured.
 
 ## The `measure` property
@@ -189,10 +189,10 @@ specification = {
 ```
 
 Represents a color palette 
-(see [pentaho/visual/color/PaletteProperty]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.PaletteProperty'}})).
+(see [pentaho/visual/color/PaletteProperty]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.PaletteProperty'}})). 
 
 The value of the property will default to the highest ranked system color palette that 
-matches the [level]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.PaletteProperty.Type#levels'}}) required by it.
+matches the [level]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.PalettePropertyType#levels'}}) required by it.
 
 ## Register the model module
 

@@ -631,7 +631,7 @@ define([
 
       if(includeType)
         return {
-          _: listType.toRefInContext(keyArgs),
+          _: listType.toSpecInContext(keyArgs),
           d: elemSpecs
         };
 
@@ -855,38 +855,30 @@ define([
         throw error.argInvalidType("instSpec", ["Array", "Object", "pentaho.type.List"], typeof instSpec);
       },
 
-      // * "list" has an id and toRefInContext immediately returns that
-      // * ["string"] -> anonymous list type, equivalent to {base: "list", of: "string"}
-      //   toRefInContext calls the toSpecInContext, cause it has no id and because a temporary id is also
-      //   never generated to it, in scope
-      //   toSpecInContext only can return this form if there are no other local list class attributes
       /** @inheritDoc */
-      toSpecInContext: function(keyArgs) {
-        if(!keyArgs) keyArgs = {};
+      _toSpecInContextCore: function(keyArgs) {
 
-        // The type's id or the temporary id in this scope.
         var baseType = this.ancestor;
         var spec = {
-          id: this.shortId,
-          base: baseType.toRefInContext(keyArgs)
+          id: null,
+          base: baseType.toSpecInContext(keyArgs)
         };
 
-        // Add "of" if we're `List` or the base `of` is different.
-        var baseElemType = baseType.isSubtypeOf(List.type) ? baseType.__elemType : null;
-        if(!baseElemType || this.__elemType !== baseElemType) {
-          spec.of = this.__elemType.toRefInContext(keyArgs);
+        // Add "of" if that of the base class is different.
+        if(this.__elemType !== baseType.__elemType) {
+          spec.of = this.__elemType.toSpecInContext(keyArgs);
         }
 
-        // No other attributes, no id and base is "list"?
-        if(!this._fillSpecInContext(spec, keyArgs) && !spec.id && spec.base === "list") {
+        // No other attributes and base is "list"?
+        if(!this._fillSpecInContext(spec, keyArgs) && spec.base === "list") {
 
-          if(!spec.of) spec.of = this.__elemType.toRefInContext(keyArgs);
+          var elemType = spec.of || this.__elemType.toSpecInContext(keyArgs);
 
-          return [spec.of];
+          return [elemType];
         }
 
-        // Need id
-        if(!spec.id) spec.id = SpecificationContext.current.add(this);
+        // Actually need and id.
+        spec.id = SpecificationContext.current.add(this);
 
         return spec;
       }

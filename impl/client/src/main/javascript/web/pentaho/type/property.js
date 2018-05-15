@@ -34,7 +34,7 @@ define([
 
   // TODO: No i18n?
 
-  var _defaultTypeMid = "string";
+  var _defaultTypeMid = "pentaho/type/String";
 
   var __propType;
 
@@ -931,7 +931,7 @@ define([
 
       // region serialization
       /** @inheritDoc */
-      toSpecInContext: function(keyArgs) {
+      _toSpecInContextCore: function(keyArgs) {
 
         if(!keyArgs) keyArgs = {};
 
@@ -939,36 +939,36 @@ define([
         var spec = {};
         var baseType;
 
-        var valueTypeRef = this.__valueType.toRefInContext(keyArgs);
+        var valueTypeRef = this.__valueType.toSpecInContext(keyArgs);
 
         // # Abstract Property Types
         //
         // Classes like Property or Property.extend() are *abstract*
         // and are base classes of actual property type roots.
         //
-        // The base of a subtype of Property is either Property or a subtype of it
-        // and needs to be output, with a type reference.
+        // If `Property` itself gets serialized, its id is output.
+        // If any other Property.extend() that has an id gets serialized , its id is output.
         //
-        // If Property itself is serialized, the id needs to be included...
+        // For anonymous property types:
+        //
+        // The `base` of a subtype of Property is either Property or a subtype of it
+        // and needs to be output, with a type reference.
         //
         // The default `base` of a root property type is Property
         // and so, in this case, `base` can be omitted.
         //
         var isAbstract = !this.__declaringType;
         if(isAbstract) {
-          // The id, if any, needs to be included.
-          // Property has an id. Subtypes of it may not have.
-          var shortId = this.shortId;
-          if(shortId) spec.id = shortId;
-
           // `ancestor` only works from root property types downwards.
           baseType = Object.getPrototypeOf(this);
-          spec.base = baseType.toRefInContext(keyArgs);
+          spec.base = baseType.toSpecInContext(keyArgs);
 
           // Abstract Property classes don't have declaring type or `name`.
 
-          // The default value type of abstract properties is value
-          if(valueTypeRef !== "value") spec.valueType = valueTypeRef;
+          // The default value type of abstract properties is `Value`.
+          if(this.__valueType !== Value.type) {
+            spec.valueType = valueTypeRef;
+          }
 
           this._fillSpecInContext(spec, keyArgs);
         } else {
@@ -982,7 +982,7 @@ define([
             // Again, the ancestor of a root property is null, and would not work in this case.
             baseType = Object.getPrototypeOf(this);
             if(baseType !== __propType) {
-              spec.base = baseType.toRefInContext(keyArgs);
+              spec.base = baseType.toSpecInContext(keyArgs);
               count++;
             }
           }
@@ -996,7 +996,7 @@ define([
           count++;
 
           // The default value type of non-abstract properties is string
-          if(valueTypeRef !== "string") {
+          if(this.__valueType.id !== _defaultTypeMid) {
             spec.valueType = valueTypeRef;
             count++;
           }

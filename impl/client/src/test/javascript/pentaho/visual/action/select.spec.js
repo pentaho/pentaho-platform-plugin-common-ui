@@ -215,7 +215,7 @@ define([
           "tests/pentaho/util/errorMatch"
         ])
         .then(function(deps) {
-          SelectAction = deps[0];
+          SelectAction = deps[0].extend();
           selectActionType = SelectAction.type;
           SelectionModes = deps[1];
           errorMatch = deps[2];

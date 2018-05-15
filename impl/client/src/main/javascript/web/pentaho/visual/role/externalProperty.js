@@ -440,7 +440,7 @@ define([
         if(strategyTypesList && !this.__isStrategyTypesDefault) {
           any = true;
           spec.strategies = strategyTypesList.map(function(strategyType) {
-            return strategyType.toRefInContext(keyArgs);
+            return strategyType.toSpecInContext(keyArgs);
           });
         }
 

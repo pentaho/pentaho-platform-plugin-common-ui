@@ -1275,6 +1275,20 @@ define([
      * this type, and any other instances and types it references,
      * and then delegates the actual work to {@link pentaho.type.Type#toSpecInContext}.
      *
+     * This method returns a reference to this type that is appropriate
+     * to be the value of an [inline type]{@link pentaho.type.spec.IInstance#_} property
+     * that is included on a specification of an instance of this type.
+     *
+     * When a type has an identifier, its [id]{@link pentaho.type.Type#id} (or
+     * its [alias]{@link pentaho.type.Type#alias}) is returned.
+     *
+     * For anonymous types, a [temporary]{@link pentaho.type.SpecificationContext.isIdTemporary},
+     * serialization-only identifier is generated.
+     * In the first occurrence in the given scope,
+     * that identifier is returned, within a full specification of the type,
+     * obtained by calling [toSpecInContext]{@link pentaho.type.Type#toSpecInContext}.
+     * In following occurrences, only the previously used temporary identifier is returned.
+     *
      * @param {Object} [keyArgs] The keyword arguments object.
      * Passed to every type and instance serialized within this scope.
      *
@@ -1283,12 +1297,18 @@ define([
      * @param {?boolean} [keyArgs.isJson=false] Generates a JSON-compatible specification.
      * Attributes that do not have a JSON-compatible specification are omitted.
      *
-     * @return {!pentaho.type.spec.IType} A specification of this type.
+     * @return {!pentaho.type.spec.TypeReference} A reference to this type.
      *
      * @see pentaho.type.Type#toSpecInContext
      * @see pentaho.type.Type#_fillSpecInContext
      */
     toSpec: function(keyArgs) {
+      var id = this.id;
+      if(id !== null) {
+        // Type has an identifier.
+        return keyArgs && keyArgs.noAlias ? id : this.shortId;
+      }
+
       return O.using(new SpecificationScope(), this.toSpecInContext.bind(this, keyArgs || {}));
     },
 
@@ -1298,25 +1318,57 @@ define([
      * This method requires that there currently exists an
      * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
      *
-     * The default implementation returns a plain object with the identifier of the type and
-     * any other specified attributes
-     * (like [label]{@link pentaho.type.Type#label} or
-     * [description]{@link pentaho.type.Type#description}).
+     * This method handles the cases where this type has an [identifier]{@link pentaho.type.Type#id}
+     * or it does not but a temporary identifier has already been assigned in the ambient specification context.
+     * Otherwise, execution delegates to [_toSpecInContextCore]{@link pentaho.type.Type#_toSpecInContextCore}.
      *
      * @param {Object} [keyArgs] The keyword arguments object.
      * Passed to every type and instance serialized within this scope.
      *
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
      *
-     * @return {!pentaho.type.spec.IType} A specification of this type.
+     * @return {!pentaho.type.spec.TypeReference} A reference to this type.
      *
      * @see pentaho.type.Type#toSpec
      */
     toSpecInContext: function(keyArgs) {
 
-      var spec = {id: this.__id || SpecificationContext.current.add(this)};
+      var id = this.id;
+      if(id !== null) {
+        // Type has an identifier.
+        return keyArgs && keyArgs.noAlias ? id : this.shortId;
+      }
 
-      this._fillSpecInContext(spec, keyArgs || {});
+      id = SpecificationContext.current.getIdOf(this);
+      if(id !== null) {
+        // Already added previously to the specification context.
+        return id;
+      }
+
+      return this._toSpecInContextCore(keyArgs || {});
+    },
+
+    /**
+     * Called to actually create a specification of this anonymous type,
+     * when it is the first time that this type occurs in the ambient specification context.
+     *
+     * @param {object} keyArgs The keyword arguments object.
+     * Passed to every type and instance serialized within this scope.
+     *
+     * Please see the documentation of subclasses for information on additional, supported keyword arguments.
+     *
+     * @return {!pentaho.type.spec.IType} A specification of this type.
+     * @protected
+     *
+     * @see pentaho.type.Type#_toSpecInContextCore
+     */
+    _toSpecInContextCore: function(keyArgs) {
+
+      var id = SpecificationContext.current.add(this);
+
+      var spec = {id: id};
+
+      this._fillSpecInContext(spec, keyArgs);
 
       return spec;
     },
@@ -1364,13 +1416,6 @@ define([
     _fillSpecInContext: function(spec, keyArgs) {
       var any = false;
       var isJson = keyArgs.isJson;
-
-      if(this.__alias != null) {
-        any = true;
-        spec.alias = this.__alias;
-      }
-
-      // TODO: if sourceId is not serialized, defaultView looses the relative reference.
 
       // Custom attributes
       if(this.isAbstract) {
@@ -1420,63 +1465,6 @@ define([
       }
 
       return any;
-    },
-
-    /**
-     * Returns a _reference_ to this type.
-     *
-     * This method returns a reference to this type that is appropriate
-     * to be the value of an [inline type]{@link pentaho.type.spec.IInstance#_} property
-     * that is included on a specification of an instance of this type.
-     *
-     * If an [ambient specification context]{@link pentaho.type.SpecificationContext.current},
-     * currently exists, it is used to manage the serialization process.
-     * Otherwise, one is created and set as current.
-     *
-     * When a type is not anonymous, the [id]{@link pentaho.type.Type#id} is returned.
-     *
-     * For anonymous types, a [temporary]{@link pentaho.type.SpecificationContext.isIdTemporary},
-     * serialization-only identifier is generated.
-     * In the first occurrence in the given scope,
-     * that identifier is returned, within a full specification of the type,
-     * obtained by calling [toSpecInContext]{@link pentaho.type.Type#toSpecInContext}.
-     * In following occurrences, only the previously used temporary identifier is returned.
-     *
-     * Some standard types have a special reference syntax.
-     * For example: [ListType#toRef]{@link pentaho.type.ListType#toRef}.
-     *
-     * @see pentaho.type.Type#toSpec
-     *
-     * @param {Object} [keyArgs] The keyword arguments object.
-     * Passed to every type and instance serialized within this scope.
-     *
-     * Please see the documentation of subclasses for information on additional, supported keyword arguments.
-     *
-     * @return {!pentaho.type.spec.TypeReference} A reference to this type.
-     */
-    toRef: function(keyArgs) {
-      var id = keyArgs && keyArgs.noAlias ? this.id : this.shortId;
-      return id || O.using(new SpecificationScope(), this.toRefInContext.bind(this, keyArgs || {}));
-    },
-
-    /**
-     * Returns a _reference_ to this type under a given specification context.
-     *
-     * This method requires that there currently exists an
-     * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
-     *
-     * @see pentaho.type.Type#toRef
-     *
-     * @param {Object} [keyArgs] The keyword arguments object.
-     * Passed to every type and instance serialized within this scope.
-     *
-     * Please see the documentation of subclasses for information on additional, supported keyword arguments.
-     *
-     * @return {!pentaho.type.spec.TypeReference} A reference to this type.
-     */
-    toRefInContext: function(keyArgs) {
-      var id = keyArgs && keyArgs.noAlias ? this.id : this.shortId;
-      return id || SpecificationContext.current.getIdOf(this) || this.toSpecInContext(keyArgs);
     },
     // endregion
 

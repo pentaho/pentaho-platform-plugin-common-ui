@@ -46,7 +46,7 @@ as an instance of type [`pentaho/config/spec/IRuleSet`]({{site.refDocsUrlPattern
    [Model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) type,
    being a [Complex]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex'}}) type,
    can be configured with the properties of the 
-   [IComplexTypeProto]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.spec.IComplexTypeProto'}}) interface.
+   [IComplexType]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.spec.IComplexType'}}) interface.
 
 3. The [**priority**]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule#priority'}}) 
    allows fine-tuning the order by which rules that target the same _type_ or _instance_ are merged.

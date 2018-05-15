@@ -66,7 +66,7 @@ define([
     // region serialization
     /** @inheritDoc */
     _toJSONValue: function(keyArgs) {
-      return this.value.toRefInContext(keyArgs);
+      return this.value.toSpecInContext(keyArgs);
     },
     // endregion
 

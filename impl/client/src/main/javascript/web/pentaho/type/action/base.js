@@ -223,7 +223,7 @@ define([
       var includeType = !!keyArgs.forceType ||
             (!!(declaredType = keyArgs.declaredType) && this.$type !== declaredType);
 
-      if(includeType) spec._ = this.$type.toRefInContext(keyArgs);
+      if(includeType) spec._ = this.$type.toSpecInContext(keyArgs);
       if(this.__label !== null) spec.label = this.label;
       if(this.__description !== null) spec.description = this.description;
 
