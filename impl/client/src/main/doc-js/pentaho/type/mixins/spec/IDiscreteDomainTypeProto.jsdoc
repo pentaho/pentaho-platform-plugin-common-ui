@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 
 /**
- * The `spec.IDiscreteDomainTypeProto` interface represents the
+ * The `spec.IDiscreteDomainType` interface represents the
  * specification made available to a property type by the discrete domain mixin.
  *
- * @name pentaho.type.mixins.spec.IDiscreteDomainTypeProto
+ * @name pentaho.type.mixins.spec.IDiscreteDomainType
  * @interface
  * @see pentaho.type.mixins.DiscreteDomain
  */
@@ -27,9 +27,9 @@
  * The list of valid values of the property type.
  *
  * @name domain
- * @memberOf pentaho.type.mixins.spec.IDiscreteDomainTypeProto#
- * @type {Array.<pentaho.type.spec.UElement> |
- *        pentaho.type.spec.PropertyDynamicAttribute.<Array.<pentaho.type.spec.UElement>>}
+ * @memberOf pentaho.type.mixins.spec.IDiscreteDomainType#
+ * @type {Array.<pentaho.type.spec.Element> |
+ *        pentaho.type.spec.PropertyDynamicAttribute.<Array.<pentaho.type.spec.Element>>}
  *
- * @see pentaho.type.mixins.DiscreteDomain.Type#domain
+ * @see pentaho.type.mixins.DiscreteDomainType#domain
  */

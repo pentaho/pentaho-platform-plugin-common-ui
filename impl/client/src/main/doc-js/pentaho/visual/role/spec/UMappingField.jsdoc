@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 /**
- * A `spec.UMappingField` represents the union of JS types that can be used to describe a
+ * A `spec.MappingField` represents the union of JS types that can be used to describe a
  * [visual role mapping field]{@link pentaho.visual.role.MappingField} instance.
  *
  * When an instance is described using _object form_,
@@ -25,5 +25,5 @@
  * in which case it is taken to be the value of
  * the [name]{@link pentaho.visual.role.spec.IMappingField#name} property.
  *
- * @typedef {pentaho.visual.role.spec.IMappingField|string} pentaho.visual.role.spec.UMappingField
+ * @typedef {pentaho.visual.role.spec.IMappingField|string} pentaho.visual.role.spec.MappingField
  */

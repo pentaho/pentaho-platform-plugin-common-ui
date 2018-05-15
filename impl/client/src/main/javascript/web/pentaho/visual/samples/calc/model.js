@@ -14,54 +14,55 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!_",
+  "pentaho/visual/base/Model",
   "pentaho/i18n!model",
   "./theme/model"
-], function(bundle) {
+], function(module, BaseModel, bundle) {
 
   "use strict";
 
-  return ["pentaho/visual/base/model", function(BaseModel) {
+  var operDomain = bundle.structured.operation.domain;
 
-    var operDomain = bundle.structured.operation.domain;
+  /**
+   * @name pentaho.visual.samples.calc.Model
+   * @class
+   * @extends pentaho.visual.base.Model
+   * @amd pentaho/visual/samples/calc/Model
+   */
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      v2Id: "sample_calc",
+      defaultView: "./View",
 
-    /**
-     * @name pentaho.visual.samples.calc.Model
-     * @class
-     * @extends pentaho.visual.base.Model
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.samples.calc.Model>} pentaho/visual/samples/calc
-     */
-    return BaseModel.extend({
-      $type: {
-        v2Id: "sample_calc",
-        defaultView: "./view",
-
-        props: [
-          {
-            name: "levels",
-            base: "pentaho/visual/role/property",
-            modes: [{dataType: "list"}],
-            fields: {isRequired: true}
-          },
-          {
-            name: "measure",
-            base: "pentaho/visual/role/property",
-            modes: [{dataType: "number"}],
-            fields: {isRequired: true}
-          },
-          {
-            name: "operation",
-            valueType: "string",
-            domain: [
-              {v: "min", f: operDomain.min.f},
-              {v: "max", f: operDomain.max.f},
-              {v: "avg", f: operDomain.avg.f},
-              {v: "sum", f: operDomain.sum.f}
-            ],
-            defaultValue: "min"
-          }
-        ]
-      }
-    })
-    .implement({$type: bundle.structured.type});
-  }];
+      props: [
+        {
+          name: "levels",
+          base: "pentaho/visual/role/Property",
+          modes: [{dataType: "list"}],
+          fields: {isRequired: true}
+        },
+        {
+          name: "measure",
+          base: "pentaho/visual/role/Property",
+          modes: [{dataType: "number"}],
+          fields: {isRequired: true}
+        },
+        {
+          name: "operation",
+          valueType: "string",
+          domain: [
+            {v: "min", f: operDomain.min.f},
+            {v: "max", f: operDomain.max.f},
+            {v: "avg", f: operDomain.avg.f},
+            {v: "sum", f: operDomain.sum.f}
+          ],
+          defaultValue: "min"
+        }
+      ]
+    }
+  })
+  .localize({$type: bundle.structured.type})
+  .configure({$type: module.config});
 });

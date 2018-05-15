@@ -14,47 +14,24 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/_baseLoader",
+  "pentaho/type/Instance",
   "pentaho/type/SpecificationContext",
-  "tests/pentaho/util/errorMatch",
-  "tests/test-utils"
-], function(Context, SpecificationContext, errorMatch, testUtils) {
+  "tests/pentaho/util/errorMatch"
+], function(typeLoader, Instance, SpecificationContext, errorMatch) {
 
   "use strict";
 
-  /* global describe:true, it:true, expect:true, beforeEach:true, afterEach:true, spyOn: true, jasmine: true*/
-
-  // Use alternate, promise-aware version of `it`.
-  var it = testUtils.itAsync;
-  var expectToRejectWith = testUtils.expectToRejectWith;
-
   describe("pentaho.type.Type", function() {
 
-    var context;
-    var Instance;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Instance = context.get("instance");
-          })
-          .then(done, done.fail);
-    });
-
     describe("construction", function() {
+
       it("should allow specifying static type members", function() {
         var Derived = Instance.extend({}, {$type: {foo: "bar"}});
 
         expect(Derived.Type.foo).toBe("bar");
       });
     });
-
-    describe("#context()", function() {
-      it("should have the context in which it was defined", function() {
-        expect(Instance.type.context).toBe(context);
-      });
-    }); // end #context
 
     describe("#label -", function() {
 
@@ -66,11 +43,14 @@ define([
         });
 
         it("should not reset the top-root label", function() {
-          var topRootLabel = Instance.type.label;
 
-          Instance.type.label = undefined;
+          return require.using(["pentaho/type/Instance"], function(Instance) {
+            var topRootLabel = Instance.type.label;
 
-          expect(Instance.type.label).toBe(topRootLabel);
+            Instance.type.label = undefined;
+
+            expect(Instance.type.label).toBe(topRootLabel);
+          });
         });
 
         it("should inherit `label`", function() {
@@ -202,7 +182,7 @@ define([
         });
       });
 
-    }); // #id and #sourceId
+    });
 
     describe("#buildSourceRelativeId -", function() {
 
@@ -246,20 +226,78 @@ define([
 
     describe("#alias", function() {
 
-      it("cannot be assigned to an anonymous type", function() {
+      it("should throw if assigned to an anonymous type", function() {
         expect(function() {
           var Derived = Instance.extend({$type: {label: "Foo", alias: "bar"}});
         }).toThrow(errorMatch.argInvalid("alias", "Anonymous types cannot have an alias"));
       });
 
-      it("is read only", function() {
+      it("should be read only", function() {
         expect(function() {
           var Derived = Instance.extend({$type: {label: "Foo", id: "type/bar", alias: "bar"}});
           Derived.type.alias = "mux";
         }).toThrowError(TypeError);
       });
 
-    }); // #alias
+      it("should default from the module's alias, when id is specified", function() {
+
+        function configAmd(localRequire) {
+
+          localRequire.config({
+            config: {
+              "pentaho/modules": {
+                "test/TypeWithAlias": {
+                  base: null,
+                  alias: "fooAlias"
+                }
+              }
+            }
+          });
+
+          localRequire.define("test/TypeWithAlias", ["pentaho/type/Value"], function(Value) {
+            return Value.extend({
+              $type: {
+                id: "test/TypeWithAlias"
+              }
+            });
+          });
+        }
+
+        return require.using(["test/TypeWithAlias"], configAmd, function(TypeWithAlias) {
+          expect(TypeWithAlias.type.alias).toBe("fooAlias");
+        });
+      });
+
+      it("should ignore the module's alias, when alias is specified", function() {
+
+        function configAmd(localRequire) {
+
+          localRequire.config({
+            config: {
+              "pentaho/modules": {
+                "test/TypeWithAlias": {
+                  base: null,
+                  alias: "fooAlias"
+                }
+              }
+            }
+          });
+
+          localRequire.define("test/TypeWithAlias", ["pentaho/type/Value"], function(Value) {
+            return Value.extend({
+              $type: {
+                id: "test/TypeWithAlias",
+                alias: "barAlias"
+              }
+            });
+          });
+        }
+
+        return require.using(["test/TypeWithAlias"], configAmd, function(TypeWithAlias) {
+          expect(TypeWithAlias.type.alias).toBe("barAlias");
+        });
+      });
+    });
 
     describe("#shortId -", function() {
 
@@ -278,7 +316,7 @@ define([
         expect(Derived.type.shortId).toBe(Derived.type.alias);
       });
 
-    }); // #shortId
+    });
 
     describe("#defaultView -", function() {
       it("should default to `null`", function() {
@@ -359,11 +397,13 @@ define([
 
       // coverage
       it("should preserve the default value", function() {
-        Instance.type.defaultView = undefined;
-        // The default value is still there (did not delete)
-        expect(Instance.type.defaultView).toBe(null);
+        return require.using(["pentaho/type/Instance"], function(Instance) {
+          Instance.type.defaultView = undefined;
+          // The default value is still there (did not delete)
+          expect(Instance.type.defaultView).toBe(null);
+        });
       });
-    }); // end #defaultView
+    });
 
     describe("#defaultViewAbs -", function() {
 
@@ -420,7 +460,7 @@ define([
         expect(pa).toBe("foo/barView");
       });
 
-    }); // end #defaultViewAbs
+    });
 
     describe("#isAbstract", function() {
       it("should respect a specified abstract spec value", function() {
@@ -444,7 +484,7 @@ define([
         expect(DerivedAbstract.type.isAbstract).toBe(false);
         expect(DerivedConcrete.type.isAbstract).toBe(false);
       });
-    }); // #isAbstract
+    });
 
     describe("#application -", function() {
       it("should have `{}` as the root value", function() {
@@ -488,14 +528,16 @@ define([
     describe("#description -", function() {
 
       it("should preserve the default value", function() {
-        var value = Instance.type.description;
+        return require.using(["pentaho/type/Instance"], function(Instance) {
+          var value = Instance.type.description;
 
-        expect(value).not.toBe(undefined);
+          expect(value).not.toBe(undefined);
 
-        Instance.type.description = undefined;
+          Instance.type.description = undefined;
 
-        // The default value is still there (did not delete)
-        expect(Instance.type.description).toBe(value);
+          // The default value is still there (did not delete)
+          expect(Instance.type.description).toBe(value);
+        });
       });
 
       describe("when not specified -", function() {
@@ -531,15 +573,17 @@ define([
           expect(Derived.type.description).toBe("Foo");
         });
       });
-    }); // #description
+    });
 
     describe("#category -", function() {
       describe("when not specified -", function() {
 
         it("should preserve the default value", function() {
-          Instance.type.category = undefined;
-          // The default value is still there (did not delete)
-          expect(Instance.type.category).toBe(null);
+          return require.using(["pentaho/type/Instance"], function(Instance) {
+            Instance.type.category = undefined;
+            // The default value is still there (did not delete)
+            expect(Instance.type.category).toBe(null);
+          });
         });
 
         it("should inherit the base category", function() {
@@ -574,13 +618,16 @@ define([
           expect(Derived.type.category).toBe("Foo");
         });
       });
-    }); // #category
+    });
 
     describe("#helpUrl -", function() {
       it("should preserve the default value", function() {
-        Instance.type.helpUrl = undefined;
-        // The default value is still there (did not delete)
-        expect(Instance.type.helpUrl).toBe(null);
+        return require.using(["pentaho/type/Instance"], function(Instance) {
+          Instance.type.helpUrl = undefined;
+          // The default value is still there (did not delete)
+          expect(Instance.type.helpUrl)
+            .toBe(null);
+        });
       });
 
       describe("when not specified", function() {
@@ -616,7 +663,7 @@ define([
           expect(Derived.type.helpUrl).toBe("Foo");
         });
       });
-    }); // #helpUrl
+    });
 
     describe("#uid -", function() {
       it("should not be inherited", function() {
@@ -625,23 +672,20 @@ define([
       });
 
       it("should be unique", function() {
-        var DerivedA = Instance.extend(),
-            DerivedB = Instance.extend();
+        var DerivedA = Instance.extend();
+        var DerivedB = Instance.extend();
         expect(DerivedA.type.uid).not.toBe(DerivedB.type.uid);
         expect(DerivedA.type.uid).not.toBe(Instance.type.uid);
       });
-    }); // #uid
+    });
 
     describe("#styleClass -", function() {
 
-      it("should be settable on the root type", function(done) {
-        Context.createAsync()
-            .then(function(context) {
-              var Instance = context.get("instance");
-              Instance.type.styleClass = "foo";
-              expect(Instance.type.styleClass).toBe("foo");
-            })
-            .then(done, done.fail);
+      it("should be settable on the root type", function() {
+        return require.using(["pentaho/type/Instance"], function(Instance) {
+          Instance.type.styleClass = "foo";
+          expect(Instance.type.styleClass).toBe("foo");
+        });
       });
 
       it("should be defined on the root type", function() {
@@ -746,9 +790,10 @@ define([
 
         expect(Derived.type.styleClass).toBe("foo-bar");
       });
-    }); // #styleClass
+    });
 
     describe("#inheritedStyleClasses -", function() {
+
       var level1StyleClassName = "Level1StyleClass";
       var level2StyleClassName = "Level2StyleClass";
       var level3StyleClassName = "Level3StyleClass";
@@ -758,18 +803,25 @@ define([
       var DerivedLevel2;
       var DerivedLevel3;
 
-      beforeEach(function(done) {
-        Context.createAsync()
-            .then(function(_context) {
-              var context = _context;
-              Instance = context.get("instance");
+      var localRequire;
 
-              Instance.type.styleClass = null;
-              DerivedLevel1 = Instance.extend({$type: {styleClass: null}});
-              DerivedLevel2 = DerivedLevel1.extend({$type: {styleClass: null}});
-              DerivedLevel3 = DerivedLevel2.extend({$type: {styleClass: null}});
-            })
-            .then(done, done.fail);
+      beforeEach(function(done) {
+        localRequire = require.new();
+
+        localRequire(["pentaho/type/Instance"], function(_Instance) {
+          Instance = _Instance;
+
+          Instance.type.styleClass = null;
+          DerivedLevel1 = Instance.extend({$type: {styleClass: null}});
+          DerivedLevel2 = DerivedLevel1.extend({$type: {styleClass: null}});
+          DerivedLevel3 = DerivedLevel2.extend({$type: {styleClass: null}});
+
+          done();
+        }, done.fail);
+      });
+
+      afterEach(function() {
+        localRequire.dispose();
       });
 
       it("should return empty array when no styleClass are defined", function() {
@@ -806,13 +858,15 @@ define([
         });
       });
 
-    }); // #inheritedStyleClasses
+    });
 
     describe("#isAdvanced -", function() {
       it("should preserve the default value", function() {
-        Instance.type.isAdvanced = undefined;
-        // The default value is still there (did not delete)
-        expect(Instance.type.isAdvanced).toBe(false);
+        return require.using(["pentaho/type/Instance"], function(Instance) {
+          Instance.type.isAdvanced = undefined;
+          // The default value is still there (did not delete)
+          expect(Instance.type.isAdvanced).toBe(false);
+        });
       });
 
       it("can be set on a derived class", function() {
@@ -839,10 +893,13 @@ define([
     }); // #isAdvanced
 
     describe("#isBrowsable -", function() {
+
       it("should preserve the default value", function() {
-        Instance.type.isBrowsable = undefined;
-        // The default value is still there (did not delete)
-        expect(Instance.type.isBrowsable).toBe(true);
+        return require.using(["pentaho/type/Instance"], function(Instance) {
+          Instance.type.isBrowsable = undefined;
+          // The default value is still there (did not delete)
+          expect(Instance.type.isBrowsable).toBe(true);
+        });
       });
 
       it("can be set on a derived class", function() {
@@ -866,13 +923,15 @@ define([
           });
         });
       });
-    }); // #isBrowsable
+    });
 
     describe("#ordinal -", function() {
       it("should preserve the default value", function() {
-        Instance.type.ordinal = undefined;
-        // The default value is still there (did not delete)
-        expect(Instance.type.ordinal).toBe(0);
+        return require.using(["pentaho/type/Instance"], function(Instance) {
+          Instance.type.ordinal = undefined;
+          // The default value is still there (did not delete)
+          expect(Instance.type.ordinal).toBe(0);
+        });
       });
 
       it("can be set on a derived class", function() {
@@ -919,7 +978,7 @@ define([
           });
         });
       });
-    }); // #ordinal
+    });
 
     describe("#isRoot -", function() {
       it("can be set on a derived class", function() {
@@ -1022,10 +1081,10 @@ define([
 
     describe("#create(instRef, instKeyArgs)", function() {
 
-      it("should call the instance container #get with type as the base type", function() {
+      it("should call the instance container #resolveInstance with type as the base type", function() {
 
         var got = {};
-        spyOn(context.instances, "get").and.returnValue(got);
+        spyOn(typeLoader, "resolveInstance").and.returnValue(got);
 
         var instRef = {};
         var instKeyArgs = {};
@@ -1033,23 +1092,23 @@ define([
         var result = Instance.type.create(instRef, instKeyArgs);
 
         expect(result).toBe(got);
-        expect(context.instances.get).toHaveBeenCalledWith(instRef, instKeyArgs, Instance.type);
+        expect(typeLoader.resolveInstance).toHaveBeenCalledWith(instRef, instKeyArgs, Instance.type);
       });
     }); // #create
 
     describe("#createAsync(instSpec, instKeyArgs)", function() {
 
-      it("should call the instance container #getAsync with type as the base type", function() {
+      it("should call the instance container #resolveInstanceAsync with type as the base type", function() {
 
         var got = {};
-        spyOn(context.instances, "getAsync").and.returnValue(Promise.resolve(got));
+        spyOn(typeLoader, "resolveInstanceAsync").and.returnValue(Promise.resolve(got));
 
         var instRef = {};
         var instKeyArgs = {};
 
         return Instance.type.createAsync(instRef, instKeyArgs).then(function(result) {
           expect(result).toBe(got);
-          expect(context.instances.getAsync).toHaveBeenCalledWith(instRef, instKeyArgs, Instance.type);
+          expect(typeLoader.resolveInstanceAsync).toHaveBeenCalledWith(instRef, instKeyArgs, Instance.type);
         });
       });
     }); // #createAsync
@@ -1136,67 +1195,53 @@ define([
 
       function defineSampleMixins(localRequire) {
 
-        localRequire.define("tests/mixins/A", [], function() {
+        localRequire.define("tests/mixins/A", ["pentaho/type/Value"], function(Value) {
 
-          return ["pentaho/type/value", function(Value) {
-
-            return Value.extend({
-              testMethodAInst: function() {},
-              $type: {
-                id: "tests/mixins/A",
-                testMethodA: function() {}
-              }
-            });
-          }];
+          return Value.extend({
+            testMethodAInst: function() {},
+            $type: {
+              id: "tests/mixins/A",
+              testMethodA: function() {}
+            }
+          });
         });
 
-        localRequire.define("tests/mixins/B", [], function() {
+        localRequire.define("tests/mixins/B", ["pentaho/type/Value"], function(Value) {
 
-          return ["pentaho/type/value", function(Value) {
-
-            return Value.extend({
-              testMethodBInst: function() {},
-              $type: {
-                id: "tests/mixins/B",
-                testMethodB: function() {}
-              }
-            });
-          }];
+          return Value.extend({
+            testMethodBInst: function() {},
+            $type: {
+              id: "tests/mixins/B",
+              testMethodB: function() {}
+            }
+          });
         });
 
-        localRequire.define("tests/mixins/C", [], function() {
+        localRequire.define("tests/mixins/C", ["pentaho/type/Value"], function(Value) {
 
-          return ["pentaho/type/value", function(Value) {
-
-            return Value.extend({
-              $type: {
-                id: "tests/mixins/C",
-                _init: function(spec, ka) {
-                  spec = this.base(spec, ka) || spec;
-                  this.__hasBeenInInit = true;
-                  return spec;
-                }
+          return Value.extend({
+            $type: {
+              id: "tests/mixins/C",
+              _init: function(spec, ka) {
+                spec = this.base(spec, ka) || spec;
+                this.__hasBeenInInit = true;
+                return spec;
               }
-            });
-          }];
+            }
+          });
         });
       }
 
       it("should initially be an empty array", function() {
 
-        return require.using(["pentaho/type/Context"], function(Context) {
+        return require.using(["pentaho/type/Value"], function(Value) {
 
-          return Context.createAsync().then(function(context) {
+          var DerivedValue = Value.extend();
 
-            var Value = context.get("pentaho/type/value");
+          var mixins = DerivedValue.type.mixins;
 
-            var DerivedValue = Value.extend();
-
-            var mixins = DerivedValue.type.mixins;
-
-            expect(Array.isArray(mixins)).toBe(true);
-            expect(mixins.length).toBe(0);
-          });
+          expect(Array.isArray(mixins)).toBe(true);
+          expect(mixins.length).toBe(0);
         });
       });
 
@@ -1204,301 +1249,241 @@ define([
 
         it("should apply a mixin specified as an [id]", function() {
 
-          return require.using(["pentaho/type/Context"], defineSampleMixins, function(Context) {
+          return require.using(["pentaho/type/Value", "tests/mixins/A"], defineSampleMixins, function(Value, MixinA) {
 
-            return Context.createAsync().then(function(context) {
-
-              return context.getDependencyApplyAsync(["pentaho/type/value", "tests/mixins/A"], function(Value, MixinA) {
-
-                var DerivedValue = Value.extend({
-                  $type: {
-                    mixins: [MixinA]
-                  }
-                });
-
-                var mixins = DerivedValue.type.mixins;
-
-                expect(Array.isArray(mixins)).toBe(true);
-                expect(mixins.length).toBe(1);
-
-                var mixinType = mixins[0];
-
-                expect(mixinType.instance.constructor).toBe(MixinA);
-              });
+            var DerivedValue = Value.extend({
+              $type: {
+                mixins: [MixinA]
+              }
             });
+
+            var mixins = DerivedValue.type.mixins;
+
+            expect(Array.isArray(mixins)).toBe(true);
+            expect(mixins.length).toBe(1);
+
+            var mixinType = mixins[0];
+
+            expect(mixinType.instance.constructor).toBe(MixinA);
           });
         });
 
         it("should apply a mixin specified as an id", function() {
 
-          return require.using(["pentaho/type/Context"], defineSampleMixins, function(Context) {
+          return require.using(["pentaho/type/Value", "tests/mixins/A"], defineSampleMixins, function(Value, MixinA) {
 
-            return Context.createAsync().then(function(context) {
-
-              return context.getDependencyApplyAsync(["pentaho/type/value", "tests/mixins/A"], function(Value, MixinA) {
-
-                var DerivedValue = Value.extend({
-                  $type: {
-                    mixins: MixinA
-                  }
-                });
-
-                var mixins = DerivedValue.type.mixins;
-
-                expect(Array.isArray(mixins)).toBe(true);
-                expect(mixins.length).toBe(1);
-
-                var mixinType = mixins[0];
-
-                expect(mixinType.instance.constructor).toBe(MixinA);
-              });
+            var DerivedValue = Value.extend({
+              $type: {
+                mixins: MixinA
+              }
             });
+
+            var mixins = DerivedValue.type.mixins;
+
+            expect(Array.isArray(mixins)).toBe(true);
+            expect(mixins.length).toBe(1);
+
+            var mixinType = mixins[0];
+
+            expect(mixinType.instance.constructor).toBe(MixinA);
           });
         });
 
         it("should apply a mixin specified as a [type factory]", function() {
 
-          return require.using(["pentaho/type/Context"], defineSampleMixins, function(Context) {
+          return require.using(["pentaho/type/Value", "tests/mixins/A"], defineSampleMixins, function(Value, MixinA) {
 
-            return Context.createAsync().then(function(context) {
-
-              return context.getDependencyApplyAsync(["pentaho/type/value", "tests/mixins/A"], function(Value, MixinA) {
-
-                var DerivedValue = Value.extend({
-                  $type: {
-                    mixins: [MixinA]
-                  }
-                });
-
-                var mixins = DerivedValue.type.mixins;
-
-                expect(Array.isArray(mixins)).toBe(true);
-                expect(mixins.length).toBe(1);
-
-                var mixinType = mixins[0];
-
-                expect(mixinType.instance.constructor).toBe(MixinA);
-              });
+            var DerivedValue = Value.extend({
+              $type: {
+                mixins: [MixinA]
+              }
             });
+
+            var mixins = DerivedValue.type.mixins;
+
+            expect(Array.isArray(mixins)).toBe(true);
+            expect(mixins.length).toBe(1);
+
+            var mixinType = mixins[0];
+
+            expect(mixinType.instance.constructor).toBe(MixinA);
           });
         });
 
         it("should apply a mixin specified as the [Instance] constructor", function() {
 
-          return require.using(["pentaho/type/Context"], defineSampleMixins, function(Context) {
+          return require.using(["pentaho/type/Value", "tests/mixins/A"], defineSampleMixins, function(Value, MixinA) {
 
-            return Context.createAsync().then(function(context) {
-
-              return context.getDependencyApplyAsync(["pentaho/type/value", "tests/mixins/A"], function(Value, MixinA) {
-
-                var DerivedValue = Value.extend({
-                  $type: {
-                    mixins: [MixinA]
-                  }
-                });
-
-                var mixins = DerivedValue.type.mixins;
-
-                expect(Array.isArray(mixins)).toBe(true);
-                expect(mixins.length).toBe(1);
-
-                var mixinType = mixins[0];
-                expect(mixinType.instance.constructor).toBe(MixinA);
-              });
+            var DerivedValue = Value.extend({
+              $type: {
+                mixins: [MixinA]
+              }
             });
+
+            var mixins = DerivedValue.type.mixins;
+
+            expect(Array.isArray(mixins)).toBe(true);
+            expect(mixins.length).toBe(1);
+
+            var mixinType = mixins[0];
+            expect(mixinType.instance.constructor).toBe(MixinA);
           });
         });
 
         it("should mix both instance and type methods", function() {
 
-          return require.using(["pentaho/type/Context"], defineSampleMixins, function(Context) {
+          return require.using(["pentaho/type/Value", "tests/mixins/A"], defineSampleMixins, function(Value, MixinA) {
 
-            return Context.createAsync().then(function(context) {
-
-              return context.getDependencyApplyAsync(["pentaho/type/value", "tests/mixins/A"], function(Value, MixinA) {
-
-                var DerivedValue = Value.extend({
-                  $type: {
-                    mixins: [MixinA]
-                  }
-                });
-
-                expect(typeof DerivedValue.prototype.testMethodAInst).toBe("function");
-                expect(typeof DerivedValue.type.testMethodA).toBe("function");
-              });
+            var DerivedValue = Value.extend({
+              $type: {
+                mixins: [MixinA]
+              }
             });
+
+            expect(typeof DerivedValue.prototype.testMethodAInst).toBe("function");
+            expect(typeof DerivedValue.type.testMethodA).toBe("function");
           });
         });
 
         it("should leave the target type's id unchanged", function() {
 
-          return require.using(["pentaho/type/Context"], defineSampleMixins, function(Context) {
+          return require.using(["pentaho/type/Value", "tests/mixins/A"], defineSampleMixins, function(Value, MixinA) {
 
-            return Context.createAsync().then(function(context) {
-
-              return context.getDependencyApplyAsync(["pentaho/type/value", "tests/mixins/A"], function(Value, MixinA) {
-
-                var DerivedValue = Value.extend({
-                  $type: {
-                    id: "tests/type/target",
-                    mixins: [MixinA]
-                  }
-                });
-
-                expect(DerivedValue.type.id).toBe("tests/type/target");
-              });
+            var DerivedValue = Value.extend({
+              $type: {
+                id: "tests/type/target",
+                mixins: [MixinA]
+              }
             });
+
+            expect(DerivedValue.type.id).toBe("tests/type/target");
           });
         });
 
         it("should get the local mixins only", function() {
 
-          return require.using(["pentaho/type/Context", "tests/mixins/B"], defineSampleMixins, function(Context) {
+          return require.using([
+            "pentaho/type/Value",
+            "tests/mixins/A",
+            "tests/mixins/B"
+          ], defineSampleMixins, function(Value, MixinA, MixinB) {
 
-            return Context.createAsync().then(function(context) {
-
-              return context.getDependencyApplyAsync([
-                "pentaho/type/value",
-                "tests/mixins/A",
-                "tests/mixins/B"
-              ], function(Value, MixinA, MixinB) {
-
-                var DerivedValue1 = Value.extend({
-                  $type: {
-                    mixins: [MixinA]
-                  }
-                });
-
-                var DerivedValue2 = DerivedValue1.extend({
-                  $type: {
-                    mixins: [MixinB]
-                  }
-                });
-
-                var mixins = DerivedValue1.type.mixins;
-
-                expect(Array.isArray(mixins)).toBe(true);
-                expect(mixins.length).toBe(1);
-
-                var mixinType = mixins[0];
-                expect(mixinType.instance.constructor).toBe(MixinA);
-                expect(typeof DerivedValue1.prototype.testMethodAInst).toBe("function");
-                expect(typeof DerivedValue1.type.testMethodA).toBe("function");
-
-                // ---
-
-                mixins = DerivedValue2.type.mixins;
-
-                expect(Array.isArray(mixins)).toBe(true);
-                expect(mixins.length).toBe(1);
-
-                mixinType = mixins[0];
-                expect(mixinType.instance.constructor).toBe(MixinB);
-
-                expect(typeof DerivedValue2.prototype.testMethodAInst).toBe("function");
-                expect(typeof DerivedValue2.type.testMethodA).toBe("function");
-                expect(typeof DerivedValue2.prototype.testMethodBInst).toBe("function");
-                expect(typeof DerivedValue2.type.testMethodB).toBe("function");
-              });
+            var DerivedValue1 = Value.extend({
+              $type: {
+                mixins: [MixinA]
+              }
             });
+
+            var DerivedValue2 = DerivedValue1.extend({
+              $type: {
+                mixins: [MixinB]
+              }
+            });
+
+            var mixins = DerivedValue1.type.mixins;
+
+            expect(Array.isArray(mixins)).toBe(true);
+            expect(mixins.length).toBe(1);
+
+            var mixinType = mixins[0];
+            expect(mixinType.instance.constructor).toBe(MixinA);
+            expect(typeof DerivedValue1.prototype.testMethodAInst).toBe("function");
+            expect(typeof DerivedValue1.type.testMethodA).toBe("function");
+
+            // ---
+
+            mixins = DerivedValue2.type.mixins;
+
+            expect(Array.isArray(mixins)).toBe(true);
+            expect(mixins.length).toBe(1);
+
+            mixinType = mixins[0];
+            expect(mixinType.instance.constructor).toBe(MixinB);
+
+            expect(typeof DerivedValue2.prototype.testMethodAInst).toBe("function");
+            expect(typeof DerivedValue2.type.testMethodA).toBe("function");
+            expect(typeof DerivedValue2.prototype.testMethodBInst).toBe("function");
+            expect(typeof DerivedValue2.type.testMethodB).toBe("function");
           });
         });
 
         it("should ignore duplicate mixins", function() {
 
-          return require.using(["pentaho/type/Context"], defineSampleMixins, function(Context) {
+          return require.using([
+            "pentaho/type/Value",
+            "tests/mixins/A",
+            "tests/mixins/B"
+          ], defineSampleMixins, function(Value, MixinA, MixinB) {
 
-            return Context.createAsync().then(function(context) {
-
-              return context.getDependencyApplyAsync([
-                "pentaho/type/value",
-                "tests/mixins/A",
-                "tests/mixins/B"
-              ], function(Value, MixinA, MixinB) {
-
-                var DerivedValue = Value.extend({
-                  $type: {
-                    mixins: [MixinA, MixinA, MixinB]
-                  }
-                });
-
-                var mixins = DerivedValue.type.mixins;
-
-                expect(Array.isArray(mixins)).toBe(true);
-                expect(mixins.length).toBe(2);
-
-                expect(mixins[0].instance.constructor).toBe(MixinA);
-                expect(mixins[1].instance.constructor).toBe(MixinB);
-              });
+            var DerivedValue = Value.extend({
+              $type: {
+                mixins: [MixinA, MixinA, MixinB]
+              }
             });
+
+            var mixins = DerivedValue.type.mixins;
+
+            expect(Array.isArray(mixins)).toBe(true);
+            expect(mixins.length).toBe(2);
+
+            expect(mixins[0].instance.constructor).toBe(MixinA);
+            expect(mixins[1].instance.constructor).toBe(MixinB);
           });
         });
 
         it("should ignore a nully value", function() {
 
-          return require.using(["pentaho/type/Context"], defineSampleMixins, function(Context) {
+          return require.using(["pentaho/type/Value", "tests/mixins/A"], defineSampleMixins, function(Value, MixinA) {
 
-            return Context.createAsync().then(function(context) {
-
-              return context.getDependencyApplyAsync(["pentaho/type/value", "tests/mixins/A"], function(Value, MixinA) {
-
-                var DerivedValue = Value.extend({
-                  $type: {
-                    mixins: null
-                  }
-                });
-
-                expect(DerivedValue.type.mixins).toEqual([]);
-
-                // ---
-
-                DerivedValue = Value.extend({
-                  $type: {
-                    mixins: undefined
-                  }
-                });
-
-                expect(DerivedValue.type.mixins).toEqual([]);
-
-                // ---
-
-                DerivedValue = Value.extend({
-                  $type: {
-                    mixins: [MixinA]
-                  }
-                });
-
-                DerivedValue.type.mixins = null;
-
-                expect(DerivedValue.type.mixins.length).toBe(1);
-
-                // ---
-
-                DerivedValue.type.mixins = undefined;
-
-                expect(DerivedValue.type.mixins.length).toBe(1);
-              });
+            var DerivedValue = Value.extend({
+              $type: {
+                mixins: null
+              }
             });
+
+            expect(DerivedValue.type.mixins).toEqual([]);
+
+            // ---
+
+            DerivedValue = Value.extend({
+              $type: {
+                mixins: undefined
+              }
+            });
+
+            expect(DerivedValue.type.mixins).toEqual([]);
+
+            // ---
+
+            DerivedValue = Value.extend({
+              $type: {
+                mixins: [MixinA]
+              }
+            });
+
+            DerivedValue.type.mixins = null;
+
+            expect(DerivedValue.type.mixins.length).toBe(1);
+
+            // ---
+
+            DerivedValue.type.mixins = undefined;
+
+            expect(DerivedValue.type.mixins.length).toBe(1);
           });
         });
 
         it("should allow overriding the Type#_init method from a mixin", function() {
 
-          return require.using(["pentaho/type/Context"], defineSampleMixins, function(Context) {
+          return require.using(["pentaho/type/Value", "tests/mixins/C"], defineSampleMixins, function(Value, MixinC) {
 
-            return Context.createAsync().then(function(context) {
-
-              return context.getDependencyApplyAsync(["pentaho/type/value", "tests/mixins/C"], function(Value, MixinC) {
-
-                var DerivedValue = Value.extend({
-                  $type: {
-                    mixins: [MixinC]
-                  }
-                });
-
-                expect(DerivedValue.type.__hasBeenInInit).toBe(true);
-              });
+            var DerivedValue = Value.extend({
+              $type: {
+                mixins: [MixinC]
+              }
             });
+
+            expect(DerivedValue.type.__hasBeenInInit).toBe(true);
           });
         });
       });

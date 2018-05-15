@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Value",
+  "pentaho/type/Complex",
+  "pentaho/type/Number",
+  "pentaho/type/List",
   "pentaho/util/fun",
   "tests/pentaho/util/errorMatch"
-], function(Context, fun, errorMatch) {
+], function(Value, Complex, PentahoNumber, List, fun, errorMatch) {
 
   "use strict";
-
-  /* global describe:true, it:true, expect:true, beforeEach:true, afterEach:true, jasmine:true, spyOn:true,
-    TypeError:true */
 
   function expectNoChanges(list) {
     expect(list.$changeset).toBe(null);
@@ -36,28 +36,14 @@ define([
     }
   }
 
-  describe("pentaho.type.List -", function() {
+  describe("pentaho.type.List", function() {
 
-    var context;
-    var Value;
-    var List;
-    var Complex;
-    var PentahoNumber;
     var NumberList;
 
-    beforeAll(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Value = context.get("value");
-            List = context.get("list");
-            Complex = context.get("complex");
-            PentahoNumber = context.get("number");
-            NumberList = List.extend({
-              $type: {of: PentahoNumber}
-            });
-          })
-          .then(done, done.fail);
+    beforeAll(function() {
+      NumberList = List.extend({
+        $type: {of: PentahoNumber}
+      });
     });
 
     it("is a function", function() {

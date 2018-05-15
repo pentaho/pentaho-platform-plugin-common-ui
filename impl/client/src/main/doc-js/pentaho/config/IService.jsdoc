@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,19 @@
 
 /**
  * The `config.IService` interface describes a service
- * that manages configurations, usually of types.
+ * that manages configurations of modules for a given environment.
+ *
+ * It is up to the implementation how the environment it uses to select rules
+ * is obtained.
  *
  * The [add]{@link pentaho.config.IService#add} method
  * is used to register a [config.spec.IRuleSet]{@link pentaho.config.spec.IRuleSet}
- * to the service.
+ * with the service.
  *
- * The [getAsync]{@link pentaho.config.IService#getAsync} method
- * gets a filtered configuration for a given environment.
+ * The configuration of a module can be obtained by calling the
+ * [selectAsync]{@link pentaho.config.IService#selectAsync} method.
  *
- * From the returned configuration,
- * rules for specific types or instances can be obtained
- * by calling its
- * [selectType]{@link pentaho.config.IConfiguration#selectType} and
- * [selectInstance]{@link pentaho.config.IConfiguration#selectInstance},
- * respectively.
- *
- * Rules that apply to a given type/instance and environment variables are sorted by specificity
+ * Rules that apply to a given module and environment variables are sorted by specificity
  * and then their [specifications]{@link pentaho.config.spec.IRule#apply} are merged.
  * For more information on the specificity of rules,
  * see [config.spec.IRuleSet]{@link pentaho.config.spec.IRuleSet}.
@@ -45,7 +41,7 @@
  *     // Disable a still experimental component.
  *     {
  *       "select": {
- *         "type": "my.foo.component"
+ *         "module": "my.foo.component"
  *       },
  *       "apply": {
  *         "enabled": false
@@ -55,7 +51,7 @@
  *     // Enable it, only for the dev user, "john", and the "super-app" application.
  *     {
  *       "select": {
- *         "type":        "my.foo.component",
+ *         "module":      "my.foo.component",
  *         "user":        "john",
  *         "application": "super-app"
  *       },
@@ -67,15 +63,21 @@
  * }
  * ```
  *
- * Now, given some implementation of a configuration service,
- * we could use it like in the following example:
- * ```js
- * configService.getAsync({
- *   user:        "john",
- *   application: "not-so-super-app"
- * }).then(function(config) {
+ * Additionally,
+ * assume that an implementation of a configuration service exists,
+ * setup for the environment:
  *
- *   var mergedConfigSpec = config.selectType("my.foo.component");
+ * ```json
+ * {
+ *   "user":        "john",
+ *   "application": "not-so-super-app"
+ * }
+ * ```
+ *
+ * We could use it like in the following example:
+ *
+ * ```js
+ * configService.selectAsync("my.foo.component").then(function(mergedConfigSpec) {
  *
  *   // Results in a configuration specification like:
  *   // {
@@ -87,28 +89,18 @@
  * @name pentaho.config.IService
  * @interface
  *
- * @see pentaho.config.IConfiguration
+ * @see pentaho.config.service
  * @see pentaho.config.spec.IRuleSet
  */
 
 /**
- * Obtains a promise for a configuration that applies to a given platform environment.
+ * Selects, asynchronously, the configuration of a module given its identifier.
  *
- * @name getAsync
+ * @name selectAsync
  * @memberOf pentaho.config.IService#
- * @method
- *
- * @param {pentaho.environment.IEnvironment} [environment] The platform environment that is used to select rules.
- * When unspecified, a "null" environment is used.
- *
- * A {@link Nully} variable value is equivalent to a variable that is not present.
- * It matches only configuration rules that do not select that variable.
- *
- * When the map is unspecified,
- * every variable will appear as though it had been specified with a `null` value.
- *
- * Variable values are matched against each value specified by a rule in its selection variables,
- * using JavaScript's strict equality operator, `===`.
- *
- * @return {!Promise.<!pentaho.config.IConfiguration>} A promise for the configuration.
+ * @param {string} moduleId - The identifier of the module.
+ * @param {Object} [keyArgs] - The keyword arguments.
+ * @param {boolean} [keyArgs.excludeGlobal=false] - Indicates that the global AMD/RequireJS configuration should
+ * not be included.
+ * @return {!Promise.<Object>} A promise for the configuration, if any, or a promise for `null`, otherwise.
  */

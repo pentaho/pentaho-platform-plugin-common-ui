@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,38 +14,40 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Complex",
+  "pentaho/type/List",
+  "pentaho/type/Number",
+  "pentaho/type/changes/Transaction",
   "pentaho/type/changes/Sort",
   "pentaho/util/fun"
-], function(Context, Sort, fun) {
+], function(Complex, List, PentahoNumber, Transaction, Sort, fun) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false */
 
   describe("pentaho.type.changes.Sort -", function() {
 
-    var context;
-    var List;
     var NumberList;
     var DerivedComplex;
     var ComplexList;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            List = context.get(["element"]);
+    beforeAll(function() {
 
-            NumberList = context.get(["number"]);
+      NumberList = List.extend({
+        $type: {of: PentahoNumber}
+      });
 
-            DerivedComplex = context.get({
-              props: [
-                {name: "foo", valueType: "number"}
-              ]
-            });
-            ComplexList = context.get([DerivedComplex]);
-          })
-          .then(done, done.fail);
+      DerivedComplex = Complex.extend({
+        $type: {
+          props: [
+            {name: "foo", valueType: PentahoNumber}
+          ]
+        }
+      });
+
+      ComplexList = List.extend({
+        $type: {of: DerivedComplex}
+      });
     });
 
     it("should be defined", function() {
@@ -64,7 +66,7 @@ define([
       var scope;
 
       beforeEach(function() {
-        scope = context.enterChange();
+        scope = Transaction.enter();
       });
 
       afterEach(function() {
@@ -189,7 +191,7 @@ define([
       var scope;
 
       beforeEach(function() {
-        scope = context.enterChange();
+        scope = Transaction.enter();
       });
 
       afterEach(function() {

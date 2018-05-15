@@ -22,7 +22,7 @@
  * and adds additional properties that allow specifying field count constraints.
  *
  * Objects of this interface are part of visual role properties and
- * are exposed in the [Property.Type#fields]{@link pentaho.visual.role.Property.Type#fields}
+ * are exposed in the [PropertyType#fields]{@link pentaho.visual.role.PropertyType#fields}
  * property.
  *
  * @name IFieldsConstraints
@@ -38,7 +38,7 @@
  * must be mapped for the visual role to be valid.
  *
  * For more information on this property see
- * [Property.Type#isRequired]{@link pentaho.type.Property.Type#isRequired}.
+ * [PropertyType#isRequired]{@link pentaho.type.PropertyType#isRequired}.
  *
  * @name isRequired
  * @memberOf pentaho.visual.role.IFieldsConstraints#
@@ -50,7 +50,7 @@
  * that must be mapped for the visual role to be valid.
  *
  * For more information on this property see
- * [Property.Type#countMin]{@link pentaho.type.Property.Type#countMin}.
+ * [PropertyType#countMin]{@link pentaho.type.PropertyType#countMin}.
  *
  * @name countMin
  * @memberOf pentaho.visual.role.IFieldsConstraints#
@@ -62,7 +62,7 @@
  * that can be mapped for the visual role to be valid.
  *
  * For more information on this property see
- * [Property.Type#countMax]{@link pentaho.type.Property.Type#countMax}.
+ * [PropertyType#countMax]{@link pentaho.type.PropertyType#countMax}.
  *
  * @name countMax
  * @memberOf pentaho.visual.role.IFieldsConstraints#

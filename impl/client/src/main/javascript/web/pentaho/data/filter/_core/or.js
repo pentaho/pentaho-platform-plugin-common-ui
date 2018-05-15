@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!../Or",
   "../KnownFilterKind"
-], function(KnownFilterKind) {
+], function(module, KnownFilterKind) {
 
   "use strict";
 
   return function(filter) {
 
     /**
-     * @name pentaho.data.filter.Or.Type
+     * @name pentaho.data.filter.OrType
      * @class
-     * @extends pentaho.data.filter.Tree.Type
+     * @extends pentaho.data.filter.TreeType
      *
      * @classDesc The type class of `Or` filter types.
      *
@@ -36,7 +37,7 @@ define([
      * @class
      * @extends pentaho.data.filter.Tree
      *
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.Or>} pentaho/data/filter/or
+     * @amd pentaho/data/filter/Or
      *
      * @classDesc The `Or` filter represents a boolean disjunction (an Or) filter.
      *
@@ -94,9 +95,8 @@ define([
         return filter.And;
       },
 
-      $type: /** @lends pentaho.data.filter.Or.Type# */{
-        id: "pentaho/data/filter/or",
-        alias: "or"
+      $type: /** @lends pentaho.data.filter.OrType# */{
+        id: module.id
       }
     });
   };

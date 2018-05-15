@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,12 @@
  */
 
 /**
- * The `context` namespace contains types that allow access to environmental information of the Pentaho Platform.
+ * The `environment` namespace contains types that allow access to environmental information of the Pentaho Platform.
  *
  * ## Overview
  *
- * The [IEnvironment]{@link pentaho.environment.IEnvironment} interface is the top interface that represents the environment.
+ * The [IEnvironment]{@link pentaho.environment.IEnvironment} interface is the top interface that represents
+ * the environment.
  * Part of its information is described by the contained
  * [IServer]{@link pentaho.environment.IServer} and
  * [IUser]{@link pentaho.environment.IUser} interfaces.

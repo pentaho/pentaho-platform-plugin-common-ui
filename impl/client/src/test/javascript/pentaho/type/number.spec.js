@@ -14,27 +14,13 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Number",
   "tests/pentaho/util/errorMatch"
-], function(Context, errorMatch) {
+], function(PentahoNumber, errorMatch) {
 
   "use strict";
 
-  /* global describe:true, it:true, expect:true, beforeEach:true*/
-
   describe("pentaho.type.Number -", function() {
-
-    var context;
-    var PentahoNumber;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            PentahoNumber = context.get("pentaho/type/number");
-          })
-          .then(done, done.fail);
-    });
 
     describe("new Number()", function() {
 
@@ -47,7 +33,7 @@ define([
       });
 
       it("should accept a string '1' and return the number 1", function() {
-        expect(new PentahoNumber('1').value).toBe(1);
+        expect(new PentahoNumber("1").value).toBe(1);
       });
 
       it("should throw and not accept a 'non-numeric' argument", function() {
@@ -72,5 +58,5 @@ define([
         });
       });
     });
-  }); // pentaho.type.Number
+  });
 });

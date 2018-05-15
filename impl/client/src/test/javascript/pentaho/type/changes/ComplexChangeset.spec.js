@@ -14,49 +14,39 @@
  * limitations under the License.
  */
 define([
+  "pentaho/type/Complex",
+  "pentaho/type/List",
+  "pentaho/type/Number",
+  "pentaho/type/changes/Transaction",
   "pentaho/type/changes/ComplexChangeset",
   "pentaho/type/changes/ListChangeset",
-  "pentaho/type/changes/Replace",
-  "pentaho/type/changes/Add",
-  "pentaho/type/Context",
-  "pentaho/lang/Base",
   "tests/pentaho/util/errorMatch"
-], function(ComplexChangeset, ListChangeset, Replace, Add, Context, Base, errorMatch) {
+], function(Complex, List, PentahoNumber, Transaction, ComplexChangeset, ListChangeset, errorMatch) {
+
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
   describe("pentaho.type.ComplexChangeset -", function() {
-    var context;
-    var Complex;
-    var List;
-    var PentahoNumber;
+
     var NumberList;
     var Derived;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Complex = context.get("pentaho/type/complex");
-            List = context.get("pentaho/type/list");
-            PentahoNumber = context.get("pentaho/type/number");
+    beforeAll(function() {
 
-            NumberList = List.extend({
-              $type: {of: PentahoNumber}
-            });
+      NumberList = List.extend({
+        $type: {of: PentahoNumber}
+      });
 
-            Derived = Complex.extend({
-              $type: {
-                props: [
-                  {name: "foo", valueType: "number"},
-                  {name: "bar", valueType: "number"},
-                  {name: "myList", valueType: NumberList}
-                ]
-              }
-            });
-          })
-          .then(done, done.fail);
+      Derived = Complex.extend({
+        $type: {
+          props: [
+            {name: "foo", valueType: PentahoNumber},
+            {name: "bar", valueType: PentahoNumber},
+            {name: "myList", valueType: NumberList}
+          ]
+        }
+      });
     });
 
     it("should be defined.", function() {
@@ -79,7 +69,7 @@ define([
         });
         myList = owner.myList;
 
-        scope = context.enterChange();
+        scope = Transaction.enter();
 
         owner.foo = 10;
         owner.myList.add(3);
@@ -173,19 +163,19 @@ define([
         });
 
         it("should return `false` if the ComplexChangeset does not have changes", function() {
-          var emptyChangeset = new ComplexChangeset(context.transaction, new Derived());
+          var emptyChangeset = new ComplexChangeset(scope.transaction, new Derived());
           expect(emptyChangeset.hasChanges).toBe(false);
         });
 
         it("should return `false` if the ComplexChangeset has a ListChangeset that doesn't have changes", function() {
-          var cset = new ComplexChangeset(context.transaction, new Derived());
-          cset._changes = {"myList": new ListChangeset(context.transaction, myList)};
+          var cset = new ComplexChangeset(scope.transaction, new Derived());
+          cset._changes = {"myList": new ListChangeset(scope.transaction, myList)};
 
           expect(cset.hasChanges).toBe(false);
         });
 
         it("should return `true` if the ComplexChangeset has a ListChangeset that has changes", function() {
-          var cset = new ComplexChangeset(context.transaction, new Derived());
+          var cset = new ComplexChangeset(scope.transaction, new Derived());
           cset._changes = {"myList": {hasChanges: true}};
 
           expect(cset.hasChanges).toBe(true);
@@ -273,7 +263,7 @@ define([
 
           var derived = new Derived({foo: "a"});
 
-          var txnScope = context.enterChange();
+          var txnScope = Transaction.enter();
 
           expect(derived.$hasChanges).toBe(false);
 
@@ -290,7 +280,7 @@ define([
 
           var derived = new Derived({foo: "a"});
 
-          var txnScope = context.enterChange();
+          var txnScope = Transaction.enter();
 
           derived.set("foo", "b");
 
@@ -313,7 +303,7 @@ define([
 
           var derived = new Derived({foo: "a"});
 
-          var txnScope = context.enterChange();
+          var txnScope = Transaction.enter();
 
           expect(derived.$hasChanges).toBe(false);
 
@@ -326,7 +316,7 @@ define([
 
         it("should redirect Complex#set on owner to its ambient changeset", function() {
 
-          var txnScope = context.enterChange();
+          var txnScope = Transaction.enter();
 
           var Derived = Complex.extend({$type: {props: ["foo"]}});
           var derived = new Derived({foo: "bar"});
@@ -350,7 +340,7 @@ define([
 
         it("should substitute a previous child changeset with a replace change", function() {
 
-          var txnScope = context.enterChange();
+          var txnScope = Transaction.enter();
 
           var ComplexValue = Complex.extend({
             $type: {
@@ -401,7 +391,7 @@ define([
 
         it("should preserve a previous replace over a new child changeset", function() {
 
-          var txnScope = context.enterChange();
+          var txnScope = Transaction.enter();
 
           var ComplexValue = Complex.extend({
             $type: {

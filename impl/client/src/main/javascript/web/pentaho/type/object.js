@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 define([
-  "../util/object",
-  "../i18n!types"
-], function(O, bundle) {
+  "pentaho/module!_",
+  "./Simple",
+  "pentaho/util/object",
+  "pentaho/i18n!types"
+], function(module, Simple, O, bundle) {
 
   "use strict";
 
@@ -29,64 +31,59 @@ define([
     enumerable:   false
   };
 
-  return ["simple", function(Simple) {
+  /**
+   * @name pentaho.type.Object
+   * @class
+   * @extends pentaho.type.Simple
+   * @amd pentaho/type/Object
+   *
+   * @classDesc The class that represents primitive, JavaScript {@link object} values.
+   *
+   * @description Creates an object instance.
+   */
+  return Simple.extend(/** @lends pentaho.type.Object# */{
+
+    constructor: function(spec) {
+
+      this.base(spec);
+
+      // Reuse an existing UID mark, so that two Simple instances with the same underlying primitive value
+      // are considered #equal.
+      var uid = O.getOwn(this.value, __OID_PROP);
+      if(uid == null) {
+        // Mark value with a non-enumerable property.
+        // Note that non-enumerable properties are not included by JSON.stringify.
+        __DEF_OID_PROP.value = uid = String(__simpleObjectNextUid++);
+        Object.defineProperty(this.value, __OID_PROP, __DEF_OID_PROP);
+      }
+
+      this.__uid = uid;
+    },
 
     /**
-     * @name pentaho.type.Object
-     * @class
-     * @extends pentaho.type.Simple
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Object>} pentaho/type/object
+     * Gets the unique key of the native object.
      *
-     * @classDesc The class that represents primitive, JavaScript {@link object} values.
+     * The key of a value identifies it among its _peers_.
      *
-     * @description Creates an object instance.
+     * @type {string}
+     * @readonly
      */
-    var PenObject = Simple.extend(/** @lends pentaho.type.Object# */{
+    get $key() {
+      return this.__uid;
+    },
 
-      constructor: function(spec) {
+    /**
+     * Gets the underlying object value of the value.
+     * @name pentaho.type.Object#value
+     * @type object
+     * @readonly
+     */
 
-        this.base(spec);
-
-        // Reuse an existing UID mark, so that two Simple instances with the same underlying primitive value
-        // are considered #equal.
-        var uid = O.getOwn(this.value, __OID_PROP);
-        if(uid == null) {
-          // Mark value with a non-enumerable property.
-          // Note that non-enumerable properties are not included by JSON.stringify.
-          __DEF_OID_PROP.value = uid = String(__simpleObjectNextUid++);
-          Object.defineProperty(this.value, __OID_PROP, __DEF_OID_PROP);
-        }
-
-        this.__uid = uid;
-      },
-
-      /**
-       * Gets the unique key of the native object.
-       *
-       * The key of a value identifies it among its _peers_.
-       *
-       * @type {string}
-       * @readonly
-       */
-      get $key() {
-        return this.__uid;
-      },
-
-      /**
-       * Gets the underlying object value of the value.
-       * @name pentaho.type.Object#value
-       * @type object
-       * @readonly
-       */
-
-      $type: /** @lends pentaho.type.Object.Type# */{
-        alias: "object",
-        cast: Object
-      }
-    }).implement(/** @lends pentaho.type.Object# */{
-      $type: bundle.structured["object"] // eslint-disable-line dot-notation
-    });
-
-    return PenObject;
-  }];
+    $type: /** @lends pentaho.type.ObjectType# */{
+      id: module.id,
+      cast: Object
+    }
+  })
+  .localize({$type: bundle.structured.Object})
+  .configure({$type: module.config});
 });

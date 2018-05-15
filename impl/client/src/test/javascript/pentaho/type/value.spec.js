@@ -14,27 +14,24 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context"
-], function(Context) {
+  "pentaho/type/Instance",
+  "pentaho/type/Value",
+  "pentaho/type/List",
+  "pentaho/type/Number"
+], function(Instance, Value, List, PentahoNumber) {
 
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
-
   describe("pentaho.type.Value", function() {
 
-    var context;
-    var Value;
+    var valueType;
     var NumberList;
+    var Type;
 
-    beforeAll(function(done) {
-      Context.createAsync()
-        .then(function(_context) {
-          context = _context;
-          Value = context.get("pentaho/type/value");
-          NumberList = context.get(["pentaho/type/number"]);
-        })
-        .then(done, done.fail);
+    beforeAll(function() {
+      Type = Instance.Type;
+      valueType = Value.type;
+      NumberList = List.extend({$type: {of: PentahoNumber}});
     });
 
     it("should be a function", function() {
@@ -42,18 +39,10 @@ define([
     });
 
     it("should be a sub-class of `Instance`", function() {
-      var Instance = context.get("instance");
-
       expect(Value.prototype instanceof Instance).toBe(true);
     });
 
     describe(".Type", function() {
-
-      var valueType;
-
-      beforeAll(function() {
-        valueType = Value.type;
-      });
 
       describe("#isValue", function() {
         it("should have `isValue` equal to `true`", function() {
@@ -77,19 +66,19 @@ define([
       describe("#areEqual(va, vb)", function() {
 
         it("should return `true` if both values are nully", function() {
-          expect(Value.type.areEqual(null, null)).toBe(true);
-          expect(Value.type.areEqual(undefined, undefined)).toBe(true);
-          expect(Value.type.areEqual(null, undefined)).toBe(true);
-          expect(Value.type.areEqual(undefined, null)).toBe(true);
+          expect(valueType.areEqual(null, null)).toBe(true);
+          expect(valueType.areEqual(undefined, undefined)).toBe(true);
+          expect(valueType.areEqual(null, undefined)).toBe(true);
+          expect(valueType.areEqual(undefined, null)).toBe(true);
         });
 
         it("should return `false` if only one of the values is nully", function() {
           var va = new Value();
 
-          expect(Value.type.areEqual(null, va)).toBe(false);
-          expect(Value.type.areEqual(undefined, va)).toBe(false);
-          expect(Value.type.areEqual(va, undefined)).toBe(false);
-          expect(Value.type.areEqual(va, null)).toBe(false);
+          expect(valueType.areEqual(null, va)).toBe(false);
+          expect(valueType.areEqual(undefined, va)).toBe(false);
+          expect(valueType.areEqual(va, undefined)).toBe(false);
+          expect(valueType.areEqual(va, null)).toBe(false);
         });
 
         it("should delegate to the equals method of the first value", function() {
@@ -99,7 +88,7 @@ define([
 
           spyOn(va, "equals").and.callThrough();
 
-          Value.type.areEqual(va, vb);
+          valueType.areEqual(va, vb);
 
           expect(va.equals).toHaveBeenCalledWith(vb);
         });
@@ -109,15 +98,15 @@ define([
 
         it("should call #areEqual(va, vb)", function() {
 
-          spyOn(Value.type, "areEqual").and.returnValue(false);
+          spyOn(valueType, "areEqual").and.returnValue(false);
 
           var va = {};
           var vb = {};
 
-          Value.type.areEqualContent(va, vb);
+          valueType.areEqualContent(va, vb);
 
-          expect(Value.type.areEqual).toHaveBeenCalledTimes(1);
-          expect(Value.type.areEqual).toHaveBeenCalledWith(va, vb);
+          expect(valueType.areEqual).toHaveBeenCalledTimes(1);
+          expect(valueType.areEqual).toHaveBeenCalledWith(va, vb);
         });
 
         it("should call vA.equalsContent(vb) if #areEqual returns true", function() {
@@ -125,10 +114,10 @@ define([
           var va = new Value();
           var vb = new Value();
 
-          spyOn(Value.type, "areEqual").and.returnValue(true);
+          spyOn(valueType, "areEqual").and.returnValue(true);
           spyOn(va, "equalsContent").and.returnValue(true);
 
-          var result = Value.type.areEqualContent(va, vb);
+          var result = valueType.areEqualContent(va, vb);
 
           expect(va.equalsContent).toHaveBeenCalledTimes(1);
           expect(va.equalsContent).toHaveBeenCalledWith(vb);
@@ -141,10 +130,10 @@ define([
           var va = new Value();
           var vb = new Value();
 
-          spyOn(Value.type, "areEqual").and.returnValue(false);
+          spyOn(valueType, "areEqual").and.returnValue(false);
           spyOn(va, "equalsContent");
 
-          var result = Value.type.areEqualContent(va, vb);
+          var result = valueType.areEqualContent(va, vb);
 
           expect(va.equalsContent).not.toHaveBeenCalled();
 
@@ -277,22 +266,6 @@ define([
 
     describe(".extend({...}) returns a value that -", function() {
 
-      var context;
-      var Instance;
-      var Type;
-      var Value;
-
-      beforeEach(function(done) {
-        Context.createAsync()
-            .then(function(_context) {
-              context = _context;
-              Instance = context.get("instance");
-              Type = Instance.Type;
-              Value = context.get("pentaho/type/value");
-            })
-            .then(done, done.fail);
-      });
-
       it("should be a function", function() {
         var Derived = Value.extend();
         expect(typeof Derived).toBe("function");
@@ -311,7 +284,7 @@ define([
           expect(typeof Derived.Type).toBe("function");
         });
 
-        it("should be a sub-class of Value.Type", function() {
+        it("should be a sub-class of ValueType", function() {
           var Derived = Value.extend();
           expect(Derived.Type).not.toBe(Value.Type);
           expect(Derived.type instanceof Value.Type).toBe(true);

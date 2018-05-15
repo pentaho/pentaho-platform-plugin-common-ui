@@ -19,11 +19,11 @@ define([
   "use strict";
 
   /**
-   * @name mixinError
+   * @name error
    * @memberOf pentaho.type.mixins
    * @mixin
    */
-  return /** @lends pentaho.type.mixins.mixinError */{
+  return /** @lends pentaho.type.mixins.error */{
 
     /**
      * Initializes the mixin.

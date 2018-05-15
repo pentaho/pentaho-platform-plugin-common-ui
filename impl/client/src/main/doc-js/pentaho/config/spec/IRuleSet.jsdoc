@@ -78,8 +78,8 @@
  * 3. selects a theme (and the other doesn't),
  * 4. selects a locale (and the other doesn't),
  * 5. selects an application (and the other doesn't),
- * 6. belongs to a type configuration that was added later, or
- * 7. it is at a greater index in the type configuration rules list.
+ * 6. belongs to a rule set that was added later, or
+ * 7. it is at a greater index within a rule set.
  *
  * ### Rule's Configuration Merging
  *
@@ -124,6 +124,20 @@
  * @interface
  *
  * @see pentaho.config.IService
+ */
+
+/**
+ * The context module identifier to which module and dependency identifiers are relative
+ * and that determines any applicable AMD/RequireJS module mappings.
+ *
+ * When unspecified and the rule set is registered and loaded from a module,
+ * this property defaults to that module's identifier.
+ *
+ * @name contextId
+ * @memberOf pentaho.config.spec.IRuleSet#
+ * @type {?string}
+ *
+ * @see pentaho.config.spec.IRule#deps
  */
 
 /**

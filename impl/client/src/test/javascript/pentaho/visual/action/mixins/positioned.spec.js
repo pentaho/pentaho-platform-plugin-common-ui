@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,40 +14,22 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context"
-], function(Context) {
+  "pentaho/visual/action/Base",
+  "pentaho/visual/action/mixins/Positioned"
+], function(BaseAction, PositionedActionMixin) {
 
   "use strict";
 
-  var context;
-  var BaseAction;
-  var PositionedActionMixin;
   var CustomPositionedAction;
 
-  beforeAll(function(done) {
+  beforeAll(function() {
 
-    Context.createAsync()
-        .then(function(_context) {
-
-          context = _context;
-
-          return context.getDependencyAsync({
-            BaseAction: "pentaho/visual/action/base",
-            PositionedActionMixin: "pentaho/visual/action/mixins/positioned"
-          });
-        })
-        .then(function(types) {
-          BaseAction = types.BaseAction;
-          PositionedActionMixin = types.PositionedActionMixin;
-
-          // Non-abstract, empty action, mixed-in with positioned mixin.
-          CustomPositionedAction = BaseAction.extend({
-            $type: {
-              mixins: [PositionedActionMixin]
-            }
-          });
-        })
-        .then(done, done.fail);
+    // Non-abstract, empty action, mixed-in with positioned mixin.
+    CustomPositionedAction = BaseAction.extend({
+      $type: {
+        mixins: [PositionedActionMixin]
+      }
+    });
   });
 
   describe("pentaho.visual.action.mixins.Positioned", function() {

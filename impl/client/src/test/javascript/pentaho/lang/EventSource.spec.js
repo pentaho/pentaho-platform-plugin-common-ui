@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,12 @@
 define([
   "pentaho/lang/Event",
   "pentaho/lang/EventSource",
-  "tests/pentaho/util/errorMatch",
-  "tests/test-utils"
-], function(Event, EventSource, errorMatch, testUtils) {
+  "tests/pentaho/util/errorMatch"
+], function(Event, EventSource, errorMatch) {
 
   "use strict";
 
   /* global jasmine:false, describe:false, it:false, expect:false, beforeEach:false, spyOn: false */
-
-  // Use alternate, promise-aware version of `it`.
-  var it = testUtils.itAsync;
 
   describe("pentaho.lang.EventSource -", function() {
 

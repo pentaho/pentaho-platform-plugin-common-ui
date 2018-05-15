@@ -15,13 +15,17 @@
  */
 define([
   "module",
-  "../lang/Collection",
-  "../util/arg",
-  "../util/error",
-  "../util/object"
-], function(module, Collection, arg, error, O) {
+  "./Property",
+  "./_baseLoader",
+  "pentaho/lang/Collection",
+  "pentaho/util/arg",
+  "pentaho/util/error",
+  "pentaho/util/object"
+], function(module, Property, baseLoader, Collection, arg, error, O) {
 
   "use strict";
+
+  var __propertyType = Property.type;
 
   /**
    * @name PropertyTypeCollection
@@ -42,7 +46,7 @@ define([
     /**
      * Initializes a property collection.
      *
-     * @param {pentaho.type.Complex.Type} declaringType - The declaring complex type.
+     * @param {pentaho.type.ComplexType} declaringType - The declaring complex type.
      * @ignore
      */
     constructor: function(declaringType) {
@@ -56,13 +60,10 @@ define([
 
       /**
        * Map of property types by nameAlias.
-       * @type {!Object.<string, pentaho.type.Property.Type>}
+       * @type {!Object.<string, pentaho.type.PropertyType>}
        * @private
        */
       this.__propTypesByAlias = Object.create(null);
-
-      // Caches Property.Type
-      this.__propType = null;
 
       // Copy the declaring complex type's ancestor's properties.
       var ancestorType = declaringType.ancestor;
@@ -98,7 +99,7 @@ define([
      * Gets a property type having a given name alias.
      *
      * @param {string} nameAlias - The name alias.
-     * @return {pentaho.type.Property.Type} The property type or `null`.
+     * @return {pentaho.type.PropertyType} The property type or `null`.
      */
     getByAlias: function(nameAlias) {
       return O.getOwn(this.__propTypesByAlias, nameAlias, null);
@@ -107,7 +108,7 @@ define([
     /**
      * The declaring complex type
      *
-     * @type {!pentaho.type.Complex.Type}
+     * @type {!pentaho.type.ComplexType}
      * @readOnly
      * @private
      */
@@ -115,42 +116,18 @@ define([
       return this.__cachedKeyArgs.declaringType;
     },
 
-    /**
-     * The context of properties of this property collection.
-     *
-     * @type {!pentaho.type.Context}
-     * @readOnly
-     * @private
-     */
-    get __context() {
-      return this.__declaringType.context;
-    },
-
-    /**
-     * The property type in this property collection's context.
-     *
-     * @type {!pentaho.type.Property.Type}
-     * @readOnly
-     * @private
-     */
-    get __propertyType() {
-      var propertyType = this.__propType;
-      if(!propertyType) this.__propType = propertyType = this.__context.get("property").type;
-      return propertyType;
-    },
-
     // region List implementation
     // elemClass: Property.Type, // Not really used.
 
     /**
-     * Add a {@link pentaho.type.UPropertyTypeProto} to the properties collection.
+     * Add a {@link pentaho.type.spec.PropertyType} to the properties collection.
      *
      * This method allows adding elements to the collection using custom options (keyword arguments).
      *
      * @param {string} spec - The name of the property.
      * @param {number} index - The location of the property in the collection.
      * @param {Object} ka - The keyword arguments.
-     * @return {pentaho.type.Property.Type} The property type to add.
+     * @return {pentaho.type.PropertyType} The property type to add.
      * @protected
      * @override
      */
@@ -178,15 +155,15 @@ define([
     },
 
     /**
-     * Replace a {@link pentaho.type.UPropertyTypeProto} in the properties collection.
+     * Replace a {@link pentaho.type.spec.PropertyType} in the properties collection.
      *
      * This method allows replacing elements in the collection using custom options (keyword arguments).
      *
      * @param {string} spec - The specification of the property.
      * @param {number} index - The location of the property in the collection.
-     * @param {!pentaho.type.Property.Type} existing - The existing property type.
+     * @param {!pentaho.type.PropertyType} existing - The existing property type.
      * @param {Object} keyArgs - The keyword arguments.
-     * @return {!pentaho.type.Property.Type} The replacement property type.
+     * @return {!pentaho.type.PropertyType} The replacement property type.
      * @protected
      * @override
      */
@@ -247,12 +224,12 @@ define([
     /**
      * Cast a property from the collection.
      *
-     * The cast is called to convert specs of properties that are new (not an override) into a Property.Type instance
+     * The cast is called to convert specs of properties that are new (not an override) into a PropertyType instance
      *
      * @param {string} spec - The name of the property.
      * @param {string} index - The location of the property in the collection.
      * @param {Object} [keyArgs] - The keyword arguments.
-     * @return {!pentaho.type.Property.Type} The new property type.
+     * @return {!pentaho.type.PropertyType} The new property type.
      * @protected
      */
     _cast: function(spec, index, keyArgs) {
@@ -265,10 +242,10 @@ define([
       var basePropType;
       var baseId = spec.base;
       if(!baseId) {
-        basePropType = this.__propertyType;
+        basePropType = __propertyType;
       } else {
-        basePropType = this.__context.get(baseId).type;
-        if(!basePropType.isSubtypeOf(this.__propertyType))
+        basePropType = baseLoader.resolveType(baseId).type;
+        if(!basePropType.isSubtypeOf(__propertyType))
           throw error.argInvalid("props[i]", "Property base type does not extend Property.");
       }
 
@@ -300,8 +277,8 @@ define([
      * Configures the properties collection.
      *
      * The configuration can be:
-     * 1. an array of {@link pentaho.type.UPropertyTypeProto}, or
-     * 2. an object whose keys are the property names and the values are {@link pentaho.type.UPropertyTypeProto},
+     * 1. an array of {@link pentaho.type.spec.PropertyType}, or
+     * 2. an object whose keys are the property names and the values are {@link pentaho.type.spec.PropertyType},
      *    having no name or a name equal to the key.
      *
      * @param {Object} config - The properties configuration.

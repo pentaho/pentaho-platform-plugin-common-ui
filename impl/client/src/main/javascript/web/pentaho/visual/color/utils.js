@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
+  "require",
   "pentaho/util/error"
-], function(error) {
+], function(localRequire, error) {
 
   var reRgbColor = /^rgb\((\d+),(\d+),(\d+)\)$/i;
 
@@ -237,7 +238,7 @@ define([
     color2 = end !== start ? parseColor(colors[end]) : color1;
 
     var domainMin = (start / steps) * domain + min;
-    var domainMax = (end   / steps) * domain + min;
+    var domainMax = (end / steps) * domain + min;
 
     return _getRgbGradientCore(value, domainMin, domainMax, color1, color2);
   }
@@ -263,9 +264,9 @@ define([
     color = parseColor(color);
     k = Math.pow(0.7, k != null ? k : 1);
     return getRgbColor(
-          Math.max(0, Math.floor(k * color[0])),
-          Math.max(0, Math.floor(k * color[1])),
-          Math.max(0, Math.floor(k * color[2])));
+      Math.max(0, Math.floor(k * color[0])),
+      Math.max(0, Math.floor(k * color[1])),
+      Math.max(0, Math.floor(k * color[2])));
   }
 
   function getRgbStep(value, min, max, colors) {
@@ -312,7 +313,7 @@ define([
   // paletteId:  "divergentRyg3", "divergentRyg5", "divergentRyb3", "divergentRyb5",
   //             "quantitativeBlue3", "quantitativeBlue5", "quantitativeGray3", "quantitativeGray5"
 
-  function buildPalette(context, colorSet, pattern, reversed) {
+  function buildPalette(colorSet, pattern, reversed) {
 
     var colors = null;
 
@@ -342,7 +343,7 @@ define([
       // ----
       var paletteId = "pentaho/visual/color/palettes/" + suffix;
 
-      var palette = context.instances.getById(paletteId);
+      var palette = localRequire(paletteId);
 
       colors = palette.colors.toArray(function(color) { return color.value; });
 

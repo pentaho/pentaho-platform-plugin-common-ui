@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!_",
+  "pentaho/type/String",
+  "pentaho/type/mixins/Enum",
   "pentaho/i18n!../i18n/model"
-], function(bundle) {
+], function(module, PentahoString, EnumMixin, bundle) {
 
   "use strict";
 
-  return ["string", function(PentahoString) {
+  return PentahoString.extend({
 
-    return PentahoString.extend({
-
-      $type: {
-        mixins: ["enum"],
-        domain: ["none", "solid", "gradient"]
-      }
-    })
-    .implement({$type: bundle.structured.backgroundFill});
-  }];
+    $type: {
+      id: module.id,
+      mixins: [EnumMixin],
+      domain: ["none", "solid", "gradient"]
+    }
+  })
+  .localize({$type: bundle.structured.BackgroundFill})
+  .configure({$type: module.config});
 });

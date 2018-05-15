@@ -95,7 +95,8 @@
         <executions>
           <execution>
             <id>prepare-assembly</id>
-            <phase>prepare-package</phase>
+            <!-- Task 1 -->
+            <phase>generate-resources</phase>
             <goals>
               <goal>single</goal>
             </goals>
@@ -108,9 +109,11 @@
               <finalName>${prepared.assembly.name}</finalName>
             </configuration>
           </execution>
+
+          <!-- Task 2 -->
           <execution>
             <id>prepare-platform-plugin-js</id>
-            <phase>package</phase>
+            <phase>process-resources</phase>
             <goals>
               <goal>single</goal>
             </goals>
@@ -123,6 +126,8 @@
               <finalName>${js.assembly.name}</finalName>
             </configuration>
           </execution>
+
+          <!-- Tasks 4 -->
           <execution>
             <id>bundle-common-ui-platform-plugin-js</id>
             <phase>package</phase>
@@ -163,6 +168,27 @@
               </descriptors>
               <appendAssemblyId>true</appendAssemblyId>
               <classifier>sources</classifier>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <!-- Task 3 -->
+          <execution>
+            <id>javascript-requirecfg-extra</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <concat destfile="${js.assembly.directory}/common-ui/common-ui-require-js-cfg.js" force="yes" append="yes">
+                  <file file="src/main/assembly/resources/require-js-cfg-extra.js" />
+                </concat>
+              </target>
             </configuration>
           </execution>
         </executions>

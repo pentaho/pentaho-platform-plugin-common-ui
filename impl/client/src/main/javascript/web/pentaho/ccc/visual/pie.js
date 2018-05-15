@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,122 +14,120 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!_",
+  "./Abstract",
+  "pentaho/visual/models/Pie",
   "./_util"
-], function(util) {
+], function(module, BaseView, Model, util) {
 
   "use strict";
 
-  return [
-    "./abstract",
-    "pentaho/visual/models/pie",
-    function(BaseView, Model) {
+  return BaseView.extend({
+    $type: {
+      id: module.id,
+      props: {
+        model: {valueType: Model}
+      }
+    },
 
-      return BaseView.extend({
-        $type: {
-          props: {
-            model: {valueType: Model}
-          }
-        },
+    _cccClass: "PieChart",
 
-        _cccClass: "PieChart",
+    _roleToCccRole: {
+      "columns": "multiChart",
+      "rows": "category",
+      "measures": "value"
+    },
 
-        _roleToCccRole: {
-          "columns": "multiChart",
-          "rows": "category",
-          "measures": "value"
-        },
+    _genericMeasureCccVisualRole: "value",
+    _genericMeasureDiscrimCccVisualRole: "multiChart",
 
-        _genericMeasureCccVisualRole: "value",
-        _genericMeasureDiscrimCccVisualRole: "multiChart",
+    _multiRole: "columns",
 
-        _multiRole: "columns",
+    _discreteColorRole: "rows",
 
-        _discreteColorRole: "rows",
+    _tooltipHidePercentageOnPercentFields: true,
 
-        _tooltipHidePercentageOnPercentFields: true,
+    _configureOptions: function() {
 
-        _configureOptions: function() {
+      this.base();
 
-          this.base();
+      if(this.options.valuesVisible) {
+        this._configureValuesMask();
+      }
+    },
 
-          if(this.options.valuesVisible) {
-            this._configureValuesMask();
-          }
-        },
+    _configureLabels: function() {
 
-        _configureLabels: function() {
+      this.base();
 
-          this.base();
+      if(this.options.valuesVisible) {
+        this.options.valuesLabelStyle = this.model.labelsOption === "outside" ? "linked" : this.model.labelsOption;
+      }
+    },
 
-          if(this.options.valuesVisible) {
-            this.options.valuesLabelStyle = this.model.labelsOption === "outside" ? "linked" : this.model.labelsOption;
-          }
-        },
+    _configureLabelsAnchor: function() {
+      // NOOP
+    },
 
-        _configureLabelsAnchor: function() {
-          // NOOP
-        },
+    _configureMultiChart: function() {
 
-        _configureMultiChart: function() {
+      this.base();
 
-          this.base();
+      this.options.legendSizeMax = "50%";
+    },
 
-          this.options.legendSizeMax = "50%";
-        },
+    _configureValuesMask: function() {
+      // Change values mask according to each category's
+      // discriminated measure being isPercent or not
+      if(this._isGenericMeasureMode) {
+        var mappingFieldInfosByName = this._mappingFieldInfosByName;
 
-        _configureValuesMask: function() {
-          // Change values mask according to each category's
-          // discriminated measure being isPercent or not
-          if(this._isGenericMeasureMode) {
-            var mappingFieldInfosByName = this._mappingFieldInfosByName;
+        // e.g. sizeRole.dim
+        var genericMeasureDiscrimName = this._genericMeasureDiscrimCccDimName;
 
-            // e.g. sizeRole.dim
-            var genericMeasureDiscrimName = this._genericMeasureDiscrimCccDimName;
+        this.options.pie = {
+          scenes: {
+            category: {
+              sliceLabelMask: function() {
 
-            this.options.pie = {
-              scenes: {
-                category: {
-                  sliceLabelMask: function() {
+                var meaasureMappingFieldInfoName = this.atoms[genericMeasureDiscrimName].value;
 
-                    var meaasureMappingFieldInfoName = this.atoms[genericMeasureDiscrimName].value;
-
-                    if(mappingFieldInfosByName[meaasureMappingFieldInfoName].sourceIsPercent) {
-                      // the value is the percentage itself;
-                      return "{value}";
-                    }
-
-                    return "{value} ({value.percent})";
-                  }
+                if(mappingFieldInfosByName[meaasureMappingFieldInfoName].sourceIsPercent) {
+                  // the value is the percentage itself;
+                  return "{value}";
                 }
-              }
-            };
-          } else {
-            var measureMappingFieldInfo = this._getMappingFieldInfosOfRole("measures")[0];
-            this.options.valuesMask = measureMappingFieldInfo.sourceIsPercent ? "{value}" : "{value} ({value.percent})";
-          }
-        },
 
-        _getDiscreteColorMap: function() {
-          var memberPalette = this._getMemberPalette();
-          var colorMap;
-          if(memberPalette) {
-            var colorMappingFieldInfos =
-                this._getMappingFieldInfosOfRole(this._discreteColorRole, /* excludeMeasureDiscrim: */true) || [];
-            var C = colorMappingFieldInfos.length;
-            // C >= 0 (color -> "rows" -> is optional)
-            // When multiple measures exist, the pie chart shows them as multiple charts.
-            // If measures would affect color, each small chart would have a single color.
-            // => consider M = 0;
-            // If C > 0, use the members' colors of the last color field.
-            if(C > 0) {
-              var mappingFieldInfo = colorMappingFieldInfos[C - 1];
-              colorMap = util.copyColorMap(null, memberPalette[mappingFieldInfo.name]);
+                return "{value} ({value.percent})";
+              }
             }
           }
+        };
+      } else {
+        var measureMappingFieldInfo = this._getMappingFieldInfosOfRole("measures")[0];
+        this.options.valuesMask = measureMappingFieldInfo.sourceIsPercent ? "{value}" : "{value} ({value.percent})";
+      }
+    },
 
-          return colorMap;
+    _getDiscreteColorMap: function() {
+      var memberPalette = this._getMemberPalette();
+      var colorMap;
+      if(memberPalette) {
+        var colorMappingFieldInfos =
+            this._getMappingFieldInfosOfRole(this._discreteColorRole, /* excludeMeasureDiscrim: */true) || [];
+        var C = colorMappingFieldInfos.length;
+        // C >= 0 (color -> "rows" -> is optional)
+        // When multiple measures exist, the pie chart shows them as multiple charts.
+        // If measures would affect color, each small chart would have a single color.
+        // => consider M = 0;
+        // If C > 0, use the members' colors of the last color field.
+        if(C > 0) {
+          var mappingFieldInfo = colorMappingFieldInfos[C - 1];
+          colorMap = util.copyColorMap(null, memberPalette[mappingFieldInfo.name]);
         }
-      });
+      }
+
+      return colorMap;
     }
-  ];
+  })
+  .configure({$type: module.config});
 });

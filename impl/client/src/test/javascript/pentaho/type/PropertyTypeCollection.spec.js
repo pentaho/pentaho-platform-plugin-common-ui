@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Property",
+  "pentaho/type/Boolean",
+  "pentaho/type/Complex",
+  "pentaho/type/String",
   "pentaho/type/PropertyTypeCollection",
   "tests/pentaho/util/errorMatch"
-], function(Context, PropertyTypeCollection, errorMatch) {
+], function(Property, PentahoBoolean, Complex, PentahoString, PropertyTypeCollection, errorMatch) {
 
   "use strict";
 
@@ -25,30 +28,16 @@ define([
 
   describe("pentaho/type/PropertyTypeCollection -", function() {
 
-    var context;
-    var Property;
-    var PentahoBoolean;
-    var PentahoString;
-    var Complex;
     var PostalCode;
     var Derived;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Property = context.get("property");
-            PentahoBoolean = context.get("boolean");
-            PentahoString = context.get("string");
-            Complex = context.get("complex");
-            PostalCode = PentahoString.extend();
-            Derived = Complex.extend({
-              $type: {
-                props: ["foo", "guru"]
-              }
-            });
-          })
-          .then(done, done.fail);
+    beforeAll(function() {
+      PostalCode = PentahoString.extend();
+      Derived = Complex.extend({
+        $type: {
+          props: ["foo", "guru"]
+        }
+      });
     });
 
     it("is a function", function() {
@@ -76,7 +65,7 @@ define([
         expect(props.length).toBe(0);
       });
 
-      it("should convert an array of pentaho.type.UPropertyTypeProto", function() {
+      it("should convert an array of pentaho.type.spec.PropertyType", function() {
 
         var props = PropertyTypeCollection.to(["foo", "bar"], Derived.type);
 
@@ -171,7 +160,7 @@ define([
           }).toThrow(errorMatch.argRequired("config"));
         });
 
-        it("should accept an array of pentaho.type.UPropertyTypeProto", function() {
+        it("should accept an array of pentaho.type.spec.PropertyType", function() {
           props.configure(["foo", "bar"]);
 
           expect(props.length).toBe(2);
@@ -181,7 +170,7 @@ define([
           expect(props[1].valueType).toBe(PentahoString.type);
         });
 
-        it("should accept an array of pentaho.type.UPropertyTypeProto whose elements " +
+        it("should accept an array of pentaho.type.spec.PropertyType whose elements " +
           "were previously defined", function() {
           var props = PropertyTypeCollection.to(["foo", {name: "eggs", valueType: "boolean"}], Derived.type);
 
@@ -197,7 +186,7 @@ define([
         });
 
         it("should accept an object whose keys are the property names and the values are " +
-           "pentaho.type.UPropertyTypeProto", function() {
+           "pentaho.type.spec.PropertyType", function() {
 
           props.configure({
             foo:  {name: "foo", valueType: "boolean"},
@@ -277,14 +266,16 @@ define([
 
       var props;
 
-      beforeEach(function() {
+      beforeAll(function() {
         MoreDerived = Derived.extend({
           $type: {
             label: "MoreDerived",
             props: ["bar"]
           }
         });
+      });
 
+      beforeEach(function() {
         props = PropertyTypeCollection.to([], MoreDerived.type);
       });
 

@@ -15,7 +15,7 @@
  */
 
 // TODO: Removed from docs, below, until isIn is made public.
-// [pentaho/data/filter/isIn]{@link pentaho.data.filter.IsIn}
+// [pentaho/data/filter/IsIn]{@link pentaho.data.filter.IsIn}
 
 /**
  * The `filter` namespace constitutes the **Pentaho Filter API** and
@@ -25,17 +25,17 @@
  *
  * The standard filter types are:
  *
- * * [pentaho/data/filter/abstract]{@link pentaho.data.filter.Abstract}
- *   * [pentaho/data/filter/tree]{@link pentaho.data.filter.Tree}
- *     * [pentaho/data/filter/and]{@link pentaho.data.filter.And}
- *     * [pentaho/data/filter/or]{@link pentaho.data.filter.Or}
- *   * [pentaho/data/filter/not]{@link pentaho.data.filter.Not}
- *   * [pentaho/data/filter/property]{@link pentaho.data.filter.Property}
- *     * [pentaho/data/filter/isEqual]{@link pentaho.data.filter.IsEqual}
- *     * [pentaho/data/filter/isGreater]{@link pentaho.data.filter.IsGreater}
- *     * [pentaho/data/filter/isLess]{@link pentaho.data.filter.IsLess}
- *     * [pentaho/data/filter/isGreaterOrEqual]{@link pentaho.data.filter.IsGreaterOrEqual}
- *     * [pentaho/data/filter/isLessOrEqual]{@link pentaho.data.filter.IsLessOrEqual}
+ * * [pentaho/data/filter/Abstract]{@link pentaho.data.filter.Abstract}
+ *   * [pentaho/data/filter/Tree]{@link pentaho.data.filter.Tree}
+ *     * [pentaho/data/filter/And]{@link pentaho.data.filter.And}
+ *     * [pentaho/data/filter/Or]{@link pentaho.data.filter.Or}
+ *   * [pentaho/data/filter/Not]{@link pentaho.data.filter.Not}
+ *   * [pentaho/data/filter/Property]{@link pentaho.data.filter.Property}
+ *     * [pentaho/data/filter/IsEqual]{@link pentaho.data.filter.IsEqual}
+ *     * [pentaho/data/filter/IsGreater]{@link pentaho.data.filter.IsGreater}
+ *     * [pentaho/data/filter/IsLess]{@link pentaho.data.filter.IsLess}
+ *     * [pentaho/data/filter/IsGreaterOrEqual]{@link pentaho.data.filter.IsGreaterOrEqual}
+ *     * [pentaho/data/filter/IsLessOrEqual]{@link pentaho.data.filter.IsLessOrEqual}
  *     * [pentaho/data/filter/IsLike]{@link pentaho.data.filter.IsLike}
  *
  * @name pentaho.data.filter

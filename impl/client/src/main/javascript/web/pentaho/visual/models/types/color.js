@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "pentaho/module!_",
+  "pentaho/type/String"
+], function(module, PentahoString) {
 
   "use strict";
 
-  return ["string", function(PentahoString) {
-
-    return PentahoString.extend();
-  }];
+  return PentahoString.extend({
+    $type: {
+      id: module.id
+    }
+  })
+  .configure({$type: module.config});
 });

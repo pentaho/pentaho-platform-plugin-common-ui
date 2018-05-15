@@ -14,57 +14,48 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Complex",
+  "pentaho/type/Property",
+  "pentaho/type/Value",
+  "pentaho/type/String",
   "pentaho/type/PropertyTypeCollection",
   "tests/pentaho/util/errorMatch",
   "tests/pentaho/type/sloppyModeUtil"
-], function(Context, PropertyTypeCollection, errorMatch, sloppyModeUtil) {
+], function(Complex, Property, Value, PentahoString, PropertyTypeCollection, errorMatch, sloppyModeUtil) {
+
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.type.Complex.Type", function() {
+  describe("pentaho.type.ComplexType", function() {
 
-    var context;
-    var Property;
-    var PropertyType;
-    var Value;
-    var Complex;
-    var PentahoString;
+    var PropertyType = Property.Type;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Property = context.get("property");
-            PropertyType = Property.Type;
-            Value = context.get("value");
-            Complex = context.get("complex");
-            PentahoString = context.get("string");
-          })
-          .then(done, done.fail);
+    var CustomComplex;
+
+    beforeAll(function() {
+      CustomComplex = Complex.extend();
     });
 
     describe("anatomy", function() {
-      it("should be a function", function() {
-        var Derived = Complex.extend();
 
-        expect(typeof Derived.Type).toBe("function");
+      it("should be a function", function() {
+        expect(typeof CustomComplex.Type).toBe("function");
       });
 
       it("should be a sub-class of Complex", function() {
-        var Derived = Complex.extend();
-
-        expect(Derived.Type).not.toBe(Value.Type);
-        expect(Derived.Type).not.toBe(Complex.Type);
-        expect(Derived.type instanceof Complex.Type).toBe(true);
+        expect(CustomComplex.Type).not.toBe(Value.Type);
+        expect(CustomComplex.Type).not.toBe(Complex.Type);
+        expect(CustomComplex.type instanceof Complex.Type).toBe(true);
       });
     });
 
     describe(".extend(...)", function() {
       describe("props", function() {
         describe("when not specified or specified empty", function() {
+
           it("should have no properties", function() {
+
             var Derived = Complex.extend();
 
             expect(Derived.type.count).toBe(0);
@@ -111,6 +102,7 @@ define([
         }); // When not specified or specified empty.
 
         describe("when specified with a single 'string' entry", function() {
+
           var Derived;
 
           beforeEach(function() {
@@ -317,8 +309,8 @@ define([
             }).toThrow(errorMatch.argInvalid("config"));
           });
         });
-      }); // props
-    }); // .extend(...)
+      });
+    });
 
     describe(".implement(...)", function() {
       it("should be possible to configure existing properties with a dictionary", function() {
@@ -360,7 +352,7 @@ define([
       var Derived;
       var DerivedB;
 
-      beforeEach(function() {
+      beforeAll(function() {
         Derived = Complex.extend({$type: {
           props: ["foo", "bar"]
         }});
@@ -417,7 +409,7 @@ define([
         return Complex.type.at.apply(Complex.type, args);
       }
 
-      beforeEach(function() {
+      beforeAll(function() {
         Derived = Complex.extend({$type: {
           props: ["foo", "bar"]
         }});
@@ -454,6 +446,7 @@ define([
     });
 
     describe("#get(name[, sloppy])", function() {
+
       var Derived;
 
       function getter(args) {
@@ -461,9 +454,11 @@ define([
       }
 
       beforeEach(function() {
-        Derived = Complex.extend({$type: {
-          props: ["foo", "bar"]
-        }});
+        Derived = Complex.extend({
+          $type: {
+            props: ["foo", "bar"]
+          }
+        });
       });
 
       describe("when name is not specified or is nully", function() {
@@ -576,7 +571,7 @@ define([
       });
     });
 
-    describe("#add", function() {
+    describe("#add(...)", function() {
       it("should add new properties", function() {
         var Derived = Complex.extend({
           $type: {
@@ -741,9 +736,12 @@ define([
 
     describe("#eachCommonWith(otherType, f, x)", function() {
 
-      it("should call f once for each corresponding property of the common base type", function() {
+      var BaseType;
+      var SubTypeA;
+      var SubTypeB;
 
-        var BaseType = Complex.extend({
+      beforeAll(function() {
+        BaseType = Complex.extend({
           $type: {
             props: [
               {name: "a", valueType: "string"},
@@ -751,9 +749,11 @@ define([
             ]
           }
         });
+        SubTypeA = BaseType.extend();
+        SubTypeB = BaseType.extend();
+      });
 
-        var SubTypeA = BaseType.extend();
-        var SubTypeB = BaseType.extend();
+      it("should call f once for each corresponding property of the common base type", function() {
 
         var f = jasmine.createSpy();
 
@@ -766,18 +766,6 @@ define([
       it("should call f once for each corresponding property of the common base type, " +
          "passing the index as second argument", function() {
 
-        var BaseType = Complex.extend({
-          $type: {
-            props: [
-              {name: "a", valueType: "string"},
-              {name: "b", valueType: "string"}
-            ]
-          }
-        });
-
-        var SubTypeA = BaseType.extend();
-        var SubTypeB = BaseType.extend();
-
         var f = jasmine.createSpy();
 
         SubTypeA.type.eachCommonWith(SubTypeB.type, f);
@@ -789,18 +777,6 @@ define([
       it("should call f once for each corresponding property of the common base type, " +
           "passing this as third argument", function() {
 
-        var BaseType = Complex.extend({
-          $type: {
-            props: [
-              {name: "a", valueType: "string"},
-              {name: "b", valueType: "string"}
-            ]
-          }
-        });
-
-        var SubTypeA = BaseType.extend();
-        var SubTypeB = BaseType.extend();
-
         var f = jasmine.createSpy();
 
         SubTypeA.type.eachCommonWith(SubTypeB.type, f);
@@ -811,17 +787,6 @@ define([
 
       it("should call f on the given x", function() {
 
-        var BaseType = Complex.extend({
-          $type: {
-            props: [
-              {name: "a", valueType: "string"}
-            ]
-          }
-        });
-
-        var SubTypeA = BaseType.extend();
-        var SubTypeB = BaseType.extend();
-
         var f = jasmine.createSpy();
 
         var x = {};
@@ -831,17 +796,6 @@ define([
       });
 
       it("should return this", function() {
-
-        var BaseType = Complex.extend({
-          $type: {
-            props: [
-              {name: "a", valueType: "string"}
-            ]
-          }
-        });
-
-        var SubTypeA = BaseType.extend();
-        var SubTypeB = BaseType.extend();
 
         var f = jasmine.createSpy();
 
@@ -878,18 +832,6 @@ define([
       });
 
       it("should stop iteration if f returns false", function() {
-
-        var BaseType = Complex.extend({
-          $type: {
-            props: [
-              {name: "a", valueType: "string"},
-              {name: "b", valueType: "string"}
-            ]
-          }
-        });
-
-        var SubTypeA = BaseType.extend();
-        var SubTypeB = BaseType.extend();
 
         var f = jasmine.createSpy().and.callFake(function() { return false; });
 
@@ -961,24 +903,24 @@ define([
 
     describe("#isReadOnly", function() {
 
+      var Derived;
+
+      beforeAll(function() {
+        Derived = Complex.extend({
+          $type: {isReadOnly: true}
+        });
+      });
+
       it("should default to `false`", function() {
         expect(Complex.type.isReadOnly).toBe(false);
       });
 
       it("should respect a specified value when the base value is false", function() {
 
-        var Derived = Complex.extend({
-          $type: {isReadOnly: true}
-        });
-
         expect(Derived.type.isReadOnly).toBe(true);
       });
 
       it("should ignore a specified value when the base value is true", function() {
-
-        var Derived = Complex.extend({
-          $type: {isReadOnly: true}
-        });
 
         var Derived2 = Derived.extend({
           $type: {isReadOnly: false}
@@ -988,10 +930,6 @@ define([
       });
 
       it("should inherit the base value", function() {
-
-        var Derived = Complex.extend({
-          $type: {isReadOnly: true}
-        });
 
         var Derived2 = Derived.extend();
 
@@ -1013,17 +951,23 @@ define([
 
       it("should allow if true and the base complex type does not have properties", function() {
 
-        var Derived = Complex.extend();
-
-        var Derived2 = Derived.extend({
+        var Derived2 = CustomComplex.extend({
           $type: {isReadOnly: true}
         });
 
         expect(Derived2.type.isReadOnly).toBe(true);
       });
-    }); // end isReadOnly
+    });
 
     describe("#isEntity", function() {
+
+      var ComplexEntity;
+
+      beforeAll(function() {
+        ComplexEntity = Complex.extend({
+          $type: {isEntity: true}
+        });
+      });
 
       it("should default to `false`", function() {
         expect(Complex.type.isEntity).toBe(false);
@@ -1031,20 +975,12 @@ define([
 
       it("should respect a specified value when the base value is false", function() {
 
-        var Derived = Complex.extend({
-          $type: {isEntity: true}
-        });
-
-        expect(Derived.type.isEntity).toBe(true);
+        expect(ComplexEntity.type.isEntity).toBe(true);
       });
 
       it("should ignore a specified value when the base value is true", function() {
 
-        var Derived = Complex.extend({
-          $type: {isEntity: true}
-        });
-
-        var Derived2 = Derived.extend({
+        var Derived2 = ComplexEntity.extend({
           $type: {isEntity: false}
         });
 
@@ -1053,15 +989,10 @@ define([
 
       it("should inherit the base value", function() {
 
-        var Derived = Complex.extend({
-          $type: {isEntity: true}
-        });
-
-        var Derived2 = Derived.extend();
+        var Derived2 = ComplexEntity.extend();
 
         expect(Derived2.type.isEntity).toBe(true);
       });
-    }); // end isEntity
-
-  }); // end pentaho.type.Complex.Type
+    });
+  }); // end pentaho.type.ComplexType
 });

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,50 +14,34 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Complex",
+  "pentaho/data/filter/IsGreaterOrEqual",
   "./propertyUtils"
-], function(Context, propertyUtils) {
+], function(Complex, IsGreaterOrEqualFilter, propertyUtils) {
 
   "use strict";
 
   describe("pentaho.data.filter.IsGreaterOrEqual", function() {
 
-    var context;
-    var Complex;
-    var IsGreaterOrEqualFilter;
     var ProductSummary;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-
-            context = _context;
-            Complex = context.get("complex");
-
-            ProductSummary = Complex.extend({
-              $type: {
-                props: [
-                  {name: "name", valueType: "string", label: "Name"},
-                  {name: "sales", valueType: "number", label: "Sales"},
-                  {name: "inStock", valueType: "boolean", label: "In Stock"}
-                ]
-              }
-            });
-
-            return context.getDependencyApplyAsync([
-              "pentaho/data/filter/isGreaterOrEqual"
-            ], function(IsGreaterOrEqual) {
-              IsGreaterOrEqualFilter = IsGreaterOrEqual;
-            });
-          })
-          .then(done, done.fail);
-
+    beforeAll(function() {
+      ProductSummary = Complex.extend({
+        $type: {
+          props: [
+            {name: "name", valueType: "string", label: "Name"},
+            {name: "sales", valueType: "number", label: "Sales"},
+            {name: "inStock", valueType: "boolean", label: "In Stock"}
+          ]
+        }
+      });
     });
 
     propertyUtils.behavesLikeProperty(function() { return IsGreaterOrEqualFilter; }, {
       valueType: "number",
       rawValue: 42,
       kind: "isGreaterOrEqual",
+      id: "IsGreaterOrEqual",
       alias: ">="
     });
 

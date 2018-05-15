@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,40 +14,15 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/visual/models/Bar",
+  "pentaho/ccc/visual/Bar",
+  "pentaho/ccc/visual/Abstract",
   "pentaho/data/Table"
-], function(Context, Table) {
+], function(BarModel, BarView, AbstractView, Table) {
 
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false*/
-  /* global document:false*/
-
   describe("pentaho.visual.ccc.views.Bar", function() {
-
-    var context;
-    var BarModel;
-    var BarView;
-    var AbstractView;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-
-            context = _context;
-
-            return context.getDependencyApplyAsync([
-              "pentaho/visual/models/bar",
-              "pentaho/ccc/visual/bar",
-              "pentaho/ccc/visual/abstract"
-            ], function(_BarModel, _BarView, _AbstractView) {
-              BarModel = _BarModel;
-              BarView  = _BarView;
-              AbstractView = _AbstractView;
-            });
-          })
-          .then(done, done.fail);
-    });
 
     it("should be a function", function() {
       expect(typeof BarView).toBe("function");

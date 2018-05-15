@@ -58,17 +58,17 @@ define([
      *
      * @param {String} url - A resource location.
      *
-     * @return {Array.<String>} the parsed url. 
+     * @return {Array.<String>} the parsed url.
      */
     parse: parseUrl
   };
 
   function createUrl(url) {
-    if (!url) {
+    if(!url) {
       return null;
     }
 
-    if (has("URL")) {
+    if(has("URL")) {
       return new URL(url, document.location);
     }
 

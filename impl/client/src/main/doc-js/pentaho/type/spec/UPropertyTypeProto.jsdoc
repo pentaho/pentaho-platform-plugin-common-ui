@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 
 /**
- * A `spec.UPropertyTypeProto` represents the union of JS types that can be used to
+ * A `spec.PropertyType` represents the union of JS types that can be used to
  * define a property of a complex type.
  *
  * When the value is a string,
  * it's taken to represent a property
- * whose {@link pentaho.type.spec.IPropertyTypeProto#name} is that string
+ * whose {@link pentaho.type.spec.IPropertyType#name} is that string
  * and
- * whose {@link pentaho.type.spec.IPropertyTypeProto#valueType} is {@link pentaho.type.String}.
+ * whose {@link pentaho.type.spec.IPropertyType#valueType} is {@link pentaho.type.String}.
  *
- * @typedef {string|pentaho.type.spec.IPropertyTypeProto} pentaho.type.spec.UPropertyTypeProto
+ * @typedef {string|pentaho.type.spec.IPropertyType} pentaho.type.spec.PropertyType
  */

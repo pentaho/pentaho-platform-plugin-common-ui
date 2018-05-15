@@ -78,33 +78,33 @@ match the absolute module identifier listed in the config object.
 Modules with a matching module identifier can access the configuration object via `module.config`.
 
 In particular, 
-this is used to configure the [`pentaho/instanceInfo`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.instanceInfo'}}) 
-plugin, used as a basic inversion-of-control mechanism to inject the package resources into the system.
+this is used to configure the `pentaho/modules` module, 
+used as a basic inversion-of-control mechanism to inject the package resources into the system.
 
 For instance, to declare that the resource `"my-viz/config.js"` 
-is an instance of type `"pentaho.config.spec.IRuleSet"`, 
+is an instance of type `"pentaho/config/spec/IRuleSet"`, 
 you would need:
 ```json
 { 
   "name": "baz",
   "version": "1.0.0",
   "config": {
-    "pentaho/instanceInfo": {
-      "baz/my-viz/config": {"type": "pentaho.config.spec.IRuleSet"}
+    "pentaho/modules": {
+      "baz/my-viz/config": {"type": "pentaho/config/spec/IRuleSet"}
     }
   }
 }
 ```
 
-Another use is to declare that a type such as that exported by the module `"my-viz/model.js"` is 
+Another use is to declare that a type such as that exported by the module `"my-viz/Model.js"` is 
 a visualization model type.
 ```json
 { 
   "name": "baz",
   "version": "1.0.0",
   "config": {
-    "pentaho/typeInfo": {
-      "baz/my-viz/model": {"base": "pentaho/visual/base/model"}
+    "pentaho/modules": {
+      "baz/my-viz/Model": {"base": "pentaho/visual/base/Model"}
     }
   }
 }

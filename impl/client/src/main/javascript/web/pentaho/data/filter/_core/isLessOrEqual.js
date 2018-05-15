@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!../IsLessOrEqual",
   "../KnownFilterKind"
-], function(KnownFilterKind) {
+], function(module, KnownFilterKind) {
 
   "use strict";
 
   return function(filter) {
 
     /**
-     * @name pentaho.data.filter.IsLessOrEqual.Type
+     * @name pentaho.data.filter.IsLessOrEqualType
      * @class
-     * @extends pentaho.data.filter.Property.Type
+     * @extends pentaho.data.filter.PropertyType
      *
      * @classDesc The type class of the less or equal than filter type.
      *
@@ -35,7 +36,7 @@ define([
      * @name pentaho.data.filter.IsLessOrEqual
      * @class
      * @extends pentaho.data.filter.Property
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.IsLessOrEqual>} pentaho/data/filter/isLessOrEqual
+     * @amd pentaho/data/filter/IsLessOrEqual
      *
      * @classDesc The `IsLessOrEqual` class represents a filter for being less than or equal to a given value.
      * The filter selects elements having the value of a certain property less or equal than a reference
@@ -89,9 +90,8 @@ define([
         return (this.property || "") + " " + (v ? v.$key : "");
       },
 
-      $type: /** @lends pentaho.data.filter.IsLessOrEqual.Type# */{
-        id: "pentaho/data/filter/isLessOrEqual",
-        alias: "<=",
+      $type: /** @lends pentaho.data.filter.IsLessOrEqualType# */{
+        id: module.id,
         props: [
           {
             name: "value",

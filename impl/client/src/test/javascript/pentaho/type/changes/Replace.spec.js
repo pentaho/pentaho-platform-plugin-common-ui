@@ -14,31 +14,36 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Complex",
+  "pentaho/type/changes/Transaction",
   "pentaho/type/changes/Replace"
-], function(Context, Replace) {
+], function(Complex, Transaction, Replace) {
+
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false */
 
   describe("pentaho.type.changes.Replace", function() {
 
-    var context;
-    var Derived;
+    var DerivedComplex;
     var ComplexOfComplex;
     var propY;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
+    beforeAll(function() {
 
-            Derived = context.get({props: ["x"]});
+      DerivedComplex = Complex.extend({
+        $type: {
+          props: ["x"]
+        }
+      });
 
-            ComplexOfComplex = context.get({props: [{name: "y", valueType: Derived}]});
-            propY = ComplexOfComplex.type.get("y");
-          })
-          .then(done, done.fail);
+      ComplexOfComplex = Complex.extend({
+        $type: {
+          props: [{name: "y", valueType: DerivedComplex}]
+        }
+      });
+
+      propY = ComplexOfComplex.type.get("y");
     });
 
     it("should be defined", function() {
@@ -56,7 +61,7 @@ define([
       var scope;
 
       beforeEach(function() {
-        scope = context.enterChange();
+        scope = Transaction.enter();
       });
 
       afterEach(function() {
@@ -65,7 +70,7 @@ define([
 
       it("should replace the property value and be visible as ambient value", function() {
 
-        var derived = new Derived({x: "0"});
+        var derived = new DerivedComplex({x: "0"});
 
         // ---
 
@@ -82,7 +87,7 @@ define([
 
       it("should reuse a Replace change object when set twice", function() {
 
-        var derived = new Derived({x: "0"});
+        var derived = new DerivedComplex({x: "0"});
 
         // ---
 
@@ -101,7 +106,7 @@ define([
 
       it("should replace the property value and remain changed when committed", function() {
 
-        var derived = new Derived({x: "0"});
+        var derived = new DerivedComplex({x: "0"});
 
         // ---
 
@@ -118,7 +123,7 @@ define([
 
       it("should replace the property value but have the original value when rejected", function() {
 
-        var derived = new Derived({x: "0"});
+        var derived = new DerivedComplex({x: "0"});
 
         // ---
 
@@ -135,7 +140,7 @@ define([
 
       it("should replace the property value but have the original value when exited", function() {
 
-        var derived = new Derived({x: "0"});
+        var derived = new DerivedComplex({x: "0"});
 
         // ---
 
@@ -153,7 +158,7 @@ define([
       it("should replace the property value but have the original value if changes cleared, " +
         "as ambient value", function() {
 
-        var derived = new Derived({x: "0"});
+        var derived = new DerivedComplex({x: "0"});
 
         // ---
 
@@ -171,7 +176,7 @@ define([
       it("should replace the property value but have the original value if changes " +
         "cleared and committed", function() {
 
-        var derived = new Derived({x: "0"});
+        var derived = new DerivedComplex({x: "0"});
 
         // ---
 
@@ -209,7 +214,7 @@ define([
       var scope;
 
       beforeEach(function() {
-        scope = context.enterChange();
+        scope = Transaction.enter();
       });
 
       afterEach(function() {
@@ -221,7 +226,7 @@ define([
 
         it("should not try to add or remove references", function() {
 
-          var owner = new Derived({x: "1"});
+          var owner = new DerivedComplex({x: "1"});
 
           // ---
 
@@ -230,7 +235,7 @@ define([
 
         it("should not try to cancel removed references when changes are cleared", function() {
 
-          var owner = new Derived({x: "1"});
+          var owner = new DerivedComplex({x: "1"});
 
           // ---
 
@@ -248,7 +253,7 @@ define([
 
           var owner = new ComplexOfComplex({y: {x: "1"}});
           var elem1 = owner.y;
-          var elem2 = new Derived({x: "2"});
+          var elem2 = new DerivedComplex({x: "2"});
 
           expectSingleRefTo(elem1, owner, propY);
           expectNoRefs(elem2);
@@ -267,7 +272,7 @@ define([
 
           var owner = new ComplexOfComplex({y: {x: "1"}});
           var elem1 = owner.y;
-          var elem2 = new Derived({x: "2"});
+          var elem2 = new DerivedComplex({x: "2"});
 
           // ---
 
@@ -287,7 +292,7 @@ define([
 
           var owner = new ComplexOfComplex({y: {x: "1"}});
           var elem1 = owner.y;
-          var elem2 = new Derived({x: "2"});
+          var elem2 = new DerivedComplex({x: "2"});
 
           // ---
 
@@ -307,7 +312,7 @@ define([
 
           var owner = new ComplexOfComplex({y: {x: "1"}});
           var elem1 = owner.y;
-          var elem2 = new Derived({x: "2"});
+          var elem2 = new DerivedComplex({x: "2"});
 
           // ---
 
@@ -327,7 +332,7 @@ define([
 
           var owner = new ComplexOfComplex({y: {x: "1"}});
           var elem1 = owner.y;
-          var elem2 = new Derived({x: "2"});
+          var elem2 = new DerivedComplex({x: "2"});
 
           // ---
 
@@ -347,7 +352,7 @@ define([
 
           var owner = new ComplexOfComplex({y: {x: "1"}});
           var elem1 = owner.y;
-          var elem2 = new Derived({x: "2"});
+          var elem2 = new DerivedComplex({x: "2"});
 
           // ---
 
@@ -370,7 +375,7 @@ define([
 
           var owner = new ComplexOfComplex({y: {x: "1"}});
           var elem1 = owner.y;
-          var elem2 = new Derived({x: "2"});
+          var elem2 = new DerivedComplex({x: "2"});
 
           // ---
 
@@ -388,7 +393,7 @@ define([
 
           var owner = new ComplexOfComplex({y: {x: "1"}});
           var elem1 = owner.y;
-          var elem2 = new Derived({x: "2"});
+          var elem2 = new DerivedComplex({x: "2"});
 
           // ---
 
@@ -410,7 +415,7 @@ define([
 
           var owner = new ComplexOfComplex({y: {x: "1"}});
           var elem1 = owner.y;
-          var elem2 = new Derived({x: "2"});
+          var elem2 = new DerivedComplex({x: "2"});
 
           // ---
 
@@ -432,8 +437,8 @@ define([
 
           var owner = new ComplexOfComplex({y: {x: "1"}});
           var elem1 = owner.y;
-          var elem2 = new Derived({x: "2"});
-          var elem3 = new Derived({x: "3"});
+          var elem2 = new DerivedComplex({x: "2"});
+          var elem3 = new DerivedComplex({x: "3"});
 
           // ---
 
@@ -467,8 +472,8 @@ define([
 
           var owner = new ComplexOfComplex({y: {x: "1"}});
           var elem1 = owner.y;
-          var elem2 = new Derived({x: "2"});
-          var elem3 = new Derived({x: "3"});
+          var elem2 = new DerivedComplex({x: "2"});
+          var elem3 = new DerivedComplex({x: "3"});
 
           // ---
 
@@ -491,8 +496,8 @@ define([
 
           var owner = new ComplexOfComplex({y: {x: "1"}});
           var elem1 = owner.y;
-          var elem2 = new Derived({x: "2"});
-          var elem3 = new Derived({x: "3"});
+          var elem2 = new DerivedComplex({x: "2"});
+          var elem3 = new DerivedComplex({x: "3"});
 
           // ---
 
@@ -515,8 +520,8 @@ define([
 
           var owner = new ComplexOfComplex({y: {x: "1"}});
           var elem1 = owner.y;
-          var elem2 = new Derived({x: "2"});
-          var elem3 = new Derived({x: "3"});
+          var elem2 = new DerivedComplex({x: "2"});
+          var elem3 = new DerivedComplex({x: "3"});
 
           // ---
 
@@ -539,8 +544,8 @@ define([
 
           var owner = new ComplexOfComplex({y: {x: "1"}});
           var elem1 = owner.y;
-          var elem2 = new Derived({x: "2"});
-          var elem3 = new Derived({x: "3"});
+          var elem2 = new DerivedComplex({x: "2"});
+          var elem3 = new DerivedComplex({x: "3"});
 
           // ---
 

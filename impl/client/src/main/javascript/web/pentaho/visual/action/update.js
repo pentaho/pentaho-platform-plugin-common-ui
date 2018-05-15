@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,44 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "pentaho/module!_",
+  "./Base"
+], function(module, BaseAction) {
 
   "use strict";
 
-  return ["pentaho/visual/action/base", function(ActionBase) {
+  /**
+   * @name pentaho.visual.action.UpdateType
+   * @class
+   * @extends pentaho.visual.action.BaseType
+   *
+   * @classDesc The type class of the update action.
+   *
+   * For more information see {@link pentaho.visual.action.Update}.
+   */
 
-    /**
-     * @name pentaho.visual.action.Update.Type
-     * @class
-     * @extends pentaho.visual.action.Base.Type
-     *
-     * @classDesc The type class of the update action.
-     *
-     * For more information see {@link pentaho.visual.action.Update}.
-     */
+  /**
+   * @name Update
+   * @memberOf pentaho.visual.action
+   * @class
+   * @extends pentaho.visual.action.Base
+   *
+   * @amd pentaho/visual/action/Update
+   *
+   * @classDesc The `visual.action.Update` class is the class of actions which
+   * represent a [View]{@link pentaho.visual.base.View} being updated.
+   *
+   * The update action is [asynchronous]{@link pentaho.type.action.BaseType#isSync}.
+   *
+   * @description Creates an update action instance given its specification.
+   * @param {pentaho.visual.action.spec.IBase} [spec] A base action specification.
+   * @constructor
+   */
 
-    /**
-     * @name Update
-     * @memberOf pentaho.visual.action
-     * @class
-     * @extends pentaho.visual.action.Base
-     *
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.action.Update>} pentaho/visual/action/update
-     *
-     * @classDesc The `visual.action.Update` class is the class of actions which
-     * represent a [View]{@link pentaho.visual.base.View} being updated.
-     *
-     * The update action is [asynchronous]{@link pentaho.type.action.Base.Type#isSync}.
-     *
-     * @description Creates an update action instance given its specification.
-     * @param {pentaho.visual.action.spec.IBase} [spec] A base action specification.
-     * @constructor
-     */
-
-    return ActionBase.extend(/** @lends pentaho.visual.action.Update# */{
-      $type: {
-        isSync: false
-      }
-    });
-  }];
+  return BaseAction.extend(/** @lends pentaho.visual.action.Update# */{
+    $type: {
+      id: module.id,
+      isSync: false
+    }
+  })
+  .configure({$type: module.config});
 });

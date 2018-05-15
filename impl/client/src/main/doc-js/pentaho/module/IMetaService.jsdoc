@@ -1,0 +1,130 @@
+/*!
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @classDesc The `IMetaService` interface represents a service that provides metadata information
+ * about JavaScript modules.
+ *
+ * @name IMetaService
+ * @memberOf pentaho.module
+ * @interface
+ */
+
+/**
+ * Configures the modules metadata service by defining new modules or
+ * configuring existing modules.
+ *
+ * @name configure
+ * @memberOf pentaho.module.IMetaService#
+ * @method
+ * @param {pentaho.module.spec.MetaMap} moduleSpecMap - A map of modules metadata.
+ * @return {!pentaho.module.IMetaService} The value of `this`.
+ */
+
+// ---
+
+/**
+ * Gets the metadata of the module having a given identifier or alias.
+ *
+ * @name get
+ * @memberOf pentaho.module.IMetaService#
+ * @method
+ * @param {string} idOrAlias - The identifier or alias of the module.
+ *
+ * @param {Object} [keyArgs] - The keyword arguments.
+ *
+ * @param {boolean} [keyArgs.createIfUndefined=false] - Indicates if an instance module of `null` type
+ * should be created and returned when the module has not been explicitly defined. In this case, note,
+ * `idOrAlias` should really contain the identifier of the module.
+ *
+ * @param {boolean} [keyArgs.assertDefined=false] - Indicates that an error should be thrown if the
+ * a module with the specified identifier or alias is not defined.
+ *
+ * @return {pentaho.module.IMeta} A module metadata, if the module is defined; `null`, otherwise.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When `keyArgs.assertDefined` is `true` and a module
+ * with the specified identifier or alias is not defined.
+ */
+
+/**
+ * Gets the identifier of a module given its identifier or alias.
+ *
+ * If a module with the given identifier or alias is not defined, `null` is returned.
+ *
+ * @name getId
+ * @memberOf pentaho.module.IMetaService#
+ * @method
+ * @param {?string} idOrAlias - The identifier or alias of the module.
+ * @return {?string} The identifier of a defined module; `null`, otherwise.
+ */
+
+// ---
+
+/**
+ * Gets the metadata of the modules which are known instances of a given type module.
+ *
+ * The modules are returned ordered descendingly by their [ranking]{@link pentaho.module.IMeta#ranking}.
+ *
+ * @name getInstancesOf
+ * @memberOf pentaho.module.IMetaService#
+ * @method
+ * @param {string} typeIdOrAlias - The identifier or alias of the type module.
+ *
+ * @return {!Array.<!pentaho.module.IInstanceMeta>} An array of metadata of instance modules, possibly empty.
+ */
+
+/**
+ * Gets the metadata of the highest [ranking]{@link pentaho.module.IMeta#ranking} module
+ * which is a known instance of a given type module.
+ *
+ * @name getInstanceOf
+ * @memberOf pentaho.module.IMetaService#
+ * @method
+ * @param {string} typeIdOrAlias - The identifier or alias of the type module.
+ *
+ * @return {pentaho.module.IInstanceMeta} The metadata of an instance module, if any, or `null`, if none.
+ */
+
+// ---
+
+/**
+ * Gets the metadata of the modules which are known _descendant_ types of a given type module.
+ *
+ * The modules are returned ordered descendingly by their [ranking]{@link pentaho.module.IMeta#ranking}.
+ *
+ * The specified base type module is not included in the result.
+ *
+ * @name getSubtypesOf
+ * @memberOf pentaho.module.IMetaService#
+ * @method
+ * @param {string} baseTypeIdOrAlias - The identifier or alias of the base type module.
+ *
+ * @return {!Array.<!pentaho.module.ITypeMeta>} An array of metadata of type modules, possibly empty.
+ */
+
+/**
+ * Gets the metadata of the highest [ranking]{@link pentaho.module.IMeta#ranking} module
+ * which is a known descendant type of a given type module.
+ *
+ * The specified base type module is not a possible result.
+ *
+ * @name getSubtypeOf
+ * @memberOf pentaho.module.IMetaService#
+ * @method
+ * @param {string} baseTypeIdOrAlias - The identifier or alias of the base type module.
+ *
+ * @return {pentaho.module.ITypeMeta} The metadata of a type module, if any, or `null`, if none.
+ */

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,11 @@
  */
 
 /**
- * The `visual.action.spec.ISelectTypeProto` interface represents the specification of a selection action type.
+ * The `visual.action.spec.ISelectType` interface represents the specification of a selection action type.
  *
- * @name pentaho.visual.action.spec.ISelectTypeProto
+ * @name pentaho.visual.action.spec.ISelectType
  * @interface
- * @extends pentaho.type.action.spec.IBaseTypeProto
- */
-
-/**
- * The extensible/configurable members of the prototype of selection action instance classes.
- *
- * @name instance
- * @memberOf pentaho.visual.action.spec.ISelectTypeProto#
- * @type {pentaho.visual.action.spec.ISelectProto}
- *
- * @see pentaho.visual.action.spec.ISelectProto#$type
+ * @extends pentaho.type.action.spec.IBaseType
  */
 
 /**
@@ -44,6 +34,6 @@
  * to assume the corresponding selection mode function.
  *
  * @name defaultSelectionMode
- * @memberOf pentaho.visual.action.spec.ISelectTypeProto#
+ * @memberOf pentaho.visual.action.spec.ISelectType#
  * @type {string|pentaho.visual.action.SelectionMode}
  */

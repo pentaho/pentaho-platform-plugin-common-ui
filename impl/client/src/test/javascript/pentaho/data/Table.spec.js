@@ -16,8 +16,8 @@
 define([
   "pentaho/data/Table",
   "pentaho/data/TableView",
-  "pentaho/type/Context"
-], function(DataTable, TableView, Context) {
+  "pentaho/data/filter/Abstract"
+], function(DataTable, TableView, AbstractFilter) {
 
   function getDatasetCDA1() {
     return {
@@ -321,31 +321,22 @@ define([
       });
 
       describe("#filter(filter)", function() {
-        var context;
+
         var data;
         var CustomFilter;
 
-        beforeEach(function(done) {
+        beforeAll(function() {
 
-          Context.createAsync()
-              .then(function(_context) {
-                context = _context;
+          var count = 1;
 
-                return context.getDependencyApplyAsync(["pentaho/data/filter/abstract"], function(AbstractFilter) {
-
-                  var count = 1;
-
-                  CustomFilter = AbstractFilter.extend({
-                    compile: function() {
-                      return function() { return false; };
-                    },
-                    _buildContentKey: function() {
-                      return String(count++);
-                    }
-                  });
-                });
-              })
-              .then(done, done.fail);
+          CustomFilter = AbstractFilter.extend({
+            compile: function() {
+              return function() { return false; };
+            },
+            _buildContentKey: function() {
+              return String(count++);
+            }
+          });
 
           data = new DataTable({
             model: [
@@ -420,31 +411,21 @@ define([
 
       describe("#filterMatchesRow(filter, rowIndex)", function() {
 
-        var context;
         var data;
         var CustomFilter;
 
-        beforeEach(function(done) {
+        beforeAll(function() {
 
-          Context.createAsync()
-              .then(function(_context) {
-                context = _context;
+          var count = 1;
 
-                return context.getDependencyApplyAsync(["pentaho/data/filter/abstract"], function(AbstractFilter) {
-
-                  var count = 1;
-
-                  CustomFilter = AbstractFilter.extend({
-                    compile: function() {
-                      return function() { return false; };
-                    },
-                    _buildContentKey: function() {
-                      return String(count++);
-                    }
-                  });
-                });
-              })
-              .then(done, done.fail);
+          CustomFilter = AbstractFilter.extend({
+            compile: function() {
+              return function() { return false; };
+            },
+            _buildContentKey: function() {
+              return String(count++);
+            }
+          });
 
           data = new DataTable({
             model: [

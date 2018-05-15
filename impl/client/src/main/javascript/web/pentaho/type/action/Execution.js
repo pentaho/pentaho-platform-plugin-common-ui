@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,10 @@ define([
   "pentaho/debug",
   "pentaho/debug/Levels",
   "pentaho/util/logger"
-],
-function(module, Base, States,
-         ArgumentRequiredError, ArgumentInvalidTypeError, OperationInvalidError,
-         UserError, RuntimeError,
-         debugMgr, DebugLevels, logger) {
+], function(module, Base, States,
+            ArgumentRequiredError, ArgumentInvalidTypeError, OperationInvalidError,
+            UserError, RuntimeError,
+            debugMgr, DebugLevels, logger) {
 
   "use strict";
 
@@ -49,7 +48,7 @@ function(module, Base, States,
   /** @type pentaho.type.action.States */
   var settledStates = States.did | rejectedStates;
 
-  return Base.extend(/** @lends pentaho.type.action.Execution# */{
+  return Base.extend(module.id, /** @lends pentaho.type.action.Execution# */{
     /**
      * @alias Execution
      * @memberOf pentaho.type.action
@@ -68,14 +67,14 @@ function(module, Base, States,
      * ##### Synchronous or Asynchronous
      *
      * The associated action can be synchronous or asynchronous, as determined by the type property,
-     * {@link pentaho.type.action.Base.Type#isSync}.
+     * {@link pentaho.type.action.BaseType#isSync}.
      * The execution of a synchronous action is completed synchronously.
      * while that of an asynchronous action only completes asynchronously,
      * due to its asynchronous "do" phase.
      *
      * The [execute]{@link pentaho.type.action.Execution#execute} method handles
      * the execution of both types of actions.
-     * When the associated action is [asynchronous]{@link pentaho.type.action.Base.Type#isSync}, or
+     * When the associated action is [asynchronous]{@link pentaho.type.action.BaseType#isSync}, or
      * it is not know if it is synchronous or asynchronous,
      * after calling `execute`,
      * obtain the value of the [promise]{@link pentaho.type.action.Execution#promise} property
@@ -477,7 +476,7 @@ function(module, Base, States,
      * This promise can be requested anytime,
      * before the execution has started, during execution, or after execution has finished.
      * It can also be requested whether or not the associated action is
-     * [synchronous]{@link pentaho.type.action.Base.Type#isSync} or asynchronous.
+     * [synchronous]{@link pentaho.type.action.BaseType#isSync} or asynchronous.
      *
      * The promise is
      * fulfilled with the action execution's [result]{@link pentaho.type.action.Execution#result} or
@@ -515,8 +514,8 @@ function(module, Base, States,
       if(this.isFinished) {
 
         promiseControl.promise = this.isDone
-            ? Promise.resolve(this.result)
-            : Promise.reject(this.error);
+          ? Promise.resolve(this.result)
+          : Promise.reject(this.error);
       } else {
 
         promiseControl.promise = new Promise(function(resolve, reject) {
@@ -535,7 +534,7 @@ function(module, Base, States,
      * Executes the action.
      *
      * When the associated action is
-     * [asynchronous]{@link pentaho.type.action.Base.Type#isSync}, or
+     * [asynchronous]{@link pentaho.type.action.BaseType#isSync}, or
      * it is not know if it is synchronous or asynchronous,
      * upon return of this method,
      * obtain the value of the [promise]{@link pentaho.type.action.Execution#promise} property
@@ -562,7 +561,7 @@ function(module, Base, States,
     /**
      * Performs the default "execution" for the associated action.
      *
-     * When the associated action is [asynchronous]{@link pentaho.type.action.Base.Type#isSync},
+     * When the associated action is [asynchronous]{@link pentaho.type.action.BaseType#isSync},
      * this method _may_ return a promise.
      * If the promise gets rejected, the action is rejected with the same rejection reason.
      * However, if the promise gets fulfilled, its value is always *ignored*.
@@ -857,6 +856,7 @@ function(module, Base, States,
         if(!this.isSettled) {
           this._doDefault();
         }
+
         return null;
       }
 
@@ -965,7 +965,7 @@ function(module, Base, States,
      * The default implementation does nothing.
      *
      * @return {?Promise} A promise to the completion of the asynchronous `do` listener,
-     * of an [asynchronous]{@link pentaho.type.action.Base.Type#isSync} action, or `null`.
+     * of an [asynchronous]{@link pentaho.type.action.BaseType#isSync} action, or `null`.
      *
      * @protected
      */

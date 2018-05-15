@@ -14,31 +14,29 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!_",
+  "./CategoricalContinuousAbstract",
+  "./mixins/MultiCharted",
   "pentaho/i18n!./i18n/model"
-], function(bundle) {
+], function(module, BaseModel, MultiChartedModel, bundle) {
 
   "use strict";
 
-  return [
-    "./categoricalContinuousAbstract",
-    "./mixins/multiCharted",
-    function(BaseModel, MultiChartedModel) {
-
-      return BaseModel.extend({
-        $type: {
-          mixins: [MultiChartedModel],
-          isAbstract: true,
-          props: [
-            {
-              name: "rows", // VISUAL_ROLE
-              modes: [
-               {dataType: "list"}
-              ]
-            }
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      mixins: [MultiChartedModel],
+      isAbstract: true,
+      props: [
+        {
+          name: "rows", // VISUAL_ROLE
+          modes: [
+            {dataType: "list"}
           ]
         }
-      })
-      .implement({$type: bundle.structured.barAbstract});
+      ]
     }
-  ];
+  })
+  .localize({$type: bundle.structured.BarAbstract})
+  .configure({$type: module.config});
 });

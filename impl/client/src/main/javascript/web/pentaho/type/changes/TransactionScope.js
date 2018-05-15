@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 define([
+  "module",
   "./AbstractTransactionScope"
-], function(AbstractTransactionScope) {
+], function(module, AbstractTransactionScope) {
 
   "use strict";
 
-  return AbstractTransactionScope.extend(/** @lends pentaho.type.changes.TransactionScope# */{
+  return AbstractTransactionScope.extend(module.id, /** @lends pentaho.type.changes.TransactionScope# */{
 
     /**
      * @name TransactionScope
@@ -29,12 +30,11 @@ define([
      *
      * @friend pentaho.type.changes.Transaction
      *
-     * @classDesc The `TransactionScope` class manages a [transaction]{@link pentaho.type.Context#transaction}.
+     * @classDesc The `TransactionScope` class manages a [transaction]{@link pentaho.type.changes.Transaction}.
      *
      * @constructor
      * @description Creates a `TransactionScope`.
      *
-     * @param {!pentaho.type.Context} context - The associated context.
      * @param {!pentaho.type.changes.Transaction} transaction - The associated transaction.
      */
 
@@ -42,7 +42,7 @@ define([
      * Gets a value that indicates if this scope can commit the ambient transaction.
      *
      * A scope can commit its transaction if:
-     * 1. it is the root and current scope of the context
+     * 1. it is the root and current scope
      * 2. the transaction is in the proposed state.
      *
      * @type {boolean}

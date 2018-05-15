@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,15 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Simple",
   "tests/pentaho/type/serializationUtil"
-], function(Context, serializationUtil) {
+], function(Simple, serializationUtil) {
 
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, spyOn:false*/
 
-  describe("pentaho.type.Simple.Type", function() {
-
-    var context;
-    var Simple;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Simple  = context.get("pentaho/type/simple");
-          })
-          .then(done, done.fail);
-    });
+  describe("pentaho.type.SimpleType", function() {
 
     describe("#_fillSpecInContext(spec, keyArgs)", function() {
 

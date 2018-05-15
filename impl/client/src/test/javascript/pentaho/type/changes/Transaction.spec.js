@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,76 +14,66 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Complex",
   "pentaho/type/changes/TransactionScope",
   "pentaho/type/changes/Transaction",
   "pentaho/type/changes/TransactionRejectedError",
   "pentaho/type/changes/Changeset",
   "pentaho/type/changes/ChangeRef",
   "tests/pentaho/util/errorMatch"
-], function(Context, TransactionScope, Transaction, TransactionRejectedError, Changeset, ChangeRef, errorMatch) {
+], function(Complex, TransactionScope, Transaction, TransactionRejectedError, Changeset, ChangeRef, errorMatch) {
 
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, jasmine:false */
 
   describe("pentaho.type.changes.Transaction", function() {
-    var context;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-          })
-          .then(done, done.fail);
+    var DerivedComplex;
+
+    beforeAll(function() {
+      DerivedComplex = Complex.extend({
+        $type: {
+          props: ["x"]
+        }
+      });
     });
 
-    describe("new(context)", function() {
+    describe("new()", function() {
       it("should be defined", function() {
         expect(typeof Transaction).toBeDefined();
       });
 
-      it("should throw if context is not specified", function() {
-        expect(function() {
-          var txn = new Transaction();
-        }).toThrow(errorMatch.argRequired("context"));
-      });
-
       it("should have isProposed = true", function() {
-        var txn = new Transaction(context);
+        var txn = new Transaction();
 
         expect(txn.isProposed).toBe(true);
       });
 
       it("should have isReadOnly = false", function() {
-        var txn = new Transaction(context);
+        var txn = new Transaction();
 
         expect(txn.isReadOnly).toBe(false);
       });
 
       it("should have isCurrent = false", function() {
-        var txn = new Transaction(context);
+        var txn = new Transaction();
 
         expect(txn.isCurrent).toBe(false);
       });
 
       it("should have result = null", function() {
-        var txn = new Transaction(context);
+        var txn = new Transaction();
 
         expect(txn.result).toBe(null);
       });
     });
 
     describe("#getChangeset(uid)", function() {
-      var Derived;
-
-      beforeEach(function() {
-        Derived = context.get({props: ["x"]});
-      });
 
       it("should return null for a container which has had no changes yet", function() {
-        var txn = new Transaction(context);
-        var container = new Derived();
+        var txn = new Transaction();
+        var container = new DerivedComplex();
 
         var cset = txn.getChangeset(container);
 
@@ -91,9 +81,9 @@ define([
       });
 
       it("should return a changeset for a container which has changes", function() {
-        var txn = new Transaction(context);
+        var txn = new Transaction();
         var scope = txn.enter();
-        var container = new Derived();
+        var container = new DerivedComplex();
         container.x = "foo";
 
         var cset = txn.getChangeset(container.$uid);
@@ -104,9 +94,9 @@ define([
       });
 
       it("should return a changeset whose owner is container", function() {
-        var txn = new Transaction(context);
+        var txn = new Transaction();
         var scope = txn.enter();
-        var container = new Derived();
+        var container = new DerivedComplex();
         container.x = "foo";
 
         var cset = txn.getChangeset(container.$uid);
@@ -117,9 +107,9 @@ define([
       });
 
       it("should return a changeset for a container which has had changes", function() {
-        var txn = new Transaction(context);
+        var txn = new Transaction();
         var scope = txn.enter();
-        var container = new Derived();
+        var container = new DerivedComplex();
         container.x = "foo";
         container.$changeset.clearChanges();
 
@@ -132,14 +122,9 @@ define([
     });
 
     describe("#ensureChangeset(changeset)", function() {
-      var Derived;
-
-      beforeEach(function() {
-        Derived = context.get({props: ["x"]});
-      });
 
       it("should throw if transaction is already read-only and a changeset does not yet exist", function() {
-        var txn = new Transaction(context);
+        var txn = new Transaction();
         var scope = txn.enter();
         scope.acceptWill();
         scope.exit();
@@ -147,15 +132,15 @@ define([
         expect(txn.isReadOnly).toBe(true);
         expect(txn.isProposed).toBe(true);
 
-        var container = new Derived();
+        var container = new DerivedComplex();
         expect(function() {
           txn.ensureChangeset(container);
         }).toThrow(errorMatch.operInvalid());
       });
 
       it("should add the changeset and make it available through #getChangeset", function() {
-        var txn = new Transaction(context);
-        var container = new Derived();
+        var txn = new Transaction();
+        var container = new DerivedComplex();
 
         var cset = txn.ensureChangeset(container);
 
@@ -165,8 +150,8 @@ define([
       });
 
       it("should add the changeset and not sync the container's changeset if txn is not current", function() {
-        var txn = new Transaction(context);
-        var container = new Derived();
+        var txn = new Transaction();
+        var container = new DerivedComplex();
 
         txn.ensureChangeset(container);
 
@@ -174,11 +159,11 @@ define([
       });
 
       it("should add the changeset and sync the container's changeset if txn is current", function() {
-        var txn = new Transaction(context);
+        var txn = new Transaction();
 
         var scope = txn.enter();
 
-        var container = new Derived();
+        var container = new DerivedComplex();
 
         var cset = txn.ensureChangeset(container);
 
@@ -189,15 +174,10 @@ define([
     });
 
     describe("#__ensureChangeRef(container)", function() {
-      var Derived;
-
-      beforeEach(function() {
-        Derived = context.get({props: ["x"]});
-      });
 
       it("should create a ChangeRef for a container which has no ref changes yet", function() {
-        var txn = new Transaction(context);
-        var container = new Derived();
+        var txn = new Transaction();
+        var container = new DerivedComplex();
 
         var cref = txn.__ensureChangeRef(container);
 
@@ -205,9 +185,9 @@ define([
       });
 
       it("should return the same  ChangeRef for a container which has had ref changes", function() {
-        var txn = new Transaction(context);
+        var txn = new Transaction();
         var scope = txn.enter();
-        var container = new Derived();
+        var container = new DerivedComplex();
 
         var cref1 = txn.__ensureChangeRef(container);
         var cref2 = txn.__ensureChangeRef(container);
@@ -218,9 +198,9 @@ define([
       });
 
       it("should return a ChangeRef with container as its owner", function() {
-        var txn = new Transaction(context);
+        var txn = new Transaction();
         var scope = txn.enter();
-        var container = new Derived();
+        var container = new DerivedComplex();
 
         var cref = txn.__ensureChangeRef(container);
 
@@ -231,15 +211,10 @@ define([
     });
 
     describe("#__getChangeRef(uid)", function() {
-      var Derived;
-
-      beforeEach(function() {
-        Derived = context.get({props: ["x"]});
-      });
 
       it("should return null for a container which has had no ref changes yet", function() {
-        var txn = new Transaction(context);
-        var container = new Derived();
+        var txn = new Transaction();
+        var container = new DerivedComplex();
 
         var cref = txn.__getChangeRef(container.$uid);
 
@@ -247,9 +222,9 @@ define([
       });
 
       it("should return a ChangeRef for a container which has ref changes", function() {
-        var txn = new Transaction(context);
+        var txn = new Transaction();
         var scope = txn.enter();
-        var container = new Derived();
+        var container = new DerivedComplex();
         txn.__ensureChangeRef(container);
 
         var cref = txn.__getChangeRef(container.$uid);
@@ -260,9 +235,9 @@ define([
       });
 
       it("should return a ChangeRef whose owner is container", function() {
-        var txn = new Transaction(context);
+        var txn = new Transaction();
         var scope = txn.enter();
-        var container = new Derived();
+        var container = new DerivedComplex();
         txn.__ensureChangeRef(container);
 
         var cref = txn.__getChangeRef(container.$uid);
@@ -274,7 +249,7 @@ define([
     });
 
     describe("#__eachChangeset(fun)", function() {
-      var Derived;
+
       var txn;
       var scope;
       var inst1;
@@ -282,15 +257,14 @@ define([
       var inst3;
 
       beforeEach(function() {
-        Derived = context.get({props: ["x"]});
 
-        txn = new Transaction(context);
+        txn = new Transaction();
 
         scope = txn.enter();
 
-        inst1 = new Derived();
-        inst2 = new Derived();
-        inst3 = new Derived();
+        inst1 = new DerivedComplex();
+        inst2 = new DerivedComplex();
+        inst3 = new DerivedComplex();
 
         inst1.x = "1";
         inst2.x = "2";
@@ -330,13 +304,11 @@ define([
 
     // enter, __scopeEnter, __enteringAmbient
     describe("#enter()", function() {
-      var Derived;
+
       var txn;
 
       beforeEach(function() {
-        Derived = context.get({props: ["x"]});
-
-        txn = new Transaction(context);
+        txn = new Transaction();
       });
 
       it("should return a transaction scope", function() {
@@ -379,15 +351,6 @@ define([
         scope1.exit();
       });
 
-      it("should return a transaction scope with context as its context", function() {
-
-        var scope = txn.enter();
-
-        expect(scope.context).toBe(txn.context);
-
-        scope.exit();
-      });
-
       it("should then have isCurrent = true", function() {
 
         var scope = txn.enter();
@@ -428,7 +391,7 @@ define([
 
         var scope = txn.enter();
 
-        var container = new Derived();
+        var container = new DerivedComplex();
         container.x = "foo";
 
         scope.exit();
@@ -451,9 +414,9 @@ define([
       it("should attach changesets to modified containers", function() {
         var scope = txn.enter();
 
-        var inst1 = new Derived();
-        var inst2 = new Derived();
-        var inst3 = new Derived();
+        var inst1 = new DerivedComplex();
+        var inst2 = new DerivedComplex();
+        var inst3 = new DerivedComplex();
 
         inst1.x = "1";
         inst2.x = "2";
@@ -485,9 +448,9 @@ define([
       it("should detach changesets from modified containers on scope exit", function() {
         var scope = txn.enter();
 
-        var inst1 = new Derived();
-        var inst2 = new Derived();
-        var inst3 = new Derived();
+        var inst1 = new DerivedComplex();
+        var inst2 = new DerivedComplex();
+        var inst3 = new DerivedComplex();
 
         inst1.x = "1";
         inst2.x = "2";
@@ -511,15 +474,11 @@ define([
 
     describe("#__doCommitWillCore", function() {
 
-      var Complex;
       var transaction;
       var scope;
 
       beforeEach(function() {
-
-        Complex = context.get("complex");
-
-        transaction = new Transaction(context);
+        transaction = new Transaction();
         scope = transaction.enter();
       });
 
@@ -1049,6 +1008,109 @@ define([
               });
             });
           });
+        });
+      });
+    });
+
+    describe(".current", function() {
+
+      it("should have a null transaction by default", function() {
+
+        return require.using(["pentaho/type/changes/Transaction"], function(Transaction) {
+          expect(Transaction.current).toBe(null);
+        });
+      });
+    });
+
+    describe(".enter()", function() {
+
+      it("should return a TransactionScope instance", function() {
+
+        return require.using([
+          "pentaho/type/changes/Transaction",
+          "pentaho/type/changes/TransactionScope"
+        ], function(Transaction, TransactionScope) {
+
+          var txnScope = Transaction.enter();
+
+          expect(txnScope instanceof TransactionScope).toBe(true);
+
+          txnScope.exit();
+        });
+      });
+
+      it("should return a TransactionScope instance whose transaction is now the ambient transaction", function() {
+
+        return require.using(["pentaho/type/changes/Transaction"], function(Transaction) {
+
+          var txnScope = Transaction.enter();
+
+          expect(txnScope.transaction).toBe(Transaction.current);
+
+          txnScope.exit();
+        });
+      });
+
+      it("should return a new TransactionScope instance each time", function() {
+
+        return require.using(["pentaho/type/changes/Transaction"], function(Transaction) {
+
+          var txnScope1 = Transaction.enter();
+          var txnScope2 = Transaction.enter();
+
+          expect(txnScope1).not.toBe(txnScope2);
+        });
+      });
+
+      it("should return a new TransactionScope of the same transaction, each time", function() {
+
+        return require.using(["pentaho/type/changes/Transaction"], function(Transaction) {
+
+          var txnScope1 = Transaction.enter();
+          var txnScope2 = Transaction.enter();
+
+          expect(txnScope1.transaction).toBe(txnScope2.transaction);
+        });
+      });
+
+      it("should call the new ambient transaction's #__enteringAmbient method", function() {
+
+        return require.using([
+          "pentaho/type/changes/Transaction",
+          "pentaho/type/changes/TransactionScope"
+        ], function(Transaction, TransactionScope) {
+
+          var txn = new Transaction();
+
+          spyOn(txn, "__enteringAmbient");
+
+          var scope = new TransactionScope(txn);
+
+          expect(txn.__enteringAmbient).toHaveBeenCalled();
+
+          scope.exit();
+        });
+      });
+
+      it("should call the suspending ambient transaction's __exitingAmbient, when a null scope enters", function() {
+
+        return require.using([
+          "pentaho/type/changes/Transaction",
+          "pentaho/type/changes/TransactionScope",
+          "pentaho/type/changes/CommittedScope"
+        ], function(Transaction, TransactionScope, CommittedScope) {
+
+          var txn = new Transaction();
+          var scope = new TransactionScope(txn);
+
+          spyOn(txn, "__exitingAmbient");
+
+          var scopeNull = new CommittedScope();
+
+          expect(txn.__exitingAmbient).toHaveBeenCalled();
+
+          scopeNull.exit();
+          scope.exit();
         });
       });
     });

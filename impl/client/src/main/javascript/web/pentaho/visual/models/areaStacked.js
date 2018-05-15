@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!_",
+  "./PointAbstract",
   "pentaho/i18n!./i18n/model"
-], function(bundle) {
+], function(module, BaseModel, bundle) {
 
   "use strict";
 
-  return ["./pointAbstract", function(BaseModel) {
-
-    return BaseModel.extend({
-      $type: {
-        v2Id: "ccc_area",
-        category: "areachart",
-        defaultView: "pentaho/ccc/visual/areaStacked"
-      }
-    })
-    .implement({$type: bundle.structured.areaStacked});
-  }];
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      v2Id: "ccc_area",
+      category: "areachart",
+      defaultView: "pentaho/ccc/visual/AreaStacked"
+    }
+  })
+  .localize({$type: bundle.structured.AreaStacked})
+  .configure({$type: module.config});
 });
