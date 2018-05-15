@@ -113,8 +113,8 @@ npm install
                   .then(function (context) {
                     // Get the model and base view types
                     return context.getDependencyAsync({
-                      CalcModel: "pentaho/visual/samples/calc/model",
-                      BaseView: "pentaho/visual/base/view"
+                      CalcModel: "pentaho/visual/samples/calc/Model",
+                      BaseView: "pentaho/visual/base/View"
                     });
                   })
                   .then(function (types) {

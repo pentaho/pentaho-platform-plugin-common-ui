@@ -14,81 +14,79 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!",
+  "./BarAbstract",
+  "./types/LabelsOption",
+  "./types/Shape",
+  "./types/LineWidth",
+  "./mixins/Interpolated",
   "pentaho/i18n!./i18n/model"
-], function(bundle) {
+], function(module, BaseModel, LabelsOption, Shape, LineWidth, InterpolatedModel, bundle) {
 
   "use strict";
 
-  return [
-    "./barAbstract",
-    "./types/labelsOption",
-    "./types/shape",
-    "./types/lineWidth",
-    "./mixins/interpolated",
-    function(BaseModel, LabelsOption, Shape, LineWidth, InterpolatedModel) {
+  return BaseModel.extend({
 
-      return BaseModel.extend({
+    $type: {
+      id: module.id,
+      mixins: [InterpolatedModel],
 
-        $type: {
-          mixins: [InterpolatedModel],
+      v2Id: "ccc_barline",
+      category: "barchart",
+      defaultView: "pentaho/ccc/visual/BarLine",
 
-          v2Id: "ccc_barline",
-          category: "barchart",
-          defaultView: "pentaho/ccc/visual/barLine",
+      props: [
+        {
+          name: "measures", // VISUAL_ROLE
+          fields: {isRequired: __isRequiredOneMeasure}
+        },
+        {
+          name: "measuresLine", // VISUAL_ROLE
+          base: "pentaho/visual/role/Property",
+          modes: [
+            {dataType: ["number"]}
+          ],
+          fields: {isRequired: __isRequiredOneMeasure},
+          ordinal: 7
+        },
 
-          props: [
-            {
-              name: "measures", // VISUAL_ROLE
-              fields: {isRequired: __isRequiredOneMeasure}
-            },
-            {
-              name: "measuresLine", // VISUAL_ROLE
-              base: "pentaho/visual/role/property",
-              modes: [
-                {dataType: ["number"]}
-              ],
-              fields: {isRequired: __isRequiredOneMeasure},
-              ordinal: 7
-            },
+        {
+          name: "lineWidth",
+          valueType: LineWidth,
+          isApplicable: __hasFieldsMeasuresLine,
+          isRequired: true,
+          defaultValue: 1
+        },
+        {
+          name: "labelsOption",
+          valueType: LabelsOption,
+          domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"],
+          isApplicable: __hasFieldsMeasures,
+          isRequired: true,
+          defaultValue: "none"
+        },
 
-            {
-              name: "lineWidth",
-              valueType: LineWidth,
-              isApplicable: __hasFieldsMeasuresLine,
-              isRequired: true,
-              defaultValue: 1
-            },
-            {
-              name: "labelsOption",
-              valueType: LabelsOption,
-              domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"],
-              isApplicable: __hasFieldsMeasures,
-              isRequired: true,
-              defaultValue: "none"
-            },
+        {
+          name: "lineLabelsOption",
+          valueType: LabelsOption,
+          domain: ["none", "center", "left", "right", "top", "bottom"],
+          isApplicable: __hasFieldsMeasuresLine,
+          isRequired: true,
+          defaultValue: "none"
+        },
 
-            {
-              name: "lineLabelsOption",
-              valueType: LabelsOption,
-              domain: ["none", "center", "left", "right", "top", "bottom"],
-              isApplicable: __hasFieldsMeasuresLine,
-              isRequired: true,
-              defaultValue: "none"
-            },
-
-            {
-              name: "shape",
-              valueType: Shape,
-              isRequired: true,
-              defaultValue: "circle",
-              isApplicable: __hasFieldsMeasuresLine
-            }
-          ]
+        {
+          name: "shape",
+          valueType: Shape,
+          isRequired: true,
+          defaultValue: "circle",
+          isApplicable: __hasFieldsMeasuresLine
         }
-      })
-      .implement({$type: bundle.structured.barLine});
+      ]
     }
-  ];
+  })
+  .localize({$type: bundle.structured.BarLine})
+  .configure({$type: module.config});
 
   function __isRequiredOneMeasure() {
     /* jshint validthis:true*/

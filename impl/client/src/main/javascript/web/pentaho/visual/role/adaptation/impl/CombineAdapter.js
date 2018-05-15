@@ -15,8 +15,9 @@
  */
 define([
   "module",
-  "./Adapter"
-], function(module, Adapter) {
+  "./Adapter",
+  "pentaho/type/String"
+], function(module, Adapter, PentahoString) {
 
   "use strict";
 
@@ -55,11 +56,11 @@ define([
        * The data type of the visual role value.
        *
        * @name dataType
-       * @type {!pentaho.type.Type}
+       * @type {!pentaho.type.Instance.Type}
        * @readOnly
        * @private
        */
-      this.__dataType = propType.context.get("string").type;
+      this.__dataType = PentahoString.type;
 
       /**
        * The value combiner function.

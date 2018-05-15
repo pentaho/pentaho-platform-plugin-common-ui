@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/visual/base/AbstractModel",
+  "pentaho/visual/role/AbstractMapping",
   "pentaho/data/Table"
-], function(Context, Table) {
+], function(AbstractModel, Mapping, Table) {
 
   "use strict";
 
-  /* globals describe, it, beforeEach, afterEach, beforeAll, spyOn */
-
   describe("pentaho.visual.role.AbstractMapping", function() {
 
-    var context;
-    var Mapping;
     var Model;
+
+    beforeAll(function() {
+      Model = AbstractModel.extend();
+    });
 
     function getDataSpec1() {
       return {
@@ -42,25 +43,6 @@ define([
         ]
       };
     }
-
-    beforeAll(function(done) {
-
-      Context.createAsync()
-          .then(function(_context) {
-
-            context = _context;
-
-            return context.getDependencyApplyAsync([
-              "pentaho/visual/base/abstractModel",
-              "pentaho/visual/role/abstractMapping"
-            ], function(_AbstractModel, _Mapping) {
-              Model = _AbstractModel.extend();
-              Mapping = _Mapping;
-            });
-          })
-          .then(done, done.fail);
-
-    });
 
     describe("#hasFields", function() {
 
@@ -96,7 +78,7 @@ define([
         var Derived = Model.extend({
           $type: {
             props: [
-              {name: "foo", base: "pentaho/visual/role/abstractProperty"}
+              {name: "foo", base: "pentaho/visual/role/AbstractProperty"}
             ]
           }
         });
@@ -125,7 +107,7 @@ define([
             props: [
               {
                 name: "propRole",
-                base: "pentaho/visual/role/abstractProperty",
+                base: "pentaho/visual/role/AbstractProperty",
                 modes: ["list"]
               }
             ]
@@ -149,7 +131,7 @@ define([
             props: [
               {
                 name: "propRole",
-                base: "pentaho/visual/role/abstractProperty",
+                base: "pentaho/visual/role/AbstractProperty",
                 modes: ["list"]
               }
             ]

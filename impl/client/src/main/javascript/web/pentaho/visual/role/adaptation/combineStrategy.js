@@ -14,105 +14,101 @@
  * limitations under the License.
  */
 define([
-  "module",
+  "pentaho/module!",
+  "./Strategy",
+  "pentaho/type/String",
   "./impl/CombineAdapter"
-], function(module, CombineAdapter) {
+], function(module, Strategy, PentahoString, CombineAdapter) {
 
   "use strict";
 
-  return [
-    "./strategy",
-    function(Strategy) {
+  /**
+   * @name pentaho.visual.role.adaptation.CombineStrategy.Type
+   * @class
+   * @extends pentaho.visual.role.adaptation.Strategy.Type
+   * @private
+   *
+   * @classDesc The type class of {@link pentaho.visual.role.adaptation.CombineStrategy}.
+   */
 
-      /**
-       * @name pentaho.visual.role.adaptation.CombineStrategy.Type
-       * @class
-       * @extends pentaho.visual.role.adaptation.Strategy.Type
-       * @private
-       *
-       * @classDesc The type class of {@link pentaho.visual.role.adaptation.CombineStrategy}.
-       */
-
-      /**
-       * @name pentaho.visual.role.adaptation.CombineStrategy
-       * @class
-       * @extends pentaho.visual.role.adaptation.Strategy
-       * @abstract
-       * @private
-       *
-       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.adaptation.CombineStrategy>} pentaho/visual/role/adaptation/combineStrategy
-       *
-       * @classDesc The `CombineStrategy` class describes the strategy of mapping one or more data properties
-       * to a single _string_ visual value by concatenating the string representation of the values of
-       * multiple fields with a special
-       * [separator character]{@link pentaho.visual.role.adaptation.CombineStrategy#valueSeparator}, and back.
-       *
-       * Formatted values are combined using the
-       * [formattedSeparator]{@link pentaho.visual.role.adaptation.CombineStrategy#formattedSeparator} text.
-       *
-       * The _combine_ strategy targets:
-       * 1. Visual roles which are [visual keys]{@link pentaho.visual.role.Property.Type#isVisualKey};
-       * 2. Modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} can
-       *    be assigned to [string]{@link pentaho.type.String};
-       * 3. Modes which are categorical (not [continuous]{@link pentaho.visual.role.Mode#isContinuous}).
-       *
-       * @description Creates a _combine_ mapping strategy instance.
-       * @constructor
-       * @param {pentaho.visual.role.adaptation.spec.IStrategy} [spec] A _combine_ mapping strategy specification.
-       */
-      var CombineStrategy = Strategy.extend(/** @lends pentaho.visual.role.adaptation.CombineStrategy# */{
-        $type: /** @lends pentaho.visual.role.adaptation.CombineStrategy.Type# */{
-          id: module.id,
-          props: [
-            /**
-             * Gets or sets the text separator used to combine the keys of each field.
-             *
-             * @name pentaho.visual.role.adaptation.CombineStrategy#valueSeparator
-             * @type {string}
-             * @default "~"
-             */
-            {
-              name: "valueSeparator",
-              valueType: "string",
-              isRequired: true,
-              defaultValue: "~"
-            },
-
-            /**
-             * Gets or sets the text separator used to combine the formatted values of each field.
-             *
-             * @name pentaho.visual.role.adaptation.CombineStrategy#formattedSeparator
-             * @type {string}
-             * @default " ~ "
-             */
-            {
-              name: "formattedSeparator",
-              valueType: "string",
-              isRequired: true,
-              defaultValue: " ~ "
-            }
-          ]
+  /**
+   * @name pentaho.visual.role.adaptation.CombineStrategy
+   * @class
+   * @extends pentaho.visual.role.adaptation.Strategy
+   * @abstract
+   * @private
+   *
+   * @amd pentaho/visual/role/adaptation/CombineStrategy
+   *
+   * @classDesc The `CombineStrategy` class describes the strategy of mapping one or more data properties
+   * to a single _string_ visual value by concatenating the string representation of the values of
+   * multiple fields with a special
+   * [separator character]{@link pentaho.visual.role.adaptation.CombineStrategy#valueSeparator}, and back.
+   *
+   * Formatted values are combined using the
+   * [formattedSeparator]{@link pentaho.visual.role.adaptation.CombineStrategy#formattedSeparator} text.
+   *
+   * The _combine_ strategy targets:
+   * 1. Visual roles which are [visual keys]{@link pentaho.visual.role.Property.Type#isVisualKey};
+   * 2. Modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} can
+   *    be assigned to [string]{@link pentaho.type.String};
+   * 3. Modes which are categorical (not [continuous]{@link pentaho.visual.role.Mode#isContinuous}).
+   *
+   * @description Creates a _combine_ mapping strategy instance.
+   * @constructor
+   * @param {pentaho.visual.role.adaptation.spec.IStrategy} [spec] A _combine_ mapping strategy specification.
+   */
+  var CombineStrategy = Strategy.extend(/** @lends pentaho.visual.role.adaptation.CombineStrategy# */{
+    $type: /** @lends pentaho.visual.role.adaptation.CombineStrategy.Type# */{
+      id: module.id,
+      props: [
+        /**
+         * Gets or sets the text separator used to combine the keys of each field.
+         *
+         * @name pentaho.visual.role.adaptation.CombineStrategy#valueSeparator
+         * @type {string}
+         * @default "~"
+         */
+        {
+          name: "valueSeparator",
+          valueType: "string",
+          isRequired: true,
+          defaultValue: "~"
         },
 
-        /** @override */
-        getMapper: function(propType, inputData, mode) {
-
-          // 1) Only really makes sense for key visual roles and categorical modes.
-          if(!propType.isVisualKey || mode.isContinuous) {
-            return null;
-          }
-
-          // 2) The mode's data type is assignable to string.
-          var stringType = propType.context.get("string").type;
-          if(!stringType.isSubtypeOf(mode.dataType)) {
-            return null;
-          }
-
-          return new CombineAdapter(this, propType, inputData, mode, this.valueSeparator, this.formattedSeparator);
+        /**
+         * Gets or sets the text separator used to combine the formatted values of each field.
+         *
+         * @name pentaho.visual.role.adaptation.CombineStrategy#formattedSeparator
+         * @type {string}
+         * @default " ~ "
+         */
+        {
+          name: "formattedSeparator",
+          valueType: "string",
+          isRequired: true,
+          defaultValue: " ~ "
         }
-      });
+      ]
+    },
 
-      return CombineStrategy;
+    /** @override */
+    getMapper: function(propType, inputData, mode) {
+
+      // 1) Only really makes sense for key visual roles and categorical modes.
+      if(!propType.isVisualKey || mode.isContinuous) {
+        return null;
+      }
+
+      // 2) The mode's data type is assignable to string.
+      if(!PentahoString.type.isSubtypeOf(mode.dataType)) {
+        return null;
+      }
+
+      return new CombineAdapter(this, propType, inputData, mode, this.valueSeparator, this.formattedSeparator);
     }
-  ];
+  })
+  .configure({$type: module.config});
+
+  return CombineStrategy;
 });

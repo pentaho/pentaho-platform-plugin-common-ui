@@ -14,47 +14,27 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/visual/base/Model",
+  "pentaho/visual/base/ModelAdapter",
+  "pentaho/visual/role/adaptation/Strategy",
   "pentaho/data/Table",
   "../role/adaptationUtil"
-], function(Context, Table, adaptationUtil) {
+], function(Model, ModelAdapter, Table, adaptationUtil) {
 
   "use strict";
 
-  /* globals describe, it, beforeEach, afterEach, beforeAll, spyOn */
-
-  var context;
-  var Model;
-  var ModelAdapter;
   var buildAdapter = adaptationUtil.buildAdapter;
   var ModelWithStringRole;
   var ElementIdentityStrategy;
 
   describe("pentaho.visual.role.ExternalMapping", function() {
 
-    beforeEach(function(done) {
+    beforeAll(function() {
 
-      Context.createAsync()
-          .then(function(_context) {
+      var mocks = adaptationUtil.createMocks();
 
-            context = _context;
-
-            return context.getDependencyApplyAsync([
-              "pentaho/visual/base/model",
-              "pentaho/visual/base/modelAdapter",
-              "pentaho/visual/role/adaptation/strategy"
-            ], function(_Model, _ModelAdapter, _BaseStrategy) {
-              Model = _Model;
-              ModelAdapter = _ModelAdapter;
-
-              var mocks = adaptationUtil.createMocks(Model, ModelAdapter, _BaseStrategy);
-
-              ModelWithStringRole = mocks.ModelWithStringRole;
-              ElementIdentityStrategy = mocks.ElementIdentityStrategy;
-            });
-          })
-          .then(done, done.fail);
-
+      ModelWithStringRole = mocks.ModelWithStringRole;
+      ElementIdentityStrategy = mocks.ElementIdentityStrategy;
     });
 
     function getDataSpec1() {
@@ -78,7 +58,7 @@ define([
 
         var strategies = [ElementIdentityStrategy.type];
 
-        var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+        var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
           {
             name: "roleA",
             strategies: strategies
@@ -104,7 +84,7 @@ define([
 
         var strategies = [ElementIdentityStrategy.type];
 
-        var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+        var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
           {
             name: "roleA",
             strategies: strategies
@@ -133,7 +113,7 @@ define([
 
         var strategies = [ElementIdentityStrategy.type];
 
-        var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+        var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
           {
             name: "roleA",
             strategies: strategies
@@ -159,7 +139,7 @@ define([
 
         var strategies = [ElementIdentityStrategy.type];
 
-        var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+        var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
           {
             name: "roleA",
             strategies: strategies

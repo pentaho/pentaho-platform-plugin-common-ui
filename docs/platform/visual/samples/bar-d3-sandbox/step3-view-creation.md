@@ -19,8 +19,8 @@ define(["module", "d3", "pentaho/visual/scene/Base"], function(module, d3, Scene
   "use strict";
 
   return [
-    "pentaho/visual/base/view",
-    "./model",
+    "pentaho/visual/base/View",
+    "./Model",
     function(BaseView, Model) {
       // Create the Bar View subclass
       var BarView = BaseView.extend({
@@ -116,8 +116,8 @@ Edit the `sandbox.html` file and place the following code in it:
           .then(function (context) {
             // Get the model and base view types
             return context.getDependencyAsync({
-              BarModel: "pentaho-visual-samples-bar-d3/model",
-              BaseView: "pentaho/visual/base/view"
+              BarModel: "pentaho-visual-samples-bar-d3/Model",
+              BaseView: "pentaho/visual/base/View"
             });
           })
           .then(function (types) {

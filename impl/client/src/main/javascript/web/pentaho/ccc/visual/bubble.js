@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,47 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "pentaho/module!",
+  "./MetricPointAbstract",
+  "pentaho/visual/models/Bubble"
+], function(module, BaseView, Model) {
 
   "use strict";
 
-  return [
-    "./metricPointAbstract",
-    "pentaho/visual/models/bubble",
-    function(BaseView, Model) {
+  return BaseView.extend({
+    $type: {
+      id: module.id,
+      props: {
+        model: {valueType: Model}
+      }
+    },
 
-      return BaseView.extend({
-        $type: {
-          props: {
-            model: {valueType: Model}
-          }
-        },
+    _options: {
+      sizeAxisUseAbs: false
+    },
 
-        _options: {
-          sizeAxisUseAbs: false
-        },
+    /* Override Default map */
+    _roleToCccRole: {
+      "multi": "multiChart",
+      "rows": "category",
+      "x": "x",
+      "y": "y",
+      "size": "size",
+      "color": "color"
+    },
 
-        /* Override Default map */
-        _roleToCccRole: {
-          "multi": "multiChart",
-          "rows": "category",
-          "x": "x",
-          "y": "y",
-          "size": "size",
-          "color": "color"
-        },
+    _configureOptions: function() {
 
-        _configureOptions: function() {
+      this.base();
 
-          this.base();
-
-          /* jshint laxbreak:true*/
-          // ~ DOT SIZE
-          this.options.axisOffset = this.model.size.hasFields
-              ? (1.1 * this.options.sizeAxisRatio / 2) // Axis offset like legacy analyzer
-              : 0;
-        }
-      });
+      /* jshint laxbreak:true*/
+      // ~ DOT SIZE
+      this.options.axisOffset = this.model.size.hasFields
+        ? (1.1 * this.options.sizeAxisRatio / 2) // Axis offset like legacy analyzer
+        : 0;
     }
-  ];
+  })
+  .configure({$type: module.config});
 });

@@ -14,50 +14,48 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!",
+  "./CartesianAbstract",
+  "./mixins/ScaleColorDiscrete",
   "pentaho/i18n!./i18n/model"
-], function(bundle) {
+], function(module, BaseModel, ScaleColorDiscreteModel, bundle) {
 
   "use strict";
 
-  return [
-    "./cartesianAbstract",
-    "./mixins/scaleColorDiscrete",
-    function(BaseModel, ScaleColorDiscreteModel) {
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      isAbstract: true,
+      mixins: [ScaleColorDiscreteModel],
 
-      return BaseModel.extend({
-        $type: {
-          isAbstract: true,
-          mixins: [ScaleColorDiscreteModel],
-
-          props: [
-            {
-              name: "columns", // VISUAL_ROLE
-              base: "pentaho/visual/role/property",
-              modes: [
-                {dataType: "list"}
-              ],
-              ordinal: 6
-            },
-            {
-              name: "multi", // VISUAL_ROLE
-              base: "pentaho/visual/role/property",
-              modes: [
-                {dataType: "list"}
-              ],
-              ordinal: 10
-            },
-            {
-              name: "measures", // VISUAL_ROLE
-              base: "pentaho/visual/role/property",
-              modes: [
-                {dataType: ["number"]}
-              ],
-              ordinal: 7
-            }
-          ]
+      props: [
+        {
+          name: "columns", // VISUAL_ROLE
+          base: "pentaho/visual/role/Property",
+          modes: [
+            {dataType: "list"}
+          ],
+          ordinal: 6
+        },
+        {
+          name: "multi", // VISUAL_ROLE
+          base: "pentaho/visual/role/Property",
+          modes: [
+            {dataType: "list"}
+          ],
+          ordinal: 10
+        },
+        {
+          name: "measures", // VISUAL_ROLE
+          base: "pentaho/visual/role/Property",
+          modes: [
+            {dataType: ["number"]}
+          ],
+          ordinal: 7
         }
-      })
-      .implement({$type: bundle.structured.categoricalContinuousAbstract});
+      ]
     }
-  ];
+  })
+  .localize({$type: bundle.structured.CategoricalContinuousAbstract})
+  .configure({$type: module.config});
 });

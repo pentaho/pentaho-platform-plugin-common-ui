@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "pentaho/module!",
+  "pentaho/type/Complex",
+  "./Level"
+], function(module, Complex, PaletteLevel) {
 
   "use strict";
 
@@ -32,7 +36,7 @@ define(function() {
    * @class
    * @extends pentaho.type.Complex
    *
-   * @amd {pentaho.type.Factory<pentaho.visual.color.Palette>} pentaho/visual/color/palette
+   * @amd pentaho/visual/color/Palette
    *
    * @classDesc The base class of color palettes.
    *
@@ -44,48 +48,48 @@ define(function() {
    * @param {pentaho.visual.color.palette.spec.IPalette} [spec] A color palette specification.
    */
 
-  return ["complex", "pentaho/visual/color/level", function(Complex, PaletteLevel) {
+  return Complex.extend({
+    /**
+     * The level of measurement of the color palette.
+     *
+     * @name level
+     * @memberOf pentaho.visual.color.Palette#
+     * @type {pentaho.visual.color.Level}
+     * @default "nominal"
+     * @readOnly
+     */
 
-    return Complex.extend({
-      /**
-       * The level of measurement of the color palette.
-       *
-       * @name level
-       * @memberOf pentaho.visual.color.Palette#
-       * @type {pentaho.visual.color.Level}
-       * @default "nominal"
-       * @readOnly
-       */
+    // TODO: document the supported color formats.
+    /**
+     * The list of colors of the color palette.
+     *
+     * This property is required.
+     *
+     * @name colors
+     * @memberOf pentaho.visual.color.Palette#
+     * @type {pentaho.type.List<pentaho.type.String>}
+     * @readOnly
+     */
 
-      // TODO: document the supported color formats.
-      /**
-       * The list of colors of the color palette.
-       *
-       * This property is required.
-       *
-       * @name colors
-       * @memberOf pentaho.visual.color.Palette#
-       * @type {pentaho.type.List<pentaho.type.String>}
-       * @readOnly
-       */
+    $type: {
+      id: module.id,
 
-      $type: {
-        props: [
-          {
-            name: "level",
-            valueType: PaletteLevel,
-            isRequired: true,
-            defaultValue: "nominal",
-            isReadOnly: true
-          },
-          {
-            name: "colors",
-            valueType: ["string"],
-            countMin: 1,
-            isReadOnly: true
-          }
-        ]
-      }
-    });
-  }];
+      props: [
+        {
+          name: "level",
+          valueType: PaletteLevel,
+          isRequired: true,
+          defaultValue: "nominal",
+          isReadOnly: true
+        },
+        {
+          name: "colors",
+          valueType: ["string"],
+          countMin: 1,
+          isReadOnly: true
+        }
+      ]
+    }
+  })
+  .configure({$type: module.config});
 });

@@ -128,14 +128,17 @@
   requireModules["pentaho/visual/base/Model"] = {base: "complex"};
   requireModules["pentaho/visual/base/View"] = {base: "complex"};
   requireModules["pentaho/visual/role/adaptation/Strategy"] = {base: "complex"};
+  requireModules["pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy"] = {
+    base: "pentaho/visual/role/adaptation/Strategy",
+    ranking: -5
+  };
   requireModules["pentaho/visual/role/adaptation/IdentityStrategy"] = {
-    base: "pentaho/visual/role/adaptation/Strategy"
+    base: "pentaho/visual/role/adaptation/Strategy",
+    ranking: -10
   };
   requireModules["pentaho/visual/role/adaptation/TupleStrategy"] = {
-    base: "pentaho/visual/role/adaptation/Strategy"
-  };
-  requireModules["pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy"] = {
-    base: "pentaho/visual/role/adaptation/Strategy"
+    base: "pentaho/visual/role/adaptation/Strategy",
+    ranking: -20
   };
   // endregion
 
@@ -346,22 +349,33 @@
   // Color Palettes
   requireModules["pentaho/visual/color/Palette"] = {base: "complex"};
 
-  [
-    "pentaho/visual/color/palettes/nominalPrimary",
-    "pentaho/visual/color/palettes/nominalNeutral",
-    "pentaho/visual/color/palettes/nominalLight",
-    "pentaho/visual/color/palettes/nominalDark",
-    "pentaho/visual/color/palettes/quantitativeBlue3",
-    "pentaho/visual/color/palettes/quantitativeBlue5",
-    "pentaho/visual/color/palettes/quantitativeGray3",
-    "pentaho/visual/color/palettes/quantitativeGray5",
-    "pentaho/visual/color/palettes/divergentRyg3",
-    "pentaho/visual/color/palettes/divergentRyg5",
-    "pentaho/visual/color/palettes/divergentRyb3",
-    "pentaho/visual/color/palettes/divergentRyb5"
-  ].forEach(function(id) {
-    requireModules[id] = {type: "pentaho/visual/color/Palette"};
-  });
+  requireModules["pentaho/visual/color/palettes/nominalPrimary"] = {type: "pentaho/visual/color/Palette", ranking: -10};
+  requireModules["pentaho/visual/color/palettes/nominalNeutral"] = {
+    type: "pentaho/visual/color/Palette",
+    ranking: -110
+  };
+  requireModules["pentaho/visual/color/palettes/nominalLight"] = {type: "pentaho/visual/color/Palette", ranking: -120};
+  requireModules["pentaho/visual/color/palettes/nominalDark"] = {type: "pentaho/visual/color/Palette", ranking: -130};
+  requireModules["pentaho/visual/color/palettes/quantitativeBlue3"] = {
+    type: "pentaho/visual/color/Palette",
+    ranking: -10
+  };
+  requireModules["pentaho/visual/color/palettes/quantitativeBlue5"] = {
+    type: "pentaho/visual/color/Palette",
+    ranking: -10
+  };
+  requireModules["pentaho/visual/color/palettes/quantitativeGray3"] = {
+    type: "pentaho/visual/color/Palette",
+    ranking: -10
+  };
+  requireModules["pentaho/visual/color/palettes/quantitativeGray5"] = {
+    type: "pentaho/visual/color/Palette",
+    ranking: -10
+  };
+  requireModules["pentaho/visual/color/palettes/divergentRyg3"] = {type: "pentaho/visual/color/Palette", ranking: -10};
+  requireModules["pentaho/visual/color/palettes/divergentRyg5"] = {type: "pentaho/visual/color/Palette", ranking: -10};
+  requireModules["pentaho/visual/color/palettes/divergentRyb3"] = {type: "pentaho/visual/color/Palette", ranking: -10};
+  requireModules["pentaho/visual/color/palettes/divergentRyb5"] = {type: "pentaho/visual/color/Palette", ranking: -10};
 
   // Copied by hand of /target/requireCfg.bundles.js
   if(useBundle) {

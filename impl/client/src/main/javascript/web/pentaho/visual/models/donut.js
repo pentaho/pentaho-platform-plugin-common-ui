@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!",
+  "./Pie",
   "pentaho/i18n!./i18n/model"
-], function(bundle) {
+], function(module, BaseModel, bundle) {
 
   "use strict";
 
-  return ["./pie", function(BaseModel) {
-
-    return BaseModel.extend({
-      $type: {
-        defaultView: "pentaho/ccc/visual/donut"
-      }
-    })
-    .implement({$type: bundle.structured.donut});
-  }];
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      defaultView: "pentaho/ccc/visual/Donut"
+    }
+  })
+  .localize({$type: bundle.structured.Donut})
+  .configure({$type: module.config});
 });

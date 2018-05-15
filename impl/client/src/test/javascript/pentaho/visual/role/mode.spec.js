@@ -14,47 +14,29 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/String",
+  "pentaho/type/Number",
+  "pentaho/type/Boolean",
+  "pentaho/type/Date",
+  "pentaho/type/Element",
+  "pentaho/type/List",
+  "pentaho/visual/role/Mode",
   "pentaho/type/SpecificationScope"
-], function(Context, SpecificationScope) {
+], function(PentahoString, PentahoNumber, PentahoBoolean, PentahoDate, Element, List,
+            Mode, Context, SpecificationScope) {
 
   "use strict";
 
-  /* globals jasmine, console, expect, it, describe, beforeEach, beforeAll */
-
   describe("pentaho.visual.role.Mode", function() {
 
-    var context;
     var Mode;
 
-    var stringType;
-    var numberType;
-    var booleanType;
-    var dateType;
-    var listType;
-    var elementType;
-
-    beforeAll(function(done) {
-
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-
-            stringType = context.get("string").type;
-            numberType = context.get("number").type;
-            booleanType = context.get("boolean").type;
-            dateType = context.get("date").type;
-            elementType = context.get("element").type;
-            listType = context.get("list").type;
-
-            return context.getAsync("pentaho/visual/role/mode");
-          })
-          .then(function(_Mode) {
-            Mode = _Mode;
-          })
-          .then(done, done.fail);
-
-    });
+    var stringType = PentahoString.type;
+    var numberType = PentahoNumber.type;
+    var booleanType = PentahoBoolean.type;
+    var dateType = PentahoDate.type;
+    var listType = List.type;
+    var elementType = Element.type;
 
     describe("new (spec)", function() {
 
@@ -68,7 +50,7 @@ define([
         it("should have a default of Instance", function() {
           var mode = new Mode();
           expect(mode.dataType != null).toBe(true);
-          expect(mode.dataType.id).toBe("pentaho/type/instance");
+          expect(mode.dataType.id).toBe("pentaho/type/Instance");
         });
 
         it("should respect and resolve a specified string value", function() {
@@ -77,7 +59,7 @@ define([
         });
 
         it("should respect and resolve a specified instance constructor value", function() {
-          var mode = new Mode({dataType: context.get("string")});
+          var mode = new Mode({dataType: PentahoString});
           expect(mode.dataType).toBe(stringType);
         });
 
@@ -109,7 +91,7 @@ define([
           expect(mode.isContinuous).toBe(false);
         });
 
-        // specifically allows continuous for a datatype that cannot be continuous
+        // Specifically allows continuous for a data-type that cannot be continuous
         // because it is assumed that a later conversion can be made within the viz implementation.
         it("should respect a specified value of true for the string dataType", function() {
           var mode = new Mode({dataType: stringType, isContinuous: true});

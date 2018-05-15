@@ -14,111 +14,107 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!",
+  "./Model",
+  "pentaho/visual/base/View",
   "pentaho/i18n!view"
-], function(bundle) {
+], function(module, Model, BaseView, bundle) {
 
   "use strict";
 
-  /* global document:false*/
+  /**
+   * @name View
+   * @memberOf pentaho.visual.samples.calc
+   * @class
+   * @extends pentaho.visual.base.View
+   * @amd pentaho/visual/samples/calc/View
+   *
+   * @classDesc The `View` of the calculator visualization.
+   */
 
-  return [
-    "pentaho/visual/samples/calc/model",
-    "pentaho/visual/base/view",
-    function(Model, BaseView) {
+  return BaseView.extend(/** @lends pentaho.visual.samples.calc.View# */{
+    $type: {
+      id: module.id,
+      props: {
+        model: {valueType: Model}
+      }
+    },
 
-      /**
-       * @name View
-       * @memberOf pentaho.visual.samples.calc
-       * @class
-       * @extends pentaho.visual.base.View
-       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.samples.calc.View>} pentaho/visual/samples/calc/view
-       *
-       * @classDesc The `View` of the calculator visualization.
-       */
+    /** @inheritDoc */
+    _initDomContainer: function() {
 
-      return BaseView.extend(/** @lends pentaho.visual.samples.calc.View# */{
-        $type: {
-          props: {
-            model: {valueType: Model}
+      var numSpan = document.createElement("span");
+      numSpan.style.fontSize = "42px";
+      numSpan.style.position = "relative";
+
+      this.domContainer.appendChild(numSpan);
+    },
+
+    /** @inheritDoc */
+    _updateAll: function() {
+
+      var result = this.__calculate();
+
+      this.domContainer.firstChild.innerHTML = bundle.get("result", [result.toFixed(2)]);
+
+      this._updateSize();
+    },
+
+    /** @inheritDoc */
+    _updateSize: function() {
+
+      var element = this.domContainer.firstChild;
+
+      // Center the span
+      var width  = this.width;
+      var height = this.height;
+      element.style.left = ((width - element.offsetWidth) / 2) + "px";
+      element.style.top  = ((height - element.offsetHeight) / 2) + "px";
+    },
+
+    // ---------
+
+    __calculate: function() {
+      var dataTable = this.model.data;
+      var rowCount = dataTable.getNumberOfRows();
+      var measureIndex = this.model.measure.fieldIndexes[0];
+
+      var getValue = function(k) {
+        var v = dataTable.getValue(k, measureIndex);
+        return !isNaN(v) && v != null ? v : null;
+      };
+
+      var aggregatedValue = null;
+      var rowIndex;
+      var value;
+
+      /* eslint default-case: 0 */
+      switch(this.model.operation) {
+        case "max":
+          for(rowIndex = 0; rowIndex < rowCount; rowIndex++)
+            if((value = getValue(rowIndex)) != null)
+              aggregatedValue = aggregatedValue == null ? value : Math.max(aggregatedValue, value);
+          break;
+
+        case "min":
+          for(rowIndex = 0; rowIndex < rowCount; rowIndex++)
+            if((value = getValue(rowIndex)) != null)
+              aggregatedValue = aggregatedValue == null ? value : Math.min(aggregatedValue, value);
+          break;
+
+        case "avg":
+          var total = aggregatedValue = 0;
+          if(rowCount) {
+            for(rowIndex = 0; rowIndex < rowCount; rowIndex++)
+              if((value = getValue(rowIndex)) != null)
+                total += value;
+            aggregatedValue = total / rowCount;
           }
-        },
+          break;
+      }
 
-        /** @inheritDoc */
-        _initDomContainer: function() {
-
-          var numSpan = document.createElement("span");
-          numSpan.style.fontSize = "42px";
-          numSpan.style.position = "relative";
-
-          this.domContainer.appendChild(numSpan);
-        },
-
-        /** @inheritDoc */
-        _updateAll: function() {
-
-          var result = this.__calculate();
-
-          this.domContainer.firstChild.innerHTML = bundle.get("result", [result.toFixed(2)]);
-
-          this._updateSize();
-        },
-
-        /** @inheritDoc */
-        _updateSize: function() {
-
-          var element = this.domContainer.firstChild;
-
-          // Center the span
-          var width  = this.width;
-          var height = this.height;
-          element.style.left = ((width - element.offsetWidth) / 2) + "px";
-          element.style.top  = ((height - element.offsetHeight) / 2) + "px";
-        },
-
-        // ---------
-
-        __calculate: function() {
-          var dataTable = this.model.data;
-          var rowCount = dataTable.getNumberOfRows();
-          var measureIndex = this.model.measure.fieldIndexes[0];
-
-          var getValue = function(k) {
-            var v = dataTable.getValue(k, measureIndex);
-            return !isNaN(v) && v != null ? v : null;
-          };
-
-          var aggregatedValue = null;
-          var rowIndex;
-          var value;
-
-          /* eslint default-case: 0 */
-          switch(this.model.operation) {
-            case "max":
-              for(rowIndex = 0; rowIndex < rowCount; rowIndex++)
-                if((value = getValue(rowIndex)) != null)
-                  aggregatedValue = aggregatedValue == null ? value : Math.max(aggregatedValue, value);
-              break;
-
-            case "min":
-              for(rowIndex = 0; rowIndex < rowCount; rowIndex++)
-                if((value = getValue(rowIndex)) != null)
-                  aggregatedValue = aggregatedValue == null ? value : Math.min(aggregatedValue, value);
-              break;
-
-            case "avg":
-              var total = aggregatedValue = 0;
-              if(rowCount) {
-                for(rowIndex = 0; rowIndex < rowCount; rowIndex++)
-                  if((value = getValue(rowIndex)) != null)
-                    total += value;
-                aggregatedValue = total / rowCount;
-              }
-              break;
-          }
-
-          return aggregatedValue;
-        }
-      });
+      return aggregatedValue;
     }
-  ];
+  })
+  .configure({$type: module.config});
 });

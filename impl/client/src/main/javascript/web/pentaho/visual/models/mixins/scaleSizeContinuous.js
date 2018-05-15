@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,30 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!",
+  "../../base/Model",
+  "../types/SizeByNegativesMode",
   "pentaho/i18n!../i18n/model"
-], function(bundle) {
+], function(module, BaseModel, SizeByNegativesMode, bundle) {
 
   "use strict";
 
   // Used by: HG, Scatter
-  return [
-    "pentaho/visual/base/model",
-    "../types/sizeByNegativesMode",
-    function(BaseModel, SizeByNegativesMode) {
-
-      return BaseModel.extend({
-        $type: {
-          isAbstract: true,
-          props: [
-            {
-              name: "sizeByNegativesMode",
-              valueType: SizeByNegativesMode,
-              isApplicable: function() { return this.countOf("size") > 0; },
-              isRequired: true,
-              defaultValue: "negLowest"
-            }
-          ]
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      isAbstract: true,
+      props: [
+        {
+          name: "sizeByNegativesMode",
+          valueType: SizeByNegativesMode,
+          isApplicable: function() { return this.countOf("size") > 0; },
+          isRequired: true,
+          defaultValue: "negLowest"
         }
-      })
-      .implement({$type: bundle.structured.scaleSizeContinuous});
+      ]
     }
-  ];
+  })
+  .localize({$type: bundle.structured.ScaleSizeContinuous})
+  .configure({$type: module.config});
 });

@@ -16,12 +16,11 @@
 define([
   "pentaho/visual/scene/Base",
   "pentaho/visual/scene/util",
-  "pentaho/type/Context",
+  "pentaho/visual/base/Model",
+  "pentaho/visual/base/View",
   "pentaho/data/Table",
   "tests/pentaho/util/errorMatch"
-], function(Scene, sceneUtil, Context, DataTable, errorMatch) {
-
-  /* globals it, describe, beforeEach, beforeAll */
+], function(Scene, sceneUtil, VisualModel, View, DataTable, errorMatch) {
 
   /* eslint max-nested-callbacks: 0 */
 
@@ -40,25 +39,6 @@ define([
   }
 
   describe("pentaho.visual.scene.Base", function() {
-
-    var VisualModel;
-    var View;
-
-    beforeAll(function(done) {
-
-      Context.createAsync()
-          .then(function(context) {
-
-            return context.getDependencyApplyAsync([
-              "pentaho/visual/base/model",
-              "pentaho/visual/base/view"
-            ], function(_VisualModel, _View) {
-              VisualModel = _VisualModel;
-              View = _View;
-            });
-          })
-          .then(done, done.fail);
-    });
 
     describe("new (parent, view)", function() {
 
@@ -321,16 +301,16 @@ define([
             props: [
               {
                 name: "category",
-                base: "pentaho/visual/role/property",
+                base: "pentaho/visual/role/Property",
                 modes: ["list"]
               },
               {
                 name: "series",
-                base: "pentaho/visual/role/property"
+                base: "pentaho/visual/role/Property"
               },
               {
                 name: "measure",
-                base: "pentaho/visual/role/property",
+                base: "pentaho/visual/role/Property",
                 modes: [{dataType: "number"}]
               }
             ]

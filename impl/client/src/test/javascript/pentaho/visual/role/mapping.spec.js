@@ -14,36 +14,14 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/changes/Transaction",
+  "pentaho/visual/base/Model",
   "pentaho/data/Table"
-], function(Context, Table) {
+], function(Transaction, Model, Table) {
 
   "use strict";
 
-  /* globals describe, it, beforeEach, afterEach, beforeAll, spyOn */
-
   describe("pentaho.visual.role.Mapping", function() {
-
-    var context;
-    var Model;
-
-    beforeEach(function(done) {
-
-      Context.createAsync()
-          .then(function(_context) {
-
-            context = _context;
-
-            return context.getDependencyApplyAsync([
-              "pentaho/visual/base/model",
-              "pentaho/visual/role/mapping"
-            ], function(_Model) {
-              Model = _Model;
-            });
-          })
-          .then(done, done.fail);
-
-    });
 
     function getDataSpec1() {
       return {
@@ -73,7 +51,7 @@ define([
               props: [
                 {
                   name: "propRoleA",
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "string"}
                   ]
@@ -106,7 +84,7 @@ define([
               props: [
                 {
                   name: "propRoleA",
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "string"}
                   ]
@@ -140,7 +118,7 @@ define([
               props: [
                 {
                   name: "propRoleA",
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "number"}
                   ]
@@ -186,7 +164,7 @@ define([
                 },
                 {
                   name: "propRoleA",
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "string"}
                   ]
@@ -206,7 +184,7 @@ define([
           mode0 = model.propRoleA.mode;
 
           // Start the transaction.
-          txnScope = context.enterChange();
+          txnScope = Transaction.enter();
         });
 
         afterEach(function() {

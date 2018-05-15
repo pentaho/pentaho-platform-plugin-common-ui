@@ -14,35 +14,17 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/visual/action/Base",
+  "pentaho/visual/action/Select",
   "pentaho/visual/action/SelectionModes",
   "tests/pentaho/util/errorMatch"
-], function(Context, SelectionModes, errorMatch) {
+], function(BaseAction, SelectAction, SelectionModes, errorMatch) {
 
   "use strict";
 
   describe("pentaho.visual.action.Select", function() {
 
     var customSelectionMode = function() {};
-
-    var BaseAction;
-    var SelectAction;
-
-    beforeEach(function(done) {
-
-      Context.createAsync()
-          .then(function(context) {
-            return context.getDependencyAsync({
-              BaseAction: "pentaho/visual/action/base",
-              SelectAction: "pentaho/visual/action/select"
-            });
-          })
-          .then(function(types) {
-            BaseAction = types.BaseAction;
-            SelectAction = types.SelectAction;
-          })
-          .then(done, done.fail);
-    });
 
     it("should be defined", function() {
 

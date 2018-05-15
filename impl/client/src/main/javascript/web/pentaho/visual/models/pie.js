@@ -14,61 +14,59 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!",
+  "./Abstract",
+  "./types/LabelsOption",
+  "./mixins/MultiCharted",
+  "./mixins/ScaleColorDiscrete",
   "pentaho/i18n!./i18n/model"
-], function(bundle) {
+], function(module, BaseModel, LabelsOption, MultiChartedModel, ScaleColorDiscreteModel, bundle) {
 
   "use strict";
 
-  return [
-    "./abstract",
-    "./types/labelsOption",
-    "./mixins/multiCharted",
-    "./mixins/scaleColorDiscrete",
-    function(BaseModel, LabelsOption, MultiChartedModel, ScaleColorDiscreteModel) {
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      mixins: [MultiChartedModel, ScaleColorDiscreteModel],
 
-      return BaseModel.extend({
-        $type: {
-          mixins: [MultiChartedModel, ScaleColorDiscreteModel],
+      v2Id: "ccc_pie",
+      category: "piechart",
+      defaultView: "pentaho/ccc/visual/Pie",
 
-          v2Id: "ccc_pie",
-          category: "piechart",
-          defaultView: "pentaho/ccc/visual/pie",
-
-          props: [
-            {
-              name: "rows", // VISUAL_ROLE
-              modes: [
-                {dataType: "list"}
-              ]
-            },
-            {
-              name: "columns", // VISUAL_ROLE
-              base: "pentaho/visual/role/property",
-              modes: [
-                {dataType: "list"}
-              ],
-              ordinal: 6
-            },
-            {
-              name: "measures", // VISUAL_ROLE
-              base: "pentaho/visual/role/property",
-              modes: [
-                {dataType: ["number"]}
-              ],
-              fields: {isRequired: true},
-              ordinal: 7
-            },
-            {
-              name: "labelsOption",
-              valueType: LabelsOption,
-              domain: ["none", "outside", "inside"],
-              isRequired: true,
-              defaultValue: "outside"
-            }
+      props: [
+        {
+          name: "rows", // VISUAL_ROLE
+          modes: [
+            {dataType: "list"}
           ]
+        },
+        {
+          name: "columns", // VISUAL_ROLE
+          base: "pentaho/visual/role/Property",
+          modes: [
+            {dataType: "list"}
+          ],
+          ordinal: 6
+        },
+        {
+          name: "measures", // VISUAL_ROLE
+          base: "pentaho/visual/role/Property",
+          modes: [
+            {dataType: ["number"]}
+          ],
+          fields: {isRequired: true},
+          ordinal: 7
+        },
+        {
+          name: "labelsOption",
+          valueType: LabelsOption,
+          domain: ["none", "outside", "inside"],
+          isRequired: true,
+          defaultValue: "outside"
         }
-      })
-      .implement({$type: bundle.structured.pie});
+      ]
     }
-  ];
+  })
+  .localize({$type: bundle.structured.Pie})
+  .configure({$type: module.config});
 });

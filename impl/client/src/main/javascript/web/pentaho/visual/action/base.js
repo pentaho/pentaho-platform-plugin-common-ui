@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,40 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "pentaho/module!",
+  "pentaho/type/action/Base"
+], function(module, ActionBase) {
 
   "use strict";
 
-  return ["pentaho/type/action/base", function(ActionBase) {
-    /**
-     * @name pentaho.visual.action.Base.Type
-     * @class
-     * @extends pentaho.type.action.Base.Type
-     *
-     * @classDesc The type class of {@link pentaho.visual.action.Base}.
-     */
+  /**
+   * @name pentaho.visual.action.Base.Type
+   * @class
+   * @extends pentaho.type.action.Base.Type
+   *
+   * @classDesc The type class of {@link pentaho.visual.action.Base}.
+   */
 
-    /**
-     * @name Base
-     * @memberOf pentaho.visual.action
-     * @class
-     * @extends pentaho.type.action.Base
-     * @abstract
-     *
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.action.Base>} pentaho/visual/action/base
-     *
-     * @classDesc The `visual.action.Base` class is the base class of the actions
-     * defined by the Visualization API.
-     *
-     * @description Creates a base action instance given its specification.
-     * @param {pentaho.visual.action.spec.IBase} [spec] A base action specification.
-     * @constructor
-     */
+  /**
+   * @name Base
+   * @memberOf pentaho.visual.action
+   * @class
+   * @extends pentaho.type.action.Base
+   * @abstract
+   *
+   * @amd pentaho/visual/action/Base
+   *
+   * @classDesc The `visual.action.Base` class is the base class of the actions
+   * defined by the Visualization API.
+   *
+   * @description Creates a base action instance given its specification.
+   * @param {pentaho.visual.action.spec.IBase} [spec] A base action specification.
+   * @constructor
+   */
 
-    return ActionBase.extend(/** @lends pentaho.visual.action.Base# */{
-      $type: /** @lends pentaho.visual.action.Base.Type# */{
-        isAbstract: true
-      }
-    });
-  }];
+  return ActionBase.extend(/** @lends pentaho.visual.action.Base# */{
+    $type: /** @lends pentaho.visual.action.Base.Type# */{
+      id: module.id,
+      isAbstract: true
+    }
+  })
+  .configure({$type: module.config});
 });

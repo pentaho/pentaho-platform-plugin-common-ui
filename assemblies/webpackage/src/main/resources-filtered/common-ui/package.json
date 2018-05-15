@@ -230,14 +230,17 @@
       "pentaho/visual/role/adaptation/Strategy": {
         "base": "complex"
       },
+      "pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy": {
+        "base": "pentaho/visual/role/adaptation/Strategy",
+        "ranking": -5
+      },
       "pentaho/visual/role/adaptation/IdentityStrategy": {
-        "base": "pentaho/visual/role/adaptation/Strategy"
+        "base": "pentaho/visual/role/adaptation/Strategy",
+        "ranking": -10
       },
       "pentaho/visual/role/adaptation/TupleStrategy": {
-        "base": "pentaho/visual/role/adaptation/Strategy"
-      },
-      "pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy": {
-        "base": "pentaho/visual/role/adaptation/Strategy"
+        "base": "pentaho/visual/role/adaptation/Strategy",
+        "ranking": -20
       },
       "pentaho/visual/models/Abstract": {
         "base": "pentaho/visual/base/Model"
@@ -329,40 +332,52 @@
         "type": "pentaho/config/spec/IRuleSet"
       },
       "pentaho/visual/color/palettes/nominalPrimary": {
-        "type": "pentaho/visual/color/Palette"
+        "type": "pentaho/visual/color/Palette",
+        "ranking": -10
       },
       "pentaho/visual/color/palettes/nominalNeutral": {
-        "type": "pentaho/visual/color/Palette"
+        "type": "pentaho/visual/color/Palette",
+        "ranking": -110
       },
       "pentaho/visual/color/palettes/nominalLight": {
-        "type": "pentaho/visual/color/Palette"
+        "type": "pentaho/visual/color/Palette",
+        "ranking": -120
       },
       "pentaho/visual/color/palettes/nominalDark": {
-        "type": "pentaho/visual/color/Palette"
+        "type": "pentaho/visual/color/Palette",
+        "ranking": -130
       },
       "pentaho/visual/color/palettes/quantitativeBlue3": {
-        "type": "pentaho/visual/color/Palette"
+        "type": "pentaho/visual/color/Palette",
+        "ranking": -10
       },
       "pentaho/visual/color/palettes/quantitativeBlue5": {
-        "type": "pentaho/visual/color/Palette"
+        "type": "pentaho/visual/color/Palette",
+        "ranking": -10
       },
       "pentaho/visual/color/palettes/quantitativeGray3": {
-        "type": "pentaho/visual/color/Palette"
+        "type": "pentaho/visual/color/Palette",
+        "ranking": -10
       },
       "pentaho/visual/color/palettes/quantitativeGray5": {
-        "type": "pentaho/visual/color/Palette"
+        "type": "pentaho/visual/color/Palette",
+        "ranking": -10
       },
       "pentaho/visual/color/palettes/divergentRyg3": {
-        "type": "pentaho/visual/color/Palette"
+        "type": "pentaho/visual/color/Palette",
+        "ranking": -10
       },
       "pentaho/visual/color/palettes/divergentRyg5": {
-        "type": "pentaho/visual/color/Palette"
+        "type": "pentaho/visual/color/Palette",
+        "ranking": -10
       },
       "pentaho/visual/color/palettes/divergentRyb3": {
-        "type": "pentaho/visual/color/Palette"
+        "type": "pentaho/visual/color/Palette",
+        "ranking": -10
       },
       "pentaho/visual/color/palettes/divergentRyb5": {
-        "type": "pentaho/visual/color/Palette"
+        "type": "pentaho/visual/color/Palette",
+        "ranking": -10
       }
     }
   },

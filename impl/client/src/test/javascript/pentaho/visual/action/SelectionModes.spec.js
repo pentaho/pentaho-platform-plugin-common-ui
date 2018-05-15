@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,82 +14,57 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/visual/base/Model",
+  "pentaho/visual/base/View",
+  "pentaho/data/filter/IsIn",
+  "pentaho/data/filter/IsEqual",
+  "pentaho/data/filter/And",
+  "pentaho/data/filter/Or",
+  "pentaho/data/filter/Not",
   "pentaho/data/Table",
   "pentaho/visual/action/SelectionModes"
-], function(Context, Table, SelectionModes) {
+], function(Model, View, IsInFilter, IsEqFilter, AndFilter, OrFilter, NotFilter, Table, SelectionModes) {
 
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false */
+  describe("pentaho.visual.action.SelectionModes", function() {
 
-  describe("pentaho.visual.action.SelectionModes -", function() {
     var sales12k;
     var inStock;
-    var countryPt;
-    var myFilter;
     var model;
     var view;
-    var IsEqFilter;
-    var AndFilter;
-    var OrFilter;
-    var NotFilter;
 
-    beforeEach(function(done) {
+    beforeEach(function() {
+      sales12k = new IsInFilter({property: "sales", values: [{_: "number", v: 12000}]});
+      inStock = new IsEqFilter({property: "inStock", value: {_: "string", v: "true"}});
 
-      Context.createAsync()
-          .then(function(context) {
+      var dataSpec = {
+        model: [
+          {name: "country", type: "string"},
+          {name: "sales", type: "number"},
+          {name: "inStock", type: "string"}
+        ],
+        rows: [
+          {c: [{v: "Portugal"}, {v: 12000}, {v: "true"}]},
+          {c: [{v: "Ireland"}, {v:  6000}, {v: "false"}]},
+          {c: [{v: "France"}, {v: 50000}, {v: "true"}]},
+          {c: [{v: "Germany"}, {v: 12000}, {v: "false"}]},
+          {c: [{v: "Italy"}, {v: 12000}, {v: "false"}]}
+        ]
+      };
 
-            return context.getDependencyApplyAsync([
-              "pentaho/visual/base/model",
-              "pentaho/visual/base/view",
-              "pentaho/data/filter/isIn",
-              "pentaho/data/filter/isEqual",
-              "pentaho/data/filter/and",
-              "pentaho/data/filter/or",
-              "pentaho/data/filter/not"
-            ], function(Model, View, IsInFilter, _IsEqFilter, _AndFilter, _OrFilter, _NotFilter) {
+      model = new Model({
+        data: new Table(dataSpec)
+      });
 
-              IsEqFilter = _IsEqFilter;
-              AndFilter = _AndFilter;
-              OrFilter = _OrFilter;
-              NotFilter = _NotFilter;
-
-              sales12k  = new IsInFilter({property: "sales", values: [{_: "number", v: 12000}]});
-              countryPt = new IsEqFilter({property: "country", value: {_: "string", v: "Portugal"}});
-              inStock   = new IsEqFilter({property: "inStock", value: {_: "string", v: "true"}});
-              myFilter  = new AndFilter({operands: [sales12k, inStock]});
-
-              var dataSpec = {
-                model: [
-                  {name: "country", type: "string"},
-                  {name: "sales", type: "number"},
-                  {name: "inStock", type: "string"}
-                ],
-                rows: [
-                  {c: [{v: "Portugal"}, {v: 12000}, {v: "true" }]},
-                  {c: [{v: "Ireland" }, {v:  6000}, {v: "false"}]},
-                  {c: [{v: "France"  }, {v: 50000}, {v: "true" }]},
-                  {c: [{v: "Germany" }, {v: 12000}, {v: "false"}]},
-                  {c: [{v: "Italy"   }, {v: 12000}, {v: "false"}]}
-                ]
-              };
-
-              model = new Model({
-                data: new Table(dataSpec)
-              });
-
-              view = new View({
-                width: 1,
-                height: 1,
-                model: model
-              });
-            });
-          })
-          .then(done, done.fail);
+      view = new View({
+        width: 1,
+        height: 1,
+        model: model
+      });
     });
 
-    describe("replace -", function() {
+    describe("replace", function() {
       it("should discard current selection and return input selection", function() {
         var result = SelectionModes.replace.call(view, sales12k, inStock);
 
@@ -97,7 +72,7 @@ define([
       });
     });
 
-    describe("toggle -", function() {
+    describe("toggle", function() {
       it("should remove the input selection from the current selection when " +
          "the input selection is fully contained in the current selection", function() {
 
@@ -172,7 +147,7 @@ define([
       });
     });
 
-    describe("add -", function() {
+    describe("add", function() {
       it("should add the input selection to the current selection", function() {
         var result = SelectionModes.add.call(view, sales12k, inStock);
 
@@ -182,13 +157,12 @@ define([
       });
     });
 
-    describe("remove -", function() {
+    describe("remove", function() {
       it("should remove the input selection from the current selection", function() {
         var result = SelectionModes.remove.call(view, sales12k, inStock);
 
         expect(result.toDnf().$contentKey).toBe("(or (and (in sales 12000) (not (= inStock true))))");
       });
     });
-
-  }); // #pentaho.visual.base.types.SelectionModes
+  });
 });

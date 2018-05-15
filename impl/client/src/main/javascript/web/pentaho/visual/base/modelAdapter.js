@@ -14,7 +14,16 @@
  * limitations under the License.
  */
 define([
-  "module",
+  "pentaho/module!",
+  "./AbstractModel",
+  "./Model",
+  "../role/ExternalProperty",
+  "pentaho/data/filter/True",
+  "pentaho/data/filter/False",
+  "pentaho/data/filter/Or",
+  "pentaho/data/filter/And",
+  "pentaho/type/loader",
+  "pentaho/type/changes/Transaction",
   "pentaho/type/changes/ComplexChangeset",
   "pentaho/data/Table",
   "pentaho/data/util",
@@ -23,14 +32,9 @@ define([
   "pentaho/util/logger",
   "pentaho/debug",
   "pentaho/debug/Levels",
-  "pentaho/i18n!model",
-  // so that r.js sees otherwise invisible dependencies.
-  "./abstractModel",
-  "./model",
-  "../role/externalProperty",
-  "pentaho/data/filter/and",
-  "pentaho/data/filter/isEqual"
-], function(module, ComplexChangeset, Table, dataUtil, O, error, logger, debugMgr, DebugLevels, bundle) {
+  "pentaho/i18n!model"
+], function(module, AbstractModel, Model, ExternalProperty, TrueFilter, FalseFilter, OrFilter, AndFilter, typeLoader,
+            Transaction, ComplexChangeset, Table, dataUtil, O, error, logger, debugMgr, DebugLevels, bundle) {
 
   "use strict";
 
@@ -89,594 +93,582 @@ define([
     }
   });
 
-  return [
-    "./abstractModel",
-    "./model",
-    "../role/externalProperty",
-    "pentaho/data/filter/true",
-    "pentaho/data/filter/false",
-    "pentaho/data/filter/or",
-    "pentaho/data/filter/and",
-    "pentaho/data/filter/isEqual",
-    function(AbstractModel, Model, ExternalProperty, TrueFilter, FalseFilter, OrFilter, AndFilter, IsEqualFilter) {
-
-      var __context = this;
-      var __externalPropertyType = ExternalProperty.type;
-
-      // NOTE: these will be kept private until it is decided between the model adapter and the viz concept.
-
-      /**
-       * @name pentaho.visual.base.ModelAdapter.Type
-       * @class
-       * @extends pentaho.visual.base.Model.Type
-       *
-       * @classDesc The type class of {@link pentaho.visual.base.ModelAdapter}.
-       *
-       * @private
-       */
-
-      /**
-       * @name ModelAdapter
-       * @memberOf pentaho.visual.base
-       * @class
-       * @extends pentaho.visual.base.Model
-       * @abstract
-       *
-       * @private
-       *
-       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.base.ModelAdapter>} pentaho/visual/base/modelAdapter
-       *
-       * @classDesc The `ModelAdapter` class is the abstract base class of model adapters.
-       *
-       * @constructor
-       * @description Creates a `ModelAdapter` instance.
-       * @param {pentaho.visual.base.spec.IModelAdapter} [instSpec] A plain object containing the model adapter
-       * specification.
-       */
-      var ModelAdapter = AbstractModel.extend(/** @lends pentaho.visual.base.ModelAdapter# */{
-
-        constructor: function() {
-
-          this.base.apply(this, arguments);
-
-          // Although model has a default value,
-          // changing the valueType of the property resets the default value.
-          // So, model can be null, after all.
-          if(this.model === null) {
-            throw error.argRequired("spec.model");
-          }
-
-          this.__adaptationModel =
-            __createAdaptationModel(this, /* previousAdaptationModel: */null, /* changeset: */null);
-
-          // assert this.__adaptationModel !== null
-
-          // This will create a txn and a changeset and the just set adaptationModel to be replaced
-          // by another one (most probably, an identical one).
-          this.__updateInternalModel();
-
-          // 1. Attaching to the event only after the previous statement has the advantage of not trying to sync the
-          // internal model once more... There's no danger of other listeners interfering (and thus needing
-          // that the handler would be attached already) because this is a new object. Also mappings are created
-          // internally.
-          //
-          // 2. Registering a listener has advantages over overriding _onChangeWill, as the transaction manages
-          // to only call a listener if things changed below it since the last time it was called.
-          // On the other hand, this will cause the commitWill evaluation phase to always have to execute its
-          // lengthier path.
-          //
-          // 3. Must be the last will:change listener, or the internal model is not guaranteed to be in sync.
-          //    TODO: find a way to ensure that we're really the last listener.
-          this.on("will:change", this.__onChangeWillHandler.bind(this), {priority: -Infinity});
-
-          this.model.on("will:change", this.__onModelChangeWillHandler.bind(this));
-        },
-
-        /** @inheritDoc */
-        _createChangeset: function(txn) {
-          return new ModelAdapterChangeset(txn, this);
-        },
-
-        // region Adaptation
-        __adaptationModel: null,
-
-        /**
-         * Gets the *ambient* adaptation model of this model adapter.
-         *
-         * When a transaction is current and this model adapter has changes,
-         * this method obtains the adaptation model of the corresponding changeset,
-         * which will be up to date with the changes made within the transaction.
-         * Otherwise, this method returns the _committed_ adaptation model of the model adapter.
-         *
-         * @return {!IAdaptationModel} The adaptation model.
-         *
-         * @private
-         * @see pentaho.visual.base.ModelAdapter#__getAdaptationModel
-         * @see pentaho.visual.base.ModelAdapterChangeset#__getAdaptationModel
-         */
-        __getAmbientAdaptationModel: function() {
-          return (this.$changeset || this).__getAdaptationModel();
-        },
-
-        /**
-         * Gets the adaptation model of the model adapter.
-         *
-         * Note that this method must exist with the exact same name and signature in
-         * {@link pentaho.visual.base.ModelAdapterChangeset}.
-         *
-         * See {@link pentaho.visual.base.ModelAdapter#__getAmbientAdaptationModel}.
-         *
-         * @return {!IAdaptationModel} The adaptation model.
-         *
-         * @private
-         */
-        __getAdaptationModel: function() {
-          return this.__adaptationModel;
-        },
-
-        /**
-         * Gets the ambient operation mode of a visual role, given its name.
-         *
-         * @param {string} roleName - The visual role name.
-         *
-         * @return {pentaho.visual.role.Mode} The visual role operation mode, if one is established;
-         * `null`, otherwise.
-         *
-         * @private
-         *
-         * @see pentaho.visual.role.ExternalMapping#mode
-         */
-        __getAmbientRoleMode: function(roleName) {
-          var strategyApplication = this.__getAmbientAdaptationModel().roleInfoMap[roleName].strategyApplication;
-          return strategyApplication && strategyApplication.externalMode;
-        },
-
-        /**
-         * Gets the ambient strategy of a visual role, given its name.
-         *
-         * @param {string} roleName - The visual role name.
-         *
-         * @return {pentaho.visual.role.adaptation.Strategy} The current strategy, if one is established;
-         * `null`, otherwise.
-         *
-         * @private
-         *
-         * @see pentaho.visual.role.ExternalMapping#strategy
-         */
-        __getAmbientRoleStrategy: function(roleName) {
-          return this.__getAmbientAdaptationModel().roleInfoMap[roleName].strategy;
-        },
-
-        /**
-         * Event handler for the `will:change` event as emitted by this object.
-         *
-         * @param {!pentaho.type.events.WillChange} event - The will change event.
-         * @private
-         */
-        __onChangeWillHandler: function(event) {
-
-          var changeset = event.changeset;
-          var propertyNames = changeset.propertyNames;
-
-          if(__hasSingleChange(propertyNames, "selectionFilter")) {
-
-            // console.log("[ModelAdapter] will:change modelAdapter.selectionFilter " +
-            //   (this.selectionFilter && this.selectionFilter.$contentKey));
-
-            this.__updateInternalSelection();
-
-          } else {
-
-            // console.log("[ModelAdapter] will:change other");
-
-            this.__updateInternalModel();
-          }
-        },
-
-        /**
-         * Event handler for the `will:change` event as emitted by this.model.
-         *
-         * @param {!pentaho.type.events.WillChange} event - The will change event.
-         * @private
-         */
-        __onModelChangeWillHandler: function(event) {
-
-          var changeset = event.changeset;
-
-          if(changeset.hasChange("selectionFilter")) {
-
-            // console.log("[ModelAdapter] will:change model.selectionFilter");
-
-            this.__updateExternalSelection();
-          }
-        },
-
-        /**
-         * Updates all properties of the internal model:
-         * * [data]{@link pentaho.visual.base.Model#data}
-         * * [selectionFilter]{@link pentaho.visual.base.Model#selectionFilter}
-         * * and for each visual role mapping:
-         *   * [modeFixed]{@link pentaho.visual.role.Mapping#modeFixed}
-         *   * [fields]{@link pentaho.visual.role.Mapping#fields}
-         *
-         * @private
-         */
-        __updateInternalModel: function() {
-
-          var adaptationModel = this.__getAmbientAdaptationModel();
-
-          var roleInfoMap = adaptationModel.roleInfoMap;
-
-          var internalModel = this.model;
-
-          var internalSelectionFilter = this.__calcInternalSelectionFilter();
-
-          // Synchronize internal model.
-          __context.enterChange().using(function(scope) {
-
-            internalModel.data = adaptationModel.internalData;
-            internalModel.selectionFilter = internalSelectionFilter;
-
-            Object.keys(roleInfoMap).forEach(function(propName) {
-
-              var roleInfo = roleInfoMap[propName];
-              var strategyApplication = roleInfo.strategyApplication;
-
-              var internalMapping = internalModel.get(propName);
-
-              internalMapping.modeFixed = strategyApplication && strategyApplication.internalMode;
-              internalMapping.fields = strategyApplication !== null ? roleInfo.strategy.outputFieldNames : [];
-            });
-
-            scope.accept();
-          });
-        },
-
-        /**
-         * Updates the [selectionFilter]{@link pentaho.visual.base.Model#selectionFilter} property of
-         * the internal model.
-         *
-         * @private
-         */
-        __updateInternalSelection: function() {
-          this.model.selectionFilter = this.__calcInternalSelectionFilter();
-        },
-
-        /**
-         * Updates the [selectionFilter]{@link pentaho.visual.base.Model#selectionFilter} property of
-         * the external model.
-         *
-         * @private
-         */
-        __updateExternalSelection: function() {
-          this.selectionFilter = this.__calcExternalSelectionFilter();
-        },
-        // endregion
-
-        // region filter conversion
-        /**
-         * Calculates the internal selection filter based on the external one.
-         *
-         * @return {pentaho.data.filter.Abstract} The internal filter, possibly `null`.
-         * @private
-         */
-        __calcInternalSelectionFilter: function() {
-          var externalSelectionFilter = this.selectionFilter;
-          if(externalSelectionFilter !== null) {
-            return this._convertFilterToInternal(externalSelectionFilter);
-          }
-
-          return null;
-        },
-        /**
-         * Calculates the external selection filter based on the internal one.
-         *
-         * @return {pentaho.data.filter.Abstract} The external filter, possibly `null`.
-         * @private
-         */
-        __calcExternalSelectionFilter: function() {
-          var internalSelectionFilter = this.model.selectionFilter;
-          if(internalSelectionFilter !== null) {
-            return this._convertFilterToExternal(internalSelectionFilter);
-          }
-
-          return null;
-        },
-
-        /**
-         * Converts a filter from the model adapter namespace into the internal model namespace.
-         *
-         * @param {!pentaho.data.filter.Abstract} externalFilter - The external filter.
-         * @return {pentaho.data.filter.Abstract} The corresponding internal filter.
-         * @protected
-         */
-        _convertFilterToInternal: function(externalFilter) {
-          var adaptationModel = this.__getAmbientAdaptationModel();
-          var internalData = adaptationModel.internalData;
-          if(internalData === null) {
-            return null;
-          }
-
-          var filterContext = {
-            modelAdapter: this,
-            internalData: internalData,
-            toExternal: false
-          };
-
-          // Find isProperty filters and convert their property equals', name and value to the internal data space.
-          return externalFilter
-            .visit(__flattenTree)
-            .visit(__transformFilter.bind(filterContext));
-        },
-
-        /**
-         * Converts a filter from the internal model namespace into the model adapter namespace.
-         *
-         * @param {!pentaho.data.filter.Abstract} internalFilter - The internal filter.
-         * @return {pentaho.data.filter.Abstract} The corresponding external filter.
-         * @protected
-         */
-        _convertFilterToExternal: function(internalFilter) {
-          var adaptationModel = this.__getAmbientAdaptationModel();
-          var internalData = adaptationModel.internalData;
-          if(internalData === null) {
-            return null;
-          }
-          var filterContext = {
-            modelAdapter: this,
-            internalData: internalData,
-            toExternal: true
-          };
-
-          // Find isProperty filters and convert their property equals', name and value to the external data space.
-          return internalFilter
-            .visit(__flattenTree)
-            .visit(__transformFilter.bind(filterContext));
-        },
-
-        /**
-         * Converts a given map of property names to values and/or cells into
-         * a map of property names to cells on the opposite model.
-         *
-         * Properties which are mapped to visual roles which are not currently valid
-         * (have no defined strategy), are skipped.
-         * Properties whose values are not known to the current strategy are skipped.
-         *
-         * @param {!Object.<string, any|pentaho.data.ICell>} originalValuesMap - The map of property names to
-         * values and/or cells.
-         * @param {boolean} toExternal If true converts from internal to external properties,
-         * the other way around if false.
-         *
-         * @return {!Object.<string, pentaho.data.ICell>} The corresponding map of internal or external property names
-         *   to cells.
-         *
-         * @private
-         */
-        __convertValuesMap: function(originalValuesMap, toExternal) {
-          var ambientRoleInfoMap = this.__getAmbientAdaptationModel().roleInfoMap;
-          var convertedValuesMap = Object.create(null);
-          var originModel = toExternal ? this.model : this;
-
-          originModel.$type.eachVisualRole(function(propType) {
-            var mapping = originModel.get(propType);
-            var strategy;
-
-            if(mapping.hasFields && (strategy = ambientRoleInfoMap[propType.name].strategy) !== null) {
-              var fieldValues = __collectFieldValues(mapping, originalValuesMap);
-              if(fieldValues !== null) {
-                var fieldCells = toExternal ? strategy.invert(fieldValues) : strategy.map(fieldValues);
-                if(fieldCells == null) {
-                  throw error.argInvalid("originalValuesMap", "Unable to convert values.");
-                }
-
-                var fieldNames = toExternal ? strategy.inputFieldNames : strategy.outputFieldNames;
-
-                fieldCells.forEach(function(fieldCell, index) {
-                  if(fieldCell !== undefined) {
-                    convertedValuesMap[fieldNames[index]] = fieldCell;
-                  }
-                });
-              }
-            }
-          });
-
-          return convertedValuesMap;
-        },
-        // endregion
-
-        $type: /** @lends pentaho.visual.base.ModelAdapter.Type# */{
-          isAbstract: true,
-
-          props: [
-            {
-              /**
-               * Gets or sets the internal model.
-               *
-               * This property can only be specified at construction time.
-               * When not specified,
-               * an empty model of the property's [valueType]{@link pentaho.type.Property.Type#valueType}
-               * is attempted to be created.
-               *
-               * @name model
-               * @memberOf pentaho.visual.base.ModelAdapter#
-               * @type {pentaho.visual.base.Model}
-               */
-              name: "model",
-              valueType: Model,
-              isBoundary: true,
-              isRequired: true,
-              isReadOnly: true,
-              // Create a new instance each time.
-              defaultValue: function() { return {}; }
-            }
-          ]
-        }
-      })
-      .implement({
-        $type: /** @lends pentaho.visual.base.ModelAdapter.Type# */{
-          // Declare in a separate specification group so as to not be triggered by the above props specification.
-          /** @inheritDoc */
-          _configureProperties: function(propTypesSpec) {
-
-            // `propTypeSpecs` is a copy of the original value.
-            var normalizedPropTypeSpecs = this._normalizePropertiesSpec(propTypesSpec);
-
-            // Expand the model property into the associated VR properties.
-
-            // Index by property name.
-            var propTypeInfoMap = Object.create(null);
-
-            normalizedPropTypeSpecs.forEach(function(propTypeSpec, index) {
-              if(!O.hasOwn(propTypeInfoMap, propTypeSpec.name)) {
-                propTypeInfoMap[propTypeSpec.name] = {
-                  spec: propTypeSpec,
-                  index: index
-                };
-              }
-            });
-
-            var modelPropInfo = propTypeInfoMap.model;
-            if(modelPropInfo != null) {
-              // Process the model valueType, if specified.
-              var internalModelTypeSpec = modelPropInfo.spec.valueType;
-              if(internalModelTypeSpec != null) {
-                var internalModelTypeBase = this.get("model").valueType;
-                var internalModelType = __context.get(internalModelTypeSpec).type;
-
-                if(internalModelTypeBase !== internalModelType &&
-                  internalModelType.isSubtypeOf(internalModelTypeBase)) {
-
-                  // Sync description and such.
-                  this.label = internalModelType.label;
-                  this.description = internalModelType.description;
-                  this.ordinal = internalModelType.ordinal;
-                  this.category = internalModelType.category;
-                  this.helpUrl = internalModelType.helpUrl;
-
-                  // Expand model.
-                  var newRolePropTypeSpecs = [];
-
-                  internalModelType.eachVisualRole(function(internalPropType) {
-                    var roleName = internalPropType.name;
-                    var internalPropTypeBase = internalModelTypeBase.get(roleName, /* sloppy: */true);
-                    if(internalPropType !== internalPropTypeBase) {
-                      // New or something changed. So, need to create/override locally as well.
-
-                      var propTypeSpec;
-                      var rolePropInfo = O.getOwn(propTypeInfoMap, roleName, null);
-                      if(rolePropInfo !== null) {
-                        // Extend and replace existing spec.
-                        propTypeSpec = Object.create(rolePropInfo.spec);
-                        if(!this.has(roleName)) {
-                          propTypeSpec.base = __externalPropertyType;
-                        }
-
-                        // Clear out, to not change indexes. Filtered at the end.
-                        propTypesSpec[rolePropInfo.index] = null;
-                      } else {
-                        propTypeSpec = {
-                          name: roleName,
-                          base: this.has(roleName) ? undefined : __externalPropertyType
-                        };
-                      }
-
-                      newRolePropTypeSpecs.push(propTypeSpec);
-                    }
-                  }, this);
-
-                  if(newRolePropTypeSpecs.length > 0) {
-                    // Insert new/changed role props after the model property.
-                    newRolePropTypeSpecs.unshift(modelPropInfo.index + 1, 0);
-                    normalizedPropTypeSpecs.splice.apply(normalizedPropTypeSpecs, newRolePropTypeSpecs);
-
-                    // Filter out nulls.
-                    propTypesSpec = normalizedPropTypeSpecs.filter(function(propTypeSpec) {
-                      return propTypeSpec !== null;
-                    });
-                  }
-                }
-              }
-            }
-
-            this.base(propTypesSpec);
-          }
-        }
-      })
-      .implement({$type: bundle.structured.modelAdapter});
-
-      return ModelAdapter;
-
-      // region Filter Conversion
-      function __transformFilter(filter) {
-        var equalsMap;
-
-        switch(filter.kind) {
-          case "true":
-          case "false":
-          case "or":
-            return null;
-
-          case "and":
-            // Collect and replace all isEqual children.
-            equalsMap = null;
-            var operands = [];
-
-            var filterOperands = filter.operands;
-            var filterOperandsCount = filterOperands.count;
-            for(var iOperand = 0; iOperand < filterOperandsCount; iOperand++) {
-              var operandFilter = filterOperands.at(iOperand);
-
-              if(operandFilter.kind === "isEqual") {
-                if(equalsMap === null) {
-                  equalsMap = Object.create(null);
-                }
-
-                // The same property cannot have different values at the same time therefore return False
-                if(equalsMap[operandFilter.property] !== undefined &&
-                  equalsMap[operandFilter.property] !== operandFilter.value) {
-                  return FalseFilter.instance;
-                }
-
-                equalsMap[operandFilter.property] = operandFilter.value;
-              } else {
-                // visit other filter types
-                operands.push(operandFilter.visit(__transformFilter.bind(this)));
-              }
-            }
-
-            // if isEqual operands found for And filter
-            if(equalsMap !== null) {
-              // Map internal/external values to external/internal values.
-              equalsMap = this.modelAdapter.__convertValuesMap(equalsMap, this.toExternal);
-
-              operands.push.apply(operands, Object.keys(equalsMap).map(function(propName) {
-                return dataUtil.createFilterIsEqualFromCell(
-                  this.internalData,
-                  propName,
-                  equalsMap[propName],
-                  __context);
-              }, this));
-            }
-
-            return new AndFilter({operands: operands});
-
-          case "isEqual":
-            equalsMap = {};
-            equalsMap[filter.property] = filter.value;
-
-            equalsMap = this.modelAdapter.__convertValuesMap(equalsMap, this.toExternal);
-
-            filter = dataUtil.createFilterFromCellsMap(equalsMap, this.internalData, __context);
-
-            return filter !== null ? filter : TrueFilter.instance;
-          default:
-            throw error.argInvalid("filter", "Converting " + filter.kind + " filter is not supported.");
-        }
+  var __externalPropertyType = ExternalProperty.type;
+
+  // NOTE: these will be kept private until it is decided between the model adapter and the viz concept.
+
+  /**
+   * @name pentaho.visual.base.ModelAdapter.Type
+   * @class
+   * @extends pentaho.visual.base.Model.Type
+   *
+   * @classDesc The type class of {@link pentaho.visual.base.ModelAdapter}.
+   *
+   * @private
+   */
+
+  /**
+   * @name ModelAdapter
+   * @memberOf pentaho.visual.base
+   * @class
+   * @extends pentaho.visual.base.Model
+   * @abstract
+   *
+   * @private
+   *
+   * @amd pentaho/visual/base/ModelAdapter
+   *
+   * @classDesc The `ModelAdapter` class is the abstract base class of model adapters.
+   *
+   * @constructor
+   * @description Creates a `ModelAdapter` instance.
+   * @param {pentaho.visual.base.spec.IModelAdapter} [instSpec] A plain object containing the model adapter
+   * specification.
+   */
+  var ModelAdapter = AbstractModel.extend(/** @lends pentaho.visual.base.ModelAdapter# */{
+
+    constructor: function() {
+
+      this.base.apply(this, arguments);
+
+      // Although model has a default value,
+      // changing the valueType of the property resets the default value.
+      // So, model can be null, after all.
+      if(this.model === null) {
+        throw error.argRequired("spec.model");
       }
 
-      // endregion
+      this.__adaptationModel =
+        __createAdaptationModel(this, /* previousAdaptationModel: */null, /* changeset: */null);
+
+      // assert this.__adaptationModel !== null
+
+      // This will create a txn and a changeset and the just set adaptationModel to be replaced
+      // by another one (most probably, an identical one).
+      this.__updateInternalModel();
+
+      // 1. Attaching to the event only after the previous statement has the advantage of not trying to sync the
+      // internal model once more... There's no danger of other listeners interfering (and thus needing
+      // that the handler would be attached already) because this is a new object. Also mappings are created
+      // internally.
+      //
+      // 2. Registering a listener has advantages over overriding _onChangeWill, as the transaction manages
+      // to only call a listener if things changed below it since the last time it was called.
+      // On the other hand, this will cause the commitWill evaluation phase to always have to execute its
+      // lengthier path.
+      //
+      // 3. Must be the last will:change listener, or the internal model is not guaranteed to be in sync.
+      //    TODO: find a way to ensure that we're really the last listener.
+      this.on("will:change", this.__onChangeWillHandler.bind(this), {priority: -Infinity, isCritical: true});
+
+      this.model.on("will:change", this.__onModelChangeWillHandler.bind(this), {priority: -Infinity, isCritical: true});
+    },
+
+    /** @inheritDoc */
+    _createChangeset: function(txn) {
+      return new ModelAdapterChangeset(txn, this);
+    },
+
+    // region Adaptation
+    __adaptationModel: null,
+
+    /**
+     * Gets the *ambient* adaptation model of this model adapter.
+     *
+     * When a transaction is current and this model adapter has changes,
+     * this method obtains the adaptation model of the corresponding changeset,
+     * which will be up to date with the changes made within the transaction.
+     * Otherwise, this method returns the _committed_ adaptation model of the model adapter.
+     *
+     * @return {!IAdaptationModel} The adaptation model.
+     *
+     * @private
+     * @see pentaho.visual.base.ModelAdapter#__getAdaptationModel
+     * @see pentaho.visual.base.ModelAdapterChangeset#__getAdaptationModel
+     */
+    __getAmbientAdaptationModel: function() {
+      return (this.$changeset || this).__getAdaptationModel();
+    },
+
+    /**
+     * Gets the adaptation model of the model adapter.
+     *
+     * Note that this method must exist with the exact same name and signature in
+     * {@link pentaho.visual.base.ModelAdapterChangeset}.
+     *
+     * See {@link pentaho.visual.base.ModelAdapter#__getAmbientAdaptationModel}.
+     *
+     * @return {!IAdaptationModel} The adaptation model.
+     *
+     * @private
+     */
+    __getAdaptationModel: function() {
+      return this.__adaptationModel;
+    },
+
+    /**
+     * Gets the ambient operation mode of a visual role, given its name.
+     *
+     * @param {string} roleName - The visual role name.
+     *
+     * @return {pentaho.visual.role.Mode} The visual role operation mode, if one is established;
+     * `null`, otherwise.
+     *
+     * @private
+     *
+     * @see pentaho.visual.role.ExternalMapping#mode
+     */
+    __getAmbientRoleMode: function(roleName) {
+      var strategyApplication = this.__getAmbientAdaptationModel().roleInfoMap[roleName].strategyApplication;
+      return strategyApplication && strategyApplication.externalMode;
+    },
+
+    /**
+     * Gets the ambient strategy of a visual role, given its name.
+     *
+     * @param {string} roleName - The visual role name.
+     *
+     * @return {pentaho.visual.role.adaptation.Strategy} The current strategy, if one is established;
+     * `null`, otherwise.
+     *
+     * @private
+     *
+     * @see pentaho.visual.role.ExternalMapping#strategy
+     */
+    __getAmbientRoleStrategy: function(roleName) {
+      return this.__getAmbientAdaptationModel().roleInfoMap[roleName].strategy;
+    },
+
+    /**
+     * Event handler for the `will:change` event as emitted by this object.
+     *
+     * @param {!pentaho.type.events.WillChange} event - The will change event.
+     * @private
+     */
+    __onChangeWillHandler: function(event) {
+
+      var changeset = event.changeset;
+      var propertyNames = changeset.propertyNames;
+
+      if(__hasSingleChange(propertyNames, "selectionFilter")) {
+
+        // console.log("[ModelAdapter] will:change modelAdapter.selectionFilter " +
+        //   (this.selectionFilter && this.selectionFilter.$contentKey));
+
+        this.__updateInternalSelection();
+
+      } else {
+
+        // console.log("[ModelAdapter] will:change other");
+
+        this.__updateInternalModel();
+      }
+    },
+
+    /**
+     * Event handler for the `will:change` event as emitted by this.model.
+     *
+     * @param {!pentaho.type.events.WillChange} event - The will change event.
+     * @private
+     */
+    __onModelChangeWillHandler: function(event) {
+
+      var changeset = event.changeset;
+
+      if(changeset.hasChange("selectionFilter")) {
+
+        // console.log("[ModelAdapter] will:change model.selectionFilter");
+
+        this.__updateExternalSelection();
+      }
+    },
+
+    /**
+     * Updates all properties of the internal model:
+     * * [data]{@link pentaho.visual.base.Model#data}
+     * * [selectionFilter]{@link pentaho.visual.base.Model#selectionFilter}
+     * * and for each visual role mapping:
+     *   * [modeFixed]{@link pentaho.visual.role.Mapping#modeFixed}
+     *   * [fields]{@link pentaho.visual.role.Mapping#fields}
+     *
+     * @private
+     */
+    __updateInternalModel: function() {
+
+      var adaptationModel = this.__getAmbientAdaptationModel();
+
+      var roleInfoMap = adaptationModel.roleInfoMap;
+
+      var internalModel = this.model;
+
+      var internalSelectionFilter = this.__calcInternalSelectionFilter();
+
+      // Synchronize internal model.
+      Transaction.enter().using(function(scope) {
+
+        internalModel.data = adaptationModel.internalData;
+        internalModel.selectionFilter = internalSelectionFilter;
+
+        Object.keys(roleInfoMap).forEach(function(propName) {
+
+          var roleInfo = roleInfoMap[propName];
+          var strategyApplication = roleInfo.strategyApplication;
+
+          var internalMapping = internalModel.get(propName);
+
+          internalMapping.modeFixed = strategyApplication && strategyApplication.internalMode;
+          internalMapping.fields = strategyApplication !== null ? roleInfo.strategy.outputFieldNames : [];
+        });
+
+        scope.accept();
+      });
+    },
+
+    /**
+     * Updates the [selectionFilter]{@link pentaho.visual.base.Model#selectionFilter} property of
+     * the internal model.
+     *
+     * @private
+     */
+    __updateInternalSelection: function() {
+      // In a scenario where the external selectionFilter is updated,
+      // this gets called and, unfortunately, the following will also cause __onModelChangeWillHandler to be called,
+      // which will update back the external selectionFilter...
+      this.model.selectionFilter = this.__calcInternalSelectionFilter();
+    },
+
+    /**
+     * Updates the [selectionFilter]{@link pentaho.visual.base.Model#selectionFilter} property of
+     * the external model.
+     *
+     * @private
+     */
+    __updateExternalSelection: function() {
+      this.selectionFilter = this.__calcExternalSelectionFilter();
+    },
+    // endregion
+
+    // region filter conversion
+    /**
+     * Calculates the internal selection filter based on the external one.
+     *
+     * @return {pentaho.data.filter.Abstract} The internal filter, possibly `null`.
+     * @private
+     */
+    __calcInternalSelectionFilter: function() {
+      var externalSelectionFilter = this.selectionFilter;
+      if(externalSelectionFilter !== null) {
+        return this._convertFilterToInternal(externalSelectionFilter);
+      }
+
+      return null;
+    },
+    /**
+     * Calculates the external selection filter based on the internal one.
+     *
+     * @return {pentaho.data.filter.Abstract} The external filter, possibly `null`.
+     * @private
+     */
+    __calcExternalSelectionFilter: function() {
+      var internalSelectionFilter = this.model.selectionFilter;
+      if(internalSelectionFilter !== null) {
+        return this._convertFilterToExternal(internalSelectionFilter);
+      }
+
+      return null;
+    },
+
+    /**
+     * Converts a filter from the model adapter namespace into the internal model namespace.
+     *
+     * @param {!pentaho.data.filter.Abstract} externalFilter - The external filter.
+     * @return {pentaho.data.filter.Abstract} The corresponding internal filter.
+     * @protected
+     */
+    _convertFilterToInternal: function(externalFilter) {
+      var adaptationModel = this.__getAmbientAdaptationModel();
+      var internalData = adaptationModel.internalData;
+      if(internalData === null) {
+        return null;
+      }
+
+      var filterContext = {
+        modelAdapter: this,
+        internalData: internalData,
+        toExternal: false
+      };
+
+      // Find isProperty filters and convert their property equals', name and value to the internal data space.
+      return externalFilter
+        .visit(__flattenTree)
+        .visit(__transformFilter.bind(filterContext));
+    },
+
+    /**
+     * Converts a filter from the internal model namespace into the model adapter namespace.
+     *
+     * @param {!pentaho.data.filter.Abstract} internalFilter - The internal filter.
+     * @return {pentaho.data.filter.Abstract} The corresponding external filter.
+     * @protected
+     */
+    _convertFilterToExternal: function(internalFilter) {
+      var adaptationModel = this.__getAmbientAdaptationModel();
+      var internalData = adaptationModel.internalData;
+      if(internalData === null) {
+        return null;
+      }
+      var filterContext = {
+        modelAdapter: this,
+        internalData: internalData,
+        toExternal: true
+      };
+
+      // Find isProperty filters and convert their property equals', name and value to the external data space.
+      return internalFilter
+        .visit(__flattenTree)
+        .visit(__transformFilter.bind(filterContext));
+    },
+
+    /**
+     * Converts a given map of property names to values and/or cells into
+     * a map of property names to cells on the opposite model.
+     *
+     * Properties which are mapped to visual roles which are not currently valid
+     * (have no defined strategy), are skipped.
+     * Properties whose values are not known to the current strategy are skipped.
+     *
+     * @param {!Object.<string, any|pentaho.data.ICell>} originalValuesMap - The map of property names to
+     * values and/or cells.
+     * @param {boolean} toExternal If true converts from internal to external properties,
+     * the other way around if false.
+     *
+     * @return {!Object.<string, pentaho.data.ICell>} The corresponding map of internal or external property names
+     *   to cells.
+     *
+     * @private
+     */
+    __convertValuesMap: function(originalValuesMap, toExternal) {
+      var ambientRoleInfoMap = this.__getAmbientAdaptationModel().roleInfoMap;
+      var convertedValuesMap = Object.create(null);
+      var originModel = toExternal ? this.model : this;
+
+      originModel.$type.eachVisualRole(function(propType) {
+        var mapping = originModel.get(propType);
+        var strategy;
+
+        if(mapping.hasFields && (strategy = ambientRoleInfoMap[propType.name].strategy) !== null) {
+          var fieldValues = __collectFieldValues(mapping, originalValuesMap);
+          if(fieldValues !== null) {
+            var fieldCells = toExternal ? strategy.invert(fieldValues) : strategy.map(fieldValues);
+            if(fieldCells == null) {
+              throw error.argInvalid("originalValuesMap", "Unable to convert values.");
+            }
+
+            var fieldNames = toExternal ? strategy.inputFieldNames : strategy.outputFieldNames;
+
+            fieldCells.forEach(function(fieldCell, index) {
+              if(fieldCell !== undefined) {
+                convertedValuesMap[fieldNames[index]] = fieldCell;
+              }
+            });
+          }
+        }
+      });
+
+      return convertedValuesMap;
+    },
+    // endregion
+
+    $type: /** @lends pentaho.visual.base.ModelAdapter.Type# */{
+
+      id: module.id,
+      isAbstract: true,
+
+      props: [
+        {
+          /**
+           * Gets or sets the internal model.
+           *
+           * This property can only be specified at construction time.
+           * When not specified,
+           * an empty model of the property's [valueType]{@link pentaho.type.Property.Type#valueType}
+           * is attempted to be created.
+           *
+           * @name model
+           * @memberOf pentaho.visual.base.ModelAdapter#
+           * @type {pentaho.visual.base.Model}
+           */
+          name: "model",
+          valueType: Model,
+          isBoundary: true,
+          isRequired: true,
+          isReadOnly: true,
+          // Create a new instance each time.
+          defaultValue: function() { return {}; }
+        }
+      ]
     }
-  ];
+  })
+    .implement({
+      $type: /** @lends pentaho.visual.base.ModelAdapter.Type# */{
+        // Declare in a separate specification group so as to not be triggered by the above props specification.
+        /** @inheritDoc */
+        _configureProperties: function(propTypesSpec) {
+
+          // `propTypeSpecs` is a copy of the original value.
+          var normalizedPropTypeSpecs = this._normalizePropertiesSpec(propTypesSpec);
+
+          // Expand the model property into the associated VR properties.
+
+          // Index by property name.
+          var propTypeInfoMap = Object.create(null);
+
+          normalizedPropTypeSpecs.forEach(function(propTypeSpec, index) {
+            if(!O.hasOwn(propTypeInfoMap, propTypeSpec.name)) {
+              propTypeInfoMap[propTypeSpec.name] = {
+                spec: propTypeSpec,
+                index: index
+              };
+            }
+          });
+
+          var modelPropInfo = propTypeInfoMap.model;
+          if(modelPropInfo != null) {
+            // Process the model valueType, if specified.
+            var internalModelTypeSpec = modelPropInfo.spec.valueType;
+            if(internalModelTypeSpec != null) {
+              var internalModelTypeBase = this.get("model").valueType;
+              var internalModelType = typeLoader.resolveType(internalModelTypeSpec).type;
+
+              if(internalModelTypeBase !== internalModelType &&
+                internalModelType.isSubtypeOf(internalModelTypeBase)) {
+
+                // Sync description and such.
+                this.label = internalModelType.label;
+                this.description = internalModelType.description;
+                this.ordinal = internalModelType.ordinal;
+                this.category = internalModelType.category;
+                this.helpUrl = internalModelType.helpUrl;
+
+                // Expand model.
+                var newRolePropTypeSpecs = [];
+
+                internalModelType.eachVisualRole(function(internalPropType) {
+                  var roleName = internalPropType.name;
+                  var internalPropTypeBase = internalModelTypeBase.get(roleName, /* sloppy: */true);
+                  if(internalPropType !== internalPropTypeBase) {
+                    // New or something changed. So, need to create/override locally as well.
+
+                    var propTypeSpec;
+                    var rolePropInfo = O.getOwn(propTypeInfoMap, roleName, null);
+                    if(rolePropInfo !== null) {
+                      // Extend and replace existing spec.
+                      propTypeSpec = Object.create(rolePropInfo.spec);
+                      if(!this.has(roleName)) {
+                        propTypeSpec.base = __externalPropertyType;
+                      }
+
+                      // Clear out, to not change indexes. Filtered at the end.
+                      propTypesSpec[rolePropInfo.index] = null;
+                    } else {
+                      propTypeSpec = {
+                        name: roleName,
+                        base: this.has(roleName) ? undefined : __externalPropertyType
+                      };
+                    }
+
+                    newRolePropTypeSpecs.push(propTypeSpec);
+                  }
+                }, this);
+
+                if(newRolePropTypeSpecs.length > 0) {
+                  // Insert new/changed role props after the model property.
+                  newRolePropTypeSpecs.unshift(modelPropInfo.index + 1, 0);
+                  normalizedPropTypeSpecs.splice.apply(normalizedPropTypeSpecs, newRolePropTypeSpecs);
+
+                  // Filter out nulls.
+                  propTypesSpec = normalizedPropTypeSpecs.filter(function(propTypeSpec) {
+                    return propTypeSpec !== null;
+                  });
+                }
+              }
+            }
+          }
+
+          this.base(propTypesSpec);
+        }
+      }
+    })
+    .localize({$type: bundle.structured.ModelAdapter})
+    .configure({$type: module.config});
+
+  return ModelAdapter;
+
+  // region Filter conversion
+  function __transformFilter(filter) {
+    var equalsMap;
+
+    switch(filter.kind) {
+      case "true":
+      case "false":
+      case "or":
+        return null;
+      case "and":
+        // Collect and replace all isEqual children.
+        equalsMap = null;
+        var operands = [];
+
+        var filterOperands = filter.operands;
+        var filterOperandsCount = filterOperands.count;
+        for(var iOperand = 0; iOperand < filterOperandsCount; iOperand++) {
+          var operandFilter = filterOperands.at(iOperand);
+
+          if(operandFilter.kind === "isEqual") {
+            if(equalsMap === null) {
+              equalsMap = Object.create(null);
+            }
+
+            // The same property cannot have different values at the same time therefore return False
+            if(equalsMap[operandFilter.property] !== undefined &&
+              equalsMap[operandFilter.property] !== operandFilter.value) {
+              return FalseFilter.instance;
+            }
+
+            equalsMap[operandFilter.property] = operandFilter.value;
+          } else {
+            // visit other filter types
+            operands.push(operandFilter.visit(__transformFilter.bind(this)));
+          }
+        }
+
+        // if isEqual operands found for And filter
+        if(equalsMap !== null) {
+          // Map internal/external values to external/internal values.
+          equalsMap = this.modelAdapter.__convertValuesMap(equalsMap, this.toExternal);
+
+          operands.push.apply(operands, Object.keys(equalsMap).map(function(propName) {
+            return dataUtil.createFilterIsEqualFromCell(
+              this.internalData,
+              propName,
+              equalsMap[propName]);
+          }, this));
+        }
+
+        return new AndFilter({operands: operands});
+
+      case "isEqual":
+        equalsMap = {};
+        equalsMap[filter.property] = filter.value;
+
+        equalsMap = this.modelAdapter.__convertValuesMap(equalsMap, this.toExternal);
+
+        filter = dataUtil.createFilterFromCellsMap(equalsMap, this.internalData);
+
+        return filter !== null ? filter : TrueFilter.instance;
+      default:
+        throw error.argInvalid("filter", "Converting " + filter.kind + " filter is not supported.");
+    }
+  }
 
   function __flattenTree(f) {
 
@@ -705,6 +697,34 @@ define([
         return new f.constructor({operands: osFlattened});
     }
   }
+
+  function __collectFieldValues(mapping, valuesMap) {
+    var fieldValues = null;
+
+    var i = 0;
+    var count = mapping.fields.count;
+    mapping.fields.each(function(mappingField) {
+      var name = mappingField.name;
+
+      var value = valuesMap[name];
+      if(value !== undefined) {
+
+        // Accept cells as well.
+        value = dataUtil.getCellValue(value);
+
+        if(fieldValues == null) {
+          fieldValues = new Array(count);
+        }
+
+        fieldValues[i] = value;
+      }
+
+      ++i;
+    });
+
+    return fieldValues;
+  }
+  // endregion
 
   function __hasSingleChange(propertyNames, propertyName) {
     return propertyNames.length === 1 && propertyNames[0] === propertyName;
@@ -834,36 +854,6 @@ define([
       strategyApplicationA.internalMode.equals(strategyApplicationB.internalMode) &&
       strategyApplicationA.externalMode.equals(strategyApplicationB.externalMode) &&
       strategyApplicationA.strategyType === strategyApplicationB.strategyType;
-  }
-
-  // endregion
-
-  // region Filter conversion
-  function __collectFieldValues(mapping, valuesMap) {
-    var fieldValues = null;
-
-    var i = 0;
-    var count = mapping.fields.count;
-    mapping.fields.each(function(mappingField) {
-      var name = mappingField.name;
-
-      var value = valuesMap[name];
-      if(value !== undefined) {
-
-        // Accept cells as well.
-        value = dataUtil.getCellValue(value);
-
-        if(fieldValues == null) {
-          fieldValues = new Array(count);
-        }
-
-        fieldValues[i] = value;
-      }
-
-      ++i;
-    });
-
-    return fieldValues;
   }
 
   // endregion

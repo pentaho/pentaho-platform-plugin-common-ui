@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,35 +14,14 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/visual/models/Abstract",
+  "pentaho/visual/models/Bar",
   "pentaho/data/Table"
-], function(Context, Table) {
+], function(AbstractModel, BarModel, Table) {
 
   "use strict";
 
-  /* global describe:true, it:true, expect:true, beforeEach:true*/
-
   describe("pentaho.visual.ccc.bar.Model", function() {
-
-    var AbstractModel;
-    var BarModel;
-
-    beforeEach(function(done) {
-
-      Context.createAsync()
-          .then(function(context) {
-
-            return context.getDependencyApplyAsync([
-              "pentaho/visual/models/abstract",
-              "pentaho/visual/models/bar"
-            ], function(_AbstractModel, _BarModel) {
-              AbstractModel = _AbstractModel;
-              BarModel = _BarModel;
-            });
-          })
-          .then(done, done.fail);
-
-    });
 
     it("should be a function", function() {
       expect(typeof BarModel).toBe("function");
@@ -53,6 +32,7 @@ define([
     });
 
     it("should be possible to create a instance with no arguments", function() {
+      // eslint-disable-next-line no-new
       new BarModel();
     });
 

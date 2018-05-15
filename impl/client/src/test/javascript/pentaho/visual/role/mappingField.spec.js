@@ -14,32 +14,13 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/visual/role/mappingField",
   "pentaho/type/SpecificationScope"
-], function(Context, SpecificationScope) {
+], function(MappingField, SpecificationScope) {
 
   "use strict";
 
-  /* globals describe, it, beforeEach, spyOn */
-
   describe("pentaho.visual.role.MappingField", function() {
-
-    var MappingField;
-
-    beforeEach(function(done) {
-
-      Context.createAsync()
-          .then(function(context) {
-
-            return context.getDependencyApplyAsync([
-              "pentaho/visual/role/mappingField"
-            ], function(_MappingField) {
-              MappingField = _MappingField;
-            });
-          })
-          .then(done, done.fail);
-
-    });
 
     describe("constructor(name|spec)", function() {
 

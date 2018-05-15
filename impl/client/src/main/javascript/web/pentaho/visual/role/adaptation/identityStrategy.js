@@ -14,175 +14,167 @@
  * limitations under the License.
  */
 define([
-  "module",
+  "pentaho/module!",
+  "./Strategy",
   "pentaho/util/object",
-  "pentaho/data/util",
+  "pentaho/data/util"
+], function(module, Strategy, O, dataUtil) {
 
-  // so that r.js sees otherwise invisible dependencies.
-  "./strategy"
-], function(module, O, dataUtil) {
+  /**
+   * @name pentaho.visual.role.adaptation.IdentityStrategy.Type
+   * @class
+   * @extends pentaho.visual.role.adaptation.Strategy.Type
+   *
+   * @classDesc The type class of {@link pentaho.visual.role.adaptation.IdentityStrategy}.
+   */
 
-  return [
-    "./strategy",
-    function(Strategy) {
+  var IdentityStrategy = Strategy.extend(/** @lends pentaho.visual.role.adaptation.IdentityStrategy# */{
 
-      /**
-       * @name pentaho.visual.role.adaptation.IdentityStrategy.Type
-       * @class
-       * @extends pentaho.visual.role.adaptation.Strategy.Type
-       *
-       * @classDesc The type class of {@link pentaho.visual.role.adaptation.IdentityStrategy}.
-       */
+    /**
+     * @alias IdentityStrategy
+     * @memberOf pentaho.visual.role.adaptation
+     * @class
+     * @extends pentaho.visual.role.adaptation.Strategy
+     * @abstract
+     *
+     * @amd pentaho/visual/role/adaptation/IdentityStrategy
+     *
+     * @classDesc The `IdentityStrategy` class describes the strategy of adapting a single data field,
+     * without modification, between the external and internal data space.
+     *
+     * The _identity_ strategy targets visual role mappings of a single field and exposes a single
+     * and is [invertible]{@link pentaho.visual.role.adaptation.Strategy#isInvertible}.
+     *
+     * @description Creates an _identity_ mapping strategy instance.
+     * @constructor
+     * @param {pentaho.visual.role.adaptation.spec.IStrategy} [instSpec] An adaptation strategy specification.
+     */
+    constructor: function(instSpec) {
 
-      var IdentityStrategy = Strategy.extend(/** @lends pentaho.visual.role.adaptation.IdentityStrategy# */{
+      instSpec = Object.create(instSpec);
+      instSpec.outputFieldIndexes = instSpec.inputFieldIndexes;
 
-        /**
-         * @alias IdentityStrategy
-         * @memberOf pentaho.visual.role.adaptation
-         * @class
-         * @extends pentaho.visual.role.adaptation.Strategy
-         * @abstract
-         *
-         * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.role.adaptation.IdentityStrategy>}
-         *      pentaho/visual/role/adaptation/identityStrategy
-         *
-         * @classDesc The `IdentityStrategy` class describes the strategy of adapting a single data field,
-         * without modification, between the external and internal data space.
-         *
-         * The _identity_ strategy targets visual role mappings of a single field and exposes a single
-         * and is [invertible]{@link pentaho.visual.role.adaptation.IStrategyMethod#isInvertible}.
-         *
-         * @description Creates an _identity_ mapping strategy instance.
-         * @constructor
-         * @param {pentaho.visual.role.adaptation.spec.IStrategy} [instSpec] An adaptation strategy specification.
-         */
-        constructor: function(instSpec) {
+      this.base(instSpec);
 
-          instSpec = Object.create(instSpec);
-          instSpec.outputFieldIndexes = instSpec.inputFieldIndexes;
+      // Created lazily by #__installIndex, when/if needed.
+      this.__index = null;
+      this.__keyFun = null;
+    },
 
-          this.base(instSpec);
+    /** @inheritDoc */
+    get isInvertible() {
+      return true;
+    },
 
-          // Created lazily by #__installIndex, when/if needed.
-          this.__index = null;
-          this.__keyFun = null;
-        },
+    /** @inheritDoc */
+    map: function(inputValues) {
 
-        /** @inheritDoc */
-        get isInvertible() {
-          return true;
-        },
+      var outputCell = this.__getCellByValue(inputValues[0]);
 
-        /** @inheritDoc */
-        map: function(inputValues) {
+      return outputCell && [outputCell];
+    },
 
-          var outputCell = this.__getCellByValue(inputValues[0]);
+    /** @inheritDoc */
+    invert: function(outputValues) {
 
-          return outputCell && [outputCell];
-        },
+      var inputCell = this.__getCellByValue(outputValues[0]);
 
-        /** @inheritDoc */
-        invert: function(outputValues) {
+      return inputCell && [inputCell];
+    },
 
-          var inputCell = this.__getCellByValue(outputValues[0]);
+    /**
+     * Gets the cell given its value or cell
+     *
+     * @param {any|!pentaho.data.ICell} valueOrCell - The value or cell.
+     * @return {pentaho.data.ICell} The cell, if any exists; `null`, if not.
+     * @private
+     */
+    __getCellByValue: function(valueOrCell) {
 
-          return inputCell && [inputCell];
-        },
+      // Must do upfront. Also creates this.__keyFun.
+      var rowIndexByValueKey = this.__getRowIndexByValueKeyMap();
 
-        /**
-         * Gets the cell given its value or cell
-         *
-         * @param {any|!pentaho.data.ICell} valueOrCell - The value or cell.
-         * @return {pentaho.data.ICell} The cell, if any exists; `null`, if not.
-         * @private
-         */
-        __getCellByValue: function(valueOrCell) {
+      // Accepts ICell or direct values.
+      var valueKey = this.__keyFun(dataUtil.getCellValue(valueOrCell));
 
-          // Must do upfront. Also creates this.__keyFun.
-          var rowIndexByValueKey = this.__getRowIndexByValueKeyMap();
+      var rowIndex = rowIndexByValueKey[valueKey];
+      if(rowIndex === undefined) {
+        return null;
+      }
 
-          // Accepts ICell or direct values.
-          var valueKey = this.__keyFun(dataUtil.getCellValue(valueOrCell));
+      return this.data.getCell(rowIndex, this.inputFieldIndexes[0]);
+    },
 
-          var rowIndex = rowIndexByValueKey[valueKey];
-          if(rowIndex === undefined) {
-            return null;
-          }
+    /**
+     * Gets a map of row index by input/output value key.
+     *
+     * @return {!Object.<string, number>} The map.
+     * @private
+     */
+    __getRowIndexByValueKeyMap: function() {
+      var index = this.__index;
+      if(index === null) {
+        this.__installIndex();
+        index = this.__index;
+      }
 
-          return this.data.getCell(rowIndex, this.inputFieldIndexes[0]);
-        },
+      return index;
+    },
 
-        /**
-         * Gets a map of row index by input/output value key.
-         *
-         * @return {!Object.<string, number>} The map.
-         * @private
-         */
-        __getRowIndexByValueKeyMap: function() {
-          var index = this.__index;
-          if(index === null) {
-            this.__installIndex();
-            index = this.__index;
-          }
+    /**
+     * Builds the map of row indexes by input/output value key.
+     * @private
+     */
+    __installIndex: function() {
 
-          return index;
-        },
+      var index = this.__index = Object.create(null);
 
-        /**
-         * Builds the map of row indexes by input/output value key.
-         * @private
-         */
-        __installIndex: function() {
+      var fieldIndex = this.outputFieldIndexes[0];
+      var dataTable = this.data;
+      var keyFun = this.__keyFun = O.getSameTypeKeyFun(dataTable.getColumnType(fieldIndex));
 
-          var index = this.__index = Object.create(null);
+      var rowCount = dataTable.getNumberOfRows();
+      var rowIndex = -1;
+      while(++rowIndex < rowCount) {
+        var value = dataTable.getValue(rowIndex, fieldIndex);
+        var valueKey = keyFun(value);
 
-          var fieldIndex = this.outputFieldIndexes[0];
-          var dataTable = this.data;
-          var keyFun = this.__keyFun = O.getSameTypeKeyFun(dataTable.getColumnType(fieldIndex));
-
-          var rowCount = dataTable.getNumberOfRows();
-          var rowIndex = -1;
-          while(++rowIndex < rowCount) {
-            var value = dataTable.getValue(rowIndex, fieldIndex);
-            var valueKey = keyFun(value);
-
-            // Keep first row index.
-            if(index[valueKey] === undefined) {
-              index[valueKey] = rowIndex;
-            }
-          }
-        },
-
-        $type: /** @lends pentaho.visual.role.adaptation.IdentityStrategy.Type# */{
-          id: module.id,
-
-          /** @inheritDoc */
-          getInputTypeFor: function(outputDataType, isVisualKey) {
-
-            // 1) Can handle a single column.
-            if(outputDataType.isList) {
-              return null;
-            }
-
-            return outputDataType;
-          },
-
-          /** @inheritDoc */
-          validateApplication: function(schemaData, inputFieldIndexes) {
-            return {isValid: true, addsFields: false};
-          },
-
-          /** @inheritDoc */
-          apply: function(data, inputFieldIndexes) {
-            return new IdentityStrategy({
-              data: data,
-              inputFieldIndexes: inputFieldIndexes
-            });
-          }
+        // Keep first row index.
+        if(index[valueKey] === undefined) {
+          index[valueKey] = rowIndex;
         }
-      });
+      }
+    },
 
-      return IdentityStrategy;
+    $type: /** @lends pentaho.visual.role.adaptation.IdentityStrategy.Type# */{
+      id: module.id,
+
+      /** @inheritDoc */
+      getInputTypeFor: function(outputDataType, isVisualKey) {
+
+        // 1) Can handle a single column.
+        if(outputDataType.isList) {
+          return null;
+        }
+
+        return outputDataType;
+      },
+
+      /** @inheritDoc */
+      validateApplication: function(schemaData, inputFieldIndexes) {
+        return {isValid: true, addsFields: false};
+      },
+
+      /** @inheritDoc */
+      apply: function(data, inputFieldIndexes) {
+        return new IdentityStrategy({
+          data: data,
+          inputFieldIndexes: inputFieldIndexes
+        });
+      }
     }
-  ];
+  })
+  .configure({$type: module.config});
+
+  return IdentityStrategy;
 });

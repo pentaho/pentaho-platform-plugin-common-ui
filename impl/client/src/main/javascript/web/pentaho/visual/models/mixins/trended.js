@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,47 +14,45 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!",
+  "../../base/Model",
+  "../types/TrendType",
+  "../types/LineWidth",
   "pentaho/i18n!../i18n/model"
-], function(bundle) {
+], function(module, BaseModel, TrendType, LineWidth, bundle) {
 
   "use strict";
 
   // Used by: Line, Bar, Scatter
 
-  return [
-    "pentaho/visual/base/model",
-    "../types/trendType",
-    "../types/lineWidth",
-    function(BaseModel, TrendType, LineWidth) {
-
-      return BaseModel.extend({
-        $type: {
-          isAbstract: true,
-          props: [
-            {
-              name: "trendType",
-              valueType: TrendType,
-              isRequired: true,
-              defaultValue: "none"
-            },
-            {
-              name: "trendName",
-              valueType: "string",
-              isApplicable: __isApplicableTrend
-            },
-            {
-              name: "trendLineWidth",
-              valueType: LineWidth,
-              isApplicable: __isApplicableTrend,
-              isRequired: true,
-              defaultValue: 1
-            }
-          ]
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      isAbstract: true,
+      props: [
+        {
+          name: "trendType",
+          valueType: TrendType,
+          isRequired: true,
+          defaultValue: "none"
+        },
+        {
+          name: "trendName",
+          valueType: "string",
+          isApplicable: __isApplicableTrend
+        },
+        {
+          name: "trendLineWidth",
+          valueType: LineWidth,
+          isApplicable: __isApplicableTrend,
+          isRequired: true,
+          defaultValue: 1
         }
-      })
-      .implement({$type: bundle.structured.trend});
+      ]
     }
-  ];
+  })
+  .localize({$type: bundle.structured.Trended})
+  .configure({$type: module.config});
 
   function __isApplicableTrend() {
     /* jshint validthis:true */

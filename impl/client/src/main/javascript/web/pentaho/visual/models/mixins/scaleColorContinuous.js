@@ -14,61 +14,58 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!",
+  "../../base/Model",
+  "../types/ColorSet",
+  "../types/Pattern",
   "pentaho/i18n!../i18n/model"
-], function(bundle) {
+], function(module, BaseModel, ColorSet, Pattern, bundle) {
 
   "use strict";
 
   // Used by: HG, Scatter and GEO
 
-  return [
-    "pentaho/visual/base/model",
-    "../types/colorSet",
-    "../types/pattern",
-    "../types/multiChartOverflow",
-    function(BaseModel, ColorSet, Pattern) {
-
-      return BaseModel.extend({
-        $type: {
-          isAbstract: true,
-          props: [
-            {
-              name: "paletteQuantitative",
-              base: "pentaho/visual/color/paletteProperty",
-              levels: ["quantitative", "divergent"],
-              isApplicable: __isColorInContinuousMode,
-              defaultValue: null // value is calculated from the other properties.
-            },
-            {
-              name: "pattern",
-              valueType: Pattern,
-              isRequired: true,
-              isApplicable: __isColorInContinuousMode,
-              defaultValue: "gradient"
-            },
-            {
-              name: "colorSet",
-              valueType: ColorSet,
-              isRequired: true,
-              isApplicable: __isColorInContinuousMode,
-              defaultValue: "ryg"
-            },
-            {
-              name: "reverseColors",
-              valueType: "boolean",
-              isRequired: true,
-              isApplicable: __isColorInContinuousMode,
-              defaultValue: false
-            }
-          ]
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      isAbstract: true,
+      props: [
+        {
+          name: "paletteQuantitative",
+          base: "pentaho/visual/color/PaletteProperty",
+          levels: ["quantitative", "divergent"],
+          isApplicable: __isColorInContinuousMode,
+          defaultValue: null // Value is calculated from the other properties.
+        },
+        {
+          name: "pattern",
+          valueType: Pattern,
+          isRequired: true,
+          isApplicable: __isColorInContinuousMode,
+          defaultValue: "gradient"
+        },
+        {
+          name: "colorSet",
+          valueType: ColorSet,
+          isRequired: true,
+          isApplicable: __isColorInContinuousMode,
+          defaultValue: "ryg"
+        },
+        {
+          name: "reverseColors",
+          valueType: "boolean",
+          isRequired: true,
+          isApplicable: __isColorInContinuousMode,
+          defaultValue: false
         }
-      })
-      .implement({$type: bundle.structured.scaleColorContinuous});
-
-      function __isColorInContinuousMode() {
-        var mode = this.color.mode;
-        return mode !== null && mode.isContinuous;
-      }
+      ]
     }
-  ];
+  })
+  .localize({$type: bundle.structured.ScaleColorContinuous})
+  .configure({$type: module.config});
+
+  function __isColorInContinuousMode() {
+    var mode = this.color.mode;
+    return mode !== null && mode.isContinuous;
+  }
 });

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "pentaho/module!",
+  "./CategoricalContinuousAbstract"
+], function(module, BaseView) {
 
   "use strict";
 
-  return [
-    "./categoricalContinuousAbstract",
-    function(BaseView) {
+  return BaseView.extend({
 
-      return BaseView.extend({
-        _cccClass: "BoxplotChart"
-      });
+    _cccClass: "BoxplotChart",
+
+    $type: {
+      id: module.id
     }
-  ];
+  })
+  .configure({$type: module.config});
 });

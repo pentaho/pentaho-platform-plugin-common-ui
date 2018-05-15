@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-define(function() {
+define(["require"], function(localRequire) {
+
   "use strict";
 
   /*
@@ -27,44 +28,46 @@ define(function() {
    * 3. Pentaho Analyzer in Dashboards - "pentaho-dashboards"
    * 4. Pentaho CDF/CDE - "pentaho-cdf"
    *
-   * Hitachi Vantara stock visualizations' model ids:
-   * 1. Pie - "pentaho/visual/models/areaStacked"
-   * 2. Column - "pentaho/visual/models/bar"
-   * 3. Bar - "pentaho/visual/models/barHorizontal"
-   * 4. Stacked Column - "pentaho/visual/models/barStacked"
-   * 5. Stacked Bar - "pentaho/visual/models/barStackedHorizontal"
-   * 6. 100% Stacked Column - "pentaho/visual/models/barNormalized"
-   * 7. 100% Stacked Bar - "pentaho/visual/models/barNormalizedHorizontal"
-   * 8. Column-Line Combo - "pentaho/visual/models/barLine"
-   * 9. Scatter - "pentaho/visual/models/scatter"
-   * 10. Bubble - "pentaho/visual/models/bubble"
-   * 11. Pie - "pentaho/visual/models/pie"
-   * 12. Donut - "pentaho/visual/models/donut"
-   * 13. Sunburst - "pentaho/visual/models/sunburst"
-   * 14. Heat Grid - "pentaho/visual/models/heatGrid"
-   * 15. Geo Map - "pentaho/visual/models/geoMap"
+   * Stock visualizations' model ids:
+   * 1. AreaStacked - "pentaho/visual/models/AreaStacked"
+   * 2. Line - "pentaho/visual/models/Line"
+   * 3. Column - "pentaho/visual/models/Bar"
+   * 4. Bar - "pentaho/visual/models/BarHorizontal"
+   * 5. Stacked Column - "pentaho/visual/models/BarStacked"
+   * 6. Stacked Bar - "pentaho/visual/models/BarStackedHorizontal"
+   * 7. 100% Stacked Column - "pentaho/visual/models/BarNormalized"
+   * 8. 100% Stacked Bar - "pentaho/visual/models/BarNormalizedHorizontal"
+   * 9. Column-Line Combo - "pentaho/visual/models/BarLine"
+   * 10. Scatter - "pentaho/visual/models/Scatter"
+   * 11. Bubble - "pentaho/visual/models/Bubble"
+   * 12. Pie - "pentaho/visual/models/Pie"
+   * 13. Donut - "pentaho/visual/models/Donut"
+   * 14. Sunburst - "pentaho/visual/models/Sunburst"
+   * 15. Heat Grid - "pentaho/visual/models/HeatGrid"
+   * 16. Geo Map - "pentaho/visual/models/GeoMap"
    *
-   * Hitachi Vantara stock visualizations' view ids:
-   * 1. Pie - "pentaho/ccc/visual/areaStacked"
-   * 2. Column - "pentaho/ccc/visual/bar"
-   * 3. Bar - "pentaho/ccc/visual/barHorizontal"  Normalized
-   * 4. Stacked Column - "pentaho/ccc/visual/barStacked"
-   * 5. Stacked Bar - "pentaho/ccc/visual/barStackedHorizontal"
-   * 6. 100% Stacked Column - "pentaho/ccc/visual/barNormalized"
-   * 7. 100% Stacked Bar - "pentaho/ccc/visual/barNormalizedHorizontal"
-   * 8. Column-Line Combo - "pentaho/ccc/visual/barLine"
-   * 9. Scatter - "pentaho/ccc/visual/scatter"
-   * 10. Bubble - "pentaho/ccc/visual/bubble"
-   * 11. Pie - "pentaho/ccc/visual/pie"
-   * 12. Donut - "pentaho/ccc/visual/donut"
-   * 13. Sunburst - "pentaho/ccc/visual/sunburst"
-   * 14. Heat Grid - "pentaho/ccc/visual/heatGrid"
-   * 15. Geo Map - "pentaho/geo/visual/map"
+   * Stock visualizations' view ids:
+   * 1. AreaStacked - "pentaho/ccc/visual/AreaStacked"
+   * 2. Line - "pentaho/ccc/visual/Line"
+   * 3. Column - "pentaho/ccc/visual/Bar"
+   * 4. Bar - "pentaho/ccc/visual/BarHorizontal"  Normalized
+   * 5. Stacked Column - "pentaho/ccc/visual/BarStacked"
+   * 6. Stacked Bar - "pentaho/ccc/visual/BarStackedHorizontal"
+   * 7. 100% Stacked Column - "pentaho/ccc/visual/BarNormalized"
+   * 8. 100% Stacked Bar - "pentaho/ccc/visual/BarNormalizedHorizontal"
+   * 9. Column-Line Combo - "pentaho/ccc/visual/BarLine"
+   * 10. Scatter - "pentaho/ccc/visual/Scatter"
+   * 11. Bubble - "pentaho/ccc/visual/Bubble"
+   * 12. Pie - "pentaho/ccc/visual/Pie"
+   * 13. Donut - "pentaho/ccc/visual/Donut"
+   * 14. Sunburst - "pentaho/ccc/visual/Sunburst"
+   * 15. Heat Grid - "pentaho/ccc/visual/HeatGrid"
+   * 16. Geo Map - "pentaho/geo/visual/Map"
    *
    * Sample visualization model ids:
-   * 1. Calculator - "pentaho/visual/samples/calc/model"
+   * 1. Calculator - "pentaho/visual/samples/calc/Model"
    *
-   * Hitachi Vantara stock color palettes' ids:
+   * Stock color palettes' ids:
    * 1. pentaho/visual/color/palettes/nominalPrimary
    * 2. pentaho/visual/color/palettes/nominalNeutral
    * 3. pentaho/visual/color/palettes/nominalLight
@@ -85,7 +88,7 @@ define(function() {
       {
         select: {
           application: ["pentaho-det", "pentaho-analyzer"],
-          type: "pentaho/visual/models/pie"
+          module: "pentaho/visual/models/Pie"
         },
         apply: {
           isBrowsable: false
@@ -98,7 +101,7 @@ define(function() {
       {
         select: {
           application: "pentaho-analyzer",
-          type: "pentaho/visual/models/barNormalizedHorizontal"
+          module: "pentaho/visual/models/BarNormalizedHorizontal"
         },
         apply: {
           label: "Relative Proportion Bar"
@@ -111,9 +114,9 @@ define(function() {
       /*
       {
         select: {
-          type: [
-            "pentaho/visual/models/line",
-            "pentaho/visual/models/barLine"
+          module: [
+            "pentaho/visual/models/Line",
+            "pentaho/visual/models/BarLine"
           ]
         },
         apply: {
@@ -132,7 +135,7 @@ define(function() {
       {
         select: {
           application: "pentaho-analyzer",
-          type: "pentaho/ccc/visual/donut"
+          module: "pentaho/ccc/visual/Donut"
         },
         apply: {
           extension: {
@@ -146,7 +149,7 @@ define(function() {
       /*
       {
         select: {
-          instance: "pentaho/visual/color/palettes/nominalPrimary"
+          module: "pentaho/visual/color/palettes/nominalPrimary"
         },
         apply: {
           colors: [
@@ -160,7 +163,7 @@ define(function() {
       /*
       {
         select: {
-          type: "pentaho/visual/models/bar"
+          module: "pentaho/visual/models/Bar"
         },
         apply: {
           props: {
@@ -180,16 +183,19 @@ define(function() {
       /*
        {
         select: {
-          type: "pentaho/visual/models/bar"
+          module: "pentaho/visual/models/Bar"
         },
-        apply: {
-          props: {
-            palette: {
-              defaultValue: {
-                $instance: {id: "pentaho/visual/color/palettes/nominalLight"}
+        deps: [
+          "pentaho/visual/color/palettes/nominalLight"
+        ],
+        apply: function(nominalLightPalette) {
+          return {
+            props: {
+              palette: {
+                defaultValue: nominalLightPalette
               }
             }
-          }
+          };
         }
       },
       */
@@ -199,11 +205,11 @@ define(function() {
       /*
       {
         select: {
-          type: "pentaho/type/Context"
+          module: "pentaho/modules"
         },
         apply: {
-          instances: {
-            "pentaho/visual/color/palettes/nominalPrimary": {ranking: -1000}
+          "pentaho/visual/color/palettes/nominalPrimary": {
+            ranking: -1000
           }
         }
       },
@@ -214,7 +220,7 @@ define(function() {
       /*
       {
         select: {
-          type: "pentaho/visual/role/adaptation/entityWithTimeIntervalKeyStrategy"
+          module: "pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy"
         },
         apply: {
           isBrowsable: false

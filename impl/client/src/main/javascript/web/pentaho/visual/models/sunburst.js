@@ -14,84 +14,83 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!",
+  "./Abstract",
+  "./types/DisplayUnits",
+  "./types/LabelsOption",
+  "./types/SliceOrder",
+  "./mixins/MultiCharted",
+  "./mixins/ScaleColorDiscrete",
   "pentaho/i18n!./i18n/model"
-], function(bundle) {
+], function(module, BaseModel, DisplayUnits, LabelsOption, SliceOrder, MultiChartedModel, ScaleColorDiscreteModel,
+            bundle) {
 
   "use strict";
 
-  return [
-    "./abstract",
-    "./types/displayUnits",
-    "./types/labelsOption",
-    "./types/sliceOrder",
-    "./mixins/multiCharted",
-    "./mixins/scaleColorDiscrete",
-    function(BaseModel, DisplayUnits, LabelsOption, SliceOrder, MultiChartedModel, ScaleColorDiscreteModel) {
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      mixins: [MultiChartedModel, ScaleColorDiscreteModel],
+      v2Id: "ccc_sunburst",
+      category: "treemapchart",
+      defaultView: "pentaho/ccc/visual/Sunburst",
 
-      return BaseModel.extend({
-        $type: {
-          mixins: [MultiChartedModel, ScaleColorDiscreteModel],
-          v2Id: "ccc_sunburst",
-          category: "treemapchart",
-          defaultView: "pentaho/ccc/visual/sunburst",
-
-          props: [
-            {
-              name: "rows", // VISUAL_ROLE
-              modes: [
-                {dataType: "list"}
-              ],
-              fields: {isRequired: true}
-            },
-            {
-              name: "size", // VISUAL_ROLE
-              base: "pentaho/visual/role/property",
-              modes: [
-                {dataType: "number"}
-              ],
-              ordinal: 7
-            },
-            {
-              name: "multi", // VISUAL_ROLE
-              base: "pentaho/visual/role/property",
-              modes: [
-                {dataType: "list"}
-              ],
-              ordinal: 10
-            },
-            {
-              name: "displayUnits",
-              valueType: DisplayUnits,
-              isRequired: true,
-              defaultValue: "units_0"
-            },
-            {
-              name: "labelsOption",
-              valueType: LabelsOption,
-              domain: ["none", "center"],
-              isApplicable: __hasFieldsSize,
-              isRequired: true,
-              defaultValue: "none"
-            },
-            {
-              name: "emptySlicesHidden",
-              valueType: "boolean",
-              isRequired: true,
-              defaultValue: true
-            },
-            {
-              name: "sliceOrder",
-              valueType: SliceOrder,
-              isApplicable: __hasFieldsSize,
-              isRequired: true,
-              defaultValue: "bySizeDescending"
-            }
-          ]
+      props: [
+        {
+          name: "rows", // VISUAL_ROLE
+          modes: [
+            {dataType: "list"}
+          ],
+          fields: {isRequired: true}
+        },
+        {
+          name: "size", // VISUAL_ROLE
+          base: "pentaho/visual/role/Property",
+          modes: [
+            {dataType: "number"}
+          ],
+          ordinal: 7
+        },
+        {
+          name: "multi", // VISUAL_ROLE
+          base: "pentaho/visual/role/Property",
+          modes: [
+            {dataType: "list"}
+          ],
+          ordinal: 10
+        },
+        {
+          name: "displayUnits",
+          valueType: DisplayUnits,
+          isRequired: true,
+          defaultValue: "units_0"
+        },
+        {
+          name: "labelsOption",
+          valueType: LabelsOption,
+          domain: ["none", "center"],
+          isApplicable: __hasFieldsSize,
+          isRequired: true,
+          defaultValue: "none"
+        },
+        {
+          name: "emptySlicesHidden",
+          valueType: "boolean",
+          isRequired: true,
+          defaultValue: true
+        },
+        {
+          name: "sliceOrder",
+          valueType: SliceOrder,
+          isApplicable: __hasFieldsSize,
+          isRequired: true,
+          defaultValue: "bySizeDescending"
         }
-      })
-      .implement({$type: bundle.structured.sunburst});
+      ]
     }
-  ];
+  })
+  .localize({$type: bundle.structured.Sunburst})
+  .configure({$type: module.config});
 
   function __hasFieldsSize() {
     return this.size.hasFields;

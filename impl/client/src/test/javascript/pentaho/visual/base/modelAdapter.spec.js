@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/loader",
+  "pentaho/visual/base/Model",
+  "pentaho/visual/base/ModelAdapter",
+  "pentaho/visual/role/adaptation/Strategy",
+  "pentaho/visual/role/ExternalProperty",
   "pentaho/data/Table",
   "../role/adaptationUtil",
   "tests/pentaho/util/errorMatch"
-], function(Context, Table, adaptationUtil, errorMatch) {
+], function(typeLoader, Model, ModelAdapter, BaseStrategy, ExternalProperty, Table, adaptationUtil, errorMatch) {
 
   "use strict";
 
-  /* globals jasmine, console, expect, it, describe, beforeEach */
-
   describe("pentaho.visual.base.ModelAdapter", function() {
-
-    var context;
-    var Model;
-    var ModelAdapter;
-    var ExternalProperty;
 
     var buildAdapter = adaptationUtil.buildAdapter;
     var ModelWithStringRole;
@@ -37,28 +34,11 @@ define([
     var CombineStrategy;
 
     beforeAll(function() {
-      return Context.createAsync()
-        .then(function(_context) {
+      var mocks = adaptationUtil.createMocks();
 
-          context = _context;
-
-          return context.getDependencyApplyAsync([
-            "pentaho/visual/base/model",
-            "pentaho/visual/base/modelAdapter",
-            "pentaho/visual/role/adaptation/strategy",
-            "pentaho/visual/role/externalProperty"
-          ], function(_Model, _ModelAdapter, _BaseStrategy, _ExternalProperty) {
-            Model = _Model;
-            ModelAdapter = _ModelAdapter;
-            ExternalProperty = _ExternalProperty;
-
-            var mocks = adaptationUtil.createMocks(Model, ModelAdapter, _BaseStrategy);
-
-            ModelWithStringRole = mocks.ModelWithStringRole;
-            ElementIdentityStrategy = mocks.ElementIdentityStrategy;
-            CombineStrategy = mocks.CombineStrategy;
-          });
-        });
+      ModelWithStringRole = mocks.ModelWithStringRole;
+      ElementIdentityStrategy = mocks.ElementIdentityStrategy;
+      CombineStrategy = mocks.CombineStrategy;
     });
 
     // region helper methods
@@ -137,7 +117,7 @@ define([
           var DerivedModel = Model.extend({
             $type: {
               props: [
-                {name: "x", base: "pentaho/visual/role/property"}
+                {name: "x", base: "pentaho/visual/role/Property"}
               ]
             }
           });
@@ -161,7 +141,7 @@ define([
           var DerivedModel = Model.extend({
             $type: {
               props: [
-                {name: "x", base: "pentaho/visual/role/property"}
+                {name: "x", base: "pentaho/visual/role/Property"}
               ]
             }
           });
@@ -177,7 +157,7 @@ define([
           var DerivedModel2 = DerivedModel.extend({
             $type: {
               props: [
-                {name: "y", base: "pentaho/visual/role/property"}
+                {name: "y", base: "pentaho/visual/role/Property"}
               ]
             }
           });
@@ -201,7 +181,7 @@ define([
           var DerivedModel = Model.extend({
             $type: {
               props: [
-                {name: "x", base: "pentaho/visual/role/property"}
+                {name: "x", base: "pentaho/visual/role/Property"}
               ]
             }
           });
@@ -243,7 +223,7 @@ define([
           var DerivedModel = Model.extend({
             $type: {
               props: [
-                {name: "x", base: "pentaho/visual/role/property"}
+                {name: "x", base: "pentaho/visual/role/Property"}
               ]
             }
           });
@@ -270,7 +250,7 @@ define([
           var DerivedModel = Model.extend({
             $type: {
               props: [
-                {name: "x", base: "pentaho/visual/role/property"}
+                {name: "x", base: "pentaho/visual/role/Property"}
               ]
             }
           });
@@ -286,7 +266,7 @@ define([
           var DerivedModel2 = DerivedModel.extend({
             $type: {
               props: [
-                {name: "y", base: "pentaho/visual/role/property"}
+                {name: "y", base: "pentaho/visual/role/Property"}
               ]
             }
           });
@@ -313,7 +293,7 @@ define([
           var DerivedModel = Model.extend({
             $type: {
               props: [
-                {name: "x", base: "pentaho/visual/role/property"}
+                {name: "x", base: "pentaho/visual/role/Property"}
               ]
             }
           });
@@ -362,7 +342,7 @@ define([
 
             var strategies = [ElementIdentityStrategy.type];
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+            var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -390,7 +370,7 @@ define([
 
             var strategies = [ElementIdentityStrategy.type];
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+            var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -415,7 +395,7 @@ define([
 
             var strategies = [CombineStrategy.type];
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+            var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -444,7 +424,7 @@ define([
 
             var strategies = [ElementIdentityStrategy.type];
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+            var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -470,7 +450,7 @@ define([
 
             var strategies = [CombineStrategy.type];
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+            var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -499,7 +479,7 @@ define([
 
             var strategies = [ElementIdentityStrategy.type];
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+            var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -524,7 +504,7 @@ define([
             var selectionFilter = modelAdapter.model.selectionFilter;
             expect(selectionFilter).not.toBe(null);
 
-            var expectedFilter = context.instances.get({_: "=", p: "country", v: "PT2"});
+            var expectedFilter = typeLoader.resolveInstance({_: "=", p: "country", v: "PT2"});
             expect(selectionFilter.equals(expectedFilter)).toBe(true);
           });
 
@@ -532,7 +512,7 @@ define([
 
             var strategies = [CombineStrategy.type];
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+            var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -563,9 +543,9 @@ define([
             var selectionFilter = modelAdapter.model.selectionFilter;
             expect(selectionFilter).not.toBe(null);
 
-            var expectedFilter = context.instances.get({
+            var expectedFilter = typeLoader.resolveInstance({
               _: "and",
-              o: [ {_: "=", p: CombineStrategy.columnName, v: "PT~fish"} ]
+              o: [{_: "=", p: CombineStrategy.columnName, v: "PT~fish"}]
             });
             expect(selectionFilter.equals(expectedFilter)).toBe(true);
           });
@@ -584,7 +564,7 @@ define([
             $type: {
               props: {
                 roleA: {
-                  base: "pentaho/visual/role/property",
+                  base: "pentaho/visual/role/Property",
                   modes: [
                     {dataType: "string"},
                     {dataType: "number"}
@@ -596,7 +576,7 @@ define([
 
           var strategies = [ElementIdentityStrategy.type];
 
-          DerivedModelAdapter = buildAdapter(ModelAdapter, CustomModel, [
+          DerivedModelAdapter = buildAdapter(CustomModel, [
             {
               name: "roleA",
               strategies: strategies
@@ -683,7 +663,7 @@ define([
 
           var strategies = [ElementIdentityStrategy.type];
 
-          DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+          DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
             {
               name: "roleA",
               strategies: strategies
@@ -793,7 +773,7 @@ define([
 
           var strategies = [ElementIdentityStrategy.type];
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+          var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
             {
               name: "roleA",
               strategies: strategies
@@ -840,7 +820,7 @@ define([
 
           var strategies = [ElementIdentityStrategy.type];
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+          var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
             {
               name: "roleA",
               strategies: strategies
@@ -885,7 +865,7 @@ define([
 
           var strategies = [ElementIdentityStrategy.type];
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+          var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
             {
               name: "roleA",
               strategies: strategies
@@ -932,7 +912,7 @@ define([
         it("should update the selectionFilter of the external model (identity strategy)", function() {
           var strategies = [ElementIdentityStrategy.type];
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+          var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
             {
               name: "roleA",
               strategies: strategies
@@ -974,14 +954,14 @@ define([
 
           expect(selectionFilter2).not.toBe(selectionFilter1);
 
-          var expectedFilter = context.instances.get({_: "=", p: "country", v: "PT4"});
+          var expectedFilter = typeLoader.resolveInstance({_: "=", p: "country", v: "PT4"});
           expect(selectionFilter2.equals(expectedFilter)).toBe(true);
         });
 
         it("should update the selectionFilter of the external model (many to one strategy)", function() {
           var strategies = [CombineStrategy.type];
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+          var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
             {
               name: "roleA",
               strategies: strategies
@@ -1015,6 +995,7 @@ define([
           spyOn(CombineStrategy.prototype, "invert").and.callFake(function() {
             return [new Cell("PT4", "Portugal"), new Cell("bird", "Bird")];
           });
+
           // ---
 
           modelAdapter.model.selectionFilter = {_: "=", p: CombineStrategy.columnName, v: "PT4~bird"};
@@ -1027,7 +1008,7 @@ define([
 
           expect(selectionFilter2).not.toBe(selectionFilter1);
 
-          var expectedFilter = context.instances.get({
+          var expectedFilter = typeLoader.resolveInstance({
             _: "and",
             o: [
               {_: "=", p: "country", v: "PT4"},
@@ -1045,7 +1026,7 @@ define([
         "the external model namespace (many to one strategy)", function() {
         var strategies = [CombineStrategy.type];
 
-        var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+        var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
           {
             name: "roleA",
             strategies: strategies
@@ -1084,7 +1065,7 @@ define([
         });
         // ---
 
-        var filterToConvert = context.instances.get({_: "=", p: CombineStrategy.columnName, v: "PT4~bird"});
+        var filterToConvert = typeLoader.resolveInstance({_: "=", p: CombineStrategy.columnName, v: "PT4~bird"});
         var translatedFilter = modelAdapter._convertFilterToExternal(filterToConvert);
 
         // ---
@@ -1095,13 +1076,13 @@ define([
         var selectionInternalFilter2 = modelAdapter.model.selectionFilter;
         expect(selectionInternalFilter2).not.toBe(null);
 
-        // filter conversion does not affect selection
+        // Filter conversion does not affect selection
         expect(selectionFilter2).toBe(selectionFilter1);
         expect(selectionInternalFilter2).toBe(selectionInternalFilter1);
 
         expect(translatedFilter).not.toBe(null);
 
-        var expectedFilter = context.instances.get({
+        var expectedFilter = typeLoader.resolveInstance({
           _: "and",
           o: [
             {_: "=", p: "country", v: "PT4"},
@@ -1121,7 +1102,7 @@ define([
         beforeEach(function() {
           strategies = [ElementIdentityStrategy.type];
 
-          spyOn(ElementIdentityStrategy.prototype, "map").and.callFake(function (inputValues) {
+          spyOn(ElementIdentityStrategy.prototype, "map").and.callFake(function(inputValues) {
             return [new Cell(inputValues[0], "")];
           });
         });
@@ -1129,7 +1110,7 @@ define([
         describe("and one visual role", function() {
 
           beforeEach(function() {
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+            var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -1152,17 +1133,18 @@ define([
 
             it("when filtering with a top isEquals", function() {
 
-              var externalFilter = context.instances.get({_: "=", p: "country", v: "PT"});
+              var externalFilter = typeLoader.resolveInstance({_: "=", p: "country", v: "PT"});
 
               var actualInternalFilter = modelAdapter._convertFilterToInternal(externalFilter);
 
               // ---
-              var expectedInternalFilter = context.instances.get({_: "=", p: "country", v: "PT"});
+
+              var expectedInternalFilter = typeLoader.resolveInstance({_: "=", p: "country", v: "PT"});
               expect(actualInternalFilter.equals(expectedInternalFilter)).toBe(true);
             });
 
             it("when filtering a top Or", function() {
-              var externalFilter = context.instances.get({
+              var externalFilter = typeLoader.resolveInstance({
                 _: "or",
                 o: [
                   {_: "=", p: "country", v: "PT"},
@@ -1173,7 +1155,8 @@ define([
               var actualInternalFilter = modelAdapter._convertFilterToInternal(externalFilter);
 
               // ---
-              var expectedInternalFilter = context.instances.get({
+
+              var expectedInternalFilter = typeLoader.resolveInstance({
                 _: "or",
                 o: [
                   {_: "=", p: "country", v: "PT"},
@@ -1185,7 +1168,7 @@ define([
             });
 
             it("when filtering a top And of mismatching values", function() {
-              var externalFilter = context.instances.get({
+              var externalFilter = typeLoader.resolveInstance({
                 _: "and",
                 o: [
                   {_: "=", p: "country", v: "PT"},
@@ -1196,12 +1179,11 @@ define([
               var actualInternalFilter = modelAdapter._convertFilterToInternal(externalFilter);
 
               // ---
-              var expectedInternalFilter = context.instances.get({_: "false"});
+
+              var expectedInternalFilter = typeLoader.resolveInstance({_: "false"});
               expect(actualInternalFilter.equals(expectedInternalFilter)).toBe(true);
             });
-
           });
-
         });
 
         describe("and two visual roles", function() {
@@ -1210,14 +1192,14 @@ define([
               $type: {
                 props: {
                   roleA: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "string"},
                       {dataType: "number"}
                     ]
                   },
                   roleB: {
-                    base: "pentaho/visual/role/property",
+                    base: "pentaho/visual/role/Property",
                     modes: [
                       {dataType: "string"},
                       {dataType: "number"}
@@ -1227,7 +1209,7 @@ define([
               }
             });
 
-            var DerivedModelAdapter = buildAdapter(ModelAdapter, TwoVisualRolesModel, [
+            var DerivedModelAdapter = buildAdapter(TwoVisualRolesModel, [
               {
                 name: "roleA",
                 strategies: strategies
@@ -1253,7 +1235,7 @@ define([
           });
 
           it("when filtering a top And of different properties", function() {
-            var externalFilter = context.instances.get({
+            var externalFilter = typeLoader.resolveInstance({
               _: "and",
               o: [
                 {_: "=", p: "country", v: "PT"},
@@ -1264,18 +1246,20 @@ define([
             var actualInternalFilter = modelAdapter._convertFilterToInternal(externalFilter);
 
             // ---
-            var expectedInternalFilter = context.instances.get({
+
+            var expectedInternalFilter = typeLoader.resolveInstance({
               _: "and",
               o: [
                 {_: "=", p: "country", v: "PT"},
                 {_: "=", p: "product", v: "fish"}
               ]
             });
+
             expect(actualInternalFilter.equals(expectedInternalFilter)).toBe(true);
           });
 
           it("when filtering nested Ands they are flattened ", function() {
-            var externalFilter = context.instances.get({
+            var externalFilter = typeLoader.resolveInstance({
               _: "and",
               o: [
                 {_: "=", p: "country", v: "PT"},
@@ -1287,18 +1271,20 @@ define([
             var actualInternalFilter = modelAdapter._convertFilterToInternal(externalFilter);
 
             // ---
-            var expectedInternalFilter = context.instances.get({
+
+            var expectedInternalFilter = typeLoader.resolveInstance({
               _: "and",
               o: [
                 {_: "=", p: "country", v: "PT"},
                 {_: "=", p: "product", v: "fish"}
               ]
             });
+
             expect(actualInternalFilter.equals(expectedInternalFilter)).toBe(true);
           });
 
           it("when filtering nested Ors they are flattened ", function() {
-            var externalFilter = context.instances.get({
+            var externalFilter = typeLoader.resolveInstance({
               _: "or",
               o: [
                 {_: "=", p: "country", v: "PT"},
@@ -1310,7 +1296,8 @@ define([
             var actualInternalFilter = modelAdapter._convertFilterToInternal(externalFilter);
 
             // ---
-            var expectedInternalFilter = context.instances.get({
+
+            var expectedInternalFilter = typeLoader.resolveInstance({
               _: "or",
               o: [
                 {_: "=", p: "country", v: "PT"},
@@ -1331,14 +1318,15 @@ define([
         beforeEach(function() {
           var strategies = [CombineStrategy.type];
 
-          spyOn(CombineStrategy.prototype, "map").and.callFake(function (inputValues) {
-            if( inputValues[0] === undefined || inputValues[1] === undefined ) {
+          spyOn(CombineStrategy.prototype, "map").and.callFake(function(inputValues) {
+            if(inputValues[0] === undefined || inputValues[1] === undefined) {
               return null;
             }
-            return [new Cell( inputValues[0] +"~" + inputValues[1], "")];
+
+            return [new Cell(inputValues[0] + "~" + inputValues[1], "")];
           });
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+          var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
             {
               name: "roleA",
               strategies: strategies
@@ -1361,7 +1349,7 @@ define([
 
           it("when filtering with an And of isEquals", function() {
 
-            var externalFilter = context.instances.get({
+            var externalFilter = typeLoader.resolveInstance({
               _: "and",
               o: [
                 {_: "=", p: "country", v: "PT"},
@@ -1372,21 +1360,22 @@ define([
             var actualInternalFilter = modelAdapter._convertFilterToInternal(externalFilter);
 
             // ---
-            var expectedInternalFilter = context.instances.get({
+
+            var expectedInternalFilter = typeLoader.resolveInstance({
               _: "and",
-              o: [ { _: "=", p: CombineStrategy.columnName, v: "PT~fish"}]
+              o: [{_: "=", p: CombineStrategy.columnName, v: "PT~fish"}]
             });
             expect(actualInternalFilter.equals(expectedInternalFilter)).toBe(true);
           });
 
           it("when filtering with an And of isEquals and other operands supported operands", function() {
 
-            var externalFilter = context.instances.get({
+            var externalFilter = typeLoader.resolveInstance({
               _: "and",
               o: [
                 {_: "=", p: "country", v: "PT"},
                 {_: "=", p: "product", v: "fish"},
-                {_: "or", o:[{_: "true"}]}
+                {_: "or", o: [{_: "true"}]}
               ]
             });
 
@@ -1394,14 +1383,13 @@ define([
 
             // ---
 
-            var expectedInternalFilter = context.instances.get({
+            var expectedInternalFilter = typeLoader.resolveInstance({
               _: "and",
               o: [
                 {_: "=", p: CombineStrategy.columnName, v: "PT~fish"},
-                {_: "or", o:[{_: "true"}]}
+                {_: "or", o: [{_: "true"}]}
               ]
             });
-
 
             expect(actualInternalFilter.equals(expectedInternalFilter)).toBe(true);
           });
@@ -1409,16 +1397,18 @@ define([
           it("when filtering with an Or of And of isEquals", function() {
 
             // (C=PT & P=fish) | (C=Ireland & P=beer)
-            var externalFilter = context.instances.get({
+            var externalFilter = typeLoader.resolveInstance({
               _: "or",
               o: [
-                { _: "and",
+                {
+                  _: "and",
                   o: [
                     {_: "=", p: "country", v: "PT"},
                     {_: "=", p: "product", v: "fish"}
                   ]
                 },
-                { _: "and",
+                {
+                  _: "and",
                   o: [
                     {_: "=", p: "country", v: "Ireland"},
                     {_: "=", p: "product", v: "beer"}
@@ -1430,14 +1420,19 @@ define([
             var actualInternalFilter = modelAdapter._convertFilterToInternal(externalFilter);
 
             // ---
-            var expectedInternalFilter = context.instances.get({
+
+            var expectedInternalFilter = typeLoader.resolveInstance({
               _: "or",
               o: [
-                {_: "and",
-                 o: [{_: "=", p: CombineStrategy.columnName, v: "PT~fish"}]},
-                {_: "and",
-                  o: [{_: "=", p: CombineStrategy.columnName, v: "Ireland~beer"}]}
-                  ]
+                {
+                  _: "and",
+                  o: [{_: "=", p: CombineStrategy.columnName, v: "PT~fish"}]
+                },
+                {
+                  _: "and",
+                  o: [{_: "=", p: CombineStrategy.columnName, v: "Ireland~beer"}]
+                }
+              ]
             });
             expect(actualInternalFilter.equals(expectedInternalFilter)).toBe(true);
           });
@@ -1446,7 +1441,7 @@ define([
         describe("should throw when the filter doesn't provide sufficient information for conversion.", function() {
           it("Using an isEqual filter", function() {
 
-            var externalFilter = context.instances.get(
+            var externalFilter = typeLoader.resolveInstance(
               {_: "=", p: "country", v: "PT"}
             );
 
@@ -1455,12 +1450,13 @@ define([
             };
 
             // ---
-            expect( act ).toThrow(errorMatch.argInvalid("originalValuesMap"));
+
+            expect(act).toThrow(errorMatch.argInvalid("originalValuesMap"));
           });
 
           it("Using an Or of isEqual filter", function() {
 
-            var externalFilter = context.instances.get({
+            var externalFilter = typeLoader.resolveInstance({
               _: "or",
               o: [
                 {_: "=", p: "country", v: "PT"},
@@ -1473,7 +1469,8 @@ define([
             };
 
             // ---
-            expect( act ).toThrow(errorMatch.argInvalid("originalValuesMap"));
+
+            expect(act).toThrow(errorMatch.argInvalid("originalValuesMap"));
           });
         });
       });
@@ -1485,11 +1482,11 @@ define([
         beforeEach(function() {
           strategies = [ElementIdentityStrategy.type];
 
-          spyOn(ElementIdentityStrategy.prototype, "map").and.callFake(function (inputValues) {
+          spyOn(ElementIdentityStrategy.prototype, "map").and.callFake(function(inputValues) {
             return [new Cell(inputValues[0], "")];
           });
 
-          var DerivedModelAdapter = buildAdapter(ModelAdapter, ModelWithStringRole, [
+          var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
             {
               name: "roleA",
               strategies: strategies
@@ -1508,9 +1505,9 @@ define([
         });
 
         it("And with > filter", function() {
-          var externalFilter = context.instances.get({
+          var externalFilter = typeLoader.resolveInstance({
             _: "and",
-            o: [ {_: ">", p: "something", v: 5 } ]
+            o: [{_: ">", p: "something", v: 5}]
           });
 
           var act = function() {
@@ -1518,9 +1515,9 @@ define([
           };
 
           // ---
+
           expect(act).toThrow(errorMatch.argInvalid("filter"));
         });
-
       });
     });
   });

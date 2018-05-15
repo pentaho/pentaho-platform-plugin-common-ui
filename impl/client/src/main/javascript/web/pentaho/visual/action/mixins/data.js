@@ -14,117 +14,109 @@
  * limitations under the License.
  */
 define([
-  "module",
-  // This exists only so that r.js sees otherwise invisible dependencies.
+  "pentaho/module!",
+  "pentaho/visual/action/Base",
+  "pentaho/data/filter/Abstract",
+  "pentaho/module/subtypesOf!pentaho/data/filter/Abstract",
+
+  // TODO: This exists only so that r.js sees otherwise invisible dependencies.
   "pentaho/data/filter/standard"
-], function(module) {
+], function(module, ActionBase, AbstractFilter) {
 
   "use strict";
 
-  /* eslint dot-notation: 0 */
+  var __abstractFilterType = AbstractFilter.type;
 
-  return [
-    "pentaho/visual/action/base",
-    "pentaho/data/filter/abstract",
+  /**
+   * @name pentaho.visual.action.mixins.Data.Type
+   * @class
+   * @extends pentaho.visual.action.Base.Type
+   *
+   * @classDesc The type class of the data action mixin.
+   *
+   * For more information see {@link pentaho.visual.action.mixins.Data}.
+   */
 
-    // Pre-load all registered filter types so that it is safe to request them synchronously.
-    {$types: {base: "pentaho/data/filter/abstract"}},
+  /**
+   * @name Data
+   * @memberOf pentaho.visual.action.mixins
+   * @class
+   * @extends pentaho.visual.action.Base
+   * @abstract
+   *
+   * @amd pentaho/visual/action/mixins/Data
+   *
+   * @classDesc The `visual.action.mixins.Data` class is a mixin class for visual actions
+   * which are performed on a subset of a data set.
+   *
+   * The actual subset is determined by the
+   * [data filter]{@link pentaho.visual.action.mixins.Data#dataFilter} property.
+   *
+   * The mixin adds [spec.IData]{@link pentaho.visual.action.mixins.spec.IData}
+   * to the specification of an action.
+   *
+   * @description This class was not designed to be constructed directly.
+   * It was designed to be used as a **mixin**.
+   * @constructor
+   */
 
-    function(ActionBase, AbstractFilter) {
+  return ActionBase.extend(/** @lends pentaho.visual.action.mixins.Data# */{
+    $type: {
+      id: module.id,
+      isAbstract: true
+    },
 
-      var __abstractFilterType = AbstractFilter.type;
+    // @override
+    _init: function(spec) {
+
+      this.base(spec);
+
+      this.dataFilter = spec && spec.dataFilter;
+    },
+
+    /**
+     * Gets or sets the _data filter_ of this action.
+     *
+     * When set to a filter specification, {@link pentaho.data.filter.spec.IAbstract},
+     * it is converted into a filter object.
+     * Any registered visual filter type can be safely loaded synchronously.
+     *
+     * @type {pentaho.data.filter.Abstract}
+     */
+    get dataFilter() {
+      return this.__dataFilter;
+    },
+
+    set dataFilter(value) {
 
       /**
-       * @name pentaho.visual.action.mixins.Data.Type
-       * @class
-       * @extends pentaho.visual.action.Base.Type
+       * The data filter of the action.
        *
-       * @classDesc The type class of the data action mixin.
-       *
-       * For more information see {@link pentaho.visual.action.mixins.Data}.
+       * @alias __dataFilter
+       * @type {pentaho.data.filter.Abstract}
+       * @memberOf pentaho.visual.action.mixins.Data#
+       * @private
        */
+      this.__dataFilter = __abstractFilterType.to(value);
+    },
 
-      /**
-       * @name Data
-       * @memberOf pentaho.visual.action.mixins
-       * @class
-       * @extends pentaho.visual.action.Base
-       * @abstract
-       *
-       * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.action.mixins.Data>} pentaho/visual/action/mixins/data
-       *
-       * @classDesc The `visual.action.mixins.Data` class is a mixin class for visual actions
-       * which are performed on a subset of a data set.
-       *
-       * The actual subset is determined by the
-       * [data filter]{@link pentaho.visual.action.mixins.Data#dataFilter} property.
-       *
-       * The mixin adds [spec.IData]{@link pentaho.visual.action.mixins.spec.IData}
-       * to the specification of an action.
-       *
-       * @description This class was not designed to be constructed directly.
-       * It was designed to be used as a **mixin**.
-       * @constructor
-       */
+    // region serialization
+    toSpecInContext: function(keyArgs) {
 
-      return ActionBase.extend(/** @lends pentaho.visual.action.mixins.Data# */{
-        $type: {
-          id: module.id,
-          isAbstract: true
-        },
+      var spec = this.base(keyArgs);
 
-        // @override
-        _init: function(spec) {
+      if(this.__dataFilter) {
 
-          this.base(spec);
+        keyArgs = keyArgs ? Object.create(keyArgs) : {};
 
-          this.dataFilter = spec && spec.dataFilter;
-        },
+        keyArgs.declaredType = __abstractFilterType;
 
-        /**
-         * Gets or sets the _data filter_ of this action.
-         *
-         * When set to a filter specification, {@link pentaho.data.filter.spec.IAbstract},
-         * it is converted into a filter object.
-         * Any registered visual filter type can be safely loaded synchronously.
-         *
-         * @type {pentaho.data.filter.Abstract}
-         */
-        get dataFilter() {
-          return this.__dataFilter;
-        },
+        spec.dataFilter = this.__dataFilter.toSpecInContext(keyArgs);
+      }
 
-        set dataFilter(value) {
-
-          /**
-           * The data filter of the action.
-           *
-           * @alias __dataFilter
-           * @type {pentaho.data.filter.Abstract}
-           * @memberOf pentaho.visual.action.mixins.Data#
-           * @private
-           */
-          this.__dataFilter = __abstractFilterType.to(value);
-        },
-
-        // region serialization
-        toSpecInContext: function(keyArgs) {
-
-          var spec = this.base(keyArgs);
-
-          if(this.__dataFilter) {
-
-            keyArgs = keyArgs ? Object.create(keyArgs) : {};
-
-            keyArgs.declaredType = __abstractFilterType;
-
-            spec.dataFilter = this.__dataFilter.toSpecInContext(keyArgs);
-          }
-
-          return spec;
-        }
-        // endregion
-      });
+      return spec;
     }
-  ];
+    // endregion
+  })
+  .configure({$type: module.config});
 });

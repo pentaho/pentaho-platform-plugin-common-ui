@@ -35,7 +35,7 @@ define([
 ], function(module) {
   "use strict";
 
-  return ["pentaho/visual/base/model", function(BaseModel) {
+  return ["pentaho/visual/base/Model", function(BaseModel) {
     // Create the Bar Model subclass
     var BarModel = BaseModel.extend({
       $type: {
@@ -48,8 +48,8 @@ define([
         label: "D3 Bar Chart",
 
         // The default view to use to render this visualization is
-        // a sibling module named `view-d3.js`
-        defaultView: "./view-d3",
+        // a sibling module named `View-d3.js`
+        defaultView: "./View-d3",
 
         // Properties
         props: [
@@ -77,7 +77,7 @@ define([
           // Palette property
           {
             name: "palette",
-            base: "pentaho/visual/color/paletteProperty",
+            base: "pentaho/visual/color/PaletteProperty",
             levels: "nominal",
             isRequired: true
           }
@@ -149,7 +149,7 @@ e.g.: `{fields: ["productFamily"]}`.
 So, the value of a visual role is an object with a list property named 
 [fields]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Mapping' | append: '#fields'}}).
 
-The [modes]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property.Type' | append: '#modes'}})
+The [modes]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.PropertyType' | append: '#modes'}})
 attribute was not specified. It defaults to a single mode of the `"string"` data type.
 Thus, the visual role will accept being mapped to fields of type `"string"`. 
 
@@ -182,14 +182,14 @@ the visual role accepts a single field of data type `"number"`.
 ```js
 specification = {
   name: "palette",
-  base: "pentaho/visual/color/paletteProperty",
+  base: "pentaho/visual/color/PaletteProperty",
   levels: "nominal",
   isRequired: true
 }
 ```
 
 Represents a color palette 
-(see [pentaho/visual/color/paletteProperty]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.PaletteProperty'}})). 
+(see [pentaho/visual/color/PaletteProperty]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.PaletteProperty'}})).
 
 The value of the property will default to the highest ranked system color palette that 
 matches the [level]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.PaletteProperty.Type#levels'}}) required by it.

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,11 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context"
-], function(Context) {
+  "pentaho/visual/action/Base",
+  "pentaho/visual/action/Update"
+], function(BaseAction, UpdateAction) {
 
   "use strict";
-
-  var BaseAction;
-  var UpdateAction;
-
-  beforeAll(function(done) {
-
-    Context.createAsync()
-        .then(function(context) {
-          return context.getDependencyAsync({
-            BaseAction: "pentaho/visual/action/base",
-            UpdateAction: "pentaho/visual/action/update"
-          });
-        })
-        .then(function(types) {
-          BaseAction = types.BaseAction;
-          UpdateAction = types.UpdateAction;
-        })
-        .then(done, done.fail);
-  });
 
   describe("pentaho.visual.action.Update", function() {
 

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,42 +14,40 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!",
+  "./BarAbstract",
+  "./types/LabelsOption",
+  "./mixins/Trended",
   "pentaho/i18n!./i18n/model"
-], function(bundle) {
+], function(module, BaseModel, LabelsOption, TrendedModel, bundle) {
 
   "use strict";
 
-  return [
-    "./barAbstract",
-    "./types/labelsOption",
-    "./mixins/trended",
-    function(BaseModel, LabelsOption, TrendedModel) {
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      mixins: [TrendedModel],
 
-      return BaseModel.extend({
-        $type: {
-          mixins: [TrendedModel],
+      v2Id: "ccc_bar",
+      category: "barchart",
+      defaultView: "pentaho/ccc/visual/Bar",
 
-          v2Id: "ccc_bar",
-          category: "barchart",
-          defaultView: "pentaho/ccc/visual/bar",
-
-          props: [
-            {
-              name: "measures", // VISUAL_ROLE
-              fields: {isRequired: true},
-              ordinal: 7
-            },
-            {
-              name: "labelsOption",
-              valueType: LabelsOption,
-              domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"],
-              isRequired: true,
-              defaultValue: "none"
-            }
-          ]
+      props: [
+        {
+          name: "measures", // VISUAL_ROLE
+          fields: {isRequired: true},
+          ordinal: 7
+        },
+        {
+          name: "labelsOption",
+          valueType: LabelsOption,
+          domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"],
+          isRequired: true,
+          defaultValue: "none"
         }
-      })
-      .implement({$type: bundle.structured.bar});
+      ]
     }
-  ];
+  })
+  .localize({$type: bundle.structured.Bar})
+  .configure({$type: module.config});
 });

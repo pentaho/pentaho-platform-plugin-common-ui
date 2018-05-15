@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,29 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!",
+  "../../base/Model",
   "pentaho/i18n!../i18n/model"
-], function(bundle) {
+], function(module, BaseModel, bundle) {
 
   "use strict";
 
   // Used by all vizs but HG and GEO
 
-  return ["pentaho/visual/base/model", function(BaseModel) {
-
-    return BaseModel.extend({
-      $type: {
-        isAbstract: true,
-        props: [
-          {
-            name: "palette",
-            base: "pentaho/visual/color/paletteProperty",
-            levels: ["nominal"],
-            isRequired: true
-          }
-        ]
-      }
-    })
-    .implement({$type: bundle.structured.scaleColorDiscrete});
-  }];
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      isAbstract: true,
+      props: [
+        {
+          name: "palette",
+          base: "pentaho/visual/color/PaletteProperty",
+          levels: ["nominal"],
+          isRequired: true
+        }
+      ]
+    }
+  })
+  .localize({$type: bundle.structured.ScaleColorDiscrete})
+  .configure({$type: module.config});
 });
