@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,34 +14,16 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
-  "tests/test-utils"
-], function(Context, testUtils) {
+  "pentaho/type/Instance"
+], function(Instance) {
 
   "use strict";
 
-  /* global describe:true, it:true, expect:true, beforeEach:true*/
-
   /* eslint max-nested-callbacks: 0 */
 
-  // Use alternate, promise-aware version of `it`.
-  var it = testUtils.itAsync;
+  var Type = Instance.Type;
 
   describe("pentaho.type.Instance -", function() {
-
-    var context;
-    var Instance;
-    var Type;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Instance = context.get("instance");
-            Type = Instance.Type;
-          })
-          .then(done, done.fail);
-    });
 
     it("is a function", function() {
       expect(typeof Instance).toBe("function");
@@ -123,18 +105,21 @@ define([
       });
 
       it("should allow a type factory module id to default the type name", function() {
-        var Derived = Instance.extend({$type: {id: "my/special/model"}});
+        var Derived = Instance.extend({$type: {id: "my/special/Model"}});
         expect(Derived.name || Derived.displayName).toBe("my.special.Model");
       });
-    }); // .extend({...})
+    });
 
     describe("get/set type of a derived class - ", function() {
+
       var Derived;
+
       beforeEach(function() {
         Derived = Instance.extend({$type: {"someAttribute": "someValue"}});
       });
 
       it("setting a falsy type has no consequence", function() {
+
         ["", null, undefined, false, 0, {}].forEach(function(type) {
           Derived.type = type;
           var inst = new Derived();
@@ -146,11 +131,12 @@ define([
         Derived.type = {"someAttribute": "someOtherValue"};
         expect(Derived.Type.someAttribute).toBe("someOtherValue");
       });
-
     });
 
     describe("get/set type of an instance - ", function() {
+
       var inst;
+
       beforeEach(function() {
         inst = new Instance();
       });
@@ -175,7 +161,7 @@ define([
         expect(inst.$type.id).toBe(id);
       });
     });
-  }); // pentaho.type.Instance
+  });
 
   describe("pentaho.type.Instance - custom AMD context", function() {
 
@@ -186,80 +172,52 @@ define([
         it("should not default $type.id when it is specified", function() {
 
           function configAmd(localRequire) {
-            localRequire.define("test/module/id", function() {
 
-              return ["complex", function(Complex) {
-                return Complex.extend({
-                  $type: {
-                    id: "test/type/id"
-                  }
-                });
-              }];
+            localRequire.define("test/module/id", ["pentaho/type/Complex"], function(Complex) {
+
+              return Complex.extend({
+                $type: {
+                  id: "test/type/id"
+                }
+              });
             });
           }
 
-          return require.using(["pentaho/type/Context"], configAmd, function(Context) {
-
-            return Context.createAsync()
-              .then(function(context) {
-                return context.getAsync("test/module/id");
-              })
-              .then(function(TestType) {
-
-                expect(TestType.type.id).toBe("test/type/id");
-              });
+          return require.using(["test/module/id"], configAmd, function(TestType) {
+            expect(TestType.type.id).toBe("test/type/id");
           });
         });
 
         it("should not default $type.id when $type.sourceId is specified", function() {
 
           function configAmd(localRequire) {
-            localRequire.define("test/module/id", function() {
 
-              return ["complex", function(Complex) {
-                return Complex.extend({
-                  $type: {
-                    sourceId: "test/module/sourceId"
-                  }
-                });
-              }];
+            localRequire.define("test/module/id", ["pentaho/type/Complex"], function(Complex) {
+
+              return Complex.extend({
+                $type: {
+                  sourceId: "test/module/sourceId"
+                }
+              });
             });
           }
 
-          return require.using(["pentaho/type/Context"], configAmd, function(Context) {
-
-            return Context.createAsync()
-                .then(function(context) {
-                  return context.getAsync("test/module/id");
-                })
-                .then(function(TestType) {
-
-                  expect(TestType.type.sourceId).toBe("test/module/sourceId");
-                  expect(TestType.type.id).toBe("test/module/sourceId");
-                });
+          return require.using(["test/module/id"], configAmd, function(TestType) {
+            expect(TestType.type.sourceId).toBe("test/module/sourceId");
+            expect(TestType.type.id).toBe("test/module/sourceId");
           });
         });
 
         it("should default $type.id when instSpec is not specified", function() {
 
           function configAmd(localRequire) {
-            localRequire.define("test/module/id", function() {
-
-              return ["complex", function(Complex) {
-                return Complex.extend();
-              }];
+            localRequire.define("test/module/id", ["pentaho/type/Complex"], function(Complex) {
+              return Complex.extend();
             });
           }
 
-          return require.using(["pentaho/type/Context"], configAmd, function(Context) {
-
-            return Context.createAsync()
-                .then(function(context) {
-                  return context.getAsync("test/module/id");
-                })
-                .then(function(TestType) {
-                  expect(TestType.type.id).toBe("test/module/id");
-                });
+          return require.using(["test/module/id"], configAmd, function(TestType) {
+            expect(TestType.type.id).toBe("test/module/id");
           });
         });
 
@@ -268,26 +226,17 @@ define([
           var instSpec = {};
 
           function configAmd(localRequire) {
-            localRequire.define("test/module/id", function() {
-
-              return ["complex", function(Complex) {
-                return Complex.extend(instSpec);
-              }];
+            localRequire.define("test/module/id", ["pentaho/type/Complex"], function(Complex) {
+              return Complex.extend(instSpec);
             });
           }
 
-          return require.using(["pentaho/type/Context"], configAmd, function(Context) {
+          return require.using(["test/module/id"], configAmd, function(TestType) {
 
-            return Context.createAsync()
-                .then(function(context) {
-                  return context.getAsync("test/module/id");
-                })
-                .then(function(TestType) {
-                  expect(TestType.type.id).toBe("test/module/id");
+            expect(TestType.type.id).toBe("test/module/id");
 
-                  // Should not modify instSpec
-                  expect(instSpec).toEqual({});
-                });
+            // Should not modify instSpec.
+            expect(instSpec).toEqual({});
           });
         });
 
@@ -298,27 +247,18 @@ define([
           var instSpec = {$type: typeSpec};
 
           function configAmd(localRequire) {
-            localRequire.define("test/module/id", function() {
-
-              return ["complex", function(Complex) {
-                return Complex.extend(instSpec);
-              }];
+            localRequire.define("test/module/id", ["pentaho/type/Complex"], function(Complex) {
+              return Complex.extend(instSpec);
             });
           }
 
-          return require.using(["pentaho/type/Context"], configAmd, function(Context) {
+          return require.using(["test/module/id"], configAmd, function(TestType) {
 
-            return Context.createAsync()
-                .then(function(context) {
-                  return context.getAsync("test/module/id");
-                })
-                .then(function(TestType) {
-                  expect(TestType.type.id).toBe("test/module/id");
+            expect(TestType.type.id).toBe("test/module/id");
 
-                  // Should not modify instSpec or typeSpec
-                  expect(instSpec).toEqual({$type: {}});
-                  expect(typeSpec).toEqual({});
-                });
+            // Should not modify instSpec or typeSpec
+            expect(instSpec).toEqual({$type: {}});
+            expect(typeSpec).toEqual({});
           });
         });
       });

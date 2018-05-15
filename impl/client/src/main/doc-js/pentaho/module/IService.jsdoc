@@ -73,7 +73,7 @@
  *
  * @return {!Promise.<!Array>} A promise to an array of module values, possibly empty.
  *
- * @see pentaho.module.IMetaService#getSubtypesOfAsync
+ * @see pentaho.module.IMetaService#getSubtypesOf
  */
 
 /**
@@ -89,5 +89,5 @@
  *
  * @return {!Promise} A promise for the value of a module, if any, or `undefined`, if none.
  *
- * @see pentaho.module.IMetaService#getSubtypeOfAsync
+ * @see pentaho.module.IMetaService#getSubtypeOf
  */

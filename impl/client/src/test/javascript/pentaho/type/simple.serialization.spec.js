@@ -14,33 +14,24 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Object",
+  "pentaho/type/Number",
+  "pentaho/type/Boolean",
+  "pentaho/type/String",
+  "pentaho/type/Function",
+  "pentaho/type/Date",
+  "pentaho/type/TypeDescriptor",
   "pentaho/type/SpecificationScope"
-], function(Context, SpecificationScope) {
+], function(PentahoObject, PentahoNumber, PentahoBoolean, PentahoString, PentahoFunction, PentahoDate,
+            TypeDescriptor, SpecificationScope) {
 
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false, Date:false */
-
   describe("Simple types", function() {
-
-    var context;
-    var PentahoObject;
-    var PentahoBoolean;
-
-    beforeAll(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            PentahoObject = context.get("pentaho/type/object");
-            PentahoBoolean = context.get("pentaho/type/boolean");
-          })
-          .then(done, done.fail);
-    });
 
     describe("pentaho.type.Simple", function() {
 
-      // Using pentaho/type/boolean because pentaho/type/simple is abstract
+      // Using pentaho/type/Boolean because pentaho/type/Simple is abstract
 
       var originalSpec = {v: false, f: "I'm a simple value"};
 
@@ -456,7 +447,7 @@ define([
     describe("pentaho.type.Boolean", function() {
 
       function getSimpleClass() {
-        return context.get("pentaho/type/boolean");
+        return PentahoBoolean;
       }
 
       function getPrimitiveValue() {
@@ -469,7 +460,7 @@ define([
     describe("pentaho.type.Number", function() {
 
       function getSimpleClass() {
-        return context.get("pentaho/type/number");
+        return PentahoNumber;
       }
 
       function getPrimitiveValue() {
@@ -482,7 +473,7 @@ define([
     describe("pentaho.type.String", function() {
 
       function getSimpleClass() {
-        return context.get("pentaho/type/string");
+        return PentahoString;
       }
 
       function getPrimitiveValue() {
@@ -495,7 +486,7 @@ define([
     describe("pentaho.type.Function", function() {
 
       function getSimpleClass() {
-        return context.get("pentaho/type/function");
+        return PentahoFunction;
       }
 
       function getPrimitiveValue() {
@@ -508,7 +499,7 @@ define([
     describe("pentaho.type.Date", function() {
 
       function getSimpleClass() {
-        return context.get("pentaho/type/date");
+        return PentahoDate;
       }
 
       function getPrimitiveValue() {
@@ -521,7 +512,7 @@ define([
     describe("pentaho.type.Object", function() {
 
       function getSimpleClass() {
-        return context.get("pentaho/type/object");
+        return PentahoObject;
       }
 
       function getPrimitiveValue1() {
@@ -544,11 +535,11 @@ define([
     describe("pentaho.type.TypeDescriptor", function() {
 
       function getSimpleClass() {
-        return context.get("pentaho/type/typeDescriptor");
+        return TypeDescriptor;
       }
 
       function getPrimitiveValue() {
-        return context.get("pentaho/type/boolean").type;
+        return PentahoBoolean.type;
       }
 
       testSimple(getSimpleClass, getPrimitiveValue, false, false);

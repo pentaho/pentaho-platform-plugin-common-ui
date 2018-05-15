@@ -24,7 +24,7 @@
 /**
  * A reference to the type's base type, if any.
  *
- * When the specification is used in the context of property, it defaults to `"property"`.
+ * When the specification is used in the context of a property, it defaults to `"property"`.
  * Otherwise, when absent or `undefined`, it defaults to `"complex"`.
  *
  * See a subtype's documentation for more information on default values.
@@ -139,7 +139,7 @@
  * @name application
  * @memberOf pentaho.type.spec.ITypeProto#
  * @type object
- * @see pentaho.type.Type#application
+ * @see pentaho.type.Instance.Type#application
  */
 
 /**

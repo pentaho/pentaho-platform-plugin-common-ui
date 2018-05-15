@@ -14,64 +14,51 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context"
-], function(Context) {
+  "pentaho/type/Value",
+  "pentaho/type/Element",
+  "pentaho/type/Number",
+  "pentaho/type/Complex"
+], function(Value, Element, PentahoNumber, Complex) {
 
   "use strict";
 
-  /* global describe:true, it:true, expect:true, beforeEach:true*/
-
   describe("pentaho.type.Element -", function() {
 
-    var context;
-    var Value;
-    var Element;
-    var PentahoNumber;
-    var Complex;
     var ComplexEntity;
     var ComplexNonEntity;
     var ComplexNonEntityReadOnly;
 
-    beforeAll(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Value = context.get("pentaho/type/value");
-            Element = context.get("pentaho/type/element");
-            PentahoNumber = context.get("pentaho/type/number");
-            Complex = context.get("pentaho/type/complex");
+    beforeAll(function() {
 
-            ComplexEntity = Complex.extend({
-              get $key() {
-                return this.name;
-              },
-              $type: {
-                isEntity: true,
-                props: [
-                  "name",
-                  {name: "age", valueType: "number"}
-                ]
-              }
-            });
+      ComplexEntity = Complex.extend({
+        get $key() {
+          return this.name;
+        },
+        $type: {
+          isEntity: true,
+          props: [
+            "name",
+            {name: "age", valueType: PentahoNumber}
+          ]
+        }
+      });
 
-            ComplexNonEntity = Complex.extend({
-              $type: {
-                props: [
-                  "name", {name: "age", valueType: "number"}
-                ]
-              }
-            });
+      ComplexNonEntity = Complex.extend({
+        $type: {
+          props: [
+            "name", {name: "age", valueType: PentahoNumber}
+          ]
+        }
+      });
 
-            ComplexNonEntityReadOnly = Complex.extend({
-              $type: {
-                isReadOnly: true,
-                props: [
-                  "name", {name: "age", valueType: "number"}
-                ]
-              }
-            });
-          })
-          .then(done, done.fail);
+      ComplexNonEntityReadOnly = Complex.extend({
+        $type: {
+          isReadOnly: true,
+          props: [
+            "name", {name: "age", valueType: PentahoNumber}
+          ]
+        }
+      });
     });
 
     it("should be a function", function() {
@@ -211,7 +198,7 @@ define([
 
         expect(va.configureOrCreate({})).toBe(result);
       });
-    }); // end #configureOrCreate
+    });
 
     describe("#_configureOrCreate(config)", function() {
 
@@ -583,7 +570,7 @@ define([
 
       var ElemType;
 
-      beforeEach(function() {
+      beforeAll(function() {
         ElemType = Element.Type;
       });
 

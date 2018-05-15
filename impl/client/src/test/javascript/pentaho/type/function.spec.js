@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,35 +14,20 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Function",
   "tests/pentaho/util/errorMatch"
-], function(Context, errorMatch) {
+], function(PentahoFunction, errorMatch) {
 
   "use strict";
 
-  /* global describe:true, it:true, expect:true, beforeEach:true*/
-
   describe("pentaho.type.Function -", function() {
-
-    var context;
-    var PentahoFunction;
-
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            PentahoFunction = context.get("pentaho/type/function");
-          })
-          .then(done, done.fail);
-    });
 
     describe("new Function()", function() {
 
-      var testFunc;
+      var testFun;
 
       beforeEach(function() {
-        testFunc = new PentahoFunction(function() {});
+        testFun = new PentahoFunction(function() {});
       });
 
       it("should be a function", function() {
@@ -50,11 +35,11 @@ define([
       });
 
       it("should be a function", function() {
-        expect(typeof testFunc.value).toBe("function");
+        expect(typeof testFun.value).toBe("function");
       });
 
       it("should return an object", function() {
-        expect(typeof testFunc).toBe("object");
+        expect(typeof testFun).toBe("object");
       });
 
       it("should accept a function value as a string as an object", function() {
@@ -96,5 +81,5 @@ define([
         expect(fun.toJSON()).toBe(null);
       });
     });
-  }); // pentaho.type.Function
+  });
 });

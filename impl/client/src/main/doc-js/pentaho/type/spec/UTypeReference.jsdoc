@@ -15,13 +15,13 @@
  */
 
 /**
- * The `spec.UTypeReference` union represents the set of JS types that can be used to reference one type.
+ * The `spec.UTypeReference` union represents the set of JS types that can be used to reference a type.
  *
  * It can be one of the following:
  *
  * ##### A _type id_ string
  *
- * A type's permanent [id]{@link pentaho.type.Type#id} —
+ * A type's permanent [id]{@link pentaho.type.Instance.Type#id} —
  * the identifier of a defined module in the AMD module system —,
  * or a [temporary]{@link pentaho.type.SpecificationContext.isIdTemporary},
  * serialization-only identifier.
@@ -33,7 +33,7 @@
  *
  * Example absolute, permanent identifier:
  * ```js
- * "pentaho/type/string"
+ * "pentaho/type/String"
  * ```
  *
  * Example temporary identifier:
@@ -45,20 +45,13 @@
  *
  * A reference to an instance constructor, like [Complex]{@link pentaho.type.Complex}.
  *
- * Usually,
- * a reference to an instance constructor is obtained from a [context]{@link pentaho.type.Context} object
- * (and not used to obtain one...) by providing the type's identifier.
- * Nevertheless, it is sometimes useful to be able to use it to identify a type.
- *
  * Example:
  *
  * ```js
- * require(["pentaho/type/Context"], function(Context) {
- *   Context.createAsync().then(function(context) {
- *     var Complex = context.get("pentaho/type/complex");
+ * require(["pentaho/type/loader", "pentaho/type/Complex"], function(typeLoader, Complex) {
  *
- *     // ...
- *   });
+ *   typeLoader.resolveType(Complex);
+ *
  * });
  * ```
  *
@@ -69,18 +62,16 @@
  *
  * Example:
  * ```js
- * require(["pentaho/type/Context"], function(Context) {
- *   Context.createAsync().then(function(context) {
- *     var PentahoNumber = context.get("pentaho/type/number");
- *     var numberType = PentahoNumber.type;
+ * require(["pentaho/type/loader", "pentaho/type/Number"], function(typeLoader, PentahoNumber) {
  *
- *     // Get a number list type
- *     var NumberList = context.get([numberType]);
+ *   var numberType = PentahoNumber.type;
  *
- *     var numbers = new NumberList([1, 2, 3]);
+ *   // Create a number list type
+ *   var NumberList = typeLoader.resolveType([numberType]);
  *
- *     // ...
- *   });
+ *   var numbers = new NumberList([1, 2, 3]);
+ *
+ *   // ...
  * });
  * ```
  *
@@ -90,33 +81,32 @@
  * Satisfies the interface [spec.ITypeProto]{@link pentaho.type.spec.ITypeProto}.
  *
  * The special `base` attribute allows specifying the base type
- * and defaults to `"pentaho/type/complex"`,
+ * and defaults to `"pentaho/type/Complex"`,
  * on a global context, or
  * to the [valueType]{@link pentaho.type.Property.Type#valueType} of the base property,
  * when overriding it.
  * Any additional attributes are determined and processed by
- * each type's {@link pentaho.type.Type.extend} method.
+ * each type's {@link pentaho.type.Instance.Type.extend} method.
  *
  * Example:
  *
  * ```js
- * require(["pentaho/type/Context"], function(Context) {
- *   Context.createAsync().then(function(context) {
+ * require(["pentaho/type/loader"], function(typeLoader) {
  *
- *     // Obtain an anonymous, derived complex type from the context
- *     var MyProduct = context.get({
- *           base: "complex" // optional
- *           props: [
- *             {name: "id",    label: "Id",    valueType: "string"},
- *             {name: "name",  label: "Name",  valueType: "string"},
- *             {name: "price", label: "Price", valueType: "number"}
- *           ]
- *         });
- *
- *     var productA = new MyProduct({id: "mabc", name: "Principia Mathematica", price: 1200});
- *
- *     // ...
+ *   // Create an anonymous, derived complex type by using the type loader.
+ *   var MyProduct = typeLoader.resolveType({
+ *     base: "complex" // optional
+ *     props: [
+ *       {name: "id",    label: "Id",    valueType: "string"},
+ *       {name: "name",  label: "Name",  valueType: "string"},
+ *       {name: "price", label: "Price", valueType: "number"}
+ *     ]
  *   });
+ *
+ *   var productA = new MyProduct({id: "mabc", name: "Principia Mathematica", price: 1200});
+ *
+ *   // ...
+ *
  * });
  * ```
  *
@@ -128,42 +118,40 @@
  * Example:
  *
  * ```js
- * require(["pentaho/type/Context"], function(Context) {
+ * require(["pentaho/type/loader"], function(typeLoader) {
  *
- *   Context.createAsync().then(function(context) {
+ *   // Obtain the List type instance constructor
  *
- *     // Obtain the List type instance constructor
+ *   // Using the id
+ *   var ListA = typeLoader.resolveType("list");
  *
- *     // Using the id
- *     var ListA = context.get("list");
+ *   // Obtain a derived List type instance constructor
+ *   // with Number as the element type
  *
- *     // Obtain a derived List type instance constructor
- *     // with Number as the element type
+ *   // Using the generic type specification syntax
+ *   var NumberListA = typeLoader.resolveType({base: "list", of: "number"});
  *
- *     // Using the generic type specification syntax
- *     var NumberListA = context.get({base: "list", of: "number"});
+ *   // Using the shorthand syntax
+ *   var NumberListB = typeLoader.resolveType(["number"]);
  *
- *     // Using the shorthand syntax
- *     var NumberListB = context.get(["number"]);
+ *   // ...
  *
- *     // ...
+ *   // Assuming the type MyProduct from a previous example
  *
- *     // Assuming the type MyProduct from a previous example
+ *   var ProductList = typeLoader.resolveType([MyProduct]);
  *
- *     var ProductList = context.get([MyProduct]);
+ *   var productList = new ProductList([
+ *     {id: "mpma", name: "Principia Mathematica", price: 1200},
+ *     {id: "flot", name: "The Laws of Thought",   price:  500}
+ *   ]);
  *
- *     var productList = new ProductList([
- *           {id: "mpma", name: "Principia Mathematica", price: 1200},
- *           {id: "flot", name: "The Laws of Thought",   price:  500}
- *         ]);
+ *   alert("Product count: " + productList.count);
  *
- *     alert("Product count: " + productList.count);
- *   });
  * });
  * ```
  *
  * @typedef {nonEmptyString|
- *           pentaho.type.Type|
+ *           pentaho.type.Instance.Type|
  *           Class.<pentaho.type.Instance>|
  *           Array.<pentaho.type.spec.UTypeReference>|
  *           pentaho.type.spec.ITypeProto} pentaho.type.spec.UTypeReference

@@ -1,0 +1,189 @@
+/*!
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `ILoader` interface describes a type and instance loader of the Type API.
+ *
+ * @name pentaho.type.ILoader
+ *
+ * @interface
+ */
+
+// region Type methods
+/**
+ * Resolves a type reference and returns its instance constructor.
+ *
+ * For more information on the `typeRef` argument,
+ * see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
+ *
+ * If it is not known whether all types that are referenced by identifier within `typeRef`
+ * have already been loaded,
+ * the asynchronous method version, [resolveTypeAsync]{@link pentaho.type.ILoader#resolveTypeAsync},
+ * should be used instead.
+ *
+ * @name resolveType
+ * @memberOf pentaho.type.ILoader#
+ * @method
+ *
+ * @see pentaho.type.ILoader#resolveTypeAsync
+ *
+ * @param {!pentaho.type.spec.UTypeReference} typeRef - A type reference.
+ * @param {Object} [keyArgs] The keyword arguments.
+ * @param {pentaho.type.spec.UTypeReference} [keyArgs.defaultBase] The default base type
+ * of `typeRef` when it is an immediate generic object specification.
+ *
+ * @return {!Class.<pentaho.type.Instance>} The instance constructor.
+ *
+ * @throws {pentaho.lang.ArgumentRequiredError} When `typeRef` is an empty string or {@link Nully}.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is of an unsupported JavaScript type:
+ * not a string, function, array or object.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is a type constructor
+ * (e.g. [Type]{@link pentaho.type.Instance.Type})
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is an instance of `pentaho.type.Instance`.
+ *
+ * @throws {Error} When the identifier of a type is not defined as a module in the AMD module system
+ * (specified directly in `typeRef`, or present in an generic type specification).
+ *
+ * @throws {Error} When an identifier is of a module that the AMD module system
+ * has not loaded yet (specified directly in `typeRef`, or present in an generic type specification).
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, an array-shorthand,
+ * list type specification that has more than one child element type specification.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, a generic object type
+ * specification that has a permanent identifier.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, a generic object type
+ * specification that has a temporary identifier which is already defined.
+ */
+
+/**
+ * Resolves a type reference, asynchronously, and returns a promise that
+ * resolves to the type's instance constructor.
+ *
+ * For more information on the `typeRef` argument,
+ * see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
+ *
+ * This method can be used even if a generic type specification references types
+ * whose modules have not yet been loaded by the AMD module system.
+ *
+ * @name resolveTypeAsync
+ * @memberOf pentaho.type.ILoader#
+ * @method
+ *
+ * @see pentaho.type.ILoader#resolveType
+ *
+ * @param {!pentaho.type.spec.UTypeReference} typeRef - A type reference.
+ * @param {Object} [keyArgs] The keyword arguments.
+ * @param {pentaho.type.spec.UTypeReference} [keyArgs.defaultBase] The default base type
+ * of `typeRef` when it is an immediate generic object specification.
+ *
+ * @return {!Promise.<!Class.<pentaho.type.Instance>>} A promise for the instance constructor.
+ *
+ * @rejects {pentaho.lang.ArgumentRequiredError} When `typeRef` is an empty string or {@link Nully}.
+ *
+ * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is of an unsupported JavaScript type:
+ * not a string, function, array or object.
+ *
+ * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is a type constructor
+ * (e.g. [Type]{@link pentaho.type.Instance.Type})
+ *
+ * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is an instance.
+ *
+ * @rejects {Error} When the identifier of a type is not defined as a module in the AMD module system
+ * (specified directly in `typeRef`, or present in an generic type specification).
+ *
+ * @rejects {pentaho.lang.OperationInvalidError} When the value returned by a factory function is not
+ * an instance constructor of a subtype of `Instance`
+ * (specified directly in `typeRef`, or obtained indirectly by loading a type's module given its identifier).
+ *
+ * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, a list type specification
+ * with an invalid structure.
+ *
+ * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, a generic object type
+ * specification that has a permanent identifier.
+ *
+ * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, a generic object type
+ * specification that has a temporary identifier which is already defined.
+ *
+ * @rejects {Error} When any other unexpected error occurs.
+ */
+// endregion
+
+// region Instance methods
+/**
+ * Resolves an instance specification.
+ *
+ * This method can be used for creating a new instance,
+ * given an [instance specification]{@link pentaho.type.spec.UInstance}.
+ *
+ * @name resolveInstance
+ * @memberOf pentaho.type.ILoader#
+ * @method
+ *
+ * @param {pentaho.type.Instance|pentaho.type.spec.UInstance} [instSpec] - An instance specification or an instance.
+ *
+ * @param {Object} [instKeyArgs] - The keyword arguments passed to the instance constructor, when one is created.
+ * @param {pentaho.type.Instance.Type} [baseType] - The base type of which returned instances must be an instance and,
+ * also, the default type used when type information is not available in `instRef`.
+ *
+ * @return {!pentaho.type.Instance} An instance.
+ *
+ * @throws {pentaho.lang.OperationInvalidError} When it is not possible to determine the type of instance to create
+ * based on `instRef` and `baseType` is not specified.
+ *
+ * @throws {pentaho.lang.OperationInvalidError} When an instance should be created but its determined type
+ * is [abstract]{@link pentaho.type.Value.Type#isAbstract}.
+ *
+ * @throws {Error} Other errors, as documented in [resolveType]{@link pentaho.type.ILoader#resolveType}.
+ *
+ * @see pentaho.type.ILoader#resolveInstanceAsync
+ * @see pentaho.type.Instance.Type#create
+ */
+
+/**
+ * Resolves an instance reference, asynchronously.
+ *
+ * This method can be used for creating a new instance,
+ * given an [instance specification]{@link pentaho.type.spec.UInstance}.
+ *
+ * @name resolveInstanceAsync
+ * @memberOf pentaho.type.ILoader#
+ * @method
+ *
+ * @param {pentaho.type.Instance|pentaho.type.spec.UInstance} [instSpec] - An instance specification or an instance.
+ *
+ * @param {Object} [instKeyArgs] - The keyword arguments passed to the instance constructor, when one is created.
+ * @param {pentaho.type.Instance.Type} [baseType] - The base type of which returned instances must be an instance and,
+ * also, the default type used when type information is not available in `instRef`.
+ *
+ * @return {!Promise.<!pentaho.type.Instance>} A promise to an instance.
+ *
+ * @rejects {pentaho.lang.OperationInvalidError} When it is not possible to determine the type of instance to create
+ * based on `instRef` and `baseType` is not specified.
+ *
+ * @rejects {pentaho.lang.OperationInvalidError} When an instance should be created but its determined type
+ * is [abstract]{@link pentaho.type.Value.Type#isAbstract}.
+ *
+ * @rejects {Error} Other errors, as documented in [resolveType]{@link pentaho.type.ILoader#resolveType}.
+ *
+ * @see pentaho.type.ILoader#resolveInstance
+ * @see pentaho.type.Instance.Type#createAsync
+ */
+// endregion

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!../Tree",
   "pentaho/util/error"
-], function(error) {
+], function(module, error) {
 
   "use strict";
 
@@ -37,7 +38,7 @@ define([
      * @extends pentaho.data.filter.Abstract
      * @abstract
      *
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.Tree>} pentaho/data/filter/tree
+     * @amd pentaho/data/filter/Tree
      *
      * @classDesc The base class of filters that combine other filters.
      *
@@ -222,7 +223,7 @@ define([
       // endregion
 
       $type: /** @lends pentaho.data.filter.Tree.Type# */{
-        id: "pentaho/data/filter/tree",
+        id: module.id,
         isAbstract: true,
         props: [
           {
@@ -236,6 +237,7 @@ define([
              * @type {pentaho.type.List<pentaho.data.filter.Abstract>}
              * @readOnly
              */
+
             name: "operands",
             nameAlias: "o",
             valueType: [filter.Abstract],

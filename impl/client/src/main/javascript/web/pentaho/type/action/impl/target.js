@@ -15,13 +15,11 @@
  */
 define([
   "module",
-  "../Execution",
   "pentaho/lang/EventSource",
-  "pentaho/util/error",
-
-  // so that r.js sees otherwise invisible dependencies.
-  "../base"
-], function(module, ActionExecution, EventSource, error) {
+  "../Base",
+  "../Execution",
+  "pentaho/util/error"
+], function(module, EventSource, ActionBase, ActionExecution, error) {
 
   "use strict";
 
@@ -65,216 +63,202 @@ define([
     }
   });
 
-  return ["../../value", "../base", function(Value, ActionBase) {
+  var __actionBaseType = ActionBase.type;
 
-    // TODO: This class is currently a Type API type solely to gain access to the Type context,
-    // and from there to action.Base.
-    // When Type API types are integrated with the AMD system, it can change to extend from EventSource directly
-    // and become a normal mixin...
+  /**
+   * The `_emitGeneric` keyword arguments used for all phases but the finally phase.
+   *
+   * In the early phases:
+   * - cancellation is possible;
+   * - arbitrary errors cause the action to fail.
+   *
+   * In the finally phase:
+   * - it is not possible to cancel;
+   * - errors are swallowed and logged and do not affect the action execution's result;
+   *   the default error handler does this.
+   */
+  var __emitActionKeyArgs = {
+    errorHandler: function(ex, actionExecution) {
+      actionExecution.fail(ex);
+    },
+    isCanceled: function(actionExecution) {
+      return actionExecution.isCanceled;
+    }
+  };
 
-    var __actionBaseType = ActionBase.type;
+  /**
+   * @classDesc The `Target` class is a mixin class that builds upon
+   * [EventSource]{@link pentaho.lang.EventSource} to implement the
+   * [ITarget]{@link pentaho.type.action.ITarget} interface.
+   *
+   * It provides a generic action [Execution]{@link pentaho.type.action.Execution}
+   * implementation which delegates to the event observers of each of the execution phases.
+   *
+   * The event observers have the following signature:
+   * ```js
+   * function(event, action) {
+   *
+   *   // assert event instanceof pentaho.type.action.Execution;
+   *
+   *   // assert action === event.action;
+   *   // assert action instanceof pentaho.type.action.Base;
+   *
+   *   // assert this === event.target;
+   *   // assert this instanceof pentaho.type.action.ITarget;
+   * }
+   * ```
+   *
+   * The `do` phase event observer can return a {@link Promise}.
+   *
+   * @name pentaho.type.action.impl.Target
+   * @class
+   *
+   * @extends pentaho.lang.EventSource
+   *
+   * @implements {pentaho.type.action.ITarget}
+   *
+   * @abstract
+   *
+   * @amd pentaho/type/action/impl/Target
+   *
+   * @description This class was not designed to be constructed directly.
+   * It was designed to be used as a **mixin**.
+   *
+   * @constructor
+   */
+
+  return EventSource.extend(module.id, /** @lends pentaho.type.action.impl.Target# */{
+
+    /** @inheritDoc */
+    act: function(action) {
+
+      if(!action) throw error.argRequired("action");
+
+      action = __actionBaseType.to(action);
+
+      return this._createActionExecution(action).execute();
+    },
 
     /**
-     * The `_emitGeneric` keyword arguments used for all phases but the finally phase.
+     * Creates an action execution for a given action.
      *
-     * In the early phases:
-     * - cancellation is possible;
-     * - arbitrary errors cause the action to fail.
+     * The default implementation delegates to
+     * [_createGenericActionExecution]{pentaho.type.action.impl.Target#_createGenericActionExecution}.
      *
-     * In the finally phase:
-     * - it is not possible to cancel;
-     * - errors are swallowed and logged and do not affect the action execution's result;
-     *   the default error handler does this.
+     * @param {!pentaho.type.action.Base} action - The action which will be executed.
+     *
+     * @return {!pentaho.type.action.Execution} The action execution.
+     *
+     * @protected
+     *
+     * @see pentaho.type.action.ITarget#act
      */
-    var __emitActionKeyArgs = {
-      errorHandler: function(ex, actionExecution) {
-        actionExecution.fail(ex);
-      },
-      isCanceled: function(actionExecution) {
-        return actionExecution.isCanceled;
-      }
-    };
+    _createActionExecution: function(action) {
+      return this._createGenericActionExecution(action);
+    },
 
     /**
-     * @classDesc The `Target` class is a mixin class that builds upon
-     * [EventSource]{@link pentaho.lang.EventSource} to implement the
-     * [ITarget]{@link pentaho.type.action.ITarget} interface.
+     * Creates a generic action execution for a given action.
      *
-     * It provides a generic action [Execution]{@link pentaho.type.action.Execution}
-     * implementation which delegates to the event observers of each of the execution phases.
+     * The implementation returns an instance of
+     * [Target.GenericActionExecution]{@link pentaho.type.action.impl.Target.GenericActionExecution}.
      *
-     * The event observers have the following signature:
-     * ```js
-     * function(event, action) {
+     * @param {!pentaho.type.action.Base} action - The action which will be executed.
      *
-     *   // assert event instanceof pentaho.type.action.Execution;
+     * @return {!pentaho.type.action.Execution} The action execution.
      *
-     *   // assert action === event.action;
-     *   // assert action instanceof pentaho.type.action.Base;
-     *
-     *   // assert this === event.target;
-     *   // assert this instanceof pentaho.type.action.ITarget;
-     * }
-     * ```
-     *
-     * The `do` phase event observer can return a {@link Promise}.
-     *
-     * @name pentaho.type.action.impl.Target
-     * @class
-     *
-     * @extends pentaho.type.Value
-     * @extends pentaho.lang.EventSource
-     *
-     * @implements {pentaho.type.action.ITarget}
-     *
-     * @abstract
-     *
-     * @amd pentaho/type/action/impl/Target
-     *
-     * @description This class was not designed to be constructed directly.
-     * It was designed to be used as a **mixin**.
-     * @constructor
+     * @protected
      */
+    _createGenericActionExecution: function(action) {
+      return new GenericActionExecution(action, this);
+    },
+    // endregion
 
-    return Value.extend(/** @lends pentaho.type.action.impl.Target# */{
+    // region Actions
+    /**
+     * Emits the `init` phase event of an action execution.
+     *
+     * The default implementation delegates to
+     * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
+     *
+     * @param {!pentaho.type.action.Execution} actionExecution - The action execution.
+     *
+     * @protected
+     */
+    _emitActionPhaseInitEvent: function(actionExecution) {
 
-      $type: {
-        id: module.id,
-        isAbstract: true
-      },
+      var action = actionExecution.action;
+      var eventType = action.$type.id;
 
-      /** @inheritDoc */
-      act: function(action) {
+      this._emitGeneric(this, [actionExecution, action], eventType, "init", __emitActionKeyArgs);
+    },
 
-        if(!action) throw error.argRequired("action");
+    /**
+     * Emits the `will` phase event of an action execution.
+     *
+     * The default implementation delegates to
+     * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
+     *
+     * @param {!pentaho.type.action.Execution} actionExecution - The action execution.
+     *
+     * @protected
+     */
+    _emitActionPhaseWillEvent: function(actionExecution) {
 
-        action = __actionBaseType.to(action);
+      var action = actionExecution.action;
+      var eventType = action.$type.id;
 
-        return this._createActionExecution(action).execute();
-      },
+      this._emitGeneric(this, [actionExecution, action], eventType, "will", __emitActionKeyArgs);
+    },
 
-      /**
-       * Creates an action execution for a given action.
-       *
-       * The default implementation delegates to
-       * [_createGenericActionExecution]{pentaho.type.action.impl.Target#_createGenericActionExecution}.
-       *
-       * @param {!pentaho.type.action.Base} action - The action which will be executed.
-       *
-       * @return {!pentaho.type.action.Execution} The action execution.
-       *
-       * @protected
-       *
-       * @see pentaho.type.action.ITarget#act
-       */
-      _createActionExecution: function(action) {
-        return this._createGenericActionExecution(action);
-      },
+    /**
+     * Emits the `do` phase event of an action execution.
+     *
+     * The default implementation delegates to
+     * [_emitGenericAllAsync]{@link pentaho.lang.EventSource#_emitGenericAllAsync},
+     * when the action is [asynchronous]{@link pentaho.type.action.Base.Type#isSync}.
+     * Delegates to
+     * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}, otherwise.
+     *
+     * @param {!pentaho.type.action.Execution} actionExecution - The action execution.
+     *
+     * @return {?Promise} A promise to the completion of the asynchronous `do` listener,
+     * of an [asynchronous]{@link pentaho.type.action.Base.Type#isSync} action, or `null`.
+     *
+     * @protected
+     */
+    _emitActionPhaseDoEvent: function(actionExecution) {
 
-      /**
-       * Creates a generic action execution for a given action.
-       *
-       * The implementation returns an instance of
-       * [Target.GenericActionExecution]{@link pentaho.type.action.impl.Target.GenericActionExecution}.
-       *
-       * @param {!pentaho.type.action.Base} action - The action which will be executed.
-       *
-       * @return {!pentaho.type.action.Execution} The action execution.
-       *
-       * @protected
-       */
-      _createGenericActionExecution: function(action) {
-        return new GenericActionExecution(action, this);
-      },
-      // endregion
+      var action = actionExecution.action;
+      var actionType = action.$type;
+      var eventType = actionType.id;
 
-      // region Actions
-      /**
-       * Emits the `init` phase event of an action execution.
-       *
-       * The default implementation delegates to
-       * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
-       *
-       * @param {!pentaho.type.action.Execution} actionExecution - The action execution.
-       *
-       * @protected
-       */
-      _emitActionPhaseInitEvent: function(actionExecution) {
-
-        var action = actionExecution.action;
-        var eventType = action.$type.id;
-
-        this._emitGeneric(this, [actionExecution, action], eventType, "init", __emitActionKeyArgs);
-      },
-
-      /**
-       * Emits the `will` phase event of an action execution.
-       *
-       * The default implementation delegates to
-       * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
-       *
-       * @param {!pentaho.type.action.Execution} actionExecution - The action execution.
-       *
-       * @protected
-       */
-      _emitActionPhaseWillEvent: function(actionExecution) {
-
-        var action = actionExecution.action;
-        var eventType = action.$type.id;
-
-        this._emitGeneric(this, [actionExecution, action], eventType, "will", __emitActionKeyArgs);
-      },
-
-      /**
-       * Emits the `do` phase event of an action execution.
-       *
-       * The default implementation delegates to
-       * [_emitGenericAllAsync]{@link pentaho.lang.EventSource#_emitGenericAllAsync},
-       * when the action is [asynchronous]{@link pentaho.type.action.Base.Type#isSync}.
-       * Delegates to
-       * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}, otherwise.
-       *
-       * @param {!pentaho.type.action.Execution} actionExecution - The action execution.
-       *
-       * @return {?Promise} A promise to the completion of the asynchronous `do` listener,
-       * of an [asynchronous]{@link pentaho.type.action.Base.Type#isSync} action, or `null`.
-       *
-       * @protected
-       */
-      _emitActionPhaseDoEvent: function(actionExecution) {
-
-        var action = actionExecution.action;
-        var actionType = action.$type;
-        var eventType = actionType.id;
-
-        if(actionType.isSync) {
-          this._emitGeneric(this, [actionExecution, action], eventType, "do", __emitActionKeyArgs);
-          return null;
-        }
-
-        return this._emitGenericAllAsync(this, [actionExecution, action], eventType, "do", __emitActionKeyArgs);
-      },
-
-      /**
-       * Emits the `finally` phase event of an action execution.
-       *
-       * The default implementation delegates to
-       * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
-       *
-       * @param {!pentaho.type.action.Execution} actionExecution - The action execution.
-       *
-       * @protected
-       */
-      _emitActionPhaseFinallyEvent: function(actionExecution) {
-
-        var action = actionExecution.action;
-        var eventType = action.$type.id;
-
-        this._emitGeneric(this, [actionExecution, action], eventType, "finally");
+      if(actionType.isSync) {
+        this._emitGeneric(this, [actionExecution, action], eventType, "do", __emitActionKeyArgs);
+        return null;
       }
-    }, {
-      GenericActionExecution: GenericActionExecution
-    })
-    .implement(EventSource);
-  }];
+
+      return this._emitGenericAllAsync(this, [actionExecution, action], eventType, "do", __emitActionKeyArgs);
+    },
+
+    /**
+     * Emits the `finally` phase event of an action execution.
+     *
+     * The default implementation delegates to
+     * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
+     *
+     * @param {!pentaho.type.action.Execution} actionExecution - The action execution.
+     *
+     * @protected
+     */
+    _emitActionPhaseFinallyEvent: function(actionExecution) {
+
+      var action = actionExecution.action;
+      var eventType = action.$type.id;
+
+      this._emitGeneric(this, [actionExecution, action], eventType, "finally");
+    }
+  }, {
+    GenericActionExecution: GenericActionExecution
+  });
 });

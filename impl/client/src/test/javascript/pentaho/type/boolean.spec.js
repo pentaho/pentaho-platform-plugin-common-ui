@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Boolean",
   "tests/pentaho/util/errorMatch"
-], function(Context, errorMatch) {
+], function(PentahoBoolean, errorMatch) {
 
   "use strict";
 
@@ -25,15 +25,6 @@ define([
   describe("pentaho.type.Boolean", function() {
 
     describe("new ()", function() {
-      var PentahoBoolean;
-
-      beforeEach(function(done) {
-        Context.createAsync()
-            .then(function(context) {
-              PentahoBoolean = context.get("pentaho/type/boolean");
-            })
-            .then(done, done.fail);
-      });
 
       it("should be a function", function() {
         expect(typeof PentahoBoolean).toBe("function");

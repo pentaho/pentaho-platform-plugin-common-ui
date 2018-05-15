@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,40 +14,24 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Property",
+  "pentaho/type/Complex",
+  "pentaho/type/String",
   "pentaho/type/SpecificationScope",
   "tests/pentaho/type/propertyTypeUtil"
-], function(Context, SpecificationScope, propertyTypeUtil) {
+], function(Property, Complex, PentahoString, SpecificationScope, propertyTypeUtil) {
 
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false, jasmine:false*/
-
   describe("pentaho.type.Property.Type", function() {
 
-    var context;
-    var Property;
-    var Complex;
-    var PentahoString;
+    var Derived;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Property = context.get("property");
-            Complex = context.get("pentaho/type/complex");
-            PentahoString = context.get("pentaho/type/string");
-          })
-          .then(done, done.fail);
+    beforeAll(function() {
+      Derived = Complex.extend();
     });
 
     describe("#toSpecInContext(keyArgs)", function() {
-
-      var Derived;
-
-      beforeEach(function() {
-        Derived = Complex.extend();
-      });
 
       it("should call #_fillSpecInContext", function() {
         var scope = new SpecificationScope();
@@ -326,8 +310,6 @@ define([
     describe("_fillSpecInContext(spec, keyArgs)", function() {
 
       it("should return false, if only name and type were set", function() {
-        var Derived = Complex.extend();
-
         var scope = new SpecificationScope();
 
         var propType = propertyTypeUtil.createRoot(Derived.type, "foo");
@@ -344,8 +326,6 @@ define([
       describe("#label", function() {
 
         it("should return true when label is set to the default label", function() {
-          var Derived = Complex.extend();
-
           var scope = new SpecificationScope();
 
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", label: "Foo"});
@@ -364,8 +344,6 @@ define([
       describe("#defaultValue", function() {
 
         it("should not serialize when undefined (root)", function() {
-          var Derived = Complex.extend();
-
           var scope = new SpecificationScope();
 
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
@@ -422,7 +400,6 @@ define([
         });
 
         it("should serialize without type annotation when of the same type", function() {
-          var Derived = Complex.extend();
 
           var scope = new SpecificationScope();
 
@@ -442,7 +419,7 @@ define([
         });
 
         it("should serialize with type annotation when of different subtype", function() {
-          var Derived = Complex.extend();
+
           var PostalCode = PentahoString.extend();
 
           var scope = new SpecificationScope();

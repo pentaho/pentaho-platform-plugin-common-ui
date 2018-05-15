@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../ReferenceList",
-  "../../lang/Base"
-], function(ReferenceList, Base) {
+  "pentaho/lang/Base"
+], function(module, ReferenceList, Base) {
 
   "use strict";
 
-  return Base.extend(/** @lends pentaho.type.changes.ChangeRef# */{
+  return Base.extend(module.id, /** @lends pentaho.type.changes.ChangeRef# */{
     /**
      * @classDesc The `ChangeRef` holds changes to the references list of a container instance.
      *

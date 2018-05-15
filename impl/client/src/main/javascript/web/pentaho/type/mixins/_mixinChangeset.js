@@ -19,12 +19,12 @@ define([
   "use strict";
 
   /**
-   * @name _mixinChangeset
+   * @name changeset
    * @memberOf pentaho.type.mixins
    * @mixin
    * @private
    */
-  return /** @lends pentaho.type.mixins._mixinChangeset */{
+  return /** @lends pentaho.type.mixins.changeset */{
 
     /**
      * Initializes the mixin.

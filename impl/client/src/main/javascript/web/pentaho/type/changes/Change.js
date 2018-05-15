@@ -15,8 +15,10 @@
  */
 
 define([
-  "../../lang/Base"
-], function(Base) {
+  "module",
+  "pentaho/lang/Base"
+], function(module, Base) {
+
   "use strict";
 
   /**
@@ -32,7 +34,7 @@ define([
    *
    * @description Creates a `Change` instance.
    */
-  return Base.extend("pentaho.type.changes.Change", /** @lends pentaho.type.changes.Change# */{
+  return Base.extend(module.id, /** @lends pentaho.type.changes.Change# */{
 
     // Block default Base.js constructor
     constructor: function() {}

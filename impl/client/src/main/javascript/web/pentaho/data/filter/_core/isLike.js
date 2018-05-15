@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!../IsLike",
   "../KnownFilterKind"
-], function(KnownFilterKind) {
+], function(module, KnownFilterKind) {
 
   "use strict";
 
@@ -35,7 +36,7 @@ define([
      * @name pentaho.data.filter.IsLike
      * @class
      * @extends pentaho.data.filter.Property
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.IsLike>} pentaho/data/filter/isLike
+     * @amd pentaho/data/filter/IsLike
      *
      * @classDesc The `IsLike` class represents a simple string matching filter.
      * This filter selects elements having the formatted value match an affix
@@ -115,8 +116,7 @@ define([
       },
 
       $type: /** @lends pentaho.data.filter.IsLike.Type# */{
-        id: "pentaho/data/filter/isLike",
-        alias: "like",
+        id: module.id,
         props: [
           {
             name: "value",

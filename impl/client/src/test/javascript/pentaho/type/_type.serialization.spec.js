@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,38 +14,22 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Instance",
   "pentaho/type/SpecificationScope",
   "pentaho/type/SpecificationContext",
-  "tests/pentaho/type/serializationUtil",
-  "tests/test-utils"
-], function(Context, SpecificationScope, SpecificationContext, serializationUtil, testUtils) {
+  "tests/pentaho/type/serializationUtil"
+], function(Instance, SpecificationScope, SpecificationContext, serializationUtil) {
 
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, spyOn:false, jasmine:false,
-           JSON:false */
-
-  var it = testUtils.itAsync;
-
-  describe("pentaho.type.Type", function() {
-    var context;
-    var Instance;
+  describe("pentaho.type.Instance.Type", function() {
 
     function getInstance() {
       return Instance;
     }
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Instance = context.get("instance");
-          })
-          .then(done, done.fail);
-    });
-
     describe("#toSpec(keyArgs)", function() {
+
       var derivedType;
 
       beforeEach(function() {
@@ -93,7 +77,7 @@ define([
 
         expect(spec2).toBe(spec);
       });
-    }); // toSpec
+    });
 
     describe("#toSpecInContext(keyArgs)", function() {
 
@@ -205,7 +189,7 @@ define([
         // Description can be null or a non-empty string, or not local.
 
         serializationUtil.itFillSpecAttribute(getInstance, "description", "foo", true);
-        serializationUtil.itFillSpecAttribute(getInstance, "description", null,  true);
+        serializationUtil.itFillSpecAttribute(getInstance, "description", null, true);
         serializationUtil.itFillSpecAttribute(getInstance, "description", undefined, false);
       });
 
@@ -213,7 +197,7 @@ define([
         // Category can be null or a non-empty string, or not local.
 
         serializationUtil.itFillSpecAttribute(getInstance, "category", "foo", true);
-        serializationUtil.itFillSpecAttribute(getInstance, "category", null,  true);
+        serializationUtil.itFillSpecAttribute(getInstance, "category", null, true);
         serializationUtil.itFillSpecAttribute(getInstance, "category", undefined, false);
       });
 
@@ -221,30 +205,30 @@ define([
         // HelpUrl can be null or a non-empty string, or not local.
 
         serializationUtil.itFillSpecAttribute(getInstance, "helpUrl", "foo", true);
-        serializationUtil.itFillSpecAttribute(getInstance, "helpUrl", null,  true);
+        serializationUtil.itFillSpecAttribute(getInstance, "helpUrl", null, true);
         serializationUtil.itFillSpecAttribute(getInstance, "helpUrl", undefined, false);
       });
 
       describe("#isBrowsable", function() {
-        // isBrowsable can be true, false or not local.
+        // `isBrowsable` can be true, false or not local.
 
-        serializationUtil.itFillSpecAttribute(getInstance, "isBrowsable", true,  true);
+        serializationUtil.itFillSpecAttribute(getInstance, "isBrowsable", true, true);
         serializationUtil.itFillSpecAttribute(getInstance, "isBrowsable", false, true);
         serializationUtil.itFillSpecAttribute(getInstance, "isBrowsable", null, false);
         serializationUtil.itFillSpecAttribute(getInstance, "isBrowsable", undefined, false);
       });
 
       describe("#isAdvanced", function() {
-        // isAdvanced can be true, false or not local.
+        // `isAdvanced` can be true, false or not local.
 
-        serializationUtil.itFillSpecAttribute(getInstance, "isAdvanced", true,  true);
+        serializationUtil.itFillSpecAttribute(getInstance, "isAdvanced", true, true);
         serializationUtil.itFillSpecAttribute(getInstance, "isAdvanced", false, true);
         serializationUtil.itFillSpecAttribute(getInstance, "isAdvanced", null, false);
         serializationUtil.itFillSpecAttribute(getInstance, "isAdvanced", undefined, false);
       });
 
       describe("#ordinal", function() {
-        // ordinal can be a number or not local.
+        // `ordinal` can be a number or not local.
 
         serializationUtil.itFillSpecAttribute(getInstance, "ordinal", 1, true);
         serializationUtil.itFillSpecAttribute(getInstance, "ordinal", 2, true);
@@ -253,11 +237,11 @@ define([
       });
 
       describe("#defaultView", function() {
-        // view can be null, function or string, or not local.
+        // View can be null, function or string, or not local.
         var f = function() {};
 
         serializationUtil.itFillSpecAttribute(getInstance, "defaultView", f, true);
-        serializationUtil.itFillSpecAttribute(getInstance, "defaultView", "/my/view", true);
+        serializationUtil.itFillSpecAttribute(getInstance, "defaultView", "/my/View", true);
         serializationUtil.itFillSpecAttribute(getInstance, "defaultView", null, true);
         serializationUtil.itFillSpecAttribute(getInstance, "defaultView", undefined, false);
 
@@ -271,11 +255,11 @@ define([
 
         it("should output a local defaultView id when isJson: true", function() {
           var spec = {};
-          var typeSpec = {defaultView: "/my/view/"};
+          var typeSpec = {defaultView: "/my/View/"};
           var result = serializationUtil.fillSpec(Instance, spec, typeSpec, {isJson: true});
 
           expect(result).toBe(true);
-          expect(spec.defaultView).toBe("/my/view/");
+          expect(spec.defaultView).toBe("/my/View/");
         });
       });
 
@@ -283,72 +267,60 @@ define([
 
         function defineSampleMixins(localRequire) {
 
-          localRequire.define("tests/mixins/A", [], function() {
+          localRequire.define("tests/mixins/A", ["pentaho/type/Value"], function(Value) {
 
-            return ["pentaho/type/value", function(Value) {
-
-              return Value.extend({
-                testMethodAInst: function() {},
-                $type: {
-                  id: "tests/mixins/A",
-                  testMethodA: function() {}
-                }
-              });
-            }];
+            return Value.extend({
+              testMethodAInst: function() {},
+              $type: {
+                id: "tests/mixins/A",
+                testMethodA: function() {}
+              }
+            });
           });
 
-          localRequire.define("tests/mixins/B", [], function() {
+          localRequire.define("tests/mixins/B", ["pentaho/type/Value"], function(Value) {
 
-            return ["pentaho/type/value", function(Value) {
-
-              return Value.extend({
-                testMethodBInst: function() {},
-                $type: {
-                  id: "tests/mixins/B",
-                  testMethodB: function() {}
-                }
-              });
-            }];
+            return Value.extend({
+              testMethodBInst: function() {},
+              $type: {
+                id: "tests/mixins/B",
+                testMethodB: function() {}
+              }
+            });
           });
         }
 
         it("should include all local mixin ids", function() {
 
-          return require.using(["pentaho/type/Context"], defineSampleMixins, function(Context) {
+          return require.using([
+            "pentaho/type/Value",
+            "tests/mixins/A",
+            "tests/mixins/B"
+          ], defineSampleMixins, function(Value, MixinA, MixinB) {
 
-            return Context.createAsync().then(function(context) {
-
-              return context.getDependencyApplyAsync([
-                "pentaho/type/value",
-                "tests/mixins/A",
-                "tests/mixins/B"
-              ], function(Value, MixinA, MixinB) {
-
-                var DerivedValue1 = Value.extend({
-                  $type: {
-                    id: "tests/types/foo1",
-                    mixins: [MixinA]
-                  }
-                });
-
-                var DerivedValue2 = DerivedValue1.extend({
-                  $type: {
-                    id: "tests/types/foo2",
-                    mixins: [MixinB]
-                  }
-                });
-
-                var scope = new SpecificationScope();
-                var spec = {};
-
-                var result = DerivedValue2.type._fillSpecInContext(spec, {});
-
-                scope.dispose();
-
-                expect(result).toBe(true);
-                expect(spec.mixins).toEqual(["tests/mixins/B"]);
-              });
+            var DerivedValue1 = Value.extend({
+              $type: {
+                id: "tests/types/foo1",
+                mixins: [MixinA]
+              }
             });
+
+            var DerivedValue2 = DerivedValue1.extend({
+              $type: {
+                id: "tests/types/foo2",
+                mixins: [MixinB]
+              }
+            });
+
+            var scope = new SpecificationScope();
+            var spec = {};
+
+            var result = DerivedValue2.type._fillSpecInContext(spec, {});
+
+            scope.dispose();
+
+            expect(result).toBe(true);
+            expect(spec.mixins).toEqual(["tests/mixins/B"]);
           });
         });
       });
@@ -551,6 +523,6 @@ define([
         expect(derivedType.toJSON).toHaveBeenCalled();
         expect(derivedType.toJSON.calls.first().object).toBe(derivedType);
       });
-    }); // toJSON
+    });
   });
 });

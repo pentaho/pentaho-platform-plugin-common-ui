@@ -42,8 +42,7 @@ define(function() {
   var RE_ECMA_TIMEZONE = /^(?:(Z)|(?:([+\-])(\d{2}):(\d{2})))$/;
 
   /**
-   * The `date` namespace contains utility functions for
-   * handling with dates.
+   * The `date` namespace contains utility functions for working with dates.
    *
    * @namespace
    * @memberOf pentaho.util

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,46 +14,27 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context"
-], function(Context) {
+  "pentaho/type/Complex",
+  "pentaho/data/filter/True",
+  "pentaho/data/filter/False"
+], function(Complex, TrueFilter, FalseFilter) {
 
   "use strict";
 
   describe("pentaho.data.filter.True", function() {
 
-    var context;
-    var Complex;
-    var TrueFilter;
-    var FalseFilter;
     var ProductSummary;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-
-            context = _context;
-            Complex = context.get("complex");
-
-            ProductSummary = Complex.extend({
-              $type: {
-                props: [
-                  {name: "name", valueType: "string", label: "Name"},
-                  {name: "sales", valueType: "number", label: "Sales"},
-                  {name: "inStock", valueType: "boolean", label: "In Stock"}
-                ]
-              }
-            });
-
-            return context.getDependencyApplyAsync([
-              "pentaho/data/filter/true",
-              "pentaho/data/filter/false"
-            ], function(True, False) {
-              TrueFilter = True;
-              FalseFilter = False;
-            });
-          })
-          .then(done, done.fail);
-
+    beforeAll(function() {
+      ProductSummary = Complex.extend({
+        $type: {
+          props: [
+            {name: "name", valueType: "string", label: "Name"},
+            {name: "sales", valueType: "number", label: "Sales"},
+            {name: "inStock", valueType: "boolean", label: "In Stock"}
+          ]
+        }
+      });
     });
 
     describe("#kind", function() {

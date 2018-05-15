@@ -25,11 +25,10 @@ define([
   "pentaho/debug",
   "pentaho/debug/Levels",
   "pentaho/util/logger"
-],
-function(module, Base, States,
-         ArgumentRequiredError, ArgumentInvalidTypeError, OperationInvalidError,
-         UserError, RuntimeError,
-         debugMgr, DebugLevels, logger) {
+], function(module, Base, States,
+            ArgumentRequiredError, ArgumentInvalidTypeError, OperationInvalidError,
+            UserError, RuntimeError,
+            debugMgr, DebugLevels, logger) {
 
   "use strict";
 
@@ -49,7 +48,7 @@ function(module, Base, States,
   /** @type pentaho.type.action.States */
   var settledStates = States.did | rejectedStates;
 
-  return Base.extend(/** @lends pentaho.type.action.Execution# */{
+  return Base.extend(module.id, /** @lends pentaho.type.action.Execution# */{
     /**
      * @alias Execution
      * @memberOf pentaho.type.action
@@ -515,8 +514,8 @@ function(module, Base, States,
       if(this.isFinished) {
 
         promiseControl.promise = this.isDone
-            ? Promise.resolve(this.result)
-            : Promise.reject(this.error);
+          ? Promise.resolve(this.result)
+          : Promise.reject(this.error);
       } else {
 
         promiseControl.promise = new Promise(function(resolve, reject) {
@@ -857,6 +856,7 @@ function(module, Base, States,
         if(!this.isSettled) {
           this._doDefault();
         }
+
         return null;
       }
 

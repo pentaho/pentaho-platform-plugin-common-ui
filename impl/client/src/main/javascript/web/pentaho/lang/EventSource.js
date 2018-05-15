@@ -125,12 +125,13 @@ define([
       if(eventTypes && eventTypes.length) {
 
         var priority = (keyArgs && keyArgs.priority) || 0;
+        var isCritical = !!(keyArgs && keyArgs.isCritical);
 
         if(F.is(observer)) observer = {__: observer};
 
         /** @type pentaho.lang.IEventRegistrationHandle[] */
         var handles = eventTypes.map(function(type) {
-          return __registerOne.call(this, type, observer, priority);
+          return __registerOne.call(this, type, observer, priority, isCritical);
         }, this);
 
         return handles.length > 1
@@ -379,6 +380,10 @@ define([
               }
             } catch(ex) {
 
+              if(queue[i].isCritical) {
+                throw ex;
+              }
+
               errorHandler.call(source, ex, eventArgs, type, phase);
             }
 
@@ -574,12 +579,13 @@ define([
    * @param {nonEmptyString} type - The event tyoe.
    * @param {!pentaho.lang.IEventObserver} observer - The event observer.
    * @param {number} priority - The listening priority.
+   * @param {boolean} isCritical - Indicates that exceptions in this listener should abort the execution.
    *
    * @return {!pentaho.lang.IEventRegistrationHandle} An event registration handle that can be used for later removal.
    *
    * @private
    */
-  function __registerOne(type, observer, priority) {
+  function __registerOne(type, observer, priority, isCritical) {
 
     // Resolve alias
     var module = moduleMetaService.get(type);
@@ -612,7 +618,8 @@ define([
     observerRegistration = {
       index: i,
       priority: priority,
-      observer: observer
+      observer: observer,
+      isCritical: isCritical
     };
 
     // Insert at index `i`.

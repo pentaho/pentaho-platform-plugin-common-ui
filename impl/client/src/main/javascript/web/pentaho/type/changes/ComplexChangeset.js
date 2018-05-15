@@ -15,12 +15,13 @@
  */
 
 define([
+  "module",
   "./Changeset",
   "./ListChangeset",
   "./Replace",
   "./Transaction",
-  "../../util/object"
-], function(Changeset, ListChangeset, Replace, Transaction, O) {
+  "pentaho/util/object"
+], function(module, Changeset, ListChangeset, Replace, Transaction, O) {
 
   "use strict";
 
@@ -45,7 +46,7 @@ define([
    * @param {!pentaho.type.changes.Transaction} transaction - The owning transaction.
    * @param {!pentaho.type.Complex} owner - The complex value where the changes take place.
    */
-  return Changeset.extend("pentaho.type.changes.ComplexChangeset", /** @lends pentaho.type.changes.ComplexChangeset#*/{
+  return Changeset.extend(module.id, /** @lends pentaho.type.changes.ComplexChangeset#*/{
 
     constructor: function(transaction, owner) {
 
@@ -471,8 +472,7 @@ define([
 
       // -- New change.
 
-      var context = type.context;
-      var scope = context.enterChange();
+      var scope = Transaction.enter();
       if(changeset === null) {
         changeset = scope.transaction.ensureChangeset(complex);
       }

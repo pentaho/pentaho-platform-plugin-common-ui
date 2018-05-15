@@ -15,21 +15,9 @@
  */
 
 /**
- * The `spec.IContextTypeConfiguration` interface contains the
- * [context]{@link pentaho.type.IContext} configuration of a Type API type.
+ * The `impl` namespace contains implementation classes of the `pentaho.type` namespace.
  *
- * @name pentaho.type.spec.IContextTypeConfiguration
- * @interface
- *
- * @see pentaho.type.IContext
- * @see pentaho.type.spec.ContextTypesConfiguration
- */
-
-/**
- * The resolution ranking of the type.
- *
- * @name ranking
- * @memberOf pentaho.type.spec.IContextTypeConfiguration#
- * @type {number}
- * @default 0
+ * @name pentaho.type.impl
+ * @namespace
+ * @private
  */

@@ -15,11 +15,12 @@
  */
 
 define([
+  "module",
   "./PrimitiveChange"
-], function(PrimitiveChange) {
+], function(module, PrimitiveChange) {
   "use strict";
 
-  return PrimitiveChange.extend("pentaho.type.changes.Add", /** @lends pentaho.type.changes.Add# */{
+  return PrimitiveChange.extend(module.id, /** @lends pentaho.type.changes.Add# */{
 
     /**
      * @alias Add

@@ -114,14 +114,14 @@
  * the local or inherited _value type_ is used.
  *
  * When unspecified and `name` defines a new, _root_ property,
- * the default _value type_ is [pentaho/type/string]{@link pentaho.type.String}.
+ * the default _value type_ is [pentaho/type/String]{@link pentaho.type.String}.
  *
  * Cannot be a {@link Nully} value.
  *
  * When specified, the value is a [spec.UTypeReference]{@link pentaho.type.spec.UTypeReference}
- * and is first resolved using [Context#get]{@link pentaho.type.Context#get}.
+ * and is first resolved using [ILoader#resolveType]{@link pentaho.type.ILoader#resolveType}.
  *
- * The resolved _value type_ must be a [subtype]{@link pentaho.type.Type#isSubtypeOf} of the
+ * The resolved _value type_ must be a [subtype]{@link pentaho.type.Instance.Type#isSubtypeOf} of the
  * attribute's current (local or inherited) _value type_.
  *
  * @name valueType
@@ -143,7 +143,7 @@
  * The _control value_ `undefined` resets the attribute,
  * causing it to assume its default value (yes, the default value of the _default value_ attribute...):
  *
- * * for [root]{@link pentaho.type.Type#root} _property types_ or
+ * * for [root]{@link pentaho.type.Instance.Type#root} _property types_ or
  *   properties with a locally set [valueType]{@link pentaho.type.Property.Type#defaultValue},
  *   the default value is `null`
  * * for other _property types_, the default value is the _inherited value_.

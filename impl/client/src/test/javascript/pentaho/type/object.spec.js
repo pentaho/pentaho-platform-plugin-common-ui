@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,13 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Object",
   "tests/pentaho/util/errorMatch"
-], function(Context, errorMatch) {
+], function(PentahoObject, errorMatch) {
 
   "use strict";
 
-  /* global describe:true, it:true, expect:true, beforeEach:true*/
-
   describe("pentaho.type.Object -", function() {
-
-    var context;
-    var PentahoObject;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            PentahoObject = context.get("pentaho/type/object");
-          })
-          .then(done, done.fail);
-    });
 
     describe("new Object() -", function() {
 
@@ -109,5 +95,5 @@ define([
         expect(key1).toBe(key2);
       });
     });
-  }); // pentaho.type.Object
+  });
 });

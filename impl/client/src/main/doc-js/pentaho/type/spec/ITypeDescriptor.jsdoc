@@ -31,7 +31,7 @@
  * One and only one of `v` or `value` must be specified, non-{@link Nully}.
  *
  * When serialized as JSON, the type's JSON specification is used,
- * as obtained by calling {@link pentaho.type.Type#toSpec} with
+ * as obtained by calling {@link pentaho.type.Instance.Type#toSpec} with
  * a `true` value for the `keyArgs.isJson` argument.
  *
  * @name value

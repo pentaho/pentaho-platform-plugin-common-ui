@@ -15,13 +15,17 @@
  */
 define([
   "module",
-  "../lang/Collection",
-  "../util/arg",
-  "../util/error",
-  "../util/object"
-], function(module, Collection, arg, error, O) {
+  "./Property",
+  "./_baseLoader",
+  "pentaho/lang/Collection",
+  "pentaho/util/arg",
+  "pentaho/util/error",
+  "pentaho/util/object"
+], function(module, Property, baseLoader, Collection, arg, error, O) {
 
   "use strict";
+
+  var __propertyType = Property.type;
 
   /**
    * @name PropertyTypeCollection
@@ -60,9 +64,6 @@ define([
        * @private
        */
       this.__propTypesByAlias = Object.create(null);
-
-      // Caches Property.Type
-      this.__propType = null;
 
       // Copy the declaring complex type's ancestor's properties.
       var ancestorType = declaringType.ancestor;
@@ -113,30 +114,6 @@ define([
      */
     get __declaringType() {
       return this.__cachedKeyArgs.declaringType;
-    },
-
-    /**
-     * The context of properties of this property collection.
-     *
-     * @type {!pentaho.type.Context}
-     * @readOnly
-     * @private
-     */
-    get __context() {
-      return this.__declaringType.context;
-    },
-
-    /**
-     * The property type in this property collection's context.
-     *
-     * @type {!pentaho.type.Property.Type}
-     * @readOnly
-     * @private
-     */
-    get __propertyType() {
-      var propertyType = this.__propType;
-      if(!propertyType) this.__propType = propertyType = this.__context.get("property").type;
-      return propertyType;
     },
 
     // region List implementation
@@ -265,10 +242,10 @@ define([
       var basePropType;
       var baseId = spec.base;
       if(!baseId) {
-        basePropType = this.__propertyType;
+        basePropType = __propertyType;
       } else {
-        basePropType = this.__context.get(baseId).type;
-        if(!basePropType.isSubtypeOf(this.__propertyType))
+        basePropType = baseLoader.resolveType(baseId).type;
+        if(!basePropType.isSubtypeOf(__propertyType))
           throw error.argInvalid("props[i]", "Property base type does not extend Property.");
       }
 

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017-2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+define([
+  "./_baseLoader",
 
-/**
- * The `spec.ContextInstancesConfiguration` interface contains the configuration of Type API instances
- * and is part of a [spec.IContext]{@link pentaho.type.IContext} specification.
- *
- * An object whose keys are instance identifiers and whose values are instance declarations.
- *
- * @typedef {Object.<string, pentaho.type.spec.IContextInstanceConfiguration>} pentaho.type.spec.ContextInstancesConfiguration
- *
- * @see pentaho.type.InstancesContainer
- */
+  // Pre-load standard types.
+  "./standard"
+], function(baseLoader) {
+
+  "use strict";
+
+  return baseLoader;
+});

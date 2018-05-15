@@ -28,7 +28,7 @@
  *
  * When unspecified,
  * the label of the action type,
- * {@link pentaho.type.Type#label}, is used.
+ * {@link pentaho.type.Instance.Type#label}, is used.
  *
  * @name label
  * @memberOf pentaho.type.action.spec.IBase#
@@ -40,7 +40,7 @@
  *
  * When unspecified,
  * the description of the action type,
- * {@link pentaho.type.Type#description}, is used.
+ * {@link pentaho.type.Instance.Type#description}, is used.
  *
  * @name description
  * @memberOf pentaho.type.action.spec.IBase#

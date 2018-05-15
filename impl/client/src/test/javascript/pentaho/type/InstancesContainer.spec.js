@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ define([
   "use strict";
 
   // Use alternate, promise-aware version of `it`.
-  var it = testUtils.itAsync;
   var expectToRejectWith = testUtils.expectToRejectWith;
 
   describe("pentaho.type.InstancesContainer", function() {
@@ -90,23 +89,23 @@ define([
 
         it("should register an instance with the given type", function() {
 
-          container.declare("foo", "pentaho/type/complex");
+          container.declare("foo", "pentaho/type/Complex");
 
-          expect(container.__instanceById.foo.typeId).toBe("pentaho/type/complex");
+          expect(container.__instanceById.foo.typeId).toBe("pentaho/type/Complex");
         });
 
         it("should register an instance with the given type alias and resolve it", function() {
 
           container.declare("foo", "complex");
 
-          expect(container.__instanceById.foo.typeId).toBe("pentaho/type/complex");
+          expect(container.__instanceById.foo.typeId).toBe("pentaho/type/Complex");
         });
 
         it("should register an instance with the given type in the instancesByType map", function() {
 
-          container.declare("foo", "pentaho/type/complex");
+          container.declare("foo", "pentaho/type/Complex");
 
-          var list = container.__instancesByType["pentaho/type/complex"];
+          var list = container.__instancesByType["pentaho/type/Complex"];
           expect(list != null).toBe(true);
           expect(list.length).toBe(1);
         });
@@ -151,11 +150,11 @@ define([
 
         it("should register an instance with the given type and ranking in the instancesByType map", function() {
 
-          container.declare("foo3", "pentaho/type/complex", {ranking:  1});
-          container.declare("foo1", "pentaho/type/complex", {ranking: 10});
-          container.declare("foo2", "pentaho/type/complex", {ranking:  1});
+          container.declare("foo3", "pentaho/type/Complex", {ranking:  1});
+          container.declare("foo1", "pentaho/type/Complex", {ranking: 10});
+          container.declare("foo2", "pentaho/type/Complex", {ranking:  1});
 
-          var list = container.__instancesByType["pentaho/type/complex"];
+          var list = container.__instancesByType["pentaho/type/Complex"];
           expect(list != null).toBe(true);
           expect(list.length).toBe(3);
           expect(list[0].id).toBe("foo1");
@@ -220,7 +219,7 @@ define([
 
         it("should a new instance when given (nully, null, MyComplex)", function() {
 
-          var Complex = context.get("pentaho/type/complex");
+          var Complex = context.get("pentaho/type/Complex");
           var MyComplex = Complex.extend();
 
           var result = container.get(null, null, MyComplex.type);
@@ -234,7 +233,7 @@ define([
 
         it("should create a number instance when given (2, null, null)", function() {
 
-          var Number = context.get("pentaho/type/number");
+          var Number = context.get("pentaho/type/Number");
 
           var result = container.get(2);
 
@@ -244,7 +243,7 @@ define([
 
         it("should create a boolean instance when given (true, null, null)", function() {
 
-          var Boolean = context.get("pentaho/type/boolean");
+          var Boolean = context.get("pentaho/type/Boolean");
 
           var result = container.get(true);
 
@@ -254,7 +253,7 @@ define([
 
         it("should create an object instance when given ({v: {}}, null, Object)", function() {
 
-          var Object = context.get("pentaho/type/object");
+          var Object = context.get("pentaho/type/Object");
           var primitive = {};
           var result = container.get({v: primitive}, null, Object.type);
 
@@ -264,8 +263,8 @@ define([
 
         it("should create an instance given ({_: '', ...}, null, null)", function() {
 
-          var Number = context.get("pentaho/type/number");
-          var result = container.get({_: "pentaho/type/number", v: 1});
+          var Number = context.get("pentaho/type/Number");
+          var result = container.get({_: "pentaho/type/Number", v: 1});
 
           expect(result).toEqual(jasmine.any(Number));
           expect(result.value).toBe(1);
@@ -273,19 +272,19 @@ define([
 
         it("should throw if given a type-annotated value that does not extend from the typeBase", function() {
 
-          var String = context.get("pentaho/type/string");
+          var String = context.get("pentaho/type/String");
 
           expect(function() {
-            container.get({_: "pentaho/type/number", v: 1}, null, String.type);
+            container.get({_: "pentaho/type/Number", v: 1}, null, String.type);
           }).toThrow(errorMatch.operInvalid());
         });
 
         it("should not throw if given a type-annotated value that does extend from the given baseType", function() {
 
-          var Simple = context.get("pentaho/type/simple");
-          var Number = context.get("pentaho/type/number");
+          var Simple = context.get("pentaho/type/Simple");
+          var Number = context.get("pentaho/type/Number");
 
-          var result = container.get({_: "pentaho/type/number", v: 1}, null, Simple.type);
+          var result = container.get({_: "pentaho/type/Number", v: 1}, null, Simple.type);
 
           expect(result).toEqual(jasmine.any(Number));
           expect(result.value).toBe(1);
@@ -293,7 +292,7 @@ define([
 
         it("should throw if given a type annotated value of an abstract type", function() {
 
-          var MyAbstract = context.get("pentaho/type/complex").extend({$type: {isAbstract: true}});
+          var MyAbstract = context.get("pentaho/type/Complex").extend({$type: {isAbstract: true}});
 
           expect(function() {
             container.get({_: MyAbstract}, null, Instance.type);
@@ -302,7 +301,7 @@ define([
 
         it("should throw if given a value and an abstract type typeBase", function() {
 
-          var MyAbstract = context.get("pentaho/type/complex").extend({$type: {isAbstract: true}});
+          var MyAbstract = context.get("pentaho/type/Complex").extend({$type: {isAbstract: true}});
 
           expect(function() {
             container.get({}, null, MyAbstract.type);
@@ -399,7 +398,7 @@ define([
 
         it("should return an instance when given (null, null, MyComplex)", function() {
 
-          var Complex = context.get("pentaho/type/complex");
+          var Complex = context.get("pentaho/type/Complex");
           var MyComplex = Complex.extend();
 
           return container.getAsync(null, null, MyComplex.type).then(function(inst) {
@@ -409,7 +408,7 @@ define([
 
         it("should create a number when given (1)", function() {
 
-          var Number = context.get("pentaho/type/number");
+          var Number = context.get("pentaho/type/Number");
 
           return Number.type.createAsync(1).then(function(number) {
             expect(number instanceof Number).toBe(true);
@@ -419,7 +418,7 @@ define([
 
         it("should create a boolean when given (true)", function() {
 
-          var Boolean = context.get("pentaho/type/boolean");
+          var Boolean = context.get("pentaho/type/Boolean");
 
           return container.getAsync(true).then(function(value) {
             expect(value instanceof Boolean).toBe(true);
@@ -428,7 +427,7 @@ define([
         });
 
         it("should create an object value when given ({}, null, Object)", function() {
-          var Object = context.get("pentaho/type/object");
+          var Object = context.get("pentaho/type/Object");
           var primitive = {};
 
           return container.getAsync({v: primitive}, null, Object.type).then(function(value) {
@@ -439,9 +438,9 @@ define([
 
         it("should create an instance given an object with a type annotation, '_'", function() {
 
-          return container.getAsync({_: "pentaho/type/number", v: 1}).then(function(value) {
+          return container.getAsync({_: "pentaho/type/Number", v: 1}).then(function(value) {
 
-            var Number = context.get("pentaho/type/number");
+            var Number = context.get("pentaho/type/Number");
 
             expect(value instanceof Number).toBe(true);
             expect(value.value).toBe(1);
@@ -450,16 +449,16 @@ define([
 
         it("should throw if given a type-annotated value that does not extend from the this type", function() {
 
-          var String = context.get("pentaho/type/string");
+          var String = context.get("pentaho/type/String");
 
           return expectToRejectWith(function() {
-            return container.getAsync({_: "pentaho/type/number", v: 1}, null, String.type);
+            return container.getAsync({_: "pentaho/type/Number", v: 1}, null, String.type);
           }, errorMatch.operInvalid());
         });
 
         it("should throw if given a type annotated value and an abstract typeBase", function() {
 
-          var MyAbstract = context.get("pentaho/type/complex").extend({$type: {isAbstract: true}});
+          var MyAbstract = context.get("pentaho/type/Complex").extend({$type: {isAbstract: true}});
 
           return expectToRejectWith(function() {
             return container.getAsync({_: MyAbstract});
@@ -484,7 +483,7 @@ define([
 
         // Root type
         localRequire.define("Root", function() {
-          return ["pentaho/type/complex", function(Complex) {
+          return ["pentaho/type/Complex", function(Complex) {
             return Complex.extend({$type: {id: "Root"}});
           }];
         });
@@ -1981,7 +1980,7 @@ define([
                 var result = container.get({$instance: {foo: 1}}, null, context.get("simple").type);
 
                 expect(container.getByType.calls.count()).toBe(1);
-                expect(container.getByType).toHaveBeenCalledWith("pentaho/type/simple", {foo: 1});
+                expect(container.getByType).toHaveBeenCalledWith("pentaho/type/Simple", {foo: 1});
 
                 expect(result).toEqual(instance);
               });
@@ -2084,7 +2083,7 @@ define([
                 var result = container.get({$instance: {type: [PenObject.type]}});
 
                 expect(container.getAllByType.calls.count()).toBe(1);
-                expect(container.getAllByType).toHaveBeenCalledWith("pentaho/type/object", {type: [PenObject.type]});
+                expect(container.getAllByType).toHaveBeenCalledWith("pentaho/type/Object", {type: [PenObject.type]});
 
                 var List = container.context.get("list");
 
@@ -2123,7 +2122,7 @@ define([
                 var result = container.get({$instance: {type: ListType.type}});
 
                 expect(container.getAllByType.calls.count()).toBe(1);
-                expect(container.getAllByType).toHaveBeenCalledWith("pentaho/type/object", {type: ListType.type});
+                expect(container.getAllByType).toHaveBeenCalledWith("pentaho/type/Object", {type: ListType.type});
 
                 expect(result).toEqual(jasmine.any(ListType));
 
@@ -2165,7 +2164,7 @@ define([
         function configAmd(localRequire) {
 
           localRequire.define("test/foo/a", function() {
-            return ["pentaho/type/complex", function(Complex) {
+            return ["pentaho/type/Complex", function(Complex) {
 
               return Complex.extend({
                 $type: {
@@ -2179,7 +2178,7 @@ define([
           });
 
           localRequire.define("test/foo/b", function() {
-            return ["pentaho/type/complex", function(Complex) {
+            return ["pentaho/type/Complex", function(Complex) {
 
               return Complex.extend({
                 $type: {
@@ -2305,7 +2304,7 @@ define([
               })
               .then(function(result) {
                 expect(container.getByTypeAsync.calls.count()).toBe(1);
-                expect(container.getByTypeAsync).toHaveBeenCalledWith("pentaho/type/simple", {foo: 1});
+                expect(container.getByTypeAsync).toHaveBeenCalledWith("pentaho/type/Simple", {foo: 1});
 
                 expect(result).toEqual(instance);
               });
@@ -2419,7 +2418,7 @@ define([
 
                 expect(container.getAllByTypeAsync.calls.count()).toBe(1);
                 expect(container.getAllByTypeAsync)
-                    .toHaveBeenCalledWith("pentaho/type/object", {type: [PenObject.type]});
+                    .toHaveBeenCalledWith("pentaho/type/Object", {type: [PenObject.type]});
 
                 var List = container.context.get("list");
 
@@ -2465,7 +2464,7 @@ define([
               .then(function(result) {
 
                 expect(container.getAllByTypeAsync.calls.count()).toBe(1);
-                expect(container.getAllByTypeAsync).toHaveBeenCalledWith("pentaho/type/object", {type: ListType.type});
+                expect(container.getAllByTypeAsync).toHaveBeenCalledWith("pentaho/type/Object", {type: ListType.type});
 
                 expect(result).toEqual(jasmine.any(ListType));
 

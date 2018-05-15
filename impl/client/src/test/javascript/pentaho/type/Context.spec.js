@@ -25,7 +25,6 @@ define([
   /* eslint max-nested-callbacks: 0, default-case: 0 */
 
   // Use alternate, promise-aware version of `it`.
-  var it = testUtils.itAsync;
   var expectToRejectWith = testUtils.expectToRejectWith;
 
   describe("pentaho.type.Context -", function() {
@@ -65,16 +64,6 @@ define([
 
           return Context.createAsync().then(function(context) {
             expect(context.environment).toBe(envDefault);
-          });
-        });
-      });
-
-      it("should create a context that has a null transaction by default", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-            expect(context.transaction).toBe(null);
           });
         });
       });
@@ -145,133 +134,6 @@ define([
           return Context.createAsync().then(function(context) {
 
             expect(declare).toHaveBeenCalledWith("myFoo", "Foo", {ranking: 3});
-          });
-        });
-      });
-    });
-
-    describe("#transaction", function() {
-      // Read
-    });
-
-    describe("#enterChange()", function() {
-
-      it("should return a TransactionScope instance", function() {
-
-        return require.using([
-          "pentaho/type/Context",
-          "pentaho/type/changes/TransactionScope"
-        ], function(Context, TransactionScope) {
-
-          return Context.createAsync().then(function(context) {
-
-            var txnScope = context.enterChange();
-
-            expect(txnScope instanceof TransactionScope).toBe(true);
-
-            txnScope.exit();
-          });
-        });
-      });
-
-      it("should return a TransactionScope instance whose transaction is now the ambient transaction", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var txnScope = context.enterChange();
-
-            expect(txnScope.transaction).toBe(context.transaction);
-
-            txnScope.exit();
-          });
-        });
-      });
-
-      it("should return a TransactionScope whose context is this one", function() {
-
-        return require.using(["pentaho/type/Context"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var txnScope = context.enterChange();
-
-            expect(txnScope.context).toBe(context);
-          });
-        });
-      });
-
-      it("should return a new TransactionScope instance each time", function() {
-
-        return require.using(["pentaho/type/Context", "pentaho/type/changes/TransactionScope"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-
-            var txnScope1 = context.enterChange();
-            var txnScope2 = context.enterChange();
-
-            expect(txnScope1).not.toBe(txnScope2);
-          });
-        });
-      });
-
-      it("should return a new TransactionScope of the same transaction, each time", function() {
-
-        return require.using(["pentaho/type/Context", "pentaho/type/changes/TransactionScope"], function(Context) {
-
-          return Context.createAsync().then(function(context) {
-            var txnScope1 = context.enterChange();
-            var txnScope2 = context.enterChange();
-
-            expect(txnScope1.transaction).toBe(txnScope2.transaction);
-          });
-        });
-      });
-
-      it("should call the new ambient transaction's #__enteringAmbient method", function() {
-
-        return require.using([
-          "pentaho/type/Context",
-          "pentaho/type/changes/Transaction",
-          "pentaho/type/changes/TransactionScope"
-        ], function(Context, Transaction, TransactionScope) {
-
-          return Context.createAsync().then(function(context) {
-            var txn = new Transaction(context);
-
-            spyOn(txn, "__enteringAmbient");
-
-            var scope = new TransactionScope(context, txn);
-
-            expect(txn.__enteringAmbient).toHaveBeenCalled();
-
-            scope.exit();
-          });
-        });
-      });
-
-      it("should call the suspending ambient transaction's __exitingAmbient, when a null scope enters", function() {
-
-        return require.using([
-          "pentaho/type/Context",
-          "pentaho/type/changes/Transaction",
-          "pentaho/type/changes/TransactionScope",
-          "pentaho/type/changes/CommittedScope"
-        ], function(Context, Transaction, TransactionScope, CommittedScope) {
-
-          return Context.createAsync().then(function(context) {
-            var txn = new Transaction(context);
-            var scope = new TransactionScope(context, txn);
-
-            spyOn(txn, "__exitingAmbient");
-
-            var scopeNull = new CommittedScope(context);
-
-            expect(txn.__exitingAmbient).toHaveBeenCalled();
-
-            scopeNull.exit();
-            scope.exit();
           });
         });
       });
@@ -362,21 +224,21 @@ define([
           return Context.createAsync().then(function(context) {
 
             [
-              "pentaho/type/instance",
-              "pentaho/type/value",
-              "pentaho/type/element",
-              "pentaho/type/list",
-              "pentaho/type/simple",
-              "pentaho/type/string",
-              "pentaho/type/number",
-              "pentaho/type/boolean",
-              "pentaho/type/date",
-              "pentaho/type/complex",
-              "pentaho/type/object",
-              "pentaho/type/function",
-              "pentaho/type/typeDescriptor",
-              "pentaho/type/property",
-              "pentaho/type/mixins/enum"
+              "pentaho/type/Instance",
+              "pentaho/type/Value",
+              "pentaho/type/Element",
+              "pentaho/type/List",
+              "pentaho/type/Simple",
+              "pentaho/type/String",
+              "pentaho/type/Number",
+              "pentaho/type/Boolean",
+              "pentaho/type/Date",
+              "pentaho/type/Complex",
+              "pentaho/type/Object",
+              "pentaho/type/Function",
+              "pentaho/type/TypeDescriptor",
+              "pentaho/type/Property",
+              "pentaho/type/mixins/Enum"
             ].forEach(function(id) {
               expect(!!context.get(id)).toBe(true);
             });
@@ -407,21 +269,21 @@ define([
         describe("should be able to get a standard type given its alias", function() {
 
           var aliasMap = {
-            "instance": "pentaho/type/instance",
-            "value": "pentaho/type/value",
-            "element": "pentaho/type/element",
-            "list": "pentaho/type/list",
-            "simple": "pentaho/type/simple",
-            "string": "pentaho/type/string",
-            "number": "pentaho/type/number",
-            "boolean": "pentaho/type/boolean",
-            "date": "pentaho/type/date",
-            "complex": "pentaho/type/complex",
-            "object": "pentaho/type/object",
-            "function": "pentaho/type/function",
-            "type": "pentaho/type/typeDescriptor",
-            "property": "pentaho/type/property",
-            "enum": "pentaho/type/mixins/enum"
+            "instance": "pentaho/type/Instance",
+            "value": "pentaho/type/Value",
+            "element": "pentaho/type/Element",
+            "list": "pentaho/type/List",
+            "simple": "pentaho/type/Simple",
+            "string": "pentaho/type/String",
+            "number": "pentaho/type/Number",
+            "boolean": "pentaho/type/Boolean",
+            "date": "pentaho/type/Date",
+            "complex": "pentaho/type/Complex",
+            "object": "pentaho/type/Object",
+            "function": "pentaho/type/Function",
+            "type": "pentaho/type/TypeDescriptor",
+            "property": "pentaho/type/Property",
+            "enum": "pentaho/type/mixins/Enum"
           };
 
           Object.keys(aliasMap).forEach(function(alias) {
@@ -444,10 +306,10 @@ define([
 
           return testGet(function(sync, context) {
 
-            var promise = callGet(context, sync, "pentaho/type/string");
+            var promise = callGet(context, sync, "pentaho/type/String");
 
             return promise.then(function(InstCtor) {
-              expect(InstCtor.type.id).toBe("pentaho/type/string");
+              expect(InstCtor.type.id).toBe("pentaho/type/String");
             });
           });
         });
@@ -460,7 +322,7 @@ define([
 
             localRequire.define(mid, [], function() {
               return [
-                "pentaho/type/simple",
+                "pentaho/type/Simple",
                 function(Simple) {
                   return Simple.extend({$type: {id: mid}});
                 }
@@ -492,7 +354,7 @@ define([
 
             localRequire.define(mid, [], function() {
               return [
-                "pentaho/type/simple",
+                "pentaho/type/Simple",
                 function(Simple) {
                   return Simple.extend({$type: {id: mid}});
                 }
@@ -525,7 +387,7 @@ define([
 
             localRequire.define(mid, [], function() {
               return [
-                "pentaho/type/simple",
+                "pentaho/type/Simple",
                 function(Simple) {
                   return Simple.extend({
                     $type: {
@@ -555,11 +417,11 @@ define([
 
           return testGet(function(sync, context) {
 
-            var Value = context.get("pentaho/type/value");
+            var Value = context.get("pentaho/type/Value");
             var promise = callGet(context, sync, Value);
 
             return promise.then(function(InstCtor) {
-              expect(InstCtor.type.id).toBe("pentaho/type/value");
+              expect(InstCtor.type.id).toBe("pentaho/type/Value");
             });
           });
         });
@@ -571,14 +433,14 @@ define([
             // "value" is configured on the Context constructor, so need to wire the prototype...
 
             spyOn(Context.prototype, "__getTypeConfig").and.callFake(function(id) {
-              return id === "pentaho/type/value" ? {foo: "bar", instance: {bar: "foo"}} : null;
+              return id === "pentaho/type/Value" ? {foo: "bar", instance: {bar: "foo"}} : null;
             });
 
             return Context.createAsync().then(function(context) {
 
-              expect(Context.prototype.__getTypeConfig).toHaveBeenCalledWith("pentaho/type/value");
+              expect(Context.prototype.__getTypeConfig).toHaveBeenCalledWith("pentaho/type/Value");
 
-              var InstCtor = context.get("pentaho/type/value");
+              var InstCtor = context.get("pentaho/type/Value");
               expect(InstCtor.prototype.bar).toBe("foo");
               expect(InstCtor.type.foo).toBe("bar");
             });
@@ -595,7 +457,7 @@ define([
 
             return Context.createAsync().then(function(context) {
 
-              var Value = context.get("pentaho/type/value");
+              var Value = context.get("pentaho/type/Value");
 
               var Value2 = Value.extend({
                 $type: {
@@ -639,7 +501,7 @@ define([
 
               expect(context.__configDepth).toBe(0);
 
-              var Value = context.get("pentaho/type/value");
+              var Value = context.get("pentaho/type/Value");
               var Value2 = Value.extend({
                 $type: {
                   id: "tests/foo/bar"
@@ -677,7 +539,7 @@ define([
 
               expect(context.__configDepth).toBe(0);
 
-              var Value = context.get("pentaho/type/value");
+              var Value = context.get("pentaho/type/Value");
 
               var Value2 = Value.extend({
                 $type: {
@@ -711,11 +573,11 @@ define([
 
           return testGet(function(sync, context) {
 
-            var Value = context.get("pentaho/type/value");
+            var Value = context.get("pentaho/type/Value");
             var promise = callGet(context, sync, Value.type);
 
             return promise.then(function(InstCtor) {
-              expect(InstCtor.type.id).toBe("pentaho/type/value");
+              expect(InstCtor.type.id).toBe("pentaho/type/Value");
             });
           });
         });
@@ -727,7 +589,7 @@ define([
 
           return testGet(function(sync, context, localRequire, errorMatch) {
 
-            var Value   = context.get("pentaho/type/value");
+            var Value   = context.get("pentaho/type/Value");
 
             return expectToRejectWith(
                 function() { return callGet(context, sync, Value.type.constructor); },
@@ -739,7 +601,7 @@ define([
 
           return testGet(function(sync, context, localRequire, errorMatch) {
 
-            var valueModule = localRequire("pentaho/type/value");
+            var valueModule = localRequire("pentaho/type/Value");
             var valueFactory = valueModule[valueModule.length - 1];
 
             return expectToRejectWith(
@@ -784,7 +646,7 @@ define([
 
           return testGet(function(sync, context, localRequire, errorMatch) {
 
-            var Value = context.get("pentaho/type/value");
+            var Value = context.get("pentaho/type/Value");
 
             return expectToRejectWith(
                 function() { return callGet(context, sync, Value.prototype); },
@@ -828,7 +690,7 @@ define([
                 var promise = callGet(context, sync, {id: "value"});
 
                 return promise.then(function(InstCtor) {
-                  var Value = context.get("pentaho/type/value");
+                  var Value = context.get("pentaho/type/Value");
 
                   expect(InstCtor).toBe(Value);
                 });
@@ -843,7 +705,7 @@ define([
 
                 return promise.then(function(InstCtor) {
 
-                  var Complex = context.get("pentaho/type/complex");
+                  var Complex = context.get("pentaho/type/Complex");
 
                   expect(InstCtor.type.isSubtypeOf(Complex.type)).toBe(true);
 
@@ -865,7 +727,7 @@ define([
 
                 return promise.then(function(InstCtor) {
 
-                  var Complex = context.get("pentaho/type/complex");
+                  var Complex = context.get("pentaho/type/Complex");
 
                   expect(InstCtor.type.isSubtypeOf(Complex.type)).toBe(true);
 
@@ -887,7 +749,7 @@ define([
 
                 return promise.then(function(InstCtor) {
 
-                  var Complex = context.get("pentaho/type/complex");
+                  var Complex = context.get("pentaho/type/Complex");
 
                   expect(InstCtor.type.isSubtypeOf(Complex.type)).toBe(true);
 
@@ -909,7 +771,7 @@ define([
 
             return promise.then(function(InstCtor) {
 
-              var Complex = context.get("pentaho/type/complex");
+              var Complex = context.get("pentaho/type/Complex");
 
               expect(InstCtor.type.isSubtypeOf(Complex.type)).toBe(true);
 
@@ -1198,7 +1060,7 @@ define([
 
             localRequire.define(mid, [], function() {
               return [
-                "pentaho/type/simple",
+                "pentaho/type/Simple",
                 function(Simple) {
                   return Simple.extend({$type: {id: mid}});
                 }
@@ -1219,7 +1081,7 @@ define([
             var mid = "pentaho/foo/bar2";
 
             localRequire.define(mid, [], function() {
-              return ["pentaho/type/simple", function(Simple) {
+              return ["pentaho/type/Simple", function(Simple) {
 
                 expect(this.__creatingTypeId).toBe(mid);
 
@@ -1241,7 +1103,7 @@ define([
             var mid = "pentaho/foo/bar2";
 
             localRequire.define(mid, [], function() {
-              return ["pentaho/type/complex", function(Complex) {
+              return ["pentaho/type/Complex", function(Complex) {
 
                 return Complex.extend({
                   $type: {
@@ -1270,7 +1132,7 @@ define([
           function defineTempModule(mid) {
             localRequire.define(mid, [], function() {
               return [
-                "pentaho/type/simple",
+                "pentaho/type/Simple",
                 function(Simple) {
                   return Simple.extend({$type: {id: mid}});
                 }
@@ -1281,7 +1143,7 @@ define([
           function defineTempMixin(mid) {
             localRequire.define(mid, [], function() {
               return [
-                "pentaho/type/value",
+                "pentaho/type/Value",
                 function(Value) {
                   return Value.extend({$type: {id: mid}});
                 }
@@ -1292,7 +1154,7 @@ define([
           function defineTempProp(mid) {
             localRequire.define(mid, [], function() {
               return [
-                "pentaho/type/property",
+                "pentaho/type/Property",
                 function(Property) {
                   return Property.extend({$type: {id: mid}});
                 }
@@ -2053,7 +1915,7 @@ define([
 
         localRequire.define("exp/baseWithNoRegistrations", [], function() {
           return [
-            "pentaho/type/simple",
+            "pentaho/type/Simple",
             function(Simple) {
               return Simple.extend({$type: {id: "exp/baseWithNoRegistrations"}});
             }
@@ -2064,7 +1926,7 @@ define([
 
         localRequire.define("exp/thing", [], function() {
           return [
-            "pentaho/type/simple",
+            "pentaho/type/Simple",
             function(Simple) {
               return Simple.extend({$type: {id: "exp/thing"}});
             }
@@ -2095,7 +1957,7 @@ define([
 
         localRequire.define("exp/dude", [], function() {
           return [
-            "pentaho/type/simple",
+            "pentaho/type/Simple",
             function(Simple) {
               return Simple.extend({$type: {id: "exp/dude"}});
             }
@@ -2106,7 +1968,7 @@ define([
 
         localRequire.define("exp/prop", [], function() {
           return [
-            "pentaho/type/property",
+            "pentaho/type/Property",
             function(Property) {
               return Property.extend({$type: {id: "exp/prop"}});
             }
@@ -2121,29 +1983,29 @@ define([
               "exp/thing": {base: null},
               "exp/foo":   {base: "exp/thing"},
               "exp/bar":   {base: "exp/thing"},
-              "exp/dude":  {base: "pentaho/type/value"},
-              "exp/prop":  {base: "pentaho/type/property"}
+              "exp/dude":  {base: "pentaho/type/Value"},
+              "exp/prop":  {base: "pentaho/type/Property"}
             }
           }
         });
       }
 
-      it("should return all known subtypes of 'pentaho/type/value'", function() {
+      it("should return all known subtypes of 'pentaho/type/Value'", function() {
 
         return require.using(["require", "pentaho/type/Context"], configRequire, function(localRequire, Context) {
 
           return Context.createAsync().then(function(context) {
 
-            var valueType = context.get("pentaho/type/value").type;
+            var valueType = context.get("pentaho/type/Value").type;
 
             return context
-                .getAllAsync("pentaho/type/value")
+                .getAllAsync("pentaho/type/Value")
                 .then(function(InstCtors) {
                   expect(InstCtors instanceof Array).toBe(true);
 
                   var requiredCount = 0;
 
-                  // While all registered but the exp/prop are pentaho/type/value,
+                  // While all registered but the exp/prop are pentaho/type/Value,
                   // We don't know about the existence of the exp/thing...
                   // Then, there are all other standard types in the registry.
                   InstCtors.forEach(function(InstCtor) {
@@ -2168,20 +2030,20 @@ define([
         });
       });
 
-      it("should return all known non-abstract subtypes of 'pentaho/type/value', when isAbstract is false", function() {
+      it("should return all known non-abstract subtypes of 'pentaho/type/Value', when isAbstract is false", function() {
 
         return require.using(["require", "pentaho/type/Context"], configRequire, function(localRequire, Context) {
 
           return Context.createAsync().then(function(context) {
 
-            var valueType = context.get("pentaho/type/value").type;
+            var valueType = context.get("pentaho/type/Value").type;
 
             return context
-                .getAllAsync("pentaho/type/value", {isAbstract: false})
+                .getAllAsync("pentaho/type/Value", {isAbstract: false})
                 .then(function(InstCtors) {
                   expect(InstCtors instanceof Array).toBe(true);
 
-                  // While all registered but the exp/prop are pentaho/type/value,
+                  // While all registered but the exp/prop are pentaho/type/Value,
                   // We don't know about the existence of the exp/thing...
                   // Then, there are all other standard types in the registry.
                   InstCtors.forEach(function(InstCtor) {
@@ -2259,7 +2121,7 @@ define([
 
         localRequire.define("exp/thing", [], function() {
           return [
-            "pentaho/type/simple",
+            "pentaho/type/Simple",
             function(Simple) {
               return Simple.extend({$type: {id: "exp/thing"}});
             }
@@ -2345,9 +2207,9 @@ define([
 
           return Context.createAsync().then(function(context) {
 
-            var simpleType = context.get("pentaho/type/simple").type;
+            var simpleType = context.get("pentaho/type/Simple").type;
 
-            var InstCtors = context.getAll("pentaho/type/simple");
+            var InstCtors = context.getAll("pentaho/type/Simple");
 
             // All simple standard types. More than Simple.
             expect(InstCtors.length).toBeGreaterThan(1);
@@ -2365,7 +2227,7 @@ define([
 
           return Context.createAsync().then(function(context) {
 
-            var simpleType = context.get("pentaho/type/simple").type;
+            var simpleType = context.get("pentaho/type/Simple").type;
 
             var ExpBar = context.get(simpleType).extend({$type: {id: "exp/bar", isBrowsable: false}});
 
@@ -2386,14 +2248,14 @@ define([
 
           return Context.createAsync().then(function(context) {
 
-            var simpleType = context.get("pentaho/type/simple").type;
+            var simpleType = context.get("pentaho/type/Simple").type;
 
             var ExpBar = context.get(simpleType).extend({$type: {id: "exp/bar", isBrowsable: false}});
 
             // register
             context.getAsync(ExpBar).then(function() {
 
-              var InstCtors = context.getAll("pentaho/type/value", {isBrowsable: false});
+              var InstCtors = context.getAll("pentaho/type/Value", {isBrowsable: false});
 
               expect(InstCtors.indexOf(ExpBar) >= 0).toBe(true);
             });
@@ -2407,14 +2269,14 @@ define([
 
           return Context.createAsync().then(function(context) {
 
-            var Simple = context.get("pentaho/type/simple");
+            var Simple = context.get("pentaho/type/Simple");
 
             var ExpBar = Simple.extend({$type: {id: "exp/bar", isBrowsable: false}});
 
             // register
             context.getAsync(ExpBar).then(function() {
 
-              var InstCtors = context.getAll("pentaho/type/value", {isBrowsable: true});
+              var InstCtors = context.getAll("pentaho/type/Value", {isBrowsable: true});
 
               expect(InstCtors.indexOf(ExpBar) >= 0).toBe(false);
             });
@@ -2426,7 +2288,7 @@ define([
 
         localRequire.define("exp/thing", [], function() {
           return [
-            "pentaho/type/simple",
+            "pentaho/type/Simple",
             function(Simple) {
               return Simple.extend({$type: {id: "exp/thing"}});
             }

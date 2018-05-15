@@ -15,13 +15,14 @@
  */
 
 define([
+  "module",
   "./PrimitiveChange",
-  "../../util/object"
-], function(PrimitiveChange, O) {
+  "pentaho/util/object"
+], function(module, PrimitiveChange, O) {
 
   "use strict";
 
-  return PrimitiveChange.extend("pentaho.type.changes.Replace", /** @lends pentaho.type.changes.Replace# */{
+  return PrimitiveChange.extend(module.id, /** @lends pentaho.type.changes.Replace# */{
 
     /**
      * @alias Replace

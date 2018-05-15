@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
   "pentaho/type/changes/TransactionScope",
   "pentaho/type/changes/Transaction",
   "tests/pentaho/util/errorMatch"
-], function(Context, TransactionScope, Transaction, errorMatch) {
+], function(TransactionScope, Transaction, errorMatch) {
 
   "use strict";
 
@@ -26,17 +25,8 @@ define([
 
   describe("pentaho.type.changes.TransactionScope", function() {
 
-    var context;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-          })
-          .then(done, done.fail);
-    });
-
-    describe("new(context, transaction)", function() {
+    describe("new(transaction)", function() {
       it("should be defined", function() {
         expect(typeof TransactionScope).toBeDefined();
       });
@@ -46,8 +36,8 @@ define([
 
       it("should return true if txn and scope just created", function() {
 
-        var txn = new Transaction(context);
-        var scope = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope = new TransactionScope(txn);
 
         expect(scope.canCommit).toBe(true);
 
@@ -56,9 +46,9 @@ define([
 
       it("should return false if scope not exited but not current", function() {
 
-        var txn = new Transaction(context);
-        var scope1 = new TransactionScope(context, txn);
-        var scope2 = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope1 = new TransactionScope(txn);
+        var scope2 = new TransactionScope(txn);
 
         expect(scope1.canCommit).toBe(false);
 
@@ -68,8 +58,8 @@ define([
 
       it("should return false if scope exited", function() {
 
-        var txn = new Transaction(context);
-        var scope = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope = new TransactionScope(txn);
 
         scope.exit();
 
@@ -78,9 +68,9 @@ define([
 
       it("should return false if scope is current but is not root", function() {
 
-        var txn = new Transaction(context);
-        var scope1 = new TransactionScope(context, txn);
-        var scope2 = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope1 = new TransactionScope(txn);
+        var scope2 = new TransactionScope(txn);
 
         expect(scope2.isRoot).toBe(false);
         expect(scope2.canCommit).toBe(false);
@@ -95,8 +85,8 @@ define([
       var scope;
 
       beforeEach(function() {
-        txn = new Transaction(context);
-        scope = new TransactionScope(context, txn);
+        txn = new Transaction();
+        scope = new TransactionScope(txn);
       });
 
       afterEach(function() {
@@ -252,8 +242,8 @@ define([
 
       it("should call txn __commitWill if current", function() {
 
-        var txn = new Transaction(context);
-        var scope = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope = new TransactionScope(txn);
 
         spyOn(txn, "__commitWill");
 
@@ -265,8 +255,8 @@ define([
 
       it("should call txn __commitWill and return its value if current", function() {
 
-        var txn = new Transaction(context);
-        var scope = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope = new TransactionScope(txn);
         var result = {};
         spyOn(txn, "__commitWill").and.returnValue(result);
 
@@ -279,9 +269,9 @@ define([
 
       it("should throw if scope not exited but not current", function() {
 
-        var txn = new Transaction(context);
-        var scope1 = new TransactionScope(context, txn);
-        var scope2 = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope1 = new TransactionScope(txn);
+        var scope2 = new TransactionScope(txn);
 
         expect(function() {
           scope1.acceptWill();
@@ -293,8 +283,8 @@ define([
 
       it("should throw if scope exited", function() {
 
-        var txn = new Transaction(context);
-        var scope = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope = new TransactionScope(txn);
 
         scope.exit();
 
@@ -308,8 +298,8 @@ define([
 
       it("should call txn __reject if current", function() {
 
-        var txn = new Transaction(context);
-        var scope = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope = new TransactionScope(txn);
 
         spyOn(txn, "__reject");
 
@@ -321,8 +311,8 @@ define([
 
       it("should call txn __reject with the given reason, if current", function() {
 
-        var txn = new Transaction(context);
-        var scope = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope = new TransactionScope(txn);
         var reason = {};
         spyOn(txn, "__reject");
 
@@ -335,8 +325,8 @@ define([
 
       it("should call txn __reject and throw its error, if current", function() {
 
-        var txn = new Transaction(context);
-        var scope = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope = new TransactionScope(txn);
         var ex = new Error();
         spyOn(txn, "__reject").and.callFake(function() { throw ex; });
 
@@ -349,9 +339,9 @@ define([
 
       it("should throw if scope not exited but not current", function() {
 
-        var txn = new Transaction(context);
-        var scope1 = new TransactionScope(context, txn);
-        var scope2 = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope1 = new TransactionScope(txn);
+        var scope2 = new TransactionScope(txn);
 
         expect(function() {
           scope1.reject();
@@ -363,8 +353,8 @@ define([
 
       it("should throw if scope exited", function() {
 
-        var txn = new Transaction(context);
-        var scope = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope = new TransactionScope(txn);
 
         scope.exit();
 
@@ -378,8 +368,8 @@ define([
 
       it("should call txn __commit if current and root", function() {
 
-        var txn = new Transaction(context);
-        var scope = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope = new TransactionScope(txn);
 
         spyOn(txn, "__commit");
 
@@ -391,8 +381,8 @@ define([
 
       it("should return this, if current and root", function() {
 
-        var txn = new Transaction(context);
-        var scope = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope = new TransactionScope(txn);
 
         var result = scope.accept();
 
@@ -401,9 +391,9 @@ define([
 
       it("should not call txn __commit and should simply call exit if cannot commit", function() {
 
-        var txn = new Transaction(context);
-        var scope1 = new TransactionScope(context, txn);
-        var scope2 = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope1 = new TransactionScope(txn);
+        var scope2 = new TransactionScope(txn);
 
         spyOn(scope2, "exit").and.callThrough();
 
@@ -416,9 +406,9 @@ define([
 
       it("should throw if scope not exited but not current", function() {
 
-        var txn = new Transaction(context);
-        var scope1 = new TransactionScope(context, txn);
-        var scope2 = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope1 = new TransactionScope(txn);
+        var scope2 = new TransactionScope(txn);
 
         expect(function() {
           scope1.accept();
@@ -430,8 +420,8 @@ define([
 
       it("should throw if scope exited", function() {
 
-        var txn = new Transaction(context);
-        var scope = new TransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope = new TransactionScope(txn);
 
         scope.exit();
 

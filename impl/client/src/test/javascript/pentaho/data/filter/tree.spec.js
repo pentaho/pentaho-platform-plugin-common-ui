@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,70 +14,50 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/filter/abstract",
+  "pentaho/data/filter/Abstract",
   "pentaho/data/filter/tree",
-  "pentaho/type/Context",
+  "pentaho/type/Complex",
   "tests/pentaho/util/errorMatch"
-], function(abstractFactory, treeFactory, Context, errorMatch) {
+], function(AbstractFilter, TreeFilter, Complex, errorMatch) {
 
   "use strict";
 
   describe("pentaho.data.filter.Tree", function() {
 
-    var context;
     var Complex;
-    var AbstractFilter;
-    var TreeFilter;
     var CustomFilter;
     var CustomTreeFilter;
     var ProductSummary;
 
     function isFalse() { return false; }
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
+    beforeAll(function() {
+      ProductSummary = Complex.extend({
+        $type: {
+          props: [
+            {name: "name", valueType: "string", label: "Name"},
+            {name: "sales", valueType: "number", label: "Sales"},
+            {name: "inStock", valueType: "boolean", label: "In Stock"}
+          ]
+        }
+      });
 
-            context = _context;
-            Complex = context.get("complex");
+      var count = 1;
 
-            ProductSummary = Complex.extend({
-              $type: {
-                props: [
-                  {name: "name", valueType: "string", label: "Name"},
-                  {name: "sales", valueType: "number", label: "Sales"},
-                  {name: "inStock", valueType: "boolean", label: "In Stock"}
-                ]
-              }
-            });
+      CustomFilter = AbstractFilter.extend({
+        compile: function() {
+          return isFalse;
+        },
+        _buildContentKey: function() {
+          return String(count++);
+        }
+      });
 
-            return context.getDependencyApplyAsync([
-              "pentaho/data/filter/abstract",
-              "pentaho/data/filter/tree"
-            ], function(Abstract, Tree) {
-              AbstractFilter = Abstract;
-              TreeFilter = Tree;
-
-              var count = 1;
-
-              CustomFilter = AbstractFilter.extend({
-                compile: function() {
-                  return isFalse;
-                },
-                _buildContentKey: function() {
-                  return String(count++);
-                }
-              });
-
-              CustomTreeFilter = TreeFilter.extend({
-                compile: function() {
-                  return isFalse;
-                }
-              });
-            });
-          })
-          .then(done, done.fail);
-
+      CustomTreeFilter = TreeFilter.extend({
+        compile: function() {
+          return isFalse;
+        }
+      });
     });
 
     describe("new ({operands})", function() {

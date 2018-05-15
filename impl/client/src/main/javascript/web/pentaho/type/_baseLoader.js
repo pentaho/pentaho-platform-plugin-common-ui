@@ -13,12 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+define([
+  "./impl/Loader"
+], function(Loader) {
 
-/**
- * The `spec.ContextTypesConfiguration` interface contains the configuration of Type API types
- * and is part of a [spec.IContext]{@link pentaho.type.IContext} specification.
- *
- * An object whose keys are type identifiers and whose values are type context configurations.
- *
- * @typedef {Object.<string, pentaho.type.spec.ITypeConfiguration>} pentaho.type.spec.ContextTypesConfiguration
- */
+  "use strict";
+
+  // `./_baseLoader` creates/contains the `ILoader` singleton instance and nothing more.
+
+  // Request `./loader` instead to be sure that all standard types can be requested synchronously.
+
+  // For convenience, requesting the `Complex` class (like, for example, when defining a new complex type)
+  // also loads some of the other standard types.
+
+  return new Loader();
+});

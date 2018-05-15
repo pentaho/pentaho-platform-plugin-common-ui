@@ -15,14 +15,15 @@
  */
 
 define([
+  "module",
   "./Change",
-  "../../util/error",
-  "../../util/object"
-], function(Change, error, O) {
+  "pentaho/util/error",
+  "pentaho/util/object"
+], function(module, Change, error, O) {
 
   "use strict";
 
-  return Change.extend("pentaho.type.changes.Changeset", /** @lends pentaho.type.changes.Changeset# */{
+  return Change.extend(module.id, /** @lends pentaho.type.changes.Changeset# */{
 
     /**
      * @alias Changeset

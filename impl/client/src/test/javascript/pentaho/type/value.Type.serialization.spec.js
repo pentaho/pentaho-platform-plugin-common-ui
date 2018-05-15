@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,35 +14,20 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Value",
   "pentaho/type/SpecificationScope",
   "tests/pentaho/type/serializationUtil"
-], function(Context, SpecificationScope, serializationUtil) {
+], function(Value, SpecificationScope, serializationUtil) {
 
   "use strict";
-
-  /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, spyOn:false, jasmine:false,
-           JSON:false */
 
   /* eslint max-nested-callbacks: 0 */
 
   describe("pentaho.type.Value.Type", function() {
 
-    var context;
-    var Value;
-
     function getValue() {
       return Value;
     }
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Value = context.get("pentaho/type/value");
-          })
-          .then(done, done.fail);
-    });
 
     describe("#toSpecInContext(keyArgs)", function() {
 
@@ -213,7 +198,7 @@ define([
         });
 
         it("should not serialize base when it is Complex", function() {
-          var Complex = context.get("pentaho/type/complex");
+          var Complex = context.get("pentaho/type/Complex");
           var DerivedComplex = Complex.extend();
 
           var scope = new SpecificationScope();

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2016 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2016 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-define([
-  "tests/test-utils"
-], function(testUtils) {
+define(function() {
 
   "use strict";
 
   /* globals describe, it, expect, beforeEach, jasmine */
-
-  // Use alternate, promise-aware version of `it`.
-  var it = testUtils.itAsync;
 
   describe("pentaho.debug.manager", function() {
 

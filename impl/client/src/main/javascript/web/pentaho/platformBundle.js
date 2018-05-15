@@ -24,11 +24,14 @@ define([
   "pentaho/module/instanceOf",
   "pentaho/module/instancesOf",
 
+  // Type API
+  "pentaho/type/loader",
+
+  // Data API
   "pentaho/data/Table",
   "pentaho/data/TableView",
   "pentaho/data/filter/standard",
 
-  "pentaho/type/Context",
   "pentaho/visual/base/model",
   "pentaho/visual/base/view",
   "pentaho/visual/base/modelAdapter",

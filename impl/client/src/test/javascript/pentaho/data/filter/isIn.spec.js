@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,44 +14,26 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/filter/isIn",
-  "pentaho/type/Context",
-  "pentaho/type/complex"
-], function(isInFactory, Context, complexFactory) {
+  "pentaho/data/filter/IsIn",
+  "pentaho/type/Complex"
+], function(IsInFilter, Complex) {
 
   "use strict";
 
   describe("pentaho.data.filter.IsIn", function() {
 
-    var context;
-    var Complex;
-    var IsInFilter;
     var ProductSummary;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-
-            context = _context;
-            Complex = context.get("complex");
-
-            ProductSummary = Complex.extend({
-              $type: {
-                props: [
-                  {name: "name", valueType: "string", label: "Name"},
-                  {name: "sales", valueType: "number", label: "Sales"},
-                  {name: "inStock", valueType: "boolean", label: "In Stock"}
-                ]
-              }
-            });
-
-            return context.getDependencyApplyAsync([
-              "pentaho/data/filter/isIn"
-            ], function(IsIn) {
-              IsInFilter = IsIn;
-            });
-          })
-          .then(done, done.fail);
+    beforeAll(function() {
+      ProductSummary = Complex.extend({
+        $type: {
+          props: [
+            {name: "name", valueType: "string", label: "Name"},
+            {name: "sales", valueType: "number", label: "Sales"},
+            {name: "inStock", valueType: "boolean", label: "In Stock"}
+          ]
+        }
+      });
     });
 
     describe("new ({property, values})", function() {

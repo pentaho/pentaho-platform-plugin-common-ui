@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Element",
+  "pentaho/type/Simple",
   "pentaho/lang/UserError",
   "tests/pentaho/util/errorMatch"
-], function(Context, UserError, errorMatch) {
+], function(Element, Simple, UserError, errorMatch) {
 
   "use strict";
 
   /* global describe:true, it:true, expect:true, beforeAll:true*/
 
   describe("pentaho.type.Simple", function() {
-
-    var context;
-    var Element;
-    var Simple;
 
     function expectThrow(spec, errorMatch) {
       expect(function() {
@@ -68,16 +65,6 @@ define([
       expect(simple.value).toBe(value);
       expect(simple.formatted).toBe(formatted);
     }
-
-    beforeAll(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Element = context.get("pentaho/type/element");
-            Simple  = context.get("pentaho/type/simple");
-          })
-          .then(done, done.fail);
-    });
 
     it("should be a function", function() {
       expect(typeof Simple).toBe("function");

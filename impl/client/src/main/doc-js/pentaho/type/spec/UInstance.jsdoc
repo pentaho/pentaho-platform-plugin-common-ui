@@ -23,7 +23,5 @@
  *
  * To describe an absent instance, use a {@link Nully} JavaScript value.
  *
- * @typedef {pentaho.type.spec.IInstance|
- *           pentaho.type.spec.UValue|
- *           Nully} pentaho.type.spec.UInstance
+ * @typedef {pentaho.type.spec.IInstance|pentaho.type.spec.UValue|Nully} pentaho.type.spec.UInstance
  */

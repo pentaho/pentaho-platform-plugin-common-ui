@@ -44,7 +44,7 @@ define([
    *       // Per AMD module
    *       "modules": {
    *         "pentaho/lang/Base": "debug",
-   *         "pentaho/type/complex": 3  // <=> "info"
+   *         "pentaho/type/Complex": 3  // <=> "info"
    *       }
    *     }
    *   }

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,72 +14,55 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
-  "pentaho/type/action/Execution"
-], function(Context, Execution) {
+  "pentaho/type/action/impl/Target",
+  "pentaho/type/action/Execution",
+  "pentaho/type/action/Base",
+  "pentaho/lang/Base"
+], function(TargetMixin, BaseAction, Base, Execution) {
 
   "use strict";
 
   describe("pentaho.type.action.impl.Target", function() {
 
-    var ComplexTarget;
-    var BaseAction;
+    var CustomTarget;
     var SyncAction;
     var AsyncAction;
 
-    beforeAll(function(done) {
+    beforeAll(function() {
 
-      Context.createAsync()
-          .then(function(context) {
-            return context.getDependencyAsync({
-              TargetMixin: "pentaho/type/action/impl/target",
-              BaseAction: "pentaho/type/action/base",
-              Complex: "pentaho/type/complex"
-            });
-          })
-          .then(function(types) {
+      // A derived non-abstract class, adding nothing new.
+      SyncAction = BaseAction.extend({
+        $type: {
+          id: "syncAction",
+          isSync: true
+        }
+      });
 
-            BaseAction = types.BaseAction;
+      // Idem.
+      AsyncAction = BaseAction.extend({
+        $type: {
+          id: "asyncAction",
+          isSync: false
+        }
+      });
 
-            // A derived non-abstract class, adding nothing new.
-            SyncAction = types.BaseAction.extend({
-              $type: {
-                id: "syncAction",
-                isSync: true
-              }
-            });
-
-            // Idem.
-            AsyncAction = types.BaseAction.extend({
-              $type: {
-                id: "asyncAction",
-                isSync: false
-              }
-            });
-
-            // A Complex type with the Target mixin applied.
-            ComplexTarget = types.Complex.extend({
-              $type: {
-                mixins: [types.TargetMixin]
-              }
-            });
-          })
-          .then(done, done.fail);
+      // A Complex type with the Target mixin applied.
+      CustomTarget = Base.extend().mixin(TargetMixin);
     });
 
     describe(".GenericActionExecution", function() {
 
       it("should get the constructor of an Execution subtype", function() {
 
-        expect(typeof ComplexTarget.GenericActionExecution).toBe("function");
-        expect(ComplexTarget.GenericActionExecution.prototype instanceof Execution).toBe(true);
+        expect(typeof CustomTarget.GenericActionExecution).toBe("function");
+        expect(CustomTarget.GenericActionExecution.prototype instanceof Execution).toBe(true);
       });
 
       describe("#_onPhaseInit", function() {
 
         it("should call the associated target's _emitActionPhaseInitEvent method", function() {
-          var target = new ComplexTarget();
-          var ae = new ComplexTarget.GenericActionExecution(new SyncAction(), target);
+          var target = new CustomTarget();
+          var ae = new CustomTarget.GenericActionExecution(new SyncAction(), target);
 
           spyOn(target, "_emitActionPhaseInitEvent");
 
@@ -93,8 +76,8 @@ define([
       describe("#_onPhaseWill", function() {
 
         it("should call the associated target's _emitActionPhaseWillEvent method", function() {
-          var target = new ComplexTarget();
-          var ae = new ComplexTarget.GenericActionExecution(new SyncAction(), target);
+          var target = new CustomTarget();
+          var ae = new CustomTarget.GenericActionExecution(new SyncAction(), target);
 
           spyOn(target, "_emitActionPhaseWillEvent");
 
@@ -108,8 +91,8 @@ define([
       describe("#_onPhaseDo", function() {
 
         it("should call the associated target's _emitActionPhaseDoEvent method", function() {
-          var target = new ComplexTarget();
-          var ae = new ComplexTarget.GenericActionExecution(new SyncAction(), target);
+          var target = new CustomTarget();
+          var ae = new CustomTarget.GenericActionExecution(new SyncAction(), target);
 
           spyOn(target, "_emitActionPhaseDoEvent");
 
@@ -120,8 +103,8 @@ define([
         });
 
         it("should return what _emitActionPhaseDoEvent returns", function() {
-          var target = new ComplexTarget();
-          var ae = new ComplexTarget.GenericActionExecution(new SyncAction(), target);
+          var target = new CustomTarget();
+          var ae = new CustomTarget.GenericActionExecution(new SyncAction(), target);
           var promise = Promise.resolve();
           spyOn(target, "_emitActionPhaseDoEvent").and.returnValue(promise);
 
@@ -134,8 +117,8 @@ define([
       describe("#_onPhaseFinally", function() {
 
         it("should call the associated target's _emitActionPhaseFinallyEvent method", function() {
-          var target = new ComplexTarget();
-          var ae = new ComplexTarget.GenericActionExecution(new SyncAction(), target);
+          var target = new CustomTarget();
+          var ae = new CustomTarget.GenericActionExecution(new SyncAction(), target);
 
           spyOn(target, "_emitActionPhaseFinallyEvent");
 
@@ -151,10 +134,10 @@ define([
 
       it("should return an instance of GenericActionExecution", function() {
 
-        var target = new ComplexTarget();
+        var target = new CustomTarget();
         var ae = target._createGenericActionExecution(new SyncAction());
 
-        expect(ae instanceof ComplexTarget.GenericActionExecution).toBe(true);
+        expect(ae instanceof CustomTarget.GenericActionExecution).toBe(true);
       });
 
       // should return an action execution with the given action - it's a clone actually.
@@ -164,7 +147,7 @@ define([
 
       it("should delegate to _createGenericActionExecution", function() {
 
-        var target = new ComplexTarget();
+        var target = new CustomTarget();
         var ae = {};
         var action = new SyncAction();
 
@@ -183,13 +166,13 @@ define([
 
       it("should accept an Action argument", function() {
 
-        var target = new ComplexTarget();
+        var target = new CustomTarget();
         target.act(new SyncAction());
       });
 
       it("should create and return an action execution", function() {
 
-        var target = new ComplexTarget();
+        var target = new CustomTarget();
         var ae = target.act(new SyncAction());
 
         expect(ae instanceof Execution).toBe(true);
@@ -197,10 +180,10 @@ define([
 
       it("should accept an Action specification argument", function() {
 
-        var target = new ComplexTarget();
+        var target = new CustomTarget();
         var ae = target.act({
           _: {
-            base: "pentaho/type/action/base"
+            base: "pentaho/type/action/Base"
           }
         });
 
@@ -209,7 +192,7 @@ define([
 
       it("should create an action execution with itself as target", function() {
 
-        var target = new ComplexTarget();
+        var target = new CustomTarget();
         var ae = target.act(new SyncAction());
 
         expect(ae.target).toBe(target);
@@ -217,7 +200,7 @@ define([
 
       it("should call #execute of the created action execution", function() {
 
-        var target = new ComplexTarget();
+        var target = new CustomTarget();
 
         var ae = jasmine.createSpyObj("execution", ["execute"]);
         spyOn(target, "_createActionExecution").and.returnValue(ae);
@@ -246,7 +229,7 @@ define([
 
         it("should return null", function() {
 
-          var target = new ComplexTarget();
+          var target = new CustomTarget();
 
           spyOn(target, "_emitGeneric");
 
@@ -268,7 +251,7 @@ define([
 
         it("should return the result of #_emitGenericAllAsync", function() {
 
-          var target = new ComplexTarget();
+          var target = new CustomTarget();
           var promise = Promise.resolve();
           spyOn(target, "_emitGenericAllAsync").and.returnValue(promise);
 
@@ -310,7 +293,7 @@ define([
       var ActionClass;
 
       beforeEach(function() {
-        target = new ComplexTarget();
+        target = new CustomTarget();
 
         spyOn(target, emitGenericMethodName);
 

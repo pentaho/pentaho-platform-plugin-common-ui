@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
+  "pentaho/module!../Not",
   "../KnownFilterKind"
-], function(KnownFilterKind) {
+], function(module, KnownFilterKind) {
 
   "use strict";
 
@@ -36,7 +37,7 @@ define([
      * @class
      * @extends pentaho.data.filter.Abstract
      *
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.data.filter.Not>} pentaho/data/filter/not
+     * @amd pentaho/data/filter/Not
      *
      * @classDesc The `Not` type represents a negation filter.
      *
@@ -73,19 +74,6 @@ define([
       _buildContentKey: function() {
         var o = this.operand;
         return o ? o.$contentKey : "";
-      },
-
-      /**
-       * Gets the operand of this filter.
-       *
-       * This getter is a shorthand for `this.get("operand")`.
-       *
-       * @type {pentaho.data.filter.Abstract}
-       *
-       * @readonly
-       */
-      get operand() {
-        return this.get("operand");
       },
 
       /** @inheritDoc */
@@ -135,10 +123,20 @@ define([
       },
 
       $type: /** @lends pentaho.data.filter.Not.Type# */{
-        id: "pentaho/data/filter/not",
-        alias: "not",
+        id: module.id,
         props: [
           {
+
+            /**
+             * Gets the operand of this filter.
+             *
+             * This getter is a shorthand for `this.get("operand")`.
+             *
+             * @name operand
+             * @memberOf pentaho.data.filter.Not#
+             * @type {pentaho.data.filter.Abstract}
+             * @readonly
+             */
             name: "operand",
             nameAlias: "o",
             valueType: filter.Abstract,
