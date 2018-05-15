@@ -10,18 +10,15 @@
     "common-data": "/dataapi",
 
     "pentaho/common": "/dojo/pentaho/common",
-
-    "pentaho/i18n": "/i18nMock",
-    "pentaho/i18n/MessageBundle": "/pentaho/i18n/MessageBundle",
-
+    "pentaho/_core": "/pentaho/_core",
+    "pentaho/module": "/pentaho/module",
     "pentaho/shim": "/pentaho/shim",
     "pentaho/util": "/pentaho/util",
     "pentaho/lang": "/pentaho/lang",
-    "pentaho/service": "/pentaho/service",
+    "pentaho/i18n": "/pentaho/i18n",
+    "pentaho/i18n/directService": "/i18nMock",
     "pentaho/data": "/pentaho/data",
     "pentaho/type": "/pentaho/type",
-    "pentaho/typeInfo": "/pentaho/typeInfo",
-    "pentaho/instanceInfo": "/pentaho/instanceInfo",
     "pentaho/visual": "/pentaho/visual",
     "pentaho/config": "/pentaho/config",
     "pentaho/environment": "/pentaho/environment",
@@ -95,275 +92,277 @@
     }
   },
 
+  "packages": [
+    {"name": "pentaho/module", "main": "metaOf"},
+    {"name": "pentaho/environment"},
+    {"name": "pentaho/i18n", "main": "directService"},
+    {"name": "pentaho/debug", "main": "manager"}
+  ],
+
   "config": {
-    "pentaho/typeInfo": {
-      "pentaho/type/instance": {
-        "alias": "instance"
+    "pentaho/modules": {
+      "pentaho/config/spec/IRuleSet": {
+        "base": null,
+        "isAbstract": true
       },
-      "pentaho/type/value": {
+      "pentaho/type/Instance": {
+        "alias": "instance",
+        "base": null
+      },
+      "pentaho/type/Value": {
         "alias": "value",
         "base": "instance"
       },
-      "pentaho/type/property": {
+      "pentaho/type/Property": {
         "alias": "property",
         "base": "instance"
       },
-      "pentaho/type/list": {
+      "pentaho/type/List": {
         "alias": "list",
         "base": "value"
       },
-      "pentaho/type/element": {
+      "pentaho/type/Element": {
         "alias": "element",
         "base": "value"
       },
-      "pentaho/type/complex": {
+      "pentaho/type/Complex": {
         "alias": "complex",
         "base": "element"
       },
-      "pentaho/type/simple": {
+      "pentaho/type/Simple": {
         "alias": "simple",
         "base": "element"
       },
-      "pentaho/type/number": {
+      "pentaho/type/Number": {
         "alias": "number",
         "base": "simple"
       },
-      "pentaho/type/string": {
+      "pentaho/type/String": {
         "alias": "string",
         "base": "simple"
       },
-      "pentaho/type/boolean": {
+      "pentaho/type/Boolean": {
         "alias": "boolean",
         "base": "simple"
       },
-      "pentaho/type/date": {
+      "pentaho/type/Date": {
         "alias": "date",
         "base": "simple"
       },
-      "pentaho/type/object": {
+      "pentaho/type/Object": {
         "alias": "object",
         "base": "simple"
       },
-      "pentaho/type/function": {
+      "pentaho/type/Function": {
         "alias": "function",
         "base": "simple"
       },
-      "pentaho/type/mixins/enum": {
+      "pentaho/type/mixins/Enum": {
         "alias": "enum",
         "base": "element"
       },
-      "pentaho/type/action/base": {
+      "pentaho/type/action/Base": {
         "base": "element"
       },
-      "pentaho/data/filter/abstract": {
+      "pentaho/data/filter/Abstract": {
         "base": "complex"
       },
-      "pentaho/data/filter/true": {
+      "pentaho/data/filter/True": {
         "alias": "true",
-        "base": "pentaho/data/filter/abstract"
+        "base": "pentaho/data/filter/Abstract"
       },
-      "pentaho/data/filter/false": {
+      "pentaho/data/filter/False": {
         "alias": "false",
-        "base": "pentaho/data/filter/abstract"
+        "base": "pentaho/data/filter/Abstract"
       },
-      "pentaho/data/filter/tree": {
-        "base": "pentaho/data/filter/abstract"
+      "pentaho/data/filter/Tree": {
+        "base": "pentaho/data/filter/Abstract"
       },
-      "pentaho/data/filter/or": {
+      "pentaho/data/filter/Or": {
         "alias": "or",
-        "base": "pentaho/data/filter/tree"
+        "base": "pentaho/data/filter/Tree"
       },
-      "pentaho/data/filter/and": {
+      "pentaho/data/filter/And": {
         "alias": "and",
-        "base": "pentaho/data/filter/tree"
+        "base": "pentaho/data/filter/Tree"
       },
-      "pentaho/data/filter/not": {
+      "pentaho/data/filter/Not": {
         "alias": "not",
-        "base": "pentaho/data/filter/abstract"
+        "base": "pentaho/data/filter/Abstract"
       },
-      "pentaho/data/filter/property": {
-        "base": "pentaho/data/filter/abstract"
+      "pentaho/data/filter/Property": {
+        "base": "pentaho/data/filter/Abstract"
       },
-      "pentaho/data/filter/isEqual": {
+      "pentaho/data/filter/IsEqual": {
         "alias": "=",
-        "base": "pentaho/data/filter/property"
+        "base": "pentaho/data/filter/Property"
       },
-      "pentaho/data/filter/isIn": {
+      "pentaho/data/filter/IsIn": {
         "alias": "in",
-        "base": "pentaho/data/filter/property"
+        "base": "pentaho/data/filter/Property"
       },
-      "pentaho/data/filter/isGreater": {
+      "pentaho/data/filter/IsGreater": {
         "alias": ">",
-        "base": "pentaho/data/filter/property"
+        "base": "pentaho/data/filter/Property"
       },
-      "pentaho/data/filter/isGreaterOrEqual": {
+      "pentaho/data/filter/IsGreaterOrEqual": {
         "alias": ">=",
-        "base": "pentaho/data/filter/property"
+        "base": "pentaho/data/filter/Property"
       },
-      "pentaho/data/filter/isLess": {
+      "pentaho/data/filter/IsLess": {
         "alias": "<",
-        "base": "pentaho/data/filter/property"
+        "base": "pentaho/data/filter/Property"
       },
-      "pentaho/data/filter/isLessOrEqual": {
+      "pentaho/data/filter/IsLessOrEqual": {
         "alias": "<=",
-        "base": "pentaho/data/filter/property"
+        "base": "pentaho/data/filter/Property"
       },
-      "pentaho/data/filter/isLike": {
+      "pentaho/data/filter/IsLike": {
         "alias": "like",
-        "base": "pentaho/data/filter/property"
+        "base": "pentaho/data/filter/Property"
       },
-      "pentaho/visual/base/model": {
+      "pentaho/visual/base/Model": {
         "base": "complex"
       },
-      "pentaho/visual/base/view": {
-        "base": "complex",
-        "props": {
-          "model": {
-            "valueType": "pentaho/visual/base/model"
-          }
-        }
-      },
-      "pentaho/visual/role/adaptation/strategy": {
+      "pentaho/visual/base/View": {
         "base": "complex"
       },
-      "pentaho/visual/role/adaptation/identityStrategy": {
-        "base": "pentaho/visual/role/adaptation/strategy"
+      "pentaho/visual/role/adaptation/Strategy": {
+        "base": "complex"
       },
-      "pentaho/visual/role/adaptation/tupleStrategy": {
-        "base": "pentaho/visual/role/adaptation/strategy"
+      "pentaho/visual/role/adaptation/IdentityStrategy": {
+        "base": "pentaho/visual/role/adaptation/Strategy"
       },
-      "pentaho/visual/role/adaptation/entityWithTimeIntervalKeyStrategy": {
-        "base": "pentaho/visual/role/adaptation/strategy"
+      "pentaho/visual/role/adaptation/TupleStrategy": {
+        "base": "pentaho/visual/role/adaptation/Strategy"
       },
-      "pentaho/visual/models/abstract": {
-        "base": "pentaho/visual/base/model"
+      "pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy": {
+        "base": "pentaho/visual/role/adaptation/Strategy"
       },
-      "pentaho/visual/samples/calc/model": {
-        "base": "pentaho/visual/base/model"
+      "pentaho/visual/models/Abstract": {
+        "base": "pentaho/visual/base/Model"
       },
-      "pentaho/visual/models/cartesianAbstract": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/samples/calc/Model": {
+        "base": "pentaho/visual/base/Model"
       },
-      "pentaho/visual/models/categoricalContinuousAbstract": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/CartesianAbstract": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/barAbstract": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/CategoricalContinuousAbstract": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/barNormalizedAbstract": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/BarAbstract": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/barHorizontal": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/BarNormalizedAbstract": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/bar": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/BarHorizontal": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/barStacked": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/Bar": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/barStackedHorizontal": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/BarStacked": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/barNormalized": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/BarStackedHorizontal": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/barNormalizedHorizontal": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/BarNormalized": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/barLine": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/BarNormalizedHorizontal": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/line": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/BarLine": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/pointAbstract": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/Line": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/metricPointAbstract": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/PointAbstract": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/areaStacked": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/MetricPointAbstract": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/pie": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/AreaStacked": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/heatGrid": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/Pie": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/sunburst": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/HeatGrid": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/donut": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/Sunburst": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/scatter": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/Donut": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/models/bubble": {
-        "base": "pentaho/visual/models/abstract"
+      "pentaho/visual/models/Scatter": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/action/base": {
-        "base": "pentaho/type/action/base"
+      "pentaho/visual/models/Bubble": {
+        "base": "pentaho/visual/models/Abstract"
       },
-      "pentaho/visual/action/select": {
+      "pentaho/visual/action/Base": {
+        "base": "pentaho/type/action/Base"
+      },
+      "pentaho/visual/action/Select": {
         "alias": "select",
-        "base": "pentaho/visual/action/base"
+        "base": "pentaho/visual/action/Base"
       },
-      "pentaho/visual/action/execute": {
+      "pentaho/visual/action/Execute": {
         "alias": "execute",
-        "base": "pentaho/visual/action/base"
+        "base": "pentaho/visual/action/Base"
       },
-      "pentaho/visual/action/update": {
-        "base": "pentaho/visual/action/base"
+      "pentaho/visual/action/Update": {
+        "base": "pentaho/visual/action/Base"
       },
-      "pentaho/visual/color/palette": {
+      "pentaho/visual/color/Palette": {
         "base": "complex"
-      }
-    },
-    "pentaho/instanceInfo": {
-      "pentaho/config/impl/instanceOfAmdLoadedService": {
-        "type": "pentaho.config.IService"
       },
       "pentaho/visual/config/vizApi.conf": {
-        "type": "pentaho.config.spec.IRuleSet"
+        "type": "pentaho/config/spec/IRuleSet"
       },
       "pentaho/visual/color/palettes/nominalPrimary": {
-        "type": "pentaho/visual/color/palette"
+        "type": "pentaho/visual/color/Palette"
       },
       "pentaho/visual/color/palettes/nominalNeutral": {
-        "type": "pentaho/visual/color/palette"
+        "type": "pentaho/visual/color/Palette"
       },
       "pentaho/visual/color/palettes/nominalLight": {
-        "type": "pentaho/visual/color/palette"
+        "type": "pentaho/visual/color/Palette"
       },
       "pentaho/visual/color/palettes/nominalDark": {
-        "type": "pentaho/visual/color/palette"
+        "type": "pentaho/visual/color/Palette"
       },
       "pentaho/visual/color/palettes/quantitativeBlue3": {
-        "type": "pentaho/visual/color/palette"
+        "type": "pentaho/visual/color/Palette"
       },
       "pentaho/visual/color/palettes/quantitativeBlue5": {
-        "type": "pentaho/visual/color/palette"
+        "type": "pentaho/visual/color/Palette"
       },
       "pentaho/visual/color/palettes/quantitativeGray3": {
-        "type": "pentaho/visual/color/palette"
+        "type": "pentaho/visual/color/Palette"
       },
       "pentaho/visual/color/palettes/quantitativeGray5": {
-        "type": "pentaho/visual/color/palette"
+        "type": "pentaho/visual/color/Palette"
       },
       "pentaho/visual/color/palettes/divergentRyg3": {
-        "type": "pentaho/visual/color/palette"
+        "type": "pentaho/visual/color/Palette"
       },
       "pentaho/visual/color/palettes/divergentRyg5": {
-        "type": "pentaho/visual/color/palette"
+        "type": "pentaho/visual/color/Palette"
       },
       "pentaho/visual/color/palettes/divergentRyb3": {
-        "type": "pentaho/visual/color/palette"
+        "type": "pentaho/visual/color/Palette"
       },
       "pentaho/visual/color/palettes/divergentRyb5": {
-        "type": "pentaho/visual/color/palette"
+        "type": "pentaho/visual/color/Palette"
       }
     }
   },

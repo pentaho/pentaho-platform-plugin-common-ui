@@ -238,7 +238,7 @@ define([
       this.__Boolean = null;
       this.__String = null;
 
-      var instanceIds = instanceInfo.getAllByType("pentaho/type/instance", {includeDescendants: true});
+      var instanceIds = instanceInfo.getAllOfType("pentaho/type/instance", {includeDescendants: true});
       if(instanceIds) {
         instanceIds.forEach(function(instanceId) {
           var typeId = instanceInfo.getTypeOf(instanceId);

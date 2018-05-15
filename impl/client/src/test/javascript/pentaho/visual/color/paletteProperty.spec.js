@@ -475,22 +475,20 @@ define([
           // Clear all default instance registrations
           localRequire.config({
             config: {
-              "pentaho/instanceInfo": null
+              "pentaho/modules": null
             }
           });
 
           localRequire.config({
             config: {
-              "pentaho/instanceInfo": {
-                // This registration is actually required for everything to work...
-                "pentaho/config/impl/instanceOfAmdLoadedService": {type: "pentaho.config.IService"},
-
-                "my/palettesContextConfig": {type: "pentaho.config.spec.IRuleSet"},
+              "pentaho/modules": {
+                "pentaho/config/spec/IRuleSet": {base: null, isAbstract: true},
+                "my/palettesContextConfig": {type: "pentaho/config/spec/IRuleSet"},
 
                 // Register palettes
-                "my/nominalPalette1": {type: "pentaho/visual/color/palette"},
-                "my/nominalPalette2": {type: "pentaho/visual/color/palette"},
-                "my/quantitativePalette1": {type: "pentaho/visual/color/palette"}
+                "my/nominalPalette1": {type: "pentaho/visual/color/Palette"},
+                "my/nominalPalette2": {type: "pentaho/visual/color/Palette"},
+                "my/quantitativePalette1": {type: "pentaho/visual/color/Palette"}
               }
             }
           });

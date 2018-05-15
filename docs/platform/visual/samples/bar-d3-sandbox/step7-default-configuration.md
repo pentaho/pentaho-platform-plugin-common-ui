@@ -61,7 +61,7 @@ We'll use the Sandbox environment to make sure.
 ## Register the configuration module in the sandbox
 
 It is still necessary to register the configuration module with the configuration system.
-For such, edit the `package.json` file and add a [`pentaho/instanceInfo`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.instanceInfo'}})
+For such, edit the `package.json` file and add a [`pentaho/modules`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.modules'}})
 configuration so that your file looks like this:
 
 ```json
@@ -70,14 +70,12 @@ configuration so that your file looks like this:
   "version": "0.0.1",
 
   "config": {
-    "pentaho/typeInfo": {
-      "pentaho-visual-samples-bar-d3/model": {
-        "base": "pentaho/visual/base/model"
-      }
-    },
-    "pentaho/instanceInfo": {
+    "pentaho/modules": {
+      "pentaho-visual-samples-bar-d3/Model": {
+        "base": "pentaho/visual/base/Model"
+      }, 
       "pentaho-visual-samples-bar-d3/config": {
-        "type": "pentaho.config.spec.IRuleSet"
+        "type": "pentaho/config/spec/IRuleSet"
       }
     }
   },

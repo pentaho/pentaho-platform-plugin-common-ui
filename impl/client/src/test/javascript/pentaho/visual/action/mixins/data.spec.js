@@ -85,8 +85,8 @@ define([
 
         localRequire.config({
           config: {
-            "pentaho/typeInfo": {
-              "tests/filter/custom": {base: "pentaho/data/filter/abstract"}
+            "pentaho/modules": {
+              "tests/filter/Custom": {base: "pentaho/data/filter/Abstract"}
             }
           }
         });

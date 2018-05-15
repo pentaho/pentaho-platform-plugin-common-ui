@@ -57,8 +57,6 @@ define([
    *
    * @param {string} description -  The test description.
    * @param {function(any) : ?Promise} test - A promise-based async test function.
-   *
-   * @return {function(function)} A Jasmine-style async test function.
    */
   function itAsync(description, test) {
     it(description, toAsyncJasmine(test));
@@ -90,6 +88,8 @@ define([
    *                                with a given error type.
    * @param {any|Error|JasmineAsymmetricEqualityTester} [error] The error that is the cause for the rejection.
    *                                                    When unspecified, rejection of any type is still asserted.
+   *
+   * @return {!Promise} The test promise.
    */
   function expectToRejectWith(asyncTest, error) {
 

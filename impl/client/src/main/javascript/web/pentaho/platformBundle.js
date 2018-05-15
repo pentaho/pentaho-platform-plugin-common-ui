@@ -14,11 +14,20 @@
  * limitations under the License.
  */
 define([
+  // Core
+  "pentaho/config/service",
+  "pentaho/module/service",
+  "pentaho/module/metaService",
+  "pentaho/module/metaOf",
+  "pentaho/module/subtypeOf",
+  "pentaho/module/subtypesOf",
+  "pentaho/module/instanceOf",
+  "pentaho/module/instancesOf",
+
   "pentaho/data/Table",
   "pentaho/data/TableView",
   "pentaho/data/filter/standard",
 
-  "pentaho/config/impl/instanceOfAmdLoadedService",
   "pentaho/type/Context",
   "pentaho/visual/base/model",
   "pentaho/visual/base/view",

@@ -99,17 +99,14 @@ if(!useDebug) {
 
     "pentaho/common",
 
-    "pentaho/i18n",
-    "pentaho/i18n/MessageBundle",
-
+    "pentaho/_core",
+    "pentaho/module",
     "pentaho/shim",
     "pentaho/util",
     "pentaho/lang",
-    "pentaho/service",
+    "pentaho/i18n",
     "pentaho/data",
     "pentaho/type",
-    "pentaho/typeInfo",
-    "pentaho/instanceInfo",
     "pentaho/visual",
     "pentaho/config",
     "pentaho/environment",

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,47 +19,61 @@
  *
  * ## Overview
  *
- * The Configuration API provides a means for _types_ and _instances_ to be configured by third-parties.
+ * The Configuration API provides a means for modules to be configured by third-parties.
  *
- * _Types_ and _instances_ are known by their _string_ identifier and are, for all other purposes, opaque entities
- * — types may or may not exist as actual classes; these may simply represent an interface type.
+ * Modules are known by their _string_ identifier.
  *
  * **Configurations** are JavaScript objects that conform to the
  * [IRuleSet]{@link pentaho.config.spec.IRuleSet} interface — essentially, a set of configuration rules,
  * [IRule]{@link pentaho.config.spec.IRule}.
  * Typically,
- * configurations are provided as the value returned by an AMD/RequireJS module.
+ * configurations are provided as the value of an AMD/RequireJS module.
  * This module needs to be advertised to the configuration system by registering it
- * with [pentaho/instanceInfo]{@link pentaho.instanceInfo},
- * as an instance of type `pentaho.config.spec.IRuleSet`.
+ * with `pentaho/modules`, as an instance of type `pentaho/config/spec/IRuleSet`:
  *
- * **Configuration rules** specify the _type_ or _instance_ and the values of any
+ * ```js
+ * require.config({
+ *   config: {
+ *     "pentaho/modules": {
+ *       "my/rules": {type: "pentaho/config/spec/IRuleSet"}
+ *     }
+ *   }
+ * });
+ * ```
+ *
+ * **Configuration rules** specify the module identifier and the values of any
  * [platform environmental variables]{@link pentaho.environment.IEnvironment}
  * to which they apply,
  * as well as the actual configuration properties that should be applied.
  *
- * Configurations can be obtained
- * through the [config.IService]{@link pentaho.config.IService} interface.
- *
- * The platform's main configuration service instance can be obtained
- * by getting the service of id `pentaho.config.IService`,
- * i.e., by requiring the AMD/RequireJS module `pentaho/service!pentaho.config.IService?single`.
+ * Configurations can be obtained through the {@link pentaho.config.IService} interface,
+ * the main instance of which is {@link pentaho.config.service}.
  * Example:
  *
  * ```js
- * require([
- *   "pentaho/service!pentaho.config.IService?single",
- *   "pentaho/environment"
- * ], function(configService, mainEnvironment) {
+ * define([
+ *   "pentaho/config/service"
+ * ], function(configService) {
  *
- *   // Get the configuration for 'my.IFoo' components,
- *   // under the main platform environment:
- *   configService.getAsync(mainEnvironment).then(function(config) {
- *     var myConfig = config.selectType("my.IFoo");
- *     if(myConfig) {
+ *   // Get the configuration for the module `my/IFoo`:
+ *   configService.selectAsync("my/IFoo").then(function(config) {
+ *     if(config !== null) {
  *       // ...
  *     }
  *   });
+ * });
+ * ```
+ *
+ * More commonly, a module requests its own configuration
+ * using the [pentaho/module!]{@link pentaho.module.metaOf} AMD/RequireJS loader plugin.
+ *
+ * For example, the `my/Foo` module could obtain its own configuration in the following way:
+ * ```js
+ * define(["pentaho/module!"], function(module) {
+ *
+ *   if(module.config !== null) {
+ *     // ...
+ *   }
  * });
  * ```
  *
@@ -67,4 +81,5 @@
  * @namespace
  */
 
-// TODO: The configuration system should use typeInfo to accept _aliases_ and allow for _configuration inheritance_.
+// TODO: The configuration system should allow for _configuration inheritance_.
+

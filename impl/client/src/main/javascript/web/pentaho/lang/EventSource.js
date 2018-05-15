@@ -18,12 +18,12 @@ define([
   "module",
   "./Base",
   "./Event",
-  "../typeInfo",
+  "../module/metaService",
   "../util/error",
   "../util/object",
   "../util/fun",
   "../util/logger"
-], function(module, Base, Event, typeInfo, error, O, F, logger) {
+], function(module, Base, Event, moduleMetaService, error, O, F, logger) {
 
   "use strict";
 
@@ -160,7 +160,10 @@ define([
         types.forEach(function(type) {
 
           // Resolve alias
-          type = typeInfo.getIdOf(type) || type;
+          var module = moduleMetaService.get(type);
+          if(module !== null) {
+            type = module.id;
+          }
 
           var observerRegistration = find.call(this, type, observer);
           if(observerRegistration) {
@@ -214,7 +217,10 @@ define([
     _hasListeners: function(type, phase) {
 
       // Resolve alias
-      type = typeInfo.getIdOf(type) || type;
+      var module = moduleMetaService.get(type);
+      if(module !== null) {
+        type = module.id;
+      }
 
       var queue = O.getOwn(this.__observersRegistry, type, null);
       if(queue !== null) {
@@ -327,7 +333,10 @@ define([
       }
 
       // Resolve alias
-      type = typeInfo.getIdOf(type) || type;
+      var module = moduleMetaService.get(type);
+      if(module !== null) {
+        type = module.id;
+      }
 
       var queue;
       if((queue = O.getOwn(this.__observersRegistry, type, null)) === null) {
@@ -453,7 +462,10 @@ define([
       }
 
       // Resolve alias
-      type = typeInfo.getIdOf(type) || type;
+      var module = moduleMetaService.get(type);
+      if(module !== null) {
+        type = module.id;
+      }
 
       var queue;
       if((queue = O.getOwn(this.__observersRegistry, type, null)) === null) {
@@ -570,7 +582,10 @@ define([
   function __registerOne(type, observer, priority) {
 
     // Resolve alias
-    type = typeInfo.getIdOf(type) || type;
+    var module = moduleMetaService.get(type);
+    if(module !== null) {
+      type = module.id;
+    }
 
     var queue = __getObserversQueueOf.call(this, type, /* create: */true);
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-(function(global) {
+(function() {
   /* globals requireCfg, CONTEXT_PATH, KARMA_RUN, SESSION_LOCALE, active_theme, ENVIRONMENT_CONFIG */
 
   /* eslint dot-notation: 0, require-jsdoc: 0 */
@@ -43,11 +43,11 @@
   }
 
   var requirePaths = requireCfg.paths;
+  var requirePackages = requireCfg.packages;
   var requireShim = requireCfg.shim;
   var requireMap = requireCfg.map;
 
-  var requireTypeInfo = requireCfg.config["pentaho/typeInfo"] || (requireCfg.config["pentaho/typeInfo"] = {});
-  var requireInstInfo = requireCfg.config["pentaho/instanceInfo"] || (requireCfg.config["pentaho/instanceInfo"] = {});
+  var requireModules = requireCfg.config["pentaho/modules"] || (requireCfg.config["pentaho/modules"] = {});
 
   // region common-ui
   requirePaths["common-ui"] = basePath;
@@ -63,65 +63,79 @@
   // so the paths of all of the following sub-modules must be configured individually.
   // E.g. requirePaths["pentaho/util"] = basePath + "/pentaho/util";
   [
-    "shim", "util", "lang",
-    "i18n", "service", "data", "type", "typeInfo", "instanceInfo",
-    "visual", "config", "environment", "debug", "ccc", "platformBundle"
+    "_core", "shim", "util", "lang",
+    "i18n", "data", "type",
+    "visual", "config", "environment",
+    "debug", "ccc", "module", "platformBundle"
   ].forEach(function(name) {
     requirePaths["pentaho/" + name] = basePath + "/pentaho/" + name;
   });
 
-  // Named instances
-  requireInstInfo["pentaho/config/impl/instanceOfAmdLoadedService"] = {type: "pentaho.config.IService"};
+  requirePackages.push({
+    "name": "pentaho/module",
+    "main": "metaOf"
+  });
 
-  requireTypeInfo["pentaho/type/instance"] = {alias: "instance"};
-  requireTypeInfo["pentaho/type/value"] = {alias: "value", base: "instance"};
-  requireTypeInfo["pentaho/type/property"] = {alias: "property", base: "instance"};
-  requireTypeInfo["pentaho/type/list"] = {alias: "list", base: "value"};
-  requireTypeInfo["pentaho/type/element"] = {alias: "element", base: "value"};
-  requireTypeInfo["pentaho/type/complex"] = {alias: "complex", base: "element"};
-  requireTypeInfo["pentaho/type/simple"] = {alias: "simple", base: "element"};
-  requireTypeInfo["pentaho/type/number"] = {alias: "number", base: "simple"};
-  requireTypeInfo["pentaho/type/string"] = {alias: "string", base: "simple"};
-  requireTypeInfo["pentaho/type/boolean"] = {alias: "boolean", base: "simple"};
-  requireTypeInfo["pentaho/type/date"] = {alias: "date", base: "simple"};
-  requireTypeInfo["pentaho/type/object"] = {alias: "object", base: "simple"};
-  requireTypeInfo["pentaho/type/function"] = {alias: "function", base: "simple"};
-  requireTypeInfo["pentaho/type/typeDescriptor"] = {alias: "type", base: "simple"};
-  requireTypeInfo["pentaho/type/mixins/enum"] = {alias: "enum", base: "element"};
-  requireTypeInfo["pentaho/type/action/base"] = {base: "element"};
+  requirePackages.push({
+    "name": "pentaho/debug",
+    "main": "manager"
+  });
 
-  requireTypeInfo["pentaho/data/filter/abstract"] = {base: "complex"};
-  requireTypeInfo["pentaho/data/filter/true"] = {alias: "true", base: "pentaho/data/filter/abstract"};
-  requireTypeInfo["pentaho/data/filter/false"] = {alias: "false", base: "pentaho/data/filter/abstract"};
-  requireTypeInfo["pentaho/data/filter/tree"] = {base: "pentaho/data/filter/abstract"};
-  requireTypeInfo["pentaho/data/filter/or"] = {alias: "or", base: "pentaho/data/filter/tree"};
-  requireTypeInfo["pentaho/data/filter/and"] = {alias: "and", base: "pentaho/data/filter/tree"};
-  requireTypeInfo["pentaho/data/filter/not"] = {alias: "not", base: "pentaho/data/filter/abstract"};
-  requireTypeInfo["pentaho/data/filter/property"] = {base: "pentaho/data/filter/abstract"};
-  requireTypeInfo["pentaho/data/filter/isEqual"] = {alias: "=", base: "pentaho/data/filter/property"};
-  requireTypeInfo["pentaho/data/filter/isIn"] = {alias: "in", base: "pentaho/data/filter/property"};
-  requireTypeInfo["pentaho/data/filter/isGreater"] = {alias: ">", base: "pentaho/data/filter/property"};
-  requireTypeInfo["pentaho/data/filter/isGreaterOrEqual"] = {alias: ">=", base: "pentaho/data/filter/property"};
-  requireTypeInfo["pentaho/data/filter/isLess"] = {alias: "<", base: "pentaho/data/filter/property"};
-  requireTypeInfo["pentaho/data/filter/isLessOrEqual"] = {alias: "<=", base: "pentaho/data/filter/property"};
-  requireTypeInfo["pentaho/data/filter/isLike"] = {alias: "like", base: "pentaho/data/filter/property"};
+  requirePackages.push({
+    "name": "pentaho/i18n",
+    "main": "serverService"
+  });
 
-  requireTypeInfo["pentaho/visual/base/model"] = {base: "complex"};
-  requireTypeInfo["pentaho/visual/base/view"] = {
-    base: "complex",
-    props: {
-      model: {valueType: "pentaho/visual/base/model"}
-    }
+  requirePackages.push({
+    "name": "pentaho/environment"
+  });
+
+  requireModules["pentaho/config/spec/IRuleSet"] = {base: null, isAbstract: true};
+
+  requireModules["pentaho/type/Instance"] = {alias: "instance", base: null};
+  requireModules["pentaho/type/Value"] = {alias: "value", base: "instance"};
+  requireModules["pentaho/type/Property"] = {alias: "property", base: "instance"};
+  requireModules["pentaho/type/List"] = {alias: "list", base: "value"};
+  requireModules["pentaho/type/Element"] = {alias: "element", base: "value"};
+  requireModules["pentaho/type/Complex"] = {alias: "complex", base: "element"};
+  requireModules["pentaho/type/Simple"] = {alias: "simple", base: "element"};
+  requireModules["pentaho/type/Number"] = {alias: "number", base: "simple"};
+  requireModules["pentaho/type/String"] = {alias: "string", base: "simple"};
+  requireModules["pentaho/type/Boolean"] = {alias: "boolean", base: "simple"};
+  requireModules["pentaho/type/Date"] = {alias: "date", base: "simple"};
+  requireModules["pentaho/type/Object"] = {alias: "object", base: "simple"};
+  requireModules["pentaho/type/Function"] = {alias: "function", base: "simple"};
+  requireModules["pentaho/type/TypeDescriptor"] = {alias: "type", base: "simple"};
+  requireModules["pentaho/type/mixins/Enum"] = {alias: "enum", base: "element"};
+  requireModules["pentaho/type/action/Base"] = {base: "element"};
+
+  requireModules["pentaho/data/filter/Abstract"] = {base: "complex"};
+  requireModules["pentaho/data/filter/True"] = {alias: "true", base: "pentaho/data/filter/Abstract"};
+  requireModules["pentaho/data/filter/False"] = {alias: "false", base: "pentaho/data/filter/Abstract"};
+  requireModules["pentaho/data/filter/Tree"] = {base: "pentaho/data/filter/Abstract"};
+  requireModules["pentaho/data/filter/Or"] = {alias: "or", base: "pentaho/data/filter/Tree"};
+  requireModules["pentaho/data/filter/And"] = {alias: "and", base: "pentaho/data/filter/Tree"};
+  requireModules["pentaho/data/filter/Not"] = {alias: "not", base: "pentaho/data/filter/Abstract"};
+  requireModules["pentaho/data/filter/Property"] = {base: "pentaho/data/filter/Abstract"};
+  requireModules["pentaho/data/filter/IsEqual"] = {alias: "=", base: "pentaho/data/filter/Property"};
+  requireModules["pentaho/data/filter/IsIn"] = {alias: "in", base: "pentaho/data/filter/Property"};
+  requireModules["pentaho/data/filter/IsGreater"] = {alias: ">", base: "pentaho/data/filter/Property"};
+  requireModules["pentaho/data/filter/IsGreaterOrEqual"] = {alias: ">=", base: "pentaho/data/filter/Property"};
+  requireModules["pentaho/data/filter/IsLess"] = {alias: "<", base: "pentaho/data/filter/Property"};
+  requireModules["pentaho/data/filter/IsLessOrEqual"] = {alias: "<=", base: "pentaho/data/filter/Property"};
+  requireModules["pentaho/data/filter/IsLike"] = {alias: "like", base: "pentaho/data/filter/Property"};
+
+  requireModules["pentaho/visual/base/Model"] = {base: "complex"};
+  requireModules["pentaho/visual/base/View"] = {base: "complex"};
+  requireModules["pentaho/visual/role/adaptation/Strategy"] = {base: "complex"};
+  requireModules["pentaho/visual/role/adaptation/IdentityStrategy"] = {
+    base: "pentaho/visual/role/adaptation/Strategy"
   };
-  requireTypeInfo["pentaho/visual/role/adaptation/strategy"] = {base: "complex"};
-  requireTypeInfo["pentaho/visual/role/adaptation/identityStrategy"] = {
-    base: "pentaho/visual/role/adaptation/strategy"
+  requireModules["pentaho/visual/role/adaptation/TupleStrategy"] = {
+    base: "pentaho/visual/role/adaptation/Strategy"
   };
-  requireTypeInfo["pentaho/visual/role/adaptation/tupleStrategy"] = {
-    base: "pentaho/visual/role/adaptation/strategy"
-  };
-  requireTypeInfo["pentaho/visual/role/adaptation/entityWithTimeIntervalKeyStrategy"] = {
-    base: "pentaho/visual/role/adaptation/strategy"
+  requireModules["pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy"] = {
+    base: "pentaho/visual/role/adaptation/Strategy"
   };
   // endregion
 
@@ -177,11 +191,6 @@
   // region Bundled 3rd party libs
   requirePaths["common-ui/jquery"] = basePath + "/jquery/jquery.conflict";
 
-  /*
-   The path for common-ui/jquery-clean must be for a different file used by common-ui/jquery.
-   If the same jquery file was used for both paths, a timeout might occur and the tests would fail.
-   See the third bullet at http://requirejs.org/docs/errors.html#timeout for more information.
-   */
   requirePaths["common-ui/jquery-clean"] = basePath + "/jquery/jquery";
   requireShim["common-ui/jquery-clean"] = {
     exports: "$",
@@ -292,50 +301,50 @@
   // sample/calc theme
   mapTheme("pentaho/visual/samples/calc", "themes", ["ruby"]);
 
-  requireInstInfo["pentaho/visual/config/vizApi.conf"] = {type: "pentaho.config.spec.IRuleSet"};
+  requireModules["pentaho/visual/config/vizApi.conf"] = {type: "pentaho/config/spec/IRuleSet"};
 
-  requireTypeInfo["pentaho/visual/models/abstract"] = {base: "pentaho/visual/base/model"};
-  requireTypeInfo["pentaho/visual/samples/calc/model"] = {base: "pentaho/visual/base/model"};
+  requireModules["pentaho/visual/models/Abstract"] = {base: "pentaho/visual/base/Model"};
+  requireModules["pentaho/visual/samples/calc/Model"] = {base: "pentaho/visual/base/Model"};
   [
-    "pentaho/visual/models/cartesianAbstract",
-    "pentaho/visual/models/categoricalContinuousAbstract",
-    "pentaho/visual/models/barAbstract",
-    "pentaho/visual/models/barNormalizedAbstract",
-    "pentaho/visual/models/barHorizontal",
-    "pentaho/visual/models/bar",
-    "pentaho/visual/models/barStacked",
-    "pentaho/visual/models/barStackedHorizontal",
-    "pentaho/visual/models/barNormalized",
-    "pentaho/visual/models/barNormalizedHorizontal",
-    "pentaho/visual/models/barLine",
-    "pentaho/visual/models/line",
-    "pentaho/visual/models/pointAbstract",
-    "pentaho/visual/models/metricPointAbstract",
-    "pentaho/visual/models/areaStacked",
-    "pentaho/visual/models/pie",
-    "pentaho/visual/models/heatGrid",
-    "pentaho/visual/models/sunburst",
-    "pentaho/visual/models/donut",
-    "pentaho/visual/models/scatter",
-    "pentaho/visual/models/bubble"
+    "pentaho/visual/models/CartesianAbstract",
+    "pentaho/visual/models/CategoricalContinuousAbstract",
+    "pentaho/visual/models/BarAbstract",
+    "pentaho/visual/models/BarNormalizedAbstract",
+    "pentaho/visual/models/BarHorizontal",
+    "pentaho/visual/models/Bar",
+    "pentaho/visual/models/BarStacked",
+    "pentaho/visual/models/BarStackedHorizontal",
+    "pentaho/visual/models/BarNormalized",
+    "pentaho/visual/models/BarNormalizedHorizontal",
+    "pentaho/visual/models/BarLine",
+    "pentaho/visual/models/Line",
+    "pentaho/visual/models/PointAbstract",
+    "pentaho/visual/models/MetricPointAbstract",
+    "pentaho/visual/models/AreaStacked",
+    "pentaho/visual/models/Pie",
+    "pentaho/visual/models/HeatGrid",
+    "pentaho/visual/models/Sunburst",
+    "pentaho/visual/models/Donut",
+    "pentaho/visual/models/Scatter",
+    "pentaho/visual/models/Bubble"
   ].forEach(function(name) {
-    requireTypeInfo[name] = {base: "pentaho/visual/models/abstract"};
+    requireModules[name] = {base: "pentaho/visual/models/Abstract"};
   });
   // endregion
 
   // TODO: this should be removed from here, and to the GEO plugin's package.json
   // when it is possible to specify global maps or an option that achieves the same effect.
-  requireMap["*"]["pentaho/visual/models/geoMap"] = "pentaho/geo/visual_${project.version}/model";
-  requireMap["*"]["pentaho/geo/visual/map"] = "pentaho/geo/visual_${project.version}/view";
+  requireMap["*"]["pentaho/visual/models/GeoMap"] = "pentaho/geo/visual_${project.version}/Model";
+  requireMap["*"]["pentaho/geo/visual/Map"] = "pentaho/geo/visual_${project.version}/View";
 
   // VizAPI actions
-  requireTypeInfo["pentaho/visual/action/base"] = {base: "pentaho/type/action/base"};
-  requireTypeInfo["pentaho/visual/action/select"] = {alias: "select", base: "pentaho/visual/action/base"};
-  requireTypeInfo["pentaho/visual/action/execute"] = {alias: "execute", base: "pentaho/visual/action/base"};
-  requireTypeInfo["pentaho/visual/action/update"] = {base: "pentaho/visual/action/base"};
+  requireModules["pentaho/visual/action/Base"] = {base: "pentaho/type/action/Base"};
+  requireModules["pentaho/visual/action/Select"] = {alias: "select", base: "pentaho/visual/action/Base"};
+  requireModules["pentaho/visual/action/Execute"] = {alias: "execute", base: "pentaho/visual/action/Base"};
+  requireModules["pentaho/visual/action/Update"] = {base: "pentaho/visual/action/Base"};
 
   // Color Palettes
-  requireTypeInfo["pentaho/visual/color/palette"] = {base: "complex"};
+  requireModules["pentaho/visual/color/Palette"] = {base: "complex"};
 
   [
     "pentaho/visual/color/palettes/nominalPrimary",
@@ -351,7 +360,7 @@
     "pentaho/visual/color/palettes/divergentRyb3",
     "pentaho/visual/color/palettes/divergentRyb5"
   ].forEach(function(id) {
-    requireInstInfo[id] = {type: "pentaho/visual/color/palette"};
+    requireModules[id] = {type: "pentaho/visual/color/Palette"};
   });
 
   // Copied by hand of /target/requireCfg.bundles.js
@@ -639,5 +648,4 @@
       "pentaho/ccc/visual/all"
     ];
   }
-
-})(this);
+})();

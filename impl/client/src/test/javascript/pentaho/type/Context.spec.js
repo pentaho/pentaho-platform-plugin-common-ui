@@ -110,12 +110,10 @@ define([
 
           localRequire.config({
             config: {
-              "pentaho/typeInfo": {
-                "Foo": {"base": "complex"}
-              },
-              "pentaho/instanceInfo": {
+              "pentaho/modules": {
+                "Foo": {"base": "complex"},
                 "myFoo": {"type": "Foo"},
-                "myConfigModule": {"type": "pentaho.config.spec.IRuleSet"}
+                "myConfigModule": {"type": "pentaho/config/spec/IRuleSet"}
               }
             }
           });
@@ -519,8 +517,8 @@ define([
 
             localRequire.config({
               config: {
-                "pentaho/typeInfo": {
-                  "test/type/a": {alias: "XYZ"}
+                "pentaho/modules": {
+                  "test/type/a": {alias: "XYZ", base: null}
                 }
               }
             });
@@ -2119,8 +2117,8 @@ define([
 
         localRequire.config({
           config: {
-            "pentaho/typeInfo": {
-              "exp/thing": {},
+            "pentaho/modules": {
+              "exp/thing": {base: null},
               "exp/foo":   {base: "exp/thing"},
               "exp/bar":   {base: "exp/thing"},
               "exp/dude":  {base: "pentaho/type/value"},
@@ -2288,13 +2286,11 @@ define([
 
         localRequire.config({
           config: {
-            "pentaho/typeInfo": {
-              "exp/thing": {},
+            "pentaho/modules": {
+              "exp/thing": {base: null},
               "exp/foo": {base: "exp/thing"},
-              "exp/bar": {base: "exp/thing"}
-            },
-            "pentaho/instanceInfo": {
-              "myConfigModule": {"type": "pentaho.config.spec.IRuleSet"}
+              "exp/bar": {base: "exp/thing"},
+              "myConfigModule": {type: "pentaho/config/spec/IRuleSet"}
             }
           }
         });
@@ -2457,8 +2453,8 @@ define([
 
         localRequire.config({
           config: {
-            "pentaho/typeInfo": {
-              "exp/thing": {},
+            "pentaho/modules": {
+              "exp/thing": {base: null},
               "exp/foo":   {base: "exp/thing"},
               "exp/bar":   {base: "exp/thing"}
             }
@@ -2523,8 +2519,8 @@ define([
 
         localRequire.config({
           config: {
-            "pentaho/instanceInfo": {
-              "myConfigModule": {"type": "pentaho.config.spec.IRuleSet"}
+            "pentaho/modules": {
+              "myConfigModule": {"type": "pentaho/config/spec/IRuleSet"}
             }
           }
         });

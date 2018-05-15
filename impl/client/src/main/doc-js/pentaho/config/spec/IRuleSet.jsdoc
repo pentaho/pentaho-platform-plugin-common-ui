@@ -78,8 +78,8 @@
  * 3. selects a theme (and the other doesn't),
  * 4. selects a locale (and the other doesn't),
  * 5. selects an application (and the other doesn't),
- * 6. belongs to a type configuration that was added later, or
- * 7. it is at a greater index in the type configuration rules list.
+ * 6. belongs to a rule set that was added later, or
+ * 7. it is at a greater index within a rule set.
  *
  * ### Rule's Configuration Merging
  *

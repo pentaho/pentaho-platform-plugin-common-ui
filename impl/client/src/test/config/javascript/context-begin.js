@@ -84,11 +84,7 @@ var requireCfg = {
   map:   {"*": {}},
   bundles:  {},
   config:   {
-    "pentaho/service": {
-    },
-    "pentaho/typeInfo": {
-    },
-    "pentaho/instanceInfo": {
+    "pentaho/modules": {
     },
     "pentaho/environment": {
       locale: SESSION_LOCALE,
@@ -120,7 +116,7 @@ var KARMA_DEBUG = false;
  * for development purposes.
  *
  * The expression is evaluated on the part of the spec file name that is after
- * `test-js/unit/` and before the `.spec.js` extension (e.g. `"pentaho/service"`).
+ * `test-js/unit/` and before the `.spec.js` extension (e.g. `"pentaho/modules"`).
  *
  * @type RegExp
  *

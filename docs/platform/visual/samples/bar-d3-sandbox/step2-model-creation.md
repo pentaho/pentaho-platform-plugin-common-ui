@@ -199,8 +199,8 @@ matches the [level]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.col
 Your visualization must be advertised to the platform so that applications like Analyzer and PDI can offer it to users.
 This is done by registering 
 the visualization's [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) module
-with [`pentaho/typeInfo`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.typeInfo'}}),
-as a subtype of `pentaho/visual/base/model`.
+with [`pentaho/modules`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.modules'}}),
+as a subtype of `pentaho/visual/base/Model`.
 
 For such, edit the `package.json` file and make sure it looks like this:
 
@@ -210,9 +210,9 @@ For such, edit the `package.json` file and make sure it looks like this:
   "version": "0.0.1",
 
   "config": {
-    "pentaho/typeInfo": {
-      "pentaho-visual-samples-bar-d3/model": {
-        "base": "pentaho/visual/base/model"
+    "pentaho/modules": {
+      "pentaho-visual-samples-bar-d3/Model": {
+        "base": "pentaho/visual/base/Model"
       }
     }
   },

@@ -363,9 +363,9 @@ define([
 
             localRequire.config({
               config: {
-                "pentaho/typeInfo": {
-                  "CustomStrategyA": {base: "pentaho/visual/role/adaptation/strategy"},
-                  "CustomStrategyB": {base: "pentaho/visual/role/adaptation/strategy"}
+                "pentaho/modules": {
+                  "CustomStrategyA": {base: "pentaho/visual/role/adaptation/Strategy"},
+                  "CustomStrategyB": {base: "pentaho/visual/role/adaptation/Strategy"}
                 }
               }
             });
@@ -432,12 +432,9 @@ define([
 
             localRequire.config({
               config: {
-                "pentaho/typeInfo": {
-                  "CustomStrategyA": {base: "pentaho/visual/role/adaptation/strategy"}
-                },
-
-                "pentaho/instanceInfo": {
-                  "my/configModule": {"type": "pentaho.config.spec.IRuleSet"}
+                "pentaho/modules": {
+                  "CustomStrategyA": {base: "pentaho/visual/role/adaptation/strategy"},
+                  "my/configModule": {type: "pentaho/config/spec/IRuleSet"}
                 }
               }
             });

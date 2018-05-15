@@ -20,8 +20,8 @@ In the same manner, **instances** are known only by their _string_ identifier
 Typically, 
 configurations are provided as the value returned by an AMD/RequireJS module.
 This module needs to be advertised to the configuration system by registering it
-with [`pentaho/instanceInfo`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.instanceInfo'}}),
-as an instance of type [`pentaho.config.spec.IRuleSet`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRuleSet'}}).
+with [`pentaho/modules`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.modules'}}),
+as an instance of type [`pentaho/config/spec/IRuleSet`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRuleSet'}}).
 
 **Configuration Rules** are composed of the following parts:
 

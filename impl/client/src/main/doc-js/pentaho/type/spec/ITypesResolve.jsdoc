@@ -27,8 +27,8 @@
  * ```
  *
  * A type is known to be a subtype of another if,
- * in its {@link pentaho.typeInfo} declaration,
- * the latter is the value of {@link pentaho.typeInfo.spec.IDeclaration#base}.
+ * in its {@link pentaho.modules} declaration,
+ * the latter is the value of {@link pentaho.modules.spec.IDeclaration#base}.
  *
  * @name pentaho.type.spec.ITypesResolve
  * @interface
