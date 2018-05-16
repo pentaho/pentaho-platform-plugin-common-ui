@@ -344,11 +344,13 @@ define([
 
           return require.using([
             "pentaho/visual/base/Model",
-            "pentaho/visual/base/modelAdapter",
+            "pentaho/visual/base/ModelAdapter",
             "pentaho/visual/role/ExternalProperty",
             "CustomStrategyA",
-            "CustomStrategyB"
-          ], configAmd, function(Model, ModelAdapter, ExternalProperty, CustomStrategyA, CustomStrategyB) {
+            "CustomStrategyB",
+            "tests/pentaho/visual/role/adaptationUtil"
+          ], configAmd, function(Model, ModelAdapter, ExternalProperty, CustomStrategyA, CustomStrategyB,
+                                 adaptationUtil) {
 
             var DerivedModel = Model.extend({
               $type: {
@@ -364,7 +366,7 @@ define([
 
             spyOn(ExternalProperty.type, "__setStrategyTypes");
 
-            var DerivedModelAdapter = buildAdapter(DerivedModel);
+            var DerivedModelAdapter = adaptationUtil.buildAdapter(DerivedModel);
 
             var propType = DerivedModelAdapter.type.get("stringKeyRole");
 
@@ -385,27 +387,16 @@ define([
             localRequire.define("CustomStrategyA", ["pentaho/visual/role/adaptation/Strategy"], function(Strategy) {
               return Strategy.extend({
                 $type: {
-                  getInputTypeFor: function() { return null; }
+                  getInputTypeFor: function() { return null; },
+                  isBrowsable: false
                 }
               });
-            });
-
-            localRequire.define("my/configModule", function() {
-              return {
-                rules: [{
-                  select: {type: "CustomStrategyA"},
-                  apply: {
-                    isBrowsable: false
-                  }
-                }]
-              };
             });
 
             localRequire.config({
               config: {
                 "pentaho/modules": {
-                  "CustomStrategyA": {base: "pentaho/visual/role/adaptation/Strategy"},
-                  "my/configModule": {type: "pentaho/config/spec/IRuleSet"}
+                  "CustomStrategyA": {base: "pentaho/visual/role/adaptation/Strategy"}
                 }
               }
             });
@@ -413,10 +404,11 @@ define([
 
           return require.using([
             "pentaho/visual/base/Model",
-            "pentaho/visual/base/modelAdapter",
-            "pentaho/visual/role/externalProperty",
-            "CustomStrategyA"
-          ], configAmd, function(Model, ModelAdapter, ExternalProperty, CustomStrategyA) {
+            "pentaho/visual/base/ModelAdapter",
+            "pentaho/visual/role/ExternalProperty",
+            "CustomStrategyA",
+            "tests/pentaho/visual/role/adaptationUtil"
+          ], configAmd, function(Model, ModelAdapter, ExternalProperty, CustomStrategyA, adaptationUtil) {
 
             var DerivedModel = Model.extend({
               $type: {
@@ -432,7 +424,7 @@ define([
 
             spyOn(ExternalProperty.type, "__setStrategyTypes");
 
-            var DerivedModelAdapter = buildAdapter(DerivedModel);
+            var DerivedModelAdapter = adaptationUtil.buildAdapter(DerivedModel);
 
             var propType = DerivedModelAdapter.type.get("stringKeyRole");
 
@@ -606,7 +598,7 @@ define([
             it("should have countRange.min = 1 if internal role is required", function() {
 
               CustomModel = buildCustomModel(ModelWithStringRole, {
-                name: "roleA", fields: { isRequired: true }
+                name: "roleA", fields: {isRequired: true}
               });
 
               var DerivedModelAdapter = buildAdapter(CustomModel);

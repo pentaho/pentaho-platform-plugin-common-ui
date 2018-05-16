@@ -930,7 +930,7 @@ define([
             });
 
             var result = 1;
-            sloppyModeUtil.itShouldReturnValueWhateverTheSloppyValue(getter, ["x"], result);
+            sloppyModeUtil.itShouldReturnValueWhateverTheSloppyValue(getter, ["xs"], result);
           });
 
           describe("test 2", function() {
@@ -939,7 +939,7 @@ define([
             });
 
             var result = 2;
-            sloppyModeUtil.itShouldReturnValueWhateverTheSloppyValue(getter, ["x"], result);
+            sloppyModeUtil.itShouldReturnValueWhateverTheSloppyValue(getter, ["xs"], result);
           });
         });
       }); // end countOf

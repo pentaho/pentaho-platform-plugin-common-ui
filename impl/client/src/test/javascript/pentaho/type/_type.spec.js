@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/loader",
+  "pentaho/type/_baseLoader",
   "pentaho/type/Instance",
   "pentaho/type/SpecificationContext",
   "tests/pentaho/util/errorMatch"

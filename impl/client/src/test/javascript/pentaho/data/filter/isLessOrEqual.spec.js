@@ -41,6 +41,7 @@ define([
       valueType: "number",
       rawValue: 42,
       kind: "isLessOrEqual",
+      id: "IsLessOrEqual",
       alias: "<="
     });
 

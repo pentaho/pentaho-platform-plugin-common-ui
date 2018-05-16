@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/data/filter/Abstract",
-  "pentaho/data/filter/tree",
+  "pentaho/data/filter/Tree",
   "pentaho/type/Complex",
   "tests/pentaho/util/errorMatch"
 ], function(AbstractFilter, TreeFilter, Complex, errorMatch) {
@@ -24,7 +24,6 @@ define([
 
   describe("pentaho.data.filter.Tree", function() {
 
-    var Complex;
     var CustomFilter;
     var CustomTreeFilter;
     var ProductSummary;

@@ -16,7 +16,7 @@
 define([
   "pentaho/type/TypeDescriptor",
   "pentaho/type/Simple",
-  "pentaho/type/TypeDescriptor",
+  "pentaho/type/Boolean",
   "tests/pentaho/util/errorMatch"
 ], function(TypeDescriptor, Simple, PentahoBoolean, errorMatch) {
 

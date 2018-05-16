@@ -111,7 +111,7 @@ define([
             noAlias: true
           });
 
-          expect(filterSpec._).toBe("pentaho/data/filter/true");
+          expect(filterSpec._).toBe("pentaho/data/filter/True");
         });
       });
     }); // #toSpec

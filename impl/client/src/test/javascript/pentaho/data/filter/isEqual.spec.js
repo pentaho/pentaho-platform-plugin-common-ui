@@ -159,7 +159,7 @@ define([
             noAlias: true
           });
 
-          expect(filterSpec._).toBe("pentaho/data/filter/isEqual");
+          expect(filterSpec._).toBe("pentaho/data/filter/IsEqual");
         });
       });
 

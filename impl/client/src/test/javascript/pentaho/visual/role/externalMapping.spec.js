@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/visual/base/Model",
-  "pentaho/visual/base/ModelAdapter",
-  "pentaho/visual/role/adaptation/Strategy",
   "pentaho/data/Table",
   "../role/adaptationUtil"
-], function(Model, ModelAdapter, Table, adaptationUtil) {
+], function(Table, adaptationUtil) {
 
   "use strict";
 

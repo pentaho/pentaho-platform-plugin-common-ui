@@ -46,9 +46,10 @@ define([
     });
 
     it("should have environment be the global environment", function() {
+
       var environment = {};
 
-      localRequire.define("pentaho/environment", function() {
+      localRequire.define("pentaho/environment/main", function() {
         return environment;
       });
 
@@ -67,8 +68,10 @@ define([
         }
       };
 
-      localRequire.define("pentaho/modules", function() {
-        return modulesMap;
+      localRequire.config({
+        config: {
+          "pentaho/modules": modulesMap
+        }
       });
 
       return localRequire.promise(["pentaho/_core/main!"])

@@ -250,7 +250,7 @@ define([
             noAlias: true
           });
 
-          expect(filterSpec._).toBe("pentaho/data/filter/not");
+          expect(filterSpec._).toBe("pentaho/data/filter/Not");
         });
       });
 

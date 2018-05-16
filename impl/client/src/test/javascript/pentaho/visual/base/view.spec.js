@@ -31,7 +31,6 @@ define([
     var Model;
     var model;
     var dataTable;
-    var context;
 
     function createValidAndDirtyView() {
       return new BaseView({
@@ -186,7 +185,7 @@ define([
 
         var promise = view.update();
 
-        promise.then(function() {
+        return promise.then(function() {
           expect(view._onUpdateInit).toHaveBeenCalled();
           expect(view._onUpdateWill).toHaveBeenCalledWith(actionExecution);
           expect(view._onUpdateDo).toHaveBeenCalledWith(actionExecution);
@@ -412,6 +411,8 @@ define([
           });
 
           var p = view.update();
+
+          expect(typeof _resolve).toBe("function");
 
           expect(p).toBe(view.update());
 
@@ -1007,12 +1008,10 @@ define([
 
     describe("#isUpdating", function() {
 
-      var UpdateAction;
       var view;
 
       beforeEach(function() {
         // Assuming pre-loaded with View
-        UpdateAction = context.get("pentaho/visual/action/Update");
         view = new BaseView({
           width: 100,
           height: 100,
@@ -1436,7 +1435,9 @@ define([
 
         view.on(CustomSyncAction.type.id, observer);
 
-        view.act(new CustomSyncAction()).promise.then(function() {
+        return view.act(new CustomSyncAction()).promise.then(function() {
+          return Promise.reject("Should have been rejected.");
+        }, function() {
           expect(observer.init).toHaveBeenCalled();
           expect(observer.will).not.toHaveBeenCalled();
           expect(observer["do"]).not.toHaveBeenCalled();
@@ -1461,7 +1462,9 @@ define([
 
         view.on(CustomSyncAction.type.id, observer);
 
-        view.act(new CustomSyncAction()).promise.then(function() {
+        return view.act(new CustomSyncAction()).promise.then(function() {
+          return Promise.reject("Should have been rejected.");
+        }, function() {
           expect(observer.init).toHaveBeenCalled();
           expect(observer.will).toHaveBeenCalled();
           expect(observer["do"]).not.toHaveBeenCalled();
@@ -1511,7 +1514,7 @@ define([
       it("should return a promise that is rejected when the type of model refers an " +
           "undefined view type", function() {
 
-        var SubModel = Model.extend({$type: {defaultView: "test/foo/bar/View"}});
+        var SubModel = Model.extend({$type: {defaultView: "test/missing"}});
 
         return testUtils.expectToRejectWith(function() { return BaseView.getClassAsync(SubModel.type); }, {
           asymmetricMatch: function(error) { return error instanceof Error; }
@@ -1520,7 +1523,7 @@ define([
 
       it("should return a promise that is rejected when the model type identifier does not exist", function() {
 
-        return testUtils.expectToRejectWith(function() { return BaseView.getClassAsync("test/foo/bar"); }, {
+        return testUtils.expectToRejectWith(function() { return BaseView.getClassAsync("test/missing"); }, {
           asymmetricMatch: function(error) { return error instanceof Error; }
         });
       });

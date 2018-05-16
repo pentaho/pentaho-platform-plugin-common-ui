@@ -15,9 +15,10 @@
  */
 define([
   "pentaho/type/Value",
+  "pentaho/type/Complex",
   "pentaho/type/SpecificationScope",
   "tests/pentaho/type/serializationUtil"
-], function(Value, SpecificationScope, serializationUtil) {
+], function(Value, Complex, SpecificationScope, serializationUtil) {
 
   "use strict";
 
@@ -198,7 +199,7 @@ define([
         });
 
         it("should not serialize base when it is Complex", function() {
-          var Complex = context.get("pentaho/type/Complex");
+
           var DerivedComplex = Complex.extend();
 
           var scope = new SpecificationScope();

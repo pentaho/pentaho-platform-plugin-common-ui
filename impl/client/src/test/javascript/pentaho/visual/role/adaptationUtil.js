@@ -83,6 +83,7 @@ define([
         },
 
         map: function() {},
+        invert: function() {},
 
         $type: {
           getInputTypeFor: function(outputDataType, isVisualKey) {
@@ -116,6 +117,7 @@ define([
         },
 
         map: function() {},
+        invert: function() {},
 
         $type: {
           getInputTypeFor: function(outputDataType, isVisualKey) {
@@ -160,6 +162,7 @@ define([
         },
 
         map: function() {},
+        invert: function() {},
 
         $type: {
           getInputTypeFor: function(outputDataType, isVisualKey) {

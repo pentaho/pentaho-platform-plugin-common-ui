@@ -44,11 +44,11 @@ define([
 
       function defineCustomFilter(localRequire) {
 
-        localRequire.define("tests/filter/custom", ["pentaho/data/filter/Abstract"], function(AbstractFilter) {
+        localRequire.define("tests/filter/Custom", ["pentaho/data/filter/Abstract"], function(AbstractFilter) {
 
           return AbstractFilter.extend({
             $type: {
-              id: "tests/filter/custom"
+              id: "tests/filter/Custom"
             }
           });
         });

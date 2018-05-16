@@ -303,7 +303,7 @@ define([
             noAlias: true
           });
 
-          expect(filterSpec._).toBe("pentaho/data/filter/or");
+          expect(filterSpec._).toBe("pentaho/data/filter/Or");
         });
       });
 

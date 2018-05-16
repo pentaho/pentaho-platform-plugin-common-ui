@@ -19,8 +19,9 @@ define([
   "pentaho/visual/role/AbstractMapping",
   "pentaho/visual/color/PaletteProperty",
   "pentaho/data/filter/Abstract",
-  "pentaho/data/Table"
-], function(AbstractModel, RoleAbstractProperty, RoleAbstractMapping, PaletteProperty, AbstractFilter, Table) {
+  "pentaho/data/Table",
+  "pentaho/type/Complex"
+], function(AbstractModel, RoleAbstractProperty, RoleAbstractMapping, PaletteProperty, AbstractFilter, Table, Complex) {
 
   "use strict";
 
@@ -164,7 +165,7 @@ define([
 
       it("should not serialize the `selectionFilter` property by default", function() {
         var model = new Model({
-          selectionFilter: {_: "pentaho/data/filter/and"}
+          selectionFilter: {_: "pentaho/data/filter/And"}
         });
 
         expect(!!model.get("selectionFilter")).toBe(true);
@@ -194,7 +195,7 @@ define([
 
       it("should serialize the `selectionFilter` property if keyArgs.omitProps.selectionFilter = false", function() {
         var model = new Model({
-          selectionFilter: {_: "pentaho/data/filter/and"}
+          selectionFilter: {_: "pentaho/data/filter/And"}
         });
 
         expect(!!model.get("selectionFilter")).toBe(true);
@@ -225,7 +226,7 @@ define([
         var model = new Model({
           width: 1,
           height: 1,
-          selectionFilter: {_: "pentaho/data/filter/and"}
+          selectionFilter: {_: "pentaho/data/filter/And"}
         });
 
         expect(!!model.get("selectionFilter")).toBe(true);
@@ -433,7 +434,8 @@ define([
         });
 
         it("should return false if type is not a Mapping", function() {
-          var NotRoleProp = context.get("complex");
+
+          var NotRoleProp = Complex;
 
           expect(Model.type.isVisualRole(NotRoleProp.type)).toBe(false);
         });
@@ -451,7 +453,7 @@ define([
 
         it("should return false if type is not a Color Palette", function() {
 
-          var NotPaletteProp = context.get("complex");
+          var NotPaletteProp = Complex;
 
           expect(Model.type.isColorPalette(NotPaletteProp.type)).toBe(false);
         });

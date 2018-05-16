@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "pentaho/shim/es6-promise"
+], function() {
 
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false */
-
-  describe("pentaho.environment", function() {
+  describe("pentaho.environment.main", function() {
 
     // Gets the value of a property path.
     function getPath(o, path, dv, create) {
@@ -55,6 +55,7 @@ define(function() {
           if(o != null) o[pLast] = v;
         }
       }
+
       return o;
     }
 
@@ -130,6 +131,5 @@ define(function() {
     testEnvironmentProperty("locale", "locale", "ABC", "abc");
 
     testEnvironmentProperty("reservedChars", "reservedChars", "ABC");
-
-  }); // pentaho.environment
+  });
 });

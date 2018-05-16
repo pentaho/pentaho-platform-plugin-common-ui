@@ -15,10 +15,10 @@
  */
 define([
   "pentaho/type/action/impl/Target",
-  "pentaho/type/action/Execution",
   "pentaho/type/action/Base",
+  "pentaho/type/action/Execution",
   "pentaho/lang/Base"
-], function(TargetMixin, BaseAction, Base, Execution) {
+], function(TargetMixin, BaseAction, Execution, Base) {
 
   "use strict";
 
@@ -47,7 +47,7 @@ define([
       });
 
       // A Complex type with the Target mixin applied.
-      CustomTarget = Base.extend().mixin(TargetMixin);
+      CustomTarget = Base.extend().mix(TargetMixin);
     });
 
     describe(".GenericActionExecution", function() {

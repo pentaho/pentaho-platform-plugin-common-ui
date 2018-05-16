@@ -19,66 +19,9 @@ define([
 
   "use strict";
 
-  /* global it:false, expect:false, Promise:false */
-
   return {
-    toAsyncJasmine: toAsyncJasmine,
-    itAsync: itAsync,
-    modal: modal,
     expectToRejectWith: expectToRejectWith
   };
-
-  /**
-   * Creates a function that adapts a given promise-based async test
-   * to a callback-based Jasmine-style async test.
-   *
-   * @param {function(any) : ?Promise} asyncTest - A promise-based async test function.
-   *
-   * @return {function(function)} A Jasmine-style async test function.
-   */
-  function toAsyncJasmine(asyncTest) {
-    // Already has a `done` argument?
-    if(asyncTest.length > 0) {
-      return asyncTest;
-    }
-
-    return function(done) {
-      var promise = asyncTest();
-      if(!promise)
-        done();
-      else
-        promise.then(done, done.fail);
-    };
-  }
-
-  /**
-   * A Jasmine `it` function replacement that supports promise-based test functions,
-   * besides Jasmine-style test functions.
-   *
-   * @param {string} description -  The test description.
-   * @param {function(any) : ?Promise} test - A promise-based async test function.
-   */
-  function itAsync(description, test) {
-    it(description, toAsyncJasmine(test));
-  }
-
-  /**
-   * Creates a promise that is resolved by waiting for all resulting promises
-   * of calling the given _modal_ test function with each of the given modes.
-   *
-   * @param {Array} modes  - An array of modes. Modes can be anything.
-   * @param {function(any) : ?Promise} modalTest - A function that when given a mode returns a promise.
-   *
-   * @return {Promise} The overall promise.
-   */
-  function modal(modes, modalTest) {
-
-    return Promise.all(modes.map(testMode));
-
-    function testMode(mode) {
-      return Promise.resolve(modalTest(mode));
-    }
-  }
 
   /**
    * Jasmine helper that _expects_ that a given async function

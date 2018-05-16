@@ -23,7 +23,6 @@ define([
 
   describe("pentaho.data.filter.IsGreaterOrEqual", function() {
 
-    var IsGreaterOrEqualFilter;
     var ProductSummary;
 
     beforeAll(function() {
@@ -42,6 +41,7 @@ define([
       valueType: "number",
       rawValue: 42,
       kind: "isGreaterOrEqual",
+      id: "IsGreaterOrEqual",
       alias: ">="
     });
 

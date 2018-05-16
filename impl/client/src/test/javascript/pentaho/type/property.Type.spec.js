@@ -45,7 +45,8 @@ define([
 
       var Derived;
 
-      beforeAll(function() {
+      // Must be each. Accessors are created in createRoot.
+      beforeEach(function() {
         Derived = Complex.extend();
       });
 
@@ -1279,7 +1280,7 @@ define([
 
         it("should allow defining and setting to a function an attribute that has no cast function", function() {
 
-          return require.using("pentaho/type/Property", function(Property2) {
+          return require.using(["pentaho/type/Property"], function(Property2) {
             Property2.implement({
               $type: {
                 dynamicAttributes: {

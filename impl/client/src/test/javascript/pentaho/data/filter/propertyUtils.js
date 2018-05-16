@@ -24,6 +24,7 @@ define(function() {
     var valueType = params.valueType;
     var rawValue = params.rawValue;
     var alias = params.alias;
+    var idSuffix = params.id;
 
     describe("Property like behaviour for " + filterName, function() {
 
@@ -143,7 +144,7 @@ define(function() {
               noAlias: true
             });
 
-            expect(filterSpec._).toBe("pentaho/data/filter/" + filterName);
+            expect(filterSpec._).toBe("pentaho/data/filter/" + idSuffix);
           });
         });
       }); // #toSpec

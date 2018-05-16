@@ -15,6 +15,7 @@
  */
 define([
   "pentaho/type/loader",
+  "pentaho/type/changes/Transaction",
   "pentaho/visual/base/Model",
   "pentaho/visual/base/ModelAdapter",
   "pentaho/visual/role/adaptation/Strategy",
@@ -22,7 +23,7 @@ define([
   "pentaho/data/Table",
   "../role/adaptationUtil",
   "tests/pentaho/util/errorMatch"
-], function(typeLoader, Model, ModelAdapter, BaseStrategy, ExternalProperty, Table, adaptationUtil, errorMatch) {
+], function(typeLoader, Transaction, Model, ModelAdapter, BaseStrategy, ExternalProperty, Table, adaptationUtil, errorMatch) {
 
   "use strict";
 
@@ -706,7 +707,7 @@ define([
           var strategy1 = modelAdapter.roleA.strategy;
           expect(strategy1).not.toBe(null);
 
-          modelAdapter.$type.context.enterChange().using(function(scope) {
+          Transaction.enter().using(function(scope) {
 
             // Create a changeset, but with no changes...
             modelAdapter.roleA.fields = modelAdapter.roleA.fields.toArray(function(mappingField) {
@@ -800,11 +801,16 @@ define([
           expect(selectionFilter1).not.toBe(null);
 
           ElementIdentityStrategy.prototype.map.and.callFake(function() {
-            return [new Cell("PT4", "Portugal")];
+            return [new Cell("PT3", "Portugal")];
+          });
+          spyOn(ElementIdentityStrategy.prototype, "invert").and.callFake(function() {
+            return [new Cell("PT3", "Portugal")];
           });
 
           // ---
-
+          // Doing this updates the internal model's selectionFilter, but then,
+          // also, that updates back the external model's selectionFilter...
+          // That's why the `invert` spy, above is needed.
           modelAdapter.selectionFilter = {_: "=", p: "country", v: "PT3"};
 
           // ---
@@ -843,13 +849,20 @@ define([
           });
 
           ElementIdentityStrategy.prototype.map.and.callFake(function() {
-            return [new Cell("PT4", "Portugal")];
+            return [new Cell("PT3", "Portugal")];
           });
+          spyOn(ElementIdentityStrategy.prototype, "invert").and.callFake(function() {
+            return [new Cell("PT3", "Portugal")];
+          });
+
 
           var strategy1 = modelAdapter.roleA.strategy;
           expect(strategy1).not.toBe(null);
 
           // ---
+          // Doing this updates the internal model's selectionFilter, but then,
+          // also, that updates back the external model's selectionFilter...
+          // That's why the `invert` spy, above is needed.
 
           modelAdapter.selectionFilter = {_: "=", p: "country", v: "PT3"};
 
@@ -888,13 +901,20 @@ define([
           });
 
           ElementIdentityStrategy.prototype.map.and.callFake(function() {
-            return [new Cell("PT4", "Portugal")];
+            return [new Cell("PT3", "Portugal")];
           });
+          spyOn(ElementIdentityStrategy.prototype, "invert").and.callFake(function() {
+            return [new Cell("PT3", "Portugal")];
+          });
+
 
           var internalData1 = modelAdapter.model.data;
           expect(internalData1).not.toBe(null);
 
           // ---
+          // Doing this updates the internal model's selectionFilter, but then,
+          // also, that updates back the external model's selectionFilter...
+          // That's why the `invert` spy, above is needed.
 
           modelAdapter.selectionFilter = {_: "=", p: "country", v: "PT3"};
 

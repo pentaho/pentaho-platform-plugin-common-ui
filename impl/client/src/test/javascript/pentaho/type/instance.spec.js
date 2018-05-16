@@ -110,29 +110,6 @@ define([
       });
     });
 
-    describe("get/set type of a derived class - ", function() {
-
-      var Derived;
-
-      beforeEach(function() {
-        Derived = Instance.extend({$type: {"someAttribute": "someValue"}});
-      });
-
-      it("setting a falsy type has no consequence", function() {
-
-        ["", null, undefined, false, 0, {}].forEach(function(type) {
-          Derived.type = type;
-          var inst = new Derived();
-          expect(inst.$type.someAttribute).toBe("someValue");
-        });
-      });
-
-      it("allows setting a .type property", function() {
-        Derived.type = {"someAttribute": "someOtherValue"};
-        expect(Derived.Type.someAttribute).toBe("someOtherValue");
-      });
-    });
-
     describe("get/set type of an instance - ", function() {
 
       var inst;
@@ -159,108 +136,6 @@ define([
         inst.$type = {};
         expect(inst.$type).not.toBeFalsy();
         expect(inst.$type.id).toBe(id);
-      });
-    });
-  });
-
-  describe("pentaho.type.Instance - custom AMD context", function() {
-
-    describe(".extend()", function() {
-
-      describe("$type.id defaulting", function() {
-
-        it("should not default $type.id when it is specified", function() {
-
-          function configAmd(localRequire) {
-
-            localRequire.define("test/module/id", ["pentaho/type/Complex"], function(Complex) {
-
-              return Complex.extend({
-                $type: {
-                  id: "test/type/id"
-                }
-              });
-            });
-          }
-
-          return require.using(["test/module/id"], configAmd, function(TestType) {
-            expect(TestType.type.id).toBe("test/type/id");
-          });
-        });
-
-        it("should not default $type.id when $type.sourceId is specified", function() {
-
-          function configAmd(localRequire) {
-
-            localRequire.define("test/module/id", ["pentaho/type/Complex"], function(Complex) {
-
-              return Complex.extend({
-                $type: {
-                  sourceId: "test/module/sourceId"
-                }
-              });
-            });
-          }
-
-          return require.using(["test/module/id"], configAmd, function(TestType) {
-            expect(TestType.type.sourceId).toBe("test/module/sourceId");
-            expect(TestType.type.id).toBe("test/module/sourceId");
-          });
-        });
-
-        it("should default $type.id when instSpec is not specified", function() {
-
-          function configAmd(localRequire) {
-            localRequire.define("test/module/id", ["pentaho/type/Complex"], function(Complex) {
-              return Complex.extend();
-            });
-          }
-
-          return require.using(["test/module/id"], configAmd, function(TestType) {
-            expect(TestType.type.id).toBe("test/module/id");
-          });
-        });
-
-        it("should default $type.id when instSpec is specified but not instSpec.$type", function() {
-
-          var instSpec = {};
-
-          function configAmd(localRequire) {
-            localRequire.define("test/module/id", ["pentaho/type/Complex"], function(Complex) {
-              return Complex.extend(instSpec);
-            });
-          }
-
-          return require.using(["test/module/id"], configAmd, function(TestType) {
-
-            expect(TestType.type.id).toBe("test/module/id");
-
-            // Should not modify instSpec.
-            expect(instSpec).toEqual({});
-          });
-        });
-
-        it("should default $type.id when instSpec.$type is specified but id and sourceId aren't", function() {
-
-          // Must not modify instSpec or typeSpec
-          var typeSpec = {};
-          var instSpec = {$type: typeSpec};
-
-          function configAmd(localRequire) {
-            localRequire.define("test/module/id", ["pentaho/type/Complex"], function(Complex) {
-              return Complex.extend(instSpec);
-            });
-          }
-
-          return require.using(["test/module/id"], configAmd, function(TestType) {
-
-            expect(TestType.type.id).toBe("test/module/id");
-
-            // Should not modify instSpec or typeSpec
-            expect(instSpec).toEqual({$type: {}});
-            expect(typeSpec).toEqual({});
-          });
-        });
       });
     });
   });

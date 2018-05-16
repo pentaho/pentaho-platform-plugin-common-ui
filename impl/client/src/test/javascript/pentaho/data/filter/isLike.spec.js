@@ -41,6 +41,7 @@ define([
       valueType: "string",
       rawValue: "match",
       kind: "isLike",
+      id: "IsLike",
       alias: "like"
     });
 

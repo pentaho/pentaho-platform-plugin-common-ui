@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/visual/role/mappingField",
+  "pentaho/visual/role/MappingField",
   "pentaho/type/SpecificationScope"
 ], function(MappingField, SpecificationScope) {
 

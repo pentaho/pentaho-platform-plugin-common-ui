@@ -63,7 +63,7 @@ define([
               $type: {
                 props: {
                   palette1: {
-                    base: "pentaho/visual/color/paletteProperty",
+                    base: "pentaho/visual/color/PaletteProperty",
                     levels: expectedLevels
                   }
                 }
@@ -81,7 +81,7 @@ define([
               $type: {
                 props: {
                   palette1: {
-                    base: "pentaho/visual/color/paletteProperty",
+                    base: "pentaho/visual/color/PaletteProperty",
                     levels: ["divergent", "nominal"]
                   }
                 }
@@ -99,7 +99,7 @@ define([
               $type: {
                 props: {
                   palette1: {
-                    base: "pentaho/visual/color/paletteProperty"
+                    base: "pentaho/visual/color/PaletteProperty"
                   }
                 }
               }
@@ -122,7 +122,7 @@ define([
                 $type: {
                   props: {
                     palette1: {
-                      base: "pentaho/visual/color/paletteProperty",
+                      base: "pentaho/visual/color/PaletteProperty",
                       levels: []
                     }
                   }
@@ -137,7 +137,7 @@ define([
               $type: {
                 props: {
                   palette1: {
-                    base: "pentaho/visual/color/paletteProperty",
+                    base: "pentaho/visual/color/PaletteProperty",
                     levels: ["nominal", "quantitative"]
                   }
                 }
@@ -167,7 +167,7 @@ define([
               $type: {
                 props: {
                   palette1: {
-                    base: "pentaho/visual/color/paletteProperty",
+                    base: "pentaho/visual/color/PaletteProperty",
                     levels: baseLevels
                   }
                 }
@@ -193,7 +193,7 @@ define([
                 $type: {
                   props: {
                     palette1: {
-                      base: "pentaho/visual/color/paletteProperty",
+                      base: "pentaho/visual/color/PaletteProperty",
                       levels: expectedLevels
                     }
                   }
@@ -226,7 +226,7 @@ define([
               $type: {
                 props: {
                   palette1: {
-                    base: "pentaho/visual/color/paletteProperty",
+                    base: "pentaho/visual/color/PaletteProperty",
                     levels: ["quantitative"]
                   }
                 }
@@ -292,7 +292,7 @@ define([
                   $type: {
                     props: {
                       palette1: {
-                        base: "pentaho/visual/color/paletteProperty",
+                        base: "pentaho/visual/color/PaletteProperty",
                         levels: ["nominal"],
                         isRequired: true,
                         defaultValue: null // suppress our smart default, for now
@@ -320,7 +320,7 @@ define([
                   $type: {
                     props: {
                       palette1: {
-                        base: "pentaho/visual/color/paletteProperty",
+                        base: "pentaho/visual/color/PaletteProperty",
                         levels: ["nominal"]
                       }
                     }
@@ -341,7 +341,7 @@ define([
                   $type: {
                     props: {
                       palette1: {
-                        base: "pentaho/visual/color/paletteProperty",
+                        base: "pentaho/visual/color/PaletteProperty",
                         levels: ["quantitative"]
                       }
                     }
@@ -361,7 +361,7 @@ define([
                   $type: {
                     props: {
                       palette1: {
-                        base: "pentaho/visual/color/paletteProperty",
+                        base: "pentaho/visual/color/PaletteProperty",
                         levels: ["quantitative"]
                       }
                     }
@@ -390,7 +390,7 @@ define([
                 $type: {
                   props: {
                     palette1: {
-                      base: "pentaho/visual/color/paletteProperty"
+                      base: "pentaho/visual/color/PaletteProperty"
                     }
                   }
                 }
@@ -416,7 +416,7 @@ define([
                 $type: {
                   props: {
                     palette1: {
-                      base: "pentaho/visual/color/paletteProperty",
+                      base: "pentaho/visual/color/PaletteProperty",
                       levels: ["quantitative"]
                     }
                   }
@@ -445,16 +445,46 @@ define([
 
         function configAmd(localRequire) {
 
-          // Clear all default instance registrations
-          localRequire.config({
-            config: {
-              "pentaho/modules": null
-            }
-          });
-
           localRequire.config({
             config: {
               "pentaho/modules": {
+                // Clear all standard palette registrations.
+                "pentaho/visual/color/palettes/nominalPrimary": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/nominalNeutral": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/nominalLight": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/nominalDark": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/quantitativeBlue3": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/quantitativeBlue5": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/quantitativeGray3": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/quantitativeGray5": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/divergentRyg3": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/divergentRyg5": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/divergentRyb3": {
+                  "type": null
+                },
+                "pentaho/visual/color/palettes/divergentRyb5": {
+                  "type": null
+                },
                 "my/nominalPalette1": {type: "pentaho/visual/color/Palette", ranking: 4},
                 "my/nominalPalette2": {type: "pentaho/visual/color/Palette", ranking: 3},
                 "my/quantitativePalette1": {type: "pentaho/visual/color/Palette", ranking: 2}
@@ -485,7 +515,7 @@ define([
                 $type: {
                   props: {
                     palette1: {
-                      base: "pentaho/visual/color/paletteProperty",
+                      base: "pentaho/visual/color/PaletteProperty",
                       levels: ["nominal", "divergent"]
                     }
                   }
@@ -507,7 +537,7 @@ define([
                 $type: {
                   props: {
                     palette1: {
-                      base: "pentaho/visual/color/paletteProperty",
+                      base: "pentaho/visual/color/PaletteProperty",
                       levels: ["divergent"]
                     }
                   }
@@ -536,13 +566,13 @@ define([
                 $type: {
                   props: {
                     palette1: {
-                      base: "pentaho/visual/color/paletteProperty"
+                      base: "pentaho/visual/color/PaletteProperty"
                     },
                     palette2: {
-                      base: "pentaho/visual/color/paletteProperty"
+                      base: "pentaho/visual/color/PaletteProperty"
                     },
                     palette3: {
-                      base: "pentaho/visual/color/paletteProperty"
+                      base: "pentaho/visual/color/PaletteProperty"
                     }
                   }
                 }
@@ -572,13 +602,13 @@ define([
                 $type: {
                   props: {
                     palette1: {
-                      base: "pentaho/visual/color/paletteProperty"
+                      base: "pentaho/visual/color/PaletteProperty"
                     },
                     palette2: {
-                      base: "pentaho/visual/color/paletteProperty"
+                      base: "pentaho/visual/color/PaletteProperty"
                     },
                     palette3: {
-                      base: "pentaho/visual/color/paletteProperty"
+                      base: "pentaho/visual/color/PaletteProperty"
                     }
                   }
                 }

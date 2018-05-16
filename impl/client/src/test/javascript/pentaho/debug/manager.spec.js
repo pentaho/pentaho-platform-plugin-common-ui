@@ -55,7 +55,7 @@ define(function() {
     it("should be an instance of debug.impl.Manager class", function() {
 
       return require.using([
-        "pentaho/debug",
+        "pentaho/debug/manager",
         "pentaho/debug/impl/Manager"
       ], function(localRequire) {
 
@@ -70,7 +70,7 @@ define(function() {
     it("should configure the instance with the AMD configuration of pentaho/debug", function() {
 
       return require.using([
-        "pentaho/debug"
+        "pentaho/debug/manager"
       ], function(localRequire) {
 
         configureDebugMgrMock(localRequire);
@@ -105,7 +105,7 @@ define(function() {
       it("should configure the instance with the AMD configuration overriding level with the url level", function() {
 
         return require.using([
-          "pentaho/debug"
+          "pentaho/debug/manager"
         ], function(localRequire) {
 
           configureDebugMgrMock(localRequire);
@@ -128,8 +128,8 @@ define(function() {
       it("should use a default debugging level of 'debug' when only debug=true is specified", function() {
 
         return require.using([
-          "pentaho/debug",
-          "pentaho/debug/Levels",
+          "pentaho/debug/manager",
+          "pentaho/debug/Levels"
         ], function(localRequire) {
 
           configureDebugMgrMock(localRequire);
@@ -145,8 +145,8 @@ define(function() {
       it("should use a default debugging level of 'debug' when debugLevel=invalid is specified", function() {
 
         return require.using([
-          "pentaho/debug",
-          "pentaho/debug/Levels",
+          "pentaho/debug/manager",
+          "pentaho/debug/Levels"
         ], function(localRequire) {
 
           configureDebugMgrMock(localRequire);
@@ -162,8 +162,8 @@ define(function() {
       it("should ignore debugLevel when debug=true is not specified", function() {
 
         return require.using([
-          "pentaho/debug",
-          "pentaho/debug/Levels",
+          "pentaho/debug/manager",
+          "pentaho/debug/Levels"
         ], function(localRequire) {
 
           configureDebugMgrMock(localRequire);
@@ -177,8 +177,8 @@ define(function() {
       it("should accept debugLevel as a named level", function() {
 
         return require.using([
-          "pentaho/debug",
-          "pentaho/debug/Levels",
+          "pentaho/debug/manager",
+          "pentaho/debug/Levels"
         ], function(localRequire) {
 
           configureDebugMgrMock(localRequire);
@@ -196,8 +196,8 @@ define(function() {
       it("should fallback to the top window when there is one and there is no local debug=true", function() {
 
         return require.using([
-          "pentaho/debug",
-          "pentaho/debug/Levels",
+          "pentaho/debug/manager",
+          "pentaho/debug/Levels"
         ], function(localRequire) {
 
           configureDebugMgrMock(localRequire);
@@ -214,8 +214,8 @@ define(function() {
           "it has no debugLevel", function() {
 
         return require.using([
-          "pentaho/debug",
-          "pentaho/debug/Levels",
+          "pentaho/debug/manager",
+          "pentaho/debug/Levels"
         ], function(localRequire) {
 
           configureDebugMgrMock(localRequire);

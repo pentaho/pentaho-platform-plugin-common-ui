@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([], function() {
+define(function() {
 
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false, jasmine:false, beforeAll:false */
-
-  describe("pentaho.i18n", function() {
+  describe("pentaho.i18n.server", function() {
     var i18n;
     var mockEnvironment;
 
     var SERVER_ROOT = "webapp/";
 
-    beforeAll(function(done) {
+    var localRequire;
+
+    beforeEach(function() {
+      localRequire = require.new();
+
       mockEnvironment = {
         server: {
           root: {
@@ -34,27 +36,29 @@ define([], function() {
         }
       };
 
-      function mockDeps(localRequire) {
-        localRequire.define("pentaho/environment", function() {
-          return mockEnvironment;
-        });
-      }
+      localRequire.define("pentaho/environment/main", function() {
+        return mockEnvironment;
+      });
 
-      require.using(["pentaho/i18n-src"], mockDeps, function(_i18n) {
-        i18n = _i18n;
-        done();
+      return localRequire.promise(["pentaho/i18n/serverService"]).then(function(deps) {
+        i18n = deps[0];
       });
     });
 
+    afterEach(function() {
+      localRequire.dispose();
+    });
+
     function mockLocalRequire(expectedValue) {
+
       var mock = jasmine.createSpyObj("localRequire", ["toUrl"]);
+
       mock.toUrl.and.callFake(function() {
         return expectedValue;
       });
 
       return mock;
     }
-
 
     describe("#__getBundleInfo", function() {
       function testGetBundleInfo(bundlePath, baseUrl, expectedPluginID) {

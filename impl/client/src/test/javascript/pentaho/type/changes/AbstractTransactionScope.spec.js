@@ -15,9 +15,10 @@
  */
 define([
   "pentaho/type/changes/AbstractTransactionScope",
+  "pentaho/type/changes/_transactionControl",
   "pentaho/type/changes/Transaction",
   "tests/pentaho/util/errorMatch"
-], function(AbstractTransactionScope, Transaction, errorMatch) {
+], function(AbstractTransactionScope, transactionControl, Transaction, errorMatch) {
 
   "use strict";
 
@@ -96,13 +97,13 @@ define([
         expect(txn.__scopeEnter).toHaveBeenCalled();
       });
 
-      it("should call Transaction#__scopeEnter", function() {
-        spyOn(Transaction, "__scopeEnter").and.callThrough();
+      it("should call transactionControl#enterScope", function() {
+        spyOn(transactionControl, "enterScope").and.callThrough();
 
         scope = new AbstractTransactionScope(txn);
 
-        expect(Transaction.__scopeEnter).toHaveBeenCalled();
-        expect(Transaction.__scopeEnter).toHaveBeenCalledWith(scope);
+        expect(transactionControl.enterScope).toHaveBeenCalled();
+        expect(transactionControl.enterScope).toHaveBeenCalledWith(scope);
       });
 
       it("should have isCurrent = true", function() {
@@ -114,19 +115,16 @@ define([
 
     describe("#exit({sloppy})", function() {
 
-      describe("with context", function() {
+      it("should set isInside to false after being called", function() {
 
-        it("should set isInside to false after being called", function() {
+        var txn = new Transaction();
+        var scope = new AbstractTransactionScope(txn);
 
-          var txn = new Transaction();
-          var scope = new AbstractTransactionScope(txn);
+        expect(scope.isInside).toBe(true);
 
-          expect(scope.isInside).toBe(true);
+        scope.exit();
 
-          scope.exit();
-
-          expect(scope.isInside).toBe(false);
-        });
+        expect(scope.isInside).toBe(false);
       });
 
       it("should log a warning when called and already exited from", function() {

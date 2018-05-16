@@ -23,13 +23,11 @@ define([
   "pentaho/visual/role/Mode",
   "pentaho/type/SpecificationScope"
 ], function(PentahoString, PentahoNumber, PentahoBoolean, PentahoDate, Element, List,
-            Mode, Context, SpecificationScope) {
+            Mode, SpecificationScope) {
 
   "use strict";
 
   describe("pentaho.visual.role.Mode", function() {
-
-    var Mode;
 
     var stringType = PentahoString.type;
     var numberType = PentahoNumber.type;

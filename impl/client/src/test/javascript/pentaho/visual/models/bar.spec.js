@@ -27,7 +27,7 @@ define([
       expect(typeof BarModel).toBe("function");
     });
 
-    it("should be a sub-class of `Value`", function() {
+    it("should be a sub-class of `AbstractModel`", function() {
       expect(BarModel.prototype instanceof AbstractModel).toBe(true);
     });
 
