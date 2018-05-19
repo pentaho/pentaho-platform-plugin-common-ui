@@ -77,13 +77,14 @@ into an `images` folder, inside of the `css` folder.
 ## Loading the CSS file with the model
 
 To load the model's CSS file dynamically, whenever the model module is loaded, use the `css` AMD/RequireJS plugin.
-Modify the AMD module declaration of the `model.js` file to the following:
+Modify the AMD module declaration of the `Model.js` file to the following:
 
 ```js
 define([
-  "module",
+  "pentaho/module!",
+  "pentaho/visual/base/Model",
   "css!./css/model"
-], function(module) {
+], function(module, BaseModel) {
   // ...
 });
 ```

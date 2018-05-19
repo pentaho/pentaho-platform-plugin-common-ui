@@ -15,7 +15,7 @@ Let's then give some love to the Bar chart by styling these elements with CSS.
 
 ## Creating the CSS file
 
-Create a folder named `css` and, in it, create a file named `view-d3.css`. Add the following content to it:
+Create a folder named `css` and, in it, create a file named `ViewD3.css`. Add the following content to it:
 
 ```css
 .pentaho-visual-samples-bar-d3 .bar {
@@ -52,16 +52,17 @@ Remarks:
 ## Loading the CSS file with the view
 
 To load the view's CSS file dynamically, whenever the view module is loaded, use the `css` AMD/RequireJS plugin.
-Modify the AMD module declaration of the `view-d3.js` file to the following:
+Modify the AMD module declaration of the `ViewD3.js` file to the following:
 
 ```js
 define([
-  "module",
+  "pentaho/module!",
+  "pentaho/visual/base/View",
+  "./Model",
   "d3",
   "pentaho/visual/scene/Base",
-  "css!./css/view-d3"
-], function(module, d3, Scene) {
-
+  "css!./css/ViewD3"
+], function(module, BaseView, BarModel, d3, Scene) {
   // ...
 });
 ```

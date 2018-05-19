@@ -29,9 +29,9 @@ Now, create a configuration file, called `config.js`, and place the following co
 
 ```js
 define(["module"], function(module) {
-  // Replace /config by /model.
-  // e.g. "pentaho-visual-samples-bar-d3/model".
-  var vizId = module.id.replace(/(\w+)$/, "model");
+  // Replace /config by /Model.
+  // e.g. "pentaho-visual-samples-bar-d3/Model".
+  var vizId = module.id.replace(/(\w+)$/, "Model");
 
   return {
     rules: [
@@ -39,7 +39,7 @@ define(["module"], function(module) {
       {
         priority: -1,
         select: {
-          type: vizId
+          module: vizId
         },
         apply: {
           props: {
@@ -61,8 +61,8 @@ We'll use the Sandbox environment to make sure.
 ## Register the configuration module in the sandbox
 
 It is still necessary to register the configuration module with the configuration system.
-For such, edit the `package.json` file and add a [`pentaho/modules`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.modules'}})
-configuration so that your file looks like this:
+For such, edit the `package.json` file and add a `pentaho/modules` configuration 
+so that your file looks like this:
 
 ```json
 {
@@ -119,7 +119,7 @@ define(["module"], function(module) {
       {
         priority: -1,
         select: {
-          type: vizId,
+          module: vizId,
           application: "pentaho-analyzer"
         },
         apply: {

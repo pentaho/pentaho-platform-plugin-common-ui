@@ -57,7 +57,7 @@ visualizations menu, effectively preventing the user from creating new visualiza
 ```js
 var ruleSpec = {
   select: {
-    type: "pentaho/visual/models/pie",
+    module: "pentaho/visual/models/Pie",
     application: "pentaho-analyzer"
   },
   apply: {
@@ -77,9 +77,9 @@ effectively preventing the user from changing its default value:
 ```js
 var ruleSpec = {
   select: {
-    type: [
-      "pentaho/visual/models/line",
-      "pentaho/visual/models/barLine"
+    module: [
+      "pentaho/visual/models/Line",
+      "pentaho/visual/models/BarLine"
     ],
     application: "pentaho-analyzer"
   },
@@ -104,9 +104,9 @@ to be the `diamond` shape:
 ```js
 var ruleSpec = {
   select: {
-    type: [
-      "pentaho/visual/models/line",
-      "pentaho/visual/models/barLine"
+    module: [
+      "pentaho/visual/models/Line",
+      "pentaho/visual/models/BarLine"
     ]
   },
   apply: {
@@ -130,7 +130,7 @@ affecting how it is displayed in the visualizations menu of the Analyzer and
 ```js
 var ruleSpec = {
   select: {
-    type:"pentaho/visual/models/bar",
+    module: "pentaho/visual/models/Bar",
     application: [
       "pentaho-analyzer",
       "pentaho-det"
@@ -172,7 +172,7 @@ in any application:
 ```js
 var ruleSpec = {
   select: {
-    type:"pentaho/ccc/visual/abstract"
+    module: "pentaho/ccc/visual/Abstract"
   },
   apply: {
     extension: {
@@ -198,7 +198,7 @@ when in the PDI application:
 ```js
 var ruleSpec = {
   select: {
-    type:"pentaho/ccc/visual/areaStacked",
+    module: "pentaho/ccc/visual/AreaStacked",
     application: "pentaho-det"
   },
   apply: {
@@ -223,7 +223,7 @@ in any application:
 ```js
 var ruleSpec = {
   select: {
-    instance:"pentaho.visual.color.palettes.nominalPrimary"
+    module: "pentaho.visual.color.palettes.nominalPrimary"
   },
   apply: {
     colors: [
@@ -242,7 +242,7 @@ so that a specific _ad hoc_ palette is used:
 ```js
 var ruleSpec = {
   select: {
-    type: "pentaho/visual/models/bar"
+    module: "pentaho/visual/models/Bar"
   },
   apply: {
     props: {
@@ -262,16 +262,19 @@ If, instead, you want to use a registered palette:
 ```js
 var ruleSpec = {
   select: {
-    type: "pentaho/visual/models/bar"
+    module: "pentaho/visual/models/Bar"
   },
-  apply: {
-    props: {
-      palette: {
-        defaultValue: {
-          $instance: {id: "pentaho/visual/color/palettes/nominalLight"}
+  deps: [
+    "pentaho/visual/color/palettes/nominalLight"
+  ],
+  apply: function(nominalLightPalette) {
+    return {
+      props: {
+        palette: {
+          defaultValue: nominalLightPalette
         }
       }
-    }
+    };
   }
 };
 ```
@@ -279,34 +282,34 @@ var ruleSpec = {
 ## Identifiers of Stock Visualizations
 
 The models of stock visualizations are all sub-modules of `pentaho/visual/models`. 
-For example, `pentaho/visual/models/line`, is the identifier of the stock Line visualization model.
+For example, `pentaho/visual/models/Line`, is the identifier of the stock Line visualization model.
 
 The corresponding CCC-based view of a stock visualization is a sub-module of `pentaho/ccc/visual`. 
-For example, `pentaho/ccc/visual/line`, is the identifier of the CCC view corresponding to 
+For example, `pentaho/ccc/visual/Line`, is the identifier of the CCC view corresponding to 
 the stock Line visualization model.
 
-| Local Module            | Description              |
-|-------------------------|--------------------------|
-| abstract                | All stock visualizations |
-| areaStacked             | Area Stacked             |
-| line                    | Line                     |
-| bar                     | Column                   |
-| barStacked              | Column Stacked           |
-| bar                     | Column Stacked 100%      |
-| barHorizontal           | Bar                      |
-| barStackedHorizontal    | Bar Stacked              |
-| barNormalizedHorizontal | Bar Stacked 100%         |
-| barLine                 | Column/Line Combo        |
-| scatter                 | X/Y Scatter              |
-| bubble                  | Bubble                   |
-| heatGrid                | Heat-Grid                |
-| pie                     | Pie                      |
-| donut                   | Donut                    |
-| sunburst                | Sunburst                 |
+| Local Module Id.          | Description              |
+|---------------------------|--------------------------|
+| `Abstract`                | All stock visualizations |
+| `AreaStacked`             | Area Stacked             |
+| `Line`                    | Line                     |
+| `Bar`                     | Column                   |
+| `BarStacked`              | Column Stacked           |
+| `Bar`                     | Column Stacked 100%      |
+| `BarHorizontal`           | Bar                      |
+| `BarStackedHorizontal`    | Bar Stacked              |
+| `BarNormalizedHorizontal` | Bar Stacked 100%         |
+| `BarLine`                 | Column/Line Combo        |
+| `Scatter`                 | X/Y Scatter              |
+| `Bubble`                  | Bubble                   |
+| `HeatGrid`                | Heat-Grid                |
+| `Pie`                     | Pie                      |
+| `Donut`                   | Donut                    |
+| `Sunburst`                | Sunburst                 |
 
 The Geo Map visualization is the exception to these rules.
-Its model's identifier is `pentaho/visual/models/geoMap`
-and its view's identifier is `pentaho/geo/visual/map`.
+Its model's identifier is `pentaho/visual/models/GeoMap`
+and its view's identifier is `pentaho/geo/visual/Map`.
 
 ## Identifiers of Stock Color Palettes
 
@@ -314,17 +317,17 @@ All stock color palettes are sub-modules of `pentaho/visual/color/palettes`.
 For example, `pentaho/visual/color/palettes/nominalPrimary`, 
 is the identifier of the default discrete color palette.
 
-| Local Module            |
+| Local Module Id.        |
 |-------------------------|
-| nominalPrimary          |
-| nominalNeutral          |
-| nominalLight            |
-| nominalDark             |
-| quantitativeBlue3       |
-| quantitativeBlue5       |
-| quantitativeGray3       |
-| quantitativeGray5       |
-| divergentRyb3           |
-| divergentRyb5           |
-| divergentRyg3           |
-| divergentRyg5           |
+| `nominalPrimary`        |
+| `nominalNeutral`        |
+| `nominalLight`          |
+| `nominalDark`           |
+| `quantitativeBlue3`     |
+| `quantitativeBlue5`     |
+| `quantitativeGray3`     |
+| `quantitativeGray5`     |
+| `divergentRyb3`         |
+| `divergentRyb5`         |
+| `divergentRyg3`         |
+| `divergentRyg5`         |

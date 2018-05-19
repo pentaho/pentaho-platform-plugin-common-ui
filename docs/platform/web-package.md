@@ -78,8 +78,8 @@ match the absolute module identifier listed in the config object.
 Modules with a matching module identifier can access the configuration object via `module.config`.
 
 In particular, 
-this is used to configure the [`pentaho/modules`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.modules'}}) 
-plugin, used as a basic inversion-of-control mechanism to inject the package resources into the system.
+this is used to configure the `pentaho/modules` module, 
+used as a basic inversion-of-control mechanism to inject the package resources into the system.
 
 For instance, to declare that the resource `"my-viz/config.js"` 
 is an instance of type `"pentaho/config/spec/IRuleSet"`, 
