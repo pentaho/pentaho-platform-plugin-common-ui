@@ -23,7 +23,7 @@ define([
 
   /* eslint max-nested-callbacks: 0 */
 
-  describe("pentaho.type.Value.Type", function() {
+  describe("pentaho.type.ValueType", function() {
 
     function getValue() {
       return Value;

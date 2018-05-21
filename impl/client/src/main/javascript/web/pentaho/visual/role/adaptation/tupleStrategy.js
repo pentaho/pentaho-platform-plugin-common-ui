@@ -130,9 +130,9 @@ define([
   // endregion
 
   /**
-   * @name pentaho.visual.role.adaptation.TupleStrategy.Type
+   * @name pentaho.visual.role.adaptation.TupleStrategyType
    * @class
-   * @extends pentaho.visual.role.adaptation.Strategy.Type
+   * @extends pentaho.visual.role.adaptation.StrategyType
    *
    * @classDesc The type class of {@link pentaho.visual.role.adaptation.TupleStrategy}.
    */
@@ -151,10 +151,10 @@ define([
      *
      * The strategy targets:
      * 1. modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} is a
-     *   [list]{@link pentaho.type.Instance.Type#isList}, and
+     *   [list]{@link pentaho.type.Type#isList}, and
      * 2. mappings of fields whose [type][@link pentaho.data.ITable#getColumnType] can be assigned to the
-     *   [element type]{@link pentaho.type.List.Type#of} of the mode's list data type.
-     * 3. mappings of fields whose data type is [continuous][@link pentaho.type.Instance.Type#isContinuous] nature
+     *   [element type]{@link pentaho.type.ListType#of} of the mode's list data type.
+     * 3. mappings of fields whose data type is [continuous][@link pentaho.type.Type#isContinuous] nature
      *   is compatible with the mode's [continuous]{@link pentaho.visual.role.Mode#isContinuous} nature;
      *   if the mode is continuous, then all mapped fields need to be as well.
      *
@@ -247,7 +247,7 @@ define([
       }
     },
 
-    $type: /** @lends pentaho.visual.role.adaptation.TupleStrategy.Type# */{
+    $type: /** @lends pentaho.visual.role.adaptation.TupleStrategyType# */{
       id: module.id,
 
       /** @inheritDoc */

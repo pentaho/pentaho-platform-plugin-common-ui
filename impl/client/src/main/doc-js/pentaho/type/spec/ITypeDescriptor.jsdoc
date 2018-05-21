@@ -31,12 +31,12 @@
  * One and only one of `v` or `value` must be specified, non-{@link Nully}.
  *
  * When serialized as JSON, the type's JSON specification is used,
- * as obtained by calling {@link pentaho.type.Instance.Type#toSpec} with
+ * as obtained by calling {@link pentaho.type.Type#toSpec} with
  * a `true` value for the `keyArgs.isJson` argument.
  *
  * @name value
  * @memberOf pentaho.type.spec.ITypeDescriptor#
- * @type {pentaho.type.spec.UTypeReference}
+ * @type {pentaho.type.spec.TypeReference}
  */
 
 /**
@@ -44,5 +44,5 @@
  *
  * @name v
  * @memberOf pentaho.type.spec.ITypeDescriptor#
- * @type {pentaho.type.spec.UTypeReference}
+ * @type {pentaho.type.spec.TypeReference}
  */

@@ -23,9 +23,9 @@ define([
   return function(filter) {
 
     /**
-     * @name pentaho.data.filter.IsEqual.Type
+     * @name pentaho.data.filter.IsEqualType
      * @class
-     * @extends pentaho.data.filter.Property.Type
+     * @extends pentaho.data.filter.PropertyType
      *
      * @classDesc The type class of the equality filter type.
      *
@@ -89,7 +89,7 @@ define([
         return (this.property || "") + " " + (v ? v.$key : "");
       },
 
-      $type: /** @lends pentaho.data.filter.IsEqual.Type# */{
+      $type: /** @lends pentaho.data.filter.IsEqualType# */{
         id: module.id,
         props: [
           {

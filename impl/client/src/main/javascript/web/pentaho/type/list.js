@@ -35,9 +35,9 @@ define([
   var __listType;
 
   /**
-   * @name pentaho.type.List.Type
+   * @name pentaho.type.ListType
    * @class
-   * @extends pentaho.type.Value.Type
+   * @extends pentaho.type.ValueType
    *
    * @classDesc The base type class of plural value types.
    *
@@ -56,7 +56,7 @@ define([
    * @classDesc The base class of plural values.
    *
    * A list is an ordered set of [elements]{@link pentaho.type.Element} of
-   * a [common, base type]{@link pentaho.type.List.Type#of}.
+   * a [common, base type]{@link pentaho.type.ListType#of}.
    *
    * @description Creates a list instance.
    *
@@ -66,7 +66,7 @@ define([
    * also be overridden to copy those properties.
    *
    * @constructor
-   * @param {pentaho.type.spec.UList|pentaho.type.List|Array.<pentaho.type.Element>} [instSpec] The
+   * @param {pentaho.type.spec.List|pentaho.type.List|Array.<pentaho.type.Element>} [instSpec] The
    * list specification or a compatible list instance or element's array.
    * @param {Object} [keyArgs] - The keyword arguments.
    * @param {boolean} [keyArgs.isBoundary=false] - Indicates if the list should be a _boundary list_.
@@ -77,8 +77,7 @@ define([
    *
    * @see pentaho.type.Element
    * @see pentaho.type.spec.IList
-   * @see pentaho.type.spec.IListProto
-   * @see pentaho.type.spec.IListTypeProto
+   * @see pentaho.type.spec.IListType
    */
   var List = Value.extend(/** @lends pentaho.type.List# */{
 
@@ -543,7 +542,7 @@ define([
      * a list of element specifications is obtained and
      * passed to the [set]{@link pentaho.type.List#set} method.
      *
-     * @param {!pentaho.type.spec.UList|!pentaho.type.List|!Array.<!pentaho.type.Element>} config - The list
+     * @param {!pentaho.type.spec.List|!pentaho.type.List|!Array.<!pentaho.type.Element>} config - The list
      * specification or a compatible list instance or element's array.
      *
      * @throws {pentaho.lang.ArgumentInvalidTypeError} When the type of `config` is not
@@ -645,7 +644,7 @@ define([
      * Determines if the given list value is valid.
      *
      * The default implementation validates each element against the
-     * list's [element type]{@link pentaho.type.List.Type#of}
+     * list's [element type]{@link pentaho.type.ListType#of}
      * and collects and returns any reported errors.
      * Override to complement with a type's specific validation logic.
      *
@@ -663,7 +662,7 @@ define([
     },
     // endregion
 
-    $type: /** @lends pentaho.type.List.Type# */{
+    $type: /** @lends pentaho.type.ListType# */{
 
       /** @inheritDoc */
       _postInit: function() {
@@ -689,7 +688,7 @@ define([
        *
        * [List]{@link pentaho.type.List} types are inherently non-entity types.
        *
-       * @name pentaho.type.List.Type#isEntity
+       * @name pentaho.type.ListType#isEntity
        * @type {boolean}
        * @readOnly
        * @see pentaho.type.Value#$key
@@ -707,9 +706,9 @@ define([
        * However, if a complex property is read-only and has a list value type,
        * then the value of the property itself, the list instance,
        * is marked [read-only]{@link pentaho.type.List#$isReadOnly}.
-       * Also, the [element type]{@link pentaho.type.List.Type#of} of a list type can be read-only.
+       * Also, the [element type]{@link pentaho.type.ListType#of} of a list type can be read-only.
        *
-       * @name pentaho.type.List.Type#isReadOnly
+       * @name pentaho.type.ListType#isReadOnly
        * @type {boolean}
        * @readOnly
        * @override
@@ -735,7 +734,7 @@ define([
        *
        * When set to `null`, an error is thrown.
        *
-       * @type {pentaho.type.Element.Type}
+       * @type {pentaho.type.ElementType}
        *
        * @throws {pentaho.lang.OperationInvalidError} When set to a type that is different from
        *   the current local type.
@@ -743,7 +742,7 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When set to a type that is not a subtype of the
        *   ancestor list type's `of` type.
        *
-       * @see pentaho.type.spec.IListTypeProto#of
+       * @see pentaho.type.spec.IListType#of
        */
       get of() {
         return this.__elemType;
@@ -806,7 +805,7 @@ define([
        * @protected
        * @override
        *
-       * @see pentaho.type.Value.Type#normalizeInstanceSpec
+       * @see pentaho.type.ValueType#normalizeInstanceSpec
        */
       _normalizeInstanceSpec: function(instSpec) {
 
@@ -828,10 +827,10 @@ define([
       /**
        * Obtains the array of elements' specifications given the list instance specification.
        *
-       * @param {pentaho.type.spec.UList|pentaho.type.List|Array.<pentaho.type.Element>} [instSpec] The
+       * @param {pentaho.type.spec.List|pentaho.type.List|Array.<pentaho.type.Element>} [instSpec] The
        * list specification or a compatible list instance or element's array.
        *
-       * @return {Array.<pentaho.type.Element|pentaho.type.spec.UElement>} The array of elements, possibly `null`.
+       * @return {Array.<pentaho.type.Element|pentaho.type.spec.Element>} The array of elements, possibly `null`.
        *
        * @throws {pentaho.lang.ArgumentInvalidTypeError} When the type of `instSpec` is not
        * {@link Object}, {@link Array} or {@link pentaho.type.List}.
@@ -904,27 +903,6 @@ define([
   })
   .localize({$type: bundle.structured.List})
   .configure({$type: module.config});
-
-  // Override the documentation to specialize the argument types.
-  /**
-   * Creates a subtype of this one.
-   *
-   * For more information on class extension, in general,
-   * see {@link pentaho.lang.Base.extend}.
-   *
-   * @name extend
-   * @memberOf pentaho.type.List
-   * @method
-   *
-   * @param {string} [name] The name of the created class, used for debugging purposes.
-   * @param {pentaho.type.spec.IListProto} [instSpec] The instance specification.
-   * @param {Object} [classSpec] The static specification.
-   * @param {Object} [keyArgs] The keyword arguments.
-   *
-   * @return {!Class.<pentaho.type.List>} The new list instance subclass.
-   *
-   * @see pentaho.type.Value.extend
-   */
 
   __listType = List.type;
 

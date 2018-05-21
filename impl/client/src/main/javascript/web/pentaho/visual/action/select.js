@@ -30,17 +30,17 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.action.Select.Type
+   * @name pentaho.visual.action.SelectType
    * @class
-   * @extends pentaho.visual.action.Base.Type
-   * @extends pentaho.visual.action.mixins.Data.Type
-   * @extends pentaho.visual.action.mixins.Positioned.Type
+   * @extends pentaho.visual.action.BaseType
+   * @extends pentaho.visual.action.mixins.DataType
+   * @extends pentaho.visual.action.mixins.PositionedType
    *
    * @classDesc The type class of {@link pentaho.visual.action.Select}.
    */
 
   return BaseAction.extend(/** @lends pentaho.visual.action.Select# */{
-    $type: /** @lends pentaho.visual.action.Select.Type# */{
+    $type: /** @lends pentaho.visual.action.SelectType# */{
 
       id: module.id,
 
@@ -115,8 +115,7 @@ define([
      * @constructor
      *
      * @see pentaho.visual.action.spec.ISelect
-     * @see pentaho.visual.action.spec.ISelectProto
-     * @see pentaho.visual.action.spec.ISelectTypeProto
+     * @see pentaho.visual.action.spec.ISelectType
      */
     constructor: function(spec) {
 
@@ -129,7 +128,7 @@ define([
      * Gets or sets the _selection mode_ of this action.
      *
      * The default value is the value of
-     * [defaultSelectionMode]{@link pentaho.visual.action.Select.Type#defaultSelectionMode}.
+     * [defaultSelectionMode]{@link pentaho.visual.action.SelectType#defaultSelectionMode}.
      *
      * Setting to a {@link Nully} value assumes the default value.
      *

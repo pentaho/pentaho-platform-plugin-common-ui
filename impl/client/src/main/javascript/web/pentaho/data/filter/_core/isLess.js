@@ -23,9 +23,9 @@ define([
   return function(filter) {
 
     /**
-     * @name pentaho.data.filter.IsLess.Type
+     * @name pentaho.data.filter.IsLessType
      * @class
-     * @extends pentaho.data.filter.Property.Type
+     * @extends pentaho.data.filter.PropertyType
      *
      * @classDesc The type class of the strict less than filter type.
      *
@@ -90,7 +90,7 @@ define([
         return (this.property || "") + " " + (v ? v.$key : "");
       },
 
-      $type: /** @lends pentaho.data.filter.IsLess.Type# */{
+      $type: /** @lends pentaho.data.filter.IsLessType# */{
         id: module.id,
         props: [
           {

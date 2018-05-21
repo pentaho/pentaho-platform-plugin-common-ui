@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 
 /**
- * The `spec.UTypeReference` union represents the set of JS types that can be used to reference a type.
+ * The `spec.TypeReference` union represents the set of JS types that can be used to reference a type.
  *
  * It can be one of the following:
  *
  * ##### A _type id_ string
  *
- * A type's permanent [id]{@link pentaho.type.Instance.Type#id} —
+ * A type's permanent [id]{@link pentaho.type.Type#id} —
  * the identifier of a defined module in the AMD module system —,
  * or a [temporary]{@link pentaho.type.SpecificationContext.isIdTemporary},
  * serialization-only identifier.
@@ -78,15 +78,15 @@
  * ##### A _generic type specification_ object
  *
  * A plain {@link Object} specification used to generically describe a type.
- * Satisfies the interface [spec.ITypeProto]{@link pentaho.type.spec.ITypeProto}.
+ * Satisfies the interface [spec.IType]{@link pentaho.type.spec.IType}.
  *
  * The special `base` attribute allows specifying the base type
  * and defaults to `"pentaho/type/Complex"`,
  * on a global context, or
- * to the [valueType]{@link pentaho.type.Property.Type#valueType} of the base property,
+ * to the [valueType]{@link pentaho.type.PropertyType#valueType} of the base property,
  * when overriding it.
  * Any additional attributes are determined and processed by
- * each type's {@link pentaho.type.Instance.Type.extend} method.
+ * each type's {@link pentaho.type.Type.extend} method.
  *
  * Example:
  *
@@ -113,7 +113,7 @@
  * ##### A _list type shorthand specification_ array
  *
  * A shorter specification syntax to reference the _List_ type, or
- * derived list types of varied [element types]{@link pentaho.type.List.Type#of}.
+ * derived list types of varied [element types]{@link pentaho.type.ListType#of}.
  *
  * Example:
  *
@@ -151,8 +151,8 @@
  * ```
  *
  * @typedef {nonEmptyString|
- *           pentaho.type.Instance.Type|
+ *           pentaho.type.Type|
  *           Class.<pentaho.type.Instance>|
- *           Array.<pentaho.type.spec.UTypeReference>|
- *           pentaho.type.spec.ITypeProto} pentaho.type.spec.UTypeReference
+ *           Array.<pentaho.type.spec.TypeReference>|
+ *           pentaho.type.spec.IType} pentaho.type.spec.TypeReference
  */

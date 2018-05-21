@@ -26,9 +26,9 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.type.mixins.Enum.Type
+   * @name pentaho.type.mixins.EnumType
    * @class
-   * @extends pentaho.type.Simple.Type
+   * @extends pentaho.type.SimpleType
    *
    * @classDesc The type class of the `Enum` mixin type.
    *
@@ -51,7 +51,7 @@ define([
    *
    * The discrete set of valid instances must be specified at type initialization.
    *
-   * The order of instances is relevant and is accounted for in [compare]{@link pentaho.type.Element.Type#compare}.
+   * The order of instances is relevant and is accounted for in [compare]{@link pentaho.type.ElementType#compare}.
    *
    * @example <caption>Defining an enumeration type</caption>
    *
@@ -76,7 +76,7 @@ define([
    * });
    * ```
    *
-   * @see pentaho.type.mixins.spec.IEnumTypeProto
+   * @see pentaho.type.mixins.spec.IEnumType
    */
   return Simple.extend(/** @lends pentaho.type.mixins.Enum# */{
 
@@ -87,7 +87,7 @@ define([
         this.$type.__validateDomain(this));
     },
 
-    $type: /** @lends pentaho.type.mixins.Enum.Type# */{
+    $type: /** @lends pentaho.type.mixins.EnumType# */{
 
       id: module.id,
 
@@ -150,7 +150,7 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidTypeError} When set to a value other than a plain object after
        * type initialization.
        *
-       * @see pentaho.type.mixins.spec.IEnumTypeProto#domain
+       * @see pentaho.type.mixins.spec.IEnumType#domain
        */
       get domain() {
         return this.__domain;

@@ -28,9 +28,9 @@ define([
   var __abstractFilterType = AbstractFilter.type;
 
   /**
-   * @name pentaho.visual.action.mixins.Data.Type
+   * @name pentaho.visual.action.mixins.DataType
    * @class
-   * @extends pentaho.visual.action.Base.Type
+   * @extends pentaho.visual.action.BaseType
    *
    * @classDesc The type class of the data action mixin.
    *

@@ -23,7 +23,7 @@ define([
 
   "use strict";
 
-  describe("pentaho.type.Property.Type", function() {
+  describe("pentaho.type.PropertyType", function() {
 
     var Derived;
 
@@ -127,7 +127,7 @@ define([
         expect(spec instanceof Object).toBe(true);
       });
 
-      it("should not include `base` when a root property has Property.Type as base", function() {
+      it("should not include `base` when a root property has PropertyType as base", function() {
         var scope = new SpecificationScope();
 
         var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", valueType: "number"});
@@ -141,7 +141,7 @@ define([
         expect("base" in spec).toBe(false);
       });
 
-      it("should include `base` when a root property has subtype of Property.Type as base", function() {
+      it("should include `base` when a root property has subtype of PropertyType as base", function() {
         var scope = new SpecificationScope();
 
         var SubProperty = Property.extend();

@@ -31,13 +31,13 @@ define([
    * @classDesc The `MappingField` class represents a field in a
    * [visual role mapping]{@link pentaho.visual.role.AbstractMapping}.
    *
-   * The `Mode` type is an [entity]{@link pentaho.type.Value.Type#isEntity} type.
+   * The `Mode` type is an [entity]{@link pentaho.type.ValueType#isEntity} type.
    *
    * @see pentaho.visual.role.AbstractMapping
    *
    * @description Creates a visual role mapping field instance.
    * @constructor
-   * @param {pentaho.visual.role.spec.UMappingField} [spec] A visual role mapping field specification.
+   * @param {pentaho.visual.role.spec.MappingField} [spec] A visual role mapping field specification.
    */
   return Complex.extend(/** @lends pentaho.visual.role.MappingField# */{
 
@@ -53,7 +53,7 @@ define([
      * @type {string}
      * @readOnly
      * @override
-     * @see pentaho.type.Value.Type#isEntity
+     * @see pentaho.type.ValueType#isEntity
      */
     get $key() {
       return this.name;
@@ -85,7 +85,7 @@ define([
       return spec;
     },
 
-    $type: /** @lends pentaho.visual.role.MappingField.Type# */{
+    $type: /** @lends pentaho.visual.role.MappingFieldType# */{
 
       id: module.id,
 

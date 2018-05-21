@@ -99,7 +99,7 @@ define([
     },
     // endregion
 
-    $type: /** @lends pentaho.type.Function.Type# */{
+    $type: /** @lends pentaho.type.FunctionType# */{
       id: module.id,
       cast: F.as
     }

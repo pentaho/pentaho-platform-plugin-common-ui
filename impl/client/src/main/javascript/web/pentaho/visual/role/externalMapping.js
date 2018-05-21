@@ -24,9 +24,9 @@ define([
   // NOTE: these will be kept private until it is decided between the model adapter and the viz concept.
 
   /**
-   * @name pentaho.visual.role.ExternalMapping.Type
+   * @name pentaho.visual.role.ExternalMappingType
    * @class
-   * @extends pentaho.visual.role.AbstractMapping.Type
+   * @extends pentaho.visual.role.AbstractMappingType
    *
    * @private
    *
@@ -82,7 +82,7 @@ define([
     },
     // endregion
 
-    $type: /** @lends pentaho.visual.role.ExternalMapping.Type# */{
+    $type: /** @lends pentaho.visual.role.ExternalMappingType# */{
 
       id: module.id,
 
@@ -91,10 +91,10 @@ define([
          * Gets or sets a value that indicates that only categorical modes of operation should be considered.
          *
          * This option only takes effect if the visual role
-         * has any continuous [modes]{@link pentaho.visual.role.AbstractProperty.Type#modes}.
+         * has any continuous [modes]{@link pentaho.visual.role.AbstractPropertyType#modes}.
          *
          * When the value is `true`,
-         * only the categorical modes of [modes]{@link pentaho.visual.role.AbstractProperty.Type#modes}
+         * only the categorical modes of [modes]{@link pentaho.visual.role.AbstractPropertyType#modes}
          * are considered.
          *
          * @name pentaho.visual.role.ExternalMapping#isCategoricalFixed

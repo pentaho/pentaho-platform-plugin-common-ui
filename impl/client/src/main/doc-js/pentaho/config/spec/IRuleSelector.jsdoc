@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@
  *
  * @name module
  * @memberOf pentaho.config.spec.IRuleSelector#
- * @type {pentaho.type.spec.UEnvironmentPropFilter<string>}
+ * @type {pentaho.type.spec.EnvironmentPropertyFilter<string>}
  */
 
 /**
@@ -44,7 +44,7 @@
  *
  * @name application
  * @memberOf pentaho.config.spec.IRuleSelector#
- * @type {pentaho.type.spec.UEnvironmentPropFilter<string>}
+ * @type {pentaho.type.spec.EnvironmentPropertyFilter<string>}
  */
 
 /**
@@ -52,7 +52,7 @@
  *
  * @name user
  * @memberOf pentaho.config.spec.IRuleSelector#
- * @type {pentaho.type.spec.UEnvironmentPropFilter<string>}
+ * @type {pentaho.type.spec.EnvironmentPropertyFilter<string>}
  */
 
 /**
@@ -60,7 +60,7 @@
  *
  * @name theme
  * @memberOf pentaho.config.spec.IRuleSelector#
- * @type {pentaho.type.spec.UEnvironmentPropFilter<string>}
+ * @type {pentaho.type.spec.EnvironmentPropertyFilter<string>}
  */
 
 /**
@@ -68,5 +68,5 @@
  *
  * @name locale
  * @memberOf pentaho.config.spec.IRuleSelector#
- * @type {pentaho.type.spec.UEnvironmentPropFilter<string>}
+ * @type {pentaho.type.spec.EnvironmentPropertyFilter<string>}
  */

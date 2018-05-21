@@ -22,9 +22,9 @@ define([
   return function(filter) {
 
     /**
-     * @name pentaho.data.filter.Property.Type
+     * @name pentaho.data.filter.PropertyType
      * @class
-     * @extends pentaho.data.filter.Abstract.Type
+     * @extends pentaho.data.filter.AbstractType
      *
      * @classDesc The base type class of filter types.
      *
@@ -65,7 +65,7 @@ define([
         return true;
       },
 
-      $type: /** @lends pentaho.data.filter.Property.Type# */{
+      $type: /** @lends pentaho.data.filter.PropertyType# */{
         id: module.id,
         isAbstract: true,
         props: [

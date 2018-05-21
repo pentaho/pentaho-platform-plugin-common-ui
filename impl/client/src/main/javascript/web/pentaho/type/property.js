@@ -39,11 +39,11 @@ define([
   var __propType;
 
   /**
-   * @name pentaho.type.Property.Type
+   * @name pentaho.type.PropertyType
    *
    * @class
-   * @extends pentaho.type.Instance.Type
-   * @extends pentaho.type.mixins.DiscreteDomain.Type
+   * @extends pentaho.type.Type
+   * @extends pentaho.type.mixins.DiscreteDomainType
    *
    * @abstract
    *
@@ -79,9 +79,9 @@ define([
 
   var Property = Instance.extend(/** @lends pentaho.type.Property# */{
 
-    $type: /** @lends pentaho.type.Property.Type# */{
-      // Note: constructor/_init is only called on sub-classes of Property.Type,
-      // and not on Property.Type itself.
+    $type: /** @lends pentaho.type.PropertyType# */{
+      // Note: constructor/_init is only called on sub-classes of PropertyType,
+      // and not on PropertyType itself.
 
       id: module.id,
       isAbstract: true,
@@ -117,19 +117,19 @@ define([
        */
       __isConstructing: false,
 
-      // TODO: Not validating property value type must descend from Value.Type.
-      // Could probably solve by assuming a Property.Type default of Value.
+      // TODO: Not validating property value type must descend from ValueType.
+      // Could probably solve by assuming a PropertyType default of Value.
 
       /**
        * Performs initialization tasks that take place before the instance is
        * extended with its spec.
        *
-       * @param {!pentaho.type.spec.UPropertyTypeProto} spec - A property name or specification object.
+       * @param {object} spec - A property name or specification object.
        * @param {!Object} keyArgs - Keyword arguments.
-       * @param {!pentaho.type.Complex.Type} keyArgs.declaringType - The complex type that declares the property.
+       * @param {!pentaho.type.ComplexType} keyArgs.declaringType - The complex type that declares the property.
        * @param {number} keyArgs.index - The index of the property within its complex type.
        *
-       * @return {pentaho.type.spec.ITypeProto} A specification to use instead of the given `spec` argument to extend
+       * @return {?object} A specification to use instead of the given `spec` argument to extend
        * the type, or `undefined`, to use the given specification.
        *
        * @protected
@@ -201,7 +201,7 @@ define([
 
       // region IListElement
       /**
-       * Gets the singular name of `Property.Type` list-elements.
+       * Gets the singular name of `PropertyType` list-elements.
        * @type string
        * @readonly
        * @default "property"
@@ -210,7 +210,7 @@ define([
 
       // region IWithKey implementation
       /**
-       * Gets the singular name of `Property.Type` keys.
+       * Gets the singular name of `PropertyType` keys.
        * @type {string}
        * @readonly
        * @default "name"
@@ -240,7 +240,7 @@ define([
       /**
        * Gets the complex type that declares this property type.
        *
-       * @type {pentaho.type.Complex.Type}
+       * @type {pentaho.type.ComplexType}
        * @readonly
        */
       get declaringType() {
@@ -267,7 +267,7 @@ define([
        * Gets or sets the name of the _property type_.
        *
        * The name of a _property type_ identifies it within
-       * its [declaring type]{@link pentaho.type.Property.Type#declaringType}.
+       * its [declaring type]{@link pentaho.type.PropertyType#declaringType}.
        *
        * ### Set
        *
@@ -282,7 +282,7 @@ define([
        * @throws {pentaho.lang.ArgumentRequiredError} When set to an empty string or a _nully_ value.
        * @throws {TypeError} When set to a value different from the current one.
        *
-       * @see pentaho.type.spec.IPropertyTypeProto#name
+       * @see pentaho.type.spec.IPropertyType#name
        */
       get name() {
         return this.__name;
@@ -328,7 +328,7 @@ define([
        * @throws {pentaho.lang.ArgumentRequiredError} When set to an empty string or a _nully_ value.
        * @throws {TypeError} When set to a value different from the current one.
        *
-       * @see pentaho.type.spec.IPropertyTypeProto#nameAlias
+       * @see pentaho.type.spec.IPropertyType#nameAlias
        */
       get nameAlias() {
         return this.__nameAlias;
@@ -352,7 +352,7 @@ define([
        * Gets a value that indicates if the property is a _list_.
        *
        * A property is a _list_ property if
-       * its [value type]{@link pentaho.type.Property.Type#valueType} is a list type,
+       * its [value type]{@link pentaho.type.PropertyType#valueType} is a list type,
        * that is, if it is or extends [List]{@link pentaho.type.List}.
        *
        * @type {boolean}
@@ -369,22 +369,22 @@ define([
       /**
        * Gets whether the value of properties of this type cannot be changed, from the outside.
        *
-       * If the _value type_ is a [list]{@link pentaho.type.Value.Type#isList} type,
+       * If the _value type_ is a [list]{@link pentaho.type.ValueType#isList} type,
        * then this property effectively makes the list read-only.
        *
        * This attribute can only be set when defining a root property or an abstract property type.
        *
-       * When the property belongs to a [read-only]{@link pentaho.type.Value.Type#isReadOnly} complex type,
+       * When the property belongs to a [read-only]{@link pentaho.type.ValueType#isReadOnly} complex type,
        * then the property is necessarily read-only,
-       * as well as the [element type]{@link pentaho.type.Instance.Type#elementType} of the property's
-       * [value type]{@link pentaho.type.Property.Type#valueType}.
+       * as well as the [element type]{@link pentaho.type.Type#elementType} of the property's
+       * [value type]{@link pentaho.type.PropertyType#valueType}.
        *
        * The default _read-only_ value of `false`.
        *
        * @type {boolean}
        *
-       * @see pentaho.type.Value.Type#isReadOnly
-       * @see pentaho.type.Property.Type#valueType
+       * @see pentaho.type.ValueType#isReadOnly
+       * @see pentaho.type.PropertyType#valueType
        */
       get isReadOnly() {
         return this.__isReadOnly;
@@ -410,7 +410,7 @@ define([
       /**
        * Gets the type of value that properties of this type can hold.
        *
-       * If the _value type_ is a [list]{@link pentaho.type.Value.Type#isList} type,
+       * If the _value type_ is a [list]{@link pentaho.type.ValueType#isList} type,
        * then this property will be a _list_ (or multiple-elements) property;
        * otherwise, this property will be an _element_ (or single-element) property.
        *
@@ -423,28 +423,28 @@ define([
        * When a {@link Nully} value is specified, it is ignored.
        *
        * Otherwise, the specified value is assumed to be an
-       * [spec.UTypeReference]{@link pentaho.type.spec.UTypeReference}
+       * [spec.TypeReference]{@link pentaho.type.spec.TypeReference}
        * and is first resolved using [ILoader#resolveType]{@link pentaho.type.ILoader#resolveType}.
        *
        * An error is thrown
-       * when the specified value is _not_ a [subtype]{@link pentaho.type.Instance.Type#isSubtypeOf} of
+       * when the specified value is _not_ a [subtype]{@link pentaho.type.Type#isSubtypeOf} of
        * the attribute's current _value type_.
        *
        * An error is thrown
        * when the specified value is such that its
-       * [element type]{@link pentaho.type.Instance.Type#elementType}
+       * [element type]{@link pentaho.type.Type#elementType}
        * would not be read-only and
-       * the property belongs to a [read-only]{@link pentaho.type.Value.Type#isReadOnly} complex type.
+       * the property belongs to a [read-only]{@link pentaho.type.ValueType#isReadOnly} complex type.
        *
        * ### Relation to the `defaultValue` attribute
        *
-       * When specified, any inherited [defaultValue]{@link pentaho.type.Property.Type#defaultValue} is ignored.
+       * When specified, any inherited [defaultValue]{@link pentaho.type.PropertyType#defaultValue} is ignored.
        *
-       * @type {!pentaho.type.Value.Type}
+       * @type {!pentaho.type.ValueType}
        *
-       * @see pentaho.type.spec.IPropertyTypeProto#valueType
-       * @see pentaho.type.Instance.Type#elementType
-       * @see pentaho.type.Value.Type#isReadOnly
+       * @see pentaho.type.spec.IPropertyType#valueType
+       * @see pentaho.type.Type#elementType
+       * @see pentaho.type.ValueType#isReadOnly
        */
       get valueType() {
         return this.__valueType;
@@ -453,7 +453,7 @@ define([
       /**
        * Sets the value type of the property.
        *
-       * @param {pentaho.type.spec.UTypeReference} value - A value type reference.
+       * @param {pentaho.type.spec.TypeReference} value - A value type reference.
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When setting to a _value type_ that is not a subtype
        * of the inherited _value type_.
@@ -493,7 +493,7 @@ define([
       /**
        * Asserts that a given value type is consistent with the `isReadOnly` status of the declaring type.
        *
-       * @param {pentaho.type.Value.Type} valueType - The value type.@
+       * @param {pentaho.type.ValueType} valueType - The value type.@
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When the _element type_ corresponding to the given
        * value type would not be read-only and the declaring complex type is read-only.
@@ -546,7 +546,7 @@ define([
        *
        * ### Set
        *
-       * When set and the property already has [descendant]{@link pentaho.type.Instance.Type#hasDescendants}
+       * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants}
        * properties, an error is thrown.
        *
        * When set to `null`, it is respected.
@@ -554,31 +554,31 @@ define([
        * When set to the _control value_ `undefined`, the attribute value is reset,
        * causing it to assume its default value (yes, the default value of the _default value_ attribute...):
        *
-       * * for [root]{@link pentaho.type.Instance.Type#root} _property types_ or
-       *   properties with a locally specified [valueType]{@link pentaho.type.Property.Type#defaultValue},
+       * * for [root]{@link pentaho.type.Type#root} _property types_ or
+       *   properties with a locally specified [valueType]{@link pentaho.type.PropertyType#defaultValue},
        *   the default value is `null`
        * * for other _property types_, the default value is the _inherited value_.
        *
        * When set to a function, it is accepted.
        * For each complex instance,
        * the function is evaluated and its result converted to the _property type_'s
-       * [valueType]{@link pentaho.type.Property.Type#valueType},
-       * using its [Value.Type#to]{@link pentaho.type.Value.Type#to} method.
+       * [valueType]{@link pentaho.type.PropertyType#valueType},
+       * using its [ValueType#to]{@link pentaho.type.ValueType#to} method.
        * The conversion may be impossible and thus an error may be thrown.
        *
        * When set to any other value,
        * it is immediately converted to the _property type_'s
-       * [valueType]{@link pentaho.type.Property.Type#valueType}.
+       * [valueType]{@link pentaho.type.PropertyType#valueType}.
        *
-       * @type {pentaho.type.Value | pentaho.type.spec.PropertyDynamicAttribute.<pentaho.type.spec.UValue>}
+       * @type {pentaho.type.Value | pentaho.type.spec.PropertyDynamicAttribute.<pentaho.type.spec.Value>}
        *
        * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
-       * [descendant]{@link pentaho.type.Instance.Type#hasDescendants} properties.
+       * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
        *
        * @throws {Error} When setting to a non-function _default value_ that cannot be converted to the
        * property type's current `valueType`.
        *
-       * @see pentaho.type.spec.IPropertyTypeProto#defaultValue
+       * @see pentaho.type.spec.IPropertyType#defaultValue
        */
       get defaultValue() {
         return this.__defaultValue;
@@ -627,7 +627,7 @@ define([
        *
        * By default, if, `defaultValueOwner` is specified,
        * a {@link Nully} value is converted to the property's default value,
-       * {@link pentaho.type.Property.Type#defaultValue}.
+       * {@link pentaho.type.PropertyType#defaultValue}.
        *
        * @param {pentaho.type.Complex} defaultValueOwner - The complex value that owns the property.
        *   Only needed if it is desired that {@link Nully} values are converted to the property's default value.
@@ -719,9 +719,9 @@ define([
        * Gets or sets whether the property is a _boundary property_.
        *
        * A _boundary property_ identifies the limits of the aggregate of its
-       * [declaring type]{@link pentaho.type.Property.Type#declaringType}.
+       * [declaring type]{@link pentaho.type.PropertyType#declaringType}.
        *
-       * If the _value type_ is a [list]{@link pentaho.type.Value.Type#isList} type,
+       * If the _value type_ is a [list]{@link pentaho.type.ValueType#isList} type,
        * then this property sets its lists as [boundary lists]{@link pentaho.type.List#$isBoundary}.
        *
        * The validity of the object with a _boundary property_
@@ -743,7 +743,7 @@ define([
        * Only a _root property type_ can set its boundary attribute.
        * When set on a _non-root property type_, an error is thrown.
        *
-       * When set and the root property already has [descendant]{@link pentaho.type.Instance.Type#hasDescendants}
+       * When set and the root property already has [descendant]{@link pentaho.type.Type#hasDescendants}
        * properties, an error is thrown.
        *
        * When set to a {@link Nully} value, the set operation is ignored.
@@ -756,7 +756,7 @@ define([
        * @throws {pentaho.lang.OperationInvalidError} When set on a non-root property type.
        *
        * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
-       * [descendant]{@link pentaho.type.Instance.Type#hasDescendants} properties.
+       * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
        */
       get isBoundary() {
         return this.__isBoundary;
@@ -807,13 +807,13 @@ define([
       /**
        * Determines if this property is valid on a given complex instance.
        *
-       * If this property is not a [boundary]{@link pentaho.type.Property.Type#isBoundary} property,
+       * If this property is not a [boundary]{@link pentaho.type.PropertyType#isBoundary} property,
        * this method validates the value of the property itself.
        *
        * Afterwards, the cardinality is verified against the attributes
-       * {@link pentaho.type.Property.Type#isRequired},
-       * {@link pentaho.type.Property.Type#countMin} and
-       * {@link pentaho.type.Property.Type#countMax}.
+       * {@link pentaho.type.PropertyType#isRequired},
+       * {@link pentaho.type.PropertyType#countMin} and
+       * {@link pentaho.type.PropertyType#countMax}.
        *
        * @param {!pentaho.type.Complex} owner - The complex value that owns the property.
        *
@@ -869,7 +869,7 @@ define([
        * Validates the given non-null value in the context of this property.
        *
        * The base implementation calls
-       * [_collectElementValidators]{@link pentaho.type.Property.Type#_collectElementValidators}
+       * [_collectElementValidators]{@link pentaho.type.PropertyType#_collectElementValidators}
        * to obtain the list of currently applicable element validators.
        * Then, each element is validated against the list of collected validators.
        *
@@ -977,7 +977,7 @@ define([
           var count = 0;
 
           if(this.isRoot) {
-            // The default `base` of a root property is Property.Type,
+            // The default `base` of a root property is PropertyType,
             // and is omitted if this is the case.
             // Again, the ancestor of a root property is null, and would not work in this case.
             baseType = Object.getPrototypeOf(this);
@@ -1046,7 +1046,7 @@ define([
       // endregion
     }
   }, /** @lends pentaho.type.Property */{
-    $type: /** @lends pentaho.type.Property.Type */{
+    $type: /** @lends pentaho.type.PropertyType */{
       /** @inheritDoc */
       _extend: function(name, instSpec, classSpec, keyArgs) {
 
@@ -1059,23 +1059,23 @@ define([
       }
     }
   }).implement({
-    $type: /** @lends pentaho.type.Property.Type# */{
+    $type: /** @lends pentaho.type.PropertyType# */{
       dynamicAttributes: {
         /**
          * Evaluates the value of the `isRequired` attribute of a property of this type
          * on a given complex value.
          *
          * This method is used to determine the effective
-         * [element count range]{@link pentaho.type.Property.Type#countRangeOn} and
+         * [element count range]{@link pentaho.type.PropertyType#countRangeOn} and
          * is not intended to be used directly.
          *
          * @name isRequiredOn
-         * @memberOf pentaho.type.Property.Type#
+         * @memberOf pentaho.type.PropertyType#
          * @method
          * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
          * @return {boolean} The evaluated value of the `isRequired` attribute.
          *
-         * @see pentaho.type.Property.Type#isRequired
+         * @see pentaho.type.PropertyType#isRequired
          */
 
         /**
@@ -1083,12 +1083,12 @@ define([
          *
          * When a property is of a required _property type_,
          * it is considered **invalid** if its value (in a complex instance) is `null`; or,
-         * in the case of a [list]{@link pentaho.type.Property.Type#isList} _property type_,
+         * in the case of a [list]{@link pentaho.type.PropertyType#isList} _property type_,
          * it has zero elements.
          *
          * Note that this attribute is taken together with
-         * the [countMin]{@link pentaho.type.Property.Type#countMin} attribute
-         * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeOn}
+         * the [countMin]{@link pentaho.type.PropertyType#countMin} attribute
+         * to determine the effective [element count range]{@link pentaho.type.PropertyType#countRangeOn}
          * of a _property type_.
          *
          * ### This attribute is *Dynamic*
@@ -1125,20 +1125,20 @@ define([
          *
          * When set to a {@link Nully} value, the set operation is ignored.
          *
-         * When set and the property already has [descendant]{@link pentaho.type.Instance.Type#hasDescendants}
+         * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants}
          * properties, an error is thrown.
          *
          * The default (root) `isRequired` attribute value is `false`.
          *
          * @name isRequired
-         * @memberOf pentaho.type.Property.Type#
+         * @memberOf pentaho.type.PropertyType#
          * @type {undefined | boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
          *
          * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
-         * [descendant]{@link pentaho.type.Instance.Type#hasDescendants} properties.
+         * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
          *
          * @see pentaho.type.Complex#isRequiredOf
-         * @see pentaho.type.spec.IPropertyTypeProto#isRequired
+         * @see pentaho.type.spec.IPropertyType#isRequired
          */
         isRequired: {
           value: false,
@@ -1156,16 +1156,16 @@ define([
          * on a given complex value.
          *
          * This method is used to determine the effective
-         * [element count range]{@link pentaho.type.Property.Type#countRangeOn} and
+         * [element count range]{@link pentaho.type.PropertyType#countRangeOn} and
          * is not intended to be used directly.
          *
          * @name countMinOn
-         * @memberOf pentaho.type.Property.Type#
+         * @memberOf pentaho.type.PropertyType#
          * @method
          * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
          * @return {number} The evaluated value of the `countMin` attribute.
          *
-         * @see pentaho.type.Property.Type#countMin
+         * @see pentaho.type.PropertyType#countMin
          */
 
         /**
@@ -1174,8 +1174,8 @@ define([
          * A non-negative integer.
          *
          * Note that this attribute is taken together with
-         * the [isRequired]{@link pentaho.type.Property.Type#isRequired} attribute
-         * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeOn}
+         * the [isRequired]{@link pentaho.type.PropertyType#isRequired} attribute
+         * to determine the effective [element count range]{@link pentaho.type.PropertyType#countRangeOn}
          * of a _property type_.
          *
          * ### This attribute is *Dynamic*
@@ -1215,18 +1215,18 @@ define([
          *
          * When set to a {@link Nully} value, the set operation is ignored.
          *
-         * When set and the property already has [descendant]{@link pentaho.type.Instance.Type#hasDescendants}
+         * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants}
          * properties, an error is thrown.
          *
          * The default (root) `countMin` attribute value is `0`.
          *
          * @name countMin
-         * @memberOf pentaho.type.Property.Type#
+         * @memberOf pentaho.type.PropertyType#
          * @type {undefined | number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
          *
          * @see pentaho.type.Complex#countRangeOf
          *
-         * @see pentaho.type.spec.IPropertyTypeProto#countMin
+         * @see pentaho.type.spec.IPropertyType#countMin
          */
         countMin: {
           value: 0,
@@ -1243,16 +1243,16 @@ define([
          * on a given complex value.
          *
          * This method is used to determine the effective
-         * [element count range]{@link pentaho.type.Property.Type#countRangeOn} and
+         * [element count range]{@link pentaho.type.PropertyType#countRangeOn} and
          * is not intended to be used directly.
          *
          * @name countMaxOn
-         * @memberOf pentaho.type.Property.Type#
+         * @memberOf pentaho.type.PropertyType#
          * @method
          * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
          * @return {number} The evaluated value of the `countMax` attribute.
          *
-         * @see pentaho.type.Property.Type#countMax
+         * @see pentaho.type.PropertyType#countMax
          */
 
         /**
@@ -1261,9 +1261,9 @@ define([
          * A non-negative integer.
          *
          * Note that this attribute is taken together with
-         * the [isRequired]{@link pentaho.type.Property.Type#isRequired}
-         * and the [countMin]{@link pentaho.type.Property.Type#countMin} attributes
-         * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeOn}
+         * the [isRequired]{@link pentaho.type.PropertyType#isRequired}
+         * and the [countMin]{@link pentaho.type.PropertyType#countMin} attributes
+         * to determine the effective [element count range]{@link pentaho.type.PropertyType#countRangeOn}
          * of a _property type_.
          *
          * ### This attribute is *Dynamic*
@@ -1303,17 +1303,17 @@ define([
          *
          * When set to a {@link Nully} value, the set operation is ignored.
          *
-         * When set and the property already has [descendant]{@link pentaho.type.Instance.Type#hasDescendants}
+         * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants}
          * properties, an error is thrown.
          *
          * The default (root) `countMax` attribute value is `Infinity`.
          *
          * @name countMax
-         * @memberOf pentaho.type.Property.Type#
+         * @memberOf pentaho.type.PropertyType#
          * @type {undefined | number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
          *
          * @see pentaho.type.Complex#countRangeOf
-         * @see pentaho.type.spec.IPropertyTypeProto#countMax
+         * @see pentaho.type.spec.IPropertyType#countMax
          */
         countMax: {
           value: Infinity,
@@ -1330,12 +1330,12 @@ define([
          * on a given owner complex value.
          *
          * @name isApplicableOn
-         * @memberOf pentaho.type.Property.Type#
+         * @memberOf pentaho.type.PropertyType#
          * @method
          * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
          * @return {boolean} The evaluated value of the `isApplicable` attribute.
          *
-         * @see pentaho.type.Property.Type#isApplicable
+         * @see pentaho.type.PropertyType#isApplicable
          */
 
         /**
@@ -1382,18 +1382,18 @@ define([
          *
          * When set to a {@link Nully} value, the set operation is ignored.
          *
-         * When set and the property already has [descendant]{@link pentaho.type.Instance.Type#hasDescendants}
+         * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants}
          * properties, an error is thrown.
          *
          * The default (root) `isApplicable` attribute value is `true`.
          *
          * @name isApplicable
-         * @memberOf pentaho.type.Property.Type#
+         * @memberOf pentaho.type.PropertyType#
          * @type {undefined | boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
          *
-         * @see pentaho.type.Property.Type#isRequired
+         * @see pentaho.type.PropertyType#isRequired
          * @see pentaho.type.Complex#isApplicableOf
-         * @see pentaho.type.spec.IPropertyTypeProto#isApplicable
+         * @see pentaho.type.spec.IPropertyType#isApplicable
          */
         isApplicable: {
           value: true,
@@ -1411,12 +1411,12 @@ define([
          * on a given owner complex value.
          *
          * @name isEnabledOn
-         * @memberOf pentaho.type.Property.Type#
+         * @memberOf pentaho.type.PropertyType#
          * @method
          * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
          * @return {boolean} The evaluated value of the `isEnabled` attribute.
          *
-         * @see pentaho.type.Property.Type#isEnabled
+         * @see pentaho.type.PropertyType#isEnabled
          */
 
         /**
@@ -1460,17 +1460,17 @@ define([
          *
          * When set to a {@link Nully} value, the set operation is ignored.
          *
-         * When set and the property already has [descendant]{@link pentaho.type.Instance.Type#hasDescendants}
+         * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants}
          * properties, an error is thrown.
          *
          * The default (root) `isEnabled` attribute value is `true`.
          *
          * @name isEnabled
-         * @memberOf pentaho.type.Property.Type#
+         * @memberOf pentaho.type.PropertyType#
          * @type {undefined | boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
          *
          * @see pentaho.type.Complex#isEnabledOf
-         * @see pentaho.type.spec.IPropertyTypeProto#isEnabled
+         * @see pentaho.type.spec.IPropertyType#isEnabled
          */
         isEnabled: {
           value: true,
@@ -1491,10 +1491,10 @@ define([
        * The _element count range_ is a conciliation of the _effective value_ of
        * the following attributes:
        *
-       * * {@link pentaho.type.Property.Type#isList}
-       * * {@link pentaho.type.Property.Type#isRequired}
-       * * {@link pentaho.type.Property.Type#countMin}
-       * * {@link pentaho.type.Property.Type#countMax}
+       * * {@link pentaho.type.PropertyType#isList}
+       * * {@link pentaho.type.PropertyType#isRequired}
+       * * {@link pentaho.type.PropertyType#countMin}
+       * * {@link pentaho.type.PropertyType#countMax}
        *
        * The logic can be best explained by the following simple example function:
        *
@@ -1546,7 +1546,7 @@ define([
     }
   })
   .implement({
-    $type: /** @lends pentaho.type.Property.Type# */{
+    $type: /** @lends pentaho.type.PropertyType# */{
       // These are applied last so that mixins see any of the methods above as base implementations.
       mixins: [DiscreteDomain]
     }

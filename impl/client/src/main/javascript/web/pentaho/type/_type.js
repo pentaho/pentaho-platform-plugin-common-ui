@@ -50,12 +50,14 @@ define([
   var __type = null;
 
   /**
-   * @name pentaho.type.Instance.Type
+   * @name pentaho.type.Type
    * @class
    *
    * @classDesc The root class of types that can be represented by the Pentaho Type API.
    *
    * For additional information, see the associated _instance class_, {@link pentaho.type.Instance}.
+   *
+   * This constructor is the value of {@link pentaho.type.InstanceType}.
    *
    * @description _Initializes_ the type's singleton object.
    * @param {Object} spec - The specification of this type.
@@ -64,7 +66,7 @@ define([
    * this type.
    * @param {boolean} [keyArgs.isRoot=false] Indicates if the type is a _root_ type.
    */
-  var Type = Base.extend("pentaho.type.Instance.Type", /** @lends pentaho.type.Instance.Type# */{
+  var Type = Base.extend("pentaho.type.Type", /** @lends pentaho.type.Type# */{
 
     /* Mixins are mixed before anything else, so that they are applied and serve as a base implementation. */
     extend_order: ["mixins"],
@@ -151,13 +153,13 @@ define([
      *
      * This method is typically overridden to block the inheritance of certain attributes.
      *
-     * @param {!pentaho.type.spec.ITypeProto} spec - The specification of this type.
+     * @param {object} spec - The specification of this type.
      * @param {!Object} keyArgs - Keyword arguments.
      * @param {!pentaho.type.Instance} keyArgs.instance - The _prototype_ of the `Instance` class associated with
      * this type.
      * @param {boolean} [keyArgs.isRoot=false] If `true`, creates a _root_ type.
      *
-     * @return {pentaho.type.spec.ITypeProto} A specification to use instead of the given `spec` argument to extend
+     * @return {?object} A specification to use instead of the given `spec` argument to extend
      * the type, or `undefined`, to use the given specification.
      *
      * @protected
@@ -192,7 +194,7 @@ define([
      * Unique type identifiers are auto-generated in each session.
      *
      * Note that even anonymous types
-     * (those whose {@link pentaho.type.Instance.Type#id} is `null`)
+     * (those whose {@link pentaho.type.Type#id} is `null`)
      * have a unique identifier.
      *
      * This attribute is _not_ inherited.
@@ -233,11 +235,11 @@ define([
      * in a property type should mean.
      *
      * @name root
-     * @memberOf pentaho.type.Instance.Type#
-     * @type {pentaho.type.Instance.Type}
+     * @memberOf pentaho.type.Type#
+     * @type {pentaho.type.Type}
      * @readonly
-     * @see pentaho.type.Instance.Type#isRoot
-     * @see pentaho.type.Instance.Type#ancestor
+     * @see pentaho.type.Type#isRoot
+     * @see pentaho.type.Type#ancestor
      */
 
     /**
@@ -247,7 +249,7 @@ define([
      *
      * @readonly
      *
-     * @see pentaho.type.Instance.Type#root
+     * @see pentaho.type.Type#root
      */
     get isRoot() {
       return this === this.root;
@@ -260,10 +262,10 @@ define([
      *
      * The root type returns `null`.
      *
-     * @type {pentaho.type.Instance.Type}
+     * @type {pentaho.type.Type}
      * @readonly
-     * @see pentaho.type.Instance.Type#root
-     * @see pentaho.type.Instance.Type#hasDescendants
+     * @see pentaho.type.Type#root
+     * @see pentaho.type.Type#hasDescendants
      */
     get ancestor() {
       return this.isRoot ? null : Object.getPrototypeOf(this);
@@ -276,7 +278,7 @@ define([
      *
      * @type {boolean}
      * @readonly
-     * @see pentaho.type.Instance.Type#ancestor
+     * @see pentaho.type.Type#ancestor
      */
     get hasDescendants() {
       return this.__hasDescendants;
@@ -308,8 +310,8 @@ define([
     // region isValue property
     /**
      * Gets a value that indicates if this type
-     * [is]{@link pentaho.type.Instance.Type#isSubtypeOf} a
-     * [value]{@link pentaho.type.Value.Type} type.
+     * [is]{@link pentaho.type.Type#isSubtypeOf} a
+     * [value]{@link pentaho.type.ValueType} type.
      *
      * @type {boolean}
      * @readOnly
@@ -320,8 +322,8 @@ define([
     // region isProperty property
     /**
      * Gets a value that indicates if this type
-     * [is]{@link pentaho.type.Instance.Type#isSubtypeOf} a
-     * [property]{@link pentaho.type.Property.Type} type.
+     * [is]{@link pentaho.type.Type#isSubtypeOf} a
+     * [property]{@link pentaho.type.PropertyType} type.
      *
      * @type {boolean}
      * @readOnly
@@ -332,9 +334,9 @@ define([
     // region isContainer property
     /**
      * Gets a value that indicates if this type
-     * [is]{@link pentaho.type.Instance.Type#isSubtypeOf} a
-     * [list]{@link pentaho.type.List.Type} or a
-     * [complex]{@link pentaho.type.Complex.Type} type.
+     * [is]{@link pentaho.type.Type#isSubtypeOf} a
+     * [list]{@link pentaho.type.ListType} or a
+     * [complex]{@link pentaho.type.ComplexType} type.
      *
      * @type {boolean}
      * @readOnly
@@ -345,8 +347,8 @@ define([
     // region isList property
     /**
      * Gets a value that indicates if this type
-     * [is]{@link pentaho.type.Instance.Type#isSubtypeOf} a
-     * [list]{@link pentaho.type.List.Type} type.
+     * [is]{@link pentaho.type.Type#isSubtypeOf} a
+     * [list]{@link pentaho.type.ListType} type.
      *
      * @type {boolean}
      * @readOnly
@@ -357,8 +359,8 @@ define([
     // region isElement property
     /**
      * Gets a value that indicates if this type
-     * [is]{@link pentaho.type.Instance.Type#isSubtypeOf} an
-     * [element]{@link pentaho.type.Element.Type} type.
+     * [is]{@link pentaho.type.Type#isSubtypeOf} an
+     * [element]{@link pentaho.type.ElementType} type.
      *
      * @type {boolean}
      * @readOnly
@@ -368,8 +370,8 @@ define([
     // region isComplex property
     /**
      * Gets a value that indicates if this type
-     * [is]{@link pentaho.type.Instance.Type#isSubtypeOf} a
-     * [complex]{@link pentaho.type.Complex.Type} type.
+     * [is]{@link pentaho.type.Type#isSubtypeOf} a
+     * [complex]{@link pentaho.type.ComplexType} type.
      *
      * @type {boolean}
      * @readOnly
@@ -380,8 +382,8 @@ define([
     // region isSimple property
     /**
      * Gets a value that indicates if this type
-     * [is]{@link pentaho.type.Instance.Type#isSubtypeOf} a
-     * [simple]{@link pentaho.type.Simple.Type} type.
+     * [is]{@link pentaho.type.Type#isSubtypeOf} a
+     * [simple]{@link pentaho.type.SimpleType} type.
      *
      * @type {boolean}
      * @readOnly
@@ -410,15 +412,15 @@ define([
     /**
      * Gets the element type of this type.
      *
-     * If this type is a [list]{@link pentaho.type.Instance.Type#isList} type,
-     * returns its [of]{@link pentaho.type.List.Type#of} attribute.
+     * If this type is a [list]{@link pentaho.type.Type#isList} type,
+     * returns its [of]{@link pentaho.type.ListType#of} attribute.
      * Otherwise, this type is an element type, and it returns itself.
      *
-     * @type {!pentaho.type.Instance.Type}
+     * @type {!pentaho.type.Type}
      * @readonly
-     * @see pentaho.type.Instance.Type#isList
-     * @see pentaho.type.Instance.Type#isElement
-     * @see pentaho.type.List.Type#of
+     * @see pentaho.type.Type#isList
+     * @see pentaho.type.Type#isElement
+     * @see pentaho.type.ListType#of
      */
     get elementType() {
       return this;
@@ -438,16 +440,16 @@ define([
      * The identifier of a type can only be specified when extending the ancestor type.
      *
      * The identifier is only defined for types which have an associated AMD/RequireJS module.
-     * However, note that all have a {@link pentaho.type.Instance.Type#uid}.
+     * However, note that all have a {@link pentaho.type.Type#uid}.
      *
      * This attribute is not inherited.
      *
-     * When unspecified, defaults to the value of [sourceId]{@link pentaho.type.Instance.Type#sourceId}.
+     * When unspecified, defaults to the value of [sourceId]{@link pentaho.type.Type#sourceId}.
      *
      * @type {?nonEmptyString}
      * @readonly
      *
-     * @see pentaho.type.Instance.Type#sourceId
+     * @see pentaho.type.Type#sourceId
      */
     get id() {
       return this.__id;
@@ -462,22 +464,22 @@ define([
      * Gets the source module identifier of this type.
      *
      * The source identifier is the module identifier of the _actual_ AMD/RequireJS module
-     * that provides the type and may be different from the [identifier]{@link pentaho.type.Instance.Type#id}
+     * that provides the type and may be different from the [identifier]{@link pentaho.type.Type#id}
      * when an AMD package or custom mapping is configured for the module.
      *
      * The source identifier is used to resolve module identifiers relative to the source module,
-     * as is the case with the {@link pentaho.type.Instance.Type#defaultView} attribute.
+     * as is the case with the {@link pentaho.type.Type#defaultView} attribute.
      *
      * The source identifier of a type can only be specified when extending the ancestor type.
      *
      * This attribute is not inherited.
      *
-     * When unspecified, defaults to the value of [id]{@link pentaho.type.Instance.Type#id}.
+     * When unspecified, defaults to the value of [id]{@link pentaho.type.Type#id}.
      *
      * @type {?nonEmptyString}
      * @readonly
-     * @see pentaho.type.Instance.Type#id
-     * @see pentaho.type.Instance.Type#defaultView
+     * @see pentaho.type.Type#id
+     * @see pentaho.type.Type#defaultView
      */
     get sourceId() {
       return this.__sourceId;
@@ -491,8 +493,8 @@ define([
      *
      * @type {?nonEmptyString}
      * @readOnly
-     * @see pentaho.type.Instance.Type#id
-     * @see pentaho.type.Instance.Type#alias
+     * @see pentaho.type.Type#id
+     * @see pentaho.type.Type#alias
      */
     get shortId() {
       return this.__alias || this.__id;
@@ -500,7 +502,7 @@ define([
 
     /**
      * Builds an absolute module identifier from
-     * one that is relative to the type's [source location]{@link pentaho.type.Instance.Type#sourceId}.
+     * one that is relative to the type's [source location]{@link pentaho.type.Type#sourceId}.
      *
      * Relative module identifiers start with a `.` and do not end with `".js"`.
      * For example, `"./View"` and `"../View"`, but not `./View.js`.
@@ -511,7 +513,7 @@ define([
      *
      * @return {string} An absolute module identifier.
      *
-     * @see pentaho.type.Instance.Type#sourceId
+     * @see pentaho.type.Type#sourceId
      *
      * @throws {OperationInvalidError} When `id` is a relative identifier and this type is anonymous,
      * or when `id` refers to an inexistent ascendant location.
@@ -537,7 +539,7 @@ define([
      * @type {?nonEmptyString}
      * @readonly
      *
-     * @see pentaho.type.Instance.Type#id
+     * @see pentaho.type.Type#id
      */
     get alias() {
       return this.__alias;
@@ -579,7 +581,7 @@ define([
      *
      * When set to a {@link Nully} value, nothing is done.
      *
-     * @type {Array.<pentaho.type.Instance.Type>}
+     * @type {Array.<pentaho.type.Type>}
      */
     get mixins() {
       var OwnCtor = this.instance.constructor;
@@ -760,8 +762,8 @@ define([
      * thus ignoring any inherited value.
      *
      * @type {?nonEmptyString}
-     * @see pentaho.type.Instance.Type#isBrowsable
-     * @see pentaho.type.Instance.Type#ordinal
+     * @see pentaho.type.Type#isBrowsable
+     * @see pentaho.type.Type#ordinal
      */
     get category() {
       return this.__category;
@@ -864,7 +866,7 @@ define([
      * except for the root type, `Instance.type` (which has no ancestor), where the attribute is `false`.
      *
      * @type {boolean}
-     * @see pentaho.type.Instance.Type#isBrowsable
+     * @see pentaho.type.Type#isBrowsable
      */
     get isAdvanced() {
       return this.__isAdvanced;
@@ -901,7 +903,7 @@ define([
      *
      * Setting to `undefined`, makes the property assume its default value.
      *
-     * The default value of a type with an [id]{@link pentaho.type.Instance.Type#id} is
+     * The default value of a type with an [id]{@link pentaho.type.Type#id} is
      * the identifier converted to _snake-case_,
      * plus special characters like `\`, `/`, `_`, `.` and spaces are converted to: a dash (`–`).
      * For example: `"pentaho/visual/models/heatGrid"` would have a default
@@ -963,8 +965,8 @@ define([
      * except for the root type, `Instance.type` (which has no ancestor), where the attribute is `0`.
      *
      * @type {number}
-     * @see pentaho.type.Instance.Type#isBrowsable
-     * @see pentaho.type.Instance.Type#category
+     * @see pentaho.type.Type#isBrowsable
+     * @see pentaho.type.Type#category
      */
     get ordinal() {
       return this.__ordinal;
@@ -994,7 +996,7 @@ define([
      * Gets or sets the default view for instances of this type.
      *
      * The identifier of the view's AMD module.
-     * If the identifier is relative, it is relative to [sourceId]{@link pentaho.type.Instance.Type#sourceId}.
+     * If the identifier is relative, it is relative to [sourceId]{@link pentaho.type.Type#sourceId}.
      *
      * Setting this to `undefined` causes the default view to be inherited from the ancestor type,
      * except for the root type, `Instance.type` (which has no ancestor), where the attribute is `null`.
@@ -1002,7 +1004,7 @@ define([
      * Setting this to a _falsy_ value (like `null` or an empty string),
      * clears the value of the attribute and sets it to `null`, ignoring any inherited value.
      *
-     * @see pentaho.type.Instance.Type#buildSourceRelativeId
+     * @see pentaho.type.Type#buildSourceRelativeId
      *
      * @type {string}
      *
@@ -1040,12 +1042,12 @@ define([
     /**
      * Gets the absolute view module identifier, if any.
      *
-     * A default view exists if property {@link pentaho.type.Instance.Type#defaultView}
+     * A default view exists if property {@link pentaho.type.Type#defaultView}
      * has a non-null value.
      *
      * @type {string}
      * @readOnly
-     * @see pentaho.type.Instance.Type#defaultView
+     * @see pentaho.type.Type#defaultView
      */
     get defaultViewAbs() {
       var defaultView = this.__defaultView;
@@ -1136,9 +1138,9 @@ define([
      * @throws {Error} Other errors, as documented in:
      * [InstancesContainer#get]{@link pentaho.type.InstancesContainer#get}.
      *
-     * @see pentaho.type.Instance.Type#createAsync
-     * @see pentaho.type.Instance.Type#to
-     * @see pentaho.type.Instance.Type#is
+     * @see pentaho.type.Type#createAsync
+     * @see pentaho.type.Type#to
+     * @see pentaho.type.Type#is
      */
     create: function(instSpec, instKeyArgs) {
       return baseLoader.resolveInstance(instSpec, instKeyArgs, this);
@@ -1159,7 +1161,7 @@ define([
      * @rejects {Error} Other errors, as documented in:
      * [InstancesContainer#getAsync]{@link pentaho.type.InstancesContainer#getAsync}.
      *
-     * @see pentaho.type.Instance.Type#create
+     * @see pentaho.type.Type#create
      */
     createAsync: function(instSpec, instKeyArgs) {
       return baseLoader.resolveInstanceAsync(instSpec, instKeyArgs, this);
@@ -1168,9 +1170,9 @@ define([
     /**
      * Asserts that a given type is a subtype of this type.
      *
-     * @param {!pentaho.type.Instance.Type} subtype - The subtype to assert.
+     * @param {!pentaho.type.Type} subtype - The subtype to assert.
      *
-     * @return {!pentaho.type.Instance.Type} The subtype `subtype`.
+     * @return {!pentaho.type.Type} The subtype `subtype`.
      *
      * @throws {pentaho.lang.OperationInvalidError} When `subtype` is not a subtype of this.
      *
@@ -1204,7 +1206,7 @@ define([
      * @param {string} attributeName - The name of the attribute being set.
      *
      * @throws {pentaho.lang.OperationInvalidError} When setting and the type
-     * already has [subtypes]{@link pentaho.type.Instance.Type#hasDescendants}.
+     * already has [subtypes]{@link pentaho.type.Type#hasDescendants}.
      *
      * @protected
      */
@@ -1231,7 +1233,7 @@ define([
      *
      * A type is considered a subtype of itself.
      *
-     * @param {pentaho.type.Instance.Type} superType - The candidate super-type.
+     * @param {pentaho.type.Type} superType - The candidate super-type.
      * @return {boolean} `true` if this is a subtype of `superType` type; `false`, otherwise.
      */
     isSubtypeOf: function(superType) {
@@ -1246,9 +1248,9 @@ define([
      * If a {@link Nully} value is specified, `null` is returned.
      *
      * Otherwise, if a given value is not already an instance of this type
-     * (checked using [is]{@link pentaho.type.Instance.Type#is}),
+     * (checked using [is]{@link pentaho.type.Type#is}),
      * this method delegates the creation of an instance to
-     * [create]{@link pentaho.type.Instance.Type#create}.
+     * [create]{@link pentaho.type.Type#create}.
      *
      * @param {?any} value - The value to convert.
      * @param {Object} [keyArgs] - The keyword arguments passed to `create`, when a new instance is created.
@@ -1271,7 +1273,7 @@ define([
      *
      * This method creates a new {@link pentaho.type.SpecificationScope} for describing
      * this type, and any other instances and types it references,
-     * and then delegates the actual work to {@link pentaho.type.Instance.Type#toSpecInContext}.
+     * and then delegates the actual work to {@link pentaho.type.Type#toSpecInContext}.
      *
      * @param {Object} [keyArgs] The keyword arguments object.
      * Passed to every type and instance serialized within this scope.
@@ -1281,10 +1283,10 @@ define([
      * @param {?boolean} [keyArgs.isJson=false] Generates a JSON-compatible specification.
      * Attributes that do not have a JSON-compatible specification are omitted.
      *
-     * @return {!pentaho.type.spec.ITypeProto} A specification of this type.
+     * @return {!pentaho.type.spec.IType} A specification of this type.
      *
-     * @see pentaho.type.Instance.Type#toSpecInContext
-     * @see pentaho.type.Instance.Type#_fillSpecInContext
+     * @see pentaho.type.Type#toSpecInContext
+     * @see pentaho.type.Type#_fillSpecInContext
      */
     toSpec: function(keyArgs) {
       return O.using(new SpecificationScope(), this.toSpecInContext.bind(this, keyArgs || {}));
@@ -1298,17 +1300,17 @@ define([
      *
      * The default implementation returns a plain object with the identifier of the type and
      * any other specified attributes
-     * (like [label]{@link pentaho.type.Instance.Type#label} or
-     * [description]{@link pentaho.type.Instance.Type#description}).
+     * (like [label]{@link pentaho.type.Type#label} or
+     * [description]{@link pentaho.type.Type#description}).
      *
      * @param {Object} [keyArgs] The keyword arguments object.
      * Passed to every type and instance serialized within this scope.
      *
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
      *
-     * @return {!pentaho.type.spec.ITypeProto} A specification of this type.
+     * @return {!pentaho.type.spec.IType} A specification of this type.
      *
-     * @see pentaho.type.Instance.Type#toSpec
+     * @see pentaho.type.Type#toSpec
      */
     toSpecInContext: function(keyArgs) {
 
@@ -1332,7 +1334,7 @@ define([
      *
      * @see pentaho.type.Instance#toSpec
      *
-     * @return {UJsonValue} A JSON-compatible specification.
+     * @return {JsonValue} A JSON-compatible specification.
      */
     toJSON: function() {
       return this.toSpec({isJson: true});
@@ -1431,26 +1433,26 @@ define([
      * currently exists, it is used to manage the serialization process.
      * Otherwise, one is created and set as current.
      *
-     * When a type is not anonymous, the [id]{@link pentaho.type.Instance.Type#id} is returned.
+     * When a type is not anonymous, the [id]{@link pentaho.type.Type#id} is returned.
      *
      * For anonymous types, a [temporary]{@link pentaho.type.SpecificationContext.isIdTemporary},
      * serialization-only identifier is generated.
      * In the first occurrence in the given scope,
      * that identifier is returned, within a full specification of the type,
-     * obtained by calling [toSpecInContext]{@link pentaho.type.Instance.Type#toSpecInContext}.
+     * obtained by calling [toSpecInContext]{@link pentaho.type.Type#toSpecInContext}.
      * In following occurrences, only the previously used temporary identifier is returned.
      *
      * Some standard types have a special reference syntax.
-     * For example: [List.Type#toRef]{@link pentaho.type.List.Type#toRef}.
+     * For example: [ListType#toRef]{@link pentaho.type.ListType#toRef}.
      *
-     * @see pentaho.type.Instance.Type#toSpec
+     * @see pentaho.type.Type#toSpec
      *
      * @param {Object} [keyArgs] The keyword arguments object.
      * Passed to every type and instance serialized within this scope.
      *
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
      *
-     * @return {!pentaho.type.spec.UTypeReference} A reference to this type.
+     * @return {!pentaho.type.spec.TypeReference} A reference to this type.
      */
     toRef: function(keyArgs) {
       var id = keyArgs && keyArgs.noAlias ? this.id : this.shortId;
@@ -1463,14 +1465,14 @@ define([
      * This method requires that there currently exists an
      * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
      *
-     * @see pentaho.type.Instance.Type#toRef
+     * @see pentaho.type.Type#toRef
      *
      * @param {Object} [keyArgs] The keyword arguments object.
      * Passed to every type and instance serialized within this scope.
      *
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
      *
-     * @return {!pentaho.type.spec.UTypeReference} A reference to this type.
+     * @return {!pentaho.type.spec.TypeReference} A reference to this type.
      */
     toRefInContext: function(keyArgs) {
       var id = keyArgs && keyArgs.noAlias ? this.id : this.shortId;
@@ -1631,7 +1633,7 @@ define([
      *
      * This method calls the base implementation.
      * Then, it calls
-     * [__fillSpecInContextDynamicAttribute]{@link pentaho.type.Instance.Type#__fillSpecInContextDynamicAttribute}
+     * [__fillSpecInContextDynamicAttribute]{@link pentaho.type.Type#__fillSpecInContextDynamicAttribute}
      * for each locally registered dynamic attribute.
      *
      * @param {!Object} spec - The specification to be filled.
@@ -1642,8 +1644,8 @@ define([
      *
      * @private
      *
-     * @see pentaho.type.Instance.Type#_fillSpecInContext
-     * @see pentaho.type.Instance.Type#__fillSpecInContextDynamicAttribute
+     * @see pentaho.type.Type#_fillSpecInContext
+     * @see pentaho.type.Type#__fillSpecInContextDynamicAttribute
      */
     __fillSpecInContextDynamicAttributes: function(spec, keyArgs) {
 
@@ -1701,8 +1703,8 @@ define([
      *
      * @private
      *
-     * @see pentaho.type.Instance.Type#_fillSpecInContext
-     * @see pentaho.type.Instance.Type#__fillSpecInContextDynamicAttributes
+     * @see pentaho.type.Type#_fillSpecInContext
+     * @see pentaho.type.Type#__fillSpecInContextDynamicAttributes
      */
     __fillSpecInContextDynamicAttribute: function(spec, name, group, localName, toSpec, keyArgs) {
 
@@ -1737,7 +1739,7 @@ define([
       return any;
     }
     // endregion
-  }, /** @lends pentaho.type.Instance.Type */{
+  }, /** @lends pentaho.type.Type */{
 
     // @override
     /*
@@ -1779,7 +1781,7 @@ define([
   return Type;
 
   /*
-   * @this {pentaho.type.Property.Type}
+   * @this {pentaho.type.PropertyType}
    */
   function __castAndNormalize(value, cast, defaultValue) {
     if(value == null) {
@@ -1794,7 +1796,7 @@ define([
   }
 
   /*
-   * @this {pentaho.type.Property.Type}
+   * @this {pentaho.type.PropertyType}
    */
   function __wrapWithCast(fun, cast, defaultValue) {
     /*

@@ -39,7 +39,7 @@ define([
      * @readonly
      */
 
-    $type: /** @lends pentaho.type.Number.Type# */{
+    $type: /** @lends pentaho.type.NumberType# */{
       id: module.id,
       cast: __toNumber,
 

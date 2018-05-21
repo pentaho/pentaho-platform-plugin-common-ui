@@ -32,15 +32,15 @@ define([
    * @extends pentaho.type.Simple
    * @amd pentaho/type/TypeDescriptor
    *
-   * @classDesc The class that wraps a {@link pentaho.type.Instance.Type} object as a Type API simple value.
+   * @classDesc The class that wraps a {@link pentaho.type.Type} object as a Type API simple value.
    *
    * @description Creates a type descriptor object.
    * @constructor
    * @param {pentaho.type.spec.ITypeDescriptor|
-   *         pentaho.type.Instance.Type|
+   *         pentaho.type.Type|
    *         Class.<pentaho.type.Instance>|
    *         nonEmptyString} [spec] A type descriptor specification,
-   *         a [Type]{@link pentaho.type.Instance.Type} object,
+   *         a [Type]{@link pentaho.type.Type} object,
    *         an [Instance]{@link pentaho.type.Instance} constructor or
    *         a (permanent) type identifier.
    */
@@ -49,7 +49,7 @@ define([
      * Gets the underlying type object.
      *
      * @name pentaho.type.TypeDescriptor#value
-     * @type {!pentaho.type.Instance.Type}
+     * @type {!pentaho.type.Type}
      * @readonly
      */
 
@@ -70,7 +70,7 @@ define([
     },
     // endregion
 
-    $type: /** @lends pentaho.type.TypeDescriptor.Type# */{
+    $type: /** @lends pentaho.type.TypeDescriptorType# */{
       id: module.id,
 
       cast: function(value) {

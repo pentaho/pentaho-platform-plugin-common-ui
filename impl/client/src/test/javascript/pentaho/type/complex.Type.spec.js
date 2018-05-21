@@ -27,7 +27,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.type.Complex.Type", function() {
+  describe("pentaho.type.ComplexType", function() {
 
     var PropertyType = Property.Type;
 
@@ -994,5 +994,5 @@ define([
         expect(Derived2.type.isEntity).toBe(true);
       });
     });
-  }); // end pentaho.type.Complex.Type
+  }); // end pentaho.type.ComplexType
 });

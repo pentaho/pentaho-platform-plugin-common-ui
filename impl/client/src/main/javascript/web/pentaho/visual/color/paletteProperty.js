@@ -35,9 +35,9 @@ define([
   var __ListLevelType = typeLoader.resolveType([PaletteLevel]);
 
   /**
-   * @name pentaho.visual.color.PaletteProperty.Type
+   * @name pentaho.visual.color.PalettePropertyType
    * @class
-   * @extends pentaho.type.PaletteProperty.Type
+   * @extends pentaho.type.PalettePropertyType
    *
    * @classDesc The type class of {@link pentaho.visual.color.PaletteProperty}.
    */
@@ -53,12 +53,12 @@ define([
    * required capabilities.
    *
    * The capabilities of the color palette are described by the
-   * [levels]{@link pentaho.visual.color.PaletteProperty.Type#levels} attribute.
+   * [levels]{@link pentaho.visual.color.PalettePropertyType#levels} attribute.
    *
-   * The [valueType]{@link pentaho.type.PaletteProperty.Type#valueType} of a property of this type is
+   * The [valueType]{@link pentaho.type.PalettePropertyType#valueType} of a property of this type is
    * [Palette]{@link pentaho.visual.color.Palette}.
    *
-   * The [defaultValue]{@link pentaho.type.PaletteProperty.Type#defaultValue} of a property of this type is
+   * The [defaultValue]{@link pentaho.type.PalettePropertyType#defaultValue} of a property of this type is
    * initialized to a function that queries registered palette instances for one with a compatible level.
    * It does not choose a palette that another palette property in the same visualization model is already using.
    * During construction, this exclusion rule only covers properties which are defined before it.
@@ -67,7 +67,7 @@ define([
    */
   var PaletteProperty = Property.extend(/** @lends pentaho.visual.color.PaletteProperty# */{
 
-    $type: /** @lends pentaho.visual.color.PaletteProperty.Type# */{
+    $type: /** @lends pentaho.visual.color.PalettePropertyType# */{
 
       valueType: Palette,
 
@@ -148,7 +148,7 @@ define([
        * @type {!pentaho.type.List.<pentaho.visual.color.Level>}
        *
        * @throws {pentaho.lang.OperationInvalidError} When setting and the type already has
-       * [subtypes]{@link pentaho.type.Instance.Type#hasDescendants}.
+       * [subtypes]{@link pentaho.type.Type#hasDescendants}.
        */
       get levels() {
         return this.__levels;

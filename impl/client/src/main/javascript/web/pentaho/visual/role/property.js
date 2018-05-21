@@ -34,9 +34,9 @@ define([
   var ListOfModeType = typeLoader.resolveType([Mode]);
 
   /**
-   * @name pentaho.visual.role.Property.Type
+   * @name pentaho.visual.role.PropertyType
    * @class
-   * @extends pentaho.visual.role.AbstractProperty.Type
+   * @extends pentaho.visual.role.AbstractPropertyType
    *
    * @classDesc The type class of {@link pentaho.visual.role.Property}.
    */
@@ -52,14 +52,14 @@ define([
    *
    * A visual role is described by:
    *
-   * 1. [modes]{@link pentaho.visual.role.Property.Type#modes}
-   * 2. [isVisualKey]{@link pentaho.visual.role.Property.Type#isVisualKey}.
+   * 1. [modes]{@link pentaho.visual.role.PropertyType#modes}
+   * 2. [isVisualKey]{@link pentaho.visual.role.PropertyType#isVisualKey}.
    *
    * @description This class was not designed to be constructed directly.
    */
   var Property = AbstractProperty.extend(/** @lends pentaho.visual.role.Property# */{
 
-    $type: /** @lends pentaho.visual.role.Property.Type# */{
+    $type: /** @lends pentaho.visual.role.PropertyType# */{
 
       id: module.id,
 
@@ -140,7 +140,7 @@ define([
        * @type {!pentaho.type.List.<pentaho.visual.role.Mode>}
        *
        * @throws {pentaho.lang.OperationInvalidError} When setting and the type already has
-       * [subtypes]{@link pentaho.type.Instance.Type#hasDescendants}.
+       * [subtypes]{@link pentaho.type.Type#hasDescendants}.
        *
        * @override
        */
@@ -190,7 +190,7 @@ define([
        * When the associated mapping has a specified [modeFixed]{@link pentaho.visual.role.Mapping#modeFixed}
        * (whether or not it is applicable), then that operation mode is used.
        *
-       * Otherwise, the first operation mode in [modes]{@link pentaho.visual.role.Property.Type#modes}
+       * Otherwise, the first operation mode in [modes]{@link pentaho.visual.role.PropertyType#modes}
        * which is applicable to the mapping's fields is used.
        * If there are no applicable modes, `null` is returned.
        *
@@ -199,7 +199,7 @@ define([
        * @return {pentaho.visual.role.Mode} The effective operation mode, if one exists; `null` if not.
        *
        * @see pentaho.visual.role.Mapping#modeFixed
-       * @see pentaho.visual.role.Property.Type#modes
+       * @see pentaho.visual.role.PropertyType#modes
        */
       getModeEffectiveOn: function(model) {
 
@@ -269,18 +269,18 @@ define([
        *
        * ### Other characteristics
        *
-       * When set and the visual role property already has [subtypes]{@link pentaho.type.Instance.Type#hasDescendants},
+       * When set and the visual role property already has [subtypes]{@link pentaho.type.Type#hasDescendants},
        * an error is thrown.
        *
        * When set to a {@link Nully} value, the set operation is ignored.
        *
        * The default value of the root property is the value returned by
-       * [hasAnyCategoricalModes]{@link pentaho.visual.role.Property.Type#hasAnyCategoricalModes}.
+       * [hasAnyCategoricalModes]{@link pentaho.visual.role.PropertyType#hasAnyCategoricalModes}.
        *
        * @type {boolean}
        *
        * @throws {pentaho.lang.OperationInvalidError} When setting and the visual role property
-       * already has [subtypes]{@link pentaho.type.Instance.Type#hasDescendants}.
+       * already has [subtypes]{@link pentaho.type.Type#hasDescendants}.
        *
        * @override
        */
@@ -455,11 +455,11 @@ define([
        *
        * 1. The number of currently mapped [fields]{@link pentaho.visual.role.Mapping#fields} must satisfy
        *    the property cardinality constraints,
-       *    according to [Property.Type#fields]{@link pentaho.visual.role.Property.Type#fields}
+       *    according to [PropertyType#fields]{@link pentaho.visual.role.PropertyType#fields}
        *
-       * 2. When specified, the value of [modeFixed]{@link pentaho.visual.role.ExternalProperty.Type#modeFixed}
+       * 2. When specified, the value of [modeFixed]{@link pentaho.visual.role.ExternalPropertyType#modeFixed}
        *    must be one of the corresponding internal visual role's
-       *    [modes]{@link pentaho.visual.role.Property.Type#modes}
+       *    [modes]{@link pentaho.visual.role.PropertyType#modes}
        *
        * @param {!pentaho.visual.base.Model} model - The visual model.
        *

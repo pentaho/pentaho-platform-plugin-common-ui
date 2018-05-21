@@ -25,9 +25,9 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.role.adaptation.Strategy.Type
+   * @name pentaho.visual.role.adaptation.StrategyType
    * @class
-   * @extends pentaho.type.Complex.Type
+   * @extends pentaho.type.ComplexType
    *
    * @classDesc The type class of {@link pentaho.visual.role.adaptation.Strategy}.
    */
@@ -207,7 +207,7 @@ define([
       return cells;
     },
 
-    $type: /** @lends pentaho.visual.role.adaptation.Strategy.Type# */{
+    $type: /** @lends pentaho.visual.role.adaptation.StrategyType# */{
       id: module.id,
 
       isAbstract: true
@@ -219,15 +219,15 @@ define([
        * If the strategy cannot be applied to the given arguments, `null` should be returned.
        *
        * @name getInputTypeFor
-       * @memberOf pentaho.visual.role.adaptation.Strategy.Type#
+       * @memberOf pentaho.visual.role.adaptation.StrategyType#
        * @method
        *
-       * @param {!pentaho.type.Instance.Type} outputDataType - The output data type.
+       * @param {!pentaho.type.Type} outputDataType - The output data type.
        * @param {boolean} isVisualKey - Indicates that the strategy should be able to preserve the key nature
        * of input fields. Created strategies should be
        * [invertible]{@link pentaho.visual.role.adaptation.Strategy#isInvertible}.
        *
-       * @return {pentaho.type.Instance.Type} The input type, if the strategy can be applied; `null`, if not.
+       * @return {pentaho.type.Type} The input type, if the strategy can be applied; `null`, if not.
        *
        * @abstract
        */
@@ -236,10 +236,10 @@ define([
        * Validates if the strategy is applicable to the given fields of a schema data table.
        *
        * This method can only be called if the data types of the given fields are compatible with the result of
-       * a previous call to [getInputTypeFor]{@link pentaho.visual.role.adaptation.Strategy.Type#getInputTypeFor}.
+       * a previous call to [getInputTypeFor]{@link pentaho.visual.role.adaptation.StrategyType#getInputTypeFor}.
        *
        * @name validateApplication
-       * @memberOf pentaho.visual.role.adaptation.Strategy.Type#
+       * @memberOf pentaho.visual.role.adaptation.StrategyType#
        * @method
        *
        * @param {!pentaho.data.Table} schemaData - A data table representative of the schema of the data.
@@ -255,12 +255,12 @@ define([
        * Applies the strategy to the given data and fields.
        *
        * This method can only be called if a previous call to
-       * [validateApplication]{@link pentaho.visual.role.adaptation.Strategy.Type#validateApplication}
+       * [validateApplication]{@link pentaho.visual.role.adaptation.StrategyType#validateApplication}
        * with compatible arguments returned a
        * [valid]{@link pentaho.visual.role.adaptation.IStrategyApplicationValidation#isValid} application object.
        *
        * @name apply
-       * @memberOf pentaho.visual.role.adaptation.Strategy.Type#
+       * @memberOf pentaho.visual.role.adaptation.StrategyType#
        * @method
        *
        * @param {!pentaho.data.Table} data - A data table.

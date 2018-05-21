@@ -22,9 +22,9 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.base.Application.Type
+   * @name pentaho.visual.base.ApplicationType
    * @class
-   * @extends pentaho.type.Complex.Type
+   * @extends pentaho.type.ComplexType
    *
    * @classDesc The base type class of visual application types.
    *

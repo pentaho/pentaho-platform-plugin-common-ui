@@ -25,9 +25,9 @@ define([
     var _true;
 
     /**
-     * @name pentaho.data.filter.True.Type
+     * @name pentaho.data.filter.TrueType
      * @class
-     * @extends pentaho.data.filter.Abstract.Type
+     * @extends pentaho.data.filter.AbstractType
      *
      * @classDesc The type class of the `True` filter type.
      *
@@ -81,7 +81,7 @@ define([
         return filter.False.instance;
       },
 
-      $type: /** @lends pentaho.data.filter.True.Type# */{
+      $type: /** @lends pentaho.data.filter.TrueType# */{
         id: module.id
       }
     }, /** @lends pentaho.data.filter.True */{

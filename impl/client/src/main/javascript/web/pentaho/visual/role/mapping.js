@@ -25,9 +25,9 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.role.Mapping.Type
+   * @name pentaho.visual.role.MappingType
    * @class
-   * @extends pentaho.visual.role.AbstractMapping.Type
+   * @extends pentaho.visual.role.AbstractMappingType
    *
    * @classDesc The type class of {@link pentaho.visual.role.Mapping}.
    */
@@ -73,7 +73,7 @@ define([
      * Gets the _effective_ operation mode in which the associated visual role is to operate.
      *
      * Calling this property is equivalent to calling
-     * [getModeEffectiveOn]{@link pentaho.visual.role.Property.Type#getModeEffectiveOn}
+     * [getModeEffectiveOn]{@link pentaho.visual.role.PropertyType#getModeEffectiveOn}
      * on the the containing visual role property.
      * However, the results are cached for performance reasons.
      *
@@ -81,7 +81,7 @@ define([
      * @readonly
      * @override
      *
-     * @see pentaho.visual.role.Property.Type#getModeEffectiveOn
+     * @see pentaho.visual.role.PropertyType#getModeEffectiveOn
      */
     get mode() {
       var mode;
@@ -117,7 +117,7 @@ define([
     },
     // endregion
 
-    $type: /** @lends pentaho.visual.role.Mapping.Type# */{
+    $type: /** @lends pentaho.visual.role.MappingType# */{
 
       id: module.id,
 
@@ -126,7 +126,7 @@ define([
          * Gets or sets the _fixed_ operation mode in which the associated visual role is to operate.
          *
          * When specified,
-         * it must be equal to one of the operation [modes]{@link pentaho.visual.role.Property.Type#modes}
+         * it must be equal to one of the operation [modes]{@link pentaho.visual.role.PropertyType#modes}
          * of the associated visual role property;
          * otherwise, the mapping is considered _invalid_.
          *

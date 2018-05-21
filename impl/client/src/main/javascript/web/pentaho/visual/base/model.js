@@ -22,9 +22,9 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.base.Model.Type
+   * @name pentaho.visual.base.ModelType
    * @class
-   * @extends pentaho.visual.base.AbstractModel.Type
+   * @extends pentaho.visual.base.AbstractModelType
    *
    * @classDesc The base class of visual model types.
    *
@@ -48,7 +48,7 @@ define([
    * internal model specification.
    */
   return AbstractModel.extend(/** @lends pentaho.visual.base.Model# */{
-    $type: /** @lends pentaho.visual.base.Model.Type# */{
+    $type: /** @lends pentaho.visual.base.ModelType# */{
       id: module.id,
       defaultView: "./View",
       isAbstract: true

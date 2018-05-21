@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -216,14 +216,14 @@ define([
      *
      * The default implementation delegates to
      * [_emitGenericAllAsync]{@link pentaho.lang.EventSource#_emitGenericAllAsync},
-     * when the action is [asynchronous]{@link pentaho.type.action.Base.Type#isSync}.
+     * when the action is [asynchronous]{@link pentaho.type.action.BaseType#isSync}.
      * Delegates to
      * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}, otherwise.
      *
      * @param {!pentaho.type.action.Execution} actionExecution - The action execution.
      *
      * @return {?Promise} A promise to the completion of the asynchronous `do` listener,
-     * of an [asynchronous]{@link pentaho.type.action.Base.Type#isSync} action, or `null`.
+     * of an [asynchronous]{@link pentaho.type.action.BaseType#isSync} action, or `null`.
      *
      * @protected
      */

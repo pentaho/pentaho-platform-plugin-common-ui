@@ -98,9 +98,9 @@ define([
   // NOTE: these will be kept private until it is decided between the model adapter and the viz concept.
 
   /**
-   * @name pentaho.visual.base.ModelAdapter.Type
+   * @name pentaho.visual.base.ModelAdapterType
    * @class
-   * @extends pentaho.visual.base.Model.Type
+   * @extends pentaho.visual.base.ModelType
    *
    * @classDesc The type class of {@link pentaho.visual.base.ModelAdapter}.
    *
@@ -479,7 +479,7 @@ define([
     },
     // endregion
 
-    $type: /** @lends pentaho.visual.base.ModelAdapter.Type# */{
+    $type: /** @lends pentaho.visual.base.ModelAdapterType# */{
 
       id: module.id,
       isAbstract: true,
@@ -491,7 +491,7 @@ define([
            *
            * This property can only be specified at construction time.
            * When not specified,
-           * an empty model of the property's [valueType]{@link pentaho.type.Property.Type#valueType}
+           * an empty model of the property's [valueType]{@link pentaho.type.PropertyType#valueType}
            * is attempted to be created.
            *
            * @name model
@@ -509,16 +509,16 @@ define([
       ]
     }
   })
-    .implement({
-      $type: /** @lends pentaho.visual.base.ModelAdapter.Type# */{
-        // Declare in a separate specification group so as to not be triggered by the above props specification.
-        /** @inheritDoc */
-        _configureProperties: function(propTypesSpec) {
+  .implement({
+    $type: /** @lends pentaho.visual.base.ModelAdapterType# */{
+      // Declare in a separate specification group so as to not be triggered by the above props specification.
+      /** @inheritDoc */
+      _configureProperties: function(propTypesSpec) {
 
           // `propTypeSpecs` is a copy of the original value.
           var normalizedPropTypeSpecs = this._normalizePropertiesSpec(propTypesSpec);
 
-          // Expand the model property into the associated VR properties.
+        // Expand the model property into the associated VR properties.
 
           // Index by property name.
           var propTypeInfoMap = Object.create(null);
@@ -595,12 +595,12 @@ define([
             }
           }
 
-          this.base(propTypesSpec);
-        }
+        this.base(propTypesSpec);
       }
-    })
-    .localize({$type: bundle.structured.ModelAdapter})
-    .configure({$type: module.config});
+    }
+  })
+  .localize({$type: bundle.structured.ModelAdapter})
+  .configure({$type: module.config});
 
   return ModelAdapter;
 

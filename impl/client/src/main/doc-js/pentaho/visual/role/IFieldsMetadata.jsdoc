@@ -19,7 +19,7 @@
  * the [fields]{@link pentaho.visual.role.AbstractMapping#fields} of visual roles' mappings.
  *
  * Objects of this interface are part of visual role properties and
- * are exposed in the [AbstractProperty.Type#fields]{@link pentaho.visual.role.AbstractProperty.Type#fields}
+ * are exposed in the [AbstractPropertyType#fields]{@link pentaho.visual.role.AbstractPropertyType#fields}
  * property.
  *
  * @name IFieldsMetadata
@@ -40,5 +40,5 @@
  * @method
  * @param {pentaho.visual.base.AbstractModel} model - The model.
  * @return {pentaho.IRange<number>} The field count range.
- * @see pentaho.type.Property.Type#countRangeOn
+ * @see pentaho.type.PropertyType#countRangeOn
  */

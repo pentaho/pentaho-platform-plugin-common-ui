@@ -21,9 +21,9 @@ define([
 ], function(module, Strategy, O, dataUtil) {
 
   /**
-   * @name pentaho.visual.role.adaptation.IdentityStrategy.Type
+   * @name pentaho.visual.role.adaptation.IdentityStrategyType
    * @class
-   * @extends pentaho.visual.role.adaptation.Strategy.Type
+   * @extends pentaho.visual.role.adaptation.StrategyType
    *
    * @classDesc The type class of {@link pentaho.visual.role.adaptation.IdentityStrategy}.
    */
@@ -146,7 +146,7 @@ define([
       }
     },
 
-    $type: /** @lends pentaho.visual.role.adaptation.IdentityStrategy.Type# */{
+    $type: /** @lends pentaho.visual.role.adaptation.IdentityStrategyType# */{
       id: module.id,
 
       /** @inheritDoc */

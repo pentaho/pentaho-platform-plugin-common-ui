@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,11 @@
  */
 
 /**
- * The `spec.ISimpleTypeProto` interface represents the specification of a simple type.
+ * The `spec.ISimpleType` interface represents the specification of a simple type.
  *
- * @name pentaho.type.spec.ISimpleTypeProto
+ * @name pentaho.type.spec.ISimpleType
  * @interface
- * @extends pentaho.type.spec.IValueTypeProto
- */
-
-/**
- * The extensible/configurable members of the prototype of simple instance classes.
- *
- * @name instance
- * @memberOf pentaho.type.spec.ISimpleTypeProto#
- * @type {pentaho.type.spec.ISimpleProto}
- *
- * @see pentaho.type.spec.ISimpleProto#$type
+ * @extends pentaho.type.spec.IValueType
  */
 
 /**
@@ -41,12 +31,12 @@
  * to not violate its intended semantics.
  *
  * @name cast
- * @memberOf pentaho.type.spec.ISimpleTypeProto#
+ * @memberOf pentaho.type.spec.ISimpleType#
  * @method
  *
  * @param {!any} value - The value to convert.
  *
  * @return {?any} The converted value or `null`, when not possible to convert.
  *
- * @see pentaho.type.Simple.Type#cast
+ * @see pentaho.type.SimpleType#cast
  */

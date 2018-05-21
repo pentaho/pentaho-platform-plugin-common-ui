@@ -21,9 +21,9 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.action.mixins.Positioned.Type
+   * @name pentaho.visual.action.mixins.PositionedType
    * @class
-   * @extends pentaho.visual.action.Base.Type
+   * @extends pentaho.visual.action.BaseType
    *
    * @classDesc The type class of the positioned action mixin.
    *

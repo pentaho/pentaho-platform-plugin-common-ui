@@ -27,9 +27,9 @@ define([
     // Also, existing containers don't currently generate filters with isIn.
 
     /**
-     * @name pentaho.data.filter.IsIn.Type
+     * @name pentaho.data.filter.IsInType
      * @class
-     * @extends pentaho.data.filter.Property.Type
+     * @extends pentaho.data.filter.PropertyType
      *
      * @classDesc The type class of the membership filter type.
      *
@@ -86,7 +86,7 @@ define([
         return (this.property || "") + " " + this.values.toArray(function(v) { return v.$key; }).join(" ");
       },
 
-      $type: /** @lends pentaho.data.filter.IsIn.Type# */{
+      $type: /** @lends pentaho.data.filter.IsInType# */{
         id: module.id,
         props: [
           // TODO: In the future, review if values should be of type pentaho.type.Value[].

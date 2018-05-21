@@ -24,9 +24,9 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.role.AbstractMapping.Type
+   * @name pentaho.visual.role.AbstractMappingType
    * @class
-   * @extends pentaho.type.Complex.Type
+   * @extends pentaho.type.ComplexType
    *
    * @classDesc The type class of {@link pentaho.visual.role.AbstractMapping}.
    */
@@ -121,7 +121,7 @@ define([
      * @readonly
      */
 
-    $type: /** @lends pentaho.visual.role.AbstractMapping.Type# */{
+    $type: /** @lends pentaho.visual.role.AbstractMappingType# */{
       id: module.id,
 
       props: [

@@ -23,9 +23,9 @@ define([
   return function(filter) {
 
     /**
-     * @name pentaho.data.filter.Tree.Type
+     * @name pentaho.data.filter.TreeType
      * @class
-     * @extends pentaho.data.filter.Abstract.Type
+     * @extends pentaho.data.filter.AbstractType
      *
      * @classDesc The base type class of `Tree` filter types.
      *
@@ -222,7 +222,7 @@ define([
       },
       // endregion
 
-      $type: /** @lends pentaho.data.filter.Tree.Type# */{
+      $type: /** @lends pentaho.data.filter.TreeType# */{
         id: module.id,
         isAbstract: true,
         props: [

@@ -22,9 +22,9 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.role.Mode.Type
+   * @name pentaho.visual.role.ModeType
    * @class
-   * @extends pentaho.type.Complex.Type
+   * @extends pentaho.type.ComplexType
    *
    * @classDesc The type class of {@link pentaho.visual.role.Mode}.
    */
@@ -41,7 +41,7 @@ define([
    * of the [type of scale]{@link pentaho.visual.role.Mode#isContinuous}, continuous or categorical,
    * used to encode it.
    *
-   * The `Mode` type is an [entity]{@link pentaho.type.Value.Type#isEntity} type.
+   * The `Mode` type is an [entity]{@link pentaho.type.ValueType#isEntity} type.
    *
    * @description Creates a visual role operating mode instance.
    * @constructor
@@ -62,7 +62,7 @@ define([
      * @type {string}
      * @readOnly
      * @override
-     * @see pentaho.type.Value.Type#isEntity
+     * @see pentaho.type.ValueType#isEntity
      */
     get $key() {
       return this.get("dataType").$key + "|" + this.isContinuous;
@@ -72,7 +72,7 @@ define([
      * Gets a value that indicates this operation mode is applicable to
      * a given list of field types.
      *
-     * @param {!Array.<pentaho.type.Instance.Type>} fieldTypes - The list of field types.
+     * @param {!Array.<pentaho.type.Type>} fieldTypes - The list of field types.
      *
      * @return {boolean} `true` if this operation mode is applicable to `fieldTypes`; `false` otherwise.
      */
@@ -120,7 +120,7 @@ define([
       return spec;
     },
 
-    $type: /** @lends pentaho.visual.role.Mode.Type# */{
+    $type: /** @lends pentaho.visual.role.ModeType# */{
       id: module.id,
 
       isEntity: true,
@@ -147,7 +147,7 @@ define([
          * meaning that values of any data type are accepted.
          *
          * @name pentaho.visual.role.Mode#dataType
-         * @type {!pentaho.type.Instance.Type}
+         * @type {!pentaho.type.Type}
          *
          * @see pentaho.visual.role.spec.IMode#dataType
          */
@@ -171,14 +171,14 @@ define([
          *
          * Typically, the value of this property is consistent with that of
          * [dataType]{@link pentaho.visual.role.Mode#dataType} -
-         * when the data type is not [continuous]{@link pentaho.type.Instance.Type#isContinuous} then
+         * when the data type is not [continuous]{@link pentaho.type.Type#isContinuous} then
          * this property is `false` as well.
          * When this is not the case, it is assumed that the visualization somehow
          * is able to convert the categorical data type into a continuous value.
          *
          * When unspecified, or specified as `null`,
-         * defaults to the value of [isContinuous]{@link pentaho.type.Instance.Type#isContinuous} of the
-         * [element type]{@link pentaho.type.Instance.Type#elementType}
+         * defaults to the value of [isContinuous]{@link pentaho.type.Type#isContinuous} of the
+         * [element type]{@link pentaho.type.Type#elementType}
          * of the mode's
          * [data type]{@link pentaho.visual.role.Mode#dataType}.
          *
@@ -188,7 +188,7 @@ define([
          * @type {boolean}
          *
          * @see pentaho.visual.role.spec.IMode#isContinuous
-         * @see pentaho.type.Instance.Type#elementType
+         * @see pentaho.type.Type#elementType
          * @see pentaho.visual.role.Mode#dataType
          */
         {

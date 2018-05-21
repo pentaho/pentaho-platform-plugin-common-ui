@@ -25,9 +25,9 @@ define([
     var _false = null;
 
     /**
-     * @name pentaho.data.filter.False.Type
+     * @name pentaho.data.filter.FalseType
      * @class
-     * @extends pentaho.data.filter.Abstract.Type
+     * @extends pentaho.data.filter.AbstractType
      *
      * @classDesc The type class of the `False` filter type.
      *
@@ -81,7 +81,7 @@ define([
         return filter.True.instance;
       },
 
-      $type: /** @lends pentaho.data.filter.False.Type# */{
+      $type: /** @lends pentaho.data.filter.FalseType# */{
         id: module.id
       }
     }, /** @lends pentaho.data.filter.False */{

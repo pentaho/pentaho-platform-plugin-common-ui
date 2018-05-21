@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,11 @@
  */
 
 /**
- * The `spec.IListTypeProto` interface represents the specification of a list type.
+ * The `spec.IListType` interface represents the specification of a list type.
  *
- * @name pentaho.type.spec.IListTypeProto
+ * @name pentaho.type.spec.IListType
  * @interface
- * @extends pentaho.type.spec.IValueTypeProto
- */
-
-/**
- * The extensible/configurable members of the prototype of list instance classes.
- *
- * @name instance
- * @memberOf pentaho.type.spec.IListTypeProto#
- * @type {pentaho.type.spec.IListProto}
- *
- * @see pentaho.type.spec.IListProto#$type
+ * @extends pentaho.type.spec.IValueType
  */
 
 /**
@@ -40,8 +30,8 @@
  * Must be a subtype of the ancestor type's `of` type.
  *
  * @name of
- * @memberOf pentaho.type.spec.IListTypeProto#
- * @type {!(pentaho.type.Element.Type|pentaho.type.List.Type)}
+ * @memberOf pentaho.type.spec.IListType#
+ * @type {!(pentaho.type.ElementType|pentaho.type.ListType)}
  *
- * @see pentaho.type.List.Type#of
+ * @see pentaho.type.ListType#of
  */

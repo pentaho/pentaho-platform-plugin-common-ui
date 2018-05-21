@@ -23,9 +23,9 @@ define([
   return function(filter) {
 
     /**
-     * @name pentaho.data.filter.IsGreaterOrEqual.Type
+     * @name pentaho.data.filter.IsGreaterOrEqualType
      * @class
-     * @extends pentaho.data.filter.Property.Type
+     * @extends pentaho.data.filter.PropertyType
      *
      * @classDesc The type class of the greater or equal than filter type.
      *
@@ -90,7 +90,7 @@ define([
         return (this.property || "") + " " + (v ? v.$key : "");
       },
 
-      $type: /** @lends pentaho.data.filter.IsGreaterOrEqual.Type# */{
+      $type: /** @lends pentaho.data.filter.IsGreaterOrEqualType# */{
         id: module.id,
         props: [
           {

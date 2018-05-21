@@ -50,9 +50,9 @@ define([
   var valueType = Value.type;
 
   /**
-   * @name pentaho.type.Complex.Type
+   * @name pentaho.type.ComplexType
    * @class
-   * @extends pentaho.type.Element.Type
+   * @extends pentaho.type.ElementType
    *
    * @classDesc The base type class of complex types.
    *
@@ -91,12 +91,11 @@ define([
    * the {@link pentaho.type.Complex#_initClone} method should also be overridden to copy those properties.
    *
    * @constructor
-   * @param {pentaho.type.spec.UComplex} [spec] A complex specification.
+   * @param {pentaho.type.spec.Complex} [spec] A complex specification.
    *
    * @see pentaho.type.Simple
    * @see pentaho.type.spec.IComplex
-   * @see pentaho.type.spec.IComplexProto
-   * @see pentaho.type.spec.IComplexTypeProto
+   * @see pentaho.type.spec.IComplexType
    */
   var Complex = Element.extend(/** @lends pentaho.type.Complex# */{
 
@@ -116,7 +115,7 @@ define([
     /**
      * Initializes the properties of the complex instance from a the given specification.
      *
-     * @param {pentaho.type.spec.UComplex} [spec] A complex specification.
+     * @param {pentaho.type.spec.Complex} [spec] A complex specification.
      * @protected
      */
     _initProperties: function(spec) {
@@ -165,7 +164,7 @@ define([
      * still generates events in the containing complex.
      * We could, however, not addRef if the prop (and, thus, the list) is also isReadOnly?
      *
-     * @param {!pentaho.type.Property.Type} propType - The property type.
+     * @param {!pentaho.type.PropertyType} propType - The property type.
      * @param {!pentaho.type.mixins.Container} value - The container value.
      *
      * @private
@@ -239,7 +238,7 @@ define([
      * @see pentaho.type.Complex#getv
      * @see pentaho.type.Complex#getf
      *
-     * @param {string|!pentaho.type.Property.Type} [name] The property name or type object.
+     * @param {string|!pentaho.type.PropertyType} [name] The property name or type object.
      * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
      *
      * @return {pentaho.type.Value|Nully} The value of the property, or a {@link Nully} value.
@@ -255,7 +254,7 @@ define([
     /**
      * Gets a value that indicates if a given property has assumed a default value.
      *
-     * @param {string|!pentaho.type.Property.Type} [name] The property name or type object.
+     * @param {string|!pentaho.type.PropertyType} [name] The property name or type object.
      * @return {boolean} Returns `true` if the property has been defaulted; `false`, otherwise.
      */
     isDefaultedOf: function(name) {
@@ -263,7 +262,7 @@ define([
       return this.__getAmbientStateByType(pType) === PROP_VALUE_DEFAULT;
     },
 
-    // @internal friend Property.Type
+    // @internal friend PropertyType
     __getAmbientByType: function(pType) {
       // List values are never changed directly, only within,
       // so there's no need to waste time asking the changeset for changes.
@@ -297,7 +296,7 @@ define([
      * For [Complex]{@link pentaho.type.Complex} and [List]{@link pentaho.type.List} types,
      * this corresponds to the value itself.
      *
-     * @param {string|!pentaho.type.Property.Type} name - The property name or type object.
+     * @param {string|!pentaho.type.PropertyType} name - The property name or type object.
      * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
      *
      * @return {any|pentaho.type.Complex|pentaho.type.List|Nully} The primitive value of a `Simple`,
@@ -327,7 +326,7 @@ define([
      * For [Complex]{@link pentaho.type.Complex} and [List]{@link pentaho.type.List} types,
      * varies with the implementation.
      *
-     * @param {string|!pentaho.type.Property.Type} name - The property name or type object.
+     * @param {string|!pentaho.type.PropertyType} name - The property name or type object.
      * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
      *
      * @return {string} The string representation of the value, or `""`.
@@ -346,7 +345,7 @@ define([
     /**
      * Sets the value of a property.
      *
-     * The value of [List]{@link pentaho.type.Property.Type#isList} properties is automatically created,
+     * The value of [List]{@link pentaho.type.PropertyType#isList} properties is automatically created,
      * when complex instance is constructed, and is never replaced by another list value.
      * However, its contents can be modified.
      * On the other hand, for element properties, their value can be replaced.
@@ -356,19 +355,19 @@ define([
      * 1. If the property is a list property:
      *   1. If `value` is {@link Nully},
      *      the list is cleared by calling the [List#clear]{@link pentaho.type.List#clear} method;
-     *      however, if the property is [read-only]{@link pentaho.type.Property.Type#isReadOnly} and
+     *      however, if the property is [read-only]{@link pentaho.type.PropertyType#isReadOnly} and
      *      the list has any elements, an error is thrown instead;
      *   2. Otherwise, if `value` is distinct from the current list value,
      *      an elements list is extracted from the given value
-     *      (see [List.Type#_normalizeInstanceSpec]{@link pentaho.type.List.Type#_normalizeInstanceSpec})
+     *      (see [ListType#_normalizeInstanceSpec]{@link pentaho.type.ListType#_normalizeInstanceSpec})
      *      and execution is delegated to the [List#set]{@link pentaho.type.List#set} method;
      *      likewise, if changes to the list would result and
-     *      the property is [read-only]{@link pentaho.type.Property.Type#isReadOnly},
+     *      the property is [read-only]{@link pentaho.type.PropertyType#isReadOnly},
      *      an error is thrown;
      *
      * 2. If the property is an element property:
      *   1. If `value` is {@link Nully},
-     *      the property's [default value]{@link pentaho.type.Property.Type#defaultValue}, if any,
+     *      the property's [default value]{@link pentaho.type.PropertyType#defaultValue}, if any,
      *      is evaluated and `value` is set to it;
      *      the property's new [defaulted status]{@link pentaho.type.Complex#isDefaultedOf} will be `true`.
      *
@@ -377,7 +376,7 @@ define([
      *
      *   3. If `value` is not [equal]{@link pentaho.type.Value#equals} to the current value and/or
      *      the property's defaulted status changes:
-     *      1. If the property is [read-only]{@link pentaho.type.Property.Type#isReadOnly}, an error is thrown.
+     *      1. If the property is [read-only]{@link pentaho.type.PropertyType#isReadOnly}, an error is thrown.
      *      2. Otherwise, the current value and the defaulted status are replaced by the new ones.
      *      3. A change action is executed, resulting in the change events `will:change` and
      *         `did:change` or `rejected:change` being emitted.
@@ -395,14 +394,14 @@ define([
      * are they assumed to represent a new value that needs to be constructed.
      *
      * For element properties, specifications are constructed
-     * having as default type the [valueType]{@link pentaho.type.Property.Type#valueType} of the property.
+     * having as default type the [valueType]{@link pentaho.type.PropertyType#valueType} of the property.
      *
      * For list properties, each element's specification is constructed
      * having as default type the
-     * [elementType]{@link pentaho.type.Instance.Type#elementType}
-     * of the property's [valueType]{@link pentaho.type.Property.Type#valueType}.
+     * [elementType]{@link pentaho.type.Type#elementType}
+     * of the property's [valueType]{@link pentaho.type.PropertyType#valueType}.
      *
-     * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
+     * @param {nonEmptyString|!pentaho.type.PropertyType} name - The property name or type object.
      * @param {any?} [valueSpec=null] A value specification.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
@@ -469,19 +468,19 @@ define([
      *
      * If in any of the described steps,
      * an error is thrown if a change would result to the property's value and
-     * the property is [read-only]{@link pentaho.type.Property.Type#isReadOnly}.
+     * the property is [read-only]{@link pentaho.type.PropertyType#isReadOnly}.
      * Also, an error is thrown if the value itself would have to be mutated and
-     * its type is [read-only]{@link pentaho.type.Value.Type#isReadOnly}.
+     * its type is [read-only]{@link pentaho.type.ValueType#isReadOnly}.
      *
-     * @param {!pentaho.type.Property.Type} propType - The property to configure.
+     * @param {!pentaho.type.PropertyType} propType - The property to configure.
      * @param {any} valueConfig - A value specification. Not `undefined`.
      *
      * @throws {TypeError} When the property value would be replaced or, in case of list properties,
      * its elements would be added, moved or removed and the
-     * property is [read-only]{@link pentaho.type.Property.Type#isReadOnly}.
+     * property is [read-only]{@link pentaho.type.PropertyType#isReadOnly}.
      *
      * @throws {TypeError} When the property's current value would be mutated and
-     * its type is [read-only]{@link pentaho.type.Value.Type#isReadOnly}.
+     * its type is [read-only]{@link pentaho.type.ValueType#isReadOnly}.
      *
      * @protected
      */
@@ -518,7 +517,7 @@ define([
      *
      * When the specified property is not a _list_ property, `0` is returned if it is `null`; `1`, otherwise.
      *
-     * @param {string|!pentaho.type.Property.Type} name - The property name or type object.
+     * @param {string|!pentaho.type.PropertyType} name - The property name or type object.
      * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
      *
      * @return {number} The number of values.
@@ -540,7 +539,7 @@ define([
     /**
      * Gets a value that indicates if a given property is currently applicable.
      *
-     * @param {string|!pentaho.type.Property.Type} name - The property name or type object.
+     * @param {string|!pentaho.type.PropertyType} name - The property name or type object.
      *
      * @return {boolean} `true` if the property is applicable; `false`, otherwise.
      *
@@ -555,7 +554,7 @@ define([
     /**
      * Gets a value that indicates if a given property is currently enabled.
      *
-     * @param {string|pentaho.type.Property.Type} name - The property name or property type object.
+     * @param {string|pentaho.type.PropertyType} name - The property name or property type object.
      *
      * @return {boolean} Returns `true` if the property is enabled; `false`, otherwise.
      *
@@ -570,7 +569,7 @@ define([
     /**
      * Gets the current valid count range of values of a given property.
      *
-     * @param {string|pentaho.type.Property.Type} name - The property name or type object.
+     * @param {string|pentaho.type.PropertyType} name - The property name or type object.
      *
      * @return {pentaho.IRange} The range of the property.
      *
@@ -588,7 +587,7 @@ define([
      * A property is currently required if
      * its current {@link pentaho.type.Complex#countRangeOf} minimum is at least 1.
      *
-     * @param {string|pentaho.type.Property.Type} [name] The property name or type object.
+     * @param {string|pentaho.type.PropertyType} [name] The property name or type object.
      *
      * @return {boolean} `true` if the property is required; `false`, otherwise.
      *
@@ -603,7 +602,7 @@ define([
     /**
      * Gets the current list of valid values of a given property.
      *
-     * @param {string|pentaho.type.Property.Type} [name] The property name or type object.
+     * @param {string|pentaho.type.PropertyType} [name] The property name or type object.
      *
      * @return {Array.<pentaho.type.Element>} An array of elements if the property is constrained; `null` otherwise.
      *
@@ -705,7 +704,7 @@ define([
      *
      * The default implementation
      * validates each property's value against
-     * the property's [valueType]{@link pentaho.type.Property.Type#valueType}
+     * the property's [valueType]{@link pentaho.type.PropertyType#valueType}
      * and collects and returns any reported errors.
      * Override to complement with a type's specific validation logic.
      *
@@ -728,7 +727,7 @@ define([
     },
     // endregion
 
-    $type: /** @lends pentaho.type.Complex.Type# */{
+    $type: /** @lends pentaho.type.ComplexType# */{
 
       /** @inheritDoc */
       _init: function(spec, keyArgs) {
@@ -779,7 +778,7 @@ define([
        *
        * When a {@link Nully} value is specified, the set operation is ignored.
        *
-       * When set and the type already has [subtypes]{@link pentaho.type.Instance.Type#hasDescendants},
+       * When set and the type already has [subtypes]{@link pentaho.type.Type#hasDescendants},
        * an error is thrown.
        *
        * The default (root) `isEntity` attribute value is `false`.
@@ -789,7 +788,7 @@ define([
        * @final
        *
        * @throws {pentaho.lang.OperationInvalidError} When setting and the type
-       * already has [subtypes]{@link pentaho.type.Instance.Type#hasDescendants}.
+       * already has [subtypes]{@link pentaho.type.Type#hasDescendants}.
        *
        * @see pentaho.type.Value#$key
        */
@@ -824,11 +823,11 @@ define([
        * but only upon definition and if the base complex type does not have any properties.
        *
        * All of the properties of a read-only complex type are
-       * implicitly marked [read-only]{@link pentaho.type.Property.Type#isReadOnly}.
-       * When the [valueType]{@link pentaho.type.Property.Type#valueType} of a property
+       * implicitly marked [read-only]{@link pentaho.type.PropertyType#isReadOnly}.
+       * When the [valueType]{@link pentaho.type.PropertyType#valueType} of a property
        * is an element type, it must be a read-only type.
        * When the `valueType` of a property is a list type, then its
-       * [element type]{@link pentaho.type.List.Type#of} must be read-only.
+       * [element type]{@link pentaho.type.ListType#of} must be read-only.
        *
        * @type {boolean}
        * @readOnly
@@ -863,8 +862,8 @@ define([
       /**
        * Adds, overrides or configures properties of this complex type.
        *
-       * @param {!Array.<pentaho.type.spec.IPropertyTypeProto> |
-       *         !Object.<string, pentaho.type.spec.IPropertyTypeProto>} propTypesSpec - The
+       * @param {!Array.<pentaho.type.spec.IPropertyType> |
+       *         !Object.<string, pentaho.type.spec.IPropertyType>} propTypesSpec - The
        * properties' specification.
        *
        * @protected
@@ -876,10 +875,10 @@ define([
       /**
        * Normalizes a properties specification.
        *
-       * @param {!Array.<pentaho.type.spec.IPropertyTypeProto> |
-       *         !Object.<string, pentaho.type.spec.IPropertyTypeProto>} propTypesSpec - The properties specification.
+       * @param {!Array.<pentaho.type.spec.IPropertyType> |
+       *         !Object.<string, pentaho.type.spec.IPropertyType>} propTypesSpec - The properties specification.
        *
-       * @return {!Array.<pentaho.type.spec.IPropertyTypeProto>} The normalized specification.
+       * @return {!Array.<pentaho.type.spec.IPropertyType>} The normalized specification.
        * @protected
        */
       _normalizePropertiesSpec: function(propTypesSpec) {
@@ -909,10 +908,10 @@ define([
        * it is returned back only if it is _the_ property type object of
        * same name in this complex type.
        *
-       * @param {string|!pentaho.type.Property.Type} name - The property name or type object.
+       * @param {string|!pentaho.type.PropertyType} name - The property name or type object.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
-       * @return {pentaho.type.Property.Type} The property type object.
+       * @return {pentaho.type.PropertyType} The property type object.
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When `sloppy` is `false` and a property with
        * name `name` is not defined.
@@ -944,7 +943,7 @@ define([
        * If a property type object is specified,
        * this method tests whether it is the same property type object that exists under that name, if any.
        *
-       * @param {string|pentaho.type.Property.Type} name - The property name or type object.
+       * @param {string|pentaho.type.PropertyType} name - The property name or type object.
        *
        * @return {boolean} `true` if the property is defined; `false`, otherwise.
        */
@@ -964,7 +963,7 @@ define([
        * @param {number} index - The property index.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified `index` is out of range.
        *
-       * @return {?pentaho.type.Property.Type} The property type object, or `null`.
+       * @return {?pentaho.type.PropertyType} The property type object, or `null`.
        *
        * @throws {pentaho.lang.ArgumentRangeError} When `sloppy` is `false` and the specified `index` is out of range.
        */
@@ -996,12 +995,12 @@ define([
       /**
        * Calls a function for each defined property type.
        *
-       * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} f
+       * @param {function(pentaho.type.PropertyType, number, pentaho.type.Complex) : boolean?} f
        * The mapping function. Return `false` to break iteration.
        *
        * @param {Object} [x] The JS context object on which `f` is called.
        *
-       * @return {!pentaho.type.Complex.Type} This object.
+       * @return {!pentaho.type.ComplexType} This object.
        */
       each: function(f, x) {
         var ps = this.__props;
@@ -1024,13 +1023,13 @@ define([
        * This method finds the lowest common ancestor of both types.
        * If it is a complex type, each of the corresponding local properties is yielded.
        *
-       * @param {!pentaho.type.Instance.Type} otherType - The other type.
-       * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} fun -
+       * @param {!pentaho.type.Type} otherType - The other type.
+       * @param {function(pentaho.type.PropertyType, number, pentaho.type.Complex) : boolean?} fun -
        * The mapping function. Return `false` to break iteration.
        *
        * @param {Object} [ctx] - The JS context object on which `fun` is called.
        *
-       * @return {!pentaho.type.Complex.Type} This object.
+       * @return {!pentaho.type.ComplexType} This object.
        */
       eachCommonWith: function(otherType, fun, ctx) {
         var lca;
@@ -1062,11 +1061,11 @@ define([
       /**
        * Adds, overrides or configures properties of this complex type.
        *
-       * @param {!pentaho.type.spec.IPropertyTypeProto|
-       *         !Array.<pentaho.type.spec.IPropertyTypeProto>} propTypeSpec - A property type specification or
+       * @param {!pentaho.type.spec.IPropertyType|
+       *         !Array.<pentaho.type.spec.IPropertyType>} propTypeSpec - A property type specification or
        *         an array of them.
        *
-       * @return {!pentaho.type.Complex.Type} This object.
+       * @return {!pentaho.type.ComplexType} This object.
        */
       add: function(propTypeSpec) {
 
@@ -1159,26 +1158,6 @@ define([
   .localize({$type: bundle.structured.Complex})
   .configure({$type: module.config});
 
-  /**
-   * Creates a subtype of this one.
-   *
-   * For more information on class extension, in general,
-   * see {@link pentaho.lang.Base.extend}.
-   *
-   * @name extend
-   * @memberOf pentaho.type.Complex
-   * @method
-   *
-   * @param {string} [name] The name of the created class, used for debugging purposes.
-   * @param {pentaho.type.spec.IComplexProto} [instSpec] The instance specification.
-   * @param {Object} [classSpec] The static specification.
-   * @param {Object} [keyArgs] The keyword arguments.
-   *
-   * @return {!Class.<pentaho.type.Complex>} The new complex instance subclass.
-   *
-   * @see pentaho.type.Value.extend
-   */
-
   return Complex;
 
   // region configure
@@ -1250,7 +1229,7 @@ define([
    * Configures an element property with a given non-undefined, distinct, value specification.
    *
    * @memberOf pentaho.type.Complex#
-   * @param {!pentaho.type.Property.Type} propType - The property to configure.
+   * @param {!pentaho.type.PropertyType} propType - The property to configure.
    * @param {pentaho.type.Value} valueAmb - The current, ambient value, possibly `null`.
    * @param {any} valueConfig - A specification. Not `undefined`. Distinct from `valueAmb`.
    * @private

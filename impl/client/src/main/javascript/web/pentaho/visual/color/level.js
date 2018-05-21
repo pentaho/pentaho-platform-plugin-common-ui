@@ -23,10 +23,10 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.color.Level.Type
+   * @name pentaho.visual.color.LevelType
    * @class
-   * @extends pentaho.type.String.Type
-   * @extends pentaho.type.mixins.DiscreteDomain.Type
+   * @extends pentaho.type.StringType
+   * @extends pentaho.type.mixins.DiscreteDomainType
    *
    * @classDesc The type class of {@link pentaho.visual.color.Level}.
    */
@@ -71,12 +71,12 @@ define([
    *    See {@link pentaho.visual.color.palettes.divergentRyg5} for an example of a divergent color palette.
    *
    *  @see pentaho.visual.color.Palette#level
-   *  @see pentaho.visual.color.PaletteProperty.Type#levels
+   *  @see pentaho.visual.color.PalettePropertyType#levels
    */
 
   return PentahoString.extend({
 
-    $type: /** @lends pentaho.visual.color.Level.Type# */{
+    $type: /** @lends pentaho.visual.color.LevelType# */{
       id: module.id,
       mixins: [EnumMixin],
       domain: ["nominal", "quantitative", "divergent"]

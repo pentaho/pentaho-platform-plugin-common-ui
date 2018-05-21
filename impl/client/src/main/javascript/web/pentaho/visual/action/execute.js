@@ -23,11 +23,11 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.action.Execute.Type
+   * @name pentaho.visual.action.ExecuteType
    * @class
-   * @extends pentaho.visual.action.Base.Type
-   * @extends pentaho.visual.action.mixins.Data.Type
-   * @extends pentaho.visual.action.mixins.Positioned.Type
+   * @extends pentaho.visual.action.BaseType
+   * @extends pentaho.visual.action.mixins.DataType
+   * @extends pentaho.visual.action.mixins.PositionedType
    *
    * @classDesc The type class of {@link pentaho.visual.action.Execute}.
    */

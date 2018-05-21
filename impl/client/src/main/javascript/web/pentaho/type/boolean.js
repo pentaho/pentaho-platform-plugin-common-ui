@@ -40,7 +40,7 @@ define([
      * @readonly
      */
 
-    $type: /** @lends pentaho.type.Boolean.Type# */{
+    $type: /** @lends pentaho.type.BooleanType# */{
       id: module.id,
       cast: Boolean
     }

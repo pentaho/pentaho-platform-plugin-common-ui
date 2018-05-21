@@ -20,7 +20,7 @@ define([
 
   "use strict";
 
-  describe("pentaho.type.List.Type", function() {
+  describe("pentaho.type.ListType", function() {
 
     describe("#toSpecInScope(keyArgs)", function() {
 

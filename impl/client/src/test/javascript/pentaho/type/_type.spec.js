@@ -22,7 +22,7 @@ define([
 
   "use strict";
 
-  describe("pentaho.type.Instance.Type", function() {
+  describe("pentaho.type.Type", function() {
 
     describe("construction", function() {
 

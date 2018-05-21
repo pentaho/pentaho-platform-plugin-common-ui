@@ -60,7 +60,7 @@ define([
         expect(Derived.Type.prototype instanceof Type).toBe(true);
       });
 
-      it("should have .type be Derived.Type#", function() {
+      it("should have .type be DerivedType#", function() {
         var Derived = Instance.extend();
         expect(Derived.type).toBe(Derived.Type.prototype);
       });

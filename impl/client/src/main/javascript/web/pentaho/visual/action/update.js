@@ -21,9 +21,9 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.action.Update.Type
+   * @name pentaho.visual.action.UpdateType
    * @class
-   * @extends pentaho.visual.action.Base.Type
+   * @extends pentaho.visual.action.BaseType
    *
    * @classDesc The type class of the update action.
    *
@@ -41,7 +41,7 @@ define([
    * @classDesc The `visual.action.Update` class is the class of actions which
    * represent a [View]{@link pentaho.visual.base.View} being updated.
    *
-   * The update action is [asynchronous]{@link pentaho.type.action.Base.Type#isSync}.
+   * The update action is [asynchronous]{@link pentaho.type.action.BaseType#isSync}.
    *
    * @description Creates an update action instance given its specification.
    * @param {pentaho.visual.action.spec.IBase} [spec] A base action specification.

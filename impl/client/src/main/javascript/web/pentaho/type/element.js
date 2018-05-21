@@ -29,9 +29,9 @@ define([
   var __elemType = null;
 
   /**
-   * @name pentaho.type.Element.Type
+   * @name pentaho.type.ElementType
    * @class
-   * @extends pentaho.type.Value.Type
+   * @extends pentaho.type.ValueType
    *
    * @classDesc The base type class of *singular* value types.
    *
@@ -118,7 +118,7 @@ define([
      *
      * This method considers configuration to not be possible in the following situations:
      *
-     * 1. this instance is of a [read-only]{@link pentaho.type.Value.Type#isReadOnly} type;
+     * 1. this instance is of a [read-only]{@link pentaho.type.ValueType#isReadOnly} type;
      * 2. `config` is of an [isEntity]{@link pentaho.type.Value#isEntity} type and is
      *     not [equals]{@link pentaho.type.Value#equals} to this value;
      * 3. `config` is not an instance of an [isEntity]{@link pentaho.type.Value#isEntity} type
@@ -248,7 +248,7 @@ define([
     },
     // endregion
 
-    $type: /** @lends pentaho.type.Element.Type# */{
+    $type: /** @lends pentaho.type.ElementType# */{
       id: module.id,
       isAbstract: true,
 
@@ -360,9 +360,9 @@ define([
        *
        * @return {!pentaho.type.Element} The new value.
        *
-       * @see pentaho.type.Value.Type#isEntity
+       * @see pentaho.type.ValueType#isEntity
        * @see pentaho.type.Value#$key
-       * @see pentaho.type.Instance.Type#hasNormalizedInstanceSpecKeyData
+       * @see pentaho.type.Type#hasNormalizedInstanceSpecKeyData
        */
       createLike: function(value, config) {
 

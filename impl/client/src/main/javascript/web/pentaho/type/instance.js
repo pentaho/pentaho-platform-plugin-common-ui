@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/module!",
-  "./Instance.Type",
+  "./InstanceType",
   "./SpecificationScope",
   "pentaho/i18n!types",
   "pentaho/lang/Base",
@@ -41,11 +41,11 @@ define([
    * which is shared by all instances of the type,
    * and essentially, holds its metadata.
    *
-   * The **type class** of the _Instance_ type is {@link pentaho.type.Instance.Type}.
+   * The **type class** of the _Instance_ type is {@link pentaho.type.Type}.
    *
    * When creating a subclass `Foo` of [Instance]{@link pentaho.type.Instance},
    * the corresponding type class is implicitly generated
-   * (a subclass of [Type]{@link pentaho.type.Instance.Type}),
+   * (a subclass of [Type]{@link pentaho.type.Type}),
    * and its singleton object is placed in the static property
    * [Foo.type]{@link pentaho.type.Instance.type}.
    *
@@ -55,7 +55,7 @@ define([
    * The instance and type classes of a type are closely bound and
    * must naturally reference each other.
    * The type singleton object references back the prototype of the instance class,
-   * in a property named [instance]{@link pentaho.type.Instance.Type#instance}.
+   * in a property named [instance]{@link pentaho.type.Type#instance}.
    *
    * @example
    * <caption>
@@ -91,8 +91,7 @@ define([
    * @description Creates an instance of this type.
    *
    * @see pentaho.type.spec.IInstance
-   * @see pentaho.type.spec.IInstanceProto
-   * @see pentaho.type.spec.ITypeProto
+   * @see pentaho.type.spec.IType
    */
   var Instance = Base.extend("pentaho.type.Instance", /** @lends pentaho.type.Instance# */{
     // NOTE: not calling base to block default Base.js from copying 1st argument into `this`.
@@ -108,10 +107,10 @@ define([
     /**
      * Gets the type of this instance.
      *
-     * @type {!pentaho.type.Instance.Type}
+     * @type {!pentaho.type.Type}
      * @readonly
      * @see pentaho.type.Instance.type
-     * @see pentaho.type.Instance.Type#instance
+     * @see pentaho.type.Type#instance
      */
     get $type() {
       return this.__type;
@@ -147,7 +146,7 @@ define([
      * @param {?boolean} [keyArgs.isJson=false] Generates a JSON-compatible specification.
      * Attributes that do not have a JSON-compatible specification are omitted.
      *
-     * @param {?pentaho.type.Instance.Type} [keyArgs.declaredType] The base type of this value's storage location.
+     * @param {?pentaho.type.Type} [keyArgs.declaredType] The base type of this value's storage location.
      * If the value does not have this exact type, its inline type property must be included
      * in the specification. Otherwise, it can be omitted.
      * When unspecified, the inline type property is only included if `forceType` is `true`.
@@ -193,7 +192,7 @@ define([
      *
      * @see pentaho.type.Instance#toSpec
      *
-     * @return {UJsonValue} A JSON-compatible specification.
+     * @return {JsonValue} A JSON-compatible specification.
      */
     toJSON: function() {
       return this.toSpec({isJson: true});
@@ -205,35 +204,13 @@ define([
     /**
      * Gets the type of this instance constructor.
      *
-     * @type {pentaho.type.Instance.Type}
+     * @type {pentaho.type.Type}
      * @readonly
      */
     get type() {
       return this.prototype.$type;
     },
     // endregion
-
-    // override the documentation to specialize the argument types.
-    /**
-     * Creates a subtype of this one.
-     *
-     * For more information on class extension, in general,
-     * see {@link pentaho.lang.Base.extend}.
-     *
-     * @name extend
-     * @memberOf pentaho.type.Instance
-     * @method
-     *
-     * @param {string} [name] The name of the created class.
-     * The name of the created class is used for debugging purposes.
-     * @param {pentaho.type.spec.IInstanceProto} [instSpec] The instance specification.
-     * @param {Object} [classSpec] The static specification.
-     * @param {Object} [keyArgs] The keyword arguments.
-     *
-     * @return {!Class.<pentaho.type.Value>} The new value subclass.
-     *
-     * @see pentaho.lang.Base.extend
-     */
 
     /*
      * Defaults `name` from `instSpec.$type.sourceId` or `instSpec.$type.id`, if any.
@@ -257,7 +234,7 @@ define([
      * @ignore
      */
     _subclassed: function(SubInstCtor, instSpec, classSpec, keyArgs) {
-      // 1. `instSpec` may override property accessors only defined by `Complex.Type`
+      // 1. `instSpec` may override property accessors only defined by `ComplexType`
       // 2. So, the Type class must be created *before* applying instSpec and classSpec to SubInstCtor
       // 3. The Type class requires InstCtor to already exist, to be able to define accessors
 
@@ -282,7 +259,7 @@ define([
      *
      * Works similarly to {@link pentaho.lang.Base.implement}.
      *
-     * @param {pentaho.type.spec.IInstanceProto} config - The localization information.
+     * @param {object} config - The localization information.
      * @return {!Class.<pentaho.type.Instance>} This constructor.
      */
     localize: function(config) {
@@ -294,7 +271,7 @@ define([
      *
      * Works similarly to {@link pentaho.lang.Base.implement}.
      *
-     * @param {pentaho.type.spec.IInstanceProto} config - The configuration information.
+     * @param {object} config - The configuration information.
      *
      * @return {!Class.<pentaho.type.Instance>} This constructor.
      */

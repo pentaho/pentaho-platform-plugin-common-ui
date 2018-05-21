@@ -193,8 +193,8 @@ define([
    *
    * @memberOf pentaho.type.impl.Loader~
    *
-   * @param {pentaho.type.spec.UTypeReference} typeRef - A type reference.
-   * @param {pentaho.type.spec.UTypeReference} defaultBase - A reference to the default base type.
+   * @param {pentaho.type.spec.TypeReference} typeRef - A type reference.
+   * @param {pentaho.type.spec.TypeReference} defaultBase - A reference to the default base type.
    * @param {boolean} [sync=false] Whether to perform a synchronous get.
    *
    * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
@@ -404,8 +404,8 @@ define([
    * a generic object specification.
    *
    * @memberOf pentaho.type.impl.Loader~
-   * @param {pentaho.type.spec.UTypeReference} typeRef - A type reference.
-   * @param {pentaho.type.spec.UTypeReference} defaultBase - The default base type
+   * @param {pentaho.type.spec.TypeReference} typeRef - A type reference.
+   * @param {pentaho.type.spec.TypeReference} defaultBase - The default base type
    * of `typeRef` when it is a generic object specification.
    *
    * @param {boolean} [sync=false] Whether to perform a synchronous resolve.
@@ -455,7 +455,7 @@ define([
     return promiseUtil.error(
       error.argInvalid(
         "typeRef",
-        "Object is not a 'pentaho.type.Instance.Type' instance or a plain object."),
+        "Object is not a 'pentaho.type.Type' instance or a plain object."),
       sync);
   }
 
@@ -478,8 +478,8 @@ define([
    *
    * @memberOf pentaho.type.impl.Loader~
    *
-   * @param {!pentaho.type.spec.ITypeProto} typeSpec - A type specification.
-   * @param {pentaho.type.spec.UTypeReference} defaultBase - The default base type.
+   * @param {!pentaho.type.spec.IType} typeSpec - A type specification.
+   * @param {pentaho.type.spec.TypeReference} defaultBase - The default base type.
    * @param {boolean} [sync=false] Whether to perform a synchronous resolve.
    *
    * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
@@ -542,8 +542,8 @@ define([
    * @memberOf pentaho.type.impl.Loader~
    *
    * @param {?string} temporaryId - The temporary identifier of the type, if any.
-   * @param {!pentaho.type.spec.ITypeProto} typeSpec - A type specification.
-   * @param {pentaho.type.spec.UTypeReference} [defaultBase] - The default base type.
+   * @param {!pentaho.type.spec.IType} typeSpec - A type specification.
+   * @param {pentaho.type.spec.TypeReference} [defaultBase] - The default base type.
    *
    * @return {!pentaho.type.Instance} The type's instance constructor.
    *

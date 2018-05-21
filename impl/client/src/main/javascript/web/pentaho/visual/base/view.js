@@ -142,9 +142,9 @@ define([
   var View = Complex.extend(/** @lends pentaho.visual.base.View# */{
 
     /**
-     * @name pentaho.visual.base.View.Type
+     * @name pentaho.visual.base.ViewType
      * @class
-     * @extends pentaho.type.Complex.Type
+     * @extends pentaho.type.ComplexType
      *
      * @classDesc The base class of view types.
      *
@@ -864,7 +864,7 @@ define([
     },
     // endregion
 
-    $type: /** @lends pentaho.visual.base.View.Type# */{
+    $type: /** @lends pentaho.visual.base.ViewType# */{
       id: module.id,
       isAbstract: true,
 
@@ -939,7 +939,7 @@ define([
        * Each visualization type should document the extension properties that
        * it honors when specified via this attribute.
        *
-       * When set and the model already has [descendant]{@link pentaho.type.Instance.Type#hasDescendants} models,
+       * When set and the model already has [descendant]{@link pentaho.type.Type#hasDescendants} models,
        * an error is thrown.
        *
        * Returns `null` when there are no local extension properties.
@@ -952,9 +952,9 @@ define([
        * @type {Object}
        *
        * @throws {pentaho.lang.OperationInvalidError} When setting and the model already has
-       * [descendant]{@link pentaho.type.Instance.Type#hasDescendants} models.
+       * [descendant]{@link pentaho.type.Type#hasDescendants} models.
        *
-       * @see pentaho.visual.base.View.Type#extensionEffective
+       * @see pentaho.visual.base.ViewType#extensionEffective
        *
        * @see pentaho.visual.base.spec.IViewType#extension
        */
@@ -983,7 +983,7 @@ define([
        * @readOnly
        * @type {Object}
        *
-       * @see pentaho.visual.base.View.Type#extension
+       * @see pentaho.visual.base.ViewType#extension
        */
       get extensionEffective() {
         var effective = this.__extensionEf;
@@ -1030,7 +1030,7 @@ define([
      * not specified or is not type annotated.
      * The returned promise is also rejected if the model type has no registered default view type.
      *
-     * Unlike the {@link pentaho.type.Instance.Type#createAsync} counterpart method,
+     * Unlike the {@link pentaho.type.Type#createAsync} counterpart method,
      * this static variant can be called to create an instance of any view type,
      * even if it isn't a subtype of `this` one.
      *
@@ -1086,7 +1086,7 @@ define([
      * Gets a promise for the view class (constructor), of the registered default type, if any,
      * for the given model type or identifier.
      *
-     * @param {string|!pentaho.visual.base.Model.Type} modelType - The visual model type or its identifier.
+     * @param {string|!pentaho.visual.base.ModelType} modelType - The visual model type or its identifier.
      * @return {!Promise.<Class.<pentaho.visual.base.View>>} A promise for a view class of the given model type.
      *
      * @rejects {pentaho.lang.ArgumentRequiredError} When `modelType` is not specified.

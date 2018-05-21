@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 /**
- * A `spec.UEnvironmentPropFilter` represents the union of JS types that can be used to
+ * A `spec.EnvironmentPropertyFilter` represents the union of JS types that can be used to
  * filter the value of an [environment variable]{@link pentaho.environment.IEnvironment},
  * in the [select]{@link pentaho.config.spec.IRule#select} attribute
  * of a type configuration rule.
@@ -29,5 +29,5 @@
  * Any other value is assumed to be a single value, and matches the environment variable
  * if it is the same value.
  *
- * @typedef {Nully|any|Array.<any>} pentaho.type.spec.UEnvironmentPropFilter
+ * @typedef {Nully|any|Array.<any>} pentaho.type.spec.EnvironmentPropertyFilter
  */

@@ -39,9 +39,9 @@ define([
   // NOTE: these will be kept private until it is decided between the model adapter and the viz concept.
 
   /**
-   * @name pentaho.visual.role.ExternalProperty.Type
+   * @name pentaho.visual.role.ExternalPropertyType
    * @class
-   * @extends pentaho.visual.role.AbstractProperty.Type
+   * @extends pentaho.visual.role.AbstractPropertyType
    *
    * @private
    *
@@ -59,14 +59,14 @@ define([
    *
    * @classDesc The `ExternalProperty` class represents a visual role of a visualization as seen from the outside.
    *
-   * The [valueType]{@link pentaho.type.Property.Type#valueType}
+   * The [valueType]{@link pentaho.type.PropertyType#valueType}
    * of a property of this type is {@link pentaho.visual.role.ExternalMapping}.
    *
    * @description This class was not designed to be constructed directly.
    */
   var ExternalProperty = AbstractProperty.extend(/** @lends pentaho.visual.role.ExternalProperty# */{
 
-    $type: /** @lends pentaho.visual.role.ExternalProperty.Type# */{
+    $type: /** @lends pentaho.visual.role.ExternalPropertyType# */{
 
       id: module.id,
 
@@ -110,7 +110,7 @@ define([
       /**
        * Gets the corresponding internal visual role property type.
        *
-       * @type {!pentaho.visual.role.Property.Type}
+       * @type {!pentaho.visual.role.PropertyType}
        * @readOnly
        * @protected
        */
@@ -216,10 +216,10 @@ define([
        *
        * The returned list or its elements should not be modified.
        *
-       * @type {!Array.<pentaho.visual.role.adaptation.Strategy.Type>}
+       * @type {!Array.<pentaho.visual.role.adaptation.StrategyType>}
        *
        * @throws {pentaho.lang.OperationInvalidError} When setting and the type already has
-       * [subtypes]{@link pentaho.type.Instance.Type#hasDescendants}.
+       * [subtypes]{@link pentaho.type.Type#hasDescendants}.
        */
       get strategies() {
         return this.__strategyTypeList;
@@ -297,7 +297,7 @@ define([
        *
        * If the current external mapping is such that its
        * [isCategoricalFixed]{@link pentaho.visual.role.ExternalMapping#isCategoricalFixed} is `true`,
-       * then only the categorical modes of [internal modes]{@link pentaho.visual.role.Property.Type#modes}
+       * then only the categorical modes of [internal modes]{@link pentaho.visual.role.PropertyType#modes}
        * are considered.
        * Otherwise, all internal modes are considered.
        *

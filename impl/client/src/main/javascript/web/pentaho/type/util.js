@@ -48,7 +48,7 @@ define([
      * Obtains the property type of the first reference, if any, of the given instance.
      *
      * @param {pentaho.type.Instance} inst The instance.
-     * @return {pentaho.type.Property.Type} The property type of the first reference.
+     * @return {pentaho.type.PropertyType} The property type of the first reference.
      * @private
      * @internal
      */

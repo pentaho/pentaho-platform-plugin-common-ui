@@ -175,7 +175,7 @@ define([
      * @name pentaho.type.changes.Changeset#__onChildChangesetCreated
      * @method
      * @param {!pentaho.type.changes.Changeset} childChangeset - The child changeset.
-     * @param {pentaho.type.Property.Type} propType - The property type whose value is the changeset owner.
+     * @param {pentaho.type.PropertyType} propType - The property type whose value is the changeset owner.
      * Only applies when this changeset is a complex changeset.
      *
      * @private

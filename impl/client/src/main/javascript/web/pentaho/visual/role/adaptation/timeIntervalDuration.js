@@ -28,7 +28,7 @@ define([
    * @private
    */
   return PentahoString.extend({
-    $type: /** @lends pentaho.visual.role.adaptation.TimeIntervalDuration.Type# */ {
+    $type: /** @lends pentaho.visual.role.adaptation.TimeIntervalDurationType# */ {
       id: module.id,
 
       mixins: [EnumMixin],

@@ -23,9 +23,9 @@ define([
   return function(filter) {
 
     /**
-     * @name pentaho.data.filter.IsLike.Type
+     * @name pentaho.data.filter.IsLikeType
      * @class
-     * @extends pentaho.data.filter.Property.Type
+     * @extends pentaho.data.filter.PropertyType
      *
      * @classDesc The type class of the is-like filter type.
      *
@@ -115,7 +115,7 @@ define([
           (ci ? ci.$key : "");
       },
 
-      $type: /** @lends pentaho.data.filter.IsLike.Type# */{
+      $type: /** @lends pentaho.data.filter.IsLikeType# */{
         id: module.id,
         props: [
           {

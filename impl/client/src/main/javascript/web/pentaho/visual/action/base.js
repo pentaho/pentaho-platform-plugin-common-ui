@@ -21,9 +21,9 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.action.Base.Type
+   * @name pentaho.visual.action.BaseType
    * @class
-   * @extends pentaho.type.action.Base.Type
+   * @extends pentaho.type.action.BaseType
    *
    * @classDesc The type class of {@link pentaho.visual.action.Base}.
    */
@@ -46,7 +46,7 @@ define([
    */
 
   return ActionBase.extend(/** @lends pentaho.visual.action.Base# */{
-    $type: /** @lends pentaho.visual.action.Base.Type# */{
+    $type: /** @lends pentaho.visual.action.BaseType# */{
       id: module.id,
       isAbstract: true
     }

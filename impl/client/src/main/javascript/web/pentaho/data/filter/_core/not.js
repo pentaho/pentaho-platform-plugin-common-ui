@@ -23,9 +23,9 @@ define([
   return function(filter) {
 
     /**
-     * @name pentaho.data.filter.Not.Type
+     * @name pentaho.data.filter.NotType
      * @class
-     * @extends pentaho.data.filter.Abstract.Type
+     * @extends pentaho.data.filter.AbstractType
      *
      * @classDesc The type class of the `Not` filter type.
      *
@@ -122,7 +122,7 @@ define([
         return this.operand || new filter.Not({operand: this});
       },
 
-      $type: /** @lends pentaho.data.filter.Not.Type# */{
+      $type: /** @lends pentaho.data.filter.NotType# */{
         id: module.id,
         props: [
           {

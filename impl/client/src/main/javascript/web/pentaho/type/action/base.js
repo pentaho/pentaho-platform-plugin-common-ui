@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,39 +27,18 @@ define([
   var actionType;
 
   /**
-   * @name pentaho.type.action.Base.Type
+   * @name pentaho.type.action.BaseType
    * @class
-   * @extends pentaho.type.Element.Type
+   * @extends pentaho.type.ElementType
    *
    * @classDesc The base class of action types.
    *
    * For more information see {@link pentaho.type.action.Base}.
    */
 
-  // override the documentation to specialize the argument types.
-  /**
-   * Creates a subtype of this one.
-   *
-   * For more information on class extension, in general,
-   * see {@link pentaho.lang.Base.extend}.
-   *
-   * @name extend
-   * @memberOf pentaho.type.action.Base
-   * @method
-   *
-   * @param {string} [name] The name of the created class; used for debugging purposes.
-   * @param {pentaho.type.action.spec.IBaseProto} [instSpec] The instance specification.
-   * @param {Object} [classSpec] The static specification.
-   * @param {Object} [keyArgs] The keyword arguments.
-   *
-   * @return {!Class.<pentaho.type.Value>} The new value instance subclass.
-   *
-   * @see pentaho.type.Instance.extend
-   */
-
   var Action = Element.extend(/** @lends pentaho.type.action.Base# */{
 
-    $type: /** @lends pentaho.type.action.Base.Type# */{
+    $type: /** @lends pentaho.type.action.BaseType# */{
 
       id: module.id,
 
@@ -123,15 +102,15 @@ define([
      * It is expected that the associated type class is used to
      * configure metadata information about actions.
      * Metadata properties such as
-     * [label]{@link pentaho.type.Instance.Type#label},
-     * [description]{@link pentaho.type.Instance.Type#description} and
-     * [styleClass]{@link pentaho.type.Instance.Type#styleClass}
+     * [label]{@link pentaho.type.Type#label},
+     * [description]{@link pentaho.type.Type#description} and
+     * [styleClass]{@link pentaho.type.Type#styleClass}
      * can be used in graphical user interfaces to offer the action to the user.
      *
      * ##### Synchronous or Asynchronous
      *
      * An action can be synchronous or asynchronous, as determined by the type property,
-     * {@link pentaho.type.action.Base.Type#isSync}.
+     * {@link pentaho.type.action.BaseType#isSync}.
      * The execution of a synchronous action is completed synchronously,
      * while that of an asynchronous action only completes asynchronously.
      *
@@ -161,8 +140,7 @@ define([
      * @param {pentaho.type.action.spec.IBase} [spec] An action specification.
      *
      * @see pentaho.type.action.spec.IBase
-     * @see pentaho.type.action.spec.IBaseProto
-     * @see pentaho.type.action.spec.IBaseTypeProto
+     * @see pentaho.type.action.spec.IBaseType
      */
     constructor: function(spec) {
       /**
@@ -204,7 +182,7 @@ define([
      * Gets or sets the label of this action.
      *
      * When not set to a non-empty local value, the label of the action type,
-     * {@link pentaho.type.Instance.Type#label} is returned.
+     * {@link pentaho.type.Type#label} is returned.
      *
      * @type {nonEmptyString}
      */
@@ -220,7 +198,7 @@ define([
      * Gets or sets the description of this action.
      *
      * When not set to a non-empty local value, the description of the action type,
-     * {@link pentaho.type.Instance.Type#description} is returned.
+     * {@link pentaho.type.Type#description} is returned.
      *
      * @type {nonEmptyString}
      */

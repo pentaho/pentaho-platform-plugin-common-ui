@@ -65,7 +65,7 @@ define([
         expect(props.length).toBe(0);
       });
 
-      it("should convert an array of pentaho.type.UPropertyTypeProto", function() {
+      it("should convert an array of pentaho.type.spec.PropertyType", function() {
 
         var props = PropertyTypeCollection.to(["foo", "bar"], Derived.type);
 
@@ -160,7 +160,7 @@ define([
           }).toThrow(errorMatch.argRequired("config"));
         });
 
-        it("should accept an array of pentaho.type.UPropertyTypeProto", function() {
+        it("should accept an array of pentaho.type.spec.PropertyType", function() {
           props.configure(["foo", "bar"]);
 
           expect(props.length).toBe(2);
@@ -170,7 +170,7 @@ define([
           expect(props[1].valueType).toBe(PentahoString.type);
         });
 
-        it("should accept an array of pentaho.type.UPropertyTypeProto whose elements " +
+        it("should accept an array of pentaho.type.spec.PropertyType whose elements " +
           "were previously defined", function() {
           var props = PropertyTypeCollection.to(["foo", {name: "eggs", valueType: "boolean"}], Derived.type);
 
@@ -186,7 +186,7 @@ define([
         });
 
         it("should accept an object whose keys are the property names and the values are " +
-           "pentaho.type.UPropertyTypeProto", function() {
+           "pentaho.type.spec.PropertyType", function() {
 
           props.configure({
             foo:  {name: "foo", valueType: "boolean"},

@@ -22,9 +22,9 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.color.Palette.Type
+   * @name pentaho.visual.color.PaletteType
    * @class
-   * @extends pentaho.type.Complex.Type
+   * @extends pentaho.type.ComplexType
    *
    * @classDesc The base type class of color palette types.
    *

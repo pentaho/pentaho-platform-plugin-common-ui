@@ -50,7 +50,7 @@
  * This property is immutable and can only be specified at construction time.
  *
  * When unspecified, or specified as `null`,
- * defaults to the value of [isContinuous]{@link pentaho.type.Instance.Type#isContinuous} of
+ * defaults to the value of [isContinuous]{@link pentaho.type.Type#isContinuous} of
  * [dataType]{@link pentaho.visual.role.Mode#dataType}.
  *
  * The types {@link pentaho.type.Number} and {@link pentaho.type.Date} are known to be continuous.

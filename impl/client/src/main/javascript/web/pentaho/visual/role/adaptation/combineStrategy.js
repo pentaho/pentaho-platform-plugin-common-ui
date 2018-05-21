@@ -23,9 +23,9 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.role.adaptation.CombineStrategy.Type
+   * @name pentaho.visual.role.adaptation.CombineStrategyType
    * @class
-   * @extends pentaho.visual.role.adaptation.Strategy.Type
+   * @extends pentaho.visual.role.adaptation.StrategyType
    * @private
    *
    * @classDesc The type class of {@link pentaho.visual.role.adaptation.CombineStrategy}.
@@ -49,7 +49,7 @@ define([
    * [formattedSeparator]{@link pentaho.visual.role.adaptation.CombineStrategy#formattedSeparator} text.
    *
    * The _combine_ strategy targets:
-   * 1. Visual roles which are [visual keys]{@link pentaho.visual.role.Property.Type#isVisualKey};
+   * 1. Visual roles which are [visual keys]{@link pentaho.visual.role.PropertyType#isVisualKey};
    * 2. Modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} can
    *    be assigned to [string]{@link pentaho.type.String};
    * 3. Modes which are categorical (not [continuous]{@link pentaho.visual.role.Mode#isContinuous}).
@@ -59,7 +59,7 @@ define([
    * @param {pentaho.visual.role.adaptation.spec.IStrategy} [spec] A _combine_ mapping strategy specification.
    */
   var CombineStrategy = Strategy.extend(/** @lends pentaho.visual.role.adaptation.CombineStrategy# */{
-    $type: /** @lends pentaho.visual.role.adaptation.CombineStrategy.Type# */{
+    $type: /** @lends pentaho.visual.role.adaptation.CombineStrategyType# */{
       id: module.id,
       props: [
         /**

@@ -22,7 +22,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, spyOn:false*/
 
-  describe("pentaho.type.Simple.Type", function() {
+  describe("pentaho.type.SimpleType", function() {
 
     describe("#_fillSpecInContext(spec, keyArgs)", function() {
 

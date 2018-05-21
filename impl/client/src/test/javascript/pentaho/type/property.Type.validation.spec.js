@@ -20,7 +20,7 @@ define([
 
   "use strict";
 
-  describe("pentaho.type.Property.Type -", function() {
+  describe("pentaho.type.PropertyType -", function() {
 
     describe("#validateOn(owner) -", function() {
 
@@ -351,5 +351,5 @@ define([
         });
       });
     });
-  }); // pentaho.type.Property.Type
+  }); // pentaho.type.PropertyType
 });

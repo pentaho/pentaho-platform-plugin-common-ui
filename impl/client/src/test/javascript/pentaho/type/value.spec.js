@@ -284,7 +284,7 @@ define([
           expect(typeof Derived.Type).toBe("function");
         });
 
-        it("should be a sub-class of Value.Type", function() {
+        it("should be a sub-class of ValueType", function() {
           var Derived = Value.extend();
           expect(Derived.Type).not.toBe(Value.Type);
           expect(Derived.type instanceof Value.Type).toBe(true);

@@ -35,6 +35,6 @@
  * The fields of the visual role mapping.
  *
  * @name pentaho.visual.role.spec.IAbstractMapping#fields
- * @type {Array.<pentaho.visual.role.spec.UMappingField>}
+ * @type {Array.<pentaho.visual.role.spec.MappingField>}
  * @see pentaho.visual.role.AbstractMapping#fields
  */

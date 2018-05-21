@@ -37,9 +37,9 @@ define([
   var booleanType = null;
 
   /**
-   * @name pentaho.type.Simple.Type
+   * @name pentaho.type.SimpleType
    * @class
-   * @extends pentaho.type.Element.Type
+   * @extends pentaho.type.ElementType
    *
    * @classDesc The type class of {@link pentaho.type.Simple}.
    */
@@ -54,12 +54,11 @@ define([
    *
    * @description Creates a simple instance.
    * @constructor
-   * @param {pentaho.type.spec.USimple} [spec] A simple specification.
+   * @param {pentaho.type.spec.Simple} [spec] A simple specification.
    *
    * @see pentaho.type.Complex
    * @see pentaho.type.spec.ISimple
-   * @see pentaho.type.spec.ISimpleProto
-   * @see pentaho.type.spec.ISimpleTypeProto
+   * @see pentaho.type.spec.ISimpleType
    */
   var Simple = Element.extend(/** @lends pentaho.type.Simple# */{
 
@@ -144,7 +143,7 @@ define([
      *
      * @type {string}
      * @readonly
-     * @see pentaho.type.Simple.Type#isEntity
+     * @see pentaho.type.SimpleType#isEntity
      */
     get $key() {
       return this.value.toString();
@@ -202,7 +201,7 @@ define([
      * Compares this element to a distinct, non-equal element of the same type according to its relative order.
      *
      * This method compares the primitive value of this value with that of `other` by delegating to
-     * the [comparePrimitiveValues]{@link pentaho.type.Simple.Type#comparePrimitiveValues} method.
+     * the [comparePrimitiveValues]{@link pentaho.type.SimpleType#comparePrimitiveValues} method.
      *
      * @param {!pentaho.type.Simple} other - The other value.
      *
@@ -210,7 +209,7 @@ define([
      * `0`, otherwise.
      *
      * @protected
-     * @see pentaho.type.Simple.Type#comparePrimitiveValues
+     * @see pentaho.type.SimpleType#comparePrimitiveValues
      */
     _compare: function(other) {
       return this.$type.comparePrimitiveValues(this.value, other.value);
@@ -281,7 +280,7 @@ define([
      * @param {!Object} keyArgs - The keyword arguments object.
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
      *
-     * @return {UJsonValue} A JSON-compatible representation of value.
+     * @return {JsonValue} A JSON-compatible representation of value.
      *
      * @protected
      */
@@ -290,7 +289,7 @@ define([
     },
     // endregion
 
-    $type: /** pentaho.type.Simple.Type# */{
+    $type: /** pentaho.type.SimpleType# */{
       id: module.id,
       isAbstract: true,
 
@@ -467,27 +466,6 @@ define([
   })
   .localize({$type: bundle.structured.Simple})
   .configure({$type: module.config});
-
-  // Override the documentation to specialize the argument types.
-  /**
-   * Creates a subtype of this one.
-   *
-   * For more information on class extension, in general,
-   * see {@link pentaho.lang.Base.extend}.
-   *
-   * @name extend
-   * @memberOf pentaho.type.Simple
-   * @method
-   *
-   * @param {string} [name] The name of the created class; used for debugging purposes.
-   * @param {pentaho.type.spec.ISimpleProto} [instSpec] The instance specification.
-   * @param {Object} [classSpec] The static specification.
-   * @param {Object} [keyArgs] The keyword arguments.
-   *
-   * @return {!Class.<pentaho.type.Simple>} The new simple instance subclass.
-   *
-   * @see pentaho.type.Value.extend
-   */
 
   return Simple;
 });

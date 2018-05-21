@@ -28,10 +28,10 @@ define([
 
 
   /**
-   * @name pentaho.type.mixins.DiscreteDomain.Type
+   * @name pentaho.type.mixins.DiscreteDomainType
    *
    * @class
-   * @extends pentaho.type.Instance.Type
+   * @extends pentaho.type.Type
    *
    * @classDesc The type class of the [DiscreteDomain]{@link pentaho.type.mixins.DiscreteDomain} type.
    */
@@ -47,20 +47,20 @@ define([
    * @classDesc A mixin type that adds to properties the ability to specify a discrete set of values
    * that are valid as property values.
    *
-   * When the property's [value type]{@link pentaho.type.Property.Type#valueType} is an
+   * When the property's [value type]{@link pentaho.type.PropertyType#valueType} is an
    * [enumeration]{@link pentaho.type.mixins.Enum}, and the property also specifies a domain,
    * the combined domain is the intersection of both.
    *
-   * A domain can be specified by using the [domain]{@link pentaho.type.mixins.DiscreteDomain.Type#domain} attribute.
+   * A domain can be specified by using the [domain]{@link pentaho.type.mixins.DiscreteDomainType#domain} attribute.
    * The effective, resulting domain is obtained by calling the
-   * [domainOn]{@link pentaho.type.mixins.DiscreteDomain.Type#domainOn} method.
+   * [domainOn]{@link pentaho.type.mixins.DiscreteDomainType#domainOn} method.
    *
    * @description This class was not designed to be constructed directly.
    */
 
   var DiscreteDomain = Instance.extend(/** @lends pentaho.type.mixins.DiscreteDomain# */{
 
-    $type: /** @lends pentaho.type.mixins.DiscreteDomain.Type# */{
+    $type: /** @lends pentaho.type.mixins.DiscreteDomainType# */{
 
       id: module.id,
 
@@ -70,11 +70,11 @@ define([
          * on a given owner complex value.
          *
          * @name domainOn
-         * @memberOf pentaho.type.mixins.DiscreteDomain.Type#
+         * @memberOf pentaho.type.mixins.DiscreteDomainType#
          * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
          * @return {Array.<pentaho.type.Element>} The evaluated value of the `domain` attribute.
          *
-         * @see pentaho.type.Property.Type#domain
+         * @see pentaho.type.PropertyType#domain
          */
 
         /**
@@ -98,7 +98,7 @@ define([
          * When the [valueType]{@link pentaho.type.Property#valueType} is an
          * [enumeration]{@link pentaho.type.mixins.DiscreteDomain},
          * the initial list of valid values is its
-         * [domain]{@link pentaho.type.mixins.DiscreteDomain.Type#domain}.
+         * [domain]{@link pentaho.type.mixins.DiscreteDomainType#domain}.
          *
          * Because this attribute is also _dynamic_,
          * the actual `domain` values are only known
@@ -119,7 +119,7 @@ define([
          *
          * When set to a {@link Nully} value, the set operation is ignored.
          *
-         * When set and the property already has [descendant]{@link pentaho.type.Instance.Type#hasDescendants}
+         * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants}
          * properties, an error is thrown.
          *
          * When the [valueType]{@link pentaho.type.Property#valueType} is an
@@ -131,12 +131,12 @@ define([
          * The last specified domain determines the order.
          *
          * @name domain
-         * @memberOf pentaho.type.Property.Type#
+         * @memberOf pentaho.type.PropertyType#
          * @type {undefined | Array.<pentaho.type.Element> |
          *        pentaho.type.spec.PropertyDynamicAttribute.<Array.<pentaho.type.Element>>}
          *
          * @see pentaho.type.Complex#domainOf
-         * @see pentaho.type.mixins.spec.IDiscreteDomainTypeProto#domain
+         * @see pentaho.type.mixins.spec.IDiscreteDomainType#domain
          */
         "domain": {
 

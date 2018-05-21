@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@
  *
  * When unspecified, or specified as a {@link Nully} value,
  * the default value, which is the value of
- * [defaultSelectionMode]{@link pentaho.visual.action.Select.Type#defaultSelectionMode},
+ * [defaultSelectionMode]{@link pentaho.visual.action.SelectType#defaultSelectionMode},
  * is used.
  *
  * Can be specified as the name of one of the standard selection modes,

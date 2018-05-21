@@ -27,9 +27,9 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.role.AbstractProperty.Type
+   * @name pentaho.visual.role.AbstractPropertyType
    * @class
-   * @extends pentaho.type.Property.Type
+   * @extends pentaho.type.PropertyType
    * @abstract
    *
    * @classDesc The type class of {@link pentaho.visual.role.AbstractProperty}.
@@ -45,7 +45,7 @@ define([
    * @classDesc The `AbstractProperty` class is the base class of properties that represent a visual role of a
    * visualization and defines its capabilities.
    *
-   * The [valueType]{@link pentaho.type.Property.Type#valueType} of a property of this type is
+   * The [valueType]{@link pentaho.type.PropertyType#valueType} of a property of this type is
    * [Mapping]{@link pentaho.visual.role.AbstractMapping} and
    * stores the association between the visual role and the data fields of a visualization's current data set.
    *
@@ -53,7 +53,7 @@ define([
    */
   var AbstractProperty = Property.extend(/** @lends pentaho.visual.role.AbstractProperty# */{
 
-    $type: /** @lends pentaho.visual.role.AbstractProperty.Type# */{
+    $type: /** @lends pentaho.visual.role.AbstractPropertyType# */{
 
       id: module.id,
 
@@ -74,7 +74,7 @@ define([
        *
        * The returned list or its elements should not be modified.
        *
-       * @name pentaho.visual.role.AbstractProperty.Type#modes
+       * @name pentaho.visual.role.AbstractPropertyType#modes
        * @type {!pentaho.type.List.<pentaho.visual.role.Mode>}
        * @readOnly
        * @abstract
@@ -86,8 +86,8 @@ define([
        * @type {boolean}
        * @readOnly
        * @see pentaho.visual.role.Mode#dataType
-       * @see pentaho.type.Instance.Type#isList
-       * @see pentaho.type.Instance.Type#isElement
+       * @see pentaho.type.Type#isList
+       * @see pentaho.type.Type#isElement
        */
       get hasAnyListModes() {
         var any = false;
@@ -105,9 +105,9 @@ define([
        *
        * @type {boolean}
        * @readOnly
-       * @see pentaho.visual.role.AbstractProperty.Type#hasAnyContinuousModes
+       * @see pentaho.visual.role.AbstractPropertyType#hasAnyContinuousModes
        * @see pentaho.visual.role.Mode#isContinuous
-       * @see pentaho.visual.role.AbstractProperty.Type#modes
+       * @see pentaho.visual.role.AbstractPropertyType#modes
        */
       get hasAnyCategoricalModes() {
         var any = false;
@@ -125,9 +125,9 @@ define([
        *
        * @type {boolean}
        * @readOnly
-       * @see pentaho.visual.role.AbstractProperty.Type#hasAnyCategoricalModes
+       * @see pentaho.visual.role.AbstractPropertyType#hasAnyCategoricalModes
        * @see pentaho.visual.role.Mode#isContinuous
-       * @see pentaho.visual.role.AbstractProperty.Type#modes
+       * @see pentaho.visual.role.AbstractPropertyType#modes
        */
       get hasAnyContinuousModes() {
         var any = false;
@@ -146,20 +146,20 @@ define([
        * @param {object} keyArgs - The keyword arguments.
        * @param {?boolean} [keyArgs.isContinuous] - Indicates that matching modes are continuous.
        * @param {?boolean} [keyArgs.isList] - Indicates that the data type of matching modes are list data types.
-       * @param {pentaho.type.UTypeReference} [keyArgs.elementDataType] - The element data type (or a subtype of)
+       * @param {pentaho.type.spec.TypeReference} [keyArgs.elementDataType] - The element data type (or a subtype of)
        * of matching modes.
        *
        * @return {boolean} `true` if a mode having the specified properties exists; `false` otherwise.
        *
-       * @see pentaho.visual.role.AbstractProperty.Type#hasAnyContinuousModes
-       * @see pentaho.visual.role.AbstractProperty.Type#hasAnyCategoricalModes
-       * @see pentaho.visual.role.AbstractProperty.Type#hasAnyListModes
+       * @see pentaho.visual.role.AbstractPropertyType#hasAnyContinuousModes
+       * @see pentaho.visual.role.AbstractPropertyType#hasAnyCategoricalModes
+       * @see pentaho.visual.role.AbstractPropertyType#hasAnyListModes
        *
-       * @see pentaho.visual.role.AbstractProperty.Type#modes
+       * @see pentaho.visual.role.AbstractPropertyType#modes
        * @see pentaho.visual.role.Mode#isContinuous
-       * @see pentaho.type.Instance.Type#isList
+       * @see pentaho.type.Type#isList
        * @see pentaho.visual.role.Mode#dataType
-       * @see pentaho.type.Instance.Type#elementType
+       * @see pentaho.type.Type#elementType
        */
       hasAnyModes: function(keyArgs) {
         var isContinuous = keyArgs.isContinuous;
@@ -200,7 +200,7 @@ define([
        * When a visual model has no key visual roles,
        * then it is assumed that one visual element is rendered per input row of data.
        *
-       * @name pentaho.visual.role.AbstractProperty.Type#isVisualKey
+       * @name pentaho.visual.role.AbstractPropertyType#isVisualKey
        * @type {boolean}
        * @readOnly
        * @abstract
@@ -209,7 +209,7 @@ define([
       /**
        * Gets the metadata about the fields property of mappings of this visual role property.
        *
-       * @name pentaho.visual.role.AbstractProperty.Type#fields
+       * @name pentaho.visual.role.AbstractPropertyType#fields
        * @type {!pentaho.visual.role.IFieldsMetadata}
        * @readOnly
        * @abstract

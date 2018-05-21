@@ -47,9 +47,9 @@ define([
   var __filter = {};
 
   /**
-   * @name pentaho.data.filter.Abstract.Type
+   * @name pentaho.data.filter.AbstractType
    * @class
-   * @extends pentaho.type.Complex.Type
+   * @extends pentaho.type.ComplexType
    *
    * @classDesc The base type class of filter types.
    *
@@ -65,7 +65,7 @@ define([
    *
    * @classDesc The base class of filter types.
    *
-   * This is an [entity]{@link pentaho.type.Value.Type#isEntity} type.
+   * This is an [entity]{@link pentaho.type.ValueType#isEntity} type.
    *
    * @description Creates a filter instance.
    *
@@ -558,7 +558,7 @@ define([
       }
     },
 
-    $type: /** @lends pentaho.data.filter.Abstract.Type# */{
+    $type: /** @lends pentaho.data.filter.AbstractType# */{
       id: module.id,
       isAbstract: true,
       isEntity: true,

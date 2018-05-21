@@ -51,7 +51,7 @@ define([
     },
     // endregion
 
-    $type: /** @lends pentaho.type.Date.Type# */{
+    $type: /** @lends pentaho.type.DateType# */{
       id: module.id,
 
       cast: function(v) {

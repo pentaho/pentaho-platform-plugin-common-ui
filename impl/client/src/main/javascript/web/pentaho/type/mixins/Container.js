@@ -147,7 +147,7 @@ define([
      * outside of any ambient txn. The _removeReference counterpart is not needed.
      *
      * @param {!pentaho.type.mixins.Container} container - The container that refers this one.
-     * @param {pentaho.type.Property.Type} [propType] When `container` is a complex,
+     * @param {pentaho.type.PropertyType} [propType] When `container` is a complex,
      * the property type whose value contains this instance.
      *
      * @private

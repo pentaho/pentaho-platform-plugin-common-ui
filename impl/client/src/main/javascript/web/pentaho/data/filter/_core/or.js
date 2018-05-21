@@ -23,9 +23,9 @@ define([
   return function(filter) {
 
     /**
-     * @name pentaho.data.filter.Or.Type
+     * @name pentaho.data.filter.OrType
      * @class
-     * @extends pentaho.data.filter.Tree.Type
+     * @extends pentaho.data.filter.TreeType
      *
      * @classDesc The type class of `Or` filter types.
      *
@@ -95,7 +95,7 @@ define([
         return filter.And;
       },
 
-      $type: /** @lends pentaho.data.filter.Or.Type# */{
+      $type: /** @lends pentaho.data.filter.OrType# */{
         id: module.id
       }
     });

@@ -273,7 +273,7 @@ define([
         expect(typeof ElemType).toBe("function");
       });
 
-      it("should be a sub-class of `Element.Type`", function() {
+      it("should be a sub-class of `ElementType`", function() {
         expect(ElemType.prototype instanceof Element.Type).toBe(true);
       });
 

@@ -43,8 +43,8 @@ define([
    *
    * Methods like
    * [Instance#toSpec]{@link pentaho.type.Instance#toSpec},
-   * [Type#toSpec]{@link pentaho.type.Instance.Type#toSpec} and
-   * [Type#toRef]{@link pentaho.type.Instance.Type#toRef}
+   * [Type#toSpec]{@link pentaho.type.Type#toSpec} and
+   * [Type#toRef]{@link pentaho.type.Type#toRef}
    * use the ambient specification context, when set,
    * to provide context to the serialization process.
    * When not set, these create a new specification context and
@@ -91,7 +91,7 @@ define([
      *
      * If the given type is anonymous and also has not been added to this context, `null` is returned.
      *
-     * @param {pentaho.type.Instance.Type} type - The type.
+     * @param {pentaho.type.Type} type - The type.
      *
      * @return {?nonEmptyString} The identifier of the type within this context, or `null`.
      */
@@ -109,7 +109,7 @@ define([
      *
      * @param {nonEmptyString} tid - The temporary identifier.
      *
-     * @return {pentaho.type.Instance.Type} The type with the given temporary identifier, if any; or, `null`.
+     * @return {pentaho.type.Type} The type with the given temporary identifier, if any; or, `null`.
      */
     get: function(tid) {
       var typeInfo = O.getOwn(this.__typeInfosByTid, tid);
@@ -125,7 +125,7 @@ define([
      * Else, the anonymous type is added to the context
      * and a temporary identifier is either given, or automatically generated and returned.
      *
-     * @param {pentaho.type.Instance.Type} type - The type to add.
+     * @param {pentaho.type.Type} type - The type to add.
      * @param {?nonEmptyString} [tid] The temporary identifier to use when adding.
      *
      * @return {nonEmptyString} The identifier of the type within this context.

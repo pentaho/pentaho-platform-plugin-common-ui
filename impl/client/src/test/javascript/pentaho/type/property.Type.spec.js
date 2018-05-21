@@ -27,7 +27,7 @@ define([
 
   /* eslint max-nested-callbacks: 0, require-jsdoc: 0 */
 
-  describe("pentaho.type.Property.Type", function() {
+  describe("pentaho.type.PropertyType", function() {
 
     var PropertyType = Property.Type;
 
@@ -3115,5 +3115,5 @@ define([
         });
       });
     });
-  }); // end pentaho.type.Property.Type
+  }); // end pentaho.type.PropertyType
 });

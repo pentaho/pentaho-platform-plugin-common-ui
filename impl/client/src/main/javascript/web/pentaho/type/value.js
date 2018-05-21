@@ -29,15 +29,15 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.type.Value.Type
+   * @name pentaho.type.ValueType
    * @class
-   * @extends pentaho.type.Instance.Type
+   * @extends pentaho.type.Type
    * @implements pentaho.lang.ISpecifiable
    *
    * @classDesc The base type class of value types.
    *
-   * Value types can be singular or plural ({@link pentaho.type.Value.Type#isList|isList}).
-   * A Value type should not be instantiated if it is {@link pentaho.type.Value.Type#isAbstract|abstract}.
+   * Value types can be singular or plural ({@link pentaho.type.ValueType#isList|isList}).
+   * A Value type should not be instantiated if it is {@link pentaho.type.ValueType#isAbstract|abstract}.
    *
    * For more information see {@link pentaho.type.Value}.
    */
@@ -58,11 +58,10 @@ define([
    *
    * @description Creates a `Value` instance.
    * @constructor
-   * @param {pentaho.type.spec.UValue} [spec] A value specification.
+   * @param {pentaho.type.spec.Value} [spec] A value specification.
    *
    * @see pentaho.type.spec.IValue
-   * @see pentaho.type.spec.IValueProto
-   * @see pentaho.type.spec.IValueTypeProto
+   * @see pentaho.type.spec.IValueType
    */
   var Value = Instance.extend(/** @lends pentaho.type.Value# */{
 
@@ -220,7 +219,7 @@ define([
      * @param {any} config - The value configuration.
      *
      * @throws {TypeError} When the value would be changed and
-     * its type is [read-only]{@link pentaho.type.Value.Type#isReadOnly}.
+     * its type is [read-only]{@link pentaho.type.ValueType#isReadOnly}.
      *
      * @final
      *
@@ -247,12 +246,12 @@ define([
      * This method can only be called when there is an ambient transaction.
      *
      * The default implementation throws an error if this value's type is
-     * [read-only]{@link pentaho.type.Value.Type#isReadOnly}.
+     * [read-only]{@link pentaho.type.ValueType#isReadOnly}.
      *
      * @param {!any} config - The distinct, non-{@link Nully} configuration.
      *
      * @throws {TypeError} When the value would be changed and
-     * its type is [read-only]{@link pentaho.type.Value.Type#isReadOnly}.
+     * its type is [read-only]{@link pentaho.type.ValueType#isReadOnly}.
      *
      * @protected
      *
@@ -287,7 +286,7 @@ define([
      * @param {?boolean} [keyArgs.isJson=false] - Generates a JSON-compatible specification.
      * Attributes which do not have a JSON-compatible specification are omitted.
      *
-     * @param {?pentaho.type.Instance.Type} [keyArgs.declaredType] The base type of this value's storage location.
+     * @param {?pentaho.type.Type} [keyArgs.declaredType] The base type of this value's storage location.
      * If the value does not have this exact type, its inline type property must be included
      * in the specification. Otherwise, it can be omitted.
      * When unspecified, the inline type property is only included if `forceType` is `true`.
@@ -320,17 +319,17 @@ define([
      * This argument only applies to complex values and
      * is not passed through to the values of their properties.
      *
-     * @return {!pentaho.type.spec.UInstance} A specification of this value.
+     * @return {!pentaho.type.spec.Instance} A specification of this value.
      */
     // endregion
 
     /**
      * Gets the type of this instance.
      *
-     * @type pentaho.type.Value.Type
+     * @type pentaho.type.ValueType
      * @readonly
      */
-    $type: /** @lends pentaho.type.Value.Type# */{
+    $type: /** @lends pentaho.type.ValueType# */{
       id: module.id,
 
       isAbstract: true,
@@ -343,7 +342,7 @@ define([
       /**
        * Gets a value that indicates if this type is an _entity_ type.
        *
-       * An _entity_ type is an [element]{@link pentaho.type.Element.Type} type
+       * An _entity_ type is an [element]{@link pentaho.type.ElementType} type
        * that represents a _business_ entity whose identity is reflected
        * by the [$key]{@link pentaho.type.Value#$key} property.
        *
@@ -367,11 +366,11 @@ define([
        *
        * A [Complex]{@link pentaho.type.Complex} type can be _marked_ read-only when defined.
        * All of the properties of a read-only complex type are
-       * implicitly marked [read-only]{@link pentaho.type.Property.Type#isReadOnly}.
-       * When the [valueType]{@link pentaho.type.Property.Type#valueType} of a property
+       * implicitly marked [read-only]{@link pentaho.type.PropertyType#isReadOnly}.
+       * When the [valueType]{@link pentaho.type.PropertyType#valueType} of a property
        * is an element type, it must be a read-only type.
        * When the `valueType` of a property is a list type, then its
-       * [element type]{@link pentaho.type.List.Type#of} must be read-only.
+       * [element type]{@link pentaho.type.ListType#of} must be read-only.
        *
        * [List]{@link pentaho.type.List} types are never, a priori, and directly read-only.
        * However, if a property of a complex type is read-only and has a list value type,
@@ -473,7 +472,7 @@ define([
        * In such cases, this method would return a normal, object, generic specification containing the given value
        * as the value of the main property.
        *
-       * This method calls the [_normalizeInstanceSpec]{@link pentaho.type.Value.Type#_normalizeInstanceSpec}
+       * This method calls the [_normalizeInstanceSpec]{@link pentaho.type.ValueType#_normalizeInstanceSpec}
        * when the specified value specification is not {@link Nully}.
        *
        * @param {any} instSpec - The value specification.
@@ -482,7 +481,7 @@ define([
        *
        * @final
        *
-       * @see pentaho.type.Value.Type#_normalizeInstanceSpec
+       * @see pentaho.type.ValueType#_normalizeInstanceSpec
        */
       normalizeInstanceSpec: function(instSpec) {
         return instSpec != null ? this._normalizeInstanceSpec(instSpec) : null;
@@ -502,7 +501,7 @@ define([
        *
        * @protected
        *
-       * @see pentaho.type.Value.Type#normalizeInstanceSpec
+       * @see pentaho.type.ValueType#normalizeInstanceSpec
        */
       _normalizeInstanceSpec: function(instSpec) {
         return instSpec;
@@ -517,8 +516,8 @@ define([
        *
        * @return {boolean} `true` if the specification contains key information; `false`, otherwise.
        *
-       * @see pentaho.type.Value.Type#isEntity
-       * @see pentaho.type.Value.Type#normalizeInstanceSpec
+       * @see pentaho.type.ValueType#isEntity
+       * @see pentaho.type.ValueType#normalizeInstanceSpec
        * @see pentaho.type.Value#$key
        */
       hasNormalizedInstanceSpecKeyData: function(instSpec) {
@@ -553,25 +552,4 @@ define([
   .configure({$type: module.config});
 
   return Value;
-
-  // Override the documentation to specialize the argument types.
-  /**
-   * Creates a subtype of this one.
-   *
-   * For more information on class extension, in general,
-   * see {@link pentaho.lang.Base.extend}.
-   *
-   * @name extend
-   * @memberOf pentaho.type.Value
-   * @method
-   *
-   * @param {string} [name] The name of the created class; used for debugging purposes.
-   * @param {pentaho.type.spec.IValueProto} [instSpec] The instance specification.
-   * @param {Object} [classSpec] The static specification.
-   * @param {Object} [keyArgs] The keyword arguments.
-   *
-   * @return {!Class.<pentaho.type.Value>} The new value instance subclass.
-   *
-   * @see pentaho.type.Instance.extend
-   */
 });
