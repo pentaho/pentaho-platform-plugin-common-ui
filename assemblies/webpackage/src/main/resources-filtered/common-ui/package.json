@@ -16,7 +16,6 @@
     "pentaho/util": "/pentaho/util",
     "pentaho/lang": "/pentaho/lang",
     "pentaho/i18n": "/pentaho/i18n",
-    "pentaho/i18n/directService": "/i18nMock",
     "pentaho/data": "/pentaho/data",
     "pentaho/type": "/pentaho/type",
     "pentaho/visual": "/pentaho/visual",
@@ -95,7 +94,7 @@
   "packages": [
     {"name": "pentaho/module", "main": "metaOf"},
     {"name": "pentaho/environment"},
-    {"name": "pentaho/i18n", "main": "directService"},
+    {"name": "pentaho/i18n", "main": "defaultService"},
     {"name": "pentaho/debug", "main": "manager"}
   ],
 

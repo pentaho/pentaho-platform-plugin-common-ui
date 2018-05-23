@@ -235,8 +235,6 @@ if(!useDebug) {
     "pentaho/type/impl/SpecificationProcessor",
     "pentaho/type/impl/Loader",
     "pentaho/type/_baseLoader",
-    "pentaho/i18n/serverService",
-    "pentaho/i18n",
     "pentaho/type/InstanceType",
     "pentaho/type/Instance",
     "pentaho/type/changes/_transactionControl",

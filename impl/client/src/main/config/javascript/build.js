@@ -142,10 +142,9 @@
 
         // Exclude these AMD modules as there is some chance that these are
         // used by code which has nothing to do with the platform bundle code.
-        "pentaho/i18n",
-        "pentaho/i18n/MessageBundle",
-
-        "pentaho/service"
+        "pentaho/i18n/defaultService",
+        "pentaho/i18n/serverService",
+        "pentaho/i18n/MessageBundle"
       ],
       exclude: [
         // Exclude virtual theme module IDs.

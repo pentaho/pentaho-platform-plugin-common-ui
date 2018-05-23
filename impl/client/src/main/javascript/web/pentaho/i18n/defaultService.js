@@ -16,8 +16,9 @@
 
 /**
  * The localization service that resolves message bundles by directly loading `.properties` files.
+ * The locale is simply ignored.
  *
- * @name directService
+ * @name defaultService
  * @memberOf pentaho.i18n
  * @type {pentaho.i18n.IService}
  * @amd pentaho/i18n
@@ -25,14 +26,35 @@
 define([
   "./MessageBundle"
 ], function(MessageBundle) {
+
+  /* globals window */
+
   return {
     load: function(bundlePath, require, onLoad, config) {
 
-      var bundleUrl = require.toUrl(bundlePath) + ".properties";
+      if(config.isBuild) {
+        // Indicate that the optimizer should not wait for this resource and complete optimization.
+        // This resource will be resolved dynamically during run time in the web browser.
+        onLoad();
+      } else {
+        var bundleUrl = require.toUrl(bundlePath) + ".properties";
+        if(bundleUrl.charAt(0) === ".") {
+          // Still a relative path. This causes problems with the text! plugin normalizing it again
+          // as a module...
+          var baseUrl = window.location.href;
+          var index = baseUrl.lastIndexOf("/");
+          if(index !== baseUrl.length - 1) {
+            // Leave the /
+            baseUrl = baseUrl.substring(0, index);
+          }
 
-      require(["text!" + bundleUrl], function(bundleText) {
-        onLoad(new MessageBundle(__parseProperties(bundleText)));
-      });
+          bundleUrl = baseUrl + bundleUrl;
+        }
+
+        require(["text!" + bundleUrl], function(bundleText) {
+          onLoad(new MessageBundle(__parseProperties(bundleText)));
+        });
+      }
     },
     normalize: function(name, normalize) {
       return normalize(__getBundleID(name));

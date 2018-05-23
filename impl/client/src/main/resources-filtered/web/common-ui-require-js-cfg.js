@@ -83,7 +83,7 @@
 
   requirePackages.push({
     "name": "pentaho/i18n",
-    "main": "serverService"
+    "main": "defaultService"
   });
 
   requirePackages.push({
@@ -435,8 +435,6 @@
       "pentaho/type/impl/SpecificationProcessor",
       "pentaho/type/impl/Loader",
       "pentaho/type/_baseLoader",
-      "pentaho/i18n/serverService",
-      "pentaho/i18n",
       "pentaho/type/InstanceType",
       "pentaho/type/Instance",
       "pentaho/type/changes/_transactionControl",

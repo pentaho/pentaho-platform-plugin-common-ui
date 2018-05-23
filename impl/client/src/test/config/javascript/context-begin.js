@@ -17,7 +17,7 @@
 
 /* globals require, define */
 
-/* eslint no-unused-vars: 0 */
+/* eslint no-unused-vars: 0, no-undef-init: 0 */
 
 var depDir;
 var webjarsSubPath = "/META-INF/resources/webjars";
