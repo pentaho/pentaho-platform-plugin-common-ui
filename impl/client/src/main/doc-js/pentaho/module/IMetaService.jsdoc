@@ -31,6 +31,7 @@
  * @memberOf pentaho.module.IMetaService#
  * @method
  * @param {pentaho.module.spec.MetaMap} moduleSpecMap - A map of modules metadata.
+ * @return {!pentaho.module.IMetaService} The value of `this`.
  */
 
 // ---

@@ -47,14 +47,17 @@
  */
 
 /**
- * The value of the module.
+ * The value of the module or a function that creates it.
  *
  * When specified, an AMD/RequireJS module with this module's id is dynamically defined.
  *
  * Only considered specified when different from `undefined`.
+ * When a function, whatever its return value is taken as the value of the module.
+ * When a function, it is called with the module metadata object,
+ * having its configuration already loaded.
  *
  * @name value
  * @memberOf pentaho.module.spec.IMeta#
- * @type {any}
+ * @type {any|(function(!pentaho.module.IMeta) : any)}
  */
 

@@ -146,6 +146,14 @@ define([
         metaService.configure();
       });
 
+      it("should return itself", function() {
+
+        var metaService = new MetaService();
+        var result = metaService.configure();
+
+        expect(result).toBe(metaService);
+      });
+
       it("should throw if given a moduleSpecMap with an empty key", function() {
 
         var metaService = new MetaService();

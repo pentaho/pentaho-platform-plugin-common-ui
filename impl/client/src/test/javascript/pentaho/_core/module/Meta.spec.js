@@ -74,6 +74,11 @@ define([
       return jasmine.createSpyObj("logger", ["info", "error"]);
     }
 
+    function createModuleMetaServiceMock() {
+      var moduleMetaService = jasmine.createSpyObj("moduleMetaService", ["get"]);
+      return moduleMetaService;
+    }
+
     describe("new Meta(id, spec)", function() {
 
       var Meta;
@@ -194,25 +199,17 @@ define([
           expect(meta.isLoaded).toBe(false);
         });
 
-        it("should respect a specified #value", function() {
+        it("should not immediately expose a specified #value", function() {
           var value = {};
           var spec = {value: value};
           var meta = new Meta(id, spec);
 
-          expect(meta.value).toBe(value);
-          expect(meta.isLoaded).toBe(true);
-        });
-
-        it("should respect a specified #value, even if `null`", function() {
-          var value = null;
-          var spec = {value: value};
-          var meta = new Meta(id, spec);
-
-          expect(meta.value).toBe(value);
-          expect(meta.isLoaded).toBe(true);
+          expect(meta.value).toBe(undefined);
+          expect(meta.isLoaded).toBe(false);
         });
 
         it("should register a corresponding AMD module whose value is the specified value", function(done) {
+
           var value = {};
           var spec = {value: value};
           var meta = new Meta(id, spec);
@@ -222,6 +219,28 @@ define([
           setTimeout(function() {
             localRequire([id], function(result) {
               expect(result).toBe(value);
+              done();
+            }, done.fail);
+          }, 0);
+        });
+
+        it("should call a value factory function with the module as argument", function(done) {
+
+          var value = {};
+          var valueFun = jasmine.createSpy("factoryValue").and.returnValue(value);
+          var spec = {value: valueFun};
+          var meta = new Meta(id, spec);
+
+          // Do not call localRequire immediately,
+          // to not shadow the behavior that the code is expected to have.
+          setTimeout(function() {
+            localRequire([id], function(result) {
+
+              expect(result).toBe(value);
+
+              expect(valueFun).toHaveBeenCalledTimes(1);
+              expect(valueFun).toHaveBeenCalledWith(jasmine.objectContaining({id: meta.id}));
+
               done();
             }, done.fail);
           }, 0);

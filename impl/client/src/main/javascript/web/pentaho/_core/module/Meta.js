@@ -21,8 +21,9 @@ define([
   "../../debug/Levels",
   "../../util/logger",
   "../../util/promise",
-  "../../util/text"
-], function(localRequire, module, Base, debugMgr, DebugLevels, logger, promiseUtil, textUtil) {
+  "../../util/text",
+  "../../util/fun"
+], function(localRequire, module, Base, debugMgr, DebugLevels, logger, promiseUtil, textUtil, F) {
 
   "use strict";
 
@@ -75,7 +76,7 @@ define([
          * @type {any}
          * @private
          */
-        this.__value = spec.value;
+        this.__value = undefined;
         this.__valuePromise = null;
 
         // NOTE: TypeMeta changes this to true, when isAbstract.
@@ -84,7 +85,7 @@ define([
          * @type {boolean}
          * @protected
          */
-        this._isLoaded = this.__value !== undefined;
+        this._isLoaded = false;
 
         /**
          * Gets the configuration of the module.
@@ -100,8 +101,9 @@ define([
 
         // this.browsingInfo;
 
-        if(this._isLoaded) {
-          this.__defineAmdModule();
+        var value = spec.value;
+        if(value !== undefined) {
+          this.__defineAmdModuleAsync(value);
         }
       },
 
@@ -167,18 +169,23 @@ define([
 
       /**
        * Registers the specified value of this module with the AMD module system.
+       * @param {any|(function(!pentaho.module.IMeta) : any)} value - The value or value factory function.
+       *
+       * @return {!Promise} A promise for the value of the module.
+       *
        * @private
        */
-      __defineAmdModule: function() {
+      __defineAmdModuleAsync: function(value) {
 
-        var value = this.__value;
-
-        define(this.id, function() { return value; });
+        if(F.is(value)) {
+          define(this.id, ["pentaho/module!"], value);
+        } else {
+          define(this.id, F.constant(value));
+        }
 
         // Capture the just defined module in the AMD context of localRequire.
         // Not calling this, would end up defining the module in the default AMD context.
-        // Also, assuming doing this never fails.
-        localRequire([this.id], function() {});
+        return this.loadAsync();
       },
       // endregion
 

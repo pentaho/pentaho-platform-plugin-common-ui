@@ -64,7 +64,7 @@ define([
       configure: function(moduleSpecMap) {
 
         if(moduleSpecMap == null) {
-          return;
+          return this;
         }
 
         var me = this;
@@ -77,6 +77,8 @@ define([
         preparedModuleIdList.forEach(function(id) {
           moduleResolver(id);
         });
+
+        return this;
 
         // ---
 
