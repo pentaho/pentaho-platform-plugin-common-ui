@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "./CategoricalContinuousAbstract",
   "pentaho/visual/models/PointAbstract",
   "pentaho/data/util",

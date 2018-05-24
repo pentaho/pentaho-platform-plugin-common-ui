@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "./Pie",
   "pentaho/visual/models/Donut"
 ], function(module, BaseView, Model) {

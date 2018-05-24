@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "./CartesianAbstract",
   "pentaho/visual/models/CategoricalContinuousAbstract"
 ], function(module, BaseView, Model) {

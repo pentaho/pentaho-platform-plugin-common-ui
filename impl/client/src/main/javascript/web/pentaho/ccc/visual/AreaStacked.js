@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "./AreaAbstract",
   "pentaho/visual/models/AreaStacked"
 ], function(module, BaseView, Model) {

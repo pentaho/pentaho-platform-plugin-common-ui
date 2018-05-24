@@ -45,7 +45,7 @@ Modify the AMD module declaration of the `ViewD3.js` file to the following:
 
 ```js
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "pentaho/visual/base/View",
   "./Model",
   "pentaho/visual/action/Execute",
@@ -143,7 +143,7 @@ Modify the type factory declaration of the `ViewD3.js` file to the following:
 
 ```js
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "pentaho/visual/base/View",
   "./Model",
   "pentaho/visual/action/Execute",

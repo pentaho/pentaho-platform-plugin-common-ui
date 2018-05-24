@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "./PointAbstract",
   "pentaho/i18n!./i18n/model"
 ], function(module, BaseModel, bundle) {

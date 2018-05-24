@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "./Simple",
   "pentaho/util/object",
   "pentaho/i18n!types"

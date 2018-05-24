@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "./BarAbstract",
   "./types/LabelsOption",
   "./types/Shape",

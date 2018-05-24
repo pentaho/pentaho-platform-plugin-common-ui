@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "pentaho/visual/base/View",
   "pentaho/visual/models/Abstract",
   "pentaho/visual/action/Select",

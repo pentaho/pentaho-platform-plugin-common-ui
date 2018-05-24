@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "pentaho/type/Number",
   "pentaho/type/mixins/Enum",
   "pentaho/i18n!../i18n/model"

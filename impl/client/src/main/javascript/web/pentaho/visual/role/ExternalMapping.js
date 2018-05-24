@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "./AbstractMapping",
   "pentaho/i18n!messages"
 ], function(module, AbstractMapping, bundle) {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "pentaho/type/Complex",
   "../role/AbstractProperty",
   "../color/PaletteProperty", // Also pre-loads all registered palette instances.

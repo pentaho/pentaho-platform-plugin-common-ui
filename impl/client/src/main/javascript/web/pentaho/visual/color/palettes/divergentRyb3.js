@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "pentaho/visual/color/Palette",
   "pentaho/util/spec"
 ], function(module, Palette, specUtil) {

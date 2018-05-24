@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "pentaho/visual/action/Base",
   "pentaho/data/filter/Abstract",
   "pentaho/module/subtypesOf!pentaho/data/filter/Abstract",

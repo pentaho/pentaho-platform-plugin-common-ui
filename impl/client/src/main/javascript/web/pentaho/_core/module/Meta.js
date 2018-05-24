@@ -178,7 +178,7 @@ define([
       __defineAmdModuleAsync: function(value) {
 
         if(F.is(value)) {
-          define(this.id, ["pentaho/module!"], value);
+          define(this.id, ["pentaho/module!_"], value);
         } else {
           define(this.id, F.constant(value));
         }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "./Simple",
   "pentaho/i18n!types"
 ], function(module, Simple, bundle) {

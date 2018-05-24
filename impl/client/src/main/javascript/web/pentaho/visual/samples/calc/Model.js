@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "pentaho/visual/base/Model",
   "pentaho/i18n!model",
   "./theme/model"

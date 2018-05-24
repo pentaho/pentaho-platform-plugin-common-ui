@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "./MetricPointAbstract",
   "pentaho/visual/models/Bubble"
 ], function(module, BaseView, Model) {

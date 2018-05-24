@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "./PointAbstract",
   "pentaho/visual/models/Line",
   "./_trends"

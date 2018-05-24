@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "pentaho/visual/color/Palette",
   "pentaho/visual/color/palettes/nominalNeutral",
   "pentaho/visual/color/palettes/nominalLight",

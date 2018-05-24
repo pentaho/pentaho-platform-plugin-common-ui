@@ -69,7 +69,7 @@
  *
  * For example, the `my/Foo` module could obtain its own configuration in the following way:
  * ```js
- * define(["pentaho/module!"], function(module) {
+ * define(["pentaho/module!_"], function(module) {
  *
  *   if(module.config !== null) {
  *     // ...

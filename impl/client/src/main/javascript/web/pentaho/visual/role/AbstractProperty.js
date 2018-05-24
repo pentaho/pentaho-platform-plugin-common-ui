@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "pentaho/type/Property",
   "./AbstractMapping",
   "pentaho/i18n!messages",

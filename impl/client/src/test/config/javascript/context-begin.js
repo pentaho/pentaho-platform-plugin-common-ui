@@ -94,7 +94,7 @@ var requireCfg = {
       }
     },
     "pentaho/debug": {
-      // "level": "debug",
+      // level: "debug",
       // modules: {
       //   "pentaho/lang/Base": "debug"
       // }

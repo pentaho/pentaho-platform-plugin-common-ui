@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "pentaho/type/String",
   "pentaho/type/mixins/Enum"
 ], function(module, PentahoString, EnumMixin) {

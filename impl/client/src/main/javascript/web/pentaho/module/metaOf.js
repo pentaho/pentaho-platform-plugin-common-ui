@@ -39,12 +39,13 @@ define([
    *
    * **AMD Plugin Usage**: `"pentaho/module!{moduleId}"`
    *
-   * 1. `{moduleId}` — The identifier of the desired module. Defaults to the requesting module.
+   * 1. `{moduleId}` — The identifier of the desired module. To refer to the requesting module,
+   *    use the special value `_`.
    *
    * @example
    *
    * // Obtain the self module.
-   * define(["pentaho/module!"], function(module) {
+   * define(["pentaho/module!_"], function(module) {
    *
    *   if(module.config) {
    *     // Do something.
@@ -68,7 +69,7 @@ define([
         onLoad();
       } else {
 
-        if(NORMALIZE_REGEX.test(name)) {
+        if(name === "_" || NORMALIZE_REGEX.test(name)) {
           name = null;
         }
 
@@ -89,7 +90,7 @@ define([
 
       // This resolves a name which is relative to the parent module.
       // Still, no way to know the actual requesting module, just the parent module's id (`normalize(".")`).
-      if(name) {
+      if(name && name !== "_") {
         return normalize(name);
       }
 

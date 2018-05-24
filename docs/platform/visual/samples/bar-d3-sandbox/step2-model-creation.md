@@ -31,7 +31,7 @@ Create a file named `Model.js` and place the following code in it:
 
 ```js
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "pentaho/visual/base/Model"
 ], function(module, BaseModel) {
   

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "./CategoricalContinuousAbstract",
   "./types/LabelsOption",
   "./mixins/MultiCharted",

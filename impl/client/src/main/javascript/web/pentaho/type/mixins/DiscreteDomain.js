@@ -15,7 +15,7 @@
  */
 
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   // This should be Property, however, because the mixin is applied to Property itself,
   // we have to derive from Instance instead (or a cycle would be formed).
   "../Instance",

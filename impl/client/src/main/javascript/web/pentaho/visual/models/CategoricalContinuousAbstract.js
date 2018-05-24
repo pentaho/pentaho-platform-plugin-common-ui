@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "./CartesianAbstract",
   "./mixins/ScaleColorDiscrete",
   "pentaho/i18n!./i18n/model"

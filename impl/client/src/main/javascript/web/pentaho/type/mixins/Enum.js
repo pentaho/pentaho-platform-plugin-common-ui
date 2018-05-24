@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "../Simple",
   "../List",
   "../util",
@@ -57,7 +57,7 @@ define([
    *
    * ```js
    * define([
-   *   "pentaho/module!",
+   *   "pentaho/module!_",
    *   "pentaho/type/String"
    * ], function(module, PenString) {
    *

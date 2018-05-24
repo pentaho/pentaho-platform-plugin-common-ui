@@ -15,7 +15,7 @@
  */
 define([
   "require",
-  "pentaho/module!",
+  "pentaho/module!_",
   "./Element",
   "./util",
   "pentaho/util/object",

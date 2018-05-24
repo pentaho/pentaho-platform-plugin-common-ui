@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "./AbstractModel",
   "../role/Property" // Pre-loaded with Model
 ], function(module, AbstractModel) {

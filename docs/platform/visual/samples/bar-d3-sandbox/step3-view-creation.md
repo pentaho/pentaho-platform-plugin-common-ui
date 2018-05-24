@@ -16,7 +16,7 @@ Create a file named `ViewD3.js` and place the following code in it:
 
 ```js
 define([
-  "pentaho/module!",
+  "pentaho/module!_",
   "pentaho/visual/base/View",
   "./Model",
   "d3",
