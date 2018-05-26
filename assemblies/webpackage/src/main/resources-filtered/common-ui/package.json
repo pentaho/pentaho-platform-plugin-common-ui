@@ -156,6 +156,10 @@
         "alias": "function",
         "base": "simple"
       },
+      "pentaho/type/TypeDescriptor": {
+        "alias": "type",
+        "base": "simple"
+      },
       "pentaho/type/mixins/Enum": {
         "alias": "enum",
         "base": "element"
