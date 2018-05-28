@@ -5,10 +5,10 @@
   <parent>
     <groupId>org.pentaho</groupId>
     <artifactId>common-ui-impl-client-config-umbrella</artifactId>
-    <version>8.0-SNAPSHOT</version>
+    <version>8.0.0.7-353</version>
   </parent>
   <artifactId>common-ui-impl-client-config-folder-enabler</artifactId>
-  <version>8.0-SNAPSHOT</version>
+  <version>8.0.0.7-353</version>
   <packaging>bundle</packaging>
   <properties>
     <osgi.version>4.3.1</osgi.version>
