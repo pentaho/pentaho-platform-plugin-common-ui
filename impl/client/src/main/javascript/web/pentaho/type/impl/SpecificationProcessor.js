@@ -173,7 +173,7 @@ define([
      *
      * @param {!pentaho.type.spec.IType} typeSpec - A generic object type specification.
      *
-     * @param {function(depIdOrAlias: string)} depFun - A function that is called for each found module dependency.
+     * @param {function(string)} depFun - A function that is called for each found module dependency.
      *
      * @private
      */

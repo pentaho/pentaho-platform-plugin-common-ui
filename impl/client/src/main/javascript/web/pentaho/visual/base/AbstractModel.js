@@ -137,7 +137,7 @@ define([
     /**
      * Gets an array of the names of fields which are mapped to _key_ visual roles.
      *
-     * @type {!Array.<string>} The array of field names.
+     * @type {!Array.<string>}
      * @readOnly
      *
      * @see pentaho.visual.role.AbstractPropertyType#isVisualKey
@@ -166,7 +166,7 @@ define([
      * Gets an array of the names of fields which are mapped to _measure_ visual roles
      * and which are not mapped to any _key_ visual roles.
      *
-     * @type {!Array.<string>} The array of field names.
+     * @type {!Array.<string>}
      * @readOnly
      * @see pentaho.visual.role.AbstractPropertyType#isVisualKey
      */

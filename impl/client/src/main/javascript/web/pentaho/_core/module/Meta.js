@@ -169,7 +169,7 @@ define([
 
       /**
        * Registers the specified value of this module with the AMD module system.
-       * @param {any|(function(!pentaho.module.IMeta) : any)} value - The value or value factory function.
+       * @param {(any|(function(!pentaho.module.IMeta) : any))} value - The value or value factory function.
        *
        * @return {!Promise} A promise for the value of the module.
        *
