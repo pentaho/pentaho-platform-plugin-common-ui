@@ -96,7 +96,7 @@ Lets see some examples using the old and the new syntax.
          {
            name: "category",
            base: "pentaho/visual/role/property",
-           modes: [{dataType: "string"}]
+           modes: [{dataType: "string"}],
            fields: {
              isRequired: true 
              // or, equivalently:
