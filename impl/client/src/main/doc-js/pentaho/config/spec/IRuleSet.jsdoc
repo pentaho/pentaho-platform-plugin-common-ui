@@ -127,6 +127,19 @@
  */
 
 /**
+ * The base module identifier to which module and dependency identifiers are relative.
+ *
+ * When unspecified and the rule set is registered and loaded from a module,
+ * this property defaults to the module's base module.
+ *
+ * @name baseId
+ * @memberOf pentaho.config.spec.IRuleSet#
+ * @type {?string}
+ *
+ * @see pentaho.config.spec.IRule#deps
+ */
+
+/**
  * The list of configuration rules.
  *
  * Within a type configuration,

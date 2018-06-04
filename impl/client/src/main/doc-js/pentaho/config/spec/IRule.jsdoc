@@ -65,7 +65,11 @@
  * The absolute identifiers of the modules that should be loaded
  * when the rule is selected for application.
  *
+ * When relative, these are relative to {@link pentaho.config.spec.IRuleSet#baseId}.
+ *
  * @name deps
  * @memberOf pentaho.config.spec.IRule#
  * @type {Array.<string>}
+ *
+ * @see pentaho.config.spec.IRuleSet#baseId
  */

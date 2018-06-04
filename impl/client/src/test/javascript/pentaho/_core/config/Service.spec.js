@@ -55,17 +55,6 @@ define(function() {
       return core;
     }
 
-    function createMetaMock() {
-
-      function Meta(id) {
-        this.id = id;
-      }
-
-      Meta.prototype.loadAsync = jasmine.createSpy("loadAsync").and.returnValue(Promise.resolve());
-
-      return Meta;
-    }
-
     function createMetaModuleServiceMock() {
 
       var moduleMetaService = jasmine.createSpyObj("moduleMetaService", [
@@ -403,6 +392,63 @@ define(function() {
         });
       });
 
+      describe("modules absolutization", function() {
+
+        it("should return config if rule applies to module", function() {
+
+          var configurationService;
+
+          core = createCoreMock();
+          ConfigurationService = configServiceFactory(core);
+
+          configurationService = new ConfigurationService();
+
+          configurationService.add({
+            baseId: "test",
+            rules: [
+              {
+                select: {
+                  module: "./A"
+                },
+                apply: {
+                  testId: "A"
+                }
+              }
+            ]
+          });
+
+          return configurationService.selectAsync("test/A").then(function(result) {
+            expect(result.testId).toEqual("A");
+          });
+        });
+
+        it("should throw if module id is relative and baseId is not specified", function() {
+
+          var configurationService;
+
+          core = createCoreMock();
+          ConfigurationService = configServiceFactory(core);
+
+          configurationService = new ConfigurationService();
+
+          expect(function() {
+
+            configurationService.add({
+              rules: [
+                {
+                  select: {
+                    module: "../A"
+                  },
+                  apply: {
+                    testId: "A"
+                  }
+                }
+              ]
+            });
+          }).toThrow(errorMatch.operInvalid());
+        });
+      });
+
       describe("filtering", function() {
 
         var ruleSet =  {
@@ -520,6 +566,61 @@ define(function() {
             expect(moduleBFactory).toHaveBeenCalled();
             expect(moduleCFactory).toHaveBeenCalled();
           });
+        });
+
+        it("should resolve all dependencies relative to baseId", function() {
+
+          var moduleBFactory = jasmine.createSpy("moduleB");
+          var moduleCFactory = jasmine.createSpy("moduleC");
+
+          localRequire.define("test/config/B", moduleBFactory);
+          localRequire.define("test/config/C", moduleCFactory);
+
+          var ruleSet = {
+            baseId: "test/config",
+            rules: [
+              {
+                select: {module: "A"},
+                deps: ["./B", "./C"],
+                apply: {}
+              }
+            ]
+          };
+
+          core = createCoreMock();
+          ConfigurationService = configServiceFactory(core);
+
+          var configurationService = new ConfigurationService({});
+
+          configurationService.add(ruleSet);
+
+          return configurationService.selectAsync("A").then(function() {
+
+            expect(moduleBFactory).toHaveBeenCalled();
+            expect(moduleCFactory).toHaveBeenCalled();
+          });
+        });
+
+        it("should throw if there are relative dependencies and baseId is not specified", function() {
+
+          var ruleSet = {
+            rules: [
+              {
+                select: {module: "A"},
+                deps: ["../B", "../C"],
+                apply: {}
+              }
+            ]
+          };
+
+          core = createCoreMock();
+          ConfigurationService = configServiceFactory(core);
+
+          var configurationService = new ConfigurationService({});
+
+          expect(function() {
+            configurationService.add(ruleSet);
+          }).toThrow(errorMatch.operInvalid());
         });
 
         it("should resolve all dependencies and pass their values to the function factory", function() {

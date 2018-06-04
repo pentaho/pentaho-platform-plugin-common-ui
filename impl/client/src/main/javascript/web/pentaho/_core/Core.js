@@ -21,9 +21,10 @@ define([
   "./module/InstanceMeta",
   "./module/TypeMeta",
   "./module/Service",
-  "./config/Service"
+  "./config/Service",
+  "../module/util"
 ], function(localRequire, module, moduleMetaServiceFactory, moduleMetaFactory, instanceModuleMetaFactory,
-            typeModuleMetaFactory, ModuleService, configurationServiceFactory) {
+            typeModuleMetaFactory, ModuleService, configurationServiceFactory, moduleUtil) {
 
   "use strict";
 
@@ -108,8 +109,14 @@ define([
 
       return ruleSetModuleMeta
         .loadAsync()
-        // eslint-disable-next-line dot-notation,no-unexpected-multiline
-        ["catch"](function() {
+        .then(function(ruleSet) {
+          // This allows for resolution of relative dependencies.
+          if(ruleSet && !ruleSet.baseId) {
+            ruleSet.baseId = moduleUtil.getBaseIdOf(ruleSetModuleMeta.id) || null;
+          }
+
+          return ruleSet;
+        }, function() {
           // Swallow and return null.
           return null;
         });

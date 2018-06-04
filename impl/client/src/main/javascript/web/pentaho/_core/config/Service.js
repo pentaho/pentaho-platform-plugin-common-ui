@@ -23,9 +23,10 @@ define([
   "../../util/object",
   "../../util/promise",
   "../../util/fun",
-  "../../util/requireJSConfig!"
+  "../../util/requireJSConfig!",
+  "../../module/util"
 ], function(localRequire, module, Base, SortedList, ArgumentRequiredError, specUtil,
-            O, promiseUtil, F, requireJSConfig) {
+            O, promiseUtil, F, requireJSConfig, moduleUtil) {
 
   "use strict";
 
@@ -97,12 +98,16 @@ define([
       /**
        * Adds a configuration rule set.
        *
-       * @param {pentaho.config.spec.IRuleSet} config - A configuration rule set to add.
+       * @param {pentaho.config.spec.IRuleSet} ruleSet - A configuration rule set to add.
        */
-      add: function(config) {
-        if(config && config.rules) {
-          config.rules.forEach(function(rule) {
-            this.addRule(rule);
+      add: function(ruleSet) {
+
+        if(ruleSet && ruleSet.rules) {
+
+          var baseId = ruleSet.baseId || null;
+
+          ruleSet.rules.forEach(function(rule) {
+            this.addRule(rule, baseId);
           }, this);
         }
       },
@@ -118,8 +123,13 @@ define([
        * the service's internal needs.
        *
        * @param {!pentaho.config.spec.IRule} rule - The configuration rule to add.
+       * @param {?string} [baseId] - The base module identifier to which dependency ids are relative.
+       *
+       * @throw {pentaho.lang.OperationInvalidError} When `rule` has relative dependencies and `baseId`
+       * is not specified.
        */
-      addRule: function(rule) {
+      addRule: function(rule, baseId) {
+
         // Assuming the Service takes ownership of the rules,
         // so mutating it directly is ok.
         rule._ordinal = __ruleCounter++;
@@ -136,10 +146,21 @@ define([
           moduleIds = [moduleIds];
         }
 
+        var depIds = rule.deps;
+        if(depIds) {
+          // Again, assuming the Service takes ownership of the rules,
+          // so mutating it directly is ok.
+          depIds.forEach(function(depId, index) {
+            depIds[index] = moduleUtil.absolutizeId(depId, baseId);
+          });
+        }
+
         moduleIds.forEach(function(moduleId) {
           if(!moduleId) {
             throw new ArgumentRequiredError("rule.select.module");
           }
+
+          moduleId = moduleUtil.absolutizeId(moduleId, baseId);
 
           var list = this.__ruleStore[moduleId];
           if(!list) {
