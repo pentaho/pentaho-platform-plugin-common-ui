@@ -17,7 +17,7 @@
 
 /* globals require, define */
 
-/* eslint no-unused-vars: 0 */
+/* eslint no-unused-vars: 0, no-undef-init: 0 */
 
 var depDir;
 var webjarsSubPath = "/META-INF/resources/webjars";
@@ -84,11 +84,7 @@ var requireCfg = {
   map:   {"*": {}},
   bundles:  {},
   config:   {
-    "pentaho/service": {
-    },
-    "pentaho/typeInfo": {
-    },
-    "pentaho/instanceInfo": {
+    "pentaho/modules": {
     },
     "pentaho/environment": {
       locale: SESSION_LOCALE,
@@ -98,9 +94,9 @@ var requireCfg = {
       }
     },
     "pentaho/debug": {
-      // "level": "debug",
+      // level: "debug",
       // modules: {
-      //   "pentaho/type/Context": "debug"
+      //   "pentaho/lang/Base": "debug"
       // }
     }
   },
@@ -120,7 +116,7 @@ var KARMA_DEBUG = false;
  * for development purposes.
  *
  * The expression is evaluated on the part of the spec file name that is after
- * `test-js/unit/` and before the `.spec.js` extension (e.g. `"pentaho/service"`).
+ * `test-js/unit/` and before the `.spec.js` extension (e.g. `"pentaho/modules"`).
  *
  * @type RegExp
  *

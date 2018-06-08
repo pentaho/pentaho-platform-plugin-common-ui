@@ -18,7 +18,7 @@
  * The `IStrategyApplicationValidation` interface describes whether the application of
  * a strategy to specific fields of a schema data table is valid.
  * It is the result of the
- * [Strategy#validateApplication]{@link pentaho.visual.role.adaptation.Strategy.Type#validateApplication} method.
+ * [Strategy#validateApplication]{@link pentaho.visual.role.adaptation.StrategyType#validateApplication} method.
  *
  * @name pentaho.visual.role.adaptation.IStrategyApplicationValidation
  *

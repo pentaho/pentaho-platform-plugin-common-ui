@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,34 +86,34 @@
  */
 
 /**
- * Creates a child context of this one given its specification.
- * Any unspecified information is inherited from this context.
+ * Creates a child environment of this one given its specification.
+ * Any unspecified information is inherited from this environment.
  *
  * @name createChild
  * @memberOf pentaho.environment.IEnvironment#
  * @method
- * @param {pentaho.environment.spec.IEnvironment} [childSpec] - The child context specification.
- * @return {!pentaho.environment.IEnvironment} The child context.
+ * @param {pentaho.environment.spec.IEnvironment} [childSpec] - The child environment specification.
+ * @return {!pentaho.environment.IEnvironment} The child environment.
  */
 
 /**
- * Creates a specification with the information of this context.
+ * Creates a specification with the information of this environment.
  *
  * @name toSpec
  * @memberOf pentaho.environment.IEnvironment#
  * @method
- * @return {!pentaho.environment.spec.IEnvironment} The context specification.
+ * @return {!pentaho.environment.spec.IEnvironment} The environment specification.
  * @see pentaho.environment.IEnvironment#toJSON
  */
 
 /**
- * Serializes this context to JSON.
+ * Serializes this environment to JSON.
  *
  * This method is an alias of [toSpec]{pentaho.environment.IEnvironment#toSpec}.
  *
  * @name toJSON
  * @memberOf pentaho.environment.IEnvironment#
  * @method
- * @return {!pentaho.environment.spec.IEnvironment} The context specification.
+ * @return {!pentaho.environment.spec.IEnvironment} The environment specification.
  * @see pentaho.environment.IEnvironment#toSpec
  */

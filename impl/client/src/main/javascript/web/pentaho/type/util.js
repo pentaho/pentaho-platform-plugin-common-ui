@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "../util/object",
-  "../util/error"
-], function(O, error) {
+  "pentaho/util/object"
+], function(O) {
 
   "use strict";
 
@@ -49,7 +48,7 @@ define([
      * Obtains the property type of the first reference, if any, of the given instance.
      *
      * @param {pentaho.type.Instance} inst The instance.
-     * @return {pentaho.type.Property.Type} The property type of the first reference.
+     * @return {pentaho.type.PropertyType} The property type of the first reference.
      * @private
      * @internal
      */

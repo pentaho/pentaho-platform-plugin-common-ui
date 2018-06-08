@@ -16,7 +16,7 @@
 
 define([
   "module",
-  "../lang/Base"
+  "pentaho/lang/Base"
 ], function(module, Base) {
 
   "use strict";
@@ -43,7 +43,7 @@ define([
      *
      * @param {!pentaho.type.mixins.Container} container - The container that references the owner of this reference
      * list.
-     * @param {pentaho.type.Property.Type} [propType] When `container` is a complex,
+     * @param {pentaho.type.PropertyType} [propType] When `container` is a complex,
      * the property type whose value contains the owner of this reference list.
      *
      * @return {boolean} `true` if the reference did not exist and was added; `false`, otherwise.
@@ -60,7 +60,7 @@ define([
      *
      * @param {!pentaho.type.mixins.Container} container - The container that references the owner of this reference
      * list.
-     * @param {pentaho.type.Property.Type} [propType] When `container` is a complex,
+     * @param {pentaho.type.PropertyType} [propType] When `container` is a complex,
      * the property type whose value used to reference.
      *
      * @return {boolean} `true` if the reference existed and was removed; `false`, otherwise.

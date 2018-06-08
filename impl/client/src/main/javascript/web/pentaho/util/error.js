@@ -21,7 +21,7 @@ define([
   "../lang/OperationInvalidError",
   "../lang/NotImplementedError"
 ], function(ArgumentRequiredError, ArgumentInvalidError, ArgumentInvalidTypeError,
-    ArgumentRangeError, OperationInvalidError, NotImplementedError) {
+            ArgumentRangeError, OperationInvalidError, NotImplementedError) {
 
   "use strict";
 

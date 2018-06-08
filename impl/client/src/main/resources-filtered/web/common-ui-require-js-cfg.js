@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-(function(global) {
+(function() {
   /* globals requireCfg, CONTEXT_PATH, KARMA_RUN, SESSION_LOCALE, active_theme, ENVIRONMENT_CONFIG */
 
   /* eslint dot-notation: 0, require-jsdoc: 0 */
@@ -43,11 +43,11 @@
   }
 
   var requirePaths = requireCfg.paths;
+  var requirePackages = requireCfg.packages;
   var requireShim = requireCfg.shim;
   var requireMap = requireCfg.map;
 
-  var requireTypeInfo = requireCfg.config["pentaho/typeInfo"] || (requireCfg.config["pentaho/typeInfo"] = {});
-  var requireInstInfo = requireCfg.config["pentaho/instanceInfo"] || (requireCfg.config["pentaho/instanceInfo"] = {});
+  var requireModules = requireCfg.config["pentaho/modules"] || (requireCfg.config["pentaho/modules"] = {});
 
   // region common-ui
   requirePaths["common-ui"] = basePath;
@@ -63,65 +63,82 @@
   // so the paths of all of the following sub-modules must be configured individually.
   // E.g. requirePaths["pentaho/util"] = basePath + "/pentaho/util";
   [
-    "shim", "util", "lang",
-    "i18n", "service", "data", "type", "typeInfo", "instanceInfo",
-    "visual", "config", "environment", "debug", "ccc", "platformBundle"
+    "_core", "shim", "util", "lang",
+    "i18n", "data", "type",
+    "visual", "config", "environment",
+    "debug", "ccc", "module", "platformBundle"
   ].forEach(function(name) {
     requirePaths["pentaho/" + name] = basePath + "/pentaho/" + name;
   });
 
-  // Named instances
-  requireInstInfo["pentaho/config/impl/instanceOfAmdLoadedService"] = {type: "pentaho.config.IService"};
+  requirePackages.push({
+    "name": "pentaho/module",
+    "main": "metaOf"
+  });
 
-  requireTypeInfo["pentaho/type/instance"] = {alias: "instance"};
-  requireTypeInfo["pentaho/type/value"] = {alias: "value", base: "instance"};
-  requireTypeInfo["pentaho/type/property"] = {alias: "property", base: "instance"};
-  requireTypeInfo["pentaho/type/list"] = {alias: "list", base: "value"};
-  requireTypeInfo["pentaho/type/element"] = {alias: "element", base: "value"};
-  requireTypeInfo["pentaho/type/complex"] = {alias: "complex", base: "element"};
-  requireTypeInfo["pentaho/type/simple"] = {alias: "simple", base: "element"};
-  requireTypeInfo["pentaho/type/number"] = {alias: "number", base: "simple"};
-  requireTypeInfo["pentaho/type/string"] = {alias: "string", base: "simple"};
-  requireTypeInfo["pentaho/type/boolean"] = {alias: "boolean", base: "simple"};
-  requireTypeInfo["pentaho/type/date"] = {alias: "date", base: "simple"};
-  requireTypeInfo["pentaho/type/object"] = {alias: "object", base: "simple"};
-  requireTypeInfo["pentaho/type/function"] = {alias: "function", base: "simple"};
-  requireTypeInfo["pentaho/type/typeDescriptor"] = {alias: "type", base: "simple"};
-  requireTypeInfo["pentaho/type/mixins/enum"] = {alias: "enum", base: "element"};
-  requireTypeInfo["pentaho/type/action/base"] = {base: "element"};
+  requirePackages.push({
+    "name": "pentaho/debug",
+    "main": "manager"
+  });
 
-  requireTypeInfo["pentaho/data/filter/abstract"] = {base: "complex"};
-  requireTypeInfo["pentaho/data/filter/true"] = {alias: "true", base: "pentaho/data/filter/abstract"};
-  requireTypeInfo["pentaho/data/filter/false"] = {alias: "false", base: "pentaho/data/filter/abstract"};
-  requireTypeInfo["pentaho/data/filter/tree"] = {base: "pentaho/data/filter/abstract"};
-  requireTypeInfo["pentaho/data/filter/or"] = {alias: "or", base: "pentaho/data/filter/tree"};
-  requireTypeInfo["pentaho/data/filter/and"] = {alias: "and", base: "pentaho/data/filter/tree"};
-  requireTypeInfo["pentaho/data/filter/not"] = {alias: "not", base: "pentaho/data/filter/abstract"};
-  requireTypeInfo["pentaho/data/filter/property"] = {base: "pentaho/data/filter/abstract"};
-  requireTypeInfo["pentaho/data/filter/isEqual"] = {alias: "=", base: "pentaho/data/filter/property"};
-  requireTypeInfo["pentaho/data/filter/isIn"] = {alias: "in", base: "pentaho/data/filter/property"};
-  requireTypeInfo["pentaho/data/filter/isGreater"] = {alias: ">", base: "pentaho/data/filter/property"};
-  requireTypeInfo["pentaho/data/filter/isGreaterOrEqual"] = {alias: ">=", base: "pentaho/data/filter/property"};
-  requireTypeInfo["pentaho/data/filter/isLess"] = {alias: "<", base: "pentaho/data/filter/property"};
-  requireTypeInfo["pentaho/data/filter/isLessOrEqual"] = {alias: "<=", base: "pentaho/data/filter/property"};
-  requireTypeInfo["pentaho/data/filter/isLike"] = {alias: "like", base: "pentaho/data/filter/property"};
+  requirePackages.push({
+    "name": "pentaho/i18n",
+    "main": "defaultService"
+  });
 
-  requireTypeInfo["pentaho/visual/base/model"] = {base: "complex"};
-  requireTypeInfo["pentaho/visual/base/view"] = {
-    base: "complex",
-    props: {
-      model: {valueType: "pentaho/visual/base/model"}
-    }
+  requirePackages.push({
+    "name": "pentaho/environment"
+  });
+
+  requireModules["pentaho/config/spec/IRuleSet"] = {base: null, isAbstract: true};
+
+  requireModules["pentaho/type/Instance"] = {alias: "instance", base: null};
+  requireModules["pentaho/type/Value"] = {alias: "value", base: "instance"};
+  requireModules["pentaho/type/Property"] = {alias: "property", base: "instance"};
+  requireModules["pentaho/type/List"] = {alias: "list", base: "value"};
+  requireModules["pentaho/type/Element"] = {alias: "element", base: "value"};
+  requireModules["pentaho/type/Complex"] = {alias: "complex", base: "element"};
+  requireModules["pentaho/type/Simple"] = {alias: "simple", base: "element"};
+  requireModules["pentaho/type/Number"] = {alias: "number", base: "simple"};
+  requireModules["pentaho/type/String"] = {alias: "string", base: "simple"};
+  requireModules["pentaho/type/Boolean"] = {alias: "boolean", base: "simple"};
+  requireModules["pentaho/type/Date"] = {alias: "date", base: "simple"};
+  requireModules["pentaho/type/Object"] = {alias: "object", base: "simple"};
+  requireModules["pentaho/type/Function"] = {alias: "function", base: "simple"};
+  requireModules["pentaho/type/TypeDescriptor"] = {alias: "type", base: "simple"};
+  requireModules["pentaho/type/mixins/Enum"] = {alias: "enum", base: "element"};
+  requireModules["pentaho/type/action/Base"] = {base: "element"};
+
+  requireModules["pentaho/data/filter/Abstract"] = {base: "complex"};
+  requireModules["pentaho/data/filter/True"] = {alias: "true", base: "pentaho/data/filter/Abstract"};
+  requireModules["pentaho/data/filter/False"] = {alias: "false", base: "pentaho/data/filter/Abstract"};
+  requireModules["pentaho/data/filter/Tree"] = {base: "pentaho/data/filter/Abstract"};
+  requireModules["pentaho/data/filter/Or"] = {alias: "or", base: "pentaho/data/filter/Tree"};
+  requireModules["pentaho/data/filter/And"] = {alias: "and", base: "pentaho/data/filter/Tree"};
+  requireModules["pentaho/data/filter/Not"] = {alias: "not", base: "pentaho/data/filter/Abstract"};
+  requireModules["pentaho/data/filter/Property"] = {base: "pentaho/data/filter/Abstract"};
+  requireModules["pentaho/data/filter/IsEqual"] = {alias: "=", base: "pentaho/data/filter/Property"};
+  requireModules["pentaho/data/filter/IsIn"] = {alias: "in", base: "pentaho/data/filter/Property"};
+  requireModules["pentaho/data/filter/IsGreater"] = {alias: ">", base: "pentaho/data/filter/Property"};
+  requireModules["pentaho/data/filter/IsGreaterOrEqual"] = {alias: ">=", base: "pentaho/data/filter/Property"};
+  requireModules["pentaho/data/filter/IsLess"] = {alias: "<", base: "pentaho/data/filter/Property"};
+  requireModules["pentaho/data/filter/IsLessOrEqual"] = {alias: "<=", base: "pentaho/data/filter/Property"};
+  requireModules["pentaho/data/filter/IsLike"] = {alias: "like", base: "pentaho/data/filter/Property"};
+
+  requireModules["pentaho/visual/base/Model"] = {base: "complex"};
+  requireModules["pentaho/visual/base/View"] = {base: "complex"};
+  requireModules["pentaho/visual/role/adaptation/Strategy"] = {base: "complex"};
+  requireModules["pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy"] = {
+    base: "pentaho/visual/role/adaptation/Strategy",
+    ranking: -5
   };
-  requireTypeInfo["pentaho/visual/role/adaptation/strategy"] = {base: "complex"};
-  requireTypeInfo["pentaho/visual/role/adaptation/identityStrategy"] = {
-    base: "pentaho/visual/role/adaptation/strategy"
+  requireModules["pentaho/visual/role/adaptation/IdentityStrategy"] = {
+    base: "pentaho/visual/role/adaptation/Strategy",
+    ranking: -10
   };
-  requireTypeInfo["pentaho/visual/role/adaptation/tupleStrategy"] = {
-    base: "pentaho/visual/role/adaptation/strategy"
-  };
-  requireTypeInfo["pentaho/visual/role/adaptation/entityWithTimeIntervalKeyStrategy"] = {
-    base: "pentaho/visual/role/adaptation/strategy"
+  requireModules["pentaho/visual/role/adaptation/TupleStrategy"] = {
+    base: "pentaho/visual/role/adaptation/Strategy",
+    ranking: -20
   };
   // endregion
 
@@ -177,11 +194,6 @@
   // region Bundled 3rd party libs
   requirePaths["common-ui/jquery"] = basePath + "/jquery/jquery.conflict";
 
-  /*
-   The path for common-ui/jquery-clean must be for a different file used by common-ui/jquery.
-   If the same jquery file was used for both paths, a timeout might occur and the tests would fail.
-   See the third bullet at http://requirejs.org/docs/errors.html#timeout for more information.
-   */
   requirePaths["common-ui/jquery-clean"] = basePath + "/jquery/jquery";
   requireShim["common-ui/jquery-clean"] = {
     exports: "$",
@@ -292,67 +304,78 @@
   // sample/calc theme
   mapTheme("pentaho/visual/samples/calc", "themes", ["ruby"]);
 
-  requireInstInfo["pentaho/visual/config/vizApi.conf"] = {type: "pentaho.config.spec.IRuleSet"};
+  requireModules["pentaho/visual/config/vizApi.conf"] = {type: "pentaho/config/spec/IRuleSet"};
 
-  requireTypeInfo["pentaho/visual/models/abstract"] = {base: "pentaho/visual/base/model"};
-  requireTypeInfo["pentaho/visual/samples/calc/model"] = {base: "pentaho/visual/base/model"};
+  requireModules["pentaho/visual/models/Abstract"] = {base: "pentaho/visual/base/Model"};
+  requireModules["pentaho/visual/samples/calc/Model"] = {base: "pentaho/visual/base/Model"};
   [
-    "pentaho/visual/models/cartesianAbstract",
-    "pentaho/visual/models/categoricalContinuousAbstract",
-    "pentaho/visual/models/barAbstract",
-    "pentaho/visual/models/barNormalizedAbstract",
-    "pentaho/visual/models/barHorizontal",
-    "pentaho/visual/models/bar",
-    "pentaho/visual/models/barStacked",
-    "pentaho/visual/models/barStackedHorizontal",
-    "pentaho/visual/models/barNormalized",
-    "pentaho/visual/models/barNormalizedHorizontal",
-    "pentaho/visual/models/barLine",
-    "pentaho/visual/models/line",
-    "pentaho/visual/models/pointAbstract",
-    "pentaho/visual/models/metricPointAbstract",
-    "pentaho/visual/models/areaStacked",
-    "pentaho/visual/models/pie",
-    "pentaho/visual/models/heatGrid",
-    "pentaho/visual/models/sunburst",
-    "pentaho/visual/models/donut",
-    "pentaho/visual/models/scatter",
-    "pentaho/visual/models/bubble"
+    "pentaho/visual/models/CartesianAbstract",
+    "pentaho/visual/models/CategoricalContinuousAbstract",
+    "pentaho/visual/models/BarAbstract",
+    "pentaho/visual/models/BarNormalizedAbstract",
+    "pentaho/visual/models/BarHorizontal",
+    "pentaho/visual/models/Bar",
+    "pentaho/visual/models/BarStacked",
+    "pentaho/visual/models/BarStackedHorizontal",
+    "pentaho/visual/models/BarNormalized",
+    "pentaho/visual/models/BarNormalizedHorizontal",
+    "pentaho/visual/models/BarLine",
+    "pentaho/visual/models/Line",
+    "pentaho/visual/models/PointAbstract",
+    "pentaho/visual/models/MetricPointAbstract",
+    "pentaho/visual/models/AreaStacked",
+    "pentaho/visual/models/Pie",
+    "pentaho/visual/models/HeatGrid",
+    "pentaho/visual/models/Sunburst",
+    "pentaho/visual/models/Donut",
+    "pentaho/visual/models/Scatter",
+    "pentaho/visual/models/Bubble"
   ].forEach(function(name) {
-    requireTypeInfo[name] = {base: "pentaho/visual/models/abstract"};
+    requireModules[name] = {base: "pentaho/visual/models/Abstract"};
   });
   // endregion
 
   // TODO: this should be removed from here, and to the GEO plugin's package.json
   // when it is possible to specify global maps or an option that achieves the same effect.
-  requireMap["*"]["pentaho/visual/models/geoMap"] = "pentaho/geo/visual_${project.version}/model";
-  requireMap["*"]["pentaho/geo/visual/map"] = "pentaho/geo/visual_${project.version}/view";
+  requireMap["*"]["pentaho/visual/models/GeoMap"] = "pentaho/geo/visual_${project.version}/Model";
+  requireMap["*"]["pentaho/geo/visual/Map"] = "pentaho/geo/visual_${project.version}/View";
 
   // VizAPI actions
-  requireTypeInfo["pentaho/visual/action/base"] = {base: "pentaho/type/action/base"};
-  requireTypeInfo["pentaho/visual/action/select"] = {alias: "select", base: "pentaho/visual/action/base"};
-  requireTypeInfo["pentaho/visual/action/execute"] = {alias: "execute", base: "pentaho/visual/action/base"};
-  requireTypeInfo["pentaho/visual/action/update"] = {base: "pentaho/visual/action/base"};
+  requireModules["pentaho/visual/action/Base"] = {base: "pentaho/type/action/Base"};
+  requireModules["pentaho/visual/action/Select"] = {alias: "select", base: "pentaho/visual/action/Base"};
+  requireModules["pentaho/visual/action/Execute"] = {alias: "execute", base: "pentaho/visual/action/Base"};
+  requireModules["pentaho/visual/action/Update"] = {base: "pentaho/visual/action/Base"};
 
   // Color Palettes
-  requireTypeInfo["pentaho/visual/color/palette"] = {base: "complex"};
+  requireModules["pentaho/visual/color/Palette"] = {base: "complex"};
 
-  [
-    "pentaho/visual/color/palettes/nominalPrimary",
-    "pentaho/visual/color/palettes/nominalNeutral",
-    "pentaho/visual/color/palettes/nominalLight",
-    "pentaho/visual/color/palettes/nominalDark",
-    "pentaho/visual/color/palettes/quantitativeBlue3",
-    "pentaho/visual/color/palettes/quantitativeBlue5",
-    "pentaho/visual/color/palettes/quantitativeGray3",
-    "pentaho/visual/color/palettes/quantitativeGray5",
-    "pentaho/visual/color/palettes/divergentRyg3",
-    "pentaho/visual/color/palettes/divergentRyg5",
-    "pentaho/visual/color/palettes/divergentRyb3",
-    "pentaho/visual/color/palettes/divergentRyb5"
-  ].forEach(function(id) {
-    requireInstInfo[id] = {type: "pentaho/visual/color/palette"};
-  });
+  requireModules["pentaho/visual/color/palettes/nominalPrimary"] = {type: "pentaho/visual/color/Palette", ranking: -10};
+  requireModules["pentaho/visual/color/palettes/nominalNeutral"] = {
+    type: "pentaho/visual/color/Palette",
+    ranking: -110
+  };
+  requireModules["pentaho/visual/color/palettes/nominalLight"] = {type: "pentaho/visual/color/Palette", ranking: -120};
+  requireModules["pentaho/visual/color/palettes/nominalDark"] = {type: "pentaho/visual/color/Palette", ranking: -130};
+  requireModules["pentaho/visual/color/palettes/quantitativeBlue3"] = {
+    type: "pentaho/visual/color/Palette",
+    ranking: -10
+  };
+  requireModules["pentaho/visual/color/palettes/quantitativeBlue5"] = {
+    type: "pentaho/visual/color/Palette",
+    ranking: -10
+  };
+  requireModules["pentaho/visual/color/palettes/quantitativeGray3"] = {
+    type: "pentaho/visual/color/Palette",
+    ranking: -10
+  };
+  requireModules["pentaho/visual/color/palettes/quantitativeGray5"] = {
+    type: "pentaho/visual/color/Palette",
+    ranking: -10
+  };
+  requireModules["pentaho/visual/color/palettes/divergentRyg3"] = {type: "pentaho/visual/color/Palette", ranking: -10};
+  requireModules["pentaho/visual/color/palettes/divergentRyg5"] = {type: "pentaho/visual/color/Palette", ranking: -10};
+  requireModules["pentaho/visual/color/palettes/divergentRyb3"] = {type: "pentaho/visual/color/Palette", ranking: -10};
+  requireModules["pentaho/visual/color/palettes/divergentRyb5"] = {type: "pentaho/visual/color/Palette", ranking: -10};
 
   // Copied by hand of /target/requireCfg.bundles.js
   if(useBundle) {
@@ -361,32 +384,120 @@
       "pentaho/util/object",
       "pentaho/util/fun",
       "pentaho/util/text",
+      "pentaho/util/requireJSConfig",
       "pentaho/debug/Levels",
       "pentaho/debug/impl/Manager",
       "pentaho/util/domWindow",
+      "pentaho/debug/manager",
       "pentaho/debug",
       "pentaho/lang/Base",
-      "pentaho/data/_ElementMock",
-      "pentaho/data/AtomicTypeName",
-      "pentaho/data/_AbstractTable",
+      "pentaho/lang/List",
+      "pentaho/lang/SortedList",
       "pentaho/lang/ArgumentError",
       "pentaho/lang/ArgumentRequiredError",
       "pentaho/lang/ArgumentInvalidError",
+      "pentaho/_core/module/MetaService",
+      "pentaho/util/logger",
       "pentaho/lang/ArgumentInvalidTypeError",
       "pentaho/lang/ArgumentRangeError",
       "pentaho/lang/OperationInvalidError",
       "pentaho/lang/NotImplementedError",
       "pentaho/util/error",
       "pentaho/util/arg",
+      "pentaho/shim/_es6-promise/es6-promise",
+      "pentaho/shim/es6-promise",
+      "pentaho/util/promise",
+      "pentaho/_core/module/Meta",
+      "pentaho/_core/module/InstanceMeta",
+      "pentaho/_core/module/TypeMeta",
+      "pentaho/_core/module/Service",
+      "pentaho/util/spec",
+      "pentaho/_core/config/Service",
+      "pentaho/_core/Core",
+      "pentaho/util/url",
+      "pentaho/environment/impl/Environment",
+      "pentaho/environment/main",
+      "pentaho/environment",
+      "pentaho/_core/main",
+      "pentaho/config/service",
+      "pentaho/module/service",
+      "pentaho/module/metaService",
+      "pentaho/module/util",
+      "pentaho/module/metaOf",
+      "pentaho/module",
+      "pentaho/module/impl/ServicePlugin",
+      "pentaho/module/subtypeOf",
+      "pentaho/module/subtypesOf",
+      "pentaho/module/instanceOf",
+      "pentaho/module/instancesOf",
+      "pentaho/type/SpecificationContext",
+      "pentaho/type/SpecificationScope",
+      "pentaho/type/impl/SpecificationProcessor",
+      "pentaho/type/impl/Loader",
+      "pentaho/type/_baseLoader",
+      "pentaho/type/InstanceType",
+      "pentaho/type/Instance",
+      "pentaho/type/changes/_transactionControl",
+      "pentaho/type/ReferenceList",
+      "pentaho/type/changes/ChangeRef",
+      "pentaho/type/changes/AbstractTransactionScope",
+      "pentaho/type/changes/TransactionScope",
+      "pentaho/type/changes/CommittedScope",
+      "pentaho/lang/UserError",
+      "pentaho/type/changes/TransactionRejectedError",
+      "pentaho/lang/ActionResult",
+      "pentaho/type/changes/Transaction",
+      "pentaho/type/util",
+      "pentaho/type/ValidationError",
+      "pentaho/type/Value",
+      "pentaho/type/Element",
+      "pentaho/lang/Event",
+      "pentaho/lang/EventSource",
+      "pentaho/type/mixins/changeset",
+      "pentaho/type/events/WillChange",
+      "pentaho/type/mixins/error",
+      "pentaho/type/events/RejectedChange",
+      "pentaho/type/events/DidChange",
+      "pentaho/type/mixins/Container",
+      "pentaho/type/changes/Change",
+      "pentaho/type/changes/Changeset",
+      "pentaho/type/changes/PrimitiveChange",
+      "pentaho/type/changes/Add",
+      "pentaho/type/changes/Remove",
+      "pentaho/type/changes/Move",
+      "pentaho/type/changes/Sort",
+      "pentaho/type/changes/Clear",
+      "pentaho/type/changes/ListChangeset",
+      "pentaho/type/List",
+      "pentaho/type/mixins/DiscreteDomain",
+      "pentaho/type/Property",
+      "pentaho/lang/Collection",
+      "pentaho/type/PropertyTypeCollection",
+      "pentaho/type/changes/Replace",
+      "pentaho/type/changes/ComplexChangeset",
+      "pentaho/type/Simple",
+      "pentaho/type/String",
+      "pentaho/type/Number",
+      "pentaho/type/Boolean",
+      "pentaho/util/date",
+      "pentaho/type/Date",
+      "pentaho/type/Object",
+      "pentaho/type/Function",
+      "pentaho/type/TypeDescriptor",
+      "pentaho/type/standardSimple",
+      "pentaho/type/Complex",
+      "pentaho/type/mixins/Enum",
+      "pentaho/type/standard",
+      "pentaho/type/loader",
+      "pentaho/data/_ElementMock",
+      "pentaho/data/AtomicTypeName",
+      "pentaho/data/_AbstractTable",
       "pentaho/data/_OfAttribute",
       "pentaho/lang/_Annotatable",
       "pentaho/data/Member",
       "pentaho/data/Cell",
       "pentaho/data/StructurePosition",
-      "pentaho/lang/List",
-      "pentaho/lang/Collection",
       "pentaho/data/MemberCollection",
-      "pentaho/util/date",
       "pentaho/data/Attribute",
       "pentaho/data/AttributeCollection",
       "pentaho/data/Model",
@@ -406,139 +517,67 @@
       "pentaho/data/AbstractTable",
       "pentaho/data/Table",
       "pentaho/data/TableView",
-      "pentaho/data/filter/_core/tree",
+      "pentaho/data/filter/_core/Tree",
       "pentaho/data/filter/KnownFilterKind",
-      "pentaho/data/filter/_core/and",
-      "pentaho/data/filter/_core/or",
-      "pentaho/data/filter/_core/not",
-      "pentaho/data/filter/_core/true",
-      "pentaho/data/filter/_core/false",
-      "pentaho/data/filter/_core/property",
-      "pentaho/data/filter/_core/isEqual",
-      "pentaho/data/filter/_core/isIn",
-      "pentaho/data/filter/_core/isGreater",
-      "pentaho/data/filter/_core/isLess",
-      "pentaho/data/filter/_core/isGreaterOrEqual",
-      "pentaho/data/filter/_core/isLessOrEqual",
-      "pentaho/data/filter/_core/isLike",
-      "pentaho/util/logger",
-      "pentaho/data/filter/abstract",
-      "pentaho/data/filter/tree",
-      "pentaho/data/filter/property",
-      "pentaho/data/filter/and",
-      "pentaho/data/filter/or",
-      "pentaho/data/filter/not",
-      "pentaho/data/filter/isEqual",
-      "pentaho/data/filter/isIn",
-      "pentaho/data/filter/isGreater",
-      "pentaho/data/filter/isLess",
-      "pentaho/data/filter/isGreaterOrEqual",
-      "pentaho/data/filter/isLessOrEqual",
-      "pentaho/data/filter/isLike",
-      "pentaho/data/filter/true",
-      "pentaho/data/filter/false",
+      "pentaho/data/filter/_core/And",
+      "pentaho/data/filter/_core/Or",
+      "pentaho/data/filter/_core/Not",
+      "pentaho/data/filter/_core/True",
+      "pentaho/data/filter/_core/False",
+      "pentaho/data/filter/_core/Property",
+      "pentaho/data/filter/_core/IsEqual",
+      "pentaho/data/filter/_core/IsIn",
+      "pentaho/data/filter/_core/IsGreater",
+      "pentaho/data/filter/_core/IsLess",
+      "pentaho/data/filter/_core/IsGreaterOrEqual",
+      "pentaho/data/filter/_core/IsLessOrEqual",
+      "pentaho/data/filter/_core/IsLike",
+      "pentaho/data/filter/Abstract",
+      "pentaho/data/filter/Tree",
+      "pentaho/data/filter/Property",
+      "pentaho/data/filter/And",
+      "pentaho/data/filter/Or",
+      "pentaho/data/filter/Not",
+      "pentaho/data/filter/IsEqual",
+      "pentaho/data/filter/IsIn",
+      "pentaho/data/filter/IsGreater",
+      "pentaho/data/filter/IsLess",
+      "pentaho/data/filter/IsGreaterOrEqual",
+      "pentaho/data/filter/IsLessOrEqual",
+      "pentaho/data/filter/IsLike",
+      "pentaho/data/filter/True",
+      "pentaho/data/filter/False",
       "pentaho/data/filter/standard",
-      "pentaho/util/spec",
-      "pentaho/lang/SortedList",
-      "pentaho/shim/_es6-promise/es6-promise",
-      "pentaho/shim/es6-promise",
-      "pentaho/config/impl/Service",
-      "pentaho/typeInfo/impl/Service",
-      "pentaho/typeInfo",
-      "pentaho/instanceInfo/impl/Service",
-      "pentaho/instanceInfo",
-      "pentaho/config/impl/AmdLoadedService",
-      "pentaho/config/impl/instanceOfAmdLoadedService",
-      "pentaho/util/url",
-      "pentaho/environment/impl/Environment",
-      "pentaho/environment",
-      "pentaho/type/SpecificationContext",
-      "pentaho/type/SpecificationScope",
-      "pentaho/type/util",
-      "pentaho/util/promise",
-      "pentaho/type/InstancesContainer",
-      "pentaho/type/ReferenceList",
-      "pentaho/type/changes/ChangeRef",
-      "pentaho/type/changes/AbstractTransactionScope",
-      "pentaho/type/changes/TransactionScope",
-      "pentaho/lang/UserError",
-      "pentaho/type/changes/TransactionRejectedError",
-      "pentaho/lang/ActionResult",
-      "pentaho/type/changes/Transaction",
-      "pentaho/type/changes/CommittedScope",
-      "pentaho/util/module",
-      "pentaho/lang/_AnnotatableLinked",
-      "pentaho/type/_type",
-      "pentaho/type/instance",
-      "pentaho/type/ValidationError",
-      "pentaho/type/value",
-      "pentaho/type/element",
-      "pentaho/lang/Event",
-      "pentaho/lang/EventSource",
-      "pentaho/type/mixins/_mixinChangeset",
-      "pentaho/type/events/WillChange",
-      "pentaho/type/mixins/mixinError",
-      "pentaho/type/events/RejectedChange",
-      "pentaho/type/events/DidChange",
-      "pentaho/type/mixins/Container",
-      "pentaho/type/changes/Change",
-      "pentaho/type/changes/Changeset",
-      "pentaho/type/changes/PrimitiveChange",
-      "pentaho/type/changes/Add",
-      "pentaho/type/changes/Remove",
-      "pentaho/type/changes/Move",
-      "pentaho/type/changes/Sort",
-      "pentaho/type/changes/Clear",
-      "pentaho/type/changes/ListChangeset",
-      "pentaho/type/list",
-      "pentaho/type/simple",
-      "pentaho/type/PropertyTypeCollection",
-      "pentaho/type/changes/Replace",
-      "pentaho/type/changes/ComplexChangeset",
-      "pentaho/type/complex",
-      "pentaho/type/string",
-      "pentaho/type/number",
-      "pentaho/type/boolean",
-      "pentaho/type/date",
-      "pentaho/type/object",
-      "pentaho/type/function",
-      "pentaho/type/typeDescriptor",
-      "pentaho/type/property",
-      "pentaho/type/mixins/enum",
-      "pentaho/type/mixins/discreteDomain",
-      "pentaho/type/standard",
-      "pentaho/type/Context",
+      "pentaho/visual/role/MappingField",
       "pentaho/data/util",
-      "pentaho/visual/role/mappingField",
-      "pentaho/visual/role/abstractMapping",
-      "pentaho/visual/role/abstractProperty",
-      "pentaho/visual/color/level",
-      "pentaho/visual/color/palette",
-      "pentaho/visual/color/paletteProperty",
-      "pentaho/visual/base/application",
-      "pentaho/visual/base/abstractModel",
-      "pentaho/visual/role/mode",
-      "pentaho/visual/role/mapping",
-      "pentaho/visual/role/property",
-      "pentaho/visual/base/model",
+      "pentaho/visual/role/AbstractMapping",
+      "pentaho/visual/role/AbstractProperty",
+      "pentaho/visual/color/Level",
+      "pentaho/visual/color/Palette",
+      "pentaho/visual/color/PaletteProperty",
+      "pentaho/visual/base/Application",
+      "pentaho/visual/base/AbstractModel",
+      "pentaho/visual/role/Mode",
+      "pentaho/visual/role/Mapping",
+      "pentaho/visual/role/Property",
+      "pentaho/visual/base/Model",
+      "pentaho/type/action/Base",
+      "pentaho/visual/action/Base",
+      "pentaho/visual/action/Update",
+      "pentaho/visual/action/mixins/Data",
+      "pentaho/visual/action/mixins/Positioned",
+      "pentaho/visual/action/SelectionModes",
+      "pentaho/visual/action/Select",
+      "pentaho/visual/action/Execute",
       "pentaho/type/action/States",
       "pentaho/lang/RuntimeError",
       "pentaho/type/action/Execution",
+      "pentaho/type/action/impl/Target",
       "pentaho/util/BitSet",
-      "pentaho/type/action/base",
-      "pentaho/type/action/impl/target",
-      "pentaho/visual/action/base",
-      "pentaho/visual/action/update",
-      "pentaho/visual/action/SelectionModes",
-      "pentaho/visual/action/select",
-      "pentaho/visual/action/execute",
-      "pentaho/visual/action/mixins/data",
-      "pentaho/visual/action/mixins/positioned",
-      "pentaho/visual/base/view",
-      "pentaho/visual/role/externalMapping",
-      "pentaho/visual/role/adaptation/strategy",
-      "pentaho/visual/role/externalProperty",
-      "pentaho/visual/base/modelAdapter",
+      "pentaho/visual/base/View",
+      "pentaho/visual/role/ExternalMapping",
+      "pentaho/visual/role/ExternalProperty",
+      "pentaho/visual/base/ModelAdapter",
       "pentaho/visual/color/utils",
       "pentaho/visual/color/palettes/divergentRyb3",
       "pentaho/visual/color/palettes/divergentRyb5",
@@ -553,91 +592,94 @@
       "pentaho/visual/color/palettes/quantitativeGray3",
       "pentaho/visual/color/palettes/quantitativeGray5",
       "pentaho/visual/color/palettes/all",
-      "pentaho/visual/role/adaptation/identityStrategy",
-      "pentaho/visual/role/adaptation/tupleStrategy",
-      "pentaho/visual/role/adaptation/timeIntervalDuration",
-      "pentaho/visual/role/adaptation/entityWithTimeIntervalKeyStrategy",
-      "pentaho/visual/role/adaptation/allStrategies",
-      "pentaho/visual/models/abstract",
-      "pentaho/visual/models/areaStacked",
-      "pentaho/visual/models/bar",
-      "pentaho/visual/models/barAbstract",
-      "pentaho/visual/models/barHorizontal",
-      "pentaho/visual/models/barLine",
-      "pentaho/visual/models/barNormalized",
-      "pentaho/visual/models/barNormalizedAbstract",
-      "pentaho/visual/models/barNormalizedHorizontal",
-      "pentaho/visual/models/barStacked",
-      "pentaho/visual/models/barStackedHorizontal",
-      "pentaho/visual/models/bubble",
-      "pentaho/visual/models/cartesianAbstract",
-      "pentaho/visual/models/categoricalContinuousAbstract",
-      "pentaho/visual/models/donut",
-      "pentaho/visual/models/heatGrid",
-      "pentaho/visual/models/line",
-      "pentaho/visual/models/metricPointAbstract",
-      "pentaho/visual/models/pie",
-      "pentaho/visual/models/pointAbstract",
-      "pentaho/visual/models/scatter",
-      "pentaho/visual/models/sunburst",
-      "pentaho/visual/models/mixins/interpolated",
-      "pentaho/visual/models/mixins/multiCharted",
-      "pentaho/visual/models/mixins/scaleColorContinuous",
-      "pentaho/visual/models/mixins/scaleColorDiscrete",
-      "pentaho/visual/models/mixins/scaleSizeContinuous",
-      "pentaho/visual/models/mixins/trended",
-      "pentaho/visual/models/types/backgroundFill",
-      "pentaho/visual/models/types/color",
-      "pentaho/visual/models/types/colorSet",
-      "pentaho/visual/models/types/displayUnits",
-      "pentaho/visual/models/types/emptyCellMode",
-      "pentaho/visual/models/types/fontStyle",
-      "pentaho/visual/models/types/labelsOption",
-      "pentaho/visual/models/types/lineWidth",
-      "pentaho/visual/models/types/maxChartsPerRow",
-      "pentaho/visual/models/types/multiChartOverflow",
-      "pentaho/visual/models/types/multiChartRangeScope",
-      "pentaho/visual/models/types/pattern",
-      "pentaho/visual/models/types/shape",
-      "pentaho/visual/models/types/sides",
-      "pentaho/visual/models/types/sizeByNegativesMode",
-      "pentaho/visual/models/types/sliceOrder",
-      "pentaho/visual/models/types/trendType",
+      "pentaho/visual/models/types/Color",
+      "pentaho/visual/models/types/BackgroundFill",
+      "pentaho/visual/models/types/FontStyle",
+      "pentaho/visual/models/types/Sides",
+      "pentaho/visual/models/types/LabelsOption",
+      "pentaho/visual/models/Abstract",
+      "pentaho/visual/models/types/DisplayUnits",
+      "pentaho/visual/models/CartesianAbstract",
+      "pentaho/visual/models/mixins/ScaleColorDiscrete",
+      "pentaho/visual/models/CategoricalContinuousAbstract",
+      "pentaho/visual/models/types/MaxChartsPerRow",
+      "pentaho/visual/models/types/MultiChartRangeScope",
+      "pentaho/visual/models/types/MultiChartOverflow",
+      "pentaho/visual/models/mixins/MultiCharted",
+      "pentaho/visual/models/types/EmptyCellMode",
+      "pentaho/visual/models/mixins/Interpolated",
+      "pentaho/visual/models/PointAbstract",
+      "pentaho/visual/models/AreaStacked",
+      "pentaho/visual/models/BarAbstract",
+      "pentaho/visual/models/types/TrendType",
+      "pentaho/visual/models/types/LineWidth",
+      "pentaho/visual/models/mixins/Trended",
+      "pentaho/visual/models/Bar",
+      "pentaho/visual/models/BarHorizontal",
+      "pentaho/visual/models/types/Shape",
+      "pentaho/visual/models/BarLine",
+      "pentaho/visual/models/BarNormalizedAbstract",
+      "pentaho/visual/models/BarNormalized",
+      "pentaho/visual/models/BarNormalizedHorizontal",
+      "pentaho/visual/models/BarStacked",
+      "pentaho/visual/models/BarStackedHorizontal",
+      "pentaho/visual/models/types/ColorSet",
+      "pentaho/visual/models/types/Pattern",
+      "pentaho/visual/models/mixins/ScaleColorContinuous",
+      "pentaho/visual/models/MetricPointAbstract",
+      "pentaho/visual/models/types/SizeByNegativesMode",
+      "pentaho/visual/models/mixins/ScaleSizeContinuous",
+      "pentaho/visual/models/Bubble",
+      "pentaho/visual/models/Pie",
+      "pentaho/visual/models/Donut",
+      "pentaho/visual/models/HeatGrid",
+      "pentaho/visual/models/Line",
+      "pentaho/visual/models/Scatter",
+      "pentaho/visual/models/types/SliceOrder",
+      "pentaho/visual/models/Sunburst",
       "pentaho/visual/models/all",
+      "pentaho/visual/role/adaptation/Strategy",
+      "pentaho/visual/role/adaptation/IdentityStrategy",
+      "pentaho/visual/role/adaptation/TupleStrategy",
+      "pentaho/visual/role/adaptation/TimeIntervalDuration",
+      "pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy",
+      "pentaho/visual/role/adaptation/allStrategies",
+      "pentaho/visual/scene/util",
+      "pentaho/visual/scene/impl/Variable",
+      "pentaho/visual/scene/Base",
       "pentaho/ccc/visual/_util",
-      "pentaho/ccc/visual/abstract",
-      "pentaho/ccc/visual/area",
-      "pentaho/ccc/visual/areaAbstract",
-      "pentaho/ccc/visual/areaStacked",
+      "pentaho/ccc/visual/Abstract",
+      "pentaho/ccc/visual/CartesianAbstract",
+      "pentaho/ccc/visual/CategoricalContinuousAbstract",
+      "pentaho/ccc/visual/PointAbstract",
+      "pentaho/ccc/visual/AreaAbstract",
+      "pentaho/ccc/visual/Area",
+      "pentaho/ccc/visual/AreaStacked",
+      "pentaho/ccc/visual/BarAbstract",
       "pentaho/data/_trends",
       "pentaho/data/_trend-linear",
       "pentaho/data/trends",
       "pentaho/ccc/visual/_trends",
-      "pentaho/ccc/visual/bar",
-      "pentaho/ccc/visual/barAbstract",
-      "pentaho/ccc/visual/barHorizontal",
-      "pentaho/ccc/visual/barLine",
-      "pentaho/ccc/visual/barNormalized",
-      "pentaho/ccc/visual/barNormalizedAbstract",
-      "pentaho/ccc/visual/barNormalizedHorizontal",
-      "pentaho/ccc/visual/barStacked",
-      "pentaho/ccc/visual/barStackedHorizontal",
-      "pentaho/ccc/visual/boxplot",
-      "pentaho/ccc/visual/bubble",
-      "pentaho/ccc/visual/cartesianAbstract",
-      "pentaho/ccc/visual/categoricalContinuousAbstract",
-      "pentaho/ccc/visual/donut",
-      "pentaho/ccc/visual/heatGrid",
-      "pentaho/ccc/visual/line",
-      "pentaho/ccc/visual/metricPointAbstract",
-      "pentaho/ccc/visual/pie",
-      "pentaho/ccc/visual/pointAbstract",
-      "pentaho/ccc/visual/scatter",
-      "pentaho/ccc/visual/sunburst",
-      "pentaho/ccc/visual/treemap",
-      "pentaho/ccc/visual/waterfall",
+      "pentaho/ccc/visual/Bar",
+      "pentaho/ccc/visual/BarHorizontal",
+      "pentaho/ccc/visual/BarLine",
+      "pentaho/ccc/visual/BarNormalizedAbstract",
+      "pentaho/ccc/visual/BarNormalized",
+      "pentaho/ccc/visual/BarNormalizedHorizontal",
+      "pentaho/ccc/visual/BarStacked",
+      "pentaho/ccc/visual/BarStackedHorizontal",
+      "pentaho/ccc/visual/Boxplot",
+      "pentaho/ccc/visual/MetricPointAbstract",
+      "pentaho/ccc/visual/Bubble",
+      "pentaho/ccc/visual/Pie",
+      "pentaho/ccc/visual/Donut",
+      "pentaho/ccc/visual/HeatGrid",
+      "pentaho/ccc/visual/Line",
+      "pentaho/ccc/visual/Scatter",
+      "pentaho/ccc/visual/Sunburst",
+      "pentaho/ccc/visual/Treemap",
+      "pentaho/ccc/visual/Waterfall",
       "pentaho/ccc/visual/all"
     ];
   }
-
-})(this);
+})();

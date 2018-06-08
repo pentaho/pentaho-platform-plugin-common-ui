@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@
  * allows actual _execution_ of the action.
  * The action cannot be canceled from within this phase, but it can, however, fail.
  *
- * When the action is [asynchronous]{@link pentaho.type.action.Base.Type#isSync},
+ * When the action is [asynchronous]{@link pentaho.type.action.BaseType#isSync},
  * the listener function _may_ return a promise that is resolved upon
  * the listener's completion. If the promise is rejected,
  * the action is rejected with the rejection reason.

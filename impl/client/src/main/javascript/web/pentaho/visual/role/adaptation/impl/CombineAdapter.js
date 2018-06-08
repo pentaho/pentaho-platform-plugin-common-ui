@@ -15,8 +15,9 @@
  */
 define([
   "module",
-  "./Adapter"
-], function(module, Adapter) {
+  "./Adapter",
+  "pentaho/type/String"
+], function(module, Adapter, PentahoString) {
 
   "use strict";
 
@@ -31,7 +32,7 @@ define([
      * @see pentaho.visual.role.adaptation.CombineStrategy
      * @description Creates a _combine_ mapper instance.
      * @param {!pentaho.type.visual.role.adaptation.Strategy} strategy - The strategy.
-     * @param {!pentaho.type.visual.role.Property.Type} propType - The visual role property type.
+     * @param {!pentaho.type.visual.role.PropertyType} propType - The visual role property type.
      * @param {!pentaho.data.ITable} inputData - The data set view to be mapped.
      * @param {!pentaho.visual.role.Mode} mode - The visual role mode of `propType` which will be used.
      * @param {string} valueSeparator - The text to use to separate combined value keys.
@@ -59,7 +60,7 @@ define([
        * @readOnly
        * @private
        */
-      this.__dataType = propType.context.get("string").type;
+      this.__dataType = PentahoString.type;
 
       /**
        * The value combiner function.

@@ -25,15 +25,15 @@
  * </caption>
  *
  * {
- *   "_": "pentaho/data/filter/and",
+ *   "_": "pentaho/data/filter/And",
  *   "operands": [
  *     {
- *       "_":     "pentaho/data/filter/isEqual",
+ *       "_":     "pentaho/data/filter/IsEqual",
  *       "property": "country",
  *       "value": {_: "string", v: "USA"}
  *     },
  *     {
- *       "_":     "pentaho/data/filter/isIn",
+ *       "_":     "pentaho/data/filter/IsIn",
  *       "property": "author",
  *       "values": [
  *         {_: "string", v: "Mark Twain"},

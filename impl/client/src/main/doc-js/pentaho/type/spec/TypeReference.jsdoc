@@ -1,0 +1,158 @@
+/*!
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.TypeReference` union represents the set of JS types that can be used to reference a type.
+ *
+ * It can be one of the following:
+ *
+ * ##### A _type id_ string
+ *
+ * A type's permanent [id]{@link pentaho.type.Type#id} —
+ * the identifier of a defined module in the AMD module system —,
+ * or a [temporary]{@link pentaho.type.SpecificationContext.isIdTemporary},
+ * serialization-only identifier.
+ *
+ * When an identifier is permanent and does not contain any "/" character,
+ * it is considered a standard type and is taken relative to Pentaho's `"pentaho/type"` module.
+ *
+ * Note that relative AMD module identifiers, such as "./foo", are not supported.
+ *
+ * Example absolute, permanent identifier:
+ * ```js
+ * "pentaho/type/String"
+ * ```
+ *
+ * Example temporary identifier:
+ * ```js
+ * "_:1"
+ * ```
+ *
+ * ##### An _instance constructor_ function
+ *
+ * A reference to an instance constructor, like [Complex]{@link pentaho.type.Complex}.
+ *
+ * Example:
+ *
+ * ```js
+ * require(["pentaho/type/loader", "pentaho/type/Complex"], function(typeLoader, Complex) {
+ *
+ *   typeLoader.resolveType(Complex);
+ *
+ * });
+ * ```
+ *
+ * ##### A _type_ object
+ *
+ * A type's singleton object,
+ * like `Number.type`, where _Number_ is [Number]{@link pentaho.type.Number}.
+ *
+ * Example:
+ * ```js
+ * require(["pentaho/type/loader", "pentaho/type/Number"], function(typeLoader, PentahoNumber) {
+ *
+ *   var numberType = PentahoNumber.type;
+ *
+ *   // Create a number list type
+ *   var NumberList = typeLoader.resolveType([numberType]);
+ *
+ *   var numbers = new NumberList([1, 2, 3]);
+ *
+ *   // ...
+ * });
+ * ```
+ *
+ * ##### A _generic type specification_ object
+ *
+ * A plain {@link Object} specification used to generically describe a type.
+ * Satisfies the interface [spec.IType]{@link pentaho.type.spec.IType}.
+ *
+ * The special `base` attribute allows specifying the base type
+ * and defaults to `"pentaho/type/Complex"`,
+ * on a global context, or
+ * to the [valueType]{@link pentaho.type.PropertyType#valueType} of the base property,
+ * when overriding it.
+ * Any additional attributes are determined and processed by
+ * each type's {@link pentaho.type.Type.extend} method.
+ *
+ * Example:
+ *
+ * ```js
+ * require(["pentaho/type/loader"], function(typeLoader) {
+ *
+ *   // Create an anonymous, derived complex type by using the type loader.
+ *   var MyProduct = typeLoader.resolveType({
+ *     base: "complex" // optional
+ *     props: [
+ *       {name: "id",    label: "Id",    valueType: "string"},
+ *       {name: "name",  label: "Name",  valueType: "string"},
+ *       {name: "price", label: "Price", valueType: "number"}
+ *     ]
+ *   });
+ *
+ *   var productA = new MyProduct({id: "mabc", name: "Principia Mathematica", price: 1200});
+ *
+ *   // ...
+ *
+ * });
+ * ```
+ *
+ * ##### A _list type shorthand specification_ array
+ *
+ * A shorter specification syntax to reference the _List_ type, or
+ * derived list types of varied [element types]{@link pentaho.type.ListType#of}.
+ *
+ * Example:
+ *
+ * ```js
+ * require(["pentaho/type/loader"], function(typeLoader) {
+ *
+ *   // Obtain the List type instance constructor
+ *
+ *   // Using the id
+ *   var ListA = typeLoader.resolveType("list");
+ *
+ *   // Obtain a derived List type instance constructor
+ *   // with Number as the element type
+ *
+ *   // Using the generic type specification syntax
+ *   var NumberListA = typeLoader.resolveType({base: "list", of: "number"});
+ *
+ *   // Using the shorthand syntax
+ *   var NumberListB = typeLoader.resolveType(["number"]);
+ *
+ *   // ...
+ *
+ *   // Assuming the type MyProduct from a previous example
+ *
+ *   var ProductList = typeLoader.resolveType([MyProduct]);
+ *
+ *   var productList = new ProductList([
+ *     {id: "mpma", name: "Principia Mathematica", price: 1200},
+ *     {id: "flot", name: "The Laws of Thought",   price:  500}
+ *   ]);
+ *
+ *   alert("Product count: " + productList.count);
+ *
+ * });
+ * ```
+ *
+ * @typedef {nonEmptyString|
+ *           pentaho.type.Type|
+ *           Class.<pentaho.type.Instance>|
+ *           Array.<pentaho.type.spec.TypeReference>|
+ *           pentaho.type.spec.IType} pentaho.type.spec.TypeReference
+ */

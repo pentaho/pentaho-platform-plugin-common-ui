@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Complex",
+  "pentaho/type/changes/Transaction",
   "pentaho/type/changes/Changeset",
   "tests/pentaho/util/errorMatch"
-], function(Context, Changeset, errorMatch) {
+], function(Complex, Transaction, Changeset, errorMatch) {
 
   "use strict";
 
@@ -25,42 +26,36 @@ define([
 
   describe("pentaho.type.changes.Changeset", function() {
 
-    var context;
-    var Complex;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            Complex = context.get("complex");
-          })
-          .then(done, done.fail);
-    });
-
     it("should be defined", function() {
       expect(typeof Changeset).toBeDefined();
     });
 
     describe("instance -", function() {
 
+      var Derived;
+
       var owner;
       var changeset;
       var scope;
 
-      beforeEach(function() {
-        var Derived = Complex.extend({
+      beforeAll(function() {
+
+        Derived = Complex.extend({
           $type: {
             props: [
               {name: "foo", defaultValue: "bar"}
             ]
           }
         });
+      });
+
+      beforeEach(function() {
 
         owner = new Derived();
 
-        scope = context.enterChange();
+        scope = Transaction.enter();
 
-        changeset = new Changeset(context.transaction, owner);
+        changeset = new Changeset(scope.transaction, owner);
       });
 
       afterEach(function() {
@@ -84,7 +79,7 @@ define([
 
         function errorOnCreate(value) {
           expect(function() {
-            var changeset2 = new Changeset(context.transaction, value);
+            var changeset2 = new Changeset(scope.transaction, value);
           }).toThrow(errorMatch.argRequired("owner"));
         }
 

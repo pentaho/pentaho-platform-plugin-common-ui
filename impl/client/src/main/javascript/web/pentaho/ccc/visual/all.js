@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,35 +14,34 @@
  * limitations under the License.
  */
 
-// This exists only so that r.js sees otherwise invisible dependencies.
 define([
-  "./abstract",
-  "./area",
-  "./areaAbstract",
-  "./areaStacked",
-  "./bar",
-  "./barAbstract",
-  "./barHorizontal",
-  "./barLine",
-  "./barNormalized",
-  "./barNormalizedAbstract",
-  "./barNormalizedHorizontal",
-  "./barStacked",
-  "./barStackedHorizontal",
-  "./boxplot",
-  "./bubble",
-  "./cartesianAbstract",
-  "./categoricalContinuousAbstract",
-  "./donut",
-  "./heatGrid",
-  "./line",
-  "./metricPointAbstract",
-  "./pie",
-  "./pointAbstract",
-  "./scatter",
-  "./sunburst",
-  "./treemap",
-  "./waterfall"
+  "./Abstract",
+  "./Area",
+  "./AreaAbstract",
+  "./AreaStacked",
+  "./Bar",
+  "./BarAbstract",
+  "./BarHorizontal",
+  "./BarLine",
+  "./BarNormalized",
+  "./BarNormalizedAbstract",
+  "./BarNormalizedHorizontal",
+  "./BarStacked",
+  "./BarStackedHorizontal",
+  "./Boxplot",
+  "./Bubble",
+  "./CartesianAbstract",
+  "./CategoricalContinuousAbstract",
+  "./Donut",
+  "./HeatGrid",
+  "./Line",
+  "./MetricPointAbstract",
+  "./Pie",
+  "./PointAbstract",
+  "./Scatter",
+  "./Sunburst",
+  "./Treemap",
+  "./Waterfall"
 ], function() {
   "use strict";
 });
