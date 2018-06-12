@@ -36,7 +36,6 @@ requireShim[getVersionedModuleId("common-ui/jquery-clean")] = {
   }
 };
 
-
 // configure cdf's angular shim
 // (not in package.json because functions aren't supported)
 requireShim[getVersionedModuleId("common-ui/angular")] = {
@@ -99,7 +98,6 @@ if(!useDebug) {
 
     "pentaho/common",
 
-    "pentaho/i18n",
     "pentaho/i18n/MessageBundle",
 
     "pentaho/shim",
