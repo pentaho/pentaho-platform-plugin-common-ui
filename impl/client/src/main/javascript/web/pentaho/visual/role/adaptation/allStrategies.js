@@ -18,7 +18,8 @@
 define([
   "./IdentityStrategy",
   "./TupleStrategy",
-  "./EntityWithTimeIntervalKeyStrategy"
+  "./EntityWithTimeIntervalKeyStrategy",
+  "./EntityWithNumberKeyStrategy"
 ], function() {
   "use strict";
 });

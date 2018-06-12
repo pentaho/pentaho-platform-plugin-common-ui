@@ -442,6 +442,7 @@ if(!useDebug) {
     "pentaho/visual/role/adaptation/TupleStrategy",
     "pentaho/visual/role/adaptation/TimeIntervalDuration",
     "pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy",
+    "pentaho/visual/role/adaptation/EntityWithNumberKeyStrategy",
     "pentaho/visual/role/adaptation/allStrategies",
     "pentaho/visual/scene/util",
     "pentaho/visual/scene/impl/Variable",
