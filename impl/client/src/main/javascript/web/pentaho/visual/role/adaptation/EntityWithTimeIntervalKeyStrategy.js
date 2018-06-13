@@ -50,8 +50,10 @@ define([
      *   time interval).
      *
      * The strategy targets:
-     * 1. modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} is [date]{@link pentaho.type.Date}, and
-     * 2. mappings of fields whose [fields][@link pentaho.data.ITable#getColumnAttribute] contain the
+     * 1. Visual roles which are [visual keys]{@link pentaho.visual.role.PropertyType#isVisualKey};
+     * 2. Modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} is
+     *    assignable to [date]{@link pentaho.type.Date}, and
+     * 3. Mappings of fields whose [fields][@link pentaho.data.ITable#getColumnProperty] contain the
      *   property "EntityWithTimeIntervalKey".
      *
      * Members of the most specific level must include the property "startDateTime". That is signaled by
@@ -63,6 +65,9 @@ define([
      *   strategy specification.
      */
     constructor: function(instSpec) {
+
+      this.base(instSpec);
+
       /**
        * The function which extracts the key of the date value.
        *
@@ -91,8 +96,8 @@ define([
        */
       this.__backIndex = Object.create(null);
 
-      var inputFieldIndexes = instSpec.inputFieldIndexes;
-      var dataTable = instSpec.data;
+      var inputFieldIndexes = this.inputFieldIndexes;
+      var dataTable = this.data;
 
       /**
        * The index of the main input field in the inputFieldIndexes array.
@@ -125,6 +130,9 @@ define([
 
       var outputColIndex = dataTable.addColumn(attributeName);
 
+      // ---
+      // Populate the new field and the indexes.
+
       var rowIndex = dataTable.getNumberOfRows();
       while(rowIndex--) {
         var inputFieldCount = inputFieldIndexes.length;
@@ -154,10 +162,9 @@ define([
         this.__forwardIndex[inputValue === null ? "" : inputValue] = rowIndex;
       }
 
-      instSpec = Object.create(instSpec);
-      instSpec.outputFieldIndexes = [outputColIndex];
+      // ---
 
-      this.base(instSpec);
+      this._setOutputFieldIndexes([outputColIndex]);
     },
 
     /** @inheritDoc */
@@ -218,23 +225,18 @@ define([
         var index = inputFieldIndexes.length;
 
         while(index--) {
-          var colAttribute = schemaData.getColumnAttribute(inputFieldIndexes[index]);
-
-          if(colAttribute != null) {
-            var annotation = colAttribute.property("EntityWithTimeIntervalKey");
-
-            if(annotation != null) {
-              // Equal duration replaces mostSpecific, because we're looping backwards.
-              if(mostSpecific == null ||
-                 TimeIntervalDuration.type.comparePrimitiveValues(
-                   mostSpecific.duration,
-                   annotation.duration) < 1) {
-                mostSpecific = annotation;
-                mostSpecificIndex = index;
-              }
-
-              continue;
+          var annotation = schemaData.getColumnProperty(inputFieldIndexes[index], "EntityWithTimeIntervalKey");
+          if(annotation != null) {
+            // Equal duration replaces mostSpecific, because we're looping backwards.
+            if(mostSpecific == null ||
+               TimeIntervalDuration.type.comparePrimitiveValues(
+                 mostSpecific.duration,
+                 annotation.duration) < 1) {
+              mostSpecific = annotation;
+              mostSpecificIndex = index;
             }
+
+            continue;
           }
 
           // If we reach here, one of the fields has no annotation, so we must reject the mapping

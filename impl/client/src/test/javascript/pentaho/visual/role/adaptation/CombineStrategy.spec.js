@@ -13,199 +13,422 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
 define([
-  "pentaho/visual/base/Model",
-  "pentaho/visual/role/adaptation/Combine",
-  "pentaho/visual/role/adaptation/impl/CombineAdapter",
-  "pentaho/data/Table",
-  "pentaho/data/TableView"
-], function(Model, Strategy, Adapter, DataTable, DataView) {
+  "pentaho/visual/role/adaptation/CombineStrategy",
+  "pentaho/type/List",
+  "pentaho/type/Element",
+  "pentaho/type/String",
+  "pentaho/type/Number",
+  "pentaho/type/Complex",
+  "pentaho/data/Table"
+], function(Strategy, List, Element, PentahoString, PentahoNumber, Complex, DataTable) {
 
   "use strict";
 
   describe("pentaho.visual.role.adaptation.CombineStrategy", function() {
 
-    var propTypeKey;
-    var propTypeNonKey;
     var dataTable;
-    var modes = {};
 
-    var datasetColumns = {
-      StringCategorical1: 0,
-      StringCategorical2: 1,
-      NumberContinuous1: 2,
-      NumberContinuous2: 3,
-      NumberCategorical1: 4,
-      NumberCategorical2: 5
+    var datasetFieldIndexes1 = {
+      orderNumber: 0,
+      country: 1,
+      measure: 2
     };
 
-    function getJSONDataset() {
+    function getDataSpec1() {
       return {
-        model: [
-          {name: "country", type: "string", label: "Country", isContinuous: false},
-          {name: "city", type: "string", label: "City", isContinuous: false},
-          {name: "sales", type: "number", label: "Sales", isContinuous: true},
-          {name: "quantity", type: "number", label: "Qty", isContinuous: true},
-          {name: "codeA", type: "number", label: "Code", isContinuous: false},
-          {name: "codeB", type: "number", label: "Code", isContinuous: false}
+        "cols": [
+          "[Order].[Number]",
+          "[Region].[Country]",
+          "[MEASURE:0]"
         ],
-        rows: [
-          {c: [{v: "Portugal"}, {v: 12000}]},
-          {c: [{v: "Ireland"}, {v: 6000}]}
-        ]
-      };
-    }
-
-    beforeAll(function() {
-
-      var CustomVisualModel = Model.extend({
-        $type: {
-          props: [
+        "rows": [
+          {
+            "c": [
+              {
+                "v": 1002,
+                "f": "1002"
+              },
+              {
+                "v": "[Region].[PT]",
+                "f": "Portugal"
+              },
+              {
+                "v": 110756.29999999999,
+                "f": "110,756"
+              }
+            ]
+          },
+          {
+            "c": [
+              {
+                "v": 1034,
+                "f": "1034"
+              },
+              {
+                "v": "[Region].[ES]",
+                "f": "Spain"
+              },
+              {
+                "v": 254838.01999999996,
+                "f": "254,838"
+              }
+            ]
+          },
+          {
+            "c": [
+              {
+                "v": 1055,
+                "f": "1055"
+              },
+              {
+                "v": "[Region].[FR]",
+                "f": "France"
+              },
+              {
+                "v": 187418.05,
+                "f": "187,418"
+              }
+            ]
+          }
+        ],
+        "model": {
+          "attrs": [
             {
-              name: "roleKey",
-              base: "pentaho/visual/role/Property",
-              isVisualKey: true,
-              modes: [
-                {dataType: "string", isContinuous: false},
-                {dataType: "element", isContinuous: false},
-                {dataType: "number", isContinuous: true},
-                {dataType: "number", isContinuous: false}
+              "name": "[Order].[Number]",
+              "label": "Order number",
+              "type": "number",
+              "isKey": true
+            },
+            {
+              "name": "[Region].[Country]",
+              "label": "Country",
+              "type": "string",
+              "isKey": true,
+              "members": [
+                {
+                  "v": "[Region].[PT]",
+                  "f": "Portugal"
+                },
+                {
+                  "v": "[Region].[ES]",
+                  "f": "Spain"
+                },
+                {
+                  "v": "[Region].[FR]",
+                  "f": "France"
+                }
               ]
             },
             {
-              name: "roleNonKey",
-              base: "pentaho/visual/role/Property",
-              isVisualKey: false
+              "name": "[MEASURE:0]",
+              "label": "Sales",
+              "type": "number",
+              "isKey": false,
+              "isPercent": false
             }
           ]
         }
-      });
+      };
+    }
 
-      dataTable = new DataTable(getJSONDataset());
+    // ---
 
-      propTypeKey = CustomVisualModel.type.get("roleKey");
-      propTypeNonKey = CustomVisualModel.type.get("roleNonKey");
+    function Cell(value, formatted) {
+      this.value = value;
+      this.formatted = formatted;
+    }
 
-      modes.StringCategorical = propTypeKey.modes.at(0);
-      modes.ElementCategorical = propTypeKey.modes.at(1);
-      modes.NumberContinuous = propTypeKey.modes.at(2);
-      modes.NumberCategorical = propTypeKey.modes.at(3);
-    });
+    Cell.prototype.valueOf = function() {
+      return this.value;
+    };
 
-    it("should be possible to create an instance", function() {
-      var strategy = new Strategy();
-      expect(strategy instanceof Strategy).toBe(true);
-    });
+    Cell.prototype.toString = function() {
+      return this.formatted;
+    };
 
-    describe("#getMapper(propType, inputData, mode)", function() {
+    // ---
 
-      it("should return null if given a non-key visual role", function() {
+    describe(".Type", function() {
 
-        var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.StringCategorical1]);
+      describe("#getInputTypeFor(outputDataType, isVisualKey)", function() {
 
-        var strategy = new Strategy();
-        var mapper = strategy.getMapper(propTypeNonKey, dataView, propTypeNonKey.modes.at(0));
+        it("should return null if not given a string type, independently of isVisualKey", function() {
+          var inputType = Strategy.type.getInputTypeFor(List.type, true);
+          expect(inputType).toBe(null);
 
-        expect(mapper).toBe(null);
-      });
+          inputType = Strategy.type.getInputTypeFor(List.type, false);
+          expect(inputType).toBe(null);
 
-      describe("when given a key visual role property", function() {
+          inputType = Strategy.type.getInputTypeFor(PentahoNumber.type, true);
+          expect(inputType).toBe(null);
 
-        it("should return null if given a continuous mode", function() {
+          inputType = Strategy.type.getInputTypeFor(PentahoNumber.type, false);
+          expect(inputType).toBe(null);
 
-          var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.NumberContinuous1]);
+          inputType = Strategy.type.getInputTypeFor(Element.type, true);
+          expect(inputType).toBe(null);
 
-          var strategy = new Strategy();
-          var mapper = strategy.getMapper(propTypeKey, dataView, modes.NumberContinuous);
+          inputType = Strategy.type.getInputTypeFor(Element.type, false);
+          expect(inputType).toBe(null);
 
-          expect(mapper).toBe(null);
+          var Foo = Complex.extend();
+
+          inputType = Strategy.type.getInputTypeFor(Foo.type, true);
+          expect(inputType).toBe(null);
+
+          inputType = Strategy.type.getInputTypeFor(Foo.type, false);
+          expect(inputType).toBe(null);
         });
 
-        describe("when given a categorical mode", function() {
+        it("should return null if given a string type but isVisualKey is false", function() {
+          var inputType = Strategy.type.getInputTypeFor(PentahoString.type, false);
+          expect(inputType).toBe(null);
+        });
 
-          it("should return null if given a mode having a number data type", function() {
+        it("should return the List type if given a string type and isVisualKey is true", function() {
+          var inputType = Strategy.type.getInputTypeFor(PentahoString.type, true);
+          expect(inputType).toBe(List.type);
+        });
+      });
 
-            var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.NumberCategorical1]);
+      describe("#validateApplication(schemaData, inputFieldIndexes)", function() {
 
-            var strategy = new Strategy();
-            var mapper = strategy.getMapper(propTypeKey, dataView, modes.NumberCategorical);
+        beforeEach(function() {
+          dataTable = new DataTable(getDataSpec1());
+        });
 
-            expect(mapper).toBe(null);
+        describe("when one input field", function() {
+
+          it("should return an object with isValid: true", function() {
+            var result = Strategy.type.validateApplication(
+              dataTable,
+              [datasetFieldIndexes1.orderNumber]);
+
+            expect(result).toEqual(jasmine.objectContaining({isValid: true}));
           });
 
-          it("should return a CombineAdapter if given a mode having an element data type", function() {
+          it("should return an object with addsFields: true", function() {
+            var result = Strategy.type.validateApplication(
+              dataTable,
+              [datasetFieldIndexes1.orderNumber]);
 
-            var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.NumberCategorical1]);
-
-            var strategy = new Strategy();
-            var mapper = strategy.getMapper(propTypeKey, dataView, modes.ElementCategorical);
-
-            expect(mapper instanceof Adapter).toBe(true);
-          });
-
-          it("should return a CombineAdapter if given a mode having a string data type", function() {
-
-            var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.NumberContinuous1]);
-
-            var strategy = new Strategy();
-            var mapper = strategy.getMapper(propTypeKey, dataView, modes.StringCategorical);
-
-            expect(mapper instanceof Adapter).toBe(true);
-          });
-
-          describe("when given a mode having a string data type", function() {
-
-            it("should return a mapper when given one number / continuous column", function() {
-
-              var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.NumberContinuous1]);
-
-              var strategy = new Strategy();
-              var mapper = strategy.getMapper(propTypeKey, dataView, modes.StringCategorical);
-
-              expect(mapper instanceof Adapter).toBe(true);
-            });
-
-            it("should return a mapper when given one number / categorical column", function() {
-
-              var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.NumberCategorical1]);
-
-              var strategy = new Strategy();
-              var mapper = strategy.getMapper(propTypeKey, dataView, modes.StringCategorical);
-
-              expect(mapper instanceof Adapter).toBe(true);
-            });
-
-            it("should return a mapper when given more than one column, " +
-                "having mixed data type and categorical status", function() {
-
-              var dataView = new DataView(dataTable).setSourceColumns([
-                datasetColumns.NumberCategorical1,
-                datasetColumns.NumberContinuous1,
-                datasetColumns.StringCategorical1,
-                datasetColumns.StringCategorical2
-              ]);
-
-              var strategy = new Strategy();
-              var mapper = strategy.getMapper(propTypeKey, dataView, modes.StringCategorical);
-
-              expect(mapper instanceof Adapter).toBe(true);
-            });
-
-            it("should return a mapper with the given inputData and mode", function() {
-
-              var dataView = new DataView(dataTable).setSourceColumns([datasetColumns.NumberContinuous1]);
-
-              var strategy = new Strategy();
-              var mapper = strategy.getMapper(propTypeKey, dataView, modes.StringCategorical);
-
-              expect(mapper.inputData).toBe(dataView);
-              expect(mapper.mode).toBe(modes.StringCategorical);
-            });
+            expect(result).toEqual(jasmine.objectContaining({addsFields: true}));
           });
         });
+
+        describe("when more than one input field", function() {
+
+          it("should return an object with isValid: true", function() {
+            var result = Strategy.type.validateApplication(
+              dataTable,
+              [datasetFieldIndexes1.orderNumber, datasetFieldIndexes1.country]);
+
+            expect(result).toEqual(jasmine.objectContaining({isValid: true}));
+          });
+
+          it("should return an object with addsFields: true", function() {
+            var result = Strategy.type.validateApplication(
+              dataTable,
+              [datasetFieldIndexes1.orderNumber, datasetFieldIndexes1.country]);
+
+            expect(result).toEqual(jasmine.objectContaining({addsFields: true}));
+          });
+        });
+      });
+
+      describe("#apply(data, inputFieldIndexes)", function() {
+
+        beforeEach(function() {
+          dataTable = new DataTable(getDataSpec1());
+        });
+
+        it("should return a strategy instance", function() {
+          var strategy = Strategy.type.apply(dataTable, [
+            datasetFieldIndexes1.orderNumber,
+            datasetFieldIndexes1.country
+          ]);
+          expect(strategy instanceof Strategy).toBe(true);
+        });
+
+        it("should return a strategy having the given data", function() {
+          var strategy = Strategy.type.apply(dataTable, [
+            datasetFieldIndexes1.orderNumber,
+            datasetFieldIndexes1.country
+          ]);
+          expect(strategy.data).toBe(dataTable);
+        });
+
+        it("should return a strategy having the given inputFieldIndexes", function() {
+          var inputFieldIndexes = [
+            datasetFieldIndexes1.orderNumber,
+            datasetFieldIndexes1.country
+          ];
+          var strategy = Strategy.type.apply(dataTable, inputFieldIndexes);
+          expect(strategy.inputFieldIndexes).toEqual(inputFieldIndexes);
+        });
+
+        it("should add a column of string type to the data table and " +
+          "return a strategy with its index as the only content of outputFieldIndexes", function() {
+
+          var strategy = Strategy.type.apply(dataTable, [
+            datasetFieldIndexes1.orderNumber,
+            datasetFieldIndexes1.country
+          ]);
+
+          var afterColsCount = dataTable.getNumberOfColumns();
+
+          expect(afterColsCount).toBe(4);
+
+          expect(strategy.outputFieldIndexes.length).toEqual(1);
+
+          var newColIndex = strategy.outputFieldIndexes[0];
+          var newCol = dataTable.getColumnAttribute(newColIndex);
+
+          expect(newCol.type).toEqual("string");
+
+          expect(dataTable.getValue(0, newColIndex)).toBe("1002~[Region].[PT]");
+          expect(dataTable.getValue(1, newColIndex)).toBe("1034~[Region].[ES]");
+          expect(dataTable.getValue(2, newColIndex)).toBe("1055~[Region].[FR]");
+        });
+
+        it("should deal with null input cells", function() {
+
+          dataTable.getCell(1, datasetFieldIndexes1.orderNumber).value = null;
+
+          var strategy = Strategy.type.apply(dataTable, [
+            datasetFieldIndexes1.orderNumber,
+            datasetFieldIndexes1.country
+          ]);
+
+          var newColIndex = strategy.outputFieldIndexes[0];
+
+          var newCell = dataTable.getCell(1, newColIndex);
+
+          expect(newCell.value).toBe("~[Region].[ES]");
+        });
+
+        it("should build labels for the created column and the values", function() {
+
+          var strategy = Strategy.type.apply(dataTable, [
+            datasetFieldIndexes1.orderNumber,
+            datasetFieldIndexes1.country
+          ]);
+
+          var newColIndex = strategy.outputFieldIndexes[0];
+          var newCol = dataTable.getColumnAttribute(newColIndex);
+
+          expect(newCol.label).toEqual("Order number ~ Country");
+
+          expect(dataTable.getFormattedValue(0, newColIndex)).toBe("1002 ~ Portugal");
+          expect(dataTable.getFormattedValue(1, newColIndex)).toBe("1034 ~ Spain");
+          expect(dataTable.getFormattedValue(2, newColIndex)).toBe("1055 ~ France");
+        });
+      });
+    });
+
+    describe("#isInvertible", function() {
+
+      it("should return true", function() {
+
+        dataTable = new DataTable(getDataSpec1());
+
+        var strategy = Strategy.type.apply(dataTable, [0]);
+
+        expect(strategy.isInvertible).toBe(true);
+      });
+
+    });
+
+    describe("#map(inputValues)", function() {
+
+      var strategy;
+
+      beforeEach(function() {
+        dataTable = new DataTable(getDataSpec1());
+
+        strategy = Strategy.type.apply(dataTable, [
+          datasetFieldIndexes1.orderNumber,
+          datasetFieldIndexes1.country
+        ]);
+      });
+
+      it("should return a cell corresponding to a given existing value", function() {
+
+        var outputCells = strategy.map([1034, "[Region].[ES]"]);
+
+        expect(outputCells).toEqual([jasmine.objectContaining({value: "1034~[Region].[ES]"})]);
+      });
+
+      it("should return a cell corresponding to a given (equal value) existing cells", function() {
+
+        var outputCells = strategy.map([new Cell(1034, "1034"), new Cell("[Region].[ES]", "Spain")]);
+
+        expect(outputCells).toEqual([jasmine.objectContaining({value: "1034~[Region].[ES]"})]);
+      });
+
+      it("should return null if given a non-existing value", function() {
+
+        var outputCells = strategy.map([1032, "[Region].[ES]"]);
+
+        expect(outputCells).toBe(null);
+      });
+    });
+
+    describe("#invert(outputValues)", function() {
+
+      var strategy;
+
+      beforeEach(function() {
+
+        dataTable = new DataTable(getDataSpec1());
+
+        dataTable.getCell(1, datasetFieldIndexes1.orderNumber).value = null;
+
+        strategy = Strategy.type.apply(dataTable, [
+          datasetFieldIndexes1.orderNumber,
+          datasetFieldIndexes1.country
+        ]);
+      });
+
+      it("should return a cell corresponding to a given existing value", function() {
+
+        var inputCells = strategy.invert(["1002~[Region].[PT]"]);
+
+        expect(inputCells).toEqual([
+          jasmine.objectContaining({value: 1002, formatted: "1002"}),
+          jasmine.objectContaining({value: "[Region].[PT]", formatted: "Portugal"})
+        ]);
+      });
+
+      it("should return a cell corresponding to a given (equal value) existing cell", function() {
+
+        var inputCells = strategy.invert([
+          new Cell("1002~[Region].[PT]", "Don't care")
+        ]);
+
+        expect(inputCells).toEqual([
+          jasmine.objectContaining({value: 1002, formatted: "1002"}),
+          jasmine.objectContaining({value: "[Region].[PT]", formatted: "Portugal"})
+        ]);
+      });
+
+      it("should return null if given a non-existing value", function() {
+
+        var inputCells = strategy.invert([10345]);
+
+        expect(inputCells).toBe(null);
+      });
+
+      it("should work with null values", function() {
+
+        var inputCells = strategy.invert(["~[Region].[ES]"]);
+
+        expect(inputCells).toEqual([
+          jasmine.objectContaining({value: null}),
+          jasmine.objectContaining({value: "[Region].[ES]", formatted: "Spain"})
+        ]);
       });
     });
   });
 });
-*/

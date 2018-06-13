@@ -18,9 +18,10 @@ define([
   "pentaho/type/Complex",
   "pentaho/util/object",
   "pentaho/util/arg",
+  "pentaho/util/error",
   "pentaho/lang/OperationInvalidError",
   "pentaho/i18n!../i18n/messages"
-], function(module, Complex, O, arg, OperationInvalidError, bundle) {
+], function(module, Complex, O, arg, error, OperationInvalidError, bundle) {
 
   "use strict";
 
@@ -71,6 +72,21 @@ define([
        * @readOnly
        */
       O.setConst(this, "inputFieldIndexes", arg.required(instSpec, "inputFieldIndexes", "instSpec"));
+    },
+
+    /**
+     * Sets the output field indexes.
+     *
+     * @param {Array.<number>} outputFieldIndexes - The output field indexes.
+     * @throws {pentaho.lang.ArgumentRequiredError} When the `outputFieldIndexes` argument is nully.
+     *
+     * @protected
+     */
+    _setOutputFieldIndexes: function(outputFieldIndexes) {
+
+      if(outputFieldIndexes == null) {
+        throw error.argRequired("instSpec.outputFieldIndexes");
+      }
 
       /**
        * Gets the indexes of the output fields.
@@ -83,7 +99,7 @@ define([
        *
        * @see pentaho.visual.role.adaptation.Strategy#outputFieldNames
        */
-      O.setConst(this, "outputFieldIndexes", arg.required(instSpec, "outputFieldIndexes", "instSpec"));
+      O.setConst(this, "outputFieldIndexes", outputFieldIndexes);
     },
 
     /**
@@ -205,6 +221,27 @@ define([
       }
 
       return cells;
+    },
+
+    /**
+     * Obtains an array of key functions for given indexes of the data table.
+     *
+     * @param {Array.<number>} fieldIndexes - The field indexes.
+     *
+     * @return {Array.<(function(any) : string)>} The array of key functions.
+     *
+     * @protected
+     */
+    _createFieldsKeyFuns: function(fieldIndexes) {
+      var inputData = this.data;
+      var fieldCount = fieldIndexes.length;
+      var keyFuns = new Array(fieldCount);
+      var index = fieldCount;
+      while(index--) {
+        keyFuns[index] = O.getSameTypeKeyFun(inputData.getColumnType(fieldIndexes[index]));
+      }
+
+      return keyFuns;
     },
 
     $type: /** @lends pentaho.visual.role.adaptation.StrategyType# */{

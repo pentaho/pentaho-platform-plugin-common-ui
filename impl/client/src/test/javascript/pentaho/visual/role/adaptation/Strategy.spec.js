@@ -17,13 +17,23 @@ define([
   "pentaho/visual/role/adaptation/Strategy",
   "pentaho/data/Table",
   "tests/pentaho/util/errorMatch"
-], function(Strategy, DataTable, errorMatch) {
+], function(BaseStrategy, DataTable, errorMatch) {
 
   "use strict";
 
   describe("pentaho.visual.role.adaptation.Strategy", function() {
 
     var dataTable;
+
+    var Strategy = BaseStrategy.extend({
+
+      constructor: function(instSpec) {
+
+        this.base(instSpec);
+
+        this._setOutputFieldIndexes(instSpec.outputFieldIndexes);
+      }
+    });
 
     function getDataSpec1() {
       return {

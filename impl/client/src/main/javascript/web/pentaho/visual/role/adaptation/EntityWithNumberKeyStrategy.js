@@ -16,12 +16,11 @@
 define([
   "pentaho/module!_",
   "./Strategy",
-  "pentaho/type/loader",
   "pentaho/type/String",
   "pentaho/type/Number",
   "pentaho/util/object",
   "pentaho/data/util"
-], function(module, Strategy, typeLoader, PentahoString, PentahoNumber, O, dataUtil) {
+], function(module, Strategy, PentahoString, PentahoNumber, O, dataUtil) {
 
   "use strict";
 
@@ -46,9 +45,11 @@ define([
      *   to a number value that equally identifies its elements.
      *
      * The strategy targets:
-     * 1. modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} is [number]{@link pentaho.type.Number}, and
-     * 2. mappings of fields whose [fields][@link pentaho.data.ITable#getColumnAttribute] contain the
-     *   property "EntityWithNumberKey".
+     * 1. Visual roles which are [visual keys]{@link pentaho.visual.role.PropertyType#isVisualKey};
+     * 2. Modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} is
+     *    assignable to [number]{@link pentaho.type.Number}, and
+     * 3. Mappings of fields whose [fields][@link pentaho.data.ITable#getColumnProperty] contain the
+     *    property "EntityWithNumberKey".
      *
      * @description Creates an `EntityWithNumberKeyStrategy` mapping strategy instance.
      * @constructor
@@ -56,6 +57,8 @@ define([
      *   strategy specification.
      */
     constructor: function(instSpec) {
+
+      this.base(instSpec);
 
       var inputKeyFun;
       var outputKeyFun;
@@ -100,8 +103,8 @@ define([
 
       // ---
 
-      var inputFieldIndex = instSpec.inputFieldIndexes[0];
-      var dataTable = instSpec.data;
+      var inputFieldIndex = this.inputFieldIndexes[0];
+      var dataTable = this.data;
 
       var fieldName;
       var baseAttributeName = fieldName = "numberKey_" + inputFieldIndex;
@@ -119,6 +122,7 @@ define([
       var outputFieldIndex = dataTable.addColumn(fieldName);
 
       // ---
+      // Populate the new field and the indexes.
 
       var rowCount = dataTable.getNumberOfRows();
       var rowIndex = -1;
@@ -128,12 +132,13 @@ define([
         var outputValue = inputValue !== null ? inputCell.referent.property("numberKey") : null;
 
         var outputCell = dataTable.getCell(rowIndex, outputFieldIndex);
+        // The DataTable's cast function ensures this is a number.
         outputCell.value = outputValue;
         outputCell.label = inputCell.label;
 
         // Keep first row index.
         var inputValueKey = inputKeyFun(inputValue);
-        if(inputIndex[inputValueKey] === undefined) {
+        if(!O.hasOwn(inputIndex, inputValueKey)) {
           inputIndex[inputValueKey] = rowIndex;
           outputIndex[outputKeyFun(outputValue)] = rowIndex;
         }
@@ -141,10 +146,7 @@ define([
 
       // ---
 
-      instSpec = Object.create(instSpec);
-      instSpec.outputFieldIndexes = [outputFieldIndex];
-
-      this.base(instSpec);
+      this._setOutputFieldIndexes([outputFieldIndex]);
     },
 
     /** @inheritDoc */
@@ -192,9 +194,7 @@ define([
       validateApplication: function(schemaData, inputFieldIndexes) {
 
         var fieldIndex = inputFieldIndexes[0];
-        var colAttribute = schemaData.getColumnAttribute(fieldIndex);
-
-        var annotation = colAttribute.property("EntityWithNumberKey");
+        var annotation = schemaData.getColumnProperty(fieldIndex, "EntityWithNumberKey");
         if(annotation == null) {
           return {isValid: false};
         }

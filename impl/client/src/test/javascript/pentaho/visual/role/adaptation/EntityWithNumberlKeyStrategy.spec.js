@@ -328,7 +328,7 @@ define([
 
           dataTable.getColumnAttribute(datasetFieldIndexes1.numberKey).members[1].property(
             "numberKey",
-            "Something that isn't a date"
+            "Something that isn't a number"
           );
 
           var strategy = Strategy.type.apply(dataTable, [datasetFieldIndexes1.numberKey]);
@@ -392,9 +392,7 @@ define([
       it("should return a cell corresponding to a given (equal value) existing cells", function() {
         var outputCells = strategy.map([new Cell("[ElapsedTime].[1002]", "1002")]);
 
-        expect(outputCells).toEqual(
-          [jasmine.objectContaining({value: 1002})]
-        );
+        expect(outputCells).toEqual([jasmine.objectContaining({value: 1002})]);
       });
 
       it("should return null if given a non-existing value", function() {

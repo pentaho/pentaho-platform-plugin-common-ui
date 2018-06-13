@@ -139,6 +139,10 @@
     base: "pentaho/visual/role/adaptation/Strategy",
     ranking: -5
   };
+  requireModules["pentaho/visual/role/adaptation/CombineStrategy"] = {
+    base: "pentaho/visual/role/adaptation/Strategy",
+    ranking: -5
+  };
   requireModules["pentaho/visual/role/adaptation/IdentityStrategy"] = {
     base: "pentaho/visual/role/adaptation/Strategy",
     ranking: -10
@@ -643,6 +647,7 @@
       "pentaho/visual/role/adaptation/Strategy",
       "pentaho/visual/role/adaptation/IdentityStrategy",
       "pentaho/visual/role/adaptation/TupleStrategy",
+      "pentaho/visual/role/adaptation/CombineStrategy",
       "pentaho/visual/role/adaptation/TimeIntervalDuration",
       "pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy",
       "pentaho/visual/role/adaptation/EntityWithNumberKeyStrategy",

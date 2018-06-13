@@ -18,6 +18,7 @@
 define([
   "./IdentityStrategy",
   "./TupleStrategy",
+  "./CombineStrategy",
   "./EntityWithTimeIntervalKeyStrategy",
   "./EntityWithNumberKeyStrategy"
 ], function() {

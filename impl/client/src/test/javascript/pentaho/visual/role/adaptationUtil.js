@@ -64,6 +64,13 @@ define([
       });
 
       exports.NullStrategy = BaseStrategy.extend({
+        constructor: function(instSpec) {
+
+          this.base(instSpec);
+
+          this._setOutputFieldIndexes(instSpec.outputFieldIndexes);
+        },
+
         $type: {
           getInputTypeFor: function() {
             return null;
@@ -74,12 +81,12 @@ define([
       // ---
 
       exports.ElementIdentityStrategy = BaseStrategy.extend({
+
         constructor: function(instSpec) {
 
-          instSpec = Object.create(instSpec);
-          instSpec.outputFieldIndexes = instSpec.inputFieldIndexes;
-
           this.base(instSpec);
+
+          this._setOutputFieldIndexes(instSpec.inputFieldIndexes);
         },
 
         map: function() {},
@@ -110,10 +117,9 @@ define([
       exports.ListIdentityStrategy = BaseStrategy.extend({
         constructor: function(instSpec) {
 
-          instSpec = Object.create(instSpec);
-          instSpec.outputFieldIndexes = instSpec.inputFieldIndexes;
-
           this.base(instSpec);
+
+          this._setOutputFieldIndexes(instSpec.inputFieldIndexes);
         },
 
         map: function() {},
@@ -144,9 +150,9 @@ define([
       exports.CombineStrategy = BaseStrategy.extend({
         constructor: function(instSpec) {
 
-          instSpec = Object.create(instSpec);
+          this.base(instSpec);
 
-          var data = instSpec.data;
+          var data = this.data;
 
           data.model.attributes.add({
             name: "combinedCol",
@@ -156,9 +162,7 @@ define([
 
           var outputFieldIndex = data.addColumn("combinedCol");
 
-          instSpec.outputFieldIndexes = [outputFieldIndex];
-
-          this.base(instSpec);
+          this._setOutputFieldIndexes([outputFieldIndex]);
         },
 
         map: function() {},

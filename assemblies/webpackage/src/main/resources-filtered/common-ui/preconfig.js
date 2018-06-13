@@ -440,6 +440,7 @@ if(!useDebug) {
     "pentaho/visual/role/adaptation/Strategy",
     "pentaho/visual/role/adaptation/IdentityStrategy",
     "pentaho/visual/role/adaptation/TupleStrategy",
+    "pentaho/visual/role/adaptation/CombineStrategy",
     "pentaho/visual/role/adaptation/TimeIntervalDuration",
     "pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy",
     "pentaho/visual/role/adaptation/EntityWithNumberKeyStrategy",
