@@ -1,0 +1,15 @@
+{
+  "model": [
+    {"name": "productFamily", "type": "string", "label": "Product Family"},
+    {"name": "sales",         "type": "number", "label": "Sales"}
+  ],
+  "rows": [
+    {"c": [{"v": "cars-classic", "f": "Classic Cars"}, 2746782]},
+    {"c": [{"v": "motorcycles", "f": "Motorcycles"}, 753753]},
+    {"c": [{"v": "planes", "f": "Planes"}, 748324]},
+    {"c": [{"v": "ships", "f": "Ships"}, 538982]},
+    {"c": [{"v": "trains", "f": "Trains"}, 165215]},
+    {"c": [{"v": "trucks-and-buses", "f": "Trucks and Buses"}, 756438]},
+    {"c": [{"v": "cars-vintage", "f": "Vintage Cars"}, 1308470]}
+  ]
+}
