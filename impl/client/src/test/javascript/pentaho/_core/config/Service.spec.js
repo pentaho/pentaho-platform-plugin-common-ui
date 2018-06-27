@@ -392,52 +392,25 @@ define(function() {
         });
       });
 
-      describe("modules absolutization", function() {
+      describe("`modules` absolutization and mapping", function() {
 
-        it("should return config if rule applies to module", function() {
+        describe("relative `modules`", function() {
 
-          var configurationService;
+          it("should return config if rule applies to module", function() {
 
-          core = createCoreMock();
-          ConfigurationService = configServiceFactory(core);
+            var configurationService;
 
-          configurationService = new ConfigurationService();
+            core = createCoreMock();
+            ConfigurationService = configServiceFactory(core);
 
-          configurationService.add({
-            baseId: "test",
-            rules: [
-              {
-                select: {
-                  module: "./A"
-                },
-                apply: {
-                  testId: "A"
-                }
-              }
-            ]
-          });
-
-          return configurationService.selectAsync("test/A").then(function(result) {
-            expect(result.testId).toEqual("A");
-          });
-        });
-
-        it("should throw if module id is relative and baseId is not specified", function() {
-
-          var configurationService;
-
-          core = createCoreMock();
-          ConfigurationService = configServiceFactory(core);
-
-          configurationService = new ConfigurationService();
-
-          expect(function() {
+            configurationService = new ConfigurationService();
 
             configurationService.add({
+              contextId: "test/B",
               rules: [
                 {
                   select: {
-                    module: "../A"
+                    module: "./A"
                   },
                   apply: {
                     testId: "A"
@@ -445,7 +418,151 @@ define(function() {
                 }
               ]
             });
-          }).toThrow(errorMatch.operInvalid());
+
+            return configurationService.selectAsync("test/A").then(function(result) {
+              expect(result).not.toBe(null);
+              expect(result.testId).toEqual("A");
+            });
+          });
+
+          it("should throw if module id is relative and contextId is not specified", function() {
+
+            var configurationService;
+
+            core = createCoreMock();
+            ConfigurationService = configServiceFactory(core);
+
+            configurationService = new ConfigurationService();
+
+            expect(function() {
+
+              configurationService.add({
+                rules: [
+                  {
+                    select: {
+                      module: "../A"
+                    },
+                    apply: {
+                      testId: "A"
+                    }
+                  }
+                ]
+              });
+            }).toThrow(errorMatch.operInvalid());
+          });
+        });
+
+        describe("`modules` mapping", function() {
+
+          it("should return config if rule applies to exactly mapped contextual module", function() {
+
+            localRequire.config({
+              map: {
+                "test/B": {
+                  "A": "test/D"
+                }
+              }
+            });
+            var configurationService;
+
+            core = createCoreMock();
+            ConfigurationService = configServiceFactory(core);
+
+            configurationService = new ConfigurationService();
+
+            configurationService.add({
+              contextId: "test/B",
+              rules: [
+                {
+                  select: {
+                    module: "A" // is mapped to test/D
+                  },
+                  apply: {
+                    testId: "D"
+                  }
+                }
+              ]
+            });
+
+            return configurationService.selectAsync("test/D").then(function(result) {
+              expect(result).not.toBe(null);
+              expect(result.testId).toEqual("D");
+            });
+          });
+
+          it("should return config if rule applies to ancestor mapped contextual module", function() {
+
+            localRequire.config({
+              map: {
+                "test": {
+                  "A": "test/D"
+                }
+              }
+            });
+
+            var configurationService;
+
+            core = createCoreMock();
+            ConfigurationService = configServiceFactory(core);
+
+            configurationService = new ConfigurationService();
+
+            configurationService.add({
+              contextId: "test/B",
+              rules: [
+                {
+                  select: {
+                    module: "A" // is mapped to test/D
+                  },
+                  apply: {
+                    testId: "D"
+                  }
+                }
+              ]
+            });
+
+            return configurationService.selectAsync("test/D").then(function(result) {
+              expect(result).not.toBe(null);
+              expect(result.testId).toEqual("D");
+            });
+          });
+
+          it("should return config if rule applies to ancestor mapped module", function() {
+
+            localRequire.config({
+              map: {
+                "test/B": {
+                  "A": "test"
+                }
+              }
+            });
+
+            var configurationService;
+
+            core = createCoreMock();
+            ConfigurationService = configServiceFactory(core);
+
+            configurationService = new ConfigurationService();
+
+            configurationService.add({
+              contextId: "test/B",
+              rules: [
+                {
+                  select: {
+                    module: "A/D" // is mapped to test/D
+                  },
+                  apply: {
+                    testId: "D"
+                  }
+                }
+              ]
+            });
+
+            return configurationService.selectAsync("test/D").then(function(result) {
+              expect(result).not.toBe(null);
+              expect(result.testId).toEqual("D");
+            });
+          });
         });
       });
 
@@ -568,7 +685,7 @@ define(function() {
           });
         });
 
-        it("should resolve all dependencies relative to baseId", function() {
+        it("should resolve all dependencies relative to contextId", function() {
 
           var moduleBFactory = jasmine.createSpy("moduleB");
           var moduleCFactory = jasmine.createSpy("moduleC");
@@ -577,7 +694,7 @@ define(function() {
           localRequire.define("test/config/C", moduleCFactory);
 
           var ruleSet = {
-            baseId: "test/config",
+            contextId: "test/config/D",
             rules: [
               {
                 select: {module: "A"},
@@ -601,7 +718,7 @@ define(function() {
           });
         });
 
-        it("should throw if there are relative dependencies and baseId is not specified", function() {
+        it("should throw if there are relative dependencies and contextId is not specified", function() {
 
           var ruleSet = {
             rules: [

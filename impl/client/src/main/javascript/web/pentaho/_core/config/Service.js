@@ -104,10 +104,10 @@ define([
 
         if(ruleSet && ruleSet.rules) {
 
-          var baseId = ruleSet.baseId || null;
+          var contextId = ruleSet.contextId || null;
 
           ruleSet.rules.forEach(function(rule) {
-            this.addRule(rule, baseId);
+            this.addRule(rule, contextId);
           }, this);
         }
       },
@@ -123,12 +123,13 @@ define([
        * the service's internal needs.
        *
        * @param {!pentaho.config.spec.IRule} rule - The configuration rule to add.
-       * @param {?string} [baseId] - The base module identifier to which dependency ids are relative.
+       * @param {?string} [contextId] - The module identifier to which rule `modules` and `deps`
+       * are relative to. Also, this module determines any applicable AMD/RequireJS mappings.
        *
-       * @throw {pentaho.lang.OperationInvalidError} When `rule` has relative dependencies and `baseId`
+       * @throw {pentaho.lang.OperationInvalidError} When `rule` has relative dependencies and `contextId`
        * is not specified.
        */
-      addRule: function(rule, baseId) {
+      addRule: function(rule, contextId) {
 
         // Assuming the Service takes ownership of the rules,
         // so mutating it directly is ok.
@@ -151,7 +152,7 @@ define([
           // Again, assuming the Service takes ownership of the rules,
           // so mutating it directly is ok.
           depIds.forEach(function(depId, index) {
-            depIds[index] = moduleUtil.absolutizeId(depId, baseId);
+            depIds[index] = moduleUtil.resolveModuleId(depId, contextId);
           });
         }
 
@@ -160,7 +161,7 @@ define([
             throw new ArgumentRequiredError("rule.select.module");
           }
 
-          moduleId = moduleUtil.absolutizeId(moduleId, baseId);
+          moduleId = moduleUtil.resolveModuleId(moduleId, contextId);
 
           var list = this.__ruleStore[moduleId];
           if(!list) {

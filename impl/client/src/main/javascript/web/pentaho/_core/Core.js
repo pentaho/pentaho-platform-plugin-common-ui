@@ -111,8 +111,8 @@ define([
         .loadAsync()
         .then(function(ruleSet) {
           // This allows for resolution of relative dependencies.
-          if(ruleSet && !ruleSet.baseId) {
-            ruleSet.baseId = moduleUtil.getBaseIdOf(ruleSetModuleMeta.id) || null;
+          if(ruleSet && !ruleSet.contextId) {
+            ruleSet.contextId = ruleSetModuleMeta.id;
           }
 
           return ruleSet;

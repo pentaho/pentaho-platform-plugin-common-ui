@@ -127,12 +127,13 @@
  */
 
 /**
- * The base module identifier to which module and dependency identifiers are relative.
+ * The context module identifier to which module and dependency identifiers are relative
+ * and that determines any applicable AMD/RequireJS module mappings.
  *
  * When unspecified and the rule set is registered and loaded from a module,
- * this property defaults to the module's base module.
+ * this property defaults to that module's identifier.
  *
- * @name baseId
+ * @name contextId
  * @memberOf pentaho.config.spec.IRuleSet#
  * @type {?string}
  *

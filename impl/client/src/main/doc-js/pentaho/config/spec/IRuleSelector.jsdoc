@@ -34,13 +34,16 @@
 /**
  * The identifier or identifiers of the modules that the rule applies to.
  *
- * When relative, these are relative to {@link pentaho.config.spec.IRuleSet#baseId}.
+ * When relative, these are relative to {@link pentaho.config.spec.IRuleSet#contextId}.
+ * Also, if there are any applicable AMD/RequireJS mappings
+ * to [contextId]{@link pentaho.config.spec.IRuleSet#contextId},
+ * these are applied.
  *
  * @name module
  * @memberOf pentaho.config.spec.IRuleSelector#
  * @type {pentaho.type.spec.EnvironmentPropertyFilter<string>}
  *
- * @see pentaho.config.spec.IRuleSet#baseId
+ * @see pentaho.config.spec.IRuleSet#contextId
  */
 
 /**

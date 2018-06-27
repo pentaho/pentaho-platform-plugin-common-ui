@@ -65,11 +65,14 @@
  * The absolute identifiers of the modules that should be loaded
  * when the rule is selected for application.
  *
- * When relative, these are relative to {@link pentaho.config.spec.IRuleSet#baseId}.
+ * When relative, these are relative to {@link pentaho.config.spec.IRuleSet#contextId}.
+ * Also, if there are any applicable AMD/RequireJS mappings
+ * to [contextId]{@link pentaho.config.spec.IRuleSet#contextId},
+ * these are applied.
  *
  * @name deps
  * @memberOf pentaho.config.spec.IRule#
  * @type {Array.<string>}
  *
- * @see pentaho.config.spec.IRuleSet#baseId
+ * @see pentaho.config.spec.IRuleSet#contextId
  */

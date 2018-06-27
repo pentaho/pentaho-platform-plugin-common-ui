@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 define([
+  "../util/requireJSConfig!",
+  "../util/object",
   "../lang/OperationInvalidError"
-], function(OperationInvalidError) {
+], function(requireJSConfig, O, OperationInvalidError) {
 
   "use strict";
+
+  var moduleIdsMapByContextId = requireJSConfig.map || {};
 
   /**
    * The `util` namespace contains utility function for working with modules.
@@ -75,8 +79,126 @@ define([
       }
 
       return id;
+    },
+
+    /**
+     * Resolves a module identifier as if it were a dependency of another module.
+     *
+     * Resolving makes `moduleId` absolute, relative to `dependentId`.
+     *
+     * Afterwards, any applicable RequireJS contextual mapping configuration is applied.
+     *
+     * @param {string} moduleId - The module to be resolved.
+     * @param {?string} dependentId - The module that depends on `moduleId`.
+     *
+     * @return {string} The resolved module.
+     */
+    resolveModuleId: function(moduleId, dependentId) {
+
+      if(moduleId.indexOf("!") !== -1) {
+        var parts = moduleId.split("!", 2);
+        return util.resolveModuleId(parts[0], dependentId) + "!" + util.resolveModuleId(parts[1], dependentId);
+      }
+
+      var absModuleId = util.absolutizeIdRelativeToSibling(moduleId, dependentId);
+
+      // Get the module id map applicable to forId.
+      var dependentMap = getModuleIdMap(dependentId);
+
+      // "Look up" moduleId in dependentMap, if any.
+      return dependentMap !== null ? mapModuleId(dependentMap, absModuleId) : absModuleId;
     }
   };
 
   return util;
+
+  /**
+   * Gets a module map used to resolve the dependencies of a given module.
+   *
+   * @param {?string|undefined} forId - The identifier of the module for which the module map is desired.
+   *
+   * @return {Object.<string, string>} A map of module identifier to module identifier.
+   */
+  function getModuleIdMap(forId) {
+
+    var moduleIdsMap;
+
+    if(forId == null) {
+      // When no forId, use the global map, if any.
+      moduleIdsMap = moduleIdsMapByContextId["*"] || null;
+    } else {
+      // Is there an exact match map?
+      moduleIdsMap = O.getOwn(moduleIdsMapByContextId, forId);
+      if(moduleIdsMap === undefined) {
+
+        // Find a map applicable to any of the "ancestor" modules,
+        // ending on the global/* map.
+
+        var closestAncestorModuleId = "";
+
+        for(var candidateBaseModuleId in moduleIdsMapByContextId) {
+          // moduleId startsWith candidateBaseModuleId and this is a longer match.
+          if(candidateBaseModuleId !== "*" &&
+             forId.indexOf(candidateBaseModuleId) === 0 &&
+             candidateBaseModuleId.length > closestAncestorModuleId.length) {
+
+            closestAncestorModuleId = candidateBaseModuleId;
+          }
+        }
+
+        if(closestAncestorModuleId.length === 0) {
+          closestAncestorModuleId = "*";
+        }
+
+        moduleIdsMap = moduleIdsMapByContextId[closestAncestorModuleId] || null; // * may not be defined.
+      }
+    }
+
+    return moduleIdsMap;
+  }
+
+  /**
+   * Maps a given module identifier using a module map.
+   *
+   * @param {Object.<string, string>} moduleIdsMap - A map of module identifier to module identifier.
+   * @param {string} moduleId - The module identifier to map.
+   *
+   * @return {string} The mapped module identifier.
+   */
+  function mapModuleId(moduleIdsMap, moduleId) {
+
+    var baseModuleId = moduleId;
+
+    // Is there not an exact match?
+    if(!O.hasOwn(moduleIdsMap, moduleId)) {
+
+      // Find the closest ancestor module.
+      var closestAncestorModuleId = "";
+
+      for(var candidateBaseModuleId in moduleIdsMap) {
+        // moduleId startsWith candidateBaseModuleId and this is a longer match.
+        if(moduleId.indexOf(candidateBaseModuleId) === 0 &&
+           candidateBaseModuleId.length > closestAncestorModuleId.length) {
+
+          closestAncestorModuleId = candidateBaseModuleId;
+        }
+      }
+
+      if(closestAncestorModuleId.length === 0) {
+        return moduleId;
+      }
+
+      baseModuleId = closestAncestorModuleId;
+    }
+
+    var moduleIdLeaf = moduleId.substring(baseModuleId.length);
+    if(moduleIdLeaf.length > 0 && moduleIdLeaf.indexOf("/") !== 0) {
+      // false positive, we just caught a substring (probably some old mapping that included an hardcoded version)
+      return moduleId;
+    }
+
+    var mappedBaseModuleId = moduleIdsMap[baseModuleId];
+
+    return mappedBaseModuleId + moduleIdLeaf;
+  }
 });
