@@ -333,11 +333,11 @@ define([
 
       it("assigns all direct enumerable properties of an object to another", function() {
         foo.xpto = "xpto";
-        Object.defineProperty(foo, "goose", {enumerable: true}); //value: undefined
+        Object.defineProperty(foo, "goose", {enumerable: true}); // value: undefined
         var ownProps = ["bar", "parrot", "lumberjack", "xpto", "goose"];
         var target = O.assignOwn({}, foo);
         expect(Object.keys(target).length).toBe(ownProps.length);
-        expect(target.spam).toBeUndefined(); //inherited property
+        expect(target.spam).toBeUndefined(); // inherited property
       });
 
       it("assigns all direct enumerable properties of an object to another (POJO variant)", function() {
@@ -384,11 +384,11 @@ define([
 
       it("assigns all defined direct enumerable properties of an object to another", function() {
         foo.xpto = "xpto";
-        Object.defineProperty(foo, "goose", {enumerable: true}); //value: undefined
+        Object.defineProperty(foo, "goose", {enumerable: true}); // value: undefined
         var ownProps = ["bar", "parrot", "lumberjack", "xpto"];
         var target = O.assignOwnDefined({}, foo);
         expect(Object.keys(target).length).toBe(ownProps.length);
-        expect(target.spam).toBeUndefined(); //inherited property
+        expect(target.spam).toBeUndefined(); // inherited property
       });
 
       it("assigns all defined direct enumerable properties of an object to another (POJO variant)", function() {
@@ -477,7 +477,7 @@ define([
         };
         var foo = getFoo();
         expectDescriptor(source, "ingredients");
-        expectDescriptor(source, "recipe"); //property is defined, its value is not
+        expectDescriptor(source, "recipe"); // property is defined, its value is not
         expectDescriptor(foo, "bar");
         expectDescriptor(foo, "parrot");
         expectDescriptor(foo, "cheese");

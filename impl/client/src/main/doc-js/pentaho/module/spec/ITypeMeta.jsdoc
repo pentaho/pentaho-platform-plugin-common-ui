@@ -1,0 +1,60 @@
+/*!
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @classDesc The `spec.ITypeMeta` interface contains the metadata of a type module.
+ *
+ * @name ITypeMeta
+ * @memberOf pentaho.module.spec
+ * @interface
+ * @extends pentaho.module.spec.IMeta
+ */
+
+/**
+ * The alias or identifier of the type's base type.
+ *
+ * When `null`, the type is a root type.
+ *
+ * This property is a synonym for {@link pentaho.module.spec.ITypeMeta#ancestor}.
+ *
+ * @name base
+ * @memberOf pentaho.module.spec.ITypeMeta#
+ * @type {?nonEmptyString}
+ */
+
+/**
+ * The alias or identifier of the type's base type.
+ *
+ * When `null`, the type is a root type.
+ *
+ * This property is a synonym for {@link pentaho.module.spec.ITypeMeta#base}.
+ *
+ * @name ancestor
+ * @memberOf pentaho.module.spec.ITypeMeta#
+ * @type {?nonEmptyString}
+ */
+
+/**
+ * Indicates if the type module is abstract.
+ *
+ * An abstract type module does not have a corresponding file or implementation.
+ * Its value is `undefined`.
+ *
+ * @name isAbstract
+ * @memberOf pentaho.module.spec.ITypeMeta#
+ * @type {?boolean}
+ * @default false
+ */

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/_baseLoader",
+  "pentaho/type/Complex",
   "pentaho/type/SpecificationScope"
-], function(Context, SpecificationScope) {
+], function(baseLoader, Complex, SpecificationScope) {
 
   "use strict";
-
-  /* globals it, expect, beforeEach */
 
   return {
     createRoot: createRoot,
@@ -31,7 +30,7 @@ define([
   function createRoot(declaringType, typeSpec) {
 
     var baseId = typeSpec && typeSpec.base;
-    var Property = declaringType.context.get(baseId || "property");
+    var Property = baseLoader.resolveType(baseId || "property");
 
     var SubProperty = Property.extend({
       $type: typeSpec
@@ -60,20 +59,6 @@ define([
   }
 
   function itDynamicAttribute(name, value, base, groupName) {
-
-    var Complex;
-
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(context) {
-            Complex = context.get("pentaho/type/complex");
-
-            if(base) {
-              return context.getAsync(base);
-            }
-          })
-          .then(done, done.fail);
-    });
 
     it("should not serialize when not specified", function() {
 

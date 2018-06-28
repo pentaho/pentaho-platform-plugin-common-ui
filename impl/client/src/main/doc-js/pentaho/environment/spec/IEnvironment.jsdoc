@@ -15,7 +15,8 @@
  */
 
 /**
- * The `spec.IEnvironment` interface represents a specification of [IEnvironment]{@link pentaho.environment.IEnvironment}.
+ * The `spec.IEnvironment` interface represents a specification of
+ * [IEnvironment]{@link pentaho.environment.IEnvironment}.
  *
  * @name pentaho.environment.spec.IEnvironment
  * @interface

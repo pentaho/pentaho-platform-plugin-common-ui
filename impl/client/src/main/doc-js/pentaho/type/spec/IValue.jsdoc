@@ -22,5 +22,5 @@
  * @interface
  * @extends pentaho.type.spec.IInstance
  *
- * @see pentaho.type.spec.UValue
+ * @see pentaho.type.spec.Value
  */

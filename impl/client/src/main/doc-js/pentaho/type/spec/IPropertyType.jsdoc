@@ -1,0 +1,371 @@
+/*!
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.IPropertyType` interface represents the information used to
+ * define a property of a [complex]{@link pentaho.type.Complex} type.
+ *
+ * It is used as part of the {@link pentaho.type.spec.IComplexType} specification.
+ *
+ * @name pentaho.type.spec.IPropertyType
+ *
+ * @interface
+ * @extends pentaho.type.spec.IType
+ */
+
+/**
+ * A reference to the property type's base type, if any.
+ *
+ * The property type's base type
+ * can only be specified on a root property of a complex type,
+ * in which case it defaults to {@link pentaho.type.Property}.
+ *
+ * For non-root property types,
+ * their base property type is that with the same name in
+ * the base type of the declaring type.
+ *
+ * @name base
+ * @memberOf pentaho.type.spec.IPropertyType#
+ * @type {?pentaho.type.spec.TypeReference}
+ * @see pentaho.type.spec.IPropertyType#name
+ */
+
+/**
+ * The name of the _property type_.
+ *
+ * The name of a _property type_ identifies it within
+ * its [declaring type]{@link pentaho.type.PropertyType#declaringType}.
+ *
+ * When it is a non-{@link Nully} and non-{@link String} value,
+ * the value is first replaced by the result of calling its `toString` method.
+ *
+ * When the specified name is the name of an inherited property,
+ * this property specification **overrides** the inherited property.
+ *
+ * When the specified name is the name of an existing local property,
+ * this property specification **configures** the existing property.
+ *
+ * @name name
+ * @memberOf pentaho.type.spec.IPropertyType#
+ * @type {!nonEmptyString | any}
+ *
+ * @see pentaho.type.PropertyType#name
+ */
+
+/**
+ * The alias for the name of the _property type_.
+ *
+ * The alias of a _property type_ is an alternative name for serialization purposes.
+ *
+ * ### Set
+ *
+ * This attribute can only be set when defining a new _property type_,
+ * and cannot be changed afterwards.
+ *
+ * When set to a non-{@link Nully} and non-{@link String} value,
+ * the value is first replaced by the result of calling its `toString` method.
+ *
+ * @name nameAlias
+ * @memberOf pentaho.type.spec.IPropertyType#
+ * @type {!nonEmptyString | any}
+ *
+ * @see pentaho.type.PropertyType#nameAlias
+ */
+
+/**
+ * The label of the property type.
+ *
+ * When non-{@link Nully} and not a string,
+ * it is taken instead to be the result of calling its `toString` method.
+ *
+ * When an empty string or {@link Nully},
+ * the label is inherited from the base type.
+ *
+ * The default label of a root property type is a capitalization of
+ * its [name]{@link pentaho.type.spec.IPropertyType#name}.
+ *
+ * @name label
+ * @memberOf pentaho.type.spec.IPropertyType#
+ * @type {?nonEmptyString | any}
+ */
+
+/**
+ * The type of value that properties of this type can hold.
+ *
+ * If the _value type_ is a [list]{@link pentaho.type.ValueType#isList} type,
+ * then this property will be a _list_ (or multiple-elements) property,
+ * otherwise, this property will be an _element_ (or single-element) property.
+ *
+ * When unspecified and [name]{@link pentaho.type.spec.IPropertyType#name} is that of
+ * an existing or inherited _property type_,
+ * the local or inherited _value type_ is used.
+ *
+ * When unspecified and `name` defines a new, _root_ property,
+ * the default _value type_ is [pentaho/type/String]{@link pentaho.type.String}.
+ *
+ * Cannot be a {@link Nully} value.
+ *
+ * When specified, the value is a [spec.TypeReference]{@link pentaho.type.spec.TypeReference}
+ * and is first resolved using [ILoader#resolveType]{@link pentaho.type.ILoader#resolveType}.
+ *
+ * The resolved _value type_ must be a [subtype]{@link pentaho.type.Type#isSubtypeOf} of the
+ * attribute's current (local or inherited) _value type_.
+ *
+ * @name valueType
+ * @memberOf pentaho.type.spec.IPropertyType#
+ * @type {!pentaho.type.spec.TypeReference}
+ *
+ * @see pentaho.type.PropertyType#valueType
+ */
+
+/**
+ * The _default value_ of properties of this type.
+ *
+ * The _default value_ is the "prototype" value that properties of this type take,
+ * on complex instances,
+ * when the property is unspecified or specified as a {@link Nully} value.
+ *
+ * The value `null` is a valid _default value_.
+ *
+ * The _control value_ `undefined` resets the attribute,
+ * causing it to assume its default value (yes, the default value of the _default value_ attribute...):
+ *
+ * * for [root]{@link pentaho.type.Type#root} _property types_ or
+ *   properties with a locally set [valueType]{@link pentaho.type.PropertyType#defaultValue},
+ *   the default value is `null`
+ * * for other _property types_, the default value is the _inherited value_.
+ *
+ * Else, the value must be either a function or a valid specification for a value of the _property type_'s
+ * current (local or inherited) [valueType]{@link pentaho.type.spec.IPropertyType#valueType}.
+ *
+ * When this is a [list]{@link pentaho.type.PropertyType#isList} _property type_,
+ * the value must be a valid list value specification.
+ *
+ * @name defaultValue
+ * @memberOf pentaho.type.spec.IPropertyType#
+ * @type {pentaho.type.spec.Value | pentaho.type.spec.PropertyDynamicAttribute.<pentaho.type.spec.Value>}
+ *
+ * @see pentaho.type.PropertyType#defaultValue
+ */
+
+/**
+ * Indicates if properties of this type are required.
+ *
+ * When a property is of a required _property type_,
+ * it is considered **invalid** if its value (in a complex instance) is `null` or,
+ * in the case of a [list]{@link pentaho.type.PropertyType#isList} _property type_,
+ * it has zero elements.
+ *
+ * Note that this attribute is taken together with
+ * the [countMin]{@link pentaho.type.spec.IPropertyType#countMin} attribute
+ * to determine the effective [element count range]{@link pentaho.type.PropertyType#countRangeOn}
+ * of a _property type_.
+ *
+ * ### This attribute is *Dynamic*
+ *
+ * A _dynamic_ attribute accepts a function that is
+ * evaluated to a different value for each complex instance.
+ * When the value is not a function, it applies to every instance.
+ *
+ * ### This attribute is *Monotonic*
+ *
+ * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
+ *
+ * In this case, a _property type_ marked as _not required_ can later be marked as _required_.
+ * However, a _property type_ marked as _required_ can no longer go back to being _not required_.
+ *
+ * ### This attribute is *Inherited*
+ *
+ * When there is no _local value_, the _effective value_ of the attribute is the _inherited effective value_.
+ *
+ * ### Other characteristics
+ *
+ * When a {@link Nully} value is specified, it is ignored.
+ *
+ * The default (root) `isRequired` attribute value is `false`.
+ *
+ * @name isRequired
+ * @memberOf pentaho.type.spec.IPropertyType#
+ * @type {boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
+ *
+ * @see pentaho.type.spec.IPropertyType#valueType
+ * @see pentaho.type.spec.IPropertyType#countMin
+ * @see pentaho.type.PropertyType#isRequired
+ * @see pentaho.type.PropertyType#countRangeOn
+ */
+
+/**
+ * Indicates if properties of this type are applicable.
+ *
+ * When a property is not (currently) applicable, then it does not apply;
+ * it does not make sense in a certain situation.
+ * It may only be applicable when another property of the complex type has a specific value, for example.
+ *
+ * When a property is not currently applicable, its value is not significant
+ * and, as such, any validations concerning it are not performed.
+ *
+ * ### This attribute is *Dynamic*
+ *
+ * A _dynamic_ attribute accepts a function that is
+ * evaluated to a different value for each complex instance.
+ * When the value is not a function, it applies to every instance.
+ *
+ * ### This attribute is *Monotonic*
+ *
+ * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
+ *
+ * In this case, a _property type_ marked as _applicable_ can later be marked as _not applicable_.
+ * However, a _property type_ marked as _not applicable_ can no longer go back to being _applicable_.
+ *
+ * ### This attribute is *Inherited*
+ *
+ * When there is no _local value_, the _effective value_ of the attribute is the _inherited effective value_.
+ *
+ * ### Other characteristics
+ *
+ * When a {@link Nully} value is specified, it is ignored.
+ *
+ * The default (root) `isApplicable` attribute value is `true`.
+ *
+ * @name isApplicable
+ * @memberOf pentaho.type.spec.IPropertyType#
+ * @type {boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
+ *
+ * @see pentaho.type.spec.IPropertyType#isRequired
+ * @see pentaho.type.PropertyType#isApplicable
+ */
+
+/**
+ * Indicates if properties of this type _can_ be changed by a user
+ * in a user interface.
+ *
+ * A property should be marked disabled whenever its value is implied/imposed somehow,
+ * and thus cannot not be changed, directly, by the user in a user interface.
+ *
+ * ### This attribute is *Dynamic*
+ *
+ * A _dynamic_ attribute accepts a function that is
+ * evaluated to a different value for each complex instance.
+ * When the value is not a function, it applies to every instance.
+ *
+ * ### This attribute is *Monotonic*
+ *
+ * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
+ *
+ * In this case, a _property type_ marked as _enabled_ can later be marked as _not enabled_.
+ * However, a _property type_ marked as _not enabled_ can no longer go back to being _enabled_.
+ *
+ * ### This attribute is *Inherited*
+ *
+ * When there is no _local value_, the _effective value_ of the attribute is the _inherited effective value_.
+ *
+ * ### Other characteristics
+ *
+ * When a {@link Nully} value is specified, it is ignored.
+ *
+ * The default (root) `isEnabled` attribute value is `true`.
+ *
+ * @name isEnabled
+ * @memberOf pentaho.type.spec.IPropertyType#
+ * @type {boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
+ *
+ * @see pentaho.type.PropertyType#isEnabled
+ */
+
+/**
+ * The minimum number of elements that properties of this type must have.
+ *
+ * Note that this attribute is taken together with
+ * the [isRequired]{@link pentaho.type.spec.IPropertyType#isRequired} attribute
+ * to determine the effective [element count range]{@link pentaho.type.PropertyType#countRangeOn}
+ * of a _property type_.
+ *
+ * ### This attribute is *Dynamic*
+ *
+ * A _dynamic_ attribute accepts a function that is
+ * evaluated to a different value for each complex instance.
+ * When the value is not a function, it applies to every instance.
+ *
+ * ### This attribute is *Monotonic*
+ *
+ * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
+ *
+ * In this case, a _property type_ having a `countMin` of `1` can later be
+ * changed to have a `countMin` of `2`.
+ * However, a _property type_ having a `countMin` of `2` can no longer go back to
+ * have a lower `countMin`, like `0`.
+ * The `countMin` attribute can only change to a greater value.
+ *
+ * ### This attribute is *Inherited*
+ *
+ * When there is no _local value_, the _effective value_ of the attribute is the _inherited effective value_.
+ *
+ * ### Other characteristics
+ *
+ * When a {@link Nully} value is specified, it is ignored.
+ *
+ * The default (root) `countMin` attribute value is `0`.
+ *
+ * @name countMin
+ * @memberOf pentaho.type.spec.IPropertyType#
+ * @type {number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
+ *
+ * @see pentaho.type.spec.IPropertyType#countMax
+ * @see pentaho.type.PropertyType#countMin
+ */
+
+/**
+ * The maximum number of elements that properties of this type can have.
+ *
+ * Note that this attribute is taken together with
+ * the [isRequired]{@link pentaho.type.spec.IPropertyType#isRequired}
+ * and the [countMin]{@link pentaho.type.IPropertyType#countMin} attributes
+ * to determine the effective [element count range]{@link pentaho.type.PropertyType#countRangeOn}
+ * of a _property type_.
+ *
+ * ### This attribute is *Dynamic*
+ *
+ * A _dynamic_ attribute accepts a function that is
+ * evaluated to a different value for each complex instance.
+ * When the value is not a function, it applies to every instance.
+ *
+ * ### This attribute is *Monotonic*
+ *
+ * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
+ *
+ * In this case, a _property type_ having a `countMax` of `5` can later be
+ * changed to have a `countMax` of `3`.
+ * However, a _property type_ having a `countMax` of `5` can no longer "go back" to
+ * have a greater `countMax`, like `7`.
+ * The `countMax` attribute can only change to a lower value.
+ *
+ * ### This attribute is *Inherited*
+ *
+ * When there is no _local value_, the _effective value_ of the attribute is the _inherited effective value_.
+ *
+ * ### Other characteristics
+ *
+ * When a {@link Nully} value is specified, it is ignored.
+ *
+ * The default (root) `countMax` attribute value is `Infinity`.
+ *
+ * @name countMax
+ * @memberOf pentaho.type.spec.IPropertyType#
+ * @type {number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
+ *
+ * @see pentaho.type.spec.IPropertyType#countMin
+ * @see pentaho.type.PropertyType#countMax
+ */

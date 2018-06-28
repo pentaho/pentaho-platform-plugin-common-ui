@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,21 @@
 // This exists only so that r.js sees otherwise invisible dependencies.
 
 define([
-  "./abstract",
-  "./tree",
-  "./property",
-  "./and",
-  "./or",
-  "./not",
-  "./isEqual",
-  "./isIn",
-  "./isGreater",
-  "./isLess",
-  "./isGreaterOrEqual",
-  "./isLessOrEqual",
-  "./isLike",
-  "./true",
-  "./false"
+  "./Abstract",
+  "./Tree",
+  "./Property",
+  "./And",
+  "./Or",
+  "./Not",
+  "./IsEqual",
+  "./IsIn",
+  "./IsGreater",
+  "./IsLess",
+  "./IsGreaterOrEqual",
+  "./IsLessOrEqual",
+  "./IsLike",
+  "./True",
+  "./False"
 ], function() {
 
   "use strict";

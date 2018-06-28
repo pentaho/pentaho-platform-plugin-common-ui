@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 define([
-  "./TableView"
-], function(TableView) {
+  "./TableView",
+  "./filter/IsEqual",
+  "./filter/And"
+], function(TableView, IsEqualFilter, AndFilter) {
 
   "use strict";
 
@@ -105,19 +107,14 @@ define([
     },
 
     /**
-     * Creates a data filter from the given cells map, source data table and Type API context.
+     * Creates a data filter from the given cells map and source data table.
      *
      * @param {!Object.<string, any|pentaho.data.ICell>} cellsMap - The data cells map.
      * @param {!pentaho.data.ITable} dataPlain - The associated source, plain data table.
-     * @param {!pentaho.type.Context} context - The Type API context from which to obtain the filter types.
-     * The types {@link pentaho.data.filter.IsEqual} and {@link pentaho.data.filter.And}
-     * must have been loaded already.
      *
      * @return {!pentaho.data.filter.Abstract} A data filter.
      */
-    createFilterFromCellsMap: function(cellsMap, dataPlain, context) {
-
-      var IsEqualFilter = context.get("=");
+    createFilterFromCellsMap: function(cellsMap, dataPlain) {
 
       var andOperands = [];
 
@@ -133,8 +130,7 @@ define([
         case 0: return null;
         case 1: return andOperands[0];
         default:
-          var And = context.get("and");
-          return new And({operands: andOperands});
+          return new AndFilter({operands: andOperands});
       }
     },
 
@@ -146,16 +142,12 @@ define([
      * @param {!pentaho.data.ITable} dataPlain - The associated source, plain data table.
      * @param {string} columnId - The column identifier.
      * @param {any|pentaho.data.ICell} cell - The data cell.
-     * @param {!pentaho.type.Context} context - The Type API context from which to obtain the filter types.
-     * The type {@link pentaho.data.filter.IsEqual} must have been loaded already.
      *
      * @return {pentaho.data.filter.IsEqual} An `IsEqual` data filter or `null`.
      */
-    createFilterIsEqualFromCell: function(dataPlain, columnId, cell, context) {
+    createFilterIsEqualFromCell: function(dataPlain, columnId, cell) {
 
-      var IsEqualFilter = context.get("=");
-
-      return __createFilterIsEqualFromCell(dataPlain, columnId, cell, IsEqualFilter);
+      return __createFilterIsEqualFromCell(dataPlain, columnId, cell);
     },
 
     /**
@@ -255,7 +247,7 @@ define([
     }
   };
 
-  function __createFilterIsEqualFromCell(dataPlain, columnId, cell, IsEqualFilter) {
+  function __createFilterIsEqualFromCell(dataPlain, columnId, cell) {
     var columnIndex = dataPlain.getColumnIndexById(columnId);
     if(columnIndex >= 0) {
       var filterValue;

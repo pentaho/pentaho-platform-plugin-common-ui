@@ -33,7 +33,7 @@
  * The fixed mode of operation in which the associated visual role is to operate.
  *
  * When specified,
- * it must be equal to one of the operation [modes]{@link pentaho.visual.role.Property.Type#modes}
+ * it must be equal to one of the operation [modes]{@link pentaho.visual.role.PropertyType#modes}
  * of the associated visual role property;
  * otherwise, the mapping is considered _invalid_.
  *

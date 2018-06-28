@@ -15,12 +15,13 @@
  */
 
 define([
+  "module",
   "./Changeset",
   "./ListChangeset",
   "./Replace",
   "./Transaction",
-  "../../util/object"
-], function(Changeset, ListChangeset, Replace, Transaction, O) {
+  "pentaho/util/object"
+], function(module, Changeset, ListChangeset, Replace, Transaction, O) {
 
   "use strict";
 
@@ -45,7 +46,7 @@ define([
    * @param {!pentaho.type.changes.Transaction} transaction - The owning transaction.
    * @param {!pentaho.type.Complex} owner - The complex value where the changes take place.
    */
-  return Changeset.extend("pentaho.type.changes.ComplexChangeset", /** @lends pentaho.type.changes.ComplexChangeset#*/{
+  return Changeset.extend(module.id, /** @lends pentaho.type.changes.ComplexChangeset#*/{
 
     constructor: function(transaction, owner) {
 
@@ -94,7 +95,7 @@ define([
     /**
      * Gets the [change]{@link pentaho.type.changes.Change} object associated with the specified property.
      *
-     * @param {nonEmptyString|!pentaho.type.Property.Type} propertyOrName - The property name or type object.
+     * @param {nonEmptyString|!pentaho.type.PropertyType} propertyOrName - The property name or type object.
      *
      * @return {pentaho.type.changes.Change} An object describing the changes to be performed
      * in the given property, or `null` if the property has not changed.
@@ -122,7 +123,7 @@ define([
     /**
      * Determines if the given property has changed.
      *
-     * @param {nonEmptyString|!pentaho.type.Property.Type} propertyOrName - The property name or type object.
+     * @param {nonEmptyString|!pentaho.type.PropertyType} propertyOrName - The property name or type object.
      *
      * @return {boolean} `true` if the property has changed; `false`, otherwise.
      *
@@ -192,7 +193,7 @@ define([
     /**
      * Gets the original value of a property.
      *
-     * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
+     * @param {nonEmptyString|!pentaho.type.PropertyType} name - The property name or type object.
      *
      * @return {pentaho.type.Value} The original value of the property (before the change).
      *
@@ -306,7 +307,7 @@ define([
     /**
      * Marks an element as added by a change or cancels a previous removal.
      * @param {!pentaho.type.Complex} element - The added element.
-     * @param {!pentaho.type.Property.Type} propType - The property type.
+     * @param {!pentaho.type.PropertyType} propType - The property type.
      * @private
      * @internal
      */
@@ -327,7 +328,7 @@ define([
     /**
      * Marks an element as removed by a change or cancels a previous addition.
      * @param {!pentaho.type.Complex} element - The removed element.
-     * @param {!pentaho.type.Property.Type} propType - The property type.
+     * @param {!pentaho.type.PropertyType} propType - The property type.
      * @private
      * @internal
      */
@@ -348,7 +349,7 @@ define([
     /**
      * Obtain the name of a property, given the property type or its name.
      *
-     * @param {nonEmptyString|!pentaho.type.Property.Type} propertyOrName - The property name or type object.
+     * @param {nonEmptyString|!pentaho.type.PropertyType} propertyOrName - The property name or type object.
      *
      * @return {string} The property name.
      *
@@ -408,7 +409,7 @@ define([
      * Sets the value of an _element property_.
      *
      * @param {!pentaho.type.Complex} complex - The complex instance.
-     * @param {!pentaho.type.Property.Type} propType - The element property type.
+     * @param {!pentaho.type.PropertyType} propType - The element property type.
      * @param {?any} valueNewSpec The new value specification.
      * @param {?boolean} [forceReplace=false] Forces replace to occur even when values are equal.
      *
@@ -471,8 +472,7 @@ define([
 
       // -- New change.
 
-      var context = type.context;
-      var scope = context.enterChange();
+      var scope = Transaction.enter();
       if(changeset === null) {
         changeset = scope.transaction.ensureChangeset(complex);
       }

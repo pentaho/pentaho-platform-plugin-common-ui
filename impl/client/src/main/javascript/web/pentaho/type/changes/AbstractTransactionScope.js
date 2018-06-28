@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 define([
-  "./Transaction",
-  "../../lang/Base",
-  "../../util/object",
-  "../../util/error",
-  "../../util/logger"
-], function(Transaction, Base, O, error, logger) {
+  "module",
+  "./_transactionControl",
+  "pentaho/lang/Base",
+  "pentaho/util/object",
+  "pentaho/util/error",
+  "pentaho/util/logger"
+], function(module, transactionControl, Base, O, error, logger) {
 
   "use strict";
 
-  return Base.extend(/** @lends pentaho.type.changes.AbstractTransactionScope# */{
+  return Base.extend(module.id, /** @lends pentaho.type.changes.AbstractTransactionScope# */{
 
     /**
      * @alias AbstractTransactionScope
@@ -32,12 +33,11 @@ define([
      *
      * @classDesc The `AbstractTransactionScope` class is the abstract base class
      * of classes that control the
-     * [ambient/current transaction]{@link pentaho.type.Context#transaction}.
+     * [ambient/current transaction]{@link pentaho.type.changes.Transaction#current}.
      *
      * @constructor
      * @description Creates a `CommittedScope`.
      *
-     * @param {!pentaho.type.Context} context - The associated context.
      * @param {pentaho.type.changes.Transaction} [transaction] The associated transaction.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the specified transaction is resolved.
@@ -45,19 +45,7 @@ define([
      * @throws {pentaho.type.changes.TransactionRejectedError} When this is the root scope of the specified transaction
      * and the transaction is automatically rejected due to a concurrency error.
      */
-    constructor: function(context, transaction) {
-      if(!context) throw error.argRequired("context");
-
-      /**
-       * Gets the associated context.
-       *
-       * @name context
-       * @memberOf pentaho.type.changes.AbstractTransactionScope#
-       * @type {!pentaho.type.Context}
-       * @readOnly
-       */
-      O.setConst(this, "context", context);
-
+    constructor: function(transaction) {
       /**
        * Gets the associated transaction, if any, or `null`.
        *
@@ -89,14 +77,14 @@ define([
 
       // Entering. May throw if already resolved or concurrency error.
       if(transaction) transaction.__scopeEnter();
-      context.__scopeEnter(this);
+      transactionControl.enterScope(this);
     },
 
     /**
      * Throws an error if the scope has been exited from or is not the current scope.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the scope has been exited from or
-     * it is not the current scope of its context.
+     * it is not the current scope.
      *
      * @protected
      */
@@ -117,14 +105,14 @@ define([
     },
 
     /**
-     * Gets an error saying the scope is not the current scope of its context.
+     * Gets an error saying the scope is not the current scope.
      *
      * @return {pentaho.lang.OperationInvalidError} The new error.
      *
      * @private
      */
     __getErrorNotCurrent: function() {
-      return error.operInvalid("Scope is not the current scope of its context.");
+      return error.operInvalid("Scope is not the current scope.");
     },
 
     /**
@@ -138,15 +126,15 @@ define([
     },
 
     /**
-     * Gets a value that indicates if this scope is the current scope of its context.
+     * Gets a value that indicates if this scope is the current scope.
      *
-     * A context's current scope is its innermost scope.
+     * The current scope is the innermost scope.
      *
      * @type {boolean}
      * @readOnly
      */
     get isCurrent() {
-      return this.__isInside && (this === this.context.__txnScopeCurrent);
+      return this.__isInside && (this === transactionControl.currentScope);
     },
 
     /**
@@ -177,7 +165,6 @@ define([
      * After this operation, the scope cannot be operated on anymore.
      * However,
      * properties like
-     * [context]{@link pentaho.type.changes.AbstractTransactionScope#context} and
      * [transaction]{@link pentaho.type.changes.AbstractTransactionScope#transaction}
      * remain available for reading.
      *
@@ -206,7 +193,7 @@ define([
     },
 
     /**
-     * Exits the scope locally and notifies its transaction and context.
+     * Exits the scope locally and notifies its transaction.
      *
      * @private
      */
@@ -216,7 +203,7 @@ define([
 
       if(this.transaction) this.transaction.__scopeExit();
 
-      this.context.__scopeExit();
+      transactionControl.exitScope();
     },
 
     /**

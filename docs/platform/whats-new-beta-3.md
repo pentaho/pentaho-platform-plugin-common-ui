@@ -49,7 +49,7 @@ layout: default
    See [pentaho.type.Type#isEntity]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type#isEntity'}}){{site.starNew}}.
 
 3. Complex types can now be declared immutable, by specifying
-   [pentaho.type.Complex.Type#isReadOnly]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex.Type#isReadOnly'}}){{site.starNew}}.
+   [pentaho.type.ComplexType#isReadOnly]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.ComplexType#isReadOnly'}}){{site.starNew}}.
    When setting the value of properties or configuring values, 
    values of immutable types are handled specially.
 

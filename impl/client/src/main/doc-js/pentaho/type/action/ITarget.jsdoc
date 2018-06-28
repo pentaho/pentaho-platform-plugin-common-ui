@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@
  * Executes or starts execution of a given action in this target and returns the
  * corresponding action execution instance.
  *
- * This method can be given [synchronous or asynchronous]{@link pentaho.type.action.Base.Type#isSync} actions.
+ * This method can be given [synchronous or asynchronous]{@link pentaho.type.action.BaseType#isSync} actions.
  * To wait for the result of an asynchronous action,
  * obtain the [promise]{@link pentaho.type.action.Execution#promise} property
  * of the returned action execution instance.

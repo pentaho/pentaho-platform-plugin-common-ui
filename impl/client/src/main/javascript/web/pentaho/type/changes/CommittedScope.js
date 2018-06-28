@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 define([
+  "module",
   "./AbstractTransactionScope"
-], function(AbstractTransactionScope) {
+], function(module, AbstractTransactionScope) {
 
   "use strict";
 
-  return AbstractTransactionScope.extend(/** @lends pentaho.type.changes.CommittedScope# */{
+  return AbstractTransactionScope.extend(module.id, /** @lends pentaho.type.changes.CommittedScope# */{
     /**
      * @alias CommittedScope
      * @memberOf pentaho.type.changes
@@ -31,11 +32,9 @@ define([
      *
      * @constructor
      * @description Creates a `CommittedScope`.
-     *
-     * @param {!pentaho.type.Context} context - The associated context.
      */
-    constructor: function(context) {
-      this.base(context, null);
+    constructor: function() {
+      this.base(null);
     }
   });
 });

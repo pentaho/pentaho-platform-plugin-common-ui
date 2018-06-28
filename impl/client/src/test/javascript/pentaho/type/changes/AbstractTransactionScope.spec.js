@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
   "pentaho/type/changes/AbstractTransactionScope",
+  "pentaho/type/changes/_transactionControl",
   "pentaho/type/changes/Transaction",
-  "tests/pentaho/util/errorMatch",
-  "tests/test-utils"
-], function(Context, AbstractTransactionScope, Transaction, errorMatch, testUtils) {
+  "tests/pentaho/util/errorMatch"
+], function(AbstractTransactionScope, transactionControl, Transaction, errorMatch) {
 
   "use strict";
 
@@ -36,22 +35,12 @@ define([
       });
     }
 
-    var context;
-
-    describe("new(context, transaction)", function() {
+    describe("new(transaction)", function() {
       var scope;
       var txn;
 
-      beforeEach(function(done) {
-        Context.createAsync()
-            .then(function(_context) {
-              context = _context;
-            })
-            .then(done, done.fail);
-      });
-
       beforeEach(function() {
-        txn = new Transaction(context);
+        txn = new Transaction();
       });
 
       afterEach(function() {
@@ -62,43 +51,31 @@ define([
         txn = null;
       });
 
-      it("should be defined", function () {
+      it("should be defined", function() {
         expect(typeof AbstractTransactionScope).toBeDefined();
       });
 
-      it("should throw an error when a context isn't specified", function() {
-        expect(function() {
-          scope = new AbstractTransactionScope(null, txn);
-        }).toThrow(errorMatch.argRequired("context"));
-      });
-
-      it("should have the specified context as #context", function() {
-        scope = new AbstractTransactionScope(context, txn);
-
-        expect(scope.context).toBe(context);
-      });
-
       it("should allow transaction to be null", function() {
-        scope = new AbstractTransactionScope(context, null);
+        scope = new AbstractTransactionScope(null);
 
         expect(scope.transaction).toBe(null);
       });
 
       it("should have the specified transaction as #transaction", function() {
-        scope = new AbstractTransactionScope(context, txn);
+        scope = new AbstractTransactionScope(txn);
 
         expect(scope.transaction).toBe(txn);
       });
 
       it("should set isRoot = true if the specified transaction has no other scopes", function() {
-        scope = new AbstractTransactionScope(context, txn);
+        scope = new AbstractTransactionScope(txn);
 
         expect(scope.isRoot).toBe(true);
       });
 
       it("should set isRoot = false if the specified transaction has other scopes", function() {
-        var scope1 = new AbstractTransactionScope(context, txn);
-        var scope2 = new AbstractTransactionScope(context, txn);
+        var scope1 = new AbstractTransactionScope(txn);
+        var scope2 = new AbstractTransactionScope(txn);
 
         expect(scope2.isRoot).toBe(false);
 
@@ -107,7 +84,7 @@ define([
       });
 
       it("should have isInside = true", function() {
-        scope = new AbstractTransactionScope(context, txn);
+        scope = new AbstractTransactionScope(txn);
 
         expect(scope.isInside).toBe(true);
       });
@@ -115,22 +92,22 @@ define([
       it("should call transaction#__scopeEnter", function() {
         spyOn(txn, "__scopeEnter").and.callThrough();
 
-        scope = new AbstractTransactionScope(context, txn);
+        scope = new AbstractTransactionScope(txn);
 
         expect(txn.__scopeEnter).toHaveBeenCalled();
       });
 
-      it("should call context#__scopeEnter", function() {
-        spyOn(context, "__scopeEnter").and.callThrough();
+      it("should call transactionControl#enterScope", function() {
+        spyOn(transactionControl, "enterScope").and.callThrough();
 
-        scope = new AbstractTransactionScope(context, txn);
+        scope = new AbstractTransactionScope(txn);
 
-        expect(context.__scopeEnter).toHaveBeenCalled();
-        expect(context.__scopeEnter).toHaveBeenCalledWith(scope);
+        expect(transactionControl.enterScope).toHaveBeenCalled();
+        expect(transactionControl.enterScope).toHaveBeenCalledWith(scope);
       });
 
       it("should have isCurrent = true", function() {
-        scope = new AbstractTransactionScope(context, txn);
+        scope = new AbstractTransactionScope(txn);
 
         expect(scope.isCurrent).toBe(true);
       });
@@ -138,168 +115,133 @@ define([
 
     describe("#exit({sloppy})", function() {
 
-      describe("with context", function() {
+      it("should set isInside to false after being called", function() {
 
-        beforeEach(function(done) {
-          Context.createAsync()
-              .then(function(_context) {
-                context = _context;
-              })
-              .then(done, done.fail);
-        });
+        var txn = new Transaction();
+        var scope = new AbstractTransactionScope(txn);
 
-        it("should set isInside to false after being called", function() {
+        expect(scope.isInside).toBe(true);
 
-          var txn = new Transaction(context);
-          var scope = new AbstractTransactionScope(context, txn);
+        scope.exit();
 
-          expect(scope.isInside).toBe(true);
+        expect(scope.isInside).toBe(false);
+      });
 
+      it("should log a warning when called and already exited from", function() {
+
+        return require.using([
+          "pentaho/type/changes/Transaction",
+          "pentaho/type/changes/AbstractTransactionScope",
+          "pentaho/util/logger"
+        ], mockLogger, function(Transaction, AbstractTransactionScope, logger) {
+
+          var txn = new Transaction();
+          var scope = new AbstractTransactionScope(txn);
+
+          // This call is legal and should not log.
+          scope.exit();
+          expect(scope.isInside).toBe(false);
+
+          // ----
+
+          // This call should log a warning.
           scope.exit();
 
+          // ---
+
+          expect(logger.warn).toHaveBeenCalled();
+        });
+      });
+
+      it("should not log a warning when called and already exited from, if keyArgs.sloppy is true", function() {
+
+        return require.using([
+          "pentaho/type/changes/Transaction",
+          "pentaho/type/changes/AbstractTransactionScope",
+          "pentaho/util/logger"
+        ], mockLogger, function(Transaction, AbstractTransactionScope, logger) {
+
+          var txn = new Transaction();
+          var scope = new AbstractTransactionScope(txn);
+
+          // This call is legal and should not log.
+          scope.exit();
           expect(scope.isInside).toBe(false);
+
+          // ----
+
+          // This call would log a warning.
+          scope.exit({sloppy: true});
+
+          // ---
+
+          expect(logger.warn).not.toHaveBeenCalled();
         });
       });
 
-      testUtils.itAsync("should log a warning when called and already exited from", function() {
+      it("should log a warning when called and not current", function() {
 
         return require.using([
-          "pentaho/type/Context",
           "pentaho/type/changes/Transaction",
           "pentaho/type/changes/AbstractTransactionScope",
           "pentaho/util/logger"
-        ], mockLogger, function(Context, Transaction, AbstractTransactionScope, logger) {
+        ], mockLogger, function(Transaction, AbstractTransactionScope, logger) {
 
-          return Context.createAsync().then(function(context) {
-            var txn = new Transaction(context);
-            var scope = new AbstractTransactionScope(context, txn);
+          var txn    = new Transaction();
+          var scope1 = new AbstractTransactionScope(txn);
+          var scope2 = new AbstractTransactionScope(txn);
 
-            // This call is legal and should not log.
-            scope.exit();
-            expect(scope.isInside).toBe(false);
+          expect(scope1.isInside ).toBe(true);
+          expect(scope1.isCurrent).toBe(false);
 
-            // ----
+          expect(scope2.isCurrent).toBe(true);
 
-            // This call should log a warning.
-            scope.exit();
+          // This call is not legal and should log a warning.
+          scope1.exit();
 
-            // ---
+          // ---
 
-            expect(logger.warn).toHaveBeenCalled();
-          });
+          expect(logger.warn).toHaveBeenCalled();
+
+          scope2.exit();
         });
       });
 
-      testUtils.itAsync("should not log a warning when called and already exited from, if keyArgs.sloppy is true",
-      function() {
+      it("should not log a warning when called and not current, if keyArgs.sloppy is true", function() {
 
         return require.using([
-          "pentaho/type/Context",
           "pentaho/type/changes/Transaction",
           "pentaho/type/changes/AbstractTransactionScope",
           "pentaho/util/logger"
-        ], mockLogger, function(Context, Transaction, AbstractTransactionScope, logger) {
+        ], mockLogger, function(Transaction, AbstractTransactionScope, logger) {
 
-          return Context.createAsync().then(function(context) {
+          var txn    = new Transaction();
+          var scope1 = new AbstractTransactionScope(txn);
+          var scope2 = new AbstractTransactionScope(txn);
 
-            var txn = new Transaction(context);
-            var scope = new AbstractTransactionScope(context, txn);
+          expect(scope1.isInside ).toBe(true);
+          expect(scope1.isCurrent).toBe(false);
 
-            // This call is legal and should not log.
-            scope.exit();
-            expect(scope.isInside).toBe(false);
+          expect(scope2.isCurrent).toBe(true);
 
-            // ----
+          // This call is not legal and should log a warning.
+          scope1.exit({sloppy: true});
 
-            // This call would log a warning.
-            scope.exit({sloppy: true});
+          // ---
 
-            // ---
+          expect(logger.warn).not.toHaveBeenCalled();
 
-            expect(logger.warn).not.toHaveBeenCalled();
-          });
-        });
-      });
-
-      testUtils.itAsync("should log a warning when called and not current", function() {
-
-        return require.using([
-          "pentaho/type/Context",
-          "pentaho/type/changes/Transaction",
-          "pentaho/type/changes/AbstractTransactionScope",
-          "pentaho/util/logger"
-        ], mockLogger, function(Context, Transaction, AbstractTransactionScope, logger) {
-
-          return Context.createAsync().then(function(context) {
-
-            var txn    = new Transaction(context);
-            var scope1 = new AbstractTransactionScope(context, txn);
-            var scope2 = new AbstractTransactionScope(context, txn);
-
-            expect(scope1.isInside ).toBe(true);
-            expect(scope1.isCurrent).toBe(false);
-
-            expect(scope2.isCurrent).toBe(true);
-
-            // This call is not legal and should log a warning.
-            scope1.exit();
-
-            // ---
-
-            expect(logger.warn).toHaveBeenCalled();
-
-            scope2.exit();
-          });
-        });
-      });
-
-      testUtils.itAsync("should not log a warning when called and not current, if keyArgs.sloppy is true", function() {
-
-        return require.using([
-          "pentaho/type/Context",
-          "pentaho/type/changes/Transaction",
-          "pentaho/type/changes/AbstractTransactionScope",
-          "pentaho/util/logger"
-        ], mockLogger, function(Context, Transaction, AbstractTransactionScope, logger) {
-
-          return Context.createAsync().then(function(context) {
-
-            var txn    = new Transaction(context);
-            var scope1 = new AbstractTransactionScope(context, txn);
-            var scope2 = new AbstractTransactionScope(context, txn);
-
-            expect(scope1.isInside ).toBe(true);
-            expect(scope1.isCurrent).toBe(false);
-
-            expect(scope2.isCurrent).toBe(true);
-
-            // This call is not legal and should log a warning.
-            scope1.exit({sloppy: true});
-
-            // ---
-
-            expect(logger.warn).not.toHaveBeenCalled();
-
-            scope2.exit();
-          });
+          scope2.exit();
         });
       });
     });
 
     describe("#dispose()", function() {
 
-      beforeEach(function(done) {
-        Context.createAsync()
-            .then(function(_context) {
-              context = _context;
-            })
-            .then(done, done.fail);
-      });
-
       it("should call exit with keyArgs.sloppy = true", function() {
 
-        var txn = new Transaction(context);
-        var scope = new AbstractTransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope = new AbstractTransactionScope(txn);
 
         spyOn(scope, "exit").and.callThrough();
 
@@ -318,17 +260,9 @@ define([
       var txn;
       var scope;
 
-      beforeEach(function(done) {
-        Context.createAsync()
-            .then(function(_context) {
-              context = _context;
-            })
-            .then(done, done.fail);
-      });
-
       beforeEach(function() {
-        txn = new Transaction(context);
-        scope = new AbstractTransactionScope(context, txn);
+        txn = new Transaction();
+        scope = new AbstractTransactionScope(txn);
       });
 
       afterEach(function() {
@@ -337,7 +271,6 @@ define([
           scope = null;
         }
         txn = null;
-        context = null;
       });
 
       it("should call the specified function", function() {
@@ -420,17 +353,9 @@ define([
 
     describe("#_assertInsideAndCurrent()", function() {
 
-      beforeEach(function(done) {
-        Context.createAsync()
-            .then(function(_context) {
-              context = _context;
-            })
-            .then(done, done.fail);
-      });
-
       it("should not throw when inside and current", function() {
-        var txn = new Transaction(context);
-        var scope = new AbstractTransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope = new AbstractTransactionScope(txn);
 
         expect(function() {
           scope._assertInsideAndCurrent();
@@ -440,9 +365,9 @@ define([
       });
 
       it("should throw when inside but not current", function() {
-        var txn = new Transaction(context);
-        var scope1 = new AbstractTransactionScope(context, txn);
-        var scope2 = new AbstractTransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope1 = new AbstractTransactionScope(txn);
+        var scope2 = new AbstractTransactionScope(txn);
 
         expect(function() {
           scope1._assertInsideAndCurrent();
@@ -453,8 +378,8 @@ define([
       });
 
       it("should throw when not inside", function() {
-        var txn = new Transaction(context);
-        var scope = new AbstractTransactionScope(context, txn);
+        var txn = new Transaction();
+        var scope = new AbstractTransactionScope(txn);
 
         scope.exit();
 

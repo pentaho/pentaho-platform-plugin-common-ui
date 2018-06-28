@@ -14,19 +14,35 @@
  * limitations under the License.
  */
 define([
+  // Core
+  "pentaho/config/service",
+  "pentaho/module/service",
+  "pentaho/module/metaService",
+  "pentaho/module/metaOf",
+  "pentaho/module/subtypeOf",
+  "pentaho/module/subtypesOf",
+  "pentaho/module/instanceOf",
+  "pentaho/module/instancesOf",
+
+  // Type API
+  "pentaho/type/loader",
+
+  // Data API
   "pentaho/data/Table",
   "pentaho/data/TableView",
   "pentaho/data/filter/standard",
 
-  "pentaho/config/impl/instanceOfAmdLoadedService",
-  "pentaho/type/Context",
-  "pentaho/visual/base/model",
-  "pentaho/visual/base/view",
-  "pentaho/visual/base/modelAdapter",
+  // Viz. API
+  "pentaho/visual/base/Model",
+  "pentaho/visual/base/View",
+  "pentaho/visual/base/ModelAdapter",
   "pentaho/visual/color/utils",
   "pentaho/visual/color/palettes/all",
-  "pentaho/visual/role/adaptation/allStrategies",
   "pentaho/visual/models/all",
+  "pentaho/visual/role/adaptation/allStrategies",
+  "pentaho/visual/scene/Base",
+
+  // CCC views
   "pentaho/ccc/visual/all"
 ], function() {
   "use strict";

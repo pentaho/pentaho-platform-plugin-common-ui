@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 define([
-  "../../lang/Event",
-  "../mixins/_mixinChangeset",
-  "../mixins/mixinError"
-], function(Event, mixinChangeset, mixinError) {
+  "module",
+  "pentaho/lang/Event",
+  "../mixins/changeset",
+  "../mixins/error"
+], function(module, Event, changesetMixin, errorMixin) {
   "use strict";
 
   /**
@@ -25,8 +26,8 @@ define([
    * @memberOf pentaho.type.events
    * @class
    * @extends pentaho.lang.Event
-   * @mixes pentaho.type.mixins.mixinError
-   * @mixes pentaho.type.mixins._mixinChangeset
+   * @mixes pentaho.type.mixins.error
+   * @mixes pentaho.type.mixins.changeset
    *
    * @classDesc This event is emitted when changes in complex or list values are rejected.
    *
@@ -38,7 +39,7 @@ define([
    * @param {!Error|pentaho.lang.UserError} error - The error of a rejected
    * {@link pentaho.lang.ActionResult|ActionResult}.
    */
-  return Event.extend("pentaho.type.events.RejectedChange", /** @lends pentaho.type.events.RejectedChange# */{
+  return Event.extend(module.id, /** @lends pentaho.type.events.RejectedChange# */{
 
     constructor: function(source, changeset, error) {
       this.base("rejected:change", source, false);
@@ -47,7 +48,7 @@ define([
     }
 
   })
-  .implement(mixinChangeset)
-  .implement(mixinError);
+  .implement(changesetMixin)
+  .implement(errorMixin);
 
 });

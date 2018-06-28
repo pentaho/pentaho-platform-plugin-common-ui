@@ -15,9 +15,9 @@
  */
 define([
   "module",
-  "../lang/Base",
-  "../util/object",
-  "../util/error"
+  "pentaho/lang/Base",
+  "pentaho/util/object",
+  "pentaho/util/error"
 ], function(module, Base, O, error) {
 
   "use strict";
@@ -42,9 +42,8 @@ define([
    * [SpecificationContext.current]{@link pentaho.type.SpecificationContext.current}.
    *
    * Methods like
-   * [Instance#toSpec]{@link pentaho.type.Instance#toSpec},
-   * [Type#toSpec]{@link pentaho.type.Type#toSpec} and
-   * [Type#toRef]{@link pentaho.type.Type#toRef}
+   * [Instance#toSpec]{@link pentaho.type.Instance#toSpec} and
+   * [Type#toSpec]{@link pentaho.type.Type#toSpec}
    * use the ambient specification context, when set,
    * to provide context to the serialization process.
    * When not set, these create a new specification context and

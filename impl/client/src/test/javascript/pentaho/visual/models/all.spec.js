@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2017 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,32 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "pentaho/type/Context"
-], function(Context) {
+define(function() {
 
   "use strict";
 
-  /* globals describe, it, expect, beforeEach */
-
   describe("pentaho.visual.models", function() {
 
-    it("should be possible to load all models", function(done) {
+    it("should be possible to load all models", function() {
 
-      Context.createAsync()
-          .then(function(context) {
-            return context.getAllAsync("pentaho/visual/base/model");
-          })
-          .then(done, done.fail);
+      require.using(["pentaho/module/subtypesOf!pentaho/visual/base/Model"], function() {
+        // NOOP
+      });
     });
 
-    it("should be possible to load the sample calc model", function(done) {
+    it("should be possible to load the sample calc model", function() {
 
-      Context.createAsync()
-          .then(function(context) {
-            return context.getAsync("pentaho/visual/samples/calc/model");
-          })
-          .then(done, done.fail);
+      require.using(["pentaho/visual/samples/calc/Model"], function() {
+        // NOOP
+      });
     });
   });
 });

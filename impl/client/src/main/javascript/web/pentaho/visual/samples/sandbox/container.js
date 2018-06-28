@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/visual/base/View",
   "pentaho/data/Table"
-], function(Context, Table) {
+], function(BaseView, Table) {
 
   "use strict";
 
@@ -38,7 +38,7 @@ define([
     height: 100,
     domContainer: sandboxContainer,
     model: {
-      _: "pentaho/visual/samples/calc/model",
+      _: "pentaho/visual/samples/calc/Model",
       data: dataTable,
       levels: {
         fields: ["family"]
@@ -51,26 +51,17 @@ define([
   };
 
   // Export for users to play with.
-  window.app = {context: null, view: null};
+  window.app = {view: null};
 
-  Context.createAsync()
-      .then(function(context) {
+  BaseView.createAsync(viewSpec)
+    .then(function(view) {
 
-        window.app.context = context;
+      window.app.view = view;
 
-        return context.getAsync("pentaho/visual/base/view");
-      })
-      .then(function(View) {
-        return View.createAsync(viewSpec);
-      })
-      .then(function(view) {
-
-        window.app.view = view;
-
-        return view.update();
-      })
-      .then(function() {
-        console.log("view update finished");
-      });
+      return view.update();
+    })
+    .then(function() {
+      console.log("View update finished");
+    });
 
 });
