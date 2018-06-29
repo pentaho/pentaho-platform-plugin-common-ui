@@ -237,6 +237,14 @@
         "base": "pentaho/visual/role/adaptation/Strategy",
         "ranking": -5
       },
+      "pentaho/visual/role/adaptation/EntityWithNumberKeyStrategy": {
+        "base": "pentaho/visual/role/adaptation/Strategy",
+        "ranking": -5
+      },
+      "pentaho/visual/role/adaptation/CombineStrategy": {
+        "base": "pentaho/visual/role/adaptation/Strategy",
+        "ranking": -5
+      },
       "pentaho/visual/role/adaptation/IdentityStrategy": {
         "base": "pentaho/visual/role/adaptation/Strategy",
         "ranking": -10

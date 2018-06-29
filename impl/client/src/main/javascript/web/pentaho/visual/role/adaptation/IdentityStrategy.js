@@ -51,10 +51,9 @@ define([
      */
     constructor: function(instSpec) {
 
-      instSpec = Object.create(instSpec);
-      instSpec.outputFieldIndexes = instSpec.inputFieldIndexes;
-
       this.base(instSpec);
+
+      this._setOutputFieldIndexes(this.inputFieldIndexes);
 
       // Created lazily by #__installIndex, when/if needed.
       this.__index = null;

@@ -42,7 +42,8 @@ define([
         "hour",
         "minute",
         "second",
-        "millisecond"
+        "millisecond",
+        "instant"
       ]
     }
   }).configure({$type: module.config});

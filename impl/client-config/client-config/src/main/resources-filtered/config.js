@@ -215,12 +215,25 @@ define(["require"], function(localRequire) {
       },
       */
 
-      // Example Rule 9 - Disable hierarchical dates strategy, to revert
+      // Example Rule 9 - Disable the continuous date strategy, to revert
       // to the old behavior (Before 8.1) that represents Time dimensions in a discrete axis.
       /*
       {
         select: {
           module: "pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy"
+        },
+        apply: {
+          isBrowsable: false
+        }
+      },
+      */
+
+      // Example Rule 10 - Disable the continuous number strategy, to revert to
+      // representing dimensions having a number keys in a discrete axis.
+      /*
+      {
+        select: {
+          module: "pentaho/visual/role/adaptation/EntityWithNumberKeyStrategy"
         },
         apply: {
           isBrowsable: false

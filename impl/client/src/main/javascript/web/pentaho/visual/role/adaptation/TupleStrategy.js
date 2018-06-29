@@ -164,10 +164,9 @@ define([
      */
     constructor: function(instSpec) {
 
-      instSpec = Object.create(instSpec);
-      instSpec.outputFieldIndexes = instSpec.inputFieldIndexes;
-
       this.base(instSpec);
+
+      this._setOutputFieldIndexes(this.inputFieldIndexes);
 
       /**
        * Gets the array of function which extract the key of the value of each column of `inputData`.
@@ -176,7 +175,7 @@ define([
        * @readOnly
        * @private
        */
-      this.__keyFuns = __createKeyFuns.call(this);
+      this.__keyFuns = this._createFieldsKeyFuns(this.inputFieldIndexes);
 
       /**
        * Gets the tree index.
@@ -277,27 +276,6 @@ define([
   .configure({$type: module.config});
 
   return TupleStrategy;
-
-  /**
-   * Creates the key functions for the values of all of the columns.
-   *
-   * @memberOf pentaho.visual.role.adaptation.TupleStrategy#
-   *
-   * @return {Array.<(function(any) : string)>} The array of key functions.
-   * @private
-   */
-  function __createKeyFuns() {
-    var inputData = this.data;
-    var fieldIndexes = this.inputFieldIndexes;
-    var fieldCount = fieldIndexes.length;
-    var keys = new Array(fieldCount);
-    var index = fieldCount;
-    while(index--) {
-      keys[index] = O.getSameTypeKeyFun(inputData.getColumnType(fieldIndexes[index]));
-    }
-
-    return keys;
-  }
 
   /**
    * Trims `undefined` values from the right of an array.
