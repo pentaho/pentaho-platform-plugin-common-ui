@@ -45,7 +45,7 @@ define([
           var index = baseUrl.lastIndexOf("/");
           if(index !== baseUrl.length - 1) {
             // Leave the /
-            baseUrl = baseUrl.substring(0, index);
+            baseUrl = baseUrl.substring(0, index + 1);
           }
 
           bundleUrl = baseUrl + bundleUrl;
