@@ -4,6 +4,10 @@
 
   "preferGlobal": true,
 
+  "dependencies": {
+    "@pentaho/cdf": "${pentaho-cdf-plugin.version}"
+  },
+
   "paths": {
     "common-ui": "/",
     "common-repo": "/repo",
