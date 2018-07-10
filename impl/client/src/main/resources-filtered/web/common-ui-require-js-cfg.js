@@ -69,7 +69,7 @@
     "_core", "shim", "util", "lang",
     "i18n", "data", "type",
     "visual", "config", "environment",
-    "debug", "ccc", "module", "platformBundle"
+    "debug", "ccc", "module", "platformBundle", "theme"
   ].forEach(function(name) {
     requirePaths["pentaho/" + name] = basePath + "/pentaho/" + name;
   });
@@ -77,20 +77,16 @@
   requirePackages.push({
     "name": "pentaho/module",
     "main": "metaOf"
-  });
-
-  requirePackages.push({
+  }, {
     "name": "pentaho/debug",
     "main": "manager"
-  });
-
-  requirePackages.push({
+  }, {
     "name": "pentaho/i18n",
     "main": "defaultService"
-  });
-
-  requirePackages.push({
+  }, {
     "name": "pentaho/environment"
+  }, {
+    "name": "pentaho/theme"
   });
 
   requireModules["pentaho/config/spec/IRuleSet"] = {base: null, isAbstract: true};

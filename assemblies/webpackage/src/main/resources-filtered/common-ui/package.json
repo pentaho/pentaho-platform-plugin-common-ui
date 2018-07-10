@@ -25,6 +25,7 @@
     "pentaho/visual": "/pentaho/visual",
     "pentaho/config": "/pentaho/config",
     "pentaho/environment": "/pentaho/environment",
+    "pentaho/theme": "/pentaho/theme",
     "pentaho/debug": "/pentaho/debug",
     "pentaho/ccc": "/pentaho/ccc",
     "pentaho/platformBundle": "/pentaho/platformBundle",
@@ -98,6 +99,7 @@
   "packages": [
     {"name": "pentaho/module", "main": "metaOf"},
     {"name": "pentaho/environment"},
+    {"name": "pentaho/theme"},
     {"name": "pentaho/i18n", "main": "defaultService"},
     {"name": "pentaho/debug", "main": "manager"}
   ],
