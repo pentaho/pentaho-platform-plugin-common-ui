@@ -856,7 +856,12 @@ define([
     return strategyApplicationA != null && strategyApplicationB != null &&
       strategyApplicationA.internalMode.equals(strategyApplicationB.internalMode) &&
       strategyApplicationA.externalMode.equals(strategyApplicationB.externalMode) &&
-      strategyApplicationA.strategyType === strategyApplicationB.strategyType;
+      strategyApplicationA.strategyType === strategyApplicationB.strategyType &&
+
+      strategyApplicationA.externalFieldIndexes.length === strategyApplicationB.externalFieldIndexes.length &&
+      strategyApplicationA.externalFieldIndexes.every(function(fieldIndex, index) {
+        return strategyApplicationB.externalFieldIndexes[index] === fieldIndex;
+      });
   }
 
   // endregion
