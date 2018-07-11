@@ -635,7 +635,29 @@ define([
 
           // ---
 
-          var strategy2 = modelAdapter.roleA.adapter;
+          var strategy2 = modelAdapter.roleA.strategy;
+          var strategyType2 = modelAdapter.__adaptationModel.roleInfoMap.roleA.strategyApplication.strategyType;
+
+          expect(strategy2).not.toBe(null);
+
+          expect(strategyType2).toBe(strategyType1);
+          expect(strategy2).not.toBe(strategy1);
+        });
+
+        it("should update the strategy even if the same strategy type and modes are being used", function() {
+
+          var strategy1 = modelAdapter.roleA.strategy;
+          var strategyType1 = modelAdapter.__adaptationModel.roleInfoMap.roleA.strategyApplication.strategyType;
+
+          expect(strategy1).not.toBe(null);
+
+          // ---
+
+          modelAdapter.roleA.fields = ["product"];
+
+          // ---
+
+          var strategy2 = modelAdapter.roleA.strategy;
           var strategyType2 = modelAdapter.__adaptationModel.roleInfoMap.roleA.strategyApplication.strategyType;
 
           expect(strategy2).not.toBe(null);
