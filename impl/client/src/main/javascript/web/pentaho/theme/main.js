@@ -80,7 +80,7 @@ define([
           : normalizedName;
 
         configService.selectAsync("pentaho/theme!" + targetModuleId)
-          .then(function(themeConfig) { return loadTheme(themeConfig, targetModuleId); })
+          .then(loadTheme)
           .then(function() { onLoad(); }, onLoad.error);
       }
     },
@@ -104,21 +104,20 @@ define([
    * Gets the theme modules corresponding to a theme configuration.
    *
    * @param {?pentaho.theme.spec.IConfiguration} themeConfig - The theme configuration.
-   * @param {string} targetModuleId - The module to which theme modules are relative.
    * @return {Array.<string>} An array of theme module identifiers.
    */
-  function getThemeModuleIds(themeConfig, targetModuleId) {
+  function getThemeModuleIds(themeConfig) {
 
     var themeModules = [];
 
     if(themeConfig !== null) {
       if(themeConfig.main) {
-        themeModules.push(moduleUtil.resolveModuleId(themeConfig.main, targetModuleId));
+        themeModules.push(themeConfig.main);
       }
 
       if(themeConfig.extensions) {
         themeConfig.extensions.forEach(function(extensionId) {
-          themeModules.push(moduleUtil.resolveModuleId(extensionId, targetModuleId));
+          themeModules.push(extensionId);
         });
       }
     }
@@ -130,11 +129,10 @@ define([
    * Loads a theme given its configuration.
    *
    * @param {?pentaho.theme.spec.IConfiguration} themeConfig - The theme configuration.
-   * @param {string} targetModuleId - The module to which theme modules are relative.
    * @return {Promise} A promise that is resolved when the theme, if any, has been loaded.
    */
-  function loadTheme(themeConfig, targetModuleId) {
-    var themeModuleIds = getThemeModuleIds(themeConfig, targetModuleId);
+  function loadTheme(themeConfig) {
+    var themeModuleIds = getThemeModuleIds(themeConfig);
     if(themeModuleIds.length === 0) {
       return Promise.resolve();
     }

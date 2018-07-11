@@ -25,9 +25,7 @@
  */
 
 /**
- * The identifier of the main theme module.
- *
- * When relative, it is relative to the module being themed.
+ * The absolute identifier of the main theme module.
  *
  * @name main
  * @memberOf pentaho.theme.spec.IConfiguration#
@@ -35,9 +33,7 @@
  */
 
 /**
- * The identifiers of the extension theme modules.
- *
- * When relative, these are relative to the module being themed.
+ * The absolute identifiers of the extension theme modules.
  *
  * @name extensions
  * @memberOf pentaho.theme.spec.IConfiguration#

@@ -259,26 +259,6 @@ define([
         themePlugin.load(name, requesterRequire, onLoad, config);
       });
 
-      it("should load relative main theme module", function(done) {
-
-        var config = {};
-        var requesterRequire = function() {};
-
-        configService.selectAsync.and.returnValue(Promise.resolve({
-          main: "./themeA"
-        }));
-
-        var onLoad = createOnLoad(done, true, function() {
-          expect(moduleUtil.resolveModuleId).toHaveBeenCalledTimes(1);
-          expect(moduleUtil.resolveModuleId).toHaveBeenCalledWith("./themeA", "test/abc");
-
-          expect(localRequire.defined("test/themeA")).toBe(true);
-        });
-        var name = "test/abc";
-
-        themePlugin.load(name, requesterRequire, onLoad, config);
-      });
-
       it("should load the extension theme modules", function(done) {
 
         var config = {};
@@ -289,28 +269,6 @@ define([
         }));
 
         var onLoad = createOnLoad(done, true, function() {
-          expect(localRequire.defined("test/themeB")).toBe(true);
-          expect(localRequire.defined("test/themeC")).toBe(true);
-        });
-        var name = "test/abc";
-
-        themePlugin.load(name, requesterRequire, onLoad, config);
-      });
-
-      it("should load relative extension theme modules", function(done) {
-
-        var config = {};
-        var requesterRequire = function() {};
-
-        configService.selectAsync.and.returnValue(Promise.resolve({
-          extensions: ["./themeB", "./themeC"]
-        }));
-
-        var onLoad = createOnLoad(done, true, function() {
-          expect(moduleUtil.resolveModuleId).toHaveBeenCalledTimes(2);
-          expect(moduleUtil.resolveModuleId).toHaveBeenCalledWith("./themeB", "test/abc");
-          expect(moduleUtil.resolveModuleId).toHaveBeenCalledWith("./themeC", "test/abc");
-
           expect(localRequire.defined("test/themeB")).toBe(true);
           expect(localRequire.defined("test/themeC")).toBe(true);
         });
