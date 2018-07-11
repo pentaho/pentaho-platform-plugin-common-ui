@@ -21,10 +21,9 @@ define([
   "./module/InstanceMeta",
   "./module/TypeMeta",
   "./module/Service",
-  "./config/Service",
-  "../module/util"
+  "./config/Service"
 ], function(localRequire, module, moduleMetaServiceFactory, moduleMetaFactory, instanceModuleMetaFactory,
-            typeModuleMetaFactory, ModuleService, configurationServiceFactory, moduleUtil) {
+            typeModuleMetaFactory, ModuleService, configurationServiceFactory) {
 
   "use strict";
 

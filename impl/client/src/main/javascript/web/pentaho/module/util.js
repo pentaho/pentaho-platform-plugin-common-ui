@@ -88,10 +88,9 @@ define([
      *
      * Afterwards, any applicable RequireJS contextual mapping configuration is applied.
      *
-     * @param {string} moduleId - The module to be resolved.
+     * @param {string} moduleId - The identifier of the module to be resolved.
      * @param {?string} dependentId - The module that depends on `moduleId`.
-     *
-     * @return {string} The resolved module.
+     * @return {string} The identifier of the resolved module.
      */
     resolveModuleId: function(moduleId, dependentId) {
 

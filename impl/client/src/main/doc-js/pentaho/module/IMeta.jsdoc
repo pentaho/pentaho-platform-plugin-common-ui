@@ -138,3 +138,18 @@
  *
  * @see pentaho.module.IMeta#config
  */
+
+/**
+ * Resolves a module identifier as if it were a dependency of this one.
+ *
+ * Resolving makes `moduleId` absolute, relative to this one.
+ *
+ * Afterwards, any applicable RequireJS contextual mapping configuration is applied.
+ *
+ * @name resolveId
+ * @memberOf pentaho.module.IMeta#
+ * @param {string} moduleId - The identifier of the module to be resolved.
+ * @return {string} The identifier of the resolved module.
+ *
+ * @see pentaho.module.util.resolveModuleId
+ */
