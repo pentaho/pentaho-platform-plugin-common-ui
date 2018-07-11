@@ -27,6 +27,8 @@ define([
     var localRequire;
     var DebugLevels;
     var Promise;
+    var moduleUtil;
+
     beforeEach(function() {
       localRequire = require.new();
 
@@ -36,11 +38,13 @@ define([
 
       return localRequire.promise([
         "pentaho/debug/Levels",
-        "pentaho/shim/es6-promise"
+        "pentaho/shim/es6-promise",
+        "pentaho/module/util"
       ])
       .then(function(deps) {
         DebugLevels = deps[0];
         Promise = deps[1];
+        moduleUtil = deps[2];
       });
     });
 
@@ -72,11 +76,6 @@ define([
 
     function createLoggerMock() {
       return jasmine.createSpyObj("logger", ["info", "error"]);
-    }
-
-    function createModuleMetaServiceMock() {
-      var moduleMetaService = jasmine.createSpyObj("moduleMetaService", ["get"]);
-      return moduleMetaService;
     }
 
     describe("new Meta(id, spec)", function() {
@@ -612,6 +611,32 @@ define([
         meta.__configure(configSpec);
 
         expect(meta.ranking).toBe(2);
+      });
+    });
+
+    xdescribe("#resolveId(moduleId)", function() {
+
+      var Meta;
+
+      beforeEach(function() {
+        return localRequire.promise(["pentaho/_core/module/Meta"])
+          .then(function(deps) {
+            var metaFactory = deps[0];
+            Meta = metaFactory(createCoreMock());
+          });
+      });
+
+      it("should call moduleUtil.resolveModuleId", function() {
+        var spec = {};
+        var meta = new Meta(id, spec);
+
+        spyOn(moduleUtil, "resolveModuleId").and.returnValue("test/xyz");
+
+        var result = meta.resolveId("./dudu");
+
+        expect(moduleUtil.resolveModuleId).toHaveBeenCalledTimes(1);
+        expect(moduleUtil.resolveModuleId).toHaveBeenCalledWith("./dudu", id);
+        expect(result).toBe("test/xyz");
       });
     });
   });

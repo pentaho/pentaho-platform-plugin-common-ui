@@ -22,8 +22,9 @@ define([
   "../../util/logger",
   "../../util/promise",
   "../../util/text",
-  "../../util/fun"
-], function(localRequire, module, Base, debugMgr, DebugLevels, logger, promiseUtil, textUtil, F) {
+  "../../util/fun",
+  "../../module/util"
+], function(localRequire, module, Base, debugMgr, DebugLevels, logger, promiseUtil, textUtil, F, moduleUtil) {
 
   "use strict";
 
@@ -120,6 +121,10 @@ define([
         if("ranking" in configSpec) {
           this.ranking = +configSpec.ranking || 0;
         }
+      },
+
+      resolveId: function(moduleId) {
+        return moduleUtil.resolveModuleId(moduleId, this.id);
       },
 
       // region Value
