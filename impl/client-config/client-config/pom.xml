@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
-    <artifactId>common-ui-impl-client-config-umbrella</artifactId>
     <groupId>org.pentaho</groupId>
-    <version>7.1-SNAPSHOT</version>
+    <artifactId>common-ui-impl-client-config-umbrella</artifactId>
+    <version>7.1.0.14-149</version>
   </parent>
-
   <artifactId>common-ui-impl-client-config</artifactId>
+  <version>7.1.0.14-149</version>
   <packaging>bundle</packaging>
-
   <properties>
-    <project.amd-module>pentaho/config/deploy</project.amd-module>
     <configuration-bundles.classifier>configuration-bundle</configuration-bundles.classifier>
+    <project.amd-module>pentaho/config/deploy</project.amd-module>
   </properties>
-
   <build>
     <resources>
       <resource>
@@ -38,48 +34,32 @@
         </includes>
       </resource>
     </resources>
-
     <plugins>
       <plugin>
-        <!-- The plugin is causing [WARNING] Unused Private-Package instructions, no such package(s) on the class path
-        due to https://issues.apache.org/jira/browse/FELIX-5163 -->
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <version>${maven-bundle-plugin.version}</version>
         <extensions>true</extensions>
-
-        <configuration>
-          <!-- just a way to distinguish artifacts intended to be exploded configuration bundles -->
-          <classifier>${configuration-bundles.classifier}</classifier>
-
-          <archive>
-            <!-- no need to include the pom.xml and pom.properties, reduces the boilerplate of the exploded bundle -->
-            <addMavenDescriptor>false</addMavenDescriptor>
-          </archive>
-
-          <instructions>
-            <!-- use META-INF instead of the default OSGI-INF folder, again for reducing the amount of boilerplate -->
-            <Bundle-Blueprint>META-INF/blueprint/blueprint.xml</Bundle-Blueprint>
-          </instructions>
-        </configuration>
-
-        <!-- The deployment of the artifact with classifier (and no primary artifact) by
-        maven-bundle-plugin:install (default-install) generates an ERROR No artifact found.
-
-        The overall build doesn't fail, but those executions aren't really needed has we don't use any OBR. -->
         <executions>
           <execution>
             <id>default-install</id>
             <phase>none</phase>
           </execution>
-
           <execution>
             <id>default-deploy</id>
             <phase>none</phase>
           </execution>
         </executions>
+        <configuration>
+          <classifier>${configuration-bundles.classifier}</classifier>
+          <archive>
+            <addMavenDescriptor>false</addMavenDescriptor>
+          </archive>
+          <instructions>
+            <Bundle-Blueprint>META-INF/blueprint/blueprint.xml</Bundle-Blueprint>
+          </instructions>
+        </configuration>
       </plugin>
     </plugins>
   </build>
-
 </project>
