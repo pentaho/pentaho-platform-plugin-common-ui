@@ -87,7 +87,7 @@ define([
         model.__adaptationModel = adaptationModel;
       } catch(ex) {
         if(debugMgr.testLevel(DebugLevels.error, module)) {
-          logger.log("ModelAdapterChangeset apply failed: " + (ex && ex.message));
+          logger.error("ModelAdapterChangeset apply failed: " + (ex && ex.message));
         }
       }
     }
@@ -361,7 +361,18 @@ define([
     __calcInternalSelectionFilter: function() {
       var externalSelectionFilter = this.selectionFilter;
       if(externalSelectionFilter !== null) {
-        return this._convertFilterToInternal(externalSelectionFilter);
+        try {
+          return this._convertFilterToInternal(externalSelectionFilter);
+        } catch(ex) {
+          // Sometimes it is not possible to convert the filter cause, for example,
+          // the data is not present anymore. Just return null.
+          if(debugMgr.testLevel(DebugLevels.info, module)) {
+            logger.info("It was not possible to convert external selection filter: " + (ex && ex.message));
+          }
+
+          return null;
+        }
+
       }
 
       return null;
@@ -375,7 +386,17 @@ define([
     __calcExternalSelectionFilter: function() {
       var internalSelectionFilter = this.model.selectionFilter;
       if(internalSelectionFilter !== null) {
-        return this._convertFilterToExternal(internalSelectionFilter);
+        try {
+          return this._convertFilterToExternal(internalSelectionFilter);
+        } catch(ex) {
+          // Sometimes it is not possible to convert the filter cause, for example,
+          // the data is not present anymore. Just return null.
+          if(debugMgr.testLevel(DebugLevels.info, module)) {
+            logger.info("It was not possible to convert internal selection filter: " + (ex && ex.message));
+          }
+
+          return null;
+        }
       }
 
       return null;
