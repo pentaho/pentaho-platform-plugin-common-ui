@@ -15,18 +15,19 @@
  */
 
 define([
+  "module",
   "./PrimitiveChange"
-], function(PrimitiveChange) {
+], function(module, PrimitiveChange) {
   "use strict";
 
-  return PrimitiveChange.extend("pentaho.type.changes.Sort", /** @lends pentaho.type.changes.Sort# */{
+  return PrimitiveChange.extend(module.id, /** @lends pentaho.type.changes.Sort# */{
 
     /**
      * @alias Sort
      * @memberOf pentaho.type.changes
      * @class
      * @extends pentaho.type.changes.PrimitiveChange
-     * @amd pentaho/type/changes/sort
+     * @amd pentaho/type/changes/Sort
      *
      * @classDesc The `Sort` class describes the primitive operation that sorts the element in a list.
      *

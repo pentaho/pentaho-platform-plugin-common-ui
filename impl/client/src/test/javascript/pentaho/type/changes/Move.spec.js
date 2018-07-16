@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Complex",
+  "pentaho/type/List",
+  "pentaho/type/Number",
+  "pentaho/type/changes/Transaction",
   "pentaho/type/changes/Move"
-], function(Context, Move) {
+], function(Complex, List, PentahoNumber, Transaction, Move) {
 
   "use strict";
 
@@ -24,24 +27,26 @@ define([
 
   describe("pentaho.type.changes.Move", function() {
 
-    var context, List, NumberList, DerivedComplex, ComplexList;
+    var NumberList;
+    var DerivedComplex;
+    var ComplexList;
 
-    beforeEach(function(done) {
-      Context.createAsync()
-          .then(function(_context) {
-            context = _context;
-            List = context.get(["element"]);
+    beforeAll(function() {
+      NumberList = List.extend({
+        $type: {of: PentahoNumber}
+      });
 
-            NumberList = context.get(["number"]);
+      DerivedComplex = Complex.extend({
+        $type: {
+          props: [
+            {name: "foo", valueType: PentahoNumber}
+          ]
+        }
+      });
 
-            DerivedComplex = context.get({
-              props: [
-                {name: "foo", valueType: "number"}
-              ]
-            });
-            ComplexList = context.get([DerivedComplex]);
-          })
-          .then(done, done.fail);
+      ComplexList = List.extend({
+        $type: {of: DerivedComplex}
+      });
     });
 
     it("should be defined", function() {
@@ -59,7 +64,7 @@ define([
       var scope;
 
       beforeEach(function() {
-        scope = context.enterChange();
+        scope = Transaction.enter();
       });
 
       afterEach(function() {
@@ -220,7 +225,7 @@ define([
       var scope;
 
       beforeEach(function() {
-        scope = context.enterChange();
+        scope = Transaction.enter();
       });
 
       afterEach(function() {

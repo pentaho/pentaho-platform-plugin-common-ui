@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+cp -r $(dirname $0)/sandbox/* .
+cp $(dirname $0)/sandbox/.npmignore .

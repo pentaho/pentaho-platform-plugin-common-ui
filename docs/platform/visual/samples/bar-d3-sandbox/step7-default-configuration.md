@@ -29,9 +29,9 @@ Now, create a configuration file, called `config.js`, and place the following co
 
 ```js
 define(["module"], function(module) {
-  // Replace /config by /model.
-  // e.g. "pentaho-visual-samples-bar-d3/model".
-  var vizId = module.id.replace(/(\w+)$/, "model");
+  // Replace /config by /Model.
+  // e.g. "pentaho-visual-samples-bar-d3/Model".
+  var vizId = module.id.replace(/(\w+)$/, "Model");
 
   return {
     rules: [
@@ -39,7 +39,7 @@ define(["module"], function(module) {
       {
         priority: -1,
         select: {
-          type: vizId
+          module: vizId
         },
         apply: {
           props: {
@@ -61,8 +61,8 @@ We'll use the Sandbox environment to make sure.
 ## Register the configuration module in the sandbox
 
 It is still necessary to register the configuration module with the configuration system.
-For such, edit the `package.json` file and add a [`pentaho/instanceInfo`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.instanceInfo'}})
-configuration so that your file looks like this:
+For such, edit the `package.json` file and add a `pentaho/modules` configuration 
+so that your file looks like this:
 
 ```json
 {
@@ -70,14 +70,12 @@ configuration so that your file looks like this:
   "version": "0.0.1",
 
   "config": {
-    "pentaho/typeInfo": {
-      "pentaho-visual-samples-bar-d3/model": {
-        "base": "pentaho/visual/base/model"
-      }
-    },
-    "pentaho/instanceInfo": {
+    "pentaho/modules": {
+      "pentaho-visual-samples-bar-d3/Model": {
+        "base": "pentaho/visual/base/Model"
+      }, 
       "pentaho-visual-samples-bar-d3/config": {
-        "type": "pentaho.config.spec.IRuleSet"
+        "type": "pentaho/config/spec/IRuleSet"
       }
     }
   },
@@ -89,7 +87,7 @@ configuration so that your file looks like this:
     "d3"
   ],
   "devDependencies": {
-    "@pentaho/viz-api": "https://github.com/pentaho/pentaho-platform-plugin-common-ui/releases/download/v3.0.0-beta2/pentaho-viz-api-v3.0.0.tgz"
+    "@pentaho/viz-api": "https://github.com/pentaho/pentaho-platform-plugin-common-ui/releases/download/v3.0.0-beta3/pentaho-viz-api-v3.0.0.tgz"
   }
 }
 ```
@@ -121,7 +119,7 @@ define(["module"], function(module) {
       {
         priority: -1,
         select: {
-          type: vizId,
+          module: vizId,
           application: "pentaho-analyzer"
         },
         apply: {

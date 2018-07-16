@@ -1,0 +1,12 @@
+{
+  "name": "@${js-package-scope}/${js-package-name}",
+  "version": "${js-package-version}",
+  "description": "Pentaho JavaScript APIs dev package",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "@pentaho/millenniumfalcon"
+  },
+  "dependencies": {
+    "requirejs": "^2.3.3"
+  }
+}

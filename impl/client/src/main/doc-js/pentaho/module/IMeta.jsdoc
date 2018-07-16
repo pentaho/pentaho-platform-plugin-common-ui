@@ -1,0 +1,155 @@
+/*!
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @classDesc The `IMeta` interface contains the metadata of a JavaScript module.
+ *
+ * A JavaScript module is identified by its [identifier]{@link pentaho.module.IMeta#id}.
+ *
+ * @name IMeta
+ * @memberOf pentaho.module
+ * @interface
+ *
+ * @see pentaho.module.ITypeMeta
+ * @see pentaho.module.IInstanceMeta
+ */
+
+/**
+ * Gets the identifier of the module.
+ *
+ * @name id
+ * @memberOf pentaho.module.IMeta#
+ * @type {nonEmptyString}
+ * @readOnly
+ */
+
+/**
+ * Gets the kind of module.
+ *
+ * One of the strings `"type"` or `"instance"`.
+ * @name kind
+ * @memberOf pentaho.module.IMeta#
+ * @type {nonEmptyString}
+ * @readOnly
+ */
+
+/**
+ * Gets the alias of the module.
+ *
+ * @name alias
+ * @memberOf pentaho.module.IMeta#
+ * @type {?nonEmptyString}
+ * @readOnly
+ */
+
+/**
+ * Gets the ranking of the module.
+ *
+ * The ranking determines the order of the module amongst other modules.
+ *
+ * @name ranking
+ * @memberOf pentaho.module.IMeta#
+ * @type {number}
+ * @readOnly
+ */
+
+/**
+ * Loads the module and returns a promise for its value.
+ *
+ * @name loadAsync
+ * @memberOf pentaho.module.IMeta#
+ * @method
+ * @return {!Promise} A promise for the value of the module.
+ *
+ * @see pentaho.module.IMeta#value
+ */
+
+/**
+ * Gets the value of the module, if it has been loaded already,
+ * or `undefined`, otherwise.
+ *
+ * @name value
+ * @memberOf pentaho.module.IMeta#
+ * @type {any}
+ * @readOnly
+ *
+ * @see pentaho.module.IMeta#isLoaded
+ * @see pentaho.module.IMeta#loadAsync
+ */
+
+/**
+ * Gets a value that indicates if the module's value is directly
+ * available through the `value` property.
+ *
+ * @name isLoaded
+ * @memberOf pentaho.module.IMeta#
+ * @type {boolean}
+ * @readOnly
+ *
+ * @see pentaho.module.IMeta#value
+ */
+
+/**
+ * Loads the configuration of the module and returns a promise for it.
+ *
+ * @name loadConfigAsync
+ * @memberOf pentaho.module.IMeta#
+ * @method
+ * @return {!Promise.<Object>} A promise for the configuration of the module.
+ *
+ * @see pentaho.module.IMeta#config
+ */
+
+/**
+ * Gets the configuration of the module.
+ *
+ * When not yet loaded, or if the module has no configuration,
+ * returns `null`.
+ *
+ * @name config
+ * @memberOf pentaho.module.IMeta#
+ * @type {Object}
+ * @readOnly
+ *
+ * @see pentaho.module.IMeta#isConfigLoaded
+ * @see pentaho.module.IMeta#loadConfigAsync
+ */
+
+/**
+ * Gets a value that indicates if the module's configuration has been loaded.
+ *
+ * @name isConfigLoaded
+ * @memberOf pentaho.module.IMeta#
+ * @type {boolean}
+ * @readOnly
+ *
+ * @see pentaho.module.IMeta#config
+ */
+
+/**
+ * Resolves a module identifier as if it were a dependency of this one.
+ *
+ * Resolving makes `moduleId` absolute, relative to this one.
+ *
+ * Afterwards, any applicable RequireJS contextual mapping configuration is applied.
+ *
+ * @name resolveId
+ * @memberOf pentaho.module.IMeta#
+ * @param {string} moduleId - The identifier of the module to be resolved.
+ * @return {string} The identifier of the resolved module.
+ *
+ * @see pentaho.module.util.resolveModuleId
+ */

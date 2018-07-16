@@ -56,7 +56,7 @@ define([
 
       var keyDataCellsMap = sceneUtil.invertVars(varsMap, model);
 
-      return dataUtil.createFilterFromCellsMap(keyDataCellsMap, model.data, model.$type.context);
+      return dataUtil.createFilterFromCellsMap(keyDataCellsMap, model.data);
     },
 
     /**

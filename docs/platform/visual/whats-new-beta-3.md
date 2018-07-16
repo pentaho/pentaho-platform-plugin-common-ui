@@ -15,7 +15,7 @@ You might also want to take a look at
 In this release, we simplified, once more, the syntax for declaring visual roles.
 
 Specifically, the two attributes `levels` and `dataType` which were used to define the _type of visual role_
-were replaced by a single [modes]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property.Type#modes'}})
+were replaced by a single [modes]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.PropertyType#modes'}})
 attribute.
 Instead of using explicit _levels of measurement_ terms to classify visual roles 
 (terms such as _quantitative_, _nominal_ and _ordinal_), 
@@ -96,7 +96,7 @@ Lets see some examples using the old and the new syntax.
          {
            name: "category",
            base: "pentaho/visual/role/property",
-           modes: [{dataType: "string"}]
+           modes: [{dataType: "string"}],
            fields: {
              isRequired: true 
              // or, equivalently:

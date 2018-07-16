@@ -1,7 +1,7 @@
 /*!
  * HITACHI VANTARA PROPRIETARY AND CONFIDENTIAL
  *
- * Copyright 2002 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2002 - 2018 Hitachi Vantara. All rights reserved.
  *
  * NOTICE: All information including source code contained herein is, and
  * remains the sole property of Hitachi Vantara and its licensors. The intellectual
@@ -20,13 +20,13 @@
  * explicitly covering such access.
  */
 
-
 load("${project.build.directory}/requireCfg.js");
-var output = "require.config("+JSON.stringify(requireCfg)+");";
 
-out = new java.io.FileWriter( "${project.build.directory}/requireCfg.js" );
+var output = "require.config(" + JSON.stringify(requireCfg) + ");";
+
+out = new java.io.FileWriter("${project.build.directory}/requireCfg.js");
 
 // Write the code to the file
-out.write( output, 0, output.length );
+out.write(output, 0, output.length);
 out.flush();
 out.close();

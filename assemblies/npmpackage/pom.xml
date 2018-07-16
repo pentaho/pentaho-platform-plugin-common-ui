@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.pentaho</groupId>
+    <artifactId>common-ui-assemblies</artifactId>
+    <version>9.0.0.0-SNAPSHOT</version>
+  </parent>
+
+  <properties>
+    <js-package-scope>pentaho</js-package-scope>
+    <js-package-name>viz-api</js-package-name>
+    <js-package-version>3.0.0</js-package-version>
+  </properties>
+
+  <artifactId>common-ui-npmpackage</artifactId>
+
+  <packaging>pom</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>pentaho</groupId>
+      <artifactId>common-ui</artifactId>
+      <version>${project.version}</version>
+      <classifier>js</classifier>
+      <type>zip</type>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeArtifactIds>common-ui</includeArtifactIds>
+              <includeClassifiers>js</includeClassifiers>
+              <includes>
+                common-ui/pentaho/**,
+                common-ui/util/require-*/**,
+                common-ui/*-cfg.js
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>assembly_package</id>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <tarLongFileMode>posix</tarLongFileMode>
+              <finalName>${js-package-scope}-${js-package-name}-${js-package-version}</finalName>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+
+</project>

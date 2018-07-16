@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 define([
-  "pentaho/lang/Base"
-], function(Base) {
+  "pentaho/visual/base/Model",
+  "pentaho/visual/base/ModelAdapter",
+  "pentaho/visual/role/adaptation/Strategy",
+  "pentaho/type/String",
+  "pentaho/type/List"
+], function(Model, ModelAdapter, BaseStrategy, PentahoString, List) {
 
   "use strict";
 
-  /* globals describe, it, beforeAll, beforeEach, afterEach, spyOn */
-
   return {
 
-    buildAdapter: function(ModelAdapter, DerivedModel, propsSpec) {
+    buildAdapter: function(DerivedModel, propsSpec) {
       return ModelAdapter.extend({
         $type: {
           props: [{name: "model", valueType: DerivedModel}].concat(propsSpec || [])
@@ -31,7 +33,7 @@ define([
       });
     },
 
-    createMocks: function(Model, ModelAdapter, BaseStrategy) {
+    createMocks: function() {
 
       var exports = {};
 
@@ -39,7 +41,7 @@ define([
         $type: {
           props: {
             roleA: {
-              base: "pentaho/visual/role/property",
+              base: "pentaho/visual/role/Property",
               modes: [
                 {dataType: "string"}
               ]
@@ -52,7 +54,7 @@ define([
         $type: {
           props: {
             roleA: {
-              base: "pentaho/visual/role/property",
+              base: "pentaho/visual/role/Property",
               modes: [
                 {dataType: ["string"]}
               ]
@@ -62,6 +64,13 @@ define([
       });
 
       exports.NullStrategy = BaseStrategy.extend({
+        constructor: function(instSpec) {
+
+          this.base(instSpec);
+
+          this._setOutputFieldIndexes(instSpec.outputFieldIndexes);
+        },
+
         $type: {
           getInputTypeFor: function() {
             return null;
@@ -72,15 +81,16 @@ define([
       // ---
 
       exports.ElementIdentityStrategy = BaseStrategy.extend({
+
         constructor: function(instSpec) {
 
-          instSpec = Object.create(instSpec);
-          instSpec.outputFieldIndexes = instSpec.inputFieldIndexes;
-
           this.base(instSpec);
+
+          this._setOutputFieldIndexes(instSpec.inputFieldIndexes);
         },
 
         map: function() {},
+        invert: function() {},
 
         $type: {
           getInputTypeFor: function(outputDataType, isVisualKey) {
@@ -107,13 +117,13 @@ define([
       exports.ListIdentityStrategy = BaseStrategy.extend({
         constructor: function(instSpec) {
 
-          instSpec = Object.create(instSpec);
-          instSpec.outputFieldIndexes = instSpec.inputFieldIndexes;
-
           this.base(instSpec);
+
+          this._setOutputFieldIndexes(instSpec.inputFieldIndexes);
         },
 
         map: function() {},
+        invert: function() {},
 
         $type: {
           getInputTypeFor: function(outputDataType, isVisualKey) {
@@ -140,9 +150,9 @@ define([
       exports.CombineStrategy = BaseStrategy.extend({
         constructor: function(instSpec) {
 
-          instSpec = Object.create(instSpec);
+          this.base(instSpec);
 
-          var data = instSpec.data;
+          var data = this.data;
 
           data.model.attributes.add({
             name: "combinedCol",
@@ -152,22 +162,20 @@ define([
 
           var outputFieldIndex = data.addColumn("combinedCol");
 
-          instSpec.outputFieldIndexes = [outputFieldIndex];
-
-          this.base(instSpec);
+          this._setOutputFieldIndexes([outputFieldIndex]);
         },
 
         map: function() {},
+        invert: function() {},
 
         $type: {
           getInputTypeFor: function(outputDataType, isVisualKey) {
-            var stringType = outputDataType.context.get("string").type;
 
-            if(!stringType.isSubtypeOf(outputDataType)) {
+            if(!PentahoString.type.isSubtypeOf(outputDataType)) {
               return null;
             }
 
-            return outputDataType.context.get("list").type;
+            return List.type;
           },
           validateApplication: function(schemaData, inputFieldIndexes) {
             return {isValid: true, addsFields: true};

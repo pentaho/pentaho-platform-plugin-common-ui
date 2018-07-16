@@ -1,0 +1,93 @@
+/*!
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @classDesc The `IService` interface represents a service that provides ways to load JavaScript modules
+ * depending on their type/instance relation to a given module.
+ *
+ * @name IService
+ * @memberOf pentaho.module
+ * @interface
+ * @see pentaho.module.IMetaService
+ */
+
+/**
+ * Gets a promise for the values of the modules which are known instances of a given type module.
+ *
+ * The modules' values are returned ordered descendingly by their [ranking]{@link pentaho.module.IMeta#ranking}.
+ *
+ * Modules which fail loading do not cause the operation to fail and are excluded from the result.
+ *
+ * @name getInstancesOfAsync
+ * @memberOf pentaho.module.IService#
+ * @method
+ * @param {string} typeIdOrAlias - The identifier or alias of the type module.
+ *
+ * @return {!Promise.<!Array>} A promise to an array of module values, possibly empty.
+ *
+ * @see pentaho.module.IMetaService#getInstancesOf
+ */
+
+/**
+ * Gets a promise for the value of the highest [ranking]{@link pentaho.module.IMeta#ranking}, successfully loaded module
+ * which is a known instance of a given type module.
+ *
+ * @name getInstanceOfAsync
+ * @memberOf pentaho.module.IService#
+ * @method
+ * @param {string} typeIdOrAlias - The identifier or alias of the type module.
+ *
+ * @return {!Promise} A promise for the value of a module, if any, or `undefined`, if none.
+ *
+ * @see pentaho.module.IMetaService#getInstanceOf
+ */
+
+// ---
+
+/**
+ * Gets a promise for the values of the modules which are known _descendant_ types of a given type module.
+ *
+ * The modules are returned ordered descendingly by their [ranking]{@link pentaho.module.IMeta#ranking}.
+ *
+ * The specified base type module is not included in the result.
+ *
+ * Modules which fail loading do not cause the operation to fail and are excluded from the result.
+ *
+ * @name getSubtypesOfAsync
+ * @memberOf pentaho.module.IService#
+ * @method
+ * @param {string} baseTypeIdOrAlias - The identifier or alias of the base type module.
+ *
+ * @return {!Promise.<!Array>} A promise to an array of module values, possibly empty.
+ *
+ * @see pentaho.module.IMetaService#getSubtypesOf
+ */
+
+/**
+ * Gets the value of the highest [ranking]{@link pentaho.module.IMeta#ranking}, successfully loaded module
+ * which is a known descendant type of a given type module.
+ *
+ * The specified base type module is not a possible result.
+ *
+ * @name getSubtypeOfAsync
+ * @memberOf pentaho.module.IService#
+ * @method
+ * @param {string} baseTypeIdOrAlias - The identifier or alias of the base type module.
+ *
+ * @return {!Promise} A promise for the value of a module, if any, or `undefined`, if none.
+ *
+ * @see pentaho.module.IMetaService#getSubtypeOf
+ */

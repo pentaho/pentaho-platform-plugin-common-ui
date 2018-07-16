@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 define([
-  "../../lang/Event",
-  "../mixins/_mixinChangeset"
-], function(Event, mixinChangeset) {
+  "module",
+  "pentaho/lang/Event",
+  "../mixins/changeset"
+], function(module, Event, changesetMixin) {
   "use strict";
 
   /**
@@ -24,7 +25,7 @@ define([
    * @memberOf pentaho.type.events
    * @class
    * @extends pentaho.lang.Event
-   * @mixes pentaho.type.mixins._mixinChangeset
+   * @mixes pentaho.type.mixins.changeset
    *
    * @classDesc This event is emitted when changes will occur in complex or list values.
    *
@@ -38,7 +39,7 @@ define([
    * @param {!pentaho.type.Complex} source - The object which is emitting the event.
    * @param {!pentaho.type.changes.Changeset} changeset -  The changeset.
    */
-  return Event.extend("pentaho.type.events.WillChange", /** @lends pentaho.type.events.WillChange# */{
+  return Event.extend(module.id, /** @lends pentaho.type.events.WillChange# */{
 
     constructor: function(source, changeset) {
       this.base("will:change", source, true);
@@ -46,5 +47,5 @@ define([
     }
 
   })
-  .implement(mixinChangeset);
+  .implement(changesetMixin);
 });

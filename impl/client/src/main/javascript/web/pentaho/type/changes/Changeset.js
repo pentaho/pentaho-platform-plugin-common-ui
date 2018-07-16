@@ -15,14 +15,15 @@
  */
 
 define([
+  "module",
   "./Change",
-  "../../util/error",
-  "../../util/object"
-], function(Change, error, O) {
+  "pentaho/util/error",
+  "pentaho/util/object"
+], function(module, Change, error, O) {
 
   "use strict";
 
-  return Change.extend("pentaho.type.changes.Changeset", /** @lends pentaho.type.changes.Changeset# */{
+  return Change.extend(module.id, /** @lends pentaho.type.changes.Changeset# */{
 
     /**
      * @alias Changeset
@@ -174,7 +175,7 @@ define([
      * @name pentaho.type.changes.Changeset#__onChildChangesetCreated
      * @method
      * @param {!pentaho.type.changes.Changeset} childChangeset - The child changeset.
-     * @param {pentaho.type.Property.Type} propType - The property type whose value is the changeset owner.
+     * @param {pentaho.type.PropertyType} propType - The property type whose value is the changeset owner.
      * Only applies when this changeset is a complex changeset.
      *
      * @private

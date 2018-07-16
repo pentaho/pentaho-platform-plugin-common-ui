@@ -16,22 +16,15 @@
 
 // This exists only so that r.js sees otherwise invisible dependencies.
 define([
-  "./instance",
-  "./value",
-  "./element",
-  "./list",
-  "./simple",
-  "./complex",
-  "./string",
-  "./number",
-  "./boolean",
-  "./date",
-  "./object",
-  "./function",
-  "./typeDescriptor",
-  "./property",
-  "./mixins/enum",
-  "./mixins/discreteDomain"
+  "./Instance",
+  "./Value",
+  "./Element",
+  "./List",
+  "./Complex",
+  "./standardSimple",
+  "./Property",
+  "./mixins/Enum",
+  "./mixins/DiscreteDomain"
 ], function() {
   "use strict";
 });
