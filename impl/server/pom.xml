@@ -1,50 +1,42 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.pentaho</groupId>
     <artifactId>common-ui-impl</artifactId>
-    <version>7.1-SNAPSHOT</version>
+    <version>7.1.0.15-157</version>
   </parent>
-
   <artifactId>common-ui-impl-server</artifactId>
-  <packaging>jar</packaging>
-
+  <version>7.1.0.15-157</version>
   <name>Common UI server side</name>
   <description>Java portion of the Common UI codebase</description>
   <url>http://www.pentaho.com</url>
-
   <properties>
-    <commons-lang.version>2.2</commons-lang.version>
-    <commons-logging.version>1.1</commons-logging.version>
+    <spring.version>4.3.2.RELEASE</spring.version>
+    <commons-vfs2.version>2.1-20150824</commons-vfs2.version>
+    <simple-jndi.version>0.11.1</simple-jndi.version>
+    <jmock-junit4.version>2.5.1</jmock-junit4.version>
+    <pentaho-connections.version>7.1.0.15-157</pentaho-connections.version>
     <commons-beanutils.version>1.9.3</commons-beanutils.version>
+    <libformula.version>7.1.0.15-157</libformula.version>
+    <pentaho-metadata.version>7.1.0.15-157</pentaho-metadata.version>
+    <commons-io.version>2.1</commons-io.version>
+    <libbase.version>7.1.0.15-157</libbase.version>
+    <maven-failsafe-plugin.forkCount>1</maven-failsafe-plugin.forkCount>
+    <maven-failsafe-plugin.reuseForks>false</maven-failsafe-plugin.reuseForks>
+    <hsqldb.version>2.3.2</hsqldb.version>
+    <pentaho-xul.version>7.1.0.15-157</pentaho-xul.version>
+    <mockito-all.version>1.8.4</mockito-all.version>
+    <pentaho-database-model.version>7.1.0.15-157</pentaho-database-model.version>
+    <pentaho-kettle.version>7.1.0.15-157</pentaho-kettle.version>
     <flexjson.version>2.1</flexjson.version>
     <org.json.version>3.1.1</org.json.version>
-    <spring.version>4.3.2.RELEASE</spring.version>
-    <commons-io.version>2.1</commons-io.version>
-    <jmock-junit4.version>2.5.1</jmock-junit4.version>
-    <mockito-all.version>1.8.4</mockito-all.version>
-    <simple-jndi.version>0.11.1</simple-jndi.version>
-    <hsqldb.version>2.3.2</hsqldb.version>
     <jug-lgpl.version>2.0.0</jug-lgpl.version>
-    <commons-vfs2.version>2.1-20150824</commons-vfs2.version>
-
-    <libformula.version>${project.version}</libformula.version>
-    <libbase.version>${project.version}</libbase.version>
-    <pentaho-platform.version>${project.version}</pentaho-platform.version>
-    <pentaho-connections.version>${project.version}</pentaho-connections.version>
-    <pentaho-metadata.version>${project.version}</pentaho-metadata.version>
-    <pentaho-kettle.version>${project.version}</pentaho-kettle.version>
-    <pentaho-xul.version>${project.version}</pentaho-xul.version>
-    <pentaho-database-model.version>${project.version}</pentaho-database-model.version>
-
-    <!-- Integration tests fail if we reuseForks -->
-    <maven-failsafe-plugin.reuseForks>false</maven-failsafe-plugin.reuseForks>
-    <maven-failsafe-plugin.forkCount>1</maven-failsafe-plugin.forkCount>
+    <pentaho-platform.version>7.1.0.15-157</pentaho-platform.version>
+    <commons-logging.version>1.1</commons-logging.version>
+    <commons-lang.version>2.2</commons-lang.version>
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>commons-lang</groupId>
@@ -53,8 +45,8 @@
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -65,8 +57,8 @@
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -77,8 +69,8 @@
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -88,8 +80,8 @@
       <version>${flexjson.version}</version>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -100,8 +92,8 @@
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -112,8 +104,8 @@
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -124,8 +116,8 @@
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -136,8 +128,8 @@
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -148,8 +140,8 @@
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -160,8 +152,8 @@
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -172,8 +164,8 @@
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -184,8 +176,8 @@
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -196,13 +188,11 @@
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
-
-    <!-- test -->
     <dependency>
       <groupId>pentaho</groupId>
       <artifactId>pentaho-platform-core</artifactId>
@@ -234,8 +224,6 @@
       <version>${jug-lgpl.version}</version>
       <scope>test</scope>
     </dependency>
-
-   <!-- Integration tests -->
     <dependency>
       <groupId>pentaho-kettle</groupId>
       <artifactId>kettle-core</artifactId>
@@ -243,8 +231,8 @@
       <scope>test</scope>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -255,8 +243,8 @@
       <scope>test</scope>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -302,11 +290,8 @@
       <version>${commons-vfs2.version}</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
-
   <build>
     <finalName>common-ui-${project.version}</finalName>
   </build>
-
 </project>
