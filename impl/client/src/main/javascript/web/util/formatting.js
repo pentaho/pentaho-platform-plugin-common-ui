@@ -20,6 +20,9 @@
  */
 define("common-ui/util/formatting", ['common-ui/util/timeutil', 'common-ui/util/TextFormatter'], function(ReportTimeUtil, TextFormatter) {
   return {
+
+    const : totalDayMinutes = 1440,
+
     /**
      * Create a text formatter that formats to/from text. This is designed to convert between data formatted as a string
      * and the Reporting Engine's expected format for that object type.
@@ -192,6 +195,28 @@ define("common-ui/util/formatting", ['common-ui/util/timeutil', 'common-ui/util/
           }
 
           if(timezone == 'client') {
+
+              if (value.length == 28) {
+
+                  var currentDate = new Date();
+                  var offsetClientMinutes  = -currentDate.getTimezoneOffset();
+
+                  // calculation is done in minutes because it is the smaller unit on a timezone definition
+                  // e.g.: "2018-05-20T01:12:23.456-0430" where -04h30m is the timezone setting
+                  var offsetServerMinutes = Number( (value.substring(23, 26) * 60) + value.substring(26, value.length()) );
+                  var diffOffset = offsetClientMinutes - offsetServerMinutes;
+
+                  if(diffOffset != 0){
+                      this._initDateFormatters();
+
+                      var currentMinutes = ( currentDate.getHours() * 60 ) + currentDate.getMinutes();
+                      var diffMinutes = currentMinutes - diffOffset;
+                      var localDate = this.parseDateWithoutTimezoneInfo(value);
+                      var dayVariance = (diffMinutes < 0) ? 1 : (diffMinutes >= totalDayMinutes) ? -1 : 0;
+                      var dayVarianceApplied = localDate.setDate(localDate.getDate() + dayVariance);
+                      return this.dateFormatters['with-timezone'].format(new Date(dayVarianceApplied));
+                  }
+              }
             return value;
           }
 
