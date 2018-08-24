@@ -5,11 +5,11 @@
   <parent>
     <groupId>org.pentaho</groupId>
     <artifactId>common-ui-assemblies</artifactId>
-    <version>8.1.0.0-SNAPSHOT</version>
+    <version>8.1.0.3-564</version>
   </parent>
   <groupId>pentaho</groupId>
   <artifactId>common-ui</artifactId>
-  <version>8.1.0.0-SNAPSHOT</version>
+  <version>8.1.0.3-564</version>
   <packaging>pom</packaging>
   <name>Common-UI Platform Plugin</name>
   <description>This module assembles the main zip file for Common-UI platform plugin. It builds it by fetching external dependencies,
@@ -25,9 +25,9 @@
     <common-ui-impl-client.directory>${prepared.assembly.directory}/common-ui-impl-client</common-ui-impl-client.directory>
     <flexjson.version>2.1</flexjson.version>
     <angular-translate.version>2.2.0-canary-pentaho-modified</angular-translate.version>
-    <pentaho-modeler.version>8.1.0.0-SNAPSHOT</pentaho-modeler.version>
+    <pentaho-modeler.version>8.1.0.3-564</pentaho-modeler.version>
     <prepared.assembly.directory>${project.build.directory}/${prepared.assembly.name}</prepared.assembly.directory>
-    <commons-gwt.version>8.1.0.0-SNAPSHOT</commons-gwt.version>
+    <commons-gwt.version>8.1.0.3-564</commons-gwt.version>
     <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
     <js.assembly.name>${project.artifactId}-${project.version}-js</js.assembly.name>
     <gwt-widgets.directory>${prepared.assembly.directory}/gwt-widgets</gwt-widgets.directory>
