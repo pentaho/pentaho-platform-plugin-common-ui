@@ -23,7 +23,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         messageType: null,                         // options are null, ERROR, WARN, INFO
 
         setTitle: function(title) {
-            this.set("title",title);
+            this.titleNode.innerHTML = title;
         },
 
         postCreate: function() {
