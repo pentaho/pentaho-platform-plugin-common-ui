@@ -1288,7 +1288,7 @@ define([
         return;
       }
 
-      if(mappingFieldInfo.sourceType === "number") {
+      if(!mappingFieldInfo.isKey && mappingFieldInfo.sourceType === "number") {
         this._buildTooltipHtmlOfFieldNumeric(lines, mappingFieldInfo, cccContext);
       } else {
         this._buildTooltipHtmlOfFieldNonNumeric(lines, mappingFieldInfo, cccContext);
@@ -1302,25 +1302,25 @@ define([
         return;
       }
 
-          var cccScene = cccContext.scene;
-          var cccComplex = cccScene.group || cccScene.datum;
+      var cccScene = cccContext.scene;
+      var cccComplex = cccScene.group || cccScene.datum;
 
-          var cccAtom = cccComplex.getSpecifiedAtom(mappingFieldInfo.name);
-          if(cccAtom === null) {
-            return;
-          }
+      var cccAtom = cccComplex.getSpecifiedAtom(mappingFieldInfo.name);
+      if(cccAtom === null) {
+        return;
+      }
 
-          var value = cccAtom.value;
+      var value = cccAtom.value;
 
       // If the chart hides null **members**...
       if(this._hideNullMembers && util.isNullMember(value)) {
         return;
       }
 
-          // TODO: null trend value?
-          if(value == null && cccScene.datum !== null && cccScene.datum.isTrend) {
-            return;
-          }
+      // TODO: null trend value?
+      if(value == null && cccScene.datum !== null && cccScene.datum.isTrend) {
+        return;
+      }
 
       // ex: "Line: Ships"
       lines.push(def.html.escape(mappingFieldInfo.label) + ": " + def.html.escape(cccAtom.label));
