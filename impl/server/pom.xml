@@ -5,10 +5,10 @@
   <parent>
     <groupId>org.pentaho</groupId>
     <artifactId>common-ui-impl</artifactId>
-    <version>8.1.0.0-SNAPSHOT</version>
+    <version>8.1.0.4-595</version>
   </parent>
   <artifactId>common-ui-impl-server</artifactId>
-  <version>8.1.0.0-SNAPSHOT</version>
+  <version>8.1.0.4-595</version>
   <name>Common UI server side</name>
   <description>Java portion of the Common UI codebase</description>
   <url>http://www.pentaho.com</url>
@@ -17,23 +17,23 @@
     <commons-vfs2.version>2.2</commons-vfs2.version>
     <simple-jndi.version>0.11.1</simple-jndi.version>
     <jmock-junit4.version>2.5.1</jmock-junit4.version>
-    <pentaho-connections.version>8.1.0.0-SNAPSHOT</pentaho-connections.version>
+    <pentaho-connections.version>8.1.0.4-595</pentaho-connections.version>
     <commons-beanutils.version>1.9.3</commons-beanutils.version>
-    <pentaho-reporting.version>8.1.0.0-SNAPSHOT</pentaho-reporting.version>
-    <pentaho-metadata.version>8.1.0.0-SNAPSHOT</pentaho-metadata.version>
+    <pentaho-reporting.version>8.1.0.4-595</pentaho-reporting.version>
+    <pentaho-metadata.version>8.1.0.4-595</pentaho-metadata.version>
     <commons-io.version>2.1</commons-io.version>
-    <pentaho-reporting.version>8.1.0.0-SNAPSHOT</pentaho-reporting.version>
+    <pentaho-reporting.version>8.1.0.4-595</pentaho-reporting.version>
     <maven-failsafe-plugin.forkCount>1</maven-failsafe-plugin.forkCount>
     <maven-failsafe-plugin.reuseForks>false</maven-failsafe-plugin.reuseForks>
     <hsqldb.version>2.3.2</hsqldb.version>
-    <commons-xul.version>8.1.0.0-SNAPSHOT</commons-xul.version>
+    <commons-xul.version>8.1.0.4-595</commons-xul.version>
     <mockito-all.version>1.8.4</mockito-all.version>
-    <commons-database.version>8.1.0.0-SNAPSHOT</commons-database.version>
-    <pdi.version>8.1.0.0-SNAPSHOT</pdi.version>
+    <commons-database.version>8.1.0.4-595</commons-database.version>
+    <pdi.version>8.1.0.4-595</pdi.version>
     <flexjson.version>2.1</flexjson.version>
     <org.json.version>3.1.1</org.json.version>
     <jug-lgpl.version>2.0.0</jug-lgpl.version>
-    <platform.version>8.1.0.0-SNAPSHOT</platform.version>
+    <platform.version>8.1.0.4-595</platform.version>
     <commons-logging.version>1.1</commons-logging.version>
     <commons-lang.version>2.2</commons-lang.version>
   </properties>
