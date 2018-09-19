@@ -985,7 +985,7 @@ define(["dojo/number", "dojo/i18n", "common-ui/prompting/PromptPanel",
         beforeEach(function() {
           paramSpy = jasmine.createSpyObj("paramSpy", ["getSelectedValuesValue"]);
 
-          componentSpy = jasmine.createSpyObj("componentSpy", ["clear", "removeErrorClass"]);
+          componentSpy = jasmine.createSpyObj("componentSpy", ["clear", "removeErrorClass", "addErrorLabel", "addErrorClass"]);
           componentSpy.parameter = paramName;
           componentSpy.type = "TestPanel";
 
@@ -1420,7 +1420,6 @@ define(["dojo/number", "dojo/i18n", "common-ui/prompting/PromptPanel",
             componentSpy.components.push(existNotDelErrorComponent);
 
             paramSpy.isErrorChanged = true;
-
             panel._changeErrors(paramSpy);
 
             expect(componentSpy.components.length).toBe(panel.paramDefn.errors[paramSpy.name].length);
