@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,22 @@ define("common-ui/prompting/components/ParameterPanelComponent", ['./PanelCompon
     removeErrorClass: function(){
       var $htmlObject = this.placeholder();
       $htmlObject.removeClass('error');
+    },
+
+    addErrorClass: function(){
+      var $htmlObject = this.placeholder();
+      $htmlObject.addClass('error');
+    },
+
+    addErrorLabel: function(errComponent){
+      var $htmlObject = this.placeholder();
+      if(!errComponent)
+        return;
+
+      var errorLabelHtml = '<div id="' + errComponent.htmlObject + '" class="parameter-label"></div>';
+
+      if($("#" + this.htmlObject + " > div").length > 1)
+        $("#" + this.htmlObject + " > div:nth-child(1)").after(errorLabelHtml);
     }
   });
 });
