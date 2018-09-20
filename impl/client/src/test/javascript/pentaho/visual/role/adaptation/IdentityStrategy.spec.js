@@ -72,7 +72,7 @@ define([
 
     describe(".Type", function() {
 
-      describe("#getInputTypeFor(outputDataType, isVisualKey)", function() {
+      describe("#getInputTypeFor(outputDataType, isVisualKeyEf)", function() {
 
         it("should return null if given a list type", function() {
 

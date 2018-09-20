@@ -322,9 +322,9 @@ define([
 
     describe(".Type", function() {
 
-      describe("#getInputTypeFor(outputDataType, isVisualKey)", function() {
+      describe("#getInputTypeFor(outputDataType, isVisualKeyEf)", function() {
 
-        it("should return null if not given a date type, independently of isVisualKey", function() {
+        it("should return null if not given a date type, independently of isVisualKeyEf", function() {
           var inputType = Strategy.type.getInputTypeFor(List.type, true);
           expect(inputType).toBe(null);
 
@@ -352,13 +352,19 @@ define([
           expect(inputType).toBe(null);
         });
 
-        it("should return null if given a date type but isVisualKey is false", function() {
+        it("should return null if given a date type but isVisualKeyEf is false", function() {
           var inputType = Strategy.type.getInputTypeFor(PentahoDate.type, false);
           expect(inputType).toBe(null);
         });
 
-        it("should return the List of Strings type if given a date type and isVisualKey is true", function() {
+        it("should return the List of Strings type if given a date type and isVisualKeyEf is true", function() {
           var inputType = Strategy.type.getInputTypeFor(PentahoDate.type, true);
+          expect(inputType.isList).toBe(true);
+          expect(inputType.of).toBe(PentahoString.type);
+        });
+
+        it("should return the List of Strings type if given a date type and isVisualKeyEf is undefined", function() {
+          var inputType = Strategy.type.getInputTypeFor(PentahoDate.type, undefined);
           expect(inputType.isList).toBe(true);
           expect(inputType.of).toBe(PentahoString.type);
         });

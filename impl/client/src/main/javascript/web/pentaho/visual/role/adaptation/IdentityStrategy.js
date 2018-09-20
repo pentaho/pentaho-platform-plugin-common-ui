@@ -149,7 +149,7 @@ define([
       id: module.id,
 
       /** @inheritDoc */
-      getInputTypeFor: function(outputDataType, isVisualKey) {
+      getInputTypeFor: function(outputDataType, isVisualKeyEf) {
 
         // 1) Can handle a single column.
         if(outputDataType.isList) {

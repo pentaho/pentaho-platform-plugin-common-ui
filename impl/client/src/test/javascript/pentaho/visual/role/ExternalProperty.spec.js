@@ -97,7 +97,7 @@ define([
 
       function buildCustomModel(Model, propSpec) {
         return Model.extend({
-          $type: { props: [propSpec || {}] }
+          $type: {props: [propSpec || {}]}
         });
       }
       // endregion
@@ -519,10 +519,9 @@ define([
           expect(externalPropType.modes.at(0)).not.toBe(internalPropType.modes.at(0));
         });
 
-        it("should generate a categorical external mode if the internal mode is categorical", function() {
+        it("should generate a discrete external mode if the internal mode is discrete", function() {
 
           var strategies = [ElementIdentityStrategy.type];
-          var internalPropType = DerivedModel.type.get("stringKeyRole");
 
           var DerivedModelAdapter = buildAdapter(DerivedModel, [
             {

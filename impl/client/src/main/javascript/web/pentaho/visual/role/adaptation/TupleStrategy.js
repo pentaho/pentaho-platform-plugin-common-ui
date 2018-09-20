@@ -250,7 +250,7 @@ define([
       id: module.id,
 
       /** @inheritDoc */
-      getInputTypeFor: function(outputDataType, isVisualKey) {
+      getInputTypeFor: function(outputDataType, isVisualKeyEf) {
 
         if(!outputDataType.isList) {
           return null;

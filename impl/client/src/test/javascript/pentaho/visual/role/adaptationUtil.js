@@ -93,7 +93,7 @@ define([
         invert: function() {},
 
         $type: {
-          getInputTypeFor: function(outputDataType, isVisualKey) {
+          getInputTypeFor: function(outputDataType, isVisualKeyEf) {
             if(outputDataType.isList) {
               return null;
             }
@@ -126,7 +126,7 @@ define([
         invert: function() {},
 
         $type: {
-          getInputTypeFor: function(outputDataType, isVisualKey) {
+          getInputTypeFor: function(outputDataType, isVisualKeyEf) {
             if(!outputDataType.isList) {
               return null;
             }
@@ -169,7 +169,7 @@ define([
         invert: function() {},
 
         $type: {
-          getInputTypeFor: function(outputDataType, isVisualKey) {
+          getInputTypeFor: function(outputDataType, isVisualKeyEf) {
 
             if(!PentahoString.type.isSubtypeOf(outputDataType)) {
               return null;

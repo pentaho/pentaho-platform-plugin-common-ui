@@ -151,9 +151,9 @@ define([
 
     describe(".Type", function() {
 
-      describe("#getInputTypeFor(outputDataType, isVisualKey)", function() {
+      describe("#getInputTypeFor(outputDataType, isVisualKeyEf)", function() {
 
-        it("should return null if not given a string type, independently of isVisualKey", function() {
+        it("should return null if not given a string type, independently of isVisualKeyEf", function() {
           var inputType = Strategy.type.getInputTypeFor(List.type, true);
           expect(inputType).toBe(null);
 
@@ -181,13 +181,18 @@ define([
           expect(inputType).toBe(null);
         });
 
-        it("should return null if given a string type but isVisualKey is false", function() {
+        it("should return null if given a string type but isVisualKeyEf is false", function() {
           var inputType = Strategy.type.getInputTypeFor(PentahoString.type, false);
           expect(inputType).toBe(null);
         });
 
-        it("should return the List type if given a string type and isVisualKey is true", function() {
+        it("should return the List type if given a string type and isVisualKeyEf is true", function() {
           var inputType = Strategy.type.getInputTypeFor(PentahoString.type, true);
+          expect(inputType).toBe(List.type);
+        });
+
+        it("should return the List type if given a string type and isVisualKeyEf is undefined", function() {
+          var inputType = Strategy.type.getInputTypeFor(PentahoString.type, undefined);
           expect(inputType).toBe(List.type);
         });
       });

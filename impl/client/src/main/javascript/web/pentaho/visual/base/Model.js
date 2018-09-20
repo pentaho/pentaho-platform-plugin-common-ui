@@ -16,8 +16,11 @@
 define([
   "pentaho/module!_",
   "./AbstractModel",
+  "./KeyTypes",
+  "pentaho/util/text",
+  "pentaho/util/error",
   "../role/Property" // Pre-loaded with Model
-], function(module, AbstractModel) {
+], function(module, AbstractModel, KeyTypes, textUtil, errorUtil) {
 
   "use strict";
 
@@ -44,14 +47,79 @@ define([
    *
    * @constructor
    * @description Creates a `Model` instance.
-   * @param {pentaho.visual.base.spec.IAbstractModel} [modelSpec] A plain object containing the
+   * @param {pentaho.visual.base.spec.IModel} [modelSpec] A plain object containing the
    * internal model specification.
    */
   return AbstractModel.extend(/** @lends pentaho.visual.base.Model# */{
     $type: /** @lends pentaho.visual.base.ModelType# */{
       id: module.id,
       defaultView: "./View",
-      isAbstract: true
+      isAbstract: true,
+
+      /** @inheritDoc */
+      _init: function(spec, keyArgs) {
+
+        spec = this.base(spec, keyArgs) || spec;
+
+        this.__setVisualKeyType(spec.visualKeyType);
+
+        return spec;
+      },
+
+      // region visualKeyType
+      __visualKeyType: undefined,
+
+      /** @inheritDoc */
+      get visualKeyType() {
+        return this.__visualKeyType;
+      },
+
+      /**
+       * Sets the value of visual key type.
+       *
+       * If the value is {@link Nully} or an empty string, it is ignored,
+       * unless this type is not [isAbstract]{@link pentaho.type.Type#isAbstract},
+       * in which case the default value of [dataKey]{@link }pentaho.visual.base.KeyTypes.dataKey} is assumed.
+       *
+       * @param {?pentaho.visual.base.KeyTypes|undefined} value - The new visual key type, if any.
+       *
+       * @throw {pentaho.lang.ArgumentRangeError} When the visual key type value is not one of the possible values.
+       * @throw {pentaho.lang.OperationInvalidError} When the visual key type value is already set and the specified
+       * value is different.
+       *
+       * @private
+       */
+      __setVisualKeyType: function(value) {
+
+        value = textUtil.nonEmptyString(value);
+
+        var visualKeyType = this.__visualKeyType;
+        if(visualKeyType === undefined) {
+
+          if(value === null) {
+
+            if(this.isAbstract) {
+              return;
+            }
+
+            value = KeyTypes.dataKey;
+
+          } else if(!KeyTypes.hasOwnProperty(value)) {
+
+            throw errorUtil.argRange("visualKeyType");
+          }
+
+          this.__visualKeyType = value;
+          return;
+        }
+
+        if(value !== null && visualKeyType !== value) {
+
+          // Would change value...
+          throw errorUtil.operInvalid("Once defined, 'visualKeyType' cannot be changed.");
+        }
+      }
+      // endregion
     }
   })
   .configure({$type: module.config});

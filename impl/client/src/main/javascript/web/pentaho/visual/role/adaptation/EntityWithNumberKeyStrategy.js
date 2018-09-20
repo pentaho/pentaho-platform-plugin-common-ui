@@ -45,7 +45,8 @@ define([
      *   to a number value that equally identifies its elements.
      *
      * The strategy targets:
-     * 1. Visual roles which are [visual keys]{@link pentaho.visual.role.PropertyType#isVisualKey};
+     * 1. Visual roles which are
+     *    [effective visual keys]{@link pentaho.visual.role.PropertyType#isVisualKeyEffective};
      * 2. Modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} is
      *    assignable to [number]{@link pentaho.type.Number}, and
      * 3. Mappings of fields whose [fields][@link pentaho.data.ITable#getColumnProperty] contain the
@@ -181,9 +182,9 @@ define([
       id: module.id,
 
       /** @inheritDoc */
-      getInputTypeFor: function(outputDataType, isVisualKey) {
+      getInputTypeFor: function(outputDataType, isVisualKeyEf) {
 
-        if(!isVisualKey || !outputDataType.isSubtypeOf(PentahoNumber.type)) {
+        if(isVisualKeyEf === false || !outputDataType.isSubtypeOf(PentahoNumber.type)) {
           return null;
         }
 

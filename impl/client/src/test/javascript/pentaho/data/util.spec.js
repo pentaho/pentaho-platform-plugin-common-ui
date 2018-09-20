@@ -238,7 +238,23 @@ define([
         expect(isEqual.getf("value")).toBe("Lisboa");
       });
 
-      it("should return an IsEqual filter with a null value when the given cell has a null value", function() {
+      it("should return an IsEqual filter with a null value when the given cell map has a null value", function() {
+
+        var cellsMap = {
+          "country": new Cell(null, "Something Null")
+        };
+
+        var dataTable = new DataTable(getDatasetDT1WithNoKeyColumns());
+        var isEqual = dataUtil.createFilterFromCellsMap(cellsMap, dataTable);
+
+        expect(isEqual instanceof AbstractFilter).toBe(true);
+        expect(isEqual.kind).toBe("isEqual");
+        expect(isEqual.property).toBe("country");
+        expect(isEqual.get("value")).toBe(null);
+      });
+
+      it("should return an IsEqual filter with a null value when the " +
+        "given cell map has a null-valued cell", function() {
 
         var cellsMap = {
           "country": null
@@ -314,6 +330,13 @@ define([
       it("should return an isEqual filter whose value is null when given a null cell", function() {
 
         var result = dataUtil.createFilterIsEqualFromCell(dataTable, "country", null);
+
+        expect(result.value).toBe(null);
+      });
+
+      it("should return an isEqual filter whose value is null when given a cell with a null value", function() {
+
+        var result = dataUtil.createFilterIsEqualFromCell(dataTable, "country", new Cell(null, "Something Null"));
 
         expect(result.value).toBe(null);
       });
