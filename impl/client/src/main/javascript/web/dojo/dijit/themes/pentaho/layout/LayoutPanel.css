@@ -66,18 +66,18 @@
   background-repeat: repeat-x;
 }
 
-.IE .propPanel_gemBar.number .gem{
+.IE .gem[type="measure"] {
   background: url('../images/gem-bg-measure.png');
   background-repeat: repeat;
 }
 
-.propPanel_gemBar.number .gem {
+.gem[type="measure"] {
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #DDF4FC), color-stop(.15, #DDF4FC), color-stop(0.50, #EEF9FD), color-stop(0.51, #DDF4FC), color-stop(0.80, #BCE9F9),color-stop(1.0, #BCE9F9));
   background: -moz-linear-gradient(#DDF4FC, #DDF4FC 15%, #EEF9FD 50%, #DDF4FC 51%, #BCE9F9 80%, #BCE9F9 100%) repeat scroll 0 0 transparent;
   border: 1px solid #7EC9F2;
 }
 
-.propPanel_gemBar.number .gem.over {
+.gem[type="measure"].over {
   background: #CBEFA3;
   border: 1px solid #87DF27;
   -moz-box-shadow: #F2FBE8 0px 0px 1px 1px inset;
