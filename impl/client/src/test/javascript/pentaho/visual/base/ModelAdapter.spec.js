@@ -23,7 +23,8 @@ define([
   "pentaho/data/Table",
   "../role/adaptationUtil",
   "tests/pentaho/util/errorMatch"
-], function(typeLoader, Transaction, Model, ModelAdapter, BaseStrategy, ExternalProperty, Table, adaptationUtil, errorMatch) {
+], function(typeLoader, Transaction, Model, ModelAdapter, BaseStrategy, ExternalProperty, Table,
+            adaptationUtil, errorMatch) {
 
   "use strict";
 
@@ -877,7 +878,6 @@ define([
             return [new Cell("PT3", "Portugal")];
           });
 
-
           var strategy1 = modelAdapter.roleA.strategy;
           expect(strategy1).not.toBe(null);
 
@@ -928,7 +928,6 @@ define([
           spyOn(ElementIdentityStrategy.prototype, "invert").and.callFake(function() {
             return [new Cell("PT3", "Portugal")];
           });
-
 
           var internalData1 = modelAdapter.model.data;
           expect(internalData1).not.toBe(null);
@@ -1560,6 +1559,60 @@ define([
 
           expect(act).toThrow(errorMatch.argInvalid("filter"));
         });
+      });
+    });
+
+    describe("Type#visualKeyType", function() {
+
+      it("should have the value of ModelType#visualKeyType when it is undefined", function() {
+
+        var DerivedModel = Model.extend({
+          $type: {
+            isAbstract: true
+          }
+        });
+
+        var DerivedModelAdapter = ModelAdapter.extend({
+          $type: {
+            props: {model: {valueType: DerivedModel}}
+          }
+        });
+
+        expect(DerivedModelAdapter.type.visualKeyType).toBe(undefined);
+      });
+
+      it("should have the value of ModelType#visualKeyType when it is 'dataKey'", function() {
+
+        var DerivedModel = Model.extend({
+          $type: {
+            visualKeyType: "dataKey"
+          }
+        });
+
+        var DerivedModelAdapter = ModelAdapter.extend({
+          $type: {
+            props: {model: {valueType: DerivedModel}}
+          }
+        });
+
+        expect(DerivedModelAdapter.type.visualKeyType).toBe("dataKey");
+      });
+
+      it("should have the value of ModelType#visualKeyType when it is 'dataKey'", function() {
+
+        var DerivedModel = Model.extend({
+          $type: {
+            visualKeyType: "dataOrdinal"
+          }
+        });
+
+        var DerivedModelAdapter = ModelAdapter.extend({
+          $type: {
+            props: {model: {valueType: DerivedModel}}
+          }
+        });
+
+        expect(DerivedModelAdapter.type.visualKeyType).toBe("dataOrdinal");
       });
     });
   });

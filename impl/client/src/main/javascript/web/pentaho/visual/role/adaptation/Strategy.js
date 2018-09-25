@@ -260,8 +260,14 @@ define([
        * @method
        *
        * @param {!pentaho.type.Type} outputDataType - The output data type.
-       * @param {boolean} isVisualKey - Indicates that the strategy should be able to preserve the key nature
-       * of input fields. Created strategies should be
+       * @param {boolean|undefined} isVisualKeyEf - Indicates that the strategy should be able to
+       * preserve the key nature of input fields.
+       *
+       * When `undefined`,
+       * it means that it is not relevant if the input is a key or not
+       * (see [visualDataKey]{@link pentaho.visual.base.AbstractModelType.visualKeyType}).
+       *
+       * Created strategies should be
        * [invertible]{@link pentaho.visual.role.adaptation.Strategy#isInvertible}.
        *
        * @return {pentaho.type.Type} The input type, if the strategy can be applied; `null`, if not.

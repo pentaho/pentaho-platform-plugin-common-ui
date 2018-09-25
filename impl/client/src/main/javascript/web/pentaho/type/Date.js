@@ -42,6 +42,12 @@ define([
      * @readonly
      */
 
+    /** @inheritDoc */
+    get $key() {
+      // Make sure to include milliseconds!
+      return this.value.toISOString();
+    },
+
     // region serialization
     /** @inheritDoc */
     _toJSONValue: function(keyArgs) {

@@ -508,6 +508,12 @@ define([
       id: module.id,
       isAbstract: true,
 
+      /** @inheritDoc */
+      get visualKeyType() {
+        var modelType = this.get("model").valueType;
+        return modelType.visualKeyType;
+      },
+
       props: [
         {
           /**
@@ -539,85 +545,85 @@ define([
       /** @inheritDoc */
       _configureProperties: function(propTypesSpec) {
 
-          // `propTypeSpecs` is a copy of the original value.
-          var normalizedPropTypeSpecs = this._normalizePropertiesSpec(propTypesSpec);
+        // `propTypeSpecs` is a copy of the original value.
+        var normalizedPropTypeSpecs = this._normalizePropertiesSpec(propTypesSpec);
 
         // Expand the model property into the associated VR properties.
 
-          // Index by property name.
-          var propTypeInfoMap = Object.create(null);
+        // Index by property name.
+        var propTypeInfoMap = Object.create(null);
 
-          normalizedPropTypeSpecs.forEach(function(propTypeSpec, index) {
-            if(!O.hasOwn(propTypeInfoMap, propTypeSpec.name)) {
-              propTypeInfoMap[propTypeSpec.name] = {
-                spec: propTypeSpec,
-                index: index
-              };
-            }
-          });
+        normalizedPropTypeSpecs.forEach(function(propTypeSpec, index) {
+          if(!O.hasOwn(propTypeInfoMap, propTypeSpec.name)) {
+            propTypeInfoMap[propTypeSpec.name] = {
+              spec: propTypeSpec,
+              index: index
+            };
+          }
+        });
 
-          var modelPropInfo = propTypeInfoMap.model;
-          if(modelPropInfo != null) {
-            // Process the model valueType, if specified.
-            var internalModelTypeSpec = modelPropInfo.spec.valueType;
-            if(internalModelTypeSpec != null) {
-              var internalModelTypeBase = this.get("model").valueType;
-              var internalModelType = typeLoader.resolveType(internalModelTypeSpec).type;
+        var modelPropInfo = propTypeInfoMap.model;
+        if(modelPropInfo != null) {
+          // Process the model valueType, if specified.
+          var internalModelTypeSpec = modelPropInfo.spec.valueType;
+          if(internalModelTypeSpec != null) {
+            var internalModelTypeBase = this.get("model").valueType;
+            var internalModelType = typeLoader.resolveType(internalModelTypeSpec).type;
 
-              if(internalModelTypeBase !== internalModelType &&
-                internalModelType.isSubtypeOf(internalModelTypeBase)) {
+            if(internalModelTypeBase !== internalModelType &&
+              internalModelType.isSubtypeOf(internalModelTypeBase)) {
 
-                // Sync description and such.
-                this.label = internalModelType.label;
-                this.description = internalModelType.description;
-                this.ordinal = internalModelType.ordinal;
-                this.category = internalModelType.category;
-                this.helpUrl = internalModelType.helpUrl;
+              // Sync description and such.
+              this.label = internalModelType.label;
+              this.description = internalModelType.description;
+              this.ordinal = internalModelType.ordinal;
+              this.category = internalModelType.category;
+              this.helpUrl = internalModelType.helpUrl;
 
-                // Expand model.
-                var newRolePropTypeSpecs = [];
+              // Expand model.
+              var newRolePropTypeSpecs = [];
 
-                internalModelType.eachVisualRole(function(internalPropType) {
-                  var roleName = internalPropType.name;
-                  var internalPropTypeBase = internalModelTypeBase.get(roleName, /* sloppy: */true);
-                  if(internalPropType !== internalPropTypeBase) {
-                    // New or something changed. So, need to create/override locally as well.
+              internalModelType.eachVisualRole(function(internalPropType) {
+                var roleName = internalPropType.name;
+                var internalPropTypeBase = internalModelTypeBase.get(roleName, /* sloppy: */true);
+                if(internalPropType !== internalPropTypeBase) {
+                  // New or something changed. So, need to create/override locally as well.
 
-                    var propTypeSpec;
-                    var rolePropInfo = O.getOwn(propTypeInfoMap, roleName, null);
-                    if(rolePropInfo !== null) {
-                      // Extend and replace existing spec.
-                      propTypeSpec = Object.create(rolePropInfo.spec);
-                      if(!this.has(roleName)) {
-                        propTypeSpec.base = __externalPropertyType;
-                      }
-
-                      // Clear out, to not change indexes. Filtered at the end.
-                      propTypesSpec[rolePropInfo.index] = null;
-                    } else {
-                      propTypeSpec = {
-                        name: roleName,
-                        base: this.has(roleName) ? undefined : __externalPropertyType
-                      };
+                  var propTypeSpec;
+                  var rolePropInfo = O.getOwn(propTypeInfoMap, roleName, null);
+                  if(rolePropInfo !== null) {
+                    // Extend and replace existing spec.
+                    propTypeSpec = Object.create(rolePropInfo.spec);
+                    if(!this.has(roleName)) {
+                      propTypeSpec.base = __externalPropertyType;
                     }
 
-                    newRolePropTypeSpecs.push(propTypeSpec);
+                    // Clear out, to not change indexes. Filtered at the end.
+                    propTypesSpec[rolePropInfo.index] = null;
+                  } else {
+                    propTypeSpec = {
+                      name: roleName,
+                      base: this.has(roleName) ? undefined : __externalPropertyType
+                    };
                   }
-                }, this);
 
-                if(newRolePropTypeSpecs.length > 0) {
-                  // Insert new/changed role props after the model property.
-                  newRolePropTypeSpecs.unshift(modelPropInfo.index + 1, 0);
-                  normalizedPropTypeSpecs.splice.apply(normalizedPropTypeSpecs, newRolePropTypeSpecs);
-
-                  // Filter out nulls.
-                  propTypesSpec = normalizedPropTypeSpecs.filter(function(propTypeSpec) {
-                    return propTypeSpec !== null;
-                  });
+                  newRolePropTypeSpecs.push(propTypeSpec);
                 }
+              }, this);
+
+              if(newRolePropTypeSpecs.length > 0) {
+                // Insert new/changed role props after the model property.
+                newRolePropTypeSpecs.unshift(modelPropInfo.index + 1, 0);
+                normalizedPropTypeSpecs.splice.apply(normalizedPropTypeSpecs, newRolePropTypeSpecs);
+
+                // Filter out nulls.
+                propTypesSpec = normalizedPropTypeSpecs.filter(function(propTypeSpec) {
+                  return propTypeSpec !== null;
+                });
               }
             }
           }
+        }
 
         this.base(propTypesSpec);
       }

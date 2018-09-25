@@ -15,13 +15,14 @@
  */
 define([
   "pentaho/visual/base/AbstractModel",
+  "pentaho/visual/base/KeyTypes",
   "pentaho/visual/role/AbstractProperty",
   "pentaho/visual/role/AbstractMapping",
   "pentaho/visual/color/PaletteProperty",
   "pentaho/data/filter/Abstract",
   "pentaho/data/Table",
   "pentaho/type/Complex"
-], function(AbstractModel, RoleAbstractProperty, RoleAbstractMapping, PaletteProperty, AbstractFilter, Table, Complex) {
+], function(AbstractModel, VisualKeyTypes, RoleAbstractProperty, RoleAbstractMapping, PaletteProperty, AbstractFilter, Table, Complex) {
 
   "use strict";
 
@@ -31,7 +32,11 @@ define([
     var dataSpec;
 
     beforeAll(function() {
-      Model = AbstractModel.extend();
+      Model = AbstractModel.extend({
+        $type: {
+          visualKeyType: VisualKeyTypes.dataKey
+        }
+      });
     });
 
     beforeEach(function() {
@@ -332,6 +337,21 @@ define([
 
         expectArray(result, ["a", "b", "e", "f"]);
       });
+
+      it("should return an empty array if the visualKeyType is not dataKey", function() {
+
+        DerivedModel.type.visualKeyType = VisualKeyTypes.dataOrdinal;
+
+        var model = new DerivedModel({
+          vr1: {fields: ["a", "b"]},
+          vr2: {fields: ["c", "d"]},
+          vr3: {fields: ["e", "f"]}
+        });
+
+        var result = model.keyFieldNames;
+
+        expectArray(result, []);
+      });
     });
 
     describe("#measureFieldNames", function() {
@@ -405,6 +425,21 @@ define([
         var result = model.measureFieldNames;
 
         expectArray(result, ["a", "b", "f"]);
+      });
+
+      it("should return an empty array if the visualKeyType is not dataKey", function() {
+
+        DerivedModel.type.visualKeyType = VisualKeyTypes.dataOrdinal;
+
+        var model = new DerivedModel({
+          vr1: {fields: ["a", "b"]},
+          vr2: {fields: ["c", "d"]},
+          vr3: {fields: ["a", "f"]}
+        });
+
+        var result = model.measureFieldNames;
+
+        expectArray(result, []);
       });
 
       it("should return an array of the measure fields not also mapped to key visual roles", function() {

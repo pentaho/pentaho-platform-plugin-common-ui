@@ -53,7 +53,8 @@ define([
      * [formattedSeparator]{@link pentaho.visual.role.adaptation.CombineStrategy#formattedSeparator} text.
      *
      * The strategy targets:
-     * 1. Visual roles which are [visual keys]{@link pentaho.visual.role.PropertyType#isVisualKey}, and
+     * 1. Visual roles which are
+     *    [effective visual keys]{@link pentaho.visual.role.PropertyType#isVisualKeyEffective}, and
      * 2. Modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} can
      *    be assigned to [string]{@link pentaho.type.String}.
      *
@@ -257,9 +258,9 @@ define([
       ],
 
       /** @inheritDoc */
-      getInputTypeFor: function(outputDataType, isVisualKey) {
+      getInputTypeFor: function(outputDataType, isVisualKeyEf) {
 
-        if(!isVisualKey || !outputDataType.isSubtypeOf(PentahoString.type)) {
+        if(isVisualKeyEf === false || !outputDataType.isSubtypeOf(PentahoString.type)) {
           return null;
         }
 

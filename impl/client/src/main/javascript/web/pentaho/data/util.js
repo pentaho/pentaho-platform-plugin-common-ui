@@ -251,14 +251,15 @@ define([
     var columnIndex = dataPlain.getColumnIndexById(columnId);
     if(columnIndex >= 0) {
       var filterValue;
-      if(cell == null) {
+      var value = dataUtil.getCellValue(cell);
+      if(value == null) {
         filterValue = null;
       } else {
         // Adding the expected data type.
         filterValue = {
           // Matches type alias corresponding simple types for all column types.
           _: dataPlain.getColumnType(columnIndex),
-          value: dataUtil.getCellValue(cell),
+          value: value,
           formatted: cell.toString()
         };
       }

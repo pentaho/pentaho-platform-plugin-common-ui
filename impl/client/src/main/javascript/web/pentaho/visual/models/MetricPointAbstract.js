@@ -21,9 +21,10 @@ define([
   "./mixins/ScaleColorDiscrete",
   "./mixins/MultiCharted",
   "./mixins/Trended",
+  "../base/KeyTypes",
   "pentaho/i18n!./i18n/model"
 ], function(module, BaseModel, LabelsOption, ScaleColorContinuousModel, ScaleColorDiscreteModel,
-            MultiChartedModel, TrendedModel, bundle) {
+            MultiChartedModel, TrendedModel, KeyTypes, bundle) {
 
   "use strict";
 
@@ -31,6 +32,9 @@ define([
     $type: {
       id: module.id,
       isAbstract: true,
+
+      visualKeyType: KeyTypes.dataOrdinal,
+
       // TODO: scaleColor... should only be applicable when color is continuous
       mixins: [TrendedModel, ScaleColorDiscreteModel, ScaleColorContinuousModel, MultiChartedModel],
 
@@ -41,8 +45,7 @@ define([
           name: "rows", // VISUAL_ROLE
           modes: [
             {dataType: "list"}
-          ],
-          fields: {isRequired: true}
+          ]
         },
         {
           name: "x", // VISUAL_ROLE

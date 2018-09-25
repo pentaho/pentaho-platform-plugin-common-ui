@@ -15,8 +15,9 @@
  */
 define([
   "pentaho/visual/base/Model",
-  "pentaho/data/Table"
-], function(Model, Table) {
+  "pentaho/data/Table",
+  "tests/pentaho/util/errorMatch"
+], function(Model, Table, errorMatch) {
 
   "use strict";
 
@@ -60,6 +61,163 @@ define([
       require.using(["require", "pentaho/visual/base/Model"], function(localRequire) {
         localRequire("pentaho/visual/role/Property");
         localRequire("pentaho/visual/role/Mode");
+      });
+    });
+
+    describe("ModelType#visualKeyType", function() {
+
+      it("should be undefined in the base.Model class", function() {
+
+        expect(Model.type.visualKeyType).toBe(undefined);
+      });
+
+      it("should remain undefined in an abstract sub-class", function() {
+
+        var SubModel = Model.extend({
+          $type: {isAbstract: true}
+        });
+
+        expect(SubModel.type.visualKeyType).toBe(undefined);
+      });
+
+      it("should default to 'dataKey' in a non-abstract sub-class", function() {
+
+        var SubModel = Model.extend();
+
+        expect(SubModel.type.visualKeyType).toBe("dataKey");
+      });
+
+      it("should be specifiable in an abstract class if not yet defined", function() {
+
+        var SubModel = Model.extend({
+          $type: {
+            isAbstract: true,
+            visualKeyType: "dataOrdinal"
+          }
+        });
+
+        expect(SubModel.type.visualKeyType).toBe("dataOrdinal");
+
+        SubModel = Model.extend({
+          $type: {
+            isAbstract: true,
+            visualKeyType: "dataKey"
+          }
+        });
+
+        expect(SubModel.type.visualKeyType).toBe("dataKey");
+      });
+
+      it("should preserve the inherited specified value from an abstract base class " +
+        "in an abstract subclass", function() {
+
+        var SubModel = Model.extend({
+          $type: {
+            isAbstract: true,
+            visualKeyType: "dataOrdinal"
+          }
+        });
+
+        var SubModel2 = SubModel.extend({
+          $type: {
+            isAbstract: true
+          }
+        });
+
+        expect(SubModel2.type.visualKeyType).toBe("dataOrdinal");
+      });
+
+      it("should preserve the inherited specified value from an abstract base class " +
+        "in a non-abstract subclass", function() {
+
+        var SubModel = Model.extend({
+          $type: {
+            isAbstract: true,
+            visualKeyType: "dataOrdinal"
+          }
+        });
+
+        var SubModel2 = SubModel.extend();
+
+        expect(SubModel2.type.visualKeyType).toBe("dataOrdinal");
+      });
+
+      it("should preserve the inherited specified value from a non-abstract base class " +
+        "in a non-abstract subclass", function() {
+
+        var SubModel = Model.extend({
+          $type: {
+            visualKeyType: "dataOrdinal"
+          }
+        });
+
+        var SubModel2 = SubModel.extend();
+
+        expect(SubModel2.type.visualKeyType).toBe("dataOrdinal");
+      });
+
+      it("should preserve the inherited specified value from a non-abstract base class " +
+        "in an abstract subclass", function() {
+
+        var SubModel = Model.extend({
+          $type: {
+            visualKeyType: "dataOrdinal"
+          }
+        });
+
+        var SubModel2 = SubModel.extend({
+          $type: {
+            isAbstract: true
+          }
+        });
+
+        expect(SubModel2.type.visualKeyType).toBe("dataOrdinal");
+      });
+
+      it("should throw if an invalid value is specified", function() {
+
+        expect(function() {
+
+          Model.extend({
+            $type: {
+              visualKeyType: "dataFoo"
+            }
+          });
+        }).toThrow(errorMatch.argRange("visualKeyType"));
+      });
+
+      it("should throw if specifying a value different from the inherited, specified value", function() {
+
+        var SubModel = Model.extend({
+          $type: {
+            visualKeyType: "dataOrdinal"
+          }
+        });
+
+        expect(function() {
+          SubModel.extend({
+            $type: {
+              visualKeyType: "dataKey"
+            }
+          });
+        }).toThrow(errorMatch.operInvalid());
+      });
+
+      it("should accept specifying a value equal to the inherited, specified value", function() {
+
+        var SubModel = Model.extend({
+          $type: {
+            visualKeyType: "dataOrdinal"
+          }
+        });
+
+        var SubModel2 = SubModel.extend({
+          $type: {
+            visualKeyType: "dataOrdinal"
+          }
+        });
+
+        expect(SubModel2.type.visualKeyType).toBe("dataOrdinal");
       });
     });
   });

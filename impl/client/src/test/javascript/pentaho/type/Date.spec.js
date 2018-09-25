@@ -70,6 +70,15 @@ define([
       });
     });
 
+    describe("#$key()", function() {
+
+      it("should return the date's ISO string", function() {
+        var testDate = new Date("1960-01-25");
+        var date = new PentahoDate(testDate);
+        expect(date.$key).toBe(date.value.toISOString());
+      });
+    });
+
     describe(".Type", function() {
 
       describe("#isContinuous", function() {

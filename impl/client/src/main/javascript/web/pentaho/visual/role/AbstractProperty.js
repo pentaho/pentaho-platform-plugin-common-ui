@@ -17,12 +17,14 @@ define([
   "pentaho/module!_",
   "pentaho/type/Property",
   "./AbstractMapping",
+  "../base/KeyTypes",
   "pentaho/i18n!messages",
   "pentaho/type/loader",
   "pentaho/type/ValidationError",
   "pentaho/data/TableView",
   "pentaho/type/util"
-], function(module, Property, AbstractMapping, bundle, typeLoader, ValidationError, DataView, typeUtil) {
+], function(module, Property, AbstractMapping, VisualKeyTypes, bundle, typeLoader,
+            ValidationError, DataView, typeUtil) {
 
   "use strict";
 
@@ -194,17 +196,41 @@ define([
       /**
        * Gets a value that indicates if the visual role is a key property of the visual space.
        *
+       * This attribute is only applicable when the associated model
+       * has [visualKeyType]{@link pentaho.visual.base.AbstractModelType#visualKeyType}
+       * of [dataKey]{@link }pentaho.visual.base.KeyTypes.dataKey}.
+       *
        * When a visual role is a key visual role,
        * each distinct combination of key visual roles' values corresponds to
        * a distinct visual element being rendered.
-       * When a visual model has no key visual roles,
-       * then it is assumed that one visual element is rendered per input row of data.
        *
        * @name pentaho.visual.role.AbstractPropertyType#isVisualKey
        * @type {boolean}
        * @readOnly
        * @abstract
+       *
+       * @see pentaho.visual.base.AbstractModelType#visualKeyType
+       * @see pentaho.visual.role.AbstractPropertyType#isVisualKeyEffective
        */
+
+      /**
+       * Gets a value that indicates if the visual role is _effectively_ a visual key.
+       *
+       * When the property's associated model is not defined or does not have a
+       * [visualKeyType]{@link pentaho.visual.base.AbstractModelType#visualKeyType} of
+       * [dataKey]{@link }pentaho.visual.base.KeyTypes.dataKey},
+       * `undefined` is returned.
+       *
+       * @type {boolean|undefined}
+       * @readOnly
+       * @see pentaho.visual.role.AbstractPropertyType#isVisualKey
+       */
+      get isVisualKeyEffective() {
+        var modelType = this.declaringType;
+        return modelType !== null && modelType.visualKeyType === VisualKeyTypes.dataKey
+          ? this.isVisualKey
+          : undefined;
+      },
 
       /**
        * Gets the metadata about the fields property of mappings of this visual role property.
@@ -289,7 +315,7 @@ define([
             // Continue
           }
 
-          // TODO: Validate isVisualKey and isKey
+          // TODO: Validate isVisualKeyEffective and isKey
         }
       }
       // endregion

@@ -50,7 +50,8 @@ define([
      *   time interval).
      *
      * The strategy targets:
-     * 1. Visual roles which are [visual keys]{@link pentaho.visual.role.PropertyType#isVisualKey};
+     * 1. Visual roles which are
+     *    [effective visual keys]{@link pentaho.visual.role.PropertyType#isVisualKeyEffective};
      * 2. Modes whose [dataType]{@link pentaho.visual.role.Mode#dataType} is
      *    assignable to [date]{@link pentaho.type.Date}, and
      * 3. Mappings of fields whose [fields][@link pentaho.data.ITable#getColumnProperty] contain the
@@ -203,8 +204,9 @@ define([
       id: module.id,
 
       /** @inheritDoc */
-      getInputTypeFor: function(outputDataType, isVisualKey) {
-        if(!isVisualKey || !outputDataType.isSubtypeOf(PentahoDate.type)) {
+      getInputTypeFor: function(outputDataType, isVisualKeyEf) {
+
+        if(isVisualKeyEf === false || !outputDataType.isSubtypeOf(PentahoDate.type)) {
           return null;
         }
 

@@ -19,6 +19,7 @@ define([
   "../role/AbstractProperty",
   "../color/PaletteProperty", // Also pre-loads all registered palette instances.
   "./Application",
+  "./KeyTypes",
   "pentaho/data/filter/Abstract",
   "pentaho/type/Object",
   "pentaho/util/object",
@@ -26,8 +27,8 @@ define([
   "pentaho/i18n!model",
   // Pre-load all registered filter types.
   "pentaho/module/subtypesOf!pentaho/data/filter/Abstract"
-], function(module, Complex, RoleAbstractProperty, PaletteProperty, VisualApplication, AbstractFilter, PentahoObject,
-            O, ComplexChangeset, bundle) {
+], function(module, Complex, RoleAbstractProperty, PaletteProperty, VisualApplication, VisualKeyTypes,
+            AbstractFilter, PentahoObject, O, ComplexChangeset, bundle) {
 
   "use strict";
 
@@ -135,40 +136,44 @@ define([
     },
 
     /**
-     * Gets an array of the names of fields which are mapped to _key_ visual roles.
+     * Gets an array of the names of fields which are mapped to _effective key_ visual roles.
      *
      * @type {!Array.<string>}
      * @readOnly
      *
-     * @see pentaho.visual.role.AbstractPropertyType#isVisualKey
+     * @see pentaho.visual.role.AbstractPropertyType#isVisualKeyEffective
      */
     get keyFieldNames() {
 
       var keyFields = [];
       var keyFieldSet = keyFields.set = Object.create(null);
 
-      this.$type.eachVisualRole(function(propType) {
-        if(propType.isVisualKey) {
-          this.get(propType).fields.each(function(field) {
-            var name = field.name;
-            if(!O.hasOwn(keyFieldSet, name)) {
-              keyFieldSet[name] = true;
-              keyFields.push(name);
-            }
-          });
-        }
-      }, this);
+      var modelType = this.$type;
+
+      if(modelType.visualKeyType === VisualKeyTypes.dataKey) {
+        modelType.eachVisualRole(function(propType) {
+          if(propType.isVisualKey) {
+            this.get(propType).fields.each(function(field) {
+              var name = field.name;
+              if(!O.hasOwn(keyFieldSet, name)) {
+                keyFieldSet[name] = true;
+                keyFields.push(name);
+              }
+            });
+          }
+        }, this);
+      }
 
       return keyFields;
     },
 
     /**
-     * Gets an array of the names of fields which are mapped to _measure_ visual roles
-     * and which are not mapped to any _key_ visual roles.
+     * Gets an array of the names of fields which are mapped to _effective measure_ visual roles
+     * and which are not mapped to any _effective key_ visual roles.
      *
      * @type {!Array.<string>}
      * @readOnly
-     * @see pentaho.visual.role.AbstractPropertyType#isVisualKey
+     * @see pentaho.visual.role.AbstractPropertyType#isVisualKeyEffective
      */
     get measureFieldNames() {
 
@@ -177,17 +182,21 @@ define([
       var measureFields = [];
       var measureFieldSet = measureFields.set = Object.create(null);
 
-      this.$type.eachVisualRole(function(propType) {
-        if(!propType.isVisualKey) {
-          this.get(propType).fields.each(function(field) {
-            var name = field.name;
-            if(!O.hasOwn(keyFieldSet, name) && !O.hasOwn(measureFieldSet, name)) {
-              measureFieldSet[name] = true;
-              measureFields.push(name);
-            }
-          });
-        }
-      }, this);
+      var modelType = this.$type;
+
+      if(modelType.visualKeyType === VisualKeyTypes.dataKey) {
+        modelType.eachVisualRole(function(propType) {
+          if(!propType.isVisualKey) {
+            this.get(propType).fields.each(function(field) {
+              var name = field.name;
+              if(!O.hasOwn(keyFieldSet, name) && !O.hasOwn(measureFieldSet, name)) {
+                measureFieldSet[name] = true;
+                measureFields.push(name);
+              }
+            });
+          }
+        }, this);
+      }
 
       return measureFields;
     },
@@ -351,6 +360,25 @@ define([
       isColorPalette: function(propType) {
         return propType.isSubtypeOf(_palettePropertyType);
       }
+
+      /**
+       * Gets the type of visual key used by the visualization.
+       *
+       * Abstract model classes may have a value of `undefined`.
+       * However, once this property is specified to a non-undefined value, it cannot be changed anymore,
+       * either in this class or in any of its subclasses.
+       *
+       * The default value, for a non-abstract class, is [dataKey]{@link }pentaho.visual.base.KeyTypes.dataKey}.
+       *
+       * @name visualKeyType
+       * @memberOf pentaho.visual.base.AbstractModelType#
+       * @type {pentaho.visual.base.KeyTypes|undefined}
+       * @readOnly
+       * @abstract
+       *
+       * @see pentaho.visual.role.AbstractPropertyType#isVisualKey
+       * @see pentaho.visual.role.AbstractPropertyType#isVisualKeyEffective
+       */
     }
   })
   .localize({$type: bundle.structured.AbstractModel})

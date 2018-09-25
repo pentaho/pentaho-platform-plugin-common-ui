@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 define([
+  "pentaho/visual/role/AbstractProperty",
   "pentaho/type/changes/Transaction",
   "tests/pentaho/util/errorMatch",
   "pentaho/visual/base/AbstractModel",
+  "pentaho/visual/base/KeyTypes",
   "pentaho/type/ValidationError",
   "pentaho/data/Table"
-], function(Transaction, errorMatch, AbstractModel, ValidationError, Table) {
+], function(AbstractProperty, Transaction, errorMatch, AbstractModel, VisualKeyTypes, ValidationError, Table) {
 
   "use strict";
 
@@ -144,6 +146,76 @@ define([
             });
           });
         }
+      });
+
+      describe("#isVisualKeyEffective", function() {
+
+        it("should return undefined when there is not associated model type", function() {
+
+          var rolePropType = AbstractProperty.type;
+
+          var result = rolePropType.isVisualKeyEffective;
+          expect(result).toBe(undefined);
+        });
+
+        it("should return undefined when the associated model type does not have visualKeyType=dataKey", function() {
+
+          var Model = AbstractModel.extend({
+            $type: {
+              visualKeyType: VisualKeyTypes.dataOrdinal,
+              props: {
+                propRole: {
+                  base: "pentaho/visual/role/AbstractProperty"
+                }
+              }
+            }
+          });
+
+          var rolePropType = Model.type.get("propRole");
+
+          var result = rolePropType.isVisualKeyEffective;
+          expect(result).toBe(undefined);
+        });
+
+        it("should return true if the property has isVisualKey=true", function() {
+
+          var Model = AbstractModel.extend({
+            $type: {
+              visualKeyType: VisualKeyTypes.dataKey,
+              props: {
+                propRole: {
+                  base: "pentaho/visual/role/AbstractProperty",
+                  isVisualKey: true
+                }
+              }
+            }
+          });
+
+          var rolePropType = Model.type.get("propRole");
+
+          var result = rolePropType.isVisualKeyEffective;
+          expect(result).toBe(true);
+        });
+
+        it("should return true if the property has isVisualKey=true", function() {
+
+          var Model = AbstractModel.extend({
+            $type: {
+              visualKeyType: VisualKeyTypes.dataKey,
+              props: {
+                propRole: {
+                  base: "pentaho/visual/role/AbstractProperty",
+                  isVisualKey: false
+                }
+              }
+            }
+          });
+
+          var rolePropType = Model.type.get("propRole");
+
+          var result = rolePropType.isVisualKeyEffective;
+          expect(result).toBe(false);
+        });
       });
     });
   });

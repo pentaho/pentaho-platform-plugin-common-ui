@@ -18,6 +18,7 @@ define([
   "./AbstractProperty",
   "./ExternalMapping",
   "./Mode",
+  "../base/KeyTypes",
   "pentaho/module/subtypesOf!pentaho/visual/role/adaptation/Strategy",
   "pentaho/i18n!messages",
   "pentaho/type/loader",
@@ -25,7 +26,7 @@ define([
   "pentaho/data/TableView",
   "pentaho/type/util",
   "pentaho/util/object"
-], function(module, AbstractProperty, ExternalMapping, Mode, allStrategyCtorsList,
+], function(module, AbstractProperty, ExternalMapping, Mode, VisualKeyTypes, allStrategyCtorsList,
             bundle, typeLoader, ValidationError, DataView, typeUtil, O) {
 
   "use strict";
@@ -255,7 +256,7 @@ define([
 
         var externalModes = new ListOfModeType();
 
-        var isVisualKey = this.isVisualKey;
+        var isVisualKeyEf = this.isVisualKeyEffective;
 
         this._internalProperty.modes.each(function(internalMode) {
 
@@ -263,7 +264,7 @@ define([
 
           strategyTypeList.forEach(function(strategyType) {
 
-            var inputType = strategyType.getInputTypeFor(internalMode.dataType, isVisualKey);
+            var inputType = strategyType.getInputTypeFor(internalMode.dataType, isVisualKeyEf);
             if(inputType != null) {
 
               var externalMode = new Mode({dataType: inputType, isContinuous: isContinuous});
