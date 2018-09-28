@@ -1,39 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>org.pentaho</groupId>
     <artifactId>pentaho-ce-jar-parent-pom</artifactId>
-    <version>7.1-SNAPSHOT</version>
+    <version>7.1.0.17-161</version>
   </parent>
-
   <artifactId>common-ui</artifactId>
-  <version>7.1-SNAPSHOT</version>
+  <version>7.1.0.17-161</version>
   <packaging>pom</packaging>
-
   <name>Common-UI root POM</name>
   <description>Parent pom for Common-UI projects.</description>
   <url>http://www.pentaho.com</url>
-  
   <modules>
     <module>impl</module>
     <module>assemblies</module>
   </modules>
-
   <scm>
     <connection>scm:git:git@github.com:pentaho/pentaho-platform-plugin-common-ui.git</connection>
     <developerConnection>scm:git:git@github.com:pentaho/pentaho-platform-plugin-common-ui.git</developerConnection>
     <url>https://github.com/pentaho/pentaho-platform-plugin-common-ui</url>
   </scm>
-
   <properties>
-    <angular.version>1.5.8</angular.version>
     <jquery.version>1.12.4</jquery.version>
     <dojo.version>1.9.2</dojo.version>
+    <angular.version>1.5.8</angular.version>
   </properties>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -46,16 +39,12 @@
         <artifactId>dijit</artifactId>
         <version>${dojo.version}</version>
       </dependency>
-      <!-- Fetching dojox from a source artifact because dojox's webjar does not include dojox/app, dojox/calendar and
-        dojox/dgauges. The reason for this is that the webjar deployer at http://www.webjars.org/bower is unable to handle
-        git submodules.
-      -->
       <dependency>
         <groupId>org.dojotoolkit.dojo</groupId>
         <artifactId>dojo-release</artifactId>
         <version>${dojo.version}</version>
-        <classifier>src</classifier>
         <type>zip</type>
+        <classifier>src</classifier>
       </dependency>
       <dependency>
         <groupId>org.webjars.npm</groupId>
@@ -83,13 +72,11 @@
         <version>${angular.version}</version>
         <exclusions>
           <exclusion>
-            <groupId>*</groupId>
             <artifactId>*</artifactId>
+            <groupId>*</groupId>
           </exclusion>
         </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-
 </project>
