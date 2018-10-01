@@ -61,6 +61,10 @@
   border: 1px solid #D6B225;
 }
 
+.propPanel_gemBar .gem{
+  margin-top: 4px;
+}
+
 .IE .gem{
   background: url('../images/gem-bg-level.png');
   background-repeat: repeat-x;
@@ -139,7 +143,7 @@
   /* Safari/Chrome */
   -webkit-border-radius: 5px;
   background-color: white;
-  padding: 5px;
+  padding: 1px 5px 5px 5px;
   border: none;
   margin-top: 5px;
 }
@@ -173,6 +177,14 @@
   padding:5px !important;
 }
 
+.gemDropZone {
+  /* Make sure the bounding box contains any gem margins,
+     so that mouse events are still within this region.
+  */
+  padding-top: 0.1px;
+  padding-bottom: 0.1px;
+}
+
 .gemPlaceholder{
   clear: both;
   text-align: center;
@@ -181,7 +193,6 @@
   height: 22px;
   line-height: 22px;
 }
-
 
 .gemPlaceholder>span{
   color: #aaa;
@@ -195,13 +206,8 @@
 
 }
 
-
-
 .pentahoPropertiesPanel .propPanel_gemBar.over{
   border-color: #CCCCCC;
-}
-
-.pentahoPropertiesPanel .propPanel_gemBar.over{
   background-color: #FEF9D4;
 }
 
@@ -219,20 +225,22 @@
 .indicator{
   background-image: url("../images/dropIndicator.png");
   background-repeat: no-repeat;
-  background-position: left center;
+  background-position: left -2px;
   position: absolute;
-  height:3px;
   width:100%;
   z-index: 1100;
-  padding: 3px;
+  padding: 4px 3px 4px 5px;
   height: 2px;
+  pointer-events: none;
 }
 .indicator .indicatorLine{
   margin-left:6px;
   background-color: #A5E482;
   width:100%;
   height: 2px;
+  pointer-events: none;
 }
+
 .propPanelItem{
 }
 
