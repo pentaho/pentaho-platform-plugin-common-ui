@@ -246,7 +246,16 @@ define([
           break;
         }
 
-        return mostSpecific != null && mostSpecific.isStartDateTimeProvided ? mostSpecificIndex : -1;
+        if(mostSpecific != null) {
+          var isStartDateTimeProvided = mostSpecific.isStartDateTimeProvided;
+
+          // default is true when isStartDateTimeProvided is omitted
+          if(isStartDateTimeProvided == null || isStartDateTimeProvided) {
+            return mostSpecificIndex;
+          }
+        }
+
+        return -1;
       },
 
       __getOutputFieldName: function(inputFieldIndexes) {
