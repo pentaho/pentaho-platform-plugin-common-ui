@@ -404,7 +404,7 @@ define([
           });
 
           it("should return an object with isValid: false if there " +
-            "are no fields with isStartDateTimeProvided=true", function() {
+               "are no fields with isStartDateTimeProvided=true", function() {
             dataTable.getColumnAttribute(datasetFieldIndexes1.months)
               .property("EntityWithTimeIntervalKey").isStartDateTimeProvided = false;
 
@@ -413,6 +413,18 @@ define([
               [datasetFieldIndexes1.years, datasetFieldIndexes1.months]
             );
             expect(result).toEqual(jasmine.objectContaining({isValid: false}));
+          });
+
+          it("should return an object with isValid: true if " +
+               "isStartDateTimeProvided is omitted", function() {
+            delete dataTable.getColumnAttribute(datasetFieldIndexes1.months)
+              .property("EntityWithTimeIntervalKey").isStartDateTimeProvided;
+
+            var result = Strategy.type.validateApplication(
+              dataTable,
+              [datasetFieldIndexes1.years, datasetFieldIndexes1.months]
+            );
+            expect(result).toEqual(jasmine.objectContaining({isValid: true}));
           });
         });
 
@@ -457,6 +469,18 @@ define([
               [datasetFieldIndexes2.instant]
             );
             expect(result).toEqual(jasmine.objectContaining({isValid: false}));
+          });
+
+          it("should return an object with isValid: true if " +
+               "isStartDateTimeProvided is omitted", function() {
+            delete dataTable.getColumnAttribute(datasetFieldIndexes2.instant)
+              .property("EntityWithTimeIntervalKey").isStartDateTimeProvided;
+
+            var result = Strategy.type.validateApplication(
+              dataTable,
+              [datasetFieldIndexes2.instant]
+            );
+            expect(result).toEqual(jasmine.objectContaining({isValid: true}));
           });
         });
       });
