@@ -1,0 +1,77 @@
+/*!
+ * Copyright 2018 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `IAddUsage` interface exposes information about the result of a hypothetical, valid _add_ operation,
+ * of a field to a visual role.
+ *
+ * @name IAddUsage
+ * @memberOf pentaho.visual.role
+ * @interface
+ * @see pentaho.visual.role.util
+ */
+
+/**
+ * The name of the visual role.
+ *
+ * @name name
+ * @memberOf pentaho.visual.role.IAddUsage#
+ * @type {string}
+ */
+
+/**
+ * The name of the field being added.
+ *
+ * @name fieldName
+ * @memberOf pentaho.visual.role.IAddUsage#
+ * @type {string}
+ */
+
+/**
+ * The index at which the field's final position.
+ *
+ * This index is relative to the visual role's original list of fields.
+ * So, if, for example, a field is moved, it does not account for the shift introduced
+ * by the removal from the old position.
+ *
+ * @name fieldPosition
+ * @memberOf pentaho.visual.role.IAddUsage#
+ * @type {number}
+ */
+
+/**
+ * Indicates if the field will replace another existing field at `fieldPosition`
+ *
+ * @name replaceTarget
+ * @memberOf pentaho.visual.role.IAddUsage#
+ * @type {boolean}
+ */
+
+/**
+ * The visual role's property type.
+ *
+ * @name propType
+ * @memberOf pentaho.visual.role.IAddUsage#
+ * @type {pentaho.visual.role.AbstractPropertyType}
+ */
+
+/**
+ * The resultin visual role's mode of operation.
+ *
+ * @name mode
+ * @memberOf pentaho.visual.role.IAddUsage#
+ * @type {pentaho.visual.role.Mode}
+ */

@@ -33,47 +33,40 @@ define([
   var roleUtil = /** @lends pentaho.visual.role.util */{
 
     /**
-     * Tests if it would be valid to add a field to a visual role.
+     * Tests if it would be valid to add a field to a visual role at a specific position.
      *
      * This method allows moving, appending/inserting or replacing a field in a visual role.
-     *
-     * When `fieldName` is already mapped to the visual role:
-     * 1. When `targetFieldPosition` is not specified, the field is moved to the last position,
-     *    if it is not already its position, in which case `null` is returned.
-     *
-     * 2. Otherwise, the field is moved to the specified position,
-     *    if it is not already its position, in which case `null` is returned.
-     *
-     * When `targetFieldPosition` is not specified:
-     * 1. When `fieldName` is already mapped to the visual role,
-     *    the field is moved to the last position.
-     * 2. Otherwise,
      *
      * When valid, returns the corresponding visual role usage.
      *
      * @param {pentaho.visual.base.AbstractModel} vizModel - The visualization model.
-     * @param {pentaho.data.Table} dataTable - The data table in which all the fields,
-     *  including the new one, is defined.
      * @param {string} roleName - The name of the visual role.
      * @param {string} fieldName - The name of the field.
-     * @param {?number} targetFieldPosition - The new index of the field in the visual role's field list.
-     *   When unspecified and the field is already mapped to the visual role, then it is moved.
      *
-     *   When unspecified and the position is determined automatically,
-     *   by attempting every position, starting from the one after the last mapped field.
+     * @param {object} [keyArgs] - The keyword arguments object.
      *
-     *   Otherwise,
-     *   when `replaceTarget` is `true`, the field replaces the existing one at the given position.
-     *   When `replaceTarget` is `false`, the field is inserted before the existing one.
+     * @param {?pentaho.data.Table} [keyArgs.alternateData] - An alternate data table which certainly
+     *  contains all of the currently mapped fields plus the new field.
      *
-     * @param {?boolean} replaceTarget - Indicates that the field should
-     *   replace the existing field at the given position,
-     *   instead of being inserted before the existing field.
+     * @param {?number} [keyArgs.fieldPosition] - The new index of the field in the visual role's field list.
      *
-     *   This argument is ignored if `targetFieldPosition` is not specified.
+     *   The default value is the number of fields, causing the field to become the last one.
      *
-     * @return {?pentaho.visual.role.Mode} The resulting visual role mode, when valid;
+     *   When specified to an existing position the field is either inserted at that position
+     *   or replaces the field at that position, depending on the value of `keyArgs.replaceTarget`.
+     *
+     * @param {?(boolean|"auto")} [keyArgs.replaceTarget=false] - When `keyArgs.fieldPosition` is specified
+     *   and a field mapping exists at that position, indicates if it should be replaced by the new field.
+     *
+     *   When `"auto"` is specified, the target is replaced only if the visual role has no more available space
+     *   for another field.
+     *
+     *   This argument is ignored if `keyArgs.fieldPosition` is not specified.
+     *
+     * @return {?pentaho.visual.role.IAddUsage} The resulting visual role usage, when valid;
      *  `null`, otherwise.
+     *
+     *  @see pentaho.visual.role.util.testAddFieldAtAutoPosition
      */
     testAddField: function(vizModel, roleName, fieldName, keyArgs) {
 
@@ -88,32 +81,40 @@ define([
       var propType = vizModel.$type.get(roleName);
       var mapping = vizModel.get(roleName);
       var mappingFields = mapping.fields;
-      var mappingField = mappingFields.get(fieldName);
+      var L = mappingFields.count;
+      var mappingField = L > 0 ? mappingFields.get(fieldName) : null;
 
       var fieldPosition = arg.optional(keyArgs, "fieldPosition", null);
       var replaceTarget = false;
 
-      if(fieldPosition != null) {
+      if(L > 0 && fieldPosition != null && fieldPosition < L) {
         // `fieldPosition` may be >= length, in which case `null` is returned.
-        var targetMappingField = mappingFields.at(fieldPosition);
-        if(targetMappingField !== null) {
-          if(targetMappingField === mappingField) {
-            // Same position (replaceTarget is irrelevant).
-            return null;
-          }
+        fieldPosition = Math.max(0, fieldPosition);
 
-          replaceTarget = arg.optional(keyArgs, "replaceTarget", false);
-          if(replaceTarget === "auto") {
+        var targetMappingField = mappingFields.at(fieldPosition);
+        // assert targetMappingField !== null
+
+        if(targetMappingField === mappingField) {
+          // Same position (replaceTarget is irrelevant).
+          return null;
+        }
+
+        replaceTarget = arg.optional(keyArgs, "replaceTarget", false);
+        if(replaceTarget === "auto") {
+          if(mappingField === null) {
             // Enter replace mode if there is no room to add/insert.
             replaceTarget = mappingFields.count >= propType.fields.countRangeOn(vizModel).max;
+          } else {
+            // It's a move, so there's space.
+            replaceTarget = false;
           }
         }
-      } else if(mappingField !== null) {
+      } else {
         // To last position.
-        fieldPosition = mappingFields.count;
+        fieldPosition = L;
 
         // Already at the last position, so no actual move?
-        if(mappingFields.at(fieldPosition - 1) === mappingField) {
+        if(mappingField !== null && mappingFields.at(fieldPosition - 1) === mappingField) {
           return null;
         }
       }
@@ -148,7 +149,8 @@ define([
 
         return {
           name: roleName,
-          propType: propType, // cache
+          propType: propType, // conveniently cached
+          fieldName: fieldName, // conveniently accessible
           fieldPosition: fieldPosition,
           replaceTarget: replaceTarget,
           mode: mapping.mode
@@ -156,6 +158,35 @@ define([
       });
     },
 
+    /**
+     * Tests if it would be valid to add a field to a visual role, at one of the possible positions.
+     *
+     * This method is similar to {@link pentaho.visual.role.util.testAddField},
+     * however, it automatically determines the first position from end, if any,
+     * at which it would be possible to add the field to the visual role.
+     *
+     * When valid, returns the corresponding visual role usage.
+     *
+     * @param {pentaho.visual.base.AbstractModel} vizModel - The visualization model.
+     * @param {string} roleName - The name of the visual role.
+     * @param {string} fieldName - The name of the field.
+     *
+     * @param {object} [keyArgs] - The keyword arguments object.
+     *
+     * @param {?pentaho.data.Table} [keyArgs.alternateData] - An alternate data table which certainly
+     *  contains all of the currently mapped fields plus the new field.
+     *
+     * @param {?(boolean|"auto")} [keyArgs.replaceTarget=false] - Indicates if an existing field at an automatically
+     *   determined position should be replaced by the new field.
+     *
+     *   When `"auto"` is specified, the target is replaced only if the visual role has no more available space
+     *   for another field.
+     *
+     * @return {?pentaho.visual.role.IAddUsage} The resulting visual role usage, when valid;
+     *  `null`, otherwise.
+     *
+     *  @see pentaho.visual.role.util.testAddField
+     */
     testAddFieldAtAutoPosition: function(vizModel, roleName, fieldName, keyArgs) {
 
       var keyArgs2 = keyArgs == null ? {} : Object.create(keyArgs);
@@ -176,6 +207,30 @@ define([
       return null;
     },
 
+    /**
+     * Gets a list of visual role usages for valid additions of a field to a visualization model
+     *
+     * This method tests adding the field to each of the visualization model's visual roles,
+     * by delegating to {@link pentaho.visual.role.util.testAddFieldAtAutoPosition}.
+     *
+     * @param {pentaho.visual.base.AbstractModel} vizModel - The visualization model.
+     * @param {string} fieldName - The name of the field.
+     *
+     * @param {object} [keyArgs] - The keyword arguments object.
+     *
+     * @param {?pentaho.data.Table} [keyArgs.alternateData] - An alternate data table which certainly
+     *  contains all of the currently mapped fields plus the new field.
+     *
+     * @param {?(boolean|"auto")} [keyArgs.replaceTarget=false] - For each of the determined visual role usages,
+     *   indicates if an existing field at the automatically determined positions should be replaced by the new field.
+     *
+     *   When `"auto"` is specified, the target is replaced only if the visual role has no more available space
+     *   for another field.
+     *
+     * @return {Array.<pentaho.visual.role.IAddUsage>} An array of visual role usages, possibly empty.
+     *
+     * @see pentaho.visual.role.util.testAddFieldAtAutoPosition
+     */
     getValidRolesForAddingField: function(vizModel, fieldName, keyArgs) {
 
       var validRoleUsages = [];
@@ -193,6 +248,44 @@ define([
       return validRoleUsages;
     },
 
+    /**
+     * Gets the "best" visual role usage for adding a field to a visualization model.
+     *
+     * This method selects one of the visual role usages returned by
+     * {@link pentaho.visual.role.util.getValidRolesForAddingField} by using the following total ordering:
+     *
+     * 1. The visual role has its minimum fields requirement satisfied.
+     *
+     * 2. The field's data type is such it matches directly the
+     *    [isContinuous]{@link pentaho.visual.role.Mode#isContinuous} property of the
+     *    [visual role usage]{@link pentaho.visual.role.IAddUsage#mode}.
+     *
+     * 3. The visual role has a lower number of mapped fields.
+     *
+     * 4. The visual order of the visual role,
+     *    according to its [ordinal]{@link pentaho.visual.role.PropertyType#ordinal} property.
+     *
+     * 5. The definition order of the visual role,
+     *    according to its [index]{@link pentaho.visual.role.PropertyType#index} property.
+     *
+     * @param {pentaho.visual.base.AbstractModel} vizModel - The visualization model.
+     * @param {string} fieldName - The name of the field.
+     *
+     * @param {object} [keyArgs] - The keyword arguments object.
+     *
+     * @param {?pentaho.data.Table} [keyArgs.alternateData] - An alternate data table which certainly
+     *  contains all of the currently mapped fields plus the new field.
+     *
+     * @param {?(boolean|"auto")} [keyArgs.replaceTarget=false] - For each of the determined visual role usages,
+     *   indicates if an existing field at the automatically determined positions should be replaced by the new field.
+     *
+     *   When `"auto"` is specified, the target is replaced only if the visual role has no more available space
+     *   for another field.
+     *
+     * @return {Array.<pentaho.visual.role.IAddUsage>} An array of visual role usages, possibly empty.
+     *
+     * @see pentaho.visual.role.util.testAddFieldAtAutoPosition
+     */
     getBestRoleForAddingField: function(vizModel, fieldName, keyArgs) {
 
       var dataTable = arg.optional(keyArgs, "alternateData") || vizModel.data;
@@ -265,15 +358,24 @@ define([
 
   return roleUtil;
 
-  function sortByProps(list, propAccessors) {
+  /**
+   * Sorts the elements of an array, in place,
+   * according to the values of some of its properties.
+   *
+   * @param {Array} list - The array to sort.
+   * @param {Array.<(function(any) : any)>} propGetters - An array of property getter functions.
+   *
+   * @return {Array} The specified array.
+   */
+  function sortByProps(list, propGetters) {
 
-    var P = propAccessors.length;
+    var P = propGetters.length;
 
     return list.sort(function(elemA, elemB) {
       var i = -1;
       while(++i < P) {
-        var propAccessor = propAccessors[i];
-        var result = F.compare(propAccessor(elemA), propAccessor(elemB));
+        var propGetter = propGetters[i];
+        var result = F.compare(propGetter(elemA), propGetter(elemB));
         if(result !== 0) {
           return result;
         }

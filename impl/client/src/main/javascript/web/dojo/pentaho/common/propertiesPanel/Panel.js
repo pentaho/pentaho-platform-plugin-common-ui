@@ -859,7 +859,7 @@ define([
         dropInfo = this.__getCurrentDropInfo();
       }
 
-      var position = this.__calculateInsertPosition(dropInfo.current, dropInfo.before);
+      var position = this.__calculateInsertPosition(dropInfo.anchor, dropInfo.before);
 
       return this.gemBar.checkAcceptance(source, nodes, silent, position);
     },
@@ -1007,7 +1007,12 @@ define([
       this.gems = [];
 
       // Main node
-      domClass.add(this.domNode, this.model.dataType); // add dataType as css class.
+
+      // Add dataType as css class.
+      var dataType = this.model.dataType;
+      if(dataType) {
+        domClass.add(this.domNode, dataType);
+      }
 
       // Drop zone that contains current gems.
       this.dropZoneNode = this.domNode.firstChild;
