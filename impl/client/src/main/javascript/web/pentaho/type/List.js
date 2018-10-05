@@ -359,7 +359,7 @@ define([
      * the element or elements are appended to the list.
      *
      * @param {any|Array} fragment - Element or elements to add.
-     * @param {number} index - The index at which to start inserting new elements.
+     * @param {?number} index - The index at which to start inserting new elements.
      *
      * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
      */

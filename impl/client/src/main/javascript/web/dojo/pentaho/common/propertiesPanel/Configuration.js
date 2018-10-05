@@ -18,6 +18,8 @@ define([
   "dojo/_base/declare", "dojo/Stateful", "dojo/_base/array", "dojo/Evented", "dojo/_base/lang", "dojo/aspect"
 ], function(declare, Stateful, array, Evented, lang, aspect) {
 
+  /* eslint-disable dot-notation */
+
   var O_hasOwn = Object.prototype.hasOwnProperty;
 
   var Configuration = declare("pentaho.common.propertiesPanel.Configuration", [Stateful, Evented], {
@@ -159,20 +161,29 @@ define([
     },
 
     insertAt: function(gem, newIdx, oldIdx) {
+
       this._value = null;
-      var currIdx = array.indexOf(this.gems, gem);
-      this.gems.splice(newIdx, 0, gem); // add it to the new pos
-      var oldIdx = currIdx;
-      if(currIdx > -1) { //reorder
+
+      var currIdx = oldIdx = array.indexOf(this.gems, gem);
+
+      // Add it to the new pos.
+      this.gems.splice(newIdx, 0, gem);
+
+      // Reorder?
+      if(currIdx > -1) {
         if(currIdx >= newIdx) {
           currIdx++;
         }
-        this.gems.splice(currIdx, 1); // remove from old pos
+
+        // Remove from old pos.
+        this.gems.splice(currIdx, 1);
       }
-      // adjust new index to account for a move
+
+      // Adjust new index to account for a move.
       if(currIdx > -1 && currIdx < newIdx) {
         newIdx--;
       }
+
       this.onModelEvent("insertAt", {gem: gem, idx: newIdx, oldIdx: oldIdx});
     }
   });

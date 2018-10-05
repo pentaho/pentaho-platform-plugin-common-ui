@@ -55,6 +55,8 @@ define([
             Target, Source, ManagerClass, Evented, topic, dom, geometry, aspect,
             Messages, Configuration) {
 
+  /* eslint-disable dot-notation, new-cap */
+
   var nextId = 0;
   function newId(prefix) {
     return prefix + (++nextId);
@@ -416,11 +418,6 @@ define([
       this.dropIndicator.id = "propertyPanelIndicator";
       this.dropIndicator.style.display = "none";
 
-      // Source#topics
-      this.topics.push(
-        on(this.dropIndicator, "mouseover", lang.hitch(this, "_redirectMouseOver")),
-        on(this.dropIndicator, "mouseup",   lang.hitch(this, "_redirectMouseUp"  )));
-
       var line = document.createElement("div");
       line.className = "indicatorLine";
 
@@ -432,80 +429,57 @@ define([
     destroy: function() {
       this.inherited(arguments);
 
+      if(this.__autoHideDropIndicatorCallback !== null) {
+        this.__autoHideDropIndicatorCallback();
+      }
+
       this.gemBar =
       this.dropIndicator =
       this.gemUIbeingInserted = null;
     },
 
-    _redirectMouseOver: function(e) {
-      var idx = this._getNodeUnderMouse(e);
-      this.lastItemOver = idx;
-      if(idx > -1) {
-        if(document.createEvent) {
-          var evt = document.createEvent("MouseEvent");
-          evt.initMouseEvent("mouseover", true, true, window, 0, e.screenX, e.screenY, e.clientX, e.clientY,
-              e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
-          this.node.dispatchEvent(evt);
-          this.node.children[idx].dispatchEvent(evt);
+    onDropAtEnd: function(source, nodes, copy) {
 
+      var dropInfo = this.__getEndDropInfo();
 
-          evt = document.createEvent("MouseEvent");
-          evt.initMouseEvent("mousemove", true, true, window, 0, e.screenX, e.screenY, e.clientX, e.clientY,
-              e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
-          this.node.dispatchEvent(evt);
-          this.node.children[idx].dispatchEvent(evt);
-        } else if(document.createEventObject) {
-          var evt = document.createEventObject(window.event);
-          evt.button = 1;
-          this.node.children[idx].fireEvent("onmouseover", evt);
-          this.node.children[idx].fireEvent("onmousemove", evt);
-        }
-      }
+      return this.onDrop(source, nodes, copy, dropInfo);
     },
 
-    _redirectMouseUp: function(e) {
-      var idx = this._getNodeUnderMouse(e);
-      if(idx > -1) {
-        if(document.createEvent) {
-          var evt = document.createEvent("MouseEvent");
-          evt.initMouseEvent("mouseup", true, true, window, 0, e.screenX, e.screenY, e.clientX, e.clientY,
-              e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
-          // this.node.dispatchEvent(evt);
-          this.node.children[idx].dispatchEvent(evt);
-        } else if(document.createEventObject) {
-          var evt = document.createEventObject(window.event);
-          this.node.children[idx].fireEvent("onmouseup", evt);
-        }
-      }
-    },
+    // @override
+    onDrop: function(source, nodes, copy, dropInfoOverride) {
+      this.dropZone2Zone = false; // Flag moves from one gembar to another.
 
-    onDrop: function(source, nodes, copy, dropAtEnd) {
-      this.dropAtEnd = dropAtEnd; // passed in by the placeholder source so we can know to insert at the end of the list
-      this.dropZone2Zone = false; // flag moves from one gembar to another
-
-      if(!nodes || nodes.length == 0) {
+      if(!nodes || nodes.length === 0) {
         return false;
       }
 
       var droppedNode = nodes[0];
 
-      // Look for an existing gem for the same element.
-      // Only check if not a reorder (same gemBar).
-      var gemUI = this.gemBar.propPanel.getGemUIById(droppedNode.id);
-      if((!gemUI || (gemUI && gemUI.gemBar != this.gemBar)) &&
-         !this.gemBar.checkAcceptance(this, nodes, /* showErrors */ true)) {
-        return;
+      // Passed in by the placeholder source, when to insert at the end of the list.
+      // When dropAtEnd, source === this and !this.current,
+      // which happens when a gem from this gembar is dropped in the associated placeholderSource,
+      // the base method will consider this a noop
+      // (how would it be possible to be dropping here a gem from here and yet there was no current?).
+      if(dropInfoOverride != null) {
+        this.current = dropInfoOverride.anchor;
+        this.before = dropInfoOverride.before;
       }
 
+      if(!this.checkAcceptanceAtDropInfo(this, nodes, /* silent: */ true)) {
+        return false;
+      }
+
+      var gemUI = this.gemBar.propPanel.getGemUIById(droppedNode.id);
       var gem;
       if(gemUI) {
         gem = gemUI.model;
-        if(gemUI.gemBar == this.gemBar) { // Reorder, notify model so it can fire an event
+        if(gemUI.gemBar === this.gemBar) { // Reorder, notify model so it can fire an event
           // fire reordered in insertNodes where we know more information
         } else {
           this.dropZone2Zone = true;
-          gemUI.gemBar.remove(gemUI, /*suppressEvent:*/true);
-          // for moves we cache the previous bar in order to add it to the move event
+          gemUI.gemBar.remove(gemUI, /* suppressEvent: */true);
+
+          // For moves we cache the previous bar in order to add it to the move event
           gemUI.model.previousGemBar = gemUI.gemBar.model;
           gemUI.gemBar = this.gemBar;
         }
@@ -519,8 +493,11 @@ define([
       this.gemUIbeingInserted = gemUI;
 
       var newId = nodes[0].id;
-      nodes[0].id = droppedNode.id; // need to ensure the original id is used when calling superclass
+      nodes[0].id = droppedNode.id; // Need to ensure the original id is used when calling superclass.
+
+      // Indirectly calls `insertNodes`.
       this.inherited(arguments);
+
       nodes[0].id = newId;
 
       this.sync();
@@ -533,7 +510,7 @@ define([
       return true;
     },
 
-    // NOTE: used from Analyzer automation API
+    // NOTE: used from Analyzer automation API.
     _onDrop: function(formula, dndType, value, gemBar, before, anchor, dndNode, postDrop) {
       var oldGemBar  = this.gemBar;
       var oldDndNode = this.node;
@@ -558,6 +535,7 @@ define([
       }
     },
 
+    // region createGem*
     createGemFromNode: function(sourceNode) {
       return this.gemBar.model.createGemFromNode(sourceNode);
     },
@@ -575,188 +553,284 @@ define([
     createGemUI: function(gem, sourceNode) {
       return this.gemBar.createGemUI(gem, sourceNode);
     },
+    // endregion
 
-    onMouseMove: function(e) {
-      this.showIndicatorIfReorder(e);
-
-      this.inherited(arguments);
-    },
-
-    onMouseOver: function(e) {
-      this.showIndicatorIfReorder(e);
+    // region drop indicator
+    // @override
+    onDraggingOver: function() {
 
       this.inherited(arguments);
+
+      // console.log("onDraggingOver");
+
+      // J.I.C.
+      this.__previousDropInfo = undefined;
+
+      this.updateDropIndicatorAtDropInfo();
     },
 
-    onMouseOut: function(e) {
-      if(e.target == this.dropIndicator) {
-        // moused over the indicator. Ignore
-        return;
+    // There's no onDragging* equivalent for Move, so have to override the lower level event.
+    // @override
+    onMouseMove: function() {
+
+      // Calling base first so that this.{isDragging, current, before, targetState} are up-to-date.
+      this.inherited(arguments);
+
+      if(this.__isDraggingAndEnabled()) {
+
+        // console.log("onMouseMove");
+
+        this.updateDropIndicatorAtDropInfo();
+      }
+    },
+
+    // @override
+    onDraggingOut: function() {
+
+      this.inherited(arguments);
+
+      // console.log("onDraggingOut");
+
+      if(this.__autoHideDropIndicatorCallback) {
+        this.__autoHideDropIndicatorCallback();
+      } else {
+        this._hideDropIndicator();
+      }
+    },
+
+    updateDropIndicatorAtEnd: function() {
+
+      var dropInfo = this.__getEndDropInfo();
+
+      this.updateDropIndicatorAtDropInfo(dropInfo);
+    },
+
+    updateDropIndicatorAtDropInfo: function(dropInfo) {
+
+      var previousDropInfo = this.__previousDropInfo;
+
+      if(dropInfo === undefined) {
+        dropInfo = this.__getCurrentDropInfo();
       }
 
-      this.dropIndicator.style.display = "none";
+      if(dropInfo !== null && !this.__shouldShowDropIndicator(dropInfo)) {
+        dropInfo = null;
+      }
 
-      this.inherited(arguments);
-    },
+      if(previousDropInfo === undefined || !this.__areEqualDropInfos(dropInfo, previousDropInfo)) {
 
-    onDraggingOut: function(e) {
-      this.dropIndicator.style.display = "none";
+        this.__previousDropInfo = dropInfo;
 
-      this.inherited(arguments);
-    },
+        // Check acceptance at dropInfo position.
+        var canDrop = dropInfo !== null &&
+          this.checkAcceptanceAtDropInfo(this, ManagerClass.manager().nodes, undefined, dropInfo);
 
-    showIndicatorIfReorder: function(e) {
-      if(ManagerClass.manager().source && this.checkAcceptance(this, ManagerClass.manager().nodes)) { // drag in progress
+        if(canDrop) {
+          this.__placeIndicator(dropInfo.anchor, dropInfo.before);
+          this.__hideDropIndicatorOnDndEnd();
 
-        var indicator = this.dropIndicator;
-        var tearDown  = function() {
-                indicator.style.display = "none";
-                cancelHandle.remove()
-              };
-        var cancelHandle = topic.subscribe("/dnd/cancel", tearDown);
-        var dropHandle   = topic.subscribe("/dnd/drop",   tearDown);
-
-        var overNode = this._getNodeUnderMouse(e);
-        // console.log("over: "+overNode);
-        if(overNode == -1) {
-          return;
+        } else if(this.__autoHideDropIndicatorCallback) {
+          this.__autoHideDropIndicatorCallback();
+        } else {
+          this._hideDropIndicator();
         }
-
-        var before = this.gravity(this.node.children[overNode], e) & 1;
-        if(this.node.children[overNode] == ManagerClass.manager().nodes[0] &&
-           (before && overNode == 0 || !before && this.node.children.length - 1 == overNode)) {
-          this.dropIndicator.style.display = "none";
-          return;
-        }
-
-        this.placeIndicator(e, overNode, before);
       }
     },
 
-    _showDropIndicator: function(e) {
-      var overNode = this._getNodeUnderMouse(e);
-      if(overNode == -1) {
-        return;
-      }
+    __previousDropInfo: undefined,
+    __autoHideDropIndicatorCallback: null,
 
-      var before = this.gravity(this.node.children[overNode], e) & 1;
-      if(this.node.children[overNode] == ManagerClass.manager().nodes[0] &&
-         (before && overNode == 0 || !before && this.node.children.length - 1 == overNode)) {
-        this.dropIndicator.style.display = "none";
-        return;
-      }
+    __hideDropIndicatorOnDndEnd: function() {
 
-      this.placeIndicator(e, overNode, before);
+      if(this.__autoHideDropIndicatorCallback === null) {
 
-      return {
-        before: before === 1,
-        anchor: this.node.children[overNode]
+        var cancelHandle;
+        var dropHandle;
+        var callback = lang.hitch(this, function() {
+
+          this.__previousDropInfo = undefined;
+          this.__autoHideDropIndicatorCallback = null;
+          this._hideDropIndicator();
+          cancelHandle.remove();
+          dropHandle.remove();
+        });
+
+        cancelHandle = topic.subscribe("/dnd/cancel", callback);
+        dropHandle = topic.subscribe("/dnd/drop", callback);
+
+        this.__autoHideDropIndicatorCallback = callback;
       }
     },
 
+    __shouldShowDropIndicator: function(dropInfo) {
+
+      var overChild = dropInfo.anchor;
+      if(overChild == null) {
+        return false;
+      }
+
+      var children = this.node.children;
+      var isBeforeOverChild = dropInfo.before;
+      var overChildIndex = this.__getChildIndex(overChild);
+      var dragNode = ManagerClass.manager().nodes[0];
+
+      // Is the mouse over the node being dragged?
+      if(overChild === dragNode) {
+        return false;
+      }
+
+      // Is AFTER and dragNode is the one after overChild?
+      if(!isBeforeOverChild && overChildIndex + 1 < children.length && children[overChildIndex + 1] === dragNode) {
+        return false;
+      }
+
+      // Is BEFORE and dragNode is the one before overChild?
+      if(isBeforeOverChild && overChildIndex > 0 && children[overChildIndex - 1] === dragNode) {
+        return false;
+      }
+
+      return true;
+    },
+
+    // NOTE: used from Analyzer automation API.
+    _showDropIndicator: function() {
+
+      var dropInfo = this.__getCurrentDropInfo();
+
+      if(this.__shouldShowDropIndicator(dropInfo)) {
+        this.__placeIndicator(dropInfo.anchor, dropInfo.before);
+        return dropInfo;
+      }
+
+      this._hideDropIndicator();
+      return null;
+    },
+
+    // NOTE: used from Analyzer automation API.
     _hideDropIndicator: function() {
       if(this.dropIndicator) {
         this.dropIndicator.style.display = "none";
       }
     },
 
-    placeIndicator: function(e, boxIndex, before) {
-      var spacing = -5, indicatorHeight = 3;
-      var bbCoords = geometry.position(this.node, true);
-      with(this.dropIndicator.style) {
-        if(boxIndex < 0) {
-          if(this.node.children.length) {
-            var coords = geometry.position(this.node.children[this.node.children.length - 1], true);
-            left = coords.x - 7 - (bbCoords.x - 5) + "px";
+    __placeIndicator: function(anchor, before) {
+      var spacing = -5;
+      var children = this.node.children;
+      var bbPos = geometry.position(this.node, true);
+      var dropStyle = this.dropIndicator.style;
+      var pos;
 
-            var coords = geometry.position(this.node.children[0]);
-            var lastChild = geometry.position(this.node.children[this.node.children.length - 1]);
-            top = (before ? coords.y - spacing : lastChild.y + lastChild.h + spacing) - (bbCoords.y - 5) + "px";
-            width = coords.w + "px";
-          } else {
-            var pos = geometry.position(this.node, true);
-            left = pos.x - 7 - (bbCoords.x - 5) + "px";
-            top = (pos.y + pos.h) - (bbCoords.y - 5) + "px";
-            width = pos.w + "px";
-          }
+      if(anchor == null) {
+        if(children.length) {
+
+          anchor = children[children.length - 1];
+
+          pos = geometry.position(anchor, true);
+
+          dropStyle.left = (pos.x - 7 - (bbPos.x - 5)) + "px";
+
+          pos = geometry.position(children[0]);
+
+          dropStyle.top = ((before ? pos.y - spacing : anchor.y + anchor.h + spacing) - (bbPos.y - 5)) + "px";
+          dropStyle.width = pos.w + "px";
         } else {
-          var child = geometry.position(this.node.children[boxIndex], true);
-          left = child.x - 7 - (bbCoords.x - 5) + "px";
-          top = (before) ? (child.y + spacing ) - (bbCoords.y - 5) + "px" : child.y + child.h + spacing - (bbCoords.y - 5) + "px";
-          width = child.w + "px";
+          dropStyle.left = "-2px";
+          dropStyle.top = (bbPos.h + 5) + "px";
+          dropStyle.width = bbPos.w + "px";
         }
+      } else {
+        var index = this.__getChildIndex(anchor);
+        var L = children.length;
+
+        // Normalize. Only the last element can have after.
+        if(!before && (index < L - 1)) {
+          before = true;
+          index++;
+          anchor = children[index];
+        }
+
+        pos = geometry.position(anchor, true);
+
+        // The indicator's absolute positioning is relative to its containing block's padding-box...
+        // That block is the parent node of this drop zone...
+        var bbPad = geometry.getPadExtents(this.dropIndicator.parentNode);
+
+        // The left of the indicator, which shows a bullet, should really align to the padding box.
+        // However, because the bullet image has some internal padding, some pixels need to be discounted for...
+        var localLeft = pos.x - bbPos.x;
+        dropStyle.left = (localLeft - 2) + "px";
+        dropStyle.width = pos.w + "px";
+
+        // Cannot measure the drop indicator if hidden.
+        this.dropIndicator.style.display = "";
+        var indicatorPos = geometry.position(this.dropIndicator, true);
+        this.dropIndicator.style.display = "none";
+
+        var centerY;
+        var localTop = (pos.y - bbPos.y);
+        if(!before) {
+          // Must be last child.
+          // After last child. Align indicator's center to last.bottom.
+          centerY = localTop + pos.h;
+
+        } else if(index === 0) {
+          // Before first child. Align indicator's center to first.top.
+          centerY = localTop;
+
+        } else {
+          // `i > 0`
+          // Center between the anchor's top and its previous sibling's bottom.
+          var posPrevious = geometry.position(children[index - 1], true);
+          var localTopPrevious = (posPrevious.y - bbPos.y);
+          var localBottomPrevious = localTopPrevious + posPrevious.h;
+
+          centerY = (localTop + localBottomPrevious) / 2;
+        }
+
+        var centerYOffset = bbPad.t - indicatorPos.h / 2;
+
+        dropStyle.top = (centerYOffset + centerY) + "px";
       }
+
       this.dropIndicator.style.display = "";
     },
+    // endregion
 
-    _getNodeUnderMouse: function(e) {
-      // find the child
-      var children = this.node.children;
-      for(var i = 0, child; children && i < children.length; ++i) {
-        if(children[i] == this.dropIndicator) {
-          continue;
+    // Must make the child-under-mouse logic be lenient,
+    // so that the indicator does not disappear when hovering between gems.
+    // @override
+    _getChildByEvent: function(e) {
+
+      var child = this.inherited(arguments);
+      if(child === null) {
+        // Maybe we're in a space between bars?
+        var closestChildIndex = this.__getIndexOfChildClosestToMouse(e);
+        if(closestChildIndex >= 0) {
+          child = this.node.children[closestChildIndex];
         }
-        var coords = geometry.position(children[i], true);
-        if(e.clientX >= coords.x && e.clientX <= coords.x + coords.w &&
-           e.clientY >= coords.y && e.clientY <= coords.y + coords.h) return i;
       }
-      return -1;
+
+      return child;
     },
 
-    gravity: function(/* HTMLElement */node, /* DOMEvent */e) {
-      //  summary
-      //  Calculates the mouse's direction of gravity relative to the centre
-      //  of the given node.
-      //  <p>
-      //  If you wanted to insert a node into a DOM tree based on the mouse
-      //  position you might use the following code:
-      //  <pre>
-      //  if(gravity(node, e) & gravity.NORTH) { [insert before]; }
-      //  else { [insert after]; }
-      //  </pre>
-      //
-      //  @param node The node
-      //  @param e    The event containing the mouse coordinates
-      //  @return    The directions, NORTH or SOUTH and EAST or WEST. These
-      //             are properties of the function.
-      node = dom.byId(node);
-      var mouse = {y: e.clientY, x: e.clientX};
+    __calculateInsertPosition: function(anchor, before) {
+      var pos;
 
-      var bb = geometry.position(node);
-      var nodecenterx = bb.x + (bb.w / 2);
-      var nodecentery = bb.y + (bb.h / 2);
-
-      with(cv.util.gravity) {
-        return ((mouse.x < nodecenterx ? WEST  : EAST) |
-                (mouse.y < nodecentery ? NORTH : SOUTH)); //  integer
-      }
-    },
-
-    insertNodes: function(addSelected, data, before, anchor, suppressInherited) {
-      // When called by a frop on the placeholder before will come in false, this need to be corrected by checking the flag
-      // set in the onDrop method
-      if(typeof this.dropAtEnd != "undefined") {
-        before = !this.dropAtEnd;
-      }
-
-      // Append : before = true, anchor = null
-      var pos = 0;
-      if(anchor == null) {
-        // add is fired in onDrop
-        pos = this.gemBar.gems.length;
-        before = false;
-      } else if(anchor != null) {
-        // could be adding to the end, ignore ite
-        for(var i = 0; i < this.node.children.length; i++) {
-          if(this.node.children[i] == anchor) {
-            pos = i;
-          }
-        }
-
+      if(anchor == null || (pos = this.__getChildIndex(anchor)) < 0) {
+        pos = this.node.children.length;
+      } else {
         pos = before ? pos : pos + 1;
       }
 
-      this.gemBar.insertAt(this.gemUIbeingInserted, pos, this.dropZone2Zone);
+      return pos;
+    },
+
+    // @override
+    insertNodes: function(addSelected, data, before, anchor, suppressInherited) {
+
+      var position = this.__calculateInsertPosition(anchor, before);
+
+      this.gemBar.insertAt(this.gemUIbeingInserted, position, this.dropZone2Zone);
 
       if(!suppressInherited) {
         this.inherited(arguments);
@@ -765,21 +839,140 @@ define([
       this.gemBar.propPanel.resize();
     },
 
+    // region checkAcceptance*
+    // This method is called within startDrag, to know if dragging is enabled.
+    // When false is returned, this.targetState is set to "Disabled".
+    // Otherwise, this.targetState is set to "".
+    // That's why this method is testing if any position exists
+    // (even if current is defined, which is sometimes the case).
+    // @override
     checkAcceptance: function(source, nodes, silent) {
-      return this.gemBar.checkAcceptance(source, nodes, silent);
+
+      // At any position.
+      var position = null;
+
+      return this.gemBar.checkAcceptance(source, nodes, silent, position);
+    },
+
+    checkAcceptanceAtDropInfo: function(source, nodes, silent, dropInfo) {
+      if(dropInfo == null) {
+        dropInfo = this.__getCurrentDropInfo();
+      }
+
+      var position = this.__calculateInsertPosition(dropInfo.anchor, dropInfo.before);
+
+      return this.gemBar.checkAcceptance(source, nodes, silent, position);
+    },
+
+    checkAcceptanceAtEnd: function(source, nodes, silent) {
+
+      var dropInfo = this.__getEndDropInfo();
+
+      return this.checkAcceptanceAtDropInfo(source, nodes, silent, dropInfo);
+    },
+    // endregion
+
+    // region drop infos
+    __getCurrentDropInfo: function() {
+      return {
+        anchor: this.current,
+        before: this.before
+      };
+    },
+
+    __getEndDropInfo: function() {
+      var children = this.node.children;
+      return {
+        anchor: children.length > 0 ? children[children.length - 1] : null,
+        before: false
+      };
+    },
+
+    __areEqualDropInfos: function(dropInfoA, dropInfoB) {
+      return dropInfoA === dropInfoB || // including both null
+        (dropInfoA !== null &&
+          dropInfoB !== null &&
+          dropInfoA.before === dropInfoB.before &&
+          dropInfoA.anchor === dropInfoB.anchor);
+    },
+    // endregion
+
+    // region utilities
+    __getChildIndex: function(child) {
+      return Array.prototype.indexOf.call(this.node.children, child);
+    },
+
+    __getIndexOfChildClosestToMouse: function(e) {
+      var delta = 6;
+      var x = e.clientX;
+      var y = e.clientY;
+      var closestChildIndex = -1;
+      var closestChildYDistance = Infinity;
+
+      var children = this.node.children;
+      for(var i = 0; children && i < children.length; ++i) {
+
+        var coords = geometry.position(children[i], true);
+
+        var right = coords.x + coords.w;
+        var left = coords.x;
+        var top = coords.y;
+        var bottom = coords.y + coords.h;
+
+        // Inside the snap-to area?
+        if(x >= left - delta && x <= right + delta && y >= top - delta && y <= bottom + delta) {
+
+          // Strictly inside?
+          if(x >= left && x <= right && y >= top && y <= bottom) {
+            // No need to search more.
+            return i;
+          }
+
+          var centerY = top + coords.h / 2;
+          var childDistance = Math.abs(y - centerY);
+
+          if(closestChildIndex < 0 || childDistance < closestChildYDistance) {
+            closestChildIndex = i;
+            closestChildYDistance = childDistance;
+          }
+        }
+      }
+
+      return closestChildIndex;
+    },
+
+    __isDraggingAndEnabled: function() {
+      return this.isDragging && this.targetState !== "Disabled";
     }
+    // endregion
   });
 
   var PlaceholderSource = declare([Target], {
     constructor: function(node, opts) {
       this.dropZone = opts.dropZone;
     },
+
+    onDraggingOver: function() {
+
+      this.inherited(arguments);
+
+      this.dropZone.updateDropIndicatorAtEnd();
+    },
+
+    // @override
+    onDraggingOut: function() {
+
+      this.inherited(arguments);
+
+      this.dropZone.updateDropIndicatorAtDropInfo(null);
+    },
+
     onDrop: function(source, nodes, copy) {
-      return this.dropZone.onDrop(source, nodes, copy, /* dropAtEnd */ true);
+      return this.dropZone.onDropAtEnd(source, nodes, copy);
     },
 
     checkAcceptance: function(source, nodes, silent) {
-      return this.dropZone.checkAcceptance(source, nodes, silent);
+      return this.dropZone.checkAcceptanceAtEnd(source, nodes, silent);
     },
 
     destroy: function() {
@@ -792,7 +985,10 @@ define([
 
     className: "propPanel_gemBar",
     gemLimit: -1,
-    templateString: "<div class='${className}' data-dojo-type='dijit.layout.BorderContainer' data-dojo-props='gutters:false'><div data-dojo-props='region:center'></div><div class='gemPlaceholder'><span>${placeholderText}</span></div></div>",
+    templateString:
+      "<div class='${className}' data-dojo-type='dijit.layout.BorderContainer' data-dojo-props='gutters:false'>" +
+      "<div class='gemDropZone' data-dojo-props='region:center'></div>" +
+      "<div class='gemPlaceholder'><span>${placeholderText}</span></div></div>",
     gems:   null,
     accept: ["gem"],
     showPlaceholder: true,
@@ -805,72 +1001,59 @@ define([
       if(this.model.ui.placeholderText) {
         this.placeholderText = this.model.ui.placeholderText;
       }
-
     },
 
     postCreate: function() {
-      domClass.add(this.domNode, this.model.dataType); // add dataType as css class.
       this.gems = [];
-      this.placeholder = query(".gemPlaceholder", this.domNode)[0];
-      this.placeholder.style.display = (this.showPlaceholder && (this.model.allowMultiple || this.model.gems.length == 0)) ? "" : "none";
-      if(this.model.required && this.model.gems.length == 0) {
-        domClass.add(this.placeholder, "reqiured");
+
+      // Main node
+
+      // Add dataType as css class.
+      var dataType = this.model.dataType;
+      if(dataType) {
+        domClass.add(this.domNode, dataType);
       }
 
+      // Drop zone that contains current gems.
       this.dropZoneNode = this.domNode.firstChild;
 
       this.dropZone = new GemBarUISource(this.dropZoneNode, {accept: this.model.ui.dndType, gemBar: this});
-      // new pentaho.common.propertiesPanel.PlaceholderSource(this.domNode, {accept: this.model.ui.dndType, dropZone: this.dropZone});
 
-      if(this.showPlaceholder && (this.model.allowMultiple || this.model.gems.length < 2)) {
-        this._placeHolderSource = new PlaceholderSource(this.placeholder, {accept: this.model.ui.dndType, dropZone: this.dropZone});
-
-        // dojo.connect(this.placeholder.firstChild, "onmouseover", function(event){
-        //   if(Manager.source && outterThis.checkAcceptance(outterThis.dropZone, Manager.nodes)){
-        //     domClass.add(outterThis.placeholder, "over");
-        //   }
-        // });
-        // on(this.placeholder.firstChild, "mouseup", lang.hitch( function(event){
-        //   domClass.remove(outterThis.placeholder,  "over"));
-        // });
+      // Drop zone to hold a new gem at the end.
+      var isGemBarEmpty = this.model.gems.length === 0;
+      var showPlaceholder = this.showPlaceholder;
+      if(showPlaceholder) {
+        var isGemBarFull = !this.model.allowMultiple && !isGemBarEmpty;
+        if(isGemBarFull) {
+          showPlaceholder = false;
+        }
       }
 
-      var unSubscribeFunc = lang.hitch(this, function() {
-        if(this.domNode) { // may have been disposed
-          this._hideDiminish();
-        }
-      });
+      this.placeholder = query(".gemPlaceholder", this.domNode)[0];
+      this.placeholder.style.display = showPlaceholder ? "" : "none";
+
+      if(this.model.required && isGemBarEmpty) {
+        domClass.add(this.placeholder, "reqiured");
+      }
+
+      if(showPlaceholder) {
+        this._placeHolderSource =
+          new PlaceholderSource(this.placeholder, {accept: this.model.ui.dndType, dropZone: this.dropZone});
+      }
 
       this.own(
-        topic.subscribe("/dnd/start", lang.hitch(this, function() {
-          if(!this.checkAcceptance(this.dropZone, ManagerClass.manager().nodes)) {
-            this._showDiminish();
-          }
-        })),
-        topic.subscribe("/dnd/cancel", unSubscribeFunc),
-        topic.subscribe("/dnd/drop",   unSubscribeFunc),
-        on(this.domNode, "mouseover",  lang.hitch(this, function(event) {
-          if(ManagerClass.manager().source &&
-             this.checkAcceptance(this.dropZone, ManagerClass.manager().nodes)) {
-            this._showOver();
-          }
-        })),
-        on(this.domNode,   "mouseout", lang.hitch(this, "_hideOver")),
-        on(this.domNode,   "mouseup",  lang.hitch(this, "_hideOver")),
-        // on(this.dropZone,  "onDrop", lang.hitch(this,  "onDrop")),
-        on(this.dropZone,  "createDropIndicator", lang.hitch(this, "createDropIndicator")),
-        on(this.dropZone,  "placeDropIndicator",  lang.hitch(this, "placeDropIndicator")),
-        on(this.dropZone,  "onMouseOver",         lang.hitch(this, "onMouseOver")),
-        on(this.dropZone,  "onMouseOut",          lang.hitch(this, "onMouseOut")),
-        on(this.dropZone,  "onDraggingOver",      lang.hitch(this, "onDraggingOver")),
-        on(this.dropZone,  "onDraggingOver",      lang.hitch(this, "onDraggingOut")),
-        // on(this.dropZone,  "checkAcceptance", lang.hitch(this, "checkAcceptance")),
-        on(this.dropZone,  "insertNodes",         lang.hitch(this, "insertNodes")));
+        aspect.after(this.dropZone, "onDndStart", lang.hitch(this, "__onDndStart"), true),
+        // `onDndCancel` is always called, whatever the dnd outcome; see `Source#onDndDrop`.
+        aspect.after(this.dropZone, "onDndCancel", lang.hitch(this, "__onDndEnd")),
+
+        on(this.domNode, "mouseover", lang.hitch(this, "__onDndOver")),
+        on(this.domNode, "mouseout", lang.hitch(this, "_hideOver"))
+      );
 
       array.forEach(this.model.gems, function(gem) {
         var gemUI = this.createGemUI(gem, gem.sourceNode);
 
-        this.domNode.firstChild.appendChild(gemUI.domNode);
+        this.dropZoneNode.appendChild(gemUI.domNode);
         this.add(gemUI);
       }, this);
 
@@ -879,18 +1062,51 @@ define([
       this.inherited(arguments);
     },
 
+    // region diminish and highlight/over
+    __onDndStart: function(source) {
+      if(this.dropZone.__isDraggingAndEnabled()) {
+        if(source === this.dropZone) {
+          // When dragging starts on a gembar,
+          // the mouse is over the gem, and not over the gembar.
+          // So, the below __onDndOver isn't triggered in this case,
+          // until the mouse goes to a free area in the gembar.
+          this._showOver();
+        }
+      } else {
+        this._showDiminish();
+      }
+    },
+
+    __onDndOver: function() {
+      if(this.dropZone.__isDraggingAndEnabled()) {
+        this._showOver();
+      }
+    },
+
+    __onDndEnd: function() {
+      this._hideDiminish();
+      this._hideOver();
+    },
+
+    // The gembar's bg color changes when it is possible to
+    // add *at any position*, in this Gem Bar.
+    // NOTE: used from Analyzer automation API.
     _showOver: function() {
       if(this.domNode) {
         domClass.add(this.domNode, "over");
       }
     },
 
+    // NOTE: used from Analyzer automation API.
     _hideOver: function() {
       if(this.domNode) {
         domClass.remove(this.domNode, "over");
       }
     },
 
+    // The gembar is made semi-transparent when
+    // dragging starts and there's no position where the draggeg
+    // gem can be added to it.
     _showDiminish: function() {
       if(this.domNode) {
         domClass.add(this.domNode, "dimished");
@@ -902,11 +1118,7 @@ define([
         domClass.remove(this.domNode, "dimished");
       }
     },
-
-    insertNodes: function(addSelected, data, before, anchor) {
-      //this.domNode.appendChild(data[0]);
-      this.onUIEvent("insertNodes", {item: this, args: arguments});
-    },
+    // endregion
 
     add: function(gemUI) {
       gemUI.model.gemBar = this.model;
@@ -924,17 +1136,17 @@ define([
 
     insertAt: function(gemUI, pos, move) {
       var currIdx = array.indexOf(this.gems, gemUI);
-      if(currIdx > -1) { // move
-        this.gems.splice(currIdx, 1); // remove from old pos
+      if(currIdx > -1) { // Move.
+        this.gems.splice(currIdx, 1); // Remove from old pos.
       }
 
-      this.gems.splice(pos, 0, gemUI); // add it to the new pos
+      this.gems.splice(pos, 0, gemUI); // Add it to the new pos.
 
       this.propPanel.registerGemUI(gemUI);
 
       this.model.insertAt(gemUI.model, pos, currIdx, move);
 
-      if(this.model.allowMultiple == false) {
+      if(!this.model.allowMultiple) {
         this.placeholder.style.display = "none";
       }
 
@@ -951,7 +1163,7 @@ define([
 
       this.model.remove(gemUI.model, suppressEvent);
 
-      if(this.model.allowMultiple == true || this.model.gems.length == 0) {
+      if(this.model.allowMultiple || this.model.gems.length === 0) {
         this.placeholder.style.display = "";
       }
 
@@ -963,32 +1175,8 @@ define([
       // to be overwritten
     },
 
-    createDropIndicator: function() {
-    },
-
-    placeDropIndicator: function(e) {
-    },
-
-    onMouseOver: function() {
-      // this.mouseMoveHandle = this.connect(window, "onMouseMove", this, "placeDropIndicator");
-    },
-
-    onMouseOut: function() {
-      // if(this.mouseMoveHandle) {
-      //   this.mouseMoveHandle.remove();
-      // }
-    },
-
-    onDraggingOver: function() {
-      return this.inherited(arguments);
-    },
-
-    onDraggingOut: function() {
-    },
-
-    checkAcceptance: function(source, nodes) {
-      return this.model.allowMultiple ||
-             (this.model.allowMultiple == false && this.model.gems.length == 0);
+    checkAcceptance: function(source, nodes, silent, position) {
+      return this.model.allowMultiple || this.model.gems.length === 0;
     },
 
     /* extension points */
@@ -1005,12 +1193,12 @@ define([
     createGemUI: function(gem, sourceNode) {
       var GemUIClass = Panel.registeredTypes["gem"];
       var options = {
-              model:      gem,
-              postDrop:   gem.postDrop,
-              dndType:    gem.dndType,
-              gemBar:     this,
-              sourceNode: sourceNode
-            };
+        model:      gem,
+        postDrop:   gem.postDrop,
+        dndType:    gem.dndType,
+        gemBar:     this,
+        sourceNode: sourceNode
+      };
 
       return GemUIClass.create ? GemUIClass.create(options) : new GemUIClass(options);
     },
@@ -1021,8 +1209,12 @@ define([
       this.inherited(arguments);
 
       // destroyRecursive should do this, investigate
+      // Actually, the last time I checked, it is calling this.
+      // However, leaving this here JIC I'm missing something.
       array.forEach(this.gems, function(gemUI) {
-        gemUI.destroyRecursive();
+        if(!gemUI._destroyed) {
+          gemUI.destroyRecursive();
+        }
       });
     },
 
@@ -1118,8 +1310,8 @@ define([
 
     // to be overwritten by container
     onContextMenu: function(e) {
-      //console.log("inner onContextMenu");
-      //event.stop(e);
+      // console.log("inner onContextMenu");
+      // event.stop(e);
     }
   });
 

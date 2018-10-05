@@ -44,6 +44,58 @@ define(function() {
 
   return {
     rules: [
+      // TODO: This should be in AbstractProperty code, however, this can only move
+      // when a way is implemented for dealing with CDF's non-key annotated tables.
+      // So, for now, this restriction is only being applied to Analyzer and DET.
+      {
+        priority: Infinity,
+        select: {
+          application: ["pentaho-analyzer", "pentaho-dashboards", "pentaho-det"],
+          module: "pentaho/visual/role/AbstractProperty"
+        },
+        deps: [
+          "pentaho/type/ValidationError"
+        ],
+        apply: function(ValidationError) {
+          return {
+            // @override
+            validateOn: function(model) {
+              var errors = this.base(model);
+              if(errors !== null) {
+                return errors;
+              }
+
+              var isVisualKeyEf;
+              var mapping = model.get(this);
+              if(!mapping.hasFields || (isVisualKeyEf = this.isVisualKeyEffective) === undefined) {
+                return null;
+              }
+
+              // Required, so must not be null.
+              var data = model.data;
+              var i = -1;
+              var mappingFields = mapping.fields;
+              var L = mappingFields.count;
+              while(++i < L) {
+                var name = mappingFields.at(i).name;
+
+                // Must exist. Already validated by base.
+                var columnIndex = data.getColumnIndexById(name);
+                if(data.isColumnKey(columnIndex) !== isVisualKeyEf) {
+                  errors = [
+                    // TODO: Localize.
+                    new ValidationError(
+                      "Visual role '" + this.name + "' cannot be mapped to non-key field '" + name + "'.")
+                  ];
+                }
+              }
+
+              return errors;
+            }
+          };
+        }
+      },
+
       // region Model Rules
 
       // line/barLine models

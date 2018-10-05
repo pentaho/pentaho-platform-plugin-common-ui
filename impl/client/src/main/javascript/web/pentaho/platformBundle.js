@@ -40,6 +40,7 @@ define([
   "pentaho/visual/color/palettes/all",
   "pentaho/visual/models/all",
   "pentaho/visual/role/adaptation/allStrategies",
+  "pentaho/visual/role/util",
   "pentaho/visual/scene/Base",
 
   // CCC views
