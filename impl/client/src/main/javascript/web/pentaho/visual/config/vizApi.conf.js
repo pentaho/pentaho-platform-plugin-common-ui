@@ -50,7 +50,8 @@ define(function() {
       {
         priority: Infinity,
         select: {
-          application: ["pentaho-analyzer", "pentaho-dashboards", "pentaho-det"],
+          // TODO: Include DET when its createEmptyTable method takes isKey into account.
+          application: ["pentaho-analyzer", "pentaho-dashboards"], // "pentaho-det"
           module: "pentaho/visual/role/AbstractProperty"
         },
         deps: [
