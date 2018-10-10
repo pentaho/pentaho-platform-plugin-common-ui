@@ -1141,7 +1141,6 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
             for(var i in existingErrors) {
               _removeChildComponent.call(this, panel, errComp);
             }
-            errComp.clearAndRemove = true;
             toRemove.push(errComp);
           }
         }
@@ -1160,9 +1159,8 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
               var errIndex = panel.components.length - 1;
               var errorComponent = _createWidgetForErrorLabel.call(this, param, error);
               this.dashboard.addComponent(errorComponent);
-              panel.components.splice(errIndex, 0, errorComponent);
-              panel.addErrorLabel(errorComponent);
               this.dashboard.updateComponent(errorComponent);
+              panel.components.splice(errIndex, 0, errorComponent);
             }
           }
         }
@@ -1172,7 +1170,6 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
         if(existingErrorComponents.length > 0) {
           if(!panel.cssClass || (panel.cssClass && panel.cssClass.indexOf("error") == -1)) {
             panel.cssClass = (panel.cssClass || "") + " error";
-            panel.addErrorClass();
           }
         } else {
           panel.cssClass = (panel.cssClass || "").replace(" error", "");
@@ -1557,9 +1554,6 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
             component.remove();
           } else {
             component.clear();
-            if(component.clearAndRemove) {
-              $("#" + component.htmlObject).remove();
-            }
           }
         }
 
