@@ -224,6 +224,8 @@ define([
             type:      'scatter',
             source:    'CCC',
             name:      vizLabel('SCATTER'),
+            // For Viz. API 3.0 integration/interop in Analyzer.
+            visualKeyType: 'dataOrdinal',
             'class':   'pentaho.ccc.MetricDotChart',
             maxValues: [1000, 2500, 5000, 10000],
             args:      {},
