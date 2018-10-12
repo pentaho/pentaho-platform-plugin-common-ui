@@ -63,6 +63,20 @@ define([
         }
       });
 
+      exports.ModelWithStringAndStringListRole = Model.extend({
+        $type: {
+          props: {
+            roleA: {
+              base: "pentaho/visual/role/Property",
+              modes: [
+                {dataType: "string"},
+                {dataType: ["string"]}
+              ]
+            }
+          }
+        }
+      });
+
       exports.NullStrategy = BaseStrategy.extend({
         constructor: function(instSpec) {
 

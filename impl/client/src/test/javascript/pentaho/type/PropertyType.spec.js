@@ -716,8 +716,9 @@ define([
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isRequired: f});
           propType.isRequiredOn(owner);
           expect(f.calls.count()).toBe(1);
-          expect(f.calls.first().args.length).toBe(1);
+          expect(f.calls.first().args.length).toBe(2);
           expect(f.calls.first().args[0]).toBe(propType);
+          expect(f.calls.first().args[1]).toBe(undefined);
         });
       });
 
@@ -813,8 +814,9 @@ define([
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMin: f});
           propType.countMinOn(owner);
           expect(f.calls.count()).toBe(1);
-          expect(f.calls.first().args.length).toBe(1);
+          expect(f.calls.first().args.length).toBe(2);
           expect(f.calls.first().args[0]).toBe(propType);
+          expect(f.calls.first().args[1]).toBe(undefined);
         });
 
         it("should throw when set and property already has descendant properties", function() {
@@ -932,8 +934,9 @@ define([
           propType.countMaxOn(owner);
 
           expect(f.calls.count()).toBe(1);
-          expect(f.calls.first().args.length).toBe(1);
+          expect(f.calls.first().args.length).toBe(2);
           expect(f.calls.first().args[0]).toBe(propType);
+          expect(f.calls.first().args[1]).toBe(undefined);
         });
 
         it("should throw when set and property already has descendant properties", function() {
@@ -1034,8 +1037,9 @@ define([
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isApplicable: f});
           propType.isApplicableOn(owner);
           expect(f.calls.count()).toBe(1);
-          expect(f.calls.first().args.length).toBe(1);
+          expect(f.calls.first().args.length).toBe(2);
           expect(f.calls.first().args[0]).toBe(propType);
+          expect(f.calls.first().args[1]).toBe(undefined);
         });
 
         it("should throw when set and property already has descendant properties", function() {
@@ -1136,8 +1140,9 @@ define([
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isEnabled: f});
           propType.isEnabledOn(owner);
           expect(f.calls.count()).toBe(1);
-          expect(f.calls.first().args.length).toBe(1);
+          expect(f.calls.first().args.length).toBe(2);
           expect(f.calls.first().args[0]).toBe(propType);
+          expect(f.calls.first().args[1]).toBe(undefined);
         });
 
         it("should throw when set and property already has descendant properties", function() {

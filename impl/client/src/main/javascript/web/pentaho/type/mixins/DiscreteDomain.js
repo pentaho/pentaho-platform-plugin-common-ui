@@ -162,13 +162,13 @@ define([
 
           combine: function(baseEval, localEval) {
 
-            return function(propType) {
+            return function(propType, keyArgs) {
               // localEval is skipped if baseDomain is empty.
-              var baseDomain = baseEval.call(this, propType);
+              var baseDomain = baseEval.call(this, propType, keyArgs);
               if(baseDomain && !baseDomain.length)
                 return baseDomain; // []
 
-              var localDomain = localEval.call(this, propType);
+              var localDomain = localEval.call(this, propType, keyArgs);
               if(!localDomain) // any value
                 return baseDomain;
 

@@ -25,9 +25,10 @@ define([
   "pentaho/type/ValidationError",
   "pentaho/data/TableView",
   "pentaho/type/util",
-  "pentaho/util/object"
+  "pentaho/util/object",
+  "pentaho/util/arg"
 ], function(module, AbstractProperty, ExternalMapping, Mode, VisualKeyTypes, allStrategyCtorsList,
-            bundle, typeLoader, ValidationError, DataView, typeUtil, O) {
+            bundle, typeLoader, ValidationError, DataView, typeUtil, O, arg) {
 
   "use strict";
 
@@ -143,8 +144,8 @@ define([
           var propType = this;
 
           this.__fields = fields = Object.freeze({
-            countRangeOn: function(model) {
-              return propType.__fieldsCountRangeOn(model);
+            countRangeOn: function(model, keyArgs) {
+              return propType.__fieldsCountRangeOn(model, keyArgs);
             }
           });
         }
@@ -159,17 +160,26 @@ define([
        *
        * Implements IFieldsMetadata#countRangeOn.
        *
-       * @param {!pentaho.visual.base.ModelAdapter} modelAdapter - The model adapter.
+       * @param {pentaho.visual.base.ModelAdapter} modelAdapter - The model adapter.
+       * @param {object} [keyArgs] - The keyword arguments object.
+       * @param {boolean} [keyArgs.ignoreCurrentMode=false] - Indicates that the current mode, if any,
+       *   should be ignored when determining the count range.
+       *   When `false` and there is a current mode, the count range is that of the current mode.
+       *
        * @return {pentaho.IRange<number>} The field count range.
        * @private
        */
-      __fieldsCountRangeOn: function(modelAdapter) {
+      __fieldsCountRangeOn: function(modelAdapter, keyArgs) {
 
-        var isRequired = this._internalProperty.fields.countRangeOn(modelAdapter.model).min > 0;
+        var isRequired = this._internalProperty.fields.countRangeOn(modelAdapter.model, keyArgs).min > 0;
 
-        // In unit-tests, these properties are used outside of a real model. So mapping can be null.
-        var externalMapping = modelAdapter.get(this);
-        var mode = externalMapping && externalMapping.mode;
+        var mode = null;
+        if(!arg.optional(keyArgs, "ignoreCurrentMode", false)) {
+          // In unit-tests, these properties are used outside of a real model.
+          // So mapping can be null.
+          var externalMapping = modelAdapter.get(this);
+          mode = externalMapping && externalMapping.mode;
+        }
 
         var countMax = (mode !== null ? mode.dataType.isList : this.hasAnyListModes) ? Infinity : 1;
 

@@ -33,6 +33,7 @@ define([
       var CustomModel;
       var ModelWithStringRole;
       var ModelWithStringListRole;
+      var ModelWithStringAndStringListRole;
 
       var NullStrategy;
       var ListIdentityStrategy;
@@ -73,6 +74,7 @@ define([
 
         ModelWithStringRole = mocks.ModelWithStringRole;
         ModelWithStringListRole = mocks.ModelWithStringListRole;
+        ModelWithStringAndStringListRole = mocks.ModelWithStringAndStringListRole;
 
         NullStrategy = mocks.NullStrategy;
         ListIdentityStrategy = mocks.ListIdentityStrategy;
@@ -590,7 +592,7 @@ define([
 
       describe("#fields", function() {
 
-        describe(".countRangeOn(modelAdapter)", function() {
+        describe(".countRangeOn(modelAdapter, {ignoreCurrentMode})", function() {
 
           describe("when there is no current mode", function() {
 
@@ -679,130 +681,234 @@ define([
 
           describe("when there is a current mode", function() {
 
-            it("should have countRange.min = 1 if internal role is required", function() {
+            describe("when ignoreCurrentMode is not specified or false", function() {
 
-              var strategies = [ElementIdentityStrategy.type];
+              it("should have countRange.min = 1 if internal role is required", function() {
 
-              var CustomModel = Model.extend({
-                $type: {
-                  props: {
-                    roleA: {
-                      base: "pentaho/visual/role/Property",
-                      modes: ["string"],
-                      fields: {isRequired: true}
+                var strategies = [ElementIdentityStrategy.type];
+
+                var CustomModel = Model.extend({
+                  $type: {
+                    props: {
+                      roleA: {
+                        base: "pentaho/visual/role/Property",
+                        modes: ["string"],
+                        fields: {isRequired: true}
+                      }
                     }
                   }
-                }
+                });
+
+                var DerivedModelAdapter = buildAdapter(CustomModel, [
+                  {
+                    name: "roleA",
+                    strategies: strategies
+                  }
+                ]);
+
+                var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+                var modelAdapter = new DerivedModelAdapter({
+                  data: new Table(getDataSpec1()),
+                  roleA: {
+                    fields: ["country"]
+                  }
+                });
+
+                expect(modelAdapter.roleA.mode).not.toBe(null);
+                expect(modelAdapter.model.roleA.modeFixed).not.toBe(null);
+
+                var range = externalPropType.fields.countRangeOn(modelAdapter);
+
+                expect(range.min).toBe(1);
               });
 
-              var DerivedModelAdapter = buildAdapter(CustomModel, [
-                {
-                  name: "roleA",
-                  strategies: strategies
-                }
-              ]);
+              it("should have countRange.min = 0 if internal role is not required", function() {
 
-              var externalPropType = DerivedModelAdapter.type.get("roleA");
+                var strategies = [ElementIdentityStrategy.type];
 
-              var modelAdapter = new DerivedModelAdapter({
-                data: new Table(getDataSpec1()),
-                roleA: {
-                  fields: ["country"]
-                }
+                var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
+                  {
+                    name: "roleA",
+                    strategies: strategies
+                  }
+                ]);
+
+                var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+                var modelAdapter = new DerivedModelAdapter({
+                  data: new Table(getDataSpec1()),
+                  roleA: {
+                    fields: ["country"]
+                  }
+                });
+
+                expect(modelAdapter.roleA.mode).not.toBe(null);
+                expect(modelAdapter.model.roleA.modeFixed).not.toBe(null);
+
+                var range = externalPropType.fields.countRangeOn(modelAdapter);
+
+                expect(range.min).toBe(0);
               });
 
-              expect(modelAdapter.roleA.mode).not.toBe(null);
-              expect(modelAdapter.model.roleA.modeFixed).not.toBe(null);
+              it("should have countRange.max = 1 if the current mode is an element mode", function() {
 
-              var range = externalPropType.fields.countRangeOn(modelAdapter);
+                var strategies = [ElementIdentityStrategy.type];
 
-              expect(range.min).toBe(1);
+                var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
+                  {
+                    name: "roleA",
+                    strategies: strategies
+                  }
+                ]);
+
+                var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+                var modelAdapter = new DerivedModelAdapter({
+                  data: new Table(getDataSpec1()),
+                  roleA: {
+                    fields: ["country"]
+                  }
+                });
+
+                expect(modelAdapter.roleA.mode).not.toBe(null);
+                expect(modelAdapter.roleA.mode.dataType.isElement).toBe(true);
+                expect(modelAdapter.model.roleA.modeFixed).not.toBe(null);
+
+                var range = externalPropType.fields.countRangeOn(modelAdapter);
+
+                expect(range.max).toBe(1);
+              });
+
+              it("should have countRange.max = Infinity if the current mode is a list mode", function() {
+
+                var strategies = [ListIdentityStrategy.type];
+
+                var DerivedModelAdapter = buildAdapter(ModelWithStringListRole, [
+                  {
+                    name: "roleA",
+                    strategies: strategies
+                  }
+                ]);
+
+                var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+                var modelAdapter = new DerivedModelAdapter({
+                  data: new Table(getDataSpec1()),
+                  roleA: {
+                    fields: ["country", "product"]
+                  }
+                });
+
+                expect(modelAdapter.roleA.mode).not.toBe(null);
+                expect(modelAdapter.roleA.mode.dataType.isList).toBe(true);
+                expect(modelAdapter.model.roleA.modeFixed).not.toBe(null);
+
+                var range = externalPropType.fields.countRangeOn(modelAdapter);
+
+                expect(range.max).toBe(Infinity);
+              });
             });
 
-            it("should have countRange.min = 0 if internal role is not required", function() {
+            describe("when ignoreCurrentMode is true", function() {
 
-              var strategies = [ElementIdentityStrategy.type];
+              it("should have countRange.min = 1 if internal role is required", function() {
 
-              var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
-                {
-                  name: "roleA",
-                  strategies: strategies
-                }
-              ]);
+                var strategies = [ElementIdentityStrategy.type];
 
-              var externalPropType = DerivedModelAdapter.type.get("roleA");
+                var CustomModel = Model.extend({
+                  $type: {
+                    props: {
+                      roleA: {
+                        base: "pentaho/visual/role/Property",
+                        modes: ["string"],
+                        fields: {isRequired: true}
+                      }
+                    }
+                  }
+                });
 
-              var modelAdapter = new DerivedModelAdapter({
-                data: new Table(getDataSpec1()),
-                roleA: {
-                  fields: ["country"]
-                }
+                var DerivedModelAdapter = buildAdapter(CustomModel, [
+                  {
+                    name: "roleA",
+                    strategies: strategies
+                  }
+                ]);
+
+                var externalPropType = DerivedModelAdapter.type.get("roleA");
+
+                var modelAdapter = new DerivedModelAdapter({
+                  data: new Table(getDataSpec1()),
+                  roleA: {
+                    fields: ["country"]
+                  }
+                });
+
+                expect(modelAdapter.roleA.mode).not.toBe(null);
+                expect(modelAdapter.model.roleA.modeFixed).not.toBe(null);
+
+                var range = externalPropType.fields.countRangeOn(modelAdapter, {ignoreCurrentMode: true});
+
+                expect(range.min).toBe(1);
               });
 
-              expect(modelAdapter.roleA.mode).not.toBe(null);
-              expect(modelAdapter.model.roleA.modeFixed).not.toBe(null);
+              it("should have countRange.min = 0 if internal role is not required", function() {
 
-              var range = externalPropType.fields.countRangeOn(modelAdapter);
+                var strategies = [ElementIdentityStrategy.type];
 
-              expect(range.min).toBe(0);
-            });
+                var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
+                  {
+                    name: "roleA",
+                    strategies: strategies
+                  }
+                ]);
 
-            it("should have countRange.max = 1 if the current mode is an element mode", function() {
+                var externalPropType = DerivedModelAdapter.type.get("roleA");
 
-              var strategies = [ElementIdentityStrategy.type];
+                var modelAdapter = new DerivedModelAdapter({
+                  data: new Table(getDataSpec1()),
+                  roleA: {
+                    fields: ["country"]
+                  }
+                });
 
-              var DerivedModelAdapter = buildAdapter(ModelWithStringRole, [
-                {
-                  name: "roleA",
-                  strategies: strategies
-                }
-              ]);
+                expect(modelAdapter.roleA.mode).not.toBe(null);
+                expect(modelAdapter.model.roleA.modeFixed).not.toBe(null);
 
-              var externalPropType = DerivedModelAdapter.type.get("roleA");
+                var range = externalPropType.fields.countRangeOn(modelAdapter, {ignoreCurrentMode: true});
 
-              var modelAdapter = new DerivedModelAdapter({
-                data: new Table(getDataSpec1()),
-                roleA: {
-                  fields: ["country"]
-                }
+                expect(range.min).toBe(0);
               });
 
-              expect(modelAdapter.roleA.mode).not.toBe(null);
-              expect(modelAdapter.roleA.mode.dataType.isElement).toBe(true);
-              expect(modelAdapter.model.roleA.modeFixed).not.toBe(null);
+              it("should have countRange.max = Infinity if there is a current element mode " +
+                 "and there are list modes", function() {
 
-              var range = externalPropType.fields.countRangeOn(modelAdapter);
+                var strategies = [ElementIdentityStrategy.type, ListIdentityStrategy.type];
 
-              expect(range.max).toBe(1);
-            });
+                var DerivedModelAdapter = buildAdapter(ModelWithStringAndStringListRole, [
+                  {
+                    name: "roleA",
+                    strategies: strategies
+                  }
+                ]);
 
-            it("should have countRange.max = Infinity if the current mode is a list mode", function() {
+                var externalPropType = DerivedModelAdapter.type.get("roleA");
 
-              var strategies = [ListIdentityStrategy.type];
+                var modelAdapter = new DerivedModelAdapter({
+                  data: new Table(getDataSpec1()),
+                  roleA: {
+                    fields: ["country"]
+                  }
+                });
 
-              var DerivedModelAdapter = buildAdapter(ModelWithStringListRole, [
-                {
-                  name: "roleA",
-                  strategies: strategies
-                }
-              ]);
+                expect(modelAdapter.roleA.mode).not.toBe(null);
+                expect(modelAdapter.roleA.mode.dataType.isElement).toBe(true);
+                expect(modelAdapter.model.roleA.modeFixed).not.toBe(null);
 
-              var externalPropType = DerivedModelAdapter.type.get("roleA");
+                var range = externalPropType.fields.countRangeOn(modelAdapter, {ignoreCurrentMode: true});
 
-              var modelAdapter = new DerivedModelAdapter({
-                data: new Table(getDataSpec1()),
-                roleA: {
-                  fields: ["country", "product"]
-                }
+                expect(range.max).toBe(Infinity);
               });
-
-              expect(modelAdapter.roleA.mode).not.toBe(null);
-              expect(modelAdapter.roleA.mode.dataType.isList).toBe(true);
-              expect(modelAdapter.model.roleA.modeFixed).not.toBe(null);
-
-              var range = externalPropType.fields.countRangeOn(modelAdapter);
-
-              expect(range.max).toBe(Infinity);
             });
           });
         });

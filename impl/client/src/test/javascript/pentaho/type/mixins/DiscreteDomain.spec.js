@@ -225,7 +225,7 @@ define([
             propA.domainOn(owner);
 
             expect(f.calls.count()).toBe(1);
-            expect(f.calls.first().args.length).toBe(1);
+            expect(f.calls.first().args.length).toBe(2);
             expect(f.calls.first().args[0]).toBe(propA);
           });
 

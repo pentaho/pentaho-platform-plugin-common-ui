@@ -40,6 +40,10 @@
  * For more information on this property see
  * [PropertyType#isRequired]{@link pentaho.type.PropertyType#isRequired}.
  *
+ * The function's `keyArgs` argument is given the keyword argument `ignoreCurrentMode`
+ * that, when `true`, indicates if the current [mode]{@link pentaho.visual.role.AbstractMapping#mode},
+ * if any, should be ignored when evaluating.
+ *
  * @name isRequired
  * @memberOf pentaho.visual.role.IFieldsConstraints#
  * @type {undefined | boolean | pentaho.type.spec.PropertyDynamicAttribute.<boolean>}
@@ -52,6 +56,10 @@
  * For more information on this property see
  * [PropertyType#countMin]{@link pentaho.type.PropertyType#countMin}.
  *
+ * The function's `keyArgs` argument is given the keyword argument `ignoreCurrentMode`
+ * that, when `true`, indicates if the current [mode]{@link pentaho.visual.role.AbstractMapping#mode},
+ * if any, should be ignored when evaluating.
+ *
  * @name countMin
  * @memberOf pentaho.visual.role.IFieldsConstraints#
  * @type {undefined | number | pentaho.type.spec.PropertyDynamicAttribute.<number>}
@@ -63,6 +71,10 @@
  *
  * For more information on this property see
  * [PropertyType#countMax]{@link pentaho.type.PropertyType#countMax}.
+ *
+ * The function's `keyArgs` argument is given the keyword argument `ignoreCurrentMode`
+ * that, when `true`, indicates if the current [mode]{@link pentaho.visual.role.AbstractMapping#mode},
+ * if any, should be ignored when evaluating.
  *
  * @name countMax
  * @memberOf pentaho.visual.role.IFieldsConstraints#
