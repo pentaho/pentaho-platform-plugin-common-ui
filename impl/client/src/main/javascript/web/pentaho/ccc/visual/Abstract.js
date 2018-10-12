@@ -1178,7 +1178,7 @@ define([
       var labelSize = model.labelSize;
       if(labelSize) {
         var labelFontFamily = model.labelFontFamily;
-        titleFont = (labelSize + 2) + "px " + labelFontFamily;
+        titleFont = util.defaultFont((labelSize + 2) + "px " + labelFontFamily);
       } else {
         titleFont = util.defaultFont(null, 12);
       }
