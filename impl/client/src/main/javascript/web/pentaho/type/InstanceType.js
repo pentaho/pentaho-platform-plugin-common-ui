@@ -1607,8 +1607,9 @@ define([
 
       // Handles passing the `owner` argument to the `this` context of the private eval method,
       // and the `this` context to the first argument...
-      root[name + "On"] = function(owner) {
-        return this[namePrivEval].call(owner, this);
+      // Passes through the keyArgs argument.
+      root[name + "On"] = function(owner, keyArgs) {
+        return this[namePrivEval].call(owner, this, keyArgs);
       };
     },
 
@@ -1790,7 +1791,7 @@ define([
     /*
      * @type {pentaho.type.spec.PropertyDynamicAttribute}
      */
-    return function(propType) {
+    return function(propType, keyArgs) {
 
       var value = fun.apply(this, arguments);
 

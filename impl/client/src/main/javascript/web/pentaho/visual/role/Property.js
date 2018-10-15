@@ -24,9 +24,10 @@ define([
   "pentaho/type/util",
   "pentaho/type/ValidationError",
   "pentaho/util/object",
-  "pentaho/util/error"
+  "pentaho/util/error",
+  "pentaho/util/arg",
 ], function(module, AbstractProperty, Mapping, Mode, bundle, bundleTypes, typeLoader, typeUtil,
-            ValidationError, O, error) {
+            ValidationError, O, error, arg) {
 
   "use strict";
 
@@ -336,8 +337,8 @@ define([
             set countMax(value) {
               propType.__fieldsCountMax = value;
             },
-            countRangeOn: function(model) {
-              return propType.__fieldsCountRangeOn(model);
+            countRangeOn: function(model, keyArgs) {
+              return propType.__fieldsCountRangeOn(model, keyArgs);
             }
           });
         }
@@ -365,9 +366,9 @@ define([
           group: "fields",
           localName: "isRequired",
           combine: function(baseEval, localEval) {
-            return function(propType) {
+            return function(propType, keyArgs) {
               // localEval is skipped if base is true.
-              return baseEval.call(this, propType) || localEval.call(this, propType);
+              return baseEval.call(this, propType, keyArgs) || localEval.call(this, propType, keyArgs);
             };
           }
         },
@@ -380,8 +381,8 @@ define([
           group: "fields",
           localName: "countMin",
           combine: function(baseEval, localEval) {
-            return function(propType) {
-              return Math.max(baseEval.call(this, propType), localEval.call(this, propType));
+            return function(propType, keyArgs) {
+              return Math.max(baseEval.call(this, propType, keyArgs), localEval.call(this, propType, keyArgs));
             };
           }
         },
@@ -398,20 +399,23 @@ define([
            *
            * @type pentaho.type.spec.PropertyDynamicAttribute
            */
-          value: function(propType) {
+          value: function(propType, keyArgs) {
 
-            var mapping = this.get(propType);
+            var mode = null;
+            if(!arg.optional(keyArgs, "ignoreCurrentMode", false)) {
+              // In unit-tests, these properties are used outside of a real model. So mapping can be null.
+              var mapping = this.get(propType);
+              mode = mapping && mapping.mode;
+            }
 
-            // In unit-tests, these properties are used outside of a real model. So mapping can be null.
-            var mode = mapping && mapping.mode;
             return (mode !== null ? mode.dataType.isList : propType.hasAnyListModes) ? Infinity : 1;
           },
           cast: __castCount,
           group: "fields",
           localName: "countMax",
           combine: function(baseEval, localEval) {
-            return function(propType) {
-              return Math.min(baseEval.call(this, propType), localEval.call(this, propType));
+            return function(propType, keyArgs) {
+              return Math.min(baseEval.call(this, propType, keyArgs), localEval.call(this, propType, keyArgs));
             };
           }
         }
@@ -421,16 +425,21 @@ define([
        * Actually implements IFieldsConstraints#countRangeOn.
        *
        * @param {pentaho.visual.base.AbstractModel} model - The model.
+       * @param {object} [keyArgs] - The keyword arguments object.
+       * @param {boolean} [keyArgs.ignoreCurrentMode=false] - Indicates that the current mode, if any,
+       *   should be ignored when determining the count range.
+       *   When `false` and there is a current mode, the count range is that of the current mode.
+       *
        * @return {pentaho.IRange<number>} The field count range.
        * @private
        */
-      __fieldsCountRangeOn: function(model) {
+      __fieldsCountRangeOn: function(model, keyArgs) {
         // TODO: Shouldn't this also integrate the underlying `fields` property's own isRequired, countMin, countMax
         // attributes? Can be a problem if anyone creates a subclass of property (outside of configuration)
         // and changes the defaults.
-        var isRequired = this.__fieldsIsRequiredOn(model);
-        var countMin = this.__fieldsCountMinOn(model);
-        var countMax = this.__fieldsCountMaxOn(model);
+        var isRequired = this.__fieldsIsRequiredOn(model, keyArgs);
+        var countMin = this.__fieldsCountMinOn(model, keyArgs);
+        var countMax = this.__fieldsCountMaxOn(model, keyArgs);
 
         if(isRequired && countMin < 1) {
           countMin = 1;

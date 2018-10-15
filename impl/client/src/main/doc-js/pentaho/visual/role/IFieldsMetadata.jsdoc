@@ -39,6 +39,11 @@
  * @memberOf pentaho.visual.role.IFieldsMetadata#
  * @method
  * @param {pentaho.visual.base.AbstractModel} model - The model.
+ * @param {object} [keyArgs] - The keyword arguments object.
+ * @param {boolean} [keyArgs.ignoreCurrentMode=false] - Indicates that the current mode, if any,
+ * should be ignored when determining the count range.
+ * When `false` and there is a current mode, the count range is that of the current mode.
+ *
  * @return {pentaho.IRange<number>} The field count range.
  * @see pentaho.type.PropertyType#countRangeOn
  */

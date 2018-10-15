@@ -1144,9 +1144,9 @@ define([
           value: false,
           cast: Boolean,
           combine: function(baseEval, localEval) {
-            return function(propType) {
+            return function(propType, keyArgs) {
               // localEval is skipped if base is true.
-              return baseEval.call(this, propType) || localEval.call(this, propType);
+              return baseEval.call(this, propType, keyArgs) || localEval.call(this, propType, keyArgs);
             };
           }
         },
@@ -1232,8 +1232,8 @@ define([
           value: 0,
           cast: __castCount,
           combine: function(baseEval, localEval) {
-            return function(propType) {
-              return Math.max(baseEval.call(this, propType), localEval.call(this, propType));
+            return function(propType, keyArgs) {
+              return Math.max(baseEval.call(this, propType, keyArgs), localEval.call(this, propType, keyArgs));
             };
           }
         },
@@ -1319,8 +1319,8 @@ define([
           value: Infinity,
           cast: __castCount,
           combine: function(baseEval, localEval) {
-            return function(propType) {
-              return Math.min(baseEval.call(this, propType), localEval.call(this, propType));
+            return function(propType, keyArgs) {
+              return Math.min(baseEval.call(this, propType, keyArgs), localEval.call(this, propType, keyArgs));
             };
           }
         },
@@ -1399,9 +1399,9 @@ define([
           value: true,
           cast: Boolean,
           combine: function(baseEval, localEval) {
-            return function(propType) {
+            return function(propType, keyArgs) {
               // localEval is skipped if base is false.
-              return baseEval.call(this, propType) && localEval.call(this, propType);
+              return baseEval.call(this, propType, keyArgs) && localEval.call(this, propType, keyArgs);
             };
           }
         },
@@ -1476,9 +1476,9 @@ define([
           value: true,
           cast: Boolean,
           combine: function(baseEval, localEval) {
-            return function(propType) {
+            return function(propType, keyArgs) {
               // localEval is skipped if base is false.
-              return baseEval.call(this, propType) && localEval.call(this, propType);
+              return baseEval.call(this, propType, keyArgs) && localEval.call(this, propType, keyArgs);
             };
           }
         }

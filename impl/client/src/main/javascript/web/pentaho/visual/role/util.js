@@ -103,7 +103,9 @@ define([
         if(replaceTarget === "auto") {
           if(mappingField === null) {
             // Enter replace mode if there is no room to add/insert.
-            replaceTarget = mappingFields.count >= propType.fields.countRangeOn(vizModel).max;
+            replaceTarget =
+              mappingFields.count >=
+              propType.fields.countRangeOn(vizModel, {ignoreCurrentMode: true}).max;
           } else {
             // It's a move, so there's space.
             replaceTarget = false;
