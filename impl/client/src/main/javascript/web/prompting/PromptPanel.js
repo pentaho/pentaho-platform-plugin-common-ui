@@ -1156,7 +1156,7 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
             var isExist = existingErrors.some(function(item) {
               return item.label == error;
             });
-            if(!isExist) {
+            if(!isExist && !param.multiSelect) {
               var errIndex = panel.components.length - 1;
               var errorComponent = _createWidgetForErrorLabel.call(this, param, error);
               this.dashboard.addComponent(errorComponent);
