@@ -347,7 +347,14 @@ define([
       this.groups  = {};
       this._gemUIByGemId = {};
 
-      this.domNode.innerHTML = "";
+      // does not work in IE 11 - It will destroy all its corresponding child elements
+      // https://social.msdn.microsoft.com/Forums/ie/en-US/0c4231cd-18d0-4557-a5dd-67678812222d/ie11-dom-elements-saved-in-arrays-have-no-innerhtml-when-recalled?forum=iewebdevelopment#b726de77-4dd2-4c23-a048-6db0e24f1a15
+      // this.domNode.innerHTML = "";
+
+      while(this.domNode.firstChild !== null) {
+        this.domNode.removeChild(this.domNode.firstChild);
+      }
+
       this.configuration = config;
       this.postCreate();
     },
