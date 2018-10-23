@@ -171,19 +171,50 @@ define([
        */
       __fieldsCountRangeOn: function(modelAdapter, keyArgs) {
 
-        var isRequired = this._internalProperty.fields.countRangeOn(modelAdapter.model, keyArgs).min > 0;
+        var internalCountRange = this._internalProperty.fields.countRangeOn(modelAdapter.model, keyArgs);
+
+        // The internal countRange (both min and max) is valid externally when
+        // all of the possible strategies are "identity" strategies.
+        if(this.__areAllStrategyApplicationsIdentity) {
+          return internalCountRange;
+        }
+
+        // Otherwise, only min can be used, partially.
 
         var mode = null;
+
         if(!arg.optional(keyArgs, "ignoreCurrentMode", false)) {
           // In unit-tests, these properties are used outside of a real model.
-          // So mapping can be null.
+          // So externalMapping can be null.
           var externalMapping = modelAdapter.get(this);
           mode = externalMapping && externalMapping.mode;
         }
 
         var countMax = (mode !== null ? mode.dataType.isList : this.hasAnyListModes) ? Infinity : 1;
 
-        return {min: isRequired ? 1 : 0, max: countMax};
+        return {min: internalCountRange.min > 0 ? 1 : 0, max: countMax};
+      },
+
+      /**
+       * Gets a value that indicates that all of the strategy types of
+       * the current strategy type applications are identities.
+       *
+       * @type {boolean}
+       * @readOnly
+       * @private
+       * @see pentaho.visual.role.ExternalPropertyType#__strategyTypeApplicationList
+       * @see pentaho.visual.role.adaptation.IStrategyApplication#strategyType
+       * @see pentaho.visual.role.adaptation.StrategyType#isIdentity
+       */
+      get __areAllStrategyApplicationsIdentity() {
+        var strategyTypeAppList = this.__strategyTypeApplicationList;
+        if(strategyTypeAppList === null) {
+          return true;
+        }
+
+        return strategyTypeAppList.every(function(strategyTypeApp) {
+          return strategyTypeApp.strategyType.isIdentity;
+        });
       },
       // endregion
 

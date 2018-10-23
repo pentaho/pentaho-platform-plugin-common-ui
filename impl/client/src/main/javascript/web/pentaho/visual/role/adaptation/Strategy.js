@@ -247,7 +247,18 @@ define([
     $type: /** @lends pentaho.visual.role.adaptation.StrategyType# */{
       id: module.id,
 
-      isAbstract: true
+      isAbstract: true,
+
+      /**
+       * Gets a value that indicates if the strategy is an identity strategy.
+       *
+       * @type {boolean}
+       * @readOnly
+       * @overridable
+       */
+      get isIdentity() {
+        return false;
+      },
 
       /**
        * Gets the input data type that would be required for this strategy to output a

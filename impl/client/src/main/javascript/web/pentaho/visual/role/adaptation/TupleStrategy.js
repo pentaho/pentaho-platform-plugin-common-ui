@@ -250,6 +250,11 @@ define([
       id: module.id,
 
       /** @inheritDoc */
+      get isIdentity() {
+        return true;
+      },
+
+      /** @inheritDoc */
       getInputTypeFor: function(outputDataType, isVisualKeyEf) {
 
         if(!outputDataType.isList) {
