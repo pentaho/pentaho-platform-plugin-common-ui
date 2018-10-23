@@ -258,7 +258,7 @@ define([
      *
      * 1. The visual role has its minimum fields requirement satisfied.
      *
-     * 2. The field's data type is such it matches directly the
+     * 2. The field's data type is such that it matches directly the
      *    [isContinuous]{@link pentaho.visual.role.Mode#isContinuous} property of the
      *    [visual role usage]{@link pentaho.visual.role.IAddUsage#mode}.
      *

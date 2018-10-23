@@ -26,9 +26,12 @@ define([
   return {
 
     buildAdapter: function(DerivedModel, propsSpec) {
+
       return ModelAdapter.extend({
         $type: {
-          props: [{name: "model", valueType: DerivedModel}].concat(propsSpec || [])
+          props: [
+            {name: "model", valueType: DerivedModel}
+          ].concat(propsSpec || [])
         }
       });
     },
@@ -107,6 +110,8 @@ define([
         invert: function() {},
 
         $type: {
+          get isIdentity() { return true; },
+
           getInputTypeFor: function(outputDataType, isVisualKeyEf) {
             if(outputDataType.isList) {
               return null;
@@ -126,9 +131,78 @@ define([
         }
       });
 
+      exports.ElementNonIdentityStrategy = BaseStrategy.extend({
+
+        constructor: function(instSpec) {
+
+          this.base(instSpec);
+
+          this._setOutputFieldIndexes(instSpec.inputFieldIndexes);
+        },
+
+        map: function() {},
+        invert: function() {},
+
+        $type: {
+          get isIdentity() { return false; },
+
+          getInputTypeFor: function(outputDataType, isVisualKeyEf) {
+            if(outputDataType.isList) {
+              return null;
+            }
+
+            return outputDataType;
+          },
+          validateApplication: function(schemaData, inputFieldIndexes) {
+            return {isValid: true, addsFields: false};
+          },
+          apply: function(data, inputFieldIndexes) {
+            return new exports.ElementNonIdentityStrategy({
+              data: data,
+              inputFieldIndexes: inputFieldIndexes
+            });
+          }
+        }
+      });
+
       // ---
 
       exports.ListIdentityStrategy = BaseStrategy.extend({
+        constructor: function(instSpec) {
+
+          this.base(instSpec);
+
+          this._setOutputFieldIndexes(instSpec.inputFieldIndexes);
+        },
+
+        map: function() {},
+        invert: function() {},
+
+        $type: {
+          get isIdentity() { return true; },
+
+          getInputTypeFor: function(outputDataType, isVisualKeyEf) {
+            if(!outputDataType.isList) {
+              return null;
+            }
+
+            return outputDataType;
+          },
+          validateApplication: function(schemaData, inputFieldIndexes) {
+            return {isValid: true, addsFields: false};
+          },
+          apply: function(data, inputFieldIndexes) {
+            return new exports.ListIdentityStrategy({
+              data: data,
+              inputFieldIndexes: inputFieldIndexes
+            });
+          }
+        }
+      });
+
+      // ---
+
+      exports.ListNonIdentityStrategy = BaseStrategy.extend({
         constructor: function(instSpec) {
 
           this.base(instSpec);
@@ -151,7 +225,7 @@ define([
             return {isValid: true, addsFields: false};
           },
           apply: function(data, inputFieldIndexes) {
-            return new exports.ListIdentityStrategy({
+            return new exports.ListNonIdentityStrategy({
               data: data,
               inputFieldIndexes: inputFieldIndexes
             });

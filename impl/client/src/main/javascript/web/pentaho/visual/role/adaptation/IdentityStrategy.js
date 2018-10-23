@@ -149,6 +149,11 @@ define([
       id: module.id,
 
       /** @inheritDoc */
+      get isIdentity() {
+        return true;
+      },
+
+      /** @inheritDoc */
       getInputTypeFor: function(outputDataType, isVisualKeyEf) {
 
         // 1) Can handle a single column.
