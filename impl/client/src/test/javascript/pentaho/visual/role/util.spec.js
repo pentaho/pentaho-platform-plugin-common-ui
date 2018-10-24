@@ -1255,6 +1255,37 @@ define([
           });
         }); // by measurement level distance
 
+        describe("by belonging to the same hierarchy", function() {
+
+          it("should prefer mapping to a visual role that has only fields from the same hierarchy assigned to it " +
+               "all other things equal", function() {
+
+            var dataTable = new Table({
+                                        model: [
+                                          {name: "[H1].[A]", type: "string"},
+                                          {name: "[H1].[B]", type: "string"},
+                                          {name: "[H2].[C]", type: "string"},
+                                          {name: "[H2].[D]", type: "string"}
+                                        ]
+                                      });
+
+            var model = new ModelListList({
+                                            "R1": {fields: ["[H1].[A]"]},
+                                            "data": dataTable
+                                          });
+
+            var fieldNameToAdd = "[H1].[B]";
+            var roleUsage = roleUtil.getBestRoleForAddingField(model, fieldNameToAdd);
+
+            expectSuccess(roleUsage, "R1");
+
+            var fieldNameToAdd = "[H2].[C]";
+            var roleUsage = roleUtil.getBestRoleForAddingField(model, fieldNameToAdd);
+
+            expectSuccess(roleUsage, "R2");
+          });
+        }); // by attribute count
+
         describe("by attribute count", function() {
 
           it("should prefer mapping to a visual role that has fewer fields assigned to it " +
