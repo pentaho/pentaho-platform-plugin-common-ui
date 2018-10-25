@@ -39,7 +39,7 @@ define([
      * Calls base plus it filters out rows having a null "rows" visual role value when
      * the visual role is operating in a continuous mode.
      *
-     * This is a temporary solution.
+     * TODO: This is a temporary solution.
      * Ideally, visual role definitions would specify an attribute such as `allowsNullData`,
      * defaulting to `true`, and the data would be filtered out a priori.
      *
@@ -59,15 +59,18 @@ define([
           // Column indexes are compatible with model.data, and not this._dataView.
           // Row indexes, atm, are common.
           var columnIndex = mapping.fieldIndexes[0];
-          var rowIndexes = dataUtil.getFilteredRowsByPredicate(this.model.data, function(data, rowIndex) {
+          var dataPlain = this.model.data;
+          var rowIndexes = dataUtil.getFilteredRowsByPredicate(dataPlain, function(data, rowIndex) {
             return data.getValue(rowIndex, columnIndex) !== null;
           });
 
           if(rowIndexes !== null) {
             this._dataView.setSourceRows(rowIndexes);
 
-            logger.warn("The visualization has ignored " + rowIndexes.length +
-              " row(s) having a null '" + this.model.data.getColumnLabel(columnIndex) + "' field value.");
+            var originalRowCount = dataPlain.getNumberOfRows();
+
+            logger.warn("The visualization has ignored " + (originalRowCount - rowIndexes.length) +
+              " row(s) having a null '" + dataPlain.getColumnLabel(columnIndex) + "' field value.");
           }
         }
       }
