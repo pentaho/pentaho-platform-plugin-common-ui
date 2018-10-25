@@ -129,6 +129,10 @@ define([
           vizModel.data = alternateDataTable;
         }
 
+        // Generally removing a field or changing the data can cause problems with the selection filter, if any.
+        // So it's wise to null it out for this purpose.
+        vizModel.selectionFilter = null;
+
         if(replaceTarget) {
           mappingFields.removeAt(fieldPosition, 1);
         }
