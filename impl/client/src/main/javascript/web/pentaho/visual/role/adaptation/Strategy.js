@@ -252,6 +252,19 @@ define([
       /**
        * Gets a value that indicates if the strategy is an identity strategy.
        *
+       * An _identity_ strategy is one for which each of its input fields
+       * corresponds to exactly one output field and vice-versa,
+       * under the same order.
+       * Moreover,
+       * the value of each input field is either the same as or equivalent to
+       * that of its output field.
+       *
+       * Under this definition,
+       * the following stock strategies are considered _identity_ strategies:
+       * * [IdentityStrategy]{@link pentaho.visual.role.adaptation.IdentityStrategy}
+       * * [TupleStrategy]{@link pentaho.visual.role.adaptation.TupleStrategy}
+       * * [EntityWithNumberKeyStrategy]{@link pentaho.visual.role.adaptation.EntityWithNumberKeyStrategy}
+       *
        * @type {boolean}
        * @readOnly
        * @overridable
