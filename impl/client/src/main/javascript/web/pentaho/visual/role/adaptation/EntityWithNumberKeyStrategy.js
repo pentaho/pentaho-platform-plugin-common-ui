@@ -182,6 +182,11 @@ define([
       id: module.id,
 
       /** @inheritDoc */
+      get isIdentity() {
+        return true;
+      },
+
+      /** @inheritDoc */
       getInputTypeFor: function(outputDataType, isVisualKeyEf) {
 
         if(isVisualKeyEf === false || !outputDataType.isSubtypeOf(PentahoNumber.type)) {
