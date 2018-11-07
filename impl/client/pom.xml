@@ -19,7 +19,7 @@
     for each of the constituents (e.g. vizapi, prompting) of the current artifact.</description>
 
   <properties>
-    <js.project.list>dojo-release,jquery,jquery-i18n-properties,pentaho-cdf-js,angular-mocks,angular,angular-resource,angular-route,angular-animate,angular-aria,angular-cookies,angular-loader,angular-message-format,angular-messages,angular-parse-ext,angular-sanitize,angular-scenario,angular-touch,angular-i18n,angular-translate</js.project.list>
+    <js.project.list>dojo-release,requirejs,jquery,jquery-i18n-properties,pentaho-cdf-js,angular-mocks,angular,angular-resource,angular-route,angular-animate,angular-aria,angular-cookies,angular-loader,angular-message-format,angular-messages,angular-parse-ext,angular-sanitize,angular-scenario,angular-touch,angular-i18n,angular-translate</js.project.list>
     <build.javascriptReportDirectory>target/js-reports</build.javascriptReportDirectory>
     <docjs.config.file>jsdoc-vizapi.json</docjs.config.file>
     <docjs.config.github.branch>master</docjs.config.github.branch>
@@ -54,6 +54,10 @@
       <groupId>pentaho</groupId>
       <artifactId>pentaho-cdf-js</artifactId>
       <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>requirejs</artifactId>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
@@ -132,6 +136,7 @@
         </includes>
       </testResource>
     </testResources>
+
     <plugins>
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>

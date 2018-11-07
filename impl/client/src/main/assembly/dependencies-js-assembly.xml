@@ -24,6 +24,18 @@
     </fileSet>
 
     <fileSet>
+      <directory>${webjars.target.directory}/requirejs/${requirejs.version}</directory>
+      <outputDirectory>.</outputDirectory>
+      <includes>
+        <include>**/require.js</include>
+      </includes>
+      <excludes>
+        <exclude>**/*.json</exclude>
+        <exclude>**/*.md</exclude>
+      </excludes>
+    </fileSet>
+
+    <fileSet>
       <directory>${webjars.target.directory}/jquery/${jquery.version}/dist</directory>
       <excludes>
         <exclude>**/*.min.js</exclude>
