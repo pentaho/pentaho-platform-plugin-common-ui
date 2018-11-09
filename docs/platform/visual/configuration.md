@@ -18,9 +18,7 @@ Visualizations are constituted by one
 type and (at least) one 
 [`View`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}})
 type,
-any of which is a 
-[Type API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type'}}) complex type 
-that can be configured.
+any of which can be seamlessly configured.
 
 Section [Identifiers of Stock Visualizations](#identifiers-of-stock-visualizations) contains the list
 of identifiers of stock `Model` and `View` types.
@@ -281,10 +279,10 @@ var ruleSpec = {
 
 ## Identifiers of Stock Visualizations
 
-The models of stock visualizations are all sub-modules of `pentaho/visual/models`. 
+The models of stock visualizations are all sub-modules of the `pentaho/visual/models` module. 
 For example, `pentaho/visual/models/Line`, is the identifier of the stock Line visualization model.
 
-The corresponding CCC-based view of a stock visualization is a sub-module of `pentaho/ccc/visual`. 
+The corresponding CCC-based view of a stock visualization is a sub-module of the `pentaho/ccc/visual` module. 
 For example, `pentaho/ccc/visual/Line`, is the identifier of the CCC view corresponding to 
 the stock Line visualization model.
 
@@ -313,7 +311,7 @@ and its view's identifier is `pentaho/geo/visual/View`.
 
 ## Identifiers of Stock Color Palettes
 
-All stock color palettes are sub-modules of `pentaho/visual/color/palettes`.
+All stock color palettes are sub-modules of the `pentaho/visual/color/palettes` module.
 For example, `pentaho/visual/color/palettes/nominalPrimary`, 
 is the identifier of the default discrete color palette.
 
