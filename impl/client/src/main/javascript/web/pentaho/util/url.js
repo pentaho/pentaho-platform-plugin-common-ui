@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2017-2018 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ define([
      * available, {@code url} is going to be parsed and a URL mock
      * will be returned instead.
      *
-     * @param {?String} url - A resource location.
+     * @param {?string} url - A resource location.
      *
      * @return {?URL} the new URL object.
      */
@@ -56,9 +56,9 @@ define([
      *  4. port (optional)
      *  5. pathname (optional)
      *
-     * @param {String} url - A resource location.
+     * @param {string} url - A resource location.
      *
-     * @return {Array.<String>} the parsed url.
+     * @return {Array.<string>} the parsed url.
      */
     parse: parseUrl
   };

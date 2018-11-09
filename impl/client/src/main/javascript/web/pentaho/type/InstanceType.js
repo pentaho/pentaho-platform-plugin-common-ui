@@ -57,8 +57,6 @@ define([
    *
    * For additional information, see the associated _instance class_, {@link pentaho.type.Instance}.
    *
-   * This constructor is the value of {@link pentaho.type.InstanceType}.
-   *
    * @description _Initializes_ the type's singleton object.
    * @param {Object} spec - The specification of this type.
    * @param {!Object} keyArgs - Keyword arguments.
