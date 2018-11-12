@@ -99,7 +99,7 @@ Go ahead and experiment with different values.
 
 ## Analyzer Integration
 
-In [Analyzer](http://www.pentaho.com/product/business-visualization-analytics), 
+In [Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html), 
 when drilling-down, the default behaviour is to _add_ the child field to the visual role 
 where the parent field is.
 However, the _Category_ visual role of the Bar visualization you developed only accepts a single field 

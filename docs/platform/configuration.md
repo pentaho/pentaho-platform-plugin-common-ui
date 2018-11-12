@@ -28,8 +28,8 @@ as an instance of type
    [application]({{site.refDocsUrlPattern | replace: '$', 'pentaho.environment.IEnvironment#application'}}),
    as it allows creating rules that are only applied when a _module_ is being used by 
    a certain _application_, like, for example, 
-   [CDF](http://community.pentaho.com/ctools/cdf/) or 
-   [Analyzer](http://www.pentaho.com/product/business-visualization-analytics).
+   [CDF](https://community.hitachivantara.com/docs/DOC-1009859-cdf-dashboard-framework) or 
+   [Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html).
    See also [Known Values of Pentaho Environment Variables](#known-values-of-pentaho-platform-environment-variables).
    
 2. The [**apply**]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule#apply'}}) object

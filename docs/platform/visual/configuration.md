@@ -49,7 +49,7 @@ define(function() {
 The following rule configures the 
 [isBrowsable]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#isBrowsable'}}) 
 type attribute to hide the stock _Pie_ visualization (and any visualizations that derive from it) 
-from the [Analyzer](http://www.pentaho.com/product/business-visualization-analytics) application's
+from the [Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html) application's
 visualizations menu, effectively preventing the user from creating new visualizations of this type:
 
 ```js
@@ -123,7 +123,7 @@ The following rule changes the
 [label]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#label'}})
 type attribute of the _Bar_ stock visualization, 
 affecting how it is displayed in the visualizations menu of the Analyzer and 
-[PDI](http://www.pentaho.com/product/data-integration) applications:
+[PDI](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-data-integration.html) applications:
 
 ```js
 var ruleSpec = {

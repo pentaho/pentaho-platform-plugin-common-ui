@@ -9,9 +9,9 @@ layout: sub-intro
 The [Visualization API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual'}}) 
 provides a unified way to visualize data across the Pentaho suite 
 (e.g.
-[Analyzer](http://www.pentaho.com/product/business-visualization-analytics), 
-[PDI](http://www.pentaho.com/product/data-integration), 
-[CDF](http://community.pentaho.com/ctools/cdf/)).
+[Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html), 
+[PDI](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-data-integration.html), 
+[CDF](https://community.hitachivantara.com/docs/DOC-1009859-cdf-dashboard-framework)).
 
 Essentially, it is a set of abstractions that enables safe, isolated operation between 
 applications, visualizations and business logic.
@@ -89,7 +89,7 @@ copy the tgz file you just built into its `system/karaf/deploy` folder.
 See [OSGi Artifacts Deployment](../osgi-deployment) if you need more information.
 
 If everything went well, you should now see your visualization being offered in Analyzer and PDI, 
-as well as be able to use it in a [CDE](http://community.pentaho.com/ctools/cde/) dashboard:
+as well as be able to use it in a [CDE](https://community.hitachivantara.com/docs/DOC-1009858-cde-dashboard-editor) dashboard:
 
 1. Your Bar/D3 visualization in Analyzer, showing off the menu and placeholder icon:
    
