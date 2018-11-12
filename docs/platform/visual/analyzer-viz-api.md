@@ -10,7 +10,7 @@ layout: default
 
 ## Overview
 
-[Pentaho Analyzer](http://www.pentaho.com/product/business-visualization-analytics) reports display visualizations that 
+[Pentaho Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html) reports display visualizations that 
 are based on the [Pentaho Visualization API](.).
 
 As of version 7.1, the Pentaho platform ships with the _new_ version of the Visualization API, still in **beta**, 
@@ -21,8 +21,8 @@ allowing you
 to evaluate and immediately take advantage of the new format, and 
 to convert any custom visualizations of the previous format at your own pace.
 
-All [stock visualizations](https://help.pentaho.com/Documentation/8.0/Products/Analyzer/Visualizations), 
-with the exception of the [Geo Map](https://help.pentaho.com/Documentation/8.0/Products/Analyzer/Visualizations#Geo_Map_Visualization), 
+All [stock visualizations](https://help.pentaho.com/Documentation/8.2/Products/Analyzer/Visualizations), 
+with the exception of the [Geo Map](https://help.pentaho.com/Documentation/8.2/Products/Analyzer/Visualizations#Geo_Map_Visualization), 
 are already available in the new format 
 and you **can choose** which format you want Analyzer to use, by configuring an Analyzer setting
 (see [Changing the visualization format of stock visualizations](#changing-the-visualization-format-of-stock-visualizations)).
