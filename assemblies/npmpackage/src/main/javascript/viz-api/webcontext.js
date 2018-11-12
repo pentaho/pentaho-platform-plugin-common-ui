@@ -28,6 +28,7 @@
   loadScriptSyncNested(basePath + "/require-cfg.js");
 
   function loadScriptSyncNested(src) {
-    document.write("<script language='javascript' type='text/javascript' src='" + src + "'></scr"+"ipt>");
+    // eslint-disable-next-line no-useless-concat
+    document.write("<script language='javascript' type='text/javascript' src='" + src + "'></scr" + "ipt>");
   }
 })(window);

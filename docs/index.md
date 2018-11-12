@@ -63,14 +63,14 @@ The APIs are organized as follows:
                                 <a title="Pentaho JavaScript Configuration API" 
                                 href="platform/configuration">Configuration</a>
                             </dt>
-                            <dd>Allows <em>types</em> to be configured by third-parties.</dd>
+                            <dd>Allows <em>modules</em> to be configured by third-parties.</dd>
                         </dl>
                     </li>
                     <li>
                         <dl>
                             <dt>
                                 <a title="Pentaho JavaScript Modules API" 
-                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.modules'}}">Modules</a>
+                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.module'}}">Modules</a>
                             </dt>
                             <dd>Provides information about existing modules.</dd>
                         </dl>

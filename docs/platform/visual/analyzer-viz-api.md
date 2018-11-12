@@ -65,8 +65,8 @@ relative to the _previous_ stock visualizations.
 1. Visualizations scroll horizontally and vertically when too many axis categories exist, 
    instead of shrinking to available space.
 2. Selection is either enabled or not, depending on whether there are no _gems_ in the 
-   Pivot "Column" gem bar, while there used to be an intermediate selection state where some 
-   partial selections were possible if only one gem was in the Pivot "Column" gem bar.
+   Pivot "Column" _gem bar_, while there used to be an intermediate selection state where some 
+   partial selections were possible if only one _gem_ was in the Pivot "Column" _gem bar_.
 3. General styling of visualizations changed to be aligned platform-wide (e.g. PDI, CDF).
 4. Standard color palettes have changed to be aligned platform-wide (e.g. PDI, CDF).
 

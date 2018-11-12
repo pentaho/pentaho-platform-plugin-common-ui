@@ -1,6 +1,6 @@
 ---
 title: Configuration API
-description: The Configuration API provides a means for types and instances to be configured by third-parties.
+description: The Configuration API provides a means for modules to be configured by third-parties.
 layout: default
 ---
 
@@ -41,10 +41,20 @@ as an instance of type
    being a [Complex]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex'}}) type,
    can be configured with the properties of the 
    [IComplexType]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.spec.IComplexType'}}) interface.
-
-3. The [**priority**]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule#priority'}}) 
+   
+   The `apply` property can also be a function, 
+   in which case it is called to determine the actual configuration object, 
+   only when and if the selected module or modules are loaded.
+   Read more about this, below, on the `deps` property section.  
+   
+3. The [**deps**]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule#deps'}}) array 
+   contains a list of additional module identifiers which are loaded 
+   only when and if the selected module or modules are loaded.
+   When `apply` is a function, then the values of the specified modules are given as arguments to it.
+   
+4. The [**priority**]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule#priority'}}) value
    allows fine-tuning the order by which rules that target the same _module_ are merged.
-   Higher values have higher priority. It is optional and defaults to `0`.
+   Higher values have higher priority. It is optional and defaults to `0`. 
 
 See 
 [Rule Specificity]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRuleSet' | append: '#Rule_Specificity'}}) 
@@ -102,10 +112,29 @@ define(function() {
       // IRule 3
       {
         select: {
-          module: "my/friend/john1"
+          module: [
+            "my/friend/john", 
+            "my/friend/marie"
+          ]
         },
         apply: {
           empathyFactor: 0.6
+        }
+      },
+      
+      // IRule 4
+      {
+        select: {
+          module: "my/house/main"
+        },
+        deps: [
+          "lodash", 
+          "./baseHouseSchematics"
+        ],
+        apply: function(_, baseHouseSchematics) {
+          return _.merge(baseHouseSchematics, {
+            averageSummerTemperature: 23
+          });
         }
       }
     ]

@@ -22,5 +22,15 @@ define([
 
   "use strict";
 
+  /**
+   * The global _Type API_ loader instance.
+   *
+   * Loading this module also pre-loads all standard _Type API_ types.
+   *
+   * @name loader
+   * @type {pentaho.type.ILoader}
+   * @memberOf pentaho.type
+   */
+
   return baseLoader;
 });
