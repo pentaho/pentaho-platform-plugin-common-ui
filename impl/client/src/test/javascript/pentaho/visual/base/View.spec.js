@@ -18,9 +18,12 @@ define([
   "pentaho/visual/base/View",
   "pentaho/visual/base/Model",
   "pentaho/visual/action/Base",
+  "pentaho/lang/UserError",
+  "pentaho/lang/RuntimeError",
+  "pentaho/visual/base/ModelChangedError",
   "tests/test-utils",
   "tests/pentaho/util/errorMatch"
-], function(Table, BaseView, BaseModel, BaseAction, testUtils, errorMatch) {
+], function(Table, BaseView, BaseModel, BaseAction, UserError, RuntimeError, ModelChangedError, testUtils, errorMatch) {
 
   "use strict";
 
@@ -31,9 +34,19 @@ define([
     var Model;
     var model;
     var dataTable;
+    var ViewWithUpdateData;
 
     function createValidAndDirtyView() {
       return new BaseView({
+        width: 100,
+        height: 100,
+        domContainer: document.createElement("div"),
+        model: model
+      });
+    }
+
+    function createValidAndDirtyViewWithUpdateData() {
+      return new ViewWithUpdateData({
         width: 100,
         height: 100,
         domContainer: document.createElement("div"),
@@ -56,6 +69,11 @@ define([
 
     beforeAll(function() {
       Model = BaseModel.extend(); // Not abstract.
+
+      ViewWithUpdateData = BaseView.extend({
+        _updateData: function() {
+        }
+      });
     });
 
     beforeEach(function() {
@@ -269,6 +287,18 @@ define([
           return view;
         }
 
+        function createViewWithUpdateData() {
+
+          var view = createValidAndDirtyViewWithUpdateData();
+
+          spyOn(view, "_onUpdateWill");
+          spyOn(view, "__updateLoop").and.callThrough();
+          spyOn(view, "_updateAll");
+          spyOn(view, "_updateData");
+
+          return view;
+        }
+
         it("should call '__updateLoop' when the update is not canceled in the will phase", function() {
 
           var view = createView();
@@ -278,7 +308,7 @@ define([
           });
         });
 
-        it("should call 'validate', before selecting the partial update method", function() {
+        it("should call 'validate', before selecting the update method", function() {
 
           var view = createView();
 
@@ -313,7 +343,7 @@ define([
           });
         });
 
-        it("should select a partial update method if '__validate' returns no errors", function() {
+        it("should select an update method if '__validate' returns no errors", function() {
 
           var view = createView();
 
@@ -324,7 +354,7 @@ define([
           });
         });
 
-        it("should call the selected partial update method", function() {
+        it("should call the selected update method", function() {
 
           var view = createView();
 
@@ -337,14 +367,14 @@ define([
           });
         });
 
-        it("should allow returning nothing from the selected partial update method", function() {
+        it("should allow returning nothing from the selected update method", function() {
 
           var view = createView();
 
           return view.update();
         });
 
-        it("should allow returning a fulfilled promise from the selected partial update method", function() {
+        it("should allow returning a fulfilled promise from the update method", function() {
 
           var view = createView();
 
@@ -353,16 +383,129 @@ define([
           return view.update();
         });
 
-        it("should reject the update when a selected partial update method returns a rejected promise", function() {
+        it("should reject the update and set all bits dirty " +
+           "when the selected update method returns a promise for an Error", function() {
 
-          var view = createView();
+          var view = createViewWithUpdateData();
 
-          view._updateAll.and.returnValue(Promise.reject(new Error()));
+          view.__dirtyPropGroups.clear();
+          view.__dirtyPropGroups.set(BaseView.PropertyGroups.Data);
+
+          var error = new Error("test error");
+          view._updateData.and.returnValue(Promise.reject(error));
 
           return view.update().then(function() {
             fail("Expected update to have been rejected.");
           }, function() {
             // Success. Swallow rejection.
+            expect(view.__dirtyPropGroups.is(BaseView.PropertyGroups.All)).toBe(true);
+          });
+        });
+
+        it("should reject the update and restore original bits " +
+           "when the selected method returns a promise for a cancellation error " +
+           "(UserError and Not RuntimeError)", function() {
+
+          var view = createViewWithUpdateData();
+
+          view.__dirtyPropGroups.clear();
+          view.__dirtyPropGroups.set(BaseView.PropertyGroups.Data);
+
+          var error = new UserError("test error");
+
+          view._updateData.and.returnValue(Promise.reject(error));
+
+          return view.update().then(function() {
+            fail("Expected update to have been rejected.");
+          }, function() {
+            // Success. Swallow rejection.
+            expect(view.__dirtyPropGroups.is(BaseView.PropertyGroups.Data)).toBe(true);
+          });
+        });
+
+        it("should reject the update and restore original bits " +
+           "when the selected method returns a promise for a string cancellation error", function() {
+
+          var view = createViewWithUpdateData();
+
+          view.__dirtyPropGroups.clear();
+          view.__dirtyPropGroups.set(BaseView.PropertyGroups.Data);
+
+          var error = "test error";
+
+          view._updateData.and.returnValue(Promise.reject(error));
+
+          return view.update().then(function() {
+            fail("Expected update to have been rejected.");
+          }, function() {
+            // Success. Swallow rejection.
+            expect(view.__dirtyPropGroups.is(BaseView.PropertyGroups.Data)).toBe(true);
+          });
+        });
+
+        it("should reject the update and set all bits dirty " +
+           "when the selected update method returns a promise for a failure error " +
+           "(RuntimeError and Not ModelChangedError)", function() {
+
+          var view = createViewWithUpdateData();
+
+          view.__dirtyPropGroups.clear();
+          view.__dirtyPropGroups.set(BaseView.PropertyGroups.Data);
+
+          var error = new RuntimeError("test error");
+
+          view._updateData.and.returnValue(Promise.reject(error));
+
+          return view.update().then(function() {
+            fail("Expected update to have been rejected.");
+          }, function() {
+            // Success. Swallow rejection.
+            expect(view.__dirtyPropGroups.is(BaseView.PropertyGroups.All)).toBe(true);
+          });
+        });
+
+        it("should reject the update and restore original bits" +
+           "when the selected update method returns a promise for a " +
+           "ModelChangedError({wantUpdateRetry: false})", function() {
+
+          var view = createViewWithUpdateData();
+
+          view.__dirtyPropGroups.clear();
+          view.__dirtyPropGroups.set(BaseView.PropertyGroups.Data);
+
+          var error = new ModelChangedError({wantUpdateRetry: false});
+
+          view._updateData.and.returnValue(Promise.reject(error));
+
+          return view.update().then(function() {
+            fail("Expected update to have been rejected.");
+          }, function() {
+            // Success. Swallow rejection.
+            expect(view.__dirtyPropGroups.is(BaseView.PropertyGroups.Data)).toBe(true);
+          });
+        });
+
+        it("should retry an update corresponding to the original dirty bits" +
+           "when the selected update method returns a promise for a " +
+           "ModelChangedError({wantUpdateRetry: true})", function() {
+
+          var view = createViewWithUpdateData();
+
+          view.__dirtyPropGroups.clear();
+          view.__dirtyPropGroups.set(BaseView.PropertyGroups.Data);
+
+          var error = new ModelChangedError({wantUpdateRetry: true});
+          var updateCount = 0;
+
+          view._updateData.and.callFake(function() {
+            if(updateCount++ === 0) {
+              return Promise.reject(error);
+            }
+          });
+
+          return view.update().then(function() {
+            expect(view._updateData).toHaveBeenCalledTimes(2);
+            expect(view.__dirtyPropGroups.is(0)).toBe(true);
           });
         });
       });
@@ -538,10 +681,10 @@ define([
 
         var view = createValidAndCleanView();
 
-        var _resolveSize = null;
+        var _resolveUpdateSize = null;
 
         spyOn(view, "_updateSize").and.callFake(function() {
-          return new Promise(function(resolve) { _resolveSize = resolve; });
+          return new Promise(function(resolve) { _resolveUpdateSize = resolve; });
         });
 
         spyOn(view, "_updateSelection");
@@ -559,7 +702,7 @@ define([
         expect((view.__dirtyPropGroups.get() & BaseView.PropertyGroups.Selection) !== 0).toBe(true);
 
         // Finish _updateSize
-        _resolveSize();
+        _resolveUpdateSize();
 
         return p.then(function() {
 
@@ -572,12 +715,12 @@ define([
 
         var view = createValidAndCleanView();
 
-        var _resolveSize1 = null;
+        var _resolveUpdateSize1 = null;
 
         spyOn(view, "_updateSize").and.callFake(function() {
           // First Size update
-          if(!_resolveSize1) {
-            return new Promise(function(resolve) { _resolveSize1 = resolve; });
+          if(!_resolveUpdateSize1) {
+            return new Promise(function(resolve) { _resolveUpdateSize1 = resolve; });
           }
         });
 
@@ -591,7 +734,7 @@ define([
         view.width = 300;
 
         // Finish _updateSize operation 1
-        _resolveSize1();
+        _resolveUpdateSize1();
 
         return p.then(function() {
 
