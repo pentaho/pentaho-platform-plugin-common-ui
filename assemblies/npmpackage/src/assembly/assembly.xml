@@ -22,6 +22,19 @@
       <directory>${basedir}/src/main/javascript/viz-api</directory>
       <outputDirectory>package</outputDirectory>
       <filtered>true</filtered>
+      <excludes>
+        <exclude>init-sandbox</exclude>
+      </excludes>
+    </fileSet>
+
+    <fileSet>
+      <directory>${basedir}/src/main/javascript/viz-api</directory>
+      <outputDirectory>package</outputDirectory>
+      <filtered>false</filtered>
+      <includes>
+        <include>init-sandbox</include>
+      </includes>
+      <fileMode>0755</fileMode>
     </fileSet>
 
   </fileSets>
