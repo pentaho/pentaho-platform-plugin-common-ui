@@ -26,6 +26,8 @@ define([
   "pentaho/type/changes/ComplexChangeset",
   "pentaho/type/changes/Transaction",
   "pentaho/lang/UserError",
+  "pentaho/lang/RuntimeError",
+  "./ModelChangedError",
   "pentaho/util/object",
   "pentaho/util/arg",
   "pentaho/util/fun",
@@ -40,7 +42,8 @@ define([
   "pentaho/module/subtypesOf!pentaho/visual/action/Base"
 
 ], function(module, Complex, VisualModel, UpdateAction, SelectAction, ExecuteAction,
-            typeLoader, ActionExecution, ActionTargetMixin, ComplexChangeset, Transaction, UserError,
+            typeLoader, ActionExecution, ActionTargetMixin, ComplexChangeset, Transaction,
+            UserError, RuntimeError, ModelChangedError,
             O, arg, F, BitSet, error, logger, promise, specUtil,
             bundle) {
 
@@ -411,18 +414,19 @@ define([
     get isDirty() {
       // Because dirty prop groups are cleared optimistically before update methods run,
       // it is needed to use isUpdating to not let that transient non-dirty state show through.
-      return this.isUpdating || this.__getIsDirty();
+      return this.isUpdating || this._checkIsDirty();
     },
 
     /**
-     * Gets a value that indicates if the view is dirty.
+     * Checks if the view is in a dirty state.
      *
      * This method always returns the most real and up-to-date value.
      *
      * @return {boolean} `true` if dirty; `false`, otherwise.
-     * @private
+     * @readOnly
+     * @protected
      */
-    __getIsDirty: function() {
+    _checkIsDirty: function() {
 
       var changesetsPending = Transaction.getChangesetsPending(this);
       if(changesetsPending !== null) {
@@ -457,7 +461,7 @@ define([
     /** @inheritDoc */
     _onChangeDid: function(changeset) {
 
-      if(this.__getIsDirty()) {
+      if(this._checkIsDirty()) {
         this._onChangeDirty(this.__dirtyPropGroups);
       }
 
@@ -651,7 +655,7 @@ define([
       var updateActionExecution = this.__updateActionExecution;
       if(updateActionExecution === null) {
         // Anything to do?
-        if(!this.__getIsDirty()) {
+        if(!this._checkIsDirty()) {
           return Promise.resolve();
         }
 
@@ -758,18 +762,64 @@ define([
       // Assume update succeeds.
       dirtyPropGroups.clear(updateMethodInfo.mask);
 
-      var me = this;
-
       return promise.wrapCall(this[updateMethodInfo.name], this)
-          .then(function() {
-            return me.__updateLoop();
-          }, function(reason) {
+          .then(this.__updateLoop.bind(this))
+          // eslint-disable-next-line no-unexpected-multiline
+          ["catch"](this.__updateRejected.bind(this, updateMethodInfo.mask));
+    },
 
-            // Restore
-            dirtyPropGroups.set(updateMethodInfo.mask);
+    /**
+     * Handles the rejection of an update loop iteration.
+     *
+     * @param {int} previousMask - The dirty bits mask which caused the rejected update operation.
+     * @param {*} reason - The rejection reason.
+     * @return {Promise} A promise for the completion of the update operation.
+     * @private
+     */
+    __updateRejected: function(previousMask, reason) {
 
-            return Promise.reject(reason);
-          });
+      if(typeof reason === "string") {
+        reason = new UserError(reason);
+      }
+
+      if(reason instanceof UserError) {
+        // Causes CANCELLATION OR FAILURE of the action.
+        // The message can be safely displayed to the user.
+
+        if(reason instanceof RuntimeError) {
+          // Causes FAILURE of the action.
+
+          // Retry now?
+          if(reason instanceof ModelChangedError) {
+
+            // Repeat the update with _at least_ the same dirty bits as initially.
+            this.__dirtyPropGroups.set(previousMask);
+
+            if(reason.wantUpdateRetry) {
+              return this.__updateLoop();
+            }
+
+            // Retry later...
+          } else {
+            // Internal state may be dangerously inconsistent, so force a full update.
+            this.__dirtyPropGroups.set(View.PropertyGroups.All);
+          }
+        } else {
+          // Causes CANCELLATION of the action.
+          // Assume nothing was done.
+          // e.g. ValidationError.
+
+          // Restore the changes that caused this update iteration and reject.
+          this.__dirtyPropGroups.set(previousMask);
+        }
+      } else {
+        // Causes FAILURE of the action.
+        // The message cannot be safely displayed to the user.
+        // Internal state may be dangerously inconsistent, so force a full update.
+        this.__dirtyPropGroups.set(View.PropertyGroups.All);
+      }
+
+      return Promise.reject(reason);
     },
 
     /**
