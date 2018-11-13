@@ -106,7 +106,9 @@ define([
     },
 
     /**
-     * Calls base plus it filters out rows having a null "x" or "y" visual role value.
+     * Calls base plus it configures a CCC `where` condition which have a null "x" or "y" visual role value.
+     *
+     * A CCC `where` filter is used so that the series/color atoms order is captured.
      *
      * TODO: This is a temporary solution.
      * Ideally, visual role definitions would specify an attribute such as `allowsNullData`,
@@ -115,38 +117,17 @@ define([
      * @protected
      * @override
      */
-    _transformData: function() {
+    _initData: function() {
 
       this.base();
 
-      var model = this.model;
-
-      var dataPlain = model.data;
-
       // X and Y are both required and continuous.
-      var mappingX = model.x;
-      var mappingY = model.y;
+      var xCccDimName = this._getMappingFieldInfosOfRole("x")[0].name;
+      var yCccDimName = this._getMappingFieldInfosOfRole("y")[0].name;
 
-      // Column indexes are compatible with model.data, and not this._dataView.
-      // Row indexes, atm, are common.
-      var xColumnIndex = mappingX.fieldIndexes[0];
-      var yColumnIndex = mappingY.fieldIndexes[0];
-
-      var rowIndexes = dataUtil.getFilteredRowsByPredicate(dataPlain, function(data, rowIndex) {
-        return data.getValue(rowIndex, xColumnIndex) !== null &&
-          data.getValue(rowIndex, yColumnIndex) !== null;
-      });
-
-      if(rowIndexes !== null) {
-        this._dataView.setSourceRows(rowIndexes);
-
-        var originalRowCount = dataPlain.getNumberOfRows();
-
-        logger.warn("The visualization has ignored " + (originalRowCount - rowIndexes.length) +
-          " row(s) having a null '" +
-          dataPlain.getColumnLabel(xColumnIndex) + "' or '" +
-          dataPlain.getColumnLabel(yColumnIndex) + "' field value(s).");
-      }
+      this._options.dataWhere = function(datum) {
+        return datum.atoms[xCccDimName].value !== null && datum.atoms[yCccDimName].value !== null;
+      };
     }
   })
   .configure({$type: module.config});
