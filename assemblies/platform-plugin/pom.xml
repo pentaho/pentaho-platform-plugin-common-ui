@@ -5,11 +5,11 @@
   <parent>
     <groupId>org.pentaho</groupId>
     <artifactId>common-ui-assemblies</artifactId>
-    <version>8.2.0.0-SNAPSHOT</version>
+    <version>8.2.0.0-342</version>
   </parent>
   <groupId>pentaho</groupId>
   <artifactId>common-ui</artifactId>
-  <version>8.2.0.0-SNAPSHOT</version>
+  <version>8.2.0.0-342</version>
   <packaging>pom</packaging>
   <name>Common-UI Platform Plugin</name>
   <description>
@@ -33,8 +33,8 @@
 
     <!-- Versions -->
     <flexjson.version>2.1</flexjson.version>
-    <pentaho-modeler.version>8.2.0.0-SNAPSHOT</pentaho-modeler.version>
-    <commons-gwt.version>8.2.0.0-SNAPSHOT</commons-gwt.version>
+    <pentaho-modeler.version>8.2.0.0-342</pentaho-modeler.version>
+    <commons-gwt.version>8.2.0.0-342</commons-gwt.version>
   </properties>
   <dependencies>
     <dependency>
