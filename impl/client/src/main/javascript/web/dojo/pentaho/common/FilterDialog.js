@@ -354,7 +354,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   getParameterName: function() {
     var parameterName = this.parameterNameInput.get("value");
     if (parameterName) {
-      parameterName = lang.trim(parameterName).replace(/[^a-zA-Z0-9 ]/g, "");
+      parameterName = lang.trim(parameterName).replace(/[^A-Za-zÀ-ÖØ-öø-ÿ0-9]/g, "");
     }
     return parameterName.length > 0 ? parameterName : undefined;
   },
