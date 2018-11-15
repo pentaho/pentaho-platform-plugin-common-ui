@@ -34,7 +34,8 @@ define([
       months: 0,
       years: 1,
       other: 2,
-      measure: 3
+      years2: 3,
+      measure: 4
     };
 
     var datasetFieldIndexes2 = {
@@ -49,6 +50,7 @@ define([
           "[Time].[Months]",
           "[Time].[Years]",
           "[Time].[Other]",
+          "[Time2].[Years]",
           "[MEASURE:0]"
         ],
         "rows": [
@@ -65,6 +67,10 @@ define([
               {
                 "v": "[Time].[Other1]",
                 "f": "Other1"
+              },
+              {
+                "v": "[Time2].[2004]",
+                "f": "2004"
               },
               {
                 "v": 110756.29999999999,
@@ -87,6 +93,10 @@ define([
                 "f": "Other2"
               },
               {
+                "v": "[Time2].[2005]",
+                "f": "2005"
+              },
+              {
                 "v": 254838.01999999996,
                 "f": "254,838"
               }
@@ -99,12 +109,16 @@ define([
                 "f": "Jan"
               },
               {
-                "v": "[Time].[2004]",
+                "v": "[Time].[2005]",
                 "f": "2005"
               },
               {
                 "v": "[Time].[Other3]",
                 "f": "Other3"
+              },
+              {
+                "v": "[Time2].[2006]",
+                "f": "2006"
               },
               {
                 "v": 187418.05,
@@ -157,12 +171,16 @@ define([
               "isKey": true,
               "members": [
                 {
-                  "v": "[Time].[2003]",
-                  "f": "2003"
+                  "v": "[Time2].[2004]",
+                  "f": "2004"
                 },
                 {
-                  "v": "[Time].[2004]",
-                  "f": "2004"
+                  "v": "[Time2].[2005]",
+                  "f": "2005"
+                },
+                {
+                  "v": "[Time2].[2006]",
+                  "f": "2006"
                 }
               ],
               "p": {
@@ -191,6 +209,30 @@ define([
                   "f": "Other3"
                 }
               ]
+            },
+            {
+              "name": "[Time2].[Years]",
+              "label": "Years2",
+              "type": "string",
+              "hierarchyName": "Time2",
+              "hierarchyOrdinal": 0,
+              "isKey": true,
+              "members": [
+                {
+                  "v": "[Time2].[2003]",
+                  "f": "2003"
+                },
+                {
+                  "v": "[Time2].[2004]",
+                  "f": "2004"
+                }
+              ],
+              "p": {
+                "EntityWithTimeIntervalKey": {
+                  "duration": "year",
+                  "isStartDateTimeProvided": false
+                }
+              }
             },
             {
               "name": "[MEASURE:0]",
@@ -425,6 +467,15 @@ define([
               [datasetFieldIndexes1.years, datasetFieldIndexes1.months]
             );
             expect(result).toEqual(jasmine.objectContaining({isValid: true}));
+          });
+
+          it("should return an object with isValid: false when not all fields are " +
+            "from the same hierarchy", function() {
+            var result = Strategy.type.validateApplication(
+              dataTable,
+              [datasetFieldIndexes1.years, datasetFieldIndexes1.months, datasetFieldIndexes1.years2]
+            );
+            expect(result).toEqual(jasmine.objectContaining({isValid: false}));
           });
         });
 
