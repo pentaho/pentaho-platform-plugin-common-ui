@@ -308,6 +308,7 @@ define([
 
       var columnIndex = dataTable.getColumnIndexById(fieldName);
       var isFieldContinuous = dataUtil.isColumnTypeContinuous(dataTable.getColumnType(columnIndex));
+      var hierarchyName = dataTable.getColumnHierarchyName(columnIndex);
 
       var orderedValidRoleUsages = sortByProps(validRoleUsages, [
 
@@ -341,28 +342,28 @@ define([
         },
 
         // 3. Try to keep together fields from the same hierarchy
-        // NOTE: AS IS IT IS ONLY VALID FOR ANALYZER - introduced to solve 8.2 regression BACKLOG-26273.
-        // TODO Do this in a proper way, like by adding hierarchy information to the metadata
         function(roleUsage) {
-          var mapping = vizModel.get(roleUsage.name);
+
+          if(hierarchyName === null) {
+            return 0;
+          }
 
           var allFieldsFromTheSameHierarchy = false;
 
-          if (mapping.fields.count > 0) {
-            var lastFormulaSeparatorIndex = roleUsage.fieldName.lastIndexOf("].[");
+          var mapping = vizModel.get(roleUsage.name);
+          if(mapping.hasFields) {
 
-            if(lastFormulaSeparatorIndex > 0) {
-              allFieldsFromTheSameHierarchy = true;
+            allFieldsFromTheSameHierarchy = true;
 
-              var hierarchy = roleUsage.fieldName.substring(0, lastFormulaSeparatorIndex + 1);
+            mapping.fieldIndexes.some(function(fieldIndex) {
+              if(dataTable.getColumnHierarchyName(fieldIndex) !== hierarchyName) {
+                allFieldsFromTheSameHierarchy = false;
+                // break;
+                return true;
+              }
 
-              mapping.fields.each(function(field) {
-                if(field.name.indexOf(hierarchy) !== 0) {
-                  allFieldsFromTheSameHierarchy = false;
-                  return false;
-                }
-              });
-            }
+              return false;
+            });
           }
 
           return allFieldsFromTheSameHierarchy ? 0 : 1;

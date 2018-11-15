@@ -902,31 +902,6 @@ define([
 
     describe("#getBestRoleForAddingField(vizModel, fieldName, keyArgs)", function() {
 
-      function createModel(config) {
-
-        return BaseModel.extend({
-          $type: {
-            props: config.map(function(propConfig) {
-              var propTypeSpec = {
-                name: propConfig.name,
-                base: RoleProperty,
-                ordinal: propConfig.ordinal
-              };
-
-              if(propConfig.modes) {
-                propTypeSpec.modes = propConfig.modes;
-              }
-
-              if(propConfig.fields) {
-                propTypeSpec.fields = propConfig.fields;
-              }
-
-              return propTypeSpec;
-            })
-          }
-        });
-      }
-
       function expectSuccess(roleUsage, roleName) {
 
         expect(roleUsage).toEqual(jasmine.objectContaining({
@@ -1261,26 +1236,26 @@ define([
                "all other things equal", function() {
 
             var dataTable = new Table({
-                                        model: [
-                                          {name: "[H1].[A]", type: "string"},
-                                          {name: "[H1].[B]", type: "string"},
-                                          {name: "[H2].[C]", type: "string"},
-                                          {name: "[H2].[D]", type: "string"}
-                                        ]
-                                      });
+              model: [
+                {name: "A", type: "string", hierarchyName: "H1"},
+                {name: "B", type: "string", hierarchyName: "H1"},
+                {name: "C", type: "string", hierarchyName: "H2"},
+                {name: "D", type: "string", hierarchyName: "H2"}
+              ]
+            });
 
             var model = new ModelListList({
-                                            "R1": {fields: ["[H1].[A]"]},
-                                            "data": dataTable
-                                          });
+              "R1": {fields: ["A"]},
+              "data": dataTable
+            });
 
-            var fieldNameToAdd = "[H1].[B]";
+            var fieldNameToAdd = "B";
             var roleUsage = roleUtil.getBestRoleForAddingField(model, fieldNameToAdd);
 
             expectSuccess(roleUsage, "R1");
 
-            var fieldNameToAdd = "[H2].[C]";
-            var roleUsage = roleUtil.getBestRoleForAddingField(model, fieldNameToAdd);
+            fieldNameToAdd = "C";
+            roleUsage = roleUtil.getBestRoleForAddingField(model, fieldNameToAdd);
 
             expectSuccess(roleUsage, "R2");
           });
@@ -1477,6 +1452,7 @@ define([
           });
         });
 
+        // TODO: Why is this commented out?
         xdescribe("attribute count overrules ordinal", function() {
 
           it("should prefer a visual role that is unmapped and has ordinal 2" +
