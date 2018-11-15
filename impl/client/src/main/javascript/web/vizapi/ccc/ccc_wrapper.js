@@ -260,6 +260,8 @@ define([
                     {
                         id: 'color',
                         dataType: 'number, string',
+                        // Supports Viz.API integration (`modes` construction).
+                        dataTypeAllowMultiple: {"number": false, "string": true},
                         dataStructure: 'column',
                         caption: dropZoneLabel('SCATTER_COL'),
                         required: false,
