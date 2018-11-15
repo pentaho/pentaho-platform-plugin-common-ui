@@ -176,6 +176,16 @@ define([
       return this.implem.getColumnLabel(colIndex);
     },
 
+    /** @inheritDoc */
+    getColumnHierarchyName: function(colIndex) {
+      return this.implem.getColumnHierarchyName(colIndex);
+    },
+
+    /** @inheritDoc */
+    getColumnHierarchyOrdinal: function(colIndex) {
+      return this.implem.getColumnHierarchyOrdinal(colIndex);
+    },
+
     // cells
     /** @inheritdoc */
     getValue: function(rowIndex, colIndex) {

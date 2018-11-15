@@ -1116,6 +1116,40 @@ define([
           expect(dataTable.isColumnKey(2)).toBe(false);
         });
       });
+
+      describe("#getColumnHierarchyName(j) -", function() {
+        it("should return the attribute hierarchyName of the attribute of given column index", function() {
+          var dataTable = new DataTable({
+            model: [
+              {name: "A", type: "number", label: "ABC"},
+              {name: "B", label: "DEF", hierarchyName: "Foo"},
+              {name: "C", label: "GHI"}
+            ],
+            rows: []
+          });
+
+          expect(dataTable.getColumnHierarchyName(0)).toBe(null);
+          expect(dataTable.getColumnHierarchyName(1)).toBe("Foo");
+          expect(dataTable.getColumnHierarchyName(2)).toBe(null);
+        });
+      });
+
+      describe("#getColumnHierarchyOrdinal(j) -", function() {
+        it("should return the attribute hierarchyOrdinal of the attribute of given column index", function() {
+          var dataTable = new DataTable({
+            model: [
+              {name: "A", type: "number", label: "ABC"},
+              {name: "B", label: "DEF", hierarchyName: "Foo", hierarchyOrdinal: 3},
+              {name: "C", label: "GHI"}
+            ],
+            rows: []
+          });
+
+          expect(dataTable.getColumnHierarchyOrdinal(0)).toBe(null);
+          expect(dataTable.getColumnHierarchyOrdinal(1)).toBe(3);
+          expect(dataTable.getColumnHierarchyOrdinal(2)).toBe(null);
+        });
+      });
     });
 
     describe("cells -", function() {

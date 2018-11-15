@@ -84,6 +84,28 @@
  */
 
 /**
+ * Gets the name of the hierarchy of a column's attribute, if any, given its index.
+ *
+ * @name pentaho.data.ITable#getColumnHierarchyName
+ * @method
+ * @param {number} colIndex - The column index (zero-based).
+ * @return {?string} The name of the hierarchy.
+ *
+ * @see pentaho.data.ITable#getColumnHierarchyOrdinal
+ */
+
+/**
+ * Gets the ordinal in the hierarchy of a column's attribute, if any, given its index.
+ *
+ * @name pentaho.data.ITable#getColumnHierarchyOrdinal
+ * @method
+ * @param {number} colIndex - The column index (zero-based).
+ * @return {?number} The ordinal of the attribute in the hierarchy.
+ *
+ * @see pentaho.data.ITable#getColumnHierarchyName
+ */
+
+/**
  * Gets a cell, given its row and column indexes.
  *
  * Depending on the underlying implementation, this method may allocate memory.

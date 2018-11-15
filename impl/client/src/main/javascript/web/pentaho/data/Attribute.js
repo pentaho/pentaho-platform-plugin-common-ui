@@ -170,6 +170,32 @@ define([
          * @see pentaho.data.Attribute#isContinuous
          */
         this.members = MemberCollection.to(spec.members || [], attrKeyArgs);
+
+        /**
+         * Gets the name of the hierarchy to which the attribute belongs, if any.
+         *
+         * This property is only non-null when the attribute is categorical.
+         *
+         * @type {?string}
+         * @readonly
+         * @see pentaho.data.Attribute#hierarchyOrdinal
+         */
+        this.hierarchyName = spec.hierarchyName || null;
+        if(this.hierarchyName === null) {
+          this.hierarchyOrdinal = null;
+        } else {
+          /**
+           * Gets the order in the hierarchy that the attribute belongs to, if any.
+           *
+           * This property is only defined when the attribute is categorical and
+           * the attribute belongs to a hierarchy.
+           *
+           * @type {?number}
+           * @readonly
+           * @see pentaho.data.Attribute#hierarchyName
+           */
+          this.hierarchyOrdinal = +spec.hierarchyOrdinal || 0;
+        }
       } else if(type === "number") {
         /**
          * Indicates if the attribute represents
@@ -233,6 +259,9 @@ define([
       return this._ord;
     },
     // endregion
+
+    hierarchyName: null,
+    hierarchyOrdinal: null,
 
     /**
      * Converts a value to the type of value supported by the attribute.
@@ -314,10 +343,14 @@ define([
         isKey: this.isKey
       };
 
-      if(this.isContinuous)
+      if(this.isContinuous) {
         attrSpec.isPercent = this.isPercent;
-      else
+      } else {
         attrSpec.members = this.members.toSpec();
+
+        attrSpec.hierarchyName = this.hierarchyName;
+        attrSpec.hierarchyOrdinal = this.hierarchyOrdinal;
+      }
 
       Annotatable.toSpec(this, attrSpec);
 
