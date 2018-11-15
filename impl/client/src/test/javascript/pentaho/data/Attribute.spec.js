@@ -263,7 +263,7 @@ define([
     describe("#members", function() {
       it("should be undefined for continuous attributes", function() {
         var attr = expectAttribute({name: "test", type: "number"});
-        expect(attr.members).toBe(undefined);
+        expect(attr.members).toBe(null);
       });
 
       it("should be an empty array for categorical attributes, when unspecified", function() {

@@ -279,6 +279,13 @@ define([
         });
       });
 
+      describe("#getColumnProperty(j, name) -", function() {
+        it("should return the column property of the given column index and name", function() {
+          expect(dataView.getColumnProperty(1, "foo")).toBe(fooValue);
+          expect(dataView.getColumnProperty(2, "bar")).toBe(barValue);
+        });
+      });
+
       describe("#getColumnRange(j) -", function() {
         it("should return a range object with both min and max `undefined` when there is no data", function() {
           var dataView2 = new DataTableView(dataTable);

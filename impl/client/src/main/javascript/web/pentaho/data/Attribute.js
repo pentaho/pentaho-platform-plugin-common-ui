@@ -260,6 +260,7 @@ define([
     },
     // endregion
 
+    members: null,
     hierarchyName: null,
     hierarchyOrdinal: null,
 
