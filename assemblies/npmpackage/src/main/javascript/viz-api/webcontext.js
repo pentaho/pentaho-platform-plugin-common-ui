@@ -25,7 +25,6 @@
   loadScriptSyncNested("node_modules/requirejs/require.js");
   loadScriptSyncNested(basePath + "/common-ui-require-js-cfg.js");
   loadScriptSyncNested(basePath + "/package-require-js-cfg.js");
-  loadScriptSyncNested(basePath + "/require-cfg.js");
 
   function loadScriptSyncNested(src) {
     // eslint-disable-next-line no-useless-concat
