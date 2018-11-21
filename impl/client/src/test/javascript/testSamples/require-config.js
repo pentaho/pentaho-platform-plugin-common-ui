@@ -1,18 +1,9 @@
 // Find and inject tests using require
-var tests = Object.keys(window.__karma__.files).filter(function (file) {
-    return (/Spec\.js$/).test(file);
+var tests = Object.keys(window.__karma__.files).filter(function(file) {
+  return (/Spec\.js$/).test(file);
 });
 
-pen = {};
-require = function() {
-  return require.apply(this, arguments);
-} 
-define = function() {
-  return define.apply(this, arguments);
-}
-
 requirejs.config({
-
   baseUrl: 'base/',
   paths: {
     'common-ui/angular': 'angular/angular',

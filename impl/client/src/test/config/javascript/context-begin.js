@@ -76,7 +76,6 @@ var KARMA_RUN = true;
  * @default undefined
  */
 var CONTEXT_PATH = undefined;
-var pen = {define: define, require: require};
 var SESSION_LOCALE = "en";
 var requireCfg = {
   paths: {},
