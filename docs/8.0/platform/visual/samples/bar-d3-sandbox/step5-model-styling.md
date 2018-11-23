@@ -11,8 +11,8 @@ layout: 8.0_default
 ---
 
 As soon as you see your visualization showing up in
-[Analyzer](http://www.pentaho.com/product/business-visualization-analytics) or in 
-[PDI](http://www.pentaho.com/product/data-integration),
+[Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html) or in 
+[PDI](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-data-integration.html),
 you'll notice that it is displayed with a "generic visualization" icon:
 
 1. In **Analyzer**, 

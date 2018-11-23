@@ -152,7 +152,7 @@ attribute exists to satisfy the pass-through of such options of the underlying t
 You should consult the view type documentation to find out about which extension properties it supports.
 
 The views of stock visualizations are implemented using the 
-[CCC](https://community.hds.com/docs/DOC-1009860) charting library,
+[CCC](https://community.hitachivantara.com/docs/DOC-1009860) charting library,
 and can be customized using its rich set of extension points.
 
 ### Thicken the axes rules of stock visualizations
