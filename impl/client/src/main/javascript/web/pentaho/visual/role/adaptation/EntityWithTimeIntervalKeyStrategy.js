@@ -223,27 +223,39 @@ define([
       __getMainInputFieldPosition: function(inputFieldIndexes, schemaData) {
         var mostSpecific = null;
         var mostSpecificIndex = null;
+        var sharedHierarchyName = null;
 
         var index = inputFieldIndexes.length;
 
         while(index--) {
-          var annotation = schemaData.getColumnProperty(inputFieldIndexes[index], "EntityWithTimeIntervalKey");
-          if(annotation != null) {
+          var fieldIndex = inputFieldIndexes[index];
+          var annotation = schemaData.getColumnProperty(fieldIndex, "EntityWithTimeIntervalKey");
+          if(annotation == null) {
+            // One of the fields has no annotation, so we must reject the mapping...
+            mostSpecific = null;
+            break;
+          }
+
+          var hierarchyName = schemaData.getColumnHierarchyName(fieldIndex);
+
+          // First field?
+          if(mostSpecific == null) {
+            mostSpecific = annotation;
+            mostSpecificIndex = index;
+            sharedHierarchyName = hierarchyName;
+          } else {
+            if(hierarchyName !== sharedHierarchyName) {
+              // Different hierarchies, so we must reject the mapping...
+              mostSpecific = null;
+              break;
+            }
+
             // Equal duration replaces mostSpecific, because we're looping backwards.
-            if(mostSpecific == null ||
-               TimeIntervalDuration.type.comparePrimitiveValues(
-                 mostSpecific.duration,
-                 annotation.duration) < 1) {
+            if(TimeIntervalDuration.type.comparePrimitiveValues(mostSpecific.duration, annotation.duration) < 1) {
               mostSpecific = annotation;
               mostSpecificIndex = index;
             }
-
-            continue;
           }
-
-          // If we reach here, one of the fields has no annotation, so we must reject the mapping
-          mostSpecific = null;
-          break;
         }
 
         if(mostSpecific != null) {

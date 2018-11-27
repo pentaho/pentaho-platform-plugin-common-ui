@@ -471,14 +471,24 @@ define([
           : this._micCols[k].attribute;
     },
 
-    getColumnType: function(colIndexOrName) {
-      var attr = this.getColumnAttribute(colIndexOrName);
+    getColumnType: function(colIndex) {
+      var attr = this.getColumnAttribute(colIndex);
       if(attr) return attr.type;
     },
 
-    isColumnKey: function(colIndexOrName) {
-      var attr = this.getColumnAttribute(colIndexOrName);
+    isColumnKey: function(colIndex) {
+      var attr = this.getColumnAttribute(colIndex);
       if(attr) return attr.isKey;
+    },
+
+    getColumnHierarchyName: function(colIndex) {
+      var attr = this.getColumnAttribute(colIndex);
+      if(attr) return attr.hierarchyName;
+    },
+
+    getColumnHierarchyOrdinal: function(colIndex) {
+      var attr = this.getColumnAttribute(colIndex);
+      if(attr) return attr.hierarchyOrdinal;
     },
 
     getColumnId: function(colIndex) {

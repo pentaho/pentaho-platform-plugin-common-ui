@@ -25,7 +25,8 @@ define([
   function getDatasetDT1() {
     return {
       model: [
-        {name: "country", type: "string",  label: "Country", p: {foo: fooValue}, isKey: true},
+        {name: "country", type: "string",  label: "Country", p: {foo: fooValue}, isKey: true,
+          hierarchyName: "Foo", hierarchyOrdinal: 3},
         {name: "sales",   type: "number",  label: "Sales",   p: {bar: barValue}, isContinuous: true},
         {name: "euro",    type: "boolean", label: "Euro"}
       ],
@@ -278,6 +279,13 @@ define([
         });
       });
 
+      describe("#getColumnProperty(j, name) -", function() {
+        it("should return the column property of the given column index and name", function() {
+          expect(dataView.getColumnProperty(1, "foo")).toBe(fooValue);
+          expect(dataView.getColumnProperty(2, "bar")).toBe(barValue);
+        });
+      });
+
       describe("#getColumnRange(j) -", function() {
         it("should return a range object with both min and max `undefined` when there is no data", function() {
           var dataView2 = new DataTableView(dataTable);
@@ -339,6 +347,22 @@ define([
           expect(dataView.isColumnKey(0)).toBe(false);
           expect(dataView.isColumnKey(1)).toBe(true);
           expect(dataView.isColumnKey(2)).toBe(false);
+        });
+      });
+
+      describe("#getColumnHierarchyName(j) -", function() {
+        it("should return the attribute hierarchyName of the attribute of given column index", function() {
+          expect(dataView.getColumnHierarchyName(0)).toBe(null);
+          expect(dataView.getColumnHierarchyName(1)).toBe("Foo");
+          expect(dataView.getColumnHierarchyName(2)).toBe(null);
+        });
+      });
+
+      describe("#getColumnHierarchyOrdinal(j) -", function() {
+        it("should return the attribute hierarchyOrdinal of the attribute of given column index", function() {
+          expect(dataView.getColumnHierarchyOrdinal(0)).toBe(null);
+          expect(dataView.getColumnHierarchyOrdinal(1)).toBe(3);
+          expect(dataView.getColumnHierarchyOrdinal(2)).toBe(null);
         });
       });
 

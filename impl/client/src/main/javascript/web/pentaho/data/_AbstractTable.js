@@ -163,7 +163,7 @@ define([
     /** @inheritDoc */
     getColumnProperty: function(colIndex, propName) {
 
-      var attr = this.model.attributes[colIndex];
+      var attr = this.getColumnAttribute(colIndex);
       if(attr) {
         return attr.property(propName);
       }
