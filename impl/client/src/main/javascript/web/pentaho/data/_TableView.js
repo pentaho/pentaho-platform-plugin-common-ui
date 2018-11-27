@@ -223,6 +223,16 @@ define([
       return this._source.isColumnKey(this.getSourceColumnIndex(colIndex));
     },
 
+    /** @inheritDoc */
+    getColumnHierarchyName: function(colIndex) {
+      return this._source.getColumnHierarchyName(this.getSourceColumnIndex(colIndex));
+    },
+
+    /** @inheritDoc */
+    getColumnHierarchyOrdinal: function(colIndex) {
+      return this._source.getColumnHierarchyOrdinal(this.getSourceColumnIndex(colIndex));
+    },
+
     // cells
     /** @inheritdoc */
     getValue: function(rowIndex, colIndex) {
