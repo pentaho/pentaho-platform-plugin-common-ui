@@ -62,27 +62,6 @@ public class MetadataModelsContentGeneratorTest {
   }
 
   @Test
-  public void testBadStream() throws Exception {
-    MetadataModelsContentGenerator cg = new MetadataModelsContentGenerator();
-
-    Map<String, IParameterProvider> parameterProviders = new HashMap<String, IParameterProvider>();
-
-    SimpleParameterProvider requestParams = new SimpleParameterProvider();
-    requestParams.setParameter( "action", MetadataModelsContentGenerator.LIST_MODELS_ACTION );
-    parameterProviders.put( IParameterProvider.SCOPE_REQUEST, requestParams );
-
-    cg.setParameterProviders( parameterProviders );
-
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
-    cg.createContent( null );
-
-    String result = output.toString();
-    Assert.assertNotNull( "result is null", result );
-    Assert.assertEquals( "Wrong contents", "", result );
-
-  }
-
-  @Test
   public void testGetModelList() throws Exception {
     MetadataModelsContentGenerator cg = new MetadataModelsContentGenerator();
 
