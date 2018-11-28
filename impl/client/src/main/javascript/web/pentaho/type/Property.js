@@ -88,7 +88,7 @@ define([
       styleClass: null,
 
       // Break inheritance
-      __label: null,
+      __label: "Property",
       __description: null,
 
       /**
