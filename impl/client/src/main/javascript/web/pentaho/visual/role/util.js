@@ -70,7 +70,7 @@ define([
      */
     testAddField: function(vizModel, roleName, fieldName, keyArgs) {
 
-      // Some pre-processing and early exists.
+      // Some pre-processing and early exits.
 
       var alternateDataTable = arg.optional(keyArgs, "alternateData", null);
       if(alternateDataTable === null && vizModel.data === null) {
@@ -266,12 +266,14 @@ define([
      *    [isContinuous]{@link pentaho.visual.role.Mode#isContinuous} property of the
      *    [visual role usage]{@link pentaho.visual.role.IAddUsage#mode}.
      *
-     * 3. The visual role has a lower number of mapped fields.
+     * 3. The field has a hierarchy and the used visual role has other fields of that hierarchy.
      *
-     * 4. The visual order of the visual role,
+     * 4. The visual role has a lower number of mapped fields.
+     *
+     * 5. The visual order of the visual role,
      *    according to its [ordinal]{@link pentaho.visual.role.PropertyType#ordinal} property.
      *
-     * 5. The definition order of the visual role,
+     * 6. The definition order of the visual role,
      *    according to its [index]{@link pentaho.visual.role.PropertyType#index} property.
      *
      * @param {pentaho.visual.base.AbstractModel} vizModel - The visualization model.
@@ -308,6 +310,7 @@ define([
 
       var columnIndex = dataTable.getColumnIndexById(fieldName);
       var isFieldContinuous = dataUtil.isColumnTypeContinuous(dataTable.getColumnType(columnIndex));
+      var hierarchyName = dataTable.getColumnHierarchyName(columnIndex);
 
       var orderedValidRoleUsages = sortByProps(validRoleUsages, [
 
@@ -341,28 +344,28 @@ define([
         },
 
         // 3. Try to keep together fields from the same hierarchy
-        // NOTE: AS IS IT IS ONLY VALID FOR ANALYZER - introduced to solve 8.2 regression BACKLOG-26273.
-        // TODO Do this in a proper way, like by adding hierarchy information to the metadata
         function(roleUsage) {
-          var mapping = vizModel.get(roleUsage.name);
+
+          if(hierarchyName === null) {
+            return 0;
+          }
 
           var allFieldsFromTheSameHierarchy = false;
 
-          if (mapping.fields.count > 0) {
-            var lastFormulaSeparatorIndex = roleUsage.fieldName.lastIndexOf("].[");
+          var mapping = vizModel.get(roleUsage.name);
+          if(mapping.hasFields) {
 
-            if(lastFormulaSeparatorIndex > 0) {
-              allFieldsFromTheSameHierarchy = true;
+            allFieldsFromTheSameHierarchy = true;
 
-              var hierarchy = roleUsage.fieldName.substring(0, lastFormulaSeparatorIndex + 1);
+            mapping.fieldIndexes.some(function(fieldIndex) {
+              if(dataTable.getColumnHierarchyName(fieldIndex) !== hierarchyName) {
+                allFieldsFromTheSameHierarchy = false;
+                // break;
+                return true;
+              }
 
-              mapping.fields.each(function(field) {
-                if(field.name.indexOf(hierarchy) !== 0) {
-                  allFieldsFromTheSameHierarchy = false;
-                  return false;
-                }
-              });
-            }
+              return false;
+            });
           }
 
           return allFieldsFromTheSameHierarchy ? 0 : 1;
@@ -387,6 +390,79 @@ define([
       ]);
 
       return orderedValidRoleUsages[0];
+    },
+
+    /**
+     * Gets the name of the first hierarchy of a field mapped to a visual role.
+     *
+     * @param {pentaho.visual.base.AbstractModel} vizModel - The visual model.
+     * @param {string} roleName - The name of the visual role.
+     *
+     * @return {?string} The name of the hierarchy; `null`, if none.
+     */
+    getRoleFirstHierarchy: function(vizModel, roleName) {
+      var dataTable = vizModel.data;
+      if(dataTable !== null) {
+        var fieldIndexes = vizModel.get(roleName).fieldIndexes;
+        if(fieldIndexes !== null) {
+          var i = -1;
+          var L = fieldIndexes.length;
+          while(++i < L) {
+            var hierarchyName = dataTable.getColumnHierarchyName(fieldIndexes[i]);
+            if(hierarchyName !== null) {
+              return hierarchyName;
+            }
+          }
+        }
+      }
+
+      return null;
+    },
+
+    /**
+     * Gets the next unused ordinal of a given hierarchy.
+     *
+     * When the model has no defined [data]{@link pentaho.visual.base.AbstractModel#data}, `null` is returned.
+     * When the model has any undefined mapped fields, `null` is returned.
+     *
+     * @param {pentaho.visual.base.AbstractModel} vizModel - The visual model.
+     * @param {string} hierarchyName - The name of the hierarchy.
+     *
+     * @return {?number} The next ordinal, starting at `0`, or `null`.
+     */
+    getHierarchyNextOrdinal: function(vizModel, hierarchyName) {
+
+      var dataTable = vizModel.data;
+      if(dataTable === null) {
+        return null;
+      }
+
+      var ordinal = -1;
+      var isValid = true;
+
+      vizModel.$type.eachVisualRole(function(propType) {
+        var mapping = vizModel.get(propType);
+        if(mapping.hasFields) {
+          var fieldIndexes = vizModel.get(propType).fieldIndexes;
+          if(fieldIndexes == null) {
+            isValid = false;
+            // break;
+            return false;
+          }
+
+          fieldIndexes.forEach(function(fieldIndex) {
+            var hierarchyName2 = dataTable.getColumnHierarchyName(fieldIndex);
+            if(hierarchyName2 === hierarchyName) {
+              var ordinal2 = dataTable.getColumnHierarchyOrdinal(fieldIndex);
+              if(ordinal2 !== null && ordinal2 > ordinal) {
+                ordinal = ordinal2;
+              }
+            }
+          });
+        }
+      });
+
+      return isValid ? (ordinal + 1) : null;
     }
   };
 

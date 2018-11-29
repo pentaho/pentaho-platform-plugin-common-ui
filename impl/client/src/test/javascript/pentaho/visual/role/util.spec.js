@@ -29,8 +29,8 @@ define([
     function getDataSpec1() {
       return {
         model: [
-          {name: "country", type: "string", label: "Country"},
-          {name: "product", type: "string", label: "Product"},
+          {name: "country", type: "string", label: "Country", hierarchyName: "Territory", hierarchyOrdinal: 1},
+          {name: "product", type: "string", label: "Product", hierarchyName: "Product", hierarchyOrdinal: 2},
           {name: "date", type: "date", label: "Date"},
           {name: "sales", type: "number", label: "Sales"}
         ],
@@ -902,31 +902,6 @@ define([
 
     describe("#getBestRoleForAddingField(vizModel, fieldName, keyArgs)", function() {
 
-      function createModel(config) {
-
-        return BaseModel.extend({
-          $type: {
-            props: config.map(function(propConfig) {
-              var propTypeSpec = {
-                name: propConfig.name,
-                base: RoleProperty,
-                ordinal: propConfig.ordinal
-              };
-
-              if(propConfig.modes) {
-                propTypeSpec.modes = propConfig.modes;
-              }
-
-              if(propConfig.fields) {
-                propTypeSpec.fields = propConfig.fields;
-              }
-
-              return propTypeSpec;
-            })
-          }
-        });
-      }
-
       function expectSuccess(roleUsage, roleName) {
 
         expect(roleUsage).toEqual(jasmine.objectContaining({
@@ -1261,26 +1236,26 @@ define([
                "all other things equal", function() {
 
             var dataTable = new Table({
-                                        model: [
-                                          {name: "[H1].[A]", type: "string"},
-                                          {name: "[H1].[B]", type: "string"},
-                                          {name: "[H2].[C]", type: "string"},
-                                          {name: "[H2].[D]", type: "string"}
-                                        ]
-                                      });
+              model: [
+                {name: "A", type: "string", hierarchyName: "H1"},
+                {name: "B", type: "string", hierarchyName: "H1"},
+                {name: "C", type: "string", hierarchyName: "H2"},
+                {name: "D", type: "string", hierarchyName: "H2"}
+              ]
+            });
 
             var model = new ModelListList({
-                                            "R1": {fields: ["[H1].[A]"]},
-                                            "data": dataTable
-                                          });
+              "R1": {fields: ["A"]},
+              "data": dataTable
+            });
 
-            var fieldNameToAdd = "[H1].[B]";
+            var fieldNameToAdd = "B";
             var roleUsage = roleUtil.getBestRoleForAddingField(model, fieldNameToAdd);
 
             expectSuccess(roleUsage, "R1");
 
-            var fieldNameToAdd = "[H2].[C]";
-            var roleUsage = roleUtil.getBestRoleForAddingField(model, fieldNameToAdd);
+            fieldNameToAdd = "C";
+            roleUsage = roleUtil.getBestRoleForAddingField(model, fieldNameToAdd);
 
             expectSuccess(roleUsage, "R2");
           });
@@ -1477,6 +1452,7 @@ define([
           });
         });
 
+        // TODO: Why is this commented out?
         xdescribe("attribute count overrules ordinal", function() {
 
           it("should prefer a visual role that is unmapped and has ordinal 2" +
@@ -1657,6 +1633,135 @@ define([
             expectSuccess(roleUsage, "rows");
           });
         });
+      });
+    });
+
+    describe("#getRoleFirstHierarchy(vizModel, roleName)", function() {
+      var dataTable;
+
+      beforeAll(function() {
+        dataTable = new Table(getDataSpec1());
+      });
+
+      it("should return the hierarchy of the first field having a hierarchy", function() {
+
+        var vizModel = new Model({
+          "data": dataTable,
+          "roleKeyMany": {fields: ["date", "country", "product"]}
+        });
+
+        var hierarchyName = roleUtil.getRoleFirstHierarchy(vizModel, "roleKeyMany");
+
+        expect(hierarchyName).toBe("Territory");
+      });
+
+      it("should return null when none of the mapped fields has a hierarchy", function() {
+
+        var vizModel = new Model({
+          "data": dataTable,
+          "roleKeyMany": {fields: ["date"]}
+        });
+
+        var hierarchyName = roleUtil.getRoleFirstHierarchy(vizModel, "roleKeyMany");
+
+        expect(hierarchyName).toBe(null);
+      });
+
+      it("should return null when `data` is null", function() {
+
+        var vizModel = new Model({
+          "roleKeyMany": {fields: ["product"]}
+        });
+
+        var hierarchyName = roleUtil.getRoleFirstHierarchy(vizModel, "roleKeyMany");
+
+        expect(hierarchyName).toBe(null);
+      });
+
+      it("should return null when role is mapped to an undefined field", function() {
+
+        var vizModel = new Model({
+          "roleKeyMany": {fields: ["foo"]}
+        });
+
+        var hierarchyName = roleUtil.getRoleFirstHierarchy(vizModel, "roleKeyMany");
+
+        expect(hierarchyName).toBe(null);
+      });
+
+      it("should return null when role is unmapped", function() {
+
+        var vizModel = new Model({
+          "roleKeyMany": {fields: ["product"]}
+        });
+
+        var hierarchyName = roleUtil.getRoleFirstHierarchy(vizModel, "roleKeyMany");
+
+        expect(hierarchyName).toBe(null);
+      });
+    });
+
+    describe("#getHierarchyNextOrdinal(vizModel, hierarchyName)", function() {
+      var dataTable;
+      var vizModel;
+
+      beforeAll(function() {
+        dataTable = new Table(getDataSpec1());
+
+        vizModel = new Model({
+          "data": dataTable,
+          "roleKeyMany": {fields: ["date", "product"]},
+          "roleKeyStringMany": {fields: ["country"]},
+          "roleMeasure": {fields: ["sales"]}
+        });
+      });
+
+      it("should return the next unused ordinal of a used hierarchy", function() {
+
+        var hierarchyOrdinal = roleUtil.getHierarchyNextOrdinal(vizModel, "Territory");
+
+        expect(hierarchyOrdinal).toBe(2);
+      });
+
+      it("should return 0 if none of the mapped fields is of the given hierarchy", function() {
+
+        var hierarchyOrdinal = roleUtil.getHierarchyNextOrdinal(vizModel, "Undefined");
+
+        expect(hierarchyOrdinal).toBe(0);
+      });
+
+      it("should return null when `data` is null", function() {
+
+        var vizModel = new Model({
+          "roleKeyMany": {fields: ["product"]}
+        });
+
+        var hierarchyOrdinal = roleUtil.getHierarchyNextOrdinal(vizModel, "Product");
+
+        expect(hierarchyOrdinal).toBe(null);
+      });
+
+      it("should return null if any mapped field is undefined", function() {
+
+        var vizModel = new Model({
+          "data": dataTable,
+          "roleKeyMany": {fields: ["foo", "product"]}
+        });
+
+        var hierarchyOrdinal = roleUtil.getHierarchyNextOrdinal(vizModel, "Product");
+
+        expect(hierarchyOrdinal).toBe(null);
+      });
+
+      it("should return 0 when all roles are unmapped", function() {
+
+        var vizModel = new Model({
+          "data": dataTable
+        });
+
+        var hierarchyOrdinal = roleUtil.getHierarchyNextOrdinal(vizModel, "Product");
+
+        expect(hierarchyOrdinal).toBe(0);
       });
     });
   });

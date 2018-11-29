@@ -90,6 +90,31 @@ define([
           attr = expectAttribute({name: "test", isKey: false});
           expect(attr.isKey).toBe(false);
         });
+
+        it("should create an attribute with the value in property `hierarchyName`", function() {
+          var attr = expectAttribute({name: "test", hierarchyName: "Foo"});
+          expect(attr.hierarchyName).toBe("Foo");
+
+          attr = expectAttribute({name: "test"});
+          expect(attr.hierarchyName).toBe(null);
+
+          attr = expectAttribute({name: "test", type: "number", hierarchyName: "Foo"});
+          expect(attr.hierarchyName).toBe(null);
+        });
+
+        it("should create an attribute with the value in property `hierarchyOrdinal`", function() {
+          var attr = expectAttribute({name: "test", hierarchyName: "Foo", hierarchyOrdinal: 1});
+          expect(attr.hierarchyOrdinal).toBe(1);
+
+          attr = expectAttribute({name: "test", hierarchyName: "Foo"});
+          expect(attr.hierarchyOrdinal).toBe(0);
+
+          attr = expectAttribute({name: "test", hierarchyOrdinal: 1});
+          expect(attr.hierarchyOrdinal).toBe(null);
+
+          attr = expectAttribute({name: "test", type: "number", hierarchyName: "Foo", hierarchyOrdinal: 3});
+          expect(attr.hierarchyOrdinal).toBe(null);
+        });
       });
     });
 
@@ -238,7 +263,7 @@ define([
     describe("#members", function() {
       it("should be undefined for continuous attributes", function() {
         var attr = expectAttribute({name: "test", type: "number"});
-        expect(attr.members).toBe(undefined);
+        expect(attr.members).toBe(null);
       });
 
       it("should be an empty array for categorical attributes, when unspecified", function() {
@@ -351,5 +376,4 @@ define([
       });
     });
   });
-
 });

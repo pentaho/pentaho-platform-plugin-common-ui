@@ -44,6 +44,8 @@ define(function() {
 
   return {
     rules: [
+      // Validates the _key aspect_'s consistency of a visual role's field mappings.
+      //
       // TODO: This should be in AbstractProperty code, however, this can only move
       // when a way is implemented for dealing with CDF's non-key annotated tables.
       // So, for now, this restriction is only being applied to Analyzer and DET.

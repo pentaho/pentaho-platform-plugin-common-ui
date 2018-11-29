@@ -70,6 +70,14 @@ define([
       return this.getColumnAttribute(colIndex).isKey;
     },
 
+    getColumnHierarchyName: function(colIndex) {
+      return this.getColumnAttribute(colIndex).hierarchyName;
+    },
+
+    getColumnHierarchyOrdinal: function(colIndex) {
+      return this.getColumnAttribute(colIndex).hierarchyOrdinal;
+    },
+
     // cells
     getValue: function(rowIndex, colIndex) {
       return this.getCell(rowIndex, colIndex).value;
