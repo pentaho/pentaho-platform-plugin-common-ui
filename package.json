@@ -7,22 +7,22 @@
   "private": true,
   "dependencies": {},
   "devDependencies": {
-    "eslint": "^4.18.2",
-    "eslint-config-google": "^0.5.0",
-    "jasmine-core": "^3.1.0",
-    "jsdoc": "^3.4.3",
-    "karma": "^2.0.0",
+    "eslint": "^5.9.0",
+    "eslint-config-google": "^0.11.0",
+    "jasmine-core": "^3.3.0",
+    "jsdoc": "^3.5.5",
+    "karma": "^3.1.1",
     "karma-chrome-launcher": "^2.2.0",
     "karma-cli": "^1.0.1",
-    "karma-coverage": "^1.1.1",
+    "karma-coverage": "^1.1.2",
     "karma-html-reporter": "0.2.x",
-    "karma-jasmine": "^1.1.1",
-    "karma-jasmine-html-reporter": "^0.2.0",
+    "karma-jasmine": "^2.0.1",
+    "karma-jasmine-html-reporter": "^1.4.0",
     "karma-junit-reporter": "^1.2.0",
     "karma-mocha-reporter": "^2.2.5",
     "karma-requirejs": "^1.1.0",
     "puppeteer": "^1.10.0",
     "requirejs": "~2.3.6",
-    "yuidocjs": "~0.3.45"
+    "yuidocjs": "~0.10.2"
   }
 }
