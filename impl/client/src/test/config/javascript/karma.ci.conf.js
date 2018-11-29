@@ -1,5 +1,8 @@
 var baseConfig = require("./karma.conf.js");
 
+const puppeteer = require('puppeteer');
+process.env.CHROME_BIN = puppeteer.executablePath();
+
 module.exports = function(config) {
   baseConfig(config);
 
@@ -17,7 +20,8 @@ module.exports = function(config) {
       "karma-junit-reporter",
       "karma-html-reporter",
       "karma-coverage",
-      "karma-phantomjs-launcher"
+      "karma-chrome-launcher",
+      'puppeteer'
     ],
 
     reporters: ["progress", "junit", "coverage"],
@@ -56,7 +60,7 @@ module.exports = function(config) {
 
     autoWatch: false,
 
-    browsers: ["PhantomJS"],
+    browsers: ["ChromeHeadless"],
 
     singleRun: true
   });
