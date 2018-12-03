@@ -17,10 +17,8 @@ define([
   "pentaho/module!_",
   "./CartesianAbstract",
   "pentaho/visual/models/MetricPointAbstract",
-  "pentaho/data/util",
-  "pentaho/util/logger",
   "./_trends"
-], function(module, BaseView, Model, dataUtil, logger) {
+], function(module, BaseView, Model) {
 
   "use strict";
 
@@ -103,31 +101,6 @@ define([
 
       this._configureAxisTickUnits("base", "x");
       this._configureAxisTickUnits("ortho", "y");
-    },
-
-    /**
-     * Calls base plus it configures a CCC `where` condition which have a null "x" or "y" visual role value.
-     *
-     * A CCC `where` filter is used so that the series/color atoms order is captured.
-     *
-     * TODO: This is a temporary solution.
-     * Ideally, visual role definitions would specify an attribute such as `allowsNullData`,
-     * defaulting to `true`, and the data would be filtered out a priori.
-     *
-     * @protected
-     * @override
-     */
-    _initData: function() {
-
-      this.base();
-
-      // X and Y are both required and continuous.
-      var xCccDimName = this._getMappingFieldInfosOfRole("x")[0].name;
-      var yCccDimName = this._getMappingFieldInfosOfRole("y")[0].name;
-
-      this._options.dataWhere = function(datum) {
-        return datum.atoms[xCccDimName].value !== null && datum.atoms[yCccDimName].value !== null;
-      };
     }
   })
   .configure({$type: module.config});
