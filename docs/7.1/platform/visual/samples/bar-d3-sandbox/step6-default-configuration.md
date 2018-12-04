@@ -85,7 +85,7 @@ Go ahead and experiment with different values.
 
 ## PDI Integration
 
-Currently, the [PDI](http://www.pentaho.com/product/data-integration) application
+Currently, the [PDI](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-data-integration.html) application
 requires visualizations to come annotated with which "data views", _Stream_ and/or _Model_, they can be used with.
 This is a current limitation that will be removed in future releases. 
 However, until then, the Bar visualization can be configured to contain this required metadata when
@@ -117,7 +117,7 @@ but is important if you package and bundle your visualization for deployment.
 
 ## Analyzer Integration
 
-In [Analyzer](http://www.pentaho.com/product/business-visualization-analytics), 
+In [Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html), 
 when drilling-down, the default behaviour is to _add_ the child attribute to the visual role 
 where the parent attribute is.
 However, the _Category_ visual role of the Bar visualization you developed only accepts a single attribute 

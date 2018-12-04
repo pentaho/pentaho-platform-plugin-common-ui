@@ -34,8 +34,8 @@ as an instance of type [`pentaho.config.spec.IRuleSet`]({{site.refDocsUrlPattern
    [application]({{site.refDocsUrlPattern81 | replace: '$', 'pentaho.environment.IEnvironment#application'}}),
    as it allows creating rules that are only applied when a _type_ or _instance_ is being used by 
    a certain _application_, like, for example, 
-   [CDF](http://community.pentaho.com/ctools/cdf/) or 
-   [Analyzer](http://www.pentaho.com/product/business-visualization-analytics).
+   [CDF](https://community.hitachivantara.com/docs/DOC-1009859) or 
+   [Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html).
    See also [Known Values of Pentaho Environment Variables](#known-values-of-pentaho-platform-environment-variables).
    
 2. The [**apply**]({{site.refDocsUrlPattern81 | replace: '$', 'pentaho.config.spec.IRule#apply'}}) object
