@@ -26,16 +26,6 @@ The APIs are organized as follows:
                    href="{{site.refDocsUrlPattern7 | replace: '$', 'pentaho.data'}}">Data</a>
             </dt>
             <dd>Abstractions for data exchange among components, applications and data sources.
-                <ul style="display: none;">
-                    <li>
-                        <dl>
-                            <dt>
-                                <a title="Pentaho JavaScript Data Access API" href="data/access">Data Access</a>
-                            </dt>
-                            <dd>Unreleased</dd>
-                        </dl>
-                    </li>
-                </ul>
             </dd>
         </dl>
     </li>

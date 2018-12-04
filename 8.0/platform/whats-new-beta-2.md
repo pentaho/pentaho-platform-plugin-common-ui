@@ -150,7 +150,7 @@ layout: 8.0_default
 
 ### Visualization API
 
-See [What's new and changed in the Visualization API beta 2]({{ "/platform/visual/whats-new-beta-2" | relative_url }}).
+See [What's new and changed in the Visualization API beta 2]({{ "/8.0/platform/visual/whats-new-beta-2" | relative_url }}).
 
 
 ## Pentaho Web Platform
@@ -161,5 +161,5 @@ The Pentaho Web Package deployer allows to easily deploy web resources in the Pe
 without the need to build a OSGi bundle JAR file.
 
 Previously you needed to setup a Maven project, deal with assemblies, KAR files, etc. With Pentaho 8.0
-you can simply create an archive with your files and directly deploy it. Check [OSGi Artifacts Deployment]({{ "/platform/osgi-deployment" | relative_url }})
+you can simply create an archive with your files and directly deploy it. Check [OSGi Artifacts Deployment]({{ "/8.0/platform/osgi-deployment" | relative_url }})
 for more information.
