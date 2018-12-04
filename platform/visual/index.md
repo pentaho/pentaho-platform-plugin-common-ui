@@ -9,9 +9,9 @@ layout: sub-intro
 The [Visualization API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual'}}) 
 provides a unified way to visualize data across the Pentaho suite 
 (e.g.
-[Analyzer](http://www.pentaho.com/product/business-visualization-analytics), 
-[PDI](http://www.pentaho.com/product/data-integration), 
-[CDF](http://community.pentaho.com/ctools/cdf/)).
+[Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html), 
+[PDI](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-data-integration.html), 
+[CDF](https://community.hitachivantara.com/docs/DOC-1009859-cdf-dashboard-framework)).
 
 Essentially, it is a set of abstractions that enables safe, isolated operation between 
 applications, visualizations and business logic.
@@ -46,13 +46,13 @@ to [configuring it](#configuring-the-visualization).
 
 Creating a visualization boils down to creating:
 
-- One [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) — 
+- One [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) class — 
   which _identifies_ the visualization and 
   _defines_ it in terms of its data requirements, 
   such as the visual degrees of freedom it has (e.g. _X position_, _color_ and _size_) and 
   any major options that affect its rendering, — and
 
-- One [`View`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}}) (at least) — 
+- One [`View`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}}) class (at least) — 
   which implements the actual rendering using chosen technologies 
   (e.g. [HTML](https://www.w3.org/TR/html/), [SVG](https://www.w3.org/TR/SVG/), [D3](https://d3js.org/)),
   and handle user interaction, 
@@ -69,8 +69,9 @@ First make sure that you have git and npm installed.</p>
 
 <pre class='highlight'><code># Clone the repository.
 git clone https://github.com/pentaho/pentaho-engineering-samples
+git checkout -b 8.1
 
-# Go to the sample's directory.
+# Go to the complete sample's directory.
 cd pentaho-engineering-samples
 cd Samples_for_Extending_Pentaho/javascript-apis/platform/visual-samples-bar-d3
 
@@ -88,7 +89,7 @@ copy the tgz file you just built into its `system/karaf/deploy` folder.
 See [OSGi Artifacts Deployment](../osgi-deployment) if you need more information.
 
 If everything went well, you should now see your visualization being offered in Analyzer and PDI, 
-as well as be able to use it in a [CDE](http://community.pentaho.com/ctools/cde/) dashboard:
+as well as be able to use it in a [CDE](https://community.hitachivantara.com/docs/DOC-1009858-cde-dashboard-editor) dashboard:
 
 1. Your Bar/D3 visualization in Analyzer, showing off the menu and placeholder icon:
    
@@ -109,7 +110,7 @@ as well as be able to use it in a [CDE](http://community.pentaho.com/ctools/cde/
 4. Your Bar/D3 visualization in CDE:
    
    You can get the following dashboard from the
-   `https://github.com/pentaho/pentaho-engineering-samples` repository,
+   `https://github.com/pentaho/pentaho-engineering-samples` repository, `8.1` branch,
    at the location:
    `Samples_for_Extending_Pentaho/javascript-apis/platform/visual-samples-bar-d3-cde`.
    

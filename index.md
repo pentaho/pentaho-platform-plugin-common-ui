@@ -26,16 +26,6 @@ The APIs are organized as follows:
                    href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.data'}}">Data</a>
             </dt>
             <dd>Abstractions for data exchange among components, applications and data sources.
-                <ul style="display: none;">
-                    <li>
-                        <dl>
-                            <dt>
-                                <a title="Pentaho JavaScript Data Access API" href="data/access">Data Access</a>
-                            </dt>
-                            <dd>Unreleased</dd>
-                        </dl>
-                    </li>
-                </ul>
             </dd>
         </dl>
     </li>
@@ -63,34 +53,16 @@ The APIs are organized as follows:
                                 <a title="Pentaho JavaScript Configuration API" 
                                 href="platform/configuration">Configuration</a>
                             </dt>
-                            <dd>Allows <em>types</em> to be configured by third-parties.</dd>
+                            <dd>Allows <em>modules</em> to be configured by third-parties.</dd>
                         </dl>
                     </li>
                     <li>
                         <dl>
                             <dt>
-                                <a title="Pentaho JavaScript Type Info API" 
-                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.typeInfo'}}">Type Info</a>
+                                <a title="Pentaho JavaScript Modules API" 
+                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.module'}}">Modules</a>
                             </dt>
-                            <dd>Provides information about existing types.</dd>
-                        </dl>
-                    </li>
-                    <li>
-                        <dl>
-                            <dt>
-                                <a title="Pentaho JavaScript Instance Info API" 
-                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.instanceInfo'}}">Instance Info</a>
-                            </dt>
-                            <dd>Provides information about existing instances.</dd>
-                        </dl>
-                    </li>
-                    <li>
-                        <dl>
-                            <dt>
-                                <a title="Pentaho JavaScript Service API" 
-                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.service'}}">Service</a>
-                            </dt>
-                            <dd>Service provider AMD/RequireJS loader plugin.</dd>
+                            <dd>Provides information about existing modules.</dd>
                         </dl>
                     </li>
                     <li>

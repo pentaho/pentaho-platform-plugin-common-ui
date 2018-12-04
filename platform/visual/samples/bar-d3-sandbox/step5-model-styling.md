@@ -11,8 +11,8 @@ layout: default
 ---
 
 As soon as you see your visualization showing up in
-[Analyzer](http://www.pentaho.com/product/business-visualization-analytics) or in 
-[PDI](http://www.pentaho.com/product/data-integration),
+[Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html) or in 
+[PDI](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-data-integration.html),
 you'll notice that it is displayed with a "generic visualization" icon:
 
 1. In **Analyzer**, 
@@ -77,13 +77,14 @@ into an `images` folder, inside of the `css` folder.
 ## Loading the CSS file with the model
 
 To load the model's CSS file dynamically, whenever the model module is loaded, use the `css` AMD/RequireJS plugin.
-Modify the AMD module declaration of the `model.js` file to the following:
+Modify the AMD module declaration of the `Model.js` file to the following:
 
 ```js
 define([
-  "module",
+  "pentaho/module!_",
+  "pentaho/visual/base/Model",
   "css!./css/model"
-], function(module) {
+], function(module, BaseModel) {
   // ...
 });
 ```

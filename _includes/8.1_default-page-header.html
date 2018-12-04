@@ -1,0 +1,48 @@
+{% if page.parent-title != null %}
+<nav class="elm-header-global-nav elm-nav" data-ga-action="Elm Navigation" style="top: 0px;">
+  <div class="elm-nav-container">
+    <ol class="mt-breadcrumbs" data-ga-action="Breadcrumbs">
+      <li>
+        <a href="{{ '/8.1' | relative_url }}" data-ga-label="Breadcrumb category">
+          <span class="mt-icon-article-category mt-icon-article-home"></span>
+          Home
+        </a>
+      </li>
+      {% if page.grand-grand-parent-title != null %}
+      <li>
+        <a href="{{ page.grand-grand-parent-path | default: '..' }}" data-ga-label="Breadcrumb category">
+          <span class="mt-icon-article-category"></span>
+          {{ page.grand-grand-parent-title | default: site.title | default: site.github.repository_name }}
+        </a>
+      </li>
+      {% endif %} {% if page.grand-parent-title != null %}
+      <li>
+        <a href="{{ page.grand-parent-path | default: '..' }}" data-ga-label="Breadcrumb category">
+          <span class="mt-icon-article-category"></span>
+          {{ page.grand-parent-title | default: site.title | default: site.github.repository_name }}
+        </a>
+      </li>
+      {% endif %}
+      <li>
+        <a href="{{ page.parent-path | default: '.' }}" data-ga-label="Breadcrumb category">
+          <span class="mt-icon-article-category"></span>
+          {{ page.parent-title | default: site.title | default: site.github.repository_name }}
+        </a>
+      </li>
+    </ol>
+  </div>
+</nav>
+{% else %}
+<nav class="elm-header-global-nav elm-nav" data-ga-action="Elm Navigation" style="top: 0px;">
+  <div class="elm-nav-container">
+    <ol class="mt-breadcrumbs" data-ga-action="Breadcrumbs">
+      <li>
+        <a href="{{ '/8.1' | relative_url }}" data-ga-label="Breadcrumb category">
+          <span class="mt-icon-article-category mt-icon-article-home"></span>
+          Home
+        </a>
+      </li>
+    </ol>
+  </div>
+</nav>
+{% endif %}

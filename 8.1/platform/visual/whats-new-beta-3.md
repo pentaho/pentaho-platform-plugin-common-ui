@@ -2,7 +2,7 @@
 title: What's new and changed in the Visualization API beta 3
 description: Describes the new and changed features in the beta 3 of the Visualization API.
 parent-title: Visualization API
-layout: default
+layout: 8.1_default
 ---
 
 You might also want to take a look at 
@@ -15,7 +15,7 @@ You might also want to take a look at
 In this release, we simplified, once more, the syntax for declaring visual roles.
 
 Specifically, the two attributes `levels` and `dataType` which were used to define the _type of visual role_
-were replaced by a single [modes]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property.Type#modes'}})
+were replaced by a single [modes]({{site.refDocsUrlPattern81 | replace: '$', 'pentaho.visual.role.Property.Type#modes'}})
 attribute.
 Instead of using explicit _levels of measurement_ terms to classify visual roles 
 (terms such as _quantitative_, _nominal_ and _ordinal_), 
@@ -284,7 +284,7 @@ Lets see some examples using the old and the new syntax.
 
 The `View` code needs to know which fields are mapped to a visual role.
 The visual role `Mapping` class was changed to expose the list of mapped fields under the 
-[pentaho.visual.role.Mapping#fields]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Mapping#fields'}})
+[pentaho.visual.role.Mapping#fields]({{site.refDocsUrlPattern81 | replace: '$', 'pentaho.visual.role.Mapping#fields'}})
 property.
 
 Example of old and new view code to obtain the column indexes of the fields mapped to the visual roles:
@@ -326,12 +326,12 @@ The name of the fields which were mapped to the visual roles are not relevant fo
 
 Additionally, when handling user interaction, a view needs to, for example, 
 translate mouse events on specific visual elements into actions such as 
-[pentaho.visual.action.Select]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select'}}) or
-[pentaho.visual.action.Execute]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Execute'}}).
+[pentaho.visual.action.Select]({{site.refDocsUrlPattern81 | replace: '$', 'pentaho.visual.action.Select'}}) or
+[pentaho.visual.action.Execute]({{site.refDocsUrlPattern81 | replace: '$', 'pentaho.visual.action.Execute'}}).
 Actions receive as input a filter that describes in the original data terms the data that was acted upon
 (_select_ the rows whose `country` has value `Portugal`).
 
-The [pentaho.visual.scene.Base]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.scene.Base'}})
+The [pentaho.visual.scene.Base]({{site.refDocsUrlPattern81 | replace: '$', 'pentaho.visual.scene.Base'}})
 helper class greatly simplifies the code you need to write to correctly handle these two needs.
 
 Check out the following comparison of code written with and without the helper class:
@@ -413,7 +413,7 @@ Follow the correspondence examples given before.
 Follow the correspondence examples given before.
 
 Optionally, convert the code to use the 
-[pentaho.visual.scene.Base]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.scene.Base'}}) helper.
+[pentaho.visual.scene.Base]({{site.refDocsUrlPattern81 | replace: '$', 'pentaho.visual.scene.Base'}}) helper.
 
 ### Convert any CDF/CDE dashboards
 

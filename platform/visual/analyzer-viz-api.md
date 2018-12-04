@@ -10,7 +10,7 @@ layout: default
 
 ## Overview
 
-[Pentaho Analyzer](http://www.pentaho.com/product/business-visualization-analytics) reports display visualizations that 
+[Pentaho Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html) reports display visualizations that 
 are based on the [Pentaho Visualization API](.).
 
 As of version 7.1, the Pentaho platform ships with the _new_ version of the Visualization API, still in **beta**, 
@@ -21,8 +21,8 @@ allowing you
 to evaluate and immediately take advantage of the new format, and 
 to convert any custom visualizations of the previous format at your own pace.
 
-All [stock visualizations](https://help.pentaho.com/Documentation/8.0/Products/Analyzer/Visualizations), 
-with the exception of the [Geo Map](https://help.pentaho.com/Documentation/8.0/Products/Analyzer/Visualizations#Geo_Map_Visualization), 
+All [stock visualizations](https://help.pentaho.com/Documentation/8.2/Products/Analyzer/Visualizations), 
+with the exception of the [Geo Map](https://help.pentaho.com/Documentation/8.2/Products/Analyzer/Visualizations#Geo_Map_Visualization), 
 are already available in the new format 
 and you **can choose** which format you want Analyzer to use, by configuring an Analyzer setting
 (see [Changing the visualization format of stock visualizations](#changing-the-visualization-format-of-stock-visualizations)).
@@ -65,8 +65,8 @@ relative to the _previous_ stock visualizations.
 1. Visualizations scroll horizontally and vertically when too many axis categories exist, 
    instead of shrinking to available space.
 2. Selection is either enabled or not, depending on whether there are no _gems_ in the 
-   Pivot "Column" gem bar, while there used to be an intermediate selection state where some 
-   partial selections were possible if only one gem was in the Pivot "Column" gem bar.
+   Pivot "Column" _gem bar_, while there used to be an intermediate selection state where some 
+   partial selections were possible if only one _gem_ was in the Pivot "Column" _gem bar_.
 3. General styling of visualizations changed to be aligned platform-wide (e.g. PDI, CDF).
 4. Standard color palettes have changed to be aligned platform-wide (e.g. PDI, CDF).
 
@@ -132,7 +132,7 @@ the default value of the "Line width" property of "Line chart" visualizations.
         {
           select: {
             application: "pentaho-analyzer",
-            type: "pentaho/visual/models/line"
+            module: "pentaho/visual/models/Line"
           },
           apply: {
             props: {
@@ -166,7 +166,7 @@ the possible _maximum number of results_ for "Bar chart" visualizations.
         {
           select: {
             application: "pentaho-analyzer",
-            type: "pentaho/visual/models/barHorizontal"
+            module: "pentaho/visual/models/BarHorizontal"
           },
           apply: {
             application: {
@@ -195,7 +195,7 @@ This property allows changing the default discrete color palette.
         {
           select: {
             application: "pentaho-analyzer",
-            instance: "pentaho/visual/color/palettes/nominalPrimary"
+            module: "pentaho/visual/color/palettes/nominalPrimary"
           },
           apply: {
             colors: [
@@ -209,21 +209,21 @@ This property allows changing the default discrete color palette.
 
 ### Correspondence between visualization identifiers
 
-| Current Vis. Id.      | Future Vis. Id.                               | Description          |
-|-----------------------|-----------------------------------------------|----------------------|
-| ccc_area              | pentaho/visual/models/areaStacked             | Area Stacked         |
-| ccc_line              | pentaho/visual/models/line                    | Line                 |
-| ccc_bar               | pentaho/visual/models/bar                     | Column               |
-| ccc_barstacked        | pentaho/visual/models/barStacked              | Column Stacked       |
-| ccc_barnormalized     | pentaho/visual/models/bar                     | Column Stacked 100%  |
-| ccc_horzbar           | pentaho/visual/models/barHorizontal           | Bar                  |
-| ccc_horzbarstacked    | pentaho/visual/models/barStackedHorizontal    | Bar Stacked          |
-| ccc_horzbarnormalized | pentaho/visual/models/barNormalizedHorizontal | Bar Stacked 100%     |
-| ccc_barline           | pentaho/visual/models/barLine                 | Column/Line Combo    |
-| ccc_scatter           | pentaho/visual/models/bubble                  | X/Y Scatter/Bubble   |
-| ccc_heatgrid          | pentaho/visual/models/heatGrid                | Heat-Grid            |
-| ccc_pie               | pentaho/visual/models/pie                     | Pie                  |
-| ccc_sunburst          | pentaho/visual/models/sunburst                | Sunburst             |
+| Current Vis. Id.        | Future Vis. Id.                                 | Description          |
+|-------------------------|-------------------------------------------------|----------------------|
+| `ccc_area`              | `pentaho/visual/models/AreaStacked`             | Area Stacked         |
+| `ccc_line`              | `pentaho/visual/models/Line`                    | Line                 |
+| `ccc_bar`               | `pentaho/visual/models/Bar`                     | Column               |
+| `ccc_barstacked`        | `pentaho/visual/models/BarStacked`              | Column Stacked       |
+| `ccc_barnormalized`     | `pentaho/visual/models/BarNormalized`           | Column Stacked 100%  |
+| `ccc_horzbar`           | `pentaho/visual/models/BarHorizontal`           | Bar                  |
+| `ccc_horzbarstacked`    | `pentaho/visual/models/BarStackedHorizontal`    | Bar Stacked          |
+| `ccc_horzbarnormalized` | `pentaho/visual/models/BarNormalizedHorizontal` | Bar Stacked 100%     |
+| `ccc_barline`           | `pentaho/visual/models/BarLine`                 | Column/Line Combo    |
+| `ccc_scatter`           | `pentaho/visual/models/Bubble`                  | X/Y Scatter/Bubble   |
+| `ccc_heatgrid`          | `pentaho/visual/models/HeatGrid`                | Heat-Grid            |
+| `ccc_pie`               | `pentaho/visual/models/Pie`                     | Pie                  |
+| `ccc_sunburst`          | `pentaho/visual/models/Sunburst`                | Sunburst             |
 
 
 ### Correspondence between visualization property values

@@ -215,7 +215,7 @@ This property allows changing the default discrete color palette.
 | ccc_line              | pentaho/visual/models/line                    | Line                 |
 | ccc_bar               | pentaho/visual/models/bar                     | Column               |
 | ccc_barstacked        | pentaho/visual/models/barStacked              | Column Stacked       |
-| ccc_barnormalized     | pentaho/visual/models/bar                     | Column Stacked 100%  |
+| ccc_barnormalized     | pentaho/visual/models/barNormalized           | Column Stacked 100%  |
 | ccc_horzbar           | pentaho/visual/models/barHorizontal           | Bar                  |
 | ccc_horzbarstacked    | pentaho/visual/models/barStackedHorizontal    | Bar Stacked          |
 | ccc_horzbarnormalized | pentaho/visual/models/barNormalizedHorizontal | Bar Stacked 100%     |
