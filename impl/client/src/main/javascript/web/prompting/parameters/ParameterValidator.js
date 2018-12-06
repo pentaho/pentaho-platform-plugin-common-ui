@@ -107,9 +107,11 @@ define(['cdf/lib/Base'],
 
           // validate untrusted parameter value
           if(currentParameter.mandatory) {
-            if(typeof untrustedValue == 'undefined' || untrustedValue == '') {
+            if(typeof untrustedValue == 'undefined') {
               // add error
               addErrorToParameter(paramDefn, paramName, "This prompt value is of an invalid value");
+            } else if(untrustedValue == ''){
+              addErrorToParameter(paramDefn, paramName, "This prompt is mandatory");
             }
           }
           var values = [];
