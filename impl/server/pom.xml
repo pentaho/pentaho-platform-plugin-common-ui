@@ -13,7 +13,6 @@
   <description>Java portion of the Common UI codebase</description>
   <url>http://www.pentaho.com</url>
   <properties>
-    <spring.version>4.3.2.RELEASE</spring.version>
     <commons-vfs2.version>2.2</commons-vfs2.version>
     <simple-jndi.version>0.11.1</simple-jndi.version>
     <jmock-junit4.version>2.5.1</jmock-junit4.version>
@@ -97,11 +96,11 @@
         </exclusion>
       </exclusions>
     </dependency>
+
+    <!-- Needed for compilation -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
-      <version>${spring.version}</version>
-      <scope>provided</scope>
       <exclusions>
         <exclusion>
           <artifactId>*</artifactId>
@@ -109,11 +108,11 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <!-- -->
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
-      <version>${spring.version}</version>
-      <scope>provided</scope>
       <exclusions>
         <exclusion>
           <artifactId>*</artifactId>
