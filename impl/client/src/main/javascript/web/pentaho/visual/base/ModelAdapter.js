@@ -183,7 +183,7 @@ define([
      * which will be up to date with the changes made within the transaction.
      * Otherwise, this method returns the _committed_ adaptation model of the model adapter.
      *
-     * @return {!IAdaptationModel} The adaptation model.
+     * @return {IAdaptationModel} The adaptation model.
      *
      * @private
      * @see pentaho.visual.base.ModelAdapter#__getAdaptationModel
@@ -201,7 +201,7 @@ define([
      *
      * See {@link pentaho.visual.base.ModelAdapter#__getAmbientAdaptationModel}.
      *
-     * @return {!IAdaptationModel} The adaptation model.
+     * @return {IAdaptationModel} The adaptation model.
      *
      * @private
      */
@@ -245,7 +245,7 @@ define([
     /**
      * Event handler for the `will:change` event as emitted by this object.
      *
-     * @param {!pentaho.type.events.WillChange} event - The will change event.
+     * @param {pentaho.type.events.WillChange} event - The will change event.
      * @private
      */
     __onChangeWillHandler: function(event) {
@@ -271,7 +271,7 @@ define([
     /**
      * Event handler for the `will:change` event as emitted by this.model.
      *
-     * @param {!pentaho.type.events.WillChange} event - The will change event.
+     * @param {pentaho.type.events.WillChange} event - The will change event.
      * @private
      */
     __onModelChangeWillHandler: function(event) {
@@ -405,7 +405,7 @@ define([
     /**
      * Converts a filter from the model adapter namespace into the internal model namespace.
      *
-     * @param {!pentaho.data.filter.Abstract} externalFilter - The external filter.
+     * @param {pentaho.data.filter.Abstract} externalFilter - The external filter.
      * @return {pentaho.data.filter.Abstract} The corresponding internal filter.
      * @protected
      */
@@ -431,7 +431,7 @@ define([
     /**
      * Converts a filter from the internal model namespace into the model adapter namespace.
      *
-     * @param {!pentaho.data.filter.Abstract} internalFilter - The internal filter.
+     * @param {pentaho.data.filter.Abstract} internalFilter - The internal filter.
      * @return {pentaho.data.filter.Abstract} The corresponding external filter.
      * @protected
      */
@@ -461,12 +461,12 @@ define([
      * (have no defined strategy), are skipped.
      * Properties whose values are not known to the current strategy are skipped.
      *
-     * @param {!Object.<string, any|pentaho.data.ICell>} originalValuesMap - The map of property names to
+     * @param {object.<string, any|pentaho.data.ICell>} originalValuesMap - The map of property names to
      * values and/or cells.
      * @param {boolean} toExternal If true converts from internal to external properties,
      * the other way around if false.
      *
-     * @return {!Object.<string, pentaho.data.ICell>} The corresponding map of internal or external property names
+     * @return {object.<string, pentaho.data.ICell>} The corresponding map of internal or external property names
      *   to cells.
      *
      * @private

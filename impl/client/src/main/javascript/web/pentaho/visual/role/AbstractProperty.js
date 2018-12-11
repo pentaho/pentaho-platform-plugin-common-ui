@@ -77,7 +77,7 @@ define([
        * The returned list or its elements should not be modified.
        *
        * @name pentaho.visual.role.AbstractPropertyType#modes
-       * @type {!pentaho.type.List.<pentaho.visual.role.Mode>}
+       * @type {pentaho.type.List.<pentaho.visual.role.Mode>}
        * @readOnly
        * @abstract
        */
@@ -236,7 +236,7 @@ define([
        * Gets the metadata about the fields property of mappings of this visual role property.
        *
        * @name pentaho.visual.role.AbstractPropertyType#fields
-       * @type {!pentaho.visual.role.IFieldsMetadata}
+       * @type {pentaho.visual.role.IFieldsMetadata}
        * @readOnly
        * @abstract
        */
@@ -257,7 +257,7 @@ define([
        *    then each field in the current mapping's
        *    [fields]{@link pentaho.visual.role.AbstractMapping#fields} must be defined in `data`.
        *
-       * @param {!pentaho.visual.base.AbstractModel} model - The abstract model.
+       * @param {pentaho.visual.base.AbstractModel} model - The abstract model.
        *
        * @return {Array.<pentaho.type.ValidationError>} A non-empty array of `ValidationError` or `null`.
        */
@@ -286,8 +286,8 @@ define([
        *
        * Assumes the mapping is valid according to the base complex validation.
        *
-       * @param {!pentaho.visual.base.AbstractModel} model - The abstract model.
-       * @param {!pentaho.visual.role.AbstractMapping} mapping - The mapping.
+       * @param {pentaho.visual.base.AbstractModel} model - The abstract model.
+       * @param {pentaho.visual.role.AbstractMapping} mapping - The mapping.
        * @param {function} addErrors - Called to add errors.
        * @private
        */

@@ -96,8 +96,8 @@ define([
       /**
        * Gets a set of used palette identifiers on the given owner.
        *
-       * @param {!pentaho.type.Complex} owner - The owner complex.
-       * @return {!Object.<string, boolean>} The set of used identifiers.
+       * @param {pentaho.type.Complex} owner - The owner complex.
+       * @return {object.<string, boolean>} The set of used identifiers.
        */
       __collectOtherUsedPalettesIdsOn: function(owner) {
 
@@ -145,7 +145,7 @@ define([
        *
        * The returned array or its elements should not be modified.
        *
-       * @type {!pentaho.type.List.<pentaho.visual.color.Level>}
+       * @type {pentaho.type.List.<pentaho.visual.color.Level>}
        *
        * @throws {pentaho.lang.OperationInvalidError} When setting and the type already has
        * [subtypes]{@link pentaho.type.Type#hasDescendants}.
@@ -194,7 +194,7 @@ define([
        *
        * 1. The current palette value must have a level which is one of the property's allowed levels.
        *
-       * @param {!pentaho.visual.base.Model} model - The visualization model.
+       * @param {pentaho.visual.base.Model} model - The visualization model.
        *
        * @return {Array.<pentaho.type.ValidationError>} A non-empty array of `ValidationError` or `null`.
        */

@@ -36,8 +36,8 @@ define([
        *
        * @constructor
        * @param {nonEmptyString} id - The identifier of the type module.
-       * @param {!pentaho.module.spec.ITypeMeta} spec - The specification of the metadata of the type module.
-       * @param {!pentaho._core.module.Resolver} resolver - The module resolver function.
+       * @param {pentaho.module.spec.ITypeMeta} spec - The specification of the metadata of the type module.
+       * @param {pentaho._core.module.Resolver} resolver - The module resolver function.
        */
       constructor: function(id, spec, resolver) {
 
@@ -67,7 +67,7 @@ define([
       /**
        * The array of subtype modules.
        *
-       * @type {!Array.<!pentaho.module.ITypeMeta>}
+       * @type {Array.<!pentaho.module.ITypeMeta>}
        * @private
        */
       __subtypes: Object.freeze([]),
@@ -79,7 +79,7 @@ define([
       /**
        * Adds a given subtype module.
        *
-       * @param {!pentaho.module.ITypeMeta} subtype - The subtype module.
+       * @param {pentaho.module.ITypeMeta} subtype - The subtype module.
        * @private
        * @internal
        */
@@ -97,7 +97,7 @@ define([
       /**
        * The array of instance modules.
        *
-       * @type {!Array.<!pentaho.module.IInstanceMeta>}
+       * @type {Array.<!pentaho.module.IInstanceMeta>}
        * @private
        */
       __instances: Object.freeze([]),
@@ -109,7 +109,7 @@ define([
       /**
        * Adds a given instance module.
        *
-       * @param {!pentaho.module.InstanceMeta} instance - The instance module.
+       * @param {pentaho.module.InstanceMeta} instance - The instance module.
        * @private
        * @internal
        */

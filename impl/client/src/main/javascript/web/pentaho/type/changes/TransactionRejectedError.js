@@ -49,7 +49,7 @@ define([
       /**
        * Gets the reason why the transaction was rejected.
        *
-       * @type {!Error}
+       * @type {Error}
        * @readOnly
        */
       O.setConst(this, "reason", reason);

@@ -30,7 +30,7 @@
  *
  * @name value
  * @memberOf pentaho.data.filter.spec.IIsLike#
- * @type pentaho.type.spec.Value
+ * @type ?pentaho.type.spec.Value
  */
 
 /**
@@ -38,7 +38,7 @@
  *
  * @name anchorStart
  * @memberOf pentaho.data.filter.spec.IIsLike#
- * @type pentaho.type.Boolean
+ * @type ?pentaho.type.Boolean
  */
 
 /**
@@ -46,7 +46,7 @@
  *
  * @name anchorEnd
  * @memberOf pentaho.data.filter.spec.IIsLike#
- * @type pentaho.type.Boolean
+ * @type ?pentaho.type.Boolean
  */
 
 /**
@@ -54,5 +54,5 @@
  *
  * @name isCaseInsensitive
  * @memberOf pentaho.data.filter.spec.IIsLike#
- * @type pentaho.type.Boolean
+ * @type ?pentaho.type.Boolean
  */

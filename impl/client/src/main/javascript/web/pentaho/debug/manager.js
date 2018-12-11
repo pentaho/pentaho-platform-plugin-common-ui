@@ -53,7 +53,7 @@ define([
    *
    * @name manager
    * @memberOf pentaho.debug
-   * @type pentaho.debug.IManager
+   * @type ?pentaho.debug.IManager
    * @amd pentaho/debug
    */
 

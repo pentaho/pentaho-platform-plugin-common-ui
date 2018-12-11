@@ -60,7 +60,7 @@ define([
 
       /**
        * Map of property types by nameAlias.
-       * @type {!Object.<string, pentaho.type.PropertyType>}
+       * @type {object.<string, pentaho.type.PropertyType>}
        * @private
        */
       this.__propTypesByAlias = Object.create(null);
@@ -108,7 +108,7 @@ define([
     /**
      * The declaring complex type
      *
-     * @type {!pentaho.type.ComplexType}
+     * @type {pentaho.type.ComplexType}
      * @readOnly
      * @private
      */
@@ -126,7 +126,7 @@ define([
      *
      * @param {string} spec - The name of the property.
      * @param {number} index - The location of the property in the collection.
-     * @param {Object} ka - The keyword arguments.
+     * @param {?object} ka - The keyword arguments.
      * @return {pentaho.type.PropertyType} The property type to add.
      * @protected
      * @override
@@ -161,9 +161,9 @@ define([
      *
      * @param {string} spec - The specification of the property.
      * @param {number} index - The location of the property in the collection.
-     * @param {!pentaho.type.PropertyType} existing - The existing property type.
-     * @param {Object} keyArgs - The keyword arguments.
-     * @return {!pentaho.type.PropertyType} The replacement property type.
+     * @param {pentaho.type.PropertyType} existing - The existing property type.
+     * @param {?object} keyArgs - The keyword arguments.
+     * @return {pentaho.type.PropertyType} The replacement property type.
      * @protected
      * @override
      */
@@ -228,8 +228,8 @@ define([
      *
      * @param {string} spec - The name of the property.
      * @param {string} index - The location of the property in the collection.
-     * @param {Object} [keyArgs] - The keyword arguments.
-     * @return {!pentaho.type.PropertyType} The new property type.
+     * @param {?object} [keyArgs] - The keyword arguments.
+     * @return {pentaho.type.PropertyType} The new property type.
      * @protected
      */
     _cast: function(spec, index, keyArgs) {
@@ -281,8 +281,8 @@ define([
      * 2. an object whose keys are the property names and the values are {@link pentaho.type.spec.PropertyType},
      *    having no name or a name equal to the key.
      *
-     * @param {Object} config - The properties configuration.
-     * @param {Object} [keyArgs] - The keyword arguments.
+     * @param {?object} config - The properties configuration.
+     * @param {?object} [keyArgs] - The keyword arguments.
      */
     configure: function(config, keyArgs) {
       if(!config) throw error.argRequired("config");

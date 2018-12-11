@@ -34,5 +34,5 @@
  *
  * @name values
  * @memberOf pentaho.data.filter.spec.IIsIn#
- * @type Array.<pentaho.type.spec.Value>
+ * @type Array.<?pentaho.type.spec.Value>
  */

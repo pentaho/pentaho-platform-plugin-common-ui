@@ -33,8 +33,8 @@ define([
    * @constructor
    * @description Creates a `DidChange` event.
    *
-   * @param {!pentaho.type.Complex} source - The object which is emitting the event.
-   * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
+   * @param {pentaho.type.Complex} source - The object which is emitting the event.
+   * @param {pentaho.type.changes.Changeset} changeset - The changeset.
    */
   return Event.extend(module.id, /** @lends pentaho.type.events.DidChange# */{
 

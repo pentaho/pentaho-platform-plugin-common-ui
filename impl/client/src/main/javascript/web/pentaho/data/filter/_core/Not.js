@@ -94,9 +94,9 @@ define([
        * Otherwise, the operand is visited, and if it is not modified, then `this` is returned.
        * Otherwise, the result of negating the transformed operand is returned.
        *
-       * @param {!pentaho.data.filter.FTransformer} transformer - The transformer function.
+       * @param {pentaho.data.filter.FTransformer} transformer - The transformer function.
        *
-       * @return {!pentaho.data.filter.Abstract} The transformed filter.
+       * @return {pentaho.data.filter.Abstract} The transformed filter.
        */
       _visitDefault: function(transformer) {
         var oper1 = this.operand;
@@ -114,7 +114,7 @@ define([
        * When [operand]{@link pentaho.data.filter.Not#operand} is set,
        * double negation is prevented by returning the operand itself.
        *
-       * @return {!pentaho.data.filter.Abstract} A filter that is the negation of this filter.
+       * @return {pentaho.data.filter.Abstract} A filter that is the negation of this filter.
        *
        * @override
        */

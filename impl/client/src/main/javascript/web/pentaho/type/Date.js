@@ -38,7 +38,7 @@ define([
     /**
      * Gets the underlying `Date` object of the date value.
      * @name pentaho.type.Date#value
-     * @type Date
+     * @type ?Date
      * @readonly
      */
 

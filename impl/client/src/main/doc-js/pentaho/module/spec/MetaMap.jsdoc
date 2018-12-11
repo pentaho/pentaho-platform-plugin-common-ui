@@ -19,5 +19,5 @@
  *
  * An object whose keys are type identifiers and whose values are module metadata specifications.
  *
- * @typedef {Object.<string, pentaho.module.spec.IMeta>} pentaho.module.spec.MetaMap
+ * @typedef {?object.<string, pentaho.module.spec.IMeta>} pentaho.module.spec.MetaMap
  */

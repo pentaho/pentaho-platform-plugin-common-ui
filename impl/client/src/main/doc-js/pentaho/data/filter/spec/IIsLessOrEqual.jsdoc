@@ -30,5 +30,5 @@
  *
  * @name value
  * @memberOf pentaho.data.filter.spec.IIsLessOrEqual#
- * @type {!pentaho.type.spec.Element}
+ * @type {pentaho.type.spec.Element}
  */

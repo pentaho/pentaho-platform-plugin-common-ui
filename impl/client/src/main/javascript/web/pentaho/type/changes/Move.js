@@ -47,7 +47,7 @@ define([
      * @constructor
      * @description Creates an instance.
      *
-     * @param {!Array.<pentaho.type.Element>} elem - The element to be moved in the list.
+     * @param {Array.<pentaho.type.Element>} elem - The element to be moved in the list.
      * @param {number} indexOld - The old index of the element in the list.
      * @param {number} indexNew - The new index of the element in the list.
      */
@@ -56,7 +56,7 @@ define([
       /**
        * Gets the element that is about to be moved in the list.
        *
-       * @type {!pentaho.type.Element}
+       * @type {pentaho.type.Element}
        * @readOnly
        */
       this.element = elem;

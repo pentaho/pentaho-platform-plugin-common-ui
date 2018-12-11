@@ -72,7 +72,7 @@ define([
       /**
        * The function which extracts the key of the date value.
        *
-       * @type {!function(any):string}
+       * @type {function(any):string}
        * @readOnly
        * @private
        */
@@ -82,7 +82,7 @@ define([
        * The mapping of original values to its first row index.
        * Assumes only the main input field is relevant.
        *
-       * @type {Object.<string, number>}
+       * @type {?object.<string, number>}
        * @readOnly
        * @private
        */
@@ -91,7 +91,7 @@ define([
       /**
        * The mapping of generated value to its first row index.
        *
-       * @type {Object.<string, number>}
+       * @type {?object.<string, number>}
        * @readOnly
        * @private
        */
@@ -103,7 +103,7 @@ define([
       /**
        * The index of the main input field in the inputFieldIndexes array.
        *
-       * @type {Object}
+       * @type {?object}
        * @readOnly
        * @private
        */

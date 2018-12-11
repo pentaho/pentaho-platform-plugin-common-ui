@@ -94,7 +94,7 @@ define([
      * If there is no container model, or the model has no data set, `null` is returned.
      * If any of the mapped fields is not defined in the data set, `null` is returned.
      *
-     * @type {!Array.<number>}
+     * @type {Array.<number>}
      * @readOnly
      */
     get fieldIndexes() {

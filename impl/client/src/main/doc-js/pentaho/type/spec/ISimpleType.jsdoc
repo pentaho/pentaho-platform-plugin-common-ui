@@ -34,9 +34,9 @@
  * @memberOf pentaho.type.spec.ISimpleType#
  * @method
  *
- * @param {!any} value - The value to convert.
+ * @param {!*} value - The value to convert.
  *
- * @return {?any} The converted value or `null`, when not possible to convert.
+ * @return {*} The converted value or `null`, when not possible to convert.
  *
  * @see pentaho.type.SimpleType#cast
  */

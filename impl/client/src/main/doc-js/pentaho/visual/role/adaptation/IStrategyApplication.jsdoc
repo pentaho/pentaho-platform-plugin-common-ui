@@ -27,7 +27,7 @@
  * Gets the adaptation strategy type.
  *
  * @name pentaho.visual.role.adaptation.IStrategyApplication#strategyType
- * @type {!pentaho.visual.role.adaptation.StrategyType}
+ * @type {pentaho.visual.role.adaptation.StrategyType}
  * @readOnly
  */
 
@@ -35,7 +35,7 @@
  * Gets the external mode.
  *
  * @name pentaho.visual.role.adaptation.IStrategyApplication#externalMode
- * @type {!pentaho.visual.role.Mode}
+ * @type {pentaho.visual.role.Mode}
  * @readOnly
  */
 
@@ -43,7 +43,7 @@
  * Gets the indexes of the external fields.
  *
  * @name pentaho.visual.role.adaptation.Strategy#externalFieldIndexes
- * @type {!Array.<number>}
+ * @type {Array.<number>}
  * @readOnly
  */
 
@@ -51,7 +51,7 @@
  * Gets the internal mode.
  *
  * @name pentaho.visual.role.adaptation.IStrategyApplication#internalMode
- * @type {!pentaho.visual.role.Mode}
+ * @type {pentaho.visual.role.Mode}
  * @readOnly
  */
 

@@ -164,8 +164,8 @@ define([
      * still generates events in the containing complex.
      * We could, however, not addRef if the prop (and, thus, the list) is also isReadOnly?
      *
-     * @param {!pentaho.type.PropertyType} propType - The property type.
-     * @param {!pentaho.type.mixins.Container} value - The container value.
+     * @param {pentaho.type.PropertyType} propType - The property type.
+     * @param {pentaho.type.mixins.Container} value - The container value.
      *
      * @private
      */
@@ -194,7 +194,7 @@ define([
      *
      * This method checks if the values of all of the properties are equal and content-equal.
      *
-     * @param {!pentaho.type.Complex} other - An equal complex value to test for content-equality.
+     * @param {pentaho.type.Complex} other - An equal complex value to test for content-equality.
      *
      * @return {boolean} `true` if the given value is equal in content to this one; `false`, otherwise.
      *
@@ -299,7 +299,7 @@ define([
      * @param {string|!pentaho.type.PropertyType} name - The property name or type object.
      * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
      *
-     * @return {any|pentaho.type.Complex|pentaho.type.List|Nully} The primitive value of a `Simple`,
+     * @return {*|pentaho.type.Complex|pentaho.type.List|Nully} The primitive value of a `Simple`,
      *  the `Complex` or `List` value itself, or a {@link Nully} value.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When `sloppy` is `false` and a property with
@@ -472,8 +472,8 @@ define([
      * Also, an error is thrown if the value itself would have to be mutated and
      * its type is [read-only]{@link pentaho.type.ValueType#isReadOnly}.
      *
-     * @param {!pentaho.type.PropertyType} propType - The property to configure.
-     * @param {any} valueConfig - A value specification. Not `undefined`.
+     * @param {pentaho.type.PropertyType} propType - The property to configure.
+     * @param {*} valueConfig - A value specification. Not `undefined`.
      *
      * @throws {TypeError} When the property value would be replaced or, in case of list properties,
      * its elements would be added, moved or removed and the
@@ -862,8 +862,8 @@ define([
       /**
        * Adds, overrides or configures properties of this complex type.
        *
-       * @param {!Array.<pentaho.type.spec.IPropertyType> |
-       *         !Object.<string, pentaho.type.spec.IPropertyType>} propTypesSpec - The
+       * @param {Array.<pentaho.type.spec.IPropertyType> |
+       *         object.<string, pentaho.type.spec.IPropertyType>} propTypesSpec - The
        * properties' specification.
        *
        * @protected
@@ -875,10 +875,10 @@ define([
       /**
        * Normalizes a properties specification.
        *
-       * @param {!Array.<pentaho.type.spec.IPropertyType> |
-       *         !Object.<string, pentaho.type.spec.IPropertyType>} propTypesSpec - The properties specification.
+       * @param {Array.<pentaho.type.spec.IPropertyType> |
+       *         object.<string, pentaho.type.spec.IPropertyType>} propTypesSpec - The properties specification.
        *
-       * @return {!Array.<pentaho.type.spec.IPropertyType>} The normalized specification.
+       * @return {Array.<pentaho.type.spec.IPropertyType>} The normalized specification.
        * @protected
        */
       _normalizePropertiesSpec: function(propTypesSpec) {
@@ -998,9 +998,9 @@ define([
        * @param {function(pentaho.type.PropertyType, number, pentaho.type.Complex) : boolean?} f
        * The mapping function. Return `false` to break iteration.
        *
-       * @param {Object} [x] The JS context object on which `f` is called.
+       * @param {?object} [x] The JS context object on which `f` is called.
        *
-       * @return {!pentaho.type.ComplexType} This object.
+       * @return {pentaho.type.ComplexType} This object.
        */
       each: function(f, x) {
         var ps = this.__props;
@@ -1023,13 +1023,13 @@ define([
        * This method finds the lowest common ancestor of both types.
        * If it is a complex type, each of the corresponding local properties is yielded.
        *
-       * @param {!pentaho.type.Type} otherType - The other type.
+       * @param {pentaho.type.Type} otherType - The other type.
        * @param {function(pentaho.type.PropertyType, number, pentaho.type.Complex) : boolean?} fun -
        * The mapping function. Return `false` to break iteration.
        *
-       * @param {Object} [ctx] - The JS context object on which `fun` is called.
+       * @param {?object} [ctx] - The JS context object on which `fun` is called.
        *
-       * @return {!pentaho.type.ComplexType} This object.
+       * @return {pentaho.type.ComplexType} This object.
        */
       eachCommonWith: function(otherType, fun, ctx) {
         var lca;
@@ -1061,11 +1061,11 @@ define([
       /**
        * Adds, overrides or configures properties of this complex type.
        *
-       * @param {!pentaho.type.spec.IPropertyType|
+       * @param {pentaho.type.spec.IPropertyType|
        *         !Array.<pentaho.type.spec.IPropertyType>} propTypeSpec - A property type specification or
        *         an array of them.
        *
-       * @return {!pentaho.type.ComplexType} This object.
+       * @return {pentaho.type.ComplexType} This object.
        */
       add: function(propTypeSpec) {
 
@@ -1165,7 +1165,7 @@ define([
    * Configures this value with a distinct, non-{@link Nully} value.
    *
    * @memberOf pentaho.type.Complex#
-   * @param {!pentaho.type.Value} other - The other value.
+   * @param {pentaho.type.Value} other - The other value.
    * @private
    */
   function __configureFromValue(other) {
@@ -1186,7 +1186,7 @@ define([
    * Configures this value with a distinct, non-{@link Nully} specification.
    *
    * @memberOf pentaho.type.Complex#
-   * @param {!any} valueSpec - A value specification.
+   * @param {!*} valueSpec - A value specification.
    * @private
    */
   function __configureFromSpec(valueSpec) {
@@ -1229,9 +1229,9 @@ define([
    * Configures an element property with a given non-undefined, distinct, value specification.
    *
    * @memberOf pentaho.type.Complex#
-   * @param {!pentaho.type.PropertyType} propType - The property to configure.
+   * @param {pentaho.type.PropertyType} propType - The property to configure.
    * @param {pentaho.type.Value} valueAmb - The current, ambient value, possibly `null`.
-   * @param {any} valueConfig - A specification. Not `undefined`. Distinct from `valueAmb`.
+   * @param {*} valueConfig - A specification. Not `undefined`. Distinct from `valueAmb`.
    * @private
    */
   function __configurePropertyElement(propType, valueAmb, valueConfig) {

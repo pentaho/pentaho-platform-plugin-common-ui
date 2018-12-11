@@ -42,7 +42,7 @@ define([
       /**
        * The map of modules' metadata by identifier and alias.
        *
-       * @type {!Object.<string, !pentaho.module.IMeta>}
+       * @type {object.<string, !pentaho.module.IMeta>}
        * @private
        */
       this.__moduleMap = Object.create(null);
@@ -174,7 +174,7 @@ define([
       /**
        * Registers a module.
        *
-       * @param {!pentaho.module.IMeta} module - The module.
+       * @param {pentaho.module.IMeta} module - The module.
        * @private
        */
       __registerModule: function(module) {
@@ -256,7 +256,7 @@ define([
     /**
      * Creates an empty sorted list for holding modules' metadata.
      *
-     * @return {!pentaho.lang.SortedList} The sorted list.
+     * @return {pentaho.lang.SortedList} The sorted list.
      */
     function __createModulesList() {
       return new SortedList({comparer: __moduleComparer});
@@ -265,8 +265,8 @@ define([
     /**
      * Collects all instance modules which are of type `baseType` or of any of its descendant types.
      *
-     * @param {!pentaho.lang.SortedList} allInstances - The sorted list of instance modules' metadata.
-     * @param {!pentaho.module.ITypeMeta} baseType - The base type module.
+     * @param {pentaho.lang.SortedList} allInstances - The sorted list of instance modules' metadata.
+     * @param {pentaho.module.ITypeMeta} baseType - The base type module.
      */
     function __collectInstanceModules(allInstances, baseType) {
 
@@ -281,8 +281,8 @@ define([
     /**
      * Collects all modules which descendant types of a given base type, excluding the base type itself.
      *
-     * @param {!pentaho.lang.SortedList} allSubtypes - The sorted list of subtypes modules' metadata.
-     * @param {!pentaho.module.ITypeMeta} baseType - The base type module.
+     * @param {pentaho.lang.SortedList} allSubtypes - The sorted list of subtypes modules' metadata.
+     * @param {pentaho.module.ITypeMeta} baseType - The base type module.
      */
     function __collectSubtypeModules(allSubtypes, baseType) {
 
@@ -296,8 +296,8 @@ define([
     /**
      * Traverses the type hierarchy which is rooted on `baseType` and calls `funPre` in pre-order.
      *
-     * @param {!pentaho.module.ITypeMeta} baseType - The base type module.
-     * @param {!function(!pentaho.module.ITypeMeta)} funPre - The function to call on each type module.
+     * @param {pentaho.module.ITypeMeta} baseType - The base type module.
+     * @param {function(!pentaho.module.ITypeMeta)} funPre - The function to call on each type module.
      */
     function __eachSubtypeModule(baseType, funPre) {
 
@@ -313,11 +313,11 @@ define([
     /**
      * Gets a type module given its identifier or alias.
      *
-     * @param {!pentaho.module.IMetaService} metaService - The module metadata service.
+     * @param {pentaho.module.IMetaService} metaService - The module metadata service.
      * @param {nonEmptyString} idOrAlias - The identifier or alias of the module.
      * @param {nonEmptyString} argName - The name of the argument.
      *
-     * @return {!pentaho.module.ITypeMeta} The desired type module.
+     * @return {pentaho.module.ITypeMeta} The desired type module.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When the module is defined but is not a type module.
      */
@@ -339,8 +339,8 @@ define([
      *
      * Implements the global order of modules: ranking descending + index ascending.
      *
-     * @param {!pentaho.module.ITypeMeta} moduleA - The first module.
-     * @param {!pentaho.module.ITypeMeta} moduleB - The second module.
+     * @param {pentaho.module.ITypeMeta} moduleA - The first module.
+     * @param {pentaho.module.ITypeMeta} moduleB - The second module.
      *
      * @return {number} The comparison result.
      */

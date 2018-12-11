@@ -34,7 +34,7 @@ define([
    * This palette's [colors]{@link pentaho.visual.color.spec.IPalette#colors} can be configured.
    *
    * @name pentaho.visual.color.palettes.divergentRyg3
-   * @type {!pentaho.visual.color.Palette}
+   * @type {pentaho.visual.color.Palette}
    * @amd pentaho/visual/color/palettes/divergentRyg3
    */
 

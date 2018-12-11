@@ -42,7 +42,7 @@
  * ```
  *
  * Apart from the special inline type property,
- * the _object form_ is of type `Object.<string, pentaho.type.spec.Instance>`.
+ * the _object form_ is of type `?object.<string, ?pentaho.type.spec.Instance>`.
  *
  * @name pentaho.type.spec.IComplex
  *

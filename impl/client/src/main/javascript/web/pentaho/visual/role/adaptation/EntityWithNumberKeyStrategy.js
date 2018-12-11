@@ -87,7 +87,7 @@ define([
       /**
        * The mapping of original values to its first row index.
        *
-       * @type {Object.<string, number>}
+       * @type {?object.<string, number>}
        * @readOnly
        * @private
        */
@@ -96,7 +96,7 @@ define([
       /**
        * The mapping of generated value to its first row index.
        *
-       * @type {Object.<string, number>}
+       * @type {?object.<string, number>}
        * @readOnly
        * @private
        */

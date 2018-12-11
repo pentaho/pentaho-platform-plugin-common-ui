@@ -64,7 +64,7 @@ define([
     /**
      * Registers reference changes caused by this change.
      *
-     * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
+     * @param {pentaho.type.changes.Changeset} changeset - The changeset.
      *
      * @protected
      * @internal
@@ -75,7 +75,7 @@ define([
     /**
      * Unregisters reference changes caused by this change.
      *
-     * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
+     * @param {pentaho.type.changes.Changeset} changeset - The changeset.
      *
      * @protected
      * @internal

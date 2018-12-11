@@ -37,8 +37,8 @@ define(function() {
        * @description Constructs the metadata of an instance module.
        * @constructor
        * @param {nonEmptyString} id - The identifier of the instance module.
-       * @param {pentaho.module.spec.IInstanceMeta} spec - The specification of the metadata of the instance module.
-       * @param {!pentaho._core.module.Resolver} resolver - The module resolver function.
+       * @param {?pentaho.module.spec.IInstanceMeta} spec - The specification of the metadata of the instance module.
+       * @param {pentaho._core.module.Resolver} resolver - The module resolver function.
        */
       constructor: function(id, spec, resolver) {
 

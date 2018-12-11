@@ -39,7 +39,7 @@ define([
      * One is obtained through an attribute's
      * {@link pentaho.data.Attribute#members} property.
      *
-     * @param {!Object} keyArgs The keyword arguments.
+     * @param {object} keyArgs The keyword arguments.
      * @param {pentaho.data.Attribute} keyArgs.attribute The attribute to which the
      *    members collection belongs.
      *

@@ -30,5 +30,5 @@
  *
  * @name operand
  * @memberOf pentaho.data.filter.spec.INot#
- * @type pentaho.data.filter.spec.IAbstract
+ * @type ?pentaho.data.filter.spec.IAbstract
  */

@@ -42,8 +42,8 @@ define([
      *
      * @ignore
      * @abstract
-     * @implements pentaho.lang.ISpecifiable
-     * @implements pentaho.lang.IAnnotatable
+     * @implements ?pentaho.lang.ISpecifiable
+     * @implements ?pentaho.lang.IAnnotatable
      *
      * @classdesc The `Cell` class represents a location or position,
      * in which the value of an attribute, for a given subject, is stored.
@@ -209,7 +209,7 @@ define([
      * getting this property returns `null`,
      * while trying to set it (to any value) throws an error.
      *
-     * @type pentaho.data.Member
+     * @type ?pentaho.data.Member
      */
     get referent() {
       var v = this.v;

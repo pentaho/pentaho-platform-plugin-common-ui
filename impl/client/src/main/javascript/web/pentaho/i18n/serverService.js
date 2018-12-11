@@ -31,7 +31,7 @@ define([
 
   "use strict";
 
-  return /** @type pentaho.i18n.IService */ {
+  return /** @type ?pentaho.i18n.IService */ {
     load: function(bundlePath, localRequire, onLoad, config) {
 
       if(config.isBuild) {
@@ -98,7 +98,7 @@ define([
    * @param {function} localRequire - The require-js function.
    * @param {string} bundlePath - The specified bundle path argument.
    *
-   * @return {Object} A bundle info object.
+   * @return {?object} A bundle info object.
    *
    * @throws {Error} If the specified module identifier cannot be resolved
    *   to a plugin identifier and bundle name.

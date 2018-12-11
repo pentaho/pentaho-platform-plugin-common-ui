@@ -28,7 +28,7 @@ define([
     /**
      * Initializes the mixin.
      *
-     * @param {!Error|pentaho.lang.UserError} errorObj The error of a rejected
+     * @param {Error|pentaho.lang.UserError} errorObj The error of a rejected
      * {@link pentaho.lang.ActionResult|ActionResult}.
      * @protected
      */
@@ -40,7 +40,7 @@ define([
     /**
      * Gets the error that caused the {@link pentaho.lang.ActionResult|ActionResult} to be rejected.
      *
-     * @type {!Error|pentaho.lang.UserError}
+     * @type {Error|pentaho.lang.UserError}
      * @readonly
      */
     get error() {

@@ -97,8 +97,8 @@ define([
      * This method requires that there currently exists an
      * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
      *
-     * @param {!Object} spec - The specification to be filled.
-     * @param {!Object} obj - The object where the method is defined.
+     * @param {object} spec - The specification to be filled.
+     * @param {object} obj - The object where the method is defined.
      * @param {string} name - The name of the method.
      *
      * @return {boolean} `true` if the attribute was added, `false`, otherwise.

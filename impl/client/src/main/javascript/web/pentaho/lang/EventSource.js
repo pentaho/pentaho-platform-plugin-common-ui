@@ -129,7 +129,7 @@ define([
 
         if(F.is(observer)) observer = {__: observer};
 
-        /** @type pentaho.lang.IEventRegistrationHandle[] */
+        /** @type ?pentaho.lang.IEventRegistrationHandle[] */
         var handles = eventTypes.map(function(type) {
           return __registerOne.call(this, type, observer, priority, isCritical);
         }, this);
@@ -260,7 +260,7 @@ define([
      * @see pentaho.lang.EventSource#_emitSafe
      * @see pentaho.lang.EventSource#_emitGeneric
      *
-     * @param {!pentaho.lang.Event} event - The event object.
+     * @param {pentaho.lang.Event} event - The event object.
      *
      * @return {?pentaho.lang.Event} The given event object or `null`, when canceled.
      *
@@ -282,7 +282,7 @@ define([
      * @see pentaho.lang.EventSource#_emit
      * @see pentaho.lang.EventSource#_emitGeneric
      *
-     * @param {!pentaho.lang.Event} event - The event object.
+     * @param {pentaho.lang.Event} event - The event object.
      *
      * @return {?pentaho.lang.Event} The given event object or `null`, when canceled.
      *
@@ -305,7 +305,7 @@ define([
      * @param {?nonEmptyString} [phase] - The phase of the event. For unstructured events don't specify this argument
      * (or specify a {@link Nully} value).
      *
-     * @param {Object} [keyArgs] - The keyword arguments' object.
+     * @param {?object} [keyArgs] - The keyword arguments' object.
      * @param {function(...any):boolean} [keyArgs.isCanceled] - A predicate that indicates if the given event args
      * are in a canceled state. Its `this` value is the value of `source`.
      * @param {function(any, Array, nonEmptyString, nonEmptyString)} [keyArgs.errorHandler] -
@@ -427,7 +427,7 @@ define([
      * @param {?nonEmptyString} [phase] - The phase of the event. For unstructured events don't specify this argument
      * (or specify a {@link Nully} value).
      *
-     * @param {Object} [keyArgs] - The keyword arguments' object.
+     * @param {?object} [keyArgs] - The keyword arguments' object.
      * @param {function(...any):boolean} [keyArgs.isCanceled] - A predicate that indicates if the given event args
      * are in a canceled state. Its `this` value is the value of `source`.
      * @param {function(...any):any} [keyArgs.getCancellationReason] - A function that given the event args
@@ -443,7 +443,7 @@ define([
      *
      * The function arguments are: the error, the event, the event type and the event phase.
      *
-     * @return {!Promise.<object>} A promise.
+     * @return {Promise.<object>} A promise.
      * When fulfilled, it is with the value `undefined`.
      * When rejected due to a thrown error, the rejection reason is that error.
      * When explicitly rejected by the error handler, the given rejection reason is preserved.
@@ -548,7 +548,7 @@ define([
    * @this pentaho.lang.EventSource
    *
    * @param {nonEmptyString} type - The event type.
-   * @return {!Array.<pentaho.lang.IEventObserverRegistration>} The array of event observer registrations.
+   * @return {Array.<pentaho.lang.IEventObserverRegistration>} The array of event observer registrations.
    *
    * @private
    */
@@ -561,7 +561,7 @@ define([
    * Creates a queue of observer registrations.
    *
    * @memberOf pentaho.lang.EventSource~
-   * @return {!Array.<pentaho.lang.IEventObserverRegistration>} An empty queue of event observer registrations.
+   * @return {Array.<pentaho.lang.IEventObserverRegistration>} An empty queue of event observer registrations.
    *
    * @private
    */
@@ -577,11 +577,11 @@ define([
    * @memberOf pentaho.lang.EventSource#
    *
    * @param {nonEmptyString} type - The event tyoe.
-   * @param {!pentaho.lang.IEventObserver} observer - The event observer.
+   * @param {pentaho.lang.IEventObserver} observer - The event observer.
    * @param {number} priority - The listening priority.
    * @param {boolean} isCritical - Indicates that exceptions in this listener should abort the execution.
    *
-   * @return {!pentaho.lang.IEventRegistrationHandle} An event registration handle that can be used for later removal.
+   * @return {pentaho.lang.IEventRegistrationHandle} An event registration handle that can be used for later removal.
    *
    * @private
    */
@@ -597,7 +597,7 @@ define([
 
     var i = queue.length;
 
-    /** @type pentaho.lang.IEventObserverRegistration */
+    /** @type ?pentaho.lang.IEventObserverRegistration */
     var observerRegistration;
     while(i-- && (observerRegistration = queue[i]).priority >= priority) {
       // Will be shifted to the right one position, with the splice operation, below.
@@ -634,7 +634,7 @@ define([
    * @memberOf pentaho.lang.EventSource#
    *
    * @param {nonEmptyString} type - The event type.
-   * @param {!pentaho.lang.IEventObserverRegistration} observerRegistration - The event observer registration.
+   * @param {pentaho.lang.IEventObserverRegistration} observerRegistration - The event observer registration.
    *
    * @private
    */
@@ -672,7 +672,7 @@ define([
    *
    * @memberOf pentaho.lang.EventSource~
    *
-   * @param {!Array.<pentaho.lang.IEventRegistrationHandle>} handles - The array of event registration handles.
+   * @param {Array.<pentaho.lang.IEventRegistrationHandle>} handles - The array of event registration handles.
    *
    * @private
    */
@@ -711,7 +711,7 @@ define([
    * @memberOf pentaho.lang.EventSource#
    *
    * @param {nonEmptyString} type - The event type.
-   * @param {!pentaho.lang.IEventObserver} observer - The event observer.
+   * @param {pentaho.lang.IEventObserver} observer - The event observer.
    *
    * @return {pentaho.lang.IEventObserverRegistration} The event registration, if any; or `null`, otherwise.
    *
@@ -762,7 +762,7 @@ define([
    *
    * @memberOf pentaho.lang.EventSource~
    *
-   * @param {!pentaho.lang.Event} event - The event object.
+   * @param {pentaho.lang.Event} event - The event object.
    *
    * @return {boolean} `true` if it is canceled; `false`, otherwise.
    *
@@ -781,7 +781,7 @@ define([
    *
    * @memberOf pentaho.lang.EventSource~
    *
-   * @param {any} error - The thrown value.
+   * @param {*} error - The thrown value.
    * @param {Array} eventArgs - The arguments of listener functions.
    * @param {nonEmptyString} type - The event type.
    * @param {nonEmptyString} phase - The event phase.

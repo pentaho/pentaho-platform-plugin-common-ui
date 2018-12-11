@@ -40,15 +40,15 @@ define([
      * [isColumnKeyEffective]{@link pentaho.data.util.isColumnKeyEffective}) of the associated data table,
      * then the returned filter will be `null`.
      *
-     * @param {!Object.<string, any|pentaho.data.ICell>} varsMap - A map of visual role names
+     * @param {object.<string, any|pentaho.data.ICell>} varsMap - A map of visual role names
      * to corresponding _variables_. All variables, even those from inherited keys are considered.
      *
      * Map keys which are not the name of a mapper visual role property of `model` are ignored.
      * Map values can be any value that supports the JavaScript's `valueOf` method.
      *
-     * @param {!pentaho.visual.base.Model} model - The associated visual model. Must be valid.
+     * @param {pentaho.visual.base.Model} model - The associated visual model. Must be valid.
      *
-     * @return {pentaho.data.filter.Abstract} The filter, if one can be created; `null`, otherwise
+     * @return {?pentaho.data.filter.Abstract} The filter, if one can be created; `null`, otherwise
      *
      * @see pentaho.data.util.createFilterFromCellsMap
      */
@@ -66,19 +66,19 @@ define([
      * as defined in [isColumnKeyEffective]{@link pentaho.data.util.isColumnKeyEffective}.
      * Specify `keyArgs.includeMeasureFields` as `true` to include all fields.
      *
-     * @param {!Object.<string, pentaho.data.ICell|Array.<pentaho.data.ICell>>} varsMap - A map of visual role names
+     * @param {?object.<string, pentaho.data.ICell|Array.<pentaho.data.ICell>>} varsMap - A map of visual role names
      * to corresponding _variables_. All variables, even those from inherited keys are considered.
      *
      * Map keys which are not the name of a mapper visual role property of `model` are ignored.
      *
-     * @param {!pentaho.visual.base.Model} model - The associated visual model. Must be valid.
+     * @param {pentaho.visual.base.Model} model - The associated visual model. Must be valid.
      *
-     * @param {Object} [keyArgs] The keyword arguments object.
+     * @param {?object} [keyArgs] The keyword arguments object.
      * @param {boolean} [keyArgs.includeMeasureFields=false] Indicates that measure fields should also
      * be included.
      * In practice, indicates that all fields should be included.
      *
-     * @return {!Object.<string, pentaho.data.ICell>} A data cells map, possibly empty.
+     * @return {object.<string, pentaho.data.ICell>} A data cells map, possibly empty.
      *
      * @see pentaho.data.util.isColumnKeyEffective
      */

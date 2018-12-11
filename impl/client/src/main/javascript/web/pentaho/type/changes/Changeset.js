@@ -42,8 +42,8 @@ define([
      * @constructor
      * @description Creates an empty `Changeset` for a given owner value.
      *
-     * @param {!pentaho.type.changes.Transaction} transaction - The owning transaction.
-     * @param {!pentaho.type.mixins.Container} owner - The container instance where the changes take place.
+     * @param {pentaho.type.changes.Transaction} transaction - The owning transaction.
+     * @param {pentaho.type.mixins.Container} owner - The container instance where the changes take place.
      */
     constructor: function(transaction, owner) {
       if(!transaction) throw error.argRequired("transaction");
@@ -54,7 +54,7 @@ define([
        *
        * @name transaction
        * @memberOf pentaho.type.changes.Changeset#
-       * @type {!pentaho.type.changes.Transaction}
+       * @type {pentaho.type.changes.Transaction}
        * @readOnly
        */
       O.setConst(this, "transaction", transaction);
@@ -64,7 +64,7 @@ define([
        *
        * @name owner
        * @memberOf pentaho.type.changes.Changeset#
-       * @type {!pentaho.type.mixins.Container}
+       * @type {pentaho.type.mixins.Container}
        * @readOnly
        */
       O.setConst(this, "owner", owner);
@@ -174,7 +174,7 @@ define([
      *
      * @name pentaho.type.changes.Changeset#__onChildChangesetCreated
      * @method
-     * @param {!pentaho.type.changes.Changeset} childChangeset - The child changeset.
+     * @param {pentaho.type.changes.Changeset} childChangeset - The child changeset.
      * @param {pentaho.type.PropertyType} propType - The property type whose value is the changeset owner.
      * Only applies when this changeset is a complex changeset.
      *
@@ -189,7 +189,7 @@ define([
      * @name pentaho.type.changes.Changeset#eachChildChangeset
      * @method
      * @param {function(pentaho.type.changeset.Changeset) : undefined|boolean} fun - The function to call.
-     * @param {any} ctx - The `this` context on which to call `fun`.
+     * @param {*} ctx - The `this` context on which to call `fun`.
      *
      * @abstract
      */

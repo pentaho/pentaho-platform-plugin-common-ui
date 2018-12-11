@@ -92,7 +92,7 @@ define([
      * The default implementation does a lexicographical comparison of the elements'
      * [keys]{@link pentaho.type.Value#$key}.
      *
-     * @param {!pentaho.type.Element} other - The other element value.
+     * @param {pentaho.type.Element} other - The other element value.
      *
      * @return {number} `-1` if this value is _before_ `other`; `1` if this value is _after_ `other`;
      * `0`, otherwise.
@@ -131,9 +131,9 @@ define([
      * If configuration is considered possible,
      * the actual configuration is delegated to the [configure]{@link pentaho.type.Value#configure} method.
      *
-     * @param {any} config - The value configuration.
+     * @param {*} config - The value configuration.
      *
-     * @return {!pentaho.type.Element} `this` value, if the configuration could be applied to it;
+     * @return {pentaho.type.Element} `this` value, if the configuration could be applied to it;
      * a new, configured value, if not.
      *
      * @final
@@ -162,9 +162,9 @@ define([
      *
      * This method can only be called when there is an ambient transaction.
      *
-     * @param {!any} config - The non-{@link Nully} configuration. Assumed distinct from `this`.
+     * @param {!*} config - The non-{@link Nully} configuration. Assumed distinct from `this`.
      *
-     * @return {!pentaho.type.Element} `this`, already configured, or a new value.
+     * @return {pentaho.type.Element} `this`, already configured, or a new value.
      *
      * @protected
      * @override
@@ -311,10 +311,10 @@ define([
        *
        * Removes duplicates of `elemsB`, keeping the first occurrence.
        *
-       * @param {!Array.<pentaho.type.Element>} elemsA - The previous array of elements.
-       * @param {!Array.<pentaho.type.Element>} elemsB - The next array of elements.
+       * @param {Array.<pentaho.type.Element>} elemsA - The previous array of elements.
+       * @param {Array.<pentaho.type.Element>} elemsB - The next array of elements.
        *
-       * @return {!Array.<pentaho.type.Element>} The intersection array, possibly empty.
+       * @return {Array.<pentaho.type.Element>} The intersection array, possibly empty.
        *
        * @private
        * @internal
@@ -355,10 +355,10 @@ define([
        * The default implementation obtains the specification of the given value,
        * merges it with the given configuration, and creates a new value from the resulting specification.
        *
-       * @param {!pentaho.type.Element} value - The value to configure.
-       * @param {!any} config - The configuration
+       * @param {pentaho.type.Element} value - The value to configure.
+       * @param {!*} config - The configuration
        *
-       * @return {!pentaho.type.Element} The new value.
+       * @return {pentaho.type.Element} The new value.
        *
        * @see pentaho.type.ValueType#isEntity
        * @see pentaho.type.Value#$key

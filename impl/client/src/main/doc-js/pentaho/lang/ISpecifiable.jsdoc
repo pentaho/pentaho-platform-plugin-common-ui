@@ -137,6 +137,6 @@
  *
  * @name pentaho.lang.ISpecifiable#toSpec
  * @method
- * @param {Object} [keyArgs] The keyword arguments.
+ * @param {?object} [keyArgs] The keyword arguments.
  * @return {*} A new specification of the object.
  */

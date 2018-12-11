@@ -38,7 +38,7 @@ define([
    * @class
    * @private
    *
-   * @param {!pentaho.environment.IEnvironment} environment - The environment.
+   * @param {pentaho.environment.IEnvironment} environment - The environment.
    */
   function Core(environment) {
 
@@ -49,10 +49,10 @@ define([
    * Creates and initializes a `Core` instance having the given environment,
    * modules configuration and rule sets.
    *
-   * @param {!pentaho.environment.IEnvironment} environment - The environment.
-   * @param {pentaho.module.spec.MetaMap} globalModuleMap - The global modules map.
+   * @param {pentaho.environment.IEnvironment} environment - The environment.
+   * @param {?pentaho.module.spec.MetaMap} globalModuleMap - The global modules map.
    *
-   * @return {!Promise.<!pentaho._core.Core>} A promise that resolves to the created and initialized `Core` instance.
+   * @return {?Promise.<!pentaho._core.Core>} A promise that resolves to the created and initialized `Core` instance.
    */
   Core.createAsync = function(environment, globalModuleMap) {
 
@@ -80,7 +80,7 @@ define([
     /**
      * Loads AMD-config registered configuration rule-set modules.
      *
-     * @return {!Promise.<!Array.<pentaho.config.spec.IRuleSet>>} A promise for an array of rule sets.
+     * @return {Promise.<!Array.<pentaho.config.spec.IRuleSet>>} A promise for an array of rule sets.
      */
     function loadConfigRuleSetsAsync() {
 
@@ -100,9 +100,9 @@ define([
     /**
      * Loads a rule set given its module metadata.
      *
-     * @param {!pentaho.module.InstanceMeta} ruleSetModuleMeta - The module metadata.
+     * @param {pentaho.module.InstanceMeta} ruleSetModuleMeta - The module metadata.
      *
-     * @return {!Promise.<pentaho.config.spec.IRuleSet>} A promise for a rule set.
+     * @return {Promise.<pentaho.config.spec.IRuleSet>} A promise for a rule set.
      */
     function loadRuleSetModuleMetaAsync(ruleSetModuleMeta) {
 
@@ -124,9 +124,9 @@ define([
     /**
      * Performs the remaining initialization of the Core instance given the registered configuration rule sets.
      *
-     * @param {!Array.<pentaho.config.spec.IRuleSet>} moduleRuleSets - The array of module rule sets.
+     * @param {Array.<pentaho.config.spec.IRuleSet>} moduleRuleSets - The array of module rule sets.
      *
-     * @return {!Promise.<!pentaho._core.Core>} A promise for the `Core` instance.
+     * @return {Promise.<!pentaho._core.Core>} A promise for the `Core` instance.
      */
     function initGivenConfigRules(moduleRuleSets) {
 

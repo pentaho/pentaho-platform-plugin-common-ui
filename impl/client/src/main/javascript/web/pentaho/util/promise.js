@@ -44,7 +44,7 @@ define([
      * or rejected with an error thrown by the function.
      *
      * @param {function() : ?any} fun The function to call.
-     * @param {?Object} [ctx] The object on which to call `fun`.
+     * @param {?object} [ctx] The object on which to call `fun`.
      *
      * @return {Promise.<?any>} A promise for the function's return value.
      */
@@ -68,7 +68,7 @@ define([
      * Optionally, receives a contextual `require` function,
      * so that module ids are taken relative to its module's folder.
      *
-     * @param {!string|!Array.<!string>} deps A single module id or an array of module ids.
+     * @param {string|Array.<!string>} deps A single module id or an array of module ids.
      * @param {?function} [localRequire] A contextual require function.
      * Defaults to the global `require` function.
      *

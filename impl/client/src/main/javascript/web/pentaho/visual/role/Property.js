@@ -138,7 +138,7 @@ define([
        *
        * The returned list or its elements should not be modified.
        *
-       * @type {!pentaho.type.List.<pentaho.visual.role.Mode>}
+       * @type {pentaho.type.List.<pentaho.visual.role.Mode>}
        *
        * @throws {pentaho.lang.OperationInvalidError} When setting and the type already has
        * [subtypes]{@link pentaho.type.Type#hasDescendants}.
@@ -195,7 +195,7 @@ define([
        * which is applicable to the mapping's fields is used.
        * If there are no applicable modes, `null` is returned.
        *
-       * @param {!pentaho.visual.base.Model} model - The visual model.
+       * @param {pentaho.visual.base.Model} model - The visual model.
        *
        * @return {pentaho.visual.role.Mode} The effective operation mode, if one exists; `null` if not.
        *
@@ -309,7 +309,7 @@ define([
       /**
        * Gets or updates the metadata about the fields property of mappings of this visual role property.
        *
-       * @type {!pentaho.visual.role.IFieldsConstraints}
+       * @type {pentaho.visual.role.IFieldsConstraints}
        * @override
        */
       get fields() {
@@ -397,7 +397,7 @@ define([
            * when there is no current mode,
            * if the visual role property has no list modes.
            *
-           * @type pentaho.type.spec.PropertyDynamicAttribute
+           * @type ?pentaho.type.spec.PropertyDynamicAttribute
            */
           value: function(propType, keyArgs) {
 
@@ -470,7 +470,7 @@ define([
        *    must be one of the corresponding internal visual role's
        *    [modes]{@link pentaho.visual.role.PropertyType#modes}
        *
-       * @param {!pentaho.visual.base.Model} model - The visual model.
+       * @param {pentaho.visual.base.Model} model - The visual model.
        *
        * @return {Array.<pentaho.type.ValidationError>} A non-empty array of `ValidationError` or `null`.
        */

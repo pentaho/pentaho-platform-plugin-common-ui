@@ -58,7 +58,7 @@ define([
      * Concrete `SortedList` sub-classes should provide a static `to` method
      * to help in their construction.
      *
-     * @param {Object}   [keyArgs]         The keyword arguments.
+     * @param {?object}   [keyArgs]         The keyword arguments.
      * @param {number} [keyArgs.orderingMode=0] `0` if the ordering is total;
      * `1` if the ordering is partial and new elements should be placed before existing elements;
      * `2` if the ordering is partial and new elements should be placed after existing elements.

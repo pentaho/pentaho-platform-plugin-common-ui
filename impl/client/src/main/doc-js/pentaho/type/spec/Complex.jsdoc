@@ -45,5 +45,5 @@
  * However, note that _array form_ can only be used if
  * the [inline type]{@link pentaho.type.spec.IInstance#_} property can, in fact, be omitted.
  *
- * @typedef {pentaho.type.spec.IComplex|Array.<pentaho.type.spec.Instance>} pentaho.type.spec.Complex
+ * @typedef {pentaho.type.spec.IComplex|Array.<?pentaho.type.spec.Instance>} pentaho.type.spec.Complex
  */

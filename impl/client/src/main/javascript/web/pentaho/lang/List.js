@@ -46,7 +46,7 @@ define([
      * @memberOf pentaho.lang
      * @extends pentaho.lang.Base.Array
      * @amd pentaho/lang/List
-     * @param {Object} [keyArgs] The keyword arguments.
+     * @param {?object} [keyArgs] The keyword arguments.
      *
      * These are not used directly by the `List` class
      * but are passed-through to the methods that handle
@@ -133,7 +133,7 @@ define([
      * adds elements using default options.
      *
      * @param {Array} elems An array of elements to add to the list.
-     * @param {Object} [keyArgs] The keyword arguments.
+     * @param {?object} [keyArgs] The keyword arguments.
      *
      * These are not used directly by the `List` class
      * but are passed-through to the methods that handle
@@ -152,7 +152,7 @@ define([
      * before actually being added to it.
      *
      * @param {*} elem An element or a value convertible to one.
-     * @param {Object} [keyArgs] The keyword arguments.
+     * @param {?object} [keyArgs] The keyword arguments.
      *
      * These are not used directly by the `List` class
      * but are passed-through to the methods that handle
@@ -244,7 +244,7 @@ define([
      * If the element's class does not implement {@link pentaho.lang.ISpecifiable},
      * each element is assumed to be its own specification.
      *
-     * @return {!Array} The list specification.
+     * @return {Array} The list specification.
      */
     toSpec: function() {
       return this.map(function(elem) { return elem.toSpec ? elem.toSpec() : elem; });

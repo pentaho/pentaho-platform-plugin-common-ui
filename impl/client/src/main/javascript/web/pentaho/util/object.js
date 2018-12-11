@@ -58,10 +58,10 @@ define(["./has"], function(has) {
      * and is an own property,
      * it is deleted and its _previous_ own value is returned.
      *
-     * @param {?Object} o - The object whose own property is to be deleted.
+     * @param {?object} o - The object whose own property is to be deleted.
      * @param {string} p - The name of the property.
-     * @param {any} [dv] - The default value. Defaults to `undefined`.
-     * @return {any} The value of the property before deletion.
+     * @param {*} [dv] - The default value. Defaults to `undefined`.
+     * @return {*} The value of the property before deletion.
      *
      * @throws {TypeError} Cannot delete a constant property.
      */
@@ -81,11 +81,11 @@ define(["./has"], function(has) {
      * Returns the function result.
      * The disposable resource is disposed before returning.
      *
-     * @param {!pentaho.lang.IDisposable} disposable The disposable resource.
+     * @param {pentaho.lang.IDisposable} disposable The disposable resource.
      * @param {function(pentaho.lang.IDisposable):any} fun The function to call with the given resource.
-     * @param {Object} [context] The context in which to call `fun`.
+     * @param {?object} [context] The context in which to call `fun`.
      *
-     * @return {any} The value returned by `fun`.
+     * @return {*} The value returned by `fun`.
      */
     using: function(disposable, fun, context) {
       try {
@@ -102,7 +102,7 @@ define(["./has"], function(has) {
      *
      * If the specified object is a {@link Nully} value, `false` is returned.
      *
-     * @param {?Object} o - The object to be tested.
+     * @param {?object} o - The object to be tested.
      * @param {string} p - The name of the property.
      * @return {boolean} `true` if this is a direct/own property, or `false` otherwise.
      */
@@ -117,9 +117,9 @@ define(["./has"], function(has) {
      *
      * If the specified object is a {@link Nully} value, the default value is returned.
      *
-     * @param {?Object} o - The object whose property is to be retrieved.
+     * @param {?object} o - The object whose property is to be retrieved.
      * @param {string} p - The name of the property.
-     * @param {any} [dv] - The default value. Defaults to `undefined`.
+     * @param {*} [dv] - The default value. Defaults to `undefined`.
      * @return {boolean} The value of the property if it exists in the object and is an own property,
      * otherwise returns `dv`.
      */
@@ -132,9 +132,9 @@ define(["./has"], function(has) {
      *
      * The created property cannot be overwritten, deleted, enumerated or configured.
      *
-     * @param {!Object} o - The object whose property is to be set.
+     * @param {object} o - The object whose property is to be set.
      * @param {string} p - The name of the property.
-     * @param {any} v - The value of the property.
+     * @param {*} v - The value of the property.
      */
     setConst: setConst,
 
@@ -147,7 +147,7 @@ define(["./has"], function(has) {
      * Each invocation of iteratee is called with two arguments: (propertyValue, propertyName).
      * If the iteratee function returns `false`, the iteration loop is broken out.
      *
-     * @param {!Object} o - The object containing the properties to be iterated.
+     * @param {object} o - The object containing the properties to be iterated.
      * @param {function} fun - The function that will be iterated.
      * @param {?object} [x] - The object which will provide the execution context of the iteratee function.
      * If nully, the iteratee will run with the context of the iterated object.
@@ -167,9 +167,9 @@ define(["./has"], function(has) {
     /**
      * Iterates over the own properties of a source object and assigns them to a target object.
      *
-     * @param {!Object} to - The target object.
-     * @param {?Object} from - The source object.
-     * @return {!Object} The target object.
+     * @param {object} to - The target object.
+     * @param {?object} from - The source object.
+     * @return {object} The target object.
      */
     assignOwn: function(to, from) {
       for(var p in from) {
@@ -184,9 +184,9 @@ define(["./has"], function(has) {
      * Iterates over the own properties of a source object,
      * checks if their values are defined, and if so, assigns them to a target object.
      *
-     * @param {!Object} to - The target object.
-     * @param {?Object} from - The source object.
-     * @return {!Object} The target object.
+     * @param {object} to - The target object.
+     * @param {?object} from - The source object.
+     * @return {object} The target object.
      * @method
      * @see pentaho.util.object.assignOwn
      */
@@ -199,8 +199,8 @@ define(["./has"], function(has) {
      * If `v` is an instance of a class, or a simple value (e.g. string, number),
      * no clone is created and the original object is returned instead.
      *
-     * @param {Object|Array|any} v - The source object.
-     * @return {any} A shallow copy of the object,
+     * @param {?object|Array|any} v - The source object.
+     * @return {*} A shallow copy of the object,
      * or the object itself if it is neither a plain object nor an array.
      */
     cloneShallow: function(v) {
@@ -220,11 +220,11 @@ define(["./has"], function(has) {
     /**
      * Retrieves an object that describes a property, traversing the inheritance chain if necessary.
      *
-     * @param {!Object} object - The object that contains the property.
+     * @param {object} object - The object that contains the property.
      * @param {string} property - The name of property.
-     * @param {Object} lcaExclude - A lowest-common-ancestor object whose inherited properties should
+     * @param {?object} lcaExclude - A lowest-common-ancestor object whose inherited properties should
      * not be returned.
-     * @return {?Object} The
+     * @return {?object} The
      * [property descriptor]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty}.
      * @method
      */
@@ -235,10 +235,10 @@ define(["./has"], function(has) {
      *
      * If one of the objects has a `null` prototype, then there is no common ancestor and `null` is returned.
      *
-     * @param {Object} o1 - The first object.
-     * @param {Object} o2 - The second object.
+     * @param {?object} o1 - The first object.
+     * @param {?object} o2 - The second object.
      *
-     * @return {Object} The lowest common ancestor object, if any; or `null`, if none.
+     * @return {?object} The lowest common ancestor object, if any; or `null`, if none.
      */
     lca: function(o1, o2) {
       if(!o1 || !o2) return null;
@@ -259,7 +259,7 @@ define(["./has"], function(has) {
      *
      * @param {function} Ctor - The constructor function of the class to be instantiated.
      * @param {?Array} [args] - The array of arguments, or arguments object, which will be passed to the constructor.
-     * @return {!Object} The constructed instance.
+     * @return {object} The constructed instance.
      */
     make: function(Ctor, args) {
       /* eslint default-case: 0 */
@@ -283,9 +283,9 @@ define(["./has"], function(has) {
      *
      * Delegates to the native implementation of `Object.setPrototypeOf`, if supported.
      *
-     * @param {!Object} object - The object which is to have its prototype set.
-     * @param {?Object} prototype - The object's new prototype.
-     * @return {!Object} The `object`.
+     * @param {object} object - The object which is to have its prototype set.
+     * @param {?object} prototype - The object's new prototype.
+     * @return {object} The `object`.
      */
     setPrototypeOf: setProtoOf,
 
@@ -295,7 +295,7 @@ define(["./has"], function(has) {
      *
      * In particular, the _prototype_ and _constructor_ properties of a given object are replaced, if necessary.
      *
-     * @param {!Object} inst - The object to be mutated.
+     * @param {object} inst - The object to be mutated.
      * @param {function} Class - The constructor of the class to be applied to the object.
      * @param {?Array} [args] - The array of arguments to be passed to the constructor of the class.
      * @return {object} The mutated object.
@@ -332,7 +332,7 @@ define(["./has"], function(has) {
     /**
      * Gets the key of a value suitable for identifying it amongst values of the same type.
      *
-     * @param {any} value - The value.
+     * @param {*} value - The value.
      * @return {string} The value's key.
      */
     getSameTypeKey: getSameTypeKey,
@@ -401,10 +401,10 @@ define(["./has"], function(has) {
    * Copies a single property from a source object to a target object, provided it is defined.
    * A property is defined if either its value, getter or setter are defined.
    *
-   * @param {!Object} to - The target object.
-   * @param {!Object} from - The source object.
+   * @param {object} to - The target object.
+   * @param {object} from - The source object.
    * @param {string} p - the name of the property.
-   * @return {!Object} The target object.
+   * @return {object} The target object.
    * @private
    */
   function copyOneDefined(to, from, p) {

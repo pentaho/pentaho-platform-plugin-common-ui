@@ -23,7 +23,7 @@ define([
   /**
    * Map of merge operation name to operation handler function.
    *
-   * @type {Object.<string, function>}
+   * @type {?object.<string, function>}
    * @see __mergeOne
    */
   var _mergeHandlers = {
@@ -54,10 +54,10 @@ define([
    * to prevent future merges from inadvertently changing the source's internal structures.
    *
    * @memberOf pentaho.util.Spec#
-   * @param {!Object} specTarget - The target specification.
-   * @param {Object} specSource - The source specification.
+   * @param {object} specTarget - The target specification.
+   * @param {?object} specSource - The source specification.
    *
-   * @return {!Object} The target specification.
+   * @return {object} The target specification.
    */
   function merge(specTarget, specSource) {
 
@@ -72,9 +72,9 @@ define([
    * Merges one property into a target object,
    * given the source property name and value.
    *
-   * @param {!Object} target - The target object.
+   * @param {object} target - The target object.
    * @param {string} name - The source property name.
-   * @param {any} sourceValue - The source property value.
+   * @param {*} sourceValue - The source property value.
    *
    * @private
    */
@@ -110,9 +110,9 @@ define([
    * Performs the merge operation when the target value is also a plain object,
    * or replaces it, if not.
    *
-   * @param {!Object} target - The target object.
+   * @param {object} target - The target object.
    * @param {string} name - The source property name.
-   * @param {!Object} sourceValue - The source property value.
+   * @param {object} sourceValue - The source property value.
    *
    * @private
    */
@@ -128,9 +128,9 @@ define([
   /**
    * Replaces the target value with a deep, own clone of the source value.
    *
-   * @param {!Object} target - The target object.
+   * @param {object} target - The target object.
    * @param {string} name - The source property name.
-   * @param {any} sourceValue - The source property value.
+   * @param {*} sourceValue - The source property value.
    *
    * @private
    */
@@ -145,9 +145,9 @@ define([
    * Otherwise, replaces the target array with a deep,
    * own clone of the source array.
    *
-   * @param {!Object} target - The target object.
+   * @param {object} target - The target object.
    * @param {string} name - The source property name.
-   * @param {any} sourceValue - The source property value.
+   * @param {*} sourceValue - The source property value.
    *
    * @private
    */
@@ -171,9 +171,9 @@ define([
    *
    * For plain object values, only their _own_ properties are included.
    *
-   * @param {any} value - The value to clone deeply.
+   * @param {*} value - The value to clone deeply.
    *
-   * @return {any} The deeply cloned value.
+   * @return {*} The deeply cloned value.
    *
    * @private
    */
@@ -197,7 +197,7 @@ define([
   /**
    * Checks if a value is a plain JavaScript object.
    *
-   * @param {any} value - The value to check.
+   * @param {*} value - The value to check.
    *
    * @return {boolean} `true` if it is; `false` if is not.
    *

@@ -48,7 +48,7 @@ define([
      * @param {?string} [text] Optional text further explaining the reason why the argument is required.
      * Can be useful when "being required" is a dynamic rule.
      *
-     * @return {!pentaho.lang.ArgumentRequiredError} The created `Error` object.
+     * @return {pentaho.lang.ArgumentRequiredError} The created `Error` object.
      */
     argRequired: function(name, text) {
       return new ArgumentRequiredError(name, text);
@@ -60,7 +60,7 @@ define([
      *
      * @param {string} name The name of the argument.
      * @param {string} reason Text that explains the reason why the argument is considered invalid.
-     * @return {!ArgumentInvalidError} The created error object.
+     * @return {ArgumentInvalidError} The created error object.
      */
     argInvalid: function(name, reason) {
       return new ArgumentInvalidError(name, reason);
@@ -77,7 +77,7 @@ define([
      * @param {string} name The name of the argument.
      * @param {string|string[]} expectedType The name or names of the expected types.
      * @param {string} [actualType] The name of the received type, when known.
-     * @return {!ArgumentInvalidTypeError} The created error object.
+     * @return {ArgumentInvalidTypeError} The created error object.
      */
     argInvalidType: function(name, expectedType, actualType) {
       return new ArgumentInvalidTypeError(name, expectedType, actualType);
@@ -92,7 +92,7 @@ define([
      * This makes flow control be clearly visible at the call site.
      *
      * @param {string} name The name of the argument.§1§
-     * @return {!pentaho.lang.ArgumentRangeError} The created error object.
+     * @return {pentaho.lang.ArgumentRangeError} The created error object.
      */
     argRange: function(name) {
       return new ArgumentRangeError(name);
@@ -105,7 +105,7 @@ define([
      * This makes flow control be clearly visible at the call site.
      *
      * @param {string} reason Text that explains the reason why performing the operation is considered invalid.
-     * @return {!pentaho.lang.OperationInvalidError} The created `Error` object.
+     * @return {pentaho.lang.OperationInvalidError} The created `Error` object.
      */
     operInvalid: function(reason) {
       return new OperationInvalidError(reason);
@@ -116,7 +116,7 @@ define([
      * and is being called.
      *
      * @param {?string} [text] Complementary text.
-     * @return {!pentaho.lang.NotImplementedError} The created `Error` object.
+     * @return {pentaho.lang.NotImplementedError} The created `Error` object.
      */
     notImplemented: function(text) {
       return new NotImplementedError(text);

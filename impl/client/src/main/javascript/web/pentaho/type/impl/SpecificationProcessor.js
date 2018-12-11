@@ -46,7 +46,7 @@ define([
      *
      * @param {object} typeSpec - The specification.
      *
-     * @return {!Promise} A promise that gets resolved when all dependencies have been loaded.
+     * @return {Promise} A promise that gets resolved when all dependencies have been loaded.
      */
     loadTypeDependenciesAsync: function(typeSpec) {
       return this.__loadDependenciesAsync(typeSpec, true);
@@ -57,7 +57,7 @@ define([
      *
      * @param {object} instSpec - The specification.
      *
-     * @return {!Promise} A promise that gets resolved when all dependencies have been loaded.
+     * @return {Promise} A promise that gets resolved when all dependencies have been loaded.
      */
     loadInstanceDependenciesAsync: function(instSpec) {
       return this.__loadDependenciesAsync(instSpec, false);
@@ -69,7 +69,7 @@ define([
      * @param {object} spec - The specification.
      * @param {boolean} isType - Indicates that the specification is a type specification.
      *
-     * @return {!Promise} A promise that gets resolved when all dependencies have been loaded.
+     * @return {Promise} A promise that gets resolved when all dependencies have been loaded.
      *
      * @private
      */
@@ -171,7 +171,7 @@ define([
     /**
      * Calls `depFun` for each dependency of a generic object specification of a type, `typeSpec`.
      *
-     * @param {!pentaho.type.spec.IType} typeSpec - A generic object type specification.
+     * @param {pentaho.type.spec.IType} typeSpec - A generic object type specification.
      *
      * @param {function(string)} depFun - A function that is called for each found module dependency.
      *

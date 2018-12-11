@@ -115,7 +115,7 @@
  *
  * @param {nonEmptyString|nonEmptyString[]} type - The type or types of events.
  * When a string, it can be a comma-separated list of event types.
- * @param {!pentaho.lang.IEventObserver|!pentaho.lang.EventListener|!pentaho.lang.EventListenerAsync} observer -
+ * @param {pentaho.lang.IEventObserver|!pentaho.lang.EventListener|!pentaho.lang.EventListenerAsync} observer -
  * The event observer (or listener function).
  * @param {?object} [keyArgs] - Keyword arguments.
  * @param {?number} [keyArgs.priority=0] - The listening priority.
@@ -124,7 +124,7 @@
  * In case two observers are assigned the same priority,
  * the registration order determines which is notified first.
  *
- * @return {!pentaho.lang.IEventRegistrationHandle} An event registration handle that can be used
+ * @return {pentaho.lang.IEventRegistrationHandle} An event registration handle that can be used
  *   for later removal.
  */
 

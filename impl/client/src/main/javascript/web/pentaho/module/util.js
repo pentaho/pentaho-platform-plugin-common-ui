@@ -116,7 +116,7 @@ define([
    *
    * @param {?string|undefined} forId - The identifier of the module for which the module map is desired.
    *
-   * @return {Object.<string, string>} A map of module identifier to module identifier.
+   * @return {?object.<string, string>} A map of module identifier to module identifier.
    */
   function getModuleIdMap(forId) {
 
@@ -159,7 +159,7 @@ define([
   /**
    * Maps a given module identifier using a module map.
    *
-   * @param {Object.<string, string>} moduleIdsMap - A map of module identifier to module identifier.
+   * @param {?object.<string, string>} moduleIdsMap - A map of module identifier to module identifier.
    * @param {string} moduleId - The module identifier to map.
    *
    * @return {string} The mapped module identifier.

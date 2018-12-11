@@ -29,7 +29,7 @@ define([
     /**
      * Initializes the mixin.
      *
-     * @param {!pentaho.type.changes.Changeset} changeset - An object that describes a set of changes.
+     * @param {pentaho.type.changes.Changeset} changeset - An object that describes a set of changes.
      * @protected
      */
     _initChangeset: function(changeset) {
@@ -40,7 +40,7 @@ define([
     /**
      * Gets the object that describes the set of changes.
      *
-     * @type {!pentaho.type.changes.Changeset}
+     * @type {pentaho.type.changes.Changeset}
      * @readonly
      */
     get changeset() {

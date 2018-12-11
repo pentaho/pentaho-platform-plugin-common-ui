@@ -39,13 +39,13 @@ define([
   var MSG_STATE_DONE = "The `done` method can only be called while in the 'do' state.";
   var MSG_STATE_REJECT = "The `reject` method can only be called while in the 'init', 'will' or 'do' states.";
 
-  /** @type pentaho.type.action.States */
+  /** @type ?pentaho.type.action.States */
   var executingUnsettledStates = States.init | States.will | States["do"];
 
-  /** @type pentaho.type.action.States */
+  /** @type ?pentaho.type.action.States */
   var rejectedStates = States.canceled | States.failed;
 
-  /** @type pentaho.type.action.States */
+  /** @type ?pentaho.type.action.States */
   var settledStates = States.did | rejectedStates;
 
   return Base.extend(module.id, /** @lends pentaho.type.action.Execution# */{
@@ -177,8 +177,8 @@ define([
      * @description Creates an action execution instance for a given action and target.
      *
      * @constructor
-     * @param {!pentaho.type.action.Base} action - The action to execute. A clone of it is used.
-     * @param {!pentaho.type.action.ITarget} target - The target on which to execute.
+     * @param {pentaho.type.action.Base} action - The action to execute. A clone of it is used.
+     * @param {pentaho.type.action.ITarget} target - The target on which to execute.
      */
     constructor: function(action, target) {
 
@@ -190,7 +190,7 @@ define([
       /**
        * The action of the action execution.
        *
-       * @type {!pentaho.type.action.Base}
+       * @type {pentaho.type.action.Base}
        * @private
        */
       this.__action = action.clone();
@@ -198,7 +198,7 @@ define([
       /**
        * The target of the action execution.
        *
-       * @type {!pentaho.type.action.ITarget}
+       * @type {pentaho.type.action.ITarget}
        * @private
        */
       this.__target = target;
@@ -215,7 +215,7 @@ define([
       /**
        * The result of a successful action execution.
        *
-       * @type {any}
+       * @type {*}
        * @private
        */
       this.__result = undefined;
@@ -245,7 +245,7 @@ define([
      * Once the action execution enters the `will` phase,
      * this object gets frozen and can no longer be modified.
      *
-     * @type {!pentaho.type.action.Base}
+     * @type {pentaho.type.action.Base}
      * @readonly
      */
     get action() {
@@ -257,7 +257,7 @@ define([
      *
      * This property returns the value of the `target` argument passed to the constructor.
      *
-     * @type {!pentaho.type.action.ITarget}
+     * @type {pentaho.type.action.ITarget}
      * @readonly
      */
     get target() {
@@ -309,7 +309,7 @@ define([
      * This property only returns a non-undefined value if
      * [isDone]{@link pentaho.type.action.Execution#isDone} is `true`.
      *
-     * @type {any}
+     * @type {*}
      * @readonly
      */
     get result() {
@@ -482,7 +482,7 @@ define([
      * fulfilled with the action execution's [result]{@link pentaho.type.action.Execution#result} or
      * rejected with the action execution's [error]{@link pentaho.type.action.Execution#error}.
      *
-     * @type {!Promise}
+     * @type {Promise}
      * @readOnly
      *
      * @rejects {Error|pentaho.type.ValidationError} The rejection reason.
@@ -540,7 +540,7 @@ define([
      * obtain the value of the [promise]{@link pentaho.type.action.Execution#promise} property
      * and wait for its resolution.
      *
-     * @return {!pentaho.type.action.Execution} The value of `this`.
+     * @return {pentaho.type.action.Execution} The value of `this`.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the action execution is not in the
      * [unstarted]{@link pentaho.type.action.States.unstarted} state.
@@ -581,7 +581,7 @@ define([
      * Called from an action observer to settle the action execution as being done,
      * optionally giving a result value.
      *
-     * @param {any} [result] - The result of the action execution, if any.
+     * @param {*} [result] - The result of the action execution, if any.
      * @return {pentaho.type.action.Execution} The value of `this`.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the action execution is not in the

@@ -90,7 +90,7 @@ define([
       /**
        * The mapping of output values to its first row index.
        *
-       * @type {Object.<string, number>}
+       * @type {?object.<string, number>}
        * @readOnly
        * @private
        */

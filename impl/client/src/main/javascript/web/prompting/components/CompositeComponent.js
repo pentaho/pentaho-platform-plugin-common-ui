@@ -21,8 +21,8 @@
  * @name CompositeComponent
  * @class
  *
- * @property {Array|BaseComponent} components The array of components
- * @property {Boolean} executeAtStart True if this component should be executed on the first update of the Dashboard
+ * @property {?(Array|BaseComponent)} components The array of components
+ * @property {boolean} executeAtStart True if this component should be executed on the first update of the Dashboard
  * object were it is, False otherwise
  */
 define([ 'common-ui/jquery-clean', 'cdf/components/BaseComponent', 'cdf/dashboard/Utils' ], 

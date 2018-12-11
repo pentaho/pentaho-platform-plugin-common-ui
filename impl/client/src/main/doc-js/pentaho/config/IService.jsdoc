@@ -99,8 +99,8 @@
  * @name selectAsync
  * @memberOf pentaho.config.IService#
  * @param {string} moduleId - The identifier of the module.
- * @param {Object} [keyArgs] - The keyword arguments.
+ * @param {?object} [keyArgs] - The keyword arguments.
  * @param {boolean} [keyArgs.excludeGlobal=false] - Indicates that the global AMD/RequireJS configuration should
  * not be included.
- * @return {!Promise.<Object>} A promise for the configuration, if any, or a promise for `null`, otherwise.
+ * @return {Promise.<Object>} A promise for the configuration, if any, or a promise for `null`, otherwise.
  */

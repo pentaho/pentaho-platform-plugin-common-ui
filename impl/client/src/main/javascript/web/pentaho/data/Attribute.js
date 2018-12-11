@@ -32,10 +32,10 @@ define([
      * @class
      * @ignore
      *
-     * @implements pentaho.lang.ISpecifiable
-     * @implements pentaho.lang.IAnnotatable
-     * @implements pentaho.lang.IListElement
-     * @implements pentaho.lang.IWithKey
+     * @implements ?pentaho.lang.ISpecifiable
+     * @implements ?pentaho.lang.IAnnotatable
+     * @implements ?pentaho.lang.IListElement
+     * @implements ?pentaho.lang.IWithKey
      *
      * @classDesc The `Attribute` class represents an attribute that can be
      * attributed to entities of a model.
@@ -61,7 +61,7 @@ define([
      * @description Creates an attribute.
      *
      * @param {pentaho.data.spec.IAttribute} spec The specification of the attribute.
-     * @param {!Object} keyArgs The keyword arguments.
+     * @param {object} keyArgs The keyword arguments.
      * @param {number} keyArgs.ordinal The ordinal of the attribute in its model's attribute collection.
      */
     constructor: function(spec, keyArgs) {
@@ -165,7 +165,7 @@ define([
          * It conveys a partial ordering of the contained attribute members.
          * See also {@link pentaho.data.Member#ordinal}.
          *
-         * @type pentaho.data.MemberCollection
+         * @type ?pentaho.data.MemberCollection
          * @readonly
          * @see pentaho.data.Attribute#isContinuous
          */
@@ -269,8 +269,8 @@ define([
      *
      * If the given value is not supported, `null` is returned.
      *
-     * @param {any} v - The value to cast.
-     * @return {any} The converted value or `null`, when invalid.
+     * @param {*} v - The value to cast.
+     * @return {*} The converted value or `null`, when invalid.
      */
     cast: function(v) {
       return this._cast(v);
@@ -281,7 +281,7 @@ define([
      *
      * @param {!(pentaho.data.spec.IMember|pentaho.data.Atomic)} memberSpec A member specification
      *     or, directly, a member's atomic value.
-     * @param {!Object} keyArgs The keyword arguments.
+     * @param {object} keyArgs The keyword arguments.
      * @param {number} keyArgs.ordinal The ordinal of the member in the attribute's member collection.
      * @return {pentaho.data.Member} A member of this attribute.
      */
@@ -318,7 +318,7 @@ define([
      * method {@link pentaho.data.StructurePosition.to} should
      * be used instead.
      *
-     * @param {!Object} keyArgs The keyword arguments.
+     * @param {object} keyArgs The keyword arguments.
      * @param {number} keyArgs.ordinal The ordinal of the structure position.
      *
      * @return {pentaho.data.StructurePosition} A structure position of this attribute.

@@ -62,7 +62,7 @@ define([
    *
    * @name main
    * @memberOf pentaho.theme
-   * @type {!IAmdLoaderPlugin}
+   * @type {IAmdLoaderPlugin}
    * @amd pentaho/theme
    *
    * @see pentaho.theme.spec.IConfiguration

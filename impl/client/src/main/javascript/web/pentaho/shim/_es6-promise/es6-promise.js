@@ -854,10 +854,10 @@
       ```
 
       @method then
-      @param {Function} onFulfilled
-      @param {Function} onRejected
+      @param {?function} onFulfilled
+      @param {?function} onRejected
       Useful for tooling.
-      @return {Promise}
+      @return {?promise}
     */
       then: function(onFulfillment, onRejection) {
         var parent = this;
@@ -905,9 +905,9 @@
       ```
 
       @method catch
-      @param {Function} onRejection
+      @param {?function} onRejection
       Useful for tooling.
-      @return {Promise}
+      @return {?promise}
     */
       'catch': function(onRejection) {
         return this.then(null, onRejection);

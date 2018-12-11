@@ -258,7 +258,7 @@ define([
      * with the same keyword arguments,
      * and is returned.
      *
-     * @param {Object} [keyArgs] Keyword arguments.
+     * @param {?object} [keyArgs] Keyword arguments.
      * @param {boolean} [keyArgs.skipRowsWithAllNullMeasures=false] Indicates that rows whose
      *    cross-tab measure cells are all null can be skipped from the output.
      *
@@ -305,7 +305,7 @@ define([
      * 2. one column per "crossed-column" attribute
      * 3. one column per "crossed-measure" attribute
      *
-     * @param {Object} [keyArgs] Keyword arguments.
+     * @param {?object} [keyArgs] Keyword arguments.
      * @param {boolean} [keyArgs.shareModel=false] Indicates that
      *    the model of the resulting specification will be
      *    the model object itself and not its specification.
@@ -323,7 +323,7 @@ define([
     /**
      * Creates a specification of the table.
      *
-     * @param {Object} [keyArgs] Keyword arguments.
+     * @param {?object} [keyArgs] Keyword arguments.
      * @param {boolean} [keyArgs.shareModel=false] Indicates that
      *    the model of the resulting specification will be
      *    the model object itself and not its specification.
@@ -377,8 +377,8 @@ define([
      *     expect(Table.convertJsonCdaToTableSpec(cdaTableSpec)).toEqual(tableSpec);
      *   });
      *
-     * @param {Object} cdaTable A table object in _CDA_ format.
-     * @return {Object} A table object in _data table_ format.
+     * @param {?object} cdaTable A table object in _CDA_ format.
+     * @return {?object} A table object in _data table_ format.
      * @see pentaho.data.AbstractTable#toJsonCda
      */
     convertJsonCdaToTableSpec: function(cdaTable) {

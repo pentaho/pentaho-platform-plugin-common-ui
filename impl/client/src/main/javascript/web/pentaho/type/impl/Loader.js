@@ -170,7 +170,7 @@ define([
    * @param {string} id - The identifier of the module.
    * @memberOf pentaho.type.impl.Loader~
    *
-   * @return {!Class.<pentaho.type.Instance>} An instance constructor.
+   * @return {Class.<pentaho.type.Instance>} An instance constructor.
    *
    * @private
    */
@@ -197,7 +197,7 @@ define([
    * @param {pentaho.type.spec.TypeReference} defaultBase - A reference to the default base type.
    * @param {boolean} [sync=false] Whether to perform a synchronous get.
    *
-   * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
+   * @return {Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
    *   returns the instance constructor; while, when async, returns a promise for it.
    *
    * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is of an unsupported JavaScript type:
@@ -261,7 +261,7 @@ define([
    *
    * @param {boolean} [sync=false] Whether to perform a synchronous get.
    *
-   * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
+   * @return {Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
    *   returns the instance constructor; while, when async, returns a promise for it.
    *
    * @private
@@ -303,9 +303,9 @@ define([
    *
    * @param {string} id - The module identifier from which the instance constructor was loaded.
    * @param {boolean} sync Whether to perform a synchronous get.
-   * @param {any} InstCtor - The module 's value.
+   * @param {*} InstCtor - The module 's value.
    *
-   * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
+   * @return {Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
    *   returns the instance constructor; while, when async, returns a promise for it.
    *
    * @throws {pentaho.lang.ArgumentInvalidError} When `InstCtor` is not an `Instance` constructor.
@@ -333,7 +333,7 @@ define([
    * @param {function} fun - A function.
    * @param {boolean} [sync=false] Whether to perform a synchronous get.
    *
-   * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
+   * @return {Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
    *   returns the instance constructor; while, when async, returns a promise for it.
    *
    * @throws {pentaho.lang.ArgumentInvalidError} When `fun` is not an `Instance` constructor.
@@ -379,7 +379,7 @@ define([
    * @param {Array} typeSpec - The list specification.
    * @param {boolean} [sync=false] Whether to perform a synchronous resolve.
    *
-   * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
+   * @return {Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
    *   returns the instance constructor; while, when async, returns a promise for it.
    *
    * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, an array-shorthand,
@@ -410,7 +410,7 @@ define([
    *
    * @param {boolean} [sync=false] Whether to perform a synchronous resolve.
    *
-   * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
+   * @return {Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
    *   returns the instance constructor; while, when async, returns a promise for it.
    *
    * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is an instance of `pentaho.type.Instance`.
@@ -431,7 +431,7 @@ define([
    * @param {pentaho.type.spec.TypeReference} typeRef - A type reference.
    * @param {boolean} [sync=false] Whether to perform a synchronous resolve.
    *
-   * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
+   * @return {Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
    *   returns the instance constructor; while, when async, returns a promise for it.
    *
    * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is an instance of `pentaho.type.Instance`.
@@ -478,11 +478,11 @@ define([
    *
    * @memberOf pentaho.type.impl.Loader~
    *
-   * @param {!pentaho.type.spec.IType} typeSpec - A type specification.
+   * @param {pentaho.type.spec.IType} typeSpec - A type specification.
    * @param {pentaho.type.spec.TypeReference} defaultBase - The default base type.
    * @param {boolean} [sync=false] Whether to perform a synchronous resolve.
    *
-   * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
+   * @return {Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
    *   returns the instance constructor; while, when async, returns a promise for it.
    *
    * @throws {pentaho.lang.ArgumentInvalidError} When `typeSpec` has a permanent identifier.
@@ -542,10 +542,10 @@ define([
    * @memberOf pentaho.type.impl.Loader~
    *
    * @param {?string} temporaryId - The temporary identifier of the type, if any.
-   * @param {!pentaho.type.spec.IType} typeSpec - A type specification.
+   * @param {pentaho.type.spec.IType} typeSpec - A type specification.
    * @param {pentaho.type.spec.TypeReference} [defaultBase] - The default base type.
    *
-   * @return {!pentaho.type.Instance} The type's instance constructor.
+   * @return {pentaho.type.Instance} The type's instance constructor.
    *
    * @private
    */

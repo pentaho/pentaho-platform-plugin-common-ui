@@ -104,7 +104,7 @@ define([
      *
      * The returned array cannot be modified directly.
      *
-     * @type {!Array.<!pentaho.visual.scene.Base>}
+     * @type {Array.<!pentaho.visual.scene.Base>}
      * @readOnly
      */
     children: Object.freeze([]),
@@ -112,7 +112,7 @@ define([
     /**
      * Gets the root scene of the tree that this scene belongs to.
      *
-     * @type {!pentaho.visual.scene.Base}
+     * @type {pentaho.visual.scene.Base}
      * @readOnly
      */
     get root() {
@@ -122,7 +122,7 @@ define([
     /**
      * Gets the associated visualization view.
      *
-     * @type {!pentaho.visual.base.View}
+     * @type {pentaho.visual.base.View}
      * @readOnly
      */
     get view() {
@@ -132,7 +132,7 @@ define([
     /**
      * Appends a given child scene in the local children array, creating one if this is the first child.
      *
-     * @param {!pentaho.visual.scene.Base} child - The child scene.
+     * @param {pentaho.visual.scene.Base} child - The child scene.
      * @return {number} The index at which the given child scene was inserted.
      * @private
      */
@@ -171,12 +171,12 @@ define([
      * When *communicating with external parties*, field values must be used and visual variable values are not
      * generally meaningful. Use this method to obtain the distinguishing field values represented by this scene.
      *
-     * @param {Object} [keyArgs] The keyword arguments object.
+     * @param {?object} [keyArgs] The keyword arguments object.
      * @param {boolean} [keyArgs.includeMeasureFields=false] Indicates that measure fields should also
      * be included.
      * In practice, indicates that all fields should be included.
      *
-     * @return {!Object.<string, pentaho.data.ICell>} A data cells map, possibly empty.
+     * @return {object.<string, pentaho.data.ICell>} A data cells map, possibly empty.
      *
      * @see pentaho.visual.scene.util.invertVars
      */
@@ -192,9 +192,9 @@ define([
      * In child scenes, for each visual role there will be a correspondingly named variable having the value
      * of the visual role.
      *
-     * @param {!pentaho.visual.base.View} view - The visualization view. Must be valid.
+     * @param {pentaho.visual.base.View} view - The visualization view. Must be valid.
      *
-     * @return {!pentaho.visual.scene.Base} The parent scene.
+     * @return {pentaho.visual.scene.Base} The parent scene.
      */
     buildScenesFlat: function(view) {
 

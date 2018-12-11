@@ -56,7 +56,7 @@ define([
      * @constructor
      *
      * @param {?object} value - The value of a successful _action_.
-     * @param {!string|Error|pentaho.lang.UserError} error - The error that contains the reason why
+     * @param {string|Error|pentaho.lang.UserError} error - The error that contains the reason why
      * the _action_ was rejected.
      */
     constructor: function(value, error) {
@@ -97,7 +97,7 @@ define([
     /**
      * Gets a value indicating if the `ActionResult` represents an _action_ that has been canceled.
      *
-     * @type {!boolean}
+     * @type {boolean}
      * @readonly
      */
     get isCanceled() {
@@ -108,7 +108,7 @@ define([
     /**
      * Gets a value indicating if the `ActionResult` represents an _action_ that has failed.
      *
-     * @type {!boolean}
+     * @type {boolean}
      * @readonly
      */
     get isFailed() {
@@ -119,7 +119,7 @@ define([
     /**
      * Gets a value indicating if the `ActionResult` represents a successful _action_.
      *
-     * @type {!boolean}
+     * @type {boolean}
      * @readonly
      */
     get isFulfilled() {
@@ -129,7 +129,7 @@ define([
     /**
      * Gets a value indicating if the `ActionResult` represents an _action_ that failed or that was canceled.
      *
-     * @type {!boolean}
+     * @type {boolean}
      * @readonly
      */
     get isRejected() {
@@ -140,8 +140,8 @@ define([
     /**
      * Creates an action result that represents a successful action.
      *
-     * @param {Object} [value] - The value of the successful action.
-     * @return {!pentaho.lang.ActionResult} A new  action result.
+     * @param {?object} [value] - The value of the successful action.
+     * @return {pentaho.lang.ActionResult} A new  action result.
      */
     fulfill: function(value) {
       return new ActionResult(value);
@@ -152,7 +152,7 @@ define([
      *
      * @param {string|Error|pentaho.lang.UserError} [error] - The error that contains the reason why
      * the action was rejected.
-     * @return {!pentaho.lang.ActionResult} A new action result.
+     * @return {pentaho.lang.ActionResult} A new action result.
      */
     reject: function(error) {
       return new ActionResult(undefined, error || new Error("failed"));

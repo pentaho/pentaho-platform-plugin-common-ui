@@ -24,8 +24,8 @@ define([
      * @alias Model
      * @memberOf pentaho.data
      * @class
-     * @implements pentaho.lang.IAnnotatable
-     * @implements pentaho.lang.ISpecifiable
+     * @implements ?pentaho.lang.IAnnotatable
+     * @implements ?pentaho.lang.ISpecifiable
      * @amd pentaho/data/Model
      * @ignore
      * @classdesc The `Model` class contains metadata about a certain type of entities.
@@ -85,7 +85,7 @@ define([
      *
      * The returned array will be empty when there are no key attributes.
      *
-     * @type {!Array.<pentaho.data.Attribute>}
+     * @type {Array.<pentaho.data.Attribute>}
      * @readOnly
      * @see pentaho.data.Model#attributes
      * @see pentaho.data.Attribute#isKey

@@ -20,9 +20,9 @@
  *
  * @name ParameterGroup
  * @class
- * @property {String} name The name of the group
- * @property {String} label The label of the group
- * @property {Array|Parameter} parameters The array of parameters within this group
+ * @property {string} name The name of the group
+ * @property {string} label The label of the group
+ * @property {?(Array|Parameter)} parameters The array of parameters within this group
  */
 define([], function(){
   return function(){

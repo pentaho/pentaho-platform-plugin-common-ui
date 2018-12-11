@@ -95,7 +95,7 @@ define([
      *
      * Use this method to assert if no bits other than those described by the mask are currently set.
      *
-     * @param {!number} mask - An integer containing the bit mask to test.
+     * @param {number} mask - An integer containing the bit mask to test.
      *
      * @return {boolean} `true` if the bits currently set are within the specified mask; `false` otherwise.
      */

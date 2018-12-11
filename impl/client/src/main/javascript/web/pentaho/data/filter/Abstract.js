@@ -188,7 +188,7 @@ define([
      * This method applies the predicate function returned by {@link pentaho.data.filter.Abstract#compile}
      * to the given element.
      *
-     * @param {!pentaho.type.Element} elem - The candidate dataset element.
+     * @param {pentaho.type.Element} elem - The candidate dataset element.
      *
      * @return {boolean} `true` if this filter contains `element`, or `false` otherwise.
      *
@@ -259,9 +259,9 @@ define([
      * Otherwise, the result of calling [_visitDefault]{@link pentaho.data.filter.Abstract#_visitDefault}
      * is returned.
      *
-     * @param {!pentaho.data.filter.FTransformer} transformer - The transformer function.
+     * @param {pentaho.data.filter.FTransformer} transformer - The transformer function.
      *
-     * @return {!pentaho.data.filter.Abstract} The transformed filter.
+     * @return {pentaho.data.filter.Abstract} The transformed filter.
      */
     visit: function(transformer) {
       if(!transformer) throw error.argRequired("transformer");
@@ -276,9 +276,9 @@ define([
      * Override to implement a custom default transformation logic,
      * as when transforming operands.
      *
-     * @param {!pentaho.data.filter.FTransformer} transformer - The transformer function.
+     * @param {pentaho.data.filter.FTransformer} transformer - The transformer function.
      *
-     * @return {!pentaho.data.filter.Abstract} The transformed filter.
+     * @return {pentaho.data.filter.Abstract} The transformed filter.
      *
      * @see pentaho.data.filter.Tree#_visitDefault
      *
@@ -291,7 +291,7 @@ define([
     /**
      * Creates a filter that is the negation of this filter.
      *
-     * @return {!pentaho.data.filter.Abstract} A negated filter.
+     * @return {pentaho.data.filter.Abstract} A negated filter.
      */
     negate: function() {
       return new __filter.Not({operand: this});
@@ -302,7 +302,7 @@ define([
      *
      * @param {...pentaho.data.filter.Abstract[]} filters - The filters to be joined with this one.
      *
-     * @return {!pentaho.data.filter.Abstract} The resulting filter.
+     * @return {pentaho.data.filter.Abstract} The resulting filter.
      */
     or: function() {
       if(!arguments.length) return this;
@@ -319,7 +319,7 @@ define([
      *
      * @param {...pentaho.data.filter.Abstract[]} filters - The filters to be intersected with this one.
      *
-     * @return {!pentaho.data.filter.Abstract} The resulting filter.
+     * @return {pentaho.data.filter.Abstract} The resulting filter.
      */
     and: function() {
       if(!arguments.length) return this;
@@ -348,7 +348,7 @@ define([
      *
      * @param {pentaho.data.filter.Abstract} exclude - The filter to be "subtracted" from this one.
      *
-     * @return {!pentaho.data.filter.Abstract} The resulting filter (not necessarily in DNF form).
+     * @return {pentaho.data.filter.Abstract} The resulting filter (not necessarily in DNF form).
      *
      * @see pentaho.data.filter.Abstract#toDnf
      */
@@ -463,7 +463,7 @@ define([
      *
      * The result of this operation is cached.
      *
-     * @return {!pentaho.data.filter.True|!pentaho.data.filter.False|!pentaho.data.filter.Or} The resulting
+     * @return {pentaho.data.filter.True|!pentaho.data.filter.False|!pentaho.data.filter.Or} The resulting
      * DNF filter.
      *
      * @see https://en.wikipedia.org/wiki/Disjunctive_normal_form
@@ -490,11 +490,11 @@ define([
      * If the resulting filtered data of a filter is empty then the [false filter]{@link pentaho.data.filter.False}
      * is returned
      *
-     * @param {!pentaho.data.ITable} dataPlain - The plain data table to be used when determining the values of
+     * @param {pentaho.data.ITable} dataPlain - The plain data table to be used when determining the values of
      * the key columns used in the extensional representation of the filter.
      * @param {string[]} keyColumnNames - The names of the columns from the `dataPlain` that are considered key.
      *
-     * @return {!pentaho.data.filter.Or|!pentaho.data.filter.False} The extensional filter.
+     * @return {pentaho.data.filter.Or|!pentaho.data.filter.False} The extensional filter.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When the resulting filtered data is not empty and `keyColumnNames`
      * is empty.
@@ -537,10 +537,10 @@ define([
       /**
        * Gets an object where the keys are the column names and the values the respective column index.
        *
-       * @param {!pentaho.data.ITable} dataTable - The data table.
+       * @param {pentaho.data.ITable} dataTable - The data table.
        * @param {string[]} keyColumnNames - The column names.
        *
-       * @return {!Object.<string, number>} The map.
+       * @return {object.<string, number>} The map.
        */
       function getColumnIdToIndexMap(dataTable, keyColumnNames) {
 

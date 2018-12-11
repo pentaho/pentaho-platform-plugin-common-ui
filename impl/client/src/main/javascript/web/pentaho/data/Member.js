@@ -29,10 +29,10 @@ define([
      * @class
      * @abstract
      * @ignore
-     * @implements pentaho.lang.ISpecifiable
-     * @implements pentaho.lang.IAnnotatable
-     * @implements pentaho.lang.IListElement
-     * @implements pentaho.lang.IWithKey
+     * @implements ?pentaho.lang.ISpecifiable
+     * @implements ?pentaho.lang.IAnnotatable
+     * @implements ?pentaho.lang.IListElement
+     * @implements ?pentaho.lang.IWithKey
      *
      * @classdesc The `Member` class is an abstract base class that
      * represents a value that a discrete attribute can hold.
@@ -69,7 +69,7 @@ define([
      * {@link pentaho.data.Attribute#toMemberOf} method.
      *
      * @param {pentaho.data.spec.IMember} spec A member specification.
-     * @param {!Object} keyArgs The keyword arguments.
+     * @param {object} keyArgs The keyword arguments.
      * @param {number} keyArgs.ordinal The ordinal of the member in the attribute's member collection.
      */
     constructor: function(spec, keyArgs) {
@@ -193,7 +193,7 @@ define([
     /**
      * Creates a specification of the member.
      *
-     * @return {!pentaho.data.spec.IMember} A new specification of the member.
+     * @return {pentaho.data.spec.IMember} A new specification of the member.
      */
     toSpec: function() {
       var memberSpec = {v: this.v};

@@ -20,10 +20,10 @@
  *
  * @name ParameterValue
  * @class
- * @property {String} type The java type of the Parameter Value
- * @property {String} label The label of the Parameter Value
- * @property {Boolean} selected True if the Parameter Value is selected, False otherwise
- * @property {Object} value The value of the Parameter Value
+ * @property {string} type The java type of the Parameter Value
+ * @property {string} label The label of the Parameter Value
+ * @property {boolean} selected True if the Parameter Value is selected, False otherwise
+ * @property {?object} value The value of the Parameter Value
  */
 define([], function () {
   return function () {

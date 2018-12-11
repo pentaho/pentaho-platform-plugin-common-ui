@@ -59,8 +59,8 @@ define([
    * Gets the index of the first indexed row having the given keys.
    *
    * @memberOf pentaho.visual.role.adaptation.TupleStrategy~IndexNode
-   * @param {!Array.<any>} values - The values from which corresponding keys are obtained.
-   * @param {!Array.<(function(any):string)>} keyFuns - The array of key functions which obtain the
+   * @param {Array.<any>} values - The values from which corresponding keys are obtained.
+   * @param {Array.<(function(any):string)>} keyFuns - The array of key functions which obtain the
    * key of each value.
    *
    * @return {number} The index, if a fact with the given keys was found, or `-1`, if one is not found.
@@ -93,13 +93,13 @@ define([
    * Indexes a row, given the data set, row index and array of functions which obtain the key of each value.
    *
    * @memberOf pentaho.visual.role.adaptation.TupleStrategy~IndexNode
-   * @param {!pentaho.data.ITable} inputData - The data set whose row is to be indexed.
+   * @param {pentaho.data.ITable} inputData - The data set whose row is to be indexed.
    * @param {number} rowIndex - The row to index.
-   * @param {!Array.<number>} columnIndexes - The column indexes to index.
-   * @param {!Array.<(function(any):string)>} keyFuns - The array of key functions which obtain the
+   * @param {Array.<number>} columnIndexes - The column indexes to index.
+   * @param {Array.<(function(any):string)>} keyFuns - The array of key functions which obtain the
    * key of each value.
    *
-   * @return {!Array.<any>} The values of the indexed row.
+   * @return {Array.<any>} The values of the indexed row.
    */
   IndexNode.prototype.add = function(inputData, rowIndex, columnIndexes, keyFuns) {
     var level = -1;
@@ -171,7 +171,7 @@ define([
       /**
        * Gets the array of function which extract the key of the value of each column of `inputData`.
        *
-       * @type {!Array.<(function(any):string)>}
+       * @type {Array.<(function(any):string)>}
        * @readOnly
        * @private
        */
@@ -217,7 +217,7 @@ define([
     /**
      * Gets the tree index.
      *
-     * @return {!pentaho.visual.role.adaptation.TupleStrategy~IndexNode} The tree index.
+     * @return {pentaho.visual.role.adaptation.TupleStrategy~IndexNode} The tree index.
      * @private
      */
     __getIndex: function() {

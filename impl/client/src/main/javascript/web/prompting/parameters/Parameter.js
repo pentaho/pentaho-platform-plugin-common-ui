@@ -20,14 +20,14 @@
  *
  * @name Parameter
  * @class
- * @property {String} name The name of the parameter
- * @property {String} type The java class name describing the type of the parameter
- * @property {Boolean} list {true} if the parameter is a list, {false} otherwise
- * @property {Boolean} mandatory {true} if the parameter is mandatory, {false} otherwise
- * @property {Boolean} multiSelect {true} if the parameter is a multi select, {false} otherwise
- * @property {Boolean} strict {true} if the parameter is strict, {false} otherwise
- * @property {String} timezoneHint The timezone of the parameter
- * @property {Object|String} attributes Hash of string for the remaining parameter attributes
+ * @property {string} name The name of the parameter
+ * @property {string} type The java class name describing the type of the parameter
+ * @property {boolean} list {true} if the parameter is a list, {false} otherwise
+ * @property {boolean} mandatory {true} if the parameter is mandatory, {false} otherwise
+ * @property {boolean} multiSelect {true} if the parameter is a multi select, {false} otherwise
+ * @property {boolean} strict {true} if the parameter is strict, {false} otherwise
+ * @property {string} timezoneHint The timezone of the parameter
+ * @property {?object|String} attributes Hash of string for the remaining parameter attributes
  * @property {Array|ParameterValue} values The array of possible values of the parameter
  */
 define(['common-ui/jquery-clean'], function ($) {

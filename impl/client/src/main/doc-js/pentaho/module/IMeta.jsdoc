@@ -72,7 +72,7 @@
  * @name loadAsync
  * @memberOf pentaho.module.IMeta#
  * @method
- * @return {!Promise} A promise for the value of the module.
+ * @return {Promise} A promise for the value of the module.
  *
  * @see pentaho.module.IMeta#value
  */
@@ -83,7 +83,7 @@
  *
  * @name value
  * @memberOf pentaho.module.IMeta#
- * @type {any}
+ * @type {*}
  * @readOnly
  *
  * @see pentaho.module.IMeta#isLoaded
@@ -108,7 +108,7 @@
  * @name loadConfigAsync
  * @memberOf pentaho.module.IMeta#
  * @method
- * @return {!Promise.<Object>} A promise for the configuration of the module.
+ * @return {Promise.<Object>} A promise for the configuration of the module.
  *
  * @see pentaho.module.IMeta#config
  */
@@ -121,7 +121,7 @@
  *
  * @name config
  * @memberOf pentaho.module.IMeta#
- * @type {Object}
+ * @type {?object}
  * @readOnly
  *
  * @see pentaho.module.IMeta#isConfigLoaded

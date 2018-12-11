@@ -68,7 +68,7 @@ define([
    * @constructor
    * @param {pentaho.type.spec.List|pentaho.type.List|Array.<pentaho.type.Element>} [instSpec] The
    * list specification or a compatible list instance or element's array.
-   * @param {Object} [keyArgs] - The keyword arguments.
+   * @param {?object} [keyArgs] - The keyword arguments.
    * @param {boolean} [keyArgs.isBoundary=false] - Indicates if the list should be a _boundary list_.
    * @param {boolean} [keyArgs.isReadOnly=false] - Indicates if the list should be a _read-only list_.
    *
@@ -186,9 +186,9 @@ define([
     /**
      * Clones the data structures that store elements.
      *
-     * @param {!Object} clone - The list clone.
+     * @param {object} clone - The list clone.
      * @param {boolean} [useCommitted=false] Indicates that the committed version is desired.
-     * @return {!Object} The specified clone object.
+     * @return {object} The specified clone object.
      *
      * @private
      * @internal
@@ -209,7 +209,7 @@ define([
      * Otherwise, a projected mock containing only
      * the elements' data structures is created and returned.
      *
-     * @type {!Object|!pentaho.type.List}
+     * @type {object|!pentaho.type.List}
      * @readOnly
      * @private
      * @internal
@@ -309,9 +309,9 @@ define([
      * The element or elements specified in argument `fragment`
      * are converted to the list's element class.
      *
-     * @param {any|Array} fragment - The element or elements to set.
+     * @param {*|Array} fragment - The element or elements to set.
      *
-     * @param {Object} [keyArgs] The keyword arguments.
+     * @param {?object} [keyArgs] The keyword arguments.
      *
      * @param {boolean} [keyArgs.noAdd=false] Prevents adding new elements to the list.
      * @param {boolean} [keyArgs.noRemove=false] Prevents removing elements not present in `fragment` from the list.
@@ -341,7 +341,7 @@ define([
      * The element or elements specified in argument `fragment`
      * are converted to the list's element class.
      *
-     * @param {any|Array} fragment - Value or values to add.
+     * @param {*|Array} fragment - Value or values to add.
      *
      * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
      */
@@ -358,7 +358,7 @@ define([
      * When the index is greater than or equal to the length of the list,
      * the element or elements are appended to the list.
      *
-     * @param {any|Array} fragment - Element or elements to add.
+     * @param {*|Array} fragment - Element or elements to add.
      * @param {?number} index - The index at which to start inserting new elements.
      *
      * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
@@ -373,7 +373,7 @@ define([
      *
      * Specified elements that are not present in the list are ignored.
      *
-     * @param {any|Array} fragment - Element or elements to remove.
+     * @param {*|Array} fragment - Element or elements to remove.
      *
      * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
      */
@@ -387,7 +387,7 @@ define([
     /**
      * Moves an element to a new position.
      *
-     * @param {any} elemSpec - An element specification.
+     * @param {*} elemSpec - An element specification.
      * @param {number} indexNew - The new index of the element.
      *
      * @throws {TypeError} When a change would occur and the list is [read-only]{@link pentaho.type.List#$isReadOnly}.
@@ -451,7 +451,7 @@ define([
      * Creates an array with the elements of the list or values derived from each element.
      *
      * @param {function(pentaho.type.Element):any} [map] A function that converts each element into something else.
-     * @param {Object} [ctx] The JS context object on which to call `map`.
+     * @param {?object} [ctx] The JS context object on which to call `map`.
      *
      * @return {Array.<any>} An array of elements.
      */
@@ -466,7 +466,7 @@ define([
      * @param {function(pentaho.type.Element, number, pentaho.type.List) : boolean?} fun - The mapping function.
      * Return `false` to break iteration.
      *
-     * @param {Object} [ctx] The JS context object on which `fun` is called.
+     * @param {?object} [ctx] The JS context object on which `fun` is called.
      */
     each: function(fun, ctx) {
       var elems = this.__projectedMock.__elems;
@@ -481,7 +481,7 @@ define([
     /**
      * Casts a value for use as a lookup key and returns it.
      *
-     * @param {any} value - The value from which the key is built.
+     * @param {*} value - The value from which the key is built.
      *
      * @return {nonEmptyString} The key.
      *
@@ -494,7 +494,7 @@ define([
     /**
      * Casts a value specification to the element type of the list.
      *
-     * @param {any} valueSpec - The value.
+     * @param {*} valueSpec - The value.
      *
      * @return {pentaho.type.Element} An element.
      *
@@ -542,7 +542,7 @@ define([
      * a list of element specifications is obtained and
      * passed to the [set]{@link pentaho.type.List#set} method.
      *
-     * @param {!pentaho.type.spec.List|!pentaho.type.List|!Array.<!pentaho.type.Element>} config - The list
+     * @param {pentaho.type.spec.List|!pentaho.type.List|!Array.<!pentaho.type.Element>} config - The list
      * specification or a compatible list instance or element's array.
      *
      * @throws {pentaho.lang.ArgumentInvalidTypeError} When the type of `config` is not
@@ -795,9 +795,9 @@ define([
       /**
        * Normalizes a given non-{@link Nully} value specification.
        *
-       * @param {!any} instSpec - The value specification.
+       * @param {!*} instSpec - The value specification.
        *
-       * @return {!any} The normalized value specification.
+       * @return {!*} The normalized value specification.
        *
        * @throws {pentaho.lang.ArgumentInvalidTypeError} When the type of `instSpec` is not
        * {@link Object}, {@link Array} or {@link pentaho.type.List}.

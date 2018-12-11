@@ -20,5 +20,5 @@
  * @name pentaho.lang.spec.IAnnotatable
  * @interface
  *
- * @property {Object} p The annotations dictionary, from annotation name to annotation value.
+ * @property {?object} p The annotations dictionary, from annotation name to annotation value.
  */

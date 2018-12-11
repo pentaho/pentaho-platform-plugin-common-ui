@@ -90,7 +90,7 @@ define([
        * Gets the underlying JavaScript value represented by the _simple_ value.
        *
        * @name pentaho.type.Simple#value
-       * @type {!any}
+       * @type {!*}
        * @readonly
        */
       O.setConst(this, "value", this.$type.toValue(value));
@@ -108,7 +108,7 @@ define([
     /**
      * Creates a clone of the simple value.
      *
-     * @return {!pentaho.type.Simple} The simple value clone.
+     * @return {pentaho.type.Simple} The simple value clone.
      */
     clone: function() {
       var SimpleClass = this.constructor;
@@ -119,7 +119,7 @@ define([
     /**
      * Gets the underlying primitive value of the _simple_ value.
      *
-     * @return {!any} The underlying value.
+     * @return {!*} The underlying value.
      */
     valueOf: function() {
       return this.value;
@@ -128,7 +128,7 @@ define([
     /**
      * Gets a string that represents the current _simple_ value.
      *
-     * @return {String} The string representation.
+     * @return {string} The string representation.
      */
     toString: function() {
       var f = this.formatted;
@@ -164,7 +164,7 @@ define([
      *
      * This method checks if the primitive value of one is equal to the primitive value of the other.
      *
-     * @param {!pentaho.type.Simple} other - A distinct value to test for equality.
+     * @param {pentaho.type.Simple} other - A distinct value to test for equality.
      *
      * @return {boolean} `true` if the given value is equal to this one; `false`, otherwise.
      *
@@ -184,7 +184,7 @@ define([
      * This method checks if the [formatted]{@link pentaho.type.Simple#formatted} value of the
      * given value is the same as that of this one.
      *
-     * @param {!pentaho.type.Simple} other - An equal simple value to test for content-equality.
+     * @param {pentaho.type.Simple} other - An equal simple value to test for content-equality.
      *
      * @return {boolean} `true` if the given value is equal in content to this one; `false`, otherwise.
      *
@@ -203,7 +203,7 @@ define([
      * This method compares the primitive value of this value with that of `other` by delegating to
      * the [comparePrimitiveValues]{@link pentaho.type.SimpleType#comparePrimitiveValues} method.
      *
-     * @param {!pentaho.type.Simple} other - The other value.
+     * @param {pentaho.type.Simple} other - The other value.
      *
      * @return {number} `-1` if this value is _before_ `other`; `1` if this value is _after_ `other`;
      * `0`, otherwise.
@@ -277,10 +277,10 @@ define([
      * The default implementation returns [value]{@link pentaho.type.Simple#value} itself.
      * Override to implement a custom JSON format for this simple value type.
      *
-     * @param {!Object} keyArgs - The keyword arguments object.
+     * @param {object} keyArgs - The keyword arguments object.
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
      *
-     * @return {JsonValue} A JSON-compatible representation of value.
+     * @return {?JsonValue} A JSON-compatible representation of value.
      *
      * @protected
      */
@@ -345,8 +345,8 @@ define([
        * this method then throws an error, in its behalf,
        * informing that the given value cannot be converted to this type.
        *
-       * @param {!any} value - The value to convert.
-       * @return {!any} The converted value.
+       * @param {!*} value - The value to convert.
+       * @return {!*} The converted value.
        *
        * @throws {pentaho.lang.ArgumentRequiredError} When the given value is {@link Nully}.
        *
@@ -382,7 +382,7 @@ define([
        *
        * The default implementation is the identity function.
        *
-       * @param {!any} value - The value to convert.
+       * @param {!*} value - The value to convert.
        *
        * @return {?any} The converted value or `null`, when not possible to convert.
        *
@@ -399,8 +399,8 @@ define([
        * If primitive values are numbers or {@link Date} objects, numeric order is used.
        * Otherwise, their string representations are compared using lexicographical ordering.
        *
-       * @param {!any} valueA - The first value.
-       * @param {!any} valueB - The second value.
+       * @param {!*} valueA - The first value.
+       * @param {!*} valueB - The second value.
        *
        * @return {number} `-1` if `valueA` is _before_ `valueB`; `1` is `valueA` is _after_ `valueB`; `0`, otherwise.
        */

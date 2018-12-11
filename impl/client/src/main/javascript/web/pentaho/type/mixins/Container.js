@@ -101,7 +101,7 @@ define([
      *
      * All property values or elements are shared with the clone.
      *
-     * @return {!pentaho.type.mixins.Container} The cloned container.
+     * @return {pentaho.type.mixins.Container} The cloned container.
      */
     clone: function() {
       var clone = Object.create(Object.getPrototypeOf(this));
@@ -114,7 +114,7 @@ define([
      *
      * The default implementation calls {@link pentaho.type.mixins.Container#_initContainer}.
      *
-     * @param {!pentaho.type.mixins.Container} clone - The cloned container to initialize.
+     * @param {pentaho.type.mixins.Container} clone - The cloned container to initialize.
      *
      * @protected
      */
@@ -146,7 +146,7 @@ define([
      * for when the internal fields are updated directly, which is done for performance and for working
      * outside of any ambient txn. The _removeReference counterpart is not needed.
      *
-     * @param {!pentaho.type.mixins.Container} container - The container that refers this one.
+     * @param {pentaho.type.mixins.Container} container - The container that refers this one.
      * @param {pentaho.type.PropertyType} [propType] When `container` is a complex,
      * the property type whose value contains this instance.
      *
@@ -233,9 +233,9 @@ define([
      *
      * @method
      *
-     * @param {!pentaho.type.changes.Transaction} transaction - The transaction that owns this changeset.
+     * @param {pentaho.type.changes.Transaction} transaction - The transaction that owns this changeset.
      *
-     * @return {!pentaho.type.changes.Changeset} A changeset of the appropriate type.
+     * @return {pentaho.type.changes.Changeset} A changeset of the appropriate type.
      *
      * @abstract
      * @protected
@@ -249,8 +249,8 @@ define([
      *
      * When overriding, be sure to call the base implementation.
      *
-     * @param {!pentaho.type.changes.Changeset} changeset - The set of changes.
-     * @param {Object} [keyArgs] - The keyword arguments' object.
+     * @param {pentaho.type.changes.Changeset} changeset - The set of changes.
+     * @param {?object} [keyArgs] - The keyword arguments' object.
      * See [EventSource#_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
      *
      * @return {pentaho.lang.UserError} An error if the changeset was canceled; `null` otherwise.
@@ -291,7 +291,7 @@ define([
      *
      * When overriding, be sure to call the base implementation.
      *
-     * @param {!pentaho.type.changes.Changeset} changeset - The set of changes.
+     * @param {pentaho.type.changes.Changeset} changeset - The set of changes.
      *
      * @protected
      * @internal
@@ -311,8 +311,8 @@ define([
      *
      * When overriding, be sure to call the base implementation.
      *
-     * @param {!pentaho.type.changes.Changeset} changeset - The set of changes.
-     * @param {!Error} reason - The reason why the changes were rejected.
+     * @param {pentaho.type.changes.Changeset} changeset - The set of changes.
+     * @param {Error} reason - The reason why the changes were rejected.
      *
      * @protected
      * @internal
