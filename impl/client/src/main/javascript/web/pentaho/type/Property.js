@@ -47,9 +47,9 @@ define([
    *
    * @abstract
    *
-   * @implements ?pentaho.lang.IWithKey
-   * @implements ?pentaho.lang.IListElement
-   * @implements ?pentaho.lang.ICollectionElement
+   * @implements {pentaho.lang.IWithKey}
+   * @implements {pentaho.lang.IListElement}
+   * @implements {pentaho.lang.ICollectionElement}
    *
    * @classDesc The type of a property of a complex type.
    *
@@ -632,7 +632,7 @@ define([
        * @param {pentaho.type.Complex} defaultValueOwner - The complex value that owns the property.
        *   Only needed if it is desired that {@link Nully} values are converted to the property's default value.
        *
-       * @param {?any} valueSpec - A value or value specification.
+       * @param {*} valueSpec - A value or value specification.
        *
        * @return {?pentaho.type.Value} A value.
        */
@@ -817,7 +817,7 @@ define([
        *
        * @param {pentaho.type.Complex} owner - The complex value that owns the property.
        *
-       * @return {pentaho.type.ValidationError|Array.<pentaho.type.ValidationError>} An error,
+       * @return {?(pentaho.type.ValidationError|Array.<pentaho.type.ValidationError>)} An error,
        * a non-empty array of errors or `null`.
        *
        * @see pentaho.type.Complex#validate
@@ -879,7 +879,7 @@ define([
        * @param {pentaho.type.Complex} owner - The complex value that owns the property.
        * @param {pentaho.type.Value} value - The value to validate.
        *
-       * @return {pentaho.type.ValidationError|Array.<pentaho.type.ValidationError>} An error,
+       * @return {?(pentaho.type.ValidationError|Array.<pentaho.type.ValidationError>)} An error,
        * a non-empty array of errors or `null`.
        *
        * @protected

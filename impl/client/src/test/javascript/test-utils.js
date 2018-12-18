@@ -29,10 +29,10 @@ define([
    *
    * @param {function() : ?Promise} asyncTest - The async function that should throw or return a rejected promise
    *                                with a given error type.
-   * @param {any|Error|JasmineAsymmetricEqualityTester} [error] The error that is the cause for the rejection.
+   * @param {*|Error|JasmineAsymmetricEqualityTester} [error] The error that is the cause for the rejection.
    *                                                    When unspecified, rejection of any type is still asserted.
    *
-   * @return {!Promise} The test promise.
+   * @return {Promise} The test promise.
    */
   function expectToRejectWith(asyncTest, error) {
 

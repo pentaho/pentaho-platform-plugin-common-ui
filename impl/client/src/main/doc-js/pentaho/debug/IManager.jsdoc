@@ -46,7 +46,7 @@
  * The url debugging level, when specified, takes precedence over this.
  * When neither is specified, defaults to {@link pentaho.debug.Levels#error}.
  *
- * @param {?object.<string, pentaho.debug.Levels|string>} [spec.modules] - Debugging levels per absolute AMD module id.
+ * @param {?Object.<string, pentaho.debug.Levels|string>} [spec.modules] - Debugging levels per absolute AMD module id.
  */
 
 /**

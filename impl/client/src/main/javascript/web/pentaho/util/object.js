@@ -19,8 +19,8 @@ define(["./has"], function(has) {
   var O_hasOwn = Object.prototype.hasOwnProperty;
   var A_empty = [];
   var setProtoOf = has("Object.setPrototypeOf")
-        ? Object.setPrototypeOf :
-        (has("Object.prototype.__proto__") ? setProtoProp : setProtoCopy);
+    ? Object.setPrototypeOf :
+    (has("Object.prototype.__proto__") ? setProtoProp : setProtoCopy);
   var constPropDesc = {value: undefined, writable: false, configurable: false, enumerable: false};
   var O_root = Object.prototype;
   var O_isProtoOf = Object.prototype.isPrototypeOf;
@@ -58,7 +58,7 @@ define(["./has"], function(has) {
      * and is an own property,
      * it is deleted and its _previous_ own value is returned.
      *
-     * @param {?object} o - The object whose own property is to be deleted.
+     * @param {?(object|function)} o - The object whose own property is to be deleted.
      * @param {string} p - The name of the property.
      * @param {*} [dv] - The default value. Defaults to `undefined`.
      * @return {*} The value of the property before deletion.
@@ -82,7 +82,7 @@ define(["./has"], function(has) {
      * The disposable resource is disposed before returning.
      *
      * @param {pentaho.lang.IDisposable} disposable The disposable resource.
-     * @param {function(pentaho.lang.IDisposable):any} fun The function to call with the given resource.
+     * @param {function(pentaho.lang.IDisposable):*} fun The function to call with the given resource.
      * @param {?object} [context] The context in which to call `fun`.
      *
      * @return {*} The value returned by `fun`.
@@ -102,7 +102,7 @@ define(["./has"], function(has) {
      *
      * If the specified object is a {@link Nully} value, `false` is returned.
      *
-     * @param {?object} o - The object to be tested.
+     * @param {?(object|function)} o - The object to be tested.
      * @param {string} p - The name of the property.
      * @return {boolean} `true` if this is a direct/own property, or `false` otherwise.
      */
@@ -117,7 +117,7 @@ define(["./has"], function(has) {
      *
      * If the specified object is a {@link Nully} value, the default value is returned.
      *
-     * @param {?object} o - The object whose property is to be retrieved.
+     * @param {?(object|function)} o - The object whose property is to be retrieved.
      * @param {string} p - The name of the property.
      * @param {*} [dv] - The default value. Defaults to `undefined`.
      * @return {boolean} The value of the property if it exists in the object and is an own property,
@@ -147,7 +147,7 @@ define(["./has"], function(has) {
      * Each invocation of iteratee is called with two arguments: (propertyValue, propertyName).
      * If the iteratee function returns `false`, the iteration loop is broken out.
      *
-     * @param {object} o - The object containing the properties to be iterated.
+     * @param {?(object|function)} o - The object containing the properties to be iterated.
      * @param {function} fun - The function that will be iterated.
      * @param {?object} [x] - The object which will provide the execution context of the iteratee function.
      * If nully, the iteratee will run with the context of the iterated object.
@@ -167,7 +167,7 @@ define(["./has"], function(has) {
     /**
      * Iterates over the own properties of a source object and assigns them to a target object.
      *
-     * @param {object} to - The target object.
+     * @param {object|function} to - The target object.
      * @param {?object} from - The source object.
      * @return {object} The target object.
      */
@@ -199,7 +199,7 @@ define(["./has"], function(has) {
      * If `v` is an instance of a class, or a simple value (e.g. string, number),
      * no clone is created and the original object is returned instead.
      *
-     * @param {?object|Array|any} v - The source object.
+     * @param {object|Array|*} v - The source object.
      * @return {*} A shallow copy of the object,
      * or the object itself if it is neither a plain object nor an array.
      */
@@ -345,7 +345,7 @@ define(["./has"], function(has) {
      * the value `date`, representing instances of {@link Date},
      * is also supported.
      *
-     * @return {function(any):string} The key function.
+     * @return {function(*):string} The key function.
      */
     getSameTypeKeyFun: function(typeName) {
       switch(typeName) {

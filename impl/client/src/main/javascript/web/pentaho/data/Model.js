@@ -24,8 +24,8 @@ define([
      * @alias Model
      * @memberOf pentaho.data
      * @class
-     * @implements ?pentaho.lang.IAnnotatable
-     * @implements ?pentaho.lang.ISpecifiable
+     * @implements {pentaho.lang.IAnnotatable}
+     * @implements {pentaho.lang.ISpecifiable}
      * @amd pentaho/data/Model
      * @ignore
      * @classdesc The `Model` class contains metadata about a certain type of entities.

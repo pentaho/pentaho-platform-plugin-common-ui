@@ -58,6 +58,6 @@
  *
  * @name value
  * @memberOf pentaho.module.spec.IMeta#
- * @type {(*|(function(!pentaho.module.IMeta) : *))}
+ * @type {(*|(function(pentaho.module.IMeta) : *))}
  */
 

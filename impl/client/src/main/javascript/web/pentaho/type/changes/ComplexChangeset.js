@@ -55,7 +55,7 @@ define([
       /**
        * A map of property name to a corresponding change.
        *
-       * @type {object.<string, !pentaho.type.changes.Change>}
+       * @type {Object.<string, pentaho.type.changes.Change>}
        * @protected
        * @readonly
        */
@@ -95,7 +95,7 @@ define([
     /**
      * Gets the [change]{@link pentaho.type.changes.Change} object associated with the specified property.
      *
-     * @param {nonEmptyString|!pentaho.type.PropertyType} propertyOrName - The property name or type object.
+     * @param {nonEmptyString|pentaho.type.PropertyType} propertyOrName - The property name or type object.
      *
      * @return {pentaho.type.changes.Change} An object describing the changes to be performed
      * in the given property, or `null` if the property has not changed.
@@ -123,7 +123,7 @@ define([
     /**
      * Determines if the given property has changed.
      *
-     * @param {nonEmptyString|!pentaho.type.PropertyType} propertyOrName - The property name or type object.
+     * @param {nonEmptyString|pentaho.type.PropertyType} propertyOrName - The property name or type object.
      *
      * @return {boolean} `true` if the property has changed; `false`, otherwise.
      *
@@ -193,7 +193,7 @@ define([
     /**
      * Gets the original value of a property.
      *
-     * @param {nonEmptyString|!pentaho.type.PropertyType} name - The property name or type object.
+     * @param {nonEmptyString|pentaho.type.PropertyType} name - The property name or type object.
      *
      * @return {pentaho.type.Value} The original value of the property (before the change).
      *
@@ -349,7 +349,7 @@ define([
     /**
      * Obtain the name of a property, given the property type or its name.
      *
-     * @param {nonEmptyString|!pentaho.type.PropertyType} propertyOrName - The property name or type object.
+     * @param {nonEmptyString|pentaho.type.PropertyType} propertyOrName - The property name or type object.
      *
      * @return {string} The property name.
      *
@@ -410,7 +410,7 @@ define([
      *
      * @param {pentaho.type.Complex} complex - The complex instance.
      * @param {pentaho.type.PropertyType} propType - The element property type.
-     * @param {?any} valueNewSpec The new value specification.
+     * @param {*} valueNewSpec The new value specification.
      * @param {?boolean} [forceReplace=false] Forces replace to occur even when values are equal.
      *
      * @private

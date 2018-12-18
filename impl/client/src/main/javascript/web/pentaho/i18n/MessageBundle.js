@@ -32,12 +32,12 @@ define([
    * using the pattern: </br> `"{0}"`, `"{1}"`, ... **or** `"{keyword0}"`, `"{keyword1}"`, ...
    *
    * @description Creates a message bundle given a messages dictionary.
-   * @param {?object.<string, string>} [source] A messages dictionary.
+   * @param {?Object.<string, string>} [source] A messages dictionary.
    */
   function MessageBundle(source) {
     /**
      * The source messages dictionary.
-     * @type ?object.<string, string>
+     * @type Object.<string, string>
      * @readonly
      */
     this.source = (source && typeof source === "object") ? source : {};
@@ -120,7 +120,7 @@ define([
    *    //}
    * });
    *
-   * @type ?object
+   * @type {object}
    * @readonly
    */
   Object.defineProperty(MessageBundle.prototype, "structured", {
@@ -213,7 +213,7 @@ define([
    * //}
    *
    * @param {?object} source  A messages dictionary.
-   * @return {?object} Message bundle object representation.
+   * @return {object} Message bundle object representation.
    */
   function propertiesToObject(source) {
     var output = {};

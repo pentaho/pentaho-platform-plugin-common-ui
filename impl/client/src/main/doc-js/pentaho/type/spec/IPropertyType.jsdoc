@@ -60,7 +60,7 @@
  *
  * @name name
  * @memberOf pentaho.type.spec.IPropertyType#
- * @type {nonEmptyString | any}
+ * @type {nonEmptyString | *}
  *
  * @see pentaho.type.PropertyType#name
  */
@@ -80,7 +80,7 @@
  *
  * @name nameAlias
  * @memberOf pentaho.type.spec.IPropertyType#
- * @type {nonEmptyString | any}
+ * @type {nonEmptyString | *}
  *
  * @see pentaho.type.PropertyType#nameAlias
  */
@@ -99,7 +99,7 @@
  *
  * @name label
  * @memberOf pentaho.type.spec.IPropertyType#
- * @type {?nonEmptyString | any}
+ * @type {?nonEmptyString | *}
  */
 
 /**

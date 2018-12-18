@@ -907,7 +907,7 @@ define([
      *   - When there are Color fields and at most one generic measure:
      *   - Uses the member colors of the last Color field, if any.
      *
-     * @return {?object.<string, pv.Color>|pv.Scale} The color map, if any or _nully_.
+     * @return {?Object.<string, pv.Color>|pv.Scale|Nully} The color map, if any or _nully_.
      *
      * @protected
      */

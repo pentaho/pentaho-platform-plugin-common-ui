@@ -40,7 +40,7 @@ define([
      * [isColumnKeyEffective]{@link pentaho.data.util.isColumnKeyEffective}) of the associated data table,
      * then the returned filter will be `null`.
      *
-     * @param {object.<string, any|pentaho.data.ICell>} varsMap - A map of visual role names
+     * @param {Object.<string, *|pentaho.data.ICell>} varsMap - A map of visual role names
      * to corresponding _variables_. All variables, even those from inherited keys are considered.
      *
      * Map keys which are not the name of a mapper visual role property of `model` are ignored.
@@ -66,7 +66,7 @@ define([
      * as defined in [isColumnKeyEffective]{@link pentaho.data.util.isColumnKeyEffective}.
      * Specify `keyArgs.includeMeasureFields` as `true` to include all fields.
      *
-     * @param {?object.<string, pentaho.data.ICell|Array.<pentaho.data.ICell>>} varsMap - A map of visual role names
+     * @param {?Object.<string, pentaho.data.ICell|Array.<pentaho.data.ICell>>} varsMap - A map of visual role names
      * to corresponding _variables_. All variables, even those from inherited keys are considered.
      *
      * Map keys which are not the name of a mapper visual role property of `model` are ignored.
@@ -78,7 +78,7 @@ define([
      * be included.
      * In practice, indicates that all fields should be included.
      *
-     * @return {object.<string, pentaho.data.ICell>} A data cells map, possibly empty.
+     * @return {Object.<string, pentaho.data.ICell>} A data cells map, possibly empty.
      *
      * @see pentaho.data.util.isColumnKeyEffective
      */

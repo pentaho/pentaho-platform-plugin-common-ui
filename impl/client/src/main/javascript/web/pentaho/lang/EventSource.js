@@ -129,7 +129,7 @@ define([
 
         if(F.is(observer)) observer = {__: observer};
 
-        /** @type ?pentaho.lang.IEventRegistrationHandle[] */
+        /** @type pentaho.lang.IEventRegistrationHandle[] */
         var handles = eventTypes.map(function(type) {
           return __registerOne.call(this, type, observer, priority, isCritical);
         }, this);
@@ -306,9 +306,9 @@ define([
      * (or specify a {@link Nully} value).
      *
      * @param {?object} [keyArgs] - The keyword arguments' object.
-     * @param {function(...any):boolean} [keyArgs.isCanceled] - A predicate that indicates if the given event args
+     * @param {function(...*):boolean} [keyArgs.isCanceled] - A predicate that indicates if the given event arguments
      * are in a canceled state. Its `this` value is the value of `source`.
-     * @param {function(any, Array, nonEmptyString, nonEmptyString)} [keyArgs.errorHandler] -
+     * @param {function(*, Array, nonEmptyString, nonEmptyString)} [keyArgs.errorHandler] -
      * When specified with a `null` value,
      * no error handling is performed and errors thrown by listeners are thrown back to this method's caller.
      * When unspecified or specified as `undefined`, defaults to a function that simply logs the listener errors,
@@ -428,11 +428,11 @@ define([
      * (or specify a {@link Nully} value).
      *
      * @param {?object} [keyArgs] - The keyword arguments' object.
-     * @param {function(...any):boolean} [keyArgs.isCanceled] - A predicate that indicates if the given event args
+     * @param {function(...*):boolean} [keyArgs.isCanceled] - A predicate that indicates if the given event arguments
      * are in a canceled state. Its `this` value is the value of `source`.
-     * @param {function(...any):any} [keyArgs.getCancellationReason] - A function that given the event args
+     * @param {function(...*):*} [keyArgs.getCancellationReason] - A function that given the event arguments
      * returns its a cancellation reason, usually an {@link Error}.  Its `this` value is the value of `source`.
-     * @param {function(any, Array, nonEmptyString, nonEmptyString) : Promise} [keyArgs.errorHandler] -
+     * @param {function(*, Array, nonEmptyString, nonEmptyString) : Promise} [keyArgs.errorHandler] -
      * When specified with a `null` value, no error handling is performed.
      * Errors thrown by, or promises rejected by,
      * any listeners cause the whole event to be rejected.

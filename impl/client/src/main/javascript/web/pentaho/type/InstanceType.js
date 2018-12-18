@@ -1219,7 +1219,7 @@ define([
     /**
      * Determines if a value is an instance of this type.
      *
-     * @param {?any} value - The value to test.
+     * @param {*} value - The value to test.
      * @return {boolean} `true` if the value is an instance of this type; `false`, otherwise.
      */
     is: function(value) {
@@ -1250,7 +1250,7 @@ define([
      * this method delegates the creation of an instance to
      * [create]{@link pentaho.type.Type#create}.
      *
-     * @param {?any} value - The value to convert.
+     * @param {*} value - The value to convert.
      * @param {?object} [keyArgs] - The keyword arguments passed to `create`, when a new instance is created.
      *
      * @return {?pentaho.type.Instance} The converted value or `null`.
@@ -1486,7 +1486,7 @@ define([
      * This **setter**-only JavaScript property is used
      * to extend the type with new dynamic attributes.
      *
-     * @type {?object}
+     * @type {object}
      * @ignore
      */
     set dynamicAttributes(attrSpecs) {
@@ -1679,7 +1679,7 @@ define([
      * @param {string} name - The name of the dynamic attribute.
      * @param {string} group - The group name of the dynamic attribute.
      * @param {string} localName - The name of the dynamic attribute within the group.
-     * @param {function(any, object) : any} toSpec - The custom serialization method of the dynamic attribute, if any,
+     * @param {function(*, object) : *} toSpec - The custom serialization method of the dynamic attribute, if any,
      * is called to serialize a specified value of the dynamic attribute.
      * The method is called with the value and the keyArgs as arguments and with the property type as
      * the `this` context and should return the serialized value.

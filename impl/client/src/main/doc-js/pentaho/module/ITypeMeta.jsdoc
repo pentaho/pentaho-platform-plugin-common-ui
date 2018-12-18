@@ -51,7 +51,7 @@
  *
  * @name subtypes
  * @memberOf pentaho.module.ITypeMeta#
- * @type {Array.<!pentaho.module.ITypeMeta>}
+ * @type {Array.<pentaho.module.ITypeMeta>}
  * @readOnly
  */
 
@@ -60,6 +60,6 @@
  *
  * @name instances
  * @memberOf pentaho.module.ITypeMeta#
- * @type {Array.<!pentaho.module.IInstanceMeta>}
+ * @type {Array.<pentaho.module.IInstanceMeta>}
  * @readOnly
  */

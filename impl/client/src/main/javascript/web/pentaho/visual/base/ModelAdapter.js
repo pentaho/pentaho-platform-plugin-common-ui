@@ -461,12 +461,12 @@ define([
      * (have no defined strategy), are skipped.
      * Properties whose values are not known to the current strategy are skipped.
      *
-     * @param {object.<string, any|pentaho.data.ICell>} originalValuesMap - The map of property names to
+     * @param {Object.<string, *|pentaho.data.ICell>} originalValuesMap - The map of property names to
      * values and/or cells.
      * @param {boolean} toExternal If true converts from internal to external properties,
      * the other way around if false.
      *
-     * @return {object.<string, pentaho.data.ICell>} The corresponding map of internal or external property names
+     * @return {Object.<string, pentaho.data.ICell>} The corresponding map of internal or external property names
      *   to cells.
      *
      * @private

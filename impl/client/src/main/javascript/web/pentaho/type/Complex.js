@@ -238,7 +238,7 @@ define([
      * @see pentaho.type.Complex#getv
      * @see pentaho.type.Complex#getf
      *
-     * @param {string|!pentaho.type.PropertyType} [name] The property name or type object.
+     * @param {string|pentaho.type.PropertyType} [name] The property name or type object.
      * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
      *
      * @return {pentaho.type.Value|Nully} The value of the property, or a {@link Nully} value.
@@ -254,7 +254,7 @@ define([
     /**
      * Gets a value that indicates if a given property has assumed a default value.
      *
-     * @param {string|!pentaho.type.PropertyType} [name] The property name or type object.
+     * @param {string|pentaho.type.PropertyType} [name] The property name or type object.
      * @return {boolean} Returns `true` if the property has been defaulted; `false`, otherwise.
      */
     isDefaultedOf: function(name) {
@@ -296,7 +296,7 @@ define([
      * For [Complex]{@link pentaho.type.Complex} and [List]{@link pentaho.type.List} types,
      * this corresponds to the value itself.
      *
-     * @param {string|!pentaho.type.PropertyType} name - The property name or type object.
+     * @param {string|pentaho.type.PropertyType} name - The property name or type object.
      * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
      *
      * @return {*|pentaho.type.Complex|pentaho.type.List|Nully} The primitive value of a `Simple`,
@@ -326,7 +326,7 @@ define([
      * For [Complex]{@link pentaho.type.Complex} and [List]{@link pentaho.type.List} types,
      * varies with the implementation.
      *
-     * @param {string|!pentaho.type.PropertyType} name - The property name or type object.
+     * @param {string|pentaho.type.PropertyType} name - The property name or type object.
      * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
      *
      * @return {string} The string representation of the value, or `""`.
@@ -401,8 +401,8 @@ define([
      * [elementType]{@link pentaho.type.Type#elementType}
      * of the property's [valueType]{@link pentaho.type.PropertyType#valueType}.
      *
-     * @param {nonEmptyString|!pentaho.type.PropertyType} name - The property name or type object.
-     * @param {any?} [valueSpec=null] A value specification.
+     * @param {nonEmptyString|pentaho.type.PropertyType} name - The property name or type object.
+     * @param {*} [valueSpec=null] A value specification.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
      * @throws {TypeError} When the property is read-only and its value would change.
@@ -517,7 +517,7 @@ define([
      *
      * When the specified property is not a _list_ property, `0` is returned if it is `null`; `1`, otherwise.
      *
-     * @param {string|!pentaho.type.PropertyType} name - The property name or type object.
+     * @param {string|pentaho.type.PropertyType} name - The property name or type object.
      * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
      *
      * @return {number} The number of values.
@@ -539,7 +539,7 @@ define([
     /**
      * Gets a value that indicates if a given property is currently applicable.
      *
-     * @param {string|!pentaho.type.PropertyType} name - The property name or type object.
+     * @param {string|pentaho.type.PropertyType} name - The property name or type object.
      *
      * @return {boolean} `true` if the property is applicable; `false`, otherwise.
      *
@@ -863,7 +863,7 @@ define([
        * Adds, overrides or configures properties of this complex type.
        *
        * @param {Array.<pentaho.type.spec.IPropertyType> |
-       *         object.<string, pentaho.type.spec.IPropertyType>} propTypesSpec - The
+       *         Object.<string, pentaho.type.spec.IPropertyType>} propTypesSpec - The
        * properties' specification.
        *
        * @protected
@@ -876,7 +876,7 @@ define([
        * Normalizes a properties specification.
        *
        * @param {Array.<pentaho.type.spec.IPropertyType> |
-       *         object.<string, pentaho.type.spec.IPropertyType>} propTypesSpec - The properties specification.
+       *         Object.<string, pentaho.type.spec.IPropertyType>} propTypesSpec - The properties specification.
        *
        * @return {Array.<pentaho.type.spec.IPropertyType>} The normalized specification.
        * @protected
@@ -908,7 +908,7 @@ define([
        * it is returned back only if it is _the_ property type object of
        * same name in this complex type.
        *
-       * @param {string|!pentaho.type.PropertyType} name - The property name or type object.
+       * @param {string|pentaho.type.PropertyType} name - The property name or type object.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {pentaho.type.PropertyType} The property type object.
@@ -1062,7 +1062,7 @@ define([
        * Adds, overrides or configures properties of this complex type.
        *
        * @param {pentaho.type.spec.IPropertyType|
-       *         !Array.<pentaho.type.spec.IPropertyType>} propTypeSpec - A property type specification or
+       *         Array.<pentaho.type.spec.IPropertyType>} propTypeSpec - A property type specification or
        *         an array of them.
        *
        * @return {pentaho.type.ComplexType} This object.

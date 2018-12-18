@@ -29,5 +29,5 @@
  * Any other value is assumed to be a single value, and matches the environment variable
  * if it is the same value.
  *
- * @typedef {Nully|*|Array.<*>} pentaho.type.spec.EnvironmentPropertyFilter
+ * @typedef {*|Nully|Array} pentaho.type.spec.EnvironmentPropertyFilter
  */

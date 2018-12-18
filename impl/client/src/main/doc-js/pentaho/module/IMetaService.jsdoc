@@ -30,7 +30,7 @@
  * @name configure
  * @memberOf pentaho.module.IMetaService#
  * @method
- * @param {?pentaho.module.spec.MetaMap} moduleSpecMap - A map of modules metadata.
+ * @param {?pentaho.module.spec.MetaMap} [moduleSpecMap] - A map of modules metadata.
  * @return {pentaho.module.IMetaService} The value of `this`.
  */
 
@@ -83,7 +83,7 @@
  * @method
  * @param {string} typeIdOrAlias - The identifier or alias of the type module.
  *
- * @return {Array.<!pentaho.module.IInstanceMeta>} An array of metadata of instance modules, possibly empty.
+ * @return {Array.<pentaho.module.IInstanceMeta>} An array of metadata of instance modules, possibly empty.
  */
 
 /**
@@ -112,7 +112,7 @@
  * @method
  * @param {string} baseTypeIdOrAlias - The identifier or alias of the base type module.
  *
- * @return {Array.<!pentaho.module.ITypeMeta>} An array of metadata of type modules, possibly empty.
+ * @return {Array.<pentaho.module.ITypeMeta>} An array of metadata of type modules, possibly empty.
  */
 
 /**

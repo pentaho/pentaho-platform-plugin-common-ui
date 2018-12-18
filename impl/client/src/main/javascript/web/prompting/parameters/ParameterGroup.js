@@ -22,7 +22,7 @@
  * @class
  * @property {string} name The name of the group
  * @property {string} label The label of the group
- * @property {?(Array|Parameter)} parameters The array of parameters within this group
+ * @property {Array|Parameter} parameters The array of parameters within this group
  */
 define([], function(){
   return function(){

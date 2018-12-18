@@ -473,7 +473,7 @@ define([
    * according to the values of some of its properties.
    *
    * @param {Array} list - The array to sort.
-   * @param {Array.<(function(any) : any)>} propGetters - An array of property getter functions.
+   * @param {Array.<(function(*) : *)>} propGetters - An array of property getter functions.
    *
    * @return {Array} The specified array.
    */

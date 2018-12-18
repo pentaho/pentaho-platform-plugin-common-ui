@@ -209,7 +209,7 @@ define([
      * Otherwise, a projected mock containing only
      * the elements' data structures is created and returned.
      *
-     * @type {object|!pentaho.type.List}
+     * @type {object|pentaho.type.List}
      * @readOnly
      * @private
      * @internal
@@ -257,7 +257,7 @@ define([
     /**
      * Gets a value that indicates if an element with a given key is present in the list.
      *
-     * @param {string|any} key - The element's key.
+     * @param {string|*} key - The element's key.
      *
      * @return {boolean} `true` if an element with the given key is present in the list; `false`, otherwise.
      */
@@ -292,7 +292,7 @@ define([
     /**
      * Gets the element having a specified key value, if any, or `null`.
      *
-     * @param {string|any} key - The element's key.
+     * @param {string|*} key - The element's key.
      *
      * @return {pentaho.type.Element} The corresponding element or `null`.
      */
@@ -450,10 +450,10 @@ define([
     /**
      * Creates an array with the elements of the list or values derived from each element.
      *
-     * @param {function(pentaho.type.Element):any} [map] A function that converts each element into something else.
+     * @param {function(pentaho.type.Element):*} [map] A function that converts each element into something else.
      * @param {?object} [ctx] The JS context object on which to call `map`.
      *
-     * @return {Array.<any>} An array of elements.
+     * @return {Array} An array of elements.
      */
     toArray: function(map, ctx) {
       var elems = this.__projectedMock.__elems;
@@ -542,7 +542,7 @@ define([
      * a list of element specifications is obtained and
      * passed to the [set]{@link pentaho.type.List#set} method.
      *
-     * @param {pentaho.type.spec.List|!pentaho.type.List|!Array.<!pentaho.type.Element>} config - The list
+     * @param {pentaho.type.spec.List|pentaho.type.List|Array.<pentaho.type.Element>} config - The list
      * specification or a compatible list instance or element's array.
      *
      * @throws {pentaho.lang.ArgumentInvalidTypeError} When the type of `config` is not

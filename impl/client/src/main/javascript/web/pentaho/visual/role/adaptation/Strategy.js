@@ -160,9 +160,9 @@ define([
      * @name pentaho.visual.role.adaptation.Strategy#map
      * @method
      *
-     * @param {Array.<any|!pentaho.data.ICell>} inputValues - The output value(s) or cell(s).
+     * @param {Array.<*|pentaho.data.ICell>} inputValues - The output value(s) or cell(s).
      *
-     * @return {Array.<!pentaho.data.ICell>} The output cells, when the given input values are present;
+     * @return {Array.<pentaho.data.ICell>} The output cells, when the given input values are present;
      * `null`, otherwise.
      *
      * @abstract
@@ -179,9 +179,9 @@ define([
      * @name pentaho.visual.role.adaptation.Strategy#invert
      * @method
      *
-     * @param {Array.<any|!pentaho.data.ICell>} outputValues - The output value(s) or cell(s).
+     * @param {Array.<*|pentaho.data.ICell>} outputValues - The output value(s) or cell(s).
      *
-     * @return {Array.<!pentaho.data.ICell>} The input cells, when the given output values are present;
+     * @return {Array.<pentaho.data.ICell>} The input cells, when the given output values are present;
      * `null`, otherwise.
      */
     invert: function(outputValues) {
@@ -198,7 +198,7 @@ define([
      * @param {?number} [count] count - The number of columns, from the start, to consider.
      * When unspecified, all columns are considered.
      *
-     * @return {Array.<!pentaho.data.ICell>} The cell array.
+     * @return {Array.<pentaho.data.ICell>} The cell array.
      *
      * @protected
      */
@@ -228,7 +228,7 @@ define([
      *
      * @param {Array.<number>} fieldIndexes - The field indexes.
      *
-     * @return {Array.<(function(any) : string)>} The array of key functions.
+     * @return {Array.<(function(*) : string)>} The array of key functions.
      *
      * @protected
      */

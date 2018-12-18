@@ -204,7 +204,7 @@ define([
     /**
      * The compiled predicate function. Lazily created.
      *
-     * @type {?function(!pentaho.type.Element) : boolean}
+     * @type {?function(pentaho.type.Element) : boolean}
      */
     __compiled: null,
 
@@ -216,7 +216,7 @@ define([
      *
      * The result of this method is cached.
      *
-     * @return {function(!pentaho.type.Element) : boolean} The predicate function.
+     * @return {function(pentaho.type.Element) : boolean} The predicate function.
      *
      * @throws {pentaho.type.ValidationError} When the filter is not valid,
      * the first error returned by the `validate` method.
@@ -245,7 +245,7 @@ define([
      * @memberOf pentaho.data.filter.Abstract#
      * @method
      *
-     * @return {function(!pentaho.type.Element) : boolean} The predicate function.
+     * @return {function(pentaho.type.Element) : boolean} The predicate function.
      *
      * @abstract
      * @protected
@@ -463,7 +463,7 @@ define([
      *
      * The result of this operation is cached.
      *
-     * @return {pentaho.data.filter.True|!pentaho.data.filter.False|!pentaho.data.filter.Or} The resulting
+     * @return {pentaho.data.filter.True|pentaho.data.filter.False|pentaho.data.filter.Or} The resulting
      * DNF filter.
      *
      * @see https://en.wikipedia.org/wiki/Disjunctive_normal_form
@@ -494,7 +494,7 @@ define([
      * the key columns used in the extensional representation of the filter.
      * @param {string[]} keyColumnNames - The names of the columns from the `dataPlain` that are considered key.
      *
-     * @return {pentaho.data.filter.Or|!pentaho.data.filter.False} The extensional filter.
+     * @return {pentaho.data.filter.Or|pentaho.data.filter.False} The extensional filter.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When the resulting filtered data is not empty and `keyColumnNames`
      * is empty.
@@ -540,7 +540,7 @@ define([
        * @param {pentaho.data.ITable} dataTable - The data table.
        * @param {string[]} keyColumnNames - The column names.
        *
-       * @return {object.<string, number>} The map.
+       * @return {Object.<string, number>} The map.
        */
       function getColumnIdToIndexMap(dataTable, keyColumnNames) {
 

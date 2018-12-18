@@ -33,7 +33,7 @@ define([
   /**
    * The stack of transactions performing the `did:change` phase.
    *
-   * @type {Array.<!pentaho.type.changes.Transaction>}
+   * @type {Array.<pentaho.type.changes.Transaction>}
    * @readOnly
    */
   var __txnInCommitDid = [];
@@ -102,7 +102,7 @@ define([
        *
        * Changesets are inserted in inverse topological order.
        *
-       * @type {pentaho.lang.SortedList.<!pentaho.type.changes.Changeset>}
+       * @type {pentaho.lang.SortedList.<pentaho.type.changes.Changeset>}
        * @private
        * @see pentaho.type.changes.Transaction#__doCommitWillCore
        */
@@ -111,7 +111,7 @@ define([
       /**
        * The set of the owner uids of changesets which are present in the changesets `__commitWillQueue`.
        *
-       * @type {?object.<string, boolean>}
+       * @type {?Object.<string, boolean>}
        * @private
        */
       this.__commitWillQueueSet = null;
@@ -127,7 +127,7 @@ define([
       /**
        * The set of owner uids of changesets which have ran at least once.
        *
-       * @type {?object.<string, boolean>}
+       * @type {?Object.<string, boolean>}
        * @private
        */
       this.__commitWillRanSet = null;

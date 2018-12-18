@@ -108,7 +108,7 @@
  * @name loadConfigAsync
  * @memberOf pentaho.module.IMeta#
  * @method
- * @return {Promise.<Object>} A promise for the configuration of the module.
+ * @return {Promise.<?object>} A promise for the configuration of the module.
  *
  * @see pentaho.module.IMeta#config
  */

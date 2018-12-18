@@ -92,7 +92,7 @@ define([
       /**
        * Performs the boolean operation including its operands and the additional operands provided as arguments.
        *
-       * @param {...any} operands - The additional operands.
+       * @param {...*} operands - The additional operands.
        * @return {pentaho.filter.Abstract} The resulting filter.
        *
        * @protected
@@ -162,7 +162,7 @@ define([
        *
        * @param {pentaho.data.filter.FTransformer} transformer - The transformer function.
        * @param {?object} [keyArgs] - The keyword arguments object.
-       * @param {function} [keyArgs.where] - A predicate function to filter desired children.
+       * @param {?function} [keyArgs.where] - A predicate function to filter desired children.
        *
        * @return {Array.<pentaho.data.filter.Abstract>} The transformed operands or `null`.
        *

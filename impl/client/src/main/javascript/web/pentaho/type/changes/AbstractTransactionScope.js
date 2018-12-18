@@ -140,7 +140,7 @@ define([
     /**
      * Calls a given function within the scope and safely exits from the scope.
      *
-     * @param {function(pentaho.type.changes.TransactionScope) : any} fun - The function to call within the scope.
+     * @param {function(pentaho.type.changes.TransactionScope) : *} fun - The function to call within the scope.
      * The function is called with the `this` context specified in argument `ctx`.
      * The return value of `fun` is returned back from this method.
      *

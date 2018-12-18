@@ -377,8 +377,8 @@ define([
      *     expect(Table.convertJsonCdaToTableSpec(cdaTableSpec)).toEqual(tableSpec);
      *   });
      *
-     * @param {?object} cdaTable A table object in _CDA_ format.
-     * @return {?object} A table object in _data table_ format.
+     * @param {object} cdaTable A table object in _CDA_ format.
+     * @return {object} A table object in _data table_ format.
      * @see pentaho.data.AbstractTable#toJsonCda
      */
     convertJsonCdaToTableSpec: function(cdaTable) {

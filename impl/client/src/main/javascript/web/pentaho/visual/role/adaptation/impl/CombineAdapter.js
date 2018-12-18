@@ -46,7 +46,7 @@ define([
       /**
        * A map from key to row index.
        *
-       * @type {object.<string, number>}
+       * @type {Object.<string, number>}
        * @private
        * @readOnly
        */

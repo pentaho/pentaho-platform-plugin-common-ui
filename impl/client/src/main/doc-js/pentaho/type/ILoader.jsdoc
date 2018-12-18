@@ -94,7 +94,7 @@
  * @param {pentaho.type.spec.TypeReference} [keyArgs.defaultBase] The default base type
  * of `typeRef` when it is an immediate generic object specification.
  *
- * @return {Promise.<!Class.<pentaho.type.Instance>>} A promise for the instance constructor.
+ * @return {Promise.<Class.<pentaho.type.Instance>>} A promise for the instance constructor.
  *
  * @rejects {pentaho.lang.ArgumentRequiredError} When `typeRef` is an empty string or {@link Nully}.
  *
@@ -173,7 +173,7 @@
  * @param {pentaho.type.Type} [baseType] - The base type of which returned instances must be an instance and,
  * also, the default type used when type information is not available in `instRef`.
  *
- * @return {Promise.<!pentaho.type.Instance>} A promise to an instance.
+ * @return {Promise.<pentaho.type.Instance>} A promise to an instance.
  *
  * @rejects {pentaho.lang.OperationInvalidError} When it is not possible to determine the type of instance to create
  * based on `instRef` and `baseType` is not specified.

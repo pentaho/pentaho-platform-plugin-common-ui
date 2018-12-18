@@ -34,7 +34,7 @@ define([
    * @name pentaho.type.ValueType
    * @class
    * @extends pentaho.type.Type
-   * @implements ?pentaho.lang.ISpecifiable
+   * @implements {pentaho.lang.ISpecifiable}
    *
    * @classDesc The base type class of value types.
    *
@@ -49,8 +49,8 @@ define([
    * @abstract
    * @class
    * @extends pentaho.type.Instance
-   * @implements ?pentaho.lang.IConfigurable
-   * @implements ?pentaho.lang.ISpecifiable
+   * @implements {pentaho.lang.IConfigurable}
+   * @implements {pentaho.lang.ISpecifiable}
    * @amd pentaho/type/Value
    *
    * @classDesc The base, abstract class of [instances]{@link pentaho.type.Instance} which
@@ -328,7 +328,7 @@ define([
     /**
      * Gets the type of this instance.
      *
-     * @type ?pentaho.type.ValueType
+     * @type {pentaho.type.ValueType}
      * @readonly
      */
     $type: /** @lends pentaho.type.ValueType# */{

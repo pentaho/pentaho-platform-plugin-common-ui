@@ -97,7 +97,7 @@ define([
        * Gets a set of used palette identifiers on the given owner.
        *
        * @param {pentaho.type.Complex} owner - The owner complex.
-       * @return {object.<string, boolean>} The set of used identifiers.
+       * @return {Object.<string, boolean>} The set of used identifiers.
        */
       __collectOtherUsedPalettesIdsOn: function(owner) {
 

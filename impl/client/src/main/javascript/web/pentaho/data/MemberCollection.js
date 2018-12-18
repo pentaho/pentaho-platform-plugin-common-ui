@@ -67,7 +67,7 @@ define([
     /**
      * Gets the attribute to which the members collection belongs.
      *
-     * @type !pentaho.data.Attribute
+     * @type pentaho.data.Attribute
      * @readonly
      */
     get attribute() {

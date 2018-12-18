@@ -85,7 +85,7 @@ define([
      * @param {number} [start=0] The index of the `args` array to begin the slice.
      * @param {number} [end] The index of the `args` array to end the slice at.
      *
-     * @return {?object} Array containing the elements from the `args` array between the `start` and the `end`.
+     * @return {Array} Array containing the elements from the `args` array between the `start` and the `end`.
      */
     slice: function(args, start, end) {
       if(!args) throw error.argRequired("args");

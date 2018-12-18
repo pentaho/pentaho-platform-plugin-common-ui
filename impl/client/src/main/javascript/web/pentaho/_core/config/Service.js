@@ -74,7 +74,7 @@ define([
        *
        * @description Creates a configuration service instance for a given environment.
        *
-       * @param {?pentaho.environment.IEnvironment} environment - The environment used to select configuration rules.
+       * @param {?pentaho.environment.IEnvironment} [environment] - The environment used to select configuration rules.
        */
       constructor: function(environment) {
 
@@ -89,7 +89,7 @@ define([
          * A map connecting a type or instance identifier to the applicable configuration rules,
          * ordered from least to most specific.
          *
-         * @type {?object.<string, Array.<pentaho.config.spec.IRule>>}
+         * @type {Object.<string, Array.<pentaho.config.spec.IRule>>}
          * @private
          */
         this.__ruleStore = Object.create(null);
@@ -316,7 +316,7 @@ define([
   /**
    * Determines if a given rule is selected by the current environment.
    *
-   * @this ?pentaho.environment.IEnvironment
+   * @this pentaho.environment.IEnvironment
    *
    * @param {pentaho.config.spec.IRule} rule - A type configuration rule to check.
    *

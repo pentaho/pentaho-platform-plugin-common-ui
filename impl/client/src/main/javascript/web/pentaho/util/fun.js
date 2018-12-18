@@ -32,7 +32,7 @@ define(function() {
       /**
        * Determine if the value passed is a `function`.
        *
-       * @param {?(object|function|*)} f Value to be tested.
+       * @param {*} f Value to be tested.
        * @return {boolean} `true` if `f` is a function, `false` otherwise.
        */
       is: function(f) {
@@ -51,7 +51,7 @@ define(function() {
        * Creates a function that always returns the same value.
        *
        * @param {*} v Value to be return by the constant function.
-       * @return {?function} Constant function.
+       * @return {function} Constant function.
        */
       constant: function(v) {
         return function() {

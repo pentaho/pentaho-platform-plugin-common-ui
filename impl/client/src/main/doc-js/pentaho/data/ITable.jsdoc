@@ -127,7 +127,7 @@
  * @method
  * @param {number} rowIndex - The row index (zero-based).
  * @param {number} colIndex - The column index (zero-based).
- * @return {*|null} The cell's value.
+ * @return {*} The cell's value.
  */
 
 /**

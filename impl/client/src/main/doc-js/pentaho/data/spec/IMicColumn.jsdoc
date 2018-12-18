@@ -41,7 +41,7 @@
  * The specification is invalid when the attribute is not specified and
  * there is more than one measure attribute.
  *
- * @property {?pentaho.data.spec.Cell[]} c An array of cell specifications.
+ * @property {pentaho.data.spec.Cell[]} c An array of cell specifications.
  *
  * These cells form a tuple that identifies the column's entity set.
  * Its structure must be that of the attributes playing the "crossed-column" role,

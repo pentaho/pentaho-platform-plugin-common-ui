@@ -397,7 +397,7 @@ define([
    * @memberOf pentaho.lang.Base
    *
    * @param {?string} name The name of the created class.
-   * @param {?object} instSpec The instance-side specification.
+   * @param {?object|undefined} instSpec The instance-side specification.
    * @param {?string[]} [instSpec.extend_order] An array of instance property names that
    * [extend]{@link pentaho.lang.Base#extend} should always apply
    * before other properties and in the given order.
@@ -415,8 +415,8 @@ define([
    *
    * Properties can have any value.
    *
-   * @param {?object} classSpec The class-side specification.
-   * @param {?object} keyArgs The keyword arguments.
+   * @param {?object|undefined} classSpec The class-side specification.
+   * @param {?object|undefined} keyArgs The keyword arguments.
    *
    * @return {Class.<pentaho.lang.Base>} The new subclass.
    *
@@ -462,7 +462,7 @@ define([
    * @memberOf pentaho.lang.Base
    *
    * @param {?string} name The name of the created class.
-   * @param {?object} instSpec The instance-side specification.
+   * @param {?object|undefined} instSpec The instance-side specification.
    * @param {?string[]} [instSpec.extend_order] An array of instance property names that
    * [extend]{@link pentaho.lang.Base#extend} should always apply
    * before other properties and in the given order.
@@ -479,8 +479,8 @@ define([
    * The given property names are joined with any inherited _excluded_ property names.
    *
    * Properties can have any value.
-   * @param {?object} classSpec The class-side specification.
-   * @param {?object} keyArgs The keyword arguments.
+   * @param {?object|undefined} classSpec The class-side specification.
+   * @param {?object|undefined} keyArgs The keyword arguments.
    *
    * @return {Class.<pentaho.lang.Base>} The new subclass.
    *
@@ -518,8 +518,8 @@ define([
     O.setConst(subProto, "__base_bases__", bases);
     O.setConst(subProto, "__base_ops__", [
       // Represents initial extend, as it will be done when mixing in another class.
-      {name: "mix", args: [instSpec, classSpec, keyArgs]
-    }]);
+      {name: "mix", args: [instSpec, classSpec, keyArgs]}
+    ]);
 
     // ----
 
@@ -555,9 +555,9 @@ define([
    * @memberOf pentaho.lang.Base
    *
    * @param {function} Subclass The created subclass.
-   * @param {?object} instSpec The instance-side specification.
-   * @param {?object} classSpec The static-side specification.
-   * @param {?object} keyArgs The keyword arguments.
+   * @param {?object|undefined} instSpec The instance-side specification.
+   * @param {?object|undefined} classSpec The static-side specification.
+   * @param {?object|undefined} keyArgs The keyword arguments.
    *
    * @protected
    */
@@ -578,7 +578,7 @@ define([
    *    2. Otherwise, creates an empty constructor.
    *
    * @param {object} proto The subclass' prototype.
-   * @param {?object} instSpec The instance-side specification.
+   * @param {?object|undefined} instSpec The instance-side specification.
    * @param {string} [name] The class name.
    *
    * @return {function} The subclass constructor.
@@ -610,7 +610,7 @@ define([
    *
    * Should not be a get/set property, or it will be evaluated and the resulting value used instead.
    *
-   * @param {?object} instSpec The instance-side specification.
+   * @param {?object|undefined} instSpec The instance-side specification.
    *
    * @return {?function} The constructor function provided in `instSpec`, if any, or `null`.
    *
@@ -643,10 +643,10 @@ define([
 
     /* eslint no-new-func: 0 */
     var f = new Function(
-        "init",
-        "return function " + sanitizeJSIdentifier(name) + "() {\n" +
-        "  return init.apply(this, arguments);\n" +
-        "};");
+      "init",
+      "return function " + sanitizeJSIdentifier(name) + "() {\n" +
+      "  return init.apply(this, arguments);\n" +
+      "};");
 
     return f(init);
   }
@@ -667,7 +667,7 @@ define([
    * @memberOf pentaho.lang.Base
    *
    * @param {*} value The value to be cast.
-   * @param {...any} other Remaining arguments passed alongside `value` to the class constructor.
+   * @param {...*} other Remaining arguments passed alongside `value` to the class constructor.
    *
    * @return {pentaho.lang.Base} The converted value.
    *
@@ -698,7 +698,7 @@ define([
    * @alias pentaho.lang.Base.Array.to
    *
    * @param {pentaho.lang.Base.Array|Array} value The value to be converted.
-   * @param {...any} other Remaining arguments passed alongside `value` to the class constructor.
+   * @param {...*} other Remaining arguments passed alongside `value` to the class constructor.
    *
    * @return {pentaho.lang.Base.Array} The converted value.
    *
@@ -734,7 +734,7 @@ define([
    * @alias mix
    * @memberOf pentaho.lang.Base
    *
-   * @param {function|Object} instSpec The class to mixin or the instance-side specification.
+   * @param {?(function|Object)} instSpec The class to mixin or the instance-side specification.
    * @param {?object} [classSpec] The class-side specification.
    * @param {?object} [keyArgs] The keyword arguments.
    * @param {?object} [keyArgs.exclude] A set of property names to _exclude_,
@@ -768,11 +768,13 @@ define([
    * @alias _mix
    * @memberOf pentaho.lang.Base
    *
-   * @param {function|Object} instSpec The class to mixin or the instance-side specification.
+   * @param {?(function|Object)} instSpec The class to mixin or the instance-side specification.
    * @param {?object} [classSpec] The class-side specification.
    * @param {?object} [keyArgs] The keyword arguments.
    * @param {?object} [keyArgs.exclude] A set of property names to _exclude_,
    *  _both_ from the instance and class sides. Properties can have any value.
+   *
+   * @return {Class.<pentaho.lang.Base>} This class.
    *
    * @private
    */
@@ -888,7 +890,7 @@ define([
    *
    * @param {...?function|...Object} instSpecs The instance-side specifications to mix-in.
    *
-   * @return {Class.<pentaho.lang.Base>|function} This class.
+   * @return {Class.<pentaho.lang.Base>} This class.
    *
    * @see pentaho.lang.Base.implementStatic
    * @see pentaho.lang.Base.mix
@@ -936,9 +938,9 @@ define([
    * @alias implementStatic
    * @memberOf pentaho.lang.Base
    *
-   * @param {...?function|...Object} classSpecs The class-side specifications to mix-in.
+   * @param {...(function|object|Nully)} classSpecs The class-side specifications to mix-in.
    *
-   * @return {Class.<pentaho.lang.Base>|function} This class.
+   * @return {Class.<pentaho.lang.Base>} This class.
    */
   function class_implementStatic() {
     /* jshint validthis:true*/

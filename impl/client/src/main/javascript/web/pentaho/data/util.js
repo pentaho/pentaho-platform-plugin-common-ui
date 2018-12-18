@@ -109,7 +109,7 @@ define([
     /**
      * Creates a data filter from the given cells map and source data table.
      *
-     * @param {object.<string, *|pentaho.data.ICell>} cellsMap - The data cells map.
+     * @param {Object.<string, *|pentaho.data.ICell>} cellsMap - The data cells map.
      * @param {pentaho.data.ITable} dataPlain - The associated source, plain data table.
      *
      * @return {pentaho.data.filter.Abstract} A data filter.
@@ -184,7 +184,7 @@ define([
      * If all rows are selected, then the given plain table is returned, directly.
      *
      * @param {pentaho.data.ITable} dataPlain - The plain data table.
-     * @param {function(!pentaho.data.ITable, number) : boolean} rowPredicate - A predicate function
+     * @param {function(pentaho.data.ITable, number) : boolean} rowPredicate - A predicate function
      * that, when given a plain data table and a row index, returns `true` to include the row and `false` to ignore it.
      *
      * @return {pentaho.data.ITable} The resulting table view.
@@ -202,7 +202,7 @@ define([
      * If all rows are selected, then `null` is returned instead.
      *
      * @param {pentaho.data.ITable} dataPlain - The plain data table.
-     * @param {function(!pentaho.data.ITable, number) : boolean} rowPredicate - A predicate function
+     * @param {function(pentaho.data.ITable, number) : boolean} rowPredicate - A predicate function
      * that, when given a plain data table and a row index, returns `true` to include the row and `false` to ignore it.
      *
      * @return {Array.<number>} The selected row indexes, or `null`.
@@ -228,7 +228,7 @@ define([
      *
      * @param {Array.<number>} columnIndexes - The column indexes.
      *
-     * @return {function(!pentaho.data.ITable, number) : boolean} The row predicate function.
+     * @return {function(pentaho.data.ITable, number) : boolean} The row predicate function.
      */
     buildRowPredicateNotAllNullColumns: function(columnIndexes) {
 

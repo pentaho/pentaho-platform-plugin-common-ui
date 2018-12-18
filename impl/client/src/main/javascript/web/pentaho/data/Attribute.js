@@ -32,10 +32,10 @@ define([
      * @class
      * @ignore
      *
-     * @implements ?pentaho.lang.ISpecifiable
-     * @implements ?pentaho.lang.IAnnotatable
-     * @implements ?pentaho.lang.IListElement
-     * @implements ?pentaho.lang.IWithKey
+     * @implements {pentaho.lang.ISpecifiable}
+     * @implements {pentaho.lang.IAnnotatable}
+     * @implements {pentaho.lang.IListElement}
+     * @implements {pentaho.lang.IWithKey}
      *
      * @classDesc The `Attribute` class represents an attribute that can be
      * attributed to entities of a model.
@@ -111,7 +111,7 @@ define([
       /**
        * Gets the name of the type of the attribute.
        *
-       * @type !pentaho.data.AtomicTypeName
+       * @type pentaho.data.AtomicTypeName
        * @readonly
        */
       this.type = type;

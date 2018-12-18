@@ -50,9 +50,9 @@ define([
    * modules configuration and rule sets.
    *
    * @param {pentaho.environment.IEnvironment} environment - The environment.
-   * @param {?pentaho.module.spec.MetaMap} globalModuleMap - The global modules map.
+   * @param {?pentaho.module.spec.MetaMap} [globalModuleMap] - The global modules map.
    *
-   * @return {?Promise.<!pentaho._core.Core>} A promise that resolves to the created and initialized `Core` instance.
+   * @return {Promise.<pentaho._core.Core>} A promise that resolves to the created and initialized `Core` instance.
    */
   Core.createAsync = function(environment, globalModuleMap) {
 
@@ -80,7 +80,7 @@ define([
     /**
      * Loads AMD-config registered configuration rule-set modules.
      *
-     * @return {Promise.<!Array.<pentaho.config.spec.IRuleSet>>} A promise for an array of rule sets.
+     * @return {Promise.<Array.<pentaho.config.spec.IRuleSet>>} A promise for an array of rule sets.
      */
     function loadConfigRuleSetsAsync() {
 
@@ -126,7 +126,7 @@ define([
      *
      * @param {Array.<pentaho.config.spec.IRuleSet>} moduleRuleSets - The array of module rule sets.
      *
-     * @return {Promise.<!pentaho._core.Core>} A promise for the `Core` instance.
+     * @return {Promise.<pentaho._core.Core>} A promise for the `Core` instance.
      */
     function initGivenConfigRules(moduleRuleSets) {
 

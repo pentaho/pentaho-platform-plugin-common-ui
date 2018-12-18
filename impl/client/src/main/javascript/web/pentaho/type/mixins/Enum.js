@@ -107,7 +107,7 @@ define([
        * Validates a value w.r.t. the restricted domain.
        *
        * @param {pentaho.type.Simple} value - The value to validate.
-       * @return {Nully|pentaho.type.ValidationError|Array.<!pentaho.type.ValidationError>} The error, errors or null.
+       * @return {Nully|pentaho.type.ValidationError|Array.<pentaho.type.ValidationError>} The error, errors or null.
        * @private
        */
       __validateDomain: function(value) {

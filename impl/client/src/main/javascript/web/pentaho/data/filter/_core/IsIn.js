@@ -97,7 +97,7 @@ define([
            *
            * @name values
            * @memberOf pentaho.data.filter.IsIn#
-           * @type {Array.<any>}
+           * @type {Array}
            *
            * @readOnly
            */

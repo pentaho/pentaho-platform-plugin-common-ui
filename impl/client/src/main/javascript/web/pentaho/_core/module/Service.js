@@ -80,7 +80,7 @@ define(function() {
    * Loads a series of modules given their metadata. Returns an array of values
    * for the successfully loaded modules.
    *
-   * @param {Array.<!pentaho.module.IMeta>} moduleMetas - The metadata of modules to load.
+   * @param {Array.<pentaho.module.IMeta>} moduleMetas - The metadata of modules to load.
    *
    * @return {Promise.<Array>} A promise for the array of successfully loaded modules' values.
    */

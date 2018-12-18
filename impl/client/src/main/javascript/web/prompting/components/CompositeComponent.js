@@ -21,7 +21,7 @@
  * @name CompositeComponent
  * @class
  *
- * @property {?(Array|BaseComponent)} components The array of components
+ * @property {Array|BaseComponent} components The array of components
  * @property {boolean} executeAtStart True if this component should be executed on the first update of the Dashboard
  * object were it is, False otherwise
  */

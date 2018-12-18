@@ -67,7 +67,7 @@ define([
       /**
        * The array of subtype modules.
        *
-       * @type {Array.<!pentaho.module.ITypeMeta>}
+       * @type {Array.<pentaho.module.ITypeMeta>}
        * @private
        */
       __subtypes: Object.freeze([]),
@@ -97,7 +97,7 @@ define([
       /**
        * The array of instance modules.
        *
-       * @type {Array.<!pentaho.module.IInstanceMeta>}
+       * @type {Array.<pentaho.module.IInstanceMeta>}
        * @private
        */
       __instances: Object.freeze([]),

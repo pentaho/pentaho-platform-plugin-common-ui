@@ -384,7 +384,7 @@ define([
        *
        * @param {!*} value - The value to convert.
        *
-       * @return {?any} The converted value or `null`, when not possible to convert.
+       * @return {*} The converted value or `null`, when not possible to convert.
        *
        * @throws {pentaho.lang.UserError} When the value cannot be converted for some reason.
        */

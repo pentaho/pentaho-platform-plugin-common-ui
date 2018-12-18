@@ -60,7 +60,7 @@ define([
 
       /**
        * Map of property types by nameAlias.
-       * @type {object.<string, pentaho.type.PropertyType>}
+       * @type {Object.<string, pentaho.type.PropertyType>}
        * @private
        */
       this.__propTypesByAlias = Object.create(null);

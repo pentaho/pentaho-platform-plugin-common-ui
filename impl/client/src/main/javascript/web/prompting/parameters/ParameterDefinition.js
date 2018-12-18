@@ -23,10 +23,10 @@
  * @property {string} layout String defining if the layout of the prompt is Vertical or Horizontal
  * @property {number} page The number of the page
  * @property {boolean} paginate True if pagination is active, False otherwise
- * @property {?(Array|ParameterGroup)} parameterGroups The array of ParameterGroup
+ * @property {Array|ParameterGroup} parameterGroups The array of ParameterGroup
  * @property {boolean} promotNeeded True if prompts are needed, False otherwise
  * @property {number} totalPages The number of total pages of the report
- * @property {?(object|Array)} errors The array of errors per parameter
+ * @property {object|Array} errors The array of errors per parameter
  */
 define(['common-ui/jquery-clean'], function ($) {
   return function () {

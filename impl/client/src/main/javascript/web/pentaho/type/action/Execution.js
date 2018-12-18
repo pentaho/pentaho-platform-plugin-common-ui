@@ -231,7 +231,7 @@ define([
       /**
        * An object with a `promise` and it's controlling `resolve` and `reject` functions.
        *
-       * @type {{promise: Promise, resolve: ?function(any), reject: ?function(any)}}
+       * @type {{promise: Promise, resolve: ?function(*), reject: ?function(*)}}
        * @private
        */
       this.__promiseControl = null;
@@ -494,7 +494,7 @@ define([
     /**
      * Gets or creates the promise control object.
      *
-     * @return {{promise: Promise, resolve: ?function(any), reject: ?function(any)}} The promise control object.
+     * @return {{promise: Promise, resolve: ?function(*), reject: ?function(*)}} The promise control object.
      * @private
      */
     __getPromiseControl: function() {
@@ -504,7 +504,7 @@ define([
     /**
      * Creates a promise control object.
      *
-     * @return {{promise: Promise, resolve: ?function(any), reject: ?function(any)}} A promise control object.
+     * @return {{promise: Promise, resolve: ?function(*), reject: ?function(*)}} A promise control object.
      * @private
      */
     __createPromiseControl: function() {

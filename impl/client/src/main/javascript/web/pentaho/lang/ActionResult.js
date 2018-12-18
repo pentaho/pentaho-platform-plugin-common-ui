@@ -55,8 +55,8 @@ define([
      *
      * @constructor
      *
-     * @param {?object} value - The value of a successful _action_.
-     * @param {string|Error|pentaho.lang.UserError} error - The error that contains the reason why
+     * @param {?object} [value=undefined] - The value of a successful _action_.
+     * @param {?(string|Error|pentaho.lang.UserError)} [error=null] - The error that contains the reason why
      * the _action_ was rejected.
      */
     constructor: function(value, error) {
@@ -150,7 +150,7 @@ define([
     /**
      * Creates an action result that represents an unsuccessful action.
      *
-     * @param {string|Error|pentaho.lang.UserError} [error] - The error that contains the reason why
+     * @param {?(string|Error|pentaho.lang.UserError)} [error=null] - The error that contains the reason why
      * the action was rejected.
      * @return {pentaho.lang.ActionResult} A new action result.
      */

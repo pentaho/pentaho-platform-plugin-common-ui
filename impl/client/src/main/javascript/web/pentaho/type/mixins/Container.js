@@ -131,7 +131,7 @@ define([
      *
      * Do **NOT** change the returned array or its elements in any way.
      *
-     * @type {Array.<Object>}
+     * @type {?Array.<object>}
      * @readOnly
      */
     get $references() {

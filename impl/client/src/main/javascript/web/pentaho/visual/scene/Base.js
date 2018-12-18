@@ -104,7 +104,7 @@ define([
      *
      * The returned array cannot be modified directly.
      *
-     * @type {Array.<!pentaho.visual.scene.Base>}
+     * @type {Array.<pentaho.visual.scene.Base>}
      * @readOnly
      */
     children: Object.freeze([]),
@@ -176,7 +176,7 @@ define([
      * be included.
      * In practice, indicates that all fields should be included.
      *
-     * @return {object.<string, pentaho.data.ICell>} A data cells map, possibly empty.
+     * @return {Object.<string, pentaho.data.ICell>} A data cells map, possibly empty.
      *
      * @see pentaho.visual.scene.util.invertVars
      */

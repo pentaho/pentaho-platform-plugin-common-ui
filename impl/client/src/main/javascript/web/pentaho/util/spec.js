@@ -23,7 +23,7 @@ define([
   /**
    * Map of merge operation name to operation handler function.
    *
-   * @type {?object.<string, function>}
+   * @type {?Object.<string, function>}
    * @see __mergeOne
    */
   var _mergeHandlers = {

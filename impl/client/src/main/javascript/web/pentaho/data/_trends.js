@@ -34,13 +34,13 @@ define([
      *
      * @method createTrend
      * @for AbstractTable
-     * @param {?object} trendArgs A keyword arguments object.
+     * @param {object} trendArgs A keyword arguments object.
      * @param {string} trendArgs.type  The type of trend to create; possible values: 'linear'.
      * @param {number} trendArgs.x     The index of the "x" value column; can be a numeric or string column.
      * @param {number} trendArgs.y     The index of the "y" value column; must be of a column of type 'number'.
-     * @param {string} trendArgs.name  The name of the new trend column; defaults to the type of trend plus the
+     * @param {?string} [trendArgs.name]  The name of the new trend column; defaults to the type of trend plus the
      * suffix "Trend".
-     * @param {string} trendArgs.label The label of the new trend column; defaults to the trend name, when specified,
+     * @param {?string} [trendArgs.label] The label of the new trend column; defaults to the trend name, when specified,
      * or to the default label of the trend type.
      * @return {number} The index of the added trend column.
      */

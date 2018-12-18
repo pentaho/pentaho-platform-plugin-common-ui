@@ -1136,7 +1136,7 @@ define([
      * Gets a promise for the view class (constructor), of the registered default type, if any,
      * for the given model type or identifier.
      *
-     * @param {string|!pentaho.visual.base.ModelType} modelType - The visual model type or its identifier.
+     * @param {string|pentaho.visual.base.ModelType} modelType - The visual model type or its identifier.
      * @return {Promise.<Class.<pentaho.visual.base.View>>} A promise for a view class of the given model type.
      *
      * @rejects {pentaho.lang.ArgumentRequiredError} When `modelType` is not specified.

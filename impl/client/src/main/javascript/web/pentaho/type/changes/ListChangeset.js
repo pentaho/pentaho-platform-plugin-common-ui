@@ -53,7 +53,7 @@ define([
       /**
        * Map of the existing child changesets, with current primitive changes applied.
        *
-       * @type {object.<string, !pentaho.type.changes.Changeset>}
+       * @type {Object.<string, pentaho.type.changes.Changeset>}
        * @private
        */
       this.__changesetByKey = Object.create(null);
@@ -61,7 +61,7 @@ define([
       /**
        * Array of primitive changes.
        *
-       * @type {Array.<!pentaho.type.changes.Change>}
+       * @type {Array.<pentaho.type.changes.Change>}
        * @private
        */
       this.__primitiveChanges = [];
@@ -227,7 +227,7 @@ define([
      * Otherwise, a projected mock containing only
      * the elements' data structures is created and returned.
      *
-     * @type {object|!pentaho.type.List}
+     * @type {object|pentaho.type.List}
      * @readOnly
      * @private
      * @internal
@@ -272,7 +272,7 @@ define([
      *
      * This method is used for computing the future value of the list incrementally.
      *
-     * @param {object|!pentaho.type.List} list - The list or list mock to which to apply changes.
+     * @param {object|pentaho.type.List} list - The list or list mock to which to apply changes.
      * @param {number} startingFromIdx - The index of the first change to be considered.
      * @private
      * @internal
@@ -543,7 +543,7 @@ define([
       // 1: Existing element, removed
       var removeKeys = {};
 
-      /** @type ?Array.<{value: pentaho.type.Element, from: number}> */
+      /** @type Array.<{value: pentaho.type.Element, from: number}> */
       var removedInfos = [];
 
       // I - Pre-process removeElems array

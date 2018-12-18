@@ -43,5 +43,5 @@
  *
  * @name d
  * @memberOf pentaho.type.spec.IList#
- * @type {Array.<!pentaho.type.spec.Element>}
+ * @type {Array.<pentaho.type.spec.Element>}
  */

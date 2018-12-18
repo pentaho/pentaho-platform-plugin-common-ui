@@ -38,8 +38,8 @@ define([
    * @memberOf pentaho.data
    * @class
    * @abstract
-   * @implements ?pentaho.lang.ISpecifiable
-   * @implements ?pentaho.data.ITable
+   * @implements {pentaho.lang.ISpecifiable}
+   * @implements {pentaho.data.ITable}
    * @amd pentaho/data/AbstractTable
    *
    * @classdesc The `AbstractTable` class is the abstract base class of
@@ -75,7 +75,7 @@ define([
      * @name pentaho.data.AbstractTable#addColumn
      * @method
      * @abstract
-     * @param {?object} colSpec The column specification.
+     * @param {object} colSpec The column specification.
      * @param {?object} [keyArgs] The keyword arguments.
      * @return {number} The index of the new column.
      */
@@ -86,7 +86,7 @@ define([
      * @name pentaho.data.AbstractTable#addRow
      * @method
      * @abstract
-     * @param {?object} rowSpec The row specification.
+     * @param {object} rowSpec The row specification.
      * @param {?object} [keyArgs] The keyword arguments.
      * @return {number} The index of the new row.
      */
@@ -108,7 +108,7 @@ define([
      *
      * @name pentaho.data.AbstractTable#model
      * @readonly
-     * @type {?pentaho.data.Model}
+     * @type {pentaho.data.Model}
      */
 
     // -----
@@ -182,8 +182,8 @@ define([
      *
      * @param {number} colIndex The column index (zero-based).
      * @param {?object} [options] A keyword arguments object.
-     * @param {function} [options.key] A function that derives values from the actual column values.
-     * @return {?pentaho.data.Range} A non-null range object.
+     * @param {?function} [options.key] A function that derives values from the actual column values.
+     * @return {pentaho.data.Range} A non-null range object.
      */
     getColumnRange: function(colIndex, options) {
       var set = false;
@@ -341,7 +341,7 @@ define([
     /**
      * Creates a CDA dataset.
      *
-     * @return {?object} The CDA dataset.
+     * @return {object} The CDA dataset.
      */
     toJsonCda: function() {
       var C = this.getNumberOfColumns();

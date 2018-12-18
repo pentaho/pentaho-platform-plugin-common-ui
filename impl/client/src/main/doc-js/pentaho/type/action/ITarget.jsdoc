@@ -46,7 +46,7 @@
  * @name act
  * @memberOf pentaho.type.action.ITarget#
  * @method
- * @param {pentaho.type.action.Base|!pentaho.type.action.spec.IBase} action - The action or
+ * @param {pentaho.type.action.Base|pentaho.type.action.spec.IBase} action - The action or
  * action specification to execute.
  * @return {pentaho.type.action.Execution} The resulting action execution.
  */

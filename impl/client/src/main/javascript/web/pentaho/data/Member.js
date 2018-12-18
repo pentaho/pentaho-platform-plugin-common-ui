@@ -29,10 +29,10 @@ define([
      * @class
      * @abstract
      * @ignore
-     * @implements ?pentaho.lang.ISpecifiable
-     * @implements ?pentaho.lang.IAnnotatable
-     * @implements ?pentaho.lang.IListElement
-     * @implements ?pentaho.lang.IWithKey
+     * @implements {pentaho.lang.ISpecifiable}
+     * @implements {pentaho.lang.IAnnotatable}
+     * @implements {pentaho.lang.IListElement}
+     * @implements {pentaho.lang.IWithKey}
      *
      * @classdesc The `Member` class is an abstract base class that
      * represents a value that a discrete attribute can hold.
@@ -118,7 +118,7 @@ define([
     /**
      * Gets the attribute of the member.
      *
-     * @type !pentaho.data.Attribute
+     * @type pentaho.data.Attribute
      * @abstract
      * @readonly
      */
@@ -146,7 +146,7 @@ define([
      *
      * Note that the value of a member cannot be {@link Nully}.
      *
-     * @type !pentaho.data.Atomic
+     * @type pentaho.data.Atomic
      */
     get value() {
       return this.v;

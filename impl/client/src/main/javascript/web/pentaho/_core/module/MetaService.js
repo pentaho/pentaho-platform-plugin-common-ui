@@ -42,7 +42,7 @@ define([
       /**
        * The map of modules' metadata by identifier and alias.
        *
-       * @type {object.<string, !pentaho.module.IMeta>}
+       * @type {Object.<string, pentaho.module.IMeta>}
        * @private
        */
       this.__moduleMap = Object.create(null);
@@ -297,7 +297,7 @@ define([
      * Traverses the type hierarchy which is rooted on `baseType` and calls `funPre` in pre-order.
      *
      * @param {pentaho.module.ITypeMeta} baseType - The base type module.
-     * @param {function(!pentaho.module.ITypeMeta)} funPre - The function to call on each type module.
+     * @param {function(pentaho.module.ITypeMeta)} funPre - The function to call on each type module.
      */
     function __eachSubtypeModule(baseType, funPre) {
 

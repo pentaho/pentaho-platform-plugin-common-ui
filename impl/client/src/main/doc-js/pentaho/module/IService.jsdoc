@@ -36,7 +36,7 @@
  * @method
  * @param {string} typeIdOrAlias - The identifier or alias of the type module.
  *
- * @return {Promise.<!Array>} A promise to an array of module values, possibly empty.
+ * @return {Promise.<Array>} A promise to an array of module values, possibly empty.
  *
  * @see pentaho.module.IMetaService#getInstancesOf
  */
@@ -71,7 +71,7 @@
  * @method
  * @param {string} baseTypeIdOrAlias - The identifier or alias of the base type module.
  *
- * @return {Promise.<!Array>} A promise to an array of module values, possibly empty.
+ * @return {Promise.<Array>} A promise to an array of module values, possibly empty.
  *
  * @see pentaho.module.IMetaService#getSubtypesOf
  */

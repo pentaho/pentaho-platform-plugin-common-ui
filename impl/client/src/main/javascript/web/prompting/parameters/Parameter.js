@@ -27,7 +27,7 @@
  * @property {boolean} multiSelect {true} if the parameter is a multi select, {false} otherwise
  * @property {boolean} strict {true} if the parameter is strict, {false} otherwise
  * @property {string} timezoneHint The timezone of the parameter
- * @property {?object|String} attributes Hash of string for the remaining parameter attributes
+ * @property {object|string} attributes Hash of string for the remaining parameter attributes
  * @property {Array|ParameterValue} values The array of possible values of the parameter
  */
 define(['common-ui/jquery-clean'], function ($) {
