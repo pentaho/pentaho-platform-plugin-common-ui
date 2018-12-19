@@ -30,7 +30,7 @@ define([
    * @implements {IAmdLoaderPlugin}
    *
    * @private
-   * @param {function(!pentaho.module.IService, string) : !Promise} callModuleService - The module service
+   * @param {function(pentaho.module.IService, string) : Promise} callModuleService - The module service
    * caller function. Called with the module service and with the absolute plugin argument.
    */
   function ServicePlugin(callModuleService) {

@@ -92,8 +92,8 @@ define([
       /**
        * Performs the boolean operation including its operands and the additional operands provided as arguments.
        *
-       * @param {...any} operands - The additional operands.
-       * @return {!pentaho.filter.Abstract} The resulting filter.
+       * @param {...*} operands - The additional operands.
+       * @return {pentaho.filter.Abstract} The resulting filter.
        *
        * @protected
        */
@@ -142,9 +142,9 @@ define([
        * This implementation visits existing operands and, if none are modified, `this` is returned.
        * Otherwise, a new filter of the same type and with the transformed operands is returned.
        *
-       * @param {!pentaho.data.filter.FTransformer} transformer - The transformer function.
+       * @param {pentaho.data.filter.FTransformer} transformer - The transformer function.
        *
-       * @return {!pentaho.data.filter.Abstract} The transformed filter.
+       * @return {pentaho.data.filter.Abstract} The transformed filter.
        *
        * @see pentaho.data.filter.Tree#visitOperands
        *
@@ -160,9 +160,9 @@ define([
        *
        * If no operands are actually modified, `null` is returned.
        *
-       * @param {!pentaho.data.filter.FTransformer} transformer - The transformer function.
-       * @param {Object} [keyArgs] - The keyword arguments object.
-       * @param {function} [keyArgs.where] - A predicate function to filter desired children.
+       * @param {pentaho.data.filter.FTransformer} transformer - The transformer function.
+       * @param {?object} [keyArgs] - The keyword arguments object.
+       * @param {?function} [keyArgs.where] - A predicate function to filter desired children.
        *
        * @return {Array.<pentaho.data.filter.Abstract>} The transformed operands or `null`.
        *

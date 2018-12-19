@@ -17,7 +17,7 @@
 /**
  * @name pentaho.data.Table
  * @class
- * @implements pentaho.data.ITable
+ * @implements {pentaho.data.ITable}
  * @amd pentaho/data/Table
  *
  * @classdesc The `Table` class implements the `ITable` interface.
@@ -41,5 +41,5 @@
  * });
  *
  * @description Creates a table given specification of data.
- * @param {Object} [table] The data specification.
+ * @param {?object} [table] The data specification.
  */

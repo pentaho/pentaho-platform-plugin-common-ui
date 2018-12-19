@@ -72,7 +72,7 @@ define([
      * Gets a value that indicates this operation mode is applicable to
      * a given list of field types.
      *
-     * @param {!Array.<pentaho.type.Type>} fieldTypes - The list of field types.
+     * @param {Array.<pentaho.type.Type>} fieldTypes - The list of field types.
      *
      * @return {boolean} `true` if this operation mode is applicable to `fieldTypes`; `false` otherwise.
      */
@@ -147,7 +147,7 @@ define([
          * meaning that values of any data type are accepted.
          *
          * @name pentaho.visual.role.Mode#dataType
-         * @type {!pentaho.type.Type}
+         * @type {pentaho.type.Type}
          *
          * @see pentaho.visual.role.spec.IMode#dataType
          */

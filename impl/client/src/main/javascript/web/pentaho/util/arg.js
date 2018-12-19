@@ -36,9 +36,9 @@ define([
      *
      * @param {?object} o The object from which to get a property.
      * @param {string} p The name of the property.
-     * @param {any} [dv] The default value.
+     * @param {*} [dv] The default value.
      *
-     * @return {any} The value of the property. If the property does not exist, returns `dv`.
+     * @return {*} The value of the property. If the property does not exist, returns `dv`.
      */
     optional: function(o, p, dv) {
       var v;
@@ -52,9 +52,9 @@ define([
      *
      * @param {?object} o The object from which to get a property.
      * @param {string} p The name of the property.
-     * @param {any} [dv] The default value.
+     * @param {*} [dv] The default value.
      *
-     * @return {any} The value of the property. If the property does not exist, returns `dv`.
+     * @return {*} The value of the property. If the property does not exist, returns `dv`.
      */
     defined: function(o, p, dv) {
       var v;
@@ -69,7 +69,7 @@ define([
      * @param {string} p The name of the property.
      * @param {?string} pscope The name of the argument where the `o` is received in the caller.
      *
-     * @return {any} The found required property value.
+     * @return {*} The found required property value.
      * @throws {Error} Argument required. The `o` must contain the `p`.
      */
     required: function(o, p, pscope) {
@@ -81,11 +81,11 @@ define([
     /**
      * Slices the provided array.
      *
-     * @param {!object} args Array of anything.
+     * @param {object} args Array of anything.
      * @param {number} [start=0] The index of the `args` array to begin the slice.
      * @param {number} [end] The index of the `args` array to end the slice at.
      *
-     * @return {Object} Array containing the elements from the `args` array between the `start` and the `end`.
+     * @return {Array} Array containing the elements from the `args` array between the `start` and the `end`.
      */
     slice: function(args, start, end) {
       if(!args) throw error.argRequired("args");

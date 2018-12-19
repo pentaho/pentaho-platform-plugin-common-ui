@@ -58,9 +58,9 @@ define([
    * For additional information, see the associated _instance class_, {@link pentaho.type.Instance}.
    *
    * @description _Initializes_ the type's singleton object.
-   * @param {Object} spec - The specification of this type.
-   * @param {!Object} keyArgs - Keyword arguments.
-   * @param {!pentaho.type.Instance} keyArgs.instance - The _prototype_ of the `Instance` class associated with
+   * @param {?object} spec - The specification of this type.
+   * @param {object} keyArgs - Keyword arguments.
+   * @param {pentaho.type.Instance} keyArgs.instance - The _prototype_ of the `Instance` class associated with
    * this type.
    * @param {boolean} [keyArgs.isRoot=false] Indicates if the type is a _root_ type.
    */
@@ -152,8 +152,8 @@ define([
      * This method is typically overridden to block the inheritance of certain attributes.
      *
      * @param {object} spec - The specification of this type.
-     * @param {!Object} keyArgs - Keyword arguments.
-     * @param {!pentaho.type.Instance} keyArgs.instance - The _prototype_ of the `Instance` class associated with
+     * @param {object} keyArgs - Keyword arguments.
+     * @param {pentaho.type.Instance} keyArgs.instance - The _prototype_ of the `Instance` class associated with
      * this type.
      * @param {boolean} [keyArgs.isRoot=false] If `true`, creates a _root_ type.
      *
@@ -178,8 +178,8 @@ define([
      *
      * This method is typically overridden to validate or default the values of the attributes.
      *
-     * @param {!Object} spec - The specification of this type.
-     * @param {!Object} keyArgs - Keyword arguments.
+     * @param {object} spec - The specification of this type.
+     * @param {object} keyArgs - Keyword arguments.
      * @protected
      */
     _postInit: function(spec, keyArgs) {
@@ -414,7 +414,7 @@ define([
      * returns its [of]{@link pentaho.type.ListType#of} attribute.
      * Otherwise, this type is an element type, and it returns itself.
      *
-     * @type {!pentaho.type.Type}
+     * @type {pentaho.type.Type}
      * @readonly
      * @see pentaho.type.Type#isList
      * @see pentaho.type.Type#isElement
@@ -1128,8 +1128,8 @@ define([
      *
      * });
      *
-     * @param {pentaho.type.Instance|pentaho.type.spec.Instance} [instSpec] - An instance or instance specification.
-     * @param {Object} [instKeyArgs] - The keyword arguments passed to the instance constructor, when one is created.
+     * @param {pentaho.type.Instance|?pentaho.type.spec.Instance} [instSpec] - An instance or instance specification.
+     * @param {?object} [instKeyArgs] - The keyword arguments passed to the instance constructor, when one is created.
      *
      * @return {pentaho.type.Instance} The created instance or the resolved instance (possibly `null`).
      *
@@ -1150,10 +1150,10 @@ define([
      * This method delegates to [InstancesContainer#getAsync]{@link pentaho.type.InstancesContainer#getAsync}
      * with this type as the `typeBase` argument.
      *
-     * @param {pentaho.type.Instance|pentaho.type.spec.Instance} [instSpec] - An instance or instance specification.
-     * @param {Object} [instKeyArgs] - The keyword arguments passed to the instance constructor, when one is created.
+     * @param {pentaho.type.Instance|?pentaho.type.spec.Instance} [instSpec] - An instance or instance specification.
+     * @param {?object} [instKeyArgs] - The keyword arguments passed to the instance constructor, when one is created.
      *
-     * @return {!Promise.<pentaho.type.Instance>} A promise to the created instance or resolved instance
+     * @return {Promise.<pentaho.type.Instance>} A promise to the created instance or resolved instance
      * (possibly `null`).
      *
      * @rejects {Error} Other errors, as documented in:
@@ -1168,9 +1168,9 @@ define([
     /**
      * Asserts that a given type is a subtype of this type.
      *
-     * @param {!pentaho.type.Type} subtype - The subtype to assert.
+     * @param {pentaho.type.Type} subtype - The subtype to assert.
      *
-     * @return {!pentaho.type.Type} The subtype `subtype`.
+     * @return {pentaho.type.Type} The subtype `subtype`.
      *
      * @throws {pentaho.lang.OperationInvalidError} When `subtype` is not a subtype of this.
      *
@@ -1219,7 +1219,7 @@ define([
     /**
      * Determines if a value is an instance of this type.
      *
-     * @param {?any} value - The value to test.
+     * @param {*} value - The value to test.
      * @return {boolean} `true` if the value is an instance of this type; `false`, otherwise.
      */
     is: function(value) {
@@ -1250,8 +1250,8 @@ define([
      * this method delegates the creation of an instance to
      * [create]{@link pentaho.type.Type#create}.
      *
-     * @param {?any} value - The value to convert.
-     * @param {Object} [keyArgs] - The keyword arguments passed to `create`, when a new instance is created.
+     * @param {*} value - The value to convert.
+     * @param {?object} [keyArgs] - The keyword arguments passed to `create`, when a new instance is created.
      *
      * @return {?pentaho.type.Instance} The converted value or `null`.
      */
@@ -1287,7 +1287,7 @@ define([
      * obtained by calling [toSpecInContext]{@link pentaho.type.Type#toSpecInContext}.
      * In following occurrences, only the previously used temporary identifier is returned.
      *
-     * @param {Object} [keyArgs] The keyword arguments object.
+     * @param {?object} [keyArgs] The keyword arguments object.
      * Passed to every type and instance serialized within this scope.
      *
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
@@ -1295,7 +1295,7 @@ define([
      * @param {?boolean} [keyArgs.isJson=false] Generates a JSON-compatible specification.
      * Attributes that do not have a JSON-compatible specification are omitted.
      *
-     * @return {!pentaho.type.spec.TypeReference} A reference to this type.
+     * @return {pentaho.type.spec.TypeReference} A reference to this type.
      *
      * @see pentaho.type.Type#toSpecInContext
      * @see pentaho.type.Type#_fillSpecInContext
@@ -1320,12 +1320,12 @@ define([
      * or it does not but a temporary identifier has already been assigned in the ambient specification context.
      * Otherwise, execution delegates to [_toSpecInContextCore]{@link pentaho.type.Type#_toSpecInContextCore}.
      *
-     * @param {Object} [keyArgs] The keyword arguments object.
+     * @param {?object} [keyArgs] The keyword arguments object.
      * Passed to every type and instance serialized within this scope.
      *
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
      *
-     * @return {!pentaho.type.spec.TypeReference} A reference to this type.
+     * @return {pentaho.type.spec.TypeReference} A reference to this type.
      *
      * @see pentaho.type.Type#toSpec
      */
@@ -1355,7 +1355,7 @@ define([
      *
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
      *
-     * @return {!pentaho.type.spec.IType} A specification of this type.
+     * @return {pentaho.type.spec.IType} A specification of this type.
      * @protected
      *
      * @see pentaho.type.Type#_toSpecInContextCore
@@ -1384,7 +1384,7 @@ define([
      *
      * @see pentaho.type.Instance#toSpec
      *
-     * @return {JsonValue} A JSON-compatible specification.
+     * @return {?JsonValue} A JSON-compatible specification.
      */
     toJSON: function() {
       return this.toSpec({isJson: true});
@@ -1399,8 +1399,8 @@ define([
      *
      * This method does _not_ add the special `id` and `base` attributes to the specification.
      *
-     * @param {!Object} spec - The specification to be filled.
-     * @param {Object} [keyArgs] The keyword arguments object.
+     * @param {object} spec - The specification to be filled.
+     * @param {?object} [keyArgs] The keyword arguments object.
      * Passed to every type and instance serialized within this scope.
      *
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
@@ -1486,7 +1486,7 @@ define([
      * This **setter**-only JavaScript property is used
      * to extend the type with new dynamic attributes.
      *
-     * @type {Object}
+     * @type {object}
      * @ignore
      */
     set dynamicAttributes(attrSpecs) {
@@ -1500,8 +1500,8 @@ define([
      *
      * A "dynamic" attribute is dynamic (can be a function), monotonic and inherited.
      *
-     * @param {String} name - The name of the attribute.
-     * @param {Object} spec - The specification of the attribute.
+     * @param {string} name - The name of the attribute.
+     * @param {?object} spec - The specification of the attribute.
      * @private
      */
     __defineDynamicAttribute: function(name, spec) {
@@ -1623,8 +1623,8 @@ define([
      * [__fillSpecInContextDynamicAttribute]{@link pentaho.type.Type#__fillSpecInContextDynamicAttribute}
      * for each locally registered dynamic attribute.
      *
-     * @param {!Object} spec - The specification to be filled.
-     * @param {Object} [keyArgs] The keyword arguments object.
+     * @param {object} spec - The specification to be filled.
+     * @param {?object} [keyArgs] The keyword arguments object.
      * Passed to every type and instance serialized within this scope.
      *
      * @return {boolean} Returns `true` if the dynamic attribute was added; `false`, otherwise.
@@ -1675,15 +1675,15 @@ define([
      * This method requires that there currently exists an
      * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
      *
-     * @param {!Object} spec - The specification to be filled.
+     * @param {object} spec - The specification to be filled.
      * @param {string} name - The name of the dynamic attribute.
      * @param {string} group - The group name of the dynamic attribute.
      * @param {string} localName - The name of the dynamic attribute within the group.
-     * @param {function(any, object) : any} toSpec - The custom serialization method of the dynamic attribute, if any,
+     * @param {function(*, object) : *} toSpec - The custom serialization method of the dynamic attribute, if any,
      * is called to serialize a specified value of the dynamic attribute.
      * The method is called with the value and the keyArgs as arguments and with the property type as
      * the `this` context and should return the serialized value.
-     * @param {Object} [keyArgs] The keyword arguments object.
+     * @param {?object} [keyArgs] The keyword arguments object.
      * Passed to every type and instance serialized within this scope.
      *
      * @return {boolean} Returns `true` if the dynamic attribute was added; `false`, otherwise.

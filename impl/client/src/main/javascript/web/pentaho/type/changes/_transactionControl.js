@@ -75,7 +75,7 @@ define([
     /**
      * Called by a scope to make it become the new ambient scope.
      *
-     * @param {!pentaho.type.changes.AbstractTransactionScope} scopeEnter - The new ambient scope.
+     * @param {pentaho.type.changes.AbstractTransactionScope} scopeEnter - The new ambient scope.
      *
      * @private
      * @internal

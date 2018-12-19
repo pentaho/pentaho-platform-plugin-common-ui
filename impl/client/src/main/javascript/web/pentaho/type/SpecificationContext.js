@@ -29,7 +29,7 @@ define([
   /**
    * @name pentaho.type.SpecificationContext
    * @class
-   * @implements pentaho.lang.IDisposable
+   * @implements {pentaho.lang.IDisposable}
    *
    * @amd pentaho/type/SpecificationContext
    *
@@ -62,7 +62,7 @@ define([
        * The type infos of anonymous types already described in the context,
        * indexed by type unique identifier.
        *
-       * @type {Object.<string, Object>}
+       * @type {?Object.<string, object>}
        * @private
        */
       this.__typeInfosByUid = {};
@@ -71,7 +71,7 @@ define([
        * The type infos of anonymous types already described in the context,
        * indexed by a temporary identifier.
        *
-       * @type {Object.<string, Object>}
+       * @type {?Object.<string, object>}
        * @private
        */
       this.__typeInfosByTid = {};

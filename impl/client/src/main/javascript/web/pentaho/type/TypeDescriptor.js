@@ -49,7 +49,7 @@ define([
      * Gets the underlying type object.
      *
      * @name pentaho.type.TypeDescriptor#value
-     * @type {!pentaho.type.Type}
+     * @type {pentaho.type.Type}
      * @readonly
      */
 

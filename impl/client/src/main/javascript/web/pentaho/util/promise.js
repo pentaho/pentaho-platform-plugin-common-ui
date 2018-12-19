@@ -43,10 +43,10 @@ define([
      * The promise is fulfilled with the function's return value
      * or rejected with an error thrown by the function.
      *
-     * @param {function() : ?any} fun The function to call.
-     * @param {?Object} [ctx] The object on which to call `fun`.
+     * @param {function() : *} fun The function to call.
+     * @param {?object} [ctx] The object on which to call `fun`.
      *
-     * @return {Promise.<?any>} A promise for the function's return value.
+     * @return {Promise} A promise for the function's return value.
      */
     wrapCall: function(fun, ctx) {
       if(!fun) throw error.argRequired("fun");
@@ -68,11 +68,11 @@ define([
      * Optionally, receives a contextual `require` function,
      * so that module ids are taken relative to its module's folder.
      *
-     * @param {!string|!Array.<!string>} deps A single module id or an array of module ids.
+     * @param {string|Array.<string>} deps A single module id or an array of module ids.
      * @param {?function} [localRequire] A contextual require function.
      * Defaults to the global `require` function.
      *
-     * @return {Promise.<any>|Promise.<any[]>} A promise that
+     * @return {Promise|Promise.<Array>} A promise that
      * is fulfilled with the value of the requested module(s), and
      * is rejected in case a module loader error occurs (like an undefined module or timeout).
      */

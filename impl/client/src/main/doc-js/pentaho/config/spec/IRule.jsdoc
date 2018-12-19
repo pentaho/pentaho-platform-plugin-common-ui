@@ -58,7 +58,7 @@
  *
  * @name apply
  * @memberOf pentaho.config.spec.IRule#
- * @type {(Object|(function(...any) : Object))}
+ * @type {(Object|(function(...*) : Object))}
  */
 
 /**

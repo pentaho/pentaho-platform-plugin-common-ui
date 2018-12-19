@@ -106,8 +106,8 @@ define([
       /**
        * Validates a value w.r.t. the restricted domain.
        *
-       * @param {!pentaho.type.Simple} value - The value to validate.
-       * @return {Nully|pentaho.type.ValidationError|Array.<!pentaho.type.ValidationError>} The error, errors or null.
+       * @param {pentaho.type.Simple} value - The value to validate.
+       * @return {Nully|pentaho.type.ValidationError|Array.<pentaho.type.ValidationError>} The error, errors or null.
        * @private
        */
       __validateDomain: function(value) {
@@ -142,7 +142,7 @@ define([
        * where its keys are the keys of the contained values,
        * as a means to configure them.
        *
-       * @type {!pentaho.type.List.<pentaho.type.Simple>}
+       * @type {pentaho.type.List.<pentaho.type.Simple>}
        *
        * @throws {pentaho.lang.ArgumentInvalidTypeError} When set to a value other than an array or a list during
        * type initialization.

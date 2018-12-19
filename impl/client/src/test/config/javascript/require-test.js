@@ -80,7 +80,7 @@
      * @alias define
      * @param {string} id The module id.
      * @param {string[]} [deps] The ids of dependencies.
-     * @param {function|any} callback The module definition function or the module's value.
+     * @param {function|*} callback The module definition function or the module's value.
      * @return {function} The `require` function.
      */
     contextRequire.define = function(id, deps, callback) {

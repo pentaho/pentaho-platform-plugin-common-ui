@@ -50,7 +50,7 @@
  *
  * @name value
  * @memberOf pentaho.type.spec.ISimple#
- * @type {?any}
+ * @type {*}
  */
 
 /**
@@ -72,7 +72,7 @@
  *
  * @name v
  * @memberOf pentaho.type.spec.ISimple#
- * @type {?any}
+ * @type {*}
  */
 
 /**

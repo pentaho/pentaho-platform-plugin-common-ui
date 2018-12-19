@@ -44,8 +44,8 @@ define([
        * @description Constructs the metadata of a module.
        * @constructor
        * @param {nonEmptyString} id - The identifier of the module.
-       * @param {!pentaho.module.spec.IMeta} spec - The specification of the metadata of the module.
-       * @param {!pentaho._core.module.Resolver} [resolver] - The module resolver function.
+       * @param {pentaho.module.spec.IMeta} spec - The specification of the metadata of the module.
+       * @param {pentaho._core.module.Resolver} [resolver] - The module resolver function.
        */
       constructor: function(id, spec, resolver) {
 
@@ -74,7 +74,7 @@ define([
          * The value of the module, if it has been loaded already,
          * or `undefined`, otherwise.
          *
-         * @type {any}
+         * @type {*}
          * @private
          */
         this.__value = undefined;
@@ -94,7 +94,7 @@ define([
          * When not yet loaded, the value is `undefined`.
          *
          * @memberOf pentaho.module.Meta#
-         * @type {Object}
+         * @type {?object}
          * @private
          */
         this.__config = undefined;
@@ -113,7 +113,7 @@ define([
        *
        * Currently, only the `ranking` option is supported.
        *
-       * @param {!pentaho.module.spec.IMeta} configSpec - The configuration specification.
+       * @param {pentaho.module.spec.IMeta} configSpec - The configuration specification.
        * @private
        * @internal
        */
@@ -174,9 +174,9 @@ define([
 
       /**
        * Registers the specified value of this module with the AMD module system.
-       * @param {(any|(function(!pentaho.module.IMeta) : any))} value - The value or value factory function.
+       * @param {(*|(function(pentaho.module.IMeta) : *))} value - The value or value factory function.
        *
-       * @return {!Promise} A promise for the value of the module.
+       * @return {Promise} A promise for the value of the module.
        *
        * @private
        */

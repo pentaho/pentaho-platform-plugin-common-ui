@@ -60,7 +60,7 @@
  *
  * @name name
  * @memberOf pentaho.type.spec.IPropertyType#
- * @type {!nonEmptyString | any}
+ * @type {nonEmptyString | *}
  *
  * @see pentaho.type.PropertyType#name
  */
@@ -80,7 +80,7 @@
  *
  * @name nameAlias
  * @memberOf pentaho.type.spec.IPropertyType#
- * @type {!nonEmptyString | any}
+ * @type {nonEmptyString | *}
  *
  * @see pentaho.type.PropertyType#nameAlias
  */
@@ -99,7 +99,7 @@
  *
  * @name label
  * @memberOf pentaho.type.spec.IPropertyType#
- * @type {?nonEmptyString | any}
+ * @type {?nonEmptyString | *}
  */
 
 /**
@@ -126,7 +126,7 @@
  *
  * @name valueType
  * @memberOf pentaho.type.spec.IPropertyType#
- * @type {!pentaho.type.spec.TypeReference}
+ * @type {pentaho.type.spec.TypeReference}
  *
  * @see pentaho.type.PropertyType#valueType
  */
@@ -156,7 +156,7 @@
  *
  * @name defaultValue
  * @memberOf pentaho.type.spec.IPropertyType#
- * @type {pentaho.type.spec.Value | pentaho.type.spec.PropertyDynamicAttribute.<pentaho.type.spec.Value>}
+ * @type {?pentaho.type.spec.Value | pentaho.type.spec.PropertyDynamicAttribute.<?pentaho.type.spec.Value>}
  *
  * @see pentaho.type.PropertyType#defaultValue
  */

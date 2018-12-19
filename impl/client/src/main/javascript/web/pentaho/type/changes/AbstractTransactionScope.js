@@ -140,14 +140,14 @@ define([
     /**
      * Calls a given function within the scope and safely exits from the scope.
      *
-     * @param {function(pentaho.type.changes.TransactionScope) : any} fun - The function to call within the scope.
+     * @param {function(pentaho.type.changes.TransactionScope) : *} fun - The function to call within the scope.
      * The function is called with the `this` context specified in argument `ctx`.
      * The return value of `fun` is returned back from this method.
      *
-     * @param {Object} [ctx] The `this` context in which to call `fun`.
+     * @param {?object} [ctx] The `this` context in which to call `fun`.
      * When unspecified, the function will have a `null` this.
      *
-     * @return {any} The value returned by `fun`.
+     * @return {*} The value returned by `fun`.
      *
      * @throws {Error} Any error thrown from within `fun`.
      */
@@ -172,11 +172,11 @@ define([
      * is not the current scope, a warning is logged,
      * unless `keyArgs.sloppy` is `true`.
      *
-     * @param {Object} [keyArgs] The keyword arguments.
+     * @param {?object} [keyArgs] The keyword arguments.
      * @param {boolean} [keyArgs.sloppy] Indicates that no warning should be logged
      * if this method is called when the scope has already been exited from or is not the current scope.
      *
-     * @return {!pentaho.type.changes.AbstractTransactionScope} This scope.
+     * @return {pentaho.type.changes.AbstractTransactionScope} This scope.
      */
     exit: function(keyArgs) {
 

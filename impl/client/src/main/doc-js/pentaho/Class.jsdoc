@@ -18,5 +18,5 @@
  * The `Class.<T>` type denotes the constructor, or class, `T`,
  * in a place where it could be interpreted as an instance of that class.
  *
- * @typedef {Function} Class
+ * @typedef {function} Class
  */

@@ -154,7 +154,7 @@ define([
       /**
        * The description of the action instance.
        *
-       * @type {!nonEmptyString}
+       * @type {nonEmptyString}
        * @private
        */
       this.description = spec && spec.description;

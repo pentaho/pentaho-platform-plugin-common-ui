@@ -72,7 +72,7 @@ define([
       /**
        * The function which extracts the key of the date value.
        *
-       * @type {!function(any):string}
+       * @type {function(*):string}
        * @readOnly
        * @private
        */
@@ -103,7 +103,7 @@ define([
       /**
        * The index of the main input field in the inputFieldIndexes array.
        *
-       * @type {Object}
+       * @type {number}
        * @readOnly
        * @private
        */

@@ -110,8 +110,8 @@ define([
    * @description Creates a select action execution instance for a given select action and view.
    *
    * @constructor
-   * @param {!pentaho.visual.action.Select} action - The select action.
-   * @param {!pentaho.visual.base.View} view - The target view.
+   * @param {pentaho.visual.action.Select} action - The select action.
+   * @param {pentaho.visual.base.View} view - The target view.
    */
   var SelectActionExecution = ActionTargetMixin.GenericActionExecution.extend({
     /**
@@ -235,7 +235,7 @@ define([
        *
        * View is initially fully dirty.
        *
-       * @type {!pentaho.util.BitSet}
+       * @type {pentaho.util.BitSet}
        * @readOnly
        * @private
        */
@@ -484,10 +484,10 @@ define([
      *
      * @see pentaho.visual.base.View#_updateAll
      *
-     * @param {!pentaho.util.BitSet} dirtyPropGroups - A bit set of property groups that should be set dirty.
+     * @param {pentaho.util.BitSet} dirtyPropGroups - A bit set of property groups that should be set dirty.
      * Use the values of [View.PropertyGroups]{@link pentaho.visual.base.View.PropertyGroups} as bit values.
      *
-     * @param {!pentaho.type.Changeset} changeset - The model's changeset.
+     * @param {pentaho.type.Changeset} changeset - The model's changeset.
      *
      * @protected
      */
@@ -528,7 +528,7 @@ define([
      *
      * The default implementation auto-updates the view, if possible.
      *
-     * @param {!pentaho.util.BitSet} dirtyPropGroups - A bit set of property groups that were changed.
+     * @param {pentaho.util.BitSet} dirtyPropGroups - A bit set of property groups that were changed.
      * Use the values of [View.PropertyGroups]{@link pentaho.visual.base.View.PropertyGroups} as bit values.
      *
      * @protected
@@ -626,7 +626,7 @@ define([
      * [_updateSize]{@link pentaho.visual.base.View#_updateSize} or
      * [_updateSelection]{@link pentaho.visual.base.View#_updateSelection}.
      *
-     * @return {!Promise} A promise that is fulfilled when the visualization is
+     * @return {Promise} A promise that is fulfilled when the visualization is
      * updated or is rejected in case some error occurs.
      *
      * @fires "pentaho/visual/action/Update:{will}"
@@ -671,7 +671,7 @@ define([
      *
      * The default implementation does nothing.
      *
-     * @param {!pentaho.type.action.Execution} updateActionExecution - The update action execution.
+     * @param {pentaho.type.action.Execution} updateActionExecution - The update action execution.
      *
      * @protected
      */
@@ -684,7 +684,7 @@ define([
      * The default implementation calls
      * [_emitActionPhaseWillEvent]{@link pentaho.type.action.impl.Target#_emitActionPhaseWillEvent}.
      *
-     * @param {!pentaho.type.action.Execution} updateActionExecution - The update action execution.
+     * @param {pentaho.type.action.Execution} updateActionExecution - The update action execution.
      *
      * @protected
      */
@@ -699,9 +699,9 @@ define([
      * if it is [dirty]{@link pentaho.visual.base.View#isDirty} and
      * [valid]{@link pentaho.visual.base.View#$isValid}.
      *
-     * @param {!pentaho.type.action.Execution} updateActionExecution - The update action execution.
+     * @param {pentaho.type.action.Execution} updateActionExecution - The update action execution.
      *
-     * @return {!Promise} A promise that is fulfilled when the update action has completed successfully.
+     * @return {Promise} A promise that is fulfilled when the update action has completed successfully.
      *
      * @protected
      */
@@ -715,7 +715,7 @@ define([
      * The default implementation calls
      * [_emitActionPhaseFinallyEvent]{@link pentaho.type.action.impl.Target#_emitActionPhaseFinallyEvent}.
      *
-     * @param {!pentaho.type.action.Execution} updateActionExecution - The update action execution.
+     * @param {pentaho.type.action.Execution} updateActionExecution - The update action execution.
      *
      * @protected
      */
@@ -737,7 +737,7 @@ define([
      *
      * Lastly, otherwise, another iteration of the loop is performed.
      *
-     * @return {!Promise} A promise that is fulfilled when the update loop has completed successfully.
+     * @return {Promise} A promise that is fulfilled when the update loop has completed successfully.
      *
      * @private
      */
@@ -825,9 +825,9 @@ define([
     /**
      * Selects the best update method for a given set of dirty property groups.
      *
-     * @param {!pentaho.util.BitSet} dirtyPropGroups - The set of dirty property groups.
+     * @param {pentaho.util.BitSet} dirtyPropGroups - The set of dirty property groups.
      *
-     * @return {!Object} The information object of the selected update method.
+     * @return {object} The information object of the selected update method.
      *
      * @private
      */
@@ -999,7 +999,7 @@ define([
        * Also, generally, there would be problems serializing functions and other objects
        * it can contain.
        *
-       * @type {Object}
+       * @type {?object}
        *
        * @throws {pentaho.lang.OperationInvalidError} When setting and the model already has
        * [descendant]{@link pentaho.type.Type#hasDescendants} models.
@@ -1031,7 +1031,7 @@ define([
        * Returns `null` when there are no local or inherited extension properties.
        *
        * @readOnly
-       * @type {Object}
+       * @type {?object}
        *
        * @see pentaho.visual.base.ViewType#extension
        */
@@ -1086,7 +1086,7 @@ define([
      *
      * @param {pentaho.visual.base.spec.IViewEx} viewSpec - The extended view specification.
      *
-     * @return {!Promise.<pentaho.visual.base.View>} A promise for a view with the given specification.
+     * @return {Promise.<pentaho.visual.base.View>} A promise for a view with the given specification.
      *
      * @rejects {pentaho.lang.ArgumentRequiredError} When `viewSpec` is not specified.
      * @rejects {pentaho.lang.ArgumentRequiredError} When `viewSpec` has no annotated type, inline, and
@@ -1136,8 +1136,8 @@ define([
      * Gets a promise for the view class (constructor), of the registered default type, if any,
      * for the given model type or identifier.
      *
-     * @param {string|!pentaho.visual.base.ModelType} modelType - The visual model type or its identifier.
-     * @return {!Promise.<Class.<pentaho.visual.base.View>>} A promise for a view class of the given model type.
+     * @param {string|pentaho.visual.base.ModelType} modelType - The visual model type or its identifier.
+     * @return {Promise.<Class.<pentaho.visual.base.View>>} A promise for a view class of the given model type.
      *
      * @rejects {pentaho.lang.ArgumentRequiredError} When `modelType` is not specified.
      * @rejects {Error} When `modelType` is a string, any error returned
@@ -1301,9 +1301,9 @@ define([
      *   });
      * });
      *
-     * @param {!pentaho.type.action.Base} action - The action to execute.
+     * @param {pentaho.type.action.Base} action - The action to execute.
      *
-     * @return {!pentaho.type.action.Base} The given action.
+     * @return {pentaho.type.action.Base} The given action.
      *
      * @override
      * @see pentaho.visual.base.View#actAsync
@@ -1323,9 +1323,9 @@ define([
      * @name pentaho.visual.base.View#actAsync
      * @method
      *
-     * @param {!pentaho.type.action.Base} action - The action to execute.
+     * @param {pentaho.type.action.Base} action - The action to execute.
      *
-     * @return {!Promise} A promise that is fulfilled with the action's
+     * @return {Promise} A promise that is fulfilled with the action's
      * [result]{@link pentaho.type.action.Base#result} or rejected with the action's
      * [error]{@link pentaho.type.action.Base#error}.
      *

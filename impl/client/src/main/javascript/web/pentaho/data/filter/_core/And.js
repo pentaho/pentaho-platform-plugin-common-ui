@@ -84,7 +84,7 @@ define([
        *
        * @param {...pentaho.data.filter.Abstract[]} filters - The filters to be intersected with this one.
        *
-       * @return {!pentaho.data.filter.Abstract} The resulting filter.
+       * @return {pentaho.data.filter.Abstract} The resulting filter.
        */
       and: function() {
         return this._operation.apply(this, arguments);

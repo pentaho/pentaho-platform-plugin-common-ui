@@ -71,7 +71,7 @@ define([
          *
          * @name domainOn
          * @memberOf pentaho.type.mixins.DiscreteDomainType#
-         * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
+         * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
          * @return {Array.<pentaho.type.Element>} The evaluated value of the `domain` attribute.
          *
          * @see pentaho.type.PropertyType#domain
@@ -140,7 +140,7 @@ define([
          */
         "domain": {
 
-          /* @type pentaho.type.spec.PropertyDynamicAttribute */
+          /* @type ?pentaho.type.spec.PropertyDynamicAttribute */
           value: function(propType) {
 
             // The initial domain is that of the property's valueType's domain, if any.

@@ -659,7 +659,7 @@ define([
 
         /**
          * Gets a fresh data table.
-         * @return {!pentaho.data.AbstractTable} A data table.
+         * @return {pentaho.data.AbstractTable} A data table.
          */
         function getTable() {
           return new DataTable({

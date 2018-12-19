@@ -59,7 +59,7 @@ define([
    *
    * @name subtypesOf
    * @memberOf pentaho.module
-   * @type {!IAmdLoaderPlugin}
+   * @type {IAmdLoaderPlugin}
    * @amd pentaho/module/subtypesOf
    *
    * @see pentaho.module.service

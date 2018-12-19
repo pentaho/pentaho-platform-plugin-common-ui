@@ -31,10 +31,10 @@ define([
      * @private
      * @see pentaho.visual.role.adaptation.CombineStrategy
      * @description Creates a _combine_ mapper instance.
-     * @param {!pentaho.type.visual.role.adaptation.Strategy} strategy - The strategy.
-     * @param {!pentaho.type.visual.role.PropertyType} propType - The visual role property type.
-     * @param {!pentaho.data.ITable} inputData - The data set view to be mapped.
-     * @param {!pentaho.visual.role.Mode} mode - The visual role mode of `propType` which will be used.
+     * @param {pentaho.type.visual.role.adaptation.Strategy} strategy - The strategy.
+     * @param {pentaho.type.visual.role.PropertyType} propType - The visual role property type.
+     * @param {pentaho.data.ITable} inputData - The data set view to be mapped.
+     * @param {pentaho.visual.role.Mode} mode - The visual role mode of `propType` which will be used.
      * @param {string} valueSeparator - The text to use to separate combined value keys.
      * @param {string} formattedSeparator - The text to use to separate combined formatted values.
      * this.formattedSeparator
@@ -46,7 +46,7 @@ define([
       /**
        * A map from key to row index.
        *
-       * @type {!Object.<string, number>}
+       * @type {Object.<string, number>}
        * @private
        * @readOnly
        */
@@ -56,7 +56,7 @@ define([
        * The data type of the visual role value.
        *
        * @name dataType
-       * @type {!pentaho.type.Type}
+       * @type {pentaho.type.Type}
        * @readOnly
        * @private
        */
@@ -115,7 +115,7 @@ define([
   /**
    * Creates a value combiner function for a given input data and separator.
    *
-   * @param {!pentaho.data.ITable} inputData - The input data.
+   * @param {pentaho.data.ITable} inputData - The input data.
    * @param {string} separator - The separator to use between combined values.
    *
    * @return {function(number):string} The value combiner function.
@@ -143,7 +143,7 @@ define([
   /**
    * Creates a formatted value combiner function for a given input data and separator.
    *
-   * @param {!pentaho.data.ITable} inputData - The input data.
+   * @param {pentaho.data.ITable} inputData - The input data.
    * @param {string} separator - The separator to use between combined formatted values.
    *
    * @return {function(number):string} The formatted value combiner function.

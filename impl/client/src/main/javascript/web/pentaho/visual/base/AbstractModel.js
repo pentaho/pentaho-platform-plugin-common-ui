@@ -59,7 +59,7 @@ define([
      * The implementation determines if the changeset
      * contains the `data` property or any other visual role property.
      *
-     * @param {!pentaho.visual.base.AbstractModelType} modelType - The target abstract model type.
+     * @param {pentaho.visual.base.AbstractModelType} modelType - The target abstract model type.
      *
      * @return {boolean} `true`, if it contains; `false`, if not.
      *
@@ -138,7 +138,7 @@ define([
     /**
      * Gets an array of the names of fields which are mapped to _effective key_ visual roles.
      *
-     * @type {!Array.<string>}
+     * @type {Array.<string>}
      * @readOnly
      *
      * @see pentaho.visual.role.AbstractPropertyType#isVisualKeyEffective
@@ -171,7 +171,7 @@ define([
      * Gets an array of the names of fields which are mapped to _effective measure_ visual roles
      * and which are not mapped to any _effective key_ visual roles.
      *
-     * @type {!Array.<string>}
+     * @type {Array.<string>}
      * @readOnly
      * @see pentaho.visual.role.AbstractPropertyType#isVisualKeyEffective
      */
@@ -325,9 +325,9 @@ define([
        * @param {function(pentaho.type.PropertyType, number, pentaho.type.Complex) : boolean?} f - The mapping
        * function. Return `false` to break iteration.
        *
-       * @param {Object} [x] The JS context object on which `f` is called.
+       * @param {?object} [x] The JS context object on which `f` is called.
        *
-       * @return {!pentaho.visual.base.Model} This object.
+       * @return {pentaho.visual.base.Model} This object.
        */
       eachVisualRole: function(f, x) {
         var j = 0;
@@ -343,7 +343,7 @@ define([
        * Gets a value that indicates if a given property type is a subtype of
        * {@link pentaho.visual.role.AbstractPropertyType}.
        *
-       * @param {!pentaho.type.PropertyType} propType - The property type to test.
+       * @param {pentaho.type.PropertyType} propType - The property type to test.
        * @return {boolean} `true` if `type` is a visual role property type; or `false`, otherwise.
        */
       isVisualRole: function(propType) {
@@ -354,7 +354,7 @@ define([
        * Gets a value that indicates if a given property type is a subtype of
        * {@link pentaho.visual.color.PalettePropertyType}.
        *
-       * @param {!pentaho.type.PropertyType} propType - The property type to test.
+       * @param {pentaho.type.PropertyType} propType - The property type to test.
        * @return {boolean} `true` if `type` is a color palette property type; or `false`, otherwise.
        */
       isColorPalette: function(propType) {

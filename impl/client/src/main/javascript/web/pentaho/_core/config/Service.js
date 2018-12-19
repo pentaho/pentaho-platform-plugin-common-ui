@@ -74,13 +74,13 @@ define([
        *
        * @description Creates a configuration service instance for a given environment.
        *
-       * @param {pentaho.environment.IEnvironment} environment - The environment used to select configuration rules.
+       * @param {?pentaho.environment.IEnvironment} [environment] - The environment used to select configuration rules.
        */
       constructor: function(environment) {
 
         /**
          * The environment used to select configuration rules.
-         * @type {!pentaho.environment.IEnvironment}
+         * @type {pentaho.environment.IEnvironment}
          * @readOnly
          */
         this.__environment = environment || {};
@@ -89,7 +89,7 @@ define([
          * A map connecting a type or instance identifier to the applicable configuration rules,
          * ordered from least to most specific.
          *
-         * @type {!Object.<string, Array.<pentaho.config.spec.IRule>>}
+         * @type {Object.<string, Array.<pentaho.config.spec.IRule>>}
          * @private
          */
         this.__ruleStore = Object.create(null);
@@ -98,7 +98,7 @@ define([
       /**
        * Adds a configuration rule set.
        *
-       * @param {pentaho.config.spec.IRuleSet} ruleSet - A configuration rule set to add.
+       * @param {?pentaho.config.spec.IRuleSet} ruleSet - A configuration rule set to add.
        */
       add: function(ruleSet) {
 
@@ -122,7 +122,7 @@ define([
        * Note that the specified rule object may be slightly modified to serve
        * the service's internal needs.
        *
-       * @param {!pentaho.config.spec.IRule} rule - The configuration rule to add.
+       * @param {pentaho.config.spec.IRule} rule - The configuration rule to add.
        * @param {?string} [contextId] - The module identifier to which rule `modules` and `deps`
        * are relative to. Also, this module determines any applicable AMD/RequireJS mappings.
        *
@@ -281,8 +281,8 @@ define([
   /**
    * Compares two type configuration rules according to specificity.
    *
-   * @param {!pentaho.config.spec.IRule} r1 - The first type configuration rule.
-   * @param {!pentaho.config.spec.IRule} r2 - The second type configuration rule.
+   * @param {pentaho.config.spec.IRule} r1 - The first type configuration rule.
+   * @param {pentaho.config.spec.IRule} r2 - The second type configuration rule.
    *
    * @return {number} `-1`, if `r1` is more specific than `r2`,
    * `1`, if `r2` is more specific than `r1`,
@@ -318,7 +318,7 @@ define([
    *
    * @this pentaho.environment.IEnvironment
    *
-   * @param {!pentaho.config.spec.IRule} rule - A type configuration rule to check.
+   * @param {pentaho.config.spec.IRule} rule - A type configuration rule to check.
    *
    * @return {boolean} `true` if `rule` is selected, `false`, otherwise.
    */

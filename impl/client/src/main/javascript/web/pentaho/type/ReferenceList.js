@@ -41,7 +41,7 @@ define([
     /**
      * Adds a reference to the owner of this reference list.
      *
-     * @param {!pentaho.type.mixins.Container} container - The container that references the owner of this reference
+     * @param {pentaho.type.mixins.Container} container - The container that references the owner of this reference
      * list.
      * @param {pentaho.type.PropertyType} [propType] When `container` is a complex,
      * the property type whose value contains the owner of this reference list.
@@ -58,7 +58,7 @@ define([
     /**
      * Removes a reference to the owner of this reference list.
      *
-     * @param {!pentaho.type.mixins.Container} container - The container that references the owner of this reference
+     * @param {pentaho.type.mixins.Container} container - The container that references the owner of this reference
      * list.
      * @param {pentaho.type.PropertyType} [propType] When `container` is a complex,
      * the property type whose value used to reference.

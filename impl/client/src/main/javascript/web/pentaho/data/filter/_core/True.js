@@ -88,7 +88,7 @@ define([
       /**
        * Gets the _true_ filter instance.
        *
-       * @type {!pentaho.data.filter.True}
+       * @type {pentaho.data.filter.True}
        * @readOnly
        */
       get instance() {

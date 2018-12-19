@@ -62,7 +62,7 @@ define([
      * @description Creates an event of a given type, source, and ability to be canceled.
      * @constructor
      * @param {nonEmptyString} type - The type of the event.
-     * @param {!pentaho.lang.IEventSource} source - The object where the event is emitted.
+     * @param {pentaho.lang.IEventSource} source - The object where the event is emitted.
      * @param {?boolean} [cancelable=false] - Indicates if the event can be canceled.
      */
     constructor: function(type, source, cancelable) {
@@ -90,7 +90,7 @@ define([
     /**
      * Gets the source of the event.
      *
-     * @type {!pentaho.lang.IEventSource}
+     * @type {pentaho.lang.IEventSource}
      * @readonly
      */
     get source() {
@@ -146,7 +146,7 @@ define([
     /**
      * Gets a value that indicates if the event has been canceled.
      *
-     * @type {!boolean}
+     * @type {boolean}
      * @readonly
      */
     get isCanceled() {
@@ -156,7 +156,7 @@ define([
     /**
      * Creates a clone of the event object.
      *
-     * @return {!pentaho.lang.Event} The cloned event object.
+     * @return {pentaho.lang.Event} The cloned event object.
      */
     clone: function() {
       var proto = Object.getPrototypeOf(this);

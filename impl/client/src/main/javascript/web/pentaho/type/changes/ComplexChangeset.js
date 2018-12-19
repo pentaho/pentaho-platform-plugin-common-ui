@@ -43,8 +43,8 @@ define([
    *
    * @constructor
    * @description Creates a new instance.
-   * @param {!pentaho.type.changes.Transaction} transaction - The owning transaction.
-   * @param {!pentaho.type.Complex} owner - The complex value where the changes take place.
+   * @param {pentaho.type.changes.Transaction} transaction - The owning transaction.
+   * @param {pentaho.type.Complex} owner - The complex value where the changes take place.
    */
   return Changeset.extend(module.id, /** @lends pentaho.type.changes.ComplexChangeset#*/{
 
@@ -55,7 +55,7 @@ define([
       /**
        * A map of property name to a corresponding change.
        *
-       * @type {!Object.<string, !pentaho.type.changes.Change>}
+       * @type {Object.<string, pentaho.type.changes.Change>}
        * @protected
        * @readonly
        */
@@ -66,7 +66,7 @@ define([
      * Gets the complex value where the changes take place.
      *
      * @name pentaho.type.changes.ComplexChangeset#owner
-     * @type {!pentaho.type.Complex}
+     * @type {pentaho.type.Complex}
      * @readonly
      */
 
@@ -95,7 +95,7 @@ define([
     /**
      * Gets the [change]{@link pentaho.type.changes.Change} object associated with the specified property.
      *
-     * @param {nonEmptyString|!pentaho.type.PropertyType} propertyOrName - The property name or type object.
+     * @param {nonEmptyString|pentaho.type.PropertyType} propertyOrName - The property name or type object.
      *
      * @return {pentaho.type.changes.Change} An object describing the changes to be performed
      * in the given property, or `null` if the property has not changed.
@@ -123,7 +123,7 @@ define([
     /**
      * Determines if the given property has changed.
      *
-     * @param {nonEmptyString|!pentaho.type.PropertyType} propertyOrName - The property name or type object.
+     * @param {nonEmptyString|pentaho.type.PropertyType} propertyOrName - The property name or type object.
      *
      * @return {boolean} `true` if the property has changed; `false`, otherwise.
      *
@@ -149,7 +149,7 @@ define([
     /**
      * Gets an array with the names of all of the changed properties contained in this changeset.
      *
-     * @type {!Array.<string>}
+     * @type {Array.<string>}
      * @readonly
      */
     get propertyNames() {
@@ -193,7 +193,7 @@ define([
     /**
      * Gets the original value of a property.
      *
-     * @param {nonEmptyString|!pentaho.type.PropertyType} name - The property name or type object.
+     * @param {nonEmptyString|pentaho.type.PropertyType} name - The property name or type object.
      *
      * @return {pentaho.type.Value} The original value of the property (before the change).
      *
@@ -251,7 +251,7 @@ define([
      * Updates the transaction version.
      *
      * @param {string} name - The property name.
-     * @param {!pentaho.type.changes.Change} change - The change.
+     * @param {pentaho.type.changes.Change} change - The change.
      *
      * @private
      */
@@ -306,8 +306,8 @@ define([
 
     /**
      * Marks an element as added by a change or cancels a previous removal.
-     * @param {!pentaho.type.Complex} element - The added element.
-     * @param {!pentaho.type.PropertyType} propType - The property type.
+     * @param {pentaho.type.Complex} element - The added element.
+     * @param {pentaho.type.PropertyType} propType - The property type.
      * @private
      * @internal
      */
@@ -327,8 +327,8 @@ define([
 
     /**
      * Marks an element as removed by a change or cancels a previous addition.
-     * @param {!pentaho.type.Complex} element - The removed element.
-     * @param {!pentaho.type.PropertyType} propType - The property type.
+     * @param {pentaho.type.Complex} element - The removed element.
+     * @param {pentaho.type.PropertyType} propType - The property type.
      * @private
      * @internal
      */
@@ -349,7 +349,7 @@ define([
     /**
      * Obtain the name of a property, given the property type or its name.
      *
-     * @param {nonEmptyString|!pentaho.type.PropertyType} propertyOrName - The property name or type object.
+     * @param {nonEmptyString|pentaho.type.PropertyType} propertyOrName - The property name or type object.
      *
      * @return {string} The property name.
      *
@@ -408,9 +408,9 @@ define([
     /**
      * Sets the value of an _element property_.
      *
-     * @param {!pentaho.type.Complex} complex - The complex instance.
-     * @param {!pentaho.type.PropertyType} propType - The element property type.
-     * @param {?any} valueNewSpec The new value specification.
+     * @param {pentaho.type.Complex} complex - The complex instance.
+     * @param {pentaho.type.PropertyType} propType - The element property type.
+     * @param {*} valueNewSpec The new value specification.
      * @param {?boolean} [forceReplace=false] Forces replace to occur even when values are equal.
      *
      * @private
@@ -488,7 +488,7 @@ define([
 
   /**
    * Gets a value that indicates if a change has changes.
-   * @param {!pentaho.type.changes.Change} change - The change.
+   * @param {pentaho.type.changes.Change} change - The change.
    * @return {boolean} `true` if yes; `false` if no.
    */
   function __hasChanges(change) {

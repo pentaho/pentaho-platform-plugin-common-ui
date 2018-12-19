@@ -107,7 +107,7 @@ define([
     /**
      * Gets the type of this instance.
      *
-     * @type {!pentaho.type.Type}
+     * @type {pentaho.type.Type}
      * @readonly
      * @see pentaho.type.Instance.type
      * @see pentaho.type.Type#instance
@@ -138,7 +138,7 @@ define([
      * Otherwise, one is created and set as current.
      * Then, the actual work is delegated to {@link pentaho.type.Instance#toSpecInContext}.
      *
-     * @param {Object} [keyArgs] - The keyword arguments' object.
+     * @param {?object} [keyArgs] - The keyword arguments' object.
      * Passed to every instance and type serialized within this scope.
      *
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
@@ -154,7 +154,7 @@ define([
      * @param {?boolean} [keyArgs.forceType=false] In the specification, forces inclusion of
      * the inline type property: `_`.
      *
-     * @return {!any} A specification of this instance.
+     * @return {!*} A specification of this instance.
      */
     toSpec: function(keyArgs) {
       return O.using(new SpecificationScope(), this.toSpecInContext.bind(this, keyArgs || {}));
@@ -163,12 +163,12 @@ define([
     /**
      * Creates a specification that describes this instance.
      *
-     * @param {Object} [keyArgs] The keyword arguments' object.
+     * @param {?object} [keyArgs] The keyword arguments' object.
      * Passed to every instance and type serialized within this scope.
      *
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
      *
-     * @return {!any} A specification of this instance.
+     * @return {!*} A specification of this instance.
      *
      * @abstract
      *
@@ -192,7 +192,7 @@ define([
      *
      * @see pentaho.type.Instance#toSpec
      *
-     * @return {JsonValue} A JSON-compatible specification.
+     * @return {?JsonValue} A JSON-compatible specification.
      */
     toJSON: function() {
       return this.toSpec({isJson: true});
@@ -260,7 +260,7 @@ define([
      * Works similarly to {@link pentaho.lang.Base.implement}.
      *
      * @param {object} config - The localization information.
-     * @return {!Class.<pentaho.type.Instance>} This constructor.
+     * @return {Class.<pentaho.type.Instance>} This constructor.
      */
     localize: function(config) {
       return this.implement(config);
@@ -273,7 +273,7 @@ define([
      *
      * @param {object} config - The configuration information.
      *
-     * @return {!Class.<pentaho.type.Instance>} This constructor.
+     * @return {Class.<pentaho.type.Instance>} This constructor.
      */
     configure: function(config) {
       return this.implement(config);

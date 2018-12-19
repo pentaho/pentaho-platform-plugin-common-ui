@@ -26,7 +26,7 @@ define([
    * @memberOf pentaho.environment.impl
    *
    * @class
-   * @implements pentaho.environment.IEnvironment
+   * @implements {pentaho.environment.IEnvironment}
    *
    * @classDesc The `Environment` class is an implementation of
    * the [IEnvironment]{@link pentaho.environment.IEnvironment} interface.

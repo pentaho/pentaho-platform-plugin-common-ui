@@ -30,7 +30,7 @@ define([
      *
      * @description Creates a variable instance having a given value and formatted value.
      * @constructor
-     * @param {any} value - The value of the variable.
+     * @param {*} value - The value of the variable.
      * @param {?string} [formatted] - The formatted value of the variable.
      */
     constructor: function(value, formatted) {

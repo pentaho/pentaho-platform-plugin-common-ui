@@ -20,10 +20,10 @@
  *
  * @callback pentaho.data.filter.FTransformer
  *
- * @param {!pentaho.data.filter.Abstract} filter - The filter to be transformed.
+ * @param {pentaho.data.filter.Abstract} filter - The filter to be transformed.
  * @param {pentaho.data.filter.Abstract[]} [filterOperands] - The list of filter operands.
  *
- * @return {!pentaho.data.filter.Abstract[]|pentaho.data.filter.Abstract}
+ * @return {pentaho.data.filter.Abstract[]|pentaho.data.filter.Abstract}
  *
  * @see pentaho.data.filter.Abstract#visit
  * @see pentaho.data.filter.Tree#visit

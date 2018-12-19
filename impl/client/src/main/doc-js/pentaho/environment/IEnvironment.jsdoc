@@ -45,7 +45,7 @@
  *
  * @name user
  * @memberOf pentaho.environment.IEnvironment#
- * @type {!pentaho.environment.IUser}
+ * @type {pentaho.environment.IUser}
  * @readOnly
  */
 
@@ -54,7 +54,7 @@
  *
  * @name server
  * @memberOf pentaho.environment.IEnvironment#
- * @type {!pentaho.environment.IServer}
+ * @type {pentaho.environment.IServer}
  * @readOnly
  */
 
@@ -93,7 +93,7 @@
  * @memberOf pentaho.environment.IEnvironment#
  * @method
  * @param {pentaho.environment.spec.IEnvironment} [childSpec] - The child environment specification.
- * @return {!pentaho.environment.IEnvironment} The child environment.
+ * @return {pentaho.environment.IEnvironment} The child environment.
  */
 
 /**
@@ -102,7 +102,7 @@
  * @name toSpec
  * @memberOf pentaho.environment.IEnvironment#
  * @method
- * @return {!pentaho.environment.spec.IEnvironment} The environment specification.
+ * @return {pentaho.environment.spec.IEnvironment} The environment specification.
  * @see pentaho.environment.IEnvironment#toJSON
  */
 
@@ -114,6 +114,6 @@
  * @name toJSON
  * @memberOf pentaho.environment.IEnvironment#
  * @method
- * @return {!pentaho.environment.spec.IEnvironment} The environment specification.
+ * @return {pentaho.environment.spec.IEnvironment} The environment specification.
  * @see pentaho.environment.IEnvironment#toSpec
  */

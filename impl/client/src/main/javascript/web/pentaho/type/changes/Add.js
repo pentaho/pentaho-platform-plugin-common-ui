@@ -39,7 +39,7 @@ define([
      * @constructor
      * @description Creates an instance.
      *
-     * @param {!pentaho.type.Element} elem - The element to be added to the list.
+     * @param {pentaho.type.Element} elem - The element to be added to the list.
      * @param {number} index - The list index at which the element should be inserted.
      */
     constructor: function(elem, index) {
@@ -47,7 +47,7 @@ define([
       /**
        * Gets the element that is added to the list.
        *
-       * @type {!pentaho.type.Element}
+       * @type {pentaho.type.Element}
        * @readOnly
        */
       this.element = elem;

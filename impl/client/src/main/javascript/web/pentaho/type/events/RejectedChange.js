@@ -34,9 +34,9 @@ define([
    * @constructor
    * @description Creates a `RejectedChange` event.
    *
-   * @param {!pentaho.type.Complex} source - The object which is emitting the event.
-   * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
-   * @param {!Error|pentaho.lang.UserError} error - The error of a rejected
+   * @param {pentaho.type.Complex} source - The object which is emitting the event.
+   * @param {pentaho.type.changes.Changeset} changeset - The changeset.
+   * @param {Error|pentaho.lang.UserError} error - The error of a rejected
    * {@link pentaho.lang.ActionResult|ActionResult}.
    */
   return Event.extend(module.id, /** @lends pentaho.type.events.RejectedChange# */{

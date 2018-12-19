@@ -60,7 +60,7 @@ define([
        * [SelectionModes]{@link pentaho.visual.action.SelectionModes},
        * to assume the corresponding selection mode function.
        *
-       * @type {!pentaho.visual.action.SelectionMode}
+       * @type {pentaho.visual.action.SelectionMode}
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When set to a `string` which is not one of the
        * standard selection mode names, [SelectionModes]{@link pentaho.visual.action.SelectionModes}.
@@ -136,7 +136,7 @@ define([
      * [SelectionModes]{@link pentaho.visual.action.SelectionModes},
      * to assume the corresponding selection mode function.
      *
-     * @type {!pentaho.visual.action.SelectionMode}
+     * @type {pentaho.visual.action.SelectionMode}
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When set to a `string` which is not one of the
      * standard selection mode names, [SelectionModes]{@link pentaho.visual.action.SelectionModes}.
@@ -222,7 +222,7 @@ define([
   /**
    * Serializes a simple function value constructed by `__getSelectionMode`.
    *
-   * @param {!pentaho.type.Function} fun - A selection mode function wrapped in a simple function value.
+   * @param {pentaho.type.Function} fun - A selection mode function wrapped in a simple function value.
    * @param {?object} keyArgs - The serialization keyword arguments.
    * @return {string} The function serialization.
    * @private

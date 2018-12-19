@@ -35,7 +35,7 @@ define([
      * @constructor
      * @description Creates a `TransactionScope`.
      *
-     * @param {!pentaho.type.changes.Transaction} transaction - The associated transaction.
+     * @param {pentaho.type.changes.Transaction} transaction - The associated transaction.
      */
 
     /**
@@ -86,7 +86,7 @@ define([
      *
      * Otherwise, if the scope cannot commit its transaction, accepting the scope simply exits from it.
      *
-     * @return {!pentaho.type.changes.AbstractTransactionScope} This scope.
+     * @return {pentaho.type.changes.AbstractTransactionScope} This scope.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the transaction scope has already been exited.
      * @throws {pentaho.lang.OperationInvalidError} When the transaction scope is not the current scope.
@@ -130,14 +130,14 @@ define([
      *
      * In any case, the scope will have been exited from when this method returns.
      *
-     * @param {function(pentaho.type.changes.TransactionScope) : any} fun - The function to call within the scope.
+     * @param {function(pentaho.type.changes.TransactionScope) : *} fun - The function to call within the scope.
      * The function is called with the `this` context specified in argument `ctx`.
      * The return value of `fun` is returned back from this method.
      *
-     * @param {Object} [ctx] The `this` context in which to call `fun`.
+     * @param {?object} [ctx] The `this` context in which to call `fun`.
      * When unspecified, the function will have a `null` this.
      *
-     * @return {any} The value returned by `fun`.
+     * @return {*} The value returned by `fun`.
      *
      * @throws {Error} When the transaction is rejected, the rejection error.
      */

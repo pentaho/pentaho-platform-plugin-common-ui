@@ -80,7 +80,7 @@
  * @method
  * @param {number} colIndex The column index (zero-based).
  * @param {string} propName The metadata property name.
- * @return {any} The metadata property value.
+ * @return {*} The metadata property value.
  */
 
 /**
@@ -114,7 +114,7 @@
  * @method
  * @param {number} rowIndex The row index (zero-based).
  * @param {number} colIndex The column index (zero-based).
- * @return {!pentaho.data.ICell} The specified cell object.
+ * @return {pentaho.data.ICell} The specified cell object.
  */
 
 /**
@@ -127,7 +127,7 @@
  * @method
  * @param {number} rowIndex - The row index (zero-based).
  * @param {number} colIndex - The column index (zero-based).
- * @return {any|null} The cell's value.
+ * @return {*} The cell's value.
  */
 
 /**
@@ -186,7 +186,7 @@
  *
  * @name pentaho.data.ITable#filterMatchesRow
  * @method
- * @param {!pentaho.data.filter.Abstract} filter - The filter.
+ * @param {pentaho.data.filter.Abstract} filter - The filter.
  * @param {number} rowIndex - The row index (zero-based).
  *
  * @return {boolean} `true` if the filter includes the row; `false`, otherwise.
@@ -202,9 +202,9 @@
  *
  * @name pentaho.data.ITable#filter
  * @method
- * @param {!pentaho.data.filter.Abstract} filter - The filter.
+ * @param {pentaho.data.filter.Abstract} filter - The filter.
  *
- * @return {!pentaho.data.TableView} A view of the filtered data table.
+ * @return {pentaho.data.TableView} A view of the filtered data table.
  *
  * @throws {pentaho.type.ValidationError} When the filter is not valid,
  * the first error returned by the `validate` method.

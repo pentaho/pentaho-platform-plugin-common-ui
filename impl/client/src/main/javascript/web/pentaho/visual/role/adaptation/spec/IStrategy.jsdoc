@@ -29,7 +29,7 @@
  *
  * @name data
  * @memberOf pentaho.visual.role.adaptation.spec.IStrategy#
- * @type {!pentaho.data.ITable}
+ * @type {pentaho.data.ITable}
  */
 
 /**
@@ -37,7 +37,7 @@
  *
  * @name inputFieldIndexes
  * @memberOf pentaho.visual.role.adaptation.spec.IStrategy#
- * @type {!Array.<number>}
+ * @type {Array.<number>}
  */
 
 /**
@@ -45,5 +45,5 @@
  *
  * @name outputFieldIndexes
  * @memberOf pentaho.visual.role.adaptation.spec.IStrategy#
- * @type {!Array.<number>}
+ * @type {Array.<number>}
  */

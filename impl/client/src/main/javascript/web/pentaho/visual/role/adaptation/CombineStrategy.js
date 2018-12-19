@@ -72,7 +72,7 @@ define([
       /**
        * Gets the array of function which extract the key of the value of each column of `inputData`.
        *
-       * @type {Array.<(function(any):string)>}
+       * @type {Array.<(function(*):string)>}
        * @readOnly
        * @private
        */
@@ -81,7 +81,7 @@ define([
       /**
        * The function which extracts the key of an output value.
        *
-       * @type {function(any):string}
+       * @type {function(*):string}
        * @readOnly
        * @private
        */
@@ -90,7 +90,7 @@ define([
       /**
        * The mapping of output values to its first row index.
        *
-       * @type {Object.<string, number>}
+       * @type {?Object.<string, number>}
        * @readOnly
        * @private
        */

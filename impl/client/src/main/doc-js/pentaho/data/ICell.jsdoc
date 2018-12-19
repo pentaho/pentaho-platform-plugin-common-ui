@@ -25,7 +25,7 @@
  * Gets or sets the value of the cell.
  *
  * @name pentaho.data.ICell#value
- * @type {any}
+ * @type {*}
  */
 
 /**
@@ -40,7 +40,7 @@
  *
  * @name pentaho.data.ICell#valueOf
  * @method
- * @return {any}
+ * @return {*}
  * @see pentaho.data.ICell#value
  */
 
@@ -51,6 +51,6 @@
  *
  * @name pentaho.data.ICell#toString
  * @method
- * @return {?any}
+ * @return {*}
  * @see pentaho.data.ICell#formatted
  */

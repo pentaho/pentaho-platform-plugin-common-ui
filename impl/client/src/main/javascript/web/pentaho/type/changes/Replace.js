@@ -40,7 +40,7 @@ define([
      * This type of change is always part of a {@link pentaho.type.changes.ComplexChangeset}.
      *
      * @constructor
-     * @param {!pentaho.type.PropertyType} propType - The property type.
+     * @param {pentaho.type.PropertyType} propType - The property type.
      * @param {pentaho.type.Element} valueNew - The proposed value of the property.
      * @param {number} stateNew - The proposed state of the property.
      *
@@ -52,7 +52,7 @@ define([
        *
        * @name property
        * @memberOf pentaho.type.changes.Replace#
-       * @type {!pentaho.type.PropertyType}
+       * @type {pentaho.type.PropertyType}
        * @readOnly
        */
       O.setConst(this, "property", propType);
@@ -64,7 +64,7 @@ define([
     /**
      * Updates the value that will replace the current value.
      *
-     * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
+     * @param {pentaho.type.changes.Changeset} changeset - The changeset.
      * @param {pentaho.type.Element} value - The new proposed value of the property.
      * @param {number} state - The new proposed state of the property.
      * @private

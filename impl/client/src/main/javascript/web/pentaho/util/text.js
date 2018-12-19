@@ -35,7 +35,7 @@ define(function() {
      * If the result is the empty string, `null` is returned.
      * Otherwise the string value is returned.
      *
-     * @param {any} value - The value to convert to a non-empty string.
+     * @param {*} value - The value to convert to a non-empty string.
      * @return {nonEmptyString} A non-empty string or `null`.
      */
     nonEmptyString: function(value) {

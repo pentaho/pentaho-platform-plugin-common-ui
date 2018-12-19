@@ -34,7 +34,7 @@ define([
     /**
      * Gets a value that indicates if a given data table has any key columns.
      *
-     * @param {!pentaho.data.ITable} dataTable - The data table.
+     * @param {pentaho.data.ITable} dataTable - The data table.
      *
      * @return {boolean} `true` if there are key columns; `false`, if not.
      *
@@ -60,7 +60,7 @@ define([
      * in the case when the data table has no actual key attributes,
      * if the attribute is categorical (see [isColumnTypeContinuous]{@link pentaho.data.util.isColumnTypeContinuous}).
      *
-     * @param {!pentaho.data.ITable} dataTable - The data table.
+     * @param {pentaho.data.ITable} dataTable - The data table.
      * @param {number} columnIndex - The column index.
      * @param {boolean} [hasDataKeyColumns] - Indicates if `dataTable`, or its source table,
      * contain any (real) key columns.
@@ -96,9 +96,9 @@ define([
     /**
      * Gets the value of a cell, or value, directly.
      *
-     * @param {any|pentaho.data.ICell} valueOrCell - The value or cell.
+     * @param {*|pentaho.data.ICell} valueOrCell - The value or cell.
      *
-     * @return {any} The cell value.
+     * @return {*} The cell value.
      */
     getCellValue: function(valueOrCell) {
       return (valueOrCell != null && !(valueOrCell instanceof Date))
@@ -109,10 +109,10 @@ define([
     /**
      * Creates a data filter from the given cells map and source data table.
      *
-     * @param {!Object.<string, any|pentaho.data.ICell>} cellsMap - The data cells map.
-     * @param {!pentaho.data.ITable} dataPlain - The associated source, plain data table.
+     * @param {Object.<string, *|pentaho.data.ICell>} cellsMap - The data cells map.
+     * @param {pentaho.data.ITable} dataPlain - The associated source, plain data table.
      *
-     * @return {!pentaho.data.filter.Abstract} A data filter.
+     * @return {pentaho.data.filter.Abstract} A data filter.
      */
     createFilterFromCellsMap: function(cellsMap, dataPlain) {
 
@@ -139,9 +139,9 @@ define([
      *
      * Returns `null` if the given `columnId` is not a defined column of `dataPlain`.
      *
-     * @param {!pentaho.data.ITable} dataPlain - The associated source, plain data table.
+     * @param {pentaho.data.ITable} dataPlain - The associated source, plain data table.
      * @param {string} columnId - The column identifier.
-     * @param {any|pentaho.data.ICell} cell - The data cell.
+     * @param {*|pentaho.data.ICell} cell - The data cell.
      *
      * @return {pentaho.data.filter.IsEqual} An `IsEqual` data filter or `null`.
      */
@@ -155,8 +155,8 @@ define([
      *
      * If any of the given column identifiers is not defined, `null` is returned.
      *
-     * @param {!pentaho.data.ITable} dataTable - The data table.
-     * @param {!Array.<string>} columnIds - The column identifiers.
+     * @param {pentaho.data.ITable} dataTable - The data table.
+     * @param {Array.<string>} columnIds - The column identifiers.
      *
      * @return {Array.<number>} The column indexes or `null`.
      */
@@ -183,11 +183,11 @@ define([
      *
      * If all rows are selected, then the given plain table is returned, directly.
      *
-     * @param {!pentaho.data.ITable} dataPlain - The plain data table.
-     * @param {function(!pentaho.data.ITable, number) : boolean} rowPredicate - A predicate function
+     * @param {pentaho.data.ITable} dataPlain - The plain data table.
+     * @param {function(pentaho.data.ITable, number) : boolean} rowPredicate - A predicate function
      * that, when given a plain data table and a row index, returns `true` to include the row and `false` to ignore it.
      *
-     * @return {!pentaho.data.ITable} The resulting table view.
+     * @return {pentaho.data.ITable} The resulting table view.
      */
     filterByPredicate: function(dataPlain, rowPredicate) {
 
@@ -201,8 +201,8 @@ define([
      *
      * If all rows are selected, then `null` is returned instead.
      *
-     * @param {!pentaho.data.ITable} dataPlain - The plain data table.
-     * @param {function(!pentaho.data.ITable, number) : boolean} rowPredicate - A predicate function
+     * @param {pentaho.data.ITable} dataPlain - The plain data table.
+     * @param {function(pentaho.data.ITable, number) : boolean} rowPredicate - A predicate function
      * that, when given a plain data table and a row index, returns `true` to include the row and `false` to ignore it.
      *
      * @return {Array.<number>} The selected row indexes, or `null`.
@@ -226,9 +226,9 @@ define([
     /**
      * Builds a row predicate function that tests if not all of the given columns contain a null value.
      *
-     * @param {!Array.<number>} columnIndexes - The column indexes.
+     * @param {Array.<number>} columnIndexes - The column indexes.
      *
-     * @return {function(!pentaho.data.ITable, number) : boolean} The row predicate function.
+     * @return {function(pentaho.data.ITable, number) : boolean} The row predicate function.
      */
     buildRowPredicateNotAllNullColumns: function(columnIndexes) {
 

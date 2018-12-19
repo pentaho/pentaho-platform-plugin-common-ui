@@ -22,7 +22,7 @@ define(function() {
    *
    * @name requireJSConfig
    * @memberOf pentaho.util
-   * @type {!IAmdLoaderPlugin}
+   * @type {IAmdLoaderPlugin}
    * @amd pentaho/util/requireJSConfig
    * @private
    */

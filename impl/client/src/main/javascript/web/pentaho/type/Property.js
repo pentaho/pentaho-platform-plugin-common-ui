@@ -47,9 +47,9 @@ define([
    *
    * @abstract
    *
-   * @implements pentaho.lang.IWithKey
-   * @implements pentaho.lang.IListElement
-   * @implements pentaho.lang.ICollectionElement
+   * @implements {pentaho.lang.IWithKey}
+   * @implements {pentaho.lang.IListElement}
+   * @implements {pentaho.lang.ICollectionElement}
    *
    * @classDesc The type of a property of a complex type.
    *
@@ -125,8 +125,8 @@ define([
        * extended with its spec.
        *
        * @param {object} spec - A property name or specification object.
-       * @param {!Object} keyArgs - Keyword arguments.
-       * @param {!pentaho.type.ComplexType} keyArgs.declaringType - The complex type that declares the property.
+       * @param {object} keyArgs - Keyword arguments.
+       * @param {pentaho.type.ComplexType} keyArgs.declaringType - The complex type that declares the property.
        * @param {number} keyArgs.index - The index of the property within its complex type.
        *
        * @return {?object} A specification to use instead of the given `spec` argument to extend
@@ -277,7 +277,7 @@ define([
        * When set to a non-{@link Nully} and non-{@link String} value,
        * the value is first replaced by the result of calling its `toString` method.
        *
-       * @type {!nonEmptyString}
+       * @type {nonEmptyString}
        *
        * @throws {pentaho.lang.ArgumentRequiredError} When set to an empty string or a _nully_ value.
        * @throws {TypeError} When set to a value different from the current one.
@@ -322,7 +322,7 @@ define([
        * When set to a non-{@link Nully} and non-{@link String} value,
        * the value is first replaced by the result of calling its `toString` method.
        *
-       * @type {!nonEmptyString}
+       * @type {nonEmptyString}
        *
        * @throws {TypeError} When attempting to set a value and the property is not a root property.
        * @throws {pentaho.lang.ArgumentRequiredError} When set to an empty string or a _nully_ value.
@@ -392,7 +392,7 @@ define([
 
       /**
        * Sets the `isReadOnly` property value.
-       * @param {any} value - The new value.
+       * @param {*} value - The new value.
        * @private
        */
       __setIsReadOnly: function(value) {
@@ -440,7 +440,7 @@ define([
        *
        * When specified, any inherited [defaultValue]{@link pentaho.type.PropertyType#defaultValue} is ignored.
        *
-       * @type {!pentaho.type.ValueType}
+       * @type {pentaho.type.ValueType}
        *
        * @see pentaho.type.spec.IPropertyType#valueType
        * @see pentaho.type.Type#elementType
@@ -570,7 +570,7 @@ define([
        * it is immediately converted to the _property type_'s
        * [valueType]{@link pentaho.type.PropertyType#valueType}.
        *
-       * @type {pentaho.type.Value | pentaho.type.spec.PropertyDynamicAttribute.<pentaho.type.spec.Value>}
+       * @type {pentaho.type.Value | pentaho.type.spec.PropertyDynamicAttribute.<?pentaho.type.spec.Value>}
        *
        * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
        * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
@@ -632,7 +632,7 @@ define([
        * @param {pentaho.type.Complex} defaultValueOwner - The complex value that owns the property.
        *   Only needed if it is desired that {@link Nully} values are converted to the property's default value.
        *
-       * @param {?any} valueSpec - A value or value specification.
+       * @param {*} valueSpec - A value or value specification.
        *
        * @return {?pentaho.type.Value} A value.
        */
@@ -673,7 +673,7 @@ define([
        *
        * Ensures that list properties always have a non-null default value.
        *
-       * @param {!pentaho.type.Complex} owner - The complex value that owns the property.
+       * @param {pentaho.type.Complex} owner - The complex value that owns the property.
        * @return {pentaho.type.Value} The default value.
        */
       defaultValueOn: function(owner) {
@@ -815,9 +815,9 @@ define([
        * {@link pentaho.type.PropertyType#countMin} and
        * {@link pentaho.type.PropertyType#countMax}.
        *
-       * @param {!pentaho.type.Complex} owner - The complex value that owns the property.
+       * @param {pentaho.type.Complex} owner - The complex value that owns the property.
        *
-       * @return {pentaho.type.ValidationError|Array.<pentaho.type.ValidationError>} An error,
+       * @return {?(pentaho.type.ValidationError|Array.<pentaho.type.ValidationError>)} An error,
        * a non-empty array of errors or `null`.
        *
        * @see pentaho.type.Complex#validate
@@ -876,10 +876,10 @@ define([
        * When overriding this method,
        * the error utilities in {@link pentaho.type.Util} can be used to help in the implementation.
        *
-       * @param {!pentaho.type.Complex} owner - The complex value that owns the property.
-       * @param {!pentaho.type.Value} value - The value to validate.
+       * @param {pentaho.type.Complex} owner - The complex value that owns the property.
+       * @param {pentaho.type.Value} value - The value to validate.
        *
-       * @return {pentaho.type.ValidationError|Array.<pentaho.type.ValidationError>} An error,
+       * @return {?(pentaho.type.ValidationError|Array.<pentaho.type.ValidationError>)} An error,
        * a non-empty array of errors or `null`.
        *
        * @protected
@@ -920,8 +920,8 @@ define([
        * When overriding this method, be sure to also call the base implementation.
        *
        * @param {function() : void} addValidator - The function to call to register an element validator.
-       * @param {!pentaho.type.Complex} owner - The complex value that owns the property.
-       * @param {!pentaho.type.Value} value - The value whose elements will be validated.
+       * @param {pentaho.type.Complex} owner - The complex value that owns the property.
+       * @param {pentaho.type.Value} value - The value whose elements will be validated.
        *
        * @protected
        */
@@ -1072,7 +1072,7 @@ define([
          * @name isRequiredOn
          * @memberOf pentaho.type.PropertyType#
          * @method
-         * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
+         * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
          * @return {boolean} The evaluated value of the `isRequired` attribute.
          *
          * @see pentaho.type.PropertyType#isRequired
@@ -1162,7 +1162,7 @@ define([
          * @name countMinOn
          * @memberOf pentaho.type.PropertyType#
          * @method
-         * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
+         * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
          * @return {number} The evaluated value of the `countMin` attribute.
          *
          * @see pentaho.type.PropertyType#countMin
@@ -1249,7 +1249,7 @@ define([
          * @name countMaxOn
          * @memberOf pentaho.type.PropertyType#
          * @method
-         * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
+         * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
          * @return {number} The evaluated value of the `countMax` attribute.
          *
          * @see pentaho.type.PropertyType#countMax
@@ -1332,7 +1332,7 @@ define([
          * @name isApplicableOn
          * @memberOf pentaho.type.PropertyType#
          * @method
-         * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
+         * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
          * @return {boolean} The evaluated value of the `isApplicable` attribute.
          *
          * @see pentaho.type.PropertyType#isApplicable
@@ -1413,7 +1413,7 @@ define([
          * @name isEnabledOn
          * @memberOf pentaho.type.PropertyType#
          * @method
-         * @param {!pentaho.type.Complex} owner - The complex value that owns a property of this type.
+         * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
          * @return {boolean} The evaluated value of the `isEnabled` attribute.
          *
          * @see pentaho.type.PropertyType#isEnabled

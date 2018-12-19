@@ -27,7 +27,7 @@ define([
      * @alias SpecificationScope
      * @memberOf pentaho.type
      * @class
-     * @implements pentaho.lang.IDisposable
+     * @implements {pentaho.lang.IDisposable}
      *
      * @amd pentaho/type/SpecificationScope
      *
@@ -63,7 +63,7 @@ define([
     /**
      * Gets the associated specification context.
      *
-     * @ype {!pentaho.type.SpecificationContext}
+     * @type {pentaho.type.SpecificationContext}
      */
     get specContext() {
       return this.__context;

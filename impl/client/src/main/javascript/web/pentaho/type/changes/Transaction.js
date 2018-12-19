@@ -33,7 +33,7 @@ define([
   /**
    * The stack of transactions performing the `did:change` phase.
    *
-   * @type {!Array.<!pentaho.type.changes.Transaction>}
+   * @type {Array.<pentaho.type.changes.Transaction>}
    * @readOnly
    */
   var __txnInCommitDid = [];
@@ -102,7 +102,7 @@ define([
        *
        * Changesets are inserted in inverse topological order.
        *
-       * @type {pentaho.lang.SortedList.<!pentaho.type.changes.Changeset>}
+       * @type {pentaho.lang.SortedList.<pentaho.type.changes.Changeset>}
        * @private
        * @see pentaho.type.changes.Transaction#__doCommitWillCore
        */
@@ -111,7 +111,7 @@ define([
       /**
        * The set of the owner uids of changesets which are present in the changesets `__commitWillQueue`.
        *
-       * @type {Object.<string, boolean>}
+       * @type {?Object.<string, boolean>}
        * @private
        */
       this.__commitWillQueueSet = null;
@@ -127,7 +127,7 @@ define([
       /**
        * The set of owner uids of changesets which have ran at least once.
        *
-       * @type {Object.<string, boolean>}
+       * @type {?Object.<string, boolean>}
        * @private
        */
       this.__commitWillRanSet = null;
@@ -242,7 +242,7 @@ define([
      *
      * @param {pentaho.type.mixins.Container} container - The container.
      *
-     * @return {!pentaho.type.changes.ChangeRef} The corresponding `ChangeRef`.
+     * @return {pentaho.type.changes.ChangeRef} The corresponding `ChangeRef`.
      *
      * @private
      * @internal
@@ -275,7 +275,7 @@ define([
     /**
      * Gets the ambient references of a given container, if any.
      *
-     * @param {!pentaho.type.mixins.Container} container - The container.
+     * @param {pentaho.type.mixins.Container} container - The container.
      * @return {pentaho.type.ReferenceList} The reference list, or `null`.
      */
     getAmbientReferences: function(container) {
@@ -286,9 +286,9 @@ define([
     /**
      * Called to obtain a changeset for a given container in this transaction.
      *
-     * @param {!pentaho.type.mixins.Container} owner - The changeset owner container.
+     * @param {pentaho.type.mixins.Container} owner - The changeset owner container.
      *
-     * @return {!pentaho.type.changes.Changeset} The existing or created changeset.
+     * @return {pentaho.type.changes.Changeset} The existing or created changeset.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the transaction has already been previewed,
      * committed or rejected, and thus can no longer be changed.
@@ -302,9 +302,9 @@ define([
     /**
      * Creates a changeset for a given container in this transaction.
      *
-     * @param {!pentaho.type.mixins.Container} owner - The changeset owner container.
+     * @param {pentaho.type.mixins.Container} owner - The changeset owner container.
      *
-     * @return {!pentaho.type.changes.Changeset} The existing or created changeset.
+     * @return {pentaho.type.changes.Changeset} The existing or created changeset.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the transaction has already been previewed,
      * committed or rejected, and thus can no longer be changed.
@@ -372,7 +372,7 @@ define([
     /**
      * Enters the transaction and returns a new transaction scope to control the transaction.
      *
-     * @return {!pentaho.type.changes.TransactionScope} The new transaction scope.
+     * @return {pentaho.type.changes.TransactionScope} The new transaction scope.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the transaction is resolved.
      *
@@ -567,7 +567,7 @@ define([
      * To notify listeners of the rejection,
      * [__commit]{@link pentaho.type.changes.Transaction#__commit} still needs to be called.
      *
-     * @return {!pentaho.lang.ActionResult} The commit-will or commit result of the transaction.
+     * @return {pentaho.lang.ActionResult} The commit-will or commit result of the transaction.
      *
      * @throws {pentaho.lang.OperationInvalidError} When this method is called while one of
      *  [__commitWill]{@link pentaho.type.changes.Transaction#__commitWill} or
@@ -598,7 +598,7 @@ define([
      * by delegating to `__doCommitWillCore`.
      * Stores the "will" result and marks all changesets as read-only.
      *
-     * @return {!pentaho.lang.ActionResult} The commit-will result of the transaction.
+     * @return {pentaho.lang.ActionResult} The commit-will result of the transaction.
      * @private
      */
     __doCommitWill: function() {
@@ -643,7 +643,7 @@ define([
      * 3.4. Go to 3.
      * 4. Exit with success.
      *
-     * @return {!pentaho.lang.ActionResult} The commit-will result of the transaction.
+     * @return {pentaho.lang.ActionResult} The commit-will result of the transaction.
      * @private
      */
     __doCommitWillCore: function() {
@@ -767,7 +767,7 @@ define([
      * Adds the parent changesets of a changeset to the commit-will queue,
      * given the child changeset owner.
      *
-     * @param {!pentaho.type.mixins.Container} childOwner - The owner of the child changeset.
+     * @param {pentaho.type.mixins.Container} childOwner - The owner of the child changeset.
      * @private
      */
     __addParentsToCommitWillQueue: function(childOwner) {
@@ -787,7 +787,7 @@ define([
     /**
      * Adds a changeset to the commit-will queue, if it isn't there yet.
      *
-     * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
+     * @param {pentaho.type.changes.Changeset} changeset - The changeset.
      * @param {boolean} forceIfRan - Indicates that the changeset should be added even if it already ran.
      * @private
      */
@@ -808,7 +808,7 @@ define([
      * this method adds the given changeset to the evaluation queue,
      * if it isn't the current changeset being evaluated.
      *
-     * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
+     * @param {pentaho.type.changes.Changeset} changeset - The changeset.
      * @private
      */
     __onChangesetLocalVersionChangeDid: function(changeset) {
@@ -820,7 +820,7 @@ define([
     /**
      * Called by a changeset when its topological order is about to change.
      *
-     * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
+     * @param {pentaho.type.changes.Changeset} changeset - The changeset.
      *
      * @return {?function} A function that should be called after the change, or `null`.
      *
@@ -844,7 +844,7 @@ define([
     /**
      * Called to finish the topological order change of a changeset.
      *
-     * @param {!pentaho.type.changes.Changeset} changeset - The changeset.
+     * @param {pentaho.type.changes.Changeset} changeset - The changeset.
      *
      * @private
      */
@@ -857,7 +857,7 @@ define([
     /**
      * Commits the transaction.
      *
-     * @return {!pentaho.lang.ActionResult} The commit result of the transaction.
+     * @return {pentaho.lang.ActionResult} The commit result of the transaction.
      *
      * @throws {pentaho.lang.OperationInvalidError} When this method is called while one of
      * [__commitWill]{@link pentaho.type.changes.Transaction#__commitWill} or
@@ -975,7 +975,7 @@ define([
      * To end the scope with an error,
      * call its [reject]{@link pentaho.type.changes.TransactionScope#reject} method.
      *
-     * @return {!pentaho.type.changes.TransactionScope} The new transaction scope.
+     * @return {pentaho.type.changes.TransactionScope} The new transaction scope.
      */
     enter: function() {
       var txn = transactionControl.current || new Transaction(); // <=> new this() :-)
@@ -988,7 +988,7 @@ define([
      * Within this scope there is no current transaction and
      * reading the properties of instances obtains their committed values.
      *
-     * @return {!pentaho.type.changes.CommittedScope} The read-committed scope.
+     * @return {pentaho.type.changes.CommittedScope} The read-committed scope.
      */
     enterCommitted: function() {
       return new CommittedScope();
@@ -1001,7 +1001,7 @@ define([
      * If a transaction is started and committed from within the `did:change` listener of another,
      * then multiple changesets may be returned.
      *
-     * @param {!pentaho.type.mixins.Container} container - The container.
+     * @param {pentaho.type.mixins.Container} container - The container.
      *
      * @return {Array.<pentaho.type.changes.Changeset>} An array of changesets, if any changeset exists;
      * `null` otherwise.
@@ -1049,7 +1049,7 @@ define([
    *
    * @memberOf pentaho.type.changes.Transaction~
    *
-   * @param {!pentaho.lang.Event} event - The event object.
+   * @param {pentaho.lang.Event} event - The event object.
    *
    * @return {boolean} `true` if it is canceled; `false`, otherwise.
    *

@@ -38,8 +38,8 @@ define([
    * @memberOf pentaho.data
    * @class
    * @abstract
-   * @implements pentaho.lang.ISpecifiable
-   * @implements pentaho.data.ITable
+   * @implements {pentaho.lang.ISpecifiable}
+   * @implements {pentaho.data.ITable}
    * @amd pentaho/data/AbstractTable
    *
    * @classdesc The `AbstractTable` class is the abstract base class of
@@ -66,7 +66,7 @@ define([
      * @function
      * @param {number} rowIndex The row index (zero-based).
      * @param {number} colIndex The column index (zero-based).
-     * @return {!pentaho.data.Cell} The specified cell object.
+     * @return {pentaho.data.Cell} The specified cell object.
      */
 
     /**
@@ -75,8 +75,8 @@ define([
      * @name pentaho.data.AbstractTable#addColumn
      * @method
      * @abstract
-     * @param {Object} colSpec The column specification.
-     * @param {Object} [keyArgs] The keyword arguments.
+     * @param {object} colSpec The column specification.
+     * @param {?object} [keyArgs] The keyword arguments.
      * @return {number} The index of the new column.
      */
 
@@ -86,8 +86,8 @@ define([
      * @name pentaho.data.AbstractTable#addRow
      * @method
      * @abstract
-     * @param {Object} rowSpec The row specification.
-     * @param {Object} [keyArgs] The keyword arguments.
+     * @param {object} rowSpec The row specification.
+     * @param {?object} [keyArgs] The keyword arguments.
      * @return {number} The index of the new row.
      */
 
@@ -98,7 +98,7 @@ define([
      * @method
      * @abstract
      * @param {number} colIndex The column index (zero-based).
-     * @return {pentaho.data.Attribute} The column attribute object or `null`, if none.
+     * @return {?pentaho.data.Attribute} The column attribute object or `null`, if none.
      *
      *    Only cross-tables can have columns that have no associated attribute.
      */
@@ -181,8 +181,8 @@ define([
      * When the data type is `"string"`, the comparison is lexicographical.
      *
      * @param {number} colIndex The column index (zero-based).
-     * @param {Object} [options] A keyword arguments object.
-     * @param {function} [options.key] A function that derives values from the actual column values.
+     * @param {?object} [options] A keyword arguments object.
+     * @param {?function} [options.key] A function that derives values from the actual column values.
      * @return {pentaho.data.Range} A non-null range object.
      */
     getColumnRange: function(colIndex, options) {
@@ -341,7 +341,7 @@ define([
     /**
      * Creates a CDA dataset.
      *
-     * @return {Object} The CDA dataset.
+     * @return {object} The CDA dataset.
      */
     toJsonCda: function() {
       var C = this.getNumberOfColumns();

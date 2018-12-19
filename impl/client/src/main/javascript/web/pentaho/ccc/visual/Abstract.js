@@ -416,7 +416,7 @@ define([
       /**
        * Registers a mapping field info.
        *
-       * @param {!MappingFieldInfo} mappingFieldInfo - The mapping field info to add.
+       * @param {MappingFieldInfo} mappingFieldInfo - The mapping field info to add.
        */
       var addMappingFieldInfo = function(mappingFieldInfo) {
 
@@ -556,7 +556,7 @@ define([
      * then we would map the special `valueRole.dim` field to CCC's
      * `series` visual role, to make series unfold for each field bound to `value`.
      *
-     * @return {!MappingFieldInfo} The created generic measure discriminator.
+     * @return {MappingFieldInfo} The created generic measure discriminator.
      * @private
      */
     _createGenericMeasureDiscriminator: function() {
@@ -907,7 +907,7 @@ define([
      *   - When there are Color fields and at most one generic measure:
      *   - Uses the member colors of the last Color field, if any.
      *
-     * @return {Object.<string, pv.Color>|pv.Scale} The color map, if any or _nully_.
+     * @return {?Object.<string, pv.Color>|pv.Scale|Nully} The color map, if any or _nully_.
      *
      * @protected
      */
@@ -1520,8 +1520,8 @@ define([
     /**
      * Creates a chart of a given class and with given options.
      *
-     * @param {!Class.<pvc.BaseChart>} ChartClass The CCC chart constructor.
-     * @return {!pvc.BaseChart} The created chart instance.
+     * @param {Class.<pvc.BaseChart>} ChartClass The CCC chart constructor.
+     * @return {pvc.BaseChart} The created chart instance.
      * @protected
      */
     _createChart: function(ChartClass) {
@@ -1763,9 +1763,9 @@ define([
      * prototype [_options]{@link pentaho.ccc.visual.Abstract#_options} property.
      *
      * @param {?string} name - The name of the created class.
-     * @param {Object} instSpec - The instance spec.
-     * @param {Object} classSpec - The static spec.
-     * @param {Object} keyArgs - Keyword arguments.
+     * @param {?object} instSpec - The instance spec.
+     * @param {?object} classSpec - The static spec.
+     * @param {?object} keyArgs - Keyword arguments.
      * @override
      */
     _extend: function(name, instSpec, classSpec, keyArgs) {

@@ -41,8 +41,8 @@ define([
    * @constructor
    * @description Creates a new instance.
    *
-   * @param {!pentaho.type.changes.Transaction} transaction - The owning transaction.
-   * @param {!pentaho.type.List} owner - The list value where the changes take place.
+   * @param {pentaho.type.changes.Transaction} transaction - The owning transaction.
+   * @param {pentaho.type.List} owner - The list value where the changes take place.
    */
   return Changeset.extend(module.id, /** @lends pentaho.type.changes.ListChangeset# */{
 
@@ -53,7 +53,7 @@ define([
       /**
        * Map of the existing child changesets, with current primitive changes applied.
        *
-       * @type {!Object.<string, !pentaho.type.changes.Changeset>}
+       * @type {Object.<string, pentaho.type.changes.Changeset>}
        * @private
        */
       this.__changesetByKey = Object.create(null);
@@ -61,7 +61,7 @@ define([
       /**
        * Array of primitive changes.
        *
-       * @type {!Array.<!pentaho.type.changes.Change>}
+       * @type {Array.<pentaho.type.changes.Change>}
        * @private
        */
       this.__primitiveChanges = [];
@@ -75,7 +75,7 @@ define([
      * Gets the list value where the changes take place.
      *
      * @name pentaho.type.changes.ListChangeset#owner
-     * @type {!pentaho.type.List}
+     * @type {pentaho.type.List}
      * @readonly
      */
 
@@ -155,7 +155,7 @@ define([
 
     /**
      * Marks an element as added by a change or cancels a previous removal.
-     * @param {!pentaho.type.Complex} element - The added element.
+     * @param {pentaho.type.Complex} element - The added element.
      * @private
      * @internal
      */
@@ -176,7 +176,7 @@ define([
 
     /**
      * Marks an element as removed by a change or cancels a previous addition.
-     * @param {!pentaho.type.Complex} element - The removed element.
+     * @param {pentaho.type.Complex} element - The removed element.
      * @private
      * @internal
      */
@@ -227,7 +227,7 @@ define([
      * Otherwise, a projected mock containing only
      * the elements' data structures is created and returned.
      *
-     * @type {!Object|!pentaho.type.List}
+     * @type {object|pentaho.type.List}
      * @readOnly
      * @private
      * @internal
@@ -272,7 +272,7 @@ define([
      *
      * This method is used for computing the future value of the list incrementally.
      *
-     * @param {!Object|!pentaho.type.List} list - The list or list mock to which to apply changes.
+     * @param {object|pentaho.type.List} list - The list or list mock to which to apply changes.
      * @param {number} startingFromIdx - The index of the first change to be considered.
      * @private
      * @internal
@@ -297,7 +297,7 @@ define([
      * populates [__primitiveChanges]{@link pentaho.type.changes.ListChangeset#__primitiveChanges} with
      * the relevant [PrimitiveChange]{@link pentaho.type.changes.PrimitiveChange} objects.
      *
-     * @param {any|Array} fragment - The element or elements to set.
+     * @param {*|Array} fragment - The element or elements to set.
      * @param {?boolean} [add=false] Adds new elements to the list.
      * @param {?boolean} [update=false] Updates elements already present in the list.
      * @param {?boolean} [remove=false] Removes elements not present in `fragment` from the list.
@@ -509,7 +509,7 @@ define([
      * Creates a set of variable number of operations that remove elements from a list,
      * and appends that set to the list of changes.
      *
-     * @param {any|Array} fragment - The element or elements to remove.
+     * @param {*|Array} fragment - The element or elements to remove.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
@@ -638,7 +638,7 @@ define([
      * Creates an operation that moves an element to a new position,
      * and appends that change to the list of changes.
      *
-     * @param {any} elemSpec - An element specification.
+     * @param {*} elemSpec - An element specification.
      * @param {number} indexNew - The new index of the element.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
@@ -735,7 +735,7 @@ define([
      * Appends a change to this changeset.
      * Called by the constructor of individual primitive changes.
      *
-     * @param {!pentaho.type.changes.PrimitiveChange} change - Change object to be appended to the list of changes.
+     * @param {pentaho.type.changes.PrimitiveChange} change - Change object to be appended to the list of changes.
      * @private
      * @internal
      */

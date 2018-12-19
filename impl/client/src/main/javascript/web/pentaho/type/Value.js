@@ -34,7 +34,7 @@ define([
    * @name pentaho.type.ValueType
    * @class
    * @extends pentaho.type.Type
-   * @implements pentaho.lang.ISpecifiable
+   * @implements {pentaho.lang.ISpecifiable}
    *
    * @classDesc The base type class of value types.
    *
@@ -49,8 +49,8 @@ define([
    * @abstract
    * @class
    * @extends pentaho.type.Instance
-   * @implements pentaho.lang.IConfigurable
-   * @implements pentaho.lang.ISpecifiable
+   * @implements {pentaho.lang.IConfigurable}
+   * @implements {pentaho.lang.ISpecifiable}
    * @amd pentaho/type/Value
    *
    * @classDesc The base, abstract class of [instances]{@link pentaho.type.Instance} which
@@ -60,7 +60,7 @@ define([
    *
    * @description Creates a `Value` instance.
    * @constructor
-   * @param {pentaho.type.spec.Value} [spec] A value specification.
+   * @param {?pentaho.type.spec.Value} [spec] A value specification.
    *
    * @see pentaho.type.spec.IValue
    * @see pentaho.type.spec.IValueType
@@ -95,7 +95,7 @@ define([
      * @name pentaho.type.Value#clone
      * @abstract
      * @method
-     * @return {!pentaho.type.Value} The value clone.
+     * @return {pentaho.type.Value} The value clone.
      */
 
     /**
@@ -123,7 +123,7 @@ define([
      *
      * The default implementation considers two values equal if they have the equal keys.
      *
-     * @param {!pentaho.type.Value} other - A distinct value to test for equality.
+     * @param {pentaho.type.Value} other - A distinct value to test for equality.
      *
      * @return {boolean} `true` if the given value is equal to this one; `false`, otherwise.
      *
@@ -143,7 +143,7 @@ define([
      *
      * The default implementation returns `false`.
      *
-     * @param {!pentaho.type.Value} other - An equal value to test for content-equality.
+     * @param {pentaho.type.Value} other - An equal value to test for content-equality.
      *
      * @return {boolean} `true` if the given value is equal in content to this one; `false`, otherwise.
      *
@@ -218,7 +218,7 @@ define([
      * see [Complex#_configure]{@link pentaho.type.Complex#_configure}
      * and [List#_configure]{@link pentaho.type.List#_configure}.
      *
-     * @param {any} config - The value configuration.
+     * @param {*} config - The value configuration.
      *
      * @throws {TypeError} When the value would be changed and
      * its type is [read-only]{@link pentaho.type.ValueType#isReadOnly}.
@@ -250,7 +250,7 @@ define([
      * The default implementation throws an error if this value's type is
      * [read-only]{@link pentaho.type.ValueType#isReadOnly}.
      *
-     * @param {!any} config - The distinct, non-{@link Nully} configuration.
+     * @param {!*} config - The distinct, non-{@link Nully} configuration.
      *
      * @throws {TypeError} When the value would be changed and
      * its type is [read-only]{@link pentaho.type.ValueType#isReadOnly}.
@@ -280,7 +280,7 @@ define([
      * @name pentaho.type.Value#toSpec
      * @method
      *
-     * @param {Object} [keyArgs] - The keyword arguments object.
+     * @param {?object} [keyArgs] - The keyword arguments object.
      * Passed to every value and type serialized within this scope.
      *
      * Please see the documentation of value subclasses for information on additional, supported keyword arguments.
@@ -312,7 +312,7 @@ define([
      * Only applies to complex values that are serialized in object form.
      * In array form, all of the properties of complex values are serialized independently of their value.
      *
-     * @param {Object} [keyArgs.omitProps] An object whose _own_ property names with a _truthy_ value
+     * @param {?object} [keyArgs.omitProps] An object whose _own_ property names with a _truthy_ value
      * are the names of the properties of the current complex type to omit from the serialization.
      *
      * Only applies when a complex is output in object form.
@@ -321,14 +321,14 @@ define([
      * This argument only applies to complex values and
      * is not passed through to the values of their properties.
      *
-     * @return {!pentaho.type.spec.Instance} A specification of this value.
+     * @return {?pentaho.type.spec.Instance} A specification of this value.
      */
     // endregion
 
     /**
      * Gets the type of this instance.
      *
-     * @type pentaho.type.ValueType
+     * @type {pentaho.type.ValueType}
      * @readonly
      */
     $type: /** @lends pentaho.type.ValueType# */{
@@ -421,8 +421,8 @@ define([
        * Checks that both values are [equals]{@link pentaho.type.Value#equals}
        * and [equalsContent]{@link pentaho.type.Value#equalsContent}.
        *
-       * @param {any} valueA - The first value.
-       * @param {any} valueB - The second value.
+       * @param {*} valueA - The first value.
+       * @param {*} valueB - The second value.
        *
        * @return {boolean} `true` if two values are considered equal and content-equal; `false`, otherwise.
        *
@@ -435,8 +435,8 @@ define([
       /**
        * Gets a value that indicates if all of the elements of two lists of the same type are *content-equal*.
        *
-       * @param {!pentaho.type.List} listA - One list instance.
-       * @param {!pentaho.type.List} listB - Another list instance.
+       * @param {pentaho.type.List} listA - One list instance.
+       * @param {pentaho.type.List} listB - Another list instance.
        *
        * @return {boolean} `true` if the elements of the two lists are content-equal; `false`, otherwise.
        *
@@ -477,7 +477,7 @@ define([
        * This method calls the [_normalizeInstanceSpec]{@link pentaho.type.ValueType#_normalizeInstanceSpec}
        * when the specified value specification is not {@link Nully}.
        *
-       * @param {any} instSpec - The value specification.
+       * @param {*} instSpec - The value specification.
        *
        * @return {?object} The normalized value specification or `null`
        *
@@ -497,9 +497,9 @@ define([
        *
        * The default implementation simply returns the given value specification.
        *
-       * @param {!any} instSpec - The value specification.
+       * @param {!*} instSpec - The value specification.
        *
-       * @return {!any} The normalized value specification.
+       * @return {!*} The normalized value specification.
        *
        * @protected
        *

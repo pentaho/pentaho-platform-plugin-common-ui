@@ -18,15 +18,15 @@
 /**
  * @name ParameterDefinition
  * @class
- * @property {Boolean} autoSubmit True is the prompt is in auto submit mode, False otherwise
- * @property {Boolean} autoSubmitUI True if the prompt is in auto submit mode defined in the ui, False otherwise
- * @property {String} layout String defining if the layout of the prompt is Vertical or Horizontal
- * @property {Number} page The number of the page
- * @property {Boolean} paginate True if pagination is active, False otherwise
+ * @property {boolean} autoSubmit True is the prompt is in auto submit mode, False otherwise
+ * @property {boolean} autoSubmitUI True if the prompt is in auto submit mode defined in the ui, False otherwise
+ * @property {string} layout String defining if the layout of the prompt is Vertical or Horizontal
+ * @property {number} page The number of the page
+ * @property {boolean} paginate True if pagination is active, False otherwise
  * @property {Array|ParameterGroup} parameterGroups The array of ParameterGroup
- * @property {Boolean} promotNeeded True if prompts are needed, False otherwise
- * @property {Number} totalPages The number of total pages of the report
- * @property {Object|Array} errors The array of errors per parameter
+ * @property {boolean} promotNeeded True if prompts are needed, False otherwise
+ * @property {number} totalPages The number of total pages of the report
+ * @property {object|Array} errors The array of errors per parameter
  */
 define(['common-ui/jquery-clean'], function ($) {
   return function () {

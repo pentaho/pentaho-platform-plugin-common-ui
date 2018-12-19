@@ -24,7 +24,7 @@ define([
    *
    * @alias service
    * @memberOf pentaho.config
-   * @type {!pentaho.config.IService}
+   * @type {pentaho.config.IService}
    * @readOnly
    */
   return core.configService;

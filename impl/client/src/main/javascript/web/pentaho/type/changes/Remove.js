@@ -37,14 +37,14 @@ define([
      * @constructor
      * @description Creates an instance.
      *
-     * @param {!Array.<pentaho.type.Element>} elems - The elements to be removed from the list.
+     * @param {Array.<pentaho.type.Element>} elems - The elements to be removed from the list.
      * @param {number} index - The starting index of the elements in the list.
      */
     constructor: function(elems, index) {
       /**
        * Gets the elements that are removed from the list.
        *
-       * @type {!Array.<pentaho.type.Element>}
+       * @type {Array.<pentaho.type.Element>}
        * @readOnly
        */
       this.elements = elems;

@@ -145,9 +145,9 @@ define([
      * The default implementation delegates to
      * [_createGenericActionExecution]{pentaho.type.action.impl.Target#_createGenericActionExecution}.
      *
-     * @param {!pentaho.type.action.Base} action - The action which will be executed.
+     * @param {pentaho.type.action.Base} action - The action which will be executed.
      *
-     * @return {!pentaho.type.action.Execution} The action execution.
+     * @return {pentaho.type.action.Execution} The action execution.
      *
      * @protected
      *
@@ -163,9 +163,9 @@ define([
      * The implementation returns an instance of
      * [Target.GenericActionExecution]{@link pentaho.type.action.impl.Target.GenericActionExecution}.
      *
-     * @param {!pentaho.type.action.Base} action - The action which will be executed.
+     * @param {pentaho.type.action.Base} action - The action which will be executed.
      *
-     * @return {!pentaho.type.action.Execution} The action execution.
+     * @return {pentaho.type.action.Execution} The action execution.
      *
      * @protected
      */
@@ -181,7 +181,7 @@ define([
      * The default implementation delegates to
      * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
      *
-     * @param {!pentaho.type.action.Execution} actionExecution - The action execution.
+     * @param {pentaho.type.action.Execution} actionExecution - The action execution.
      *
      * @protected
      */
@@ -199,7 +199,7 @@ define([
      * The default implementation delegates to
      * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
      *
-     * @param {!pentaho.type.action.Execution} actionExecution - The action execution.
+     * @param {pentaho.type.action.Execution} actionExecution - The action execution.
      *
      * @protected
      */
@@ -220,7 +220,7 @@ define([
      * Delegates to
      * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}, otherwise.
      *
-     * @param {!pentaho.type.action.Execution} actionExecution - The action execution.
+     * @param {pentaho.type.action.Execution} actionExecution - The action execution.
      *
      * @return {?Promise} A promise to the completion of the asynchronous `do` listener,
      * of an [asynchronous]{@link pentaho.type.action.BaseType#isSync} action, or `null`.
@@ -247,7 +247,7 @@ define([
      * The default implementation delegates to
      * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
      *
-     * @param {!pentaho.type.action.Execution} actionExecution - The action execution.
+     * @param {pentaho.type.action.Execution} actionExecution - The action execution.
      *
      * @protected
      */

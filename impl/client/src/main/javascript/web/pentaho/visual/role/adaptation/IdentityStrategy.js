@@ -84,7 +84,7 @@ define([
     /**
      * Gets the cell given its value or cell
      *
-     * @param {any|!pentaho.data.ICell} valueOrCell - The value or cell.
+     * @param {*|pentaho.data.ICell} valueOrCell - The value or cell.
      * @return {pentaho.data.ICell} The cell, if any exists; `null`, if not.
      * @private
      */
@@ -107,7 +107,7 @@ define([
     /**
      * Gets a map of row index by input/output value key.
      *
-     * @return {!Object.<string, number>} The map.
+     * @return {Object.<string, number>} The map.
      * @private
      */
     __getRowIndexByValueKeyMap: function() {

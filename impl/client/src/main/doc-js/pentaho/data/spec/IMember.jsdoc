@@ -21,7 +21,7 @@
  * @interface
  * @extends pentaho.lang.spec.IAnnotatable
  *
- * @property {!pentaho.data.Atomic} v The value that identifies the member.
+ * @property {pentaho.data.Atomic} v The value that identifies the member.
  *
  * @property {string|undefined|null} f The label of the member.
  *

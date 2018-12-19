@@ -26,7 +26,7 @@ define(function() {
    *
    * @description Constructs a module service instance.
    * @constructor
-   * @param {!pentaho.module.IMetaService} metaService - The modules' metadata service.
+   * @param {pentaho.module.IMetaService} metaService - The modules' metadata service.
    */
   function Service(metaService) {
     this.__metaService = metaService;
@@ -80,9 +80,9 @@ define(function() {
    * Loads a series of modules given their metadata. Returns an array of values
    * for the successfully loaded modules.
    *
-   * @param {!Array.<!pentaho.module.IMeta>} moduleMetas - The metadata of modules to load.
+   * @param {Array.<pentaho.module.IMeta>} moduleMetas - The metadata of modules to load.
    *
-   * @return {!Promise.<Array>} A promise for the array of successfully loaded modules' values.
+   * @return {Promise.<Array>} A promise for the array of successfully loaded modules' values.
    */
   function __loadModulesAsync(moduleMetas) {
     if(moduleMetas.length > 0) {
@@ -106,7 +106,7 @@ define(function() {
   /**
    * Indicates if a value is not the failed load value.
    *
-   * @param {any} value - A value to test.
+   * @param {*} value - A value to test.
    *
    * @return {boolean} `true` if the value is not a failed load value; `false`, otherwise.
    */

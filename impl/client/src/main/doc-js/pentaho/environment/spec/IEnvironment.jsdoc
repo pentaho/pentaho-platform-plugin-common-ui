@@ -36,7 +36,7 @@
  *
  * @name user
  * @memberOf pentaho.environment.spec.IEnvironment#
- * @type {!pentaho.environment.spec.IUser}
+ * @type {pentaho.environment.spec.IUser}
  */
 
 /**
@@ -44,7 +44,7 @@
  *
  * @name server
  * @memberOf pentaho.environment.spec.IEnvironment#
- * @type {!pentaho.environment.spec.IServer}
+ * @type {pentaho.environment.spec.IServer}
  */
 
 /**

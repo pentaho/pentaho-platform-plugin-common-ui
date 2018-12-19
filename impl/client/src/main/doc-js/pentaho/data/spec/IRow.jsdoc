@@ -29,5 +29,5 @@
  * @interface
  * @see pentaho.data.spec.Row
  *
- * @property {pentaho.data.spec.Cell[]} c An array of cell specifications.
+ * @property {?pentaho.data.spec.Cell[]} c An array of cell specifications.
  */

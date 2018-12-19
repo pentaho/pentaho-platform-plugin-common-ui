@@ -49,7 +49,7 @@ define([
      *
      * @description Creates a visual role adaptation strategy instance.
      * @constructor
-     * @param {!pentaho.visual.role.adaptation.spec.IStrategy} instSpec - An adaptation strategy specification.
+     * @param {pentaho.visual.role.adaptation.spec.IStrategy} instSpec - An adaptation strategy specification.
      */
     constructor: function(instSpec) {
 
@@ -59,7 +59,7 @@ define([
        * Gets the data set of this strategy.
        *
        * @name pentaho.visual.role.adaptation.Strategy#data
-       * @type {!pentaho.data.ITable}
+       * @type {pentaho.data.ITable}
        * @readOnly
        */
       O.setConst(this, "data", arg.required(instSpec, "data", "instSpec"));
@@ -68,7 +68,7 @@ define([
        * Gets the indexes of the input fields.
        *
        * @name pentaho.visual.role.adaptation.Strategy#inputFieldIndexes
-       * @type {!Array.<number>}
+       * @type {Array.<number>}
        * @readOnly
        */
       O.setConst(this, "inputFieldIndexes", arg.required(instSpec, "inputFieldIndexes", "instSpec"));
@@ -94,7 +94,7 @@ define([
        * In identity-like strategies, `outputFieldIndexes` are equal to `inputFieldIndexes`.
        *
        * @name pentaho.visual.role.adaptation.Strategy#outputFieldIndexes
-       * @type {!Array.<number>}
+       * @type {Array.<number>}
        * @readOnly
        *
        * @see pentaho.visual.role.adaptation.Strategy#outputFieldNames
@@ -118,7 +118,7 @@ define([
     /**
      * Gets the names of the output fields.
      *
-     * @type {!Array.<string>}
+     * @type {Array.<string>}
      * @readOnly
      *
      * @see pentaho.visual.role.adaptation.Strategy#outputFieldIndexes
@@ -135,7 +135,7 @@ define([
     /**
      * Gets the names of the input fields.
      *
-     * @type {!Array.<string>}
+     * @type {Array.<string>}
      * @readOnly
      *
      * @see pentaho.visual.role.adaptation.Strategy#inputFieldIndexes
@@ -160,9 +160,9 @@ define([
      * @name pentaho.visual.role.adaptation.Strategy#map
      * @method
      *
-     * @param {Array.<any|!pentaho.data.ICell>} inputValues - The output value(s) or cell(s).
+     * @param {Array.<*|pentaho.data.ICell>} inputValues - The output value(s) or cell(s).
      *
-     * @return {Array.<!pentaho.data.ICell>} The output cells, when the given input values are present;
+     * @return {Array.<pentaho.data.ICell>} The output cells, when the given input values are present;
      * `null`, otherwise.
      *
      * @abstract
@@ -179,9 +179,9 @@ define([
      * @name pentaho.visual.role.adaptation.Strategy#invert
      * @method
      *
-     * @param {Array.<any|!pentaho.data.ICell>} outputValues - The output value(s) or cell(s).
+     * @param {Array.<*|pentaho.data.ICell>} outputValues - The output value(s) or cell(s).
      *
-     * @return {Array.<!pentaho.data.ICell>} The input cells, when the given output values are present;
+     * @return {Array.<pentaho.data.ICell>} The input cells, when the given output values are present;
      * `null`, otherwise.
      */
     invert: function(outputValues) {
@@ -194,11 +194,11 @@ define([
      * When the given row is negative, `null` is returned.
      *
      * @param {number} rowIndex - The row index.
-     * @param {!Array.<number>} columnIndexes - The column indexes.
+     * @param {Array.<number>} columnIndexes - The column indexes.
      * @param {?number} [count] count - The number of columns, from the start, to consider.
      * When unspecified, all columns are considered.
      *
-     * @return {Array.<!pentaho.data.ICell>} The cell array.
+     * @return {Array.<pentaho.data.ICell>} The cell array.
      *
      * @protected
      */
@@ -228,7 +228,7 @@ define([
      *
      * @param {Array.<number>} fieldIndexes - The field indexes.
      *
-     * @return {Array.<(function(any) : string)>} The array of key functions.
+     * @return {Array.<(function(*) : string)>} The array of key functions.
      *
      * @protected
      */
@@ -283,7 +283,7 @@ define([
        * @memberOf pentaho.visual.role.adaptation.StrategyType#
        * @method
        *
-       * @param {!pentaho.type.Type} outputDataType - The output data type.
+       * @param {pentaho.type.Type} outputDataType - The output data type.
        * @param {boolean|undefined} isVisualKeyEf - Indicates that the strategy should be able to
        * preserve the key nature of input fields.
        *
@@ -309,10 +309,10 @@ define([
        * @memberOf pentaho.visual.role.adaptation.StrategyType#
        * @method
        *
-       * @param {!pentaho.data.Table} schemaData - A data table representative of the schema of the data.
-       * @param {!Array.<number>} inputFieldIndexes - The indexes of the input fields.
+       * @param {pentaho.data.Table} schemaData - A data table representative of the schema of the data.
+       * @param {Array.<number>} inputFieldIndexes - The indexes of the input fields.
        *
-       * @return {!pentaho.visual.role.adaptation.IStrategyApplicationValidation} A method application
+       * @return {pentaho.visual.role.adaptation.IStrategyApplicationValidation} A method application
        * validation object.
        *
        * @abstract
@@ -330,10 +330,10 @@ define([
        * @memberOf pentaho.visual.role.adaptation.StrategyType#
        * @method
        *
-       * @param {!pentaho.data.Table} data - A data table.
-       * @param {!Array.<number>} inputFieldIndexes - The indexes of the input fields.
+       * @param {pentaho.data.Table} data - A data table.
+       * @param {Array.<number>} inputFieldIndexes - The indexes of the input fields.
        *
-       * @return {!pentaho.visual.role.adaptation.Strategy} A strategy instance.
+       * @return {pentaho.visual.role.adaptation.Strategy} A strategy instance.
        *
        * @abstract
        */

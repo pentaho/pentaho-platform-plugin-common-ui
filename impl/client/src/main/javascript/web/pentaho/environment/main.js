@@ -30,7 +30,7 @@ define([
    * which is the value of this module's AMD configuration.
    *
    * @name pentaho.environment.main
-   * @type pentaho.environment.IEnvironment
+   * @type ?pentaho.environment.IEnvironment
    * @amd pentaho/environment
    * @see pentaho.environment.spec.IEnvironment
    */

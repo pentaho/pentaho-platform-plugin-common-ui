@@ -62,5 +62,5 @@
  * To know, exactly, which types of JavaScript values are accepted as specifications of
  * a specific {@link pentaho.type.spec.ISimple} subtype, see the subtype's documentation.
  *
- * @typedef {pentaho.type.spec.ISimple|any} pentaho.type.spec.Simple
+ * @typedef {pentaho.type.spec.ISimple|*} pentaho.type.spec.Simple
  */

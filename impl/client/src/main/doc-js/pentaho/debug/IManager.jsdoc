@@ -29,8 +29,8 @@
  * @name setLevel
  * @memberOf pentaho.debug.IManager#
  * @method
- * @param {!pentaho.debug.Levels|string} level - The debugging level.
- * @param {!Object|string} [module] - An AMD module object, as returned by requesting the `"module"` dependency,
+ * @param {pentaho.debug.Levels|string} level - The debugging level.
+ * @param {object|string} [module] - An AMD module object, as returned by requesting the `"module"` dependency,
  * or a module id.
  * When unspecified, the default debugging level is set.
  */
@@ -46,7 +46,7 @@
  * The url debugging level, when specified, takes precedence over this.
  * When neither is specified, defaults to {@link pentaho.debug.Levels#error}.
  *
- * @param {Object.<string, pentaho.debug.Levels|string>} [spec.modules] - Debugging levels per absolute AMD module id.
+ * @param {?Object.<string, pentaho.debug.Levels|string>} [spec.modules] - Debugging levels per absolute AMD module id.
  */
 
 /**
@@ -68,11 +68,11 @@
  * @name getLevel
  * @memberOf pentaho.debug.IManager#
  * @method
- * @param {!Object|string} [module] - An AMD module object, as returned by requesting the `"module"` dependency,
+ * @param {object|string} [module] - An AMD module object, as returned by requesting the `"module"` dependency,
  * or a module id.
  * When unspecified, the default debugging level is returned.
  *
- * @return {!pentaho.debug.Levels} The debugging level.
+ * @return {pentaho.debug.Levels} The debugging level.
  */
 
 /**
@@ -93,8 +93,8 @@
  * @name testLevel
  * @memberOf pentaho.debug.IManager#
  * @method
- * @param {!pentaho.debug.Levels|string} level - The debugging level to test.
- * @param {!Object|string} [module] - An AMD module object, as returned by requesting the `"module"` dependency,
+ * @param {pentaho.debug.Levels|string} level - The debugging level to test.
+ * @param {object|string} [module] - An AMD module object, as returned by requesting the `"module"` dependency,
  * or a module id.
  * When unspecified, the default debugging level is used.
  *

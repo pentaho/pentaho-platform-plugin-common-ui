@@ -33,5 +33,5 @@
  *
  * @name extension
  * @memberOf pentaho.visual.base.spec.IView#
- * @type {Object}
+ * @type {?object}
  */

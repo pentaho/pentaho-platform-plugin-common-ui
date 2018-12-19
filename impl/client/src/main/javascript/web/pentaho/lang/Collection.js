@@ -54,7 +54,7 @@ define([
      * Concrete `Collection` sub-classes should provide a static `to` method
      * to help in their construction.
      *
-     * @param {Object} [keyArgs] The keyword arguments.
+     * @param {?object} [keyArgs] The keyword arguments.
      *
      * These are not used directly by the `Collection` class
      * but are passed-through to the methods that handle
@@ -78,7 +78,7 @@ define([
      * when an element with a given key
      * is not contained in the collection.
      *
-     * @type {any}
+     * @type {*}
      * @default null
      * @readonly
      */

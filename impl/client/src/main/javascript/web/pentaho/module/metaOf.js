@@ -54,7 +54,7 @@ define([
    *
    * @name metaOf
    * @memberOf pentaho.module
-   * @type {!IAmdLoaderPlugin}
+   * @type {IAmdLoaderPlugin}
    * @amd pentaho/module
    *
    * @see pentaho.module.IMeta

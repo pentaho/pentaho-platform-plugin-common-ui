@@ -112,7 +112,7 @@ define([
       /**
        * Gets the corresponding internal visual role property type.
        *
-       * @type {!pentaho.visual.role.PropertyType}
+       * @type {pentaho.visual.role.PropertyType}
        * @readOnly
        * @protected
        */
@@ -133,7 +133,7 @@ define([
       /**
        * Gets the metadata about the fields property of mappings of this visual role property.
        *
-       * @type {!pentaho.visual.role.IFieldsMetadata}
+       * @type {pentaho.visual.role.IFieldsMetadata}
        * @readOnly
        * @override
        */
@@ -258,7 +258,7 @@ define([
        *
        * The returned list or its elements should not be modified.
        *
-       * @type {!Array.<pentaho.visual.role.adaptation.StrategyType>}
+       * @type {Array.<pentaho.visual.role.adaptation.StrategyType>}
        *
        * @throws {pentaho.lang.OperationInvalidError} When setting and the type already has
        * [subtypes]{@link pentaho.type.Type#hasDescendants}.
@@ -343,7 +343,7 @@ define([
        * are considered.
        * Otherwise, all internal modes are considered.
        *
-       * @param {!pentaho.visual.base.ModelAdapter} modelAdapter - The model adapter.
+       * @param {pentaho.visual.base.ModelAdapter} modelAdapter - The model adapter.
        *
        * @return {pentaho.visual.role.adaptation.IStrategyApplication} A valid strategy method application,
        * if one can be applied; `null`, otherwise.
@@ -386,10 +386,10 @@ define([
        * Performs basic validation that the external fields are compatible with the strategy's external data type,
        * and if so, calls the strategy type's own validation.
        *
-       * @param {!pentaho.visual.role.adaptation.IStrategyApplication} strategyApplication - The strategy type
+       * @param {pentaho.visual.role.adaptation.IStrategyApplication} strategyApplication - The strategy type
        * application.
-       * @param {!pentaho.data.Table} schemaData - The schema data table.
-       * @param {!Array.<number>} externalFieldIndexes - The indexes of the external fields.
+       * @param {pentaho.data.Table} schemaData - The schema data table.
+       * @param {Array.<number>} externalFieldIndexes - The indexes of the external fields.
        *
        * @return {pentaho.visual.role.adaptation.IStrategyApplication} A valid strategy type application,
        * if the application is valid; `null`, otherwise.
@@ -426,7 +426,7 @@ define([
         result.externalFieldIndexes = externalFieldIndexes;
         result.addsFields = validation.addsFields;
 
-        return /** @type {!pentaho.visual.role.adaptation.IStrategyApplication} */Object.freeze(result);
+        return /** @type {pentaho.visual.role.adaptation.IStrategyApplication} */Object.freeze(result);
       },
       // endregion
 
@@ -442,7 +442,7 @@ define([
        * 1. One of the registered strategies must be able to adapt the specified fields to one of the
        *    visual role's modes.
        *
-       * @param {!pentaho.visual.base.ModelAdapter} modelAdapter - The model adapter.
+       * @param {pentaho.visual.base.ModelAdapter} modelAdapter - The model adapter.
        *
        * @return {Array.<pentaho.type.ValidationError>} A non-empty array of `ValidationError` or `null`.
        */
