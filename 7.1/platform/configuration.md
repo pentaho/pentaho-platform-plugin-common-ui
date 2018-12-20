@@ -32,8 +32,8 @@ as a service of type [`pentaho.config.spec.IRuleSet`]({{site.refDocsUrlPattern7 
    [application]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.context.IContext#application'}}),
    as it allows creating rules that are only applied when a _type_ is being used by a certain _application_,
    like, for example, 
-   [CDF](http://community.pentaho.com/ctools/cdf/) or 
-   [Analyzer](http://www.pentaho.com/product/business-visualization-analytics).
+   [CDF](https://community.hitachivantara.com/docs/DOC-1009859) or 
+   [Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html).
    See also [Known Values of Pentaho Environment Variables](#known-values-of-pentaho-environment-variables).
    
 2. The [**apply**]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.config.spec.IRule#apply'}}) object

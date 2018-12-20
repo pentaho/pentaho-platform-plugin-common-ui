@@ -51,7 +51,7 @@ define(function() {
 The following rule configures the 
 [isBrowsable]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.type.Type' | append: '#isBrowsable'}}) 
 type attribute to hide the stock _Pie_ visualization (and any visualizations that derive from it) 
-from the [Analyzer](http://www.pentaho.com/product/business-visualization-analytics) application's
+from the [Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html) application's
 visualizations menu, effectively preventing the user from creating new visualizations of this type:
 
 ```js
@@ -125,7 +125,7 @@ The following rule changes the
 [label]({{site.refDocsUrlPattern8 | replace: '$', 'pentaho.type.Type' | append: '#label'}})
 type attribute of the _Bar_ stock visualization, 
 affecting how it is displayed in the visualizations menu of the Analyzer and 
-[PDI](http://www.pentaho.com/product/data-integration) applications:
+[PDI](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-data-integration.html) applications:
 
 ```js
 var ruleSpec = {
@@ -154,7 +154,7 @@ attribute exists to satisfy the pass-through of such options of the underlying t
 You should consult the view type documentation to find out about which extension properties it supports.
 
 The views of stock visualizations are implemented using the 
-[CCC](https://community.hds.com/docs/DOC-1009860) charting library,
+[CCC](https://community.hitachivantara.com/docs/DOC-1009860) charting library,
 and can be customized using its rich set of extension points.
 
 ### Thicken the axes rules of stock visualizations

@@ -16,10 +16,10 @@ layout: 8.0_default
 
 <pre class='highlight'><code># Clone the sample repository.
 git clone https://github.com/pentaho/pentaho-engineering-samples
+cd pentaho-engineering-samples
 git checkout -b 8.0
 
 # Go to the complete sample's directory.
-cd pentaho-engineering-samples
 cd Samples_for_Extending_Pentaho/javascript-apis/platform/visual-samples-bar-d3
 
 # Install the dependencies.
