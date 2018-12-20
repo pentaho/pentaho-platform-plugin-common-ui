@@ -69,9 +69,10 @@ First make sure that you have git and npm installed.</p>
 
 <pre class='highlight'><code># Clone the repository.
 git clone https://github.com/pentaho/pentaho-engineering-samples
+cd pentaho-engineering-samples
+git checkout -b 8.1
 
 # Go to the sample's directory.
-cd pentaho-engineering-samples
 cd Samples_for_Extending_Pentaho/javascript-apis/platform/visual-samples-bar-d3
 
 # Install the dependencies.
