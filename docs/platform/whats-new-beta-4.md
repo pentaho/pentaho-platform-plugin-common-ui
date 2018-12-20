@@ -67,8 +67,8 @@ All AMD modules now consume configurations explicitly via the Modules API
 
    * [pentaho/module/instanceOf!]({{site.refDocsUrlPattern | replace: '$', 'pentaho.module' | append: '#.instanceOf'}})
    * [pentaho/module/instancesOf!]({{site.refDocsUrlPattern | replace: '$', 'pentaho.module' | append: '#.instancesOf'}})
-   * [pentaho/module/typeOf!]({{site.refDocsUrlPattern | replace: '$', 'pentaho.module' | append: '#.typeOf'}})
-   * [pentaho/module/typesOf!]({{site.refDocsUrlPattern | replace: '$', 'pentaho.module' | append: '#.typesOf'}})
+   * [pentaho/module/subtypeOf!]({{site.refDocsUrlPattern | replace: '$', 'pentaho.module' | append: '#.subtypeOf'}})
+   * [pentaho/module/subtypesOf!]({{site.refDocsUrlPattern | replace: '$', 'pentaho.module' | append: '#.subtypesOf'}})
 
    The following example illustrates the use of `pentaho/module/instanceOf` to obtain a 
    registered instance of the `IHomeScreen` interface:
@@ -83,7 +83,7 @@ All AMD modules now consume configurations explicitly via the Modules API
 
 1. Configuration rules no longer distinguish if a `type` or an `instance` module is being configured.
   These must now use the new 
-  [module]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule#module'}})
+  [module]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRuleSelector#module'}})
   property, indistinguishably.
 
 2. Configuration rules have become more powerful as now these can specify dependency modules, 
@@ -169,7 +169,7 @@ The use of _Type API_ types and instances has been greatly simplified.
 
 2. It is now each type's responsibility to apply its own configuration.
    It is nonetheless advisable to use the new 
-   [configure]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type#configure'}}) method. 
+   [configure]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Instance#.configure'}}) method. 
  
 3. The identifiers of all standard type modules have been renamed to using _CamelCase_,
    to match the exported value kind, a type.
