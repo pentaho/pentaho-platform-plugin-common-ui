@@ -74,10 +74,10 @@ so that it can be deployed to a Pentaho product.
 
 <pre class='highlight'><code># Clone the repository.
 git clone https://github.com/pentaho/pentaho-engineering-samples
+cd pentaho-engineering-samples
 git checkout -b 7.1
 
 # Go to the sample's directory.
-cd pentaho-engineering-samples
 cd Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/bar-d3-bundle
 
 # Build the Web Project
