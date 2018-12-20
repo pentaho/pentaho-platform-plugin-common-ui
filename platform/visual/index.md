@@ -30,7 +30,7 @@ The Visualization API is built on top of other Platform JavaScript APIs:
   services registration and consumption.
 
 A set of stock visualizations is included, covering the most common chart types.
-Based on the [CCC](https://community.hds.com/docs/DOC-1009860-ccc-chart-components) charting library, 
+Based on the [CCC](https://community.hitachivantara.com/docs/DOC-1009860-ccc-chart-components) charting library, 
 they're customizable and extensible to fit your organization's desired look and feel.
 
 If you want to know more about the specifics of how Analyzer exposes the Visualization API, 
@@ -69,10 +69,10 @@ First make sure that you have git and npm installed.</p>
 
 <pre class='highlight'><code># Clone the repository.
 git clone https://github.com/pentaho/pentaho-engineering-samples
-git checkout -b 8.1
+cd pentaho-engineering-samples
+git checkout -b 8.2
 
 # Go to the complete sample's directory.
-cd pentaho-engineering-samples
 cd Samples_for_Extending_Pentaho/javascript-apis/platform/visual-samples-bar-d3
 
 # Install the dependencies.

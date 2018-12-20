@@ -19,7 +19,7 @@ by removing the magic by which configurations were automatically applied to the 
 via its old custom module format.
 All AMD modules now consume configurations explicitly via the Modules API 
 (or, alternatively, explicitly via the global configuration service module, 
- [pentaho/config/service]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.service'}})).
+ [pentaho/config/service]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config' | append: '#.service'}})).
  
 1. An AMD module will now typically request its _Modules API_ module object
    by using the 
@@ -179,7 +179,7 @@ The use of _Type API_ types and instances has been greatly simplified.
    Type API types given a type reference, 
    or instances given their specification, 
    you can use the new 
-   [pentaho.type.loader]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.loader'}}) service. 
+   [pentaho.type.loader]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type' | append: '#.loader'}}) service. 
 
 ### Visualization API
 

@@ -15,9 +15,9 @@ This documentation relates to the new version.</p>
 The [Visualization API]({{site.refDocsUrlPattern7 | replace: '$', 'pentaho.visual'}}) 
 provides a unified way to visualize data across the Pentaho suite 
 (e.g.
-[Analyzer](http://www.pentaho.com/product/business-visualization-analytics), 
-[PDI](http://www.pentaho.com/product/data-integration), 
-[CDF](http://community.pentaho.com/ctools/cdf/)).
+[Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html), 
+[PDI](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-data-integration.html), 
+[CDF](https://community.hitachivantara.com/docs/DOC-1009859)).
 
 Essentially, it is a set of abstractions that enables safe, isolated operation between 
 applications, visualizations and business logic.
@@ -36,7 +36,7 @@ The Visualization API is built on top of other Platform JavaScript APIs:
   services registration and consumption.
 
 A set of stock visualizations is included, covering the most common chart types.
-Based on the [CCC](https://community.hds.com/docs/DOC-1009860) charting library, 
+Based on the [CCC](https://community.hitachivantara.com/docs/DOC-1009860) charting library, 
 they're customizable and extensible to fit your organization's desired look and feel.
 
 If you want to know more about the specifics of how Analyzer exposes the Visualization API, 
@@ -74,10 +74,10 @@ so that it can be deployed to a Pentaho product.
 
 <pre class='highlight'><code># Clone the repository.
 git clone https://github.com/pentaho/pentaho-engineering-samples
+cd pentaho-engineering-samples
 git checkout -b 7.1
 
 # Go to the sample's directory.
-cd pentaho-engineering-samples
 cd Samples_for_Extending_Pentaho/javascript-apis/platform/pentaho/visual/samples/bar-d3-bundle
 
 # Build the Web Project
@@ -91,7 +91,7 @@ copy the KAR file you just built (located at `assemblies/target`) into its `syst
 See [OSGi Artifacts Deployment](../osgi-deployment) if you need more information.
 
 If everything went well, you should now see your visualization being offered in Analyzer and PDI, 
-as well as be able to use it in a [CDE](http://community.pentaho.com/ctools/cde/) dashboard:
+as well as be able to use it in a [CDE](https://community.hitachivantara.com/docs/DOC-1009858) dashboard:
 
 1. Your Bar/D3 visualization in Analyzer:
    
