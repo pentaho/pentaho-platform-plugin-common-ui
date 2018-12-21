@@ -10,7 +10,7 @@ layout: 8.0_default
 
 ## Overview
 
-[Pentaho Analyzer](http://www.pentaho.com/product/business-visualization-analytics) reports display visualizations that 
+[Pentaho Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html) reports display visualizations that 
 are based on the [Pentaho Visualization API](.).
 
 As of version 7.1, the Pentaho platform ships with the _new_ version of the Visualization API, still in **beta**, 
