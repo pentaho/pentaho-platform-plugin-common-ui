@@ -7,11 +7,11 @@
   <parent>
     <groupId>org.pentaho</groupId>
     <artifactId>common-ui-impl</artifactId>
-    <version>8.2.0.0-SNAPSHOT</version>
+    <version>8.2.0.1-427</version>
   </parent>
 
   <artifactId>common-ui-impl-client</artifactId>
-  <version>8.2.0.0-SNAPSHOT</version>
+  <version>8.2.0.1-427</version>
   <name>Common UI client side</name>
 
   <description>This artifact is a temporary container for all client side code that either was produced by pentaho or
