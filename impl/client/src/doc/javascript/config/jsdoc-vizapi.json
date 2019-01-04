@@ -6,7 +6,8 @@
     "include": [
       "${project.basedir}/src/main/doc-js/pentaho",
       "${build.javascriptSourceDirectory}/web/pentaho",
-      "${build.javascriptSourceDirectory}/web/pentaho/VizApiReadme.md"
+      "${build.javascriptSourceDirectory}/web/pentaho/VizApiReadme.md",
+      "${build.javascriptSourceDirectory}/web/util/AnalyzerModule.js"
     ],
     "exclude": [
       "${build.javascriptSourceDirectory}/web/pentaho/shim",
