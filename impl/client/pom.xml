@@ -21,9 +21,12 @@
   <properties>
     <js.project.list>dojo-release,requirejs,jquery,jquery-i18n-properties,pentaho-cdf-js,angular-mocks,angular,angular-resource,angular-route,angular-animate,angular-aria,angular-cookies,angular-loader,angular-message-format,angular-messages,angular-parse-ext,angular-sanitize,angular-scenario,angular-touch,angular-i18n,angular-translate</js.project.list>
     <build.javascriptReportDirectory>target/js-reports</build.javascriptReportDirectory>
+
     <docjs.config.file>jsdoc-vizapi.json</docjs.config.file>
+    <mindtouch.upload.version><!-- version of Mindtouch link. 7.0, 8.1, ... --></mindtouch.upload.version>
     <docjs.config.github.branch>master</docjs.config.github.branch>
     <docjs.config.template.directory>${project.basedir}/src/doc/javascript/template</docjs.config.template.directory>
+
     <js.build.optimizer>uglify2</js.build.optimizer>
     <requirejs.config.files.pattern>**/*-require-js-cfg.js</requirejs.config.files.pattern>
     <webjars.target.directory>${build.dependenciesDirectory}/META-INF/resources/webjars</webjars.target.directory>
