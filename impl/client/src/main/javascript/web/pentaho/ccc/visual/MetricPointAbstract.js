@@ -17,10 +17,8 @@ define([
   "pentaho/module!_",
   "./CartesianAbstract",
   "pentaho/visual/models/MetricPointAbstract",
-  "pentaho/data/util",
-  "pentaho/util/logger",
   "./_trends"
-], function(module, BaseView, Model, dataUtil, logger) {
+], function(module, BaseView, Model) {
 
   "use strict";
 
@@ -103,50 +101,6 @@ define([
 
       this._configureAxisTickUnits("base", "x");
       this._configureAxisTickUnits("ortho", "y");
-    },
-
-    /**
-     * Calls base plus it filters out rows having a null "x" or "y" visual role value.
-     *
-     * TODO: This is a temporary solution.
-     * Ideally, visual role definitions would specify an attribute such as `allowsNullData`,
-     * defaulting to `true`, and the data would be filtered out a priori.
-     *
-     * @protected
-     * @override
-     */
-    _transformData: function() {
-
-      this.base();
-
-      var model = this.model;
-
-      var dataPlain = model.data;
-
-      // X and Y are both required and continuous.
-      var mappingX = model.x;
-      var mappingY = model.y;
-
-      // Column indexes are compatible with model.data, and not this._dataView.
-      // Row indexes, atm, are common.
-      var xColumnIndex = mappingX.fieldIndexes[0];
-      var yColumnIndex = mappingY.fieldIndexes[0];
-
-      var rowIndexes = dataUtil.getFilteredRowsByPredicate(dataPlain, function(data, rowIndex) {
-        return data.getValue(rowIndex, xColumnIndex) !== null &&
-          data.getValue(rowIndex, yColumnIndex) !== null;
-      });
-
-      if(rowIndexes !== null) {
-        this._dataView.setSourceRows(rowIndexes);
-
-        var originalRowCount = dataPlain.getNumberOfRows();
-
-        logger.warn("The visualization has ignored " + (originalRowCount - rowIndexes.length) +
-          " row(s) having a null '" +
-          dataPlain.getColumnLabel(xColumnIndex) + "' or '" +
-          dataPlain.getColumnLabel(yColumnIndex) + "' field value(s).");
-      }
     }
   })
   .configure({$type: module.config});

@@ -16,10 +16,8 @@
 define([
   "pentaho/module!_",
   "./CategoricalContinuousAbstract",
-  "pentaho/visual/models/PointAbstract",
-  "pentaho/data/util",
-  "pentaho/util/logger"
-], function(module, BaseView, Model, dataUtil, logger) {
+  "pentaho/visual/models/PointAbstract"
+], function(module, BaseView, Model) {
 
   "use strict";
 
@@ -33,47 +31,6 @@ define([
 
     _setNullInterpolationMode: function(value) {
       this.options.nullInterpolationMode = value;
-    },
-
-    /**
-     * Calls base plus it filters out rows having a null "rows" visual role value when
-     * the visual role is operating in a continuous mode.
-     *
-     * TODO: This is a temporary solution.
-     * Ideally, visual role definitions would specify an attribute such as `allowsNullData`,
-     * defaulting to `true`, and the data would be filtered out a priori.
-     *
-     * @protected
-     * @override
-     */
-    _transformData: function() {
-
-      this.base();
-
-      // Filter out rows with a null x value in a continuous axis.
-      var mapping = this.model.rows;
-      if(mapping.hasFields) {
-        var mode = mapping.mode;
-        if(mode !== null && mode.isContinuous) {
-
-          // Column indexes are compatible with model.data, and not this._dataView.
-          // Row indexes, atm, are common.
-          var columnIndex = mapping.fieldIndexes[0];
-          var dataPlain = this.model.data;
-          var rowIndexes = dataUtil.getFilteredRowsByPredicate(dataPlain, function(data, rowIndex) {
-            return data.getValue(rowIndex, columnIndex) !== null;
-          });
-
-          if(rowIndexes !== null) {
-            this._dataView.setSourceRows(rowIndexes);
-
-            var originalRowCount = dataPlain.getNumberOfRows();
-
-            logger.warn("The visualization has ignored " + (originalRowCount - rowIndexes.length) +
-              " row(s) having a null '" + dataPlain.getColumnLabel(columnIndex) + "' field value.");
-          }
-        }
-      }
     }
   })
   .configure({$type: module.config});
