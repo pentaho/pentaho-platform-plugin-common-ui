@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1156,7 +1156,7 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
             var isExist = existingErrors.some(function(item) {
               return item.label == error;
             });
-            if(!isExist && !param.multiSelect) {
+            if(!isExist) {
               var errIndex = panel.components.length - 1;
               var errorComponent = _createWidgetForErrorLabel.call(this, param, error);
               this.dashboard.addComponent(errorComponent);
@@ -1380,7 +1380,7 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
         if(this.onAfterRender) {
           this.onAfterRender();
         }
-      } else if(this.diff) { // Perform update when there are differences
+      } else if(this.diff && (this.diff.toAdd.parameters || this.diff.toChangeData.parameters || this.diff.toRemove.parameters || this.isForceRefresh)) { // Perform update when there are differences
         this.update(this.diff);
 
         var layout = this.dashboard.getComponentByName("prompt" + this.guid);
