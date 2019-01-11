@@ -2,7 +2,7 @@
   "auth": "mt-user:mt-password",
 
   "root": "https://help.pentaho.com/",
-  "destination": "Documentation/${mindtouch.upload.version}/Developer_Center/JavaScript_API/platform/",
+  "destination": "Documentation/:version:/Developer_Center/JavaScript_API/platform/",
 
   "source": "${project.build.directory}/site/jsdoc/",
 
