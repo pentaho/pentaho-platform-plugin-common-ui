@@ -27,8 +27,7 @@ define([
   "pentaho/util/logger"
 ], function(module, Base, States,
             ArgumentRequiredError, ArgumentInvalidTypeError, OperationInvalidError,
-            UserError, RuntimeError,
-            debugMgr, DebugLevels, logger) {
+            UserError, RuntimeError, debugMgr, DebugLevels, logger) {
 
   "use strict";
 
@@ -549,7 +548,7 @@ define([
 
       this.__assertStates(States.unstarted, MSG_STATE_EXECUTION_START);
 
-      if(this.__action.$type.isSync) {
+      if(this.__action.constructor.isSync) {
         this.__executeSyncAction();
       } else {
         this.__executeAsyncAction();
@@ -851,7 +850,7 @@ define([
 
       var promise = this._onPhaseDo();
 
-      var isSync = this.__action.$type.isSync;
+      var isSync = this.__action.constructor.isSync;
       if(isSync) {
         if(!this.isSettled) {
           this._doDefault();

@@ -63,7 +63,7 @@ define([
     }
   });
 
-  var __actionBaseType = ActionBase.type;
+  // var __actionBaseType = ActionBase.type;
 
   /**
    * The `_emitGeneric` keyword arguments used for all phases but the finally phase.
@@ -134,7 +134,7 @@ define([
 
       if(!action) throw error.argRequired("action");
 
-      action = __actionBaseType.to(action);
+      // action = __actionBaseType.to(action);
 
       return this._createActionExecution(action).execute();
     },
@@ -188,7 +188,7 @@ define([
     _emitActionPhaseInitEvent: function(actionExecution) {
 
       var action = actionExecution.action;
-      var eventType = action.$type.id;
+      var eventType = action.type;
 
       this._emitGeneric(this, [actionExecution, action], eventType, "init", __emitActionKeyArgs);
     },
@@ -206,7 +206,7 @@ define([
     _emitActionPhaseWillEvent: function(actionExecution) {
 
       var action = actionExecution.action;
-      var eventType = action.$type.id;
+      var eventType = action.type;
 
       this._emitGeneric(this, [actionExecution, action], eventType, "will", __emitActionKeyArgs);
     },
@@ -230,11 +230,12 @@ define([
     _emitActionPhaseDoEvent: function(actionExecution) {
 
       var action = actionExecution.action;
-      var actionType = action.$type;
-      var eventType = actionType.id;
+      var isActionSync = action.constructor.isSync;
+      var eventType = action.type;
 
-      if(actionType.isSync) {
+      if(isActionSync) {
         this._emitGeneric(this, [actionExecution, action], eventType, "do", __emitActionKeyArgs);
+
         return null;
       }
 
@@ -254,7 +255,7 @@ define([
     _emitActionPhaseFinallyEvent: function(actionExecution) {
 
       var action = actionExecution.action;
-      var eventType = action.$type.id;
+      var eventType = action.type;
 
       this._emitGeneric(this, [actionExecution, action], eventType, "finally");
     }

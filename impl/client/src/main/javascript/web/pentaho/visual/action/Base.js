@@ -21,11 +21,10 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.action.BaseType
-   * @class
-   * @extends pentaho.type.action.BaseType
+   * @name _fillSpec
+   * @memberOf pentaho.visual.action.Base#
    *
-   * @classDesc The type class of {@link pentaho.visual.action.Base}.
+   * @abstract
    */
 
   /**
@@ -45,11 +44,5 @@ define([
    * @constructor
    */
 
-  return ActionBase.extend(/** @lends pentaho.visual.action.Base# */{
-    $type: /** @lends pentaho.visual.action.BaseType# */{
-      id: module.id,
-      isAbstract: true
-    }
-  })
-  .configure({$type: module.config});
+  return ActionBase.extend(module.id);
 });

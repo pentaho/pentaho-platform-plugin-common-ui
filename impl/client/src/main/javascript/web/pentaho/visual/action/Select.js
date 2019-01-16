@@ -29,72 +29,7 @@ define([
 
   "use strict";
 
-  /**
-   * @name pentaho.visual.action.SelectType
-   * @class
-   * @extends pentaho.visual.action.BaseType
-   * @extends pentaho.visual.action.mixins.DataType
-   * @extends pentaho.visual.action.mixins.PositionedType
-   *
-   * @classDesc The type class of {@link pentaho.visual.action.Select}.
-   */
-
-  return BaseAction.extend(/** @lends pentaho.visual.action.Select# */{
-    $type: /** @lends pentaho.visual.action.SelectType# */{
-
-      id: module.id,
-
-      mixins: [DataActionMixin, PositionedActionMixin],
-
-      // region defaultSelectionMode
-      __defaultSelectionMode: null,
-
-      /**
-       * Gets or sets the _default selection mode_ of actions of this type.
-       *
-       * The default value is {@link pentaho.visual.action.SelectionModes#replace}.
-       *
-       * When set to a {@link Nully} value, the default value is assumed.
-       *
-       * Can be set to the name of one of the standard selection modes,
-       * [SelectionModes]{@link pentaho.visual.action.SelectionModes},
-       * to assume the corresponding selection mode function.
-       *
-       * @type {pentaho.visual.action.SelectionMode}
-       *
-       * @throws {pentaho.lang.ArgumentInvalidError} When set to a `string` which is not one of the
-       * standard selection mode names, [SelectionModes]{@link pentaho.visual.action.SelectionModes}.
-       *
-       * @throws {pentaho.lang.ArgumentInvalidTypeError} When set to a value which is not a `string`
-       * or a `function`.
-       */
-      get defaultSelectionMode() {
-
-        var fun = this.__defaultSelectionMode;
-        return fun ? fun.valueOf() : SelectionModes.replace;
-      },
-
-      set defaultSelectionMode(value) {
-
-        this.__defaultSelectionMode = __getSelectionMode(value, "defaultSelectionMode");
-      },
-      // endregion
-
-      // region serialization
-      /** @inheritDoc */
-      _fillSpecInContext: function(spec, keyArgs) {
-
-        var any = this.base(spec, keyArgs);
-
-        if(this.__defaultSelectionMode) {
-          spec.defaultSelectionMode = __serializeSelectionMode(this.__defaultSelectionMode, keyArgs);
-          any = true;
-        }
-
-        return any;
-      }
-      // endregion
-    },
+  return BaseAction.extend(module.id, /** @lends pentaho.visual.action.Select# */{
 
     /**
      * @alias Select
@@ -145,7 +80,7 @@ define([
      */
     get selectionMode() {
       var fun = this.__selectionMode;
-      return fun ? fun.valueOf() : this.$type.defaultSelectionMode;
+      return fun ? fun.valueOf() : __getDefaultSelectionMode();
     },
 
     set selectionMode(value) {
@@ -162,21 +97,24 @@ define([
       this.__selectionMode = __getSelectionMode(value, "selectionMode");
     },
 
+    get type() {
+      return module.id;
+    },
+
     // region serialization
     /** @inheritDoc */
-    toSpecInContext: function(keyArgs) {
+    _fillSpec: function(spec) {
 
-      var spec = this.base(keyArgs);
+      this.base(spec);
 
       if(this.__selectionMode) {
-        spec.selectionMode = __serializeSelectionMode(this.__selectionMode, keyArgs);
+        spec.selectionMode = this.__selectionMode;
       }
-
-      return spec;
     }
     // endregion
   })
-  .configure({$type: module.config});
+  .mix(DataActionMixin)
+  .mix(PositionedActionMixin);
 
   /**
    * Gets a selection mode given its standard name and validates that, otherwise, it is a function.
@@ -196,45 +134,37 @@ define([
   function __getSelectionMode(value, argName) {
     if(value != null) {
 
-      var name;
-
       if(typeof value === "string") {
         if(!O.hasOwn(SelectionModes, value)) {
           throw new ArgumentInvalidError(argName, "Not one of the standard selection mode names.");
         }
-        name = value;
+
         value = SelectionModes[value];
       } else if(!F.is(value)) {
         throw new ArgumentInvalidTypeError(argName, ["string", "function"], typeof value);
       }
 
-      var fun = new PenFunction(value);
-
-      // For serialization purposes
-      fun.selectionModeName = name;
-
-      return fun;
+      return value;
     }
 
-    return null;
+    return __getDefaultSelectionMode();
   }
 
   /**
-   * Serializes a simple function value constructed by `__getSelectionMode`.
+   * The default selection mode of actions of this [Action]{@link pentaho.type.action.Base}.
    *
-   * @param {pentaho.type.Function} fun - A selection mode function wrapped in a simple function value.
-   * @param {?object} keyArgs - The serialization keyword arguments.
-   * @return {string} The function serialization.
+   * The default value is {@link pentaho.visual.action.SelectionModes#replace}.
+   *
+   * When specified as a {@link Nully} value, the default value is assumed.
+   *
+   * @return {pentaho.type.Function} A selection mode function wrapped in a simple function value.
    * @private
    */
-  function __serializeSelectionMode(fun, keyArgs) {
+  function __getDefaultSelectionMode() {
+    var config = module.config || {};
 
-    if(fun.selectionModeName) return fun.selectionModeName;
+    var value = config.defaultSelectionMode || SelectionModes.replace;
 
-    keyArgs = keyArgs ? Object.create(keyArgs) : {};
-
-    keyArgs.declaredType = PenFunction.type;
-
-    return fun.toSpecInContext(keyArgs);
+    return __getSelectionMode(value, "defaultSelectionMode");
   }
 });

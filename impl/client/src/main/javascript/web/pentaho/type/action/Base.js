@@ -15,84 +15,18 @@
  */
 define([
   "pentaho/module!_",
-  "../Element",
-  "pentaho/lang/OperationInvalidError",
-  "pentaho/util/object",
-  "pentaho/util/text",
-  "pentaho/i18n!../i18n/types"
-], function(module, Element, OperationInvalidError, O, textUtil, bundle) {
+  "pentaho/lang/Base"
+], function(module, Base) {
 
   "use strict";
 
-  var actionType;
-
-  /**
-   * @name pentaho.type.action.BaseType
-   * @class
-   * @extends pentaho.type.ElementType
-   *
-   * @classDesc The base class of action types.
-   *
-   * For more information see {@link pentaho.type.action.Base}.
-   */
-
-  var Action = Element.extend(/** @lends pentaho.type.action.Base# */{
-
-    $type: /** @lends pentaho.type.action.BaseType# */{
-
-      id: module.id,
-
-      isAbstract: true,
-      label: null,
-      description: null,
-
-      /** @inheritDoc */
-      _init: function(spec, keyArgs) {
-
-        spec = this.base(spec, keyArgs) || spec;
-
-        var isSync = spec && spec.isSync;
-        isSync = isSync == null ? this.__isSync : !!isSync;
-
-        O.setConst(this, "__isSync", isSync);
-      },
-
-      // region Attribute isSync
-      /** @private */
-      __isSync: true,
-
-      /**
-       * Gets a value that indicates if the action is synchronous.
-       *
-       * @type {boolean}
-       * @readOnly
-       */
-      get isSync() {
-        return this.__isSync;
-      },
-      // endregion
-
-      // region serialization
-      /** @inheritDoc */
-      _fillSpecInContext: function(spec, keyArgs) {
-
-        var any = this.base(spec, keyArgs);
-
-        if(this !== actionType && this.isSync !== this.ancestor.isSync) {
-          spec.isSync = this.isSync;
-          any = true;
-        }
-
-        return any;
-      }
-      // endregion
-    },
+  var Action = Base.extend(module.id, /** @lends pentaho.type.action.Base# */{
 
     /**
      * @alias Base
      * @memberOf pentaho.type.action
      * @class
-     * @extends pentaho.type.Element
+     * @extends pentaho.lang.Base
      * @abstract
      *
      * @amd pentaho/type/action/Base
@@ -130,7 +64,7 @@ define([
      *    the action and change what will be done;
      * 2. "will" - action is now frozen and the action can be canceled based on what wil be done;
      * 3. "do" - the action is executed;
-     * 4. "finally" - the action execution has finished successfuly or not.
+     * 4. "finally" - the action execution has finished successfully or not.
      *
      * For more information, see [Execution]{@link pentaho.type.action.Execution}.
      *
@@ -143,22 +77,6 @@ define([
      * @see pentaho.type.action.spec.IBaseType
      */
     constructor: function(spec) {
-      /**
-       * The label of the action instance.
-       *
-       * @type {nonEmptyString}
-       * @private
-       */
-      this.label = spec && spec.label;
-
-      /**
-       * The description of the action instance.
-       *
-       * @type {nonEmptyString}
-       * @private
-       */
-      this.description = spec && spec.description;
-
       // Let mixins take part.
       this._init(spec);
     },
@@ -177,64 +95,44 @@ define([
       return new this.constructor(this.toSpec());
     },
 
-    // region Action Description
     /**
-     * Gets or sets the label of this action.
-     *
-     * When not set to a non-empty local value, the label of the action type,
-     * {@link pentaho.type.Type#label} is returned.
-     *
-     * @type {nonEmptyString}
+     * @abstract
      */
-    get label() {
-      return this.__label || this.$type.label;
-    },
-
-    set label(value) {
-      this.__label = textUtil.nonEmptyString(value);
+    get type() {
+      return null;
     },
 
     /**
-     * Gets or sets the description of this action.
-     *
-     * When not set to a non-empty local value, the description of the action type,
-     * {@link pentaho.type.Type#description} is returned.
-     *
-     * @type {nonEmptyString}
+     * @abstract
      */
-    get description() {
-      return this.__description || this.$type.description;
+    validate: function() {
+      return null;
     },
 
-    set description(value) {
-      this.__description = textUtil.nonEmptyString(value);
+    /**
+     * @abstract
+     *
+     * @param {pentaho.type.action.spec.IBase} [spec] An action specification.
+     * @protected
+     */
+    _fillSpec: function(spec) {
     },
-    // endregion
 
     // region serialization
     /** @inheritDoc */
-    toSpecInContext: function(keyArgs) {
-
-      keyArgs = keyArgs ? Object.create(keyArgs) : {};
-
+    toSpec: function() {
       var spec = {};
 
-      var declaredType;
-      var includeType = !!keyArgs.forceType ||
-            (!!(declaredType = keyArgs.declaredType) && this.$type !== declaredType);
-
-      if(includeType) spec._ = this.$type.toSpecInContext(keyArgs);
-      if(this.__label !== null) spec.label = this.label;
-      if(this.__description !== null) spec.description = this.description;
+      this._fillSpec(spec);
 
       return spec;
     }
     // endregion
-  })
-  .localize({$type: bundle.structured.Action})
-  .configure({$type: module.config});
-
-  actionType = Action.type;
+  }, {
+    get isSync() {
+      return true;
+    }
+  });
 
   return Action;
 });

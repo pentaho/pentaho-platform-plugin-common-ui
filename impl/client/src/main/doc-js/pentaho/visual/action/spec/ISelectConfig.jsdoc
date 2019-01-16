@@ -15,9 +15,9 @@
  */
 
 /**
- * The `visual.action.spec.ISelectType` interface represents the specification of a selection action type.
+ * The `visual.action.spec.ISelectConfig` interface represents the specification of a selection action type.
  *
- * @name pentaho.visual.action.spec.ISelectType
+ * @name pentaho.visual.action.spec.ISelectConfig
  * @interface
  * @extends pentaho.type.action.spec.IBaseType
  */
@@ -34,6 +34,6 @@
  * to assume the corresponding selection mode function.
  *
  * @name defaultSelectionMode
- * @memberOf pentaho.visual.action.spec.ISelectType#
+ * @memberOf pentaho.visual.action.spec.ISelectConfig#
  * @type {string|pentaho.visual.action.SelectionMode}
  */

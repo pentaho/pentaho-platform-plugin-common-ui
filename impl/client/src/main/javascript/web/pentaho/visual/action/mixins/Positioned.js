@@ -21,16 +21,6 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.action.mixins.PositionedType
-   * @class
-   * @extends pentaho.visual.action.BaseType
-   *
-   * @classDesc The type class of the positioned action mixin.
-   *
-   * For more information see {@link pentaho.visual.action.mixins.Positioned}.
-   */
-
-  /**
    * @name Positioned
    * @memberOf pentaho.visual.action.mixins
    * @class
@@ -53,11 +43,7 @@ define([
    * @constructor
    */
 
-  return ActionBase.extend(/** @lends pentaho.visual.action.mixins.Positioned# */{
-    $type: {
-      id: module.id,
-      isAbstract: true
-    },
+  return ActionBase.extend(module.id, /** @lends pentaho.visual.action.mixins.Positioned# */{
 
     // @override
     _init: function(spec) {
@@ -81,17 +67,14 @@ define([
     },
 
     // region serialization
-    toSpecInContext: function(keyArgs) {
+    _fillSpec: function(spec) {
 
-      var spec = this.base(keyArgs);
+      this.base(spec);
 
       if(this.__position) {
         spec.position = {x: this.__position.x, y: this.__position.y};
       }
-
-      return spec;
     }
     // endregion
-  })
-  .configure({$type: module.config});
+  });
 });

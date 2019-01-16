@@ -619,7 +619,7 @@ define([
      *
      * Evaluation proceeds as follows:
      *
-     * 1. Create a queue of changesets, in which changesets are ordered so that leafs are placed beore roots.
+     * 1. Create a queue of changesets, in which changesets are ordered so that leafs are placed before roots.
      * 2. Add all of the leaf changesets to the queue.
      * 3. If there are no changesets in the queue go to 4.
      *    Otherwise, do:

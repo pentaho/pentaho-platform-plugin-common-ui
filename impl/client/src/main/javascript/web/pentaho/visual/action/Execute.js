@@ -23,16 +23,6 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.action.ExecuteType
-   * @class
-   * @extends pentaho.visual.action.BaseType
-   * @extends pentaho.visual.action.mixins.DataType
-   * @extends pentaho.visual.action.mixins.PositionedType
-   *
-   * @classDesc The type class of {@link pentaho.visual.action.Execute}.
-   */
-
-  /**
    * @name Execute
    * @memberOf pentaho.visual.action
    * @class
@@ -46,11 +36,11 @@ define([
    * is performed when the user interacts with a visual element,
    * typically by double clicking it.
    */
-  return BaseAction.extend(/** @lends  pentaho.visual.action.Execute# */{
-    $type: {
-      id: module.id,
-      mixins: [DataActionMixin, PositionedActionMixin]
+  return BaseAction.extend(module.id, {
+    get type() {
+      return module.id;
     }
   })
-  .configure({$type: module.config});
+  .mix(DataActionMixin)
+  .mix(PositionedActionMixin);
 });
