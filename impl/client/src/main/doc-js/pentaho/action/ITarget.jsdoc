@@ -16,7 +16,7 @@
 
 /**
  * The `ITarget` interface represents the entity which is acted upon
- * or the place where the [action]{@link pentaho.type.action.Base} takes place.
+ * or the place where the [action]{@link pentaho.action.Base} takes place.
  *
  * A target controls the execution of actions in it.
  * Depending on the target and type of action,
@@ -27,26 +27,26 @@
  * It is advisable that when a target does not know a specific action type
  * that it executes it generically, by delegating all of its phases to events.
  *
- * @name pentaho.type.action.ITarget
+ * @name pentaho.action.ITarget
  *
  * @interface
  *
- * @see pentaho.type.action.Base
+ * @see pentaho.action.Base
  */
 
 /**
  * Executes or starts execution of a given action in this target and returns the
  * corresponding action execution instance.
  *
- * This method can be given [synchronous or asynchronous]{@link pentaho.type.action.BaseType#isSync} actions.
+ * This method can be given [synchronous or asynchronous]{@link pentaho.action.BaseType#isSync} actions.
  * To wait for the result of an asynchronous action,
- * obtain the [promise]{@link pentaho.type.action.Execution#promise} property
+ * obtain the [promise]{@link pentaho.action.Execution#promise} property
  * of the returned action execution instance.
  *
  * @name act
- * @memberOf pentaho.type.action.ITarget#
+ * @memberOf pentaho.action.ITarget#
  * @method
- * @param {pentaho.type.action.Base|pentaho.type.action.spec.IBase} action - The action or
+ * @param {pentaho.action.Base|pentaho.action.spec.IBase} action - The action or
  * action specification to execute.
- * @return {pentaho.type.action.Execution} The resulting action execution.
+ * @return {pentaho.action.Execution} The resulting action execution.
  */

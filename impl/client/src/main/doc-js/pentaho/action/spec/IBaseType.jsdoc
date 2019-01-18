@@ -15,34 +15,23 @@
  */
 
 /**
- * The `spec.IBase` interface describes an action instance using a generic, _object_ form.
+ * The `spec.IBaseType` interface represents the specification of an action type.
  *
- * @name pentaho.type.action.spec.IBase
- *
+ * @name pentaho.action.spec.IBaseType
  * @interface
- * @extends pentaho.type.spec.IValue
+ * @extends pentaho.type.spec.IValueType
  */
 
 /**
- * The label of the action instance.
+ * Indicates if the action is synchronous.
  *
- * When unspecified,
- * the label of the action type,
- * {@link pentaho.type.Type#label}, is used.
+ * When unspecified, inherits the value of the ancestor action type.
+ * The root action type's value is `true`.
  *
- * @name label
- * @memberOf pentaho.type.action.spec.IBase#
- * @type {nonEmptyString}
- */
-
-/**
- * The description of the action instance.
+ * If a {@link Nully} value is specified, it is ignored.
+ * If a non-boolean value is specified, it is converted to boolean by passing it to the `Boolean` function.
  *
- * When unspecified,
- * the description of the action type,
- * {@link pentaho.type.Type#description}, is used.
- *
- * @name description
- * @memberOf pentaho.type.action.spec.IBase#
- * @type {nonEmptyString}
+ * @name isSync
+ * @memberOf pentaho.action.spec.IBaseType#
+ * @type {boolean}
  */

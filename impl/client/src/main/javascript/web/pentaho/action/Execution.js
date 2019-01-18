@@ -38,24 +38,24 @@ define([
   var MSG_STATE_DONE = "The `done` method can only be called while in the 'do' state.";
   var MSG_STATE_REJECT = "The `reject` method can only be called while in the 'init', 'will' or 'do' states.";
 
-  /** @type ?pentaho.type.action.States */
+  /** @type ?pentaho.action.States */
   var executingUnsettledStates = States.init | States.will | States["do"];
 
-  /** @type ?pentaho.type.action.States */
+  /** @type ?pentaho.action.States */
   var rejectedStates = States.canceled | States.failed;
 
-  /** @type ?pentaho.type.action.States */
+  /** @type ?pentaho.action.States */
   var settledStates = States.did | rejectedStates;
 
-  return Base.extend(module.id, /** @lends pentaho.type.action.Execution# */{
+  return Base.extend(module.id, /** @lends pentaho.action.Execution# */{
     /**
      * @alias Execution
-     * @memberOf pentaho.type.action
+     * @memberOf pentaho.action
      * @class
      * @extends pentaho.lang.Base
      * @abstract
      *
-     * @amd pentaho/type/action/Execution
+     * @amd pentaho/action/Execution
      *
      * @classDesc The `action.Execution` class represents a certain model of action execution.
      *
@@ -66,17 +66,17 @@ define([
      * ##### Synchronous or Asynchronous
      *
      * The associated action can be synchronous or asynchronous, as determined by the type property,
-     * {@link pentaho.type.action.BaseType#isSync}.
+     * {@link pentaho.action.BaseType#isSync}.
      * The execution of a synchronous action is completed synchronously.
      * while that of an asynchronous action only completes asynchronously,
      * due to its asynchronous "do" phase.
      *
-     * The [execute]{@link pentaho.type.action.Execution#execute} method handles
+     * The [execute]{@link pentaho.action.Execution#execute} method handles
      * the execution of both types of actions.
-     * When the associated action is [asynchronous]{@link pentaho.type.action.BaseType#isSync}, or
+     * When the associated action is [asynchronous]{@link pentaho.action.BaseType#isSync}, or
      * it is not know if it is synchronous or asynchronous,
      * after calling `execute`,
-     * obtain the value of the [promise]{@link pentaho.type.action.Execution#promise} property
+     * obtain the value of the [promise]{@link pentaho.action.Execution#promise} property
      * and wait for its resolution.
      *
      * ##### Execution model
@@ -84,36 +84,36 @@ define([
      * The following is a detailed description of the action execution model:
      *
      * 1. When an action execution is constructed,
-     *    it is in the [unstarted]{@link pentaho.type.action.States.unstarted} state.
+     *    it is in the [unstarted]{@link pentaho.action.States.unstarted} state.
      *
      *    The action's
-     *    [label]{@link pentaho.type.action.Base#label} and
-     *    [description]{@link pentaho.type.action.Base#description} properties,
+     *    [label]{@link pentaho.action.Base#label} and
+     *    [description]{@link pentaho.action.Base#description} properties,
      *    and any other property which defines what it ultimately does,
      *    can still be freely modified.
      *
      *    In this state,
      *    the execution cannot be
      *    settled by marking it
-     *    [done]{@link pentaho.type.action.Execution#done} or
-     *    [rejected]{@link pentaho.type.action.Execution#reject}.
+     *    [done]{@link pentaho.action.Execution#done} or
+     *    [rejected]{@link pentaho.action.Execution#reject}.
      *
-     * 2. When the [execute]{@link pentaho.type.action.Execution#execute} method is called,
+     * 2. When the [execute]{@link pentaho.action.Execution#execute} method is called,
      *    the execution enters the **init** phase:
-     *    -  the state is set to [init]{@link pentaho.type.action.States.init};
-     *    -  the [_onPhaseInit]{@link pentaho.type.action.Execution#_onPhaseInit} method is called.
+     *    -  the state is set to [init]{@link pentaho.action.States.init};
+     *    -  the [_onPhaseInit]{@link pentaho.action.Execution#_onPhaseInit} method is called.
      *
      *    The action's
-     *    [label]{@link pentaho.type.action.Base#label} and
-     *    [description]{@link pentaho.type.action.Base#description} properties,
+     *    [label]{@link pentaho.action.Base#label} and
+     *    [description]{@link pentaho.action.Base#description} properties,
      *    and any other property which defines what it ultimately does,
      *    can be freely modified at this stage.
      *
-     *    The execution can be settled by marking it [rejected]{@link pentaho.type.action.Execution#reject}
+     *    The execution can be settled by marking it [rejected]{@link pentaho.action.Execution#reject}
      *    in which case it transits to the _finally_ phase.
      *
      *    Otherwise,
-     *    if the associated action is not [valid]{@link pentaho.type.action.Base#validate},
+     *    if the associated action is not [valid]{@link pentaho.action.Base#validate},
      *    the execution is automatically rejected with the first reported validation error.
      *
      *    Otherwise,
@@ -121,51 +121,51 @@ define([
      *
      * 3. In the **will** phase,
      *    what the associated action will do is already determined and cannot change anymore:
-     *    - the state is set to [will]{@link pentaho.type.action.States.will};
+     *    - the state is set to [will]{@link pentaho.action.States.will};
      *    - the associated action is frozen, using {@link Object.freeze},
      *      and should **not** be modified anymore (e.g. by modifying nested objects);
      *      trying to modify direct properties of the action will throw a {@link TypeError};
-     *    - the [_onPhaseWill]{@link pentaho.type.action.Execution#_onPhaseWill} method is called.
+     *    - the [_onPhaseWill]{@link pentaho.action.Execution#_onPhaseWill} method is called.
      *
      *    From this point on, an execution can be canceled based on what exactly
      *    the associated action will do.
      *
-     *    The execution can be settled by marking it [rejected]{@link pentaho.type.action.Execution#reject},
+     *    The execution can be settled by marking it [rejected]{@link pentaho.action.Execution#reject},
      *    in which case it transits to the _finally_ phase.
      *
      *    Otherwise, the execution automatically transits to the _do_ phase.
      *
      * 4. In the **do** phase, the execution, proper, is carried out:
-     *    - the state is set to [do]{@link pentaho.type.action.States.do};
-     *    - the [_onPhaseDo]{@link pentaho.type.action.Execution#_onPhaseDo} method is called.
+     *    - the state is set to [do]{@link pentaho.action.States.do};
+     *    - the [_onPhaseDo]{@link pentaho.action.Execution#_onPhaseDo} method is called.
      *    - if after calling `_onPhaseDo`, the execution is not yet done or rejected,
-     *      the [_doDefault]{@link pentaho.type.action.Execution#_doDefault} method is called,
+     *      the [_doDefault]{@link pentaho.action.Execution#_doDefault} method is called,
      *      allowing the action execution class to clearly handle a default behaviour.
      *
      *    The execution can be settled by marking it
-     *    [rejected]{@link pentaho.type.action.Execution#reject} or,
+     *    [rejected]{@link pentaho.action.Execution#reject} or,
      *    alternatively,
-     *    [done]{@link pentaho.type.action.Execution#done}.
+     *    [done]{@link pentaho.action.Execution#done}.
      *
      *    In either case, the execution transits to the _finally_ phase.
      *
      * 5. In the beginning of the **finally** phase,
-     *    the execution is considered [settled]{@link pentaho.type.action.Execution#isSettled},
+     *    the execution is considered [settled]{@link pentaho.action.Execution#isSettled},
      *    with or without success.
      *
      *    If this phase was entered due to a rejection,
      *    the execution is in one of the states
-     *    [canceled]{@link pentaho.type.action.States.canceled} or
-     *    [failed]{@link pentaho.type.action.States.failed},
+     *    [canceled]{@link pentaho.action.States.canceled} or
+     *    [failed]{@link pentaho.action.States.failed},
      *    depending on the type of rejection reason,
-     *    [isRejected]{@link pentaho.type.action.Execution#isRejected} is `true`,
-     *    and an [error]{@link pentaho.type.action.Execution#error} may be available.
+     *    [isRejected]{@link pentaho.action.Execution#isRejected} is `true`,
+     *    and an [error]{@link pentaho.action.Execution#error} may be available.
      *
      *    Otherwise,
      *    the execution was successful and
-     *    it is in the [did]{@link pentaho.type.action.States.did} state.
-     *    Property [isDone]{@link pentaho.type.action.Execution#isDone} now returns `true` and
-     *    a [result]{@link pentaho.type.action.Execution#result} may be available.
+     *    it is in the [did]{@link pentaho.action.States.did} state.
+     *    Property [isDone]{@link pentaho.action.Execution#isDone} now returns `true` and
+     *    a [result]{@link pentaho.action.Execution#result} may be available.
      *
      *    The [_onPhaseFinally]{@link pentaho.type.action.Execution#_onPhaseFinally} method is called.
      *
@@ -206,7 +206,7 @@ define([
        * The current action state.
        *
        * @type {pentaho.type.action.States}
-       * @default pentaho.type.action.States.unstarted
+       * @default pentaho.action.States.unstarted
        * @private
        */
       this.__state = States.unstarted;

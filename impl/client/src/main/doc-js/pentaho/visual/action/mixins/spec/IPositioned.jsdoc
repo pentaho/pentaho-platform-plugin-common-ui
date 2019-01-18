@@ -21,7 +21,7 @@
  * @name pentaho.visual.action.mixins.spec.IPositioned
  *
  * @interface
- * @extends pentaho.type.action.spec.IBase
+ * @extends pentaho.action.spec.IBase
  */
 
 /**

@@ -15,7 +15,7 @@
  */
 
 /**
- * @name pentaho.type.action
+ * @name pentaho.action
  * @namespace
  *
  * @description The `action` namespace contains types related with the action concept.

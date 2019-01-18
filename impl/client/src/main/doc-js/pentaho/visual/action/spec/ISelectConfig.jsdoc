@@ -19,7 +19,7 @@
  *
  * @name pentaho.visual.action.spec.ISelectConfig
  * @interface
- * @extends pentaho.type.action.spec.IBaseType
+ * @extends pentaho.action.spec.IBaseType
  */
 
 /**

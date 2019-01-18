@@ -25,21 +25,21 @@ define([
 
   /**
    * @classDesc The `GenericActionExecution` class is an inner class of
-   * [Target]{@link pentaho.type.action.impl.Target} that assumes that
-   * that the execution [target]{@link pentaho.type.action.Execution#target}
+   * [Target]{@link pentaho.action.impl.Target} that assumes that
+   * that the execution [target]{@link pentaho.action.Execution#target}
    * is a `Target`.
    *
-   * It provides a generic implementation of [Execution]{@link pentaho.type.action#Execution}
+   * It provides a generic implementation of [Execution]{@link pentaho.action#Execution}
    * which delegates to the event observers of each of the execution phases,
    * by calling the correspondingly named methods of target:
-   * [Target#_emitActionPhaseInitEvent]{@link pentaho.type.action.impl.Target#_emitActionPhaseInitEvent},
-   * [Target#_emitActionPhaseWillEvent]{@link pentaho.type.action.impl.Target#_emitActionPhaseWillEvent}
-   * [Target#_emitActionPhaseDoEvent]{@link pentaho.type.action.impl.Target#_emitActionPhaseDoEvent} and
-   * [Target#_emitActionPhaseFinallyEvent]{@link pentaho.type.action.impl.Target#_emitActionPhaseFinallyEvent}.
+   * [Target#_emitActionPhaseInitEvent]{@link pentaho.action.impl.Target#_emitActionPhaseInitEvent},
+   * [Target#_emitActionPhaseWillEvent]{@link pentaho.action.impl.Target#_emitActionPhaseWillEvent}
+   * [Target#_emitActionPhaseDoEvent]{@link pentaho.action.impl.Target#_emitActionPhaseDoEvent} and
+   * [Target#_emitActionPhaseFinallyEvent]{@link pentaho.action.impl.Target#_emitActionPhaseFinallyEvent}.
    *
    * @class
-   * @memberOf pentaho.type.action.impl.Target
-   * @extends pentaho.type.action.Execution
+   * @memberOf pentaho.action.impl.Target
+   * @extends pentaho.action.Execution
    */
   var GenericActionExecution = ActionExecution.extend({
     // @override
@@ -89,37 +89,37 @@ define([
   /**
    * @classDesc The `Target` class is a mixin class that builds upon
    * [EventSource]{@link pentaho.lang.EventSource} to implement the
-   * [ITarget]{@link pentaho.type.action.ITarget} interface.
+   * [ITarget]{@link pentaho.action.ITarget} interface.
    *
-   * It provides a generic action [Execution]{@link pentaho.type.action.Execution}
+   * It provides a generic action [Execution]{@link pentaho.action.Execution}
    * implementation which delegates to the event observers of each of the execution phases.
    *
    * The event observers have the following signature:
    * ```js
    * function(event, action) {
    *
-   *   // assert event instanceof pentaho.type.action.Execution;
+   *   // assert event instanceof pentaho.action.Execution;
    *
    *   // assert action === event.action;
-   *   // assert action instanceof pentaho.type.action.Base;
+   *   // assert action instanceof pentaho.action.Base;
    *
    *   // assert this === event.target;
-   *   // assert this instanceof pentaho.type.action.ITarget;
+   *   // assert this instanceof pentaho.action.ITarget;
    * }
    * ```
    *
    * The `do` phase event observer can return a {@link Promise}.
    *
-   * @name pentaho.type.action.impl.Target
+   * @name pentaho.action.impl.Target
    * @class
    *
    * @extends pentaho.lang.EventSource
    *
-   * @implements {pentaho.type.action.ITarget}
+   * @implements {pentaho.action.ITarget}
    *
    * @abstract
    *
-   * @amd pentaho/type/action/impl/Target
+   * @amd pentaho/action/impl/Target
    *
    * @description This class was not designed to be constructed directly.
    * It was designed to be used as a **mixin**.
@@ -127,7 +127,7 @@ define([
    * @constructor
    */
 
-  return EventSource.extend(module.id, /** @lends pentaho.type.action.impl.Target# */{
+  return EventSource.extend(module.id, /** @lends pentaho.action.impl.Target# */{
 
     /** @inheritDoc */
     act: function(action) {
@@ -143,15 +143,15 @@ define([
      * Creates an action execution for a given action.
      *
      * The default implementation delegates to
-     * [_createGenericActionExecution]{pentaho.type.action.impl.Target#_createGenericActionExecution}.
+     * [_createGenericActionExecution]{pentaho.action.impl.Target#_createGenericActionExecution}.
      *
-     * @param {pentaho.type.action.Base} action - The action which will be executed.
+     * @param {pentaho.action.Base} action - The action which will be executed.
      *
-     * @return {pentaho.type.action.Execution} The action execution.
+     * @return {pentaho.action.Execution} The action execution.
      *
      * @protected
      *
-     * @see pentaho.type.action.ITarget#act
+     * @see pentaho.action.ITarget#act
      */
     _createActionExecution: function(action) {
       return this._createGenericActionExecution(action);
@@ -161,11 +161,11 @@ define([
      * Creates a generic action execution for a given action.
      *
      * The implementation returns an instance of
-     * [Target.GenericActionExecution]{@link pentaho.type.action.impl.Target.GenericActionExecution}.
+     * [Target.GenericActionExecution]{@link pentaho.action.impl.Target.GenericActionExecution}.
      *
-     * @param {pentaho.type.action.Base} action - The action which will be executed.
+     * @param {pentaho.action.Base} action - The action which will be executed.
      *
-     * @return {pentaho.type.action.Execution} The action execution.
+     * @return {pentaho.action.Execution} The action execution.
      *
      * @protected
      */
@@ -181,7 +181,7 @@ define([
      * The default implementation delegates to
      * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
      *
-     * @param {pentaho.type.action.Execution} actionExecution - The action execution.
+     * @param {pentaho.action.Execution} actionExecution - The action execution.
      *
      * @protected
      */
@@ -199,7 +199,7 @@ define([
      * The default implementation delegates to
      * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
      *
-     * @param {pentaho.type.action.Execution} actionExecution - The action execution.
+     * @param {pentaho.action.Execution} actionExecution - The action execution.
      *
      * @protected
      */
@@ -216,14 +216,14 @@ define([
      *
      * The default implementation delegates to
      * [_emitGenericAllAsync]{@link pentaho.lang.EventSource#_emitGenericAllAsync},
-     * when the action is [asynchronous]{@link pentaho.type.action.BaseType#isSync}.
+     * when the action is [asynchronous]{@link pentaho.action.BaseType#isSync}.
      * Delegates to
      * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}, otherwise.
      *
-     * @param {pentaho.type.action.Execution} actionExecution - The action execution.
+     * @param {pentaho.action.Execution} actionExecution - The action execution.
      *
      * @return {?Promise} A promise to the completion of the asynchronous `do` listener,
-     * of an [asynchronous]{@link pentaho.type.action.BaseType#isSync} action, or `null`.
+     * of an [asynchronous]{@link pentaho.action.BaseType#isSync} action, or `null`.
      *
      * @protected
      */
@@ -248,7 +248,7 @@ define([
      * The default implementation delegates to
      * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
      *
-     * @param {pentaho.type.action.Execution} actionExecution - The action execution.
+     * @param {pentaho.action.Execution} actionExecution - The action execution.
      *
      * @protected
      */

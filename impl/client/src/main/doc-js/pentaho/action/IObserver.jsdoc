@@ -15,14 +15,14 @@
  */
 
 /**
- * The `IObserver` interface represents an [action]{@link pentaho.type.action.Base} _observer_
+ * The `IObserver` interface represents an [action]{@link pentaho.action.Base} _observer_
  * and allows specifying event listener functions for each of an _action's phases_.
  *
- * @name pentaho.type.action.IObserver
+ * @name pentaho.action.IObserver
  *
  * @interface
  * @extends pentaho.lang.IEventObserver
- * @see pentaho.type.action.Base
+ * @see pentaho.action.Base
  */
 
 /**
@@ -34,8 +34,8 @@
  * and only its state-related properties may change.
  *
  * @name init
- * @memberOf pentaho.type.action.IObserver#
- * @type {?pentaho.lang.EventListener.<pentaho.type.action.Base>}
+ * @memberOf pentaho.action.IObserver#
+ * @type {?pentaho.lang.EventListener.<pentaho.action.Base>}
  */
 
 /**
@@ -45,8 +45,8 @@
  * allows cancellation (or failure) of the action.
  *
  * @name will
- * @memberOf pentaho.type.action.IObserver#
- * @type {?pentaho.lang.EventListener.<pentaho.type.action.Base>}
+ * @memberOf pentaho.action.IObserver#
+ * @type {?pentaho.lang.EventListener.<pentaho.action.Base>}
  */
 
 /**
@@ -56,15 +56,15 @@
  * allows actual _execution_ of the action.
  * The action cannot be canceled from within this phase, but it can, however, fail.
  *
- * When the action is [asynchronous]{@link pentaho.type.action.BaseType#isSync},
+ * When the action is [asynchronous]{@link pentaho.action.BaseType#isSync},
  * the listener function _may_ return a promise that is resolved upon
  * the listener's completion. If the promise is rejected,
  * the action is rejected with the rejection reason.
  * However, if the promise is fulfilled, its value is always *ignored*.
  *
  * @name do
- * @memberOf pentaho.type.action.IObserver#
- * @type {?pentaho.lang.EventListenerAsync.<pentaho.type.action.Base>}
+ * @memberOf pentaho.action.IObserver#
+ * @type {?pentaho.lang.EventListenerAsync.<pentaho.action.Base>}
  */
 
 /**
@@ -73,6 +73,6 @@
  * The _finally_ phase, follows either a _do_ phase, or rejected _init_ and _will_ phases.
  *
  * @name finally
- * @memberOf pentaho.type.action.IObserver#
- * @type {?pentaho.lang.EventListener.<pentaho.type.action.Base>}
+ * @memberOf pentaho.action.IObserver#
+ * @type {?pentaho.lang.EventListener.<pentaho.action.Base>}
  */

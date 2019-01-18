@@ -36,7 +36,7 @@ define([
    * is performed when the user interacts with a visual element,
    * typically by double clicking it.
    */
-  return BaseAction.extend(module.id, {
+  return BaseAction.extend(module.id, /** @lends pentaho.visual.action.Execute# */{
     get type() {
       return module.id;
     }

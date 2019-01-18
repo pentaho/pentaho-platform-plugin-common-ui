@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/action/Base"
+  "pentaho/action/Base"
 ], function(ActionBase) {
 
   "use strict";
 
-  describe("pentaho.type.action.Base", function() {
+  describe("pentaho.action.Base", function() {
 
     var SubAction;
 

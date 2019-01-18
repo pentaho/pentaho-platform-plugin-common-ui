@@ -20,16 +20,16 @@ define([
 
   "use strict";
 
-  var Action = Base.extend(module.id, /** @lends pentaho.type.action.Base# */{
+  var Action = Base.extend(module.id, /** @lends pentaho.action.Base# */{
 
     /**
      * @alias Base
-     * @memberOf pentaho.type.action
+     * @memberOf pentaho.action
      * @class
      * @extends pentaho.lang.Base
      * @abstract
      *
-     * @amd pentaho/type/action/Base
+     * @amd pentaho/action/Base
      *
      * @classDesc The `action.Base` class represents a certain model of actions.
      *
@@ -44,19 +44,19 @@ define([
      * ##### Synchronous or Asynchronous
      *
      * An action can be synchronous or asynchronous, as determined by the type property,
-     * {@link pentaho.type.action.BaseType#isSync}.
+     * {@link pentaho.action.BaseType#isSync}.
      * The execution of a synchronous action is completed synchronously,
      * while that of an asynchronous action only completes asynchronously.
      *
      * #### Execution
      *
      * Actions are executed at and by target objects,
-     * which implement the interface [ITarget]{@link pentaho.type.action.ITarget},
-     * by being passed as the argument to the [ITarget#act]{@link pentaho.type.action.ITarget#act} method.
+     * which implement the interface [ITarget]{@link pentaho.action.ITarget},
+     * by being passed as the argument to the [ITarget#act]{@link pentaho.action.ITarget#act} method.
      *
      * Targets control the exact implementation of the execution of an action,
      * which is returned from the `act` method,
-     * in the form of an [Execution]{@link pentaho.type.action.Execution}.
+     * in the form of an [Execution]{@link pentaho.action.Execution}.
      * However, it is the action that imposes whether execution is synchronous or not,
      * and the phases by which execution goes through, which are, for all action types:
      *
@@ -66,15 +66,15 @@ define([
      * 3. "do" - the action is executed;
      * 4. "finally" - the action execution has finished successfully or not.
      *
-     * For more information, see [Execution]{@link pentaho.type.action.Execution}.
+     * For more information, see [Execution]{@link pentaho.action.Execution}.
      *
      * @description Creates an action instance given its specification.
      *
      * @constructor
-     * @param {pentaho.type.action.spec.IBase} [spec] An action specification.
+     * @param {pentaho.action.spec.IBase} [spec] An action specification.
      *
-     * @see pentaho.type.action.spec.IBase
-     * @see pentaho.type.action.spec.IBaseType
+     * @see pentaho.action.spec.IBase
+     * @see pentaho.action.spec.IBaseType
      */
     constructor: function(spec) {
       // Let mixins take part.
@@ -84,7 +84,7 @@ define([
     /**
      * Initializes an action instance given its specification.
      *
-     * @param {pentaho.type.action.spec.IBase} [spec] An action specification.
+     * @param {pentaho.action.spec.IBase} [spec] An action specification.
      * @protected
      */
     _init: function(spec) {
@@ -112,7 +112,7 @@ define([
     /**
      * @abstract
      *
-     * @param {pentaho.type.action.spec.IBase} [spec] An action specification.
+     * @param {pentaho.action.spec.IBase} [spec] An action specification.
      * @protected
      */
     _fillSpec: function(spec) {

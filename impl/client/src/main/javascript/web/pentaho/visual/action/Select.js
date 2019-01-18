@@ -151,7 +151,7 @@ define([
   }
 
   /**
-   * The default selection mode of actions of this [Action]{@link pentaho.type.action.Base}.
+   * The default selection mode of actions of this [Action]{@link pentaho.action.Base}.
    *
    * The default value is {@link pentaho.visual.action.SelectionModes#replace}.
    *

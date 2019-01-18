@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/module!_",
-  "pentaho/type/action/Base"
+  "pentaho/action/Base"
 ], function(module, ActionBase) {
 
   "use strict";
@@ -31,7 +31,7 @@ define([
    * @name Base
    * @memberOf pentaho.visual.action
    * @class
-   * @extends pentaho.type.action.Base
+   * @extends pentaho.action.Base
    * @abstract
    *
    * @amd pentaho/visual/action/Base

@@ -67,7 +67,7 @@
   // E.g. requirePaths["pentaho/util"] = basePath + "/pentaho/util";
   [
     "_core", "shim", "util", "lang",
-    "i18n", "data", "type",
+    "i18n", "data", "action", "type",
     "visual", "config", "environment",
     "debug", "ccc", "module", "platformBundle", "theme"
   ].forEach(function(name) {
@@ -106,7 +106,6 @@
   requireModules["pentaho/type/Function"] = {alias: "function", base: "simple"};
   requireModules["pentaho/type/TypeDescriptor"] = {alias: "type", base: "simple"};
   requireModules["pentaho/type/mixins/Enum"] = {alias: "enum", base: "element"};
-  requireModules["pentaho/type/action/Base"] = {base: "element"};
 
   requireModules["pentaho/data/filter/Abstract"] = {base: "complex"};
   requireModules["pentaho/data/filter/True"] = {alias: "true", base: "pentaho/data/filter/Abstract"};
@@ -342,12 +341,6 @@
   });
   // endregion
 
-  // VizAPI actions
-  requireModules["pentaho/visual/action/Base"] = {base: "pentaho/type/action/Base"};
-  requireModules["pentaho/visual/action/Select"] = {alias: "select", base: "pentaho/visual/action/Base"};
-  requireModules["pentaho/visual/action/Execute"] = {alias: "execute", base: "pentaho/visual/action/Base"};
-  requireModules["pentaho/visual/action/Update"] = {base: "pentaho/visual/action/Base"};
-
   // Color Palettes
   requireModules["pentaho/visual/color/Palette"] = {base: "complex"};
 
@@ -564,7 +557,7 @@
       "pentaho/visual/role/Mapping",
       "pentaho/visual/role/Property",
       "pentaho/visual/base/Model",
-      "pentaho/type/action/Base",
+      "pentaho/action/Base",
       "pentaho/visual/action/Base",
       "pentaho/visual/action/Update",
       "pentaho/visual/action/mixins/Data",
@@ -572,10 +565,10 @@
       "pentaho/visual/action/SelectionModes",
       "pentaho/visual/action/Select",
       "pentaho/visual/action/Execute",
-      "pentaho/type/action/States",
+      "pentaho/action/States",
       "pentaho/lang/RuntimeError",
-      "pentaho/type/action/Execution",
-      "pentaho/type/action/impl/Target",
+      "pentaho/action/Execution",
+      "pentaho/action/impl/Target",
       "pentaho/util/BitSet",
       "pentaho/visual/base/View",
       "pentaho/visual/role/ExternalMapping",

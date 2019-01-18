@@ -21,8 +21,8 @@ define([
   "../action/Select",
   "../action/Execute", // TODO: Here to make it visible to r.js...
   "pentaho/type/loader",
-  "pentaho/type/action/Execution",
-  "pentaho/type/action/impl/Target",
+  "pentaho/action/Execution",
+  "pentaho/action/impl/Target",
   "pentaho/type/changes/ComplexChangeset",
   "pentaho/type/changes/Transaction",
   "pentaho/lang/UserError",
@@ -100,7 +100,7 @@ define([
    * @name SelectExecution
    * @memberOf pentaho.visual.action
    * @class
-   * @extends pentaho.type.action.Execution
+   * @extends pentaho.action.Execution
    * @private
    *
    * @classDesc The execution class for a
@@ -160,7 +160,7 @@ define([
      *
      * @class
      * @extends pentaho.type.Complex
-     * @extends pentaho.type.action.impl.Target
+     * @extends pentaho.action.impl.Target
      * @implements {pentaho.lang.IDisposable}
      *
      * @abstract
@@ -252,7 +252,7 @@ define([
       /**
        * The current update action execution, if any; `null`, otherwise.
        *
-       * @type {pentaho.type.action.Execution}
+       * @type {pentaho.action.Execution}
        * @private
        */
       this.__updateActionExecution = null;
@@ -575,8 +575,8 @@ define([
      * the update method creates an [Update]{@link pentaho.visual.action.Update}
      * action and executes it.
      * This is done by passing the action to the [act]{@link pentaho.visual.base.View#act},
-     * and then returning back the [promise]{@link pentaho.type.action.Execution#promise}
-     * of the returned [action execution]{@link pentaho.type.action.Execution}.
+     * and then returning back the [promise]{@link pentaho.action.Execution#promise}
+     * of the returned [action execution]{@link pentaho.action.Execution}.
      *
      * The update then goes through all of the phases of the execution of an action:
      * `init`, `will`, `do` and `finally`.
@@ -632,7 +632,7 @@ define([
      * @fires "pentaho/visual/action/Update:{will}"
      * @fires "pentaho/visual/action/Update:{finally}"
      *
-     * @see pentaho.type.action.Execution
+     * @see pentaho.action.Execution
      *
      * @see pentaho.visual.base.View#isAutoUpdate
      * @see pentaho.visual.base.View#isUpdating
@@ -671,7 +671,7 @@ define([
      *
      * The default implementation does nothing.
      *
-     * @param {pentaho.type.action.Execution} updateActionExecution - The update action execution.
+     * @param {pentaho.action.Execution} updateActionExecution - The update action execution.
      *
      * @protected
      */
@@ -682,9 +682,9 @@ define([
      * Performs the _will_ phase of an update action execution.
      *
      * The default implementation calls
-     * [_emitActionPhaseWillEvent]{@link pentaho.type.action.impl.Target#_emitActionPhaseWillEvent}.
+     * [_emitActionPhaseWillEvent]{@link pentaho.action.impl.Target#_emitActionPhaseWillEvent}.
      *
-     * @param {pentaho.type.action.Execution} updateActionExecution - The update action execution.
+     * @param {pentaho.action.Execution} updateActionExecution - The update action execution.
      *
      * @protected
      */
@@ -699,7 +699,7 @@ define([
      * if it is [dirty]{@link pentaho.visual.base.View#isDirty} and
      * [valid]{@link pentaho.visual.base.View#$isValid}.
      *
-     * @param {pentaho.type.action.Execution} updateActionExecution - The update action execution.
+     * @param {pentaho.action.Execution} updateActionExecution - The update action execution.
      *
      * @return {Promise} A promise that is fulfilled when the update action has completed successfully.
      *
@@ -713,9 +713,9 @@ define([
      * Performs the _finally_ phase of an update action execution.
      *
      * The default implementation calls
-     * [_emitActionPhaseFinallyEvent]{@link pentaho.type.action.impl.Target#_emitActionPhaseFinallyEvent}.
+     * [_emitActionPhaseFinallyEvent]{@link pentaho.action.impl.Target#_emitActionPhaseFinallyEvent}.
      *
-     * @param {pentaho.type.action.Execution} updateActionExecution - The update action execution.
+     * @param {pentaho.action.Execution} updateActionExecution - The update action execution.
      *
      * @protected
      */
@@ -1260,7 +1260,7 @@ define([
      * with the action as event payload,
      * for each of the action's phases.
      *
-     * This method can be given [synchronous]{@link pentaho.type.action.BaseType#isSync} or asynchronous actions.
+     * This method can be given [synchronous]{@link pentaho.action.BaseType#isSync} or asynchronous actions.
      * However, in the latter case, this method is only suitable for _fire-and-forget_ scenarios,
      * where it is not needed to know the outcome of the asynchronous action.
      *
@@ -1301,9 +1301,9 @@ define([
      *   });
      * });
      *
-     * @param {pentaho.type.action.Base} action - The action to execute.
+     * @param {pentaho.action.Base} action - The action to execute.
      *
-     * @return {pentaho.type.action.Base} The given action.
+     * @return {pentaho.action.Base} The given action.
      *
      * @override
      * @see pentaho.visual.base.View#actAsync
@@ -1316,18 +1316,18 @@ define([
      * with the action as event payload,
      * for each of the action's phases.
      *
-     * This method can be given [synchronous]{@link pentaho.type.action.BaseType#isSync} or asynchronous actions,
+     * This method can be given [synchronous]{@link pentaho.action.BaseType#isSync} or asynchronous actions,
      * and can be used when uniformity in treatment is desired and it is needed to know the outcome of the
      * asynchronous action.
      *
      * @name pentaho.visual.base.View#actAsync
      * @method
      *
-     * @param {pentaho.type.action.Base} action - The action to execute.
+     * @param {pentaho.action.Base} action - The action to execute.
      *
      * @return {Promise} A promise that is fulfilled with the action's
-     * [result]{@link pentaho.type.action.Base#result} or rejected with the action's
-     * [error]{@link pentaho.type.action.Base#error}.
+     * [result]{@link pentaho.action.Base#result} or rejected with the action's
+     * [error]{@link pentaho.action.Base#error}.
      *
      * @override
      * @see pentaho.visual.base.View#act

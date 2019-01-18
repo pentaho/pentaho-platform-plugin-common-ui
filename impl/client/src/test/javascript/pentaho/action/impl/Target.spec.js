@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/action/impl/Target",
-  "pentaho/type/action/Base",
-  "pentaho/type/action/Execution",
+  "pentaho/action/impl/Target",
+  "pentaho/action/Base",
+  "pentaho/action/Execution",
   "pentaho/lang/Base"
 ], function(TargetMixin, BaseAction, Execution, Base) {
 
   "use strict";
 
-  describe("pentaho.type.action.impl.Target", function() {
+  describe("pentaho.action.impl.Target", function() {
 
     var CustomTarget;
     var SyncAction;
@@ -183,7 +183,7 @@ define([
         var target = new CustomTarget();
         var ae = target.act({
           _: {
-            base: "pentaho/type/action/Base"
+            base: "pentaho/action/Base"
           }
         });
 

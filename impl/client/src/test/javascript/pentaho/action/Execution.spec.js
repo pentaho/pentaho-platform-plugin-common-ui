@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/action/Base",
-  "pentaho/type/action/Execution",
-  "pentaho/type/action/States",
+  "pentaho/action/Base",
+  "pentaho/action/Execution",
+  "pentaho/action/States",
   "pentaho/type/ValidationError",
   "pentaho/lang/UserError",
   "pentaho/lang/RuntimeError",
@@ -32,7 +32,7 @@ define([
   /* eslint max-nested-callbacks: 0, require-jsdoc: 0, no-unused-vars: 0,
      default-case: 0, no-fallthrough: 0, dot-notation: 0 */
 
-  describe("pentaho.type.action.Execution", function() {
+  describe("pentaho.action.Execution", function() {
 
     // A derived non-abstract class.
     var SubActionExecution = Execution.extend();
