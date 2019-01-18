@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 - 2018 Hitachi Vantara.  All rights reserved.
+ * Copyright 2017 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,7 @@ define([
   beforeAll(function() {
 
     // Non-abstract, empty action, mixed-in with positioned mixin.
-    CustomPositionedAction = BaseAction.extend({
-      $type: {
-        mixins: [PositionedActionMixin]
-      }
-    });
+    CustomPositionedAction = BaseAction.extend().mix(PositionedActionMixin);
   });
 
   describe("pentaho.visual.action.mixins.Positioned", function() {

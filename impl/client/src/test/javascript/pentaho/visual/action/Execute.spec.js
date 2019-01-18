@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 - 2018 Hitachi Vantara.  All rights reserved.
+ * Copyright 2017 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ define([
 
     it("should be synchronous", function() {
 
-      expect(ExecuteAction.type.isSync).toBe(true);
+      expect(ExecuteAction.isSync).toBe(true);
     });
   });
 });

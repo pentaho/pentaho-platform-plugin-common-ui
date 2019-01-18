@@ -36,11 +36,7 @@ define([
   "pentaho/util/logger",
   "pentaho/util/promise",
   "pentaho/util/spec",
-  "pentaho/i18n!view",
-
-  // Pre-load all registered visual action types so that it is safe to request them synchronously.
-  "pentaho/module/subtypesOf!pentaho/visual/action/Base"
-
+  "pentaho/i18n!view"
 ], function(module, Complex, VisualModel, UpdateAction, SelectAction, ExecuteAction,
             typeLoader, ActionExecution, ActionTargetMixin, ComplexChangeset, Transaction,
             UserError, RuntimeError, ModelChangedError,

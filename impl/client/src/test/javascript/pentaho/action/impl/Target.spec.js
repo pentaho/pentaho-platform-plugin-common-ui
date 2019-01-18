@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 - 2018 Hitachi Vantara.  All rights reserved.
+ * Copyright 2017 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,17 +32,23 @@ define([
 
       // A derived non-abstract class, adding nothing new.
       SyncAction = BaseAction.extend({
-        $type: {
-          id: "syncAction",
-          isSync: true
+        get type() {
+          return "syncAction";
+        }
+      }, {
+        get isSync() {
+          return true;
         }
       });
 
       // Idem.
       AsyncAction = BaseAction.extend({
-        $type: {
-          id: "asyncAction",
-          isSync: false
+        get type() {
+          return "asyncAction";
+        }
+      }, {
+        get isSync() {
+          return false;
         }
       });
 
@@ -178,7 +184,8 @@ define([
         expect(ae instanceof Execution).toBe(true);
       });
 
-      it("should accept an Action specification argument", function() {
+      // TODO remove?
+      xit("should accept an Action specification argument", function() {
 
         var target = new CustomTarget();
         var ae = target.act({
@@ -290,16 +297,16 @@ define([
       // The EventSource method that it delegates to.
       var emitGenericMethodName = isSync ? "_emitGeneric" : "_emitGenericAllAsync";
 
-      var ActionClass;
+      var action;
 
       beforeEach(function() {
         target = new CustomTarget();
 
         spyOn(target, emitGenericMethodName);
 
-        ActionClass = isSync ? SyncAction : AsyncAction;
+        var ActionClass = isSync ? SyncAction : AsyncAction;
 
-        var action = new ActionClass();
+        action = new ActionClass();
 
         ae = new Execution(action, target);
 
@@ -328,9 +335,9 @@ define([
         expect(listenerArgs[1]).toBe(ae.action);
       });
 
-      it("should call #" + emitGenericMethodName + " with action.$type.id as event type", function() {
-        // event type to be $type.id
-        expect(call.args[2]).toBe(ActionClass.type.id);
+      it("should call #" + emitGenericMethodName + " with action.type as event type", function() {
+        // event type to be action.type
+        expect(call.args[2]).toBe(action.type);
       });
 
       it("should call #" + emitGenericMethodName + " with phase '" + phase + "'", function() {

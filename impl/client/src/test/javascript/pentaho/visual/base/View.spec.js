@@ -1513,9 +1513,8 @@ define([
       beforeAll(function() {
         // Assuming pre-loaded with View
         CustomSyncAction = BaseAction.extend({
-          $type: {
-            id: "my/test/Action",
-            isAbstract: false
+          get type() {
+            return "my/test/Action";
           }
         });
       });
@@ -1549,9 +1548,11 @@ define([
         };
 
         var view = new BaseView();
-        view.on(CustomSyncAction.type.id, observer);
+        var action = new CustomSyncAction();
 
-        var actionExecution = view.act(new CustomSyncAction());
+        view.on(action.type, observer);
+
+        var actionExecution = view.act(action);
 
         return actionExecution.promise.then(function() {
           expect(observer.init).toHaveBeenCalledWith(actionExecution, actionExecution.action);
@@ -1575,10 +1576,11 @@ define([
         };
 
         var view = new BaseView();
+        var action = new CustomSyncAction();
 
-        view.on(CustomSyncAction.type.id, observer);
+        view.on(action.type, observer);
 
-        return view.act(new CustomSyncAction()).promise.then(function() {
+        return view.act(action).promise.then(function() {
           return Promise.reject("Should have been rejected.");
         }, function() {
           expect(observer.init).toHaveBeenCalled();
@@ -1602,10 +1604,11 @@ define([
         };
 
         var view = new BaseView();
+        var action = new CustomSyncAction();
 
-        view.on(CustomSyncAction.type.id, observer);
+        view.on(action.type, observer);
 
-        return view.act(new CustomSyncAction()).promise.then(function() {
+        return view.act(action).promise.then(function() {
           return Promise.reject("Should have been rejected.");
         }, function() {
           expect(observer.init).toHaveBeenCalled();

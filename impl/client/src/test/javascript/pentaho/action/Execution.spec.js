@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 - 2018 Hitachi Vantara.  All rights reserved.
+ * Copyright 2017 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,16 +45,16 @@ define([
       target = Object.freeze({});
 
       // A derived non-abstract class, adding nothing new.
-      SyncAction = BaseAction.extend({
-        $type: {
-          isSync: true
+      SyncAction = BaseAction.extend({}, {
+        get isSync() {
+          return true;
         }
       });
 
       // Idem.
-      AsyncAction = BaseAction.extend({
-        $type: {
-          isSync: false
+      AsyncAction = BaseAction.extend({}, {
+        get isSync() {
+          return false;
         }
       });
     });
