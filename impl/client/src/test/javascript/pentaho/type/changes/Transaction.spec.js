@@ -93,7 +93,7 @@ define([
         scope.exit();
       });
 
-      it("should return a changeset whose owner is container", function() {
+      it("should return a changeset whose target is container", function() {
         var txn = new Transaction();
         var scope = txn.enter();
         var container = new DerivedComplex();
@@ -101,7 +101,7 @@ define([
 
         var cset = txn.getChangeset(container.$uid);
 
-        expect(cset.owner).toBe(container);
+        expect(cset.target).toBe(container);
 
         scope.exit();
       });
@@ -197,14 +197,14 @@ define([
         scope.exit();
       });
 
-      it("should return a ChangeRef with container as its owner", function() {
+      it("should return a ChangeRef with container as its target", function() {
         var txn = new Transaction();
         var scope = txn.enter();
         var container = new DerivedComplex();
 
         var cref = txn.__ensureChangeRef(container);
 
-        expect(cref.owner).toBe(container);
+        expect(cref.target).toBe(container);
 
         scope.exit();
       });
@@ -234,7 +234,7 @@ define([
         scope.exit();
       });
 
-      it("should return a ChangeRef whose owner is container", function() {
+      it("should return a ChangeRef whose target is container", function() {
         var txn = new Transaction();
         var scope = txn.enter();
         var container = new DerivedComplex();
@@ -242,7 +242,7 @@ define([
 
         var cref = txn.__getChangeRef(container.$uid);
 
-        expect(cref.owner).toBe(container);
+        expect(cref.target).toBe(container);
 
         scope.exit();
       });
@@ -526,7 +526,7 @@ define([
           $type: {
             props: [
               {name: "color", valueType: "string"},
-              {name: "owner", valueType: scenario.Person},
+              {name: "target", valueType: scenario.Person},
               {name: "residents", valueType: [scenario.Person]}
             ]
           }
@@ -538,7 +538,7 @@ define([
          *
          * dog1 ----(pets)----> person1  ---(residents)---------\
          *                 /                                     >--> house1
-         * dog2 ----(pets)----> person2  ---(owner, residents)--/
+         * dog2 ----(pets)----> person2  ---(target, residents)--/
          *
          * (8 changesets)
          */
@@ -554,7 +554,7 @@ define([
         scenario.graph1.person2 = new scenario.Person({name: "Maria", age: 33, pets: [scenario.graph1.dog2]});
         scenario.graph1.house1 = new scenario.House({
           color: "red",
-          owner: scenario.graph1.person2,
+          target: scenario.graph1.person2,
           residents: [scenario.graph1.person1, scenario.graph1.person2]
         });
 
@@ -562,12 +562,12 @@ define([
          *
          *  4          3            2                1                0
          *
-         * cat1 ----(pets)---->  person1  ---(owner, residents)--> house1
+         * cat1 ----(pets)---->  person1  ---(target, residents)--> house1
          *
          *
          * For reference, because of list containers, the actual graph is more like this:
          *
-         * cat1 ---- pets ---->  person1  ------ (owner) --------> house1
+         * cat1 ---- pets ---->  person1  ------ (target) --------> house1
          *                                \                    /
          *                                 \----> residents --/
          *
@@ -578,7 +578,7 @@ define([
         scenario.graph2.person1 = new scenario.Person({name: "Sophia", age: 20, pets: [scenario.graph2.cat1]});
         scenario.graph2.house1 = new scenario.House({
           color: "pink",
-          owner: scenario.graph2.person1,
+          target: scenario.graph2.person1,
           residents: [scenario.graph2.person1]
         });
 
@@ -597,10 +597,10 @@ define([
       }
       // endregion
 
-      function expectQueue(owners) {
+      function expectQueue(targets) {
 
         expect(transaction.__commitWillQueue.slice())
-          .toEqual(owners.map(function(owner) { return owner.$changeset; }));
+          .toEqual(targets.map(function(target) { return target.$changeset; }));
       }
 
       describe("when there are no changes", function() {
@@ -676,7 +676,7 @@ define([
             ]);
           });
 
-          it("should return false if there are no changeset owners have will:change listeners", function() {
+          it("should return false if there are no changeset targets have will:change listeners", function() {
 
             var neighborhood = scenarioNeighborhood();
 
@@ -688,7 +688,7 @@ define([
             expect(result).toBe(false);
           });
 
-          it("should return true if there is at least one changeset owner that has will:change listeners", function() {
+          it("should return true if there is at least one changeset target that has will:change listeners", function() {
 
             var neighborhood = scenarioNeighborhood();
 
@@ -766,7 +766,7 @@ define([
             expect(person1Order).toBe(3);
           });
 
-          describe("when a changeset owner cancels the event", function() {
+          describe("when a changeset target cancels the event", function() {
 
             it("should call __finalizeCommitWillQueue and return rejected", function() {
 
@@ -834,11 +834,11 @@ define([
             });
           });
 
-          describe("when no changeset owner cancels the event", function() {
+          describe("when no changeset target cancels the event", function() {
 
             describe("when there are multiple paths to a changset", function() {
 
-              it("should call _onChangeWill on its owner only once if no additional changes occur", function() {
+              it("should call _onChangeWill on its target only once if no additional changes occur", function() {
 
                 var neighborhood = scenarioNeighborhood();
 

@@ -75,7 +75,7 @@ define([
     /** @inheritDoc */
     _prepare: function(changeset) {
       var element = this.element;
-      if(element.__addReference && !changeset.owner.$isBoundary) {
+      if(element.__addReference && !changeset.target.$isBoundary) {
         changeset.__addComplexElement(element);
       }
     },
@@ -83,7 +83,7 @@ define([
     /** @inheritDoc */
     _cancel: function(changeset) {
       var element = this.element;
-      if(element.__addReference && !changeset.owner.$isBoundary) {
+      if(element.__addReference && !changeset.target.$isBoundary) {
         changeset.__removeComplexElement(element);
       }
     },

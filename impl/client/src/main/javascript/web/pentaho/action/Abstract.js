@@ -20,18 +20,18 @@ define([
 
   "use strict";
 
-  var Action = Base.extend(module.id, /** @lends pentaho.action.Base# */{
+  var AbstractAction = Base.extend(module.id, /** @lends pentaho.action.Abstract# */{
 
     /**
-     * @alias Base
+     * @alias Abstract
      * @memberOf pentaho.action
      * @class
      * @extends pentaho.lang.Base
      * @abstract
      *
-     * @amd pentaho/action/Base
+     * @amd pentaho/action/Abstract
      *
-     * @classDesc The `action.Base` class represents a certain model of actions.
+     * @classDesc The `action.Abstract` class represents a certain model of actions.
      *
      * It is expected that the associated type class is used to
      * configure metadata information about actions.
@@ -44,7 +44,7 @@ define([
      * ##### Synchronous or Asynchronous
      *
      * An action can be synchronous or asynchronous, as determined by the type property,
-     * {@link pentaho.action.BaseType#isSync}.
+     * {@link pentaho.action.Abstract.isSync}.
      * The execution of a synchronous action is completed synchronously,
      * while that of an asynchronous action only completes asynchronously.
      *
@@ -61,7 +61,7 @@ define([
      * and the phases by which execution goes through, which are, for all action types:
      *
      * 1. "init" - the execution is being initialized and a chance is given to mutate
-     *    the action and change what will be done;
+     *             the action and change what will be done;
      * 2. "will" - action is now frozen and the action can be canceled based on what wil be done;
      * 3. "do" - the action is executed;
      * 4. "finally" - the action execution has finished successfully or not.
@@ -69,70 +69,67 @@ define([
      * For more information, see [Execution]{@link pentaho.action.Execution}.
      *
      * @description Creates an action instance given its specification.
-     *
      * @constructor
-     * @param {pentaho.action.spec.IBase} [spec] An action specification.
      *
      * @see pentaho.action.spec.IBase
-     * @see pentaho.action.spec.IBaseType
      */
-    constructor: function(spec) {
-      // Let mixins take part.
-      this._init(spec);
+    contructor: function() {
     },
 
     /**
-     * Initializes an action instance given its specification.
+     * Gets the type of action.
      *
-     * @param {pentaho.action.spec.IBase} [spec] An action specification.
-     * @protected
-     */
-    _init: function(spec) {
-    },
-
-    /** @inheritDoc */
-    clone: function() {
-      return new this.constructor(this.toSpec());
-    },
-
-    /**
+     * @name type
+     * @memberOf pentaho.action.Abstract#
+     * @type {string}
+     *
      * @abstract
      */
     get type() {
-      return null;
+    },
+
+    get eventName() {
+      return this.type;
     },
 
     /**
+     * @name validate
+     * @memberOf pentaho.action.Abstract#
+     *
      * @abstract
      */
     validate: function() {
-      return null;
     },
 
     /**
-     * @abstract
+     * @name clone
+     * @memberOf pentaho.action.Abstract#
      *
-     * @param {pentaho.action.spec.IBase} [spec] An action specification.
-     * @protected
+     * @abstract
      */
-    _fillSpec: function(spec) {
+    clone: function() {
     },
 
-    // region serialization
-    /** @inheritDoc */
+    /**
+     * @name toSpec
+     * @memberOf pentaho.action.Abstract#
+     *
+     * @abstract
+     */
     toSpec: function() {
-      var spec = {};
-
-      this._fillSpec(spec);
-
-      return spec;
     }
-    // endregion
-  }, {
+  }, /** @lends pentaho.action.Abstract.*/{
+
+    /**
+     *
+     * @memberOf pentaho.action.Abstract.
+     * @type {boolean}
+     * @static
+     */
     get isSync() {
       return true;
     }
   });
 
-  return Action;
+  return AbstractAction;
 });

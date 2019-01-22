@@ -34,20 +34,20 @@ define([
      * @abstract
      *
      * @classDesc The `Changeset` class describes a set of changes occurring in a structured value,
-     * the [owner]{@link pentaho.type.changes.Changeset#owner} value.
+     * the [target]{@link pentaho.type.changes.Changeset#target} value.
      *
      * A changeset is a container for a set of
      * [PrimitiveChange]{@link pentaho.type.changes.PrimitiveChange} instances.
      *
      * @constructor
-     * @description Creates an empty `Changeset` for a given owner value.
+     * @description Creates an empty `Changeset` for a given target value.
      *
      * @param {pentaho.type.changes.Transaction} transaction - The owning transaction.
-     * @param {pentaho.type.mixins.Container} owner - The container instance where the changes take place.
+     * @param {pentaho.type.mixins.Container} target - The container instance where the changes take place.
      */
-    constructor: function(transaction, owner) {
+    constructor: function(transaction, target) {
       if(!transaction) throw error.argRequired("transaction");
-      if(!owner) throw error.argRequired("owner");
+      if(!target) throw error.argRequired("target");
 
       /**
        * Gets the owning transaction.
@@ -62,15 +62,15 @@ define([
       /**
        * Gets the container where the changes take place.
        *
-       * @name owner
+       * @name target
        * @memberOf pentaho.type.changes.Changeset#
        * @type {pentaho.type.mixins.Container}
        * @readOnly
        */
-      O.setConst(this, "owner", owner);
+      O.setConst(this, "target", target);
 
       this.__isReadOnly = false;
-      this.__ownerVersion = owner.$version;
+      this.__targetVersion = target.$version;
 
       // The longest path by which this changeset can be reached following the paths from parent to children changesets.
       this._netOrder = 0;
@@ -153,7 +153,7 @@ define([
 
       var maxParentOrder = 0;
       var transaction = this.transaction;
-      var irefs = transaction.getAmbientReferences(this.owner);
+      var irefs = transaction.getAmbientReferences(this.target);
       if(irefs !== null) {
         var i = irefs.length;
         while(i--) {
@@ -175,7 +175,7 @@ define([
      * @name pentaho.type.changes.Changeset#__onChildChangesetCreated
      * @method
      * @param {pentaho.type.changes.Changeset} childChangeset - The child changeset.
-     * @param {pentaho.type.PropertyType} propType - The property type whose value is the changeset owner.
+     * @param {pentaho.type.PropertyType} propType - The property type whose value is the changeset target.
      * Only applies when this changeset is a complex changeset.
      *
      * @private
@@ -232,13 +232,13 @@ define([
 
     // region Versions
     /**
-     * Gets the version of the owner at the time when the changeset was created.
+     * Gets the version of the target at the time when the changeset was created.
      *
      * @type {number}
      * @readOnly
      */
-    get ownerVersion() {
-      return this.__ownerVersion;
+    get targetVersion() {
+      return this.__targetVersion;
     },
 
     /**
@@ -359,7 +359,7 @@ define([
      */
     __notifyParentsTxnVersionDirty: function(noNotifyParentChangeset) {
 
-      var irefs = this.transaction.getAmbientReferences(this.owner);
+      var irefs = this.transaction.getAmbientReferences(this.target);
       if(irefs !== null) {
         var L = irefs.length;
         var i = -1;
@@ -456,22 +456,22 @@ define([
     // endregion
 
     /**
-     * Applies the contained changes to the owner value and updates its version
+     * Applies the contained changes to the target value and updates its version
      * to the given value.
      *
-     * @param {number} version - The new owner version.
+     * @param {number} version - The new target version.
      *
      * @private
      * @friend {pentaho.type.changes.Transaction}
      */
     _applyInternal: function(version) {
 
-      var owner = this.owner;
+      var target = this.target;
 
-      this._apply(owner);
+      this._apply(target);
 
       // Update version
-      owner.__setVersionInternal(version);
+      target.__setVersionInternal(version);
     }
   });
 });

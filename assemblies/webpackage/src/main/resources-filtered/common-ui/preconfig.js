@@ -362,7 +362,7 @@ if(!useDebug) {
     "pentaho/visual/role/Mapping",
     "pentaho/visual/role/Property",
     "pentaho/visual/base/Model",
-    "pentaho/action/Base",
+    "pentaho/action/Generic",
     "pentaho/visual/action/Base",
     "pentaho/visual/action/Update",
     "pentaho/visual/action/mixins/Data",

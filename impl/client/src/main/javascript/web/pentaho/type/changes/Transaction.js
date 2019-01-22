@@ -109,7 +109,7 @@ define([
       this.__commitWillQueue = null;
 
       /**
-       * The set of the owner uids of changesets which are present in the changesets `__commitWillQueue`.
+       * The set of the target uids of changesets which are present in the changesets `__commitWillQueue`.
        *
        * @type {?Object.<string, boolean>}
        * @private
@@ -125,7 +125,7 @@ define([
       this.__commitWillChangeset = null;
 
       /**
-       * The set of owner uids of changesets which have ran at least once.
+       * The set of target uids of changesets which have ran at least once.
        *
        * @type {?Object.<string, boolean>}
        * @private
@@ -286,7 +286,7 @@ define([
     /**
      * Called to obtain a changeset for a given container in this transaction.
      *
-     * @param {pentaho.type.mixins.Container} owner - The changeset owner container.
+     * @param {pentaho.type.mixins.Container} target - The changeset target container.
      *
      * @return {pentaho.type.changes.Changeset} The existing or created changeset.
      *
@@ -295,14 +295,14 @@ define([
      *
      * @see pentaho.type.changes.Changeset#__onChildChangesetCreated
      */
-    ensureChangeset: function(owner) {
-      return O.getOwn(this.__csetByUid, owner.$uid) || this.__createChangeset(owner);
+    ensureChangeset: function(target) {
+      return O.getOwn(this.__csetByUid, target.$uid) || this.__createChangeset(target);
     },
 
     /**
      * Creates a changeset for a given container in this transaction.
      *
-     * @param {pentaho.type.mixins.Container} owner - The changeset owner container.
+     * @param {pentaho.type.mixins.Container} target - The changeset target container.
      *
      * @return {pentaho.type.changes.Changeset} The existing or created changeset.
      *
@@ -311,27 +311,27 @@ define([
      *
      * @private
      */
-    __createChangeset: function(owner) {
+    __createChangeset: function(target) {
 
       if(this.isReadOnly) {
         throw error.operInvalid(
           "Transaction cannot change because it has already been previewed, committed or rejected.");
       }
 
-      var changeset = owner._createChangeset(this);
+      var changeset = target._createChangeset(this);
 
-      this.__csetByUid[owner.$uid] = changeset;
+      this.__csetByUid[target.$uid] = changeset;
       this.__csets.push(changeset);
 
       if(this.__isCurrent) {
-        owner.__cset = changeset;
+        target.__cset = changeset;
       }
 
       // Traverse references and create changesets, connecting them along the way.
 
       // TODO: Should be being careful not to create changeset cycles when there are reference cycles...
 
-      var irefs = this.getAmbientReferences(owner);
+      var irefs = this.getAmbientReferences(target);
       if(irefs !== null) {
         irefs.forEach(function(iref) {
           // Recursive call, when container changeset does not exist yet.
@@ -406,7 +406,7 @@ define([
       if(!this.__scopeCount) {
         // Reentering a txn that was set aside?
         // This txn may now be in concurrency error.
-        // a) Check if every owners' version is that which was initially captured in the changeset.
+        // a) Check if every targets' version is that which was initially captured in the changeset.
 
         var csets = this.__csets;
         var L = csets.length;
@@ -414,7 +414,7 @@ define([
         var cset;
         while(++i < L) {
           cset = csets[i];
-          if(cset.ownerVersion !== cset.owner.$version)
+          if(cset.targetVersion !== cset.target.$version)
             throw this.__reject(new TransactionRejectedError("Concurrency error."));
         }
       }
@@ -445,7 +445,7 @@ define([
     __enteringAmbient: function() {
 
       this.__eachChangeset(function(cset) {
-        cset.owner.__cset = cset;
+        cset.target.__cset = cset;
       });
 
       this.__isCurrent = true;
@@ -464,7 +464,7 @@ define([
       this.__isCurrent = false;
 
       this.__eachChangeset(function(cset) {
-        cset.owner.__cset = null;
+        cset.target.__cset = null;
       });
     },
     // endregion
@@ -557,7 +557,7 @@ define([
      *
      * For each changeset that was registered with the transaction,
      * and that really has changes,
-     * its owner is called to emit the `will:change` event, for any registered listeners.
+     * its target is called to emit the `will:change` event, for any registered listeners.
      *
      * Listeners may modify the changeset or any of the changesets contained in the transaction.
      * Also, new changesets can be added to the transaction.
@@ -615,7 +615,7 @@ define([
 
     /**
      * Actually performs the commit-will evaluation phase,
-     * going through `will:change` listeners of the owners of the changesets in this transaction.
+     * going through `will:change` listeners of the targets of the changesets in this transaction.
      *
      * Evaluation proceeds as follows:
      *
@@ -658,27 +658,27 @@ define([
         var changesetQueue = this.__commitWillQueue;
         var changesetQueueSet = this.__commitWillQueueSet;
 
-        // @type owner.uid -> [ lastChangesetVersionSeenByListener ]
+        // @type target.uid -> [ lastChangesetVersionSeenByListener ]
         var listenersVersionsByUid = Object.create(null);
 
         var currentChangeset;
-        var currentOwner;
+        var currentTarget;
         var currentListenersVersions;
 
         var keyArgsOnChangeWill = {
           isCanceled: __event_isCanceled,
-          interceptor: function(listener, owner, eventArgs, index) {
+          interceptor: function(listener, target, eventArgs, index) {
 
-            // Take care to only allocate `currentListenersVersions` if owner has at least one listener,
+            // Take care to only allocate `currentListenersVersions` if target has at least one listener,
             // which is now surely the case...
             if(currentListenersVersions === null) {
               currentListenersVersions =
-                listenersVersionsByUid[currentOwner.$uid] || (listenersVersionsByUid[currentOwner.$uid] = []);
+                listenersVersionsByUid[currentTarget.$uid] || (listenersVersionsByUid[currentTarget.$uid] = []);
             }
 
             if((currentListenersVersions[index] || 0) < currentChangeset.transactionVersion) {
               try {
-                listener.apply(owner, eventArgs);
+                listener.apply(target, eventArgs);
               } finally {
                 if(!eventArgs[0].isCanceled) {
                   // Store for later.
@@ -691,21 +691,21 @@ define([
 
         while((currentChangeset = changesetQueue.shift()) !== undefined) {
 
-          currentOwner = currentChangeset.owner;
+          currentTarget = currentChangeset.target;
 
-          delete changesetQueueSet[currentOwner.$uid];
-          this.__commitWillRanSet[currentOwner.$uid] = true;
+          delete changesetQueueSet[currentTarget.$uid];
+          this.__commitWillRanSet[currentTarget.$uid] = true;
           this.__commitWillChangeset = currentChangeset;
 
           currentListenersVersions = null;
 
-          var cancelReason = currentOwner._onChangeWill(currentChangeset, keyArgsOnChangeWill);
+          var cancelReason = currentTarget._onChangeWill(currentChangeset, keyArgsOnChangeWill);
           if(cancelReason != null) {
             this.__finalizeCommitWillQueue();
             return ActionResult.reject(cancelReason);
           }
 
-          this.__addParentsToCommitWillQueue(currentOwner);
+          this.__addParentsToCommitWillQueue(currentTarget);
         }
       }
 
@@ -739,7 +739,7 @@ define([
 
         var isParent = false;
 
-        if(!anyChangeWillListeners && changeset.owner._hasListeners("will:change")) {
+        if(!anyChangeWillListeners && changeset.target._hasListeners("will:change")) {
           anyChangeWillListeners = true;
         }
 
@@ -765,13 +765,13 @@ define([
 
     /**
      * Adds the parent changesets of a changeset to the commit-will queue,
-     * given the child changeset owner.
+     * given the child changeset target.
      *
-     * @param {pentaho.type.mixins.Container} childOwner - The owner of the child changeset.
+     * @param {pentaho.type.mixins.Container} childTarget - The target of the child changeset.
      * @private
      */
-    __addParentsToCommitWillQueue: function(childOwner) {
-      var irefs = this.getAmbientReferences(childOwner);
+    __addParentsToCommitWillQueue: function(childTarget) {
+      var irefs = this.getAmbientReferences(childTarget);
       if(irefs !== null) {
         var L = irefs.length;
         var i = -1;
@@ -793,7 +793,7 @@ define([
      */
     __addToCommitWillQueue: function(changeset, forceIfRan) {
       // Safe to not use O.hasOwn because container uids are numeric strings (cannot be "__proto__").
-      var uid = changeset.owner.$uid;
+      var uid = changeset.target.$uid;
       if(!this.__commitWillQueueSet[uid] && (forceIfRan || !this.__commitWillRanSet[uid])) {
 
         this.__commitWillQueue.push(changeset);
@@ -830,7 +830,7 @@ define([
       // Remove from the queue if it's there.
       // Leave it in the set though.
       var commitWillQueue = this.__commitWillQueue;
-      if(commitWillQueue !== null && this.__commitWillQueueSet[changeset.owner.$uid]) {
+      if(commitWillQueue !== null && this.__commitWillQueueSet[changeset.target.$uid]) {
         var index = commitWillQueue.search(changeset);
         if(index >= 0) {
           commitWillQueue.splice(index, 1);
@@ -893,7 +893,7 @@ define([
     // @private
     __applyChanges: function() {
       // Apply all changesets.
-      // Includes setting owner versions to the new txn version.
+      // Includes setting target versions to the new txn version.
       var version = __takeNextVersion();
 
       this.__crefs.forEach(function(cref) {
@@ -929,8 +929,8 @@ define([
 
       // jshint laxbreak:true
       var mapper = reason
-        ? function(cset) { cset.owner._onChangeRejected(cset, reason); }
-        : function(cset) { cset.owner._onChangeDid(cset); };
+        ? function(cset) { cset.target._onChangeRejected(cset, reason); }
+        : function(cset) { cset.target._onChangeDid(cset); };
 
       __txnInCommitDid.push(this);
 

@@ -55,27 +55,27 @@ define([
 
     describe("instance -", function() {
       var changeset;
-      var owner;
+      var target;
       var listChangeset;
       var myList;
       var scope;
       var properties = ["foo", "myList"];
 
       beforeEach(function() {
-        owner = new Derived({
+        target = new Derived({
           foo: 5,
           bar: 6,
           myList: [1]
         });
-        myList = owner.myList;
+        myList = target.myList;
 
         scope = Transaction.enter();
 
-        owner.foo = 10;
-        owner.myList.add(3);
+        target.foo = 10;
+        target.myList.add(3);
 
         listChangeset = myList.$changeset;
-        changeset = owner.$changeset;
+        changeset = target.$changeset;
       });
 
       afterEach(function() {
@@ -92,9 +92,9 @@ define([
           var transaction = scope.transaction;
           var transactionVersion = transaction.version;
 
-          var owner = new Derived();
+          var target = new Derived();
 
-          var changeset = new ComplexChangeset(transaction, owner);
+          var changeset = new ComplexChangeset(transaction, target);
 
           expect(changeset.transactionVersion).toBe(transactionVersion);
         });
@@ -103,25 +103,25 @@ define([
 
           var transactionVersion = changeset.transactionVersion;
 
-          owner.bar = 20;
+          target.bar = 20;
 
           expect(changeset.transactionVersion).toBeGreaterThan(transactionVersion);
         });
 
         it("should be incremented when the value of a property goes back to its initial value", function() {
 
-          owner.bar = 20;
+          target.bar = 20;
 
           var transactionVersion = changeset.transactionVersion;
 
-          owner.bar = 5;
+          target.bar = 5;
 
           expect(changeset.transactionVersion).toBeGreaterThan(transactionVersion);
         });
 
         it("should be incremented when changes are cleared", function() {
 
-          owner.bar = 20;
+          target.bar = 20;
 
           var transactionVersion = changeset.transactionVersion;
 
@@ -134,7 +134,7 @@ define([
 
           var transactionVersion = changeset.transactionVersion;
 
-          owner.myList.add(4);
+          target.myList.add(4);
 
           expect(changeset.transactionVersion).toBeGreaterThan(transactionVersion);
         });
@@ -143,7 +143,7 @@ define([
 
           var transactionVersion = changeset.transactionVersion;
 
-          owner.myList.$changeset.clearChanges();
+          target.myList.$changeset.clearChanges();
 
           expect(changeset.transactionVersion).toBeGreaterThan(transactionVersion);
         });
@@ -189,7 +189,7 @@ define([
           scope.acceptWill();
         });
 
-        it("should throw an error if the property does not exist in the owner of the changeset", function() {
+        it("should throw an error if the property does not exist in the target of the changeset", function() {
           expect(function() {
             changeset.getChange("baz");
           }).toThrow(errorMatch.argInvalid("name"));
@@ -208,7 +208,7 @@ define([
 
       // region #hasChange
       describe("#hasChange -", function() {
-        it("should throw an error if the property does not exist in the owner of the changeset", function() {
+        it("should throw an error if the property does not exist in the target of the changeset", function() {
           expect(function() {
             changeset.hasChange("baz");
           }).toThrow(errorMatch.argInvalid("name"));
@@ -223,10 +223,10 @@ define([
         });
       }); // endregion #hasChange
 
-      // region #owner.get
-      describe("#owner.get()", function() {
+      // region #target.get
+      describe("#target.get()", function() {
         it("should return the property's original value if it isn't changing", function() {
-          expect(owner.bar).toBe(6);
+          expect(target.bar).toBe(6);
         });
 
         it("should return the the property's new value if has changed", function() {
@@ -238,7 +238,7 @@ define([
 
       // region #getOld
       describe("#getOld -", function() {
-        it("should throw an error if the property does not exist in the owner of the changeset", function() {
+        it("should throw an error if the property does not exist in the target of the changeset", function() {
           expect(function() {
             changeset.getOld("baz");
           }).toThrow(errorMatch.argInvalid("name"));
@@ -251,8 +251,8 @@ define([
         });
       }); // endregion #getOld
 
-      // region #owner.set()
-      describe("#owner.set() -", function() {
+      // region #target.set()
+      describe("#target.set() -", function() {
 
         beforeEach(function() {
           if(scope.isCurrent) scope.exit();
@@ -314,7 +314,7 @@ define([
           txnScope.dispose();
         });
 
-        it("should redirect Complex#set on owner to its ambient changeset", function() {
+        it("should redirect Complex#set on target to its ambient changeset", function() {
 
           var txnScope = Transaction.enter();
 
@@ -326,7 +326,7 @@ define([
           var changeset = txnScope.transaction.ensureChangeset(derived);
 
           expect(changeset.hasChanges).toBe(false);
-          expect(changeset.owner).toBe(derived);
+          expect(changeset.target).toBe(derived);
 
           // ---
 
@@ -366,7 +366,7 @@ define([
           var changeset = txnScope.transaction.ensureChangeset(derived);
 
           expect(changeset.hasChanges).toBe(false);
-          expect(changeset.owner).toBe(derived);
+          expect(changeset.target).toBe(derived);
 
           // ---
 
@@ -417,7 +417,7 @@ define([
           var changeset = txnScope.transaction.ensureChangeset(derived);
 
           expect(changeset.hasChanges).toBe(false);
-          expect(changeset.owner).toBe(derived);
+          expect(changeset.target).toBe(derived);
 
           // ---
           // Replace foo.
@@ -443,7 +443,7 @@ define([
           txnScope.dispose();
         });
 
-      }); // endregion #owner.set()
+      }); // endregion #target.set()
 
       // region #propertyNames
       describe("#propertyNames -", function() {
@@ -467,20 +467,20 @@ define([
 
       // region scope.accept()
       describe("scope.accept()", function() {
-        it("should apply changes to its owner", function() {
-          expect(owner.foo).toBe(10);
+        it("should apply changes to its target", function() {
+          expect(target.foo).toBe(10);
 
           scope.accept();
 
-          expect(owner.foo).toBe(10);
+          expect(target.foo).toBe(10);
         });
 
-        it("should update the version of its owner", function() {
-          var version0 = owner.$version;
+        it("should update the version of its target", function() {
+          var version0 = target.$version;
 
           scope.accept();
 
-          expect(owner.$version).toBeGreaterThan(version0);
+          expect(target.$version).toBeGreaterThan(version0);
         });
 
         it("should apply all changes of a contained ListChangeset", function() {
@@ -519,7 +519,7 @@ define([
             expect(changeset.hasChanges).toBe(false);
           });
 
-          owner.on("will:change", willListener);
+          target.on("will:change", willListener);
 
           scope.acceptWill();
 
@@ -536,7 +536,7 @@ define([
             expect(listChangeset.hasChanges).toBe(false);
           });
 
-          owner.on("will:change", willListener);
+          target.on("will:change", willListener);
 
           scope.acceptWill();
 

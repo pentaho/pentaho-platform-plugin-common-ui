@@ -62,7 +62,7 @@ define([
     },
 
     __getAdaptationModel: function() {
-      return this.__adaptationModel = __createAdaptationModel(this.owner, this.__adaptationModel, this);
+      return this.__adaptationModel = __createAdaptationModel(this.target, this.__adaptationModel, this);
     },
 
     /** @inheritDoc */

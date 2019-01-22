@@ -38,11 +38,11 @@ define([
      * @class
      * @extends pentaho.lang.Base
      * @constructor
-     * @param {pentaho.type.mixins.Container} owner - The owner container.
+     * @param {pentaho.type.mixins.Container} target - The target container.
      * @private
      */
-    constructor: function(owner) {
-      this.owner = owner;
+    constructor: function(target) {
+      this.target = target;
 
       this.__refsAdd = null;
       this.__refsRem = null;
@@ -50,11 +50,11 @@ define([
     },
 
     /**
-     * Adds a reference to the owner of this changeset.
+     * Adds a reference to the target of this changeset.
      *
-     * @param {pentaho.type.mixins.Container} container - The container that references the owner of the changeset.
+     * @param {pentaho.type.mixins.Container} container - The container that references the target of the changeset.
      * @param {pentaho.type.PropertyType} [propType] When `container` is a complex,
-     * the property type whose value contains the owner of this changeset.
+     * the property type whose value contains the target of this changeset.
      */
     addReference: function(container, propType) {
       if((this.__refsRem !== null && this.__refsRem.remove(container, propType)) ||
@@ -86,7 +86,7 @@ define([
     get projectedReferences() {
       var refsCache = this.__refsCache;
       if(refsCache === undefined) {
-        this.__refsCache = refsCache = this.__updateReferences(this.owner.__refs, /* mutate: */false);
+        this.__refsCache = refsCache = this.__updateReferences(this.target.__refs, /* mutate: */false);
       }
 
       return refsCache;
@@ -95,16 +95,16 @@ define([
     apply: function() {
       var refsCache = this.__refsCache;
       if(refsCache === undefined) {
-        this.owner.__refs = this.__updateReferences(this.owner.__refs, /* mutate: */true);
+        this.target.__refs = this.__updateReferences(this.target.__refs, /* mutate: */true);
       } else {
-        this.owner.__refs = refsCache;
+        this.target.__refs = refsCache;
       }
     },
 
     /**
      * Updates a given references array with the reference changes in this changeset.
      *
-     * When there are no ref changes, the owner refs are returned, which, note, can be `null`.
+     * When there are no ref changes, the target refs are returned, which, note, can be `null`.
      *
      * @param {pentaho.type.ReferenceList} refs - The references list to update, or `null`.
      * @param {boolean} mutate - Indicates if the given list can be mutated, or if a copy must be created.

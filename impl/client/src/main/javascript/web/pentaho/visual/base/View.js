@@ -431,7 +431,7 @@ define([
         var i = -1;
         while(++i < L) {
           var changesetPending = changesetsPending[i];
-          if(changesetPending.ownerVersion >= this.__dirtyLastVersion) {
+          if(changesetPending.targetVersion >= this.__dirtyLastVersion) {
 
             var bitSetNew = new BitSet();
 
@@ -870,7 +870,7 @@ define([
     },
 
     // region Property groups - instance
-    // see Base.js
+    // see Generic.js
     /** @inheritDoc */
     extend: function(source, keyArgs) {
 
@@ -1158,7 +1158,7 @@ define([
     // endregion
 
     // region Property groups - class
-    // see Base.js
+    // see Generic.js
     /** @inheritDoc */
     _subclassed: function(Subclass, instSpec, classSpec, keyArgs) {
 

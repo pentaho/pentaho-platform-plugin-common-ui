@@ -226,24 +226,24 @@ define([
 
         it("should not try to add or remove references", function() {
 
-          var owner = new DerivedComplex({x: "1"});
+          var target = new DerivedComplex({x: "1"});
 
           // ---
 
-          owner.x = "2";
+          target.x = "2";
         });
 
         it("should not try to cancel removed references when changes are cleared", function() {
 
-          var owner = new DerivedComplex({x: "1"});
+          var target = new DerivedComplex({x: "1"});
 
           // ---
 
-          owner.x = "2";
+          target.x = "2";
 
           // ---
 
-          owner.$changeset.clearChanges();
+          target.$changeset.clearChanges();
         });
       });
 
@@ -251,32 +251,32 @@ define([
 
         it("should remove add and remove references as soon as the change is made, as ambient values", function() {
 
-          var owner = new ComplexOfComplex({y: {x: "1"}});
-          var elem1 = owner.y;
+          var target = new ComplexOfComplex({y: {x: "1"}});
+          var elem1 = target.y;
           var elem2 = new DerivedComplex({x: "2"});
 
-          expectSingleRefTo(elem1, owner, propY);
+          expectSingleRefTo(elem1, target, propY);
           expectNoRefs(elem2);
 
           // ---
 
-          owner.y = elem2;
+          target.y = elem2;
 
           // ---
 
           expectNoRefs(elem1);
-          expectSingleRefTo(elem2, owner, propY);
+          expectSingleRefTo(elem2, target, propY);
         });
 
         it("should add and remove references but should have no effect if rejected", function() {
 
-          var owner = new ComplexOfComplex({y: {x: "1"}});
-          var elem1 = owner.y;
+          var target = new ComplexOfComplex({y: {x: "1"}});
+          var elem1 = target.y;
           var elem2 = new DerivedComplex({x: "2"});
 
           // ---
 
-          owner.y = elem2;
+          target.y = elem2;
 
           // ---
 
@@ -284,19 +284,19 @@ define([
 
           // ---
 
-          expectSingleRefTo(elem1, owner, propY);
+          expectSingleRefTo(elem1, target, propY);
           expectNoRefs(elem2);
         });
 
         it("should add and remove references but should have no effect if exited from", function() {
 
-          var owner = new ComplexOfComplex({y: {x: "1"}});
-          var elem1 = owner.y;
+          var target = new ComplexOfComplex({y: {x: "1"}});
+          var elem1 = target.y;
           var elem2 = new DerivedComplex({x: "2"});
 
           // ---
 
-          owner.y = elem2;
+          target.y = elem2;
 
           // ---
 
@@ -304,19 +304,19 @@ define([
 
           // ---
 
-          expectSingleRefTo(elem1, owner, propY);
+          expectSingleRefTo(elem1, target, propY);
           expectNoRefs(elem2);
         });
 
         it("should really add and remove references if committed", function() {
 
-          var owner = new ComplexOfComplex({y: {x: "1"}});
-          var elem1 = owner.y;
+          var target = new ComplexOfComplex({y: {x: "1"}});
+          var elem1 = target.y;
           var elem2 = new DerivedComplex({x: "2"});
 
           // ---
 
-          owner.y = elem2;
+          target.y = elem2;
 
           // ---
 
@@ -325,80 +325,80 @@ define([
           // ---
 
           expectNoRefs(elem1);
-          expectSingleRefTo(elem2, owner, propY);
+          expectSingleRefTo(elem2, target, propY);
         });
 
         it("should cancel added and removed references when changes are cleared, in ambient values", function() {
 
-          var owner = new ComplexOfComplex({y: {x: "1"}});
-          var elem1 = owner.y;
+          var target = new ComplexOfComplex({y: {x: "1"}});
+          var elem1 = target.y;
           var elem2 = new DerivedComplex({x: "2"});
 
           // ---
 
-          owner.y = elem2;
+          target.y = elem2;
 
           // ---
 
-          owner.$changeset.clearChanges();
+          target.$changeset.clearChanges();
 
           // ---
 
-          expectSingleRefTo(elem1, owner, propY);
+          expectSingleRefTo(elem1, target, propY);
           expectNoRefs(elem2);
         });
 
         it("should cancel added and removed references when changes are cleared, and committed", function() {
 
-          var owner = new ComplexOfComplex({y: {x: "1"}});
-          var elem1 = owner.y;
+          var target = new ComplexOfComplex({y: {x: "1"}});
+          var elem1 = target.y;
           var elem2 = new DerivedComplex({x: "2"});
 
           // ---
 
-          owner.y = elem2;
+          target.y = elem2;
 
           // ---
 
-          owner.$changeset.clearChanges();
+          target.$changeset.clearChanges();
 
           scope.accept();
 
           // ---
 
-          expectSingleRefTo(elem1, owner, propY);
+          expectSingleRefTo(elem1, target, propY);
           expectNoRefs(elem2);
         });
 
         it("should add and remove references, but if the initial element is set again, " +
             "it should restore the changed references and become visible again as ambient values", function() {
 
-          var owner = new ComplexOfComplex({y: {x: "1"}});
-          var elem1 = owner.y;
+          var target = new ComplexOfComplex({y: {x: "1"}});
+          var elem1 = target.y;
           var elem2 = new DerivedComplex({x: "2"});
 
           // ---
 
-          owner.y = elem2;
-          owner.y = elem1;
+          target.y = elem2;
+          target.y = elem1;
 
           // ---
 
-          expectSingleRefTo(elem1, owner, propY);
+          expectSingleRefTo(elem1, target, propY);
           expectNoRefs(elem2);
         });
 
         it("should add and remove references, but if the initial element is set again, " +
             "it should restore the changed references and still be there when committed", function() {
 
-          var owner = new ComplexOfComplex({y: {x: "1"}});
-          var elem1 = owner.y;
+          var target = new ComplexOfComplex({y: {x: "1"}});
+          var elem1 = target.y;
           var elem2 = new DerivedComplex({x: "2"});
 
           // ---
 
-          owner.y = elem2;
-          owner.y = elem1;
+          target.y = elem2;
+          target.y = elem1;
 
           // ---
 
@@ -406,21 +406,21 @@ define([
 
           // ---
 
-          expectSingleRefTo(elem1, owner, propY);
+          expectSingleRefTo(elem1, target, propY);
           expectNoRefs(elem2);
         });
 
         it("should add and remove references, but if the initial element is set again, " +
            "it should restore the changed references and still be there when rejected", function() {
 
-          var owner = new ComplexOfComplex({y: {x: "1"}});
-          var elem1 = owner.y;
+          var target = new ComplexOfComplex({y: {x: "1"}});
+          var elem1 = target.y;
           var elem2 = new DerivedComplex({x: "2"});
 
           // ---
 
-          owner.y = elem2;
-          owner.y = elem1;
+          target.y = elem2;
+          target.y = elem1;
 
           // ---
 
@@ -428,57 +428,57 @@ define([
 
           // ---
 
-          expectSingleRefTo(elem1, owner, propY);
+          expectSingleRefTo(elem1, target, propY);
           expectNoRefs(elem2);
         });
 
         it("should add and remove references, but if another value is set, " +
             "references should be changed again, as ambient values", function() {
 
-          var owner = new ComplexOfComplex({y: {x: "1"}});
-          var elem1 = owner.y;
+          var target = new ComplexOfComplex({y: {x: "1"}});
+          var elem1 = target.y;
           var elem2 = new DerivedComplex({x: "2"});
           var elem3 = new DerivedComplex({x: "3"});
 
           // ---
 
-          expectSingleRefTo(elem1, owner, propY);
+          expectSingleRefTo(elem1, target, propY);
           expectNoRefs(elem2);
           expectNoRefs(elem3);
 
           // ---
 
-          owner.y = elem2;
+          target.y = elem2;
 
           // ---
 
           expectNoRefs(elem1);
-          expectSingleRefTo(elem2, owner, propY);
+          expectSingleRefTo(elem2, target, propY);
           expectNoRefs(elem3);
 
           // ---
 
-          owner.y = elem3;
+          target.y = elem3;
 
           // ---
 
           expectNoRefs(elem1);
           expectNoRefs(elem2);
-          expectSingleRefTo(elem3, owner, propY);
+          expectSingleRefTo(elem3, target, propY);
         });
 
         it("should add and remove references, but if another value is set, " +
            "references should be changed again, and still be there if committed", function() {
 
-          var owner = new ComplexOfComplex({y: {x: "1"}});
-          var elem1 = owner.y;
+          var target = new ComplexOfComplex({y: {x: "1"}});
+          var elem1 = target.y;
           var elem2 = new DerivedComplex({x: "2"});
           var elem3 = new DerivedComplex({x: "3"});
 
           // ---
 
-          owner.y = elem2;
-          owner.y = elem3;
+          target.y = elem2;
+          target.y = elem3;
 
           // ---
 
@@ -488,21 +488,21 @@ define([
 
           expectNoRefs(elem1);
           expectNoRefs(elem2);
-          expectSingleRefTo(elem3, owner, propY);
+          expectSingleRefTo(elem3, target, propY);
         });
 
         it("should add and remove references, but if another value is set, " +
            "references should be changed again, but be forgotten if rejected", function() {
 
-          var owner = new ComplexOfComplex({y: {x: "1"}});
-          var elem1 = owner.y;
+          var target = new ComplexOfComplex({y: {x: "1"}});
+          var elem1 = target.y;
           var elem2 = new DerivedComplex({x: "2"});
           var elem3 = new DerivedComplex({x: "3"});
 
           // ---
 
-          owner.y = elem2;
-          owner.y = elem3;
+          target.y = elem2;
+          target.y = elem3;
 
           // ---
 
@@ -510,7 +510,7 @@ define([
 
           // ---
 
-          expectSingleRefTo(elem1, owner, propY);
+          expectSingleRefTo(elem1, target, propY);
           expectNoRefs(elem2);
           expectNoRefs(elem3);
         });
@@ -518,23 +518,23 @@ define([
         it("should add and remove references, but if another value is set, " +
             "references should be changed again, but be forgotten if changes cleared, as ambient values", function() {
 
-          var owner = new ComplexOfComplex({y: {x: "1"}});
-          var elem1 = owner.y;
+          var target = new ComplexOfComplex({y: {x: "1"}});
+          var elem1 = target.y;
           var elem2 = new DerivedComplex({x: "2"});
           var elem3 = new DerivedComplex({x: "3"});
 
           // ---
 
-          owner.y = elem2;
-          owner.y = elem3;
+          target.y = elem2;
+          target.y = elem3;
 
           // ---
 
-          owner.$changeset.clearChanges();
+          target.$changeset.clearChanges();
 
           // ---
 
-          expectSingleRefTo(elem1, owner, propY);
+          expectSingleRefTo(elem1, target, propY);
           expectNoRefs(elem2);
           expectNoRefs(elem3);
         });
@@ -542,24 +542,24 @@ define([
         it("should add and remove references, but if another value is set, " +
             "references should be changed again, but be forgotten if changes cleared, and committed", function() {
 
-          var owner = new ComplexOfComplex({y: {x: "1"}});
-          var elem1 = owner.y;
+          var target = new ComplexOfComplex({y: {x: "1"}});
+          var elem1 = target.y;
           var elem2 = new DerivedComplex({x: "2"});
           var elem3 = new DerivedComplex({x: "3"});
 
           // ---
 
-          owner.y = elem2;
-          owner.y = elem3;
+          target.y = elem2;
+          target.y = elem3;
 
           // ---
 
-          owner.$changeset.clearChanges();
+          target.$changeset.clearChanges();
           scope.accept();
 
           // ---
 
-          expectSingleRefTo(elem1, owner, propY);
+          expectSingleRefTo(elem1, target, propY);
           expectNoRefs(elem2);
           expectNoRefs(elem3);
         });

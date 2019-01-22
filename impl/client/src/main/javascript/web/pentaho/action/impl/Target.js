@@ -16,7 +16,7 @@
 define([
   "module",
   "pentaho/lang/EventSource",
-  "../Base",
+  "../Generic",
   "../Execution",
   "pentaho/util/error"
 ], function(module, EventSource, ActionBase, ActionExecution, error) {

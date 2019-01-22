@@ -88,7 +88,7 @@ define([
     _prepare: function(changeset) {
       var property = this.property;
       if(!property.isBoundary && !property.valueType.isSimple) {
-        this.__replace(changeset, changeset.owner.__getByName(property.name), this.__value);
+        this.__replace(changeset, changeset.target.__getByName(property.name), this.__value);
       }
     },
 
@@ -96,7 +96,7 @@ define([
     _cancel: function(changeset) {
       var property = this.property;
       if(!property.isBoundary && !property.valueType.isSimple) {
-        this.__replace(changeset, this.__value, changeset.owner.__getByName(property.name));
+        this.__replace(changeset, this.__value, changeset.target.__getByName(property.name));
       }
     },
 

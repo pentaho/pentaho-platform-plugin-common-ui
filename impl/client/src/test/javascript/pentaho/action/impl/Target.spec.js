@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/action/impl/Target",
-  "pentaho/action/Base",
+  "pentaho/action/Generic",
   "pentaho/action/Execution",
   "pentaho/lang/Base"
 ], function(TargetMixin, BaseAction, Execution, Base) {
@@ -182,19 +182,6 @@ define([
         var ae = target.act(new SyncAction());
 
         expect(ae instanceof Execution).toBe(true);
-      });
-
-      // TODO remove?
-      xit("should accept an Action specification argument", function() {
-
-        var target = new CustomTarget();
-        var ae = target.act({
-          _: {
-            base: "pentaho/action/Base"
-          }
-        });
-
-        expect(ae.action instanceof BaseAction).toBe(true);
       });
 
       it("should create an action execution with itself as target", function() {

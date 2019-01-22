@@ -42,13 +42,13 @@ define([
    * @description Creates a new instance.
    *
    * @param {pentaho.type.changes.Transaction} transaction - The owning transaction.
-   * @param {pentaho.type.List} owner - The list value where the changes take place.
+   * @param {pentaho.type.List} target - The list value where the changes take place.
    */
   return Changeset.extend(module.id, /** @lends pentaho.type.changes.ListChangeset# */{
 
-    constructor: function(transaction, owner) {
+    constructor: function(transaction, target) {
 
-      this.base(transaction, owner);
+      this.base(transaction, target);
 
       /**
        * Map of the existing child changesets, with current primitive changes applied.
@@ -74,7 +74,7 @@ define([
     /**
      * Gets the list value where the changes take place.
      *
-     * @name pentaho.type.changes.ListChangeset#owner
+     * @name pentaho.type.changes.ListChangeset#target
      * @type {pentaho.type.List}
      * @readonly
      */
@@ -163,7 +163,7 @@ define([
 
       // The transaction version is already affected by the __addChange or _clearChanges methods.
 
-      this.transaction.__ensureChangeRef(element).addReference(this.owner);
+      this.transaction.__ensureChangeRef(element).addReference(this.target);
 
       var childChangeset = element.__cset;
       if(childChangeset !== null) {
@@ -183,7 +183,7 @@ define([
     __removeComplexElement: function(element) {
       // The transaction version is already affected by the __addChange or _clearChanges methods.
 
-      this.transaction.__ensureChangeRef(element).removeReference(this.owner);
+      this.transaction.__ensureChangeRef(element).removeReference(this.target);
 
       var childChangeset = element.__cset;
       if(childChangeset !== null) {
@@ -210,7 +210,7 @@ define([
       // This is called when the child changeset is a current child.
       // However, if a remove or clear change is added,
       // this child changeset is not being removed...
-      this.__changesetByKey[childChangeset.owner.$key] = childChangeset;
+      this.__changesetByKey[childChangeset.target.$key] = childChangeset;
 
       // `childChangeset` was just created.
       // In its constructor, its transaction version is set to the latest of the transaction.
@@ -223,7 +223,7 @@ define([
     /**
      * Gets a mock projection of the updated list value.
      *
-     * When there are no changes, the owner list returned.
+     * When there are no changes, the target list returned.
      * Otherwise, a projected mock containing only
      * the elements' data structures is created and returned.
      *
@@ -235,11 +235,11 @@ define([
     get __projectedMock() {
       var changeCount = this.__primitiveChanges.length;
       if(changeCount === 0) {
-        return this.owner;
+        return this.target;
       }
 
       var projectedMock = this.__projMock ||
-          (this.__projMock = this.owner._cloneElementData({changeCount: 0}, /* useCommitted: */true));
+          (this.__projMock = this.target._cloneElementData({changeCount: 0}, /* useCommitted: */true));
 
       if(projectedMock.changeCount < changeCount) {
         this.__applyFrom(projectedMock, projectedMock.changeCount);
@@ -251,7 +251,7 @@ define([
 
     /** @inheritDoc */
     _apply: function(target) {
-      if(target === this.owner && this.__projMock) {
+      if(target === this.target && this.__projMock) {
 
         // Reuse `__projMock`'s fields and discard it afterwards.
 
@@ -308,7 +308,7 @@ define([
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
-     * @throws {TypeError} When a change would occur and the owner list
+     * @throws {TypeError} When a change would occur and the target list
      * is [read-only]{@link pentaho.type.List#$isReadOnly}.
      *
      * @private
@@ -322,12 +322,12 @@ define([
       var list = this.__projectedMock; // Calculate relative to the last change.
       var elems = list.__elems;
       var keys = list.__keys;
-      var elemType = this.owner.$type.elementType;
+      var elemType = this.target.$type.elementType;
       var existing;
       var elem;
       var key;
-      var isOwnerReadOnly = this.owner.$isReadOnly;
-      var needReadOnlyElementValidation = this.owner.__needReadOnlyElementValidation;
+      var isTargetReadOnly = this.target.$isReadOnly;
+      var needReadOnlyElementValidation = this.target.__needReadOnlyElementValidation;
 
       // Next insert index.
       // It will be corrected with the removes
@@ -423,8 +423,8 @@ define([
               --index;
             }
 
-            if(isOwnerReadOnly) {
-              this.owner.__assertEditable();
+            if(isTargetReadOnly) {
+              this.target.__assertEditable();
             }
 
             this.__addChange(new Remove([elem], i - removeCount));
@@ -459,8 +459,8 @@ define([
 
           var newIndex = index + action.to;
 
-          if(isOwnerReadOnly) {
-            this.owner.__assertEditable();
+          if(isTargetReadOnly) {
+            this.target.__assertEditable();
           }
 
           if(needReadOnlyElementValidation && !action.value.$type.isReadOnly) {
@@ -488,8 +488,8 @@ define([
             if(currentIndex < baseIndex + i || currentIndex < lastDestinationIndex) {
               var destinationIndex = Math.max(baseIndex + i, lastDestinationIndex);
 
-              if(isOwnerReadOnly) {
-                this.owner.__assertEditable();
+              if(isTargetReadOnly) {
+                this.target.__assertEditable();
               }
 
               this.__addChange(new Move([elem], currentIndex, destinationIndex));
@@ -513,7 +513,7 @@ define([
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
-     * @throws {TypeError} When a change would occur and the owner list
+     * @throws {TypeError} When a change would occur and the target list
      * is [read-only]{@link pentaho.type.List#$isReadOnly}.
      *
      * @see pentaho.type.changes.Remove
@@ -526,7 +526,7 @@ define([
       this._assertWritable();
 
       var list = this.__projectedMock; // Calculate relative to the last change.
-      var elemType = this.owner.$type.elementType;
+      var elemType = this.target.$type.elementType;
       var elems = list.__elems;
       var keys = list.__keys;
       var removeElems = Array.isArray(fragment)
@@ -562,7 +562,7 @@ define([
 
       if((L = removedInfos.length)) {
 
-        this.owner.__assertEditable();
+        this.target.__assertEditable();
 
         // II - Order descending so indexes keep valid
         removedInfos.sort(function(info1, info2) {
@@ -603,7 +603,7 @@ define([
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
-     * @throws {TypeError} When a change would occur and the owner list
+     * @throws {TypeError} When a change would occur and the target list
      * is [read-only]{@link pentaho.type.List#$isReadOnly}.
      *
      * @see pentaho.type.changes.Remove
@@ -627,7 +627,7 @@ define([
 
       if(start < 0) start = Math.max(0, L + start);
 
-      this.owner.__assertEditable();
+      this.target.__assertEditable();
 
       var removed = list.__elems.slice(start, start + count);
 
@@ -643,7 +643,7 @@ define([
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
-     * @throws {TypeError} When a change would occur and the owner list
+     * @throws {TypeError} When a change would occur and the target list
      * is [read-only]{@link pentaho.type.List#$isReadOnly}.
      *
      * @see pentaho.type.changes.Move
@@ -655,11 +655,11 @@ define([
 
       this._assertWritable();
 
-      var owner = this.owner;
-      var elem = owner.__cast(elemSpec);
-      var existing = owner.get(elem.$key);
+      var target = this.target;
+      var elem = target.__cast(elemSpec);
+      var existing = target.get(elem.$key);
       if(existing) {
-        var indexOld = owner.indexOf(existing);
+        var indexOld = target.indexOf(existing);
 
         // assert indexOld >= 0
 
@@ -669,7 +669,7 @@ define([
 
         if(indexOld !== indexNew) {
 
-          this.owner.__assertEditable();
+          this.target.__assertEditable();
 
           this.__addChange(new Move(elem, indexOld, indexNew));
         }
@@ -684,7 +684,7 @@ define([
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
-     * @throws {TypeError} When a change would occur and the owner list
+     * @throws {TypeError} When a change would occur and the target list
      * is [read-only]{@link pentaho.type.List#$isReadOnly}.
      *
      * @see pentaho.type.changes.Sort
@@ -696,7 +696,7 @@ define([
 
       this._assertWritable();
 
-      this.owner.__assertEditable();
+      this.target.__assertEditable();
 
       this.__addChange(new Sort(comparer));
     },
@@ -707,7 +707,7 @@ define([
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
-     * @throws {TypeError} When a change would occur and the owner list
+     * @throws {TypeError} When a change would occur and the target list
      * is [read-only]{@link pentaho.type.List#$isReadOnly}.
      *
      * @see pentaho.type.changes.Clear
@@ -719,11 +719,11 @@ define([
 
       this._assertWritable();
 
-      if(this.owner.count === 0) {
+      if(this.target.count === 0) {
         return;
       }
 
-      this.owner.__assertEditable();
+      this.target.__assertEditable();
 
       // See #__applyFrom.
       this.__lastClearIndex = this.__primitiveChanges.length;

@@ -94,7 +94,7 @@ define([
    * @see pentaho.type.spec.IType
    */
   var Instance = Base.extend("pentaho.type.Instance", /** @lends pentaho.type.Instance# */{
-    // NOTE: not calling base to block default Base.js from copying 1st argument into `this`.
+    // NOTE: not calling base to block default Generic.js from copying 1st argument into `this`.
     constructor: function() {
     },
 
@@ -230,7 +230,7 @@ define([
     },
 
     /*
-     * See `Base.js`.
+     * See `Generic.js`.
      * @ignore
      */
     _subclassed: function(SubInstCtor, instSpec, classSpec, keyArgs) {

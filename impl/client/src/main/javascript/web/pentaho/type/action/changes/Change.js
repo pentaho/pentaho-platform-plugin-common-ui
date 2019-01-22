@@ -16,16 +16,16 @@
 
 define([
   "module",
-  "pentaho/lang/Base"
-], function(module, Base) {
+  "pentaho/action/Abstract"
+], function(module, AbstractAction) {
 
   "use strict";
 
   /**
    * @name Change
-   * @memberOf pentaho.type.changes
+   * @memberOf pentaho.type.action.changes
    * @class
-   * @extends pentaho.lang.Base
+   * @extends pentaho.action.Abstract
    * @amd pentaho/type/changes/Change
    * @abstract
    *
@@ -34,20 +34,11 @@ define([
    *
    * @description Creates a `Change` instance.
    */
-  return Base.extend(module.id, /** @lends pentaho.type.changes.Change# */{
+  return AbstractAction.extend(module.id, /** @lends pentaho.type.action.changes.Change# */{
 
-    // Block default Base.js constructor
-    constructor: function() {}
-
-    /**
-     * Gets the type of change.
-     *
-     * @name type
-     * @memberOf pentaho.type.changes.Change#
-     * @type {string}
-     * @readonly
-     * @abstract
-     */
+    get eventName() {
+      return "change";
+    },
 
     /**
      * Gets the transaction version of this change.

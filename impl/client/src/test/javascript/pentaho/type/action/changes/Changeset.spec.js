@@ -34,7 +34,7 @@ define([
 
       var Derived;
 
-      var owner;
+      var target;
       var changeset;
       var scope;
 
@@ -51,11 +51,11 @@ define([
 
       beforeEach(function() {
 
-        owner = new Derived();
+        target = new Derived();
 
         scope = Transaction.enter();
 
-        changeset = new Changeset(scope.transaction, owner);
+        changeset = new Changeset(scope.transaction, target);
       });
 
       afterEach(function() {
@@ -66,7 +66,7 @@ define([
 
         function errorOnCreate(value) {
           expect(function() {
-            var changeset2 = new Changeset(value, owner);
+            var changeset2 = new Changeset(value, target);
           }).toThrow(errorMatch.argRequired("transaction"));
         }
 
@@ -75,12 +75,12 @@ define([
         errorOnCreate(undefined);
       });
 
-      it("should throw error when an owner isn't specified", function() {
+      it("should throw error when an target isn't specified", function() {
 
         function errorOnCreate(value) {
           expect(function() {
             var changeset2 = new Changeset(scope.transaction, value);
-          }).toThrow(errorMatch.argRequired("owner"));
+          }).toThrow(errorMatch.argRequired("target"));
         }
 
         errorOnCreate();
@@ -104,34 +104,34 @@ define([
         });
       });
 
-      // region #owner
-      describe("#owner -", function() {
-        it("should return the same owner that was passed to the constructor", function() {
-          expect(changeset.owner).toBe(owner);
+      // region #target
+      describe("#target -", function() {
+        it("should return the same target that was passed to the constructor", function() {
+          expect(changeset.target).toBe(target);
         });
 
-        it("should not allow changing the owner", function() {
+        it("should not allow changing the target", function() {
           expect(function() {
-            changeset.owner = "foo";
+            changeset.target = "foo";
           }).toThrowError(TypeError);
         });
-      }); // endregion #owner
+      }); // endregion #target
 
-      // region #ownerVersion
-      describe("#ownerVersion -", function() {
-        it("should return the version of the owner at the time it was passed to the constructor", function() {
+      // region #targetVersion
+      describe("#targetVersion -", function() {
+        it("should return the version of the target at the time it was passed to the constructor", function() {
 
-          var v = owner.$version;
+          var v = target.$version;
 
-          expect(changeset.ownerVersion).toBe(v);
+          expect(changeset.targetVersion).toBe(v);
         });
 
-        it("should not allow changing the ownerVersion", function() {
+        it("should not allow changing the targetVersion", function() {
           expect(function() {
-            changeset.ownerVersion = 200;
+            changeset.targetVersion = 200;
           }).toThrowError(TypeError);
         });
-      }); // endregion #ownerVersion
+      }); // endregion #targetVersion
 
       // region #_applyInternal
       describe("#_applyInternal(version)", function() {
@@ -144,22 +144,22 @@ define([
           expect(changeset._apply).toHaveBeenCalled();
         });
 
-        it("should call owner.__setVersionInternal", function() {
+        it("should call target.__setVersionInternal", function() {
           changeset._apply = jasmine.createSpy();
 
-          spyOn(changeset.owner, "__setVersionInternal");
+          spyOn(changeset.target, "__setVersionInternal");
 
           changeset._applyInternal(1);
 
-          expect(changeset.owner.__setVersionInternal).toHaveBeenCalledWith(1);
+          expect(changeset.target.__setVersionInternal).toHaveBeenCalledWith(1);
         });
 
-        it("should call _apply with the owner", function() {
+        it("should call _apply with the target", function() {
           changeset._apply = jasmine.createSpy();
 
           changeset._applyInternal(1);
 
-          expect(changeset._apply).toHaveBeenCalledWith(owner);
+          expect(changeset._apply).toHaveBeenCalledWith(target);
         });
       }); // endregion #_applyInternal
 

@@ -72,7 +72,7 @@ define([
     /** @inheritDoc */
     _prepare: function(changeset) {
 
-      var container = changeset.owner;
+      var container = changeset.target;
 
       if(!container.$isBoundary && !container.$type.elementType.isSimple) {
         var i = -1;
@@ -89,7 +89,7 @@ define([
     /** @inheritDoc */
     _cancel: function(changeset) {
 
-      var container = changeset.owner;
+      var container = changeset.target;
 
       if(!container.$isBoundary && !container.$type.elementType.isSimple) {
         var i = -1;

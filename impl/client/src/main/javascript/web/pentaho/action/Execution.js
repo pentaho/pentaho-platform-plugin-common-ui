@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,14 +66,14 @@ define([
      * ##### Synchronous or Asynchronous
      *
      * The associated action can be synchronous or asynchronous, as determined by the type property,
-     * {@link pentaho.action.BaseType#isSync}.
+     * {@link pentaho.action.Abstract.isSync}.
      * The execution of a synchronous action is completed synchronously.
      * while that of an asynchronous action only completes asynchronously,
      * due to its asynchronous "do" phase.
      *
      * The [execute]{@link pentaho.action.Execution#execute} method handles
      * the execution of both types of actions.
-     * When the associated action is [asynchronous]{@link pentaho.action.BaseType#isSync}, or
+     * When the associated action is [asynchronous]{@link pentaho.action.Base.isSync}, or
      * it is not know if it is synchronous or asynchronous,
      * after calling `execute`,
      * obtain the value of the [promise]{@link pentaho.action.Execution#promise} property

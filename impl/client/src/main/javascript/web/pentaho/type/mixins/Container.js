@@ -227,7 +227,7 @@ define([
     },
 
     /**
-     * Creates a changeset with this container as owner and returns it.
+     * Creates a changeset with this container as target and returns it.
      *
      * @name pentaho.type.mixins.Container#_createChangeset
      *

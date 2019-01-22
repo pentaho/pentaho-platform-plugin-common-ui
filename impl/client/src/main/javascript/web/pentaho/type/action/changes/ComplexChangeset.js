@@ -19,7 +19,7 @@ define([
   "./Changeset",
   "./ListChangeset",
   "./Replace",
-  "../../changes/Transaction",
+  "pentaho/type/changes/Transaction",
   "pentaho/util/object"
 ], function(module, Changeset, ListChangeset, Replace, Transaction, O) {
 
@@ -44,13 +44,13 @@ define([
    * @constructor
    * @description Creates a new instance.
    * @param {pentaho.type.changes.Transaction} transaction - The owning transaction.
-   * @param {pentaho.type.Complex} owner - The complex value where the changes take place.
+   * @param {pentaho.type.Complex} target - The complex value where the changes take place.
    */
   return Changeset.extend(module.id, /** @lends pentaho.type.changes.ComplexChangeset#*/{
 
-    constructor: function(transaction, owner) {
+    constructor: function(transaction, target) {
 
-      this.base(transaction, owner);
+      this.base(transaction, target);
 
       /**
        * A map of property name to a corresponding change.
@@ -65,7 +65,7 @@ define([
     /**
      * Gets the complex value where the changes take place.
      *
-     * @name pentaho.type.changes.ComplexChangeset#owner
+     * @name pentaho.type.changes.ComplexChangeset#target
      * @type {pentaho.type.Complex}
      * @readonly
      */
@@ -170,10 +170,10 @@ define([
       if(change !== null) {
         // If it's a changeset, it's either a ComplexChangeset or a ListChangeset, bubbling.
         // Otherwise, it's a `Replace` change.
-        return (change instanceof Changeset) ? change.owner : change.value;
+        return (change instanceof Changeset) ? change.target : change.value;
       }
 
-      return this.owner.__getByName(name);
+      return this.target.__getByName(name);
     },
 
     // ATTENTION: This method's name and signature must be in sync with that of Complex#__getStateByName.
@@ -187,7 +187,7 @@ define([
         return (change instanceof Changeset) ? PROP_VALUE_SPECIFIED : change.state;
       }
 
-      return this.owner.__getStateByName(name);
+      return this.target.__getStateByName(name);
     },
 
     /**
@@ -200,8 +200,8 @@ define([
      * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
      */
     getOld: function(name) {
-      var pName = this.owner.$type.get(name).name;
-      return this.owner.__getByName(pName);
+      var pName = this.target.$type.get(name).name;
+      return this.target.__getByName(pName);
     },
 
     /** @inheritDoc */
@@ -316,7 +316,7 @@ define([
       // The transaction version is already affected by the
       // __setPrimitiveChange, __removePrimitiveChange and __updateReplaceChange methods.
 
-      this.transaction.__ensureChangeRef(element).addReference(this.owner, propType);
+      this.transaction.__ensureChangeRef(element).addReference(this.target, propType);
 
       var childChangeset = element.__cset;
       if(childChangeset !== null) {
@@ -337,7 +337,7 @@ define([
       // The transaction version is already affected by the
       // __setPrimitiveChange, __removePrimitiveChange and __updateReplaceChange methods.
 
-      this.transaction.__ensureChangeRef(element).removeReference(this.owner, propType);
+      this.transaction.__ensureChangeRef(element).removeReference(this.target, propType);
 
       var childChangeset = element.__cset;
       if(childChangeset !== null) {
@@ -358,7 +358,7 @@ define([
      * @private
      */
     __resolvePropertyName: function(propertyOrName) {
-      return this.owner.$type.get(propertyOrName).name;
+      return this.target.$type.get(propertyOrName).name;
     },
 
     /** @inheritDoc */

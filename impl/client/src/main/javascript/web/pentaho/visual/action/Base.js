@@ -15,17 +15,10 @@
  */
 define([
   "pentaho/module!_",
-  "pentaho/action/Base"
+  "pentaho/action/Generic"
 ], function(module, ActionBase) {
 
   "use strict";
-
-  /**
-   * @name _fillSpec
-   * @memberOf pentaho.visual.action.Base#
-   *
-   * @abstract
-   */
 
   /**
    * @name Base
