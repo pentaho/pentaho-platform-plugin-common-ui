@@ -23,7 +23,7 @@ define([
   "pentaho/data/filter/Abstract",
   "pentaho/type/Object",
   "pentaho/util/object",
-  "pentaho/type/changes/ComplexChangeset",
+  "pentaho/type/action/changes/ComplexChangeset",
   "pentaho/i18n!model",
   // Pre-load all registered filter types.
   "pentaho/module/subtypesOf!pentaho/data/filter/Abstract"

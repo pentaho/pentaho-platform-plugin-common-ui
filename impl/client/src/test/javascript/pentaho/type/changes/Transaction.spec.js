@@ -18,7 +18,7 @@ define([
   "pentaho/type/changes/TransactionScope",
   "pentaho/type/changes/Transaction",
   "pentaho/type/changes/TransactionRejectedError",
-  "pentaho/type/changes/Changeset",
+  "pentaho/type/action/changes/Changeset",
   "pentaho/type/changes/ChangeRef",
   "tests/pentaho/util/errorMatch"
 ], function(Complex, TransactionScope, Transaction, TransactionRejectedError, Changeset, ChangeRef, errorMatch) {

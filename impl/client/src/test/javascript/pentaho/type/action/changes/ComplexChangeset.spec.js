@@ -18,8 +18,8 @@ define([
   "pentaho/type/List",
   "pentaho/type/Number",
   "pentaho/type/changes/Transaction",
-  "pentaho/type/changes/ComplexChangeset",
-  "pentaho/type/changes/ListChangeset",
+  "pentaho/type/action/changes/ComplexChangeset",
+  "pentaho/type/action/changes/ListChangeset",
   "tests/pentaho/util/errorMatch"
 ], function(Complex, List, PentahoNumber, Transaction, ComplexChangeset, ListChangeset, errorMatch) {
 
@@ -27,7 +27,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.type.ComplexChangeset -", function() {
+  describe("pentaho.type.action.ComplexChangeset -", function() {
 
     var NumberList;
     var Derived;

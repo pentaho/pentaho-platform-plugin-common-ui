@@ -18,9 +18,9 @@ define([
   "pentaho/type/List",
   "pentaho/type/Number",
   "pentaho/type/changes/Transaction",
-  "pentaho/type/changes/ListChangeset",
-  "pentaho/type/changes/ComplexChangeset",
-  "pentaho/type/changes/Add",
+  "pentaho/type/action/changes/ListChangeset",
+  "pentaho/type/action/changes/ComplexChangeset",
+  "pentaho/type/action/changes/Add",
   "tests/pentaho/util/errorMatch"
 ], function(Complex, List, PentahoNumber, Transaction, ListChangeset, ComplexChangeset, Add, errorMatch) {
 
@@ -28,7 +28,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false */
 
-  describe("pentaho.type.changes.ListChangeset", function() {
+  describe("pentaho.type.action.changes.ListChangeset", function() {
 
     function expectEqualValueAt(list, checkValues) {
       var L = checkValues.length;

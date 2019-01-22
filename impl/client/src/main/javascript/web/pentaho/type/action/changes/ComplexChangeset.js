@@ -19,7 +19,7 @@ define([
   "./Changeset",
   "./ListChangeset",
   "./Replace",
-  "./Transaction",
+  "../../changes/Transaction",
   "pentaho/util/object"
 ], function(module, Changeset, ListChangeset, Replace, Transaction, O) {
 

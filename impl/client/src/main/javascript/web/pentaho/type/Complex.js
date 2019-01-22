@@ -21,7 +21,7 @@ define([
   "./PropertyTypeCollection",
   "./util",
   "./mixins/Container",
-  "./changes/ComplexChangeset",
+  "./action/changes/ComplexChangeset",
   "pentaho/lang/ActionResult",
   "pentaho/lang/UserError",
   "pentaho/util/object",

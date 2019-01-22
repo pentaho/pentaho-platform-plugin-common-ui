@@ -16,14 +16,14 @@
 define([
   "pentaho/type/Complex",
   "pentaho/type/changes/Transaction",
-  "pentaho/type/changes/Replace"
+  "pentaho/type/action/changes/Replace"
 ], function(Complex, Transaction, Replace) {
 
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false */
 
-  describe("pentaho.type.changes.Replace", function() {
+  describe("pentaho.type.action.changes.Replace", function() {
 
     var DerivedComplex;
     var ComplexOfComplex;

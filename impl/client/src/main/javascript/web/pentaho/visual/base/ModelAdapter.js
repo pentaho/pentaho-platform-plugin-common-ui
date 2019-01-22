@@ -24,7 +24,7 @@ define([
   "pentaho/data/filter/And",
   "pentaho/type/loader",
   "pentaho/type/changes/Transaction",
-  "pentaho/type/changes/ComplexChangeset",
+  "pentaho/type/action/changes/ComplexChangeset",
   "pentaho/data/Table",
   "pentaho/data/util",
   "pentaho/util/object",

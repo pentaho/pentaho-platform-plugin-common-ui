@@ -16,7 +16,7 @@
 define([
   "pentaho/type/Complex",
   "pentaho/type/changes/Transaction",
-  "pentaho/type/changes/Changeset",
+  "pentaho/type/action/changes/Changeset",
   "tests/pentaho/util/errorMatch"
 ], function(Complex, Transaction, Changeset, errorMatch) {
 
@@ -24,7 +24,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false */
 
-  describe("pentaho.type.changes.Changeset", function() {
+  describe("pentaho.type.action.changes.Changeset", function() {
 
     it("should be defined", function() {
       expect(typeof Changeset).toBeDefined();
