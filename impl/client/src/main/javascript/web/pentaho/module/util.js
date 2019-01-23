@@ -16,12 +16,34 @@
 define([
   "../util/requireJSConfig!",
   "../util/object",
-  "../lang/OperationInvalidError"
-], function(requireJSConfig, O, OperationInvalidError) {
+  "../lang/OperationInvalidError",
+  "../lang/ArgumentRequiredError"
+], function(requireJSConfig, O, OperationInvalidError, ArgumentRequiredError) {
 
   "use strict";
 
   var moduleIdsMapByContextId = requireJSConfig.map || {};
+
+  /**
+   * Parses a versioned module id like:
+   *
+   * * `pentaho/visual/models/Bar` into
+   *
+   *     `[undefined, undefined, "pentaho/visual/models/Bar"]`
+   *
+   * * `pentaho-core@1.2.20-SNAPSHOT/pentaho/visual/models/Bar` into
+   *
+   *     `["pentaho-core", "1.2.20-SNAPSHOT", "pentaho/visual/models/Bar"]`
+   *
+   * * `@hitachivantara/pentaho-core@1.2.20-SNAPSHOT/pentaho/visual/models/Bar` into
+   *
+   *     `["@hitachivantara/pentaho-core", "1.2.20-SNAPSHOT", "pentaho/visual/models/Bar"]`
+   *
+   *
+   * @type RegExp
+   * @private
+   */
+  var reVersionedModuleId = /^(?:((?:@[^/@]+\/)?[^/@]+)@([^/@]+)\/)?(.*)$/;
 
   /**
    * The `util` namespace contains utility function for working with modules.
@@ -33,6 +55,11 @@ define([
   var util = {
     getBaseIdOf: function(id) {
       return id && id.replace(/.[^/]+$/, "");
+    },
+
+    getLeafIdOf: function(id) {
+      var match = id && /[^/]+$/.exec(id);
+      return match !== null ? match[0] : null;
     },
 
     getId: function(localRequire) {
@@ -106,6 +133,36 @@ define([
 
       // "Look up" moduleId in dependentMap, if any.
       return dependentMap !== null ? mapModuleId(dependentMap, absModuleId) : absModuleId;
+    },
+
+    /**
+     * Parses a module identifier produced by the Web Package system.
+     *
+     * It is assumed to have a structure similar to:
+     *
+     * * `@hitachivantara/pentaho-core@1.2.20/pentaho/visual/models/Bar`
+     *
+     * The package name and version part is optional and when not present,
+     * the whole `package` property will be returned null.
+     *
+     * @param {string} id - The module identifier.
+     * @return {({package: ?({name: string, version}), name: string})} The parsed module information.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When the module identifier has an invalid syntax.
+     *
+     * @private
+     */
+    parseId: function(id) {
+      if(id == null) {
+        throw new ArgumentRequiredError("id");
+      }
+
+      var match = reVersionedModuleId.exec(id);
+      // assert match !== null
+      return {
+        package: match[1] ? {name: match[1], version: match[2]} : null,
+        name: match[3]
+      };
     }
   };
 

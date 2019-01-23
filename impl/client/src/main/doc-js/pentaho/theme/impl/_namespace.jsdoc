@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,10 @@
  */
 
 /**
- * @classDesc The `spec.IConfiguration` interface contains the configuration of a theme.
+ * The `impl` namespace contains implementation types of the `pentaho.theme` namespace.
  *
- * @name IConfiguration
- * @memberOf pentaho.theme.spec
- * @interface
- *
- * @see pentaho.theme.main
+ * @name pentaho.theme.impl
+ * @namespace
+ * @private
  */
 
-/**
- * The absolute identifier of the main theme module.
- *
- * @name main
- * @memberOf pentaho.theme.spec.IConfiguration#
- * @type {?nonEmptyString}
- */
-
-/**
- * The absolute identifiers of the extension theme modules.
- *
- * @name extensions
- * @memberOf pentaho.theme.spec.IConfiguration#
- * @type {?Array.<nonEmptyString>}
- */

@@ -1,0 +1,99 @@
+/*!
+ * Copyright 2019 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @classDesc The `IService` interface contains methods for managing themes of modules.
+ *
+ * @name IService
+ * @memberOf pentaho.theme
+ * @interface
+ *
+ * @see pentaho.theme.main
+ * @see pentaho.theme.ThemeAnnotation
+ * @see pentaho.theme.LoadThemeAnnotation
+ */
+
+/**
+ * Loads the theme resources of a given module, if any.
+ *
+ * Determines if the module has an associated
+ * [ThemeAnnotation]{@link pentaho.theme.ThemeAnnotation},
+ * in which case its
+ * [main]{@link pentaho.theme.ThemeAnnotation#main} and
+ * [extensions]{@link pentaho.theme.ThemeAnnotation#extensions} resource modules
+ * are loaded.
+ *
+ * If module is a type module,
+ * any theme resources of ascendant modules are also loaded.
+ *
+ * @name loadModuleThemeAsync
+ * @memberOf pentaho.theme.IService#
+ * @method
+ * @param {string|pentaho.module.IMeta} moduleOrId - The module object or its identifier.
+ * @return {Promise} A promise which is resolved when the themes are loaded.
+ */
+
+/**
+ * Brands a DOM element so that the styles of CSS theme resources apply to it.
+ *
+ * Currently,
+ * two CSS classes are added to the element,
+ * one which identifies every version of this module and
+ * another which identifies exactly the current version.
+ *
+ * @name linkModuleTheme
+ * @memberOf pentaho.theme.IService#
+ * @method
+ * @param {string|pentaho.module.IMeta} moduleOrId - The module object or its identifier.
+ * @param {HTMLElement} domElement - The DOM element.
+ *
+ * @see pentaho.theme.IService#getModuleNameCssSelector
+ * @see pentaho.theme.IService#getModuleUniqueCssSelector
+ */
+
+/**
+ * Gets a CSS selector that selects all versions of a given module.
+ *
+ * As an example, if the given module had the identifier:
+ *
+ * * `@hitachivantara/pentaho-core@1.2.20/pentaho/visual/models/Bar`,
+ *
+ * then the selector would be:
+ *
+ * * `.pentaho-visual-models-Bar`.
+ *
+ * @name getModuleNameCssSelector
+ * @memberOf pentaho.theme.IService#
+ * @method
+ * @param {string|pentaho.module.IMeta} moduleOrId - The module object or its identifier.
+ * @return {string} The CSS selector.
+ *
+ * @see pentaho.theme.IService#getModuleUniqueCssSelector
+ */
+
+/**
+ * Gets a CSS selector that selects a given module.
+ *
+ * This method may return a random CSS selector associated with each module.
+ *
+ * @name getModuleUniqueCssSelector
+ * @memberOf pentaho.theme.IService#
+ * @method
+ * @param {string|pentaho.module.IMeta} moduleOrId - The module object or its identifier.
+ * @return {string} The CSS selector.
+ *
+ * @see pentaho.theme.IService#getModuleNameCssSelector
+ */

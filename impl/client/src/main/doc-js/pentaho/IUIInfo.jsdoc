@@ -1,0 +1,99 @@
+/*!
+ * Copyright 2019 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `IUIInfo` interface contains information which is generally useful for
+ * browsing some entity in a user interface.
+ *
+ * @name IUIInfo
+ * @memberOf pentaho
+ * @interface
+ */
+
+/**
+ * Gets a label that identifies this entity.
+ *
+ * The label should be localized according to the current locale.
+ *
+ * @name label
+ * @memberOf pentaho.IUIInfo#
+ * @type {nonEmptyString}
+ * @readOnly
+ * @see pentaho.environment.IEnvironment#locale
+ */
+
+/**
+ * Gets a description of this entity.
+ *
+ * The description should be localized according to the current locale.
+ *
+ * @name description
+ * @memberOf pentaho.IUIInfo#
+ * @type {?nonEmptyString}
+ * @readOnly
+ * @see pentaho.environment.IEnvironment#locale
+ */
+
+/**
+ * Gets a category of this entity, for grouping with other entities.
+ *
+ * @name category
+ * @memberOf pentaho.IUIInfo#
+ * @type {?nonEmptyString}
+ * @readOnly
+ */
+
+/**
+ * Gets the position of this entity relative to other entities having the same category.
+ *
+ * @name ordinal
+ * @memberOf pentaho.IUIInfo#
+ * @type {number}
+ * @default 0
+ * @readOnly
+ * @see pentaho.IUIInfo#category
+ */
+
+/**
+ * Gets a URL pointing to documentation associated with this entity.
+ *
+ * @name helpUrl
+ * @memberOf pentaho.IUIInfo#
+ * @type {?nonEmptyString}
+ * @readOnly
+ */
+
+/**
+ * Gets a value that indicates if this entity should be presented to the user
+ * when browsing entities.
+ *
+ * @name isBrowsable
+ * @memberOf pentaho.IUIInfo#
+ * @type {boolean}
+ * @default true
+ * @readOnly
+ */
+
+/**
+ * Gets a value that indicates if this entity should be presented to the user
+ * only when the user interface is in "advanced mode".
+ *
+ * @name isAdvanced
+ * @memberOf pentaho.IUIInfo#
+ * @type {boolean}
+ * @default false
+ * @readOnly
+ */

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 define([
   "require",
   "module",
-  "pentaho/config/service",
+  "./main",
   "pentaho/module/util",
   "pentaho/shim/es6-promise"
-], function(localRequire, module, configService, moduleUtil) {
+], function(localRequire, module, themeService, configService, moduleUtil) {
 
   "use strict";
 
@@ -30,22 +30,28 @@ define([
 
   /**
    * The `pentaho/theme!` module is an AMD/RequireJS loader plugin that
-   * loads a configured theme module for another given module.
+   * loads the configured theme resource modules for a given module.
    *
    * **AMD Plugin Usage**: `"pentaho/theme!{moduleId}"`
    *
    * 1. `{moduleId}` — The identifier of the module being themed. To refer to the requesting module,
    *    use the special value `_`.
    *
-   * To register a theme module, configure the module composed of the plugin and its argument.
-   * For example, to configure the theme of the `my/View` module to be the `my/theme/view` module,
+   * To register theme resources for a module,
+   * configure the module in `pentaho/modules` with a [ThemeAnnotation]{@link pentaho.theme.ThemeAnnotation} annotation.
+   *
+   * For example, to configure the theme of the `my/View` module to be the `my/theme/view` resource module,
    * specify the following AMD/RequireJS configuration:
    *
    * ```js
    * {
    *   "config": {
-   *     "pentaho/theme!my/View": {
-   *       main: "my/theme/view"
+   *     "pentaho/modules": {
+   *       "my/View": {
+   *         "annotations": {
+   *           "pentaho/theme/Theme": {"main": "my/theme/view"}
+   *         }
+   *       }
    *     }
    *   }
    * }
@@ -60,12 +66,17 @@ define([
    * });
    * ```
    *
+   * Alternatively, associate the [LoadThemeAnnotation]{@link pentaho.theme.LoadThemeAnnotation}
+   * annotation with a module.
+   *
    * @name main
    * @memberOf pentaho.theme
    * @type {IAmdLoaderPlugin}
    * @amd pentaho/theme
    *
-   * @see pentaho.theme.spec.IConfiguration
+   * @see pentaho.theme.LoadThemeAnnotation
+   * @see pentaho.theme.ThemeAnnotation
+   * @see pentaho.theme.spec.IThemeAnnotation
    */
 
   return {
@@ -79,8 +90,8 @@ define([
           ? moduleUtil.getId(requesterRequire)
           : normalizedName;
 
-        configService.selectAsync("pentaho/theme!" + targetModuleId)
-          .then(loadTheme)
+        return themeService
+          .loadModuleThemeAsync(targetModuleId)
           .then(function() { onLoad(); }, onLoad.error);
       }
     },
@@ -99,46 +110,4 @@ define([
       return SELF_PREFIX + (++selfCounter);
     }
   };
-
-  /**
-   * Gets the theme modules corresponding to a theme configuration.
-   *
-   * @param {?pentaho.theme.spec.IConfiguration} themeConfig - The theme configuration.
-   * @return {Array.<string>} An array of theme module identifiers.
-   */
-  function getThemeModuleIds(themeConfig) {
-
-    var themeModules = [];
-
-    if(themeConfig !== null) {
-      if(themeConfig.main) {
-        themeModules.push(themeConfig.main);
-      }
-
-      if(themeConfig.extensions) {
-        themeConfig.extensions.forEach(function(extensionId) {
-          themeModules.push(extensionId);
-        });
-      }
-    }
-
-    return themeModules;
-  }
-
-  /**
-   * Loads a theme given its configuration.
-   *
-   * @param {?pentaho.theme.spec.IConfiguration} themeConfig - The theme configuration.
-   * @return {Promise} A promise that is resolved when the theme, if any, has been loaded.
-   */
-  function loadTheme(themeConfig) {
-    var themeModuleIds = getThemeModuleIds(themeConfig);
-    if(themeModuleIds.length === 0) {
-      return Promise.resolve();
-    }
-
-    return new Promise(function(resolve, reject) {
-      localRequire(themeModuleIds, resolve, reject);
-    });
-  }
 });
