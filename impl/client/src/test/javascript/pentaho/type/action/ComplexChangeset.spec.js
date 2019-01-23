@@ -18,8 +18,8 @@ define([
   "pentaho/type/List",
   "pentaho/type/Number",
   "pentaho/type/changes/Transaction",
-  "pentaho/type/action/changes/ComplexChangeset",
-  "pentaho/type/action/changes/ListChangeset",
+  "pentaho/type/action/ComplexChangeset",
+  "pentaho/type/action/ListChangeset",
   "tests/pentaho/util/errorMatch"
 ], function(Complex, List, PentahoNumber, Transaction, ComplexChangeset, ListChangeset, errorMatch) {
 

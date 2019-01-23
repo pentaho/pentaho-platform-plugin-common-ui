@@ -17,14 +17,14 @@ define([
   "pentaho/type/loader",
   "pentaho/type/Complex",
   "pentaho/type/changes/Transaction",
-  "pentaho/type/action/changes/Clear"
+  "pentaho/type/action/Clear"
 ], function(typeLoader, Complex, Transaction, Clear) {
 
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false */
 
-  describe("pentaho.type.action.changes.Clear -", function() {
+  describe("pentaho.type.action.Clear -", function() {
 
     var List;
     var NumberList;

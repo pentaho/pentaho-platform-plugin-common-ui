@@ -23,7 +23,7 @@ define([
   "pentaho/type/loader",
   "pentaho/action/Execution",
   "pentaho/action/impl/Target",
-  "pentaho/type/action/changes/ComplexChangeset",
+  "pentaho/type/action/ComplexChangeset",
   "pentaho/type/changes/Transaction",
   "pentaho/lang/UserError",
   "pentaho/lang/RuntimeError",

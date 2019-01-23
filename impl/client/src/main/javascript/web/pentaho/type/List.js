@@ -18,7 +18,7 @@ define([
   "./Value",
   "./Element",
   "./mixins/Container",
-  "./action/changes/ListChangeset",
+  "./action/ListChangeset",
   "./util",
   "./SpecificationContext",
   "./_baseLoader",

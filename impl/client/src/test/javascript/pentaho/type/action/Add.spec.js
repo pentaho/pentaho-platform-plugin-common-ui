@@ -18,14 +18,14 @@ define([
   "pentaho/type/List",
   "pentaho/type/Number",
   "pentaho/type/changes/Transaction",
-  "pentaho/type/action/changes/Add"
+  "pentaho/type/action/Add"
 ], function(Complex, List, PentahoNumber, Transaction, Add) {
 
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false */
 
-  describe("pentaho.type.action.changes.Add", function() {
+  describe("pentaho.type.action.Add", function() {
 
     var NumberList;
     var DerivedComplex;

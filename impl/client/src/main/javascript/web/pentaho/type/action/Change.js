@@ -34,11 +34,11 @@ define([
    *
    * @description Creates a `Change` instance.
    */
-  return AbstractAction.extend(module.id, /** @lends pentaho.type.action.changes.Change# */{
+  return AbstractAction.extend(module.id, /** @lends pentaho.type.action.Change# */{
 
     get eventName() {
       return "change";
-    },
+    }
 
     /**
      * Gets the transaction version of this change.
