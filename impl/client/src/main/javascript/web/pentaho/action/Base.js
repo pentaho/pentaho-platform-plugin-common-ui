@@ -20,7 +20,7 @@ define([
 
   "use strict";
 
-  var AbstractAction = Base.extend(module.id, /** @lends pentaho.action.Abstract# */{
+  var AbstractAction = Base.extend(module.id, /** @lends pentaho.action.Base# */{
 
     /**
      * @alias Abstract
@@ -29,7 +29,7 @@ define([
      * @extends pentaho.lang.Base
      * @abstract
      *
-     * @amd pentaho/action/Abstract
+     * @amd pentaho/action/Base
      *
      * @classDesc The `action.Abstract` class represents a certain model of actions.
      *
@@ -44,7 +44,7 @@ define([
      * ##### Synchronous or Asynchronous
      *
      * An action can be synchronous or asynchronous, as determined by the type property,
-     * {@link pentaho.action.Abstract.isSync}.
+     * {@link pentaho.action.Base.isSync}.
      * The execution of a synchronous action is completed synchronously,
      * while that of an asynchronous action only completes asynchronously.
      *
@@ -80,51 +80,96 @@ define([
      * Gets the type of action.
      *
      * @name type
-     * @memberOf pentaho.action.Abstract#
+     * @memberOf pentaho.action.Base#
      * @type {string}
+     * @readonly
      *
      * @abstract
      */
     get type() {
     },
 
+    /**
+     * Gets the event name of the action.
+     *
+     * @name eventName
+     * @memberOf pentaho.action.Base#
+     * @type {string}
+     * @readonly
+     *
+     * @abstract
+     */
     get eventName() {
-      return this.type;
     },
 
     /**
+     * Determines if the given action is valid.
+     *
+     * The default implementation does nothing and considers the instance valid.
+     * Override to implement an action's specific validation logic.
+     *
      * @name validate
-     * @memberOf pentaho.action.Abstract#
+     * @memberOf pentaho.action.Base#
      *
      * @abstract
+     * @method
+     * @return {Array.<pentaho.lang.UserError>} A non-empty array of errors or `null`.
      */
     validate: function() {
     },
 
     /**
+     * Creates a shallow clone of this value.
+     *
      * @name clone
-     * @memberOf pentaho.action.Abstract#
+     * @memberOf pentaho.action.Base#
      *
      * @abstract
+     * @method
+     * @return {pentaho.action.Base} The action clone.
      */
     clone: function() {
+      return new this.constructor(this.toSpec());
     },
 
     /**
-     * @name toSpec
-     * @memberOf pentaho.action.Abstract#
+     * Creates a specification that describes this action.
      *
-     * @abstract
+     * @name toSpec
+     * @memberOf pentaho.action.Base#
+     *
+     * @method
+     * @return {pentaho.action.spec.IBase} An action specification.
      */
     toSpec: function() {
-    }
-  }, /** @lends pentaho.action.Abstract.*/{
+      var spec = {};
+
+      this._fillSpec(spec);
+
+      return spec;
+    },
 
     /**
+     * Fills the given specification with this action's attributes' local values,
+     * and returns whether any attribute was actually added.
      *
-     * @memberOf pentaho.action.Abstract.
+     * @param {pentaho.action.spec.IBase} [spec] An action specification.
+     * @protected
+     * @abstract
+     */
+    _fillSpec: function(spec) {
+    }
+  }, /** @lends pentaho.action.Base*/{
+
+    /**
+     * Indicates if the action is synchronous.
+     *
+     * When unspecified, inherits the value of the ancestor action.
+     *
+     * @memberOf pentaho.action.Base
      * @type {boolean}
-     * @static
+     * @default true
+     * @readonly
      */
     get isSync() {
       return true;

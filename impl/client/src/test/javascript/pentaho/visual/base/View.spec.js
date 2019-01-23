@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1508,13 +1508,14 @@ define([
     });
 
     describe("#act", function() {
+      var customActionType = "my/test/Action";
       var CustomSyncAction;
 
       beforeAll(function() {
         // Assuming pre-loaded with View
         CustomSyncAction = BaseAction.extend({
           get type() {
-            return "my/test/Action";
+            return customActionType;
           }
         });
       });
@@ -1548,11 +1549,9 @@ define([
         };
 
         var view = new BaseView();
-        var action = new CustomSyncAction();
+        view.on(customActionType, observer);
 
-        view.on(action.type, observer);
-
-        var actionExecution = view.act(action);
+        var actionExecution = view.act(new CustomSyncAction());
 
         return actionExecution.promise.then(function() {
           expect(observer.init).toHaveBeenCalledWith(actionExecution, actionExecution.action);
@@ -1576,11 +1575,9 @@ define([
         };
 
         var view = new BaseView();
-        var action = new CustomSyncAction();
+        view.on(customActionType, observer);
 
-        view.on(action.type, observer);
-
-        return view.act(action).promise.then(function() {
+        return view.act(new CustomSyncAction()).promise.then(function() {
           return Promise.reject("Should have been rejected.");
         }, function() {
           expect(observer.init).toHaveBeenCalled();
@@ -1604,11 +1601,9 @@ define([
         };
 
         var view = new BaseView();
-        var action = new CustomSyncAction();
+        view.on(customActionType, observer);
 
-        view.on(action.type, observer);
-
-        return view.act(action).promise.then(function() {
+        return view.act(new CustomSyncAction()).promise.then(function() {
           return Promise.reject("Should have been rejected.");
         }, function() {
           expect(observer.init).toHaveBeenCalled();

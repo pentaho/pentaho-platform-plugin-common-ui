@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 - 2019 Hitachi Vantara.  All rights reserved.
+ * Copyright 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 define([
-  "pentaho/action/Base"
-], function(ActionBase) {
+  "pentaho/action/Generic"
+], function(GenericAction) {
 
   "use strict";
 
-  describe("pentaho.action.Base", function() {
+  describe("pentaho.action.Generic", function() {
 
     var SubAction;
 
     beforeAll(function() {
 
       // A derived non-abstract class, adding nothing new.
-      SubAction = ActionBase.extend({});
+      SubAction = GenericAction.extend({});
     });
 
     describe("new (spec)", function() {
@@ -36,6 +36,31 @@ define([
         var action = new SubAction();
 
         expect(action instanceof SubAction).toBe(true);
+      });
+
+      it("should call the #_init(spec) method, for mixins to take part", function() {
+
+        spyOn(SubAction.prototype, "_init");
+
+        var spec = {};
+
+        var action = new SubAction(spec);
+
+        expect(SubAction.prototype._init).toHaveBeenCalledTimes(1);
+        expect(SubAction.prototype._init).toHaveBeenCalledWith(spec);
+        expect(SubAction.prototype._init.calls.first().object).toBe(action);
+      });
+
+    });
+
+    describe("#clone()", function() {
+
+      it("should return a distinct instance", function() {
+        var action = new SubAction();
+        var clone = action.clone();
+
+        expect(clone).not.toBe(action);
+        expect(clone instanceof SubAction).toBe(true);
       });
 
     });

@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/action/impl/Target",
-  "pentaho/action/Generic",
+  "pentaho/action/Base",
   "pentaho/action/Execution",
   "pentaho/lang/Base"
 ], function(TargetMixin, BaseAction, Execution, Base) {
@@ -56,19 +56,19 @@ define([
       CustomTarget = Base.extend().mix(TargetMixin);
     });
 
-    describe(".GenericActionExecution", function() {
+    describe(".ActionExecution", function() {
 
       it("should get the constructor of an Execution subtype", function() {
 
-        expect(typeof CustomTarget.GenericActionExecution).toBe("function");
-        expect(CustomTarget.GenericActionExecution.prototype instanceof Execution).toBe(true);
+        expect(typeof CustomTarget.ActionExecution).toBe("function");
+        expect(CustomTarget.ActionExecution.prototype instanceof Execution).toBe(true);
       });
 
       describe("#_onPhaseInit", function() {
 
         it("should call the associated target's _emitActionPhaseInitEvent method", function() {
           var target = new CustomTarget();
-          var ae = new CustomTarget.GenericActionExecution(new SyncAction(), target);
+          var ae = new CustomTarget.ActionExecution(new SyncAction(), target);
 
           spyOn(target, "_emitActionPhaseInitEvent");
 
@@ -83,7 +83,7 @@ define([
 
         it("should call the associated target's _emitActionPhaseWillEvent method", function() {
           var target = new CustomTarget();
-          var ae = new CustomTarget.GenericActionExecution(new SyncAction(), target);
+          var ae = new CustomTarget.ActionExecution(new SyncAction(), target);
 
           spyOn(target, "_emitActionPhaseWillEvent");
 
@@ -98,7 +98,7 @@ define([
 
         it("should call the associated target's _emitActionPhaseDoEvent method", function() {
           var target = new CustomTarget();
-          var ae = new CustomTarget.GenericActionExecution(new SyncAction(), target);
+          var ae = new CustomTarget.ActionExecution(new SyncAction(), target);
 
           spyOn(target, "_emitActionPhaseDoEvent");
 
@@ -110,7 +110,7 @@ define([
 
         it("should return what _emitActionPhaseDoEvent returns", function() {
           var target = new CustomTarget();
-          var ae = new CustomTarget.GenericActionExecution(new SyncAction(), target);
+          var ae = new CustomTarget.ActionExecution(new SyncAction(), target);
           var promise = Promise.resolve();
           spyOn(target, "_emitActionPhaseDoEvent").and.returnValue(promise);
 
@@ -124,7 +124,7 @@ define([
 
         it("should call the associated target's _emitActionPhaseFinallyEvent method", function() {
           var target = new CustomTarget();
-          var ae = new CustomTarget.GenericActionExecution(new SyncAction(), target);
+          var ae = new CustomTarget.ActionExecution(new SyncAction(), target);
 
           spyOn(target, "_emitActionPhaseFinallyEvent");
 
@@ -136,36 +136,17 @@ define([
       });
     });
 
-    describe("#_createGenericActionExecution(action)", function() {
-
-      it("should return an instance of GenericActionExecution", function() {
-
-        var target = new CustomTarget();
-        var ae = target._createGenericActionExecution(new SyncAction());
-
-        expect(ae instanceof CustomTarget.GenericActionExecution).toBe(true);
-      });
-
-      // should return an action execution with the given action - it's a clone actually.
-    });
-
     describe("#_createActionExecution(action)", function() {
 
-      it("should delegate to _createGenericActionExecution", function() {
+      it("should return an instance of ActionExecution", function() {
 
         var target = new CustomTarget();
-        var ae = {};
-        var action = new SyncAction();
+        var ae = target._createActionExecution(new SyncAction());
 
-        spyOn(target, "_createGenericActionExecution").and.returnValue(ae);
-
-        var result = target._createActionExecution(action);
-
-        expect(result).toBe(ae);
-        expect(target._createGenericActionExecution).toHaveBeenCalledWith(action);
+        expect(ae instanceof CustomTarget.ActionExecution).toBe(true);
       });
 
-      // should return an action execution with the given action - actually, it will be a clone of the given action.
+      // Should return an action execution with the given action - actually, it will be a clone of the given action.
     });
 
     describe("#act", function() {

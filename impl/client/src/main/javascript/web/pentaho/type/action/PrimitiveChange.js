@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,25 +20,25 @@ define([
 ], function(module, Change) {
   "use strict";
 
-  return Change.extend(module.id, /** @lends pentaho.type.changes.PrimitiveChange# */{
+  return Change.extend(module.id, /** @lends pentaho.type.action.PrimitiveChange# */{
 
     /**
      * @name PrimitiveChange
-     * @memberOf pentaho.type.changes
+     * @memberOf pentaho.type.action
      * @class
      * @abstract
-     * @extends pentaho.type.changes.Change
-     * @amd pentaho/type/changes/PrimitiveChange
+     * @extends pentaho.type.action.Change
+     * @amd pentaho/type/action/PrimitiveChange
      *
      * @classDesc The `PrimitiveChange` class is the abstract base class of changes
      * that are the direct consequence of performing **primitive operations** on a
      * [structured value]{@link pentaho.type.mixins.Container}.
      *
-     * Primitive changes always exist in the context of a [Changeset]{@link pentaho.type.changes.Changeset}.
+     * Primitive changes always exist in the context of a [Changeset]{@link pentaho.type.action.Changeset}.
      *
      * Example primitive changes are
-     * the [Replace]{@link pentaho.type.changes.Replace} operation on a [Complex]{@link pentaho.type.Complex} value, and
-     * the [Add]{@link pentaho.type.changes.Add} and [Clear]{@link pentaho.type.changes.Clear} operations on a
+     * the [Replace]{@link pentaho.type.action.Replace} operation on a [Complex]{@link pentaho.type.Complex} value, and
+     * the [Add]{@link pentaho.type.action.Add} and [Clear]{@link pentaho.type.action.Clear} operations on a
      * [List]{@link pentaho.type.List} value.
      *
      * @constructor
@@ -64,7 +64,7 @@ define([
     /**
      * Registers reference changes caused by this change.
      *
-     * @param {pentaho.type.changes.Changeset} changeset - The changeset.
+     * @param {pentaho.type.action.Changeset} changeset - The changeset.
      *
      * @protected
      * @internal
@@ -75,7 +75,7 @@ define([
     /**
      * Unregisters reference changes caused by this change.
      *
-     * @param {pentaho.type.changes.Changeset} changeset - The changeset.
+     * @param {pentaho.type.action.Changeset} changeset - The changeset.
      *
      * @protected
      * @internal

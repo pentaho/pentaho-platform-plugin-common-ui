@@ -15,18 +15,18 @@
  */
 define([
   "pentaho/module!_",
-  "./Abstract"
-], function(module, AbstractAction) {
+  "./Base"
+], function(module, ActionBase) {
 
   "use strict";
 
-  var GenericAction = AbstractAction.extend(module.id, /** @lends pentaho.action.Generic# */{
+  var GenericAction = ActionBase.extend(module.id, /** @lends pentaho.action.Generic# */{
 
     /**
      * @alias Generic
      * @memberOf pentaho.action
      * @class
-     * @extends pentaho.action.Abstract
+     * @extends pentaho.action.Base
      * @abstract
      *
      * @amd pentaho/action/Generic
@@ -38,6 +38,11 @@ define([
     constructor: function(spec) {
       // Let mixins take part.
       this._init(spec);
+    },
+
+    /** @inheritDoc */
+    get eventName() {
+      return this.type;
     },
 
     /**
@@ -52,27 +57,7 @@ define([
     /** @inheritDoc */
     clone: function() {
       return new this.constructor(this.toSpec());
-    },
-
-    /**
-     * @abstract
-     *
-     * @param {pentaho.action.spec.IBase} [spec] An action specification.
-     * @protected
-     */
-    _fillSpec: function(spec) {
-    },
-
-    // region serialization
-    /** @inheritDoc */
-    toSpec: function() {
-      var spec = {};
-
-      this._fillSpec(spec);
-
-      return spec;
     }
-    // endregion
   });
 
   return GenericAction;

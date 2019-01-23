@@ -21,7 +21,7 @@ define([
   "pentaho/type/List",
   "pentaho/type/changes/Transaction",
   "pentaho/type/PropertyTypeCollection",
-  "pentaho/action/ComplexChangeset",
+  "pentaho/type/action/ComplexChangeset",
   "tests/pentaho/util/errorMatch",
   "tests/pentaho/type/sloppyModeUtil"
 ], function(Value, Complex, PentahoNumber, Property, List,

@@ -15,8 +15,8 @@
  */
 
 /**
- * The `changes` namespace contains classes that describe the flow of internal changes of values.
- *
- * @name pentaho.type.changes
+ * @name pentaho.action
  * @namespace
+ *
+ * @description The `action` namespace contains classes related with the internal value change action concept.
  */

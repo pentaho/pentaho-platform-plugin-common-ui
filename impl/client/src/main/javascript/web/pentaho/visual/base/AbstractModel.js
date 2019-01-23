@@ -38,7 +38,7 @@ define([
    * target abstract model.
    * @memberOf pentaho.visual.base
    * @class
-   * @extends pentaho.type.changes.ComplexChangeset
+   * @extends pentaho.type.action.ComplexChangeset
    * @private
    */
   var AbstractModelChangeset = ComplexChangeset.extend({

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,22 +22,22 @@ define([
 
   "use strict";
 
-  return PrimitiveChange.extend(module.id, /** @lends pentaho.type.changes.Replace# */{
+  return PrimitiveChange.extend(module.id, /** @lends pentaho.type.action.Replace# */{
 
     /**
      * @alias Replace
-     * @memberOf pentaho.type.changes
+     * @memberOf pentaho.type.action
      * @class
-     * @extends pentaho.type.changes.PrimitiveChange
+     * @extends pentaho.type.action.PrimitiveChange
      *
-     * @friend pentaho.type.changes.ComplexChangeset
+     * @friend pentaho.type.action.ComplexChangeset
      *
-     * @amd pentaho/type/changes/Replace
+     * @amd pentaho/type/action/Replace
      *
      * @classDesc The `Replace` class describes the primitive operation that replaces the value of
      * an [element property]{@link pentaho.type.Property#isList} of a complex instance.
      *
-     * This type of change is always part of a {@link pentaho.type.changes.ComplexChangeset}.
+     * This type of change is always part of a {@link pentaho.type.action.ComplexChangeset}.
      *
      * @constructor
      * @param {pentaho.type.PropertyType} propType - The property type.
@@ -51,7 +51,7 @@ define([
        * Gets the property whose value is replaced.
        *
        * @name property
-       * @memberOf pentaho.type.changes.Replace#
+       * @memberOf pentaho.type.action.Replace#
        * @type {pentaho.type.PropertyType}
        * @readOnly
        */
@@ -64,12 +64,12 @@ define([
     /**
      * Updates the value that will replace the current value.
      *
-     * @param {pentaho.type.changes.Changeset} changeset - The changeset.
+     * @param {pentaho.type.action.Changeset} changeset - The changeset.
      * @param {pentaho.type.Element} value - The new proposed value of the property.
      * @param {number} state - The new proposed state of the property.
      * @private
      * @internal
-     * @see pentaho.type.changes.ComplexChangeset.__setElement
+     * @see pentaho.type.action.ComplexChangeset.__setElement
      */
     __updateValue: function(changeset, value, state) {
 

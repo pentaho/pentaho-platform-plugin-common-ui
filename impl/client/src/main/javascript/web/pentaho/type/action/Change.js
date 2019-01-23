@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 define([
   "module",
-  "pentaho/action/Abstract"
-], function(module, AbstractAction) {
+  "pentaho/action/Base"
+], function(module, ActionBase) {
 
   "use strict";
 
@@ -25,8 +25,8 @@ define([
    * @name Change
    * @memberOf pentaho.type.action.changes
    * @class
-   * @extends pentaho.action.Abstract
-   * @amd pentaho/type/changes/Change
+   * @extends pentaho.action.Base
+   * @amd pentaho/type/action/Change
    * @abstract
    *
    * @classDesc The `Change` class is the abstract base class of classes that
@@ -34,8 +34,9 @@ define([
    *
    * @description Creates a `Change` instance.
    */
-  return AbstractAction.extend(module.id, /** @lends pentaho.type.action.Change# */{
+  return ActionBase.extend(module.id, /** @lends pentaho.type.action.Change# */{
 
+    /** @inheritDoc */
     get eventName() {
       return "change";
     }
@@ -44,7 +45,7 @@ define([
      * Gets the transaction version of this change.
      *
      * @name transactionVersion
-     * @memberOf pentaho.type.changes.Change#
+     * @memberOf pentaho.type.action.Change#
      * @type {number}
      * @readOnly
      * @abstract
@@ -54,7 +55,7 @@ define([
      * Applies any local primitive changes.
      *
      * @name _apply
-     * @memberOf pentaho.type.changes.Change#
+     * @memberOf pentaho.type.action.Change#
      * @method
      * @param {pentaho.type.mixins.Container} target - The container to which changes are applied.
      * @abstract

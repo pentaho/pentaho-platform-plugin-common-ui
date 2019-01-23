@@ -50,7 +50,7 @@ define([
      * @constructor
      *
      * @see pentaho.visual.action.spec.ISelect
-     * @see pentaho.visual.action.spec.ISelectType
+     * @see pentaho.visual.action.spec.ISelectConfig
      */
     constructor: function(spec) {
 

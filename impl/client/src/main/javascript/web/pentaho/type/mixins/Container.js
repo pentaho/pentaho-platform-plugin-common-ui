@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ define([
        * Ambient changeset. Set whenever this container has a changeset in the ambient transaction.
        *
        * @memberOf pentaho.type.mixins.Container#
-       * @type {pentaho.type.changes.Changeset}
+       * @type {pentaho.type.action.Changeset}
        * @private
        * @internal
        */
@@ -176,7 +176,7 @@ define([
      *
      * @private
      * @internal
-     * @friend {pentaho.type.changes.Changeset}
+     * @friend {pentaho.type.action.Changeset}
      * @friend {pentaho.data.filter.Abstract}
      */
     __setVersionInternal: function(version) {
@@ -188,7 +188,7 @@ define([
     /**
      * Gets the changeset of this instance in the ambient transaction, if any, or `null`.
      *
-     * @type {pentaho.type.changes.Changeset}
+     * @type {pentaho.type.action.Changeset}
      * @readonly
      */
     get $changeset() {
@@ -235,7 +235,7 @@ define([
      *
      * @param {pentaho.type.changes.Transaction} transaction - The transaction that owns this changeset.
      *
-     * @return {pentaho.type.changes.Changeset} A changeset of the appropriate type.
+     * @return {pentaho.type.action.Changeset} A changeset of the appropriate type.
      *
      * @abstract
      * @protected
@@ -249,7 +249,7 @@ define([
      *
      * When overriding, be sure to call the base implementation.
      *
-     * @param {pentaho.type.changes.Changeset} changeset - The set of changes.
+     * @param {pentaho.type.action.Changeset} changeset - The set of changes.
      * @param {?object} [keyArgs] - The keyword arguments' object.
      * See [EventSource#_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
      *
@@ -291,7 +291,7 @@ define([
      *
      * When overriding, be sure to call the base implementation.
      *
-     * @param {pentaho.type.changes.Changeset} changeset - The set of changes.
+     * @param {pentaho.type.action.Changeset} changeset - The set of changes.
      *
      * @protected
      * @internal
@@ -311,7 +311,7 @@ define([
      *
      * When overriding, be sure to call the base implementation.
      *
-     * @param {pentaho.type.changes.Changeset} changeset - The set of changes.
+     * @param {pentaho.type.action.Changeset} changeset - The set of changes.
      * @param {Error} reason - The reason why the changes were rejected.
      *
      * @protected

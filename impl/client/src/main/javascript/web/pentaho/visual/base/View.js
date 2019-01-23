@@ -109,7 +109,7 @@ define([
    * @param {pentaho.visual.action.Select} action - The select action.
    * @param {pentaho.visual.base.View} view - The target view.
    */
-  var SelectActionExecution = ActionTargetMixin.GenericActionExecution.extend({
+  var SelectActionExecution = ActionTargetMixin.ActionExecution.extend({
     /**
      * Applies the associated action's
      * [selectionMode]{@link pentaho.visual.action.Select#selectionMode}
@@ -1256,7 +1256,7 @@ define([
      * with the action as event payload,
      * for each of the action's phases.
      *
-     * This method can be given [synchronous]{@link pentaho.action.BaseType#isSync} or asynchronous actions.
+     * This method can be given [synchronous]{@link pentaho.action.Base.isSync} or asynchronous actions.
      * However, in the latter case, this method is only suitable for _fire-and-forget_ scenarios,
      * where it is not needed to know the outcome of the asynchronous action.
      *
@@ -1312,7 +1312,7 @@ define([
      * with the action as event payload,
      * for each of the action's phases.
      *
-     * This method can be given [synchronous]{@link pentaho.action.BaseType#isSync} or asynchronous actions,
+     * This method can be given [synchronous]{@link pentaho.action.Base.isSync} or asynchronous actions,
      * and can be used when uniformity in treatment is desired and it is needed to know the outcome of the
      * asynchronous action.
      *

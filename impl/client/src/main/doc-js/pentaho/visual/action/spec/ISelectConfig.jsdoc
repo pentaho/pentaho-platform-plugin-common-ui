@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  */
 
 /**
- * The `visual.action.spec.ISelectConfig` interface represents the specification of a selection action type.
+ * The `visual.action.spec.ISelectConfig`  interface represents the configuration specification
+ * of {@link pentaho.visual.action.Select} actions.
  *
  * @name pentaho.visual.action.spec.ISelectConfig
  * @interface
- * @extends pentaho.action.spec.IBaseType
  */
 
 /**

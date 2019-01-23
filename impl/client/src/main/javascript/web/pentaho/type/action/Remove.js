@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,19 +20,19 @@ define([
 ], function(module, PrimitiveChange) {
   "use strict";
 
-  return PrimitiveChange.extend(module.id, /** @lends pentaho.type.changes.Remove# */{
+  return PrimitiveChange.extend(module.id, /** @lends pentaho.type.action.Remove# */{
 
     /**
      * @name Remove
-     * @memberOf pentaho.type.changes
+     * @memberOf pentaho.type.action
      * @class
-     * @extends pentaho.type.changes.PrimitiveChange
-     * @amd pentaho/type/changes/Remove
+     * @extends pentaho.type.action.PrimitiveChange
+     * @amd pentaho/type/action/Remove
      *
      * @classDesc The `Remove` class describes the primitive operation that
      * removes a set of contiguous elements from a list.
      *
-     * This type of change is always part of a {@link pentaho.type.changes.ListChangeset}.
+     * This type of change is always part of a {@link pentaho.type.action.ListChangeset}.
      *
      * @constructor
      * @description Creates an instance.

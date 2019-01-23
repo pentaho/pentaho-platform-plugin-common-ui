@@ -60,7 +60,7 @@ layout: 8.1_default
    [pentaho.type.Type#isContinuous]({{site.refDocsUrlPattern81 | replace: '$', 'pentaho.type.Type#isContinuous'}}){{site.starNew}}
    property.
 
-6. Reviewed the action classes, [pentaho.action]({{site.refDocsUrlPattern81 | replace: '$', 'pentaho.action'}}).
+6. Reviewed the action classes, [pentaho.type.action]({{site.refDocsUrlPattern81 | replace: '$', 'pentaho.type.action'}}).
 
 7. Reviewed the process of calling `will:change` listeners when changes occur. 
    It is now ensured that listeners are called again if a value below in the bubbling chain is modified after 

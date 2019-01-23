@@ -16,20 +16,19 @@
 define([
   "module",
   "pentaho/lang/EventSource",
-  "../Generic",
   "../Execution",
   "pentaho/util/error"
-], function(module, EventSource, ActionBase, ActionExecution, error) {
+], function(module, EventSource, ActionExecution, error) {
 
   "use strict";
 
   /**
-   * @classDesc The `GenericActionExecution` class is an inner class of
+   * @classDesc The `Target.ActionExecution` class is an inner class of
    * [Target]{@link pentaho.action.impl.Target} that assumes that
    * that the execution [target]{@link pentaho.action.Execution#target}
    * is a `Target`.
    *
-   * It provides a generic implementation of [Execution]{@link pentaho.action#Execution}
+   * It provides an implementation of [Execution]{@link pentaho.action#Execution}
    * which delegates to the event observers of each of the execution phases,
    * by calling the correspondingly named methods of target:
    * [Target#_emitActionPhaseInitEvent]{@link pentaho.action.impl.Target#_emitActionPhaseInitEvent},
@@ -41,7 +40,7 @@ define([
    * @memberOf pentaho.action.impl.Target
    * @extends pentaho.action.Execution
    */
-  var GenericActionExecution = ActionExecution.extend({
+  var TargetActionExecution = ActionExecution.extend({
     // @override
     _onPhaseInit: function() {
       this.target._emitActionPhaseInitEvent(this);
@@ -62,8 +61,6 @@ define([
       this.target._emitActionPhaseFinallyEvent(this);
     }
   });
-
-  // var __actionBaseType = ActionBase.type;
 
   /**
    * The `_emitGeneric` keyword arguments used for all phases but the finally phase.
@@ -134,16 +131,11 @@ define([
 
       if(!action) throw error.argRequired("action");
 
-      // action = __actionBaseType.to(action);
-
       return this._createActionExecution(action).execute();
     },
 
     /**
      * Creates an action execution for a given action.
-     *
-     * The default implementation delegates to
-     * [_createGenericActionExecution]{pentaho.action.impl.Target#_createGenericActionExecution}.
      *
      * @param {pentaho.action.Base} action - The action which will be executed.
      *
@@ -154,23 +146,7 @@ define([
      * @see pentaho.action.ITarget#act
      */
     _createActionExecution: function(action) {
-      return this._createGenericActionExecution(action);
-    },
-
-    /**
-     * Creates a generic action execution for a given action.
-     *
-     * The implementation returns an instance of
-     * [Target.GenericActionExecution]{@link pentaho.action.impl.Target.GenericActionExecution}.
-     *
-     * @param {pentaho.action.Base} action - The action which will be executed.
-     *
-     * @return {pentaho.action.Execution} The action execution.
-     *
-     * @protected
-     */
-    _createGenericActionExecution: function(action) {
-      return new GenericActionExecution(action, this);
+      return new TargetActionExecution(action, this);
     },
     // endregion
 
@@ -216,14 +192,14 @@ define([
      *
      * The default implementation delegates to
      * [_emitGenericAllAsync]{@link pentaho.lang.EventSource#_emitGenericAllAsync},
-     * when the action is [asynchronous]{@link pentaho.action.BaseType#isSync}.
+     * when the action is [asynchronous]{@link pentaho.action.Base.isSync}.
      * Delegates to
      * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}, otherwise.
      *
      * @param {pentaho.action.Execution} actionExecution - The action execution.
      *
      * @return {?Promise} A promise to the completion of the asynchronous `do` listener,
-     * of an [asynchronous]{@link pentaho.action.BaseType#isSync} action, or `null`.
+     * of an [asynchronous]{@link pentaho.action.Base.isSync} action, or `null`.
      *
      * @protected
      */
@@ -260,6 +236,6 @@ define([
       this._emitGeneric(this, [actionExecution, action], eventType, "finally");
     }
   }, {
-    GenericActionExecution: GenericActionExecution
+    ActionExecution: TargetActionExecution
   });
 });

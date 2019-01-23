@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +20,21 @@ define([
 ], function(module, PrimitiveChange) {
   "use strict";
 
-  return PrimitiveChange.extend(module.id, /** @lends pentaho.type.changes.Add# */{
+  return PrimitiveChange.extend(module.id, /** @lends pentaho.type.action.Add# */{
 
     /**
      * @alias Add
-     * @memberOf pentaho.type.changes
+     * @memberOf pentaho.type.action
      * @class
-     * @extends pentaho.type.changes.PrimitiveChange
+     * @extends pentaho.type.action.PrimitiveChange
      *
-     * @friend pentaho.type.changes.ListChangeset
+     * @friend pentaho.type.action.ListChangeset
      *
-     * @amd pentaho/type/changes/Add
+     * @amd pentaho/type/action/Add
      *
      * @classDesc The `Add` class describes the primitive operation of adding a new element to a list at a given index.
      *
-     * This type of change is always part of a {@link pentaho.type.changes.ListChangeset}.
+     * This type of change is always part of a {@link pentaho.type.action.ListChangeset}.
      *
      * @constructor
      * @description Creates an instance.

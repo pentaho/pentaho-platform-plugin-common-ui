@@ -35,7 +35,7 @@ define([
    * @description Creates a `RejectedChange` event.
    *
    * @param {pentaho.type.Complex} source - The object which is emitting the event.
-   * @param {pentaho.type.changes.Changeset} changeset - The changeset.
+   * @param {pentaho.type.action.Changeset} changeset - The changeset.
    * @param {Error|pentaho.lang.UserError} error - The error of a rejected
    * {@link pentaho.lang.ActionResult|ActionResult}.
    */

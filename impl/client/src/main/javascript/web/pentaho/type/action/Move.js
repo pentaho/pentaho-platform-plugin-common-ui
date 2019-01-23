@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ define([
 ], function(module, PrimitiveChange) {
   "use strict";
 
-  return PrimitiveChange.extend(module.id, /** @lends pentaho.type.changes.Move# */{
+  return PrimitiveChange.extend(module.id, /** @lends pentaho.type.action.Move# */{
 
     // To behind its position
     //     v-----+
@@ -34,15 +34,15 @@ define([
 
     /**
      * @alias Move
-     * @memberOf pentaho.type.changes
+     * @memberOf pentaho.type.action
      * @class
-     * @extends pentaho.type.changes.PrimitiveChange
-     * @amd pentaho/type/changes/Move
+     * @extends pentaho.type.action.PrimitiveChange
+     * @amd pentaho/type/action/Move
      *
      * @classDesc The `Move` class describes the primitive operation that
      * changes an element position inside a list.
      *
-     * This type of change is always part of a {@link pentaho.type.changes.ListChangeset}.
+     * This type of change is always part of a {@link pentaho.type.action.ListChangeset}.
      *
      * @constructor
      * @description Creates an instance.

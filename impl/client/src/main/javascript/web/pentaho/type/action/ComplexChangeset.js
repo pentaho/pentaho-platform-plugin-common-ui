@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,13 +30,13 @@ define([
 
   /**
    * @name ComplexChangeset
-   * @memberOf pentaho.type.changes
+   * @memberOf pentaho.type.action
    * @class
-   * @extends pentaho.type.changes.Changeset
+   * @extends pentaho.type.action.Changeset
    *
    * @friend pentaho.type.Complex
    *
-   * @amd pentaho/type/changes/ComplexChangeset
+   * @amd pentaho/type/action/ComplexChangeset
    *
    * @classDesc The class `ComplexChangeset` describes a set of changes to the values of properties
    * in a [complex]{@linkplain pentaho.type.Complex} value.
@@ -46,7 +46,7 @@ define([
    * @param {pentaho.type.changes.Transaction} transaction - The owning transaction.
    * @param {pentaho.type.Complex} target - The complex value where the changes take place.
    */
-  return Changeset.extend(module.id, /** @lends pentaho.type.changes.ComplexChangeset#*/{
+  return Changeset.extend(module.id, /** @lends pentaho.type.action.ComplexChangeset#*/{
 
     constructor: function(transaction, target) {
 
@@ -55,7 +55,7 @@ define([
       /**
        * A map of property name to a corresponding change.
        *
-       * @type {Object.<string, pentaho.type.changes.Change>}
+       * @type {Object.<string, pentaho.type.action.Change>}
        * @protected
        * @readonly
        */
@@ -65,7 +65,7 @@ define([
     /**
      * Gets the complex value where the changes take place.
      *
-     * @name pentaho.type.changes.ComplexChangeset#target
+     * @name pentaho.type.action.ComplexChangeset#target
      * @type {pentaho.type.Complex}
      * @readonly
      */
@@ -93,11 +93,11 @@ define([
     },
 
     /**
-     * Gets the [change]{@link pentaho.type.changes.Change} object associated with the specified property.
+     * Gets the [change]{@link pentaho.type.action.Change} object associated with the specified property.
      *
      * @param {nonEmptyString|pentaho.type.PropertyType} propertyOrName - The property name or type object.
      *
-     * @return {pentaho.type.changes.Change} An object describing the changes to be performed
+     * @return {pentaho.type.action.Change} An object describing the changes to be performed
      * in the given property, or `null` if the property has not changed.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `propertyOrName` is not defined.
@@ -107,11 +107,11 @@ define([
     },
 
     /**
-     * Gets the [change]{@link pentaho.type.changes.Change} object associated with the specified property.
+     * Gets the [change]{@link pentaho.type.action.Change} object associated with the specified property.
      *
      * @param {nonEmptyString} name - The property name.
      *
-     * @return {pentaho.type.changes.Change} An object describing the changes to be performed
+     * @return {pentaho.type.action.Change} An object describing the changes to be performed
      * in the given property, or `null` if the property has not changed.
      *
      * @private
@@ -251,7 +251,7 @@ define([
      * Updates the transaction version.
      *
      * @param {string} name - The property name.
-     * @param {pentaho.type.changes.Change} change - The change.
+     * @param {pentaho.type.action.Change} change - The change.
      *
      * @private
      */
@@ -488,7 +488,7 @@ define([
 
   /**
    * Gets a value that indicates if a change has changes.
-   * @param {pentaho.type.changes.Change} change - The change.
+   * @param {pentaho.type.action.Change} change - The change.
    * @return {boolean} `true` if yes; `false` if no.
    */
   function __hasChanges(change) {

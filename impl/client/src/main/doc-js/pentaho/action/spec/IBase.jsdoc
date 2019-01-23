@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,34 +15,9 @@
  */
 
 /**
- * The `spec.IBase` interface describes an action instance using a generic, _object_ form.
+ * The `spec.IBase` interface describes a base action instance.
  *
  * @name pentaho.action.spec.IBase
  *
  * @interface
- * @extends pentaho.type.spec.IValue
- */
-
-/**
- * The label of the action instance.
- *
- * When unspecified,
- * the label of the action type,
- * {@link pentaho.type.Type#label}, is used.
- *
- * @name label
- * @memberOf pentaho.action.spec.IBase#
- * @type {nonEmptyString}
- */
-
-/**
- * The description of the action instance.
- *
- * When unspecified,
- * the description of the action type,
- * {@link pentaho.type.Type#description}, is used.
- *
- * @name description
- * @memberOf pentaho.action.spec.IBase#
- * @type {nonEmptyString}
  */

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,21 +23,21 @@ define([
 
   "use strict";
 
-  return Change.extend(module.id, /** @lends pentaho.type.changes.Changeset# */{
+  return Change.extend(module.id, /** @lends pentaho.type.action.Changeset# */{
 
     /**
      * @alias Changeset
-     * @memberOf pentaho.type.changes
+     * @memberOf pentaho.type.action
      * @class
-     * @extends pentaho.type.changes.Change
-     * @amd pentaho/type/changes/Changeset
+     * @extends pentaho.type.action.Change
+     * @amd pentaho/type/action/Changeset
      * @abstract
      *
      * @classDesc The `Changeset` class describes a set of changes occurring in a structured value,
-     * the [target]{@link pentaho.type.changes.Changeset#target} value.
+     * the [target]{@link pentaho.type.action.Changeset#target} value.
      *
      * A changeset is a container for a set of
-     * [PrimitiveChange]{@link pentaho.type.changes.PrimitiveChange} instances.
+     * [PrimitiveChange]{@link pentaho.type.action.PrimitiveChange} instances.
      *
      * @constructor
      * @description Creates an empty `Changeset` for a given target value.
@@ -53,7 +53,7 @@ define([
        * Gets the owning transaction.
        *
        * @name transaction
-       * @memberOf pentaho.type.changes.Changeset#
+       * @memberOf pentaho.type.action.Changeset#
        * @type {pentaho.type.changes.Transaction}
        * @readOnly
        */
@@ -63,7 +63,7 @@ define([
        * Gets the container where the changes take place.
        *
        * @name target
-       * @memberOf pentaho.type.changes.Changeset#
+       * @memberOf pentaho.type.action.Changeset#
        * @type {pentaho.type.mixins.Container}
        * @readOnly
        */
@@ -106,7 +106,7 @@ define([
      * by calculating it based on its current parents.
      *
      * @protected
-     * @see pentaho.type.changes.Changeset#__calculateNetOrder
+     * @see pentaho.type.action.Changeset#__calculateNetOrder
      */
     _resetNetOrder: function() {
 
@@ -172,9 +172,9 @@ define([
     /**
      * Adds a new child changeset to this parent changeset.
      *
-     * @name pentaho.type.changes.Changeset#__onChildChangesetCreated
+     * @name pentaho.type.action.Changeset#__onChildChangesetCreated
      * @method
-     * @param {pentaho.type.changes.Changeset} childChangeset - The child changeset.
+     * @param {pentaho.type.action.Changeset} childChangeset - The child changeset.
      * @param {pentaho.type.PropertyType} propType - The property type whose value is the changeset target.
      * Only applies when this changeset is a complex changeset.
      *
@@ -186,7 +186,7 @@ define([
     /**
      * Calls a function once per child changeset.
      *
-     * @name pentaho.type.changes.Changeset#eachChildChangeset
+     * @name pentaho.type.action.Changeset#eachChildChangeset
      * @method
      * @param {function(pentaho.type.changeset.Changeset) : undefined|boolean} fun - The function to call.
      * @param {*} ctx - The `this` context on which to call `fun`.
@@ -199,7 +199,7 @@ define([
      * Throws an error if the changeset is read-only.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has been marked
-     * [read-only]{@link pentaho.type.changes.Changeset#isReadOnly}.
+     * [read-only]{@link pentaho.type.action.Changeset#isReadOnly}.
      *
      * @protected
      */
@@ -299,7 +299,7 @@ define([
      * that their version is dirty.
      *
      * @param {number} txnVersion - The new transaction version.
-     * @param {pentaho.type.changes.Changeset} [noNotifyParentChangeset=null] - The parent changeset that should not
+     * @param {pentaho.type.action.Changeset} [noNotifyParentChangeset=null] - The parent changeset that should not
      * be notified.
      *
      * @protected
@@ -322,11 +322,11 @@ define([
     /**
      * Updates the local transaction version to a given value due to a local, primitive change,
      * if it is greater than the current one.
-     * Then, it calls [_setTransactionVersion]{@link pentaho.type.changes.Changeset#_setTransactionVersion}
+     * Then, it calls [_setTransactionVersion]{@link pentaho.type.action.Changeset#_setTransactionVersion}
      * with the same arguments.
      *
      * @param {number} txnVersionLocal - The new local transaction version.
-     * @param {pentaho.type.changes.Changeset} [noNotifyParentChangeset=null] - The parent changeset that should not
+     * @param {pentaho.type.action.Changeset} [noNotifyParentChangeset=null] - The parent changeset that should not
      * be notified.
      *
      * @protected
@@ -352,7 +352,7 @@ define([
      * Notifies all parent changesets, except the optionally specified one,
      * that their version is dirty.
      *
-     * @param {pentaho.type.changes.Changeset} noNotifyParentChangeset - A parent changeset that should not
+     * @param {pentaho.type.action.Changeset} noNotifyParentChangeset - A parent changeset that should not
      * be notified.
      *
      * @private
@@ -388,7 +388,7 @@ define([
      * Gets a value that indicates if this changeset contains any changes,
      * whether they are primitive or in contained changesets.
      *
-     * @name pentaho.type.changes.Changeset#hasChanges
+     * @name pentaho.type.action.Changeset#hasChanges
      * @type {boolean}
      * @readOnly
      * @abstract
@@ -405,13 +405,13 @@ define([
      * Primitive changes are removed, while contained changesets are cleared.
      *
      * This method validates that the changeset is in a valid state and then delegates actual
-     * work to the [_clearChangesRecursive]{@link pentaho.type.changes.Changeset#_clearChangesRecursive} method.
+     * work to the [_clearChangesRecursive]{@link pentaho.type.action.Changeset#_clearChangesRecursive} method.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset or any of its contained changesets
-     * have been marked [read-only]{@link pentaho.type.changes.Changeset#isReadOnly}.
+     * have been marked [read-only]{@link pentaho.type.action.Changeset#isReadOnly}.
      *
-     * @see pentaho.type.changes.Changeset#_clearChanges
-     * @see pentaho.type.changes.Changeset#_clearChangesRecursive
+     * @see pentaho.type.action.Changeset#_clearChanges
+     * @see pentaho.type.action.Changeset#_clearChangesRecursive
      */
     clearChanges: function() {
 
@@ -424,13 +424,13 @@ define([
      * Called by a parent changeset on its child changeset, this, for it to clear its changes.
      *
      * This method updates the transaction version of this changeset to match the parent's version
-     * and then delegates to the [_clearChanges]{@link pentaho.type.changes.Changeset#_clearChanges} method.
+     * and then delegates to the [_clearChanges]{@link pentaho.type.action.Changeset#_clearChanges} method.
      *
-     * @param {pentaho.type.changes.Changeset} parentChangeset - The parent changeset.
+     * @param {pentaho.type.action.Changeset} parentChangeset - The parent changeset.
      *
      * @protected
-     * @see pentaho.type.changes.Changeset#transactionVersion
-     * @see pentaho.type.changes.Changeset#clearChanges
+     * @see pentaho.type.action.Changeset#transactionVersion
+     * @see pentaho.type.action.Changeset#clearChanges
      */
     _clearChangesRecursive: function(parentChangeset) {
 
@@ -447,11 +447,11 @@ define([
     /**
      * Actually removes all changes from this changeset.
      *
-     * @name pentaho.type.changes.Changeset#_clearChanges
+     * @name pentaho.type.action.Changeset#_clearChanges
      * @method
      * @abstract
      * @protected
-     * @see pentaho.type.changes.Changeset#clearChanges
+     * @see pentaho.type.action.Changeset#clearChanges
      */
     // endregion
 

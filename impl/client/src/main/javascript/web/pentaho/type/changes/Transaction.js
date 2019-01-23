@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ define([
        *
        * Changesets are inserted in inverse topological order.
        *
-       * @type {pentaho.lang.SortedList.<pentaho.type.changes.Changeset>}
+       * @type {pentaho.lang.SortedList.<pentaho.type.action.Changeset>}
        * @private
        * @see pentaho.type.changes.Transaction#__doCommitWillCore
        */
@@ -119,7 +119,7 @@ define([
       /**
        * The current changeset being evaluated in the commit will phase.
        *
-       * @type {pentaho.type.changes.Changeset}
+       * @type {pentaho.type.action.Changeset}
        * @private
        */
       this.__commitWillChangeset = null;
@@ -174,7 +174,7 @@ define([
      * Initially, a transaction has version `0`.
      * This number is then incremented per each individual made change.
      * Each change indicates the version it caused the transaction to assume:
-     * {@link pentaho.type.changes.Change#transactionVersion}.
+     * {@link pentaho.type.action.Change#transactionVersion}.
      *
      * @type {number}
      * @readOnly
@@ -231,7 +231,7 @@ define([
      *
      * @param {string} uid - The unique identifier of the instance.
      *
-     * @return {pentaho.type.changes.Changeset} The changeset, or `null`.
+     * @return {pentaho.type.action.Changeset} The changeset, or `null`.
      */
     getChangeset: function(uid) {
       return O.getOwn(this.__csetByUid, uid, null);
@@ -288,12 +288,12 @@ define([
      *
      * @param {pentaho.type.mixins.Container} target - The changeset target container.
      *
-     * @return {pentaho.type.changes.Changeset} The existing or created changeset.
+     * @return {pentaho.type.action.Changeset} The existing or created changeset.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the transaction has already been previewed,
      * committed or rejected, and thus can no longer be changed.
      *
-     * @see pentaho.type.changes.Changeset#__onChildChangesetCreated
+     * @see pentaho.type.action.Changeset#__onChildChangesetCreated
      */
     ensureChangeset: function(target) {
       return O.getOwn(this.__csetByUid, target.$uid) || this.__createChangeset(target);
@@ -304,7 +304,7 @@ define([
      *
      * @param {pentaho.type.mixins.Container} target - The changeset target container.
      *
-     * @return {pentaho.type.changes.Changeset} The existing or created changeset.
+     * @return {pentaho.type.action.Changeset} The existing or created changeset.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the transaction has already been previewed,
      * committed or rejected, and thus can no longer be changed.
@@ -345,7 +345,7 @@ define([
     /**
      * Iterates through all of the changesets.
      *
-     * @param {function(this:pentaho.type.changes.Transaction, pentaho.type.changes.Changeset):boolean} fun - The
+     * @param {function(this:pentaho.type.changes.Transaction, pentaho.type.action.Changeset):boolean} fun - The
      * iteratee method.
      *
      * @private
@@ -787,7 +787,7 @@ define([
     /**
      * Adds a changeset to the commit-will queue, if it isn't there yet.
      *
-     * @param {pentaho.type.changes.Changeset} changeset - The changeset.
+     * @param {pentaho.type.action.Changeset} changeset - The changeset.
      * @param {boolean} forceIfRan - Indicates that the changeset should be added even if it already ran.
      * @private
      */
@@ -808,7 +808,7 @@ define([
      * this method adds the given changeset to the evaluation queue,
      * if it isn't the current changeset being evaluated.
      *
-     * @param {pentaho.type.changes.Changeset} changeset - The changeset.
+     * @param {pentaho.type.action.Changeset} changeset - The changeset.
      * @private
      */
     __onChangesetLocalVersionChangeDid: function(changeset) {
@@ -820,7 +820,7 @@ define([
     /**
      * Called by a changeset when its topological order is about to change.
      *
-     * @param {pentaho.type.changes.Changeset} changeset - The changeset.
+     * @param {pentaho.type.action.Changeset} changeset - The changeset.
      *
      * @return {?function} A function that should be called after the change, or `null`.
      *
@@ -844,7 +844,7 @@ define([
     /**
      * Called to finish the topological order change of a changeset.
      *
-     * @param {pentaho.type.changes.Changeset} changeset - The changeset.
+     * @param {pentaho.type.action.Changeset} changeset - The changeset.
      *
      * @private
      */
@@ -1003,7 +1003,7 @@ define([
      *
      * @param {pentaho.type.mixins.Container} container - The container.
      *
-     * @return {Array.<pentaho.type.changes.Changeset>} An array of changesets, if any changeset exists;
+     * @return {Array.<pentaho.type.action.Changeset>} An array of changesets, if any changeset exists;
      * `null` otherwise.
      */
     getChangesetsPending: function(container) {

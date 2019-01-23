@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,18 @@ define([
 ], function(module, PrimitiveChange) {
   "use strict";
 
-  return PrimitiveChange.extend(module.id, /** @lends pentaho.type.changes.Sort# */{
+  return PrimitiveChange.extend(module.id, /** @lends pentaho.type.action.Sort# */{
 
     /**
      * @alias Sort
-     * @memberOf pentaho.type.changes
+     * @memberOf pentaho.type.action
      * @class
-     * @extends pentaho.type.changes.PrimitiveChange
-     * @amd pentaho/type/changes/Sort
+     * @extends pentaho.type.action.PrimitiveChange
+     * @amd pentaho/type/action/Sort
      *
      * @classDesc The `Sort` class describes the primitive operation that sorts the element in a list.
      *
-     * This type of change is always part of a {@link pentaho.type.changes.ListChangeset}.
+     * This type of change is always part of a {@link pentaho.type.action.ListChangeset}.
      *
      * @constructor
      * @description Creates an instance.

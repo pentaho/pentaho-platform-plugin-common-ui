@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
+ * Copyright 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,10 @@
  */
 
 /**
- * The `changes` namespace contains classes that describe the flow of internal changes of values.
+ * The `spec.IGeneric` interface describes a generic action instance.
  *
- * @name pentaho.type.changes
- * @namespace
+ * @name pentaho.action.spec.IGeneric
+ *
+ * @interface
+ * @extends pentaho.action.spec.IBase
  */

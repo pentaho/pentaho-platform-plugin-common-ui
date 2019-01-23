@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/action/Generic",
+  "pentaho/action/Base",
   "pentaho/action/Execution",
   "pentaho/action/States",
   "pentaho/type/ValidationError",

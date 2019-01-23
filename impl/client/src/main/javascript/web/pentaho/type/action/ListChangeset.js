@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,11 +29,11 @@ define([
 
   /**
    * @name ListChangeset
-   * @memberOf pentaho.type.changes
+   * @memberOf pentaho.type.action
    * @class
-   * @extends pentaho.type.changes.Changeset
+   * @extends pentaho.type.action.Changeset
    *
-   * @amd pentaho/type/changes/ListChangeset
+   * @amd pentaho/type/action/ListChangeset
    *
    * @classDesc The class `ListChangeset` describes a log of changes in a
    * [list]{@linkplain pentaho.type.List} value.
@@ -44,7 +44,7 @@ define([
    * @param {pentaho.type.changes.Transaction} transaction - The owning transaction.
    * @param {pentaho.type.List} target - The list value where the changes take place.
    */
-  return Changeset.extend(module.id, /** @lends pentaho.type.changes.ListChangeset# */{
+  return Changeset.extend(module.id, /** @lends pentaho.type.action.ListChangeset# */{
 
     constructor: function(transaction, target) {
 
@@ -53,7 +53,7 @@ define([
       /**
        * Map of the existing child changesets, with current primitive changes applied.
        *
-       * @type {Object.<string, pentaho.type.changes.Changeset>}
+       * @type {Object.<string, pentaho.type.action.Changeset>}
        * @private
        */
       this.__changesetByKey = Object.create(null);
@@ -61,7 +61,7 @@ define([
       /**
        * Array of primitive changes.
        *
-       * @type {Array.<pentaho.type.changes.Change>}
+       * @type {Array.<pentaho.type.action.Change>}
        * @private
        */
       this.__primitiveChanges = [];
@@ -74,7 +74,7 @@ define([
     /**
      * Gets the list value where the changes take place.
      *
-     * @name pentaho.type.changes.ListChangeset#target
+     * @name pentaho.type.action.ListChangeset#target
      * @type {pentaho.type.List}
      * @readonly
      */
@@ -123,7 +123,7 @@ define([
      *
      * @param {string} key - The key of the element.
      *
-     * @return {pentaho.type.changes.ComplexChangeset} The child changeset or `null`.
+     * @return {pentaho.type.action.ComplexChangeset} The child changeset or `null`.
      */
     getChange: function(key) {
       return O.getOwn(this.__changesetByKey, key) || null;
@@ -294,8 +294,8 @@ define([
 
     /**
      * Decomposes the modifications into a set of operations and
-     * populates [__primitiveChanges]{@link pentaho.type.changes.ListChangeset#__primitiveChanges} with
-     * the relevant [PrimitiveChange]{@link pentaho.type.changes.PrimitiveChange} objects.
+     * populates [__primitiveChanges]{@link pentaho.type.action.ListChangeset#__primitiveChanges} with
+     * the relevant [PrimitiveChange]{@link pentaho.type.action.PrimitiveChange} objects.
      *
      * @param {*|Array} fragment - The element or elements to set.
      * @param {?boolean} [add=false] Adds new elements to the list.
@@ -516,7 +516,7 @@ define([
      * @throws {TypeError} When a change would occur and the target list
      * is [read-only]{@link pentaho.type.List#$isReadOnly}.
      *
-     * @see pentaho.type.changes.Remove
+     * @see pentaho.type.action.Remove
      * @private
      * @internal
      * @friend pentaho.type.List
@@ -606,7 +606,7 @@ define([
      * @throws {TypeError} When a change would occur and the target list
      * is [read-only]{@link pentaho.type.List#$isReadOnly}.
      *
-     * @see pentaho.type.changes.Remove
+     * @see pentaho.type.action.Remove
      * @private
      * @internal
      * @friend pentaho.type.List
@@ -646,7 +646,7 @@ define([
      * @throws {TypeError} When a change would occur and the target list
      * is [read-only]{@link pentaho.type.List#$isReadOnly}.
      *
-     * @see pentaho.type.changes.Move
+     * @see pentaho.type.action.Move
      * @private
      * @internal
      * @friend pentaho.type.List
@@ -677,7 +677,7 @@ define([
     },
 
     /**
-     * Adds a [sorting]{@link pentaho.type.changes.Sort} operation to the list of changes.
+     * Adds a [sorting]{@link pentaho.type.action.Sort} operation to the list of changes.
      *
      * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer - The
      * function used for comparing elements in the list.
@@ -687,7 +687,7 @@ define([
      * @throws {TypeError} When a change would occur and the target list
      * is [read-only]{@link pentaho.type.List#$isReadOnly}.
      *
-     * @see pentaho.type.changes.Sort
+     * @see pentaho.type.action.Sort
      * @private
      * @internal
      * @friend pentaho.type.List
@@ -710,7 +710,7 @@ define([
      * @throws {TypeError} When a change would occur and the target list
      * is [read-only]{@link pentaho.type.List#$isReadOnly}.
      *
-     * @see pentaho.type.changes.Clear
+     * @see pentaho.type.action.Clear
      * @private
      * @internal
      * @friend pentaho.type.List
@@ -735,7 +735,7 @@ define([
      * Appends a change to this changeset.
      * Called by the constructor of individual primitive changes.
      *
-     * @param {pentaho.type.changes.PrimitiveChange} change - Change object to be appended to the list of changes.
+     * @param {pentaho.type.action.PrimitiveChange} change - Change object to be appended to the list of changes.
      * @private
      * @internal
      */

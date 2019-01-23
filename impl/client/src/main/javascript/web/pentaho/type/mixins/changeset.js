@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ define([
     /**
      * Initializes the mixin.
      *
-     * @param {pentaho.type.changes.Changeset} changeset - An object that describes a set of changes.
+     * @param {pentaho.type.action.Changeset} changeset - An object that describes a set of changes.
      * @protected
      */
     _initChangeset: function(changeset) {
@@ -40,7 +40,7 @@ define([
     /**
      * Gets the object that describes the set of changes.
      *
-     * @type {pentaho.type.changes.Changeset}
+     * @type {pentaho.type.action.Changeset}
      * @readonly
      */
     get changeset() {
