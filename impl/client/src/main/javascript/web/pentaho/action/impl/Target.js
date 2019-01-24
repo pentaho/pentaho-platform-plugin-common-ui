@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2017 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@ define([
   "module",
   "pentaho/lang/EventSource",
   "../Execution",
+  "pentaho/lang/ArgumentRequiredError",
   "pentaho/util/error"
-], function(module, EventSource, ActionExecution, error) {
+], function(module, EventSource, ActionExecution, ArgumentRequiredError, error) {
 
   "use strict";
 
@@ -39,8 +40,50 @@ define([
    * @class
    * @memberOf pentaho.action.impl.Target
    * @extends pentaho.action.Execution
+   *
+   * @description Creates an action execution instance for a given action and target.
+   *
+   * @constructor
+   * @param {pentaho.type.action.Base} action - The action to execute. A clone of it is used.
+   * @param {pentaho.type.action.ITarget} target - The target on which to execute.
    */
   var TargetActionExecution = ActionExecution.extend({
+    constructor: function(action, target) {
+
+      this.base();
+
+      if(!action) throw new ArgumentRequiredError("action");
+      if(!target) throw new ArgumentRequiredError("target");
+
+      // Clone action so that it can be safely frozen and
+      // still allow the original action to be re-executed.
+      /**
+       * The action of the action execution.
+       *
+       * @type {pentaho.type.action.Base}
+       * @private
+       */
+      this.__action = action.clone();
+
+      /**
+       * The target of the action execution.
+       *
+       * @type {pentaho.type.action.ITarget}
+       * @private
+       */
+      this.__target = target;
+    },
+
+    /** @inheritDoc */
+    get action() {
+      return this.__action;
+    },
+
+    /** @inheritDoc */
+    get target() {
+      return this.__target;
+    },
+
     // @override
     _onPhaseInit: function() {
       this.target._emitActionPhaseInitEvent(this);
@@ -164,7 +207,7 @@ define([
     _emitActionPhaseInitEvent: function(actionExecution) {
 
       var action = actionExecution.action;
-      var eventType = action.type;
+      var eventType = action.eventName;
 
       this._emitGeneric(this, [actionExecution, action], eventType, "init", __emitActionKeyArgs);
     },
@@ -182,7 +225,7 @@ define([
     _emitActionPhaseWillEvent: function(actionExecution) {
 
       var action = actionExecution.action;
-      var eventType = action.type;
+      var eventType = action.eventName;
 
       this._emitGeneric(this, [actionExecution, action], eventType, "will", __emitActionKeyArgs);
     },
@@ -207,7 +250,7 @@ define([
 
       var action = actionExecution.action;
       var isActionSync = action.constructor.isSync;
-      var eventType = action.type;
+      var eventType = action.eventName;
 
       if(isActionSync) {
         this._emitGeneric(this, [actionExecution, action], eventType, "do", __emitActionKeyArgs);
@@ -231,7 +274,7 @@ define([
     _emitActionPhaseFinallyEvent: function(actionExecution) {
 
       var action = actionExecution.action;
-      var eventType = action.type;
+      var eventType = action.eventName;
 
       this._emitGeneric(this, [actionExecution, action], eventType, "finally");
     }

@@ -240,25 +240,25 @@ define([
 
     describe("#acceptWill()", function() {
 
-      it("should call txn __commitWill if current", function() {
+      it("should call txn __commitInit if current", function() {
 
         var txn = new Transaction();
         var scope = new TransactionScope(txn);
 
-        spyOn(txn, "__commitWill");
+        spyOn(txn, "__commitInit");
 
         scope.acceptWill();
 
-        expect(txn.__commitWill).toHaveBeenCalled();
+        expect(txn.__commitInit).toHaveBeenCalled();
         scope.exit();
       });
 
-      it("should call txn __commitWill and return its value if current", function() {
+      it("should call txn __commitInit and return its value if current", function() {
 
         var txn = new Transaction();
         var scope = new TransactionScope(txn);
         var result = {};
-        spyOn(txn, "__commitWill").and.returnValue(result);
+        spyOn(txn, "__commitInit").and.returnValue(result);
 
         var result2 = scope.acceptWill();
 

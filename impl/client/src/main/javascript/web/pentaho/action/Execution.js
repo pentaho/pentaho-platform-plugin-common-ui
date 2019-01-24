@@ -176,31 +176,8 @@ define([
      * @description Creates an action execution instance for a given action and target.
      *
      * @constructor
-     * @param {pentaho.type.action.Base} action - The action to execute. A clone of it is used.
-     * @param {pentaho.type.action.ITarget} target - The target on which to execute.
      */
-    constructor: function(action, target) {
-
-      if(!action) throw new ArgumentRequiredError("action");
-      if(!target) throw new ArgumentRequiredError("target");
-
-      // Clone action so that it can be safely frozen and
-      // still allow the original action to be re-executed.
-      /**
-       * The action of the action execution.
-       *
-       * @type {pentaho.type.action.Base}
-       * @private
-       */
-      this.__action = action.clone();
-
-      /**
-       * The target of the action execution.
-       *
-       * @type {pentaho.type.action.ITarget}
-       * @private
-       */
-      this.__target = target;
+    constructor: function() {
 
       /**
        * The current action state.
@@ -246,9 +223,9 @@ define([
      *
      * @type {pentaho.type.action.Base}
      * @readonly
+     * @abstract
      */
     get action() {
-      return this.__action;
     },
 
     /**
@@ -258,9 +235,9 @@ define([
      *
      * @type {pentaho.type.action.ITarget}
      * @readonly
+     * @abstract
      */
     get target() {
-      return this.__target;
     },
 
     // region ActionExecution state and result, predicates and get/set properties
@@ -818,9 +795,7 @@ define([
 
       // Validating here and not on the end of `__executePhaseInit`
       // ensures that isSettled is false (not rejected already).
-      var errors = this.__action.validate();
-      if(errors && errors.length) {
-        this.__reject(errors[0]);
+      if(this.__validatePhaseWill() != null) {
         return;
       }
 
@@ -828,6 +803,18 @@ define([
       Object.freeze(this.__action);
 
       this._onPhaseWill();
+    },
+
+    __validatePhaseWill: function() {
+      var errors = this.__action.validate();
+
+      if(errors && errors.length) {
+        this.__reject(errors[0]);
+
+        return errors;
+      }
+
+      return null;
     },
 
     /**
@@ -981,7 +968,5 @@ define([
      */
     _onPhaseFinally: function() {
     }
-    // endregion
-    // endregion
   });
 });

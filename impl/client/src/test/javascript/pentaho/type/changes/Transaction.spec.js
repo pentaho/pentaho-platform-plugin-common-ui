@@ -472,7 +472,7 @@ define([
       });
     });
 
-    describe("#__doCommitWillCore", function() {
+    describe("#__doCommitInitCore", function() {
 
       var transaction;
       var scope;
@@ -599,7 +599,7 @@ define([
 
       function expectQueue(targets) {
 
-        expect(transaction.__commitWillQueue.slice())
+        expect(transaction.__commitInitQueue.slice())
           .toEqual(targets.map(function(target) { return target.$changeset; }));
       }
 
@@ -607,16 +607,16 @@ define([
 
         it("should return immediately", function() {
 
-          spyOn(transaction, "__initCommitWillQueue");
+          spyOn(transaction, "__setupCommitInitQueue");
 
-          transaction.__doCommitWillCore();
+          transaction.__doCommitInitCore();
 
-          expect(transaction.__initCommitWillQueue).not.toHaveBeenCalled();
+          expect(transaction.__setupCommitInitQueue).not.toHaveBeenCalled();
         });
 
         it("should return fulfilled", function() {
 
-          var result = transaction.__doCommitWillCore();
+          var result = transaction.__doCommitInitCore();
 
           expect(result != null).toBe(true);
           expect(result.isFulfilled).toBe(true);
@@ -625,27 +625,27 @@ define([
 
       describe("when there are changes", function() {
 
-        it("should call __initCommitWillQueue to initialize the queue", function() {
+        it("should call __setupCommitInitQueue to initialize the queue", function() {
 
           spyOnProperty(transaction, "version", "get").and.returnValue(1);
-          spyOn(transaction, "__initCommitWillQueue").and.callFake(function() {
-            transaction.__commitWillQueue = [];
+          spyOn(transaction, "__setupCommitInitQueue").and.callFake(function() {
+            transaction.__commitInitQueue = [];
           });
 
-          transaction.__doCommitWillCore();
+          transaction.__doCommitInitCore();
 
-          expect(transaction.__initCommitWillQueue).toHaveBeenCalled();
+          expect(transaction.__setupCommitInitQueue).toHaveBeenCalled();
         });
 
-        describe("#__initCommitWillQueue", function() {
+        describe("#__setupCommitInitQueue", function() {
 
           it("should create the queue data structures", function() {
 
-            transaction.__initCommitWillQueue();
+            transaction.__setupCommitInitQueue();
 
-            expect(transaction.__commitWillQueue instanceof Array).toBe(true);
-            expect(typeof transaction.__commitWillQueueSet).toBe("object");
-            expect(transaction.__commitWillChangeset).toBe(null);
+            expect(transaction.__commitInitQueue instanceof Array).toBe(true);
+            expect(typeof transaction.__commitInitQueueSet).toBe("object");
+            expect(transaction.__commitInitChangeset).toBe(null);
           });
 
           it("should add leaf changesets of all graphs to the queue in correct order", function() {
@@ -667,7 +667,7 @@ define([
             // => 5 changesets (net order 4)
             neighborhood.graph2.cat1.name = "felix2";
 
-            transaction.__initCommitWillQueue();
+            transaction.__setupCommitInitQueue();
 
             expectQueue([
               neighborhood.graph1.dog1,
@@ -683,7 +683,7 @@ define([
             // => 3 changesets (net order 2)
             neighborhood.graph3.dog1.name = "can2";
 
-            var result = transaction.__initCommitWillQueue();
+            var result = transaction.__setupCommitInitQueue();
 
             expect(result).toBe(false);
           });
@@ -697,13 +697,13 @@ define([
             // => 3 changesets (net order 2)
             neighborhood.graph3.dog1.name = "can2";
 
-            var result = transaction.__initCommitWillQueue();
+            var result = transaction.__setupCommitInitQueue();
 
             expect(result).toBe(true);
           });
         });
 
-        describe("when __initCommitWillQueue returns false", function() {
+        describe("when __setupCommitInitQueue returns false", function() {
 
           it("should return fulfilled immediately", function() {
 
@@ -712,26 +712,26 @@ define([
             // => 3 changesets (net order 2)
             neighborhood.graph3.dog1.name = "can2";
 
-            spyOn(transaction, "__initCommitWillQueue").and.returnValue(false);
+            spyOn(transaction, "__setupCommitInitQueue").and.returnValue(false);
 
-            spyOn(neighborhood.graph3.dog1, "_onChangeWill");
-            spyOn(neighborhood.graph3.person1, "_onChangeWill");
-            spyOn(neighborhood.graph3.person1.pets, "_onChangeWill");
+            spyOn(neighborhood.graph3.dog1, "_onChangeInit");
+            spyOn(neighborhood.graph3.person1, "_onChangeInit");
+            spyOn(neighborhood.graph3.person1.pets, "_onChangeInit");
 
-            var result = transaction.__doCommitWillCore();
+            var result = transaction.__doCommitInitCore();
 
-            expect(neighborhood.graph3.dog1._onChangeWill).not.toHaveBeenCalled();
-            expect(neighborhood.graph3.person1._onChangeWill).not.toHaveBeenCalled();
-            expect(neighborhood.graph3.person1.pets._onChangeWill).not.toHaveBeenCalled();
+            expect(neighborhood.graph3.dog1._onChangeInit).not.toHaveBeenCalled();
+            expect(neighborhood.graph3.person1._onChangeInit).not.toHaveBeenCalled();
+            expect(neighborhood.graph3.person1.pets._onChangeInit).not.toHaveBeenCalled();
 
             expect(result != null).toBe(true);
             expect(result.isFulfilled).toBe(true);
           });
         });
 
-        describe("when __initCommitWillQueue returns true", function() {
+        describe("when __setupCommitInitQueue returns true", function() {
 
-          it("should call _onChangeWill on every changeset in queue order", function() {
+          it("should call _onChangeInit on every changeset in queue order", function() {
 
             var neighborhood = scenarioNeighborhood();
 
@@ -745,21 +745,21 @@ define([
             var petsOrder;
             var person1Order;
 
-            spyOn(neighborhood.graph3.dog1, "_onChangeWill").and.callFake(function() {
+            spyOn(neighborhood.graph3.dog1, "_onChangeInit").and.callFake(function() {
               dog1Order = order++;
             });
-            spyOn(neighborhood.graph3.person1.pets, "_onChangeWill").and.callFake(function() {
+            spyOn(neighborhood.graph3.person1.pets, "_onChangeInit").and.callFake(function() {
               petsOrder = order++;
             });
-            spyOn(neighborhood.graph3.person1, "_onChangeWill").and.callFake(function() {
+            spyOn(neighborhood.graph3.person1, "_onChangeInit").and.callFake(function() {
               person1Order = order++;
             });
 
-            transaction.__doCommitWillCore();
+            transaction.__doCommitInitCore();
 
-            expect(neighborhood.graph3.dog1._onChangeWill).toHaveBeenCalledTimes(1);
-            expect(neighborhood.graph3.person1._onChangeWill).toHaveBeenCalledTimes(1);
-            expect(neighborhood.graph3.person1.pets._onChangeWill).toHaveBeenCalledTimes(1);
+            expect(neighborhood.graph3.dog1._onChangeInit).toHaveBeenCalledTimes(1);
+            expect(neighborhood.graph3.person1._onChangeInit).toHaveBeenCalledTimes(1);
+            expect(neighborhood.graph3.person1.pets._onChangeInit).toHaveBeenCalledTimes(1);
 
             expect(dog1Order).toBe(1);
             expect(petsOrder).toBe(2);
@@ -768,11 +768,11 @@ define([
 
           describe("when a changeset target cancels the event", function() {
 
-            it("should call __finalizeCommitWillQueue and return rejected", function() {
+            it("should call __finalizeCommitInitQueue and return rejected", function() {
 
               var neighborhood = scenarioNeighborhood();
 
-              spyOn(transaction, "__finalizeCommitWillQueue");
+              spyOn(transaction, "__finalizeCommitInitQueue");
 
               var cancelReason = new Error();
 
@@ -781,13 +781,13 @@ define([
               // => 3 changesets (net order 2)
               neighborhood.graph3.dog1.name = "can2";
 
-              spyOn(neighborhood.graph3.dog1, "_onChangeWill").and.returnValue(cancelReason);
-              spyOn(neighborhood.graph3.person1.pets, "_onChangeWill");
-              spyOn(neighborhood.graph3.person1, "_onChangeWill");
+              spyOn(neighborhood.graph3.dog1, "_onChangeInit").and.returnValue(cancelReason);
+              spyOn(neighborhood.graph3.person1.pets, "_onChangeInit");
+              spyOn(neighborhood.graph3.person1, "_onChangeInit");
 
-              var result = transaction.__doCommitWillCore();
+              var result = transaction.__doCommitInitCore();
 
-              expect(transaction.__finalizeCommitWillQueue).toHaveBeenCalledTimes(1);
+              expect(transaction.__finalizeCommitInitQueue).toHaveBeenCalledTimes(1);
 
               expect(result != null).toBe(true);
               expect(result.isRejected).toBe(true);
@@ -800,7 +800,7 @@ define([
 
               var neighborhood = scenarioNeighborhood();
 
-              spyOn(transaction, "__finalizeCommitWillQueue");
+              spyOn(transaction, "__finalizeCommitInitQueue");
 
               var cancelReason = new Error();
 
@@ -811,26 +811,26 @@ define([
 
               // Person1 was created first and will be the first to add an iref in dog2 (through its pets list).
               // So it will be placed in the queue before Person2.
-              spyOn(neighborhood.graph1.dog2, "_onChangeWill");
-              spyOn(neighborhood.graph1.person1.pets, "_onChangeWill");
-              spyOn(neighborhood.graph1.person1, "_onChangeWill").and.returnValue(cancelReason);
+              spyOn(neighborhood.graph1.dog2, "_onChangeInit");
+              spyOn(neighborhood.graph1.person1.pets, "_onChangeInit");
+              spyOn(neighborhood.graph1.person1, "_onChangeInit").and.returnValue(cancelReason);
 
-              spyOn(neighborhood.graph1.person2.pets, "_onChangeWill");
-              spyOn(neighborhood.graph1.person2, "_onChangeWill");
+              spyOn(neighborhood.graph1.person2.pets, "_onChangeInit");
+              spyOn(neighborhood.graph1.person2, "_onChangeInit");
 
-              spyOn(neighborhood.graph1.house1.residents, "_onChangeWill");
-              spyOn(neighborhood.graph1.house1, "_onChangeWill");
+              spyOn(neighborhood.graph1.house1.residents, "_onChangeInit");
+              spyOn(neighborhood.graph1.house1, "_onChangeInit");
 
-              transaction.__doCommitWillCore();
+              transaction.__doCommitInitCore();
 
-              expect(neighborhood.graph1.dog2._onChangeWill).toHaveBeenCalledTimes(1);
-              expect(neighborhood.graph1.person1.pets._onChangeWill).toHaveBeenCalledTimes(1);
-              expect(neighborhood.graph1.person2.pets._onChangeWill).toHaveBeenCalledTimes(1);
-              expect(neighborhood.graph1.person1._onChangeWill).toHaveBeenCalledTimes(1);
+              expect(neighborhood.graph1.dog2._onChangeInit).toHaveBeenCalledTimes(1);
+              expect(neighborhood.graph1.person1.pets._onChangeInit).toHaveBeenCalledTimes(1);
+              expect(neighborhood.graph1.person2.pets._onChangeInit).toHaveBeenCalledTimes(1);
+              expect(neighborhood.graph1.person1._onChangeInit).toHaveBeenCalledTimes(1);
 
-              expect(neighborhood.graph1.person2._onChangeWill).not.toHaveBeenCalled();
-              expect(neighborhood.graph1.house1.residents._onChangeWill).not.toHaveBeenCalled();
-              expect(neighborhood.graph1.house1._onChangeWill).not.toHaveBeenCalled();
+              expect(neighborhood.graph1.person2._onChangeInit).not.toHaveBeenCalled();
+              expect(neighborhood.graph1.house1.residents._onChangeInit).not.toHaveBeenCalled();
+              expect(neighborhood.graph1.house1._onChangeInit).not.toHaveBeenCalled();
             });
           });
 
@@ -838,7 +838,7 @@ define([
 
             describe("when there are multiple paths to a changset", function() {
 
-              it("should call _onChangeWill on its target only once if no additional changes occur", function() {
+              it("should call _onChangeInit on its target only once if no additional changes occur", function() {
 
                 var neighborhood = scenarioNeighborhood();
 
@@ -847,40 +847,40 @@ define([
                 // => 5 changesets (net order 4)
                 neighborhood.graph2.cat1.name = "felix2";
 
-                spyOn(neighborhood.graph2.cat1, "_onChangeWill");
-                spyOn(neighborhood.graph2.person1.pets, "_onChangeWill");
-                spyOn(neighborhood.graph2.person1, "_onChangeWill");
-                spyOn(neighborhood.graph2.house1.residents, "_onChangeWill");
-                spyOn(neighborhood.graph2.house1, "_onChangeWill");
+                spyOn(neighborhood.graph2.cat1, "_onChangeInit");
+                spyOn(neighborhood.graph2.person1.pets, "_onChangeInit");
+                spyOn(neighborhood.graph2.person1, "_onChangeInit");
+                spyOn(neighborhood.graph2.house1.residents, "_onChangeInit");
+                spyOn(neighborhood.graph2.house1, "_onChangeInit");
 
-                transaction.__doCommitWillCore();
+                transaction.__doCommitInitCore();
 
-                expect(neighborhood.graph2.cat1._onChangeWill).toHaveBeenCalledTimes(1);
-                expect(neighborhood.graph2.person1._onChangeWill).toHaveBeenCalledTimes(1);
-                expect(neighborhood.graph2.person1.pets._onChangeWill).toHaveBeenCalledTimes(1);
-                expect(neighborhood.graph2.house1.residents._onChangeWill).toHaveBeenCalledTimes(1);
-                expect(neighborhood.graph2.house1._onChangeWill).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph2.cat1._onChangeInit).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph2.person1._onChangeInit).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph2.person1.pets._onChangeInit).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph2.house1.residents._onChangeInit).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph2.house1._onChangeInit).toHaveBeenCalledTimes(1);
               });
             });
 
-            it("should call __finalizeCommitWillQueue and return fulfilled", function() {
+            it("should call __finalizeCommitInitQueue and return fulfilled", function() {
 
               var neighborhood = scenarioNeighborhood();
 
-              spyOn(transaction, "__finalizeCommitWillQueue");
+              spyOn(transaction, "__finalizeCommitInitQueue");
 
               neighborhood.graph3.dog1.on("will:change", jasmine.createSpy("will:change"));
 
               // => 3 changesets (net order 2)
               neighborhood.graph3.dog1.name = "can2";
 
-              spyOn(neighborhood.graph3.dog1, "_onChangeWill");
-              spyOn(neighborhood.graph3.person1.pets, "_onChangeWill");
-              spyOn(neighborhood.graph3.person1, "_onChangeWill");
+              spyOn(neighborhood.graph3.dog1, "_onChangeInit");
+              spyOn(neighborhood.graph3.person1.pets, "_onChangeInit");
+              spyOn(neighborhood.graph3.person1, "_onChangeInit");
 
-              var result = transaction.__doCommitWillCore();
+              var result = transaction.__doCommitInitCore();
 
-              expect(transaction.__finalizeCommitWillQueue).toHaveBeenCalledTimes(1);
+              expect(transaction.__finalizeCommitInitQueue).toHaveBeenCalledTimes(1);
 
               expect(result != null).toBe(true);
               expect(result.isFulfilled).toBe(true);
@@ -905,26 +905,26 @@ define([
                 // Set after the set above of dog1 name!
                 spyOn(transaction, "__onChangesetLocalVersionChangeDid").and.callThrough();
 
-                spyOn(transaction, "__addToCommitWillQueue").and.callThrough();
+                spyOn(transaction, "__addToCommitInitQueue").and.callThrough();
 
-                spyOn(neighborhood.graph3.dog1, "_onChangeWill").and.callFake(function() {
+                spyOn(neighborhood.graph3.dog1, "_onChangeInit").and.callFake(function() {
                   dog1Order = order++;
                   neighborhood.graph3.person1.age = 35;
                 });
 
-                spyOn(neighborhood.graph3.person1.pets, "_onChangeWill").and.callFake(function() {
+                spyOn(neighborhood.graph3.person1.pets, "_onChangeInit").and.callFake(function() {
                   petsOrder = order++;
                 });
 
-                spyOn(neighborhood.graph3.person1, "_onChangeWill").and.callFake(function() {
+                spyOn(neighborhood.graph3.person1, "_onChangeInit").and.callFake(function() {
                   person1Order = order++;
                 });
 
-                transaction.__doCommitWillCore();
+                transaction.__doCommitInitCore();
 
-                expect(neighborhood.graph3.dog1._onChangeWill).toHaveBeenCalledTimes(1);
-                expect(neighborhood.graph3.person1._onChangeWill).toHaveBeenCalledTimes(1);
-                expect(neighborhood.graph3.person1.pets._onChangeWill).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.dog1._onChangeInit).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.person1._onChangeInit).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.person1.pets._onChangeInit).toHaveBeenCalledTimes(1);
 
                 expect(dog1Order).toBe(1);
                 expect(petsOrder).toBe(2);
@@ -933,7 +933,7 @@ define([
                 expect(transaction.__onChangesetLocalVersionChangeDid).toHaveBeenCalledTimes(1);
                 expect(transaction.__onChangesetLocalVersionChangeDid)
                   .toHaveBeenCalledWith(neighborhood.graph3.person1.$changeset);
-                expect(transaction.__addToCommitWillQueue).toHaveBeenCalledTimes(4);
+                expect(transaction.__addToCommitInitQueue).toHaveBeenCalledTimes(4);
               });
             });
 
@@ -948,18 +948,18 @@ define([
                 // => 3 changesets (net order 2)
                 neighborhood.graph3.dog1.name = "can2";
 
-                spyOn(neighborhood.graph3.dog1, "_onChangeWill");
-                spyOn(neighborhood.graph3.person1.pets, "_onChangeWill").and.callFake(function() {
+                spyOn(neighborhood.graph3.dog1, "_onChangeInit");
+                spyOn(neighborhood.graph3.person1.pets, "_onChangeInit").and.callFake(function() {
                   neighborhood.graph3.dog1.name = "can3";
                 });
-                spyOn(neighborhood.graph3.person1, "_onChangeWill");
+                spyOn(neighborhood.graph3.person1, "_onChangeInit");
 
-                transaction.__doCommitWillCore();
+                transaction.__doCommitInitCore();
 
-                expect(neighborhood.graph3.dog1._onChangeWill).toHaveBeenCalledTimes(1);
-                expect(neighborhood.graph3.person1.pets._onChangeWill).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.dog1._onChangeInit).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.person1.pets._onChangeInit).toHaveBeenCalledTimes(1);
 
-                expect(neighborhood.graph3.person1._onChangeWill).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.person1._onChangeInit).toHaveBeenCalledTimes(1);
               });
 
               it("should be added to the queue and be executed if it did not yet ran", function() {
@@ -968,22 +968,22 @@ define([
 
                 neighborhood.graph3.person1.on("will:change", jasmine.createSpy("will:change"));
 
-                spyOn(neighborhood.graph3.dog1, "_onChangeWill");
-                spyOn(neighborhood.graph3.person1.pets, "_onChangeWill");
-                spyOn(neighborhood.graph3.person1, "_onChangeWill").and.callFake(function() {
+                spyOn(neighborhood.graph3.dog1, "_onChangeInit");
+                spyOn(neighborhood.graph3.person1.pets, "_onChangeInit");
+                spyOn(neighborhood.graph3.person1, "_onChangeInit").and.callFake(function() {
                   // => 3 changesets (net order 2)
                   neighborhood.graph3.dog1.name = "can2";
                 });
 
                 neighborhood.graph3.person1.name = "Trash2";
 
-                transaction.__doCommitWillCore();
+                transaction.__doCommitInitCore();
 
-                expect(neighborhood.graph3.dog1._onChangeWill).toHaveBeenCalledTimes(1);
-                expect(neighborhood.graph3.person1.pets._onChangeWill).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.dog1._onChangeInit).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.person1.pets._onChangeInit).toHaveBeenCalledTimes(1);
 
-                // _onChangeWill called twice, but listener only once.
-                expect(neighborhood.graph3.person1._onChangeWill).toHaveBeenCalledTimes(2);
+                // _onChangeInit called twice, but listener only once.
+                expect(neighborhood.graph3.person1._onChangeInit).toHaveBeenCalledTimes(2);
               });
 
               it("should not call the listener that changed the before changeset twice " +
@@ -999,10 +999,10 @@ define([
                 });
                 neighborhood.graph3.person1.pets.on("will:change", person1PetsChangeWill);
 
-                spyOn(neighborhood.graph3.dog1, "_onChangeWill");
-                spyOn(neighborhood.graph3.person1, "_onChangeWill");
+                spyOn(neighborhood.graph3.dog1, "_onChangeInit");
+                spyOn(neighborhood.graph3.person1, "_onChangeInit");
 
-                transaction.__doCommitWillCore();
+                transaction.__doCommitInitCore();
 
                 expect(person1PetsChangeWill).toHaveBeenCalledTimes(1);
               });

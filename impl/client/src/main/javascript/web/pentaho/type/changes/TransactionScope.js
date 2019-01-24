@@ -53,7 +53,7 @@ define([
     },
 
     /**
-     * Previews the result of committing the transaction by performing its _will_ phase.
+     * Previews the result of committing the transaction by performing its _init_ phase.
      *
      * Call this method to determine if an operation would be valid when there's
      * no _a priori_ intention of committing it, in case it is valid.
@@ -73,7 +73,7 @@ define([
     acceptWill: function() {
       this._assertInsideAndCurrent();
 
-      return this.transaction.__commitWill();
+      return this.transaction.__commitInit();
     },
 
     /**

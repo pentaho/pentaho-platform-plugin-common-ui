@@ -36,7 +36,7 @@ define([
      * @description Creates an action instance given its specification.
      * @constructor
      *
-     * @param {pentaho.action.spec.IGeneric} [spec] An action specification.
+     * @param {pentaho.action.spec.IGeneric} [spec] A generic action specification.
      *
      * @see pentaho.action.spec.IGeneric
      */
@@ -53,7 +53,7 @@ define([
     /**
      * Initializes an action instance given its specification.
      *
-     * @param {pentaho.action.spec.IGeneric} [spec] An action specification.
+     * @param {pentaho.action.spec.IGeneric} [spec] A generic action specification.
      * @protected
      */
     _init: function(spec) {
@@ -82,7 +82,7 @@ define([
      * Fills the given specification with this action's attributes' local values,
      * and returns whether any attribute was actually added.
      *
-     * @param {pentaho.action.spec.IGeneric} [spec] An action specification.
+     * @param {pentaho.action.spec.IGeneric} [spec] A generic action specification.
      *
      * @protected
      * @method

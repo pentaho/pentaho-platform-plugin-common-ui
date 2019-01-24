@@ -152,16 +152,20 @@ define([
       // that the handler would be attached already) because this is a new object. Also mappings are created
       // internally.
       //
-      // 2. Registering a listener has advantages over overriding _onChangeWill, as the transaction manages
+      // 2. Registering a listener has advantages over overriding _onChangeInit, as the transaction manages
       // to only call a listener if things changed below it since the last time it was called.
-      // On the other hand, this will cause the commitWill evaluation phase to always have to execute its
+      // On the other hand, this will cause the commitInit evaluation phase to always have to execute its
       // lengthier path.
       //
       // 3. Must be the last will:change listener, or the internal model is not guaranteed to be in sync.
       //    TODO: find a way to ensure that we're really the last listener.
-      this.on("will:change", this.__onChangeWillHandler.bind(this), {priority: -Infinity, isCritical: true});
+      this.on("change", {
+        will: this.__onChangeWillHandler.bind(this)
+      }, {priority: -Infinity, isCritical: true});
 
-      this.model.on("will:change", this.__onModelChangeWillHandler.bind(this), {priority: -Infinity, isCritical: true});
+      this.model.on("change", {
+        will: this.__onModelChangeWillHandler.bind(this)
+      }, {priority: -Infinity, isCritical: true});
     },
 
     /** @inheritDoc */
@@ -243,15 +247,15 @@ define([
     },
 
     /**
-     * Event handler for the `will:change` event as emitted by this object.
+     * Handler for the _will_ phase of a change action execution as emitted by this object.
      *
-     * @param {pentaho.type.events.WillChange} event - The will change event.
+     * @param {pentaho.action.Execution} actionExecution - The change action execution.
      * @private
      */
-    __onChangeWillHandler: function(event) {
+    __onChangeWillHandler: function(actionExecution) {
 
-      var changeset = event.changeset;
-      var propertyNames = changeset.propertyNames;
+      var changesetAction = actionExecution.action;
+      var propertyNames = changesetAction.propertyNames;
 
       if(__hasSingleChange(propertyNames, "selectionFilter")) {
 
@@ -269,16 +273,16 @@ define([
     },
 
     /**
-     * Event handler for the `will:change` event as emitted by this.model.
+     * Handler for the _will_ phase of a change action execution as emitted by this.model.
      *
-     * @param {pentaho.type.events.WillChange} event - The will change event.
+     * @param {pentaho.action.Execution} actionExecution - The change action execution.
      * @private
      */
-    __onModelChangeWillHandler: function(event) {
+    __onModelChangeWillHandler: function(actionExecution) {
 
-      var changeset = event.changeset;
+      var changesetAction = actionExecution.action;
 
-      if(changeset.hasChange("selectionFilter")) {
+      if(changesetAction.hasChange("selectionFilter")) {
 
         // console.log("[ModelAdapter] will:change model.selectionFilter");
 

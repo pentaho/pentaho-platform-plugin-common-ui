@@ -23,9 +23,31 @@ define([
   "../events/RejectedChange",
   "../events/DidChange",
   "pentaho/util/object"
-], function(module, Base, EventSource, ReferenceList, Transaction, WillChange, RejectedChange, DidChange, O) {
+], function(module, Base, EventSource, ReferenceList, Transaction,
+            WillChange, RejectedChange, DidChange, O) {
 
   "use strict";
+
+  /**
+   * The `_emitGeneric` keyword arguments used for all phases but the finally phase.
+   *
+   * In the early phases:
+   * - cancellation is possible;
+   * - arbitrary errors cause the action to fail.
+   *
+   * In the finally phase:
+   * - it is not possible to cancel;
+   * - errors are swallowed and logged and do not affect the action execution's result;
+   *   the default error handler does this.
+   */
+  var __emitActionKeyArgs = {
+    errorHandler: function(ex, actionExecution) {
+      actionExecution.fail(ex);
+    },
+    isCanceled: function(actionExecution) {
+      return actionExecution.isCanceled;
+    }
+  };
 
   /**
    * The unique id number of the next created container.
@@ -242,86 +264,64 @@ define([
      */
 
     /**
-     * Called before a changeset is committed.
      *
-     * The default implementation emits the "will:change" event for the given changeset,
-     * if there are any listeners.
-     *
-     * When overriding, be sure to call the base implementation.
-     *
-     * @param {pentaho.type.action.Changeset} changeset - The set of changes.
+     * @param actionExecution
      * @param {?object} [keyArgs] - The keyword arguments' object.
-     * See [EventSource#_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
-     *
-     * @return {pentaho.lang.UserError} An error if the changeset was canceled; `null` otherwise.
-     *
-     * @protected
-     * @internal
-     * @friend {pentaho.type.changes.Transaction}
+     * @private
      */
-    _onChangeWill: function(changeset, keyArgs) {
+    __emitChangeActionPhaseInitEvent: function(actionExecution, keyArgs) {
 
-      if(this._hasListeners("will:change")) {
+      var action = actionExecution.action;
+      var eventType = action.eventName;
 
-        var event = new WillChange(this, changeset);
-
-        try {
-          var result = keyArgs == null
-            ? this._emitSafe(event)
-            : this._emitGeneric(this, [event], event.type, null, keyArgs);
-
-          if(!result) {
-            return event.cancelReason;
-          }
-        } catch(ex) {
-          // `isCritical` listeners can throw...
-          event.cancel(ex);
-          return event.cancelReason;
-        }
-      }
-
-      return null;
+      this._emitGeneric(this, [actionExecution, action], eventType, "init", keyArgs);
     },
 
     /**
-     * Called after a changeset has been committed.
      *
-     * The default implementation emits the "did:change" event for the given changeset,
-     * if there are any listeners.
-     *
-     * When overriding, be sure to call the base implementation.
-     *
-     * @param {pentaho.type.action.Changeset} changeset - The set of changes.
-     *
-     * @protected
-     * @internal
-     * @friend {pentaho.type.changes.Transaction}
+     * @param actionExecution
+     * @private
      */
-    _onChangeDid: function(changeset) {
-      if(this._hasListeners("did:change")) {
-        this._emitSafe(new DidChange(this, changeset));
-      }
+    __emitChangeActionPhaseWillEvent: function(actionExecution) {
+
+      var action = actionExecution.action;
+      var eventType = action.eventName;
+
+      this._emitGeneric(this, [actionExecution, action], eventType, "will", __emitActionKeyArgs);
     },
 
     /**
-     * Called after a changeset has been rejected.
      *
-     * The default implementation emits the "rejected:change" event for the given changeset,
-     * if there are any listeners.
-     *
-     * When overriding, be sure to call the base implementation.
-     *
-     * @param {pentaho.type.action.Changeset} changeset - The set of changes.
-     * @param {Error} reason - The reason why the changes were rejected.
-     *
-     * @protected
-     * @internal
-     * @friend {pentaho.type.changes.Transaction}
+     * @param actionExecution
+     * @return {*}
+     * @private
      */
-    _onChangeRejected: function(changeset, reason) {
-      if(this._hasListeners("rejected:change")) {
-        this._emitSafe(new RejectedChange(this, changeset, reason));
+    __emitChangeActionPhaseDoEvent: function(actionExecution) {
+
+      var action = actionExecution.action;
+      var isActionSync = action.constructor.isSync;
+      var eventType = action.eventName;
+
+      if(isActionSync) {
+        this._emitGeneric(this, [actionExecution, action], eventType, "do", __emitActionKeyArgs);
+
+        return null;
       }
+
+      return this._emitGenericAllAsync(this, [actionExecution, action], eventType, "do", __emitActionKeyArgs);
+    },
+
+    /**
+     *
+     * @param actionExecution
+     * @private
+     */
+    __emitChangeActionPhaseFinallyEvent: function(actionExecution) {
+
+      var action = actionExecution.action;
+      var eventType = action.eventName;
+
+      this._emitGeneric(this, [actionExecution, action], eventType, "finally");
     }
     // endregion
   })
