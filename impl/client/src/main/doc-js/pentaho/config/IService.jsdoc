@@ -16,7 +16,7 @@
 
 /**
  * The `config.IService` interface describes a service
- * that manages configurations of modules for a given environment.
+ * that manages configurations of modules, and of module annotations, for a given environment.
  *
  * It is up to the implementation how the environment it uses to select rules
  * is obtained.
@@ -25,10 +25,10 @@
  * is used to register a [config.spec.IRuleSet]{@link pentaho.config.spec.IRuleSet}
  * with the service.
  *
- * The configuration of a module can be obtained by calling the
+ * The configuration of a module or module annotation can be obtained by calling the
  * [selectAsync]{@link pentaho.config.IService#selectAsync} method.
  *
- * Rules that apply to a given module and environment variables are sorted by specificity
+ * Rules that apply to a given module and given environment variables are sorted by specificity
  * and then their [specifications]{@link pentaho.config.spec.IRule#apply} are merged.
  * For more information on the specificity of rules,
  * see [config.spec.IRuleSet]{@link pentaho.config.spec.IRuleSet}.
@@ -99,8 +99,5 @@
  * @name selectAsync
  * @memberOf pentaho.config.IService#
  * @param {string} moduleId - The identifier of the module.
- * @param {?object} [keyArgs] - The keyword arguments.
- * @param {boolean} [keyArgs.excludeGlobal=false] - Indicates that the global AMD/RequireJS configuration should
- * not be included.
  * @return {Promise.<?object>} A promise for the configuration, if any, or a promise for `null`, otherwise.
  */

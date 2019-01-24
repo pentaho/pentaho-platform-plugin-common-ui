@@ -15,20 +15,22 @@
  */
 define([
   "module",
-  "./AsyncAnnotation"
+  "../module/AsyncAnnotation"
 ], function(module, AsyncAnnotation) {
 
-  return AsyncAnnotation.extend(module.id, /** @lends pentaho.module.ExternalConfigAnnotation# */{
+  return AsyncAnnotation.extend(module.id, /** @lends pentaho.config.ExternalAnnotation# */{
     /**
-     * @classDesc External configuration annotations allow external sources to contribute
+     * @classDesc The external configuration annotation allows external sources to contribute
      * to the configuration of a module.
      *
-     * The [priority]{@link pentaho.module.ExternalConfigAnnotation.priority} property
-     * allows specifying the order with which configuration sources are merged with the _internal_ configuration.
+     * The [priority]{@link pentaho.config.ExternalAnnotation.priority} property
+     * allows specifying the order with which configuration sources are merged with the overall
+     * _internal_ configuration,
+     * which is considered to have priority `0`.
      * Configurations are merged by using the {@link pentaho.util.spec.merge} method.
      *
-     * @alias ExternalConfigAnnotation
-     * @memberOf pentaho.module
+     * @alias ExternalAnnotation
+     * @memberOf pentaho.config
      * @class
      * @extend pentaho.module.AsyncAnnotation
      * @abstract
@@ -43,7 +45,7 @@ define([
       this.base(forModule);
 
       this._config = config;
-    }
+    },
 
     /**
      * Gets the external configuration.
@@ -54,11 +56,22 @@ define([
     get config() {
       return this._config;
     }
-  }, /** @lends pentaho.module.ExternalConfigAnnotation */{
+  }, /** @lends pentaho.config.ExternalAnnotation */{
+    /**
+     * Gets the type of annotation.
+     *
+     * @type {string}
+     * @readOnly
+     * @override
+     */
+    get id() {
+      return module.id;
+    },
+
     /**
      * Gets the priority of the configuration.
      *
-     * The internal configuration has priority 0,
+     * The internal configuration has priority 0.
      * while this property defaults to `-1`.
      *
      * @type {number}

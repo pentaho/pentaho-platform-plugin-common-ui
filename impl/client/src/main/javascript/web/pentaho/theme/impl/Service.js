@@ -19,7 +19,7 @@ define([
   "../ThemeAnnotation",
   "pentaho/module/metaService",
   "pentaho/module/util",
-  "pentaho/lang/text",
+  "pentaho/util/text",
   "pentaho/lang/ArgumentRequiredError",
   "pentaho/shim/es6-promise"
 ], function(module, Base, ThemeAnnotation, metaService, moduleUtil, text, ArgumentRequiredError) {
@@ -44,31 +44,55 @@ define([
         throw new ArgumentRequiredError("moduleOrIdOrArrayOf");
       }
 
-      var module = typeof moduleOrIdOrArrayOf === "string" ? metaService.get(moduleOrIdOrArrayOf) : moduleOrIdOrArrayOf;
-      if(module === null) {
+      if(!Array.isArray(moduleOrIdOrArrayOf)) {
+        moduleOrIdOrArrayOf = [moduleOrIdOrArrayOf];
+      }
+
+      var modules = moduleOrIdOrArrayOf
+        .map(function(moduleOrId) {
+          return typeof moduleOrId === "string" ? metaService.get(moduleOrId) : moduleOrId;
+        })
+        .filter(function(module) {
+          return module !== null;
+        });
+
+      if(modules.length === 0) {
         return Promise.resolve();
       }
 
-      return loadModuleThemeAsync(module);
+      return Promise.all(modules.map(loadModuleThemeAsync));
     },
 
     classifyDomAsModule: function(domElement, moduleOrId) {
+      var moduleId = getModuleId(moduleOrId);
       var classList = domElement.classList;
       if(classList) {
-        classList.add(getModuleNameCssClass(moduleOrId));
+        classList.add(getModuleNameCssClass(moduleId));
         // NOOP if duplicate.
-        classList.add(getModuleUniqueCssClass(moduleOrId));
+        classList.add(getModuleUniqueCssClass(moduleId));
       }
     },
 
     getModuleNameCssSelector: function(moduleOrId) {
-      return getModuleNameCssClass(moduleOrId);
+      var moduleId = getModuleId(moduleOrId);
+      return "." + getModuleNameCssClass(moduleId);
     },
 
     getModuleUniqueCssSelector: function(moduleOrId) {
-      return getModuleUniqueCssClass(moduleOrId);
+      var moduleId = getModuleId(moduleOrId);
+      return "." + getModuleUniqueCssClass(moduleId);
     }
   });
+
+  /**
+   * Gets the identifier of a module, given the module or an identifier.
+   *
+   * @param {pentaho.module.IMeta|string} moduleOrId - The module or identifier.
+   * @return {string} The module identifier.
+   */
+  function getModuleId(moduleOrId) {
+    return typeof moduleOrId === "string" ? moduleOrId : moduleOrId.id;
+  }
 
   /**
    * Loads the theme resources of a given module, if any.
@@ -89,7 +113,7 @@ define([
   function loadModuleThemeAsync(module) {
     // Load any base modules first, so that it is more likely
     // that CSS order precedence based on link tag document order is in effect.
-    var baseModule = (module.kind === "type") ? module.base : null;
+    var baseModule = (module.kind === "type") ? module.ancestor : null;
     if(baseModule !== null) {
       return loadModuleThemeAsync(baseModule).then(loadLocalThemeAsync);
     }

@@ -28,7 +28,7 @@ define([
     var themePlugin;
     var requesterModuleId;
     var moduleUtil;
-    var configService;
+    var themeService;
 
     beforeEach(function() {
 
@@ -36,14 +36,14 @@ define([
       requesterModuleId = "test/xyz";
 
       moduleUtil = createModuleUtilMock();
-      configService = createConfigServiceMock();
+      themeService = createThemeServiceMock();
 
       localRequire.define("pentaho/module/util", function() {
         return moduleUtil;
       });
 
-      localRequire.define("pentaho/config/service", function() {
-        return configService;
+      localRequire.define("pentaho/theme/service", function() {
+        return themeService;
       });
 
       localRequire.define("test/themeA", function() {
@@ -107,13 +107,13 @@ define([
       return onLoad;
     }
 
-    function createConfigServiceMock() {
+    function createThemeServiceMock() {
 
-      var configService = jasmine.createSpyObj("configService", ["selectAsync"]);
+      var themeService = jasmine.createSpyObj("themeService", ["loadModuleThemeAsync"]);
 
-      configService.selectAsync.and.returnValue(Promise.resolve(null));
+      themeService.loadModuleThemeAsync.and.returnValue(Promise.resolve(null));
 
-      return configService;
+      return themeService;
     }
     // endregion
 
@@ -216,15 +216,16 @@ define([
         themePlugin.load(name, requesterRequire, onLoad, config);
       });
 
-      it("should call configService.selectAsync with the full module name (automatic name)", function(done) {
+      it("should call themeService.loadModuleThemeAsync (automatic name)", function(done) {
 
         var config = {};
         var requesterRequire = function() {};
 
         var onLoad = createOnLoad(done, true, function() {
-          expect(configService.selectAsync).toHaveBeenCalledTimes(1);
-          expect(configService.selectAsync).toHaveBeenCalledWith("pentaho/theme!test/xyz");
+          expect(themeService.loadModuleThemeAsync).toHaveBeenCalledTimes(1);
+          expect(themeService.loadModuleThemeAsync).toHaveBeenCalledWith(requesterModuleId);
         });
+
         var name = "$_$_1";
 
         themePlugin.load(name, requesterRequire, onLoad, config);
@@ -235,66 +236,11 @@ define([
         var config = {};
         var requesterRequire = function() {};
 
-        var onLoad = createOnLoad(done, true, function() {
-          expect(configService.selectAsync).toHaveBeenCalledTimes(1);
-          expect(configService.selectAsync).toHaveBeenCalledWith("pentaho/theme!test/abc");
-        });
         var name = "test/abc";
-
-        themePlugin.load(name, requesterRequire, onLoad, config);
-      });
-
-      it("should load the main theme module", function(done) {
-
-        var config = {};
-        var requesterRequire = function() {};
-
-        configService.selectAsync.and.returnValue(Promise.resolve({
-          main: "test/themeA"
-        }));
-
         var onLoad = createOnLoad(done, true, function() {
-          expect(localRequire.defined("test/themeA")).toBe(true);
+          expect(themeService.loadModuleThemeAsync).toHaveBeenCalledTimes(1);
+          expect(themeService.loadModuleThemeAsync).toHaveBeenCalledWith(name);
         });
-        var name = "test/abc";
-
-        themePlugin.load(name, requesterRequire, onLoad, config);
-      });
-
-      it("should load the extension theme modules", function(done) {
-
-        var config = {};
-        var requesterRequire = function() {};
-
-        configService.selectAsync.and.returnValue(Promise.resolve({
-          extensions: ["test/themeB", "test/themeC"]
-        }));
-
-        var onLoad = createOnLoad(done, true, function() {
-          expect(localRequire.defined("test/themeB")).toBe(true);
-          expect(localRequire.defined("test/themeC")).toBe(true);
-        });
-        var name = "test/abc";
-
-        themePlugin.load(name, requesterRequire, onLoad, config);
-      });
-
-      it("should load both the main and extension theme modules", function(done) {
-
-        var config = {};
-        var requesterRequire = function() {};
-
-        configService.selectAsync.and.returnValue(Promise.resolve({
-          main: "test/themeA",
-          extensions: ["test/themeB", "test/themeC"]
-        }));
-
-        var onLoad = createOnLoad(done, true, function() {
-          expect(localRequire.defined("test/themeA")).toBe(true);
-          expect(localRequire.defined("test/themeB")).toBe(true);
-          expect(localRequire.defined("test/themeC")).toBe(true);
-        });
-        var name = "test/abc";
 
         themePlugin.load(name, requesterRequire, onLoad, config);
       });

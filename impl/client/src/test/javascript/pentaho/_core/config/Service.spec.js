@@ -87,9 +87,6 @@ define(function() {
         var ruleOneId2;
         var ruleMultiIds;
         var ruleMultiIdsOneNull;
-        var ruleModuleAndInstId;
-        var ruleInstAndTypeId;
-        var ruleTypeId;
 
         var configurationService;
 
@@ -103,38 +100,6 @@ define(function() {
           ruleMultiIds = {
             select: {
               module: ["test/type", "test/type2", "A2"],
-              user: "1",
-              theme: "1",
-              locale: "1",
-              application: "1"
-            }
-          };
-
-          ruleModuleAndInstId  = {
-            select: {
-              module: "A",
-              instance: "B",
-              user: "1",
-              theme: "1",
-              locale: "1",
-              application: "1"
-            }
-          };
-
-          ruleInstAndTypeId  = {
-            select: {
-              instance: "A",
-              type: "B",
-              user: "1",
-              theme: "1",
-              locale: "1",
-              application: "1"
-            }
-          };
-
-          ruleTypeId = {
-            select: {
-              type: "A",
               user: "1",
               theme: "1",
               locale: "1",
@@ -163,30 +128,6 @@ define(function() {
           expect(configurationService.__ruleStore["A2"]).toBeDefined();
         });
 
-        it("should ignore select.instance if select.module is specified", function() {
-
-          configurationService.add({rules: [ruleModuleAndInstId]});
-
-          expect(configurationService.__ruleStore["A"]).toBeDefined();
-          expect(configurationService.__ruleStore["B"]).not.toBeDefined();
-        });
-
-        it("should ignore select.type if select.instance is specified", function() {
-
-          configurationService.add({rules: [ruleInstAndTypeId]});
-
-          expect(configurationService.__ruleStore["A"]).toBeDefined();
-          expect(configurationService.__ruleStore["B"]).not.toBeDefined();
-        });
-
-        it("should define rules when only select.type is specified", function() {
-
-          configurationService.add({rules: [ruleTypeId]});
-
-          expect(configurationService.__ruleStore["A"]).toBeDefined();
-          expect(configurationService.__ruleStore["B"]).not.toBeDefined();
-        });
-
         it("should define rules with given a rule-set with multiple rules", function() {
 
           configurationService.add({rules: [
@@ -196,15 +137,6 @@ define(function() {
 
           expect(configurationService.__ruleStore["A"]).toBeDefined();
           expect(configurationService.__ruleStore["B"]).toBeDefined();
-        });
-
-        it("should throw if given a rule with no module, type or instance", function() {
-
-          expect(function() {
-            configurationService.add({rules: [
-              ruleNoId
-            ]});
-          }).toThrow(errorMatch.argRequired("rule.select.module"));
         });
 
         it("should throw if given a rule with a module array having null elements", function() {
@@ -978,7 +910,7 @@ define(function() {
           core = createCoreMock();
           ConfigurationService = configServiceFactory(core);
 
-          configurationService = new ConfigurationService();
+          configurationService = new ConfigurationService(null, selectExternalConfigsAsync);
 
           configurationService.add({
             rules: [
@@ -993,17 +925,35 @@ define(function() {
               }
             ]
           });
+
+          function selectExternalConfigsAsync(moduleId) {
+            if(moduleId === "C") {
+              return Promise.resolve([
+                {
+                  priority: -Infinity,
+                  config: {
+                    testId: "C"
+                  }
+                }
+              ]);
+            }
+
+            if(moduleId === "A") {
+              return Promise.resolve([
+                {
+                  priority: -Infinity,
+                  config: {
+                    testId: "A"
+                  }
+                }
+              ]);
+            }
+
+            return Promise.resolve(null);
+          }
         });
 
         it("should include the global configuration by default", function() {
-
-          localRequire.config({
-            config: {
-              "C": {
-                testId: "C"
-              }
-            }
-          });
 
           return configurationService.selectAsync("C").then(function(result) {
             expect(result.testId).toEqual("C");
@@ -1011,14 +961,6 @@ define(function() {
         });
 
         it("should give less priority to the global configuration than to any IRuleSet rule", function() {
-
-          localRequire.config({
-            config: {
-              "A": {
-                testId: "A0"
-              }
-            }
-          });
 
           return configurationService.selectAsync("A").then(function(result) {
             expect(result.testId).toEqual("A");

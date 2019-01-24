@@ -93,12 +93,12 @@ define([
     /**
      * Gets the type of annotation.
      *
-     * @name id
-     * @memberOf pentaho.module.Annotation
      * @type {string}
      * @readOnly
-     * @abstract
      */
+    get id() {
+      return module.id;
+    },
 
     /**
      * Gets the type of annotation, excluding the `Annotation` suffix, if any.

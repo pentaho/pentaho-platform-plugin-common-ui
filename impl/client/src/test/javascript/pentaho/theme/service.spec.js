@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
+ * Copyright 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,20 @@
  * limitations under the License.
  */
 define([
-  "./Core",
-  "pentaho/environment"
-], function(Core, environment) {
+  "pentaho/theme/impl/Service",
+  "pentaho/theme/service"
+], function(Service, service) {
 
-  var corePromise = null;
+  "use strict";
 
-  return {
-    load: function(name, require, onLoad, config) {
+  describe("pentaho/theme/service", function() {
 
-      if(config.isBuild) {
-        // Don't create when building.
-        onLoad({moduleMetaService: {}, moduleService: {}});
-      } else {
-        if(corePromise === null) {
-          corePromise = Core.createAsync(environment);
-        }
+    it("should be defined", function() {
+      expect(service != null).toBe(true);
+    });
 
-        corePromise.then(onLoad, onLoad.error);
-      }
-    }
-  };
+    it("should be a impl/Service", function() {
+      expect(service instanceof Service).toBe(true);
+    });
+  });
 });

@@ -37,6 +37,17 @@ define([
      */
   }, /** @lends pentaho.module.SyncAnnotation */{
     /**
+     * Gets the type of annotation.
+     *
+     * @type {string}
+     * @readOnly
+     * @override
+     */
+    get id() {
+      return module.id;
+    },
+
+    /**
      * Gets a value that indicates if the annotation type is synchronous.
      *
      * This property always returns `true`.

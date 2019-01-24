@@ -16,10 +16,10 @@
 define([
   "require",
   "module",
-  "./main",
+  "./service",
   "pentaho/module/util",
   "pentaho/shim/es6-promise"
-], function(localRequire, module, themeService, configService, moduleUtil) {
+], function(localRequire, module, themeService, moduleUtil) {
 
   "use strict";
 

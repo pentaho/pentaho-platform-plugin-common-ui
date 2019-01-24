@@ -153,3 +153,91 @@
  *
  * @see pentaho.module.util.resolveModuleId
  */
+
+/**
+ * Gets an annotation associated with this module, given the annotation type.
+ *
+ * If this module is not annotated with an annotation of the given type, `null` is returned.
+ *
+ * Otherwise, this method assumes that the annotation can be obtained synchronously.
+ * If the given annotation type is asynchronous and the annotation has not been loaded yet,
+ * an error is thrown.
+ *
+ * If it is not known whether an asynchronous annotation has already been loaded,
+ * the {@link pentaho.module.IMeta#getAnnotationAsync} method should be used instead.
+ * From within a module's code, it is always safe to get any annotation which is
+ * known to have been associated with it.
+ *
+ * When this method returns an annotation, for a given annotation type,
+ * it always returns the same annotation instance.
+ *
+ * @name getAnnotation
+ * @memberOf pentaho.module.IMeta#
+ * @method
+ *
+ * @param {Class.<pentaho.module.Annotation>} Annotation - The constructor of the annotation.
+ * @param {object} [keyArgs] - The keyword arguments object.
+ * @param {boolean} [keyArgs.assertPresent=false] - Indicates that an error should be thrown
+ *  if the module is not annotated with an annotation of the requested type.
+ *
+ * @return {?pentaho.module.Annotation} The requested annotation, if one is associated with this module;
+ * `null`, otherwise.
+ *
+ * @throw {pentaho.lang.InvalidOperationError} When an annotation of the specified type
+ *   is associated with this module but it is asynchronous and has not been loaded yet.
+ *
+ * @throw {pentaho.lang.InvalidOperationError} When an annotation of the specified type
+ *   is not associated with this module and `assertPresent` was specified with a `true` value.
+ */
+
+/**
+ * Determines if this module is annotated with an annotation of a given type.
+ *
+ * Note that an annotation of the given type may be associated with this module and,
+ * still, not have been loaded yet!
+ * You may want to use this method to avoid a call to
+ * {@link pentaho.module.IMeta#getAnnotationAsync} which would resolve to `null`.
+ *
+ * @name hasAnnotation
+ * @memberOf pentaho.module.IMeta#
+ * @param {Class.<pentaho.module.Annotation>} Annotation - The constructor of the annotation.
+ *
+ * @return {boolean} `true` if an annotation of the given type is associated with this module; `false`, otherwise.
+ */
+
+/**
+ * Gets an array of identifiers of the annotations of this module, if any.
+ *
+ * @name getAnnotationsIds
+ * @memberOf pentaho.module.IMeta#
+ *
+ * @return {?(string[])} An array of annotation identifiers, if any; `null`, otherwise.
+ */
+
+/**
+ * Gets an annotation associated with this module, asynchronously, given the annotation type.
+ *
+ * If this module is not annotated with an annotation of the given type,
+ * a settled promise with the value `null` is returned.
+ *
+ * When this method returns a settled promise, with an annotation, for a given annotation type,
+ * it always returns the same annotation instance.
+ *
+ * @name getAnnotationAsync
+ * @memberOf pentaho.module.IMeta#
+ * @method
+ *
+ * @param {Class.<pentaho.module.Annotation>} Annotation - The constructor of the annotation.
+ * @param {object} [keyArgs] - The keyword arguments object.
+ * @param {boolean} [keyArgs.assertPresent=false] - Indicates that the promise should be rejected with an error
+ *  if the module is not annotated with an annotation of the requested type.
+ *
+ * @return {Promise.<?pentaho.module.Annotation>} A promise that resolves to the requested annotation,
+ *  if one is associated with this module, or to `null`, otherwise.
+ *
+ * @rejects {pentaho.lang.InvalidOperationError} When an annotation of the specified type
+ *   is associated with this module but it is asynchronous and has not been loaded yet.
+ *
+ * @rejects {pentaho.lang.InvalidOperationError} When an annotation of the specified type
+ *   is not associated with this module and `assertPresent` was specified with a `true` value.
+ */

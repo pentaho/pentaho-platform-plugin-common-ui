@@ -16,7 +16,7 @@
 define([
   "require",
   "module",
-  "pentaho/module/ExternalConfigAnnotation",
+  "pentaho/config/ExternalAnnotation",
   "pentaho/module/util",
   "pentaho/i18n",
   "pentaho/shim/es6-promise"
@@ -33,7 +33,7 @@ define([
      * @name LoadConfigAnnotation
      * @memberOf pentaho.i18n
      * @class
-     * @extend pentaho.module.ExternalConfigAnnotation
+     * @extend pentaho.config.ExternalAnnotation
      *
      * @description Creates a _load i18n configuration_ annotation associated with a given module.
      * @constructor
