@@ -52,10 +52,11 @@ define([
       return loadModuleThemeAsync(module);
     },
 
-    linkModuleTheme: function(moduleOrId, domElement) {
+    classifyDomAsModule: function(domElement, moduleOrId) {
       var classList = domElement.classList;
       if(classList) {
         classList.add(getModuleNameCssClass(moduleOrId));
+        // NOOP if duplicate.
         classList.add(getModuleUniqueCssClass(moduleOrId));
       }
     },

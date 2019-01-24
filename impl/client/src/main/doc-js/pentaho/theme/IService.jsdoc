@@ -15,7 +15,7 @@
  */
 
 /**
- * @classDesc The `IService` interface contains methods for managing themes of modules.
+ * The `IService` interface contains methods for managing themes of modules.
  *
  * @name IService
  * @memberOf pentaho.theme
@@ -47,18 +47,18 @@
  */
 
 /**
- * Brands a DOM element so that the styles of CSS theme resources apply to it.
+ * Brands a DOM element so that the styles of CSS theme resources of a module apply to it.
  *
  * Currently,
  * two CSS classes are added to the element,
  * one which identifies every version of this module and
  * another which identifies exactly the current version.
  *
- * @name linkModuleTheme
+ * @name classifyDomAsModule
  * @memberOf pentaho.theme.IService#
  * @method
- * @param {string|pentaho.module.IMeta} moduleOrId - The module object or its identifier.
  * @param {HTMLElement} domElement - The DOM element.
+ * @param {string|pentaho.module.IMeta} moduleOrId - The module object or its identifier.
  *
  * @see pentaho.theme.IService#getModuleNameCssSelector
  * @see pentaho.theme.IService#getModuleUniqueCssSelector

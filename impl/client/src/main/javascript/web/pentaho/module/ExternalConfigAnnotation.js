@@ -25,7 +25,7 @@ define([
      *
      * The [priority]{@link pentaho.module.ExternalConfigAnnotation.priority} property
      * allows specifying the order with which configuration sources are merged with the _internal_ configuration.
-     * Configurations are merged by using the {@link pentaho.util.Spec#merge} method.
+     * Configurations are merged by using the {@link pentaho.util.spec.merge} method.
      *
      * @alias ExternalConfigAnnotation
      * @memberOf pentaho.module

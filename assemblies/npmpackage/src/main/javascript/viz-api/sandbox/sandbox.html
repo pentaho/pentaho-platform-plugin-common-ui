@@ -3,7 +3,8 @@
 
 <head>
   <style>
-    #viz_div {
+    /* Snake-case-id of the visualization model */
+    .pentaho-visual-samples-calc-Model {
       border: solid 1px #005da6;
       width: 60%;
       height: 60%;
@@ -26,12 +27,27 @@
 
       var vizTypeId = "pentaho/visual/samples/calc/Model";
 
-      visualUtil.getModelAndDefaultViewClassesAsync(vizTypeId)
-        .then(function(classes) {
-          return createAndUpdateViz(classes.Model, classes.View, classes.viewTypeId);
-        }, function(error) {
-          alert(error.message);
+      visualUtil.getModelAndDefaultViewClassesAsync(vizTypeId).then(function(result) {
+
+        return createAndUpdateViz(result.Model, result.View, result.viewTypeId);
+
+      }, function(error) {
+        alert(error.message);
+      });
+
+      // ---
+
+      function createModel(Model, width, height) {
+
+        return new Model({
+          "width": width,
+          "height": height,
+          "data": new Table(dataSpec),
+          "levels": {fields: ["productFamily"]},
+          "measure": {fields: ["sales"]},
+          "operation": "avg"
         });
+      }
 
       function createAndUpdateViz(Model, View, viewTypeId) {
 
@@ -41,14 +57,7 @@
         // Measure it.
         var rect = domContainer.getBoundingClientRect();
 
-        var model = new Model({
-          "width": rect.width,
-          "height": rect.height,
-          "data": new Table(dataSpec),
-          "levels": {fields: ["productFamily"]},
-          "measure": {fields: ["sales"]},
-          "operation": "avg"
-        });
+        var model = createModel(Model, rect.width, rect.height);
 
         // Handle the execute action.
         model.on(ExecuteAction.id, {
@@ -64,8 +73,8 @@
           }
         });
 
-        // Mark the container with the model's CSS classes, for styling purposes.
-        domContainer.className = Model.type.inheritedStyleClasses.join(" ");
+        // Setup CSS classes.
+        visualUtil.classifyDomAsContainer(domContainer, vizTypeId, viewTypeId);
 
         var view = new View({model: model, domContainer: domContainer});
 
