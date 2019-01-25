@@ -31,9 +31,14 @@ define([
      *
      * @amd pentaho/action/Generic
      *
-     * @constructor
-     * @param {pentaho.action.spec.IBase} [spec] An action specification.
+     * @classdesc The `action.Generic` class represents a generic model of actions.
      *
+     * @description Creates an action instance given its specification.
+     * @constructor
+     *
+     * @param {pentaho.action.spec.IGeneric} [spec] An action specification.
+     *
+     * @see pentaho.action.spec.IGeneric
      */
     constructor: function(spec) {
       // Let mixins take part.
@@ -48,7 +53,7 @@ define([
     /**
      * Initializes an action instance given its specification.
      *
-     * @param {pentaho.action.spec.IBase} [spec] An action specification.
+     * @param {pentaho.action.spec.IGeneric} [spec] An action specification.
      * @protected
      */
     _init: function(spec) {
@@ -57,6 +62,32 @@ define([
     /** @inheritDoc */
     clone: function() {
       return new this.constructor(this.toSpec());
+    },
+
+    /**
+     * Creates a specification that describes this action.
+     *
+     * @method
+     * @return {pentaho.action.spec.IGeneric} A generic action specification.
+     */
+    toSpec: function() {
+      var spec = {};
+
+      this._fillSpec(spec);
+
+      return spec;
+    },
+
+    /**
+     * Fills the given specification with this action's attributes' local values,
+     * and returns whether any attribute was actually added.
+     *
+     * @param {pentaho.action.spec.IGeneric} [spec] An action specification.
+     *
+     * @protected
+     * @method
+     */
+    _fillSpec: function(spec) {
     }
   });
 
