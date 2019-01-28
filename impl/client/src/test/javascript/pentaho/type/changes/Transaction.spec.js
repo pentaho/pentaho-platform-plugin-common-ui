@@ -676,7 +676,7 @@ define([
             ]);
           });
 
-          it("should return false if there are no changeset targets have will:change listeners", function() {
+          it("should return false if there are no changeset targets have `init` phase listeners", function() {
 
             var neighborhood = scenarioNeighborhood();
 
@@ -688,11 +688,13 @@ define([
             expect(result).toBe(false);
           });
 
-          it("should return true if there is at least one changeset target that has will:change listeners", function() {
+          it("should return true if there is at least one changeset target that has `init` phase listeners", function() {
 
             var neighborhood = scenarioNeighborhood();
 
-            neighborhood.graph3.dog1.on("will:change", jasmine.createSpy("will:change"));
+            neighborhood.graph3.dog1.on("change", {
+              init: jasmine.createSpy("init")
+            });
 
             // => 3 changesets (net order 2)
             neighborhood.graph3.dog1.name = "can2";
@@ -735,7 +737,9 @@ define([
 
             var neighborhood = scenarioNeighborhood();
 
-            neighborhood.graph3.dog1.on("will:change", jasmine.createSpy("will:change"));
+            neighborhood.graph3.dog1.on("change", {
+              init: jasmine.createSpy("init")
+            });
 
             // => 3 changesets (net order 2)
             neighborhood.graph3.dog1.name = "can2";
@@ -745,21 +749,21 @@ define([
             var petsOrder;
             var person1Order;
 
-            spyOn(neighborhood.graph3.dog1, "_onChangeInit").and.callFake(function() {
+            spyOn(neighborhood.graph3.dog1, "__emitChangeActionPhaseInitEvent").and.callFake(function() {
               dog1Order = order++;
             });
-            spyOn(neighborhood.graph3.person1.pets, "_onChangeInit").and.callFake(function() {
+            spyOn(neighborhood.graph3.person1.pets, "__emitChangeActionPhaseInitEvent").and.callFake(function() {
               petsOrder = order++;
             });
-            spyOn(neighborhood.graph3.person1, "_onChangeInit").and.callFake(function() {
+            spyOn(neighborhood.graph3.person1, "__emitChangeActionPhaseInitEvent").and.callFake(function() {
               person1Order = order++;
             });
 
             transaction.__doCommitInitCore();
 
-            expect(neighborhood.graph3.dog1._onChangeInit).toHaveBeenCalledTimes(1);
-            expect(neighborhood.graph3.person1._onChangeInit).toHaveBeenCalledTimes(1);
-            expect(neighborhood.graph3.person1.pets._onChangeInit).toHaveBeenCalledTimes(1);
+            expect(neighborhood.graph3.dog1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
+            expect(neighborhood.graph3.person1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
+            expect(neighborhood.graph3.person1.pets.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
 
             expect(dog1Order).toBe(1);
             expect(petsOrder).toBe(2);
@@ -776,14 +780,16 @@ define([
 
               var cancelReason = new Error();
 
-              neighborhood.graph3.dog1.on("will:change", jasmine.createSpy("will:change"));
+              neighborhood.graph3.dog1.on("change", {
+                init: jasmine.createSpy("init")
+              });
 
               // => 3 changesets (net order 2)
               neighborhood.graph3.dog1.name = "can2";
 
-              spyOn(neighborhood.graph3.dog1, "_onChangeInit").and.returnValue(cancelReason);
-              spyOn(neighborhood.graph3.person1.pets, "_onChangeInit");
-              spyOn(neighborhood.graph3.person1, "_onChangeInit");
+              spyOn(neighborhood.graph3.dog1, "__emitChangeActionPhaseInitEvent").and.returnValue(cancelReason);
+              spyOn(neighborhood.graph3.person1.pets, "__emitChangeActionPhaseInitEvent");
+              spyOn(neighborhood.graph3.person1, "__emitChangeActionPhaseInitEvent");
 
               var result = transaction.__doCommitInitCore();
 
@@ -804,33 +810,35 @@ define([
 
               var cancelReason = new Error();
 
-              neighborhood.graph1.dog2.on("will:change", jasmine.createSpy("will:change"));
+              neighborhood.graph1.dog2.on("change", {
+                init: jasmine.createSpy("init")
+              });
 
               // => 7 changesets (net order 4)
               neighborhood.graph1.dog2.name = "wilde2";
 
               // Person1 was created first and will be the first to add an iref in dog2 (through its pets list).
               // So it will be placed in the queue before Person2.
-              spyOn(neighborhood.graph1.dog2, "_onChangeInit");
-              spyOn(neighborhood.graph1.person1.pets, "_onChangeInit");
-              spyOn(neighborhood.graph1.person1, "_onChangeInit").and.returnValue(cancelReason);
+              spyOn(neighborhood.graph1.dog2, "__emitChangeActionPhaseInitEvent");
+              spyOn(neighborhood.graph1.person1.pets, "__emitChangeActionPhaseInitEvent");
+              spyOn(neighborhood.graph1.person1, "__emitChangeActionPhaseInitEvent").and.returnValue(cancelReason);
 
-              spyOn(neighborhood.graph1.person2.pets, "_onChangeInit");
-              spyOn(neighborhood.graph1.person2, "_onChangeInit");
+              spyOn(neighborhood.graph1.person2.pets, "__emitChangeActionPhaseInitEvent");
+              spyOn(neighborhood.graph1.person2, "__emitChangeActionPhaseInitEvent");
 
-              spyOn(neighborhood.graph1.house1.residents, "_onChangeInit");
-              spyOn(neighborhood.graph1.house1, "_onChangeInit");
+              spyOn(neighborhood.graph1.house1.residents, "__emitChangeActionPhaseInitEvent");
+              spyOn(neighborhood.graph1.house1, "__emitChangeActionPhaseInitEvent");
 
               transaction.__doCommitInitCore();
 
-              expect(neighborhood.graph1.dog2._onChangeInit).toHaveBeenCalledTimes(1);
-              expect(neighborhood.graph1.person1.pets._onChangeInit).toHaveBeenCalledTimes(1);
-              expect(neighborhood.graph1.person2.pets._onChangeInit).toHaveBeenCalledTimes(1);
-              expect(neighborhood.graph1.person1._onChangeInit).toHaveBeenCalledTimes(1);
+              expect(neighborhood.graph1.dog2.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
+              expect(neighborhood.graph1.person1.pets.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
+              expect(neighborhood.graph1.person2.pets.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
+              expect(neighborhood.graph1.person1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
 
-              expect(neighborhood.graph1.person2._onChangeInit).not.toHaveBeenCalled();
-              expect(neighborhood.graph1.house1.residents._onChangeInit).not.toHaveBeenCalled();
-              expect(neighborhood.graph1.house1._onChangeInit).not.toHaveBeenCalled();
+              expect(neighborhood.graph1.person2.__emitChangeActionPhaseInitEvent).not.toHaveBeenCalled();
+              expect(neighborhood.graph1.house1.residents.__emitChangeActionPhaseInitEvent).not.toHaveBeenCalled();
+              expect(neighborhood.graph1.house1.__emitChangeActionPhaseInitEvent).not.toHaveBeenCalled();
             });
           });
 
@@ -838,28 +846,30 @@ define([
 
             describe("when there are multiple paths to a changset", function() {
 
-              it("should call _onChangeInit on its target only once if no additional changes occur", function() {
+              it("should call __emitChangeActionPhaseInitEvent on its target only once if no additional changes occur", function() {
 
                 var neighborhood = scenarioNeighborhood();
 
-                neighborhood.graph2.cat1.on("will:change", jasmine.createSpy("will:change"));
+                neighborhood.graph2.cat1.on("change", {
+                  init: jasmine.createSpy("init")
+                });
 
                 // => 5 changesets (net order 4)
                 neighborhood.graph2.cat1.name = "felix2";
 
-                spyOn(neighborhood.graph2.cat1, "_onChangeInit");
-                spyOn(neighborhood.graph2.person1.pets, "_onChangeInit");
-                spyOn(neighborhood.graph2.person1, "_onChangeInit");
-                spyOn(neighborhood.graph2.house1.residents, "_onChangeInit");
-                spyOn(neighborhood.graph2.house1, "_onChangeInit");
+                spyOn(neighborhood.graph2.cat1, "__emitChangeActionPhaseInitEvent");
+                spyOn(neighborhood.graph2.person1.pets, "__emitChangeActionPhaseInitEvent");
+                spyOn(neighborhood.graph2.person1, "__emitChangeActionPhaseInitEvent");
+                spyOn(neighborhood.graph2.house1.residents, "__emitChangeActionPhaseInitEvent");
+                spyOn(neighborhood.graph2.house1, "__emitChangeActionPhaseInitEvent");
 
                 transaction.__doCommitInitCore();
 
-                expect(neighborhood.graph2.cat1._onChangeInit).toHaveBeenCalledTimes(1);
-                expect(neighborhood.graph2.person1._onChangeInit).toHaveBeenCalledTimes(1);
-                expect(neighborhood.graph2.person1.pets._onChangeInit).toHaveBeenCalledTimes(1);
-                expect(neighborhood.graph2.house1.residents._onChangeInit).toHaveBeenCalledTimes(1);
-                expect(neighborhood.graph2.house1._onChangeInit).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph2.cat1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph2.person1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph2.person1.pets.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph2.house1.residents.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph2.house1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
               });
             });
 
@@ -869,14 +879,16 @@ define([
 
               spyOn(transaction, "__finalizeCommitInitQueue");
 
-              neighborhood.graph3.dog1.on("will:change", jasmine.createSpy("will:change"));
+              neighborhood.graph3.dog1.on("change", {
+                init: jasmine.createSpy("init")
+              });
 
               // => 3 changesets (net order 2)
               neighborhood.graph3.dog1.name = "can2";
 
-              spyOn(neighborhood.graph3.dog1, "_onChangeInit");
-              spyOn(neighborhood.graph3.person1.pets, "_onChangeInit");
-              spyOn(neighborhood.graph3.person1, "_onChangeInit");
+              spyOn(neighborhood.graph3.dog1, "__emitChangeActionPhaseInitEvent");
+              spyOn(neighborhood.graph3.person1.pets, "__emitChangeActionPhaseInitEvent");
+              spyOn(neighborhood.graph3.person1, "__emitChangeActionPhaseInitEvent");
 
               var result = transaction.__doCommitInitCore();
 
@@ -892,7 +904,9 @@ define([
 
                 var neighborhood = scenarioNeighborhood();
 
-                neighborhood.graph3.dog1.on("will:change", jasmine.createSpy("will:change"));
+                neighborhood.graph3.dog1.on("change", {
+                  init: jasmine.createSpy("init")
+                });
 
                 // => 3 changesets (net order 2)
                 neighborhood.graph3.dog1.name = "can2";
@@ -907,24 +921,24 @@ define([
 
                 spyOn(transaction, "__addToCommitInitQueue").and.callThrough();
 
-                spyOn(neighborhood.graph3.dog1, "_onChangeInit").and.callFake(function() {
+                spyOn(neighborhood.graph3.dog1, "__emitChangeActionPhaseInitEvent").and.callFake(function() {
                   dog1Order = order++;
                   neighborhood.graph3.person1.age = 35;
                 });
 
-                spyOn(neighborhood.graph3.person1.pets, "_onChangeInit").and.callFake(function() {
+                spyOn(neighborhood.graph3.person1.pets, "__emitChangeActionPhaseInitEvent").and.callFake(function() {
                   petsOrder = order++;
                 });
 
-                spyOn(neighborhood.graph3.person1, "_onChangeInit").and.callFake(function() {
+                spyOn(neighborhood.graph3.person1, "__emitChangeActionPhaseInitEvent").and.callFake(function() {
                   person1Order = order++;
                 });
 
                 transaction.__doCommitInitCore();
 
-                expect(neighborhood.graph3.dog1._onChangeInit).toHaveBeenCalledTimes(1);
-                expect(neighborhood.graph3.person1._onChangeInit).toHaveBeenCalledTimes(1);
-                expect(neighborhood.graph3.person1.pets._onChangeInit).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.dog1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.person1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.person1.pets.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
 
                 expect(dog1Order).toBe(1);
                 expect(petsOrder).toBe(2);
@@ -943,34 +957,38 @@ define([
 
                 var neighborhood = scenarioNeighborhood();
 
-                neighborhood.graph3.dog1.on("will:change", jasmine.createSpy("will:change"));
+                neighborhood.graph3.dog1.on("change", {
+                  init: jasmine.createSpy("init")
+                });
 
                 // => 3 changesets (net order 2)
                 neighborhood.graph3.dog1.name = "can2";
 
-                spyOn(neighborhood.graph3.dog1, "_onChangeInit");
-                spyOn(neighborhood.graph3.person1.pets, "_onChangeInit").and.callFake(function() {
+                spyOn(neighborhood.graph3.dog1, "__emitChangeActionPhaseInitEvent");
+                spyOn(neighborhood.graph3.person1.pets, "__emitChangeActionPhaseInitEvent").and.callFake(function() {
                   neighborhood.graph3.dog1.name = "can3";
                 });
-                spyOn(neighborhood.graph3.person1, "_onChangeInit");
+                spyOn(neighborhood.graph3.person1, "__emitChangeActionPhaseInitEvent");
 
                 transaction.__doCommitInitCore();
 
-                expect(neighborhood.graph3.dog1._onChangeInit).toHaveBeenCalledTimes(1);
-                expect(neighborhood.graph3.person1.pets._onChangeInit).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.dog1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.person1.pets.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
 
-                expect(neighborhood.graph3.person1._onChangeInit).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.person1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
               });
 
               it("should be added to the queue and be executed if it did not yet ran", function() {
 
                 var neighborhood = scenarioNeighborhood();
 
-                neighborhood.graph3.person1.on("will:change", jasmine.createSpy("will:change"));
+                neighborhood.graph3.person1.on("change", {
+                  init: jasmine.createSpy("init")
+                });
 
-                spyOn(neighborhood.graph3.dog1, "_onChangeInit");
-                spyOn(neighborhood.graph3.person1.pets, "_onChangeInit");
-                spyOn(neighborhood.graph3.person1, "_onChangeInit").and.callFake(function() {
+                spyOn(neighborhood.graph3.dog1, "__emitChangeActionPhaseInitEvent");
+                spyOn(neighborhood.graph3.person1.pets, "__emitChangeActionPhaseInitEvent");
+                spyOn(neighborhood.graph3.person1, "__emitChangeActionPhaseInitEvent").and.callFake(function() {
                   // => 3 changesets (net order 2)
                   neighborhood.graph3.dog1.name = "can2";
                 });
@@ -979,11 +997,11 @@ define([
 
                 transaction.__doCommitInitCore();
 
-                expect(neighborhood.graph3.dog1._onChangeInit).toHaveBeenCalledTimes(1);
-                expect(neighborhood.graph3.person1.pets._onChangeInit).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.dog1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
+                expect(neighborhood.graph3.person1.pets.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
 
-                // _onChangeInit called twice, but listener only once.
-                expect(neighborhood.graph3.person1._onChangeInit).toHaveBeenCalledTimes(2);
+                // __emitChangeActionPhaseInitEvent called twice, but listener only once.
+                expect(neighborhood.graph3.person1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(2);
               });
 
               it("should not call the listener that changed the before changeset twice " +
@@ -994,13 +1012,16 @@ define([
                 // => 3 changesets (net order 2)
                 neighborhood.graph3.dog1.name = "can2";
 
-                var person1PetsChangeWill = jasmine.createSpy("will:change").and.callFake(function() {
+                var person1PetsChangeInit = jasmine.createSpy("init").and.callFake(function() {
                   neighborhood.graph3.dog1.name = "can3";
                 });
-                neighborhood.graph3.person1.pets.on("will:change", person1PetsChangeWill);
 
-                spyOn(neighborhood.graph3.dog1, "_onChangeInit");
-                spyOn(neighborhood.graph3.person1, "_onChangeInit");
+                neighborhood.graph3.person1.pets.on("change", {
+                  init: person1PetsChangeInit
+                });
+
+                spyOn(neighborhood.graph3.dog1, "__emitChangeActionPhaseInitEvent");
+                spyOn(neighborhood.graph3.person1, "__emitChangeActionPhaseInitEvent");
 
                 transaction.__doCommitInitCore();
 

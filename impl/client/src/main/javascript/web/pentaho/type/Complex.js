@@ -378,8 +378,8 @@ define([
      *      the property's defaulted status changes:
      *      1. If the property is [read-only]{@link pentaho.type.PropertyType#isReadOnly}, an error is thrown.
      *      2. Otherwise, the current value and the defaulted status are replaced by the new ones.
-     *      3. A change action is executed, resulting in the change events `will:change` and
-     *         `did:change` or `rejected:change` being emitted.
+     *      3. A change action is executed, resulting in the change events for the `init`, `will`,
+     *         `do` and `finally` being emitted.
      *
      *   4. Otherwise, if `value` and the defaulted status do not change, nothing is done.
      *
@@ -409,10 +409,7 @@ define([
      *
      * @see pentaho.type.Value#configure
      * @see pentaho.type.Value#isReadOnly
-     *
-     * @fires "will:change"
-     * @fires "did:change"
-     * @fires "rejected:change"
+     * @see pentaho.action.Execution
      */
     set: function(name, valueSpec) {
 

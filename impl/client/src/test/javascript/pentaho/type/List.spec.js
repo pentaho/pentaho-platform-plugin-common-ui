@@ -46,6 +46,19 @@ define([
       });
     });
 
+    var setupListeners = function(derived) {
+      var listeners = jasmine.createSpyObj("listeners", ["init", "will", "do", "finally"]);
+
+      derived.on("change", {
+        init: listeners.init,
+        will: listeners.will,
+        "do": listeners.do,
+        "finally": listeners.finally
+      });
+
+      return listeners;
+    }
+
     it("is a function", function() {
       expect(typeof List).toBe("function");
     });
@@ -695,10 +708,11 @@ define([
 
         var derived = new Derived();
 
-        var listeners = jasmine.createSpyObj("listeners", ["will", "did", "rejected"]);
-        derived.on("will:change", listeners.will);
-        derived.on("rejected:change", listeners.rejected);
-        derived.on("did:change", listeners.did);
+        var listeners = setupListeners(derived);
+
+        listeners.finally.and.callFake(function(actionExecution) {
+          expect(actionExecution.isDone).toBe(true);
+        });
 
         var list = derived.get("foo");
 
@@ -706,9 +720,10 @@ define([
 
         // ----
 
+        expect(listeners.init).toHaveBeenCalled();
         expect(listeners.will).toHaveBeenCalled();
-        expect(listeners.did).toHaveBeenCalled();
-        expect(listeners.rejected).not.toHaveBeenCalled();
+        expect(listeners.do).toHaveBeenCalled();
+        expect(listeners.finally).toHaveBeenCalled();
       });
 
       it("should append a given array of convertible values, to an empty list, " +
@@ -859,10 +874,11 @@ define([
 
         var derived = new Derived();
 
-        var listeners = jasmine.createSpyObj("listeners", ["will", "did", "rejected"]);
-        derived.on("will:change", listeners.will);
-        derived.on("rejected:change", listeners.rejected);
-        derived.on("did:change", listeners.did);
+        var listeners = setupListeners(derived);
+
+        listeners.finally.and.callFake(function(actionExecution) {
+          expect(actionExecution.isDone).toBe(true);
+        });
 
         var list = derived.foo;
 
@@ -870,9 +886,10 @@ define([
 
         // ----
 
+        expect(listeners.init).toHaveBeenCalled();
         expect(listeners.will).toHaveBeenCalled();
-        expect(listeners.did).toHaveBeenCalled();
-        expect(listeners.rejected).not.toHaveBeenCalled();
+        expect(listeners.do).toHaveBeenCalled();
+        expect(listeners.finally).toHaveBeenCalled();
       });
 
       it("should throw a TypeError if list is read-only", function() {
@@ -969,18 +986,20 @@ define([
 
         var derived = new Derived();
 
-        var listeners = jasmine.createSpyObj("listeners", ["will", "did", "rejected"]);
-        derived.on("will:change", listeners.will);
-        derived.on("rejected:change", listeners.rejected);
-        derived.on("did:change", listeners.did);
+        var listeners = setupListeners(derived);
+
+        listeners.finally.and.callFake(function(actionExecution) {
+          expect(actionExecution.isDone).toBe(true);
+        });
 
         derived.foo.clear();
 
         // ----
 
+        expect(listeners.init).toHaveBeenCalled();
         expect(listeners.will).toHaveBeenCalled();
-        expect(listeners.did).toHaveBeenCalled();
-        expect(listeners.rejected).not.toHaveBeenCalled();
+        expect(listeners.do).toHaveBeenCalled();
+        expect(listeners.finally).toHaveBeenCalled();
       });
 
       it("should clear all elements of the list", function() {
@@ -1029,18 +1048,20 @@ define([
 
         var derived = new Derived();
 
-        var listeners = jasmine.createSpyObj("listeners", ["will", "did", "rejected"]);
-        derived.on("will:change", listeners.will);
-        derived.on("rejected:change", listeners.rejected);
-        derived.on("did:change", listeners.did);
+        var listeners = setupListeners(derived);
+
+        listeners.finally.and.callFake(function(actionExecution) {
+          expect(actionExecution.isDone).toBe(true);
+        });
 
         derived.foo.removeAt(1, 1);
 
         // ----
 
+        expect(listeners.init).toHaveBeenCalled();
         expect(listeners.will).toHaveBeenCalled();
-        expect(listeners.did).toHaveBeenCalled();
-        expect(listeners.rejected).not.toHaveBeenCalled();
+        expect(listeners.do).toHaveBeenCalled();
+        expect(listeners.finally).toHaveBeenCalled();
       });
 
       it("should throw a TypeError if list is read-only", function() {
@@ -1470,16 +1491,18 @@ define([
 
         var derived = new Derived();
 
-        var listeners = jasmine.createSpyObj("listeners", ["will", "did", "rejected"]);
-        derived.on("will:change", listeners.will);
-        derived.on("rejected:change", listeners.rejected);
-        derived.on("did:change", listeners.did);
+        var listeners = setupListeners(derived);
+
+        listeners.finally.and.callFake(function(actionExecution) {
+          expect(actionExecution.isDone).toBe(true);
+        });
 
         derived.foo.sort(fun.compare);
 
+        expect(listeners.init).toHaveBeenCalled();
         expect(listeners.will).toHaveBeenCalled();
-        expect(listeners.did).toHaveBeenCalled();
-        expect(listeners.rejected).not.toHaveBeenCalled();
+        expect(listeners.do).toHaveBeenCalled();
+        expect(listeners.finally).toHaveBeenCalled();
       });
 
       it("should sort the list", function() {

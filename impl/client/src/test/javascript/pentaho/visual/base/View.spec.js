@@ -1136,15 +1136,17 @@ define([
 
         view.isAutoUpdate = false;
 
-        var didChangeHandler = jasmine.createSpy().and.callFake(function() {
+        var finallyChangeHandler = jasmine.createSpy().and.callFake(function() {
           expect(view.isDirty).toBe(true);
         });
 
-        model.on("did:change", didChangeHandler);
+        model.on("change", {
+          "finally": finallyChangeHandler
+        });
 
         model.selectionFilter = {_: "true"}; // Marks the view as dirty
 
-        expect(didChangeHandler).toHaveBeenCalled();
+        expect(finallyChangeHandler).toHaveBeenCalled();
       });
 
     }); // #isDirty
@@ -1497,12 +1499,17 @@ define([
           var viewSpec2 = view.toSpec();
           expect(viewSpec2).toEqual(viewSpec);
 
-          var didChangeSpy = jasmine.createSpy("did:change");
-          view.on("did:change", didChangeSpy);
+          var finallyChangeSpy = jasmine.createSpy("finally").and.callFake(function(actionExecution) {
+            expect(actionExecution.isRejected).toBe(true);
+          });
+
+          view.on("change", {
+            "finally": finallyChangeSpy
+          })
 
           view.configure(viewSpec);
 
-          expect(didChangeSpy).not.toHaveBeenCalled();
+          expect(finallyChangeSpy).toHaveBeenCalled();
         });
       });
     });

@@ -33,7 +33,7 @@ define([
   "use strict";
 
   /**
-   * @classDesc The `ChangeActionExecution` class is an inner class of
+   * @classDesc The `Transaction.ActionExecution` class is an inner class of
    * [Transaction]{@link pentaho.type.changes.Transaction} that assumes that
    * that the execution [target]{@link pentaho.action.Execution#target}
    * is a [Container]{@link pentaho.type.mixins.Container}.
@@ -207,7 +207,7 @@ define([
       this.__version = 0;
 
       /**
-       * @type {pentaho.action.}
+       * @type {pentaho.action.Transaction.ActionExecution}
        */
       this.__actionExecution = new ChangeActionExecution();
     },
@@ -601,7 +601,7 @@ define([
     // region __commitInit
     /**
      * Previews the result of [committing]{@link pentaho.type.changes.Transaction#__commit}
-     * the transaction by performing its _will_ phase.
+     * the transaction by performing its _init_ phase.
      *
      * Call this method to determine if an operation would be valid when there's
      * no _a priori_ intention of committing it, in case it is valid.
@@ -615,21 +615,21 @@ define([
      * Any subsequent calls to the method while in the proposed state
      * return the result of the first call.
      * As such, when the `__commit` method is later called,
-     * it will reuse the result of the anticipated _will_ phase.
+     * it will reuse the result of the anticipated _init_ phase.
      *
      * For each changeset that was registered with the transaction,
      * and that really has changes,
-     * its target is called to emit the `will:change` event, for any registered listeners.
+     * its target is called to emit the `init` phase event, for any registered listeners.
      *
      * Listeners may modify the changeset or any of the changesets contained in the transaction.
      * Also, new changesets can be added to the transaction.
      *
-     * If a `will:change` listener cancels one of the changesets,
+     * If a `init` phase listener cancels one of the changesets,
      * no more listeners are notified and the rejected result is returned.
      * To notify listeners of the rejection,
      * [__commit]{@link pentaho.type.changes.Transaction#__commit} still needs to be called.
      *
-     * @return {pentaho.lang.ActionResult} The commit-will or commit result of the transaction.
+     * @return {pentaho.lang.ActionResult} The commit-init or commit result of the transaction.
      *
      * @throws {pentaho.lang.OperationInvalidError} When this method is called while one of
      *  [__commitInit]{@link pentaho.type.changes.Transaction#__commitInit} or
@@ -656,11 +656,11 @@ define([
     },
 
     /**
-     * Performs the commit-will evaluation phase
+     * Performs the commit-init evaluation phase
      * by delegating to `__doCommitInitCore`.
-     * Stores the "will" result and marks all changesets as read-only.
+     * Stores the "init" result and marks all changesets as read-only.
      *
-     * @return {pentaho.lang.ActionResult} The commit-will result of the transaction.
+     * @return {pentaho.lang.ActionResult} The commit-init result of the transaction.
      * @private
      */
     __doCommitInit: function() {
@@ -709,8 +709,8 @@ define([
     },
 
     /**
-     * Actually performs the commit-will evaluation phase,
-     * going through `will:change` listeners of the targets of the changesets in this transaction.
+     * Actually performs the commit-init evaluation phase,
+     * going through `init` phase listeners of the targets of the changesets in this transaction.
      *
      * Evaluation proceeds as follows:
      *
@@ -719,7 +719,7 @@ define([
      * 3. If there are no changesets in the queue go to 4.
      *    Otherwise, do:
      * 3.1. Take the first changeset from the queue.
-     * 3.2. For each of its will:change listeners, in order, do:
+     * 3.2. For each of its `init` phase listeners, in order, do:
      * 3.2.1. If its transaction version is equal to the current changeset transaction version,
      *        go directly to step 3.3.
      * 3.2.2. Execute the listener.
@@ -738,7 +738,7 @@ define([
      * 3.4. Go to 3.
      * 4. Exit with success.
      *
-     * @return {pentaho.lang.ActionResult} The commit-will result of the transaction.
+     * @return {pentaho.lang.ActionResult} The commit-init result of the transaction.
      * @private
      */
     __doCommitInitCore: function() {
@@ -816,9 +816,9 @@ define([
     },
 
     /**
-     * Creates the queue data structures that support the commit-will evaluation phase.
+     * Creates the queue data structures that support the commit-init evaluation phase.
      *
-     * @return {boolean} `true` if there are any changesets with `will:change` event listeners; `false`, otherwise.
+     * @return {boolean} `true` if there are any changesets with `init` phase event listeners; `false`, otherwise.
      *
      * @private
      */
@@ -866,7 +866,7 @@ define([
     },
 
     /**
-     * Adds the parent changesets of a changeset to the commit-will queue,
+     * Adds the parent changesets of a changeset to the commit-init queue,
      * given the child changeset target.
      *
      * @param {pentaho.type.mixins.Container} childTarget - The target of the child changeset.
@@ -887,7 +887,7 @@ define([
     },
 
     /**
-     * Adds a changeset to the commit-will queue, if it isn't there yet.
+     * Adds a changeset to the commit-init queue, if it isn't there yet.
      *
      * @param {pentaho.type.action.Changeset} changeset - The changeset.
      * @param {boolean} forceIfRan - Indicates that the changeset should be added even if it already ran.
@@ -906,7 +906,7 @@ define([
     /**
      * Called by a changeset when its `transactionVersionLocal` changes.
      *
-     * When the commit-will phase is evaluating,
+     * When the commit-init phase is evaluating,
      * this method adds the given changeset to the evaluation queue,
      * if it isn't the current changeset being evaluated.
      *
@@ -1076,6 +1076,8 @@ define([
     }
   }, /** @lends pentaho.type.changes.Transaction */{
 
+    ActionExecution: ChangeActionExecution,
+
     /**
      * Gets the ambient transaction, if any, or `null`.
      *
@@ -1128,7 +1130,7 @@ define([
      * Gets any changesets still being delivered through notifications in the commit phase
      * of transactions.
      *
-     * If a transaction is started and committed from within the `did:change` listener of another,
+     * If a transaction is started and committed from within the `finally` phase listener of another,
      * then multiple changesets may be returned.
      *
      * @param {pentaho.type.mixins.Container} container - The container.
@@ -1172,20 +1174,5 @@ define([
    */
   function __takeNextVersion() {
     return ++__nextVersion;
-  }
-
-  /**
-   * Determines if a given event object is canceled.
-   *
-   * @memberOf pentaho.type.changes.Transaction~
-   *
-   * @param {pentaho.lang.Event} event - The event object.
-   *
-   * @return {boolean} `true` if it is canceled; `false`, otherwise.
-   *
-   * @private
-   */
-  function __event_isCanceled(event) {
-    return event.isCanceled;
   }
 });

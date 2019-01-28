@@ -88,29 +88,24 @@ define([
      * The default implementation does nothing and considers the instance valid.
      * Override to implement an action's specific validation logic.
      *
-     * @abstract
-     * @method
-     * @return {Array.<pentaho.lang.UserError>} A non-empty array of errors or `null`.
+     * @return {?Array.<pentaho.lang.UserError>} A non-empty array of errors or `null`.
      */
     validate: function() {
+      return null;
     },
 
     /**
      * Creates a shallow clone of this action.
      *
-     * @method
      * @return {pentaho.action.Base} The action clone.
      */
     clone: function() {
       return new this.constructor();
     }
-
-  }, /** @lends pentaho.action.Base*/{
+  }, /** @lends pentaho.action.Base */{
 
     /**
      * Indicates if the action is synchronous.
-     *
-     * When unspecified, inherits the value of the ancestor action.
      *
      * @type {boolean}
      * @default true

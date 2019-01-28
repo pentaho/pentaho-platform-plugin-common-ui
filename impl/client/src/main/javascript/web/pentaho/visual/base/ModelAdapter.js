@@ -157,14 +157,14 @@ define([
       // On the other hand, this will cause the commitInit evaluation phase to always have to execute its
       // lengthier path.
       //
-      // 3. Must be the last will:change listener, or the internal model is not guaranteed to be in sync.
+      // 3. Must be the last change action init phase listener, or the internal model is not guaranteed to be in sync.
       //    TODO: find a way to ensure that we're really the last listener.
       this.on("change", {
-        will: this.__onChangeWillHandler.bind(this)
+        will: this.__onChangeActionPhaseInitHandler.bind(this)
       }, {priority: -Infinity, isCritical: true});
 
       this.model.on("change", {
-        will: this.__onModelChangeWillHandler.bind(this)
+        will: this.__onModelChangeActionPhaseInitHandler.bind(this)
       }, {priority: -Infinity, isCritical: true});
     },
 
@@ -247,44 +247,44 @@ define([
     },
 
     /**
-     * Handler for the _will_ phase of a change action execution as emitted by this object.
+     * Handler for the _init_ phase of a change action execution as emitted by this object.
      *
      * @param {pentaho.action.Execution} actionExecution - The change action execution.
      * @private
      */
-    __onChangeWillHandler: function(actionExecution) {
+    __onChangeActionPhaseInitHandler: function(actionExecution) {
 
       var changesetAction = actionExecution.action;
       var propertyNames = changesetAction.propertyNames;
 
       if(__hasSingleChange(propertyNames, "selectionFilter")) {
 
-        // console.log("[ModelAdapter] will:change modelAdapter.selectionFilter " +
+        // console.log("[ModelAdapter] change action init phase, modelAdapter.selectionFilter " +
         //   (this.selectionFilter && this.selectionFilter.$contentKey));
 
         this.__updateInternalSelection();
 
       } else {
 
-        // console.log("[ModelAdapter] will:change other");
+        // console.log("[ModelAdapter] change action init phase, other");
 
         this.__updateInternalModel();
       }
     },
 
     /**
-     * Handler for the _will_ phase of a change action execution as emitted by this.model.
+     * Handler for the _init_ phase of a change action execution as emitted by this.model.
      *
      * @param {pentaho.action.Execution} actionExecution - The change action execution.
      * @private
      */
-    __onModelChangeWillHandler: function(actionExecution) {
+    __onModelChangeActionPhaseInitHandler: function(actionExecution) {
 
       var changesetAction = actionExecution.action;
 
       if(changesetAction.hasChange("selectionFilter")) {
 
-        // console.log("[ModelAdapter] will:change model.selectionFilter");
+        // console.log("[ModelAdapter] change action init phase, model.selectionFilter");
 
         this.__updateExternalSelection();
       }
@@ -339,7 +339,7 @@ define([
      */
     __updateInternalSelection: function() {
       // In a scenario where the external selectionFilter is updated,
-      // this gets called and, unfortunately, the following will also cause __onModelChangeWillHandler to be called,
+      // this gets called and, unfortunately, the following will also cause __onModelChangeActionPhaseInitHandler to be called,
       // which will update back the external selectionFilter...
       this.model.selectionFilter = this.__calcInternalSelectionFilter();
     },

@@ -510,7 +510,7 @@ define([
 
         it("should retain no changes", function() {
 
-          var willListener = jasmine.createSpy().and.callThrough(function() {
+          var initListener = jasmine.createSpy().and.callThrough(function() {
             expect(changeset.hasChanges).toBe(true);
             expect(listChangeset.hasChanges).toBe(true);
 
@@ -519,15 +519,17 @@ define([
             expect(changeset.hasChanges).toBe(false);
           });
 
-          target.on("will:change", willListener);
+          target.on("change", {
+            init: initListener
+          });
 
           scope.acceptWill();
 
-          expect(willListener).toHaveBeenCalled();
+          expect(initListener).toHaveBeenCalled();
         });
 
         it("should clear contained changesets", function() {
-          var willListener = jasmine.createSpy().and.callThrough(function() {
+          var initListener = jasmine.createSpy().and.callThrough(function() {
             expect(changeset.hasChanges).toBe(true);
             expect(listChangeset.hasChanges).toBe(true);
 
@@ -536,11 +538,13 @@ define([
             expect(listChangeset.hasChanges).toBe(false);
           });
 
-          target.on("will:change", willListener);
+          target.on("change", {
+            init: initListener
+          });
 
           scope.acceptWill();
 
-          expect(willListener).toHaveBeenCalled();
+          expect(initListener).toHaveBeenCalled();
         });
       }); // endregion #_clearChanges()
 

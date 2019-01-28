@@ -32,7 +32,7 @@ define([
 
   "use strict";
 
-  // NOTE: Doing it this way, did:change listeners cannot observe invalid cached information.
+  // NOTE: Doing it this way, `finally` phase listeners cannot observe invalid cached information.
   /**
    * @classDesc Manages the lifetime of the cached information of the mapping instances associated with a
    * target abstract model.
@@ -121,7 +121,7 @@ define([
 
     /**
      * Called when the data property or any of the visual role properties has changed,
-     * but before notifying any `did:change` listeners.
+     * but before notifying any `finally` phase listeners of a change action.
      *
      * The default implementation calls the
      * [_onDataOrMappingChanged]{@link pentaho.visual.role.AbstractMapping#_onDataOrMappingChanged}
