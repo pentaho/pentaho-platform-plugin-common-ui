@@ -19,7 +19,7 @@ define([
   "pentaho/type/Number",
   "pentaho/type/Property",
   "pentaho/type/List",
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/Transaction",
   "pentaho/type/PropertyTypeCollection",
   "pentaho/type/action/ComplexChangeset",
   "tests/pentaho/util/errorMatch",
@@ -721,11 +721,13 @@ define([
           beforeEach(function() {
 
             listeners = jasmine.createSpyObj("listeners", [
-              "init", "will", "do", "finally"
+              "init",
+              "will",
+              "finally"
             ]);
 
             listeners.init.and.callFake(function(event) {
-              if(event.source.x === THREE) event.cancel();
+              if(event.target.x === THREE) event.reject();
             });
 
             complex = new Derived({x: 0});
@@ -748,75 +750,48 @@ define([
           describe("With listeners -", function() {
 
             beforeEach(function() {
-              complex.on("change", {
-                init: listeners.init,
-                will: listeners.will,
-                "do": listeners.do,
-                "finally": listeners.finally,
-              })
+              complex.on("change", listeners);
             });
 
-            it("should call the `init` phase listener of the `change` action", function() {
+            it("should call the `change:init` listener", function() {
               complex.x = 1;
               expect(listeners.init).toHaveBeenCalled();
             });
 
-            it("should call the `will` phase listener of the `change` action", function() {
+            it("should call the `change:finally` listener when successful", function() {
               complex.x = 1;
-              expect(listeners.will).toHaveBeenCalled();
-            });
-
-            it("should call the `do` phase listener of the `change` action", function() {
-              complex.x = 1;
-              expect(listeners.do).toHaveBeenCalled();
-            });
-
-            it("should call the `finally` phase listener of the `change` action " +
-              "with a `did` state, when successful", function() {
-              complex.x = 1;
-
-              listeners.finally.and.callFake(function(actionExecution) {
-                expect(actionExecution.isDone).toBe(true);
-              });
-
               expect(listeners.finally).toHaveBeenCalled();
               expect(complex.x).toBe(1);
             });
 
-            it("should call the `finally` phase listener of the `change` action " +
-              "with a `rejected` state, when unsuccessful", function() {
+            it("should call the `change:finally` listener when unsuccessful", function() {
               expect(function() {
                 complex.x = THREE;
               }).toThrow();
-
-              listeners.finally.and.callFake(function(actionExecution) {
-                expect(actionExecution.isRejected).toBe(true);
-              });
 
               expect(listeners.finally).toHaveBeenCalled();
               expect(complex.x).toBe(0);
             });
 
             // Coverage.
-            // TODO: does it make sence with the finally?
-            xit("should support having no `rejected:change` listener when unsuccessful", function() {
-              complex.off("rejected:change", listeners.rejected);
+            it("should support having no `change:finally` listener when unsuccessful", function() {
+
+              complex.off("change");
+              complex.on("change", {init: listeners.init});
 
               expect(function() {
                 complex.x = THREE;
               }).toThrow();
 
-              expect(listeners.did).not.toHaveBeenCalled();
-              expect(listeners.rejected).not.toHaveBeenCalled();
               expect(complex.x).toBe(0);
             });
 
             it("should allow changing an element property value, directly on the complex, " +
-               "from within the `init` phase of a change action", function() {
+               "from within the `change:init` event", function() {
 
-              listeners.init.and.callFake(function(actionExecution) {
+              listeners.init.and.callFake(function(event) {
                 expect(function() {
-                  actionExecution.target.x = 2;
+                  event.target.x = 2;
                 }).not.toThrow(); // Listeners errors are swallowed.
               });
 
@@ -827,20 +802,15 @@ define([
               expect(complex.x).toBe(2);
             });
 
-            it("should initiate a new transaction when setting from a `change` action in the `finally` phase " +
-              "that ran succesfully", function() {
+            it("should initiate a new transaction when setting from a successfull `change:finally` event", function() {
               var entryCount = 0;
 
-              listeners.finally.and.callFake(function(actionExecution) {
-                if (entryCount === 0) {
-                  expect(actionExecution.isDone).toBe(true);
-                }
-
+              listeners.finally.and.callFake(function(event) {
                 entryCount++;
 
                 if(entryCount === 1) {
                   // Starts a nested change.
-                  actionExecution.target.x = 2;
+                  event.target.x = 2;
                 }
               });
 
@@ -851,20 +821,16 @@ define([
               expect(entryCount).toBe(2);
             });
 
-            it("should initiate a new transaction when setting from a `change` action in the `finally` phase " +
-              "that was rejected", function() {
+            it("should initiate a new transaction when setting from a rejected `change:finally` event", function() {
+
               var entryCount = 0;
 
-              listeners.finally.and.callFake(function(actionExecution) {
-                if (entryCount === 0) {
-                  expect(actionExecution.isRejected).toBe(true);
-                }
-
+              listeners.finally.and.callFake(function(event) {
                 entryCount++;
 
                 if(entryCount === 1) {
                   // Starts a nested change.
-                  actionExecution.target.x = 2;
+                  event.target.x = 2;
                 }
               });
 
@@ -876,21 +842,23 @@ define([
               expect(complex.x).toBe(2);
             });
 
-            it("should emit the `init` phase of a change action when setting a list property to a different value", function() {
+            it("should emit the `change:init` and `change:will` event when setting a list property " +
+              "to a different value", function() {
 
               complex.set("y", [1, 2]);
 
               expect(listeners.init).toHaveBeenCalled();
+              expect(listeners.will).toHaveBeenCalled();
 
               expect(complex.y.at(0).value).toBe(1);
               expect(complex.y.at(1).value).toBe(2);
             });
 
-            it("should allow changing directly the list value from within the `init` phase of a change action", function() {
+            it("should allow changing directly the list value from within the `change:init` event", function() {
 
-              listeners.init.and.callFake(function(actionExecution) {
+              listeners.init.and.callFake(function(event) {
                 expect(function() {
-                  actionExecution.target.y.add(2);
+                  event.target.y.add(2);
                 }).not.toThrow(); // Listeners errors are swallowed.
               });
 

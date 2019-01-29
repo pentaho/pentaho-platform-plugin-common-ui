@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/type/loader",
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/Transaction",
   "pentaho/visual/base/Model",
   "pentaho/visual/base/ModelAdapter",
   "pentaho/visual/role/adaptation/Strategy",

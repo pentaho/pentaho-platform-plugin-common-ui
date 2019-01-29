@@ -34,12 +34,14 @@ define([
   /* eslint dot-notation: 0 */
   /* globals Promise */
 
-  var MSG_STATE_EXECUTION_START = "The `execute` method can only be called while in the 'unstarted' state.";
+  var MSG_STATE_EXECUTION_REENTRY = "This method can not be called during execution.";
+  var MSG_STATE_EXECUTE = "This method can not be called after the 'will' phase.";
+
   var MSG_STATE_DONE = "The `done` method can only be called while in the 'do' state.";
   var MSG_STATE_REJECT = "The `reject` method can only be called while in the 'init', 'will' or 'do' states.";
 
   /** @type ?pentaho.action.States */
-  var executingUnsettledStates = States.init | States.will | States["do"];
+  var executingUnsettledStates = States.unstarted | States.init | States.will | States["do"];
 
   /** @type ?pentaho.action.States */
   var rejectedStates = States.canceled | States.failed;
@@ -189,6 +191,17 @@ define([
       this.__state = States.unstarted;
 
       /**
+       * Indicates if currently calling any of the methods: `execute`, `executeWill`,
+       * `_onPhaseFinally__executePhaseFinally`.
+       *
+       * @type {boolean}
+       * @default false
+       *
+       * @see pentaho.action.Execution#__callInside
+       */
+      this.__isInside = false;
+
+      /**
        * The result of a successful action execution.
        *
        * @type {*}
@@ -216,29 +229,35 @@ define([
     /**
      * Gets the action of the action execution.
      *
-     * This property returns a clone of the `action` argument passed to the constructor.
-     *
      * Once the action execution enters the `will` phase,
      * this object gets frozen and can no longer be modified.
      *
+     * @name action
+     * @memberOf pentaho.action.Execution#
      * @type {pentaho.type.action.Base}
      * @readonly
      * @abstract
      */
-    get action() {
+
+    /**
+     * Gets a value that indicates if the execution is synchronous.
+     *
+     * @type {boolean}
+     * @readOnly
+     */
+    get isSync() {
+      return this.action.constructor.isSync;
     },
 
     /**
      * Gets the target of the action execution.
      *
-     * This property returns the value of the `target` argument passed to the constructor.
-     *
+     * @name target
+     * @memberOf pentaho.action.Execution#
      * @type {pentaho.type.action.ITarget}
      * @readonly
      * @abstract
      */
-    get target() {
-    },
 
     // region ActionExecution state and result, predicates and get/set properties
 
@@ -517,21 +536,67 @@ define([
      * and wait for its resolution.
      *
      * @return {pentaho.type.action.Execution} The value of `this`.
-     *
-     * @throws {pentaho.lang.OperationInvalidError} When the action execution is not in the
-     * [unstarted]{@link pentaho.type.action.States.unstarted} state.
      */
     execute: function() {
 
-      this.__assertStates(States.unstarted, MSG_STATE_EXECUTION_START);
-
-      if(this.__action.constructor.isSync) {
-        this.__executeSyncAction();
-      } else {
-        this.__executeAsyncAction();
+      if(this.__state > States.will) {
+        throw new OperationInvalidError(MSG_STATE_EXECUTE);
       }
 
+      this.__callInside(function() {
+        if(this.isSync) {
+          this.__executeSyncAction();
+        } else {
+          this.__executeAsyncAction();
+        }
+      });
+
       return this;
+    },
+
+    /**
+     * Executes up to the 'will' phase of the action.
+     *
+     * @return {pentaho.type.action.Execution} The value of `this`.
+     */
+    executeWill: function() {
+
+      if(this.__state > States.will) {
+        throw new OperationInvalidError(MSG_STATE_EXECUTE);
+      }
+
+      this.__callInside(function() {
+        try {
+          this.__executePhaseInit();
+          this.__executePhaseWill();
+        } catch(ex) {
+          this.__rejectOrLog(ex);
+        }
+      });
+
+      return this;
+    },
+
+    /**
+     * Calls a given method while ensuring `__isInside` is currently false.
+     *
+     * @param {function} fun - The method to call. Cannot throw.
+     * @return {*} The value returned by `fun`.
+     * @private
+     */
+    __callInside: function(fun) {
+
+      if(this.__isInside) {
+        throw new OperationInvalidError(MSG_STATE_EXECUTION_REENTRY);
+      }
+
+      this.__isInside = true;
+
+      var result = fun.call(this);
+
+      this.__isInside = false;
+
+      return result;
     },
 
     /**
@@ -586,6 +651,9 @@ define([
      * an instance of [UserError]{@link pentaho.lang.UserError}
      * (which is not an instance of [RuntimeError]{@link pentaho.lang.RuntimeError}).
      *
+     * When unstarted, the execution's 'finally' phase is run.
+     * Otherwise, it is run later, when the execution reaches that phase.
+     *
      * @example
      *
      * define([
@@ -623,6 +691,7 @@ define([
      *
      * @throws {pentaho.lang.OperationInvalidError} When the action execution is
      * not in one of the states
+     * [unstarted]{@link pentaho.type.action.States.unstarted},
      * [init]{@link pentaho.type.action.States.init},
      * [will]{@link pentaho.type.action.States.will} or
      * [do]{@link pentaho.type.action.States.do}.
@@ -636,7 +705,14 @@ define([
 
       this.__assertStates(executingUnsettledStates, MSG_STATE_REJECT);
 
+      var wasExecuting = this.isExecuting;
+
       this.__reject(reason);
+
+      // Unstarted?
+      if(!wasExecuting) {
+        this.__executePhaseFinally();
+      }
 
       return this;
     },
@@ -653,16 +729,8 @@ define([
     __executeSyncAction: function() {
       try {
         this.__executePhaseInit();
-
-        if(!this.isSettled) {
-
-          this.__executePhaseWill();
-
-          if(!this.isSettled) {
-
-            this.__executePhaseDo();
-          }
-        }
+        this.__executePhaseWill();
+        this.__executePhaseDo();
       } catch(ex) {
         this.__rejectOrLog(ex);
       }
@@ -680,24 +748,18 @@ define([
       var promiseFinished;
       try {
         this.__executePhaseInit();
+        this.__executePhaseWill();
 
-        if(!this.isSettled) {
+        /* eslint no-unexpected-multiline: 0 */
 
-          this.__executePhaseWill();
+        promiseFinished = Promise.resolve(this.__executePhaseDo())
+            ["catch"](this.__rejectOrLog.bind(this));
 
-          if(!this.isSettled) {
-
-            /* eslint no-unexpected-multiline: 0 */
-
-            promiseFinished = Promise.resolve(this.__executePhaseDo())
-                ["catch"](this.__rejectOrLog.bind(this));
-          }
-        }
       } catch(ex) {
         this.__rejectOrLog(ex);
       }
 
-      var boundFinally = this.__executePhaseFinally.bind(this);
+      var boundFinally = this.__callInside.bind(this, this.__executePhaseFinally);
 
       (promiseFinished || Promise.resolve()).then(boundFinally, boundFinally);
     },
@@ -771,21 +833,26 @@ define([
      */
     __executePhaseInit: function() {
 
-      this.__state = States.init;
+      if(this.__state < States.init) {
 
-      this._onPhaseInit();
+        this.__state = States.init;
+
+        this._onPhaseInit();
+      }
     },
 
     /**
      * Executes the **will** phase.
      *
-     * Validates the action.
+     * Validates the action,
+     * by delegating to [_validatePhaseWill]{@link pentaho.type.action.Execution#_validatePhaseWill}.
      * When invalid, the execution is rejected with the first validation error.
      *
      * Otherwise,
-     * changes the state to [will]{@link pentaho.type.action.States.will},
-     * freezes the action instance and
-     * delegates to [_onPhaseWill]{@link pentaho.type.action.Execution#_onPhaseWill}.
+     * changes the state to [will]{@link pentaho.type.action.States.will}.
+     * The action instance is locked by calling
+     * [_lockAction]{@link pentaho.type.action.Execution#_lockAction}
+     * further execution delegated to [_onPhaseWill]{@link pentaho.type.action.Execution#_onPhaseWill}.
      *
      * Used by both the synchronous and the asynchronous actions.
      *
@@ -793,20 +860,43 @@ define([
      */
     __executePhaseWill: function() {
 
-      // Validating here and not on the end of `__executePhaseInit`
-      // ensures that isSettled is false (not rejected already).
-      if(this.__validatePhaseWill() != null) {
-        return;
+      if(this.__state < States.will) {
+
+        this.__state = States.will;
+
+        // Validating here and not on the end of `__executePhaseInit`
+        // ensures that isSettled is false (not rejected already).
+        if(this._validatePhaseWill() == null) {
+
+          this._lockAction();
+
+          this._onPhaseWill();
+        }
       }
-
-      this.__state = States.will;
-      Object.freeze(this.__action);
-
-      this._onPhaseWill();
     },
 
-    __validatePhaseWill: function() {
-      var errors = this.__action.validate();
+    /**
+     * Locks the action.
+     *
+     * The default implementation locks the action by using the `Object.freeze()` method.
+     *
+     * @protected
+     */
+    _lockAction: function() {
+      Object.freeze(this.action);
+    },
+
+    /**
+     * Validates that the action is valid for entering the `will` phase.
+     *
+     * When invalid, the execution is rejected with the first validation error.
+     *
+     * @return {?Array.<Error>} A non-empty array of errors, if any; otherwise `null`.
+     * @protected
+     */
+    _validatePhaseWill: function() {
+
+      var errors = this.action.validate();
 
       if(errors && errors.length) {
         this.__reject(errors[0]);
@@ -827,31 +917,35 @@ define([
      *
      * Used by both the synchronous and the asynchronous actions.
      *
-     * @return {Promise} A promise to the completion of an asynchronous _do_ phase or `null`.
+     * @return {?Promise} A promise to the completion of an asynchronous _do_ phase or `null`.
      *
      * @private
      */
     __executePhaseDo: function() {
 
-      this.__state = States["do"];
+      if(this.__state < States["do"]) {
 
-      var promise = this._onPhaseDo();
+        this.__state = States["do"];
 
-      var isSync = this.__action.constructor.isSync;
-      if(isSync) {
-        if(!this.isSettled) {
-          this._doDefault();
+        var promise = this._onPhaseDo();
+
+        if(this.isSync) {
+          if(!this.isSettled) {
+            this._doDefault();
+          }
+
+          return null;
         }
 
-        return null;
+        // Ignore promise if already settled.
+        if(!promise || this.isSettled) {
+          return this.__executePhaseDoDefaultAsync();
+        }
+
+        return promise.then(this.__executePhaseDoDefaultAsync.bind(this));
       }
 
-      // Ignore promise if already settled.
-      if(!promise || this.isSettled) {
-        return this.__executePhaseDoDefaultAsync();
-      }
-
-      return promise.then(this.__executePhaseDoDefaultAsync.bind(this));
+      return null;
     },
 
     /**
@@ -894,31 +988,34 @@ define([
      */
     __executePhaseFinally: function() {
 
-      if(!this.isSettled) {
-        // Auto-fulfill the action, in case no explicit done(.) or reject(.) was called.
-        this.done();
-      }
+      if(this.__state < States.finished) {
 
-      try {
-        this._onPhaseFinally();
-      } catch(ex) {
-        // `finally` errors don't affect the outcome of the action.
-        // Just log these.
-        if(debugMgr.testLevel(DebugLevels.warn, module)) {
-          logger.warn("Ignoring error occurred during action finally phase: " + ex + "\n Stack trace:\n" + ex.stack);
+        if(!this.isSettled) {
+          // Auto-fulfill the action, in case no explicit done(.) or reject(.) was called.
+          this.done();
         }
-      }
 
-      this.__state |= States.finished;
+        try {
+          this._onPhaseFinally();
+        } catch(ex) {
+          // `finally` errors don't affect the outcome of the action.
+          // Just log these.
+          if(debugMgr.testLevel(DebugLevels.warn, module)) {
+            logger.warn("Ignoring error occurred during action finally phase: " + ex + "\n Stack trace:\n" + ex.stack);
+          }
+        }
 
-      // Resolve the promise, if there is one, in which case it surely
-      // is not settled, as only now the state has been made finished...
-      var promiseControl = this.__promiseControl;
-      if(promiseControl) {
-        if(this.isDone) {
-          promiseControl.resolve(this.result);
-        } else {
-          promiseControl.reject(this.error);
+        this.__state |= States.finished;
+
+        // Resolve the promise, if there is one, in which case it surely
+        // is not settled, as only now the state has been made finished...
+        var promiseControl = this.__promiseControl;
+        if(promiseControl) {
+          if(this.isDone) {
+            promiseControl.resolve(this.result);
+          } else {
+            promiseControl.reject(this.error);
+          }
         }
       }
     },

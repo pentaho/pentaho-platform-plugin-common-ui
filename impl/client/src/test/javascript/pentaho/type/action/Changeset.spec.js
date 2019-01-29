@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/type/Complex",
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/Transaction",
   "pentaho/type/action/Changeset",
   "tests/pentaho/util/errorMatch"
 ], function(Complex, Transaction, Changeset, errorMatch) {

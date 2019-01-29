@@ -17,7 +17,7 @@ define([
   "pentaho/type/Complex",
   "pentaho/type/List",
   "pentaho/type/Number",
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/Transaction",
   "pentaho/type/action/ListChangeset",
   "pentaho/type/action/ComplexChangeset",
   "pentaho/type/action/Add",

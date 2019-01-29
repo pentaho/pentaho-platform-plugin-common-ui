@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/changes/AbstractTransactionScope",
-  "pentaho/type/changes/_transactionControl",
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/AbstractTransactionScope",
+  "pentaho/type/action/_transactionControl",
+  "pentaho/type/action/Transaction",
   "tests/pentaho/util/errorMatch"
 ], function(AbstractTransactionScope, transactionControl, Transaction, errorMatch) {
 
@@ -24,7 +24,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, jasmine:false */
 
-  describe("pentaho.type.changes.AbstractTransactionScope", function() {
+  describe("pentaho.type.action.AbstractTransactionScope", function() {
 
     function mockLogger(localRequire) {
 
@@ -130,8 +130,8 @@ define([
       it("should log a warning when called and already exited from", function() {
 
         return require.using([
-          "pentaho/type/changes/Transaction",
-          "pentaho/type/changes/AbstractTransactionScope",
+          "pentaho/type/action/Transaction",
+          "pentaho/type/action/AbstractTransactionScope",
           "pentaho/util/logger"
         ], mockLogger, function(Transaction, AbstractTransactionScope, logger) {
 
@@ -156,8 +156,8 @@ define([
       it("should not log a warning when called and already exited from, if keyArgs.sloppy is true", function() {
 
         return require.using([
-          "pentaho/type/changes/Transaction",
-          "pentaho/type/changes/AbstractTransactionScope",
+          "pentaho/type/action/Transaction",
+          "pentaho/type/action/AbstractTransactionScope",
           "pentaho/util/logger"
         ], mockLogger, function(Transaction, AbstractTransactionScope, logger) {
 
@@ -182,8 +182,8 @@ define([
       it("should log a warning when called and not current", function() {
 
         return require.using([
-          "pentaho/type/changes/Transaction",
-          "pentaho/type/changes/AbstractTransactionScope",
+          "pentaho/type/action/Transaction",
+          "pentaho/type/action/AbstractTransactionScope",
           "pentaho/util/logger"
         ], mockLogger, function(Transaction, AbstractTransactionScope, logger) {
 
@@ -210,8 +210,8 @@ define([
       it("should not log a warning when called and not current, if keyArgs.sloppy is true", function() {
 
         return require.using([
-          "pentaho/type/changes/Transaction",
-          "pentaho/type/changes/AbstractTransactionScope",
+          "pentaho/type/action/Transaction",
+          "pentaho/type/action/AbstractTransactionScope",
           "pentaho/util/logger"
         ], mockLogger, function(Transaction, AbstractTransactionScope, logger) {
 

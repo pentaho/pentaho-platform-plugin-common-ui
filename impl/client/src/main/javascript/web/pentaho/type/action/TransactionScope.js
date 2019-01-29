@@ -20,22 +20,22 @@ define([
 
   "use strict";
 
-  return AbstractTransactionScope.extend(module.id, /** @lends pentaho.type.changes.TransactionScope# */{
+  return AbstractTransactionScope.extend(module.id, /** @lends pentaho.type.action.TransactionScope# */{
 
     /**
      * @name TransactionScope
-     * @memberOf pentaho.type.changes
+     * @memberOf pentaho.type.action
      * @class
-     * @extends pentaho.type.changes.AbstractTransactionScope
+     * @extends pentaho.type.action.AbstractTransactionScope
      *
-     * @friend pentaho.type.changes.Transaction
+     * @friend pentaho.type.action.Transaction
      *
-     * @classDesc The `TransactionScope` class manages a [transaction]{@link pentaho.type.changes.Transaction}.
+     * @classDesc The `TransactionScope` class manages a [transaction]{@link pentaho.type.action.Transaction}.
      *
      * @constructor
      * @description Creates a `TransactionScope`.
      *
-     * @param {pentaho.type.changes.Transaction} transaction - The associated transaction.
+     * @param {pentaho.type.action.Transaction} transaction - The associated transaction.
      */
 
     /**
@@ -49,11 +49,11 @@ define([
      * @readOnly
      */
     get canCommit() {
-      return this.isRoot && this.isCurrent && this.transaction.isProposed;
+      return this.isRoot && this.isCurrent && !this.transaction.isSettled;
     },
 
     /**
-     * Previews the result of committing the transaction by performing its _init_ phase.
+     * Previews the result of committing the transaction by performing its _init_ and _will_ phases.
      *
      * Call this method to determine if an operation would be valid when there's
      * no _a priori_ intention of committing it, in case it is valid.
@@ -62,43 +62,49 @@ define([
      * In any case,
      * no more changes can be performed in this transaction,
      * after `acceptWill` has been called;
-     * the transaction becomes [read-only]{@link pentaho.type.changes.Transaction#isReadOnly}.
+     * the transaction becomes [read-only]{@link pentaho.type.action.Transaction#isReadOnly}.
      *
-     * @return {pentaho.lang.ActionResult} The commit result, if the transaction was committed; `null`, otherwise.
+     * @return {pentaho.action.Execution} The transaction.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the transaction scope has already been exited from.
      * @throws {pentaho.lang.OperationInvalidError} When the transaction scope is not the current scope.
-     * Can only accept the current scope of the transaction.
      */
     acceptWill: function() {
       this._assertInsideAndCurrent();
 
-      return this.transaction.__commitInit();
+      return this.transaction.executeWill();
     },
 
     /**
      * Accepts the scope.
      *
      * When the scope can commit its transaction,
-     * as determined by [canCommit]{@link pentaho.type.changes.TransactionScope#canCommit},
+     * as determined by [canCommit]{@link pentaho.type.action.TransactionScope#canCommit},
      * accepting the scope attempts to commit its transaction and exits from the scope.
      * If committing the transaction fails, the rejection error is thrown.
      *
      * Otherwise, if the scope cannot commit its transaction, accepting the scope simply exits from it.
      *
-     * @return {pentaho.type.changes.AbstractTransactionScope} This scope.
+     * @return {pentaho.type.action.AbstractTransactionScope} This scope.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the transaction scope has already been exited.
      * @throws {pentaho.lang.OperationInvalidError} When the transaction scope is not the current scope.
      * @throws {Error} When attempting to commit the transaction fails.
      */
     accept: function() {
+
       this._assertInsideAndCurrent();
 
-      if(this.canCommit)
-        this.transaction.__commit();
-      else
+      if(this.canCommit) {
+
+        this.transaction.execute();
+
+        var error = this.transaction.error;
+        if(error) throw error;
+
+      } else {
         this.exit();
+      }
 
       return this;
     },
@@ -109,16 +115,17 @@ define([
      *
      * @param {string|Error|pentaho.lang.UserError} [reason="canceled"] The reason for rejecting the transaction.
      *
-     * @throws {pentaho.lang.OperationInvalidError} When not `sloppy` and the transaction scope has
-     * already been exited from.
-     * @throws {pentaho.lang.OperationInvalidError} When not `sloppy` and the transaction scope is
-     * not the current scope.
+     * @throws {pentaho.lang.OperationInvalidError} When the transaction scope has already been exited from.
+     * @throws {pentaho.lang.OperationInvalidError} When the transaction scope is not the current scope.
      * @throws {Error} The rejection error.
      */
     reject: function(reason) {
+
       this._assertInsideAndCurrent();
 
-      this.transaction.__reject(reason);
+      this.transaction.reject(reason || "Transaction canceled.");
+
+      throw this.transaction.error;
     },
 
     /**
@@ -130,7 +137,7 @@ define([
      *
      * In any case, the scope will have been exited from when this method returns.
      *
-     * @param {function(pentaho.type.changes.TransactionScope) : *} fun - The function to call within the scope.
+     * @param {function(pentaho.type.action.TransactionScope) : *} fun - The function to call within the scope.
      * The function is called with the `this` context specified in argument `ctx`.
      * The return value of `fun` is returned back from this method.
      *
@@ -159,9 +166,9 @@ define([
 
       // Make sure a rejection results in a throw to the caller,
       // even if `fun` swallowed the initial throw.
-      var ar = this.transaction.result;
-      if(ar && ar.error)
-        throw ar.error;
+      var error = this.transaction.error;
+      if(error)
+        throw error;
 
       return result;
     }

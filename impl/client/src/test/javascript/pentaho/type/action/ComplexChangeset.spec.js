@@ -17,7 +17,7 @@ define([
   "pentaho/type/Complex",
   "pentaho/type/List",
   "pentaho/type/Number",
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/Transaction",
   "pentaho/type/action/ComplexChangeset",
   "pentaho/type/action/ListChangeset",
   "tests/pentaho/util/errorMatch"
@@ -519,9 +519,7 @@ define([
             expect(changeset.hasChanges).toBe(false);
           });
 
-          target.on("change", {
-            init: initListener
-          });
+          target.on("change", {init: initListener});
 
           scope.acceptWill();
 
@@ -538,9 +536,7 @@ define([
             expect(listChangeset.hasChanges).toBe(false);
           });
 
-          target.on("change", {
-            init: initListener
-          });
+          target.on("change", {init: initListener});
 
           scope.acceptWill();
 

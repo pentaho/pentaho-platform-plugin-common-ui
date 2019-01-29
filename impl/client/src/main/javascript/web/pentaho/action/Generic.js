@@ -45,11 +45,6 @@ define([
       this._init(spec);
     },
 
-    /** @inheritDoc */
-    get eventName() {
-      return this.type;
-    },
-
     /**
      * Initializes an action instance given its specification.
      *
@@ -67,7 +62,6 @@ define([
     /**
      * Creates a specification that describes this action.
      *
-     * @method
      * @return {pentaho.action.spec.IGeneric} A generic action specification.
      */
     toSpec: function() {
@@ -85,7 +79,6 @@ define([
      * @param {pentaho.action.spec.IGeneric} [spec] A generic action specification.
      *
      * @protected
-     * @method
      */
     _fillSpec: function(spec) {
     }

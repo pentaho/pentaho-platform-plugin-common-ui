@@ -15,11 +15,11 @@
  */
 define([
   "pentaho/type/Complex",
-  "pentaho/type/changes/TransactionScope",
-  "pentaho/type/changes/Transaction",
-  "pentaho/type/changes/TransactionRejectedError",
+  "pentaho/type/action/TransactionScope",
+  "pentaho/type/action/Transaction",
+  "pentaho/type/action/TransactionRejectedError",
   "pentaho/type/action/Changeset",
-  "pentaho/type/changes/ChangeRef",
+  "pentaho/type/action/ChangeRef",
   "tests/pentaho/util/errorMatch"
 ], function(Complex, TransactionScope, Transaction, TransactionRejectedError, Changeset, ChangeRef, errorMatch) {
 
@@ -27,7 +27,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, jasmine:false */
 
-  describe("pentaho.type.changes.Transaction", function() {
+  describe("pentaho.type.action.Transaction", function() {
 
     var DerivedComplex;
 
@@ -44,12 +44,6 @@ define([
         expect(typeof Transaction).toBeDefined();
       });
 
-      it("should have isProposed = true", function() {
-        var txn = new Transaction();
-
-        expect(txn.isProposed).toBe(true);
-      });
-
       it("should have isReadOnly = false", function() {
         var txn = new Transaction();
 
@@ -60,12 +54,6 @@ define([
         var txn = new Transaction();
 
         expect(txn.isCurrent).toBe(false);
-      });
-
-      it("should have result = null", function() {
-        var txn = new Transaction();
-
-        expect(txn.result).toBe(null);
       });
     });
 
@@ -130,7 +118,7 @@ define([
         scope.exit();
 
         expect(txn.isReadOnly).toBe(true);
-        expect(txn.isProposed).toBe(true);
+        expect(txn.isSettled).toBe(false);
 
         var container = new DerivedComplex();
         expect(function() {
@@ -472,7 +460,7 @@ define([
       });
     });
 
-    describe("#__doCommitInitCore", function() {
+    describe("#_onPhaseInit", function() {
 
       var transaction;
       var scope;
@@ -609,17 +597,16 @@ define([
 
           spyOn(transaction, "__setupCommitInitQueue");
 
-          transaction.__doCommitInitCore();
+          transaction._onPhaseInit();
 
           expect(transaction.__setupCommitInitQueue).not.toHaveBeenCalled();
         });
 
-        it("should return fulfilled", function() {
+        it("should not become rejected", function() {
 
-          var result = transaction.__doCommitInitCore();
+          transaction._onPhaseInit();
 
-          expect(result != null).toBe(true);
-          expect(result.isFulfilled).toBe(true);
+          expect(transaction.isRejected).toBe(false);
         });
       });
 
@@ -632,7 +619,7 @@ define([
             transaction.__commitInitQueue = [];
           });
 
-          transaction.__doCommitInitCore();
+          transaction._onPhaseInit();
 
           expect(transaction.__setupCommitInitQueue).toHaveBeenCalled();
         });
@@ -676,7 +663,7 @@ define([
             ]);
           });
 
-          it("should return false if there are no changeset targets have `init` phase listeners", function() {
+          it("should return false if there are no changeset targets have change:init listeners", function() {
 
             var neighborhood = scenarioNeighborhood();
 
@@ -688,13 +675,11 @@ define([
             expect(result).toBe(false);
           });
 
-          it("should return true if there is at least one changeset target that has `init` phase listeners", function() {
+          it("should return true if there is at least one changeset target that has change:init listeners", function() {
 
             var neighborhood = scenarioNeighborhood();
 
-            neighborhood.graph3.dog1.on("change", {
-              init: jasmine.createSpy("init")
-            });
+            neighborhood.graph3.dog1.on("change", {init: jasmine.createSpy("change:init")});
 
             // => 3 changesets (net order 2)
             neighborhood.graph3.dog1.name = "can2";
@@ -707,7 +692,7 @@ define([
 
         describe("when __setupCommitInitQueue returns false", function() {
 
-          it("should return fulfilled immediately", function() {
+          it("should return not rejected immediately", function() {
 
             var neighborhood = scenarioNeighborhood();
 
@@ -716,30 +701,27 @@ define([
 
             spyOn(transaction, "__setupCommitInitQueue").and.returnValue(false);
 
-            spyOn(neighborhood.graph3.dog1, "_onChangeInit");
-            spyOn(neighborhood.graph3.person1, "_onChangeInit");
-            spyOn(neighborhood.graph3.person1.pets, "_onChangeInit");
+            spyOn(neighborhood.graph3.dog1, "__emitChangeActionPhaseInitEvent");
+            spyOn(neighborhood.graph3.person1, "__emitChangeActionPhaseInitEvent");
+            spyOn(neighborhood.graph3.person1.pets, "__emitChangeActionPhaseInitEvent");
 
-            var result = transaction.__doCommitInitCore();
+            transaction._onPhaseInit();
 
-            expect(neighborhood.graph3.dog1._onChangeInit).not.toHaveBeenCalled();
-            expect(neighborhood.graph3.person1._onChangeInit).not.toHaveBeenCalled();
-            expect(neighborhood.graph3.person1.pets._onChangeInit).not.toHaveBeenCalled();
+            expect(neighborhood.graph3.dog1.__emitChangeActionPhaseInitEvent).not.toHaveBeenCalled();
+            expect(neighborhood.graph3.person1.__emitChangeActionPhaseInitEvent).not.toHaveBeenCalled();
+            expect(neighborhood.graph3.person1.pets.__emitChangeActionPhaseInitEvent).not.toHaveBeenCalled();
 
-            expect(result != null).toBe(true);
-            expect(result.isFulfilled).toBe(true);
+            expect(transaction.isRejected).toBe(false);
           });
         });
 
         describe("when __setupCommitInitQueue returns true", function() {
 
-          it("should call _onChangeInit on every changeset in queue order", function() {
+          it("should call __emitChangeActionPhaseInitEvent on every changeset in queue order", function() {
 
             var neighborhood = scenarioNeighborhood();
 
-            neighborhood.graph3.dog1.on("change", {
-              init: jasmine.createSpy("init")
-            });
+            neighborhood.graph3.dog1.on("change", {init: jasmine.createSpy("change:init")});
 
             // => 3 changesets (net order 2)
             neighborhood.graph3.dog1.name = "can2";
@@ -759,7 +741,7 @@ define([
               person1Order = order++;
             });
 
-            transaction.__doCommitInitCore();
+            transaction._onPhaseInit();
 
             expect(neighborhood.graph3.dog1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
             expect(neighborhood.graph3.person1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
@@ -780,24 +762,25 @@ define([
 
               var cancelReason = new Error();
 
-              neighborhood.graph3.dog1.on("change", {
-                init: jasmine.createSpy("init")
-              });
+              neighborhood.graph3.dog1.on("change", {init: jasmine.createSpy("change:init")});
 
               // => 3 changesets (net order 2)
               neighborhood.graph3.dog1.name = "can2";
 
-              spyOn(neighborhood.graph3.dog1, "__emitChangeActionPhaseInitEvent").and.returnValue(cancelReason);
+              spyOn(neighborhood.graph3.dog1, "__emitChangeActionPhaseInitEvent")
+                .and.callFake(function(actionExecution) {
+                  actionExecution.reject(cancelReason);
+                });
+
               spyOn(neighborhood.graph3.person1.pets, "__emitChangeActionPhaseInitEvent");
               spyOn(neighborhood.graph3.person1, "__emitChangeActionPhaseInitEvent");
 
-              var result = transaction.__doCommitInitCore();
+              transaction._onPhaseInit();
 
               expect(transaction.__finalizeCommitInitQueue).toHaveBeenCalledTimes(1);
 
-              expect(result != null).toBe(true);
-              expect(result.isRejected).toBe(true);
-              expect(result.error).toBe(cancelReason);
+              expect(transaction.isRejected).toBe(true);
+              expect(transaction.error).toBe(cancelReason);
             });
 
             it("should not call any more changesets", function() {
@@ -810,9 +793,7 @@ define([
 
               var cancelReason = new Error();
 
-              neighborhood.graph1.dog2.on("change", {
-                init: jasmine.createSpy("init")
-              });
+              neighborhood.graph1.dog2.on("change", {init: jasmine.createSpy("change:init")});
 
               // => 7 changesets (net order 4)
               neighborhood.graph1.dog2.name = "wilde2";
@@ -821,7 +802,10 @@ define([
               // So it will be placed in the queue before Person2.
               spyOn(neighborhood.graph1.dog2, "__emitChangeActionPhaseInitEvent");
               spyOn(neighborhood.graph1.person1.pets, "__emitChangeActionPhaseInitEvent");
-              spyOn(neighborhood.graph1.person1, "__emitChangeActionPhaseInitEvent").and.returnValue(cancelReason);
+              spyOn(neighborhood.graph1.person1, "__emitChangeActionPhaseInitEvent")
+                .and.callFake(function(actionExecution) {
+                  actionExecution.reject(cancelReason);
+                });
 
               spyOn(neighborhood.graph1.person2.pets, "__emitChangeActionPhaseInitEvent");
               spyOn(neighborhood.graph1.person2, "__emitChangeActionPhaseInitEvent");
@@ -829,7 +813,7 @@ define([
               spyOn(neighborhood.graph1.house1.residents, "__emitChangeActionPhaseInitEvent");
               spyOn(neighborhood.graph1.house1, "__emitChangeActionPhaseInitEvent");
 
-              transaction.__doCommitInitCore();
+              transaction._onPhaseInit();
 
               expect(neighborhood.graph1.dog2.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
               expect(neighborhood.graph1.person1.pets.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
@@ -844,15 +828,14 @@ define([
 
           describe("when no changeset target cancels the event", function() {
 
-            describe("when there are multiple paths to a changset", function() {
+            describe("when there are multiple paths to a changeset", function() {
 
-              it("should call __emitChangeActionPhaseInitEvent on its target only once if no additional changes occur", function() {
+              it("should call __emitChangeActionPhaseInitEvent on its target only once " +
+                "if no additional changes occur", function() {
 
                 var neighborhood = scenarioNeighborhood();
 
-                neighborhood.graph2.cat1.on("change", {
-                  init: jasmine.createSpy("init")
-                });
+                neighborhood.graph2.cat1.on("change", {init: jasmine.createSpy("change:init")});
 
                 // => 5 changesets (net order 4)
                 neighborhood.graph2.cat1.name = "felix2";
@@ -863,7 +846,7 @@ define([
                 spyOn(neighborhood.graph2.house1.residents, "__emitChangeActionPhaseInitEvent");
                 spyOn(neighborhood.graph2.house1, "__emitChangeActionPhaseInitEvent");
 
-                transaction.__doCommitInitCore();
+                transaction._onPhaseInit();
 
                 expect(neighborhood.graph2.cat1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
                 expect(neighborhood.graph2.person1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
@@ -873,15 +856,13 @@ define([
               });
             });
 
-            it("should call __finalizeCommitInitQueue and return fulfilled", function() {
+            it("should call __finalizeCommitInitQueue and return not rejected", function() {
 
               var neighborhood = scenarioNeighborhood();
 
               spyOn(transaction, "__finalizeCommitInitQueue");
 
-              neighborhood.graph3.dog1.on("change", {
-                init: jasmine.createSpy("init")
-              });
+              neighborhood.graph3.dog1.on("change", {init: jasmine.createSpy("change:init")});
 
               // => 3 changesets (net order 2)
               neighborhood.graph3.dog1.name = "can2";
@@ -890,12 +871,11 @@ define([
               spyOn(neighborhood.graph3.person1.pets, "__emitChangeActionPhaseInitEvent");
               spyOn(neighborhood.graph3.person1, "__emitChangeActionPhaseInitEvent");
 
-              var result = transaction.__doCommitInitCore();
+              transaction._onPhaseInit();
 
               expect(transaction.__finalizeCommitInitQueue).toHaveBeenCalledTimes(1);
 
-              expect(result != null).toBe(true);
-              expect(result.isFulfilled).toBe(true);
+              expect(transaction.isRejected).toBe(false);
             });
 
             describe("when a changeset which is after the current one in the graph is locally changed", function() {
@@ -904,9 +884,7 @@ define([
 
                 var neighborhood = scenarioNeighborhood();
 
-                neighborhood.graph3.dog1.on("change", {
-                  init: jasmine.createSpy("init")
-                });
+                neighborhood.graph3.dog1.on("change", {init: jasmine.createSpy("change:init")});
 
                 // => 3 changesets (net order 2)
                 neighborhood.graph3.dog1.name = "can2";
@@ -934,7 +912,7 @@ define([
                   person1Order = order++;
                 });
 
-                transaction.__doCommitInitCore();
+                transaction._onPhaseInit();
 
                 expect(neighborhood.graph3.dog1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
                 expect(neighborhood.graph3.person1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
@@ -957,9 +935,7 @@ define([
 
                 var neighborhood = scenarioNeighborhood();
 
-                neighborhood.graph3.dog1.on("change", {
-                  init: jasmine.createSpy("init")
-                });
+                neighborhood.graph3.dog1.on("change", {init: jasmine.createSpy("change:init")});
 
                 // => 3 changesets (net order 2)
                 neighborhood.graph3.dog1.name = "can2";
@@ -970,7 +946,7 @@ define([
                 });
                 spyOn(neighborhood.graph3.person1, "__emitChangeActionPhaseInitEvent");
 
-                transaction.__doCommitInitCore();
+                transaction._onPhaseInit();
 
                 expect(neighborhood.graph3.dog1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
                 expect(neighborhood.graph3.person1.pets.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
@@ -982,9 +958,7 @@ define([
 
                 var neighborhood = scenarioNeighborhood();
 
-                neighborhood.graph3.person1.on("change", {
-                  init: jasmine.createSpy("init")
-                });
+                neighborhood.graph3.person1.on("change", {init: jasmine.createSpy("change:init")});
 
                 spyOn(neighborhood.graph3.dog1, "__emitChangeActionPhaseInitEvent");
                 spyOn(neighborhood.graph3.person1.pets, "__emitChangeActionPhaseInitEvent");
@@ -995,7 +969,7 @@ define([
 
                 neighborhood.graph3.person1.name = "Trash2";
 
-                transaction.__doCommitInitCore();
+                transaction._onPhaseInit();
 
                 expect(neighborhood.graph3.dog1.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
                 expect(neighborhood.graph3.person1.pets.__emitChangeActionPhaseInitEvent).toHaveBeenCalledTimes(1);
@@ -1012,20 +986,17 @@ define([
                 // => 3 changesets (net order 2)
                 neighborhood.graph3.dog1.name = "can2";
 
-                var person1PetsChangeInit = jasmine.createSpy("init").and.callFake(function() {
+                var person1PetsChangeInit = jasmine.createSpy("change:init").and.callFake(function() {
                   neighborhood.graph3.dog1.name = "can3";
                 });
-
-                neighborhood.graph3.person1.pets.on("change", {
-                  init: person1PetsChangeInit
-                });
+                neighborhood.graph3.person1.pets.on("change", {init: person1PetsChangeInit});
 
                 spyOn(neighborhood.graph3.dog1, "__emitChangeActionPhaseInitEvent");
                 spyOn(neighborhood.graph3.person1, "__emitChangeActionPhaseInitEvent");
 
-                transaction.__doCommitInitCore();
+                transaction._onPhaseInit();
 
-                expect(person1PetsChangeWill).toHaveBeenCalledTimes(1);
+                expect(person1PetsChangeInit).toHaveBeenCalledTimes(1);
               });
             });
           });
@@ -1037,7 +1008,7 @@ define([
 
       it("should have a null transaction by default", function() {
 
-        return require.using(["pentaho/type/changes/Transaction"], function(Transaction) {
+        return require.using(["pentaho/type/action/Transaction"], function(Transaction) {
           expect(Transaction.current).toBe(null);
         });
       });
@@ -1048,8 +1019,8 @@ define([
       it("should return a TransactionScope instance", function() {
 
         return require.using([
-          "pentaho/type/changes/Transaction",
-          "pentaho/type/changes/TransactionScope"
+          "pentaho/type/action/Transaction",
+          "pentaho/type/action/TransactionScope"
         ], function(Transaction, TransactionScope) {
 
           var txnScope = Transaction.enter();
@@ -1062,7 +1033,7 @@ define([
 
       it("should return a TransactionScope instance whose transaction is now the ambient transaction", function() {
 
-        return require.using(["pentaho/type/changes/Transaction"], function(Transaction) {
+        return require.using(["pentaho/type/action/Transaction"], function(Transaction) {
 
           var txnScope = Transaction.enter();
 
@@ -1074,7 +1045,7 @@ define([
 
       it("should return a new TransactionScope instance each time", function() {
 
-        return require.using(["pentaho/type/changes/Transaction"], function(Transaction) {
+        return require.using(["pentaho/type/action/Transaction"], function(Transaction) {
 
           var txnScope1 = Transaction.enter();
           var txnScope2 = Transaction.enter();
@@ -1085,7 +1056,7 @@ define([
 
       it("should return a new TransactionScope of the same transaction, each time", function() {
 
-        return require.using(["pentaho/type/changes/Transaction"], function(Transaction) {
+        return require.using(["pentaho/type/action/Transaction"], function(Transaction) {
 
           var txnScope1 = Transaction.enter();
           var txnScope2 = Transaction.enter();
@@ -1097,8 +1068,8 @@ define([
       it("should call the new ambient transaction's #__enteringAmbient method", function() {
 
         return require.using([
-          "pentaho/type/changes/Transaction",
-          "pentaho/type/changes/TransactionScope"
+          "pentaho/type/action/Transaction",
+          "pentaho/type/action/TransactionScope"
         ], function(Transaction, TransactionScope) {
 
           var txn = new Transaction();
@@ -1116,9 +1087,9 @@ define([
       it("should call the suspending ambient transaction's __exitingAmbient, when a null scope enters", function() {
 
         return require.using([
-          "pentaho/type/changes/Transaction",
-          "pentaho/type/changes/TransactionScope",
-          "pentaho/type/changes/CommittedScope"
+          "pentaho/type/action/Transaction",
+          "pentaho/type/action/TransactionScope",
+          "pentaho/type/action/CommittedScope"
         ], function(Transaction, TransactionScope, CommittedScope) {
 
           var txn = new Transaction();

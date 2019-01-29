@@ -16,7 +16,7 @@
 define([
   "pentaho/type/loader",
   "pentaho/type/Complex",
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/Transaction",
   "pentaho/type/action/Clear"
 ], function(typeLoader, Complex, Transaction, Clear) {
 

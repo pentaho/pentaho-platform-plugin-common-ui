@@ -24,25 +24,25 @@ define([
 
   "use strict";
 
-  return Base.extend(module.id, /** @lends pentaho.type.changes.AbstractTransactionScope# */{
+  return Base.extend(module.id, /** @lends pentaho.type.action.AbstractTransactionScope# */{
 
     /**
      * @alias AbstractTransactionScope
-     * @memberOf pentaho.type.changes
+     * @memberOf pentaho.type.action
      * @class
      *
      * @classDesc The `AbstractTransactionScope` class is the abstract base class
      * of classes that control the
-     * [ambient/current transaction]{@link pentaho.type.changes.Transaction#current}.
+     * [ambient/current transaction]{@link pentaho.type.action.Transaction#current}.
      *
      * @constructor
      * @description Creates a `CommittedScope`.
      *
-     * @param {pentaho.type.changes.Transaction} [transaction] The associated transaction.
+     * @param {pentaho.type.action.Transaction} [transaction] The associated transaction.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the specified transaction is resolved.
      *
-     * @throws {pentaho.type.changes.TransactionRejectedError} When this is the root scope of the specified transaction
+     * @throws {pentaho.type.action.TransactionRejectedError} When this is the root scope of the specified transaction
      * and the transaction is automatically rejected due to a concurrency error.
      */
     constructor: function(transaction) {
@@ -50,8 +50,8 @@ define([
        * Gets the associated transaction, if any, or `null`.
        *
        * @name transaction
-       * @memberOf pentaho.type.changes.AbstractTransactionScope#
-       * @type {pentaho.type.changes.Transaction}
+       * @memberOf pentaho.type.action.AbstractTransactionScope#
+       * @type {pentaho.type.action.Transaction}
        * @readOnly
        */
       O.setConst(this, "transaction", transaction || null);
@@ -60,7 +60,7 @@ define([
        * Indicates if this scope is the ambient transaction's root/outermost scope.
        *
        * @name isRoot
-       * @memberOf pentaho.type.changes.TransactionScope#
+       * @memberOf pentaho.type.action.TransactionScope#
        * @type {boolean}
        * @readOnly
        */
@@ -140,7 +140,7 @@ define([
     /**
      * Calls a given function within the scope and safely exits from the scope.
      *
-     * @param {function(pentaho.type.changes.TransactionScope) : *} fun - The function to call within the scope.
+     * @param {function(pentaho.type.action.TransactionScope) : *} fun - The function to call within the scope.
      * The function is called with the `this` context specified in argument `ctx`.
      * The return value of `fun` is returned back from this method.
      *
@@ -165,7 +165,7 @@ define([
      * After this operation, the scope cannot be operated on anymore.
      * However,
      * properties like
-     * [transaction]{@link pentaho.type.changes.AbstractTransactionScope#transaction}
+     * [transaction]{@link pentaho.type.action.AbstractTransactionScope#transaction}
      * remain available for reading.
      *
      * If this method is called and the the scope has already been exited from, or
@@ -176,7 +176,7 @@ define([
      * @param {boolean} [keyArgs.sloppy] Indicates that no warning should be logged
      * if this method is called when the scope has already been exited from or is not the current scope.
      *
-     * @return {pentaho.type.changes.AbstractTransactionScope} This scope.
+     * @return {pentaho.type.action.AbstractTransactionScope} This scope.
      */
     exit: function(keyArgs) {
 
@@ -184,10 +184,14 @@ define([
         var error = !this.__isInside ? this.__getErrorNotInside() :
           !this.isCurrent ? this.__getErrorNotCurrent() : null;
 
-        if(error) logger.warn(error.message);
+        if(error !== null) {
+          logger.warn(error.message);
+        }
       }
 
-      if(this.__isInside) this.__exit();
+      if(this.__isInside) {
+        this.__exit();
+      }
 
       return this;
     },
@@ -219,7 +223,7 @@ define([
     /**
      * Exits the scope, without any warnings in case it is not inside or is not the current scope.
      *
-     * This method is equivalent to calling [exit]{@link pentaho.type.changes.AbstractTransactionScope#exit}
+     * This method is equivalent to calling [exit]{@link pentaho.type.action.AbstractTransactionScope#exit}
      * with `keyArgs.sloppy` with value `true`.
      */
     dispose: function() {

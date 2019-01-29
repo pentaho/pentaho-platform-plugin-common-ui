@@ -38,6 +38,7 @@ define([
    * [Target#_emitActionPhaseFinallyEvent]{@link pentaho.action.impl.Target#_emitActionPhaseFinallyEvent}.
    *
    * @class
+   * @alias ActionExecution
    * @memberOf pentaho.action.impl.Target
    * @extends pentaho.action.Execution
    *

@@ -41,7 +41,7 @@ define([
    * @constructor
    * @description Creates a new instance.
    *
-   * @param {pentaho.type.changes.Transaction} transaction - The owning transaction.
+   * @param {pentaho.type.action.Transaction} transaction - The owning transaction.
    * @param {pentaho.type.List} target - The list value where the changes take place.
    */
   return Changeset.extend(module.id, /** @lends pentaho.type.action.ListChangeset# */{

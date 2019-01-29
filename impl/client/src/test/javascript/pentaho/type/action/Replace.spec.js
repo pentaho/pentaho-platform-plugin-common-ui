@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/type/Complex",
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/Transaction",
   "pentaho/type/action/Replace"
 ], function(Complex, Transaction, Replace) {
 

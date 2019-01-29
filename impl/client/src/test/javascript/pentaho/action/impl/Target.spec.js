@@ -17,8 +17,9 @@ define([
   "pentaho/action/impl/Target",
   "pentaho/action/Base",
   "pentaho/action/Execution",
-  "pentaho/lang/Base"
-], function(TargetMixin, BaseAction, Execution, Base) {
+  "pentaho/lang/Base",
+  "tests/pentaho/util/errorMatch"
+], function(TargetMixin, BaseAction, Execution, Base, errorMatch) {
 
   "use strict";
 
@@ -27,8 +28,28 @@ define([
     var CustomTarget;
     var SyncAction;
     var AsyncAction;
+    var SubActionExecution;
 
     beforeAll(function() {
+
+      // A derived non-abstract class.
+      SubActionExecution = Execution.extend({
+        constructor: function(action, target) {
+
+          this.base();
+
+          this.__action = action;
+          this.__target = target;
+        },
+
+        get action() {
+          return this.__action;
+        },
+
+        get target() {
+          return this.__target;
+        }
+      });
 
       // A derived non-abstract class, adding nothing new.
       SyncAction = BaseAction.extend({
@@ -62,6 +83,52 @@ define([
 
         expect(typeof CustomTarget.ActionExecution).toBe("function");
         expect(CustomTarget.ActionExecution.prototype instanceof Execution).toBe(true);
+      });
+
+      it("should throw if action is not specified", function() {
+
+        var target = new CustomTarget();
+
+        expect(function() {
+
+          var ae = new CustomTarget.ActionExecution(null, target);
+
+        }).toThrow(errorMatch.argRequired("action"));
+      });
+
+      it("should throw if target is not specified", function() {
+
+        var action = new SyncAction();
+
+        expect(function() {
+
+          var ae = new CustomTarget.ActionExecution(action);
+
+        }).toThrow(errorMatch.argRequired("target"));
+      });
+
+      it("should not throw if both action and target are specified", function() {
+
+        var action = new SyncAction();
+        var target = new CustomTarget();
+
+        var ae = new CustomTarget.ActionExecution(action, target);
+
+        expect(ae instanceof CustomTarget.ActionExecution).toBe(true);
+      });
+
+      it("should have #action be a clone of the specified action argument", function() {
+
+        var action = new SyncAction();
+        var target = new CustomTarget();
+
+        spyOn(action, "clone").and.callThrough();
+
+        var ae = new CustomTarget.ActionExecution(action, target);
+
+        expect(action.clone).toHaveBeenCalled();
+
+        expect(ae.action).not.toBe(action);
       });
 
       describe("#_onPhaseInit", function() {
@@ -210,7 +277,7 @@ define([
 
           var action = new SyncAction();
 
-          var ae = new Execution(action, target);
+          var ae = new SubActionExecution(action, target);
 
           // Call the being tested method.
           var result = target._emitActionPhaseDoEvent(ae);
@@ -232,7 +299,7 @@ define([
 
           var action = new AsyncAction();
 
-          var ae = new Execution(action, target);
+          var ae = new SubActionExecution(action, target);
 
           var result = target._emitActionPhaseDoEvent(ae);
 
@@ -276,7 +343,7 @@ define([
 
         action = new ActionClass();
 
-        ae = new Execution(action, target);
+        ae = new SubActionExecution(action, target);
 
         // Call the being tested method.
         target[emitMethodName](ae);

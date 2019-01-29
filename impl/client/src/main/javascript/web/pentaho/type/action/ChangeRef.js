@@ -21,7 +21,7 @@ define([
 
   "use strict";
 
-  return Base.extend(module.id, /** @lends pentaho.type.changes.ChangeRef# */{
+  return Base.extend(module.id, /** @lends pentaho.type.action.ChangeRef# */{
     /**
      * @classDesc The `ChangeRef` holds changes to the references list of a container instance.
      *
@@ -34,7 +34,7 @@ define([
      * It is passed again on the relevant methods.
      *
      * @alias ChangeRef
-     * @memberOf pentaho.type.changes
+     * @memberOf pentaho.type.action
      * @class
      * @extends pentaho.lang.Base
      * @constructor

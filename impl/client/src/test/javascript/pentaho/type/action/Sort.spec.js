@@ -17,7 +17,7 @@ define([
   "pentaho/type/Complex",
   "pentaho/type/List",
   "pentaho/type/Number",
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/Transaction",
   "pentaho/type/action/Sort",
   "pentaho/util/fun"
 ], function(Complex, List, PentahoNumber, Transaction, Sort, fun) {

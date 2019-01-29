@@ -1140,9 +1140,7 @@ define([
           expect(view.isDirty).toBe(true);
         });
 
-        model.on("change", {
-          "finally": finallyChangeHandler
-        });
+        model.on("change", {finally: finallyChangeHandler});
 
         model.selectionFilter = {_: "true"}; // Marks the view as dirty
 
@@ -1499,17 +1497,13 @@ define([
           var viewSpec2 = view.toSpec();
           expect(viewSpec2).toEqual(viewSpec);
 
-          var finallyChangeSpy = jasmine.createSpy("finally").and.callFake(function(actionExecution) {
-            expect(actionExecution.isRejected).toBe(true);
-          });
+          var finallyChangeSpy = jasmine.createSpy("change:finally");
 
-          view.on("change", {
-            "finally": finallyChangeSpy
-          })
+          view.on("change", {finally: finallyChangeSpy});
 
           view.configure(viewSpec);
 
-          expect(finallyChangeSpy).toHaveBeenCalled();
+          expect(finallyChangeSpy).not.toHaveBeenCalled();
         });
       });
     });

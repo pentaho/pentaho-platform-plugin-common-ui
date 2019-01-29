@@ -17,75 +17,23 @@ define([
   "module",
   "pentaho/action/Execution",
   "pentaho/action/States",
-  "./_transactionControl",
+  "../action/_transactionControl",
   "./ChangeRef",
   "./TransactionScope",
   "./CommittedScope",
   "./TransactionRejectedError",
-  "pentaho/lang/Base",
-  "pentaho/lang/ActionResult",
   "pentaho/lang/SortedList",
   "pentaho/util/object",
   "pentaho/util/error"
 ], function(module, ActionExecution, States, transactionControl, ChangeRef, TransactionScope, CommittedScope,
-            TransactionRejectedError, Base, ActionResult, SortedList, O, error) {
+            TransactionRejectedError, SortedList, O, error) {
 
   "use strict";
 
   /**
-   * @classDesc The `Transaction.ActionExecution` class is an inner class of
-   * [Transaction]{@link pentaho.type.changes.Transaction} that assumes that
-   * that the execution [target]{@link pentaho.action.Execution#target}
-   * is a [Container]{@link pentaho.type.mixins.Container}.
-   *
-   * @class
-   * @memberOf pentaho.type.changes.Transaction
-   * @extends pentaho.action.Execution
-   */
-  var ChangeActionExecution = ActionExecution.extend({
-
-    /** @inheritDoc */
-    get action() {
-      return this.__action;
-    },
-
-    /**
-     * Gets the target of the action execution.
-     *
-     * This property returns the value of the `target` argument passed to the constructor.
-     *
-     * @type {pentaho.type.mixins.Container}
-     * @readonly
-     */
-    get target() {
-      return this.__action.target;
-    },
-
-    // @override
-    _onPhaseInit: function(keyArgs) {
-      this.target.__emitChangeActionPhaseInitEvent(this, keyArgs);
-    },
-
-    // @override
-    _onPhaseWill: function() {
-      this.target.__emitChangeActionPhaseWillEvent(this);
-    },
-
-    // @override
-    _onPhaseDo: function() {
-      return this.target.__emitChangeActionPhaseDoEvent(this);
-    },
-
-    // @override
-    _onPhaseFinally: function() {
-      this.target.__emitChangeActionPhaseFinallyEvent(this);
-    }
-  });
-
-  /**
    * The stack of transactions performing the `finally` phase of a change action.
    *
-   * @type {Array.<pentaho.type.changes.Transaction>}
+   * @type {Array.<pentaho.type.action.Transaction>}
    * @readOnly
    */
   var __txnInCommitFinally = [];
@@ -98,15 +46,17 @@ define([
    */
   var __nextVersion = 1;
 
-  var Transaction = Base.extend(module.id, /** @lends pentaho.type.changes.Transaction# */{
+  var Transaction = ActionExecution.extend(module.id, /** @lends pentaho.type.action.Transaction# */{
+
     /**
      * @alias Transaction
-     * @memberOf pentaho.type.changes
+     * @memberOf pentaho.type.action
      * @class
-     * @friend {pentaho.type.changes.TransactionScope}
+     * @extends pentaho.action.Execution
      * @implements {pentaho.lang.IDisposable}
+     * @friend {pentaho.type.action.TransactionScope}
      *
-     * @amd pentaho/type/Transaction
+     * @amd pentaho/type/action/Transaction
      *
      * @classDesc A `Transaction` object stores information about changes performed to
      * [instances]{@link pentaho.type.Instance}.
@@ -117,7 +67,7 @@ define([
      * until the transaction is committed.
      *
      * The ambient transaction is accessible through
-     * [Transaction.current]{@link pentaho.type.changes.Transaction#current}.
+     * [Transaction.current]{@link pentaho.type.action.Transaction#current}.
      *
      * All of the changes are immediately visible, through any read operations of the modified instances,
      * while the transaction is the ambient transaction.
@@ -129,12 +79,14 @@ define([
      * Otherwise, if the transaction is simply disposed of, all the changes it captured are lost.
      *
      * Managing the ambient transaction is best handled implicitly,
-     * by delegating to a [TransactionScope]{@link pentaho.type.changes.TransactionScope} object.
+     * by delegating to a [TransactionScope]{@link pentaho.type.action.TransactionScope} object.
      *
      * @constructor
      * @description Creates a `Transaction`.
      */
     constructor: function() {
+
+      this.base();
 
       // Dictionary of changesets by container uid.
       this.__csetByUid = {};
@@ -144,45 +96,7 @@ define([
       this.__crefByUid = {};
       this.__crefs = [];
 
-      this.__commitLockTaken = false;
-      this.__resultInit = null;
-      this.__result = null;
       this.__isCurrent = false;
-
-      /**
-       * The queue of changesets for the evaluation of the commit will phase.
-       *
-       * Changesets are inserted in inverse topological order.
-       *
-       * @type {pentaho.lang.SortedList.<pentaho.type.action.Changeset>}
-       * @private
-       * @see pentaho.type.changes.Transaction#__doCommitInitCore
-       */
-      this.__commitInitQueue = null;
-
-      /**
-       * The set of the target uids of changesets which are present in the changesets `__commitInitQueue`.
-       *
-       * @type {?Object.<string, boolean>}
-       * @private
-       */
-      this.__commitInitQueueSet = null;
-
-      /**
-       * The current changeset being evaluated in the commit will phase.
-       *
-       * @type {pentaho.type.action.Changeset}
-       * @private
-       */
-      this.__commitInitChangeset = null;
-
-      /**
-       * The set of target uids of changesets which have ran at least once.
-       *
-       * @type {?Object.<string, boolean>}
-       * @private
-       */
-      this.__commitInitRanSet = null;
 
       /**
        * The number of active scopes of this transaction.
@@ -207,9 +121,47 @@ define([
       this.__version = 0;
 
       /**
-       * @type {pentaho.action.Transaction.ActionExecution}
+       * The queue of changesets for the evaluation of the commit init phase.
+       *
+       * Changesets are inserted in inverse topological order.
+       *
+       * @type {pentaho.lang.SortedList.<pentaho.type.action.Changeset>}
+       * @private
+       * @see pentaho.type.action.Transaction#_onPhaseInit
        */
-      this.__actionExecution = new ChangeActionExecution();
+      this.__commitInitQueue = null;
+
+      /**
+       * The set of target uids of changesets which are present in the changesets of `__commitInitQueue`..
+       *
+       * @type {?Object.<string, boolean>}
+       * @private
+       */
+      this.__commitInitQueueSet = null;
+
+      /**
+       * The current changeset being evaluated in the commit init phase.
+       *
+       * @type {pentaho.type.action.Changeset}
+       * @private
+       */
+      this.__commitInitChangeset = null;
+
+      /**
+       * The set of target uids of changesets which have ran at least once.
+       *
+       * @type {?Object.<string, boolean>}
+       * @private
+       */
+      this.__commitInitRanSet = null;
+
+      /**
+       * The current changeset action.
+       *
+       * @type {?pentaho.type.action.Changeset}
+       * @private
+       */
+      this.__action = null;
     },
 
     /**
@@ -242,19 +194,6 @@ define([
 
     // region State
     /**
-     * Gets a value that indicates if the transaction is in a proposed state,
-     * that is, it has not been committed or rejected.
-     *
-     * @type {boolean}
-     * @readOnly
-     *
-     * @see pentaho.type.changes.Transaction#result
-     */
-    get isProposed() {
-      return !this.__result;
-    },
-
-    /**
      * Gets a value that indicates if the transaction is in a read-only state.
      *
      * A transaction becomes read-only when it is previewed, committed or rejected.
@@ -263,20 +202,35 @@ define([
      * @readOnly
      */
     get isReadOnly() {
-      return !!(this.__result || this.__resultInit);
+      return this.state > States.init;
+    },
+    // endregion
+
+    // region ActionExecution fields
+    /** @inheritDoc */
+    get action() {
+      var action = this.__action;
+      if(action === null) {
+        throw error.operInvalid("Action is not set.");
+      }
+
+      return action;
+    },
+
+    /** @inheritDoc */
+    get isSync() {
+      return true;
     },
 
     /**
-     * Gets an action result of the final state of the transaction; or `null`,
-     * if the transaction is still in a proposed state.
+     * Gets the target of the action execution.
      *
-     * @type {pentaho.lang.ActionResult}
-     * @readOnly
-     *
-     * @see pentaho.type.changes.Transaction#isProposed
+     * @type {pentaho.type.mixins.Container}
+     * @readonly
+     * @override
      */
-    get result() {
-      return this.__result;
+    get target() {
+      return this.action.target;
     },
     // endregion
 
@@ -299,7 +253,7 @@ define([
      *
      * @param {pentaho.type.mixins.Container} container - The container.
      *
-     * @return {pentaho.type.changes.ChangeRef} The corresponding `ChangeRef`.
+     * @return {pentaho.type.action.ChangeRef} The corresponding `ChangeRef`.
      *
      * @private
      * @internal
@@ -320,7 +274,7 @@ define([
      *
      * @param {string} uid - The container unique identifier.
      *
-     * @return {pentaho.type.changes.ChangeRef} The corresponding `ChangeRef` or `null`.
+     * @return {pentaho.type.action.ChangeRef} The corresponding `ChangeRef` or `null`.
      *
      * @private
      * @internal
@@ -390,40 +344,35 @@ define([
 
       var irefs = this.getAmbientReferences(target);
       if(irefs !== null) {
-        this.__each(irefs, function(iref) {
+        irefs.forEach(function(iref) {
           // Recursive call, when container changeset does not exist yet.
           this.ensureChangeset(iref.container).__onChildChangesetCreated(changeset, iref.property);
-        });
+        }, this);
       }
 
       return changeset;
     },
 
-    __each: function(values, fun) {
-      var L = values && values.length;
-      var i = -1;
-      while(++i < L) fun.call(this, values[i]);
-    },
-
     /**
      * Iterates through all of the changesets.
      *
-     * @param {function(this:pentaho.type.changes.Transaction, pentaho.type.action.Changeset):boolean} fun - The
+     * @param {function(this:pentaho.type.action.Transaction, pentaho.type.action.Changeset):boolean} fun - The
      * iteratee method.
      *
      * @private
      */
     __eachChangeset: function(fun) {
       var changesets = this.__csets;
-
-      this.__each(changesets, fun);
+      var L = changesets.length;
+      var i = -1;
+      while(++i < L) fun.call(this, changesets[i]);
     },
     // endregion
 
     // region Ambient transaction
     /**
      * Gets a value that indicates if this transaction is the
-     * [current transaction]{@link pentaho.type.changes.Transaction#current}.
+     * [current transaction]{@link pentaho.type.action.Transaction#current}.
      *
      * @type {boolean}
      */
@@ -434,11 +383,11 @@ define([
     /**
      * Enters the transaction and returns a new transaction scope to control the transaction.
      *
-     * @return {pentaho.type.changes.TransactionScope} The new transaction scope.
+     * @return {pentaho.type.action.TransactionScope} The new transaction scope.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the transaction is resolved.
      *
-     * @throws {pentaho.type.changes.TransactionRejectedError} When entering the root scope of the transaction
+     * @throws {pentaho.type.action.TransactionRejectedError} When entering the root scope of the transaction
      * and the transaction is automatically rejected due to a concurrency error.
      */
     enter: function() {
@@ -450,19 +399,20 @@ define([
      *
      * @throws {pentaho.lang.OperationInvalidError} When the transaction is resolved.
      *
-     * @throws {pentaho.type.changes.TransactionRejectedError} When the root scope is entering
+     * @throws {pentaho.type.action.TransactionRejectedError} When the root scope is entering
      * and the transaction is automatically rejected due to a concurrency error.
      *
      * @private
      * @internal
      *
-     * @see pentaho.type.changes.AbstractTransactionScope
+     * @see pentaho.type.action.AbstractTransactionScope
      */
     __scopeEnter: function() {
       // Validate entry
 
-      if(this.__result)
+      if(this.isSettled) {
         throw error.operInvalid("The transaction is resolved.");
+      }
 
       // Is this the root scope entering?
       if(!this.__scopeCount) {
@@ -476,8 +426,10 @@ define([
         var cset;
         while(++i < L) {
           cset = csets[i];
-          if(cset.targetVersion !== cset.target.$version)
-            throw this.__reject(new TransactionRejectedError("Concurrency error."));
+          if(cset.targetVersion !== cset.target.$version) {
+            this.reject(new TransactionRejectedError("Concurrency error."));
+            throw this.error;
+          }
         }
       }
 
@@ -490,7 +442,7 @@ define([
      * @private
      * @internal
      *
-     * @see pentaho.type.changes.AbstractTransactionScope#__exit
+     * @see pentaho.type.action.AbstractTransactionScope#__exit
      */
     __scopeExit: function() {
       this.__scopeCount--;
@@ -502,7 +454,7 @@ define([
      * @private
      * @internal
      *
-     * @see pentaho.type.changes.Transaction#__setCurrent
+     * @see pentaho.type.action.Transaction#__setCurrent
      */
     __enteringAmbient: function() {
 
@@ -519,7 +471,7 @@ define([
      * @private
      * @internal
      *
-     * @see pentaho.type.changes.Transaction#__setCurrent
+     * @see pentaho.type.action.Transaction#__setCurrent
      */
     __exitingAmbient: function() {
 
@@ -531,186 +483,10 @@ define([
     },
     // endregion
 
-    // region Action Lock
+    // region Phase INIT
     /**
-     * Tries to acquire the _commit_ lock, throwing if it is already taken.
-     *
-     * @throws {pentaho.lang.OperationInvalidError} When this method is called while one of
-     *  [__commitInit]{@link pentaho.type.changes.Transaction#__commitInit},
-     *  [__reject]{@link pentaho.type.changes.Transaction#__reject} or
-     *  [__commit]{@link pentaho.type.changes.Transaction#__commit}
-     *  is already being called.
-     *
-     * @private
-     */
-    __acquireCommitLock: function() {
-      this.__assertCommitLockFree();
-      this.__commitLockTaken = true;
-    },
-
-    /**
-     * Asserts that the _commit_ lock is not taken.
-     *
-     * @throws {pentaho.lang.OperationInvalidError} When this method is called while one of
-     * [__commitInit]{@link pentaho.type.changes.Transaction#__commitInit},
-     * [__reject]{@link pentaho.type.changes.Transaction#__reject} or
-     * [__commit]{@link pentaho.type.changes.Transaction#__commit}
-     * is already being called.
-     *
-     * @private
-     */
-    __assertCommitLockFree: function() {
-      if(this.__commitLockTaken) {
-        throw error.operInvalid("Already in the __commit or __commitInit methods.");
-      }
-    },
-
-    /**
-     * Releases a previously acquired _commit_ lock.
-     *
-     * @private
-     */
-    __releaseCommitLock: function() {
-      this.__commitLockTaken = false;
-    },
-    // endregion
-
-    // region __reject
-    /**
-     * Rejects the transaction with a given reason and throws an error.
-     *
-     * @param {string|Error|pentaho.lang.UserError} [reason="canceled"] The reason for rejecting the transaction.
-     *
-     * @throws {pentaho.lang.OperationInvalidError} When this method is called while one of
-     * [__commitInit]{@link pentaho.type.changes.Transaction#__commitInit} or
-     * [__commit]{@link pentaho.type.changes.Transaction#__commit} is already being called.
-     *
-     * @throws {Error} If all else goes well, an error is thrown containing the provided rejection reason.
-     *
-     * @private
-     * @internal
-     */
-    __reject: function(reason) {
-
-      this.__assertCommitLockFree();
-
-      throw this.__resolve(ActionResult.reject(reason || "Transaction canceled."));
-    },
-    // endregion
-
-    // region __commitInit
-    /**
-     * Previews the result of [committing]{@link pentaho.type.changes.Transaction#__commit}
-     * the transaction by performing its _init_ phase.
-     *
-     * Call this method to determine if an operation would be valid when there's
-     * no _a priori_ intention of committing it, in case it is valid.
-     * If previewing returns a fulfilled result, the transaction can still be committed, if desired.
-     * In any case,
-     * no more changes can be performed in this transaction after `__commitInit` has been called for the first time.
-     *
-     * If this method is called after a transaction has been committed or rejected,
-     * the [commit result]{@link pentaho.type.changes.Transaction#result} is returned.
-     *
-     * Any subsequent calls to the method while in the proposed state
-     * return the result of the first call.
-     * As such, when the `__commit` method is later called,
-     * it will reuse the result of the anticipated _init_ phase.
-     *
-     * For each changeset that was registered with the transaction,
-     * and that really has changes,
-     * its target is called to emit the `init` phase event, for any registered listeners.
-     *
-     * Listeners may modify the changeset or any of the changesets contained in the transaction.
-     * Also, new changesets can be added to the transaction.
-     *
-     * If a `init` phase listener cancels one of the changesets,
-     * no more listeners are notified and the rejected result is returned.
-     * To notify listeners of the rejection,
-     * [__commit]{@link pentaho.type.changes.Transaction#__commit} still needs to be called.
-     *
-     * @return {pentaho.lang.ActionResult} The commit-init or commit result of the transaction.
-     *
-     * @throws {pentaho.lang.OperationInvalidError} When this method is called while one of
-     *  [__commitInit]{@link pentaho.type.changes.Transaction#__commitInit} or
-     *  [__commit]{@link pentaho.type.changes.Transaction#__commit} is already being called.
-     *
-     * @private
-     * @internal
-     */
-    __commitInit: function() {
-      // NOTE: the reason why we don't immediately reject the transaction when the __commitInit
-      // is rejected is that if in the future we'd want to support making further changes
-      // that behavior would be broken...
-
-      var result = this.__result || this.__resultInit;
-      if(!result) {
-        this.__acquireCommitLock();
-
-        result = this.__doCommitInit();
-
-        this.__releaseCommitLock();
-      }
-
-      return result;
-    },
-
-    /**
-     * Performs the commit-init evaluation phase
-     * by delegating to `__doCommitInitCore`.
-     * Stores the "init" result and marks all changesets as read-only.
-     *
-     * @return {pentaho.lang.ActionResult} The commit-init result of the transaction.
-     * @private
-     */
-    __doCommitInit: function() {
-
-      console.log("#__doCommitInit");
-
-      var actionExecution = this.__actionExecution;
-
-      // --- set execution to init state ---
-      actionExecution.__state = States.init;
-
-      // --- execute init phase ---
-      var result = this.__resultInit = this.__doCommitInitCore();
-
-      // Lock changes, whatever the result.
-      this.__eachChangeset(function(cset) {
-        cset.__setReadOnlyInternal();
-      });
-
-      return result;
-    },
-
-    __doCommitWill: function() {
-
-      console.log("#__doCommitWill");
-
-      var actionExecution = this.__actionExecution;
-
-      var changesets = this.__csets;
-      var L = changesets.length;
-      var i = -1;
-      while(++i < L) {
-        actionExecution.__action = changesets[i];
-        actionExecution.__validatePhaseWill();
-
-        if(actionExecution.isRejected) {
-          return ActionResult.reject(actionExecution.error);
-        }
-
-        actionExecution._onPhaseWill();
-      }
-
-      actionExecution.__state = States.will;
-
-      return ActionResult.fulfill();
-    },
-
-    /**
-     * Actually performs the commit-init evaluation phase,
-     * going through `init` phase listeners of the targets of the changesets in this transaction.
+     * Performs the init evaluation phase,
+     * going through `change:init` listeners of the targets of the changesets in this transaction.
      *
      * Evaluation proceeds as follows:
      *
@@ -719,7 +495,7 @@ define([
      * 3. If there are no changesets in the queue go to 4.
      *    Otherwise, do:
      * 3.1. Take the first changeset from the queue.
-     * 3.2. For each of its `init` phase listeners, in order, do:
+     * 3.2. For each of its change:init listeners, in order, do:
      * 3.2.1. If its transaction version is equal to the current changeset transaction version,
      *        go directly to step 3.3.
      * 3.2.2. Execute the listener.
@@ -737,22 +513,17 @@ define([
      * 3.3. Add the changeset's current parent changesets to the queue.
      * 3.4. Go to 3.
      * 4. Exit with success.
-     *
-     * @return {pentaho.lang.ActionResult} The commit-init result of the transaction.
-     * @private
      */
-    __doCommitInitCore: function() {
 
-      console.log("#__doCommitInitCore");
+    /** @inheritDoc */
+    _onPhaseInit: function() {
 
       if(this.version === 0) {
-        // NOOP
-        return ActionResult.fulfill();
+        return;
       }
 
       if(this.__setupCommitInitQueue()) {
 
-        var actionExecution = this.__actionExecution;
         var changesetQueue = this.__commitInitQueue;
         var changesetQueueSet = this.__commitInitQueueSet;
 
@@ -762,11 +533,9 @@ define([
         var currentChangeset;
         var currentTarget;
         var currentListenersVersions;
-
+        var txn = this;
         var keyArgsOnChangeInit = {
-          isCanceled: function(actionExecution) {
-            return actionExecution.isCanceled;
-          },
+          isCanceled: __actionExecution_isCanceled,
           interceptor: function(listener, target, eventArgs, index) {
 
             // Take care to only allocate `currentListenersVersions` if target has at least one listener,
@@ -780,7 +549,7 @@ define([
               try {
                 listener.apply(target, eventArgs);
               } finally {
-                if(!eventArgs[0].isCanceled) {
+                if(!txn.isRejected) {
                   // Store for later.
                   currentListenersVersions[index] = currentChangeset.transactionVersion;
                 }
@@ -790,9 +559,9 @@ define([
         };
 
         while((currentChangeset = changesetQueue.shift()) !== undefined) {
-          actionExecution.__action = currentChangeset;
 
-          currentTarget = actionExecution.target;
+          this.__action = currentChangeset;
+          currentTarget = currentChangeset.target;
 
           delete changesetQueueSet[currentTarget.$uid];
           this.__commitInitRanSet[currentTarget.$uid] = true;
@@ -800,11 +569,11 @@ define([
 
           currentListenersVersions = null;
 
-          actionExecution._onPhaseInit(keyArgsOnChangeInit);
+          currentTarget.__emitChangeActionPhaseInitEvent(this, keyArgsOnChangeInit);
 
-          if(actionExecution.isRejected) {
+          if(this.isRejected) {
             this.__finalizeCommitInitQueue();
-            return ActionResult.reject(actionExecution.error);
+            return;
           }
 
           this.__addParentsToCommitInitQueue(currentTarget);
@@ -812,37 +581,32 @@ define([
       }
 
       this.__finalizeCommitInitQueue();
-      return ActionResult.fulfill();
     },
 
     /**
      * Creates the queue data structures that support the commit-init evaluation phase.
      *
-     * @return {boolean} `true` if there are any changesets with `init` phase event listeners; `false`, otherwise.
+     * @return {boolean} `true` if there are any changesets with `change:init` event listeners; `false`, otherwise.
      *
      * @private
      */
     __setupCommitInitQueue: function() {
 
-      var transaction = this;
+      var me = this;
 
       this.__commitInitQueue = new SortedList({comparer: __compareChangesets});
       this.__commitInitQueueSet = Object.create(null);
       this.__commitInitRanSet = Object.create(null);
       this.__commitInitChangeset = null;
 
-      var anyChangeWillListeners = false;
+      var anyChangeInitListeners = false;
 
-      this.__eachChangeset(collectLeafChangesetsRecursive);
-
-      return anyChangeWillListeners;
-
-      function collectLeafChangesetsRecursive(changeset) {
+      this.__csets.forEach(function collectLeafChangesetsRecursive(changeset) {
 
         var isParent = false;
 
-        if(!anyChangeWillListeners && changeset.target._hasListeners("change", "init")) {
-          anyChangeWillListeners = true;
+        if(!anyChangeInitListeners && changeset.target._hasListeners("change", "init")) {
+          anyChangeInitListeners = true;
         }
 
         changeset.eachChildChangeset(function() {
@@ -852,17 +616,20 @@ define([
         });
 
         if(!isParent) {
-          transaction.__addToCommitInitQueue(changeset);
+          me.__addToCommitInitQueue(changeset);
         }
-      }
+      });
+
+      return anyChangeInitListeners;
     },
 
     /**
-     * Releases the queue data structures that support the commit-will evaluation phase.
+     * Releases the queue data structures that support the commit-init evaluation phase.
      * @private
      */
     __finalizeCommitInitQueue: function() {
       this.__commitInitQueue = this.__commitInitQueueSet = this.__commitInitChangeset = this.__commitInitRanSet = null;
+      this.__action = null;
     },
 
     /**
@@ -955,92 +722,77 @@ define([
     },
     // endregion
 
-    // region __commit
-    /**
-     * Commits the transaction.
-     *
-     * @return {pentaho.lang.ActionResult} The commit result of the transaction.
-     *
-     * @throws {pentaho.lang.OperationInvalidError} When this method is called while one of
-     * [__commitInit]{@link pentaho.type.changes.Transaction#__commitInit} or
-     * [__commit]{@link pentaho.type.changes.Transaction#__commit} is already being called.
-     *
-     * @throws {Error} When the transaction is rejected.
-     *
-     * @private
-     * @internal
-     */
-    __commit: function() {
+    // region Phase WILL
+    /** @inheritDoc */
+    _validatePhaseWill: function() {
 
-      console.log("#__commit");
+      var changesets = this.__csets;
+      var L = changesets.length;
+      var i = -1;
+      while(++i < L) {
 
-      var actionExecution = this.__actionExecution;
+        this.__action = changesets[i];
 
-      this.__acquireCommitLock();
-
-      try {
-        var result = this.__resultInit;
-        if(!result) {
-          result = this.__doCommitInit(); // -> actionExecution._onPhaseInit
+        var errors = this.base();
+        if(errors != null) {
+          this.__action = null;
+          return errors;
         }
-
-        if(result.isFulfilled) {
-          result = this.__doCommitWill(); // -> actionExecution._onPhaseWill
-
-          if(result.isFulfilled) {
-            result = this.__applyChanges(); // -> actionExecution._onPhaseDo
-          }
-        }
-      } catch(ex) {
-        actionExecution.__rejectOrLog(ex);
       }
 
-      this.__releaseCommitLock();
-
-      this.__resolve(result); // -> actionExecution._onPhaseFinally
-
-      if(actionExecution.error) throw result.error;
-
-      return result;
+      this.__action = null;
     },
 
-    // @private
-    __applyChanges: function() {
+    /** @inheritDoc */
+    _lockAction: function() {
+      var changesets = this.__csets;
+      var L = changesets.length;
+      var i = -1;
+      while(++i < L) {
+        changesets[i].__setReadOnlyInternal();
+      }
+    },
 
-      console.log("#__applyChanges -> __doCommitDo");
+    /** @inheritDoc */
+    _onPhaseWill: function() {
 
-      var actionExecution = this.__actionExecution;
+      var changesets = this.__csets;
+      var L = changesets.length;
+      var i = -1;
+      while(++i < L) {
 
-      actionExecution.__state = States.do;
+        this.__action = changesets[i];
 
+        this.target.__emitChangeActionPhaseWillEvent(this);
+
+        if(this.isRejected) {
+          break;
+        }
+      }
+
+      this.__action = null;
+    },
+    // endregion
+
+    /** @inheritDoc */
+    _onPhaseDo: function() {
       // Apply all changesets.
       // Includes setting target versions to the new txn version.
       var version = __takeNextVersion();
 
-      this.__each(this.__crefs, function(cref) {
+      // .. Apply change refs.
+      this.__crefs.forEach(function(cref) {
         cref.apply();
       });
 
+      // .. Apply change sets.
       this.__eachChangeset(function(cset) {
-        actionExecution.__action = cset;
-
         cset._applyInternal(version);
-        actionExecution._onPhaseDo();
       });
-
-      return ActionResult.fulfill(version);
     },
-    // endregion
 
-    // @private
-    __resolve: function(result) {
-
-      console.log("#__resolve -> __doCommitFinally");
-
-      this.__result = result;
-
-      // Release any __commitInit result.
-      this.__resultInit = null;
+    /** @inheritDoc */
+    _onPhaseFinally: function() {
 
       // Exit all scopes, including CommittedScopes, until the isRoot scope.
       // The error thrown below, if rejected, should help prevent executing lines of code that would fail.
@@ -1050,38 +802,34 @@ define([
         transactionControl.exitCurrent();
       }
 
-      // Any new changes arising from notification create new transactions/changesets.
-      var reason = result.error;
-
-      var actionExecution = this.__actionExecution;
-
-      // jshint laxbreak:true
-      var mapper = function(changeset) {
-        actionExecution.__action = changeset;
-
-        actionExecution._onPhaseFinally();
-      };
-
       __txnInCommitFinally.push(this);
 
       // Make sure to execute listeners without an active transaction.
-      Transaction.enterCommitted().using(this.__eachChangeset.bind(this, mapper));
+      var txn = this;
 
-      var txn = __txnInCommitFinally.pop();
-      if(txn !== this) {
+      Transaction.enterCommitted().using(function() {
+
+        txn.__eachChangeset(function(changeset) {
+
+          txn.__action = changeset;
+
+          txn.target.__emitChangeActionPhaseFinallyEvent(txn);
+        });
+      });
+
+      this.__action = null;
+
+      var txnOther = __txnInCommitFinally.pop();
+      if(txnOther !== this) {
         throw error.operInvalid("Unbalanced transaction exit commit finally.");
       }
-
-      return reason;
     }
-  }, /** @lends pentaho.type.changes.Transaction */{
-
-    ActionExecution: ChangeActionExecution,
+  }, /** @lends pentaho.type.action.Transaction */{
 
     /**
      * Gets the ambient transaction, if any, or `null`.
      *
-     * @type {pentaho.type.changes.Transaction}
+     * @type {pentaho.type.action.Transaction}
      * @readOnly
      */
     get current() {
@@ -1092,11 +840,11 @@ define([
      * Enters a scope of change.
      *
      * To mark the changes in the scope as error,
-     * call its [reject]{@link pentaho.type.changes.TransactionScope#reject} method.
+     * call its [reject]{@link pentaho.type.action.TransactionScope#reject} method.
      *
      * To end the scope of change successfully,
      * dispose the returned transaction scope,
-     * by calling its [dispose]{@link pentaho.type.changes.TransactionScope#scope} method.
+     * by calling its [dispose]{@link pentaho.type.action.TransactionScope#scope} method.
      *
      * If the scope initiated a transaction,
      * then that transaction is committed.
@@ -1105,9 +853,9 @@ define([
      * that transaction is left uncommitted.
      *
      * To end the scope with an error,
-     * call its [reject]{@link pentaho.type.changes.TransactionScope#reject} method.
+     * call its [reject]{@link pentaho.type.action.TransactionScope#reject} method.
      *
-     * @return {pentaho.type.changes.TransactionScope} The new transaction scope.
+     * @return {pentaho.type.action.TransactionScope} The new transaction scope.
      */
     enter: function() {
       var txn = transactionControl.current || new Transaction(); // <=> new this() :-)
@@ -1120,7 +868,7 @@ define([
      * Within this scope there is no current transaction and
      * reading the properties of instances obtains their committed values.
      *
-     * @return {pentaho.type.changes.CommittedScope} The read-committed scope.
+     * @return {pentaho.type.action.CommittedScope} The read-committed scope.
      */
     enterCommitted: function() {
       return new CommittedScope();
@@ -1130,7 +878,7 @@ define([
      * Gets any changesets still being delivered through notifications in the commit phase
      * of transactions.
      *
-     * If a transaction is started and committed from within the `finally` phase listener of another,
+     * If a transaction is started and committed from within the `change:finally` listener of another,
      * then multiple changesets may be returned.
      *
      * @param {pentaho.type.mixins.Container} container - The container.
@@ -1159,20 +907,38 @@ define([
 
   return Transaction;
 
+  /**
+   * Compares two changesets according to net order.
+   *
+   * @param {pentaho.type.action.Changeset} csa - The first changeset.
+   * @param {pentaho.type.action.Changeset} csb - The second changeset.
+   *
+   * @return {number} A comparison result.
+   */
   function __compareChangesets(csa, csb) {
     return csb._netOrder - csa._netOrder;
   }
 
   /**
    * Increments and returns the next version number for use in the
-   * [commit]{@link pentaho.type.changes.Transaction#__applyChanges} of a transaction.
+   * [commit]{@link pentaho.type.action.Transaction#execute} of a transaction.
    *
-   * @memberOf pentaho.type.changes.Transaction~
+   * @memberOf pentaho.type.action.Transaction~
    * @private
    *
    * @return {number} The next version number.
    */
   function __takeNextVersion() {
     return ++__nextVersion;
+  }
+
+  /**
+   * Determines if a given action execution is canceled.
+   *
+   * @param {pentaho.type.action.Transaction~ActionExecution} actionExecution - The action execution.
+   * @return {boolean} `true` if it is canceled; `false`, otherwise.
+   */
+  function __actionExecution_isCanceled(actionExecution) {
+    return actionExecution.isCanceled;
   }
 });

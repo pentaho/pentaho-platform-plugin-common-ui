@@ -16,7 +16,7 @@
 define([
   "pentaho/module!_",
   "./Value",
-  "./changes/Transaction",
+  "./action/Transaction",
   "./_baseLoader",
   "pentaho/i18n!types",
   "pentaho/util/object",

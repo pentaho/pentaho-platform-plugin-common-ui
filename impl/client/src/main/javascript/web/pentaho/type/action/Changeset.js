@@ -42,7 +42,7 @@ define([
      * @constructor
      * @description Creates an empty `Changeset` for a given target value.
      *
-     * @param {pentaho.type.changes.Transaction} transaction - The owning transaction.
+     * @param {pentaho.type.action.Transaction} transaction - The owning transaction.
      * @param {pentaho.type.mixins.Container} target - The container instance where the changes take place.
      */
     constructor: function(transaction, target) {
@@ -54,7 +54,7 @@ define([
        *
        * @name transaction
        * @memberOf pentaho.type.action.Changeset#
-       * @type {pentaho.type.changes.Transaction}
+       * @type {pentaho.type.action.Transaction}
        * @readOnly
        */
       O.setConst(this, "transaction", transaction);
@@ -180,7 +180,7 @@ define([
      *
      * @private
      * @internal
-     * @see pentaho.type.changes.Transaction#__addChangeset
+     * @see pentaho.type.action.Transaction#__addChangeset
      */
 
     /**
@@ -223,7 +223,7 @@ define([
      *
      * @private
      * @internal
-     * @friend {pentaho.type.changes.Transaction}
+     * @friend {pentaho.type.action.Transaction}
      */
     __setReadOnlyInternal: function() {
       this.__isReadOnly = true;
@@ -462,7 +462,7 @@ define([
      * @param {number} version - The new target version.
      *
      * @private
-     * @friend {pentaho.type.changes.Transaction}
+     * @friend {pentaho.type.action.Transaction}
      */
     _applyInternal: function(version) {
 

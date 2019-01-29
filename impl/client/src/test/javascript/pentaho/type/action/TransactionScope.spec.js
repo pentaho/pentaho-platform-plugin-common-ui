@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/changes/TransactionScope",
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/TransactionScope",
+  "pentaho/type/action/Transaction",
   "tests/pentaho/util/errorMatch"
 ], function(TransactionScope, Transaction, errorMatch) {
 
@@ -23,8 +23,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, jasmine:false */
 
-  describe("pentaho.type.changes.TransactionScope", function() {
-
+  describe("pentaho.type.action.TransactionScope", function() {
 
     describe("new(transaction)", function() {
       it("should be defined", function() {
@@ -232,7 +231,7 @@ define([
           scope.using(fun);
         }).toThrow(ex);
 
-        expect(scope.transaction.result.error).toBe(ex);
+        expect(scope.transaction.error).toBe(ex);
 
         scope = null;
       });
@@ -240,29 +239,28 @@ define([
 
     describe("#acceptWill()", function() {
 
-      it("should call txn __commitInit if current", function() {
+      it("should call txn executeWill if current", function() {
 
         var txn = new Transaction();
         var scope = new TransactionScope(txn);
 
-        spyOn(txn, "__commitInit");
+        spyOn(txn, "executeWill");
 
         scope.acceptWill();
 
-        expect(txn.__commitInit).toHaveBeenCalled();
+        expect(txn.executeWill).toHaveBeenCalled();
         scope.exit();
       });
 
-      it("should call txn __commitInit and return its value if current", function() {
+      it("should call txn executeWill and return txn", function() {
 
         var txn = new Transaction();
         var scope = new TransactionScope(txn);
-        var result = {};
-        spyOn(txn, "__commitInit").and.returnValue(result);
+        spyOn(txn, "executeWill").and.returnValue(txn);
 
         var result2 = scope.acceptWill();
 
-        expect(result2).toBe(result);
+        expect(result2).toBe(txn);
 
         scope.exit();
       });
@@ -296,39 +294,45 @@ define([
 
     describe("#reject(reason)", function() {
 
-      it("should call txn __reject if current", function() {
+      it("should call txn reject if current", function() {
 
         var txn = new Transaction();
         var scope = new TransactionScope(txn);
 
-        spyOn(txn, "__reject");
+        spyOn(txn, "reject");
 
-        scope.reject();
-
-        expect(txn.__reject).toHaveBeenCalled();
-        scope.exit();
+        try {
+          // throws
+          scope.reject();
+        } catch(ex) {
+          expect(txn.reject).toHaveBeenCalled();
+          scope.exit();
+        }
       });
 
-      it("should call txn __reject with the given reason, if current", function() {
+      it("should call txn reject with the given reason, if current", function() {
 
         var txn = new Transaction();
         var scope = new TransactionScope(txn);
+
         var reason = {};
-        spyOn(txn, "__reject");
+        spyOn(txn, "reject");
 
-        scope.reject(reason);
-
-        expect(txn.__reject).toHaveBeenCalledWith(reason);
-
-        scope.exit();
+        try {
+          // throws
+          scope.reject(reason);
+        } catch(ex) {
+          expect(txn.reject).toHaveBeenCalledWith(reason);
+          scope.exit();
+        }
       });
 
-      it("should call txn __reject and throw its error, if current", function() {
+      it("should call txn reject and throw its error, if current", function() {
 
         var txn = new Transaction();
         var scope = new TransactionScope(txn);
         var ex = new Error();
-        spyOn(txn, "__reject").and.callFake(function() { throw ex; });
+        spyOn(txn, "reject").and.callFake(function() { throw ex; });
 
         expect(function() {
           scope.reject();
@@ -366,16 +370,16 @@ define([
 
     describe("#accept()", function() {
 
-      it("should call txn __commit if current and root", function() {
+      it("should call txn execute if current and root", function() {
 
         var txn = new Transaction();
         var scope = new TransactionScope(txn);
 
-        spyOn(txn, "__commit");
+        spyOn(txn, "execute");
 
         scope.accept();
 
-        expect(txn.__commit).toHaveBeenCalled();
+        expect(txn.execute).toHaveBeenCalled();
         scope.exit();
       });
 
@@ -389,7 +393,7 @@ define([
         expect(result).toBe(scope);
       });
 
-      it("should not call txn __commit and should simply call exit if cannot commit", function() {
+      it("should not call txn execute and should simply call exit if cannot commit", function() {
 
         var txn = new Transaction();
         var scope1 = new TransactionScope(txn);

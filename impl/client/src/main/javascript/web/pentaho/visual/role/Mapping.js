@@ -18,7 +18,7 @@ define([
   "./AbstractMapping",
   "./MappingField",
   "./Mode",
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/Transaction",
   "pentaho/i18n!messages"
 ], function(module, AbstractMapping, MappingField, Mode, Transaction, bundle) {
 

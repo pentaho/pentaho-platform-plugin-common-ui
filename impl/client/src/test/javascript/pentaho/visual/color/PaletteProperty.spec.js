@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/Transaction",
   "pentaho/visual/base/Model",
   "pentaho/visual/color/Palette",
   "pentaho/visual/color/PaletteProperty",

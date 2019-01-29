@@ -18,13 +18,9 @@ define([
   "pentaho/lang/Base",
   "pentaho/lang/EventSource",
   "../ReferenceList",
-  "../changes/Transaction",
-  "../events/WillChange",
-  "../events/RejectedChange",
-  "../events/DidChange",
+  "../action/Transaction",
   "pentaho/util/object"
-], function(module, Base, EventSource, ReferenceList, Transaction,
-            WillChange, RejectedChange, DidChange, O) {
+], function(module, Base, EventSource, ReferenceList, Transaction, O) {
 
   "use strict";
 
@@ -87,7 +83,7 @@ define([
       /**
        * Version number.
        *
-       * Updated with each transaction's version on Transaction#__commit.
+       * Updated with each transaction's version on Transaction#execute.
        *
        * @memberOf pentaho.type.mixins.Container#
        * @type {number}
@@ -255,7 +251,7 @@ define([
      *
      * @method
      *
-     * @param {pentaho.type.changes.Transaction} transaction - The transaction that owns this changeset.
+     * @param {pentaho.type.action.Transaction} transaction - The transaction that owns this changeset.
      *
      * @return {pentaho.type.action.Changeset} A changeset of the appropriate type.
      *
@@ -288,27 +284,6 @@ define([
       var eventType = action.eventName;
 
       this._emitGeneric(this, [actionExecution, action], eventType, "will", __emitActionKeyArgs);
-    },
-
-    /**
-     *
-     * @param actionExecution
-     * @return {*}
-     * @private
-     */
-    __emitChangeActionPhaseDoEvent: function(actionExecution) {
-
-      var action = actionExecution.action;
-      var isActionSync = action.constructor.isSync;
-      var eventType = action.eventName;
-
-      if(isActionSync) {
-        this._emitGeneric(this, [actionExecution, action], eventType, "do", __emitActionKeyArgs);
-
-        return null;
-      }
-
-      return this._emitGenericAllAsync(this, [actionExecution, action], eventType, "do", __emitActionKeyArgs);
     },
 
     /**

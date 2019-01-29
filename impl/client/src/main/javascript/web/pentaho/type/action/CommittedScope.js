@@ -20,12 +20,12 @@ define([
 
   "use strict";
 
-  return AbstractTransactionScope.extend(module.id, /** @lends pentaho.type.changes.CommittedScope# */{
+  return AbstractTransactionScope.extend(module.id, /** @lends pentaho.type.action.CommittedScope# */{
     /**
      * @alias CommittedScope
-     * @memberOf pentaho.type.changes
+     * @memberOf pentaho.type.action
      * @class
-     * @extends pentaho.type.changes.AbstractTransactionScope
+     * @extends pentaho.type.action.AbstractTransactionScope
      *
      * @classDesc The `CommittedScope` class provides a way for a certain region of code to
      * read the committed values of instances.

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/changes/TransactionRejectedError"
+  "pentaho/type/action/TransactionRejectedError"
 ], function(TransactionRejectedError) {
 
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, jasmine:false */
 
-  describe("pentaho.type.changes.TransactionRejectedError", function() {
+  describe("pentaho.type.action.TransactionRejectedError", function() {
 
     describe("new(reason)", function() {
       it("should be defined", function () {

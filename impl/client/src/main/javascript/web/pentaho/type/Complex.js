@@ -22,7 +22,6 @@ define([
   "./util",
   "./mixins/Container",
   "./action/ComplexChangeset",
-  "pentaho/lang/ActionResult",
   "pentaho/lang/UserError",
   "pentaho/util/object",
   "pentaho/util/error",
@@ -32,7 +31,7 @@ define([
   "./List",
   "./standardSimple"
 ], function(module, Value, Element, Property, PropertyTypeCollection, typeUtil,
-            ContainerMixin, ComplexChangeset, ActionResult, UserError,
+            ContainerMixin, ComplexChangeset, UserError,
             O, error, bundle) {
 
   "use strict";
@@ -378,8 +377,8 @@ define([
      *      the property's defaulted status changes:
      *      1. If the property is [read-only]{@link pentaho.type.PropertyType#isReadOnly}, an error is thrown.
      *      2. Otherwise, the current value and the defaulted status are replaced by the new ones.
-     *      3. A change action is executed, resulting in the change events for the `init`, `will`,
-     *         `do` and `finally` being emitted.
+     *      3. A change action is executed, resulting in the `change` phase events `init`,
+     *         `will` and `finally`  being emitted.
      *
      *   4. Otherwise, if `value` and the defaulted status do not change, nothing is done.
      *

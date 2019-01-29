@@ -24,14 +24,14 @@ define([
 
   /**
    * @classDesc The `TransactionRejectedError` class wraps the reason used to reject a
-   * [transaction]{@link pentaho.type.changes.Transaction} and is thrown
+   * [transaction]{@link pentaho.type.action.Transaction} and is thrown
    * whenever a transaction is rejected through a transaction scope's
-   * [reject]{@link pentaho.type.changes.TransactionScope#reject} method or
+   * [reject]{@link pentaho.type.action.TransactionScope#reject} method or
    * the commit fails, through a transaction scope's
-   * [accept]{@link pentaho.type.changes.TransactionScope#accept} method.
+   * [accept]{@link pentaho.type.action.TransactionScope#accept} method.
    *
    * @name TransactionRejectedError
-   * @memberOf pentaho.type.changes
+   * @memberOf pentaho.type.action
    * @class
    * @extends pentaho.lang.UserError
    *
@@ -40,7 +40,7 @@ define([
    * @param {Error} reason - The error message.
    */
 
-  return UserError.extend(module.id, /** @lends pentaho.type.changes.TransactionRejectedError# */{
+  return UserError.extend(module.id, /** @lends pentaho.type.action.TransactionRejectedError# */{
 
     constructor: function(reason) {
 

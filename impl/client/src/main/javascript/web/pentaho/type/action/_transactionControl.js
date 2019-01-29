@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-], function() {
+define(function() {
 
   "use strict";
 
@@ -23,14 +22,14 @@ define([
   /**
    * The ambient/current transaction, if any, or `null`.
    *
-   * @type {pentaho.type.changes.Transaction}
+   * @type {pentaho.type.action.Transaction}
    */
   var __txnCurrent = null;
 
   /**
    * The stack of transaction scopes.
    *
-   * @type {Array.<pentaho.type.changes.AbstractTransactionScope>}
+   * @type {Array.<pentaho.type.action.AbstractTransactionScope>}
    * @readOnly
    */
   var __txnScopes = [];
@@ -39,7 +38,7 @@ define([
     /**
      * Gets the ambient transaction, if any, or `null`.
      *
-     * @type {pentaho.type.changes.Transaction}
+     * @type {pentaho.type.action.Transaction}
      * @readOnly
      */
     get current() {
@@ -75,12 +74,12 @@ define([
     /**
      * Called by a scope to make it become the new ambient scope.
      *
-     * @param {pentaho.type.changes.AbstractTransactionScope} scopeEnter - The new ambient scope.
+     * @param {pentaho.type.action.AbstractTransactionScope} scopeEnter - The new ambient scope.
      *
      * @private
      * @internal
      *
-     * @see pentaho.type.changes.AbstractTransactionScope
+     * @see pentaho.type.action.AbstractTransactionScope
      */
     enterScope: function(scopeEnter) {
 
@@ -95,7 +94,7 @@ define([
      * @private
      * @internal
      *
-     * @see pentaho.type.changes.AbstractTransactionScope#exit
+     * @see pentaho.type.action.AbstractTransactionScope#exit
      */
     exitScope: function() {
 
@@ -110,7 +109,7 @@ define([
   /**
    * Sets the new ambient transaction.
    *
-   * @param {pentaho.type.changes.Transaction} txnNew - The new ambient transaction.
+   * @param {pentaho.type.action.Transaction} txnNew - The new ambient transaction.
    *
    * @private
    * @internal

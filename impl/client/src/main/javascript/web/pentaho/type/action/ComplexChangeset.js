@@ -19,7 +19,7 @@ define([
   "./Changeset",
   "./ListChangeset",
   "./Replace",
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/Transaction",
   "pentaho/util/object"
 ], function(module, Changeset, ListChangeset, Replace, Transaction, O) {
 
@@ -43,7 +43,7 @@ define([
    *
    * @constructor
    * @description Creates a new instance.
-   * @param {pentaho.type.changes.Transaction} transaction - The owning transaction.
+   * @param {pentaho.type.action.Transaction} transaction - The owning transaction.
    * @param {pentaho.type.Complex} target - The complex value where the changes take place.
    */
   return Changeset.extend(module.id, /** @lends pentaho.type.action.ComplexChangeset#*/{

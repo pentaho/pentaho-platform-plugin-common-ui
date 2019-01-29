@@ -24,7 +24,7 @@ define([
   "pentaho/action/Execution",
   "pentaho/action/impl/Target",
   "pentaho/type/action/ComplexChangeset",
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/Transaction",
   "pentaho/lang/UserError",
   "pentaho/lang/RuntimeError",
   "./ModelChangedError",
@@ -48,7 +48,25 @@ define([
   var __reUpdateMethodName = /^_update(.+)$/;
 
   var UpdateActionExecution = ActionExecution.extend({
-    // @override
+    constructor: function(action, target) {
+
+      this.base();
+
+      this.__action = action;
+      this.__target = target;
+    },
+
+    /** @override */
+    get action() {
+      return this.__action;
+    },
+
+    /** @override */
+    get target() {
+      return this.__target;
+    },
+
+    /** @override */
     _onPhaseInit: function() {
       var view = this.target;
 
@@ -65,17 +83,17 @@ define([
       view._onUpdateInit(this);
     },
 
-    // @override
+    /** @override */
     _onPhaseWill: function() {
       this.target._onUpdateWill(this);
     },
 
-    // @override
+    /** @override */
     _onPhaseDo: function() {
       return this.target._onUpdateDo(this);
     },
 
-    // @override
+    /** @override */
     _onPhaseFinally: function() {
 
       // assert this.__updateActionExecution === updateActionExecution;

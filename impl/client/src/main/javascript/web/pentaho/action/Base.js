@@ -74,13 +74,14 @@ define([
     /**
      * Gets the event name of the action.
      *
-     * @name eventName
-     * @memberOf pentaho.action.Base#
+     * The base implementation returns the value of {@link pentaho.action.Base#type}.
+     *
      * @type {string}
      * @readonly
-     *
-     * @abstract
      */
+    get eventName() {
+      return this.type;
+    },
 
     /**
      * Determines if the given action is valid.

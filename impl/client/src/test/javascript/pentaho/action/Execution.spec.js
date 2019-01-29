@@ -35,7 +35,24 @@ define([
   describe("pentaho.action.Execution", function() {
 
     // A derived non-abstract class.
-    var SubActionExecution = Execution.extend();
+    var SubActionExecution = Execution.extend({
+      constructor: function(action, target) {
+
+        this.base();
+
+        this.__action = action;
+        this.__target = target;
+      },
+
+      get action() {
+        return this.__action;
+      },
+
+      get target() {
+        return this.__target;
+      }
+    });
+
     var SyncAction;
     var AsyncAction;
     var target;
@@ -81,43 +98,6 @@ define([
         expect(ae.isDone).toBe(false);
       }
 
-      it("should throw if action is not specified", function() {
-        expect(function() {
-
-          var ae = new SubActionExecution(null, target);
-
-        }).toThrow(errorMatch.argRequired("action"));
-      });
-
-      it("should throw if target is not specified", function() {
-
-        var action = new SyncAction();
-
-        expect(function() {
-
-          var ae = new SubActionExecution(action);
-
-        }).toThrow(errorMatch.argRequired("target"));
-      });
-
-      it("should not throw if both action and target are specified", function() {
-
-        var ae = new SubActionExecution(action, target);
-
-        expect(ae instanceof SubActionExecution).toBe(true);
-      });
-
-      it("should have #action be a clone of the specified action argument", function() {
-
-        spyOn(action, "clone").and.callThrough();
-
-        var ae = new SubActionExecution(action, target);
-
-        expect(action.clone).toHaveBeenCalled();
-
-        expect(ae.action).not.toBe(action);
-      });
-
       it("should have #target be the specified target argument", function() {
 
         var ae = new SubActionExecution(action, target);
@@ -147,7 +127,7 @@ define([
       });
     });
 
-    describe("#execute()", function() {
+    describe("#execute() and #executeWill()", function() {
 
       // Testing mode. Synchronous or asynchronous.
       var isSync;
@@ -182,9 +162,9 @@ define([
           itsPhaseFinallyShared();
         });
 
-        describe("calling #execute requires the unstarted state", function() {
+        describe("calling #execute", function() {
 
-          it("should throw when calling #execute after having finished", function() {
+          it("should throw when called after having finished", function() {
 
             var ae = createExecution();
 
@@ -193,6 +173,65 @@ define([
             expect(function() {
               ae.execute();
             }).toThrow(errorMatch.operInvalid());
+          });
+        });
+
+        describe("calling #executeWill", function() {
+
+          it("should do the init and will phases", function() {
+
+            var ae = createExecution();
+
+            ae.executeWill();
+
+            expect(ae._onPhaseInit).toHaveBeenCalledTimes(1);
+            expect(ae._onPhaseWill).toHaveBeenCalledTimes(1);
+
+            expect(ae.isSettled).toBe(false);
+          });
+
+          it("should do the init phase only, if canceled", function() {
+
+            var ae = createExecution({
+              init: function(event) {
+                event.reject();
+              }
+            });
+
+            ae.executeWill();
+
+            expect(ae._onPhaseInit).toHaveBeenCalledTimes(1);
+            expect(ae._onPhaseWill).not.toHaveBeenCalled();
+
+            expect(ae.isRejected).toBe(true);
+          });
+
+          it("should do nothing when called again", function() {
+
+            var ae = createExecution();
+
+            ae.executeWill();
+
+            ae.executeWill();
+
+            expect(ae._onPhaseInit).toHaveBeenCalledTimes(1);
+            expect(ae._onPhaseWill).toHaveBeenCalledTimes(1);
+
+            expect(ae.isSettled).toBe(false);
+          });
+
+          it("should allow continuing execution afterwards", function() {
+
+            var ae = createExecution();
+
+            ae.executeWill();
+
+            ae.execute();
+
+            expect(ae._onPhaseInit).toHaveBeenCalledTimes(1);
+            expect(ae._onPhaseWill).toHaveBeenCalledTimes(1);
+
+            expect(ae.isSettled).toBe(true);
           });
         });
       });
@@ -231,9 +270,9 @@ define([
           itsPhaseFinallyShared();
         });
 
-        describe("calling #execute requires the unstarted state", function() {
+        describe("calling #execute", function() {
 
-          it("should throw when calling #execute from the outside " +
+          it("should throw when called from the outside " +
               "after having started but not yet finished", function() {
 
             var resolve;
@@ -262,7 +301,7 @@ define([
             return ae.promise;
           });
 
-          it("should throw when calling #execute after having finished", function() {
+          it("should throw when called after having finished", function() {
 
             var ae = createExecution();
 
@@ -514,56 +553,6 @@ define([
       function itsPhaseInitShared() {
 
         var phase = "init";
-
-        // region modify action succeeds
-        it("should be possible to modify the action's #label", function() {
-
-          var label;
-          var upToPhase = "do";
-
-          var spySpec = {};
-          spySpec[phase] = function() {
-            // NOTE: action !== this.action
-            this.action.label = label + "a";
-          };
-
-          spySpec["finally"] = function() {
-
-            expect(this.action.label).toBe(label + "a");
-
-            expectStateDid(this, undefined);
-          };
-
-          var ae = createExecution(spySpec);
-          label = ae.action.label;
-
-          return testExecute(ae, upToPhase);
-        });
-
-        it("should be possible to modify the action's #description", function() {
-
-          var description;
-          var upToPhase = "do";
-
-          var spySpec = {};
-          spySpec[phase] = function() {
-            // NOTE: action !== this.action
-            this.action.description = description + "a";
-          };
-
-          spySpec["finally"] = function() {
-
-            expect(this.action.description).toBe(description + "a");
-
-            expectStateDid(this, undefined);
-          };
-
-          var ae = createExecution(spySpec);
-          description = ae.action.description;
-
-          return testExecute(ae, upToPhase);
-        });
-        // endregion
 
         // region action invalid cancels
         it("should cancel when the action is invalid", function() {
