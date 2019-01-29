@@ -733,20 +733,6 @@ define([
             complex = new Derived({x: 0});
           });
 
-          describe("Without listeners -", function() {
-
-            it("should not call _emitSafe or _emitGeneric.", function() {
-
-              spyOn(complex, "_emitSafe");
-              spyOn(complex, "_emitGeneric");
-
-              complex.set("x", 1);
-
-              expect(complex._emitSafe).not.toHaveBeenCalled();
-              expect(complex._emitGeneric).not.toHaveBeenCalled();
-            });
-          }); // end without listeners
-
           describe("With listeners -", function() {
 
             beforeEach(function() {
@@ -776,7 +762,7 @@ define([
             // Coverage.
             it("should support having no `change:finally` listener when unsuccessful", function() {
 
-              complex.off("change");
+              complex.off("change", listeners);
               complex.on("change", {init: listeners.init});
 
               expect(function() {

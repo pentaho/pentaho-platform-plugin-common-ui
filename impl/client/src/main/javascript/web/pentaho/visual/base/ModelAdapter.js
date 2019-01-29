@@ -152,7 +152,7 @@ define([
       // that the handler would be attached already) because this is a new object. Also mappings are created
       // internally.
       //
-      // 2. Registering a listener has advantages over overriding __emitChangeActionPhaseInitEvent, as the
+      // 2. Registering a listener has advantages over overriding _onChangeInit, as the
       // transaction manages to only call a listener if things changed below it since the last time it was called.
       // On the other hand, this will cause the commitInit evaluation phase to always have to execute its
       // lengthier path.

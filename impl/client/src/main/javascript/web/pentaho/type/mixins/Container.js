@@ -263,9 +263,9 @@ define([
      *
      * @param actionExecution
      * @param {?object} [keyArgs] - The keyword arguments' object.
-     * @private
+     * @protected
      */
-    __emitChangeActionPhaseInitEvent: function(actionExecution, keyArgs) {
+    _onChangeInit: function(actionExecution, keyArgs) {
 
       var action = actionExecution.action;
       var eventType = action.eventName;
@@ -276,9 +276,9 @@ define([
     /**
      *
      * @param actionExecution
-     * @private
+     * @protected
      */
-    __emitChangeActionPhaseWillEvent: function(actionExecution) {
+    _onChangeWill: function(actionExecution) {
 
       var action = actionExecution.action;
       var eventType = action.eventName;
@@ -289,9 +289,9 @@ define([
     /**
      *
      * @param actionExecution
-     * @private
+     * @protected
      */
-    __emitChangeActionPhaseFinallyEvent: function(actionExecution) {
+    _onChangeFinally: function(actionExecution) {
 
       var action = actionExecution.action;
       var eventType = action.eventName;

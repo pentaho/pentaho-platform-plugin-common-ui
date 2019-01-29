@@ -798,19 +798,19 @@ define([
       // Depends
       var isFail = false;
 
-      if(reason) {
-        if(typeof reason === "string") {
-          reason = new UserError(reason);
-        } else if(reason instanceof Error) {
-          if(!(reason instanceof UserError) || (reason instanceof RuntimeError)) {
-            isFail = true;
-          }
-        } else {
-          reason = new ArgumentInvalidTypeError("reason", ["string", "Error"], typeof reason);
+      if(!reason) {
+        reason = "Canceled";
+      }
+
+      if(typeof reason === "string") {
+        reason = new UserError(reason);
+      } else if(reason instanceof Error) {
+        if(!(reason instanceof UserError) || (reason instanceof RuntimeError)) {
           isFail = true;
         }
       } else {
-        reason = null;
+        reason = new ArgumentInvalidTypeError("reason", ["string", "Error"], typeof reason);
+        isFail = true;
       }
 
       this.__state = isFail ? States.failed : States.canceled;

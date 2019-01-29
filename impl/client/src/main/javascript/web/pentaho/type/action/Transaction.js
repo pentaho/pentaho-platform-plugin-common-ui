@@ -569,7 +569,7 @@ define([
 
           currentListenersVersions = null;
 
-          currentTarget.__emitChangeActionPhaseInitEvent(this, keyArgsOnChangeInit);
+          currentTarget._onChangeInit(this, keyArgsOnChangeInit);
 
           if(this.isRejected) {
             this.__finalizeCommitInitQueue();
@@ -763,7 +763,7 @@ define([
 
         this.__action = changesets[i];
 
-        this.target.__emitChangeActionPhaseWillEvent(this);
+        this.target._onChangeWill(this);
 
         if(this.isRejected) {
           break;
@@ -813,7 +813,7 @@ define([
 
           txn.__action = changeset;
 
-          txn.target.__emitChangeActionPhaseFinallyEvent(txn);
+          txn.target._onChangeFinally(txn);
         });
       });
 

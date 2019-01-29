@@ -473,15 +473,15 @@ define([
     // region Changes
     // @override Container
     /** @inheritDoc */
-    _onChangeDid: function(changeset) {
+    _onChangeFinally: function(txn) {
 
-      if(this._checkIsDirty()) {
+      if(txn.isDone && this._checkIsDirty()) {
         this._onChangeDirty(this.__dirtyPropGroups);
       }
 
       // Emit event.
 
-      this.base(changeset);
+      this.base(txn);
     },
 
     /**
