@@ -564,6 +564,7 @@
       "pentaho/lang/RuntimeError",
       "pentaho/action/Execution",
       "pentaho/action/impl/Target",
+      "pentaho/visual/base/ModelChangedError",
       "pentaho/util/BitSet",
       "pentaho/visual/base/View",
       "pentaho/visual/role/ExternalMapping",

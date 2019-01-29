@@ -484,7 +484,7 @@ define([
     // endregion
 
     // region Phase INIT
-    /**
+    /*
      * Performs the init evaluation phase,
      * going through `change:init` listeners of the targets of the changesets in this transaction.
      *
@@ -654,7 +654,7 @@ define([
     },
 
     /**
-     * Adds a changeset to the commit-init queue, if it isn't there yet.
+     * Adds a changeset to the commit-will queue, if it isn't there yet.
      *
      * @param {pentaho.type.action.Changeset} changeset - The changeset.
      * @param {boolean} forceIfRan - Indicates that the changeset should be added even if it already ran.
@@ -673,7 +673,7 @@ define([
     /**
      * Called by a changeset when its `transactionVersionLocal` changes.
      *
-     * When the commit-init phase is evaluating,
+     * When the commit-will phase is evaluating,
      * this method adds the given changeset to the evaluation queue,
      * if it isn't the current changeset being evaluated.
      *

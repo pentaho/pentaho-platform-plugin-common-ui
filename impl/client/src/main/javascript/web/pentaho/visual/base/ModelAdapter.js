@@ -160,11 +160,11 @@ define([
       // 3. Must be the last change action init phase listener, or the internal model is not guaranteed to be in sync.
       //    TODO: find a way to ensure that we're really the last listener.
       this.on("change", {
-        will: this.__onChangeActionPhaseInitHandler.bind(this)
+        init: this.__onChangeInitHandler.bind(this)
       }, {priority: -Infinity, isCritical: true});
 
       this.model.on("change", {
-        will: this.__onModelChangeActionPhaseInitHandler.bind(this)
+        init: this.__onModelChangeInitHandler.bind(this)
       }, {priority: -Infinity, isCritical: true});
     },
 
@@ -252,7 +252,7 @@ define([
      * @param {pentaho.action.Execution} actionExecution - The change action execution.
      * @private
      */
-    __onChangeActionPhaseInitHandler: function(actionExecution) {
+    __onChangeInitHandler: function(actionExecution) {
 
       var changesetAction = actionExecution.action;
       var propertyNames = changesetAction.propertyNames;
@@ -278,7 +278,7 @@ define([
      * @param {pentaho.action.Execution} actionExecution - The change action execution.
      * @private
      */
-    __onModelChangeActionPhaseInitHandler: function(actionExecution) {
+    __onModelChangeInitHandler: function(actionExecution) {
 
       var changesetAction = actionExecution.action;
 
@@ -339,7 +339,7 @@ define([
      */
     __updateInternalSelection: function() {
       // In a scenario where the external selectionFilter is updated,
-      // this gets called and, unfortunately, the following will also cause __onModelChangeActionPhaseInitHandler to be called,
+      // this gets called and, unfortunately, the following will also cause __onModelChangeInitHandler to be called,
       // which will update back the external selectionFilter...
       this.model.selectionFilter = this.__calcInternalSelectionFilter();
     },
