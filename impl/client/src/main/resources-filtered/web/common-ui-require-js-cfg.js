@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,27 +22,36 @@
   // are duplicated in cgg's define-cfg.js. Keep all in sync.
   // Also, it is duplicated in the testing require.config.js.
   var basePath;
+  var baseUncompressedPath;
   var useBundle = false;
+  var useDebug = true;
 
   // environment configured
   if((typeof ENVIRONMENT_CONFIG !== "undefined" &&
       ENVIRONMENT_CONFIG.paths !== undefined &&
       ENVIRONMENT_CONFIG.paths["common-ui"] !== undefined)) {
 
+    if(ENVIRONMENT_CONFIG.debug != null) {
+      useDebug = !!ENVIRONMENT_CONFIG.debug;
+    }
+
     basePath = ENVIRONMENT_CONFIG.paths["common-ui"];
 
   } else if(typeof CONTEXT_PATH !== "undefined") {
-    var useDebug = typeof document === "undefined" || document.location.href.indexOf("debug=true") > 0;
+    useDebug = typeof document === "undefined" || document.location.href.indexOf("debug=true") > 0;
 
     // production
     basePath = CONTEXT_PATH + "content/common-ui/resources/web";
-    if(!useDebug) {
-      basePath += "/compressed";
-      useBundle = true;
-    }
   } else {
     // build / test
     basePath = "common-ui";
+  }
+
+  baseUncompressedPath = basePath;
+
+  if(!useDebug) {
+    basePath += "/compressed";
+    useBundle = true;
   }
 
   var requirePaths = requireCfg.paths;
@@ -310,6 +319,9 @@
 
   // sample/calc theme
   mapTheme("pentaho/visual/samples/calc", "themes", ["ruby"]);
+
+  // This file is always in the non-compressed location.
+  requirePaths["pentaho/visual/config/vizApi.conf"] = baseUncompressedPath + "/pentaho/visual/config/vizApi.conf";
 
   requireModules["pentaho/visual/config/vizApi.conf"] = {type: "pentaho/config/spec/IRuleSet"};
 
