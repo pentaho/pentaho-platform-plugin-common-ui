@@ -138,12 +138,6 @@
       <artifactId>pentaho-platform-core</artifactId>
       <version>${platform.version}</version>
       <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>*</artifactId>
-          <groupId>*</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>pentaho</groupId>
@@ -192,13 +186,6 @@
           <groupId>*</groupId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>pentaho</groupId>
-      <artifactId>pentaho-platform-core</artifactId>
-      <version>${platform.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
