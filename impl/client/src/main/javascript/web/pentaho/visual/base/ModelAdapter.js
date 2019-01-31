@@ -157,7 +157,7 @@ define([
       // On the other hand, this will cause the commitInit evaluation phase to always have to execute its
       // lengthier path.
       //
-      // 3. Must be the last change action init phase listener, or the internal model is not guaranteed to be in sync.
+      // 3. Must be the last change:init phase listener, or the internal model is not guaranteed to be in sync.
       //    TODO: find a way to ensure that we're really the last listener.
       this.on("change", {
         init: this.__onChangeInitHandler.bind(this)
@@ -247,35 +247,37 @@ define([
     },
 
     /**
-     * Handler for the _init_ phase of a change action execution as emitted by this object.
+     * Event handler for the for the `change:init` event as emitted by this object.
      *
-     * @param {pentaho.action.Execution} actionExecution - The change action execution.
+     * @param {pentaho.type.action.Transaction} transactionExecution - The action execution.
+     *
      * @private
      */
     __onChangeInitHandler: function(actionExecution) {
 
-      var changesetAction = actionExecution.action;
-      var propertyNames = changesetAction.propertyNames;
+      var changeset = actionExecution.action;
+      var propertyNames = changeset.propertyNames;
 
       if(__hasSingleChange(propertyNames, "selectionFilter")) {
 
-        // console.log("[ModelAdapter] change action init phase, modelAdapter.selectionFilter " +
+        // console.log("[ModelAdapter] change:init modelAdapter.selectionFilter " +
         //   (this.selectionFilter && this.selectionFilter.$contentKey));
 
         this.__updateInternalSelection();
 
       } else {
 
-        // console.log("[ModelAdapter] change action init phase, other");
+        // console.log("[ModelAdapter] change:init other");
 
         this.__updateInternalModel();
       }
     },
 
     /**
-     * Handler for the _init_ phase of a change action execution as emitted by this.model.
+     * Event handler for the for the `change:init` event as emitted by this.model.
      *
-     * @param {pentaho.action.Execution} actionExecution - The change action execution.
+     * @param {pentaho.type.action.Transaction} actionExecution - The action execution.
+     *
      * @private
      */
     __onModelChangeInitHandler: function(actionExecution) {
@@ -284,7 +286,7 @@ define([
 
       if(changesetAction.hasChange("selectionFilter")) {
 
-        // console.log("[ModelAdapter] change action init phase, model.selectionFilter");
+        // console.log("[ModelAdapter] change:init model.selectionFilter");
 
         this.__updateExternalSelection();
       }
@@ -381,6 +383,7 @@ define([
 
       return null;
     },
+
     /**
      * Calculates the external selection filter based on the internal one.
      *

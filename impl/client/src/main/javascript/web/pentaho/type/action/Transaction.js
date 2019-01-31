@@ -31,7 +31,7 @@ define([
   "use strict";
 
   /**
-   * The stack of transactions performing the `finally` phase of a change action.
+   * The stack of transactions performing the `change:finally` phase of a change action.
    *
    * @type {Array.<pentaho.type.action.Transaction>}
    * @readOnly
@@ -935,7 +935,7 @@ define([
   /**
    * Determines if a given action execution is canceled.
    *
-   * @param {pentaho.type.action.Transaction~ActionExecution} actionExecution - The action execution.
+   * @param {pentaho.type.action.Transaction} actionExecution - The action execution.
    * @return {boolean} `true` if it is canceled; `false`, otherwise.
    */
   function __actionExecution_isCanceled(actionExecution) {

@@ -260,22 +260,37 @@ define([
      */
 
     /**
+     * Emits the `init` phase event of a change action execution.
      *
-     * @param actionExecution
+     * The default implementation delegates to
+     * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
+     *
+     * @param {pentaho.type.action.Transaction} actionExecution - The action execution.
      * @param {?object} [keyArgs] - The keyword arguments' object.
+     *
      * @protected
      */
     _onChangeInit: function(actionExecution, keyArgs) {
 
-      var action = actionExecution.action;
-      var eventType = action.eventName;
+      try {
+        var action = actionExecution.action;
+        var eventType = action.eventName;
 
-      this._emitGeneric(this, [actionExecution, action], eventType, "init", keyArgs);
+        this._emitGeneric(this, [actionExecution, action], eventType, "init", keyArgs);
+      } catch(ex) {
+        // `isCritical` listeners can throw...
+        actionExecution.reject(ex);
+      }
     },
 
     /**
+     * Emits the `will` phase event of a change action execution.
      *
-     * @param actionExecution
+     * The default implementation delegates to
+     * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
+     *
+     * @param {pentaho.type.action.Transaction} actionExecution - The action execution.
+     *
      * @protected
      */
     _onChangeWill: function(actionExecution) {
@@ -287,8 +302,13 @@ define([
     },
 
     /**
+     * Emits the `finally` phase event of a change action execution.
      *
-     * @param actionExecution
+     * The default implementation delegates to
+     * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
+     *
+     * @param {pentaho.type.action.Transaction} actionExecution - The action execution.
+     *
      * @protected
      */
     _onChangeFinally: function(actionExecution) {
