@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,14 @@
 define([
   "pentaho/module!_",
   "./Abstract",
-  "pentaho/visual/models/Pie",
   "./_util"
-], function(module, BaseView, Model, util) {
+], function(module, BaseView, util) {
 
   "use strict";
 
-  return BaseView.extend({
-    $type: {
-      id: module.id,
-      props: {
-        model: {valueType: Model}
-      }
-    },
+  // "pentaho/visual/models/Pie"
 
+  return BaseView.extend(module.id, {
     _cccClass: "PieChart",
 
     _roleToCccRole: {
@@ -129,5 +123,5 @@ define([
       return colorMap;
     }
   })
-  .configure({$type: module.config});
+  .implement(module.config);
 });

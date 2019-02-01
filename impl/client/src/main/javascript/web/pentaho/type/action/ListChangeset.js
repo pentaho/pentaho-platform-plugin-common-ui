@@ -85,6 +85,8 @@ define([
      * @type {string}
      * @readonly
      * @default "list"
+     * @override
+     * @see pentaho.type.action.Change#type
      */
     get type() {
       return "list";
@@ -750,5 +752,10 @@ define([
       this._setTransactionVersionLocal(txnVersion);
     }
     // endregion
+  }, /** @lends pentaho.type.action.ListChangeset */{
+    /** @inheritDoc */
+    get id() {
+      return module.id;
+    }
   });
 });

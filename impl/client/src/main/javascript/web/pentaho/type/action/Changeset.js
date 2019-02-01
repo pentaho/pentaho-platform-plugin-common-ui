@@ -188,7 +188,7 @@ define([
      *
      * @name pentaho.type.action.Changeset#eachChildChangeset
      * @method
-     * @param {function(pentaho.type.changeset.Changeset) : undefined|boolean} fun - The function to call.
+     * @param {function(pentaho.type.action.Changeset) : undefined|boolean} fun - The function to call.
      * @param {*} ctx - The `this` context on which to call `fun`.
      *
      * @abstract

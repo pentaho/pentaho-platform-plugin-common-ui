@@ -15,7 +15,6 @@
  */
 define([
   "pentaho/visual/base/Model",
-  "pentaho/visual/base/View",
   "pentaho/data/filter/IsIn",
   "pentaho/data/filter/IsEqual",
   "pentaho/data/filter/And",
@@ -23,7 +22,7 @@ define([
   "pentaho/data/filter/Not",
   "pentaho/data/Table",
   "pentaho/visual/action/SelectionModes"
-], function(Model, View, IsInFilter, IsEqFilter, AndFilter, OrFilter, NotFilter, Table, SelectionModes) {
+], function(Model, IsInFilter, IsEqFilter, AndFilter, OrFilter, NotFilter, Table, SelectionModes) {
 
   "use strict";
 
@@ -32,7 +31,6 @@ define([
     var sales12k;
     var inStock;
     var model;
-    var view;
 
     beforeEach(function() {
       sales12k = new IsInFilter({property: "sales", values: [{_: "number", v: 12000}]});
@@ -56,17 +54,11 @@ define([
       model = new Model({
         data: new Table(dataSpec)
       });
-
-      view = new View({
-        width: 1,
-        height: 1,
-        model: model
-      });
     });
 
     describe("replace", function() {
       it("should discard current selection and return input selection", function() {
-        var result = SelectionModes.replace.call(view, sales12k, inStock);
+        var result = SelectionModes.replace.call(model, sales12k, inStock);
 
         expect(result).toBe(inStock);
       });
@@ -82,12 +74,12 @@ define([
         var currentFilter = sales12k;
         var inputFilter = sales12k.and(inStock);
 
-        var result = SelectionModes.toggle.call(view, currentFilter, inputFilter);
+        var result = SelectionModes.toggle.call(model, currentFilter, inputFilter);
 
         expect(SelectionModes.add.calls.count()).toBe(0);
 
         expect(SelectionModes.remove.calls.count()).toBe(1);
-        expect(SelectionModes.remove.calls.first().object).toBe(view);
+        expect(SelectionModes.remove.calls.first().object).toBe(model);
 
         var args = SelectionModes.remove.calls.first().args;
         expect(args[0]).toBe(currentFilter);
@@ -106,12 +98,12 @@ define([
         // Portugal & Germany & Italy
         var currentFilter = sales12k;
 
-        var result = SelectionModes.toggle.call(view, currentFilter, inputFilter);
+        var result = SelectionModes.toggle.call(model, currentFilter, inputFilter);
 
         expect(SelectionModes.remove.calls.count()).toBe(0);
 
         expect(SelectionModes.add.calls.count()).toBe(1);
-        expect(SelectionModes.add.calls.first().object).toBe(view);
+        expect(SelectionModes.add.calls.first().object).toBe(model);
 
         var args = SelectionModes.add.calls.first().args;
         expect(args[0]).toBe(currentFilter);
@@ -132,12 +124,12 @@ define([
         // Germany
         var currentFilter = new IsEqFilter({property: "country", value: {_: "string", v: "Germany"}});
 
-        var result = SelectionModes.toggle.call(view, currentFilter, inputFilter);
+        var result = SelectionModes.toggle.call(model, currentFilter, inputFilter);
 
         expect(SelectionModes.remove.calls.count()).toBe(0);
 
         expect(SelectionModes.add.calls.count()).toBe(1);
-        expect(SelectionModes.add.calls.first().object).toBe(view);
+        expect(SelectionModes.add.calls.first().object).toBe(model);
 
         var args = SelectionModes.add.calls.first().args;
         expect(args[0]).toBe(currentFilter);
@@ -149,7 +141,7 @@ define([
 
     describe("add", function() {
       it("should add the input selection to the current selection", function() {
-        var result = SelectionModes.add.call(view, sales12k, inStock);
+        var result = SelectionModes.add.call(model, sales12k, inStock);
 
         expect(result instanceof OrFilter).toBe(true);
         expect(result.operands.at(0)).toBe(sales12k);
@@ -159,7 +151,7 @@ define([
 
     describe("remove", function() {
       it("should remove the input selection from the current selection", function() {
-        var result = SelectionModes.remove.call(view, sales12k, inStock);
+        var result = SelectionModes.remove.call(model, sales12k, inStock);
 
         expect(result.toDnf().$contentKey).toBe("(or (and (in sales 12000) (not (= inStock true))))");
       });

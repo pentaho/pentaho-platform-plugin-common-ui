@@ -61,10 +61,10 @@ define([
   var Action = Base.extend(module.id, /** @lends pentaho.action.Base# */{
 
     /**
-     * Gets the type of action.
+     * Gets the identifier of the action type module.
      *
-     * @name type
-     * @memberOf pentaho.action.Base#
+     * @name id
+     * @memberOf pentaho.action.Base
      * @type {string}
      * @readonly
      *
@@ -74,13 +74,13 @@ define([
     /**
      * Gets the event name of the action.
      *
-     * The base implementation returns the value of {@link pentaho.action.Base#type}.
+     * The default implementation returns the value of {@link pentaho.action.Base.id}.
      *
      * @type {string}
      * @readonly
      */
     get eventName() {
-      return this.type;
+      return this.constructor.id;
     },
 
     /**

@@ -77,6 +77,8 @@ define([
      * @type {string}
      * @readonly
      * @default "complex"
+     * @override
+     * @see pentaho.type.action.Change#type
      */
     get type() {
       return "complex";
@@ -404,7 +406,12 @@ define([
       }
     }
     // endregion
-  }, {
+  }, /** @lends pentaho.type.action.ComplexChangeset */{
+    /** @inheritDoc */
+    get id() {
+      return module.id;
+    },
+
     /**
      * Sets the value of an _element property_.
      *
@@ -488,6 +495,7 @@ define([
 
   /**
    * Gets a value that indicates if a change has changes.
+   *
    * @param {pentaho.type.action.Change} change - The change.
    * @return {boolean} `true` if yes; `false` if no.
    */

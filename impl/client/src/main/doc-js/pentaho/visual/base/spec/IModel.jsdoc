@@ -25,13 +25,18 @@
  */
 
 /**
- * The type of visual key used by the visualization.
+ * Enables or disables automatic updates of the model.
  *
- * @name visualKeyType
+ * This property is special and is not serialized.
+ *
+ * @type {?boolean}
+ *
+ * @name isAutoUpdate
  * @memberOf pentaho.visual.base.spec.IModel#
- * @type {?pentaho.visual.base.KeyTypes|undefined}
+ * @type {boolean}
+ * @default true
  *
- * @see pentaho.visual.base.AbstractModelType#visualKeyType
+ * @see pentaho.visual.base.Model#isAutoUpdate
  */
 
 /**

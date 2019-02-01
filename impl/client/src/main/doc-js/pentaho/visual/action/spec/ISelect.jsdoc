@@ -15,12 +15,12 @@
  */
 
 /**
- * The `visual.action.spec.ISelect` interface describes a selection action instance using a generic, _object_ form.
+ * The `visual.action.spec.ISelect` interface describes a _select_ action instance using a generic, _object_ form.
  *
  * @name pentaho.visual.action.spec.ISelect
  *
  * @interface
- * @extends pentaho.visual.action.spec.IBase
+ * @extends pentaho.visual.action.spec.IInteraction
  * @extends pentaho.visual.action.mixins.spec.IData
  * @extends pentaho.visual.action.mixins.spec.IPositioned
  */

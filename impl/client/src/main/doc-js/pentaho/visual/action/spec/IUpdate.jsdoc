@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,21 @@
  */
 
 /**
- * The `IViewType` interface represents the set of options used to define and configure a view type.
+ * The `visual.action.spec.IUpdate` interface describes an _update_ action instance using a generic, _object_ form.
  *
- * @name pentaho.visual.base.spec.IViewType
+ * @name pentaho.visual.action.spec.IUpdate
+ *
  * @interface
- * @extends pentaho.type.spec.IComplexType
- *
- * @see pentaho.visual.base.ViewType
+ * @extends pentaho.visual.action.spec.IBase
  */
 
 /**
- * Extension properties that a view knows how to handle directly.
+ * A complex changeset describing the model changes since the last update execution.
  *
- * This property is expected to be specified through configuration.
+ * When unspecified, or specified as a {@link Nully} value,
+ * it is interpreted as if _everything has changed_.
  *
- * Custom view classes should document the supported options.
- *
- * @name extension
- * @memberOf pentaho.visual.base.spec.IView#
- * @type {?object}
+ * @name changeset
+ * @memberOf pentaho.visual.action.spec.IUpdate#
+ * @type {?pentaho.type.action.ComplexChangeset}
  */

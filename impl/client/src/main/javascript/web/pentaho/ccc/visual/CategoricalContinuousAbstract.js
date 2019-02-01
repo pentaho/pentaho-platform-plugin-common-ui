@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,13 @@
  */
 define([
   "pentaho/module!_",
-  "./CartesianAbstract",
-  "pentaho/visual/models/CategoricalContinuousAbstract"
-], function(module, BaseView, Model) {
+  "./CartesianAbstract"
+], function(module, BaseView) {
 
   "use strict";
+  // "pentaho/visual/models/CategoricalContinuousAbstract"
 
-  return BaseView.extend({
-    $type: {
-      id: module.id,
-      props: {
-        model: {valueType: Model}
-      }
-    },
-
+  return BaseView.extend(module.id, {
     _genericMeasureCccVisualRole: "value",
     _genericMeasureDiscrimCccVisualRole: "series",
 
@@ -96,5 +89,5 @@ define([
       return chart;
     }
   })
-  .configure({$type: module.config});
+  .implement(module.config);
 });

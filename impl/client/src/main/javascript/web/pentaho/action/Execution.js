@@ -845,7 +845,7 @@ define([
      * Executes the **will** phase.
      *
      * Validates the action,
-     * by delegating to [_validatePhaseWill]{@link pentaho.type.action.Execution#_validatePhaseWill}.
+     * by delegating to [_validate]{@link pentaho.type.action.Execution#_validate}.
      * When invalid, the execution is rejected with the first validation error.
      *
      * Otherwise,
@@ -866,11 +866,14 @@ define([
 
         // Validating here and not on the end of `__executePhaseInit`
         // ensures that isSettled is false (not rejected already).
-        if(this._validatePhaseWill() == null) {
+        var errors = this._validate();
+        if(errors == null || errors.length === 0) {
 
           this._lockAction();
 
           this._onPhaseWill();
+        } else {
+          this.__reject(errors[0]);
         }
       }
     },
@@ -887,24 +890,15 @@ define([
     },
 
     /**
-     * Validates that the action is valid for entering the `will` phase.
+     * Validates that the action execution is valid for entering the `will` phase.
      *
-     * When invalid, the execution is rejected with the first validation error.
+     * The default implementation validates the action.
      *
      * @return {?Array.<Error>} A non-empty array of errors, if any; otherwise `null`.
      * @protected
      */
-    _validatePhaseWill: function() {
-
-      var errors = this.action.validate();
-
-      if(errors && errors.length) {
-        this.__reject(errors[0]);
-
-        return errors;
-      }
-
-      return null;
+    _validate: function() {
+      return this.action.validate();
     },
 
     /**

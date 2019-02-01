@@ -116,6 +116,8 @@ define([
      * @type {string}
      * @readOnly
      * @default "replace"
+     * @override
+     * @see pentaho.type.action.Change#type
      */
     get type() {
       return "replace";
@@ -146,6 +148,11 @@ define([
       var name = this.property.name;
       target.__values[name] = this.__value;
       target.__valuesState[name] = this.__state;
+    }
+  }, /** @lends pentaho.type.action.Replace */{
+    /** @inheritDoc */
+    get id() {
+      return module.id;
     }
   });
 });

@@ -35,13 +35,14 @@
  *   such as the visual degrees of freedom it has (e.g. _X position_, _color_ and _size_) and
  *   any major options that affect its rendering.
  *
- * * One [View]{@link pentaho.visual.base.View} (at least),
+ * * One [View]{@link pentaho.visual.IView} (at least),
  *   which implements the actual rendering using chosen technologies
  *   (e.g. [HTML]{@link https://www.w3.org/TR/html/},
  *   [SVG]{@link https://www.w3.org/TR/SVG/},
  *   [D3]{@link https://d3js.org/}),
  *   and handle user interaction,
- *   dispatching [actions]{@link pentaho.visual.action} and, for example, showing tooltips.
+ *   by dispatching [actions]{@link pentaho.visual.action} on the associated model and,
+ *   for example, showing tooltips.
  *   The standard data actions are
  *   [Select]{@link pentaho.visual.action.Select} and
  *   [Execute]{@link pentaho.visual.action.Execute}.

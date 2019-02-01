@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,9 @@ define([
   "pentaho/visual/scene/Base",
   "pentaho/visual/scene/util",
   "pentaho/visual/base/Model",
-  "pentaho/visual/base/View",
   "pentaho/data/Table",
   "tests/pentaho/util/errorMatch"
-], function(Scene, sceneUtil, VisualModel, View, DataTable, errorMatch) {
+], function(Scene, sceneUtil, VisualModel, DataTable, errorMatch) {
 
   /* eslint max-nested-callbacks: 0 */
 
@@ -40,28 +39,28 @@ define([
 
   describe("pentaho.visual.scene.Base", function() {
 
-    describe("new (parent, view)", function() {
+    describe("new (parent, model)", function() {
 
       it("should throw when given no arguments", function() {
         expect(function() {
           // eslint-disable-next-line no-unused-vars
           var scene = new Scene();
-        }).toThrow(errorMatch.argRequired("view"));
+        }).toThrow(errorMatch.argRequired("model"));
       });
 
-      describe("when given (parent: null, view)", function() {
+      describe("when given (parent: null, model)", function() {
 
-        var CustomView;
-        var view;
+        var CustomModel;
+        var model;
         var rootScene;
 
         beforeAll(function() {
-          CustomView = View.extend();
+          CustomModel = VisualModel.extend();
         });
 
         beforeEach(function() {
-          view = new CustomView();
-          rootScene = new Scene(null, view);
+          model = new CustomModel();
+          rootScene = new Scene(null, model);
         });
 
         it("should create a scene instance", function() {
@@ -77,8 +76,8 @@ define([
           expect(rootScene.root).toBe(rootScene);
         });
 
-        it("should have #view be the given view", function() {
-          expect(rootScene.view).toBe(view);
+        it("should have #model be the given model", function() {
+          expect(rootScene.model).toBe(model);
         });
 
         it("should have #vars be a root variable map", function() {
@@ -92,19 +91,19 @@ define([
         });
       });
 
-      describe("when given (parent: root, view: null)", function() {
-        var CustomView;
-        var view;
+      describe("when given (parent: root, model: null)", function() {
+        var CustomModel;
+        var model;
         var rootScene;
         var childScene;
 
         beforeAll(function() {
-          CustomView = View.extend();
+          CustomModel = VisualModel.extend();
         });
 
         beforeEach(function() {
-          view = new CustomView();
-          rootScene = new Scene(null, view);
+          model = new CustomModel();
+          rootScene = new Scene(null, model);
 
           // eslint-disable-next-line no-unused-vars
           var childScene1 = new Scene(rootScene);
@@ -129,8 +128,8 @@ define([
           expect(childScene.root).toBe(rootScene.root);
         });
 
-        it("should have #view be the parent's view", function() {
-          expect(childScene.view).toBe(view);
+        it("should have #model be the parent's model", function() {
+          expect(childScene.model).toBe(model);
         });
 
         it("should have #vars have the parent's #vars as prototype", function() {
@@ -144,20 +143,20 @@ define([
         });
       });
 
-      describe("when given (parent: notRoot, view: null)", function() {
-        var CustomView;
-        var view;
+      describe("when given (parent: notRoot, model: null)", function() {
+        var CustomModel;
+        var model;
         var rootScene;
         var parentScene;
         var childScene;
 
         beforeAll(function() {
-          CustomView = View.extend();
+          CustomModel = VisualModel.extend();
         });
 
         beforeEach(function() {
-          view = new CustomView();
-          rootScene = new Scene(null, view);
+          model = new CustomModel();
+          rootScene = new Scene(null, model);
           parentScene = new Scene(rootScene);
 
           // eslint-disable-next-line no-unused-vars
@@ -183,8 +182,8 @@ define([
           expect(childScene.root).toBe(rootScene);
         });
 
-        it("should have #view be the root's view", function() {
-          expect(childScene.view).toBe(view);
+        it("should have #model be the root's model", function() {
+          expect(childScene.model).toBe(model);
         });
 
         it("should have #vars have the parent's #vars as prototype", function() {
@@ -201,27 +200,23 @@ define([
 
     describe("#createFilter()", function() {
 
-      var CustomView;
       var CustomModel;
 
-      var view;
       var model;
 
       var parentScene;
 
       beforeAll(function() {
-        CustomView = View.extend();
         CustomModel = VisualModel.extend();
       });
 
       beforeEach(function() {
         model = new CustomModel();
-        view = new CustomView({model: model});
 
-        parentScene = new Scene(null, view);
+        parentScene = new Scene(null, model);
       });
 
-      it("should call scene.util.createFilterFromVars with this vars and this view's model", function() {
+      it("should call scene.util.createFilterFromVars with this vars and this model", function() {
 
         spyOn(sceneUtil, "createFilterFromVars");
 
@@ -243,27 +238,23 @@ define([
 
     describe("#invert(keyArgs)", function() {
 
-      var CustomView;
       var CustomModel;
 
-      var view;
       var model;
 
       var parentScene;
 
       beforeAll(function() {
-        CustomView = View.extend();
         CustomModel = VisualModel.extend();
       });
 
       beforeEach(function() {
         model = new CustomModel();
-        view = new CustomView({model: model});
 
-        parentScene = new Scene(null, view);
+        parentScene = new Scene(null, model);
       });
 
-      it("should call scene.util.invertVars with this vars, this view's model and the given keyArgs", function() {
+      it("should call scene.util.invertVars with this vars, this model and the given keyArgs", function() {
 
         spyOn(sceneUtil, "invertVars");
 
@@ -285,17 +276,13 @@ define([
       });
     });
 
-    describe(".buildScenesFlat(view)", function() {
+    describe(".buildScenesFlat(model)", function() {
 
-      var CustomView;
       var CustomModel;
 
-      var view;
       var model;
 
       beforeAll(function() {
-        CustomView = View.extend();
-
         CustomModel = VisualModel.extend({
           $type: {
             props: [
@@ -329,40 +316,38 @@ define([
             fields: ["sales"]
           }
         });
-
-        view = new CustomView({model: model});
       });
 
       it("should return a root scene", function() {
 
-        var parentScene = Scene.buildScenesFlat(view);
+        var parentScene = Scene.buildScenesFlat(model);
 
         // ---
 
         expect(parentScene.root).toBe(parentScene);
       });
 
-      it("should return a scene whose view is the given view", function() {
+      it("should return a scene whose model is the given model", function() {
 
-        var parentScene = Scene.buildScenesFlat(view);
+        var parentScene = Scene.buildScenesFlat(model);
 
         // ---
 
-        expect(parentScene.view).toBe(view);
+        expect(parentScene.model).toBe(model);
       });
 
       it("should return a scene with as many child scenes as there are data table rows", function() {
 
-        var parentScene = Scene.buildScenesFlat(view);
+        var parentScene = Scene.buildScenesFlat(model);
 
         // ---
 
-        expect(parentScene.children.length).toBe(view.model.data.getNumberOfRows());
+        expect(parentScene.children.length).toBe(model.data.getNumberOfRows());
       });
 
       it("should return a scene whose child scenes have one variable for each of the mapped visual roles", function() {
 
-        var parentScene = Scene.buildScenesFlat(view);
+        var parentScene = Scene.buildScenesFlat(model);
 
         // ---
 

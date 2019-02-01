@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,33 +17,28 @@
 /**
  * The `IView` interface represents the set of options used to initialize a view instance.
  *
- * @name pentaho.visual.base.spec.IView
+ * @name pentaho.visual.spec.IView
  * @interface
- * @extends pentaho.type.spec.IComplex
  *
- * @see pentaho.visual.base.View
+ * @see pentaho.visual.IView
  */
 
 /**
- * The width that the container application has allocated to display the view
- * without horizontal or vertical scrolling, in pixels.
+ * The HTML container element where the view is rendered.
  *
  * This property is required.
  *
- * @name width
- * @memberOf pentaho.visual.base.spec.IView#
- * @type {number}
- * @see pentaho.visual.base.View#width
+ * @name domContainer
+ * @memberOf pentaho.visual.spec.IView#
+ * @type {HTMLElement}
  */
 
 /**
- * The height that the container application has allocated to display the view
- * without horizontal or vertical scrolling, in pixels.
+ * The visualization model.
  *
  * This property is required.
  *
- * @name height
- * @memberOf pentaho.visual.base.spec.IView#
- * @type {number}
- * @see pentaho.visual.base.View#height
+ * @name model
+ * @memberOf pentaho.visual.spec.IView#
+ * @type {pentaho.visual.base.Model}
  */

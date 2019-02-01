@@ -46,7 +46,7 @@ define([
       });
     });
 
-    it("should be possible to render an instance", function(done) {
+    it("should be possible to render an instance", function() {
       var tableSpec = {
         model: [
           {name: "country", type: "string", label: "Country"},
@@ -74,10 +74,9 @@ define([
 
       spyOn(view, "_renderCore");
 
-      view.update().then(function() {
+      return model.update().then(function() {
         expect(view._renderCore).toHaveBeenCalled();
-        done();
-      }, done.fail);
+      });
     });
   });
 });

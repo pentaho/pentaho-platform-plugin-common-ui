@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,14 @@
 define([
   "pentaho/module!_",
   "./PointAbstract",
-  "pentaho/visual/models/Line",
   "./_trends"
-], function(module, BaseView, Model) {
+], function(module, BaseView) {
 
   "use strict";
 
-  return BaseView.extend({
-    $type: {
-      id: module.id,
-      props: {
-        model: {valueType: Model}
-      }
-    },
+  // "pentaho/visual/models/Line"
 
+  return BaseView.extend(module.id, {
     _cccClass: "LineChart",
 
     _supportsTrends: true,
@@ -49,5 +43,5 @@ define([
       }
     }
   })
-  .configure({$type: module.config});
+  .implement(module.config);
 });

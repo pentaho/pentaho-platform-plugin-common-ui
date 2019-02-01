@@ -1598,7 +1598,7 @@ define([
         expect(DerivedModelAdapter.type.visualKeyType).toBe("dataKey");
       });
 
-      it("should have the value of ModelType#visualKeyType when it is 'dataKey'", function() {
+      it("should have the value of ModelType#visualKeyType when it is 'dataOrdinal'", function() {
 
         var DerivedModel = Model.extend({
           $type: {

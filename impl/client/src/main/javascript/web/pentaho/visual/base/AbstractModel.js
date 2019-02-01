@@ -242,7 +242,7 @@ define([
          * [toSpec]{@link pentaho.visual.base.AbstractModel#toSpec} to `false`.
          *
          * @name application
-         * @memberOf pentaho.visual.base.Model#
+         * @memberOf pentaho.visual.base.AbstractModel#
          * @type {pentaho.visual.base.Application}
          */
         {
@@ -258,7 +258,7 @@ define([
          * [toSpec]{@link pentaho.visual.base.AbstractModel#toSpec} to `false`.
          *
          * @name data
-         * @memberOf pentaho.visual.base.Model#
+         * @memberOf pentaho.visual.base.AbstractModel#
          * @type {pentaho.data.ITable}
          */
         {
@@ -286,27 +286,27 @@ define([
         // by property types. Because of this, the conversion to DNF (or simply calling toDnf() to make sure
         // non-termination is caught early) is not being ensured when the property is set but only on
         // the Select action's _doDefault.
+        /**
+         * Gets or sets the current data selection filter.
+         *
+         * This property is required.
+         *
+         * By default, this property is not included when serializing to JSON.
+         * To serialize it, specify the argument `keyArgs.omitProps.selectionFilter` of
+         * [toSpec]{@link pentaho.visual.base.AbstractModel#toSpec} to `false`.
+         *
+         * When set to a filter specification, {@link pentaho.data.filter.spec.IAbstract},
+         * it is converted into a filter object.
+         * Any standard filter can be safely loaded synchronously.
+         *
+         * **ATTENTION**: The current implementation only supports filters that can be
+         * converted to [DNF]{@link pentaho.data.filter.Abstract#toDnf} _in a reasonable amount of time_.
+         *
+         * @name selectionFilter
+         * @memberOf pentaho.visual.base.AbstractModel#
+         * @type {pentaho.data.filter.Abstract}
+         */
         {
-          /**
-           * Gets or sets the current data selection filter.
-           *
-           * This property is required.
-           *
-           * By default, this property is not included when serializing to JSON.
-           * To serialize it, specify the argument `keyArgs.omitProps.selectionFilter` of
-           * [toSpec]{@link pentaho.visual.base.AbstractModel#toSpec} to `false`.
-           *
-           * When set to a filter specification, {@link pentaho.data.filter.spec.IAbstract},
-           * it is converted into a filter object.
-           * Any standard filter can be safely loaded synchronously.
-           *
-           * **ATTENTION**: The current implementation only supports filters that can be
-           * converted to [DNF]{@link pentaho.data.filter.Abstract#toDnf} _in a reasonable amount of time_.
-           *
-           * @name selectionFilter
-           * @memberOf pentaho.visual.base.View#
-           * @type {pentaho.data.filter.Abstract}
-           */
           name: "selectionFilter",
           valueType: AbstractFilter,
 

@@ -54,7 +54,7 @@ define([
         return current;
       }
 
-      var data = this.model.data;
+      var data = this.data;
       if(!data) {
         return current;
       }
@@ -97,7 +97,7 @@ define([
         // the `input` filter includes only `row1` and `row2`.
 
         // Filtering-out rows with all null measures can speed up things a lot.
-        var measureFieldNames = this.model.measureFieldNames;
+        var measureFieldNames = this.measureFieldNames;
         if(measureFieldNames.length > 0) {
           var measureIndexes = dataUtil.getColumnIndexesByIds(data, measureFieldNames);
 

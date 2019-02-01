@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,9 @@ define([
   "pentaho/module!_",
   "pentaho/visual/base/View",
   "pentaho/visual/models/Abstract",
-  "pentaho/visual/action/Select",
-  "pentaho/visual/action/Execute",
-  "pentaho/visual/action/SelectionModes",
   "pentaho/lang/UserError",
   "cdf/lib/CCC/def",
   "cdf/lib/CCC/pvc",
-  "cdf/lib/CCC/cdo",
   "cdf/lib/CCC/protovis",
   "./_util",
   "pentaho/data/util",
@@ -34,12 +30,12 @@ define([
   "pentaho/visual/color/utils",
   "pentaho/data/TableView",
   "pentaho/util/logger",
+  "pentaho/util/spec",
   "pentaho/debug",
   "pentaho/debug/Levels",
   "pentaho/i18n!view"
-], function(module, BaseView, Model, SelectAction, ExecuteAction, SelectionModes,
-            UserError, def, pvc, cdo, pv, util, dataUtil, OrFilter, AndFilter, IsEqualFilter,
-            O, visualColorUtils, DataView, logger, debugMgr, DebugLevels, bundle) {
+], function(module, BaseView, Model, UserError, def, pvc, pv, util, dataUtil, OrFilter, AndFilter, IsEqualFilter,
+            O, visualColorUtils, DataView, logger, specUtil, debugMgr, DebugLevels, bundle) {
 
   "use strict";
 
@@ -71,14 +67,7 @@ define([
     "dataCategoriesCount": 1
   };
 
-  return BaseView.extend(/** @lends pentaho.ccc.visual.Abstract# */{
-
-    $type: {
-      id: module.id,
-      props: {
-        model: {valueType: Model}
-      }
-    },
+  var AbstractView = BaseView.extend(module.id, /** @lends pentaho.ccc.visual.Abstract# */{
 
     // region PROPERTIES
     _options: {
@@ -227,11 +216,14 @@ define([
     },
 
     /** @inheritDoc */
-    _releaseDomContainer: function() {
+    dispose: function() {
+
       if(this._chart && this._chart.dispose) {
         this._chart.dispose();
         this._chart = null;
       }
+
+      this.base();
     },
 
     /** @inheritDoc */
@@ -305,8 +297,10 @@ define([
     _doResize: function() {
       if(this._chart) {
         var options = this._chart.options;
-        options.width = this.width;
-        options.height = this.height;
+
+        var model = this.model;
+        options.width = model.width;
+        options.height = model.height;
 
         this._prepareLayout();
 
@@ -317,11 +311,12 @@ define([
     _initOptions: function() {
       // Recursively inherit this class' shared options
       var options = this.options = def.create(this._options);
+      var model = this.model;
       def.set(
         options,
         "canvas", this.domContainer,
-        "height", this.height || 400,
-        "width", this.width || 400,
+        "height", model.height || 400,
+        "width", model.width || 400,
         "dimensions", {},
         "visualRoles", {},
         "readers", []);
@@ -1494,7 +1489,7 @@ define([
 
       var valid = null;
 
-      var extension = this.$type.extensionEffective;
+      var extension = this.extensionEffective;
       if(extension) {
         def.each(extension, function(v, p) {
           if(!def.hasOwn(extensionBlacklist, p)) {
@@ -1616,10 +1611,10 @@ define([
 
       var srcEvent = cccContext.event;
 
-      this.act(new SelectAction({
+      this.select({
         dataFilter: selectFilter,
         position: srcEvent ? {x: srcEvent.clientX, y: srcEvent.clientY} : null
-      }));
+      });
 
       // Explicitly cancel CCC's own selection handling.
       return [];
@@ -1695,10 +1690,10 @@ define([
 
       var srcEvent = cccContext.event;
 
-      this.act(new ExecuteAction({
+      this.execute({
         dataFilter: executeFilter,
         position: srcEvent ? {x: srcEvent.clientX, y: srcEvent.clientY} : null
-      }));
+      });
     },
 
     _createExecuteFilter: function(cccContext) {
@@ -1752,8 +1747,75 @@ define([
       });
 
       return filter;
-    }
+    },
     // endregion
+
+    // region Extension
+    __extension: null,
+    __extensionEf: undefined,
+
+    /**
+     * Gets or sets extension properties.
+     *
+     * This property is expected to be specified through configuration.
+     *
+     * Returns `null` when there are no local extension properties.
+     *
+     * @type {?object}
+     *
+     * @see pentaho.ccc.visual.Abstract#extensionEffective
+     * @see pentaho.ccc.visual.spec.IAbstractConfig#extension
+     */
+    get extension() {
+      return this.__extension;
+    },
+
+    set extension(value) {
+      this.__extension = value ? Object(value) : null;
+      this.__extensionEf = undefined;
+    },
+
+    /**
+     * Gets the effective extension properties,
+     * a merge between the inherited extension properties and the
+     * locally specified extension properties.
+     *
+     * The merging is performed using the rules of the
+     * {@link pentaho.util.Spec#merge} method.
+     *
+     * Returns `null` when there are no local or inherited extension properties.
+     *
+     * @readOnly
+     * @type {?object}
+     *
+     * @see pentaho.ccc.visual.Abstract#extension
+     */
+    get extensionEffective() {
+      var effective = this.__extensionEf;
+      if(effective === undefined) {
+        effective = null;
+
+        if(AbstractView != null) {
+          var ancestor = Object.getPrototypeOf(this);
+          if(ancestor !== AbstractView.prototype) {
+            var ancestorExtEf = ancestor.extensionEffective;
+            if(ancestorExtEf) {
+              effective = {};
+              specUtil.merge(effective, ancestorExtEf);
+            }
+          }
+        }
+
+        if(this.__extension) {
+          if(!effective) effective = {};
+          specUtil.merge(effective, this.__extension);
+        }
+
+        this.__extensionEf = effective;
+      }
+
+      return effective;
+    }
   }, /** @lends pentaho.ccc.visual.Abstract */{
 
     /**
@@ -1776,7 +1838,19 @@ define([
       instSpec._options = def.mixin.share({}, this.prototype._options, instSpec._options || {});
 
       return this.base(name, instSpec, classSpec, keyArgs);
+    },
+
+    /** @inheritDoc */
+    _subclassed: function(Subclass, instSpec, classSpec, keyArgs) {
+
+      // Block inheritance, with default values
+      Subclass.prototype.__extension = null;
+      Subclass.prototype.__extensionEf = undefined;
+
+      this.base(Subclass, instSpec, classSpec, keyArgs);
     }
   })
-  .configure({$type: module.config});
+  .implement(module.config);
+
+  return AbstractView;
 });

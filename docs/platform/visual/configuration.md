@@ -146,14 +146,12 @@ See [pentaho/i18n]({{site.refDocsUrlPattern | replace: '$', 'pentaho.i18n'}}).
 ## Examples of typical View configurations
 
 Note that view configuration is typically tied to the technology with which views are built.
-The 
-[ViewType#extension]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.ViewType' | append: '#extension'}})
-attribute exists to satisfy the pass-through of such options of the underlying technology.
-You should consult the view type documentation to find out about which extension properties it supports.
+You should consult the view documentation to find out about which extension properties it supports.
 
 The views of stock visualizations are implemented using the 
 [CCC](https://community.hitachivantara.com/docs/DOC-1009860) charting library,
-and can be customized using its rich set of extension points.
+and can be customized using its rich set of extension points, 
+by specifying these in an object in the `extension` configuration property.
 
 ### Thicken the axes rules of stock visualizations
 
