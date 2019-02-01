@@ -15,13 +15,15 @@
  */
 define([
   "pentaho/type/Complex",
+  "pentaho/action/States",
   "pentaho/type/action/TransactionScope",
   "pentaho/type/action/Transaction",
   "pentaho/type/action/TransactionRejectedError",
   "pentaho/type/action/Changeset",
   "pentaho/type/action/ChangeRef",
   "tests/pentaho/util/errorMatch"
-], function(Complex, TransactionScope, Transaction, TransactionRejectedError, Changeset, ChangeRef, errorMatch) {
+], function(Complex, States, TransactionScope, Transaction, TransactionRejectedError,
+            Changeset, ChangeRef, errorMatch) {
 
   "use strict";
 
@@ -54,6 +56,47 @@ define([
         var txn = new Transaction();
 
         expect(txn.isCurrent).toBe(false);
+      });
+
+      it("should have isSync = true", function() {
+        var txn = new Transaction();
+
+        expect(txn.isSync).toBe(true);
+      });
+
+      it("should throw getting undefined action", function() {
+        var txn = new Transaction();
+
+        expect(function() {
+          var action = txn.action;
+        }).toThrow(errorMatch.operInvalid("Action is not set."));
+      });
+
+      it("should have result = undefined", function() {
+        var txn = new Transaction();
+
+        expect(txn.result).toBe(undefined);
+      });
+
+      it("should have error = null", function() {
+        var txn = new Transaction();
+
+        expect(txn.error).toBe(null);
+      });
+
+      it("should have state = unstarted", function() {
+        var txn = new Transaction();
+
+        expect(txn.state).toBe(States.unstarted);
+
+        expect(txn.isUnstarted).toBe(true);
+        expect(txn.isExecuting).toBe(false);
+        expect(txn.isSettled).toBe(false);
+        expect(txn.isFinished).toBe(false);
+        expect(txn.isRejected).toBe(false);
+        expect(txn.isCanceled).toBe(false);
+        expect(txn.isFailed).toBe(false);
+        expect(txn.isDone).toBe(false);
       });
     });
 
@@ -1001,6 +1044,114 @@ define([
             });
           });
         });
+      });
+    });
+
+    describe("#__onPhaseWill", function() {
+      var transaction;
+      var scope;
+
+      var container1;
+      var container2;
+
+      beforeEach(function() {
+        transaction = new Transaction();
+        scope = transaction.enter();
+
+        container1 = new DerivedComplex();
+        container2 = new DerivedComplex();
+      });
+
+      afterEach(function() {
+        scope.exit();
+      });
+
+      it("should call the changed targets' _onChangeWill method", function() {
+        spyOn(container1, "_onChangeWill");
+        spyOn(container2, "_onChangeWill");
+
+        container1.x = "foo";
+        container2.x = "bar";
+
+        transaction._onPhaseWill();
+
+        expect(container1._onChangeWill).toHaveBeenCalledTimes(1);
+        expect(container1._onChangeWill).toHaveBeenCalledWith(transaction);
+
+        expect(container2._onChangeWill).toHaveBeenCalledTimes(1);
+        expect(container2._onChangeWill).toHaveBeenCalledWith(transaction);
+      });
+
+      it("should stop calling the changed targets' _onChangeWill method when a listener" +
+        "rejects the transaction", function() {
+
+        var error = new Error();
+        var willChangeHandler = jasmine.createSpy("change:will").and.callFake(function(txn) {
+          txn.reject(error);
+        });
+
+        container1.on("change", {will: willChangeHandler});
+
+        spyOn(container1, "_onChangeWill").and.callThrough();
+        spyOn(container2, "_onChangeWill");
+
+        container1.x = "foo";
+        container2.x = "bar";
+
+        transaction._onPhaseWill();
+
+        expect(container1._onChangeWill).toHaveBeenCalledTimes(1);
+        expect(container2._onChangeWill).not.toHaveBeenCalled();
+
+        expect(transaction.isRejected).toBe(true);
+        expect(transaction.error).toBe(error);
+      });
+    });
+
+    describe("#__onPhaseFinally", function() {
+      var transaction;
+      var scope;
+
+      var container1;
+
+      beforeEach(function() {
+        transaction = new Transaction();
+        scope = transaction.enter();
+
+        container1 = new DerivedComplex();
+      });
+
+      afterEach(function() {
+        scope.exit();
+      });
+
+      it("should call the targets' _onChangeFinally method", function() {
+        spyOn(Transaction, "enterCommitted").and.callThrough();
+        spyOn(container1, "_onChangeFinally");
+
+        container1.x = "foo";
+
+        transaction._onPhaseFinally();
+
+        expect(Transaction.enterCommitted).toHaveBeenCalledTimes(1);
+
+        expect(container1._onChangeFinally).toHaveBeenCalledTimes(1);
+        expect(container1._onChangeFinally).toHaveBeenCalledWith(transaction);
+      });
+
+      it("should exit all scopes before calling the targets' _onChangeFinally method", function() {
+        transaction.__scopeCount = 2;
+        spyOn(transaction, "__exitingAmbient");
+
+        spyOn(container1, "_onChangeFinally");
+        container1.x = "foo";
+
+        transaction._onPhaseFinally();
+
+        expect(transaction.__exitingAmbient).toHaveBeenCalledTimes(1);
+
+        expect(container1._onChangeFinally).toHaveBeenCalledTimes(1);
+        expect(container1._onChangeFinally).toHaveBeenCalledWith(transaction);
       });
     });
 
