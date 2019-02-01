@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1136,15 +1136,15 @@ define([
 
         view.isAutoUpdate = false;
 
-        var didChangeHandler = jasmine.createSpy().and.callFake(function() {
+        var finallyChangeHandler = jasmine.createSpy().and.callFake(function() {
           expect(view.isDirty).toBe(true);
         });
 
-        model.on("did:change", didChangeHandler);
+        model.on("change", {finally: finallyChangeHandler});
 
         model.selectionFilter = {_: "true"}; // Marks the view as dirty
 
-        expect(didChangeHandler).toHaveBeenCalled();
+        expect(finallyChangeHandler).toHaveBeenCalled();
       });
 
     }); // #isDirty
@@ -1497,25 +1497,26 @@ define([
           var viewSpec2 = view.toSpec();
           expect(viewSpec2).toEqual(viewSpec);
 
-          var didChangeSpy = jasmine.createSpy("did:change");
-          view.on("did:change", didChangeSpy);
+          var finallyChangeSpy = jasmine.createSpy("change:finally");
+
+          view.on("change", {finally: finallyChangeSpy});
 
           view.configure(viewSpec);
 
-          expect(didChangeSpy).not.toHaveBeenCalled();
+          expect(finallyChangeSpy).not.toHaveBeenCalled();
         });
       });
     });
 
     describe("#act", function() {
+      var customActionType = "my/test/Action";
       var CustomSyncAction;
 
       beforeAll(function() {
         // Assuming pre-loaded with View
         CustomSyncAction = BaseAction.extend({
-          $type: {
-            id: "my/test/Action",
-            isAbstract: false
+          get type() {
+            return customActionType;
           }
         });
       });
@@ -1549,7 +1550,7 @@ define([
         };
 
         var view = new BaseView();
-        view.on(CustomSyncAction.type.id, observer);
+        view.on(customActionType, observer);
 
         var actionExecution = view.act(new CustomSyncAction());
 
@@ -1575,8 +1576,7 @@ define([
         };
 
         var view = new BaseView();
-
-        view.on(CustomSyncAction.type.id, observer);
+        view.on(customActionType, observer);
 
         return view.act(new CustomSyncAction()).promise.then(function() {
           return Promise.reject("Should have been rejected.");
@@ -1602,8 +1602,7 @@ define([
         };
 
         var view = new BaseView();
-
-        view.on(CustomSyncAction.type.id, observer);
+        view.on(customActionType, observer);
 
         return view.act(new CustomSyncAction()).promise.then(function() {
           return Promise.reject("Should have been rejected.");

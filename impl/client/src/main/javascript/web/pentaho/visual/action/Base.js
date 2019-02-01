@@ -15,24 +15,16 @@
  */
 define([
   "pentaho/module!_",
-  "pentaho/type/action/Base"
+  "pentaho/action/Generic"
 ], function(module, ActionBase) {
 
   "use strict";
 
   /**
-   * @name pentaho.visual.action.BaseType
-   * @class
-   * @extends pentaho.type.action.BaseType
-   *
-   * @classDesc The type class of {@link pentaho.visual.action.Base}.
-   */
-
-  /**
    * @name Base
    * @memberOf pentaho.visual.action
    * @class
-   * @extends pentaho.type.action.Base
+   * @extends pentaho.action.Base
    * @abstract
    *
    * @amd pentaho/visual/action/Base
@@ -45,11 +37,5 @@ define([
    * @constructor
    */
 
-  return ActionBase.extend(/** @lends pentaho.visual.action.Base# */{
-    $type: /** @lends pentaho.visual.action.BaseType# */{
-      id: module.id,
-      isAbstract: true
-    }
-  })
-  .configure({$type: module.config});
+  return ActionBase.extend(module.id);
 });

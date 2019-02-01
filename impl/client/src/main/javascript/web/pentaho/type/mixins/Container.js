@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,32 @@ define([
   "pentaho/lang/Base",
   "pentaho/lang/EventSource",
   "../ReferenceList",
-  "../changes/Transaction",
-  "../events/WillChange",
-  "../events/RejectedChange",
-  "../events/DidChange",
+  "../action/Transaction",
   "pentaho/util/object"
-], function(module, Base, EventSource, ReferenceList, Transaction, WillChange, RejectedChange, DidChange, O) {
+], function(module, Base, EventSource, ReferenceList, Transaction, O) {
 
   "use strict";
+
+  /**
+   * The `_emitGeneric` keyword arguments used for all phases but the finally phase.
+   *
+   * In the early phases:
+   * - cancellation is possible;
+   * - arbitrary errors cause the action to fail.
+   *
+   * In the finally phase:
+   * - it is not possible to cancel;
+   * - errors are swallowed and logged and do not affect the action execution's result;
+   *   the default error handler does this.
+   */
+  var __emitActionKeyArgs = {
+    errorHandler: function(ex, actionExecution) {
+      actionExecution.fail(ex);
+    },
+    isCanceled: function(actionExecution) {
+      return actionExecution.isCanceled;
+    }
+  };
 
   /**
    * The unique id number of the next created container.
@@ -65,7 +83,7 @@ define([
       /**
        * Version number.
        *
-       * Updated with each transaction's version on Transaction#__commit.
+       * Updated with each transaction's version on Transaction#execute.
        *
        * @memberOf pentaho.type.mixins.Container#
        * @type {number}
@@ -77,7 +95,7 @@ define([
        * Ambient changeset. Set whenever this container has a changeset in the ambient transaction.
        *
        * @memberOf pentaho.type.mixins.Container#
-       * @type {pentaho.type.changes.Changeset}
+       * @type {pentaho.type.action.Changeset}
        * @private
        * @internal
        */
@@ -176,7 +194,7 @@ define([
      *
      * @private
      * @internal
-     * @friend {pentaho.type.changes.Changeset}
+     * @friend {pentaho.type.action.Changeset}
      * @friend {pentaho.data.filter.Abstract}
      */
     __setVersionInternal: function(version) {
@@ -188,7 +206,7 @@ define([
     /**
      * Gets the changeset of this instance in the ambient transaction, if any, or `null`.
      *
-     * @type {pentaho.type.changes.Changeset}
+     * @type {pentaho.type.action.Changeset}
      * @readonly
      */
     get $changeset() {
@@ -227,101 +245,78 @@ define([
     },
 
     /**
-     * Creates a changeset with this container as owner and returns it.
+     * Creates a changeset with this container as target and returns it.
      *
      * @name pentaho.type.mixins.Container#_createChangeset
      *
      * @method
      *
-     * @param {pentaho.type.changes.Transaction} transaction - The transaction that owns this changeset.
+     * @param {pentaho.type.action.Transaction} transaction - The transaction that owns this changeset.
      *
-     * @return {pentaho.type.changes.Changeset} A changeset of the appropriate type.
+     * @return {pentaho.type.action.Changeset} A changeset of the appropriate type.
      *
      * @abstract
      * @protected
      */
 
     /**
-     * Called before a changeset is committed.
+     * Emits the `init` phase event of a change action execution.
      *
-     * The default implementation emits the "will:change" event for the given changeset,
-     * if there are any listeners.
+     * The default implementation delegates to
+     * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
      *
-     * When overriding, be sure to call the base implementation.
-     *
-     * @param {pentaho.type.changes.Changeset} changeset - The set of changes.
+     * @param {pentaho.type.action.Transaction} actionExecution - The action execution.
      * @param {?object} [keyArgs] - The keyword arguments' object.
-     * See [EventSource#_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
-     *
-     * @return {pentaho.lang.UserError} An error if the changeset was canceled; `null` otherwise.
      *
      * @protected
-     * @internal
-     * @friend {pentaho.type.changes.Transaction}
      */
-    _onChangeWill: function(changeset, keyArgs) {
+    _onChangeInit: function(actionExecution, keyArgs) {
 
-      if(this._hasListeners("will:change")) {
+      try {
+        var action = actionExecution.action;
+        var eventType = action.eventName;
 
-        var event = new WillChange(this, changeset);
-
-        try {
-          var result = keyArgs == null
-            ? this._emitSafe(event)
-            : this._emitGeneric(this, [event], event.type, null, keyArgs);
-
-          if(!result) {
-            return event.cancelReason;
-          }
-        } catch(ex) {
-          // `isCritical` listeners can throw...
-          event.cancel(ex);
-          return event.cancelReason;
-        }
-      }
-
-      return null;
-    },
-
-    /**
-     * Called after a changeset has been committed.
-     *
-     * The default implementation emits the "did:change" event for the given changeset,
-     * if there are any listeners.
-     *
-     * When overriding, be sure to call the base implementation.
-     *
-     * @param {pentaho.type.changes.Changeset} changeset - The set of changes.
-     *
-     * @protected
-     * @internal
-     * @friend {pentaho.type.changes.Transaction}
-     */
-    _onChangeDid: function(changeset) {
-      if(this._hasListeners("did:change")) {
-        this._emitSafe(new DidChange(this, changeset));
+        this._emitGeneric(this, [actionExecution, action], eventType, "init", keyArgs);
+      } catch(ex) {
+        // `isCritical` listeners can throw...
+        actionExecution.reject(ex);
       }
     },
 
     /**
-     * Called after a changeset has been rejected.
+     * Emits the `will` phase event of a change action execution.
      *
-     * The default implementation emits the "rejected:change" event for the given changeset,
-     * if there are any listeners.
+     * The default implementation delegates to
+     * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
      *
-     * When overriding, be sure to call the base implementation.
-     *
-     * @param {pentaho.type.changes.Changeset} changeset - The set of changes.
-     * @param {Error} reason - The reason why the changes were rejected.
+     * @param {pentaho.type.action.Transaction} actionExecution - The action execution.
      *
      * @protected
-     * @internal
-     * @friend {pentaho.type.changes.Transaction}
      */
-    _onChangeRejected: function(changeset, reason) {
-      if(this._hasListeners("rejected:change")) {
-        this._emitSafe(new RejectedChange(this, changeset, reason));
-      }
+    _onChangeWill: function(actionExecution) {
+
+      var action = actionExecution.action;
+      var eventType = action.eventName;
+
+      this._emitGeneric(this, [actionExecution, action], eventType, "will", __emitActionKeyArgs);
+    },
+
+    /**
+     * Emits the `finally` phase event of a change action execution.
+     *
+     * The default implementation delegates to
+     * [_emitGeneric]{@link pentaho.lang.EventSource#_emitGeneric}.
+     *
+     * @param {pentaho.type.action.Transaction} actionExecution - The action execution.
+     *
+     * @protected
+     */
+    _onChangeFinally: function(actionExecution) {
+
+      var action = actionExecution.action;
+      var eventType = action.eventName;
+
+      this._emitGeneric(this, [actionExecution, action], eventType, "finally");
     }
     // endregion
   })

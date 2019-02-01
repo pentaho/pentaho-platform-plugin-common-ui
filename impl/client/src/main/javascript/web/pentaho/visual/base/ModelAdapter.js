@@ -23,8 +23,8 @@ define([
   "pentaho/data/filter/Or",
   "pentaho/data/filter/And",
   "pentaho/type/loader",
-  "pentaho/type/changes/Transaction",
-  "pentaho/type/changes/ComplexChangeset",
+  "pentaho/type/action/Transaction",
+  "pentaho/type/action/ComplexChangeset",
   "pentaho/data/Table",
   "pentaho/data/util",
   "pentaho/util/object",
@@ -43,7 +43,7 @@ define([
    * target abstract model.
    * @memberOf pentaho.visual.base
    * @class
-   * @extends pentaho.type.changes.ComplexChangeset
+   * @extends pentaho.type.action.ComplexChangeset
    * @private
    */
   var ModelAdapterChangeset = ComplexChangeset.extend({
@@ -62,7 +62,7 @@ define([
     },
 
     __getAdaptationModel: function() {
-      return this.__adaptationModel = __createAdaptationModel(this.owner, this.__adaptationModel, this);
+      return this.__adaptationModel = __createAdaptationModel(this.target, this.__adaptationModel, this);
     },
 
     /** @inheritDoc */
@@ -152,16 +152,20 @@ define([
       // that the handler would be attached already) because this is a new object. Also mappings are created
       // internally.
       //
-      // 2. Registering a listener has advantages over overriding _onChangeWill, as the transaction manages
-      // to only call a listener if things changed below it since the last time it was called.
-      // On the other hand, this will cause the commitWill evaluation phase to always have to execute its
+      // 2. Registering a listener has advantages over overriding _onChangeInit, as the
+      // transaction manages to only call a listener if things changed below it since the last time it was called.
+      // On the other hand, this will cause the commitInit evaluation phase to always have to execute its
       // lengthier path.
       //
-      // 3. Must be the last will:change listener, or the internal model is not guaranteed to be in sync.
+      // 3. Must be the last change:init phase listener, or the internal model is not guaranteed to be in sync.
       //    TODO: find a way to ensure that we're really the last listener.
-      this.on("will:change", this.__onChangeWillHandler.bind(this), {priority: -Infinity, isCritical: true});
+      this.on("change", {
+        init: this.__onChangeInitHandler.bind(this)
+      }, {priority: -Infinity, isCritical: true});
 
-      this.model.on("will:change", this.__onModelChangeWillHandler.bind(this), {priority: -Infinity, isCritical: true});
+      this.model.on("change", {
+        init: this.__onModelChangeInitHandler.bind(this)
+      }, {priority: -Infinity, isCritical: true});
     },
 
     /** @inheritDoc */
@@ -243,44 +247,46 @@ define([
     },
 
     /**
-     * Event handler for the `will:change` event as emitted by this object.
+     * Event handler for the for the `change:init` event as emitted by this object.
      *
-     * @param {pentaho.type.events.WillChange} event - The will change event.
+     * @param {pentaho.type.action.Transaction} transactionExecution - The action execution.
+     *
      * @private
      */
-    __onChangeWillHandler: function(event) {
+    __onChangeInitHandler: function(actionExecution) {
 
-      var changeset = event.changeset;
+      var changeset = actionExecution.action;
       var propertyNames = changeset.propertyNames;
 
       if(__hasSingleChange(propertyNames, "selectionFilter")) {
 
-        // console.log("[ModelAdapter] will:change modelAdapter.selectionFilter " +
+        // console.log("[ModelAdapter] change:init modelAdapter.selectionFilter " +
         //   (this.selectionFilter && this.selectionFilter.$contentKey));
 
         this.__updateInternalSelection();
 
       } else {
 
-        // console.log("[ModelAdapter] will:change other");
+        // console.log("[ModelAdapter] change:init other");
 
         this.__updateInternalModel();
       }
     },
 
     /**
-     * Event handler for the `will:change` event as emitted by this.model.
+     * Event handler for the for the `change:init` event as emitted by this.model.
      *
-     * @param {pentaho.type.events.WillChange} event - The will change event.
+     * @param {pentaho.type.action.Transaction} actionExecution - The action execution.
+     *
      * @private
      */
-    __onModelChangeWillHandler: function(event) {
+    __onModelChangeInitHandler: function(actionExecution) {
 
-      var changeset = event.changeset;
+      var changesetAction = actionExecution.action;
 
-      if(changeset.hasChange("selectionFilter")) {
+      if(changesetAction.hasChange("selectionFilter")) {
 
-        // console.log("[ModelAdapter] will:change model.selectionFilter");
+        // console.log("[ModelAdapter] change:init model.selectionFilter");
 
         this.__updateExternalSelection();
       }
@@ -335,7 +341,7 @@ define([
      */
     __updateInternalSelection: function() {
       // In a scenario where the external selectionFilter is updated,
-      // this gets called and, unfortunately, the following will also cause __onModelChangeWillHandler to be called,
+      // this gets called and, unfortunately, the following will also cause __onModelChangeInitHandler to be called,
       // which will update back the external selectionFilter...
       this.model.selectionFilter = this.__calcInternalSelectionFilter();
     },
@@ -377,6 +383,7 @@ define([
 
       return null;
     },
+
     /**
      * Calculates the external selection filter based on the internal one.
      *

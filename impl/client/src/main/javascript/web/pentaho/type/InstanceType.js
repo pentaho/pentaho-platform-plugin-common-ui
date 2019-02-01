@@ -1731,7 +1731,7 @@ define([
     // @override
     /*
      * Only takes effect in classes derived from this one.
-     * See Base.js.
+     * See Generic.js.
      * @ignore
      */
     _subclassed: function(SubTypeCtor, instSpec, classSpec, keyArgs) {

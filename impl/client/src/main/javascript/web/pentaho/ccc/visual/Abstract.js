@@ -247,7 +247,7 @@ define([
         // Skipping rows with all null measures, when converting from cross-tab, can speed up things a lot.
         // The dataView sourceColumns are not relevant as filter uses the field names.
         // TODO: replace by a view of plain table without all null measures rows.
-        // There's a similar construct in Analyzer cv.Report#displayClientSideReport / will:change handler
+        // There's a similar construct in Analyzer cv.Report#displayClientSideReport / change:init handler
         // and in pentaho.visual.action.SelectionModes.toggle
         var dataTable = this.model.data;
         if(dataTable.originalCrossTable) {

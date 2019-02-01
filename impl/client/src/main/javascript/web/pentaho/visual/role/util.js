@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/Transaction",
   "pentaho/data/util",
   "pentaho/util/arg",
   "pentaho/util/fun"
@@ -148,7 +148,7 @@ define([
         // Query if the visual role is valid.
         // Do not accept the transaction. Rollback changes.
 
-        var isRoleValid = scope.acceptWill().isFulfilled && !propType.validateOn(vizModel);
+        var isRoleValid = !scope.acceptWill().isRejected && !propType.validateOn(vizModel);
         if(!isRoleValid) {
           return null;
         }

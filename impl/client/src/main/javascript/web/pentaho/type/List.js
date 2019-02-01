@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ define([
   "./Value",
   "./Element",
   "./mixins/Container",
-  "./changes/ListChangeset",
+  "./action/ListChangeset",
   "./util",
   "./SpecificationContext",
   "./_baseLoader",
@@ -192,8 +192,8 @@ define([
      *
      * @private
      * @internal
-     * @friend {pentaho.type.changes.ListChangeset}
-     * @see pentaho.type.changes.ListChangeset#__projectedMock
+     * @friend {pentaho.type.action.ListChangeset}
+     * @see pentaho.type.action.ListChangeset#__projectedMock
      */
     _cloneElementData: function(clone, useCommitted) {
       var mock = useCommitted ? this : this.__projectedMock;
@@ -213,7 +213,7 @@ define([
      * @readOnly
      * @private
      * @internal
-     * @see pentaho.type.changes.ListChangeset#__projectedMock
+     * @see pentaho.type.action.ListChangeset#__projectedMock
      */
     get __projectedMock() {
       var cset;

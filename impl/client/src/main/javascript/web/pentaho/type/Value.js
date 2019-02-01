@@ -16,7 +16,7 @@
 define([
   "pentaho/module!_",
   "./Instance",
-  "./changes/Transaction",
+  "./action/Transaction",
   "./util",
   "./ValidationError",
   "./SpecificationContext",

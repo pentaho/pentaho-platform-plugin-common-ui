@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,7 @@ define([
   "./PropertyTypeCollection",
   "./util",
   "./mixins/Container",
-  "./changes/ComplexChangeset",
-  "pentaho/lang/ActionResult",
+  "./action/ComplexChangeset",
   "pentaho/lang/UserError",
   "pentaho/util/object",
   "pentaho/util/error",
@@ -32,7 +31,7 @@ define([
   "./List",
   "./standardSimple"
 ], function(module, Value, Element, Property, PropertyTypeCollection, typeUtil,
-            ContainerMixin, ComplexChangeset, ActionResult, UserError,
+            ContainerMixin, ComplexChangeset, UserError,
             O, error, bundle) {
 
   "use strict";
@@ -378,8 +377,8 @@ define([
      *      the property's defaulted status changes:
      *      1. If the property is [read-only]{@link pentaho.type.PropertyType#isReadOnly}, an error is thrown.
      *      2. Otherwise, the current value and the defaulted status are replaced by the new ones.
-     *      3. A change action is executed, resulting in the change events `will:change` and
-     *         `did:change` or `rejected:change` being emitted.
+     *      3. A change action is executed, resulting in the `change` phase events `init`,
+     *         `will` and `finally`  being emitted.
      *
      *   4. Otherwise, if `value` and the defaulted status do not change, nothing is done.
      *
@@ -409,10 +408,7 @@ define([
      *
      * @see pentaho.type.Value#configure
      * @see pentaho.type.Value#isReadOnly
-     *
-     * @fires "will:change"
-     * @fires "did:change"
-     * @fires "rejected:change"
+     * @see pentaho.action.Execution
      */
     set: function(name, valueSpec) {
 

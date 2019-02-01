@@ -17,7 +17,7 @@ define([
   "pentaho/visual/base/Model",
   "pentaho/visual/role/Property",
   "tests/pentaho/util/errorMatch",
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/Transaction",
   "pentaho/type/ValidationError",
   "pentaho/type/SpecificationScope",
   "pentaho/data/Table",

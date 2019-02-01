@@ -21,16 +21,6 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.action.UpdateType
-   * @class
-   * @extends pentaho.visual.action.BaseType
-   *
-   * @classDesc The type class of the update action.
-   *
-   * For more information see {@link pentaho.visual.action.Update}.
-   */
-
-  /**
    * @name Update
    * @memberOf pentaho.visual.action
    * @class
@@ -41,18 +31,19 @@ define([
    * @classDesc The `visual.action.Update` class is the class of actions which
    * represent a [View]{@link pentaho.visual.base.View} being updated.
    *
-   * The update action is [asynchronous]{@link pentaho.type.action.BaseType#isSync}.
+   * The update action is [asynchronous]{@link pentaho.action.Base.isSync}.
    *
    * @description Creates an update action instance given its specification.
    * @param {pentaho.visual.action.spec.IBase} [spec] A base action specification.
    * @constructor
    */
-
-  return BaseAction.extend(/** @lends pentaho.visual.action.Update# */{
-    $type: {
-      id: module.id,
-      isSync: false
+  return BaseAction.extend(module.id, {
+    get type() {
+      return module.id;
     }
-  })
-  .configure({$type: module.config});
+  }, {
+    get isSync() {
+      return false;
+    }
+  });
 });

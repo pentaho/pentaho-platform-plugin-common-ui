@@ -23,7 +23,7 @@ define([
   "pentaho/data/filter/Abstract",
   "pentaho/type/Object",
   "pentaho/util/object",
-  "pentaho/type/changes/ComplexChangeset",
+  "pentaho/type/action/ComplexChangeset",
   "pentaho/i18n!model",
   // Pre-load all registered filter types.
   "pentaho/module/subtypesOf!pentaho/data/filter/Abstract"
@@ -32,13 +32,13 @@ define([
 
   "use strict";
 
-  // NOTE: Doing it this way, did:change listeners cannot observe invalid cached information.
+  // NOTE: Doing it this way, `change:finally` phase listeners cannot observe invalid cached information.
   /**
    * @classDesc Manages the lifetime of the cached information of the mapping instances associated with a
    * target abstract model.
    * @memberOf pentaho.visual.base
    * @class
-   * @extends pentaho.type.changes.ComplexChangeset
+   * @extends pentaho.type.action.ComplexChangeset
    * @private
    */
   var AbstractModelChangeset = ComplexChangeset.extend({
@@ -121,7 +121,7 @@ define([
 
     /**
      * Called when the data property or any of the visual role properties has changed,
-     * but before notifying any `did:change` listeners.
+     * but before notifying any `change:finally` phase listeners of a change action.
      *
      * The default implementation calls the
      * [_onDataOrMappingChanged]{@link pentaho.visual.role.AbstractMapping#_onDataOrMappingChanged}

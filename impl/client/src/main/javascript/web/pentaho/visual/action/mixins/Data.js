@@ -28,16 +28,6 @@ define([
   var __abstractFilterType = AbstractFilter.type;
 
   /**
-   * @name pentaho.visual.action.mixins.DataType
-   * @class
-   * @extends pentaho.visual.action.BaseType
-   *
-   * @classDesc The type class of the data action mixin.
-   *
-   * For more information see {@link pentaho.visual.action.mixins.Data}.
-   */
-
-  /**
    * @name Data
    * @memberOf pentaho.visual.action.mixins
    * @class
@@ -60,12 +50,7 @@ define([
    * @constructor
    */
 
-  return ActionBase.extend(/** @lends pentaho.visual.action.mixins.Data# */{
-    $type: {
-      id: module.id,
-      isAbstract: true
-    },
-
+  return ActionBase.extend(module.id, /** @lends pentaho.visual.action.mixins.Data# */{
     // @override
     _init: function(spec) {
 
@@ -101,22 +86,14 @@ define([
     },
 
     // region serialization
-    toSpecInContext: function(keyArgs) {
+    _fillSpec: function(spec) {
 
-      var spec = this.base(keyArgs);
+      this.base(spec);
 
       if(this.__dataFilter) {
-
-        keyArgs = keyArgs ? Object.create(keyArgs) : {};
-
-        keyArgs.declaredType = __abstractFilterType;
-
-        spec.dataFilter = this.__dataFilter.toSpecInContext(keyArgs);
+        spec.dataFilter = this.__dataFilter;
       }
-
-      return spec;
     }
     // endregion
-  })
-  .configure({$type: module.config});
+  });
 });

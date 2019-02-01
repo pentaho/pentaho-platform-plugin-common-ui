@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/Transaction",
   "pentaho/visual/base/Model",
   "pentaho/data/Table"
 ], function(Transaction, Model, Table) {

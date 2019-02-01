@@ -1,10 +1,10 @@
 /*!
- * Based on Base.js 1.1a (c) 2006-2010, Dean Edwards
+ * Based on Generic.js 1.1a (c) 2006-2010, Dean Edwards
  * Updated to pass JSHint and converted into a module by Kenneth Powers
  * License: http://www.opensource.org/licenses/mit-license.php
  */
 /*!
- * Based on Base.js by Dean Edwards, and later edited by Kenneth Powers.
+ * Based on Generic.js by Dean Edwards, and later edited by Kenneth Powers.
  *
  * Changes:
  * 1. Added support for the `instanceof` operator.
@@ -64,7 +64,7 @@ define([
   var A_slice = Array.prototype.slice;
   var _nextClassId = 1;
   var _excludeExtendInst = Object.freeze({
-    // Base.js gives special meaning to these properties in instance extend specifications
+    // Generic.js gives special meaning to these properties in instance extend specifications
 
     // Special when creating new classes:
     //  Class#extend's instance specification
@@ -75,7 +75,7 @@ define([
     // reserved for instances to call base methods.
     "base": 1,
 
-    // Base.js custom prototype properties (stored in prototypes of Base.js classes)
+    // Generic.js custom prototype properties (stored in prototypes of Generic.js classes)
     "__base_init__": 1,
     "__base_root_proto__": 1,
     "__base_extend_order__": 1,
@@ -85,7 +85,7 @@ define([
     "__base_ops__": 1
   });
   var _excludeExtendStatic = Object.freeze({
-    // Base.js custom constructor properties
+    // Generic.js custom constructor properties
     "ancestor": 1,
     "mixins": 1, // holds list of mixed in classes
     "prototype": 1,
@@ -115,7 +115,7 @@ define([
     /**
      * @classdesc `Base` Class for JavaScript Inheritance.
      *
-     * Based on Base.js by Dean Edwards, and later edited by Kenneth Powers.
+     * Based on Generic.js by Dean Edwards, and later edited by Kenneth Powers.
      *
      * @class
      * @alias Base
@@ -222,14 +222,14 @@ define([
   }
 
   /**
-   * Gets or assigns the Base.js class id of a given prototype.
+   * Gets or assigns the Generic.js class id of a given prototype.
    *
-   * Having a Base.js doesn't imply that a constructor is a class defined by Base.js.
-   * Every mixed in class gets assigned a Base.js id.
+   * Having a Generic.js doesn't imply that a constructor is a class defined by Generic.js.
+   * Every mixed in class gets assigned a Generic.js id.
    *
    * @param {object} proto - The prototype.
    * @param {boolean} [assign] - Indicates is an id is assigned when not present.
-   * @return {number} The Base.js class id.
+   * @return {number} The Generic.js class id.
    */
   function base_getOrAssignClassId(proto, assign) {
     return O_hasOwn.call(proto, "__base_class_id__")
@@ -808,7 +808,7 @@ define([
     if(isClassMixin) {
       (this.mixins || (this.mixins = [])).push(classSpec);
 
-      // Mixing in a Base.js class?
+      // Mixing in a Generic.js class?
       if(instSpec && instSpec.__base_ops__) {
         class_mix_baseJsClass.call(this, classSpec);
         return this;
@@ -824,10 +824,10 @@ define([
   }
 
   /**
-   * Mixes another Base.js class into this one,
+   * Mixes another Generic.js class into this one,
    * by replaying the recorded operations defining it.
    *
-   * @param {function} Other - A Base.js class to mix in.
+   * @param {function} Other - A Generic.js class to mix in.
    * @private
    */
   function class_mix_baseJsClass(Other) {

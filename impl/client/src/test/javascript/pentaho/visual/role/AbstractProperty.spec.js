@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/visual/role/AbstractProperty",
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/Transaction",
   "tests/pentaho/util/errorMatch",
   "pentaho/visual/base/AbstractModel",
   "pentaho/visual/base/KeyTypes",

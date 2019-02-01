@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 - 2018 Hitachi Vantara.  All rights reserved.
+ * Copyright 2017 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,7 @@ define([
 
   beforeAll(function() {
     // Non-abstract, empty action, mixed-in with data mixin.
-    CustomDataAction = BaseAction.extend({
-      $type: {
-        mixins: [DataActionMixin]
-      }
-    });
+    CustomDataAction = BaseAction.extend().mix(DataActionMixin);
   });
 
   describe("pentaho.visual.action.mixins.Data", function() {
@@ -168,39 +164,6 @@ define([
         expect(action.dataFilter).toBe(null);
       });
 
-      describe("#toSpecInContext()", function() {
-
-        it("should not serialize a null dataFilter", function() {
-
-          var action = new CustomDataAction();
-
-          // ---
-
-          var spec = action.toSpec();
-
-          // ---
-
-          expect("dataFilter" in spec).toBe(false);
-        });
-
-        it("should serialize a non-null dataFilter", function() {
-
-          var filter = new IsEqualFilter({property: "a", value: "1"});
-          var action = new CustomDataAction({dataFilter: filter});
-
-          // ---
-
-          var spec = action.toSpec();
-
-          // ---
-
-          expect(spec.dataFilter).toEqual({
-            _: "=",
-            p: "a",
-            v: "1"
-          });
-        });
-      });
     });
   });
 });

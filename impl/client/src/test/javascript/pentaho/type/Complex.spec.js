@@ -19,9 +19,9 @@ define([
   "pentaho/type/Number",
   "pentaho/type/Property",
   "pentaho/type/List",
-  "pentaho/type/changes/Transaction",
+  "pentaho/type/action/Transaction",
   "pentaho/type/PropertyTypeCollection",
-  "pentaho/type/changes/ComplexChangeset",
+  "pentaho/type/action/ComplexChangeset",
   "tests/pentaho/util/errorMatch",
   "tests/pentaho/type/sloppyModeUtil"
 ], function(Value, Complex, PentahoNumber, Property, List,
@@ -721,101 +721,82 @@ define([
           beforeEach(function() {
 
             listeners = jasmine.createSpyObj("listeners", [
+              "init",
               "will",
-              "did",
-              "rejected"
+              "finally"
             ]);
 
-            listeners.will.and.callFake(function(event) {
-              if(event.source.x === THREE) event.cancel();
+            listeners.init.and.callFake(function(event) {
+              if(event.target.x === THREE) event.reject();
             });
 
             complex = new Derived({x: 0});
           });
 
-          describe("Without listeners -", function() {
-
-            it("should not call _emitSafe or _emitGeneric.", function() {
-
-              spyOn(complex, "_emitSafe");
-              spyOn(complex, "_emitGeneric");
-
-              complex.set("x", 1);
-
-              expect(complex._emitSafe).not.toHaveBeenCalled();
-              expect(complex._emitGeneric).not.toHaveBeenCalled();
-            });
-          }); // end without listeners
-
           describe("With listeners -", function() {
 
             beforeEach(function() {
-              complex.on("will:change", listeners.will);
-              complex.on("rejected:change", listeners.rejected);
-              complex.on("did:change", listeners.did);
+              complex.on("change", listeners);
             });
 
-            it("should call the `will:change` listener", function() {
+            it("should call the `change:init` listener", function() {
               complex.x = 1;
-              expect(listeners.will).toHaveBeenCalled();
+              expect(listeners.init).toHaveBeenCalled();
             });
 
-            it("should call the `did:change` listener when successful", function() {
+            it("should call the `change:finally` listener when successful", function() {
               complex.x = 1;
-              expect(listeners.did).toHaveBeenCalled();
-              expect(listeners.rejected).not.toHaveBeenCalled();
+              expect(listeners.finally).toHaveBeenCalled();
               expect(complex.x).toBe(1);
             });
 
-            it("should call the `rejected:change` listener when unsuccessful", function() {
+            it("should call the `change:finally` listener when unsuccessful", function() {
               expect(function() {
                 complex.x = THREE;
               }).toThrow();
 
-              expect(listeners.did).not.toHaveBeenCalled();
-              expect(listeners.rejected).toHaveBeenCalled();
+              expect(listeners.finally).toHaveBeenCalled();
               expect(complex.x).toBe(0);
             });
 
             // Coverage.
-            it("should support having no `rejected:change` listener when unsuccessful", function() {
+            it("should support having no `change:finally` listener when unsuccessful", function() {
 
-              complex.off("rejected:change", listeners.rejected);
+              complex.off("change", listeners);
+              complex.on("change", {init: listeners.init});
 
               expect(function() {
                 complex.x = THREE;
               }).toThrow();
 
-              expect(listeners.did).not.toHaveBeenCalled();
-              expect(listeners.rejected).not.toHaveBeenCalled();
               expect(complex.x).toBe(0);
             });
 
             it("should allow changing an element property value, directly on the complex, " +
-               "from within the `will:change` event", function() {
+               "from within the `change:init` event", function() {
 
-              listeners.will.and.callFake(function(event) {
+              listeners.init.and.callFake(function(event) {
                 expect(function() {
-                  event.source.x = 2;
+                  event.target.x = 2;
                 }).not.toThrow(); // Listeners errors are swallowed.
               });
 
               complex.x = 1;
 
-              expect(listeners.will).toHaveBeenCalled();
+              expect(listeners.init).toHaveBeenCalled();
 
               expect(complex.x).toBe(2);
             });
 
-            it("should initiate a new transaction when setting from a `did:change` event", function() {
+            it("should initiate a new transaction when setting from a successfull `change:finally` event", function() {
               var entryCount = 0;
 
-              listeners.did.and.callFake(function(event) {
+              listeners.finally.and.callFake(function(event) {
                 entryCount++;
 
                 if(entryCount === 1) {
                   // Starts a nested change.
-                  event.source.x = 2;
+                  event.target.x = 2;
                 }
               });
 
@@ -826,14 +807,16 @@ define([
               expect(entryCount).toBe(2);
             });
 
-            it("should initiate a new transaction when setting from a `rejected:change` event", function() {
+            it("should initiate a new transaction when setting from a rejected `change:finally` event", function() {
+
               var entryCount = 0;
 
-              listeners.rejected.and.callFake(function(event) {
+              listeners.finally.and.callFake(function(event) {
                 entryCount++;
+
                 if(entryCount === 1) {
                   // Starts a nested change.
-                  event.source.x = 2;
+                  event.target.x = 2;
                 }
               });
 
@@ -845,27 +828,29 @@ define([
               expect(complex.x).toBe(2);
             });
 
-            it("should emit the `will:change` event when setting a list property to a different value", function() {
+            it("should emit the `change:init` and `change:will` event when setting a list property " +
+              "to a different value", function() {
 
               complex.set("y", [1, 2]);
 
+              expect(listeners.init).toHaveBeenCalled();
               expect(listeners.will).toHaveBeenCalled();
 
               expect(complex.y.at(0).value).toBe(1);
               expect(complex.y.at(1).value).toBe(2);
             });
 
-            it("should allow changing directly the list value from within the `will:change` event", function() {
+            it("should allow changing directly the list value from within the `change:init` event", function() {
 
-              listeners.will.and.callFake(function(event) {
+              listeners.init.and.callFake(function(event) {
                 expect(function() {
-                  event.source.y.add(2);
+                  event.target.y.add(2);
                 }).not.toThrow(); // Listeners errors are swallowed.
               });
 
               complex.y = [1];
 
-              expect(listeners.will).toHaveBeenCalled();
+              expect(listeners.init).toHaveBeenCalled();
 
               expect(complex.y.at(0).value).toBe(1);
               expect(complex.y.at(1).value).toBe(2);
