@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara.  All rights reserved.
+ * Copyright 2018 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 define([
-  "pentaho/visual/base/AbstractModel",
-  "pentaho/visual/base/KeyTypes",
+  "pentaho/visual/AbstractModel",
+  "pentaho/visual/KeyTypes",
   "pentaho/visual/role/AbstractProperty",
   "pentaho/visual/role/AbstractMapping",
   "pentaho/visual/color/PaletteProperty",
@@ -26,7 +26,7 @@ define([
 
   "use strict";
 
-  describe("pentaho.visual.base.AbstractModel", function() {
+  describe("pentaho.visual.AbstractModel", function() {
 
     var Model;
     var dataSpec;
@@ -73,14 +73,14 @@ define([
 
     it("should preload registered filter types", function() {
 
-      require.using(["require", "pentaho/visual/base/AbstractModel"], function(localRequire) {
+      require.using(["require", "pentaho/visual/AbstractModel"], function(localRequire) {
         localRequire("pentaho/data/filter/Or");
       });
     });
 
     it("should pre-load all standard base visual role related modules", function() {
 
-      require.using(["require", "pentaho/visual/base/AbstractModel"], function(localRequire) {
+      require.using(["require", "pentaho/visual/AbstractModel"], function(localRequire) {
         localRequire("pentaho/visual/role/AbstractProperty");
       });
     });

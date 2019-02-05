@@ -132,8 +132,7 @@
   requireModules["pentaho/data/filter/IsLessOrEqual"] = {alias: "<=", base: "pentaho/data/filter/Property"};
   requireModules["pentaho/data/filter/IsLike"] = {alias: "like", base: "pentaho/data/filter/Property"};
 
-  requireModules["pentaho/visual/base/Model"] = {base: "complex"};
-  requireModules["pentaho/visual/base/View"] = {base: "complex"};
+  requireModules["pentaho/visual/Model"] = {base: "complex"};
   requireModules["pentaho/visual/role/adaptation/Strategy"] = {base: "complex"};
   requireModules["pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy"] = {
     base: "pentaho/visual/role/adaptation/Strategy",
@@ -324,8 +323,8 @@
 
   requireModules["pentaho/visual/config/vizApi.conf"] = {type: "pentaho/config/spec/IRuleSet"};
 
-  requireModules["pentaho/visual/models/Abstract"] = {base: "pentaho/visual/base/Model"};
-  requireModules["pentaho/visual/samples/calc/Model"] = {base: "pentaho/visual/base/Model"};
+  requireModules["pentaho/visual/models/Abstract"] = {base: "pentaho/visual/Model"};
+  requireModules["pentaho/visual/samples/calc/Model"] = {base: "pentaho/visual/Model"};
   [
     "pentaho/visual/models/CartesianAbstract",
     "pentaho/visual/models/CategoricalContinuousAbstract",
@@ -556,13 +555,13 @@
       "pentaho/visual/role/MappingField",
       "pentaho/data/util",
       "pentaho/visual/role/AbstractMapping",
-      "pentaho/visual/base/KeyTypes",
+      "pentaho/visual/KeyTypes",
       "pentaho/visual/role/AbstractProperty",
       "pentaho/visual/color/Level",
       "pentaho/visual/color/Palette",
       "pentaho/visual/color/PaletteProperty",
-      "pentaho/visual/base/Application",
-      "pentaho/visual/base/AbstractModel",
+      "pentaho/visual/Application",
+      "pentaho/visual/AbstractModel",
       "pentaho/action/impl/Target",
       "pentaho/action/Generic",
       "pentaho/visual/action/Base",
@@ -580,12 +579,12 @@
       "pentaho/visual/role/Mode",
       "pentaho/visual/role/Mapping",
       "pentaho/visual/role/Property",
-      "pentaho/visual/base/Model",
+      "pentaho/visual/Model",
       "pentaho/util/BitSet",
-      "pentaho/visual/base/View",
+      "pentaho/visual/impl/View",
       "pentaho/visual/role/ExternalMapping",
       "pentaho/visual/role/ExternalProperty",
-      "pentaho/visual/base/ModelAdapter",
+      "pentaho/visual/ModelAdapter",
       "pentaho/visual/color/utils",
       "pentaho/visual/color/palettes/divergentRyb3",
       "pentaho/visual/color/palettes/divergentRyb5",

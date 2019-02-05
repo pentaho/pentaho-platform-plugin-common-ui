@@ -38,7 +38,7 @@
  * @name countRangeOn
  * @memberOf pentaho.visual.role.IFieldsMetadata#
  * @method
- * @param {pentaho.visual.base.AbstractModel} model - The model.
+ * @param {pentaho.visual.AbstractModel} model - The model.
  * @param {object} [keyArgs] - The keyword arguments object.
  * @param {boolean} [keyArgs.ignoreCurrentMode=false] - Indicates that the current mode, if any,
  * should be ignored when determining the count range.

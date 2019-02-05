@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,28 +22,28 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.visual.base.ApplicationType
+   * @name pentaho.visual.ApplicationType
    * @class
    * @extends pentaho.type.ComplexType
    *
    * @classDesc The base type class of visual application types.
    *
-   * For more information see {@link pentaho.visual.base.Application}.
+   * For more information see {@link pentaho.visual.Application}.
    */
 
   /**
-   * @name pentaho.visual.base.Application
+   * @name pentaho.visual.Application
    * @class
    * @extends pentaho.type.Complex
    *
-   * @amd pentaho/visual/base/Application
+   * @amd pentaho/visual/Application
    *
    * @classDesc The base class of visual applications.
    *
    * @description Creates a visual application instance.
    *
    * @constructor
-   * @param {pentaho.visual.base.spec.IApplication} [spec] A visual application specification.
+   * @param {pentaho.visual.spec.IApplication} [spec] A visual application specification.
    */
   return Complex.extend({
     $type: {

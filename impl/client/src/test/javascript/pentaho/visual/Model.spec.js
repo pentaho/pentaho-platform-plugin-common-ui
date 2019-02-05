@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/visual/base/Model",
+  "pentaho/visual/Model",
   "pentaho/visual/action/Base",
   "pentaho/visual/action/Select",
   "pentaho/visual/action/Execute",
@@ -28,7 +28,7 @@ define([
 
   /* eslint dot-notation: 0 */
 
-  describe("pentaho.visual.base.Model", function() {
+  describe("pentaho.visual.Model", function() {
 
     var dataSpec;
 
@@ -80,7 +80,7 @@ define([
 
     it("should pre-load all standard visual role related modules", function() {
 
-      require.using(["require", "pentaho/visual/base/Model"], function(localRequire) {
+      require.using(["require", "pentaho/visual/Model"], function(localRequire) {
         localRequire("pentaho/visual/role/Property");
         localRequire("pentaho/visual/role/Mode");
       });
@@ -88,7 +88,7 @@ define([
 
     describe("ModelType#visualKeyType", function() {
 
-      it("should be undefined in the base.Model class", function() {
+      it("should be undefined in the visual Model class", function() {
 
         expect(Model.type.visualKeyType).toBe(undefined);
       });
@@ -249,7 +249,7 @@ define([
 
         function config(localRequire) {
 
-          localRequire.define("test/foo/Model", ["pentaho/visual/base/Model"], function(BaseModel) {
+          localRequire.define("test/foo/Model", ["pentaho/visual/Model"], function(BaseModel) {
 
             return BaseModel.extend({
               $type: {

@@ -228,10 +228,7 @@
         "alias": "like",
         "base": "pentaho/data/filter/Property"
       },
-      "pentaho/visual/base/Model": {
-        "base": "complex"
-      },
-      "pentaho/visual/base/View": {
+      "pentaho/visual/Model": {
         "base": "complex"
       },
       "pentaho/visual/role/adaptation/Strategy": {
@@ -258,10 +255,10 @@
         "ranking": -20
       },
       "pentaho/visual/models/Abstract": {
-        "base": "pentaho/visual/base/Model"
+        "base": "pentaho/visual/Model"
       },
       "pentaho/visual/samples/calc/Model": {
-        "base": "pentaho/visual/base/Model"
+        "base": "pentaho/visual/Model"
       },
       "pentaho/visual/models/CartesianAbstract": {
         "base": "pentaho/visual/models/Abstract"

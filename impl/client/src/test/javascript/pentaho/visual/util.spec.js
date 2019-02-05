@@ -27,12 +27,12 @@ define([
     describe("getModelAndDefaultViewClassesAsync(vizTypeId)", function() {
 
       function configRequireJs(localRequire) {
-        localRequire.define("test/foo/View", ["pentaho/visual/base/View"], function(BaseView) {
+        localRequire.define("test/foo/View", ["pentaho/visual/impl/View"], function(BaseView) {
           return BaseView.extend({
           });
         });
 
-        localRequire.define("test/foo/Model", ["pentaho/visual/base/Model"], function(BaseModel) {
+        localRequire.define("test/foo/Model", ["pentaho/visual/Model"], function(BaseModel) {
           return BaseModel.extend({
             $type: {
               id: "test/foo/Model",
@@ -41,7 +41,7 @@ define([
           });
         });
 
-        localRequire.define("test/foo/ModelNoDefaultView", ["pentaho/visual/base/Model"], function(BaseModel) {
+        localRequire.define("test/foo/ModelNoDefaultView", ["pentaho/visual/Model"], function(BaseModel) {
           return BaseModel.extend({
             $type: {
               id: "test/foo/ModelNoDefaultView",
@@ -50,7 +50,7 @@ define([
           });
         });
 
-        localRequire.define("test/foo/ModelUndefDefaultView", ["pentaho/visual/base/Model"], function(BaseModel) {
+        localRequire.define("test/foo/ModelUndefDefaultView", ["pentaho/visual/Model"], function(BaseModel) {
           return BaseModel.extend({
             $type: {
               id: "test/foo/ModelUndefDefaultView",

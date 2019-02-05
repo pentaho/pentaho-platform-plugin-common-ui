@@ -25,7 +25,7 @@ define([
   "pentaho/type/ValidationError",
   "pentaho/util/object",
   "pentaho/util/error",
-  "pentaho/util/arg",
+  "pentaho/util/arg"
 ], function(module, AbstractProperty, Mapping, Mode, bundle, bundleTypes, typeLoader, typeUtil,
             ValidationError, O, error, arg) {
 
@@ -195,7 +195,7 @@ define([
        * which is applicable to the mapping's fields is used.
        * If there are no applicable modes, `null` is returned.
        *
-       * @param {pentaho.visual.base.Model} model - The visual model.
+       * @param {pentaho.visual.Model} model - The visual model.
        *
        * @return {pentaho.visual.role.Mode} The effective operation mode, if one exists; `null` if not.
        *
@@ -424,7 +424,7 @@ define([
       /**
        * Actually implements IFieldsConstraints#countRangeOn.
        *
-       * @param {pentaho.visual.base.AbstractModel} model - The model.
+       * @param {pentaho.visual.AbstractModel} model - The model.
        * @param {object} [keyArgs] - The keyword arguments object.
        * @param {boolean} [keyArgs.ignoreCurrentMode=false] - Indicates that the current mode, if any,
        *   should be ignored when determining the count range.
@@ -470,7 +470,7 @@ define([
        *    must be one of the corresponding internal visual role's
        *    [modes]{@link pentaho.visual.role.PropertyType#modes}
        *
-       * @param {pentaho.visual.base.Model} model - The visual model.
+       * @param {pentaho.visual.Model} model - The visual model.
        *
        * @return {Array.<pentaho.type.ValidationError>} A non-empty array of `ValidationError` or `null`.
        */

@@ -14,19 +14,19 @@ If not, you should first read [Configuration API](../configuration) and
 [Creating a visualization](./#creating-a-visualization).
 
 Visualizations are constituted by one 
-[`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) 
+[`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.Model'}}) 
 type and (at least) one 
-[`View`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}})
+[`IView`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.IView'}})
 type,
 any of which can be seamlessly configured.
 
 Section [Identifiers of Stock Visualizations](#identifiers-of-stock-visualizations) contains the list
-of identifiers of stock `Model` and `View` types.
+of identifiers of stock model and view types.
 Additionally, 
 section [Identifiers of Stock Color Palettes](#identifiers-of-stock-color-palettes) contains the list
 of identifiers of stock color palettes.
 
-The following sections show examples of typical `Model` and `View` configurations.
+The following sections show examples of typical model and view configurations.
 A single [IRule]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule'}}) object 
 is provided in each example, 
 but it should be interpreted as being part of the following generic configuration module:
@@ -143,7 +143,7 @@ var ruleSpec = {
 Note that it is a best practice to load localizable text from a resource bundle. 
 See [pentaho/i18n]({{site.refDocsUrlPattern | replace: '$', 'pentaho.i18n'}}).
 
-## Examples of typical View configurations
+## Examples of typical view configurations
 
 Note that view configuration is typically tied to the technology with which views are built.
 You should consult the view documentation to find out about which extension properties it supports.

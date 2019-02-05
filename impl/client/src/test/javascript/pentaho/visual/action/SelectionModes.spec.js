@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/visual/base/Model",
+  "pentaho/visual/Model",
   "pentaho/data/filter/IsIn",
   "pentaho/data/filter/IsEqual",
   "pentaho/data/filter/And",

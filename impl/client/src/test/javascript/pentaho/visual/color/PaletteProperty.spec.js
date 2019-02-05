@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/type/action/Transaction",
-  "pentaho/visual/base/Model",
+  "pentaho/visual/Model",
   "pentaho/visual/color/Palette",
   "pentaho/visual/color/PaletteProperty",
   "tests/pentaho/util/errorMatch",
@@ -509,7 +509,7 @@ define([
 
           it("should select a palette with a compatible level", function() {
 
-            return require.using(["pentaho/visual/base/Model"], configAmd, function(BaseModel) {
+            return require.using(["pentaho/visual/Model"], configAmd, function(BaseModel) {
 
               var Model = BaseModel.extend({
                 $type: {
@@ -532,7 +532,7 @@ define([
 
           it("should select a palette with a compatible level, and assign null if there's not one", function() {
 
-            return require.using(["pentaho/visual/base/Model"], configAmd, function(BaseModel) {
+            return require.using(["pentaho/visual/Model"], configAmd, function(BaseModel) {
               var Model = BaseModel.extend({
                 $type: {
                   props: {
@@ -556,7 +556,7 @@ define([
               "the previous properties (when initializing)", function() {
 
             return require.using([
-              "pentaho/visual/base/Model",
+              "pentaho/visual/Model",
               "my/nominalPalette1",
               "my/nominalPalette2",
               "my/quantitativePalette1"
@@ -592,7 +592,7 @@ define([
           it("should select a compatible palette which is not used in the other properties (when setting)", function() {
 
             return require.using([
-              "pentaho/visual/base/Model",
+              "pentaho/visual/Model",
               "my/nominalPalette1",
               "my/nominalPalette2",
               "my/quantitativePalette1"

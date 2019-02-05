@@ -33,9 +33,9 @@ define([
   "pentaho/data/filter/standard",
 
   // Viz. API
-  "pentaho/visual/base/Model",
-  "pentaho/visual/base/View",
-  "pentaho/visual/base/ModelAdapter",
+  "pentaho/visual/Model",
+  "pentaho/visual/impl/View",
+  "pentaho/visual/ModelAdapter",
   "pentaho/visual/color/utils",
   "pentaho/visual/color/palettes/all",
   "pentaho/visual/models/all",

@@ -28,13 +28,13 @@ define([
      * @classDesc The `Scene` class represents one distinct visual state which is represented
      * visually by one or more visual elements.
      *
-     * Scenes are *not* needed to implement visualization [views]{@link pentaho.visual.base.View}.
+     * Scenes are *not* needed to implement visualization [views]{@link pentaho.visual.impl.View}.
      * However, their use simplifies their implementation in many use cases.
      *
      * Scenes have a map of visual variables,
      * [vars]{@link pentaho.visual.scene.Base#vars} whose values are inherited from parent to child scenes.
      *
-     * To *create scenes*, most `View` implementations can simply use the [scene.Base.buildScenesFlat] method.
+     * To *create scenes*, most view implementations can simply use the [scene.Base.buildScenesFlat] method.
      * This method creates one parent scene having one child scene per row of the model's dataset.
      * In child scenes,
      * for each visual role there will be a correspondingly named variable having the value of the visual role.
@@ -59,7 +59,7 @@ define([
      * @description Creates a scene instance.
      * @constructor
      * @param {pentaho.visual.scene.Base} parent - The parent scene, if any.
-     * @param {pentaho.visual.base.Model} model — The model. Required if `parent` is not specified.
+     * @param {pentaho.visual.Model} model - The model. Required if `parent` is not specified.
      */
     constructor: function(parent, model) {
 
@@ -122,7 +122,7 @@ define([
     /**
      * Gets the associated visualization model.
      *
-     * @type {pentaho.visual.base.Model}
+     * @type {pentaho.visual.Model}
      * @readOnly
      */
     get model() {
@@ -188,11 +188,11 @@ define([
      * Builds a flat, single-level scene tree according to the data and visual roles of a given model.
      *
      * This method creates one parent scene having one child scene per row of the
-     * [model's dataset]{@link pentaho.visual.base.Model#data}.
+     * [model's dataset]{@link pentaho.visual.Model#data}.
      * In child scenes, for each visual role there will be a correspondingly named variable having the value
      * of the visual role.
      *
-     * @param {pentaho.visual.base.Model} model - The visualization model. Must be valid.
+     * @param {pentaho.visual.Model} model - The visualization model. Must be valid.
      *
      * @return {pentaho.visual.scene.Base} The parent scene.
      */

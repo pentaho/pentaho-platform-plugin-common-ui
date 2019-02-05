@@ -29,13 +29,13 @@ define([
    * @classDesc The execution class for actions which arise from interaction with the view.
    *
    * Interaction actions cannot be executed if the associated model is
-   * [isDirty]{@link pentaho.visual.base.Model#isDirty}.
+   * [isDirty]{@link pentaho.visual.Model#isDirty}.
    *
    * @description Creates an action execution instance for a given visual action and model.
    *
    * @constructor
    * @param {pentaho.visual.action.Base} action - The visual action.
-   * @param {pentaho.visual.base.Model} view - The target model.
+   * @param {pentaho.visual.Model} view - The target model.
    */
   var InteractionExecution =
   ActionTargetMixin.ActionExecution.extend(module.id, /** @lends pentaho.visual.action.InteractionExecution#*/{
@@ -43,7 +43,7 @@ define([
      * Gets the target model.
      * @name target
      * @memberOf pentaho.visual.action.InteractionExecution#
-     * @type {pentaho.visual.base.Model}
+     * @type {pentaho.visual.Model}
      * @readonly
      * @override
      */

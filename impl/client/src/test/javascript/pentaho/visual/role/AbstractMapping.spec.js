@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/visual/base/AbstractModel",
+  "pentaho/visual/AbstractModel",
   "pentaho/visual/role/AbstractMapping",
   "pentaho/data/Table"
 ], function(AbstractModel, Mapping, Table) {

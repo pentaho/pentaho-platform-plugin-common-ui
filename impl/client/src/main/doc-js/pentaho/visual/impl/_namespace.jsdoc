@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 
 /**
- * The `base` namespace contains the types used to define the _base_ visualization.
+ * The `impl` namespace contains implementation types of the `pentaho.visual` namespace.
  *
- * @name pentaho.visual.base
+ * @name pentaho.visual.impl
  * @namespace
  */

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,13 +29,13 @@
  *
  * A **visualization** is constituted by:
  *
- * * One [Model]{@link pentaho.visual.base.Model},
+ * * One [Model]{@link pentaho.visual.Model},
  *   which _identifies_ the visualization and
  *   _defines_ it in terms of its data requirements,
  *   such as the visual degrees of freedom it has (e.g. _X position_, _color_ and _size_) and
  *   any major options that affect its rendering.
  *
- * * One [View]{@link pentaho.visual.IView} (at least),
+ * * One [IView]{@link pentaho.visual.IView} (at least),
  *   which implements the actual rendering using chosen technologies
  *   (e.g. [HTML]{@link https://www.w3.org/TR/html/},
  *   [SVG]{@link https://www.w3.org/TR/SVG/},

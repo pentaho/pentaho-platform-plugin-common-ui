@@ -57,7 +57,7 @@ Modify the AMD module declaration of the `ViewD3.js` file to the following:
 ```js
 define([
   "pentaho/module!_",
-  "pentaho/visual/base/View",
+  "pentaho/visual/impl/View",
   "./Model",
   "d3",
   "pentaho/visual/scene/Base",

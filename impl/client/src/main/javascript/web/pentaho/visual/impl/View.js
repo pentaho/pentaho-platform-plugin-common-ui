@@ -16,7 +16,7 @@
 define([
   "module",
   "pentaho/lang/Base",
-  "./Model",
+  "../Model",
   "pentaho/type/action/ComplexChangeset",
   "pentaho/lang/UserError",
   "pentaho/lang/RuntimeError",
@@ -38,10 +38,10 @@ define([
 
   var __reUpdateMethodName = /^_update(.+)$/;
 
-  var View = Base.extend(module.id, /** @lends pentaho.visual.base.View# */{
+  var BaseView = Base.extend(module.id, /** @lends pentaho.visual.impl.View# */{
 
     /**
-     * @alias View
+     * @alias BaseView
      * @memberOf pentaho.visual.base
      *
      * @class
@@ -50,16 +50,16 @@ define([
      *
      * @abstract
      *
-     * @amd pentaho/visual/base/View
+     * @amd pentaho/visual/impl/View
      *
-     * @classDesc The `View` class is an optional base class for visualization views which implements
+     * @classDesc The `impl.View` class is an optional base class for visualization views which implements
      * the [IView]{@link pentaho.visual.IView} interface.
      *
      * An application instantiates a view given a specification with the visualization model and
      * the container HTML element.
      *
      * The first update of the view must be explicitly triggered by a call to
-     * [model.update]{@link pentaho.visual.base.Model#update}.
+     * [model.update]{@link pentaho.visual.Model#update}.
      *
      * Over time, the model may be mutated and, whenever its `Update:{do}` event is emitted,
      * the view automatically updates itself.
@@ -67,15 +67,15 @@ define([
      * The view translates user interaction by perform [actions]{@link pentaho.visual.Model#act} on the model.
      * The standard actions are [Select]{@link pentaho.visual.action.Select} and
      * [Execute]{@link pentaho.visual.action.Execute}.
-     * There are sugar methods on the model to perform these, [select]{@link pentaho.visual.base.Model#select} and
-     * [execute]{@link pentaho.visual.base.Model#execute}.
+     * There are sugar methods on the model to perform these, [select]{@link pentaho.visual.Model#select} and
+     * [execute]{@link pentaho.visual.Model#execute}.
      *
      * When a view is no longer needed,
-     * the application **must** call its [dispose]{@link pentaho.visual.base.View#dispose} method,
+     * the application **must** call its [dispose]{@link pentaho.visual.impl.View#dispose} method,
      * so that the view can free held _resources_ and not cause memory-leaks.
      *
      * @constructor
-     * @description Creates a `View` instance, given its specification.
+     * @description Creates a view instance, given its specification.
      *
      * @param {pentaho.visual.spec.IView} viewSpec - The view specification.
      */
@@ -84,7 +84,7 @@ define([
       /**
        * The visualization model.
        *
-       * @type {pentaho.visual.base.Model}
+       * @type {pentaho.visual.Model}
        * @readOnly
        * @private
        */
@@ -134,8 +134,8 @@ define([
      *
      * Its size is controlled by the container application and does not need to be the same as
      * that implied by the visual model's
-     * [width]{@link pentaho.visual.base.Model#width} and
-     * [height]{@link pentaho.visual.base.Model#height} properties,
+     * [width]{@link pentaho.visual.Model#width} and
+     * [height]{@link pentaho.visual.Model#height} properties,
      * however, normally, it will.
      *
      * It is the responsibility of the container application to clean up the container element's content,
@@ -153,7 +153,7 @@ define([
     /**
      * Gets the visualization model.
      *
-     * @type {pentaho.visual.base.Model}
+     * @type {pentaho.visual.Model}
      */
     get model() {
       return this.__model;
@@ -176,25 +176,25 @@ define([
     /**
      * Updates the view by choosing an appropriate `_update*` method according to the given changeset.
      *
-     * The [first update]{@link pentaho.visual.base.View#hasUpdatedAll} of a visualization
+     * The [first update]{@link pentaho.visual.impl.View#hasUpdatedAll} of a visualization
      * is always a complete update of the visualization,
-     * as implemented by [_updateAll]{@link pentaho.visual.base.View#_updateAll}.
+     * as implemented by [_updateAll]{@link pentaho.visual.impl.View#_updateAll}.
      *
-     * View subclasses **should** override and implement the `_updateAll` method.
+     * BaseView subclasses **should** override and implement the `_updateAll` method.
      *
      * Additionally, view subclasses should consider implementing one or more of the optional
      * **partial update methods**, like
-     * [_updateData]{@link pentaho.visual.base.View#_updateData},
-     * [_updateSize]{@link pentaho.visual.base.View#_updateSize},
-     * [_updateSelection]{@link pentaho.visual.base.View#_updateSelection} and
-     * [_updateGeneral]{@link pentaho.visual.base.View#_updateGeneral}.
+     * [_updateData]{@link pentaho.visual.impl.View#_updateData},
+     * [_updateSize]{@link pentaho.visual.impl.View#_updateSize},
+     * [_updateSelection]{@link pentaho.visual.impl.View#_updateSelection} and
+     * [_updateGeneral]{@link pentaho.visual.impl.View#_updateGeneral}.
      *
      * Other appropriate combinations of these can also be implemented,
      * for example, `_updateSizeAndSelection`,
      * by combining the names of the known property groups: `Data`, `Size`, `Selection` and `General`,
      * with an `And` to form a corresponding method name.
      * For more information on property groups,
-     * see [View.PropertyGroups]{@link pentaho.visual.base.View.PropertyGroups}.
+     * see [View.PropertyGroups]{@link pentaho.visual.impl.View.PropertyGroups}.
      *
      * @param {pentaho.action.Execution} event - The update action execution.
      * @param {pentaho.visual.action.Update} action - The update action.
@@ -203,12 +203,12 @@ define([
      *
      * @protected
      *
-     * @see pentaho.visual.base.View#hasUpdatedAll
-     * @see pentaho.visual.base.View#_updateAll
-     * @see pentaho.visual.base.View#_updateData
-     * @see pentaho.visual.base.View#_updateSize
-     * @see pentaho.visual.base.View#_updateSelection
-     * @see pentaho.visual.base.View#_updateGeneral
+     * @see pentaho.visual.impl.View#hasUpdatedAll
+     * @see pentaho.visual.impl.View#_updateAll
+     * @see pentaho.visual.impl.View#_updateData
+     * @see pentaho.visual.impl.View#_updateSize
+     * @see pentaho.visual.impl.View#_updateSelection
+     * @see pentaho.visual.impl.View#_updateGeneral
      */
     _update: function(event, action) {
 
@@ -247,13 +247,13 @@ define([
      * by the given changeset as dirty.
      *
      * The recognized property groups are those of
-     * [View.PropertyGroups]{@link pentaho.visual.base.View.PropertyGroups}.
+     * [View.PropertyGroups]{@link pentaho.visual.impl.View.PropertyGroups}.
      *
      * Implementations can override this method to change the default behavior for some or all of the
      * model properties.
      *
      * @param {pentaho.util.BitSet} dirtyPropGroups - A bit set of property groups that should be set dirty.
-     * Use the values of [View.PropertyGroups]{@link pentaho.visual.base.View.PropertyGroups} as bit values.
+     * Use the values of [View.PropertyGroups]{@link pentaho.visual.impl.View.PropertyGroups} as bit values.
      *
      * @param {?pentaho.type.Changeset} changeset - The model's changeset. When `null`,
      * indicates that everything has changed.
@@ -390,7 +390,7 @@ define([
       return this;
     }
     // endregion
-  }, /** @lends pentaho.visual.base.View */{
+  }, /** @lends pentaho.visual.impl.View */{
 
     // region Property groups - class
     /** @inheritDoc */
@@ -409,13 +409,13 @@ define([
       Object.create(null),
       /**
        * The `PropertyGroups` enumeration contains the entries for the distinct groups of properties that the
-       * base [View]{@link pentaho.visual.base.View} class recognizes when categorizing property changes.
+       * [View]{@link pentaho.visual.impl.View} class recognizes when categorizing property changes.
        *
-       * @alias pentaho.visual.base.View.PropertyGroups
+       * @alias pentaho.visual.impl.View.PropertyGroups
        * @enum {number}
        * @readOnly
        *
-       * @see pentaho.visual.base.View#__onChangeClassify
+       * @see pentaho.visual.impl.View#__onChangeClassify
        */
       {
         /**
@@ -438,7 +438,7 @@ define([
          * The group of data-related properties.
          *
          * The only property of this group is the
-         * [data]{@link pentaho.visual.base.Model#data} property.
+         * [data]{@link pentaho.visual.Model#data} property.
          */
         Data: 2,
 
@@ -446,8 +446,8 @@ define([
          * The group of size-related properties.
          *
          * The properties of this group are the
-         * [width]{@link pentaho.visual.base.Model#width} and
-         * [height]{@link pentaho.visual.base.Model#height} properties.
+         * [width]{@link pentaho.visual.Model#width} and
+         * [height]{@link pentaho.visual.Model#height} properties.
          */
         Size: 4,
 
@@ -455,12 +455,12 @@ define([
          * The group of selection-related properties.
          *
          * The only property of this group is the
-         * [selectionFilter]{@link pentaho.visual.base.Model#selectionFilter} property.
+         * [selectionFilter]{@link pentaho.visual.Model#selectionFilter} property.
          */
         Selection:  8
       }),
 
-    // View property path -> Property group name
+    // BaseView property path -> Property group name
     __PropertyGroupOfProperty: O.assignOwn(Object.create(null), {
       // "_": "All",
       "data": "Data",
@@ -476,7 +476,7 @@ define([
     __UpdateMethodsList: []
     // endregion
   })
-  .implement(/** @lends pentaho.visual.base.View# */{
+  .implement(/** @lends pentaho.visual.impl.View# */{
     // region _updateXyz Methods
     /**
      * Fully renders or updates the view.
@@ -487,9 +487,9 @@ define([
      *
      * @protected
      *
-     * @see pentaho.visual.base.View#_update
-     * @see pentaho.visual.base.View#hasUpdatedAll
-     * @see pentaho.visual.base.View.PropertyGroups
+     * @see pentaho.visual.impl.View#_update
+     * @see pentaho.visual.impl.View#hasUpdatedAll
+     * @see pentaho.visual.impl.View.PropertyGroups
      */
     _updateAll: function() {
     }
@@ -502,15 +502,15 @@ define([
      *
      * Implement this method to provide a faster way to resize a view.
      * When not specified, and no other applicable partial update method exists,
-     * the full [_updateAll]{@link pentaho.visual.base.View#_updateAll} method is used to update the view.
+     * the full [_updateAll]{@link pentaho.visual.impl.View#_updateAll} method is used to update the view.
      *
      * @name _updateSize
-     * @memberOf pentaho.visual.base.View#
+     * @memberOf pentaho.visual.impl.View#
      * @method
      * @protected
      * @optional
      *
-     * @see pentaho.visual.base.View#_update
+     * @see pentaho.visual.impl.View#_update
      */
 
     /**
@@ -521,15 +521,15 @@ define([
      *
      * Implement this method to provide a faster way to update the selection of the view.
      * When not specified, and no other applicable partial update method exists,
-     * the view is updated using the [_updateAll]{@link pentaho.visual.base.View#_updateAll} method.
+     * the view is updated using the [_updateAll]{@link pentaho.visual.impl.View#_updateAll} method.
      *
      * @name _updateSelection
-     * @memberOf pentaho.visual.base.View#
+     * @memberOf pentaho.visual.impl.View#
      * @method
      * @protected
      * @optional
      *
-     * @see pentaho.visual.base.View#_update
+     * @see pentaho.visual.impl.View#_update
      */
 
     /**
@@ -540,15 +540,15 @@ define([
      *
      * Implement this method to provide a faster way to update the data displayed by the view.
      * When not specified, and no other applicable partial update method exists,
-     * the view is updated using the [_updateAll]{@link pentaho.visual.base.View#_updateAll} method.
+     * the view is updated using the [_updateAll]{@link pentaho.visual.impl.View#_updateAll} method.
      *
      * @name _updateData
-     * @memberOf pentaho.visual.base.View#
+     * @memberOf pentaho.visual.impl.View#
      * @method
      * @protected
      * @optional
      *
-     * @see pentaho.visual.base.View#_update
+     * @see pentaho.visual.impl.View#_update
      */
 
     /**
@@ -558,25 +558,25 @@ define([
      *
      * Implement this method to provide a faster way to update the "general information" displayed by the view.
      * When not specified, and no other applicable partial update method exists,
-     * the view is updated using the [_updateAll]{@link pentaho.visual.base.View#_updateAll} method.
+     * the view is updated using the [_updateAll]{@link pentaho.visual.impl.View#_updateAll} method.
      *
      * @name _updateGeneral
-     * @memberOf pentaho.visual.base.View#
+     * @memberOf pentaho.visual.impl.View#
      * @method
      * @protected
      * @optional
      *
-     * @see pentaho.visual.base.View#_update
+     * @see pentaho.visual.impl.View#_update
      */
     // endregion
   });
 
-  return View;
+  return BaseView;
 
   /**
    * Parses the custom part of the name of partial update method (like *_updateXyz*).
    *
-   * @param {Class.<pentaho.visual.base.View>} ViewClass - The view class.
+   * @param {Class.<pentaho.visual.impl.View>} ViewClass - The view class.
    * @param {string} groupNamesText - The part of the method name following the prefix "_update".
    *
    * @return {number} The property group bits corresponding to the method name.

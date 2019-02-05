@@ -19,18 +19,18 @@ define([
   "./KeyTypes",
   "pentaho/action/impl/Target",
   "pentaho/type/action/Transaction",
-  "../action/Update",
-  "../action/UpdateExecution",
-  "../action/Interaction",
-  "../action/InteractionExecution",
-  "../action/Select",
-  "../action/SelectExecution",
-  "../action/Execute",
+  "./action/Update",
+  "./action/UpdateExecution",
+  "./action/Interaction",
+  "./action/InteractionExecution",
+  "./action/Select",
+  "./action/SelectExecution",
+  "./action/Execute",
   "pentaho/util/text",
   "pentaho/util/error",
   "pentaho/util/logger",
   "pentaho/i18n!model",
-  "../role/Property" // Pre-loaded with Model
+  "./role/Property" // Pre-loaded with Model
 ], function(module, AbstractModel, KeyTypes, ActionTargetMixin, Transaction, UpdateAction, UpdateExecution,
             Interaction, InteractionExecution, SelectAction, SelectExecution, ExecuteAction,
             textUtil, errorUtil, logger, bundle) {
@@ -100,24 +100,24 @@ define([
   // endregion
 
   /**
-   * @name pentaho.visual.base.ModelType
+   * @name pentaho.visual.ModelType
    * @class
-   * @extends pentaho.visual.base.AbstractModelType
+   * @extends pentaho.visual.AbstractModelType
    *
    * @classDesc The base class of visual model types.
    *
-   * For more information see {@link pentaho.visual.base.Model}.
+   * For more information see {@link pentaho.visual.Model}.
    */
 
   /**
    * @name Model
-   * @memberOf pentaho.visual.base
+   * @memberOf pentaho.visual
    * @class
-   * @extends pentaho.visual.base.AbstractModel
+   * @extends pentaho.visual.AbstractModel
    * @extends pentaho.action.impl.Target
    * @abstract
    *
-   * @amd pentaho/visual/base/Model
+   * @amd pentaho/visual/Model
    *
    * @classDesc The `Model` class is the required, base class of visualization models.
    *
@@ -126,14 +126,14 @@ define([
    *
    * @constructor
    * @description Creates a model instance, given its specification.
-   * @param {pentaho.visual.base.spec.IModel} [modelSpec] The model specification.
+   * @param {pentaho.visual.spec.IModel} [modelSpec] The model specification.
    *
-   * @see pentaho.visual.base.IView
+   * @see pentaho.visual.IView
    * @see pentaho.visual.action.Select
    * @see pentaho.visual.action.Execute
    * @see pentaho.visual.action.Update
    */
-  return AbstractModel.extend(/** @lends pentaho.visual.base.Model# */{
+  return AbstractModel.extend(/** @lends pentaho.visual.Model# */{
 
     constructor: function(modelSpec) {
 
@@ -149,7 +149,7 @@ define([
      * to perform the initialization of a model instance.
      * In principle, you should call the base implementation before settings any properties in `this`.
      *
-     * @param {pentaho.visual.base.spec.IModel} modelSpec - The model specification provided at construction time,
+     * @param {pentaho.visual.spec.IModel} modelSpec - The model specification provided at construction time,
      * if any.
      * @protected
      */
@@ -204,7 +204,7 @@ define([
      * the [Change:{finally}]{@link pentaho.type.action.Change} action.
      *
      * When `false`, the model must be manually updated by calling the
-     * [update]{@link pentaho.visual.base.Model#update} method.
+     * [update]{@link pentaho.visual.Model#update} method.
      *
      * @type {boolean}
      * @readOnly
@@ -218,7 +218,7 @@ define([
      *
      * A model is considered _dirty_ from the time it is changed to the time it is updated.
      * This includes the entirety of the update execution.
-     * Contrast this with the [isDirtyNew]{@link pentaho.visual.base.Model#isDirtyNew} property,
+     * Contrast this with the [isDirtyNew]{@link pentaho.visual.Model#isDirtyNew} property,
      * which excludes the period of the current update execution.
      *
      * During the _dirty_ period,
@@ -228,8 +228,8 @@ define([
      * @type {boolean}
      * @readOnly
      *
-     * @see pentaho.visual.base.Model#isDirtyNew
-     * @see pentaho.visual.base.Model#isUpdating
+     * @see pentaho.visual.Model#isDirtyNew
+     * @see pentaho.visual.Model#isUpdating
      */
     get isDirty() {
       // Because changesets are cleared optimistically before update occurs,
@@ -243,17 +243,17 @@ define([
      * A model is dirty if changes exist which were not captured by a past or ongoing update execution.
      *
      * This property yields the correct result even if called before the local
-     * [_onChangeFinally]{@link pentaho.visual.base.Model#_onChangeFinally} handler,
+     * [_onChangeFinally]{@link pentaho.visual.Model#_onChangeFinally} handler,
      * during a transaction.
      *
-     * Contrast this property with the [isDirty]{@link pentaho.visual.base.Model#isDirty} property,
-     * which takes into account whether the view is [updating]{@link pentaho.visual.base.Model#isUpdating},
+     * Contrast this property with the [isDirty]{@link pentaho.visual.Model#isDirty} property,
+     * which takes into account whether the view is [updating]{@link pentaho.visual.Model#isUpdating},
      * while this property does not.
      *
      * @type {boolean}
      * @readOnly
-     * @see pentaho.visual.base.Model#isDirty
-     * @see pentaho.visual.base.Model#isUpdating
+     * @see pentaho.visual.Model#isDirty
+     * @see pentaho.visual.Model#isUpdating
      */
     get isDirtyNew() {
       var changeset = this.__changeset;
@@ -286,9 +286,9 @@ define([
      * The default implementation proceeds like:
      *
      * 1. When the change action is [successful]{@link pentaho.action.Execution#isDone}
-     *    the change is acknowledged, by affecting the [isDirty]{@link pentaho.visual.base.Model#isDirty}.
-     * 2. When the change action is successful and [isAutoUpdate]{@link pentaho.visual.base.Model#isAutoUpdate}
-     *    is `true`, calls the [_onAutoUpdate]{@link pentaho.visual.base.Model#_onAutoUpdate} method.
+     *    the change is acknowledged, by affecting the [isDirty]{@link pentaho.visual.Model#isDirty}.
+     * 2. When the change action is successful and [isAutoUpdate]{@link pentaho.visual.Model#isAutoUpdate}
+     *    is `true`, calls the [_onAutoUpdate]{@link pentaho.visual.Model#_onAutoUpdate} method.
      * 3. Delegates to the base implementation, which handles emitting the `finally` phase event.
      *
      * @param {pentaho.type.action.Transaction} transaction - The action execution.
@@ -315,12 +315,12 @@ define([
     /**
      * Called when a change is made and `isAutoUpdate` is `true`.
      *
-     * The default implementation calls the [update]{@link pentaho.visual.base.Model#update} method,
+     * The default implementation calls the [update]{@link pentaho.visual.Model#update} method,
      * taking care to log a warning, when it is rejected.
      *
      * @protected
      *
-     * @see pentaho.visual.base.Model#_onChangeFinally
+     * @see pentaho.visual.Model#_onChangeFinally
      */
     _onAutoUpdate: function() {
 
@@ -339,7 +339,7 @@ define([
      * @type {boolean}
      * @readOnly
      *
-     * @see pentaho.visual.base.Model#update
+     * @see pentaho.visual.Model#update
      */
     get isUpdating() {
       return this.__updateControl !== null;
@@ -348,10 +348,10 @@ define([
     /**
      * Updates the model to match the latest changes.
      *
-     * Models are created in a [dirty]{@link pentaho.visual.base.Mode#isDirty} state.
+     * Models are created in a [dirty]{@link pentaho.visual.Mode#isDirty} state.
      * An initial call to this method is necessary to update any views for the first time.
      *
-     * However, when [isAutoUpdate]{@link pentaho.visual.base.Model#isAutoUpdate} is `true`,
+     * However, when [isAutoUpdate]{@link pentaho.visual.Model#isAutoUpdate} is `true`,
      * any changes to the model cause this method to be called automatically.
      *
      * The update action is asynchronous. This is true even if all listeners handle the update synchronously.
@@ -361,8 +361,8 @@ define([
      *
      * When this method is called, the model may be in four different states,
      * depending on the current values of the properties
-     * [isDirtyNew]{@link pentaho.visual.base.Model#isDirtyNew} and
-     * [isUpdating]{@link pentaho.visual.base.Model#isUpdating}:
+     * [isDirtyNew]{@link pentaho.visual.Model#isDirtyNew} and
+     * [isUpdating]{@link pentaho.visual.Model#isUpdating}:
      *
      * 1. The model is _not dirty_ and is _not updating_: a resolved promise is returned.
      * 2. The model is _not dirty_, yet is still _updating_: a promise for the completion of the current update
@@ -375,7 +375,7 @@ define([
      *    a promise for the completion of this following update execution is returned;
      *    if a following update execution had already been scheduled, it is reused.
      *
-     * The [isUpdating]{@link pentaho.visual.base.Model#isUpdating} property is `true` during all of the phases of
+     * The [isUpdating]{@link pentaho.visual.Model#isUpdating} property is `true` during all of the phases of
      * the update execution: `init`, `will`, `do` and `finally`.
      *
      * Listeners of the `Update` action receive an action execution of type
@@ -395,10 +395,10 @@ define([
      *
      * @see pentaho.visual.action.Update
      * @see pentaho.visual.action.UpdateExecution
-     * @see pentaho.visual.base.Model#isAutoUpdate
-     * @see pentaho.visual.base.Model#isDirtyNew
-     * @see pentaho.visual.base.Model#isDirty
-     * @see pentaho.visual.base.Model#isUpdating
+     * @see pentaho.visual.Model#isAutoUpdate
+     * @see pentaho.visual.Model#isDirtyNew
+     * @see pentaho.visual.Model#isDirty
+     * @see pentaho.visual.Model#isUpdating
      * @see pentaho.visual.action.WellKnownErrorNames
      */
     update: function() {
@@ -562,7 +562,7 @@ define([
     /**
      * Performs a _select_ action, given its specification.
      *
-     * A _select_ action can only be performed if the model is not [dirty]{@link pentaho.visual.base.Model#isDirty}.
+     * A _select_ action can only be performed if the model is not [dirty]{@link pentaho.visual.Model#isDirty}.
      *
      * @param {pentaho.visual.action.Select|pentaho.visual.action.spec.ISelect} [actionOrSpec] - The _select_ action
      * or its specification.
@@ -579,7 +579,7 @@ define([
     /**
      * Performs an _execute_ action, given its specification.
      *
-     * An _execute_ action can only be performed if the model is not [dirty]{@link pentaho.visual.base.Model#isDirty}.
+     * An _execute_ action can only be performed if the model is not [dirty]{@link pentaho.visual.Model#isDirty}.
      *
      * @param {pentaho.visual.action.Execute|pentaho.visual.action.spec.IExecute} [actionOrSpec] - The _execute_ action
      * or its specification.
@@ -593,7 +593,7 @@ define([
       return this.act(action);
     },
 
-    $type: /** @lends pentaho.visual.base.ModelType# */{
+    $type: /** @lends pentaho.visual.ModelType# */{
       id: module.id,
       defaultView: "./View",
       isAbstract: true,
@@ -606,11 +606,11 @@ define([
          * This property is required.
          *
          * @name width
-         * @memberOf pentaho.visual.base.Model#
+         * @memberOf pentaho.visual.Model#
          * @type {number}
          * @default 300
          *
-         * @see pentaho.visual.base.Model#height
+         * @see pentaho.visual.Model#height
          */
         {
           name: "width",
@@ -625,11 +625,11 @@ define([
          * This property is required.
          *
          * @name height
-         * @memberOf pentaho.visual.base.Model#
+         * @memberOf pentaho.visual.Model#
          * @type {number}
          * @default 300
          *
-         * @see pentaho.visual.base.Model#width
+         * @see pentaho.visual.Model#width
          */
         {
           name: "height",
@@ -662,9 +662,9 @@ define([
        *
        * If the value is {@link Nully} or an empty string, it is ignored,
        * unless this type is not [isAbstract]{@link pentaho.type.Type#isAbstract},
-       * in which case the default value of [dataKey]{@link }pentaho.visual.base.KeyTypes.dataKey} is assumed.
+       * in which case the default value of [dataKey]{@link }pentaho.visual.KeyTypes.dataKey} is assumed.
        *
-       * @param {?pentaho.visual.base.KeyTypes|undefined} value - The new visual key type, if any.
+       * @param {?pentaho.visual.KeyTypes|undefined} value - The new visual key type, if any.
        *
        * @throw {pentaho.lang.ArgumentRangeError} When the visual key type value is not one of the possible values.
        * @throw {pentaho.lang.OperationInvalidError} When the visual key type value is already set and the specified
@@ -706,7 +706,7 @@ define([
     }
   })
   .mix(ActionTargetMixin)
-  .implement(/** @lends pentaho.visual.base.Model# */{
+  .implement(/** @lends pentaho.visual.Model# */{
 
     // region ITarget implementation
     /** @inheritDoc */

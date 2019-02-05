@@ -16,7 +16,7 @@
 define([
   "pentaho/visual/scene/Base",
   "pentaho/visual/scene/util",
-  "pentaho/visual/base/Model",
+  "pentaho/visual/Model",
   "pentaho/data/Table",
   "tests/pentaho/util/errorMatch"
 ], function(Scene, sceneUtil, VisualModel, DataTable, errorMatch) {

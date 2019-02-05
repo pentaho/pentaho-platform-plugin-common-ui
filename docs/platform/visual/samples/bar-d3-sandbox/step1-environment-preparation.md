@@ -97,7 +97,7 @@ npm install
           <script type="text/javascript">
             require([
               "pentaho/visual/samples/calc/Model",
-              "pentaho/visual/base/View",
+              "pentaho/visual/impl/View",
               "pentaho/data/Table",
               "json!./sandbox-data.json"
             ], function(CalcModel, BaseView, Table, dataSpec) {

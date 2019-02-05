@@ -17,8 +17,8 @@ define([
   "pentaho/visual/role/AbstractProperty",
   "pentaho/type/action/Transaction",
   "tests/pentaho/util/errorMatch",
-  "pentaho/visual/base/AbstractModel",
-  "pentaho/visual/base/KeyTypes",
+  "pentaho/visual/AbstractModel",
+  "pentaho/visual/KeyTypes",
   "pentaho/type/ValidationError",
   "pentaho/data/Table"
 ], function(AbstractProperty, Transaction, errorMatch, AbstractModel, VisualKeyTypes, ValidationError, Table) {

@@ -59,7 +59,7 @@ define([
      * Called by the containing abstract model whenever its data or visual role properties change.
      *
      * @protected
-     * @friend pentaho.visual.base.AbstractModel
+     * @friend pentaho.visual.AbstractModel
      */
     _onDataOrMappingChanged: function() {
       // Clear any cached mode.

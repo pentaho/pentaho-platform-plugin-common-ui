@@ -30,7 +30,7 @@ define([
    * @amd pentaho/visual/action/Update
    *
    * @classDesc The `visual.action.Update` class is the class of actions which
-   * represent a [View]{@link pentaho.visual.base.View} being updated.
+   * represent an [IView]{@link pentaho.visual.IView} being updated.
    *
    * The update action is [asynchronous]{@link pentaho.action.Base.isSync}.
    *

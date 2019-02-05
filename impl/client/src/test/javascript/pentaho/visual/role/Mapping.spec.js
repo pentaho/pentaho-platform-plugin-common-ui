@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/type/action/Transaction",
-  "pentaho/visual/base/Model",
+  "pentaho/visual/Model",
   "pentaho/visual/role/Mode",
   "pentaho/data/Table"
 ], function(Transaction, Model, Mode, Table) {

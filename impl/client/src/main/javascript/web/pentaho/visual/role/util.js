@@ -39,7 +39,7 @@ define([
      *
      * When valid, returns the corresponding visual role usage.
      *
-     * @param {pentaho.visual.base.AbstractModel} vizModel - The visualization model.
+     * @param {pentaho.visual.AbstractModel} vizModel - The visualization model.
      * @param {string} roleName - The name of the visual role.
      * @param {string} fieldName - The name of the field.
      *
@@ -173,7 +173,7 @@ define([
      *
      * When valid, returns the corresponding visual role usage.
      *
-     * @param {pentaho.visual.base.AbstractModel} vizModel - The visualization model.
+     * @param {pentaho.visual.AbstractModel} vizModel - The visualization model.
      * @param {string} roleName - The name of the visual role.
      * @param {string} fieldName - The name of the field.
      *
@@ -219,7 +219,7 @@ define([
      * This method tests adding the field to each of the visualization model's visual roles,
      * by delegating to {@link pentaho.visual.role.util.testAddFieldAtAutoPosition}.
      *
-     * @param {pentaho.visual.base.AbstractModel} vizModel - The visualization model.
+     * @param {pentaho.visual.AbstractModel} vizModel - The visualization model.
      * @param {string} fieldName - The name of the field.
      *
      * @param {object} [keyArgs] - The keyword arguments object.
@@ -276,7 +276,7 @@ define([
      * 6. The definition order of the visual role,
      *    according to its [index]{@link pentaho.visual.role.PropertyType#index} property.
      *
-     * @param {pentaho.visual.base.AbstractModel} vizModel - The visualization model.
+     * @param {pentaho.visual.AbstractModel} vizModel - The visualization model.
      * @param {string} fieldName - The name of the field.
      *
      * @param {object} [keyArgs] - The keyword arguments object.
@@ -395,7 +395,7 @@ define([
     /**
      * Gets the name of the first hierarchy of a field mapped to a visual role.
      *
-     * @param {pentaho.visual.base.AbstractModel} vizModel - The visual model.
+     * @param {pentaho.visual.AbstractModel} vizModel - The visual model.
      * @param {string} roleName - The name of the visual role.
      *
      * @return {?string} The name of the hierarchy; `null`, if none.
@@ -422,10 +422,10 @@ define([
     /**
      * Gets the next unused ordinal of a given hierarchy.
      *
-     * When the model has no defined [data]{@link pentaho.visual.base.AbstractModel#data}, `null` is returned.
+     * When the model has no defined [data]{@link pentaho.visual.AbstractModel#data}, `null` is returned.
      * When the model has any undefined mapped fields, `null` is returned.
      *
-     * @param {pentaho.visual.base.AbstractModel} vizModel - The visual model.
+     * @param {pentaho.visual.AbstractModel} vizModel - The visual model.
      * @param {string} hierarchyName - The name of the hierarchy.
      *
      * @return {?number} The next ordinal, starting at `0`, or `null`.

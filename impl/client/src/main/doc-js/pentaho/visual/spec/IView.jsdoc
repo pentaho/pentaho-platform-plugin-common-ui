@@ -40,5 +40,5 @@
  *
  * @name model
  * @memberOf pentaho.visual.spec.IView#
- * @type {pentaho.visual.base.Model}
+ * @type {pentaho.visual.Model}
  */

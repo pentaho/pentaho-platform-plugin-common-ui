@@ -67,7 +67,7 @@ define([
      * Called by the containing abstract model whenever its data or visual role properties change.
      *
      * @protected
-     * @friend pentaho.visual.base.AbstractModel
+     * @friend pentaho.visual.AbstractModel
      */
     _onDataOrMappingChanged: function() {
     },
@@ -75,7 +75,7 @@ define([
     /**
      * Gets the reference corresponding to the containing abstract model and visual role property, if any.
      *
-     * @type {?({container: pentaho.visual.base.AbstractModel, property: pentaho.visual.role.AbstractProperty})}
+     * @type {?({container: pentaho.visual.AbstractModel, property: pentaho.visual.role.AbstractProperty})}
      * @readOnly
      * @protected
      */

@@ -46,7 +46,7 @@ define([
      * Map keys which are not the name of a mapper visual role property of `model` are ignored.
      * Map values can be any value that supports the JavaScript's `valueOf` method.
      *
-     * @param {pentaho.visual.base.Model} model - The associated visual model. Must be valid.
+     * @param {pentaho.visual.Model} model - The associated visual model. Must be valid.
      *
      * @return {?pentaho.data.filter.Abstract} The filter, if one can be created; `null`, otherwise
      *
@@ -71,7 +71,7 @@ define([
      *
      * Map keys which are not the name of a mapper visual role property of `model` are ignored.
      *
-     * @param {pentaho.visual.base.Model} model - The associated visual model. Must be valid.
+     * @param {pentaho.visual.Model} model - The associated visual model. Must be valid.
      *
      * @param {?object} [keyArgs] The keyword arguments object.
      * @param {boolean} [keyArgs.includeMeasureFields=false] Indicates that measure fields should also

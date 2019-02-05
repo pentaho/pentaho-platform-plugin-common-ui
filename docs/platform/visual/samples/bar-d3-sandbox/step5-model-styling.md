@@ -82,7 +82,7 @@ Modify the AMD module declaration of the `Model.js` file to the following:
 ```js
 define([
   "pentaho/module!_",
-  "pentaho/visual/base/Model",
+  "pentaho/visual/Model",
   "css!./css/model"
 ], function(module, BaseModel) {
   // ...

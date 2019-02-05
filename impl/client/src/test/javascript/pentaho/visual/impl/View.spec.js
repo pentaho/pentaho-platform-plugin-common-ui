@@ -15,8 +15,8 @@
  */
 define([
   "pentaho/data/Table",
-  "pentaho/visual/base/View",
-  "pentaho/visual/base/Model",
+  "pentaho/visual/impl/View",
+  "pentaho/visual/Model",
   "pentaho/lang/UserError",
   "pentaho/lang/RuntimeError",
   "pentaho/visual/action/ModelChangedError",
@@ -40,7 +40,7 @@ define([
   // As in Complex.js
   var PROP_VALUE_SPECIFIED = 1;
 
-  describe("pentaho.visual.base.View", function() {
+  describe("pentaho.visual.impl.View", function() {
 
     var Model;
     var model;
@@ -125,7 +125,7 @@ define([
       it("should throw if invoked with a viewSpec.model which is not a Model", function() {
         expect(function() {
           var view = new BaseView({model: {}});
-        }).toThrow(errorMatch.argInvalidType("viewSpec.model", "pentaho/visual/base/Model", "object"));
+        }).toThrow(errorMatch.argInvalidType("viewSpec.model", "pentaho/visual/Model", "object"));
       });
     });
 
@@ -680,7 +680,7 @@ define([
 
       function configRequireJs(localRequire) {
 
-        localRequire.define("test/foo/View", ["pentaho/visual/base/View"], function(BaseView) {
+        localRequire.define("test/foo/View", ["pentaho/visual/impl/View"], function(BaseView) {
           return BaseView.extend({
             _updateData: function() {},
             _updateSize: function() {},
@@ -689,7 +689,7 @@ define([
           });
         });
 
-        localRequire.define("test/foo/Model", ["pentaho/visual/base/Model"], function(BaseModel) {
+        localRequire.define("test/foo/Model", ["pentaho/visual/Model"], function(BaseModel) {
 
           return BaseModel.extend({
             $type: {

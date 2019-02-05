@@ -17,7 +17,7 @@ define([
   "pentaho/module!_",
   "pentaho/type/Property",
   "./AbstractMapping",
-  "../base/KeyTypes",
+  "../KeyTypes",
   "pentaho/i18n!messages",
   "pentaho/type/loader",
   "pentaho/type/ValidationError",
@@ -197,8 +197,8 @@ define([
        * Gets a value that indicates if the visual role is a key property of the visual space.
        *
        * This attribute is only applicable when the associated model
-       * has [visualKeyType]{@link pentaho.visual.base.AbstractModelType#visualKeyType}
-       * of [dataKey]{@link }pentaho.visual.base.KeyTypes.dataKey}.
+       * has [visualKeyType]{@link pentaho.visual.AbstractModelType#visualKeyType}
+       * of [dataKey]{@link }pentaho.visual.KeyTypes.dataKey}.
        *
        * When a visual role is a key visual role,
        * each distinct combination of key visual roles' values corresponds to
@@ -209,7 +209,7 @@ define([
        * @readOnly
        * @abstract
        *
-       * @see pentaho.visual.base.AbstractModelType#visualKeyType
+       * @see pentaho.visual.AbstractModelType#visualKeyType
        * @see pentaho.visual.role.AbstractPropertyType#isVisualKeyEffective
        */
 
@@ -217,8 +217,8 @@ define([
        * Gets a value that indicates if the visual role is _effectively_ a visual key.
        *
        * When the property's associated model is not defined or does not have a
-       * [visualKeyType]{@link pentaho.visual.base.AbstractModelType#visualKeyType} of
-       * [dataKey]{@link }pentaho.visual.base.KeyTypes.dataKey},
+       * [visualKeyType]{@link pentaho.visual.AbstractModelType#visualKeyType} of
+       * [dataKey]{@link }pentaho.visual.KeyTypes.dataKey},
        * `undefined` is returned.
        *
        * @type {boolean|undefined}
@@ -250,14 +250,14 @@ define([
        *
        * Otherwise, validity is further determined as follows:
        *
-       * 1. If the abstract model has a `null` [data]{@link pentaho.visual.base.AbstractModel#data},
+       * 1. If the abstract model has a `null` [data]{@link pentaho.visual.AbstractModel#data},
        *    then every field in the current mapping's
        *    [fields]{@link pentaho.visual.role.AbstractMapping#fields} is considered undefined and invalid;
-       * 2. Otherwise, if the model has a non-`null` [data]{@link pentaho.visual.base.AbstractModel#data},
+       * 2. Otherwise, if the model has a non-`null` [data]{@link pentaho.visual.AbstractModel#data},
        *    then each field in the current mapping's
        *    [fields]{@link pentaho.visual.role.AbstractMapping#fields} must be defined in `data`.
        *
-       * @param {pentaho.visual.base.AbstractModel} model - The abstract model.
+       * @param {pentaho.visual.AbstractModel} model - The abstract model.
        *
        * @return {Array.<pentaho.type.ValidationError>} A non-empty array of `ValidationError` or `null`.
        */
@@ -286,7 +286,7 @@ define([
        *
        * Assumes the mapping is valid according to the base complex validation.
        *
-       * @param {pentaho.visual.base.AbstractModel} model - The abstract model.
+       * @param {pentaho.visual.AbstractModel} model - The abstract model.
        * @param {pentaho.visual.role.AbstractMapping} mapping - The mapping.
        * @param {function} addErrors - Called to add errors.
        * @private

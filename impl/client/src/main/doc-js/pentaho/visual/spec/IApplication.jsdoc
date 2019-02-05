@@ -15,8 +15,12 @@
  */
 
 /**
- * @name pentaho.visual.base.spec
- * @namespace
+ * The `spec.IApplication` interface describes a visual application instance in object form.
  *
- * @description The `visual.base.spec` namespace contains specification interfaces for the base visual types.
+ * @name pentaho.visual.spec.IApplication
+ *
+ * @interface
+ * @extends pentaho.type.spec.IComplex
+ *
+ * @see pentaho.visual.spec.IAbstractModel#application
  */

@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/module!_",
-  "pentaho/visual/base/View",
+  "pentaho/visual/impl/View",
   "pentaho/visual/models/Abstract",
   "pentaho/lang/UserError",
   "cdf/lib/CCC/def",

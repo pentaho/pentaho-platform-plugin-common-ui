@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/module!_",
-  "../../base/Model",
+  "../../Model",
   "../types/SizeByNegativesMode",
   "pentaho/i18n!../i18n/model"
 ], function(module, BaseModel, SizeByNegativesMode, bundle) {

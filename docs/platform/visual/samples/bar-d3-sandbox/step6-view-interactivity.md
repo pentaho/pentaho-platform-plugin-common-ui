@@ -46,7 +46,7 @@ Modify the AMD module declaration of the `ViewD3.js` file to the following:
 ```js
 define([
   "pentaho/module!_",
-  "pentaho/visual/base/View",
+  "pentaho/visual/impl/View",
   "./Model",
   "pentaho/visual/action/Execute",
   "d3",
@@ -122,7 +122,7 @@ Refresh the `sandbox.html` page in the browser, and double-click a bar!
 The `Select` action is an _auxiliary_ action.
 Its goal is to mark a subset of data on which, later, a _real_ action, such as drilling-down, is performed.
 The current set of selected data is stored in the model's 
-[selectionFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model' | append: '#selectionFilter'}})
+[selectionFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.Model' | append: '#selectionFilter'}})
 property.
 For each `Select` action that is performed, 
 its [dataFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select' | append: '#dataFilter'}}), 
@@ -144,7 +144,7 @@ Modify the type factory declaration of the `ViewD3.js` file to the following:
 ```js
 define([
   "pentaho/module!_",
-  "pentaho/visual/base/View",
+  "pentaho/visual/impl/View",
   "./Model",
   "pentaho/visual/action/Execute",
   "pentaho/visual/action/Select",

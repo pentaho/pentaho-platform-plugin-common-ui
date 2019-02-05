@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/module!_",
-  "../../base/Model",
+  "../../Model",
   "../types/TrendType",
   "../types/LineWidth",
   "pentaho/i18n!../i18n/model"

@@ -28,7 +28,7 @@ define([
    *
    * @classDesc The execution class for an
    * [Update]{@link pentaho.visual.action.Update} action in a
-   * [Model]{@link pentaho.visual.base.Model}.
+   * [Model]{@link pentaho.visual.Model}.
    *
    * Use the [assertModelUnchanged]{@link pentaho.visual.action.UpdateExecution#assertModelUnchanged} method
    * during the update `do` phase to throw an error
@@ -38,7 +38,7 @@ define([
    *
    * @constructor
    * @param {pentaho.visual.action.Update} action - The update action.
-   * @param {pentaho.visual.base.Model} view - The target model.
+   * @param {pentaho.visual.Model} view - The target model.
    */
   var UpdateExecution =
   ActionTargetMixin.ActionExecution.extend(module.id, /** @lends pentaho.visual.action.UpdateExecution# */{

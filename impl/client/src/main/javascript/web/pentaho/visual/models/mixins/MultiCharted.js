@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/module!_",
-  "../../base/Model",
+  "../../Model",
   "../types/MaxChartsPerRow",
   "../types/MultiChartRangeScope",
   "../types/MultiChartOverflow",

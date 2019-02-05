@@ -33,7 +33,7 @@ define([
    * which originate from the user directly interacting with the view.
    *
    * Interaction actions cannot be executed if the associated model is
-   * [isDirty]{@link pentaho.visual.base.Model#isDirty}.
+   * [isDirty]{@link pentaho.visual.Model#isDirty}.
    *
    * @description Creates an interaction instance given its specification.
    * @param {pentaho.visual.action.spec.IInteraction} [spec] An interaction specification.

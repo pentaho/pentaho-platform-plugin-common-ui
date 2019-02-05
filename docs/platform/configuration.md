@@ -37,7 +37,7 @@ as an instance of type
    You will need to consult the reference documentation of the target _module_ to know 
    the list of available properties.
    For example, the [Visualization API](visual)'s 
-   [Model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) type,
+   [Model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.Model'}}) type,
    being a [Complex]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex'}}) type,
    can be configured with the properties of the 
    [IComplexType]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.spec.IComplexType'}}) interface.

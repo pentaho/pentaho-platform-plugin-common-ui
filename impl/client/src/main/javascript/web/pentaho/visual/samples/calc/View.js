@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/module!_",
-  "pentaho/visual/base/View",
+  "pentaho/visual/impl/View",
   "pentaho/i18n!view"
 ], function(module, BaseView, bundle) {
 
@@ -25,7 +25,7 @@ define([
    * @name View
    * @memberOf pentaho.visual.samples.calc
    * @class
-   * @extends pentaho.visual.base.View
+   * @extends pentaho.visual.impl.View
    *
    * @amd pentaho/visual/samples/calc/View
    *

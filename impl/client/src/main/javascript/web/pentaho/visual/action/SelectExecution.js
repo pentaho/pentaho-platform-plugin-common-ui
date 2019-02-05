@@ -27,20 +27,20 @@ define([
    *
    * @classDesc The execution class for a
    * [Select]{@link pentaho.visual.action.Select} action in a
-   * [Model]{@link pentaho.visual.base.Model}.
+   * [Model]{@link pentaho.visual.Model}.
    *
    * @description Creates a select action execution instance for a given select action and model.
    *
    * @constructor
    * @param {pentaho.visual.action.Select} action - The select action.
-   * @param {pentaho.visual.base.Model} view - The target model.
+   * @param {pentaho.visual.Model} view - The target model.
    */
   var SelectExecution = InteractionExecution.extend(module.id, /** @lends pentaho.visual.action.SelectExecution# */{
     /**
      * Applies the associated action's
      * [selectionMode]{@link pentaho.visual.action.Select#selectionMode}
      * function to the associated model's
-     * [selectionFilter]{@link pentaho.visual.base.Model#selectionFilter} and
+     * [selectionFilter]{@link pentaho.visual.Model#selectionFilter} and
      * the action's [dataFilter]{@link pentaho.visual.action.Select#dataFilter}.
      *
      * The resulting data filter is set as the model's new `selectionFilter`.

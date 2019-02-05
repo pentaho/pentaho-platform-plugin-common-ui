@@ -35,7 +35,7 @@ define([
      * @param {string} vizTypeId - The identifier of the visualization type.
      *
      * @return {Promise.<({
-     *     Model: Class.<pentaho.visual.base.Model>,
+     *     Model: Class.<pentaho.visual.Model>,
      *     View:  Class.<pentaho.visual.IView>,
      *     viewTypeId: string
      *  })>} A promise that resolves to an object containing the model and default view classes,
