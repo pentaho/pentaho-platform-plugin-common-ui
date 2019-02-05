@@ -28,16 +28,20 @@ define([
   "./action/Execute",
   "pentaho/util/text",
   "pentaho/util/error",
+  "pentaho/debug",
+  "pentaho/debug/Levels",
   "pentaho/util/logger",
   "pentaho/i18n!model",
   "./role/Property" // Pre-loaded with Model
 ], function(module, AbstractModel, KeyTypes, ActionTargetMixin, Transaction, UpdateAction, UpdateExecution,
             Interaction, InteractionExecution, SelectAction, SelectExecution, ExecuteAction,
-            textUtil, errorUtil, logger, bundle) {
+            textUtil, errorUtil, debugMgr, DebugLevels, logger, bundle) {
 
   "use strict";
 
   /* eslint max-len:0 */
+
+  var __isDebugMode = debugMgr.testLevel(DebugLevels.debug, module);
 
   // region Custom Action Executions
   /**
@@ -327,7 +331,9 @@ define([
       /* eslint dot-notation: 0 */
 
       this.update()["catch"](function(error) {
-        logger.warn("Auto-update was rejected: " + error);
+        if(__isDebugMode) {
+          logger.debug("Auto-update was rejected: " + error);
+        }
       });
     },
     // endregion
@@ -603,7 +609,7 @@ define([
          * Gets or sets the width that the container application has allocated to display the visualization
          * without horizontal or vertical scrolling, in pixels.
          *
-         * This property is required.
+         * This property is required and non-browsable.
          *
          * @name width
          * @memberOf pentaho.visual.Model#
@@ -616,13 +622,14 @@ define([
           name: "width",
           valueType: "number",
           isRequired: true,
-          defaultValue: 300
+          defaultValue: 300,
+          isBrowsable: false
         },
         /**
          * Gets or sets the height that the container application has allocated to display the visualization
          * without horizontal or vertical scrolling, in pixels.
          *
-         * This property is required.
+         * This property is required and non-browsable.
          *
          * @name height
          * @memberOf pentaho.visual.Model#
@@ -635,7 +642,8 @@ define([
           name: "height",
           valueType: "number",
           isRequired: true,
-          defaultValue: 300
+          defaultValue: 300,
+          isBrowsable: false
         }
       ],
 
@@ -753,8 +761,7 @@ define([
         return __fullChangeset;
       }
 
-      // TODO
-      return changeset1;
+      return changeset1.compose(changeset2);
     }
 
     return changeset1 || changeset2;

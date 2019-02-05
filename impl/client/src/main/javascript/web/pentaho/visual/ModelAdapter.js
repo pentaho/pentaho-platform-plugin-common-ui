@@ -249,7 +249,7 @@ define([
     /**
      * Event handler for the for the `change:init` event as emitted by this object.
      *
-     * @param {pentaho.type.action.Transaction} transactionExecution - The action execution.
+     * @param {pentaho.type.action.Transaction} actionExecution - The action execution.
      *
      * @private
      */

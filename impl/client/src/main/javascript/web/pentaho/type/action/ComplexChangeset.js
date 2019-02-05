@@ -17,11 +17,11 @@
 define([
   "module",
   "./Changeset",
-  "./ListChangeset",
   "./Replace",
   "pentaho/type/action/Transaction",
-  "pentaho/util/object"
-], function(module, Changeset, ListChangeset, Replace, Transaction, O) {
+  "pentaho/util/object",
+  "pentaho/util/error"
+], function(module, Changeset, Replace, Transaction, O, error) {
 
   "use strict";
 
@@ -46,7 +46,7 @@ define([
    * @param {pentaho.type.action.Transaction} transaction - The owning transaction.
    * @param {pentaho.type.Complex} target - The complex value where the changes take place.
    */
-  return Changeset.extend(module.id, /** @lends pentaho.type.action.ComplexChangeset#*/{
+  var ComplexChangeset = Changeset.extend(module.id, /** @lends pentaho.type.action.ComplexChangeset# */{
 
     constructor: function(transaction, target) {
 
@@ -234,6 +234,63 @@ define([
     },
 
     /** @inheritDoc */
+    compose: function(changeset) {
+
+      if(!(changeset instanceof ComplexChangeset)) {
+        throw error.argInvalidType("changeset", "pentaho.type.action.ComplexChangeset", typeof changeset);
+      }
+
+      if(changeset === this) {
+        throw error.argInvalid("changeset", "Changeset is equal to itself.");
+      }
+
+      var target = changeset.target;
+      if(target !== this.target) {
+        throw error.argInvalid("changeset.target", "Cannot compose with a changeset which has a different target.");
+      }
+
+      var targetVersion = changeset.targetVersion;
+      if(targetVersion < this.targetVersion) {
+        throw error.argInvalid("changeset.targetVersion", "Cannot compose with a changeset which has a previous target version.");
+      }
+
+      var transaction =  changeset.transaction;
+      var resultChangeset = new ComplexChangeset(transaction, target);
+
+      resultChangeset.__targetVersion = targetVersion;
+      resultChangeset.__setReadOnlyInternal();
+
+      // Populate result changeset with changes from the previous changeset.
+      var name;
+      var previousChanges = O.assignOwn({}, this._changes);
+      for(name in previousChanges) {
+        if(O.hasOwn(previousChanges, name)) {
+          resultChangeset._changes[name] = previousChanges[name];
+        }
+      }
+
+      // Merge new changes in the result changeset.
+      var changes = O.assignOwn({}, changeset._changes);
+      for(name in changes) {
+        if(O.hasOwn(changes, name)) {
+          var change = changes[name];
+          var prevChange = resultChangeset._changes[name];
+
+          var isPrevChangeset = prevChange != null && prevChange instanceof Changeset;
+          if(isPrevChangeset && change instanceof Changeset) {
+            resultChangeset._changes[name] = prevChange.compose(change);
+          } else {
+            // Previous Change is `null` or a `Replace`
+            // or new Change is a `Replace`.
+            resultChangeset._changes[name] = change;
+          }
+        }
+      }
+
+      return resultChangeset;
+    },
+
+    /** @inheritDoc */
     __onChildChangesetCreated: function(childChangeset, propType) {
 
       // Cannot set changesets over Replace changes
@@ -314,16 +371,19 @@ define([
      * @internal
      */
     __addComplexElement: function(element, propType) {
+      // Do not run any `Transaction` related code, when calling this method while composing two changesets,
+      // being this changeset in read-only mode.
+      if(!this.isReadOnly) {
+        // The transaction version is already affected by the
+        // __setPrimitiveChange, __removePrimitiveChange and __updateReplaceChange methods.
 
-      // The transaction version is already affected by the
-      // __setPrimitiveChange, __removePrimitiveChange and __updateReplaceChange methods.
+        this.transaction.__ensureChangeRef(element).addReference(this.target, propType);
 
-      this.transaction.__ensureChangeRef(element).addReference(this.target, propType);
-
-      var childChangeset = element.__cset;
-      if(childChangeset !== null) {
-        // Make sure that the new changeset descendants have at least our topological order.
-        childChangeset.__updateNetOrder(this._netOrder + 1);
+        var childChangeset = element.__cset;
+        if (childChangeset !== null) {
+          // Make sure that the new changeset descendants have at least our topological order.
+          childChangeset.__updateNetOrder(this._netOrder + 1);
+        }
       }
     },
 
@@ -335,16 +395,19 @@ define([
      * @internal
      */
     __removeComplexElement: function(element, propType) {
+      // Do not run any `Transaction` related code, when calling this method while composing two changesets,
+      // being this changeset in read-only mode.
+      if(!this.isReadOnly) {
+        // The transaction version is already affected by the
+        // __setPrimitiveChange, __removePrimitiveChange and __updateReplaceChange methods.
 
-      // The transaction version is already affected by the
-      // __setPrimitiveChange, __removePrimitiveChange and __updateReplaceChange methods.
+        this.transaction.__ensureChangeRef(element).removeReference(this.target, propType);
 
-      this.transaction.__ensureChangeRef(element).removeReference(this.target, propType);
-
-      var childChangeset = element.__cset;
-      if(childChangeset !== null) {
-        // Make sure that the changeset descendants update its new topological order.
-        childChangeset._resetNetOrder();
+        var childChangeset = element.__cset;
+        if (childChangeset !== null) {
+          // Make sure that the changeset descendants update its new topological order.
+          childChangeset._resetNetOrder();
+        }
       }
     },
 
@@ -492,6 +555,8 @@ define([
       scope.accept();
     }
   });
+
+  return ComplexChangeset;
 
   /**
    * Gets a value that indicates if a change has changes.

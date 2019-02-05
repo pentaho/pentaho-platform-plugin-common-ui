@@ -559,6 +559,7 @@ define([
         var result = view._update(event, action);
 
         expect(view._updateSize).toHaveBeenCalledTimes(1);
+        expect(view._updateSize).toHaveBeenCalledWith(event);
 
         return result;
       });

@@ -218,12 +218,20 @@ define([
     /** @inheritDoc */
     dispose: function() {
 
+      this.__disposeChart();
+
+      this.base();
+    },
+
+    /**
+     * Disposes an existing CCC chart.
+     * @private
+     */
+    __disposeChart: function() {
       if(this._chart && this._chart.dispose) {
         this._chart.dispose();
         this._chart = null;
       }
-
-      this.base();
     },
 
     /** @inheritDoc */
@@ -1223,7 +1231,7 @@ define([
      */
     _getTooltipHtml: function(cccContext) {
 
-      if(this.isDirty) {
+      if(this.model.isDirty) {
         return;
       }
 
@@ -1551,6 +1559,9 @@ define([
     },
 
     _renderCore: function() {
+
+      this.__disposeChart();
+
       this._chart = this._createChart(pvc[this._cccClass]);
       this._chart.setData(this._dataView.toJsonCda());
 
@@ -1602,7 +1613,7 @@ define([
 
     _onUserSelection: function(cccContext, cccSelectingDatums, cccSelectingGroup) {
 
-      if(this.isDirty) {
+      if(this.model.isDirty) {
         // Explicitly cancel CCC's own selection handling.
         return [];
       }
@@ -1611,7 +1622,7 @@ define([
 
       var srcEvent = cccContext.event;
 
-      this.select({
+      this.model.select({
         dataFilter: selectFilter,
         position: srcEvent ? {x: srcEvent.clientX, y: srcEvent.clientY} : null
       });
@@ -1677,7 +1688,7 @@ define([
 
     _executeOn: function(cccContext) {
 
-      if(this.isDirty) {
+      if(this.model.isDirty) {
         return;
       }
 
@@ -1690,7 +1701,7 @@ define([
 
       var srcEvent = cccContext.event;
 
-      this.execute({
+      this.model.execute({
         dataFilter: executeFilter,
         position: srcEvent ? {x: srcEvent.clientX, y: srcEvent.clientY} : null
       });
@@ -1795,14 +1806,12 @@ define([
       if(effective === undefined) {
         effective = null;
 
-        if(AbstractView != null) {
+        if(AbstractView != null && this !== AbstractView.prototype) {
           var ancestor = Object.getPrototypeOf(this);
-          if(ancestor !== AbstractView.prototype) {
-            var ancestorExtEf = ancestor.extensionEffective;
-            if(ancestorExtEf) {
-              effective = {};
-              specUtil.merge(effective, ancestorExtEf);
-            }
+          var ancestorExtEf = ancestor.extensionEffective;
+          if(ancestorExtEf) {
+            effective = {};
+            specUtil.merge(effective, ancestorExtEf);
           }
         }
 

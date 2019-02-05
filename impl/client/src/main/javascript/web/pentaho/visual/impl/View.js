@@ -223,7 +223,7 @@ define([
 
         var updateMethodInfo = this.__selectUpdateMethod(dirtyPropGroups);
 
-        return Promise.resolve(this[updateMethodInfo.name]())
+        return Promise.resolve(this[updateMethodInfo.name](event))
           .then(this.__onUpdateResolved.bind(this, event));
       }
     },
@@ -485,13 +485,14 @@ define([
      *
      * The default implementation does nothing.
      *
+     * @param {pentaho.action.Execution} event - The update action execution.
      * @protected
      *
      * @see pentaho.visual.impl.View#_update
      * @see pentaho.visual.impl.View#hasUpdatedAll
      * @see pentaho.visual.impl.View.PropertyGroups
      */
-    _updateAll: function() {
+    _updateAll: function(event) {
     }
 
     /**
@@ -507,6 +508,7 @@ define([
      * @name _updateSize
      * @memberOf pentaho.visual.impl.View#
      * @method
+     * @param {pentaho.action.Execution} event - The update action execution.
      * @protected
      * @optional
      *
@@ -526,6 +528,7 @@ define([
      * @name _updateSelection
      * @memberOf pentaho.visual.impl.View#
      * @method
+     * @param {pentaho.action.Execution} event - The update action execution.
      * @protected
      * @optional
      *
@@ -545,6 +548,7 @@ define([
      * @name _updateData
      * @memberOf pentaho.visual.impl.View#
      * @method
+     * @param {pentaho.action.Execution} event - The update action execution.
      * @protected
      * @optional
      *
@@ -563,6 +567,7 @@ define([
      * @name _updateGeneral
      * @memberOf pentaho.visual.impl.View#
      * @method
+     * @param {pentaho.action.Execution} event - The update action execution.
      * @protected
      * @optional
      *

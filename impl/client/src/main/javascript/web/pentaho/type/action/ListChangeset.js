@@ -22,8 +22,9 @@ define([
   "./Sort",
   "./Clear",
   "pentaho/util/arg",
-  "pentaho/util/object"
-], function(module, Changeset, Add, Remove, Move, Sort, Clear, arg, O) {
+  "pentaho/util/object",
+  "pentaho/util/error"
+], function(module, Changeset, Add, Remove, Move, Sort, Clear, arg, O, error) {
 
   "use strict";
 
@@ -44,7 +45,7 @@ define([
    * @param {pentaho.type.action.Transaction} transaction - The owning transaction.
    * @param {pentaho.type.List} target - The list value where the changes take place.
    */
-  return Changeset.extend(module.id, /** @lends pentaho.type.action.ListChangeset# */{
+  var ListChangeset = Changeset.extend(module.id, /** @lends pentaho.type.action.ListChangeset# */{
 
     constructor: function(transaction, target) {
 
@@ -61,7 +62,7 @@ define([
       /**
        * Array of primitive changes.
        *
-       * @type {Array.<pentaho.type.action.Change>}
+       * @type {Array.<pentaho.type.action.PrimitiveChange>}
        * @private
        */
       this.__primitiveChanges = [];
@@ -97,7 +98,7 @@ define([
      *
      * The returned array should not be modified.
      *
-     * @type {pentaho.type.change.PrimitiveChange[]}
+     * @type {Array.<pentaho.type.action.PrimitiveChange>}
      * @readOnly
      */
     get changes() {
@@ -131,6 +132,72 @@ define([
       return O.getOwn(this.__changesetByKey, key) || null;
     },
 
+
+    /** @inheritDoc */
+    compose: function(changeset) {
+
+      if(!(changeset instanceof ListChangeset)) {
+        throw error.argInvalidType("changeset", "pentaho.type.action.ListChangeset", typeof changeset);
+      }
+
+      if(changeset === this) {
+        throw error.argInvalid("changeset", "Changeset is equal to itself.");
+      }
+
+      var target = changeset.target;
+      if(target !== this.target) {
+        throw error.argInvalid("changeset.target", "Cannot compose with a changeset which has a different target.");
+      }
+
+      var targetVersion = changeset.targetVersion;
+      if(targetVersion < this.targetVersion) {
+        throw error.argInvalid("changeset.targetVersion", "Cannot compose with a changeset which has a previous target version.");
+      }
+
+      var transaction =  changeset.transaction;
+      var resultChangeset = new ListChangeset(transaction, target);
+
+      resultChangeset.__targetVersion = targetVersion;
+      resultChangeset.__setReadOnlyInternal();
+
+      // Populate result changeset with changes from the previous changeset.
+      var key;
+      var prevChildChangesets = O.assignOwn({}, this.__changesetByKey);
+      for(key in prevChildChangesets) {
+        if(O.hasOwn(prevChildChangesets, key)) {
+          resultChangeset.__changesetByKey[key] = prevChildChangesets[key];
+        }
+      }
+      resultChangeset.__primitiveChanges = this.__primitiveChanges.slice();
+
+      // Merge new child changesets in the result changeset.
+      var childChangesets = O.assignOwn({}, changeset.__changesetByKey);
+      for(key in childChangesets) {
+        if(O.hasOwn(childChangesets, key)) {
+          var change = childChangesets[key];
+          var previousChange = resultChangeset.__changesetByKey[key];
+
+          resultChangeset.__changesetByKey[key] = previousChange != null
+            ? previousChange.compose(change)
+            : change;
+        }
+      }
+
+      // Merge new primitive changes in the result changeset.
+      var primitiveChanges = changeset.__primitiveChanges.slice();
+      var i = -1;
+      var L = primitiveChanges.length;
+      while(++i < L) {
+        var pChange = primitiveChanges[i];
+
+        resultChangeset.__primitiveChanges.push(pChange);
+
+        pChange._prepare(resultChangeset);
+      }
+
+      return resultChangeset;
+    },
+
     /** @inheritDoc */
     _clearChanges: function() {
 
@@ -162,17 +229,23 @@ define([
      * @internal
      */
     __addComplexElement: function(element) {
+      // Do not run any `Transaction` related code, when calling this method while composing two changesets,
+      // being this changeset in read-only mode.
+      var isReadOnly = this.isReadOnly;
+      if(!isReadOnly) {
+        // The transaction version is already affected by the __addChange or _clearChanges methods.
 
-      // The transaction version is already affected by the __addChange or _clearChanges methods.
-
-      this.transaction.__ensureChangeRef(element).addReference(this.target);
+        this.transaction.__ensureChangeRef(element).addReference(this.target);
+      }
 
       var childChangeset = element.__cset;
       if(childChangeset !== null) {
         this.__changesetByKey[element.$key] = childChangeset;
 
-        // Make sure that the new changeset descendants have at least our topological order.
-        childChangeset.__updateNetOrder(this._netOrder + 1);
+        if(!isReadOnly) {
+          // Make sure that the new changeset descendants have at least our topological order.
+          childChangeset.__updateNetOrder(this._netOrder + 1);
+        }
       }
     },
 
@@ -183,17 +256,24 @@ define([
      * @internal
      */
     __removeComplexElement: function(element) {
-      // The transaction version is already affected by the __addChange or _clearChanges methods.
+      // Do not run any `Transaction` related code, when calling this method while composing two changesets,
+      // being this changeset in read-only mode.
+      var isReadOnly = this.isReadOnly;
+      if(!isReadOnly) {
+        // The transaction version is already affected by the __addChange or _clearChanges methods.
 
-      this.transaction.__ensureChangeRef(element).removeReference(this.target);
+        this.transaction.__ensureChangeRef(element).removeReference(this.target);
+      }
 
       var childChangeset = element.__cset;
       if(childChangeset !== null) {
 
         delete this.__changesetByKey[element.$key];
 
-        // Make sure that the changeset descendants update its new topological order.
-        childChangeset._resetNetOrder();
+        if(!isReadOnly) {
+          // Make sure that the changeset descendants update its new topological order.
+          childChangeset._resetNetOrder();
+        }
       }
     },
 
@@ -758,4 +838,6 @@ define([
       return module.id;
     }
   });
+
+  return ListChangeset;
 });

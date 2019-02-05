@@ -452,7 +452,7 @@ define([
       });
 
       // Coverage.
-      // TODO: should test that logger.warn is called.
+      // TODO: should test that logger.debug is called.
       it("should log the rejected case of an auto-update", function() {
 
         var model = createValidCleanModel(true);

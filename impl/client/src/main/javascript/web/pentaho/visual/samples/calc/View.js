@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!_",
+  "module",
   "pentaho/visual/impl/View",
   "pentaho/i18n!view"
 ], function(module, BaseView, bundle) {

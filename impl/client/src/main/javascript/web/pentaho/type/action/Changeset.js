@@ -394,6 +394,24 @@ define([
      * @abstract
      */
 
+    /**
+     * Creates a new changeset which combines the current changeset with another one
+     * which contains new changes to the same [target]{@link pentaho.type.mixins.Container}.
+     *
+     * @name pentaho.type.action.Changeset#compose
+     * @method
+     * @abstract
+     *
+     * @param {pentaho.type.action.Changeset} changeset - The new changeset.
+     *
+     * @return {pentaho.type.action.Changeset} The composed changeset.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidTypeError} When `changeset` is not a {@link pentaho.type.action.Changeset}.
+     * @throws {pentaho.lang.ArgumentInvalidError} When `changeset` is the same as `this`.
+     * @throws {pentaho.lang.ArgumentInvalidError} When composing with a `changeset` that has a different `target`.
+     * @throws {pentaho.lang.ArgumentInvalidError} When composing with a `changeset` that has a previous `targetVersion`.
+     */
+
     // region clearChanges
 
     // TODO: Define clearChanges semantics.

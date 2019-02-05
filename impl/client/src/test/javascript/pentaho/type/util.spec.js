@@ -84,7 +84,7 @@ define([
       });
     });
 
-    describe("#fillSpecMethodInContext(spec, obj, name)", function() {
+    describe("#__fillSpecMethodInContext(spec, obj, name)", function() {
 
       it("should return false when the method is not overridden locally", function() {
         var Derived = Base.extend({
@@ -93,7 +93,7 @@ define([
         var Derived2 = Derived.extend();
 
         var spec = {};
-        var result = typeUtil.fillSpecMethodInContext(spec, Derived2.prototype,  "foo");
+        var result = typeUtil.__fillSpecMethodInContext(spec, Derived2.prototype,  "foo");
 
         expect(result).toBe(false);
         expect("foo" in spec).toBe(false);
@@ -110,7 +110,7 @@ define([
         });
 
         var spec = {};
-        var result = typeUtil.fillSpecMethodInContext(spec, Derived2.prototype, "foo");
+        var result = typeUtil.__fillSpecMethodInContext(spec, Derived2.prototype, "foo");
 
         expect(result).toBe(true);
         expect(spec.foo).toBe(f);
@@ -127,7 +127,7 @@ define([
         });
 
         var spec = {};
-        var result = typeUtil.fillSpecMethodInContext(spec, Derived2.prototype, "foo");
+        var result = typeUtil.__fillSpecMethodInContext(spec, Derived2.prototype, "foo");
 
         expect(result).toBe(true);
         expect(spec.foo).toBe(f);

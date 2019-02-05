@@ -775,11 +775,14 @@ define([
 
       if(!this.isSettled) {
         this.__reject(reason);
-      } else if(debugMgr.testLevel(DebugLevels.warn, module)) {
+      } else if((!reason || this.error !== reason)) {
+        // Do not log the rejection reason itself.
         // Else, it is not possible to reject.
         // It's already done/rejected...
         // Log the error anyway, like what is done with errors on the _onPhaseFinally method.
-        logger.warn("Ignoring error occurred after being marked done: " + reason);
+        if(debugMgr.testLevel(DebugLevels.warn, module)) {
+          logger.warn("Ignoring error occurred after being marked done: " + reason);
+        }
       }
     },
 
