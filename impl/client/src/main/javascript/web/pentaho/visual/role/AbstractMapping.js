@@ -40,7 +40,7 @@ define([
    * @amd pentaho/visual/role/AbstractMapping
    *
    * @classDesc The `AbstractMapping` class is the base class for associations between
-   * a visual role and data fields of a visualization's current data set.
+   * a visual role and data fields of a visualization's current dataset.
    *
    * A mapping contains a list of [fields]{@link pentaho.visual.role.AbstractMapping#fields},
    * each of the type [MappingField]{@link pentaho.visual.role.MappingField}.
@@ -89,10 +89,10 @@ define([
     },
 
     /**
-     * Gets an array of the indexes of data set columns of the mapped fields.
+     * Gets an array of the indexes of dataset columns of the mapped fields.
      *
-     * If there is no container model, or the model has no data set, `null` is returned.
-     * If any of the mapped fields is not defined in the data set, `null` is returned.
+     * If there is no container model, or the model has no dataset, `null` is returned.
+     * If any of the mapped fields is not defined in the dataset, `null` is returned.
      *
      * @type {Array.<number>}
      * @readOnly

@@ -1703,7 +1703,7 @@ define([
       if(cccScene.groups !== null && cccScene.groups.length > 1) {
         // If there is more than one group in a scene, then there is not a well-defined execution target.
         // This happens in scenes of the discrete non-composite axis that are the result of
-        // merging several ticks and their data sets (groups), due to lack of space.
+        // merging several ticks and their datasets (groups), due to lack of space.
         return null;
       }
 

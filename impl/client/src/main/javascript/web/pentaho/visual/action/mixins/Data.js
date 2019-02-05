@@ -37,7 +37,7 @@ define([
    * @amd pentaho/visual/action/mixins/Data
    *
    * @classDesc The `visual.action.mixins.Data` class is a mixin class for visual actions
-   * which are performed on a subset of a data set.
+   * which are performed on a subset of a dataset.
    *
    * The actual subset is determined by the
    * [data filter]{@link pentaho.visual.action.mixins.Data#dataFilter} property.

@@ -49,7 +49,7 @@ define([
    *
    * The [valueType]{@link pentaho.type.PropertyType#valueType} of a property of this type is
    * [Mapping]{@link pentaho.visual.role.AbstractMapping} and
-   * stores the association between the visual role and the data fields of a visualization's current data set.
+   * stores the association between the visual role and the data fields of a visualization's current dataset.
    *
    * @description This class was not designed to be constructed directly.
    */

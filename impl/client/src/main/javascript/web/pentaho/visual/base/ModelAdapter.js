@@ -789,7 +789,7 @@ define([
     var previousRoleInfoMap = hasDataChanged ? null : previousAdaptationModel.roleInfoMap;
 
     // If, for any VR, the selected method changes and it was or is not an identity method,
-    // then a new data set needs to be determined and all strategies need to be recreated.
+    // then a new dataset needs to be determined and all strategies need to be recreated.
 
     var nextRoleInfoMap = Object.create(null);
     var nextRoleInfoList = [];

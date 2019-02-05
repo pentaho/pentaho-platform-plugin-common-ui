@@ -30,10 +30,10 @@ define(function() {
   var WellKnownErrorNames = {
     /**
      * This error can result from an [Update]{@link pentaho.visual.action.Update} action
-     * when the given data set does not have any rows or
+     * when the given dataset does not have any rows or
      * when all of its rows do not have data which can be rendered.
      *
-     * This can be the case, for example, if all of the rows in a data set only have null measure values.
+     * This can be the case, for example, if all of the rows in a dataset only have null measure values.
      *
      * @default
      */
@@ -41,7 +41,7 @@ define(function() {
 
     /**
      * This error can result from an [Update]{@link pentaho.visual.action.Update} action
-     * when the model's data set contains data which is invalid for the visualization.
+     * when the model's dataset contains data which is invalid for the visualization.
      *
      * This can be the case, for example,
      * if a Pie chart receives rows for which the sum of all measure values is 0.
@@ -52,7 +52,7 @@ define(function() {
 
     /**
      * This error can result from an [Update]{@link pentaho.visual.action.Update} action
-     * when the model's data set is too big for being rendered by a view.
+     * when the model's dataset is too big for being rendered by a view.
      *
      * Frequently, the rendering complexity is not dependent on the number of rows,
      * but, instead, is dependent on the product between the distinct number of tuples of certain column sets.

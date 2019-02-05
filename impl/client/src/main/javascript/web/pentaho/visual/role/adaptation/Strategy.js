@@ -56,7 +56,7 @@ define([
       this.base(instSpec);
 
       /**
-       * Gets the data set of this strategy.
+       * Gets the dataset of this strategy.
        *
        * @name pentaho.visual.role.adaptation.Strategy#data
        * @type {pentaho.data.ITable}

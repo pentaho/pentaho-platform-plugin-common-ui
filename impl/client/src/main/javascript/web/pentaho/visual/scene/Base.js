@@ -35,7 +35,7 @@ define([
      * [vars]{@link pentaho.visual.scene.Base#vars} whose values are inherited from parent to child scenes.
      *
      * To *create scenes*, most `View` implementations can simply use the [scene.Base.buildScenesFlat] method.
-     * This method creates one parent scene having one child scene per row of the model's data set.
+     * This method creates one parent scene having one child scene per row of the model's dataset.
      * In child scenes,
      * for each visual role there will be a correspondingly named variable having the value of the visual role.
      *
@@ -188,7 +188,7 @@ define([
      * Builds a flat, single-level scene tree according to the data and visual roles of a given model.
      *
      * This method creates one parent scene having one child scene per row of the
-     * [model's data set]{@link pentaho.visual.base.Model#data}.
+     * [model's dataset]{@link pentaho.visual.base.Model#data}.
      * In child scenes, for each visual role there will be a correspondingly named variable having the value
      * of the visual role.
      *
