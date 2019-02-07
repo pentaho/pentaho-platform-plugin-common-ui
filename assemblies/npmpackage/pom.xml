@@ -46,7 +46,10 @@
               <includes>
                 common-ui/pentaho/**,
                 common-ui/util/require-*/**,
-                common-ui/*-cfg.js
+                common-ui/*-cfg.js,
+                common-ui/require.js,
+                common-ui/compressed/pentaho/**,
+                common-ui/compressed/util/require-*/**
               </includes>
             </configuration>
           </execution>
