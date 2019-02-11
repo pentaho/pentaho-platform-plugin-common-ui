@@ -49,10 +49,10 @@ function initAsync(config) {
 
   var requireCfg;
 
+  var global = getGlobal();
+
   return loadScript(basePath + "/require.js")
     .then(function() {
-
-      var global = getGlobal();
 
       global.requireCfg = requireCfg = {
         paths: {},
@@ -82,7 +82,7 @@ function initAsync(config) {
     })
     .then(function() {
 
-      require.config(requireCfg);
+      global.require.config(requireCfg);
 
       requireCfg = null;
 
@@ -93,10 +93,10 @@ function initAsync(config) {
       });
 
       if(requireCfg !== null) {
-        require.config(requireCfg);
+        global.require.config(requireCfg);
       }
 
-      return require;
+      return global.require;
     });
 }
 
