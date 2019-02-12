@@ -64,6 +64,8 @@ define([
      * @type {string}
      * @readonly
      * @default "remove"
+     * @override
+     * @see pentaho.type.action.Change#type
      */
     get type() {
       return "remove";
@@ -112,6 +114,11 @@ define([
       elems.forEach(function(elem) {
         delete target.__keys[elem.$key];
       });
+    }
+  }, /** @lends pentaho.type.action.Remove */{
+    /** @inheritDoc */
+    get id() {
+      return module.id;
     }
   });
 });

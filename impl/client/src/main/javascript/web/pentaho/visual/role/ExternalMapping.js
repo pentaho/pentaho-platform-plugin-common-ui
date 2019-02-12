@@ -43,7 +43,7 @@ define([
    * @amd pentaho/visual/role/ExternalMapping
    *
    * @classDesc The `ExternalMapping` class holds the association between
-   * a specific visual role and the data fields of a visualization's current data set,
+   * a specific visual role and the data fields of a visualization's current dataset,
    * as seen by parties external to a visualization, such as a container.
    *
    * It extends the base [Mapping]{@link pentaho.visual.role.AbstractMapping} class to add

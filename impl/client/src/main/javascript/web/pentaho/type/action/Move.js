@@ -84,6 +84,8 @@ define([
      * @type {string}
      * @readonly
      * @default "move"
+     * @override
+     * @see pentaho.type.action.Change#type
      */
     get type() {
       return "move";
@@ -92,6 +94,11 @@ define([
     /** @inheritDoc */
     _apply: function(target) {
       target.__elems.splice(this.indexNew, 0, target.__elems.splice(this.indexOld, 1)[0]);
+    }
+  }, /** @lends pentaho.type.action.Move */{
+    /** @inheritDoc */
+    get id() {
+      return module.id;
     }
   });
 });

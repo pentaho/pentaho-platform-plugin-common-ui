@@ -42,6 +42,19 @@ define([
     }
 
     /**
+     * Gets the type of change.
+     *
+     * Contrast this with {@link pentaho.action.Base.id}, which globally identifies actions.
+     *
+     * @name type
+     * @memberOf pentaho.type.action.Change#
+     * @type {string}
+     * @readonly
+     *
+     * @abstract
+     */
+
+    /**
      * Gets the transaction version of this change.
      *
      * @name transactionVersion

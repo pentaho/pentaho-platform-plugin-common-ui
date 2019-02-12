@@ -49,6 +49,8 @@ define([
      * @type {string}
      * @readonly
      * @default "sort"
+     * @override
+     * @see pentaho.type.action.Change#type
      */
     get type() {
       return "sort";
@@ -57,6 +59,11 @@ define([
     /** @inheritDoc */
     _apply: function(target) {
       target.__elems.sort(this.comparer);
+    }
+  }, /** @lends pentaho.type.action.Sort */{
+    /** @inheritDoc */
+    get id() {
+      return module.id;
     }
   });
 });

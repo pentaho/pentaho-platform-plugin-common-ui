@@ -775,11 +775,14 @@ define([
 
       if(!this.isSettled) {
         this.__reject(reason);
-      } else if(debugMgr.testLevel(DebugLevels.warn, module)) {
+      } else if((!reason || this.error !== reason)) {
+        // Do not log the rejection reason itself.
         // Else, it is not possible to reject.
         // It's already done/rejected...
         // Log the error anyway, like what is done with errors on the _onPhaseFinally method.
-        logger.warn("Ignoring error occurred after being marked done: " + reason);
+        if(debugMgr.testLevel(DebugLevels.warn, module)) {
+          logger.warn("Ignoring error occurred after being marked done: " + reason);
+        }
       }
     },
 
@@ -845,7 +848,7 @@ define([
      * Executes the **will** phase.
      *
      * Validates the action,
-     * by delegating to [_validatePhaseWill]{@link pentaho.type.action.Execution#_validatePhaseWill}.
+     * by delegating to [_validate]{@link pentaho.type.action.Execution#_validate}.
      * When invalid, the execution is rejected with the first validation error.
      *
      * Otherwise,
@@ -866,11 +869,14 @@ define([
 
         // Validating here and not on the end of `__executePhaseInit`
         // ensures that isSettled is false (not rejected already).
-        if(this._validatePhaseWill() == null) {
+        var errors = this._validate();
+        if(errors == null || errors.length === 0) {
 
           this._lockAction();
 
           this._onPhaseWill();
+        } else {
+          this.__reject(errors[0]);
         }
       }
     },
@@ -887,24 +893,15 @@ define([
     },
 
     /**
-     * Validates that the action is valid for entering the `will` phase.
+     * Validates that the action execution is valid for entering the `will` phase.
      *
-     * When invalid, the execution is rejected with the first validation error.
+     * The default implementation validates the action.
      *
      * @return {?Array.<Error>} A non-empty array of errors, if any; otherwise `null`.
      * @protected
      */
-    _validatePhaseWill: function() {
-
-      var errors = this.action.validate();
-
-      if(errors && errors.length) {
-        this.__reject(errors[0]);
-
-        return errors;
-      }
-
-      return null;
+    _validate: function() {
+      return this.action.validate();
     },
 
     /**

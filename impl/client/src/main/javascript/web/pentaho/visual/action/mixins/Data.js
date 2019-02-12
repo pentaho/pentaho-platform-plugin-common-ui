@@ -15,13 +15,13 @@
  */
 define([
   "pentaho/module!_",
-  "pentaho/visual/action/Base",
+  "pentaho/visual/action/Interaction",
   "pentaho/data/filter/Abstract",
   "pentaho/module/subtypesOf!pentaho/data/filter/Abstract",
 
   // TODO: This exists only so that r.js sees otherwise invisible dependencies.
   "pentaho/data/filter/standard"
-], function(module, ActionBase, AbstractFilter) {
+], function(module, Interaction, AbstractFilter) {
 
   "use strict";
 
@@ -37,7 +37,7 @@ define([
    * @amd pentaho/visual/action/mixins/Data
    *
    * @classDesc The `visual.action.mixins.Data` class is a mixin class for visual actions
-   * which are performed on a subset of a data set.
+   * which are performed on a subset of a dataset.
    *
    * The actual subset is determined by the
    * [data filter]{@link pentaho.visual.action.mixins.Data#dataFilter} property.
@@ -50,7 +50,7 @@ define([
    * @constructor
    */
 
-  return ActionBase.extend(module.id, /** @lends pentaho.visual.action.mixins.Data# */{
+  return Interaction.extend(module.id, /** @lends pentaho.visual.action.mixins.Data# */{
     // @override
     _init: function(spec) {
 
@@ -66,7 +66,9 @@ define([
      * it is converted into a filter object.
      * Any registered visual filter type can be safely loaded synchronously.
      *
-     * @type {pentaho.data.filter.Abstract}
+     * When `null`, the action targets the entire dataset.
+     *
+     * @type {?pentaho.data.filter.Abstract}
      */
     get dataFilter() {
       return this.__dataFilter;
@@ -78,7 +80,7 @@ define([
        * The data filter of the action.
        *
        * @alias __dataFilter
-       * @type {pentaho.data.filter.Abstract}
+       * @type {?pentaho.data.filter.Abstract}
        * @memberOf pentaho.visual.action.mixins.Data#
        * @private
        */

@@ -16,7 +16,7 @@
 define([
   "pentaho/visual/scene/util",
   "pentaho/data/filter/Abstract",
-  "pentaho/visual/base/Model",
+  "pentaho/visual/Model",
   "pentaho/data/Table"
 ], function(sceneUtil, AbstractFilter, VisualModel, DataTable) {
 

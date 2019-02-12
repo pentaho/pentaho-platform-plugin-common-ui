@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara.  All rights reserved.
+ * Copyright 2018 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,19 @@
 define([
   "pentaho/type/loader",
   "pentaho/type/action/Transaction",
-  "pentaho/visual/base/Model",
-  "pentaho/visual/base/ModelAdapter",
+  "pentaho/visual/Model",
+  "pentaho/visual/ModelAdapter",
   "pentaho/visual/role/adaptation/Strategy",
   "pentaho/visual/role/ExternalProperty",
   "pentaho/data/Table",
-  "../role/adaptationUtil",
+  "./role/adaptationUtil",
   "tests/pentaho/util/errorMatch"
 ], function(typeLoader, Transaction, Model, ModelAdapter, BaseStrategy, ExternalProperty, Table,
             adaptationUtil, errorMatch) {
 
   "use strict";
 
-  describe("pentaho.visual.base.ModelAdapter", function() {
+  describe("pentaho.visual.ModelAdapter", function() {
 
     var buildAdapter = adaptationUtil.buildAdapter;
     var ModelWithStringRole;
@@ -1598,7 +1598,7 @@ define([
         expect(DerivedModelAdapter.type.visualKeyType).toBe("dataKey");
       });
 
-      it("should have the value of ModelType#visualKeyType when it is 'dataKey'", function() {
+      it("should have the value of ModelType#visualKeyType when it is 'dataOrdinal'", function() {
 
         var DerivedModel = Model.extend({
           $type: {

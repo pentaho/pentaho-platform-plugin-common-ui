@@ -17,21 +17,26 @@
 /**
  * The `IModel` interface represents the set of options used to initialize a visual model.
  *
- * @name pentaho.visual.base.spec.IModel
+ * @name pentaho.visual.spec.IModel
  * @interface
- * @extends pentaho.visual.base.spec.IAbstractModel
+ * @extends pentaho.visual.spec.IAbstractModel
  *
- * @see pentaho.visual.base.Model
+ * @see pentaho.visual.Model
  */
 
 /**
- * The type of visual key used by the visualization.
+ * Enables or disables automatic updates of the model.
  *
- * @name visualKeyType
- * @memberOf pentaho.visual.base.spec.IModel#
- * @type {?pentaho.visual.base.KeyTypes|undefined}
+ * This property is special and is not serialized.
  *
- * @see pentaho.visual.base.AbstractModelType#visualKeyType
+ * @type {?boolean}
+ *
+ * @name isAutoUpdate
+ * @memberOf pentaho.visual.spec.IModel#
+ * @type {boolean}
+ * @default true
+ *
+ * @see pentaho.visual.Model#isAutoUpdate
  */
 
 /**
@@ -41,10 +46,10 @@
  *
  * This property is not serialized by default.
  * To serialize it, specify the argument `keyArgs.omitProps.data` of
- * [toSpec]{@link pentaho.visual.base.AbstractModel#toSpec} to `false`.
+ * [toSpec]{@link pentaho.visual.AbstractModel#toSpec} to `false`.
  *
  * @name data
- * @memberOf pentaho.visual.base.spec.IAbstractModel#
+ * @memberOf pentaho.visual.spec.IAbstractModel#
  * @type {pentaho.data.ITable}
  */
 
@@ -53,10 +58,10 @@
  *
  * This property is not serialized by default.
  * To serialize it, specify the argument `keyArgs.omitProps.selectionFilter` of
- * [toSpec]{@link pentaho.visual.AbstractModel.View#toSpec} to `false`.
+ * [toSpec]{@link pentaho.visual.AbstractModel#toSpec} to `false`.
  *
  * @name selectionFilter
- * @memberOf pentaho.visual.base.spec.IAbstractModel#
+ * @memberOf pentaho.visual.spec.IAbstractModel#
  * @type {pentaho.data.filter.Abstract}
- * @see pentaho.visual.base.AbstractModel#selectionFilter
+ * @see pentaho.visual.AbstractModel#selectionFilter
  */

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,17 @@
 define([
   "pentaho/module!_",
   "./Abstract",
-  "pentaho/visual/models/Sunburst",
   "cdf/lib/CCC/protovis",
   "cdf/lib/CCC/def",
   "./_util",
   "pentaho/i18n!./i18n/view"
-], function(module, BaseView, Model, pv, def, util, bundle) {
+], function(module, BaseView, pv, def, util, bundle) {
 
   "use strict";
 
-  return BaseView.extend({
-    $type: {
-      id: module.id,
-      props: {
-        model: {valueType: Model}
-      }
-    },
+  // "pentaho/visual/models/Sunburst"
 
+  return BaseView.extend(module.id, {
     _cccClass: "SunburstChart",
 
     _roleToCccRole: {
@@ -267,5 +261,5 @@ define([
       }
     }
   })
-  .configure({$type: module.config});
+  .implement(module.config);
 });

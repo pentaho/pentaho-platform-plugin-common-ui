@@ -44,6 +44,8 @@ define([
      * @type {string}
      * @readonly
      * @default "clear"
+     * @override
+     * @see pentaho.type.action.Change#type
      */
     get type() {
       return "clear";
@@ -87,6 +89,11 @@ define([
     _apply: function(target) {
       target.__elems = [];
       target.__keys = {};
+    }
+  }, /** @lends pentaho.type.action.Clear */{
+    /** @inheritDoc */
+    get id() {
+      return module.id;
     }
   });
 });

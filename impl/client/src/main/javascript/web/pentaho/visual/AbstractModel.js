@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 define([
   "pentaho/module!_",
   "pentaho/type/Complex",
-  "../role/AbstractProperty",
-  "../color/PaletteProperty", // Also pre-loads all registered palette instances.
+  "./role/AbstractProperty",
+  "./color/PaletteProperty", // Also pre-loads all registered palette instances.
   "./Application",
   "./KeyTypes",
   "pentaho/data/filter/Abstract",
@@ -36,7 +36,7 @@ define([
   /**
    * @classDesc Manages the lifetime of the cached information of the mapping instances associated with a
    * target abstract model.
-   * @memberOf pentaho.visual.base
+   * @memberOf pentaho.visual
    * @class
    * @extends pentaho.type.action.ComplexChangeset
    * @private
@@ -59,7 +59,7 @@ define([
      * The implementation determines if the changeset
      * contains the `data` property or any other visual role property.
      *
-     * @param {pentaho.visual.base.AbstractModelType} modelType - The target abstract model type.
+     * @param {pentaho.visual.AbstractModelType} modelType - The target abstract model type.
      *
      * @return {boolean} `true`, if it contains; `false`, if not.
      *
@@ -89,30 +89,30 @@ define([
   var _palettePropertyType = PaletteProperty.type;
 
   /**
-   * @name pentaho.visual.base.AbstractModelType
+   * @name pentaho.visual.AbstractModelType
    * @class
    * @extends pentaho.type.ComplexType
    *
-   * @classDesc The type class of {@link pentaho.visual.base.AbstractModel}.
+   * @classDesc The type class of {@link pentaho.visual.AbstractModel}.
    */
 
   /**
    * @name AbstractModel
-   * @memberOf pentaho.visual.base
+   * @memberOf pentaho.visual
    * @class
    * @extends pentaho.type.Complex
    * @abstract
    *
-   * @amd pentaho/visual/base/AbstractModel
+   * @amd pentaho/visual/AbstractModel
    *
    * @classDesc The `AbstractModel` class is the abstract base class of visualization models.
    *
    * @constructor
    * @description Creates an `AbstractModel` instance.
-   * @param {pentaho.visual.base.spec.IAbstractModel} [modelSpec] A plain object containing the abstract model
+   * @param {pentaho.visual.spec.IAbstractModel} [modelSpec] A plain object containing the abstract model
    * specification.
    */
-  var AbstractModel = Complex.extend(/** @lends pentaho.visual.base.AbstractModel# */{
+  var AbstractModel = Complex.extend(/** @lends pentaho.visual.AbstractModel# */{
 
     /** @inheritDoc */
     _createChangeset: function(txn) {
@@ -224,7 +224,7 @@ define([
     },
     // endregion
 
-    $type: /** @lends pentaho.visual.base.AbstractModelType# */{
+    $type: /** @lends pentaho.visual.AbstractModelType# */{
 
       id: module.id,
       isAbstract: true,
@@ -239,11 +239,11 @@ define([
          *
          * By default, this property is not included when serializing to JSON.
          * To serialize it, specify the argument `keyArgs.omitProps.application` of
-         * [toSpec]{@link pentaho.visual.base.AbstractModel#toSpec} to `false`.
+         * [toSpec]{@link pentaho.visual.AbstractModel#toSpec} to `false`.
          *
          * @name application
-         * @memberOf pentaho.visual.base.Model#
-         * @type {pentaho.visual.base.Application}
+         * @memberOf pentaho.visual.AbstractModel#
+         * @type {pentaho.visual.Application}
          */
         {
           name: "application",
@@ -255,10 +255,10 @@ define([
          *
          * By default, this property is not included when serializing to JSON.
          * To serialize it, specify the argument `keyArgs.omitProps.data` of
-         * [toSpec]{@link pentaho.visual.base.AbstractModel#toSpec} to `false`.
+         * [toSpec]{@link pentaho.visual.AbstractModel#toSpec} to `false`.
          *
          * @name data
-         * @memberOf pentaho.visual.base.Model#
+         * @memberOf pentaho.visual.AbstractModel#
          * @type {pentaho.data.ITable}
          */
         {
@@ -286,27 +286,27 @@ define([
         // by property types. Because of this, the conversion to DNF (or simply calling toDnf() to make sure
         // non-termination is caught early) is not being ensured when the property is set but only on
         // the Select action's _doDefault.
+        /**
+         * Gets or sets the current data selection filter.
+         *
+         * This property is required.
+         *
+         * By default, this property is not included when serializing to JSON.
+         * To serialize it, specify the argument `keyArgs.omitProps.selectionFilter` of
+         * [toSpec]{@link pentaho.visual.AbstractModel#toSpec} to `false`.
+         *
+         * When set to a filter specification, {@link pentaho.data.filter.spec.IAbstract},
+         * it is converted into a filter object.
+         * Any standard filter can be safely loaded synchronously.
+         *
+         * **ATTENTION**: The current implementation only supports filters that can be
+         * converted to [DNF]{@link pentaho.data.filter.Abstract#toDnf} _in a reasonable amount of time_.
+         *
+         * @name selectionFilter
+         * @memberOf pentaho.visual.AbstractModel#
+         * @type {pentaho.data.filter.Abstract}
+         */
         {
-          /**
-           * Gets or sets the current data selection filter.
-           *
-           * This property is required.
-           *
-           * By default, this property is not included when serializing to JSON.
-           * To serialize it, specify the argument `keyArgs.omitProps.selectionFilter` of
-           * [toSpec]{@link pentaho.visual.base.AbstractModel#toSpec} to `false`.
-           *
-           * When set to a filter specification, {@link pentaho.data.filter.spec.IAbstract},
-           * it is converted into a filter object.
-           * Any standard filter can be safely loaded synchronously.
-           *
-           * **ATTENTION**: The current implementation only supports filters that can be
-           * converted to [DNF]{@link pentaho.data.filter.Abstract#toDnf} _in a reasonable amount of time_.
-           *
-           * @name selectionFilter
-           * @memberOf pentaho.visual.base.View#
-           * @type {pentaho.data.filter.Abstract}
-           */
           name: "selectionFilter",
           valueType: AbstractFilter,
 
@@ -327,7 +327,7 @@ define([
        *
        * @param {?object} [x] The JS context object on which `f` is called.
        *
-       * @return {pentaho.visual.base.Model} This object.
+       * @return {pentaho.visual.Model} This object.
        */
       eachVisualRole: function(f, x) {
         var j = 0;
@@ -368,11 +368,11 @@ define([
        * However, once this property is specified to a non-undefined value, it cannot be changed anymore,
        * either in this class or in any of its subclasses.
        *
-       * The default value, for a non-abstract class, is [dataKey]{@link }pentaho.visual.base.KeyTypes.dataKey}.
+       * The default value, for a non-abstract class, is [dataKey]{@link }pentaho.visual.KeyTypes.dataKey}.
        *
        * @name visualKeyType
-       * @memberOf pentaho.visual.base.AbstractModelType#
-       * @type {pentaho.visual.base.KeyTypes|undefined}
+       * @memberOf pentaho.visual.AbstractModelType#
+       * @type {pentaho.visual.KeyTypes|undefined}
        * @readOnly
        * @abstract
        *

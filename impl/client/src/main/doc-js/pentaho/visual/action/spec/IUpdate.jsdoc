@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,21 @@
  */
 
 /**
- * The `spec.IApplication` interface describes a visual application instance in object form.
+ * The `visual.action.spec.IUpdate` interface describes an _update_ action instance using a generic, _object_ form.
  *
- * @name pentaho.visual.base.spec.IApplication
+ * @name pentaho.visual.action.spec.IUpdate
  *
  * @interface
- * @extends pentaho.type.spec.IComplex
+ * @extends pentaho.visual.action.spec.IBase
+ */
+
+/**
+ * A complex changeset describing the model changes since the last update execution.
  *
- * @see pentaho.visual.base.spec.IAbstractModel#application
+ * When unspecified, or specified as a {@link Nully} value,
+ * it is interpreted as if _everything has changed_.
+ *
+ * @name changeset
+ * @memberOf pentaho.visual.action.spec.IUpdate#
+ * @type {?pentaho.type.action.ComplexChangeset}
  */

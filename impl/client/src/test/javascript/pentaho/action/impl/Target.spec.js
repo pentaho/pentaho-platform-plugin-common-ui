@@ -53,10 +53,10 @@ define([
 
       // A derived non-abstract class, adding nothing new.
       SyncAction = BaseAction.extend({
-        get type() {
-          return "syncAction";
-        }
       }, {
+        get id() {
+          return "syncAction";
+        },
         get isSync() {
           return true;
         }
@@ -64,10 +64,10 @@ define([
 
       // Idem.
       AsyncAction = BaseAction.extend({
-        get type() {
-          return "asyncAction";
-        }
       }, {
+        get id() {
+          return "asyncAction";
+        },
         get isSync() {
           return false;
         }
@@ -370,13 +370,11 @@ define([
         expect(listenerArgs[1]).toBe(ae.action);
       });
 
-      it("should call #" + emitGenericMethodName + " with action.type as event type", function() {
-        // event type to be action.type
-        expect(call.args[2]).toBe(action.type);
+      it("should call #" + emitGenericMethodName + " with action.eventName as event type", function() {
+        expect(call.args[2]).toBe(action.eventName);
       });
 
       it("should call #" + emitGenericMethodName + " with phase '" + phase + "'", function() {
-        // phase to be ,phase
         expect(call.args[3]).toBe(phase);
       });
 
@@ -391,17 +389,17 @@ define([
         });
 
         it("should call #" + emitGenericMethodName + " with an errorHandler that " +
-            "calls the actionExecution.fail method with the given error", function() {
+            "calls the actionExecution.reject method with the given error", function() {
 
           var keyArgs = call.args[4];
           var errorHandler = keyArgs.errorHandler;
-          var ae = jasmine.createSpyObj("actionExecution", ["fail"]);
+          var ae = jasmine.createSpyObj("actionExecution", ["reject"]);
           var error = new Error();
 
-          errorHandler(error, ae);
+          errorHandler(error, [ae, {}]);
 
-          expect(ae.fail).toHaveBeenCalledTimes(1);
-          expect(ae.fail).toHaveBeenCalledWith(error);
+          expect(ae.reject).toHaveBeenCalledTimes(1);
+          expect(ae.reject).toHaveBeenCalledWith(error);
         });
 
         it("should call #" + emitGenericMethodName + " with an isCanceled that " +

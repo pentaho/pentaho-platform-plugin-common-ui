@@ -119,11 +119,15 @@ define([
    *   the default error handler does this.
    */
   var __emitActionKeyArgs = {
-    errorHandler: function(ex, actionExecution) {
-      actionExecution.fail(ex);
+    errorHandler: function(ex, eventArgs) {
+      var actionExecution = eventArgs[0];
+      actionExecution.reject(ex);
     },
     isCanceled: function(actionExecution) {
       return actionExecution.isCanceled;
+    },
+    getCancellationReason: function(actionExecution) {
+      return actionExecution.error;
     }
   };
 

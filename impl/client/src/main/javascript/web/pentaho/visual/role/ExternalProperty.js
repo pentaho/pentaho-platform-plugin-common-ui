@@ -18,7 +18,7 @@ define([
   "./AbstractProperty",
   "./ExternalMapping",
   "./Mode",
-  "../base/KeyTypes",
+  "../KeyTypes",
   "pentaho/module/subtypesOf!pentaho/visual/role/adaptation/Strategy",
   "pentaho/i18n!messages",
   "pentaho/type/loader",
@@ -160,7 +160,7 @@ define([
        *
        * Implements IFieldsMetadata#countRangeOn.
        *
-       * @param {pentaho.visual.base.ModelAdapter} modelAdapter - The model adapter.
+       * @param {pentaho.visual.ModelAdapter} modelAdapter - The model adapter.
        * @param {object} [keyArgs] - The keyword arguments object.
        * @param {boolean} [keyArgs.ignoreCurrentMode=false] - Indicates that the current mode, if any,
        *   should be ignored when determining the count range.
@@ -343,7 +343,7 @@ define([
        * are considered.
        * Otherwise, all internal modes are considered.
        *
-       * @param {pentaho.visual.base.ModelAdapter} modelAdapter - The model adapter.
+       * @param {pentaho.visual.ModelAdapter} modelAdapter - The model adapter.
        *
        * @return {pentaho.visual.role.adaptation.IStrategyApplication} A valid strategy method application,
        * if one can be applied; `null`, otherwise.
@@ -442,7 +442,7 @@ define([
        * 1. One of the registered strategies must be able to adapt the specified fields to one of the
        *    visual role's modes.
        *
-       * @param {pentaho.visual.base.ModelAdapter} modelAdapter - The model adapter.
+       * @param {pentaho.visual.ModelAdapter} modelAdapter - The model adapter.
        *
        * @return {Array.<pentaho.type.ValidationError>} A non-empty array of `ValidationError` or `null`.
        */

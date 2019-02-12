@@ -189,7 +189,7 @@ You should see the result of the average operation: `The result is 1002566.28571
 
 The page shows the simplest (and kind of useless) visualization: a
 calculator, which just displays the result of aggregating the values of
-one column of a data set.
+one column of a dataset.
 
 That's why you have to create your own!
 

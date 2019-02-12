@@ -40,7 +40,7 @@ define([
    * @amd pentaho/visual/role/AbstractMapping
    *
    * @classDesc The `AbstractMapping` class is the base class for associations between
-   * a visual role and data fields of a visualization's current data set.
+   * a visual role and data fields of a visualization's current dataset.
    *
    * A mapping contains a list of [fields]{@link pentaho.visual.role.AbstractMapping#fields},
    * each of the type [MappingField]{@link pentaho.visual.role.MappingField}.
@@ -67,7 +67,7 @@ define([
      * Called by the containing abstract model whenever its data or visual role properties change.
      *
      * @protected
-     * @friend pentaho.visual.base.AbstractModel
+     * @friend pentaho.visual.AbstractModel
      */
     _onDataOrMappingChanged: function() {
     },
@@ -75,7 +75,7 @@ define([
     /**
      * Gets the reference corresponding to the containing abstract model and visual role property, if any.
      *
-     * @type {?({container: pentaho.visual.base.AbstractModel, property: pentaho.visual.role.AbstractProperty})}
+     * @type {?({container: pentaho.visual.AbstractModel, property: pentaho.visual.role.AbstractProperty})}
      * @readOnly
      * @protected
      */
@@ -89,10 +89,10 @@ define([
     },
 
     /**
-     * Gets an array of the indexes of data set columns of the mapped fields.
+     * Gets an array of the indexes of dataset columns of the mapped fields.
      *
-     * If there is no container model, or the model has no data set, `null` is returned.
-     * If any of the mapped fields is not defined in the data set, `null` is returned.
+     * If there is no container model, or the model has no dataset, `null` is returned.
+     * If any of the mapped fields is not defined in the dataset, `null` is returned.
      *
      * @type {Array.<number>}
      * @readOnly

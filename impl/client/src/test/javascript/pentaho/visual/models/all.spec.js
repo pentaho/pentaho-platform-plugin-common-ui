@@ -21,7 +21,7 @@ define(function() {
 
     it("should be possible to load all models", function() {
 
-      require.using(["pentaho/module/subtypesOf!pentaho/visual/base/Model"], function() {
+      require.using(["pentaho/module/subtypesOf!pentaho/visual/Model"], function() {
         // NOOP
       });
     });

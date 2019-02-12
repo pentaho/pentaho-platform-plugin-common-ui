@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/module!_",
-  "./Base",
+  "./Interaction",
   "./mixins/Data",
   "./mixins/Positioned",
   "./SelectionModes",
@@ -24,29 +24,29 @@ define([
   "pentaho/util/fun",
   "pentaho/lang/ArgumentInvalidError",
   "pentaho/lang/ArgumentInvalidTypeError"
-], function(module, BaseAction, DataActionMixin, PositionedActionMixin, SelectionModes, PenFunction,
+], function(module, Interaction, DataActionMixin, PositionedActionMixin, SelectionModes, PenFunction,
             O, F, ArgumentInvalidError, ArgumentInvalidTypeError) {
 
   "use strict";
 
-  return BaseAction.extend(module.id, /** @lends pentaho.visual.action.Select# */{
+  return Interaction.extend(module.id, /** @lends pentaho.visual.action.Select# */{
 
     /**
      * @alias Select
      * @memberOf pentaho.visual.action
      * @class
-     * @extends pentaho.visual.action.Base
+     * @extends pentaho.visual.action.Interaction
      * @extends pentaho.visual.action.mixins.Data
      * @extends pentaho.visual.action.mixins.Positioned
      *
      * @amd pentaho/visual/action/Select
      *
-     * @classDesc The `Select` action is a synchronous, data and positioned  action that
+     * @classDesc The `Select` action is a synchronous, data and positioned action that
      * is performed when the user interacts with a visual element,
      * typically by clicking on it.
 
-     * @description Creates a data action instance given its specification.
-     * @param {pentaho.visual.action.spec.ISelect} [spec] A selection action specification.
+     * @description Creates a _select_ action given its specification.
+     * @param {pentaho.visual.action.spec.ISelect} [spec] A _select_ action specification.
      * @constructor
      *
      * @see pentaho.visual.action.spec.ISelect
@@ -97,10 +97,6 @@ define([
       this.__selectionMode = __getSelectionMode(value, "selectionMode");
     },
 
-    get type() {
-      return module.id;
-    },
-
     // region serialization
     /** @inheritDoc */
     _fillSpec: function(spec) {
@@ -112,6 +108,11 @@ define([
       }
     }
     // endregion
+  }, /** @lends pentaho.visual.action.Select */{
+    /** @inheritDoc */
+    get id() {
+      return module.id;
+    }
   })
   .mix(DataActionMixin)
   .mix(PositionedActionMixin);

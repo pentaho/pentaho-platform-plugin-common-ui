@@ -15,8 +15,8 @@
  */
 define([
   "pentaho/type/action/Transaction",
-  "pentaho/visual/base/Model",
-  "pentaho/visual/base/ModelAdapter",
+  "pentaho/visual/Model",
+  "pentaho/visual/ModelAdapter",
   "pentaho/data/Table",
   "pentaho/type/SpecificationScope",
   "./adaptationUtil"
@@ -353,8 +353,8 @@ define([
           }
 
           return require.using([
-            "pentaho/visual/base/Model",
-            "pentaho/visual/base/ModelAdapter",
+            "pentaho/visual/Model",
+            "pentaho/visual/ModelAdapter",
             "pentaho/visual/role/ExternalProperty",
             "CustomStrategyA",
             "CustomStrategyB",
@@ -413,8 +413,8 @@ define([
           }
 
           return require.using([
-            "pentaho/visual/base/Model",
-            "pentaho/visual/base/ModelAdapter",
+            "pentaho/visual/Model",
+            "pentaho/visual/ModelAdapter",
             "pentaho/visual/role/ExternalProperty",
             "CustomStrategyA",
             "tests/pentaho/visual/role/adaptationUtil"

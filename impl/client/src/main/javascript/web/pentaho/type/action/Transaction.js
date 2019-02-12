@@ -724,7 +724,7 @@ define([
 
     // region Phase WILL
     /** @inheritDoc */
-    _validatePhaseWill: function() {
+    _validate: function() {
 
       var changesets = this.__csets;
       var L = changesets.length;

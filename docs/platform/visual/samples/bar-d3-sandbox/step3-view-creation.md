@@ -17,7 +17,7 @@ Create a file named `ViewD3.js` and place the following code in it:
 ```js
 define([
   "pentaho/module!_",
-  "pentaho/visual/base/View",
+  "pentaho/visual/impl/View",
   "./Model",
   "d3",
   "pentaho/visual/scene/Base"
@@ -50,13 +50,13 @@ Remarks:
   - Defines a visualization view whose id is the file's AMD module identifier
     (depending on how AMD is configured, it can be, for example: `pentaho-visual-samples-bar-d3/ViewD3`).
   - Inherits directly from the base visualization view, 
-    [pentaho/visual/base/View]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}}).
+    [pentaho/visual/impl/View]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.impl.View'}}).
   - The inherited 
-    [model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#model'}}) 
+    [model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.impl.View' | append: '#model'}}) 
     property is overridden so that its 
     [valueType]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.PropertyType' | append: '#valueType'}}) 
     is the Bar model you previously created.
-  - The [_updateAll]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#_updateAll'}})
+  - The [_updateAll]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.impl.View' | append: '#_updateAll'}})
     method is where the code that fully renders the visualization must go,
     and, for now, it simply uses D3 to output `"Hello World!"` in the view's DOM element, `domContainer`.
   - The 
@@ -103,7 +103,7 @@ Edit the `sandbox.html` file and place the following code in it:
 
     require([
       "pentaho-visual-samples-bar-d3/Model",
-      "pentaho/visual/base/View",
+      "pentaho/visual/impl/View",
       "pentaho/data/Table",
       "json!./sandbox-data.json"
     ], function(BarModel, BaseView, Table, dataSpec) {
@@ -190,7 +190,7 @@ To make it easy, we'll adapt the code of following D3 block:
 [https://bl.ocks.org/mbostock/3885304](https://bl.ocks.org/mbostock/3885304).
 
 We'll now go through the view's
-[_updateAll]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#_updateAll'}})
+[_updateAll]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.impl.View' | append: '#_updateAll'}})
 code, piece by piece.
 
 ### Method `_updateAll`, part 1
@@ -215,14 +215,14 @@ function() {
 ```
 
 Remarks:
-  - [this.model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#model'}}) 
+  - [this.model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.impl.View' | append: '#model'}}) 
     gives you access to the visualization model object.
   - The data in the data table needs to be converted into an "array of plain objects" form, 
     so that then it can be directly consumed by D3; 
     to that end, 
     the [pentaho.visual.scene.Base]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.scene.Base'}}) helper
     class is used.
-  - [this.domContainer]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#domContainer'}})
+  - [this.domContainer]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.impl.View' | append: '#domContainer'}})
     gives you access to the DIV where rendering should take place.
 
 ### Method `_updateAll`, part 2
@@ -306,8 +306,8 @@ function() {
 
 Remarks:
   - The view dimensions are available through 
-    [this.width]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#width'}}) and 
-    [this.height]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View' | append: '#height'}}).
+    [this.width]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.impl.View' | append: '#width'}}) and 
+    [this.height]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.impl.View' | append: '#height'}}).
   - The dynamic chart title is built with the help of the `__getRoleLabel` method, which will be introduced below.
   - The chart title is built with the labels of the mapped fields (see `getRoleLabel` below).
   - The Bar model's `barSize` property is being used to limit the width of bars.

@@ -456,7 +456,7 @@ define([
         var any = this.base(spec, keyArgs);
 
         if(!keyArgs.isJson) {
-          any = typeUtil.fillSpecMethodInContext(spec, this, "cast") || any;
+          any = typeUtil.__fillSpecMethodInContext(spec, this, "cast") || any;
         }
 
         return any;

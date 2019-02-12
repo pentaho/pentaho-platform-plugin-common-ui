@@ -104,7 +104,7 @@ a visualization model type.
   "version": "1.0.0",
   "config": {
     "pentaho/modules": {
-      "baz/my-viz/Model": {"base": "pentaho/visual/base/Model"}
+      "baz/my-viz/Model": {"base": "pentaho/visual/Model"}
     }
   }
 }

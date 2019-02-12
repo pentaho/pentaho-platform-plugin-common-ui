@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 define([
+  "pentaho/type/Element",
   "pentaho/type/Complex",
   "pentaho/type/List",
   "pentaho/type/Number",
@@ -22,7 +23,7 @@ define([
   "pentaho/type/action/ComplexChangeset",
   "pentaho/type/action/Add",
   "tests/pentaho/util/errorMatch"
-], function(Complex, List, PentahoNumber, Transaction, ListChangeset, ComplexChangeset, Add, errorMatch) {
+], function(Element, Complex, List, PentahoNumber, Transaction, ListChangeset, ComplexChangeset, Add, errorMatch) {
 
   "use strict";
 
@@ -39,12 +40,22 @@ define([
       }
     }
 
-    var NumberList;
+    var ElementList;
+    var Derived;
     var scope;
 
     beforeAll(function() {
-      NumberList = List.extend({
-        $type: {of: PentahoNumber}
+      Derived = Complex.extend({
+        $type: {
+          props: [
+            {name: "x", valueType: PentahoNumber},
+            {name: "y", valueType: PentahoNumber}
+          ]
+        }
+      });
+
+      ElementList = List.extend({
+        $type: {of: Element}
       });
     });
 
@@ -63,9 +74,11 @@ define([
     describe("instance -", function() {
 
       var changeset;
+      var target;
 
       beforeEach(function() {
-        changeset = new ListChangeset(scope.transaction, new NumberList([]));
+        target = new ElementList([]);
+        changeset = new ListChangeset(scope.transaction, target);
       });
 
       describe("#type -", function() {
@@ -102,7 +115,6 @@ define([
         });
 
         it("should be `true` when it contains a nested changeset with changes", function() {
-          var Derived = Complex.extend();
           var elem = new Derived();
           var cset = new ComplexChangeset(scope.transaction, elem);
           Object.defineProperty(cset, "hasChanges", {value: true});
@@ -113,7 +125,6 @@ define([
         });
 
         it("should be `false` when it contains a nested changeset without changes", function() {
-          var Derived = Complex.extend();
           var elem = new Derived();
           var cset = new ComplexChangeset(scope.transaction, elem);
 
@@ -123,16 +134,198 @@ define([
         });
       });
 
+      describe("#compose -", function () {
+        var secondChangeset;
+        var myComplex;
+        var myComplexKey;
+
+        function expectEqualChanges(actual, expected) {
+          expect(expected).toBeDefined();
+          expect(actual).toBeDefined();
+
+          expect(actual).toBe(expected);
+        }
+
+        beforeEach(function() {
+          myComplex = new Derived({
+            x: 1,
+            y: 2
+          });
+
+          myComplexKey = myComplex.$key;
+
+          target = new ElementList([
+            1, myComplex
+          ]);
+
+          target.add(2);
+
+          changeset = target.$changeset;
+        });
+
+        describe("should throw when", function() {
+
+          it("composing with a changeset which is not an instanceof `ListChangeset`", function () {
+            secondChangeset = new ComplexChangeset(scope.transaction, new Derived());
+
+            expect(function () {
+              changeset.compose(secondChangeset)
+            }).toThrow(errorMatch.argInvalidType("changeset", "pentaho.type.action.ListChangeset", typeof secondChangeset));
+          });
+
+          it("the changeset is the same has itself", function () {
+            secondChangeset = changeset;
+
+            expect(function () {
+              changeset.compose(changeset)
+            }).toThrow(errorMatch.argInvalid("changeset"));
+          });
+
+          it("the changeset has a different target", function () {
+            secondChangeset = new ListChangeset(scope.transaction, new ElementList([]));
+
+            expect(function () {
+              changeset.compose(secondChangeset)
+            }).toThrow(errorMatch.argInvalid("changeset.target"));
+          });
+
+          it("the changeset has a previous target version", function () {
+            var targetVersion = 0;
+
+            secondChangeset = new ListChangeset(scope.transaction, target);
+            spyOnProperty(secondChangeset, "targetVersion", "get").and.returnValue(targetVersion++);
+            spyOnProperty(changeset, "targetVersion", "get").and.returnValue(targetVersion);
+
+            expect(function () {
+              changeset.compose(secondChangeset)
+            }).toThrow(errorMatch.argInvalid("changeset.targetVersion"));
+          });
+        });
+
+        it("should create a new ListChangeset which is read-only", function() {
+          secondChangeset = new ListChangeset(scope.transaction, target);
+
+          var composedChangeset = changeset.compose(secondChangeset);
+
+          expect(composedChangeset).not.toBe(changeset);
+          expect(composedChangeset).not.toBe(secondChangeset);
+
+          expect(composedChangeset.isReadOnly).toBe(true);
+        });
+
+        it("should merge PrimitiveChanges from both changesets", function() {
+          scope.accept();
+
+          Transaction.enter().using(function(scope) {
+            target.remove(1);
+
+            secondChangeset = target.$changeset;
+            scope.accept();
+          });
+
+          var composedChangeset = changeset.compose(secondChangeset);
+
+          // ---
+
+          var previousPrimitiveChange = changeset.changes[0];
+          var newPrimitiveChange = secondChangeset.changes[0];
+          var composedPrimitiveChanges = composedChangeset.changes;
+
+          expect(previousPrimitiveChange.type).toBe("add");
+          expect(newPrimitiveChange.type).toBe("remove");
+
+          expect(composedPrimitiveChanges.length).toBe(2);
+
+          expectEqualChanges(composedPrimitiveChanges[0], previousPrimitiveChange);
+          expectEqualChanges(composedPrimitiveChanges[1], newPrimitiveChange);
+        });
+
+        it("should only prepare PrimitiveChanges from the new changeset", function() {
+          scope.accept();
+
+          Transaction.enter().using(function(scope) {
+            target.remove(1);
+
+            secondChangeset = target.$changeset;
+            scope.accept();
+          });
+
+          var previousPrimitiveChange = changeset.changes[0];
+          var newPrimitiveChange = secondChangeset.changes[0];
+
+          spyOn(previousPrimitiveChange, "_prepare");
+          spyOn(newPrimitiveChange, "_prepare");
+
+          changeset.compose(secondChangeset);
+
+          // ---
+
+          expect(previousPrimitiveChange._prepare).not.toHaveBeenCalled();
+          expect(newPrimitiveChange._prepare).toHaveBeenCalled();
+        });
+
+        it("should use the new child ComplexChangeset, when it previously did not exist", function() {
+          scope.accept();
+
+          Transaction.enter().using(function(scope) {
+            target.at(1).x = 2;
+
+            secondChangeset = target.$changeset;
+            scope.accept();
+          });
+
+          var composedChangeset = changeset.compose(secondChangeset);
+
+          // ---
+
+          var previousChange = changeset.getChange(myComplexKey);
+          var newChange = secondChangeset.getChange(myComplexKey);
+          var composedChange = composedChangeset.getChange(myComplexKey);
+
+          expect(previousChange).toBeNull();
+          expect(newChange.type).toBe("complex");
+
+          expectEqualChanges(composedChange, newChange);
+        });
+
+        it("should combine the new child ComplexChangeset, with the previous child ComplexChangeset", function() {
+          target.at(1).x = 2;
+          scope.accept();
+
+          Transaction.enter().using(function(scope) {
+            target.at(1).y = 3;
+
+            secondChangeset = target.$changeset;
+            scope.accept();
+          });
+
+          var composedChangeset = changeset.compose(secondChangeset);
+
+          // ---
+
+          var previousChange = changeset.getChange(myComplexKey);
+          var newChange = secondChangeset.getChange(myComplexKey);
+          var composedChange = composedChangeset.getChange(myComplexKey);
+
+          expect(previousChange.type).toBe("complex");
+          expect(newChange.type).toBe("complex");
+          expect(composedChange.type).toBe("complex");
+
+          expectEqualChanges(composedChange.getChange("x"), previousChange.getChange("x"));
+          expectEqualChanges(composedChange.getChange("y"), newChange.getChange("y"));
+        });
+      });
+
       describe("#__projectedMock -", function() {
         it("should return the original list when there are no changes", function() {
-          var list = new NumberList([1, 2, 3]);
+          var list = new ElementList([1, 2, 3]);
 
           changeset = new ListChangeset(scope.transaction, list);
           expect(changeset.__projectedMock).toBe(list);
         });
 
         it("should return a mock with all changes applied", function() {
-          var list = new NumberList([1, 2, 3]);
+          var list = new ElementList([1, 2, 3]);
           var listElems = list.__elems;
 
           changeset = new ListChangeset(scope.transaction, list);
@@ -152,7 +345,7 @@ define([
         });
 
         it("should not try to calculate the projected mock multiple times", function() {
-          var list = new NumberList([1, 2, 3]);
+          var list = new ElementList([1, 2, 3]);
 
           changeset = new ListChangeset(scope.transaction, list);
           changeset.__addChange(new Add(list.__cast(4), 0));
@@ -177,7 +370,6 @@ define([
         });
 
         it("should clear changes of a nested changeset", function() {
-          var Derived = Complex.extend();
           var elem = new Derived();
           var childChangeset = new ComplexChangeset(scope.transaction, elem);
 
@@ -212,7 +404,7 @@ define([
 
         it("should append a `clear` change to the changeset", function() {
 
-          changeset = new ListChangeset(scope.transaction, new NumberList([1, 2]));
+          changeset = new ListChangeset(scope.transaction, new ElementList([1, 2]));
 
           changeset.__clear(); // Create clear change.
 
@@ -248,7 +440,7 @@ define([
         });
 
         it("should prevent the creation of duplicates when add=true", function() {
-          var list = new NumberList([1, 2, 3, 4]);
+          var list = new ElementList([1, 2, 3, 4]);
           changeset = new ListChangeset(scope.transaction, list);
           changeset.__set([9, 9, 9, 9], true);
 
@@ -257,7 +449,7 @@ define([
         });
 
         it("for a single element, and remove=true, should append N -1 `Remove` changes to the changeset", function() {
-          var list = new NumberList([1, 2, 3, 4]);
+          var list = new ElementList([1, 2, 3, 4]);
           changeset = new ListChangeset(scope.transaction, list);
 
           changeset.__set([2], false, false, true);
@@ -269,7 +461,7 @@ define([
         });
 
         it("for two existing elements, and move=true, should append a `Move` change to the changeset", function() {
-          var list = new NumberList([1, 2, 3, 4]);
+          var list = new ElementList([1, 2, 3, 4]);
           changeset = new ListChangeset(scope.transaction, list);
 
           changeset.__set([3, 2], false, false, false, true);
@@ -282,7 +474,7 @@ define([
            "should only append an `Add` and a `Move` to the changeset when the list is " +
            "composed of simple values", function() {
 
-          var list = new NumberList([1, 2, 3, 4]);
+          var list = new ElementList([1, 2, 3, 4]);
           changeset = new ListChangeset(scope.transaction, list);
 
           changeset.__set([5, 2], true, true, false, true);
@@ -295,7 +487,7 @@ define([
 
       describe("#__remove -", function() {
         it("for a single element, should append a `Remove` change to the changeset", function() {
-          var list = new NumberList([1, 2, 3, 4]);
+          var list = new ElementList([1, 2, 3, 4]);
           changeset = new ListChangeset(scope.transaction, list);
           changeset.__remove(2);
 
@@ -304,7 +496,7 @@ define([
         });
 
         it("for an array of elements, should append a `Remove` change to the changeset per element", function() {
-          var list = new NumberList([1, 2, 3, 4]);
+          var list = new ElementList([1, 2, 3, 4]);
           changeset = new ListChangeset(scope.transaction, list);
           changeset.__remove([2, 3]);
 
@@ -314,7 +506,7 @@ define([
         });
 
         it("should throw when called after becoming read-only", function() {
-          var list = new NumberList([1, 2, 3, 4]);
+          var list = new ElementList([1, 2, 3, 4]);
           changeset = new ListChangeset(scope.transaction, list);
           changeset.__setReadOnlyInternal();
 
@@ -328,7 +520,7 @@ define([
         var list;
 
         beforeEach(function() {
-          list = new NumberList([1, 2, 3, 4]);
+          list = new ElementList([1, 2, 3, 4]);
           changeset = new ListChangeset(scope.transaction, list);
         });
 
@@ -377,7 +569,7 @@ define([
 
       describe("#_apply -", function() {
         it("should modify the owning object", function() {
-          var list = new NumberList([1, 2, 3, 4]);
+          var list = new ElementList([1, 2, 3, 4]);
 
           changeset = new ListChangeset(scope.transaction, list);
           changeset.__set([5], true); // Append an element.
@@ -391,7 +583,7 @@ define([
 
         it("should recycle a previously calculated value when modifying the owning object", function() {
 
-          var list = new NumberList([1, 2, 3, 4]);
+          var list = new ElementList([1, 2, 3, 4]);
 
           changeset = new ListChangeset(scope.transaction, list);
 

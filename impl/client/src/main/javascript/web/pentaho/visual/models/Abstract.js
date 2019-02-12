@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/module!_",
-  "../base/Model",
+  "../Model",
   "./types/Color",
   "./types/BackgroundFill",
   "./types/FontStyle",

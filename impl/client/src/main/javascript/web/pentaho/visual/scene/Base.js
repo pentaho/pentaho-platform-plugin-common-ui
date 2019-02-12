@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,14 +28,14 @@ define([
      * @classDesc The `Scene` class represents one distinct visual state which is represented
      * visually by one or more visual elements.
      *
-     * Scenes are *not* needed to implement visualization [views]{@link pentaho.visual.base.View}.
+     * Scenes are *not* needed to implement visualization [views]{@link pentaho.visual.impl.View}.
      * However, their use simplifies their implementation in many use cases.
      *
      * Scenes have a map of visual variables,
      * [vars]{@link pentaho.visual.scene.Base#vars} whose values are inherited from parent to child scenes.
      *
-     * To *create scenes*, most `View` implementations can simply use the [scene.Base.buildScenesFlat] method.
-     * This method creates one parent scene having one child scene per row of the model's data set.
+     * To *create scenes*, most view implementations can simply use the [scene.Base.buildScenesFlat] method.
+     * This method creates one parent scene having one child scene per row of the model's dataset.
      * In child scenes,
      * for each visual role there will be a correspondingly named variable having the value of the visual role.
      *
@@ -43,7 +43,7 @@ define([
      * the scene instances' [createFilter]{@link pentaho.visual.scene.Base#createFilter} method provides
      * an easy way to create a filter that selects the data from which the scene was generated based on its
      * distinguishing field values.
-     * This filter can then be passed to a [data action]{@link pentaho.visual.action.mixins.DataType} such as
+     * This filter can then be passed to a [data action]{@link pentaho.visual.action.mixins.Data} such as
      * [Select]{@link pentaho.visual.action.Select} or [Execute]{@link pentaho.visual.action.Execute}.
      *
      * When *communicating with external parties*, field values must be used and visual variable values are not
@@ -59,9 +59,9 @@ define([
      * @description Creates a scene instance.
      * @constructor
      * @param {pentaho.visual.scene.Base} parent - The parent scene, if any.
-     * @param {pentaho.visual.base.View} view — The owner view. Required if `parent` is not specified.
+     * @param {pentaho.visual.Model} model - The model. Required if `parent` is not specified.
      */
-    constructor: function(parent, view) {
+    constructor: function(parent, model) {
 
       var hasParent = parent != null;
       if(hasParent) {
@@ -76,10 +76,10 @@ define([
 
         O.setConst(this.vars, "$root", this);
 
-        if(view == null) {
-          throw error.argRequired("view");
+        if(model == null) {
+          throw error.argRequired("model");
         }
-        this.__view = view;
+        this.__model = model;
       }
     },
 
@@ -120,13 +120,13 @@ define([
     },
 
     /**
-     * Gets the associated visualization view.
+     * Gets the associated visualization model.
      *
-     * @type {pentaho.visual.base.View}
+     * @type {pentaho.visual.Model}
      * @readOnly
      */
-    get view() {
-      return this.root.__view;
+    get model() {
+      return this.root.__model;
     },
 
     /**
@@ -152,7 +152,7 @@ define([
      * This method provides an easy way to create a filter that selects the data that this scene visually represents
      * based on its distinguishing field values.
      *
-     * This filter can then be passed to a [data action]{@link pentaho.visual.action.mixins.DataType} such as
+     * This filter can then be passed to a [data action]{@link pentaho.visual.action.mixins.Data} such as
      * [Select]{@link pentaho.visual.action.Select} or [Execute]{@link pentaho.visual.action.Execute}.
      *
      * In certain circumstances, the returned value may be `null`. A filter can only be created for a scene
@@ -162,7 +162,7 @@ define([
      * @return {pentaho.data.filter.Abstract} The filter, if one can be created; `null`, otherwise.
      */
     createFilter: function() {
-      return sceneUtil.createFilterFromVars(this.vars, this.view.model);
+      return sceneUtil.createFilterFromVars(this.vars, this.model);
     },
 
     /**
@@ -181,26 +181,24 @@ define([
      * @see pentaho.visual.scene.util.invertVars
      */
     invert: function(keyArgs) {
-      return sceneUtil.invertVars(this.vars, this.view.model, keyArgs);
+      return sceneUtil.invertVars(this.vars, this.model, keyArgs);
     }
   }, /** @lends pentaho.visual.scene.Base*/ {
     /**
-     * Builds a flat, single-level scene tree according to the data and visual roles of the model of a given view.
+     * Builds a flat, single-level scene tree according to the data and visual roles of a given model.
      *
      * This method creates one parent scene having one child scene per row of the
-     * [model's data set]{@link pentaho.visual.base.Model#data}.
+     * [model's dataset]{@link pentaho.visual.Model#data}.
      * In child scenes, for each visual role there will be a correspondingly named variable having the value
      * of the visual role.
      *
-     * @param {pentaho.visual.base.View} view - The visualization view. Must be valid.
+     * @param {pentaho.visual.Model} model - The visualization model. Must be valid.
      *
      * @return {pentaho.visual.scene.Base} The parent scene.
      */
-    buildScenesFlat: function(view) {
+    buildScenesFlat: function(model) {
 
-      var parentScene = new Scene(/* parent: */null, view);
-
-      var model = view.model;
+      var parentScene = new Scene(/* parent: */null, model);
 
       // assert model.isValid
 

@@ -46,13 +46,13 @@ to [configuring it](#configuring-the-visualization).
 
 Creating a visualization boils down to creating:
 
-- One [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) class — 
+- One [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.Model'}}) class — 
   which _identifies_ the visualization and 
   _defines_ it in terms of its data requirements, 
   such as the visual degrees of freedom it has (e.g. _X position_, _color_ and _size_) and 
   any major options that affect its rendering, — and
 
-- One [`View`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}}) class (at least) — 
+- One [`IView`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.IView'}}) class (at least) — 
   which implements the actual rendering using chosen technologies 
   (e.g. [HTML](https://www.w3.org/TR/html/), [SVG](https://www.w3.org/TR/SVG/), [D3](https://d3js.org/)),
   and handle user interaction, 

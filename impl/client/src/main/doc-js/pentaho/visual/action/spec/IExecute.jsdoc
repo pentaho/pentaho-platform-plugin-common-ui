@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,12 @@
  */
 
 /**
- * The `base` namespace contains the types used to define the _base_ visualization.
+ * The `visual.action.spec.IExecute` interface describes an _execute_ action instance using a generic, _object_ form.
  *
- * @name pentaho.visual.base
- * @namespace
+ * @name pentaho.visual.action.spec.IExecute
+ *
+ * @interface
+ * @extends pentaho.visual.action.spec.IInteraction
+ * @extends pentaho.visual.action.mixins.spec.IData
+ * @extends pentaho.visual.action.mixins.spec.IPositioned
  */

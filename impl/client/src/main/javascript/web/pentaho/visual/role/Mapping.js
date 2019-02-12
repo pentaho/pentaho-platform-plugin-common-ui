@@ -41,7 +41,7 @@ define([
    * @amd pentaho/visual/role/Mapping
    *
    * @classDesc The `Mapping` class holds the association between
-   * a specific visual role and the data fields of a model's current data set,
+   * a specific visual role and the data fields of a model's current dataset,
    * as seen internally to the visualization, by the view.
    *
    * It extends the [AbstractMapping]{@link pentaho.visual.role.AbstractMapping} class to add
@@ -59,7 +59,7 @@ define([
      * Called by the containing abstract model whenever its data or visual role properties change.
      *
      * @protected
-     * @friend pentaho.visual.base.AbstractModel
+     * @friend pentaho.visual.AbstractModel
      */
     _onDataOrMappingChanged: function() {
       // Clear any cached mode.

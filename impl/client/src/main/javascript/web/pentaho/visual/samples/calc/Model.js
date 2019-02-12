@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/module!_",
-  "pentaho/visual/base/Model",
+  "pentaho/visual/Model",
   "pentaho/i18n!model",
   "./theme/model"
 ], function(module, BaseModel, bundle) {
@@ -27,7 +27,7 @@ define([
   /**
    * @name pentaho.visual.samples.calc.Model
    * @class
-   * @extends pentaho.visual.base.Model
+   * @extends pentaho.visual.Model
    * @amd pentaho/visual/samples/calc/Model
    */
   return BaseModel.extend({

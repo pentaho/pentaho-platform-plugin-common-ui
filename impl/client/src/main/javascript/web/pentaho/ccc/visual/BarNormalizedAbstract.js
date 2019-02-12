@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,14 @@
  */
 define([
   "pentaho/module!_",
-  "./BarAbstract",
-  "pentaho/visual/models/BarNormalizedAbstract"
-], function(module, BaseView, Model) {
+  "./BarAbstract"
+], function(module, BaseView) {
 
   "use strict";
 
-  return BaseView.extend({
-    $type: {
-      id: module.id,
-      props: {
-        model: {valueType: Model}
-      }
-    },
+  // "pentaho/visual/models/BarNormalizedAbstract"
+
+  return BaseView.extend(module.id, {
     _options: {
       valuesNormalized: true,
       stacked: true
@@ -39,7 +34,7 @@ define([
       this.options.orthoAxisTickFormatter = formatTickPercent;
     }
   })
-  .configure({$type: module.config});
+  .implement(module.config);
 
   function formatTickPercent(v) {
     return v + "%";

@@ -32,7 +32,7 @@ Create a file named `Model.js` and place the following code in it:
 ```js
 define([
   "pentaho/module!_",
-  "pentaho/visual/base/Model"
+  "pentaho/visual/Model"
 ], function(module, BaseModel) {
   
   "use strict";
@@ -93,7 +93,7 @@ Remarks:
   - Defines a visualization (model) whose id is the file's AMD module identifier
     (depending on how AMD is configured, it can be, for example: `pentaho-visual-samples-bar-d3/Model`).
   - Inherits directly from the base visualization model, 
-    [pentaho/visual/base/Model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}).
+    [pentaho/visual/Model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.Model'}}).
   - Specifies the [styleClass]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#styleClass'}}),
     which will later be useful to style the component using CSS.
   - Specifies the
@@ -141,7 +141,7 @@ Represents the _Category_ visual role.
 The property is of a special type, 
 a [visual role property]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property'}}).
 
-The [data]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model' | append: '#data'}}) property, 
+The [data]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.Model' | append: '#data'}}) property, 
 which is inherited from the base visualization model, 
 is given a dataset containing data for fields such as _Product Family_ and _Sales_.
 The value of a visual role contains the names of the fields that are _mapped_ to it,
@@ -198,8 +198,8 @@ matches the [level]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.col
 
 Your visualization must be advertised to the platform so that applications like Analyzer and PDI can offer it to users.
 This is done by registering 
-the visualization's [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) module
-with `pentaho/modules`, as a subtype of `pentaho/visual/base/Model`.
+the visualization's [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.Model'}}) module
+with `pentaho/modules`, as a subtype of `pentaho/visual/Model`.
 
 For such, edit the `package.json` file and make sure it looks like this:
 
@@ -211,7 +211,7 @@ For such, edit the `package.json` file and make sure it looks like this:
   "config": {
     "pentaho/modules": {
       "pentaho-visual-samples-bar-d3/Model": {
-        "base": "pentaho/visual/base/Model"
+        "base": "pentaho/visual/Model"
       }
     }
   },

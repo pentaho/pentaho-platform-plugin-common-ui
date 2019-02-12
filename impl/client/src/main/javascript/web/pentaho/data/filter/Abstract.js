@@ -134,18 +134,6 @@ define([
      * @type {string}
      * @readOnly
      * @final
-     * @deprecated Use `$contentKey` instead.
-     */
-    get contentKey() {
-      return this.$contentKey;
-    },
-
-    /**
-     * Gets a key that identifies the content of this filter.
-     *
-     * @type {string}
-     * @readOnly
-     * @final
      */
     get $contentKey() {
       return this.__contentKey || (this.__contentKey = this.__buildContentKeyOuter());

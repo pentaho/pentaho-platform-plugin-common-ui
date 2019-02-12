@@ -90,10 +90,10 @@ define([
   };
 
   /**
-   * Indexes a row, given the data set, row index and array of functions which obtain the key of each value.
+   * Indexes a row, given the dataset, row index and array of functions which obtain the key of each value.
    *
    * @memberOf pentaho.visual.role.adaptation.TupleStrategy~IndexNode
-   * @param {pentaho.data.ITable} inputData - The data set whose row is to be indexed.
+   * @param {pentaho.data.ITable} inputData - The dataset whose row is to be indexed.
    * @param {number} rowIndex - The row to index.
    * @param {Array.<number>} columnIndexes - The column indexes to index.
    * @param {Array.<(function(*):string)>} keyFuns - The array of key functions which obtain the

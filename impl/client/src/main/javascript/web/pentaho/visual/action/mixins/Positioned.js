@@ -15,8 +15,8 @@
  */
 define([
   "pentaho/module!_",
-  "pentaho/visual/action/Base"
-], function(module, ActionBase) {
+  "pentaho/visual/action/Interaction"
+], function(module, Interaction) {
 
   "use strict";
 
@@ -24,7 +24,7 @@ define([
    * @name Positioned
    * @memberOf pentaho.visual.action.mixins
    * @class
-   * @extends pentaho.visual.action.Base
+   * @extends pentaho.visual.action.Interaction
    * @abstract
    *
    * @amd pentaho/visual/action/mixins/Positioned
@@ -43,7 +43,7 @@ define([
    * @constructor
    */
 
-  return ActionBase.extend(module.id, /** @lends pentaho.visual.action.mixins.Positioned# */{
+  return Interaction.extend(module.id, /** @lends pentaho.visual.action.mixins.Positioned# */{
 
     // @override
     _init: function(spec) {

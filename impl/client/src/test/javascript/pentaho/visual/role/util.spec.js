@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/visual/role/util",
-  "pentaho/visual/base/Model",
+  "pentaho/visual/Model",
   "pentaho/visual/role/Property",
   "tests/pentaho/util/errorMatch",
   "pentaho/type/ValidationError",

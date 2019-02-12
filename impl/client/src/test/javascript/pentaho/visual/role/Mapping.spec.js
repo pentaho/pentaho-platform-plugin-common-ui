@@ -15,9 +15,10 @@
  */
 define([
   "pentaho/type/action/Transaction",
-  "pentaho/visual/base/Model",
+  "pentaho/visual/Model",
+  "pentaho/visual/role/Mode",
   "pentaho/data/Table"
-], function(Transaction, Model, Table) {
+], function(Transaction, Model, Mode, Table) {
 
   "use strict";
 
@@ -61,7 +62,7 @@ define([
           });
 
           var propType = CustomModel.type.get("propRoleA");
-          var mode = {};
+          var mode = new Mode();
           spyOn(propType, "getModeEffectiveOn").and.returnValue(mode);
 
           var model = new CustomModel({
@@ -94,7 +95,7 @@ define([
           });
 
           var propType = CustomModel.type.get("propRoleA");
-          var mode = {};
+          var mode = new Mode();
           spyOn(propType, "getModeEffectiveOn").and.returnValue(mode);
 
           var model = new CustomModel({
@@ -193,7 +194,7 @@ define([
 
         it("should ignore the cached value and call prop.getModeEffectiveOn again", function() {
 
-          var mode = {};
+          var mode = new Mode();
           spyOn(propType, "getModeEffectiveOn").and.returnValue(mode);
 
           var result = model.propRoleA.mode;
@@ -204,7 +205,7 @@ define([
 
         it("should not cache values and call prop.getModeEffectiveOn each time", function() {
 
-          var mode = {};
+          var mode = new Mode();
           spyOn(propType, "getModeEffectiveOn").and.returnValue(mode);
 
           var result1 = model.propRoleA.mode;
@@ -215,7 +216,7 @@ define([
 
         it("should return the original cached value if the transaction causes no changes", function() {
 
-          var mode = {};
+          var mode = new Mode();
           spyOn(propType, "getModeEffectiveOn").and.returnValue(mode);
 
           txnScope.accept();
@@ -228,7 +229,7 @@ define([
 
         it("should return a new value if the transaction changes the `data` property", function() {
 
-          var mode = {};
+          var mode = new Mode();
           spyOn(propType, "getModeEffectiveOn").and.returnValue(mode);
 
           model.data = new Table(getDataSpec1());
@@ -244,7 +245,7 @@ define([
 
         it("should return a new value if the transaction changes a visual role property", function() {
 
-          var mode = {};
+          var mode = new Mode();
           spyOn(propType, "getModeEffectiveOn").and.returnValue(mode);
 
           model.propRoleA.fields = ["product"];
@@ -260,7 +261,7 @@ define([
 
         it("should return the original cached value if the transaction changes normal properties", function() {
 
-          var mode = {};
+          var mode = new Mode();
           spyOn(propType, "getModeEffectiveOn").and.returnValue(mode);
 
           model.propNormal = "new-value";

@@ -56,7 +56,7 @@ define([
       this.base(instSpec);
 
       /**
-       * Gets the data set of this strategy.
+       * Gets the dataset of this strategy.
        *
        * @name pentaho.visual.role.adaptation.Strategy#data
        * @type {pentaho.data.ITable}
@@ -289,7 +289,7 @@ define([
        *
        * When `undefined`,
        * it means that it is not relevant if the input is a key or not
-       * (see [visualDataKey]{@link pentaho.visual.base.AbstractModelType.visualKeyType}).
+       * (see [visualDataKey]{@link pentaho.visual.AbstractModelType.visualKeyType}).
        *
        * Created strategies should be
        * [invertible]{@link pentaho.visual.role.adaptation.Strategy#isInvertible}.

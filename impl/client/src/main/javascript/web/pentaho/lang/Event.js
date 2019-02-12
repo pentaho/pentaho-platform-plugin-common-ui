@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ define([
 ], function(Base, O, error, UserError) {
 
   "use strict";
+
+  // NOTE: Not currently being used.
 
   return Base.extend("pentaho.lang.Event", /** @lends pentaho.lang.Event# */{
     /**
@@ -58,6 +60,7 @@ define([
      * @memberOf pentaho.lang
      * @class
      * @amd pentaho/lang/Event
+     * @private
      *
      * @description Creates an event of a given type, source, and ability to be canceled.
      * @constructor

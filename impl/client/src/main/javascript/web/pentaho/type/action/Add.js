@@ -67,6 +67,8 @@ define([
      * @type {string}
      * @readonly
      * @default "add"
+     * @override
+     * @see pentaho.type.action.Change#type
      */
     get type() {
       return "add";
@@ -94,6 +96,11 @@ define([
 
       target.__elems.splice(this.index, 0, elem);
       target.__keys[elem.$key] = elem;
+    }
+  }, /** @lends pentaho.type.action.Add */{
+    /** @inheritDoc */
+    get id() {
+      return module.id;
     }
   });
 });

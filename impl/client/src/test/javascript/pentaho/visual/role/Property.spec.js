@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/visual/base/Model",
+  "pentaho/visual/Model",
   "pentaho/visual/role/Property",
   "tests/pentaho/util/errorMatch",
   "pentaho/type/action/Transaction",

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,11 @@
  */
 
 /**
- * @name pentaho.visual.base.spec
- * @namespace
+ * The `visual.action.spec.IInteraction` interface describes
+ * an interaction instance using a generic, _object_ form.
  *
- * @description The `visual.base.spec` namespace contains specification interfaces for the base visual types.
+ * @name pentaho.visual.action.spec.IInteraction
+ *
+ * @interface
+ * @extends pentaho.visual.action.spec.IBase
  */

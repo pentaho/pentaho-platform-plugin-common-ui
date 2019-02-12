@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!_",
+  "module",
   "pentaho/action/Generic"
 ], function(module, ActionBase) {
 

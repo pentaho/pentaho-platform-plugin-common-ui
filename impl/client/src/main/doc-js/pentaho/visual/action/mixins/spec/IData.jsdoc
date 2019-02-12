@@ -21,13 +21,13 @@
  * @name pentaho.visual.action.mixins.spec.IData
  *
  * @interface
- * @extends pentaho.visual.action.spec.IBase
+ * @extends pentaho.visual.action.spec.IInteraction
  */
 
 /**
  * The data filter of the action instance.
  *
- * When unspecified, the action targets the whole data set.
+ * When unspecified, the action targets the entire dataset.
  *
  * @name dataFilter
  * @memberOf pentaho.visual.action.mixins.spec.IData#

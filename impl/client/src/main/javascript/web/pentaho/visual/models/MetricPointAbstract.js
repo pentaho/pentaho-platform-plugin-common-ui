@@ -21,7 +21,7 @@ define([
   "./mixins/ScaleColorDiscrete",
   "./mixins/MultiCharted",
   "./mixins/Trended",
-  "../base/KeyTypes",
+  "../KeyTypes",
   "pentaho/i18n!./i18n/model"
 ], function(module, BaseModel, LabelsOption, ScaleColorContinuousModel, ScaleColorDiscreteModel,
             MultiChartedModel, TrendedModel, KeyTypes, bundle) {

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 define([
-  "pentaho/module!_",
-  "./Model",
-  "pentaho/visual/base/View",
+  "module",
+  "pentaho/visual/impl/View",
   "pentaho/i18n!view"
-], function(module, Model, BaseView, bundle) {
+], function(module, BaseView, bundle) {
 
   "use strict";
 
@@ -26,22 +25,18 @@ define([
    * @name View
    * @memberOf pentaho.visual.samples.calc
    * @class
-   * @extends pentaho.visual.base.View
+   * @extends pentaho.visual.impl.View
+   *
    * @amd pentaho/visual/samples/calc/View
    *
    * @classDesc The `View` of the calculator visualization.
    */
 
-  return BaseView.extend(/** @lends pentaho.visual.samples.calc.View# */{
-    $type: {
-      id: module.id,
-      props: {
-        model: {valueType: Model}
-      }
-    },
+  return BaseView.extend(module.id, /** @lends pentaho.visual.samples.calc.View# */{
 
-    /** @inheritDoc */
-    _initDomContainer: function() {
+    constructor: function(viewSpec) {
+
+      this.base(viewSpec);
 
       var numSpan = document.createElement("span");
       numSpan.style.fontSize = "42px";
@@ -66,8 +61,8 @@ define([
       var element = this.domContainer.firstChild;
 
       // Center the span
-      var width  = this.width;
-      var height = this.height;
+      var width  = this.model.width;
+      var height = this.model.height;
       element.style.left = ((width - element.offsetWidth) / 2) + "px";
       element.style.top  = ((height - element.offsetHeight) / 2) + "px";
     },
@@ -111,10 +106,18 @@ define([
             aggregatedValue = total / rowCount;
           }
           break;
+
+        case "sum":
+          aggregatedValue = 0;
+          if(rowCount) {
+            for(rowIndex = 0; rowIndex < rowCount; rowIndex++)
+              if((value = getValue(rowIndex)) != null)
+                aggregatedValue += value;
+          }
+          break;
       }
 
       return aggregatedValue;
     }
-  })
-  .configure({$type: module.config});
+  });
 });

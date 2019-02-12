@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 define([
-  "pentaho/visual/base/View",
+  "pentaho/visual/util",
   "pentaho/data/Table"
-], function(BaseView, Table) {
+], function(vizUtil, Table) {
 
   "use strict";
 
-  var sandboxContainer = document.getElementById("sandbox-container");
+  var domContainer = document.getElementById("sandbox-container");
 
   var dataTable = new Table({
     model: [
@@ -33,35 +33,35 @@ define([
     ]
   });
 
-  var viewSpec = {
+  var vizTypeId = "pentaho/visual/samples/calc/Model";
+  var modelSpec = {
     width:  100,
     height: 100,
-    domContainer: sandboxContainer,
-    model: {
-      _: "pentaho/visual/samples/calc/Model",
-      data: dataTable,
-      levels: {
-        fields: ["family"]
-      },
-      measure: {
-        fields: ["sales"]
-      },
-      operation: "avg"
-    }
+    data: dataTable,
+    levels: {
+      fields: ["family"]
+    },
+    measure: {
+      fields: ["sales"]
+    },
+    operation: "avg"
   };
 
-  // Export for users to play with.
-  window.app = {view: null};
+  vizUtil.getModelAndDefaultViewClassesAsync(vizTypeId)
+    .then(function(classes) {
 
-  BaseView.createAsync(viewSpec)
-    .then(function(view) {
+      var model = new classes.Model(modelSpec);
+      var view = new classes.View({model: model, domContainer: domContainer});
 
-      window.app.view = view;
+      // Export for users to play with.
+      window.viz = {view: view, model: model};
 
-      return view.update();
+      return model.update();
     })
     .then(function() {
-      console.log("View update finished");
+      console.log("Viz update finished");
+    })
+    .catch(function(error) {
+      console.log("Viz update failed: " + error.message);
     });
-
 });

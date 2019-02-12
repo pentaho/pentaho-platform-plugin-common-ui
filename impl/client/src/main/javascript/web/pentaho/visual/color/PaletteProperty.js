@@ -194,7 +194,7 @@ define([
        *
        * 1. The current palette value must have a level which is one of the property's allowed levels.
        *
-       * @param {pentaho.visual.base.Model} model - The visualization model.
+       * @param {pentaho.visual.Model} model - The visualization model.
        *
        * @return {Array.<pentaho.type.ValidationError>} A non-empty array of `ValidationError` or `null`.
        */

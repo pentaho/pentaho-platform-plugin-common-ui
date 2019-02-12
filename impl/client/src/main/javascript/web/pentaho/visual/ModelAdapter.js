@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ define([
   "pentaho/module!_",
   "./AbstractModel",
   "./Model",
-  "../role/ExternalProperty",
+  "./role/ExternalProperty",
   "pentaho/data/filter/True",
   "pentaho/data/filter/False",
   "pentaho/data/filter/Or",
@@ -41,7 +41,7 @@ define([
   /**
    * @classDesc Manages the lifetime of the cached information of the mapping instances associated with a
    * target abstract model.
-   * @memberOf pentaho.visual.base
+   * @memberOf pentaho.visual
    * @class
    * @extends pentaho.type.action.ComplexChangeset
    * @private
@@ -98,34 +98,34 @@ define([
   // NOTE: these will be kept private until it is decided between the model adapter and the viz concept.
 
   /**
-   * @name pentaho.visual.base.ModelAdapterType
+   * @name pentaho.visual.ModelAdapterType
    * @class
-   * @extends pentaho.visual.base.ModelType
+   * @extends pentaho.visual.ModelType
    *
-   * @classDesc The type class of {@link pentaho.visual.base.ModelAdapter}.
+   * @classDesc The type class of {@link pentaho.visual.ModelAdapter}.
    *
    * @private
    */
 
   /**
    * @name ModelAdapter
-   * @memberOf pentaho.visual.base
+   * @memberOf pentaho.visual
    * @class
-   * @extends pentaho.visual.base.Model
+   * @extends pentaho.visual.Model
    * @abstract
    *
    * @private
    *
-   * @amd pentaho/visual/base/ModelAdapter
+   * @amd pentaho/visual/ModelAdapter
    *
    * @classDesc The `ModelAdapter` class is the abstract base class of model adapters.
    *
    * @constructor
    * @description Creates a `ModelAdapter` instance.
-   * @param {pentaho.visual.base.spec.IModelAdapter} [instSpec] A plain object containing the model adapter
+   * @param {pentaho.visual.spec.IModelAdapter} [instSpec] A plain object containing the model adapter
    * specification.
    */
-  var ModelAdapter = AbstractModel.extend(/** @lends pentaho.visual.base.ModelAdapter# */{
+  var ModelAdapter = AbstractModel.extend(/** @lends pentaho.visual.ModelAdapter# */{
 
     constructor: function() {
 
@@ -190,8 +190,8 @@ define([
      * @return {IAdaptationModel} The adaptation model.
      *
      * @private
-     * @see pentaho.visual.base.ModelAdapter#__getAdaptationModel
-     * @see pentaho.visual.base.ModelAdapterChangeset#__getAdaptationModel
+     * @see pentaho.visual.ModelAdapter#__getAdaptationModel
+     * @see pentaho.visual.ModelAdapterChangeset#__getAdaptationModel
      */
     __getAmbientAdaptationModel: function() {
       return (this.$changeset || this).__getAdaptationModel();
@@ -201,9 +201,9 @@ define([
      * Gets the adaptation model of the model adapter.
      *
      * Note that this method must exist with the exact same name and signature in
-     * {@link pentaho.visual.base.ModelAdapterChangeset}.
+     * {@link pentaho.visual.ModelAdapterChangeset}.
      *
-     * See {@link pentaho.visual.base.ModelAdapter#__getAmbientAdaptationModel}.
+     * See {@link pentaho.visual.ModelAdapter#__getAmbientAdaptationModel}.
      *
      * @return {IAdaptationModel} The adaptation model.
      *
@@ -249,7 +249,7 @@ define([
     /**
      * Event handler for the for the `change:init` event as emitted by this object.
      *
-     * @param {pentaho.type.action.Transaction} transactionExecution - The action execution.
+     * @param {pentaho.type.action.Transaction} actionExecution - The action execution.
      *
      * @private
      */
@@ -294,8 +294,8 @@ define([
 
     /**
      * Updates all properties of the internal model:
-     * * [data]{@link pentaho.visual.base.Model#data}
-     * * [selectionFilter]{@link pentaho.visual.base.Model#selectionFilter}
+     * * [data]{@link pentaho.visual.Model#data}
+     * * [selectionFilter]{@link pentaho.visual.Model#selectionFilter}
      * * and for each visual role mapping:
      *   * [modeFixed]{@link pentaho.visual.role.Mapping#modeFixed}
      *   * [fields]{@link pentaho.visual.role.Mapping#fields}
@@ -334,7 +334,7 @@ define([
     },
 
     /**
-     * Updates the [selectionFilter]{@link pentaho.visual.base.Model#selectionFilter} property of
+     * Updates the [selectionFilter]{@link pentaho.visual.Model#selectionFilter} property of
      * the internal model.
      *
      * @private
@@ -347,7 +347,7 @@ define([
     },
 
     /**
-     * Updates the [selectionFilter]{@link pentaho.visual.base.Model#selectionFilter} property of
+     * Updates the [selectionFilter]{@link pentaho.visual.Model#selectionFilter} property of
      * the external model.
      *
      * @private
@@ -510,7 +510,7 @@ define([
     },
     // endregion
 
-    $type: /** @lends pentaho.visual.base.ModelAdapterType# */{
+    $type: /** @lends pentaho.visual.ModelAdapterType# */{
 
       id: module.id,
       isAbstract: true,
@@ -532,8 +532,8 @@ define([
            * is attempted to be created.
            *
            * @name model
-           * @memberOf pentaho.visual.base.ModelAdapter#
-           * @type {pentaho.visual.base.Model}
+           * @memberOf pentaho.visual.ModelAdapter#
+           * @type {pentaho.visual.Model}
            */
           name: "model",
           valueType: Model,
@@ -547,7 +547,7 @@ define([
     }
   })
   .implement({
-    $type: /** @lends pentaho.visual.base.ModelAdapterType# */{
+    $type: /** @lends pentaho.visual.ModelAdapterType# */{
       // Declare in a separate specification group so as to not be triggered by the above props specification.
       /** @inheritDoc */
       _configureProperties: function(propTypesSpec) {
@@ -789,7 +789,7 @@ define([
     var previousRoleInfoMap = hasDataChanged ? null : previousAdaptationModel.roleInfoMap;
 
     // If, for any VR, the selected method changes and it was or is not an identity method,
-    // then a new data set needs to be determined and all strategies need to be recreated.
+    // then a new dataset needs to be determined and all strategies need to be recreated.
 
     var nextRoleInfoMap = Object.create(null);
     var nextRoleInfoList = [];

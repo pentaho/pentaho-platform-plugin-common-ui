@@ -89,7 +89,7 @@ define([
       Context.createAsync()
           .then(function(context) {
             return context.getDependencyApplyAsync([
-              "pentaho/visual/base/Model"
+              "pentaho/visual/Model"
             ], function(VisualModel) {
 
               var CustomVisualModel = VisualModel.extend({

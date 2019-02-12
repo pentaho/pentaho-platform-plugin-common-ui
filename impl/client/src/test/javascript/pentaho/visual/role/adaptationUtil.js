@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 define([
-  "pentaho/visual/base/Model",
-  "pentaho/visual/base/ModelAdapter",
+  "pentaho/visual/Model",
+  "pentaho/visual/ModelAdapter",
   "pentaho/visual/role/adaptation/Strategy",
   "pentaho/type/String",
   "pentaho/type/List"

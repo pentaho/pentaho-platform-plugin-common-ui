@@ -31,6 +31,7 @@ define([
 
     var NumberList;
     var Derived;
+    var DerivedInner;
 
     beforeAll(function() {
 
@@ -38,12 +39,22 @@ define([
         $type: {of: PentahoNumber}
       });
 
+      DerivedInner = Complex.extend({
+        $type: {
+          props: [
+            {name: "x", valueType: PentahoNumber},
+            {name: "y", valueType: PentahoNumber}
+          ]
+        }
+      });
+
       Derived = Complex.extend({
         $type: {
           props: [
             {name: "foo", valueType: PentahoNumber},
             {name: "bar", valueType: PentahoNumber},
-            {name: "myList", valueType: NumberList}
+            {name: "myList", valueType: NumberList},
+            {name: "myComplex", valueType: DerivedInner}
           ]
         }
       });
@@ -58,6 +69,7 @@ define([
       var target;
       var listChangeset;
       var myList;
+      var myComplex;
       var scope;
       var properties = ["foo", "myList"];
 
@@ -65,9 +77,11 @@ define([
         target = new Derived({
           foo: 5,
           bar: 6,
-          myList: [1]
+          myList: [1],
+          myComplex: new DerivedInner({x: 1})
         });
         myList = target.myList;
+        myComplex = target.myComplex;
 
         scope = Transaction.enter();
 
@@ -222,6 +236,197 @@ define([
           expect(changeset.hasChange("bar")).toBe(false);
         });
       }); // endregion #hasChange
+
+      // region #compose
+      describe("#compose -", function () {
+        var secondChangeset;
+
+        function expectEqualChanges(actual, expected) {
+          expect(expected).toBeDefined();
+          expect(actual).toBeDefined();
+
+          expect(actual).toBe(expected);
+        }
+
+        describe("should throw when", function() {
+
+          it("composing with a changeset which is not an instanceof `ComplexChangeset`", function () {
+            secondChangeset = new ListChangeset(scope.transaction, myList);
+
+            expect(function () {
+              changeset.compose(secondChangeset)
+            }).toThrow(errorMatch.argInvalidType("changeset", "pentaho.type.action.ComplexChangeset", typeof secondChangeset));
+          });
+
+          it("the changeset is the same has itself", function () {
+            secondChangeset = changeset;
+
+            expect(function () {
+              changeset.compose(secondChangeset)
+            }).toThrow(errorMatch.argInvalid("changeset"));
+          });
+
+          it("the changeset has a different target", function () {
+            secondChangeset = new ComplexChangeset(scope.transaction, new Derived());
+
+            expect(function () {
+              changeset.compose(secondChangeset)
+            }).toThrow(errorMatch.argInvalid("changeset.target"));
+          });
+
+          it("the changeset has a previous target version", function () {
+            var targetVersion = 0;
+
+            secondChangeset = new ComplexChangeset(scope.transaction, target);
+            spyOnProperty(secondChangeset, "targetVersion", "get").and.returnValue(targetVersion++);
+            spyOnProperty(changeset, "targetVersion", "get").and.returnValue(targetVersion);
+
+            expect(function () {
+              changeset.compose(secondChangeset)
+            }).toThrow(errorMatch.argInvalid("changeset.targetVersion"));
+          });
+        });
+
+        it("should create a new ComplexChangeset which is read-only", function() {
+          secondChangeset = new ComplexChangeset(scope.transaction, target);
+
+          var composedChangeset = changeset.compose(secondChangeset);
+
+          // ---
+
+          expect(composedChangeset).not.toBe(changeset);
+          expect(composedChangeset).not.toBe(secondChangeset);
+
+          expect(composedChangeset.isReadOnly).toBe(true);
+        });
+
+        it("should use the new Change, when it previously did not exist", function() {
+          scope.accept();
+
+          Transaction.enter().using(function(scope) {
+            target.myComplex = new DerivedInner();
+
+            secondChangeset = target.$changeset;
+            scope.accept();
+          });
+
+          var composedChangeset = changeset.compose(secondChangeset);
+
+          // ---
+
+          var previousChange = changeset.getChange("myComplex");
+          var newChange = secondChangeset.getChange("myComplex");
+          var composedChange = composedChangeset.getChange("myComplex");
+
+          expect(previousChange).toBeNull();
+          expect(newChange.type).toBe("replace");
+
+          expectEqualChanges(composedChange, newChange);
+        });
+
+        it("should choose the new Replace change, over a previous child ComplexChangeset", function() {
+          myComplex.x = 2;
+          scope.accept();
+
+          Transaction.enter().using(function(scope) {
+            target.myComplex = new DerivedInner();
+
+            secondChangeset = target.$changeset;
+            scope.accept();
+          });
+
+          var composedChangeset = changeset.compose(secondChangeset);
+
+          // ---
+
+          var previousChange = changeset.getChange("myComplex");
+          var newChange = secondChangeset.getChange("myComplex");
+          var composedChange = composedChangeset.getChange("myComplex");
+
+          expect(previousChange.type).toBe("complex");
+          expect(newChange.type).toBe("replace");
+
+          expectEqualChanges(composedChange, newChange);
+        });
+
+        it("should choose the new child ComplexChangeset, over a previous Replace change", function() {
+          target.myComplex = new DerivedInner();
+          scope.accept();
+
+          Transaction.enter().using(function(scope) {
+            target.myComplex.x = 2;
+
+            secondChangeset = target.$changeset;
+            scope.accept();
+          });
+
+          var composedChangeset = changeset.compose(secondChangeset);
+
+          // ---
+
+          var previousChange = changeset.getChange("myComplex");
+          var newChange = secondChangeset.getChange("myComplex");
+          var composedChange = composedChangeset.getChange("myComplex");
+
+          expect(previousChange.type).toBe("replace");
+          expect(newChange.type).toBe("complex");
+
+          expectEqualChanges(composedChange, newChange);
+        });
+
+        it("should combine the new child ComplexChangeset, with the previous child ComplexChangeset", function() {
+          target.myComplex.x = 2;
+          scope.accept();
+
+          Transaction.enter().using(function(scope) {
+            target.myComplex.y = 2;
+
+            secondChangeset = target.$changeset;
+            scope.accept();
+          });
+
+          var composedChangeset = changeset.compose(secondChangeset);
+
+          // ---
+
+          var previousChange = changeset.getChange("myComplex");
+          var newChange = secondChangeset.getChange("myComplex");
+          var composedChange = composedChangeset.getChange("myComplex");
+
+          expect(previousChange.type).toBe("complex");
+          expect(newChange.type).toBe("complex");
+          expect(composedChange.type).toBe("complex");
+
+          expectEqualChanges(composedChange.getChange("x"), previousChange.getChange("x"));
+          expectEqualChanges(composedChange.getChange("y"), newChange.getChange("y"));
+        });
+
+        it("should combine the new child ListChangeset, with the previous child ListChangeset", function() {
+          scope.accept();
+
+          Transaction.enter().using(function(scope) {
+            target.myList.remove(1);
+
+            secondChangeset = target.$changeset;
+            scope.accept();
+          });
+
+          var composedChangeset = changeset.compose(secondChangeset);
+
+          // ---
+
+          var previousChange = changeset.getChange("myList");
+          var newChange = secondChangeset.getChange("myList");
+          var composedChange = composedChangeset.getChange("myList");
+
+          expect(previousChange.type).toBe("list");
+          expect(newChange.type).toBe("list");
+          expect(composedChange.type).toBe("list");
+
+          expectEqualChanges(composedChange.changes[0], previousChange.changes[0]);
+          expectEqualChanges(composedChange.changes[1], newChange.changes[0]);
+        });
+      }); // endregion
 
       // region #target.get
       describe("#target.get()", function() {

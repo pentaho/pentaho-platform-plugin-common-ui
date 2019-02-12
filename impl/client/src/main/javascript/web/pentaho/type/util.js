@@ -30,33 +30,6 @@ define([
    */
 
   return /** @lends pentaho.type.Util# */{
-
-    /**
-     * Obtains the container of the first reference, if any, of the given instance.
-     *
-     * @param {pentaho.type.Instance} inst The instance.
-     * @return {pentaho.type.Instance} The container of the first reference.
-     * @private
-     * @internal
-     */
-    __getFirstRefContainer: function(inst) {
-      var refs = inst.$references;
-      return refs && refs.length ? refs[0].container : null;
-    },
-
-    /**
-     * Obtains the property type of the first reference, if any, of the given instance.
-     *
-     * @param {pentaho.type.Instance} inst The instance.
-     * @return {pentaho.type.PropertyType} The property type of the first reference.
-     * @private
-     * @internal
-     */
-    __getFirstRefProperty: function(inst) {
-      var refs = inst.$references;
-      return refs && refs.length ? refs[0].property : null;
-    },
-
     /**
      * Normalizes a validation errors result.
      *
@@ -102,8 +75,9 @@ define([
      * @param {string} name - The name of the method.
      *
      * @return {boolean} `true` if the attribute was added, `false`, otherwise.
+     * @private
      */
-    fillSpecMethodInContext: function(spec, obj, name) {
+    __fillSpecMethodInContext: function(spec, obj, name) {
       var any = false;
       var method;
 
