@@ -31,7 +31,6 @@ define([
    */
 
   return /** @lends pentaho.visual.util */{
-    // region ---
     /**
      * Gets the module of the default view class of a visualization, given its identifier.
      *
@@ -79,10 +78,13 @@ define([
 
       var viewModule = modelModule.getAnnotation(DefaultViewAnnotation, {assertExists: true}).module;
 
+      //     __defaultViewTypeId = Model.type.defaultViewAbs;
+      //     if(!__defaultViewTypeId) {
+      //       throw new Error("No registered default view.");
+      //     }
+
       return {model: modelModule, view: viewModule};
     },
-
-    // endregion
 
     /**
      * Gets a promise for the model and default view classes, given a visualization type identifier.
@@ -97,10 +99,11 @@ define([
      *  as well as the identifier of the view class.
      */
     getModelAndDefaultViewClassesAsync: function(vizTypeId) {
+      var utils = this;
 
       return new Promise(function(resolve, reject) {
 
-        var modules = this.getModelAndDefaultViewModules(vizTypeId);
+        var modules = utils.getModelAndDefaultViewModules(vizTypeId);
 
         Promise
           .all([modules.model.getAsync(), modules.view.getAsync()])
@@ -108,7 +111,11 @@ define([
             var Model = Classes[0];
             var View = Classes[1];
 
-            resolve({Model: Model, View: View, viewTypeId: modules.id});
+            resolve({
+              Model: Model,
+              View: View,
+              viewTypeId: modules.view.id
+            });
           }, reject);
 
       });

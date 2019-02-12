@@ -134,9 +134,14 @@ define([
         function configureDefaultSelectionMode(localRequire) {
           localRequire.config({
             config: {
-              "pentaho/visual/action/Select": {
-                defaultSelectionMode: customDefaultSelectionMode
+              "pentaho/modules": {
+                "pentaho/visual/action/Select": {
+                  config: {
+                    defaultSelectionMode: customDefaultSelectionMode
+                  }
+                }
               }
+
             }
           });
         }
