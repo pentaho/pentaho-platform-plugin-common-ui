@@ -712,7 +712,7 @@ define(["dojo/number", "dojo/i18n", "common-ui/prompting/PromptPanel",
       });
 
       it("should not init dashboard without showing panel and with submitting", function() {
-        panel.init();
+        panel.init(false);
         expect(panel.update).not.toHaveBeenCalled();
         expect(paramDefn.showParameterUI).toHaveBeenCalled();
         expect(paramDefn.mapParameters).toHaveBeenCalled();
@@ -720,6 +720,19 @@ define(["dojo/number", "dojo/i18n", "common-ui/prompting/PromptPanel",
         expect(dash.init).not.toHaveBeenCalled();
         expect(panel._initializeParameterValue).not.toHaveBeenCalled();
         expect(panel.submit).toHaveBeenCalledWith(panel, {
+          isInit: true
+        });
+      });
+
+      it("should not init dashboard without showing panel and without submitting", function() {
+        panel.init();
+        expect(panel.update).not.toHaveBeenCalled();
+        expect(paramDefn.showParameterUI).toHaveBeenCalled();
+        expect(paramDefn.mapParameters).toHaveBeenCalled();
+        expect(dash.addComponents).not.toHaveBeenCalled();
+        expect(dash.init).not.toHaveBeenCalled();
+        expect(panel._initializeParameterValue).not.toHaveBeenCalled();
+        expect(panel.submit).not.toHaveBeenCalledWith(panel, {
           isInit: true
         });
       });

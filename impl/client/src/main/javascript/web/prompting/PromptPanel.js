@@ -1405,7 +1405,7 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
 
         // Must submit, independently of auto-submit value.
         // All parameters are initialized, fire the submit
-        fireSubmit = !noAutoAutoSubmit;
+        fireSubmit = (noAutoAutoSubmit != null) && !noAutoAutoSubmit;
       }
 
       if(this.forceSubmit || fireSubmit) {
