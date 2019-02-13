@@ -287,33 +287,6 @@ define([
         serializationUtil.itFillSpecAttribute(getInstance, "ordinal", undefined, false);
       });
 
-      describe("#defaultView", function() {
-        // View can be null, function or string, or not local.
-        var f = function() {};
-
-        serializationUtil.itFillSpecAttribute(getInstance, "defaultView", f, true);
-        serializationUtil.itFillSpecAttribute(getInstance, "defaultView", "/my/View", true);
-        serializationUtil.itFillSpecAttribute(getInstance, "defaultView", null, true);
-        serializationUtil.itFillSpecAttribute(getInstance, "defaultView", undefined, false);
-
-        it("should not output a local defaultView constructor when isJson: true", function() {
-          var spec = {};
-          var typeSpec = {defaultView: f};
-          var result = serializationUtil.fillSpec(Instance, spec, typeSpec, {isJson: true});
-
-          expect(result).toBe(false);
-        });
-
-        it("should output a local defaultView id when isJson: true", function() {
-          var spec = {};
-          var typeSpec = {defaultView: "/my/View/"};
-          var result = serializationUtil.fillSpec(Instance, spec, typeSpec, {isJson: true});
-
-          expect(result).toBe(true);
-          expect(spec.defaultView).toBe("/my/View/");
-        });
-      });
-
       describe("#mixins", function() {
 
         function defineSampleMixins(localRequire) {
