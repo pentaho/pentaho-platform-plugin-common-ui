@@ -132,7 +132,10 @@
   requireModules["pentaho/data/filter/IsLessOrEqual"] = {alias: "<=", base: "pentaho/data/filter/Property"};
   requireModules["pentaho/data/filter/IsLike"] = {alias: "like", base: "pentaho/data/filter/Property"};
 
-  requireModules["pentaho/visual/Model"] = {base: "complex"};
+  requireModules["pentaho/visual/Model"] = {
+    base: "complex",
+    annotations: {"pentaho/visual/DefaultView": {/* module: "./View" */}}
+  };
   requireModules["pentaho/visual/role/adaptation/Strategy"] = {base: "complex"};
   requireModules["pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy"] = {
     base: "pentaho/visual/role/adaptation/Strategy",
@@ -323,32 +326,39 @@
 
   requireModules["pentaho/visual/config/vizApi.conf"] = {type: "pentaho/config/spec/IRuleSet"};
 
-  requireModules["pentaho/visual/models/Abstract"] = {base: "pentaho/visual/Model"};
-  requireModules["pentaho/visual/samples/calc/Model"] = {base: "pentaho/visual/Model"};
+  requireModules["pentaho/visual/models/Abstract"] = {
+    base: "pentaho/visual/Model",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/Abstract"}
+    }
+  };
+  requireModules["pentaho/visual/samples/calc/Model"] = {
+    base: "pentaho/visual/Model",
+    annotations: {"pentaho/visual/DefaultView": {/* module: "./View" */}}
+  };
   [
-    "pentaho/visual/models/CartesianAbstract",
-    "pentaho/visual/models/CategoricalContinuousAbstract",
-    "pentaho/visual/models/BarAbstract",
-    "pentaho/visual/models/BarNormalizedAbstract",
-    "pentaho/visual/models/BarHorizontal",
-    "pentaho/visual/models/Bar",
-    "pentaho/visual/models/BarStacked",
-    "pentaho/visual/models/BarStackedHorizontal",
-    "pentaho/visual/models/BarNormalized",
-    "pentaho/visual/models/BarNormalizedHorizontal",
-    "pentaho/visual/models/BarLine",
-    "pentaho/visual/models/Line",
-    "pentaho/visual/models/PointAbstract",
-    "pentaho/visual/models/MetricPointAbstract",
-    "pentaho/visual/models/AreaStacked",
-    "pentaho/visual/models/Pie",
-    "pentaho/visual/models/HeatGrid",
-    "pentaho/visual/models/Sunburst",
-    "pentaho/visual/models/Donut",
-    "pentaho/visual/models/Scatter",
-    "pentaho/visual/models/Bubble"
+    "BarHorizontal",
+    "Bar",
+    "BarStacked",
+    "BarStackedHorizontal",
+    "BarNormalized",
+    "BarNormalizedHorizontal",
+    "BarLine",
+    "Line",
+    "AreaStacked",
+    "Pie",
+    "HeatGrid",
+    "Sunburst",
+    "Donut",
+    "Scatter",
+    "Bubble"
   ].forEach(function(name) {
-    requireModules[name] = {base: "pentaho/visual/models/Abstract"};
+    requireModules["pentaho/visual/models/" + name] = {
+      base: "pentaho/visual/models/Abstract",
+      annotations: {
+        "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/" + name}
+      }
+    };
   });
   // endregion
 
@@ -413,13 +423,16 @@
       "pentaho/shim/_es6-promise/es6-promise",
       "pentaho/shim/es6-promise",
       "pentaho/util/promise",
+      "pentaho/util/spec",
       "pentaho/module/util",
       "pentaho/_core/module/Meta",
       "pentaho/_core/module/InstanceMeta",
       "pentaho/_core/module/TypeMeta",
       "pentaho/_core/module/Service",
-      "pentaho/util/spec",
       "pentaho/_core/config/Service",
+      "pentaho/module/Annotation",
+      "pentaho/module/AsyncAnnotation",
+      "pentaho/config/ExternalAnnotation",
       "pentaho/_core/Core",
       "pentaho/util/url",
       "pentaho/environment/impl/Environment",
