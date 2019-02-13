@@ -78,11 +78,6 @@ define([
 
       var viewModule = modelModule.getAnnotation(DefaultViewAnnotation, {assertExists: true}).module;
 
-      //     __defaultViewTypeId = Model.type.defaultViewAbs;
-      //     if(!__defaultViewTypeId) {
-      //       throw new Error("No registered default view.");
-      //     }
-
       return {model: modelModule, view: viewModule};
     },
 

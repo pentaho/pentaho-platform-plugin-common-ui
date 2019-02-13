@@ -25,8 +25,7 @@ define([
     $type: {
       id: module.id,
       v2Id: "ccc_area",
-      category: "areachart",
-      defaultView: "pentaho/ccc/visual/AreaStacked"
+      category: "areachart"
     }
   })
   .localize({$type: bundle.structured.AreaStacked})

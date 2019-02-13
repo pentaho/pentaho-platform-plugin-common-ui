@@ -23,8 +23,7 @@ define([
 
   return BaseModel.extend({
     $type: {
-      id: module.id,
-      defaultView: "pentaho/ccc/visual/Scatter"
+      id: module.id
     }
   })
   .localize({$type: bundle.structured.Scatter})

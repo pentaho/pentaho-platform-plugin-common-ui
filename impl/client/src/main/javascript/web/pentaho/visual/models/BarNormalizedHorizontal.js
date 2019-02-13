@@ -25,9 +25,7 @@ define([
     $type: {
       id: module.id,
       v2Id: "ccc_horzbarnormalized",
-      category: "horzbarchart",
-
-      defaultView: "pentaho/ccc/visual/BarNormalizedHorizontal"
+      category: "horzbarchart"
     }
   })
   .localize({$type: bundle.structured.BarNormalizedHorizontal})

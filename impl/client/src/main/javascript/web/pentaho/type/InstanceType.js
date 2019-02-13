@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -465,8 +465,7 @@ define([
      * that provides the type and may be different from the [identifier]{@link pentaho.type.Type#id}
      * when an AMD package or custom mapping is configured for the module.
      *
-     * The source identifier is used to resolve module identifiers relative to the source module,
-     * as is the case with the {@link pentaho.type.Type#defaultView} attribute.
+     * The source identifier is used to resolve module identifiers relative to the source module.
      *
      * The source identifier of a type can only be specified when extending the ancestor type.
      *
@@ -477,7 +476,6 @@ define([
      * @type {?nonEmptyString}
      * @readonly
      * @see pentaho.type.Type#id
-     * @see pentaho.type.Type#defaultView
      */
     get sourceId() {
       return this.__sourceId;
@@ -496,28 +494,6 @@ define([
      */
     get shortId() {
       return this.__alias || this.__id;
-    },
-
-    /**
-     * Builds an absolute module identifier from
-     * one that is relative to the type's [source location]{@link pentaho.type.Type#sourceId}.
-     *
-     * Relative module identifiers start with a `.` and do not end with `".js"`.
-     * For example, `"./View"` and `"../View"`, but not `./View.js`.
-     *
-     * Absolute identifiers are returned without modification.
-     *
-     * @param {string} id - A module identifier.
-     *
-     * @return {string} An absolute module identifier.
-     *
-     * @see pentaho.type.Type#sourceId
-     *
-     * @throws {OperationInvalidError} When `id` is a relative identifier and this type is anonymous,
-     * or when `id` refers to an inexistent ascendant location.
-     */
-    buildSourceRelativeId: function(id) {
-      return moduleUtil.absolutizeIdRelativeToSibling(id, this.sourceId);
     },
 
     // -> nonEmptyString, Optional(null), Immutable, Shared (note: not Inherited)
@@ -981,78 +957,6 @@ define([
     },
     // endregion
 
-    // region defaultView property
-
-    // -> nonEmptyString, Optional, Inherited, Configurable, Localized
-    // undefined -> inherit
-    // null -> clear
-    // "" -> null conversion
-
-    __defaultView: null, // {value: any, promise: Promise.<Class.<View>>}
-
-    /**
-     * Gets or sets the default view for instances of this type.
-     *
-     * The identifier of the view's AMD module.
-     * If the identifier is relative, it is relative to [sourceId]{@link pentaho.type.Type#sourceId}.
-     *
-     * Setting this to `undefined` causes the default view to be inherited from the ancestor type,
-     * except for the root type, `Instance.type` (which has no ancestor), where the attribute is `null`.
-     *
-     * Setting this to a _falsy_ value (like `null` or an empty string),
-     * clears the value of the attribute and sets it to `null`, ignoring any inherited value.
-     *
-     * @see pentaho.type.Type#buildSourceRelativeId
-     *
-     * @type {string}
-     *
-     * @throws {pentaho.lang.ArgumentInvalidTypeError} When the set value is not
-     * a string, a function or {@link Nully}.
-     *
-     * @throws {OperationInvalidError} When `defaultView` is a relative identifier and this type is anonymous,
-     * or when `defaultView` refers to an inexistent ascendant location.
-     */
-    get defaultView() {
-      return this.__defaultView && this.__defaultView.value;
-    },
-
-    set defaultView(value) {
-      var defaultViewInfo;
-
-      if(value === undefined) {
-
-        if(this !== __type) {
-          delete this.__defaultView;
-        }
-
-      } else if(!value) { // Is null || ""
-
-        this.__defaultView = null;
-
-      } else {
-        defaultViewInfo = O.getOwn(this, "__defaultView");
-        if(!defaultViewInfo || (defaultViewInfo.value !== value && defaultViewInfo.fullValue !== value)) {
-          this.__defaultView = {value: value, fullValue: this.buildSourceRelativeId(value)};
-        }
-      }
-    },
-
-    /**
-     * Gets the absolute view module identifier, if any.
-     *
-     * A default view exists if property {@link pentaho.type.Type#defaultView}
-     * has a non-null value.
-     *
-     * @type {string}
-     * @readOnly
-     * @see pentaho.type.Type#defaultView
-     */
-    get defaultViewAbs() {
-      var defaultView = this.__defaultView;
-      return defaultView ? defaultView.fullValue : null;
-    },
-    // endregion
-
     // region creation
     /**
      * Creates or resolves an instance of this type given an instance reference.
@@ -1446,15 +1350,6 @@ define([
       if(styleClass && this.__styleClassIsSet) {
         any = true;
         spec.styleClass = styleClass;
-      }
-
-      var defaultViewInfo = O.getOwn(this, "__defaultView");
-      if(defaultViewInfo !== undefined) { // Can be null.
-        var defaultView = defaultViewInfo && defaultViewInfo.value;
-        if(!defaultView || !isJson || !F.is(defaultView)) {
-          any = true;
-          spec.defaultView = defaultView;
-        }
       }
 
       // Dynamic attributes

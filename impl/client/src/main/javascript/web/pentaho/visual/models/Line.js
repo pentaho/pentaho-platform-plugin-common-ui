@@ -31,7 +31,6 @@ define([
 
       v2Id: "ccc_line",
       category: "linechart",
-      defaultView: "pentaho/ccc/visual/Line",
       props: [
         {
           name: "lineWidth",

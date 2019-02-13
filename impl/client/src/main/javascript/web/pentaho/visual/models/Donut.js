@@ -23,8 +23,7 @@ define([
 
   return BaseModel.extend({
     $type: {
-      id: module.id,
-      defaultView: "pentaho/ccc/visual/Donut"
+      id: module.id
     }
   })
   .localize({$type: bundle.structured.Donut})

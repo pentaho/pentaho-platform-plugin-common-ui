@@ -33,7 +33,6 @@ define([
 
       v2Id: "ccc_barline",
       category: "barchart",
-      defaultView: "pentaho/ccc/visual/BarLine",
 
       props: [
         {

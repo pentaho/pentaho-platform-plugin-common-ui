@@ -32,7 +32,6 @@ define([
 
       v2Id: "ccc_heatgrid",
       category: "heatgrid",
-      defaultView: "pentaho/ccc/visual/HeatGrid",
 
       props: [
         {
