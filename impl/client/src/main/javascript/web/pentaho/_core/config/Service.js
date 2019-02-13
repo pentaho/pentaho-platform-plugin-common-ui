@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 define([
-  "require",
   "module",
   "../../lang/Base",
   "../../lang/SortedList",
   "../../lang/ArgumentRequiredError",
   "../../util/spec",
   "../../util/object",
-  "../../util/promise",
+  "../../util/requireJS",
   "../../util/fun",
-  "../../util/requireJSConfig!",
   "../../module/util"
-], function(localRequire, module, Base, SortedList, ArgumentRequiredError, specUtil,
-            O, promiseUtil, F, requireJSConfig, moduleUtil) {
+], function(module, Base, SortedList, ArgumentRequiredError, specUtil, O, requireJSUtil, F, moduleUtil) {
 
   "use strict";
 
@@ -349,7 +346,7 @@ define([
 
     function __loadDependency(id) {
       var module = core.moduleMetaService.get(id);
-      return module !== null ? module.loadAsync() : promiseUtil.require(id, localRequire);
+      return module !== null ? module.loadAsync() : requireJSUtil.promise(id);
     }
 
     function resolveId(idOrAlias, contextId) {

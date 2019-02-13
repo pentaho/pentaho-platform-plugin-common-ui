@@ -109,8 +109,34 @@
     "pentaho/modules": {
       "pentaho/config/spec/IRuleSet": {
         "base": null,
-        "isAbstract": true
+        "isVirtual": true
       },
+
+      "pentaho/module/Annotation": {
+        "base": null
+      },
+      "pentaho/module/SyncAnnotation": {
+        "base": "pentaho/module/Annotation"
+      },
+      "pentaho/module/AsyncAnnotation": {
+        "base": "pentaho/module/Annotation"
+      },
+      "pentaho/config/ExternalAnnotation": {
+        "base": "pentaho/module/AsyncAnnotation"
+      },
+      "pentaho/module/LoadUIInfoAnnotation": {
+        "base": "pentaho/module/AsyncAnnotation",
+      },
+      "pentaho/i18n/LoadConfigAnnotation": {
+        "base": "pentaho/config/ExternalAnnotation",
+      },
+      "pentaho/theme/LoadThemeAnnotation": {
+        "base": "pentaho/module/AsyncAnnotation",
+      },
+      "pentaho/theme/ThemeAnnotation": {
+        "base": "pentaho/module/SyncAnnotation",
+      },
+
       "pentaho/type/Instance": {
         "alias": "instance",
         "base": null
@@ -235,6 +261,9 @@
             "module": "./View"
           }
         }
+      },
+      "pentaho/visual/DefaultViewAnnotation": {
+        "base": "pentaho/module/SyncAnnotation"
       },
       "pentaho/visual/role/adaptation/Strategy": {
         "base": "complex"

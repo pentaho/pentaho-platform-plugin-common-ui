@@ -184,7 +184,7 @@ if(!useDebug) {
     "pentaho/util/object",
     "pentaho/util/fun",
     "pentaho/util/text",
-    "pentaho/util/requireJSConfig",
+    "pentaho/util/requireJS",
     "pentaho/debug/Levels",
     "pentaho/debug/impl/Manager",
     "pentaho/util/domWindow",

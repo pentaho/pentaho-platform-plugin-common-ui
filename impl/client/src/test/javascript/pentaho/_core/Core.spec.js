@@ -36,11 +36,12 @@ define([
     });
 
     // region Mocks
-    function moduleMetaFactoryMock() {
+    function moduleMetaFactoryMock(core) {
 
       function Meta(id, spec) {
         this.id = id;
         this.alias = spec.alias;
+        this.isVirtual = !!spec.isVirtual;
         this.__index = spec.index;
         this.ranking = spec.ranking || 0;
         this.__configSpec = spec.config || null;
@@ -48,6 +49,20 @@ define([
 
       Meta.prototype.getAnnotationsIds = jasmine.createSpy("getAnnotationsIds").and.returnValue(null);
       Meta.prototype.loadAsync = jasmine.createSpy("loadAsync").and.returnValue(Promise.resolve(null));
+      Meta.prototype.__loadAnnotationsAsync = function(annotationIds) {
+
+        var module = this;
+
+        return Promise.all(annotationIds.map(function(annotationId) {
+          return core.moduleMetaService.get(annotationId).loadAsync()
+            .then(function(Annotation) {
+              return module.getAnnotationAsync(Annotation);
+            });
+        }));
+      };
+      Meta.prototype.isSubtypeOf = jasmine.createSpy("isSubtypeOf").and.returnValue(false);
+      Meta.prototype.isInstanceOf = jasmine.createSpy("isSubtypeOf").and.returnValue(false);
+
       return Meta;
     }
 
@@ -61,7 +76,6 @@ define([
 
         var ancestorId = spec.ancestor || spec.base || null;
         this.ancestor = ancestorId ? moduleResolver(ancestorId, "type") : null;
-        this.isAbstract = !!spec.isAbstract;
         this.subtypes = [];
         this.instances = [];
 
@@ -676,11 +690,14 @@ define([
 
         it("should provide to the configService with each module's external config annotations", function() {
 
-          var configA = {"A": "B"};
-          var annotationA = {
-            config: {"A": "C"}
+          var AAnnotation = function() {
+            this.config = {"A": "C"};
           };
-          var annotationAPriority = 5;
+
+          AAnnotation.id = "SomeExternalConfigAnnotation";
+          AAnnotation.priority = 5;
+
+          var annotationA = new AAnnotation();
 
           moduleMetaServiceFactory.and.callFake(function(core) {
             var aMeta;
@@ -723,10 +740,11 @@ define([
               ancestor: EXTERNAL_CONFIG_ANNOTATION_ID
             }, moduleResolver);
 
-            annotationAMeta.loadAsync.and.returnValue(Promise.resolve({
-              id: "SomeExternalConfigAnnotation",
-              priority: annotationAPriority
-            }));
+            annotationAMeta.loadAsync.and.returnValue(Promise.resolve(AAnnotation));
+
+            annotationAMeta.isSubtypeOf.and.callFake(function(other) {
+              return other === externalConfigAnnotationMeta;
+            });
 
             var MetaService = moduleMetaServiceFactoryMock(core);
 
@@ -763,7 +781,7 @@ define([
 
                 expect(Array.isArray(prioritizedModulesConfigs)).toBe(true);
                 expect(prioritizedModulesConfigs.length).toBe(1);
-                expect(prioritizedModulesConfigs[0].priority).toBe(annotationAPriority);
+                expect(prioritizedModulesConfigs[0].priority).toBe(AAnnotation.priority);
                 expect(prioritizedModulesConfigs[0].config).toEqual(annotationA.config);
               });
             });
@@ -774,10 +792,15 @@ define([
           "external config annotations", function() {
 
           var configA = {"A": "B"};
-          var annotationA = {
-            config: {"A": "C"}
+
+          var AAnnotation = function() {
+            this.config = {"A": "C"};
           };
-          var annotationAPriority = 5;
+
+          AAnnotation.id = "SomeExternalConfigAnnotation";
+          AAnnotation.priority = 5;
+
+          var annotationA = new AAnnotation();
 
           moduleMetaServiceFactory.and.callFake(function(core) {
             var aMeta;
@@ -821,10 +844,11 @@ define([
               ancestor: EXTERNAL_CONFIG_ANNOTATION_ID
             }, moduleResolver);
 
-            annotationAMeta.loadAsync.and.returnValue(Promise.resolve({
-              id: "SomeExternalConfigAnnotation",
-              priority: annotationAPriority
-            }));
+            annotationAMeta.loadAsync.and.returnValue(Promise.resolve(AAnnotation));
+
+            annotationAMeta.isSubtypeOf.and.callFake(function(other) {
+              return other === externalConfigAnnotationMeta;
+            });
 
             var MetaService = moduleMetaServiceFactoryMock(core);
 
@@ -863,7 +887,7 @@ define([
                 expect(prioritizedModulesConfigs.length).toBe(2);
                 expect(prioritizedModulesConfigs[0].priority).toBe(-Infinity);
                 expect(prioritizedModulesConfigs[0].config).toEqual(configA);
-                expect(prioritizedModulesConfigs[1].priority).toBe(annotationAPriority);
+                expect(prioritizedModulesConfigs[1].priority).toBe(AAnnotation.priority);
                 expect(prioritizedModulesConfigs[1].config).toEqual(annotationA.config);
               });
             });

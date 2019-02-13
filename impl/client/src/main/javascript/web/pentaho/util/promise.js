@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,44 +53,6 @@ define([
 
       return new Promise(function(resolve) {
         resolve(fun.call(ctx));
-      });
-    },
-
-    /**
-     * Gets a promise for one or more modules, given their ids.
-     *
-     * When `deps` is a `string`, a single module is required,
-     * and the promise is fulfilled directly with the value of that module.
-     *
-     * When `deps` is an `Array`, zero or more modules are required,
-     * and the promise is fulfilled with an array with the values of those modules.
-     *
-     * Optionally, receives a contextual `require` function,
-     * so that module ids are taken relative to its module's folder.
-     *
-     * @param {string|Array.<string>} deps A single module id or an array of module ids.
-     * @param {?function} [localRequire] A contextual require function.
-     * Defaults to the global `require` function.
-     *
-     * @return {Promise|Promise.<Array>} A promise that
-     * is fulfilled with the value of the requested module(s), and
-     * is rejected in case a module loader error occurs (like an undefined module or timeout).
-     */
-    require: function(deps, localRequire) {
-      if(deps == null) throw error.argRequired("deps");
-
-      var requireFun = localRequire || require;
-
-      if(Array.isArray(deps)) {
-        return new Promise(function(resolve, reject) {
-          requireFun(deps, function() {
-            resolve(arg.slice(arguments));
-          }, reject);
-        });
-      }
-
-      return new Promise(function(resolve, reject) {
-        requireFun([deps], resolve, reject);
       });
     },
 

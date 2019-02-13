@@ -47,6 +47,17 @@
  */
 
 /**
+ * Indicates if the module is virtual.
+ *
+ * A virtual module does not have a corresponding file or implementation.
+ *
+ * @name isVirtual
+ * @memberOf pentaho.module.spec.IMeta#
+ * @type {?boolean}
+ * @default false
+ */
+
+/**
  * The value of the module or a function that creates it.
  *
  * When specified, an AMD/RequireJS module with this module's id is dynamically defined.

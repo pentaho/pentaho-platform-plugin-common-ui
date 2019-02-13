@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 define([
-  "./error"
-], function(error) {
+  "../lang/ArgumentRequiredError"
+], function(ArgumentRequiredError) {
   "use strict";
 
   var A_slice = Array.prototype.slice;
@@ -74,8 +74,11 @@ define([
      */
     required: function(o, p, pscope) {
       var v;
-      if(o && (v = o[p]) != null) return v;
-      throw error.argRequired((pscope ? (pscope + ".") : "") + p);
+      if(o && (v = o[p]) != null) {
+        return v;
+      }
+
+      throw new ArgumentRequiredError((pscope ? (pscope + ".") : "") + p);
     },
 
     /**
@@ -88,13 +91,16 @@ define([
      * @return {Array} Array containing the elements from the `args` array between the `start` and the `end`.
      */
     slice: function(args, start, end) {
-      if(!args) throw error.argRequired("args");
+      if(!args) {
+        throw new ArgumentRequiredError("args");
+      }
 
       /* eslint default-case: 0 */
       switch(arguments.length) {
         case 1: return A_slice.call(args);
         case 2: return A_slice.call(args, start);
       }
+
       return A_slice.call(args, start, end);
     }
   };

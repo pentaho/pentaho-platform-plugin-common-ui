@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/util/requireJSConfig!",
+  "pentaho/util/requireJS",
   "./impl/Environment"
-], function(requireJSConfig, Environment) {
+], function(requireJSUtil, Environment) {
 
   "use strict";
 
@@ -35,7 +35,7 @@ define([
    * @see pentaho.environment.spec.IEnvironment
    */
 
-  var environmentConfig = requireJSConfig.config["pentaho/environment"] || null;
+  var environmentConfig = requireJSUtil.config().config["pentaho/environment"] || null;
 
   return new Environment(environmentConfig);
 });

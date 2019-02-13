@@ -171,7 +171,7 @@ define([
         });
       });
 
-      describe("#config and #isConfigLoaded", function() {
+      describe("#config and #isPrepared", function() {
 
         it("should have #config default to `null`", function() {
           var spec = {};
@@ -180,11 +180,11 @@ define([
           expect(meta.config).toBe(null);
         });
 
-        it("should have #isConfigLoaded be `false`", function() {
+        it("should have #isPrepared be `false`", function() {
           var spec = {};
           var meta = new Meta(id, spec);
 
-          expect(meta.isConfigLoaded).toBe(false);
+          expect(meta.isPrepared).toBe(false);
         });
       });
 
@@ -311,6 +311,17 @@ define([
           });
       });
 
+      it("should have #isPrepared return true", function() {
+
+        var spec = {};
+        var meta = new Meta(id, spec);
+
+        return meta.loadAsync()
+          .then(function() {
+            expect(meta.isPrepared).toBe(true);
+          });
+      });
+
       it("should have #isLoaded return true", function() {
 
         var spec = {};
@@ -334,7 +345,22 @@ define([
           }, function(ex) {
             expect(ex).toEqual(jasmine.any(Error));
             expect(meta.isLoaded).toBe(false);
-            expect(meta.value).toBe(undefined);
+            expect(meta.isRejected).toBe(true);
+          });
+      });
+
+      it("should throw when value is got and loading failed", function() {
+
+        var spec = {};
+        var meta = new Meta("test/missing", spec);
+
+        return meta.loadAsync()
+          .then(function() {
+            return Promise.reject(new Error("Expected a rejected promise."));
+          }, function(ex) {
+            expect(function() {
+              var value = meta.value;
+            }).toThrow(ex);
           });
       });
 
@@ -450,7 +476,7 @@ define([
       });
     });
 
-    describe("#loadConfigAsync()", function() {
+    describe("#prepareAsync()", function() {
 
       var config;
       var core;
@@ -474,7 +500,7 @@ define([
 
       it("should return a promise", function() {
 
-        var result = meta.loadConfigAsync();
+        var result = meta.prepareAsync();
 
         expect(result instanceof Promise).toBe(true);
 
@@ -484,78 +510,54 @@ define([
 
       it("should request the configuration to the configuration service", function() {
 
-        return meta.loadConfigAsync()
+        return meta.prepareAsync()
           .then(function() {
             expect(core.configService.selectAsync).toHaveBeenCalledTimes(1);
             expect(core.configService.selectAsync).toHaveBeenCalledWith(id);
           });
       });
 
-      it("should return a promise that resolves to the configuration " +
-        "returned by the configuration service", function() {
+      it("should return a promise that resolves to undefined", function() {
 
-        return meta.loadConfigAsync()
+        return meta.prepareAsync()
           .then(function(result) {
-            expect(result).toBe(config);
+            expect(result).toBe(undefined);
           });
       });
 
       it("should support the configuration service returning a null configuration", function() {
 
         core.configService.selectAsync.and.returnValue(Promise.resolve(null));
-        return meta.loadConfigAsync()
-          .then(function(result) {
-            expect(result).toBe(null);
-          });
+        return meta.prepareAsync();
       });
 
       it("should load the configuration and make it available in #config", function() {
 
-        return meta.loadConfigAsync()
+        return meta.prepareAsync()
           .then(function() {
             expect(meta.config).toBe(config);
           });
       });
 
-      it("should load the configuration and make #isConfigLoaded return true", function() {
+      it("should make #isPrepared return true", function() {
 
-        return meta.loadConfigAsync()
+        expect(meta.isPrepared).toBe(false);
+
+        return meta.prepareAsync()
           .then(function() {
-            expect(meta.isConfigLoaded).toBe(true);
-          });
-      });
-
-      it("should load a null configuration and make #isConfigLoaded return true", function() {
-
-        core.configService.selectAsync.and.returnValue(Promise.resolve(null));
-        return meta.loadConfigAsync()
-          .then(function() {
-            expect(meta.isConfigLoaded).toBe(true);
+            expect(meta.isPrepared).toBe(true);
           });
       });
 
       it("should only call the configuration service the first time", function() {
 
-        return meta.loadConfigAsync()
+        return meta.prepareAsync()
           .then(function() {
             expect(core.configService.selectAsync).toHaveBeenCalledTimes(1);
 
-            return meta.loadConfigAsync()
+            return meta.prepareAsync()
               .then(function() {
                 expect(core.configService.selectAsync).toHaveBeenCalledTimes(1);
-              });
-          });
-      });
-
-      it("should return a promise that resolves to the same value each time", function() {
-
-        return meta.loadConfigAsync()
-          .then(function(result1) {
-            expect(result1).toBe(config);
-
-            return meta.loadConfigAsync()
-              .then(function(result2) {
-                expect(result2).toBe(config);
               });
           });
       });
@@ -614,7 +616,7 @@ define([
       });
     });
 
-    xdescribe("#resolveId(moduleId)", function() {
+    describe("#resolveId(moduleId)", function() {
 
       var Meta;
 
@@ -637,6 +639,46 @@ define([
         expect(moduleUtil.resolveModuleId).toHaveBeenCalledTimes(1);
         expect(moduleUtil.resolveModuleId).toHaveBeenCalledWith("./dudu", id);
         expect(result).toBe("test/xyz");
+      });
+    });
+
+    describe("#isVirtual", function() {
+
+      var Meta;
+
+      beforeEach(function() {
+
+        return localRequire.promise(["pentaho/_core/module/Meta"])
+          .then(function(deps) {
+            var metaFactory = deps[0];
+            Meta = metaFactory(createCoreMock());
+          });
+      });
+
+      it("should default to false", function() {
+        var spec = {};
+        var meta = new Meta(id, spec);
+
+        expect(meta.isVirtual).toBe(false);
+      });
+
+      it("should respect the specified `spec.isAbstract` value", function() {
+        var spec = {isVirtual: true};
+        var meta = new Meta(id, spec);
+
+        expect(meta.isVirtual).toBe(true);
+
+        spec = {isVirtual: false};
+        meta = new Meta(id, spec);
+
+        expect(meta.isVirtual).toBe(false);
+      });
+
+      it("should convert the specified `spec.isVirtual` to a boolean", function() {
+        var spec = {isVirtual: 1};
+        var meta = new Meta(id, spec);
+
+        expect(meta.isVirtual).toBe(true);
       });
     });
   });

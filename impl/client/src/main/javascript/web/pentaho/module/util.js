@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 define([
-  "../util/requireJSConfig!",
+  "../util/requireJS",
   "../util/object",
   "../lang/OperationInvalidError",
   "../lang/ArgumentRequiredError"
-], function(requireJSConfig, O, OperationInvalidError, ArgumentRequiredError) {
+], function(requireJSUtil, O, OperationInvalidError, ArgumentRequiredError) {
 
   "use strict";
 
-  var moduleIdsMapByContextId = requireJSConfig.map || {};
+  var moduleIdsMapByContextId = requireJSUtil.config().map || {};
 
   /**
    * Parses a versioned module id like:

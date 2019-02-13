@@ -98,7 +98,16 @@
     "name": "pentaho/theme"
   });
 
-  requireModules["pentaho/config/spec/IRuleSet"] = {base: null, isAbstract: true};
+  requireModules["pentaho/config/spec/IRuleSet"] = {base: null, isVirtual: true};
+
+  requireModules["pentaho/module/Annotation"] = {base: null};
+  requireModules["pentaho/module/SyncAnnotation"] = {base: "pentaho/module/Annotation"};
+  requireModules["pentaho/module/AsyncAnnotation"] = {base: "pentaho/module/Annotation"};
+  requireModules["pentaho/config/ExternalAnnotation"] = {base: "pentaho/module/AsyncAnnotation"};
+  requireModules["pentaho/module/LoadUIInfoAnnotation"] = {base: "pentaho/module/AsyncAnnotation"};
+  requireModules["pentaho/i18n/LoadConfigAnnotation"] = {base: "pentaho/config/ExternalAnnotation"};
+  requireModules["pentaho/theme/LoadThemeAnnotation"] = {base: "pentaho/module/AsyncAnnotation"};
+  requireModules["pentaho/theme/ThemeAnnotation"] = {base: "pentaho/module/SyncAnnotation"};
 
   requireModules["pentaho/type/Instance"] = {alias: "instance", base: null};
   requireModules["pentaho/type/Value"] = {alias: "value", base: "instance"};
@@ -132,10 +141,8 @@
   requireModules["pentaho/data/filter/IsLessOrEqual"] = {alias: "<=", base: "pentaho/data/filter/Property"};
   requireModules["pentaho/data/filter/IsLike"] = {alias: "like", base: "pentaho/data/filter/Property"};
 
-  requireModules["pentaho/visual/Model"] = {
-    base: "complex",
-    annotations: {"pentaho/visual/DefaultView": {/* module: "./View" */}}
-  };
+  requireModules["pentaho/visual/Model"] = {base: "complex"};
+  requireModules["pentaho/visual/DefaultViewAnnotation"] = {base: "pentaho/module/SyncAnnotation"};
   requireModules["pentaho/visual/role/adaptation/Strategy"] = {base: "complex"};
   requireModules["pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy"] = {
     base: "pentaho/visual/role/adaptation/Strategy",
@@ -400,7 +407,7 @@
       "pentaho/util/object",
       "pentaho/util/fun",
       "pentaho/util/text",
-      "pentaho/util/requireJSConfig",
+      "pentaho/util/requireJS",
       "pentaho/debug/Levels",
       "pentaho/debug/impl/Manager",
       "pentaho/util/domWindow",

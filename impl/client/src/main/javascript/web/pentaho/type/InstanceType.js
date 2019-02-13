@@ -1367,7 +1367,7 @@ define([
      * @return {string} A textual representation.
      */
     toString: function() {
-      return this.id || this.label; // Never empty;
+      return this.id || this.label || "";
     },
 
     // region dynamic & monotonic attributes

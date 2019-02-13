@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,108 +81,6 @@ define([
         promiseUtil.wrapCall(fun, ctx);
         expect(fun.calls.count()).toBe(1);
         expect(fun.calls.first().object).toBe(ctx);
-      });
-    });
-
-    describe("require(deps, localRequire)", function() {
-      it("should throw when `deps` is not specified", function() {
-        function expectIt(args) {
-          expect(function() {
-
-            promiseUtil.require.apply(promiseUtil, args);
-
-          }).toThrow(errorMatch.argRequired("deps"));
-        }
-
-        expectIt([]);
-        expectIt([null]);
-        expectIt([undefined]);
-      });
-
-      it("should fulfill to a single value when `deps` is a string", function(done) {
-        var mid = "pentaho/tests/promise/require/test1";
-        require.undef(mid);
-        var moduleValue = {};
-        define(mid, [], function() {
-          return moduleValue;
-        });
-
-        var promise = promiseUtil.require(mid);
-        expect(promise instanceof Promise).toBe(true);
-        promise.then(function(value) {
-          expect(value).toEqual(moduleValue);
-          require.undef(mid);
-          done();
-        }, done.fail);
-      });
-
-      it("should fulfill to an empty array when `deps` is an empty array", function(done) {
-        var promise = promiseUtil.require([]);
-        expect(promise instanceof Promise).toBe(true);
-        promise.then(function(values) {
-          expect(values).toEqual([]);
-          done();
-        }, done.fail);
-      });
-
-      it("should fulfill to an array value when `deps` is a (non-empty) array", function(done) {
-        var mid1 = "pentaho/tests/promise/require/test1";
-        var mid2 = "pentaho/tests/promise/require/test2";
-        require.undef(mid1);
-        require.undef(mid2);
-
-        var moduleValue1 = {};
-        var moduleValue2 = {};
-        define(mid1, [], function() {
-          return moduleValue1;
-        });
-        define(mid2, [], function() {
-          return moduleValue2;
-        });
-
-        var promise = promiseUtil.require([mid1, mid2]);
-        expect(promise instanceof Promise).toBe(true);
-        promise.then(function(values) {
-          expect(Array.isArray(values)).toBe(true);
-          expect(values.length).toBe(2);
-          expect(values[0]).toBe(moduleValue1);
-          expect(values[1]).toBe(moduleValue2);
-          require.undef(mid1);
-          require.undef(mid2);
-          done();
-        }, done.fail);
-      });
-
-      it("should use the specified `localRequire` instead of the global one when `deps` is a string", function() {
-        // Executed synchronously
-        var localRequire = jasmine.createSpy("localRequire")
-            .and.callThrough(function(deps, callback, errback) {
-
-              expect(deps).toEqual(["foo"]);
-
-              // resolve the promise
-              callback(1);
-            });
-
-        promiseUtil.require("foo", localRequire);
-
-        expect(localRequire).toHaveBeenCalled();
-      });
-
-      it("should use the specified `localRequire` instead of the global one when `deps` is an array", function() {
-        // Executed synchronously
-        var localRequire = jasmine.createSpy("localRequire")
-            .and.callThrough(function(deps, calllback, errback) {
-
-              expect(deps).toEqual(["foo", "bar"]);
-
-              // resolve the promise
-              calllback(1);
-            });
-
-        promiseUtil.require(["foo", "bar"], localRequire);
-
-        expect(localRequire).toHaveBeenCalled();
       });
     });
 

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 define([
-  "require",
   "module",
   "../../lang/Base",
   "../../debug",
   "../../debug/Levels",
   "../../util/object",
+  "../../util/requireJS",
   "../../util/logger",
   "../../util/promise",
   "../../util/text",
@@ -29,12 +29,47 @@ define([
   "../../module/util",
   "../../lang/ArgumentRequiredError",
   "../../lang/OperationInvalidError"
-], function(localRequire, module, Base, debugMgr, DebugLevels, O, logger, promiseUtil, textUtil, F,
+], function(module, Base, debugMgr, DebugLevels, O, requireJSUtil, logger, promiseUtil, textUtil, F,
             specUtil, argUtil, moduleUtil, ArgumentRequiredError, OperationInvalidError) {
 
   "use strict";
 
   var reFullAnnotationId = /Annotation$/;
+
+  /**
+   * Module is created, yet not loaded or prepared.
+   * @type {number}
+   * @default 0
+   */
+  var STATE_INIT = 0;
+
+  /**
+   * Module is prepared.
+   *
+   * Configuration and asynchronous annotations are loaded.
+   *
+   * @type {number}
+   * @default 1
+   */
+  var STATE_PREPARED = 1;
+
+  /**
+   * Module is loaded.
+   *
+   * Module is prepared and its value has been loaded.
+   *
+   * @type {number}
+   * @default 2
+   */
+  var STATE_LOADED = 2;
+
+  /**
+   * Module errored during preparation or loading.
+   *
+   * @type {number}
+   * @default -1
+   */
+  var STATE_ERROR = -1;
 
   return function(core) {
 
@@ -79,35 +114,40 @@ define([
         this.ranking = 0;
 
         /**
-         * The value of the module, if it has been loaded already,
-         * or `undefined`, otherwise.
+         * The state of the module.
          *
-         * @type {*}
+         * @type {number}
          * @private
          */
-        this.__value = undefined;
-        this.__valuePromise = null;
+        this.__state = STATE_INIT;
 
-        // NOTE: TypeMeta changes this to true, when isAbstract.
         /**
-         * Indicates the value has been loaded or was specified.
-         * @type {boolean}
-         * @protected
+         * The value of the module, if it loaded successfully;
+         * the preparation of loading error, if it failed loading;
+         * `undefined`, otherwise.
+         *
+         * @type {*|Error|undefined}
+         * @private
          */
-        this._isLoaded = false;
+        this.__result = undefined;
+
+        /**
+         * An object holding promises during the preparation and/or loading phases.
+         *
+         * @type {?({prepare: ?Promise, value: ?Promise})}
+         * @private
+         */
+        this.__promisesControl = null;
 
         /**
          * Gets the configuration of the module.
-         *
-         * When not yet loaded, the value is `undefined`.
          *
          * @memberOf pentaho.module.Meta#
          * @type {?object}
          * @private
          */
-        this.__config = undefined;
+        this.__config = null;
         this.__configSpec = spec.config || null;
-        this.__configPromise = null;
 
         /**
          * The store of annotations.
@@ -125,8 +165,10 @@ define([
         this.__configure(spec);
 
         var value = spec.value;
-        if(value !== undefined) {
-          this.__defineAmdModuleAsync(value);
+
+        this.isVirtual = !!spec.isVirtual || value !== undefined;
+        if(this.isVirtual) {
+          this.__defineRequireJSValue(value);
         }
       },
 
@@ -173,99 +215,210 @@ define([
         return moduleUtil.resolveModuleId(moduleId, this.id);
       },
 
-      // region Value
+      isSubtypeOf: function(baseIdOrAlias) {
+        return false;
+      },
+
+      isInstanceOf: function(typeIdOrAlias) {
+        return false;
+      },
+
+      // region State
       /** @inheritDoc */
-      get value() {
-        return this.__value;
+      get isPrepared() {
+        return this.__state >= STATE_PREPARED;
       },
 
       /** @inheritDoc */
       get isLoaded() {
-        return this._isLoaded;
+        return this.__state >= STATE_LOADED;
+      },
+
+      /** @inheritDoc */
+      get isRejected() {
+        return this.__state === STATE_ERROR;
+      },
+      // endregion
+
+      // region Preparation
+      /** @inheritDoc */
+      prepareAsync: function() {
+        if(this.isPrepared) {
+          return Promise.resolve();
+        }
+
+        if(this.isRejected) {
+          return Promise.reject(this.__result);
+        }
+
+        // Load config.
+        // Load all async annotations.
+        var promisesControl = this.__getPromisesControl();
+        if(promisesControl.prepare === null) {
+
+          var promises = [
+            // 1. Configuration.
+            core.configService.selectAsync(this.id).then(this.__setConfig.bind(this))
+          ];
+
+          // 2. Annotations.
+          var annotationsIds = this.__getAsyncAnnotationsIds();
+          if(annotationsIds !== null) {
+            promises.push(this.__loadAnnotationsAsync(annotationsIds));
+          }
+
+          promisesControl.prepare = Promise.all(promises)
+            .then(this.__onPrepareResolved.bind(this), this.__onLoadRejected.bind(this));
+        }
+
+        return promisesControl.prepare;
+      },
+
+      /**
+       * Marks a module as prepared.
+       *
+       * @private
+       */
+      __onPrepareResolved: function() {
+
+        this.__state = STATE_PREPARED;
+
+        // Release memory.
+        if(this.__promisesControl !== null) {
+          this.__promisesControl.prepare = null;
+        }
+      },
+      // endregion
+
+      // region Value
+      /**
+       * Registers the specified value of this module with the AMD module system.
+       *
+       * @param {(*|(function(pentaho.module.IMeta) : *))} value - The value or value factory function.
+       * Possibly undefined.
+       *
+       * @private
+       */
+      __defineRequireJSValue: function(value) {
+        requireJSUtil.define(this.id, ["pentaho/module!_"], F.is(value) ? value : F.constant(value));
+      },
+
+      /** @inheritDoc */
+      get value() {
+        if(this.isRejected) {
+          throw this.__result;
+        }
+
+        // Will be undefined if not yet loaded.
+        return this.__result;
+      },
+
+      /** @inheritDoc */
+      get error() {
+        return this.isRejected ? this.__result : null;
       },
 
       /** @inheritDoc */
       loadAsync: function() {
-        // Promise preserves value or error!
-        var promise = this.__valuePromise;
-        if(promise === null) {
-          if(this._isLoaded) {
-            promise = Promise.resolve(this.__value);
-          } else {
-
-            var me = this;
-
-            promise = promiseUtil.require(this.id, localRequire)
-              .then(function(value) {
-                me.__value = value;
-                me._isLoaded = true;
-
-                if(debugMgr.testLevel(DebugLevels.info, module)) {
-                  logger.info("Loaded module '" + me.id + "'.");
-                }
-
-                return value;
-              }, function(error) {
-
-                if(debugMgr.testLevel(DebugLevels.error, module)) {
-                  logger.error("Failed loading module '" + me.id + "'. Error: " + error);
-                }
-
-                return Promise.reject(error);
-              });
-          }
-
-          this.__valuePromise = promise;
+        if(this.isLoaded) {
+          return Promise.resolve(this.__result);
         }
 
-        return promise;
+        if(this.isRejected) {
+          return Promise.reject(this.__result);
+        }
+
+        // Promise preserves value or error!
+        var promisesControl = this.__getPromisesControl();
+
+        if(promisesControl.value === null) {
+
+          promisesControl.value = Promise.all([requireJSUtil.promise(this.id), this.prepareAsync()])
+            .then(
+              function(results) { return this.__onLoadResolved(results[0]); }.bind(this),
+              this.__onLoadRejected.bind(this));
+        }
+
+        return promisesControl.value;
       },
 
       /**
-       * Registers the specified value of this module with the AMD module system.
-       * @param {(*|(function(pentaho.module.IMeta) : *))} value - The value or value factory function.
+       * Gets the promises control. Creates the object if it isn't created yet.
        *
-       * @return {Promise} A promise for the value of the module.
-       *
+       * @return {({prepare: ?Promise, value: ?Promise})} The promises control.
        * @private
        */
-      __defineAmdModuleAsync: function(value) {
+      __getPromisesControl: function() {
+        return this.__promisesControl || (this.__promisesControl = {prepare: null, value: null});
+      },
 
-        if(F.is(value)) {
-          define(this.id, ["pentaho/module!_"], value);
-        } else {
-          define(this.id, F.constant(value));
+      /**
+       * Marks the module as loaded, given its value.
+       *
+       * @param {*} value - The module's value.
+       * @return {*} The module's value.
+       * @private
+       */
+      __onLoadResolved: function(value) {
+
+        this.__state = STATE_LOADED;
+        this.__result = value;
+
+        // Release memory.
+        this.__promisesControl = null;
+
+        if(debugMgr.testLevel(DebugLevels.info, module)) {
+          logger.info("Loaded module '" + this.id + "'.");
         }
 
-        // Capture the just defined module in the AMD context of localRequire.
-        // Not calling this, would end up defining the module in the default AMD context.
-        return this.loadAsync();
+        return value;
+      },
+
+      /**
+       * Marks the module as rejected, given a preparation or loading error.
+       *
+       * @param {*} error - The module's preparation or loading error.
+       * @return {Promise.<Error>} A rejected promise with an error.
+       * @private
+       */
+      __onLoadRejected: function(error) {
+
+        // May already have been rejected in the preparation catch and is now passing through the load catch.
+        if(this.__state !== STATE_ERROR) {
+
+          if(typeof error === "string") {
+            error = new Error(error);
+          }
+
+          this.__state = STATE_ERROR;
+          this.__result = error;
+
+          // Release memory.
+          this.__promisesControl = null;
+
+          if(debugMgr.testLevel(DebugLevels.error, module)) {
+            logger.error("Failed loading module '" + this.id + "'. Error: " + error.message);
+          }
+        }
+
+        return Promise.reject(this.__result);
       },
       // endregion
 
       // region Configuration
       /** @inheritDoc */
       get config() {
-        return this.__config || null;
+        return this.__config;
       },
 
-      /** @inheritDoc */
-      get isConfigLoaded() {
-        return this.__config !== undefined;
-      },
-
-      /** @inheritDoc */
-      loadConfigAsync: function() {
-
-        var promise = this.__configPromise;
-        if(promise === null) {
-          this.__configPromise = promise = core.configService.selectAsync(this.id)
-            .then(function(config) {
-              return (this.__config = config);
-            }.bind(this));
-        }
-
-        return promise;
+      /**
+       * Sets the configuration of the module.
+       *
+       * @param {?object} config - The module's configuration or `null`.
+       * @private
+       */
+      __setConfig: function(config) {
+        this.__config = config;
       },
       // endregion
 
@@ -296,58 +449,6 @@ define([
         return this.__getAnnotationSync(Annotation, annotationId, keyArgs, true);
       },
 
-      /**
-       * Gets an annotation, or a promise for one, if it is created already.
-       *
-       * @param {Class.<pentaho.module.Annotation>} Annotation - The annotation class.
-       * @param {string} annotationId - The annotation identifier.
-       * @param {?object} keyArgs - The keyword arguments object.
-       * @param {boolean} [keyArgs.assertPresent=false] - Indicates that an error should be thrown
-       *  if the module is not annotated with an annotation of the requested type or it is not loaded.
-       * @param {boolean} sync - Indicates if the value should be returned directly and any errors thrown, or
-       * if a promise should be returned.
-       *
-       * @return {pentaho.module.Annotation} The annotation or a promise for one.
-       *
-       * @private
-       */
-      __getAnnotationSync: function(Annotation, annotationId, keyArgs, sync) {
-
-        var annotationsStore = this.__annotationsStore;
-
-        var annotationResult = annotationsStore && O.getOwn(annotationsStore.results, annotationId, null);
-        if(annotationResult === null) {
-          var annotationSpec = annotationsStore && O.getOwn(annotationsStore.specs, annotationId, null);
-          if(annotationSpec === null) {
-            if(argUtil.optional(keyArgs, "assertPresent", false)) {
-              return promiseUtil.error(createErrorNotPresent(this.id, annotationId));
-            }
-
-            return promiseUtil.return(null, sync);
-          }
-
-          if(!Annotation.isSync) {
-            return promiseUtil.error(new OperationInvalidError(
-              "The asynchronous annotation '" + annotationId +
-              "' has not yet been created in module '" + this.id + "'."), sync);
-          }
-
-          var annotation = null;
-          var error = null;
-          try {
-            annotation = Annotation.create(this, annotationSpec);
-          } catch(ex) {
-            error = ex;
-          }
-
-          annotationResult = this.__setAnnotationResult(annotationId, annotation, error);
-        }
-
-        return annotationResult.error !== null
-          ? promiseUtil.error(annotationResult.error, sync)
-          : promiseUtil.return(annotationResult.value, sync);
-      },
-
       /** @inheritDoc */
       getAnnotationAsync: function(Annotation, keyArgs) {
         if(Annotation == null) {
@@ -374,7 +475,7 @@ define([
         var annotationSpec = annotationsStore && O.getOwn(annotationsStore.specs, annotationId, null);
         if(annotationSpec === null) {
           if(argUtil.optional(keyArgs, "assertPresent", false)) {
-            return Promise.reject(createErrorNotPresent(this.id, annotationId));
+            return Promise.reject(createErrorAnnotationNotPresent(this.id, annotationId));
           }
 
           return Promise.resolve(null);
@@ -391,6 +492,58 @@ define([
         });
 
         return this.__setAnnotationPromise(annotationId, annotationPromise);
+      },
+
+      /**
+       * Gets an annotation or a promise for one, if it is created already.
+       *
+       * @param {Class.<pentaho.module.Annotation>} Annotation - The annotation class.
+       * @param {string} annotationId - The annotation identifier.
+       * @param {?object} keyArgs - The keyword arguments object.
+       * @param {boolean} [keyArgs.assertPresent=false] - Indicates that an error should be thrown
+       *  if the module is not annotated with an annotation of the requested type or it is not loaded.
+       * @param {boolean} sync - Indicates if the value should be returned directly and any errors thrown, or
+       * if a promise should be returned.
+       *
+       * @return {pentaho.module.Annotation|Promise.<pentaho.module.Annotation>} The annotation or a promise for one.
+       *
+       * @private
+       */
+      __getAnnotationSync: function(Annotation, annotationId, keyArgs, sync) {
+
+        var annotationsStore = this.__annotationsStore;
+
+        var annotationResult = annotationsStore && O.getOwn(annotationsStore.results, annotationId, null);
+        if(annotationResult === null) {
+          var annotationSpec = annotationsStore && O.getOwn(annotationsStore.specs, annotationId, null);
+          if(annotationSpec === null) {
+            if(argUtil.optional(keyArgs, "assertPresent", false)) {
+              return promiseUtil.error(createErrorAnnotationNotPresent(this.id, annotationId));
+            }
+
+            return promiseUtil.return(null, sync);
+          }
+
+          if(!Annotation.isSync) {
+            return promiseUtil.error(new OperationInvalidError(
+              "The asynchronous annotation '" + annotationId +
+              "' has not yet been created in module '" + this.id + "'."), sync);
+          }
+
+          var annotation = null;
+          var error = null;
+          try {
+            annotation = Annotation.create(this, annotationSpec);
+          } catch(ex) {
+            error = ex;
+          }
+
+          annotationResult = this.__setAnnotationResult(annotationId, annotation, error);
+        }
+
+        return annotationResult.error !== null
+          ? promiseUtil.error(annotationResult.error, sync)
+          : promiseUtil.return(annotationResult.value, sync);
       },
 
       // region Annotations' Helpers
@@ -460,12 +613,52 @@ define([
         var annotationsStore = this.__getAnnotationsStore();
 
         return (annotationsStore.promises || (annotationsStore.promises = Object.create(null)))[annotationId] = promise;
+      },
+
+      /**
+       * Gets an array of asynchronous annotations identifiers, if any, or `null`, otherwise.
+       *
+       * @return {?Array.<string>} An array of module identifiers or `null`.
+       * @private
+       */
+      __getAsyncAnnotationsIds: function() {
+        var annotationsIds = this.getAnnotationsIds();
+        if(annotationsIds !== null) {
+
+          annotationsIds = annotationsIds.filter(isAsyncAnnotation);
+          if(annotationsIds.length > 0) {
+            return annotationsIds;
+          }
+        }
+
+        return null;
+      },
+
+      /**
+       * Loads existing annotations asynchronously, given their identifiers.
+       *
+       * @param {Array.<string>} annotationIds - The annotation identifiers.
+       * @return {Promise.<Array.<pentaho.module.Annotation>>} A promise for an array of annotations.
+       *
+       * @private
+       * @internal
+       */
+      __loadAnnotationsAsync: function(annotationIds) {
+
+        var module = this;
+
+        return Promise.all(annotationIds.map(function(annotationId) {
+          return loadModuleByIdAsync(annotationId).then(function(Annotation) {
+            return module.getAnnotationAsync(Annotation);
+          });
+        }));
       }
       // endregion
 
       // endregion
     });
 
+    // region More annotation helpers
     /**
      * Creates an error for when an annotation is not present in a module.
      *
@@ -474,7 +667,7 @@ define([
      *
      * @return {pentaho.lang.OperationInvalidError} The "not present" error.
      */
-    function createErrorNotPresent(moduleId, annotationId) {
+    function createErrorAnnotationNotPresent(moduleId, annotationId) {
       return new OperationInvalidError(
         "The annotation '" + annotationId + "' is not defined in module '" + moduleId + "'.");
     }
@@ -510,6 +703,32 @@ define([
      */
     function rewriteAnnotationId(annotationId) {
       return reFullAnnotationId.test(annotationId) ? annotationId : (annotationId + "Annotation");
+    }
+
+    /**
+     * Determines if an annotation is asynchronous, given its identifier.
+     *
+     * @param {string} annotationId - The annotation identifier.
+     * @return {boolean} `true` if it is asynchronous; `false`, otherwise.
+     */
+    function isAsyncAnnotation(annotationId) {
+      if(core.asyncAnnotationModule === null) {
+        return false;
+      }
+
+      var module = core.moduleMetaService.get(annotationId);
+      return module !== null && module.isSubtypeOf(core.asyncAnnotationModule);
+    }
+    // endregion
+
+    /**
+     * Loads an existing module given its identifier.
+     *
+     * @param {string} moduleId - The module identifier.
+     * @return {Promise} A promise for the module's value.
+     */
+    function loadModuleByIdAsync(moduleId) {
+      return core.moduleMetaService.get(moduleId).loadAsync();
     }
   };
 });

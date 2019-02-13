@@ -43,6 +43,7 @@ define([
       function Meta(id, spec) {
         this.id = id;
         this.alias = spec.alias;
+        this.isVirtual = !!spec.isVirtual;
         this.__index = spec.index;
         this.ranking = spec.ranking || 0;
       }
@@ -54,7 +55,6 @@ define([
 
         var ancestorId = spec.ancestor || spec.base || null;
         this.ancestor = ancestorId ? moduleResolver(ancestorId, "type") : null;
-        this.isAbstract = !!spec.isAbstract;
         this.subtypes = [];
         this.instances = [];
 

@@ -30,11 +30,11 @@ define([
     var ModuleMeta = Base.extend({
       constructor: function(id) {
         this.id = id;
-        this._isLoaded = false;
+        this._isValueLoaded = false;
       },
 
       get isLoaded() {
-        return this._isLoaded;
+        return this._isValueLoaded;
       }
     });
 
@@ -136,42 +136,6 @@ define([
 
           expect(baseTypeMeta.__addSubtype).toHaveBeenCalledTimes(1);
           expect(baseTypeMeta.__addSubtype).toHaveBeenCalledWith(meta);
-        });
-      });
-
-      describe("#isAbstract", function() {
-
-        it("should default to false", function() {
-          var spec = {ancestor: baseTypeId};
-          var meta = new TypeMeta(id, spec, moduleResolver);
-
-          expect(meta.isAbstract).toBe(false);
-        });
-
-        it("should respect the specified `spec.isAbstract` value", function() {
-          var spec = {ancestor: baseTypeId, isAbstract: true};
-          var meta = new TypeMeta(id, spec, moduleResolver);
-
-          expect(meta.isAbstract).toBe(true);
-
-          spec = {ancestor: baseTypeId, isAbstract: false};
-          meta = new TypeMeta(id, spec, moduleResolver);
-
-          expect(meta.isAbstract).toBe(false);
-        });
-
-        it("should convert the specified `spec.isAbstract` to a boolean", function() {
-          var spec = {ancestor: baseTypeId, isAbstract: 1};
-          var meta = new TypeMeta(id, spec, moduleResolver);
-
-          expect(meta.isAbstract).toBe(true);
-        });
-
-        it("should cause isLoaded to be true, when isAbstract is true", function() {
-          var spec = {ancestor: baseTypeId, isAbstract: true};
-          var meta = new TypeMeta(id, spec, moduleResolver);
-
-          expect(meta.isLoaded).toBe(true);
         });
       });
     });

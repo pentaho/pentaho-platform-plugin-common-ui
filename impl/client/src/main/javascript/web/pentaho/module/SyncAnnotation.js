@@ -60,18 +60,17 @@ define([
      */
     get isSync() {
       return true;
-    }
+    },
 
     /**
      * Creates a synchronous annotation, given the annotated module and the annotation specification.
      *
-     * @name create
-     * @memberOf pentaho.module.SyncAnnotation
-     * @method
      * @param {pentaho.module.IMeta} forModule - The annotated module.
      * @param {object} annotSpec - The annotation specification.
      * @return {pentaho.module.SyncAnnotation} The created annotation.
-     * @abstract
      */
+    create: function(forModule, annotSpec) {
+      return new this(forModule, annotSpec);
+    }
   });
 });

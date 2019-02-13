@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 define([
-  "pentaho/util/requireJSConfig!",
+  "../util/requireJS",
   "./impl/Manager",
   "./Levels",
   "../util/domWindow"
-], function(requireJSConfig, Manager, DebugLevels, domWindow) {
+], function(requireJSUtil, Manager, DebugLevels, domWindow) {
 
   "use strict";
 
-  var spec = requireJSConfig.config["pentaho/debug"] || {};
+  var spec = requireJSUtil.config().config["pentaho/debug"] || {};
 
   // URL debugLevel has precedence
   var level = __urlDebugLevel();

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 define([
+  "../../lang/ArgumentRequiredError",
+  "../../lang/ArgumentInvalidError",
   "../../util/object"
-], function(O) {
+], function(ArgumentRequiredError, ArgumentInvalidError, O) {
 
   "use strict";
 
+  var keyArgsAssertDefined = {assertDefined: true};
+
   return function(core) {
 
-    return core.ModuleMeta.extend("pentaho._core.module.TypeMeta", /** @lends pentaho._core.module.TypeMeta# */{
+    var TypeMeta = core.ModuleMeta.extend("pentaho._core.module.TypeMeta", /** @lends pentaho._core.module.TypeMeta# */{
 
       /**
        * @classDesc The `TypeMeta` class implements the `ITypeMeta` interface.
@@ -48,11 +52,6 @@ define([
         var ancestor = ancestorId !== null ? resolver(ancestorId, "type") : null;
 
         this.ancestor = ancestor;
-
-        this.isAbstract = !!spec.isAbstract;
-        if(this.isAbstract) {
-          this._isLoaded = true;
-        }
 
         if(ancestor !== null) {
           ancestor.__addSubtype(this);
@@ -120,8 +119,36 @@ define([
         }
 
         instances.push(instance);
-      }
+      },
       // endregion
+
+      /** @inheritDoc  */
+      isSubtypeOf: function(baseIdOrAlias) {
+        if(!baseIdOrAlias) {
+          throw new ArgumentRequiredError("baseIdOrAlias");
+        }
+
+        var baseModule = typeof baseIdOrAlias === "string"
+          ? core.moduleMetaService.get(baseIdOrAlias, keyArgsAssertDefined)
+          : baseIdOrAlias;
+
+        if(!(baseModule instanceof TypeMeta)) {
+          throw new ArgumentInvalidError("baseIdOrAlias", "Must be or identify a type module.");
+        }
+
+        var subModule = this;
+        do {
+          if(baseModule === subModule) {
+            return true;
+          }
+
+          subModule = subModule.ancestor;
+        } while(subModule !== null);
+
+        return false;
+      }
     });
+
+    return TypeMeta;
   };
 });

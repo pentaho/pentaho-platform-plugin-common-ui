@@ -104,20 +104,19 @@ define([
     get extensions() {
       return this._extensions;
     }
-  }, /** @lends pentaho.theme.ThemeAnnotation */{
-
-    /**
-     * Creates a synchronous annotation, given the annotated module and the annotation specification.
-     *
-     * @param {pentaho.module.IMeta} forModule - The annotated module.
-     * @param {pentaho.theme.spec.IThemeAnnotation} annotSpec - The theme annotation specification.
-     * @return {pentaho.module.ThemeAnnotation} The created annotation.
-     * @override
-     */
-    create: function(forModule, annotSpec) {
-      return new ThemeAnnotation(forModule, annotSpec);
-    }
   });
+
+  /**
+   * Creates a theme annotation, given the annotated module and the theme specification.
+   *
+   * @name create
+   * @memberOf pentaho.theme.ThemeAnnotation
+   * @method
+   * @param {pentaho.module.IMeta} forModule - The annotated module.
+   * @param {pentaho.theme.spec.IThemeAnnotation} annotSpec - The theme specification.
+   * @return {pentaho.module.ThemeAnnotation} The theme annotation.
+   * @override
+   */
 
   return ThemeAnnotation;
 });

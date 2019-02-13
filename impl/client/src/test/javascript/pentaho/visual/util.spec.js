@@ -27,6 +27,7 @@ define([
     describe("getModelAndDefaultViewClassesAsync(vizTypeId)", function() {
 
       function configRequireJs(localRequire) {
+
         localRequire.define("test/foo/View", ["pentaho/visual/impl/View"], function(BaseView) {
           return BaseView.extend({
           });
@@ -35,8 +36,7 @@ define([
         localRequire.define("test/foo/Model", ["pentaho/visual/Model"], function(BaseModel) {
           return BaseModel.extend({
             $type: {
-              id: "test/foo/Model",
-              defaultView: "test/foo/View"
+              id: "test/foo/Model"
             }
           });
         });
@@ -44,8 +44,7 @@ define([
         localRequire.define("test/foo/ModelNoDefaultView", ["pentaho/visual/Model"], function(BaseModel) {
           return BaseModel.extend({
             $type: {
-              id: "test/foo/ModelNoDefaultView",
-              defaultView: null
+              id: "test/foo/ModelNoDefaultView"
             }
           });
         });
@@ -53,10 +52,26 @@ define([
         localRequire.define("test/foo/ModelUndefDefaultView", ["pentaho/visual/Model"], function(BaseModel) {
           return BaseModel.extend({
             $type: {
-              id: "test/foo/ModelUndefDefaultView",
-              defaultView: "test/foo/UndefinedDefaultView"
+              id: "test/foo/ModelUndefDefaultView"
             }
           });
+        });
+
+        localRequire.config({
+          config: {
+            "pentaho/modules": {
+              "test/foo/Model": {
+                "annotations": {
+                  "pentaho/visual/DefaultView": {module: "test/foo/View"}
+                }
+              },
+              "test/foo/ModelUndefDefaultView": {
+                "annotations": {
+                  "pentaho/visual/DefaultView": {module: "test/foo/UndefinedDefaultView"}
+                }
+              }
+            }
+          }
         });
       }
 

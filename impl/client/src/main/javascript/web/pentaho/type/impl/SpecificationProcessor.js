@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 define([
-  "require",
   "module",
   "pentaho/lang/Base",
   "pentaho/module/metaService",
   "../SpecificationContext",
-  "pentaho/util/promise",
+  "pentaho/util/requireJS",
   "pentaho/util/object"
-], function(localRequire, module, Base, moduleMetaService, SpecificationContext, promiseUtil, O) {
+], function(module, Base, moduleMetaService, SpecificationContext, requireJSUtil, O) {
 
   "use strict";
 
@@ -93,7 +92,7 @@ define([
         var depId = moduleMetaService.getId(depIdOrAlias) || depIdOrAlias;
         if(!O.hasOwn(depIdSet, depId)) {
           depIdSet[depId] = 1;
-          depPromises.push(promiseUtil.require(depId, localRequire));
+          depPromises.push(requireJSUtil.promise(depId));
         }
       }
     },

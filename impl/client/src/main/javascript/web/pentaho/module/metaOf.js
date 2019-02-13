@@ -80,7 +80,7 @@ define([
 
         var moduleMeta = moduleMetaService.get(moduleId, __keyArgsCreateIfUndefined);
 
-        moduleMeta.loadConfigAsync()
+        moduleMeta.prepareAsync()
           .then(function() {
             onLoad(moduleMeta);
           }, onLoad.error);

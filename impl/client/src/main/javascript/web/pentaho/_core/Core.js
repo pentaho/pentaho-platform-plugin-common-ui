@@ -24,17 +24,19 @@ define([
   "./config/Service",
   "../module/util",
   "../util/fun",
+  "../module/AsyncAnnotation",
   "../config/ExternalAnnotation",
-  "pentaho/util/requireJSConfig!"
+  "../util/requireJS"
 ], function(localRequire, module, moduleMetaServiceFactory, moduleMetaFactory, instanceModuleMetaFactory,
-            typeModuleMetaFactory, ModuleService, configurationServiceFactory, moduleUtil, F, ExternalConfigAnnotation,
-            requireJSConfig) {
+            typeModuleMetaFactory, ModuleService, configurationServiceFactory, moduleUtil, F, AsyncAnnotation,
+            ExternalConfigAnnotation, requireJSUtil) {
 
   "use strict";
 
   var RULESET_TYPE_ID = moduleUtil.resolveModuleId("pentaho/config/spec/IRuleSet", module.id);
   var MODULES_ID = moduleUtil.resolveModuleId("pentaho/modules", module.id);
   var EXTERNAL_CONFIG_ANNOTATION_ID = ExternalConfigAnnotation.id;
+  var ASYNC_ANNOTATION_ID = AsyncAnnotation.id;
 
   /**
    * @classDesc The `Core` class represents the core layer of the Pentaho JavaScript platform.
@@ -73,6 +75,9 @@ define([
     core.moduleMetaService = new ModuleMetaService();
 
     core.moduleService = new ModuleService(core.moduleMetaService);
+
+    core.asyncAnnotationModule = null;
+    core.externalConfigAnnotationModule = null;
 
     return loadConfigRuleSetsAsync().then(initGivenConfigRules);
 
@@ -150,6 +155,10 @@ define([
             core.moduleMetaService.configure(modulesConfig);
           }
 
+          // Should always exist, but relaxing for unit tests...
+          core.externalConfigAnnotationModule = core.moduleMetaService.get(EXTERNAL_CONFIG_ANNOTATION_ID);
+          core.asyncAnnotationModule = core.moduleMetaService.get(ASYNC_ANNOTATION_ID);
+
           return core;
         });
     }
@@ -210,7 +219,7 @@ define([
       var prioritizedConfigs = null;
 
       // Get the global AMD configuration.
-      var globalModulesMap = requireJSConfig.config[MODULES_ID] || null;
+      var globalModulesMap = requireJSUtil.config().config[MODULES_ID] || null;
       if(globalModulesMap !== null) {
         prioritizedConfigs = [
           {priority: -Infinity, config: globalModulesMap}
@@ -225,7 +234,8 @@ define([
      *
      * @param {pentaho.module.IMeta} module - The module.
      *
-     * @return {Promise.<?({priority: number, config: object})>} A promise for an array of external configurations.
+     * @return {?Promise.<Array.<({priority: number, config: object})>>} A promise for an array of
+     * external configurations; `null`, if there are no external configuration annotations.
      */
     function selectModuleAnnotationsConfigAsync(module) {
 
@@ -235,18 +245,12 @@ define([
         var configAnnotationsIds = annotationsIds.filter(isExternalConfigAnnotation);
         if(configAnnotationsIds.length > 0) {
 
-          var annotatedPrioritizedConfigsPromises = configAnnotationsIds.map(function(configAnnotationId) {
-
-            return loadModuleAsync(configAnnotationId).then(function(Annotation) {
-
-              return module.getAnnotationAsync(Annotation).then(function(configAnnotation) {
-
-                return {priority: Annotation.priority, config: configAnnotation.config};
+          return module.__loadAnnotationsAsync(configAnnotationsIds)
+            .then(function(configAnnotations) {
+              return configAnnotations.map(function(configAnnotation) {
+                return {priority: configAnnotation.constructor.priority, config: configAnnotation.config};
               });
             });
-          });
-
-          return Promise.all(annotatedPrioritizedConfigsPromises);
         }
       }
 
@@ -261,34 +265,12 @@ define([
      */
     function isExternalConfigAnnotation(annotationId) {
 
-      var module = core.moduleMetaService.get(annotationId);
-      return module !== null && module.kind === "type" && __isExternalConfigAnnotation(module);
-    }
-
-    /**
-     * Determines if an annotation module is a subtype of {@link pentaho.config.ExternalAnnotation}.
-     *
-     * @param {pentaho.module.ITypeMeta} module - The annotation module.
-     * @return {boolean} `true` if it is; `false`, otherwise.
-     */
-    function __isExternalConfigAnnotation(module) {
-
-      if(module.id === EXTERNAL_CONFIG_ANNOTATION_ID) {
-        return true;
+      if(core.externalConfigAnnotationModule === null) {
+        return false;
       }
 
-      var ancestor;
-      return (ancestor = module.ancestor) !== null && __isExternalConfigAnnotation(ancestor);
-    }
-
-    /**
-     * Loads a module given its identifier.
-     *
-     * @param {string} moduleId - The module identifier.
-     * @return {Promise} A promise for the module's value.
-     */
-    function loadModuleAsync(moduleId) {
-      return core.moduleMetaService.get(moduleId).loadAsync();
+      var module = core.moduleMetaService.get(annotationId);
+      return module !== null && module.isSubtypeOf(core.externalConfigAnnotationModule);
     }
   };
 

@@ -175,6 +175,36 @@
     }
   };
 
+  interceptRequire();
+
+  /**
+   * Make sure all non-global require functions have a `contextName` property.
+   */
+  function interceptRequire() {
+
+    var originalNewContext = require.s.newContext;
+
+    require.s.newContext = function() {
+
+      var context = originalNewContext.apply(require.s, arguments);
+
+      context.require.contextName = context.contextName;
+
+      var originalMakeRequire = context.makeRequire;
+
+      context.makeRequire = function() {
+
+        var localRequire = originalMakeRequire.apply(context, arguments);
+
+        localRequire.contextName = context.contextName;
+
+        return localRequire;
+      };
+
+      return context;
+    };
+  }
+
   // ---
 
   function newContextName() {

@@ -65,11 +65,11 @@ define([
     },
 
     /**
-     * Creates an annotation, given the annotated module and the annotation specification.
+     * Creates a default view annotation, given the annotated module and the annotation specification.
      *
      * @param {pentaho.module.IMeta} forModule - The annotated module.
      * @param {pentaho.visual.spec.IDefaultViewAnnotation} annotSpec - The annotation specification.
-     * @return {Promise.<pentaho.module.AsyncAnnotation>} A promise that resolves to the created annotation.
+     * @return {pentaho.visual.DefaultViewAnnotation} A default view annotation.
      * @override
      */
     create: function(forModule, annotSpec) {

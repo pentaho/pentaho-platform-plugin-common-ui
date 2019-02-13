@@ -432,7 +432,9 @@ define([
           },
 
           sharedBaseMethod1: function() {},
-          sharedBaseMethod2: function() {}
+          sharedBaseMethod2: function() {},
+
+          create: function() {}
         };
 
         level2_instance_spec = {
@@ -624,6 +626,8 @@ define([
           describe("class level", function() {
             it("functions", function() {
               expect(Cat.destroy).toBe(Animal.destroy);
+              expect(Cat.create).toBe(Animal.create);
+              expect(Cat.create).toBe(level1_static_spec.create);
             });
 
             it("getters and setters", function() {

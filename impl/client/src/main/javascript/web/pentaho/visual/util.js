@@ -101,7 +101,7 @@ define([
         var modules = utils.getModelAndDefaultViewModules(vizTypeId);
 
         Promise
-          .all([modules.model.getAsync(), modules.view.getAsync()])
+          .all([modules.model.loadAsync(), modules.view.loadAsync()])
           .then(function(Classes) {
             var Model = Classes[0];
             var View = Classes[1];
@@ -112,9 +112,7 @@ define([
               viewTypeId: modules.view.id
             });
           }, reject);
-
       });
-
     },
 
     /**
