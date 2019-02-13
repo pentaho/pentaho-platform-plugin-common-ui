@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 define([
+  "pentaho/visual/util",
   "pentaho/visual/models/Abstract",
   "pentaho/visual/models/Bar",
   "pentaho/data/Table"
-], function(AbstractModel, BarModel, Table) {
+], function(visualUtil, AbstractModel, BarModel, Table) {
 
   "use strict";
 
@@ -53,8 +54,10 @@ define([
     });
 
     it("should have a default view", function() {
+      var vizTypeId = BarModel.type.id;
 
-      expect(!!BarModel.type.defaultView).toBe(true);
+      var defaultView = visualUtil.getDefaultViewModule(vizTypeId);
+      expect(!!defaultView).toBe(true);
     });
   });
 });
