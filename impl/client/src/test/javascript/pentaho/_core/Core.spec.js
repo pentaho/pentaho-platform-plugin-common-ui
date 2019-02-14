@@ -593,8 +593,8 @@ define([
           var promise = Core.createAsync(environment);
 
           return promise.then(function(core) {
-            expect(core.moduleMetaService.configure).toHaveBeenCalledTimes(1);
-            expect(core.moduleMetaService.configure).toHaveBeenCalledWith(globalModuleMap);
+            expect(core.moduleMetaService.configure).toHaveBeenCalledTimes(2);
+            expect(core.moduleMetaService.configure).toHaveBeenCalledWith(jasmine.any(Object));
           });
         });
 

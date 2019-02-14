@@ -50,6 +50,7 @@ define([
   function Core(environment) {
 
     this.environment = environment;
+    this.configService = null;
   }
 
   /**
@@ -73,6 +74,7 @@ define([
     // Create the module metadata service.
     var ModuleMetaService = moduleMetaServiceFactory(core);
     core.moduleMetaService = new ModuleMetaService();
+    core.moduleMetaService.configure(getGlobalRuleSetModulesMapConfig());
 
     core.moduleService = new ModuleService(core.moduleMetaService);
 
@@ -120,7 +122,7 @@ define([
 
           return ruleSet;
         }, function() {
-          // Swallow and return null.
+          // Swallow and return null. Already logged by loadAsync.
           return null;
         });
     }
@@ -209,7 +211,8 @@ define([
     }
 
     /**
-     * Gets a promise for an array with the configuration of "pentaho/modules".
+     * Gets a promise for an array with the configuration of "pentaho/modules", excluding ruleset modules, which
+     * were previously processed.
      *
      * @return {Promise.<?({priority: number, config: object})>} A promise for an array with the global modules
      * configuration or for `null`.
@@ -218,15 +221,49 @@ define([
 
       var prioritizedConfigs = null;
 
-      // Get the global AMD configuration.
+      // Get the global AMD configuration, excluding any ruleset modules, which were already processed.
       var globalModulesMap = requireJSUtil.config().config[MODULES_ID] || null;
       if(globalModulesMap !== null) {
+
+        var allButRulesetModulesMap = {};
+
+        Object.keys(globalModulesMap).forEach(function(moduleId) {
+          var moduleSpec = globalModulesMap[moduleId];
+          if(moduleSpec && moduleSpec.type !== RULESET_TYPE_ID) {
+            allButRulesetModulesMap[moduleId] = moduleSpec;
+          }
+        });
+
         prioritizedConfigs = [
-          {priority: -Infinity, config: globalModulesMap}
+          {priority: -Infinity, config: allButRulesetModulesMap}
         ];
       }
 
       return Promise.resolve(prioritizedConfigs);
+    }
+
+    /**
+     * Gets an array with the configuration of rule set "pentaho/modules" and
+     * of the rule set spec itself.
+     *
+     * @return {Object.<string, pentaho.module.spec.IMeta>} A map of rule set modules' specifications.
+     */
+    function getGlobalRuleSetModulesMapConfig() {
+
+      var ruleSetModulesMap = {};
+
+      // Get the global AMD configuration.
+      var globalModulesMap = requireJSUtil.config().config[MODULES_ID] || null;
+      if(globalModulesMap !== null) {
+        Object.keys(globalModulesMap).forEach(function(moduleId) {
+          var moduleSpec = globalModulesMap[moduleId];
+          if(moduleSpec && (moduleId === RULESET_TYPE_ID || moduleSpec.type === RULESET_TYPE_ID)) {
+            ruleSetModulesMap[moduleId] = moduleSpec;
+          }
+        });
+      }
+
+      return ruleSetModulesMap;
     }
 
     /**

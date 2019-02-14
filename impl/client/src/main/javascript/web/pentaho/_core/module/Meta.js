@@ -256,10 +256,13 @@ define([
         var promisesControl = this.__getPromisesControl();
         if(promisesControl.prepare === null) {
 
-          var promises = [
-            // 1. Configuration.
-            core.configService.selectAsync(this.id).then(this.__setConfig.bind(this))
-          ];
+          var promises = [];
+
+          // 1. Configuration.
+          if(core.configService !== null) {
+            // RuleSet module and RuleSets themselves are initialized before the config service.
+            core.configService.selectAsync(this.id).then(this.__setConfig.bind(this));
+          }
 
           // 2. Annotations.
           var annotationsIds = this.__getAsyncAnnotationsIds();
