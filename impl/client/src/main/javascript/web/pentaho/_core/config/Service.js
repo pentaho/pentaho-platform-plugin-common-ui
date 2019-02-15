@@ -269,8 +269,7 @@ define([
       },
 
       /**
-       * Selects, asynchronously, the internal configuration of a module and, optionally, annotation,
-       * given their identifiers.
+       * Selects, asynchronously, the internal configuration of a module, given its identifier.
        *
        * @param {string} moduleId - The identifier of the module.
        *
