@@ -22,8 +22,9 @@ define([
   "../../util/object",
   "../../util/requireJS",
   "../../util/fun",
-  "../../module/util"
-], function(module, Base, SortedList, ArgumentRequiredError, specUtil, O, requireJSUtil, F, moduleUtil) {
+  "../../module/util",
+  "../../module/Annotation"
+], function(module, Base, SortedList, ArgumentRequiredError, specUtil, O, requireJSUtil, F, moduleUtil, Annotation) {
 
   "use strict";
 
@@ -154,7 +155,7 @@ define([
 
         var annotationId = select.annotation || null;
         if(annotationId !== null) {
-          annotationId = resolveId(annotationId, contextId);
+          annotationId = resolveId(Annotation.toFullId(annotationId), contextId);
         }
 
         if(!Array.isArray(moduleIds)) {

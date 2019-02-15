@@ -27,14 +27,13 @@ define([
   "../../util/spec",
   "../../util/arg",
   "../../module/util",
+  "../../module/Annotation",
   "../../lang/ArgumentRequiredError",
   "../../lang/OperationInvalidError"
 ], function(module, Base, debugMgr, DebugLevels, O, requireJSUtil, logger, promiseUtil, textUtil, F,
-            specUtil, argUtil, moduleUtil, ArgumentRequiredError, OperationInvalidError) {
+            specUtil, argUtil, moduleUtil, Annotation, ArgumentRequiredError, OperationInvalidError) {
 
   "use strict";
-
-  var reFullAnnotationId = /Annotation$/;
 
   /**
    * Module is created, yet not loaded or prepared.
@@ -204,7 +203,7 @@ define([
         var annotations2 = Object.create(null);
 
         Object.keys(annotations).forEach(function(annotationId) {
-          annotations2[rewriteAnnotationId(annotationId)] = annotations[annotationId];
+          annotations2[Annotation.toFullId(annotationId)] = annotations[annotationId];
         });
 
         return annotations2;
@@ -696,16 +695,6 @@ define([
       }
 
       return annotationId;
-    }
-
-    /**
-     * Rewrites the identifier of an annotation type so it has the `Annotation` suffix.
-     *
-     * @param {string} annotationId - The annotation type identifier.
-     * @return {string} The rewritten annotation type identifier.
-     */
-    function rewriteAnnotationId(annotationId) {
-      return reFullAnnotationId.test(annotationId) ? annotationId : (annotationId + "Annotation");
     }
 
     /**

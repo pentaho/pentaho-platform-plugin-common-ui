@@ -19,7 +19,7 @@ define([
   "pentaho/lang/ArgumentRequiredError"
 ], function(module, Base, ArgumentRequiredError) {
 
-  var reAnnotationSuffix = /Annotation$/;
+  var reFullAnnotationId = /Annotation$/;
 
   return Base.extend(module.id, /** @lends pentaho.module.Annotation# */{
     /**
@@ -101,16 +101,13 @@ define([
     },
 
     /**
-     * Gets the type of annotation, excluding the `Annotation` suffix, if any.
+     * Rewrites an annotation identifier so that it surely has the `Annotation` suffix.
      *
-     * @memberOf pentaho.module.Annotation
-     * @type {string}
-     * @readOnly
-     * @final
+     * @param {string} annotationId - The annotation type identifier.
+     * @return {string} The rewritten annotation type identifier.
      */
-    get shortId() {
-      var id = this.id;
-      return id && id.replace(reAnnotationSuffix, "");
+    toFullId: function(annotationId) {
+      return reFullAnnotationId.test(annotationId) ? annotationId : (annotationId + "Annotation");
     }
 
     /**
