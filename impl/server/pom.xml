@@ -97,10 +97,11 @@
       </exclusions>
     </dependency>
 
-    <!-- Needed for compilation -->
+    <!-- region - Needed for compilation -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
+      <scope>provided</scope>
       <exclusions>
         <exclusion>
           <artifactId>*</artifactId>
@@ -108,11 +109,12 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- -->
+    <!-- endregion -->
 
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
+      <scope>provided</scope>
       <exclusions>
         <exclusion>
           <artifactId>*</artifactId>
