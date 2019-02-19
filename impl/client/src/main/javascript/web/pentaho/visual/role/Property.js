@@ -222,6 +222,10 @@ define([
           return null;
         }
 
+        if(fieldIndexes.length === 0) {
+          return null;
+        }
+
         var fieldTypes = fieldIndexes.map(function(fieldIndex) {
           var columnTypeName = data.getColumnType(fieldIndex);
           return typeLoader.resolveType(columnTypeName).type;
