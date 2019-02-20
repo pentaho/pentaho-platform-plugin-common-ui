@@ -1488,6 +1488,32 @@ define([
 
           describe("when data is specified", function() {
 
+            it("should return null when there are no mapped fields", function() {
+
+              var DerivedModel = Model.extend({
+                $type: {
+                  props: {
+                    propRole: {
+                      base: "pentaho/visual/role/Property",
+                      modes: [
+                        {dataType: ["string"]}
+                      ]
+                    }
+                  }
+                }
+              });
+
+              var rolePropType = DerivedModel.type.get("propRole");
+
+              var model = new DerivedModel({
+                data: new Table(getDataSpec1())
+              });
+
+              var result = rolePropType.getModeEffectiveOn(model);
+
+              expect(result).toBe(null);
+            });
+
             it("should return null when the mapping references an undefined field", function() {
 
               var DerivedModel = Model.extend({
