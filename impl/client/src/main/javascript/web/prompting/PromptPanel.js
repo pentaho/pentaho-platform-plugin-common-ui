@@ -1373,7 +1373,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
 
             // Must submit, independently of auto-submit value.
             // All parameters are initialized, fire the submit
-            fireSubmit = !noAutoAutoSubmit;
+            fireSubmit = (noAutoAutoSubmit != null) && !noAutoAutoSubmit;
           }
 
           if (this.forceSubmit || fireSubmit) {
