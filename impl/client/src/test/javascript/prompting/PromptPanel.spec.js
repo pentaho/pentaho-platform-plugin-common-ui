@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file expect in compliance with the License.
@@ -762,17 +762,6 @@ define(["dojo/number", "dojo/i18n", "common-ui/prompting/PromptPanel",
         panel.diff = jasmine.createSpy("diff");
         panel.isRefresh = true;
 
-        var numberParam = new Parameter();
-        numberParam.type = "java.lang.Number";
-        numberParam.name = "number_test_param";
-        var group = new ParameterGroup();
-        group.name = "test_group";
-        group.label = "test_group_label";
-        group.parameters.push(numberParam);
-        panel.diff.toChangeData = group;
-        panel.diff.toRemove = {};
-        panel.diff.toAdd = {};
-
         panel.init(true);
         expect(panel.update).toHaveBeenCalled();
         expect(panel._multiListBoxTopValuesByParam).not.toBeDefined();
@@ -791,9 +780,6 @@ define(["dojo/number", "dojo/i18n", "common-ui/prompting/PromptPanel",
       it("should update components if isForceRefresh dy diff", function() {
         paramDefn.showParameterUI.and.returnValue(true);
         panel.diff = jasmine.createSpy("diff");
-        panel.diff.toRemove = {};
-        panel.diff.toAdd = {};
-        panel.diff.toChangeData = {};
         panel.isRefresh = true;
         panel.isForceRefresh = true;
 
