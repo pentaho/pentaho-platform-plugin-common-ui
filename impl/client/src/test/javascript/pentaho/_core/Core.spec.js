@@ -307,6 +307,39 @@ define([
         });
       });
 
+      it("should configure moduleMetaService with global IRuleSet modules", function() {
+
+        localRequire.config({
+          config: {
+            "pentaho/modules": {
+              "test/config/A": {
+                "type": "pentaho/config/spec/IRuleSet"
+              },
+              "test/B": {
+                "test1": "test2"
+              }
+            }
+          }
+        });
+
+        var promise = Core.createAsync(environment);
+
+        return promise.then(function(core) {
+          expect(core.moduleMetaService.configure).toHaveBeenCalledTimes(1);
+          expect(core.moduleMetaService.configure).toHaveBeenCalledWith(jasmine.objectContaining({
+            "test/config/A": {
+              "type": "pentaho/config/spec/IRuleSet"
+            }
+          }));
+
+          expect(core.moduleMetaService.configure).not.toHaveBeenCalledWith(jasmine.objectContaining({
+            "test/B": {
+              "test1": "test2"
+            }
+          }));
+        });
+      });
+
       describe("RuleSet modules", function() {
 
         it("should get all rule set modules from moduleMetaService", function() {
@@ -316,6 +349,51 @@ define([
           return promise.then(function(core) {
             expect(core.moduleMetaService.getInstancesOf).toHaveBeenCalledTimes(1);
             expect(core.moduleMetaService.getInstancesOf).toHaveBeenCalledWith("pentaho/config/spec/IRuleSet");
+          });
+        });
+
+        it("should get all rule set modules from moduleMetaService " +
+           "after configuring the meta service with global IRuleSet modules", function() {
+
+          localRequire.config({
+            config: {
+              "pentaho/modules": {
+                "test/config/A": {
+                  "type": "pentaho/config/spec/IRuleSet"
+                },
+                "test/B": {
+                  "test1": "test2"
+                }
+              }
+            }
+          });
+
+          var index = 0;
+          var configureIndex;
+          var getInstancesOfIndex;
+
+          moduleMetaServiceFactory.and.callFake(function(core) {
+
+            var MetaService = moduleMetaServiceFactoryMock(core);
+
+            MetaService.prototype.configure.and.callFake(function() {
+              if(configureIndex === undefined) {
+                configureIndex = ++index;
+              }
+            });
+
+            MetaService.prototype.getInstancesOf.and.callFake(function() {
+              getInstancesOfIndex = ++index;
+              return [];
+            });
+
+            return MetaService;
+          });
+
+          var promise = Core.createAsync(environment);
+
+          return promise.then(function(core) {
+            expect(configureIndex).toBeLessThan(getInstancesOfIndex);
           });
         });
 
@@ -598,10 +676,12 @@ define([
           });
         });
 
-        it("should provide to the configService the RequireJS configuration of pentaho/modules", function() {
+        it("should provide to the configService the RequireJS configuration of pentaho/modules, " +
+          "excluding IRuleSet modules", function() {
 
           var globalRequireJSModulesConfig = {
             "a": {},
+            "b": {type: "pentaho/config/spec/IRuleSet"},
             "c": {}
           };
 
@@ -628,7 +708,14 @@ define([
               expect(prioritizedModulesConfigs.length).toBe(1);
               expect(prioritizedModulesConfigs[0].priority).toBe(-Infinity);
               expect(prioritizedModulesConfigs[0].config)
-                .toEqual(jasmine.objectContaining(globalRequireJSModulesConfig));
+                .toEqual(jasmine.objectContaining({
+                  "a": {},
+                  "c": {}
+                }));
+              expect(prioritizedModulesConfigs[0].config)
+                .not.toEqual(jasmine.objectContaining({
+                  "b": {type: "pentaho/config/spec/IRuleSet"}
+                }));
             });
           });
         });
