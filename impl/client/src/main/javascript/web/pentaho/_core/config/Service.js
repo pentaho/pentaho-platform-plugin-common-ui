@@ -155,7 +155,7 @@ define([
 
         var annotationId = select.annotation || null;
         if(annotationId !== null) {
-          annotationId = resolveId(Annotation.toFullId(annotationId), contextId);
+          annotationId = resolveAnnotationId(annotationId, contextId);
         }
 
         if(!Array.isArray(moduleIds)) {
@@ -240,7 +240,7 @@ define([
           return internalConfigsPromise.then(__mergeConfigs);
         }
 
-        var externalPrioritizedConfigsPromise = selectExternalAsync(moduleId);
+        var externalPrioritizedConfigsPromise = Promise.resolve(selectExternalAsync(moduleId));
 
         return Promise.all([internalConfigsPromise, externalPrioritizedConfigsPromise])
           .then(function(results) {
@@ -274,7 +274,8 @@ define([
        *
        * @param {string} moduleId - The identifier of the module.
        *
-       * @return {Promise.<?object>} A promise for the configuration, if any, or a promise for `null`, otherwise.
+       * @return {?Promise.<object[]>} A promise for the applicable configuration objects, ordered by priority;
+       * `null`, if there are no applicable configuration rules.
        * @private
        */
       __selectInternalAsync: function(moduleId) {
@@ -350,8 +351,39 @@ define([
     }
 
     function resolveId(idOrAlias, contextId) {
-      var id = core.moduleMetaService.getId(idOrAlias) || idOrAlias;
-      return moduleUtil.resolveModuleId(id, contextId);
+
+      var id = null;
+
+      if(idOrAlias) {
+        // Not relative?
+        if(idOrAlias[0] !== ".") {
+          id = core.moduleMetaService.getId(idOrAlias);
+        }
+
+        if(id === null) {
+          id = moduleUtil.resolveModuleId(idOrAlias, contextId);
+        }
+      }
+
+      return id;
+    }
+
+    function resolveAnnotationId(idOrAlias, contextId) {
+
+      var id = null;
+
+      if(idOrAlias) {
+        // Not relative?
+        if(idOrAlias[0] !== ".") {
+          id = core.moduleMetaService.getId(idOrAlias);
+        }
+
+        if(id === null) {
+          id = moduleUtil.resolveModuleId(Annotation.toFullId(idOrAlias), contextId);
+        }
+      }
+
+      return id;
     }
 
     return ConfigurationService;
@@ -444,8 +476,8 @@ define([
   }
 
   function __prioritizedConfigComparer(pc1, pc2) {
-    var priority1 = pc1.priority;
-    var priority2 = pc2.priority;
+    var priority1 = pc1.priority || 0;
+    var priority2 = pc2.priority || 0;
 
     if(priority1 !== priority2) {
       return priority1 > priority2 ? 1 : -1;
