@@ -40,6 +40,8 @@ define([
      * @param {pentaho.module.IMeta} defaultViewModule - The default view module.
      */
     constructor: function(forModule, defaultViewModule) {
+      this.base(forModule);
+
       this._module = defaultViewModule;
     },
 
