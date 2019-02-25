@@ -23,6 +23,7 @@ define([
   describe("pentaho._core.module.Meta", function() {
 
     var id = "test/foo/bar";
+    var id2 = "test/foo/dudu";
 
     var localRequire;
     var DebugLevels;
@@ -679,6 +680,50 @@ define([
         var meta = new Meta(id, spec);
 
         expect(meta.isVirtual).toBe(true);
+      });
+    });
+
+    describe("#isSubtypeOf(baseMeta)", function() {
+
+      var Meta;
+
+      beforeEach(function() {
+
+        return localRequire.promise(["pentaho/_core/module/Meta"])
+          .then(function(deps) {
+            var metaFactory = deps[0];
+            Meta = metaFactory(createCoreMock());
+          });
+      });
+
+      it("should return false", function() {
+        var spec = {};
+        var meta = new Meta(id, spec);
+        var meta2 = new Meta(id2, spec);
+
+        expect(meta.isSubtypeOf(meta2)).toBe(false);
+      });
+    });
+
+    describe("#isInstanceOf(typeMeta)", function() {
+
+      var Meta;
+
+      beforeEach(function() {
+
+        return localRequire.promise(["pentaho/_core/module/Meta"])
+          .then(function(deps) {
+            var metaFactory = deps[0];
+            Meta = metaFactory(createCoreMock());
+          });
+      });
+
+      it("should return false", function() {
+        var spec = {};
+        var meta = new Meta(id, spec);
+        var meta2 = new Meta(id2, spec);
+
+        expect(meta.isInstanceOf(meta2)).toBe(false);
       });
     });
   });

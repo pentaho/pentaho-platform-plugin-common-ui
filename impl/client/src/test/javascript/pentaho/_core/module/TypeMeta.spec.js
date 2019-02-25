@@ -55,8 +55,13 @@ define([
     }
 
     function createTypeMetaMock(id) {
-      var typeMeta = jasmine.createSpyObj("baseTypeMeta", ["__addSubtype"]);
+      var typeMeta = jasmine.createSpyObj("typeMeta", ["__addSubtype", "isSubtypeOf"]);
       typeMeta.id = id;
+      typeMeta.ancestor = null;
+
+      typeMeta.isSubtypeOf.and.callFake(function(other) {
+        return this === other || this.ancestor === other;
+      });
       return typeMeta;
     }
 
@@ -68,7 +73,7 @@ define([
 
     function createModuleResolver(typeMeta) {
       return jasmine.createSpy("moduleResolver").and.callFake(function(id) {
-        if(id === typeMeta.id) return typeMeta;
+        if(typeMeta && id === typeMeta.id) return typeMeta;
         throw new Error("Unexpected type id '" + id + "'.");
       });
     }
@@ -200,6 +205,36 @@ define([
         meta.__addInstance(instanceMeta2);
 
         expect(meta.instances).toEqual([instanceMeta1, instanceMeta2]);
+      });
+    });
+
+    describe("#isSubtypeOf(baseTypeMeta)", function() {
+
+      it("should return true when given itself", function() {
+        var spec = {};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        expect(meta.isSubtypeOf(meta)).toBe(true);
+      });
+
+      it("should return true when given its base type", function() {
+
+        baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        expect(meta.isSubtypeOf(baseTypeMeta)).toBe(true);
+      });
+
+      it("should return false when given an unrelated type", function() {
+        var otherTypeMeta = new TypeMeta("test/foo/bar/other", {}, createModuleResolver(null));
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        expect(meta.isSubtypeOf(otherTypeMeta)).toBe(false);
       });
     });
   });
