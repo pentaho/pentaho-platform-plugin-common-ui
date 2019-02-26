@@ -88,8 +88,7 @@ define(function() {
         name = name
             .replace(/([a-z\d])([A-Z])/g, "$1-$2")
             .replace(/[\/\\_\s\.@]+/g, "-")
-            .replace(/-+/g, "-")
-            .toLowerCase();
+            .replace(/-+/g, "-");
 
         // Replace a leading - with an _.
         if(name.charAt(0) === "-") {
