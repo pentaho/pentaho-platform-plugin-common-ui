@@ -168,8 +168,6 @@ define([
       // Don't use inherited property definition which may be writable false
       Object.defineProperty(this, "__hasDescendants", {value: false, writable: true});
 
-      if(!("styleClass" in spec)) this.styleClass = undefined;
-
       this.__application = specUtil.merge({}, this.__application);
     },
 
@@ -857,73 +855,6 @@ define([
     },
     // endregion
 
-    // region styleClass property
-    // @type nonEmptyString
-    // -> nonEmptyString, Optional(null), Configurable, Localized
-    // "" or undefined -> null conversion
-
-    __styleClass: null,
-    __styleClassIsSet: undefined,
-
-    /**
-     * Gets or sets the CSS class associated with this type.
-     *
-     * This attribute is typically used to associate an icon with a type.
-     *
-     * Attempting to set to a non-string value type implicitly
-     * converts the value to a string before assignment.
-     *
-     * An empty string or `null` clears the property value.
-     *
-     * Setting to `undefined`, makes the property assume its default value.
-     *
-     * The default value of a type with an [id]{@link pentaho.type.Type#id} is
-     * the identifier converted to _snake-case_,
-     * plus special characters like `\`, `/`, `_`, `.` and spaces are converted to: a dash (`–`).
-     * For example: `"pentaho/visual/models/heatGrid"` would have a default
-     * `styleClass` of: `"pentaho-visual-ccc-heat-grid"`.
-     * The default value of an anonymous type is `null`.
-     *
-     * @type {?nonEmptyString}
-     */
-    get styleClass() {
-      return this.__styleClass;
-    },
-
-    set styleClass(value) {
-      if(value === undefined) {
-        this.__styleClass = this.__id ? text.toSnakeCase(this.__id) : null;
-        this.__styleClassIsSet = false;
-      } else {
-        this.__styleClass = value === "" ? null : value;
-        this.__styleClassIsSet = true;
-      }
-    },
-
-    /**
-     * Gets the style classes of this and any base types.
-     *
-     * The returned array should not be modified.
-     *
-     * @type {string[]}
-     * @readonly
-     */
-    get inheritedStyleClasses() {
-      var styleClasses;
-      var styleClass = this.__styleClass;
-
-      var baseType = this !== __type ? Object.getPrototypeOf(this) : null;
-      if(baseType) {
-        styleClasses = baseType.inheritedStyleClasses;
-        if(styleClass) styleClasses = styleClasses.concat(styleClass);
-      } else {
-        styleClasses = styleClass ? [styleClass] : [];
-      }
-
-      return styleClasses;
-    },
-    // endregion
-
     // region ordinal property
     // @type integer
     // -> Optional(0), Inherited, Configurable
@@ -1345,12 +1276,6 @@ define([
           spec[name] = this[__attrName];
         }
       }, this);
-
-      var styleClass = this.__styleClass;
-      if(styleClass && this.__styleClassIsSet) {
-        any = true;
-        spec.styleClass = styleClass;
-      }
 
       // Dynamic attributes
       if(this.__fillSpecInContextDynamicAttributes(spec, keyArgs)) {

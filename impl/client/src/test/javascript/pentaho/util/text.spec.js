@@ -87,11 +87,11 @@ define([
 
     describe("toSnakeCase(text)", function() {
       it("should split when case changes and join with an hyphen", function() {
-        expect(text.toSnakeCase("productFamilyId").toLowerCase()).toBe("product-family-id");
+        expect(text.toSnakeCase("productFamilyId").toLowerCase()).toBe("product-Family-Id");
       });
 
       it("should convert the result to lower case", function() {
-        expect(text.toSnakeCase("Product")).toBe("product");
+        expect(text.toSnakeCase("Product")).toBe("Product");
       });
 
       it("should convert spaces to hyphen", function() {
