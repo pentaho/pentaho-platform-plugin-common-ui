@@ -104,7 +104,6 @@
   requireModules["pentaho/module/SyncAnnotation"] = {base: "pentaho/module/Annotation"};
   requireModules["pentaho/module/AsyncAnnotation"] = {base: "pentaho/module/Annotation"};
   requireModules["pentaho/config/ExternalAnnotation"] = {base: "pentaho/module/AsyncAnnotation"};
-  requireModules["pentaho/module/LoadUIInfoAnnotation"] = {base: "pentaho/module/AsyncAnnotation"};
   requireModules["pentaho/i18n/LoadConfigAnnotation"] = {base: "pentaho/config/ExternalAnnotation"};
   requireModules["pentaho/theme/LoadThemeAnnotation"] = {base: "pentaho/module/AsyncAnnotation"};
   requireModules["pentaho/theme/ThemeAnnotation"] = {base: "pentaho/module/SyncAnnotation"};

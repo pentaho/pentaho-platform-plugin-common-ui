@@ -35,6 +35,8 @@ define([
      * @extend pentaho.module.AsyncAnnotation
      * @abstract
      *
+     * @private
+     *
      * @description Creates an external configuration annotation associated with a given module.
      * @constructor
      * @param {pentaho.module.IMeta} forModule - The annotated module.

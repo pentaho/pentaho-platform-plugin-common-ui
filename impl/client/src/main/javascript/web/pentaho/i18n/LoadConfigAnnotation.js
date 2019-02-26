@@ -34,6 +34,7 @@ define([
      * @memberOf pentaho.i18n
      * @class
      * @extend pentaho.config.ExternalAnnotation
+     * @private
      *
      * @description Creates a _load i18n configuration_ annotation associated with a given module.
      * @constructor
