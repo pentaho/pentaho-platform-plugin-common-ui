@@ -67,6 +67,38 @@
  */
 
 /**
+ * Gets a value that indicates if the module is virtual.
+ *
+ * A virtual module does not have a corresponding file or implementation.
+ *
+ * @name isVirtual
+ * @memberOf pentaho.module.IMeta#
+ * @type {boolean}
+ * @readOnly
+ */
+
+/**
+ * Prepares a module for loading.
+ *
+ * The preparation of a module consists of:
+ * i) loading its configuration, and
+ * ii) loading asynchronous annotations associated with it.
+ *
+ * Loading a module, through [loadAsync]{@link pentaho.module.IMeta#loadAsync},
+ * also prepares it.
+ *
+ * @name prepareAsync
+ * @memberOf pentaho.module.IMeta#
+ * @method
+ * @return {Promise} A promise for the completion of the module's preparation.
+ *
+ * @see pentaho.module.IMeta#isPrepared
+ * @see pentaho.module.IMeta#config
+ * @see pentaho.module.IMeta#getAnnotation
+ * @see pentaho.module.IMeta#value
+ */
+
+/**
  * Loads the module and returns a promise for its value.
  *
  * @name loadAsync
@@ -75,42 +107,6 @@
  * @return {Promise} A promise for the value of the module.
  *
  * @see pentaho.module.IMeta#value
- */
-
-/**
- * Gets the value of the module, if it has been loaded already,
- * or `undefined`, otherwise.
- *
- * @name value
- * @memberOf pentaho.module.IMeta#
- * @type {*}
- * @readOnly
- *
- * @see pentaho.module.IMeta#isLoaded
- * @see pentaho.module.IMeta#loadAsync
- */
-
-/**
- * Gets a value that indicates if the module's value is directly
- * available through the `value` property.
- *
- * @name isLoaded
- * @memberOf pentaho.module.IMeta#
- * @type {boolean}
- * @readOnly
- *
- * @see pentaho.module.IMeta#value
- */
-
-/**
- * Loads the configuration of the module and returns a promise for it.
- *
- * @name loadConfigAsync
- * @memberOf pentaho.module.IMeta#
- * @method
- * @return {Promise.<?object>} A promise for the configuration of the module.
- *
- * @see pentaho.module.IMeta#config
  */
 
 /**
@@ -124,19 +120,90 @@
  * @type {?object}
  * @readOnly
  *
- * @see pentaho.module.IMeta#isConfigLoaded
- * @see pentaho.module.IMeta#loadConfigAsync
+ * @see pentaho.module.IMeta#isPrepared
+ * @see pentaho.module.IMeta#prepareAsync
+ * @see pentaho.module.IMeta#value
  */
 
 /**
- * Gets a value that indicates if the module's configuration has been loaded.
+ * Gets the value of the module, if it has been loaded already,
+ * or `undefined`, otherwise.
  *
- * @name isConfigLoaded
+ * If the module failed to prepare or load,
+ * its [error]{@link pentaho.module.IMeta#error} is thrown.
+ *
+ * @name value
+ * @memberOf pentaho.module.IMeta#
+ * @type {*}
+ * @readOnly
+ * @throws {Error} When the module preparation or loading failed.
+ *
+ * @see pentaho.module.IMeta#isPrepared
+ * @see pentaho.module.IMeta#isLoaded
+ * @see pentaho.module.IMeta#isRejected
+ *
+ * @see pentaho.module.IMeta#config
+ * @see pentaho.module.IMeta#error
+ * @see pentaho.module.IMeta#getAnnotation
+ *
+ * @see pentaho.module.IMeta#prepareAsync
+ * @see pentaho.module.IMeta#loadAsync
+ */
+
+/**
+ * Gets the preparation or loading error of the module, if any,
+ * or `null`, otherwise.
+ *
+ * @name error
+ * @memberOf pentaho.module.IMeta#
+ * @type {?Error}
+ * @readOnly
+ *
+ * @see pentaho.module.IMeta#isRejected
+ * @see pentaho.module.IMeta#value
+ */
+
+/**
+ * Gets a value that indicates if the module's configuration and asynchronous annotations have been loaded.
+ *
+ * @name isPrepared
  * @memberOf pentaho.module.IMeta#
  * @type {boolean}
  * @readOnly
  *
+ * @see pentaho.module.IMeta#prepareAsync
  * @see pentaho.module.IMeta#config
+ * @see pentaho.module.IMeta#getAnnotation
+ * @see pentaho.module.IMeta#value
+ */
+
+/**
+ * Gets a value that indicates if the module is loaded.
+ *
+ * When a module is loaded,
+ * its [value]{@link pentaho.module.IMeta#value},
+ * [configuration]{@link pentaho.module.IMeta#config},
+ * and even its asynchronous [annotations]{@link pentaho.module.IMeta#getAnnotation}
+ * are accessible synchronously.
+ *
+ * @name isLoaded
+ * @memberOf pentaho.module.IMeta#
+ * @type {boolean}
+ * @readOnly
+ *
+ * @see pentaho.module.IMeta#value
+ */
+
+/**
+ * Gets a value that indicates if the module's preparation or loading failed.
+ *
+ * @name isRejected
+ * @memberOf pentaho.module.IMeta#
+ * @type {boolean}
+ * @readOnly
+ *
+ * @see pentaho.module.IMeta#error
+ * @see pentaho.module.IMeta#value
  */
 
 /**
@@ -152,4 +219,126 @@
  * @return {string} The identifier of the resolved module.
  *
  * @see pentaho.module.util.resolveModuleId
+ */
+
+/**
+ * Gets an annotation associated with this module, given the annotation type.
+ *
+ * If this module is not annotated with an annotation of the given type, `null` is returned.
+ *
+ * Otherwise, this method assumes that the annotation can be obtained synchronously.
+ * If the given annotation type is asynchronous and the annotation has not been loaded yet,
+ * an error is thrown.
+ *
+ * If it is not known whether an asynchronous annotation has already been loaded,
+ * the {@link pentaho.module.IMeta#getAnnotationAsync} method should be used instead.
+ * From within a module's code, it is always safe to get any annotation which is
+ * known to have been associated with it.
+ *
+ * When this method returns an annotation, for a given annotation type,
+ * it always returns the same annotation instance.
+ *
+ * @name getAnnotation
+ * @memberOf pentaho.module.IMeta#
+ * @method
+ *
+ * @param {Class.<pentaho.module.Annotation>} Annotation - The constructor of the annotation.
+ * @param {object} [keyArgs] - The keyword arguments object.
+ * @param {boolean} [keyArgs.assertPresent=false] - Indicates that an error should be thrown
+ *  if the module is not annotated with an annotation of the requested type.
+ *
+ * @return {?pentaho.module.Annotation} The requested annotation, if one is associated with this module;
+ * `null`, otherwise.
+ *
+ * @throw {pentaho.lang.InvalidOperationError} When an annotation of the specified type
+ *   is associated with this module but it is asynchronous and has not been loaded yet.
+ *
+ * @throw {pentaho.lang.InvalidOperationError} When an annotation of the specified type
+ *   is not associated with this module and `assertPresent` was specified with a `true` value.
+ */
+
+/**
+ * Determines if this module is annotated with an annotation of a given type.
+ *
+ * Note that an annotation of the given type may be associated with this module and,
+ * still, not have been loaded yet!
+ * You may want to use this method to avoid a call to
+ * {@link pentaho.module.IMeta#getAnnotationAsync} which would resolve to `null`.
+ *
+ * @name hasAnnotation
+ * @memberOf pentaho.module.IMeta#
+ * @param {Class.<pentaho.module.Annotation>} Annotation - The constructor of the annotation.
+ *
+ * @return {boolean} `true` if an annotation of the given type is associated with this module; `false`, otherwise.
+ */
+
+/**
+ * Gets an array of identifiers of the annotations of this module, if any.
+ *
+ * @name getAnnotationsIds
+ * @memberOf pentaho.module.IMeta#
+ *
+ * @return {?(string[])} An array of annotation identifiers, if any; `null`, otherwise.
+ */
+
+/**
+ * Gets an annotation associated with this module, asynchronously, given the annotation type.
+ *
+ * If this module is not annotated with an annotation of the given type,
+ * a settled promise with the value `null` is returned.
+ *
+ * When this method returns a settled promise, with an annotation, for a given annotation type,
+ * it always returns the same annotation instance.
+ *
+ * @name getAnnotationAsync
+ * @memberOf pentaho.module.IMeta#
+ * @method
+ *
+ * @param {Class.<pentaho.module.Annotation>} Annotation - The constructor of the annotation.
+ * @param {object} [keyArgs] - The keyword arguments object.
+ * @param {boolean} [keyArgs.assertPresent=false] - Indicates that the promise should be rejected with an error
+ *  if the module is not annotated with an annotation of the requested type.
+ *
+ * @return {Promise.<?pentaho.module.Annotation>} A promise that resolves to the requested annotation,
+ *  if one is associated with this module, or to `null`, otherwise.
+ *
+ * @rejects {pentaho.lang.InvalidOperationError} When an annotation of the specified type
+ *   is associated with this module but it is asynchronous and has not been loaded yet.
+ *
+ * @rejects {pentaho.lang.InvalidOperationError} When an annotation of the specified type
+ *   is not associated with this module and `assertPresent` was specified with a `true` value.
+ */
+
+/**
+ * Indicates if this module is a type module which is a subtype of given type module.
+ *
+ * A module is a subtype of another if both are type modules and
+ * they're the same module or the base module can be found by walking up through its
+ * [ancestor]{@link pentaho.module.ITypeMeta#ancestor} property.
+ *
+ * @name isSubtypeOf
+ * @memberOf pentaho.module.IMeta#
+ *
+ * @method
+ *
+ * @param {string|pentaho.module.IMeta} baseIdOrAlias - The identifier or alias or instance of the base module.
+ * @return {boolean} `true` if both modules are type modules and this module is a subtype of the given base module;
+ * `false`, otherwise.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When the `baseIdOrAlias` module is defined but is not a type module.
+ */
+
+/**
+ * Indicates if this module is an instance module which is a direct or indirect instance of a given type module.
+ *
+ * @name isInstanceOf
+ * @memberOf pentaho.module.IMeta#
+ *
+ * @method
+ *
+ * @param {string|pentaho.module.IMeta} typeIdOrAlias - The identifier or alias or instance of a type module.
+ * @return {boolean} `true` if this module is an instance module which is an instance of the given type module;
+ * `false`, otherwise.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When the `typeIdOrAlias` module is defined but is not a type module.
  */

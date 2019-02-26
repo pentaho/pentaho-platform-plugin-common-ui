@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 define([
-  "require",
   "module",
   "../../lang/Base",
   "../../lang/SortedList",
   "../../lang/ArgumentRequiredError",
   "../../util/spec",
   "../../util/object",
-  "../../util/promise",
+  "../../util/requireJS",
   "../../util/fun",
-  "../../util/requireJSConfig!",
-  "../../module/util"
-], function(localRequire, module, Base, SortedList, ArgumentRequiredError, specUtil,
-            O, promiseUtil, F, requireJSConfig, moduleUtil) {
+  "../../module/util",
+  "../../module/Annotation"
+], function(module, Base, SortedList, ArgumentRequiredError, specUtil, O, requireJSUtil, F, moduleUtil, Annotation) {
 
   "use strict";
+
+  var MODULES_ID = moduleUtil.resolveModuleId("pentaho/modules", module.id);
 
   /**
    * List of names of environment variables that are handled "generically" when sorting rules.
@@ -75,8 +75,10 @@ define([
        * @description Creates a configuration service instance for a given environment.
        *
        * @param {?pentaho.environment.IEnvironment} [environment] - The environment used to select configuration rules.
+       * @param {function(string) : Promise.<?({priority: number, config: object})>} [selectExternalAsync]
+       * - An asynchronous callback function for obtaining external configurations of modules, given their identifier.
        */
-      constructor: function(environment) {
+      constructor: function(environment, selectExternalAsync) {
 
         /**
          * The environment used to select configuration rules.
@@ -86,13 +88,22 @@ define([
         this.__environment = environment || {};
 
         /**
-         * A map connecting a type or instance identifier to the applicable configuration rules,
+         * A map connecting a module identifier to the applicable configuration rules,
          * ordered from least to most specific.
          *
          * @type {Object.<string, Array.<pentaho.config.spec.IRule>>}
          * @private
          */
         this.__ruleStore = Object.create(null);
+
+        /**
+         * A function which, given module identifier, returns
+         * a promise for an array, possibly null, of external configurations, including priorities.
+         *
+         * @type {?(function(string, string) : Promise.<?({priority: number, config: object})>)}
+         * @private
+         */
+        this.__selectExternalAsync = selectExternalAsync || null;
       },
 
       /**
@@ -137,10 +148,14 @@ define([
 
         var select = rule.select || {};
 
-        // TODO: remove the fallbacks.
-        var moduleIds = select.module || select.instance || select.type;
+        var moduleIds = select.module;
         if(!moduleIds) {
           throw new ArgumentRequiredError("rule.select.module");
+        }
+
+        var annotationId = select.annotation || null;
+        if(annotationId !== null) {
+          annotationId = resolveAnnotationId(annotationId, contextId);
         }
 
         if(!Array.isArray(moduleIds)) {
@@ -152,48 +167,135 @@ define([
           // Again, assuming the Service takes ownership of the rules,
           // so mutating it directly is ok.
           depIds.forEach(function(depId, index) {
-            depIds[index] = moduleUtil.resolveModuleId(depId, contextId);
+            depIds[index] = resolveId(depId, contextId);
           });
         }
 
-        moduleIds.forEach(function(moduleId) {
+        var applicationId = select.application;
+        if(applicationId) {
+          if(Array.isArray(applicationId)) {
+            select.application = applicationId.map(function(appId) {
+              return resolveId(appId, contextId);
+            });
+          } else {
+            select.application = resolveId(applicationId, contextId);
+          }
+        }
+
+        moduleIds.forEach(function(moduleId, index) {
           if(!moduleId) {
             throw new ArgumentRequiredError("rule.select.module");
           }
 
-          moduleId = moduleUtil.resolveModuleId(moduleId, contextId);
+          moduleIds[index] = resolveId(moduleId, contextId);
+        });
 
-          var list = this.__ruleStore[moduleId];
-          if(!list) {
-            this.__ruleStore[moduleId] = list = new SortedList({comparer: __ruleComparer});
-          }
+        if(annotationId === null) {
+          moduleIds.forEach(function(moduleId) {
+            this.__addRule(moduleId, rule);
+          }, this);
+        } else {
+          moduleIds.forEach(function(moduleId) {
 
-          list.push(rule);
-        }, this);
+            var apply = __wrapAnnotationRuleApply(moduleId, annotationId, rule.apply);
+
+            var select = {
+              module: MODULES_ID
+            };
+
+            Object.keys(rule.select).forEach(function(key) {
+              if(key !== "annotation" && key !== "module") {
+                select = rule.select[key];
+              }
+            });
+
+            this.__addRule(MODULES_ID, {
+              priority: rule.priority,
+              select: select,
+              deps: rule.deps,
+              apply: apply,
+              _ordinal: rule._ordinal
+            });
+          }, this);
+        }
+      },
+
+      __addRule: function(moduleId, rule) {
+
+        var list = this.__ruleStore[moduleId];
+        if(!list) {
+          this.__ruleStore[moduleId] = list = new SortedList({comparer: __ruleComparer});
+        }
+
+        list.push(rule);
       },
 
       /** @inheritDoc */
-      selectAsync: function(moduleId, keyArgs) {
+      selectAsync: function(moduleId) {
 
-        var excludeGlobal = !!(keyArgs && keyArgs.excludeGlobal);
-        var globalConfig = excludeGlobal ? null : (requireJSConfig.config[moduleId] || null);
+        var internalConfigsPromise = this.__selectInternalAsync(moduleId);
+
+        var selectExternalAsync = this.__selectExternalAsync;
+        if(selectExternalAsync === null) {
+          return internalConfigsPromise.then(__mergeConfigs);
+        }
+
+        var externalPrioritizedConfigsPromise = Promise.resolve(selectExternalAsync(moduleId));
+
+        return Promise.all([internalConfigsPromise, externalPrioritizedConfigsPromise])
+          .then(function(results) {
+
+            var internalConfigs = results[0];
+            var externalPrioritizedConfigs = results[1];
+
+            if(externalPrioritizedConfigs == null) {
+              return __mergeConfigs(internalConfigs);
+            }
+
+            if(internalConfigs === null) {
+              return __sortAndMergePrioritizedConfigs(externalPrioritizedConfigs);
+            }
+
+            // Internal and external have to be merged together, or specUtil.merge does not
+            // give the same result.
+
+            var internalPrioritizedConfigs = internalConfigs.map(function(config) {
+              return {priority: 0, config: config};
+            });
+
+            externalPrioritizedConfigs.push.apply(externalPrioritizedConfigs, internalPrioritizedConfigs);
+
+            return __sortAndMergePrioritizedConfigs(externalPrioritizedConfigs);
+          });
+      },
+
+      /**
+       * Selects, asynchronously, the internal configuration of a module, given its identifier.
+       *
+       * @param {string} moduleId - The identifier of the module.
+       *
+       * @return {?Promise.<object[]>} A promise for the applicable configuration objects, ordered by priority;
+       * `null`, if there are no applicable configuration rules.
+       * @private
+       */
+      __selectInternalAsync: function(moduleId) {
 
         var rules = O.getOwn(this.__ruleStore, moduleId, null);
         if(rules === null) {
-          return Promise.resolve(globalConfig);
+          return Promise.resolve(null);
         }
 
         var filteredRules = rules.filter(__ruleFilterer, this.__environment);
         if(filteredRules.length === 0) {
-          return Promise.resolve(globalConfig);
+          return Promise.resolve(null);
         }
 
+        // Collect the dependencies of all filteredRules and
+        // load them all in parallel.
         var depPromisesList = null;
         var depIndexesById = null;
 
-        var processDependency = function(depIdOrAlias) {
-
-          var depId = core.moduleMetaService.getId(depIdOrAlias) || depIdOrAlias;
+        var processDependency = function(depId) {
 
           var depIndex = O.getOwn(depIndexesById, depId, null);
           if(depIndex === null) {
@@ -218,8 +320,8 @@ define([
               depIndexesById = Object.create(null);
             }
 
-            rule.deps.forEach(function(depIdOrAlias) {
-              var depIndex = processDependency(depIdOrAlias);
+            rule.deps.forEach(function(depId) {
+              var depIndex = processDependency(depId);
               if(isFun) {
                 depIndexes.push(depIndex);
               }
@@ -234,34 +336,94 @@ define([
         // Collect all configs and start loading any dependencies.
         var configFactories = filteredRules.map(createRuleConfigFactory);
 
-        if(globalConfig !== null) {
-          // Global configuration has the least priority.
-          configFactories.unshift(F.constant(globalConfig));
-        }
-
-        // Wait for any dependencies to be loaded...
         return Promise.all(depPromisesList || [])
           .then(function(depValues) {
-
-            return configFactories.reduce(function(result, configFactory) {
-
-              // Obtain this rule's configuration.
-              var config = configFactory(depValues);
-
-              // Merge the config with the current result.
-              return specUtil.merge(result, config);
-            }, {});
+            return configFactories.map(function(configFactory) {
+              return configFactory(depValues);
+            });
           });
       }
     });
 
     function __loadDependency(id) {
       var module = core.moduleMetaService.get(id);
-      return module !== null ? module.loadAsync() : promiseUtil.require(id, localRequire);
+      return module !== null ? module.loadAsync() : requireJSUtil.promise(id);
+    }
+
+    function resolveId(idOrAlias, contextId) {
+
+      var id = null;
+
+      if(idOrAlias) {
+        // Not relative?
+        if(idOrAlias[0] !== ".") {
+          id = core.moduleMetaService.getId(idOrAlias);
+        }
+
+        if(id === null) {
+          id = moduleUtil.resolveModuleId(idOrAlias, contextId);
+        }
+      }
+
+      return id;
+    }
+
+    function resolveAnnotationId(idOrAlias, contextId) {
+
+      var id = null;
+
+      if(idOrAlias) {
+        // Not relative?
+        if(idOrAlias[0] !== ".") {
+          id = core.moduleMetaService.getId(idOrAlias);
+        }
+
+        if(id === null) {
+          id = moduleUtil.resolveModuleId(Annotation.toFullId(idOrAlias), contextId);
+        }
+      }
+
+      return id;
     }
 
     return ConfigurationService;
   };
+
+  function __wrapAnnotationRuleApply(moduleId, annotationId, apply) {
+
+    return function ruleWrappedAnnotationApply() {
+
+      var annotationsSpec = {};
+      annotationsSpec[annotationId] = F.is(apply) ? apply.apply(this, arguments) : apply;
+
+      var modulesSpec = {};
+      modulesSpec[moduleId] = {
+        annotations: annotationsSpec
+      };
+
+      return modulesSpec;
+    };
+  }
+
+  function __mergeConfigs(configs) {
+    return configs && configs.reduce(function(result, config) {
+      return specUtil.merge(result, config);
+    }, {});
+  }
+
+  function __sortAndMergePrioritizedConfigs(prioritizedConfigs) {
+    // Sort and merge.
+    // Ensure stable sort.
+    prioritizedConfigs.forEach(function(prioritizedConfig, index) {
+      prioritizedConfig.ordinal = index;
+    });
+
+    prioritizedConfigs.sort(__prioritizedConfigComparer);
+
+    return prioritizedConfigs.reduce(function(result, prioritizedConfig) {
+      return specUtil.merge(result, prioritizedConfig.config);
+    }, {});
+  }
 
   function __wrapRuleConfigFactory(factory, depIndexes) {
 
@@ -311,6 +473,17 @@ define([
     }
 
     return r1._ordinal > r2._ordinal ? 1 : -1;
+  }
+
+  function __prioritizedConfigComparer(pc1, pc2) {
+    var priority1 = pc1.priority || 0;
+    var priority2 = pc2.priority || 0;
+
+    if(priority1 !== priority2) {
+      return priority1 > priority2 ? 1 : -1;
+    }
+
+    return pc1.ordinal > pc2.ordinal ? 1 : -1;
   }
 
   /**

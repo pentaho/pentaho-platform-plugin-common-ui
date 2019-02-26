@@ -30,11 +30,11 @@ define([
     var ModuleMeta = Base.extend({
       constructor: function(id) {
         this.id = id;
-        this._isLoaded = false;
+        this._isValueLoaded = false;
       },
 
       get isLoaded() {
-        return this._isLoaded;
+        return this._isValueLoaded;
       }
     });
 
@@ -55,8 +55,13 @@ define([
     }
 
     function createTypeMetaMock(id) {
-      var typeMeta = jasmine.createSpyObj("baseTypeMeta", ["__addSubtype"]);
+      var typeMeta = jasmine.createSpyObj("typeMeta", ["__addSubtype", "isSubtypeOf"]);
       typeMeta.id = id;
+      typeMeta.ancestor = null;
+
+      typeMeta.isSubtypeOf.and.callFake(function(other) {
+        return this === other || this.ancestor === other;
+      });
       return typeMeta;
     }
 
@@ -68,7 +73,7 @@ define([
 
     function createModuleResolver(typeMeta) {
       return jasmine.createSpy("moduleResolver").and.callFake(function(id) {
-        if(id === typeMeta.id) return typeMeta;
+        if(typeMeta && id === typeMeta.id) return typeMeta;
         throw new Error("Unexpected type id '" + id + "'.");
       });
     }
@@ -138,42 +143,6 @@ define([
           expect(baseTypeMeta.__addSubtype).toHaveBeenCalledWith(meta);
         });
       });
-
-      describe("#isAbstract", function() {
-
-        it("should default to false", function() {
-          var spec = {ancestor: baseTypeId};
-          var meta = new TypeMeta(id, spec, moduleResolver);
-
-          expect(meta.isAbstract).toBe(false);
-        });
-
-        it("should respect the specified `spec.isAbstract` value", function() {
-          var spec = {ancestor: baseTypeId, isAbstract: true};
-          var meta = new TypeMeta(id, spec, moduleResolver);
-
-          expect(meta.isAbstract).toBe(true);
-
-          spec = {ancestor: baseTypeId, isAbstract: false};
-          meta = new TypeMeta(id, spec, moduleResolver);
-
-          expect(meta.isAbstract).toBe(false);
-        });
-
-        it("should convert the specified `spec.isAbstract` to a boolean", function() {
-          var spec = {ancestor: baseTypeId, isAbstract: 1};
-          var meta = new TypeMeta(id, spec, moduleResolver);
-
-          expect(meta.isAbstract).toBe(true);
-        });
-
-        it("should cause isLoaded to be true, when isAbstract is true", function() {
-          var spec = {ancestor: baseTypeId, isAbstract: true};
-          var meta = new TypeMeta(id, spec, moduleResolver);
-
-          expect(meta.isLoaded).toBe(true);
-        });
-      });
     });
 
     describe("#kind", function() {
@@ -236,6 +205,36 @@ define([
         meta.__addInstance(instanceMeta2);
 
         expect(meta.instances).toEqual([instanceMeta1, instanceMeta2]);
+      });
+    });
+
+    describe("#isSubtypeOf(baseTypeMeta)", function() {
+
+      it("should return true when given itself", function() {
+        var spec = {};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        expect(meta.isSubtypeOf(meta)).toBe(true);
+      });
+
+      it("should return true when given its base type", function() {
+
+        baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        expect(meta.isSubtypeOf(baseTypeMeta)).toBe(true);
+      });
+
+      it("should return false when given an unrelated type", function() {
+        var otherTypeMeta = new TypeMeta("test/foo/bar/other", {}, createModuleResolver(null));
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        expect(meta.isSubtypeOf(otherTypeMeta)).toBe(false);
       });
     });
   });

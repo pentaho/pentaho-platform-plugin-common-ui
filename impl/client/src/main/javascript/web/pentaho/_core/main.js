@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,8 @@
  */
 define([
   "./Core",
-  "pentaho/environment",
-  "pentaho/util/requireJSConfig!"
-], function(Core, environment, requireJSConfig) {
+  "pentaho/environment"
+], function(Core, environment) {
 
   var corePromise = null;
 
@@ -29,9 +28,7 @@ define([
         onLoad({moduleMetaService: {}, moduleService: {}});
       } else {
         if(corePromise === null) {
-          var globalModulesMap = requireJSConfig.config["pentaho/modules"] || null;
-
-          corePromise = Core.createAsync(environment, globalModulesMap);
+          corePromise = Core.createAsync(environment);
         }
 
         corePromise.then(onLoad, onLoad.error);

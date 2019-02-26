@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "../../lang/ArgumentRequiredError"
+], function(ArgumentRequiredError) {
 
   "use strict";
 
@@ -50,6 +52,15 @@ define(function() {
         if(type) {
           this.type.__addInstance(this);
         }
+      },
+
+      /** @inheritDoc  */
+      isInstanceOf: function(typeIdOrAlias) {
+        if(!typeIdOrAlias) {
+          throw new ArgumentRequiredError("typeIdOrAlias");
+        }
+
+        return this.type !== null && this.type.isSubtypeOf(typeIdOrAlias);
       }
     });
   };

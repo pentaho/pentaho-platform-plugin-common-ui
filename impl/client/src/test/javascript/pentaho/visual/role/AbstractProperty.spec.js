@@ -197,7 +197,7 @@ define([
           expect(result).toBe(true);
         });
 
-        it("should return true if the property has isVisualKey=true", function() {
+        it("should return true if the property has isVisualKey=false", function() {
 
           var Model = AbstractModel.extend({
             $type: {

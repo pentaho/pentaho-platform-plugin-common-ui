@@ -33,7 +33,6 @@ define([
       mixins: [MultiChartedModel, ScaleColorDiscreteModel],
       v2Id: "ccc_sunburst",
       category: "treemapchart",
-      defaultView: "pentaho/ccc/visual/Sunburst",
 
       props: [
         {

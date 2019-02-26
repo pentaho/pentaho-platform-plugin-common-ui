@@ -601,7 +601,6 @@ define([
 
     $type: /** @lends pentaho.visual.ModelType# */{
       id: module.id,
-      defaultView: "./View",
       isAbstract: true,
 
       props: [

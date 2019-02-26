@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,17 @@
  */
 
 /**
+ * Indicates if the module is virtual.
+ *
+ * A virtual module does not have a corresponding file or implementation.
+ *
+ * @name isVirtual
+ * @memberOf pentaho.module.spec.IMeta#
+ * @type {?boolean}
+ * @default false
+ */
+
+/**
  * The value of the module or a function that creates it.
  *
  * When specified, an AMD/RequireJS module with this module's id is dynamically defined.
@@ -61,3 +72,29 @@
  * @type {(*|(function(pentaho.module.IMeta) : *))}
  */
 
+/**
+ * The map of global module annotations' configurations.
+ *
+ * A map whose keys are annotation module identifiers and
+ * whose values are global annotation configurations.
+ *
+ * Annotations can be further configured, conditionally,
+ * using the configuration rules' [annotation]{@link pentaho.config.spec.IRuleSelector#annotation}
+ * selector property.
+ *
+ * @name annotations
+ * @memberOf pentaho.module.spec.IMeta#
+ * @type {?Object.<string, null|object|boolean>}
+ */
+
+/**
+ * The module's global configuration object.
+ *
+ * Modules can be further configured, conditionally,
+ * using the configuration rules' [module]{@link pentaho.config.spec.IRuleSelector#module}
+ * selector property.
+ *
+ * @name config
+ * @memberOf pentaho.module.spec.IMeta#
+ * @type {?object}
+ */

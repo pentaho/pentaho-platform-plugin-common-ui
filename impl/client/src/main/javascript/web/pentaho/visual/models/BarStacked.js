@@ -28,8 +28,6 @@ define([
       v2Id: "ccc_barstacked",
       category: "barchart",
 
-      defaultView: "pentaho/ccc/visual/BarStacked",
-
       props: [
         {
           name: "measures", // VISUAL_ROLE

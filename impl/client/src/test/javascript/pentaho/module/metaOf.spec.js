@@ -85,9 +85,9 @@ define([
 
     function createMetaMock() {
 
-      var moduleMeta = jasmine.createSpyObj("moduleMeta", ["loadConfigAsync"]);
+      var moduleMeta = jasmine.createSpyObj("moduleMeta", ["prepareAsync"]);
 
-      moduleMeta.loadConfigAsync.and.returnValue(Promise.resolve(null));
+      moduleMeta.prepareAsync.and.returnValue(Promise.resolve());
 
       return moduleMeta;
     }
@@ -189,10 +189,10 @@ define([
       modulePlugin.load(name, requesterRequire, onLoad, config);
     });
 
-    it("should call loadConfigAsync of the obtained metadata object", function(done) {
+    it("should call prepareAsync of the obtained metadata object", function(done) {
 
       var onLoad = createOnLoad(done, true, function() {
-        expect(moduleMeta.loadConfigAsync).toHaveBeenCalledTimes(1);
+        expect(moduleMeta.prepareAsync).toHaveBeenCalledTimes(1);
       });
 
       modulePlugin.load(name, requesterRequire, onLoad, config);
@@ -207,10 +207,10 @@ define([
       modulePlugin.load(name, requesterRequire, onLoad, config);
     });
 
-    it("should call onLoad.error with the result of the promise, when loadConfigAsync is unsuccessful", function(done) {
+    it("should call onLoad.error with the result of the promise, when prepareAsync is unsuccessful", function(done) {
 
       var error = new Error();
-      moduleMeta.loadConfigAsync.and.returnValue(Promise.reject(error));
+      moduleMeta.prepareAsync.and.returnValue(Promise.reject(error));
 
       var onLoad = createOnLoad(done, false, function(result) {
         expect(result).toBe(error);

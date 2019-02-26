@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
-  /**
-   * The `pentaho/util/requireJSConfig!` module is a RequireJS loader plugin that
-   * provides access to the full RequireJS configuration.
-   *
-   * **AMD Plugin Usage**: `"pentaho/util/requireJSConfig!`
-   *
-   * @name requireJSConfig
-   * @memberOf pentaho.util
-   * @type {IAmdLoaderPlugin}
-   * @amd pentaho/util/requireJSConfig
-   * @private
-   */
-  return {
-    load: function(name, requesterRequire, onLoad, amdConfig) {
-      onLoad(amdConfig);
-    }
-  };
-});
+
+/**
+ * The `impl` namespace contains implementation types of the `pentaho.theme` namespace.
+ *
+ * @name pentaho.theme.impl
+ * @namespace
+ * @private
+ */
+

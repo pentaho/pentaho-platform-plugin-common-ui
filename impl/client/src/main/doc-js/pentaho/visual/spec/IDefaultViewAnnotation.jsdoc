@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,22 @@
  */
 
 /**
- * @classDesc The `spec.IConfiguration` interface contains the configuration of a theme.
+ * The `visual.spec.IDefaultViewAnnotation` interface describes the configuration options of the
+ * {@link pentaho.visual.DefaultViewAnnotation} annotation.
  *
- * @name IConfiguration
- * @memberOf pentaho.theme.spec
+ * @name pentaho.visual.spec.IDefaultViewAnnotation
+ *
  * @interface
- *
- * @see pentaho.theme.main
  */
 
 /**
- * The absolute identifier of the main theme module.
+ * The identifier of the associated default view module.
  *
- * @name main
- * @memberOf pentaho.theme.spec.IConfiguration#
- * @type {?nonEmptyString}
- */
-
-/**
- * The absolute identifiers of the extension theme modules.
+ * When unspecified, the sibling module, `./View`, is assumed.
+ * When specified, it is relative to the annotated module.
  *
- * @name extensions
- * @memberOf pentaho.theme.spec.IConfiguration#
- * @type {?Array.<nonEmptyString>}
+ * @name module
+ * @memberOf pentaho.visual.spec.IDefaultViewAnnotation#
+ * @type {?string}
+ * @default "./View"
  */

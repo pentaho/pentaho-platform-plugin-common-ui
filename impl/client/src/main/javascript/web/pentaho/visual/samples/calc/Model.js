@@ -34,7 +34,6 @@ define([
     $type: {
       id: module.id,
       v2Id: "sample_calc",
-      defaultView: "./View",
 
       props: [
         {

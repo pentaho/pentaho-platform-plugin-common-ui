@@ -48,10 +48,6 @@ define([
       // The label may show up in menus
       label: "D3 Bar Chart",
     
-      // The default view to use to render this visualization is
-      // a sibling module named `ViewD3.js`
-      defaultView: "./ViewD3",
-    
       // Properties
       props: [
         // General properties

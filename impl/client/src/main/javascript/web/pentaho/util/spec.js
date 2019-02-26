@@ -33,14 +33,14 @@ define([
   };
 
   /**
-   * @classDesc A singleton class that contains utilities related to handling of specification objects.
+   * The `util.spec` contains utilities related with handling of specification objects.
    *
-   * @name pentaho.util.Spec
+   * @name pentaho.util.spec
    * @class
-   * @amd {pentaho.util.Spec} pentaho/util/spec
+   * @amd pentaho/util/spec
    */
 
-  return /** @lends pentaho.util.Spec# */{
+  return /** @lends pentaho.util.spec */{
     merge: merge
   };
 
@@ -53,7 +53,7 @@ define([
    * The latter is actually deep-cloned, whenever full-subtrees are set at a target place,
    * to prevent future merges from inadvertently changing the source's internal structures.
    *
-   * @memberOf pentaho.util.Spec#
+   * @memberOf pentaho.util.spec
    * @param {object} specTarget - The target specification.
    * @param {?object} specSource - The source specification.
    *

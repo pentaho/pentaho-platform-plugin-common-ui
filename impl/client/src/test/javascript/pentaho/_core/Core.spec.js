@@ -21,6 +21,7 @@ define([
   "use strict";
 
   var RULESET_TYPE_ID = "pentaho/config/spec/IRuleSet";
+  var EXTERNAL_CONFIG_ANNOTATION_ID = "pentaho/config/ExternalAnnotation";
 
   describe("pentaho._core.Core", function() {
 
@@ -35,14 +36,32 @@ define([
     });
 
     // region Mocks
-    function moduleMetaFactoryMock() {
+    function moduleMetaFactoryMock(core) {
 
       function Meta(id, spec) {
         this.id = id;
         this.alias = spec.alias;
+        this.isVirtual = !!spec.isVirtual;
         this.__index = spec.index;
         this.ranking = spec.ranking || 0;
+        this.__configSpec = spec.config || null;
       }
+
+      Meta.prototype.getAnnotationsIds = jasmine.createSpy("getAnnotationsIds").and.returnValue(null);
+      Meta.prototype.loadAsync = jasmine.createSpy("loadAsync").and.returnValue(Promise.resolve(null));
+      Meta.prototype.__loadAnnotationsAsync = function(annotationIds) {
+
+        var module = this;
+
+        return Promise.all(annotationIds.map(function(annotationId) {
+          return core.moduleMetaService.get(annotationId).loadAsync()
+            .then(function(Annotation) {
+              return module.getAnnotationAsync(Annotation);
+            });
+        }));
+      };
+      Meta.prototype.isSubtypeOf = jasmine.createSpy("isSubtypeOf").and.returnValue(false);
+      Meta.prototype.isInstanceOf = jasmine.createSpy("isSubtypeOf").and.returnValue(false);
 
       return Meta;
     }
@@ -57,7 +76,6 @@ define([
 
         var ancestorId = spec.ancestor || spec.base || null;
         this.ancestor = ancestorId ? moduleResolver(ancestorId, "type") : null;
-        this.isAbstract = !!spec.isAbstract;
         this.subtypes = [];
         this.instances = [];
 
@@ -65,6 +83,9 @@ define([
           this.ancestor.subtypes.push(this);
         }
       }
+
+      TypeMeta.prototype = Object.create(core.ModuleMeta.prototype);
+      TypeMeta.prototype.constructor = TypeMeta;
 
       return TypeMeta;
     }
@@ -92,20 +113,30 @@ define([
 
       MetaService.prototype.configure = jasmine.createSpy();
       MetaService.prototype.getInstancesOf = jasmine.createSpy().and.callFake(function() { return []; });
+      MetaService.prototype.get = jasmine.createSpy().and.returnValue(null);
 
       return MetaService;
     }
 
     function configurationServiceFactoryMock(core) {
 
-      function ConfigurationService(environment) {
+      function ConfigurationService(environment, selectExternalAsync) {
 
         this.__environment = environment || {};
-
+        this.__selectExternalAsync = selectExternalAsync ? jasmine.createSpy().and.callFake(selectExternalAsync) : null;
       }
 
       ConfigurationService.prototype.add = jasmine.createSpy();
-      ConfigurationService.prototype.selectAsync = jasmine.createSpy().and.returnValue(Promise.resolve(null));
+      ConfigurationService.prototype.selectAsync = jasmine.createSpy().and.callFake(function(moduleId) {
+
+        if(this.__selectExternalAsync !== null) {
+          return this.__selectExternalAsync(moduleId).then(function(prioritizedConfigs) {
+            return null;
+          });
+        }
+
+        return Promise.resolve(null);
+      });
 
       return ConfigurationService;
     }
@@ -124,7 +155,7 @@ define([
     }
     // endregion
 
-    describe(".createAsync(environment, globalModuleMap)", function() {
+    describe(".createAsync(environment)", function() {
 
       var Core;
       var moduleMetaFactory;
@@ -276,15 +307,36 @@ define([
         });
       });
 
-      it("should configure moduleMetaService with the specified globalModuleMap", function() {
+      it("should configure moduleMetaService with global IRuleSet modules", function() {
 
-        var globalModuleMap = {};
+        localRequire.config({
+          config: {
+            "pentaho/modules": {
+              "test/config/A": {
+                "type": "pentaho/config/spec/IRuleSet"
+              },
+              "test/B": {
+                "test1": "test2"
+              }
+            }
+          }
+        });
 
-        var promise = Core.createAsync(environment, globalModuleMap);
+        var promise = Core.createAsync(environment);
 
         return promise.then(function(core) {
           expect(core.moduleMetaService.configure).toHaveBeenCalledTimes(1);
-          expect(core.moduleMetaService.configure).toHaveBeenCalledWith(globalModuleMap);
+          expect(core.moduleMetaService.configure).toHaveBeenCalledWith(jasmine.objectContaining({
+            "test/config/A": {
+              "type": "pentaho/config/spec/IRuleSet"
+            }
+          }));
+
+          expect(core.moduleMetaService.configure).not.toHaveBeenCalledWith(jasmine.objectContaining({
+            "test/B": {
+              "test1": "test2"
+            }
+          }));
         });
       });
 
@@ -301,7 +353,20 @@ define([
         });
 
         it("should get all rule set modules from moduleMetaService " +
-          "after configuring the meta service with globalModuleMap", function() {
+           "after configuring the meta service with global IRuleSet modules", function() {
+
+          localRequire.config({
+            config: {
+              "pentaho/modules": {
+                "test/config/A": {
+                  "type": "pentaho/config/spec/IRuleSet"
+                },
+                "test/B": {
+                  "test1": "test2"
+                }
+              }
+            }
+          });
 
           var index = 0;
           var configureIndex;
@@ -312,7 +377,9 @@ define([
             var MetaService = moduleMetaServiceFactoryMock(core);
 
             MetaService.prototype.configure.and.callFake(function() {
-              configureIndex = ++index;
+              if(configureIndex === undefined) {
+                configureIndex = ++index;
+              }
             });
 
             MetaService.prototype.getInstancesOf.and.callFake(function() {
@@ -497,20 +564,7 @@ define([
 
           return promise.then(function(core) {
 
-            expect(core.configService.selectAsync).toHaveBeenCalledWith("pentaho/modules", jasmine.any(Object));
-          });
-        });
-
-        it("should ask the configuration service for the 'pentaho/modules' configuration, " +
-          "excluding the global configuration", function() {
-
-          var promise = Core.createAsync(environment);
-
-          return promise.then(function(core) {
-
-            expect(core.configService.selectAsync).toHaveBeenCalledWith("pentaho/modules", jasmine.objectContaining({
-              excludeGlobal: true
-            }));
+            expect(core.configService.selectAsync).toHaveBeenCalledWith("pentaho/modules");
           });
         });
 
@@ -592,6 +646,338 @@ define([
           return promise.then(function(core) {
 
             expect(core.moduleMetaService.configure).toHaveBeenCalledWith(modulesMap);
+          });
+        });
+
+        it("should configure moduleMetaService with what the configService returns", function() {
+
+          var globalModuleMap = {};
+
+          configServiceFactory.and.callFake(function(core) {
+
+            var ConfigurationService = configurationServiceFactoryMock(core);
+
+            ConfigurationService.prototype.selectAsync.and.callFake(function(moduleId) {
+              if(moduleId === "pentaho/modules") {
+                return Promise.resolve(globalModuleMap);
+              }
+
+              return Promise.resolve(null);
+            });
+
+            return ConfigurationService;
+          });
+
+          var promise = Core.createAsync(environment);
+
+          return promise.then(function(core) {
+            expect(core.moduleMetaService.configure).toHaveBeenCalledTimes(2);
+            expect(core.moduleMetaService.configure).toHaveBeenCalledWith(jasmine.any(Object));
+          });
+        });
+
+        it("should provide to the configService the RequireJS configuration of pentaho/modules, " +
+          "excluding IRuleSet modules", function() {
+
+          var globalRequireJSModulesConfig = {
+            "a": {},
+            "b": {type: "pentaho/config/spec/IRuleSet"},
+            "c": {}
+          };
+
+          localRequire.config({
+            "config": {
+              "pentaho/modules": globalRequireJSModulesConfig
+            }
+          });
+
+          var promise = Core.createAsync(environment);
+
+          return promise.then(function(core) {
+            var selectExternalAsync = core.configService.__selectExternalAsync;
+
+            expect(selectExternalAsync).toHaveBeenCalledTimes(1);
+            expect(selectExternalAsync).toHaveBeenCalledWith("pentaho/modules");
+
+            var promiseExternalConfig = selectExternalAsync.calls.first().returnValue;
+
+            expect(promiseExternalConfig.then !== null).toBe(true);
+
+            return promiseExternalConfig.then(function(prioritizedModulesConfigs) {
+              expect(Array.isArray(prioritizedModulesConfigs)).toBe(true);
+              expect(prioritizedModulesConfigs.length).toBe(1);
+              expect(prioritizedModulesConfigs[0].priority).toBe(-Infinity);
+              expect(prioritizedModulesConfigs[0].config)
+                .toEqual(jasmine.objectContaining({
+                  "a": {},
+                  "c": {}
+                }));
+              expect(prioritizedModulesConfigs[0].config)
+                .not.toEqual(jasmine.objectContaining({
+                  "b": {type: "pentaho/config/spec/IRuleSet"}
+                }));
+            });
+          });
+        });
+      });
+
+      describe("configuration of other modules", function() {
+
+        it("should provide to the configService each module's global config", function() {
+
+          var configA = {"A": "B"};
+
+          moduleMetaServiceFactory.and.callFake(function(core) {
+
+            var MetaService = moduleMetaServiceFactoryMock(core);
+
+            MetaService.prototype.get.and.callFake(function(moduleId) {
+              if(moduleId === "a") {
+                return new core.TypeModuleMeta(moduleId, {
+                  config: configA
+                });
+              }
+
+              return null;
+            });
+
+            return MetaService;
+          });
+
+          var promise = Core.createAsync(environment);
+
+          return promise.then(function(core) {
+
+            var selectExternalAsync = core.configService.__selectExternalAsync;
+
+            expect(selectExternalAsync).toHaveBeenCalledTimes(1);
+            expect(selectExternalAsync).toHaveBeenCalledWith("pentaho/modules");
+
+            return core.configService.selectAsync("a").then(function() {
+
+              expect(selectExternalAsync).toHaveBeenCalledTimes(2);
+              expect(selectExternalAsync).toHaveBeenCalledWith("a");
+
+              expect(core.moduleMetaService.get).toHaveBeenCalledWith("a");
+
+              var promiseExternalConfig = selectExternalAsync.calls.mostRecent().returnValue;
+
+              expect(promiseExternalConfig.then !== null).toBe(true);
+
+              return promiseExternalConfig.then(function(prioritizedModulesConfigs) {
+
+                expect(Array.isArray(prioritizedModulesConfigs)).toBe(true);
+                expect(prioritizedModulesConfigs.length).toBe(1);
+                expect(prioritizedModulesConfigs[0].priority).toBe(-Infinity);
+                expect(prioritizedModulesConfigs[0].config).toEqual(configA);
+              });
+            });
+          });
+        });
+
+        it("should provide to the configService with each module's external config annotations", function() {
+
+          var AAnnotation = function() {
+            this.config = {"A": "C"};
+          };
+
+          AAnnotation.id = "SomeExternalConfigAnnotation";
+          AAnnotation.priority = 5;
+
+          var annotationA = new AAnnotation();
+
+          moduleMetaServiceFactory.and.callFake(function(core) {
+            var aMeta;
+            var annotationAMeta;
+            var externalConfigAnnotationMeta;
+
+            var moduleResolver = function(id) {
+              switch(id) {
+                case EXTERNAL_CONFIG_ANNOTATION_ID: return externalConfigAnnotationMeta;
+                case "SomeExternalConfigAnnotation": return annotationAMeta;
+                case "a": return aMeta;
+                default: return null;
+              }
+            };
+
+            aMeta = new core.TypeModuleMeta("a", {
+              ancestor: null
+            });
+
+            aMeta.getAnnotationsIds.and.returnValue([
+              "SomeExternalConfigAnnotation",
+              "SomeNotAnExternalConfigAnnotation"
+            ]);
+
+            aMeta.getAnnotationAsync = jasmine.createSpy("getAnnotationAsync").and.callFake(function(Annotation) {
+              if(Annotation.id === "SomeExternalConfigAnnotation") {
+                return Promise.resolve(annotationA);
+              }
+
+              return Promise.resolve(null);
+            });
+
+            // ---
+
+            externalConfigAnnotationMeta = new core.TypeModuleMeta(EXTERNAL_CONFIG_ANNOTATION_ID, {
+              ancestor: null
+            });
+
+            annotationAMeta = new core.TypeModuleMeta("a", {
+              ancestor: EXTERNAL_CONFIG_ANNOTATION_ID
+            }, moduleResolver);
+
+            annotationAMeta.loadAsync.and.returnValue(Promise.resolve(AAnnotation));
+
+            annotationAMeta.isSubtypeOf.and.callFake(function(other) {
+              return other === externalConfigAnnotationMeta;
+            });
+
+            var MetaService = moduleMetaServiceFactoryMock(core);
+
+            MetaService.prototype.get.and.callFake(function(moduleId) {
+              return moduleResolver(moduleId);
+            });
+
+            return MetaService;
+          });
+
+          var promise = Core.createAsync(environment);
+
+          return promise.then(function(core) {
+
+            var selectExternalAsync = core.configService.__selectExternalAsync;
+
+            expect(selectExternalAsync).toHaveBeenCalledTimes(1);
+            expect(selectExternalAsync).toHaveBeenCalledWith("pentaho/modules");
+
+            // ---
+
+            return core.configService.selectAsync("a").then(function() {
+
+              expect(selectExternalAsync).toHaveBeenCalledTimes(2);
+              expect(selectExternalAsync).toHaveBeenCalledWith("a");
+
+              expect(core.moduleMetaService.get).toHaveBeenCalledWith("a");
+
+              var promiseExternalConfig = selectExternalAsync.calls.mostRecent().returnValue;
+
+              expect(promiseExternalConfig.then !== null).toBe(true);
+
+              return promiseExternalConfig.then(function(prioritizedModulesConfigs) {
+
+                expect(Array.isArray(prioritizedModulesConfigs)).toBe(true);
+                expect(prioritizedModulesConfigs.length).toBe(1);
+                expect(prioritizedModulesConfigs[0].priority).toBe(AAnnotation.priority);
+                expect(prioritizedModulesConfigs[0].config).toEqual(annotationA.config);
+              });
+            });
+          });
+        });
+
+        it("should provide to the configService with each module's global config and " +
+          "external config annotations", function() {
+
+          var configA = {"A": "B"};
+
+          var AAnnotation = function() {
+            this.config = {"A": "C"};
+          };
+
+          AAnnotation.id = "SomeExternalConfigAnnotation";
+          AAnnotation.priority = 5;
+
+          var annotationA = new AAnnotation();
+
+          moduleMetaServiceFactory.and.callFake(function(core) {
+            var aMeta;
+            var annotationAMeta;
+            var externalConfigAnnotationMeta;
+
+            var moduleResolver = function(id) {
+              switch(id) {
+                case EXTERNAL_CONFIG_ANNOTATION_ID: return externalConfigAnnotationMeta;
+                case "SomeExternalConfigAnnotation": return annotationAMeta;
+                case "a": return aMeta;
+                default: return null;
+              }
+            };
+
+            aMeta = new core.TypeModuleMeta("a", {
+              ancestor: null,
+              config: configA
+            });
+
+            aMeta.getAnnotationsIds.and.returnValue([
+              "SomeExternalConfigAnnotation",
+              "SomeNotAnExternalConfigAnnotation"
+            ]);
+
+            aMeta.getAnnotationAsync = jasmine.createSpy("getAnnotationAsync").and.callFake(function(Annotation) {
+              if(Annotation.id === "SomeExternalConfigAnnotation") {
+                return Promise.resolve(annotationA);
+              }
+
+              return Promise.resolve(null);
+            });
+
+            // ---
+
+            externalConfigAnnotationMeta = new core.TypeModuleMeta(EXTERNAL_CONFIG_ANNOTATION_ID, {
+              ancestor: null
+            });
+
+            annotationAMeta = new core.TypeModuleMeta("a", {
+              ancestor: EXTERNAL_CONFIG_ANNOTATION_ID
+            }, moduleResolver);
+
+            annotationAMeta.loadAsync.and.returnValue(Promise.resolve(AAnnotation));
+
+            annotationAMeta.isSubtypeOf.and.callFake(function(other) {
+              return other === externalConfigAnnotationMeta;
+            });
+
+            var MetaService = moduleMetaServiceFactoryMock(core);
+
+            MetaService.prototype.get.and.callFake(function(moduleId) {
+              return moduleResolver(moduleId);
+            });
+
+            return MetaService;
+          });
+
+          var promise = Core.createAsync(environment);
+
+          return promise.then(function(core) {
+
+            var selectExternalAsync = core.configService.__selectExternalAsync;
+
+            expect(selectExternalAsync).toHaveBeenCalledTimes(1);
+            expect(selectExternalAsync).toHaveBeenCalledWith("pentaho/modules");
+
+            // ---
+
+            return core.configService.selectAsync("a").then(function() {
+
+              expect(selectExternalAsync).toHaveBeenCalledTimes(2);
+              expect(selectExternalAsync).toHaveBeenCalledWith("a");
+
+              expect(core.moduleMetaService.get).toHaveBeenCalledWith("a");
+
+              var promiseExternalConfig = selectExternalAsync.calls.mostRecent().returnValue;
+
+              expect(promiseExternalConfig.then !== null).toBe(true);
+
+              return promiseExternalConfig.then(function(prioritizedModulesConfigs) {
+
+                expect(Array.isArray(prioritizedModulesConfigs)).toBe(true);
+                expect(prioritizedModulesConfigs.length).toBe(2);
+                expect(prioritizedModulesConfigs[0].priority).toBe(-Infinity);
+                expect(prioritizedModulesConfigs[0].config).toEqual(configA);
+                expect(prioritizedModulesConfigs[1].priority).toBe(AAnnotation.priority);
+                expect(prioritizedModulesConfigs[1].config).toEqual(annotationA.config);
+              });
+            });
           });
         });
       });

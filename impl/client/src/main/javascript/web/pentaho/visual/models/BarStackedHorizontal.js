@@ -28,8 +28,6 @@ define([
       v2Id: "ccc_horzbarstacked",
       category: "horzbarchart",
 
-      defaultView: "pentaho/ccc/visual/BarStackedHorizontal",
-
       props: [
         {
           name: "measures", // VISUAL_ROLE

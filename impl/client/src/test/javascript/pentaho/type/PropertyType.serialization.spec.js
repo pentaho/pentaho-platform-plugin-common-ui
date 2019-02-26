@@ -141,7 +141,7 @@ define([
         expect("base" in spec).toBe(false);
       });
 
-      it("should include `base` when a root property has subtype of PropertyType as base", function() {
+      it("should include `base` when a root property has a subtype of PropertyType as base", function() {
         var scope = new SpecificationScope();
 
         var SubProperty = Property.extend();

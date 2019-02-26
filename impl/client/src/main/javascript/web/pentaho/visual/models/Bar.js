@@ -30,7 +30,6 @@ define([
 
       v2Id: "ccc_bar",
       category: "barchart",
-      defaultView: "pentaho/ccc/visual/Bar",
 
       props: [
         {

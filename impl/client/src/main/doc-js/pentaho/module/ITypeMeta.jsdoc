@@ -35,18 +35,6 @@
  */
 
 /**
- * Gets a value that indicates if the type module is abstract.
- *
- * An abstract type module does not have a corresponding file or implementation.
- * Its value is `undefined`.
- *
- * @name isAbstract
- * @memberOf pentaho.module.ITypeMeta#
- * @type {boolean}
- * @readOnly
- */
-
-/**
  * Gets the array of subtypes, possibly empty.
  *
  * @name subtypes

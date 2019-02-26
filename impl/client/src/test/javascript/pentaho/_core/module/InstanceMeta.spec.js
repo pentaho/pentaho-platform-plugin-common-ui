@@ -26,6 +26,7 @@ define([
 
     var id = "test/foo/bar";
     var typeId = "test/foo/bar/type";
+    var type2Id = "test/foo/bar/type2";
 
     var ModuleMeta = Base.extend({
       constructor: function(id) {
@@ -50,8 +51,12 @@ define([
     }
 
     function createTypeMetaMock(id) {
-      var typeMeta = jasmine.createSpyObj("typeMeta", ["__addInstance"]);
+      var typeMeta = jasmine.createSpyObj("typeMeta", ["__addInstance", "isSubtypeOf"]);
       typeMeta.id = id;
+      typeMeta.isSubtypeOf.and.callFake(function(other) {
+        return this === other || this.ancestor === other;
+      });
+
       return typeMeta;
     }
 
@@ -113,6 +118,35 @@ define([
         var meta = new InstanceMeta(id, spec, moduleResolver);
 
         expect(meta.kind).toBe("instance");
+      });
+    });
+
+    describe("#isInstanceOf(typeMeta)", function() {
+
+      it("should return true when given its type", function() {
+        var spec = {type: typeId};
+        var meta = new InstanceMeta(id, spec, moduleResolver);
+
+        expect(meta.isInstanceOf(typeMeta)).toBe(true);
+      });
+
+      it("should return true when given its type's base type", function() {
+        var spec = {type: typeId};
+        var meta = new InstanceMeta(id, spec, moduleResolver);
+
+        var type2Meta = createTypeMetaMock(type2Id);
+        typeMeta.ancestor = type2Meta;
+
+        expect(meta.isInstanceOf(type2Meta)).toBe(true);
+      });
+
+      it("should return false when given an unrelated type", function() {
+        var spec = {type: typeId};
+        var meta = new InstanceMeta(id, spec, moduleResolver);
+
+        var type2Meta = createTypeMetaMock(type2Id);
+
+        expect(meta.isInstanceOf(type2Meta)).toBe(false);
       });
     });
   });

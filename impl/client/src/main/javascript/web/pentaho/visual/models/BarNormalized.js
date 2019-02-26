@@ -25,9 +25,7 @@ define([
     $type: {
       id: module.id,
       v2Id: "ccc_barnormalized",
-      category: "barchart",
-
-      defaultView: "pentaho/ccc/visual/BarNormalized"
+      category: "barchart"
     }
   })
   .localize({$type: bundle.structured.BarNormalized})

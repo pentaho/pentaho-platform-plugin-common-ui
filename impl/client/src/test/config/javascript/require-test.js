@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -174,6 +174,36 @@
       localRequire.dispose();
     }
   };
+
+  interceptRequire();
+
+  /**
+   * Make sure all require functions of contexts other than the default have a `contextName` property.
+   */
+  function interceptRequire() {
+
+    var originalNewContext = require.s.newContext;
+
+    require.s.newContext = function() {
+
+      var context = originalNewContext.apply(require.s, arguments);
+
+      context.require.contextName = context.contextName;
+
+      var originalMakeRequire = context.makeRequire;
+
+      context.makeRequire = function() {
+
+        var localRequire = originalMakeRequire.apply(context, arguments);
+
+        localRequire.contextName = context.contextName;
+
+        return localRequire;
+      };
+
+      return context;
+    };
+  }
 
   // ---
 

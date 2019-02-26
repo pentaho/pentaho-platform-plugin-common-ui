@@ -37,8 +37,7 @@ define([
    * require.config({
    *   config: {
    *     "pentaho/modules": {
-   *       "IHomeScreen":         {base: null, isAbstract: true},
-   *
+   *       "IHomeScreen":         {base: null, isVirtual: true},
    *       "mine/homeScreen":     {type: "IHomeScreen"},
    *       "yours/proHomeScreen": {type: "IHomeScreen", ranking: 2}
    *     }

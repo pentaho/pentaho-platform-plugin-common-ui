@@ -31,7 +31,6 @@ define([
 
       v2Id: "ccc_pie",
       category: "piechart",
-      defaultView: "pentaho/ccc/visual/Pie",
 
       props: [
         {

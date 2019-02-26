@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "pentaho/shim/es6-promise"
+], function() {
 
   "use strict";
 
   /* eslint dot-notation: 0 */
 
-  describe("pentaho._core.config.Service -", function() {
+  describe("pentaho._core.config.Service", function() {
 
     var localRequire;
     var core;
@@ -87,9 +89,6 @@ define(function() {
         var ruleOneId2;
         var ruleMultiIds;
         var ruleMultiIdsOneNull;
-        var ruleModuleAndInstId;
-        var ruleInstAndTypeId;
-        var ruleTypeId;
 
         var configurationService;
 
@@ -103,38 +102,6 @@ define(function() {
           ruleMultiIds = {
             select: {
               module: ["test/type", "test/type2", "A2"],
-              user: "1",
-              theme: "1",
-              locale: "1",
-              application: "1"
-            }
-          };
-
-          ruleModuleAndInstId  = {
-            select: {
-              module: "A",
-              instance: "B",
-              user: "1",
-              theme: "1",
-              locale: "1",
-              application: "1"
-            }
-          };
-
-          ruleInstAndTypeId  = {
-            select: {
-              instance: "A",
-              type: "B",
-              user: "1",
-              theme: "1",
-              locale: "1",
-              application: "1"
-            }
-          };
-
-          ruleTypeId = {
-            select: {
-              type: "A",
               user: "1",
               theme: "1",
               locale: "1",
@@ -163,30 +130,6 @@ define(function() {
           expect(configurationService.__ruleStore["A2"]).toBeDefined();
         });
 
-        it("should ignore select.instance if select.module is specified", function() {
-
-          configurationService.add({rules: [ruleModuleAndInstId]});
-
-          expect(configurationService.__ruleStore["A"]).toBeDefined();
-          expect(configurationService.__ruleStore["B"]).not.toBeDefined();
-        });
-
-        it("should ignore select.type if select.instance is specified", function() {
-
-          configurationService.add({rules: [ruleInstAndTypeId]});
-
-          expect(configurationService.__ruleStore["A"]).toBeDefined();
-          expect(configurationService.__ruleStore["B"]).not.toBeDefined();
-        });
-
-        it("should define rules when only select.type is specified", function() {
-
-          configurationService.add({rules: [ruleTypeId]});
-
-          expect(configurationService.__ruleStore["A"]).toBeDefined();
-          expect(configurationService.__ruleStore["B"]).not.toBeDefined();
-        });
-
         it("should define rules with given a rule-set with multiple rules", function() {
 
           configurationService.add({rules: [
@@ -196,15 +139,6 @@ define(function() {
 
           expect(configurationService.__ruleStore["A"]).toBeDefined();
           expect(configurationService.__ruleStore["B"]).toBeDefined();
-        });
-
-        it("should throw if given a rule with no module, type or instance", function() {
-
-          expect(function() {
-            configurationService.add({rules: [
-              ruleNoId
-            ]});
-          }).toThrow(errorMatch.argRequired("rule.select.module"));
         });
 
         it("should throw if given a rule with a module array having null elements", function() {
@@ -392,15 +326,17 @@ define(function() {
         });
       });
 
-      describe("`modules` absolutization and mapping", function() {
+      describe("select.module resolution", function() {
 
-        describe("relative `modules`", function() {
+        describe("relative mapping", function() {
 
           it("should return config if rule applies to module", function() {
 
             var configurationService;
 
             core = createCoreMock();
+            core.moduleMetaService.getId.and.returnValue(null);
+
             ConfigurationService = configServiceFactory(core);
 
             configurationService = new ConfigurationService();
@@ -430,6 +366,8 @@ define(function() {
             var configurationService;
 
             core = createCoreMock();
+            core.moduleMetaService.getId.and.returnValue(null);
+
             ConfigurationService = configServiceFactory(core);
 
             configurationService = new ConfigurationService();
@@ -452,7 +390,7 @@ define(function() {
           });
         });
 
-        describe("`modules` mapping", function() {
+        describe("AMD mapping", function() {
 
           it("should return config if rule applies to exactly mapped contextual module", function() {
 
@@ -466,6 +404,8 @@ define(function() {
             var configurationService;
 
             core = createCoreMock();
+            core.moduleMetaService.getId.and.returnValue(null);
+
             ConfigurationService = configServiceFactory(core);
 
             configurationService = new ConfigurationService();
@@ -503,6 +443,8 @@ define(function() {
             var configurationService;
 
             core = createCoreMock();
+            core.moduleMetaService.getId.and.returnValue(null);
+
             ConfigurationService = configServiceFactory(core);
 
             configurationService = new ConfigurationService();
@@ -540,6 +482,8 @@ define(function() {
             var configurationService;
 
             core = createCoreMock();
+            core.moduleMetaService.getId.and.returnValue(null);
+
             ConfigurationService = configServiceFactory(core);
 
             configurationService = new ConfigurationService();
@@ -561,6 +505,402 @@ define(function() {
             return configurationService.selectAsync("test/D").then(function(result) {
               expect(result).not.toBe(null);
               expect(result.testId).toEqual("D");
+            });
+          });
+        });
+
+        describe("module alias mapping", function() {
+          it("should return config if rule applies to a module's alias", function() {
+
+            // localRequire.config({
+            //   config: {
+            //     "pentaho/modules": {
+            //       "test/D": {
+            //         alias: "A"
+            //       }
+            //     }
+            //   }
+            // });
+
+            var configurationService;
+
+            core = createCoreMock();
+            core.moduleMetaService.getId.and.callFake(function(idOrAlias) {
+              if(idOrAlias === "A") {
+                return "test/D";
+              }
+
+              return idOrAlias;
+            });
+
+            ConfigurationService = configServiceFactory(core);
+
+            configurationService = new ConfigurationService();
+
+            configurationService.add({
+              rules: [
+                {
+                  select: {
+                    module: "A" // is mapped to test/D
+                  },
+                  apply: {
+                    testId: "D"
+                  }
+                }
+              ]
+            });
+
+            return configurationService.selectAsync("test/D").then(function(result) {
+              expect(result).not.toBe(null);
+              expect(result.testId).toEqual("D");
+            });
+          });
+        });
+      });
+
+      describe("select.application resolution", function() {
+
+        describe("relative mapping", function() {
+
+          it("should return config if rule applies to application", function() {
+
+            var configurationService;
+
+            core = createCoreMock();
+            ConfigurationService = configServiceFactory(core);
+
+            configurationService = new ConfigurationService({
+              application: "test/App"
+            });
+
+            configurationService.add({
+              contextId: "test/B",
+              rules: [
+                {
+                  select: {
+                    module: "test/A",
+                    application: "./App"
+                  },
+                  apply: {
+                    testId: "A"
+                  }
+                }
+              ]
+            });
+
+            return configurationService.selectAsync("test/A").then(function(result) {
+              expect(result).not.toBe(null);
+              expect(result.testId).toEqual("A");
+            });
+          });
+
+          it("should throw if module id is relative and contextId is not specified", function() {
+
+            var configurationService;
+
+            core = createCoreMock();
+            ConfigurationService = configServiceFactory(core);
+
+            configurationService = new ConfigurationService({
+              application: "test/App"
+            });
+
+            expect(function() {
+
+              configurationService.add({
+                rules: [
+                  {
+                    select: {
+                      module: "test/A",
+                      application: "../App"
+                    },
+                    apply: {
+                      testId: "A"
+                    }
+                  }
+                ]
+              });
+            }).toThrow(errorMatch.operInvalid());
+          });
+        });
+
+        describe("AMD mapping", function() {
+
+          it("should return config if rule applies to exactly mapped contextual module", function() {
+
+            localRequire.config({
+              map: {
+                "test/B": {
+                  "App": "test/App"
+                }
+              }
+            });
+            var configurationService;
+
+            core = createCoreMock();
+            core.moduleMetaService.getId.and.returnValue(null);
+
+            ConfigurationService = configServiceFactory(core);
+
+            configurationService = new ConfigurationService({
+              application: "test/App"
+            });
+
+            configurationService.add({
+              contextId: "test/B",
+              rules: [
+                {
+                  select: {
+                    module: "test/A",
+                    application: "App" // is mapped to test/App
+                  },
+                  apply: {
+                    testId: "D"
+                  }
+                }
+              ]
+            });
+
+            return configurationService.selectAsync("test/A").then(function(result) {
+              expect(result).not.toBe(null);
+              expect(result.testId).toEqual("D");
+            });
+          });
+        });
+
+        describe("module alias mapping", function() {
+
+          it("should return config if rule applies to a module's alias", function() {
+
+            // localRequire.config({
+            //   config: {
+            //     "pentaho/modules": {
+            //       "test/App": {
+            //         alias: "App"
+            //       }
+            //     }
+            //   }
+            // });
+
+            var configurationService;
+
+            core = createCoreMock();
+            core.moduleMetaService.getId.and.callFake(function(idOrAlias) {
+              if(idOrAlias === "App") {
+                return "test/App";
+              }
+
+              return idOrAlias;
+            });
+
+            ConfigurationService = configServiceFactory(core);
+
+            configurationService = new ConfigurationService({
+              application: "test/App"
+            });
+
+            configurationService.add({
+              rules: [
+                {
+                  select: {
+                    module: "test/A",
+                    application: "App" // is mapped to test/App
+                  },
+                  apply: {
+                    testId: "D"
+                  }
+                }
+              ]
+            });
+
+            return configurationService.selectAsync("test/A").then(function(result) {
+              expect(result).not.toBe(null);
+              expect(result.testId).toEqual("D");
+            });
+          });
+        });
+      });
+
+      describe("select.annotation resolution", function() {
+
+        describe("relative mapping", function() {
+
+          it("should return resolved config in pentaho modules", function() {
+
+            var configurationService;
+
+            core = createCoreMock();
+            core.moduleMetaService.getId.and.returnValue(null);
+
+            ConfigurationService = configServiceFactory(core);
+
+            configurationService = new ConfigurationService();
+
+            configurationService.add({
+              contextId: "test/B",
+              rules: [
+                {
+                  select: {
+                    module: "test/A",
+                    annotation: "./Info"
+                  },
+                  apply: {
+                    testId: "A"
+                  }
+                }
+              ]
+            });
+
+            return configurationService.selectAsync("pentaho/modules").then(function(result) {
+              expect(result).not.toBe(null);
+              expect(result).toEqual(jasmine.objectContaining({
+                "test/A": {
+                  annotations: {
+                    "test/InfoAnnotation": {
+                      testId: "A"
+                    }
+                  }
+                }
+              }));
+            });
+          });
+
+          it("should throw if annotation id is relative and contextId is not specified", function() {
+
+            var configurationService;
+
+            core = createCoreMock();
+            core.moduleMetaService.getId.and.returnValue(null);
+
+            ConfigurationService = configServiceFactory(core);
+
+            configurationService = new ConfigurationService({
+              application: "test/App"
+            });
+
+            expect(function() {
+
+              configurationService.add({
+                rules: [
+                  {
+                    select: {
+                      module: "test/A",
+                      annotation: "../Info"
+                    },
+                    apply: {
+                      testId: "A"
+                    }
+                  }
+                ]
+              });
+            }).toThrow(errorMatch.operInvalid());
+          });
+        });
+
+        describe("AMD mapping", function() {
+
+          it("should return config in pentaho/modules if rule applies to exactly mapped contextual module", function() {
+
+            localRequire.config({
+              map: {
+                "test/B": {
+                  "InfoAnnotation": "test/InfoAnnotation"
+                }
+              }
+            });
+            var configurationService;
+
+            core = createCoreMock();
+            core.moduleMetaService.getId.and.returnValue(null);
+
+            ConfigurationService = configServiceFactory(core);
+
+            configurationService = new ConfigurationService();
+
+            configurationService.add({
+              contextId: "test/B",
+              rules: [
+                {
+                  select: {
+                    module: "test/A",
+                    annotation: "Info" // is mapped to test/InfoAnnotation
+                  },
+                  apply: {
+                    testId: "D"
+                  }
+                }
+              ]
+            });
+
+            return configurationService.selectAsync("pentaho/modules").then(function(result) {
+              expect(result).not.toBe(null);
+              expect(result).toEqual(jasmine.objectContaining({
+                "test/A": {
+                  annotations: {
+                    "test/InfoAnnotation": {
+                      testId: "D"
+                    }
+                  }
+                }
+              }));
+            });
+          });
+        });
+
+        describe("module alias mapping", function() {
+
+          it("should return config in pentaho/modules if rule applies to an annotation's alias", function() {
+
+            // localRequire.config({
+            //   config: {
+            //     "pentaho/modules": {
+            //       "test/InfoAnnotation": {
+            //         alias: "Info"
+            //       }
+            //     }
+            //   }
+            // });
+
+            var configurationService;
+
+            core = createCoreMock();
+            core.moduleMetaService.getId.and.callFake(function(idOrAlias) {
+              if(idOrAlias === "Info") {
+                return "test/InfoAnnotation";
+              }
+
+              return idOrAlias;
+            });
+
+            ConfigurationService = configServiceFactory(core);
+
+            configurationService = new ConfigurationService();
+
+            configurationService.add({
+              rules: [
+                {
+                  select: {
+                    module: "test/A",
+                    annotation: "Info" // is mapped to test/InfoAnnotation
+                  },
+                  apply: {
+                    testId: "D"
+                  }
+                }
+              ]
+            });
+
+            return configurationService.selectAsync("pentaho/modules").then(function(result) {
+              expect(result).not.toBe(null);
+              expect(result).toEqual(jasmine.objectContaining({
+                "test/A": {
+                  annotations: {
+                    "test/InfoAnnotation": {
+                      testId: "D"
+                    }
+                  }
+                }
+              }));
             });
           });
         });
@@ -705,6 +1045,91 @@ define(function() {
           };
 
           core = createCoreMock();
+          ConfigurationService = configServiceFactory(core);
+
+          var configurationService = new ConfigurationService({});
+
+          configurationService.add(ruleSet);
+
+          return configurationService.selectAsync("A").then(function() {
+
+            expect(moduleBFactory).toHaveBeenCalled();
+            expect(moduleCFactory).toHaveBeenCalled();
+          });
+        });
+
+        it("should resolve all dependencies with the AMD map configuration", function() {
+
+          var moduleBFactory = jasmine.createSpy("moduleB");
+          var moduleCFactory = jasmine.createSpy("moduleC");
+
+          localRequire.define("test/configB", moduleBFactory);
+          localRequire.define("test/configC", moduleCFactory);
+          localRequire.config({
+            map: {
+              "test/config/D": {
+                "B": "test/configB",
+                "C": "test/configC"
+              }
+            }
+          });
+
+          var ruleSet = {
+            contextId: "test/config/D",
+            rules: [
+              {
+                select: {module: "A"},
+                deps: ["B", "C"],
+                apply: {}
+              }
+            ]
+          };
+
+          core = createCoreMock();
+          core.moduleMetaService.getId.and.returnValue(null);
+          ConfigurationService = configServiceFactory(core);
+
+          var configurationService = new ConfigurationService({});
+
+          configurationService.add(ruleSet);
+
+          return configurationService.selectAsync("A").then(function() {
+
+            expect(moduleBFactory).toHaveBeenCalled();
+            expect(moduleCFactory).toHaveBeenCalled();
+          });
+        });
+
+        it("should resolve all dependencies with the module aliases", function() {
+
+          var moduleBFactory = jasmine.createSpy("moduleB");
+          var moduleCFactory = jasmine.createSpy("moduleC");
+
+          localRequire.define("test/configB", moduleBFactory);
+          localRequire.define("test/configC", moduleCFactory);
+
+          var ruleSet = {
+            rules: [
+              {
+                select: {module: "A"},
+                deps: ["B", "C"],
+                apply: {}
+              }
+            ]
+          };
+
+          core = createCoreMock();
+          core.moduleMetaService.getId.and.callFake(function(idOrAlias) {
+            if(idOrAlias === "B") {
+              return "test/configB";
+            }
+            if(idOrAlias === "C") {
+              return "test/configC";
+            }
+
+            return idOrAlias;
+          });
+
           ConfigurationService = configServiceFactory(core);
 
           var configurationService = new ConfigurationService({});
@@ -969,7 +1394,7 @@ define(function() {
         });
       });
 
-      describe("global configuration", function() {
+      describe("external configuration", function() {
 
         var configurationService;
 
@@ -978,7 +1403,7 @@ define(function() {
           core = createCoreMock();
           ConfigurationService = configServiceFactory(core);
 
-          configurationService = new ConfigurationService();
+          configurationService = new ConfigurationService(null, selectExternalConfigsAsync);
 
           configurationService.add({
             rules: [
@@ -990,38 +1415,111 @@ define(function() {
                 apply: {
                   testId: "A"
                 }
+              },
+              {
+                priority: -Infinity,
+                select: {
+                  module: "test/DefaultExternalPriority"
+                },
+                apply: {
+                  testId: "Internal"
+                }
+              },
+              {
+                priority: -Infinity,
+                select: {
+                  module: "test/GreaterExternalPriority"
+                },
+                apply: {
+                  testId: "Internal"
+                }
               }
             ]
           });
+
+          function selectExternalConfigsAsync(moduleId) {
+            if(moduleId === "C") {
+              return Promise.resolve([
+                {
+                  priority: -Infinity,
+                  config: {
+                    testId: "C"
+                  }
+                }
+              ]);
+            }
+
+            if(moduleId === "A") {
+              return Promise.resolve([
+                {
+                  priority: -Infinity,
+                  config: {
+                    testId: "A"
+                  }
+                }
+              ]);
+            }
+
+            if(moduleId === "test/DefaultExternalPriority") {
+              return Promise.resolve([
+                {
+                  config: {
+                    testId: "External"
+                  }
+                }
+              ]);
+            }
+
+            if(moduleId === "test/GreaterExternalPriority") {
+              return Promise.resolve([
+                {
+                  priority: 1,
+                  config: {
+                    testId: "External"
+                  }
+                }
+              ]);
+            }
+
+            if(moduleId === "test/OnlyExternalConfig") {
+              return Promise.resolve([
+                {
+                  config: {
+                    testId: "External"
+                  }
+                }
+              ]);
+            }
+
+            return Promise.resolve(null);
+          }
         });
 
-        it("should include the global configuration by default", function() {
-
-          localRequire.config({
-            config: {
-              "C": {
-                testId: "C"
-              }
-            }
-          });
+        it("should include the external configuration by default", function() {
 
           return configurationService.selectAsync("C").then(function(result) {
             expect(result.testId).toEqual("C");
           });
         });
 
-        it("should give less priority to the global configuration than to any IRuleSet rule", function() {
+        it("should give less priority by default to the external configuration", function() {
 
-          localRequire.config({
-            config: {
-              "A": {
-                testId: "A0"
-              }
-            }
+          return configurationService.selectAsync("test/DefaultExternalPriority").then(function(result) {
+            expect(result.testId).toEqual("Internal");
           });
+        });
 
-          return configurationService.selectAsync("A").then(function(result) {
-            expect(result.testId).toEqual("A");
+        it("should have greater priority than internal configuration if priority = 1", function() {
+
+          return configurationService.selectAsync("test/GreaterExternalPriority").then(function(result) {
+            expect(result.testId).toEqual("External");
+          });
+        });
+
+        it("should get the external configuration when there is no internal configuraiton", function() {
+
+          return configurationService.selectAsync("test/OnlyExternalConfig").then(function(result) {
+            expect(result.testId).toEqual("External");
           });
         });
       });

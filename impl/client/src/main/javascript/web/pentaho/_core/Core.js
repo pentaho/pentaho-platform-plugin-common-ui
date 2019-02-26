@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,22 @@ define([
   "./module/InstanceMeta",
   "./module/TypeMeta",
   "./module/Service",
-  "./config/Service"
+  "./config/Service",
+  "../module/util",
+  "../util/fun",
+  "../module/AsyncAnnotation",
+  "../config/ExternalAnnotation",
+  "../util/requireJS"
 ], function(localRequire, module, moduleMetaServiceFactory, moduleMetaFactory, instanceModuleMetaFactory,
-            typeModuleMetaFactory, ModuleService, configurationServiceFactory) {
+            typeModuleMetaFactory, ModuleService, configurationServiceFactory, moduleUtil, F, AsyncAnnotation,
+            ExternalConfigAnnotation, requireJSUtil) {
 
   "use strict";
 
-  var RULESET_TYPE_ID = "pentaho/config/spec/IRuleSet";
-  var MODULES_ID = "pentaho/modules";
-  var __keyArgsExcludeGlobal = Object.freeze({excludeGlobal: true});
+  var RULESET_TYPE_ID = moduleUtil.resolveModuleId("pentaho/config/spec/IRuleSet", module.id);
+  var MODULES_ID = moduleUtil.resolveModuleId("pentaho/modules", module.id);
+  var EXTERNAL_CONFIG_ANNOTATION_ID = ExternalConfigAnnotation.id;
+  var ASYNC_ANNOTATION_ID = AsyncAnnotation.id;
 
   /**
    * @classDesc The `Core` class represents the core layer of the Pentaho JavaScript platform.
@@ -43,6 +50,7 @@ define([
   function Core(environment) {
 
     this.environment = environment;
+    this.configService = null;
   }
 
   /**
@@ -50,11 +58,10 @@ define([
    * modules configuration and rule sets.
    *
    * @param {pentaho.environment.IEnvironment} environment - The environment.
-   * @param {?pentaho.module.spec.MetaMap} [globalModuleMap] - The global modules map.
    *
    * @return {Promise.<pentaho._core.Core>} A promise that resolves to the created and initialized `Core` instance.
    */
-  Core.createAsync = function(environment, globalModuleMap) {
+  Core.createAsync = function(environment) {
 
     // Create the Core instance.
     var core = new Core(environment);
@@ -66,14 +73,13 @@ define([
 
     // Create the module metadata service.
     var ModuleMetaService = moduleMetaServiceFactory(core);
-
     core.moduleMetaService = new ModuleMetaService();
-    core.moduleMetaService.configure(globalModuleMap);
+    core.moduleMetaService.configure(getGlobalRuleSetModulesMapConfig());
 
     core.moduleService = new ModuleService(core.moduleMetaService);
 
-    // Module meta service could also be used to obtain a registration for
-    // the configuration service itself. Don't think it's worth the effort now.
+    core.asyncAnnotationModule = null;
+    core.externalConfigAnnotationModule = null;
 
     return loadConfigRuleSetsAsync().then(initGivenConfigRules);
 
@@ -91,7 +97,7 @@ define([
 
       // Ensure repeatable rule application. This effectively ignores the ranking of rule set modules...
       ruleSetModuleMetas = ruleSetModuleMetas.slice().sort(function(a, b) {
-        return a.id.localeCompare(b.id);
+        return F.compare(a.id, b.id);
       });
 
       return Promise.all(ruleSetModuleMetas.map(loadRuleSetModuleMetaAsync));
@@ -116,7 +122,7 @@ define([
 
           return ruleSet;
         }, function() {
-          // Swallow and return null.
+          // Swallow and return null. Already logged by loadAsync.
           return null;
         });
     }
@@ -134,7 +140,7 @@ define([
 
       core.ConfigurationService = configurationServiceFactory(core);
 
-      var configService = core.configService = new core.ConfigurationService(environment);
+      var configService = core.configService = new core.ConfigurationService(environment, selectExternalConfigsAsync);
 
       moduleRuleSets.forEach(function(ruleSet) {
         // Filter out rule sets whose loading failed.
@@ -144,17 +150,164 @@ define([
       });
 
       // Load "pentaho/modules" _environmental_ configuration.
-      // Do not include the AMD/RequireJS configuration,
-      // as it would unnecessarily account for `globalModuleMap`, twice.
-      return configService.selectAsync(MODULES_ID, __keyArgsExcludeGlobal)
+      return configService.selectAsync(MODULES_ID)
         .then(function(modulesConfig) {
           // Configure the `moduleMetaService` with any existing environmental configuration.
           if(modulesConfig !== null) {
             core.moduleMetaService.configure(modulesConfig);
           }
 
+          // Should always exist, but relaxing for unit tests...
+          core.externalConfigAnnotationModule = core.moduleMetaService.get(EXTERNAL_CONFIG_ANNOTATION_ID);
+          core.asyncAnnotationModule = core.moduleMetaService.get(ASYNC_ANNOTATION_ID);
+
           return core;
         });
+    }
+
+    /**
+     * Gets a promise for an array of external configurations, including each's priority.
+     *
+     * @param {string} moduleId - The module identifier.
+     *
+     * @return {Promise.<?({priority: number, config: object})>} A promise for an array of external configurations.
+     */
+    function selectExternalConfigsAsync(moduleId) {
+
+      // "pentaho/modules"
+      if(moduleId === MODULES_ID) {
+        return selectGlobalModulesConfigAsync();
+      }
+
+      var prioritizedConfigs = null;
+
+      // Assume "pentaho/modules" has already been setup.
+      var module = core.moduleMetaService.get(moduleId);
+      if(module !== null) {
+
+        var config = module.__configSpec;
+        if(config !== null) {
+          prioritizedConfigs = [{priority: -Infinity, config: config}];
+        }
+
+        // Get annotations of subtypes of pentaho.config.ExternalAnnotation.
+        var prioritizedConfigsPromise = selectModuleAnnotationsConfigAsync(module);
+        if(prioritizedConfigsPromise !== null) {
+
+          if(prioritizedConfigs !== null) {
+            prioritizedConfigsPromise = prioritizedConfigsPromise.then(function(annotatedPrioritizedConfigs) {
+
+              prioritizedConfigs.push.apply(prioritizedConfigs, annotatedPrioritizedConfigs);
+
+              return prioritizedConfigs;
+            });
+          }
+
+          return prioritizedConfigsPromise;
+        }
+      }
+
+      return Promise.resolve(prioritizedConfigs);
+    }
+
+    /**
+     * Gets a promise for an array with the configuration of "pentaho/modules", excluding ruleset modules, which
+     * were previously processed.
+     *
+     * @return {Promise.<?({priority: number, config: object})>} A promise for an array with the global modules
+     * configuration or for `null`.
+     */
+    function selectGlobalModulesConfigAsync() {
+
+      var prioritizedConfigs = null;
+
+      // Get the global AMD configuration, excluding any ruleset modules, which were already processed.
+      var globalModulesMap = requireJSUtil.config().config[MODULES_ID] || null;
+      if(globalModulesMap !== null) {
+
+        var allButRulesetModulesMap = {};
+
+        Object.keys(globalModulesMap).forEach(function(moduleId) {
+          var moduleSpec = globalModulesMap[moduleId];
+          if(moduleSpec && moduleSpec.type !== RULESET_TYPE_ID) {
+            allButRulesetModulesMap[moduleId] = moduleSpec;
+          }
+        });
+
+        prioritizedConfigs = [
+          {priority: -Infinity, config: allButRulesetModulesMap}
+        ];
+      }
+
+      return Promise.resolve(prioritizedConfigs);
+    }
+
+    /**
+     * Gets an array with the configuration of rule set "pentaho/modules" and
+     * of the rule set spec itself.
+     *
+     * @return {Object.<string, pentaho.module.spec.IMeta>} A map of rule set modules' specifications.
+     */
+    function getGlobalRuleSetModulesMapConfig() {
+
+      var ruleSetModulesMap = {};
+
+      // Get the global AMD configuration.
+      var globalModulesMap = requireJSUtil.config().config[MODULES_ID] || null;
+      if(globalModulesMap !== null) {
+        Object.keys(globalModulesMap).forEach(function(moduleId) {
+          var moduleSpec = globalModulesMap[moduleId];
+          if(moduleSpec && (moduleId === RULESET_TYPE_ID || moduleSpec.type === RULESET_TYPE_ID)) {
+            ruleSetModulesMap[moduleId] = moduleSpec;
+          }
+        });
+      }
+
+      return ruleSetModulesMap;
+    }
+
+    /**
+     * Gets a promise for an array of a module's annotations' prioritized configurations.
+     *
+     * @param {pentaho.module.IMeta} module - The module.
+     *
+     * @return {?Promise.<Array.<({priority: number, config: object})>>} A promise for an array of
+     * external configurations; `null`, if there are no external configuration annotations.
+     */
+    function selectModuleAnnotationsConfigAsync(module) {
+
+      var annotationsIds = module.getAnnotationsIds();
+      if(annotationsIds !== null) {
+
+        var configAnnotationsIds = annotationsIds.filter(isExternalConfigAnnotation);
+        if(configAnnotationsIds.length > 0) {
+
+          return module.__loadAnnotationsAsync(configAnnotationsIds)
+            .then(function(configAnnotations) {
+              return configAnnotations.map(function(configAnnotation) {
+                return {priority: configAnnotation.constructor.priority, config: configAnnotation.config};
+              });
+            });
+        }
+      }
+
+      return null;
+    }
+
+    /**
+     * Determines if an annotation is a subtype of {@link pentaho.config.ExternalAnnotation}, given its identifier.
+     *
+     * @param {string} annotationId - The annotation identifier.
+     * @return {boolean} `true` if it is; `false`, otherwise.
+     */
+    function isExternalConfigAnnotation(annotationId) {
+
+      if(core.externalConfigAnnotationModule === null) {
+        return false;
+      }
+
+      var module = core.moduleMetaService.get(annotationId);
+      return module !== null && module.isSubtypeOf(core.externalConfigAnnotationModule);
     }
   };
 

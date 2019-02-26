@@ -28,7 +28,6 @@ define([
       mixins: [ScaleSizeContinuousModel],
 
       v2Id: "ccc_scatter",
-      defaultView: "pentaho/ccc/visual/Bubble",
 
       props: [
         {

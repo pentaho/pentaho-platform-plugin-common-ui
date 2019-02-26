@@ -98,7 +98,16 @@
     "name": "pentaho/theme"
   });
 
-  requireModules["pentaho/config/spec/IRuleSet"] = {base: null, isAbstract: true};
+  requireModules["pentaho/config/spec/IRuleSet"] = {base: null, isVirtual: true};
+
+  requireModules["pentaho/module/Annotation"] = {base: null};
+  requireModules["pentaho/module/SyncAnnotation"] = {base: "pentaho/module/Annotation"};
+  requireModules["pentaho/module/AsyncAnnotation"] = {base: "pentaho/module/Annotation"};
+  requireModules["pentaho/config/ExternalAnnotation"] = {base: "pentaho/module/AsyncAnnotation"};
+  requireModules["pentaho/module/LoadUIInfoAnnotation"] = {base: "pentaho/module/AsyncAnnotation"};
+  requireModules["pentaho/i18n/LoadConfigAnnotation"] = {base: "pentaho/config/ExternalAnnotation"};
+  requireModules["pentaho/theme/LoadThemeAnnotation"] = {base: "pentaho/module/AsyncAnnotation"};
+  requireModules["pentaho/theme/ThemeAnnotation"] = {base: "pentaho/module/SyncAnnotation"};
 
   requireModules["pentaho/type/Instance"] = {alias: "instance", base: null};
   requireModules["pentaho/type/Value"] = {alias: "value", base: "instance"};
@@ -133,6 +142,7 @@
   requireModules["pentaho/data/filter/IsLike"] = {alias: "like", base: "pentaho/data/filter/Property"};
 
   requireModules["pentaho/visual/Model"] = {base: "complex"};
+  requireModules["pentaho/visual/DefaultViewAnnotation"] = {base: "pentaho/module/SyncAnnotation"};
   requireModules["pentaho/visual/role/adaptation/Strategy"] = {base: "complex"};
   requireModules["pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy"] = {
     base: "pentaho/visual/role/adaptation/Strategy",
@@ -323,32 +333,39 @@
 
   requireModules["pentaho/visual/config/vizApi.conf"] = {type: "pentaho/config/spec/IRuleSet"};
 
-  requireModules["pentaho/visual/models/Abstract"] = {base: "pentaho/visual/Model"};
-  requireModules["pentaho/visual/samples/calc/Model"] = {base: "pentaho/visual/Model"};
+  requireModules["pentaho/visual/models/Abstract"] = {
+    base: "pentaho/visual/Model",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/Abstract"}
+    }
+  };
+  requireModules["pentaho/visual/samples/calc/Model"] = {
+    base: "pentaho/visual/Model",
+    annotations: {"pentaho/visual/DefaultView": {/* module: "./View" */}}
+  };
   [
-    "pentaho/visual/models/CartesianAbstract",
-    "pentaho/visual/models/CategoricalContinuousAbstract",
-    "pentaho/visual/models/BarAbstract",
-    "pentaho/visual/models/BarNormalizedAbstract",
-    "pentaho/visual/models/BarHorizontal",
-    "pentaho/visual/models/Bar",
-    "pentaho/visual/models/BarStacked",
-    "pentaho/visual/models/BarStackedHorizontal",
-    "pentaho/visual/models/BarNormalized",
-    "pentaho/visual/models/BarNormalizedHorizontal",
-    "pentaho/visual/models/BarLine",
-    "pentaho/visual/models/Line",
-    "pentaho/visual/models/PointAbstract",
-    "pentaho/visual/models/MetricPointAbstract",
-    "pentaho/visual/models/AreaStacked",
-    "pentaho/visual/models/Pie",
-    "pentaho/visual/models/HeatGrid",
-    "pentaho/visual/models/Sunburst",
-    "pentaho/visual/models/Donut",
-    "pentaho/visual/models/Scatter",
-    "pentaho/visual/models/Bubble"
+    "BarHorizontal",
+    "Bar",
+    "BarStacked",
+    "BarStackedHorizontal",
+    "BarNormalized",
+    "BarNormalizedHorizontal",
+    "BarLine",
+    "Line",
+    "AreaStacked",
+    "Pie",
+    "HeatGrid",
+    "Sunburst",
+    "Donut",
+    "Scatter",
+    "Bubble"
   ].forEach(function(name) {
-    requireModules[name] = {base: "pentaho/visual/models/Abstract"};
+    requireModules["pentaho/visual/models/" + name] = {
+      base: "pentaho/visual/models/Abstract",
+      annotations: {
+        "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/" + name}
+      }
+    };
   });
   // endregion
 
@@ -390,7 +407,9 @@
       "pentaho/util/object",
       "pentaho/util/fun",
       "pentaho/util/text",
-      "pentaho/util/requireJSConfig",
+      "pentaho/shim/_es6-promise/es6-promise",
+      "pentaho/shim/es6-promise",
+      "pentaho/util/requireJS",
       "pentaho/debug/Levels",
       "pentaho/debug/impl/Manager",
       "pentaho/util/domWindow",
@@ -404,22 +423,23 @@
       "pentaho/lang/ArgumentInvalidError",
       "pentaho/_core/module/MetaService",
       "pentaho/util/logger",
+      "pentaho/util/arg",
       "pentaho/lang/ArgumentInvalidTypeError",
       "pentaho/lang/ArgumentRangeError",
       "pentaho/lang/OperationInvalidError",
       "pentaho/lang/NotImplementedError",
       "pentaho/util/error",
-      "pentaho/util/arg",
-      "pentaho/shim/_es6-promise/es6-promise",
-      "pentaho/shim/es6-promise",
       "pentaho/util/promise",
+      "pentaho/util/spec",
       "pentaho/module/util",
       "pentaho/_core/module/Meta",
       "pentaho/_core/module/InstanceMeta",
       "pentaho/_core/module/TypeMeta",
       "pentaho/_core/module/Service",
-      "pentaho/util/spec",
       "pentaho/_core/config/Service",
+      "pentaho/module/Annotation",
+      "pentaho/module/AsyncAnnotation",
+      "pentaho/config/ExternalAnnotation",
       "pentaho/_core/Core",
       "pentaho/util/url",
       "pentaho/environment/impl/Environment",

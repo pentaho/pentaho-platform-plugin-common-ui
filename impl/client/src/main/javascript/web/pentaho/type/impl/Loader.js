@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,11 @@ define([
   "pentaho/module/util",
   "pentaho/util/object",
   "pentaho/util/promise",
+  "pentaho/util/requireJS",
   "pentaho/util/error",
   "pentaho/util/fun"
 ], function(localRequire, module, Base, SpecificationScope, SpecificationContext, SpecificationProcessor,
-            moduleMetaService, moduleUtil, O, promiseUtil, error, F) {
+            moduleMetaService, moduleUtil, O, promiseUtil, requireJSUtil, error, F) {
 
   "use strict";
 
@@ -295,7 +296,7 @@ define([
       return __validateLoadedType(id, sync, localRequire(id));
     }
 
-    return promiseUtil.require(id, localRequire).then(__validateLoadedType.bind(null, id, sync));
+    return requireJSUtil.promise(id, localRequire).then(__validateLoadedType.bind(null, id, sync));
   }
 
   /**

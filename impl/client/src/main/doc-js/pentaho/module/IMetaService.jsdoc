@@ -84,6 +84,8 @@
  * @param {string} typeIdOrAlias - The identifier or alias of the type module.
  *
  * @return {Array.<pentaho.module.IInstanceMeta>} An array of metadata of instance modules, possibly empty.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When the `typeIdOrAlias` module is defined but is not a type module.
  */
 
 /**
@@ -96,6 +98,8 @@
  * @param {string} typeIdOrAlias - The identifier or alias of the type module.
  *
  * @return {pentaho.module.IInstanceMeta} The metadata of an instance module, if any, or `null`, if none.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When the `typeIdOrAlias` module is defined but is not a type module.
  */
 
 // ---
@@ -113,6 +117,8 @@
  * @param {string} baseTypeIdOrAlias - The identifier or alias of the base type module.
  *
  * @return {Array.<pentaho.module.ITypeMeta>} An array of metadata of type modules, possibly empty.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When the `baseTypeIdOrAlias` module is defined but is not a type module.
  */
 
 /**
@@ -127,4 +133,6 @@
  * @param {string} baseTypeIdOrAlias - The identifier or alias of the base type module.
  *
  * @return {pentaho.module.ITypeMeta} The metadata of a type module, if any, or `null`, if none.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When the `baseTypeIdOrAlias` module is defined but is not a type module.
  */

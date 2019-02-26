@@ -32,8 +32,6 @@ define([
       id: module.id,
       isAbstract: true,
 
-      defaultView: "pentaho/ccc/visual/Abstract",
-
       props: [
         // region Visual Roles
         {

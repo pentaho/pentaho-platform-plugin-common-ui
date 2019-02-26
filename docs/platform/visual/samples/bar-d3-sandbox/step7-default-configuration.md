@@ -72,7 +72,10 @@ so that your file looks like this:
   "config": {
     "pentaho/modules": {
       "pentaho-visual-samples-bar-d3/Model": {
-        "base": "pentaho/visual/Model"
+        "base": "pentaho/visual/Model",
+        "annotations": {
+          "pentaho/visual/DefaultView": {"module":  "./ViewD3"}
+        }
       }, 
       "pentaho-visual-samples-bar-d3/config": {
         "type": "pentaho/config/spec/IRuleSet"

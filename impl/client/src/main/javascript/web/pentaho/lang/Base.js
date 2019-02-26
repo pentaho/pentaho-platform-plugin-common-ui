@@ -923,7 +923,8 @@ define([
     /* jshint validthis:true*/
 
     for(var name in BaseClass)
-      if(!(name in Object) && !O_hasOwn.call(_excludeExtendStatic, name))
+      if((!(name in Object) || (BaseClass[name] !== Object[name])) &&
+         !O_hasOwn.call(_excludeExtendStatic, name))
         inst_extend_propDesc.call(this, name, BaseClass, undefined, /* funOnly: */true);
   }
 
@@ -989,7 +990,7 @@ define([
       var LCA = lcaProto && lcaProto.constructor;
 
       for(n in source) {
-        if(!(n in Object) &&
+        if((!(n in Object) || (source[n] !== Object[n])) &&
            !O_hasOwn.call(_excludeExtendStatic, n) &&
            (!l_exclude || !O_hasOwn.call(l_exclude, n)) &&
            (!LCA ||
@@ -1003,7 +1004,7 @@ define([
 
     } else {
       for(n in source) {
-        if(!(n in Object) &&
+        if((!(n in Object) || (source[n] !== Object[n])) &&
            !O_hasOwn.call(_excludeExtendInst, n) &&
            !O_hasOwn.call(_excludeExtendStatic, n) &&
            (!l_exclude || !O_hasOwn.call(l_exclude, n))) {
