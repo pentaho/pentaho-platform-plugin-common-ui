@@ -259,8 +259,8 @@ define([
 
           // 1. Configuration.
           if(core.configService !== null) {
-            // RuleSet module and RuleSets themselves are initialized before the config service.
-            core.configService.selectAsync(this.id).then(this.__setConfig.bind(this));
+            // RuleSet module and RuleSets themselves are initialized before the config service is created.
+            promises.push(core.configService.selectAsync(this.id).then(this.__setConfig.bind(this)));
           }
 
           // 2. Annotations.
