@@ -366,7 +366,7 @@ define(function() {
 
         var result = themeService.getModuleNameCssSelector(module);
 
-        expect(result).toBe(".and-do-that");
+        expect(result).toBe(".and-Do-That");
       });
 
       it("should extract the module name when given a string with the package id", function() {
@@ -375,7 +375,7 @@ define(function() {
 
         var result = themeService.getModuleNameCssSelector(module);
 
-        expect(result).toBe(".and-do-that");
+        expect(result).toBe(".and-Do-That");
       });
     });
 
@@ -421,7 +421,7 @@ define(function() {
 
         var result = themeService.getModuleUniqueCssSelector(module);
 
-        expect(result).toBe(".and-do-that");
+        expect(result).toBe(".and-Do-That");
       });
 
       it("should support being given a string with the package id", function() {
@@ -430,7 +430,7 @@ define(function() {
 
         var result = themeService.getModuleUniqueCssSelector(module);
 
-        expect(result).toBe("._scope-package-2-1-1-and-do-that");
+        expect(result).toBe("._scope-package-2-1-1-and-Do-That");
       });
     });
 

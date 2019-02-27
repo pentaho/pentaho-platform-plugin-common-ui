@@ -122,17 +122,40 @@ define([
      * associated with either the model or the view classes are applied to it.
      *
      * @param {HTMLElement} domElement - The DOM element.
-     * @param {string} vizTypeId - The identifier of the visualization type.
+     * @param {?string} [vizTypeId] - The identifier of the visualization type.
      * @param {?string} [viewTypeId] - The identifier of the view type.
      *
      * @see pentaho.theme.IService#classifyDomAsModule
      */
-    classifyDomAsContainer: function(domElement, vizTypeId, viewTypeId) {
+    classifyDom: function(domElement, vizTypeId, viewTypeId) {
+      if (vizTypeId) {
+        themeService.classifyDomAsModule(domElement, vizTypeId);
+      }
 
-      themeService.classifyDomAsModule(domElement, vizTypeId);
       if(viewTypeId) {
         themeService.classifyDomAsModule(domElement, viewTypeId);
       }
+    },
+
+    /**
+     *
+     * @param {?string} [vizTypeId] - The identifier of the visualization type.
+     * @param {?string} [viewTypeId] - The identifier of the view type.
+     *
+     * @return {string} The Css Classes
+     */
+    getCssClasses: function(vizTypeId, viewTypeId) {
+      var cssClasses = [];
+
+      if (vizTypeId) {
+        cssClasses.push(themeService.getModuleCssClasses(vizTypeId));
+      }
+
+      if (vizTypeId) {
+        cssClasses.push(themeService.getModuleCssClasses(viewTypeId));
+      }
+
+      return cssClasses.join(" ");
     }
   };
 });

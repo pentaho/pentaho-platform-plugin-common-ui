@@ -81,6 +81,17 @@ define([
     getModuleUniqueCssSelector: function(moduleOrId) {
       var moduleId = getModuleId(moduleOrId);
       return "." + getModuleUniqueCssClass(moduleId);
+    },
+
+    getModuleCssClasses: function(moduleOrId) {
+      var moduleId = getModuleId(moduleOrId);
+
+      var cssClasses = [
+        getModuleNameCssClass(moduleId),
+        getModuleUniqueCssClass(moduleId)
+      ]; // TODO avoid duplicates?
+
+      return cssClasses.join(" ");
     }
   });
 

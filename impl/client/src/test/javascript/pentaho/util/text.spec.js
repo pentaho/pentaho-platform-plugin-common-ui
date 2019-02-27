@@ -87,7 +87,7 @@ define([
 
     describe("toSnakeCase(text)", function() {
       it("should split when case changes and join with an hyphen", function() {
-        expect(text.toSnakeCase("productFamilyId").toLowerCase()).toBe("product-Family-Id");
+        expect(text.toSnakeCase("productFamilyId")).toBe("product-Family-Id");
       });
 
       it("should convert the result to lower case", function() {
