@@ -60,40 +60,40 @@
  * @param {HTMLElement} domElement - The DOM element.
  * @param {string|pentaho.module.IMeta} moduleOrId - The module object or its identifier.
  *
- * @see pentaho.theme.IService#getModuleNameCssSelector
- * @see pentaho.theme.IService#getModuleUniqueCssSelector
+ * @see pentaho.theme.IService#getModuleCssClass
+ * @see pentaho.theme.IService#getModuleUniqueCssClass
  */
 
 /**
- * Gets a CSS selector that selects all versions of a given module.
+ * Gets a CSS class that selects all versions of a given module.
  *
  * As an example, if the given module had the identifier:
  *
  * * `@hitachivantara/pentaho-core@1.2.20/pentaho/visual/models/Bar`,
  *
- * then the selector would be:
+ * then the class would be:
  *
- * * `.pentaho-visual-models-Bar`.
+ * * `_hitachivantara-pentaho-core-pentaho-visual-models-Bar`.
  *
- * @name getModuleNameCssSelector
+ * @name getModuleCssClass
  * @memberOf pentaho.theme.IService#
  * @method
  * @param {string|pentaho.module.IMeta} moduleOrId - The module object or its identifier.
- * @return {string} The CSS selector.
+ * @return {string} The CSS class.
  *
- * @see pentaho.theme.IService#getModuleUniqueCssSelector
+ * @see pentaho.theme.IService#getModuleUniqueCssClass
  */
 
 /**
- * Gets a CSS selector that selects a given module.
+ * Gets a CSS class that selects a given module.
  *
- * This method may return a random CSS selector associated with each module.
+ * This method may return a random CSS class associated with each module.
  *
- * @name getModuleUniqueCssSelector
+ * @name getModuleUniqueCssClass
  * @memberOf pentaho.theme.IService#
  * @method
  * @param {string|pentaho.module.IMeta} moduleOrId - The module object or its identifier.
- * @return {string} The CSS selector.
+ * @return {string} The CSS class.
  *
- * @see pentaho.theme.IService#getModuleNameCssSelector
+ * @see pentaho.theme.IService#getModuleCssClass
  */

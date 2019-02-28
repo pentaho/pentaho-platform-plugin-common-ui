@@ -67,29 +67,30 @@ define([
       var moduleId = getModuleId(moduleOrId);
       var classList = domElement.classList;
       if(classList) {
-        classList.add(getModuleNameCssClass(moduleId));
+        classList.add(getModuleCssClass(moduleId));
         // NOOP if duplicate.
         classList.add(getModuleUniqueCssClass(moduleId));
       }
     },
 
-    getModuleNameCssSelector: function(moduleOrId) {
+    getModuleCssClass: function(moduleOrId) {
       var moduleId = getModuleId(moduleOrId);
-      return "." + getModuleNameCssClass(moduleId);
+      return getModuleCssClass(moduleId);
     },
 
-    getModuleUniqueCssSelector: function(moduleOrId) {
+    getModuleUniqueCssClass: function(moduleOrId) {
       var moduleId = getModuleId(moduleOrId);
-      return "." + getModuleUniqueCssClass(moduleId);
+      return getModuleUniqueCssClass(moduleId);
     },
 
     getModuleCssClasses: function(moduleOrId) {
       var moduleId = getModuleId(moduleOrId);
 
-      var cssClasses = [
-        getModuleNameCssClass(moduleId),
-        getModuleUniqueCssClass(moduleId)
-      ]; // TODO avoid duplicates?
+      var cssClasses = [getModuleCssClass(moduleId)];
+      var cssClassUnique = getModuleUniqueCssClass(moduleId);
+      if(cssClassUnique !== cssClasses[0]) {
+        cssClasses.push(cssClassUnique);
+      }
 
       return cssClasses.join(" ");
     }
@@ -170,8 +171,10 @@ define([
    * @param {string} id - The module identifier.
    * @return {string} The CSS class.
    */
-  function getModuleNameCssClass(id) {
-    return sanitizeCssClass(moduleUtil.parseId(id).name);
+  function getModuleCssClass(id) {
+    var parsed = moduleUtil.parseId(id);
+    var unversioned = (parsed.package ? (parsed.package.name + "/") : "") + parsed.name;
+    return sanitizeCssClass(unversioned);
   }
 
   /**

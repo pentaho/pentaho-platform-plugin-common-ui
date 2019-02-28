@@ -128,7 +128,8 @@ define([
      * @see pentaho.theme.IService#classifyDomAsModule
      */
     classifyDom: function(domElement, vizTypeId, viewTypeId) {
-      if (vizTypeId) {
+
+      if(vizTypeId) {
         themeService.classifyDomAsModule(domElement, vizTypeId);
       }
 
@@ -147,11 +148,11 @@ define([
     getCssClasses: function(vizTypeId, viewTypeId) {
       var cssClasses = [];
 
-      if (vizTypeId) {
+      if(vizTypeId) {
         cssClasses.push(themeService.getModuleCssClasses(vizTypeId));
       }
 
-      if (vizTypeId) {
+      if(viewTypeId) {
         cssClasses.push(themeService.getModuleCssClasses(viewTypeId));
       }
 

@@ -324,7 +324,7 @@ define(function() {
       });
     });
 
-    describe("#getModuleNameCssSelector(moduleOrId)", function() {
+    describe("#getModuleCssClass(moduleOrId)", function() {
 
       var themeService;
 
@@ -347,39 +347,39 @@ define(function() {
       it("should support being given a module", function() {
         var module = {id: "abc"};
 
-        var result = themeService.getModuleNameCssSelector(module);
+        var result = themeService.getModuleCssClass(module);
 
-        expect(result).toBe(".abc");
+        expect(result).toBe("abc");
       });
 
       it("should support being given a string", function() {
         var module = "abc";
 
-        var result = themeService.getModuleNameCssSelector(module);
+        var result = themeService.getModuleCssClass(module);
 
-        expect(result).toBe(".abc");
+        expect(result).toBe("abc");
       });
 
       it("should support being given a camelCase string", function() {
 
         var module = "andDoThat";
 
-        var result = themeService.getModuleNameCssSelector(module);
+        var result = themeService.getModuleCssClass(module);
 
-        expect(result).toBe(".and-Do-That");
+        expect(result).toBe("and-Do-That");
       });
 
-      it("should extract the module name when given a string with the package id", function() {
+      it("should preserve the package name when given a string with the package id", function() {
 
         var module = "@scope/package@2.1.1/andDoThat";
 
-        var result = themeService.getModuleNameCssSelector(module);
+        var result = themeService.getModuleCssClass(module);
 
-        expect(result).toBe(".and-Do-That");
+        expect(result).toBe("_scope-package-and-Do-That");
       });
     });
 
-    describe("#getModuleUniqueCssSelector(moduleOrId)", function() {
+    describe("#getModuleUniqueCssClass(moduleOrId)", function() {
 
       var themeService;
 
@@ -402,35 +402,35 @@ define(function() {
       it("should support being given a module", function() {
         var module = {id: "abc"};
 
-        var result = themeService.getModuleUniqueCssSelector(module);
+        var result = themeService.getModuleUniqueCssClass(module);
 
-        expect(result).toBe(".abc");
+        expect(result).toBe("abc");
       });
 
       it("should support being given a string", function() {
         var module = "abc";
 
-        var result = themeService.getModuleUniqueCssSelector(module);
+        var result = themeService.getModuleUniqueCssClass(module);
 
-        expect(result).toBe(".abc");
+        expect(result).toBe("abc");
       });
 
       it("should support being given a camelCase string", function() {
 
         var module = "andDoThat";
 
-        var result = themeService.getModuleUniqueCssSelector(module);
+        var result = themeService.getModuleUniqueCssClass(module);
 
-        expect(result).toBe(".and-Do-That");
+        expect(result).toBe("and-Do-That");
       });
 
       it("should support being given a string with the package id", function() {
 
         var module = "@scope/package@2.1.1/andDoThat";
 
-        var result = themeService.getModuleUniqueCssSelector(module);
+        var result = themeService.getModuleUniqueCssClass(module);
 
-        expect(result).toBe("._scope-package-2-1-1-and-Do-That");
+        expect(result).toBe("_scope-package-2-1-1-and-Do-That");
       });
     });
 
@@ -469,7 +469,7 @@ define(function() {
         themeService.classifyDomAsModule(domElement, module);
 
         expect(domElement.classList.add).toHaveBeenCalledTimes(2);
-        expect(domElement.classList.add).toHaveBeenCalledWith("abc");
+        expect(domElement.classList.add).toHaveBeenCalledWith("package-abc");
         expect(domElement.classList.add).toHaveBeenCalledWith("package-2-1-1-abc");
       });
 
@@ -480,7 +480,7 @@ define(function() {
         themeService.classifyDomAsModule(domElement, module);
 
         expect(domElement.classList.add).toHaveBeenCalledTimes(2);
-        expect(domElement.classList.add).toHaveBeenCalledWith("abc");
+        expect(domElement.classList.add).toHaveBeenCalledWith("package-abc");
         expect(domElement.classList.add).toHaveBeenCalledWith("package-2-1-1-abc");
       });
 
