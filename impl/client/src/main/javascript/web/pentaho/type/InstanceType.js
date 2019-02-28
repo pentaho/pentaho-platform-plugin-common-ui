@@ -28,8 +28,7 @@ define([
   "pentaho/util/promise",
   "pentaho/util/text",
   "pentaho/util/spec",
-  "pentaho/module/util",
-  "./theme/model"
+  "pentaho/module/util"
 ], function(localRequire, baseLoader, SpecificationScope, SpecificationContext, bundle, moduleMetaService, Base,
             error, arg, O, F, promiseUtil, text, specUtil, moduleUtil) {
 

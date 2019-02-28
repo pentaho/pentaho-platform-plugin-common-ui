@@ -147,8 +147,7 @@
       ],
       exclude: [
         // Exclude virtual theme module IDs.
-        "pentaho/visual/models/theme/model",
-        "pentaho/type/theme/model"
+        "pentaho/visual/models/theme/model"
       ]
     }
   ]

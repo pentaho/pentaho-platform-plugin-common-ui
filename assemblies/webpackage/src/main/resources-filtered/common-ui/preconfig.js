@@ -80,9 +80,6 @@ function mapTheme(mid, themeRoot, themes) {
   requirePaths[getVersionedModuleId(mid) + "/theme"] = basePath + "/" + mid + "/" + themeRoot + "/" + theme;
 }
 
-// Type API Base Theme
-mapTheme("pentaho/type", "themes", ["ruby"]);
-
 // Visual Models Themes
 mapTheme("pentaho/visual/models", "themes", ["crystal", "sapphire", "onyx", "det", "ruby"]);
 

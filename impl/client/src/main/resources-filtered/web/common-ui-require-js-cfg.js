@@ -318,9 +318,6 @@
     requireMap["*"][mid + "/theme"] = mid + "/" + themeRoot + "/" + theme;
   }
 
-  // Type API Base Theme
-  mapTheme("pentaho/type", "themes", ["ruby"]);
-
   // Visual Models Themes
   mapTheme("pentaho/visual/models", "themes", ["crystal", "sapphire", "onyx", "det", "ruby"]);
 
