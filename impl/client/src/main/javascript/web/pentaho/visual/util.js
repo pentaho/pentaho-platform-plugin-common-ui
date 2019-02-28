@@ -19,9 +19,10 @@ define([
   "./DefaultViewAnnotation",
   "pentaho/theme/service",
   "pentaho/type/loader",
+  "pentaho/util/object",
   "pentaho/util/promise",
   "pentaho/util/error"
-], function(localRequire, moduleMetaService, DefaultViewAnnotation, themeService, typeLoader, promiseUtil, error) {
+], function(localRequire, moduleMetaService, DefaultViewAnnotation, themeService, typeLoader, O, promiseUtil, error) {
 
   /**
    * The `pentaho/visual/util` contains utilities for dealing with visualizations.
@@ -39,6 +40,7 @@ define([
      * associated to the visualization's model class.
      *
      * @param {string} vizTypeId - The visualization identifier.
+     * @param {object} [keyArgs] - The keyword arguments object.
      *
      * @throws {pentaho.lang.ArgumentRequiredError} When `vizTypeId` is not specified.
      * @throws {pentaho.lang.OperationInvalidError} When the model class of the given visualization is not annotated
@@ -48,8 +50,8 @@ define([
      *
      * @see pentaho.visual.util.getModelAndDefaultViewModules
      */
-    getDefaultViewModule: function(vizTypeId) {
-      return this.getModelAndDefaultViewModules(vizTypeId).view;
+    getDefaultViewModule: function(vizTypeId, keyArgs) {
+      return this.getModelAndDefaultViewModules(vizTypeId, keyArgs).view;
     },
 
     /**
@@ -61,6 +63,7 @@ define([
      * associated to the visualization's model class.
      *
      * @param {string} vizTypeId - The visualization identifier.
+     * @param {object} [keyArgs] - The keyword arguments object.
      *
      * @throws {pentaho.lang.ArgumentRequiredError} When `vizTypeId` is not specified.
      * @throws {pentaho.lang.OperationInvalidError} When the model class of the given visualization is not annotated
@@ -69,14 +72,15 @@ define([
      * @return {({model: pentaho.module.IMeta, view: pentaho.module.IMeta})} An object
      * containing the modules of the model class and the default view class.
      */
-    getModelAndDefaultViewModules: function(vizTypeId) {
+    getModelAndDefaultViewModules: function(vizTypeId, keyArgs) {
       if(!vizTypeId) {
         throw error.argRequired("vizTypeId");
       }
 
       var modelModule = moduleMetaService.get(vizTypeId, {createIfUndefined: true});
 
-      var viewModule = modelModule.getAnnotation(DefaultViewAnnotation, {assertExists: true}).module;
+      keyArgs = O.assignOwn({assertExists: true}, keyArgs);
+      var viewModule = modelModule.getAnnotation(DefaultViewAnnotation, keyArgs).module;
 
       return {model: modelModule, view: viewModule};
     },
