@@ -491,5 +491,41 @@ define(function() {
         themeService.classifyDomAsModule({}, module);
       });
     });
+
+    describe("#getModuleCssClasses(moduleOrId)", function() {
+      var themeService;
+
+      beforeAll(function() {
+
+        localRequire = require.new();
+
+        return localRequire.promise(["pentaho/theme/impl/Service"])
+          .then(function(deps) {
+            ThemeService = deps[0];
+
+            themeService = new ThemeService();
+          });
+      });
+
+      afterAll(function() {
+        localRequire.dispose();
+      });
+
+      it("should support being given a module", function() {
+        var module = {id: "package@2.1.1/abc"};
+
+        var cssClasses = themeService.getModuleCssClasses(module);
+
+        expect(cssClasses).toBe("package-abc package-2-1-1-abc");
+      });
+
+      it("should support being given a string", function() {
+        var module = "package@2.1.1/abc";
+
+        var cssClasses = themeService.getModuleCssClasses(module);
+
+        expect(cssClasses).toBe("package-abc package-2-1-1-abc");
+      });
+    });
   });
 });

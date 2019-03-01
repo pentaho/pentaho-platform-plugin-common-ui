@@ -19,6 +19,7 @@ define([], function() {
     var localRequire;
 
     var moduleMetaService;
+    var themeService;
     var visualUtil;
     var errorMatch;
 
@@ -79,11 +80,13 @@ define([], function() {
       return localRequire.promise([
         "pentaho/visual/util",
         "pentaho/module/metaService",
+        "pentaho/theme/service",
         "tests/pentaho/util/errorMatch"
       ]).then(function(deps) {
         visualUtil = deps[0];
         moduleMetaService = deps[1];
-        errorMatch = deps[2];
+        themeService = deps[2];
+        errorMatch = deps[3];
       })
     });
 
@@ -179,6 +182,72 @@ define([], function() {
               expect(error).toEqual(jasmine.any(Error));
             });
         });
+      });
+    });
+
+    describe("#classifyDom(domElement, vizTypeId, viewTypeId)", function() {
+      var domElement;
+
+      beforeEach(function() {
+        domElement = {
+          classList: {
+            add: jasmine.createSpy("classList.add")
+          }
+        };
+      });
+
+      it("should do nothing if `vizTypeId` and `viewTypeId` are 'undefined'", function() {
+        visualUtil.classifyDom(domElement);
+
+        expect(domElement.classList.add).toHaveBeenCalledTimes(0);
+      });
+
+      it("should classify `domElement` with `vizTypeId` css classes", function() {
+        var vizTypeId = "package@2.1.1/Model";
+
+        visualUtil.classifyDom(domElement, vizTypeId);
+
+        expect(domElement.classList.add).toHaveBeenCalledTimes(2);
+        expect(domElement.classList.add).toHaveBeenCalledWith("package-Model");
+        expect(domElement.classList.add).toHaveBeenCalledWith("package-2-1-1-Model");
+      });
+
+      it("should classify `domElement` with `vizTypeId` and `viewTypeId` css classes", function() {
+        var vizTypeId = "package@2.1.1/Model";
+        var viewTypeId = "package@2.1.1/View";
+
+        visualUtil.classifyDom(domElement, vizTypeId, viewTypeId);
+
+        expect(domElement.classList.add).toHaveBeenCalledTimes(4);
+        expect(domElement.classList.add).toHaveBeenCalledWith("package-Model");
+        expect(domElement.classList.add).toHaveBeenCalledWith("package-2-1-1-Model");
+        expect(domElement.classList.add).toHaveBeenCalledWith("package-View");
+        expect(domElement.classList.add).toHaveBeenCalledWith("package-2-1-1-View");
+      });
+    });
+
+    describe("#getCssClasses(vizTypeId, viewTypeId)", function() {
+      it("should return an empty string if no argument is given", function() {
+        var cssClasses = visualUtil.getCssClasses();
+
+        expect(cssClasses).toBe("");
+      });
+
+      it("should return the css classes for `vizTypeId`", function() {
+        var vizTypeId = "package@2.1.1/Model";
+
+        var cssClasses = visualUtil.getCssClasses(vizTypeId);
+
+        expect(cssClasses).toBe("package-Model package-2-1-1-Model");
+      });
+
+      it("should return the css classes for both `vizTypeId` and `viewTypeId`", function() {
+        var vizTypeId = "package@2.1.1/Model";
+        var viewTypeId = "package@2.1.1/View";
+
+        var cssClasses = visualUtil.getCssClasses(vizTypeId, viewTypeId);
+
+        expect(cssClasses).toEqual("package-Model package-2-1-1-Model package-View package-2-1-1-View");
       });
     });
   });
