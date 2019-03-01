@@ -12,9 +12,7 @@
   <packaging>feature</packaging>
   <name>Client config folder</name>
   <description>Ensures the client's configuration deploy folder is enabled.</description>
-  <properties>
-    <karaf-maven-plugin.version>3.0.3</karaf-maven-plugin.version>
-  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.pentaho</groupId>
@@ -22,17 +20,5 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.karaf.tooling</groupId>
-        <artifactId>karaf-maven-plugin</artifactId>
-        <version>${karaf-maven-plugin.version}</version>
-        <extensions>true</extensions>
-        <configuration>
-          <aggregateFeatures>true</aggregateFeatures>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+
 </project>
