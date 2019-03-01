@@ -1,9 +1,12 @@
 {
   "name": "${project.amd-module}",
   "version": "${project.version}",
+  "paths": {
+    "pentaho/config/deploy": "/"
+  },
   "config": {
     "pentaho/modules": {
-      "${project.amd-module}_${project.version}/config": {"type": "pentaho/config/spec/IRuleSet"}
+      "${project.amd-module}@${project.version}/pentaho/config/deploy/config": {"type": "pentaho/config/spec/IRuleSet"}
     }
   }
 }

@@ -15,7 +15,7 @@
 
   <properties>
     <configuration-bundles.classifier>configuration-bundle</configuration-bundles.classifier>
-    <project.amd-module>pentaho/config/deploy</project.amd-module>
+    <project.amd-module>pentaho-config-deploy</project.amd-module>
   </properties>
 
   <build>
