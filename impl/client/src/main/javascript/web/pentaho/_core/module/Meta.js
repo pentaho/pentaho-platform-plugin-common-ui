@@ -517,7 +517,7 @@ define([
 
         var annotationResult = annotationsStore && O.getOwn(annotationsStore.results, annotationId, null);
         if(annotationResult === null) {
-          var annotationSpec = annotationsStore && O.getOwn(annotationsStore.specs, annotationId, null);
+          var annotationSpec = this.__getAnnotationSpec(annotationId, keyArgs);
           if(annotationSpec === null) {
             if(argUtil.optional(keyArgs, "assertPresent", false)) {
               return promiseUtil.error(createErrorAnnotationNotPresent(this.id, annotationId));
@@ -546,6 +546,25 @@ define([
         return annotationResult.error !== null
           ? promiseUtil.error(annotationResult.error, sync)
           : promiseUtil.return(annotationResult.value, sync);
+      },
+
+      __getAnnotationSpec: function(annotationId, keyArgs) {
+        var inheritAnnotations = argUtil.optional(keyArgs, "inherit", false);
+
+        var module = this;
+        var annotationSpec = null;
+        do {
+          var annotationsStore = module.__annotationsStore;
+
+          annotationSpec = annotationsStore && O.getOwn(annotationsStore.specs, annotationId, null);
+          if (!inheritAnnotations || annotationSpec !== null) {
+            return annotationSpec;
+          }
+
+          module = module.ancestor;
+        } while(module !== null);
+
+        return annotationSpec;
       },
 
       // region Annotations' Helpers
