@@ -6,7 +6,7 @@
   },
   "config": {
     "pentaho/modules": {
-      "@pentaho/config-deploy@${project.version}/pentaho/config/deploy/config": {"type": "pentaho/config/spec/IRuleSet"}
+      "pentaho/config/deploy/config": {"type": "pentaho/config/spec/IRuleSet"}
     }
   }
 }
