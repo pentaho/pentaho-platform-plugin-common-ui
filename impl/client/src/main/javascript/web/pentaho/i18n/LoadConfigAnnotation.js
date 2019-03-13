@@ -72,7 +72,7 @@ define([
      *
      * @param {pentaho.module.IMeta} forModule - The annotated module.
      * @param {object} annotSpec - The annotation specification.
-     * @return {Promise.<pentaho.module.AsyncAnnotation>} A promise that resolves to the created annotation.
+     * @return {Promise.<pentaho.i18n.LoadConfigAnnotation>} A promise that resolves to the created annotation.
      * @override
      */
     createAsync: function(forModule, annotSpec) {

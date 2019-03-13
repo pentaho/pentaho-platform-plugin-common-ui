@@ -212,7 +212,6 @@ if(!useDebug) {
     "pentaho/_core/module/Service",
     "pentaho/_core/config/Service",
     "pentaho/module/Annotation",
-    "pentaho/module/AsyncAnnotation",
     "pentaho/config/ExternalAnnotation",
     "pentaho/_core/Core",
     "pentaho/util/url",

@@ -127,34 +127,33 @@ define([
     // that CSS order precedence based on link tag document order is in effect.
     var baseModule = (module.kind === "type") ? module.ancestor : null;
     if(baseModule !== null) {
-      return loadModuleThemeAsync(baseModule).then(loadLocalThemeAsync);
+      return loadModuleThemeAsync(baseModule).then(loadLocalThemeAsync.bind(null, module));
     }
 
-    return loadLocalThemeAsync();
+    return loadLocalThemeAsync(module);
+  }
 
-    /**
-     * Loads any local theme resources according to an existing ThemeAnnotation.
-     *
-     * @return {Promise} A promise which is resolved when the local themes are loaded.
-     */
-    function loadLocalThemeAsync() {
-      var annotation = module.getAnnotation(ThemeAnnotation);
-      if(annotation !== null) {
-        return loadThemeAnnotationAsync(annotation);
-      }
-
-      // NOOP
-      return Promise.resolve();
-    }
+  /**
+   * Loads any local theme resources according to an existing ThemeAnnotation.
+   *
+   * @param {pentaho.module.IMeta} module - The module object.
+   * @return {Promise} A promise which is resolved when the local themes are loaded.
+   */
+  function loadLocalThemeAsync(module) {
+    return module.getAnnotationAsync(ThemeAnnotation).then(loadThemeAnnotationAsync);
   }
 
   /**
    * Loads any local theme resources of a given ThemeAnnotation.
    *
-   * @param {pentaho.theme.ThemeAnnotation} annotation - The theme annotation.
+   * @param {?pentaho.theme.ThemeAnnotation} annotation - The theme annotation.
    * @return {Promise} A promise which is resolved when the local themes are loaded.
    */
   function loadThemeAnnotationAsync(annotation) {
+    if(annotation === null) {
+      return Promise.resolve();
+    }
+
     // Again, main should be loaded before extensions :-(.
     return annotation.main.loadAsync().then(function() {
       if(annotation.extensions !== null) {

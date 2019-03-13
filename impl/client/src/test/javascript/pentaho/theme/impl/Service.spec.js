@@ -107,18 +107,18 @@ define(function() {
         });
       });
 
-      it("should call module.getAnnotation for each given module", function() {
+      it("should call module.getAnnotationAsync for each given module", function() {
 
         var aMeta = {
           kind: "type",
           ancestor: null,
-          getAnnotation: jasmine.createSpy("getAnnotation").and.returnValue(null)
+          getAnnotationAsync: jasmine.createSpy("getAnnotationAsync").and.returnValue(Promise.resolve(null))
         };
 
         var bMeta = {
           kind: "type",
           ancestor: null,
-          getAnnotation: jasmine.createSpy("getAnnotation").and.returnValue(null)
+          getAnnotationAsync: jasmine.createSpy("getAnnotationAsync").and.returnValue(Promise.resolve(null))
         };
 
         moduleMetaService.get.and.callFake(function(id) {
@@ -136,8 +136,8 @@ define(function() {
         var themeService = new ThemeService();
 
         return themeService.loadModuleThemeAsync(["a", "b"]).then(function() {
-          expect(aMeta.getAnnotation).toHaveBeenCalledWith(ThemeAnnotation);
-          expect(bMeta.getAnnotation).toHaveBeenCalledWith(ThemeAnnotation);
+          expect(aMeta.getAnnotationAsync).toHaveBeenCalledWith(ThemeAnnotation);
+          expect(bMeta.getAnnotationAsync).toHaveBeenCalledWith(ThemeAnnotation);
         });
       });
 
@@ -153,7 +153,7 @@ define(function() {
         var aMeta = {
           kind: "type",
           ancestor: null,
-          getAnnotation: jasmine.createSpy("getAnnotation").and.returnValue(annotationA)
+          getAnnotationAsync: jasmine.createSpy("getAnnotationAsync").and.returnValue(Promise.resolve(annotationA))
         };
 
         moduleMetaService.get.and.callFake(function(id) {
@@ -190,7 +190,7 @@ define(function() {
         var aMeta = {
           kind: "type",
           ancestor: null,
-          getAnnotation: jasmine.createSpy("getAnnotation").and.returnValue(annotationA)
+          getAnnotationAsync: jasmine.createSpy("getAnnotationAsync").and.returnValue(Promise.resolve(annotationA))
         };
 
         moduleMetaService.get.and.callFake(function(id) {
@@ -234,7 +234,7 @@ define(function() {
         var aMeta = {
           kind: "type",
           ancestor: null,
-          getAnnotation: jasmine.createSpy("getAnnotation").and.returnValue(annotationA)
+          getAnnotationAsync: jasmine.createSpy("getAnnotationAsync").and.returnValue(Promise.resolve(annotationA))
         };
 
         moduleMetaService.get.and.callFake(function(id) {
@@ -297,13 +297,13 @@ define(function() {
         var aMeta = {
           kind: "type",
           ancestor: null,
-          getAnnotation: jasmine.createSpy("getAnnotation").and.returnValue(annotationA)
+          getAnnotationAsync: jasmine.createSpy("getAnnotationAsync").and.returnValue(Promise.resolve(annotationA))
         };
 
         var bMeta = {
           kind: "type",
           ancestor: aMeta,
-          getAnnotation: jasmine.createSpy("getAnnotation").and.returnValue(annotationB)
+          getAnnotationAsync: jasmine.createSpy("getAnnotationAsync").and.returnValue(Promise.resolve(annotationB))
         };
 
         moduleMetaService.get.and.callFake(function(id) {

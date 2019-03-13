@@ -15,11 +15,11 @@
  */
 define([
   "module",
-  "pentaho/module/AsyncAnnotation",
+  "pentaho/module/Annotation",
   "./service"
-], function(module, AsyncAnnotation, themeService) {
+], function(module, Annotation, themeService) {
 
-  var LoadThemeAnnotation = AsyncAnnotation.extend(module.id, /** @lends pentaho.theme.LoadThemeAnnotation# */{
+  var LoadThemeAnnotation = Annotation.extend(module.id, /** @lends pentaho.theme.LoadThemeAnnotation# */{
     /**
      * @classDesc The `LoadThemeAnnotation` causes a module's associated theme resources, if any,
      * to be loaded when the module is loaded.
@@ -27,7 +27,7 @@ define([
      * @name LoadThemeAnnotation
      * @memberOf pentaho.theme
      * @class
-     * @extend pentaho.module.AsyncAnnotation
+     * @extend pentaho.module.Annotation
      *
      * @description Creates a _load theme_ annotation associated with a given module.
      * @constructor
@@ -53,7 +53,7 @@ define([
      *
      * @param {pentaho.module.IMeta} forModule - The annotated module.
      * @param {object} annotSpec - The annotation specification.
-     * @return {Promise.<pentaho.module.AsyncAnnotation>} A promise that resolves to the created annotation.
+     * @return {Promise.<pentaho.theme.LoadThemeAnnotation>} A promise that resolves to the created annotation.
      * @override
      */
     createAsync: function(forModule, annotSpec) {

@@ -15,10 +15,10 @@
  */
 define([
   "module",
-  "../module/AsyncAnnotation"
-], function(module, AsyncAnnotation) {
+  "../module/Annotation"
+], function(module, Annotation) {
 
-  return AsyncAnnotation.extend(module.id, /** @lends pentaho.config.ExternalAnnotation# */{
+  return Annotation.extend(module.id, /** @lends pentaho.config.ExternalAnnotation# */{
     /**
      * @classDesc The external configuration annotation allows external sources to contribute
      * to the configuration of a module.
@@ -32,7 +32,7 @@ define([
      * @alias ExternalAnnotation
      * @memberOf pentaho.config
      * @class
-     * @extend pentaho.module.AsyncAnnotation
+     * @extend pentaho.module.Annotation
      * @abstract
      *
      * @private

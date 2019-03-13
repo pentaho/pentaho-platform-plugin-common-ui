@@ -167,6 +167,11 @@ define([
 
           me.__registerModule(module);
 
+          // Register annotation rules.
+          if(preparedModuleSpec.annotations) {
+
+          }
+
           return module;
         }
       },

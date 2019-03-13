@@ -725,7 +725,7 @@ define([
 
         describe("relative mapping", function() {
 
-          it("should return resolved config in pentaho modules", function() {
+          it("should return resolved config", function() {
 
             var configurationService;
 
@@ -751,17 +751,11 @@ define([
               ]
             });
 
-            return configurationService.selectAsync("pentaho/modules").then(function(result) {
+            return configurationService.selectAsync("test/A", "test/InfoAnnotation").then(function(result) {
               expect(result).not.toBe(null);
-              expect(result).toEqual(jasmine.objectContaining({
-                "test/A": {
-                  annotations: {
-                    "test/InfoAnnotation": {
-                      testId: "A"
-                    }
-                  }
-                }
-              }));
+              expect(result).toEqual({
+                testId: "A"
+              });
             });
           });
 
@@ -799,7 +793,7 @@ define([
 
         describe("AMD mapping", function() {
 
-          it("should return config in pentaho/modules if rule applies to exactly mapped contextual module", function() {
+          it("should return config if rule applies to exactly mapped contextual module", function() {
 
             localRequire.config({
               map: {
@@ -832,24 +826,18 @@ define([
               ]
             });
 
-            return configurationService.selectAsync("pentaho/modules").then(function(result) {
+            return configurationService.selectAsync("test/A", "test/InfoAnnotation").then(function(result) {
               expect(result).not.toBe(null);
-              expect(result).toEqual(jasmine.objectContaining({
-                "test/A": {
-                  annotations: {
-                    "test/InfoAnnotation": {
-                      testId: "D"
-                    }
-                  }
-                }
-              }));
+              expect(result).toEqual({
+                testId: "D"
+              });
             });
           });
         });
 
         describe("module alias mapping", function() {
 
-          it("should return config in pentaho/modules if rule applies to an annotation's alias", function() {
+          it("should return config if rule applies to an annotation's alias", function() {
 
             // localRequire.config({
             //   config: {
@@ -890,17 +878,11 @@ define([
               ]
             });
 
-            return configurationService.selectAsync("pentaho/modules").then(function(result) {
+            return configurationService.selectAsync("test/A", "test/InfoAnnotation").then(function(result) {
               expect(result).not.toBe(null);
-              expect(result).toEqual(jasmine.objectContaining({
-                "test/A": {
-                  annotations: {
-                    "test/InfoAnnotation": {
-                      testId: "D"
-                    }
-                  }
-                }
-              }));
+              expect(result).toEqual({
+                testId: "D"
+              });
             });
           });
         });

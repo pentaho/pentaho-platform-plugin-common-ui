@@ -24,11 +24,10 @@ define([
   "./config/Service",
   "../module/util",
   "../util/fun",
-  "../module/AsyncAnnotation",
   "../config/ExternalAnnotation",
   "../util/requireJS"
 ], function(localRequire, module, moduleMetaServiceFactory, moduleMetaFactory, instanceModuleMetaFactory,
-            typeModuleMetaFactory, ModuleService, configurationServiceFactory, moduleUtil, F, AsyncAnnotation,
+            typeModuleMetaFactory, ModuleService, configurationServiceFactory, moduleUtil, F,
             ExternalConfigAnnotation, requireJSUtil) {
 
   "use strict";
@@ -36,7 +35,6 @@ define([
   var RULESET_TYPE_ID = moduleUtil.resolveModuleId("pentaho/config/spec/IRuleSet", module.id);
   var MODULES_ID = moduleUtil.resolveModuleId("pentaho/modules", module.id);
   var EXTERNAL_CONFIG_ANNOTATION_ID = ExternalConfigAnnotation.id;
-  var ASYNC_ANNOTATION_ID = AsyncAnnotation.id;
 
   /**
    * @classDesc The `Core` class represents the core layer of the Pentaho JavaScript platform.
@@ -78,7 +76,6 @@ define([
 
     core.moduleService = new ModuleService(core.moduleMetaService);
 
-    core.asyncAnnotationModule = null;
     core.externalConfigAnnotationModule = null;
 
     return loadConfigRuleSetsAsync().then(initGivenConfigRules);
@@ -159,18 +156,18 @@ define([
 
           // Should always exist, but relaxing for unit tests...
           core.externalConfigAnnotationModule = core.moduleMetaService.get(EXTERNAL_CONFIG_ANNOTATION_ID);
-          core.asyncAnnotationModule = core.moduleMetaService.get(ASYNC_ANNOTATION_ID);
 
           return core;
         });
     }
 
     /**
-     * Gets a promise for an array of external configurations, including each's priority.
+     * Gets a promise for an array of external module configurations,
+     * including each's priority relative to internal configurations.
      *
      * @param {string} moduleId - The module identifier.
      *
-     * @return {Promise.<?({priority: number, config: object})>} A promise for an array of external configurations.
+     * @return {Promise.<?({priority: number, config: ?object})>} A promise for an array of external configurations.
      */
     function selectExternalConfigsAsync(moduleId) {
 
@@ -282,16 +279,24 @@ define([
         var configAnnotationsIds = annotationsIds.filter(isExternalConfigAnnotation);
         if(configAnnotationsIds.length > 0) {
 
-          return module.__loadAnnotationsAsync(configAnnotationsIds)
-            .then(function(configAnnotations) {
-              return configAnnotations.map(function(configAnnotation) {
-                return {priority: configAnnotation.constructor.priority, config: configAnnotation.config};
-              });
-            });
+          return Promise.all(configAnnotationsIds.map(function(annotationId) {
+            return module.getAnnotationAsync(annotationId).then(configAnnotationToPrioritizedConfig);
+          }));
         }
       }
 
       return null;
+    }
+
+    /**
+     * Converts an external configuration annotation into a prioritized configuration object.
+     *
+     * @param {pentaho.config.ExternalAnnotation} configAnnotation - The external configuration annotation.
+     *
+     * @return {({priority: number, config: object})} The prioritized configuration object.
+     */
+    function configAnnotationToPrioritizedConfig(configAnnotation) {
+      return {priority: configAnnotation.constructor.priority, config: configAnnotation.config};
     }
 
     /**

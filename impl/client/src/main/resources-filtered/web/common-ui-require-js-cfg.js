@@ -101,12 +101,10 @@
   requireModules["pentaho/config/spec/IRuleSet"] = {base: null, isVirtual: true};
 
   requireModules["pentaho/module/Annotation"] = {base: null};
-  requireModules["pentaho/module/SyncAnnotation"] = {base: "pentaho/module/Annotation"};
-  requireModules["pentaho/module/AsyncAnnotation"] = {base: "pentaho/module/Annotation"};
-  requireModules["pentaho/config/ExternalAnnotation"] = {base: "pentaho/module/AsyncAnnotation"};
+  requireModules["pentaho/config/ExternalAnnotation"] = {base: "pentaho/module/Annotation"};
   requireModules["pentaho/i18n/LoadConfigAnnotation"] = {base: "pentaho/config/ExternalAnnotation"};
-  requireModules["pentaho/theme/LoadThemeAnnotation"] = {base: "pentaho/module/AsyncAnnotation"};
-  requireModules["pentaho/theme/ThemeAnnotation"] = {base: "pentaho/module/SyncAnnotation"};
+  requireModules["pentaho/theme/LoadThemeAnnotation"] = {base: "pentaho/module/Annotation"};
+  requireModules["pentaho/theme/ThemeAnnotation"] = {base: "pentaho/module/Annotation"};
 
   requireModules["pentaho/type/Instance"] = {alias: "instance", base: null};
   requireModules["pentaho/type/Value"] = {alias: "value", base: "instance"};
@@ -141,7 +139,7 @@
   requireModules["pentaho/data/filter/IsLike"] = {alias: "like", base: "pentaho/data/filter/Property"};
 
   requireModules["pentaho/visual/Model"] = {base: "complex"};
-  requireModules["pentaho/visual/DefaultViewAnnotation"] = {base: "pentaho/module/SyncAnnotation"};
+  requireModules["pentaho/visual/DefaultViewAnnotation"] = {base: "pentaho/module/Annotation"};
   requireModules["pentaho/visual/role/adaptation/Strategy"] = {base: "complex"};
   requireModules["pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy"] = {
     base: "pentaho/visual/role/adaptation/Strategy",
@@ -434,7 +432,6 @@
       "pentaho/_core/module/Service",
       "pentaho/_core/config/Service",
       "pentaho/module/Annotation",
-      "pentaho/module/AsyncAnnotation",
       "pentaho/config/ExternalAnnotation",
       "pentaho/_core/Core",
       "pentaho/util/url",

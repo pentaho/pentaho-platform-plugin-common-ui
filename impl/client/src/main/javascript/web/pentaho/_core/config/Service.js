@@ -76,7 +76,7 @@ define([
        *
        * @param {?pentaho.environment.IEnvironment} [environment] - The environment used to select configuration rules.
        * @param {function(string) : Promise.<?({priority: number, config: object})>} [selectExternalAsync]
-       * - An asynchronous callback function for obtaining external configurations of modules, given their identifier.
+       * - An asynchronous callback function for obtaining the external configuration of a module given its identifier.
        */
       constructor: function(environment, selectExternalAsync) {
 
@@ -88,13 +88,23 @@ define([
         this.__environment = environment || {};
 
         /**
-         * A map connecting a module identifier to the applicable configuration rules,
+         * A map connecting a module and annotation identifier to the applicable configuration rules,
          * ordered from least to most specific.
          *
          * @type {Object.<string, Array.<pentaho.config.spec.IRule>>}
          * @private
+         *
+         * @see __buildRuleKey
          */
         this.__ruleStore = Object.create(null);
+
+        /**
+         * A map connecting a module identifier to an object whose keys are the identifiers of existing annotations.
+         *
+         * @type {Object.<string, Object.<string, boolean>>}
+         * @private
+         */
+        this.__moduleAnnots = Object.create(null);
 
         /**
          * A function which, given module identifier, returns
@@ -182,61 +192,42 @@ define([
           }
         }
 
-        moduleIds.forEach(function(moduleId, index) {
+        moduleIds.forEach(function(moduleId) {
           if(!moduleId) {
             throw new ArgumentRequiredError("rule.select.module");
           }
 
-          moduleIds[index] = resolveId(moduleId, contextId);
-        });
+          moduleId = resolveId(moduleId, contextId);
 
-        if(annotationId === null) {
-          moduleIds.forEach(function(moduleId) {
-            this.__addRule(moduleId, rule);
-          }, this);
-        } else {
-          moduleIds.forEach(function(moduleId) {
-
-            var apply = __wrapAnnotationRuleApply(moduleId, annotationId, rule.apply);
-
-            var select = {
-              module: MODULES_ID
-            };
-
-            Object.keys(rule.select).forEach(function(key) {
-              if(key !== "annotation" && key !== "module") {
-                select = rule.select[key];
-              }
-            });
-
-            this.__addRule(MODULES_ID, {
-              priority: rule.priority,
-              select: select,
-              deps: rule.deps,
-              apply: apply,
-              _ordinal: rule._ordinal
-            });
-          }, this);
-        }
+          this.__addRule(moduleId, annotationId, rule);
+        }, this);
       },
 
-      __addRule: function(moduleId, rule) {
+      __addRule: function(moduleId, annotationId, rule) {
 
-        var list = this.__ruleStore[moduleId];
+        var ruleKey = __buildRuleKey(moduleId, annotationId);
+
+        var list = this.__ruleStore[ruleKey];
         if(!list) {
-          this.__ruleStore[moduleId] = list = new SortedList({comparer: __ruleComparer});
+          this.__ruleStore[ruleKey] = list = new SortedList({comparer: __ruleComparer});
+        }
+
+        if(annotationId) {
+          (this.__moduleAnnots[moduleId] || (this.__moduleAnnots[moduleId] = Object.create(null)))[annotationId] = true;
         }
 
         list.push(rule);
       },
 
       /** @inheritDoc */
-      selectAsync: function(moduleId) {
+      selectAsync: function(moduleId, annotationId) {
 
-        var internalConfigsPromise = this.__selectInternalAsync(moduleId);
+        var internalConfigsPromise = this.__selectInternalAsync(moduleId, annotationId);
 
+        // Annotations do not support external configurations,
+        // as the existence of configs needs to be known a priori (getAnnotationIds and hasAnnotation).
         var selectExternalAsync = this.__selectExternalAsync;
-        if(selectExternalAsync === null) {
+        if(annotationId || selectExternalAsync === null) {
           return internalConfigsPromise.then(__mergeConfigs);
         }
 
@@ -269,18 +260,33 @@ define([
           });
       },
 
+      /** @inheritDoc */
+      getAnnotationsIds: function(moduleId) {
+        var annotIds = this.__moduleAnnots[moduleId];
+        return annotIds ? Object.keys(annotIds) : null;
+      },
+
+      /** @inheritDoc */
+      hasAnnotation: function(moduleId, annotationId) {
+        var annotIds = this.__moduleAnnots[moduleId];
+        return annotIds ? !!annotIds[annotationId] : null;
+      },
+
       /**
-       * Selects, asynchronously, the internal configuration of a module, given its identifier.
+       * Selects, asynchronously, the internal configuration of a module, or a module annotation,
+       * given their identifiers.
        *
        * @param {string} moduleId - The identifier of the module.
-       *
+       * @param {?string} annotationId - The identifier of the module annotation.
        * @return {?Promise.<object[]>} A promise for the applicable configuration objects, ordered by priority;
        * `null`, if there are no applicable configuration rules.
        * @private
        */
-      __selectInternalAsync: function(moduleId) {
+      __selectInternalAsync: function(moduleId, annotationId) {
 
-        var rules = O.getOwn(this.__ruleStore, moduleId, null);
+        var ruleKey = __buildRuleKey(moduleId, annotationId);
+
+        var rules = O.getOwn(this.__ruleStore, ruleKey, null);
         if(rules === null) {
           return Promise.resolve(null);
         }
@@ -389,20 +395,8 @@ define([
     return ConfigurationService;
   };
 
-  function __wrapAnnotationRuleApply(moduleId, annotationId, apply) {
-
-    return function ruleWrappedAnnotationApply() {
-
-      var annotationsSpec = {};
-      annotationsSpec[annotationId] = F.is(apply) ? apply.apply(this, arguments) : apply;
-
-      var modulesSpec = {};
-      modulesSpec[moduleId] = {
-        annotations: annotationsSpec
-      };
-
-      return modulesSpec;
-    };
+  function __buildRuleKey(moduleId, annotationId) {
+    return moduleId + (annotationId ? ("|" + annotationId) : "");
   }
 
   function __mergeConfigs(configs) {

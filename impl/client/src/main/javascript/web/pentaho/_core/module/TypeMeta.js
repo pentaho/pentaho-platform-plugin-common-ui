@@ -16,8 +16,9 @@
 define([
   "../../lang/ArgumentRequiredError",
   "../../lang/ArgumentInvalidError",
-  "../../util/object"
-], function(ArgumentRequiredError, ArgumentInvalidError, O) {
+  "../../util/object",
+  "../../util/arg"
+], function(ArgumentRequiredError, ArgumentInvalidError, O, argUtil) {
 
   "use strict";
 
@@ -146,9 +147,102 @@ define([
         } while(subModule !== null);
 
         return false;
+      },
+
+      /** @override */
+      _prepareCoreAsync: function() {
+
+        if(this.ancestor !== null) {
+          return this.ancestor.prepareAsync().then(this.base.bind(this));
+        }
+
+        return this.base();
+      },
+
+      /** @override */
+      _hasAnnotationCore: function(annotationId, keyArgs) {
+
+        var hasAnnotation = this.base(annotationId, keyArgs);
+        if(!hasAnnotation && this.ancestor !== null && argUtil.optional(keyArgs, "inherit")) {
+          hasAnnotation = this.ancestor._hasAnnotationCore(annotationId, keyArgs);
+        }
+
+        return hasAnnotation;
+      },
+
+      getAnnotationsIds: function(keyArgs) {
+
+        var annotationIds = this.base(keyArgs);
+
+        if(this.ancestor !== null && argUtil.optional(keyArgs, "inherit")) {
+          var baseAnnotationIds = this.ancestor.getAnnotationsIds(keyArgs);
+          if(baseAnnotationIds !== null) {
+            if(annotationIds === null) {
+              annotationIds = baseAnnotationIds;
+            } else {
+              // Merge the two lists.
+              annotationIds = mergeStringArrays(annotationIds, baseAnnotationIds);
+            }
+          }
+        }
+
+        return annotationIds;
+      },
+
+      /** @override */
+      _getAnnotationResult: function(annotationId, keyArgs) {
+
+        var annotationResult = this.base(annotationId, keyArgs);
+
+        if(annotationResult === null && this.ancestor !== null && argUtil.optional(keyArgs, "inherit")) {
+          // Don't store result.
+          annotationResult = this.ancestor._getAnnotationResult(annotationId, keyArgs);
+        }
+
+        return annotationResult;
+      },
+
+      /** @override */
+      _getAnnotationCoreAsync: function(Annotation, annotationId, keyArgs) {
+
+        var annotationPromise = this.base(Annotation, annotationId, keyArgs);
+
+        if(annotationPromise === null && this.ancestor !== null && argUtil.optional(keyArgs, "inherit")) {
+          // Don't store result.
+          annotationPromise = this.ancestor._getAnnotationCoreAsync(Annotation, annotationId, keyArgs);
+        }
+
+        return annotationPromise;
       }
     });
 
     return TypeMeta;
   };
+
+  // Assumes that as and bs don't have duplicates themselves.
+  // Returns a copy if necessary.
+  function mergeStringArrays(as, bs) {
+    // Index `as`.
+    var asMap = Object.create(null);
+    var i = as.length;
+    while(i--) {
+      asMap[as[i]] = true;
+    }
+
+    var rs = null;
+    var L = bs.length;
+    i = -1;
+    while(++i < L) {
+      var b = bs[i];
+      if(!O.hasOwn(asMap, b)) {
+        if(rs === null) {
+          rs = as.slice();
+        }
+
+        rs.push(b);
+      }
+    }
+
+    return rs || as;
+  }
 });

@@ -16,7 +16,8 @@
 define([
   "module",
   "pentaho/lang/Base",
-  "pentaho/lang/ArgumentRequiredError"
+  "pentaho/lang/ArgumentRequiredError",
+  "pentaho/shim/es6-promise"
 ], function(module, Base, ArgumentRequiredError) {
 
   var reFullAnnotationId = /Annotation$/;
@@ -41,19 +42,13 @@ define([
      * through either of the above methods -
      * the annotation type's [shortId]{@link pentaho.module.Annotation.shortId} must be used.
      *
-     * When a module is loaded, all of its annotations are created (if not already created),
-     * including asynchronous ones.
+     * When a module is prepared, all of its annotations are created (if not already created).
      *
      * Annotations are allowed to depend on other annotations.
-     * When being created,
-     * through either
-     * [SyncAnnotation.create]{@link pentaho.module.SyncAnnotation.create} or
-     * [AsyncAnnotation.createAsync]{@link pentaho.module.AsyncAnnotation.createAsync},
-     * other annotations can be obtained, using either
-     * [IMeta#getAnnotation]{@link pentaho.module.IMeta#getAnnotation} or
+     * When being created, through [Annotation.createAsync]{@link pentaho.module.Annotation.createAsync},
+     * other annotations can be obtained using
      * [IMeta#getAnnotationAsync]{@link pentaho.module.IMeta#getAnnotationAsync},
      * as long as no cycles arise.
-     * A synchronous annotation cannot depend on an asynchronous annotation.
      *
      * Annotations are immutable.
      *
@@ -66,9 +61,8 @@ define([
      * @constructor
      * @param {pentaho.module.IMeta} forModule - The annotated module.
      *
-     * @see pentaho.module.SyncAnnotation
-     * @see pentaho.module.AsyncAnnotation
      * @see pentaho.module.IMeta#hasAnnotation
+     * @see pentaho.module.IMeta#getAnnotationsIds
      * @see pentaho.module.IMeta#getAnnotation
      * @see pentaho.module.IMeta#getAnnotationAsync
      */
@@ -108,16 +102,17 @@ define([
      */
     toFullId: function(annotationId) {
       return reFullAnnotationId.test(annotationId) ? annotationId : (annotationId + "Annotation");
-    }
+    },
 
     /**
-     * Gets a value that indicates if the annotation type is synchronous.
+     * Creates an annotation, given the annotated module and the annotation specification.
      *
-     * @name isSync
-     * @memberOf pentaho.module.Annotation
-     * @type {boolean}
-     * @readOnly
-     * @abstract
+     * @param {pentaho.module.IMeta} forModule - The annotated module.
+     * @param {object} annotSpec - The annotation specification.
+     * @return {Promise.<pentaho.module.Annotation>} A promise that resolves to the created annotation.
      */
+    createAsync: function(forModule, annotSpec) {
+      return Promise.resolve(new this(forModule, annotSpec));
+    }
   });
 });

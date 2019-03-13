@@ -27,11 +27,10 @@ define([
   "../../util/spec",
   "../../util/arg",
   "../../module/util",
-  "../../module/Annotation",
   "../../lang/ArgumentRequiredError",
   "../../lang/OperationInvalidError"
 ], function(module, Base, debugMgr, DebugLevels, O, requireJSUtil, logger, promiseUtil, textUtil, F,
-            specUtil, argUtil, moduleUtil, Annotation, ArgumentRequiredError, OperationInvalidError) {
+            specUtil, argUtil, moduleUtil, ArgumentRequiredError, OperationInvalidError) {
 
   "use strict";
 
@@ -69,6 +68,8 @@ define([
    * @default -1
    */
   var STATE_ERROR = -1;
+
+  var LOCAL_NOT_CREATED_ANNOTATION_RESULT = Object.freeze({value: null, error: null});
 
   return function(core) {
 
@@ -151,11 +152,9 @@ define([
         /**
          * The store of annotations.
          *
-         * @type {?({
-         *   results: Object.<string, ({value: ?pentaho.module.Annotation, error: ?Error})>,
-         *   specs: Object.<string, object>,
-         *   promises: Object.<string, Promise.<?pentaho.module.Annotation>>
-         * })}
+         * Annotation id to an annotation holder.
+         *
+         * @type {?Object.<string, ({result: {value: ?pentaho.module.Annotation, error: ?Error}, promise: ?Promise})>}
          *
          * @private
          */
@@ -181,32 +180,26 @@ define([
        * @internal
        */
       __configure: function(configSpec) {
+
         if("ranking" in configSpec) {
           this.ranking = +configSpec.ranking || 0;
         }
 
+        // Module Definition Annotations are converted to global annotation rules.
         var annotations = configSpec.annotations;
-        if(annotations != null) {
-          specUtil.merge(this.__getAnnotationsSpecs(), this.__rewriteAnnotationIds(annotations));
+        if(annotations != null && core.configService !== null) {
+
+          Object.keys(annotations).forEach(function(annotationId) {
+            core.configService.addRule({
+              priority: -Infinity,
+              select: {
+                module: this.id,
+                annotation: annotationId
+              },
+              apply: annotations[annotationId]
+            });
+          }, this);
         }
-      },
-
-      /**
-       * Rewrites the keys of an annotations specification so that they have the `Annotation` suffix.
-       *
-       * @param {Object.<string, ?object>} annotations - The annotations specification.
-       * @return {Object.<string, ?object>} The rewritten annotations specification.
-       * @private
-       */
-      __rewriteAnnotationIds: function(annotations) {
-
-        var annotations2 = Object.create(null);
-
-        Object.keys(annotations).forEach(function(annotationId) {
-          annotations2[Annotation.toFullId(annotationId)] = annotations[annotationId];
-        });
-
-        return annotations2;
       },
 
       /** @inheritDoc */
@@ -252,28 +245,42 @@ define([
 
         // Load config.
         // Load all async annotations.
+        // Load all sync annotation configs.
         var promisesControl = this.__getPromisesControl();
         if(promisesControl.prepare === null) {
-
-          var promises = [];
-
-          // 1. Configuration.
-          if(core.configService !== null) {
-            // RuleSet module and RuleSets themselves are initialized before the config service is created.
-            promises.push(core.configService.selectAsync(this.id).then(this.__setConfig.bind(this)));
-          }
-
-          // 2. Annotations.
-          var annotationsIds = this.__getAsyncAnnotationsIds();
-          if(annotationsIds !== null) {
-            promises.push(this.__loadAnnotationsAsync(annotationsIds));
-          }
-
-          promisesControl.prepare = Promise.all(promises)
-            .then(this.__onPrepareResolved.bind(this), this.__onLoadRejected.bind(this));
+          promisesControl.prepare = this._prepareCoreAsync();
         }
 
         return promisesControl.prepare;
+      },
+
+      /**
+       * Actually prepares a module.
+       *
+       * @return {Promise} A promise for the completion of the module's preparation.
+       * @private
+       * @internal
+       */
+      _prepareCoreAsync: function() {
+
+        var promises = [];
+
+        if(core.configService !== null) {
+          // 1. Configuration
+          // RuleSet module and RuleSets themselves are initialized before the config service is created.
+          promises.push(core.configService.selectAsync(this.id).then(this.__setConfig.bind(this)));
+
+          // 2. Local Annotations
+          // Come from configService as well...
+          var annotationsIds = this.getAnnotationsIds();
+          if(annotationsIds !== null) {
+            annotationsIds.forEach(function(annotationId) {
+              promises.push(this.getAnnotationAsync(annotationId));
+            }, this);
+          }
+        }
+
+        return Promise.all(promises).then(this.__onPrepareResolved.bind(this), this.__onLoadRejected.bind(this));
       },
 
       /**
@@ -426,21 +433,64 @@ define([
 
       // region Annotations
       /** @inheritDoc */
-      hasAnnotation: function(Annotation) {
+      hasAnnotation: function(Annotation, keyArgs) {
 
         var annotationId = getAnnotationId(Annotation);
 
-        return this.__annotationsStore !== null && O.hasOwn(this.__annotationsStore.specs, annotationId);
+        return this._hasAnnotationCore(annotationId, keyArgs);
+      },
+
+      /**
+       * Determines if this module is annotated with an annotation of a given type.
+       *
+       * Note that an annotation of the given type may be associated with this module and,
+       * still, not have been loaded yet!
+       * You may want to use this method to avoid a call to
+       * {@link pentaho.module.IMeta#getAnnotationAsync} which would resolve to `null`.
+       *
+       * @name hasAnnotation
+       * @memberOf pentaho.module.IMeta#
+       * @param {string} annotationId - The annotation identifier.
+       * @param {object} [keyArgs] - The keyword arguments object.
+       * @param {boolean} [keyArgs.inherit=false] - Indicates that if an annotation of the specified type is not present
+       * in this module and this is a type module,
+       * an annotation of the specified type and from ancestor modules may be considered.
+       *
+       * @return {boolean} `true` if an annotation of the given type is associated with this module; `false`, otherwise.
+       * @private
+       * @internal
+       */
+      _hasAnnotationCore: function(annotationId, keyArgs) {
+
+        var holder = this._getAnnotationHolder(annotationId);
+        if(holder !== null) {
+          return true;
+        }
+
+        // RuleSet module and RuleSets themselves are initialized before the config service is created.
+        return !this.isPrepared &&
+          core.configService !== null &&
+          core.configService.hasAnnotation(this.id, annotationId);
+      },
+
+      _getAnnotationHolder: function(annotationId) {
+        return O.getOwn(this.__annotationsStore, annotationId, null);
       },
 
       /** @inheritDoc */
-      getAnnotationsIds: function() {
-        var annotationsStore = this.__annotationsStore;
-        if(annotationsStore === null) {
-          return null;
+      getAnnotationsIds: function(keyArgs) {
+
+        if(this.isPrepared) {
+          return this.__annotationsStore === null ? null : Object.keys(this.__annotationsStore);
         }
 
-        return Object.keys(annotationsStore.specs);
+        // Assuming that all annotations come from the config. service.
+        // RuleSet module and RuleSets themselves are initialized before the config service is created.
+        if(core.configService !== null) {
+          return core.configService.getAnnotationsIds(this.id);
+        }
+
+        return null;
       },
 
       /** @inheritDoc */
@@ -448,7 +498,22 @@ define([
 
         var annotationId = getAnnotationId(Annotation);
 
-        return this.__getAnnotationSync(Annotation, annotationId, keyArgs, true);
+        var annotationResult = this._getAnnotationResult(annotationId, keyArgs);
+
+        var isMissing = annotationResult == null || annotationResult === LOCAL_NOT_CREATED_ANNOTATION_RESULT;
+        if(isMissing) {
+          if(argUtil.optional(keyArgs, "assertResult")) {
+            throw createErrorAnnotationNotAvailable(this.id, annotationId);
+          }
+
+          return null;
+        }
+
+        if(annotationResult.error !== null) {
+          throw annotationResult.error;
+        }
+
+        return annotationResult.value;
       },
 
       /** @inheritDoc */
@@ -457,246 +522,143 @@ define([
           return Promise.reject(new ArgumentRequiredError("Annotation"));
         }
 
-        var annotationId = Annotation.id;
-        if(annotationId == null) {
-          return Promise.reject(new ArgumentRequiredError("Annotation.id"));
-        }
-
-        if(Annotation.isSync) {
-          return this.__getAnnotationSync(Annotation, annotationId, keyArgs, false);
-        }
-
-        var annotationsStore = this.__annotationsStore;
-
-        // Is async and already loading/loaded?
-        var annotationPromise = annotationsStore && O.getOwn(annotationsStore.promises, annotationId, null);
-        if(annotationPromise !== null) {
-          return annotationPromise;
-        }
-
-        var annotationSpec = annotationsStore && O.getOwn(annotationsStore.specs, annotationId, null);
-        if(annotationSpec === null) {
-          if(argUtil.optional(keyArgs, "assertPresent", false)) {
-            return Promise.reject(createErrorAnnotationNotPresent(this.id, annotationId));
+        var annotationId;
+        if(typeof Annotation === "string") {
+          annotationId = Annotation;
+          Annotation = null;
+        } else {
+          annotationId = Annotation.id;
+          if(annotationId == null) {
+            return Promise.reject(new ArgumentRequiredError("Annotation.id"));
           }
-
-          return Promise.resolve(null);
         }
+
+        // Obtain Annotation class if not given.
+        var annotationClassPromise = Annotation === null
+          ? core.moduleMetaService.get(annotationId, {createIfUndefined: true}).loadAsync()
+          : Promise.resolve(Annotation);
 
         var me = this;
 
-        annotationPromise = Annotation.createAsync(this, annotationSpec).then(function(annotation) {
-          me.__setAnnotationResult(annotationId, annotation, null);
-          return annotation;
-        }, function(error) {
-          me.__setAnnotationResult(annotationId, null, error);
-          return Promise.reject(error);
-        });
-
-        return this.__setAnnotationPromise(annotationId, annotationPromise);
-      },
-
-      /**
-       * Gets an annotation or a promise for one, if it is created already.
-       *
-       * @param {Class.<pentaho.module.Annotation>} Annotation - The annotation class.
-       * @param {string} annotationId - The annotation identifier.
-       * @param {?object} keyArgs - The keyword arguments object.
-       * @param {boolean} [keyArgs.assertPresent=false] - Indicates that an error should be thrown
-       *  if the module is not annotated with an annotation of the requested type or it is not loaded.
-       * @param {boolean} sync - Indicates if the value should be returned directly and any errors thrown, or
-       * if a promise should be returned.
-       *
-       * @return {pentaho.module.Annotation|Promise.<pentaho.module.Annotation>} The annotation or a promise for one.
-       *
-       * @private
-       */
-      __getAnnotationSync: function(Annotation, annotationId, keyArgs, sync) {
-
-        var annotationsStore = this.__annotationsStore;
-
-        var annotationResult = annotationsStore && O.getOwn(annotationsStore.results, annotationId, null);
-        if(annotationResult === null) {
-          var annotationSpec = this.__getAnnotationSpec(annotationId, keyArgs);
-          if(annotationSpec === null) {
-            if(argUtil.optional(keyArgs, "assertPresent", false)) {
-              return promiseUtil.error(createErrorAnnotationNotPresent(this.id, annotationId));
+        return annotationClassPromise
+          .then(function(Annotation) {
+            return me._getAnnotationCoreAsync(Annotation, annotationId, keyArgs);
+          })
+          .then(function(annotation) {
+            if(annotation === null && argUtil.optional(keyArgs, "assertResult")) {
+              return Promise.reject(createErrorAnnotationNotAvailable(me.id, annotationId));
             }
 
-            return promiseUtil.return(null, sync);
-          }
-
-          if(!Annotation.isSync) {
-            return promiseUtil.error(new OperationInvalidError(
-              "The asynchronous annotation '" + annotationId +
-              "' has not yet been created in module '" + this.id + "'."), sync);
-          }
-
-          var annotation = null;
-          var error = null;
-          try {
-            annotation = Annotation.create(this, annotationSpec);
-          } catch(ex) {
-            error = ex;
-          }
-
-          annotationResult = this.__setAnnotationResult(annotationId, annotation, error);
-        }
-
-        return annotationResult.error !== null
-          ? promiseUtil.error(annotationResult.error, sync)
-          : promiseUtil.return(annotationResult.value, sync);
-      },
-
-      __getAnnotationSpec: function(annotationId, keyArgs) {
-        var inheritAnnotations = argUtil.optional(keyArgs, "inherit", false);
-
-        var module = this;
-        var annotationSpec = null;
-        do {
-          var annotationsStore = module.__annotationsStore;
-
-          annotationSpec = annotationsStore && O.getOwn(annotationsStore.specs, annotationId, null);
-          if (!inheritAnnotations || annotationSpec !== null) {
-            return annotationSpec;
-          }
-
-          module = module.ancestor;
-        } while(module !== null);
-
-        return annotationSpec;
-      },
-
-      // region Annotations' Helpers
-      /**
-       * Gets the annotations' store, creating it if not yet created.
-       *
-       * @return {?({
-       *   results: Object.<string, ({value: ?pentaho.module.Annotation, error: ?Error})>,
-       *   specs: Object.<string, object>,
-       *   promises: Object.<string, Promise.<?pentaho.module.Annotation>>
-       * })} The annotations' store.
-       *
-       * @private
-       */
-      __getAnnotationsStore: function() {
-        return this.__annotationsStore ||
-          (this.__annotationsStore = {results: null, specs: null, promises: null});
+            return annotation;
+          });
       },
 
       /**
-       * Gets the annotations' specifications, from the annotations' store,
-       * creating these, if not yet created.
+       * Really gets an annotation, asynchronously.
        *
-       * @return {?Object.<string, object>} The specifications of the annotations store.
+       * @param {Class.<pentaho.module.Annotation>} Annotation - The constructor of the annotation.
+       * @param {string} annotationId - The annotation identifier.
+       * @param {?object} keyArgs - The keyword arguments object.
+       * @param {boolean} [keyArgs.inherit=false] - Indicates that when this is a type module and
+       * the annotation is not present locally, it can be inherited from an ancestor module.
        *
-       * @private
-       */
-      __getAnnotationsSpecs: function() {
-
-        var annotationsStore = this.__getAnnotationsStore();
-
-        return annotationsStore.specs || (annotationsStore.specs = Object.create(null));
-      },
-
-      /**
-       * Sets the result of creating an annotation and returns it.
-       *
-       * @param {string} annotationId - The type of annotation.
-       * @param {?pentaho.module.Annotation} annotation - The annotation.
-       * @param {?Error} error - The error.
-       *
-       * @return {({value: ?pentaho.module.Annotation, error: ?Error})} The annotation result.
-       *
-       * @private
-       */
-      __setAnnotationResult: function(annotationId, annotation, error) {
-
-        var annotationsStore = this.__getAnnotationsStore();
-
-        return (annotationsStore.results || (annotationsStore.results = Object.create(null)))[annotationId] = {
-          value: annotation,
-          error: error
-        };
-      },
-
-      /**
-       * Sets the promise for the creation of an asynchronous annotation and returns it.
-       *
-       * @param {string} annotationId - The type of annotation.
-       * @param {Promise} promise - The annotation promise.
-       *
-       * @return {Promise} The annotation promise.
-       * @private
-       */
-      __setAnnotationPromise: function(annotationId, promise) {
-
-        var annotationsStore = this.__getAnnotationsStore();
-
-        return (annotationsStore.promises || (annotationsStore.promises = Object.create(null)))[annotationId] = promise;
-      },
-
-      /**
-       * Gets an array of asynchronous annotations identifiers, if any, or `null`, otherwise.
-       *
-       * @return {?Array.<string>} An array of module identifiers or `null`.
-       * @private
-       */
-      __getAsyncAnnotationsIds: function() {
-        var annotationsIds = this.getAnnotationsIds();
-        if(annotationsIds !== null) {
-
-          annotationsIds = annotationsIds.filter(isAsyncAnnotation);
-          if(annotationsIds.length > 0) {
-            return annotationsIds;
-          }
-        }
-
-        return null;
-      },
-
-      /**
-       * Loads existing annotations asynchronously, given their identifiers.
-       *
-       * @param {Array.<string>} annotationIds - The annotation identifiers.
-       * @return {Promise.<Array.<pentaho.module.Annotation>>} A promise for an array of annotations.
+       * @return {?Promise.<pentaho.module.Annotation>} A promise for the annotation,
+       * if the result is settled; `null` if no local annotation exists.
        *
        * @private
        * @internal
        */
-      __loadAnnotationsAsync: function(annotationIds) {
+      _getAnnotationCoreAsync: function(Annotation, annotationId, keyArgs) {
 
-        var module = this;
+        // Already loading/loaded?
+        var holder = this._getAnnotationHolder(annotationId);
+        if(holder !== null) {
+          // assert holder.promise
+          return holder.promise;
+        }
 
-        return Promise.all(annotationIds.map(function(annotationId) {
-          return loadModuleByIdAsync(annotationId).then(function(Annotation) {
-            return module.getAnnotationAsync(Annotation);
-          });
-        }));
+        // If the module is prepared, all locally defined annotations are already created,
+        //  so the above holder would have not been null. Surely does not exist locally, but may still be inherited.
+
+        // Is the module not prepared and there is a configuration for the annotation?
+        if(!this.isPrepared && core.configService !== null && core.configService.hasAnnotation(this.id, annotationId)) {
+
+          var annotationPromise = core.configService.selectAsync(this.id, annotationId)
+            .then(function(annotationSpec) {
+              return Annotation.createAsync(this, annotationSpec);
+            }.bind(this))
+            .then(function(annotation) {
+              holder.result = {value: annotation, error: null};
+              return annotation;
+            }, function(error) {
+              holder.result = {value: null, error: error};
+              return Promise.reject(error);
+            });
+
+          (this.__annotationsStore || (this.__annotationsStore = Object.create(null)))[annotationId] = holder = {
+            result: null,
+            promise: annotationPromise
+          };
+
+          return annotationPromise;
+        }
+
+        // Not settled. May inherit
+        return null;
+      },
+
+      /**
+       * Gets an available annotation result.
+       *
+       * @param {string} annotationId - The annotation identifier.
+       * @param {?object} keyArgs - The keyword arguments object.
+       * @param {boolean} [keyArgs.inherit=false] - Indicates that when this is a type module and
+       * the annotation is not present locally, it can be inherited from an ancestor module.
+       *
+       * @return {?{value: pentaho.module.Annotation, error: ?Error}} The annotation result or `null`.
+       *
+       * @private
+       * @internal
+       */
+      _getAnnotationResult: function(annotationId, keyArgs) {
+
+        var holder = this._getAnnotationHolder(annotationId);
+        if(holder !== null) {
+          // May be on the way.
+          return holder.result || LOCAL_NOT_CREATED_ANNOTATION_RESULT;
+        }
+
+        if(!this.isPrepared &&
+           core.configService !== null &&
+           core.configService.hasAnnotation(this.id, annotationId)) {
+
+          // There is a local annotation. But its not created.
+          // Return a settled, yet null, result to prevent inheritance.
+          return LOCAL_NOT_CREATED_ANNOTATION_RESULT;
+        }
+
+        return null;
       }
-      // endregion
-
-      // endregion
     });
 
-    // region More annotation helpers
+    // region Annotation helpers
     /**
-     * Creates an error for when an annotation is not present in a module.
+     * Creates an error for when an annotation is not present or otherwise currently available in a module.
      *
      * @param {string} moduleId - The module identifier.
      * @param {string} annotationId - The annotation identifier.
      *
      * @return {pentaho.lang.OperationInvalidError} The "not present" error.
      */
-    function createErrorAnnotationNotPresent(moduleId, annotationId) {
+    function createErrorAnnotationNotAvailable(moduleId, annotationId) {
       return new OperationInvalidError(
-        "The annotation '" + annotationId + "' is not defined in module '" + moduleId + "'.");
+        "The annotation '" + annotationId + "' is not available in module '" + moduleId + "'.");
     }
 
     /**
-     * Gets the identifier of an annotation type.
+     * Gets the identifier of an annotation, given its type or its identifier.
      *
-     * @param {Class.<pentaho.module.Annotation>} Annotation - The annotation class.
+     * @param {Class.<pentaho.module.Annotation>|string} Annotation - The annotation class or identifier.
      *
      * @return {string} The annotation identifier.
      *
@@ -708,6 +670,10 @@ define([
         throw new ArgumentRequiredError("Annotation");
       }
 
+      if(typeof Annotation === "string") {
+        return Annotation;
+      }
+
       var annotationId = Annotation.id;
       if(annotationId == null) {
         throw new ArgumentRequiredError("Annotation.id");
@@ -715,31 +681,6 @@ define([
 
       return annotationId;
     }
-
-    /**
-     * Determines if an annotation is asynchronous, given its identifier.
-     *
-     * @param {string} annotationId - The annotation identifier.
-     * @return {boolean} `true` if it is asynchronous; `false`, otherwise.
-     */
-    function isAsyncAnnotation(annotationId) {
-      if(core.asyncAnnotationModule === null) {
-        return false;
-      }
-
-      var module = core.moduleMetaService.get(annotationId);
-      return module !== null && module.isSubtypeOf(core.asyncAnnotationModule);
-    }
     // endregion
-
-    /**
-     * Loads an existing module given its identifier.
-     *
-     * @param {string} moduleId - The module identifier.
-     * @return {Promise} A promise for the module's value.
-     */
-    function loadModuleByIdAsync(moduleId) {
-      return core.moduleMetaService.get(moduleId).loadAsync();
-    }
   };
 });

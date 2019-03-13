@@ -15,11 +15,11 @@
  */
 define([
   "module",
-  "pentaho/module/SyncAnnotation",
+  "pentaho/module/Annotation",
   "pentaho/module/metaService"
-], function(module, SyncAnnotation, moduleMetaService) {
+], function(module, Annotation, moduleMetaService) {
 
-  var DefaultViewAnnotation = SyncAnnotation.extend(module.id, /** @lends pentaho.visual.DefaultViewAnnotation# */{
+  var DefaultViewAnnotation = Annotation.extend(module.id, /** @lends pentaho.visual.DefaultViewAnnotation# */{
     /**
      * @classDesc The `DefaultViewAnnotation` marks the existence of a View module
      * and makes it be the default view to use for the annotated model.
@@ -31,7 +31,7 @@ define([
      * @name DefaultViewAnnotation
      * @memberOf pentaho.visual
      * @class
-     * @extend pentaho.module.SyncAnnotation
+     * @extend pentaho.module.Annotation
      * @see pentaho.visual.IView
      *
      * @description Creates a default view annotation associated with a given module.
@@ -71,10 +71,10 @@ define([
      *
      * @param {pentaho.module.IMeta} forModule - The annotated module.
      * @param {pentaho.visual.spec.IDefaultViewAnnotation} annotSpec - The annotation specification.
-     * @return {pentaho.visual.DefaultViewAnnotation} A default view annotation.
+     * @return {Promise.<pentaho.visual.DefaultViewAnnotation>} A default view annotation.
      * @override
      */
-    create: function(forModule, annotSpec) {
+    createAsync: function(forModule, annotSpec) {
 
       var moduleId = annotSpec && annotSpec.module;
 
@@ -82,7 +82,7 @@ define([
 
       var defaultViewModule = moduleMetaService.get(moduleId, {createIfUndefined: true});
 
-      return new DefaultViewAnnotation(forModule, defaultViewModule);
+      return Promise.resolve(new DefaultViewAnnotation(forModule, defaultViewModule));
     }
   });
 
