@@ -323,9 +323,9 @@
   mapTheme("pentaho/visual/samples/calc", "themes", ["ruby"]);
 
   // This file is always in the non-compressed location.
-  requirePaths["pentaho/visual/config/vizApi.conf"] = baseUncompressedPath + "/pentaho/visual/config/vizApi.conf";
+  requirePaths["pentaho/visual/config"] = baseUncompressedPath + "/pentaho/visual/config";
 
-  requireModules["pentaho/visual/config/vizApi.conf"] = {type: "pentaho/config/spec/IRuleSet"};
+  requireModules["pentaho/visual/config"] = {type: "pentaho/config/spec/IRuleSet"};
 
   requireModules["pentaho/visual/models/Abstract"] = {
     base: "pentaho/visual/Model",
@@ -430,8 +430,8 @@
       "pentaho/_core/module/InstanceMeta",
       "pentaho/_core/module/TypeMeta",
       "pentaho/_core/module/Service",
-      "pentaho/_core/config/Service",
       "pentaho/module/Annotation",
+      "pentaho/_core/config/Service",
       "pentaho/config/ExternalAnnotation",
       "pentaho/_core/Core",
       "pentaho/util/url",
@@ -449,6 +449,14 @@
       "pentaho/module/subtypesOf",
       "pentaho/module/instanceOf",
       "pentaho/module/instancesOf",
+      "pentaho/i18n/MessageBundle",
+      "pentaho/i18n/LoadConfigAnnotation",
+      "pentaho/theme/main",
+      "pentaho/theme",
+      "pentaho/theme/ThemeAnnotation",
+      "pentaho/theme/impl/Service",
+      "pentaho/theme/service",
+      "pentaho/theme/LoadThemeAnnotation",
       "pentaho/type/SpecificationContext",
       "pentaho/type/SpecificationScope",
       "pentaho/type/impl/SpecificationProcessor",
@@ -598,6 +606,7 @@
       "pentaho/visual/role/ExternalMapping",
       "pentaho/visual/role/ExternalProperty",
       "pentaho/visual/ModelAdapter",
+      "pentaho/visual/action/WellKnownErrorNames",
       "pentaho/visual/color/utils",
       "pentaho/visual/color/palettes/divergentRyb3",
       "pentaho/visual/color/palettes/divergentRyb5",
@@ -670,6 +679,9 @@
       "pentaho/visual/scene/util",
       "pentaho/visual/scene/impl/Variable",
       "pentaho/visual/scene/Base",
+      "pentaho/visual/DefaultViewAnnotation",
+      "pentaho/visual/util",
+      "pentaho/visual/samples/calc/Model",
       "pentaho/ccc/visual/_util",
       "pentaho/ccc/visual/Abstract",
       "pentaho/ccc/visual/CartesianAbstract",

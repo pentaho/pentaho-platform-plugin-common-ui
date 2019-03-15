@@ -436,7 +436,7 @@
       "pentaho/visual/color/Palette": {
         "base": "complex"
       },
-      "pentaho/visual/config/vizApi.conf": {
+      "pentaho/visual/config": {
         "type": "pentaho/config/spec/IRuleSet"
       },
       "pentaho/visual/color/palettes/nominalPrimary": {

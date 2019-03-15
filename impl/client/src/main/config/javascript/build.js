@@ -55,7 +55,7 @@
   appDir: "${project.build.outputDirectory}/web",
 
   // Files which aren't even copied to the output directory.
-  fileExclusionRegExp: /^\.|^require\.js$|^common-ui-require-js-cfg\.js$|^require-cfg\.js$/,
+  fileExclusionRegExp: /^\.|^require\.js$|^common-ui-require-js-cfg\.js$|^require-cfg\.js$|\.md$/,
 
   // By default, all modules are located relative to this path. If appDir is set, then
   // baseUrl should be specified as relative to the appDir.
@@ -139,15 +139,14 @@
       excludeShallow: [
         // Don't want to exclude other pentaho/ modules used by these.
 
-        // Exclude these AMD modules as there is some chance that these are
-        // used by code which has nothing to do with the platform bundle code.
+        // Exclude these AMD modules as different environments use different impls.
         "pentaho/i18n/defaultService",
-        "pentaho/i18n/serverService",
-        "pentaho/i18n/MessageBundle"
+        "pentaho/i18n/serverService"
       ],
       exclude: [
         // Exclude virtual theme module IDs.
-        "pentaho/visual/models/theme/model"
+        "pentaho/visual/models/theme/model",
+        "pentaho/visual/samples/calc/theme/model"
       ]
     }
   ]

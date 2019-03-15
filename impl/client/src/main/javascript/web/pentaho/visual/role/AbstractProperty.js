@@ -315,7 +315,7 @@ define([
             // Continue
           }
 
-          // TODO: Validate isVisualKeyEffective and isKey. Note the rule on vizApi.conf.js temporarily doing this
+          // TODO: Validate isVisualKeyEffective and isKey. Note the rule on visual/config.js temporarily doing this
           // for Analyzer and DET.
         }
       }

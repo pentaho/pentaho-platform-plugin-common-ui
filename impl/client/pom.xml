@@ -209,9 +209,9 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
-          <!-- TODO: remove this when RequireJS is upgraded to >= 2.2.0 -->
+          <!-- r.js 's fileExclusionRegExp option does not support paths with directories. -->
           <excludes>
-            <exclude>web/compressed/build.txt</exclude>
+            <exclude>web/compressed/pentaho/visual/config.js</exclude>
           </excludes>
         </configuration>
       </plugin>

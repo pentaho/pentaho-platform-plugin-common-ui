@@ -20,4 +20,5 @@
  *
  * @name pentaho.visual.role.adaptation
  * @namespace
+ * @private
  */
