@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2017 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define(["require"], function(localRequire) {
+define(function() {
 
   "use strict";
 
@@ -92,6 +92,18 @@ define(["require"], function(localRequire) {
         },
         apply: {
           isBrowsable: false
+        }
+      },
+      */
+
+      // Example Rule 1.b - Show the Sample calculator visualization (hidden by default)
+      /*
+      {
+        select: {
+          module: "pentaho/visual/samples/calc/Model"
+        },
+        apply: {
+          isBrowsable: true
         }
       },
       */

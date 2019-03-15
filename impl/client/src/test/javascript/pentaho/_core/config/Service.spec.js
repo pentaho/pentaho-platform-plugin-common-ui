@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,17 +111,17 @@ define([
         });
 
         beforeEach(function() {
-          configurationService = new ConfigurationService();
+          configurationService = new ConfigurationService({application: "1"});
         });
 
-        it("should define rules with one module id", function() {
+        it("should define a rule that has one module id", function() {
 
           configurationService.add({rules: [ruleOneId1]});
 
           expect(configurationService.__ruleStore["A"]).toBeDefined();
         });
 
-        it("should define rules with multiple module ids", function() {
+        it("should define a rule that has multiple module ids", function() {
 
           configurationService.add({rules: [ruleMultiIds]});
 
@@ -130,7 +130,7 @@ define([
           expect(configurationService.__ruleStore["A2"]).toBeDefined();
         });
 
-        it("should define rules with given a rule-set with multiple rules", function() {
+        it("should define multiple rules given a rule-set with multiple rules", function() {
 
           configurationService.add({rules: [
             ruleOneId1,
@@ -205,6 +205,8 @@ define([
             ruleApplicationSpecific1 = {select: {module: "test/type", application: "1"}};
 
             var configurationService = new ConfigurationService();
+
+            configurationService.__filterRule = function() { return true; };
 
             configurationService.add({
               rules: [
