@@ -12,28 +12,45 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
- * Copyright 2014 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2014 - 2019 Hitachi Vantara. All rights reserved.
  */
-
 
 define(["common-ui/util/URLEncoder"], function(Encoder) {
 
   describe("URL Encoder", function() {
 
-    beforeEach(function(){
-
-    });
-
     it("should handle non-reserved strings", function() {
-     expect(Encoder.encode("http://www.foo.com/{0}/{1}/", ["bang", "baz"])).toBe("http://www.foo.com/bang/baz/");
-
+      expect(Encoder.encode("http://www.foo.com/{0}/{1}/", ["bang", "baz"]))
+        .toBe("http://www.foo.com/bang/baz/");
     });
+
     it("should handle reserved URI strings", function() {
-      expect(Encoder.encode("http://www.foo.com/{0}/{1}/", ["&/\\", "?:"])).toBe("http://www.foo.com/%26%252F%255C/%3F%3A/");
+      expect(Encoder.encode("http://www.foo.com/{0}/{1}/", ["&/\\", "?:"]))
+        .toBe("http://www.foo.com/%26%252F%255C/%3F%3A/");
     });
 
-    it("should handle multiple occurances of slashes", function() {
-      expect(Encoder.encode("http://www.foo.com/{0}/{1}/", ["&/\\foo\\", "?:/var/"])).toBe("http://www.foo.com/%26%252F%255Cfoo%255C/%3F%3A%252Fvar%252F/" );
+    it("should handle multiple occurrences of slashes", function() {
+      expect(Encoder.encode("http://www.foo.com/{0}/{1}/", ["&/\\foo\\", "?:/var/"]))
+        .toBe("http://www.foo.com/%26%252F%255Cfoo%255C/%3F%3A%252Fvar%252F/");
     });
-  })
-})
+
+    it("should handle a single string args", function() {
+      expect(Encoder.encode("http://www.foo.com/{0}/", "foo"))
+        .toBe("http://www.foo.com/foo/");
+    });
+
+    it("should handle query obj", function() {
+      var queryObj = {
+        arg1: "value1",
+        arg2: [1, 2]
+      };
+
+      expect(Encoder.encode("http://www.foo.com/{0}/{1}/", ["foo", "bar"], queryObj))
+        .toBe("http://www.foo.com/foo/bar/?arg1=value1&arg2=1&arg2=2");
+    });
+
+    it("should handle no args and no queryObjs", function() {
+      expect(Encoder.encode("http://www.foo.com/")).toBe("http://www.foo.com/");
+    });
+  });
+});
