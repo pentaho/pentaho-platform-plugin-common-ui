@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ define([
   "./types/Sides",
   "./types/LabelsOption",
   "pentaho/i18n!./i18n/model",
-  "./theme/model"
+  "css!./theme/tipsy.css"
 ], function(module, BaseModel, Color, BackgroundFill, FontStyle, Sides, LabelsOption, bundle) {
 
   "use strict";

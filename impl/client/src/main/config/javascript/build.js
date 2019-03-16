@@ -142,11 +142,6 @@
         // Exclude these AMD modules as different environments use different impls.
         "pentaho/i18n/defaultService",
         "pentaho/i18n/serverService"
-      ],
-      exclude: [
-        // Exclude virtual theme module IDs.
-        "pentaho/visual/models/theme/model",
-        "pentaho/visual/samples/calc/theme/model"
       ]
     }
   ]

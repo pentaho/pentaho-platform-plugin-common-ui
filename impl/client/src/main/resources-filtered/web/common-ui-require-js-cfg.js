@@ -308,19 +308,6 @@
   // endregion
 
   // region Type API and Visualization Models Packages and Themes
-  function mapTheme(mid, themeRoot, themes) {
-    var theme = (typeof active_theme !== "undefined") ? active_theme : null;
-    if(!theme || themes.indexOf(theme) < 0) theme = themes[0];
-
-    // e.g. "/theme" -> "/themes/crystal"
-    requireMap["*"][mid + "/theme"] = mid + "/" + themeRoot + "/" + theme;
-  }
-
-  // Visual Models Themes
-  mapTheme("pentaho/visual/models", "themes", ["crystal", "sapphire", "onyx", "det", "ruby"]);
-
-  // sample/calc theme
-  mapTheme("pentaho/visual/samples/calc", "themes", ["ruby"]);
 
   // This file is always in the non-compressed location.
   requirePaths["pentaho/visual/config"] = baseUncompressedPath + "/pentaho/visual/config";

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,7 @@
 define([
   "pentaho/module!_",
   "pentaho/visual/Model",
-  "pentaho/i18n!model",
-  "./theme/model"
+  "pentaho/i18n!model"
 ], function(module, BaseModel, bundle) {
 
   "use strict";

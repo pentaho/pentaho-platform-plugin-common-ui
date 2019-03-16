@@ -72,20 +72,6 @@ requireShim[getVersionedModuleId("common-ui/angular")] = {
   }
 };
 
-function mapTheme(mid, themeRoot, themes) {
-  var theme = (typeof active_theme !== "undefined") ? active_theme : null;
-  if(!theme || themes.indexOf(theme) < 0) theme = themes[0];
-
-  // e.g. "/theme" -> "/themes/crystal"
-  requirePaths[getVersionedModuleId(mid) + "/theme"] = basePath + "/" + mid + "/" + themeRoot + "/" + theme;
-}
-
-// Visual Models Themes
-mapTheme("pentaho/visual/models", "themes", ["crystal", "sapphire", "onyx", "det", "ruby"]);
-
-// sample/calc theme
-mapTheme("pentaho/visual/samples/calc", "themes", ["ruby"]);
-
 // switch paths to use compressed versions
 if(!useDebug) {
   [
