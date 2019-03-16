@@ -23,10 +23,10 @@ define(function() {
    * of visualizations when displayed in different applications.
    *
    * Known Application Ids:
-   * 1. PDI Data Inspection - "pentaho-det"
-   * 2. Pentaho Analyzer - "pentaho-analyzer"
-   * 3. Pentaho Analyzer in Dashboards - "pentaho-dashboards"
-   * 4. Pentaho CDF/CDE - "pentaho-cdf"
+   * 1. PDI Data Inspection - "pentaho/det"
+   * 2. Pentaho Analyzer - "pentaho/analyzer"
+   * 3. Pentaho Analyzer in Dashboards - "pentaho/dashboardDesigner"
+   * 4. Pentaho CDF/CDE - "pentaho/cdf"
    *
    * Stock visualizations' model ids:
    * 1. AreaStacked - "pentaho/visual/models/AreaStacked"
@@ -87,7 +87,7 @@ define(function() {
       /*
       {
         select: {
-          application: ["pentaho-det", "pentaho-analyzer"],
+          application: ["pentaho/det", "pentaho/analyzer"],
           module: "pentaho/visual/models/Pie"
         },
         apply: {
@@ -112,7 +112,7 @@ define(function() {
       /*
       {
         select: {
-          application: "pentaho-analyzer",
+          application: "pentaho/analyzer",
           module: "pentaho/visual/models/BarNormalizedHorizontal"
         },
         apply: {
@@ -146,7 +146,7 @@ define(function() {
       /*
       {
         select: {
-          application: "pentaho-analyzer",
+          application: "pentaho/analyzer",
           module: "pentaho/ccc/visual/Donut"
         },
         apply: {

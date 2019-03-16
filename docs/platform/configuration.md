@@ -89,7 +89,7 @@ define(function() {
       {
         select: {
           module: "my/ICar",
-          application: "my-vehicle-editor"
+          application: "my/vehicleEditor"
         },
         apply: {
           tireSize: 18,
@@ -174,10 +174,10 @@ included and registered in the same [Pentaho Web Package](web-package).
 
 | Description             | Value                |
 |-------------------------|----------------------|
-| CDF                     | `pentaho-cdf`        |
-| Analyzer                | `pentaho-analyzer`   |
-| Analyzer in Dashboards  | `pentaho-dashboards` |
-| PDI                     | `pentaho-det`        |
+| CDF                     | `pentaho/cdf`        |
+| Analyzer                | `pentaho/analyzer`   |
+| Analyzer in Dashboards  | `pentaho/dashboardDesigner` |
+| PDI                     | `pentaho/det`        |
 
 ### `theme`
 
