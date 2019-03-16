@@ -21,8 +21,7 @@ define([
   "./types/FontStyle",
   "./types/Sides",
   "./types/LabelsOption",
-  "pentaho/i18n!./i18n/model",
-  "css!./theme/tipsy.css"
+  "pentaho/i18n!./i18n/model"
 ], function(module, BaseModel, Color, BackgroundFill, FontStyle, Sides, LabelsOption, bundle) {
 
   "use strict";

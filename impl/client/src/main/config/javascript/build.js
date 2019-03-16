@@ -142,6 +142,10 @@
         // Exclude these AMD modules as different environments use different impls.
         "pentaho/i18n/defaultService",
         "pentaho/i18n/serverService"
+      ],
+      exclude: [
+        // cgg does not like embedded css.
+        "css!pentaho/ccc/visual/theme/tipsy.css"
       ]
     }
   ]

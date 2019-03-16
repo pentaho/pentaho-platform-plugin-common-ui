@@ -33,7 +33,8 @@ define([
   "pentaho/util/spec",
   "pentaho/debug",
   "pentaho/debug/Levels",
-  "pentaho/i18n!view"
+  "pentaho/i18n!view",
+  "css!./theme/tipsy.css"
 ], function(module, BaseView, Model, UserError, def, pvc, pv, util, dataUtil, OrFilter, AndFilter, IsEqualFilter,
             O, visualColorUtils, DataView, logger, specUtil, debugMgr, DebugLevels, bundle) {
 
