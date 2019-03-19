@@ -94,7 +94,7 @@ define([], function() {
 
     });
 
-    describe(".create", function() {
+    describe(".createAsync", function() {
 
       var defaultViewModuleId;
       var defaultViewModule;
@@ -120,19 +120,19 @@ define([], function() {
       });
 
       it("should default to './View' when the annotation spec is 'undefined'", function() {
-        var annotation = DefaultViewAnnotation.create(forModule);
-
-        expect(moduleMetaService.get.calls.first().args[0]).toBe(defaultViewModuleId);
-        expect(annotation.module).toBe(defaultViewModule);
+        DefaultViewAnnotation.createAsync(forModule).then(function(annotation) {
+          expect(moduleMetaService.get.calls.first().args[0]).toBe(defaultViewModuleId);
+          expect(annotation.module).toBe(defaultViewModule);
+        });
       });
 
       it("should resolve module argument in the annotation spec", function() {
-        var annotation = DefaultViewAnnotation.create(forModule, {
+        DefaultViewAnnotation.createAsync(forModule, {
           module: viewModuleId
+        }).then(function(annotation) {
+          expect(moduleMetaService.get.calls.first().args[0]).toBe(viewModuleId);
+          expect(annotation.module).toBe(viewModule);
         });
-
-        expect(moduleMetaService.get.calls.first().args[0]).toBe(viewModuleId);
-        expect(annotation.module).toBe(viewModule);
       });
     });
   });

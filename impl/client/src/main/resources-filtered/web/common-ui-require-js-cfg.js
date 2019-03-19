@@ -101,12 +101,10 @@
   requireModules["pentaho/config/spec/IRuleSet"] = {base: null, isVirtual: true};
 
   requireModules["pentaho/module/Annotation"] = {base: null};
-  requireModules["pentaho/module/SyncAnnotation"] = {base: "pentaho/module/Annotation"};
-  requireModules["pentaho/module/AsyncAnnotation"] = {base: "pentaho/module/Annotation"};
-  requireModules["pentaho/config/ExternalAnnotation"] = {base: "pentaho/module/AsyncAnnotation"};
+  requireModules["pentaho/config/ExternalAnnotation"] = {base: "pentaho/module/Annotation"};
   requireModules["pentaho/i18n/LoadConfigAnnotation"] = {base: "pentaho/config/ExternalAnnotation"};
-  requireModules["pentaho/theme/LoadThemeAnnotation"] = {base: "pentaho/module/AsyncAnnotation"};
-  requireModules["pentaho/theme/ThemeAnnotation"] = {base: "pentaho/module/SyncAnnotation"};
+  requireModules["pentaho/theme/LoadThemeAnnotation"] = {base: "pentaho/module/Annotation"};
+  requireModules["pentaho/theme/ThemeAnnotation"] = {base: "pentaho/module/Annotation"};
 
   requireModules["pentaho/type/Instance"] = {alias: "instance", base: null};
   requireModules["pentaho/type/Value"] = {alias: "value", base: "instance"};
@@ -141,7 +139,7 @@
   requireModules["pentaho/data/filter/IsLike"] = {alias: "like", base: "pentaho/data/filter/Property"};
 
   requireModules["pentaho/visual/Model"] = {base: "complex"};
-  requireModules["pentaho/visual/DefaultViewAnnotation"] = {base: "pentaho/module/SyncAnnotation"};
+  requireModules["pentaho/visual/DefaultViewAnnotation"] = {base: "pentaho/module/Annotation"};
   requireModules["pentaho/visual/role/adaptation/Strategy"] = {base: "complex"};
   requireModules["pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy"] = {
     base: "pentaho/visual/role/adaptation/Strategy",
@@ -310,27 +308,11 @@
   // endregion
 
   // region Type API and Visualization Models Packages and Themes
-  function mapTheme(mid, themeRoot, themes) {
-    var theme = (typeof active_theme !== "undefined") ? active_theme : null;
-    if(!theme || themes.indexOf(theme) < 0) theme = themes[0];
-
-    // e.g. "/theme" -> "/themes/crystal"
-    requireMap["*"][mid + "/theme"] = mid + "/" + themeRoot + "/" + theme;
-  }
-
-  // Type API Base Theme
-  mapTheme("pentaho/type", "themes", ["ruby"]);
-
-  // Visual Models Themes
-  mapTheme("pentaho/visual/models", "themes", ["crystal", "sapphire", "onyx", "det", "ruby"]);
-
-  // sample/calc theme
-  mapTheme("pentaho/visual/samples/calc", "themes", ["ruby"]);
 
   // This file is always in the non-compressed location.
-  requirePaths["pentaho/visual/config/vizApi.conf"] = baseUncompressedPath + "/pentaho/visual/config/vizApi.conf";
+  requirePaths["pentaho/visual/config"] = baseUncompressedPath + "/pentaho/visual/config";
 
-  requireModules["pentaho/visual/config/vizApi.conf"] = {type: "pentaho/config/spec/IRuleSet"};
+  requireModules["pentaho/visual/config"] = {type: "pentaho/config/spec/IRuleSet"};
 
   requireModules["pentaho/visual/models/Abstract"] = {
     base: "pentaho/visual/Model",
@@ -435,9 +417,8 @@
       "pentaho/_core/module/InstanceMeta",
       "pentaho/_core/module/TypeMeta",
       "pentaho/_core/module/Service",
-      "pentaho/_core/config/Service",
       "pentaho/module/Annotation",
-      "pentaho/module/AsyncAnnotation",
+      "pentaho/_core/config/Service",
       "pentaho/config/ExternalAnnotation",
       "pentaho/_core/Core",
       "pentaho/util/url",
@@ -455,6 +436,14 @@
       "pentaho/module/subtypesOf",
       "pentaho/module/instanceOf",
       "pentaho/module/instancesOf",
+      "pentaho/i18n/MessageBundle",
+      "pentaho/i18n/LoadConfigAnnotation",
+      "pentaho/theme/main",
+      "pentaho/theme",
+      "pentaho/theme/ThemeAnnotation",
+      "pentaho/theme/impl/Service",
+      "pentaho/theme/service",
+      "pentaho/theme/LoadThemeAnnotation",
       "pentaho/type/SpecificationContext",
       "pentaho/type/SpecificationScope",
       "pentaho/type/impl/SpecificationProcessor",
@@ -604,6 +593,7 @@
       "pentaho/visual/role/ExternalMapping",
       "pentaho/visual/role/ExternalProperty",
       "pentaho/visual/ModelAdapter",
+      "pentaho/visual/action/WellKnownErrorNames",
       "pentaho/visual/color/utils",
       "pentaho/visual/color/palettes/divergentRyb3",
       "pentaho/visual/color/palettes/divergentRyb5",
@@ -676,6 +666,9 @@
       "pentaho/visual/scene/util",
       "pentaho/visual/scene/impl/Variable",
       "pentaho/visual/scene/Base",
+      "pentaho/visual/DefaultViewAnnotation",
+      "pentaho/visual/util",
+      "pentaho/visual/samples/calc/Model",
       "pentaho/ccc/visual/_util",
       "pentaho/ccc/visual/Abstract",
       "pentaho/ccc/visual/CartesianAbstract",

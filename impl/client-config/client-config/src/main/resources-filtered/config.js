@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2017 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define(["require"], function(localRequire) {
+define(function() {
 
   "use strict";
 
@@ -23,10 +23,10 @@ define(["require"], function(localRequire) {
    * of visualizations when displayed in different applications.
    *
    * Known Application Ids:
-   * 1. PDI Data Inspection - "pentaho-det"
-   * 2. Pentaho Analyzer - "pentaho-analyzer"
-   * 3. Pentaho Analyzer in Dashboards - "pentaho-dashboards"
-   * 4. Pentaho CDF/CDE - "pentaho-cdf"
+   * 1. PDI Data Inspection - "pentaho/det"
+   * 2. Pentaho Analyzer - "pentaho/analyzer"
+   * 3. Pentaho Analyzer in Dashboards - "pentaho/dashboardDesigner"
+   * 4. Pentaho CDF/CDE - "pentaho/cdf"
    *
    * Stock visualizations' model ids:
    * 1. AreaStacked - "pentaho/visual/models/AreaStacked"
@@ -87,7 +87,7 @@ define(["require"], function(localRequire) {
       /*
       {
         select: {
-          application: ["pentaho-det", "pentaho-analyzer"],
+          application: ["pentaho/det", "pentaho/analyzer"],
           module: "pentaho/visual/models/Pie"
         },
         apply: {
@@ -96,11 +96,23 @@ define(["require"], function(localRequire) {
       },
       */
 
+      // Example Rule 1.b - Show the Sample calculator visualization (hidden by default)
+      /*
+      {
+        select: {
+          module: "pentaho/visual/samples/calc/Model"
+        },
+        apply: {
+          isBrowsable: true
+        }
+      },
+      */
+
       // Example Rule 2 - Change the menu label of the 100% Stacked Bar chart in Pentaho Analyzer
       /*
       {
         select: {
-          application: "pentaho-analyzer",
+          application: "pentaho/analyzer",
           module: "pentaho/visual/models/BarNormalizedHorizontal"
         },
         apply: {
@@ -134,7 +146,7 @@ define(["require"], function(localRequire) {
       /*
       {
         select: {
-          application: "pentaho-analyzer",
+          application: "pentaho/analyzer",
           module: "pentaho/ccc/visual/Donut"
         },
         apply: {

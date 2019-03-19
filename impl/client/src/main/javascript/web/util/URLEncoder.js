@@ -12,7 +12,7 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
- * Copyright 2014 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2014 - 2019 Hitachi Vantara. All rights reserved.
  */
 /**
  * This module supports the pentaho-specific URL encoding scheme for templated URLs. The characters / and \ are
@@ -44,55 +44,110 @@
  *    // results in "some/path/val1/val2?bang=something&baz=a&baz=b
  * }
  */
-define( "common-ui/util/URLEncoder", [ "dojo/_base/lang", "dojo/_base/array", "dojo/io-query" ], function( lang, array, ioQuery ){
+define("common-ui/util/URLEncoder", [], function() {
 
-  var Encoder = lang.getObject("pho.Encoder", true); // create global reference for non-amd users
+  // Create global reference for non-amd users.
 
-  function doubleEncode(str){
-    return str.replace(/%5C/g, "%255C").replace(/%2F/g, "%252F");
-  }
-  function singleEncode(str){
-    return str.replace(/\\/g, "%5C").replace(/\//g, "%2F");
-  }
+  /* global pho:true */
+  pho = typeof pho === "undefined" ? {} : pho;
 
-  Encoder.encode = function( str, args, queryObj ){
-    "use strict"
-    if( typeof args === "undefined" ){
+  var Encoder = pho.Encoder || (pho.Encoder = {});
+
+  // ---
+
+  var O_proto = Object.prototype;
+
+  Encoder.encode = function(str, args, queryObj) {
+
+    "use strict";
+
+    if(args === undefined) {
+      // TODO: what about queryObj??
       return str;
     }
-    if( typeof args === "string" ){
-      args = [ args ];
+
+    if(typeof args === "string") {
+      args = [args];
     }
-    // detect the presence of the "?" to determin when the special double-slash encoding should end
-    var pathPart = str.split("\?")[0];
+
+    // Detect the presence of the "?" to determine
+    // when the special double-slash encoding should end.
+    var pathPart = str.split("?")[0];
     var pathBounds = (pathPart.match(/\{[\d]+\}/g) || []).length;
-    args = array.map( args, function( item, pos ){
-      var encodedStr = encodeURIComponent( String( item ) )
-      // double-encode / and \ to work around Tomcat issue
-      if(pos < pathBounds){
+
+    args = (args || []).map(function(item, pos) {
+
+      var encodedStr = encodeURIComponent(String(item));
+
+      // Double-encode / and \ to work around Tomcat issue.
+      if(pos < pathBounds) {
         encodedStr = encodedStr.replace(/%5C/g, "%255C").replace(/%2F/g, "%252F");
       }
+
       return encodedStr;
-    } );
-    var result = lang.replace( str, args )
-    if( queryObj ){
-      result += (result.indexOf("?") > -1)? "&" : "?";
-      result += ioQuery.objectToQuery( queryObj );
+    });
+
+    var result = format(str, args);
+    if(queryObj) {
+      result += result.indexOf("?") > -1 ? "&" : "?";
+      result += objectToQuery(queryObj);
     }
+
     return result;
   };
 
-  Encoder.encodeRepositoryPath = function( str ) {
-    "use strict"
-    var encodedStr = String( str ).replace( new RegExp (":", "g"), "\t").replace( new RegExp ("[\\\\/]", "g"), ":")
-    return encodedStr;
+  Encoder.encodeRepositoryPath = function(str) {
+
+    "use strict";
+
+    return String(str)
+      .replace(new RegExp(":", "g"), "\t")
+      .replace(new RegExp("[\\\\/]", "g"), ":");
   };
 
-  Encoder.decodeRepositoryPath = function ( str ) {
-    return String( str ).replace( new RegExp (":", "g"), "\/").replace( new RegExp ("\\t", "g"), ":");
+  Encoder.decodeRepositoryPath = function(str) {
+
+    "use strict";
+
+    return String(str)
+      .replace(new RegExp(":", "g"), "/")
+      .replace(new RegExp("\\t", "g"), ":");
   };
 
-  // Return encoder for AMD use
+  // Return encoder for AMD use.
   return Encoder;
+
+  // Adapted from dojo/io-query.js
+  function objectToQuery(map) {
+
+    var pairs = [];
+
+    // eslint-disable-next-line guard-for-in
+    for(var name in map) {
+      var value = map[name];
+      // Ensure not inherited from Object prototype.
+      if(value !== O_proto[name]) {
+
+        var prefix = encodeURIComponent(name) + "=";
+
+        if(Array.isArray(value)) {
+          for(var i = 0, L = value.length; i < L; ++i) {
+            pairs.push(prefix + encodeURIComponent(value[i]));
+          }
+        } else {
+          pairs.push(prefix + encodeURIComponent(value));
+        }
+      }
+    }
+
+    return pairs.join("&");
+  }
+
+  function format(text, scope) {
+    return String(text).replace(/\{(\d+)\}/g, function($0, prop) {
+      return scope[prop];
+    });
+  }
 });
+
 require(["common-ui/util/URLEncoder"]);

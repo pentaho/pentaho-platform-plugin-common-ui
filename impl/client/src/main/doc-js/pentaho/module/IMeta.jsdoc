@@ -222,18 +222,22 @@
  */
 
 /**
- * Gets an annotation associated with this module, given the annotation type.
+ * Gets an annotation associated with this module, given the annotation type or its identifier.
  *
- * If this module is not annotated with an annotation of the given type, `null` is returned.
+ * Either this module is annotated with the requested annotation, or, optionally,
+ * if this is a type module and `keyArgs.inherit` is `true`,
+ * one of its ancestors is.
  *
- * Otherwise, this method assumes that the annotation can be obtained synchronously.
- * If the given annotation type is asynchronous and the annotation has not been loaded yet,
- * an error is thrown.
+ * If no annotation exists (or is inherited), or exists but is not available synchronously, `null` is returned,
+ * unless `keyArgs.assertResult` is `true`, in which case an error is thrown instead.
  *
- * If it is not known whether an asynchronous annotation has already been loaded,
+ * If this module has already been prepared, then all of its annotations (even if inherited)
+ * are available synchronously.
+ * From within the code of a module which uses the [pentaho/module!_]{@link pentaho/module/metaOf} AMD loader plugin,
+ * it is always safe to get any annotation which is known to have been associated with it.
+ *
+ * If it is not known whether an annotation can be obtained synchronously,
  * the {@link pentaho.module.IMeta#getAnnotationAsync} method should be used instead.
- * From within a module's code, it is always safe to get any annotation which is
- * known to have been associated with it.
  *
  * When this method returns an annotation, for a given annotation type,
  * it always returns the same annotation instance.
@@ -242,19 +246,20 @@
  * @memberOf pentaho.module.IMeta#
  * @method
  *
- * @param {Class.<pentaho.module.Annotation>} Annotation - The constructor of the annotation.
+ * @param {Class.<pentaho.module.Annotation>|string} Annotation - The constructor of the annotation or the
+ * annotation identifier.
  * @param {object} [keyArgs] - The keyword arguments object.
- * @param {boolean} [keyArgs.assertPresent=false] - Indicates that an error should be thrown
- *  if the module is not annotated with an annotation of the requested type.
+ * @param {boolean} [keyArgs.inherit=false] - Indicates that if an annotation of the specified type is not present
+ * in this module and this is a type module, an annotation of the specified type may be returned
+ * from the closest ancestor module which has one.
+ * @param {boolean} [keyArgs.assertResult=false] - Indicates that an error should be thrown if an annotation
+ * does not exist or, otherwise, cannot be returned synchronously.
  *
  * @return {?pentaho.module.Annotation} The requested annotation, if one is associated with this module;
  * `null`, otherwise.
  *
- * @throw {pentaho.lang.InvalidOperationError} When an annotation of the specified type
- *   is associated with this module but it is asynchronous and has not been loaded yet.
- *
- * @throw {pentaho.lang.InvalidOperationError} When an annotation of the specified type
- *   is not associated with this module and `assertPresent` was specified with a `true` value.
+ * @throw {pentaho.lang.InvalidOperationError} When `keyArgs.assertResult` is `true` and the requested annotation
+ * either does not exist or exists but is not available synchronously.
  */
 
 /**
@@ -267,7 +272,12 @@
  *
  * @name hasAnnotation
  * @memberOf pentaho.module.IMeta#
- * @param {Class.<pentaho.module.Annotation>} Annotation - The constructor of the annotation.
+ * @param {Class.<pentaho.module.Annotation>|string} Annotation - The constructor of the annotation or the
+ * annotation identifier.
+ * @param {object} [keyArgs] - The keyword arguments object.
+ * @param {boolean} [keyArgs.inherit=false] - Indicates that if an annotation of the specified type is not present
+ * in this module and this is a type module,
+ * an annotation of the specified type and from ancestor modules may be considered.
  *
  * @return {boolean} `true` if an annotation of the given type is associated with this module; `false`, otherwise.
  */
@@ -277,15 +287,24 @@
  *
  * @name getAnnotationsIds
  * @memberOf pentaho.module.IMeta#
+ * @param {object} [keyArgs] - The keyword arguments object.
+ * @param {boolean} [keyArgs.inherit=false] - Indicates that if this is a type module,
+ * annotations from ancestor modules should be included.
  *
  * @return {?(string[])} An array of annotation identifiers, if any; `null`, otherwise.
  */
 
 /**
- * Gets an annotation associated with this module, asynchronously, given the annotation type.
+ * Gets an annotation associated with this module, asynchronously, given the annotation type or its identifier.
  *
- * If this module is not annotated with an annotation of the given type,
- * a settled promise with the value `null` is returned.
+ * Either this module is annotated with the requested annotation, or, optionally,
+ * if this is a type module and `keyArgs.inherit` is `true`,
+ * one of its ancestors is.
+ *
+ * If no annotation exists (or is inherited),
+ * a settled promise with the value `null` is returned,
+ * unless `keyArgs.assertResult` is `true`,
+ * in which case a rejected promise is returned instead.
  *
  * When this method returns a settled promise, with an annotation, for a given annotation type,
  * it always returns the same annotation instance.
@@ -294,19 +313,20 @@
  * @memberOf pentaho.module.IMeta#
  * @method
  *
- * @param {Class.<pentaho.module.Annotation>} Annotation - The constructor of the annotation.
+ * @param {Class.<pentaho.module.Annotation>|string} Annotation - The constructor of the annotation or the
+ * annotation identifier.
  * @param {object} [keyArgs] - The keyword arguments object.
- * @param {boolean} [keyArgs.assertPresent=false] - Indicates that the promise should be rejected with an error
- *  if the module is not annotated with an annotation of the requested type.
+ * @param {boolean} [keyArgs.inherit=false] - Indicates that if an annotation of the specified type is not present
+ * in this module and this is a type module, an annotation of the specified type may be returned
+ * from the closest ancestor module which has one.
+ * @param {boolean} [keyArgs.assertResult=false] - Indicates that the promise should be rejected with an error
+ *  if the module (and, optionally, any of its ancestors) is not annotated with an annotation of the requested type.
  *
  * @return {Promise.<?pentaho.module.Annotation>} A promise that resolves to the requested annotation,
  *  if one is associated with this module, or to `null`, otherwise.
  *
- * @rejects {pentaho.lang.InvalidOperationError} When an annotation of the specified type
- *   is associated with this module but it is asynchronous and has not been loaded yet.
- *
- * @rejects {pentaho.lang.InvalidOperationError} When an annotation of the specified type
- *   is not associated with this module and `assertPresent` was specified with a `true` value.
+ * @rejects {pentaho.lang.InvalidOperationError} When `keyArgs.assertResult` is `true` and the requested annotation
+ * does not exist.
  */
 
 /**

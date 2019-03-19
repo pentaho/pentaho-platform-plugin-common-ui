@@ -42,7 +42,7 @@
  *       select: {
  *         type:        "my/radial/bar",
  *         user:        "john",
- *         application: "pentaho.analyzer"
+ *         application: "pentaho/analyzer"
  *       },
  *       apply: {
  *         isBrowsable: true

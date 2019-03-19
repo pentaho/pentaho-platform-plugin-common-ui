@@ -15,14 +15,14 @@
  */
 define([
   "module",
-  "pentaho/module/SyncAnnotation",
+  "pentaho/module/Annotation",
   "pentaho/module/metaService",
   "pentaho/lang/ArgumentRequiredError"
-], function(module, SyncAnnotation, metaService, ArgumentRequiredError) {
+], function(module, Annotation, metaService, ArgumentRequiredError) {
 
   var createIfUndefinedKeyArgs = Object.freeze({createIfUndefined: true});
 
-  var ThemeAnnotation = SyncAnnotation.extend(module.id, /** @lends pentaho.theme.ThemeAnnotation# */{
+  var ThemeAnnotation = Annotation.extend(module.id, /** @lends pentaho.theme.ThemeAnnotation# */{
     /**
      * @classDesc The theme annotation associates theming resources with a module.
      *
@@ -53,7 +53,7 @@ define([
      * @alias ThemeAnnotation
      * @memberOf pentaho.theme
      * @class
-     * @extend pentaho.module.SyncAnnotation
+     * @extend pentaho.module.Annotation
      *
      * @description Creates a theme annotation associated with a given module.
      * @constructor
@@ -104,17 +104,28 @@ define([
     get extensions() {
       return this._extensions;
     }
+  }, /** @lends pentaho.theme.ThemeAnnotation */{
+    /**
+     * Gets the type of annotation.
+     *
+     * @type {string}
+     * @readOnly
+     * @override
+     */
+    get id() {
+      return module.id;
+    }
   });
 
   /**
    * Creates a theme annotation, given the annotated module and the theme specification.
    *
-   * @name create
+   * @name createAsync
    * @memberOf pentaho.theme.ThemeAnnotation
    * @method
    * @param {pentaho.module.IMeta} forModule - The annotated module.
    * @param {pentaho.theme.spec.IThemeAnnotation} annotSpec - The theme specification.
-   * @return {pentaho.module.ThemeAnnotation} The theme annotation.
+   * @return {Promise.<pentaho.module.ThemeAnnotation>} A promise for the theme annotation.
    * @override
    */
 

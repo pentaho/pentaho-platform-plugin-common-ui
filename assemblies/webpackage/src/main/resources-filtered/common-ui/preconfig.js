@@ -72,23 +72,6 @@ requireShim[getVersionedModuleId("common-ui/angular")] = {
   }
 };
 
-function mapTheme(mid, themeRoot, themes) {
-  var theme = (typeof active_theme !== "undefined") ? active_theme : null;
-  if(!theme || themes.indexOf(theme) < 0) theme = themes[0];
-
-  // e.g. "/theme" -> "/themes/crystal"
-  requirePaths[getVersionedModuleId(mid) + "/theme"] = basePath + "/" + mid + "/" + themeRoot + "/" + theme;
-}
-
-// Type API Base Theme
-mapTheme("pentaho/type", "themes", ["ruby"]);
-
-// Visual Models Themes
-mapTheme("pentaho/visual/models", "themes", ["crystal", "sapphire", "onyx", "det", "ruby"]);
-
-// sample/calc theme
-mapTheme("pentaho/visual/samples/calc", "themes", ["ruby"]);
-
 // switch paths to use compressed versions
 if(!useDebug) {
   [
@@ -213,9 +196,8 @@ if(!useDebug) {
     "pentaho/_core/module/InstanceMeta",
     "pentaho/_core/module/TypeMeta",
     "pentaho/_core/module/Service",
-    "pentaho/_core/config/Service",
     "pentaho/module/Annotation",
-    "pentaho/module/AsyncAnnotation",
+    "pentaho/_core/config/Service",
     "pentaho/config/ExternalAnnotation",
     "pentaho/_core/Core",
     "pentaho/util/url",
@@ -233,6 +215,14 @@ if(!useDebug) {
     "pentaho/module/subtypesOf",
     "pentaho/module/instanceOf",
     "pentaho/module/instancesOf",
+    "pentaho/i18n/MessageBundle",
+    "pentaho/i18n/LoadConfigAnnotation",
+    "pentaho/theme/main",
+    "pentaho/theme",
+    "pentaho/theme/ThemeAnnotation",
+    "pentaho/theme/impl/Service",
+    "pentaho/theme/service",
+    "pentaho/theme/LoadThemeAnnotation",
     "pentaho/type/SpecificationContext",
     "pentaho/type/SpecificationScope",
     "pentaho/type/impl/SpecificationProcessor",
@@ -382,6 +372,7 @@ if(!useDebug) {
     "pentaho/visual/role/ExternalMapping",
     "pentaho/visual/role/ExternalProperty",
     "pentaho/visual/ModelAdapter",
+    "pentaho/visual/action/WellKnownErrorNames",
     "pentaho/visual/color/utils",
     "pentaho/visual/color/palettes/divergentRyb3",
     "pentaho/visual/color/palettes/divergentRyb5",
@@ -454,6 +445,9 @@ if(!useDebug) {
     "pentaho/visual/scene/util",
     "pentaho/visual/scene/impl/Variable",
     "pentaho/visual/scene/Base",
+    "pentaho/visual/DefaultViewAnnotation",
+    "pentaho/visual/util",
+    "pentaho/visual/samples/calc/Model",
     "pentaho/ccc/visual/_util",
     "pentaho/ccc/visual/Abstract",
     "pentaho/ccc/visual/CartesianAbstract",

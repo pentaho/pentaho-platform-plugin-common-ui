@@ -61,6 +61,16 @@ define([
         }
 
         return this.type !== null && this.type.isSubtypeOf(typeIdOrAlias);
+      },
+
+      /** @override */
+      _prepareCoreAsync: function() {
+
+        if(this.type !== null) {
+          return this.type.prepareAsync().then(this.base.bind(this));
+        }
+
+        return this.base();
       }
     });
   };

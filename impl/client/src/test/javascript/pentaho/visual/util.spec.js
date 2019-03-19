@@ -19,6 +19,7 @@ define([], function() {
     var localRequire;
 
     var moduleMetaService;
+    var themeService;
     var visualUtil;
     var errorMatch;
 
@@ -65,6 +66,8 @@ define([], function() {
               "annotations": {
                 "pentaho/visual/DefaultView": {module: "test/foo/UndefinedDefaultView"}
               }
+            },
+            "test/foo/ModelNoDefaultView": {
             }
           }
         }
@@ -79,12 +82,14 @@ define([], function() {
       return localRequire.promise([
         "pentaho/visual/util",
         "pentaho/module/metaService",
+        "pentaho/theme/service",
         "tests/pentaho/util/errorMatch"
       ]).then(function(deps) {
         visualUtil = deps[0];
         moduleMetaService = deps[1];
-        errorMatch = deps[2];
-      })
+        themeService = deps[2];
+        errorMatch = deps[3];
+      });
     });
 
     afterEach(function() {
@@ -95,55 +100,66 @@ define([], function() {
       expect(visualUtil instanceof Object).toBe(true);
     });
 
-    describe("getDefaultViewModule(vizTypeId)", function() {
+    describe("getDefaultViewModule(vizTypeId, {assertResult, inherit})", function() {
 
       it("should throw if `vizTypeId` is not specified", function() {
         expect(function() {
-          visualUtil.getDefaultViewModule()
+          visualUtil.getDefaultViewModule();
         }).toThrow(errorMatch.argRequired("vizTypeId"));
       });
 
-      it("should get the model's default view module", function() {
-        var result = visualUtil.getDefaultViewModule("test/foo/Model");
+      describe("when the vizTypeId module is not yet prepared", function() {
+        it("should throw if `assertResult` is not specified", function() {
+          expect(function() {
+            visualUtil.getDefaultViewModule("test/foo/Model");
+          }).toThrow(errorMatch.operInvalid());
+        });
 
-        expect(result).toBe(moduleMetaService.get("test/foo/View"));
+        it("should throw if `assertResult` is specified as true", function() {
+          expect(function() {
+            visualUtil.getDefaultViewModule("test/foo/Model", {assertResult: true});
+          }).toThrow(errorMatch.operInvalid());
+        });
+
+        it("should return null if `assertResult` is specified as false", function() {
+          var result = visualUtil.getDefaultViewModule("test/foo/Model", {assertResult: false});
+          expect(result).toBe(null);
+        });
       });
 
-    });
+      describe("when the vizTypeId module is prepared", function() {
 
-    describe("getModelAndDefaultViewModules(vizTypeId)", function() {
+        beforeEach(function() {
+          return Promise.all([
+            moduleMetaService.get("test/foo/Model").prepareAsync(),
+            moduleMetaService.get("test/foo/ModelNoDefaultView").prepareAsync()
+          ]);
+        });
 
-      it("should throw if `vizTypeId` is not specified", function() {
-        expect(function() {
-          visualUtil.getDefaultViewModule()
-        }).toThrow(errorMatch.argRequired("vizTypeId"));
+        it("should return the view module when the annotation exists", function() {
+          var result = visualUtil.getDefaultViewModule("test/foo/Model");
+
+          expect(result).toBe(moduleMetaService.get("test/foo/View"));
+        });
+
+        it("should return null when the annotation does not exist and assertResult is false", function() {
+          var result = visualUtil.getDefaultViewModule("test/foo/ModelNoDefaultView", {assertResult: false});
+
+          expect(result).toBe(null);
+        });
+
+        it("should throw when the annotation does not exist and assertResult is true", function() {
+          expect(function() {
+            visualUtil.getDefaultViewModule("test/foo/ModelNoDefaultView", {assertResult: true});
+          }).toThrow(errorMatch.operInvalid());
+        });
+
+        it("should throw when the annotation does not exist and assertResult is not specified", function() {
+          expect(function() {
+            visualUtil.getDefaultViewModule("test/foo/ModelNoDefaultView");
+          }).toThrow(errorMatch.operInvalid());
+        });
       });
-
-      it("should reject if the model has no defined default view class", function() {
-        return visualUtil.getModelAndDefaultViewClassesAsync("test/foo/Model2")
-          .then(function() {
-            return Promise.reject("Should have been rejected.");
-          }, function(error) {
-            expect(error).toEqual(jasmine.any(Error));
-          });
-      });
-
-      it("should reject if the model refers to an undefined default view class", function() {
-        return visualUtil.getModelAndDefaultViewClassesAsync("test/foo/ModelUndefDefaultView")
-          .then(function() {
-            return Promise.reject("Should have been rejected.");
-          }, function(error) {
-            expect(error).toEqual(jasmine.any(Error));
-          });
-      });
-
-      it("should get the model module and its default view module", function() {
-        var result = visualUtil.getModelAndDefaultViewModules("test/foo/Model");
-
-        expect(result.model).toEqual(moduleMetaService.get("test/foo/Model"));
-        expect(result.view).toEqual(moduleMetaService.get("test/foo/View"));
-      });
-
     });
 
     describe("getModelAndDefaultViewClassesAsync(vizTypeId)", function() {
@@ -179,6 +195,72 @@ define([], function() {
               expect(error).toEqual(jasmine.any(Error));
             });
         });
+      });
+    });
+
+    describe("#classifyDom(domElement, vizTypeId, viewTypeId)", function() {
+      var domElement;
+
+      beforeEach(function() {
+        domElement = {
+          classList: {
+            add: jasmine.createSpy("classList.add")
+          }
+        };
+      });
+
+      it("should do nothing if `vizTypeId` and `viewTypeId` are 'undefined'", function() {
+        visualUtil.classifyDom(domElement);
+
+        expect(domElement.classList.add).toHaveBeenCalledTimes(0);
+      });
+
+      it("should classify `domElement` with `vizTypeId` css classes", function() {
+        var vizTypeId = "package@2.1.1/Model";
+
+        visualUtil.classifyDom(domElement, vizTypeId);
+
+        expect(domElement.classList.add).toHaveBeenCalledTimes(2);
+        expect(domElement.classList.add).toHaveBeenCalledWith("package-Model");
+        expect(domElement.classList.add).toHaveBeenCalledWith("package-2-1-1-Model");
+      });
+
+      it("should classify `domElement` with `vizTypeId` and `viewTypeId` css classes", function() {
+        var vizTypeId = "package@2.1.1/Model";
+        var viewTypeId = "package@2.1.1/View";
+
+        visualUtil.classifyDom(domElement, vizTypeId, viewTypeId);
+
+        expect(domElement.classList.add).toHaveBeenCalledTimes(4);
+        expect(domElement.classList.add).toHaveBeenCalledWith("package-Model");
+        expect(domElement.classList.add).toHaveBeenCalledWith("package-2-1-1-Model");
+        expect(domElement.classList.add).toHaveBeenCalledWith("package-View");
+        expect(domElement.classList.add).toHaveBeenCalledWith("package-2-1-1-View");
+      });
+    });
+
+    describe("#getCssClasses(vizTypeId, viewTypeId)", function() {
+      it("should return an empty string if no argument is given", function() {
+        var cssClasses = visualUtil.getCssClasses();
+
+        expect(cssClasses).toBe("");
+      });
+
+      it("should return the css classes for `vizTypeId`", function() {
+        var vizTypeId = "package@2.1.1/Model";
+
+        var cssClasses = visualUtil.getCssClasses(vizTypeId);
+
+        expect(cssClasses).toBe("package-Model package-2-1-1-Model");
+      });
+
+      it("should return the css classes for both `vizTypeId` and `viewTypeId`", function() {
+        var vizTypeId = "package@2.1.1/Model";
+        var viewTypeId = "package@2.1.1/View";
+
+        var cssClasses = visualUtil.getCssClasses(vizTypeId, viewTypeId);
+
+        expect(cssClasses).toEqual("package-Model package-2-1-1-Model package-View package-2-1-1-View");
       });
     });
   });

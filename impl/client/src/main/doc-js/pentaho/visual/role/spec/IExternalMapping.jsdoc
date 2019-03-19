@@ -28,6 +28,7 @@
  *
  * @interface
  * @extends pentaho.visual.role.spec.IAbstractMapping
+ * @private
  */
 
 /**

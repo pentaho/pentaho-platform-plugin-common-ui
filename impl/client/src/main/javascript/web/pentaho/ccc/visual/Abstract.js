@@ -33,7 +33,8 @@ define([
   "pentaho/util/spec",
   "pentaho/debug",
   "pentaho/debug/Levels",
-  "pentaho/i18n!view"
+  "pentaho/i18n!view",
+  "css!./theme/tipsy.css"
 ], function(module, BaseView, Model, UserError, def, pvc, pv, util, dataUtil, OrFilter, AndFilter, IsEqualFilter,
             O, visualColorUtils, DataView, logger, specUtil, debugMgr, DebugLevels, bundle) {
 
@@ -1477,7 +1478,7 @@ define([
       // Unfortunately, diamonds are slightly bigger than other shapes, and would overflow or touch the text.
       var extraMargin = 1;
 
-      // [BACKLOG-15788] In 'pentaho/visual/config/vizApi.conf#L778' there is a configuration for "pentaho-cdf"
+      // [BACKLOG-15788] In 'pentaho/visual/config.js#L778' there is a configuration for "pentaho/cdf"
       // that needs to match this values
       options.legendMarkerSize = 2 * (dotRadius + extraMargin);
       options.legend$Dot_lineWidth = dotStrokeWidth;

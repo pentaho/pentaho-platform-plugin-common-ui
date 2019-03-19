@@ -109,8 +109,9 @@ However, the _Category_ visual role of the Bar visualization you developed only 
 being mapped to it. This results in Analyzer not allowing to drill-down.
 
 However, it is possible to configure the Analyzer-specific metadata property, 
-`application.keepLevelOnDrilldown` to force replacing the
-parent field with the child field when drilling-down.
+`keepLevelOnDrilldown` to force replacing the
+parent field with the child field when drilling-down,
+by using the `pentaho/analyzer/visual/OptionsAnnotation` annotation.
 Add the following rule to the `config.js` file:
 
 ```js
@@ -123,18 +124,19 @@ define(["module"], function(module) {
         priority: -1,
         select: {
           module: vizId,
-          application: "pentaho-analyzer"
+          application: "pentaho/analyzer",
+          annotation: "pentaho/analyzer/visual/Options"
         },
         apply: {
-          application: {
-            keepLevelOnDrilldown: false
-          }
+          keepLevelOnDrilldown: false
         }
       }
     ]
   };
 });
 ```
+
+Note that the annotation identifier can be specified without the `Annotation` suffix.
 
 Again, note that this rule has no effect when testing your visualization in the sandbox environment, 
 but is important if you package your visualization for deployment.

@@ -107,18 +107,18 @@ define(function() {
         });
       });
 
-      it("should call module.getAnnotation for each given module", function() {
+      it("should call module.getAnnotationAsync for each given module", function() {
 
         var aMeta = {
           kind: "type",
           ancestor: null,
-          getAnnotation: jasmine.createSpy("getAnnotation").and.returnValue(null)
+          getAnnotationAsync: jasmine.createSpy("getAnnotationAsync").and.returnValue(Promise.resolve(null))
         };
 
         var bMeta = {
           kind: "type",
           ancestor: null,
-          getAnnotation: jasmine.createSpy("getAnnotation").and.returnValue(null)
+          getAnnotationAsync: jasmine.createSpy("getAnnotationAsync").and.returnValue(Promise.resolve(null))
         };
 
         moduleMetaService.get.and.callFake(function(id) {
@@ -136,8 +136,8 @@ define(function() {
         var themeService = new ThemeService();
 
         return themeService.loadModuleThemeAsync(["a", "b"]).then(function() {
-          expect(aMeta.getAnnotation).toHaveBeenCalledWith(ThemeAnnotation);
-          expect(bMeta.getAnnotation).toHaveBeenCalledWith(ThemeAnnotation);
+          expect(aMeta.getAnnotationAsync).toHaveBeenCalledWith(ThemeAnnotation);
+          expect(bMeta.getAnnotationAsync).toHaveBeenCalledWith(ThemeAnnotation);
         });
       });
 
@@ -153,7 +153,7 @@ define(function() {
         var aMeta = {
           kind: "type",
           ancestor: null,
-          getAnnotation: jasmine.createSpy("getAnnotation").and.returnValue(annotationA)
+          getAnnotationAsync: jasmine.createSpy("getAnnotationAsync").and.returnValue(Promise.resolve(annotationA))
         };
 
         moduleMetaService.get.and.callFake(function(id) {
@@ -190,7 +190,7 @@ define(function() {
         var aMeta = {
           kind: "type",
           ancestor: null,
-          getAnnotation: jasmine.createSpy("getAnnotation").and.returnValue(annotationA)
+          getAnnotationAsync: jasmine.createSpy("getAnnotationAsync").and.returnValue(Promise.resolve(annotationA))
         };
 
         moduleMetaService.get.and.callFake(function(id) {
@@ -234,7 +234,7 @@ define(function() {
         var aMeta = {
           kind: "type",
           ancestor: null,
-          getAnnotation: jasmine.createSpy("getAnnotation").and.returnValue(annotationA)
+          getAnnotationAsync: jasmine.createSpy("getAnnotationAsync").and.returnValue(Promise.resolve(annotationA))
         };
 
         moduleMetaService.get.and.callFake(function(id) {
@@ -297,13 +297,13 @@ define(function() {
         var aMeta = {
           kind: "type",
           ancestor: null,
-          getAnnotation: jasmine.createSpy("getAnnotation").and.returnValue(annotationA)
+          getAnnotationAsync: jasmine.createSpy("getAnnotationAsync").and.returnValue(Promise.resolve(annotationA))
         };
 
         var bMeta = {
           kind: "type",
           ancestor: aMeta,
-          getAnnotation: jasmine.createSpy("getAnnotation").and.returnValue(annotationB)
+          getAnnotationAsync: jasmine.createSpy("getAnnotationAsync").and.returnValue(Promise.resolve(annotationB))
         };
 
         moduleMetaService.get.and.callFake(function(id) {
@@ -324,7 +324,7 @@ define(function() {
       });
     });
 
-    describe("#getModuleNameCssSelector(moduleOrId)", function() {
+    describe("#getModuleCssClass(moduleOrId)", function() {
 
       var themeService;
 
@@ -347,39 +347,39 @@ define(function() {
       it("should support being given a module", function() {
         var module = {id: "abc"};
 
-        var result = themeService.getModuleNameCssSelector(module);
+        var result = themeService.getModuleCssClass(module);
 
-        expect(result).toBe(".abc");
+        expect(result).toBe("abc");
       });
 
       it("should support being given a string", function() {
         var module = "abc";
 
-        var result = themeService.getModuleNameCssSelector(module);
+        var result = themeService.getModuleCssClass(module);
 
-        expect(result).toBe(".abc");
+        expect(result).toBe("abc");
       });
 
       it("should support being given a camelCase string", function() {
 
         var module = "andDoThat";
 
-        var result = themeService.getModuleNameCssSelector(module);
+        var result = themeService.getModuleCssClass(module);
 
-        expect(result).toBe(".and-do-that");
+        expect(result).toBe("and-Do-That");
       });
 
-      it("should extract the module name when given a string with the package id", function() {
+      it("should preserve the package name when given a string with the package id", function() {
 
         var module = "@scope/package@2.1.1/andDoThat";
 
-        var result = themeService.getModuleNameCssSelector(module);
+        var result = themeService.getModuleCssClass(module);
 
-        expect(result).toBe(".and-do-that");
+        expect(result).toBe("_scope-package-and-Do-That");
       });
     });
 
-    describe("#getModuleUniqueCssSelector(moduleOrId)", function() {
+    describe("#getModuleUniqueCssClass(moduleOrId)", function() {
 
       var themeService;
 
@@ -402,35 +402,35 @@ define(function() {
       it("should support being given a module", function() {
         var module = {id: "abc"};
 
-        var result = themeService.getModuleUniqueCssSelector(module);
+        var result = themeService.getModuleUniqueCssClass(module);
 
-        expect(result).toBe(".abc");
+        expect(result).toBe("abc");
       });
 
       it("should support being given a string", function() {
         var module = "abc";
 
-        var result = themeService.getModuleUniqueCssSelector(module);
+        var result = themeService.getModuleUniqueCssClass(module);
 
-        expect(result).toBe(".abc");
+        expect(result).toBe("abc");
       });
 
       it("should support being given a camelCase string", function() {
 
         var module = "andDoThat";
 
-        var result = themeService.getModuleUniqueCssSelector(module);
+        var result = themeService.getModuleUniqueCssClass(module);
 
-        expect(result).toBe(".and-do-that");
+        expect(result).toBe("and-Do-That");
       });
 
       it("should support being given a string with the package id", function() {
 
         var module = "@scope/package@2.1.1/andDoThat";
 
-        var result = themeService.getModuleUniqueCssSelector(module);
+        var result = themeService.getModuleUniqueCssClass(module);
 
-        expect(result).toBe("._scope-package-2-1-1-and-do-that");
+        expect(result).toBe("_scope-package-2-1-1-and-Do-That");
       });
     });
 
@@ -469,7 +469,7 @@ define(function() {
         themeService.classifyDomAsModule(domElement, module);
 
         expect(domElement.classList.add).toHaveBeenCalledTimes(2);
-        expect(domElement.classList.add).toHaveBeenCalledWith("abc");
+        expect(domElement.classList.add).toHaveBeenCalledWith("package-abc");
         expect(domElement.classList.add).toHaveBeenCalledWith("package-2-1-1-abc");
       });
 
@@ -480,7 +480,7 @@ define(function() {
         themeService.classifyDomAsModule(domElement, module);
 
         expect(domElement.classList.add).toHaveBeenCalledTimes(2);
-        expect(domElement.classList.add).toHaveBeenCalledWith("abc");
+        expect(domElement.classList.add).toHaveBeenCalledWith("package-abc");
         expect(domElement.classList.add).toHaveBeenCalledWith("package-2-1-1-abc");
       });
 
@@ -489,6 +489,42 @@ define(function() {
         var module = "package@2.1.1/abc";
 
         themeService.classifyDomAsModule({}, module);
+      });
+    });
+
+    describe("#getModuleCssClasses(moduleOrId)", function() {
+      var themeService;
+
+      beforeAll(function() {
+
+        localRequire = require.new();
+
+        return localRequire.promise(["pentaho/theme/impl/Service"])
+          .then(function(deps) {
+            ThemeService = deps[0];
+
+            themeService = new ThemeService();
+          });
+      });
+
+      afterAll(function() {
+        localRequire.dispose();
+      });
+
+      it("should support being given a module", function() {
+        var module = {id: "package@2.1.1/abc"};
+
+        var cssClasses = themeService.getModuleCssClasses(module);
+
+        expect(cssClasses).toBe("package-abc package-2-1-1-abc");
+      });
+
+      it("should support being given a string", function() {
+        var module = "package@2.1.1/abc";
+
+        var cssClasses = themeService.getModuleCssClasses(module);
+
+        expect(cssClasses).toBe("package-abc package-2-1-1-abc");
       });
     });
   });

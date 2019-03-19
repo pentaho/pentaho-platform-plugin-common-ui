@@ -94,10 +94,31 @@
  */
 
 /**
- * Selects, asynchronously, the configuration of a module given its identifier.
+ * Selects, asynchronously, the configuration of a module, or module annotation,
+ * given their identifiers.
  *
  * @name selectAsync
  * @memberOf pentaho.config.IService#
  * @param {string} moduleId - The identifier of the module.
+ * @param {?string} [annotationId] - The identifier of the module annotation.
  * @return {Promise.<?object>} A promise for the configuration, if any, or a promise for `null`, otherwise.
+ */
+
+/**
+ * Gets the identifiers of specified annotations of a module, if any, given its identifier.
+ *
+ * @name getAnnotationsIds
+ * @memberOf pentaho.config.IService#
+ * @param {string} moduleId - The identifier of the module.
+ * @return {?Array.<string>} An array of annotation identifiers, if any; `null`, otherwise.
+ */
+
+/**
+ * Gets a value that indicates if a module annotation specification exists.
+ *
+ * @name hasAnnotation
+ * @memberOf pentaho.config.IService#
+ * @param {string} moduleId - The identifier of the module.
+ * @param {string} annotationId - The identifier of the module annotation.
+ * @return {boolean} `true` if a module annotation specification exists; `false`, otherwise.
  */

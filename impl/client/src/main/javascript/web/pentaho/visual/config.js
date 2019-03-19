@@ -53,7 +53,7 @@ define(function() {
         priority: Infinity,
         select: {
           // TODO: Include DET when its createEmptyTable method takes isKey into account.
-          application: ["pentaho-analyzer", "pentaho-dashboards"], // "pentaho-det"
+          application: ["pentaho/analyzer", "pentaho/dashboardDesigner"], // "pentaho/det"
           module: "pentaho/visual/role/AbstractProperty"
         },
         deps: [
@@ -785,7 +785,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: "pentaho-det",
+          application: "pentaho/det",
           module: "pentaho/ccc/visual/Abstract"
         },
         apply: {
@@ -797,7 +797,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: ["pentaho-det", "pentaho-cdf"],
+          application: ["pentaho/det", "pentaho/cdf"],
           module: "pentaho/ccc/visual/Abstract"
         },
         apply: {
@@ -813,7 +813,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: "pentaho-cdf",
+          application: "pentaho/cdf",
           module: "pentaho/ccc/visual/Abstract"
         },
         apply: {
@@ -839,7 +839,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: ["pentaho-det", "pentaho-cdf"],
+          application: ["pentaho/det", "pentaho/cdf"],
           module: "pentaho/ccc/visual/PointAbstract"
         },
         apply: {
@@ -856,7 +856,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: ["pentaho-det", "pentaho-cdf"],
+          application: ["pentaho/det", "pentaho/cdf"],
           module: "pentaho/ccc/visual/CartesianAbstract"
         },
         apply: {
@@ -879,7 +879,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: "pentaho-cdf",
+          application: "pentaho/cdf",
           module: "pentaho/ccc/visual/BarAbstract"
         },
         apply: {
@@ -892,7 +892,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: ["pentaho-analyzer", "pentaho-det"],
+          application: ["pentaho/analyzer", "pentaho/det"],
           module: "pentaho/ccc/visual/CartesianAbstract"
         },
         apply: {
@@ -926,7 +926,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: ["pentaho-analyzer", "pentaho-det"],
+          application: ["pentaho/analyzer", "pentaho/det"],
           module: "pentaho/ccc/visual/HeatGrid"
         },
         apply: {
@@ -941,7 +941,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: "pentaho-cdf",
+          application: "pentaho/cdf",
           module: "pentaho/ccc/visual/MetricPointAbstract"
         },
         apply: {
@@ -955,7 +955,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: "pentaho-cdf",
+          application: "pentaho/cdf",
           module: "pentaho/ccc/visual/Bubble"
         },
         apply: {

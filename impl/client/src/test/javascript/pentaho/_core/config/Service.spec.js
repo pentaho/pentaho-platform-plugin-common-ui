@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,17 +111,17 @@ define([
         });
 
         beforeEach(function() {
-          configurationService = new ConfigurationService();
+          configurationService = new ConfigurationService({application: "1"});
         });
 
-        it("should define rules with one module id", function() {
+        it("should define a rule that has one module id", function() {
 
           configurationService.add({rules: [ruleOneId1]});
 
           expect(configurationService.__ruleStore["A"]).toBeDefined();
         });
 
-        it("should define rules with multiple module ids", function() {
+        it("should define a rule that has multiple module ids", function() {
 
           configurationService.add({rules: [ruleMultiIds]});
 
@@ -130,7 +130,7 @@ define([
           expect(configurationService.__ruleStore["A2"]).toBeDefined();
         });
 
-        it("should define rules with given a rule-set with multiple rules", function() {
+        it("should define multiple rules given a rule-set with multiple rules", function() {
 
           configurationService.add({rules: [
             ruleOneId1,
@@ -205,6 +205,8 @@ define([
             ruleApplicationSpecific1 = {select: {module: "test/type", application: "1"}};
 
             var configurationService = new ConfigurationService();
+
+            configurationService.__filterRule = function() { return true; };
 
             configurationService.add({
               rules: [
@@ -725,7 +727,7 @@ define([
 
         describe("relative mapping", function() {
 
-          it("should return resolved config in pentaho modules", function() {
+          it("should return resolved config", function() {
 
             var configurationService;
 
@@ -751,17 +753,11 @@ define([
               ]
             });
 
-            return configurationService.selectAsync("pentaho/modules").then(function(result) {
+            return configurationService.selectAsync("test/A", "test/InfoAnnotation").then(function(result) {
               expect(result).not.toBe(null);
-              expect(result).toEqual(jasmine.objectContaining({
-                "test/A": {
-                  annotations: {
-                    "test/InfoAnnotation": {
-                      testId: "A"
-                    }
-                  }
-                }
-              }));
+              expect(result).toEqual({
+                testId: "A"
+              });
             });
           });
 
@@ -799,7 +795,7 @@ define([
 
         describe("AMD mapping", function() {
 
-          it("should return config in pentaho/modules if rule applies to exactly mapped contextual module", function() {
+          it("should return config if rule applies to exactly mapped contextual module", function() {
 
             localRequire.config({
               map: {
@@ -832,24 +828,18 @@ define([
               ]
             });
 
-            return configurationService.selectAsync("pentaho/modules").then(function(result) {
+            return configurationService.selectAsync("test/A", "test/InfoAnnotation").then(function(result) {
               expect(result).not.toBe(null);
-              expect(result).toEqual(jasmine.objectContaining({
-                "test/A": {
-                  annotations: {
-                    "test/InfoAnnotation": {
-                      testId: "D"
-                    }
-                  }
-                }
-              }));
+              expect(result).toEqual({
+                testId: "D"
+              });
             });
           });
         });
 
         describe("module alias mapping", function() {
 
-          it("should return config in pentaho/modules if rule applies to an annotation's alias", function() {
+          it("should return config if rule applies to an annotation's alias", function() {
 
             // localRequire.config({
             //   config: {
@@ -890,17 +880,11 @@ define([
               ]
             });
 
-            return configurationService.selectAsync("pentaho/modules").then(function(result) {
+            return configurationService.selectAsync("test/A", "test/InfoAnnotation").then(function(result) {
               expect(result).not.toBe(null);
-              expect(result).toEqual(jasmine.objectContaining({
-                "test/A": {
-                  annotations: {
-                    "test/InfoAnnotation": {
-                      testId: "D"
-                    }
-                  }
-                }
-              }));
+              expect(result).toEqual({
+                testId: "D"
+              });
             });
           });
         });

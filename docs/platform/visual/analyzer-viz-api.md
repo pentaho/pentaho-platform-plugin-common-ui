@@ -131,7 +131,7 @@ the default value of the "Line width" property of "Line chart" visualizations.
       return [
         {
           select: {
-            application: "pentaho-analyzer",
+            application: "pentaho/analyzer",
             module: "pentaho/visual/models/Line"
           },
           apply: {
@@ -165,13 +165,12 @@ the possible _maximum number of results_ for "Bar chart" visualizations.
       return [
         {
           select: {
-            application: "pentaho-analyzer",
-            module: "pentaho/visual/models/BarHorizontal"
+            application: "pentaho/analyzer",
+            module: "pentaho/visual/models/BarHorizontal",
+            annotation: "pentaho/analyzer/visual/Options"
           },
           apply: {
-            application: {
-              maxValues: [250, 500, 1000, 5000]
-            }
+            maxValues: [250, 500, 1000, 5000]
           }
         }
       ];
@@ -194,7 +193,7 @@ This property allows changing the default discrete color palette.
       return [
         {
           select: {
-            application: "pentaho-analyzer",
+            application: "pentaho/analyzer",
             module: "pentaho/visual/color/palettes/nominalPrimary"
           },
           apply: {

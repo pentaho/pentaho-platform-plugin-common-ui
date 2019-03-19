@@ -10,7 +10,7 @@
     config: {
       "pentaho/modules": {},
       "pentaho/environment": {
-        application: "pentaho-viz-api-sandbox"
+        application: "pentaho/visual/samples/sandbox"
       }
     },
     packages: []

@@ -56,7 +56,7 @@ visualizations menu, effectively preventing the user from creating new visualiza
 var ruleSpec = {
   select: {
     module: "pentaho/visual/models/Pie",
-    application: "pentaho-analyzer"
+    application: "pentaho/analyzer"
   },
   apply: {
     isBrowsable: false
@@ -79,7 +79,7 @@ var ruleSpec = {
       "pentaho/visual/models/Line",
       "pentaho/visual/models/BarLine"
     ],
-    application: "pentaho-analyzer"
+    application: "pentaho/analyzer"
   },
   apply: {
     props: {
@@ -130,8 +130,8 @@ var ruleSpec = {
   select: {
     module: "pentaho/visual/models/Bar",
     application: [
-      "pentaho-analyzer",
-      "pentaho-det"
+      "pentaho/analyzer",
+      "pentaho/det"
     ]
   },
   apply: {
@@ -195,7 +195,7 @@ when in the PDI application:
 var ruleSpec = {
   select: {
     module: "pentaho/ccc/visual/AreaStacked",
-    application: "pentaho-det"
+    application: "pentaho/det"
   },
   apply: {
     extension: {

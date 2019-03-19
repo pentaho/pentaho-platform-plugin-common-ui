@@ -2,9 +2,27 @@
 
   var pkg = getPackageJsonSync();
 
-  var config = {paths: {}};
+  var config = {paths: {}, map: {"*": {}}};
 
-  config.paths[pkg.name] = ".";
+  if(pkg.paths) {
+    var keys = Object.keys(pkg.paths);
+    var L = keys.length;
+    var i = -1;
+    while(++i < L) {
+      var module = keys[i];
+      var versionedModule = pkg.name + "@" + pkg.version + "/" + module;
+
+      // E.g. "./"
+      var path = "." + pkg.paths[keys[i]];
+
+      config.paths[versionedModule] = path;
+
+      // Allow referencing by the unversioned module id in the sandbox.
+      config.map["*"][module] = versionedModule;
+    }
+  } else {
+    config.paths[pkg.name] = ".";
+  }
 
   if(pkg.dependencies) {
     for(var key in pkg.dependencies) {

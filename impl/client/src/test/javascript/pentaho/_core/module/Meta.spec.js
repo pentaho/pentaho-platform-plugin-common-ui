@@ -56,11 +56,11 @@ define([
     function createCoreMock() {
 
       var core = {
-        configService: jasmine.createSpyObj("configService", ["selectAsync"])
+        configService: jasmine.createSpyObj("configService", ["selectAsync", "getAnnotationsIds"])
       };
 
       core.configService.selectAsync.and.returnValue(Promise.resolve(null));
-
+      core.configService.getAnnotationsIds.and.returnValue(null);
       return core;
     }
 
@@ -246,6 +246,8 @@ define([
           }, 0);
         });
       });
+
+      
     });
 
     describe("#loadAsync()", function() {

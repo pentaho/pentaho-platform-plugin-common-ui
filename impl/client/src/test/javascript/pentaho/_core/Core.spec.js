@@ -49,17 +49,6 @@ define([
 
       Meta.prototype.getAnnotationsIds = jasmine.createSpy("getAnnotationsIds").and.returnValue(null);
       Meta.prototype.loadAsync = jasmine.createSpy("loadAsync").and.returnValue(Promise.resolve(null));
-      Meta.prototype.__loadAnnotationsAsync = function(annotationIds) {
-
-        var module = this;
-
-        return Promise.all(annotationIds.map(function(annotationId) {
-          return core.moduleMetaService.get(annotationId).loadAsync()
-            .then(function(Annotation) {
-              return module.getAnnotationAsync(Annotation);
-            });
-        }));
-      };
       Meta.prototype.isSubtypeOf = jasmine.createSpy("isSubtypeOf").and.returnValue(false);
       Meta.prototype.isInstanceOf = jasmine.createSpy("isSubtypeOf").and.returnValue(false);
 
@@ -775,7 +764,7 @@ define([
           });
         });
 
-        it("should provide to the configService with each module's external config annotations", function() {
+        it("should provide to the configService each module's external config annotations", function() {
 
           var AAnnotation = function() {
             this.config = {"A": "C"};
@@ -810,7 +799,7 @@ define([
             ]);
 
             aMeta.getAnnotationAsync = jasmine.createSpy("getAnnotationAsync").and.callFake(function(Annotation) {
-              if(Annotation.id === "SomeExternalConfigAnnotation") {
+              if(Annotation === "SomeExternalConfigAnnotation") {
                 return Promise.resolve(annotationA);
               }
 
@@ -914,7 +903,7 @@ define([
             ]);
 
             aMeta.getAnnotationAsync = jasmine.createSpy("getAnnotationAsync").and.callFake(function(Annotation) {
-              if(Annotation.id === "SomeExternalConfigAnnotation") {
+              if(Annotation === "SomeExternalConfigAnnotation") {
                 return Promise.resolve(annotationA);
               }
 

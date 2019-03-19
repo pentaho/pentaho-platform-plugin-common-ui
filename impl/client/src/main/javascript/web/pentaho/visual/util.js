@@ -19,9 +19,10 @@ define([
   "./DefaultViewAnnotation",
   "pentaho/theme/service",
   "pentaho/type/loader",
+  "pentaho/util/object",
   "pentaho/util/promise",
   "pentaho/util/error"
-], function(localRequire, moduleMetaService, DefaultViewAnnotation, themeService, typeLoader, promiseUtil, error) {
+], function(localRequire, moduleMetaService, DefaultViewAnnotation, themeService, typeLoader, O, promiseUtil, error) {
 
   /**
    * The `pentaho/visual/util` contains utilities for dealing with visualizations.
@@ -38,78 +39,82 @@ define([
      * {@link pentaho.visual.DefaultViewAnnotation} annotation
      * associated to the visualization's model class.
      *
-     * @param {string} vizTypeId - The visualization identifier.
-     *
-     * @throws {pentaho.lang.ArgumentRequiredError} When `vizTypeId` is not specified.
-     * @throws {pentaho.lang.OperationInvalidError} When the model class of the given visualization is not annotated
-     *   with {@link pentaho.visual.DefaultViewAnnotation}.
-     *
-     * @return {pentaho.module.IMeta} The module of the default view.
-     *
-     * @see pentaho.visual.util.getModelAndDefaultViewModules
-     */
-    getDefaultViewModule: function(vizTypeId) {
-      return this.getModelAndDefaultViewModules(vizTypeId).view;
-    },
-
-    /**
-     * Gets the modules of the model class and of the default view class of a visualization,
-     * given its identifier.
-     *
-     * The default view class is determined by the
-     * {@link pentaho.visual.DefaultViewAnnotation} annotation
-     * associated to the visualization's model class.
+     * This method is only reliable to determine the default view module if the
+     * {@link pentaho.visual.DefaultViewAnnotation} annotation can be got synchronously.
+     * This will be the case if the visualization type module has already been loaded (or prepared)
+     * or if the annotation has already been read asynchronously at least once.
      *
      * @param {string} vizTypeId - The visualization identifier.
+     * @param {object} [keyArgs] - The keyword arguments object.
+     * @param {boolean} [keyArgs.assertResult=true] - Indicates that an error should be thrown
+     *  if a default view is not defined or cannot be obtained synchronously for the given visualization.
+     *
+     * @param {boolean} [keyArgs.inherit=false] - Indicates that the {@link pentaho.visual.DefaultViewAnnotation}
+     * annotation can be obtained from an ancestor visualization type.
      *
      * @throws {pentaho.lang.ArgumentRequiredError} When `vizTypeId` is not specified.
-     * @throws {pentaho.lang.OperationInvalidError} When the model class of the given visualization is not annotated
-     *   with {@link pentaho.visual.DefaultViewAnnotation}.
+     * @throws {pentaho.lang.OperationInvalidError} When `keyArgs.assertResult` is true
+     * and a default view is not defined or cannot be obtained synchronously for the given visualization.
      *
-     * @return {({model: pentaho.module.IMeta, view: pentaho.module.IMeta})} An object
-     * containing the modules of the model class and the default view class.
+     * @return {?pentaho.module.IMeta} The module of the default view; `null` if not available.
      */
-    getModelAndDefaultViewModules: function(vizTypeId) {
+    getDefaultViewModule: function(vizTypeId, keyArgs) {
       if(!vizTypeId) {
         throw error.argRequired("vizTypeId");
       }
 
       var modelModule = moduleMetaService.get(vizTypeId, {createIfUndefined: true});
 
-      var viewModule = modelModule.getAnnotation(DefaultViewAnnotation, {assertExists: true}).module;
+      keyArgs = O.assignOwn({assertResult: true}, keyArgs);
 
-      return {model: modelModule, view: viewModule};
+      var defaultAnnotation = modelModule.getAnnotation(DefaultViewAnnotation, keyArgs);
+
+      return defaultAnnotation && defaultAnnotation.module;
     },
 
     /**
      * Gets a promise for the model and default view classes, given a visualization type identifier.
      *
      * @param {string} vizTypeId - The identifier of the visualization type.
-     *
+     * @param {object} [keyArgs] - The keyword arguments object.
+     * @param {boolean} [keyArgs.assertResult=true] - Indicates that the promise should be rejected with an error
+     *  if the specified visualization type is not annotated with a
+     *  {@link pentaho.visual.DefaultViewAnnotation} annotation.
+     * @param {boolean} [keyArgs.inherit=false] - Indicates that the {@link pentaho.visual.DefaultViewAnnotation}
+     * annotation can be obtained from an ancestor visualization type.
      * @return {Promise.<({
      *     Model: Class.<pentaho.visual.Model>,
-     *     View:  Class.<pentaho.visual.IView>,
-     *     viewTypeId: string
+     *     View:  ?Class.<pentaho.visual.IView>,
+     *     viewTypeId: ?string
      *  })>} A promise that resolves to an object containing the model and default view classes,
      *  as well as the identifier of the view class.
      */
-    getModelAndDefaultViewClassesAsync: function(vizTypeId) {
-      var utils = this;
+    getModelAndDefaultViewClassesAsync: function(vizTypeId, keyArgs) {
+
+      if(!vizTypeId) {
+        return Promise.reject(error.argRequired("vizTypeId"));
+      }
 
       return new Promise(function(resolve, reject) {
 
-        var modules = utils.getModelAndDefaultViewModules(vizTypeId);
+        var modelModule = moduleMetaService.get(vizTypeId, {createIfUndefined: true});
+        var modelClassPromise = modelModule.loadAsync();
+
+        keyArgs = O.assignOwn({assertResult: true}, keyArgs);
+
+        var viewInfoPromise = modelModule.getAnnotationAsync(DefaultViewAnnotation, keyArgs)
+          .then(loadDefaultViewInfo);
 
         Promise
-          .all([modules.model.loadAsync(), modules.view.loadAsync()])
-          .then(function(Classes) {
-            var Model = Classes[0];
-            var View = Classes[1];
+          .all([modelClassPromise, viewInfoPromise])
+          .then(function(results) {
+            var Model = results[0];
+            var viewInfo = results[1];
 
             resolve({
               Model: Model,
-              View: View,
-              viewTypeId: modules.view.id
+              View: viewInfo && viewInfo.Class,
+              viewTypeId: viewInfo && viewInfo.id
             });
           }, reject);
       });
@@ -122,17 +127,60 @@ define([
      * associated with either the model or the view classes are applied to it.
      *
      * @param {HTMLElement} domElement - The DOM element.
-     * @param {string} vizTypeId - The identifier of the visualization type.
+     * @param {?string} [vizTypeId] - The identifier of the visualization type.
      * @param {?string} [viewTypeId] - The identifier of the view type.
      *
      * @see pentaho.theme.IService#classifyDomAsModule
      */
-    classifyDomAsContainer: function(domElement, vizTypeId, viewTypeId) {
+    classifyDom: function(domElement, vizTypeId, viewTypeId) {
 
-      themeService.classifyDomAsModule(domElement, vizTypeId);
+      if(vizTypeId) {
+        themeService.classifyDomAsModule(domElement, vizTypeId);
+      }
+
       if(viewTypeId) {
         themeService.classifyDomAsModule(domElement, viewTypeId);
       }
+    },
+
+    /**
+     *
+     * @param {?string} [vizTypeId] - The identifier of the visualization type.
+     * @param {?string} [viewTypeId] - The identifier of the view type.
+     *
+     * @return {string} The Css Classes
+     */
+    getCssClasses: function(vizTypeId, viewTypeId) {
+      var cssClasses = [];
+
+      if(vizTypeId) {
+        cssClasses.push(themeService.getModuleCssClasses(vizTypeId));
+      }
+
+      if(viewTypeId) {
+        cssClasses.push(themeService.getModuleCssClasses(viewTypeId));
+      }
+
+      return cssClasses.join(" ");
     }
   };
+
+  /**
+   * Gets a promise for the view information of a given default view annotation.
+   *
+   * @param {?pentaho.visual.DefaultViewAnnotation} defaultAnnotation - The default view annotation.
+   *
+   * @return {?Promise.<({Class: Class.<pentaho.visual.IView>, id: string})>} A promise for the default view
+   * information, if the annotation is defined; `null`, otherwise.
+   */
+  function loadDefaultViewInfo(defaultAnnotation) {
+    if(defaultAnnotation !== null) {
+      var viewModule = defaultAnnotation.module;
+      return viewModule.loadAsync().then(function(View) {
+        return {Class: View, id: viewModule.id};
+      });
+    }
+
+    return null;
+  }
 });
