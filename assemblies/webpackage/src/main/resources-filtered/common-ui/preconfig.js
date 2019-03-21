@@ -373,7 +373,7 @@ if(!useDebug) {
     "pentaho/visual/role/ExternalProperty",
     "pentaho/visual/ModelAdapter",
     "pentaho/visual/action/WellKnownErrorNames",
-    "pentaho/visual/color/utils",
+    "pentaho/visual/color/util",
     "pentaho/visual/color/palettes/divergentRyb3",
     "pentaho/visual/color/palettes/divergentRyb5",
     "pentaho/visual/color/palettes/divergentRyg3",

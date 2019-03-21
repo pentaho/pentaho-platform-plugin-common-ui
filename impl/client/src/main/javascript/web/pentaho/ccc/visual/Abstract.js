@@ -27,7 +27,7 @@ define([
   "pentaho/data/filter/And",
   "pentaho/data/filter/IsEqual",
   "pentaho/util/object",
-  "pentaho/visual/color/utils",
+  "pentaho/visual/color/util",
   "pentaho/data/TableView",
   "pentaho/util/logger",
   "pentaho/util/spec",
