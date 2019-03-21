@@ -42,7 +42,7 @@ define([
       d3.select(this.domContainer).text("Hello World!");
     }
   })
-  .configure({$type: module.config});
+  .configure();
 });
 ```
 

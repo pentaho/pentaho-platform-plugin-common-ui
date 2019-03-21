@@ -62,7 +62,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.ScaleColorContinuous})
-  .configure({$type: module.config});
+  .configure();
 
   function __isColorInContinuousMode() {
     var mode = this.color.mode;

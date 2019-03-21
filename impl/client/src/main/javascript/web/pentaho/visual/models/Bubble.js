@@ -42,5 +42,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.Bubble})
-  .configure({$type: module.config});
+  .configure();
 });

@@ -30,5 +30,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.Sides})
-  .configure({$type: module.config});
+  .configure();
 });

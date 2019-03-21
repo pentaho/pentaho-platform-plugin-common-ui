@@ -39,5 +39,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.ScaleSizeContinuous})
-  .configure({$type: module.config});
+  .configure();
 });

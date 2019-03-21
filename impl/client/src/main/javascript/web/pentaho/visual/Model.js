@@ -736,7 +736,7 @@ define([
     // endregion
   })
   .localize({$type: bundle.structured.Model})
-  .configure({$type: module.config});
+  .configure();
 
   /**
    * Creates a new changeset which combines two given changesets.

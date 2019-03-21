@@ -38,5 +38,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.ScaleColorDiscrete})
-  .configure({$type: module.config});
+  .configure();
 });

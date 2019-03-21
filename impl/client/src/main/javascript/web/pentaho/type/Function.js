@@ -105,5 +105,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.Function})
-  .configure({$type: module.config});
+  .configure();
 });

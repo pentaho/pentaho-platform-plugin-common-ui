@@ -44,5 +44,5 @@ define([
 
   })
   .localize({$type: bundle.structured.BarNormalizedAbstract})
-  .configure({$type: module.config});
+  .configure();
 });

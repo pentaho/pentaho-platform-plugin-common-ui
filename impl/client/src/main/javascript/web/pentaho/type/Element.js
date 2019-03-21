@@ -383,7 +383,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.Element})
-  .configure({$type: module.config});
+  .configure();
 
   __elemType = Element.type;
 

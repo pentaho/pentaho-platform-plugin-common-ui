@@ -30,5 +30,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.MultiChartOverflow})
-  .configure({$type: module.config});
+  .configure();
 });

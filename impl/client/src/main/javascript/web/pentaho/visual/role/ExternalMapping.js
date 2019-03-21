@@ -107,7 +107,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.ExternalMapping})
-  .configure({$type: module.config});
+  .configure();
 
   return ExternalMapping;
 });

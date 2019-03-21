@@ -89,7 +89,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.Sunburst})
-  .configure({$type: module.config});
+  .configure();
 
   function __hasFieldsSize() {
     return this.size.hasFields;

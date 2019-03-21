@@ -278,7 +278,7 @@ define([
       }
     }
   })
-  .configure({$type: module.config});
+  .configure();
 
   return TupleStrategy;
 

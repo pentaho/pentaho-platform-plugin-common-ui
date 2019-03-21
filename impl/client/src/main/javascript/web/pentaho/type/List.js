@@ -894,7 +894,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.List})
-  .configure({$type: module.config});
+  .configure();
 
   __listType = List.type;
 

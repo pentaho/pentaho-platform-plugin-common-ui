@@ -30,5 +30,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.FontStyle})
-  .configure({$type: module.config});
+  .configure();
 });

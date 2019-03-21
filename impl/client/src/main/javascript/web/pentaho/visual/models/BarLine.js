@@ -85,7 +85,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.BarLine})
-  .configure({$type: module.config});
+  .configure();
 
   function __isRequiredOneMeasure() {
     /* jshint validthis:true*/

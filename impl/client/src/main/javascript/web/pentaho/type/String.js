@@ -45,5 +45,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.String})
-  .configure({$type: module.config});
+  .configure();
 });

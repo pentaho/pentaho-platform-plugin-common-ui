@@ -136,7 +136,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.AbstractMapping})
-  .configure({$type: module.config});
+  .configure();
 
   return AbstractMapping;
 });

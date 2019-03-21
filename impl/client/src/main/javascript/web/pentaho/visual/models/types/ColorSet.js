@@ -30,5 +30,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.ColorSet})
-  .configure({$type: module.config});
+  .configure();
 });

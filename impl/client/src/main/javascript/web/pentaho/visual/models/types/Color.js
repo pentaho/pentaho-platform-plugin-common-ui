@@ -25,5 +25,5 @@ define([
       id: module.id
     }
   })
-  .configure({$type: module.config});
+  .configure();
 });

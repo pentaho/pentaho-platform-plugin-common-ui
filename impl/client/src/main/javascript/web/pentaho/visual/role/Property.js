@@ -561,7 +561,7 @@ define([
       // endregion
     }
   })
-  .configure({$type: module.config});
+  .configure();
 
   return Property;
 

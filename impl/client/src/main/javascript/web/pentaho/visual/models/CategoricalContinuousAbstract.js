@@ -57,5 +57,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.CategoricalContinuousAbstract})
-  .configure({$type: module.config});
+  .configure();
 });

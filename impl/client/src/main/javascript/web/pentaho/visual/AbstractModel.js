@@ -382,7 +382,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.AbstractModel})
-  .configure({$type: module.config});
+  .configure();
 
   return AbstractModel;
 });

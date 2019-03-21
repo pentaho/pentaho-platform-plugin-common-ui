@@ -44,5 +44,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.BarHorizontal})
-  .configure({$type: module.config});
+  .configure();
 });

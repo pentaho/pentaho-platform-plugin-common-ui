@@ -323,7 +323,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.AbstractProperty})
-  .configure({$type: module.config});
+  .configure();
 
   return AbstractProperty;
 });

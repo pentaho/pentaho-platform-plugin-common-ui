@@ -29,5 +29,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.BarNormalized})
-  .configure({$type: module.config});
+  .configure();
 });

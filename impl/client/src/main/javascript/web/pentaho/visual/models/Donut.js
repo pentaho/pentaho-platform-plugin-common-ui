@@ -27,5 +27,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.Donut})
-  .configure({$type: module.config});
+  .configure();
 });

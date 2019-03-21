@@ -53,5 +53,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.CartesianAbstract})
-  .configure({$type: module.config});
+  .configure();
 });

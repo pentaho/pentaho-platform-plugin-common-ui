@@ -54,5 +54,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.MultiCharted})
-  .configure({$type: module.config});
+  .configure();
 });

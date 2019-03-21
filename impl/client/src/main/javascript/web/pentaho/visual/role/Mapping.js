@@ -144,7 +144,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.Mapping})
-  .configure({$type: module.config});
+  .configure();
 
   return Mapping;
 });

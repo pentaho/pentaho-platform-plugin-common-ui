@@ -97,5 +97,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.MetricPointAbstract})
-  .configure({$type: module.config});
+  .configure();
 });

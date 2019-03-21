@@ -205,7 +205,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.Mode})
-  .configure({$type: module.config});
+  .configure();
 
   return VisualRoleMode;
 });

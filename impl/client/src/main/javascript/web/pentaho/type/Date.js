@@ -79,5 +79,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.Date})
-  .configure({$type: module.config});
+  .configure();
 });

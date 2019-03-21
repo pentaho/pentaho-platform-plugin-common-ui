@@ -79,5 +79,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.TypeDescriptor})
-  .configure({$type: module.config});
+  .configure();
 });
