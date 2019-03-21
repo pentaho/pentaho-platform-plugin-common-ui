@@ -340,7 +340,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.adaptation.Strategy})
-  .configure({$type: module.config});
+  .configure();
 
   return Strategy;
 });

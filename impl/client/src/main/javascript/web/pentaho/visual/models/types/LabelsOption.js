@@ -37,5 +37,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.LabelsOption})
-  .configure({$type: module.config});
+  .configure();
 });

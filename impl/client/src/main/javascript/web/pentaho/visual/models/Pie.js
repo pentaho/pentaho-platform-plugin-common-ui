@@ -67,5 +67,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.Pie})
-  .configure({$type: module.config});
+  .configure();
 });

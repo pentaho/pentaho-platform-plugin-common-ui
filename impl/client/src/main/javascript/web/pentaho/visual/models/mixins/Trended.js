@@ -52,7 +52,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.Trended})
-  .configure({$type: module.config});
+  .configure();
 
   function __isApplicableTrend() {
     /* jshint validthis:true */

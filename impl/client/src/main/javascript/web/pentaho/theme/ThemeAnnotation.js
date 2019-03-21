@@ -68,7 +68,7 @@ define([
 
       var mainId = annotSpec && annotSpec.main;
       if(!mainId) {
-        throw new ArgumentRequiredError("main");
+        throw new ArgumentRequiredError("annotSpec.main");
       }
 
       this._main = metaService.get(forModule.resolveId(mainId), createIfUndefinedKeyArgs);

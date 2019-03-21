@@ -147,7 +147,7 @@ define([
 
   })
   .localize({$type: bundle.structured.Abstract})
-  .configure({$type: module.config});
+  .configure();
 
   function __isApplicableLegend() {
     /* jshint validthis:true */

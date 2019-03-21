@@ -47,5 +47,5 @@ define([
 
   })
   .localize({$type: bundle.structured.PointAbstract})
-  .configure({$type: module.config});
+  .configure();
 });

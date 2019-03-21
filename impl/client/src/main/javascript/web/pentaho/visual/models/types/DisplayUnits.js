@@ -46,5 +46,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.DisplayUnits})
-  .configure({$type: module.config});
+  .configure();
 });

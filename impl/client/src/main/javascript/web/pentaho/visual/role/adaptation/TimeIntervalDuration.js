@@ -46,5 +46,5 @@ define([
         "instant"
       ]
     }
-  }).configure({$type: module.config});
+  }).configure();
 });

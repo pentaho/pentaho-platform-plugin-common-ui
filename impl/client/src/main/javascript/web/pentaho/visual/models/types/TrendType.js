@@ -30,5 +30,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.TrendType})
-  .configure({$type: module.config});
+  .configure();
 });

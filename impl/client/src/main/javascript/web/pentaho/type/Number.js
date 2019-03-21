@@ -58,7 +58,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.Number})
-  .configure({$type: module.config});
+  .configure();
 
   function __toNumber(v) {
     v = +v;

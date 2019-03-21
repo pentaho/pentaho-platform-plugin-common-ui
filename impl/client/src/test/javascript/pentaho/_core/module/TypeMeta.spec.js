@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,70 @@ define([
       constructor: function(id) {
         this.id = id;
         this._isValueLoaded = false;
+        this.isPrepared = false;
       },
 
       get isLoaded() {
         return this._isValueLoaded;
+      },
+
+      prepareAsync: function() {
+
+        return this._prepareCoreAsync();
+      },
+
+      _prepareCoreAsync: function() {
+
+        return Promise.resolve().then(function() {
+          this.isPrepared = true;
+        }.bind(this));
+      },
+
+      hasAnnotation: function(annotationId, keyArgs) {
+
+        return this._hasAnnotationCore(annotationId, keyArgs);
+      },
+
+      __hasAnnotationResult: false,
+
+      _hasAnnotationCore: function() {
+        return this.__hasAnnotationResult;
+      },
+
+      getAnnotation: function(annotationId, keyArgs) {
+
+        var annotationResult = this._getAnnotationResult(annotationId, keyArgs);
+        if(annotationResult == null) {
+          return null;
+        }
+
+        if(annotationResult.error !== null) {
+          throw annotationResult.error;
+        }
+
+        return annotationResult.value;
+      },
+
+      __annotationResult: null,
+
+      _getAnnotationResult: function() {
+        return this.__annotationResult;
+      },
+
+      getAnnotationAsync: function(Annotation, keyArgs) {
+        return Promise.resolve(this._getAnnotationCoreAsync(Annotation, Annotation.id, keyArgs));
+      },
+
+      __getAnnotationAsyncResult: null,
+
+      _getAnnotationCoreAsync: function(Annotation, annotationId, keyArgs) {
+        return this.__getAnnotationAsyncResult;
+      },
+
+      __getAnnotationsIdsResult: null,
+
+      getAnnotationsIds: function(keyArgs) {
+        return this.__getAnnotationsIdsResult;
       }
     });
 
@@ -49,9 +109,17 @@ define([
     });
 
     function createCoreMock() {
-      return {
+
+      var core = {
+        configService: jasmine.createSpyObj("configService", [
+          "selectAsync",
+          "getAnnotationsIds",
+          "hasAnnotation"
+        ]),
         ModuleMeta: ModuleMeta
       };
+
+      return core;
     }
 
     function createTypeMetaMock(id) {
@@ -235,6 +303,324 @@ define([
         var meta = new TypeMeta(id, spec, moduleResolver);
 
         expect(meta.isSubtypeOf(otherTypeMeta)).toBe(false);
+      });
+    });
+
+    describe("#prepareAsync()", function() {
+
+      it("should prepare ancestor types", function() {
+
+        var baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        return meta.prepareAsync().then(function() {
+
+          expect(meta.isPrepared).toBe(true);
+          expect(baseTypeMeta.isPrepared).toBe(true);
+        });
+      });
+    });
+
+    describe("#hasAnnotation(annotationId, {inherit})", function() {
+
+      it("should not call ancestor if annotation exists locally", function() {
+
+        var baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        baseTypeMeta._hasAnnotationCore = jasmine.createSpy("hasAnnotationCore");
+        meta.__hasAnnotationResult = true;
+
+        var result = meta.hasAnnotation("foo");
+
+        expect(result).toBe(true);
+        expect(baseTypeMeta._hasAnnotationCore).not.toHaveBeenCalled();
+      });
+
+      it("should not call ancestor if annotation does not exist locally and inherit is false", function() {
+
+        var baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        baseTypeMeta._hasAnnotationCore = jasmine.createSpy("hasAnnotationCore");
+
+        var result = meta.hasAnnotation("foo");
+
+        expect(result).toBe(false);
+        expect(baseTypeMeta._hasAnnotationCore).not.toHaveBeenCalled();
+      });
+
+      it("should call ancestor if annotation does not exist locally and inherit is true", function() {
+
+        var baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        baseTypeMeta.__hasAnnotationResult = true;
+        meta.__hasAnnotationResult = false;
+
+        var result = meta.hasAnnotation("foo", {inherit: true});
+
+        expect(result).toBe(true);
+      });
+
+      it("should not call ancestor if there is no ancestor and annotation does not exist locally " +
+        "and inherit is true", function() {
+
+        var moduleResolver = createModuleResolver(null);
+        var spec = {ancestor: null};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        meta.__hasAnnotationResult = false;
+
+        var result = meta.hasAnnotation("foo", {inherit: true});
+
+        expect(result).toBe(false);
+      });
+    });
+
+    describe("#getAnnotation(annotationId, {inherit})", function() {
+
+      it("should not call ancestor if annotation exists locally", function() {
+
+        var baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        baseTypeMeta._getAnnotationResult = jasmine.createSpy("_getAnnotationResult").and.returnValue(null);
+        meta.__annotationResult = {value: "a", error: null};
+
+        var result = meta.getAnnotation("foo");
+
+        expect(result).toBe("a");
+        expect(baseTypeMeta._getAnnotationResult).not.toHaveBeenCalled();
+      });
+
+      it("should not call ancestor if annotation does not exist locally and inherit is false", function() {
+
+        var baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        baseTypeMeta._getAnnotationResult = jasmine.createSpy("_getAnnotationResult").and.returnValue(null);
+        meta.__annotationResult = null;
+
+        var result = meta.getAnnotation("foo");
+
+        expect(result).toBe(null);
+        expect(baseTypeMeta._getAnnotationResult).not.toHaveBeenCalled();
+      });
+
+      it("should call ancestor if annotation does not exist locally and inherit is true", function() {
+
+        var baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        baseTypeMeta._getAnnotationResult = jasmine.createSpy("_getAnnotationResult")
+          .and.returnValue({value: "a", error: null});
+        meta.__annotationResult = null;
+
+        var result = meta.getAnnotation("foo", {inherit: true});
+
+        expect(result).toBe("a");
+        expect(baseTypeMeta._getAnnotationResult).toHaveBeenCalled();
+      });
+    });
+
+    describe("#getAnnotationAsync(annotationId, {inherit})", function() {
+
+      it("should not call ancestor if annotation exists locally", function() {
+
+        var baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+        var annotation = {};
+
+        baseTypeMeta._getAnnotationCoreAsync = jasmine.createSpy("_getAnnotationCoreAsync").and.returnValue(null);
+        meta.__getAnnotationAsyncResult = Promise.resolve(annotation);
+
+        var Annotation = {id: "foo"};
+
+        return meta.getAnnotationAsync(Annotation).then(function(result) {
+          expect(result).toBe(annotation);
+          expect(baseTypeMeta._getAnnotationCoreAsync).not.toHaveBeenCalled();
+        });
+      });
+
+      it("should not call ancestor if annotation does not exist locally and inherit is false", function() {
+
+        var baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        baseTypeMeta._getAnnotationCoreAsync = jasmine.createSpy("_getAnnotationCoreAsync").and.returnValue(null);
+        meta.__getAnnotationAsyncResult = null;
+
+        var Annotation = {id: "foo"};
+
+        return meta.getAnnotationAsync(Annotation).then(function(result) {
+          expect(result).toBe(null);
+          expect(baseTypeMeta._getAnnotationCoreAsync).not.toHaveBeenCalled();
+        });
+      });
+
+      it("should call ancestor if annotation does not exist locally and inherit is true", function() {
+
+        var baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+        var annotation = {};
+
+        baseTypeMeta._getAnnotationCoreAsync = jasmine.createSpy("_getAnnotationCoreAsync")
+          .and.returnValue(Promise.resolve(annotation));
+
+        meta.__getAnnotationAsyncResult = null;
+
+        var Annotation = {id: "foo"};
+
+        return meta.getAnnotationAsync(Annotation, {inherit: true}).then(function(result) {
+          expect(result).toBe(annotation);
+          expect(baseTypeMeta._getAnnotationCoreAsync).toHaveBeenCalled();
+        });
+      });
+    });
+
+    describe("#getAnnotationsIds({inherit})", function() {
+
+      it("should not call ancestor if inherit is false and there are no local annotations", function() {
+
+        var baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        baseTypeMeta.getAnnotationsIds = jasmine.createSpy("getAnnotationsIds").and.returnValue(null);
+        meta.__getAnnotationsIdsResult = null;
+
+        var result = meta.getAnnotationsIds();
+        expect(result).toBe(null);
+        expect(baseTypeMeta.getAnnotationsIds).not.toHaveBeenCalled();
+      });
+
+      it("should not call ancestor if inherit is false and there are local annotations", function() {
+
+        var baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        baseTypeMeta.getAnnotationsIds = jasmine.createSpy("getAnnotationsIds").and.returnValue(null);
+        meta.__getAnnotationsIdsResult = ["a"];
+
+        var result = meta.getAnnotationsIds();
+        expect(result).toEqual(["a"]);
+        expect(baseTypeMeta.getAnnotationsIds).not.toHaveBeenCalled();
+      });
+
+      it("should call ancestor if inherit is true", function() {
+
+        var baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        baseTypeMeta.getAnnotationsIds = jasmine.createSpy("getAnnotationsIds").and.returnValue(null);
+        meta.__getAnnotationsIdsResult = null;
+
+        var result = meta.getAnnotationsIds({inherit: true});
+        expect(result).toEqual(null);
+        expect(baseTypeMeta.getAnnotationsIds).toHaveBeenCalled();
+      });
+
+      it("should call ancestor if inherit is true and there are local annotations but not inherited", function() {
+
+        var baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        baseTypeMeta.getAnnotationsIds = jasmine.createSpy("getAnnotationsIds").and.returnValue(null);
+        meta.__getAnnotationsIdsResult = ["a"];
+
+        var result = meta.getAnnotationsIds({inherit: true});
+        expect(result).toEqual(["a"]);
+        expect(baseTypeMeta.getAnnotationsIds).toHaveBeenCalled();
+      });
+
+      it("should call ancestor if inherit is true and there are no local annotations but inherited yes", function() {
+
+        var baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        baseTypeMeta.getAnnotationsIds = jasmine.createSpy("getAnnotationsIds").and.returnValue(["b"]);
+        meta.__getAnnotationsIdsResult = null;
+
+        var result = meta.getAnnotationsIds({inherit: true});
+        expect(result).toEqual(["b"]);
+        expect(baseTypeMeta.getAnnotationsIds).toHaveBeenCalled();
+      });
+
+      it("should call ancestor if inherit is true and there are local and inherited annotations", function() {
+
+        var baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        baseTypeMeta.getAnnotationsIds = jasmine.createSpy("getAnnotationsIds").and.returnValue(["b"]);
+        meta.__getAnnotationsIdsResult = ["a"];
+
+        var result = meta.getAnnotationsIds({inherit: true});
+        expect(result).toEqual(["a", "b"]);
+        expect(baseTypeMeta.getAnnotationsIds).toHaveBeenCalled();
+      });
+
+      it("should remove duplicate inherited values", function() {
+
+        var baseTypeMeta = new TypeMeta(baseTypeId, {}, createModuleResolver(null));
+        moduleResolver = createModuleResolver(baseTypeMeta);
+
+        var spec = {ancestor: baseTypeId};
+        var meta = new TypeMeta(id, spec, moduleResolver);
+
+        baseTypeMeta.getAnnotationsIds = jasmine.createSpy("getAnnotationsIds").and.returnValue(["b", "a"]);
+        meta.__getAnnotationsIdsResult = ["a"];
+
+        var result = meta.getAnnotationsIds({inherit: true});
+        expect(result).toEqual(["a", "b"]);
+        expect(baseTypeMeta.getAnnotationsIds).toHaveBeenCalled();
       });
     });
   });

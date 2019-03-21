@@ -245,7 +245,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.Property})
-  .configure({$type: module.config});
+  .configure();
 
   return PaletteProperty;
 });

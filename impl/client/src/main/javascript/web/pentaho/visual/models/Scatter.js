@@ -27,5 +27,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.Scatter})
-  .configure({$type: module.config});
+  .configure();
 });

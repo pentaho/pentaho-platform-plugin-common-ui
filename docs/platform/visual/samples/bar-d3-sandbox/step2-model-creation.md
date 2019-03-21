@@ -81,7 +81,7 @@ define([
       ]
     }
   })
-  .configure({$type: module.config});
+  .configure();
 });
 ```
 

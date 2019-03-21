@@ -29,5 +29,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.AreaStacked})
-  .configure({$type: module.config});
+  .configure();
 });

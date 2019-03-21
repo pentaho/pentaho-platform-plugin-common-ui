@@ -43,7 +43,7 @@ define([
   "pentaho/visual/impl/View",
   "pentaho/visual/ModelAdapter",
   "pentaho/visual/action/WellKnownErrorNames",
-  "pentaho/visual/color/utils",
+  "pentaho/visual/color/util",
   "pentaho/visual/color/palettes/all",
   "pentaho/visual/models/all",
   "pentaho/visual/role/adaptation/allStrategies",

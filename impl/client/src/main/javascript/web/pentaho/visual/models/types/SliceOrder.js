@@ -30,5 +30,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.SliceOrder})
-  .configure({$type: module.config});
+  .configure();
 });

@@ -1551,7 +1551,7 @@ define([
       mixins: [DiscreteDomain]
     }
   })
-  .configure({$type: module.config});
+  .configure();
 
   __propType = Property.type;
 

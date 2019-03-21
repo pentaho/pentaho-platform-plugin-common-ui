@@ -1152,7 +1152,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.Complex})
-  .configure({$type: module.config});
+  .configure();
 
   return Complex;
 

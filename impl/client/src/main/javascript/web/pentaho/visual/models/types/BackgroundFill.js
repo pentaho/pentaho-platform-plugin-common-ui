@@ -31,5 +31,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.BackgroundFill})
-  .configure({$type: module.config});
+  .configure();
 });

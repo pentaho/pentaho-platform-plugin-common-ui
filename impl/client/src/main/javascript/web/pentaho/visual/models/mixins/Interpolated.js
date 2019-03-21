@@ -39,5 +39,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.Interpolation})
-  .configure({$type: module.config});
+  .configure();
 });

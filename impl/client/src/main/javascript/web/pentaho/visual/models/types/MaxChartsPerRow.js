@@ -30,5 +30,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.MaxChartsPerRow})
-  .configure({$type: module.config});
+  .configure();
 });

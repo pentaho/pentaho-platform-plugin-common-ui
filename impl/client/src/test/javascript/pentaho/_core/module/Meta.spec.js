@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,11 +56,23 @@ define([
     function createCoreMock() {
 
       var core = {
-        configService: jasmine.createSpyObj("configService", ["selectAsync", "getAnnotationsIds"])
+        configService: jasmine.createSpyObj("configService", [
+          "selectAsync",
+          "getAnnotationsIds",
+          "addRule",
+          "hasAnnotation"
+        ]),
+        moduleMetaService: jasmine.createSpyObj("moduleMetaService", [
+          "get"
+        ])
       };
 
       core.configService.selectAsync.and.returnValue(Promise.resolve(null));
       core.configService.getAnnotationsIds.and.returnValue(null);
+      core.configService.hasAnnotation.and.returnValue(false);
+
+      core.moduleMetaService.get.and.returnValue(null);
+
       return core;
     }
 
@@ -82,12 +94,14 @@ define([
     describe("new Meta(id, spec)", function() {
 
       var Meta;
+      var core;
 
       beforeEach(function() {
         return localRequire.promise(["pentaho/_core/module/Meta"])
           .then(function(deps) {
             var metaFactory = deps[0];
-            Meta = metaFactory(createCoreMock());
+            core = createCoreMock();
+            Meta = metaFactory(core);
           });
       });
 
@@ -247,7 +261,37 @@ define([
         });
       });
 
-      
+      describe("spec.annotations", function() {
+
+        it("should register one rule per annotation", function() {
+          var spec = {
+            annotations: {
+              "FooAnnotation": {foo: "a"},
+              "BarAnnotation": {bar: "b"}
+            }
+          };
+
+          var meta = new Meta(id, spec);
+
+          expect(core.configService.addRule).toHaveBeenCalledTimes(2);
+          expect(core.configService.addRule.calls.argsFor(0)).toEqual([{
+            priority: -Infinity,
+            select: {
+              module: id,
+              annotation: "FooAnnotation"
+            },
+            apply: {foo: "a"}
+          }]);
+          expect(core.configService.addRule.calls.argsFor(1)).toEqual([{
+            priority: -Infinity,
+            select: {
+              module: id,
+              annotation: "BarAnnotation"
+            },
+            apply: {bar: "b"}
+          }]);
+        });
+      });
     });
 
     describe("#loadAsync()", function() {
@@ -481,22 +525,22 @@ define([
 
     describe("#prepareAsync()", function() {
 
-      var config;
+      var Annotation;
       var core;
       var meta;
 
       beforeEach(function() {
-        config = {};
-
         core = createCoreMock();
-        core.configService.selectAsync.and.returnValue(Promise.resolve(config));
 
-        return localRequire.promise(["pentaho/_core/module/Meta"])
+        return localRequire.promise(["pentaho/_core/module/Meta", "pentaho/module/Annotation"])
           .then(function(deps) {
             var metaFactory = deps[0];
             var Meta = metaFactory(core);
 
+            Annotation = deps[1];
+
             var spec = {};
+
             meta = new Meta(id, spec);
           });
       });
@@ -535,10 +579,13 @@ define([
       });
 
       it("should load the configuration and make it available in #config", function() {
+        var moduleConfig = {};
+
+        core.configService.selectAsync.and.returnValue(Promise.resolve(moduleConfig));
 
         return meta.prepareAsync()
           .then(function() {
-            expect(meta.config).toBe(config);
+            expect(meta.config).toBe(moduleConfig);
           });
       });
 
@@ -564,17 +611,120 @@ define([
               });
           });
       });
+
+      it("should create all annotations", function() {
+        var moduleConfig = {};
+        var annotationAConfig = {};
+        var annotationBConfig = {};
+
+        core.configService.getAnnotationsIds.and.returnValue([
+          "test/AnnotationA", "test/AnnotationB"
+        ]);
+        core.configService.hasAnnotation.and.returnValue(true);
+        core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+          if(annotationId == null) {
+            return Promise.resolve(moduleConfig);
+          }
+
+          switch(annotationId) {
+            case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+            case "test/AnnotationB": return Promise.resolve(annotationBConfig);
+            default: return null;
+          }
+        });
+
+        var AnnotationA = Annotation.extend({}, {
+          get id() {
+            return "test/AnnotationA";
+          }
+        });
+        var AnnotationB = Annotation.extend({}, {
+          get id() {
+            return "test/AnnotationB";
+          }
+        });
+
+        core.moduleMetaService.get.and.callFake(function(id) {
+          switch(id) {
+            case "test/AnnotationA": return {
+              loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+            };
+            case "test/AnnotationB": return {
+              loadAsync: jasmine.createSpy("AnnotationB.loadAsync").and.returnValue(Promise.resolve(AnnotationB))
+            };
+            default: return null;
+          }
+        });
+
+        return meta.prepareAsync()
+          .then(function() {
+            expect(core.configService.selectAsync).toHaveBeenCalledTimes(3);
+            expect(core.configService.selectAsync).toHaveBeenCalledWith(id);
+            expect(core.configService.selectAsync).toHaveBeenCalledWith(id, "test/AnnotationA");
+            expect(core.configService.selectAsync).toHaveBeenCalledWith(id, "test/AnnotationB");
+          });
+      });
+
+      it("should return a rejected promise if creating an annotation fails", function() {
+        var moduleConfig = {};
+        var annotationAConfig = {};
+
+        core.configService.getAnnotationsIds.and.returnValue([
+          "test/AnnotationA"
+        ]);
+        core.configService.hasAnnotation.and.returnValue(true);
+        core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+          if(annotationId == null) {
+            return Promise.resolve(moduleConfig);
+          }
+
+          switch(annotationId) {
+            case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+            default: return null;
+          }
+        });
+
+        var error = new Error("Annotation creation failed.");
+
+        var AnnotationA = Annotation.extend({}, {
+          get id() {
+            return "test/AnnotationA";
+          },
+
+          createAsync: function() {
+            return Promise.reject(error);
+          }
+        });
+
+        core.moduleMetaService.get.and.callFake(function(id) {
+          switch(id) {
+            case "test/AnnotationA": return {
+              loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+            };
+            default: return null;
+          }
+        });
+
+        return meta.prepareAsync()
+          .then(function() {
+            return Promise.reject("Rejection expected.");
+          }, function(reason) {
+            expect(reason).toBe(error);
+          });
+      });
     });
 
     describe("#__configure(configSpec)", function() {
 
       var Meta;
+      var core;
 
       beforeEach(function() {
         return localRequire.promise(["pentaho/_core/module/Meta"])
           .then(function(deps) {
             var metaFactory = deps[0];
-            Meta = metaFactory(createCoreMock());
+            core = createCoreMock();
+            Meta = metaFactory(core);
           });
       });
 
@@ -616,6 +766,37 @@ define([
         meta.__configure(configSpec);
 
         expect(meta.ranking).toBe(2);
+      });
+
+      it("should register one rule per annotation in `configSpec.annotations`", function() {
+        var configSpec = {
+          annotations: {
+            "FooAnnotation": {foo: "a"},
+            "BarAnnotation": {bar: "b"}
+          }
+        };
+
+        var meta = new Meta(id, {});
+
+        meta.__configure(configSpec);
+
+        expect(core.configService.addRule).toHaveBeenCalledTimes(2);
+        expect(core.configService.addRule.calls.argsFor(0)).toEqual([{
+          priority: -Infinity,
+          select: {
+            module: id,
+            annotation: "FooAnnotation"
+          },
+          apply: {foo: "a"}
+        }]);
+        expect(core.configService.addRule.calls.argsFor(1)).toEqual([{
+          priority: -Infinity,
+          select: {
+            module: id,
+            annotation: "BarAnnotation"
+          },
+          apply: {bar: "b"}
+        }]);
       });
     });
 
@@ -726,6 +907,1352 @@ define([
         var meta2 = new Meta(id2, spec);
 
         expect(meta.isInstanceOf(meta2)).toBe(false);
+      });
+    });
+
+    describe("#getAnnotationAsync(Annotation, {assertResult})", function() {
+
+      var Annotation;
+      var AnnotationA;
+      var core;
+      var Meta;
+      var errorMatch;
+
+      beforeEach(function() {
+
+        core = createCoreMock();
+
+        return localRequire.promise([
+          "pentaho/_core/module/Meta",
+          "pentaho/module/Annotation",
+          "tests/pentaho/util/errorMatch"
+        ])
+        .then(function(deps) {
+          var metaFactory = deps[0];
+          Meta = metaFactory(core);
+
+          Annotation = deps[1];
+          errorMatch = deps[2];
+
+          AnnotationA = Annotation.extend({}, {
+            get id() {
+              return "test/AnnotationA";
+            }
+          });
+        });
+      });
+
+      it("should return a rejected promise if Annotation is null", function() {
+
+        var meta = new Meta(id, {});
+
+        return meta.getAnnotationAsync(null).then(function() {
+          return Promise.reject("Expected rejection.");
+        }, function(error) {
+          expect(error).toEqual(errorMatch.argRequired("Annotation"));
+        });
+      });
+
+      describe("when module is not yet prepared", function() {
+
+        describe("when given a string identifier", function() {
+
+          it("should return a rejected promise when the identifier is not of a defined annotation", function() {
+
+            var error = new Error("Does not exist.");
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync")
+                    .and.returnValue(Promise.reject(error))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            return meta.getAnnotationAsync("test/AnnotationA").then(function(annotation) {
+              return Promise.reject("Rejection expected.");
+            }, function(reason) {
+              expect(reason).toBe(error);
+            });
+          });
+
+          it("should return a promise that resolves to null " +
+            "when the identifier is of a non-existing annotation", function() {
+
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            return meta.getAnnotationAsync("test/AnnotationA").then(function(annotation) {
+              expect(annotation).toBe(null);
+            });
+          });
+
+          it("should return a rejected promise when the identifier is of a non-existing annotation and" +
+            "assertResult is true", function() {
+
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            return meta.getAnnotationAsync("test/AnnotationA", {assertResult: true})
+              .then(function() {
+                return Promise.reject("Rejection expected.");
+              }, function(error) {
+                expect(error).toEqual(errorMatch.operInvalid());
+              });
+          });
+
+          it("should return a promise that resolves to the requested annotation, " +
+            "when the identifier is of an existing annotation", function() {
+
+            var annotationAConfig = {};
+
+            core.configService.getAnnotationsIds.and.returnValue([
+              "test/AnnotationA"
+            ]);
+            core.configService.hasAnnotation.and.returnValue(true);
+            core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+              switch(annotationId) {
+                case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+                default: return null;
+              }
+            });
+
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            return meta.getAnnotationAsync("test/AnnotationA").then(function(annotation) {
+              expect(annotation instanceof AnnotationA).toBe(true);
+            });
+          });
+
+          it("should return a promise that resolves to the requested annotation, " +
+            "when the annotation had been requested before", function() {
+
+            var annotationAConfig = {};
+
+            core.configService.getAnnotationsIds.and.returnValue([
+              "test/AnnotationA"
+            ]);
+            core.configService.hasAnnotation.and.returnValue(true);
+            core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+              switch(annotationId) {
+                case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+                default: return null;
+              }
+            });
+
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            return meta.getAnnotationAsync("test/AnnotationA").then(function(annotation) {
+              expect(annotation instanceof AnnotationA).toBe(true);
+
+              return meta.getAnnotationAsync("test/AnnotationA").then(function(annotation2) {
+                expect(annotation).toBe(annotation2);
+              });
+            });
+          });
+        });
+
+        describe("when given an annotation constructor", function() {
+
+          it("should return a rejected promise if the function has no id", function() {
+
+            var meta = new Meta(id, {});
+            var NotAnAnnotation = function() {};
+
+            return meta.getAnnotationAsync(NotAnAnnotation).then(function() {
+              return Promise.reject("Expected rejection.");
+            }, function(error) {
+              expect(error).toEqual(errorMatch.argRequired("Annotation.id"));
+            });
+          });
+
+          it("should return a promise that resolves to null " +
+            "when the module is not annotated with that annotation", function() {
+
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            return meta.getAnnotationAsync(AnnotationA).then(function(annotation) {
+              expect(annotation).toBe(null);
+            });
+          });
+
+          it("should return a rejected promise when the module is not annotated with that annotation and " +
+            "assertResult is true", function() {
+
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            return meta.getAnnotationAsync(AnnotationA, {assertResult: true})
+              .then(function() {
+                return Promise.reject("Rejection expected.");
+              }, function(error) {
+                expect(error).toEqual(errorMatch.operInvalid());
+              });
+          });
+
+          it("should return a promise that resolves to the requested annotation, " +
+            "when the module is annotated with that annotation", function() {
+
+            var annotationAConfig = {};
+
+            core.configService.getAnnotationsIds.and.returnValue([
+              "test/AnnotationA"
+            ]);
+            core.configService.hasAnnotation.and.returnValue(true);
+            core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+              switch(annotationId) {
+                case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+                default: return null;
+              }
+            });
+
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            return meta.getAnnotationAsync(AnnotationA).then(function(annotation) {
+              expect(annotation instanceof AnnotationA).toBe(true);
+            });
+          });
+
+          it("should return a promise that resolves to the requested annotation, " +
+            "when the annotation had been requested before", function() {
+
+            var annotationAConfig = {};
+
+            core.configService.getAnnotationsIds.and.returnValue([
+              "test/AnnotationA"
+            ]);
+            core.configService.hasAnnotation.and.returnValue(true);
+            core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+              switch(annotationId) {
+                case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+                default: return null;
+              }
+            });
+
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            return meta.getAnnotationAsync(AnnotationA).then(function(annotation) {
+              expect(annotation instanceof AnnotationA).toBe(true);
+
+              return meta.getAnnotationAsync(AnnotationA).then(function(annotation2) {
+                expect(annotation).toBe(annotation2);
+              });
+            });
+          });
+
+          it("should return a rejected promise when creating the requested annotation fails", function() {
+            var error = new Error("Annotation failed createAsync");
+            var annotationAConfig = {};
+
+            core.configService.getAnnotationsIds.and.returnValue([
+              "test/AnnotationA"
+            ]);
+            core.configService.hasAnnotation.and.returnValue(true);
+            core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+              switch(annotationId) {
+                case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+                default: return null;
+              }
+            });
+
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            AnnotationA.createAsync = function() {
+              return Promise.reject(error);
+            };
+
+            return meta.getAnnotationAsync(AnnotationA).then(function() {
+              return Promise.reject("Rejection expected.");
+            }, function(reason) {
+              expect(reason).toBe(error);
+            });
+          });
+
+          it("should return a rejected promise with the same error by " +
+            "which the annotation creating previously failed", function() {
+            var error = new Error("Annotation failed createAsync");
+            var annotationAConfig = {};
+
+            core.configService.getAnnotationsIds.and.returnValue([
+              "test/AnnotationA"
+            ]);
+            core.configService.hasAnnotation.and.returnValue(true);
+            core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+              switch(annotationId) {
+                case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+                default: return null;
+              }
+            });
+
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            AnnotationA.createAsync = function() {
+              return Promise.reject(error);
+            };
+
+            return meta.getAnnotationAsync(AnnotationA).then(function() {
+              return Promise.reject("Rejection expected.");
+            }, function(reason) {
+
+              expect(reason).toBe(error);
+
+              return meta.getAnnotationAsync(AnnotationA).then(function() {
+                return Promise.reject("Rejection expected.");
+              }, function(reason2) {
+                expect(reason).toBe(reason2);
+              });
+            });
+          });
+        });
+      });
+
+      describe("when module is prepared", function() {
+
+        it("should return a promise that resolves to the requested annotation, " +
+          "when the module is annotated with that annotation", function() {
+
+          var moduleConfig = {};
+          var annotationAConfig = {};
+
+          core.configService.getAnnotationsIds.and.returnValue([
+            "test/AnnotationA"
+          ]);
+          core.configService.hasAnnotation.and.returnValue(true);
+          core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+
+            if(annotationId == null) {
+              return Promise.resolve(moduleConfig);
+            }
+
+            switch(annotationId) {
+              case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+              default: return null;
+            }
+          });
+
+          core.moduleMetaService.get.and.callFake(function(id) {
+            switch(id) {
+              case "test/AnnotationA": return {
+                loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+              };
+              default: return null;
+            }
+          });
+
+          var meta = new Meta(id, {});
+
+          return meta.prepareAsync().then(function() {
+
+            return meta.getAnnotationAsync(AnnotationA).then(function(annotation) {
+              expect(annotation instanceof AnnotationA).toBe(true);
+            });
+          });
+        });
+
+        it("should return a rejected promise when requesting an annotation whose creation had failed", function() {
+          var error = new Error("Annotation failed createAsync");
+          var moduleConfig = {};
+          var annotationAConfig = {};
+
+          core.configService.getAnnotationsIds.and.returnValue([
+            "test/AnnotationA"
+          ]);
+          core.configService.hasAnnotation.and.returnValue(true);
+          core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+
+            if(annotationId == null) {
+              return Promise.resolve(moduleConfig);
+            }
+
+            switch(annotationId) {
+              case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+              default: return null;
+            }
+          });
+
+          core.moduleMetaService.get.and.callFake(function(id) {
+            switch(id) {
+              case "test/AnnotationA": return {
+                loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+              };
+              default: return null;
+            }
+          });
+
+          var meta = new Meta(id, {});
+
+          AnnotationA.createAsync = function() {
+            return Promise.reject(error);
+          };
+
+          return meta.prepareAsync().then(function() {
+
+            return Promise.reject("Rejection expected.");
+          }, function() {
+
+            return meta.getAnnotationAsync(AnnotationA).then(function() {
+
+              return Promise.reject("Rejection expected.");
+            }, function(reason) {
+              expect(reason).toBe(error);
+            });
+          });
+        });
+      });
+    });
+
+    describe("#getAnnotation(Annotation, {assertResult})", function() {
+
+      var Annotation;
+      var AnnotationA;
+      var core;
+      var Meta;
+      var errorMatch;
+
+      beforeEach(function() {
+
+        core = createCoreMock();
+
+        return localRequire.promise([
+          "pentaho/_core/module/Meta",
+          "pentaho/module/Annotation",
+          "tests/pentaho/util/errorMatch"
+        ])
+          .then(function(deps) {
+            var metaFactory = deps[0];
+            Meta = metaFactory(core);
+
+            Annotation = deps[1];
+            errorMatch = deps[2];
+
+            AnnotationA = Annotation.extend({}, {
+              get id() {
+                return "test/AnnotationA";
+              }
+            });
+          });
+      });
+
+      it("should throw if Annotation is null", function() {
+
+        var meta = new Meta(id, {});
+
+        expect(function() {
+          meta.getAnnotation(null);
+        }).toThrow(errorMatch.argRequired("Annotation"));
+      });
+
+      describe("when module is not yet prepared", function() {
+
+        describe("when given a string identifier", function() {
+
+          it("should return null when the identifier is of a non-existing annotation", function() {
+
+            core.configService.hasAnnotation.and.returnValue(false);
+
+            var meta = new Meta(id, {});
+
+            var annotation = meta.getAnnotation("test/AnnotationA");
+
+            expect(annotation).toBe(null);
+          });
+
+          it("should throw when the identifier is of a non-existing annotation and assertResult is true", function() {
+
+            core.configService.hasAnnotation.and.returnValue(false);
+
+            var meta = new Meta(id, {});
+
+            expect(function() {
+              meta.getAnnotation("test/AnnotationA", {assertResult: true});
+            }).toThrow(errorMatch.operInvalid());
+          });
+
+          it("should return null when the identifier is of an existing annotation " +
+            "which has not yet been loaded", function() {
+
+            core.configService.hasAnnotation.and.returnValue(true);
+
+            var meta = new Meta(id, {});
+
+            var annotation = meta.getAnnotation("test/AnnotationA");
+
+            expect(annotation).toBe(null);
+          });
+
+          it("should throw when the identifier is of an existing annotation which has not yet been loaded " +
+            "and assertResult is true", function() {
+
+            core.configService.hasAnnotation.and.returnValue(true);
+
+            var meta = new Meta(id, {});
+
+            expect(function() {
+              meta.getAnnotation("test/AnnotationA", {assertResult: true});
+            }).toThrow(errorMatch.operInvalid());
+          });
+
+          it("should return the requested annotation, if it exists and had been previously obtained", function() {
+
+            var annotationAConfig = {};
+
+            core.configService.getAnnotationsIds.and.returnValue([
+              "test/AnnotationA"
+            ]);
+            core.configService.hasAnnotation.and.returnValue(true);
+            core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+              switch(annotationId) {
+                case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+                default: return null;
+              }
+            });
+
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            return meta.getAnnotationAsync("test/AnnotationA").then(function(annotation) {
+
+              var annotationA = meta.getAnnotation("test/AnnotationA");
+
+              expect(annotationA instanceof AnnotationA).toBe(true);
+              expect(annotationA).toBe(annotation);
+            });
+          });
+        });
+
+        describe("when given an annotation constructor", function() {
+
+          it("should throw an error if the function has no id", function() {
+
+            var meta = new Meta(id, {});
+            var NotAnAnnotation = function() {};
+
+            expect(function() {
+              meta.getAnnotation(NotAnAnnotation);
+            }).toThrow(errorMatch.argRequired("Annotation.id"));
+          });
+
+          it("should return null when the module is not annotated with that annotation", function() {
+
+            core.configService.hasAnnotation.and.returnValue(false);
+
+            var meta = new Meta(id, {});
+
+            var annotation = meta.getAnnotation(AnnotationA);
+            expect(annotation).toBe(null);
+          });
+
+          it("should throw when the module is not annotated with the requested annotation " +
+            "and assertResult is true", function() {
+
+            core.configService.hasAnnotation.and.returnValue(false);
+
+            var meta = new Meta(id, {});
+
+            expect(function() {
+              meta.getAnnotation(AnnotationA, {assertResult: true});
+            }).toThrow(errorMatch.operInvalid());
+          });
+
+          it("should return the requested annotation, if it exists and had been previously obtained", function() {
+
+            var annotationAConfig = {};
+
+            core.configService.getAnnotationsIds.and.returnValue([
+              "test/AnnotationA"
+            ]);
+            core.configService.hasAnnotation.and.returnValue(true);
+            core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+              switch(annotationId) {
+                case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+                default: return null;
+              }
+            });
+
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            return meta.getAnnotationAsync(AnnotationA).then(function(annotation) {
+
+              var annotationA = meta.getAnnotation(AnnotationA);
+
+              expect(annotationA instanceof AnnotationA).toBe(true);
+              expect(annotationA).toBe(annotation);
+            });
+          });
+
+          it("should throw when the module is annotated with the requested annotation but has not yet been loaded " +
+            "and assertResult is true", function() {
+
+            core.configService.hasAnnotation.and.returnValue(true);
+
+            var meta = new Meta(id, {});
+
+            expect(function() {
+              meta.getAnnotation(AnnotationA, {assertResult: true});
+            }).toThrow(errorMatch.operInvalid());
+          });
+
+          it("should throw when creating the requested annotation had previously failed", function() {
+            var error = new Error("Annotation failed createAsync");
+            var annotationAConfig = {};
+
+            core.configService.getAnnotationsIds.and.returnValue([
+              "test/AnnotationA"
+            ]);
+            core.configService.hasAnnotation.and.returnValue(true);
+            core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+              switch(annotationId) {
+                case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+                default: return null;
+              }
+            });
+
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            AnnotationA.createAsync = function() {
+              return Promise.reject(error);
+            };
+
+            return meta.getAnnotationAsync(AnnotationA).then(function() {
+
+              return Promise.reject("Rejection expected.");
+            }, function(reason) {
+
+              expect(function() {
+                meta.getAnnotation(AnnotationA);
+              }).toThrow(error);
+            });
+          });
+
+          it("should return null if the annotation exists and is still loading", function() {
+
+            var annotationAConfig = {};
+
+            core.configService.getAnnotationsIds.and.returnValue([
+              "test/AnnotationA"
+            ]);
+            core.configService.hasAnnotation.and.returnValue(true);
+            core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+              switch(annotationId) {
+                case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+                default: return null;
+              }
+            });
+
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            var promise = meta.getAnnotationAsync(AnnotationA);
+
+            var annotationA = meta.getAnnotation(AnnotationA);
+
+            expect(annotationA).toBe(null);
+
+            return promise;
+          });
+
+          it("should throw when if the annotation exists and is still loading but assertResult is true", function() {
+
+            var annotationAConfig = {};
+
+            core.configService.getAnnotationsIds.and.returnValue([
+              "test/AnnotationA"
+            ]);
+            core.configService.hasAnnotation.and.returnValue(true);
+            core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+              switch(annotationId) {
+                case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+                default: return null;
+              }
+            });
+
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            var promise = meta.getAnnotationAsync(AnnotationA);
+
+            expect(function() {
+              meta.getAnnotation(AnnotationA, {assertResult: true});
+            }).toThrow(errorMatch.operInvalid());
+
+            return promise;
+          });
+        });
+      });
+
+      describe("when module is prepared", function() {
+
+        it("should return null when the module is not annotated with that annotation", function() {
+
+          core.configService.hasAnnotation.and.returnValue(false);
+
+          var meta = new Meta(id, {});
+
+          return meta.prepareAsync().then(function() {
+
+            var annotation = meta.getAnnotation(AnnotationA);
+
+            expect(annotation).toBe(null);
+          });
+        });
+
+        it("should throw when the module is not annotated with the requested annotation " +
+          "and assertResult is true", function() {
+
+          core.configService.hasAnnotation.and.returnValue(false);
+
+          var meta = new Meta(id, {});
+
+          return meta.prepareAsync().then(function() {
+
+            expect(function() {
+              meta.getAnnotation(AnnotationA, {assertResult: true});
+            })
+            .toThrow(errorMatch.operInvalid());
+          });
+        });
+
+        it("should return the requested annotation, if it exists", function() {
+
+          var moduleConfig = {};
+          var annotationAConfig = {};
+
+          core.configService.getAnnotationsIds.and.returnValue([
+            "test/AnnotationA"
+          ]);
+          core.configService.hasAnnotation.and.returnValue(true);
+          core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+
+            if(annotationId == null) {
+              return Promise.resolve(moduleConfig);
+            }
+
+            switch(annotationId) {
+              case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+              default: return null;
+            }
+          });
+
+          core.moduleMetaService.get.and.callFake(function(id) {
+            switch(id) {
+              case "test/AnnotationA": return {
+                loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+              };
+              default: return null;
+            }
+          });
+
+          var meta = new Meta(id, {});
+
+          return meta.prepareAsync().then(function() {
+
+            var annotationA = meta.getAnnotation(AnnotationA);
+
+            expect(annotationA instanceof AnnotationA).toBe(true);
+          });
+        });
+
+        it("should throw when creating the requested annotation had previously failed", function() {
+          var error = new Error("Annotation failed createAsync");
+          var moduleConfig = {};
+          var annotationAConfig = {};
+
+          core.configService.getAnnotationsIds.and.returnValue([
+            "test/AnnotationA"
+          ]);
+          core.configService.hasAnnotation.and.returnValue(true);
+          core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+
+            if(annotationId == null) {
+              return Promise.resolve(moduleConfig);
+            }
+
+            switch(annotationId) {
+              case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+              default: return null;
+            }
+          });
+
+          core.moduleMetaService.get.and.callFake(function(id) {
+            switch(id) {
+              case "test/AnnotationA": return {
+                loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+              };
+              default: return null;
+            }
+          });
+
+          var meta = new Meta(id, {});
+
+          AnnotationA.createAsync = function() {
+            return Promise.reject(error);
+          };
+
+          return meta.prepareAsync().then(function() {
+
+            return Promise.reject("Rejection expected.");
+          }, function(reason) {
+
+            expect(function() {
+              meta.getAnnotation(AnnotationA);
+            }).toThrow(error);
+          });
+        });
+      });
+    });
+
+    describe("#hasAnnotation(Annotation, keyArgs)", function() {
+
+      var Annotation;
+      var AnnotationA;
+      var core;
+      var Meta;
+      var errorMatch;
+
+      beforeEach(function() {
+
+        core = createCoreMock();
+
+        return localRequire.promise([
+          "pentaho/_core/module/Meta",
+          "pentaho/module/Annotation",
+          "tests/pentaho/util/errorMatch"
+        ])
+          .then(function(deps) {
+            var metaFactory = deps[0];
+            Meta = metaFactory(core);
+
+            Annotation = deps[1];
+            errorMatch = deps[2];
+
+            AnnotationA = Annotation.extend({}, {
+              get id() {
+                return "test/AnnotationA";
+              }
+            });
+          });
+      });
+
+      it("should throw if Annotation is null", function() {
+
+        var meta = new Meta(id, {});
+
+        expect(function() {
+          meta.hasAnnotation(null);
+        }).toThrow(errorMatch.argRequired("Annotation"));
+      });
+
+      describe("when module is not yet prepared", function() {
+
+        describe("when given a string identifier", function() {
+
+          it("should return false when the identifier is of a non-existing annotation", function() {
+
+            core.configService.hasAnnotation.and.returnValue(false);
+
+            var meta = new Meta(id, {});
+
+            var result = meta.hasAnnotation("test/AnnotationA");
+
+            expect(result).toBe(false);
+          });
+
+          it("should return true when the identifier is of an existing annotation " +
+            "which has not yet been loaded", function() {
+
+            core.configService.hasAnnotation.and.returnValue(true);
+
+            var meta = new Meta(id, {});
+
+            var result = meta.hasAnnotation("test/AnnotationA");
+
+            expect(result).toBe(true);
+          });
+
+          it("should return true if it exists and had been previously obtained", function() {
+
+            var annotationAConfig = {};
+
+            core.configService.getAnnotationsIds.and.returnValue([
+              "test/AnnotationA"
+            ]);
+            core.configService.hasAnnotation.and.returnValue(true);
+            core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+              switch(annotationId) {
+                case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+                default: return null;
+              }
+            });
+
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            return meta.getAnnotationAsync("test/AnnotationA").then(function(annotation) {
+
+              var result = meta.hasAnnotation("test/AnnotationA");
+
+              expect(result).toBe(true);
+            });
+          });
+        });
+
+        describe("when given an annotation constructor", function() {
+
+          it("should throw an error if the function has no id", function() {
+
+            var meta = new Meta(id, {});
+            var NotAnAnnotation = function() {};
+
+            expect(function() {
+              meta.hasAnnotation(NotAnAnnotation);
+            }).toThrow(errorMatch.argRequired("Annotation.id"));
+          });
+
+          it("should return false when the module is not annotated with the requested annotation", function() {
+
+            core.configService.hasAnnotation.and.returnValue(false);
+
+            var meta = new Meta(id, {});
+
+            var result = meta.hasAnnotation(AnnotationA);
+
+            expect(result).toBe(false);
+          });
+
+          it("should return true when the identifier is of an existing annotation " +
+            "which has not yet been loaded", function() {
+
+            core.configService.hasAnnotation.and.returnValue(true);
+
+            var meta = new Meta(id, {});
+
+            var result = meta.hasAnnotation(AnnotationA);
+
+            expect(result).toBe(true);
+          });
+
+          it("should return true if it exists and had been previously obtained", function() {
+
+            var annotationAConfig = {};
+
+            core.configService.getAnnotationsIds.and.returnValue([
+              "test/AnnotationA"
+            ]);
+            core.configService.hasAnnotation.and.returnValue(true);
+            core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+              switch(annotationId) {
+                case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+                default: return null;
+              }
+            });
+
+            core.moduleMetaService.get.and.callFake(function(id) {
+              switch(id) {
+                case "test/AnnotationA": return {
+                  loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+                };
+                default: return null;
+              }
+            });
+
+            var meta = new Meta(id, {});
+
+            return meta.getAnnotationAsync(AnnotationA).then(function() {
+
+              var result = meta.hasAnnotation(AnnotationA);
+
+              expect(result).toBe(true);
+            });
+          });
+        });
+      });
+
+      describe("when module is prepared", function() {
+
+        it("should return false when the module is not annotated with that annotation", function() {
+
+          core.configService.hasAnnotation.and.returnValue(false);
+
+          var meta = new Meta(id, {});
+
+          return meta.prepareAsync().then(function() {
+
+            var result = meta.hasAnnotation(AnnotationA);
+
+            expect(result).toBe(false);
+          });
+        });
+
+        it("should return true if the module is annotated with that annotation", function() {
+
+          var moduleConfig = {};
+          var annotationAConfig = {};
+
+          core.configService.getAnnotationsIds.and.returnValue([
+            "test/AnnotationA"
+          ]);
+          core.configService.hasAnnotation.and.returnValue(true);
+          core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+
+            if(annotationId == null) {
+              return Promise.resolve(moduleConfig);
+            }
+
+            switch(annotationId) {
+              case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+              default: return null;
+            }
+          });
+
+          core.moduleMetaService.get.and.callFake(function(id) {
+            switch(id) {
+              case "test/AnnotationA": return {
+                loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+              };
+              default: return null;
+            }
+          });
+
+          var meta = new Meta(id, {});
+
+          return meta.prepareAsync().then(function() {
+
+            var result = meta.hasAnnotation(AnnotationA);
+
+            expect(result).toBe(true);
+          });
+        });
+
+        it("should return true if the module is annotated with that annotation and " +
+          "its creation had previously failed", function() {
+          var error = new Error("Annotation failed createAsync");
+          var moduleConfig = {};
+          var annotationAConfig = {};
+
+          core.configService.getAnnotationsIds.and.returnValue([
+            "test/AnnotationA"
+          ]);
+          core.configService.hasAnnotation.and.returnValue(true);
+          core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+
+            if(annotationId == null) {
+              return Promise.resolve(moduleConfig);
+            }
+
+            switch(annotationId) {
+              case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+              default: return null;
+            }
+          });
+
+          core.moduleMetaService.get.and.callFake(function(id) {
+            switch(id) {
+              case "test/AnnotationA": return {
+                loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+              };
+              default: return null;
+            }
+          });
+
+          var meta = new Meta(id, {});
+
+          AnnotationA.createAsync = function() {
+            return Promise.reject(error);
+          };
+
+          return meta.prepareAsync().then(function() {
+
+            return Promise.reject("Rejection expected.");
+          }, function(reason) {
+
+            var result = meta.hasAnnotation(AnnotationA);
+            expect(result).toBe(true);
+          });
+        });
+      });
+    });
+
+    describe("#getAnnotationsIds(keyArgs)", function() {
+
+      var Annotation;
+      var AnnotationA;
+      var AnnotationB;
+      var core;
+      var Meta;
+
+      beforeEach(function() {
+
+        core = createCoreMock();
+
+        return localRequire.promise([
+          "pentaho/_core/module/Meta",
+          "pentaho/module/Annotation"
+        ])
+          .then(function(deps) {
+            var metaFactory = deps[0];
+            Meta = metaFactory(core);
+
+            Annotation = deps[1];
+
+            AnnotationA = Annotation.extend({}, {
+              get id() {
+                return "test/AnnotationA";
+              }
+            });
+
+            AnnotationB = Annotation.extend({}, {
+              get id() {
+                return "test/AnnotationB";
+              }
+            });
+          });
+      });
+
+      describe("when module is not yet prepared", function() {
+
+        it("should return null when there is no config service", function() {
+
+          core.configService = null;
+
+          var meta = new Meta(id, {});
+
+          var result = meta.getAnnotationsIds();
+
+          expect(result).toBe(null);
+        });
+
+        it("should return the array returned by the config service", function() {
+
+          core.configService.getAnnotationsIds.and.returnValue([
+            "test/AnnotationA", "test/AnnotationB"
+          ]);
+
+          var meta = new Meta(id, {});
+
+          var result = meta.getAnnotationsIds();
+
+          expect(result).toEqual(["test/AnnotationA", "test/AnnotationB"]);
+        });
+
+        it("should return null if the config service returns null", function() {
+
+          core.configService.getAnnotationsIds.and.returnValue(null);
+
+          var meta = new Meta(id, {});
+
+          var result = meta.getAnnotationsIds();
+
+          expect(result).toBe(null);
+        });
+      });
+
+      describe("when module is prepared", function() {
+
+        it("should return the existing annotation ids when there are annotations", function() {
+
+          var moduleConfig = {};
+          var annotationAConfig = {};
+          var annotationBConfig = {};
+
+          core.configService.getAnnotationsIds.and.returnValue([
+            "test/AnnotationA", "test/AnnotationB"
+          ]);
+          core.configService.hasAnnotation.and.returnValue(true);
+          core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+            if(annotationId == null) {
+              return Promise.resolve(moduleConfig);
+            }
+
+            switch(annotationId) {
+              case "test/AnnotationA": return Promise.resolve(annotationAConfig);
+              case "test/AnnotationB": return Promise.resolve(annotationBConfig);
+              default: return null;
+            }
+          });
+
+          core.moduleMetaService.get.and.callFake(function(id) {
+            switch(id) {
+              case "test/AnnotationA": return {
+                loadAsync: jasmine.createSpy("AnnotationA.loadAsync").and.returnValue(Promise.resolve(AnnotationA))
+              };
+              case "test/AnnotationB": return {
+                loadAsync: jasmine.createSpy("AnnotationB.loadAsync").and.returnValue(Promise.resolve(AnnotationB))
+              };
+              default: return null;
+            }
+          });
+
+          var meta = new Meta(id, {});
+
+          return meta.prepareAsync()
+            .then(function() {
+              var result = meta.getAnnotationsIds();
+
+              expect(result).toEqual(["test/AnnotationA", "test/AnnotationB"]);
+            });
+        });
+
+        it("should return null when there are no annotations", function() {
+
+          var moduleConfig = {};
+
+          core.configService.getAnnotationsIds.and.returnValue(null);
+          core.configService.hasAnnotation.and.returnValue(false);
+          core.configService.selectAsync.and.callFake(function(moduleId, annotationId) {
+            if(annotationId == null) {
+              return Promise.resolve(moduleConfig);
+            }
+          });
+
+          var meta = new Meta(id, {});
+
+          return meta.prepareAsync()
+            .then(function() {
+              var result = meta.getAnnotationsIds();
+
+              expect(result).toBe(null);
+            });
+        });
       });
     });
   });

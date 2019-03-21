@@ -30,5 +30,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.MultiChartRangeScope})
-  .configure({$type: module.config});
+  .configure();
 });

@@ -30,5 +30,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.EmptyCellMode})
-  .configure({$type: module.config});
+  .configure();
 });

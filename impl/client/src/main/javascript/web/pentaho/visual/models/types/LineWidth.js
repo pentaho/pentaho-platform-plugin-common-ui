@@ -30,5 +30,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.LineWidth})
-  .configure({$type: module.config});
+  .configure();
 });

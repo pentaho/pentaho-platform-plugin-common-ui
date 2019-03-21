@@ -86,7 +86,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.HeatGrid})
-  .configure({$type: module.config});
+  .configure();
 
   function __isRequiredOneMeasure() {
     /* jshint validthis:true*/

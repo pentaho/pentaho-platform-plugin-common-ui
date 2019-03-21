@@ -72,7 +72,7 @@ define([
    *       ]
    *     }
    *   })
-   *   .configure({$type: module.config});
+   *   .configure();
    * });
    * ```
    *
@@ -199,5 +199,5 @@ define([
       throw error.operInvalid("Enum types are final and cannot be subtyped.");
     }
   })
-  .configure({$type: module.config});
+  .configure();
 });

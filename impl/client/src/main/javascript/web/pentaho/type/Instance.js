@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,12 @@ define([
   "pentaho/module!_",
   "./InstanceType",
   "./SpecificationScope",
+  "pentaho/module/metaService",
   "pentaho/i18n!types",
   "pentaho/lang/Base",
   "pentaho/util/error",
   "pentaho/util/object"
-], function(module, Type, SpecificationScope, bundle, Base, error, O) {
+], function(module, Type, SpecificationScope, moduleMetaService, bundle, Base, error, O) {
 
   "use strict";
 
@@ -271,11 +272,27 @@ define([
      *
      * Works similarly to {@link pentaho.lang.Base.implement}.
      *
-     * @param {object} config - The configuration information.
+     * @param {object} [config] - The configuration information. When unspecified,
+     * or specified as `undefined`, and the type is identified,
+     * the corresponding module configuration, if already loaded, is used to configure the type.
      *
      * @return {Class.<pentaho.type.Instance>} This constructor.
      */
     configure: function(config) {
+
+      if(config === undefined) {
+        var id = this.type.id;
+        if(id !== null) {
+          var module = moduleMetaService.get(id);
+          if(module !== null) {
+            config = module.config;
+            if(config !== null) {
+              config = {$type: config};
+            }
+          }
+        }
+      }
+
       return this.implement(config);
     }
   });

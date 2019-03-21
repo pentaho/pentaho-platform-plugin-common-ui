@@ -637,7 +637,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.ModelAdapter})
-  .configure({$type: module.config});
+  .configure();
 
   return ModelAdapter;
 

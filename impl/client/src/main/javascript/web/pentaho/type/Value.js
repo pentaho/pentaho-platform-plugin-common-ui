@@ -550,7 +550,7 @@ define([
     isRoot: true
   })
   .localize({$type: bundle.structured.Value})
-  .configure({$type: module.config});
+  .configure();
 
   return Value;
 });

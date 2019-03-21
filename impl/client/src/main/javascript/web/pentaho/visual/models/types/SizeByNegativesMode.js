@@ -30,5 +30,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.SizeByNegativesMode})
-  .configure({$type: module.config});
+  .configure();
 });

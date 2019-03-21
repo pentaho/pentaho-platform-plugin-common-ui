@@ -465,7 +465,7 @@ define([
     }
   })
   .localize({$type: bundle.structured.Simple})
-  .configure({$type: module.config});
+  .configure();
 
   return Simple;
 });

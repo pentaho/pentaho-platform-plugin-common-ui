@@ -117,5 +117,5 @@ define([
     }
   })
   .localize({$type: bundle.structured.MappingField})
-  .configure({$type: module.config});
+  .configure();
 });
