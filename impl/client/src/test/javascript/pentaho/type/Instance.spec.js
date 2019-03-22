@@ -139,7 +139,7 @@ define([
       });
     });
 
-    fdescribe(".configure(spec)", function() {
+    describe(".configure(spec)", function() {
 
       it("should call implement with the given spec", function() {
 
