@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+* Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 *
 */
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "dojox/html/entities", "dojo/dom-class", "dojo/_base/array",
-"dojo/dom-construct", "dojo/dnd/Source", "dojo/dnd/Selector", "dojo/_base/lang", "dojo/dom", "dojo/_base/event"],
-    function(declare, _WidgetBase, _Templated, on, query, entities, domClass, array, construct, Source, Selector, lang, dom, event){
+"dojo/dom-construct", "dojo/dnd/Source", "dojo/dnd/Selector", "dojo/_base/lang", "dojo/dom", "dojo/_base/event", "dojo/regexp"],
+    function(declare, _WidgetBase, _Templated, on, query, entities, domClass, array, construct, Source, Selector, lang, dom, event, regexp){
       return declare("pentaho.common.FieldList",
     [_WidgetBase, _Templated],
 {
@@ -30,6 +30,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
   categorize: true,
   categoryClassMap: {},
   usedCategoryIds: {},
+  fieldListNodes: [],
+  localeStringFind: "Find:",
+  localeStringClearSearch: "Clear Search",
 
   sanitizeIdAndClassNames: function(name) {
     if(name != null){
@@ -142,6 +145,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
   },
 
   _localize: function() {
+    if (this.getLocaleString) {
+      this.localeStringFind = this.getLocaleString("fieldListFind");
+      this.localeStringClearSearch = this.getLocaleString("fieldListClearSearch");
+    }
   },
 
   _addItemClass: function(node, type){
@@ -185,9 +192,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
 
     this.categoryClassMap = {};
     this.usedCategoryIds = {};
+    this.fieldListNodes = [];
   },
 
-  configureFor: function(datasource) {
+  configureFor: function(datasource, searchContainer) {
     this.unload();
 
     this.dndObj = new Source(this.containerNode,
@@ -215,6 +223,18 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     this.dndObj._addItemClass = this._addItemClass;
     this.dndObj._removeItemClass = this._removeItemClass;
 
+    // If configureFor is called with a searchContainer then search functionality will be added to 
+    // this instance of the fieldlist and the search input box will be appended to the searchContainer node
+    if (searchContainer) {
+      var searchBox = construct.create("div",
+      {
+        "id": "searchBox"
+      }, searchContainer);
+      searchBox.innerHTML = this.localeStringFind + " <input type=text id='searchField' /><div id='clearSearchField' title='" + this.localeStringClearSearch + "' class='hidden pentaho-deletebutton'></div>";
+      this.connectHandles.push(on(dom.byId("searchField"),  'keyup', lang.hitch( this,  "searchFields")));
+      this.connectHandles.push(on(dom.byId("clearSearchField"),  'click', lang.hitch( this,  "onClearSearch")));
+    }
+    
     if(!this.categorize) {
       var fields = this.getFields(datasource, null, this.filters);
       this.addFields( fields, this.containerNode, '' );
@@ -224,6 +244,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     var addedCategories = [];
 
     var categories = this.getCategories(datasource);
+    
+    var isFirstCategory = true;
 
     array.forEach(categories, function(category, idx) {
       if (array.indexOf(addedCategories, category.id) != -1) {
@@ -241,7 +263,12 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         {
           "id": catId
         }, this.containerNode);
-
+      if (isFirstCategory) {
+        domClass.add(categoryDiv, "categoryNodeFirst");
+        isFirstCategory = false;
+      } else {
+        domClass.add(categoryDiv, "categoryNodeNotFirst");
+      }
       // create +- expand/collapse indicator
       var categoryIndicator = construct.create("div",
         {
@@ -318,7 +345,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         "id": "field-" + this.sanitizeIdAndClassNames(item.fieldId),
         "innerHTML": item.displayName,
         "fieldId": item.fieldId,
-        "class": item.categoryId
+        "class": item.categoryId,
+        "categoryId" : item.categoryId
     };
     if(item.description) {
         props.title = item.description;
@@ -326,6 +354,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     	props.title = item.fieldId;
     }
     var div = construct.create("div", props);
+    this.fieldListNodes.push(div);
     if (hint === "avatar") {
       domClass.add(div, "dragDropAvatar");
     } else {
@@ -554,6 +583,103 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
 
   setContextMenu: function( fieldContextMenu ) {
     this.fieldContextMenu = fieldContextMenu;
+  },
+  
+  searchFields: function(key) {
+  
+    var isFirstCategory = true;
+    var searchField = dom.byId("searchField");
+    var clearSearchField = dom.byId("clearSearchField");
+    
+    // if only one field shown, press return to add it
+    if (key && key.keyCode == 13) {
+      if (this.fieldCount == 1 && this.dndObj && this.dndObj.anchor) {
+        if(this.doubleClickCallback) {
+            this.doubleClickCallback(dojo.attr(this.dndObj.anchor, "fieldId"));
+            this.clearSelection();
+        }
+      }
+      return;
+    }
+    
+    // Reset the highlight on the last selected field if there was one
+    this.clearSelection();
+  
+    // do search
+    var key = searchField.value;
+    var len = this.fieldListNodes.length;
+    this.fieldCount = 0;
+    var re = null;
+    if (key) {
+      re = new RegExp(regexp.escapeString(key), 'i');
+      domClass.remove(clearSearchField, "hidden");
+    } else {
+      domClass.add(clearSearchField, "hidden");
+    }
+
+    var showGroup = false, groupHeader = null;
+    var firstNode = null;
+    for (var x = 0; x < len; ++x) {
+      var node = this.fieldListNodes[x];
+      // if group changes, hide the group header first
+      var nodeGroupHeader = dom.byId(dojo.attr(node, "categoryId"));
+      if (groupHeader != nodeGroupHeader) {
+        groupHeader = nodeGroupHeader;
+        showGroup = false;
+        if (groupHeader) {
+          domClass.add(groupHeader, "hidden");
+          domClass.remove(groupHeader, "categoryNodeFirst");
+          domClass.remove(groupHeader, "categoryNodeNotFirst");
+        }
+      }
+      if (!re || node.textContent.search(re) >= 0) {
+        domClass.remove(node, "hidden");
+        ++this.fieldCount;
+        if (!firstNode)
+          firstNode = node; // remember the first node
+        if (!showGroup && groupHeader) {
+          domClass.remove(groupHeader, "hidden");
+          showGroup = true;
+          if (isFirstCategory) {
+            domClass.add(groupHeader, "categoryNodeFirst");
+            isFirstCategory = false;
+          } else {
+            domClass.add(groupHeader, "categoryNodeNotFirst");
+          }
+        }
+      } else {
+        domClass.add(node, "hidden");
+      }
+    }
+    
+    // if there is only one node left, do sth special
+    if (this.fieldCount === 1) {
+      this.updateSelectionForContextMenu(dojo.attr(firstNode, "fieldId"));
+    } 
+    
+    this.expandAllCategories();
+  },
+  
+  onClearSearch : function() {
+    var searchField = dom.byId("searchField");
+    var clearSearchField = dom.byId("clearSearchField");
+    if (searchField.value) {
+      searchField.value = "";
+      this.searchFields();
+      this.expandAllCategories();
+      searchField.focus();
+    }
+    domClass.add(clearSearchField, "hidden");
+  },
+  
+  expandAllCategories : function() {
+    for (var categoryId in this.usedCategoryIds) {
+      var indicatorNode = dom.byId(categoryId + "-indicator");
+      var expanded = dojo.attr(indicatorNode, "collapsed") != "true";
+      if (!expanded) {
+        this.expandCollapseCategory({target: indicatorNode})
+      }
+    }
   }
 
 });
