@@ -1539,12 +1539,7 @@ define([
      * @protected
      */
     _getVisualElementsCountMax: function() {
-
-      // TODO: Currently, this is DET dependent...
-
-      var modelTypeApp = this.model.$type.application;
-      var cellCountMax = +(modelTypeApp && modelTypeApp.optimalMaxDataSize);
-      return cellCountMax > 0 ? cellCountMax : -1;
+      return -1;
     },
 
     _validateVisualElementsCount: function(count, countMax) {
