@@ -59,6 +59,7 @@ define([
     window.analyzerModules = {};
   }
 
+
   /**
    * build query string of provided options to append to iframe src url
    *
@@ -90,6 +91,11 @@ define([
       }
 
       queryObj["ts"] = new Date().getTime();
+
+      var useDebug = typeof document === "undefined" || document.location.href.indexOf("debug=true") > 0;
+      if(useDebug) {
+        queryObj["debug"] = "true";
+      }
 
       result = ioQuery.objectToQuery(queryObj);
     }
