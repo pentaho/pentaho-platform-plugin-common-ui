@@ -85,9 +85,7 @@
     "common-ui/properties-parser": "/angular-translate/properties-parser",
     "common-ui/angular-translate": "/angular-translate/angular-translate",
     "common-ui/angular-translate-loader-partial": "/angular-translate/angular-translate-loader-partial",
-    "common-ui/angular-translate-loader-static": "/angular-translate/angular-translate-loader-static-files",
-    "common-ui/angular-ui-bootstrap": "/bootstrap/ui-bootstrap-tpls-0.6.0.min",
-    "common-ui/angular-directives": "/angular-directives"
+    "common-ui/angular-translate-loader-static": "/angular-translate/angular-translate-loader-static-files"
   },
 
   "map": {
@@ -546,16 +544,6 @@
     "common-ui/angular-translate-loader-static": {
       "deps": [
         "common-ui/angular-translate"
-      ]
-    },
-    "common-ui/angular-ui-bootstrap": {
-      "deps": [
-        "common-ui/angular"
-      ]
-    },
-    "common-ui/angular-directives": {
-      "deps": [
-        "common-ui/angular-ui-bootstrap"
       ]
     }
   },
