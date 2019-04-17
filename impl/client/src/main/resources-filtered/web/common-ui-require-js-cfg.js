@@ -308,40 +308,117 @@
 
   requireModules["pentaho/visual/config"] = {type: "pentaho/config/spec/IRuleSet"};
 
-  requireModules["pentaho/visual/models/Abstract"] = {
-    base: "pentaho/visual/Model",
+  requireModules["pentaho/visual/models/Abstract"] = {base: "pentaho/visual/Model"};
+  requireModules["pentaho/visual/models/CartesianAbstract"] = {base: "pentaho/visual/models/Abstract"};
+
+  requireModules["pentaho/visual/models/CategoricalContinuousAbstract"] = {
+    base: "pentaho/visual/models/CartesianAbstract"
+  };
+
+  requireModules["pentaho/visual/models/BarAbstract"] = {base: "pentaho/visual/models/CategoricalContinuousAbstract"};
+
+  requireModules["pentaho/visual/models/Bar"] = {
+    base: "pentaho/visual/models/BarAbstract",
     annotations: {
-      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/Abstract"}
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/Bar"}
     }
   };
+  requireModules["pentaho/visual/models/BarHorizontal"] = {
+    base: "pentaho/visual/models/BarAbstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/BarHorizontal"}
+    }
+  };
+  requireModules["pentaho/visual/models/BarStacked"] = {
+    base: "pentaho/visual/models/BarAbstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/BarStacked"}
+    }
+  };
+  requireModules["pentaho/visual/models/BarStackedHorizontal"] = {
+    base: "pentaho/visual/models/BarAbstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/BarStackedHorizontal"}
+    }
+  };
+  requireModules["pentaho/visual/models/BarLine"] = {
+    base: "pentaho/visual/models/BarAbstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/BarLine"}
+    }
+  };
+  requireModules["pentaho/visual/models/BarNormalizedAbstract"] = {base: "pentaho/visual/models/BarAbstract"};
+  requireModules["pentaho/visual/models/BarNormalized"] = {
+    base: "pentaho/visual/models/BarNormalizedAbstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/BarNormalized"}
+    }
+  };
+  requireModules["pentaho/visual/models/BarNormalizedHorizontal"] = {
+    base: "pentaho/visual/models/BarNormalizedAbstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/BarNormalizedHorizontal"}
+    }
+  };
+
+  requireModules["pentaho/visual/models/Sunburst"] = {
+    base: "pentaho/visual/models/Abstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/Sunburst"}
+    }
+  };
+  requireModules["pentaho/visual/models/Pie"] = {
+    base: "pentaho/visual/models/Abstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/Pie"}
+    }
+  };
+  requireModules["pentaho/visual/models/Donut"] = {
+    base: "pentaho/visual/models/Pie",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/Donut"}
+    }
+  };
+
+  requireModules["pentaho/visual/models/MetricPointAbstract"] = {base: "pentaho/visual/models/CartesianAbstract"};
+  requireModules["pentaho/visual/models/Scatter"] = {
+    base: "pentaho/visual/models/MetricPointAbstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/Scatter"}
+    }
+  };
+  requireModules["pentaho/visual/models/Bubble"] = {
+    base: "pentaho/visual/models/MetricPointAbstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/Bubble"}
+    }
+  };
+
+  requireModules["pentaho/visual/models/PointAbstract"] = {base: "pentaho/visual/models/CartesianAbstract"};
+  requireModules["pentaho/visual/models/Line"] = {
+    base: "pentaho/visual/models/PointAbstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/Line"}
+    }
+  };
+  requireModules["pentaho/visual/models/AreaStacked"] = {
+    base: "pentaho/visual/models/PointAbstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/AreaStacked"}
+    }
+  };
+
+  requireModules["pentaho/visual/models/HeatGrid"] = {
+    base: "pentaho/visual/models/CartesianAbstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/HeatGrid"}
+    }
+  };
+
   requireModules["pentaho/visual/samples/calc/Model"] = {
     base: "pentaho/visual/Model",
     annotations: {"pentaho/visual/DefaultView": {/* module: "./View" */}}
   };
-  [
-    "BarHorizontal",
-    "Bar",
-    "BarStacked",
-    "BarStackedHorizontal",
-    "BarNormalized",
-    "BarNormalizedHorizontal",
-    "BarLine",
-    "Line",
-    "AreaStacked",
-    "Pie",
-    "HeatGrid",
-    "Sunburst",
-    "Donut",
-    "Scatter",
-    "Bubble"
-  ].forEach(function(name) {
-    requireModules["pentaho/visual/models/" + name] = {
-      base: "pentaho/visual/models/Abstract",
-      annotations: {
-        "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/" + name}
-      }
-    };
-  });
   // endregion
 
   // Color Palettes
