@@ -841,27 +841,30 @@ define([
      * @protected
      */
     _configureDiscreteColors: function() {
-
       var defaultScale = pv.colors(this._getDefaultDiscreteColors());
-      var scale;
+      var compositeColorMapScale;
 
       if(this._discreteColorRole) {
         var colorMap = this._getDiscreteColorMap();
         if(colorMap) {
           // Final?
           if(def.fun.is(colorMap)) {
-            scale = colorMap;
+            compositeColorMapScale = colorMap;
           } else {
             var colorMapScale = function(key) {
               return def.getOwn(colorMap, key);
             };
 
-            scale = this._createDiscreteColorMapScaleFactory(colorMapScale, defaultScale);
+            colorMapScale.domain = function() {
+              return Object.keys(colorMap);
+            };
+
+            compositeColorMapScale = this._createDiscreteColorMapScaleFactory(colorMapScale, defaultScale);
           }
         }
       }
 
-      this.options.colors = scale || defaultScale;
+      this.options.colors = compositeColorMapScale || defaultScale;
     },
 
     _configureContinuousColors: function() {
@@ -1042,21 +1045,43 @@ define([
      */
     _createDiscreteColorMapScaleFactory: function(colorMapScale, baseScale) {
 
-      // Make sure the scales returned by scaleFactory
-      // "are like" pv.Scale - have all the necessary methods.
-      return function safeScaleFactory() {
-        return def.copy(scaleFactory(), baseScale);
-      };
+      return function composedScaleFactory(initialBaseDomain) {
 
-      function scaleFactory() {
-        return function(compKey) {
+        baseScale.domain(initialBaseDomain);
+
+        // Make sure the scales returned by scaleFactory
+        // "are like" pv.Scale - have all the necessary methods.
+        def.copy(composedScale, baseScale);
+
+        composedScale.domain = function() {
+
+          var colorMapDomain = colorMapScale.domain();
+          var baseDomain = baseScale.domain(); // .map(extractBaseKey);
+
+          return def.query(colorMapDomain)
+            .union(baseDomain)
+            .distinct(def.identity)
+            .array();
+        };
+
+        return composedScale;
+
+        function composedScale(compKey) {
           if(compKey) {
-            var keys = compKey.split("~");
-            var key = keys[keys.length - 1];
+            var key = extractBaseKey(compKey);
             return colorMapScale(key) || baseScale(key);
           }
-        };
-      }
+        }
+
+        // By the members palette specification,
+        // only the last field of the visual role (which is) used for color determination is actually used.
+        // That field must have an associated members palette.
+        // Thus, the actual, composite key is split and the last segment obtained for indexing the base color scales.
+        function extractBaseKey(compKey) {
+          var keys = compKey.split("~");
+          return keys[keys.length - 1];
+        }
+      };
     },
     // endregion
 
@@ -1075,6 +1100,7 @@ define([
 
       options.trendType = trendType;
       if(trendType !== "none") {
+
         var trendName = model.trendName;
         if(!trendName)
           trendName = bundle.get("trend.name." + trendType.toLowerCase(), trendType);
@@ -1092,6 +1118,13 @@ define([
           var radius = 5 / 6 * (value - 2) + 4;
           options.trendDot_shapeSize = radius * radius;
         }
+
+        // Don't inherit the members palette color scale for trends.
+        var defaultScale = pv.colors(this._getDefaultDiscreteColors());
+        this.options.color2AxisColors = defaultScale;
+      } else if(this._supportsTrends) {
+        // Could have been set before...
+        delete this.options.color2AxisColors;
       }
     },
 
