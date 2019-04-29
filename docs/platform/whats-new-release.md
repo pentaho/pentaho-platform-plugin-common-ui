@@ -183,4 +183,4 @@ The use of _Type API_ types and instances has been greatly simplified.
 
 ### Visualization API
 
-See [What's new and changed in the Visualization API beta 4]({{ "/platform/visual/whats-new-beta-4" | relative_url }}).
+See [What's new and changed in the Visualization API]({{ "/platform/visual/whats-new-release" | relative_url }}).

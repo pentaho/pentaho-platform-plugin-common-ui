@@ -6,7 +6,7 @@ layout: default
 ---
 
 You might want to take a look at 
-[What's new and changed in the Platform JavaScript APIs beta 4](../whats-new-beta-4). 
+[What's new and changed in the Platform JavaScript APIs](../whats-new-beta-release). 
 
 ## Procedure for converting a visualization from beta 3 to beta 4
 
