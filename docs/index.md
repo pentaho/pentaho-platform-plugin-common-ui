@@ -95,6 +95,15 @@ The APIs are organized as follows:
                     <li>
                         <dl>
                             <dt>
+                                <a title="Pentaho JavaScript Theming API"
+                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.theme'}}">Theming</a>
+                            </dt>
+                            <dd>Coordinates themes registration and application.</dd>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl>
+                            <dt>
                                 <a title="Pentaho JavaScript Language Support API"
                                    href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.lang'}}">Language Support</a>
                             </dt>

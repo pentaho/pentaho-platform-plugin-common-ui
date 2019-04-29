@@ -47,7 +47,7 @@ npm install
   ```
   
 2. Now, you should edit the just created `package.json` file and add the `paths` property to it,
-   to define the root AMD/RequireJS module ID as `pentaho/visual/samples/barD3`:
+   to define the root AMD/RequireJS module identifier as `pentaho/visual/samples/barD3`:
    
    ```json
    {
@@ -69,7 +69,7 @@ npm install
    
    {% include callout.html type="warning" content="<h3>Attention</h3>
    <p>This tutorial assumes the name <code>@pentaho/visual-samples-bar-d3</code> as your package name
-      and the name <code>pentaho/visual/samples/barD3</code> as the root AMD/RequireJS module ID. 
+      and the name <code>pentaho/visual/samples/barD3</code> as the root AMD/RequireJS module identifier. 
       If you which to use different names, 
       you will have to take care to change all the references to the original names throughout the tutorial.
    </p>

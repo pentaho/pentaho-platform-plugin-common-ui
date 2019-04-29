@@ -1,64 +1,23 @@
 ---
-title: What's new and changed in the Visualization API beta 4
-description: Describes the new and changed features in the beta 4 of the Visualization API.
+title: What's new and changed in the Visualization API release
+description: Describes the new and changed features in the release version of the Visualization API, relative to the beta 4 version.
 parent-title: Visualization API
 layout: default
 ---
 
 You might want to take a look at 
-[What's new and changed in the Platform JavaScript APIs](../whats-new-beta-release). 
+[What's new and changed in the Platform JavaScript APIs release](../whats-new-release). 
 
-## Procedure for converting a visualization from beta 3 to beta 4
+## Procedure for converting a visualization from beta 4 to release
 
 ### Convert the Model class
 
-1. Convert the file name to camel case.
-2. Add the `pentaho/module!_` dependency to the AMD module.
-3. Move _Type API_ dependencies to dependencies of the AMD module,
-   converting all type modules to camel case.
-   Includes, at a minimum, the base model type dependency.
-4. Specify the `id` type property using `module.id`.
-5. Convert the `defaultView` type property to reference 
-   the new camel case view identifier.
-6. Convert any other references to _Type API_ types to camel case, 
-   for example, in visual role properties, 
-   convert their `base` attribute to `pentaho/visual/role/Property`.
-7. Apply the module configuration to the type.
+1. Change the identifier `pentaho/visual/base/Model` to `pentaho/visual/Model`.
+2. Remove the `defaultView` attribute (but remember what it contained).
+3. Remove the `{$type: module.config}` argument of the `configure` method call;
+   this is now the default behavior.
 
 **Before Example**
-```js
-// File .../model.js
-define(["module"], function(module) {
-  
-  return ["pentaho/visual/base/model", function(BaseModel) {
-    
-    return BaseModel.extend({
-      $type: {
-        id: module.id,
-        defaultView: "./view",
-        props: [
-          // Visual role property
-          {
-            name: "category",
-            base: "pentaho/visual/role/property",
-            fields: {isRequired: true}
-          },
-            
-          // Palette property
-          {
-            name: "palette",
-            base: "pentaho/visual/color/paletteProperty",
-            levels: "nominal",
-            isRequired: true
-          }
-        ]
-      }
-    });
-  }];
-});
-```
-
-**After Example**
 ```js
 // File .../Model.js
 define([
@@ -92,52 +51,114 @@ define([
 });
 ```
 
-### Convert the View class
-
-1. Convert the file name to camel case.
-2. Add the `pentaho/module!_` dependency to the AMD module.
-3. Move _Type API_ dependencies to dependencies of the AMD module,
-   converting all type modules to camel case.
-   Includes, at a minimum, the base view type and the associated model dependencies.
-4. Specify the `id` type property using `module.id`.
-5. Convert any other references to _Type API_ types to camel case, 
-   for example, the identifiers of select or execute actions,
-   or of filters. For example:
-   * `pentaho/visual/action/Select`
-   * `pentaho/visual/action/Execute`
-   * `pentaho/data/filter/And`.
-6. Apply the module configuration to the type.
-
-**Before Example**
+**After Example**
 ```js
-// File .../view.js
-define(["module"], function(module) {
+// File .../Model.js
+define([
+  "pentaho/module!_",
+  "pentaho/visual/Model"
+], function(module, BaseModel) {
   
-  return [
-    "pentaho/visual/base/view", 
-    "./model",
-    "pentaho/visual/action/execute",
-    "pentaho/visual/action/select",
-    "pentaho/data/filter/and",
-    function(BaseView, Model, ExecuteAction, SelectAction, AndFilter) {
-    
-    return BaseView.extend({
-      $type: {
-        id: module.id,
-        props: [
-          {
-            name: "model",
-            valueType: Model
-          }
-        ]
-      },
-      // ...
-    });
-  }];
+  return BaseModel.extend({
+    $type: {
+      id: module.id,
+      props: [
+        // Visual role property
+        {
+          name: "category",
+          base: "pentaho/visual/role/Property",
+          fields: {isRequired: true}
+        },
+        
+        // Palette property
+        {
+          name: "palette",
+          base: "pentaho/visual/color/PaletteProperty",
+          levels: "nominal",
+          isRequired: true
+        }
+      ]
+    }
+  })
+  .configure();
 });
 ```
 
-**After Example**
+### Change the model registration
+
+In the associated `package.json` file, 
+change the identifier `pentaho/visual/base/Model` to `pentaho/visual/Model`.
+
+### Register the default view
+
+In the associated `package.json` file, 
+add a 
+[pentaho/visual/DefaultViewAnnotation]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.DefaultViewAnnotation'}}) 
+module annotation to the visualization model's module, 
+referencing the value which was previously on the `defaultView` attribute
+(the `"..."` properties stand for omitted content):
+
+```json
+{
+  "...": "...",
+  
+  "config": {
+    "pentaho/modules": {
+      
+      "...": "...",
+      
+      "my/viz/Model": {
+        "base": "pentaho/visual/Model",
+        "annotations": {
+        
+          "...": "...",
+          
+          "pentaho/visual/DefaultView": {
+            "module": "./View"
+          },
+          
+          "...": "..."
+        }
+      },
+      
+      "...": "..."
+    }
+  },
+  
+  "...": "...",
+}
+```
+
+### Convert the View class
+
+The view class no longer has a required base class — it simply needs to implement the
+[pentaho/visual/IView]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.IView'}})
+interface. 
+Nonetheless, an optional base class is provided,
+[pentaho/visual/impl/View]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.impl.View'}}),
+which implements basic functionality and is mostly compatible with the previous `pentaho.visual.base.View` base class.
+
+One consequence of this is that view classes no longer need to be Type API types.
+If a view is configurable, it must now implement its configuration logic by reading and applying `module.config`.
+
+1. Remove the dependency on the associated model class.
+2. Replace the dependency on `pentaho/visual/base/View` by a dependency to `pentaho/visual/impl/View`. 
+3. Should no longer need to explicitly depend on the `pentaho/visual/action/Execute` and 
+   `pentaho/visual/action/Select` as the new model methods 
+   [Model#execute]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.Model' | append: '#execute'}}) 
+   and 
+   [Model#select]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.Model' | append: '#select'}})
+   can be conveniently used; 
+   direct calls to the  
+   [Model#act]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.Model' | append: '#act'}}) method
+   can be replaced by these higher-level ones;
+   also, notice how these are now methods of the model and not of the view.
+4. Replace references to `this.width` and `this.height` to `this.model.width` and `this.model.height`, respectively;
+   these two properties have moved to the model class.
+5. Move any code in the now removed `_initDomContainer` method to the constructor.
+6. Move any code in the now removed `_releaseDomContainer` method to the `dispose` method.
+
+**Before Example**
 ```js
 // File .../View.js
 define([
@@ -145,9 +166,8 @@ define([
   "pentaho/visual/base/View",
   "./Model",
   "pentaho/visual/action/Execute",
-  "pentaho/visual/action/Select",
-  "pentaho/data/filter/And" 
-], function(module, BaseView, Model, ExecuteAction, SelectAction, AndFilter) {
+  "pentaho/visual/action/Select"
+], function(module, BaseView, Model, ExecuteAction, SelectAction) {
   
   return BaseView.extend({
     $type: {
@@ -159,106 +179,134 @@ define([
         }
       ]
     },
+    
+    // ...
+    
+    _initDomContainer: function() {
+      
+      // Code to initialize this.domContainer.
+      
+    },
+    
+    _updateAll: function() {
+      
+      var width = this.width;
+      var height = this.height;
+      
+      // ...
+      
+      this.act(new ExecuteAction({dataFilter: dataFilter}));
+      
+      // ...
+      
+      this.act(new SelectAction({dataFilter: dataFilter}));
+    },
+    
+    _releaseDomContainer: function() {
+      
+      // Code to release this.domContainer.
+      
+    }
+    
     // ...
   })
   .configure({$type: module.config});
 });
 ```
 
-### Convert Registrations in the Package Definition
-
-1. Merge the `pentaho/typeInfo` and `pentaho/instanceInfo` sections into a 
-   single `pentaho/modules` section.
-2. Rename the advertised model type to upper case, as long as its base type.
-3. Change rule set configuration modules to be of the type `pentaho/config/spec/IRuleSet`.
-
-**Before Example**:
-```json
-{
-  "name": "my-viz",
-  "version": "1.0.0",
-  "config": {
-    "pentaho/typeInfo": {
-      "my-viz/model": {
-        "base": "pentaho/visual/base/model"
-      }
+**After Example**
+```js
+// File .../View.js
+define([
+  "pentaho/module!_",
+  "pentaho/visual/impl/View"
+], function(module, BaseView) {
+  
+  return BaseView.extend(module.id, {
+    
+    constructor: function(viewSpec) {
+      
+      this.base(viewSpec);
+      
+      // Code to initialize this.domContainer.
+      
     },
-    "pentaho/instanceInfo": {
-      "my-viz/config": {
-        "type": "pentaho.config.spec.IRuleSet"
+    
+    // ...
+    
+    
+    _updateAll: function() {
+       
+      // ...
+       
+      var width = this.model.width;
+      var height = this.model.height;
+             
+      // ...
+      
+      this.model.execute({dataFilter: dataFilter});
+      
+      // ...
+      
+      this.model.select({dataFilter: dataFilter});
+    },
+    
+    // ...
+    
+    dispose: function() {
+      
+      if(this.domContainer !== null) {
+        
+        // Code to release this.domContainer.
+                
       }
+      
+      this.base();
     }
-  }
-}
-```
-
-**After Example**:
-```json
-{
-  "name": "my-viz",
-  "version": "2.0.0",
-  "config": {
-    "pentaho/modules": {
-      "my-viz/Model": {
-        "base": "pentaho/visual/base/Model"
-      },
-      "my-viz/config": {
-        "type": "pentaho/config/spec/IRuleSet"
-      }
-    }
-  }
-}
+  });
+});
 ```
 
 ### Convert Configuration Rules
 
-1. Rename the `type` and `instance` properties to `module`.
-2. Move AMD module dependencies of a rule set module,
-   that are specific to certain rules, 
-   to dependencies of the rules themselves.
-3. Prefer the use of relative module ids in the `module` or `deps` properties.
+1. Rename the identifiers of applications used in the `application` selector attribute of any rules;
+   use [this correspondence table](../whats-new-release#application-identifiers-changed).
 
 **Before Example**:
 ```js
-define(["module"], function(module) {
-  // Replace /config by /model (e.g. "my-viz/model").
-  var vizId = module.id.replace(/(\w+)$/, "model");
-
-  return {
-    rules: [
-      {
-        select: {
-          type: vizId
-        },
-        apply: {
-          props: {
-            barSize: {defaultValue: 50}
-          }
+define({
+  rules: [
+    {
+      select: {
+        module: "./Model",
+        application: "pentaho-analyzer"
+      },
+      apply: {
+        props: {
+          barSize: {defaultValue: 50}
         }
       }
-    ]
-  };
+    }
+  ]
 });
 ```
 
 **After Example**:
 ```js
-define(function() {
-  return {
-    rules: [
-      {
-        select: {
-          // Assuming the config file is beside the Model file.
-          module: "./Model"
-        },
-        apply: {
-          props: {
-            barSize: {defaultValue: 50}
-          }
+define({
+  rules: [
+    {
+      select: {
+        module: "./Model",
+        application: "pentaho/analyzer"
+      },
+      apply: {
+        props: {
+          barSize: {defaultValue: 50}
         }
       }
-    ]
-  };
+    }
+  ]
 });
 ```
 
